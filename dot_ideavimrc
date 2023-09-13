@@ -1,0 +1,391 @@
+"" Source your .vimrc
+"source ~/.vimrc
+
+"" -- Suggested options --
+" Show a few lines of context around the cursor. Note that this makes the
+" text scroll if you mouse-click near the start or end of the window.
+set scrolloff=5
+
+" Do incremental searching.
+set incsearch
+
+" Don't use Ex mode, use Q for formatting.
+map Q gq
+
+
+"" -- Map IDE actions to IdeaVim -- https://jb.gg/abva4t
+"" Map \r to the Reformat Code action
+"map \r <Action>(ReformatCode)
+
+"" Map <leader>d to start debug
+"map <leader>d <Action>(Debug)
+
+"" Map \b to toggle the breakpoint on the current line
+"map \b <Action>(ToggleLineBreakpoint)
+
+
+" Find more examples here: https://jb.gg/share-ideavimrc
+
+" -----------------------------------------------------my configs--------------------------------------------------------
+let mapleader=' '
+
+""" Plugins  --------------------------------
+" https://github.com/AlexPl292/IdeaVim-EasyMotion#supported-commands
+" <ll>s, <ll>f/F, <ll>t/T, <ll>w/W, <ll>b/B, <ll>e/E, <ll>j, <ll>k, <ll>n/N
+set easymotion
+" https://github.com/Mishkun/ideavim-sneak#usage
+" s{char}{char}    s/S    ;/,
+" set sneak
+" https://plugins.jetbrains.com/plugin/19417-ideavim-quickscope
+" f/F/t/T
+" set quickscope
+" https://github.com/JetBrains/ideavim/wiki/NERDTree-support
+" o/O/go, x/X, p/P, j, k, m, q
+set NERDTree
+" https://github.com/tpope/vim-surround/blob/master/doc/surround.txt
+" ys("ys" is "you surround"), cs, ds, S
+set surround
+" https://github.com/terryma/vim-multiple-cursors/blob/master/doc/multiple_cursors.txt
+" TODO how to use?
+set multiple-cursors
+" https://github.com/tpope/vim-commentary/blob/master/doc/commentary.txt
+" [count]gc{motion}, o_gc, v_gc, gcc
+set commentary
+" https://github.com/vim-scripts/ReplaceWithRegister/blob/master/doc/ReplaceWithRegister.txt
+" [count]["x]gr{motion}, [count]["x]grr, {Visual}["x]gr
+set ReplaceWithRegister
+" argument text objects: aa, ia
+set argtextobj
+" https://github.com/tommcdo/vim-exchange/blob/master/doc/exchange.txt
+" cx{motion} to select, again to exchange
+" cx, cxx, v_X, cxc (eg. exchanging two words using `cxiw` and `.`)
+set exchange
+" https://github.com/kana/vim-textobj-entire/blob/master/doc/textobj-entire.txt
+" entire buffer text object: ae, ie(like `ae`, but leading and trailing empty lines are excluded)
+set textobj-entire
+" https://github.com/machakann/vim-highlightedyank/blob/master/doc/highlightedyank.txt
+set highlightedyank
+" https://github.com/dbakker/vim-paragraph-motion#vim-paragraph-motion
+" { }
+set vim-paragraph-motion
+" https://github.com/michaeljsmith/vim-indent-object/blob/master/doc/indent-object.txt
+" ai ii aI iI
+set textobj-indent
+" https://github.com/adelarsq/vim-matchit/blob/master/doc/matchit.txt
+" TODO what is this?
+set matchit
+set which-key
+set notimeout
+" set timeoutlen=5000
+
+""" Plugin settings -------------------------
+let g:argtextobj_pairs="[:],(:),<:>"
+
+let g:highlightedyank_highlight_duration = "500"
+let g:highlightedyank_highlight_color = "rgba(57, 197, 187, 155)"
+
+" <C-n> seems to me as a better solution than <M-n>,
+" map <C-n> <Plug>NextWholeOccurrence
+" Remap multiple-cursors shortcuts to match terryma/vim-multiple-cursors
+nmap <C-n> <Plug>NextWholeOccurrence
+xmap <C-n> <Plug>NextWholeOccurrence
+nmap g<C-n> <Plug>NextOccurrence
+xmap g<C-n> <Plug>NextOccurrence
+xmap <C-x> <Plug>SkipOccurrence
+xmap <C-p> <Plug>RemoveOccurrence
+
+" https://github.com/MarcoIeni/intellimacs/blob/main/which-key.vim
+" Show the menu also for default Vim actions like `gg` or `zz`.
+let g:WhichKey_ShowVimActions = "true"
+" https://github.com/JaimeArboleda/jet_brains_settings/blob/main/.ideavimrc
+" let g:WhichKey_FontSize = 16
+let g:WhichKey_CommandColor = "#41ead4"
+let g:WhichKey_PrefixColor = "#f335b2"
+let g:WhichKey_SortOrder = "by_key_prefix_first"
+let g:WhichKeyDesc_leader = "<leader> Leader key"
+let g:WhichKey_DefaultDelay = 200
+
+" https://github.com/justinmk/vim-sneak
+" map f <Plug>Sneak_f
+" map F <Plug>Sneak_F
+" map t <Plug>Sneak_t
+" map T <Plug>Sneak_T
+
+" https://plugins.jetbrains.com/plugin/10149-kjump
+" nmap <leader><leader>s :action KJumpAction<cr>
+" nmap <leader><leader>w :action KJumpAction.Word0<cr>
+" nmap <leader>, :action KJumpAction.Word1<cr>
+" nmap <leader>, :action KJumpAction.Word0<cr>
+" nmap <leader><leader>l :action KJumpAction.Line<cr>
+
+" Set this option to 0 if you want to disable the default mappings
+let g:EasyMotion_do_mapping = 0
+
+" Default Mapping |  <Plug> command       |
+" -----------------------------------------------------------------
+"  <ll>s          |  <Plug>(easymotion-s) |  mapped to sn
+" map <leader>f <Plug>(easymotion-s)
+"  <ll>f{char}    |  <Plug>(easymotion-f) |  mapped to fn
+" map <leader>e <Plug>(easymotion-f)
+
+" 不使用 sneak 的原因 ---> 想与 leap.nvim 体验一致
+" map s <Plug>(easymotion-f)
+" map S <Plug>(easymotion-F)
+" nmap mm <Plug>(easymotion-s)
+
+map s <Plug>(easymotion-s)
+map S :action KJumpAction.Word0<cr>
+
+""" Common settings -------------------------
+" :h 'clipboard'
+" On Mac OS X and Windows, the * and + registers both point to the system clipboard so unnamed and unnamedplus have the same effect: the unnamed register is synchronized with the system clipboard. | https://stackoverflow.com/questions/30691466/what-is-difference-between-vims-clipboard-unnamed-and-unnamedplus-settings
+" 寄存器 ["*] 和寄存器 [""] 保持同步（即共享系统剪切板）
+set clipboard=unnamed
+" https://youtrack.jetbrains.com/issue/VIM-25/VIM-code-paste-should-be-smarter
+set clipboard+=ideaput
+set hlsearch
+set ignorecase
+set smartcase
+set number
+" set relativenumber
+set showmode
+set showcmd
+set history=1000
+
+" Clear highlights
+nnoremap <esc> :noh<return><esc>
+
+""" Idea specific settings ------------------
+" https://github.com/JetBrains/ideavim/wiki/ideajoin-examples
+set ideajoin
+set idearefactormode=keep
+set ideastatusicon=gray
+" Map vim marks to IDEA global marks
+set ideamarks
+
+""" IdeaVim development stuff
+" TODO what is this?
+set ideastrictmode
+
+""" My Mappings -----------------------------
+nmap \e :e ~/.ideavimrc<CR>
+" nmap \r :source ~/.ideavimrc<CR>
+nmap \r <Action>(IdeaVim.ReloadVimRc.reload)
+nmap \a <Action>(VimFindActionIdAction)
+" nmap \t :action ActivateTerminalToolWindow<CR>
+nmap \t <Action>(Terminal.OpenInTerminal)
+nmap \g <Action>(Generate)
+nmap \l <Action>(ReformatCode)
+nmap \f <Action>(FindInPath)
+nmap \o <Action>(SelectAllOccurrences)
+nmap \hc <Action>(CallHierarchy)
+nmap \hm <Action>(MethodHierarchy)
+nmap \ht <Action>(TypeHierarchy)
+" nmap \tt <Action>($ShowTranslationDialogAction)
+" nmap \ts <Action>($TranslateTextComponent)
+" nmap \ti <Action>($InclusiveTranslateAction)
+" nmap \te <Action>($ExclusiveTranslateAction)
+
+imap jj <esc>
+imap jk <esc>
+imap kj <esc>
+nmap Y y$
+nmap U <C-r>
+" map 0 ^
+map H ^
+map L $
+
+" Have j and k navigate visual lines rather than logical ones
+" Notice: just for fix ideavim bug ---> when meet @SuppressWarnings("unchecked"), jjj... will not walk through (but gj not work well when soft-wrap is on)
+nmap j gj
+nmap k gk
+
+nmap * *zz
+nmap # #zz
+nmap n nzz
+nmap N Nzz
+
+" TODO is this better or not?
+nmap <C-o> <Action>(Back)
+nmap <C-i> <Action>(Forward)
+
+" Do not overwrite unnamed register with x and s
+nnoremap x "_x
+" sneak Plugin use `s`
+" nnoremap s "_s
+
+nmap [[ <Action>(MethodUp)
+nmap ]] <Action>(MethodDown)
+nmap ]c <Action>(VcsShowNextChangeMarker)
+nmap [c <Action>(VcsShowPrevChangeMarker)
+" nmap [c <Action>(JumpToLastChange)
+" nmap ]c <Action>(JumpToNextChange)
+
+" map <C-h> gT
+" map <C-l> gt
+" nmap <C-j> <Action>(MethodDown)
+" nmap <C-k> <Action>(MethodUp)
+map <M-j> <Action>(MoveStatementDown)
+map <M-k> <Action>(MoveStatementUp)
+
+" behaves like Vimium (with goku vim-s-mode rules)
+map <up> <Action>(PreviousTab)
+map <down> <Action>(NextTab)
+map <left> <Action>(Back)
+map <right> <Action>(Forward)
+
+" github copilot <TAB> (behaves like zsh-autosuggestions)
+imap <C-l> <Action>(copilot.applyInlays)
+nmap <C-l> <Action>(copilot.applyInlays)
+imap <C-j> <Action>(copilot.cycleNextInlays)
+nmap <C-j> <Action>(copilot.cycleNextInlays)
+imap <C-k> <Action>(copilot.cyclePrevInlays)
+nmap <C-k> <Action>(copilot.cyclePrevInlays)
+imap <C-space> <Action>(copilot.applyInlays)
+nmap <C-space> <Action>(copilot.applyInlays)
+
+" 断行
+" nnoremap <CR> a<CR><Esc>k$
+" nnoremap <CR> o<Esc>
+
+" https://github.com/ruohola/dotfiles/blob/master/vim/.ideavimrc
+" Makes using marks a lot better, ` mapping clashes with surround.
+" nmap ' <Action>(ShowBookmarks)
+" nmap m <Action>(ToggleBookmarkWithMnemonic)
+
+map gi <Action>(GotoImplementation)
+map gI <Action>(QuickImplementations)
+" execute hover on gh
+map gh <Action>(ShowErrorDescription)
+map gb <Action>(Back)
+map gD <Action>(GotoTypeDeclaration)
+map gf <Action>(Forward)
+map gs <Action>(GotoSuperMethod)
+
+" TODO https://github.com/q843705423/ideavimrc/blob/master/.ideavimrc
+" TODO https://gist.github.com/SakuraWald/fa80eb949412e1a8c806512ad5f8a847
+" TODO https://github.com/ruohola/dotfiles/blob/master/vim/.ideavimrc
+" TODO https://github.com/JaimeArboleda/jet_brains_settings/blob/main/.ideavimrc
+
+" -----------------------------------------------------常用--------------------------------------------------------
+" CloseEditor 关不掉 Compare.LastVersion
+" map <leader>bd <Action>(CloseEditor)
+map <leader>bd <Action>(CloseContent)
+map <leader>ba <Action>(CloseAllEditors)
+" Kill all buffers
+map <leader>bK <Action>(CloseAllEditors)
+map <leader>bo <Action>(CloseAllEditorsButActive)
+map <leader>bn <Action>(NextTab)
+map <leader>bp <Action>(PreviousTab)
+map <leader>ch :action CallHierarchy<CR>
+map <leader>cL <Action>(copilot.loginGitHub)
+map <leader>cp <Action>(CopyAbsolutePath)
+map <leader>cP :action CloseProject<CR>
+map <leader>cs <Action>(EditorCompleteStatement)
+map <leader>cr <Action>(CopyReference)
+map <leader>cu <Action>(CheckForUpdate)
+map <leader>dd <Action>(Debug)
+map <leader>db <Action>(ToggleLineBreakpoint)
+map <Leader>dv :action ViewBreakpoints<CR>
+map <Leader>dc :action ChooseDebugConfiguration<CR>
+map <leader>ds <Action>(Stop)
+map <leader>ee :NERDTree<CR>
+map <Leader>em :action ExtractMethod<CR>
+map <Leader>ei :action ExtractInterface<CR>
+map <Leader>fd :action FixDocComment<CR>
+map <leader>ff <Action>(FindInPath)
+map <leader>fu <Action>(FindUsages)
+map <Leader>fp :action ShowFilePath<CR>
+map <leader>fs <Action>(FileStructurePopup)
+" yank file path (doomemacs keybinding)
+map <leader>fy <Action>(CopyAbsolutePath)
+map <leader>gg :action Generate<CR>
+" 打开 IdeaVim: Track Action Ids
+map <Leader>ga :action GotoAction<CR>
+map <Leader>gc :action GotoClass<CR>
+map <Leader>gf :action GotoFile<CR>
+map <Leader>gs :action GotoSymbol<CR>
+" Highlight usages, use CMD+G/Shift+CMD+G to iterate
+map <leader>hu <Action>(HighlightUsagesInFile)
+map <leader>hl <Action>(HighlightUsagesInFile)
+map <leader>hw <Action>(HideAllWindows)
+map <leader>im <Action>(ImplementMethods)
+map <leader>iv <Action>(IntroduceVariable)
+" Reformat the current line only
+map <leader>ll V<Action>(ReformatCode)
+map <leader>L <Action>(ReformatCode)
+map <leader>lh <Action>(LocalHistory.ShowHistory)
+map <leader>lw <Action>(JumpToLastWindow)
+map <leader>mh <Action>(MethodHierarchy)
+map <Leader>nc :action NewClass<CR>
+map <Leader>nb :action ShowNavBar<CR>
+map <Leader>nf <Action>(NewFile)
+map <leader>of <Action>(OpenFile)
+map <Leader>oi <Action>(OptimizeImports)
+map <Leader>om :action OverrideMethods<CR>
+map <Leader>pm :action ShowPopupMenu<CR>
+map <Leader>pr <Action>(ExternalSystem.ProjectRefreshAction)
+" CloseEditor 关不掉 Compare.LastVersion
+map <leader>qq <Action>(CloseContent)
+map <Leader>qa :action CloseAllEditors<CR>
+map <leader>qd <Action>(QuickJavaDoc)
+" quick fix
+map <leader>qf <Action>(ShowIntentionActions)
+map <leader>qi <Action>(QuickImplementations)
+" quickscope 插件开关
+map <leader>qs :set quickscope<CR>
+map <leader>qS :set noquickscope<CR>
+map <Leader>rc :action ChooseRunConfiguration<CR>
+map <leader>re <Action>(RenameElement)
+map <leader>rf <Action>(RecentFiles)
+map <leader>rl <Action>(RecentLocations)
+map <leader>rp <Action>(ManageRecentProjects)
+map <leader>rq :action Refactorings.QuickListPopupAction<CR>
+map <leader>rr <Action>(Run)
+map <leader>rs <Action>(Stop)
+map <leader>sd <Action>(SafeDelete)
+map <leader>si <Action>(SelectIn)
+map <leader>su <Action>(ShowUsages)
+map <Leader>sw :action SurroundWith<CR>
+map <Leader>sm <Action>(ShowBookmarks)
+map <leader>th <Action>(TypeHierarchy)
+map <leader>tt <Action>(ActivateTerminalToolWindow)
+map <leader>uw <Action>(Unwrap)
+map <leader>va <Action>(Annotate)
+map <leader>vc <Action>(Compare.LastVersion)
+map <leader>vq <Action>(Vcs.QuickListPopupAction)
+map <leader>vh <Action>(Vcs.ShowTabbedFileHistory)
+" map <leader>w <Action>(CloseContent)
+map <leader>ww <Action>(JumpToLastWindow)
+map <leader>wt <Action>(ActivateTerminalToolWindow)
+map <leader>wr <Action>(ActivateRunToolWindow)
+map <leader>wm <Action>(MaximizeToolWindow)
+map <leader>x <Action>(HideAllWindows)
+map <leader>z <Action>(ToggleDistractionFreeMode)
+
+" map <leader>1 <Action>(SelectInProjectView)
+map <leader>1 <Action>(GoToTab1)
+map <leader>2 <Action>(GoToTab2)
+map <leader>3 <Action>(GoToTab3)
+map <leader>4 <Action>(GoToTab4)
+map <leader>5 <Action>(GoToTab5)
+map <leader>6 <Action>(GoToTab6)
+map <leader>7 <Action>(GoToTab7)
+map <leader>8 <Action>(GoToTab8)
+map <leader>9 <Action>(GoToTab9)
+
+map <S-Space> <Action>(GotoNextError)
+" insert模式无效，已设置为IDEA快捷键，Code Completion - Basic
+map <TAB> <Action>(CodeCompletion)
+" TODO 仅map <CR>影响重命名时的回车确认
+map <leader><CR> <Action>(EditorCompleteStatement)
+" quick fix
+map <leader><leader> <Action>(ShowIntentionActions)
+
+" TODO EditorSelectWord opt+up_arrow
+" TODO EditorUnSelectWord opt+down_arrow
+" TODO SelectNextOccurrence 多选-光标处的符号/选择此符号的下一个匹配项
+" TODO UnselectPreviousOccurrence 多选-取消选择上一个匹配项
+" TODO SelectAllOccurrences 多选-选择文件中的所有匹配项
+
+" TODO https://github.com/MarcoIeni/intellimacs | https://github.com/syl20bnr/spacemacs#spacemacs-everywhere
