@@ -423,10 +423,11 @@
    :rules [:website-mode
            [:spacebar [:open "https://google.com/search?q=$(pbpaste)"]]
            [:f [:opena-file "/Applications/Google Chrome.app" "chrome://newtab/"]]
+           [:d [:open "https://github.com/qw457812/dotfiles"]]
            ;; https://github.com/pqrs-org/Karabiner-Elements/issues/2535
-           ;; [:d :!Cc nil {:delayed {:invoked [:open "https://translate.google.com/?sl=en&tl=zh-CN&text=$(pbpaste)&op=translate"]} :params {:delay 30}}]
-           ;; [:d [:open "https://translate.google.com/?sl=en&tl=zh-CN&text=$(pbpaste)&op=translate"]]
-           [:d [:open "https://translate.google.com/?sl=en&tl=zh-CN&op=translate"]]
+           ;; [:s :!Cc nil {:delayed {:invoked [:open "https://translate.google.com/?sl=en&tl=zh-CN&text=$(pbpaste)&op=translate"]} :params {:delay 30}}]
+           ;; [:s [:open "https://translate.google.com/?sl=en&tl=zh-CN&text=$(pbpaste)&op=translate"]]
+           [:s [:open "https://translate.google.com/?sl=en&tl=zh-CN&op=translate"]]
            ;; [:b [:open "raycast://extensions/Codely/google-chrome/search-bookmarks"]] ; Can't press again to close, 适合那种不出现Raycast窗口直接执行的, open or open -g ?
            [:b :!!hyphen] ; raycast://extensions/Codely/google-chrome/search-bookmarks
            [:h :!!f9] ; raycast://extensions/Codely/google-chrome/search-history
