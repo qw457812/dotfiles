@@ -1,0 +1,132 @@
+ # squirrel.yaml的补丁文件是squirrel.custom.yaml
+patch:
+  # ascii_mode、inline、no_inline、vim_mode 等等设定
+  # 可参考 /Library/Input Methods/Squirrel.app/Contents/SharedSupport/squirrel.yaml
+  # 注: rime_ice.custom.yaml中配置了默认英文(即ascii_mode默认为true), 故此处只需配置ascii_mode需要改为false的app
+  # TODO 其他app
+  app_options:
+    com.apple.Spotlight:
+      ascii_mode: true    # 开启默认英文
+    org.vim.MacVim:
+      ascii_mode: true  # 初始爲西文模式
+      no_inline: true   # 不使用行內編輯
+      vim_mode: true    # 退出VIM插入模式自動切換輸入法狀態
+    com.microsoft.VSCode:
+      ascii_mode: true
+      no_inline: true
+      vim_mode: true
+    com.googlecode.iterm2:
+      ascii_mode: true
+      no_inline: true
+      vim_mode: true
+    net.kovidgoyal.kitty:
+      ascii_mode: true
+      no_inline: true
+      vim_mode: true
+    com.apple.dt.Xcode:
+      ascii_mode: true
+    org.gnu.Emacs:
+      ascii_mode: true
+      no_inline: true
+      vim_mode: true # evil
+    com.google.Chrome:
+      ascii_mode: true
+      # 規避 https://github.com/rime/squirrel/issues/435
+      inline: true
+    com.qvacua.VimR:
+      ascii_mode: true
+      no_inline: true
+      vim_mode: true
+    com.neovide.neovide:
+      ascii_mode: true
+      no_inline: true
+      vim_mode: true
+    com.jetbrains.intellij.ce:
+      ascii_mode: true
+      no_inline: true
+      vim_mode: true
+    com.jetbrains.pycharm.ce:
+      ascii_mode: true
+      no_inline: true
+      vim_mode: true
+    com.tidgi:
+      ascii_mode: true
+      no_inline: true
+      vim_mode: true
+    org.jkiss.dbeaver.core.product:
+      ascii_mode: true
+      no_inline: true
+      vim_mode: true
+    md.obsidian:
+      ascii_mode: true
+      no_inline: true
+      vim_mode: true
+    # -------------------------------------默认为中文的app-------------------------------------
+    # 打开"/Applications/企业微信.app/Contents/Info.plist" ---> 搜索"BundleIdentifier" ---> 获取其值"com.tencent.WeWorkMac"
+    # `grep -A1 "CFBundleIdentifier" /Applications/企业微信.app/Contents/Info.plist`
+    # `osascript -e 'id of app "企业微信"'`
+    com.tencent.WeWorkMac:
+      ascii_mode: false
+
+  # purity_of_form_custom主题: 候选项排列方向 stacked | linear
+  # preset_color_schemes/purity_of_form_custom/candidate_list_layout: linear
+
+  # 选择皮肤，亮色与暗色主题
+  style/color_scheme: macos_light
+  style/color_scheme_dark: macos_dark
+
+  preset_color_schemes/+:
+    # https://github.com/NavisLab/rime-pifu
+    macos_light:
+      name: Mac仿原生亮色/macos_light
+      author: 一方
+      back_color: 0xFFFFFF    # 候选条背景色，24位色值，16进制，BGR顺序
+      border_color: 0xFFFFFF    # 边框色
+      text_color: 0x424242    # 拼音行文字颜色
+      hilited_back_color: 0xD75A00    # 第一候选项背景背景色
+      hilited_candidate_text_color: 0xFFFFFF    # 第一候选项文字颜色
+      hilited_candidate_label_color: 0xFFFFFF   # 第一候选项编号颜色
+      hilited_comment_text_color: 0x999999    # 注解文字高亮
+      hilited_text_color: 0x999999    # 高亮拼音 (需要开启内嵌编码)
+      candidate_text_color: 0x3c3c3c    # 预选项文字颜色
+      comment_text_color: 0x999999    # 拼音等提示文字颜色
+      horizontal: true    # 水平排列
+      inline_preedit: true    # 单行显示，false双行显示
+      label_color: 0x999999   # 预选栏编号颜色
+      candidate_format: "%c\u2005%@"    # 用 1/6 em 空格 U+2005 来控制编号 %c 和候选词 %@ 前后的空间。
+      font_face: "PingFangSC"   # 候选词编号字体
+      font_point: 17    # 候选文字大小
+      label_font_point: 13    # 候选编号大小
+      corner_radius: 5    # 候选条圆角
+      hilited_corner_radius: 5    # 高亮圆角
+      border_height: 4     # 窗口上下高度
+      border_width: 4   # 窗口左右宽度
+      border_color_width: 0   #输入条边框宽度
+      #label_font_face: "SFCompactText-Regular"  # 候选词编号字体
+
+    macos_dark:
+      name: Mac仿原生暗色/macos_dark
+      author: 一方
+      back_color: 0x252a2e    # 候选条背景色，24位色值，16进制，BGR顺序
+      border_color: 0x050505    # 边框色
+      text_color: 0x424242    # 拼音行文字颜色
+      hilited_back_color: 0xD75A00    # 第一候选项背景背景色
+      hilited_candidate_text_color: 0xFFFFFF    # 第一候选项文字颜色
+      hilited_candidate_label_color: 0xFFFFFF   # 第一候选项编号颜色
+      hilited_comment_text_color: 0x999999    # 注解文字高亮
+      hilited_text_color: 0x999999    # 高亮拼音 (需要开启内嵌编码)
+      candidate_text_color: 0xe9e9ea    # 预选项文字颜色
+      comment_text_color: 0x999999    # 拼音等提示文字颜色
+      horizontal: true    # 水平排列
+      inline_preedit: true    # 单行显示，false双行显示
+      label_color: 0x999999   # 预选栏编号颜色
+      candidate_format: "%c\u2005%@"    # 用 1/6 em 空格 U+2005 来控制编号 %c 和候选词 %@ 前后的空间。
+      font_face: "PingFangSC"   # 候选词编号字体
+      font_point: 17    # 候选文字大小
+      label_font_point: 13    # 候选编号大小
+      corner_radius: 5    # 候选条圆角
+      hilited_corner_radius: 5    # 高亮圆角
+      border_height: 4     # 窗口上下高度
+      border_width: 4   # 窗口左右宽度
+      border_color_width: 0   #输入条边框宽度
+      #label_font_face: "SFCompactText-Regular"  # 候选词编号字体
