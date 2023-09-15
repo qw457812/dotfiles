@@ -1,0 +1,61 @@
+" This File Is For DBeaver.app
+" General Purpose Tools
+" Eclipse 2023-06 - https://download.eclipse.org/releases/2023-06/
+" Marketplace Client	1.10.1.v20221110-1841	org.eclipse.epp.mpc.feature.group	Eclipse Marketplace Client
+" Vrapper	0.74.0	net.sourceforge.vrapper.feature.group	Vrapper Team
+
+" my config
+set incsearch
+set clipboard=unnamed
+set hlsearch
+nnoremap <esc> :noh<return><esc>
+nmap Y y$
+" map 0 ^
+map H ^
+map L $
+" https://github.com/vrapper/vrapper/issues/861
+" let mapleader=' '
+let mapleader='\'
+
+" https://vrapper.sourceforge.net/documentation/?topic=optional_plugins
+nmap s <Plug>(sneak_s)
+nmap S <Plug>(sneak_S)
+nmap ; <Plug>(sneak-next)
+nmap , <Plug>(sneak-prev)
+vmap s <Plug>(sneak_s)
+vmap Z <Plug>(sneak_S)
+vmap ; <Plug>(sneak-next)
+vmap , <Plug>(sneak-prev)
+nmap f <Plug>(sneak_f)
+nmap F <Plug>(sneak_F)
+nmap t <Plug>(sneak_t)
+nmap T <Plug>(sneak_T)
+vmap f <Plug>(sneak_f)
+vmap F <Plug>(sneak_F)
+vmap t <Plug>(sneak_t)
+vmap T <Plug>(sneak_T)
+omap z <Plug>(sneak_s)
+omap Z <Plug>(sneak_S)
+
+noremap <Leader>b <Plug>(subword-back)
+noremap <Leader>e <Plug>(subword-end)
+noremap <Leader>w <Plug>(subword-word)
+vnoremap i<Leader> <Plug>(subword-inner)
+onoremap i<Leader> <Plug>(subword-inner)
+vnoremap a<Leader> <Plug>(subword-outer)
+onoremap a<Leader> <Plug>(subword-outer)
+
+noremap <SPACE>b <Plug>(subword-back)
+noremap <SPACE>e <Plug>(subword-end)
+noremap <SPACE>w <Plug>(subword-word)
+vnoremap i<SPACE> <Plug>(subword-inner)
+onoremap i<SPACE> <Plug>(subword-inner)
+vnoremap a<SPACE> <Plug>(subword-outer)
+onoremap a<SPACE> <Plug>(subword-outer)
+
+" https://vrapper.sourceforge.net/documentation/?topic=configuration
+imap jj <esc>
+imap jk <esc>
+imap kj <esc>
+set ignorecase
+set smartcase
