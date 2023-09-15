@@ -435,12 +435,13 @@
            [:g [:open "https://github.com/search"]]
            [:c [:open "https://chat.openai.com/chat"]]
            [:n [:open "https://wiki.nikiv.dev"]]
+           [:z [:open "https://www.chezmoi.io/quick-start/"]]
            [:x [:open "https://learnxinyminutes.com/"]]
            ;; 临时使用
-           [:v [:open "https://access.sinosig.com/vpn/index.html"]]
-           [:2 [:open "http://10.8.207.86:8888/vue/login/#/"]]
-           [:3 [:open "http://10.7.21.145:8088/vue/login/#/"]]
-           [:4 [:open "file:///Users/xingyuqiang/Work%20Documents/sinosig/password.html"] nil {:delayed {:invoked [:q :w :return_or_enter :escape]} :params {:delay 500}}] ; "qw"是密码
+           [:v ["/Users/xingyuqiang/temp/temp_open_vpn"]]
+           [:2 ["/Users/xingyuqiang/temp/temp_open_ui_uat"]]
+           [:3 ["/Users/xingyuqiang/temp/temp_open_ui_prod"]]
+           [:4 ["/Users/xingyuqiang/temp/temp_open_pass"] nil {:delayed {:invoked [:q :w :return_or_enter :escape]} :params {:delay 500}}] ; "qw"是密码
            [:5 [:open "http://localhost:5000"]]
            [:1 [:open "http://localhost:8501/"]]
            ]}
@@ -1169,9 +1170,9 @@
 
            [:!Px :!Pdelete_forward]
            [:!Pd :!PCx]
-           [:!PRd [:!PCSright_arrow :!PCx]] ; D(d$)
+           [:!PRd [:!PCSright_arrow :!PCx]] ; D for d$
            [:!Py :!PCc]
-           [:!PSy [:!PCSright_arrow :!PCc]] ; Y(y$)
+           [:!PSy [:!PCSright_arrow :!PCc]] ; Y for y$
            [:!Pp :!PCv]
            [:!Pu :!PCz]
            [:!Pr :!PCSz]
