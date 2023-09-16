@@ -190,7 +190,7 @@ imap jj <esc>
 imap jk <esc>
 imap kj <esc>
 nmap Y y$
-nmap U <C-r>
+" nmap U <C-r>
 " map 0 ^
 map H ^
 map L $
@@ -206,33 +206,29 @@ nmap n nzz
 nmap N Nzz
 
 " TODO is this better or not?
-nmap <C-o> <Action>(Back)
-nmap <C-i> <Action>(Forward)
+" nmap <C-o> <Action>(Back)
+" nmap <C-i> <Action>(Forward)
 
 " Do not overwrite unnamed register with x and s
 nnoremap x "_x
 " sneak Plugin use `s`
 " nnoremap s "_s
 
-nmap [[ <Action>(MethodUp)
-nmap ]] <Action>(MethodDown)
+" nmap [[ <Action>(MethodUp)
+" nmap ]] <Action>(MethodDown)
 nmap ]c <Action>(VcsShowNextChangeMarker)
 nmap [c <Action>(VcsShowPrevChangeMarker)
 " nmap [c <Action>(JumpToLastChange)
 " nmap ]c <Action>(JumpToNextChange)
 
-" map <C-h> gT
-" map <C-l> gt
-" nmap <C-j> <Action>(MethodDown)
-" nmap <C-k> <Action>(MethodUp)
 map <M-j> <Action>(MoveStatementDown)
 map <M-k> <Action>(MoveStatementUp)
 
 " behaves like Vimium (with goku vim-s-mode rules)
-map <up> <Action>(PreviousTab)
-map <down> <Action>(NextTab)
-map <left> <Action>(Back)
-map <right> <Action>(Forward)
+map <up> <Action>(MethodUp)
+map <down> <Action>(MethodDown)
+map <left> <Action>(JumpToLastChange)
+map <right> <Action>(JumpToNextChange)
 
 " github copilot <TAB> (behaves like zsh-autosuggestions)
 imap <C-l> <Action>(copilot.applyInlays)
@@ -241,8 +237,8 @@ imap <C-j> <Action>(copilot.cycleNextInlays)
 nmap <C-j> <Action>(copilot.cycleNextInlays)
 imap <C-k> <Action>(copilot.cyclePrevInlays)
 nmap <C-k> <Action>(copilot.cyclePrevInlays)
-imap <C-space> <Action>(copilot.applyInlays)
-nmap <C-space> <Action>(copilot.applyInlays)
+" imap <C-space> <Action>(copilot.applyInlays)
+" nmap <C-space> <Action>(copilot.applyInlays)
 
 " 断行
 " nnoremap <CR> a<CR><Esc>k$
@@ -272,6 +268,7 @@ map gs <Action>(GotoSuperMethod)
 " map <leader>bd <Action>(CloseEditor)
 map <leader>bd <Action>(CloseContent)
 map <leader>ba <Action>(CloseAllEditors)
+map <leader>bk <Action>(CloseContent)
 " Kill all buffers
 map <leader>bK <Action>(CloseAllEditors)
 map <leader>bo <Action>(CloseAllEditorsButActive)
