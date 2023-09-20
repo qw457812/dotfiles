@@ -182,10 +182,6 @@
            ;; [:##v :left_option]
            ;; [:##b :left_command]
 
-           ;; switch tabs in most apps
-           ;; [:##comma :!CSopen_bracket] ; Cmd Shift [
-           ;; [:##period :!CSclose_bracket] ; Cmd Shift ]
-
            ;; [:##f :fn]
            [:d :!Cc]
            [:f :!Cv]
@@ -253,10 +249,16 @@
            [:j [:spacebar :tab :close_bracket] :Emacs] ; doomemacs: next workspace
            [:k [:spacebar :tab :open_bracket] :Emacs] ; doomemacs: previous workspace
 
-           [:l :!Ct :!tmux-autostart-terminals] ; Cmd t
+           ;; create/close tab in most apps
+           [:l :!Ct [:!create-tab-by-cmd-n-app :!tmux-autostart-terminals]] ; Cmd t
            [:h :!Cw :!tmux-autostart-terminals] ; Cmd w
+           [:l :!Cn :create-tab-by-cmd-n-app] ; Cmd n
            [:l [:!Tb :c] :tmux-autostart-terminals] ; tmux: new window
            [:h [:!Tb :!S7] :tmux-autostart-terminals] ; tmux: kill window
+
+           ;; switch sheets
+           [:comma :!COopen_bracket :WPSOffice] ; wps: previous worksheet
+           [:period :!COclose_bracket :WPSOffice] ; wps: next worksheet
 
            ;; resize window, remap Rectangle.app
            [:m :!TSOspacebar] ; maximize
@@ -275,8 +277,11 @@
            [:##j :page_down]
            [:##k :page_up]
            ;; TODO 根据不同app使用: home end :!Ta :!Te :!Cleft_arrow !Cright_arrow
-           [:##h :home]
-           [:##l :end]]}
+           [:##h :home :!line-navigating-by-cmd-arrow-app]
+           [:##l :end :!line-navigating-by-cmd-arrow-app]
+           [:##h :!Cleft_arrow :line-navigating-by-cmd-arrow-app]
+           [:##l :!Cright_arrow :line-navigating-by-cmd-arrow-app]
+           ]}
   
   {:des   "Vi Visual Mode [V as Trigger Key]"
    :rules [:vi-visual-mode
@@ -412,7 +417,8 @@
            [:v [:open "/Applications/Karabiner-EventViewer.app"]]
            ;; open my tiddlywiki then press escape to trigger vimium in chrome
            [:n [:open "http://127.0.0.1:8080/"] nil {:delayed {:invoked [:escape]} :params {:delay 700}}] ; note
-           [:m [:open "/Applications/Thunderbird.app"]] ; email
+           [:m [:open "/Applications/Thunderbird.app"] :!Thunderbird] ; email
+           [:m :same_wind_app :Thunderbird]
            [:comma [:open "/System/Applications/System Settings.app"]] ; cmd+, for setting
            [:period [:open "/System/Applications/Launchpad.app"]] ; 启动台
            [:slash [:open "/Applications/WhatPulse/WhatPulse.app"]]
@@ -606,11 +612,12 @@
   {:des   "t mode (toogle setting or information)"
    :rules [:t-mode
            [:spacebar :!!f16] ; show hidden items for Bartender 4
-           [:j :!!close_bracket] ; open Menu for ClashX
            [:i :!!close_bracket nil {:delayed {:invoked [:!Ct]} :params {:delay 100}}] ; trigger Benchmark for ClashX
-           [:k [:hs ["toggleAClock"]]] ; show time
-           [:l :!!f2] ; control center by Bartender 4
            [:h :!!open_bracket] ; Switch Hosts (Raycast extensions)
+           [:j :!!close_bracket] ; open Menu for ClashX
+           [:k [:hs ["toggleAClock"]]] ; show time
+           [:l :!!f12] ; itsycal (calendar)
+           [:semicolon :!!f2] ; control center by Bartender 4
            ;; Toggle dark mode (https://github.com/sindresorhus/dark-mode/blob/main/Sources/DarkMode.swift)
            [:d "osascript -e 'tell application \"System Events\" to tell appearance preferences to set dark mode to not dark mode'"]
            [:w :!!f13] ; wifi by Bartender 4
@@ -620,7 +627,6 @@
 
            ;; information
            [:n :!!f1] ; clock by Bartender 4 (n for notifications)
-           [:c :!!f12] ; itsycal by Bartender 4 (c for calendar)
            ;; TODO f11 desktop
 
            ;; tool
@@ -649,10 +655,10 @@
 
            ;; snippets
            [:h :home_dir]
-           [:4 [:4 :5 :7 :8 :1 :2]]
            [:q [:q :w :4 :5 :7 :8 :1 :2]]
            [:m [:q :w :4 :5 :7 :8 :1 :2 :!S2 :1 :6 :3 :period :c :o :m]]
-           [:u [:open_bracket :close_bracket :left_arrow :!Cv :right_arrow :!S9 :!S0 :left_arrow :!!f7] nil {:delayed {:invoked [:!C2]} :params {:delay 500}}] ; markdown url
+           ;; [:u [:open_bracket :close_bracket :left_arrow :!Cv :right_arrow :!S9 :!S0 :left_arrow :!!f7] nil {:delayed {:invoked [:!C2]} :params {:delay 500}}] ; markdown url
+           [:u [:open_bracket :!Cv :close_bracket :!S9 :!S0 :left_arrow :!!f7] nil {:delayed {:invoked [:!C2]} :params {:delay 500}}] ; markdown url
            [:p [:!Sa :period :s :o :u :t :tab :escape] :IntelliJ]
            [:p [:!Sa :period :p :r :i :n :t :tab :escape] :PyCharm]
            ]}
@@ -990,7 +996,6 @@
 
   {:des   "e-mode (cmd+tab)"
    :rules [:e-mode
-           ;; [:j :!Ctab]
            [:j :prev_app] ; cmd+tab
            [:k :!CStab]
            [:l :same_wind_app] ; cmd+`
@@ -1006,8 +1011,6 @@
            [:semicolon :!Sgrave_accent_and_tilde] ; ~
 
            [:n :delete_forward]
-
-           ;; [:q :!Sescape] ; shift+esc for IntelliJ IDEA, Raycast
 
            ;; f -> shift for right hand symbols
            ;; [:6 :!S6] ; ^
@@ -1211,11 +1214,8 @@
   {:des "tmux window navigation in tmux-autostart-terminals"
    :rules
    [:tmux-autostart-terminals
-    ;; [:!CSclose_bracket [:!Tb :!Tl]] ; Cmd Shift ] -> next window
-    ;; [:!CSopen_bracket [:!Tb :!Th]] ; Cmd Shift [ -> previous window
-
-    [:!Ct [:!Tb :c]] ; Cmd T -> new window
-    [:!Cw [:!Tb :!S7]] ; Cmd W -> kill window
+    [:!Ct [:!Tb :c]] ; Cmd T -> tmux: new window
+    [:!Cw [:!Tb :!S7]] ; Cmd W -> tmux: kill window
     ]}
 
   {:des "# For Not HHKB\n- caps_lock to left_control when pressed alone, to escape as modifier\n- left_control to hyper when pressed alone, to caps_lock as modifier\n- similar to HHKB, swap delete_or_backspace and \\, but keep shift+\\ as |"
@@ -1223,7 +1223,7 @@
    [:!hhkb-bt
     [:##caps_lock :left_control nil {:alone :escape}]
     [:##left_control :!CTOleft_shift nil {:alone :caps_lock}]
-    ;; Similar to HHKB, swap delete_or_backspace and \
+    ;; behaves like HHKB, swap delete_or_backspace and \
     [:##delete_or_backspace :backslash]
     [:#CTObackslash :delete_or_backspace] ; keep shift+\ as |
     ]}
@@ -1263,13 +1263,14 @@
 
   ;; FIXME not work
   ;; TODO add disable app condition: kitty
-  ;; inspired by this chrome extension: Copy on Select
+  ;; inspired by chrome extension: Copy on Select
   ;; {:des "Paste on Mouse middle click"
   ;;  :rules [[{:pkey :button3} :!Cv]]}
 
   ;; WARN: the order of rules matters ---> try put this rules before :f-mode, then press f-space and hold f, release space and press space again
   ;; https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/to/lazy/
-  ;; https://github.com/yqrashawn/yqdotfiles/blob/master/modules/yqrashawn/home-manager/dotfiles/karabiner.edn#L517
+  ;; https://github.com/yqrashawn/yqdotfiles/blob/121c105d7851f3113eae9b51c27a4dc4f02b8d12/modules/yqrashawn/home-manager/dotfiles/karabiner.edn#L519
+  ;; inspired by [The SpaceFN layout](https://geekhack.org/index.php?topic=51069.0)
   ;; The space bar does not auto-repeat. To compensate, space+left_shift (space is left_shift now, so space+left_shift is useless) is an autorepeating space.
   ;; FIXME produce typo "likeThis", use simlayers? ---> see "Spacebar Mode (shift)" above
   #_{:des "space to left_shift when pressed with other keys (space+left_shift->space to compensate auto-repeat)"
@@ -1290,7 +1291,7 @@
  :devices            {:macbook-internal   [{:product_id 0 :vendor_id 0}]
                       :hhkb-bt            [{:vendor_id 1278 :product_id 33}]
                       :niz-x87            [{:vendor_id 1452 :product_id 272}]
-                      :niz-x87-wired      [{:vendor_id 1155 :product_id 20785}] ; NIZ有线: 87EC-XRGB (Milsky)
+                      :niz-x87-wired      [{:vendor_id 1155 :product_id 20785}] ; NIZ有线
                       }
 
  ;; osascript -e 'id of app "Finder"'
@@ -1335,6 +1336,10 @@
    "^md\\.obsidian$" "^com\\.tidgi$"]
   :switch-tabs-by-ctrl-tab-app
   ["^org\\.mozilla\\.thunderbird$" "^com\\.kingsoft\\.wpsoffice\\.mac$"]
+  :create-tab-by-cmd-n-app
+  ["^com\\.microsoft\\.VSCode(Insiders)?$"]
+  :line-navigating-by-cmd-arrow-app
+  ["^com\\.google\\.Chrome$"]
   :tmux-autostart-terminals
   ["^net\\.kovidgoyal\\.kitty$"]
   :Emacs        ["^org\\.gnu\\.Emacs$" "^org\\.gnu\\.AquamacsEmacs$"
