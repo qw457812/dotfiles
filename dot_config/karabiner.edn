@@ -14,6 +14,8 @@
 ;; !! | mandatory command + control + optional + shift (hyper)
 ;; ## | optional any
 
+;; key names: https://github.com/yqrashawn/GokuRakuJoudo/blob/master/src/karabiner_configurator/keys_info.clj
+
 ;; https://github.com/nikitavoloboev/config/blob/master/karabiner/karabiner.edn
 ;; https://github.com/yqrashawn/yqdotfiles/blob/master/modules/yqrashawn/home-manager/dotfiles/karabiner.edn
 ;; https://github.com/yqrashawn/GokuRakuJoudo/blob/master/in-the-wild.md
@@ -143,8 +145,6 @@
   ;; :shift-z-mode          {:key     :z
   ;;                         :condi   [:!mouse_keys_mode_v4]}
 
-  ;; :shift-slash-mode      {:key     :slash}
-
   ;; :number-r-mode         {:key     :r}
 
   ;; :symbol-e-mode         {:key     :e}
@@ -156,9 +156,9 @@
                           :modi    {:optional :caps_lock}}}
 
  :main
- [{:des   "Vi Mode [S as Trigger Key]"
+ [{:des   "s mode (vi mode)"
    :rules [:vi-s-mode
-           ;; TODO ##有用吗 去掉后diff json
+           ;; `##`有用吗, 去掉后diff json ---> 似乎没用
            [:##j :down_arrow]
            [:##k :up_arrow]
            [:##h :left_arrow]
@@ -194,7 +194,7 @@
            [:a :!!f7] ; clipboard history by Maccy.app
            ]}
 
-  #_{:des   "Vi Mode [D as Trigger Key]"
+  #_{:des   "d mode (vi mode)"
    :rules [:vi-d-mode
            [:##j :down_arrow]
            [:##k :up_arrow]
@@ -279,7 +279,7 @@
            [:s :!!f5] ; Scrolling
            ]}
 
-  {:des   "Vi Goto Mode [G as Trigger Key]"
+  {:des   "g mode (vi goto mode)"
    :rules [:vi-goto-mode
            ;; https://docs.helix-editor.com/keymap.html#goto-mode
            [:##j :page_down]
@@ -291,7 +291,7 @@
            [:##l :!Cright_arrow :line-navigating-by-cmd-arrow-app]
            ]}
   
-  {:des   "Vi Visual Mode [V as Trigger Key]"
+  {:des   "v mode (vi visual mode)"
    :rules [:vi-visual-mode
            [:##j :!Sdown_arrow]
            [:##k :!Sup_arrow]
@@ -320,7 +320,7 @@
            [:semicolon [:!Cleft_arrow :!CSright_arrow]] ; Highlight current line
            ]}
 
-  {:des "q mode (cmd + shift)"
+  {:des "q mode (cmd+shift)"
    :rules [:q-mode
            [:1 :!CS1]
            [:2 :!CS2]
@@ -380,10 +380,9 @@
            ]}
 
   ;; Karabiner-EventViewer.app ---> Frontmost Application
-  {:des   "launcher mode [W as Trigger Key]"
+  {:des   "w mode (application launcher)"
    :rules [:launch-mode
-           ;; TODO
-           ;; [:spacebar :same_wind_app] ; cmd+`
+           ;; TODO spacebar
            [:left_command [:open "/Applications/OpenInTerminal-Lite.app"]]
            [:right_command [:open "/Applications/OpenInEditor-Lite.app"]]
            [:h [:open "/Applications/企业微信.app"] :!WeWork]
@@ -430,10 +429,10 @@
            [:comma [:open "/System/Applications/System Settings.app"]] ; cmd+, for setting
            [:period [:open "/System/Applications/Launchpad.app"]] ; 启动台
            [:slash [:open "/Applications/WhatPulse/WhatPulse.app"]]
-           [:open_bracket [:open "/Applications/企业微信.app/Contents/Frameworks/wwmapp.app"]]
+           [:open_bracket [:open "/Applications/企业微信.app/Contents/Frameworks/wwmapp.app"]] ; 企业微信•会议
            ]}
 
-  {:des   "website mode [O as Trigger Key]"
+  {:des   "o mode (website)"
    :rules [:website-mode
            [:spacebar [:open "https://google.com/search?q=$(pbpaste)"]]
            [:f [:opena-file "/Applications/Google Chrome.app" "chrome://newtab/"]]
@@ -461,43 +460,7 @@
            [:7 [:open "http://localhost:7860/"]]
            ]}
 
-  #_{:des   "Spacebar Mode (1~= -> F1~F12)"
-   :rules [:spacebar-mode
-           [:##j :page_down]
-           [:##k :page_up]
-           [:##h :home]
-           [:##l :end]
-           [:a :!CSc] ; Maccy.app clipboard history
-           [:s :!Cx]
-           [:d :!Cc]
-           [:f :!Cv]
-
-           [:##1 :f1]
-           [:##2 :f2]
-           [:##3 :f3]
-           [:##4 :f4]
-           [:##5 :f5]
-           [:##6 :f6]
-           [:##7 :f7]
-           [:##8 :f8]
-           [:##9 :f9]
-           [:##0 :f10]
-           [:##hyphen :f11]
-           [:##equal_sign :f12]
-           [:##q :f1]
-           [:##w :f2]
-           [:##e :f3]
-           [:##r :f4]
-           [:##t :f5]
-           [:##y :f6]
-           [:##u :f7]
-           [:##i :f8]
-           [:##o :f9]
-           [:##p :f10]
-           [:##open_bracket :f11]
-           [:##close_bracket :f12]]}
-
-  {:des   "Spacebar Mode (shift)"
+  {:des   "space mode (shift)"
    :rules [:spacebar-mode
            [:1 :!S1]
            [:2 :!S2]
@@ -568,7 +531,7 @@
            [:left_control :!Sescape :hhkb-bt] ; shift+esc for IntelliJ IDEA, Raycast
            ]}
 
-  {:des   "Tab Mode (uiopjkl;m,./ -> F1~F12)"
+  {:des   "tab mode (uiopjkl;m,./ to f1~f12)"
    :rules [:tab-mode
            [:##u :f1]
            [:##i :f2]
@@ -609,6 +572,7 @@
            ;; [:8 :!TOS8]                   ;; register 8
            ;; [:9 :!TOS9]                   ;; register 9
            ;; [:0 :!TOS0]                   ;; register 0
+
            [:hyphen :!TOShyphen]         ;; shrink
            [:equal_sign :!TOSequal_sign] ;; enlarge
 
@@ -618,7 +582,7 @@
 
   ;; TODO t 不好按
   ;; TODO 可用键位 :!!f15 :!!f14 :!!f18
-  {:des   "t mode (toogle setting or information)"
+  {:des   "t mode (toggle setting, information, tool)"
    :rules [:t-mode
            [:spacebar :!!f16] ; show hidden items for Bartender 4
            [:i :!!close_bracket nil {:delayed {:invoked [:!Ct]} :params {:delay 100}}] ; trigger Benchmark for ClashX
@@ -666,7 +630,7 @@
            [:h :home_dir]
            [:q [:q :w :4 :5 :7 :8 :1 :2]]
            [:m [:q :w :4 :5 :7 :8 :1 :2 :!S2 :1 :6 :3 :period :c :o :m]]
-           ;; TODO
+           ;; FIXME markdown url
            ;; [:u [:open_bracket :close_bracket :left_arrow :!Cv :right_arrow :!S9 :!S0 :left_arrow :!!f7] nil {:delayed {:invoked [:!C2]} :params {:delay 500}}] ; markdown url
            [:u [:open_bracket :!Cv :close_bracket :!S9 :!S0 :left_arrow :!!f7] nil {:delayed {:invoked [:!C2]} :params {:delay 500}}] ; markdown url
            [:p [:!Sa :period :s :o :u :t :tab :escape] :IntelliJ]
@@ -703,7 +667,7 @@
            [:##spacebar {:pkey :button1}] ; Left click
            ]}
 
-  {:des   "a mode (a to left_control)"
+  {:des   "a mode (control)"
    :rules [:ctrl-a-mode
            [:1 :!T1]
            [:2 :!T2]
@@ -764,7 +728,7 @@
            [:delete_or_backspace :!Tdelete_or_backspace]
            ]}
 
-  {:des   "semicolon mode (; to right_control)"
+  {:des   "; mode (control)"
    :rules [:ctrl-semicolon-mode
            [:1 :!W1]
            [:2 :!W2]
@@ -825,7 +789,7 @@
            [:delete_or_backspace :!Wdelete_or_backspace]
            ]}
 
-  {:des   "m mode (m to right_control)"
+  {:des   "m mode (control)"
    :rules [:ctrl-m-mode
            [:1 :!W1]
            [:2 :!W2]
@@ -886,7 +850,7 @@
            [:delete_or_backspace :!Wdelete_or_backspace]
            ]}
 
-  #_{:des   "z mode (z to left_shift)"
+  #_{:des   "z mode (shift)"
    :rules [:shift-z-mode
            [:6 :!S6]
            [:7 :!S7]
@@ -923,41 +887,6 @@
            [:period :!Speriod]
            [:slash :!Sslash]]}
 
-  #_{:des   "slash mode (/ to right_shift)"
-   :rules [:shift-slash-mode
-           [:1 :!R1]
-           [:2 :!R2]
-           [:3 :!R3]
-           [:4 :!R4]
-           [:5 :!R5]
-           [:q :!Rq]
-           [:w :!Rw]
-           [:e :!Re]
-           [:r :!Rr]
-           [:t :!Rt]
-           [:y :!Ry]
-           [:u :!Ru]
-           [:i :!Ri]
-           [:o :!Ro]
-           [:p :!Rp]
-           [:a :!Ra]
-           [:s :!Rs]
-           [:d :!Rd]
-           [:f :!Rf]
-           [:g :!Rg]
-           [:h :!Rh]
-           [:j :!Rj]
-           [:k :!Rk]
-           [:l :!Rl]
-           [:grave_accent_and_tilde [:!Rgrave_accent_and_tilde]] ; -> ~
-           [:z :!Rz]
-           [:x :!Rx]
-           [:c :!Rc]
-           [:v :!Rv]
-           [:b :!Rb]
-           [:n :!Rn]
-           [:m :!Rm]]}
-
   #_{:des "r mode (numbers)"
    :rules [:number-r-mode
            ;; [:##a :left_control]
@@ -986,7 +915,7 @@
   ;; |------+------+------+------+------+------|------+------+------+------+------+------|
   ;; |                                         |   =  |   |  |   <  |   >  |   ?  |      |
   ;; |------+------+------+------+------+------+------+------+------+------+------+------
-  #_{:des   "E Dev Mode (symbols)"
+  #_{:des   "e mode (symbols)"
    :rules [:symbol-e-mode
            [:u :hyphen]
            [:i :!Sequal_sign] ; +
@@ -1011,7 +940,7 @@
            [:l :same_wind_app] ; cmd+`
            ]}
 
-  {:des   "F Mode (delete, return, backslash)"
+  {:des   "f mode (delete, return, backslash)"
    :rules [:f-mode
            [:spacebar :tab]
            [:h :!Sbackslash] ; |
@@ -1020,7 +949,7 @@
            [:l :backslash] ; \ for HHKB
            [:semicolon :!Sgrave_accent_and_tilde] ; ~
 
-           [:n :delete_forward]
+           [:m :delete_forward]
 
            ;; f -> shift for right hand symbols
            ;; [:6 :!S6] ; ^
@@ -1048,7 +977,7 @@
            ]}
 
   ;; jk mk ji df jl kl nk
-  {:des  "some simultaneous keys [j k]"
+  {:des  "simultaneous keys (jk, mk)"
          :rules [
                  [[:j :k] :escape]
                  ;; [[:j :k] :escape nil {:params {:sim 50}}] ; sim 值越大, j 延迟越高
@@ -1083,7 +1012,7 @@
 
   ;; TODO 改为在屏幕上下左右的中心点击一下鼠标
   ;; 组合键使用
-  {:des "Change right_command+ijkl to arrow keys"
+  {:des "right_command+ijkl to arrow"
    :rules
    [[:!Q##i :up_arrow]
     [:!Q##j :left_arrow]
@@ -1108,13 +1037,12 @@
   ;;  :rules [:!niz-x87 [:right_command :right_command nil {:alone :!Qgrave_accent_and_tilde}]]}
   ;; {:des  "right cmd alone -> return"
   ;;  :rules [:!niz-x87 [:right_command :right_command nil {:alone :return_or_enter}]]}
-  {:des  "right cmd alone -> Centre mouse to active app, then Maximize Window"
+  {:des  "right cmd alone -> centre mouse to active app, then maximize window"
    :rules [:!niz-x87 [:right_command :right_command nil {:alone [:hs ["mouseCenterClickThenMaximizeWindow"]]}]]}
 
   ;; {:des   "left option alone -> hyper+f18 (iTerm2 Hotkey Window)"
   ;;  :rules [:!niz-x87-wired [:left_option :left_option nil {:alone [:!!f18]}]]}
-  ;; TODO cmd+v
-  {:des   "left option alone -> hyper+f18 (iTerm2 Hotkey Window)"
+  {:des   "left option alone -> tmux prefix"
    :rules [:!niz-x87-wired
            ;; [:left_option :left_option :!Terminals {:alone [:!!f18]}]
            [:left_option :left_option :!tmux-autostart-terminals {:alone [:open "/Applications/kitty.app"]}]
@@ -1124,9 +1052,9 @@
   ;; TODO right_option -> hyper
   ;; TODO :super-hyper [:command :shift :control :option :fn]
   ;; TODO translate in nvim
-  ;; {:des   "right option alone -> option+shift+a (immersive-translate shortcut in chrome, safari)"
+  ;; {:des   "right option alone -> option+shift+a (immersive-translate in chrome, safari)"
   ;;  :rules [:!niz-x87 [:right_option :right_option nil {:alone [:!OSa]}]]}
-  {:des   "right option alone -> option+shift+a (immersive-translate shortcut in chrome, safari)"
+  {:des   "right option alone -> option+shift+a (immersive-translate in chrome, safari)"
    :rules [[:right_option :right_option [:!niz-x87 :!niz-x87-wired] {:alone [:!OSa]}]]}
 
   ;; TODO 影响 double shift
@@ -1137,16 +1065,16 @@
 
   ;; TODO alone 修饰键 right_shift(状态开关 类似caps_lock 开关vim模式) right_option
   ;; TODO noti like command-q
-  {:des   "right shift alone -> caps_lock (see \"caps_lock layer: vim normal mode\" below)"
+  {:des   "right shift alone -> caps_lock (see \"caps_lock layer: vim mode\" below)"
    :rules [[:#Pright_shift :right_shift nil {:alone [:caps_lock]}]]}
 
 ;; ------------------------------ Fundamental ------------------------------
-;; WARN: the order of rules matters, see "space to left_shift" below
+;; WARN: the order of rules matters, see "space to shift" below
 
 ;; TODO 仅参考 https://github.com/mmroczka/.dotfiles/blob/master/karabiner/karabiner.edn
 ;; {:des "Double colon triggers emoji search" :rules[ [:!Ssemicolon [:delete_or_backspace :!TCspacebar ["emoji_mode" 0]] ["emoji_mode" 1]]
                                                   ;; [:!Ssemicolon ["emoji_mode" 1] nil {:alone :!Ssemicolon :delayed {:invoked ["emoji_mode" 0] :canceled ["emoji_mode" 0]}}] ]}
-  {:des "caps_lock layer: vim normal mode"
+  {:des "caps_lock layer: vim mode"
    :rules [[:!P#Sj :!Pdown_arrow]
            [:!P#Sk :!Pup_arrow]
            [:!P#Sh :!Pleft_arrow]
@@ -1223,14 +1151,14 @@
            [:!T#Sa :!Cleft_arrow]
            [:!T#Se :!Cright_arrow]]}
 
-  {:des "tmux window manipulation in tmux-autostart-terminals"
+  {:des "tmux window manipulation"
    :rules
    [:tmux-autostart-terminals
     [:!Ct [:!Tb :c]] ; Cmd T -> tmux: new window
     [:!Cw [:!Tb :!S7]] ; Cmd W -> tmux: kill window
     ]}
 
-  {:des "# For Not HHKB\n- caps_lock to escape when pressed alone, to left_control as modifier\n- left_control to cmd+v when pressed alone, to hyper as modifier\n- behaves like HHKB, swap delete_or_backspace and \\, but keep shift+\\ as |"
+  {:des "# For Not HHKB\n- caps_lock to esc when pressed alone, to control as modifier\n- left_control to cmd+v when pressed alone, to hyper as modifier\n- behaves like HHKB, swap delete_or_backspace and \\, but keep shift+\\ as |"
    :rules
    [:!hhkb-bt
     [:##caps_lock :left_control nil {:alone :escape}]
@@ -1241,7 +1169,7 @@
     [:#CTObackslash :delete_or_backspace] ; keep shift+\ as |
     ]}
 
-  {:des "# For HHKB\n- left_control to esc when pressed alone, to left_control as modifier\n- esc to `\n- ` to \\\n- shift+delete_or_backspace to |"
+  {:des "# For HHKB\n- left_control to esc when pressed alone, to control as modifier\n- esc to `\n- ` to \\\n- shift+delete to |"
    :rules
    [:hhkb-bt
     [:##left_control :left_control nil {:alone :escape}]
@@ -1289,7 +1217,7 @@
             {:alone {:pkey :button1 :modi :left_command :lazy true :halt true}
              :held :button1
              :afterup :!Cc
-             ;; held 越短 command + left click 选择文本的延迟越低, 但是太短会导致快速点击时复制且不发送command
+             ;; held 越短 command + left click 选择文本的延迟越低, 但是太短会导致快速点击时复制且不发送 command
              :params {:alone 90 :held 90}}]
            ]}
 
@@ -1298,11 +1226,11 @@
   ;; https://github.com/yqrashawn/yqdotfiles/blob/121c105d7851f3113eae9b51c27a4dc4f02b8d12/modules/yqrashawn/home-manager/dotfiles/karabiner.edn#L519
   ;; inspired by [The SpaceFN layout](https://geekhack.org/index.php?topic=51069.0)
   ;; The space bar does not auto-repeat. To compensate, space+left_shift (space is left_shift now, so space+left_shift is useless) is an autorepeating space.
-  ;; {:des "space to left_shift when pressed with other non-modifier keys (space+left_shift->space to compensate auto-repeat)"
+  ;; {:des "space to shift when pressed with other non-modifier keys (space+left_shift->space to compensate auto-repeat)"
   ;;  :rules [[:spacebar {:key :left_shift :lazy true} nil {:alone :spacebar}]
   ;;          [:!Sleft_shift :spacebar]]}
   ;; FIXME produce typo "likeThis", use simlayers? ---> see "Spacebar Mode (shift)" above
-  #_{:des "space to left_shift when pressed with other keys (space+left_shift->space to compensate auto-repeat)"
+  #_{:des "space to shift when pressed with other keys (space+left_shift->space to compensate auto-repeat)"
    :rules [[:##spacebar {:key :left_shift :lazy true} nil {:alone :spacebar}]
            [:!Sleft_shift :spacebar]]}
 
