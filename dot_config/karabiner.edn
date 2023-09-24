@@ -136,8 +136,8 @@
   :ctrl-a-mode           {:key     :a
                           :modi    {:optional :caps_lock}}
 
-  :ctrl-semicolon-mode   {:key     :semicolon
-                          :modi    {:optional :caps_lock}}
+  ;; :ctrl-semicolon-mode   {:key     :semicolon
+  ;;                         :modi    {:optional :caps_lock}}
 
   :ctrl-m-mode           {:key     :m
                           :modi    {:optional :caps_lock}}
@@ -429,7 +429,8 @@
            [:comma [:open "/System/Applications/System Settings.app"]] ; cmd+, for setting
            [:period [:open "/System/Applications/Launchpad.app"]] ; 启动台
            [:slash [:open "/Applications/WhatPulse/WhatPulse.app"]]
-           [:open_bracket [:open "/Applications/企业微信.app/Contents/Frameworks/wwmapp.app"]] ; 企业微信•会议
+           [:open_bracket [[:open "/Applications/企业微信.app/Contents/Frameworks/wwmapp.app"] :same_wind_app] :!WeWork-Meeting] ; 企业微信•会议
+           [:open_bracket :same_wind_app :WeWork-Meeting]
            ]}
 
   {:des   "o mode (website)"
@@ -475,7 +476,7 @@
            [:hyphen :!Shyphen]
            [:equal_sign :!Sequal_sign]
            [:q :!Sq]
-           [:w :!Sw]
+           [:w :!Sw :!Preview]
            [:e :!Se]
            [:r :!Sr]
            [:t :!St]
@@ -483,7 +484,7 @@
            [:u :!Su]
            [:i :!Si]
            [:o :!So]
-           [:p :!Sp]
+           [:p :!Sp :!Preview]
            [:open_bracket :!Sopen_bracket]
            [:close_bracket :!Sclose_bracket]
            [:backslash :!Sbackslash]
@@ -492,7 +493,7 @@
            [:d :!Sd]
            [:f :!Sf]
            [:g :!Sg]
-           [:h :!Sh]
+           [:h :!Sh :!Preview]
            [:j :!Sj]
            [:k :!Sk]
            [:l :!Sl]
@@ -529,6 +530,11 @@
            [:grave_accent_and_tilde :!Sescape :hhkb-bt]
            [:delete_or_backspace :!Sbackslash :hhkb-bt] ; shift+delete -> |
            [:left_control :!Sescape :hhkb-bt] ; shift+esc for IntelliJ IDEA, Raycast
+
+           ;; see "Preview: doomemacs like keybindings" below
+           [:w :!C0 :Preview] ; Actual Size (doomemacs pdf-view-fit-width-to-window)
+           [:h :!C9 :Preview] ; Zoom to Fit (doomemacs pdf-view-fit-height-to-window)
+           [:p :!C9 :Preview] ; Zoom to Fit (doomemacs pdf-view-fit-page-to-window)
            ]}
 
   {:des   "tab mode (uiopjkl;m,./ to f1~f12)"
@@ -728,7 +734,7 @@
            [:delete_or_backspace :!Tdelete_or_backspace]
            ]}
 
-  {:des   "; mode (control)"
+  #_{:des   "; mode (control)"
    :rules [:ctrl-semicolon-mode
            [:1 :!W1]
            [:2 :!W2]
@@ -1008,6 +1014,30 @@
   {:des   "WeWork: switch chat message"
    :rules [:WeWork
            [:!Tj :!COdown_arrow] ; select next unread chat message
+           ]}
+
+  ;; behaves like doomemacs pdf-tools | ~/.config/doomemacs/.local/straight/repos/pdf-tools/lisp/pdf-view.el
+  {:des   "Preview: doomemacs like keybindings"
+   :rules [:Preview
+           [:j :down_arrow]
+           [:k :up_arrow]
+           [:h :left_arrow]
+           [:l :right_arrow]
+           ;; page_up/page_down not work
+           [:u [:up_arrow :up_arrow :up_arrow :up_arrow :up_arrow
+                :up_arrow :up_arrow :up_arrow :up_arrow :up_arrow
+                :up_arrow :up_arrow :up_arrow :up_arrow :up_arrow
+                :up_arrow :up_arrow :up_arrow :up_arrow :up_arrow]]
+           [:d [:down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
+                :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
+                :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
+                :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow]]
+           [:equal_sign :!Cequal_sign] ; Zoom In
+           [:hyphen :!Chyphen] ; Zoom Out
+           [:!Rw :!C0] ; Actual Size (doomemacs pdf-view-fit-width-to-window)
+           [:!Sh :!C9] ; Zoom to Fit (doomemacs pdf-view-fit-height-to-window)
+           [:!Sp :!C9] ; Zoom to Fit (doomemacs pdf-view-fit-page-to-window)
+           [:0 :!C9] ; Zoom to Fit (doomemacs pdf-view-scale-reset)
            ]}
 
   ;; TODO 改为在屏幕上下左右的中心点击一下鼠标
@@ -1296,35 +1326,36 @@
   ["^com\\.google\\.Chrome$"]
   :tmux-autostart-terminals
   ["^net\\.kovidgoyal\\.kitty$"]
-  :Emacs        ["^org\\.gnu\\.Emacs$" "^org\\.gnu\\.AquamacsEmacs$"
-                 "^org\\.gnu\\.Aquamacs$"]
-  :VSCode       ["^com\\.microsoft\\.VSCode$"]
-  :IntelliJ     ["^com\\.jetbrains\\.intellij\\.ce$"]
-  :PyCharm      ["^com\\.jetbrains\\.pycharm\\.ce$"]
-  :Kitty        ["^net\\.kovidgoyal\\.kitty$"]
-  :iTerm        ["^com\\.googlecode\\.iterm2$"]
-  :Finder       ["^com\\.apple\\.finder$"]
-  :Preview      ["^com\\.apple\\.Preview$"]
-  :Thunderbird  ["^org\\.mozilla\\.thunderbird$"]
-  :WeWork       ["^com\\.tencent\\.WeWorkMac$"]
-  :ChatGPT      ["^com\\.lencx\\.chatgpt$"]
-  :WPSOffice    ["^com\\.kingsoft\\.wpsoffice\\.mac$"]
-  :Chrome       ["^com\\.google\\.Chrome$"]
-  :Safari       ["^com\\.apple\\.Safari$"]
-  :Firefoxes    ["^org\\.mozilla\\.firefox$"
-                 "^org\\.mozilla\\.firefoxdeveloperedition$"]
-  :Terminals    ["^com\\.apple\\.Terminal$"
-                 "^com\\.googlecode\\.iterm2$"
-                 "^co\\.zeit\\.hyperterm$" "^co\\.zeit\\.hyper$"
-                 "^io\\.alacritty$"
-                 "^com\\.github\\.wez\\.wezterm$"
-                 "^net\\.kovidgoyal\\.kitty$"
-                 ;; "^dev\\.warp\\.Warp.*"
-                 ]
-  :Games        ["^unity\\." "^com\\.Klei\\." "^unity\\.Klei\\."
-                 "^org\\.Terraria"
-                 "\\.rimworld$"
-                 "Zomboid$"]}
+  :Emacs            ["^org\\.gnu\\.Emacs$" "^org\\.gnu\\.AquamacsEmacs$"
+                     "^org\\.gnu\\.Aquamacs$"]
+  :VSCode           ["^com\\.microsoft\\.VSCode$"]
+  :IntelliJ         ["^com\\.jetbrains\\.intellij\\.ce$"]
+  :PyCharm          ["^com\\.jetbrains\\.pycharm\\.ce$"]
+  :Kitty            ["^net\\.kovidgoyal\\.kitty$"]
+  :iTerm            ["^com\\.googlecode\\.iterm2$"]
+  :Finder           ["^com\\.apple\\.finder$"]
+  :Preview          ["^com\\.apple\\.Preview$"]
+  :Thunderbird      ["^org\\.mozilla\\.thunderbird$"]
+  :WeWork           ["^com\\.tencent\\.WeWorkMac$"]
+  :WeWork-Meeting   ["^com\\.tencent\\.wwmapp$"]
+  :ChatGPT          ["^com\\.lencx\\.chatgpt$"]
+  :WPSOffice        ["^com\\.kingsoft\\.wpsoffice\\.mac$"]
+  :Chrome           ["^com\\.google\\.Chrome$"]
+  :Safari           ["^com\\.apple\\.Safari$"]
+  :Firefoxes        ["^org\\.mozilla\\.firefox$"
+                     "^org\\.mozilla\\.firefoxdeveloperedition$"]
+  :Terminals        ["^com\\.apple\\.Terminal$"
+                     "^com\\.googlecode\\.iterm2$"
+                     "^co\\.zeit\\.hyperterm$" "^co\\.zeit\\.hyper$"
+                     "^io\\.alacritty$"
+                     "^com\\.github\\.wez\\.wezterm$"
+                     "^net\\.kovidgoyal\\.kitty$"
+                     ;; "^dev\\.warp\\.Warp.*"
+                     ]
+  :Games            ["^unity\\." "^com\\.Klei\\." "^unity\\.Klei\\."
+                     "^org\\.Terraria"
+                     "\\.rimworld$"
+                     "Zomboid$"]}
 
  ;; simlayer-threshold 设置较高的值 ---> 会导致 w 等键有点卡顿，但可以减少快速输入时的误触
  ;; the default value is 250
