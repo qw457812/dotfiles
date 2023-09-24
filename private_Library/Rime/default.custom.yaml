@@ -47,6 +47,7 @@ patch:
     # optimized_mode_switch:
     # 切换中英
     # - { when: always, accept: Shift+space, toggle: ascii_mode }
+    - { when: always, accept: Control+Shift+bracketright, toggle: ascii_mode }
     # 切换中英标点
     # - { when: always, accept: Control+period, toggle: ascii_punct }
 

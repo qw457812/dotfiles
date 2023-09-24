@@ -74,7 +74,7 @@
   :open-app        "osascript -e 'tell application \"%s\" to activate'" ; slower than "open -a"
   ;; :open-in-chrome  "open -na \"Google Chrome\" --args \"%s\""
   :hs              "open -g hammerspoon://%s" ; ~/.hammerspoon/init.lua
-  ;; :raycast         "open -g raycast://extensions/%s" ; Deeplink, 不适合有Raycast窗口的Command(如Google Search), 适合OCR但也会有Raycast窗口一闪而过
+  ;; :raycast         "open -g raycast://extensions/%s" ; Deeplink, 不适合有Raycast窗口的Command(如Google Search, can't press again to close), 适合不出现Raycast窗口直接执行的(如OCR, 但也会有Raycast窗口一闪而过)
   :wait_seconds    "osascript -e 'delay %s'"}
 
  ;; https://github.com/yqrashawn/GokuRakuJoudo/blob/master/tutorial.md#simlayers
@@ -284,7 +284,7 @@
            ;; https://docs.helix-editor.com/keymap.html#goto-mode
            [:##j :page_down]
            [:##k :page_up]
-           ;; TODO 根据不同app使用: home end :!Ta :!Te :!Cleft_arrow !Cright_arrow
+           ;; TODO 根据不同app使用: home/end, ctrl+a/ctrl+e, cmd+left_arrow/cmd+right_arrow
            [:##h :home :!line-navigating-by-cmd-arrow-app]
            [:##l :end :!line-navigating-by-cmd-arrow-app]
            [:##h :!Cleft_arrow :line-navigating-by-cmd-arrow-app]
@@ -320,7 +320,7 @@
            [:semicolon [:!Cleft_arrow :!CSright_arrow]] ; Highlight current line
            ]}
 
-  {:des "q mode (cmd+shift)"
+  {:des   "q mode (cmd+shift)"
    :rules [:q-mode
            [:1 :!CS1]
            [:2 :!CS2]
@@ -421,6 +421,8 @@
            [:o [:open "/Applications/wpsoffice.app"]] ; office
            [:p [:open "/System/Applications/Preview.app"] :!Preview]
            [:p :same_wind_app :Preview]
+           [:open_bracket [[:open "/Applications/企业微信.app/Contents/Frameworks/wwmapp.app"] :same_wind_app] :!WeWork-Meeting] ; 企业微信•会议
+           [:open_bracket :same_wind_app :WeWork-Meeting]
            [:v [:open "/Applications/Karabiner-EventViewer.app"]]
            ;; open my tiddlywiki then press escape to trigger vimium in chrome
            [:n [:open "http://127.0.0.1:8080/"] nil {:delayed {:invoked [:escape]} :params {:delay 700}}] ; note
@@ -429,8 +431,6 @@
            [:comma [:open "/System/Applications/System Settings.app"]] ; cmd+, for setting
            [:period [:open "/System/Applications/Launchpad.app"]] ; 启动台
            [:slash [:open "/Applications/WhatPulse/WhatPulse.app"]]
-           [:open_bracket [[:open "/Applications/企业微信.app/Contents/Frameworks/wwmapp.app"] :same_wind_app] :!WeWork-Meeting] ; 企业微信•会议
-           [:open_bracket :same_wind_app :WeWork-Meeting]
            ]}
 
   {:des   "o mode (website)"
@@ -442,7 +442,6 @@
            ;; [:s :!Cc nil {:delayed {:invoked [:open "https://translate.google.com/?sl=en&tl=zh-CN&text=$(pbpaste)&op=translate"]} :params {:delay 30}}]
            ;; [:s [:open "https://translate.google.com/?sl=en&tl=zh-CN&text=$(pbpaste)&op=translate"]]
            [:s [:open "https://translate.google.com/?sl=en&tl=zh-CN&op=translate"]]
-           ;; [:b [:open "raycast://extensions/Codely/google-chrome/search-bookmarks"]] ; Can't press again to close, 适合那种不出现Raycast窗口直接执行的, open or open -g ?
            [:b :!!hyphen] ; raycast://extensions/Codely/google-chrome/search-bookmarks
            [:h :!!f9] ; raycast://extensions/Codely/google-chrome/search-history
            [:t :!!f8] ; raycast://extensions/Codely/google-chrome/search-tab
@@ -519,16 +518,19 @@
 
            [:escape :!Sescape :!hhkb-bt]
            [:grave_accent_and_tilde :!Sgrave_accent_and_tilde :!hhkb-bt]
-           ;; [:delete_or_backspace :!Sdelete_or_backspace :!hhkb-bt]
+           ;; [:delete_or_backspace :!Sdelete_or_backspace :macbook-internal]
+           [:delete_or_backspace :!Sdelete_or_backspace :!hhkb-bt]
 
            ;; see "For Not HHKB" below
-           [:delete_or_backspace :!Sbackslash :!hhkb-bt]
            [:caps_lock :!Sescape :!hhkb-bt]
+
+           ;; see "For Neither HHKB nor Apple-Internal-Keyboard" below
+           ;; [:delete_or_backspace :!Sbackslash [:!hhkb-bt :!macbook-internal]]
 
            ;; see "For HHKB" below
            [:escape :!Sgrave_accent_and_tilde :hhkb-bt]
            [:grave_accent_and_tilde :!Sescape :hhkb-bt]
-           [:delete_or_backspace :!Sbackslash :hhkb-bt] ; shift+delete -> |
+           [:delete_or_backspace :!Sbackslash :hhkb-bt] ; left_shift+delete -> |
            [:left_control :!Sescape :hhkb-bt] ; shift+esc for IntelliJ IDEA, Raycast
 
            ;; see "Preview: doomemacs like keybindings" below
@@ -669,7 +671,7 @@
            [:i :!Ckeypad_plus] ; Zoom in
            [:o :!Ckeypad_hyphen] ; Zoom out
            [:m [:hs ["mouseHighlight"]]] ; show mouse
-           ;; [:spacebar [:hs ["mouseCenterClick"]]] ; Centre mouse to active app
+           ;; [:spacebar [:hs ["mouseCenterClick"]]] ; centre mouse to active app
            [:##spacebar {:pkey :button1}] ; Left click
            ]}
 
@@ -893,7 +895,7 @@
            [:period :!Speriod]
            [:slash :!Sslash]]}
 
-  #_{:des "r mode (numbers)"
+  #_{:des   "r mode (numbers)"
    :rules [:number-r-mode
            ;; [:##a :left_control]
            ;; [:##s :left_shift]
@@ -957,97 +959,90 @@
 
            [:m :delete_forward]
 
-           ;; f -> shift for right hand symbols
-           ;; [:6 :!S6] ; ^
-           ;; [:7 :!S7] ; &
-           ;; [:8 :!S8] ; *
-           ;; [:9 [:!S9 :!S0 :left_arrow]] ; ()
-           ;; [:0 :!S0] ; )
            [:y :!S6] ; ^
            [:u :hyphen] ; -
            [:i :equal_sign] ; =
            [:o :!Shyphen] ; _
            [:p :!Sequal_sign] ; +
-           ;; [:semicolon :!Ssemicolon] ; :
-           ;; [:quote [:!Squote :!Squote :left_arrow]] ; ""
-           ;; [:n [:open_bracket :close_bracket :left_arrow]] ; []
-           ;; [:m [:!Sopen_bracket :!Sclose_bracket :left_arrow]] ; {}
-           ;; [:comma [:!Scomma :!Speriod :left_arrow]] ; <>
-           ;; [:period :!Speriod] ; >
-           ;; [:slash :!Sslash] ; ?
-
-           ;; [:hyphen :!Shyphen] ; _
-           ;; [:equal_sign :!Sequal_sign] ; +
-           ;; [:open_bracket :!Sopen_bracket] ; {
-           ;; [:close_bracket :!Sclose_bracket] ; }
            ]}
 
   ;; jk mk ji df jl kl nk
   {:des  "simultaneous keys (jk, mk)"
-         :rules [
-                 [[:j :k] :escape]
-                 ;; [[:j :k] :escape nil {:params {:sim 50}}] ; sim 值越大, j 延迟越高
-                 ;; [[:k :l] :return_or_enter]
+   :rules [
+           ;; or jj to esc?
+           [[:j :k] :escape]
+           ;; [[:j :k] :escape nil {:params {:sim 50}}] ; sim 值越大, j 延迟越高
+           ;; [[:k :l] :return_or_enter]
 
-                 [[:j :l] :!!spacebar] ; Alfred Hotkey
+           [[:j :l] :!!spacebar] ; Alfred Hotkey
 
-                 ;; TODO left-hand mode
-                 [[:m :k] :!!backslash] ; raycast://extensions/isfeng/easydict/easydict
-                 [[:n :k] :!!equal_sign] ; raycast://extensions/raycast/floating-notes/toggle-floating-notes-window
+           ;; TODO left-hand mode
+           [[:m :k] :!!backslash] ; raycast://extensions/isfeng/easydict/easydict
+           [[:n :k] :!!equal_sign] ; raycast://extensions/raycast/floating-notes/toggle-floating-notes-window
 
-                 ;; emacs-everywhere | https://github.com/tecosaur/emacs-everywhere
-                 ;; [[:j :i] "/opt/homebrew/bin/emacsclient --eval \"(emacs-everywhere)\"" [:!vim-mode-disabled-application :!Emacs]]
-                 ;; [[:j :i] [:!Tx :5 :0] :Emacs]
-                 ]}
+           ;; emacs-everywhere | https://github.com/tecosaur/emacs-everywhere
+           ;; [[:j :i] "/opt/homebrew/bin/emacsclient --eval \"(emacs-everywhere)\"" [:!vim-mode-disabled-application :!Emacs]]
+           ;; [[:j :i] [:!Tx :5 :0] :Emacs]
+           ]}
 
   ;; or hold cmd+q for a while?
   ;; https://github.com/yqrashawn/GokuRakuJoudo/blob/master/examples.org#command-q-twice-to-quit-application
-  {:des "Quit application by pressing command-q twice"
-   :rules
-   [[:!C#Pq [:!Cq ["command-q" 0] [:noti :cmdq]] ["command-q" 1]]
-    [:!C#Pq [[:noti :cmdq "Press Again to QUIT"] ["command-q" 1]] nil
-     {:delayed {:invoked  [["command-q" 0] [:noti :cmdq]]
-                :canceled [["command-q" 0] [:noti :cmdq]]}
-      :params {:delay 500}}]]}
+  {:des   "Quit application by pressing command-q twice"
+   :rules [[
+            ;; <from> second cmd-q (when variable "command-q" is 1)
+            :!C#Pq
+            ;; <to>, 3 to action
+            ;; 1. call cmd-q
+            ;; 2. set variable "command-q" to 0
+            ;; 3. cleanup the :cmdq notification (omit the thrid item to cleanup notification)
+            [:!Cq ["command-q" 0] [:noti :cmdq]]
+            ;; <condition> when variable "command-q" is 1
+            ["command-q" 1]]
 
-  ;; TODO ranger like keybinding for Finder
-  {:des   "WeWork: switch chat message"
-   :rules [:WeWork
-           [:!Tj :!COdown_arrow] ; select next unread chat message
-           ]}
 
-  ;; behaves like doomemacs pdf-tools | ~/.config/doomemacs/.local/straight/repos/pdf-tools/lisp/pdf-view.el
-  {:des   "Preview: doomemacs like keybindings"
-   :rules [:Preview
-           [:j :down_arrow]
-           [:k :up_arrow]
-           [:h :left_arrow]
-           [:l :right_arrow]
-           ;; page_up/page_down not work
-           [:u [:up_arrow :up_arrow :up_arrow :up_arrow :up_arrow
-                :up_arrow :up_arrow :up_arrow :up_arrow :up_arrow
-                :up_arrow :up_arrow :up_arrow :up_arrow :up_arrow
-                :up_arrow :up_arrow :up_arrow :up_arrow :up_arrow]]
-           [:d [:down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
-                :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
-                :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
-                :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow]]
-           [:equal_sign :!Cequal_sign] ; Zoom In
-           [:hyphen :!Chyphen] ; Zoom Out
-           [:!Rw :!C0] ; Actual Size (doomemacs pdf-view-fit-width-to-window)
-           [:!Sh :!C9] ; Zoom to Fit (doomemacs pdf-view-fit-height-to-window)
-           [:!Sp :!C9] ; Zoom to Fit (doomemacs pdf-view-fit-page-to-window)
-           [:0 :!C9] ; Zoom to Fit (doomemacs pdf-view-scale-reset)
-           ]}
+           [
+            ;; <from> first cmd-q (when variable "command-q" is 0)
+            :!C#Pq
+
+            ;; <to>, 2 to action
+            ;; 1. show notification with :id :cmdq, :text "Press Again to QUIT"
+            ;; 2. set variable "command-q" to 1 (for the second press)
+            [[:noti :cmdq "Press Again to QUIT"] ["command-q" 1]]
+
+            ;; <condition> nil means no required condition
+            nil
+
+            ;; <additional-option>
+            {
+             ;; to_delayed_action documentation
+             ;; https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/to-delayed-action/
+             :delayed {
+                       ;; run 2 actions when no other key presses after basic.to_delayed_action_delay_milliseconds
+                       ;; 1. set variable "command-q" to 0
+                       ;; 2. cleanup notification :id :cmdq
+                       :invoked  [["command-q" 0] [:noti :cmdq]]
+
+                       ;; run 2 actions when another key presses within basic.to_delayed_action_delay_milliseconds
+                       ;; 1. set variable "command-q" to 0
+                       ;; 2. cleanup notification :id :cmdq
+                       :canceled [["command-q" 0] [:noti :cmdq]]}
+
+             :params  {
+                       ;; basic.to_delayed_action_delay_milliseconds
+                       :delay    500}}]]}
+
+  ;; https://github.com/mmroczka/.dotfiles/blob/master/karabiner/karabiner.edn
+  #_{:des   "Double colon triggers emoji search"
+   :rules [[:!Ssemicolon [:delete_or_backspace :!TCspacebar ["emoji_mode" 0]] ["emoji_mode" 1]]
+           [:!Ssemicolon ["emoji_mode" 1] nil {:alone :!Ssemicolon :delayed {:invoked ["emoji_mode" 0] :canceled ["emoji_mode" 0]}}]]}
 
   ;; TODO 改为在屏幕上下左右的中心点击一下鼠标
   ;; 组合键使用
-  {:des "right_command+ijkl to arrow"
-   :rules
-   [[:!Q##i :up_arrow]
-    [:!Q##j :left_arrow]
-    [:!Q##k :down_arrow]
-    [:!Q##l :right_arrow]]}
+  {:des   "right_command+ijkl to arrow"
+   :rules [[:!Q##i :up_arrow]
+           [:!Q##j :left_arrow]
+           [:!Q##k :down_arrow]
+           [:!Q##l :right_arrow]]}
 
   #_{:des   "Hold cmd+v for clipboard history by Maccy.app"
    :rules [[:!Cv nil nil {:alone :!Cv :held :!!f7 :repeat false :halt true :params {:alone 200 :held 200}}]]}
@@ -1062,49 +1057,97 @@
   {:des   "left cmd alone -> cmd+tab"
    :rules [:!niz-x87-wired [:#Pleft_command :left_command nil {:alone :prev_app}]]} ; ":prev_app" is same as ":!Ctab"
 
-  ;; right cmd -> rime/raycast/mouseCenter/return
-  ;; {:des  "right cmd alone -> cmd+`"
-  ;;  :rules [:!niz-x87 [:right_command :right_command nil {:alone :!Qgrave_accent_and_tilde}]]}
-  ;; {:des  "right cmd alone -> return"
-  ;;  :rules [:!niz-x87 [:right_command :right_command nil {:alone :return_or_enter}]]}
-  {:des  "right cmd alone -> centre mouse to active app, then maximize window"
-   :rules [:!niz-x87 [:right_command :right_command nil {:alone [:hs ["mouseCenterClickThenMaximizeWindow"]]}]]}
+  ;; right cmd -> cmd+`/rime/raycast/mouseCenter/return
+  {:des   "right cmd alone -> mouse center click to active app then maximize window"
+   :rules [:!niz-x87-bt [:#Pright_command :right_command nil {:alone [:hs ["mouseCenterClickThenMaximizeWindow"]]}]]}
 
-  ;; {:des   "left option alone -> hyper+f18 (iTerm2 Hotkey Window)"
-  ;;  :rules [:!niz-x87-wired [:left_option :left_option nil {:alone [:!!f18]}]]}
+  ;; TODO or press f twice to switch rime's english/chinese input? see "Double colon triggers emoji search" above
+  ;; TODO "For NIZ" below
+  ;; https://github.com/yqrashawn/GokuRakuJoudo/blob/master/examples.org#two-stroke-keybindings-emacs-c-x-mode
+  #_{:des   "right cmd alone -> toggle rime's ascii_mode, right cmd twice -> mouse center click to active app then maximize window"
+   :rules [:!niz-x87-bt
+           [
+            ;; <from> second right_command (when variable "right-command" is 1)
+            :#Pright_command
+
+            ;; <to>
+            [:right_command ["right-command" 0]] ; or move `["right-command" 0]` into `:afterup`
+            ;; :right_command
+
+            ;; <condition>
+            ["right-command" 1]
+
+            ;; <additional-option>
+            {
+             ;; [to_if_alone](https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/to-if-alone/)
+             ;; run 3 actions when the <from> key is pressed alone
+             ;; 1. send control+shift+] (toggle rime's ascii_mode back | ~/Library/Rime/default.custom.yaml)
+             ;; 2. call hammerspoon URL event "mouseCenterClickThenMaximizeWindow"
+             ;; 3. set variable "right-command" to 0
+             ;; FIXME vscode 切换中英文经常不灵
+             :alone   [:!TSclose_bracket [:hs ["mouseCenterClickThenMaximizeWindow"]] ["right-command" 0]] ; or move `["right-command" 0]` into `:afterup`
+             ;; :alone   [:!TSclose_bracket [:hs ["mouseCenterClickThenMaximizeWindow"]]]
+
+             ;; [to_after_key_up](https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/to-after-key-up/)
+             ;; set variable "right-command" to 0 when the <from> key is released
+             ;; :afterup ["right-command" 0]
+             }]
+
+
+           [
+            ;; <from> first right_command (when variable "right-command" is 0)
+            :#Pright_command
+
+            ;; <to>
+            :right_command
+
+            ;; <condition>
+            nil
+
+            ;; <additional-option>
+            {
+             ;; run 2 actions when the <from> key is pressed alone
+             ;; 1. send left_shift  (toggle rime's ascii_mode | ~/Library/Rime/default.yaml)
+             ;; 2. set variable "right-command" to 1 (for the second press)
+             ;; FIXME vscode 切换中英文经常不灵
+             :alone   [:left_shift ["right-command" 1]]
+
+             :delayed {
+                       ;; set variable "right-command" to 0 when no other key presses after basic.to_delayed_action_delay_milliseconds
+                       :invoked  ["right-command" 0]
+
+                       ;; set variable "right-command" to 0 when another key presses within basic.to_delayed_action_delay_milliseconds
+                       :canceled ["right-command" 0]}
+
+             :params  {:delay    500}}]]}
+
   {:des   "left option alone -> tmux prefix"
    :rules [:!niz-x87-wired
-           ;; [:left_option :left_option :!Terminals {:alone [:!!f18]}]
-           [:left_option :left_option :!tmux-autostart-terminals {:alone [:open "/Applications/kitty.app"]}]
-           [:left_option :left_option :tmux-autostart-terminals {:alone [:!Tb]}] ; tmux prefix
+           ;; [:left_option :left_option :!Terminals {:alone [:!!f18]}] ; left option alone -> hyper+f18 (iTerm2 Hotkey Window)
+           [:#Pleft_option :left_option :!tmux-autostart-terminals {:alone [:open "/Applications/kitty.app"]}]
+           [:#Pleft_option :left_option :tmux-autostart-terminals {:alone [:!Tb]}] ; tmux prefix
            ]}
 
-  ;; TODO right_option -> hyper
+  ;; TODO right_option -> hyper/super-hyper(hyper+fn)/translate
   ;; TODO :super-hyper [:command :shift :control :option :fn]
-  ;; TODO translate in nvim
-  ;; {:des   "right option alone -> option+shift+a (immersive-translate in chrome, safari)"
-  ;;  :rules [:!niz-x87 [:right_option :right_option nil {:alone [:!OSa]}]]}
   {:des   "right option alone -> option+shift+a (immersive-translate in chrome, safari)"
-   :rules [[:right_option :right_option [:!niz-x87 :!niz-x87-wired] {:alone [:!OSa]}]]}
+   :rules [[:#Pright_option :right_option [:!niz-x87-bt :!niz-x87-wired] {:alone [:!OSa]}]]}
 
   ;; TODO 影响 double shift
-  ;; FIXME vscode 里切换中英文经常不灵 为什么 rime 可以组合键吗
+  ;; FIXME vscode 切换中英文经常不灵
   ;; rime 中英切换 left_shift改为right_control | ~/Library/Rime/default.custom.yaml
   #_{:des   "left shift alone -> switch rime's english/chinese input"
    :rules [[:left_shift :left_shift nil {:alone :right_control}]]}
 
-  ;; TODO alone 修饰键 right_shift(状态开关 类似caps_lock 开关vim模式) right_option
+  ;; TODO alone 修饰键 right_shift(状态开关 类似caps_lock 开关vi模式)
   ;; TODO noti like command-q
-  {:des   "right shift alone -> caps_lock (see \"caps_lock layer: vim mode\" below)"
+  {:des   "right shift alone -> caps_lock (see \"caps_lock layer: vi mode\" below)"
    :rules [[:#Pright_shift :right_shift nil {:alone [:caps_lock]}]]}
 
 ;; ------------------------------ Fundamental ------------------------------
 ;; WARN: the order of rules matters, see "space to shift" below
 
-;; TODO 仅参考 https://github.com/mmroczka/.dotfiles/blob/master/karabiner/karabiner.edn
-;; {:des "Double colon triggers emoji search" :rules[ [:!Ssemicolon [:delete_or_backspace :!TCspacebar ["emoji_mode" 0]] ["emoji_mode" 1]]
-                                                  ;; [:!Ssemicolon ["emoji_mode" 1] nil {:alone :!Ssemicolon :delayed {:invoked ["emoji_mode" 0] :canceled ["emoji_mode" 0]}}] ]}
-  {:des "caps_lock layer: vim mode"
+  {:des   "caps_lock layer: vi mode"
    :rules [[:!P#Sj :!Pdown_arrow]
            [:!P#Sk :!Pup_arrow]
            [:!P#Sh :!Pleft_arrow]
@@ -1132,10 +1175,9 @@
            [:!PR#S4 :!PTe]
            [:!PT#Su :!Ppage_up]
            [:!PT#Sd :!Ppage_down]
-           ;; TODO gg ... 
+           ;; TODO gg, see "Double colon triggers emoji search" above
            ;; notimeout ---> https://github.com/yqrashawn/GokuRakuJoudo/blob/master/examples.org#custom-variable
            ;; timeoutlen=delay ---> https://github.com/yqrashawn/GokuRakuJoudo/blob/master/examples.org#two-stroke-keybindings-emacs-c-x-mode
-           ;; TODO gg 参考 "Double colon triggers emoji search" above
            [:!P#Sg :!PCup_arrow]
            [:!PR#Sg :!PCdown_arrow]
 
@@ -1181,66 +1223,89 @@
            [:!T#Sa :!Cleft_arrow]
            [:!T#Se :!Cright_arrow]]}
 
-  {:des "tmux window manipulation"
-   :rules
-   [:tmux-autostart-terminals
-    [:!Ct [:!Tb :c]] ; Cmd T -> tmux: new window
-    [:!Cw [:!Tb :!S7]] ; Cmd W -> tmux: kill window
-    ]}
+  ;; TODO ranger like keybinding for Finder
+  {:des   "WeWork: switch chat message"
+   :rules [:WeWork
+           [:!Tj :!COdown_arrow] ; select next unread chat message
+           ]}
 
-  {:des "# For Not HHKB\n- caps_lock to esc when pressed alone, to control as modifier\n- left_control to cmd+v when pressed alone, to hyper as modifier\n- behaves like HHKB, swap delete_or_backspace and \\, but keep shift+\\ as |"
-   :rules
-   [:!hhkb-bt
-    [:##caps_lock :left_control nil {:alone :escape}]
-    [:##left_control :!CTOleft_shift nil {:alone :!Cv}]
-    ;; behaves like HHKB, swap delete_or_backspace and \
-    [:##delete_or_backspace :backslash]
-    ;; FIXME cmd+option+delete
-    [:#CTObackslash :delete_or_backspace] ; keep shift+\ as |
-    ]}
+  {:des   "Kitty: tmux window manipulation"
+   :rules [:tmux-autostart-terminals
+           [:!Ct [:!Tb :c]] ; Cmd T -> tmux: new window
+           [:!Cw [:!Tb :!S7]] ; Cmd W -> tmux: kill window
+           ]}
 
-  {:des "# For HHKB\n- left_control to esc when pressed alone, to control as modifier\n- esc to `\n- ` to \\\n- shift+delete to |"
-   :rules
-   [:hhkb-bt
-    [:##left_control :left_control nil {:alone :escape}]
-    [:##grave_accent_and_tilde :escape] ; 组合键使用 shift+esc for IntelliJ IDEA, Raycast
-    ;; [:##grave_accent_and_tilde :backslash] ; ` -> \ (即左上角两个键都改为\)
-    [:##escape :grave_accent_and_tilde]
-    [:!Sdelete_or_backspace :!Sbackslash] ; shift+delete -> |
-    ]}
+  ;; behaves like doomemacs pdf-tools | ~/.config/doomemacs/.local/straight/repos/pdf-tools/lisp/pdf-view.el
+  {:des   "Preview: doomemacs like keybindings"
+   :rules [:Preview
+           [:j :down_arrow]
+           [:k :up_arrow]
+           [:h :left_arrow]
+           [:l :right_arrow]
+           ;; page_up/page_down not work
+           [:u [:up_arrow :up_arrow :up_arrow :up_arrow :up_arrow
+                :up_arrow :up_arrow :up_arrow :up_arrow :up_arrow
+                :up_arrow :up_arrow :up_arrow :up_arrow :up_arrow
+                :up_arrow :up_arrow :up_arrow :up_arrow :up_arrow]]
+           [:d [:down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
+                :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
+                :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
+                :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow]]
+           [:equal_sign :!Cequal_sign] ; Zoom In
+           [:hyphen :!Chyphen] ; Zoom Out
+           [:!Rw :!C0] ; Actual Size (doomemacs pdf-view-fit-width-to-window)
+           [:!Sh :!C9] ; Zoom to Fit (doomemacs pdf-view-fit-height-to-window)
+           [:!Sp :!C9] ; Zoom to Fit (doomemacs pdf-view-fit-page-to-window)
+           [:0 :!C9] ; Zoom to Fit (doomemacs pdf-view-scale-reset)
+           ]}
 
-  {:des "# For NIZ\n- fix the right hand modifier keys"
-   :rules
-   [:niz-x87
-    ;; [:##right_control :right_command nil {:alone :!Qgrave_accent_and_tilde}] ; command, see "right cmd alone" above
-    ;; [:##right_control :right_command nil {:alone :return_or_enter}] ; command, see "right cmd alone" above
-    [:##right_control :right_command nil {:alone [:hs ["mouseCenterClickThenMaximizeWindow"]]}] ; command, see "right cmd alone" above
-    [:##right_command :right_option nil {:alone [:!OSa]}] ; option, see "right option alone -> option+shift+a" above
-    [:##right_option :!CTOleft_shift nil {:alone :!Cv}] ; ctrl
-    ]}
+  {:des   "For Not HHKB\n- caps_lock to esc when pressed alone, to control as modifier\n- left_control to cmd+v when pressed alone, to hyper as modifier"
+   :rules [:!hhkb-bt
+           [:##caps_lock :left_control nil {:alone :escape}]
+           [:##left_control :!CTOleft_shift nil {:alone :!Cv}]
+           ]}
 
-  {:des "# For NIZ-wired use USB\n- fix the modifier keys"
-   :rules
-   [:niz-x87-wired
-    [:##left_option :left_command nil {:alone :prev_app}] ; left_command, see "left cmd alone" above
-    ;; [:##left_command :left_option nil {:alone [:!!f18]}] ; left_option, see "left option alone" above
-    ;; [:##left_command :left_option :!Terminals {:alone [:!!f18]}] ; left_option, see "left option alone" above
-    [:##left_command :left_option :!tmux-autostart-terminals {:alone [:open "/Applications/kitty.app"]}] ; left_option, see "left option alone" above
-    [:##left_command :left_option :tmux-autostart-terminals {:alone [:!Tb]}] ; left_option, see "left option alone" above
-    [:##right_option :right_command nil {:alone [:hs ["mouseCenterClickThenMaximizeWindow"]]}] ; right_command, see "right cmd alone" above
-    [:##application :right_option nil {:alone [:!OSa]}] ; right_option, see "right option alone -> option+shift+a" above
-    [:##right_control :!CTOleft_shift nil {:alone :!Cv}] ; right_ctrl
-    ]}
+  ;; https://github.com/yqrashawn/GokuRakuJoudo/blob/master/examples.org#device-input-method-application-conditions
+  #_{:des   "# For Neither HHKB nor Apple-Internal-Keyboard\n- behaves like HHKB, swap delete_or_backspace and \\, but keep shift+\\ as |"
+   :rules [[:condi :!hhkb-bt :!macbook-internal]
+           ;; behaves like HHKB, swap delete_or_backspace and \
+           [:##delete_or_backspace :backslash]
+           ;; FIXME cmd+shift+delete
+           [:#CTObackslash :delete_or_backspace] ; keep shift+\ as |
+           ]}
+
+  {:des   "For HHKB\n- left_control to esc when pressed alone\n- swap esc and `\n- shift+delete to |"
+   :rules [:hhkb-bt
+           [:##left_control :left_control nil {:alone :escape}]
+           [:##escape :grave_accent_and_tilde] ; esc -> `
+           ;; [:##grave_accent_and_tilde :backslash] ; ` -> \ (即左上角两个键都改为\)
+           [:##grave_accent_and_tilde :escape] ; ` -> esc (组合键使用 shift+esc for IntelliJ IDEA, Raycast)
+           [:!S#Pdelete_or_backspace :!Sbackslash] ; left_shift+delete -> |
+           ]}
+
+  {:des   "For NIZ: fix the wrong position of modifier keys"
+   :rules [:niz-x87-bt
+           [:##right_control :right_command nil {:alone [:hs ["mouseCenterClickThenMaximizeWindow"]]}] ; right_command, see "right cmd alone" above
+           [:##right_command :right_option nil {:alone [:!OSa]}] ; right_option, see "right option alone" above
+           [:##right_option :!CTOleft_shift nil {:alone :!Cv}] ; right_ctrl see "For Not HHKB" above
+           :niz-x87-wired
+           [:##left_option :left_command nil {:alone :prev_app}] ; left_command, see "left cmd alone" above
+           ;; [:##left_command :left_option :!Terminals {:alone [:!!f18]}] ; left_option, see "left option alone" above
+           [:##left_command :left_option :!tmux-autostart-terminals {:alone [:open "/Applications/kitty.app"]}] ; left_option, see "left option alone" above
+           [:##left_command :left_option :tmux-autostart-terminals {:alone [:!Tb]}] ; left_option, see "left option alone" above
+           [:##right_option :right_command nil {:alone [:hs ["mouseCenterClickThenMaximizeWindow"]]}] ; right_command, see "right cmd alone" above
+           [:##application :right_option nil {:alone [:!OSa]}] ; right_option, see "right option alone" above
+           [:##right_control :!CTOleft_shift nil {:alone :!Cv}] ; right_ctrl, see "For Not HHKB" above
+           ]}
 
   ;; TODO quick copy/paste for Trackpad
   ;; inspired by chrome extension: Copy on Select
   ;; https://apple.stackexchange.com/questions/21595/can-i-copy-by-highlighting-and-paste-by-middle-click-on-mac-os-x
   ;; `:button1` and `{:pkey :button1}` both work for <to>, but only `{:pkey :button3}` work for <from>
-  {:des "copy on command + left click, paste on middle click"
-   :rules [
-           [:from-middle-click [{:pkey :button1} :!Cv]]
+  {:des   "copy on command + left click, paste on middle click"
+   :rules [[:from-middle-click [{:pkey :button1} :!Cv]]
            ;; [:from-command-left-click :button1 nil {:afterup :!Cc}]
-           ;; FIXME command + left click twice to copy a word
+           ;; TODO command + left click twice to copy a word
            [:from-command-left-click nil nil
             ;; command + left click 快速点击时不复制, 发送command + left click (IntelliJ, Chrome 跳转)
             ;; https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/to/halt/
@@ -1256,16 +1321,16 @@
   ;; https://github.com/yqrashawn/yqdotfiles/blob/121c105d7851f3113eae9b51c27a4dc4f02b8d12/modules/yqrashawn/home-manager/dotfiles/karabiner.edn#L519
   ;; inspired by [The SpaceFN layout](https://geekhack.org/index.php?topic=51069.0)
   ;; The space bar does not auto-repeat. To compensate, space+left_shift (space is left_shift now, so space+left_shift is useless) is an autorepeating space.
-  ;; {:des "space to shift when pressed with other non-modifier keys (space+left_shift->space to compensate auto-repeat)"
+  ;; {:des   "space to shift when pressed with other non-modifier keys (space+left_shift->space to compensate auto-repeat)"
   ;;  :rules [[:spacebar {:key :left_shift :lazy true} nil {:alone :spacebar}]
   ;;          [:!Sleft_shift :spacebar]]}
-  ;; FIXME produce typo "likeThis", use simlayers? ---> see "Spacebar Mode (shift)" above
-  #_{:des "space to shift when pressed with other keys (space+left_shift->space to compensate auto-repeat)"
+  ;; produce typo "likeThis", use simlayers instead, see "space mode (shift)" above
+  #_{:des   "space to shift when pressed with other keys (space+left_shift->space to compensate auto-repeat)"
    :rules [[:##spacebar {:key :left_shift :lazy true} nil {:alone :spacebar}]
            [:!Sleft_shift :spacebar]]}
 
   ;; swap 后 shift+; 会触发鼠须管 shift 切换中英文
-  #_{:des "swap : and ;"
+  #_{:des   "swap : and ;"
    :rules [[:#Psemicolon :!Ssemicolon]
            [:!Ssemicolon :semicolon]]}
 
@@ -1274,8 +1339,8 @@
 
  :devices            {:macbook-internal   [{:product_id 0 :vendor_id 0}]
                       :hhkb-bt            [{:vendor_id 1278 :product_id 33}]
-                      :niz-x87            [{:vendor_id 1452 :product_id 272}]
-                      :niz-x87-wired      [{:vendor_id 1155 :product_id 20785}] ; NIZ有线
+                      :niz-x87-bt         [{:vendor_id 1452 :product_id 272}]
+                      :niz-x87-wired      [{:vendor_id 1155 :product_id 20785}] ; NIZ有线(USB)
                       }
 
  ;; osascript -e 'id of app "Finder"'
