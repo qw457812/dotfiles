@@ -145,6 +145,9 @@
   ;; :symbol-e-mode         {:key     :e}
 
   :e-mode                {:key     :e
+                          :modi    {:optional :caps_lock}}
+
+  :r-mode                {:key     :r
                           :modi    {:optional :caps_lock}}}
 
  :main
@@ -865,6 +868,13 @@
            [:l :same_wind_app] ; cmd+`
            ]}
 
+  {:des   "r mode (scrolling)"
+   :rules [:r-mode
+           [:j {:mkey {:vwheel -64}}]
+           [:h {:mkey {:hwheel -64}}]
+           [:k {:mkey {:vwheel 64}}]
+           [:l {:mkey {:hwheel 64}}]]}
+
   ;; jk mk ji df jl kl nk
   {:des  "simultaneous keys (jk, mk)"
    :rules [
@@ -1161,8 +1171,7 @@
   {:des   "For Not HHKB\n- caps_lock to esc when pressed alone, to control as modifier\n- left_control to cmd+v when pressed alone, to hyper as modifier"
    :rules [:!hhkb-bt
            [:##caps_lock :left_control nil {:alone :escape}]
-           [:##left_control :!CTOleft_shift nil {:alone :!Cv}]
-           ]}
+           [:##left_control :!CTOleft_shift nil {:alone :!Cv}]]}
 
   ;; https://github.com/yqrashawn/GokuRakuJoudo/blob/master/examples.org#device-input-method-application-conditions
   #_{:des   "# For Neither HHKB nor Apple-Internal-Keyboard\n- behaves like HHKB, swap delete_or_backspace and \\, but keep shift+\\ as |"
@@ -1224,8 +1233,7 @@
            [:from-middle-click nil nil
             {:alone   [{:pkey :button1} :!Cv]
              :held    [{:pkey :button1} :!Ca {:key :v :modi [:left_command] :lazy true :repeat false}] ; hold middle click to overwrite
-             :params  {:alone 500 :held 500}}]
-           ]}
+             :params  {:alone 500 :held 500}}]]}
 
   {:des   "trackpad + keyboard: copy/paste, vi mode"
    :rules [
