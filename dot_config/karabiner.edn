@@ -1197,18 +1197,18 @@
            [:##right_control :!CTOleft_shift nil {:alone :!Cv}] ; right_ctrl, see "For Not HHKB" above
            ]}
 
-  ;; TODO quick copy/paste for Trackpad
   ;; inspired by chrome extension: Copy on Select
   ;; https://apple.stackexchange.com/questions/21595/can-i-copy-by-highlighting-and-paste-by-middle-click-on-mac-os-x
   ;; `:button1` and `{:pkey :button1}` both work for <to>, but only `{:pkey :button3}` work for <from>
-  {:des   "copy on command + left click, paste on middle click, copy word on option + left click"
+  {:des   "mouse + keyboard: copy/paste"
    :rules [
-           ;; [:from-middle-click [{:pkey :button1} :!Cv]]
-           [:from-middle-click nil nil
-            {:alone   [{:pkey :button1} :!Cv]
-             ;; TODO test repeat
-             :held    [{:pkey :button1} :!Ca {:key :v :modi [:left_command] :lazy true :repeat false}] ; hold middle click to overwrite
-             :params  {:alone 500 :held 500}}]
+           ;; option + click -> copy word
+           ;; [:from-option-left-click [:button1 :button1 :!Cc]]
+           [:from-option-left-click nil nil
+            {:alone   [{:pkey :button1} {:pkey :button1} :!Cc]
+             :held    {:pkey :button1 :modi :left_option :lazy true}
+             :params  {:alone 250 :held 250}}]
+           ;; command + click -> copy selected
            ;; [:from-command-left-click :button1 nil {:afterup :!Cc}]
            ;; TODO command + left click twice to copy a word
            [:from-command-left-click nil nil
@@ -1219,29 +1219,40 @@
              :afterup :!Cc
              ;; held 越短 command + left click 选择文本的延迟越低, 但是太短会导致快速点击时复制且不发送 command
              :params  {:alone 90 :held 90}}]
-           ;; [:from-option-left-click [:button1 :button1 :!Cc]]
-           [:from-option-left-click nil nil
-            {:alone   [{:pkey :button1} {:pkey :button1} :!Cc]
-             :held    {:pkey :button1 :modi :left_option :lazy true}
-             :params  {:alone 250 :held 250}}]
+           ;; middle click -> paste
+           ;; [:from-middle-click [{:pkey :button1} :!Cv]]
+           [:from-middle-click nil nil
+            {:alone   [{:pkey :button1} :!Cv]
+             :held    [{:pkey :button1} :!Ca {:key :v :modi [:left_command] :lazy true :repeat false}] ; hold middle click to overwrite
+             :params  {:alone 500 :held 500}}]
            ]}
 
-  {:des   "trackpad + keyboard"
+  {:des   "trackpad + keyboard: copy/paste, vi mode"
    :rules [
-           ;; quick copy/paste
+           ;; s(when the finger is on the trackpad) -> copy word
+           {:type       :basic
+            :from       {:key_code :s}
+            :to         [{:pointing_button :button1}
+                         {:pointing_button :button1}
+                         {:key_code :c :modifiers [:left_command] :lazy true}]
+            :conditions [{:type  :variable_unless
+                          :name  "multitouch_extension_finger_count_total"
+                          :value 0}]}
+           ;; d -> copy selected
            {:type       :basic
             :from       {:key_code :d}
             :to         [{:key_code :c :modifiers [:left_command] :lazy true}]
             :conditions [{:type  :variable_unless
                           :name  "multitouch_extension_finger_count_total"
                           :value 0}]}
-          #_{:type       :basic
-            :from       {:key_code :f}
-            :to         [{:pointing_button :button1}
-                         {:key_code :v :modifiers [:left_command] :lazy true}]
-            :conditions [{:type  :variable_unless
-                          :name  "multitouch_extension_finger_count_total"
-                          :value 0}]}
+           ;; {:type       :basic
+           ;;  :from       {:key_code :f}
+           ;;  :to         [{:pointing_button :button1}
+           ;;               {:key_code :v :modifiers [:left_command] :lazy true}]
+           ;;  :conditions [{:type  :variable_unless
+           ;;                :name  "multitouch_extension_finger_count_total"
+           ;;                :value 0}]}
+           ;; f -> paste
            {:type            :basic
             :from            {:key_code :f}
             :to_if_alone     [{:pointing_button :button1}
@@ -1257,6 +1268,7 @@
                               :basic.to_if_held_down_threshold_milliseconds 500}}
 
            ;; [Multitouch Vi Mode](https://ke-complex-modifications.pqrs.org/#multitouch_vi_mode)
+           ;; h/j/k/l to home/page_down/page_up/end when two fingers are on the trackpad
            {:type       :basic
             :from       {:key_code :h :modifiers {:optional :any}}
             :to         [{:key_code :home}]
@@ -1281,6 +1293,7 @@
             :conditions [{:type  :variable_if
                           :name  "multitouch_extension_finger_count_total"
                           :value 2}]}
+           ;; h/j/k/l to arrow keys when the number of fingers on the trackpad is not zero or two 
            {:type       :basic
             :from       {:key_code :h :modifiers {:optional :any}}
             :to         [{:key_code :left_arrow}]
@@ -1306,13 +1319,13 @@
                           :name  "multitouch_extension_finger_count_total"
                           :value 0}]}
 
+           ;; e/r -> scroll up/down
            {:type       :basic
             :from       {:key_code :r}
             :to         [{:mouse_key {:vertical_wheel -128}}]
             :conditions [{:type  :variable_unless
                           :name  "multitouch_extension_finger_count_total"
                           :value 0}]}
-           ;; FIXME
            {:type       :basic
             :from       {:key_code :e}
             :to         [{:mouse_key {:vertical_wheel 128}}]
