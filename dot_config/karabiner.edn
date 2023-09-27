@@ -486,15 +486,23 @@
            [:k :!Cup_arrow :WeWork] ; wework: previous chat message
 
            ;; create/close tab in most apps
-           [:l :!Ct [:!create-tab-by-cmd-n-app :!tmux-autostart-terminals]] ; Cmd t
-           [:h :!Cw :!tmux-autostart-terminals] ; Cmd w
-           [:l :!Cn :create-tab-by-cmd-n-app] ; Cmd n
-           [:l [:!Tb :c] :tmux-autostart-terminals] ; tmux: new window
-           [:h [:!Tb :!S7] :tmux-autostart-terminals] ; tmux: kill window
+           ;; [:l :!Ct [:!create-tab-by-cmd-n-app :!tmux-autostart-terminals]] ; Cmd t
+           ;; [:h :!Cw :!tmux-autostart-terminals] ; Cmd w
+           ;; [:l :!Cn :create-tab-by-cmd-n-app] ; Cmd n
+           ;; [:l [:!Tb :c] :tmux-autostart-terminals] ; tmux: new window
+           ;; [:h [:!Tb :!S7] :tmux-autostart-terminals] ; tmux: kill window
+           [:n :!Ct [:!create-tab-by-cmd-n-app :!tmux-autostart-terminals]] ; Cmd t
+           [:n :!Cn :create-tab-by-cmd-n-app] ; Cmd n
+           [:n [:!Tb :c] :tmux-autostart-terminals] ; tmux: new window
 
            ;; switch sheets
-           [:comma :!COopen_bracket :WPSOffice] ; wps: previous worksheet
-           [:period :!COclose_bracket :WPSOffice] ; wps: next worksheet
+           ;; [:comma :!COopen_bracket :WPSOffice] ; wps: previous worksheet
+           ;; [:period :!COclose_bracket :WPSOffice] ; wps: next worksheet
+           [:h :!COopen_bracket :WPSOffice] ; wps: previous worksheet
+           [:l :!COclose_bracket :WPSOffice] ; wps: next worksheet
+           ;; TODO tmux: previous pane
+           [:h [:!Tb :h :!Tb :k] :tmux-autostart-terminals] ; tmux: previous pane
+           [:l [:!Tb :o] :tmux-autostart-terminals] ; tmux: next pane
 
            ;; resize window, remap Rectangle.app
            [:m :!TSOspacebar] ; maximize
@@ -529,6 +537,8 @@
   {:des   "w mode (application launcher)"
    :rules [:launch-mode
            ;; TODO spacebar
+           [:spacebar [:open "$HOME/Applications/PyCharm Community Edition.app"] :!PyCharm]
+           [:spacebar :same_wind_app :PyCharm]
            [:h [:open "/Applications/企业微信.app"] :!WeWork]
            [:h :same_wind_app :WeWork]
            [:j [:open "/Applications/Google Chrome.app"] :!Chrome]
@@ -863,8 +873,11 @@
 
   {:des   "e mode (cmd+tab)"
    :rules [:e-mode
-           [:j :prev_app] ; cmd+tab
-           [:k :!CStab]
+           ;; [:j :prev_app] ; cmd+tab
+           ;; [:k :!CStab]
+           [:j :!Otab] ; AltTab.app
+           ;; [:k [:!Otab :!Oright_shift :!Oright_shift]]
+           [:k :!Otab nil {:delayed {:invoked [:!Oright_shift :!Oright_shift]} :params {:delay 30}}]
            [:l :same_wind_app] ; cmd+`
            ]}
 
@@ -1070,14 +1083,14 @@
            [:!P#Sw :!POright_arrow]
            [:!P#Se :!POright_arrow]
 
-           [:!P#Si :!PCleft_arrow]
-           [:!P#Sa :!PCright_arrow]
+           ;; [:!P#Si :!PCleft_arrow]
+           ;; [:!P#Sa :!PCright_arrow]
            ;; i/I/a/A -> exit this layer to input, inspired by https://github.com/zuorn/EmacsVim
            ;; FIXME caps_lock 触发了多次 -> try :lazy
            ;; [:!PSi [:!Pcaps_lock :!Cleft_arrow]]
            ;; [:!PRa [:!Pcaps_lock :!Cright_arrow]]
-           ;; [:!Pi :caps_lock]
-           ;; [:!Pa [:!Pright_arrow :caps_lock]]
+           [:!Pi :!Pcaps_lock]
+           [:!Pa [:!Pright_arrow :!Pcaps_lock]]
 
            [:!P#S0 :!PTa]
            [:!P#S4 :!PTe]
@@ -1235,6 +1248,7 @@
              :held    [{:pkey :button1} :!Ca {:key :v :modi [:left_command] :lazy true :repeat false}] ; hold middle click to overwrite
              :params  {:alone 500 :held 500}}]]}
 
+  ;; TODO easy to accidentally trigger
   {:des   "trackpad + keyboard: copy/paste, vi mode"
    :rules [
            ;; s(when the finger is on the trackpad) -> copy word
@@ -1277,69 +1291,70 @@
 
            ;; [Multitouch Vi Mode](https://ke-complex-modifications.pqrs.org/#multitouch_vi_mode)
            ;; h/j/k/l to home/page_down/page_up/end when two fingers are on the trackpad
-           {:type       :basic
-            :from       {:key_code :h :modifiers {:optional :any}}
-            :to         [{:key_code :home}]
-            :conditions [{:type  :variable_if
-                          :name  "multitouch_extension_finger_count_total"
-                          :value 2}]}
-           {:type       :basic
-            :from       {:key_code :j :modifiers {:optional :any}}
-            :to         [{:key_code :page_down}]
-            :conditions [{:type  :variable_if
-                          :name  "multitouch_extension_finger_count_total"
-                          :value 2}]}
-           {:type       :basic
-            :from       {:key_code :k :modifiers {:optional :any}}
-            :to         [{:key_code :page_up}]
-            :conditions [{:type  :variable_if
-                          :name  "multitouch_extension_finger_count_total"
-                          :value 2}]}
-           {:type       :basic
-            :from       {:key_code :l :modifiers {:optional :any}}
-            :to         [{:key_code :end}]
-            :conditions [{:type  :variable_if
-                          :name  "multitouch_extension_finger_count_total"
-                          :value 2}]}
+           ;; {:type       :basic
+           ;;  :from       {:key_code :h :modifiers {:optional :any}}
+           ;;  :to         [{:key_code :home}]
+           ;;  :conditions [{:type  :variable_if
+           ;;                :name  "multitouch_extension_finger_count_total"
+           ;;                :value 2}]}
+           ;; {:type       :basic
+           ;;  :from       {:key_code :j :modifiers {:optional :any}}
+           ;;  :to         [{:key_code :page_down}]
+           ;;  :conditions [{:type  :variable_if
+           ;;                :name  "multitouch_extension_finger_count_total"
+           ;;                :value 2}]}
+           ;; {:type       :basic
+           ;;  :from       {:key_code :k :modifiers {:optional :any}}
+           ;;  :to         [{:key_code :page_up}]
+           ;;  :conditions [{:type  :variable_if
+           ;;                :name  "multitouch_extension_finger_count_total"
+           ;;                :value 2}]}
+           ;; {:type       :basic
+           ;;  :from       {:key_code :l :modifiers {:optional :any}}
+           ;;  :to         [{:key_code :end}]
+           ;;  :conditions [{:type  :variable_if
+           ;;                :name  "multitouch_extension_finger_count_total"
+           ;;                :value 2}]}
            ;; h/j/k/l to arrow keys when the number of fingers on the trackpad is not zero or two 
-           {:type       :basic
-            :from       {:key_code :h :modifiers {:optional :any}}
-            :to         [{:key_code :left_arrow}]
-            :conditions [{:type  :variable_unless
-                          :name  "multitouch_extension_finger_count_total"
-                          :value 0}]}
-           {:type       :basic
-            :from       {:key_code :j :modifiers {:optional :any}}
-            :to         [{:key_code :down_arrow}]
-            :conditions [{:type  :variable_unless
-                          :name  "multitouch_extension_finger_count_total"
-                          :value 0}]}
-           {:type       :basic
-            :from       {:key_code :k :modifiers {:optional :any}}
-            :to         [{:key_code :up_arrow}]
-            :conditions [{:type  :variable_unless
-                          :name  "multitouch_extension_finger_count_total"
-                          :value 0}]}
-           {:type       :basic
-            :from       {:key_code :l :modifiers {:optional :any}}
-            :to         [{:key_code :right_arrow}]
-            :conditions [{:type  :variable_unless
-                          :name  "multitouch_extension_finger_count_total"
-                          :value 0}]}
+           ;; {:type       :basic
+           ;;  :from       {:key_code :h :modifiers {:optional :any}}
+           ;;  :to         [{:key_code :left_arrow}]
+           ;;  :conditions [{:type  :variable_unless
+           ;;                :name  "multitouch_extension_finger_count_total"
+           ;;                :value 0}]}
+           ;; {:type       :basic
+           ;;  :from       {:key_code :j :modifiers {:optional :any}}
+           ;;  :to         [{:key_code :down_arrow}]
+           ;;  :conditions [{:type  :variable_unless
+           ;;                :name  "multitouch_extension_finger_count_total"
+           ;;                :value 0}]}
+           ;; {:type       :basic
+           ;;  :from       {:key_code :k :modifiers {:optional :any}}
+           ;;  :to         [{:key_code :up_arrow}]
+           ;;  :conditions [{:type  :variable_unless
+           ;;                :name  "multitouch_extension_finger_count_total"
+           ;;                :value 0}]}
+           ;; {:type       :basic
+           ;;  :from       {:key_code :l :modifiers {:optional :any}}
+           ;;  :to         [{:key_code :right_arrow}]
+           ;;  :conditions [{:type  :variable_unless
+           ;;                :name  "multitouch_extension_finger_count_total"
+           ;;                :value 0}]}
 
            ;; e/r -> scroll up/down
-           {:type       :basic
-            :from       {:key_code :r}
-            :to         [{:mouse_key {:vertical_wheel -128}}]
-            :conditions [{:type  :variable_unless
-                          :name  "multitouch_extension_finger_count_total"
-                          :value 0}]}
-           {:type       :basic
-            :from       {:key_code :e}
-            :to         [{:mouse_key {:vertical_wheel 128}}]
-            :conditions [{:type  :variable_unless
-                          :name  "multitouch_extension_finger_count_total"
-                          :value 0}]}]}
+           ;; {:type       :basic
+           ;;  :from       {:key_code :r}
+           ;;  :to         [{:mouse_key {:vertical_wheel -128}}]
+           ;;  :conditions [{:type  :variable_unless
+           ;;                :name  "multitouch_extension_finger_count_total"
+           ;;                :value 0}]}
+           ;; {:type       :basic
+           ;;  :from       {:key_code :e}
+           ;;  :to         [{:mouse_key {:vertical_wheel 128}}]
+           ;;  :conditions [{:type  :variable_unless
+           ;;                :name  "multitouch_extension_finger_count_total"
+           ;;                :value 0}]}
+           ]}
 
   ;; WARN: the order of rules matters ---> try put this rules before :f-mode, then press f-space and hold f, release space and press space again
   ;; https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/to/lazy/
@@ -1409,7 +1424,8 @@
    "^org\\.jkiss\\.dbeaver\\.core\\.product$"
    "^md\\.obsidian$" "^com\\.tidgi$"]
   :switch-tabs-by-ctrl-tab-app
-  ["^org\\.mozilla\\.thunderbird$" "^com\\.kingsoft\\.wpsoffice\\.mac$"]
+  ["^org\\.mozilla\\.thunderbird$" "^com\\.kingsoft\\.wpsoffice\\.mac$"
+   "^com\\.citrix\\.receiver\\.icaviewer\\.mac$"]
   :create-tab-by-cmd-n-app
   ["^com\\.microsoft\\.VSCode(Insiders)?$"]
   :line-navigating-by-cmd-arrow-app
