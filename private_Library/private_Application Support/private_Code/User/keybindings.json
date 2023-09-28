@@ -1,0 +1,102 @@
+// 将键绑定放在此文件中以覆盖默认值
+// https://github.com/nikitavoloboev/config/blob/master/vscode/keybindings.json
+[
+    {
+        "key": "shift+;",
+        "command": "vim.showQuickpickCmdLine",
+        "when": "inZenMode && vim.mode != 'Insert'"
+    },
+    {
+        "key": "alt+j",
+        "command": "editor.action.moveLinesDownAction",
+        "when": "textInputFocus"
+    },
+    {
+        "key": "alt+k",
+        "command": "editor.action.moveLinesUpAction",
+        "when": "textInputFocus"
+    },
+    {
+        "command": "vscode-neovim.compositeEscape1",
+        "key": "j",
+        "when": "neovim.mode == insert && editorTextFocus",
+        "args": "j"
+    },
+    {
+        "command": "vscode-neovim.compositeEscape2",
+        "key": "k",
+        "when": "neovim.mode == insert && editorTextFocus",
+        "args": "k"
+    },
+    {
+        "key": "ctrl+;",
+        "command": "workbench.action.terminal.focus",
+        "when": "!terminalFocus"
+    },
+    {
+        "key": "ctrl+;",
+        "command": "workbench.action.focusFirstEditorGroup",
+        "when": "terminalFocus"
+    },
+    // vim redo
+    // {
+    //     "key": "ctrl+r",
+    //     "command": "workbench.view.explorer"
+    // },
+    {
+        "key": "ctrl+j",
+        "command": "workbench.action.previousEditor"
+    },
+    {
+        "key": "ctrl+k",
+        "command": "workbench.action.nextEditor"
+    },
+    {
+        "key": "cmd+j",
+        "command": "workbench.action.showAllEditors"
+    },
+    {
+        "key": "cmd+m",
+        "command": "workbench.action.quickOpenTerm"
+    },
+    {
+        "key": "enter",
+        "command": "editor.action.goToDeclaration",
+        "when": "inSearchEditor && editorTextFocus && vim.mode == 'Normal'"
+    },
+    {
+        "key": "ctrl+i",
+        "command": "editor.action.quickFix",
+        "when": "editorHasCodeActionsProvider && editorTextFocus && !editorReadonly"
+    },
+    {
+        "key": "shift+cmd+'",
+        "command": "toggleVim"
+    },
+    {
+        "key": "ctrl+space",
+        "command": "-editor.action.triggerSuggest",
+        "when": "editorHasCompletionItemProvider && textInputFocus && !editorReadonly"
+    },
+    {
+        "key": "f2",
+        "command": "-editor.action.rename",
+        "when": "editorHasRenameProvider && editorTextFocus && !editorReadonly"
+    },
+    {
+        "key": "ctrl+d",
+        "command": "editor.action.rename"
+    },
+    {
+        "key": "cmd+.",
+        "command": "workbench.action.togglePanel"
+    },
+    {
+        "key": "ctrl+n",
+        "command": "editor.action.codeAction"
+    },
+    {
+        "key": "shift+cmd+f",
+        "command": "search.action.openEditor"
+    }
+]

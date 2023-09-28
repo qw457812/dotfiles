@@ -1,0 +1,26 @@
+{
+  "settingsVersion": "1.67.7",
+  "exclusionRules": [
+    {
+      "pattern": "https?://mail.google.com/*",
+      "passKeys": ""
+    }
+  ],
+  "filterLinkHints": false,
+  "waitForEnterForFilteredHints": true,
+  "hideHud": false,
+  "keyMappings": "# Insert your preferred key mappings here.\n#  Safari Extension Vimari\nmap q previousTab\nmap w nextTab\nmap h goBack\nmap l goForward\nmap H scrollLeft\nmap L scrollRight\nmap ' Marks.activateGotoMode\nmap s LinkHints.activateModeToOpenInNewForegroundTab\n# https://github.com/philc/vimium/wiki/Key-Mappings#helix\nmap zh scrollToLeft\nmap zl scrollToRight\nmap gh firstTab\n# map gp previousTab\n# map gn nextTab\nmap ga visitPreviousTab\nmap gl lastTab\nmap e Vomnibar.activateEditUrl\nmap E Vomnibar.activateEditUrlInNewTab\nmap \\ passNextKey\nmap ch closeTabsOnLeft\nmap cl closeTabsOnRight\nmap co closeOtherTabs\n# map <space> scrollPageDown\n# [left hand mode](https://github.com/philc/vimium/issues/1455#issuecomment-80618649)\nmap a Vomnibar.activateTabSelection\nmap ; Vomnibar.activateInNewTab\nmap J nextTab\nmap K previousTab\nmap gp goPrevious\nmap gn goNext\nunmap <a-p>\nmap <c-p> togglePinTab\nunmap <a-m>\nmap <c-m> toggleMuteTab\nunmap <a-f>\nmap <c-f> LinkHints.activateModeWithQueue",
+  "linkHintCharacters": "sadfjklewcmpgh",
+  "linkHintNumbers": "0123456789",
+  "newTabUrl": "about:newtab",
+  "nextPatterns": "next,more,newer,>,›,→,»,≫,>>,下一页",
+  "previousPatterns": "prev,previous,back,older,<,‹,←,«,≪,<<,上一页",
+  "regexFindMode": false,
+  "ignoreKeyboardLayout": false,
+  "scrollStepSize": 60,
+  "smoothScroll": true,
+  "grabBackFocus": false,
+  "searchEngines": "w: https://www.wikipedia.org/w/index.php?title=Special:Search&search=%s Wikipedia\n\n# More examples.\n#\n# (Vimium supports search completion Wikipedia, as\n# above, and for these.)\n#\n# g: https://www.google.com/search?q=%s Google\n# l: https://www.google.com/search?q=%s&btnI I'm feeling lucky...\n# y: https://www.youtube.com/results?search_query=%s Youtube\n# gm: https://www.google.com/maps?q=%s Google maps\n# b: https://www.bing.com/search?q=%s Bing\n# d: https://duckduckgo.com/?q=%s DuckDuckGo\n# az: https://www.amazon.com/s/?field-keywords=%s Amazon\n# qw: https://www.qwant.com/?q=%s Qwant\n\n# https://github.com/philc/vimium/wiki/Search-Engines\nl: https://www.google.com/search?q=%s&btnI I'm feeling lucky...\nrecent: https://www.google.com/search?hl=en&tbo=1&tbs=qdr:y&q=%s Google (last year only)\ntranslate: https://translate.google.com/?source=osdd#auto|auto|%s Google Translator\nw: https://en.wikipedia.org/wiki/Special:Search?search=%s Wikipedia\nd: https://duckduckgo.com/?q=%s DuckDuckGo\nb: https://www.bing.com/search?setmkt=en-GB&q=%s Bing\ngh: https://github.com/search?q=%s GitHub\nhn: https://www.hnsearch.com/search#request/submissions&q=%s&start=0 HackerNews\nso: https://stackoverflow.com/search?q=%s StackOverflow\nsu: https://superuser.com/search?q=%s SuperUser\nsh: http://symbolhound.com/?q=%s SymbolHound\n# Use google to search the current site you're on\nsite: javascript:location='https://www.google.com/search?num=100&q=site:'+escape(location.hostname)+'+%s'",
+  "searchUrl": "https://www.google.com/search?q=",
+  "userDefinedLinkHintCss": "div > .vimiumHintMarker {\n/* linkhint boxes */\nbackground: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#FFF785),\n  color-stop(100%,#FFC542));\nborder: 1px solid #E3BE23;\n}\n\ndiv > .vimiumHintMarker span {\n/* linkhint text */\ncolor: black;\nfont-weight: bold;\nfont-size: 12px;\n}\n\ndiv > .vimiumHintMarker > .matchingCharacter {\n}"
+}
