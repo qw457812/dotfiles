@@ -384,6 +384,8 @@ set -g mode-keys vi
 # bind -r p previous-window # select previous window
 # bind -r n next-window     # select next window
 
+# edit configuration with chezmoi
+bind e new-window -n "#{TMUX_CONF_LOCAL}" sh -c 'chezmoi edit --apply --verbose "$TMUX_CONF_LOCAL" && "$TMUX_PROGRAM" ${TMUX_SOCKET:+-S "$TMUX_SOCKET"} source "$TMUX_CONF" \; display "$TMUX_CONF_LOCAL sourced"'
 
 # -- tpm -----------------------------------------------------------------------
 
