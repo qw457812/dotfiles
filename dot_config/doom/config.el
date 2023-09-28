@@ -155,7 +155,7 @@
                                                 :default t)])
 ;; current VSCode defaults
 ;; (setq lsp-java-vmargs '("-XX:+UseParallelGC" "-XX:GCTimeRatio=4" "-XX:AdaptiveSizePolicyWeight=90" "-Dsun.zip.disableMemoryMapping=true" "-Xmx2G" "-Xms100m"))
-;; /Users/xingyuqiang/Library/Application Support/JetBrains/IdeaIC2023.1/idea.vmoptions
+;; ~/Library/Application Support/JetBrains/IdeaIC2023.1/idea.vmoptions
 (setq lsp-java-vmargs '("-XX:+UseParallelGC" "-XX:GCTimeRatio=4" "-XX:AdaptiveSizePolicyWeight=90" "-Dsun.zip.disableMemoryMapping=true" "-Xmx4096m" "-Xms2048m"))
 ;; TODO https://github.com/emacs-lsp/lsp-java#spring-boot-support-experimental
 

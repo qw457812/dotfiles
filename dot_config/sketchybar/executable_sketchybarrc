@@ -1,0 +1,195 @@
+# This is a demo config to show some of the most important commands more easily.
+# This is meant to be changed and configured, as it is intentionally kept sparse.
+# For a more advanced configuration example see my dotfiles:
+# https://github.com/FelixKratz/dotfiles
+
+# https://github.com/FelixKratz/SketchyBar/discussions/12?sort=top
+# https://github.com/FelixKratz/dotfiles/blob/master/.config/sketchybar/sketchybarrc
+source "$CONFIG_DIR/colors.sh" # Loads all defined colors
+source "$CONFIG_DIR/icons.sh" # Loads all defined icons
+
+# https://github.com/khaneliman/dotfiles/blob/main/dots/macos/yabai/home/.config/sketchybar/sketchybarrc
+# Setting up and starting the helper process
+source "$HOME/.config/sketchybar/helper/helper.sh"
+
+FONT="JetBrainsMono Nerd Font"
+
+PLUGIN_DIR="$CONFIG_DIR/plugins"
+
+##### Bar Appearance #####
+# Configuring the general appearance of the bar, these are only some of the
+# options available. For all options see:
+# https://felixkratz.github.io/SketchyBar/config/bar
+# If you are looking for other colors, see the color picker:
+# https://felixkratz.github.io/SketchyBar/config/tricks#color-picker
+
+sketchybar --bar height=22        \
+                 blur_radius=30   \
+                 position=top     \
+                 sticky=off       \
+                 padding_left=10  \
+                 padding_right=10 \
+                 color=0x15ffffff
+
+##### Changing Defaults #####
+# We now change some default values that are applied to all further items
+# For a full list of all available item properties see:
+# https://felixkratz.github.io/SketchyBar/config/items
+
+sketchybar --default icon.font="$FONT:Bold:17.0"           \
+                     icon.color=0xffffffff                 \
+                     label.font="$FONT:Bold:14.0"          \
+                     label.color=0xffffffff                \
+                     padding_left=5                        \
+                     padding_right=5                       \
+                     label.padding_left=4                  \
+                     label.padding_right=4                 \
+                     icon.padding_left=4                   \
+                     icon.padding_right=4
+
+##### Adding Mission Control Space Indicators #####
+# Now we add some mission control spaces:
+# https://felixkratz.github.io/SketchyBar/config/components#space----associate-mission-control-spaces-with-an-item
+# to indicate active and available mission control spaces
+
+# SPACE_ICONS=("1" "2" "3" "4" "5" "6" "7" "8" "9" "10")
+#
+# for i in "${!SPACE_ICONS[@]}"
+# do
+#   sid=$(($i+1))
+#   sketchybar --add space space.$sid left                                 \
+#              --set space.$sid associated_space=$sid                      \
+#                               icon=${SPACE_ICONS[i]}                     \
+#                               background.color=0x44ffffff                \
+#                               background.corner_radius=5                 \
+#                               background.height=20                       \
+#                               background.drawing=off                     \
+#                               label.drawing=off                          \
+#                               script="$PLUGIN_DIR/space.sh"              \
+#                               click_script="yabai -m space --focus $sid"
+# done
+
+##### Adding Left Items #####
+# We add some regular items to the left side of the bar
+# only the properties deviating from the current defaults need to be set
+
+# sketchybar --add item space_separator left                         \
+#            --set space_separator icon=                            \
+#                                  padding_left=10                   \
+#                                  padding_right=10                  \
+#                                  label.drawing=off                 \
+#                                                                    \
+sketchybar --add item front_app left                               \
+           --set front_app       script="$PLUGIN_DIR/front_app.sh" \
+                                 icon.drawing=off                  \
+           --subscribe front_app front_app_switched
+
+##### Adding Right Items #####
+# In the same way as the left items we can add items to the right side.
+# Additional position (e.g. center) are available, see:
+# https://felixkratz.github.io/SketchyBar/config/items#adding-items-to-sketchybar
+
+# Some items refresh on a fixed cycle, e.g. the clock runs its script once
+# every 10s. Other items respond to events they subscribe to, e.g. the
+# volume.sh script is only executed once an actual change in system audio
+# volume is registered. More info about the event system can be found here:
+# https://felixkratz.github.io/SketchyBar/config/events
+
+# sketchybar --add item clock right                              \
+#            --set clock   update_freq=10                        \
+#                          icon=                                \
+#                          script="$PLUGIN_DIR/clock.sh"         \
+#                                                                \
+#            --add item wifi right                               \
+#            --set wifi    script="$PLUGIN_DIR/wifi.sh"          \
+#                          icon=                                \
+#            --subscribe wifi wifi_change                        \
+#                                                                \
+#            --add item volume right                             \
+#            --set volume  script="$PLUGIN_DIR/volume.sh"        \
+#            --subscribe volume volume_change                    \
+#                                                                \
+#            --add item battery right                            \
+#            --set battery script="$PLUGIN_DIR/battery.sh"       \
+#                          update_freq=120                       \
+#            --subscribe battery system_woke power_source_change \
+
+clock=(
+  icon.drawing=off
+  icon.font="$FONT:Bold:14.0"
+  script="$PLUGIN_DIR/clock.sh"
+  update_freq=10
+)
+
+battery=(
+  icon.drawing=off
+  # label.drawing=off
+  script="$PLUGIN_DIR/battery.sh"
+  update_freq=120
+  updates=on
+)
+
+# Trigger the brew_udpate event when brew update or upgrade is run from cmdline
+# e.g. via function in .zshrc
+brew=(
+  icon=􀐛
+  icon.font="$FONT:Bold:14.0"
+  label=?
+  script="$PLUGIN_DIR/brew.sh"
+  update_freq=900
+)
+
+# cpu, memory: https://github.com/FelixKratz/SketchyBar/discussions/12?sort=top#discussioncomment-4623255
+# FIXME No matching processes belonging to you were found\n ps: stdout: Broken pipe | /opt/homebrew/var/log/sketchybar/sketchybar.err.log
+cpu_percent=(
+	icon="$CPU"
+	icon.color="$BLUE"
+	label=?
+	update_freq=4
+	mach_helper="$HELPER"
+)
+
+memory=(
+	icon="$MEMORY"
+	icon.color="$GREEN"
+	update_freq=15
+	script="$PLUGIN_DIR/ram.sh"
+)
+
+sketchybar --add item clock right                                    \
+           --set clock "${clock[@]}"                                 \
+           --subscribe clock system_woke                             \
+                                                                     \
+           --add item battery right                                  \
+           --set battery "${battery[@]}"                             \
+           --subscribe battery system_woke power_source_change       \
+                                                                     \
+           --add item cpu.percent right                              \
+           --set cpu.percent "${cpu_percent[@]}"                     \
+                                                                     \
+           --add item memory right                                   \
+           --set memory "${memory[@]}"                               \
+                                                                     \
+           --add event brew_update                                   \
+           --add item brew right                                     \
+           --set brew "${brew[@]}"                                   \
+           --subscribe brew brew_update
+           
+
+# https://github.com/FelixKratz/SketchyVim
+# sketchybar --add item svim.mode right \
+#            --set svim.mode popup.align=right \
+#                            icon= \
+#                            icon.font="$FONT:Bold:28.0" \
+#                            label.font="$FONT:Bold:13.0" \
+#                            icon.color=0xffff6578 \
+#                            script="sketchybar --set svim.mode popup.drawing=off" \
+#            --subscribe svim.mode front_app_switched window_focus \
+#            --add item svim.cmdline popup.svim.mode \
+#            --set svim.cmdline icon="Command: "
+
+##### Finalizing Setup #####
+# The below command is only needed at the end of the initial configuration to
+# force all scripts to run the first time, it should never be run in an item script.
+
+sketchybar --update
