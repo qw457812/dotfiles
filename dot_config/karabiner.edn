@@ -480,8 +480,10 @@
            [:k :!TStab :switch-tabs-by-ctrl-tab-app] ; Ctrl Shift Tab
            [:j [:!Tb :!Tl] :tmux-autostart-terminals] ; tmux: next window
            [:k [:!Tb :!Th] :tmux-autostart-terminals] ; tmux: previous window
-           [:j [:spacebar :tab :close_bracket] :Emacs] ; doomemacs: next workspace
-           [:k [:spacebar :tab :open_bracket] :Emacs] ; doomemacs: previous workspace
+           ;; [:j [:spacebar :tab :close_bracket] :Emacs] ; doomemacs: next workspace
+           ;; [:k [:spacebar :tab :open_bracket] :Emacs] ; doomemacs: previous workspace
+           [:j [:spacebar :b :n] :Emacs] ; doomemacs: next buffer
+           [:k [:spacebar :b :p] :Emacs] ; doomemacs: previous buffer
            [:j :!Cdown_arrow :WeWork] ; wework: next chat message
            [:k :!Cup_arrow :WeWork] ; wework: previous chat message
 
@@ -491,9 +493,10 @@
            ;; [:l :!Cn :create-tab-by-cmd-n-app] ; Cmd n
            ;; [:l [:!Tb :c] :tmux-autostart-terminals] ; tmux: new window
            ;; [:h [:!Tb :!S7] :tmux-autostart-terminals] ; tmux: kill window
-           [:n :!Ct [:!create-tab-by-cmd-n-app :!tmux-autostart-terminals]] ; Cmd t
+           [:n :!Ct [:!create-tab-by-cmd-n-app :!tmux-autostart-terminals :!Emacs]] ; Cmd t
            [:n :!Cn :create-tab-by-cmd-n-app] ; Cmd n
            [:n [:!Tb :c] :tmux-autostart-terminals] ; tmux: new window
+           [:n [:spacebar :b :!Sn] :Emacs] ; doomemacs: new empty buffer
 
            ;; switch sheets
            ;; [:comma :!COopen_bracket :WPSOffice] ; wps: previous worksheet
@@ -503,6 +506,8 @@
            ;; TODO tmux: previous pane
            [:h [:!Tb :h :!Tb :k] :tmux-autostart-terminals] ; tmux: previous pane
            [:l [:!Tb :o] :tmux-autostart-terminals] ; tmux: next pane
+           [:h [:spacebar :w :!Sw] :Emacs] ; doomemacs: previous window
+           [:l [:spacebar :w :w] :Emacs] ; doomemacs: next window
 
            ;; resize window, remap Rectangle.app
            [:m :!TSOspacebar] ; maximize
@@ -523,6 +528,7 @@
            [:k :return_or_enter]
            [:l :backslash] ; \ for HHKB
 
+           ;; [:m :delete_forward]
            [:n :delete_forward]
            [:m :tab]
 
@@ -1151,7 +1157,8 @@
            [:!Tj :!COdown_arrow] ; select next unread chat message
            ]}
 
-  {:des   "Kitty: tmux window manipulation"
+  ;; 影响 cmd+w 关闭 raycast
+  #_{:des   "Kitty: tmux window manipulation"
    :rules [:tmux-autostart-terminals
            [:!Ct [:!Tb :c]] ; Cmd T -> tmux: new window
            [:!Cw [:!Tb :!S7]] ; Cmd W -> tmux: kill window
@@ -1249,7 +1256,7 @@
              :params  {:alone 500 :held 500}}]]}
 
   ;; TODO easy to accidentally trigger
-  {:des   "trackpad + keyboard: copy/paste, vi mode"
+  #_{:des   "trackpad + keyboard: copy/paste, vi mode"
    :rules [
            ;; s(when the finger is on the trackpad) -> copy word
            {:type       :basic
