@@ -87,7 +87,8 @@ plugins=(git tmux)
 #     ZSH_TMUX_AUTOSTART=true 
 #     # ZSH_TMUX_AUTOCONNECT=false 
 # fi
-# 防止影响JetBrains, emacs, vscode的终端
+# -z "$INTELLIJ_ENVIRONMENT_READER" | https://github.com/ohmyzsh/ohmyzsh/pull/11927
+# 防止影响JetBrains, emacs, vscode内的终端
 if [[ "$TERM" == "xterm-kitty" ]]; then
     ZSH_TMUX_AUTOSTART=true 
 fi
