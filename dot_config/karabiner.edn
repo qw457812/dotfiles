@@ -416,6 +416,9 @@
            ;; [:##v :left_option]
            ;; [:##b :left_command]
 
+           ; rime: next schema | ~/Library/Rime/default.custom.yaml
+           [:i :!TSopen_bracket]
+
            ;; [:##f :fn]
            [:d :!Cc]
            [:f :!Cv]
@@ -683,6 +686,7 @@
            ;; [:p :!!f17] ; Toggle System Proxy for ClashX
            [:p [:!!f17 :!!f4]] ; Toggle System Proxy and Enhance Mode for ClashX Pro
            [:g "/opt/homebrew/bin/goku"]
+           [:r :!TOgrave_accent_and_tilde] ; rime deploy
 
            ;; information
            [:n :!!f1] ; clock by Bartender 4 (n for notifications)

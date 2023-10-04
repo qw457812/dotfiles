@@ -58,6 +58,9 @@ patch:
     - { when: composing, accept: Control+v, send: Page_Down }
 
     # optimized_mode_switch:
+    # 在最近的两个方案之间切换
+    # - { when: always, accept: Control+Shift+space, select: .next }
+    - { when: always, accept: Control+Shift+bracketleft, select: .next }
     # 切换中英
     # - { when: always, accept: Shift+space, toggle: ascii_mode }
     - { when: always, accept: Control+Shift+bracketright, toggle: ascii_mode }
@@ -66,7 +69,8 @@ patch:
 
     # https://github.com/ssnhd/rime
     - { when: has_menu, accept: semicolon, send: 2 }              # ":" (分号)选择第 2 个候选词
-    - { when: has_menu, accept: apostrophe, send: 3 }             # "'" (引号)选择第 3 个候选词
+    # 影响全拼单引号分词，改为小鹤双拼方案专有快捷键
+    # - { when: has_menu, accept: apostrophe, send: 3 }             # "'" (引号)选择第 3 个候选词
 
   # Lua 配置: 以词定字（上屏当前词句的第一个或最后一个字）
   key_binder/select_first_character: "bracketleft" # 即 [

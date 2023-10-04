@@ -25,3 +25,16 @@ patch:
     - name: full_shape
       states: [ 半角, 全角 ]
       reset: 0
+
+  # # 从 default 继承快捷键
+  # key_binder:
+  #   import_preset: default  # 从 default.yaml 继承通用的
+  #   # bindings:             # 也可以再增加方案专有的
+  key_binder/bindings:
+    # https://github.com/ssnhd/rime
+    - { when: has_menu, accept: apostrophe, send: 3 }             # "'" (引号)选择第 3 个候选词
+
+  # https://dvel.me/posts/rime-ice/#%e4%b8%8d%e5%90%8c%e7%9a%84%e4%b8%8a%e5%b1%8f%e6%96%b9%e5%bc%8f
+  # 如果是双拼方案，preedit_format 还可以选择是否在输入框进行转换，比如小鹤双拼输入 zz 时，是显示 zz 还是 zou。
+  # 要设置双拼不转换为全拼，可以直接把 preedit_format 及下面那些 xform 都删除，或者这样打补丁：
+  # translator/preedit_format: []
