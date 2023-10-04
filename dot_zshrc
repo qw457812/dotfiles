@@ -176,7 +176,7 @@ export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 # brew search vim
 # Warning: Error searching on GitHub: GitHub API Error: Requires authentication
 # Create a GitHub personal access token: https://github.com/settings/tokens/new?scopes=gist,repo,workflow&description=Homebrew
-export HOMEBREW_GITHUB_API_TOKEN=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
+# export HOMEBREW_GITHUB_API_TOKEN=
 
 # http://www.npmmirror.com/
 #alias for cnpm
