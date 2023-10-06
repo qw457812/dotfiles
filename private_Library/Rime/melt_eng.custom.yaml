@@ -1,0 +1,10 @@
+# melt_eng.schema.yaml的补丁文件是melt_eng.custom.yaml
+patch:
+  # [双拼的补丁示例 | 常见问题 · Issue #133 · iDvel/rime-ice](https://github.com/iDvel/rime-ice/issues/133)
+  # 因为 melt_eng.dict.yaml 不能打补丁，所以创建另外一个 my_eng.dict.yaml 文件并修改引入的地方。
+  # 修改引入词库有一些反直觉，开始我以为只修改拼音方案的 melt_eng/dictionary 就可以了，但实际测试发现还需要修改英文方案本身的。
+  # 改为挂载刚创建的 my_eng.dict.yaml
+  translator/dictionary: my_eng
+  speller/algebra:
+    # 修改为小鹤双拼的拼写派生规则，因为不在同一个文件了，前面要加上文件名
+    __include: melt_eng.schema.yaml:/algebra_flypy

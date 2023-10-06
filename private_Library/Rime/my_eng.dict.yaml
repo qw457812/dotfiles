@@ -1,0 +1,28 @@
+# Rime dictionary
+# encoding: utf-8
+#
+# 挂载英文输入方案的词库
+#
+# [双拼的补丁示例 | 常见问题 · Issue #133 · iDvel/rime-ice](https://github.com/iDvel/rime-ice/issues/133)
+# 以小鹤双拼方案 double_pinyin_flypy.schema.yaml 为例。
+# 因为 melt_eng.dict.yaml 不能打补丁，所以需要创建另外一个文件并修改引入的地方。
+# 创建 my_eng.dict.yaml 并将其中的中英混输词库由全拼改为小鹤：
+
+---
+# name: melt_eng
+name: my_eng
+# version: "2023-05-09"
+version: "1"
+import_tables:
+  - en_dicts/en_ext  # 补充（里面有些许带权重的，且和 en 重复，需要把 en_ext 放在上面）
+  - en_dicts/en      # 英文主词库
+
+  # 中英混输词库
+  # - en_dicts/cn_en                        # 全拼
+  # - en_dicts/cn_en_double_pinyin          # 自然码双拼 
+  - en_dicts/cn_en_double_pinyin_flypy      # 小鹤双拼
+  # - en_dicts/cn_en_double_pinyin_mspy     # 微软双拼
+  # - en_dicts/cn_en_double_pinyin_sogou    # 搜狗双拼
+  # - en_dicts/cn_en_double_pinyin_ziguang  # 紫光双拼
+  # - en_dicts/cn_en_double_pinyin_abc      # 智能 ABC 双拼
+...

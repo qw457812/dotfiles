@@ -5,18 +5,18 @@ patch:
   schema_list:
     # 可以直接删除或注释不需要的方案，对应的 *.schema.yaml 方案文件也可以直接删除
     # 除了 t9，它依赖于 rime_ice，用九宫格别删 rime_ice.schema.yaml
+    - schema: double_pinyin_flypy    # 小鹤双拼
     - schema: rime_ice               # 雾凇拼音（全拼）
     # - schema: t9                     # 雾凇拼音（九宫格）
     # - schema: double_pinyin          # 自然码双拼
     # - schema: double_pinyin_abc      # 智能 ABC 双拼
     # - schema: double_pinyin_mspy     # 微软双拼
     # - schema: double_pinyin_sogou    # 搜狗双拼
-    - schema: double_pinyin_flypy    # 小鹤双拼
     # - schema: double_pinyin_ziguang  # 紫光双拼
 
   # 一例、定製每頁候選數
   # "menu/page_size": 9
-  "menu/page_size": 7
+  # "menu/page_size": 7
 
   # 切换中英：
   # 不同的选项表示：打字打到一半时按下了 CapsLock、Shift、Control 后：
@@ -68,6 +68,7 @@ patch:
     # - { when: always, accept: Control+period, toggle: ascii_punct }
 
     # https://github.com/ssnhd/rime
+    # https://github.com/LEOYoon-Tsaw/Rime_collections/blob/master/Rime_description.md#%E7%A4%BA%E4%BE%8B-10
     - { when: has_menu, accept: semicolon, send: 2 }              # ":" (分号)选择第 2 个候选词
     # 影响全拼单引号分词，改为小鹤双拼方案专有快捷键
     # - { when: has_menu, accept: apostrophe, send: 3 }             # "'" (引号)选择第 3 个候选词

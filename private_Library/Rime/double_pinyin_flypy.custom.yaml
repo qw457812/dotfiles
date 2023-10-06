@@ -1,40 +1,50 @@
 # double_pinyin_flypy.schema.yaml的补丁文件是double_pinyin_flypy.custom.yaml
 patch:
-# 开关
-# 鼠须管 0.16 后，用快捷键切换时的提示文字由 states 定义
-# states: 方案选单显示的名称。可以注释掉，仍可以通过快捷键切换。
-# reset: 默认状态。 注释掉后，切换窗口时不会重置到默认状态。
-#
-# https://github.com/iDvel/rime-ice/issues/397
-# reset 的值表示设置 上一行的 states，0表示选中第一个，1表示选中第二个
+  # 开关
+  # 鼠须管 0.16 后，用快捷键切换时的提示文字由 states 定义
+  # states: 方案选单显示的名称。可以注释掉，仍可以通过快捷键切换。
+  # reset: 默认状态。 注释掉后，切换窗口时不会重置到默认状态。
   switches:
+    # https://github.com/iDvel/rime-ice/issues/397
+    # https://github.com/LEOYoon-Tsaw/Rime_collections/blob/master/Rime_description.md#%E9%96%8B%E9%97%9C
+    # ascii_mode 是中英文转换开关。预设 0 为中文，1 为英文
     - name: ascii_mode
       states: [ 中, A ]
       # reset: 0
       reset: 1 # 默认英文输入开始
+      # reset 的作用是當從其他輸入方案切換到本方案時，重設爲指定的狀態，而不保留在前一個方案中設定的狀態。---> 能否配合 KeyboardHolder.app 实现 active app 时重置 rime 中英状态？
     - name: ascii_punct # 中英标点
       states: [ ¥, $ ]
       reset: 0
     - name: traditionalization
-      states: [ 简, 繁 ]
+      # states: [ 简, 繁 ]
       reset: 0
     - name: emoji
-      states: [ 💀, 😄 ]
+      # states: [ 💀, 😄 ]
       # reset: 1
       reset: 0 # 默认禁止表情包
     - name: full_shape
       states: [ 半角, 全角 ]
       reset: 0
 
-  # # 从 default 继承快捷键
-  # key_binder:
-  #   import_preset: default  # 从 default.yaml 继承通用的
-  #   # bindings:             # 也可以再增加方案专有的
+  # 除了从 default.yaml 继承通用的快捷键以外，再增加方案专有的快捷键
   key_binder/bindings:
     # https://github.com/ssnhd/rime
-    - { when: has_menu, accept: apostrophe, send: 3 }             # "'" (引号)选择第 3 个候选词
+    # https://github.com/LEOYoon-Tsaw/Rime_collections/blob/master/Rime_description.md#%E7%A4%BA%E4%BE%8B-10
+    - { when: has_menu, accept: apostrophe, send: 3 } # "'" (引号)选择第 3 个候选词
 
   # https://dvel.me/posts/rime-ice/#%e4%b8%8d%e5%90%8c%e7%9a%84%e4%b8%8a%e5%b1%8f%e6%96%b9%e5%bc%8f
   # 如果是双拼方案，preedit_format 还可以选择是否在输入框进行转换，比如小鹤双拼输入 zz 时，是显示 zz 还是 zou。
   # 要设置双拼不转换为全拼，可以直接把 preedit_format 及下面那些 xform 都删除，或者这样打补丁：
+  # 显示为双拼编码，即清空 preedit_format 中的内容
   # translator/preedit_format: []
+
+  # [双拼 | 常见问题 · Issue #133 · iDvel/rime-ice](https://github.com/iDvel/rime-ice/issues/133)
+  # 默认启用的中英混输词库是全拼的，需要在 melt_eng.dict.yaml 中修改为对应的双拼的。
+  # melt_eng.schema.yaml 中有一些不通用的派生规则，默认启用的是全拼的。
+  # 两分输入方案的拼字功能是写死了的全拼编码，双拼方案也需要使用全拼拼写。（这个改不了）
+  #
+  # [双拼的补丁示例 | 常见问题 · Issue #133 · iDvel/rime-ice](https://github.com/iDvel/rime-ice/issues/133)
+  # 因为 melt_eng.dict.yaml 不能打补丁，所以创建另外一个 my_eng.dict.yaml 文件并修改引入的地方。
+  # 改为挂载刚创建的 my_eng.dict.yaml
+  melt_eng/dictionary: my_eng

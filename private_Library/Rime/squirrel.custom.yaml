@@ -20,7 +20,8 @@ patch:
       vim_mode: true
     net.kovidgoyal.kitty:
       ascii_mode: true
-      no_inline: true
+      # no_inline: true
+      inline: true
       vim_mode: true
     com.apple.dt.Xcode:
       ascii_mode: true
@@ -31,6 +32,7 @@ patch:
     com.google.Chrome:
       ascii_mode: true
       # 規避 https://github.com/rime/squirrel/issues/435
+      # [鼠须管输入法配置 - 哈呜.王](https://www.hawu.me/others/2666)
       inline: true
     com.qvacua.VimR:
       ascii_mode: true
@@ -75,6 +77,7 @@ patch:
   style/color_scheme_dark: macos_dark
   # style/color_scheme: wechat_light
   # style/color_scheme_dark: wechat_dark
+  # style/color_scheme: metro
 
   preset_color_schemes/+:
     # https://github.com/NavisLab/rime-pifu
@@ -170,3 +173,32 @@ patch:
       label_color: 0x999999                     # 预选栏编号颜色
       candidate_text_color: 0xe9e9ea            # 预选项文字颜色
       inline_preedit: true                      # 拼音位于： 候选框 false | 行内 true
+
+    # 小鹤音形“鼠须管”for macOS.zip | _______挂接——音形码 | http://flypy.ysepan.com/
+    metro:
+      author: "flypy.com"
+      back_color: 0xffffff                    # 候选条背景色
+      border_color_width: 1
+      #border_color: 0xe89f00                  # 边框色
+      #preedit_back_color: 0xf0403516   #新增，未知其意
+      border_height: 8                        # 窗口边界高度，大于圆角半径才生效
+      border_width: 8                         # 窗口边界宽度，大于圆角半径才生效
+      candidate_format: "%c\u2005%@\u2005"          # 用 1/6 em 空格 U+2005 来控制编号 %c 和候选词 %@ 前后的空间。
+      corner_radius: 6                        # 窗口圆角半径
+      #hilited_corner_radius: 6                # 高亮圆角
+      hilited_text_color: 0x000000            # 编码高亮
+      hilited_back_color: 0xffffff            # 编码背景高亮
+      hilited_candidate_label_color: 0xeeeeee # 首选编号色
+      hilited_candidate_text_color: 0xffffff  # 首选文字色
+      hilited_candidate_back_color: 0xe89f00  # 首选背景色
+      hilited_comment_text_color: 0xcccccc    # 首选提示字母色
+      label_color: 0x555555                             # 次选编号色
+      candidate_text_color: 0x000000                    # 次选文字色
+      candidate_back_color: 0xffffff                    # 次选背景色
+      comment_text_color: 0x555555                      # 次选提示字母色
+      horizontal: true                        # 候选窗横向显示
+      font_point: 18                          # 候选窗文字字号
+      label_font_point: 14                    # 候选窗编号字号
+      inline_preedit: true                    # 开启嵌入编码
+      name: "metro"
+      text_color: 0x333333                    # 编码行文字颜色，24位色值，16进制，BGR顺序
