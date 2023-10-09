@@ -531,15 +531,23 @@
            [:k :return_or_enter]
            [:l :backslash] ; \ for HHKB
 
-           ;; [:m :delete_forward]
-           [:n :delete_forward]
-           [:m :tab]
+           [:m :delete_forward]
+           ;; [:n :delete_forward]
+           ;; [:m :tab]
 
            [:y :!S6] ; ^
            [:u :hyphen] ; -
            [:i :equal_sign] ; =
            [:o :!Shyphen] ; _
            [:p :!Sequal_sign] ; +
+
+           ;; tool
+           [:q :!!7] ; Snipaste: hide/show all images
+           [:w :!!6] ; Snipaste: paste
+           [:e :!!5] ; Snipaste: snip and copy
+           [:s :!!f11] ; Snipaste: snip
+           [:d :!!f10] ; raycast://extensions/isfeng/easydict/ocr
+           [:a :!!f3] ; raycast://extensions/huzef44/screenocr/recognize-text
            ]}
 
   ;; Karabiner-EventViewer.app ---> Frontmost Application
@@ -622,7 +630,7 @@
            [:v ["$HOME/temp/temp_open_vpn"]]
            [:2 ["$HOME/temp/temp_open_ui_uat"]]
            [:3 ["$HOME/temp/temp_open_ui_prod"]]
-           [:4 ["$HOME/temp/temp_open_pass"] nil {:delayed {:invoked [:q :w :return_or_enter :escape]} :params {:delay 500}}] ; "qw"是密码
+           [:4 ["$HOME/temp/temp_open_pass"] nil {:delayed {:invoked [:q :w :return_or_enter :escape]} :params {:delay 700}}] ; "qw"是密码
            [:5 [:open "http://localhost:5000"]]
            [:1 [:open "http://localhost:8501/"]]
            [:7 [:open "http://localhost:7860/"]]
@@ -670,8 +678,8 @@
            ]}
 
   ;; TODO t 不好按
-  ;; TODO 可用键位 :!!f15 :!!f14 :!!f18
-  {:des   "t mode (toggle setting, information, tool)"
+  ;; TODO 可用键位 :!!f14 :!!f15 :!!f18
+  {:des   "t mode (toggle setting, information)"
    :rules [:t-mode
            [:spacebar :!!f16] ; show hidden items for Bartender 4
            [:i :!!close_bracket nil {:delayed {:invoked [:!Ct]} :params {:delay 100}}] ; trigger Benchmark for ClashX
@@ -691,11 +699,6 @@
            ;; information
            [:n :!!f1] ; clock by Bartender 4 (n for notifications)
            ;; TODO f11 desktop
-
-           ;; tool
-           [:s :!!f11] ; screenshot by Snipaste
-           [:a :!!f10] ; raycast://extensions/isfeng/easydict/ocr
-           [:o :!!f3] ; raycast://extensions/huzef44/screenocr/recognize-text
 
            ;; MonitorControl.app
            [:open_bracket :display_brightness_decrement]
@@ -1062,8 +1065,10 @@
 
   ;; TODO right_option -> hyper/super-hyper(hyper+fn)/translate
   ;; TODO :super-hyper [:command :shift :control :option :fn]
-  {:des   "right option alone -> option+shift+a (immersive-translate in chrome, safari)"
-   :rules [[:#Pright_option :right_option [:!niz-x87-bt :!niz-x87-wired] {:alone [:!OSa]}]]}
+  {:des   "right option alone -> translate (immersive-translate in chrome/safari, Translation in JetBrains IDEs, Raycast Easydict in other apps)"
+   :rules [[:#Pright_option :right_option [:!niz-x87-bt :!niz-x87-wired :translate-by-opt-shift-a-app] {:alone [:!OSa]}]
+           [:#Pright_option :right_option [:!niz-x87-bt :!niz-x87-wired :!translate-by-opt-shift-a-app] {:alone [:!!backslash]}] ; raycast://extensions/isfeng/easydict/easydict
+           ]}
 
   ;; TODO 影响 double shift
   ;; FIXME vscode 切换中英文经常不灵
@@ -1218,7 +1223,8 @@
   {:des   "For NIZ: fix the wrong position of modifier keys"
    :rules [:niz-x87-bt
            [:##right_control :right_command nil {:alone [:hs ["mouseCenterClickThenMaximizeWindow"]]}] ; right_command, see "right cmd alone" above
-           [:##right_command :right_option nil {:alone [:!OSa]}] ; right_option, see "right option alone" above
+           [:##right_command :right_option :translate-by-opt-shift-a-app {:alone [:!OSa]}] ; right_option, see "right option alone" above
+           [:##right_command :right_option :!translate-by-opt-shift-a-app {:alone [:!!backslash]}] ; right_option, see "right option alone" above
            [:##right_option :!CTOleft_shift nil {:alone :!Cv}] ; right_ctrl see "For Not HHKB" above
            :niz-x87-wired
            [:##left_option :left_command nil {:alone :prev_app}] ; left_command, see "left cmd alone" above
@@ -1226,7 +1232,8 @@
            [:##left_command :left_option :!tmux-autostart-terminals {:alone [:open "/Applications/kitty.app"]}] ; left_option, see "left option alone" above
            [:##left_command :left_option :tmux-autostart-terminals {:alone [:!Tb]}] ; left_option, see "left option alone" above
            [:##right_option :right_command nil {:alone [:hs ["mouseCenterClickThenMaximizeWindow"]]}] ; right_command, see "right cmd alone" above
-           [:##application :right_option nil {:alone [:!OSa]}] ; right_option, see "right option alone" above
+           [:##application :right_option :translate-by-opt-shift-a-app {:alone [:!OSa]}] ; right_option, see "right option alone" above
+           [:##application :right_option :!translate-by-opt-shift-a-app {:alone [:!!backslash]}] ; right_option, see "right option alone" above
            [:##right_control :!CTOleft_shift nil {:alone :!Cv}] ; right_ctrl, see "For Not HHKB" above
            ]}
 
@@ -1441,6 +1448,9 @@
   ["^com\\.microsoft\\.VSCode(Insiders)?$"]
   :line-navigating-by-cmd-arrow-app
   ["^com\\.google\\.Chrome$"]
+  :translate-by-opt-shift-a-app
+  ["^com\\.google\\.Chrome$" "^com\\.apple\\.Safari$"
+   "^com\\.jetbrains\\.intellij\\.ce$" "^com\\.jetbrains\\.pycharm\\.ce$"]
   :tmux-autostart-terminals
   ["^net\\.kovidgoyal\\.kitty$"]
   :Emacs            ["^org\\.gnu\\.Emacs$" "^org\\.gnu\\.AquamacsEmacs$"
