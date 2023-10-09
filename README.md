@@ -46,3 +46,15 @@ Here are some settings.
 | trackpad          | s/d + finger on trackpad     | copy word/selected                                                |                                                                            |          | easy to accidentally trigger               |
 | trackpad          | f + finger on trackpad       | paste(hold f to overwrite)                                        |                                                                            |          | easy to accidentally trigger               |
 | trackpad          | h/j/k/l + finger on trackpad | arrow keys(one finger), home/page_down/page_up/end(two fingers)   |                                                                            |          | easy to accidentally trigger               |
+
+## [IdeaVim](https://github.com/JetBrains/ideavim)
+
+[.ideavimrc](./dot_ideavimrc)
+
+## [rime-ice](https://github.com/iDvel/rime-ice)
+
+[patches](./private_Library/Rime)
+
+## [SketchyBar](https://github.com/FelixKratz/SketchyBar)
+
+[sketchybarrc and plugin scripts](./dot_config/sketchybar)
