@@ -58,3 +58,7 @@ Here are some settings.
 ## [SketchyBar](https://github.com/FelixKratz/SketchyBar)
 
 [sketchybarrc and plugin scripts](./dot_config/sketchybar)
+
+## [vscode](https://code.visualstudio.com/)
+
+[settings.json](./private_Library/private_Application%20Support/private_Code/User/settings.json)
