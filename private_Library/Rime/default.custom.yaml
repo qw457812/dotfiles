@@ -7,6 +7,7 @@ patch:
     # 除了 t9，它依赖于 rime_ice，用九宫格别删 rime_ice.schema.yaml
     - schema: double_pinyin_flypy    # 小鹤双拼
     - schema: rime_ice               # 雾凇拼音（全拼）
+    - schema: flypy                  # 小鹤音形 (小鹤官方挂接, 非rime-ice)
     # - schema: t9                     # 雾凇拼音（九宫格）
     # - schema: double_pinyin          # 自然码双拼
     # - schema: double_pinyin_abc      # 智能 ABC 双拼

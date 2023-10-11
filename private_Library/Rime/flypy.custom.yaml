@@ -1,0 +1,183 @@
+# flypy.schema.yaml的补丁文件是flypy.custom.yaml
+# 小鹤音形Rime鼠须管挂接 | https://help.flypy.com/#/gj
+# 小鹤音形“鼠须管”for macOS.zip | _______挂接——音形码 | http://flypy.ysepan.com/
+# ------------------------------------------------------------------------------------------
+# ❯ tree 小鹤音形Rime平台鼠须管for\ macOS
+# 小鹤音形Rime平台鼠须管for macOS
+# ├── MAC鼠须管小鹤音形挂接说明.txt
+# └── rime
+#     ├── build
+#     │   ├── flypy.prism.bin
+#     │   ├── flypy.reverse.bin
+#     │   ├── flypy.table.bin
+#     │   ├── flypydz.prism.bin
+#     │   ├── flypydz.reverse.bin
+#     │   └── flypydz.table.bin
+#     ├── default.custom.yaml
+#     ├── default.yaml
+#     ├── flypy.schema.yaml
+#     ├── flypy_full全码字.txt
+#     ├── flypy_sys.txt
+#     ├── flypy_top.txt
+#     ├── flypy_user.txt
+#     ├── lua
+#     │   └── calculator_translator.lua
+#     ├── rime.lua
+#     ├── squirrel.custom.yaml
+#     └── squirrel.yaml
+# 
+# 4 directories, 18 files
+# ------------------------------------------------------------------------------------------
+# ❯ cat 小鹤音形Rime平台鼠须管for\ macOS/MAC鼠须管小鹤音形挂接说明.txt
+#                 小鹤音形Rime鼠须管挂接说明 macOS系统
+# 
+# 一、Rime平台鼠须管下载地址：
+# 
+#    https://rime.im/download/
+#    
+#    请到此地址下载鼠须管目前最新版0.14.0   （2019年6月23日），并安装
+# 
+# 二、挂接小鹤音形
+# 
+# 1、在桌面顶部的菜单栏中输入法选择“鼠须管”，然后点开输入法菜单选择“用户设定”，弹开Rime文件夹
+# 
+# 2、将本压缩包rime文件夹中的“文件及文件夹”全部复制到上面打开的Rime文件夹内，覆盖同名文件
+#   
+# 3、回到鼠须管菜单，点击“重新部署”即完成
+# 
+#  sys——含符号编码、二重简码等
+#  top——置顶词库，当用户词和系统词重码，且需要用户词居前时放此文件
+#  user——用户词库，日常使用用户词添加到此文件
+#  full——<全码字>分类文件，需删除文件名中的“全码字”，再部署生效，补全所有字全码
+#  build文件夹内为码表文件
+# 
+# 三、常用组合键：
+# 
+# Ctrl+.     切换中英文标点
+# Shift+空格 切换全半角
+# Control+j 简繁转换
+# 
+# 四、当前日期orq，当前时间ouj
+# 
+# 五、万能键 `
+# 
+# 这个键在tab键上方，用于反查编码，替代单字全码“声韵形形”中的任何一码
+# 
+# 备注：
+#     ①修改文件后，重新部署方能生效
+#     ②用户词库自行备份
+# 
+# 
+#                                                   小鹤官网：https://flypy.com
+#                                                   小鹤Q群：182883808
+# ------------------------------------------------------------------------------------------
+# ❯ cat 小鹤音形Rime平台鼠须管for\ macOS/rime/default.yaml | head
+# # Rime default settings
+# # encoding: utf-8
+# 
+# config_version: "0.38"
+# 
+# schema_list:
+#   - schema: flypy
+# ...
+# ------------------------------------------------------------------------------------------
+# ❯ cat 小鹤音形Rime平台鼠须管for\ macOS/rime/default.custom.yaml | head
+# customization:
+#   distribution_code_name: Squirrel
+#   distribution_version: 2019-06-23
+#   rime_version: 1.5.3
+# patch:
+#   schema_list:
+#     - schema: flypy # 添加小鹤音形
+# ...
+# ------------------------------------------------------------------------------------------
+# 拷贝文件:
+#   build/*
+#   flypy.schema.yaml
+#   flypy_full全码字.txt
+#   flypy_sys.txt
+#   flypy_top.txt
+#   flypy_user.txt
+#   lua/calculator_translator.lua
+# 新增文件:
+#   flypy.custom.yaml
+# 修改文件:
+#   default.custom.yaml # 方案列表增加小鹤音形
+# ------------------------------------------------------------------------------------------
+patch:
+  switches:
+    - name: ascii_mode
+      # reset: 0
+      reset: 1 # 默认英文输入开始
+      # states: [ 中文, 英文 ]
+      states: [ 中, A ]
+    - name: full_shape
+     # states: [ 半角, 全角 ]
+    - name: simplification
+     # states: [ 简, 繁 ]
+      reset: 0
+    - name: ascii_punct
+     # states: [ 。，, ．， ]
+      states: [ ¥, $ ]
+      reset: 0
+    # FIXME 如何禁用表情包
+    # - name: emoji
+      # states: [ 💀, 😄 ]
+      # reset: 1
+      # reset: 0 # 默认禁止表情包
+
+  engine:
+    processors:
+      - ascii_composer
+      - recognizer
+      - key_binder
+      - speller
+      - punctuator
+      - selector
+      - navigator
+      - express_editor
+    segmentors:
+      - ascii_segmentor
+      - matcher
+      - abc_segmentor
+      - punct_segmentor
+      - fallback_segmentor
+    translators:
+      - punct_translator
+      - table_translator
+      - lua_translator@date_translator # 使用rime-ice同名的date_translator
+      # - lua_translator@time_translator # rime-ice的date_translator包含time
+      - table_translator@custom_phraseVD
+      - table_translator@custom_phraseXT
+      - table_translator@custom_phraseYH
+      - table_translator@custom_phraseQMZ
+      - reverse_lookup_translator
+      - history_translator@history
+      # https://github.com/hchunhui/librime-lua/wiki/Scripting#%E6%96%B0%E7%89%88-librime-lua
+      # 避免在 rime.lua 中增加 `calculator_translator = require("calculator_translator")`
+      # - lua_translator@calculator_translator
+      - lua_translator@*calculator_translator
+    filters:
+      - simplifier
+      - simplifier@simplification
+      - uniquifier
+      # FIXME 如何禁用表情包
+      # - simplifier@emoji # Emoji (copy from double_pinyin_flypy.schema.yaml)
+
+  # 根据小鹤音形挂接中的rime.lua，配置rime-ice的date_translator (copy from double_pinyin_flypy.schema.yaml)
+  # Lua 配置: 日期、时间、星期、ISO 8601、时间戳的触发关键字
+  date_translator:
+    # date: date            # 日期： 2022-11-29
+    date: orq             # 日期： 2022-11-29
+    # time: time            # 时间： 18:13
+    time: ouj             # 时间： 18:13
+    # week: week            # 星期： 星期二
+    # datetime: datetime    # ISO 8601： 2022-11-29T18:13:11+08:00
+    # timestamp: timestamp  # 时间戳： 1669716794
+
+  # FIXME 如何禁用表情包
+  # copy from double_pinyin_flypy.schema.yaml
+  # Emoji
+  # emoji:
+  #   opencc_config: emoji.json
+  #   option_name: emoji
