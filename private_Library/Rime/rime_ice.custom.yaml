@@ -24,5 +24,5 @@ patch:
       # reset: 1
       reset: 0 # 默认禁止表情包
     - name: full_shape
-      states: [ 半角, 全角 ]
+      # states: [ 半角, 全角 ]
       reset: 0

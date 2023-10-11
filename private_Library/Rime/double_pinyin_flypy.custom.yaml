@@ -1,4 +1,13 @@
 # double_pinyin_flypy.schema.yaml的补丁文件是double_pinyin_flypy.custom.yaml
+# ------------------------------------------------------------------------------------------
+# 新增文件:
+#   double_pinyin_flypy.custom.yaml
+#   custom_phrase_double.txt # 空文件
+#   my_eng.dict.yaml # 小鹤双拼中英混输
+# 修改文件:
+#   default.custom.yaml
+#   melt_eng.custom.yaml # 小鹤双拼中英混输
+# ------------------------------------------------------------------------------------------
 patch:
   # 开关
   # 鼠须管 0.16 后，用快捷键切换时的提示文字由 states 定义
@@ -24,7 +33,7 @@ patch:
       # reset: 1
       reset: 0 # 默认禁止表情包
     - name: full_shape
-      states: [ 半角, 全角 ]
+      # states: [ 半角, 全角 ]
       reset: 0
 
   # 除了从 default.yaml 继承通用的快捷键以外，再增加方案专有的快捷键

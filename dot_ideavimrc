@@ -384,5 +384,7 @@ map <leader><leader> <Action>(ShowIntentionActions)
 " TODO SelectNextOccurrence 多选-光标处的符号/选择此符号的下一个匹配项
 " TODO UnselectPreviousOccurrence 多选-取消选择上一个匹配项
 " TODO SelectAllOccurrences 多选-选择文件中的所有匹配项
+" TODO NextDiff f7
+" TODO PreviousDiff shift+f7
 
 " TODO https://github.com/MarcoIeni/intellimacs | https://github.com/syl20bnr/spacemacs#spacemacs-everywhere

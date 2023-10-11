@@ -242,7 +242,9 @@
     "vim.commandLineModeKeyBindings": [],
     "vscode-neovim.neovimExecutablePaths.darwin": "/opt/homebrew/bin/nvim",
     "extensions.experimental.affinity": {
-        "asvetliakov.vscode-neovim": 1
+        "asvetliakov.vscode-neovim": 1,
+        // VSCodeVim is too slow! To improve performance | https://github.com/microsoft/vscode/issues/75627#issuecomment-1078827311
+        "vscodevim.vim": 1
     },
     "terminal.integrated.copyOnSelection": true,
     "workbench.editor.enablePreview": false,
