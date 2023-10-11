@@ -1,5 +1,119 @@
 # flypy.schema.yaml的补丁文件是flypy.custom.yaml
+# ------------------------------------------------------------------------------------------
 # 小鹤音形Rime鼠须管挂接 | https://help.flypy.com/#/gj
+# ------------------------------------------------------------------------------------------
+patch:
+  switches:
+    - name: ascii_mode
+      # reset: 0
+      reset: 1 # 默认英文输入开始
+      # states: [ 中文, 英文 ]
+      states: [ 中, A ]
+    - name: full_shape
+     # states: [ 半角, 全角 ]
+    - name: simplification
+     # states: [ 简, 繁 ]
+      reset: 0
+    - name: ascii_punct
+     # states: [ 。，, ．， ]
+      states: [ ¥, $ ]
+      reset: 0
+    # FIXME 如何禁用表情包
+    # - name: emoji
+      # states: [ 💀, 😄 ]
+      # reset: 1
+      # reset: 0 # 默认禁止表情包
+
+  engine:
+    processors:
+      - ascii_composer
+      - recognizer
+      - key_binder
+      - speller
+      - punctuator
+      - selector
+      - navigator
+      - express_editor
+    segmentors:
+      - ascii_segmentor
+      - matcher
+      - abc_segmentor
+      - punct_segmentor
+      - fallback_segmentor
+    translators:
+      - punct_translator
+      - table_translator
+      - lua_translator@date_translator # 使用rime-ice同名的date_translator
+      # - lua_translator@time_translator # rime-ice的date_translator包含time
+      - table_translator@custom_phraseVD
+      - table_translator@custom_phraseXT
+      - table_translator@custom_phraseYH
+      - table_translator@custom_phraseQMZ
+      - reverse_lookup_translator
+      - history_translator@history
+      # https://github.com/hchunhui/librime-lua/wiki/Scripting#%E6%96%B0%E7%89%88-librime-lua
+      # 避免在 rime.lua 中增加 `calculator_translator = require("calculator_translator")`
+      # - lua_translator@calculator_translator
+      - lua_translator@*calculator_translator
+    filters:
+      - simplifier
+      - simplifier@simplification
+      - uniquifier
+      # FIXME 如何禁用表情包
+      # - simplifier@emoji # Emoji (copy from double_pinyin_flypy.schema.yaml)
+
+  # 初学模式
+  translator/enable_completion: true # 编码提示开关
+
+  # 初学模式
+  custom_phraseQMZ/user_dict: flypy_full全码字
+
+  key_binder:
+    import_preset: default #方案切换相关
+    bindings:
+      - {accept: bracketleft, send: Page_Up, when: paging} # [上翻页
+      - {accept: bracketright, send: Page_Down, when: has_menu} # ]下翻页
+      - {accept: comma, send: comma, when: paging} #注销逗号翻页
+      - {accept: period, send: period, when: has_menu} #注销句号翻页
+      - {accept: semicolon, send: 2, when: has_menu} #分号次选
+    #  - {accept: Release+semicolon, send: semicolon, when: has_menu} #如启用此行，则分号引导符号功能无效
+      - {accept: Release+period, send: period, when: composing} #句号顶屏
+      - {accept: Release+comma, send: comma, when: composing} #逗号顶屏
+      - {accept: "Tab", send: Escape, when: composing}
+      - {accept: "Shift_R", send: Escape, when: composing}
+      # - {accept: "Shift+space", toggle: full_shape, when: always} #切换全半角
+      # - {accept: "Control+period", toggle: ascii_punct, when: always} #切换中英标点
+      # - {accept: "Control+j", toggle: simplification, when: always} #切换简繁
+
+  recognizer:
+    # import_preset: default
+    patterns:
+      #uppercase: "[A-Z][-_+.'0-9A-Za-z]*$"
+      uppercase: "" #中文状态大写锁定直接上屏
+      reverse_lookup: "[a-z`]*`+[a-z`]*"
+      punct: ""
+      expression: "^=.*$"
+
+  # 根据小鹤音形挂接中的rime.lua，配置rime-ice的date_translator (copy from double_pinyin_flypy.schema.yaml)
+  # Lua 配置: 日期、时间、星期、ISO 8601、时间戳的触发关键字
+  date_translator:
+    # date: date            # 日期： 2022-11-29
+    date: orq             # 日期： 2022-11-29
+    # time: time            # 时间： 18:13
+    time: ouj             # 时间： 18:13
+    # week: week            # 星期： 星期二
+    # datetime: datetime    # ISO 8601： 2022-11-29T18:13:11+08:00
+    # timestamp: timestamp  # 时间戳： 1669716794
+
+  # FIXME 如何禁用表情包
+  # copy from double_pinyin_flypy.schema.yaml
+  # Emoji
+  # emoji:
+  #   opencc_config: emoji.json
+  #   option_name: emoji
+
+
+# ------------------------------------------------------------------------------------------
 # 小鹤音形“鼠须管”for macOS.zip | _______挂接——音形码 | http://flypy.ysepan.com/
 # ------------------------------------------------------------------------------------------
 # ❯ tree 小鹤音形Rime平台鼠须管for\ macOS
@@ -71,7 +185,7 @@
 #                                                   小鹤官网：https://flypy.com
 #                                                   小鹤Q群：182883808
 # ------------------------------------------------------------------------------------------
-# ❯ cat 小鹤音形Rime平台鼠须管for\ macOS/rime/default.yaml | head
+# ❯ cat 小鹤音形Rime平台鼠须管for\ macOS/rime/default.yaml
 # # Rime default settings
 # # encoding: utf-8
 # 
@@ -79,9 +193,149 @@
 # 
 # schema_list:
 #   - schema: flypy
-# ...
+# 
+# switcher:
+#   caption: 〔方案选单〕
+#   hotkeys:
+#     - Control+grave
+#     - Control+Shift+grave
+#     - F4
+#   save_options:
+#     - full_shape
+#     - ascii_punct
+#     - simplification
+#   fold_options: true
+#   abbreviate_options: true
+#   #option_list_separator: '／'
+# 
+# menu:
+#   page_size: 5
+# 
+# punctuator:
+#   full_shape:
+#     ' ' : { commit: '　' }
+#     ',' : { commit: ， }
+#     '.' : { commit: 。 }
+#     '<' : [ 《, 〈, «, ‹ ]
+#     '>' : [ 》, 〉, », › ]
+#     '/' : { commit: 、 }
+#     '?' : { commit: ？ }
+#     ';' : { commit: ； }
+#     ':' : { commit: ： }
+#     '''' : { pair: [ '‘', '’' ] }
+#     '"' : { pair: [ '“', '”' ] }
+#     '\' : { commit: 、 }
+#     '|' : '｜'
+#     '`' : ｀
+#     '~' : ～
+#     '!' : { commit: ！ }
+#     '@' : '＠'
+#     '#' : '＃'
+#     '%' : '％'
+#     '$' : [ ￥, '$', '€', '£', '¥', '¢', '¤' ]
+#     '^' : { commit: …… }
+#     '&' : ＆
+#     '*' : '＊'
+#     '(' : （
+#     ')' : ）
+#     '-' : －
+#     '_' : ——
+#     '+' : ＋
+#     '=' : ＝
+#     '[' : [ 「, 【, 〔, ［ ]
+#     ']' : [ 」, 】, 〕, ］ ]
+#     '{' : [ 『, 〖, ｛ ]
+#     '}' : [ 』, 〗, ｝ ]
+#   half_shape:
+#     ',' : { commit: ， }
+#     '.' : { commit: 。 }
+#     '<' : [ 《, 〈, «, ‹ ]
+#     '>' : [ 》, 〉, », › ]
+#     '/' : { commit: 、 }
+#     '?' : { commit: ？ }
+#     ';' : { commit: ； }
+#     ':' : { commit: ： }
+#     '''' : { pair: [ '‘', '’' ] }
+#     '"' : { pair: [ '“', '”' ] }
+#     '\' : { commit: 、 }
+#     '|' : '|'
+#     '`' : '`'
+#     '~' : { commit: ～ }
+#     '!' : { commit: ！ }
+#     '@' : '@'
+#     '#' : '#'
+#     '%' : { commit: '%' }
+#     '$' : { commit: "$" }
+#     '^' : { commit: …… }
+#     '&' : '&'
+#     '*' : { commit: '*' }
+#     '(' : （
+#     ')' : ）
+#     '-' : '-'
+#     '_' : ——
+#     '+' : '+'
+#     '=' : '='
+#     '[' : { commit: '【' }
+#     ']' : { commit: '】' }
+#     '{' : { commit: '｛' }
+#     '}' : { commit: '｝' }
+# 
+# key_binder:
+#   bindings:
+#     # Emacs style
+#     - { when: composing, accept: Control+p, send: Up }
+#     - { when: composing, accept: Control+n, send: Down }
+#     - { when: composing, accept: Control+b, send: Left }
+#     - { when: composing, accept: Control+f, send: Right }
+#     - { when: composing, accept: Control+a, send: Home }
+#     - { when: composing, accept: Control+e, send: End }
+#     - { when: composing, accept: Control+d, send: Delete }
+#     - { when: composing, accept: Control+k, send: Shift+Delete }
+#     - { when: composing, accept: Control+h, send: BackSpace }
+#     - { when: composing, accept: Control+g, send: Escape }
+#     - { when: composing, accept: Control+bracketleft, send: Escape }
+#     - { when: composing, accept: Alt+v, send: Page_Up }
+#     - { when: composing, accept: Control+v, send: Page_Down }
+#     # move by word
+#     - { when: composing, accept: ISO_Left_Tab, send: Shift+Left }
+#     - { when: composing, accept: Shift+Tab, send: Shift+Left }
+#     - { when: composing, accept: Tab, send: Shift+Right }
+#     # flip page
+#     - { when: has_menu, accept: minus, send: Page_Up }
+#     - { when: has_menu, accept: equal, send: Page_Down }
+#     - { when: paging, accept: comma, send: Page_Up }
+#     - { when: has_menu, accept: period, send: Page_Down }
+#     # hotkey switch
+#     - { when: always, accept: Control+Shift+1, select: .next }
+#     - { when: always, accept: Control+Shift+2, toggle: ascii_mode }
+#     - { when: always, accept: Control+Shift+3, toggle: full_shape }
+#     - { when: always, accept: Control+Shift+4, toggle: simplification }
+#     - { when: always, accept: Control+Shift+5, toggle: extended_charset }
+#     - { when: always, accept: Control+Shift+exclam, select: .next }
+#     - { when: always, accept: Control+Shift+at, toggle: ascii_mode }
+#     - { when: always, accept: Control+Shift+numbersign, toggle: full_shape }
+#     - { when: always, accept: Control+Shift+dollar, toggle: simplification }
+#     - { when: always, accept: Control+Shift+percent, toggle: extended_charset }
+#     - { when: always, accept: Shift+space, toggle: full_shape }
+#     - { when: always, accept: Control+period, toggle: ascii_punct }
+# 
+# recognizer:
+#   patterns:
+#     uppercase: "[A-Z][-_+.'0-9A-Za-z]*$"
+#     reverse_lookup: "[a-z`]*`+[a-z`]*"
+#     punct: ""
+# 
+# ascii_composer:
+#   good_old_caps_lock: true
+#   switch_key:
+#     Shift_L: inline_ascii
+#     Shift_R: commit_text
+#     Control_L: noop
+#     Control_R: noop
+#     Caps_Lock: clear
+#     Eisu_toggle: clear
 # ------------------------------------------------------------------------------------------
-# ❯ cat 小鹤音形Rime平台鼠须管for\ macOS/rime/default.custom.yaml | head
+# ❯ cat 小鹤音形Rime平台鼠须管for\ macOS/rime/default.custom.yaml
 # customization:
 #   distribution_code_name: Squirrel
 #   distribution_version: 2019-06-23
@@ -89,7 +343,37 @@
 # patch:
 #   schema_list:
 #     - schema: flypy # 添加小鹤音形
-# ...
+# 
+# #
+# # 可用的按键有 Caps_Lock, Shift_L, Shift_R, Control_L, control_R
+# # Mac 系统上的鼠须管不能区分左、右，因此只有对 Shift_L, Control_L 的设定起作用
+# #
+# # 已输入编码时按切换键，可以进一步设定输入法中西文切换的形式
+# # 可选的临时切换策略有三：
+# # inline_ascii 在输入法的临时西文编辑区内输入字母、数字、符号、空格等，回车上屏后自动复位到中文
+# # commit_text 已输入的候选文字上屏并切换至西文输入模式
+# # commit_code 已输入的编码字符上屏并切换至西文输入模式
+# # 设为 noop, 屏蔽该切换键
+# #
+# # 如果要把Caps Lock 设为只改变字母的大小写而不做中西文切换，可将 Caps_Lock 对应的切换方式设为 noop
+# # 如果要以Caps Lock 切换到西文模式，默认输出小写字母，请置 ascii_composer/good_old_caps_lock: false
+# # 如果要以Caps Lock 切换到西文模式，默认输出大写字母，请置 ascii_composer/good_old_caps_lock: true
+# 
+#   ascii_composer/good_old_caps_lock: true
+#   ascii_composer/switch_key:
+#     Caps_Lock: noop
+#     Shift_L: commit_code
+#     Shift_R: noop
+#     Control_L: noop
+#     Control_R: noop
+# 
+#   key_binder/bindings:
+#     - when: paging
+#       accept: bracketleft
+#       send: Page_Up
+#     - when: has_menu
+#       accept: bracketright
+#       send: Page_Down
 # ------------------------------------------------------------------------------------------
 # 拷贝文件:
 #   build/*
@@ -104,80 +388,3 @@
 # 修改文件:
 #   default.custom.yaml # 方案列表增加小鹤音形
 # ------------------------------------------------------------------------------------------
-patch:
-  switches:
-    - name: ascii_mode
-      # reset: 0
-      reset: 1 # 默认英文输入开始
-      # states: [ 中文, 英文 ]
-      states: [ 中, A ]
-    - name: full_shape
-     # states: [ 半角, 全角 ]
-    - name: simplification
-     # states: [ 简, 繁 ]
-      reset: 0
-    - name: ascii_punct
-     # states: [ 。，, ．， ]
-      states: [ ¥, $ ]
-      reset: 0
-    # FIXME 如何禁用表情包
-    # - name: emoji
-      # states: [ 💀, 😄 ]
-      # reset: 1
-      # reset: 0 # 默认禁止表情包
-
-  engine:
-    processors:
-      - ascii_composer
-      - recognizer
-      - key_binder
-      - speller
-      - punctuator
-      - selector
-      - navigator
-      - express_editor
-    segmentors:
-      - ascii_segmentor
-      - matcher
-      - abc_segmentor
-      - punct_segmentor
-      - fallback_segmentor
-    translators:
-      - punct_translator
-      - table_translator
-      - lua_translator@date_translator # 使用rime-ice同名的date_translator
-      # - lua_translator@time_translator # rime-ice的date_translator包含time
-      - table_translator@custom_phraseVD
-      - table_translator@custom_phraseXT
-      - table_translator@custom_phraseYH
-      - table_translator@custom_phraseQMZ
-      - reverse_lookup_translator
-      - history_translator@history
-      # https://github.com/hchunhui/librime-lua/wiki/Scripting#%E6%96%B0%E7%89%88-librime-lua
-      # 避免在 rime.lua 中增加 `calculator_translator = require("calculator_translator")`
-      # - lua_translator@calculator_translator
-      - lua_translator@*calculator_translator
-    filters:
-      - simplifier
-      - simplifier@simplification
-      - uniquifier
-      # FIXME 如何禁用表情包
-      # - simplifier@emoji # Emoji (copy from double_pinyin_flypy.schema.yaml)
-
-  # 根据小鹤音形挂接中的rime.lua，配置rime-ice的date_translator (copy from double_pinyin_flypy.schema.yaml)
-  # Lua 配置: 日期、时间、星期、ISO 8601、时间戳的触发关键字
-  date_translator:
-    # date: date            # 日期： 2022-11-29
-    date: orq             # 日期： 2022-11-29
-    # time: time            # 时间： 18:13
-    time: ouj             # 时间： 18:13
-    # week: week            # 星期： 星期二
-    # datetime: datetime    # ISO 8601： 2022-11-29T18:13:11+08:00
-    # timestamp: timestamp  # 时间戳： 1669716794
-
-  # FIXME 如何禁用表情包
-  # copy from double_pinyin_flypy.schema.yaml
-  # Emoji
-  # emoji:
-  #   opencc_config: emoji.json
-  #   option_name: emoji
