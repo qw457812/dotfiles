@@ -2,6 +2,9 @@
 # ------------------------------------------------------------------------------------------
 # 小鹤音形Rime鼠须管挂接 | https://help.flypy.com/#/gj
 # ------------------------------------------------------------------------------------------
+# 功能与安卓TR版类似 [2.7 安卓TR版（停更） · 小鹤音形](https://www.kancloud.cn/flypy/xhrm/1960611)
+# ------------------------------------------------------------------------------------------
+# 禁用表情包: 暂时注释掉 flypy_sys.txt 中的 emoji
 patch:
   switches:
     - name: ascii_mode
@@ -18,11 +21,6 @@ patch:
      # states: [ 。，, ．， ]
       states: [ ¥, $ ]
       reset: 0
-    # FIXME 如何禁用表情包
-    # - name: emoji
-      # states: [ 💀, 😄 ]
-      # reset: 1
-      # reset: 0 # 默认禁止表情包
 
   engine:
     processors:
@@ -50,20 +48,29 @@ patch:
       - table_translator@custom_phraseYH
       - table_translator@custom_phraseQMZ
       - reverse_lookup_translator
-      - history_translator@history
+      # 禁用快符中的;f重复上屏功能
+      # - history_translator@history
       # https://github.com/hchunhui/librime-lua/wiki/Scripting#%E6%96%B0%E7%89%88-librime-lua
       # 避免在 rime.lua 中增加 `calculator_translator = require("calculator_translator")`
       # - lua_translator@calculator_translator
-      - lua_translator@*calculator_translator
+      # 禁用计算器（= 号） | lua/calculator_translator.lua
+      # - lua_translator@*calculator_translator
     filters:
       - simplifier
       - simplifier@simplification
       - uniquifier
-      # FIXME 如何禁用表情包
-      # - simplifier@emoji # Emoji (copy from double_pinyin_flypy.schema.yaml)
 
-  # 初学模式
-  translator/enable_completion: true # 编码提示开关
+  # 禁用快符（分号键）
+  speller/alphabet: "abcdefghijklmnopqrstuvwxyz'"
+  speller/initials: 'abcdefghijklmnopqrstuvwxyz'
+
+  # translator/enable_completion: true # 编码提示开关
+
+  # 禁用快符中的;f重复上屏功能
+  history:
+  #    input: ;f
+  #    size: 1 #重复前几次上屏
+  #    initial_quality: 1 #首选
 
   # 初学模式
   custom_phraseQMZ/user_dict: flypy_full全码字
@@ -92,29 +99,18 @@ patch:
       uppercase: "" #中文状态大写锁定直接上屏
       reverse_lookup: "[a-z`]*`+[a-z`]*"
       punct: ""
-      expression: "^=.*$"
+      # 禁用计算器（= 号） | lua/calculator_translator.lua
+      # expression: "^=.*$"
 
   # 根据小鹤音形挂接中的rime.lua，配置rime-ice的date_translator (copy from double_pinyin_flypy.schema.yaml)
   # Lua 配置: 日期、时间、星期、ISO 8601、时间戳的触发关键字
   date_translator:
-    # date: date            # 日期： 2022-11-29
     date: orq             # 日期： 2022-11-29
-    # time: time            # 时间： 18:13
     time: ouj             # 时间： 18:13
-    # week: week            # 星期： 星期二
-    # datetime: datetime    # ISO 8601： 2022-11-29T18:13:11+08:00
-    # timestamp: timestamp  # 时间戳： 1669716794
-
-  # FIXME 如何禁用表情包
-  # copy from double_pinyin_flypy.schema.yaml
-  # Emoji
-  # emoji:
-  #   opencc_config: emoji.json
-  #   option_name: emoji
 
 
 # ------------------------------------------------------------------------------------------
-# 小鹤音形“鼠须管”for macOS.zip | _______挂接——音形码 | http://flypy.ysepan.com/
+# 小鹤音形“鼠须管”for macOS.zip (1.9MB ios仓输入法可使用 2023/1/13 12:20:51) | _______挂接——音形码 | http://flypy.ysepan.com/
 # ------------------------------------------------------------------------------------------
 # ❯ tree 小鹤音形Rime平台鼠须管for\ macOS
 # 小鹤音形Rime平台鼠须管for macOS

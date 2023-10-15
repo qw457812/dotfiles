@@ -164,14 +164,16 @@ export EDITOR='nvim'
 # brew info lesspipe
 export LESSOPEN="|/opt/homebrew/bin/lesspipe.sh %s"
 
-# https://github.com/sharkdp/bat/blob/master/doc/README-zh.md
+# https://github.com/sharkdp/bat
 # bat --list-themes | fzf --preview="bat --theme={} --color=always ~/.zshrc"
 export BAT_THEME="TwoDark"
-# export BAT_THEME="gruvbox-dark"
-# export BAT_THEME="zenburn"
-# export BAT_THEME="Visual Studio Dark+"
-# export BAT_THEME="ansi"
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+# plain: disables all available components. | bat --help
+export BAT_STYLE="plain"
+# use global aliases to override -h and --help entirely:
+# Be aware that in some cases, -h may not be a shorthand of --help (for example with ls).
+# alias -g -- -h='-h 2>&1 | bat --language=help --style=plain'
+alias -g -- --help='--help 2>&1 | bat --language=help --style=plain'
 
 # brew search vim
 # Warning: Error searching on GitHub: GitHub API Error: Requires authentication
