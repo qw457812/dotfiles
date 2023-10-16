@@ -420,8 +420,10 @@
            [:i :!TSopen_bracket]
 
            ;; [:##f :fn]
-           [:d :!Cc]
-           [:f :!Cv]
+           [:d :!Cc :!CitrixViewer]
+           [:f :!Cv :!CitrixViewer]
+           [:d :!Cinsert :CitrixViewer] ; for MTPuTTY
+           [:f :!Sinsert :CitrixViewer] ; for MTPuTTY
            [:a :!!f7] ; clipboard history by Maccy.app
            ]}
 
@@ -610,7 +612,8 @@
 
   {:des   "o mode (website)"
    :rules [:website-mode
-           [:spacebar [:open "https://google.com/search?q=$(pbpaste)"]]
+           ;; TODO spacebar
+           [:j [:open "https://google.com/search?q=$(pbpaste)"]]
            [:f [:opena-file "/Applications/Google Chrome.app" "chrome://newtab/"]]
            [:e [:opena-file "/Applications/Google Chrome.app" "chrome://extensions/"]]
            [:d [:open "https://github.com/qw457812/dotfiles"]]
@@ -626,6 +629,7 @@
            [:n [:open "https://wiki.nikiv.dev"]]
            [:z [:open "https://www.chezmoi.io/quick-start/"]]
            [:x [:open "https://learnxinyminutes.com/"]]
+           [:p [:open "https://help.flypy.com/#/bj"]]
            ;; 临时使用
            [:v ["$HOME/temp/temp_open_vpn"]]
            [:2 ["$HOME/temp/temp_open_ui_uat"]]
@@ -1465,6 +1469,7 @@
   :Thunderbird      ["^org\\.mozilla\\.thunderbird$"]
   :WeWork           ["^com\\.tencent\\.WeWorkMac$"]
   :WeWork-Meeting   ["^com\\.tencent\\.wwmapp$"]
+  :CitrixViewer     ["^com\\.citrix\\.receiver\\.icaviewer\\.mac$"]
   :ChatGPT          ["^com\\.lencx\\.chatgpt$"]
   :WPSOffice        ["^com\\.kingsoft\\.wpsoffice\\.mac$"]
   :Chrome           ["^com\\.google\\.Chrome$"]
