@@ -388,10 +388,10 @@ set -g mode-keys vi
 bind e new-window -n "#{TMUX_CONF_LOCAL}" sh -c 'chezmoi edit --apply --verbose "$TMUX_CONF_LOCAL" && "$TMUX_PROGRAM" ${TMUX_SOCKET:+-S "$TMUX_SOCKET"} source "$TMUX_CONF" \; display "$TMUX_CONF_LOCAL sourced"'
 
 # enter copy mode
-bind C-b copy-mode
-bind B send-prefix
-bind C-a copy-mode
-bind A send-prefix -2
+# bind C-b copy-mode
+# bind B send-prefix
+# bind C-a copy-mode
+# bind A send-prefix -2
 
 # -- tpm -----------------------------------------------------------------------
 

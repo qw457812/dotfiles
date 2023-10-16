@@ -73,7 +73,7 @@ patch:
   #    initial_quality: 1 #首选
 
   # 初学模式
-  custom_phraseQMZ/user_dict: flypy_full全码字
+  # custom_phraseQMZ/user_dict: flypy_full全码字
 
   key_binder:
     import_preset: default #方案切换相关
@@ -107,6 +107,9 @@ patch:
   date_translator:
     date: orq             # 日期： 2022-11-29
     time: ouj             # 时间： 18:13
+    week: ""              # 星期： 星期二
+    datetime: ""          # ISO 8601： 2022-11-29T18:13:11+08:00
+    timestamp: ""         # 时间戳： 1669716794
 
 
 # ------------------------------------------------------------------------------------------
