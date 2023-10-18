@@ -47,6 +47,7 @@ Tracking my keyboard input use [WhatPulse](https://whatpulse.org/) to observe.
 | trackpad          | s/d + finger on trackpad     | copy word/selected                                                |                                                                            |          | easy to accidentally trigger               |
 | trackpad          | f + finger on trackpad       | paste(hold f to overwrite)                                        |                                                                            |          | easy to accidentally trigger               |
 | trackpad          | h/j/k/l + finger on trackpad | arrow keys(one finger), home/page_down/page_up/end(two fingers)   |                                                                            |          | easy to accidentally trigger               |
+
 </details>
 
 ## [IdeaVim](https://github.com/JetBrains/ideavim)
@@ -58,6 +59,8 @@ Tracking my keyboard input use [WhatPulse](https://whatpulse.org/) to observe.
 [Rime config](./private_Library/Rime) for Chinese input power by rime-ice and [flypy](https://flypy.com/), including:
 - 补丁: [雾凇拼音](./private_Library/Rime/rime_ice.custom.yaml), [小鹤双拼](./private_Library/Rime/double_pinyin_flypy.custom.yaml)
 - 方案 + 补丁: [小鹤音形](./private_Library/Rime/flypy.custom.yaml)
+
+Using [KeyboardHolder](https://keyboardholder.leavesc.com/zh-cn/) to keep [Squirrel](https://github.com/rime/squirrel) as the only input method on Mac, instead of ABC.
 
 ## [SketchyBar](https://github.com/FelixKratz/SketchyBar)
 
