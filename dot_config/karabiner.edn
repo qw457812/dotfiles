@@ -599,7 +599,7 @@
            [:v [:open "/Applications/Karabiner-EventViewer.app"]]
            [:b [:open "/Applications/JetBrains Toolbox.app"]]
            ;; open my tiddlywiki then press escape to trigger vimium in chrome
-           [:n [:open "http://127.0.0.1:8080/"] nil {:delayed {:invoked [:escape]} :params {:delay 700}}] ; note
+           [:n [:open "http://127.0.0.1:8080/"] nil {:delayed {:invoked [:escape]} :params {:delay 800}}] ; note
            [:m [:open "/Applications/Thunderbird.app"] :!Thunderbird] ; email
            [:m :same_wind_app :Thunderbird]
            [:comma [:open "/System/Applications/System Settings.app"]] ; cmd+, for setting
@@ -629,12 +629,12 @@
            [:n [:open "https://wiki.nikiv.dev"]]
            [:z [:open "https://www.chezmoi.io/quick-start/"]]
            [:x [:open "https://learnxinyminutes.com/"]]
-           [:p [:open "https://help.flypy.com/#/bj"]]
+           [:p [:open "https://help.flypy.com/#/xz"]]
            ;; 临时使用
            [:v ["$HOME/temp/temp_open_vpn"]]
            [:2 ["$HOME/temp/temp_open_ui_uat"]]
            [:3 ["$HOME/temp/temp_open_ui_prod"]]
-           [:4 ["$HOME/temp/temp_open_pass"] nil {:delayed {:invoked [:q :w :return_or_enter :escape]} :params {:delay 700}}] ; "qw"是密码
+           [:4 ["$HOME/temp/temp_open_pass"] nil {:delayed {:invoked [:q :w :return_or_enter :escape]} :params {:delay 800}}] ; "qw"是密码
            [:5 [:open "http://localhost:5000"]]
            [:1 [:open "http://localhost:8501/"]]
            [:7 [:open "http://localhost:7860/"]]
