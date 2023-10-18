@@ -8,9 +8,10 @@ Hack my keyboard use [Karabiner](https://github.com/pqrs-org/Karabiner-Elements)
 
 Head over to [nikitavoloboev](https://github.com/nikitavoloboev)'s [**__personal wiki__**](https://wiki.nikiv.dev/macOS/apps/karabiner/) to learn more about karabiner and goku.
 
-Tracking my keyboard input use [WhatPulse](https://whatpulse.org/) to improve goku config.
+Tracking my keyboard input use [WhatPulse](https://whatpulse.org/) to observe.
 
-Here are some settings.
+<details>
+<summary><strong>Here are some settings</strong> (click to see)</summary>
 
 | Type              | From                         | To                                                                | Comment                                                                    | Favorite | Todo                                       |
 |-------------------|------------------------------|-------------------------------------------------------------------|----------------------------------------------------------------------------|----------|--------------------------------------------|
@@ -46,6 +47,7 @@ Here are some settings.
 | trackpad          | s/d + finger on trackpad     | copy word/selected                                                |                                                                            |          | easy to accidentally trigger               |
 | trackpad          | f + finger on trackpad       | paste(hold f to overwrite)                                        |                                                                            |          | easy to accidentally trigger               |
 | trackpad          | h/j/k/l + finger on trackpad | arrow keys(one finger), home/page_down/page_up/end(two fingers)   |                                                                            |          | easy to accidentally trigger               |
+</details>
 
 ## [IdeaVim](https://github.com/JetBrains/ideavim)
 
@@ -53,7 +55,9 @@ Here are some settings.
 
 ## [rime-ice](https://github.com/iDvel/rime-ice)
 
-[patches](./private_Library/Rime)
+[Rime config](./private_Library/Rime) for Chinese input power by rime-ice and [flypy](https://flypy.com/), including:
+- 补丁: 雾凇拼音, 小鹤双拼
+- 方案: 小鹤音形
 
 ## [SketchyBar](https://github.com/FelixKratz/SketchyBar)
 

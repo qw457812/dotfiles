@@ -4,7 +4,7 @@
 # ------------------------------------------------------------------------------------------
 # 功能与安卓TR版类似 [2.7 安卓TR版（停更） · 小鹤音形](https://www.kancloud.cn/flypy/xhrm/1960611)
 # ------------------------------------------------------------------------------------------
-# 禁用表情包: 暂时注释掉 flypy_sys.txt 中的 emoji
+# 如何禁用表情包: 暂时需要注释掉 flypy_sys.txt 中的 emoji 部分
 patch:
   switches:
     - name: ascii_mode
@@ -60,6 +60,7 @@ patch:
       - simplifier@simplification
       - uniquifier
 
+  # TODO 单引号的作用是？
   # 禁用快符（分号键）
   speller/alphabet: "abcdefghijklmnopqrstuvwxyz'"
   speller/initials: 'abcdefghijklmnopqrstuvwxyz'

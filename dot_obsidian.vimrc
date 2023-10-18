@@ -1,3 +1,6 @@
+" To link the Obsidian vault to this Vimrc file location:
+"   ln -s -f ~/.obsidian.vimrc ~/Documents/Obsidian\ Vault
+
 " Have j and k navigate visual lines rather than logical ones
 nmap j gj
 nmap k gk
