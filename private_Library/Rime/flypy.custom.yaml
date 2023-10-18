@@ -60,8 +60,8 @@ patch:
       - simplifier@simplification
       - uniquifier
 
-  # TODO 单引号的作用是？
   # 禁用快符（分号键）
+  # 生僻字是前三码加单引号打出: aof' ---> 嶅
   speller/alphabet: "abcdefghijklmnopqrstuvwxyz'"
   speller/initials: 'abcdefghijklmnopqrstuvwxyz'
 
