@@ -388,6 +388,7 @@ map <leader><CR> <Action>(EditorCompleteStatement)
 " quick fix
 map <leader><leader> <Action>(ShowIntentionActions)
 
+" TODO not cool, overwrite vim’s original actions
 " https://gist.github.com/PisecesPeng/9fabf2a1c1834bd35bf02c2bcb904708
 " 选择模式扩大选择范围 opt+up_arrow
 vmap v <Action>(EditorSelectWord)

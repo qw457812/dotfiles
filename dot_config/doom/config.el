@@ -96,6 +96,13 @@
 ;; https://emacsredux.com/blog/2020/12/04/maximize-the-emacs-frame-on-startup/
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 
+;; No Titlebar
+;; https://github.com/d12frosted/homebrew-emacs-plus#emacs-29-and-emacs-30
+;; square corners
+;; (add-to-list 'default-frame-alist '(undecorated . t))
+;; round corners
+(add-to-list 'default-frame-alist '(undecorated-round . t))
+
 ;; M-x describe-key
 (map! :nvo "H" 'evil-first-non-blank)
 (map! :nvo "L" 'evil-end-of-line)
