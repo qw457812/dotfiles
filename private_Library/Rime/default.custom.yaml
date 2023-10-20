@@ -19,6 +19,13 @@ patch:
   # "menu/page_size": 9
   # "menu/page_size": 7
 
+  # 方案选单相关
+  switcher/hotkeys:
+    # - F4
+    - Control+grave
+    # - Alt+grave
+    # - Control+Shift+grave
+
   # 切换中英：
   # 不同的选项表示：打字打到一半时按下了 CapsLock、Shift、Control 后：
   # commit_code  上屏原始的编码，然后切换到英文

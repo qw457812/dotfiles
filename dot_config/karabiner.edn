@@ -616,7 +616,7 @@
            [:j [:open "https://google.com/search?q=$(pbpaste)"]]
            [:f [:opena-file "/Applications/Google Chrome.app" "chrome://newtab/"]]
            [:e [:opena-file "/Applications/Google Chrome.app" "chrome://extensions/"]]
-           [:d [:open "https://github.com/qw457812/dotfiles"]]
+           [:d [:open "https://www.deepl.com/translator"]]
            ;; https://github.com/pqrs-org/Karabiner-Elements/issues/2535
            ;; [:s :!Cc nil {:delayed {:invoked [:open "https://translate.google.com/?sl=en&tl=zh-CN&text=$(pbpaste)&op=translate"]} :params {:delay 30}}]
            ;; [:s [:open "https://translate.google.com/?sl=en&tl=zh-CN&text=$(pbpaste)&op=translate"]]
@@ -630,6 +630,7 @@
            [:z [:open "https://www.chezmoi.io/quick-start/"]]
            [:x [:open "https://learnxinyminutes.com/"]]
            [:p [:open "https://help.flypy.com/#/xz"]]
+           [:grave_accent_and_tilde [:open "https://github.com/qw457812/dotfiles"]]
            ;; 临时使用
            [:v ["$HOME/temp/temp_open_vpn"]]
            [:2 ["$HOME/temp/temp_open_ui_uat"]]

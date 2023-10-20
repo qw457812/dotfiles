@@ -98,10 +98,8 @@
 
 ;; No Titlebar
 ;; https://github.com/d12frosted/homebrew-emacs-plus#emacs-29-and-emacs-30
-;; square corners
-;; (add-to-list 'default-frame-alist '(undecorated . t))
-;; round corners
-(add-to-list 'default-frame-alist '(undecorated-round . t))
+;; (add-to-list 'default-frame-alist '(undecorated . t)) ; square corners
+(add-to-list 'default-frame-alist '(undecorated-round . t)) ; round corners
 
 ;; M-x describe-key
 (map! :nvo "H" 'evil-first-non-blank)
