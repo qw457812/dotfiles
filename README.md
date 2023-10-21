@@ -1,8 +1,8 @@
-# Personal dotfiles on macOS
+<p align="center">
+  <a href="https://git.io/typing-svg"><img src="https://readme-typing-svg.demolab.com/?lines=Personal+dotfiles+on+macOS+managed+by+chezmoi&font=Fira%20Code&center=true&width=550&height=50"/></a>
+</p>
 
-Manage dotfiles use [chezmoi](https://github.com/twpayne/chezmoi).
-
-# [Goku](https://github.com/yqrashawn/GokuRakuJoudo)
+## [Goku](https://github.com/yqrashawn/GokuRakuJoudo)
 
 Hack keyboard use [Karabiner](https://github.com/pqrs-org/Karabiner-Elements), and maintain [**__my karabiner config__**](./dot_config/karabiner.edn) with Goku.
 
@@ -41,7 +41,7 @@ Tracking keyboard input use [WhatPulse](https://whatpulse.org/) to observe.
 | modifier alone    | right shift                  | caps_lock                                                         | turn on caps_lock to enter vi mode (in process)                            |          | more vi binding                            |
 | modifier alone    | fn                           | copy                                                              |                                                                            |          |                                            |
 | modifier alone    | left control                 | paste                                                             |                                                                            |          |                                            |
-| other             | caps_lock                    | esc(pressed alone)/control(as modifier)                           | use j+k and v/m+any instead                                                |          |                                            |
+| other             | caps_lock                    | esc(pressed alone)/control(as modifier)                           | use `j+k` and `v/m+any` instead                                            |          |                                            |
 | mouse             | option/command + left click  | copy word/selected                                                |                                                                            |          |                                            |
 | mouse             | middle click                 | paste(hold middle click to overwrite)                             |                                                                            |          |                                            |
 | trackpad          | s/d + finger on trackpad     | copy word/selected                                                |                                                                            |          | easy to accidentally trigger               |
@@ -50,13 +50,14 @@ Tracking keyboard input use [WhatPulse](https://whatpulse.org/) to observe.
 
 </details>
 
-# [IdeaVim](https://github.com/JetBrains/ideavim)
+## [IdeaVim](https://github.com/JetBrains/ideavim)
 
 [.ideavimrc](./dot_ideavimrc)
 
-# [rime-ice](https://github.com/iDvel/rime-ice)
+## [rime-ice](https://github.com/iDvel/rime-ice)
 
 [Rime config](./private_Library/Rime) for Chinese input power by rime-ice and [flypy](https://flypy.com/), including:
+
 - 补丁: [雾凇拼音](./private_Library/Rime/rime_ice.custom.yaml), [小鹤双拼](./private_Library/Rime/double_pinyin_flypy.custom.yaml)
 - 方案 + 补丁: [小鹤音形](./private_Library/Rime/flypy.custom.yaml)
 
@@ -64,10 +65,10 @@ Using [KeyboardHolder](https://keyboardholder.leavesc.com/zh-cn/) to keep [Squir
 
 And using [ShowyEdge](https://github.com/pqrs-org/ShowyEdge) to notice when input source automatically changes to ABC.
 
-# [SketchyBar](https://github.com/FelixKratz/SketchyBar)
+## [SketchyBar](https://github.com/FelixKratz/SketchyBar)
 
 [sketchybarrc and plugin scripts](./dot_config/sketchybar)
 
-# [vscode](https://code.visualstudio.com/)
+## [VSCodeVim](https://github.com/VSCodeVim/Vim)
 
 [settings.json](./private_Library/private_Application%20Support/private_Code/User/settings.json)
