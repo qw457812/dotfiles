@@ -4,9 +4,9 @@
 
 ## [Goku](https://github.com/yqrashawn/GokuRakuJoudo)
 
-Hack keyboard use [Karabiner](https://github.com/pqrs-org/Karabiner-Elements), and maintain [**__my karabiner config__**](./dot_config/karabiner.edn) with Goku.
+Hack keyboard use [Karabiner](https://github.com/pqrs-org/Karabiner-Elements), and maintain ***[my karabiner config](./dot_config/karabiner.edn)*** with Goku.
 
-Head over to [nikitavoloboev](https://github.com/nikitavoloboev)'s [**__personal wiki__**](https://wiki.nikiv.dev/macOS/apps/karabiner/) to learn more about karabiner and goku.
+Head over to [nikitavoloboev](https://github.com/nikitavoloboev)'s ***[personal wiki](https://wiki.nikiv.dev/macOS/apps/karabiner/)*** to learn more about karabiner and goku.
 
 Tracking keyboard input use [WhatPulse](https://whatpulse.org/) to observe.
 

@@ -74,6 +74,7 @@ patch:
     - { when: always, accept: Control+Shift+bracketright, toggle: ascii_mode }
     # 切换中英标点
     # - { when: always, accept: Control+period, toggle: ascii_punct }
+    - { when: always, accept: Control+Shift+period, toggle: ascii_punct }
 
     # https://github.com/ssnhd/rime
     # https://github.com/LEOYoon-Tsaw/Rime_collections/blob/master/Rime_description.md#%E7%A4%BA%E4%BE%8B-10
