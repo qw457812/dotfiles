@@ -416,8 +416,9 @@
            ;; [:##v :left_option]
            ;; [:##b :left_command]
 
-           ; rime: next schema | ~/Library/Rime/default.custom.yaml
-           [:i :!TSopen_bracket]
+           ; ~/Library/Rime/default.custom.yaml
+           [:i :!TSopen_bracket] ; select next schema
+           [:o :!TSperiod] ; toggle ascii punct
 
            ;; [:##f :fn]
            [:d :!Cc :!CitrixViewer]
