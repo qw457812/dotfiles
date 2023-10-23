@@ -66,3 +66,7 @@
 ;; https://github.com/zerolfx/copilot.el#example-for-doom-emacs
 (package! copilot
   :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
+
+;; https://github.com/DogLooksGood/emacs-rime/blob/master/INSTALLATION.org#macos-1
+(package! rime
+  :recipe (:host github :repo "DogLooksGood/emacs-rime" :files ("*.el" "Makefile" "lib.c")))
