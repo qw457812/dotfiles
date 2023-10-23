@@ -1081,6 +1081,9 @@
   ;; rime 中英切换 left_shift改为right_control | ~/Library/Rime/default.custom.yaml
   #_{:des   "left shift alone -> switch rime's english/chinese input"
    :rules [[:left_shift :left_shift nil {:alone :right_control}]]}
+  ;; doomemacs: toggle-input-method (C-\) | https://github.com/DogLooksGood/emacs-rime
+  {:des   "left shift alone -> switch rime's english/chinese input"
+   :rules [[:left_shift :left_shift :Emacs {:alone [:left_shift :!Tbackslash]}]]}
 
   ;; TODO alone 修饰键 right_shift(状态开关 类似caps_lock 开关vi模式)
   ;; TODO noti like command-q

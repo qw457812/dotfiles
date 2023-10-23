@@ -206,3 +206,68 @@
               ("C-<tab>" . 'copilot-accept-completion-by-word)
               ("M-n" . 'copilot-next-completion) ; https://github.com/zerolfx/copilot.el/issues/103
               ("M-p" . 'copilot-previous-completion)))
+
+;; https://github.com/DogLooksGood/emacs-rime
+(use-package! rime
+  :custom
+  (default-input-method "rime")
+  (rime-librime-root "~/librime/dist")
+  (rime-share-data-dir "~/Library/Rime/")
+  (rime-user-data-dir "~/emacs-rime")
+  (rime-emacs-module-header-root "/opt/homebrew/opt/emacs-plus@29/include")
+  (rime-show-candidate 'posframe)
+  (rime-show-preedit 'inline)
+  ;; (rime-cursor "˰")
+  :bind
+  (:map rime-mode-map
+  ("C-`" . 'rime-send-keybinding)))
+;; 自动化设置
+;; 临时英文模式：其中有任何一个断言的值 **不是** nil 时，会自动使用英文
+(setq rime-disable-predicates
+      '(rime-predicate-evil-mode-p                   ; 在 evil-mode 的非编辑状态下
+        rime-predicate-after-alphabet-char-p         ; 在英文字符串之后（必须为以字母开头的英文字符串）
+        rime-predicate-prog-in-code-p                ; 在 prog-mode 和 conf-mode 中除了注释和引号内字符串之外的区域
+
+        ;; rime-predicate-after-ascii-char-p            ; 任意英文字符后
+        rime-predicate-in-code-string-p              ; 在代码的字符串中，不含注释的字符串
+        rime-predicate-current-input-punctuation-p   ; 当要输入的是符号时
+        ;; rime-predicate-punctuation-after-space-cc-p  ; 当要在中文字符且有空格之后输入符号时
+        ;; rime-predicate-punctuation-after-ascii-p     ; 当要在任意英文字符之后输入符号时
+        ;; rime-predicate-punctuation-line-begin-p      ; 在行首要输入符号时
+        ;; rime-predicate-space-after-ascii-p           ; 在任意英文字符且有空格之后
+        rime-predicate-space-after-cc-p              ; 在中文字符且有空格之后
+        ;; rime-predicate-current-uppercase-letter-p    ; 将要输入的为大写字母时
+        ;; rime-predicate-tex-math-or-command-p         ; 在 (La)TeX 数学环境中或者输入 (La)TeX 命令时
+        ))
+;; 结合 evil-escape 一起使用 (以下代码可能有性能问题)
+(defun rime-evil-escape-advice (orig-fun key)
+  "advice for `rime-input-method' to make it work together with `evil-escape'.
+        Mainly modified from `evil-escape-pre-command-hook'"
+  (if rime--preedit-overlay
+      ;; if `rime--preedit-overlay' is non-nil, then we are editing something, do not abort
+      (apply orig-fun (list key))
+    (when (featurep 'evil-escape)
+      (let (
+            (fkey (elt evil-escape-key-sequence 0))
+            (skey (elt evil-escape-key-sequence 1))
+            )
+        (if (or (char-equal key fkey)
+                (and evil-escape-unordered-key-sequence
+                     (char-equal key skey)))
+            (let ((evt (read-event nil nil evil-escape-delay)))
+              (cond
+               ((and (characterp evt)
+                     (or (and (char-equal key fkey) (char-equal evt skey))
+                         (and evil-escape-unordered-key-sequence
+                              (char-equal key skey) (char-equal evt fkey))))
+                (evil-repeat-stop)
+                (evil-normal-state))
+               ((null evt) (apply orig-fun (list key)))
+               (t
+                (apply orig-fun (list key))
+                (if (numberp evt)
+                    (apply orig-fun (list evt))
+                  (setq unread-command-events (append unread-command-events (list evt))))))
+              )
+          (apply orig-fun (list key)))))))
+(advice-add 'rime-input-method :around #'rime-evil-escape-advice)
