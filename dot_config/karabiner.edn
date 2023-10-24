@@ -631,7 +631,9 @@
            [:z [:open "https://www.chezmoi.io/quick-start/"]]
            [:x [:open "https://learnxinyminutes.com/"]]
            [:p [:open "https://help.flypy.com/#/xz"]]
-           [:grave_accent_and_tilde [:open "https://github.com/qw457812/dotfiles"]]
+           ;; see "For HHKB" below
+           [:grave_accent_and_tilde [:open "https://github.com/qw457812/dotfiles"] :!hhkb-bt]
+           [:escape [:open "https://github.com/qw457812/dotfiles"] :hhkb-bt]
            ;; 临时使用
            [:v ["$HOME/temp/temp_open_vpn"]]
            [:2 ["$HOME/temp/temp_open_ui_uat"]]
