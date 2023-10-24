@@ -1,0 +1,107 @@
+# ~/Library/Rime/flypy.custom.yaml
+patch:
+  switches:
+    - name: ascii_mode
+      reset: 0
+      # reset: 1 # 默认英文输入开始
+      # states: [ 中文, 英文 ]
+      states: [ 中, A ]
+    - name: full_shape
+     # states: [ 半角, 全角 ]
+    - name: simplification
+     # states: [ 简, 繁 ]
+      reset: 0
+    - name: ascii_punct
+     # states: [ 。，, ．， ]
+      states: [ ¥, $ ]
+      reset: 0
+
+  engine:
+    processors:
+      - ascii_composer
+      - recognizer
+      - key_binder
+      - speller
+      - punctuator
+      - selector
+      - navigator
+      - express_editor
+    segmentors:
+      - ascii_segmentor
+      - matcher
+      - abc_segmentor
+      - punct_segmentor
+      - fallback_segmentor
+    translators:
+      - punct_translator
+      - table_translator
+      - lua_translator@date_translator # 使用rime-ice同名的date_translator
+      # - lua_translator@time_translator # rime-ice的date_translator包含time
+      - table_translator@custom_phraseVD
+      - table_translator@custom_phraseXT
+      - table_translator@custom_phraseYH
+      - table_translator@custom_phraseQMZ
+      - reverse_lookup_translator
+      # 禁用快符中的;f重复上屏功能
+      # - history_translator@history
+      # https://github.com/hchunhui/librime-lua/wiki/Scripting#%E6%96%B0%E7%89%88-librime-lua
+      # 避免在 rime.lua 中增加 `calculator_translator = require("calculator_translator")`
+      # - lua_translator@calculator_translator
+      # 禁用计算器（= 号） | lua/calculator_translator.lua
+      # - lua_translator@*calculator_translator
+    filters:
+      - simplifier
+      - simplifier@simplification
+      - uniquifier
+
+  # 禁用快符（分号键）
+  # 生僻字是前三码加单引号打出: aof' ---> 嶅
+  speller/alphabet: "abcdefghijklmnopqrstuvwxyz'"
+  speller/initials: 'abcdefghijklmnopqrstuvwxyz'
+
+  # translator/enable_completion: true # 编码提示开关
+
+  # 禁用快符中的;f重复上屏功能
+  history:
+  #    input: ;f
+  #    size: 1 #重复前几次上屏
+  #    initial_quality: 1 #首选
+
+  # 初学模式
+  # custom_phraseQMZ/user_dict: flypy_full全码字
+
+  key_binder:
+    import_preset: default #方案切换相关
+    bindings:
+      - {accept: bracketleft, send: Page_Up, when: paging} # [上翻页
+      - {accept: bracketright, send: Page_Down, when: has_menu} # ]下翻页
+      - {accept: comma, send: comma, when: paging} #注销逗号翻页
+      - {accept: period, send: period, when: has_menu} #注销句号翻页
+      - {accept: semicolon, send: 2, when: has_menu} #分号次选
+    #  - {accept: Release+semicolon, send: semicolon, when: has_menu} #如启用此行，则分号引导符号功能无效
+      - {accept: Release+period, send: period, when: composing} #句号顶屏
+      - {accept: Release+comma, send: comma, when: composing} #逗号顶屏
+      - {accept: "Tab", send: Escape, when: composing}
+      - {accept: "Shift_R", send: Escape, when: composing}
+      # - {accept: "Shift+space", toggle: full_shape, when: always} #切换全半角
+      # - {accept: "Control+period", toggle: ascii_punct, when: always} #切换中英标点
+      # - {accept: "Control+j", toggle: simplification, when: always} #切换简繁
+
+  recognizer:
+    # import_preset: default
+    patterns:
+      #uppercase: "[A-Z][-_+.'0-9A-Za-z]*$"
+      uppercase: "" #中文状态大写锁定直接上屏
+      reverse_lookup: "[a-z`]*`+[a-z`]*"
+      punct: ""
+      # 禁用计算器（= 号） | lua/calculator_translator.lua
+      # expression: "^=.*$"
+
+  # 根据小鹤音形挂接中的rime.lua，配置rime-ice的date_translator (copy from double_pinyin_flypy.schema.yaml)
+  # Lua 配置: 日期、时间、星期、ISO 8601、时间戳的触发关键字
+  date_translator:
+    date: orq             # 日期： 2022-11-29
+    time: ouj             # 时间： 18:13
+    week: ""              # 星期： 星期二
+    datetime: ""          # ISO 8601： 2022-11-29T18:13:11+08:00
+    timestamp: ""         # 时间戳： 1669716794
