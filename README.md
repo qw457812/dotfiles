@@ -72,3 +72,7 @@ And using [ShowyEdge](https://github.com/pqrs-org/ShowyEdge) to notice when inpu
 ## [VSCodeVim](https://github.com/VSCodeVim/Vim)
 
 [settings.json](./private_Library/private_Application%20Support/private_Code/User/settings.json)
+
+## [Doom Emacs](https://github.com/doomemacs/doomemacs)
+
+[DOOMDIR](./dot_config/doom)

@@ -211,9 +211,13 @@
 (use-package! rime
   :custom
   (default-input-method "rime")
+  ;; curl -L -O https://github.com/rime/librime/releases/download/1.8.5/rime-08dd95f-macOS.tar.bz2
   (rime-librime-root "~/librime/dist")
+  ;; 共享目录：Rime 安装后放置配置（包括输入方案）的目录
+  ;; Squirrel 0.16.2
   (rime-share-data-dir "~/Library/Rime/")
-  (rime-user-data-dir "~/emacs-rime")
+  ;; 用户目录：emacs-rime 布署的位置（包括词频等）。默认为 ~/.emacs.d/rime
+  (rime-user-data-dir "~/.config/emacs-rime")
   (rime-emacs-module-header-root "/opt/homebrew/opt/emacs-plus@29/include")
   (rime-show-candidate 'posframe)
   (rime-show-preedit 'inline)
@@ -221,6 +225,9 @@
   :bind
   (:map rime-mode-map
   ("C-`" . 'rime-send-keybinding)))
+(setq rime-posframe-properties
+ (list :font "sarasa ui sc"
+       :internal-border-width 10))
 ;; 自动化设置
 ;; 临时英文模式：其中有任何一个断言的值 **不是** nil 时，会自动使用英文
 (setq rime-disable-predicates
@@ -230,15 +237,19 @@
 
         ;; rime-predicate-after-ascii-char-p            ; 任意英文字符后
         rime-predicate-in-code-string-p              ; 在代码的字符串中，不含注释的字符串
+        rime-predicate-ace-window-p                  ; 激活 ace-window-mode
+        rime-predicate-hydra-p                       ; 如果激活了一个 hydra keymap
         rime-predicate-current-input-punctuation-p   ; 当要输入的是符号时
         ;; rime-predicate-punctuation-after-space-cc-p  ; 当要在中文字符且有空格之后输入符号时
         ;; rime-predicate-punctuation-after-ascii-p     ; 当要在任意英文字符之后输入符号时
         ;; rime-predicate-punctuation-line-begin-p      ; 在行首要输入符号时
         ;; rime-predicate-space-after-ascii-p           ; 在任意英文字符且有空格之后
         rime-predicate-space-after-cc-p              ; 在中文字符且有空格之后
-        ;; rime-predicate-current-uppercase-letter-p    ; 将要输入的为大写字母时
-        ;; rime-predicate-tex-math-or-command-p         ; 在 (La)TeX 数学环境中或者输入 (La)TeX 命令时
+        rime-predicate-current-uppercase-letter-p    ; 将要输入的为大写字母时
+        rime-predicate-tex-math-or-command-p         ; 在 (La)TeX 数学环境中或者输入 (La)TeX 命令时
         ))
+;; 可提示临时英文状态的提示符：如下设置可替换输入法的符号，使其用颜色提示当前的临时英文状态
+(setq mode-line-mule-info '((:eval (rime-lighter))))
 ;; 结合 evil-escape 一起使用 (以下代码可能有性能问题)
 (defun rime-evil-escape-advice (orig-fun key)
   "advice for `rime-input-method' to make it work together with `evil-escape'.
