@@ -1,0 +1,9 @@
+# https://github.com/DogLooksGood/emacs-rime#%E9%87%8D%E6%96%B0%E9%83%A8%E7%BD%B2
+patch:
+  schema_list:
+    - schema: flypy # 小鹤音形
+  menu/page_size: 5 # 每页显示5个候选字词。
+  switcher:
+    hotkeys:
+      - Control+grave # 激活RIME选单的快捷键，某些版本的RIME支持<F4>为快捷键，容易与其他软件冲突。
+    fold_options: false # 呼出时是否折叠，多方案时建议折叠 true ，一个方案建议展开 false
