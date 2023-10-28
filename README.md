@@ -56,7 +56,7 @@ Tracking keyboard input use [WhatPulse](https://whatpulse.org/) to observe.
 
 ## [rime-ice](https://github.com/iDvel/rime-ice)
 
-[Rime config](./private_Library/Rime) for Chinese input power by rime-ice and [flypy](https://flypy.com/), including:
+[Rime config](./private_Library/Rime) for Chinese input powered by rime-ice and [flypy](https://flypy.com/), including:
 
 - 补丁: [雾凇拼音](./private_Library/Rime/rime_ice.custom.yaml), [小鹤双拼](./private_Library/Rime/double_pinyin_flypy.custom.yaml)
 - 方案 + 补丁: [小鹤音形](./private_Library/Rime/flypy.custom.yaml)
@@ -64,6 +64,8 @@ Tracking keyboard input use [WhatPulse](https://whatpulse.org/) to observe.
 Using [KeyboardHolder](https://keyboardholder.leavesc.com/zh-cn/) to keep [Squirrel](https://github.com/rime/squirrel) as the only input source on macOS, instead of ABC.
 
 And using [ShowyEdge](https://github.com/pqrs-org/ShowyEdge) to notice when input source automatically changes to ABC.
+
+Using [emacs-rime](https://github.com/DogLooksGood/emacs-rime) in Doom Emacs.
 
 ## [SketchyBar](https://github.com/FelixKratz/SketchyBar)
 
@@ -76,3 +78,5 @@ And using [ShowyEdge](https://github.com/pqrs-org/ShowyEdge) to notice when inpu
 ## [Doom Emacs](https://github.com/doomemacs/doomemacs)
 
 [DOOMDIR](./dot_config/doom)
+
+Using [Emacs Plus](https://github.com/d12frosted/homebrew-emacs-plus).
