@@ -33,7 +33,7 @@
 ;; https://github.com/doomemacs/doomemacs/blob/develop/docs/faq.org#how-do-i-change-the-fonts
 ;; (setq doom-font "JetBrainsMono Nerd Font:pixelsize=12:weight=light:slant=normal:width=normal:spacing=0:scalable=true")
 ;; M-x nerd-icons-install-fonts
-(setq doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 12 :weight 'light)
+(setq doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 13 :weight 'light)
       doom-variable-pitch-font (font-spec :family "IBM Plex Sans") ; TODO what is this?
       ;; 这样设置会导致emoji等unicode字符显示不了 (在不勾选init.el中的emoji时)
       ;; doom-unicode-font (font-spec :family "LXGW WenKai Mono")
@@ -224,10 +224,11 @@
   ;; (rime-cursor "˰")
   :bind
   (:map rime-mode-map
-  ("C-`" . 'rime-send-keybinding)))
+        ("C-`" . 'rime-send-keybinding)))
 (setq rime-posframe-properties
- (list :font "sarasa ui sc"
-       :internal-border-width 10))
+ (list :font "Sarasa UI SC:pixelsize=16:weight=regular:slant=normal:width=normal:spacing=0:scalable=true"
+       ;; :internal-border-width 10
+       :internal-border-width 7))
 ;; 自动化设置
 ;; 临时英文模式：其中有任何一个断言的值 **不是** nil 时，会自动使用英文
 (setq rime-disable-predicates
@@ -238,10 +239,10 @@
         rime-predicate-in-code-string-p              ; 在代码的字符串中，不含注释的字符串
         rime-predicate-ace-window-p                  ; 激活 ace-window-mode
         rime-predicate-hydra-p                       ; 如果激活了一个 hydra keymap
-        rime-predicate-current-input-punctuation-p   ; 当要输入的是符号时
-        ;; rime-predicate-punctuation-after-space-cc-p  ; 当要在中文字符且有空格之后输入符号时
-        ;; rime-predicate-punctuation-after-ascii-p     ; 当要在任意英文字符之后输入符号时
-        ;; rime-predicate-punctuation-line-begin-p      ; 在行首要输入符号时
+        ;; rime-predicate-current-input-punctuation-p   ; 当要输入的是符号时
+        rime-predicate-punctuation-after-space-cc-p  ; 当要在中文字符且有空格之后输入符号时
+        rime-predicate-punctuation-after-ascii-p     ; 当要在任意英文字符之后输入符号时
+        rime-predicate-punctuation-line-begin-p      ; 在行首要输入符号时
         ;; rime-predicate-space-after-ascii-p           ; 在任意英文字符且有空格之后
         rime-predicate-space-after-cc-p              ; 在中文字符且有空格之后
         rime-predicate-current-uppercase-letter-p    ; 将要输入的为大写字母时
