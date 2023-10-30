@@ -250,7 +250,7 @@
            [:r :!Tr]
            [:t :!Tt]
            [:y :!Ty]
-           [:u :!Tu]
+           [:u :!Tu :!Spotify]
            [:i :!Ti]
            [:o :!To]
            [:p :!Tp]
@@ -259,14 +259,14 @@
            [:backslash :!Tbackslash]
            [:a :!Ta]
            [:s :!Ts]
-           [:d :!Td]
+           [:d :!Td :!Spotify]
            [:f :!Tf]
            [:g :!Tg]
-           [:h :!Th]
+           [:h :!Th :!Spotify]
            ;; [:h :delete_or_backspace] ; C-h to backspace
-           [:j :!Tj :!WeWork]
-           [:k :!Tk]
-           [:l :!Tl]
+           [:j :!Tj [:!WeWork :!Spotify]]
+           [:k :!Tk :!Spotify]
+           [:l :!Tl :!Spotify]
            [:semicolon :!Tsemicolon]
            [:quote :!Tquote]
            [:z :!Tz]
@@ -292,6 +292,14 @@
 
            ;; see "WeWork: chat message navigation" below
            [:j :!COdown_arrow :WeWork] ; select next unread chat message
+
+           ;; see "Spotify: play navigation" below
+           [:j :!Cright_arrow :Spotify] ; next
+           [:k :!Cleft_arrow :Spotify] ; previous
+           [:l :!CSright_arrow :Spotify] ; seek forward
+           [:h :!CSleft_arrow :Spotify] ; seek backward
+           [:u :!Cup_arrow :Spotify] ; volume up
+           [:d :!Cdown_arrow :Spotify] ; volume down
            ]}
 
   {:des   "m mode (control)"
@@ -323,7 +331,7 @@
            [:backslash :!Wbackslash]
            [:a :!Wa]
            [:s :!Ws]
-           [:d :!Wd]
+           [:d :!Wd :!Spotify]
            [:f :!Wf]
            [:g :!Wg]
            [:h :!Wh]
@@ -353,6 +361,9 @@
            [:escape :!Wescape]
            [:grave_accent_and_tilde :!Wgrave_accent_and_tilde]
            [:delete_or_backspace :!Wdelete_or_backspace]
+
+           ;; see "Spotify: play navigation" below
+           [:d :!Cdown_arrow :Spotify] ; volume down
            ]}
 
   ;; Mos.app 翻转鼠标滚动方向
@@ -1177,6 +1188,16 @@
            [:!Tj :!COdown_arrow] ; select next unread chat message
            ]}
 
+  {:des   "Spotify: play navigation"
+   :rules [:Spotify
+           [:!Tj :!Cright_arrow] ; next
+           [:!Tk :!Cleft_arrow] ; previous
+           [:!Tl :!CSright_arrow] ; seek forward
+           [:!Th :!CSleft_arrow] ; seek backward
+           [:!Tu :!Cup_arrow] ; volume up
+           [:!Td :!Cdown_arrow] ; volume down
+           ]}
+
   ;; 影响 cmd+w 关闭 raycast
   #_{:des   "Kitty: tmux window manipulation"
    :rules [:tmux-autostart-terminals
@@ -1474,6 +1495,7 @@
   :Finder           ["^com\\.apple\\.finder$"]
   :Preview          ["^com\\.apple\\.Preview$"]
   :Thunderbird      ["^org\\.mozilla\\.thunderbird$"]
+  :Spotify          ["^com\\.spotify\\.client$"]
   :WeWork           ["^com\\.tencent\\.WeWorkMac$"]
   :WeWork-Meeting   ["^com\\.tencent\\.wwmapp$"]
   :CitrixViewer     ["^com\\.citrix\\.receiver\\.icaviewer\\.mac$"]
