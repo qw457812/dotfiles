@@ -35,7 +35,7 @@ let mapleader=' '
 set easymotion
 " https://github.com/Mishkun/ideavim-sneak#usage
 " s{char}{char}    s/S    ;/,
-" set sneak
+set sneak
 " https://plugins.jetbrains.com/plugin/19417-ideavim-quickscope
 " f/F/t/T
 " set quickscope
@@ -106,6 +106,7 @@ let g:WhichKeyDesc_leader = "<leader> Leader key"
 let g:WhichKey_DefaultDelay = 200
 
 " https://github.com/justinmk/vim-sneak
+" let g:sneak#label = 1
 " map f <Plug>Sneak_f
 " map F <Plug>Sneak_F
 " map t <Plug>Sneak_t
@@ -132,9 +133,16 @@ let g:EasyMotion_do_mapping = 0
 " map s <Plug>(easymotion-f)
 " map S <Plug>(easymotion-F)
 " nmap mm <Plug>(easymotion-s)
+nmap mm :action KJumpAction.Word0<cr>
 
-map s <Plug>(easymotion-s)
-map S :action KJumpAction.Word0<cr>
+" map s <Plug>(easymotion-s)
+" map S :action KJumpAction.Word0<cr>
+
+" https://github.com/Mishkun/ideavim-sneak/issues/16
+" Press `S` in normal mode to activate AceJump mode before the caret
+" nmap S <Action>(AceBackwardAction)
+" Press `s` in normal mode to activate AceJump mode after the caret
+" nmap s <Action>(AceForwardAction)
 
 """ Common settings -------------------------
 " :h 'clipboard'
