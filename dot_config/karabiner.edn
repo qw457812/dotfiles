@@ -571,7 +571,8 @@
            [:spacebar [:open "$HOME/Applications/PyCharm Community Edition.app"] :!PyCharm]
            [:spacebar :same_wind_app :PyCharm]
            [:h [:open "/Applications/企业微信.app"] :!WeWork]
-           [:h :same_wind_app :WeWork]
+           ;; [:h :same_wind_app :WeWork]
+           [:h :!Ograve_accent_and_tilde :WeWork] ; AltTab.app
            [:j [:open "/Applications/Google Chrome.app"] :!Chrome]
            [:j :same_wind_app :Chrome]
            [:k [:open "/Applications/kitty.app"] :!Kitty]
