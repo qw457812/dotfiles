@@ -219,8 +219,14 @@
   ;; 用户目录：emacs-rime 布署的位置（包括词频等）。默认为 ~/.emacs.d/rime
   (rime-user-data-dir "~/.config/emacs-rime")
   (rime-emacs-module-header-root "/opt/homebrew/opt/emacs-plus@29/include")
-  (rime-show-candidate 'posframe)
-  (rime-show-preedit 'inline)
+  ;; 候选框展示风格
+  ;; (rime-show-candidate 'posframe) ; 使用 posframe 展示跟随的候选，在不可用的时候会用 popup
+  ;; (rime-show-candidate 'minibuffer) ; 在 minibuffer 中展示， 推荐使用的方式
+  (rime-show-candidate nil) ; 不展示
+  ;; 编码的展示形式
+  ;; (rime-show-preedit 'inline) ; 替换上屏预览
+  ;; (rime-show-preedit t) ; 展示在菜单中
+  (rime-show-preedit nil) ; 不展示
   ;; (rime-cursor "˰")
   :bind
   (:map rime-mode-map
@@ -288,3 +294,9 @@
 ;; https://www.const.no/init/
 (after! evil-snipe
   (setq evil-snipe-scope 'visible))
+
+;; FIXME 无法区分 idle-highlight 与 evil-visual-state 的高亮
+;; https://codeberg.org/ideasman42/emacs-idle-highlight-mode
+(use-package! idle-highlight-mode
+  :config (setq idle-highlight-idle-time 0.2)
+  :hook ((prog-mode text-mode) . idle-highlight-mode))
