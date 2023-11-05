@@ -264,7 +264,7 @@
            [:g :!Tg]
            [:h :!Th :!Spotify]
            ;; [:h :delete_or_backspace] ; C-h to backspace
-           [:j :!Tj [:!WeWork :!Spotify]]
+           [:j :!Tj [:!WeWork :!WeChat :!Spotify]]
            [:k :!Tk :!Spotify]
            [:l :!Tl :!Spotify]
            [:semicolon :!Tsemicolon]
@@ -292,6 +292,9 @@
 
            ;; see "WeWork: chat message navigation" below
            [:j :!COdown_arrow :WeWork] ; select next unread chat message
+
+           ;; see "WeChat: chat message navigation" below
+           [:j :!COdown_arrow :WeChat] ; select next unread chat message
 
            ;; see "Spotify: play navigation" below
            [:j :!Cright_arrow :Spotify] ; next
@@ -491,8 +494,8 @@
            [:spacebar :same_wind_app] ; cmd+`
 
            ;; switch tabs in most apps
-           [:j :!CSclose_bracket [:!switch-tabs-by-ctrl-tab-app :!tmux-autostart-terminals :!Emacs :!WeWork]] ; Cmd Shift ]
-           [:k :!CSopen_bracket [:!switch-tabs-by-ctrl-tab-app :!tmux-autostart-terminals :!Emacs :!WeWork]] ; Cmd Shift [
+           [:j :!CSclose_bracket [:!switch-tabs-by-ctrl-tab-app :!tmux-autostart-terminals :!Emacs :!WeWork :!WeChat]] ; Cmd Shift ]
+           [:k :!CSopen_bracket [:!switch-tabs-by-ctrl-tab-app :!tmux-autostart-terminals :!Emacs :!WeWork :!WeChat]] ; Cmd Shift [
            [:j :!Ttab :switch-tabs-by-ctrl-tab-app] ; Ctrl Tab
            [:k :!TStab :switch-tabs-by-ctrl-tab-app] ; Ctrl Shift Tab
            [:j [:!Tb :!Tl] :tmux-autostart-terminals] ; tmux: next window
@@ -503,6 +506,8 @@
            [:k [:spacebar :b :p] :Emacs] ; doomemacs: previous buffer
            [:j :!Cdown_arrow :WeWork] ; wework: next chat message
            [:k :!Cup_arrow :WeWork] ; wework: previous chat message
+           [:j :!Odown_arrow :WeChat] ; wechat: next chat message
+           [:k :!Oup_arrow :WeChat] ; wechat: previous chat message
 
            ;; create/close tab in most apps
            ;; [:l :!Ct [:!create-tab-by-cmd-n-app :!tmux-autostart-terminals]] ; Cmd t
@@ -621,6 +626,7 @@
            [:left_command [:open "/Applications/OpenInTerminal-Lite.app"]]
            [:right_command [:open "/Applications/OpenInEditor-Lite.app"]]
            [:left_option [:open "/Applications/Karabiner-Elements.app"]]
+           [:right_option [:open "/Applications/WeChat.app"]]
            ]}
 
   {:des   "o mode (website)"
@@ -642,7 +648,7 @@
            [:n [:open "https://wiki.nikiv.dev"]]
            [:z [:open "https://www.chezmoi.io/quick-start/"]]
            [:x [:open "https://learnxinyminutes.com/"]]
-           [:p [:open "https://help.flypy.com/#/xz"]]
+           [:p [:open "https://xgr313l2jy.k.topthink.com/@xhrm/home.html"]]
            ;; see "For HHKB" below
            [:grave_accent_and_tilde [:open "https://github.com/qw457812/dotfiles"] :!hhkb-bt]
            [:escape [:open "https://github.com/qw457812/dotfiles"] :hhkb-bt]
@@ -1189,6 +1195,11 @@
            [:!Tj :!COdown_arrow] ; select next unread chat message
            ]}
 
+  {:des   "WeChat: chat message navigation"
+   :rules [:WeChat
+           [:!Tj :!COdown_arrow] ; select next unread chat message
+           ]}
+
   {:des   "Spotify: play navigation"
    :rules [:Spotify
            [:!Tj :!Cright_arrow] ; next
@@ -1480,7 +1491,7 @@
   :create-tab-by-cmd-n-app
   ["^com\\.microsoft\\.VSCode(Insiders)?$"]
   :line-navigating-by-cmd-arrow-app
-  ["^com\\.google\\.Chrome$"]
+  ["^com\\.google\\.Chrome$" "^com\\.tencent\\.xinWeChat$"]
   :translate-by-opt-shift-a-app
   ["^com\\.google\\.Chrome$" "^com\\.apple\\.Safari$"
    "^com\\.jetbrains\\.intellij\\.ce$" "^com\\.jetbrains\\.pycharm\\.ce$"]
@@ -1499,6 +1510,7 @@
   :Spotify          ["^com\\.spotify\\.client$"]
   :WeWork           ["^com\\.tencent\\.WeWorkMac$"]
   :WeWork-Meeting   ["^com\\.tencent\\.wwmapp$"]
+  :WeChat           ["^com\\.tencent\\.xinWeChat$"]
   :CitrixViewer     ["^com\\.citrix\\.receiver\\.icaviewer\\.mac$"]
   :ChatGPT          ["^com\\.lencx\\.chatgpt$"]
   :WPSOffice        ["^com\\.kingsoft\\.wpsoffice\\.mac$"]
