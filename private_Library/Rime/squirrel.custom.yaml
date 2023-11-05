@@ -68,6 +68,8 @@ patch:
     # `osascript -e 'id of app "企业微信"'`
     com.tencent.WeWorkMac:
       ascii_mode: false
+    com.tencent.xinWeChat:
+      ascii_mode: false
 
   # purity_of_form_custom主题: 候选项排列方向 stacked | linear
   # preset_color_schemes/purity_of_form_custom/candidate_list_layout: linear
