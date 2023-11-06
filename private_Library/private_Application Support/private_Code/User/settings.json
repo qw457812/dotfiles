@@ -176,7 +176,13 @@
             ]
         },
     ],
-    "vim.normalModeKeyBindingsNonRecursive": [],
+    "vim.normalModeKeyBindingsNonRecursive": [
+        // https://vspacecode.github.io/docs/whichkey/
+        // {
+        //   "before": ["<space>"],
+        //   "commands": ["whichkey.show"]
+        // }
+    ],
     "vim.insertModeKeyBindings": [
         {
             "before": ["j", "j"],
@@ -228,6 +234,13 @@
                 "editor.action.showHover"
             ]
         },
+    ],
+    "vim.visualModeKeyBindingsNonRecursive": [
+        // https://vspacecode.github.io/docs/whichkey/
+        // {
+        //   "before": ["<space>"],
+        //   "commands": ["whichkey.show"]
+        // }
     ],
     "vim.operatorPendingModeKeyBindings": [
         // makes yL and dH work like y$ and d^ respectively
