@@ -1,0 +1,2145 @@
+#下面的 #号 是注释符，注释了就无效了，删掉即可生效
+
+patch:
+  translator/dictionary: tiger.extended #引入增补自定词典，这个不要改动
+  #translator/enable_completion: true # 编码提示，默认关闭，删掉行首的#号，即可开启
+  #speller/auto_select_pattern: ^;\w+|^\w{4}$  # 四码上屏功能，删掉行首的#号，即可开启
+  #speller/alphabet: "['zyxwvutsrqponmlkjihgfedcba]" # 取消分号引导的快符功能（分号不作码元），删掉行首#号即可生效
+  #style/mark_text: " " #编号前标志，删除前面的#号可以替换成空格，也可在引号里可以自己加东西替换，如 "😅"
+  #style/layout/border_width: 2 #边框宽度，默认是0
+  #style/layout/border_height: 2 #边框高度，默认是0
+
+  # ------------------------------------------------------------------------------------------
+  # menu/page_size: 9 # 自定义候选个数，可修改。若要改成5个，行首加上#号注释即可（Rime默认就是5个）
+  # ------------------------------------------------------------------------------------------
+  #style/horizontal: true # 默认是false竖排显示，删掉行首的#号，可横排显示（横排建议把上面这行注释掉）
+  #style/layout/candidate_spacing: 17 #候选框改为横排后,增加 候选与候选 的间距
+  #style/layout/hilite_spacing: 8  #候选框改为横排后,增加 标号与候选 的间距
+  #style/layout/min_width: 80  #候选框改为横排后,增加最小宽度
+  #style/layout/max_width: 1000 #候选框改为横排后，限制最大宽度，超长自动换行
+  # 横排显示建议把下面这行也注释掉，换成阿拉伯数字标号
+  # ------------------------------------------------------------------------------------------
+  # menu/alternative_select_labels: [ ㊀, ㊁, ㊂, ㊃, ㊄, ㊅, ㊆, ㊇, ㊈ ]  # 自定义候选序号显示符，可自定修改，如要显示阿拉伯数字，直接注释掉这行（在前面加#号）
+  # ------------------------------------------------------------------------------------------
+  # 以下是备选样式（自行删除#号即可生效，只能生效一种）
+  #menu/alternative_select_labels: [ ①,②,③,④,⑤,⑥,⑦,⑧,⑨,⑩ ]
+  #menu/alternative_select_labels: [ ❶,❷,❸,❹,❺,❻,❼,❽,❾,❿ ]
+  #menu/alternative_select_labels: [ ⓵,⓶,⓷,⓸,⓹,⓺,⓻,⓼,⓽,⓾ ]
+  #menu/alternative_select_labels: [ ㊀,㊁,㊂,㊃,㊄,㊅,㊆,㊇,㊈,㊉ ]
+  #menu/alternative_select_labels: [ ㈠,㈡,㈢,㈣,㈤,㈥,㈦,㈧,㈨,㈩ ]
+  #menu/alternative_select_labels: [ 🀇,🀈,🀉,🀊,🀋,🀌,🀍,🀎,🀏,🀄 ]
+  #menu/alternative_select_labels: [ Ⅰ,Ⅱ,Ⅲ,Ⅳ,Ⅴ,Ⅵ,Ⅶ,Ⅷ,Ⅸ,Ⅹ ]
+  #menu/alternative_select_labels: [ ⅰ,ⅱ,ⅲ,ⅳ,ⅴ,ⅵ,ⅶ,ⅷ,ⅸ,ⅹ ]
+  #menu/alternative_select_labels: [ Ⓐ,Ⓑ,Ⓒ,Ⓓ,Ⓔ,Ⓕ,Ⓖ,Ⓗ,Ⓘ,Ⓙ ]
+  #menu/alternative_select_labels: [ ⓐ,ⓑ,ⓒ,ⓓ,ⓔ,ⓕ,ⓖ,ⓗ,ⓘ,ⓙ ]
+
+  #style/preedit_type: preview # 嵌入首选项内容(字词)。有4个选项可设：input 嵌入输入码 | composition 嵌入编码 | preview 嵌入首选项 | preview_all 嵌入全部内容 
+  #style/layout/margin_y : -1 # 启用后可隐藏候选框(盲打)，建议配合上面的嵌入首选项，一起使用
+  #style/inline_preedit: false # 嵌入编码模式，默认是true开启，若想关闭，取消注释即可（删除前面的#号）
+
+  # 去掉圆角 新小狼毫（Win）
+  #style/layout/corner_radius: 0 #候选圆角
+  #style/layout/round_corner: 0 #高亮圆角
+
+  # #候选字体
+  #style/font_face: "Consolas, Segoe UI Emoji, Noto Color Emoji, LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
+  #style/font_point: 15 #主字体字号
+  # #滤镜内容字体
+  #style/comment_font_face: "Consolas, Segoe UI Emoji, Noto Color Emoji, TumanPUA, LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
+  #style/comment_font_point: 15 # 滤镜内容字号
+  # #候选前编号标志字体
+  #style/label_font_face: "LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
+  #style/label_font_point: 15 #候选前编号标志字号
+
+  # 以下是解决 新狼毫候选框响应慢 的方法，删除下面四行前面的#号即可生效
+  #style/color_font: false
+  #style/font_face: LXGW WenKai GB Screen R
+  #style/comment_font_face: LXGW WenKai GB Screen R
+  #style/label_font_face: LXGW WenKai GB Screen R
+
+  # 去除拼音滤镜的括号，如对括号有需求，可在下面5行前面加上#号注释掉
+  #pinyin/comment_format:
+   #- 'xform/&nbsp;/ /'
+   #- 'xform/^/ /'
+   #- 'xform/（//'
+   #- 'xform/）//'
+  # 也可自己把 （ 替换成别的，比如 'xform/（/〔/'
+
+  # ------------------------------------------------------------------------------------------
+  # rename emoji.json to emoji_cn.json, emoji.txt to emoji_cn.txt
+  # ↓emoji表情滤镜
+  emoji_cn/opencc_config: emoji_cn.json
+
+  engine:
+    processors:
+      - ascii_composer
+      - recognizer
+      - key_binder
+      - speller
+      - punctuator
+      # - lua_processor@exe_processor #exe启动器
+      - lua_processor@*exe #exe启动器
+      - selector
+      - navigator
+      - express_editor #计算
+    segmentors:  # 分段
+      - ascii_segmentor
+      - matcher
+      - affix_segmentor@easy_english #英文相关
+      - abc_segmentor
+      - punct_segmentor
+      - fallback_segmentor
+    translators:
+      - punct_translator
+      - reverse_lookup_translator #拼音反查
+      - table_translator
+      - table_translator@easy_english #临时英文
+      - history_translator@historyDM # 重复上屏 电脑
+      - history_translator@historyDM2 # 重复上屏 电脑2
+      - history_translator@historyDM3 # 重复上屏 电脑3
+      - history_translator@historySJ # 重复上屏 手机
+      # - lua_translator@number_translator # 数字转大写
+      - lua_translator@*number # 数字转大写
+      # - lua_translator@calculator_translator # 简易计算器
+      - lua_translator@*calculator_translator # 简易计算器
+      # - lua_translator@shijian2_translator # 高级时间
+      - lua_translator@*shijian2 # 高级时间
+
+
+    filters:
+      # - lua_filter@core2022  #自定义字集过滤lua；放在最上面完美解决简繁滤镜出错的问题
+      - lua_filter@*core2022_filter  #自定义字集过滤lua；放在最上面完美解决简繁滤镜出错的问题
+      # - lua_filter@dz_ci  #过滤词组lua，单字模式
+      # - charset_filter@utf8
+      # - charset_filter@gbk
+      # - charset_filter@gb2312
+      - simplifier@simplification  #简繁滤镜
+      # - reverse_lookup_filter@reverse_lookup #反查词典滤镜
+      # - simplifier@fanjian #繁简滤镜
+      - simplifier@pinyin #拼音滤镜
+      - simplifier@chaifen #拆分滤镜
+      - simplifier@emoji_cn #表情滤镜
+      # - lua_filter@charset_comment_filter #Unicode分区提示滤镜
+      - lua_filter@*charset_comment_filter #Unicode分区提示滤镜
+      # - lua_filter@lua_unicode_display_filter #Unicode编码显示
+      - lua_filter@*unicode_display #Unicode编码显示
+      - uniquifier #过滤重复
+
+  key_binder:
+    #  import_preset: default
+    bindings:
+      #- { when: composing, accept: Return, send: Escape } # 回车清屏编码
+      #- { accept: space, send: space, when: has_menu } # 有候选时空格上屏首选
+      #- { accept: space, send: Escape, when: composing } # 无候选(空码）时空格清屏编码
+      - { accept: semicolon, send: 2, when: has_menu } # 分号次选
+      - { when: has_menu, accept: apostrophe, send: 3 } # 引号三选
+      - { when: composing, accept: Tab, send: Escape } # tab清屏
+      - { when: has_menu, accept: minus, send: Page_Up } # - 向后翻页
+      - { when: has_menu, accept: equal, send: Page_Down } # = 向前翻页
+      # - { when: composing, accept: bracketleft, send: Page_Up } # [ 后翻
+      # - { when: composing, accept: bracketright, send: Page_Down } # ] 前翻
+      # - { accept: "Control+o", toggle: simplification, when: composing }  # 简繁开关
+      # - { accept: "Control+Shift+O", toggle: fanjian, when: composing }  # 繁简开关
+      # - { accept: "Control+p", toggle: pinyin, when: composing }  # PC 拼音开关
+      # - { accept: "Control+i", toggle: emoji_cn, when: composing }  # PC emoji开关
+      # - { accept: "Control+u", toggle: charset_comment_filter, when: composing }  # PC Unicode分区开关
+      # - { accept: "Control+y", toggle: udpf_switch, when: composing }  #PC Unicode编码开关
+      # - { accept: "Control+h", toggle: extended_char, when: composing } # PC 自定字集开关
+      # - { accept: "Control+Shift+H", toggle: extended_char, when: composing } # PC 自定字集开关2
+      # - { accept: "Control+j", toggle: chaifen, when: composing } # PC 拆分滤镜开关
+      # - { when: composing, accept: '&', toggle: emoji_cn } # 手机 emoji开关
+      # - { when: composing, accept: '*', toggle: simplification } # 手机 繁简开关
+      # - { when: composing, accept: '\', toggle: pinyin } # 手机 拼音开关
+      # - { when: composing, accept: '^', toggle: charset_comment_filter } # 手机 Unicode分区开关1
+      # - { when: composing, accept: '#', toggle: charset_comment_filter } # 手机 Unicode分区开关2
+      # - { accept: "%", toggle: udpf_switch, when: composing }  #手机 Unicode编码开关
+      # - { accept: "+", toggle: udpf_switch, when: composing }  #手机 Unicode编码开关
+      # - { when: composing, accept: '_', toggle: extended_char} # 手机 自定字集开关1
+      # - { when: composing, accept: ':', toggle: extended_char} # 手机 自定字集开关2
+      # - { when: composing, accept: '"', toggle: chaifen } # 手机 拆分滤镜开关
+      - { when: has_menu, accept: Right, send: Down } # 右方向键 向后移动焦点
+      - { when: has_menu, accept: Left, send: Up } # 左方向键 向前移动焦点
+      # - { when: always, accept: "Control+period" , toggle: ascii_punct } # 中英标点切换
+      # - { when: always, accept: "Shift+space" , toggle: full_shape } # 全半角切换
+
+# ------------------------------------------------------------------------------------------
+# 虎码秃版 鼠须管 （Mac）2023.10.22.zip (18.0MB) | 鼠须管（推荐） | ④Mac | 03 虎码输入法下载 | http://huma.ysepan.com/
+# ------------------------------------------------------------------------------------------
+# ❯ tree 虎码秃版\ 鼠须管\ （Mac）
+# 虎码秃版 鼠须管 （Mac）
+# ├── 01 双拼反查配置（自然码 小鹤 微软）
+# │   ├── 自然码
+# │   │   └── PY_c.custom.yaml
+# │   ├── 小鹤双拼
+# │   │   └── PY_c.custom.yaml
+# │   ├── 微软双拼
+# │   │   └── PY_c.custom.yaml
+# │   └── 双拼反查配置 必看说明.txt
+# ├── PY_c.dict.yaml
+# ├── PY_c.schema.yaml
+# ├── core2022.dict.yaml
+# ├── core2022.schema.yaml
+# ├── default.custom.yaml
+# ├── easy_english.dict.yaml
+# ├── easy_english.schema.yaml
+# ├── lua
+# │   ├── calculator_translator.lua
+# │   ├── charset_comment_filter.lua
+# │   ├── core2022_filter.lua
+# │   ├── dz_ci_filter.lua
+# │   ├── exe.lua
+# │   ├── number.lua
+# │   ├── shijian2.lua
+# │   └── unicode_display.lua
+# ├── opencc
+# │   ├── HKVariants.txt
+# │   ├── HKVariantsPhrases.txt
+# │   ├── HKVariantsRev.txt
+# │   ├── HKVariantsRevPhrases.txt
+# │   ├── JPVariants.txt
+# │   ├── PYCharacters.txt
+# │   ├── PYPhrases.txt
+# │   ├── STCharacters_Tu.txt
+# │   ├── STPhrases.txt
+# │   ├── TSCharacters.txt
+# │   ├── TSPhrases.txt
+# │   ├── TWPhrases.txt
+# │   ├── TWPhrasesRev.txt
+# │   ├── TWVariants.txt
+# │   ├── TWVariantsRev.txt
+# │   ├── TWVariantsRevPhrases.txt
+# │   ├── emoji.json
+# │   ├── emoji.txt
+# │   ├── hk2s.json
+# │   ├── hu_cf.json
+# │   ├── hu_cf.txt
+# │   ├── pinyin.json
+# │   ├── s2hk.json
+# │   ├── s2t.json
+# │   ├── s2tw.json
+# │   ├── s2twp.json
+# │   ├── st_tu.json
+# │   ├── t2hk.json
+# │   ├── t2s.json
+# │   ├── t2tw.json
+# │   ├── tw2s.json
+# │   └── tw2sp.json
+# ├── rime.lua
+# ├── squirrel.custom.yaml
+# ├── stroke.dict.yaml
+# ├── stroke.schema.yaml
+# ├── symbols.yaml
+# ├── tiger.custom.yaml
+# ├── tiger.dict.yaml
+# ├── tiger.extended.dict.yaml
+# ├── tiger.schema.yaml
+# ├── tigress.custom.yaml
+# ├── tigress.dict.yaml
+# ├── tigress.extended.dict.yaml
+# ├── tigress.schema.yaml
+# ├── tigress_ci.dict.yaml
+# └── tigress_simp_ci.dict.yaml
+# 
+# 7 directories, 66 files
+# ------------------------------------------------------------------------------------------
+# ❯ cat 虎码秃版\ 鼠须管\ （Mac）/default.custom.yaml
+# # customization:
+# #   distribution_code_name: Weasel
+# #   distribution_version: 0.14.3
+# #   generator: "Rime::SwitcherSettings"
+# #   modified_time: "Fri Sep 23 08:36:10 2022"
+# #   rime_version: 1.7.3
+# patch:
+#   schema_list:
+#     - {schema: tiger}
+#     - {schema: tigress}
+#     - {schema: PY_c}
+#   "switcher/hotkeys":  # 将默认的 F4热键 更改为ctrl+~
+#     - "Control+grave"
+#     - "Control+F8"
+#     # - "F4"
+#     # 如果想用F4来切换，把上一行，行首的#删去
+# #左Shift键输入字符直接切换为英文上屏，输入状态变为英文。
+#   ascii_composer/good_old_caps_lock: true
+#   ascii_composer/switch_key:
+#     Caps_Lock: clear # 转大写并清屏
+#     #  如果要把 Caps Lock 设为只改变字母的大小写而不做中西文切换，可将 Caps_Lock 对应的切换方式设为 noop
+#     Control_L: noop # 使其主动失效
+#     Control_R: noop
+#     Eisu_toggle: clear
+#     Shift_L: commit_code
+#     Shift_R: commit_code
+#     # inline_asci 在输入法的临时西文编辑区內输入字母、数字、符号、空格等，回车上屏后自动复位到中文
+#     # commit_code 已输入的编码字符上屏并切换至西文输入模式
+#     # commit_text 候选框内的文字上屏并切换至西文输入模式%
+# ------------------------------------------------------------------------------------------
+# ❯ cat 虎码秃版\ 鼠须管\ （Mac）/rime.lua
+# charset_comment_filter = require("charset_comment_filter") --Unicode分区提示
+# core2022 = require("core2022_filter") --自定义字符集过滤（常用字集）
+# -- dz_ci = require("dz_ci_filter") --单字模式 这个别用，有问题的
+# number_translator = require("number")
+# lua_unicode_display_filter = require("unicode_display")  --Unicode编码提示
+# calculator_translator = require("calculator_translator")  --简易计算器
+# exe_processor = require("exe")  -- 网页启动器
+# shijian2_translator = require("shijian2") -- 高级时间%
+# ------------------------------------------------------------------------------------------
+# ❯ cat 虎码秃版\ 鼠须管\ （Mac）/squirrel.custom.yaml
+# 
+# patch:
+#   preset_color_schemes:
+#     mac_light:
+#       name: Mac浅色
+#       horizontal: true             # true横排，false竖排
+#       # candidate_format: "%c %@ "   # 用 1/6 em 空格 U+2005 来控制编号 %c 和候选词 %@ 前后的空间
+#       corner_radius: 5                             # 窗口圆角
+#       hilited_corner_radius: 5                     # 高亮圆角
+#       line_spacing: 10                             # 行间距(适用于竖排)
+#       border_height: 4                             # 窗口上下高度，大于圆角半径才生效
+#       border_width: 4                              # 窗口左右宽度，大于圆角半径才生效
+#       # font_face: "PingFangSC"                      # 候选词字体
+#       # font_point: 16                               # 候选字大小
+#       # label_font_point: 13                         # 候选编号大小
+#       text_color: 0x424242                    # 拼音行文字颜色
+#       back_color: 0xFFFFFF                    # 候选条背景色
+#       border_color: 0xFFFFFF                  # 边框色
+#       label_color: 0x999999                   # 预选栏编号颜色
+#       candidate_text_color: 0x3c3c3c          # 预选项文字颜色
+#       comment_text_color: 0x999999            # 拼音等提示文字颜色
+#       hilited_text_color: 0x999999            # 高亮拼音 (需要开启内嵌编码)
+#       hilited_back_color: 0xD75A00            # 第一候选项背景背景色
+#       hilited_candidate_text_color: 0xFFFFFF  # 第一候选项文字颜色
+#       hilited_candidate_label_color: 0xFFFFFF # 第一候选项编号颜色
+#       hilited_comment_text_color: 0x999999    # 注解文字高亮
+# 
+#     mac_dark:
+#       name: Mac深色
+#       horizontal: true             # true横排，false竖排
+#       # candidate_format: "%c %@ "   # 用 1/6 em 空格 U+2005 来控制编号 %c 和候选词 %@ 前后的空间
+#       corner_radius: 5                             # 窗口圆角
+#       hilited_corner_radius: 5                     # 高亮圆角
+#       line_spacing: 10                              # 行间距(适用于竖排)
+#       border_height: 4                             # 窗口上下高度，大于圆角半径才生效
+#       border_width: 4                              # 窗口左右宽度，大于圆角半径才生效
+#       # font_face: "PingFangSC"                      # 候选词字体
+#       # font_point: 16                               # 候选字大小
+#       # label_font_point: 13                         # 候选编号大小
+#       text_color: 0x424242                    # 拼音行文字颜色
+#       back_color: 0x252a2e                    # 候选条背景色
+#       border_color: 0x050505                  # 边框色
+#       label_color: 0x999999                   # 预选栏编号颜色
+#       candidate_text_color: 0xe9e9ea          # 预选项文字颜色
+#       comment_text_color: 0x999999            # 拼音等提示文字颜色
+#       hilited_text_color: 0x999999            # 高亮拼音 (需要开启内嵌编码)
+#       hilited_back_color: 0xD75A00            # 第一候选项背景背景色
+#       hilited_candidate_text_color: 0xFFFFFF  # 第一候选项文字颜色
+#       hilited_candidate_label_color: 0xFFFFFF # 第一候选项编号颜色
+#       hilited_comment_text_color: 0x999999    # 注解文字高亮
+#     eucalyptus:
+#       author: "ID;Peace B"
+#       back_color: 0xFFFFFF
+#       border_color: 0xC9B881
+#       candidate_text_color: 0x8C7662
+#       comment_text_color: 0x8C7662
+#       hilited_back_color: 0xD5E2F2
+#       hilited_candidate_back_color: 0xD1A78E
+#       hilited_candidate_text_color: 0xFFFFFF
+#       hilited_comment_text_color: 0xFFFFFF
+#       name: "秃秃推荐／尤加利"
+#       text_color: 0x2B1007
+#     blackpink:
+#       author: swwrww
+#       back_color: 0x1e1e1e
+#       border_color: 0xff303030
+#       candidate_text_color: 0xaaa6f0
+#       comment_text_color: 0xaaa6f0
+#       hilited_back_color: 0xaaa6f0
+#       hilited_candidate_back_color: 0xA996F1
+#       hilited_candidate_text_color: 0x1e1e1e
+#       hilited_comment_text_color: 0x1e1e1e
+#       hilited_label_color: 0x1e1e1e
+#       hilited_mark_color: 0xf9f9f9
+#       hilited_text_color: 0xFFFFFF
+#       label_color: 0xaaa6f0
+#       name: "秃秃推荐／脏粉"
+#       text_color: 0xFFFFFF
+#     easy_dark:
+#       author: "木易"
+#       back_color: 0x36261F
+#       candidate_text_color: 0xDBDBDB
+#       comment_text_color: 0xA8A8A8
+#       hilited_back_color: 0x471885
+#       hilited_candidate_back_color: 0x63453A
+#       hilited_candidate_label_color: 0xFFFFFF
+#       hilited_candidate_text_color: 0xDBDBDB
+#       hilited_comment_text_color: 0xA8A8A8
+#       hilited_text_color: 0xD6D6D6
+#       label_color: 0xDBDBDB
+#       name: "秃秃推荐／蓝黑"
+#       text_color: 0xD6D6D6
+#     gruvbox_light:
+#       author: Q
+#       back_color: 0xc7f1fb
+#       border_color: 0xb2dbeb
+#       candidate_text_color: 0x888545
+#       comment_text_color: 0xa2577f
+#       hilited_back_color: 0xb2dbeb
+#       hilited_candidate_text_color: 0x000000
+#       hilited_label_color: 0x1a9798
+#       hilited_text_color: 0x1d24cc
+#       label_color: 0x0e5dd6
+#       name: "秃秃推荐／Gruvbox Light"
+#       text_color: 0x6a9d68
+#     pink:
+#       author: swwrww
+#       back_color: 0x877A73
+#       border_color: 0x877A73
+#       candidate_text_color: 0xBABABA
+#       comment_text_color: 0xFFFFFF
+#       hilited_back_color: 0xA996F1
+#       hilited_candidate_back_color: 0xA996F1
+#       hilited_candidate_text_color: 0xffffff
+#       hilited_mark_color: 0xf9f9f9
+#       hilited_text_color: 0xFFFFFF
+#       label_color: 0xFFFFFF
+#       name: "萌猫粉"
+#       text_color: 0xFFFFFF
+#     pornhub:
+#       author: swwrww
+#       back_color: 0x232323
+#       border_color: 0x00000000
+#       candidate_back_color: 0x00000000
+#       candidate_shadow_color: 0x000083FF
+#       candidate_text_color: 0xffffff
+#       comment_text_color: 0xffffff
+#       hilited_back_color: 0x00000000
+#       hilited_candidate_back_color: 0x0083FF
+#       hilited_candidate_shadow_color: 0x00000000
+#       hilited_candidate_text_color: 0x000000
+#       hilited_comment_text_color: 0x000000
+#       hilited_label_color: 0x000000
+#       hilited_mark_color: 0xffffff
+#       hilited_shadow_color: 0x000083FF
+#       hilited_text_color: 0xffffff
+#       label_color: 0xFFFFFF
+#       name: "P站风／Pornhub"
+#       shadow_color: 0x00000000
+#       text_color: 0x0083FF
+#     rose_red:
+#       author: "木易"
+#       back_color: 0xF4F4F6
+#       border_color: 0xffffff
+#       candidate_text_color: 0x383838
+#       comment_text_color: 0x87807B
+#       hilited_back_color: 0xEFEFF4
+#       hilited_candidate_back_color: 0xEDEDF9
+#       hilited_candidate_label_color: 0x884F11FA
+#       hilited_candidate_text_color: 0x4F11FA
+#       hilited_comment_text_color: 0xF19C38
+#       hilited_corner_radius: 5
+#       hilited_text_color: 0x8E8E93
+#       label_color: 0xaaaaaa
+#       name: "秃秃推荐 / 玫红"
+#       preedit_back_color: 0x364572
+#     so_young_qmod_01:
+#       author: Q
+#       back_color: 0xe3f6fd
+#       border_color: 0xc5c8cc
+#       candidate_back_color: 0xe3f6fd
+#       candidate_text_color: 0x736b55
+#       comment_text_color: 0x9377b9
+#       hilited_back_color: 0x736b55
+#       hilited_candidate_back_color: 0x736b55
+#       hilited_candidate_text_color: 0xd5e8ee
+#       hilited_comment_text_color: 0xd5e8ee
+#       hilited_mark_color: 0xffffff
+#       hilited_text_color: 0xd5e8ee
+#       key_symbol_color: 0x339977
+#       label_color: 0x919183
+#       name: "秃秃推荐／致青春·Q改"
+#       preview_back_color: 0x6b55d073
+#       preview_text_color: 0xd5e8ee
+#       text_color: 0x808070
+#     win10black:
+#       back_color: 0x000000
+#       border_color: 0x347440
+#       candidate_text_color: 0xffffff
+#       comment_text_color: 0x666666
+#       hilited_back_color: 0x347440
+#       hilited_candidate_back_color: 0x347440
+#       hilited_candidate_text_color: 0xffffff
+#       hilited_comment_text_color: 0xa9a9a9
+#       hilited_label_color: 0xa9a9a9
+#       hilited_mark_color: 0xa9a9a9
+#       hilited_text_color: 0xffffff
+#       label_color: 0xa9a9a9
+#       name: Win10Black
+#       shadow_color: 0x00000000
+#       text_color: 0xffffff
+#     win10blue:
+#       back_color: 0xffffff
+#       border_color: 0xd77800
+#       candidate_back_color: 0x00ffffff
+#       candidate_shadow_color: 0x00ffffff
+#       candidate_text_color: 0x000000
+#       comment_text_color: 0x222222
+#       hilited_back_color: 0xd77800
+#       hilited_candidate_back_color: 0xd77800
+#       hilited_candidate_shadow_color: 0x00d77800
+#       hilited_candidate_text_color: 0xffffff
+#       hilited_comment_text_color: 0xffffff
+#       hilited_label_color: 0xffffff
+#       hilited_mark_color: 0xffffff
+#       hilited_shadow_color: 0x00d77800
+#       hilited_text_color: 0xffffff
+#       label_color: 0x838383
+#       name: Win10Blue
+#       shadow_color: 0x20000000
+#       text_color: 0x000000
+#     win10gray:
+#       back_color: 0xf4f4f4
+#       border_color: 0xcccccc
+#       candidate_text_color: 0x000000
+#       comment_text_color: 0x666666
+#       hilited_back_color: 0xffffff
+#       hilited_candidate_back_color: 0xcccccc
+#       hilited_candidate_text_color: 0x000000
+#       hilited_comment_text_color: 0x555555
+#       hilited_label_color: 0x444444
+#       hilited_mark_color: 0x444444
+#       hilited_text_color: 0x000000
+#       label_color: 0x888888
+#       name: Win10Gray
+#       shadow_color: 0x20000000
+#       text_color: 0x000000
+#     win11dark:
+#       back_color: 0x303030
+#       border_color: 0xc202020
+#       candidate_back_color: 0x00303030
+#       candidate_text_color: 0xc9c9c9
+#       comment_text_color: 0xc9c9c9
+#       hilited_back_color: 0x202020
+#       hilited_candidate_back_color: 0x202020
+#       hilited_candidate_text_color: 0xf9f9f9
+#       hilited_comment_text_color: 0xf9f9f9
+#       hilited_label_color: 0xf9f9f9
+#       hilited_mark_color: 0xf9f9f9
+#       hilited_text_color: 0xf9f9f9
+#       label_color: 0xc9c9c9
+#       name: Win11Dark
+#       shadow_color: 0x16000000
+#       text_color: 0xc9c9c9
+#     win11light:
+#       back_color: 0xfff9f9f9
+#       border_color: 0x10f0f0f0
+#       candidate_back_color: 0xfff9f9f9
+#       candidate_text_color: 0x000000
+#       comment_text_color: 0x666666
+#       hilited_back_color: 0xf0f0f0
+#       hilited_candidate_back_color: 0xf0f0f0
+#       hilited_candidate_text_color: 0x0A0A0A
+#       hilited_comment_text_color: 0x1a1a1a
+#       hilited_label_color: 0x1a1a1a
+#       hilited_mark_color: 0x303030
+#       hilited_text_color: 0x1a1a1a
+#       label_color: 0x1a1a1a
+#       name: "秃秃推荐／Win11Light"
+#       shadow_color: 0x00000000
+#       text_color: 0x1a1a1a
+#     perianth:
+#       author: "毛毛虫"
+#       back_color: 0x2802FA
+#       border_color: 0xF34FFF3
+#       candidate_text_color: 0xF9A6FF
+#       comment_text_color: 0xF9A6FF
+#       hilited_back_color: 0xDDDDDD
+#       hilited_candidate_back_color: 0x5E9341
+#       hilited_candidate_text_color: 0x42E6FF
+#       hilited_comment_text_color: 0x82D2FF
+#       hilited_text_color: 0x82D2FF
+#       label_color: 0xF9A6FF
+#       name: "肛师专用／东北大花被"
+#       text_color: 0x1D9FFF
+#   style:
+#     #capture_type: none
+#     #color_font: true
+#     comment_font_face: "Consolas, Apple Color Emoji, TumanPUA, LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
+#     comment_font_point: 16 #滤镜字号
+#     #display_tray_icon: false
+#     font_face: "Consolas, Apple Color Emoji, LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
+#     font_point: 16 #主字体字号
+#     #fullscreen: false
+#     inline_preedit: true #鼠须管开嵌入在QQ上可能会有点问题，这里可改为 true 关闭嵌入模式
+#     label_font_face: "LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
+#     label_font_point: 16 #标号字号
+#     #label_format: "%s."
+#     layout:
+#       min_width: 85
+#     corner_radius: 5
+#     hilited_corner_radius: 5
+#     line_spacing: 8
+#     hilite_spacing: 6
+#     spacing: 12
+#     color_scheme: win11light
+#     color_scheme_dark: easy_dark
+#     # 鼠须管盲打，嵌入首选，删除下面两行的#号，即可生效
+#     #alpha: 0.0001
+#     #inline_candidate: true%
+# ------------------------------------------------------------------------------------------
+# ❯ cat 虎码秃版\ 鼠须管\ （Mac）/01\ 双拼反查配置（自然码\ 小鹤\ 微软）/双拼反查配置\ 必看说明.txt
+# 一共有3种双拼方案，分置于3个文件夹
+# 自然码
+# 小鹤双拼
+# 微软双拼
+# 
+# 打开你所用的双拼方案文件夹
+# 将里面的文件 PY_c.custom.yaml 移至最外层文件夹，才能生效
+#         即：与  PY_c.schema.yaml  位于同级文件夹
+# 
+# 不要忘记重新部署
+# 
+# 然后就可以用 ` 键 引导，使用 自然码|小鹤|微软 双拼反查了
+# ------------------------------------------------------------------------------------------
+# 拷贝文件:
+#   01\ 双拼反查配置（自然码\ 小鹤\ 微软）/小鹤双拼/PY_c.custom.yaml
+#   core2022.dict.yaml
+#   core2022.schema.yaml
+#   easy_english.dict.yaml
+#   easy_english.schema.yaml
+#   lua/charset_comment_filter.lua
+#   lua/core2022_filter.lua
+#   lua/dz_ci_filter.lua
+#   lua/exe.lua
+#   lua/number.lua
+#   lua/shijian2.lua
+#   lua/unicode_display.lua
+#   opencc/* # rename emoji.json to emoji_cn.json, emoji.txt to emoji_cn.txt
+#   PY_c.dict.yaml
+#   PY_c.schema.yaml
+#   stroke.dict.yaml
+#   stroke.schema.yaml
+#   symbols.yaml
+#   tiger.custom.yaml
+#   tiger.dict.yaml
+#   tiger.extended.dict.yaml
+#   tiger.schema.yaml
+#   tigress.custom.yaml
+#   tigress.dict.yaml
+#   tigress.extended.dict.yaml
+#   tigress.schema.yaml
+#   tigress_ci.dict.yaml
+#   tigress_simp_ci.dict.yaml
+# 修改文件:
+#   opencc/emoji.json # rename emoji.json to emoji_cn.json
+#   opencc/emoji.txt # rename emoji.txt to emoji_cn.txt
+#   PY_c.custom.yaml
+#   tigress.custom.yaml
+#   tiger.custom.yaml
+#   default.custom.yaml # 方案列表增加虎码
+# ------------------------------------------------------------------------------------------
+# 
+# ------------------------------------------------------------------------------------------
+# 必看！ 虎码秃版 全功能介绍+挂接教程 2023.10.22.zip (43.0KB 教程说明) | 鼠须管（推荐） | ④Mac | 03 虎码输入法下载 | http://huma.ysepan.com/
+# ------------------------------------------------------------------------------------------
+# ❯ cat 必看！\ 虎码秃版\ 全功能介绍+挂接教程/①\ PC端\ 小狼毫\ 如何导入虎码方案.txt
+# 下载 群文件或网盘 里的 新小狼毫 安装包，
+# 也可以去  https://github.com/fxliang/weasel/releases  他的github里下载
+#         最好安装在默认路径C盘，不然功能滤镜大概率会失效 (可以正常打字，仅损失些功能)
+#                 本质上是路径里不能有中文
+#                 如果你用默认安装路径，滤镜也会失效，就是电脑用户名有中文
+#                         中文用户名改为英文的方法，可见下面两个链接教程（一个是视频，一个是图文）
+#                         https://blog.csdn.net/QQ847475065/article/details/128715105
+#                         https://b23.tv/E9vUce2
+#                 注意：小白用户不要随便改！！
+# 
+# 有旧版小狼毫的请先卸载旧版，卸载后重启电脑
+# 
+# 1. 首先要打开小狼毫的『用户文件夹』
+# 2. 使用 win+空格键，切换输入法为小狼毫，在右下角的系统托盘里，鼠标右击小狼毫的图标，点击 “用户文件夹”
+# 3. 下载群里的虎码配置方案：  “虎码秃版 小狼毫 鼠须管（Win Mac）.7z”
+# 4. 压缩包解压后，点开文件夹，将里面所有文件，全选，复制，再粘贴 到『用户文件夹』里
+# 
+# 再次右键点击小狼毫图标，点击 “重新部暑” 即可
+# 
+# 如果没出现方案，可以试试  右键点击小狼毫图标，点击 “输入设定” （一般是不用的）
+#         默认就会勾上3个方案
+#         1. 虎码单字
+#         2. 拼音++
+#         3. 虎码词版
+# 
+# 
+# 启动输入法后，按  ctrl + `(数字键1左边)  或 Ctrl+F8   可以切换不同的方案 （用数字键选，+ - 翻页）
+# 
+# --------
+# 
+# 然后 要安装下 群文件或网盘 的字体文件，位于  ”虎码方案必装字体.7z“  这个压缩包内
+# 
+# 解压字体文件 后，还会有几个压缩包，继续解压
+#         注意标注有 2选1 的，任选其中一个解压即可
+# 完成解压后，全选所有的字体文件，鼠标右键点击唤出菜单，点击 “为所有用户安装”
+# 
+# 除了上面的方法，也可以直接将字体文件移至以下路径的文件夹
+# C:\Windows\Fonts
+#         将上面的地址复制到  “此电脑(我的电脑)"  里的路径栏，按下回车 即可跳转至该文件夹%
+# ------------------------------------------------------------------------------------------
+# ❯ cat 必看！\ 虎码秃版\ 全功能介绍+挂接教程/②\ 安卓\ 中文输入法\ 导入虎码方案配置\ .txt
+# 手机上请使用 APP   "中文输入法"
+# 
+# 下载群里的 Rime主题配置文件 “虎码秃版 中文输入法（安卓）.7z”
+# 
+# 如果你是在手机上操作的，从qq下载的东西
+# 位于 Andriod → Data → com.tencent.mobileqq → Tencent → QQfile_recv
+# 从这里把文件夹解压，然后把文件夹内所有的文件全选后，移动到 Andoird → Rime (这个是中文输入法默认的用户文件夹)
+#         这里要注意，你解压好后，是有一个大文件夹，名字是  “虎码秃版 中文输入法（安卓）”
+#         一定要把先点开这个文件夹，将里面的文件 全选 再移动
+# 
+# 
+# 如果你的手机文件管理器打不开上述路径，可以到 “酷安”（一个应用市场） ，下个 “MT管理器”（MT也自带解压功能）
+#         下好MT后，点击最上面的路径，可输入目标路径快速打开
+#                 QQ下载路径： /storage/emulated/0/Android/data/com.tencent.mobileqq/Tencent/QQfile_recv/
+#                 中文输入法用户文件夹路径： /storage/emulated/0/Android/rime/
+#         用MT打开上述文件夹后，停留在该页面，然后点击右上角的 3个竖点，会有个 “添加书签” 的选项，可以保存上面2个，以后方便
+#                 在MT内，从底部工具栏向上滑，就能打开保存过的书签，直接进入路径文件夹
+#                         MT的视窗分2列，各自独立，要移动文件，需在一边打开 QQ下载路径，另一边打开 中文输入法用户文件夹路径
+#                                 然后将 QQ下载路径 内的所需文件，全选后，移动至 中文输入法用户文件夹路径
+# 
+# MT如何选全选？
+#         首先你要向左或向右滑动某个文件，就会自动选中目标文件，然后下方会出现5个新的控制按钮
+#                 第1个是 全选
+#                 第2个是 反选（选中 除去被你选中的目标文件外的 所有其他文件）
+#                 第3个是 取消选中
+#                 第4个是 选中同类文件（例如：目标是文件夹，就选中 同目录下的所有文件夹，若目标是文件，就选中 同目录下后缀名相同的所有文件）
+#                 第5个是 提示（会弹窗提醒：滑动任意2个文件，会自动选中它们之间的所有文件）
+# 
+# 或者也下载到电脑 在电脑上解压  手机数据线连电脑  复制到 文件夹Andoird → 文件夹Rime
+# 
+# ！！！然后打开你的 中文输入法APP  点击 其他 → 部署，才能生效
+# 
+# 打开  『输入』 → 『方案』
+#         有3个方案，默认勾选的是单字版
+#                 虎码单字版
+#                 虎码词库版（有16万词库）
+#                 拼音++
+#         新人推荐用 虎码单字版
+# 
+# 
+# 然后  打开  键盘 → 主题
+#         选一个主题，有多个，看自己喜好选择了
+#                 主题的具体用法，详见前面带 【主题】的说明文件
+# 
+# 中文输入法要进行一些初始的设置，详见说明文件   “③ 中文输入法 如何初始设置”
+# ------------------------------------------------------------------------------------------
+# ❯ cat 必看！\ 虎码秃版\ 全功能介绍+挂接教程/③\ 安卓\ 中文输入法\ 如何初始设置.txt
+# 导入虎码配置方案后，需搞些初始设置
+# 
+# 先选择 〖键盘〗
+#         在 “外观” 中
+#                 先点 『其他』 → 『部署』
+#                 再点 『键盘』 → 『主题』 选想要的主题，推荐 光明黑暗 九重
+#                 点 『嵌入编码模式』 → 选 『输入码』
+# 
+#         在 “反馈“ 中
+#                 开启 『按键声音』 调整『按键音量』
+#                         可以自己在 『键盘音效包』 里换音效
+#                         如果开了还是没有声音，就是手机的铃声没有开启
+#                                 注意，是铃声！不是媒体音量（有些手机开了免打扰也会没有声音）
+#                 勾选 『按键时振动』 调整 『振动强度』
+# 
+#         在 “操作“ 中
+#                 长按按键延迟时间 推荐调到 120 至 150
+#                 重复按键的间隔 一定要调到 最低 10
+# 
+# 再选择 〖候选栏〗
+#         这里可凭自己喜好调整
+#                 悬浮窗口推荐默认的 fixed
+#                         如果选 right_up 可以跟随，但在一些软件里会失效乱飘，极个别会崩溃（如闲鱼）
+#         可在这里修改 候选个数
+#                 找到 『最大候选条数』 这一项，自己更改数字
+# 
+#         若不想显示悬浮候选框，可关闭 『显示悬浮窗口』
+# 
+#         如果想要追求手机上的 盲打
+#                 打开『键盘』→『嵌入式编辑模式』→『首选』
+#                 然后在主题键盘上，上滑shift 可隐藏候选栏
+# 
+# 如果主题键盘上没有符号显示，可检查两项设置 是否启用（一般默认是启用的）
+#         1. 打开 『键盘』 → 『外观』 → 启用 『显示助记』
+#         2. 打开 『键盘』 → 『操作』 → 启用 『键盘长按』
+# 
+# 若某些键位长按易崩溃（多为触发滤镜功能导致，小概率），可点击 『其他』 关闭 『使用线程处理按键』
+# 如果没问题就不换取消勾选，还是用线程%
+# ------------------------------------------------------------------------------------------
+# ❯ cat 必看！\ 虎码秃版\ 全功能介绍+挂接教程/④\ PC\ +\ 移动端\ 虎码方案\ 功能介绍.txt
+# Ctrl + `(数字1左边的) 或 ctrl + F8 可以切换方案（单字版和字词版）
+# 
+# 
+# # 选重：
+#         分号次选，相当于数字键2。双击分号，可以打出 分号 本身
+#         引号（在分号的右边)三选，相当于数字键3
+#         默认是9个候选其余的4-9就用数字键选
+# 
+#         虎码打字，如果4码候选唯一，会自动上屏，不用按空格（该功能新版默认已取消，可自行开启，具体看相关说明文件）
+#         五码顶：4码有多个候选，如果你想打的是第一个字(词)，也不用按空格，继续打下个字的编码，会自动将 首选字 顶上去
+# 
+# 
+# # 快速操作：
+#         Tab键 可清空未上屏编码
+# 
+# 
+# # 拼音反查功能
+# 使用 反引号`（即数字1左边的键），可引导拼音反查编码
+#         使用引号' 可取消拼音编码串输入
+#                 也可用tab直接清屏取消输入
+# 
+# # 重复上次输入，有3种方式：
+# 
+# 1. PC端：
+# 有3种
+# [ 或 ] + 空格   （左右方括号均可）
+#         四码单字重复上屏不用按空格
+#         如： 爽爽  只需打  mbbb[空格  能直接顶出第2个爽
+# 
+# z + 次选
+# 
+# PC端还有一种方式
+# 连续按2下 单引号键' （其实是重复目标位于 3选位，也可用 '+数字3 选取）
+#         一般用于打较长的连续重复文本，如：哈哈哈哈哈哈哈哈哈
+#         就长按 单引号键 不松开，就能一直重复下去
+#         注意：这个方式的重复上屏，不能用于第五码顶（如果你开了四码唯一自动上屏就没事了）
+# 
+# 2. 手机端：
+# 推荐使用  z + 次选
+# 启用简词后的字词版，需使用 z + 3选
+# 
+# 因左右方括号占了功能，翻页仅可使用  +号 或  -号
+# 
+# 如要打出 /  \ 这些符号自身，按下 enter键，即可直接上屏
+# 
+# 顿号 可以按  反斜杠\  直出，也可以用 斜杠 + 空格打出
+# 不过更推荐使用下面的快符功能  ;+d  直出
+# 
+# 
+# # 快符功能
+# 使用 分号; +字母  可以快速上屏标点符号
+# 例如输入  ;a  可以上屏感叹号（不用按空格即可自动上屏）
+# 
+# 
+# 以下是符号列表：
+# #----------标点符号----------#
+# # 第一排
+# ：“     ;q
+# ？      ;w
+# （      ;e
+# ）      ;r
+# →       ;t
+# ·       ;y
+# ~       ;u
+# ——      ;i
+# 〖      ;o
+# 〗      ;p
+# 
+# # 第二排
+# ！      ;a
+# ……      ;s
+# 、      ;d
+# “       ;f
+# ”       ;g
+# 『      ;h
+# 』      ;j
+# ￥      ;k
+# %       ;l
+# ：      ;
+# ；      ;
+# 
+# # 第三排
+# |       ;z
+# 【      ;x
+# 】      ;c
+# 《      ;v
+# 》      ;b
+# 「      ;n
+# 」      ;m
+# 
+# 注意：
+# 分号+空格 → 打出冒号：
+# 双击分号（分号+分号） → 打出分号；
+# 
+# 单字版的标点，也被内置在一简次选中
+#         一简次选的好处是都可以标顶
+# 
+# 还有少量拓展符号，放在一简3选
+# ‘       F 三选
+# ’       G 三选
+# ：‘     Q 三选
+# …       S 三选
+# —       S 三选
+# 〔      X 三选
+# 〕      C 三选
+# 〈      V 三选
+# 〉      B 三选
+# $       K 三选
+# 
+# -----
+# 
+# 
+# 斜杠 /（右shift左边的键)，可以引导很多符号：/1 /a /bq  /bd /fh 等  （具体可以看另个文档 “⑥ 斜杠引导 输出扩展符号 查看与修改.txt”）
+# 
+# # 打个别符号：
+#         如果要打出外国名字 A·B 中间的“·”，在中文状态下 按 shift + \（enter 上面的键) 次选  即可
+#         以上符号都可以用上面的分号+字母引导打出,如 ;y 可打出 “·”
+# 
+# 
+# # 功能：
+#         ctrl + ` (数字1左边的键) 进入方案选单，按下空格或数字2，可以切换一些功能
+#         - 如 中英标点（中文状态下用英文标点，这个功能有快捷键，下面会讲)
+#         - 可切换字集
+#                 字集有两种，全集近10W字，默认是自定常用字集，9700+字
+#         - 使用带词库方案，可开启单字模式，过滤掉所以词组
+#         - 可以切换  打简出繁 + 打繁出简（有部分异体）
+#         - 可以开启拼音滤镜，Emoji滤镜，Unicode滤镜，拆分滤镜
+# 
+# 
+#         上述的功能有快捷键：
+#         可以先打个字，唤出候选窗口，然后 按 ctrl + o 就可以切换 打简出繁 的状态。
+#         必须得有候选窗口，如果想关掉，也得再一次唤出窗口。之所以这样做，是为了防止与其他的快捷键冲突。
+#         拼音滤镜        ctrl + p
+#         emoji滤镜       ctrl + i
+#         打简出繁        ctrl + o
+#         Unicode分区滤镜 ctrl + u        （如不了解 Unicode，可以看下这个网站 https://unicode-table.com/cn/blocks/）
+#         Unicode编码滤镜 ctrl + y
+#         自定常用字集    ctrl + h 或 ctrl + shift + h （新版NT框架QQ，ctrl + h是隐藏QQ，冲突了，故增加 ctrl + shift + h）
+#                 （默认启用，会过滤掉大部分字，只留9700+常用字，再按一次组合键能关闭，就能打全字集）
+#         拆分滤镜        ctrl + j
+#                 用 ` 引导的拼音反查下，默认只显示编码，按ctrl+j，可显示具体拆分
+#                         PC端，需安装fonts文件夹里的 LXGWWenKaiGBScreenR.ttf
+#                                 鼠标右击这个字体，选择 “为所有用户安装” 即可
+# 
+# ！！！快捷键都必须在有候选框的前提下才能生效
+#         注意：候选框可以没有内容
+#                 （因为默认是用 嵌入模式，这时观感上等于没有 候选框  但实际是有 编码字母框 的）
+#         例如：在常用字集下 按wwww 是空码，这个时候按下 Ctrl + h 就能出来候选项 䲜
+# 
+# 同时开启 拼音滤镜和拆分滤镜 时，拆分滤镜会显示在上层（拼音滤镜仍存在，在下层被隐藏了），且四码自动上屏会失效
+#         好处是可以看一些本来看不到的字的拆分（这部分字直接会上屏，就没法看滤镜内容了）
+#                 一般推荐开启拼音滤镜，需要拆分的时打开拆分滤镜看一眼，再关掉
+# 
+# 上述所有滤镜，可使用 ctrl + shift + 回车  单独上屏滤镜内容
+#         例如: 开启拼音滤镜后，打 “我” 的编码t，按 ctrl +shift +回车，会上屏  “wǒ”
+#                 如要上屏非首选，需用 上下或左右方向键，选好你要的候选，再按 ctrl +shift +回车
+# 
+# 中英标点切换，快捷键是 Ctrl + . （句号）
+#         开启后可能中文状态下，使用英文标点
+#                 该快捷键不需要 有候选框的前提，直接按即可
+# 
+# 全半角切换，快捷键是 Shift + 空格
+#         同上，该快捷键不需要 有候选框的前提，直接按即可
+# 
+# 临时英文功能：
+#         在中文状态下，用 引号' ，可引导打临时英文，使用  反引号`  来取消英文编码串输入
+# 
+# 
+# Lua功能：
+#         以下功能，用 / 斜杠 引导
+#         内容为 英文 或 f+简拼 或 虎码编码
+# 
+#         /date 或 /frq 或 /orzh，可输出当前日期，有公历 + 农历
+#                 如：2022年12月04日  壬寅年(虎)冬月十一
+#         /time 或 /fsj 或 /okao，可输出当前时间 （ 小鹤双拼用户可输入 /fuj ）
+#                 如：下午12:37  12点39分48秒
+#         /week 或 /fxq 或 /olzh，可输出当前是 周/星期 几
+#                 如：周日  星期日
+#         /cdate 或 /fnl 或 /wtxs，可输出农历
+#                 如： 壬寅年(虎)冬月廿七
+#         /fjq 或 /lzvq，可输出 节气
+#                 如： 冬至 2022-12-22  立春 2023-02-04
+# 
+# 
+#         转换 大写数(s)字
+#                 大写 S 引导，然后打数字1到0 （注意！是大写的S，在 中文状态 下，按 Shift+s，然后打数字）
+#                         如：输入 “S123456”  →  返回  十二万三千四百五十六  拾贰万叁仟肆佰伍拾陆元整
+#         转换 公历农(n)历
+#                 大写 N 引导，然后打 各2位的 年月日 （注意！是大写的N，在 中文状态 下，按 Shift+n，然后打数字）
+#                         如：输入 “N20221212”  →  返回  2022年12月12日   壬寅年(虎)冬月十九
+#         注意！因以上2个功能用了数字键作为输入编码，所以 非首选 的候选项，不能用数字键选取
+#                 要用 上下方向键，选中你需要的，再按空格上屏
+# 
+# 计算功能
+#         用 等号= 引导，=“输入内容”，可进行些简易计算
+#         举些基本的例子
+# 
+#         基本运算符
+#         +  -  *  /  %   （加 减 乘 除 取余）
+#                 取余就是求余数 如：10%3  得  1
+#         可以用括号 优先运算
+#                 如：(2+2^3)/12.43  得  0.80450522928399
+# 
+#         乘方、开方 ( ^  sqrt)
+#                 2^3 得 8  ； sqrt(9) 得 3
+# 
+#         e 直接出自然常数 e=2.718281828459
+#         pi 出  π     pi=3.1415926535898
+# 
+#         最大数  max ； 最小数 min
+#                 max{2*3,3*4,7*2.1} 得 14.7
+#                 min{-2,3,-10} 得 -10
+# 
+#         支持 tan sin cos log ln exp （正弦 余弦 正切 10为底的对数 e为底的对数 e为底的指数）
+#                 sin(120) 得 0.58061118421231
+#                 exp(2) 得 7.3890560989307
+#                 log(100) 得 2
+#                 ln(2)    得 0.69314718055995
+#                 exp(2) 得 7.3890560989307
+#         反的  atan asin acos
+# 
+# 
+#         平均数 avg{1,7,8}  得 5.3333333333333
+#         求和   sum{1,2,4} 得 7
+# 
+#         fac 阶乘
+#                 fac(3)  得 6
+#         abs 绝对值
+#                 abs(-2) 得 2
+#         random 随机数
+#                 random(1,10) 得 7 （1到10之间的）
+#         floor  向下取整
+#                 floor(2.4)  得2
+#         ceil  向上取整
+#                 ceil(2.4)  得 3
+#         mod 求余函数
+#                 mod(8,3)  得 2 （8除3的余数）
+#         rad 弧度 ，deg 角度，deriv 导数 ……
+# 
+#         其他例子：
+#                 floor(9^(8/7)*cos(deg(6))) 得 -3
+#                 =e^pi>pi^e 得 true
+#                 =map({1,2,3},\x.x^2|) 得 {1, 4, 9}
+#                 =map(range(-5,5),\x.x*pi/4|,deriv(sin)) 得 {-0.7071, -1, -0.7071, 0, 0.7071, 1, 0.7071, 0, -0.7071, -1}
+#                 =$(range(-5,5,0.01))(map,\x.-60*x^2-16*x+20|)(max)() 得 21.066
+#                 =test(\x.trunc(sin(x),1e-3)==trunc(deriv(cos)(x),1e-3)|,range(-2,2,0.1)) 得 true
+# 
+# 
+# -----
+# 
+# 拼音方案的功能基本一致
+#         除去字集切换，拆分滤镜，分号引导打标点，其他的功能都是有的
+# 
+# 拼音方案的反查是  笔画反查
+#         也是用 反引号` 引导
+#         一 丨 丿 丶 ㄥ 对应 h s p n z （ 横竖撇捺折 的 简拼）
+#                 注意3点
+#                         1. “丶” =  捺
+#                         2. “亅” =  竖
+#                         3. “㇀”  = 横
+#         输入 hppn  为  仄  可用 ctrl + p 开启带声调的拼音滤镜
+#                  和虎码一样，按 ctrl + shift + 回车 可上屏滤镜内容  (zè)
+# 
+# 
+# --------
+# 
+# 用斜杠引导可快速打加一些网址
+# 内置了6个，引导编码有三种，全拼 小鹤双拼 虎码
+# 
+# 输入 /huma 或 /zhmn 可打开虎码官网
+#         仅在PC端小狼毫与鼠须管有效
+# 输入 /baidu 或 /bddu 或 /fuxl 可打开百度搜索
+#         仅在PC端小狼毫与鼠须管有效
+# 输入 /biying 或 /bing 或 /biyk 或 /htxk 可打开微软必应搜索
+#         仅在PC端小狼毫与鼠须管有效
+# 输入 /guge 或/google 或 /hgzz 可打开谷歌搜索
+#         仅在PC端小狼毫与鼠须管有效
+# 输入 /wangpan 或 /whpj 或 /mbia 可打开虎码网盘
+#         仅在PC端小狼毫与鼠须管有效
+# 输入 /muyi 或/emon 或 /genda 或 /gfda 或 /piua 可打开网页版木易跟打器（由群友 木易某某 开发）
+#         仅在PC端小狼毫与鼠须管有效
+# 输入 /zitong 或 /zits 或 /whib 可打开字统网 https://zi.tools
+#         仅在PC端小狼毫与鼠须管有效
+# 输入 /yedian 或 /yedm 或 /dnih 可打开叶典网 http://www.yedict.com
+#         仅在PC端小狼毫与鼠须管有效
+# 
+# 
+# 如需自己添加其他网址，打开lua文件夹中的 exe.lua
+# 按以下格式继续追加
+#   elseif (context.input == "/引导字母" or context.input == "/引导字母") then
+#     generic_open("所需网址")
+#     context:clear()
+# 
+# or 代表可以有多个引导方式，例如：全拼简拼，虎码……
+# 网址注意看我前面添加的格式，建议直接从网址栏复制%
+# ------------------------------------------------------------------------------------------
+# ❯ cat 必看！\ 虎码秃版\ 全功能介绍+挂接教程/⑤\ 虎码方案\ 所有配置文件简要介绍.txt
+# 虎码配置文件里，一共有4个主方案，前3个方案默认启用
+# 
+# 1. 虎码单字版
+#         码表文件： tiger.dict.yaml （虎码单字码表，该码表不推荐改动）
+#         用户自定扩展码表： tiger.extended.dict.yaml （用户可自定 加词 调频 加简码 修改快符 等，打开文件 内附详细注解）
+#         方案配置文件： tiger.schema.yaml （该文件不推荐 Rime小白用户改动）
+#         用户自定修改方案配置文件：tiger.custom.yaml （用户可做简单的样式和功能修改，打开文件 内附详细注解，这个推荐看看）
+# 
+# 2. 虎码字词版
+#         码表文件1： tigress.dict.yaml （虎词版单字码表，这个和单字版是一样的）
+#         码表文件2： tigress_ci.dict.yaml （全码词码表，用户可以在这里删全码词）
+#         码表文件3： tigress_simp_ci.dict.yaml （简词码表，用户可以在这里删简词。该码表默认未启用，个人不推荐。如需启用详见文件 “【答疑】如何启用 简词.txt”）
+#         用户自定扩展码表： tigress.extended.dict.yaml （用户可自定 加词 调频 加简码 修改快符 等，打开文件 内附详细注解）
+#         方案配置文件： tigress.schema.yaml （该文件不推荐 Rime小白用户改动）
+#         用户自定修改方案配置文件：tigress.custom.yaml （用户可做简单的样式和功能修改，打开文件 内附详细注解，这个推荐看看）
+# 
+# 3. 拼音++
+#         该方案用于 拼音反查 和 辅助打出emoji符号
+#                 能作为独立方案打拼音，不过体验一般，可能会有点问题
+#         码表文件： PY_c.dict.yaml （用户可自行加词，需带上拼音，格式为：词+tab+拼音+tab+权重）
+#         方案配置文件： PY_c.schema.yaml （该文件不推荐 Rime小白用户改动）
+#         双拼扩展文件：PY_c.custom.yaml (该文件有3个，支持用户拓展 小鹤 自然码 微软 3种双拼反查，具体看下面)
+# 双拼反查配置
+#         位于文件夹 ”01 双拼反查配置（自然码 小鹤 微软）” ，内置3种双拼，用来更改拼音反查（默认是全拼）
+#         具体使用详见 该文件夹内的  “双拼反查配置 必看说明.txt”
+# 
+# 笔画反查配置
+#         stroke.schema.yaml 与 stroke.dict.yaml  是用于拼音方案下 笔画反查辅助方案的配置文件及码表
+# 
+# 4. 英语词库（该方案默认未启用，也不要启用）
+#         该方案用于辅助临时英文输入
+#         码表文件： easy_english.dict.yaml （用户可自行加单词，格式为：单词+tab+输入字母编码+tab+权重）
+#         方案配置文作： easy_english.schema.yaml （该文件不推荐 Rime小白用户改动）
+# 
+# 还有一个字集过滤的伪方案（！！！该方案不要启用）
+#         主码表： core2022.dict.yaml （用于字集过滤，具体使用说明详见： 文件【滤镜】如何增删自定常用字集.txt）
+#         方案配置文件： core2022.schema.yaml （该文件不推荐 Rime小白用户改动）
+# 
+# 
+# 其他通用必需文件
+#         opencc文件夹：里面是功能滤镜
+#         lua文件夹：里面是功能脚本
+#         rime.lua：脚本的总开关
+#         symbols.yaml：符号文件
+#         default.custom.yaml：作用于所有方案的全局自定设置(以补丁形式增补或覆盖)，可更改 切换方案的快捷键、启用哪些方案 、shift ctrl capslock等键位功能
+# 
+# 配色文件
+#         weasel.custom.yaml：电脑端 小狼毫上的自定配色文件 （Win）
+#         squirrel.custom.yaml：电脑端 鼠须管上的自定配色文件 （Mac）
+# 
+# 
+# 仅用于安卓中文输入法的相关文件
+#         名字里带 trime.yaml 的：都是 主题皮肤 文件
+#         名字带 trime 的文件夹：都是主题需要的素材文件
+#                 如：图片、音频……
+#         backgrounds文件夹：也是主题素材，主要用于咖啡系主题
+#         sounds文件夹：内置了些全局通用音频文件，可在中文输入法的 键盘音效包 里选择设置成全主题通用音效
+#         fonts文件夹：字体文件，用于显示生僻字、拆分滤镜内容以及部分主题的键盘字体
+#         script文件夹：手机上的脚本文件%
+# ------------------------------------------------------------------------------------------
+# ❯ cat 必看！\ 虎码秃版\ 全功能介绍+挂接教程/⑥\ 斜杠引导\ 输出扩展符号\ 查看与修改.txt
+# 在 symbols.yaml 这个文件里，可自行 查看+修改
+#         符号文件用 斜杠/ 引导，如：/tab，可直接打出制表符，按空格上屏
+#         改完后需重新部署%
+# ------------------------------------------------------------------------------------------
+# ❯ cat 必看！\ 虎码秃版\ 全功能介绍+挂接教程/【主题】九重键盘\ 咖啡\ 标准布局\ 功能介绍.txt
+# 安卓手机上的中文输入法主题介绍（ios没有）
+# 
+# 功能主要基于 长按 上滑  下滑 少量的左滑 右滑
+# 
+# 首先是第一行，分别是
+# 中英切换
+#         （这个建议用下面说的 长按空格)
+# 
+# 字集切换
+#         可切在 自定常用字集 与 全字集 切换（全字集近10W，常用字是9700多）
+#         默认是开启的，会过滤大部分生僻字，只打9700+常用字（再次点击能关闭，就能打全字集）
+#                 有顶部数字键的，可通过长按H键开启关闭
+#                 无顶部数字键的，长按N键
+# 
+# 拼音滤镜
+#         开启后，增加拼音注解
+#                 可以通过长按p，开启关闭 （前提 是必须有 候选窗口）
+# 
+# emoji滤镜
+#         开启后，候选会出现emoji  （例如输入 看，牛...)
+#                 以通过长按i，开启关闭 （前提 是必须有 候选窗口）
+# 
+# 拆分滤镜
+#         开启后，显示拆分和全码
+#                 有顶部数字键的，可通过长按 J键开启关闭
+#                 无顶部数字键的，长按B键
+# 
+# 打简出繁（有部分异体）
+#         打简体出繁体
+#                 可以通过长按o，开启关闭 （前提 是必须有 候选窗口）
+# 
+# 有刻 半刻 无刻
+#         半刻 只隐藏键盘字母（符号是显示的），无刻 全部都隐藏 (有些主题不行）
+# 
+# Unicode分区滤镜
+#         开启后，增加Unicode分区注解
+#                 可通过长按U，开启关闭 （前提 是必须有 候选窗口）
+#                         Unicode 可以该网站了解 https://unicode-table.com/cn/blocks/
+# 
+# ！！！上面的 u i o p , 在没有顶新数字键的主题，用 h J K L 代替
+# 
+# 
+# Unicode编码滤镜 长按 Y 开启
+#         无顶部数字键的，长按F键
+# 
+# 
+# ！！！长按键 都必须在有候选框的前提下才能生效
+#         注意：候选框可以没有内容
+#         例如：在常用字集下 按wwww 是空码，这个时候按下 Ctrl + h 就能出来候选项 䲜
+# 
+# 
+# 上述所有滤镜，可 左滑回删键  单独上屏滤镜内容
+#         例如: 开启拼音滤镜后，打 “我” 的编码t，左滑回删键，会上屏  “wǒ”
+#                 如要上屏非首选，需用 左右或上下滑动 空格，选好你要的候选项，再 左滑回删键
+# 
+# 同时开启 拼音滤镜和拆分滤镜 时，拆分滤镜会显示在上层（拼音滤镜仍存在，在下层被隐藏了），且四码自动上屏会失效
+#         好处是可以看一些本来看不到的字的拆分（这部分字直接会上屏，就没法看滤镜内容了）
+#                 一般推荐开启拼音滤镜，需要拆分的时打开拆分滤镜看一眼，再关掉
+# 
+# 中英标点
+#         可在中文状态使用英文标点
+# 
+# 单字词组
+#         开启后，有词库的方案会过滤掉词组，只能打单字
+# 
+# 助记开关
+#         启用就有常用字根的键位助记 （这个功能在九重键盘里没有）
+# 
+# 全半角切换
+#         （用默认的半角就行)
+# 
+# 
+# 之后是  肆到零  对应数字键 4到0
+# 肆到玖 长按可以打出成对符号 长按零 可以打出 A·B 之间的·符号，上滑零 左书名号 下滑零 右书名号
+# 在打字的时候 数字4与0 会变成 上下翻页键，剩下的键会变成 五选到九选 用于选重
+#         非九选重主题，没有这一行
+# 
+# 数字1到3 需要分别 长按QWE才可以打出来
+# 如果要输入较多的数字，还是 推荐  上滑 M键 进入 数字键盘
+# 
+# 
+# 26个字母键，长按也可以出符号，英中状态下是不同的，中文有额外扩充符号
+# 
+# Q到P 这一行的符号或数字，既能长按输出，也可上滑输出
+# 
+# 上滑A 行首 模拟Hone键
+# 上滑L 行尾 摸拟End键，用于把光标移出成对符号，例如《 》
+# 
+# 长按A 全选  下滑A 输出@
+# 长按Z 引导进行拼音反查（本质上是输出反引号)
+#         上滑 Z  进入emoji 键盘
+# 长按X 剪切
+#         上滑X   刷新主题 （适用于 只修改主题，没有改方案，这样就不用重新部暑）
+# 长按C 复制
+#         上滑C   进入 增强符号键盘
+# 长按V 粘贴
+# 
+# 上滑S 进入 脚本功能界面（这个功能看着强大，实际作用不大的，可自己加脚本拓展)
+# 上滑D 日期 例如 2022-01-07
+# 上滑F 时间 例如 17:05 周六
+# 
+# 上滑G  进入编辑功能界面 里面还有个超级编辑，具体看群里的演示视频
+# 
+# 上滑J  打开剪切板
+# 下滑L  输出破折号——（英文状态下，输出 下划线_）
+# 
+# 长按L后，再空格出顿号
+# 长按L后，接着输入一些键位可引导符号，比如 /bq, /1 , /o , /py , /fh , /bd 等 （具体可以看另个文档 斜杠引导符号大全.txt）
+#         ！！如果是没有数字键的主题，长按L 改成   下滑P
+#         本质上是用 / 斜杠 引导
+# 该键位还可引导lua功能，和电脑上一致
+# 还是用 /斜杠 引导
+#         Lua功能：
+#                 以下功能，用 / 斜杠 引导
+#                 内容为 英文 或 f+简拼 或 虎码编码
+# 
+#                 /date 或 /frq 或 /orzh，可输出当前日期，有公历 + 农历
+#                         如：2022年12月04日  壬寅年(虎)冬月十一
+#                 /time 或 /fsj 或 /okao，可输出当前时间 （ 小鹤双拼用户可输入 /fuj ）
+#                         如：下午12:37  12点39分48秒
+#                 /week 或 /fxq 或 /olzh，可输出当前是 周/星期 几
+#                         如：周日  星期日
+#                 /cdate 或 /fnl 或 /wtxs，可输出农历
+#                         如： 壬寅年(虎)冬月廿七
+#                 /fjq 或 /lzvq，可输出 节气
+#                         如： 冬至 2022-12-22  立春 2023-02-04
+# 
+# 
+#         转换 大写数(s)字
+#                 大写 S 引导，然后打数字1到0 （注意！是大写的S，在 中文状态 下，按 Shift+s，然后打数字）
+#                         如：输入 “S123456”  →  返回  十二万三千四百五十六  拾贰万叁仟肆佰伍拾陆元整
+#         转换 公历农(n)历
+#                 大写 N 引导，然后打 各2位的 年月日 （注意！是大写的N，在 中文状态 下，按 Shift+n，然后打数字）
+#                         如：输入 “N20221212”  →  返回  2022年12月12日   壬寅年(虎)冬月十九
+#         注意！因以上2个功能用了数字键作为输入编码，所以 非首选 的候选项，不能用数字键选取
+#                 要用 上下方向键，选中你需要的，再按空格上屏
+#                 手机上可以直接在候选框上点，或 左右滑动空格 选中所需候选项，再按空格上屏
+# 手机上可用下面讲的数字键盘打数字
+# 
+# 上滑M   进入 计算键盘，该键盘有计算功能
+#         用 等号= 引导，=“输入内容”，可进行些简易计算
+#         举些基本的例子
+# 
+#         基本运算符
+#         +  -  *  /  %   （加 减 乘 除 取余）
+#                 取余就是求余数 如：10%3  得  1
+#         可以用括号 优先运算
+#                 如：(2+2^3)/12.43  得  0.80450522928399
+# 
+#         乘方、开方 ( ^  sqrt)
+#                 2^3 得 8  ； sqrt(9) 得 3
+# 
+#         e 直接出自然常数 e=2.718281828459
+# 
+#         最大数  max ； 最小数 min
+#                 max{2*3,3*4,7*2.1} 得 14.7
+#                 min{-2,3,-10} 得 -10
+# 
+#         支持 tan sin cos log ln exp （正弦 余弦 正切 10为底的对数 e为底的对数 e为底的指数）
+#                 sin(120) 得 0.58061118421231
+#                 exp(2) 得 7.3890560989307
+#                 log(100) 得 2
+#                 ln(2)    得 0.69314718055995
+#                 exp(2) 得 7.3890560989307
+# 
+#         fac 阶乘
+#                 fac(3)  得 6
+#         abs 绝对值
+#                 abs(-2) 得 2
+#         random 随机数
+#                 random(1,10) 得 7 （1到10之间的）
+#         floor  向下取整
+#                 floor(2.4)  得2
+#         ceil  向上取整
+#                 ceil(2.4)  得 3
+#         mod 求余函数
+#                 mod(8,3)  得 2 （8除3的余数）
+#         rad 弧度 ，deg 角度，deriv 导数 ……
+# 
+#         其他例子：
+#                 floor(9^(8/7)*cos(deg(6))) 得 -3
+#                 =e^pi>pi^e 得 true
+#                 =map({1,2,3},\x.x^2|) 得 {1, 4, 9}
+#                 =map(range(-5,5),\x.x*pi/4|,deriv(sin)) 得 {-0.7071, -1, -0.7071, 0, 0.7071, 1, 0.7071, 0, -0.7071, -1}
+#                 =$(range(-5,5,0.01))(map,\x.-60*x^2-16*x+20|)(max)() 得 21.066
+#                 =test(\x.trunc(sin(x),1e-3)==trunc(deriv(cos)(x),1e-3)|,range(-2,2,0.1)) 得 true
+# 数字键盘的回删键 仅有 下滑全删 的功能
+# 右下角的 输出 按钮，长按就是 Enter，有换行功能
+# 
+# 
+# 上滑N，打开 短语面板，可从剪切板添加
+# 
+# 上滑shift  隐藏固定的候选窗口 (悬浮候选窗口 还是有的)
+# 长按shift 锁定大写
+# shift键 在打字的时候会变成Esc键，可以清空编码，就不用退格一个个删了
+# 
+# 
+# 上滑回删键 删除全部
+# 下滑回删键 删除光标所在行
+# 
+# 点击 標點鍵，进入 数字界面
+# 长按 標點鍵，切换 中英文 （长按空格也行）
+# 右滑 標點鍵，更换输入方案 （比如从 “虎码单字” 换成 “拼音++”）
+# 
+# 上滑 標點鍵（就是最左下角那个键位），进入功能拓展菜单界面
+# 两行功能拓展，分别是 5+5 个功能
+# 第一行：
+# 1.虎码拆分查询(先打个字 上屏后，再使用这个功能)
+# 2.部署 （比如方案更新，换了文件，点一下这个就可以生效)
+# 3.切换方案(如: 双拼 换到 虎码)
+# 4.切换输入法（如:中文 换到 搜狗)
+# 5.开启隐藏提示 （每个按键的名称，主键盘上的符号标记）
+# 
+# 第二行
+# 1.浏览器搜索(需先打个字，上屏后，再点一下这个)
+# 2.查 汉典(同上，需先打字上屏)
+# 3.打开MT编辑器(需先下载这个APP)
+# 4.查 字统网
+# 5.进入设置界面
+# 
+# 长按或上滑 逗号键，输出 感叹号
+# 
+# 上 下 左 右 滑动空格，模拟四方位方向键，移动光标
+# 
+# 长按或上滑 句号键，输出 问号
+# 
+# 句号在打字的时候 会变成二选
+# 逗号在打字的时候 会变成三选
+#         咖啡主题 逗号和数字123键 都会变成三选
+# 標點鍵 在打字的时候 会变成四选
+# 
+# 上滑 enter 换主题 （主题有功能，键盘布局的区别)
+# 长按 enter 换配色 (配色就只是配色,样式上的区别)
+# 
+# 
+# 临时英文功能：
+#         在中文状态下，用 引号 ' ，可引导打临时英文
+# 
+# 
+# # 快符功能
+# 使用 分号; +字母  可以快速上屏标点符号
+# 例如输入  ;a  可以上屏感叹号（不用按空格即可自动上屏）
+# 
+# 以下是符号列表
+# #----------标点符号----------#
+# # 第一排
+# ：“     ;q
+# ？      ;w
+# （      ;e
+# ）      ;r
+# →       ;t
+# ·       ;y
+# ~       ;u
+# ——      ;i
+# 〖      ;o
+# 〗      ;p
+# 
+# # 第二排
+# ！      ;a
+# ……      ;s
+# 、      ;d
+# “       ;f
+# ”       ;g
+# 『      ;h
+# 』      ;j
+# ￥      ;k
+# %       ;l
+# ：      ;
+# ；      ;
+# 
+# # 第三排
+# |       ;z
+# 【      ;x
+# 】      ;c
+# 《      ;v
+# 》      ;b
+# 「      ;n
+# 」      ;m
+# 
+# 
+# 单字版的标点，也被内置在一简次选中
+#         一简次选的好处是都可以标顶
+# 
+# 还有少量拓展符号，放在一简3选
+# ‘       F 三选
+# ’       G 三选
+# ：‘     Q 三选
+# …       S 三选
+# —       S 三选
+# 〔      X 三选
+# 〕      C 三选
+# 〈      V 三选
+# 〉      B 三选
+# $       K 三选
+# 
+# -----
+# 
+# 拼音方案的功能基本一致
+#         除了没有字集切换，拆分滤镜，其他的功能都是有的
+# 
+# 拼音方案的反查是  笔画反查
+#         也是用 反引号` 引导
+#         一 丨 丿 丶 ㄥ 对应 h s p n z （ 横竖撇捺折 的 简拼）
+#                 注意3点
+#                         1. “丶” =  捺
+#                         2. “亅” =  竖
+#                         3. “㇀”  = 横
+#         输入 hppn  为  仄  可用 ctrl + p 开启带声调的拼音滤镜
+#                 和虎码一样，按 ctrl + shift + 回车 可上屏滤镜内容  (zè)
+#                 手机上可用 左滑 回删键 上屏
+# 
+# ------
+# 
+# 咖啡主题，大部分功能都一样
+#         区别在于：
+#                 上滑数字123键 可打开字根助记
+#                 下滑shift  进入无刻模式
+#                         上滑shift 的选项更多，有4排
+#                 J键 N键 增加下滑功能，有两种剪切板和短语（即能上滑，也能下滑）
+#                 功能拓展菜单界面更丰富%
+# ------------------------------------------------------------------------------------------
+# ❯ cat 必看！\ 虎码秃版\ 全功能介绍+挂接教程/【主题】光明·黑暗\ 亂\ 特殊布局\ 功能介绍.txt
+# 安卓手机上的中文输入法主题介绍（ios没有）
+# 
+# 功能主要基于 长按 上滑 下滑 少量的左滑 右滑
+# 
+# 首先是第一行，分别是 （可向左滑动显示更多）
+# 
+# 中英切换
+#         （这个建议用下面说的 长按空格)
+# 
+# 字集切换
+#         可切在 自定常用字集 与 全字集 切换（全字集近10W，常用字是9700多）
+#         默认开启，过滤大部分生僻字，只打9700+常用字（再次点击可以关闭，就能打全字集）
+#                 可通过长按 N，开启关闭 （前提 是必须有 候选窗口）
+# 
+# 拼音滤镜
+#         开启后，增加拼音注解
+#                 可以通过长按 L，开启关闭 （前提 是必须有 候选窗口）
+# 
+# emoji滤镜
+#         开启后，候选会出现emoji  （例如输入 看，牛...)
+#                 以通过长按 O，开启关闭 （前提 是必须有 候选窗口）
+# 
+# 
+# 拆分滤镜
+#         开启后，显示拆分和全码
+#                 可通过长按 D，开启关闭 （前提 是必须有 候选窗口）
+# 
+# 打简出繁（有部分异体）
+#         打简体出繁体
+#                 可以通过长按 K，开启关闭 （前提 是必须有 候选窗口）
+# 
+# 
+# Unicode分区滤镜 Unicode 可以该网站了解 https://unicode-table.com/cn/blocks/
+#         开启后，增加Unicode分区注解
+#                 可通过长按 P，开启关闭 （前提 是必须有 候选窗口）
+# 
+# Unicode编码滤镜
+#         长按 W 开启
+# 
+# 
+# ！！！长按键 都必须在有候选框的前提下才能生效
+#         注意：候选框可以没有内容
+#         例如：在常用字集下 按wwww 是空码，这个时候按下 Ctrl + h 就能出来候选项 䲜
+# 
+# 上述所有滤镜，可 左滑回删键  单独上屏滤镜内容
+#         例如: 开启拼音滤镜后，打 “我” 的编码t，左滑回删键，会上屏  “wǒ”
+#                 如要上屏非首选，需用 左右或上下滑动 空格，选好你要的候选项，再 左滑回删键
+# 
+# 同时开启 拼音滤镜和拆分滤镜 时，拆分滤镜会显示在上层（拼音滤镜仍存在，在下层被隐藏了），且四码自动上屏会失效
+#         好处是可以看一些本来看不到的字的拆分（这部分字直接会上屏，就没法看滤镜内容了）
+#                 一般推荐开启拼音滤镜，需要拆分的时打开拆分滤镜看一眼，再关掉
+# 
+# 中英标点
+#         可在中文状态使用英文标点
+# 
+# 单字词组
+#         开启后，有词库的方案会过滤掉词组，只能打单字
+# 
+# 助记开关
+#         启用就有常用字根的键位助记 （这个功能在九重键盘里没有）
+# 
+# 全半角切换
+#         （用默认的半角就行)
+# 
+# 
+# 首先，这个布局也是26键，但和标准26是不一样的
+# 键位更大，双空格
+# 手机上用两天就能适应，适应后手机上打字就不会按错了
+# 
+# 
+# 26个字母键，长按也可以出符号，英中状态下是不同的，中文有额外扩充符号
+# 
+# 里面有一个需要长按就能触发的数字键布局
+# rui
+# tyi
+# fgh
+# b
+# 这10个键对应 1 到 0
+# 也可以用来选重
+#         如果你用的是虎码，输入编码 rydk ,长按U（对应的是数字键2），可输出 “笘”
+# 
+# 也可以  上滑 M键 进入 数字键盘
+# 
+# 下滑Q 行首 模拟Hone键
+# 下滑P 行尾 摸拟End键，用于把光标移出成对符号，例如《 》
+# 
+# 长按A 全选 上滑A @
+# 长按Z 引导进行拼音反查（本质上是输出反引号)
+#         上滑 Z  进入emoji 键盘
+# 长按X 剪切
+#         上滑X   刷新主题 （适用于 只修改主题，没有改方案，这样就不用重新部暑）
+# 长按C 复制
+#         上滑C   进入 增强符号键盘
+# 长按V 粘贴
+# 
+# 上滑S 进入 脚本功能界面（这个功能看着强大，实际作用不大的，可自己加脚本拓展)
+# 上滑D 日期 例如 2022-01-07
+# 上滑F 时间 例如 17:05 周六
+# 
+# 上滑G  进入编辑功能界面
+# 
+# 上滑J  打开剪切板
+# 上滑k  输出破折号——（在英文状态下输出 下划线_）
+# 
+# 上滑L后，再空格可出顿号 （更推荐使用下面的快符打法）
+# 上滑L后，接着输入一些键位可引导符号，如 ：/bq, /1 , /o , /py , /fh , /bd 等 （具体可以看另个文档 斜杠引导符号大全.txt）
+#         本质上是打出了  /斜杠 符号来引导的
+# 该键位还可引导lua功能，和电脑上一致
+#         Lua功能：
+#                 以下功能，用 / 斜杠 引导
+#                 内容为 英文 或 f+简拼 或 虎码编码
+# 
+#                 /date 或 /frq 或 /orzh，可输出当前日期，有公历 + 农历
+#                         如：2022年12月04日  壬寅年(虎)冬月十一
+#                 /time 或 /fsj 或 /okao，可输出当前时间 （ 小鹤双拼用户可输入 /fuj ）
+#                         如：下午12:37  12点39分48秒
+#                 /week 或 /fxq 或 /olzh，可输出当前是 周/星期 几
+#                         如：周日  星期日
+#                 /cdate 或 /fnl 或 /wtxs，可输出农历
+#                         如： 壬寅年(虎)冬月廿七
+#                 /fjq 或 /lzvq，可输出 节气
+#                         如： 冬至 2022-12-22  立春 2023-02-04
+# 
+# 
+#         转换 大写数(s)字
+#                 大写 S 引导，然后打数字1到0 （注意！是大写的S，在 中文状态 下，按 Shift+s，然后打数字）
+#                         如：输入 “S123456”  →  返回  十二万三千四百五十六  拾贰万叁仟肆佰伍拾陆元整
+#         转换 公历农(n)历
+#                 大写 N 引导，然后打 各2位的 年月日 （注意！是大写的N，在 中文状态 下，按 Shift+n，然后打数字）
+#                         如：输入 “N20221212”  →  返回  2022年12月12日   壬寅年(虎)冬月十九
+#         注意！因以上2个功能用了数字键作为输入编码，所以 非首选 的候选项，不能用数字键选取
+#                 要用 上下方向键，选中你需要的，再按空格上屏
+#                 手机上可以直接在候选框上点，或 左右滑动空格 选中所需候选项，再按空格上屏
+# 手机上可用下面讲的数字键盘打数字
+# 
+# 上滑M键 ，进入 计算键盘，该键盘有计算功能
+#         用 等号= 引导，=“输入内容”，可进行些简易计算
+#         举些基本的例子
+# 
+#         基本运算符
+#         +  -  *  /  %   （加 减 乘 除 取余）
+#                 取余就是求余数 如：10%3  得  1
+#         可以用括号 优先运算
+#                 如：(2+2^3)/12.43  得  0.80450522928399
+# 
+#         乘方、开方 ( ^  sqrt)
+#                 2^3 得 8  ； sqrt(9) 得 3
+# 
+#         e 直接出自然常数 e=2.718281828459
+#         pi 出  π     pi=3.1415926535898
+# 
+#         最大数  max ； 最小数 min
+#                 max{2*3,3*4,7*2.1} 得 14.7
+#                 min{-2,3,-10} 得 -10
+# 
+#         支持 tan sin cos log ln exp （正弦 余弦 正切 10为底的对数 e为底的对数 e为底的指数）
+#                 sin(120) 得 0.58061118421231
+#                 exp(2) 得 7.3890560989307
+#                 log(100) 得 2
+#                 ln(2)    得 0.69314718055995
+#                 exp(2) 得 7.3890560989307
+#         反的  atan asin acos
+# 
+# 
+#         平均数 avg{1,7,8}  得 5.3333333333333
+#         求和   sum{1,2,4} 得 7
+# 
+#         fac 阶乘
+#                 fac(3)  得 6
+#         abs 绝对值
+#                 abs(-2) 得 2
+#         random 随机数
+#                 random(1,10) 得 7 （1到10之间的）
+#         floor  向下取整
+#                 floor(2.4)  得2
+#         ceil  向上取整
+#                 ceil(2.4)  得 3
+#         mod 求余函数
+#                 mod(8,3)  得 2 （8除3的余数）
+#         rad 弧度 ，deg 角度，deriv 导数 ……
+# 
+#         其他例子：
+#                 floor(9^(8/7)*cos(deg(6))) 得 -3
+#                 =e^pi>pi^e 得 true
+#                 =map({1,2,3},\x.x^2|) 得 {1, 4, 9}
+#                 =map(range(-5,5),\x.x*pi/4|,deriv(sin)) 得 {-0.7071, -1, -0.7071, 0, 0.7071, 1, 0.7071, 0, -0.7071, -1}
+#                 =$(range(-5,5,0.01))(map,\x.-60*x^2-16*x+20|)(max)() 得 21.066
+#                 =test(\x.trunc(sin(x),1e-3)==trunc(deriv(cos)(x),1e-3)|,range(-2,2,0.1)) 得 true
+# 数字键盘的回删键 仅有下 滑全删 的功能
+# 右下角的 输出 按钮，长按就是 Enter，有换行功能
+# 
+# 上滑N，打开 短语面板，可从剪切板添加
+# 
+# 下滑shift  隐藏固定的候选窗口 (悬浮候选窗口还是有的)
+# 长按shift 锁定大写
+# shift键 在打字时会变成 向下翻页，如果要向上翻，就点击候选栏的最左侧的空白处
+# 
+# 上滑回删键 删除全部
+# 下滑回删键 删除光标所在行
+# 
+# 点击 符號鍵，进入 数字符号拓展界面
+# 长按 符號鍵，切换 中英文 （长按空格也行）
+# 右滑 符號鍵，更换输入方案 （比如从 “虎码单字” 换成 “拼音++”）
+# 
+# 上滑 符號鍵（就是最左下角的那个键），进入功能拓展菜单界面
+# 两行功能拓展，分别是 5+5 个功能
+# 第一行：
+# 1.虎码拆分查询(先打个字 上屏后，再使用这个功能)
+# 2.部署 （比如方案更新，换了文件，点一下这个就可以生效)
+# 3.切换方案(如: 双拼 换到 虎码)
+# 4.切换输入法（如:中文 换到 搜狗)
+# 5.开启隐藏提示 （每个按键的名称，主键盘上的符号标记）
+# 
+# 第二行
+# 1.浏览器搜索(需先打个字，上屏后，再点一下这个)
+# 2.查 汉典(同上，需先打字上屏)
+# 3.打开MT编辑器(需先下载这个APP)
+# 4.查 字统网
+# 5.进入设置界面
+# 
+# 长按或上滑 逗号键，输出 感叹号
+# 
+# 长按空格，语音输入(需要按住不松开，讲完再松手)
+# 上 下 左 右 滑动空格，模拟四方位方向键，移动光标
+# 上下两个空格都是一样的功能
+# 
+# 长按或上滑 句号键，输出 问号
+# 
+# 句号在打字的时候 会变成二选
+# 逗号在打字的时候 会变成三选
+# 符號鍵 在打字的时候 会变成ESC键，可以清空编码，就不用退格一个个删了
+# 
+# 上滑 enter 换主题 （主题有功能，键盘布局的区别)
+# 长按 enter 换配色 (配色就只是配色,样式上的区别)
+# 
+# 临时英文功能：
+#         在中文状态下，用 引号 ' ，可引导打临时英文
+# 
+# 
+# # 快符功能
+# 使用 分号; +字母  可以快速上屏标点符号
+# 例如输入  ;a  可以上屏感叹号（不用按空格即可自动上屏）
+# 
+# 以下是符号列表
+# #----------标点符号----------#
+# # 第一排
+# ：“     ;q
+# ？      ;w
+# （      ;e
+# ）      ;r
+# →       ;t
+# ·       ;y
+# ~       ;u
+# ——      ;i
+# 〖      ;o
+# 〗      ;p
+# 
+# # 第二排
+# ！      ;a
+# ……      ;s
+# 、      ;d
+# “       ;f
+# ”       ;g
+# 『      ;h
+# 』      ;j
+# ￥      ;k
+# %       ;l
+# ：      ;
+# ；      ;
+# 
+# # 第三排
+# |       ;z
+# 【      ;x
+# 】      ;c
+# 《      ;v
+# 》      ;b
+# 「      ;n
+# 」      ;m
+# 
+# 
+# 单字版的标点，也被内置在一简次选中
+#         一简次选的好处是都可以标顶
+# 
+# 还有少量拓展符号，放在一简3选
+# ‘       F 三选
+# ’       G 三选
+# ：‘     Q 三选
+# …       S 三选
+# —       S 三选
+# 〔      X 三选
+# 〕      C 三选
+# 〈      V 三选
+# 〉      B 三选
+# $       K 三选
+# 
+# -----
+# 
+# 拼音方案的功能基本一致
+#         除了没有字集切换，拆分滤镜，其他的功能都是有的
+# 
+# 拼音方案的反查是  笔画反查
+#         也是用 反引号` 引导
+#         一 丨 丿 丶 ㄥ 对应 h s p n z （ 横竖撇捺折 的 简拼）
+#                 注意3点
+#                         1. “丶” =  捺
+#                         2. “亅” =  竖
+#                         3. “㇀”  = 横
+#         输入 hppn  为  仄  可用 ctrl + p 开启带声调的拼音滤镜
+#                 和虎码一样，按 ctrl + shift + 回车 可上屏滤镜内容  (zè)
+#                 手机上可用 左滑 回删键 上屏%
+# ------------------------------------------------------------------------------------------
+# ❯ cat 必看！\ 虎码秃版\ 全功能介绍+挂接教程/【主题】安卓\ 调整键盘行高\ 底部增高.txt
+# 如果你的手机改过系统默认字号大小与文本大小
+# 那主题的行高显示可能会有点问题，会过高或过低
+# 
+# 同样的，主题默认设置了底部增高行
+# 如果你手机是物理三键导航，加上增高行可能会过高
+# 
+# 可以自行简单调整主题的 主键盘行高 与 底部增高行
+# 
+# 主题文件  就是  后缀名为 .trime.yaml 的，哪个主题看你自己用的是什么
+# 打开主题文件后，搜索 主键盘行高  与  底部增高行，改对应的数字就行
+#         如： 光明黑暗主题，搜索结果为  “A: &VJG 51 #主键盘行高”  改这里的 “51” 即可
+# 
+# 咖啡主题的增高行，要在 『 咖啡•机械键盘•增高.trime.yaml 』与 『 咖啡•增高.trime.yaml 』这两个文件内改
+#         主键盘行高，在 『 咖啡.trime.yaml 』文件改，咖啡普通 与 咖啡机械 都是这个文件%
+# ------------------------------------------------------------------------------------------
+# ❯ cat 必看！\ 虎码秃版\ 全功能介绍+挂接教程/【滤镜】Emoji滤镜内容\ 如何修改.txt
+# Emoji滤镜在 opencc文件夹 内的 emoji.txt 中
+# 
+# 支持1对1，1对多
+# 格式为：
+# 字词+tab+字词+空格+emoji1+空格+emoji2……
+# 例如：
+# 梨      梨 🍐
+# 力量    力量 💪 🦾 💪🏻 💪🏼 💪🏽 💪🏾 💪🏿 💪🏻
+# 
+# 如果想给同一个emoji加多个名字，可以这样
+# 梨      梨 🍐
+# 梨子    梨子 🍐
+# 梨头    梨头 🍐
+# 
+# ！注意  主词头不能有重复项，否则会导致滤镜功能失效
+#         需追加到同一词头后面，以空格分界，如前面举例的力量
+# 添加时需先搜索检查，原文件内是否已有词头
+# 
+# 滤镜也不能有空行，就算加在最下面，也不行，都会导致功能失效
+# 
+# 改完后记得重新部署%
+# ------------------------------------------------------------------------------------------
+# ❯ cat 必看！\ 虎码秃版\ 全功能介绍+挂接教程/【滤镜】如何修改滤镜开关的默认状态.txt
+# 像 拼音 拆分 常用字集 这些滤镜，除开常用字集滤镜默认开启，其他都是默认关闭的
+#         即便手动用快捷键开启或关闭，换个方案或换到其他软件，也会自动回到默认状态
+# 
+# 如要修改默认状态
+# 单字版找到 tiger.schema.yaml
+# 字词版找到 tigress.schema.yaml
+# 
+# 搜索 switches:
+# 有个 reset:     后面加 0 就是关闭 ，加 1 就是开启
+# 
+# 举例1：
+# 默认关闭 常用字集滤镜，这样就默认显示全字集
+#   - name: extended_char  #自定义字集
+#     reset: 1
+#     states: [ 全字集 , 常用字 ]
+# 将  reset: 1  改成 reset: 0
+# 
+# 举例2：
+# 默认开启 拼音滤镜
+#   - name: pinyin  #拼音滤镜
+#     reset: 0
+#     states: [ 拼, pīn ]
+# 将 reset: 0  改成 reset: 1
+# 
+# 改完后重新部署%
+# ------------------------------------------------------------------------------------------
+# ❯ cat 必看！\ 虎码秃版\ 全功能介绍+挂接教程/【滤镜】如何增删\ 自定常用字集.txt
+# 虎码共有近10W字，平时肯定用不了那么多
+# 
+# 默认使用自定常用字集，其他字会被过滤掉
+#         这个字集范围是我自己搞的，9700+字
+# 
+# 在 文件 core2022.dict.yaml 中，可增删
+# 
+# 加字格式为： 字+tab+t
+# 雙      t
+#         手机端有些编辑器会把tab转成空格，可尝试用 /tab 引导打出
+# 
+# 删除就直接删掉 目标字所在行
+# 
+# 改完后重新部署%
+# ------------------------------------------------------------------------------------------
+# ❯ cat 必看！\ 虎码秃版\ 全功能介绍+挂接教程/【答疑】PC端\ 五码顶失效\ 是咋回事.txt
+# 五码顶的功能突然失效
+# 
+# 是因为你同时开启了 拼音 和 拆分滤镜，这两个不能同时开启
+#         同时按了 ctrl + p 拼音 和 ctrl + j 拆分
+# 
+# 观感上是 仅显示 拆分滤镜内容，其实底下还有一层拼音滤镜内容
+#         需要按下 ctrl + j 将拆分滤镜关掉，就可以看到底下的拼音滤镜了，五码顶的功能也就恢复了
+# 
+# 推荐平时只开 拼音滤镜即可，拆分滤镜主要是拼音反查的时用
+# 平时打字，会打了，就不需要拆分滤镜了
+#         最多偶尔 ctrl + j 开一下 看一眼，然后再 ctrl + j 关掉%
+# ------------------------------------------------------------------------------------------
+# ❯ cat 必看！\ 虎码秃版\ 全功能介绍+挂接教程/【答疑】PC端\ 修改方案切换键.txt
+# 方案切换键 默认是 F4键，我关闭了，改成了 Ctrl+F8
+# 如想自行修改
+# 找到 default.custom.yaml 这个文件，搜索 switcher/hotkeys
+#         可以自行修改 ，# 是注释符号，注释了就无效了
+#         不要忘记重新部署%
+# ------------------------------------------------------------------------------------------
+# ❯ cat 必看！\ 虎码秃版\ 全功能介绍+挂接教程/【答疑】PC端\ 突然\(开机\)打不出字咋办\ \(重启算法服务\).txt
+# 如果你突然打不了字，切换输入法也没用，大概是算法服务 没有自启 或者 自己掉了
+# 需要 重启算法服务
+# 按 Win + s  ，搜索 小狼毫算法
+# 点击搜索到的结果，即可启动
+# 
+# 有时，点 重新部署 也可能误点到 退出算法服务，也是用上面的方法解决
+#         ！建议鼠标右键点击小狼毫图标后，按 r 键重新部署。用鼠标点容易按错
+# 
+# 如果你经常遇到开机算法不能自启的情况
+# 可以将 小狼毫算法服务的程序文件，放到 开机自启文件夹
+# 
+# 首先，鼠标右键点击右下角的小狼毫图标，再点击 “程序文件夹” （直接按p也能打开)
+# 找到 “WeaselServer.exe” ，鼠标右键点击该文件，按下s 创建快捷方式，会生成一个  “WeaselServer.exe - 快捷方式”
+# 选中这个快捷方式，Ctrl + x 剪切
+# 按下 Win + r ，输入 shell:startup
+# 就能打开 开机自启文件夹
+# 在该文件夹页面，按下 Ctrl + v ，就能将 之前剪切好的 “WeaselServer.exe - 快捷方式”，复制到这里了
+# 这样就能确保，开启一定能自启算法服务了%
+# ------------------------------------------------------------------------------------------
+# ❯ cat 必看！\ 虎码秃版\ 全功能介绍+挂接教程/【答疑】候选个数\ 横排\ 编码提示\ 如何修改.txt
+# 单字版找到  tiger.custom.yaml
+# 字词版找到  tigress.custom.yaml
+# 
+# 修改下面三行即可，有写说明的
+#   menu/page_size: 9 # 自定义候选个数，可修改。若要改成5个，行首加上#号注释即可（Rime默认就是5个）
+#   #translator/enable_completion: true # 编码提示true开启，false关闭。默认关闭，删掉行首的#号，即可开启
+# 
+# 横排相关
+#   menu/page_size: 9 # 自定义候选个数，可修改。若要改成5个，行首加上#号注释即可（Rime默认就是5个）
+#   #style/horizontal: true # 默认是false竖排显示，删掉行首的#号，可横排显示（横排建议把上面这行注释掉）
+#   #style/layout/candidate_spacing: 10 #候选框改为横排后,增加 候选与候选 的间距
+#   #style/layout/hilite_spacing: 8  #候选框改为横排后,增加 标号与候选 的间距
+#   #style/layout/min_width: 80 #候选框改为横排后，降低最小宽度
+#   #横排显示建议把下面这行也注释掉，换成阿拉伯数字标号
+#   menu/alternative_select_labels: [ ㊀, ㊁, ㊂, ㊃, ㊄, ㊅, ㊆, ㊇, ㊈ ]  # 自定义候选序号显示符，可自定修改，如要显示阿拉伯数字，直接注释掉这行（在前面加#号）%
+# ------------------------------------------------------------------------------------------
+# ❯ cat 必看！\ 虎码秃版\ 全功能介绍+挂接教程/【答疑】关于\ 嵌入模式与盲打模式.txt
+# 单字版 找 tiger.custom.yaml
+# 字词版 找 tigress.custom.yaml
+# 
+# 如何关闭嵌入模式？
+#         找到下面这一行
+#         #style/inline_preedit: false # 嵌入编码模式，默认是true开启，若想关闭，取消注释即可（删除前面的#号）
+#         按照注释说的，删掉前面的#号，即可关闭嵌入模式
+# 
+# 如何开启盲打模式？
+#         找到下面这两行
+#         #style/preedit_type: preview # 嵌入首选项内容，而非编码。有3个选项可设：input 嵌入输入码 | composition 嵌入编码 | preview 嵌入首选项
+#         #style/layout/margin_y : -1 # 启用后可隐藏候选框(盲打)，建议配合上面的嵌入首选项，一起使用
+#         按照注释说的，删掉前面的#号，即可开启盲打模式
+# 
+# 鼠须管要打开 文件squirrel.custom.yaml
+#     # 鼠须管盲打，嵌入首选，删除下面两行的#号，即可生效
+#     #alpha: 0.0001
+#     #inline_candidate: true
+# 不要忘记重新部署%
+# ------------------------------------------------------------------------------------------
+# ❯ cat 必看！\ 虎码秃版\ 全功能介绍+挂接教程/【答疑】如何修改\ 快符\ \(分号引导\).txt
+# 单字版 找 tiger.extended.dict.yaml
+# 字词版 找 tigress.extended.dict.yaml
+# 
+# 直接搜索快符
+# 
+# 可以找到下面这些
+# 
+# #----------标点符号 快符----------#
+# # 第一排
+# ：“     ;q
+# 
+# 格式是
+# 符号 + tab + ;字母
+# 如：将  ;q  的  ：“  改成：
+# ？”     ;q
+# 
+# 
+# 这类标点也被内置在一简次选位，也可用字母+分号或数字键2打出来
+#         一般 A-G 按分号，H-L 按数字2
+# 
+# 若要取消快符功能
+# 搜索 speller/alphabet:
+# 找到下面这行，根据注释删掉#号
+# #speller/alphabet: "['zyxwvutsrqponmlkjihgfedcba]" # 取消分号引导的快符功能（分号不作码元），删掉行首#号即可生效%
+# ------------------------------------------------------------------------------------------
+# ❯ cat 必看！\ 虎码秃版\ 全功能介绍+挂接教程/【答疑】如何关闭全半角切换.txt
+# 秃版全半角切换是 shift + 空格
+# 大部人用不到这个功能，偶尔的误触只会带来困扰
+# 如果要关闭这个功能，单字版找  tiger.schema.yaml，词版找 tigress.schema.yaml
+# 
+# 搜索 全半角切换
+# 找到
+#     - { when: always, accept: "Shift+space" , toggle: full_shape } # 全半角切换
+# 在 - 前面加个#号
+#     #- { when: always, accept: "Shift+space" , toggle: full_shape } # 全半角切换
+# 
+# 然后再重新部署就能生效了 %
+# ------------------------------------------------------------------------------------------
+# ❯ cat 必看！\ 虎码秃版\ 全功能介绍+挂接教程/【答疑】如何加词\ 简词\ 调频.txt
+# 单字版 找 tiger.extended.dict.yaml
+# 字词版 找 tigress.extended.dict.yaml
+# 
+# 文件内有写详细说明%
+# ------------------------------------------------------------------------------------------
+# ❯ cat 必看！\ 虎码秃版\ 全功能介绍+挂接教程/【答疑】如何启用\ 简词.txt
+# 首先，个人不推荐启用简词
+# 
+# 官方搞了 3重一、二简词（一简个别有4重），三简词按空码加
+# 
+# 如有对简词实在有需求，可打开 tigress.extended.dict.yaml
+# 搜索 #- tigress_simp_ci，删掉前面的#号即可启用
+# 
+# 不要忘记重新部署%
+# ------------------------------------------------------------------------------------------
+# ❯ cat 必看！\ 虎码秃版\ 全功能介绍+挂接教程/【答疑】如何开启\ 四码上屏功能.txt
+# 四码候选唯一自动上屏功能,默认是关掉的
+#         其实我个人是推荐关掉这个功能的，句末字 统一用空格上屏
+# 第五码还是可以顶的
+#         爽的 → mbbbu+空格 （按 u 时，『爽』字就被顶上屏了）
+# 
+# 如果要开启四码自动上屏功能
+#         单字版找到  tiger.custom.yaml
+#         字词版找到  tigress.custom.yaml
+# 找到 #speller/auto_select_pattern: ^;\w+|^\w{4}$  这一行
+# 去掉行首的『#』 ，即可生效
+# 改完后重新部署%
+# ------------------------------------------------------------------------------------------
+# ❯ cat 必看！\ 虎码秃版\ 全功能介绍+挂接教程/【答疑】如何用回车清空编码.txt
+# 单字版找  tiger.schema.yaml
+# 字词版找  tigress.schema.yaml
+# 
+# 搜索  回车清屏编码
+# 找到 #- { when: composing, accept: Return, send: Escape } # 回车清屏编码
+# 将行首的 # 删掉，即可生效
+# 
+# 不要忘记重新部署！%
+# ------------------------------------------------------------------------------------------
+# ❯ cat 必看！\ 虎码秃版\ 全功能介绍+挂接教程/【答疑】如何设置\ 默认英文状态.txt
+# 单字版找  tiger.schema.yaml
+# 字词版找  tigress.schema.yaml
+# 
+# 搜索  #中英文状态
+# 会找到
+#   - name: ascii_mode
+#     reset: 0
+#     states: [ 中文, 西文 ]  #中英文状态
+# 
+# 将上面的  reset: 0  改为
+# reset: 1
+# 
+# 这样默认就是英文状态了
+# 
+# 不要忘记重新部署%
+# ------------------------------------------------------------------------------------------
+# ❯ cat 必看！\ 虎码秃版\ 全功能介绍+挂接教程/【答疑】字号\ 字体\ 如何修改.txt
+# 单字版找到  tiger.custom.yaml
+# 字词版找到  tigress.custom.yaml
+# 
+# 
+# 搜索“字体”或“字号”即可找到
+# 
+#   # #候选字体
+#   #style/font_face: "Consolas, Segoe UI Emoji, Noto Color Emoji, LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
+#   #style/font_point: 15 #主字体字号
+#   # #滤镜内容字体
+#   #style/comment_font_face: "Consolas, Segoe UI Emoji, Noto Color Emoji, TumanPUA, LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
+#   #style/comment_font_point: 15 # 滤镜内容字号
+#   # #候选前编号标志字体
+#   #style/label_font_face: "LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
+#   #style/label_font_point: 15 #候选前编号标志字号
+# 
+# 这里不建议改字体，默认的文楷是一直在更新优化的字体，融合了虎码字根
+# 可以自己看情况改下字号，即 font_point: 后面的数字 （字号一般，3个选项都改成一样的大小）%
+# ------------------------------------------------------------------------------------------
+# ❯ cat 必看！\ 虎码秃版\ 全功能介绍+挂接教程/【答疑】新小狼毫响应慢咋办.txt
+# 此问题0.15版已基本解决，不太需要下述操作了
+# 
+# 新小狼毫，在部分应用窗口，候选框响应 可能会有点慢
+# 
+# 如果你感觉不卡，就不用改
+# 
+# 有个折中的办法
+# 首先找到 需修改的目标文件
+#         单字版找 tiger.custom.yaml
+#         字词版找 tigress.custom.yaml
+# 
+# 搜索 响应慢
+# 会找到以下内容，根据说明弄就行
+# 
+#   # 以下是解决 新狼毫候选框响应慢 的方法，删除下面四行前面的#号即可生效
+#   #style/color_font: false
+#   #style/font_face: LXGW WenKai GB Screen R
+#   #style/comment_font_face: LXGW WenKai GB Screen R
+#   #style/label_font_face: LXGW WenKai GB Screen R
+# 
+# 最后不要忘记重新部署
+# 
+# 注：这样弄过就不太会卡，代价是win11上，扩G区的字可能无法显示，以及emoji没有彩色了
+#         但也有可能还是会卡%
+# ------------------------------------------------------------------------------------------
+# ❯ cat 必看！\ 虎码秃版\ 全功能介绍+挂接教程/【答疑】重新部署一直无效怎么办.txt
+# 有时候重新部署，却怎么都不生效，可用下述方法解决
+# 估计是你自己改崩了，又找不出问题在哪里
+# 
+# 首先，右键点击桌面右下角的小狼毫图标，唤出菜单后，点击 “用户文件夹”
+# 
+# 再次进行上面的右键点击操作，点击 “退出算法服务”
+# 
+# 打开 "build"文件夹，将里面的所有文件全选后，删除
+#         有时候你改崩了还能正常打字，是因为你仍在使用该文件夹里的 旧版的 部署生成的.bin文件
+# 
+# 下载群里方案配置文件，替换更新
+# 
+# 按 Win + s ，搜索 “小狼毫”  ，会出来 “小狼毫算法服务”，点击即可重启算法
+# 
+# 然后就能正常使用了%
+# ------------------------------------------------------------------------------------------
+# ❯ cat 必看！\ 虎码秃版\ 全功能介绍+挂接教程/【配色】PC端\ 如何\ 切换修改配色.txt
+# 右键 右下角的小狼毫图标
+# 点击 『输入法设定』
+# 点击 底部中间的 『中』，会进入配色选择界面
+# 选好你要的配色 例如：Win11Light
+# 推荐的配色前面会有 “秃秃推荐” 4个字
+# 
+# 也可直接在源文件里修改
+#         打开 weasel.custom.yaml 文件，最后一行 style/color_scheme": so_young_qmod_01
+#                 so_young_qmod_01  就是配色名字
+#         其他的配色名，可搜索  preset_color_schemes/
+#                 例如： preset_color_schemes/blackpink ，配色名就是 blackpink
+#                         （后面有个显示名 name: "脏粉"，用在输入法设定的更换配色界面里）
+#                 在 style/color_scheme": 后面，加上 blackpink，变成 style/color_scheme": blackpink
+# 
+# 
+# ------
+# 
+# 鼠须管用户，也是最后一行
+# color_scheme: so_young_qmod_01
+#         更改冒号后面的即可
+# 以下是几个推荐的配色
+# win11light
+# win11dark
+# so_young_qmod_01
+# gruvbox_light
+# rose_red
+# easy_dark
+# perianth
+# blackpink
+# 
+# 几项参数的说明：
+# 
+# preset_color_schemes:
+#   aqua:                                              #配色主题名(英文，程序识别用)
+#     name: 碧水／Aqua                           #主题显示名 (可以有中文，选取配色时的显示名)
+#     author: 佛振 <chen.sst@gmail.com>    #作者 (无所谓，随便填)
+#     text_color: 0x000000                          #默认文字颜色
+#     back_color: 0xeceeee                          #候选窗背景色
+#     shadow_color: 0x00000000                      #候选窗阴影色，默认全透明（无阴影）
+#     border_color: 0xe0e0e0                        #候选窗边框颜色
+#     hilited_text_color: 0x000000                  #编码文字颜色
+#     hilited_back_color: 0xd4d4d4                  #编码背景颜色
+#     hilited_shadow_color: 0x00000000              #编码背景块阴影颜色
+#     hilited_candidate_text_color: 0xffffff        #高亮候选文字颜色
+#     hilited_candidate_back_color: 0xfa3a0a        #高亮候选背景颜色
+#     hilited_candidate_shadow_color: 0x00000000    #高亮候选背景块阴影颜色
+#     candidate_text_color: 0x000000                #非高亮候选文字颜色
+#     candidate_back_color: 0xeceeee                #非高亮候选背景颜色
+#     candidate_shadow_color: 0x00000000            #非高亮候选背景块阴影颜色
+# 
+# 
+# ------
+# 下面两个链接可在线修改配色，能实时生成效果图，以及对应的代码
+# (Win) 小狼毫：https://bennyyip.github.io/Rime-See-Me/
+# (Mac) 鼠须管：https://gjrobert.github.io/Rime-See-Me-squirrel/
+# 
+# 新版小狼毫的配色修改的教程，可以参看98五笔的
+# https://wubi98.gitee.io/2023/03/14/2023-03-14-03.weasel/%
+# ------------------------------------------------------------------------------------------

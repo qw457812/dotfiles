@@ -397,12 +397,16 @@ map <leader><CR> <Action>(EditorCompleteStatement)
 map <leader><leader> <Action>(ShowIntentionActions)
 " TODO map <leader><TAB>
 
-" TODO not cool, overwrite vim’s original actions
 " https://gist.github.com/PisecesPeng/9fabf2a1c1834bd35bf02c2bcb904708
 " 选择模式扩大选择范围 opt+up_arrow
-vmap v <Action>(EditorSelectWord)
+" vmap v <Action>(EditorSelectWord)
 " 选择模式缩小选择范围 opt+down_arrow
-vmap V <Action>(EditorUnSelectWord)
+" vmap V <Action>(EditorUnSelectWord)
+" https://github.com/VSCodeVim/Vim#-vscodevim-tricks
+" vmap af <Action>(EditorSelectWord)
+" https://github.com/terryma/vim-expand-region#mapping
+vmap K <Action>(EditorSelectWord)
+vmap J <Action>(EditorUnSelectWord)
 
 " TODO SelectNextOccurrence 多选-光标处的符号/选择此符号的下一个匹配项
 " TODO UnselectPreviousOccurrence 多选-取消选择上一个匹配项

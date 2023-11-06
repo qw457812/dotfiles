@@ -1,0 +1,134 @@
+# 虎码秃版\ 鼠须管\ （Mac）/01\ 双拼反查配置（自然码\ 小鹤\ 微软）/小鹤双拼/PY_c.custom.yaml
+# ------------------------------------------------------------------------------------------
+patch: 
+  speller/algebra:
+    - erase/^xx$/
+    - derive/^([jqxy])u$/$1v/
+    - derive/^([aoe])([ioun])$/$1$1$2/
+    - xform/^([aoe])(ng)?$/$1$1$2/
+    - xform/iu$/Q/
+    - xform/(.)ei$/$1W/
+    - xform/uan$/R/
+    - xform/[uv]e$/T/
+    - xform/un$/Y/
+    - xform/^sh/U/
+    - xform/^ch/I/
+    - xform/^zh/V/
+    - xform/uo$/O/
+    - xform/ie$/P/
+    - xform/i?ong$/S/
+    - xform/ing$|uai$/K/
+    - xform/(.)ai$/$1D/
+    - xform/(.)en$/$1F/
+    - xform/(.)eng$/$1G/
+    - xform/[iu]ang$/L/
+    - xform/(.)ang$/$1H/
+    - xform/ian$/M/
+    - xform/(.)an$/$1J/
+    - xform/(.)ou$/$1Z/
+    - xform/[iu]a$/X/
+    - xform/iao$/N/
+    - xform/(.)ao$/$1C/
+    - xform/ui$/V/
+    - xform/in$/B/
+    - xlit/QWRTYUIOPSDFGHJKLZXCVBNM/qwrtyuiopsdfghjklzxcvbnm/
+  #      - abbrev/^(.).+$/$1/  #词组在后
+  #      - derive/^(.).+$/$1/  #词组在前
+
+# 以下是双拼候选编码框的输入编码，自动转为全拼
+
+  # translator/preedit_format:
+  #   - xform/([bpmfdtnljqx])n/$1iao/
+  #   - xform/(\w)g/$1eng/
+  #   - xform/(\w)q/$1iu/
+  #   - xform/(\w)w/$1ei/
+  #   - xform/([dtnlgkhjqxyvuirzcs])r/$1uan/
+  #   - xform/(\w)t/$1ve/
+  #   - xform/(\w)y/$1un/
+  #   - xform/([dtnlgkhvuirzcs])o/$1uo/
+  #   - xform/(\w)p/$1ie/
+  #   - xform/([jqx])s/$1iong/
+  #   - xform/(\w)s/$1ong/
+  #   - xform/(\w)d/$1ai/
+  #   - xform/(\w)f/$1en/
+  #   - xform/(\w)h/$1ang/
+  #   - xform/(\w)j/$1an/
+  #   - xform/([gkhvuirzcs])k/$1uai/
+  #   - xform/(\w)k/$1ing/
+  #   - xform/([jqxnlb])l/$1iang/
+  #   - xform/(\w)l/$1uang/
+  #   - xform/(\w)z/$1ou/
+  #   - xform/([gkhvuirzcs])x/$1ua/
+  #   - xform/(\w)x/$1ia/
+  #   - xform/(\w)c/$1ao/
+  #   - xform/([dtgkhvuirzcs])v/$1ui/
+  #   - xform/(\w)b/$1in/
+  #   - xform/(\w)m/$1ian/
+  #   - xform/([aoe])\1(\w)/$1$2/
+  #   - "xform/(^|[ '])v/$1zh/"
+  #   - "xform/(^|[ '])i/$1ch/"
+  #   - "xform/(^|[ '])u/$1sh/"
+  #   - xform/([jqxy])v/$1u/
+  #   - xform/([nl])v/$1ü/
+
+  # ------------------------------------------------------------------------------------------
+  # rename emoji.json to emoji_cn.json, emoji.txt to emoji_cn.txt
+  # ↓emoji表情滤镜
+  emoji_cn/opencc_config: emoji_cn.json
+
+  engine:
+    processors:
+    # 1.2版本加入的- fluid_editor # 将字符按键记入输入上下文，将输入法连缀成一串
+      - ascii_composer # 处理英文模式及中英文切换
+      - recognizer # 与 matcher 搭配，处理符合特定规则的输入码，如网址、反查等
+      - key_binder # 在特定条件下将按键绑定到其他按键，如重定义逗号、句号为候选翻页键
+      - speller # 把字母追加到编码串
+      - punctuator # 处理符号按键
+      # - lua_processor@exe_processor #exe启动器
+      - lua_processor@*exe #exe启动器
+      - selector # 选字和换页功能
+      - navigator # 移动插入点
+      - express_editor # 空格确认当前输入，其他字符直接上屏
+    segmentors:
+      - ascii_segmentor
+      - matcher
+      - affix_segmentor@easy_english #英文相关
+      - abc_segmentor # 标记输入码的类型
+      - punct_segmentor # 割界，与前后方的其他编码区分开
+      - fallback_segmentor
+    translators:
+      # - echo_translator # 没有其他结果时，创建一个与编码串一样的候选项
+      - punct_translator # 转换标点符号
+      - script_translator # 脚本表转换
+      # - table_translator@custom_phrase
+      - table_translator
+      - table_translator@easy_english #临时英文
+      - reverse_lookup_translator # 反查翻译器
+      - history_translator@historyDM # 历史上屏 电脑
+      - history_translator@historyDM2 # 历史上屏 电脑2
+      - history_translator@historyDM3 # 历史上屏 电脑3
+      - history_translator@historySJ # 历史上屏 手机  
+      # - lua_translator@number_translator # 数字转大写
+      - lua_translator@*number # 数字转大写
+      # - lua_translator@calculator_translator # 简易计算器
+      - lua_translator@*calculator_translator # 简易计算器
+      # - lua_translator@shijian2_translator # 高级时间
+      - lua_translator@*shijian2 # 高级时间
+
+
+    filters:
+      # - lua_filter@core2022  #自定义字集过滤lua；放在最上面完美解决简繁滤镜出错的问题
+      # - lua_filter@dz_ci  #过滤词组lua，单字模式
+      # - charset_filter@utf8
+      # - charset_filter@gbk
+      # - charset_filter@gb2312
+      # - charset_filter@big5
+      - simplifier@simplification  #简繁滤镜
+      # - simplifier@fanjian  #繁简滤镜
+      - simplifier@pinyin  #拼音滤镜
+      - simplifier@emoji_cn  #表情滤镜
+      # - lua_filter@charset_comment_filter #Unicode分区提示滤镜
+      - lua_filter@*charset_comment_filter #Unicode分区提示滤镜
+      # - lua_filter@lua_unicode_display_filter #Unicode编码显示
+      - lua_filter@*unicode_display #Unicode编码显示
+      - uniquifier  # 过滤重复的候选字，可能来自简繁转换
