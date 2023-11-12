@@ -1470,7 +1470,7 @@
    "^org\\.macosforge\\.xquartz\\.X11$" "^org\\.macports\\.X11$"
    "^com\\.sublimetext\\." "^com\\.microsoft\\.VSCode(Insiders)?$"
    "^com\\.jetbrains\\.intellij\\.ce$"
-   "^com\\.jetbrains\\.pycharm\\.ce$"
+   "^com\\.jetbrains\\.pycharm\\.ce(-EAP)?$"
    "^com\\.neovide\\.neovide$"
    "^org\\.jkiss\\.dbeaver\\.core\\.product$"
    "^md\\.obsidian$" "^com\\.tidgi$"]
@@ -1481,7 +1481,7 @@
    "^com\\.qvacua\\.VimR$"
    "^com\\.microsoft\\.VSCode(Insiders)?$"
    "^com\\.jetbrains\\.intellij\\.ce$"
-   "^com\\.jetbrains\\.pycharm\\.ce$"
+   "^com\\.jetbrains\\.pycharm\\.ce(-EAP)?$"
    "^com\\.neovide\\.neovide$"
    "^org\\.jkiss\\.dbeaver\\.core\\.product$"
    "^md\\.obsidian$" "^com\\.tidgi$"]
@@ -1494,14 +1494,14 @@
   ["^com\\.google\\.Chrome$" "^com\\.tencent\\.xinWeChat$"]
   :translate-by-opt-shift-a-app
   ["^com\\.google\\.Chrome$" "^com\\.apple\\.Safari$"
-   "^com\\.jetbrains\\.intellij\\.ce$" "^com\\.jetbrains\\.pycharm\\.ce$"]
+   "^com\\.jetbrains\\.intellij\\.ce$" "^com\\.jetbrains\\.pycharm\\.ce(-EAP)?$"]
   :tmux-autostart-terminals
   ["^net\\.kovidgoyal\\.kitty$"]
   :Emacs            ["^org\\.gnu\\.Emacs$" "^org\\.gnu\\.AquamacsEmacs$"
                      "^org\\.gnu\\.Aquamacs$"]
   :VSCode           ["^com\\.microsoft\\.VSCode$"]
   :IntelliJ         ["^com\\.jetbrains\\.intellij\\.ce$"]
-  :PyCharm          ["^com\\.jetbrains\\.pycharm\\.ce$"]
+  :PyCharm          ["^com\\.jetbrains\\.pycharm\\.ce(-EAP)?$"]
   :Kitty            ["^net\\.kovidgoyal\\.kitty$"]
   :iTerm            ["^com\\.googlecode\\.iterm2$"]
   :Finder           ["^com\\.apple\\.finder$"]

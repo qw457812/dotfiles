@@ -2143,3 +2143,75 @@ patch:
 # 新版小狼毫的配色修改的教程，可以参看98五笔的
 # https://wubi98.gitee.io/2023/03/14/2023-03-14-03.weasel/%
 # ------------------------------------------------------------------------------------------
+# 
+# ------------------------------------------------------------------------------------------
+# 虎码方案必装字体 2023.10.07.7z (69.9MB) | ！虎码字体 | 06 其他资源 (字体、拆分表、字集、字典等) | http://huma.ysepan.com/
+# ------------------------------------------------------------------------------------------
+# ❯ sudo cat 虎码方案必装字体\ 2023.10.07/字体说明.txt
+# Password:
+# Consolas  英文字母编码字体
+# TumanPUA  字根字体（私用区）
+# LXGWWenKaiGBScreenR  主字体，文楷，虎码的常用字基本都覆盖了（也融合了虎码字根）
+# Segoe UI Emoji 和 NotoColorEmoji-Regular  用来显示Emoji （给Win版的小狼毫用，Mac端无需字体即可显示）
+# Win系统宋体升级包 扩i已支持（2选1）和 TH-Tshyn-4.0.0（2选1） 超集字体（生僻字）支持，2个选1个装上就行，一般Win版选第一个，Mac端选第二个%
+# ------------------------------------------------------------------------------------------
+# ❯ sudo cat 虎码方案必装字体\ 2023.10.07/TH-Tshyn-4.1.0/ReadMe\(English\).html
+# Password:
+# <html>
+# 
+# <head>
+# <meta http-equiv="Content-Language" content="en">
+# <title>ReadMe</title>
+# </head>
+# 
+# <body style="background:#f6f65c">
+# 
+# <p align="center"><font size="7" face="Times New Roman">TH-fonts<font size="6">-"TH-Tshyn&nbsp;V4.1.0"</font>Description of Using and Installing (For Windows)</font></p>
+# <p align="center"><font face="Times New Roman">(You can have the best experience if you do as the following steps. Do not install arbitrarily unless you are professional.)</font></p>
+# <p align="left"><font size="5" face="Times New Roman">1. Please copy the fonts(*.ttf/*.ttc) to C:\Windows\Fonts\ first; You can also double click the font files to install quicker in the system version above WinVista.</font></p>
+# <p align="left" style="color:#ff0000"><font size="6" face="Times New Roman">**If you want to update the version of TH-fonts, installing the new one after force-deleting by Shift+Delete the old one is suggested. Direct installation is not suggested, because the "false overwriting" would happen and the Font-Link would then lose effectiveness.</font></p>
+# <p align="left"><font size="5" face="Times New Roman">2. Double click the reg files, add the keys into the register of the system. These files have the effect of Font-Link. TH-Tshyn is the biggest assemblage of fonts at present, it can support 146,000+ kanjis, and different kinds of symbols (contains all the characters in Unicode15.1, like the emojis, small languages and so on).</font></p>
+# <p align="left"><font size="5" face="Times New Roman">3. The reg files take effects only after your LOGOUTing or RESTARTing the system.</font></p>
+# <p align="left"><font size="5" face="Times New Roman">4. The assemblage of fonts will not effect the normal use of the computer; Only delete the fonts while UNINSTALLING, unnecessary to rechange the register.<br></font></p>
+# <p align="left"><font size="5" face="Times New Roman">5. If you have any problems about TH-fonts, please join into the QQ GROUP 436064726. You can ask questions, and we will try our best to help you.<br></font></p>
+# <p align="left"><font size="5" face="Times New Roman">6. For protecting the COPYRIGHT (contains the copyright of the glyphs which have been made by EACH COMPANY and my ARRANGEMENT), the compression pack has been encrypted. If you tamper the data, it is easy to recognize. Beware of CRIME! Do not use for BUSINESS!<br></font></p>
+# <p align="left"><font size="5" face="Times New Roman">Remark-1: When installing on Mac or Linux, just install the font files, and the system will link them automatically, please ignore the reg files; The installation method on the Android phone can be seen at <a href=https://zhuanlan.zhihu.com/p/26524450>this hyperlink</a> (Simplified Chinese).<br></font></p>
+# <p align="left"><font size="5" face="Times New Roman">Remark-2: TH-Times.ttc is used for shaping of the complex texts. The detailed description can be seen at <a href=http://cheonhyeong.com/Tools/Times.html>this hyperlink</a> (Simplified Chinese). If you installed TH-Times.ttf in TH-Tshyn V3.1.0, please uninstall it manually before install the ttc!<br><br></font></p>
+# <p align="left"><font size="5" face="Calibri">Font style: MIXTURE</font></p>
+# <p align="left"><font size="5" face="Calibri">Compile date: Oct. 3, 2023 / *Aug. 21, 2022 (the font files of P1 & P16 are V4.0.0, NOTHING changes in V4.1.0)</font></p>
+# <p align="right"><font size="7" face="Arial">CheonHyeong Sim</font></p>
+# <p align="right"><font size="7" face="Symbol">2023-10-03</font></p>
+# 
+# </body>
+# 
+# </html>
+# ------------------------------------------------------------------------------------------
+# ❯ open 虎码方案必装字体\ 2023.10.07/TH-Tshyn-4.1.0/安装使用前必读\(简中\).html
+# <html>
+# 
+# <head>
+# <meta http-equiv="Content-Language" content="zh-cn">
+# <title>使用说明</title>
+# </head>
+# 
+# <body style="background:#f6f65c">
+# 
+# <p align="center"><font size="7" face="SimSun">天珩字库<font size="6">-「天珩全字库V4.1.0」</font>安装使用说明(Windows用)</font></p>
+# <p align="center"><font face="SimSun">（按照下面的步骤做会获得最好的体验效果，非专业人员请千万不要自行操作）</font></p>
+# <p align="left"><font size="5" face="SimSun">一、先将字体文件(*.ttf/*.ttc)复制到C:\Windows\Fonts\目录下；WinVista以上的电脑可双击字体文件点击“安装”进行快捷安装。</font></p>
+# <p align="left" style="color:#ff0000"><font size="6" face="SimSun">**若要为旧版本更新，建议使用将原字体以Shift+Delete的方式强制删除后再安装的方法；不建议直接安装，可能出现“假覆盖”现象，使字体链接失效。</font></p>
+# <p align="left"><font size="5" face="SimSun">二、双击注册表文件(*.reg)，将其值加入系统的注册表中。注册表文件起到字体链接的作用。天珩全字库为目前最大字库，使用链接可支持14万6千多汉字、各种符号(包括但不限于表情符号、小语种等所有Unicode15.1所定义的字符)的同台显示和处理。</font></p>
+# <p align="left"><font size="5" face="SimSun">三、注册表项需注销或重启后才能生效。</font></p>
+# <p align="left"><font size="5" face="SimSun">四、字库对于电脑的正常使用不会有任何影响；卸载时只需卸载字体文件，注册表项无需更改。<br></font></p>
+# <p align="left"><font size="5" face="SimSun">五、如有任何关于天珩字库的问题，请加QQ群436064726进行询问，我们会尽力帮助。<br></font></p>
+# <p align="left"><font size="5" face="SimSun">六、为保护字库之版权(包括各大公司的字形版权和本人的整理制作)，本次压缩包做过加密处理，若有篡改数据可以轻松识别，谨防犯罪！请勿用于商业用途！<br></font></p>
+# <p align="left"><font size="5" face="SimSun">备注1：Mac或Linux安装时仅需安装字体即可，系统将自动链接，请忽视reg文件；安卓手机的安装方法见<a href=https://zhuanlan.zhihu.com/p/26524450>此链接</a>。<br></font></p>
+# <p align="left"><font size="5" face="SimSun">备注2：TH-Times.ttc用于支持复杂文本的变形，详细说明见<a href=http://cheonhyeong.com/Tools/Times.html>此链接</a>；若曾有安装3.1.0版本字库中的TH-Times.ttf，请在安装ttc前手动卸载之！<br><br></font></p>
+# <p align="left"><font size="5" face="Microsoft YaHei">字体风格：混合型大字库</font></p>
+# <p align="left"><font size="5" face="Microsoft YaHei">编译日期：2023年10月3日/*2022年8月21日(P1、P16字体为4.0.0版本，4.1.0版本字库未对该二字体作出改动)</font></p>
+# <p align="right"><font size="7" face="隶书">沈天珩</font></p>
+# <p align="right"><font size="7" face="隶书"><font face="Symbol">2023</font>年<font face="Symbol">10</font>月<font face="Symbol">3</font>日</font></p>
+# 
+# </body>
+# 
+# </html>

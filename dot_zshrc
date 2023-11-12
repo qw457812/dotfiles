@@ -236,7 +236,7 @@ function zvm_vi_yank() {
 
 # https://github.com/DarrinTisdale/zsh-aliases-exa
 # l='ls -lah'
-alias l='eza --long --all --git --time-style=iso --group --color-scale'
+alias l='eza --long --all --git --time-style=iso --group --color-scale all'
 # la='ls -lAh'
 alias la='l --binary --created --modified --accessed --header'
 # alias llm='la --changed --sort=modified'

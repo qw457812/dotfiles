@@ -393,6 +393,9 @@ bind e new-window -n "#{TMUX_CONF_LOCAL}" sh -c 'chezmoi edit --apply --verbose 
 # bind C-a copy-mode
 # bind A send-prefix -2
 
+# session navigation
+bind Tab switch-client -l  # move to last session
+
 # -- tpm -----------------------------------------------------------------------
 
 # while I don't use tpm myself, many people requested official support so here
