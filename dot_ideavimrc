@@ -162,6 +162,8 @@ set history=1000
 
 " Clear highlights
 nnoremap <esc> :noh<return><esc>
+" https://stackoverflow.com/questions/60760660/how-to-ideavim-combine-two-action
+" nnoremap <esc> :noh \| action HideAllWindows<CR><esc>
 
 """ Idea specific settings ------------------
 " https://github.com/JetBrains/ideavim/wiki/ideajoin-examples
@@ -177,8 +179,8 @@ set ideastrictmode
 
 """ My Mappings -----------------------------
 nmap \e :e ~/.ideavimrc<CR>
-" nmap \r :source ~/.ideavimrc<CR>
-nmap \r <Action>(IdeaVim.ReloadVimRc.reload)
+nmap \r :source ~/.ideavimrc<CR>
+" nmap \r <Action>(IdeaVim.ReloadVimRc.reload)
 nmap \a <Action>(VimFindActionIdAction)
 " nmap \t :action ActivateTerminalToolWindow<CR>
 nmap \t <Action>(Terminal.OpenInTerminal)
@@ -207,8 +209,8 @@ map L $
 
 " Have j and k navigate visual lines rather than logical ones
 " Notice: just for fix ideavim bug ---> when meet @SuppressWarnings("unchecked"), jjj... will not walk through (but gj not work well when soft-wrap is on)
-nmap j gj
-nmap k gk
+" nmap j gj
+" nmap k gk
 
 nmap * *zz
 nmap # #zz
