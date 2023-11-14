@@ -88,10 +88,22 @@
                           ;; https://github.com/yqrashawn/GokuRakuJoudo/blob/master/CHANGELOG.org#050---2022-01-08
                           :modi    {:optional :any}}
 
+  :backspace-shift-mode  {:key     :delete_or_backspace
+                          :condi   :glove80
+                          :modi    {:optional :any}}
+
   :v-ctrl-mode           {:key     :v
                           :modi    {:optional :caps_lock}}
 
+  :delete-ctrl-mode      {:key     :delete_forward
+                          :condi   :glove80
+                          :modi    {:optional :caps_lock}}
+
   :m-ctrl-mode           {:key     :m
+                          :modi    {:optional :caps_lock}}
+
+  :return-ctrl-mode      {:key     :return_or_enter
+                          :condi   :glove80
                           :modi    {:optional :caps_lock}}
 
   :mouse_keys_mode_v4    {:key     :a
@@ -210,7 +222,7 @@
            [:escape :!Sescape :!hhkb-bt]
            [:grave_accent_and_tilde :!Sgrave_accent_and_tilde :!hhkb-bt]
            ;; [:delete_or_backspace :!Sdelete_or_backspace :macbook-internal]
-           [:delete_or_backspace :!Sdelete_or_backspace :!hhkb-bt]
+           [:delete_or_backspace :!Sdelete_or_backspace [:!hhkb-bt :!glove80]]
 
            ;; see "For Not HHKB" below
            [:caps_lock :!Sescape :!hhkb-bt]
@@ -228,6 +240,95 @@
            [:w :!C0 :Preview] ; Actual Size (doomemacs pdf-view-fit-width-to-window)
            [:h :!C9 :Preview] ; Zoom to Fit (doomemacs pdf-view-fit-height-to-window)
            [:p :!C9 :Preview] ; Zoom to Fit (doomemacs pdf-view-fit-page-to-window)
+
+           ;; rime
+           [:delete_or_backspace :left_shift [:glove80 :!Emacs]]
+           ;; emacs-rime
+           [:delete_or_backspace :!Tbackslash [:glove80 :Emacs]]
+           ]}
+
+ {:des   "backspace mode for glove80 (shift)"
+   :rules [:backspace-shift-mode
+           [:1 :!S1]
+           [:2 :!S2]
+           [:3 :!S3]
+           [:4 :!S4]
+           [:5 :!S5]
+           [:6 :!S6]
+           [:7 :!S7]
+           [:8 :!S8]
+           [:9 :!S9]
+           [:0 :!S0]
+           [:hyphen :!Shyphen]
+           [:equal_sign :!Sequal_sign]
+           [:q :!Sq]
+           [:w :!Sw :!Preview]
+           [:e :!Se]
+           [:r :!Sr]
+           [:t :!St]
+           [:y :!Sy]
+           [:u :!Su]
+           [:i :!Si]
+           [:o :!So]
+           [:p :!Sp :!Preview]
+           [:open_bracket :!Sopen_bracket]
+           [:close_bracket :!Sclose_bracket]
+           [:backslash :!Sbackslash]
+           [:a :!Sa]
+           [:s :!Ss]
+           [:d :!Sd]
+           [:f :!Sf]
+           [:g :!Sg]
+           [:h :!Sh :!Preview]
+           [:j :!Sj]
+           [:k :!Sk]
+           [:l :!Sl]
+           [:semicolon :!Ssemicolon]
+           [:quote :!Squote]
+           [:z :!Sz]
+           [:x :!Sx]
+           [:c :!Sc]
+           [:v :!Sv]
+           [:b :!Sb]
+           [:n :!Sn]
+           [:m :!Sm]
+           [:comma :!Scomma]
+           [:period :!Speriod]
+           [:slash :!Sslash]
+           [:down_arrow :!Sdown_arrow]
+           [:up_arrow :!Sup_arrow]
+           [:left_arrow :!Sleft_arrow]
+           [:right_arrow :!Sright_arrow]
+           ;; [:spacebar :!Sspacebar]
+           [:return_or_enter :!Sreturn_or_enter]
+           [:tab :!Stab]
+
+           [:escape :!Sescape :!hhkb-bt]
+           [:grave_accent_and_tilde :!Sgrave_accent_and_tilde :!hhkb-bt]
+           ;; [:delete_or_backspace :!Sdelete_or_backspace :macbook-internal]
+           ;; [:delete_or_backspace :!Sdelete_or_backspace :!hhkb-bt]
+
+           ;; see "For Not HHKB" below
+           [:caps_lock :!Sescape :!hhkb-bt]
+
+           ;; see "For Neither HHKB nor Apple-Internal-Keyboard" below
+           ;; [:delete_or_backspace :!Sbackslash [:!hhkb-bt :!macbook-internal]]
+
+           ;; see "For HHKB" below
+           [:escape :!Sgrave_accent_and_tilde :hhkb-bt]
+           [:grave_accent_and_tilde :!Sescape :hhkb-bt]
+           [:delete_or_backspace :!Sbackslash :hhkb-bt] ; left_shift+delete -> |
+           [:left_control :!Sescape :hhkb-bt] ; shift+esc for IntelliJ IDEA, Raycast
+
+           ;; see "Preview: doomemacs like keybindings" below
+           [:w :!C0 :Preview] ; Actual Size (doomemacs pdf-view-fit-width-to-window)
+           [:h :!C9 :Preview] ; Zoom to Fit (doomemacs pdf-view-fit-height-to-window)
+           [:p :!C9 :Preview] ; Zoom to Fit (doomemacs pdf-view-fit-page-to-window)
+
+           ;; rime
+           [:spacebar :left_shift :!Emacs]
+           ;; emacs-rime
+           [:spacebar :!Tbackslash :Emacs]
            ]}
 
   {:des   "v mode (control)"
@@ -273,6 +374,81 @@
            [:x :!Tx]
            [:c :!Tc]
            ;; [:v :!Tv]
+           [:b :!Tb]
+           [:n :!Tn]
+           [:m :!Tm]
+           [:comma :!Tcomma]
+           [:period :!Tperiod]
+           [:slash :!Tslash]
+           [:down_arrow :!Tdown_arrow]
+           [:up_arrow :!Tup_arrow]
+           [:left_arrow :!Tleft_arrow]
+           [:right_arrow :!Tright_arrow]
+           [:spacebar :!Tspacebar]
+           [:return_or_enter :!Treturn_or_enter]
+           [:tab :!Ttab]
+           [:escape :!Tescape]
+           [:grave_accent_and_tilde :!Tgrave_accent_and_tilde]
+           [:delete_or_backspace :!Tdelete_or_backspace]
+
+           ;; see "WeWork: chat message navigation" below
+           [:j :!COdown_arrow :WeWork] ; select next unread chat message
+
+           ;; see "WeChat: chat message navigation" below
+           [:j :!COdown_arrow :WeChat] ; select next unread chat message
+
+           ;; see "Spotify: play navigation" below
+           [:j :!Cright_arrow :Spotify] ; next
+           [:k :!Cleft_arrow :Spotify] ; previous
+           [:l :!CSright_arrow :Spotify] ; seek forward
+           [:h :!CSleft_arrow :Spotify] ; seek backward
+           [:u :!Cup_arrow :Spotify] ; volume up
+           [:d :!Cdown_arrow :Spotify] ; volume down
+           ]}
+
+  {:des   "delete mode for glove80 (control)"
+   :rules [:delete-ctrl-mode
+           [:1 :!T1]
+           [:2 :!T2]
+           [:3 :!T3]
+           [:4 :!T4]
+           [:5 :!T5]
+           [:6 :!T6]
+           [:7 :!T7]
+           [:8 :!T8]
+           [:9 :!T9]
+           [:0 :!T0]
+           [:hyphen :!Thyphen]
+           [:equal_sign :!Tequal_sign]
+           [:q :!Tq]
+           [:w :!Tw]
+           [:e :!Te]
+           [:r :!Tr]
+           [:t :!Tt]
+           [:y :!Ty]
+           [:u :!Tu :!Spotify]
+           [:i :!Ti]
+           [:o :!To]
+           [:p :!Tp]
+           [:open_bracket :!Topen_bracket]
+           [:close_bracket :!Tclose_bracket]
+           [:backslash :!Tbackslash]
+           [:a :!Ta]
+           [:s :!Ts]
+           [:d :!Td :!Spotify]
+           [:f :!Tf]
+           [:g :!Tg]
+           [:h :!Th :!Spotify]
+           ;; [:h :delete_or_backspace] ; C-h to backspace
+           [:j :!Tj [:!WeWork :!WeChat :!Spotify]]
+           [:k :!Tk :!Spotify]
+           [:l :!Tl :!Spotify]
+           [:semicolon :!Tsemicolon]
+           [:quote :!Tquote]
+           [:z :!Tz]
+           [:x :!Tx]
+           [:c :!Tc]
+           [:v :!Tv]
            [:b :!Tb]
            [:n :!Tn]
            [:m :!Tm]
@@ -360,6 +536,70 @@
            [:right_arrow :!Wright_arrow]
            [:spacebar :!Wspacebar]
            [:return_or_enter :!Wreturn_or_enter]
+           [:tab :!Wtab]
+           [:escape :!Wescape]
+           [:grave_accent_and_tilde :!Wgrave_accent_and_tilde]
+           [:delete_or_backspace :!Wdelete_or_backspace]
+
+           ;; see "Spotify: play navigation" below
+           [:d :!Cdown_arrow :Spotify] ; volume down
+           ]}
+
+  {:des   "return mode for glove80 (control)"
+   :rules [:return-ctrl-mode
+           [:1 :!W1]
+           [:2 :!W2]
+           [:3 :!W3]
+           [:4 :!W4]
+           [:5 :!W5]
+           [:6 :!W6]
+           [:7 :!W7]
+           [:8 :!W8]
+           [:9 :!W9]
+           [:0 :!W0]
+           [:hyphen :!Whyphen]
+           [:equal_sign :!Wequal_sign]
+           [:q :!Wq]
+           [:w :!Ww]
+           [:e :!We]
+           [:r :!Wr]
+           [:t :!Wt]
+           [:y :!Wy]
+           [:u :!Wu]
+           [:i :!Wi]
+           [:o :!Wo]
+           [:p :!Wp]
+           [:open_bracket :!Wopen_bracket]
+           [:close_bracket :!Wclose_bracket]
+           [:backslash :!Wbackslash]
+           [:a :!Wa]
+           [:s :!Ws]
+           [:d :!Wd :!Spotify]
+           [:f :!Wf]
+           [:g :!Wg]
+           [:h :!Wh]
+           ;; [:h :delete_or_backspace] ; C-h to backspace
+           [:j :!Wj]
+           ;; [:k :!Wk] ; see "simultaneous keys" below
+           [:l :!Wl]
+           [:semicolon :!Wsemicolon]
+           [:quote :!Wquote]
+           [:z :!Wz]
+           [:x :!Wx]
+           [:c :!Wc]
+           [:v :!Wv]
+           [:b :!Wb]
+           [:n :!Wn]
+           [:m :!Wm]
+           [:comma :!Wcomma]
+           [:period :!Wperiod]
+           [:slash :!Wslash]
+           [:down_arrow :!Wdown_arrow]
+           [:up_arrow :!Wup_arrow]
+           [:left_arrow :!Wleft_arrow]
+           [:right_arrow :!Wright_arrow]
+           [:spacebar :!Wspacebar]
+           ;; [:return_or_enter :!Wreturn_or_enter]
            [:tab :!Wtab]
            [:escape :!Wescape]
            [:grave_accent_and_tilde :!Wgrave_accent_and_tilde]
@@ -1083,7 +1323,7 @@
              :params  {:delay    500}}]]}
 
   {:des   "left option alone -> tmux prefix"
-   :rules [:!niz-x87-wired
+   :rules [[:condi :!niz-x87-wired :!glove80]
            ;; [:left_option :left_option :!Terminals {:alone [:!!f18]}] ; left option alone -> hyper+f18 (iTerm2 Hotkey Window)
            [:#Pleft_option :left_option :!tmux-autostart-terminals {:alone [:open "/Applications/kitty.app"]}]
            [:#Pleft_option :left_option :tmux-autostart-terminals {:alone [:!Tb]}] ; tmux prefix
@@ -1092,7 +1332,8 @@
   ;; TODO right_option -> hyper/super-hyper(hyper+fn)/translate
   ;; TODO :super-hyper [:command :shift :control :option :fn]
   {:des   "right option alone -> translate (immersive-translate in chrome/safari, Translation in JetBrains IDEs, Raycast Easydict in other apps)"
-   :rules [[:#Pright_option :right_option [:!niz-x87-bt :!niz-x87-wired :translate-by-opt-shift-a-app] {:alone [:!OSa]}]
+   :rules [:!glove80
+           [:#Pright_option :right_option [:!niz-x87-bt :!niz-x87-wired :translate-by-opt-shift-a-app] {:alone [:!OSa]}]
            [:#Pright_option :right_option [:!niz-x87-bt :!niz-x87-wired :!translate-by-opt-shift-a-app] {:alone [:!!backslash]}] ; raycast://extensions/isfeng/easydict/easydict
            ]}
 
@@ -1102,13 +1343,17 @@
   #_{:des   "left shift alone -> switch rime's english/chinese input"
    :rules [[:left_shift :left_shift nil {:alone :right_control}]]}
   ;; doomemacs: toggle-input-method (C-\) | https://github.com/DogLooksGood/emacs-rime
+  ;; {:des   "left shift alone -> switch rime's english/chinese input"
+  ;;  :rules [[:left_shift :left_shift :Emacs {:alone [:left_shift :!Tbackslash]}]]}
   {:des   "left shift alone -> switch rime's english/chinese input"
-   :rules [[:left_shift :left_shift :Emacs {:alone [:left_shift :!Tbackslash]}]]}
+   :rules [[:left_shift :left_shift [:Emacs :!glove80] {:alone [:left_shift :!Tbackslash]}]]}
 
   ;; TODO alone 修饰键 right_shift(状态开关 类似caps_lock 开关vi模式)
   ;; TODO noti like command-q
+  ;; {:des   "right shift alone -> caps_lock (see \"caps_lock layer: vi mode\" below)"
+  ;;  :rules [[:#Pright_shift :right_shift nil {:alone [:caps_lock]}]]}
   {:des   "right shift alone -> caps_lock (see \"caps_lock layer: vi mode\" below)"
-   :rules [[:#Pright_shift :right_shift nil {:alone [:caps_lock]}]]}
+   :rules [[:#Pright_shift :right_shift :!glove80 {:alone [:caps_lock]}]]}
 
 ;; ------------------------------ Fundamental ------------------------------
 ;; WARN: the order of rules matters, see "space to shift" below
@@ -1241,8 +1486,29 @@
            [:0 :!C9] ; Zoom to Fit (doomemacs pdf-view-scale-reset)
            ]}
 
+  {:des   "For Glove80\n- backspace to space"
+   :rules [:glove80
+           ;; TODO delete cmd-c cmd-v rime ` = [ ]
+           ;; TODO check: simlayers, modifier alone
+           [:##delete_or_backspace :spacebar]
+           [:##return_or_enter :delete_or_backspace]
+           [:##delete_forward :return_or_enter]
+           ;; TODO as modifier
+           [:##left_option :tab]
+           ;; TODO as modifier
+           [:##right_option :escape]
+           [:##left_shift :left_command nil {:alone :prev_app}]
+           [:##right_shift :right_command nil {:alone [:hs ["mouseCenterClickThenMaximizeWindow"]]}]
+           [:##left_control :left_option :!tmux-autostart-terminals {:alone [:open "/Applications/kitty.app"]}]
+           [:##left_control :left_option :tmux-autostart-terminals {:alone [:!Tb]}] ; tmux prefix
+           [:##right_control :right_option :translate-by-opt-shift-a-app {:alone [:!OSa]}]
+           [:##right_control :right_option :!translate-by-opt-shift-a-app {:alone [:!!backslash]}] ; raycast://extensions/isfeng/easydict/easydict
+           [:##up_arrow :down_arrow]
+           [:##down_arrow :up_arrow]
+           ]}
+
   {:des   "For Not HHKB\n- caps_lock to esc when pressed alone, to control as modifier\n- left_control to cmd+v when pressed alone, to hyper as modifier"
-   :rules [:!hhkb-bt
+   :rules [[:condi :!hhkb-bt :!glove80]
            [:##caps_lock :left_control nil {:alone :escape}]
            [:##left_control :!CTOleft_shift nil {:alone :!Cv}]]}
 
@@ -1440,6 +1706,7 @@
   ]
 
  :devices            {:macbook-internal   [{:product_id 0 :vendor_id 0}]
+                      :glove80            [{:vendor_id 5824 :product_id 10203}]
                       :hhkb-bt            [{:vendor_id 1278 :product_id 33}]
                       :niz-x87-bt         [{:vendor_id 1452 :product_id 272}]
                       :niz-x87-wired      [{:vendor_id 1155 :product_id 20785}] ; NIZ有线(USB)
