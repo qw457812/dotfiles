@@ -97,14 +97,14 @@
 
   :delete-ctrl-mode      {:key     :delete_forward
                           :condi   :glove80
-                          :modi    {:optional :caps_lock}}
+                          :modi    {:optional :any}}
 
   :m-ctrl-mode           {:key     :m
                           :modi    {:optional :caps_lock}}
 
   :return-ctrl-mode      {:key     :return_or_enter
                           :condi   :glove80
-                          :modi    {:optional :caps_lock}}
+                          :modi    {:optional :any}}
 
   :mouse_keys_mode_v4    {:key     :a
                           :condi   [:!Games]
@@ -241,10 +241,8 @@
            [:h :!C9 :Preview] ; Zoom to Fit (doomemacs pdf-view-fit-height-to-window)
            [:p :!C9 :Preview] ; Zoom to Fit (doomemacs pdf-view-fit-page-to-window)
 
-           ;; rime
-           [:delete_or_backspace :left_shift [:glove80 :!Emacs]]
-           ;; emacs-rime
-           [:delete_or_backspace :!Tbackslash [:glove80 :Emacs]]
+           ;; Glove80 only
+           [:delete_or_backspace :!Cspacebar :glove80] ; raycast
            ]}
 
  {:des   "backspace mode for glove80 (shift)"
@@ -325,10 +323,8 @@
            [:h :!C9 :Preview] ; Zoom to Fit (doomemacs pdf-view-fit-height-to-window)
            [:p :!C9 :Preview] ; Zoom to Fit (doomemacs pdf-view-fit-page-to-window)
 
-           ;; rime
-           [:spacebar :left_shift :!Emacs]
-           ;; emacs-rime
-           [:spacebar :!Tbackslash :Emacs]
+           ;; Glove80 only
+           [:spacebar :!Cspacebar] ; raycast
            ]}
 
   {:des   "v mode (control)"
@@ -863,10 +859,14 @@
            [:comma [:open "/System/Applications/System Settings.app"]] ; cmd+, for setting
            [:period [:open "/System/Applications/Launchpad.app"]] ; 启动台
            [:slash [:open "/Applications/WhatPulse/WhatPulse.app"]]
-           [:left_command [:open "/Applications/OpenInTerminal-Lite.app"]]
-           [:right_command [:open "/Applications/OpenInEditor-Lite.app"]]
-           [:left_option [:open "/Applications/Karabiner-Elements.app"]]
-           [:right_option [:open "/Applications/WeChat.app"]]
+           [:left_command [:open "/Applications/OpenInTerminal-Lite.app"] :!glove80]
+           [:left_shift [:open "/Applications/OpenInTerminal-Lite.app"] :glove80]
+           [:right_command [:open "/Applications/OpenInEditor-Lite.app"] :!glove80]
+           [:right_shift [:open "/Applications/OpenInEditor-Lite.app"] :glove80]
+           [:left_option [:open "/Applications/Karabiner-Elements.app"] :!glove80]
+           [:left_control [:open "/Applications/Karabiner-Elements.app"] :glove80]
+           [:right_option [:open "/Applications/WeChat.app"] :!glove80]
+           [:right_control [:open "/Applications/WeChat.app"] :glove80]
            ]}
 
   {:des   "o mode (website)"
@@ -1256,11 +1256,17 @@
 
   ;; 和 iterm2 hotkey window 的 double cmd 快捷键冲突 ---> 改为 hyper+f18 (map to left_option alone)
   {:des   "left cmd alone -> cmd+tab"
-   :rules [:!niz-x87-wired [:#Pleft_command :left_command nil {:alone :prev_app}]]} ; ":prev_app" is same as ":!Ctab"
+   :rules [[:condi :!niz-x87-wired :!glove80]
+           [:#Pleft_command :left_command nil {:alone :prev_app}]]} ; ":prev_app" is same as ":!Ctab"
 
   ;; right cmd -> cmd+`/rime/raycast/mouseCenter/return
-  {:des   "right cmd alone -> mouse center click to active app then maximize window"
-   :rules [:!niz-x87-bt [:#Pright_command :right_command nil {:alone [:hs ["mouseCenterClickThenMaximizeWindow"]]}]]}
+  {:des   "right cmd alone -> toggle rime chinese/english"
+   :rules [[:condi :!niz-x87-bt :!glove80]
+           ;; [:#Pright_command :right_command nil {:alone [:hs ["mouseCenterClickThenMaximizeWindow"]]}]
+           ;; TODO `:##` or `:#P`
+           [:##right_command :right_command :!Emacs {:alone :left_shift}] ; rime
+           [:##right_command :right_command :Emacs {:alone :!Tbackslash}] ; emacs-rime
+           ]}
 
   ;; TODO or press f twice to switch rime's english/chinese input? see "Double colon triggers emoji search" above
   ;; TODO "For NIZ" below
@@ -1331,10 +1337,21 @@
 
   ;; TODO right_option -> hyper/super-hyper(hyper+fn)/translate
   ;; TODO :super-hyper [:command :shift :control :option :fn]
-  {:des   "right option alone -> translate (immersive-translate in chrome/safari, Translation in JetBrains IDEs, Raycast Easydict in other apps)"
-   :rules [:!glove80
-           [:#Pright_option :right_option [:!niz-x87-bt :!niz-x87-wired :translate-by-opt-shift-a-app] {:alone [:!OSa]}]
-           [:#Pright_option :right_option [:!niz-x87-bt :!niz-x87-wired :!translate-by-opt-shift-a-app] {:alone [:!!backslash]}] ; raycast://extensions/isfeng/easydict/easydict
+  {:des   "right option alone -> mouse center click to active app then maximize window"
+   :rules [[:condi :!glove80 :!niz-x87-bt :!niz-x87-wired]
+           ;; [:#Pright_option :right_option :translate-by-opt-shift-a-app {:alone [:!OSa]}]
+           ;; [:#Pright_option :right_option :!translate-by-opt-shift-a-app {:alone [:!!backslash]}] ; raycast://extensions/isfeng/easydict/easydict
+           [:#Pright_option :right_option nil {:alone [:hs ["mouseCenterClickThenMaximizeWindow"]]}]
+           ]}
+
+  ;; FIXME
+  #_{:des   "hit both cmd -> translate (immersive-translate in chrome/safari, Translation in JetBrains IDEs, Raycast Easydict in other apps)"
+   :rules [[:condi :!glove80 :!niz-x87-bt :!niz-x87-wired]
+           [:!C#Pright_command :!OSa :translate-by-opt-shift-a-app]
+           [:!Q#Pleft_command :!OSa :translate-by-opt-shift-a-app]
+           ;; raycast://extensions/isfeng/easydict/easydict
+           [:!C#Pright_command :!!backslash :!translate-by-opt-shift-a-app]
+           [:!Q#Pleft_command :!!backslash :!translate-by-opt-shift-a-app]
            ]}
 
   ;; TODO 影响 double shift
@@ -1489,22 +1506,39 @@
   {:des   "For Glove80\n- backspace to space"
    :rules [:glove80
            ;; TODO delete cmd-c cmd-v rime ` = [ ]
-           ;; TODO check: simlayers, modifier alone
+           ;; TODO check: simlayers of modifier, modifier alone
+           ;; TODO when need to be `:#P` instead of `:##`
            [:##delete_or_backspace :spacebar]
-           [:##return_or_enter :delete_or_backspace]
-           [:##delete_forward :return_or_enter]
+           [:##delete_forward :delete_or_backspace]
+           ;; [:##return_or_enter :delete_or_backspace]
+           ;; [:##delete_forward :return_or_enter]
            ;; TODO as modifier
            [:##left_option :tab]
            ;; TODO as modifier
            [:##right_option :escape]
            [:##left_shift :left_command nil {:alone :prev_app}]
-           [:##right_shift :right_command nil {:alone [:hs ["mouseCenterClickThenMaximizeWindow"]]}]
+           ;; [:##right_shift :right_command nil {:alone [:hs ["mouseCenterClickThenMaximizeWindow"]]}]
+           [:##right_shift :right_command :!Emacs {:alone :left_shift}] ; rime
+           [:##right_shift :right_command :Emacs {:alone :!Tbackslash}] ; emacs-rime
            [:##left_control :left_option :!tmux-autostart-terminals {:alone [:open "/Applications/kitty.app"]}]
            [:##left_control :left_option :tmux-autostart-terminals {:alone [:!Tb]}] ; tmux prefix
-           [:##right_control :right_option :translate-by-opt-shift-a-app {:alone [:!OSa]}]
-           [:##right_control :right_option :!translate-by-opt-shift-a-app {:alone [:!!backslash]}] ; raycast://extensions/isfeng/easydict/easydict
+           ;; [:##right_control :right_option :translate-by-opt-shift-a-app {:alone [:!OSa]}]
+           ;; [:##right_control :right_option :!translate-by-opt-shift-a-app {:alone [:!!backslash]}] ; raycast://extensions/isfeng/easydict/easydict
+           [:##right_control :right_option nil {:alone [:hs ["mouseCenterClickThenMaximizeWindow"]]}]
            [:##up_arrow :down_arrow]
            [:##down_arrow :up_arrow]
+
+           ;; TODO System
+           [:left_command :left_command :translate-by-opt-shift-a-app {:alone :!OSa}]
+           [:left_command :left_command :!translate-by-opt-shift-a-app {:alone :!!backslash}]
+
+           ;; FIXME
+           ;; see "hit both cmd" above
+           ;; [:!S#Pright_shift :!OSa :translate-by-opt-shift-a-app]
+           ;; [:!R#Pleft_shift :!OSa :translate-by-opt-shift-a-app]
+           ;; raycast://extensions/isfeng/easydict/easydict
+           ;; [:!S#Pright_shift :!!backslash :!translate-by-opt-shift-a-app]
+           ;; [:!R#Pleft_shift :!!backslash :!translate-by-opt-shift-a-app]
            ]}
 
   {:des   "For Not HHKB\n- caps_lock to esc when pressed alone, to control as modifier\n- left_control to cmd+v when pressed alone, to hyper as modifier"

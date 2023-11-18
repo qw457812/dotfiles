@@ -208,9 +208,9 @@ map H ^
 map L $
 
 " Have j and k navigate visual lines rather than logical ones
-" Notice: just for fix ideavim bug ---> when meet @SuppressWarnings("unchecked"), jjj... will not walk through (but gj not work well when soft-wrap is on)
-" nmap j gj
-" nmap k gk
+" Notice: just for fix ideavim bug ---> when meet folded @SuppressWarnings("unchecked") like /unchecked/, jjj... will not walk through (but gj not work well when soft-wrap is on)
+nmap j gj
+nmap k gk
 
 nmap * *zz
 nmap # #zz
