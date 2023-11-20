@@ -85,11 +85,11 @@ patch:
   # style/color_scheme_dark: wechat_dark
   # style/color_scheme: metro
 
-  # 虎码秃版 鼠须管 （Mac）2023.10.22.zip | 03 虎码输入法下载 | http://huma.ysepan.com/
+  # 虎码秃版 鼠须管 （Mac）2023.10.22.zip (18.0MB) | 鼠须管（推荐） | ④Mac | 03 虎码输入法下载 | http://huma.ysepan.com/
   # 鼠须管盲打，嵌入首选
-  style/alpha: 0.0001 # 隐藏候选框只需将alpha设为0.00001即可 | https://github.com/rime/squirrel/issues/576
-  style/inline_candidate: true # https://github.com/rime/squirrel/pull/577
-
+  # style/alpha: 0.0001 # 隐藏候选框只需将alpha设为0.00001即可 | https://github.com/rime/squirrel/issues/576
+  # style/inline_candidate: true # https://github.com/rime/squirrel/pull/577
+  # 过渡（自用）
   # style/alpha: 0.5
 
   preset_color_schemes/+:
@@ -572,28 +572,28 @@ patch:
       label_color: 0xF9A6FF
       name: "肛师专用／东北大花被"
       text_color: 0x1D9FFF
-  # style:
-  #   #capture_type: none
-  #   #color_font: true
-  #   comment_font_face: "Consolas, Apple Color Emoji, TumanPUA, LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
-  #   comment_font_point: 16 #滤镜字号
-  #   #display_tray_icon: false
-  #   font_face: "Consolas, Apple Color Emoji, LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
-  #   font_point: 16 #主字体字号
-  #   #fullscreen: false
-  #   inline_preedit: true #鼠须管开嵌入在QQ上可能会有点问题，这里可改为 true 关闭嵌入模式
-  #   label_font_face: "LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
-  #   label_font_point: 16 #标号字号
-  #   #label_format: "%s."
-  #   layout:
-  #     min_width: 85
-  #   corner_radius: 5
-  #   hilited_corner_radius: 5
-  #   line_spacing: 8
-  #   hilite_spacing: 6
-  #   spacing: 12
-  #   color_scheme: win11light
-  #   color_scheme_dark: easy_dark
-  #   # 鼠须管盲打，嵌入首选，删除下面两行的#号，即可生效
-  #   #alpha: 0.0001
-  #   #inline_candidate: true
+  style:
+    #capture_type: none
+    #color_font: true
+    comment_font_face: "Consolas, Apple Color Emoji, TumanPUA, LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
+    comment_font_point: 16 #滤镜字号
+    #display_tray_icon: false
+    font_face: "Consolas, Apple Color Emoji, LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
+    font_point: 16 #主字体字号
+    #fullscreen: false
+    inline_preedit: true #鼠须管开嵌入在QQ上可能会有点问题，这里可改为 true 关闭嵌入模式
+    label_font_face: "LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
+    label_font_point: 16 #标号字号
+    #label_format: "%s."
+    layout:
+      min_width: 85
+    corner_radius: 5
+    hilited_corner_radius: 5
+    line_spacing: 8
+    hilite_spacing: 6
+    spacing: 12
+    color_scheme: win11light
+    color_scheme_dark: easy_dark
+    # 鼠须管盲打，嵌入首选，删除下面两行的#号，即可生效
+    #alpha: 0.0001
+    #inline_candidate: true
