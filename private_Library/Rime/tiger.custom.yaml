@@ -70,6 +70,55 @@ patch:
   # ↓emoji表情滤镜
   emoji_cn/opencc_config: emoji_cn.json
 
+  switches: # 0 默认关，1 默认开
+    - name: ascii_mode
+      # reset: 0
+      reset: 1
+      states: [ 中文, 西文 ]  #中英文状态
+    - name: extended_char  #自定义字集
+      reset: 1
+      states: [ 全字集 , 常用字 ]
+    - name: pinyin  #拼音滤镜
+      reset: 0
+      states: [ 拼, pīn ]
+    - name: emoji_cn  #emoji滤镜
+      reset: 0
+      # states: [ 🈚, 🈶 ]
+    - name: chaifen
+      # reset: 0 
+      reset: 1 
+      states: [ 拆隐, 拆显 ]
+    # - options: [ gb2312, gbk, utf8 ]
+    #   states: [ gb2312, GBK, UTF-8 ]
+    #   reset: 0
+    - name: simplification  #简转繁滤镜
+      reset: 0
+      # states: [ 简中, 繁中 ]
+    - options: [_keyboard_default, _keyboard_defaultbk, _keyboard_defaultwk]
+      reset: 0
+      states: [ 有刻, 半刻, 无刻 ]
+    - name: charset_comment_filter  #字符集提示
+      reset: 0  
+      states: [ U区关, U区开 ]
+    - name: udpf_switch
+      reset: 0
+      states: [ U编关, U编开]
+    - name: ascii_punct
+      reset: 0
+      states: [ 。，, ．， ]
+    # - name: dz_ci  #过滤词组
+    #   reset: 0
+    #   states: [ 词组, 单字 ]
+    - options: [_keyboard_default, _keyboard_defaultzj]
+      reset: 0
+      states: [ 助记关, 助记开 ]
+    # - name: fanjian  #繁转简滤镜
+    #   reset: 0
+    #   states: [ 反繁, 反简 ]
+    - name: full_shape
+      reset: 0
+      # states: [ 半角, 全角 ]
+
   engine:
     processors:
       - ascii_composer

@@ -38,7 +38,7 @@ patch:
   # 切换中英快捷键由 left_shift 改为 right_control (交换 : 和 ; 后按 shift+; 会触发鼠须管 shift 切换中英文)
   # 改为 right_control 后, 在 VSCode 和 tidgi (均开启 vim 模式) 中切换中英文经常不灵
   # ascii_composer/switch_key/Shift_L: noop
-  # ascii_composer/switch_key/Control_R: commit_code
+  ascii_composer/switch_key/Control_R: commit_code
 
   ##### 结尾的 /+ 表示在原基础上追加
   # 保留已有的快捷键，追加
