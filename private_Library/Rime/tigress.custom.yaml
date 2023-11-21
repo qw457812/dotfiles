@@ -70,6 +70,55 @@ patch:
   # ↓emoji表情滤镜
   emoji_cn/opencc_config: emoji_cn.json
   
+  switches: # 0 默认关，1 默认开
+    - name: ascii_mode
+      # reset: 0
+      reset: 1
+      states: [ 中文, 西文 ]  #中英文状态
+    - name: extended_char  #自定义字集
+      reset: 1
+      states: [ 全集 , 常用 ]
+    - name: pinyin  #拼音滤镜
+      reset: 0
+      states: [ 拼, pīn ]
+    - name: emoji_cn  #emoji滤镜
+      reset: 0
+      # states: [ 🈚, 🈶 ]
+    - name: chaifen
+      # reset: 0 
+      reset: 1 
+      states: [ 拆隐, 拆显 ]
+    # - options: [ gb2312, gbk, utf8 ]
+    #   states: [ gb2312, GBK, UTF-8 ]
+    #   reset: 0
+    - name: simplification  #简转繁滤镜
+      reset: 0
+      # states: [ 简中, 繁中 ]
+    - options: [_keyboard_default, _keyboard_defaultbk, _keyboard_defaultwk]
+      reset: 0
+      states: [ 有刻, 半刻, 无刻 ]
+    - name: charset_comment_filter  #字符集提示
+      reset: 0  
+      states: [ U区关, U区开 ]
+    - name: udpf_switch
+      reset: 0
+      states: [ U编关, U编开]
+    - name: ascii_punct
+      reset: 0
+      states: [ 。，, ．， ]
+    # - name: dz_ci  #过滤词组
+    #   reset: 0
+    #   states: [ 词组, 单字 ]
+    - options: [_keyboard_default, _keyboard_defaultzj]
+      reset: 0
+      states: [ 助记关, 助记开 ]
+    # - name: fanjian  #繁转简滤镜
+    #   reset: 0
+    #   states: [ 反繁, 反简 ]
+    - name: full_shape
+      reset: 0
+      # states: [ 半角, 全角 ]
+
   engine:
     processors:
       - ascii_composer
@@ -125,3 +174,42 @@ patch:
       # - lua_filter@lua_unicode_display_filter #Unicode编码显示
       - lua_filter@*unicode_display #Unicode编码显示
       - uniquifier #过滤重复
+
+  key_binder:
+    #  import_preset: default
+    bindings:
+      #- { when: composing, accept: Return, send: Escape }
+      #- { accept: space, send: space, when: has_menu } #有候选时空格上屏首选
+      #- { accept: space, send: Escape, when: composing } #无候选时(空码)空格清屏
+      - { accept: semicolon, send: 2, when: has_menu } # 分号次选
+      - { when: has_menu, accept: apostrophe, send: 3 } # 引号三选
+      - { when: composing, accept: Tab, send: Escape } # tab清屏
+      - { when: has_menu, accept: minus, send: Page_Up } # - 向后翻页
+      - { when: has_menu, accept: equal, send: Page_Down } # = 向前翻页
+      # - { when: composing, accept: bracketleft, send: Page_Up } # [ 后翻
+      # - { when: composing, accept: bracketright, send: Page_Down } # ] 前翻
+      # - { accept: "Control+o", toggle: simplification, when: composing }  # 简繁开关
+      # - { accept: "Control+Shift+O", toggle: fanjian, when: composing }  # 繁简开关
+      # - { accept: "Control+p", toggle: pinyin, when: composing }  # PC 拼音开关
+      # - { accept: "Control+i", toggle: emoji_cn, when: composing }  # PC emoji开关
+      # - { accept: "Control+u", toggle: charset_comment_filter, when: composing }  # PC Unicode分区开关
+      # - { accept: "Control+y", toggle: udpf_switch, when: composing }  #PC Unicode编码开关
+      # - { accept: "Control+h", toggle: extended_char, when: composing } # PC 自定字集开关
+      # - { accept: "Control+Shift+H", toggle: extended_char, when: composing } # PC 自定字集开关2
+      # - { accept: "Control+j", toggle: chaifen, when: composing } # PC 拆分滤镜开关
+      # - { when: composing, accept: '&', toggle: emoji_cn } # 手机 emoji开关
+      # - { when: composing, accept: '*', toggle: simplification } # 手机 繁简开关
+      # - { when: composing, accept: '\', toggle: pinyin } # 手机 拼音开关
+      # - { when: composing, accept: '^', toggle: charset_comment_filter } # 手机 Unicode分区开关1
+      # - { when: composing, accept: '#', toggle: charset_comment_filter } # 手机 Unicode分区开关2
+      # - { accept: "%", toggle: udpf_switch, when: composing }  #手机 Unicode编码开关
+      # - { accept: "+", toggle: udpf_switch, when: composing }  #手机 Unicode编码开关
+      # - { when: composing, accept: '_', toggle: extended_char} # 手机 自定字集开关1
+      # - { when: composing, accept: ':', toggle: extended_char} # 手机 自定字集开关2
+      # - { when: composing, accept: '"', toggle: chaifen } # 手机 拆分滤镜开关
+      - { when: has_menu, accept: Right, send: Down } # 右方向键 向后移动焦点
+      - { when: has_menu, accept: Left, send: Up } # 左方向键 向前移动焦点
+      # - { when: always, accept: "Control+period" , toggle: ascii_punct } # 中英标点切换
+      # - { when: always, accept: "Shift+space" , toggle: full_shape } # 全半角切换
+      # 在最近的两个方案之间切换
+      - { when: always, accept: Control+Shift+bracketleft, select: .next }
