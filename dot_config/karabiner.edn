@@ -341,6 +341,7 @@
            [:p :!C9 :Preview] ; Zoom to Fit (doomemacs pdf-view-fit-page-to-window)
 
            ;; Glove80 only
+           [:right_control :!Tgrave_accent_and_tilde] ; rime 方案选单
            ;; 左右互击
            [:spacebar :!Cspacebar] ; raycast
            [:right_shift :!Sescape] ; see "For Glove80" below
@@ -1346,7 +1347,8 @@
    :rules [[:condi :!niz-x87-bt :!glove80]
            ;; [:#Pright_command :right_command nil {:alone [:hs ["mouseCenterClickThenMaximizeWindow"]]}]
            ;; TODO `:##` or `:#P`
-           [:##right_command :right_command :!Emacs {:alone :left_shift}] ; rime
+           ;; [:##right_command :right_command :!Emacs {:alone :left_shift}] ; rime
+           [:##right_command :right_command :!Emacs {:alone :right_control}] ; rime
            [:##right_command :right_command :Emacs {:alone :!Tbackslash}] ; emacs-rime
            ]}
 
