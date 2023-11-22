@@ -84,13 +84,29 @@ patch:
   # style/color_scheme: wechat_light
   # style/color_scheme_dark: wechat_dark
   # style/color_scheme: metro
+  # style/color_scheme: crane
+  # style/color_scheme_dark: crane
 
   # 虎码秃版 鼠须管 （Mac）2023.10.22.zip (18.0MB) | 鼠须管（推荐） | ④Mac | 03 虎码输入法下载 | http://huma.ysepan.com/
+  # -------------------------------------为了不影响小鹤，已移至tiger.custom.yaml和tigress.custom.yaml-------------------------------------
+  # style/comment_font_face: "Consolas, Apple Color Emoji, TumanPUA, LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16" # 注字体及大小
+  # style/comment_font_point: 16 #滤镜字号
+  # style/font_face: "Consolas, Apple Color Emoji, LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16" # 候选词字体
+  # style/font_point: 16 #主字体字号（候选字词大小）
+  # style/inline_preedit: true #鼠须管开嵌入在QQ上可能会有点问题，这里可改为 true 关闭嵌入模式
+  # style/label_font_face: "LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16" #候选词编号字体
+  # style/label_font_point: 16 #标号字号（候选编号大小）
+  # style/layout/min_width: 85
+  # style/corner_radius: 5 # 候选条圆角
+  # style/hilited_corner_radius: 5 # 选中框（高亮） 圆角半径
+  # style/line_spacing: 8 # 行间距
+  # style/hilite_spacing: 6
+  # style/spacing: 12 # 拼音与候选项之间的距离 （inline_preedit: false）
+  # -------------------------------------为了不影响小鹤，已移至tiger.custom.yaml和tigress.custom.yaml-------------------------------------
   # 鼠须管盲打，嵌入首选
   # style/alpha: 0.0001 # 隐藏候选框只需将alpha设为0.00001即可 | https://github.com/rime/squirrel/issues/576
   # style/inline_candidate: true # https://github.com/rime/squirrel/pull/577
-  # 过渡（自用）
-  # style/alpha: 0.5
+  # style/alpha: 0.5 # 过渡（自用）
 
   preset_color_schemes/+:
     # https://github.com/NavisLab/rime-pifu
@@ -298,6 +314,37 @@ patch:
     #   # preedit_back_color:                   # 拼音底色 （inline_preedit: false）
     #   hilited_back_color: 0x79af22            # 选中拼音底色 （inline_preedit: false）
     #   border_color: 0x292929                  # 外边框颜色
+
+    # https://github.com/kchen0x/rime-crane/blob/main/flypy.schema.yaml
+    # 凇鹤版小鹤双拼输入法皮肤
+    crane:
+      name: "雪下鹤"
+      author: "水猫 <kchen0x@gmail.com>"
+      back_color: 0xE3E3E3                    # 候选条背景色
+      border_color_width: 2
+      border_color: 0x545554                  # 边框色
+      border_height: 4                        # 窗口边界高度，大于圆角半径才生效
+      border_width: 4                         # 窗口边界宽度，大于圆角半径才生效
+      candidate_format: "\u2005%@\u2005"      # 取消掉候选序号，用 1/6 em 空格 U+2005 包围候选词，这样更边距更舒服
+      corner_radius: 4                        # 窗口圆角半径
+      hilited_text_color: 0x000000            # 编码高亮
+      hilited_back_color: 0xffffff            # 编码背景高亮
+      hilited_candidate_label_color: 0xeeeeee # 首选编号色
+      hilited_candidate_text_color: 0xffffff  # 首选文字色
+      hilited_candidate_back_color: 0x545554  # 首选背景色
+      hilited_comment_text_color: 0xcccccc    # 首选提示字母色
+      label_color: 0x555555                             # 次选编号色
+      candidate_text_color: 0x000000                    # 次选文字色
+      candidate_back_color: 0xffffff                    # 次选背景色
+      comment_text_color: 0x555555                      # 次选提示字母色
+      # horizontal: true                        # 候选窗横向显示
+      horizontal: true                        # 候选窗横向显示
+      font_point: 16                          # 候选窗文字字号
+      label_font_point: 12                    # 候选窗编号字号
+      # inline_preedit: true                    # 开启嵌入编码
+      inline_preedit: true                    # 开启嵌入编码
+      # inline_candidate: true                  # 开启嵌入候选
+      text_color: 0x333333                    # 编码行文字颜色，24位色值，16进制，BGR顺序
 
     # 虎码秃版 鼠须管 （Mac）2023.10.22.zip (18.0MB) | 鼠须管（推荐） | ④Mac | 03 虎码输入法下载 | http://huma.ysepan.com/
     mac_light:
@@ -572,28 +619,28 @@ patch:
       label_color: 0xF9A6FF
       name: "肛师专用／东北大花被"
       text_color: 0x1D9FFF
-  style:
-    #capture_type: none
-    #color_font: true
-    comment_font_face: "Consolas, Apple Color Emoji, TumanPUA, LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
-    comment_font_point: 16 #滤镜字号
-    #display_tray_icon: false
-    font_face: "Consolas, Apple Color Emoji, LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
-    font_point: 16 #主字体字号
-    #fullscreen: false
-    inline_preedit: true #鼠须管开嵌入在QQ上可能会有点问题，这里可改为 true 关闭嵌入模式
-    label_font_face: "LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
-    label_font_point: 16 #标号字号
-    #label_format: "%s."
-    layout:
-      min_width: 85
-    corner_radius: 5
-    hilited_corner_radius: 5
-    line_spacing: 8
-    hilite_spacing: 6
-    spacing: 12
-    color_scheme: win11light
-    color_scheme_dark: easy_dark
-    # 鼠须管盲打，嵌入首选，删除下面两行的#号，即可生效
-    #alpha: 0.0001
-    #inline_candidate: true
+  # style:
+  #   #capture_type: none
+  #   #color_font: true
+  #   comment_font_face: "Consolas, Apple Color Emoji, TumanPUA, LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
+  #   comment_font_point: 16 #滤镜字号
+  #   #display_tray_icon: false
+  #   font_face: "Consolas, Apple Color Emoji, LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
+  #   font_point: 16 #主字体字号
+  #   #fullscreen: false
+  #   inline_preedit: true #鼠须管开嵌入在QQ上可能会有点问题，这里可改为 true 关闭嵌入模式
+  #   label_font_face: "LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
+  #   label_font_point: 16 #标号字号
+  #   #label_format: "%s."
+  #   layout:
+  #     min_width: 85
+  #   corner_radius: 5
+  #   hilited_corner_radius: 5
+  #   line_spacing: 8
+  #   hilite_spacing: 6
+  #   spacing: 12
+  #   color_scheme: win11light
+  #   color_scheme_dark: easy_dark
+  #   # 鼠须管盲打，嵌入首选，删除下面两行的#号，即可生效
+  #   #alpha: 0.0001
+  #   #inline_candidate: true
