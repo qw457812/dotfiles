@@ -106,6 +106,10 @@
                           :condi   :glove80
                           :modi    {:optional :any}}
 
+  :lshift-cmd-mode       {:key     :left_shift
+                          :condi   :glove80
+                          :modi    {:optional :any}}
+
   :mouse_keys_mode_v4    {:key     :a
                           :condi   [:!Games]
                           :afterup {:set ["mouse_keys_mode_v4_scroll" 0]}
@@ -211,8 +215,8 @@
            [:comma :!Scomma]
            [:period :!Speriod]
            [:slash :!Sslash]
-           [:down_arrow :!Sdown_arrow]
-           [:up_arrow :!Sup_arrow]
+           [:down_arrow :!Sdown_arrow :!glove80]
+           [:up_arrow :!Sup_arrow :!glove80]
            [:left_arrow :!Sleft_arrow]
            [:right_arrow :!Sright_arrow]
            ;; [:spacebar :!Sspacebar]
@@ -246,7 +250,12 @@
            [:p :!C9 :Preview] ; Zoom to Fit (doomemacs pdf-view-fit-page-to-window)
 
            ;; Glove80 only
+           [:down_arrow :!Sup_arrow :glove80] ; see "For Glove80" below
+           [:up_arrow :!Sdown_arrow :glove80] ; see "For Glove80" below
+           ;; 左右互击
            [:delete_or_backspace :!Cspacebar :glove80] ; raycast
+           [:left_shift :delete_forward :glove80] ; delete_forward, see "For Glove80" below
+           [:delete_forward :!Stab :glove80]
            ]}
 
  {:des   "backspace mode for glove80 (shift)"
@@ -297,8 +306,8 @@
            [:comma :!Scomma]
            [:period :!Speriod]
            [:slash :!Sslash]
-           [:down_arrow :!Sdown_arrow]
-           [:up_arrow :!Sup_arrow]
+           [:down_arrow :!Sup_arrow] ; see "For Glove80" below
+           [:up_arrow :!Sdown_arrow] ; see "For Glove80" below
            [:left_arrow :!Sleft_arrow]
            [:right_arrow :!Sright_arrow]
            ;; [:spacebar :!Sspacebar]
@@ -332,7 +341,9 @@
            [:p :!C9 :Preview] ; Zoom to Fit (doomemacs pdf-view-fit-page-to-window)
 
            ;; Glove80 only
+           ;; 左右互击
            [:spacebar :!Cspacebar] ; raycast
+           [:right_shift :!Sescape] ; see "For Glove80" below
            ]}
 
   {:des   "v mode (control)"
@@ -584,7 +595,7 @@
            [:h :!Wh]
            ;; [:h :delete_or_backspace] ; C-h to backspace
            [:j :!Wj]
-           ;; [:k :!Wk] ; see "simultaneous keys" below
+           [:k :!Wk]
            [:l :!Wl]
            [:semicolon :!Wsemicolon]
            [:quote :!Wquote]
@@ -611,6 +622,71 @@
 
            ;; see "Spotify: play navigation" below
            [:d :!Cdown_arrow :Spotify] ; volume down
+           ]}
+
+  {:des   "lshift mode for glove80 (cmd)"
+   :rules [:lshift-cmd-mode
+           [:1 :!C1]
+           [:2 :!C2]
+           [:3 :!C3]
+           [:4 :!C4]
+           [:5 :!C5]
+           [:6 :!C6]
+           [:7 :!C7]
+           [:8 :!C8]
+           [:9 :!C9]
+           [:0 :!C0]
+           [:hyphen :!Chyphen]
+           [:equal_sign :!Cequal_sign]
+           [:q :!Cq]
+           [:w :!Cw]
+           [:e :!Ce]
+           [:r :!Cr]
+           [:t :!Ct]
+           [:y :!Cy]
+           [:u :!Cu]
+           [:i :!Ci]
+           [:o :!Co]
+           [:p :!Cp]
+           [:open_bracket :!Copen_bracket]
+           [:close_bracket :!Cclose_bracket]
+           [:backslash :!Cbackslash]
+           [:a :!Ca]
+           [:s :!Cs]
+           [:d :!Cd]
+           [:f :!Cf]
+           [:g :!Cg]
+           [:h :!Ch]
+           [:j :!Cj]
+           [:k :!Ck]
+           [:l :!Cl]
+           [:semicolon :!Csemicolon]
+           [:quote :!Cquote]
+           [:z :!Cz]
+           [:x :!Cx]
+           [:c :!Cc]
+           [:v :!Cv]
+           [:b :!Cb]
+           [:n :!Cn]
+           [:m :!Cm]
+           [:comma :!Ccomma]
+           [:period :!Cperiod]
+           [:slash :!Cslash]
+           [:down_arrow :!Cup_arrow] ; see "For Glove80" below
+           [:up_arrow :!Cdown_arrow] ; see "For Glove80" below
+           [:left_arrow :!Cleft_arrow]
+           [:right_arrow :!Cright_arrow]
+           [:spacebar :!Cspacebar]
+           [:return_or_enter :!Creturn_or_enter]
+           [:tab :!Ctab]
+           [:escape :!Cescape]
+           [:right_shift :!Cescape] ; see "For Glove80" below
+           [:grave_accent_and_tilde :!Cgrave_accent_and_tilde]
+           [:delete_or_backspace :!Cdelete_or_backspace]
+           [:home :!Chome]
+           [:end :!Cend]
+           [:page_up :!Cpage_up]
+           [:page_down :!Cpage_down]
            ]}
 
   ;; Mos.app 翻转鼠标滚动方向
@@ -1504,8 +1580,10 @@
            ;; TODO delete cmd-c cmd-v rime ` = \ [ ]
            ;; TODO when need to be `:#P` instead of `:##`
            [:##delete_or_backspace :spacebar]
-           [:##delete_forward :delete_or_backspace]
-           [:##left_shift :left_command nil {:alone :prev_app}]
+           ;; [:##delete_forward :delete_or_backspace]
+           [:##delete_forward :tab]
+           ;; [:##left_shift :left_command nil {:alone :prev_app}]
+           [:##left_shift :delete_or_backspace] ; see lshift-cmd-mode simlayer above
            [:##right_shift :right_command nil {:alone :escape}]
            [:##left_option :left_option :!tmux-autostart-terminals {:alone [:open "/Applications/kitty.app"]}]
            [:##left_option :left_option :tmux-autostart-terminals {:alone [:!Tb]}] ; tmux prefix
@@ -1513,7 +1591,8 @@
            [:##up_arrow :down_arrow]
            [:##down_arrow :up_arrow]
 
-           [:##left_control :left_control nil {:alone :tab}]
+           ;; [:##left_control :left_control nil {:alone :tab}]
+           [:##left_control :left_control nil {:alone :prev_app}]
            [:!T##j :down_arrow]
            [:!T##k :up_arrow]
            [:!T##h :left_arrow]
