@@ -113,6 +113,13 @@ patch:
     datetime: ""          # ISO 8601： 2022-11-29T18:13:11+08:00
     timestamp: ""         # 时间戳： 1669716794
 
+  # https://github.com/kchen0x/rime-crane/blob/main/flypy.schema.yaml
+  style:
+    color_scheme: crane
+    color_scheme_dark: crane
+    # 鼠须管盲打，嵌入首选
+    # alpha: 0.0001
+    # inline_candidate: true
 
 # ------------------------------------------------------------------------------------------
 # 小鹤音形“鼠须管”for macOS.zip (1.9MB ios仓输入法可使用 2023/1/13 12:20:51) | _______挂接——音形码 | http://flypy.ysepan.com/
