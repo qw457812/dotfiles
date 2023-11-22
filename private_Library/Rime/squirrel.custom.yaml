@@ -88,21 +88,6 @@ patch:
   # style/color_scheme_dark: crane
 
   # 虎码秃版 鼠须管 （Mac）2023.10.22.zip (18.0MB) | 鼠须管（推荐） | ④Mac | 03 虎码输入法下载 | http://huma.ysepan.com/
-  # -------------------------------------为了不影响小鹤，已移至tiger.custom.yaml和tigress.custom.yaml-------------------------------------
-  # style/comment_font_face: "Consolas, Apple Color Emoji, TumanPUA, LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16" # 注字体及大小
-  # style/comment_font_point: 16 #滤镜字号
-  # style/font_face: "Consolas, Apple Color Emoji, LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16" # 候选词字体
-  # style/font_point: 16 #主字体字号（候选字词大小）
-  # style/inline_preedit: true #鼠须管开嵌入在QQ上可能会有点问题，这里可改为 true 关闭嵌入模式
-  # style/label_font_face: "LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16" #候选词编号字体
-  # style/label_font_point: 16 #标号字号（候选编号大小）
-  # style/layout/min_width: 85
-  # style/corner_radius: 5 # 候选条圆角
-  # style/hilited_corner_radius: 5 # 选中框（高亮） 圆角半径
-  # style/line_spacing: 8 # 行间距
-  # style/hilite_spacing: 6
-  # style/spacing: 12 # 拼音与候选项之间的距离 （inline_preedit: false）
-  # -------------------------------------为了不影响小鹤，已移至tiger.custom.yaml和tigress.custom.yaml-------------------------------------
   # 鼠须管盲打，嵌入首选
   # style/alpha: 0.0001 # 隐藏候选框只需将alpha设为0.00001即可 | https://github.com/rime/squirrel/issues/576
   # style/inline_candidate: true # https://github.com/rime/squirrel/pull/577
@@ -619,6 +604,7 @@ patch:
       label_color: 0xF9A6FF
       name: "肛师专用／东北大花被"
       text_color: 0x1D9FFF
+  # -------------------------------------为了不影响小鹤，已移至tiger.custom.yaml和tigress.custom.yaml-------------------------------------
   # style:
   #   #capture_type: none
   #   #color_font: true
@@ -644,3 +630,4 @@ patch:
   #   # 鼠须管盲打，嵌入首选，删除下面两行的#号，即可生效
   #   #alpha: 0.0001
   #   #inline_candidate: true
+  # -------------------------------------为了不影响小鹤，已移至tiger.custom.yaml和tigress.custom.yaml-------------------------------------
