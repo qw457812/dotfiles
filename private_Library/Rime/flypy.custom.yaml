@@ -39,6 +39,8 @@ patch:
       - punct_segmentor
       - fallback_segmentor
     translators:
+      # 中英混输 | https://github.com/rime/home/wiki/RimeWithSchemata
+      # - echo_translator # 沒有其他候選字時，回顯輸入碼
       - punct_translator
       - table_translator
       - lua_translator@date_translator # 使用rime-ice同名的date_translator

@@ -85,8 +85,7 @@ patch:
       reset: 0
       # states: [ 🈚, 🈶 ]
     - name: chaifen
-      # reset: 0 
-      reset: 1 
+      reset: 0 
       states: [ 拆隐, 拆显 ]
     # - options: [ gb2312, gbk, utf8 ]
     #   states: [ gb2312, GBK, UTF-8 ]
@@ -139,6 +138,9 @@ patch:
       - punct_segmentor
       - fallback_segmentor
     translators:
+      # TODO 有的码没有创建候选项，比如xxxxx，和translators顺序有关吗？
+      # 中英混输 | https://github.com/rime/home/wiki/RimeWithSchemata
+      # - echo_translator # 沒有其他候選字時，回顯輸入碼
       - punct_translator
       - reverse_lookup_translator #拼音反查
       - table_translator
@@ -228,8 +230,8 @@ patch:
   style/hilite_spacing: 6
   style/spacing: 12 # 拼音与候选项之间的距离 （inline_preedit: false）
   # 鼠须管盲打，嵌入首选
-  # style/alpha: 0.0001 # 隐藏候选框只需将alpha设为0.00001即可 | https://github.com/rime/squirrel/issues/576
-  # style/inline_candidate: true # https://github.com/rime/squirrel/pull/577
+  style/alpha: 0.0001 # 隐藏候选框只需将alpha设为0.00001即可 | https://github.com/rime/squirrel/issues/576
+  style/inline_candidate: true # https://github.com/rime/squirrel/pull/577
 
 # ------------------------------------------------------------------------------------------
 # 虎码秃版 鼠须管 （Mac）2023.10.22.zip (18.0MB) | 鼠须管（推荐） | ④Mac | 03 虎码输入法下载 | http://huma.ysepan.com/
@@ -2224,37 +2226,6 @@ patch:
 # Segoe UI Emoji 和 NotoColorEmoji-Regular  用来显示Emoji （给Win版的小狼毫用，Mac端无需字体即可显示）
 # Win系统宋体升级包 扩i已支持（2选1）和 TH-Tshyn-4.0.0（2选1） 超集字体（生僻字）支持，2个选1个装上就行，一般Win版选第一个，Mac端选第二个%
 # ------------------------------------------------------------------------------------------
-# ❯ sudo cat 虎码方案必装字体\ 2023.10.07/TH-Tshyn-4.1.0/ReadMe\(English\).html
-# Password:
-# <html>
-# 
-# <head>
-# <meta http-equiv="Content-Language" content="en">
-# <title>ReadMe</title>
-# </head>
-# 
-# <body style="background:#f6f65c">
-# 
-# <p align="center"><font size="7" face="Times New Roman">TH-fonts<font size="6">-"TH-Tshyn&nbsp;V4.1.0"</font>Description of Using and Installing (For Windows)</font></p>
-# <p align="center"><font face="Times New Roman">(You can have the best experience if you do as the following steps. Do not install arbitrarily unless you are professional.)</font></p>
-# <p align="left"><font size="5" face="Times New Roman">1. Please copy the fonts(*.ttf/*.ttc) to C:\Windows\Fonts\ first; You can also double click the font files to install quicker in the system version above WinVista.</font></p>
-# <p align="left" style="color:#ff0000"><font size="6" face="Times New Roman">**If you want to update the version of TH-fonts, installing the new one after force-deleting by Shift+Delete the old one is suggested. Direct installation is not suggested, because the "false overwriting" would happen and the Font-Link would then lose effectiveness.</font></p>
-# <p align="left"><font size="5" face="Times New Roman">2. Double click the reg files, add the keys into the register of the system. These files have the effect of Font-Link. TH-Tshyn is the biggest assemblage of fonts at present, it can support 146,000+ kanjis, and different kinds of symbols (contains all the characters in Unicode15.1, like the emojis, small languages and so on).</font></p>
-# <p align="left"><font size="5" face="Times New Roman">3. The reg files take effects only after your LOGOUTing or RESTARTing the system.</font></p>
-# <p align="left"><font size="5" face="Times New Roman">4. The assemblage of fonts will not effect the normal use of the computer; Only delete the fonts while UNINSTALLING, unnecessary to rechange the register.<br></font></p>
-# <p align="left"><font size="5" face="Times New Roman">5. If you have any problems about TH-fonts, please join into the QQ GROUP 436064726. You can ask questions, and we will try our best to help you.<br></font></p>
-# <p align="left"><font size="5" face="Times New Roman">6. For protecting the COPYRIGHT (contains the copyright of the glyphs which have been made by EACH COMPANY and my ARRANGEMENT), the compression pack has been encrypted. If you tamper the data, it is easy to recognize. Beware of CRIME! Do not use for BUSINESS!<br></font></p>
-# <p align="left"><font size="5" face="Times New Roman">Remark-1: When installing on Mac or Linux, just install the font files, and the system will link them automatically, please ignore the reg files; The installation method on the Android phone can be seen at <a href=https://zhuanlan.zhihu.com/p/26524450>this hyperlink</a> (Simplified Chinese).<br></font></p>
-# <p align="left"><font size="5" face="Times New Roman">Remark-2: TH-Times.ttc is used for shaping of the complex texts. The detailed description can be seen at <a href=http://cheonhyeong.com/Tools/Times.html>this hyperlink</a> (Simplified Chinese). If you installed TH-Times.ttf in TH-Tshyn V3.1.0, please uninstall it manually before install the ttc!<br><br></font></p>
-# <p align="left"><font size="5" face="Calibri">Font style: MIXTURE</font></p>
-# <p align="left"><font size="5" face="Calibri">Compile date: Oct. 3, 2023 / *Aug. 21, 2022 (the font files of P1 & P16 are V4.0.0, NOTHING changes in V4.1.0)</font></p>
-# <p align="right"><font size="7" face="Arial">CheonHyeong Sim</font></p>
-# <p align="right"><font size="7" face="Symbol">2023-10-03</font></p>
-# 
-# </body>
-# 
-# </html>
-# ------------------------------------------------------------------------------------------
 # ❯ open 虎码方案必装字体\ 2023.10.07/TH-Tshyn-4.1.0/安装使用前必读\(简中\).html
 # <html>
 # 
@@ -2284,3 +2255,16 @@ patch:
 # </body>
 # 
 # </html>
+# ------------------------------------------------------------------------------------------
+# 虎码秃版 鼠须管 （Mac）2023.11.09.zip (18.0MB) | 鼠须管 | ④Mac | 03 虎码输入法下载 | http://huma.ysepan.com/
+# ------------------------------------------------------------------------------------------
+# ❯ diff --brief --recursive 虎码秃版\ 鼠须管\ （Mac）2023.10.22 虎码秃版\ 鼠须管\ （Mac）2023.11.09
+# Files 虎码秃版 鼠须管 （Mac）2023.10.22/core2022.dict.yaml and 虎码秃版 鼠须管 （Mac）2023.11.09/core2022.dict.yaml differ
+# Files 虎码秃版 鼠须管 （Mac）2023.10.22/opencc/PYCharacters.txt and 虎码秃版 鼠须管 （Mac）2023.11.09/opencc/PYCharacters.txt differ
+# Files 虎码秃版 鼠须管 （Mac）2023.10.22/opencc/STCharacters_Tu.txt and 虎码秃版 鼠须管 （Mac）2023.11.09/opencc/STCharacters_Tu.txt differ
+# Files 虎码秃版 鼠须管 （Mac）2023.10.22/opencc/hu_cf.txt and 虎码秃版 鼠须管 （Mac）2023.11.09/opencc/hu_cf.txt differ
+# Files 虎码秃版 鼠须管 （Mac）2023.10.22/symbols.yaml and 虎码秃版 鼠须管 （Mac）2023.11.09/symbols.yaml differ
+# Files 虎码秃版 鼠须管 （Mac）2023.10.22/tiger.dict.yaml and 虎码秃版 鼠须管 （Mac）2023.11.09/tiger.dict.yaml differ
+# Files 虎码秃版 鼠须管 （Mac）2023.10.22/tigress.dict.yaml and 虎码秃版 鼠须管 （Mac）2023.11.09/tigress.dict.yaml differ
+# Files 虎码秃版 鼠须管 （Mac）2023.10.22/tigress_ci.dict.yaml and 虎码秃版 鼠须管 （Mac）2023.11.09/tigress_ci.dict.yaml differ
+# Files 虎码秃版 鼠须管 （Mac）2023.10.22/tigress_simp_ci.dict.yaml and 虎码秃版 鼠须管 （Mac）2023.11.09/tigress_simp_ci.dict.yaml differ

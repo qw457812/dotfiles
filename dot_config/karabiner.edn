@@ -1599,8 +1599,12 @@
            [:!T##k :up_arrow]
            [:!T##h :left_arrow]
            [:!T##l :right_arrow]
+           [:!T#Pa :!!f7] ; clipboard history by Maccy.app
+           [:!T#Ps :!Cx]
+           [:!T#Pd :!Cc]
+           [:!T#Pf :!Cv]
            ;; right_control -> rime: toggle ascii punct | ~/Library/Rime/default.custom.yaml
-           [:##right_control :right_control :Emacs {:alone :!Tbackslash}] ; emacs-rime
+           [:##right_control :right_control :Emacs {:alone [:right_control :!Tbackslash]}] ; emacs-rime
            ;; TODO launch-mode
            [:!Wh [:open "/Applications/企业微信.app"] :!WeWork]
            [:!Wh :!Ograve_accent_and_tilde :WeWork] ; AltTab.app
