@@ -74,3 +74,6 @@
 ;; https://codeberg.org/ideasman42/emacs-idle-highlight-mode
 (package! idle-highlight-mode
   :recipe (:host codeberg :repo "ideasman42/emacs-idle-highlight-mode"))
+
+(package! immersive-translate
+  :recipe (:host github :repo "Elilif/emacs-immersive-translate"))

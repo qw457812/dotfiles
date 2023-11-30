@@ -187,7 +187,7 @@
             (defun your-hook-that-disable-evil-mode-in-go-translate-buffer (&rest _)
               (turn-off-evil-mode)))
   )
-(map! :leader :desc "Translate" :nv "T" #'gts-do-translate)
+;; (map! :leader :desc "Translate" :nv "T" #'gts-do-translate)
 
 ;; FIXME
 ;; (after! google-translate
@@ -300,3 +300,18 @@
 (use-package! idle-highlight-mode
   :config (setq idle-highlight-idle-time 0.2)
   :hook ((prog-mode text-mode) . idle-highlight-mode))
+
+(use-package! immersive-translate)
+;; https://github.com/Elilif/emacs-immersive-translate
+;; (require 'immersive-translate)
+(add-hook 'elfeed-show-mode-hook #'immersive-translate-setup)
+(add-hook 'nov-pre-html-render-hook #'immersive-translate-setup)
+;; use Baidu Translation
+;; (setq immersive-translate-backend 'baidu
+;;       immersive-translate-baidu-appid "your-appid")
+;; use ChatGPT
+;; (setq immersive-translate-backend 'chatgpt
+;;       immersive-translate-chatgpt-host "api.openai.com")
+;; use translate-shell
+(setq immersive-translate-backend 'trans)
+(map! :leader :desc "Translate" :n "T" #'immersive-translate-paragraph)

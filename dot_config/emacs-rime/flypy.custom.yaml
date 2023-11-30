@@ -33,6 +33,8 @@ patch:
       - punct_segmentor
       - fallback_segmentor
     translators:
+      # 中英混输 | https://github.com/rime/home/wiki/RimeWithSchemata
+      # - echo_translator # 沒有其他候選字時，回顯輸入碼
       - punct_translator
       - table_translator
       - lua_translator@date_translator # 使用rime-ice同名的date_translator
@@ -62,10 +64,11 @@ patch:
   # translator/enable_completion: true # 编码提示开关
 
   # 禁用快符中的;f重复上屏功能
-  history:
+  # history:
   #    input: ;f
   #    size: 1 #重复前几次上屏
   #    initial_quality: 1 #首选
+  history: {}
 
   # 初学模式
   # custom_phraseQMZ/user_dict: flypy_full全码字
