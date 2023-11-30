@@ -95,13 +95,13 @@ patch:
       # states: [ 简中, 繁中 ]
     - options: [_keyboard_default, _keyboard_defaultbk, _keyboard_defaultwk]
       reset: 0
-      states: [ 有刻, 半刻, 无刻 ]
+      # states: [ 有刻, 半刻, 无刻 ]
     - name: charset_comment_filter  #字符集提示
       reset: 0  
-      states: [ U区关, U区开 ]
+      # states: [ U区关, U区开 ]
     - name: udpf_switch
       reset: 0
-      states: [ U编关, U编开]
+      # states: [ U编关, U编开]
     - name: ascii_punct
       reset: 0
       states: [ 。，, ．， ]
@@ -110,7 +110,7 @@ patch:
     #   states: [ 词组, 单字 ]
     - options: [_keyboard_default, _keyboard_defaultzj]
       reset: 0
-      states: [ 助记关, 助记开 ]
+      # states: [ 助记关, 助记开 ]
     # - name: fanjian  #繁转简滤镜
     #   reset: 0
     #   states: [ 反繁, 反简 ]
@@ -208,8 +208,8 @@ patch:
       # - { when: composing, accept: '_', toggle: extended_char} # 手机 自定字集开关1
       # - { when: composing, accept: ':', toggle: extended_char} # 手机 自定字集开关2
       # - { when: composing, accept: '"', toggle: chaifen } # 手机 拆分滤镜开关
-      - { when: has_menu, accept: Right, send: Down } # 右方向键 向后移动焦点
-      - { when: has_menu, accept: Left, send: Up } # 左方向键 向前移动焦点
+      # - { when: has_menu, accept: Right, send: Down } # 右方向键 向后移动焦点
+      # - { when: has_menu, accept: Left, send: Up } # 左方向键 向前移动焦点
       # - { when: always, accept: "Control+period" , toggle: ascii_punct } # 中英标点切换
       # - { when: always, accept: "Shift+space" , toggle: full_shape } # 全半角切换
       # 在最近的两个方案之间切换

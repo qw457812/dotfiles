@@ -1,7 +1,8 @@
+# ~/Library/Rime/tiger.custom.yaml
 #下面的 #号 是注释符，注释了就无效了，删掉即可生效
 
 patch:
-  translator/dictionary: tigress.extended #引入增补自定词典，这个不要改动
+  translator/dictionary: tiger.extended #引入增补自定词典，这个不要改动
   #translator/enable_completion: true # 编码提示，默认关闭，删掉行首的#号，即可开启
   #speller/auto_select_pattern: ^;\w+|^\w{4}$  # 四码上屏功能，删掉行首的#号，即可开启
   #speller/alphabet: "['zyxwvutsrqponmlkjihgfedcba]" # 取消分号引导的快符功能（分号不作码元），删掉行首#号即可生效
@@ -69,15 +70,15 @@ patch:
   # rename emoji.json to emoji_cn.json, emoji.txt to emoji_cn.txt
   # ↓emoji表情滤镜
   emoji_cn/opencc_config: emoji_cn.json
-  
+
   switches: # 0 默认关，1 默认开
     - name: ascii_mode
-      # reset: 0
-      reset: 1
+      reset: 0
+      # reset: 1
       states: [ 中文, 西文 ]  #中英文状态
     - name: extended_char  #自定义字集
       reset: 1
-      states: [ 全集 , 常用 ]
+      states: [ 全字集 , 常用字 ]
     - name: pinyin  #拼音滤镜
       reset: 0
       states: [ 拼, pīn ]
@@ -138,6 +139,9 @@ patch:
       - punct_segmentor
       - fallback_segmentor
     translators:
+      # TODO 有的码没有创建候选项，比如xxxxx，和translators顺序有关吗？
+      # 中英混输 | https://github.com/rime/home/wiki/RimeWithSchemata
+      # - echo_translator # 沒有其他候選字時，回顯輸入碼
       - punct_translator
       - reverse_lookup_translator #拼音反查
       - table_translator
@@ -155,19 +159,19 @@ patch:
 
 
     filters:
+      # 对于emacs-rime的坑(emacs-rime deploy 没有生成 core2022.reverse.bin): `env.coredb = ReverseDb("build/core2022.reverse.bin")` | lua/core2022_filter.lua
       # - lua_filter@core2022  #自定义字集过滤lua；放在最上面完美解决简繁滤镜出错的问题
       - lua_filter@*core2022_filter  #自定义字集过滤lua；放在最上面完美解决简繁滤镜出错的问题
       # - lua_filter@dz_ci  #过滤词组lua，单字模式
       # - charset_filter@utf8
       # - charset_filter@gbk
       # - charset_filter@gb2312
-      # - charset_filter@big5
       - simplifier@simplification  #简繁滤镜
-      # - simplifier@fanjian  #繁简滤镜
       # - reverse_lookup_filter@reverse_lookup #反查词典滤镜
-      - simplifier@pinyin  #拼音滤镜
+      # - simplifier@fanjian #繁简滤镜
+      - simplifier@pinyin #拼音滤镜
       - simplifier@chaifen #拆分滤镜
-      - simplifier@emoji_cn  #表情滤镜
+      - simplifier@emoji_cn #表情滤镜
       # - lua_filter@charset_comment_filter #Unicode分区提示滤镜
       - lua_filter@*charset_comment_filter #Unicode分区提示滤镜
       # - lua_filter@lua_unicode_display_filter #Unicode编码显示
@@ -177,9 +181,9 @@ patch:
   key_binder:
     #  import_preset: default
     bindings:
-      #- { when: composing, accept: Return, send: Escape }
-      #- { accept: space, send: space, when: has_menu } #有候选时空格上屏首选
-      #- { accept: space, send: Escape, when: composing } #无候选时(空码)空格清屏
+      #- { when: composing, accept: Return, send: Escape } # 回车清屏编码
+      #- { accept: space, send: space, when: has_menu } # 有候选时空格上屏首选
+      #- { accept: space, send: Escape, when: composing } # 无候选(空码）时空格清屏编码
       - { accept: semicolon, send: 2, when: has_menu } # 分号次选
       - { when: has_menu, accept: apostrophe, send: 3 } # 引号三选
       - { when: composing, accept: Tab, send: Escape } # tab清屏
@@ -210,23 +214,3 @@ patch:
       # - { when: has_menu, accept: Left, send: Up } # 左方向键 向前移动焦点
       # - { when: always, accept: "Control+period" , toggle: ascii_punct } # 中英标点切换
       # - { when: always, accept: "Shift+space" , toggle: full_shape } # 全半角切换
-      # 在最近的两个方案之间切换
-      - { when: always, accept: Control+Shift+bracketleft, select: .next }
-
-  # 虎码秃版\ 鼠须管\ （Mac）/squirrel.custom.yaml
-  style/comment_font_face: "Consolas, Apple Color Emoji, TumanPUA, LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16" # 注字体及大小
-  style/comment_font_point: 16 #滤镜字号
-  style/font_face: "Consolas, Apple Color Emoji, LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16" # 候选词字体
-  style/font_point: 16 #主字体字号（候选字词大小）
-  style/inline_preedit: true #鼠须管开嵌入在QQ上可能会有点问题，这里可改为 true 关闭嵌入模式
-  style/label_font_face: "LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16" #候选词编号字体
-  style/label_font_point: 16 #标号字号（候选编号大小）
-  style/layout/min_width: 85
-  style/corner_radius: 5 # 候选条圆角
-  style/hilited_corner_radius: 5 # 选中框（高亮） 圆角半径
-  style/line_spacing: 8 # 行间距
-  style/hilite_spacing: 6
-  style/spacing: 12 # 拼音与候选项之间的距离 （inline_preedit: false）
-  # 鼠须管盲打，嵌入首选
-  # style/alpha: 0.0001 # 隐藏候选框只需将alpha设为0.00001即可 | https://github.com/rime/squirrel/issues/576
-  # style/inline_candidate: true # https://github.com/rime/squirrel/pull/577

@@ -26,6 +26,12 @@
 ;; https://github.com/mathiasbynens/dotfiles/blob/main/.macos
 ;; defaults write NSGlobalDomain KeyRepeat -int 1
 ;; defaults write NSGlobalDomain InitialKeyRepeat -int 10
+;; https://gist.github.com/mbinna/2357277
+;; defaults write NSGlobalDomain KeyRepeat -int 0.02
+;; defaults write NSGlobalDomain InitialKeyRepeat -int 12
+;; my config
+;; defaults write NSGlobalDomain KeyRepeat -int 1
+;; defaults write NSGlobalDomain InitialKeyRepeat -int 14
 {:profiles  {:Goku
              {:default true :sim 30 :delay 250 :alone 250 :held 250}} ; my config
 
@@ -222,13 +228,13 @@
            ;; [:spacebar :!Sspacebar]
            [:return_or_enter :!Sreturn_or_enter]
            [:tab :!Stab]
-           [:home :!Shome]
-           [:end :!Send]
+           [:home :!Shome :!glove80]
+           [:end :!Send :!glove80]
            [:page_up :!Spage_up]
            [:page_down :!Spage_down]
 
-           [:escape :!Sescape :!hhkb-bt]
-           [:grave_accent_and_tilde :!Sgrave_accent_and_tilde :!hhkb-bt]
+           [:escape :!Sescape [:!hhkb-bt :!glove80]]
+           [:grave_accent_and_tilde :!Sgrave_accent_and_tilde [:!hhkb-bt :!glove80]]
            ;; [:delete_or_backspace :!Sdelete_or_backspace :macbook-internal]
            [:delete_or_backspace :!Sdelete_or_backspace [:!hhkb-bt :!glove80]]
 
@@ -252,6 +258,10 @@
            ;; Glove80 only
            [:down_arrow :!Sup_arrow :glove80] ; see "For Glove80" below
            [:up_arrow :!Sdown_arrow :glove80] ; see "For Glove80" below
+           [:home :!Sequal_sign :glove80] ; see "For Glove80" below
+           [:end :!Shyphen :glove80] ; see "For Glove80" below
+           [:escape :!Sgrave_accent_and_tilde :glove80] ; see "For Glove80" below
+           [:grave_accent_and_tilde :left_shift :glove80] ; see "For Glove80" below
            ;; 左右互击
            [:delete_or_backspace :!Cspacebar :glove80] ; raycast
            [:left_shift :delete_forward :glove80] ; delete_forward, see "For Glove80" below
@@ -313,27 +323,13 @@
            ;; [:spacebar :!Sspacebar]
            [:return_or_enter :!Sreturn_or_enter]
            [:tab :!Stab]
-           [:home :!Shome]
-           [:end :!Send]
+           [:home :!Sequal_sign] ; see "For Glove80" below
+           [:end :!Shyphen] ; see "For Glove80" below
            [:page_up :!Spage_up]
            [:page_down :!Spage_down]
-
-           [:escape :!Sescape :!hhkb-bt]
-           [:grave_accent_and_tilde :!Sgrave_accent_and_tilde :!hhkb-bt]
-           ;; [:delete_or_backspace :!Sdelete_or_backspace :macbook-internal]
-           ;; [:delete_or_backspace :!Sdelete_or_backspace :!hhkb-bt]
-
-           ;; see "For Not HHKB" below
-           [:caps_lock :!Sescape :!hhkb-bt]
-
-           ;; see "For Neither HHKB nor Apple-Internal-Keyboard" below
-           ;; [:delete_or_backspace :!Sbackslash [:!hhkb-bt :!macbook-internal]]
-
-           ;; see "For HHKB" below
-           [:escape :!Sgrave_accent_and_tilde :hhkb-bt]
-           [:grave_accent_and_tilde :!Sescape :hhkb-bt]
-           [:delete_or_backspace :!Sbackslash :hhkb-bt] ; left_shift+delete -> |
-           [:left_control :!Sescape :hhkb-bt] ; shift+esc for IntelliJ IDEA, Raycast
+           [:escape :!Sgrave_accent_and_tilde] ; see "For Glove80" below
+           ;; [:grave_accent_and_tilde :!Sgrave_accent_and_tilde]
+           [:grave_accent_and_tilde :vk_none] ; see "For Glove80" below
 
            ;; see "Preview: doomemacs like keybindings" below
            [:w :!C0 :Preview] ; Actual Size (doomemacs pdf-view-fit-width-to-window)
@@ -1071,7 +1067,7 @@
            [:0 :!CS0]
            [:hyphen :!CShyphen]
            [:equal_sign :!CSequal_sign]
-           [:w :!CSw [:!Chrome :!Safari]] ; accidentally close all tabs
+           [:w :!CSw [:!Chrome :!Safari :!CitrixViewer]] ; accidentally close all tabs
            [:e :!CSe]
            [:r :!CSr]
            [:t :!CSt]
@@ -1579,6 +1575,10 @@
 
   {:des   "For Glove80\n- backspace to space"
    :rules [:glove80
+           ;; TODO temp
+           [:!Wdelete_or_backspace [:open "$HOME/Applications/PyCharm Community Edition.app"] :!PyCharm]
+           [:!Wdelete_or_backspace :same_wind_app :PyCharm]
+
            ;; TODO delete cmd-c cmd-v rime ` = \ [ ]
            ;; TODO when need to be `:#P` instead of `:##`
            [:##delete_or_backspace :spacebar]
@@ -1592,9 +1592,14 @@
            [:##right_option :right_option nil {:alone [:hs ["mouseCenterClickThenMaximizeWindow"]]}]
            [:##up_arrow :down_arrow]
            [:##down_arrow :up_arrow]
+           [:##home :equal_sign]
+           [:##end :hyphen]
+           [:##escape :grave_accent_and_tilde]
+           [:##grave_accent_and_tilde :left_shift]
 
            ;; [:##left_control :left_control nil {:alone :tab}]
            [:##left_control :left_control nil {:alone :prev_app}]
+           ;; TODO
            [:!T##j :down_arrow]
            [:!T##k :up_arrow]
            [:!T##h :left_arrow]
