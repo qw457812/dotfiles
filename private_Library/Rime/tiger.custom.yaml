@@ -2268,3 +2268,14 @@ patch:
 # Files 虎码秃版 鼠须管 （Mac）2023.10.22/tigress.dict.yaml and 虎码秃版 鼠须管 （Mac）2023.11.09/tigress.dict.yaml differ
 # Files 虎码秃版 鼠须管 （Mac）2023.10.22/tigress_ci.dict.yaml and 虎码秃版 鼠须管 （Mac）2023.11.09/tigress_ci.dict.yaml differ
 # Files 虎码秃版 鼠须管 （Mac）2023.10.22/tigress_simp_ci.dict.yaml and 虎码秃版 鼠须管 （Mac）2023.11.09/tigress_simp_ci.dict.yaml differ
+# ------------------------------------------------------------------------------------------
+# 虎码秃版 鼠须管 （Mac）2023.11.28.zip (18.0MB) | 鼠须管 | ④Mac | 03 虎码输入法下载 | http://huma.ysepan.com/
+# ------------------------------------------------------------------------------------------
+# ❯ diff --brief --recursive 虎码秃版\ 鼠须管\ （Mac）2023.11.09 虎码秃版\ 鼠须管\ （Mac）2023.11.28
+# Files 虎码秃版 鼠须管 （Mac）2023.11.09/core2022.dict.yaml and 虎码秃版 鼠须管 （Mac）2023.11.28/core2022.dict.yaml differ
+# Files 虎码秃版 鼠须管 （Mac）2023.11.09/opencc/hu_cf.txt and 虎码秃版 鼠须管 （Mac）2023.11.28/opencc/hu_cf.txt differ
+# Files 虎码秃版 鼠须管 （Mac）2023.11.09/symbols.yaml and 虎码秃版 鼠须管 （Mac）2023.11.28/symbols.yaml differ
+# Files 虎码秃版 鼠须管 （Mac）2023.11.09/tiger.dict.yaml and 虎码秃版 鼠须管 （Mac）2023.11.28/tiger.dict.yaml differ
+# Files 虎码秃版 鼠须管 （Mac）2023.11.09/tigress.dict.yaml and 虎码秃版 鼠须管 （Mac）2023.11.28/tigress.dict.yaml differ
+# Files 虎码秃版 鼠须管 （Mac）2023.11.09/tigress_ci.dict.yaml and 虎码秃版 鼠须管 （Mac）2023.11.28/tigress_ci.dict.yaml differ
+# Files 虎码秃版 鼠须管 （Mac）2023.11.09/tigress_simp_ci.dict.yaml and 虎码秃版 鼠须管 （Mac）2023.11.28/tigress_simp_ci.dict.yaml differ
