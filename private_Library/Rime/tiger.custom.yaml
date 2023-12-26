@@ -2279,3 +2279,21 @@ patch:
 # Files 虎码秃版 鼠须管 （Mac）2023.11.09/tigress.dict.yaml and 虎码秃版 鼠须管 （Mac）2023.11.28/tigress.dict.yaml differ
 # Files 虎码秃版 鼠须管 （Mac）2023.11.09/tigress_ci.dict.yaml and 虎码秃版 鼠须管 （Mac）2023.11.28/tigress_ci.dict.yaml differ
 # Files 虎码秃版 鼠须管 （Mac）2023.11.09/tigress_simp_ci.dict.yaml and 虎码秃版 鼠须管 （Mac）2023.11.28/tigress_simp_ci.dict.yaml differ
+# ------------------------------------------------------------------------------------------
+# ❯ cat 必看！\ 虎码秃版\ 全功能介绍+挂接教程\ 2023.11.28/【答疑】如何关闭竖排候选自动倒序.txt
+# 目前只有小狼毫内有效
+# 
+# 当你使用竖排候选时（默认就是竖排）
+# 候选框位于屏幕底部 且 候选的个数较多时，会自动倒序排列候选项
+# 目的是为了使 首选项 始终离焦点最近
+# 
+# 如果你想关闭此功能
+# 单字版找到  tiger.custom.yaml
+# 字词版找到  tigress.custom.yaml
+# 
+# 搜索「自动倒序」，找到下方内容：
+#   # 竖排候选框，自动倒序
+#   #style/vertical_auto_reverse: false # 默认是会自动倒序的，若想关闭，把该行行首的#删掉
+# 
+# 把  #style/vertical_auto_reverse  前面的 『#』删掉
+# 保存文件后，再重新部署即可生效%
