@@ -1,0 +1,9 @@
+# https://pwmt.org/projects/zathura/documentation/
+# https://pwmt.org/projects/girara/options/
+
+# https://github.com/zegervdv/homebrew-zathura#copying-to-clipboard
+set selection-clipboard clipboard
+
+# https://gist.github.com/agzam/76d761804330cc8c4600fccda952ed1c
+set window-height 3000
+set window-width 3000
