@@ -77,3 +77,6 @@
 
 (package! immersive-translate
   :recipe (:host github :repo "Elilif/emacs-immersive-translate"))
+
+(package! mermaid-mode
+  :recipe (:host github :repo "abrochard/mermaid-mode"))
