@@ -1,0 +1,17 @@
+{
+    "j": "cmd:cmd_nextMsg",
+    "k": "cmd:cmd_previousMsg",
+    "o": "cmd:cmd_openMessage",
+    "f": "cmd:cmd_forward",
+    "#": "cmd:cmd_delete",
+    "r": "cmd:cmd_reply",
+    "a": "cmd:cmd_replyall",
+    "x": "cmd:cmd_archive",
+    "c": "func:MsgNewMessage",
+    "esc": "tbkeys:closeMessageAndRefresh",
+    "/": "cmd:cmd_showQuickFilterBar",
+    "u": "window.gTabmail.currentAboutMessage.getMessagePaneBrowser().contentWindow.scrollBy(0, -100)",
+    "d": "window.gTabmail.currentAboutMessage.getMessagePaneBrowser().contentWindow.scrollBy(0, 100)",
+    "h": "window.document.getElementById('tabmail-tabs').advanceSelectedTab(-1, true)",
+    "l": "window.document.getElementById('tabmail-tabs').advanceSelectedTab(1, true)"
+}
