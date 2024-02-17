@@ -54,12 +54,6 @@ patch:
   #style/label_font_face: "LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
   #style/label_font_point: 15 #候选前编号标志字号
 
-  # 以下是解决 新狼毫候选框响应慢 的方法，删除下面四行前面的#号即可生效
-  #style/color_font: false
-  #style/font_face: LXGW WenKai GB Screen R
-  #style/comment_font_face: LXGW WenKai GB Screen R
-  #style/label_font_face: LXGW WenKai GB Screen R
-
   # 去除拼音滤镜的括号，如对括号有需求，可在下面5行前面加上#号注释掉
   #pinyin/comment_format:
    #- 'xform/&nbsp;/ /'
@@ -2421,4 +2415,15 @@ patch:
 # └── 字体说明.txt
 # 
 # 3 directories, 25 files
+# ------------------------------------------------------------------------------------------
+# 
+# ------------------------------------------------------------------------------------------
+# 虎码秃版 鼠须管 （Mac）2024新春版.zip (18.0MB) | 鼠须管 | ④Mac | 03 虎码输入法下载 | http://huma.ysepan.com/
+# ------------------------------------------------------------------------------------------
+# ❯ diff --brief --recursive 虎码秃版\ 鼠须管\ （Mac）2024.01.07 虎码秃版\ 鼠须管\ （Mac）2024新春版
+# Files 虎码秃版 鼠须管 （Mac）2024.01.07/PY_c.dict.yaml and 虎码秃版 鼠须管 （Mac）2024新春版/PY_c.dict.yaml differ
+# Files 虎码秃版 鼠须管 （Mac）2024.01.07/opencc/hu_cf.txt and 虎码秃版 鼠须管 （Mac）2024新春版/opencc/hu_cf.txt differ
+# Files 虎码秃版 鼠须管 （Mac）2024.01.07/symbols.yaml and 虎码秃版 鼠须管 （Mac）2024新春版/symbols.yaml differ
+# Files 虎码秃版 鼠须管 （Mac）2024.01.07/tiger.custom.yaml and 虎码秃版 鼠须管 （Mac）2024新春版/tiger.custom.yaml differ
+# Files 虎码秃版 鼠须管 （Mac）2024.01.07/tigress.custom.yaml and 虎码秃版 鼠须管 （Mac）2024新春版/tigress.custom.yaml differ
 # ------------------------------------------------------------------------------------------
