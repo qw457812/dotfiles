@@ -3,7 +3,7 @@
 # 新增文件:
 #   double_pinyin_flypy.custom.yaml
 #   custom_phrase_double.txt # 空文件
-#   my_eng.dict.yaml # 小鹤双拼中英混输
+#   # my_eng.dict.yaml # 小鹤双拼中英混输 --->  # 废弃: 2024-02-04    commit 0017a08e42b97218a0c68724cf9d2e3081357ce5
 # 修改文件:
 #   default.custom.yaml
 #   melt_eng.custom.yaml # 小鹤双拼中英混输
@@ -56,4 +56,4 @@ patch:
   # [双拼的补丁示例 | 常见问题 · Issue #133 · iDvel/rime-ice](https://github.com/iDvel/rime-ice/issues/133)
   # 因为 melt_eng.dict.yaml 不能打补丁，所以创建另外一个 my_eng.dict.yaml 文件并修改引入的地方。
   # 改为挂载刚创建的 my_eng.dict.yaml
-  melt_eng/dictionary: my_eng
+  # melt_eng/dictionary: my_eng # commit 0017a08e42b97218a0c68724cf9d2e3081357ce5    2024-02-04    BREAKING CHANGE: 中英混输词库由英文方案附属切换到单独的 table_translator    - 词库文件由 `cn_en*.dict.yaml` 变为 `cn_en*.txt`    - 双拼不再需要去 `melt_eng.dict.yaml` 更改引用词库
