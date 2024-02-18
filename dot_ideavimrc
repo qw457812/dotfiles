@@ -286,6 +286,9 @@ map <leader>bK <Action>(CloseAllEditors)
 map <leader>bo <Action>(CloseAllEditorsButActive)
 map <leader>bn <Action>(NextTab)
 map <leader>bp <Action>(PreviousTab)
+map <leader>cc <Action>(copilot.chat.show)
+map <leader>cD <Action>(copilot.disableCopilot)
+map <leader>cE <Action>(copilot.enableCopilot)
 map <leader>ch :action CallHierarchy<CR>
 map <leader>cL <Action>(copilot.loginGitHub)
 map <leader>cp <Action>(CopyAbsolutePath)
@@ -398,7 +401,8 @@ map <TAB> <Action>(CodeCompletion)
 " TODO 仅map <CR>影响重命名时的回车确认
 map <leader><CR> <Action>(EditorCompleteStatement)
 " quick fix
-map <leader><leader> <Action>(ShowIntentionActions)
+" keys: https://ideavim.sourceforge.net/vim/intro.html
+map <leader><Space> <Action>(ShowIntentionActions)
 " TODO map <leader><TAB>
 
 " https://gist.github.com/PisecesPeng/9fabf2a1c1834bd35bf02c2bcb904708
