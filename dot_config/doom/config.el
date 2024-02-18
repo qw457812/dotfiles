@@ -298,9 +298,9 @@
 
 ;; FIXME 无法区分 idle-highlight 与 evil-visual-state 的高亮
 ;; https://codeberg.org/ideasman42/emacs-idle-highlight-mode
-(use-package! idle-highlight-mode
-  :config (setq idle-highlight-idle-time 0.2)
-  :hook ((prog-mode text-mode) . idle-highlight-mode))
+;; (use-package! idle-highlight-mode
+;;   :config (setq idle-highlight-idle-time 0.2)
+;;   :hook ((prog-mode text-mode) . idle-highlight-mode))
 
 (use-package! immersive-translate)
 ;; https://github.com/Elilif/emacs-immersive-translate
