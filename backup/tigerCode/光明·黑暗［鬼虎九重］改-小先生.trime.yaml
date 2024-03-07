@@ -1088,15 +1088,15 @@ preset_keyboards:
       # - {click: 9, key_text_size: 14,key_back_color: TEX, width: 14, label: 9, composing: JXX, long_click: "]", key_text_color: TEX, key_symbol_color: TEX, hilited_key_back_color: CCH, hilited_key_text_color: CXH, key_border_color: BKYS, hilited_key_symbol_color: CSH}
       # - {click: 0, key_text_size: 14,key_back_color: TEX, width: 15, label: 0, long_click: "|", swipe_up: '<', swipe_down: '>', composing: Page_Down1, key_text_color: TEX, key_symbol_color: TEX, hilited_key_back_color: CCH, key_border_color: BKYS, hilited_key_text_color: AXH, hilited_key_symbol_color: ASH}
 
-      - {height: 40, click: 1, key_text_size: 14,key_back_color: TEX, width: 10, label: 1, composing: Page_Up2, long_click: "[", key_text_color: TEX, key_symbol_color: TEX, hilited_key_back_color: CCH, hilited_key_text_color: AXH, key_border_color: BKYS, hilited_key_symbol_color: ASH}
+      - {height: 40, click: 1, key_text_size: 14,key_back_color: TEX, width: 10, label: 1, composing: Page_Up2, long_click: "[", swipe_up: "[]{Left}", key_text_color: TEX, key_symbol_color: TEX, hilited_key_back_color: CCH, hilited_key_text_color: AXH, key_border_color: BKYS, hilited_key_symbol_color: ASH}
       - {click: 2, key_text_size: 14,key_back_color: TEX, width: 10, label: 2, long_click: "]", key_text_color: TEX, key_symbol_color: TEX, hilited_key_back_color: CCH, hilited_key_text_color: BXH, key_border_color: BKYS, hilited_key_symbol_color: BSH}
-      - {click: 3, key_text_size: 14,key_back_color: TEX, width: 10, label: 3, long_click: '{', key_text_color: TEX, key_symbol_color: TEX, hilited_key_back_color: CCH, hilited_key_text_color: CXH, key_border_color: BKYS, hilited_key_symbol_color: CSH}
+      - {click: 3, key_text_size: 14,key_back_color: TEX, width: 10, label: 3, long_click: '{', swipe_up: "{}{Left}", key_text_color: TEX, key_symbol_color: TEX, hilited_key_back_color: CCH, hilited_key_text_color: CXH, key_border_color: BKYS, hilited_key_symbol_color: CSH}
       - {click: 4, key_text_size: 14,key_back_color: TEX, width: 10, label: 4, long_click: '}', key_text_color: TEX, key_symbol_color: TEX, hilited_key_back_color: CCH, hilited_key_text_color: AXH, key_border_color: BKYS, hilited_key_symbol_color: ASH}
       - {click: 5, key_text_size: 14,key_back_color: TEX, width: 10, label: 5, long_click: q_zhuuji, key_text_color: TEX, key_symbol_color: TEX, hilited_key_back_color: CCH, hilited_key_text_color: BXH, key_border_color: BKYS, hilited_key_symbol_color: BSH}
       - {click: 6, key_text_size: 14,key_back_color: TEX, width: 10, label: 6, long_click: _Keyboard_clip_script, key_text_color: TEX, key_symbol_color: TEX, hilited_key_back_color: CCH, hilited_key_text_color: CXH, key_border_color: BKYS, hilited_key_symbol_color: CSH}
-      - {click: 7, key_text_size: 14,key_back_color: TEX, width: 10, label: 7, long_click: '<', key_text_color: TEX, key_symbol_color: TEX, hilited_key_back_color: CCH, hilited_key_text_color: AXH, key_border_color: BKYS, hilited_key_symbol_color: ASH}
+      - {click: 7, key_text_size: 14,key_back_color: TEX, width: 10, label: 7, long_click: '<', swipe_up: "<>{Left}", key_text_color: TEX, key_symbol_color: TEX, hilited_key_back_color: CCH, hilited_key_text_color: AXH, key_border_color: BKYS, hilited_key_symbol_color: ASH}
       - {click: 8, key_text_size: 14,key_back_color: TEX, width: 10, label: 8, long_click: '>', key_text_color: TEX, key_symbol_color: TEX, hilited_key_back_color: CCH, hilited_key_text_color: BXH, key_border_color: BKYS, hilited_key_symbol_color: BSH}
-      - {click: 9, key_text_size: 14,key_back_color: TEX, width: 10, label: 9, long_click: "(", key_text_color: TEX, key_symbol_color: TEX, hilited_key_back_color: CCH, hilited_key_text_color: CXH, key_border_color: BKYS, hilited_key_symbol_color: CSH}
+      - {click: 9, key_text_size: 14,key_back_color: TEX, width: 10, label: 9, long_click: "(", swipe_up: "(){Left}", key_text_color: TEX, key_symbol_color: TEX, hilited_key_back_color: CCH, hilited_key_text_color: CXH, key_border_color: BKYS, hilited_key_symbol_color: CSH}
       - {click: 0, key_text_size: 14,key_back_color: TEX, width: 10, label: 0, composing: Page_Down2, long_click: ")", key_text_color: TEX, key_symbol_color: TEX, hilited_key_back_color: CCH, key_border_color: BKYS, hilited_key_text_color: AXH, hilited_key_symbol_color: ASH}
 
       - {click: q, long_click: "~", swipe_up: "1", key_text_color: TEX, key_symbol_color: TEX,  key_border_color: BKYS, key_back_color: QQQ}
@@ -1157,7 +1157,8 @@ preset_keyboards:
       # ❹swipe_up: _Keyboard_emoji, 
       # - {height: *KGGD, click: "q_zb", swipe_right: Menu, label: "标点",key_text_size: 14, swipe_up: q_xd, has_menu: SSX, long_click: IME_switch, key_back_color: sza, key_text_color: szt, key_symbol_color: szs, hilited_key_back_color: 123, key_border_color: BKYSS, width: 17}
       # - {height: *KGGD, click: "q_zb", swipe_right: Menu, label: "符号",key_text_size: 14, swipe_up: q_xd, composing: Page_Down1, long_click: IME_switch, key_back_color: sza, key_text_color: szt, key_symbol_color: szs, hilited_key_back_color: 123, key_border_color: BKYSS, width: 14}
-      - {height: *KGGD, click: IME_switch, swipe_right: Menu, key_text_size: 14, swipe_up: q_xd, composing: SX, long_click: "q_zb", key_back_color: sza, key_text_color: szt, key_symbol_color: szs, hilited_key_back_color: 123, key_border_color: BKYSS, width: 14}
+      # - {height: *KGGD, click: IME_switch, swipe_right: Menu, key_text_size: 14, swipe_up: q_xd, composing: SX, long_click: "q_zb", key_back_color: sza, key_text_color: szt, key_symbol_color: szs, hilited_key_back_color: 123, key_border_color: BKYSS, width: 14}
+      - {height: *KGGD, click: IME_last, swipe_right: Menu, key_text_size: 14, swipe_up: q_xd, composing: SX, long_click: IME_switch, key_back_color: sza, key_text_color: szt, key_symbol_color: szs, hilited_key_back_color: 123, key_border_color: BKYSS, width: 14}
       # - {click: ",", label: " ，", key_text_size: 12, long_click: "!", swipe_up: "!", composing: SX, key_back_color: zbd, key_text_color: bdt, key_symbol_color: bds, hilited_key_back_color: fxx, key_border_color: BKYSS, width: 13}
       # 取消三选，逗号标顶
       - {click: ",", label: " ，", key_text_size: 12, long_click: "!", swipe_up: "!", key_back_color: zbd, key_text_color: bdt, key_symbol_color: bds, hilited_key_back_color: fxx, key_border_color: BKYSS, width: 13}
@@ -1879,6 +1880,9 @@ preset_keys:
   q_xd: {label: "菜单", send: Eisu_toggle, select: "menu"}
   Menu: {label: ✡, functional: false, send: Menu} #方案选单
   IME_switch: {label: ⌨, functional: false, send: LANGUAGE_SWITCH} #输入法
+  # IME_switch: {label: 🌐, send: LANGUAGE_SWITCH} #彈出對話框選擇輸入法
+  IME_last: {label: 🌐, send: LANGUAGE_SWITCH, select: .last} #直接切換到上一輸入法
+  IME_next: {label: 下一輸入法, send: LANGUAGE_SWITCH, select: .next} #直接切換到下一輸入法
   Deploy: {label: ♻, functional: false, send: function, command: broadcast, option: "com.osfans.trime.deploy"} #部署
   Full_Half: {toggle: full_shape, send: Mode_switch, states: [ ◖, ● ]}
   Full_Half1: {toggle: full_shape, functional: false, text: "{Full_Half}{K_back}", send: Mode_switch, states: [ ◐, ● ]}
