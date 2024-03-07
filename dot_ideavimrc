@@ -239,8 +239,10 @@ map <M-k> <Action>(MoveStatementUp)
 " behaves like Vimium (with goku vim-s-mode rules)
 map <up> <Action>(MethodUp)
 map <down> <Action>(MethodDown)
-map <left> <Action>(JumpToLastChange)
-map <right> <Action>(JumpToNextChange)
+" map <left> <Action>(JumpToLastChange)
+map <left> <C-o>
+" map <right> <Action>(JumpToNextChange)
+map <right> <C-i>
 
 " github copilot <TAB> (behaves like zsh-autosuggestions)
 imap <C-l> <Action>(copilot.applyInlays)
@@ -287,6 +289,7 @@ map <leader>bo <Action>(CloseAllEditorsButActive)
 map <leader>bn <Action>(NextTab)
 map <leader>bp <Action>(PreviousTab)
 map <leader>cc <Action>(copilot.chat.show)
+map <leader>cC <Action>(de.netnexus.CamelCasePlugin.ToggleCamelCase)
 map <leader>cD <Action>(copilot.disableCopilot)
 map <leader>cE <Action>(copilot.enableCopilot)
 map <leader>ch :action CallHierarchy<CR>
@@ -321,6 +324,7 @@ map <Leader>gs :action GotoSymbol<CR>
 map <leader>hu <Action>(HighlightUsagesInFile)
 map <leader>hl <Action>(HighlightUsagesInFile)
 map <leader>hw <Action>(HideAllWindows)
+map <leader>ic <Action>(IntroduceConstant)
 map <leader>im <Action>(ImplementMethods)
 map <leader>iv <Action>(IntroduceVariable)
 " Reformat the current line only

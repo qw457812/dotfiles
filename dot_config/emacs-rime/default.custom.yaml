@@ -1,9 +1,9 @@
 # https://github.com/DogLooksGood/emacs-rime#%E9%87%8D%E6%96%B0%E9%83%A8%E7%BD%B2
 patch:
   schema_list:
-    - schema: flypy   # 小鹤音形
+    # - schema: flypy   # 小鹤音形
     - schema: tiger   # 虎码官方单字
-    - schema: tigress # 虎码官方词库
+    # - schema: tigress # 虎码官方词库
   menu/page_size: 5 # 每页显示5个候选字词。
   switcher:
     hotkeys:
