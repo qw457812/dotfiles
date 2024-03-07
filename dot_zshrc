@@ -189,9 +189,6 @@ alias cnpm="npm --registry=https://registry.npmmirror.com \
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
-# https://sourceforge.net/projects/sshpass/
-export PATH="$PATH:$HOME/Tools/sshpass/1.10/bin"
-
 # https://github.com/pyenv/pyenv#set-up-your-shell-environment-for-pyenv
 export PYENV_ROOT="$HOME/.pyenv"
 command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"

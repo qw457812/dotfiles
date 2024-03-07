@@ -45,13 +45,13 @@ patch:
   #style/vertical_auto_reverse: false # 默认是会自动倒序的，若想关闭，把该行行首的#删掉
 
   # #候选字体
-  #style/font_face: "Consolas, Segoe UI Emoji, Noto Color Emoji, LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
+  #style/font_face: "Consolas, Segoe UI Emoji, Noto Color Emoji, LXGW WenKai GB Screen, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
   #style/font_point: 15 #主字体字号
   # #滤镜内容字体
-  #style/comment_font_face: "Consolas, Segoe UI Emoji, Noto Color Emoji, TumanPUA, LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
+  #style/comment_font_face: "Consolas, Segoe UI Emoji, Noto Color Emoji, TumanPUA, LXGW WenKai GB Screen, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
   #style/comment_font_point: 15 # 滤镜内容字号
   # #候选前编号标志字体
-  #style/label_font_face: "LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
+  #style/label_font_face: "LXGW WenKai GB Screen, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
   #style/label_font_point: 15 #候选前编号标志字号
 
   # 去除拼音滤镜的括号，如对括号有需求，可在下面5行前面加上#号注释掉
@@ -2426,4 +2426,50 @@ patch:
 # Files 虎码秃版 鼠须管 （Mac）2024.01.07/symbols.yaml and 虎码秃版 鼠须管 （Mac）2024新春版/symbols.yaml differ
 # Files 虎码秃版 鼠须管 （Mac）2024.01.07/tiger.custom.yaml and 虎码秃版 鼠须管 （Mac）2024新春版/tiger.custom.yaml differ
 # Files 虎码秃版 鼠须管 （Mac）2024.01.07/tigress.custom.yaml and 虎码秃版 鼠须管 （Mac）2024新春版/tigress.custom.yaml differ
+# ------------------------------------------------------------------------------------------
+# 
+# ------------------------------------------------------------------------------------------
+# 虎码秃版 鼠须管 （Mac）2024.02.25.zip (18.0MB) | 鼠须管 | ④Mac | 03 虎码输入法下载 | http://huma.ysepan.com/
+# ------------------------------------------------------------------------------------------
+# ❯ diff --brief --recursive 虎码秃版\ 鼠须管\ （Mac）2024新春版 虎码秃版\ 鼠须管\ （Mac）2024.02.25
+# Files 虎码秃版 鼠须管 （Mac）2024新春版/core2022.dict.yaml and 虎码秃版 鼠须管 （Mac）2024.02.25/core2022.dict.yaml differ
+# Files 虎码秃版 鼠须管 （Mac）2024新春版/squirrel.custom.yaml and 虎码秃版 鼠须管 （Mac）2024.02.25/squirrel.custom.yaml differ
+# Files 虎码秃版 鼠须管 （Mac）2024新春版/tiger.custom.yaml and 虎码秃版 鼠须管 （Mac）2024.02.25/tiger.custom.yaml differ
+# Files 虎码秃版 鼠须管 （Mac）2024新春版/tiger.dict.yaml and 虎码秃版 鼠须管 （Mac）2024.02.25/tiger.dict.yaml differ
+# Files 虎码秃版 鼠须管 （Mac）2024新春版/tigress.custom.yaml and 虎码秃版 鼠须管 （Mac）2024.02.25/tigress.custom.yaml differ
+# Files 虎码秃版 鼠须管 （Mac）2024新春版/tigress.dict.yaml and 虎码秃版 鼠须管 （Mac）2024.02.25/tigress.dict.yaml differ
+# Files 虎码秃版 鼠须管 （Mac）2024新春版/tigress_ci.dict.yaml and 虎码秃版 鼠须管 （Mac）2024.02.25/tigress_ci.dict.yaml differ
+# Files 虎码秃版 鼠须管 （Mac）2024新春版/tigress_simp_ci.dict.yaml and 虎码秃版 鼠须管 （Mac）2024.02.25/tigress_simp_ci.dict.yaml differ
+# ------------------------------------------------------------------------------------------
+# ❯ tree 虎码方案必装字体\ 2024.03.04
+# 虎码方案必装字体 2024.03.04
+# ├── LXGWWenKaiGBScreen.ttf
+# ├── NotoColorEmoji-Regular.ttf
+# ├── Segoe UI Emoji.ttf
+# ├── TH-Tshyn-4.1.0（Mac）
+# │   ├── IE_font-link.reg
+# │   ├── Office_font-link.reg
+# │   ├── ReadMe(English).html
+# │   ├── SurrogateFallback.reg
+# │   ├── SystemLink.reg
+# │   ├── TH-Times.ttc
+# │   ├── TH-Tshyn-P0.ttf
+# │   ├── TH-Tshyn-P1.ttf
+# │   ├── TH-Tshyn-P16.ttf
+# │   ├── TH-Tshyn-P2.ttf
+# │   ├── 安装使用前必读(简中).html
+# │   ├── 安裝使用前必讀(繁中).html
+# │   ├── 인스톨·사용 전에 필독(한국어).html
+# │   └── インストール・使用前に必読(日本語).html
+# ├── TumanPUA.ttf
+# ├── Win系统宋体升级包 2023.12
+# │   ├── simsun.ttc
+# │   ├── simsunb.ttf
+# │   ├── simsung.ttf
+# │   ├── 安装说明.txt
+# │   ├── 安装字体（以管理员身份运行）.bat
+# │   └── 恢复原始字体（以管理员身份运行）.bat
+# └── 字体说明.txt
+# 
+# 3 directories, 25 files
 # ------------------------------------------------------------------------------------------
