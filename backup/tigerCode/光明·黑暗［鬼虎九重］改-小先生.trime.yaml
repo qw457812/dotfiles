@@ -2021,7 +2021,8 @@ preset_keys:
 
   t_ladk: {label: "▶拉丁: /a-z　　　　▶拉丁大写: /ld[a-z]", functional: false}
 
-  redo: {label: ↷, functional: false, send: Control+y} #下一步
+  redo: {label: 重做, functional: false, send: Control+y} #下一步
+  redo1: {label: ↷, functional: false, send: Control+y} #下一步
   undo: {label: 撤销, functional: false, send: Control+z} #撤销
   Home: {label: ⇤, send: Home, functional: false}
   End: {label: ⇥, send: End, functional: false} #行尾
