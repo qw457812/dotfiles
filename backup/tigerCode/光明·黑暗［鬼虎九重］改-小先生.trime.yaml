@@ -116,7 +116,7 @@ style:
   key_long_text_size: 12 #两字以上时键字号
   key_text_size: 16 #键字号
   key_width: 10.0 #键宽，占银幕宽的百分比
-  keyboards: [.default, default_land, qtyw, menu, qtlssz, qtsz, qtzb, qtzb2, defaultzj, defaultwk, defaultbk] #声明
+  keyboards: [.default, default_land, qtyw, menu, qtlssz, qtsz, qtzb, qtzb2, defaultzj, defaultwk, defaultbk, number, symbols, emoji, _edit_board] #声明
   label_text_size: 14 #悬浮窗序号字号
   latin_locale: en_US #西文语言
   locale: zh_CN #预设语言
@@ -1160,7 +1160,7 @@ preset_keyboards:
       # - {height: *KGGD, click: "q_zb", swipe_right: Menu, label: "标点",key_text_size: 14, swipe_up: q_xd, has_menu: SSX, long_click: IME_switch, key_back_color: sza, key_text_color: szt, key_symbol_color: szs, hilited_key_back_color: 123, key_border_color: BKYSS, width: 17}
       # - {height: *KGGD, click: "q_zb", swipe_right: Menu, label: "符号",key_text_size: 14, swipe_up: q_xd, composing: Page_Down1, long_click: IME_switch, key_back_color: sza, key_text_color: szt, key_symbol_color: szs, hilited_key_back_color: 123, key_border_color: BKYSS, width: 14}
       # - {height: *KGGD, click: IME_switch, swipe_right: Menu, key_text_size: 14, swipe_up: q_xd, composing: SX, long_click: "q_zb", key_back_color: sza, key_text_color: szt, key_symbol_color: szs, hilited_key_back_color: 123, key_border_color: BKYSS, width: 14}
-      - {height: *KGGD, click: Mode_switch, swipe_right: Menu, key_text_size: 14, swipe_up: q_xd, long_click: Keyboard_number, key_back_color: sza, key_text_color: szt, key_symbol_color: szs, hilited_key_back_color: 123, key_border_color: BKYSS, width: 15}
+      - {height: *KGGD, click: Mode_switch, swipe_right: Menu, key_text_size: 14, swipe_up: q_xd, long_click: Keyboard_number, key_back_color: sza, key_text_color: TEXX, key_symbol_color: szs, hilited_key_back_color: 123, key_border_color: BKYSS, width: 15}
       # - {click: ",", label: " ，", key_text_size: 12, long_click: "!", swipe_up: "!", composing: SX, key_back_color: zbd, key_text_color: bdt, key_symbol_color: bds, hilited_key_back_color: fxx, key_border_color: BKYSS, width: 13}
       # 取消三选，逗号标顶
       - {click: ",", label: " ，", key_text_size: 12, long_click: "!", swipe_up: "Deploy", key_back_color: zbd, key_text_color: bdt, key_symbol_color: bds, hilited_key_back_color: fxx, key_border_color: BKYSS, width: 12}
@@ -1180,7 +1180,8 @@ preset_keyboards:
       - {click: Left, key_back_color: zzh, width: 13}
       - {click: Right, key_back_color: zzh, width: 13}
       # - {click: Mode_switch, key_back_color: zzh, width: 13}
-      - {click: space22, label: " ", key_back_color: zzh, width: 13}
+      # - {click: space22, label: " ", key_back_color: zzh, width: 13}
+      - {click: Keyboard_symbols, key_back_color: zzh, width: 13}
       - {click: Down, key_back_color: zzh, width: 13}
       - {click: Up, key_back_color: zzh, width: 13}
       - {click: IME_switch2, key_back_color: zzh, width: 17.5}
@@ -1778,6 +1779,155 @@ preset_keyboards:
     name: "数字。临时"
     width: 20
 
+  # copy from trime.yaml
+  _edit_board:
+    author: flypy.com
+    name: "编辑键盘"
+    ascii_mode: 0
+    width: 20
+    height: 55
+    keys:
+    - {click: select_all}
+    - {click: Page_Up}
+    - {click: Up}
+    - {click: Page_Down}
+    - {click: _Keyboard_phrase}
+    - {click: cut}
+    - {click: Left}
+    - {click: Shift_L, label: 选择}
+    - {click: Right}
+    - {click: _Keyboard_clip}
+    - {click: copy}
+    - {click: Home}
+    - {click: Down}
+    - {click: End}
+    - {click: BackSpace}
+    - {click: paste}
+    - {click: undo}
+    - {click: Clear}
+    - {click: redo}
+    - {click: Keyboard_default}
+
+  number:
+    name: 數字键盘
+    author: "osfans <waxaca@163.com>"
+    ascii_mode: 1
+    width: 20
+    height: 55
+    keys:
+    - {click: '+'}
+    - {click: '1'}
+    - {click: '2'}
+    - {click: '3'}
+    - {click: BackSpace}
+
+    - {click: '-'}
+    - {click: '4'}
+    - {click: '5'}
+    - {click: '6'}
+    - {click: '='}
+
+    - {click: '*'}
+    - {click: '7'}
+    - {click: '8'}
+    - {click: '9'}
+    - {click: space}
+
+    - {click: '/'}
+    - {click: Keyboard_default, long_click: Keyboard_symbols}
+    - {click: '0'}
+    - {click: '.'}
+    - {click: Return}
+
+  symbols:
+    name: 符号键盘
+    author: "天真可愛的滿滿"
+    ascii_mode: -1
+    width: 10
+    height: 44
+    keys:
+#1
+    - {click: '·', ascii: '`'}
+    - {click: '~', ascii: '~'}
+    - {click: '！', ascii: '!'}
+    - {click: '@', ascii: '@'}
+    - {click: '#', ascii: '#'}
+    - {click: '￥', ascii: '$'}
+    - {click: '%', ascii: '%'}
+    - {click: '1'}
+    - {click: '2'}
+    - {click: '3'}
+
+#2
+    - {click: '……', ascii: '^'}
+    - {click: '&', ascii: '&'}
+    - {click: '*', ascii: '*'}
+    - {click: '（', ascii: '('}
+    - {click: '）', ascii: ')'}
+    - {click: '-', ascii: '-'}
+    - {click: '=', ascii: '='}
+    - {click: '4'}
+    - {click: '5'}
+    - {click: '6'}
+
+#3
+    - {click: '——', ascii: '_'}
+    - {click: '+', ascii: '+'}
+    - {click: '【', ascii: '['}
+    - {click: '】', ascii: ']'}
+    - {click: '{', ascii: '{'}
+    - {click: '}', ascii: '}'}
+    - {click: '|', ascii: '|'}
+
+    - {click: '7'}
+    - {click: '8'}
+    - {click: '9'}
+
+#4
+    - {click: '“', ascii: '"'}
+    - {click: '”', ascii: "'"}
+    - {click: '《', ascii: '<'}
+    - {click: '》', ascii: '>'}
+    - {click: '？', ascii: '?'}
+    - {click: '：', ascii: ':'}
+    - {click: '；', ascii: ';'}
+    - {click: '、', ascii: '\'}
+    - {click: '0'}
+
+    - {click: BackSpace}
+
+    - {click: Keyboard_default, long_click: Menu, width: 15}
+    - {click: Keyboard_emoji, long_click: Keyboard_number}
+    - {click: '，', ascii: ','}
+    - {click: space, width: 30}
+    - {click: '。', ascii: '.'}
+    - {click: '/', ascii: '/'}
+    - {click: Mode_switch, width: 15}
+
+  emoji:
+    name: 表情键盘
+    author: "nirenr"
+    ascii_mode: 1
+    type: "long"
+    width: 10
+    height: 44
+    keys: ['😀', '😁', '😂', '😃', '😄', '😅', '😆', '😉', '😊', '😋', '😎', '😍', '😘', '😗', '😙', '😚', '☺', '🙂', '🤗', '😇', '🤓', '🤔', '😐', '😑', '😶', '🙄', '😏', '😣', '😥', '😮', '🤐', '😯', '😪', '😫', '😴', '😌', '😛', '😜', '😝', '😒', '😓', '😔', '😕', '🙃', '🤑', '😲', '😷', '🤒',
+      '🤕', '🙁', '😖', '😞', '😟', '😤', '😢', '😭', '😦', '😧', '😨', '😩', '😬', '😰', '😱', '😳', '😵', '😡', '😠', '😈', '👿', '👹', '👺', '💀', '☠', '👻', '👽', '👾', '🤖', '💩', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾', '🙈', '🙉', '🙊',
+      '👦', '👧', '👨', '👩', '👴', '👵', '👶', '👱', '👮', '👲', '👳', '👷', '⛑', '👸', '💂', '🕵', '🎅', '👰', '👼', '💆', '💇', '🙍', '🙎', '🙅', '🙆', '💁', '🙋', '🙇', '🙌', '🙏', '🗣', '👤', '👥', '🚶', '🏃', '👯', '💃', '🕴', '👫', '👬', '👭', '💏', '💑', '👪', '💪', '👈', '👉', '☝', '👆',
+      '🖕', '👇', '✌', '🖖', '🤘', '🖐', '✋', '👌', '👍', '👎', '✊', '👊', '👋', '👏', '👐', '✍', '💅', '👂', '👃', '👣', '👀', '👁', '👅', '👄', '💋',
+      '💘', '❤', '💓', '💔', '💕', '💖', '💗', '💙', '💚', '💛', '💜', '💝', '💞', '💟',
+      '❣', '💌', '💤', '💢', '💣', '💥', '💦', '💨', '💫', '💬', '🗨', '🗯', '💭', '🕳', '👓', '🕶', '👔', '👕', '👖', '👗', '👘', '👙', '👚', '👛', '👜', '👝', '🛍', '🎒', '👞', '👟', '👠', '👡', '👢', '👑', '👒', '🎩', '🎓', '📿', '💄', '💍',
+      '🏧', '🚮', '🚰', '♿', '🚹', '🚺', '🚻', '🚼', '🚾', '🛂', '🛃', '🛄', '🛅', '⚠', '🚸', '⛔', '🚫', '🚳', '🚭', '🚯', '🚱', '🚷', '☢', '☣', '⬆', '↗', '➡', '↘', '⬇', '↙', '⬅', '↖', '↕', '↔', '↩', '↪', '⤴', '⤵', '🔃', '🔄', '🔙', '🔚', '🔛', '🔜', '🔝', '🛐', '⚛', '🕉', '✡', '☸', '☯', '✝', '☦', '☪', '☮', '🕎', '🔯', '♻', '📛', '⚜', '🔰', '🔱', '⭕', '✅', '☑', '✔', '✖', '❌', '❎', '➕', '➖', '➗', '➰', '➿', '〽', '✳', '✴', '❇', '‼', '⁉',
+      '🍇', '🍈', '🍉', '🍊', '🍋', '🍌', '🍍', '🍎', '🍏', '🍐', '🍑', '🍒', '🍓', '🍅', '🍆', '🌽', '🌶', '🍄', '🌰',
+      '🍞', '🧀', '🍖', '🍗', '🍔', '🍟', '🍕', '🌭', '🌮', '🌯', '🍳', '🍲', '🍿', '🍱', '🍘', '🍙', '🍚', '🍛', '🍜', '🍝', '🍠', '🍢', '🍣', '🍤', '🍥', '🍡', '🍦', '🍧', '🍨', '🍩', '🍪', '🎂', '🍰', '🍫', '🍬', '🍭', '🍮', '🍯', '🍼', '☕', '🍵', '🍶', '🍾', '🍷', '🍸', '🍹', '🍺', '🍻', '🍽', '🍴', '🔪', '🏺',
+      '🎃', '🎄', '🎆', '🎇', '✨', '🎈', '🎉', '🎊', '🎋', '🎍', '🎎', '🎏', '🎐', '🎑', '🎀', '🎁', '🎗', '🎟', '🎫',
+      '🎖', '🏆', '🏅', '⚽', '⚾', '🏀', '🏐', '🏈', '🏉', '🎾', '🎱', '🎳', '🏏', '🏑', '🏒', '🏓', '🏸', '⛳', '🏌', '⛸', '🎣', '🎽', '🎿', '⛷', '🏂', '🏄', '🏇', '🏊', '⛹', '🏋', '🚴', '🚵', '🏎', '🏍', '🎯', '🎮', '🕹', '🎲', '♠', '♥', '♦', '♣', '🃏', '🀄', '🎴',
+      '🐵', '🐒', '🐶', '🐕', '🐩', '🐺', '🐱', '🐈', '🦁', '🐯', '🐅', '🐆', '🐴', '🐎', '🦄', '🐮', '🐂', '🐃', '🐄', '🐷', '🐖', '🐗', '🐽', '🐏', '🐑', '🐐', '🐪', '🐫', '🐘', '🐭', '🐁', '🐀', '🐹', '🐰', '🐇', '🐿', '🐻', '🐨', '🐼', '🐾', '🦃', '🐔', '🐓', '🐣', '🐤', '🐥', '🐦', '🐧', '🕊', '🐸', '🐊', '🐢', '🐍', '🐲', '🐉', '🐳', '🐋', '🐬', '🐟', '🐠', '🐡', '🐙', '🐚', '🦀', '🐌', '🐛', '🐜', '🐝', '🐞', '🕷', '🕸', '🦂',
+      '💐', '🌸', '💮', '🏵', '🌹', '🌺', '🌻', '🌼', '🌷', '🌱', '🌲', '🌳', '🌴', '🌵', '🌾', '🌿', '☘', '🍀', '🍁', '🍂', '🍃',
+      '🏠', '🏡', '🏢', '🏣', '🏤', '🏥', '🏦', '🏨', '🏩', '🏪', '🏫', '🏬', '🏭', '🏯', '🏰', '💒', '🗼', '🗽', '⛪',
+      '🛎', '🚪', '🛌', '🛏', '🛋', '🚽', '🚿', '🛀', '🛁',
+      '⌛', '⏳', '⌚', '⏰', '⏲', '🕰', '🕛', '🕧', '🕐', '🕜', '🕑', '🕝', '🕒', '🕞', '🕓', '🕟', '🕔', '🕠', '🕕', '🕡', '🕖', '🕢', '🕗', '🕣', '🕘', '🕤', '🕙', '🕥', '🕚', '🕦', '🌑',
+      '🌍', '🌎', '🌏', '🌐', '🗺', '🗾', '🏔', '⛰', '🌋', '🗻', '🏕', '🏖', '🏜', '🏝', '🏞', '🏟', '🏛', '🏗', '🏘', '🏙', '🏚','🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘', '🌙', '🌚', '🌛', '🌜', '🌡', '☀', '🌝', '🌞', '⭐', '🌟', '🌠', '☁', '⛅', '⛈', '🌤', '🌥', '🌦', '🌧', '🌨', '🌩', '🌪', '🌫', '🌬', '🌀', '🌈', '🌂', '☂', '☔', '⛱', '⚡', '❄', '☃', '⛄', '⛲', '⛺', '🌁', '🌃', '🌄', '🌅', '🌆', '🌇', '🌉', '♨', '🌌']
 
 android_keys:
   name: [VoidSymbol, SOFT_LEFT, SOFT_RIGHT, HOME, BACK, CALL, ENDCALL,
@@ -1986,7 +2136,8 @@ preset_keys:
   CommitComment: {label: 编码, send: Control+Shift+Return}
   DeleteCandidate: {label: 删词, send: Control+Delete, functional: false}
   # rime状态
-  Mode_switch: {toggle: ascii_mode, functional: false, send: Mode_switch, states: [ 中文, En ]}
+  # Mode_switch: {toggle: ascii_mode, functional: false, send: Mode_switch, states: [ 中文, En ]}
+  Mode_switch: {toggle: ascii_mode, functional: false, send: Mode_switch, states: [ 中, En ]}
 
   #shift键锁定
   on_key_back_color: 0xff7200 #shift锁键时背景（shift键不得设置key_back_color，否则无效）
@@ -2087,3 +2238,5 @@ preset_keys:
   _lua_phrase: {label: 短语, send: function, command: '01 脚本启动器/脚本库/短语.lua', option: "%1$s"}
 
   Keyboard_number: {label: 123, send: Eisu_toggle, select: number}
+  Keyboard_symbols: {label: ϟ, send: Eisu_toggle, select: symbols}
+  Keyboard_emoji: {label: 表情, send: Eisu_toggle, select: emoji}
