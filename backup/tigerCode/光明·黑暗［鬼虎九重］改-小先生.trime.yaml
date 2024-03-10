@@ -1093,7 +1093,7 @@ preset_keyboards:
       - {click: 3, key_text_size: 14,key_back_color: TEX, width: 10, label: 3, long_click: '{', swipe_up: "{}{Left}", key_text_color: TEX, key_symbol_color: TEX, hilited_key_back_color: CCH, hilited_key_text_color: CXH, key_border_color: BKYS, hilited_key_symbol_color: CSH}
       - {click: 4, key_text_size: 14,key_back_color: TEX, width: 10, label: 4, long_click: '}', key_text_color: TEX, key_symbol_color: TEX, hilited_key_back_color: CCH, hilited_key_text_color: AXH, key_border_color: BKYS, hilited_key_symbol_color: ASH}
       - {click: 5, key_text_size: 14,key_back_color: TEX, width: 10, label: 5, long_click: q_zhuuji, key_text_color: TEX, key_symbol_color: TEX, hilited_key_back_color: CCH, hilited_key_text_color: BXH, key_border_color: BKYS, hilited_key_symbol_color: BSH}
-      - {click: 6, key_text_size: 14,key_back_color: TEX, width: 10, label: 6, long_click: _Keyboard_clip, key_text_color: TEX, key_symbol_color: TEX, hilited_key_back_color: CCH, hilited_key_text_color: CXH, key_border_color: BKYS, hilited_key_symbol_color: CSH}
+      - {click: 6, key_text_size: 14,key_back_color: TEX, width: 10, label: 6, long_click: _Keyboard_phrase, key_text_color: TEX, key_symbol_color: TEX, hilited_key_back_color: CCH, hilited_key_text_color: CXH, key_border_color: BKYS, hilited_key_symbol_color: CSH}
       - {click: 7, key_text_size: 14,key_back_color: TEX, width: 10, label: 7, long_click: '<', swipe_up: "<>{Left}", key_text_color: TEX, key_symbol_color: TEX, hilited_key_back_color: CCH, hilited_key_text_color: AXH, key_border_color: BKYS, hilited_key_symbol_color: ASH}
       - {click: 8, key_text_size: 14,key_back_color: TEX, width: 10, label: 8, long_click: '>', key_text_color: TEX, key_symbol_color: TEX, hilited_key_back_color: CCH, hilited_key_text_color: BXH, key_border_color: BKYS, hilited_key_symbol_color: BSH}
       - {click: 9, key_text_size: 14,key_back_color: TEX, width: 10, label: 9, long_click: "(", swipe_up: "(){Left}", key_text_color: TEX, key_symbol_color: TEX, hilited_key_back_color: CCH, hilited_key_text_color: CXH, key_border_color: BKYS, hilited_key_symbol_color: CSH}
@@ -1154,13 +1154,13 @@ preset_keyboards:
       # - {click: Shift_L, shift_lock : long, label: Shift, key_text_size: 12, composing: Escape, swipe_up: Hide, key_symbol_color: ssy, key_back_color: shb, key_text_color: SHt, hilited_key_back_color: shift, key_border_color: BKYSS, width: 9}
       # - {width: 29, click: BackSpace, label: Delete, swipe_up: Clear, swipe_down: DelH, swipe_left: CommitComment, key_text_size: 14, key_back_color: hsb, key_text_color: hst, hilited_key_back_color: scj, key_border_color: BKYSS}
       # - {click: Tab2, long_click: ":", composing: BackSpace, key_text_size: 12, swipe_up: Candidate_switch1, key_symbol_color: ssy, key_back_color: shb, key_text_color: SHt, hilited_key_back_color: shift, key_border_color: BKYSS, width: 10}
-      - {click: Shift_L, shift_lock : long, key_text_size: 12, composing: BackSpace, swipe_up: Candidate_switch1, key_symbol_color: ssy, key_back_color: shb, key_text_color: SHt, hilited_key_back_color: shift, key_border_color: BKYSS, width: 10}
+      - {click: Shift_L3, shift_lock : long, key_text_size: 12, composing: BackSpace, swipe_up: Candidate_switch1, key_symbol_color: ssy, key_back_color: shb, key_text_color: SHt, hilited_key_back_color: shift, key_border_color: BKYSS, width: 10}
       - {width: 20, click: BackSpace, swipe_up: Clear, swipe_down: DelH, swipe_left: CommitComment, key_text_size: 14, key_back_color: hsb, key_text_color: hst, hilited_key_back_color: scj, key_border_color: BKYSS}
       # ❹swipe_up: _Keyboard_emoji, 
       # - {height: *KGGD, click: "q_zb", swipe_right: Menu, label: "标点",key_text_size: 14, swipe_up: q_xd, has_menu: SSX, long_click: IME_switch, key_back_color: sza, key_text_color: szt, key_symbol_color: szs, hilited_key_back_color: 123, key_border_color: BKYSS, width: 17}
       # - {height: *KGGD, click: "q_zb", swipe_right: Menu, label: "符号",key_text_size: 14, swipe_up: q_xd, composing: Page_Down1, long_click: IME_switch, key_back_color: sza, key_text_color: szt, key_symbol_color: szs, hilited_key_back_color: 123, key_border_color: BKYSS, width: 14}
       # - {height: *KGGD, click: IME_switch, swipe_right: Menu, key_text_size: 14, swipe_up: q_xd, composing: SX, long_click: "q_zb", key_back_color: sza, key_text_color: szt, key_symbol_color: szs, hilited_key_back_color: 123, key_border_color: BKYSS, width: 14}
-      - {height: *KGGD, click: Mode_switch, swipe_right: Menu, key_text_size: 14, swipe_up: q_xd, long_click: Keyboard_number, key_back_color: sza, key_text_color: TEXX, key_symbol_color: szs, hilited_key_back_color: 123, key_border_color: BKYSS, width: 15}
+      - {height: *KGGD, click: Mode_switch, swipe_right: Menu, key_text_size: 14, swipe_up: q_xd, long_click: Keyboard_symbols1, key_back_color: sza, key_text_color: TEXX, key_symbol_color: szs, hilited_key_back_color: 123, key_border_color: BKYSS, width: 15}
       # - {click: ",", label: " ，", key_text_size: 12, long_click: "!", swipe_up: "!", composing: SX, key_back_color: zbd, key_text_color: bdt, key_symbol_color: bds, hilited_key_back_color: fxx, key_border_color: BKYSS, width: 13}
       # 取消三选，逗号标顶
       - {click: ",", label: " ，", key_text_size: 12, long_click: "!", swipe_up: "Deploy", key_back_color: zbd, key_text_color: bdt, key_symbol_color: bds, hilited_key_back_color: fxx, key_border_color: BKYSS, width: 12}
@@ -1170,21 +1170,21 @@ preset_keyboards:
       - {click: ".", label: " 。", key_text_size: 12, long_click: "?", swipe_up: "lua_script_all", composing: CX, key_back_color: ybd, key_text_color: bdt, key_symbol_color: bds, hilited_key_back_color: fxxx, key_border_color: BKYSS, width: 12}
       # width: 17 -> 14
       # - {click: Return, key_text_size: 14, long_click: Color_settings1, swipe_up: Theme_settings, key_back_color: hcb, key_text_color: hct, key_symbol_color: hct, hilited_key_back_color: hcx, key_border_color: BKYSS, width: 14}
-      - {click: Return, key_text_size: 14, long_click: _Keyboard_edit, swipe_up: Theme_settings, key_back_color: hcb, key_text_color: hct, key_symbol_color: hct, hilited_key_back_color: hcx, key_border_color: BKYSS, width: 15}
+      - {click: Return, key_text_size: 14, long_click: _Keyboard_edit1, swipe_up: Theme_settings, key_back_color: hcb, key_text_color: hct, key_symbol_color: hct, hilited_key_back_color: hcx, key_border_color: BKYSS, width: 15}
 
 #long_click: VOICE_ASSIST_Ch
 
       # - {height: *ZGH, width: 100, label: " ", click: "space22", long_click: Hide1, hilited_key_back_color: zzh, key_back_color: zzh}
       # - {height: *ZGH, width: 100, click: Mode_switch, long_click: Hide1, hilited_key_back_color: zzh, key_back_color: zzh}
-      - {height: *ZGH, click: IME_last1, key_back_color: zzh, width: 17.5}
+      - {height: *ZGH, click: IME_last1, long_click: IME_switch2, key_back_color: zzh, width: 17.5}
       - {click: Left, key_back_color: zzh, width: 13}
       - {click: Right, key_back_color: zzh, width: 13}
       # - {click: Mode_switch, key_back_color: zzh, width: 13}
       # - {click: space22, label: " ", key_back_color: zzh, width: 13}
-      - {click: Keyboard_symbols, key_back_color: zzh, width: 13}
+      - {click: Keyboard_number1, long_click: Hide1, key_back_color: zzh, width: 13}
       - {click: Down, key_back_color: zzh, width: 13}
       - {click: Up, key_back_color: zzh, width: 13}
-      - {click: IME_switch2, key_back_color: zzh, width: 17.5}
+      - {click: paste1, long_click: _Keyboard_clip2, key_back_color: zzh, width: 17.5}
     name: "默认"
     width: 10
 
@@ -1834,9 +1834,9 @@ preset_keyboards:
     - {click: space}
 
     - {click: '/'}
-    - {click: Keyboard_default, long_click: Keyboard_symbols}
-    - {click: '0'}
     - {click: '.'}
+    - {click: '0'}
+    - {click: Keyboard_default, long_click: Keyboard_symbols}
     - {click: Return}
 
   symbols:
@@ -2069,6 +2069,7 @@ preset_keys:
   Shift_R: {label: Enter, send: Shift_R}
   Caps_Lock: {label: Caps, send: Caps_Lock}
   Shift_L: {functional: true, label: Shift, send: Shift_L, shift_lock: ascii_long}  # 中文状态一次锁定，英文状态长按锁定
+  Shift_L3: {functional: true, label: ⬆, send: Shift_L, shift_lock: ascii_long}  # 中文状态一次锁定，英文状态长按锁定
   Shift_L1: {functional: true, label: Shift, send: Shift_L, shift_lock: long}  # 中文状态长按锁定
   Shift1: {functional: false, label: ☩, preview: ☩, send: Shift_L, shift_lock: click}  # 英文状态一次锁定
   Return: {label: ↩, preview: ↩, send: Return}
@@ -2077,7 +2078,7 @@ preset_keys:
   Hide: {label: · · ·, send: BACK}
   Hide1: {label: " ", send: BACK}
   BackSpace: {label: "⌫", preview: ⌫, repeatable: true, send: BackSpace}
-  space: {repeatable: false, preview: ␣, functional: false, send: space} #空格
+  space: {repeatable: false, preview: ␣, functional: false, send: space, label: 空格} #空格
   space11: {repeatable: false, preview: ␣, functional: false, send: space} #空格
   space1: {repeatable: true, preview: ␣, label: ️️◉️ ️English, functional: true, send: space}
   space2: {repeatable: true, preview: '␣', label: "空格", functional: true, send: space}
@@ -2232,11 +2233,16 @@ preset_keys:
   HMCH: {label: '🐯', functional: false, send: function, command: web_search, option: "https://tiger-code.com/search?query=%4$s"}
 
 
-  _Keyboard_clip: {label: ☵, send: Eisu_toggle, select: _clip_board}
+  _Keyboard_clip: {label: 剪贴板, send: Eisu_toggle, select: _clip_board}
+  _Keyboard_clip1: {label: ☵, send: Eisu_toggle, select: _clip_board}
+  _Keyboard_clip2: {label: " ", send: Eisu_toggle, select: _clip_board}
   _Keyboard_edit: {label: 编辑, send: Eisu_toggle, select: _edit_board}
+  _Keyboard_edit1: {label: ☩, send: Eisu_toggle, select: _edit_board}
   _Keyboard_Color: {label: 🥶, send: function, command: 'emoji键盘.lua'}
   _lua_phrase: {label: 短语, send: function, command: '01 脚本启动器/脚本库/短语.lua', option: "%1$s"}
 
-  Keyboard_number: {label: 123, send: Eisu_toggle, select: number}
-  Keyboard_symbols: {label: ϟ, send: Eisu_toggle, select: symbols}
+  Keyboard_number: {label: 数字, send: Eisu_toggle, select: number}
+  Keyboard_number1: {label: " ", send: Eisu_toggle, select: number}
+  Keyboard_symbols: {label: 符号, send: Eisu_toggle, select: symbols}
+  Keyboard_symbols1: {label: "ϟ", send: Eisu_toggle, select: symbols}
   Keyboard_emoji: {label: 表情, send: Eisu_toggle, select: emoji}
