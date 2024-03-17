@@ -1177,14 +1177,14 @@ preset_keyboards:
       # - {height: *ZGH, width: 100, label: " ", click: "space22", long_click: Hide1, hilited_key_back_color: zzh, key_back_color: zzh}
       # - {height: *ZGH, width: 100, click: Mode_switch, long_click: Hide1, hilited_key_back_color: zzh, key_back_color: zzh}
       - {height: *ZGH, click: IME_last1, long_click: IME_switch2, key_back_color: zzh, width: 17.5}
-      - {click: Left, key_back_color: zzh, width: 13}
-      - {click: Right, key_back_color: zzh, width: 13}
+      - {click: Left1, key_back_color: zzh, width: 16.25}
+      - {click: Right1, key_back_color: zzh, width: 16.25}
       # - {click: Mode_switch, key_back_color: zzh, width: 13}
       # - {click: space22, label: " ", key_back_color: zzh, width: 13}
-      - {click: Keyboard_number1, long_click: Hide1, key_back_color: zzh, width: 13}
-      - {click: Down, key_back_color: zzh, width: 13}
-      - {click: Up, key_back_color: zzh, width: 13}
-      - {click: paste1, long_click: _Keyboard_clip2, key_back_color: zzh, width: 17.5}
+      # - {click: Keyboard_number1, long_click: Hide1, key_back_color: zzh, width: 13}
+      - {click: Down1, key_back_color: zzh, width: 16.25}
+      - {click: Up1, key_back_color: zzh, width: 16.25}
+      - {click: Keyboard_number1, long_click: _Keyboard_clip2, key_back_color: zzh, width: 17.5}
     name: "默认"
     width: 10
 
@@ -1819,25 +1819,25 @@ preset_keyboards:
     - {click: '1'}
     - {click: '2'}
     - {click: '3'}
-    - {click: BackSpace}
+    - {click: '='}
 
     - {click: '-'}
     - {click: '4'}
     - {click: '5'}
     - {click: '6'}
-    - {click: '='}
+    - {click: BackSpace}
 
     - {click: '*'}
     - {click: '7'}
     - {click: '8'}
     - {click: '9'}
-    - {click: space}
+    - {click: Return}
 
     - {click: '/'}
     - {click: '.'}
     - {click: '0'}
+    - {click: space}
     - {click: Keyboard_default, long_click: Keyboard_symbols}
-    - {click: Return}
 
   symbols:
     name: 符号键盘
@@ -2096,7 +2096,8 @@ preset_keys:
   Page_Down1: {label: 下页, send: Page_Down, functional: false}
   Page_Down2: {label: "▶", send: Page_Down, functional: false}
   Left: {label: ←, send: Left, repeatable: true, functional: false}
-  Left1: {label: ⇦, send: Control+Left, repeatable: true, functional: false}
+  Left1: {label: " ", send: Left, repeatable: true, functional: false}
+  Left2: {label: ⇦, send: Control+Left, repeatable: true, functional: false}
   CX: {label: 次选, send: 2}
   SX: {label: 三选, send: 3}
   SSX: {label: 四选, send: 4}
@@ -2107,9 +2108,12 @@ preset_keys:
   JXX: {label: 九选, send: 9}
 
   Down: {label: ↓️️, send: Down, repeatable: true, functional: false}
+  Down1: {label: " ", send: Down, repeatable: true, functional: false}
   Up: {label: ️↑, send: Up, repeatable: true, functional: false}
+  Up1: {label: " ", send: Up, repeatable: true, functional: false}
   Right: {label: →, send: Right, repeatable: true, functional: false}
-  Right1: {label: ⇨, send: Control+Right, repeatable: true, functional: false}
+  Right1: {label: " ", send: Right, repeatable: true, functional: false}
+  Right2: {label: ⇨, send: Control+Right, repeatable: true, functional: false}
   select_all: {label: ☑, functional: false, send: Control+a}
   select_all2: {label: 全选, functional: false, send: Control+a}
   select_all1: {label: " ", functional: false, send: Control+a}
