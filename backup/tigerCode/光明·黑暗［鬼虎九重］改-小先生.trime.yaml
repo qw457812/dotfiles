@@ -1160,7 +1160,7 @@ preset_keyboards:
       # - {height: *KGGD, click: "q_zb", swipe_right: Menu, label: "标点",key_text_size: 14, swipe_up: q_xd, has_menu: SSX, long_click: IME_switch, key_back_color: sza, key_text_color: szt, key_symbol_color: szs, hilited_key_back_color: 123, key_border_color: BKYSS, width: 17}
       # - {height: *KGGD, click: "q_zb", swipe_right: Menu, label: "符号",key_text_size: 14, swipe_up: q_xd, composing: Page_Down1, long_click: IME_switch, key_back_color: sza, key_text_color: szt, key_symbol_color: szs, hilited_key_back_color: 123, key_border_color: BKYSS, width: 14}
       # - {height: *KGGD, click: IME_switch, swipe_right: Menu, key_text_size: 14, swipe_up: q_xd, composing: SX, long_click: "q_zb", key_back_color: sza, key_text_color: szt, key_symbol_color: szs, hilited_key_back_color: 123, key_border_color: BKYSS, width: 14}
-      - {height: *KGGD, click: Mode_switch, swipe_right: Menu, key_text_size: 14, swipe_up: q_xd, long_click: Keyboard_symbols1, key_back_color: sza, key_text_color: TEXX, key_symbol_color: szs, hilited_key_back_color: 123, key_border_color: BKYSS, width: 15}
+      - {height: *KGGD, click: Mode_switch, composing: Mode_switch_composing, swipe_right: Menu, key_text_size: 14, swipe_up: q_xd, long_click: Keyboard_symbols1, key_back_color: sza, key_text_color: TEXX, key_symbol_color: szs, hilited_key_back_color: 123, key_border_color: BKYSS, width: 15}
       # - {click: ",", label: " ，", key_text_size: 12, long_click: "!", swipe_up: "!", composing: SX, key_back_color: zbd, key_text_color: bdt, key_symbol_color: bds, hilited_key_back_color: fxx, key_border_color: BKYSS, width: 13}
       # 取消三选，逗号标顶
       - {click: ",", label: " ，", key_text_size: 12, long_click: "!", swipe_up: "Deploy", key_back_color: zbd, key_text_color: bdt, key_symbol_color: bds, hilited_key_back_color: fxx, key_border_color: BKYSS, width: 12}
@@ -2144,6 +2144,7 @@ preset_keys:
   # rime状态
   # Mode_switch: {toggle: ascii_mode, functional: false, send: Mode_switch, states: [ 中文, En ]}
   Mode_switch: {toggle: ascii_mode, functional: false, send: Mode_switch, states: [ 中, En ]}
+  Mode_switch_composing: {label: "中", functional: false, text: "{Mode_switch}{Return}"}  # 中文状态下，切换到英文并上屏字母
 
   #shift键锁定
   on_key_back_color: 0xff7200 #shift锁键时背景（shift键不得设置key_back_color，否则无效）
