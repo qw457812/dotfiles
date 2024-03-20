@@ -399,15 +399,23 @@ map <leader>7 <Action>(GoToTab7)
 map <leader>8 <Action>(GoToTab8)
 map <leader>9 <Action>(GoToTab9)
 
-map <S-Space> <Action>(GotoNextError)
-" insert模式无效，已设置为IDEA快捷键，Code Completion - Basic
-map <TAB> <Action>(CodeCompletion)
-" TODO 仅map <CR>影响重命名时的回车确认
-map <leader><CR> <Action>(EditorCompleteStatement)
 " quick fix
+" 仅map <CR>影响重命名时的回车确认
+map <leader><CR> <Action>(ShowIntentionActions)
 " keys: https://ideavim.sourceforge.net/vim/intro.html
-map <leader><Space> <Action>(ShowIntentionActions)
-" TODO map <leader><TAB>
+map <leader><Space> gd
+map <leader><TAB> <Action>(EditorCompleteStatement)
+
+" insert模式无效，已设置为IDEA快捷键，Code Completion - Basic
+" map <TAB> <Action>(CodeCompletion)
+" use <TAB> as second Leader key
+nmap <TAB><TAB> <Action>(CodeCompletion)
+nmap <TAB><CR> <Action>(GotoNextError)
+nmap <TAB>j gt
+nmap <TAB>k gT
+nmap <TAB>t <Action>(Terminal.OpenInTerminal)
+
+map <S-Space> <Action>(GotoNextError)
 
 " https://gist.github.com/PisecesPeng/9fabf2a1c1834bd35bf02c2bcb904708
 " 选择模式扩大选择范围 opt+up_arrow
