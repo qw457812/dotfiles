@@ -1800,10 +1800,10 @@
 
              :params  {
                        ;; basic.to_delayed_action_delay_milliseconds
-                       :delay    250
+                       :delay    150
                        ;; held 越短 right-click 选择文本的延迟越低, 但是太短会导致单击 right-click 时, 如果按下去的时间稍长就会发送 left-click 且松开后复制
-                       :alone    150
-                       :held     150}}]]}
+                       :alone    125
+                       :held     125}}]]}
 
   ;; TODO easy to accidentally trigger
   #_{:des   "trackpad + keyboard: copy/paste, vi mode"
