@@ -159,7 +159,6 @@ export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 
 export EDITOR='nvim'
-# export EDITOR='lvim'
 
 # brew info lesspipe
 export LESSOPEN="|/opt/homebrew/bin/lesspipe.sh %s"
@@ -206,6 +205,7 @@ if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -
 # alias v="vim"
 alias v='lvim'
 alias n="nvim"
+alias rr="ranger"
 
 # https://github.com/jeffreytse/zsh-vi-mode | brew info zsh-vi-mode
 source $(brew --prefix)/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
@@ -256,6 +256,7 @@ export PATH="$PATH:$HOME/.config/doomemacs/bin"
 # https://github.com/archidote/best-bash-zsh-alias-for-linux-terminal/blob/master/install.sh
 alias d="date"
 alias b="cd -"
+alias q="exit"
 
 # install lsp server jdtls for doomemacs (temporary)
 # export JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home
@@ -300,6 +301,16 @@ function o() {
 # small enough for one screen.
 function tre() {
 	tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX;
+}
+
+# alias ll="less"
+unalias ll
+function ll() {
+	if [ $# -eq 0 ]; then
+		less .;
+	else
+		less "$@";
+	fi;
 }
 
 # deal this warning from `doom doctor`: "! The installed grep binary was not built with support for PCRE lookaheads"
@@ -396,3 +407,7 @@ alias czz='chezmoi cd'
 alias czgoku='chezmoi edit --apply --verbose $HOME/.config/karabiner.edn && goku'
 alias czzshrc='chezmoi edit --apply --verbose ${ZDOTDIR:-$HOME}/.zshrc && exec ${SHELL} -l'
 alias czcode='chezmoi edit --apply --verbose "$HOME/Library/Application Support/Code/User/settings.json"'
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"

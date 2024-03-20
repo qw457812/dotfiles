@@ -20,6 +20,10 @@
 ;; https://github.com/yqrashawn/yqdotfiles/blob/master/modules/yqrashawn/home-manager/dotfiles/karabiner.edn
 ;; https://github.com/yqrashawn/GokuRakuJoudo/blob/master/in-the-wild.md
 
+;; 系统输入法(ABC): 禁用长按键输入特殊字符, 改为按键重复
+;; defaults read NSGlobalDomain ApplePressAndHoldEnabled ---> The domain/default pair of (kCFPreferencesAnyApplication, ApplePressAndHoldEnabled) does not exist
+;; defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
+
 ;; 系统设置 ---> 键盘 ---> 键重复速率(最快) / 重复前延迟(最短)
 ;; defaults read NSGlobalDomain KeyRepeat ---> 2
 ;; defaults read NSGlobalDomain InitialKeyRepeat ---> 15
@@ -53,6 +57,8 @@
 
  :froms     {:from-middle-click       {:pkey :button3
                                        :modi {:optional :caps_lock}}
+             :from-right-click        {:pkey :button2
+                                       :modi {:optional :caps_lock}}
              :from-command-left-click {:pkey :button1
                                        :modi {:optional :caps_lock
                                               :mandatory :left_command}}
@@ -75,14 +81,16 @@
                                         :lazy true}]}
 
  :templates
- {:open            "open \"%s\""
-  :opena           "open -a \"%s\""
-  :opena-file      "open -a \"%s\" \"%s\""
-  :open-app        "osascript -e 'tell application \"%s\" to activate'" ; slower than "open -a"
-  ;; :open-in-chrome  "open -na \"Google Chrome\" --args \"%s\""
-  :hs              "open -g hammerspoon://%s" ; ~/.hammerspoon/init.lua
-  ;; :raycast         "open -g raycast://extensions/%s" ; Deeplink, 不适合有Raycast窗口的Command(如Google Search, can't press again to close), 适合不出现Raycast窗口直接执行的(如OCR, 但也会有Raycast窗口一闪而过)
-  :wait_seconds    "osascript -e 'delay %s'"}
+ {:open                 "open \"%s\""
+  :opena                "open -a \"%s\""
+  :opena-file           "open -a \"%s\" \"%s\""
+  :open-app             "osascript -e 'tell application \"%s\" to activate'" ; slower than "open -a"
+  ;; :open-in-chrome       "open -na \"Google Chrome\" --args \"%s\""
+  :hs                   "open -g hammerspoon://%s" ; ~/.hammerspoon/init.lua
+  ;; :raycast              "open -g raycast://extensions/%s" ; Deeplink, 不适合有Raycast窗口的Command(如Google Search, can't press again to close), 适合不出现Raycast窗口直接执行的(如OCR, 但也会有Raycast窗口一闪而过)
+  :wait_seconds         "osascript -e 'delay %s'"
+  :cli_set_var          "'/Library/Application Support/org.pqrs/Karabiner-Elements/bin/karabiner_cli' --set-variables '{\"%s\":%s}'"
+  :delay_cli_set_var    "osascript -e 'delay %s' && '/Library/Application Support/org.pqrs/Karabiner-Elements/bin/karabiner_cli' --set-variables '{\"%s\":%s}'"}
 
  ;; https://github.com/yqrashawn/GokuRakuJoudo/blob/master/tutorial.md#simlayers
  ;; There're two problems in old layer. When we type "w1" really fast, we trigger the "1" in w layer rather than insert "w1". When we keep press w key down, the w key won't repeat. There won't be a "wwwwwwwwwwwwwwwwwwww".
@@ -557,6 +565,7 @@
            [:d :!Cdown_arrow :Spotify] ; volume down
            ]}
 
+  ;; FIXME right_ctrl toggle rime's ascii_mode accidentally
   {:des   "return mode for glove80 (control)"
    :rules [:return-ctrl-mode
            [:1 :!W1]
@@ -940,10 +949,10 @@
            [:comma [:open "/System/Applications/System Settings.app"]] ; cmd+, for setting
            [:period [:open "/System/Applications/Launchpad.app"]] ; 启动台
            [:slash [:open "/Applications/WhatPulse/WhatPulse.app"]]
-           [:left_command [:open "/Applications/OpenInTerminal-Lite.app"] :!glove80]
-           [:left_shift [:open "/Applications/OpenInTerminal-Lite.app"] :glove80]
-           [:right_command [:open "/Applications/OpenInEditor-Lite.app"] :!glove80]
-           [:right_shift [:open "/Applications/OpenInEditor-Lite.app"] :glove80]
+           ;; [:left_command [:open "/Applications/OpenInTerminal-Lite.app"] :!glove80]
+           ;; [:left_shift [:open "/Applications/OpenInTerminal-Lite.app"] :glove80]
+           ;; [:right_command [:open "/Applications/OpenInEditor-Lite.app"] :!glove80]
+           ;; [:right_shift [:open "/Applications/OpenInEditor-Lite.app"] :glove80]
            [:left_option [:open "/Applications/Karabiner-Elements.app"]]
            [:right_option [:open "/Applications/WeChat.app"]]
            ]}
@@ -1067,7 +1076,7 @@
            [:0 :!CS0]
            [:hyphen :!CShyphen]
            [:equal_sign :!CSequal_sign]
-           [:w :!CSw [:!Chrome :!Safari :!CitrixViewer]] ; accidentally close all tabs
+           [:w :!CSw [:!Chrome :!Brave :!Safari :!CitrixViewer]] ; accidentally close all tabs
            [:e :!CSe]
            [:r :!CSr]
            [:t :!CSt]
@@ -1611,48 +1620,48 @@
            ;; right_control -> rime: toggle ascii punct | ~/Library/Rime/default.custom.yaml
            [:##right_control :right_control :Emacs {:alone [:right_control :!Tbackslash]}] ; emacs-rime
            ;; TODO launch-mode
-           [:!Wh [:open "/Applications/企业微信.app"] :!WeWork]
-           [:!Wh :!Ograve_accent_and_tilde :WeWork] ; AltTab.app
-           [:!Wj [:open "/Applications/Google Chrome.app"] :!Chrome]
-           [:!Wj :same_wind_app :Chrome]
-           [:!Wk [:open "/Applications/kitty.app"] :!Kitty]
-           [:!Wk :same_wind_app :Kitty]
-           [:!Wl [:open "/Applications/Visual Studio Code.app"] :!VSCode]
-           [:!Wl :same_wind_app :VSCode]
-           [:!Wsemicolon [:open "/Library/Application Support/Citrix Receiver/Citrix Viewer.app"]] ; Citrix Workspace.app
-           [:!Wquote [:open "/Applications/SwitchHosts.app"]]
-           [:!Wa [:open "/System/Applications/Utilities/Activity Monitor.app"]]
-           [:!Ws [:open "/Applications/Spotify.app"]]
-           [:!Wd [:open "/Applications/DBeaver.app"]]
-           [:!Wf [:open "/System/Library/CoreServices/Finder.app"] :!Finder]
-           [:!Wf :same_wind_app :Finder]
-           [:!Wg [:open "/Applications/ChatGPT.app"] :!ChatGPT]
-           [:!Wg :same_wind_app :ChatGPT]
-           [:!We [:open "/Applications/Emacs.app"] :!Emacs]
-           [:!We :same_wind_app :Emacs]
-           [:!Wr [:open "/Applications/Safari.app"] :!Safari]
-           [:!Wr :same_wind_app :Safari]
-           [:!Wt [:open "/Applications/iTerm.app"] :!iTerm]
-           [:!Wt :same_wind_app :iTerm]
-           [:!Wy [:open "$HOME/Applications/PyCharm Community Edition.app"] :!PyCharm]
-           [:!Wy :same_wind_app :PyCharm]
-           [:!Wu [:open "/Applications/Neovide.app"]] ; pronounce
-           [:!Wi [:open "/Applications/IntelliJ IDEA CE.app"] :!IntelliJ]
-           [:!Wi :same_wind_app :IntelliJ]
-           [:!Wo [:open "/Applications/wpsoffice.app"]] ; office
-           [:!Wp [:open "/System/Applications/Preview.app"] :!Preview]
-           [:!Wp :same_wind_app :Preview]
-           [:!Wopen_bracket [[:open "/Applications/企业微信.app/Contents/Frameworks/wwmapp.app"] :same_wind_app] :!WeWork-Meeting] ; 企业微信•会议
-           [:!Wopen_bracket :same_wind_app :WeWork-Meeting]
-           [:!Wv [:open "/Applications/Karabiner-EventViewer.app"]]
-           [:!Wb [:open "/Applications/JetBrains Toolbox.app"]]
-           [:!Wn [:open "http://127.0.0.1:8080/"] nil {:delayed {:invoked [:escape]} :params {:delay 800}}] ; note
-           [:!Wm [:open "/Applications/Thunderbird.app"] :!Thunderbird] ; email
-           [:!Wm :same_wind_app :Thunderbird]
-           [:!Wcomma [:open "/System/Applications/System Settings.app"]] ; cmd+, for setting
-           [:!Wperiod [:open "/System/Applications/Launchpad.app"]] ; 启动台
-           [:!Wslash [:open "/Applications/WhatPulse/WhatPulse.app"]]
-           [:!Wx [:open "/Applications/WeChat.app"]]
+           ; [:!Wh [:open "/Applications/企业微信.app"] :!WeWork]
+           ; [:!Wh :!Ograve_accent_and_tilde :WeWork] ; AltTab.app
+           ; [:!Wj [:open "/Applications/Google Chrome.app"] :!Chrome]
+           ; [:!Wj :same_wind_app :Chrome]
+           ; [:!Wk [:open "/Applications/kitty.app"] :!Kitty]
+           ; [:!Wk :same_wind_app :Kitty]
+           ; [:!Wl [:open "/Applications/Visual Studio Code.app"] :!VSCode]
+           ; [:!Wl :same_wind_app :VSCode]
+           ; [:!Wsemicolon [:open "/Library/Application Support/Citrix Receiver/Citrix Viewer.app"]] ; Citrix Workspace.app
+           ; [:!Wquote [:open "/Applications/SwitchHosts.app"]]
+           ; [:!Wa [:open "/System/Applications/Utilities/Activity Monitor.app"]]
+           ; [:!Ws [:open "/Applications/Spotify.app"]]
+           ; [:!Wd [:open "/Applications/DBeaver.app"]]
+           ; [:!Wf [:open "/System/Library/CoreServices/Finder.app"] :!Finder]
+           ; [:!Wf :same_wind_app :Finder]
+           ; [:!Wg [:open "/Applications/ChatGPT.app"] :!ChatGPT]
+           ; [:!Wg :same_wind_app :ChatGPT]
+           ; [:!We [:open "/Applications/Emacs.app"] :!Emacs]
+           ; [:!We :same_wind_app :Emacs]
+           ; [:!Wr [:open "/Applications/Safari.app"] :!Safari]
+           ; [:!Wr :same_wind_app :Safari]
+           ; [:!Wt [:open "/Applications/iTerm.app"] :!iTerm]
+           ; [:!Wt :same_wind_app :iTerm]
+           ; [:!Wy [:open "$HOME/Applications/PyCharm Community Edition.app"] :!PyCharm]
+           ; [:!Wy :same_wind_app :PyCharm]
+           ; [:!Wu [:open "/Applications/Neovide.app"]] ; pronounce
+           ; [:!Wi [:open "/Applications/IntelliJ IDEA CE.app"] :!IntelliJ]
+           ; [:!Wi :same_wind_app :IntelliJ]
+           ; [:!Wo [:open "/Applications/wpsoffice.app"]] ; office
+           ; [:!Wp [:open "/System/Applications/Preview.app"] :!Preview]
+           ; [:!Wp :same_wind_app :Preview]
+           ; [:!Wopen_bracket [[:open "/Applications/企业微信.app/Contents/Frameworks/wwmapp.app"] :same_wind_app] :!WeWork-Meeting] ; 企业微信•会议
+           ; [:!Wopen_bracket :same_wind_app :WeWork-Meeting]
+           ; [:!Wv [:open "/Applications/Karabiner-EventViewer.app"]]
+           ; [:!Wb [:open "/Applications/JetBrains Toolbox.app"]]
+           ; [:!Wn [:open "http://127.0.0.1:8080/"] nil {:delayed {:invoked [:escape]} :params {:delay 800}}] ; note
+           ; [:!Wm [:open "/Applications/Thunderbird.app"] :!Thunderbird] ; email
+           ; [:!Wm :same_wind_app :Thunderbird]
+           ; [:!Wcomma [:open "/System/Applications/System Settings.app"]] ; cmd+, for setting
+           ; [:!Wperiod [:open "/System/Applications/Launchpad.app"]] ; 启动台
+           ; [:!Wslash [:open "/Applications/WhatPulse/WhatPulse.app"]]
+           ; [:!Wx [:open "/Applications/WeChat.app"]]
 
            ;; TODO
            [:left_command :left_command :translate-by-opt-shift-a-app {:alone :!OSa}]
@@ -1710,6 +1719,7 @@
             {:alone   [{:pkey :button1} {:pkey :button1} :!Cc]
              :held    {:pkey :button1 :modi :left_option :lazy true}
              :params  {:alone 250 :held 250}}]
+
            ;; command + click -> copy selected
            ;; [:from-command-left-click :button1 nil {:afterup :!Cc}]
            ;; TODO command + left click twice to copy a word
@@ -1721,12 +1731,79 @@
              :afterup :!Cc
              ;; held 越短 command + left click 选择文本的延迟越低, 但是太短会导致快速点击时复制且不发送 command
              :params  {:alone 90 :held 90}}]
+
+           ;; right click -> copy selected, see "hold right click -> copy selected, right click twice -> copy a word" below
+           ;; [:from-right-click nil nil
+           ;;  ;; right click 快速点击时不复制, 发送right click (右键菜单)
+           ;;  {:alone   {:pkey :button2 :halt true}
+           ;;   :held    {:pkey :button1}
+           ;;   :afterup :!Cc
+           ;;   ;; held 越短 right click 选择文本的延迟越低, 但是太短会导致快速点击时复制且将 right click 发送为 left click
+           ;;   :params  {:alone 150 :held 150}}]
+
            ;; middle click -> paste
            ;; [:from-middle-click [{:pkey :button1} :!Cv]]
            [:from-middle-click nil nil
             {:alone   [{:pkey :button1} :!Cv]
              :held    [{:pkey :button1} :!Ca {:key :v :modi [:left_command] :lazy true :repeat false}] ; hold middle click to overwrite
              :params  {:alone 500 :held 500}}]]}
+
+  {:des   "hold right click -> copy selected, right click twice -> copy a word"
+   :rules [[
+            ;; <from> second right-click (when variable "right-clicked" is 1)
+            :from-right-click
+            ;; <to>, 4 to action
+            ;; 1. call left-click
+            ;; 2. call left-click
+            ;; 3. call cmd-c
+            ;; 4. set variable "right-clicked" to 0
+            [{:pkey :button1} {:pkey :button1} :!Cc ["right-clicked" 0]]
+            ;; <condition> when variable "right-clicked" is 1
+            ["right-clicked" 1]]
+
+
+           [
+            ;; <from> first right-click (when variable "right-clicked" is 0)
+            :from-right-click
+
+            ;; <to>, 1 to action
+            ;; 1. set variable "right-clicked" to 1 (for the second press)
+            [["right-clicked" 1]]
+
+            ;; <condition> nil means no required condition
+            nil
+
+            ;; <additional-option>
+            {
+             ;; to_delayed_action documentation
+             ;; https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/to-delayed-action/
+             :delayed {
+                       ;; run 1 actions when no other key presses after basic.to_delayed_action_delay_milliseconds
+                       ;; 1. set variable "right-clicked" to 0
+                       :invoked  [["right-clicked" 0]]
+
+                       ;; run 1 actions when another key presses within basic.to_delayed_action_delay_milliseconds
+                       ;; 1. set variable "right-clicked" to 0
+                       :canceled [["right-clicked" 0]]
+                       }
+
+             ;; 单击right-click: 发送right-click本身 (右键菜单)
+             ;; 经测试, :halt 不仅取消了 :afterup, 还取消了 :delayed, 故此处用 karabiner_cli 实现 :alone 触发后延时 set variable "right-clicked" to 0
+             ;; :alone   [{:pkey :button2 :halt true} [:cli_set_var "right-clicked" "0"]] ; shell_command 本身就有一定延迟, 故此处不需要额外延时也可以实现 :alone 触发后延时 set variable "right-clicked" to 0
+             :alone   [{:pkey :button2 :halt true} [:delay_cli_set_var "0.01" "right-clicked" "0"]]
+
+             ;; 长按right-click: 发送left-click (选择文本)
+             :held    {:pkey :button1}
+
+             ;; 长按的right-click松开后: 发送cmd-c (复制已选择的文本)
+             :afterup :!Cc
+
+             :params  {
+                       ;; basic.to_delayed_action_delay_milliseconds
+                       :delay    250
+                       ;; held 越短 right-click 选择文本的延迟越低, 但是太短会导致单击 right-click 时, 如果按下去的时间稍长就会发送 left-click 且松开后复制
+                       :alone    150
+                       :held     150}}]]}
 
   ;; TODO easy to accidentally trigger
   #_{:des   "trackpad + keyboard: copy/paste, vi mode"
@@ -1910,9 +1987,11 @@
   :create-tab-by-cmd-n-app
   ["^com\\.microsoft\\.VSCode(Insiders)?$"]
   :line-navigating-by-cmd-arrow-app
-  ["^com\\.google\\.Chrome$" "^com\\.tencent\\.xinWeChat$"]
+  ["^com\\.google\\.Chrome$" "^com\\.brave\\.Browser$"
+   "^com\\.tencent\\.xinWeChat$"]
   :translate-by-opt-shift-a-app
-  ["^com\\.google\\.Chrome$" "^com\\.apple\\.Safari$"
+  ["^com\\.google\\.Chrome$" "^com\\.brave\\.Browser$"
+   "^com\\.apple\\.Safari$"
    "^com\\.jetbrains\\.intellij\\.ce$" "^com\\.jetbrains\\.pycharm\\.ce(-EAP)?$"]
   :tmux-autostart-terminals
   ["^net\\.kovidgoyal\\.kitty$"]
@@ -1934,6 +2013,7 @@
   :ChatGPT          ["^com\\.lencx\\.chatgpt$"]
   :WPSOffice        ["^com\\.kingsoft\\.wpsoffice\\.mac$"]
   :Chrome           ["^com\\.google\\.Chrome$"]
+  :Brave            ["^com\\.brave\\.Browser$"]
   :Safari           ["^com\\.apple\\.Safari$"]
   :Firefoxes        ["^org\\.mozilla\\.firefox$"
                      "^org\\.mozilla\\.firefoxdeveloperedition$"]
