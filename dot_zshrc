@@ -197,6 +197,8 @@ eval "$(pyenv init -)"
 export PATH="$PATH:$HOME/.local/bin"
 fpath=(~/.zsh.d/ $fpath)
 
+# pyenv-virtualenv: prompt changing will be removed from future release. configure `export PYENV_VIRTUALENV_DISABLE_PROMPT=1' to simulate the behavior.
+export PYENV_VIRTUALENV_DISABLE_PROMPT=1
 # https://github.com/pyenv/pyenv-virtualenv
 # eval "$(pyenv virtualenv-init -)"
 # To enable auto-activation add to your profile: | brew info pyenv-virtualenv
@@ -219,7 +221,7 @@ ZVM_VI_INSERT_ESCAPE_BINDKEY=jj
 # /opt/homebrew/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.zsh
 function zvm_vi_yank() {
   zvm_yank
-	# echo ${CUTBUFFER} | pbcopy
+  # echo ${CUTBUFFER} | pbcopy
   # Since the `echo` command can not print the character `-`, here we use `printf` command alternatively.
   printf "%s" "${CUTBUFFER}" | pbcopy
   zvm_exit_visual_mode ${1:-true}
@@ -280,37 +282,37 @@ alias pwdc="pwd | tr -d '\n' | pbcopy"
 # https://github.com/mathiasbynens/dotfiles/blob/main/.functions
 # Create a new directory and enter it
 function mkd() {
-	mkdir -p "$@" && cd "$_";
+  mkdir -p "$@" && cd "$_";
 }
 # Change working directory to the top-most Finder window location
 function cdf() { # short for `cdfinder`
-	cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')";
+  cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')";
 }
 # `o` with no arguments opens the current directory, otherwise opens the given
 # location
 function o() {
-	if [ $# -eq 0 ]; then
-		open .;
-	else
-		open "$@";
-	fi;
+  if [ $# -eq 0 ]; then
+    open .;
+  else
+    open "$@";
+  fi;
 }
 # `tre` is a shorthand for `tree` with hidden files and color enabled, ignoring
 # the `.git` directory, listing directories first. The output gets piped into
 # `less` with options to preserve color and line numbers, unless the output is
 # small enough for one screen.
 function tre() {
-	tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX;
+  tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX;
 }
 
 # alias ll="less"
 unalias ll
 function ll() {
-	if [ $# -eq 0 ]; then
-		less .;
-	else
-		less "$@";
-	fi;
+  if [ $# -eq 0 ]; then
+    less .;
+  else
+    less "$@";
+  fi;
 }
 
 # deal this warning from `doom doctor`: "! The installed grep binary was not built with support for PCRE lookaheads"
@@ -370,11 +372,15 @@ alias bs='brew services'
 function bss() {
   # echo "$(brew services info $@ --json | jq '.[0] | .status')"
   # cheat jq
-	if [ -z "$(brew services info $@ --json | jq '.[] | select(.status == "started")')" ]; then
-    brew services start "$@";
-	else
-    brew services stop "$@";
-	fi;
+  if [ $# -eq 0 ]; then
+    brew services
+  else
+    if [ -z "$(brew services info $@ --json | jq '.[] | select(.status == "started")')" ]; then
+      brew services start "$@";
+    else
+      brew services stop "$@";
+    fi;
+  fi;
 }
 alias bsr='brew services restart'
 alias bsk='brew services kill'
@@ -411,3 +417,6 @@ alias czcode='chezmoi edit --apply --verbose "$HOME/Library/Application Support/
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+
+# set python command if 'py' not installed | https://github.com/ohmyzsh/ohmyzsh/blob/master/plugins/python/python.plugin.zsh
+builtin which py > /dev/null || alias py='python3'
