@@ -217,6 +217,9 @@ nmap # #zz
 nmap n nzz
 nmap N Nzz
 
+" https://github.com/JetBrains/ideavim/discussions/357#discussioncomment-1189455
+nnoremap cn *Ncgn
+
 " TODO is this better or not?
 " nmap <C-o> <Action>(Back)
 " nmap <C-i> <Action>(Forward)
@@ -240,9 +243,11 @@ map <M-k> <Action>(MoveStatementUp)
 map <up> <Action>(MethodUp)
 map <down> <Action>(MethodDown)
 " map <left> <Action>(JumpToLastChange)
-map <left> <C-o>
+" map <left> <C-o>
+map <left> <Action>(Back)
 " map <right> <Action>(JumpToNextChange)
-map <right> <C-i>
+" map <right> <C-i>
+map <right> <Action>(Forward)
 
 " github copilot <TAB> (behaves like zsh-autosuggestions)
 imap <C-l> <Action>(copilot.applyInlays)
@@ -368,11 +373,18 @@ map <Leader>sm <Action>(ShowBookmarks)
 map <leader>th <Action>(TypeHierarchy)
 map <leader>tt <Action>(ActivateTerminalToolWindow)
 map <leader>uw <Action>(Unwrap)
-map <leader>va <Action>(Annotate)
-map <leader>vc <Action>(Compare.LastVersion)
+" add
+map <leader>va <Action>(ChangesView.AddUnversioned)
+" blame
+map <leader>vb <Action>(Annotate)
+" commit
+map <leader>vc <Action>(CheckinProject)
+map <leader>vC <Action>(CheckinFiles)
+" diff
+map <leader>vd <Action>(Compare.LastVersion)
 map <leader>vh <Action>(Vcs.ShowTabbedFileHistory)
 map <leader>vq <Action>(Vcs.QuickListPopupAction)
-map <leader>vu <Action>(ChangesView.AddUnversioned)
+map <leader>vr <Action>(ChangesView.Revert)
 " map <leader>w <Action>(CloseContent)
 map <leader>ww <Action>(JumpToLastWindow)
 map <leader>wt <Action>(ActivateTerminalToolWindow)
@@ -411,9 +423,13 @@ map <leader><TAB> <Action>(EditorCompleteStatement)
 " use <TAB> as second Leader key
 nmap <TAB><TAB> <Action>(CodeCompletion)
 nmap <TAB><CR> <Action>(GotoNextError)
+nmap <TAB>a <Action>(VimFindActionIdAction)
 nmap <TAB>j gt
 nmap <TAB>k gT
+nmap <TAB>l <Action>(ReformatCode) \| <Action>(OptimizeImports)
+nmap <TAB>r :source ~/.ideavimrc<CR>
 nmap <TAB>t <Action>(Terminal.OpenInTerminal)
+nmap <TAB>v <Action>(Vcs.QuickListPopupAction)
 
 map <S-Space> <Action>(GotoNextError)
 

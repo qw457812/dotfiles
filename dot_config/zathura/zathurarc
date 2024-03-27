@@ -1,9 +1,21 @@
 # https://pwmt.org/projects/zathura/documentation/
 # https://pwmt.org/projects/girara/options/
 
+# https://manpages.ubuntu.com/manpages/trusty/man5/zathurarc.5.html
+
 # https://github.com/zegervdv/homebrew-zathura#copying-to-clipboard
 set selection-clipboard clipboard
 
 # https://gist.github.com/agzam/76d761804330cc8c4600fccda952ed1c
 set window-height 3000
 set window-width 3000
+
+# https://github.com/Jguer/dotfiles/blob/sway/zathura/zathurarc
+set recolor true
+set adjust-open width
+set scroll-step 50
+# doomemacs pdf-view-fit-width-to-window
+map w adjust_window width
+# doomemacs pdf-view-fit-page-to-window
+map p adjust_window best-fit
+map b toggle_statusbar
