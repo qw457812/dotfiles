@@ -1609,14 +1609,45 @@
            ;; [:##left_control :left_control nil {:alone :tab}]
            [:##left_control :left_control nil {:alone :prev_app}]
            ;; TODO
-           [:!T##j :down_arrow]
-           [:!T##k :up_arrow]
-           [:!T##h :left_arrow]
-           [:!T##l :right_arrow]
-           [:!T#Pa :!!f7] ; clipboard history by Maccy.app
-           [:!T#Ps :!Cx]
-           [:!T#Pd :!Cc]
-           [:!T#Pf :!Cv]
+           ; [:!T##j :down_arrow]
+           ; [:!T##k :up_arrow]
+           ; [:!T##h :left_arrow]
+           ; [:!T##l :right_arrow]
+           ; [:!T#Pa :!!f7] ; clipboard history by Maccy.app
+           ; [:!T#Ps :!Cx]
+           ; [:!T#Pd :!Cc]
+           ; [:!T#Pf :!Cv]
+           ;; see "d mode (tab navigation)" above
+           [:!T#Pspacebar :same_wind_app] ; cmd+`
+           ;; switch tabs in most apps
+           [:!T#Pj :!CSclose_bracket [:!switch-tabs-by-ctrl-tab-app :!tmux-autostart-terminals :!Emacs :!WeWork :!WeChat]] ; Cmd Shift ]
+           [:!T#Pk :!CSopen_bracket [:!switch-tabs-by-ctrl-tab-app :!tmux-autostart-terminals :!Emacs :!WeWork :!WeChat]] ; Cmd Shift [
+           [:!T#Pj :!Ttab :switch-tabs-by-ctrl-tab-app] ; Ctrl Tab
+           [:!T#Pk :!TStab :switch-tabs-by-ctrl-tab-app] ; Ctrl Shift Tab
+           [:!T#Pj [:!Tb :!Tl] :tmux-autostart-terminals] ; tmux: next window
+           [:!T#Pk [:!Tb :!Th] :tmux-autostart-terminals] ; tmux: previous window
+           [:!T#Pj [:spacebar :b :n] :Emacs] ; doomemacs: next buffer
+           [:!T#Pk [:spacebar :b :p] :Emacs] ; doomemacs: previous buffer
+           [:!T#Pj :!Cdown_arrow :WeWork] ; wework: next chat message
+           [:!T#Pk :!Cup_arrow :WeWork] ; wework: previous chat message
+           [:!T#Pj :!Odown_arrow :WeChat] ; wechat: next chat message
+           [:!T#Pk :!Oup_arrow :WeChat] ; wechat: previous chat message
+           ;; create tab in most apps
+           [:!T#Pn :!Ct [:!create-tab-by-cmd-n-app :!tmux-autostart-terminals :!Emacs]] ; Cmd t
+           [:!T#Pn :!Cn :create-tab-by-cmd-n-app] ; Cmd n
+           [:!T#Pn [:!Tb :c] :tmux-autostart-terminals] ; tmux: new window
+           [:!T#Pn [:spacebar :b :!Sn] :Emacs] ; doomemacs: new empty buffer
+           ;; switch sheets
+           [:!T#Ph :!COopen_bracket :WPSOffice] ; wps: previous worksheet
+           [:!T#Pl :!COclose_bracket :WPSOffice] ; wps: next worksheet
+           ;; TODO tmux: previous pane
+           [:!T#Ph [:!Tb :h :!Tb :k] :tmux-autostart-terminals] ; tmux: previous pane
+           [:!T#Pl [:!Tb :o] :tmux-autostart-terminals] ; tmux: next pane
+           [:!T#Ph [:spacebar :w :!Sw] :Emacs] ; doomemacs: previous window
+           [:!T#Pl [:spacebar :w :w] :Emacs] ; doomemacs: next window
+           ;; resize window, remap Rectangle.app
+           [:!T#Pm :!TSOspacebar] ; maximize
+
            ;; right_control -> rime: toggle ascii punct | ~/Library/Rime/default.custom.yaml
            [:##right_control :right_control :Emacs {:alone [:right_control :!Tbackslash]}] ; emacs-rime
            ;; TODO launch-mode

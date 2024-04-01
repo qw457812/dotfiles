@@ -78,7 +78,7 @@ zstyle ':omz:update' frequency 2
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git tmux)
+plugins=(git tmux zsh-vi-mode)
 
 # you have to add the `ZSH...=...` assignment before the line `source $ZSH/oh-my-zsh.sh`, from https://github.com/ohmyzsh/ohmyzsh/issues/3676#issuecomment-77806736
 # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/tmux
@@ -209,23 +209,15 @@ alias v='lvim'
 alias n="nvim"
 alias rr="ranger"
 
+# use my fork because of system clipboard integration: https://github.com/qw457812/zsh-vi-mode
 # https://github.com/jeffreytse/zsh-vi-mode | brew info zsh-vi-mode
-source $(brew --prefix)/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
-# export ZVM_VI_EDITOR='nvim'
+# source $(brew --prefix)/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
 # Append a command directly
 zvm_after_init_commands+=('[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh')
 # Always starting with insert mode for each command line
 ZVM_LINE_INIT_MODE=$ZVM_MODE_INSERT
 ZVM_VI_INSERT_ESCAPE_BINDKEY=jj
-# TODO clipboard | https://github.com/jeffreytse/zsh-vi-mode/issues/19
-# /opt/homebrew/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.zsh
-function zvm_vi_yank() {
-  zvm_yank
-  # echo ${CUTBUFFER} | pbcopy
-  # Since the `echo` command can not print the character `-`, here we use `printf` command alternatively.
-  printf "%s" "${CUTBUFFER}" | pbcopy
-  zvm_exit_visual_mode ${1:-true}
-}
+ZVM_KEYTIMEOUT=0.3
 
 # https://github.com/starship/starship
 # eval "$(starship init zsh)"
