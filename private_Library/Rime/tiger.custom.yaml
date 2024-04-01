@@ -2473,3 +2473,15 @@ patch:
 # 
 # 3 directories, 25 files
 # ------------------------------------------------------------------------------------------
+# 
+# ------------------------------------------------------------------------------------------
+# 虎码秃版 鼠须管 （Mac）2024.04.01.zip (18.0MB) | 鼠须管 | ④Mac | 03 虎码输入法下载 | http://huma.ysepan.com/
+# ------------------------------------------------------------------------------------------
+# ❯ diff --brief --recursive 虎码秃版\ 鼠须管\ （Mac）2024.02.25 虎码秃版\ 鼠须管\ （Mac）2024.04.01
+# Files 虎码秃版 鼠须管 （Mac）2024.02.25/core2022.dict.yaml and 虎码秃版 鼠须管 （Mac）2024.04.01/core2022.dict.yaml differ
+# Files 虎码秃版 鼠须管 （Mac）2024.02.25/opencc/hu_cf.txt and 虎码秃版 鼠须管 （Mac）2024.04.01/opencc/hu_cf.txt differ
+# Files 虎码秃版 鼠须管 （Mac）2024.02.25/tiger.dict.yaml and 虎码秃版 鼠须管 （Mac）2024.04.01/tiger.dict.yaml differ
+# Files 虎码秃版 鼠须管 （Mac）2024.02.25/tigress.dict.yaml and 虎码秃版 鼠须管 （Mac）2024.04.01/tigress.dict.yaml differ
+# Files 虎码秃版 鼠须管 （Mac）2024.02.25/tigress_ci.dict.yaml and 虎码秃版 鼠须管 （Mac）2024.04.01/tigress_ci.dict.yaml differ
+# Files 虎码秃版 鼠须管 （Mac）2024.02.25/tigress_simp_ci.dict.yaml and 虎码秃版 鼠须管 （Mac）2024.04.01/tigress_simp_ci.dict.yaml differ
+# ------------------------------------------------------------------------------------------
