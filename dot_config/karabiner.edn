@@ -961,8 +961,10 @@
    :rules [:website-mode
            ;; TODO spacebar
            [:j [:open "https://google.com/search?q=$(pbpaste)"]]
-           [:f [:opena-file "/Applications/Google Chrome.app" "chrome://newtab/"]]
-           [:e [:opena-file "/Applications/Google Chrome.app" "chrome://extensions/"]]
+           ;; [:f [:opena-file "/Applications/Google Chrome.app" "chrome://newtab/"]]
+           [:f [:opena-file "/Applications/Brave Browser.app" "brave://newtab/"]]
+           ;; [:e [:opena-file "/Applications/Google Chrome.app" "chrome://extensions/"]]
+           [:e [:opena-file "/Applications/Brave Browser.app" "brave://extensions/"]]
            [:d [:open "https://www.deepl.com/translator"]]
            ;; https://github.com/pqrs-org/Karabiner-Elements/issues/2535
            ;; [:s :!Cc nil {:delayed {:invoked [:open "https://translate.google.com/?sl=en&tl=zh-CN&text=$(pbpaste)&op=translate"]} :params {:delay 30}}]

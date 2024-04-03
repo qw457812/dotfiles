@@ -1,0 +1,8 @@
+# "TidGi.app"已损坏，无法打开。 你应该将它移到废纸篓。
+# macOS DMG 安装后无法打开，提示损坏 ---> 网络下载应用被 Apple 添加隔离标识，终端输入命令解除即可：
+# “LX Music.app” is damaged and can’t be opened. You should move it to the Trash.
+# 这是因为软件没有签名，被系统阻止运行
+xattr -rd com.apple.quarantine /Applications/TidGi.app
+
+# List key:value extended attributes for a given file:
+xattr -l /Applications/TidGi.app
