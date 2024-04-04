@@ -1,0 +1,3 @@
+# https://yazi-rs.github.io/docs/configuration/yazi
+[manager]
+show_hidden = true

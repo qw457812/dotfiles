@@ -454,3 +454,13 @@ lf () {
     # `command` is needed in case `lfcd` is aliased to `lf`
     cd "$(command lf -print-last-dir "$@")"
 }
+
+# https://yazi-rs.github.io/docs/quick-start
+function yy() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXX")"
+	yazi "$@" --cwd-file="$tmp"
+	if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+		cd -- "$cwd"
+	fi
+	rm -f -- "$tmp"
+}
