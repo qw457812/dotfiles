@@ -1,7 +1,11 @@
 # https://github.com/gokcehan/lf/blob/master/doc.md
 # `:doc` in lf
-# show hidden files (default false)
+# Show hidden files
 set hidden true
+# Jump to the first match after each keystroke during searching
+set incsearch true
+# Set the interval in seconds for periodic checks of directory updates (default 0)
+set period 1
 
 # PREFIXES
 # The following command prefixes are used by lf:
@@ -66,6 +70,7 @@ map a :push %mkdir<space>
 # make sure trash folder exists
 # %mkdir -p ~/.trash
 
+# TODO trash-cli
 # move current file or selected files to trash folder
 # (also see 'man mv' for backup/overwrite options)
 cmd trash %set -f; mv $fx ~/.trash
@@ -94,6 +99,7 @@ cmd extract ${{
         *.tar.bz|*.tar.bz2|*.tbz|*.tbz2) tar xjvf $f;;
         *.tar.gz|*.tgz) tar xzvf $f;;
         *.tar.xz|*.txz) tar xJvf $f;;
+        *.tar) tar xvf $f;;
         *.zip) unzip $f;;
         *.rar) unrar x $f;;
         *.7z) 7z x $f;;
@@ -124,6 +130,7 @@ cmd z %{{
 	result="$(zoxide query --exclude $PWD $@ | sed 's/\\/\\\\/g;s/"/\\"/g')"
 	lf -remote "send $id cd \"$result\""
 }}
+map zz push :z<space>
 
 cmd zi ${{
 	result="$(zoxide query -i | sed 's/\\/\\\\/g;s/"/\\"/g')"
@@ -131,7 +138,24 @@ cmd zi ${{
 }}
 
 cmd on-cd &{{
-        zoxide add "$PWD"
+  zoxide add "$PWD"
+
+	# display repository status in your prompt
+	if [ -d .git ] || [ -f .git ]; then
+		branch=$(git branch --show-current 2>/dev/null) || true
+		remote=$(git config --get branch.$branch.remote 2>/dev/null) || true
+		url=$(git remote get-url $remote 2>/dev/null) || true
+		fmt="\033[32;1m%u@%h\033[0m:\033[34;1m%w\033[0m\033[33;1m [GIT BRANCH:> $branch >> $url]\033[0m"
+	elif [ -d .hg ]; then
+		hg=$(hg branch 2>/dev/null) || true
+		fmt="\033[32;1m%u@%h\033[0m:\033[34;1m%w\033[0m\033[33;1m [HG BRANCH:> $hg]\033[0m"
+	elif [ -d .svn ]; then
+		svn=$(svn info 2>/dev/null | awk '/^URL: /{print $2}') || true
+		fmt="\033[32;1m%u@%h\033[0m:\033[34;1m%w\033[0m\033[33;1m [SVN URL:> $svn]\033[0m"
+	else
+		fmt="\033[32;1m%u@%h\033[0m:\033[34;1m%d\033[0m\033[1m%f\033[0m"
+	fi
+	lf -remote "send $id set promptfmt \"$fmt\""
 }}
 
 # eza
@@ -141,13 +165,7 @@ cmd on-select &{{
 
 # fzf
 # map f $$EDITOR $(fzf)
-cmd fzf_find ${{
-    res="$(fd --hidden --no-ignore | fzf --reverse --header='Find file')"
-    if [ -n "$res" ]; then
-        res="$(printf '%s' "$res" | sed 's/\\/\\\\/g;s/"/\\"/g')"
-        lf -remote "send $id select \"$res\""
-    fi
-}}
+cmd fzf_find $lf -remote "send $id select \"$(fzf --reverse --header='Find file')\""
 map gf :fzf_find
 
 # ripgrep
@@ -162,3 +180,23 @@ cmd fzf_search ${{
     [ -n "$res" ] && lf -remote "send $id select \"$res\""
 }}
 map gs :fzf_search
+
+# git
+cmd git_branch ${{
+    git branch | fzf | xargs git checkout
+    pwd_shell=$(pwd | sed 's/\\/\\\\/g;s/"/\\"/g')
+    lf -remote "send $id updir"
+    lf -remote "send $id cd \"$pwd_shell\""
+}}
+map gB :git_branch
+map gP ${{clear; git pull --rebase || true; echo "press ENTER"; read ENTER}}
+map gS ${{clear; git status; echo "press ENTER"; read ENTER}}
+map gL ${{clear; git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit}}
+
+# shortcut
+map gc cd ~/.config
+map gd cd ~/Documents
+map gD cd ~/Downloads
+
+# TODO https://github.com/aharoJ/lf-config/blob/main/lfrc
+# TODO https://github.com/jiu-chen/my-lfrc/blob/main/lfrc
