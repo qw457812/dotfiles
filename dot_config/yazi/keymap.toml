@@ -1,0 +1,17 @@
+# https://github.com/sxyazi/yazi/blob/latest/yazi-config/preset/keymap.toml
+[manager]
+prepend_keymap = [
+  # https://yazi-rs.github.io/docs/tips/#dropping-to-shell
+  # Dropping to the shell
+  { on = [ "<C-s>" ], run = 'shell "$SHELL" --block --confirm', desc = "Open shell here" },
+  # https://yazi-rs.github.io/docs/tips/#smart-enter
+  # https://yazi-rs.github.io/docs/faq#why-separate-open-enter
+  { on = [ "l" ], run = "plugin --sync smart-enter", desc = "Enter the child directory, or open the file" },
+]
+
+[input]
+prepend_keymap = [
+  # https://yazi-rs.github.io/docs/tips/#close-input-by-esc
+  # Close input by once `Esc` press (without entering Vi mode)
+  # { on = [ "<Esc>" ], run = 'close', desc = "Cancel input" },
+]
