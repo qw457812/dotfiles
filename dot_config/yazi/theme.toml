@@ -1,0 +1,14 @@
+# https://yazi-rs.github.io/docs/faq#dont-like-nerd-fonts
+[status]
+separator_open  = ""
+separator_close = ""
+
+[icon]
+rules = []
+
+# git clone https://github.com/yazi-rs/flavors.git ~/.config/yazi/flavors
+# [flavor]
+# use = "catppuccin-mocha"
+# use = "catppuccin-latte"
+# use = "catppuccin-frappe"
+# use = "catppuccin-macchiato"
