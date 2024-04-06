@@ -96,6 +96,10 @@ fi
 # https://docs.brew.sh/Shell-Completion
 FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
 
+# `vv` of zsh-vi-mode
+export EDITOR='nvim'
+export VISUAL='nvim'
+
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
@@ -141,8 +145,6 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
 eval $(thefuck --alias)
 
 # https://github.com/cheat/cheat
@@ -157,9 +159,6 @@ eval "$(zoxide init zsh)"
 export LC_ALL=en_US.UTF-8
 # You may need to manually set your language environment
 export LANG=en_US.UTF-8
-
-export EDITOR='nvim'
-export VISUAL='nvim'
 
 # brew info lesspipe
 export LESSOPEN="|/opt/homebrew/bin/lesspipe.sh %s"
@@ -181,11 +180,11 @@ alias -g -- --help='--help 2>&1 | bat --language=help --style=plain'
 # export HOMEBREW_GITHUB_API_TOKEN=
 
 # http://www.npmmirror.com/
-#alias for cnpm
-alias cnpm="npm --registry=https://registry.npmmirror.com \
-  --cache=$HOME/.npm/.cache/cnpm \
-  --disturl=https://npmmirror.com/mirrors/node \
-  --userconfig=$HOME/.cnpmrc"
+# alias for cnpm
+# alias cnpm="npm --registry=https://registry.npmmirror.com \
+#   --cache=$HOME/.npm/.cache/cnpm \
+#   --disturl=https://npmmirror.com/mirrors/node \
+#   --userconfig=$HOME/.cnpmrc"
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
@@ -211,11 +210,35 @@ alias n="nvim"
 alias lv='lvim'
 alias rr="ranger"
 
-# use my fork because of system clipboard integration: https://github.com/qw457812/zsh-vi-mode
+# use my fork (system clipboard integration) instead: https://github.com/qw457812/zsh-vi-mode
 # https://github.com/jeffreytse/zsh-vi-mode | brew info zsh-vi-mode
 # source $(brew --prefix)/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
-# Append a command directly
-zvm_after_init_commands+=('[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh')
+#
+# Since the default [initialization mode](https://github.com/jeffreytse/zsh-vi-mode#initialization-mode), this plugin
+# will overwrite the previous key bindings, this causes the key bindings of
+# other plugins (i.e. `fzf`, `zsh-autocomplete`, etc.) to fail.
+#
+# You can solve the compatibility issue as below:
+#
+# The plugin will auto execute this zvm_after_init function
+function zvm_after_init() {
+  # https://github.com/junegunn/fzf#setting-up-shell-integration
+  # Set up fzf key bindings and fuzzy completion
+  eval "$(fzf --zsh)"
+
+  # downside vs fzf: atuin do not highlight the matched text like fzf do: https://github.com/atuinsh/atuin/issues/503
+  # https://docs.atuin.sh/configuration/key-binding/
+  export ATUIN_NOBIND="true"
+  # https://github.com/atuinsh/atuin#shell-plugin
+  eval "$(atuin init zsh)"
+  # bind ctrl-r to zsh-vi-mode's insert mode
+  bindkey '^r' atuin-search
+  # bindkey -M vicmd '^r' atuin-search # disable in zsh-vi-mode's normal mode
+  # bind up arrow to zsh-vi-mode's insert mode
+  # run `cat -v` to observe up arrow key codes | https://github.com/zsh-users/zsh-history-substring-search
+  bindkey '^[[A' atuin-up-search
+  # bindkey -M vicmd 'k' atuin-up-search # disable in zsh-vi-mode's normal mode
+}
 # Always starting with insert mode for each command line
 ZVM_LINE_INIT_MODE=$ZVM_MODE_INSERT
 ZVM_VI_INSERT_ESCAPE_BINDKEY=jj
@@ -392,9 +415,9 @@ alias -g G='| grep'
 alias -g L="| less"
 alias -g LL="2>&1 | less"
 alias -g C="| clipcopy"
-# alias rm='rm -i'
-# alias cp='cp -i'
-# alias mv='mv -i'
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
 
 # https://github.com/posquit0/zshrc/blob/9a33d6e3194dd9f2667e407029ef537b8ce74b41/aliases.zshrc
 alias cz=chezmoi
