@@ -7,6 +7,9 @@ prepend_keymap = [
   # https://yazi-rs.github.io/docs/tips/#smart-enter
   # https://yazi-rs.github.io/docs/faq#why-separate-open-enter
   { on = [ "l" ], run = "plugin --sync smart-enter", desc = "Enter the child directory, or open the file" },
+  # https://yazi-rs.github.io/docs/tips#parent-arrow
+  { on = [ "K" ], run = "plugin --sync parent-arrow --args=-1", desc = "Navigation in the parent directory without leaving the CWD" },
+  { on = [ "J" ], run = "plugin --sync parent-arrow --args=1", desc = "Navigation in the parent directory without leaving the CWD" },
 ]
 
 [input]
