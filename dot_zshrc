@@ -205,10 +205,9 @@ export PYENV_VIRTUALENV_DISABLE_PROMPT=1
 # To enable auto-activation add to your profile: | brew info pyenv-virtualenv
 if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi
 
-# alias v="vim"
-# alias n="nvim"
-alias v='nvim'
+alias v='vim'
 alias vi="vim"
+alias n="nvim"
 alias lv='lvim'
 alias rr="ranger"
 
@@ -418,7 +417,7 @@ builtin which py > /dev/null || alias py='python3'
 
 # https://github.com/jarun/nnn/wiki/Basic-use-cases#configure-cd-on-quit
 # https://github.com/jarun/nnn/blob/master/misc/quitcd/quitcd.bash_sh_zsh
-n ()
+nn ()
 {
     # Block nesting of nnn in subshells
     [ "${NNNLVL:-0}" -eq 0 ] || {
@@ -458,7 +457,9 @@ lf () {
 # https://yazi-rs.github.io/docs/quick-start
 function yy() {
 	local tmp="$(mktemp -t "yazi-cwd.XXXXX")"
-	yazi "$@" --cwd-file="$tmp"
+	# TODO yazi via homebrew is outdated
+	# yazi "$@" --cwd-file="$tmp"
+	$HOME/Tools/yazi-aarch64-apple-darwin/yazi "$@" --cwd-file="$tmp"
 	if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
 		cd -- "$cwd"
 	fi

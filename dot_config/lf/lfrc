@@ -34,6 +34,35 @@ cmd yank_path %{{
 }}
 map Y :yank_path
 
+# follow symlinks
+cmd follow_link %{{
+  lf -remote "send ${id} select '$(readlink $f)'"
+}}
+map gL follow_link
+
+# TODO not working
+# create symlinks (soft / hard)
+# y (select for copy) and P to paste soft-link
+# d (select for cut) and P to paste hard-link
+# cmd link %{{
+#     set -- $(cat ~/.local/share/lf/files)
+#     mode="$1"
+#     shift
+#     if [ "$#" -lt 1 ]; then
+#         lf -remote "send $id echo no files to link"
+#         exit 0
+#     fi
+#     case "$mode" in
+#         # symbolically copy mode is indicating a soft link
+#         copy) ln -sr -t . -- "$@";;
+#         # while a move mode is indicating a hard link
+#         move) ln -t . -- "$@";;
+#     esac
+#     rm ~/.local/share/lf/files
+#     lf -remote "send clear"
+# }}
+# map P :link
+
 # https://github.com/gokcehan/lf/blob/master/etc/lfrc.example
 # use enter for shell commands
 map <enter> shell
@@ -182,16 +211,16 @@ cmd fzf_search ${{
 map gs :fzf_search
 
 # git
-cmd git_branch ${{
-    git branch | fzf | xargs git checkout
-    pwd_shell=$(pwd | sed 's/\\/\\\\/g;s/"/\\"/g')
-    lf -remote "send $id updir"
-    lf -remote "send $id cd \"$pwd_shell\""
-}}
-map gB :git_branch
-map gP ${{clear; git pull --rebase || true; echo "press ENTER"; read ENTER}}
-map gS ${{clear; git status; echo "press ENTER"; read ENTER}}
-map gL ${{clear; git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit}}
+# cmd git_branch ${{
+#     git branch | fzf | xargs git checkout
+#     pwd_shell=$(pwd | sed 's/\\/\\\\/g;s/"/\\"/g')
+#     lf -remote "send $id updir"
+#     lf -remote "send $id cd \"$pwd_shell\""
+# }}
+# map gB :git_branch
+# map gP ${{clear; git pull --rebase || true; echo "press ENTER"; read ENTER}}
+# map gS ${{clear; git status; echo "press ENTER"; read ENTER}}
+# map gL ${{clear; git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit}}
 
 # shortcut
 map gc cd ~/.config
