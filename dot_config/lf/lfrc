@@ -14,7 +14,7 @@ set period 1
 # %  shell-pipe      shell command running with the UI
 # !  shell-wait      shell command waiting for a key press
 # &  shell-async     shell command running asynchronously
-map U !du -csh *
+map U !printf "\n";du -csh *
 
 # https://github.com/gokcehan/lf/wiki/Tips
 # repeating the previous command
@@ -227,5 +227,11 @@ map gc cd ~/.config
 map gd cd ~/Documents
 map gD cd ~/Downloads
 
+# https://github.com/rockyzhang24/dotfiles/blob/master/.config/lf/lfrc
+# https://github.com/gokcehan/lf/pull/482
+cmap <tab> cmd-menu-complete
+cmap <backtab> cmd-menu-complete-back
+
+# TODO https://github.com/rockyzhang24/dotfiles/blob/master/.config/lf/lfrc
 # TODO https://github.com/aharoJ/lf-config/blob/main/lfrc
 # TODO https://github.com/jiu-chen/my-lfrc/blob/main/lfrc

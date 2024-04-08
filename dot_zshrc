@@ -236,7 +236,7 @@ function zvm_after_init() {
   # bindkey -M vicmd '^r' atuin-search # disable in zsh-vi-mode's normal mode
   # bind up arrow to zsh-vi-mode's insert mode
   # run `cat -v` to observe up arrow key codes | https://github.com/zsh-users/zsh-history-substring-search
-  bindkey '^[[A' atuin-up-search
+  # bindkey '^[[A' atuin-up-search
   # bindkey -M vicmd 'k' atuin-up-search # disable in zsh-vi-mode's normal mode
 }
 # Always starting with insert mode for each command line
@@ -480,11 +480,23 @@ lf () {
 # https://yazi-rs.github.io/docs/quick-start
 function yy() {
 	local tmp="$(mktemp -t "yazi-cwd.XXXXX")"
-	# TODO yazi via homebrew is outdated
-	# yazi "$@" --cwd-file="$tmp"
-	$HOME/Tools/yazi-aarch64-apple-darwin/yazi "$@" --cwd-file="$tmp"
+	yazi "$@" --cwd-file="$tmp"
 	if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
 		cd -- "$cwd"
 	fi
 	rm -f -- "$tmp"
+}
+
+# Exit to last working directory (LWD) | https://github.com/kyoheiu/felix
+source <(command fx --init)
+
+# https://wiki.vifm.info/index.php/How_to_set_shell_working_directory_after_leaving_Vifm
+vv()
+{
+    local dst="$(command vifm --choose-dir - "$@")"
+    if [ -z "$dst" ]; then
+        echo 'Directory picking cancelled/failed'
+        return 1
+    fi
+    cd "$dst"
 }
