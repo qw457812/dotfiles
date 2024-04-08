@@ -72,7 +72,7 @@ set vim-paragraph-motion
 " ai ii aI iI
 set textobj-indent
 " https://github.com/adelarsq/vim-matchit/blob/master/doc/matchit.txt
-" TODO what is this?
+" % g%
 set matchit
 set which-key
 set notimeout
@@ -430,6 +430,8 @@ nmap <TAB>l <Action>(ReformatCode) \| <Action>(OptimizeImports)
 nmap <TAB>r :source ~/.ideavimrc<CR>
 nmap <TAB>t <Action>(Terminal.OpenInTerminal)
 nmap <TAB>v <Action>(Vcs.QuickListPopupAction)
+
+" TODO more Leader key like `<BS>`, `,` | https://github.com/rockyzhang24/dotfiles/tree/master/.config/nvim#-key-mappings
 
 map <S-Space> <Action>(GotoNextError)
 
