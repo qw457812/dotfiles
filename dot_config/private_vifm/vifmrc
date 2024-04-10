@@ -1,9 +1,12 @@
 " vim: filetype=vifm :
-" Sample configuration file for vifm on OSX (last updated: 2 April, 2023)
+" Sample configuration file for vifm on OSX (last updated: 19 March, 2024)
 " You can edit this file by hand.
 " The " character at the beginning of a line comments out the line.
 " Blank lines are ignored.
 " The basic format for each item is shown with an example.
+
+" Check Update:
+" https://github.com/vifm/vifm/blob/master/data/vifmrc-osx
 
 " ------------------------------------------------------------------------------
 " Main settings
@@ -57,10 +60,10 @@ set trash
 
 " What should be saved automatically on restarting vifm.  Drop "savedirs"
 " value if you don't want vifm to remember last visited directories for you.
-" set vifminfo=dhistory,savedirs,chistory,state,tui,shistory,
-"             \phistory,fhistory,dirstack,registers,bookmarks,bmarks
-set vifminfo=dhistory,chistory,state,tui,shistory,
-            \phistory,fhistory,dirstack,registers,bookmarks,bmarks
+" set vifminfo=dhistory,savedirs,chistory,state,tui,tabs,shistory,ehistory,
+"             \phistory,fhistory,dirstack,registers,bookmarks,bmarks,mchistory
+set vifminfo=dhistory,chistory,state,tui,tabs,shistory,ehistory,
+            \phistory,fhistory,dirstack,registers,bookmarks,bmarks,mchistory
 
 " This is how many directories to store in the directory history.
 " set history=100
@@ -131,6 +134,9 @@ colorscheme papercolor-dark gruvbox molokai zenburn_1 Default-256 Default
 
 mark b ~/bin/
 mark h ~/
+mark c ~/.config/
+mark d ~/Documents/
+mark D ~/Downloads/
 
 " ------------------------------------------------------------------------------
 " Commands
@@ -197,11 +203,16 @@ command! reload :write | restart full
 " program.  There is also %FOREGROUND, which is useful for entering passwords.
 
 " Pdf
+" filetype {*.pdf},<application/pdf>
+"        \ {Open in Preview}
+"        \ open -a Preview.app,
+"        \ {Open in Skim}
+"        \ open -a Skim.app,
 filetype {*.pdf},<application/pdf>
+       \ {Open in Zathura}
+       \ zathura %c %i &,
        \ {Open in Preview}
        \ open -a Preview.app,
-       \ {Open in Skim}
-       \ open -a Skim.app,
 fileviewer {*.pdf},<application/pdf> pdftotext -nopgbrk %c -
 
 " PostScript
@@ -227,7 +238,7 @@ fileviewer {*.wav,*.mp3,*.flac,*.m4a,*.wma,*.ape,*.ac3,*.og[agx],*.spx,*.opus,
 
 " Video
 filetype {*.avi,*.mp4,*.wmv,*.dat,*.3gp,*.ogv,*.mkv,*.mpg,*.mpeg,*.vob,
-         \*.fl[icv],*.m2v,*.mov,*.webm,*.ts,*.mts,*.m4v,*.r[am],*.qt,*.divx,
+         \*.fl[icv],*.m2v,*.mov,*.webm,*.mts,*.m4v,*.r[am],*.qt,*.divx,
          \*.as[fx],*.unknown_video},
         \<video/*>
        \ {Open in QuickTime Player}
@@ -237,17 +248,24 @@ filetype {*.avi,*.mp4,*.wmv,*.dat,*.3gp,*.ogv,*.mkv,*.mpg,*.mpeg,*.vob,
        \ {Open in VLC}
        \ open -a VLC.app,
 fileviewer {*.avi,*.mp4,*.wmv,*.dat,*.3gp,*.ogv,*.mkv,*.mpg,*.mpeg,*.vob,
-           \*.fl[icv],*.m2v,*.mov,*.webm,*.ts,*.mts,*.m4v,*.r[am],*.qt,*.divx,
+           \*.fl[icv],*.m2v,*.mov,*.webm,*.mts,*.m4v,*.r[am],*.qt,*.divx,
            \*.as[fx],*.unknown_video},
           \<video/*>
          \ ffprobe -hide_banner -pretty %c 2>&1
 
 " Web
+" filetype {*.xhtml,*.html,*.htm},<text/html>
+"        \ {Open in Safari}
+"        \ open -a Safari.app,
+"        \ {Open in Firefox}
+"        \ open -a Firefox.app,
+"        \ {Open in Chrome}
+"        \ open -a Google\ Chrome.app,
+"        \ {Open in vim}
+"        \ vim,
 filetype {*.xhtml,*.html,*.htm},<text/html>
-       \ {Open in Safari}
-       \ open -a Safari.app,
-       \ {Open in Firefox}
-       \ open -a Firefox.app,
+       \ {Open in Brave}
+       \ open -a Brave\ Browser.app,
        \ {Open in Chrome}
        \ open -a Google\ Chrome.app,
        \ {Open in vim}
@@ -336,10 +354,15 @@ filetype {*.odt,*.doc,*.docx,*.xls,*.xlsx,*.odp,*.pptx,*.ppt},
           \application/vnd.ms-excel>
        \ open -a LibreOffice.app
 fileviewer {*.doc},<application/msword> antiword -
-fileviewer {*.docx},
-          \<application/
-           \vnd.openxmlformats-officedocument.wordprocessingml.document>
-         \ docx2txt.pl %f -
+" fileviewer {*.docx},
+"           \<application/
+"            \vnd.openxmlformats-officedocument.wordprocessingml.document>
+"          \ docx2txt.pl %f -
+" https://github.com/ObserverOfTime/home.files/blob/master/.config/vifm/vifmrc
+fileviewer *.epub pandoc -f epub -t plain %c
+fileviewer *.docx pandoc -f docx -t plain %c
+fileviewer *.odt pandoc -f odt -t plain %c
+fileviewer *.ipynb pandoc -f ipynb -t gfm %c
 
 " Syntax highlighting in preview
 "
@@ -391,6 +414,7 @@ nnoremap S :sort<cr>
 nnoremap w :view<cr>
 vnoremap w :view<cr>gv
 
+" TODO l Enter o
 " Open file in new MacVim tab
 nnoremap o :!mvim --remote-tab-silent %f<cr>
 " Open file in new MacVim window
@@ -406,7 +430,11 @@ nnoremap yd :!printf %d | pbcopy<cr>
 nnoremap yf :!printf %f:p:gs? ?\\ ? | pbcopy<cr>
 
 " View preview in Quick Look
-nnoremap <space> :!qlmanage -p %f > /dev/null 2>&1<cr>
+" nnoremap <space> :!qlmanage -p %f > /dev/null 2>&1<cr>
+nnoremap ,<space> :!qlmanage -p %f > /dev/null 2>&1<cr>
+
+" switch to view pane | :nmap
+nnoremap <tab> <s-tab>
 
 " Mappings for faster renaming
 nnoremap I cw<c-a>
@@ -480,8 +508,324 @@ nnoremap <c-u> <c-w>x
 " https://wiki.vifm.info/index.php/FAQ#How_to_show_hidden_files_by_default_on_startup.3F
 set dotfiles
 
+" Active quick view (:view)
+" set quickview
+
+" start with single-pane mode, even by `vifm <path> <path>` or vifm was in double-pane mode on finishing previous run | https://vifm.info/manual.shtml
+:only
+
+" vifm can be used like ranger's column view
+set millerview
+
+" For double-pane mode:
+" Example of two-column mode which is useful in combination with :view command: | https://vifm.info/manual.shtml
+" default: "lsize:1,csize:1,rsize:1,rpreview:dirs"
+" set milleroptions=lsize:1,csize:2
+"
+" maxtreedepth:num 0 max number of levels in preview tree
+" 0 for maxtreedepth means "unlimited", 1 will only show selected directory, 2 adds its children, and so forth.
+" set previewoptions=graphicsdelay:50000,maxtreedepth:2
+
+" For single-pane mode:
+" Yazi's manager.ratio | https://github.com/sxyazi/yazi/blob/latest/yazi-config/preset/yazi.toml
+set milleroptions=lsize:1,csize:4,rsize:3,rpreview:all
+
+" https://github.com/ObserverOfTime/home.files/blob/master/.config/vifm/vifmrc
+" Controls how size of directories is displayed in file views
+set dirsize=nitems
+
+" Toggle between single <--> double pane mode
+" combination with `:only`, `:set millerview`, `:view`
+"
+" https://q2a.vifm.info/649/view-pane-always-on-the-right-side
+" `:wincmd H` same as `<c-w>H`
+" `:view!` same as `:set quickview`
+"
+" double-pane mode:
+"     1. `set nomillerview` for both active pane and inactive pane
+"     2. `set noquickview`
+"     3. position current pane on the left using `:wincmd H`
+"
+" single-pane mode(default):
+"     1. `set millerview` and `set milleroptions=...` for both active pane and inactive pane
+command! togglepane : if layoutis('only')
+                   \|     vsplit
+                   \|     set noquickview
+                   \|     set nomillerview
+                   \|     execute 'wincmd H'
+                   \|     execute 'wincmd w'
+                   \|     set nomillerview
+                   \|     execute 'wincmd w'
+                   \| else
+                   \|     only
+                   \|     set millerview
+                   \|     set milleroptions=lsize:1,csize:4,rsize:3,rpreview:all
+                   \|     execute 'wincmd w'
+                   \|     set millerview
+                   \|     set milleroptions=lsize:1,csize:4,rsize:3,rpreview:all
+                   \|     execute 'wincmd w'
+                   \| endif
+nnoremap <silent> W :togglepane<cr>
+vnoremap <silent> W :togglepane<cr>gv
+
+" Quit vifm
+" nnoremap q :q<cr>
+nnoremap q :wqall<cr>
+
+" edit forward search pattern in editor
+nnoremap ,/ q/
+" edit cmdline in editor
+nnoremap ,: q:
+nnoremap ,; q:
+" edit local filter pattern in editor
+nnoremap ,= q=
+" edit backward search pattern in editor
+nnoremap ,? q?
+
+" Single stroke to access command line | https://wiki.archlinux.org/title/Vifm
+nmap ; :
+
+" https://github.com/kyoheiu/felix#key-manual
+" Create a new empty file.
+" TODO Create a file or directory (ends with "/" for directories) | https://yazi-rs.github.io/docs/quick-start#filedirectory-operations
+nnoremap i :touch<space>
+" Create a new empty directory.
+" nnoremap I :mkdir<space>
+
+" ==============================================================================
+" appearance
+
+" hide side borders
+set tuioptions-=s
+if $TERM != 'linux'
+    " use Unicode ellipsis
+    set tuioptions+=u
+endif
+
+" change appearance of middle border
+set fillchars=vborder:·
+
+" ==============================================================================
+" various options
+
+" allow partially entered external commands with unambiguous beginning using :!
+" set fastrun
+
+" completely disable compatibility with older versions:
+" * make yy and dd ignore selection and work with file under the cursor;
+" * make <c-i> (and <tab>) work in same way as in Vim (go forward in history).
+set cpoptions-=fst
+
+" don't wrap long lines in preview pane
+set nowrap
+
+" hide .. directory everywhere
+set dotdirs=
+
+" ==============================================================================
+" various mappings
+
+" use < and > without ctrl-w prefix key in normal mode
+nnoremap < <c-w><
+nnoremap > <c-w>>
+
+" moving cursor in another pane
+nnoremap <silent> J <space>j<space>
+nnoremap <silent> K <space>k<space>
+
+" moving though sibling directories
+nnoremap <c-j> ]R
+nnoremap <c-k> [R
+
+" faster search of files that start with a particular string
+nnoremap f/ /^
+
+" substitute in all files
+nnoremap as :%s/
+
+" force file editing rather than opening it
+nnoremap E :edit<cr>
+
+" use space and shift-tab as tab in quick view mode
+qnoremap <space> <tab>
+qnoremap <s-tab> <tab>
+
+" toggle between sorting: by name <--> by size <--> by mtime
+command! togglesort
+         \ :if &sort == '-size,+name'
+         \ |    set sort=+mtime
+         \ |    echo 'Sorted by modification date'
+         \ |elseif &sort == '+name'
+         \ |    set sort=-size
+         \ |    echo 'Sorted by size'
+         \ |else
+         \ |    set sort=+name
+         \ |    echo 'Sorted by name'
+         \ |endif
+nnoremap <silent> ,S :togglesort<cr>
+
+" ==============================================================================
+" various commands
+
+" makes a backup copy
+command! bak :clone %c.bak
+
+" use Vim to diff files
+" uses selection of current pane when it contains more than one file
+" otherwise uses left pane file and right pane file keeping order inside Vim
+command! diff : if expand('%%c') == expand('%%f')
+            \ |     if paneisat('right') && paneisat('bottom')
+            \ |         execute '!nvim -d %%C %%c'
+            \ |     else
+            \ |         execute '!nvim -d %%c %%C'
+            \ |     endif
+            \ | else
+            \ |     execute '!nvim -d %%f'
+            \ | endif
+
+" ------------------------------------------------------------------------------
+" Integration
+" ------------------------------------------------------------------------------
+
+" ==============================================================================
+" zoxide
+
+" https://q2a.vifm.info/949/how-can-i-integrate-zoxide-into-vifm
+" jump to highest ranked directory when occurs "zoxide: no match found" like zoxide itself does, or don't jump?
+" %a instead of '%a' to handle multiple arguments like `z foo bar`
+command! z : if '%a' == ''
+          \|     execute 'cd ~'
+          \| else
+          \|     let $Z_PICK = term("zoxide query --exclude '%d' %a 2>/dev/tty")
+          \|     if $Z_PICK != ''
+          \|         execute 'cd' fnameescape($Z_PICK)
+          \|     endif
+          \| endif
+
+" https://github.com/sxyazi/yazi/blob/main/yazi-plugin/preset/plugins/zoxide.lua
+" '%d' instead of %d to handle spaces in directory names
+" command! zi :set noquickview | :execute 'cd' fnameescape(system("zoxide query -i --exclude '%d' 2>/dev/tty")) '%IU' | redraw
+command! zi : set noquickview
+           \| let $ZI_PICK = system("zoxide query -i --exclude '%d' 2>/dev/tty")
+           \| if $ZI_PICK != ''
+           \|     execute 'cd' fnameescape($ZI_PICK) '%IU'
+           \| endif
+           \| redraw
+nnoremap ` :zi<cr>
+
+" %d instead of '%d' to handle spaces in directory names
+autocmd DirEnter * !zoxide add %d %i
+
+" ==============================================================================
+" fzf + fd/rg
+
+" https://wiki.vifm.info/index.php/How_to_integrate_fzf_for_fuzzy_finding
+" https://github.com/vifm/vifm/issues/279#issuecomment-1001788619
+if $TMUX
+    " Use popup window. Requires tmux 3.2 and up
+    command! FZFfind : set noquickview
+                    \| let $FZF_PICK = system('fd -H | fzf-tmux -p 60%% --reverse --header="Find in path: %d" 2>/dev/tty')
+                    \| if $FZF_PICK != ''
+                    \|     execute 'goto' fnameescape($FZF_PICK)
+                    \|     redraw
+                    \| endif
+
+    command! FZFgrep : set noquickview
+                    \| let $RG_PREFIX = "rg --column --line-number --no-heading --color=always --smart-case "
+                    \| let $FZF_PICK = system("FZF_DEFAULT_COMMAND=\"$RG_PREFIX ''\" fzf-tmux -p 60%% --bind \"change:reload:$RG_PREFIX {q} || true\" --ansi --disabled --layout=reverse --header 'Grep in path: %d' 2>/dev/tty | cut -d':' -f1")
+                    \| if $FZF_PICK != ''
+                    \|     execute system('[ -f "$FZF_PICK" ] && echo goto || echo cd') fnameescape($FZF_PICK)
+                    \|     redraw
+                    \| endif
+
+    " `-d 1` for fd to search only one level deep
+    command! FZFcd : set noquickview
+                  \| let $FZF_PICK = system('fd -H -t d | fzf-tmux -p 90,30 --reverse --header="%d ❯ cd" 2>/dev/tty')
+                  \| if $FZF_PICK != ''
+                  \|     execute 'cd' fnameescape($FZF_PICK)
+                  \|     redraw
+                  \| endif
+
+    command! FZFedit : set noquickview
+                    \| let $FZF_PICK = system('fd -H -t f | fzf-tmux -p 90,30 --reverse --header="%d ❯ $EDITOR" 2>/dev/tty')
+                    \| if $FZF_PICK != ''
+                    \|     execute 'edit' fnameescape($FZF_PICK)
+                    \|     redraw
+                    \| endif
+else
+    " Use full-screen. Works without tmux
+    command! FZFfind : let $FZF_PICK = term('fd -H | fzf --reverse --header="Find in path: %d" 2>/dev/tty')
+                    \| if $FZF_PICK != ''
+                    \|     execute 'goto' fnameescape($FZF_PICK)
+                    \| endif
+
+    " https://q2a.vifm.info/1624/how-to-use-ripgrep-fzf-to-navigate-in-vifm
+    " https://github.com/gokcehan/lf/wiki/Integrations#ripgrep
+    " https://github.com/junegunn/fzf#3-interactive-ripgrep-integration
+    command! FZFgrep : let $RG_PREFIX = "rg --column --line-number --no-heading --color=always --smart-case "
+                    \| let $FZF_PICK = term("FZF_DEFAULT_COMMAND=\"$RG_PREFIX ''\" fzf --bind \"change:reload:$RG_PREFIX {q} || true\" --ansi --disabled --layout=reverse --header 'Grep in path: %d' 2>/dev/tty | cut -d':' -f1")
+                    \| if $FZF_PICK != ''
+                    \|     execute system('[ -f "$FZF_PICK" ] && echo goto || echo cd') fnameescape($FZF_PICK)
+                    \| endif
+
+    command! FZFcd : let $FZF_PICK = term('fd -H -t d | fzf --reverse --header="%d ❯ cd" 2>/dev/tty')
+                  \| if $FZF_PICK != ''
+                  \|     execute 'cd' fnameescape($FZF_PICK)
+                  \| endif
+
+    command! FZFedit : let $FZF_PICK = term('fd -H -t f | fzf --reverse --header="%d ❯ $EDITOR" 2>/dev/tty')
+                    \| if $FZF_PICK != ''
+                    \|     execute 'edit' fnameescape($FZF_PICK)
+                    \| endif
+endif
+
+" find
+" nnoremap <c-p> :FZFfind<cr>
+nnoremap ,f :FZFfind<cr>
+
+" grep
+nnoremap ,g :FZFgrep<cr>
+
+" cd to child directory
+" nnoremap <space>j :FZFcd<cr>
+
+" edit file from child directory in nvim
+" nnoremap <space>e :FZFedit<cr>
+
+" TODO bookmarks (see https://github.com/vifm/vifm/issues/279)
+
 " ------------------------------------------------------------------------------
 " TODO
 " ------------------------------------------------------------------------------
 
+" https://github.com/xaizek/dotvifm/blob/master/vifmrc
+" https://github.com/ObserverOfTime/home.files/blob/master/.config/vifm/vifmrc
 " https://github.com/rockyzhang24/dotfiles/tree/master/.config/vifm | https://github.com/vifm/vifm#other-resources
+" https://github.com/gerardbm/dotfiles/blob/master/vifm/.config/vifm/vifmrc
+
+" Use ripgrep instead of grep
+" set grepprg=rg\ --color=never\ -Hn\ %i\ %a\ %s
+" Use fd instead of find
+" set findprg=fd\ --color=never\ %p\ %s
+
+" available key mappings
+" nnoremap x
+" nnoremap X
+" nnoremap b
+" nnoremap B
+" nnoremap ,
+" zoxide?
+" nnoremap `
+" Yazi: Create a symbolic link to the yanked files (absolute path)
+" nnoremap -
+" Yazi: Create a symbolic link to the yanked files (relative path)
+" nnoremap _
+" nnoremap V
+" nnoremap :
+" nnoremap a
+" nnoremap r
+" local filter like Yazi? (as ; maps to :)
+" nnoremap f =
+" nnoremap s
+
+" TODO <c-i> Forward not working

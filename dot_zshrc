@@ -204,7 +204,7 @@ export PYENV_VIRTUALENV_DISABLE_PROMPT=1
 # To enable auto-activation add to your profile: | brew info pyenv-virtualenv
 if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi
 
-alias v='vim'
+# alias v='vim'
 alias vi="vim"
 alias n="nvim"
 alias lv='lvim'
@@ -491,7 +491,7 @@ function yy() {
 source <(command fx --init)
 
 # https://wiki.vifm.info/index.php/How_to_set_shell_working_directory_after_leaving_Vifm
-vv()
+v()
 {
     local dst="$(command vifm --choose-dir - "$@")"
     if [ -z "$dst" ]; then
