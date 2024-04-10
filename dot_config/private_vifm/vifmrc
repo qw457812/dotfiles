@@ -120,7 +120,10 @@ set scrolloff=4
 set slowfs=curlftpfs
 
 " Set custom status line look
-set statusline="  Hint: %z%= %A %10u:%-7g %15s %20d  "
+" set statusline="  Hint: %z%= %A %10u:%-7g %15s %20d  "
+" https://q2a.vifm.info/1769/how-to-show-links-full-path
+" set statusline="  %t%[ -> %T%]%= %A %10u:%-7g %15s %20d  "
+" set statusline="%7s %A %10u:%-7g %15d   %t%[ -> %T%]%= Hint: %z  "
 
 " List of color schemes to try (picks the first one supported by the terminal)
 " colorscheme Default-256 Default
@@ -447,7 +450,11 @@ nnoremap A cw
 " nnoremap A cW
 
 " Open editor to edit vifmrc and apply settings after returning to vifm
-nnoremap ,c :write | edit $MYVIFMRC | restart full<cr>
+" nnoremap ,c :write | edit $MYVIFMRC | restart full<cr>
+" edit vifmrc with chezmoi
+" nnoremap ,c :write | edit $MYVIFMRC | let $CZ_IGNORED = term("chezmoi add $MYVIFMRC") | restart full<cr>
+" https://wiki.vifm.info/index.php/Configuration_model
+nnoremap ,c :write | execute ':!%nchezmoi edit --apply --verbose $MYVIFMRC' | restart<cr>
 " Open MacVim to edit vifmrc
 nnoremap ,C :!mvim --remote-tab-silent $MYVIFMRC &<cr>
 
@@ -637,11 +644,6 @@ set dotdirs=
 
 " ==============================================================================
 " custom status line look
-
-" default(:set statusline?): "  Hint: %z%= %A %10u:%-7g %15s %20d  "
-" https://q2a.vifm.info/1769/how-to-show-links-full-path
-" set statusline="  %t%[ -> %T%]%= %A %10u:%-7g %15s %20d  "
-" set statusline="%7s %A %10u:%-7g %15d   %t%[ -> %T%]%= Hint: %z  "
 
 let &statusline = ''
 " see "nesting detection" above
