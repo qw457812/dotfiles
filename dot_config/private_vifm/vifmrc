@@ -592,6 +592,19 @@ nnoremap i :touch<space>
 " Create a new empty directory.
 " nnoremap I :mkdir<space>
 
+" Author of vifm: https://github.com/xaizek/dotvifm/blob/master/vifmrc
+" ==============================================================================
+" nesting detection
+
+if $INSIDE_VIFM != ''
+    let $SL_PREFIX = 'vifm '
+else
+    if $PS1 != ''
+        let $SL_PREFIX = 'bash '
+    endif
+    let $INSIDE_VIFM = 'true'
+endif
+
 " ==============================================================================
 " appearance
 
@@ -621,6 +634,21 @@ set nowrap
 
 " hide .. directory everywhere
 set dotdirs=
+
+" ==============================================================================
+" custom status line look
+
+" default(:set statusline?): "  Hint: %z%= %A %10u:%-7g %15s %20d  "
+" https://q2a.vifm.info/1769/how-to-show-links-full-path
+" set statusline="  %t%[ -> %T%]%= %A %10u:%-7g %15s %20d  "
+" set statusline="%7s %A %10u:%-7g %15d   %t%[ -> %T%]%= Hint: %z  "
+
+let &statusline = ''
+" see "nesting detection" above
+if $SL_PREFIX != ''
+    let &statusline .= ' '.$SL_PREFIX.'|'
+endif
+let &statusline .= '%7s %A %10u:%-7g %15d   %t%[ -> %T%]%= Hint: %z  '
 
 " ==============================================================================
 " various mappings
