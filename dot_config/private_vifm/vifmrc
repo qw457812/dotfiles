@@ -367,6 +367,15 @@ fileviewer *.docx pandoc -f docx -t plain %c
 fileviewer *.odt pandoc -f odt -t plain %c
 fileviewer *.ipynb pandoc -f ipynb -t gfm %c
 
+" TODO find a tool to do this
+" CSV/Excel | https://github.com/sdushantha/dotfiles/blob/master/vifm/.config/vifm/vifmrc
+" fileviewer *.csv sed "s/,,,,/,,-,,/g;s/,,/ /g" %c | column -t | sed "s/ - /  /g" | cut -c -%pw
+
+" TODO how to work together with `pygmentize` below? seems that `pygmentize` can colorize file like `~/.spacemacs` but `bat` can't
+" Text based files | https://github.com/sdushantha/dotfiles/blob/master/vifm/.config/vifm/vifmrc
+" fileviewer <text/*> env -uCOLORTERM bat --color always --wrap never --pager never %c -p
+fileviewer <text/*> bat --color=always --wrap=never --paging=never --style=plain %c
+
 " Syntax highlighting in preview
 "
 " Explicitly set highlight type for some extensions
@@ -382,7 +391,9 @@ fileviewer *.ipynb pandoc -f ipynb -t gfm %c
 " fileviewer *[^/] pygmentize -O style=monokai -f console256 -g
 " pygmentize -L styles
 " https://stylishthemes.github.io/Syntax-Themes/pygments/
-fileviewer *[^/] pygmentize -O style=one-dark -f console256 -g
+" `.*[^/]` for .zshrc
+" TODO how to avoid binary files? use `file %c` for binary files
+" fileviewer *[^/],.*[^/] pygmentize -O style=one-dark -f console256 -g
 
 " Displaying pictures in terminal
 " fileviewer *.jpg,*.png shellpic %c
@@ -400,6 +411,14 @@ fileviewer {*/,.*/},
          \ tree -a -L 2 -I '.git|.idea' -C %c,
          \ eza --all --color=always --oneline %c,
          \ ls -A --color=always %c
+
+" Other files
+" https://github.com/sdushantha/dotfiles/blob/master/vifm/.config/vifm/vifmrc
+" the reason why I am using "file" to preview other files is so that "vifm"
+" does not lag when trying "cat" the file
+" fileviewer * file -b %c
+" `.*` for .DS_Store
+fileviewer *,.* file %c
 
 " Open all other files with default system programs (you can also remove all
 " :file[x]type commands above to ensure they don't interfere with system-wide
@@ -436,9 +455,11 @@ vnoremap w :view<cr>gv
 
 " TODO l Enter o
 " Open file in new MacVim tab
-nnoremap o :!mvim --remote-tab-silent %f<cr>
+" nnoremap o :!mvim --remote-tab-silent %f<cr>
+" nnoremap o :!nvim %f<cr>
+nnoremap o :!open %f<cr>
 " Open file in new MacVim window
-nnoremap O :!mvim %f<cr>
+" nnoremap O :!mvim %f<cr>
 
 " Open file in the background using its default program
 nnoremap gb :!open -g %f<cr>
@@ -866,6 +887,7 @@ nnoremap ,g :FZFgrep<cr>
 " https://github.com/ObserverOfTime/home.files/blob/master/.config/vifm/vifmrc
 " https://github.com/rockyzhang24/dotfiles/tree/master/.config/vifm | https://github.com/vifm/vifm#other-resources
 " https://github.com/gerardbm/dotfiles/blob/master/vifm/.config/vifm/vifmrc
+" https://github.com/sdushantha/dotfiles/blob/master/vifm/.config/vifm/vifmrc
 
 " Use ripgrep instead of grep
 " set grepprg=rg\ --color=never\ -Hn\ %i\ %a\ %s
