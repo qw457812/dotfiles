@@ -452,6 +452,18 @@ nnoremap S :sort<cr>
 " Toggle visibility of preview window
 nnoremap w :view<cr>
 vnoremap w :view<cr>gv
+" TODO https://wiki.vifm.info/index.php/Single-pane_preview
+" nnoremap <silent> w : if &quickview && !layoutis('only')
+"                    \|     view
+"                    \| else
+"                    \|     if layoutis('only')
+"                    \|         if &lines + 50 < &columns | vsplit | else | split | endif
+"                    \|     endif
+"                    \|     view!
+"                    \|     execute 'qnoremap w q:view|only|qunmap w<lt>cr>'
+"                    \|     execute 'wincmd w'
+"                    \| endif
+"                    \| <cr>
 
 " TODO l Enter o
 " Open file in new MacVim tab
@@ -550,7 +562,13 @@ nnoremap <c-u> <c-w>x
 " ------------------------------------------------------------------------------
 
 " https://wiki.vifm.info/index.php/FAQ#How_to_show_hidden_files_by_default_on_startup.3F
+" Show dotfiles/dotdirs
 set dotfiles
+
+" https://wiki.vifm.info/index.php/Sort_dotfiles/dotdirs_separately_from_other_files/directories
+" TODO Regexp error in (|\.).*: empty (sub)expressio
+" set sortgroups='(|\.).*'
+" set sort=+groups,+dir,+name
 
 " Show file and directory preview in right pane (only works in double-pane mode, not in single-pane mode)
 " Note that `:view!` same as `:set quickview`
@@ -627,12 +645,19 @@ nnoremap ,? q?
 " Single stroke to access command line | https://wiki.archlinux.org/title/Vifm
 nmap ; :
 
+" TODO Create specific directory and its parents if needed (mkdir -p path/to/directory): `:create path/to/directory/` and `:create path/to/directory/file`
 " https://github.com/kyoheiu/felix#key-manual
-" Create a new empty file.
-" TODO Create a file or directory (ends with "/" for directories) | https://yazi-rs.github.io/docs/quick-start#filedirectory-operations
-nnoremap i :touch<space>
-" Create a new empty directory.
-" nnoremap I :mkdir<space>
+" https://wiki.vifm.info/index.php/Creating_directories_and_files_with_a_single_command
+" Create a file or directory (ends with "/" for directories) | https://yazi-rs.github.io/docs/quick-start#filedirectory-operations
+command create :
+\|  let $last_char = expand(system("str=\"%a\"; echo \"${str: -1}\""))
+\|  if $last_char == "/"
+\|    mkdir "%a"
+\|  else
+\|    touch "%a"
+\|  endif
+" nnoremap a :create<space>
+nnoremap i :create<space>
 
 " Author of vifm: https://github.com/xaizek/dotvifm/blob/master/vifmrc
 " ==============================================================================
@@ -767,6 +792,12 @@ command! diff : if expand('%%c') == expand('%%f')
             \ | else
             \ |     execute '!nvim -d %%f'
             \ | endif
+
+" https://wiki.vifm.info/index.php/Compare_directory_-_remaining_the_difference_only
+" visually compared when checking differences in only two directories:
+" enter each folder and use `:compare listall` (double-pane mode)
+nnoremap ][ :compare listall<cr>
+nnoremap ]] :diff<cr>
 
 " ------------------------------------------------------------------------------
 " Integration

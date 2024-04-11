@@ -169,6 +169,9 @@ export BAT_THEME="TwoDark"
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 # plain: disables all available components. | bat --help
 export BAT_STYLE="plain"
+help() {
+    "$@" --help 2>&1 | bat --plain --language=help
+}
 # use global aliases to override -h and --help entirely:
 # Be aware that in some cases, -h may not be a shorthand of --help (for example with ls).
 # alias -g -- -h='-h 2>&1 | bat --language=help --style=plain'
