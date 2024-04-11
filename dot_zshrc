@@ -252,11 +252,11 @@ ZVM_KEYTIMEOUT=0.3
 
 # https://github.com/DarrinTisdale/zsh-aliases-exa
 # l='ls -lah'
-alias l='eza --long --all --git --time-style=iso --group --color=always --color-scale all'
+alias l='eza --all --color=always --color-scale all --long --group --time-style=iso --git'
 # la='ls -lAh'
-alias la='l --binary --created --modified --accessed --header'
-# alias llm='la --changed --sort=modified'
-alias lm='la --changed --sort=modified'
+alias la='eza --all --color=always --color-scale all --long --binary --group --header --modified --accessed --created --time-style=iso --git'
+# llm
+alias lm='eza --all --sort=modified --color=always --color-scale all --long --binary --group --header --modified --accessed --created --changed --time-style=iso --git'
 alias lS='eza -1' # one column, just names
 alias lt='eza --tree --level=2'
 # ll='ls -lh'

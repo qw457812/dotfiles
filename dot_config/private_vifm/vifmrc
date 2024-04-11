@@ -138,8 +138,8 @@ colorscheme papercolor-dark gruvbox molokai zenburn_1 Default-256 Default
 mark b ~/bin/
 mark h ~/
 mark c ~/.config/
-mark d ~/Documents/
-mark D ~/Downloads/
+mark d ~/Downloads/
+mark D ~/Documents/
 
 " ------------------------------------------------------------------------------
 " Commands
@@ -380,9 +380,26 @@ fileviewer *.ipynb pandoc -f ipynb -t gfm %c
 "
 " Or leave it for automatic detection
 " fileviewer *[^/] pygmentize -O style=monokai -f console256 -g
+" pygmentize -L styles
+" https://stylishthemes.github.io/Syntax-Themes/pygments/
+fileviewer *[^/] pygmentize -O style=one-dark -f console256 -g
 
 " Displaying pictures in terminal
 " fileviewer *.jpg,*.png shellpic %c
+
+" Customize directory preview (only works in double-pane mode, not in single-pane mode)
+" https://github.com/vifm/vifm/issues/628
+" there is builtin code for drawing a tree since v0.8.1 (because `tree` isn't always
+" installed by default on Linux and its equivalent on Windows caused trouble).
+" Builtin implementation is used only if no viewer matches directories (`*` pattern
+" matches all files including directories).
+"
+" Comment these lines out to use the default builtin tree viewer
+fileviewer {*/,.*/},
+         \ eza --all --level=2 --ignore-glob='.git|.idea' --tree --color=always --color-scale all --long --time-style=iso --git --no-permissions --no-user %c,
+         \ tree -a -L 2 -I '.git|.idea' -C %c,
+         \ eza --all --color=always --oneline %c,
+         \ ls -A --color=always %c
 
 " Open all other files with default system programs (you can also remove all
 " :file[x]type commands above to ensure they don't interfere with system-wide
@@ -435,20 +452,6 @@ nnoremap yf :!printf %f:p:gs? ?\\ ? | pbcopy<cr>
 " View preview in Quick Look
 " nnoremap <space> :!qlmanage -p %f > /dev/null 2>&1<cr>
 nnoremap ,<space> :!qlmanage -p %f > /dev/null 2>&1<cr>
-
-" TODO map to gt?
-" TODO map to <space> then make <space> as Leader key?
-" switch to view pane | :nmap
-nnoremap <tab> <s-tab>
-
-" Note that due to the way terminals process their input, several keyboard keys might be mapped to single key code, for example: | https://vifm.info/manual.shtml
-"   - <cr> and <c-m>;
-"   - <tab> and <c-i>;
-"   - <c-h> and <bs> and <del>;
-"   - etc.
-"
-" after `nnoremap <tab> <s-tab>`, <c-i> also mapped to <s-tab> automatically, so need to fix it
-nnoremap <c-i> :histnext<cr>
 
 " Mappings for faster renaming
 nnoremap I cw<c-a>
@@ -705,6 +708,26 @@ command! togglesort
          \ |endif
 nnoremap <silent> ,S :togglesort<cr>
 
+" Note that due to the way terminals process their input, several keyboard keys might be mapped to single key code, for example: | https://vifm.info/manual.shtml
+"   - <cr> and <c-m>;
+"   - <tab> and <c-i>;
+"   - <c-h> and <bs> and <del>;
+"   - etc.
+"
+" TODO make <space> as Leader key
+" switches active pane (use <s-tab> to switch to view pane in double-pane mode) | :nmap
+nnoremap <tab> <space>
+"
+" After `nnoremap <tab> <space>`, <c-i> also mapped to <space> automatically.
+" I don't know how to map <tab> and <c-i> separately, so I have to use use <right> instead of <c-i>.
+"
+" :histprev same as <c-o>
+" nnoremap <left> :histprev<cr>
+nnoremap <left> <c-o>
+" :histnext same as <c-i>
+" nnoremap <right> :histnext<cr>
+nnoremap <right> <c-i>
+
 " ==============================================================================
 " various commands
 
@@ -868,3 +891,10 @@ nnoremap ,g :FZFgrep<cr>
 " local filter like Yazi? (as ; maps to :)
 " nnoremap f =
 " nnoremap s
+" nnoremap H
+" nnoremap M
+" nnoremap L
+" nnoremap T
+" nnoremap U
+" nnoremap <up>
+" nnoremap <down>
