@@ -374,8 +374,7 @@ fileviewer *.ipynb pandoc -f ipynb -t gfm %c
 " https://q2a.vifm.info/1555/how-set-fileviewer-for-all-files-that-contains-readable-text
 " Text based files | https://github.com/sdushantha/dotfiles/blob/master/vifm/.config/vifm/vifmrc
 " fileviewer <text/*> bat --color=always --wrap=never --paging=never --style=plain %c
-" seems that `pygmentize` can colorize file like `~/.spacemacs` but `bat` can't
-fileviewer <text/*> pygmentize -O style=one-dark -f console256 -g
+" fileviewer <text/*> pygmentize -O style=one-dark -f console256 -g
 
 " Syntax highlighting in preview
 "
@@ -393,9 +392,9 @@ fileviewer <text/*> pygmentize -O style=one-dark -f console256 -g
 " see `pygmentize -L styles` or https://stylishthemes.github.io/Syntax-Themes/pygments/
 " `.*[^/]` for .zshrc
 " fileviewer *[^/],.*[^/] pygmentize -O style=one-dark -f console256 -g
-" handle non-binary files like: file --mime -b ~/.taskbook.json -> application/json; charset=us-ascii
-" TODO not work, is ~/.config/vifm/scripts for this? fix it then comment out the `fileviewer <text/*>` above
-" fileviewer *[^/],.*[^/] if [[ $(file --mime-encoding -b %c) == "binary" ]]; then file %c; else pygmentize -O style=one-dark -f console256 -g %c; fi
+" fileviewer *[^/],.*[^/] bat --color=always --wrap=never --paging=never --style=plain %c
+" https://github.com/gerardbm/dotfiles/blob/master/vifm/.config/vifm/scripts/gvimr
+fileviewer *[^/],.*[^/] binaryfileviewer %c
 
 " Displaying pictures in terminal
 " fileviewer *.jpg,*.png shellpic %c
