@@ -123,7 +123,7 @@ set slowfs=curlftpfs
 " set statusline="  Hint: %z%= %A %10u:%-7g %15s %20d  "
 " https://q2a.vifm.info/1769/how-to-show-links-full-path
 " set statusline="  %t%[ -> %T%]%= %A %10u:%-7g %15s %20d  "
-" set statusline="%7s %A %10u:%-7g %15d   %t%[ -> %T%]%= Hint: %z  "
+" set statusline="%A %7s %13u:%-7g %15d   %t%[ -> %T%]%= Hint: %z"
 
 " List of color schemes to try (picks the first one supported by the terminal)
 " colorscheme Default-256 Default
@@ -711,9 +711,9 @@ set dotdirs=
 let &statusline = ''
 " see "nesting detection" above
 if $SL_PREFIX != ''
-    let &statusline .= ' '.$SL_PREFIX.'|'
+    let &statusline .= $SL_PREFIX.'| '
 endif
-let &statusline .= '%7s %A %10u:%-7g %15d   %t%[ -> %T%]%= Hint: %z  '
+let &statusline .= '%A %7s %13u:%-7g %15d   %t%[ -> %T%]%= Hint: %z'
 
 " ==============================================================================
 " various mappings
