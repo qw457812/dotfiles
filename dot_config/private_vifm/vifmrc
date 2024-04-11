@@ -5,7 +5,7 @@
 " Blank lines are ignored.
 " The basic format for each item is shown with an example.
 
-" Check Update:
+" Check update manually before official release:
 " https://github.com/vifm/vifm/blob/master/data/vifmrc-osx
 
 " ------------------------------------------------------------------------------
@@ -271,8 +271,8 @@ filetype {*.xhtml,*.html,*.htm},<text/html>
        \ open -a Brave\ Browser.app,
        \ {Open in Chrome}
        \ open -a Google\ Chrome.app,
-       \ {Open in vim}
-       \ vim,
+       \ {Open in nvim}
+       \ nvim,
 fileviewer {*.xhtml,*.html,*.htm},<text/html> w3m -dump -T text/html
 
 " Object
@@ -436,8 +436,19 @@ nnoremap yf :!printf %f:p:gs? ?\\ ? | pbcopy<cr>
 " nnoremap <space> :!qlmanage -p %f > /dev/null 2>&1<cr>
 nnoremap ,<space> :!qlmanage -p %f > /dev/null 2>&1<cr>
 
+" TODO map to gt?
+" TODO map to <space> then make <space> as Leader key?
 " switch to view pane | :nmap
 nnoremap <tab> <s-tab>
+
+" Note that due to the way terminals process their input, several keyboard keys might be mapped to single key code, for example: | https://vifm.info/manual.shtml
+"   - <cr> and <c-m>;
+"   - <tab> and <c-i>;
+"   - <c-h> and <bs> and <del>;
+"   - etc.
+"
+" after `nnoremap <tab> <s-tab>`, <c-i> also mapped to <s-tab> automatically, so need to fix it
+nnoremap <c-i> :histnext<cr>
 
 " Mappings for faster renaming
 nnoremap I cw<c-a>
@@ -454,9 +465,11 @@ nnoremap A cw
 " edit vifmrc with chezmoi
 " nnoremap ,c :write | edit $MYVIFMRC | let $CZ_IGNORED = term("chezmoi add $MYVIFMRC") | restart full<cr>
 " https://wiki.vifm.info/index.php/Configuration_model
-nnoremap ,c :write | execute ':!%nchezmoi edit --apply --verbose $MYVIFMRC' | restart<cr>
+" To be able to use another command after one of these, wrap it with the :execute command | https://vifm.info/manual.shtml
+" by my test, `:write | restart` can retore the inactive tab's directory position, but `:write | restart full` can't
+nnoremap ,c :write | execute ':!%nchezmoi edit --apply --verbose $MYVIFMRC' | restart full<cr>
 " Open MacVim to edit vifmrc
-nnoremap ,C :!mvim --remote-tab-silent $MYVIFMRC &<cr>
+" nnoremap ,C :!mvim --remote-tab-silent $MYVIFMRC &<cr>
 
 " Toggle wrap setting on ,w key
 nnoremap ,w :set wrap!<cr>
@@ -515,7 +528,9 @@ nnoremap <c-u> <c-w>x
 " https://wiki.vifm.info/index.php/FAQ#How_to_show_hidden_files_by_default_on_startup.3F
 set dotfiles
 
-" Active quick view (:view)
+" Show file and directory preview in right pane (only works in double-pane mode, not in single-pane mode)
+" Note that `:view!` same as `:set quickview`
+" :view!
 " set quickview
 
 " start with single-pane mode, even by `vifm <path> <path>` or vifm was in double-pane mode on finishing previous run | https://vifm.info/manual.shtml
@@ -541,19 +556,15 @@ set milleroptions=lsize:1,csize:4,rsize:3,rpreview:all
 " Controls how size of directories is displayed in file views
 set dirsize=nitems
 
-" Toggle between single <--> double pane mode
-" combination with `:only`, `:set millerview`, `:view`
-"
-" https://q2a.vifm.info/649/view-pane-always-on-the-right-side
-" `:wincmd H` same as `<c-w>H`
-" `:view!` same as `:set quickview`
+" Toggle between single <--> double pane mode (combination with `:only`, `:set millerview`, `:view`)
+" Note that `:wincmd H` same as `<c-w>H` | https://q2a.vifm.info/649/view-pane-always-on-the-right-side
 "
 " double-pane mode:
 "     1. `set nomillerview` for both active pane and inactive pane
 "     2. `set noquickview`
 "     3. position current pane on the left using `:wincmd H`
 "
-" single-pane mode(default):
+" single-pane mode (default):
 "     1. `set millerview` and `set milleroptions=...` for both active pane and inactive pane
 command! togglepane : if layoutis('only')
                    \|     vsplit
@@ -857,5 +868,3 @@ nnoremap ,g :FZFgrep<cr>
 " local filter like Yazi? (as ; maps to :)
 " nnoremap f =
 " nnoremap s
-
-" TODO <c-i> Forward not working
