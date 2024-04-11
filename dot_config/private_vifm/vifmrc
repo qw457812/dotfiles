@@ -371,10 +371,11 @@ fileviewer *.ipynb pandoc -f ipynb -t gfm %c
 " CSV/Excel | https://github.com/sdushantha/dotfiles/blob/master/vifm/.config/vifm/vifmrc
 " fileviewer *.csv sed "s/,,,,/,,-,,/g;s/,,/ /g" %c | column -t | sed "s/ - /  /g" | cut -c -%pw
 
-" TODO how to work together with `pygmentize` below? seems that `pygmentize` can colorize file like `~/.spacemacs` but `bat` can't
+" https://q2a.vifm.info/1555/how-set-fileviewer-for-all-files-that-contains-readable-text
 " Text based files | https://github.com/sdushantha/dotfiles/blob/master/vifm/.config/vifm/vifmrc
-" fileviewer <text/*> env -uCOLORTERM bat --color always --wrap never --pager never %c -p
-fileviewer <text/*> bat --color=always --wrap=never --paging=never --style=plain %c
+" fileviewer <text/*> bat --color=always --wrap=never --paging=never --style=plain %c
+" seems that `pygmentize` can colorize file like `~/.spacemacs` but `bat` can't
+fileviewer <text/*> pygmentize -O style=one-dark -f console256 -g
 
 " Syntax highlighting in preview
 "
@@ -389,11 +390,12 @@ fileviewer <text/*> bat --color=always --wrap=never --paging=never --style=plain
 "
 " Or leave it for automatic detection
 " fileviewer *[^/] pygmentize -O style=monokai -f console256 -g
-" pygmentize -L styles
-" https://stylishthemes.github.io/Syntax-Themes/pygments/
+" see `pygmentize -L styles` or https://stylishthemes.github.io/Syntax-Themes/pygments/
 " `.*[^/]` for .zshrc
-" TODO how to avoid binary files? use `file %c` for binary files
 " fileviewer *[^/],.*[^/] pygmentize -O style=one-dark -f console256 -g
+" handle non-binary files like: file --mime -b ~/.taskbook.json -> application/json; charset=us-ascii
+" TODO not work, is ~/.config/vifm/scripts for this? fix it then comment out the `fileviewer <text/*>` above
+" fileviewer *[^/],.*[^/] if [[ $(file --mime-encoding -b %c) == "binary" ]]; then file %c; else pygmentize -O style=one-dark -f console256 -g %c; fi
 
 " Displaying pictures in terminal
 " fileviewer *.jpg,*.png shellpic %c
@@ -416,7 +418,6 @@ fileviewer {*/,.*/},
 " https://github.com/sdushantha/dotfiles/blob/master/vifm/.config/vifm/vifmrc
 " the reason why I am using "file" to preview other files is so that "vifm"
 " does not lag when trying "cat" the file
-" fileviewer * file -b %c
 " `.*` for .DS_Store
 fileviewer *,.* file %c
 
