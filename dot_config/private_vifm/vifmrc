@@ -566,9 +566,12 @@ nnoremap <c-u> <c-w>x
 set dotfiles
 
 " https://wiki.vifm.info/index.php/Sort_dotfiles/dotdirs_separately_from_other_files/directories
-" TODO Regexp error in (|\.).*: empty (sub)expressio
-" set sortgroups='(|\.).*'
-" set sort=+groups,+dir,+name
+" Sort dotfiles/dotdirs separately from other files/directories
+" By (ab)using the `sortgroups` option, you can split all the listed files into two groups - one containing items with a `.` prefix, and one containing all the other items.
+" set sortgroups='(|\.).*' " Regexp error in (|\.).*: empty (sub)expressio
+set sortgroups='(^|\.).*'
+" Ultimately, we get the following order - directories, files, dotdirs, dotfiles
+set sort=+groups,+dir,+name
 
 " Show file and directory preview in right pane (only works in double-pane mode, not in single-pane mode)
 " Note that `:view!` same as `:set quickview`
