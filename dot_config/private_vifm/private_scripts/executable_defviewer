@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# https://wiki.vifm.info/index.php/Default_viewer_script
+# This script can be used to view files for which no viewer is registered. It has some convenience features like:
+#   - displaying only beginning of a file, so that huge files are processed at the same speed as the small ones;
+#   - displaying binary files as a [hex dump](https://en.wikipedia.org/wiki/Hex_dump).
+
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 filename"
+    exit 1
+fi
+
+# upper limit of lines to display for text files
+nlines=150
+# upper limit of bytes to display for binary files
+nbytes=2048
+
+# info=$(head -$nlines "$1" | file --mime -)
+# charset=${info#*=}
+# charset=$(head -$nlines "$1" | file --mime-encoding -b -)
+charset=$(file --mime-encoding -b "$1")
+
+if [ "x$charset" == "xbinary" ]; then
+    # file --mime -b "$1"
+    # file -b "$1"
+
+    # hexdump -e '"%08_ax: "' -e '8/1 "%02x " "  " 8/1 "%02x "' -e '" |" 16/1 "%_p"' -e '"\n"' -v -n $nbytes "$1"
+    hexdump -C -v -n $nbytes "$1"
+else
+    # bat --color=always --wrap=never --paging=never --style=plain --line-range :$nlines "$1"
+    # bat --color=always --wrap=never --paging=never --style=plain "$1"
+
+    # pygmentize -L styles | grep '^\*' | sed 's/\* //g' | sed 's/://g' | fzf --preview="pygmentize -O style={} -f console256 -g ~/.zshrc"
+    # pygmentize -L styles | grep '^\*' | tr -d '* ' | cut -d ':' -f 1 | fzf --preview="pygmentize -O style={} -f console256 -g ~/.zshrc"
+    # head -$nlines "$1" | pygmentize -O style=one-dark -f console256 -g # poor guess, may be lack of file extension
+    pygmentize -O style=one-dark -f console256 -g "$1"
+fi
