@@ -43,10 +43,16 @@
 #     mouse_action2                resize         \
 #     mouse_drop_action            swap
 
-yabai -m config layout float
+# If you always want windows to be fullscreen you can just use the `stack` layout instead of `bsp`.
+# https://github.com/koekeishiya/skhd/issues/273#issuecomment-1574851997
+# https://github.com/koekeishiya/yabai/discussions/1038#discussioncomment-1591562
+# yabai -m config layout float
+yabai -m config layout stack
 
 # zathura auto focus on open
 # https://github.com/zegervdv/homebrew-zathura/issues/62#issuecomment-1413968157
 yabai -m signal --add app="^zathura$" event=window_created action="~/.config/yabai/focus_last_window_id.zsh zathura"
 
 echo "yabai configuration loaded.."
+
+# TODO https://github.com/AdamWagner/stackline
