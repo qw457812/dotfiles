@@ -1579,9 +1579,12 @@
            [:equal_sign :!Cequal_sign] ; Zoom In
            [:hyphen :!Chyphen] ; Zoom Out
            [:!Rw :!C0] ; Actual Size (doomemacs pdf-view-fit-width-to-window)
+           [:w :!C0] ; Actual Size
            [:!Sh :!C9] ; Zoom to Fit (doomemacs pdf-view-fit-height-to-window)
            [:!Sp :!C9] ; Zoom to Fit (doomemacs pdf-view-fit-page-to-window)
+           [:p :!C9] ; Zoom to Fit
            [:0 :!C9] ; Zoom to Fit (doomemacs pdf-view-scale-reset)
+           [:q :!Cq] ; Quit
            ]}
 
   {:des   "For Glove80\n- backspace to space"

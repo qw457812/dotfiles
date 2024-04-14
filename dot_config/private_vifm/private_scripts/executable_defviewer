@@ -30,6 +30,7 @@ else
     # bat --color=always --wrap=never --paging=never --style=plain --line-range :$nlines "$1"
     # bat --color=always --wrap=never --paging=never --style=plain "$1"
 
+    # one-dark, zenburn
     # pygmentize -L styles | grep '^\*' | sed 's/\* //g' | sed 's/://g' | fzf --preview="pygmentize -O style={} -f console256 -g ~/.zshrc"
     # pygmentize -L styles | grep '^\*' | tr -d '* ' | cut -d ':' -f 1 | fzf --preview="pygmentize -O style={} -f console256 -g ~/.zshrc"
     # head -$nlines "$1" | pygmentize -O style=one-dark -f console256 -g # poor guess, may be lack of file extension

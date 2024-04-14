@@ -287,6 +287,13 @@ filetype {*.bmp,*.jpg,*.jpeg,*.png,*.gif,*.xpm},<image/*>
        \ open -a Preview.app,
 fileviewer {*.bmp,*.jpg,*.jpeg,*.png,*.gif,*.xpm},<image/*>
          \ identify %f
+" https://github.com/rockyzhang24/dotfiles/blob/master/.config/vifm/vifmrc
+" https://github.com/kovidgoyal/kitty/issues/1308
+" https://github.com/vifm/vifm/issues/731#issuecomment-1445124018
+" fileviewer *.png
+"     \ kitten icat --silent --transfer-mode=file --place=%pwx%ph@%pxx%py %c >/dev/tty </dev/tty %N
+"     \ %pc
+"     \ kitten icat --clear --silent >/dev/tty </dev/tty %N
 
 " MD5
 filetype *.md5
@@ -378,7 +385,7 @@ fileviewer *.xlsx xlsx2csv %c | bat --color=always --wrap=never --paging=never -
 
 " https://github.com/rockyzhang24/dotfiles/blob/master/.config/vifm/vifmrc
 " Source code (with highlighting)
-fileviewer *.[ch],*.[ch]pp,*.html,*.css,*.less,*.js,*.java,*.go,*.py,*.coffee,*.dart,*.lua,*.md,*.rb,*.ts,*.php,*.cs,*.vim,*.conf,*.swift,*.json,*.xml bat --color=always --wrap=never --paging=never --style=plain %c
+fileviewer *.[ch],*.[ch]pp,*.html,*.css,*.less,*.js,*.java,*.go,*.py,*.coffee,*.dart,*.lua,*.md,*.rb,*.ts,*.php,*.cs,*.vim,*.conf,*.swift,*.json,*.xml,*.org bat --color=always --wrap=never --paging=never --style=plain %c
 fileviewer Makefile,Makefile.* bat --color=always --wrap=never --paging=never --style=plain %c
 
 " https://q2a.vifm.info/1555/how-set-fileviewer-for-all-files-that-contains-readable-text
