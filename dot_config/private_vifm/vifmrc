@@ -256,6 +256,15 @@ fileviewer {*.avi,*.mp4,*.wmv,*.dat,*.3gp,*.ogv,*.mkv,*.mpg,*.mpeg,*.vob,
           \<video/*>
          \ ffprobe -hide_banner -pretty %c 2>&1
 
+" Source code
+filetype {*.org},
+       \ {Open in Emacs}
+       \ open -a Emacs.app,
+       \ {Open in nvim}
+       \ nvim,
+" https://github.com/rockyzhang24/dotfiles/blob/master/.config/vifm/vifmrc
+fileviewer *.[ch],*.[ch]pp,*.html,*.css,*.less,*.js,*.java,*.go,*.py,*.coffee,*.dart,*.lua,*.md,*.rb,*.ts,*.php,*.cs,*.vim,*.conf,*.swift,*.json,*.xml,*.org,Makefile,Makefile.* bat --color=always --wrap=never --paging=never --style=plain %c
+
 " Web
 " filetype {*.xhtml,*.html,*.htm},<text/html>
 "        \ {Open in Safari}
@@ -266,7 +275,14 @@ fileviewer {*.avi,*.mp4,*.wmv,*.dat,*.3gp,*.ogv,*.mkv,*.mpg,*.mpeg,*.vob,
 "        \ open -a Google\ Chrome.app,
 "        \ {Open in vim}
 "        \ vim,
-filetype {*.xhtml,*.html,*.htm},<text/html>
+filetype {*.html},<text/html>
+       \ {Open in nvim}
+       \ nvim,
+       \ {Open in Brave}
+       \ open -a Brave\ Browser.app,
+       \ {Open in Chrome}
+       \ open -a Google\ Chrome.app,
+filetype {*.xhtml,*.htm},<text/html>
        \ {Open in Brave}
        \ open -a Brave\ Browser.app,
        \ {Open in Chrome}
@@ -382,11 +398,6 @@ fileviewer *.xlsx xlsx2csv %c | bat --color=always --wrap=never --paging=never -
 " fileviewer *.csv sed "s/,,,,/,,-,,/g;s/,,/ /g" %c | column -t | sed "s/ - /  /g" | cut -c -%pw
 " https://stackoverflow.com/questions/1875305/view-tabular-file-such-as-csv-from-command-line
 " fileviewer *.csv cat %c | column -s, -t
-
-" https://github.com/rockyzhang24/dotfiles/blob/master/.config/vifm/vifmrc
-" Source code (with highlighting)
-fileviewer *.[ch],*.[ch]pp,*.html,*.css,*.less,*.js,*.java,*.go,*.py,*.coffee,*.dart,*.lua,*.md,*.rb,*.ts,*.php,*.cs,*.vim,*.conf,*.swift,*.json,*.xml,*.org bat --color=always --wrap=never --paging=never --style=plain %c
-fileviewer Makefile,Makefile.* bat --color=always --wrap=never --paging=never --style=plain %c
 
 " https://q2a.vifm.info/1555/how-set-fileviewer-for-all-files-that-contains-readable-text
 " Text based files | https://github.com/sdushantha/dotfiles/blob/master/vifm/.config/vifm/vifmrc
