@@ -35,7 +35,7 @@
 ;; defaults write NSGlobalDomain InitialKeyRepeat -int 12
 ;; my config
 ;; defaults write NSGlobalDomain KeyRepeat -int 1
-;; defaults write NSGlobalDomain InitialKeyRepeat -int 14
+;; defaults write NSGlobalDomain InitialKeyRepeat -int 12
 {:profiles  {:Goku
              {:default true :sim 30 :delay 250 :alone 250 :held 250}} ; my config
 
@@ -622,6 +622,8 @@
            [:spacebar :!Wspacebar]
            ;; [:return_or_enter :!Wreturn_or_enter]
            [:tab :!Wtab]
+           [:home :!Wequal_sign] ; see "For Glove80" below
+           [:end :!Whyphen] ; see "For Glove80" below
            [:escape :!Wescape]
            [:grave_accent_and_tilde :!Wgrave_accent_and_tilde]
            [:delete_or_backspace :!Wdelete_or_backspace]
@@ -689,8 +691,8 @@
            [:right_shift :!Cescape] ; see "For Glove80" below
            [:grave_accent_and_tilde :!Cgrave_accent_and_tilde]
            [:delete_or_backspace :!Cdelete_or_backspace]
-           [:home :!Chome]
-           [:end :!Cend]
+           [:home :!Cequal_sign] ; see "For Glove80" below
+           [:end :!Chyphen] ; see "For Glove80" below
            [:page_up :!Cpage_up]
            [:page_down :!Cpage_down]
            ]}
@@ -1258,7 +1260,8 @@
            [:l {:mkey {:hwheel 64}}]]}
 
   ;; jk mk ji df jl kl nk
-  {:des  "simultaneous keys (jk, mk)"
+  ;; 减少 hjkl 延迟, 注掉
+  #_{:des  "simultaneous keys (jk, mk)"
    :rules [
            ;; or jj to esc?
            [[:j :k] :escape]
@@ -1606,8 +1609,10 @@
            [:##right_option :right_option nil {:alone [:hs ["mouseCenterClickThenMaximizeWindow"]]}]
            [:##up_arrow :down_arrow]
            [:##down_arrow :up_arrow]
-           [:##home :equal_sign]
-           [:##end :hyphen]
+           [:##home :equal_sign :!Preview]
+           [:##end :hyphen :!Preview]
+           [:##home :equal_sign :Preview {:alone :!Cequal_sign}] ; Zoom In, see "Preview: doomemacs like keybindings" above
+           [:##end :hyphen :Preview {:alone :!Chyphen}] ; Zoom Out, see "Preview: doomemacs like keybindings" above
            [:##escape :grave_accent_and_tilde]
            [:##grave_accent_and_tilde :left_shift]
 
