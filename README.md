@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://git.io/typing-svg"><img src="https://readme-typing-svg.demolab.com/?lines=Personal+dotfiles+on+macOS+managed+by+chezmoi&font=Fira%20Code&center=true&width=550&height=50"/></a>
+  <a href="https://git.io/typing-svg"><img src="https://readme-typing-svg.demolab.com/?lines=Personal+dotfiles+on+macOS+managed+by+chezmoi&font=Fira%20Code&center=true&width=550&height=50&pause=1000"/></a>
 </p>
 
 ## [Goku](https://github.com/yqrashawn/GokuRakuJoudo)
@@ -57,10 +57,7 @@ Tracking keyboard input use [WhatPulse](https://whatpulse.org/) to observe.
 
 ## [rime-ice](https://github.com/iDvel/rime-ice)
 
-[Rime config](./private_Library/Rime) for Chinese input powered by rime-ice, [flypy](https://flypy.com/) and [TigerCode](https://tiger-code.com/), including:
-
-- 补丁: [雾凇拼音](./private_Library/Rime/rime_ice.custom.yaml), [小鹤双拼](./private_Library/Rime/double_pinyin_flypy.custom.yaml)
-- 方案 + 补丁: [小鹤音形](./private_Library/Rime/flypy.custom.yaml), [虎码](./private_Library/Rime/tiger.custom.yaml)
+[Rime config](./private_Library/Rime) for Chinese input powered by rime-ice and [TigerCode](https://tiger-code.com/).
 
 Using [KeyboardHolder](https://keyboardholder.leavesc.com/zh-cn/) to keep [Squirrel](https://github.com/rime/squirrel) as the only input source on macOS, instead of ABC.
 
@@ -81,3 +78,7 @@ Using [emacs-rime](https://github.com/DogLooksGood/emacs-rime) in Doom Emacs.
 [DOOMDIR](./dot_config/doom)
 
 Using [Emacs Plus](https://github.com/d12frosted/homebrew-emacs-plus).
+
+## [Vifm](https://github.com/vifm/vifm)
+
+[vifmrc](./dot_config/private_vifm/vifmrc)
