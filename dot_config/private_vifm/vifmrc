@@ -424,6 +424,9 @@ fileviewer *[^/],.*[^/] defviewer %c
 " Displaying pictures in terminal
 " fileviewer *.jpg,*.png shellpic %c
 
+" https://q2a.vifm.info/1677/fileviewer-for-git-directories
+fileviewer .git/ git -c color.status=always status --short --branch %d %pu
+
 " Customize directory preview (only works in double-pane mode, not in single-pane mode)
 " https://github.com/vifm/vifm/issues/628
 " there is builtin code for drawing a tree since v0.8.1 (because `tree` isn't always
@@ -603,6 +606,7 @@ set sort=+groups,+dir,+name
 " Note that `:view!` same as `:set quickview`
 " :view!
 " set quickview
+set noquickview
 
 " start with single-pane mode, even by `vifm <path> <path>` or vifm was in double-pane mode on finishing previous run | https://vifm.info/manual.shtml
 :only
@@ -631,15 +635,16 @@ set dirsize=nitems
 " Note that `:wincmd H` same as `<c-w>H` | https://q2a.vifm.info/649/view-pane-always-on-the-right-side
 "
 " double-pane mode:
-"     1. `set nomillerview` for both active pane and inactive pane
-"     2. `set noquickview`
+"     1. `set noquickview`
+"     2. `set nomillerview` for both active pane and inactive pane
 "     3. position current pane on the left using `:wincmd H`
 "
 " single-pane mode (default):
-"     1. `set millerview` and `set milleroptions=...` for both active pane and inactive pane
-command! togglepane : if layoutis('only')
+"     1. `set noquickview`
+"     2. `set millerview` and `set milleroptions=...` for both active pane and inactive pane
+command! togglepane : set noquickview
+                   \| if layoutis('only')
                    \|     vsplit
-                   \|     set noquickview
                    \|     set nomillerview
                    \|     execute 'wincmd H'
                    \|     execute 'wincmd w'
@@ -974,6 +979,12 @@ nnoremap <wait> <space>cza :!chezmoi add %f<cr>
 nnoremap <wait> <space>czz :execute 'cd' fnameescape(system('chezmoi source-path'))<cr>
 
 " TODO bookmarks (see https://github.com/vifm/vifm/issues/279)
+
+" ==============================================================================
+" git
+
+" always show git log in preview of files inside some repository
+" au DirEnter '~/.local/share/chezmoi/**/*' setl previewprg='git log --color -- %c 2>&1'
 
 " ------------------------------------------------------------------------------
 " TODO
