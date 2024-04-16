@@ -693,7 +693,6 @@ command create :
 " nnoremap a :create<space>
 nnoremap i :create<space>
 
-" nnoremap cd :cd<cr>
 nnoremap cd :cd<space>
 
 " Author of vifm: https://github.com/xaizek/dotvifm/blob/master/vifmrc
@@ -859,6 +858,8 @@ command! z : if '%a' == ''
           \|         execute 'cd' fnameescape($Z_PICK)
           \|     endif
           \| endif
+nnoremap z<space> :z<space>
+nnoremap z<cr> :cd<cr>
 
 " https://github.com/sxyazi/yazi/blob/main/yazi-plugin/preset/plugins/zoxide.lua
 " '%d' instead of %d to handle spaces in directory names
@@ -869,6 +870,7 @@ command! zi : set noquickview
            \|     execute 'cd' fnameescape($ZI_PICK) '%IU'
            \| endif
            \| redraw
+nnoremap zi :zi<cr>
 nnoremap ` :zi<cr>
 
 " %d instead of '%d' to handle spaces in directory names
@@ -964,8 +966,12 @@ nnoremap <wait> <space>j :FZFcd<cr>
 nnoremap <wait> <space>e :FZFedit<cr>
 
 " edit file from child directory with chezmoi
-nnoremap <wait> <space>ce :FZFczea<cr>
 nnoremap <wait> <space>c<esc> <nop>
+nnoremap <wait> <space>cz<esc> <nop>
+nnoremap <wait> <space>czf :FZFczea<cr>
+nnoremap <wait> <space>cze :!chezmoi edit --apply --verbose %f<cr>
+nnoremap <wait> <space>cza :!chezmoi add %f<cr>
+nnoremap <wait> <space>czz :execute 'cd' fnameescape(system('chezmoi source-path'))<cr>
 
 " TODO bookmarks (see https://github.com/vifm/vifm/issues/279)
 
