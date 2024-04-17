@@ -259,6 +259,7 @@ fileviewer {*.avi,*.mp4,*.wmv,*.dat,*.3gp,*.ogv,*.mkv,*.mpg,*.mpeg,*.vob,
 " Source code
 filetype {*.org},
        \ {Open in Emacs}
+       " \ emacsclient -t,
        \ open -a Emacs.app,
        \ {Open in nvim}
        \ nvim,

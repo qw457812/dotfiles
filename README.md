@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://git.io/typing-svg"><img src="https://readme-typing-svg.demolab.com/?lines=Personal+dotfiles+on+macOS+managed+by+chezmoi&font=Fira%20Code&center=true&width=550&height=50&pause=1000"/></a>
+  <a href="https://git.io/typing-svg"><img src="https://readme-typing-svg.demolab.com?font=Fira+Code&duration=3500&pause=2000&color=21C8B8&center=true&vCenter=true&width=550&height=50&lines=Personal+dotfiles+on+macOS+managed+by+chezmoi" alt="dotfiles-typing-svg" /></a>
 </p>
 
 ## [Goku](https://github.com/yqrashawn/GokuRakuJoudo)
