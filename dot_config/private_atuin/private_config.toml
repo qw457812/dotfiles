@@ -24,6 +24,7 @@
 
 ## enable or disable automatic sync
 # auto_sync = true
+auto_sync = true
 
 ## enable or disable automatic update checks
 # update_check = true
@@ -35,6 +36,7 @@
 ## is ran, so sync intervals may well be longer
 ## set it to 0 to sync after every command
 # sync_frequency = "10m"
+sync_frequency = "0"
 
 ## which search mode to use
 ## possible values: prefix, fulltext, fuzzy, skim

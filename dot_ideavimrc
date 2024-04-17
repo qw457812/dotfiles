@@ -386,6 +386,7 @@ map <leader>vh <Action>(Vcs.ShowTabbedFileHistory)
 map <leader>vq <Action>(Vcs.QuickListPopupAction)
 map <leader>vr <Action>(ChangesView.Revert)
 " map <leader>w <Action>(CloseContent)
+map <leader>wd <Action>(ActivateDebugToolWindow)
 map <leader>ww <Action>(JumpToLastWindow)
 map <leader>wt <Action>(ActivateTerminalToolWindow)
 " https://youtrack.jetbrains.com/issue/VIM-2666/How-to-use-vim-bindings-in-Tool-Windows-like-Run-Structure-etc..
@@ -453,3 +454,8 @@ vmap J <Action>(EditorUnSelectWord)
 " TODO PreviousDiff shift+f7
 
 " TODO https://github.com/MarcoIeni/intellimacs | https://github.com/syl20bnr/spacemacs#spacemacs-everywhere
+
+" Finding action ids
+" `:actionlist [pattern]` | https://github.com/JetBrains/ideavim#finding-action-ids
+" https://gist.github.com/ferhaterata/29fe8977145c7d7aadc8cb49eb0302a5
+" https://github.com/lisiur/idea-actions
