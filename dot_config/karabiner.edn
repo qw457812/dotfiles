@@ -76,8 +76,8 @@
              ;; bonus: switch between the windows of same app like cmd+`
              ;; https://github.com/mmroczka/.dotfiles/blob/master/karabiner/karabiner.edn
              ;; https://github.com/koekeishiya/dotfiles/blob/master/yabai/yabairc
-             ;; :prev_app                {:shell "export PATH=/opt/homebrew/bin:$PATH yabai -m window --focus recent &> /dev/null || (id=$(yabai -m query --windows --space | jq '.[1].id') && yabai -m window --focus $id &> /dev/null)"}
-             :prev_app                {:shell "export PATH=/opt/homebrew/bin:$PATH yabai -m window --focus recent &> /dev/null || yabai -m window --focus $(yabai -m query --windows --space | jq '.[1].id') &> /dev/null"}
+             ;; :prev_app                {:shell "export PATH=/opt/homebrew/bin:$PATH yabai -m window --focus recent &> /dev/null || (id=$(yabai -m query --windows --space | jq '.[1].id') && yabai -m window --focus $id &> /dev/null) || open -g hammerspoon://cmdTab &> /dev/null"}
+             :prev_app                {:shell "export PATH=/opt/homebrew/bin:$PATH yabai -m window --focus recent &> /dev/null || yabai -m window --focus $(yabai -m query --windows --space | jq '.[1].id') &> /dev/null || open -g hammerspoon://cmdTab &> /dev/null"}
              :home_dir                [{:key  :grave_accent_and_tilde
                                         :modi [:left_shift]
                                         :lazy true} {:key :slash}]

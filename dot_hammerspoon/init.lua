@@ -46,6 +46,22 @@ hs.urlevent.bind("mouseCenterClickThenMaximizeWindow", function(eventName, param
     maximizeWindow()
 end)
 
+hs.urlevent.bind("cmdTab", function(eventName, params)
+    -- problem: act like cmd+tab, but not release cmd
+    -- hs.eventtap.keyStroke({"cmd"}, "tab")
+
+    -- problem: wired behavior with delay
+    -- https://www.hammerspoon.org/docs/hs.window.switcher.html
+    -- hs.window.switcher.nextWindow()
+    -- hs.window.switcher.new():next()
+
+    -- https://www.hammerspoon.org/docs/hs.eventtap.event.html#newKeyEvent
+    hs.eventtap.event.newKeyEvent(hs.keycodes.map.cmd, true):post()
+    hs.eventtap.event.newKeyEvent(hs.keycodes.map.tab, true):post()
+    hs.eventtap.event.newKeyEvent(hs.keycodes.map.tab, false):post()
+    hs.eventtap.event.newKeyEvent(hs.keycodes.map.cmd, false):post()
+end)
+
 -- We can demonstrate this by creating a very simple callback which will make sure that when you activate the Finder application,
 -- all of its windows will be brought to the front of the display.
 -- function applicationWatcher(appName, eventType, appObject)
