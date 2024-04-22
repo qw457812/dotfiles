@@ -13,7 +13,7 @@ ignore_case: true
 # true  -> vice versa
 # If not set, will default to false.
 # match_vim_exit_behavior: false
-match_vim_exit_behavior: true
+# match_vim_exit_behavior: true
 
 # key (the command you want to use when opening file): [values] (extensions)
 # In the key, You can use arguments.

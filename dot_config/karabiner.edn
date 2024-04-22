@@ -69,9 +69,15 @@
  :tos       {:same_wind_app           {:key  :grave_accent_and_tilde
                                        :modi [:left_command]
                                        :lazy true}
-             :prev_app                {:key  :tab
-                                       :modi [:left_command]
-                                       :lazy true}
+             ; :prev_app                {:key  :tab
+             ;                           :modi [:left_command]
+             ;                           :lazy true}
+             ;; use yabai instead of cmd+tab: do not show Finder.app's closed window
+             ;; bonus: switch between the windows of same app like cmd+`
+             ;; https://github.com/mmroczka/.dotfiles/blob/master/karabiner/karabiner.edn
+             ;; https://github.com/koekeishiya/dotfiles/blob/master/yabai/yabairc
+             ;; :prev_app                {:shell "export PATH=/opt/homebrew/bin:$PATH yabai -m window --focus recent &> /dev/null || (id=$(yabai -m query --windows --space | jq '.[1].id') && yabai -m window --focus $id &> /dev/null)"}
+             :prev_app                {:shell "export PATH=/opt/homebrew/bin:$PATH yabai -m window --focus recent &> /dev/null || yabai -m window --focus $(yabai -m query --windows --space | jq '.[1].id') &> /dev/null"}
              :home_dir                [{:key  :grave_accent_and_tilde
                                         :modi [:left_shift]
                                         :lazy true} {:key :slash}]
@@ -1053,6 +1059,7 @@
            [:p [:!!f17 :!!f4]] ; Toggle System Proxy and Enhance Mode for ClashX Pro
            [:g "/opt/homebrew/bin/goku"]
            [:r :!TOgrave_accent_and_tilde] ; rime deploy
+           [:y "/opt/homebrew/bin/yabai --restart-service"] ; https://github.com/koekeishiya/yabai/wiki/Tips-and-tricks#quickly-restart-the-yabai-launch-agent
 
            ;; information
            [:n :!!f1] ; clock by Bartender 4 (n for notifications)
@@ -1261,7 +1268,7 @@
 
   ;; jk mk ji df jl kl nk
   ;; 减少 hjkl 延迟, 注掉
-  #_{:des  "simultaneous keys (jk, mk)"
+  {:des  "simultaneous keys (jk, mk)"
    :rules [
            ;; or jj to esc?
            [[:j :k] :escape]
@@ -1275,8 +1282,9 @@
            [[:n :k] :!!equal_sign] ; raycast://extensions/raycast/floating-notes/toggle-floating-notes-window
 
            ;; emacs-everywhere | https://github.com/tecosaur/emacs-everywhere
-           ;; [[:j :i] "/opt/homebrew/bin/emacsclient --eval \"(emacs-everywhere)\"" [:!vim-mode-disabled-application :!Emacs]]
-           ;; [[:j :i] [:!Tx :5 :0] :Emacs]
+           ;; https://github.com/yqrashawn/yqdotfiles/blob/master/modules/yqrashawn/home-manager/dotfiles/karabiner.edn
+           [[:j :i] [:!Ca :!Cx "/opt/homebrew/bin/emacsclient --eval '(emacs-everywhere)'"] [:!vim-mode-disabled-application :!Emacs]]
+           [[:j :i] [:!Tx :5 :0] :Emacs]
            ]}
 
   ;; or hold cmd+q for a while?
