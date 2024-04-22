@@ -49,10 +49,28 @@
 # yabai -m config layout float
 yabai -m config layout stack
 
-# zathura auto focus on open
+# app auto focus on open
 # https://github.com/zegervdv/homebrew-zathura/issues/62#issuecomment-1413968157
-yabai -m signal --add app="^zathura$" event=window_created action="~/.config/yabai/focus_last_window_id.zsh zathura"
+for app in "zathura" \
+  "Karabiner-Elements"; do
+  yabai -m signal --add app="^${app}$" event=window_created action="~/.config/yabai/focus_last_window_id.zsh ${app}"
+done
+
+# https://github.com/yqrashawn/yqdotfiles/blob/master/modules/yqrashawn/home-manager/dotfiles/yabai/rules
+yabai -m rule --add app="^Emacs$" title="^(Emacs Everywhere|edit - )" manage=off
+
+# If no window is focused after a window is destroyed or minimized, focus the window under the cursor
+# usefull when close Finder.app's last window
+# https://github.com/z20240/yabai/blob/master/scripts/windowFocusOnDestroy.sh
+# https://github.com/koekeishiya/yabai/issues/485#issuecomment-617953545
+# https://github.com/koekeishiya/dotfiles/blob/master/yabai/yabairc
+yabai -m signal --add event=window_destroyed active=yes action="yabai -m query --windows --window &> /dev/null || yabai -m window --focus mouse &> /dev/null || yabai -m window --focus \$(yabai -m query --windows --space | jq '.[0].id') &> /dev/null"
+# yabai -m signal --add event=window_minimized active=yes action="if \$(yabai -m query --windows --window \$YABAI_WINDOW_ID | jq -r '.\"is-floating\"'); then yabai -m query --windows --window &> /dev/null || yabai -m window --focus mouse &> /dev/null || yabai -m window --focus \$(yabai -m query --windows --space | jq '.[0].id') &> /dev/null; fi"
+yabai -m signal --add event=window_minimized active=yes action="yabai -m query --windows --window &> /dev/null || yabai -m window --focus mouse &> /dev/null || yabai -m window --focus \$(yabai -m query --windows --space | jq '.[0].id') &> /dev/null"
 
 echo "yabai configuration loaded.."
 
-# TODO https://github.com/AdamWagner/stackline
+# TODO
+# https://github.com/koekeishiya/dotfiles/blob/master/yabai/yabairc
+# https://github.com/FelixKratz/dotfiles/blob/master/.config/yabai/yabairc
+# https://github.com/AdamWagner/stackline
