@@ -1,0 +1,3 @@
+# https://github.com/erikw/vim-keybindings-everywhere-the-ultimate-list
+set editing-mode vi
+set keymap vi-insert
