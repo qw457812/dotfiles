@@ -3,7 +3,7 @@ local M = {}
 
 M.general = {
   n = {
-    -- [";"] = { ":", "enter command mode", opts = { nowait = true } },
+    [";"] = { ":", "enter command mode", opts = { nowait = true } },
     -- xyq https://nvchad.com/docs/config/mappings
     -- [":"] = { ";", "repeat previous f, t, F or T movement (swap ; and : by xyq)", opts = { nowait = true } },
 
