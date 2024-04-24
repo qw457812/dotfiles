@@ -7,7 +7,7 @@ local autocmd = vim.api.nvim_create_autocmd
 -- })
 
 -- xyq
--- local g = vim.g
+local g = vim.g
 
 -- :help copilot
 -- https://github.com/LunarVim/LunarVim/issues/1856#issuecomment-954224770
@@ -21,3 +21,8 @@ local autocmd = vim.api.nvim_create_autocmd
 autocmd("TextYankPost", {
   command = "silent! lua vim.highlight.on_yank({timeout=250})",
 })
+
+-- https://github.com/iamcco/markdown-preview.nvim#markdownpreview-config
+-- use a custom port to start server or empty for random
+-- work with Dark Reader extension for Browser
+g.mkdp_port = '12388'

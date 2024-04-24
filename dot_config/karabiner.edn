@@ -77,6 +77,7 @@
              ;; https://github.com/mmroczka/.dotfiles/blob/master/karabiner/karabiner.edn
              ;; https://github.com/koekeishiya/dotfiles/blob/master/yabai/yabairc
              ;; :prev_app                {:shell "export PATH=/opt/homebrew/bin:$PATH yabai -m window --focus recent &> /dev/null || (id=$(yabai -m query --windows --space | jq '.[1].id') && yabai -m window --focus $id &> /dev/null) || open -g hammerspoon://cmdTab &> /dev/null"}
+             ;; TODO use cmd+2 in ActivityMonitor.app, then this will not work
              :prev_app                {:shell "export PATH=/opt/homebrew/bin:$PATH yabai -m window --focus recent &> /dev/null || yabai -m window --focus $(yabai -m query --windows --space | jq '.[1].id') &> /dev/null || open -g hammerspoon://cmdTab &> /dev/null"}
              :home_dir                [{:key  :grave_accent_and_tilde
                                         :modi [:left_shift]
@@ -1196,6 +1197,7 @@
            [:h :home_dir]
            [:q [:q :w :4 :5 :7 :8 :1 :2]]
            [:m [:q :w :4 :5 :7 :8 :1 :2 :!S2 :1 :6 :3 :period :c :o :m]]
+           [:j [:j :k :d :f :l :f :j :!S2 :g :m :a :i :l :period :c :o :m]]
            ;; FIXME markdown url
            ;; [:u [:open_bracket :close_bracket :left_arrow :!Cv :right_arrow :!S9 :!S0 :left_arrow :!!f7] nil {:delayed {:invoked [:!C2]} :params {:delay 500}}] ; markdown url
            [:u [:open_bracket :!Cv :close_bracket :!S9 :!S0 :left_arrow :!!f7] nil {:delayed {:invoked [:!C2]} :params {:delay 500}}] ; markdown url
@@ -1596,6 +1598,11 @@
            [:p :!C9] ; Zoom to Fit
            [:0 :!C9] ; Zoom to Fit (doomemacs pdf-view-scale-reset)
            [:q :!Cq] ; Quit
+           ]}
+
+  {:des   "Activity Monitor: / -> filter"
+   :rules [:ActivityMonitor
+           [:slash :!COf] ; Filter Processes
            ]}
 
   {:des   "For Glove80\n- backspace to space"
@@ -2052,6 +2059,7 @@
   :iTerm            ["^com\\.googlecode\\.iterm2$"]
   :Finder           ["^com\\.apple\\.finder$"]
   :Preview          ["^com\\.apple\\.Preview$"]
+  :ActivityMonitor  ["^com\\.apple\\.ActivityMonitor$"]
   :Thunderbird      ["^org\\.mozilla\\.thunderbird$"]
   :Spotify          ["^com\\.spotify\\.client$"]
   :WeWork           ["^com\\.tencent\\.WeWorkMac$"]
