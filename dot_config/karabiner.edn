@@ -1365,7 +1365,7 @@
   ;; right cmd -> cmd+`/rime/raycast/mouseCenter/return
   {:des   "right cmd alone -> toggle rime chinese/english"
    :rules [[:condi :!niz-x87-bt :!glove80]
-           ;; [:#Pright_command :right_command nil {:alone [:hs ["mouseCenterClickThenMaximizeWindow"]]}]
+           ;; [:#Pright_command :right_command nil {:alone [:hs ["mouseCenterClick"]]}]
            ;; TODO `:##` or `:#P`
            ;; [:##right_command :right_command :!Emacs {:alone :left_shift}] ; rime
            [:##right_command :right_command :!Emacs {:alone :right_control}] ; rime
@@ -1375,7 +1375,7 @@
   ;; TODO or press f twice to switch rime's english/chinese input? see "Double colon triggers emoji search" above
   ;; TODO "For NIZ" below
   ;; https://github.com/yqrashawn/GokuRakuJoudo/blob/master/examples.org#two-stroke-keybindings-emacs-c-x-mode
-  #_{:des   "right cmd alone -> toggle rime's ascii_mode, right cmd twice -> mouse center click to active app then maximize window"
+  #_{:des   "right cmd alone -> toggle rime's ascii_mode, right cmd twice -> mouse center click to active app"
    :rules [:!niz-x87-bt
            [
             ;; <from> second right_command (when variable "right-command" is 1)
@@ -1393,11 +1393,11 @@
              ;; [to_if_alone](https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/to-if-alone/)
              ;; run 3 actions when the <from> key is pressed alone
              ;; 1. send control+shift+] (toggle rime's ascii_mode back | ~/Library/Rime/default.custom.yaml)
-             ;; 2. call hammerspoon URL event "mouseCenterClickThenMaximizeWindow"
+             ;; 2. call hammerspoon URL event "mouseCenterClick"
              ;; 3. set variable "right-command" to 0
              ;; FIXME vscode 切换中英文经常不灵
-             :alone   [:!TSclose_bracket [:hs ["mouseCenterClickThenMaximizeWindow"]] ["right-command" 0]] ; or move `["right-command" 0]` into `:afterup`
-             ;; :alone   [:!TSclose_bracket [:hs ["mouseCenterClickThenMaximizeWindow"]]]
+             :alone   [:!TSclose_bracket [:hs ["mouseCenterClick"]] ["right-command" 0]] ; or move `["right-command" 0]` into `:afterup`
+             ;; :alone   [:!TSclose_bracket [:hs ["mouseCenterClick"]]]
 
              ;; [to_after_key_up](https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/to-after-key-up/)
              ;; set variable "right-command" to 0 when the <from> key is released
@@ -1441,11 +1441,11 @@
 
   ;; TODO right_option -> hyper/super-hyper(hyper+fn)/translate
   ;; TODO :super-hyper [:command :shift :control :option :fn]
-  {:des   "right option alone -> mouse center click to active app then maximize window"
+  {:des   "right option alone -> mouse center click to active app"
    :rules [[:condi :!glove80 :!niz-x87-bt :!niz-x87-wired]
            ;; [:#Pright_option :right_option :translate-by-opt-shift-a-app {:alone [:!OSa]}]
            ;; [:#Pright_option :right_option :!translate-by-opt-shift-a-app {:alone [:!!backslash]}] ; raycast://extensions/isfeng/easydict/easydict
-           [:#Pright_option :right_option nil {:alone [:hs ["mouseCenterClickThenMaximizeWindow"]]}]
+           [:#Pright_option :right_option nil {:alone [:hs ["mouseCenterClick"]]}]
            ]}
 
   ;; TODO 影响 double shift
@@ -1621,7 +1621,7 @@
            [:##right_shift :right_command nil {:alone :escape}]
            [:##left_option :left_option :!tmux-autostart-terminals {:alone [:open "/Applications/kitty.app"]}]
            [:##left_option :left_option :tmux-autostart-terminals {:alone [:!Tb]}] ; tmux prefix
-           [:##right_option :right_option nil {:alone [:hs ["mouseCenterClickThenMaximizeWindow"]]}]
+           [:##right_option :right_option nil {:alone [:hs ["mouseCenterClick"]]}]
            [:##up_arrow :down_arrow]
            [:##down_arrow :up_arrow]
            [:##home :equal_sign :!Preview]
@@ -1749,7 +1749,7 @@
 
   {:des   "For NIZ: fix the wrong position of modifier keys"
    :rules [:niz-x87-bt
-           [:##right_control :right_command nil {:alone [:hs ["mouseCenterClickThenMaximizeWindow"]]}] ; right_command, see "right cmd alone" above
+           [:##right_control :right_command nil {:alone [:hs ["mouseCenterClick"]]}] ; right_command, see "right cmd alone" above
            [:##right_command :right_option :translate-by-opt-shift-a-app {:alone [:!OSa]}] ; right_option, see "right option alone" above
            [:##right_command :right_option :!translate-by-opt-shift-a-app {:alone [:!!backslash]}] ; right_option, see "right option alone" above
            [:##right_option :!CTOleft_shift nil {:alone :!Cv}] ; right_ctrl see "For Not HHKB" above
@@ -1758,7 +1758,7 @@
            ;; [:##left_command :left_option :!Terminals {:alone [:!!f18]}] ; left_option, see "left option alone" above
            [:##left_command :left_option :!tmux-autostart-terminals {:alone [:open "/Applications/kitty.app"]}] ; left_option, see "left option alone" above
            [:##left_command :left_option :tmux-autostart-terminals {:alone [:!Tb]}] ; left_option, see "left option alone" above
-           [:##right_option :right_command nil {:alone [:hs ["mouseCenterClickThenMaximizeWindow"]]}] ; right_command, see "right cmd alone" above
+           [:##right_option :right_command nil {:alone [:hs ["mouseCenterClick"]]}] ; right_command, see "right cmd alone" above
            [:##application :right_option :translate-by-opt-shift-a-app {:alone [:!OSa]}] ; right_option, see "right option alone" above
            [:##application :right_option :!translate-by-opt-shift-a-app {:alone [:!!backslash]}] ; right_option, see "right option alone" above
            [:##right_control :!CTOleft_shift nil {:alone :!Cv}] ; right_ctrl, see "For Not HHKB" above

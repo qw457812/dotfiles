@@ -4,67 +4,39 @@ patch:
   # 可参考 /Library/Input Methods/Squirrel.app/Contents/SharedSupport/squirrel.yaml
   # 注: rime_ice.custom.yaml中配置了默认英文(即ascii_mode默认为true), 故此处只需配置ascii_mode需要改为false的app
   app_options:
-    com.apple.Spotlight:
-      ascii_mode: true    # 开启默认英文
+    # com.apple.Spotlight:
+    #   ascii_mode: true    # 开启默认英文
     org.vim.MacVim:
-      ascii_mode: true  # 初始爲西文模式
-      no_inline: true   # 不使用行內編輯
+      # ascii_mode: true  # 初始爲西文模式
+      # no_inline: true   # 不使用行內編輯
       vim_mode: true    # 退出VIM插入模式自動切換輸入法狀態
     com.microsoft.VSCode:
-      ascii_mode: true
-      no_inline: true
       vim_mode: true
     com.googlecode.iterm2:
-      ascii_mode: true
-      no_inline: true
       vim_mode: true
     net.kovidgoyal.kitty:
-      ascii_mode: true
-      # no_inline: true
-      inline: true
       vim_mode: true
-    com.apple.dt.Xcode:
-      ascii_mode: true
     org.gnu.Emacs:
-      ascii_mode: true
-      no_inline: true
       vim_mode: true # evil
-    com.google.Chrome:
-      ascii_mode: true
-      # 規避 https://github.com/rime/squirrel/issues/435
-      # [鼠须管输入法配置 - 哈呜.王](https://www.hawu.me/others/2666)
-      inline: true
+    # com.google.Chrome:
+    #   # 規避 https://github.com/rime/squirrel/issues/435
+    #   # [鼠须管输入法配置 - 哈呜.王](https://www.hawu.me/others/2666)
+    #   inline: true
     com.qvacua.VimR:
-      ascii_mode: true
-      no_inline: true
       vim_mode: true
     com.neovide.neovide:
-      ascii_mode: true
-      no_inline: true
       vim_mode: true
     com.jetbrains.intellij.ce:
-      ascii_mode: true
-      no_inline: true
       vim_mode: true
     com.jetbrains.pycharm.ce:
-      ascii_mode: true
-      no_inline: true
       vim_mode: true
     com.jetbrains.pycharm.ce-EAP:
-      ascii_mode: true
-      no_inline: true
       vim_mode: true
     com.tidgi:
-      ascii_mode: true
-      no_inline: true
       vim_mode: true
     org.jkiss.dbeaver.core.product:
-      ascii_mode: true
-      no_inline: true
       vim_mode: true
     md.obsidian:
-      ascii_mode: true
-      no_inline: true
       vim_mode: true
     # -------------------------------------默认为中文的app-------------------------------------
     # 打开"/Applications/企业微信.app/Contents/Info.plist" ---> 搜索"BundleIdentifier" ---> 获取其值"com.tencent.WeWorkMac"

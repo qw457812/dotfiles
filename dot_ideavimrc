@@ -207,6 +207,11 @@ nmap Y y$
 map H ^
 map L $
 
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+
 " Have j and k navigate visual lines rather than logical ones
 " Notice: just for fix ideavim bug ---> when meet folded @SuppressWarnings("unchecked") like /unchecked/, jjj... will not walk through (but gj not work well when soft-wrap is on)
 nmap j gj
@@ -251,11 +256,11 @@ map <right> <Action>(Forward)
 
 " github copilot <TAB> (behaves like zsh-autosuggestions)
 imap <C-l> <Action>(copilot.applyInlays)
-nmap <C-l> <Action>(copilot.applyInlays)
+" nmap <C-l> <Action>(copilot.applyInlays)
 imap <C-j> <Action>(copilot.cycleNextInlays)
-nmap <C-j> <Action>(copilot.cycleNextInlays)
+" nmap <C-j> <Action>(copilot.cycleNextInlays)
 imap <C-k> <Action>(copilot.cyclePrevInlays)
-nmap <C-k> <Action>(copilot.cyclePrevInlays)
+" nmap <C-k> <Action>(copilot.cyclePrevInlays)
 " imap <C-space> <Action>(copilot.applyInlays)
 " nmap <C-space> <Action>(copilot.applyInlays)
 
@@ -347,6 +352,10 @@ map <Leader>oi <Action>(OptimizeImports)
 map <Leader>om :action OverrideMethods<CR>
 map <Leader>pm :action ShowPopupMenu<CR>
 map <Leader>pr <Action>(ExternalSystem.ProjectRefreshAction)
+" markdown preview
+map <Leader>pc <Action>(TextEditorWithPreview.Layout.EditorOnly)
+map <Leader>po <Action>(TextEditorWithPreview.Layout.EditorAndPreview)
+map <Leader>pO <Action>(TextEditorWithPreview.Layout.PreviewOnly)
 " CloseEditor 关不掉 Compare.LastVersion
 map <leader>qq <Action>(CloseContent)
 map <Leader>qa :action CloseAllEditors<CR>
