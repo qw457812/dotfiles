@@ -1,5 +1,4 @@
 // 将键绑定放在此文件中以覆盖默认值
-// https://github.com/nikitavoloboev/config/blob/master/vscode/keybindings.json
 [
     {
         "key": "shift+;",
@@ -28,6 +27,37 @@
         "when": "neovim.mode == insert && editorTextFocus",
         "args": "k"
     },
+    // https://gist.github.com/MasoodGit/1cc302c61622e777ca09f8bf4ae84adc
+    {
+        "key": "ctrl+h",
+        "command": "workbench.action.focusLeftGroup",
+        // markdown-preview-enhanced
+        // "when": "editorTextFocus && vim.active && vim.mode != 'Insert'"
+        // https://code.visualstudio.com/api/references/when-clause-contexts#available-context-keys
+        "when": "vim.active && vim.mode != 'Insert'"
+    },
+    {
+        "key": "ctrl+l",
+        "command": "workbench.action.focusRightGroup",
+        // "when": "editorTextFocus && vim.active && vim.mode != 'Insert'"
+        "when": "vim.active && vim.mode != 'Insert'"
+    },
+    {
+        "key": "ctrl+k",
+        "command": "workbench.action.focusAboveGroup",
+        "when": "editorTextFocus && vim.active && vim.mode != 'Insert'"
+    },
+    {
+        "key": "ctrl+j",
+        "command": "workbench.action.focusBelowGroup",
+        "when": "editorTextFocus && vim.active && vim.mode != 'Insert'"
+    },
+    // {
+    //     "key": "space l",
+    //     "command": "workbench.action.toggleSidebarVisibility",
+    //     "when": "vim.active && vim.mode != 'Insert'"
+    // },
+    // https://github.com/nikitavoloboev/config/blob/master/vscode/keybindings.json
     {
         "key": "ctrl+;",
         "command": "workbench.action.terminal.focus",
@@ -43,14 +73,14 @@
     //     "key": "ctrl+r",
     //     "command": "workbench.view.explorer"
     // },
-    {
-        "key": "ctrl+j",
-        "command": "workbench.action.previousEditor"
-    },
-    {
-        "key": "ctrl+k",
-        "command": "workbench.action.nextEditor"
-    },
+    // {
+    //     "key": "ctrl+j",
+    //     "command": "workbench.action.previousEditor"
+    // },
+    // {
+    //     "key": "ctrl+k",
+    //     "command": "workbench.action.nextEditor"
+    // },
     {
         "key": "cmd+j",
         "command": "workbench.action.showAllEditors"
@@ -64,11 +94,11 @@
         "command": "editor.action.goToDeclaration",
         "when": "inSearchEditor && editorTextFocus && vim.mode == 'Normal'"
     },
-    {
-        "key": "ctrl+i",
-        "command": "editor.action.quickFix",
-        "when": "editorHasCodeActionsProvider && editorTextFocus && !editorReadonly"
-    },
+    // {
+    //     "key": "ctrl+i",
+    //     "command": "editor.action.quickFix",
+    //     "when": "editorHasCodeActionsProvider && editorTextFocus && !editorReadonly"
+    // },
     {
         "key": "shift+cmd+'",
         "command": "toggleVim"
@@ -83,10 +113,10 @@
         "command": "-editor.action.rename",
         "when": "editorHasRenameProvider && editorTextFocus && !editorReadonly"
     },
-    {
-        "key": "ctrl+d",
-        "command": "editor.action.rename"
-    },
+    // {
+    //     "key": "ctrl+d",
+    //     "command": "editor.action.rename"
+    // },
     {
         "key": "cmd+.",
         "command": "workbench.action.togglePanel"
@@ -98,5 +128,14 @@
     {
         "key": "shift+cmd+f",
         "command": "search.action.openEditor"
-    }
+    },
+    // https://github.com/beishanyufu/ime-and-cursor
+    // {
+    //     "key": "ctrl+\\",
+    //     "command": "ime-and-cursor.switch"
+    // },
+    // {
+    //     "key": "shift+space",
+    //     "command": "-ime-and-cursor.switch"
+    // }
 ]
