@@ -230,7 +230,8 @@ patch:
   style/hilite_spacing: 6
   style/spacing: 12 # 拼音与候选项之间的距离 （inline_preedit: false）
   # 鼠须管盲打，嵌入首选
-  style/alpha: 0.0001 # 隐藏候选框只需将alpha设为0.00001即可 | https://github.com/rime/squirrel/issues/576
+  # style/alpha: 0.0001 # 隐藏候选框只需将alpha设为0.00001即可 | https://github.com/rime/squirrel/issues/576
+  style/alpha: 0 # https://github.com/rime/squirrel/releases/tag/0.18
   style/inline_candidate: true # https://github.com/rime/squirrel/pull/577
 
 # ------------------------------------------------------------------------------------------

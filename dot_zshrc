@@ -83,14 +83,20 @@ plugins=(git tmux zsh-vi-mode)
 # you have to add the `ZSH...=...` assignment before the line `source $ZSH/oh-my-zsh.sh`, from https://github.com/ohmyzsh/ohmyzsh/issues/3676#issuecomment-77806736
 # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/tmux
 # https://github.com/ohmyzsh/ohmyzsh/issues/7420
-# if [ "$TERMINAL_EMULATOR" != "JetBrains-JediTerm" ]; then 
-#     ZSH_TMUX_AUTOSTART=true 
-#     # ZSH_TMUX_AUTOCONNECT=false 
+# if [ "$TERMINAL_EMULATOR" != "JetBrains-JediTerm" ]; then
+#     ZSH_TMUX_AUTOSTART=true
+#     # ZSH_TMUX_AUTOCONNECT=false
 # fi
 # -z "$INTELLIJ_ENVIRONMENT_READER" | https://github.com/ohmyzsh/ohmyzsh/pull/11927
 # 防止影响JetBrains, emacs, vscode内的终端
-if [[ "$TERM" == "xterm-kitty" ]]; then
-    ZSH_TMUX_AUTOSTART=true 
+# if [[ "$TERM" == "xterm-kitty" ]]; then
+#     ZSH_TMUX_AUTOSTART=true
+# fi
+# outside of tmux, `$TERM` must be set to `xterm-256color` | https://github.com/gpakosz/.tmux
+export TERM='xterm-256color'
+# run `env | less` on kitty and iterm2
+if [[ "${__CFBundleIdentifier}" == "net.kovidgoyal.kitty" ]]; then
+    ZSH_TMUX_AUTOSTART=true
 fi
 
 # https://docs.brew.sh/Shell-Completion
@@ -325,14 +331,14 @@ function tre() {
 }
 
 # alias ll="less"
-unalias ll
-function ll() {
-  if [ $# -eq 0 ]; then
-    less .;
-  else
-    less "$@";
-  fi;
-}
+# unalias ll
+# function ll() {
+#   if [ $# -eq 0 ]; then
+#     less .;
+#   else
+#     less "$@";
+#   fi;
+# }
 
 # deal this warning from `doom doctor`: "! The installed grep binary was not built with support for PCRE lookaheads"
 # brew info grep
