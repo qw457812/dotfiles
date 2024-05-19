@@ -97,7 +97,8 @@
   ;; :raycast              "open -g raycast://extensions/%s" ; Deeplink, 不适合有Raycast窗口的Command(如Google Search, can't press again to close), 适合不出现Raycast窗口直接执行的(如OCR, 但也会有Raycast窗口一闪而过)
   :wait_seconds         "osascript -e 'delay %s'"
   :cli_set_var          "'/Library/Application Support/org.pqrs/Karabiner-Elements/bin/karabiner_cli' --set-variables '{\"%s\":%s}'"
-  :delay_cli_set_var    "osascript -e 'delay %s' && '/Library/Application Support/org.pqrs/Karabiner-Elements/bin/karabiner_cli' --set-variables '{\"%s\":%s}'"}
+  :delay_cli_set_var    "osascript -e 'delay %s' && '/Library/Application Support/org.pqrs/Karabiner-Elements/bin/karabiner_cli' --set-variables '{\"%s\":%s}'"
+  :yabai                "PATH=/opt/homebrew/bin:$PATH yabai -m %s"}
 
  ;; https://github.com/yqrashawn/GokuRakuJoudo/blob/master/tutorial.md#simlayers
  ;; There're two problems in old layer. When we type "w1" really fast, we trigger the "1" in w layer rather than insert "w1". When we keep press w key down, the w key won't repeat. There won't be a "wwwwwwwwwwwwwwwwwwww".
@@ -148,8 +149,17 @@
   :f-mode                {:key     :f
                           :modi    {:optional :caps_lock}}
 
-  :launch-mode           {:key     :w
-                          :condi   :!Games
+  ;; :launch-mode           {:key     :w
+  ;;                         :condi   :!Games
+  ;;                         :modi    {:optional :caps_lock}}
+
+  :yabai-config-mode     {:key     :w
+                          :modi    {:optional :caps_lock}}
+
+  :yabai-warp-mode       {:key     :r
+                          :modi    {:optional :caps_lock}}
+
+  :yabai-scale-mode      {:key     :c
                           :modi    {:optional :caps_lock}}
 
   :website-mode          {:key     :o
@@ -184,8 +194,9 @@
   :e-mode                {:key     :e
                           :modi    {:optional :caps_lock}}
 
-  :r-mode                {:key     :r
-                          :modi    {:optional :caps_lock}}}
+  ; :r-mode                {:key     :r
+  ;                         :modi    {:optional :caps_lock}}
+  }
 
  :main
  [{:des   "space mode (shift)"
@@ -905,11 +916,9 @@
            ]}
 
   ;; Karabiner-EventViewer.app ---> Frontmost Application
-  {:des   "w mode (application launcher)"
+  #_{:des   "w mode (application launcher)"
    :rules [:launch-mode
            ;; TODO spacebar
-           [:spacebar [:open "$HOME/Applications/PyCharm Community Edition.app"] :!PyCharm]
-           [:spacebar :same_wind_app :PyCharm]
            [:h [:open "/Applications/企业微信.app"] :!WeWork]
            ;; [:h :same_wind_app :WeWork]
            [:h :!Ograve_accent_and_tilde :WeWork] ; AltTab.app
@@ -966,6 +975,46 @@
            [:right_option [:open "/Applications/WeChat.app"]]
            ]}
 
+  {:des   "w mode (yabai)"
+   :rules [:yabai-config-mode
+           ;; toggle yabai layout between bsp and stack
+           [:spacebar "if [ $(/opt/homebrew/bin/yabai -m config layout) = 'stack' ]; then /opt/homebrew/bin/yabai -m config layout bsp; else /opt/homebrew/bin/yabai -m config layout stack; fi"]
+           [:return_or_enter [:yabai "window --toggle float"]]
+           [:o :!COh] ; Hide Others (only)
+           [:p [:yabai "window --toggle zoom-parent"]]
+           [:m [:yabai "window --toggle zoom-fullscreen"]]
+           [:x [:yabai "window --close"]]
+           [:delete_or_backspace [:yabai "window --close"]]
+           ;; focus mode
+           [:h "/opt/homebrew/bin/yabai -m window --focus west || /opt/homebrew/bin/yabai -m window --focus $(/opt/homebrew/bin/yabai -m query --windows --display west | /opt/homebrew/bin/jq 'map(select(.\"is-visible\" == true and .\"is-sticky\" == false)) | sort_by(.frame.x, .frame.y) | first | .id')"]
+           [:j "/opt/homebrew/bin/yabai -m window --focus south || /opt/homebrew/bin/yabai -m window --focus $(/opt/homebrew/bin/yabai -m query --windows --display south | /opt/homebrew/bin/jq 'map(select(.\"is-visible\" == true and .\"is-sticky\" == false)) | sort_by(.frame.y, .frame.x) | first | .id')"]
+           [:k "/opt/homebrew/bin/yabai -m window --focus north || /opt/homebrew/bin/yabai -m window --focus $(/opt/homebrew/bin/yabai -m query --windows --display north | /opt/homebrew/bin/jq 'map(select(.\"is-visible\" == true and .\"is-sticky\" == false)) | sort_by(.frame.x, .frame.y) | first | .id')"]
+           [:l "/opt/homebrew/bin/yabai -m window --focus east || /opt/homebrew/bin/yabai -m window --focus $(/opt/homebrew/bin/yabai -m query --windows --display east | /opt/homebrew/bin/jq 'map(select(.\"is-visible\" == true and .\"is-sticky\" == false)) | sort_by(.frame.x, .frame.y) | first | .id')"]
+           ;; [:spacebar "yabai -m window --focus prev"]
+           [:n [:yabai "space --focus next"]]
+           [:p [:yabai "space --focus prev"]]
+           ]}
+
+  {:des   "r mode (yabai)"
+   :rules [:yabai-warp-mode
+           ;; move windows
+           [:h [:yabai "window --warp west"]]
+           [:j [:yabai "window --warp south"]]
+           [:k [:yabai "window --warp north"]]
+           [:l [:yabai "window --warp east"]]
+           [:n [:yabai "window --warp next"]]
+           [:p [:yabai "window --warp prev"]]
+           ]}
+
+  {:des   "c mode (yabai)"
+   :rules [:yabai-scale-mode
+           ;; scale windows
+           [:h "~/.config/yabai/resize left"]
+           [:j "~/.config/yabai/resize down"]
+           [:k "~/.config/yabai/resize up"]
+           [:l "~/.config/yabai/resize right"]
+           ]}
+
   {:des   "o mode (website)"
    :rules [:website-mode
            ;; TODO spacebar
@@ -1012,7 +1061,7 @@
            [:##h :!Cleft_arrow :line-navigating-by-cmd-arrow-app]
            [:##l :!Cright_arrow :line-navigating-by-cmd-arrow-app]
            ]}
-  
+
   {:des   "x mode (vi visual mode)"
    :rules [:vi-visual-mode
            [:##j :!Sdown_arrow]
@@ -1927,7 +1976,7 @@
            ;;  :conditions [{:type  :variable_if
            ;;                :name  "multitouch_extension_finger_count_total"
            ;;                :value 2}]}
-           ;; h/j/k/l to arrow keys when the number of fingers on the trackpad is not zero or two 
+           ;; h/j/k/l to arrow keys when the number of fingers on the trackpad is not zero or two
            ;; {:type       :basic
            ;;  :from       {:key_code :h :modifiers {:optional :any}}
            ;;  :to         [{:key_code :left_arrow}]
