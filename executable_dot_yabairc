@@ -49,6 +49,13 @@
 # yabai -m config layout float
 yabai -m config layout stack
 
+# When focusing a window, put the mouse at its center
+# https://github.com/yqrashawn/yqdotfiles/blob/master/modules/yqrashawn/home-manager/dotfiles/yabai/yabairc
+yabai -m config mouse_follows_focus on
+
+# Balance the window tree upon change, so that all windows occupy the same area.
+yabai -m config auto_balance on
+
 # app auto focus on open
 # https://github.com/zegervdv/homebrew-zathura/issues/62#issuecomment-1413968157
 for app in "zathura" \
@@ -58,6 +65,7 @@ done
 
 # https://github.com/yqrashawn/yqdotfiles/blob/master/modules/yqrashawn/home-manager/dotfiles/yabai/rules
 yabai -m rule --add app="^Emacs$" title="^(Emacs Everywhere|edit - )" manage=off
+yabai -m rule --add app="^KeePassXC$" title="^(Unlock Database - )" manage=off
 
 # TODO not work if: open Filder (no visible window of Filder before) -> cmd+f -> cmd+w -> cmd+w
 # If no window is focused after a window is destroyed or minimized, focus the window under the cursor
