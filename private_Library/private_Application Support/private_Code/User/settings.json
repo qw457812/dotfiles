@@ -2,6 +2,7 @@
 // https://code.visualstudio.com/docs/getstarted/keybindings#_accepted-keys
 // https://github.com/nikitavoloboev/config/blob/master/vscode/settings.json
 // https://github.com/AnthonyAsDev/VSCodeVimSettings
+// TODO https://github.com/redguardtoo/vscode-setup/blob/master/settings.json
 {
     "hediet.vscode-drawio.resizeImages": null,
     "hediet.vscode-drawio.theme": "dark",
@@ -65,6 +66,12 @@
             "before": ["g", "i"],
             "commands": [
                 "editor.action.goToImplementation",
+            ]
+        },
+        {
+            "before": ["g", "D"],
+            "commands": [
+                "editor.action.goToTypeDefinition",
             ]
         },
         {
@@ -198,6 +205,12 @@
                 "workbench.action.files.copyPathOfActiveFile",
             ]
         },
+        {
+            "before": ["leader", "f", "Y"],
+            "commands": [
+                "copyRelativeFilePath",
+            ]
+        },
         // https://github.com/zhangymPerson/learning-notes/blob/ae1471b072e209ba8856756ab2081003ce663dd7/tools/vim/vim_vscode.json#L42
         {
             "before": ["leader", "f", "r"],
@@ -217,6 +230,12 @@
                 "workbench.action.toggleZenMode",
             ]
         },
+        {
+            "before": ["leader", "s", "b"],
+            "commands": [
+                "actions.find",
+            ]
+        },
         // search all open buffers
         {
             "before": ["leader", "s", "B"],
@@ -227,9 +246,6 @@
         },
         {
             "before": ["leader", "x"],
-            // "commands": [
-            //     "workbench.action.maximizeEditorHideSidebar",
-            // ]
             "commands": [
                 {
                     "command": "workbench.action.maximizeEditorHideSidebar",
@@ -362,6 +378,18 @@
         //   "before": ["<space>"],
         //   "commands": ["whichkey.show"]
         // }
+        {
+            "before": ["K"],
+            "commands": [
+                "editor.action.smartSelect.expand"
+            ]
+        },
+        {
+            "before": ["J"],
+            "commands": [
+                "editor.action.smartSelect.shrink"
+            ]
+        },
     ],
     "vim.operatorPendingModeKeyBindings": [
         // makes yL and dH work like y$ and d^ respectively
