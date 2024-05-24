@@ -62,6 +62,34 @@
             "after": ["$"]
         },
         {
+            "before": ["g", "i"],
+            "commands": [
+                "editor.action.goToImplementation",
+            ]
+        },
+        {
+            "before":["enter"],
+            "after": ["g", "d"]
+        },
+        {
+            "before":["backspace"],
+            "commands": [
+                "workbench.action.closeActiveEditor",
+            ]
+        },
+        {
+            "before": ["left"],
+            "commands": [
+                "workbench.action.navigateBack",
+            ]
+        },
+        {
+            "before": ["right"],
+            "commands": [
+                "workbench.action.navigateForward",
+            ]
+        },
+        {
             "before": ["leader", "q"],
             "commands": [
                 "workbench.action.closeActiveEditor",
@@ -74,24 +102,30 @@
                 "workbench.view.extensions",
             ]
         },
+        // {
+        //     "before": ["<leader>", "a"],
+        //     "after": [],
+        //     "commands": [
+        //         {
+        //             "command": "workbench.action.files.save",
+        //             "args": []
+        //         },
+        //         {
+        //             "command": "workbench.action.closeActiveEditor",
+        //             "args": []
+        //         }
+        //     ]
+        // },
+        // {
+        //     "before": ["leader", "r"],
+        //     "commands": [
+        //         "editor.action.startFindReplaceAction",
+        //     ]
+        // },
         {
-            "before": ["<leader>", "a"],
-            "after": [],
+            "before": ["leader", "r", "e"],
             "commands": [
-                {
-                    "command": "workbench.action.files.save",
-                    "args": []
-                },
-                {
-                    "command": "workbench.action.closeActiveEditor",
-                    "args": []
-                }
-            ]
-        },
-        {
-            "before": ["leader", "r"],
-            "commands": [
-                "editor.action.startFindReplaceAction",
+                "editor.action.rename",
             ]
         },
         {
@@ -164,6 +198,13 @@
                 "workbench.action.files.copyPathOfActiveFile",
             ]
         },
+        // https://github.com/zhangymPerson/learning-notes/blob/ae1471b072e209ba8856756ab2081003ce663dd7/tools/vim/vim_vscode.json#L42
+        {
+            "before": ["leader", "f", "r"],
+            "commands": [
+                "workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup",
+            ]
+        },
         {
             "before": ["leader", "t", "w"],
             "commands": [
@@ -174,6 +215,85 @@
             "before": ["leader", "t", "z"],
             "commands": [
                 "workbench.action.toggleZenMode",
+            ]
+        },
+        // search all open buffers
+        {
+            "before": ["leader", "s", "B"],
+            "commands": [
+                // "workbench.view.search",
+                "workbench.action.findInFiles",
+            ]
+        },
+        {
+            "before": ["leader", "x"],
+            // "commands": [
+            //     "workbench.action.maximizeEditorHideSidebar",
+            // ]
+            "commands": [
+                {
+                    "command": "workbench.action.maximizeEditorHideSidebar",
+                    "args": []
+                },
+                {
+                    "command": "workbench.action.closePanel",
+                    "args": []
+                }
+            ]
+        },
+        {
+            "before": ["leader", "e", "e"],
+            "commands": [
+                // "workbench.files.action.focusFilesExplorer",
+                "workbench.files.action.showActiveFileInExplorer",
+            ]
+        },
+        {
+            "before": ["leader", "?"],
+            "commands": [
+                "workbench.action.openGlobalKeybindings",
+            ]
+        },
+        {
+            "before": ["leader", "o", "f"],
+            "commands": [
+                "workbench.action.files.openFile",
+            ]
+        },
+        {
+            "before": ["leader", "o", "F"],
+            "commands": [
+                "workbench.action.files.openFolder",
+            ]
+        },
+        {
+            "before": ["leader", "o", "t"],
+            "commands": [
+                "workbench.action.terminal.focus",
+            ]
+        },
+        {
+            "before": ["leader", "L"],
+            "commands": [
+                "editor.action.formatDocument",
+            ]
+        },
+        {
+            "before": ["leader", "d", "s"],
+            "commands": [
+                "workbench.action.debug.stop",
+            ]
+        },
+        {
+            "before": ["leader", "d", "r"],
+            "commands": [
+                "workbench.action.debug.restart",
+            ]
+        },
+        {
+            "before": ["leader", "d", "b"],
+            "commands": [
+                "editor.debug.action.toggleBreakpoint",
             ]
         },
     ],
@@ -265,14 +385,15 @@
     "github.copilot.enable": {
         "*": true,
         "plaintext": true,
-        "markdown": false,
+        "markdown": true,
         "scminput": false
     },
     "markdown-preview-enhanced.codeBlockTheme": "github.css",
     "markdown-preview-enhanced.previewTheme": "github-light.css",
     "markdown-preview-enhanced.enablePreviewZenMode": true,
     "workbench.editor.enablePreview": false,
-    "maven.settingsFile": ""
+    "maven.settingsFile": "",
+    "editor.minimap.enabled": false
     // https://github.com/beishanyufu/ime-and-cursor
     // "ime-and-cursor.ChineseIM": "im.rime.inputmethod.Squirrel.Hans",
     // "ime-and-cursor.EnglishIM": "com.apple.keylayout.ABC",

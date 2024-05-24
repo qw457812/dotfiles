@@ -1,4 +1,6 @@
 // 将键绑定放在此文件中以覆盖默认值
+// TODO https://github.com/magidc/dotfiles/blob/master/vscode/keybindings.json | https://github.com/magidc/nvim-config#equivalent-mapping-configurations-for-other-ides-vim-integrations
+// TODO https://github.com/zhangymPerson/learning-notes/blob/ae1471b072e209ba8856756ab2081003ce663dd7/tools/vscode/keybindings/keybindings.json
 [
     {
         "key": "shift+;",
@@ -28,30 +30,45 @@
         "args": "k"
     },
     // https://gist.github.com/MasoodGit/1cc302c61622e777ca09f8bf4ae84adc
+    // https://github.com/magidc/dotfiles/blob/3a20bc944187fbf459e9c16de0c3e50d7b3800a9/vscode/keybindings.json#L321
     {
         "key": "ctrl+h",
-        "command": "workbench.action.focusLeftGroup",
-        // markdown-preview-enhanced
-        // "when": "editorTextFocus && vim.active && vim.mode != 'Insert'"
+        // "command": "workbench.action.focusLeftGroup",
+        "command": "workbench.action.navigateLeft"
+        // remove editorTextFocus for markdown-preview-enhanced
         // https://code.visualstudio.com/api/references/when-clause-contexts#available-context-keys
-        "when": "vim.active && vim.mode != 'Insert'"
+        // "when": "vim.active && vim.mode != 'Insert'"
     },
     {
         "key": "ctrl+l",
-        "command": "workbench.action.focusRightGroup",
-        // "when": "editorTextFocus && vim.active && vim.mode != 'Insert'"
-        "when": "vim.active && vim.mode != 'Insert'"
+        // "command": "workbench.action.focusRightGroup",
+        "command": "workbench.action.navigateRight"
+        // "when": "vim.active && vim.mode != 'Insert'"
     },
     {
         "key": "ctrl+k",
-        "command": "workbench.action.focusAboveGroup",
-        "when": "editorTextFocus && vim.active && vim.mode != 'Insert'"
+        // "command": "workbench.action.focusAboveGroup",
+        "command": "workbench.action.navigateUp"
+        // "when": "editorTextFocus && vim.active && vim.mode != 'Insert'"
     },
     {
         "key": "ctrl+j",
-        "command": "workbench.action.focusBelowGroup",
-        "when": "editorTextFocus && vim.active && vim.mode != 'Insert'"
+        // "command": "workbench.action.focusBelowGroup",
+        "command": "workbench.action.navigateDown"
+        // "when": "editorTextFocus && vim.active && vim.mode != 'Insert'"
     },
+    {
+        "key": "escape",
+        // "command": "workbench.action.navigateEditorGroups",
+        "command": "workbench.action.focusFirstEditorGroup",
+        "when": "!editorFocus"
+    },
+    // 文件资源管理器
+    // {
+    //     "key": "o",
+    //     "command": "explorer.openAndPassFocus",
+    //     "when": "filesExplorerFocus && foldersViewVisible && !explorerResourceIsFolder && !inputFocus"
+    // },
     // {
     //     "key": "space l",
     //     "command": "workbench.action.toggleSidebarVisibility",
