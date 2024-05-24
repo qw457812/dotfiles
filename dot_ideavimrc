@@ -240,6 +240,8 @@ nmap ]c <Action>(VcsShowNextChangeMarker)
 nmap [c <Action>(VcsShowPrevChangeMarker)
 " nmap [c <Action>(JumpToLastChange)
 " nmap ]c <Action>(JumpToNextChange)
+map ]e <Action>(GotoNextError)
+map [e <Action>(GotoPreviousError)
 
 map <M-j> <Action>(MoveStatementDown)
 map <M-k> <Action>(MoveStatementUp)
@@ -286,6 +288,7 @@ map gs <Action>(GotoSuperMethod)
 " TODO https://gist.github.com/SakuraWald/fa80eb949412e1a8c806512ad5f8a847
 " TODO https://github.com/ruohola/dotfiles/blob/master/vim/.ideavimrc
 " TODO https://github.com/JaimeArboleda/jet_brains_settings/blob/main/.ideavimrc
+" TODO https://github.com/magidc/dotfiles/blob/master/jetbrains/ideavimrc | https://github.com/magidc/nvim-config
 
 " -----------------------------------------------------常用--------------------------------------------------------
 " CloseEditor 关不掉 Compare.LastVersion
@@ -446,6 +449,9 @@ nmap <TAB>v <Action>(Vcs.QuickListPopupAction)
 " TODO more Leader key like `<BS>`, `,` | https://github.com/rockyzhang24/dotfiles/tree/master/.config/nvim#-key-mappings
 
 map <S-Space> <Action>(GotoNextError)
+
+nmap <CR> gd
+nmap <BS> <Action>(CloseContent)
 
 " https://gist.github.com/PisecesPeng/9fabf2a1c1834bd35bf02c2bcb904708
 " 选择模式扩大选择范围 opt+up_arrow

@@ -1656,9 +1656,15 @@
 
   {:des   "For Glove80\n- backspace to space"
    :rules [:glove80
-           ;; TODO temp
-           ; [:!Wdelete_or_backspace [:open "$HOME/Applications/PyCharm Community Edition.app"] :!PyCharm]
-           ; [:!Wdelete_or_backspace :same_wind_app :PyCharm]
+           ;; TODO temp launch-mode
+           [:!Wdelete_or_backspace [:open "/Applications/Brave Browser.app"] :!Brave] ; space
+           [:!Wdelete_or_backspace :same_wind_app :Brave]
+           [:!Wdelete_forward [:open "/Applications/Visual Studio Code.app"] :!VSCode] ; tab
+           [:!Wdelete_forward :same_wind_app :VSCode]
+           [:!Wescape [:open "/Applications/YesPlayMusic.app"]] ; `
+           ;; 企业微信•会议
+           [:!Wend [[:open "/Applications/企业微信.app/Contents/Frameworks/wwmapp.app"] :same_wind_app] :!WeWork-Meeting] ; -
+           [:!Wend :same_wind_app :WeWork-Meeting]
 
            ;; TODO delete cmd-c cmd-v rime ` = \ [ ]
            ;; TODO when need to be `:#P` instead of `:##`
@@ -1725,52 +1731,50 @@
            ;; right_control -> rime: toggle ascii punct | ~/Library/Rime/default.custom.yaml
            [:##right_control :right_control :Emacs {:alone [:right_control :!Tbackslash]}] ; emacs-rime
            ;; TODO launch-mode
-           ; [:!Wh [:open "/Applications/企业微信.app"] :!WeWork]
-           ; [:!Wh :!Ograve_accent_and_tilde :WeWork] ; AltTab.app
-           ; [:!Wj [:open "/Applications/Google Chrome.app"] :!Chrome]
-           ; [:!Wj :same_wind_app :Chrome]
-           ; [:!Wk [:open "/Applications/kitty.app"] :!Kitty]
-           ; [:!Wk :same_wind_app :Kitty]
-           ; [:!Wl [:open "/Applications/Visual Studio Code.app"] :!VSCode]
-           ; [:!Wl :same_wind_app :VSCode]
-           ; [:!Wsemicolon [:open "/Library/Application Support/Citrix Receiver/Citrix Viewer.app"]] ; Citrix Workspace.app
+           ;; TODO h, j, k, l -> yabai
+           ;; TODO a, s, d, g, v
+           [:!Wq [:open "/Applications/企业微信.app"] :!WeWork]
+           [:!Wq :!Ograve_accent_and_tilde :WeWork] ; AltTab.app
+           [:!Wsemicolon [:open "/Library/Application Support/Citrix Receiver/Citrix Viewer.app"]] ; Citrix Workspace.app
            ; [:!Wquote [:open "/Applications/SwitchHosts.app"]]
-           ; [:!Wa [:open "/System/Applications/Utilities/Activity Monitor.app"]]
-           ; [:!Ws [:open "/Applications/Spotify.app"]]
-           ; [:!Wd [:open "/Applications/DBeaver.app"]]
-           ; [:!Wf [:open "/System/Library/CoreServices/Finder.app"] :!Finder]
-           ; [:!Wf :same_wind_app :Finder]
+           [:!Wa [:open "/System/Applications/Utilities/Activity Monitor.app"]]
+           [:!Ws [:open "/Applications/Spotify.app"]]
+           [:!Wd [:open "/Applications/DBeaver.app"]]
+           [:!Wf [:open "/System/Library/CoreServices/Finder.app"] :!Finder]
+           [:!Wf :same_wind_app :Finder]
            ; [:!Wg [:open "/Applications/ChatGPT.app"] :!ChatGPT]
            ; [:!Wg :same_wind_app :ChatGPT]
-           ; [:!We [:open "/Applications/Emacs.app"] :!Emacs]
-           ; [:!We :same_wind_app :Emacs]
-           ; [:!Wr [:open "/Applications/Safari.app"] :!Safari]
-           ; [:!Wr :same_wind_app :Safari]
-           ; [:!Wt [:open "/Applications/iTerm.app"] :!iTerm]
-           ; [:!Wt :same_wind_app :iTerm]
-           ; [:!Wy [:open "$HOME/Applications/PyCharm Community Edition.app"] :!PyCharm]
-           ; [:!Wy :same_wind_app :PyCharm]
-           ; [:!Wu [:open "/Applications/Neovide.app"]] ; pronounce
-           ; [:!Wi [:open "/Applications/IntelliJ IDEA CE.app"] :!IntelliJ]
-           ; [:!Wi :same_wind_app :IntelliJ]
+           [:!We [:open "/Applications/Emacs.app"] :!Emacs]
+           [:!We :same_wind_app :Emacs]
+           [:!Wr [:open "/Applications/Safari.app"] :!Safari]
+           [:!Wr :same_wind_app :Safari]
+           [:!Wt [:open "/Applications/iTerm.app"] :!iTerm]
+           [:!Wt :same_wind_app :iTerm]
+           [:!Wy [:open "$HOME/Applications/PyCharm Community Edition.app"] :!PyCharm]
+           [:!Wy :same_wind_app :PyCharm]
+           [:!Wu [:open "/Applications/Neovide.app"]] ; pronounce
+           [:!Wi [:open "/Applications/IntelliJ IDEA CE.app"] :!IntelliJ]
+           [:!Wi :same_wind_app :IntelliJ]
            ; [:!Wo [:open "/Applications/wpsoffice.app"]] ; office
-           ; [:!Wp [:open "/System/Applications/Preview.app"] :!Preview]
-           ; [:!Wp :same_wind_app :Preview]
-           ; [:!Wopen_bracket [[:open "/Applications/企业微信.app/Contents/Frameworks/wwmapp.app"] :same_wind_app] :!WeWork-Meeting] ; 企业微信•会议
-           ; [:!Wopen_bracket :same_wind_app :WeWork-Meeting]
-           ; [:!Wv [:open "/Applications/Karabiner-EventViewer.app"]]
-           ; [:!Wb [:open "/Applications/JetBrains Toolbox.app"]]
-           ; [:!Wn [:open "http://127.0.0.1:8080/"] nil {:delayed {:invoked [:escape]} :params {:delay 800}}] ; note
-           ; [:!Wm [:open "/Applications/Thunderbird.app"] :!Thunderbird] ; email
-           ; [:!Wm :same_wind_app :Thunderbird]
-           ; [:!Wcomma [:open "/System/Applications/System Settings.app"]] ; cmd+, for setting
-           ; [:!Wperiod [:open "/System/Applications/Launchpad.app"]] ; 启动台
+           [:!Wo [:open "/Applications/LibreOffice.app"]] ; office
+           [:!Wp [:open "/System/Applications/Preview.app"] :!Preview]
+           [:!Wp :same_wind_app :Preview]
+           [:!Wv [:open "/Applications/Karabiner-EventViewer.app"]]
+           [:!Wb [:open "/Applications/JetBrains Toolbox.app"]]
+           [:!Wn [:open "http://127.0.0.1:8080/"] nil {:delayed {:invoked [:escape]} :params {:delay 800}}] ; note
+           [:!Wm [:open "/Applications/Thunderbird.app"] :!Thunderbird] ; email
+           [:!Wm :same_wind_app :Thunderbird]
+           [:!Wcomma [:open "/System/Applications/System Settings.app"]] ; cmd+, for setting
+           [:!Wperiod [:open "/System/Applications/Launchpad.app"]] ; 启动台
            ; [:!Wslash [:open "/Applications/WhatPulse/WhatPulse.app"]]
            ; [:!Wx [:open "/Applications/WeChat.app"]]
 
            ;; TODO
            [:left_command :left_command :translate-by-opt-shift-a-app {:alone :!OSa}]
            [:left_command :left_command :!translate-by-opt-shift-a-app {:alone :!!backslash}] ; raycast://extensions/isfeng/easydict/easydict
+
+           [:##equal_sign :f11]
+           [:##hyphen :f12]
            ]}
 
   {:des   "For Not HHKB\n- caps_lock to esc when pressed alone, to control as modifier\n- left_control to cmd+v when pressed alone, to hyper as modifier"
