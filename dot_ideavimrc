@@ -370,9 +370,9 @@ map <leader>qi <Action>(QuickImplementations)
 map <leader>qs :set quickscope<CR>
 map <leader>qS :set noquickscope<CR>
 map <Leader>rc :action ChooseRunConfiguration<CR>
-map <leader>re <Action>(RenameElement)
 map <leader>rf <Action>(RecentFiles)
 map <leader>rl <Action>(RecentLocations)
+map <leader>rn <Action>(RenameElement)
 map <leader>rp <Action>(ManageRecentProjects)
 map <leader>rq :action Refactorings.QuickListPopupAction<CR>
 map <leader>rr <Action>(Run)

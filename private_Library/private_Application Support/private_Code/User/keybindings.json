@@ -1,8 +1,10 @@
 // 将键绑定放在此文件中以覆盖默认值
-// TODO https://github.com/vscode-neovim/vscode-neovim/blob/02d13f0e119afbec8f68fe5add0f2c2a1072ec49/package.json#L1453
+// https://code.visualstudio.com/docs/getstarted/keybindings
+// `when` clause contexts: https://code.visualstudio.com/api/references/when-clause-contexts#available-context-keys
+// https://github.com/vscode-neovim/vscode-neovim/blob/02d13f0e119afbec8f68fe5add0f2c2a1072ec49/package.json#L1453
+// https://github.com/search?q=explorer.newFile+language%3AJSON&type=code
 // TODO https://github.com/magidc/dotfiles/blob/master/vscode/keybindings.json | https://github.com/magidc/nvim-config#equivalent-mapping-configurations-for-other-ides-vim-integrations
-// TODO https://github.com/zhangymPerson/learning-notes/blob/ae1471b072e209ba8856756ab2081003ce663dd7/tools/vscode/keybindings/keybindings.json
-// TODO https://github.com/kasecato/vscode-intellij-idea-keybindings/blob/master/src/package-with-comment.json
+// TODO https://github.com/kasecato/vscode-intellij-idea-keybindings/blob/7cd150280667f88770ead6e4b187542d9961b52f/src/package-with-comment.json#L94
 [
     {
         "key": "shift+;",
@@ -35,35 +37,36 @@
     // https://github.com/magidc/dotfiles/blob/3a20bc944187fbf459e9c16de0c3e50d7b3800a9/vscode/keybindings.json#L321
     {
         "key": "ctrl+h",
-        // "command": "workbench.action.focusLeftGroup",
         "command": "workbench.action.navigateLeft"
-        // remove editorTextFocus for markdown-preview-enhanced
-        // https://code.visualstudio.com/api/references/when-clause-contexts#available-context-keys
+        // can be used with extension: markdown-preview-enhanced
         // "when": "vim.active && vim.mode != 'Insert'"
     },
     {
         "key": "ctrl+l",
-        // "command": "workbench.action.focusRightGroup",
         "command": "workbench.action.navigateRight"
         // "when": "vim.active && vim.mode != 'Insert'"
     },
     {
         "key": "ctrl+k",
-        // "command": "workbench.action.focusAboveGroup",
         "command": "workbench.action.navigateUp"
         // "when": "editorTextFocus && vim.active && vim.mode != 'Insert'"
     },
     {
         "key": "ctrl+j",
-        // "command": "workbench.action.focusBelowGroup",
         "command": "workbench.action.navigateDown"
         // "when": "editorTextFocus && vim.active && vim.mode != 'Insert'"
     },
+    // https://code.visualstudio.com/docs/getstarted/keybindings#_running-multiple-commands
     {
         "key": "escape",
-        // "command": "workbench.action.navigateEditorGroups",
-        // "command": "workbench.action.focusFirstEditorGroup",
-        "command": "workbench.action.focusActiveEditorGroup",
+        "command": "runCommands",
+        "args": {
+          "commands": [
+            "workbench.action.focusActiveEditorGroup",
+            "workbench.action.closeSidebar",
+            "workbench.action.closePanel"
+          ]
+        },
         "when": "!editorFocus"
     },
     // https://github.com/vscode-neovim/vscode-neovim/blob/02d13f0e119afbec8f68fe5add0f2c2a1072ec49/package.json#L1453
@@ -128,7 +131,6 @@
         "when": "listFocus && treeFindOpen && inputFocus"
     },
     // 文件资源管理器
-    // https://github.com/search?q=explorer.newFile+language%3AJSON&type=code
     {
         "key": "r",
         "command": "renameFile",
@@ -172,6 +174,17 @@
     {
         "key": "shift+r",
         "command": "workbench.files.action.refreshFilesExplorer",
+        "when": "filesExplorerFocus && !inputFocus"
+    },
+    {
+        "key": "q",
+        "command": "runCommands",
+        "args": {
+          "commands": [
+            "workbench.action.focusActiveEditorGroup",
+            "workbench.action.closeSidebar"
+          ]
+        },
         "when": "filesExplorerFocus && !inputFocus"
     },
     {
@@ -276,83 +289,54 @@
         "key": "shift+g",
         "when": "editorHoverFocused"
     },
+    // TODO leader 配置到 keybindings.json 中（在 settings.json 中配置的缺点：只有 editorFocus 时才能触发）
     // {
     //     "key": "space l",
     //     "command": "workbench.action.toggleSidebarVisibility",
     //     "when": "vim.active && vim.mode != 'Insert'"
     // },
     // https://github.com/nikitavoloboev/config/blob/master/vscode/keybindings.json
-    {
-        "key": "ctrl+;",
-        "command": "workbench.action.terminal.focus",
-        "when": "!terminalFocus"
-    },
-    {
-        "key": "ctrl+;",
-        "command": "workbench.action.focusFirstEditorGroup",
-        "when": "terminalFocus"
-    },
-    // vim redo
     // {
-    //     "key": "ctrl+r",
-    //     "command": "workbench.view.explorer"
+    //     "key": "ctrl+;",
+    //     "command": "workbench.action.terminal.focus",
+    //     "when": "!terminalFocus"
     // },
     // {
-    //     "key": "ctrl+j",
-    //     "command": "workbench.action.previousEditor"
+    //     "key": "ctrl+;",
+    //     "command": "workbench.action.focusActiveEditorGroup",
+    //     "when": "terminalFocus"
     // },
     // {
-    //     "key": "ctrl+k",
-    //     "command": "workbench.action.nextEditor"
+    //     "key": "cmd+j",
+    //     "command": "workbench.action.showAllEditors"
     // },
-    {
-        "key": "cmd+j",
-        "command": "workbench.action.showAllEditors"
-    },
-    {
-        "key": "cmd+m",
-        "command": "workbench.action.quickOpenTerm"
-    },
-    {
-        "key": "enter",
-        "command": "editor.action.goToDeclaration",
-        "when": "inSearchEditor && editorTextFocus && vim.mode == 'Normal'"
-    },
+    // {
+    //     "key": "cmd+m",
+    //     "command": "workbench.action.quickOpenTerm"
+    // },
+    // {
+    //     "key": "enter",
+    //     "command": "editor.action.goToDeclaration",
+    //     "when": "inSearchEditor && editorTextFocus && vim.mode == 'Normal'"
+    // },
     // {
     //     "key": "ctrl+i",
     //     "command": "editor.action.quickFix",
     //     "when": "editorHasCodeActionsProvider && editorTextFocus && !editorReadonly"
     // },
-    {
-        "key": "shift+cmd+'",
-        "command": "toggleVim"
-    },
-    {
-        "key": "ctrl+space",
-        "command": "-editor.action.triggerSuggest",
-        "when": "editorHasCompletionItemProvider && textInputFocus && !editorReadonly"
-    },
-    {
-        "key": "f2",
-        "command": "-editor.action.rename",
-        "when": "editorHasRenameProvider && editorTextFocus && !editorReadonly"
-    },
     // {
-    //     "key": "ctrl+d",
-    //     "command": "editor.action.rename"
+    //     "key": "ctrl+space",
+    //     "command": "-editor.action.triggerSuggest",
+    //     "when": "editorHasCompletionItemProvider && textInputFocus && !editorReadonly"
     // },
-    {
-        "key": "cmd+.",
-        "command": "workbench.action.togglePanel"
-    },
-    {
-        "key": "ctrl+n",
-        "command": "editor.action.codeAction"
-    },
-    {
-        "key": "shift+cmd+f",
-        "command": "search.action.openEditor"
-    },
+    // {
+    //     "key": "ctrl+n",
+    //     "command": "editor.action.codeAction"
+    // },
+    // {
+    //     "key": "shift+cmd+f",
+    //     "command": "search.action.openEditor"
+    // },
     // https://github.com/beishanyufu/ime-and-cursor
     // {
     //     "key": "ctrl+\\",
