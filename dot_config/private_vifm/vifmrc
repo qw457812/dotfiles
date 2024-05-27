@@ -696,6 +696,8 @@ command create :
 \|    endif
 \|    touch "%a"
 \|  endif
+" Other sensible key mappings:
+" `a` for file, `A` for folder | https://github.com/vscode-neovim/vscode-neovim/blob/02d13f0e119afbec8f68fe5add0f2c2a1072ec49/package.json#L1544
 " nnoremap a :create<space>
 nnoremap i :create<space>
 
@@ -1028,3 +1030,9 @@ nnoremap <wait> <space>czz :execute 'cd' fnameescape(system('chezmoi source-path
 " nnoremap U
 " nnoremap <up>
 " nnoremap <down>
+
+" sensible key mappings
+" https://github.com/vscode-neovim/vscode-neovim/blob/02d13f0e119afbec8f68fe5add0f2c2a1072ec49/package.json#L1454
+" https://github.com/sxyazi/yazi
+" https://github.com/kyoheiu/felix#key-manual
+" https://github.com/yorukot/superfile
