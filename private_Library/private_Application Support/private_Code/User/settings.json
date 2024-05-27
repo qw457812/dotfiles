@@ -50,6 +50,13 @@
                 ":nohl",
             ]
         },
+        // https://github.com/vscode-neovim/vscode-neovim/blob/02d13f0e119afbec8f68fe5add0f2c2a1072ec49/package.json#L1674
+        {
+            "before": ["K"],
+            "commands": [
+                "editor.action.showHover"
+            ]
+        },
         {
             "before":["Y"],
             "after": ["y", "$"]

@@ -62,12 +62,73 @@
     {
         "key": "escape",
         // "command": "workbench.action.navigateEditorGroups",
-        "command": "workbench.action.focusFirstEditorGroup",
+        // "command": "workbench.action.focusFirstEditorGroup",
+        "command": "workbench.action.focusActiveEditorGroup",
         "when": "!editorFocus"
     },
+    // https://github.com/vscode-neovim/vscode-neovim/blob/02d13f0e119afbec8f68fe5add0f2c2a1072ec49/package.json#L1453
+    {
+        "key": "j",
+        "command": "list.focusDown",
+        "when": "listFocus && !inputFocus"
+    },
+    {
+        "key": "k",
+        "command": "list.focusUp",
+        "when": "listFocus && !inputFocus"
+    },
+    {
+        "key": "h",
+        "command": "list.collapse",
+        "when": "listFocus && !inputFocus"
+    },
+    {
+        "key": "l",
+        "command": "list.select",
+        "when": "listFocus && !inputFocus"
+    },
+    {
+        "key": "enter",
+        "command": "list.select",
+        "when": "listFocus && !inputFocus && !notebookCellListFocused"
+    },
+    {
+        "key": "g g",
+        "command": "list.focusFirst",
+        "when": "listFocus && !inputFocus"
+    },
+    {
+        "key": "shift+g",
+        "command": "list.focusLast",
+        "when": "listFocus && !inputFocus"
+    },
+    {
+        "key": "o",
+        "command": "list.toggleExpand",
+        "when": "listFocus && !inputFocus"
+    },
+    {
+        "key": "ctrl+u",
+        "command": "list.focusPageUp",
+        "when": "listFocus && !inputFocus"
+    },
+    {
+        "key": "ctrl+d",
+        "command": "list.focusPageDown",
+        "when": "listFocus && !inputFocus"
+    },
+    {
+        "key": "/",
+        "command": "list.find",
+        "when": "listFocus && listSupportsFind && !inputFocus"
+    },
+    {
+        "key": "enter",
+        "command": "list.closeFind",
+        "when": "listFocus && treeFindOpen && inputFocus"
+    },
     // 文件资源管理器
-    // https://github.com/search?q=explorer.newFile+language%3AJSON&type=code&l=JSON
-    // https://github.com/vscode-neovim/vscode-neovim/blob/02d13f0e119afbec8f68fe5add0f2c2a1072ec49/package.json#L1513
+    // https://github.com/search?q=explorer.newFile+language%3AJSON&type=code
     {
         "key": "r",
         "command": "renameFile",
@@ -113,11 +174,108 @@
         "command": "workbench.files.action.refreshFilesExplorer",
         "when": "filesExplorerFocus && !inputFocus"
     },
-    // {
-    //     "key": "o",
-    //     "command": "explorer.openAndPassFocus",
-    //     "when": "filesExplorerFocus && foldersViewVisible && !explorerResourceIsFolder && !inputFocus"
-    // },
+    {
+        "key": "z o",
+        "command": "list.expand",
+        "when": "!editorTextFocus && !inputFocus"
+    },
+    {
+        "key": "z shift+o",
+        "command": "list.expand",
+        "when": "!editorTextFocus && !inputFocus"
+    },
+    {
+        "key": "z c",
+        "command": "list.collapse",
+        "when": "!editorTextFocus && !inputFocus"
+    },
+    {
+        "key": "z shift+c",
+        "command": "list.collapseAllToFocus",
+        "when": "!editorTextFocus && !inputFocus"
+    },
+    {
+        "key": "z a",
+        "command": "list.toggleExpand",
+        "when": "!editorTextFocus && !inputFocus"
+    },
+    {
+        "key": "z shift+a",
+        "command": "list.toggleExpand",
+        "when": "!editorTextFocus && !inputFocus"
+    },
+    {
+        "key": "z m",
+        "command": "list.collapseAll",
+        "when": "!editorTextFocus && !inputFocus"
+    },
+    {
+        "key": "z shift+m",
+        "command": "list.collapseAll",
+        "when": "!editorTextFocus && !inputFocus"
+    },
+    // referenceSearch can be activated by `g d`
+    {
+        "key": "tab",
+        "command": "togglePeekWidgetFocus",
+        "when": "inReferenceSearchEditor && neovim.mode == normal || referenceSearchVisible"
+    },
+    // hover
+    {
+        "command": "editor.action.showHover",
+        "key": "shift+k",
+        "when": "vim.mode == 'Normal' && editorTextFocus && editorHoverVisible"
+    },
+    {
+        "command": "editor.action.pageDownHover",
+        "key": "ctrl+f",
+        "when": "editorHoverFocused"
+    },
+    {
+        "command": "editor.action.pageUpHover",
+        "key": "ctrl+b",
+        "when": "editorHoverFocused"
+    },
+    {
+        "command": "editor.action.pageDownHover",
+        "key": "ctrl+d",
+        "when": "editorHoverFocused"
+    },
+    {
+        "command": "editor.action.pageUpHover",
+        "key": "ctrl+u",
+        "when": "editorHoverFocused"
+    },
+    {
+        "command": "editor.action.scrollDownHover",
+        "key": "j",
+        "when": "editorHoverFocused"
+    },
+    {
+        "command": "editor.action.scrollUpHover",
+        "key": "k",
+        "when": "editorHoverFocused"
+    },
+    {
+        "command": "editor.action.scrollLeftHover",
+        "key": "h",
+        "when": "editorHoverFocused"
+    },
+    {
+        "command": "editor.action.scrollRightHover",
+        "key": "l",
+        "when": "editorHoverFocused"
+    },
+    {
+        "command": "editor.action.goToTopHover",
+        "key": "g g",
+        "when": "editorHoverFocused"
+    },
+    {
+        "command": "editor.action.goToBottomHover",
+        "key": "shift+g",
+        "when": "editorHoverFocused"
+    },
     // {
     //     "key": "space l",
     //     "command": "workbench.action.toggleSidebarVisibility",
