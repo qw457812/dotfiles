@@ -442,8 +442,6 @@ alias czea='chezmoi edit --apply --verbose'
 alias czz='chezmoi cd'
 alias czgoku='chezmoi edit --apply --verbose $HOME/.config/karabiner.edn && goku'
 alias czzshrc='chezmoi edit --apply --verbose ${ZDOTDIR:-$HOME}/.zshrc && exec ${SHELL} -l'
-alias czcodes='chezmoi edit --apply --verbose "$HOME/Library/Application Support/Code/User/settings.json"'
-alias czcodek='chezmoi edit --apply --verbose "$HOME/Library/Application Support/Code/User/keybindings.json"'
 # https://www.reddit.com/r/KittyTerminal/comments/rzpjed/easier_ways_to_reload_kitty/
 # You can reload the config file within kitty by sending kitty the SIGUSR1 signal with `kill -SIGUSR1 $KITTY_PID`. | https://sw.kovidgoyal.net/kitty/conf/
 alias czkitty='chezmoi edit --apply --verbose $HOME/.config/kitty/kitty.conf && kill -SIGUSR1 $(pgrep -a kitty)'
