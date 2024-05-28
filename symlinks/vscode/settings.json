@@ -669,15 +669,4 @@
         }
     ],
     "vim.commandLineModeKeyBindings": [],
-    // https://github.com/beishanyufu/ime-and-cursor
-    // "ime-and-cursor.ChineseIM": "im.rime.inputmethod.Squirrel.Hans",
-    // "ime-and-cursor.EnglishIM": "com.apple.keylayout.ABC",
-    // "ime-and-cursor.obtainIMCmd": "/opt/homebrew/bin/macism",
-    // "ime-and-cursor.switchIMCmd": "/opt/homebrew/bin/macism {im}",
-    // "ime-and-cursor.cursorStyle.enable": false,
-    // "ime-and-cursor.cursorColor.enable": true,
-    // "ime-and-cursor.helpVim": true,
-    // https://github.com/OrangeX4/vscode-smart-ime
-    // "smart-ime.enableEnglishAndDoubleSpaceSwitchToChinese": true,
-    // "smart-ime.disabledOnVim": true
 }
