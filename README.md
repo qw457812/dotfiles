@@ -4,7 +4,7 @@
 
 ## [Goku](https://github.com/yqrashawn/GokuRakuJoudo)
 
-Hack keyboard use [Karabiner](https://github.com/pqrs-org/Karabiner-Elements), and maintain ***[my karabiner config](./dot_config/karabiner.edn)*** with Goku.
+Hack keyboard use [Karabiner](https://github.com/pqrs-org/Karabiner-Elements), and maintain ***[my karabiner config](dot_config/karabiner.edn)*** with Goku.
 
 Head over to [nikitavoloboev](https://github.com/nikitavoloboev)'s ***[personal wiki](https://wiki.nikiv.dev/macOS/apps/karabiner/)*** to learn more about karabiner and goku.
 
@@ -53,11 +53,11 @@ Tracking keyboard input use [WhatPulse](https://whatpulse.org/) to observe.
 
 ## [IdeaVim](https://github.com/JetBrains/ideavim)
 
-[.ideavimrc](./dot_ideavimrc)
+[.ideavimrc](dot_ideavimrc)
 
 ## [rime-ice](https://github.com/iDvel/rime-ice)
 
-[Rime config](./private_Library/Rime) for Chinese input powered by rime-ice and [TigerCode](https://tiger-code.com/).
+[Rime config](private_Library/Rime) for Chinese input powered by rime-ice and [TigerCode](https://tiger-code.com/).
 
 Using [KeyboardHolder](https://keyboardholder.leavesc.com/zh-cn/) to keep [Squirrel](https://github.com/rime/squirrel) as the only input source on macOS, instead of ABC.
 
@@ -67,20 +67,20 @@ Using [emacs-rime](https://github.com/DogLooksGood/emacs-rime) in Doom Emacs.
 
 ## [SketchyBar](https://github.com/FelixKratz/SketchyBar)
 
-[sketchybarrc and plugin scripts](./dot_config/sketchybar)
+[sketchybarrc and plugin scripts](dot_config/sketchybar)
 
 ## [VSCodeVim](https://github.com/VSCodeVim/Vim)
 
-[settings.json](./private_Library/private_Application%20Support/private_Code/User/settings.json)
+[settings.json](symlinks/vscode/settings.json)
 
-[keybindings.json](./private_Library/private_Application%20Support/private_Code/User/keybindings.json)
+[keybindings.json](symlinks/vscode/keybindings.json)
 
 ## [Doom Emacs](https://github.com/doomemacs/doomemacs)
 
-[DOOMDIR](./dot_config/doom)
+[DOOMDIR](dot_config/doom)
 
 Using [Emacs Plus](https://github.com/d12frosted/homebrew-emacs-plus).
 
 ## [Vifm](https://github.com/vifm/vifm)
 
-[vifmrc](./dot_config/private_vifm/vifmrc)
+[vifmrc](dot_config/private_vifm/vifmrc)
