@@ -376,13 +376,4 @@
     //     "command": "workbench.action.focusActiveEditorGroup",
     //     "when": "terminalFocus"
     // },
-    // https://github.com/beishanyufu/ime-and-cursor
-    // {
-    //     "key": "ctrl+\\",
-    //     "command": "ime-and-cursor.switch"
-    // },
-    // {
-    //     "key": "shift+space",
-    //     "command": "-ime-and-cursor.switch"
-    // }
 ]
