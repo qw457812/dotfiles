@@ -1,10 +1,14 @@
 // 将键绑定放在此文件中以覆盖默认值
 // https://code.visualstudio.com/docs/getstarted/keybindings
 // `when` clause contexts: https://code.visualstudio.com/api/references/when-clause-contexts#available-context-keys
+// `when` `vim.mode`: https://github.com/VSCodeVim/Vim#vim-modes
 // https://github.com/vscode-neovim/vscode-neovim/blob/02d13f0e119afbec8f68fe5add0f2c2a1072ec49/package.json#L1453
 // https://github.com/search?q=explorer.newFile+language%3AJSON&type=code
-// TODO https://github.com/magidc/dotfiles/blob/master/vscode/keybindings.json | https://github.com/magidc/nvim-config#equivalent-mapping-configurations-for-other-ides-vim-integrations
-// TODO https://github.com/kasecato/vscode-intellij-idea-keybindings/blob/7cd150280667f88770ead6e4b187542d9961b52f/src/package-with-comment.json#L94
+
+// TODO
+// https://github.com/magidc/dotfiles/blob/master/vscode/keybindings.json | https://github.com/magidc/nvim-config#equivalent-mapping-configurations-for-other-ides-vim-integrations
+// https://github.com/kasecato/vscode-intellij-idea-keybindings/blob/7cd150280667f88770ead6e4b187542d9961b52f/src/package-with-comment.json#L94
+// https://github.com/LeeLaffan/vscode_config_compile/blob/8233dd269a58781f47e90494bd53c8e80479fba8/settings/keybindings.json
 [
     {
         "key": "shift+;",
@@ -61,14 +65,52 @@
         "key": "escape",
         "command": "runCommands",
         "args": {
-          "commands": [
-            "workbench.action.focusActiveEditorGroup",
-            "workbench.action.closeSidebar",
-            "workbench.action.closePanel"
-          ]
+            "commands": [
+                "workbench.action.focusActiveEditorGroup",
+                "workbench.action.closeSidebar",
+                "workbench.action.closePanel"
+            ]
         },
+        // "when": "!editorFocus && !listFocus"
         "when": "!editorFocus"
     },
+    // https://github.com/LeeLaffan/vscode_config_compile/blob/8233dd269a58781f47e90494bd53c8e80479fba8/input/find.json#L6
+    {
+        "key": "escape",
+        "command": "workbench.action.closeActiveEditor",
+        "when": "inSearchEditor && searchInputBoxFocus"
+    },
+    {
+        "key": "escape",
+        "command": "search.action.focusQueryEditorWidget",
+        "when": "inSearchEditor && !searchInputBoxFocus"
+    },
+    {
+        "key": "enter",
+        // alternative
+        // "command": "extension.multiCommand.execute",
+        // "args": {
+        //     "sequence": [
+        //         "search.action.focusNextSearchResult",
+        //         "extension.vim_escape"
+        //     ]
+        // },
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                "search.action.focusNextSearchResult",
+                "extension.vim_escape"
+            ]
+        },
+        "when": "inSearchEditor && searchInputBoxFocus"
+    },
+    // already map <enter> to `gd` in settings.json
+    // https://github.com/nikitavoloboev/config/blob/master/vscode/keybindings.json
+    // {
+    //     "key": "enter",
+    //     "command": "editor.action.goToDeclaration",
+    //     "when": "inSearchEditor && editorTextFocus && vim.mode == 'Normal'"
+    // },
     // https://github.com/vscode-neovim/vscode-neovim/blob/02d13f0e119afbec8f68fe5add0f2c2a1072ec49/package.json#L1453
     {
         "key": "j",
@@ -180,12 +222,12 @@
         "key": "q",
         "command": "runCommands",
         "args": {
-          "commands": [
-            "workbench.action.focusActiveEditorGroup",
-            "workbench.action.closeSidebar"
-          ]
+            "commands": [
+                "workbench.action.focusActiveEditorGroup",
+                "workbench.action.closeSidebar"
+            ]
         },
-        "when": "filesExplorerFocus && !inputFocus"
+        "when": "(filesExplorerFocus || searchViewletFocus) && !inputFocus"
     },
     {
         "key": "z o",
@@ -231,7 +273,7 @@
     {
         "key": "tab",
         "command": "togglePeekWidgetFocus",
-        "when": "inReferenceSearchEditor && neovim.mode == normal || referenceSearchVisible"
+        "when": "inReferenceSearchEditor && vim.mode == 'Normal' || referenceSearchVisible"
     },
     // hover
     {
@@ -289,6 +331,34 @@
         "key": "shift+g",
         "when": "editorHoverFocused"
     },
+    // TODO inSearchEditor
+    // https://github.com/ravenxrz/dotfiles/blob/a58c20cf867fb8620217d94d5533a73d84d36e7c/vscode/keybindings.json#L62
+    // focus on searching result
+    {
+        "command": "search.action.focusSearchList",
+        "key": "tab",
+        // https://code.visualstudio.com/api/references/when-clause-contexts#visiblefocused-view-when-clause-context
+        // "when": "focusedView == 'workbench.view.search' && !listFocus" // alternative
+        "when": "searchViewletFocus && !listFocus"
+    },
+    // TODO focus on search input box
+    {
+        "command": "search.focus.previousInputBox",
+        "key": "tab",
+        // FIXME when
+        "when": "searchViewletFocus && listFocus"
+    },
+    // find & replace
+    {
+        "key": "cmd+f",
+        "command": "editor.action.startFindReplaceAction",
+        "when": "editorFocus || editorIsOpen"
+    },
+    {
+        "key": "cmd+f",
+        "command": "-actions.find",
+        "when": "editorFocus || editorIsOpen"
+    },
     // TODO leader 配置到 keybindings.json 中（在 settings.json 中配置的缺点：只有 editorFocus 时才能触发）
     // {
     //     "key": "space l",
@@ -305,37 +375,6 @@
     //     "key": "ctrl+;",
     //     "command": "workbench.action.focusActiveEditorGroup",
     //     "when": "terminalFocus"
-    // },
-    // {
-    //     "key": "cmd+j",
-    //     "command": "workbench.action.showAllEditors"
-    // },
-    // {
-    //     "key": "cmd+m",
-    //     "command": "workbench.action.quickOpenTerm"
-    // },
-    // {
-    //     "key": "enter",
-    //     "command": "editor.action.goToDeclaration",
-    //     "when": "inSearchEditor && editorTextFocus && vim.mode == 'Normal'"
-    // },
-    // {
-    //     "key": "ctrl+i",
-    //     "command": "editor.action.quickFix",
-    //     "when": "editorHasCodeActionsProvider && editorTextFocus && !editorReadonly"
-    // },
-    // {
-    //     "key": "ctrl+space",
-    //     "command": "-editor.action.triggerSuggest",
-    //     "when": "editorHasCompletionItemProvider && textInputFocus && !editorReadonly"
-    // },
-    // {
-    //     "key": "ctrl+n",
-    //     "command": "editor.action.codeAction"
-    // },
-    // {
-    //     "key": "shift+cmd+f",
-    //     "command": "search.action.openEditor"
     // },
     // https://github.com/beishanyufu/ime-and-cursor
     // {

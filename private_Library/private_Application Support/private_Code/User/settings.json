@@ -2,21 +2,55 @@
 // https://code.visualstudio.com/docs/getstarted/keybindings#_accepted-keys
 // https://github.com/nikitavoloboev/config/blob/master/vscode/settings.json
 // https://github.com/AnthonyAsDev/VSCodeVimSettings
-// TODO https://github.com/redguardtoo/vscode-setup/blob/master/settings.json
-// TODO https://github.com/MilesMcBain/vsconfig/blob/01a8763aa8cfad89d11bd4e7ed14d73f54e96409/settings.json#L1449
-// TODO https://github.com/ravenxrz/dotfiles/blob/3553f11637f8ac6c00eb0f4b1fc3836d08a1ec06/vscode/settings.json
+
+// TODO
+// https://github.com/redguardtoo/vscode-setup/blob/master/settings.json
+// https://github.com/MilesMcBain/vsconfig/blob/01a8763aa8cfad89d11bd4e7ed14d73f54e96409/settings.json#L1449
+// https://github.com/ravenxrz/dotfiles/tree/3553f11637f8ac6c00eb0f4b1fc3836d08a1ec06/vscode
+// https://github.com/Quitlox/dotfiles/blob/e581ffdb3cd71b8b0d421bc9720a90878e297895/settings.json
+// https://github.com/sokhuong-uon/vscode-nvim/blob/dee26642a5705ee7f39c13e3ffe6a7164b8fcf1e/whichkey/settings.json
 {
     "hediet.vscode-drawio.resizeImages": null,
     "hediet.vscode-drawio.theme": "dark",
     "hediet.vscode-drawio.customColorSchemes": [],
     "window.density.editorTabHeight": "compact",
     "editor.accessibilitySupport": "off",
-    "[python]": {
-        "editor.formatOnType": true
-    },
     "editor.fontLigatures": false,
     "editor.fontWeight": "normal",
     "editor.wordWrap": "on",
+    "editor.minimap.enabled": false,
+    "editor.renderWhitespace": "boundary",
+    // "editor.suggest.preview": true,
+    "[python]": {
+        "editor.formatOnType": true
+    },
+    "workbench.editor.enablePreview": false,
+    "workbench.editor.tabActionCloseVisibility": false,
+    "workbench.editor.highlightModifiedTabs": true,
+    // https://github.com/canyonwan/vscode-settings/blob/739ad93d34d52affe03fa18d9d72ee4794aae861/User/History/2276140c/SbTI.json#L179
+    "workbench.colorCustomizations": {
+        "editorCursor.foreground": "#0095FF",
+        "tab.activeBorder": "#d63864"
+    },
+    "terminal.integrated.copyOnSelection": true,
+    "extensions.experimental.affinity": {
+        "asvetliakov.vscode-neovim": 1,
+        // VSCodeVim is too slow! To improve performance | https://github.com/microsoft/vscode/issues/75627#issuecomment-1078827311
+        "vscodevim.vim": 1
+    },
+    "github.copilot.editor.enableAutoCompletions": true,
+    "github.copilot.enable": {
+        "*": true,
+        "plaintext": true,
+        "markdown": true,
+        "scminput": false
+    },
+    "markdown-preview-enhanced.previewTheme": "github-light.css",
+    "markdown-preview-enhanced.codeBlockTheme": "github.css",
+    "markdown-preview-enhanced.enablePreviewZenMode": true,
+    "todo-tree.highlights.useColourScheme": true,
+    "maven.settingsFile": "",
+    "vscode-neovim.neovimExecutablePaths.darwin": "/opt/homebrew/bin/nvim",
     "vim.useSystemClipboard": true,
     "vim.hlsearch": true,
     "vim.visualstar": true,
@@ -36,17 +70,24 @@
         "<C-s>": false,
         "<C-z>": false
     },
+    // https://github.com/VSCodeVim/Vim#-faq
+    // "vim.foldfix": true, // not work
+    // https://github.com/VSCodeVim/Vim#vim-airline
+    // "vim.statusBarColorControl": true,
     "vim.leader": "<space>",
-    // TODO
-    // projectManager.listProjectsNewWindow
-    // workbench.action.splitEditorDown
-    // workbench.action.splitEditorRight
-    // editor.fold
-    // editor.unfold
-    // workbench.action.showAllEditorsByMostRecentlyUsed
-    // references-view.showCallHierarchy
-    // workbench.action.debug.run
     "vim.normalModeKeyBindings": [
+        // TODO
+        // projectManager.listProjectsNewWindow
+        // workbench.action.splitEditorDown
+        // workbench.action.splitEditorRight
+        // editor.fold
+        // editor.unfold
+        // workbench.action.showAllEditors
+        // workbench.action.quickOpenTerm
+        // breadcrumbs.focusAndSelect
+        // workbench.action.tasks.runTask
+
+        // https://github.com/VSCodeVim/Vim#-faq
         {
             "before":["j"],
             "after": ["g", "j"]
@@ -133,34 +174,29 @@
             "silent": true
         },
         {
+            "before": ["leader", "/"],
+            "commands": [
+                "workbench.view.search"
+            ]
+        },
+        {
             "before": ["leader", "?"],
             "commands": [
                 "workbench.action.openGlobalKeybindings"
             ]
         },
-        // {
-        //     "before": ["leader", "r"],
-        //     "commands": [
-        //         "editor.action.startFindReplaceAction"
-        //     ]
-        // },
-        // TODO cf
         {
-            "before": ["leader", "L"],
+            "before": ["leader", "="],
             "commands": [
                 "editor.action.formatDocument"
             ]
         },
-        // w for window
         {
-            "before": ["leader", "w", "e"],
+            "before": ["leader", "R"],
             "commands": [
-                "workbench.view.extensions"
+                "editor.action.refactor"
             ]
         },
-        // TODO version control: workbench.view.scm
-        // TODO workbench.view.explorer
-        // TODO cr
         {
             "before": ["leader", "r", "n"],
             "commands": [
@@ -199,6 +235,30 @@
             ]
         },
         {
+            "before": ["leader", "c", "a"],
+            "commands": [
+                "editor.action.codeAction"
+            ]
+        },
+        {
+            "before": ["leader", "c", "f"],
+            "commands": [
+                "editor.action.formatDocument"
+            ]
+        },
+        {
+            "before": ["leader", "c", "r"],
+            "commands": [
+                "editor.action.rename"
+            ]
+        },
+        // {
+        //     "before": ["leader", "c", "S"],
+        //     "commands": [
+        //         "workbench.action.showAllSymbols"
+        //     ]
+        // },
+        {
             "before": ["leader", "f", "s"],
             "commands": [
                 "workbench.action.files.save"
@@ -220,7 +280,16 @@
         {
             "before": ["leader", "f", "r"],
             "commands": [
+                // "workbench.action.showAllEditorsByMostRecentlyUsed"
                 "workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup"
+            ]
+        },
+        // https://github.com/sokhuong-uon/vscode-nvim/blob/dee26642a5705ee7f39c13e3ffe6a7164b8fcf1e/whichkey/settings.json#L98
+        {
+            "before": ["leader", "f", "R"],
+            "commands": [
+                "workbench.files.action.showActiveFileInExplorer",
+                "renameFile"
             ]
         },
         {
@@ -254,15 +323,9 @@
             ]
         },
         {
-            "before": ["leader", "t", "b"],
+            "before": ["leader", "s", "s"],
             "commands": [
-                "workbench.action.toggleSidebarVisibility"
-            ]
-        },
-        {
-            "before": ["leader", "t", "p"],
-            "commands": [
-                "workbench.action.togglePanel"
+                "search.action.openEditor"
             ]
         },
         {
@@ -300,12 +363,6 @@
             ]
         },
         {
-            "before": ["leader", "o", "r"],
-            "commands": [
-                "workbench.action.openRecent"
-            ]
-        },
-        {
             "before": ["leader", "d", "s"],
             "commands": [
                 "workbench.action.debug.stop"
@@ -314,6 +371,7 @@
         {
             "before": ["leader", "d", "r"],
             "commands": [
+                // "workbench.action.debug.run"
                 "workbench.action.debug.restart"
             ]
         },
@@ -329,8 +387,18 @@
         },
         {
             "before": ["leader", "p", "r"],
-            "commands": ["editor.action.referenceSearch.trigger"]
+            "commands": [
+                "workbench.action.openRecent"
+            ]
         },
+        // {
+        //     "before": ["leader", "p", "i"],
+        //     "commands": ["editor.action.peekImplementation"]
+        // },
+        // {
+        //     "before": ["leader", "p", "r"],
+        //     "commands": ["editor.action.referenceSearch.trigger"]
+        // },
         {
             "before": ["leader", "q", "q"],
             "commands": [
@@ -358,6 +426,22 @@
                 "workbench.action.closePanel"
             ],
             "silent": true
+        },
+        {
+            "before":[";"],
+            "after": [":"]
+        },
+        // {
+        //     "before":[":"],
+        //     "after": [";"]
+        // },
+        {
+            "before":["n"],
+            "after": ["n", "z", "z"]
+        },
+        {
+            "before":["N"],
+            "after": ["N", "z", "z"]
         },
         {
             "before":["enter"],
@@ -399,13 +483,81 @@
                 }
             ]
         },
+        // toggle ui
+        {
+            "before": [",", ","],
+            "commands": [
+                "workbench.view.explorer"
+            ]
+        },
+        {
+            "before": [",", "b"],
+            "commands": [
+                "workbench.action.toggleSidebarVisibility"
+            ]
+        },
+        {
+            "before": [",", "e"],
+            "commands": [
+                "workbench.view.explorer"
+            ]
+        },
+        {
+            "before": [",", "s"],
+            "commands": [
+                "workbench.view.search"
+            ]
+        },
+        {
+            "before": [",", "v"],
+            "commands": [
+                "workbench.view.scm"
+            ]
+        },
+        {
+            "before": [",", "d"],
+            "commands": [
+                "workbench.view.debug"
+            ]
+        },
+        {
+            "before": [",", "E"],
+            "commands": [
+                "workbench.view.extensions"
+            ]
+        },
+        {
+            "before": [",", "r"],
+            "commands": [
+                "references-view.showCallHierarchy"
+            ]
+        },
+        {
+            "before": [",", "c"],
+            "commands": [
+                "workbench.panel.chat.view.copilot.focus"
+            ]
+        },
+        {
+            "before": [",", "p"],
+            "commands": [
+                "workbench.action.togglePanel"
+            ]
+        },
+        {
+            "before": [",", "t"],
+            "commands": [
+                "workbench.action.terminal.toggleTerminal"
+            ]
+        },
         // https://github.com/Valloric/dotfiles/blob/bda97c9a6369564671942c0b4fb750b71a55f6da/vscode/settings.json
         {
             "before": ["z", "j"],
-            "after": ["m", "m", "o", "<Esc>", "`", "m"]
+            "after": ["m", "z", "o", "<Esc>", "`", "z"]
         },
         {
             "before": ["z", "k"],
+            // "after": ["m", "z", "O", "<Esc>", "`", "z"] // not work
             "after": ["O", "<Esc>", "j", "0"]
         },
     ],
@@ -461,9 +613,28 @@
             ]
         },
         {
-            "before": ["leader", "L"],
+            "before": ["leader", ";"],
+            "commands": [
+                "workbench.action.showCommands",
+            ],
+            "silent": true
+        },
+        {
+            "before": ["leader", "="],
             "commands": [
                 "editor.action.formatSelection"
+            ]
+        },
+        {
+            "before": ["leader", "c", "f"],
+            "commands": [
+                "editor.action.formatSelection"
+            ]
+        },
+        {
+            "before": ["leader", "R"],
+            "commands": [
+                "editor.action.refactor"
             ]
         },
     ],
@@ -498,34 +669,6 @@
         }
     ],
     "vim.commandLineModeKeyBindings": [],
-    "vscode-neovim.neovimExecutablePaths.darwin": "/opt/homebrew/bin/nvim",
-    "extensions.experimental.affinity": {
-        "asvetliakov.vscode-neovim": 1,
-        // VSCodeVim is too slow! To improve performance | https://github.com/microsoft/vscode/issues/75627#issuecomment-1078827311
-        "vscodevim.vim": 1
-    },
-    "terminal.integrated.copyOnSelection": true,
-    "github.copilot.enable": {
-        "*": true,
-        "plaintext": true,
-        "markdown": true,
-        "scminput": false
-    },
-    "markdown-preview-enhanced.codeBlockTheme": "github.css",
-    "markdown-preview-enhanced.previewTheme": "github-light.css",
-    "markdown-preview-enhanced.enablePreviewZenMode": true,
-    "workbench.editor.enablePreview": false,
-    "workbench.editor.tabActionCloseVisibility": false,
-    "workbench.editor.highlightModifiedTabs": true,
-    // https://github.com/canyonwan/vscode-settings/blob/739ad93d34d52affe03fa18d9d72ee4794aae861/User/History/2276140c/SbTI.json#L179
-    "workbench.colorCustomizations": {
-        "editorCursor.foreground": "#0095FF", // 光标颜色
-        "tab.activeBorder": "#d63864" // 选中选项卡的下边框
-    },
-    "maven.settingsFile": "",
-    "editor.minimap.enabled": false,
-    "github.copilot.editor.enableAutoCompletions": true,
-    "todo-tree.highlights.useColourScheme": true,
     // https://github.com/beishanyufu/ime-and-cursor
     // "ime-and-cursor.ChineseIM": "im.rime.inputmethod.Squirrel.Hans",
     // "ime-and-cursor.EnglishIM": "com.apple.keylayout.ABC",
