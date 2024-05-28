@@ -77,15 +77,9 @@
     "vim.leader": "<space>",
     "vim.normalModeKeyBindings": [
         // TODO
-        // projectManager.listProjectsNewWindow
-        // workbench.action.splitEditorDown
-        // workbench.action.splitEditorRight
         // editor.fold
         // editor.unfold
-        // workbench.action.showAllEditors
-        // workbench.action.quickOpenTerm
         // breadcrumbs.focusAndSelect
-        // workbench.action.tasks.runTask
 
         // https://github.com/VSCodeVim/Vim#-faq
         {
@@ -162,7 +156,7 @@
         {
             "before": ["leader", ","],
             "commands": [
-                "workbench.action.quickOpen",
+                "workbench.action.showAllEditors",
             ],
             "silent": true
         },
@@ -189,6 +183,37 @@
             "before": ["leader", "="],
             "commands": [
                 "editor.action.formatDocument"
+            ]
+        },
+        {
+            "before": ["leader", "-"],
+            "commands": [
+                "workbench.action.splitEditorDown"
+            ]
+        },
+        {
+            "before": ["leader", "|"],
+            "commands": [
+                "workbench.action.splitEditorRight"
+            ]
+        },
+        {
+            "before": ["leader", "x"],
+            "commands": [
+                {
+                    "command": "workbench.action.closeSidebar",
+                    "args": []
+                },
+                {
+                    "command": "workbench.action.closePanel",
+                    "args": []
+                }
+            ]
+        },
+        {
+            "before": ["leader", "V"],
+            "commands": [
+                "workbench.action.splitEditorRight"
             ]
         },
         {
@@ -258,6 +283,24 @@
         //         "workbench.action.showAllSymbols"
         //     ]
         // },
+        {
+            "before": ["leader", "C", "s"],
+            "commands": [
+                "workbench.action.openSettingsJson"
+            ]
+        },
+        {
+            "before": ["leader", "C", "k"],
+            "commands": [
+                "workbench.action.openGlobalKeybindingsFile"
+            ]
+        },
+        {
+            "before": ["leader", "f", "f"],
+            "commands": [
+                "workbench.action.quickOpen"
+            ]
+        },
         {
             "before": ["leader", "f", "s"],
             "commands": [
@@ -381,9 +424,18 @@
                 "editor.debug.action.toggleBreakpoint"
             ]
         },
+        // https://marketplace.visualstudio.com/items?itemName=alefragnani.project-manager
         {
-            "before": ["leader", "p", "d"],
-            "commands": ["editor.action.peekDefinition"]
+            "before": ["leader", "p", "a"],
+            "commands": [
+                "projectManager.saveProject"
+            ]
+        },
+        {
+            "before": ["leader", "p", "p"],
+            "commands": [
+                "projectManager.listProjectsNewWindow"
+            ]
         },
         {
             "before": ["leader", "p", "r"],
@@ -391,6 +443,10 @@
                 "workbench.action.openRecent"
             ]
         },
+        // {
+        //     "before": ["leader", "p", "d"],
+        //     "commands": ["editor.action.peekDefinition"]
+        // },
         // {
         //     "before": ["leader", "p", "i"],
         //     "commands": ["editor.action.peekImplementation"]
@@ -473,17 +529,11 @@
         {
             "before": ["leader", "<space>"],
             "commands": [
-                {
-                    "command": "workbench.action.closeSidebar",
-                    "args": []
-                },
-                {
-                    "command": "workbench.action.closePanel",
-                    "args": []
-                }
+                "workbench.action.quickOpen"
             ]
         },
-        // toggle ui
+        // ui
+        // TODO use leader u like LazyVim
         {
             "before": [",", ","],
             "commands": [
