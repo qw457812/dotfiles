@@ -73,6 +73,8 @@ Using [emacs-rime](https://github.com/DogLooksGood/emacs-rime) in Doom Emacs.
 
 [settings.json](./private_Library/private_Application%20Support/private_Code/User/settings.json)
 
+[keybindings.json](./private_Library/private_Application%20Support/private_Code/User/keybindings.json)
+
 ## [Doom Emacs](https://github.com/doomemacs/doomemacs)
 
 [DOOMDIR](./dot_config/doom)
