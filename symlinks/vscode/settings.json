@@ -9,6 +9,10 @@
 // https://github.com/ravenxrz/dotfiles/tree/3553f11637f8ac6c00eb0f4b1fc3836d08a1ec06/vscode
 // https://github.com/Quitlox/dotfiles/blob/e581ffdb3cd71b8b0d421bc9720a90878e297895/settings.json
 // https://github.com/sokhuong-uon/vscode-nvim/blob/dee26642a5705ee7f39c13e3ffe6a7164b8fcf1e/whichkey/settings.json
+// https://github.com/apexskier/dotfiles/blob/71a2c6dff15f5ec216a759a4b4a1b61657928a09/vscode/settings.json
+// https://github.com/apemost/vimrc/blob/9e04a58def2fbccd03f8988e354c689b9a9a510f/vscodevim.json
+// https://github.com/halafi/dotfiles/blob/master/vscode/settings.json
+// https://github.com/s5k/nixdots/blob/c7f402fb64709824cc1557a3169c3721e3f76b91/dotfiles/vscode/userSettings.json
 {
     "hediet.vscode-drawio.resizeImages": null,
     "hediet.vscode-drawio.theme": "dark",
@@ -21,8 +25,19 @@
     "editor.minimap.enabled": false,
     "editor.renderWhitespace": "boundary",
     // "editor.suggest.preview": true,
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true,
     "[python]": {
-        "editor.formatOnType": true
+        "editor.formatOnSave": true,
+        // https://github.com/astral-sh/ruff-vscode#configuring-vs-code
+        "editor.codeActionsOnSave": {
+            // "source.fixAll": "explicit", // like unused imports
+            "source.organizeImports": "explicit"
+        },
+        // https://code.visualstudio.com/docs/python/formatting
+        "editor.defaultFormatter": "ms-python.black-formatter"
+        // "editor.defaultFormatter": "charliermarsh.ruff"
     },
     "workbench.editor.enablePreview": false,
     "workbench.editor.tabActionCloseVisibility": false,
@@ -33,8 +48,35 @@
         "tab.activeBorder": "#d63864"
     },
     "terminal.integrated.copyOnSelection": true,
+    // TODO activate python virtual environment in tmux new session
+    // https://github.com/microsoft/vscode-python/issues/22289
+    // https://github.com/halafi/filiphalas.com/blob/168b1e501652ceb388b370ef54f92b6793c3080d/articles/keyboard-controlled-vscode-with-vim-and-tmux.md
+    // https://github.com/eestrada/dotfiles/blob/6e3229367a519ba6ae31ee3e90b58d5142fc3cae/AppData/Roaming/Code/User/settings.json#L79
+    // https://github.com/axonasif/dotsh/blob/159d7b6ed19f6ede0e8d2d439ade3d5827bd757b/src/config/shell/mod.sh#L170
+    // `terminal.integrated.env.osx` + .zshrc | https://github.com/rwblickhan/astro-rwblickhan.org/blob/21f1953371f3b1e4ef6b14635d36d12d53b4c8ef/src/content/tilTechnical/20230820-tmux-in-vscode.md
+    // alternative: set `ZSH_TMUX_AUTOSTART=true` for vscode in .zshrc, then comment out `terminal.integrated.defaultProfile.osx` below
+    "python.terminal.activateEnvironment": false, // avoid creating unnecessary tmux sessions
+    "terminal.integrated.defaultProfile.osx": "my-tmux",
+    "terminal.integrated.profiles.osx": {
+        "zsh (login)": {
+            "path": "zsh",
+            "args": [
+                "-l"
+            ]
+        },
+        "my-tmux": {
+            "path": "tmux",
+            "args": [
+                "new-session",
+                "-A",
+                "-s",
+                // TODO replace $HOME with ~ | https://github.com/microsoft/vscode/issues/115560#issuecomment-861486217
+                "vscode:${workspaceFolder}"
+            ],
+            "icon": "terminal-tmux"
+        },
+    },
     "extensions.experimental.affinity": {
-        "asvetliakov.vscode-neovim": 1,
         // VSCodeVim is too slow! To improve performance | https://github.com/microsoft/vscode/issues/75627#issuecomment-1078827311
         "vscodevim.vim": 1
     },
@@ -48,9 +90,10 @@
     "markdown-preview-enhanced.previewTheme": "github-light.css",
     "markdown-preview-enhanced.codeBlockTheme": "github.css",
     "markdown-preview-enhanced.enablePreviewZenMode": true,
+    "zenMode.fullScreen": false,
+    "zenMode.hideLineNumbers": false,
     "todo-tree.highlights.useColourScheme": true,
     "maven.settingsFile": "",
-    "vscode-neovim.neovimExecutablePaths.darwin": "/opt/homebrew/bin/nvim",
     "vim.useSystemClipboard": true,
     "vim.hlsearch": true,
     "vim.visualstar": true,
@@ -80,6 +123,7 @@
         // editor.fold
         // editor.unfold
         // breadcrumbs.focusAndSelect
+        // gitlens.showQuickFileHistory
 
         // https://github.com/VSCodeVim/Vim#-faq
         {
@@ -109,6 +153,33 @@
                 "editor.action.showHover"
             ]
         },
+        // https://github.com/vscode-neovim/vscode-neovim#code-navigation
+        // `:h gf` in nvim (goto file)
+        {
+            "before": ["g", "f"],
+            "commands": [
+                "editor.action.revealDeclaration"
+            ]
+        },
+        {
+            "before": ["g", "F"],
+            "commands": [
+                "editor.action.peekDeclaration"
+            ]
+        },
+        {
+            "before": ["g", "H"],
+            "commands": [
+                "editor.action.referenceSearch.trigger"
+            ]
+        },
+        // `:h gO` in nvim (outline)
+        {
+            "before": ["g", "O"],
+            "commands": [
+                "workbench.action.gotoSymbol"
+            ]
+        },
         {
             "before": ["g", "i"],
             "commands": [
@@ -119,6 +190,7 @@
             "before": ["g", "D"],
             "commands": [
                 "editor.action.goToTypeDefinition"
+                // "editor.action.peekDefinition"
             ]
         },
         {
@@ -157,6 +229,13 @@
             "before": ["leader", ","],
             "commands": [
                 "workbench.action.showAllEditors",
+            ],
+            "silent": true
+        },
+        {
+            "before": ["leader", "."],
+            "commands": [
+                "workbench.action.terminal.focus"
             ],
             "silent": true
         },
@@ -220,6 +299,60 @@
             "before": ["leader", "R"],
             "commands": [
                 "editor.action.refactor"
+            ]
+        },
+        {
+            "before": ["leader", "1"],
+            "commands": [
+                "workbench.action.openEditorAtIndex1"
+            ]
+        },
+        {
+            "before": ["leader", "2"],
+            "commands": [
+                "workbench.action.openEditorAtIndex2"
+            ]
+        },
+        {
+            "before": ["leader", "3"],
+            "commands": [
+                "workbench.action.openEditorAtIndex3"
+            ]
+        },
+        {
+            "before": ["leader", "4"],
+            "commands": [
+                "workbench.action.openEditorAtIndex4"
+            ]
+        },
+        {
+            "before": ["leader", "5"],
+            "commands": [
+                "workbench.action.openEditorAtIndex5"
+            ]
+        },
+        {
+            "before": ["leader", "6"],
+            "commands": [
+                "workbench.action.openEditorAtIndex6"
+            ]
+        },
+        {
+            "before": ["leader", "7"],
+            "commands": [
+                "workbench.action.openEditorAtIndex7"
+            ]
+        },
+        {
+            "before": ["leader", "8"],
+            "commands": [
+                "workbench.action.openEditorAtIndex8"
+            ]
+        },
+        {
+            "before": ["leader", "9"],
+            "commands": [
+                "workbench.action.openEditorAtIndex9"
             ]
         },
         {
@@ -310,6 +443,7 @@
         {
             "before": ["leader", "f", "y"],
             "commands": [
+                // "copyFilePath"
                 "workbench.action.files.copyPathOfActiveFile"
             ]
         },
@@ -335,10 +469,29 @@
                 "renameFile"
             ]
         },
+        // TODO git
         {
             "before": ["leader", "g", "s"],
             "commands": [
                 "workbench.action.gotoSymbol"
+            ]
+        },
+        {
+            "before": ["leader", "g", "d"],
+            "commands": [
+                "git.openChange"
+            ]
+        },
+        {
+            "before": ["leader", "g", "l"],
+            "commands": [
+                "git.pull"
+            ]
+        },
+        {
+            "before": ["leader", "g", "p"],
+            "commands": [
+                "git.push"
             ]
         },
         {
@@ -498,6 +651,11 @@
         {
             "before":["N"],
             "after": ["N", "z", "z"]
+        },
+        // execute q macro with Q
+        {
+            "before":["Q"],
+            "after": ["@", "q"]
         },
         {
             "before":["enter"],

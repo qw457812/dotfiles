@@ -364,7 +364,9 @@ tmux_conf_theme_clock_style="24"
 #   - false (default)
 #   - disabled
 # on Linux, this requires xsel, xclip or wl-copy
-tmux_conf_copy_to_os_clipboard=false
+# tmux_conf_copy_to_os_clipboard=false
+# for terminal inside vscode
+tmux_conf_copy_to_os_clipboard=true
 
 
 # -- urlscan -------------------------------------------------------------------
@@ -405,10 +407,12 @@ set -g mode-keys vi
 
 
 # -- my bindings ---------------------------------------------------------------
-# unbind n
-# unbind p
+# window navigation
 # bind -r p previous-window # select previous window
 # bind -r n next-window     # select next window
+# with karabiner-elements, the -r flag causes delay
+bind C-h previous-window # select previous window
+bind C-l next-window     # select next window
 
 # edit configuration with chezmoi
 bind e new-window -n "#{TMUX_CONF_LOCAL}" sh -c 'chezmoi edit --apply --verbose "$TMUX_CONF_LOCAL" && "$TMUX_PROGRAM" ${TMUX_SOCKET:+-S "$TMUX_SOCKET"} source "$TMUX_CONF" \; display "$TMUX_CONF_LOCAL sourced"'
@@ -420,7 +424,13 @@ bind e new-window -n "#{TMUX_CONF_LOCAL}" sh -c 'chezmoi edit --apply --verbose 
 # bind A send-prefix -2
 
 # session navigation
-bind Tab switch-client -l  # move to last session
+bind ` switch-client -l  # move to last session
+
+# enter copy mode
+bind Space copy-mode
+
+# select next layout
+bind Enter next-layout
 
 
 # -- tpm -----------------------------------------------------------------------
