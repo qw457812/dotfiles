@@ -9,6 +9,7 @@
 // https://github.com/magidc/dotfiles/blob/master/vscode/keybindings.json | https://github.com/magidc/nvim-config#equivalent-mapping-configurations-for-other-ides-vim-integrations
 // https://github.com/kasecato/vscode-intellij-idea-keybindings/blob/7cd150280667f88770ead6e4b187542d9961b52f/src/package-with-comment.json#L94
 // https://github.com/LeeLaffan/vscode_config_compile/blob/8233dd269a58781f47e90494bd53c8e80479fba8/settings/keybindings.json
+// https://github.com/halafi/dotfiles/blob/master/vscode/keybindings.json
 [
     {
         "key": "shift+;",
@@ -25,18 +26,6 @@
         "command": "editor.action.moveLinesUpAction",
         "when": "textInputFocus"
     },
-    {
-        "command": "vscode-neovim.compositeEscape1",
-        "key": "j",
-        "when": "neovim.mode == insert && editorTextFocus",
-        "args": "j"
-    },
-    {
-        "command": "vscode-neovim.compositeEscape2",
-        "key": "k",
-        "when": "neovim.mode == insert && editorTextFocus",
-        "args": "k"
-    },
     // https://gist.github.com/MasoodGit/1cc302c61622e777ca09f8bf4ae84adc
     // https://github.com/magidc/dotfiles/blob/3a20bc944187fbf459e9c16de0c3e50d7b3800a9/vscode/keybindings.json#L321
     {
@@ -47,8 +36,9 @@
     },
     {
         "key": "ctrl+l",
-        "command": "workbench.action.navigateRight"
+        "command": "workbench.action.navigateRight",
         // "when": "vim.active && vim.mode != 'Insert'"
+        "when": "!terminalFocus" // ctrl+l clear terminal
     },
     {
         "key": "ctrl+k",
@@ -71,8 +61,20 @@
                 "workbench.action.closePanel"
             ]
         },
-        // "when": "!editorFocus && !listFocus"
-        "when": "!editorFocus"
+        // && !listFocus
+        "when": "!editorFocus && !terminalFocus"
+    },
+    {
+        "key": "shift+escape",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                "workbench.action.focusActiveEditorGroup",
+                "workbench.action.closeSidebar",
+                "workbench.action.closePanel"
+            ]
+        },
+        // "when": "terminalFocus"
     },
     // https://github.com/LeeLaffan/vscode_config_compile/blob/8233dd269a58781f47e90494bd53c8e80479fba8/input/find.json#L6
     {
@@ -358,6 +360,31 @@
         "key": "cmd+f",
         "command": "-actions.find",
         "when": "editorFocus || editorIsOpen"
+    },
+    // with tmux and karabiner-elements
+    {
+        "key": "ctrl+b",
+        "command": "workbench.action.terminal.focus",
+        "when": "!terminalFocus"
+    },
+    // https://code.visualstudio.com/docs/terminal/advanced#_custom-sequence-keybindings
+    {
+        "key": "cmd+shift+]",
+        "command": "workbench.action.terminal.sendSequence",
+        "args": {
+            // send ctrl+b ctrl+l to tmux: next-window
+            "text": "\u0002\u000c"
+        },
+        "when": "terminalFocus"
+    },
+    {
+        "key": "cmd+shift+[",
+        "command": "workbench.action.terminal.sendSequence",
+        "args": {
+            // send ctrl+b ctrl+h to tmux: previous-window
+            "text": "\u0002\u0008"
+        },
+        "when": "terminalFocus"
     },
     // TODO leader 配置到 keybindings.json 中（在 settings.json 中配置的缺点：只有 editorFocus 时才能触发）
     // {
