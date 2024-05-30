@@ -364,7 +364,7 @@
     // with tmux and karabiner-elements
     {
         "key": "ctrl+b",
-        "command": "workbench.action.terminal.focus",
+        "command": "workbench.action.toggleMaximizedPanel",
         "when": "!terminalFocus"
     },
     // https://code.visualstudio.com/docs/terminal/advanced#_custom-sequence-keybindings
@@ -388,7 +388,7 @@
     },
     {
         "key": "cmd+.",
-        "command": "workbench.action.toggleMaximizedPanel",
+        "command": "workbench.action.terminal.focus",
         "when": "!terminalFocus"
     },
     {
