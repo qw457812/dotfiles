@@ -48,6 +48,7 @@
         "tab.activeBorder": "#d63864"
     },
     "terminal.integrated.copyOnSelection": true,
+    "terminal.integrated.rightClickBehavior": "paste",
     // TODO activate python virtual environment in tmux new session
     // https://github.com/microsoft/vscode-python/issues/22289
     // https://github.com/halafi/filiphalas.com/blob/168b1e501652ceb388b370ef54f92b6793c3080d/articles/keyboard-controlled-vscode-with-vim-and-tmux.md
