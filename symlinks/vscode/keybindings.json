@@ -386,6 +386,22 @@
         },
         "when": "terminalFocus"
     },
+    {
+        "key": "cmd+.",
+        "command": "workbench.action.toggleMaximizedPanel",
+        "when": "!terminalFocus"
+    },
+    {
+        "key": "cmd+.",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                "workbench.action.focusActiveEditorGroup",
+                "workbench.action.closePanel"
+            ]
+        },
+        "when": "terminalFocus"
+    },
     // TODO leader 配置到 keybindings.json 中（在 settings.json 中配置的缺点：只有 editorFocus 时才能触发）
     // {
     //     "key": "space l",
