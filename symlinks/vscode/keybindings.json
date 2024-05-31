@@ -344,7 +344,18 @@
     {
         "key": "ctrl+b",
         "command": "workbench.action.toggleMaximizedPanel",
-        "when": "!terminalFocus"
+        "when": "!terminalFocus && !view.terminal.visible"
+    },
+    {
+        "key": "ctrl+b",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                "workbench.action.toggleMaximizedPanel",
+                "workbench.action.terminal.focus"
+            ]
+        },
+        "when": "!terminalFocus && view.terminal.visible"
     },
     // https://code.visualstudio.com/docs/terminal/advanced#_custom-sequence-keybindings
     {

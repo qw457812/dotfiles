@@ -22,7 +22,7 @@
     "editor.accessibilitySupport": "off",
     "editor.fontLigatures": false,
     "editor.fontWeight": "normal",
-    "editor.wordWrap": "on",
+    "editor.wordWrap": "off",
     "editor.minimap.enabled": false,
     "editor.renderWhitespace": "boundary",
     // "editor.suggest.preview": true,
@@ -40,6 +40,8 @@
         "editor.defaultFormatter": "ms-python.black-formatter"
         // "editor.defaultFormatter": "charliermarsh.ruff"
     },
+    // TODO what is this?
+    // "python.analysis.autoImportCompletions": true,
     "workbench.editor.enablePreview": false,
     "workbench.editor.tabActionCloseVisibility": false,
     "workbench.editor.highlightModifiedTabs": true,
@@ -93,7 +95,7 @@
     "markdown-preview-enhanced.codeBlockTheme": "github.css",
     "markdown-preview-enhanced.enablePreviewZenMode": true,
     "zenMode.fullScreen": false,
-    "zenMode.hideLineNumbers": false,
+    "zenMode.hideLineNumbers": true,
     "todo-tree.highlights.useColourScheme": true,
     "maven.settingsFile": "",
     "vim.useSystemClipboard": true,
@@ -686,6 +688,18 @@
             "commands": [
                 // "workbench.action.navigateForward"
                 "extension.vim_ctrl+i"
+            ]
+        },
+        {
+            "before": ["down"],
+            "commands": [
+                "workbench.action.nextEditor"
+            ]
+        },
+        {
+            "before": ["up"],
+            "commands": [
+                "workbench.action.previousEditor"
             ]
         },
         {
