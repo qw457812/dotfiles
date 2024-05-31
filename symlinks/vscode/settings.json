@@ -4,6 +4,7 @@
 // https://github.com/AnthonyAsDev/VSCodeVimSettings
 
 // TODO
+// https://github.com/VSpaceCode/vscode-which-key/blob/master/package.json
 // https://github.com/redguardtoo/vscode-setup/blob/master/settings.json
 // https://github.com/MilesMcBain/vsconfig/blob/01a8763aa8cfad89d11bd4e7ed14d73f54e96409/settings.json#L1449
 // https://github.com/ravenxrz/dotfiles/tree/3553f11637f8ac6c00eb0f4b1fc3836d08a1ec06/vscode
@@ -194,6 +195,7 @@
                 // "editor.action.peekDefinition"
             ]
         },
+        // TODO `]e` or `]d` ?
         {
             "before": ["]", "e"],
             "commands": [
@@ -471,10 +473,11 @@
             ]
         },
         // TODO git
+        // https://github.com/VSpaceCode/vscode-which-key/blob/master/package.json
         {
             "before": ["leader", "g", "s"],
             "commands": [
-                "workbench.action.gotoSymbol"
+                "workbench.view.scm"
             ]
         },
         {
