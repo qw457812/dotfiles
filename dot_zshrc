@@ -353,13 +353,13 @@ function tre() {
 alias e='emacsclient -t'
 
 # doomemacs by chemacs2
-function de() {
-  echo 'default' > ~/.emacs-profile && e "$@"
-}
+# function de() {
+#   echo 'default' > ~/.emacs-profile && e "$@"
+# }
 # spacemacs by chemacs2
-function se() {
-  echo 'spacemacs' > ~/.emacs-profile && e "$@"
-}
+# function se() {
+#   echo 'spacemacs' > ~/.emacs-profile && e "$@"
+# }
 
 # brew install jenv
 export PATH="$HOME/.jenv/bin:$PATH"
@@ -432,6 +432,7 @@ alias -g G='| grep'
 alias -g L="| less"
 alias -g LL="2>&1 | less"
 alias -g C="| clipcopy"
+alias -g F='| fzf'
 alias rm='rm -i'
 alias cp='cp -i'
 alias mv='mv -i'

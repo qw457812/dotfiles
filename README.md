@@ -10,6 +10,8 @@ Head over to [nikitavoloboev](https://github.com/nikitavoloboev)'s ***[personal 
 
 Tracking keyboard input use [WhatPulse](https://whatpulse.org/) to observe.
 
+Using [Glove80](https://www.moergo.com/).
+
 <details>
 <summary><strong>Here are some settings</strong> (click to see)</summary>
 
@@ -51,23 +53,37 @@ Tracking keyboard input use [WhatPulse](https://whatpulse.org/) to observe.
 
 </details>
 
+
+## [Neovim](https://neovim.io/)
+
+[my neovim config](dot_config/nvim) based on [NvChad](https://github.com/NvChad/NvChad).
+
+> very poor, need to be improved
+
+todo:
+
+1. [ ] try [LazyVim](https://github.com/LazyVim/LazyVim), [Kickstart](https://github.com/nvim-lua/kickstart.nvim), [AstroNvim](https://github.com/AstroNvim/AstroNvim) by [Lazyman](https://github.com/doctorfree/nvim-lazyman), configure them and compare with NvChad.
+2. [ ] find out a set of keybindings that can be used in all apps, especially in browsers. [equivalent mapping configurations for other IDEs VIM integrations](https://github.com/magidc/nvim-config#equivalent-mapping-configurations-for-other-ides-vim-integrations): IdeaVim, VSCodeVim.
+
+tips:
+
+1. remap esc
+
+   - For all keyboard (mainly for Apple Internal Keyboard): remap to **j+k** by karabiner
+   - For Glove80 specifically: remap to **thumb key** by karabiner
+   - In Vim(s): `inoremap jj <esc>` or `inoremap jk <esc>`
+
+2. turn up `Key repeat rate` and turn down `Delay until repeat` in `System Settings -> Keyboard`
+
+   see [.macos](backup/.macos)
+
+3. when leaving insert mode, auto switch to english input source (if using chinese input source)
+
+   - by [Rime](https://rime.im/)'s [vim_mode](https://github.com/rime/home/blob/11bbdb85d2acbb6789433064711b03b4952aa7f5/blog/source/release/squirrel/index.md?plain=1#L256) app option, see [squirrel.custom.yaml](private_Library/Rime/squirrel.custom.yaml)
+
 ## [IdeaVim](https://github.com/JetBrains/ideavim)
 
 [.ideavimrc](dot_ideavimrc)
-
-## [rime-ice](https://github.com/iDvel/rime-ice)
-
-[Rime config](private_Library/Rime) for Chinese input powered by rime-ice and [TigerCode](https://tiger-code.com/).
-
-Using [KeyboardHolder](https://keyboardholder.leavesc.com/zh-cn/) to keep [Squirrel](https://github.com/rime/squirrel) as the only input source on macOS, instead of ABC.
-
-And using [ShowyEdge](https://github.com/pqrs-org/ShowyEdge) to notice when input source automatically changes to ABC.
-
-Using [emacs-rime](https://github.com/DogLooksGood/emacs-rime) in Doom Emacs.
-
-## [SketchyBar](https://github.com/FelixKratz/SketchyBar)
-
-[sketchybarrc and plugin scripts](dot_config/sketchybar)
 
 ## [VSCodeVim](https://github.com/VSCodeVim/Vim)
 
@@ -81,6 +97,40 @@ Using [emacs-rime](https://github.com/DogLooksGood/emacs-rime) in Doom Emacs.
 
 Using [Emacs Plus](https://github.com/d12frosted/homebrew-emacs-plus).
 
+## [Oh My Zsh](https://ohmyz.sh/)
+
+[.zshrc](dot_zshrc)
+
+## [Oh my tmux!](https://github.com/gpakosz/.tmux)
+
+[.tmux.conf.local](dot_tmux.conf.local)
+
 ## [Vifm](https://github.com/vifm/vifm)
 
 [vifmrc](dot_config/private_vifm/vifmrc)
+
+## [rime-ice](https://github.com/iDvel/rime-ice)
+
+[my rime config](private_Library/Rime) for Chinese input based on rime-ice and powered by [TigerCode](https://tiger-code.com/).
+
+Using [KeyboardHolder](https://keyboardholder.leavesc.com/zh-cn/) to keep [Squirrel](https://github.com/rime/squirrel) as the only input source on macOS, instead of ABC.
+
+And using [ShowyEdge](https://github.com/pqrs-org/ShowyEdge) to notice when input source automatically changes to ABC.
+
+Using [emacs-rime](https://github.com/DogLooksGood/emacs-rime) in Doom Emacs.
+
+## [SketchyBar](https://github.com/FelixKratz/SketchyBar)
+
+[sketchybarrc](dot_config/sketchybar/executable_sketchybarrc)
+
+## [yabai](https://github.com/koekeishiya/yabai)
+
+[.yabairc](executable_dot_yabairc)
+
+## [zathura](https://github.com/zegervdv/homebrew-zathura)
+
+[zathurarc](dot_config/zathura/zathurarc)
+
+Using [zathura-pdf-poppler](https://github.com/zegervdv/homebrew-zathura#install-and-link-one-of-the-two-plugins) plugin.
+
+Fix [zathura auto focus on open](https://github.com/zegervdv/homebrew-zathura/issues/62#issuecomment-1413968157) problem by using yabai.

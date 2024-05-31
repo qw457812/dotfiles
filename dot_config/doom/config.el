@@ -6,8 +6,8 @@
 
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets. It is optional.
-(setq user-full-name "John Doe"
-      user-mail-address "john@doe.com")
+(setq user-full-name "jkdflfj"
+      user-mail-address "jkdflfj@gmail.com")
 
 ;; Doom exposes five (optional) variables for controlling fonts in Doom:
 ;;
@@ -315,4 +315,26 @@
 ;;       immersive-translate-chatgpt-host "api.openai.com")
 ;; use translate-shell
 (setq immersive-translate-backend 'trans)
-(map! :leader :desc "Translate" :n "T" #'immersive-translate-paragraph)
+(map! :leader :desc "Translate" :n "tt" #'immersive-translate-paragraph)
+
+;; TODO not work
+;; https://github.com/hlissner/.doom.d/blob/master/config.el
+;;; :app everywhere
+;; (after! emacs-everywhere
+;;   ;; Easier to match with a bspwm rule:
+;;   ;;   bspc rule -a 'Emacs:emacs-everywhere' state=floating sticky=on
+;;   (setq emacs-everywhere-frame-name-format "emacs-anywhere")
+;;
+;;   ;; The modeline is not useful to me in the popup window. It looks much nicer
+;;   ;; to hide it.
+;;   (remove-hook 'emacs-everywhere-init-hooks #'hide-mode-line-mode)
+;;
+;;   ;; Semi-center it over the target window, rather than at the cursor position
+;;   ;; (which could be anywhere).
+;;   (defadvice! center-emacs-everywhere-in-origin-window (frame window-info)
+;;     :override #'emacs-everywhere-set-frame-position
+;;     (cl-destructuring-bind (x y width height)
+;;         (emacs-everywhere-window-geometry window-info)
+;;       (set-frame-position frame
+;;                           (+ x (/ width 2) (- (/ width 2)))
+;;                           (+ y (/ height 2))))))
