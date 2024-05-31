@@ -16,6 +16,12 @@
         "command": "vim.showQuickpickCmdLine",
         "when": "inZenMode && vim.mode != 'Insert'"
     },
+    // `nmap ; :` for zen mode
+    // {
+    //     "key": ";",
+    //     "command": "vim.showQuickpickCmdLine",
+    //     "when": "inZenMode && vim.mode != 'Insert'"
+    // },
     {
         "key": "alt+j",
         "command": "editor.action.moveLinesDownAction",
@@ -278,6 +284,7 @@
         "when": "inReferenceSearchEditor && vim.mode == 'Normal' || referenceSearchVisible"
     },
     // hover
+    // first K show hover, second K focus hover
     {
         "command": "editor.action.showHover",
         "key": "shift+k",
@@ -333,34 +340,6 @@
         "key": "shift+g",
         "when": "editorHoverFocused"
     },
-    // TODO inSearchEditor
-    // https://github.com/ravenxrz/dotfiles/blob/a58c20cf867fb8620217d94d5533a73d84d36e7c/vscode/keybindings.json#L62
-    // focus on searching result
-    {
-        "command": "search.action.focusSearchList",
-        "key": "tab",
-        // https://code.visualstudio.com/api/references/when-clause-contexts#visiblefocused-view-when-clause-context
-        // "when": "focusedView == 'workbench.view.search' && !listFocus" // alternative
-        "when": "searchViewletFocus && !listFocus"
-    },
-    // TODO focus on search input box
-    {
-        "command": "search.focus.previousInputBox",
-        "key": "tab",
-        // FIXME when
-        "when": "searchViewletFocus && listFocus"
-    },
-    // find & replace
-    {
-        "key": "cmd+f",
-        "command": "editor.action.startFindReplaceAction",
-        "when": "editorFocus || editorIsOpen"
-    },
-    {
-        "key": "cmd+f",
-        "command": "-actions.find",
-        "when": "editorFocus || editorIsOpen"
-    },
     // with tmux and karabiner-elements
     {
         "key": "ctrl+b",
@@ -386,6 +365,7 @@
         },
         "when": "terminalFocus"
     },
+    // https://github.com/nikitavoloboev/config/blob/master/vscode/keybindings.json
     {
         "key": "cmd+.",
         "command": "workbench.action.terminal.focus",
@@ -402,21 +382,68 @@
         },
         "when": "terminalFocus"
     },
+    {
+        "command": "workbench.action.compareEditor.nextChange",
+        "key": "] ]",
+        "when": "textCompareEditorVisible"
+    },
+    {
+        "command": "workbench.action.compareEditor.previousChange",
+        "key": "[ [",
+        "when": "textCompareEditorVisible"
+    },
+    {
+        "command": "editor.action.marker.next",
+        "key": "] e",
+        "when": "textCompareEditorVisible"
+    },
+    {
+        "command": "editor.action.marker.prev",
+        "key": "[ e",
+        "when": "textCompareEditorVisible"
+    },
+    {
+        "command": "workbench.action.compareEditor.nextChange",
+        "key": "] c",
+        "when": "textCompareEditorVisible"
+    },
+    {
+        "command": "workbench.action.compareEditor.previousChange",
+        "key": "[ c",
+        "when": "textCompareEditorVisible"
+    },
+    // find & replace
+    {
+        "key": "cmd+f",
+        "command": "editor.action.startFindReplaceAction",
+        "when": "editorFocus || editorIsOpen"
+    },
+    {
+        "key": "cmd+f",
+        "command": "-actions.find",
+        "when": "editorFocus || editorIsOpen"
+    },
+    // TODO inSearchEditor
+    // https://github.com/ravenxrz/dotfiles/blob/a58c20cf867fb8620217d94d5533a73d84d36e7c/vscode/keybindings.json#L62
+    // focus on searching result
+    {
+        "command": "search.action.focusSearchList",
+        "key": "tab",
+        // https://code.visualstudio.com/api/references/when-clause-contexts#visiblefocused-view-when-clause-context
+        // "when": "focusedView == 'workbench.view.search' && !listFocus" // alternative
+        "when": "searchViewletFocus && !listFocus"
+    },
+    // TODO focus on search input box
+    {
+        "command": "search.focus.previousInputBox",
+        "key": "tab",
+        // FIXME when
+        "when": "searchViewletFocus && listFocus"
+    },
     // TODO leader 配置到 keybindings.json 中（在 settings.json 中配置的缺点：只有 editorFocus 时才能触发）
     // {
     //     "key": "space l",
     //     "command": "workbench.action.toggleSidebarVisibility",
     //     "when": "vim.active && vim.mode != 'Insert'"
-    // },
-    // https://github.com/nikitavoloboev/config/blob/master/vscode/keybindings.json
-    // {
-    //     "key": "ctrl+;",
-    //     "command": "workbench.action.terminal.focus",
-    //     "when": "!terminalFocus"
-    // },
-    // {
-    //     "key": "ctrl+;",
-    //     "command": "workbench.action.focusActiveEditorGroup",
-    //     "when": "terminalFocus"
     // },
 ]
