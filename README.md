@@ -63,7 +63,7 @@ Using [Glove80](https://www.moergo.com/).
 todo:
 
 1. [ ] try [LazyVim](https://github.com/LazyVim/LazyVim), [Kickstart](https://github.com/nvim-lua/kickstart.nvim), [AstroNvim](https://github.com/AstroNvim/AstroNvim) by [Lazyman](https://github.com/doctorfree/nvim-lazyman), configure them and compare with NvChad.
-2. [ ] find out a set of keybindings that can be used in all apps, especially in browsers. [equivalent mapping configurations for other IDEs VIM integrations](https://github.com/magidc/nvim-config#equivalent-mapping-configurations-for-other-ides-vim-integrations): IdeaVim, VSCodeVim.
+2. [ ] find out a set of keybindings that can be used everywhere, [equivalent mapping configurations for other IDEs VIM integrations](https://github.com/magidc/nvim-config#equivalent-mapping-configurations-for-other-ides-vim-integrations): IdeaVim, VSCodeVim.
 
 tips:
 
