@@ -10,8 +10,6 @@ Head over to [nikitavoloboev](https://github.com/nikitavoloboev)'s ***[personal 
 
 Tracking keyboard input use [WhatPulse](https://whatpulse.org/) to observe.
 
-Using [Glove80](https://www.moergo.com/).
-
 <details>
 <summary><strong>Here are some settings</strong> (click to see)</summary>
 
@@ -53,33 +51,40 @@ Using [Glove80](https://www.moergo.com/).
 
 </details>
 
+Using [Glove80](https://www.moergo.com/) keyboard.
 
 ## [Neovim](https://neovim.io/)
 
-[my neovim config](dot_config/nvim) based on [NvChad](https://github.com/NvChad/NvChad).
+[My neovim config](dot_config/nvim) based on [NvChad](https://github.com/NvChad/NvChad).
 
-> very poor, need to be improved
+> Very poor, need to be improved.
 
-todo:
+TODO:
 
-1. [ ] try [LazyVim](https://github.com/LazyVim/LazyVim), [Kickstart](https://github.com/nvim-lua/kickstart.nvim), [AstroNvim](https://github.com/AstroNvim/AstroNvim) by [Lazyman](https://github.com/doctorfree/nvim-lazyman), configure them and compare with NvChad.
-2. [ ] find out a set of keybindings that can be used everywhere, [equivalent mapping configurations for other IDEs VIM integrations](https://github.com/magidc/nvim-config#equivalent-mapping-configurations-for-other-ides-vim-integrations): IdeaVim, VSCodeVim.
+1. [ ] Try [LazyVim](https://github.com/LazyVim/LazyVim), [Kickstart](https://github.com/nvim-lua/kickstart.nvim), [AstroNvim](https://github.com/AstroNvim/AstroNvim) by [Lazyman](https://github.com/doctorfree/nvim-lazyman), configure them and compare with NvChad.
+2. [ ] Find out a set of keybindings that can be used everywhere, [equivalent mapping configurations for other IDEs VIM integrations](https://github.com/magidc/nvim-config#equivalent-mapping-configurations-for-other-ides-vim-integrations): IdeaVim, VSCodeVim.
 
-tips:
+Tips:
 
-1. remap esc
+1. Remap `esc`.
 
-   - For all keyboard (mainly for Apple Internal Keyboard): remap to **j+k** by karabiner
-   - For Glove80 specifically: remap to **thumb key** by karabiner
-   - In Vim(s): `inoremap jj <esc>` or `inoremap jk <esc>`
+   - For all keyboard (mainly for Apple Internal Keyboard): remap `jk` to `esc` by karabiner.
+   - For Glove80 specifically: remap one of the **thumb keys** to `esc` by karabiner.
+   - In vim(s): `inoremap jj <esc>` or `inoremap jk <esc>`.
 
-2. turn up `Key repeat rate` and turn down `Delay until repeat` in `System Settings -> Keyboard`
+2. Turn up `Key repeat rate` and turn down `Delay until repeat` in `System Settings` -> `Keyboard`.
 
-   see [.macos](backup/.macos)
+   See [.macos](backup/.macos).
 
-3. when leaving insert mode, auto switch to english input source (if using chinese input source)
+3. When leaving insert mode, auto switch to english input source (if necessary).
 
-   - by [Rime](https://rime.im/)'s [vim_mode](https://github.com/rime/home/blob/11bbdb85d2acbb6789433064711b03b4952aa7f5/blog/source/release/squirrel/index.md?plain=1#L256) app option, see [squirrel.custom.yaml](private_Library/Rime/squirrel.custom.yaml)
+   - By [Rime](https://rime.im/)'s [vim_mode](https://github.com/rime/home/blob/11bbdb85d2acbb6789433064711b03b4952aa7f5/blog/source/release/squirrel/index.md?plain=1#L256) app option, see [squirrel.custom.yaml](private_Library/Rime/squirrel.custom.yaml).
+
+4. Remap `shift` (optional).
+
+   - For all keyboard: remap `space` to `shift` by karabiner.
+
+     > Don't worry, the original tap and hold (repeat) functions of `space` are retained.
 
 ## [IdeaVim](https://github.com/JetBrains/ideavim)
 
