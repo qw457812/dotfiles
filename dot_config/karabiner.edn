@@ -20,20 +20,6 @@
 ;; https://github.com/yqrashawn/yqdotfiles/blob/master/modules/yqrashawn/home-manager/dotfiles/karabiner.edn
 ;; https://github.com/yqrashawn/GokuRakuJoudo/blob/master/in-the-wild.md
 
-;; 系统输入法(ABC): 禁用长按键输入特殊字符, 改为按键重复
-;; defaults read NSGlobalDomain ApplePressAndHoldEnabled ---> The domain/default pair of (kCFPreferencesAnyApplication, ApplePressAndHoldEnabled) does not exist
-;; defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
-
-;; 系统设置 ---> 键盘 ---> 键重复速率(最快) / 重复前延迟(最短)
-;; defaults read NSGlobalDomain KeyRepeat ---> 2
-;; defaults read NSGlobalDomain InitialKeyRepeat ---> 15
-;; https://github.com/mathiasbynens/dotfiles/blob/main/.macos
-;; defaults write NSGlobalDomain KeyRepeat -int 1
-;; defaults write NSGlobalDomain InitialKeyRepeat -int 10
-;; https://gist.github.com/mbinna/2357277
-;; defaults write NSGlobalDomain KeyRepeat -int 0.02
-;; defaults write NSGlobalDomain InitialKeyRepeat -int 12
-;; my config
 ;; defaults write NSGlobalDomain KeyRepeat -int 1
 ;; defaults write NSGlobalDomain InitialKeyRepeat -int 12
 {:profiles  {:Goku
@@ -198,6 +184,7 @@
   ;                         :modi    {:optional :caps_lock}}
   }
 
+ ;; TODO glove80 right space + right-hand keys 有点浪费, 比如大写 J 会用 left space + j, 可以用作 launch-mode (hjkl 也可以用作 arrow keys)
  :main
  [{:des   "space mode (shift)"
    :rules [:spacebar-shift-mode
@@ -294,7 +281,8 @@
            [:delete_forward :!Stab :glove80]
            ]}
 
- {:des   "backspace mode for glove80 (shift)"
+  ;; TODO left space + left-hand keys 有点浪费, 比如大写 D 会用 right space + d, 可以用作 launch-mode
+  {:des   "backspace mode for glove80 (shift)"
    :rules [:backspace-shift-mode
            [:1 :!S1]
            [:2 :!S2]
@@ -1393,11 +1381,44 @@
 
   ;; TODO 改为在屏幕上下左右的中心点击一下鼠标
   ;; 组合键使用
-  {:des   "right_command+ijkl to arrow"
+  #_{:des   "right_command+ijkl to arrow"
    :rules [[:!Q##i :up_arrow]
            [:!Q##j :left_arrow]
            [:!Q##k :down_arrow]
            [:!Q##l :right_arrow]]}
+
+  {:des   "right_command with right-hand keys to launch-mode"
+   :rules [[:!Qh [:open "/Applications/企业微信.app"] :!WeWork]
+           [:!Qh :!Ograve_accent_and_tilde :WeWork] ; AltTab.app
+           [:!Qj [:open "/Applications/Brave Browser.app"] :!Brave]
+           [:!Qj :same_wind_app :Brave]
+           [:!Qk [:open "/Applications/kitty.app"] :!Kitty]
+           [:!Qk :same_wind_app :Kitty]
+           [:!Ql [:open "/Applications/Visual Studio Code.app"] :!VSCode]
+           [:!Ql :same_wind_app :VSCode]
+           [:!Qsemicolon [:open "/Library/Application Support/Citrix Receiver/Citrix Viewer.app"]] ; Citrix Workspace.app
+           [:!Qf [:open "/System/Library/CoreServices/Finder.app"] :!Finder]
+           [:!Qf :same_wind_app :Finder]
+           [:!Qe [:open "/Applications/Emacs.app"] :!Emacs]
+           [:!Qe :same_wind_app :Emacs]
+           [:!Qy [:open "$HOME/Applications/PyCharm Community Edition.app"] :!PyCharm]
+           [:!Qy :same_wind_app :PyCharm]
+           [:!Qu [:open "/Applications/Neovide.app"]] ; pronounce
+           [:!Qi [:open "/Applications/IntelliJ IDEA CE.app"] :!IntelliJ]
+           [:!Qi :same_wind_app :IntelliJ]
+           [:!Qo [:open "/Applications/LibreOffice.app"]] ; office
+           [:!Qp [:open "/System/Applications/Preview.app"] :!Preview]
+           [:!Qp :same_wind_app :Preview]
+           [:!Qn [:open "http://127.0.0.1:8080/"] nil {:delayed {:invoked [:escape]} :params {:delay 800}}] ; note
+           [:!Qm [:open "/Applications/Thunderbird.app"] :!Thunderbird] ; email
+           [:!Qm :same_wind_app :Thunderbird]
+           [:!Qspacebar [:open "/Applications/KeePassXC.app"]]
+           [:!Qgrave_accent_and_tilde [:open "/Applications/YesPlayMusic.app"]]
+           [:!Qcomma [:open "/System/Applications/System Settings.app"]] ; cmd+, for setting
+           [:!Qperiod [:open "/System/Applications/Launchpad.app"]] ; 启动台
+           [:!Qopen_bracket [[:open "/Applications/企业微信.app/Contents/Frameworks/wwmapp.app"] :same_wind_app] :!WeWork-Meeting] ; 企业微信•会议
+           [:!Qopen_bracket :same_wind_app :WeWork-Meeting]
+           ]}
 
   #_{:des   "Hold cmd+v for clipboard history by Maccy.app"
    :rules [[:!Cv nil nil {:alone :!Cv :held :!!f7 :repeat false :halt true :params {:alone 200 :held 200}}]]}
@@ -1657,11 +1678,12 @@
            [:slash :!COf] ; Filter Processes
            ]}
 
+  ;; TODO \
   {:des   "For Glove80\n- backspace to space"
    :rules [:glove80
            ;; TODO temp launch-mode
            [:!Wdelete_or_backspace [:open "/Applications/KeePassXC.app"]] ; space
-           [:!Wdelete_forward [:open "/Applications/YesPlayMusic.app"]] ; tab
+           [:!Wescape [:open "/Applications/YesPlayMusic.app"]] ; `
            ;; 企业微信•会议
            [:!Wend [[:open "/Applications/企业微信.app/Contents/Frameworks/wwmapp.app"] :same_wind_app] :!WeWork-Meeting] ; -
            [:!Wend :same_wind_app :WeWork-Meeting]
@@ -1734,14 +1756,14 @@
            ;; TODO launch-mode
            ;; TODO h, j, k, l -> yabai
            ;; TODO a, s, d, g, v
+           [:!Wh [:open "/Applications/企业微信.app"] :!WeWork]
+           [:!Wh :!Ograve_accent_and_tilde :WeWork] ; AltTab.app
            [:!Wj [:open "/Applications/Brave Browser.app"] :!Brave]
            [:!Wj :same_wind_app :Brave]
            [:!Wk [:open "/Applications/kitty.app"] :!Kitty]
            [:!Wk :same_wind_app :Kitty]
            [:!Wl [:open "/Applications/Visual Studio Code.app"] :!VSCode]
            [:!Wl :same_wind_app :VSCode]
-           [:!Wq [:open "/Applications/企业微信.app"] :!WeWork]
-           [:!Wq :!Ograve_accent_and_tilde :WeWork] ; AltTab.app
            [:!Wsemicolon [:open "/Library/Application Support/Citrix Receiver/Citrix Viewer.app"]] ; Citrix Workspace.app
            ; [:!Wquote [:open "/Applications/SwitchHosts.app"]]
            [:!Wa [:open "/System/Applications/Utilities/Activity Monitor.app"]]
