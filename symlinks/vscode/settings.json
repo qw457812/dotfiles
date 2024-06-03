@@ -48,7 +48,17 @@
     // https://github.com/canyonwan/vscode-settings/blob/739ad93d34d52affe03fa18d9d72ee4794aae861/User/History/2276140c/SbTI.json#L179
     "workbench.colorCustomizations": {
         "editorCursor.foreground": "#0095FF",
-        "tab.activeBorder": "#d63864"
+        "tab.activeBorder": "#d63864",
+        // https://stackoverflow.com/questions/35926381/change-highlight-text-color-in-visual-studio-code
+        "editor.selectionBackground": "#e788ff7c", // Currently SELECTED text
+        "editor.selectionHighlightBackground": "#ff00005b", // Same content as selection
+        "editor.findMatchBackground": "#00cc44a8", // Current SEARCH MATCH
+        "editor.findMatchHighlightBackground": "#ff7b00a1", // Other SEARCH MATCHES
+        // https://code.visualstudio.com/api/references/theme-color#editor-colors
+        "editor.wordHighlightBackground": "#8888", // #e788ff7c #8888
+        "editor.wordHighlightStrongBorder": "#FF9800", // #FF9800 #17E5E6
+        // https://github.com/EsIce/highlight-icemode#requirements
+        "editor.wordHighlightStrongBackground": "#00000000", // 透明色
     },
     "terminal.integrated.copyOnSelection": true,
     "terminal.integrated.rightClickBehavior": "paste",
@@ -98,6 +108,16 @@
     "zenMode.hideLineNumbers": true,
     "todo-tree.highlights.useColourScheme": true,
     "maven.settingsFile": "",
+    // https://github.com/oderwat/vscode-indent-rainbow#configuration
+    "indentRainbow.includedLanguages": ["python"],
+    "indentRainbow.indicatorStyle": "light",
+    "indentRainbow.lightIndicatorStyleLineWidth": 1,
+    "indentRainbow.colors": [
+        "rgba(255,255,64,0.3)",
+        "rgba(127,255,127,0.3)",
+        "rgba(255,127,255,0.3)",
+        "rgba(79,236,236,0.3)"
+    ],
     "vim.useSystemClipboard": true,
     "vim.hlsearch": true,
     "vim.visualstar": true,
