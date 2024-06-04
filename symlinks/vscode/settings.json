@@ -45,18 +45,21 @@
     "workbench.editor.enablePreview": false,
     "workbench.editor.tabActionCloseVisibility": false,
     "workbench.editor.highlightModifiedTabs": true,
-    // https://github.com/canyonwan/vscode-settings/blob/739ad93d34d52affe03fa18d9d72ee4794aae861/User/History/2276140c/SbTI.json#L179
+    // https://code.visualstudio.com/api/references/theme-color
     "workbench.colorCustomizations": {
-        "editorCursor.foreground": "#0095FF",
-        "tab.activeBorder": "#d63864",
+        // https://github.com/canyonwan/vscode-settings/blob/739ad93d34d52affe03fa18d9d72ee4794aae861/User/History/2276140c/SbTI.json#L180
+        // "editorCursor.foreground": "#F8F8F0", // #0095FF #F8F8F0
+        "tab.activeBorder": "#40d4e7", // #49e9a6 #40d4e7 #80CBC4 #ffd866 #cba6f7
+        "tab.activeBorderTop": "#00000000", // 透明色
+        "tab.activeModifiedBorder": "#e61c58",
+        // "tab.inactiveModifiedBorder": "#e61c58",
         // https://stackoverflow.com/questions/35926381/change-highlight-text-color-in-visual-studio-code
         "editor.selectionBackground": "#e788ff7c", // Currently SELECTED text
         "editor.selectionHighlightBackground": "#ff00005b", // Same content as selection
         "editor.findMatchBackground": "#00cc44a8", // Current SEARCH MATCH
         "editor.findMatchHighlightBackground": "#ff7b00a1", // Other SEARCH MATCHES
-        // https://code.visualstudio.com/api/references/theme-color#editor-colors
         "editor.wordHighlightBackground": "#8888", // #e788ff7c #8888
-        "editor.wordHighlightStrongBorder": "#FF9800", // #FF9800 #17E5E6
+        "editor.wordHighlightStrongBorder": "#cccccc", // #FF9800 #17E5E6 #cccccc #b7b7b7
         // https://github.com/EsIce/highlight-icemode#requirements
         "editor.wordHighlightStrongBackground": "#00000000", // 透明色
     },
