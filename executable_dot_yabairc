@@ -69,7 +69,7 @@ yabai -m rule --add app="^Emacs$" title="^(Emacs Everywhere|edit - )" manage=off
 
 # TODO not work if: open Filder (no visible window of Filder before) -> cmd+f -> cmd+w -> cmd+w
 # If no window is focused after a window is destroyed or minimized, focus the window under the cursor
-# usefull when close Finder.app's last window
+# useful when close Finder.app's last window
 # https://github.com/z20240/yabai/blob/master/scripts/windowFocusOnDestroy.sh
 # https://github.com/koekeishiya/yabai/issues/485#issuecomment-617953545
 # https://github.com/koekeishiya/dotfiles/blob/master/yabai/yabairc
