@@ -6,9 +6,7 @@
 
 Hack keyboard use [Karabiner](https://github.com/pqrs-org/Karabiner-Elements), and maintain ***[my karabiner config](dot_config/karabiner.edn)*** with Goku.
 
-Head over to [nikitavoloboev](https://github.com/nikitavoloboev)'s ***[personal wiki](https://wiki.nikiv.dev/macOS/apps/karabiner/)*** to learn more about karabiner and goku.
-
-Tracking keyboard input use [WhatPulse](https://whatpulse.org/) to observe.
+> Head over to [nikitavoloboev](https://github.com/nikitavoloboev)'s ***[personal wiki](https://wiki.nikiv.dev/macOS/apps/karabiner/)*** to learn more about karabiner and goku.
 
 <details>
 <summary><strong>Here are some settings</strong> (click to see)</summary>
@@ -52,6 +50,8 @@ Tracking keyboard input use [WhatPulse](https://whatpulse.org/) to observe.
 </details>
 
 Using [Glove80](https://www.moergo.com/) keyboard.
+
+Using [WhatPulse](https://whatpulse.org/) to track keyboard input.
 
 ## [Neovim](https://neovim.io/)
 
@@ -116,7 +116,7 @@ Using [Emacs Plus](https://github.com/d12frosted/homebrew-emacs-plus).
 
 ## [rime-ice](https://github.com/iDvel/rime-ice)
 
-[my rime config](private_Library/Rime) for Chinese input based on rime-ice and powered by [TigerCode](https://tiger-code.com/).
+[My rime config](private_Library/Rime) for Chinese input based on rime-ice and powered by [TigerCode](https://tiger-code.com/).
 
 Using [KeyboardHolder](https://keyboardholder.leavesc.com/zh-cn/) to keep [Squirrel](https://github.com/rime/squirrel) as the only input source on macOS, instead of ABC.
 

@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# https://github.com/microsoft/vscode/issues/115560#issuecomment-861486217
+# https://github.com/shellicar/dotfiles/blob/main/.tmux-shell
+# https://medium.com/@jeanmark.wright/making-vs-code-and-tmux-awesome-9938081b9c25
+# https://gist.github.com/jaywhy13/4f3c05b15117ad9012a9ffade7789176
+
+# exec tmux new-session -A -s "vscode $PWD"
+
+WORKSPACE_FOLDER="${1:-$PWD}"
+
+if [[ "$WORKSPACE_FOLDER" == "\${workspaceFolder}" ]]; then
+  # non workspace
+  WORKSPACE_FOLDER="~"
+elif [[ "$WORKSPACE_FOLDER" == "${HOME%/}/"* ]]; then
+  # replace $HOME with ~ if start with $HOME/
+  # https://stackoverflow.com/questions/13210880/replace-one-substring-for-another-string-in-shell-script
+  WORKSPACE_FOLDER="${WORKSPACE_FOLDER/#$HOME/~}"
+  # WORKSPACE_FOLDER=$(echo "$WORKSPACE_FOLDER" | sed "s#$HOME#~#")
+  # https://unix.stackexchange.com/questions/706227/how-can-i-use-the-sed-command-to-replace-home-user-with
+  # WORKSPACE_FOLDER=$(printf '~%s\n' "${WORKSPACE_FOLDER#"${HOME%/}"}")
+fi
+
+# $(basename $WORKSPACE_FOLDER)
+# ${WORKSPACE_FOLDER##*/}
+
+exec tmux new-session -A -s "vscode $WORKSPACE_FOLDER"
+

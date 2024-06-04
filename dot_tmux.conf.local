@@ -432,6 +432,8 @@ bind Space copy-mode
 # select next layout
 bind Enter next-layout
 
+# TODO https://github.com/samoshkin/tmux-config#key-bindings
+
 
 # -- tpm -----------------------------------------------------------------------
 
@@ -472,6 +474,11 @@ tmux_conf_uninstall_plugins_on_reload=true
 #set -g @plugin 'tmux-plugins/tmux-cpu'
 set -g @plugin 'MunifTanjim/tmux-suspend'
 set -g @plugin 'MunifTanjim/tmux-mode-indicator'
+set -g @plugin 'tmux-plugins/tmux-sidebar'
+set -g @sidebar-tree-command 'tree -C'
+set -g @plugin 'tmux-plugins/tmux-open'
+set -g @open 'O'
+set -g @open-S 'https://www.google.com/search?q='
 set -g @plugin 'tmux-plugins/tmux-resurrect'
 # https://github.com/tmux-plugins/tmux-continuum#known-issues
 set -g @plugin 'tmux-plugins/tmux-continuum'

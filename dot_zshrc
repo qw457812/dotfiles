@@ -219,6 +219,7 @@ if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -
 
 alias v='nvim'
 alias vi="vim"
+alias view="nvim -R"
 # alias n="nvim"
 alias lv='lvim'
 alias rr="ranger"

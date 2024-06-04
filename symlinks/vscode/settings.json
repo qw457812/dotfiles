@@ -40,6 +40,7 @@
         "editor.defaultFormatter": "ms-python.black-formatter"
         // "editor.defaultFormatter": "charliermarsh.ruff"
     },
+    "workbench.startupEditor": "newUntitledFile",
     // TODO what is this?
     // "python.analysis.autoImportCompletions": true,
     "workbench.editor.enablePreview": false,
@@ -72,8 +73,8 @@
     // https://github.com/axonasif/dotsh/blob/159d7b6ed19f6ede0e8d2d439ade3d5827bd757b/src/config/shell/mod.sh#L170
     // `terminal.integrated.env.osx` + .zshrc | https://github.com/rwblickhan/astro-rwblickhan.org/blob/21f1953371f3b1e4ef6b14635d36d12d53b4c8ef/src/content/tilTechnical/20230820-tmux-in-vscode.md
     // alternative: set `ZSH_TMUX_AUTOSTART=true` for vscode in .zshrc, then comment out `terminal.integrated.defaultProfile.osx` below
-    "python.terminal.activateEnvironment": false, // avoid creating unnecessary tmux sessions
-    "terminal.integrated.defaultProfile.osx": "my-tmux",
+    "python.terminal.activateEnvironment": false, // not work with tmux anyway
+    "terminal.integrated.defaultProfile.osx": "vscode-tmux",
     "terminal.integrated.profiles.osx": {
         "zsh (login)": {
             "path": "zsh",
@@ -81,17 +82,24 @@
                 "-l"
             ]
         },
-        "my-tmux": {
-            "path": "tmux",
+        // problem: creating too many unnecessary tmux sessions
+        // "my-tmux": {
+        //     "path": "/opt/homebrew/bin/tmux",
+        //     "args": [
+        //         "new-session",
+        //         "-A",
+        //         "-s",
+        //         "vscode:${workspaceFolder}"
+        //     ],
+        //     "icon": "terminal-tmux"
+        // },
+        "vscode-tmux": {
+            "path": "${userHome}/.local/bin/vscode-tmux",
             "args": [
-                "new-session",
-                "-A",
-                "-s",
-                // TODO replace $HOME with ~ | https://github.com/microsoft/vscode/issues/115560#issuecomment-861486217
-                "vscode:${workspaceFolder}"
+                "${workspaceFolder}"
             ],
             "icon": "terminal-tmux"
-        },
+        }
     },
     "extensions.experimental.affinity": {
         // VSCodeVim is too slow! To improve performance | https://github.com/microsoft/vscode/issues/75627#issuecomment-1078827311
