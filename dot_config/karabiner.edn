@@ -222,7 +222,8 @@
            [:j :!Sj]
            [:k :!Sk]
            [:l :!Sl]
-           [:semicolon :!Ssemicolon]
+           ; [:semicolon :!Ssemicolon]
+           [:semicolon :semicolon] ; see "swap : and ;" below
            [:quote :!Squote]
            [:z :!Sz]
            [:x :!Sx]
@@ -318,7 +319,8 @@
            [:j :!Sj]
            [:k :!Sk]
            [:l :!Sl]
-           [:semicolon :!Ssemicolon]
+           ; [:semicolon :!Ssemicolon]
+           [:semicolon :semicolon] ; see "swap : and ;" below
            [:quote :!Squote]
            [:z :!Sz]
            [:x :!Sx]
@@ -1529,20 +1531,20 @@
   ;; doomemacs: toggle-input-method (C-\) | https://github.com/DogLooksGood/emacs-rime
   ;; {:des   "left shift alone -> switch rime's english/chinese input"
   ;;  :rules [[:left_shift :left_shift :Emacs {:alone [:left_shift :!Tbackslash]}]]}
-  {:des   "left shift alone -> switch rime's english/chinese input"
+  #_{:des   "left shift alone -> switch rime's english/chinese input"
    :rules [[:left_shift :left_shift [:Emacs :!glove80] {:alone [:left_shift :!Tbackslash]}]]}
 
   ;; TODO alone 修饰键 right_shift(状态开关 类似caps_lock 开关vi模式)
   ;; TODO noti like command-q
   ;; {:des   "right shift alone -> caps_lock (see \"caps_lock layer: vi mode\" below)"
   ;;  :rules [[:#Pright_shift :right_shift nil {:alone [:caps_lock]}]]}
-  {:des   "right shift alone -> caps_lock (see \"caps_lock layer: vi mode\" below)"
+  #_{:des   "right shift alone -> caps_lock (see \"caps_lock layer: vi mode\" below)"
    :rules [[:#Pright_shift :right_shift :!glove80 {:alone [:caps_lock]}]]}
 
 ;; ------------------------------ Fundamental ------------------------------
 ;; WARN: the order of rules matters, see "space to shift" below
 
-  {:des   "caps_lock layer: vi mode"
+  #_{:des   "caps_lock layer: vi mode"
    :rules [[:!P#Sj :!Pdown_arrow]
            [:!P#Sk :!Pup_arrow]
            [:!P#Sh :!Pleft_arrow]
@@ -1665,6 +1667,7 @@
            [:equal_sign :!Cequal_sign] ; Zoom In
            [:hyphen :!Chyphen] ; Zoom Out
            [:!Rw :!C0] ; Actual Size (doomemacs pdf-view-fit-width-to-window)
+           [:!Sw :!C0] ; Actual Size
            [:w :!C0] ; Actual Size
            [:!Sh :!C9] ; Zoom to Fit (doomemacs pdf-view-fit-height-to-window)
            [:!Sp :!C9] ; Zoom to Fit (doomemacs pdf-view-fit-page-to-window)
@@ -2067,7 +2070,7 @@
            [:!Sleft_shift :spacebar]]}
 
   ;; swap 后 shift+; 会触发鼠须管 shift 切换中英文
-  #_{:des   "swap : and ;"
+  {:des   "swap : and ;"
    :rules [[:#Psemicolon :!Ssemicolon]
            [:!Ssemicolon :semicolon]]}
 

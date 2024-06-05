@@ -678,7 +678,7 @@ nnoremap ,= q=
 nnoremap ,? q?
 
 " Single stroke to access command line | https://wiki.archlinux.org/title/Vifm
-nmap ; :
+" nmap ; :
 
 " https://github.com/kyoheiu/felix#key-manual
 " https://wiki.vifm.info/index.php/Creating_directories_and_files_with_a_single_command
