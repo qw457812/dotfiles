@@ -70,11 +70,16 @@ patch:
   # ↓emoji表情滤镜
   emoji_cn/opencc_config: emoji_cn.json
 
+  # 取消分号引导的快符功能（分号不作码元）
+  # 让【 】可以直接上屏（对应的重复上屏的功能也没了）
+  speller/alphabet: "'zyxwvutsrqponmlkjihgfedcba"
+
   switches: # 0 默认关，1 默认开
     - name: ascii_mode
       # reset: 0
       reset: 1
-      states: [ 中文, 西文 ]  #中英文状态
+      # states: [ 中文, 西文 ]  #中英文状态
+      states: [ 中, A ]  #中英文状态
     - name: extended_char  #自定义字集
       reset: 1
       states: [ 全字集 , 常用字 ]
@@ -183,6 +188,11 @@ patch:
       #- { accept: space, send: space, when: has_menu } # 有候选时空格上屏首选
       #- { accept: space, send: Escape, when: composing } # 无候选(空码）时空格清屏编码
       - { accept: semicolon, send: 2, when: has_menu } # 分号次选
+      # swap : and ; by karabiner
+      # TODO not work
+      # https://github.com/LEOYoon-Tsaw/Rime_collections/blob/7cf820fa117025872c5878774b39627a3fb1c1cf/Rime%E6%96%B9%E6%A1%88%E8%A3%BD%E4%BD%9C%E8%A9%B3%E8%A7%A3.html#L761
+      # - { accept: colon, send: 2, when: has_menu } # 冒号次选
+      # - { accept: "Shift+semicolon", send: 2, when: has_menu } # 冒号次选
       - { when: has_menu, accept: apostrophe, send: 3 } # 引号三选
       - { when: composing, accept: Tab, send: Escape } # tab清屏
       - { when: has_menu, accept: minus, send: Page_Up } # - 向后翻页
@@ -231,8 +241,8 @@ patch:
   style/spacing: 12 # 拼音与候选项之间的距离 （inline_preedit: false）
   # 鼠须管盲打，嵌入首选
   # style/alpha: 0.0001 # 隐藏候选框只需将alpha设为0.00001即可 | https://github.com/rime/squirrel/issues/576
-  style/alpha: 0 # https://github.com/rime/squirrel/releases/tag/0.18
-  style/inline_candidate: true # https://github.com/rime/squirrel/pull/577
+  # style/alpha: 0 # https://github.com/rime/squirrel/releases/tag/0.18
+  # style/inline_candidate: true # https://github.com/rime/squirrel/pull/577
 
 # ------------------------------------------------------------------------------------------
 # 虎码秃版 鼠须管 （Mac）2023.10.22.zip (18.0MB) | 鼠须管（推荐） | ④Mac | 03 虎码输入法下载 | http://huma.ysepan.com/
