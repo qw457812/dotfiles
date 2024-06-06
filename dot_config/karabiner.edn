@@ -1684,11 +1684,11 @@
   ;; TODO \
   {:des   "For Glove80\n- backspace to space"
    :rules [:glove80
-           ;; TODO temp launch-mode
-           [:!Wdelete_or_backspace [:open "/Applications/KeePassXC.app"]] ; space
-           [:!Wescape [:open "/Applications/YesPlayMusic.app"]] ; `
+           ;; launch-mode before remap
+           [:!Wdelete_or_backspace [:left_command [:open "/Applications/KeePassXC.app"]]] ; space
+           [:!Wescape [:left_command [:open "/Applications/YesPlayMusic.app"]]] ; `
            ;; 企业微信•会议
-           [:!Wend [[:open "/Applications/企业微信.app/Contents/Frameworks/wwmapp.app"] :same_wind_app] :!WeWork-Meeting] ; -
+           [:!Wend [:left_command [:open "/Applications/企业微信.app/Contents/Frameworks/wwmapp.app"] :same_wind_app] :!WeWork-Meeting] ; -
            [:!Wend :same_wind_app :WeWork-Meeting]
 
            ;; TODO delete cmd-c cmd-v rime ` = \ [ ]
@@ -1759,47 +1759,52 @@
            ;; TODO launch-mode
            ;; TODO h, j, k, l -> yabai
            ;; TODO a, s, d, g, v
-           [:!Wh [:open "/Applications/企业微信.app"] :!WeWork]
-           [:!Wh :!Ograve_accent_and_tilde :WeWork] ; AltTab.app
-           [:!Wj [:open "/Applications/Brave Browser.app"] :!Brave]
+           ;; Add a left_command to avoid toggle rime's ascii_mode for frontmost application
+           ;; (:!Wx will send a right_control, leave it alone will toggle rime's ascii_mode.
+           ;; Add a left_command, like [:!Wx :same_wind_app :App],
+           ;; will send right_control + left_command, which will not toggle rime's ascii_mode.)
+           [:!Wh [:left_command [:open "/Applications/企业微信.app"]] :!WeWork]
+           ; [:!Wh :!Ograve_accent_and_tilde :WeWork] ; AltTab.app (toggle rime's ascii_mode accidentally)
+           [:!Wh :same_wind_app :WeWork]
+           [:!Wj [:left_command [:open "/Applications/Brave Browser.app"]] :!Brave]
            [:!Wj :same_wind_app :Brave]
-           [:!Wk [:open "/Applications/kitty.app"] :!Kitty]
+           [:!Wk [:left_command [:open "/Applications/kitty.app"]] :!Kitty]
            [:!Wk :same_wind_app :Kitty]
-           [:!Wl [:open "/Applications/Visual Studio Code.app"] :!VSCode]
+           [:!Wl [:left_command [:open "/Applications/Visual Studio Code.app"]] :!VSCode]
            [:!Wl :same_wind_app :VSCode]
-           [:!Wsemicolon [:open "/Library/Application Support/Citrix Receiver/Citrix Viewer.app"]] ; Citrix Workspace.app
+           [:!Wsemicolon [:left_command [:open "/Library/Application Support/Citrix Receiver/Citrix Viewer.app"]]] ; Citrix Workspace.app
            ; [:!Wquote [:open "/Applications/SwitchHosts.app"]]
-           [:!Wa [:open "/System/Applications/Utilities/Activity Monitor.app"]]
-           [:!Ws [:open "/Applications/Spotify.app"]]
-           [:!Wd [:open "/Applications/DBeaver.app"]]
-           [:!Wf [:open "/System/Library/CoreServices/Finder.app"] :!Finder]
+           [:!Wa [:left_command [:open "/System/Applications/Utilities/Activity Monitor.app"]]]
+           [:!Ws [:left_command [:open "/Applications/spotube.app"]]]
+           [:!Wd [:left_command [:open "/Applications/DBeaver.app"]]]
+           [:!Wf [:left_command [:open "/System/Library/CoreServices/Finder.app"]] :!Finder]
            [:!Wf :same_wind_app :Finder]
            ; [:!Wg [:open "/Applications/ChatGPT.app"] :!ChatGPT]
            ; [:!Wg :same_wind_app :ChatGPT]
            ;; pin https://chatgpt.com/ to first tab
-           [:!Wg [:open "/Applications/Brave Browser.app"] nil {:delayed {:invoked [:!C1 :!CSo :!Cr]} :params {:delay 800}}]
-           [:!We [:open "/Applications/Emacs.app"] :!Emacs]
+           [:!Wg [:left_command [:open "/Applications/Brave Browser.app"]] nil {:delayed {:invoked [:!C1 :!CSo :!Cr]} :params {:delay 800}}]
+           [:!We [:left_command [:open "/Applications/Emacs.app"]] :!Emacs]
            [:!We :same_wind_app :Emacs]
-           [:!Wr [:open "/Applications/Safari.app"] :!Safari]
+           [:!Wr [:left_command [:open "/Applications/Safari.app"]] :!Safari]
            [:!Wr :same_wind_app :Safari]
-           [:!Wt [:open "/Applications/iTerm.app"] :!iTerm]
+           [:!Wt [:left_command [:open "/Applications/iTerm.app"]] :!iTerm]
            [:!Wt :same_wind_app :iTerm]
-           [:!Wy [:open "$HOME/Applications/PyCharm Community Edition.app"] :!PyCharm]
+           [:!Wy [:left_command [:open "$HOME/Applications/PyCharm Community Edition.app"]] :!PyCharm]
            [:!Wy :same_wind_app :PyCharm]
-           [:!Wu [:open "/Applications/Neovide.app"]] ; pronounce
-           [:!Wi [:open "/Applications/IntelliJ IDEA CE.app"] :!IntelliJ]
+           [:!Wu [:left_command [:open "/Applications/Neovide.app"]]] ; pronounce
+           [:!Wi [:left_command [:open "/Applications/IntelliJ IDEA CE.app"]] :!IntelliJ]
            [:!Wi :same_wind_app :IntelliJ]
            ; [:!Wo [:open "/Applications/wpsoffice.app"]] ; office
-           [:!Wo [:open "/Applications/LibreOffice.app"]] ; office
-           [:!Wp [:open "/System/Applications/Preview.app"] :!Preview]
+           [:!Wo [:left_command [:open "/Applications/LibreOffice.app"]]] ; office
+           [:!Wp [:left_command [:open "/System/Applications/Preview.app"]] :!Preview]
            [:!Wp :same_wind_app :Preview]
-           [:!Wv [:open "/Applications/Karabiner-EventViewer.app"]]
-           [:!Wb [:open "/Applications/JetBrains Toolbox.app"]]
-           [:!Wn [:open "http://127.0.0.1:8080/"] nil {:delayed {:invoked [:escape]} :params {:delay 800}}] ; note
-           [:!Wm [:open "/Applications/Thunderbird.app"] :!Thunderbird] ; email
+           [:!Wv [:left_command [:open "/Applications/Karabiner-EventViewer.app"]]]
+           [:!Wb [:left_command [:open "/Applications/JetBrains Toolbox.app"]]]
+           [:!Wn [:left_command [:open "http://127.0.0.1:8080/"]] nil {:delayed {:invoked [:escape]} :params {:delay 800}}] ; note
+           [:!Wm [:left_command [:open "/Applications/Thunderbird.app"]] :!Thunderbird] ; email
            [:!Wm :same_wind_app :Thunderbird]
-           [:!Wcomma [:open "/System/Applications/System Settings.app"]] ; cmd+, for setting
-           [:!Wperiod [:open "/System/Applications/Launchpad.app"]] ; 启动台
+           [:!Wcomma [:left_command [:open "/System/Applications/System Settings.app"]]] ; cmd+, for setting
+           [:!Wperiod [:left_command [:open "/System/Applications/Launchpad.app"]]] ; 启动台
            ; [:!Wslash [:open "/Applications/WhatPulse/WhatPulse.app"]]
            ; [:!Wx [:open "/Applications/WeChat.app"]]
 
