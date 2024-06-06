@@ -63,9 +63,10 @@
         "editor.wordHighlightStrongBorder": "#cccccc" // #FF9800 #17E5E6 #cccccc #b7b7b7
     },
     // "workbench.colorTheme": "One Dark Pro",
+    "terminal.integrated.fontFamily": "MesloLGM Nerd Font", // JetBrainsMono Nerd Font, Hack Nerd Font, MesloLGM Nerd Font, MesloLGS Nerd Font Mono
     "terminal.integrated.copyOnSelection": true,
     "terminal.integrated.rightClickBehavior": "paste",
-    "terminal.integrated.fontFamily": "MesloLGM Nerd Font", // JetBrainsMono Nerd Font, Hack Nerd Font, MesloLGM Nerd Font, MesloLGS Nerd Font Mono
+    "terminal.integrated.focusAfterRun": "terminal",
     // TODO activate python virtual environment in tmux new session
     // https://github.com/microsoft/vscode-python/issues/22289
     // https://github.com/halafi/filiphalas.com/blob/168b1e501652ceb388b370ef54f92b6793c3080d/articles/keyboard-controlled-vscode-with-vim-and-tmux.md
@@ -279,7 +280,7 @@
             "silent": true
         },
         {
-            "before": ["leader", ";"],
+            "before": ["leader", ":"],
             "commands": [
                 "workbench.action.showCommands",
             ],
@@ -873,7 +874,7 @@
             ]
         },
         {
-            "before": ["leader", ";"],
+            "before": ["leader", ":"],
             "commands": [
                 "workbench.action.showCommands",
             ],
