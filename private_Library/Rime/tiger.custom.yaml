@@ -156,8 +156,11 @@ patch:
       - history_translator@historySJ # 重复上屏 手机
       # - lua_translator@number_translator # 数字转大写
       - lua_translator@*number # 数字转大写
+      # https://github.com/hchunhui/librime-lua/wiki/Scripting#%E6%96%B0%E7%89%88-librime-lua
+      # 避免在 rime.lua 中增加 `calculator_translator = require("calculator_translator")`
       # - lua_translator@calculator_translator # 简易计算器
-      - lua_translator@*calculator_translator # 简易计算器
+      # 禁用计算器（= 号） | lua/calculator_translator.lua
+      # - lua_translator@*calculator_translator # 简易计算器
       # - lua_translator@shijian2_translator # 高级时间
       - lua_translator@*shijian2 # 高级时间
 
@@ -189,10 +192,11 @@ patch:
       #- { accept: space, send: Escape, when: composing } # 无候选(空码）时空格清屏编码
       - { accept: semicolon, send: 2, when: has_menu } # 分号次选
       # swap : and ; by karabiner
-      # TODO not work
-      # https://github.com/LEOYoon-Tsaw/Rime_collections/blob/7cf820fa117025872c5878774b39627a3fb1c1cf/Rime%E6%96%B9%E6%A1%88%E8%A3%BD%E4%BD%9C%E8%A9%B3%E8%A7%A3.html#L761
+      # https://github.com/LEOYoon-Tsaw/Rime_collections/blob/master/Rime_description.md#%E5%85%AB%E5%85%B6%E5%AE%83
+      # `colon` or `"Shift+semicolon"` not work, but `"Shift+semicolon"` works
       # - { accept: colon, send: 2, when: has_menu } # 冒号次选
       # - { accept: "Shift+semicolon", send: 2, when: has_menu } # 冒号次选
+      - { accept: "Shift+colon", send: 2, when: has_menu } # 冒号次选
       - { when: has_menu, accept: apostrophe, send: 3 } # 引号三选
       - { when: composing, accept: Tab, send: Escape } # tab清屏
       - { when: has_menu, accept: minus, send: Page_Up } # - 向后翻页
@@ -224,6 +228,22 @@ patch:
       # - { when: always, accept: "Shift+space" , toggle: full_shape } # 全半角切换
       # 在最近的两个方案之间切换
       - { when: always, accept: Control+Shift+bracketleft, select: .next }
+
+  recognizer:
+    import_preset: default
+    patterns:
+      punct: "^/([0-9]0?|[A-Za-z]+)$"
+      # uppercase: "" #中文状态大写锁定直接上屏
+      reverse_lookup: "^`[a-z]*'?$"
+      easy_english: "^'[A-Z|a-z]*`?$"
+      # 禁用计算器（= 号） | lua/calculator_translator.lua
+      # expression: "^=.*$"
+
+  # 禁用扩展符号
+  # punctuator:
+  #   import_preset: symbols
+  # punctuator: {}
+  # TODO 禁用扩展符号后无法输出中文小括号，应该修改扩展符号，如去掉=号的其它选项
 
   # 虎码秃版\ 鼠须管\ （Mac）/squirrel.custom.yaml
   style/comment_font_face: "Consolas, Apple Color Emoji, TumanPUA, LXGW WenKai GB Screen R, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16" # 注字体及大小
