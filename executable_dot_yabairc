@@ -65,6 +65,8 @@ done
 
 # https://github.com/yqrashawn/yqdotfiles/blob/master/modules/yqrashawn/home-manager/dotfiles/yabai/rules
 yabai -m rule --add app="^Emacs$" title="^(Emacs Everywhere|edit - )" manage=off
+yabai -m rule --add app="^System Settings$" manage=off
+yabai -m rule --add app="^Raycast$" manage=off
 # yabai -m rule --add app="^KeePassXC$" title="^(Unlock Database - )" manage=off
 
 # TODO not work if: open Filder (no visible window of Filder before) -> cmd+f -> cmd+w -> cmd+w
