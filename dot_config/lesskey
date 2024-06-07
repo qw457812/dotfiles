@@ -1,0 +1,26 @@
+# https://github.com/infokiller/config-public/blob/939e5c3735762ba15c298d8ce37a1b48461d2e72/.config/lesskey
+# https://github.com/chrisgrieser/.config/blob/2926ac0071d947ccb5e9be876bed38b3534349ab/less/lesskey
+# https://github.com/jamesrayman/dotfiles/blob/7495d797b84b329831eb2b13cff18b4c87f76700/.config/less/lesskey
+
+#command
+h left-scroll
+l right-scroll
+# t next-tag
+t toggle-option
+# T prev-tag
+# T invalid
+# i toggle-option --ignore-case\n
+i toggle-option i
+w toggle-option S
+, toggle-option N
+f filter
+^N next-file
+^P prev-file
+^L clear-search
+# map `esc` to `nohlsearch`
+# \e undo-hilite
+
+#env
+# do this in `~/.zshrc` file
+# LESS = --RAW-CONTROL-CHARS --ignore-case --LONG-PROMPT --chop-long-lines --incsearch --use-color
+

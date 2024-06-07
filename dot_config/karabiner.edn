@@ -64,7 +64,9 @@
              ;; https://github.com/koekeishiya/dotfiles/blob/master/yabai/yabairc
              ;; :prev_app                {:shell "export PATH=/opt/homebrew/bin:$PATH yabai -m window --focus recent &> /dev/null || (id=$(yabai -m query --windows --space | jq '.[1].id') && yabai -m window --focus $id &> /dev/null) || open -g hammerspoon://cmdTab &> /dev/null"}
              ;; TODO use cmd+2 in ActivityMonitor.app, then this will not work
-             :prev_app                {:shell "export PATH=/opt/homebrew/bin:$PATH yabai -m window --focus recent &> /dev/null || yabai -m window --focus $(yabai -m query --windows --space | jq '.[1].id') &> /dev/null || open -g hammerspoon://cmdTab &> /dev/null"}
+             ;; TODO 多桌面时 `yabai -m query --windows --space | jq '.[1].id'` 需要排除当前窗口
+             ; :prev_app                {:shell "/opt/homebrew/bin/yabai -m window --focus recent &> /dev/null || /opt/homebrew/bin/yabai -m window --focus $(/opt/homebrew/bin/yabai -m query --windows --space | /opt/homebrew/bin/jq '.[1].id') &> /dev/null || open -g hammerspoon://cmdTab &> /dev/null"}
+             :prev_app                {:shell "/opt/homebrew/bin/yabai -m window --focus recent || open -g hammerspoon://cmdTab"}
              :home_dir                [{:key  :grave_accent_and_tilde
                                         :modi [:left_shift]
                                         :lazy true} {:key :slash}]
@@ -1533,6 +1535,8 @@
   ;;  :rules [[:left_shift :left_shift :Emacs {:alone [:left_shift :!Tbackslash]}]]}
   #_{:des   "left shift alone -> switch rime's english/chinese input"
    :rules [[:left_shift :left_shift [:Emacs :!glove80] {:alone [:left_shift :!Tbackslash]}]]}
+  {:des   "left shift alone -> copy"
+   :rules [[:left_shift :left_shift :!glove80 {:alone :!Cc}]]}
 
   ;; TODO alone 修饰键 right_shift(状态开关 类似caps_lock 开关vi模式)
   ;; TODO noti like command-q
@@ -1655,15 +1659,21 @@
            [:k :up_arrow]
            [:h :left_arrow]
            [:l :right_arrow]
-           ;; page_up/page_down not work
+           ;; page_up/page_down not work, use arrow + scroll
            [:u [:up_arrow :up_arrow :up_arrow :up_arrow :up_arrow
                 :up_arrow :up_arrow :up_arrow :up_arrow :up_arrow
                 :up_arrow :up_arrow :up_arrow :up_arrow :up_arrow
-                :up_arrow :up_arrow :up_arrow :up_arrow :up_arrow]]
+                {:mkey {:vwheel 32}}]]
+           ;; scroll down's delay is higher than scroll up
            [:d [:down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
                 :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
                 :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
-                :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow]]
+                :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
+                :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
+                :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
+                :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
+                :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
+                {:mkey {:vwheel -32}}]]
            [:equal_sign :!Cequal_sign] ; Zoom In
            [:hyphen :!Chyphen] ; Zoom Out
            [:!Rw :!C0] ; Actual Size (doomemacs pdf-view-fit-width-to-window)
@@ -1674,6 +1684,7 @@
            [:p :!C9] ; Zoom to Fit
            [:0 :!C9] ; Zoom to Fit (doomemacs pdf-view-scale-reset)
            [:q :!Cq] ; Quit
+           [:x :!Cw] ; Close Window
            ]}
 
   {:des   "Activity Monitor: / -> filter"
@@ -1710,7 +1721,7 @@
            [:##home :equal_sign :Preview {:alone :!Cequal_sign}] ; Zoom In, see "Preview: doomemacs like keybindings" above
            [:##end :hyphen :Preview {:alone :!Chyphen}] ; Zoom Out, see "Preview: doomemacs like keybindings" above
            [:##escape :grave_accent_and_tilde]
-           [:##grave_accent_and_tilde :left_shift]
+           [:##grave_accent_and_tilde :left_shift nil {:alone :!Cc}] ; see "left shift alone" above
 
            ;; [:##left_control :left_control nil {:alone :tab}]
            [:##left_control :left_control nil {:alone :prev_app}]
