@@ -179,9 +179,10 @@ export LANG=en_US.UTF-8
 # --status-column --status-col-width=1
 # --underline-special
 # --tabs=4
-# export LESS='--RAW-CONTROL-CHARS --ignore-case --LONG-PROMPT --chop-long-lines --incsearch --color=d+b$ --color=s+y$ --color=u+g$'
+# --shift=10
+# --color=d+b$ --color=s+y$ --color=u+g$ (--use-color not required)
 # https://explainshell.com/explain?cmd=less+-RiMS
-export LESS='--RAW-CONTROL-CHARS --ignore-case --LONG-PROMPT --chop-long-lines --incsearch --use-color'
+export LESS='--RAW-CONTROL-CHARS --ignore-case --LONG-PROMPT --chop-long-lines --incsearch --use-color --intr=c$ --save-marks --status-line'
 
 # brew info lesspipe
 export LESSOPEN="|/opt/homebrew/bin/lesspipe.sh %s"

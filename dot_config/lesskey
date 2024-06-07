@@ -5,18 +5,41 @@
 #command
 h left-scroll
 l right-scroll
-# t next-tag
-t toggle-option
-# T prev-tag
-# T invalid
-# i toggle-option --ignore-case\n
-i toggle-option i
-w toggle-option S
-, toggle-option N
+
+# &pattern: display only lines which match the pattern
 f filter
+
+x clear-search
+^L clear-search
+
+# t next-tag
+# T prev-tag
+
+# -
+t toggle-option
+# T invalid
+
+# --ignore-case: smart case for search
+i toggle-option i
+
+I toggle-option --incsearch\n
+
+# --chop-long-lines: wrap
+w toggle-option S
+
+# --LINE-NUMBERS
+L toggle-option N
+,n toggle-option N
+
+# --status-column: display a status column, showing search results and marks
+,s toggle-option J
+
+# color marked line
+,m toggle-option --status-line\n
+
 ^N next-file
 ^P prev-file
-^L clear-search
+
 # map `esc` to `nohlsearch`
 # \e undo-hilite
 
