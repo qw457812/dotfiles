@@ -78,7 +78,7 @@ zstyle ':omz:update' frequency 2
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git tmux zsh-vi-mode)
+plugins=(git tmux zsh-vi-mode aliases)
 
 # you have to add the `ZSH...=...` assignment before the line `source $ZSH/oh-my-zsh.sh`, from https://github.com/ohmyzsh/ohmyzsh/issues/3676#issuecomment-77806736
 # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/tmux
@@ -170,6 +170,19 @@ export LC_ALL=en_US.UTF-8
 # You may need to manually set your language environment
 export LANG=en_US.UTF-8
 
+
+# export LESS='-R'
+# https://github.com/infokiller/config-public/blob/939e5c3735762ba15c298d8ce37a1b48461d2e72/.config/lesskey
+# https://github.com/infokiller/config-public/blob/939e5c3735762ba15c298d8ce37a1b48461d2e72/.profile#L318
+# https://github.com/PatrickF1/dotfiles/blob/b9d08e85a606dbd8be997e6a1cdba1e1dcf08b12/.config/lesskey#L23
+# https://github.com/christian-oudard/dotfiles/blob/4c92919d514611aa70b4f33beb933dfdb4cf391a/dot_config/lesskey#L121
+# --status-column --status-col-width=1
+# --underline-special
+# --tabs=4
+# export LESS='--RAW-CONTROL-CHARS --ignore-case --LONG-PROMPT --chop-long-lines --incsearch --color=d+b$ --color=s+y$ --color=u+g$'
+# https://explainshell.com/explain?cmd=less+-RiMS
+export LESS='--RAW-CONTROL-CHARS --ignore-case --LONG-PROMPT --chop-long-lines --incsearch --use-color'
+
 # brew info lesspipe
 export LESSOPEN="|/opt/homebrew/bin/lesspipe.sh %s"
 
@@ -179,7 +192,7 @@ export BAT_THEME="TwoDark"
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 # plain: disables all available components. | bat --help
 export BAT_STYLE="plain"
-help() {
+h() {
     "$@" --help 2>&1 | bat --plain --language=help
 }
 # use global aliases to override -h and --help entirely:
@@ -289,6 +302,8 @@ export PATH="$PATH:$HOME/.config/doomemacs/bin"
 # https://github.com/archidote/best-bash-zsh-alias-for-linux-terminal/blob/master/install.sh
 alias b="cd -"
 alias q="exit"
+alias c="clear"
+# alias h="history | less"
 
 # install lsp server jdtls for doomemacs (temporary)
 # export JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home
@@ -335,15 +350,18 @@ function tre() {
   tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX;
 }
 
-# alias ll="less"
-# unalias ll
-# function ll() {
+# more
+alias m='less'
+# alias m='bat --paging=always'
+# function m() {
 #   if [ $# -eq 0 ]; then
 #     less .;
 #   else
 #     less "$@";
 #   fi;
 # }
+
+alias cat='bat --paging=never'
 
 # deal this warning from `doom doctor`: "! The installed grep binary was not built with support for PCRE lookaheads"
 # brew info grep
@@ -432,6 +450,7 @@ alias -g T='| tail'
 alias -g G='| grep'
 alias -g L="| less"
 alias -g LL="2>&1 | less"
+alias -g B="| bat --paging=always"
 alias -g C="| clipcopy"
 alias -g F='| fzf'
 alias rm='rm -i'
@@ -524,6 +543,7 @@ f()
     cd "$dst"
 }
 
+# comment out unused aliases in ~/.config/nvim-Lazyman/.lazymanrc: less, tree
 # https://github.com/doctorfree/nvim-lazyman
 # Source the Lazyman shell initialization for aliases and nvims selector
 # shellcheck source=.config/nvim-Lazyman/.lazymanrc
