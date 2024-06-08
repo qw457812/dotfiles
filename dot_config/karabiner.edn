@@ -55,18 +55,19 @@
  :tos       {:same_wind_app           {:key  :grave_accent_and_tilde
                                        :modi [:left_command]
                                        :lazy true}
+             ;; problem: can switch to Finder.app's closed window
              ; :prev_app                {:key  :tab
              ;                           :modi [:left_command]
              ;                           :lazy true}
              ;; use yabai instead of cmd+tab: do not show Finder.app's closed window
              ;; bonus: switch between the windows of same app like cmd+`
-             ;; https://github.com/mmroczka/.dotfiles/blob/master/karabiner/karabiner.edn
              ;; https://github.com/koekeishiya/dotfiles/blob/master/yabai/yabairc
-             ;; :prev_app                {:shell "export PATH=/opt/homebrew/bin:$PATH yabai -m window --focus recent &> /dev/null || (id=$(yabai -m query --windows --space | jq '.[1].id') && yabai -m window --focus $id &> /dev/null) || open -g hammerspoon://cmdTab &> /dev/null"}
-             ;; TODO use cmd+2 in ActivityMonitor.app, then this will not work
-             ;; TODO 多桌面时 `yabai -m query --windows --space | jq '.[1].id'` 需要排除当前窗口
-             ; :prev_app                {:shell "/opt/homebrew/bin/yabai -m window --focus recent &> /dev/null || /opt/homebrew/bin/yabai -m window --focus $(/opt/homebrew/bin/yabai -m query --windows --space | /opt/homebrew/bin/jq '.[1].id') &> /dev/null || open -g hammerspoon://cmdTab &> /dev/null"}
-             :prev_app                {:shell "/opt/homebrew/bin/yabai -m window --focus recent || open -g hammerspoon://cmdTab"}
+             ;; problem1: can't switch after press cmd+2 in ActivityMonitor.app
+             ;; problem2: can't switch to another space's app
+             ; :prev_app                {:shell "/opt/homebrew/bin/yabai -m window --focus recent || (id=$(/opt/homebrew/bin/yabai -m query --windows --space | /opt/homebrew/bin/jq '.[1].id') && /opt/homebrew/bin/yabai -m window --focus \"$id\") || open -g hammerspoon://cmdTab"}
+             ;; problem: can switch to Finder.app's closed window
+             ; :prev_app                {:shell "/opt/homebrew/bin/yabai -m window --focus recent || open -g hammerspoon://cmdTab"}
+             :prev_app                {:shell "open -g hammerspoon://prevApp"}
              :home_dir                [{:key  :grave_accent_and_tilde
                                         :modi [:left_shift]
                                         :lazy true} {:key :slash}]
@@ -970,7 +971,7 @@
   {:des   "w mode (yabai)"
    :rules [:yabai-config-mode
            ;; toggle yabai layout between bsp and stack
-           [:spacebar "if [ $(/opt/homebrew/bin/yabai -m config layout) = 'stack' ]; then /opt/homebrew/bin/yabai -m config layout bsp; else /opt/homebrew/bin/yabai -m config layout stack; fi"]
+           [:spacebar "if [ $(/opt/homebrew/bin/yabai -m config layout) = 'stack' ]; then /opt/homebrew/bin/yabai -m config layout bsp && /opt/homebrew/bin/brew services run felixkratz/formulae/borders; else /opt/homebrew/bin/yabai -m config layout stack && /opt/homebrew/bin/brew services stop felixkratz/formulae/borders; fi"]
            [:return_or_enter [:yabai "window --toggle float"]]
            [:o :!COh] ; Hide Others (only)
            [:p [:yabai "window --toggle zoom-parent"]]

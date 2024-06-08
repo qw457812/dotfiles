@@ -352,15 +352,16 @@ function tre() {
 }
 
 # more
-alias m='less'
+# alias m='less'
 # alias m='bat --paging=always'
-# function m() {
-#   if [ $# -eq 0 ]; then
-#     less .;
-#   else
-#     less "$@";
-#   fi;
-# }
+# zsh completions for function?
+function m() {
+  if [ $# -eq 0 ]; then
+    less .;
+  else
+    less "$@";
+  fi;
+}
 
 alias cat='bat --paging=never'
 

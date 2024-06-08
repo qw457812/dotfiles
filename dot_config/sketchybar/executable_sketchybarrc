@@ -73,6 +73,11 @@ sketchybar --default icon.font="$FONT:Bold:17.0"           \
 # We add some regular items to the left side of the bar
 # only the properties deviating from the current defaults need to be set
 
+# TODO yabai layout, prev_app
+# https://github.com/FelixKratz/SketchyBar/discussions/12?sort=top#discussioncomment-6974258
+# current_app: yabai -m query --windows --window | jq '.app'
+# prev_app   : yabai -m query --windows --window recent | jq '.app'
+
 # sketchybar --add item space_separator left                         \
 #            --set space_separator icon=                            \
 #                                  padding_left=10                   \
@@ -131,6 +136,7 @@ battery=(
 
 # Trigger the brew_udpate event when brew update or upgrade is run from cmdline
 # e.g. via function in .zshrc
+# icon=  nf-fa-beer | https://www.nerdfonts.com/cheat-sheet
 brew=(
   icon=􀐛
   icon.font="$FONT:Bold:14.0"
