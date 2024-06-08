@@ -36,7 +36,7 @@ function maximizeWindow()
     -- f.h = max.h
     -- win:setFrame(f, 0)
 
-    -- Maximize Window use Rectangle.app
+    -- Maximize Window use Rectangle.app, note that not work with yabai
     -- https://www.hammerspoon.org/docs/hs.eventtap.html#keyStroke
     -- https://www.hammerspoon.org/docs/hs.keycodes.html#map
     hs.eventtap.keyStroke({"ctrl", "alt", "shift"}, "space")
@@ -46,7 +46,7 @@ hs.urlevent.bind("mouseCenterClickThenMaximizeWindow", function(eventName, param
     maximizeWindow()
 end)
 
-hs.urlevent.bind("cmdTab", function(eventName, params)
+function cmdTab(repeatTimes)
     -- problem: act like cmd+tab, but not release cmd
     -- hs.eventtap.keyStroke({"cmd"}, "tab")
 
@@ -57,21 +57,77 @@ hs.urlevent.bind("cmdTab", function(eventName, params)
 
     -- https://www.hammerspoon.org/docs/hs.eventtap.event.html#newKeyEvent
     hs.eventtap.event.newKeyEvent(hs.keycodes.map.cmd, true):post()
-    hs.eventtap.event.newKeyEvent(hs.keycodes.map.tab, true):post()
-    hs.eventtap.event.newKeyEvent(hs.keycodes.map.tab, false):post()
+
+    for _ = 1, repeatTimes do
+        hs.eventtap.event.newKeyEvent(hs.keycodes.map.tab, true):post()
+        hs.eventtap.event.newKeyEvent(hs.keycodes.map.tab, false):post()
+    end
+
     hs.eventtap.event.newKeyEvent(hs.keycodes.map.cmd, false):post()
+end
+hs.urlevent.bind("cmdTab", function(eventName, params)
+    cmdTab(1)
 end)
 
--- We can demonstrate this by creating a very simple callback which will make sure that when you activate the Finder application,
--- all of its windows will be brought to the front of the display.
+function prevApp()
+    cmdTab(1)
+
+    -- Note:
+    -- After `defaults write com.apple.finder QuitMenuItem -bool true`, Finder can be quit by cmd+q.
+    -- As long as Finder stays quit, the following code won't be needed that much.
+
+    -- Wait for the cmd+tab event to complete, maybe including the animation when
+    -- switching between a full-screen app and a non-full-screen app.
+    -- Ensure the `app` below is obtained after the cmd+tab event.
+    -- https://www.hammerspoon.org/docs/hs.timer.html#doAfter
+    hs.timer.doAfter(0.3, function()
+        -- alternative: hs.window.focusedWindow():application()
+        local app = hs.application.frontmostApplication()
+
+        -- Do not focus Finder when no open window on cmd+tab
+        if (app:name() == "Finder") then
+            -- https://www.hammerspoon.org/docs/hs.application.html#allWindows
+            local windows = app:allWindows()
+            -- For Finder, when no open window, both allWindows and visibleWindows are 1
+            if #windows == 1 then
+                -- Use another cmd+tab+tab to skip Finder
+                cmdTab(2)
+            end
+        end
+    end)
+end
+
+
+hs.urlevent.bind("prevApp", function(eventName, params)
+    local _, status = hs.execute("/opt/homebrew/bin/yabai -m window --focus recent")
+
+    -- fallback to cmd+tab on yabai failed
+    if not status then
+        prevApp()
+    end
+end)
+
 -- function applicationWatcher(appName, eventType, appObject)
 --     if (eventType == hs.application.watcher.activated) then
 --         if (appName == "Finder") then
 --             -- Bring all Finder windows forward when one gets activated
---             appObject:selectMenuItem({"Window", "Bring All to Front"})
+--             -- appObject:selectMenuItem({"Window", "Bring All to Front"})
+--
+--             -- Do not focus Finder when no open window on cmd+tab
+--             local windows = appObject:allWindows()
+--             -- For Finder, when no open window, both allWindows and visibleWindows are 1
+--             if #windows == 1 then
+--                 -- Wait for cmd+tab which cause the activated event to finished,
+--                 -- make sure `cmdTab(2)` below is separate from the current event.
+--                 hs.timer.doAfter(0.25, function()
+--                     -- Use another cmd+tab+tab to skip Finder
+--                     cmdTab(2)
+--                 end)
+--             end
 --         end
 --     end
 -- end
+-- -- https://www.hammerspoon.org/docs/hs.application.watcher.html#new
 -- appWatcher = hs.application.watcher.new(applicationWatcher)
 -- appWatcher:start()
 

@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+
+# ~/.macos — https://mths.be/macos
+
+# https://github.com/mathiasbynens/dotfiles/blob/main/.macos
+# https://github.com/yqrashawn/yqdotfiles/blob/master/.macos
+# https://gist.github.com/mbinna/2357277
+# https://gist.github.com/erikh/2260182
+
+# 系统输入法(ABC): 禁用长按键输入特殊字符, 改为按键重复
+defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
+
+# System Settings -> Keyboard -> Key repeat rate (Fastest) / Delay until repeat (Shortest)
+# defaults read NSGlobalDomain KeyRepeat ---> 2
+# defaults read NSGlobalDomain InitialKeyRepeat ---> 15
+# https://github.com/mathiasbynens/dotfiles/blob/main/.macos
+# defaults write NSGlobalDomain KeyRepeat -int 1
+# defaults write NSGlobalDomain InitialKeyRepeat -int 10
+# https://gist.github.com/mbinna/2357277
+# defaults write NSGlobalDomain KeyRepeat -int 0.02
+# defaults write NSGlobalDomain InitialKeyRepeat -int 12
+defaults write NSGlobalDomain KeyRepeat -int 1
+defaults write NSGlobalDomain InitialKeyRepeat -int 12
+
+# Enable full keyboard access for all controls (e.g. enable Tab in modal dialogs)
+# defaults read NSGlobalDomain AppleKeyboardUIMode ---> 1
+defaults write NSGlobalDomain AppleKeyboardUIMode -int 3
+
+# https://wiki.nikiv.dev/macOS/#code
+# Remove dock animation. https://www.reddit.com/r/apple/comments/6xg9xq/tip_of_the_day_one_thing_i_cant_live_without_in/
+defaults write com.apple.dock autohide-delay -int 0
+defaults write com.apple.dock autohide-time-modifier -float 0.4
+killall Dock
+
+# https://stackoverflow.com/questions/77248249/disable-macos-sonoma-text-insertion-point-cursor-caps-lock-indicator
+defaults write kCFPreferencesAnyApplication TSMLanguageIndicatorEnabled 0
+sudo defaults write /Library/Preferences/FeatureFlags/Domain/UIKit.plist redesigned_text_cursor -dict-add Enabled -bool NO
+
+###############################################################################
+# Finder                                                                      #
+###############################################################################
+
+# I really need this to quit Finder, it’s annoying when switching to a closed window with cmd+tab
+# Finder: allow quitting via ⌘ + Q; doing so will also hide desktop icons
+defaults write com.apple.finder QuitMenuItem -bool true
+
+# Finder: disable window animations and Get Info animations
+defaults write com.apple.finder DisableAllAnimations -bool true
+
+# Finder: show hidden files by default
+defaults write com.apple.finder AppleShowAllFiles -bool true
+
+# Finder: show all filename extensions
+defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+
+# Finder: show status bar
+defaults write com.apple.finder ShowStatusBar -bool true
+
+# Finder: show path bar
+defaults write com.apple.finder ShowPathbar -bool true
+
+# Display full POSIX path as Finder window title
+defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
+
+# Keep folders on top when sorting by name
+defaults write com.apple.finder _FXSortFoldersFirst -bool true
+
+# When performing a search, search the current folder by default
+defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
+
+# Disable the warning when changing a file extension
+defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
+
+# Enable spring loading for directories
+defaults write NSGlobalDomain com.apple.springing.enabled -bool true
+
+# Remove the spring loading delay for directories
+defaults write NSGlobalDomain com.apple.springing.delay -float 0
+
+# Use list view in all Finder windows by default
+# Four-letter codes for the other view modes: `icnv`, `clmv`, `glyv`
+defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
+
+# Expand the following File Info panes:
+# “General”, “Open with”, and “Sharing & Permissions”
+defaults write com.apple.finder FXInfoPanesExpanded -dict \
+	General -bool true \
+	OpenWith -bool true \
+	Privileges -bool true
+
+killall Finder &> /dev/null
+
+# Increase window resize speed for Cocoa applications
+defaults write NSGlobalDomain NSWindowResizeTime -float 0.001
+
