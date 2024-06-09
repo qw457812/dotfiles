@@ -14,920 +14,777 @@
 // https://github.com/apemost/vimrc/blob/9e04a58def2fbccd03f8988e354c689b9a9a510f/vscodevim.json
 // https://github.com/halafi/dotfiles/blob/master/vscode/settings.json
 // https://github.com/s5k/nixdots/blob/c7f402fb64709824cc1557a3169c3721e3f76b91/dotfiles/vscode/userSettings.json
+// https://github.com/KhoaLee/KleeVSCodeSettings
+// https://github.com/forivall/dotfiles/blob/fa4dd764a14d81d864482ed4807564320c859e2b/vscode/settings.json
 {
-    "window.density.editorTabHeight": "compact",
-    "editor.accessibilitySupport": "off",
-    "editor.fontLigatures": false,
-    "editor.fontWeight": "normal",
-    "editor.wordWrap": "off",
-    "editor.minimap.enabled": false,
-    "editor.renderWhitespace": "boundary",
-    // "editor.suggest.preview": true,
-    "files.trimTrailingWhitespace": true,
-    "files.insertFinalNewline": true,
-    "files.trimFinalNewlines": true,
-    "[python]": {
-        "editor.formatOnSave": true,
-        // https://github.com/astral-sh/ruff-vscode#configuring-vs-code
-        "editor.codeActionsOnSave": {
-            // "source.fixAll": "explicit", // like unused imports
-            "source.organizeImports": "explicit"
-        },
-        // https://code.visualstudio.com/docs/python/formatting
-        "editor.defaultFormatter": "ms-python.black-formatter"
-        // "editor.defaultFormatter": "charliermarsh.ruff"
+  "window.density.editorTabHeight": "compact",
+  "editor.accessibilitySupport": "off",
+  "editor.fontLigatures": false,
+  "editor.fontWeight": "normal",
+  "editor.wordWrap": "off",
+  "editor.minimap.enabled": false,
+  "editor.renderWhitespace": "boundary",
+  // "editor.suggest.preview": true,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "diffEditor.renderSideBySide": true,
+  "[python]": {
+    "editor.formatOnSave": true,
+    // https://github.com/astral-sh/ruff-vscode#configuring-vs-code
+    "editor.codeActionsOnSave": {
+      // "source.fixAll": "explicit", // eg. remove unused imports
+      "source.organizeImports": "explicit" // sort imports by ruff
     },
-    "workbench.startupEditor": "newUntitledFile",
-    // TODO what is this?
-    // "python.analysis.autoImportCompletions": true,
-    "workbench.editor.enablePreview": false,
-    "workbench.editor.tabActionCloseVisibility": false,
-    "workbench.editor.highlightModifiedTabs": true,
-    // https://code.visualstudio.com/api/references/theme-color
-    "workbench.colorCustomizations": {
-        // https://github.com/canyonwan/vscode-settings/blob/739ad93d34d52affe03fa18d9d72ee4794aae861/User/History/2276140c/SbTI.json#L180
-        // "editorCursor.foreground": "#F8F8F0", // #0095FF #F8F8F0
-        "tab.activeBorder": "#40d4e7", // #49e9a6 #40d4e7 #80CBC4 #ffd866 #cba6f7
-        "tab.activeBorderTop": "#00000000", // 透明色
-        "tab.activeModifiedBorder": "#e61c58",
-        // "tab.inactiveModifiedBorder": "#e61c58",
-        // https://stackoverflow.com/questions/35926381/change-highlight-text-color-in-visual-studio-code
-        "editor.selectionBackground": "#e788ff7c", // Currently SELECTED text
-        "editor.selectionHighlightBackground": "#ff00005b", // Same content as selection
-        "editor.findMatchBackground": "#00cc44a8", // Current SEARCH MATCH
-        "editor.findMatchHighlightBackground": "#ff7b00a1", // Other SEARCH MATCHES
-        "editor.wordHighlightBackground": "#8888", // #e788ff7c #8888
-        "editor.wordHighlightStrongBackground": "#8888",
-        // https://github.com/EsIce/highlight-icemode#requirements
-        // "editor.wordHighlightStrongBackground": "#00000000", // 透明色
-        "editor.wordHighlightStrongBorder": "#cccccc" // #FF9800 #17E5E6 #cccccc #b7b7b7
+    // https://code.visualstudio.com/docs/python/formatting
+    "editor.defaultFormatter": "ms-python.black-formatter"
+    // "editor.defaultFormatter": "charliermarsh.ruff"
+  },
+  "[jsonc]": {
+    "editor.formatOnSave": true,
+    // "editor.defaultFormatter": "vscode.json-language-features" // built-in
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[markdown]": {
+    "editor.formatOnSave": true,
+    // trailing whitespace has special meaning
+    "files.trimTrailingWhitespace": false,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "workbench.startupEditor": "newUntitledFile",
+  // TODO what is this?
+  // "python.analysis.autoImportCompletions": true,
+  "workbench.editor.enablePreview": false,
+  "workbench.editor.tabActionCloseVisibility": false,
+  "workbench.editor.highlightModifiedTabs": true,
+  // https://code.visualstudio.com/api/references/theme-color
+  "workbench.colorCustomizations": {
+    // https://github.com/canyonwan/vscode-settings/blob/739ad93d34d52affe03fa18d9d72ee4794aae861/User/History/2276140c/SbTI.json#L180
+    // "editorCursor.foreground": "#F8F8F0", // #0095FF #F8F8F0
+    "tab.activeBorder": "#40d4e7", // #49e9a6 #40d4e7 #80CBC4 #ffd866 #cba6f7
+    "tab.activeBorderTop": "#00000000", // 透明色
+    "tab.activeModifiedBorder": "#e61c58",
+    // "tab.inactiveModifiedBorder": "#e61c58",
+    // https://stackoverflow.com/questions/35926381/change-highlight-text-color-in-visual-studio-code
+    "editor.selectionBackground": "#e788ff7c", // Currently SELECTED text
+    "editor.selectionHighlightBackground": "#ff00005b", // Same content as selection
+    "editor.findMatchBackground": "#00cc44a8", // Current SEARCH MATCH
+    "editor.findMatchHighlightBackground": "#ff7b00a1", // Other SEARCH MATCHES
+    "editor.wordHighlightBackground": "#8888", // #e788ff7c #8888
+    "editor.wordHighlightStrongBackground": "#8888",
+    // https://github.com/EsIce/highlight-icemode#requirements
+    // "editor.wordHighlightStrongBackground": "#00000000", // 透明色
+    "editor.wordHighlightStrongBorder": "#cccccc" // #FF9800 #17E5E6 #cccccc #b7b7b7
+  },
+  // "workbench.colorTheme": "One Dark Pro",
+  "terminal.integrated.fontFamily": "MesloLGM Nerd Font", // JetBrainsMono Nerd Font, Hack Nerd Font, MesloLGM Nerd Font, MesloLGS Nerd Font Mono
+  "terminal.integrated.copyOnSelection": true,
+  "terminal.integrated.rightClickBehavior": "paste",
+  "terminal.integrated.focusAfterRun": "terminal",
+  // TODO activate python virtual environment in tmux new session
+  // https://github.com/microsoft/vscode-python/issues/22289
+  // https://github.com/halafi/filiphalas.com/blob/168b1e501652ceb388b370ef54f92b6793c3080d/articles/keyboard-controlled-vscode-with-vim-and-tmux.md
+  // https://github.com/eestrada/dotfiles/blob/6e3229367a519ba6ae31ee3e90b58d5142fc3cae/AppData/Roaming/Code/User/settings.json#L79
+  // https://github.com/axonasif/dotsh/blob/159d7b6ed19f6ede0e8d2d439ade3d5827bd757b/src/config/shell/mod.sh#L170
+  // `terminal.integrated.env.osx` + .zshrc | https://github.com/rwblickhan/astro-rwblickhan.org/blob/21f1953371f3b1e4ef6b14635d36d12d53b4c8ef/src/content/tilTechnical/20230820-tmux-in-vscode.md
+  // alternative: set `ZSH_TMUX_AUTOSTART=true` for vscode in .zshrc, then comment out `terminal.integrated.defaultProfile.osx` below
+  "python.terminal.activateEnvironment": false, // not work with tmux anyway
+  "terminal.integrated.defaultProfile.osx": "vscode-tmux",
+  "terminal.integrated.profiles.osx": {
+    "zsh (login)": {
+      "path": "zsh",
+      "args": ["-l"]
     },
-    // "workbench.colorTheme": "One Dark Pro",
-    "terminal.integrated.fontFamily": "MesloLGM Nerd Font", // JetBrainsMono Nerd Font, Hack Nerd Font, MesloLGM Nerd Font, MesloLGS Nerd Font Mono
-    "terminal.integrated.copyOnSelection": true,
-    "terminal.integrated.rightClickBehavior": "paste",
-    "terminal.integrated.focusAfterRun": "terminal",
-    // TODO activate python virtual environment in tmux new session
-    // https://github.com/microsoft/vscode-python/issues/22289
-    // https://github.com/halafi/filiphalas.com/blob/168b1e501652ceb388b370ef54f92b6793c3080d/articles/keyboard-controlled-vscode-with-vim-and-tmux.md
-    // https://github.com/eestrada/dotfiles/blob/6e3229367a519ba6ae31ee3e90b58d5142fc3cae/AppData/Roaming/Code/User/settings.json#L79
-    // https://github.com/axonasif/dotsh/blob/159d7b6ed19f6ede0e8d2d439ade3d5827bd757b/src/config/shell/mod.sh#L170
-    // `terminal.integrated.env.osx` + .zshrc | https://github.com/rwblickhan/astro-rwblickhan.org/blob/21f1953371f3b1e4ef6b14635d36d12d53b4c8ef/src/content/tilTechnical/20230820-tmux-in-vscode.md
-    // alternative: set `ZSH_TMUX_AUTOSTART=true` for vscode in .zshrc, then comment out `terminal.integrated.defaultProfile.osx` below
-    "python.terminal.activateEnvironment": false, // not work with tmux anyway
-    "terminal.integrated.defaultProfile.osx": "vscode-tmux",
-    "terminal.integrated.profiles.osx": {
-        "zsh (login)": {
-            "path": "zsh",
-            "args": [
-                "-l"
-            ]
-        },
-        // problem: creating too many unnecessary tmux sessions
-        // "my-tmux": {
-        //     "path": "/opt/homebrew/bin/tmux",
-        //     "args": [
-        //         "new-session",
-        //         "-A",
-        //         "-s",
-        //         "vscode:${workspaceFolder}"
-        //     ],
-        //     "icon": "terminal-tmux"
-        // },
-        "vscode-tmux": {
-            "path": "${userHome}/.local/bin/vscode-tmux",
-            "args": [
-                "${workspaceFolder}"
-            ],
-            "icon": "terminal-tmux"
-        }
-    },
-    "extensions.experimental.affinity": {
-        // VSCodeVim is too slow! To improve performance | https://github.com/microsoft/vscode/issues/75627#issuecomment-1078827311
-        "vscodevim.vim": 1
-    },
-    "github.copilot.editor.enableAutoCompletions": true,
-    "github.copilot.enable": {
-        "*": true,
-        "plaintext": true,
-        "markdown": true,
-        "scminput": false
-    },
-    "markdown-preview-enhanced.previewTheme": "github-light.css",
-    "markdown-preview-enhanced.codeBlockTheme": "github.css",
-    "markdown-preview-enhanced.enablePreviewZenMode": true,
-    "zenMode.fullScreen": false,
-    "zenMode.hideLineNumbers": true,
-    "todo-tree.highlights.useColourScheme": true,
-    "maven.settingsFile": "",
-    // https://github.com/oderwat/vscode-indent-rainbow#configuration
-    "indentRainbow.includedLanguages": ["python"],
-    "indentRainbow.indicatorStyle": "light",
-    "indentRainbow.lightIndicatorStyleLineWidth": 1,
-    "indentRainbow.colors": [
-        "rgba(255,255,64,0.3)",
-        "rgba(127,255,127,0.3)",
-        "rgba(255,127,255,0.3)",
-        "rgba(79,236,236,0.3)"
-    ],
-    "hediet.vscode-drawio.resizeImages": null,
-    "hediet.vscode-drawio.theme": "dark",
-    "hediet.vscode-drawio.customColorSchemes": [],
-    "vim.useSystemClipboard": true,
-    "vim.hlsearch": true,
-    "vim.visualstar": true,
-    "vim.camelCaseMotion.enable": true,
-    "vim.easymotion": true,
-    // "vim.easymotionMarkerBackgroundColor": "yellow",
-    // "vim.easymotionKeys": "hklyuiopnm,qwertzxcvbasdgjf;",
-    // "vim.easymotionMarkerForegroundColorOneChar": "black",
-    "vim.highlightedyank.enable": true,
-    "vim.highlightedyank.duration": 500,
-    "vim.replaceWithRegister": true,
-    "vim.sneak": true,
-    "vim.sneakReplacesF": true,
-    "vim.sneakUseIgnorecaseAndSmartcase": true,
-    "vim.handleKeys": {
-        "<C-d>": true,
-        "<C-s>": false,
-        "<C-z>": false
-    },
-    // https://github.com/VSCodeVim/Vim#-faq
-    // "vim.foldfix": true, // not work
-    // https://github.com/VSCodeVim/Vim#vim-airline
-    // "vim.statusBarColorControl": true,
-    "vim.leader": "<space>",
-    "vim.normalModeKeyBindings": [
-        // TODO
-        // editor.fold
-        // editor.unfold
-        // breadcrumbs.focusAndSelect
-        // gitlens.showQuickFileHistory
+    // problem: creating too many unnecessary tmux sessions
+    // "my-tmux": {
+    //     "path": "/opt/homebrew/bin/tmux",
+    //     "args": [
+    //         "new-session",
+    //         "-A",
+    //         "-s",
+    //         "vscode:${workspaceFolder}"
+    //     ],
+    //     "icon": "terminal-tmux"
+    // },
+    "vscode-tmux": {
+      "path": "${userHome}/.local/bin/vscode-tmux",
+      "args": ["${workspaceFolder}"],
+      "icon": "terminal-tmux"
+    }
+  },
+  "extensions.experimental.affinity": {
+    // VSCodeVim is too slow! To improve performance | https://github.com/microsoft/vscode/issues/75627#issuecomment-1078827311
+    "vscodevim.vim": 1
+  },
+  "github.copilot.editor.enableAutoCompletions": true,
+  "github.copilot.enable": {
+    "*": true,
+    "plaintext": true,
+    "markdown": true,
+    "scminput": false
+  },
+  "markdown-preview-enhanced.previewTheme": "github-light.css",
+  "markdown-preview-enhanced.codeBlockTheme": "github.css",
+  "markdown-preview-enhanced.enablePreviewZenMode": true,
+  "zenMode.fullScreen": false,
+  "zenMode.hideLineNumbers": true,
+  "todo-tree.highlights.useColourScheme": true,
+  "maven.settingsFile": "",
+  // https://github.com/oderwat/vscode-indent-rainbow#configuration
+  "indentRainbow.includedLanguages": ["python"],
+  "indentRainbow.indicatorStyle": "light",
+  "indentRainbow.lightIndicatorStyleLineWidth": 1,
+  "indentRainbow.colors": [
+    "rgba(255,255,64,0.3)",
+    "rgba(127,255,127,0.3)",
+    "rgba(255,127,255,0.3)",
+    "rgba(79,236,236,0.3)"
+  ],
+  "hediet.vscode-drawio.resizeImages": null,
+  "hediet.vscode-drawio.theme": "dark",
+  "hediet.vscode-drawio.customColorSchemes": [],
+  "vim.useSystemClipboard": true,
+  "vim.hlsearch": true,
+  "vim.visualstar": true,
+  "vim.camelCaseMotion.enable": true,
+  "vim.easymotion": true,
+  // "vim.easymotionMarkerBackgroundColor": "yellow",
+  // "vim.easymotionKeys": "hklyuiopnm,qwertzxcvbasdgjf;",
+  // "vim.easymotionMarkerForegroundColorOneChar": "black",
+  "vim.highlightedyank.enable": true,
+  "vim.highlightedyank.duration": 500,
+  "vim.replaceWithRegister": true,
+  "vim.sneak": true,
+  "vim.sneakReplacesF": true,
+  "vim.sneakUseIgnorecaseAndSmartcase": true,
+  "vim.handleKeys": {
+    "<C-d>": true,
+    "<C-s>": false,
+    "<C-z>": false
+  },
+  // https://github.com/VSCodeVim/Vim#-faq
+  // "vim.foldfix": true, // not work
+  // https://github.com/VSCodeVim/Vim#vim-airline
+  // "vim.statusBarColorControl": true,
+  "vim.leader": "<space>",
+  "vim.normalModeKeyBindings": [
+    // TODO
+    // editor.fold
+    // editor.unfold
+    // breadcrumbs.focusAndSelect
+    // gitlens.showQuickFileHistory
 
-        // https://github.com/VSCodeVim/Vim#-faq
-        {
-            "before":["j"],
-            "after": ["g", "j"]
-        },
-        {
-            "before":["k"],
-            "after": ["g", "k"]
-        },
-        {
-            "before":["Y"],
-            "after": ["y", "$"]
-        },
-        {
-            "before":["H"],
-            "after": ["^"]
-        },
-        {
-            "before":["L"],
-            "after": ["$"]
-        },
-        // https://github.com/vscode-neovim/vscode-neovim/blob/02d13f0e119afbec8f68fe5add0f2c2a1072ec49/package.json#L1674
-        {
-            "before": ["K"],
-            "commands": [
-                "editor.action.showHover"
-            ]
-        },
-        // https://github.com/vscode-neovim/vscode-neovim#code-navigation
-        // `:h gf` in nvim (goto file)
-        {
-            "before": ["g", "f"],
-            "commands": [
-                "editor.action.revealDeclaration"
-            ]
-        },
-        {
-            "before": ["g", "F"],
-            "commands": [
-                "editor.action.peekDeclaration"
-            ]
-        },
-        {
-            "before": ["g", "H"],
-            "commands": [
-                "editor.action.referenceSearch.trigger"
-            ]
-        },
-        // `:h gO` in nvim (outline)
-        {
-            "before": ["g", "O"],
-            "commands": [
-                "workbench.action.gotoSymbol"
-            ]
-        },
-        {
-            "before": ["g", "i"],
-            "commands": [
-                "editor.action.goToImplementation"
-            ]
-        },
-        {
-            "before": ["g", "D"],
-            "commands": [
-                "editor.action.goToTypeDefinition"
-                // "editor.action.peekDefinition"
-            ]
-        },
-        // TODO `]e` or `]d` ?
-        {
-            "before": ["]", "e"],
-            "commands": [
-                "editor.action.marker.next"
-            ]
-        },
-        {
-            "before": ["[", "e"],
-            "commands": [
-                "editor.action.marker.prev"
-            ]
-        },
-        {
-            "before": ["]", "c"],
-            "commands": [
-                // "workbench.action.editor.nextChange",
-                "editor.action.dirtydiff.next"
-            ]
-        },
-        {
-            "before": ["[", "c"],
-            "commands": [
-                // "workbench.action.editor.previousChange",
-                "editor.action.dirtydiff.previous"
-            ]
-        },
-        {
-            "before": ["leader", "enter"],
-            "commands": [
-                "editor.action.quickFix"
-            ]
-        },
-        {
-            "before": ["leader", ","],
-            "commands": [
-                "workbench.action.showAllEditors",
-            ],
-            "silent": true
-        },
-        {
-            "before": ["leader", "."],
-            "commands": [
-                "workbench.action.terminal.focus"
-            ],
-            "silent": true
-        },
-        {
-            "before": ["leader", ":"],
-            "commands": [
-                "workbench.action.showCommands",
-            ],
-            "silent": true
-        },
-        {
-            "before": ["leader", "/"],
-            "commands": [
-                "workbench.view.search"
-            ]
-        },
-        {
-            "before": ["leader", "?"],
-            "commands": [
-                "workbench.action.openGlobalKeybindings"
-            ]
-        },
-        {
-            "before": ["leader", "="],
-            "commands": [
-                "editor.action.formatDocument"
-            ]
-        },
-        {
-            "before": ["leader", "-"],
-            "commands": [
-                "workbench.action.splitEditorDown"
-            ]
-        },
-        {
-            "before": ["leader", "|"],
-            "commands": [
-                "workbench.action.splitEditorRight"
-            ]
-        },
-        {
-            "before": ["leader", "x"],
-            "commands": [
-                {
-                    "command": "workbench.action.closeSidebar",
-                    "args": []
-                },
-                {
-                    "command": "workbench.action.closePanel",
-                    "args": []
-                }
-            ]
-        },
-        {
-            "before": ["leader", "V"],
-            "commands": [
-                "workbench.action.splitEditorRight"
-            ]
-        },
-        {
-            "before": ["leader", "R"],
-            "commands": [
-                "editor.action.refactor"
-            ]
-        },
-        {
-            "before": ["leader", "1"],
-            "commands": [
-                "workbench.action.openEditorAtIndex1"
-            ]
-        },
-        {
-            "before": ["leader", "2"],
-            "commands": [
-                "workbench.action.openEditorAtIndex2"
-            ]
-        },
-        {
-            "before": ["leader", "3"],
-            "commands": [
-                "workbench.action.openEditorAtIndex3"
-            ]
-        },
-        {
-            "before": ["leader", "4"],
-            "commands": [
-                "workbench.action.openEditorAtIndex4"
-            ]
-        },
-        {
-            "before": ["leader", "5"],
-            "commands": [
-                "workbench.action.openEditorAtIndex5"
-            ]
-        },
-        {
-            "before": ["leader", "6"],
-            "commands": [
-                "workbench.action.openEditorAtIndex6"
-            ]
-        },
-        {
-            "before": ["leader", "7"],
-            "commands": [
-                "workbench.action.openEditorAtIndex7"
-            ]
-        },
-        {
-            "before": ["leader", "8"],
-            "commands": [
-                "workbench.action.openEditorAtIndex8"
-            ]
-        },
-        {
-            "before": ["leader", "9"],
-            "commands": [
-                "workbench.action.openEditorAtIndex9"
-            ]
-        },
-        {
-            "before": ["leader", "r", "n"],
-            "commands": [
-                "editor.action.rename"
-            ]
-        },
-        // doomemacs keybindings
-        {
-            "before": ["leader", "b", "d"],
-            "commands": [
-                "workbench.action.closeActiveEditor"
-            ]
-        },
-        {
-            "before": ["leader", "b", "n"],
-            "commands": [
-                "workbench.action.nextEditor"
-            ]
-        },
-        {
-            "before": ["leader", "b", "p"],
-            "commands": [
-                "workbench.action.previousEditor"
-            ]
-        },
-        {
-            "before": ["leader", "b", "N"],
-            "commands": [
-                "workbench.action.files.newUntitledFile"
-            ]
-        },
-        {
-            "before": ["leader", "b", "o"],
-            "commands": [
-                "workbench.action.closeOtherEditors"
-            ]
-        },
-        {
-            "before": ["leader", "c", "a"],
-            "commands": [
-                "editor.action.codeAction"
-            ]
-        },
-        {
-            "before": ["leader", "c", "f"],
-            "commands": [
-                "editor.action.formatDocument"
-            ]
-        },
-        {
-            "before": ["leader", "c", "r"],
-            "commands": [
-                "editor.action.rename"
-            ]
-        },
-        // {
-        //     "before": ["leader", "c", "S"],
-        //     "commands": [
-        //         "workbench.action.showAllSymbols"
-        //     ]
-        // },
-        {
-            "before": ["leader", "C", "s"],
-            "commands": [
-                "workbench.action.openSettingsJson"
-            ]
-        },
-        {
-            "before": ["leader", "C", "k"],
-            "commands": [
-                "workbench.action.openGlobalKeybindingsFile"
-            ]
-        },
-        {
-            "before": ["leader", "f", "f"],
-            "commands": [
-                "workbench.action.quickOpen"
-            ]
-        },
-        {
-            "before": ["leader", "f", "s"],
-            "commands": [
-                "workbench.action.files.save"
-            ]
-        },
-        {
-            "before": ["leader", "f", "y"],
-            "commands": [
-                // "copyFilePath"
-                "workbench.action.files.copyPathOfActiveFile"
-            ]
-        },
-        {
-            "before": ["leader", "f", "Y"],
-            "commands": [
-                "copyRelativeFilePath"
-            ]
-        },
-        // https://github.com/zhangymPerson/learning-notes/blob/ae1471b072e209ba8856756ab2081003ce663dd7/tools/vim/vim_vscode.json#L42
-        {
-            "before": ["leader", "f", "r"],
-            "commands": [
-                // "workbench.action.showAllEditorsByMostRecentlyUsed"
-                "workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup"
-            ]
-        },
-        // https://github.com/sokhuong-uon/vscode-nvim/blob/dee26642a5705ee7f39c13e3ffe6a7164b8fcf1e/whichkey/settings.json#L98
-        {
-            "before": ["leader", "f", "R"],
-            "commands": [
-                "workbench.files.action.showActiveFileInExplorer",
-                "renameFile"
-            ]
-        },
-        // TODO git
-        // https://github.com/VSpaceCode/vscode-which-key/blob/master/package.json
-        {
-            "before": ["leader", "g", "s"],
-            "commands": [
-                "workbench.view.scm"
-            ]
-        },
-        {
-            "before": ["leader", "g", "d"],
-            "commands": [
-                "git.openChange"
-            ]
-        },
-        {
-            "before": ["leader", "g", "l"],
-            "commands": [
-                "git.pull"
-            ]
-        },
-        {
-            "before": ["leader", "g", "p"],
-            "commands": [
-                "git.push"
-            ]
-        },
-        {
-            "before": ["leader", "t", "t"],
-            "commands": [
-                "workbench.action.terminal.focus"
-            ]
-        },
-        {
-            "before": ["leader", "t", "w"],
-            "commands": [
-                "editor.action.toggleWordWrap"
-            ]
-        },
-        {
-            "before": ["leader", "t", "z"],
-            "commands": [
-                "workbench.action.toggleZenMode"
-            ]
-        },
-        {
-            "before": ["leader", "t", "F"],
-            "commands": [
-                "workbench.action.toggleFullScreen"
-            ]
-        },
-        {
-            "before": ["leader", "s", "s"],
-            "commands": [
-                "search.action.openEditor"
-            ]
-        },
-        {
-            "before": ["leader", "s", "b"],
-            "commands": [
-                "actions.find"
-            ]
-        },
-        // search all open buffers
-        {
-            "before": ["leader", "s", "B"],
-            "commands": [
-                // "workbench.view.search"
-                "workbench.action.findInFiles"
-            ]
-        },
-        {
-            "before": ["leader", "e", "e"],
-            "commands": [
-                // "workbench.files.action.focusFilesExplorer"
-                // "workbench.files.action.showActiveFileInExplorer"
-                "workbench.view.explorer"
-            ]
-        },
-        {
-            "before": ["leader", "o", "f"],
-            "commands": [
-                "workbench.action.files.openFile"
-            ]
-        },
-        {
-            "before": ["leader", "o", "F"],
-            "commands": [
-                "workbench.action.files.openFolder"
-            ]
-        },
-        {
-            "before": ["leader", "d", "s"],
-            "commands": [
-                "workbench.action.debug.stop"
-            ]
-        },
-        {
-            "before": ["leader", "d", "r"],
-            "commands": [
-                // "workbench.action.debug.run"
-                "workbench.action.debug.restart"
-            ]
-        },
-        {
-            "before": ["leader", "d", "b"],
-            "commands": [
-                "editor.debug.action.toggleBreakpoint"
-            ]
-        },
-        // https://marketplace.visualstudio.com/items?itemName=alefragnani.project-manager
-        {
-            "before": ["leader", "p", "a"],
-            "commands": [
-                "projectManager.saveProject"
-            ]
-        },
-        {
-            "before": ["leader", "p", "p"],
-            "commands": [
-                "projectManager.listProjectsNewWindow"
-            ]
-        },
-        {
-            "before": ["leader", "p", "r"],
-            "commands": [
-                "workbench.action.openRecent"
-            ]
-        },
-        // {
-        //     "before": ["leader", "p", "d"],
-        //     "commands": ["editor.action.peekDefinition"]
-        // },
-        // {
-        //     "before": ["leader", "p", "i"],
-        //     "commands": ["editor.action.peekImplementation"]
-        // },
-        // {
-        //     "before": ["leader", "p", "r"],
-        //     "commands": ["editor.action.referenceSearch.trigger"]
-        // },
-        {
-            "before": ["leader", "q", "q"],
-            "commands": [
-                // "workbench.action.closeActiveEditor"
-                "workbench.action.closeWindow"
-            ]
+    // https://github.com/VSCodeVim/Vim#-faq
+    // {
+    //   "before": ["j"],
+    //   "after": ["g", "j"]
+    // },
+    // {
+    //   "before": ["k"],
+    //   "after": ["g", "k"]
+    // },
+    {
+      "before": ["Y"],
+      "after": ["y", "$"]
+    },
+    {
+      "before": ["H"],
+      "after": ["^"]
+    },
+    {
+      "before": ["L"],
+      "after": ["$"]
+    },
+    // https://github.com/vscode-neovim/vscode-neovim/blob/02d13f0e119afbec8f68fe5add0f2c2a1072ec49/package.json#L1674
+    {
+      "before": ["K"],
+      "commands": ["editor.action.showHover"]
+    },
+    // https://github.com/vscode-neovim/vscode-neovim#code-navigation
+    // `:h gf` in nvim (goto file)
+    {
+      "before": ["g", "f"],
+      "commands": ["editor.action.revealDeclaration"]
+    },
+    {
+      "before": ["g", "F"],
+      "commands": ["editor.action.peekDeclaration"]
+    },
+    {
+      "before": ["g", "H"],
+      "commands": ["editor.action.referenceSearch.trigger"]
+    },
+    // `:h gO` in nvim (outline)
+    {
+      "before": ["g", "O"],
+      "commands": ["workbench.action.gotoSymbol"]
+    },
+    {
+      "before": ["g", "i"],
+      "commands": ["editor.action.goToImplementation"]
+    },
+    {
+      "before": ["g", "D"],
+      "commands": [
+        "editor.action.goToTypeDefinition"
+        // "editor.action.peekDefinition"
+      ]
+    },
+    {
+      "before": ["]", "d"],
+      "commands": ["editor.action.marker.next"]
+    },
+    {
+      "before": ["[", "d"],
+      "commands": ["editor.action.marker.prev"]
+    },
+    {
+      "before": ["]", "c"],
+      "commands": [
+        // "workbench.action.editor.nextChange",
+        "editor.action.dirtydiff.next"
+      ]
+    },
+    {
+      "before": ["[", "c"],
+      "commands": [
+        // "workbench.action.editor.previousChange",
+        "editor.action.dirtydiff.previous"
+      ]
+    },
+    {
+      "before": ["leader", "enter"],
+      "commands": ["editor.action.quickFix"]
+    },
+    {
+      "before": ["leader", ","],
+      "commands": ["workbench.action.showAllEditors"],
+      "silent": true
+    },
+    {
+      "before": ["leader", "."],
+      "commands": ["workbench.action.terminal.focus"],
+      "silent": true
+    },
+    {
+      "before": ["leader", ":"],
+      "commands": ["workbench.action.showCommands"],
+      "silent": true
+    },
+    {
+      "before": ["leader", "/"],
+      "commands": ["workbench.view.search"]
+    },
+    {
+      "before": ["leader", "?"],
+      "commands": ["workbench.action.openGlobalKeybindings"]
+    },
+    {
+      "before": ["leader", "="],
+      "commands": ["editor.action.formatDocument"]
+    },
+    {
+      "before": ["leader", "-"],
+      "commands": ["workbench.action.splitEditorDown"]
+    },
+    {
+      "before": ["leader", "|"],
+      "commands": ["workbench.action.splitEditorRight"]
+    },
+    {
+      "before": ["leader", "x"],
+      "commands": [
+        {
+          "command": "workbench.action.closeSidebar",
+          "args": []
+        },
+        {
+          "command": "workbench.action.closePanel",
+          "args": []
         }
-    ],
-    "vim.normalModeKeyBindingsNonRecursive": [
-        // https://vspacecode.github.io/docs/whichkey/
-        // {
-        //   "before": ["<space>"],
-        //   "commands": ["whichkey.show"]
-        // }
-        {
-            "before":["<Esc>"],
-            // without `after`: editor.action.peekDefinition -> togglePeekWidgetFocus -> `esc` will not close peek widget
-            "after": ["<Esc>"],
-            "commands": [
-                // https://github.com/VSCodeVim/Vim/issues/9029#issuecomment-2130972680
-                // "extension.vim_escape",
-                ":nohl",
-                // "workbench.action.maximizeEditorHideSidebar",
-                "workbench.action.closeSidebar",
-                "workbench.action.closePanel"
-            ],
-            "silent": true
-        },
-        // {
-        //     "before":[";"],
-        //     "after": [":"]
-        // },
-        // {
-        //     "before":[":"],
-        //     "after": [";"]
-        // },
-        {
-            "before":["n"],
-            "after": ["n", "z", "z"]
-        },
-        {
-            "before":["N"],
-            "after": ["N", "z", "z"]
-        },
-        // execute q macro with Q
-        {
-            "before":["Q"],
-            "after": ["@", "q"]
-        },
-        {
-            "before":["enter"],
-            // editor.action.revealDefinition
-            "after": ["g", "d"]
-        },
-        {
-            "before":["backspace"],
-            "commands": [
-                "workbench.action.closeActiveEditor"
-            ]
-        },
-        {
-            "before": ["left"],
-            "commands": [
-                // "workbench.action.navigateBack"
-                // https://github.com/Valloric/dotfiles/blob/bda97c9a6369564671942c0b4fb750b71a55f6da/vscode/settings.json#L239
-                // workbench.action.openGlobalKeybindings -> search "extension.vim"
-                "extension.vim_ctrl+o"
-            ]
-        },
-        {
-            "before": ["right"],
-            "commands": [
-                // "workbench.action.navigateForward"
-                "extension.vim_ctrl+i"
-            ]
-        },
-        {
-            "before": ["down"],
-            "commands": [
-                "workbench.action.nextEditor"
-            ]
-        },
-        {
-            "before": ["up"],
-            "commands": [
-                "workbench.action.previousEditor"
-            ]
-        },
-        {
-            "before": ["leader", "<space>"],
-            "commands": [
-                "workbench.action.quickOpen"
-            ]
-        },
-        // ui
-        // TODO use leader u like LazyVim
-        {
-            "before": [",", ","],
-            "commands": [
-                "workbench.view.explorer"
-            ]
-        },
-        {
-            "before": [",", "b"],
-            "commands": [
-                "workbench.action.toggleSidebarVisibility"
-            ]
-        },
-        {
-            "before": [",", "e"],
-            "commands": [
-                "workbench.view.explorer"
-            ]
-        },
-        {
-            "before": [",", "s"],
-            "commands": [
-                "workbench.view.search"
-            ]
-        },
-        {
-            "before": [",", "v"],
-            "commands": [
-                "workbench.view.scm"
-            ]
-        },
-        {
-            "before": [",", "d"],
-            "commands": [
-                "workbench.view.debug"
-            ]
-        },
-        {
-            "before": [",", "E"],
-            "commands": [
-                "workbench.view.extensions"
-            ]
-        },
-        {
-            "before": [",", "r"],
-            "commands": [
-                "references-view.showCallHierarchy"
-            ]
-        },
-        {
-            "before": [",", "c"],
-            "commands": [
-                "workbench.panel.chat.view.copilot.focus"
-            ]
-        },
-        {
-            "before": [",", "p"],
-            "commands": [
-                "workbench.action.togglePanel"
-            ]
-        },
-        {
-            "before": [",", "t"],
-            "commands": [
-                "workbench.action.terminal.toggleTerminal"
-            ]
-        },
-        // https://github.com/Valloric/dotfiles/blob/bda97c9a6369564671942c0b4fb750b71a55f6da/vscode/settings.json
-        {
-            "before": ["z", "j"],
-            "after": ["m", "z", "o", "<Esc>", "`", "z"]
-        },
-        {
-            "before": ["z", "k"],
-            // "after": ["m", "z", "O", "<Esc>", "`", "z"] // not work
-            "after": ["O", "<Esc>", "j", "0"]
-        }
-    ],
-    "vim.insertModeKeyBindings": [
-        {
-            "before": ["j", "j"],
-            "after": ["<Esc>"]
-        },
-        {
-            "before": ["j", "k"],
-            "after": ["<Esc>"]
-        },
-        {
-            "before": ["k", "j"],
-            "after": ["<Esc>"]
-        }
-    ],
-    "vim.visualModeKeyBindings": [
-        {
-            "before":["j"],
-            "after": ["g", "j"]
-        },
-        {
-            "before":["k"],
-            "after": ["g", "k"]
-        },
-        {
-            "before":["H"],
-            "after": ["^"]
-        },
-        {
-            "before":["L"],
-            "after": ["$"]
-        },
-        // Bind > and < in visual mode to indent/outdent lines (repeatable)
-        {
-            "before": [">"],
-            "commands": [
-                "editor.action.indentLines"
-            ]
-        },
-        {
-            "before": ["<"],
-            "commands": [
-                "editor.action.outdentLines"
-            ]
-        },
-        // work with extension: Comment Translate
-        {
-            "before": ["g", "h"],
-            "commands": [
-                "editor.action.showHover"
-            ]
-        },
-        {
-            "before": ["leader", ":"],
-            "commands": [
-                "workbench.action.showCommands",
-            ],
-            "silent": true
-        },
-        {
-            "before": ["leader", "="],
-            "commands": [
-                "editor.action.formatSelection"
-            ]
-        },
-        {
-            "before": ["leader", "c", "f"],
-            "commands": [
-                "editor.action.formatSelection"
-            ]
-        },
-        {
-            "before": ["leader", "R"],
-            "commands": [
-                "editor.action.refactor"
-            ]
-        }
-    ],
-    "vim.visualModeKeyBindingsNonRecursive": [
-        // https://vspacecode.github.io/docs/whichkey/
-        // {
-        //   "before": ["<space>"],
-        //   "commands": ["whichkey.show"]
-        // }
-        {
-            "before": ["K"],
-            "commands": [
-                "editor.action.smartSelect.expand"
-            ]
-        },
-        {
-            "before": ["J"],
-            "commands": [
-                "editor.action.smartSelect.shrink"
-            ]
-        }
-    ],
-    "vim.operatorPendingModeKeyBindings": [
-        // makes yL and dH work like y$ and d^ respectively
-        {
-            "before": ["L"],
-            "after": ["$"]
-        },
-        {
-            "before": ["H"],
-            "after": ["^"]
-        }
-    ],
-    "vim.commandLineModeKeyBindings": []
+      ]
+    },
+    {
+      "before": ["leader", "V"],
+      "commands": ["workbench.action.splitEditorRight"]
+    },
+    {
+      "before": ["leader", "R"],
+      "commands": ["editor.action.refactor"]
+    },
+    {
+      "before": ["leader", "1"],
+      "commands": ["workbench.action.openEditorAtIndex1"]
+    },
+    {
+      "before": ["leader", "2"],
+      "commands": ["workbench.action.openEditorAtIndex2"]
+    },
+    {
+      "before": ["leader", "3"],
+      "commands": ["workbench.action.openEditorAtIndex3"]
+    },
+    {
+      "before": ["leader", "4"],
+      "commands": ["workbench.action.openEditorAtIndex4"]
+    },
+    {
+      "before": ["leader", "5"],
+      "commands": ["workbench.action.openEditorAtIndex5"]
+    },
+    {
+      "before": ["leader", "6"],
+      "commands": ["workbench.action.openEditorAtIndex6"]
+    },
+    {
+      "before": ["leader", "7"],
+      "commands": ["workbench.action.openEditorAtIndex7"]
+    },
+    {
+      "before": ["leader", "8"],
+      "commands": ["workbench.action.openEditorAtIndex8"]
+    },
+    {
+      "before": ["leader", "9"],
+      "commands": ["workbench.action.openEditorAtIndex9"]
+    },
+    {
+      "before": ["leader", "r", "n"],
+      "commands": ["editor.action.rename"]
+    },
+    // doomemacs keybindings
+    {
+      "before": ["leader", "b", "d"],
+      "commands": ["workbench.action.closeActiveEditor"]
+    },
+    {
+      "before": ["leader", "b", "n"],
+      "commands": ["workbench.action.nextEditor"]
+    },
+    {
+      "before": ["leader", "b", "p"],
+      "commands": ["workbench.action.previousEditor"]
+    },
+    {
+      "before": ["leader", "b", "N"],
+      "commands": ["workbench.action.files.newUntitledFile"]
+    },
+    {
+      "before": ["leader", "b", "o"],
+      "commands": ["workbench.action.closeOtherEditors"]
+    },
+    {
+      "before": ["leader", "c", "a"],
+      "commands": ["editor.action.codeAction"]
+    },
+    {
+      "before": ["leader", "c", "f"],
+      "commands": ["editor.action.formatDocument"]
+    },
+    {
+      "before": ["leader", "c", "r"],
+      "commands": ["editor.action.rename"]
+    },
+    // {
+    //     "before": ["leader", "c", "S"],
+    //     "commands": [
+    //         "workbench.action.showAllSymbols"
+    //     ]
+    // },
+    {
+      "before": ["leader", "C", "s"],
+      "commands": ["workbench.action.openSettingsJson"]
+    },
+    {
+      "before": ["leader", "C", "k"],
+      "commands": ["workbench.action.openGlobalKeybindingsFile"]
+    },
+    {
+      "before": ["leader", "f", "f"],
+      "commands": ["workbench.action.quickOpen"]
+    },
+    {
+      "before": ["leader", "f", "s"],
+      "commands": ["workbench.action.files.save"]
+    },
+    {
+      "before": ["leader", "f", "y"],
+      "commands": [
+        // "copyFilePath"
+        "workbench.action.files.copyPathOfActiveFile"
+      ]
+    },
+    {
+      "before": ["leader", "f", "Y"],
+      "commands": ["copyRelativeFilePath"]
+    },
+    // https://github.com/zhangymPerson/learning-notes/blob/ae1471b072e209ba8856756ab2081003ce663dd7/tools/vim/vim_vscode.json#L42
+    {
+      "before": ["leader", "f", "r"],
+      "commands": [
+        // "workbench.action.showAllEditorsByMostRecentlyUsed"
+        "workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup"
+      ]
+    },
+    // https://github.com/sokhuong-uon/vscode-nvim/blob/dee26642a5705ee7f39c13e3ffe6a7164b8fcf1e/whichkey/settings.json#L98
+    {
+      "before": ["leader", "f", "R"],
+      "commands": [
+        "workbench.files.action.showActiveFileInExplorer",
+        "renameFile"
+      ]
+    },
+    // TODO git
+    // https://github.com/VSpaceCode/vscode-which-key/blob/master/package.json
+    {
+      "before": ["leader", "g", "s"],
+      "commands": ["workbench.view.scm"]
+    },
+    {
+      "before": ["leader", "g", "d"],
+      "commands": ["git.openChange"]
+    },
+    {
+      "before": ["leader", "g", "D"],
+      "commands": ["toggle.diff.renderSideBySide"]
+    },
+    {
+      "before": ["leader", "g", "l"],
+      "commands": ["git.pull"]
+    },
+    {
+      "before": ["leader", "g", "p"],
+      "commands": ["git.push"]
+    },
+    {
+      "before": ["leader", "t", "t"],
+      "commands": ["workbench.action.terminal.focus"]
+    },
+    {
+      "before": ["leader", "t", "w"],
+      "commands": ["editor.action.toggleWordWrap"]
+    },
+    {
+      "before": ["leader", "t", "z"],
+      "commands": ["workbench.action.toggleZenMode"]
+    },
+    {
+      "before": ["leader", "t", "F"],
+      "commands": ["workbench.action.toggleFullScreen"]
+    },
+    {
+      "before": ["leader", "s", "s"],
+      "commands": ["search.action.openEditor"]
+    },
+    {
+      "before": ["leader", "s", "b"],
+      "commands": ["actions.find"]
+    },
+    // search all open buffers
+    {
+      "before": ["leader", "s", "B"],
+      "commands": [
+        // "workbench.view.search"
+        "workbench.action.findInFiles"
+      ]
+    },
+    {
+      "before": ["leader", "e", "e"],
+      "commands": [
+        // "workbench.files.action.focusFilesExplorer"
+        // "workbench.files.action.showActiveFileInExplorer"
+        "workbench.view.explorer"
+      ]
+    },
+    {
+      "before": ["leader", "o", "f"],
+      "commands": ["workbench.action.files.openFile"]
+    },
+    {
+      "before": ["leader", "o", "F"],
+      "commands": ["workbench.action.files.openFolder"]
+    },
+    {
+      "before": ["leader", "d", "s"],
+      "commands": ["workbench.action.debug.stop"]
+    },
+    {
+      "before": ["leader", "d", "r"],
+      "commands": [
+        // "workbench.action.debug.run"
+        "workbench.action.debug.restart"
+      ]
+    },
+    {
+      "before": ["leader", "d", "b"],
+      "commands": ["editor.debug.action.toggleBreakpoint"]
+    },
+    // https://marketplace.visualstudio.com/items?itemName=alefragnani.project-manager
+    {
+      "before": ["leader", "p", "a"],
+      "commands": ["projectManager.saveProject"]
+    },
+    {
+      "before": ["leader", "p", "p"],
+      "commands": ["projectManager.listProjectsNewWindow"]
+    },
+    {
+      "before": ["leader", "p", "r"],
+      "commands": ["workbench.action.openRecent"]
+    },
+    // {
+    //     "before": ["leader", "p", "d"],
+    //     "commands": ["editor.action.peekDefinition"]
+    // },
+    // {
+    //     "before": ["leader", "p", "i"],
+    //     "commands": ["editor.action.peekImplementation"]
+    // },
+    // {
+    //     "before": ["leader", "p", "r"],
+    //     "commands": ["editor.action.referenceSearch.trigger"]
+    // },
+    {
+      "before": ["leader", "q", "q"],
+      "commands": [
+        // "workbench.action.closeActiveEditor"
+        "workbench.action.closeWindow"
+      ]
+    }
+  ],
+  "vim.normalModeKeyBindingsNonRecursive": [
+    // https://vspacecode.github.io/docs/whichkey/
+    // {
+    //   "before": ["<space>"],
+    //   "commands": ["whichkey.show"]
+    // }
+    {
+      "before": ["<Esc>"],
+      // without `after`: editor.action.peekDefinition -> togglePeekWidgetFocus -> `esc` will not close peek widget
+      "after": ["<Esc>"],
+      "commands": [
+        // https://github.com/VSCodeVim/Vim/issues/9029#issuecomment-2130972680
+        // "extension.vim_escape",
+        ":nohl",
+        // "workbench.action.maximizeEditorHideSidebar",
+        "workbench.action.closeSidebar",
+        "workbench.action.closePanel"
+      ],
+      "silent": true
+    },
+    // use vscode's undo stack, note this doesn't work with macro | https://github.com/VSCodeVim/Vim/issues/1490#issuecomment-300595431
+    {
+      "before": ["u"],
+      "commands": ["undo"]
+    },
+    {
+      "before": ["<C-r>"],
+      "commands": ["redo"]
+    },
+    // {
+    //     "before":[";"],
+    //     "after": [":"]
+    // },
+    // {
+    //     "before":[":"],
+    //     "after": [";"]
+    // },
+    {
+      "before": ["n"],
+      "after": ["n", "z", "z"]
+    },
+    {
+      "before": ["N"],
+      "after": ["N", "z", "z"]
+    },
+    // execute q macro with Q
+    {
+      "before": ["Q"],
+      "after": ["@", "q"]
+    },
+    {
+      "before": ["enter"],
+      // editor.action.revealDefinition
+      "after": ["g", "d"]
+    },
+    {
+      "before": ["backspace"],
+      "commands": ["workbench.action.closeActiveEditor"]
+    },
+    {
+      "before": ["left"],
+      "commands": [
+        // "workbench.action.navigateBack"
+        // https://github.com/Valloric/dotfiles/blob/bda97c9a6369564671942c0b4fb750b71a55f6da/vscode/settings.json#L239
+        // workbench.action.openGlobalKeybindings -> search "extension.vim"
+        "extension.vim_ctrl+o"
+      ]
+    },
+    {
+      "before": ["right"],
+      "commands": [
+        // "workbench.action.navigateForward"
+        "extension.vim_ctrl+i"
+      ]
+    },
+    {
+      "before": ["down"],
+      "commands": ["workbench.action.nextEditor"]
+    },
+    {
+      "before": ["up"],
+      "commands": ["workbench.action.previousEditor"]
+    },
+    {
+      "before": ["leader", "<space>"],
+      "commands": ["workbench.action.quickOpen"]
+    },
+    // ui
+    // TODO use leader u like LazyVim
+    {
+      "before": [",", ","],
+      "commands": ["workbench.view.explorer"]
+    },
+    {
+      "before": [",", "b"],
+      "commands": ["workbench.action.toggleSidebarVisibility"]
+    },
+    {
+      "before": [",", "e"],
+      "commands": ["workbench.view.explorer"]
+    },
+    {
+      "before": [",", "s"],
+      "commands": ["workbench.view.search"]
+    },
+    {
+      "before": [",", "v"],
+      "commands": ["workbench.view.scm"]
+    },
+    {
+      "before": [",", "d"],
+      "commands": ["workbench.view.debug"]
+    },
+    {
+      "before": [",", "E"],
+      "commands": ["workbench.view.extensions"]
+    },
+    {
+      "before": [",", "r"],
+      "commands": ["references-view.showCallHierarchy"]
+    },
+    {
+      "before": [",", "c"],
+      "commands": ["workbench.panel.chat.view.copilot.focus"]
+    },
+    {
+      "before": [",", "p"],
+      "commands": ["workbench.action.togglePanel"]
+    },
+    {
+      "before": [",", "t"],
+      "commands": ["workbench.action.terminal.toggleTerminal"]
+    },
+    // https://github.com/Valloric/dotfiles/blob/bda97c9a6369564671942c0b4fb750b71a55f6da/vscode/settings.json
+    {
+      "before": ["z", "j"],
+      "after": ["m", "z", "o", "<Esc>", "`", "z"]
+    },
+    {
+      "before": ["z", "k"],
+      // "after": ["m", "z", "O", "<Esc>", "`", "z"] // not work
+      "after": ["O", "<Esc>", "j", "0"]
+    }
+  ],
+  "vim.insertModeKeyBindings": [
+    {
+      "before": ["j", "j"],
+      "after": ["<Esc>"]
+    },
+    {
+      "before": ["j", "k"],
+      "after": ["<Esc>"]
+    },
+    {
+      "before": ["k", "j"],
+      "after": ["<Esc>"]
+    }
+  ],
+  "vim.visualModeKeyBindings": [
+    // {
+    //   "before": ["j"],
+    //   "after": ["g", "j"]
+    // },
+    // {
+    //   "before": ["k"],
+    //   "after": ["g", "k"]
+    // },
+    {
+      "before": ["H"],
+      "after": ["^"]
+    },
+    {
+      "before": ["L"],
+      "after": ["$"]
+    },
+    // Bind > and < in visual mode to indent/outdent lines (repeatable)
+    {
+      "before": [">"],
+      "commands": ["editor.action.indentLines"]
+    },
+    {
+      "before": ["<"],
+      "commands": ["editor.action.outdentLines"]
+    },
+    // work with extension: Comment Translate
+    {
+      "before": ["g", "h"],
+      "commands": ["editor.action.showHover"]
+    },
+    {
+      "before": ["leader", ":"],
+      "commands": ["workbench.action.showCommands"],
+      "silent": true
+    },
+    {
+      "before": ["leader", "="],
+      "commands": ["editor.action.formatSelection"]
+    },
+    {
+      "before": ["leader", "c", "f"],
+      "commands": ["editor.action.formatSelection"]
+    },
+    {
+      "before": ["leader", "R"],
+      "commands": ["editor.action.refactor"]
+    }
+  ],
+  "vim.visualModeKeyBindingsNonRecursive": [
+    // https://vspacecode.github.io/docs/whichkey/
+    // {
+    //   "before": ["<space>"],
+    //   "commands": ["whichkey.show"]
+    // }
+    {
+      "before": ["K"],
+      "commands": ["editor.action.smartSelect.expand"]
+    },
+    {
+      "before": ["J"],
+      "commands": ["editor.action.smartSelect.shrink"]
+    }
+  ],
+  "vim.operatorPendingModeKeyBindings": [
+    // makes yL and dH work like y$ and d^ respectively
+    {
+      "before": ["L"],
+      "after": ["$"]
+    },
+    {
+      "before": ["H"],
+      "after": ["^"]
+    }
+  ],
+  "vim.commandLineModeKeyBindings": [],
+  "explorer.confirmDelete": false
 }

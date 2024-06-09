@@ -10,451 +10,464 @@
 // https://github.com/kasecato/vscode-intellij-idea-keybindings/blob/7cd150280667f88770ead6e4b187542d9961b52f/src/package-with-comment.json#L94
 // https://github.com/LeeLaffan/vscode_config_compile/blob/8233dd269a58781f47e90494bd53c8e80479fba8/settings/keybindings.json
 // https://github.com/halafi/dotfiles/blob/master/vscode/keybindings.json
+// https://github.com/forivall/dotfiles/blob/fa4dd764a14d81d864482ed4807564320c859e2b/vscode/keybindings.json
 [
-    {
-        "key": "shift+;",
-        "command": "vim.showQuickpickCmdLine",
-        "when": "inZenMode && vim.mode != 'Insert'"
-    },
-    // `nmap ; :` for zen mode
-    // {
-    //     "key": ";",
-    //     "command": "vim.showQuickpickCmdLine",
-    //     "when": "inZenMode && vim.mode != 'Insert'"
-    // },
-    {
-        "key": "alt+j",
-        "command": "editor.action.moveLinesDownAction",
-        "when": "textInputFocus"
-    },
-    {
-        "key": "alt+k",
-        "command": "editor.action.moveLinesUpAction",
-        "when": "textInputFocus"
-    },
-    // https://gist.github.com/MasoodGit/1cc302c61622e777ca09f8bf4ae84adc
-    // https://github.com/magidc/dotfiles/blob/3a20bc944187fbf459e9c16de0c3e50d7b3800a9/vscode/keybindings.json#L321
-    {
-        "key": "ctrl+h",
-        "command": "workbench.action.navigateLeft"
-        // can be used with extension: markdown-preview-enhanced
-        // "when": "vim.active && vim.mode != 'Insert'"
-    },
-    {
-        "key": "ctrl+l",
-        "command": "workbench.action.navigateRight",
-        // "when": "vim.active && vim.mode != 'Insert'"
-        "when": "!terminalFocus" // ctrl+l clear terminal
-    },
-    {
-        "key": "ctrl+k",
-        "command": "workbench.action.navigateUp"
-        // "when": "editorTextFocus && vim.active && vim.mode != 'Insert'"
-    },
-    {
-        "key": "ctrl+j",
-        "command": "workbench.action.navigateDown"
-        // "when": "editorTextFocus && vim.active && vim.mode != 'Insert'"
-    },
-    // https://code.visualstudio.com/docs/getstarted/keybindings#_running-multiple-commands
-    {
-        "key": "escape",
-        "command": "runCommands",
-        "args": {
-            "commands": [
-                "workbench.action.focusActiveEditorGroup",
-                "workbench.action.closeSidebar",
-                "workbench.action.closePanel"
-            ]
-        },
-        // && !listFocus
-        "when": "!editorFocus && !terminalFocus"
-    },
-    {
-        "key": "shift+escape",
-        "command": "runCommands",
-        "args": {
-            "commands": [
-                "workbench.action.focusActiveEditorGroup",
-                "workbench.action.closeSidebar",
-                "workbench.action.closePanel"
-            ]
-        },
-        // "when": "terminalFocus"
-    },
-    // https://github.com/LeeLaffan/vscode_config_compile/blob/8233dd269a58781f47e90494bd53c8e80479fba8/input/find.json#L6
-    {
-        "key": "escape",
-        "command": "workbench.action.closeActiveEditor",
-        "when": "inSearchEditor && searchInputBoxFocus"
-    },
-    {
-        "key": "escape",
-        "command": "search.action.focusQueryEditorWidget",
-        "when": "inSearchEditor && !searchInputBoxFocus"
-    },
-    {
-        "key": "enter",
-        // alternative
-        // "command": "extension.multiCommand.execute",
-        // "args": {
-        //     "sequence": [
-        //         "search.action.focusNextSearchResult",
-        //         "extension.vim_escape"
-        //     ]
-        // },
-        "command": "runCommands",
-        "args": {
-            "commands": [
-                "search.action.focusNextSearchResult",
-                "extension.vim_escape"
-            ]
-        },
-        "when": "inSearchEditor && searchInputBoxFocus"
-    },
-    // already map <enter> to `gd` in settings.json
-    // https://github.com/nikitavoloboev/config/blob/master/vscode/keybindings.json
-    // {
-    //     "key": "enter",
-    //     "command": "editor.action.goToDeclaration",
-    //     "when": "inSearchEditor && editorTextFocus && vim.mode == 'Normal'"
-    // },
-    // https://github.com/vscode-neovim/vscode-neovim/blob/02d13f0e119afbec8f68fe5add0f2c2a1072ec49/package.json#L1453
-    {
-        "key": "j",
-        "command": "list.focusDown",
-        "when": "listFocus && !inputFocus"
-    },
-    {
-        "key": "k",
-        "command": "list.focusUp",
-        "when": "listFocus && !inputFocus"
-    },
-    {
-        "key": "h",
-        "command": "list.collapse",
-        "when": "listFocus && !inputFocus"
-    },
-    {
-        "key": "l",
-        "command": "list.select",
-        "when": "listFocus && !inputFocus"
-    },
-    {
-        "key": "enter",
-        "command": "list.select",
-        "when": "listFocus && !inputFocus && !notebookCellListFocused"
-    },
-    {
-        "key": "g g",
-        "command": "list.focusFirst",
-        "when": "listFocus && !inputFocus"
-    },
-    {
-        "key": "shift+g",
-        "command": "list.focusLast",
-        "when": "listFocus && !inputFocus"
-    },
-    {
-        "key": "o",
-        "command": "list.toggleExpand",
-        "when": "listFocus && !inputFocus"
-    },
-    {
-        "key": "ctrl+u",
-        "command": "list.focusPageUp",
-        "when": "listFocus && !inputFocus"
-    },
-    {
-        "key": "ctrl+d",
-        "command": "list.focusPageDown",
-        "when": "listFocus && !inputFocus"
-    },
-    {
-        "key": "/",
-        "command": "list.find",
-        "when": "listFocus && listSupportsFind && !inputFocus"
-    },
-    {
-        "key": "enter",
-        "command": "list.closeFind",
-        "when": "listFocus && treeFindOpen && inputFocus"
-    },
-    // 文件资源管理器
-    {
-        "key": "r",
-        "command": "renameFile",
-        "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus"
-    },
-    {
-        "key": "d",
-        "command": "deleteFile",
-        "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceReadonly && !inputFocus"
-    },
-    {
-        "key": "y",
-        "command": "filesExplorer.copy",
-        "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !inputFocus"
-    },
-    {
-        "key": "x",
-        "command": "filesExplorer.cut",
-        "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !inputFocus"
-    },
-    {
-        "key": "p",
-        "command": "filesExplorer.paste",
-        "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceReadonly && !inputFocus"
-    },
-    {
-        "key": "v",
-        "command": "explorer.openToSide",
-        "when": "explorerViewletFocus && explorerViewletVisible && !inputFocus"
-    },
-    {
-        "key": "a",
-        "command": "explorer.newFile",
-        "when": "filesExplorerFocus && !inputFocus"
-    },
-    {
-        "key": "shift+a",
-        "command": "explorer.newFolder",
-        "when": "filesExplorerFocus && !inputFocus"
-    },
-    {
-        "key": "shift+r",
-        "command": "workbench.files.action.refreshFilesExplorer",
-        "when": "filesExplorerFocus && !inputFocus"
-    },
-    {
-        "key": "q",
-        "command": "runCommands",
-        "args": {
-            "commands": [
-                "workbench.action.focusActiveEditorGroup",
-                "workbench.action.closeSidebar"
-            ]
-        },
-        "when": "(filesExplorerFocus || searchViewletFocus) && !inputFocus"
-    },
-    {
-        "key": "z o",
-        "command": "list.expand",
-        "when": "!editorTextFocus && !inputFocus"
-    },
-    {
-        "key": "z shift+o",
-        "command": "list.expand",
-        "when": "!editorTextFocus && !inputFocus"
-    },
-    {
-        "key": "z c",
-        "command": "list.collapse",
-        "when": "!editorTextFocus && !inputFocus"
-    },
-    {
-        "key": "z shift+c",
-        "command": "list.collapseAllToFocus",
-        "when": "!editorTextFocus && !inputFocus"
-    },
-    {
-        "key": "z a",
-        "command": "list.toggleExpand",
-        "when": "!editorTextFocus && !inputFocus"
-    },
-    {
-        "key": "z shift+a",
-        "command": "list.toggleExpand",
-        "when": "!editorTextFocus && !inputFocus"
-    },
-    {
-        "key": "z m",
-        "command": "list.collapseAll",
-        "when": "!editorTextFocus && !inputFocus"
-    },
-    {
-        "key": "z shift+m",
-        "command": "list.collapseAll",
-        "when": "!editorTextFocus && !inputFocus"
-    },
-    // referenceSearch can be activated by `g d`
-    {
-        "key": "tab",
-        "command": "togglePeekWidgetFocus",
-        "when": "inReferenceSearchEditor && vim.mode == 'Normal' || referenceSearchVisible"
-    },
-    // hover
-    // first K show hover, second K focus hover
-    {
-        "command": "editor.action.showHover",
-        "key": "shift+k",
-        "when": "vim.mode == 'Normal' && editorTextFocus && editorHoverVisible"
-    },
-    {
-        "command": "editor.action.pageDownHover",
-        "key": "ctrl+f",
-        "when": "editorHoverFocused"
-    },
-    {
-        "command": "editor.action.pageUpHover",
-        "key": "ctrl+b",
-        "when": "editorHoverFocused"
-    },
-    {
-        "command": "editor.action.pageDownHover",
-        "key": "ctrl+d",
-        "when": "editorHoverFocused"
-    },
-    {
-        "command": "editor.action.pageUpHover",
-        "key": "ctrl+u",
-        "when": "editorHoverFocused"
-    },
-    {
-        "command": "editor.action.scrollDownHover",
-        "key": "j",
-        "when": "editorHoverFocused"
-    },
-    {
-        "command": "editor.action.scrollUpHover",
-        "key": "k",
-        "when": "editorHoverFocused"
-    },
-    {
-        "command": "editor.action.scrollLeftHover",
-        "key": "h",
-        "when": "editorHoverFocused"
-    },
-    {
-        "command": "editor.action.scrollRightHover",
-        "key": "l",
-        "when": "editorHoverFocused"
-    },
-    {
-        "command": "editor.action.goToTopHover",
-        "key": "g g",
-        "when": "editorHoverFocused"
-    },
-    {
-        "command": "editor.action.goToBottomHover",
-        "key": "shift+g",
-        "when": "editorHoverFocused"
-    },
-    // with tmux and karabiner-elements
-    {
-        "key": "ctrl+b",
-        "command": "workbench.action.toggleMaximizedPanel",
-        "when": "!terminalFocus && !view.terminal.visible"
-    },
-    {
-        "key": "ctrl+b",
-        "command": "runCommands",
-        "args": {
-            "commands": [
-                "workbench.action.toggleMaximizedPanel",
-                "workbench.action.terminal.focus"
-            ]
-        },
-        "when": "!terminalFocus && view.terminal.visible"
-    },
-    // https://code.visualstudio.com/docs/terminal/advanced#_custom-sequence-keybindings
-    {
-        "key": "cmd+shift+]",
-        "command": "workbench.action.terminal.sendSequence",
-        "args": {
-            // send ctrl+b ctrl+l to tmux: next-window
-            "text": "\u0002\u000c"
-        },
-        "when": "terminalFocus"
-    },
-    {
-        "key": "cmd+shift+[",
-        "command": "workbench.action.terminal.sendSequence",
-        "args": {
-            // send ctrl+b ctrl+h to tmux: previous-window
-            "text": "\u0002\u0008"
-        },
-        "when": "terminalFocus"
-    },
-    // https://github.com/nikitavoloboev/config/blob/master/vscode/keybindings.json
-    {
-        "key": "cmd+.",
-        "command": "workbench.action.terminal.focus",
-        "when": "!terminalFocus"
-    },
-    {
-        "key": "cmd+.",
-        "command": "runCommands",
-        "args": {
-            "commands": [
-                "workbench.action.focusActiveEditorGroup",
-                "workbench.action.closePanel"
-            ]
-        },
-        "when": "terminalFocus"
-    },
-    {
-        "command": "workbench.action.compareEditor.nextChange",
-        "key": "] ]",
-        "when": "textCompareEditorVisible"
-    },
-    {
-        "command": "workbench.action.compareEditor.previousChange",
-        "key": "[ [",
-        "when": "textCompareEditorVisible"
-    },
-    {
-        "command": "editor.action.marker.next",
-        "key": "] e",
-        "when": "textCompareEditorVisible"
-    },
-    {
-        "command": "editor.action.marker.prev",
-        "key": "[ e",
-        "when": "textCompareEditorVisible"
-    },
-    {
-        "command": "workbench.action.compareEditor.nextChange",
-        "key": "] c",
-        "when": "textCompareEditorVisible"
-    },
-    {
-        "command": "workbench.action.compareEditor.previousChange",
-        "key": "[ c",
-        "when": "textCompareEditorVisible"
-    },
-    // find & replace
-    {
-        "key": "cmd+f",
-        "command": "editor.action.startFindReplaceAction",
-        "when": "editorFocus || editorIsOpen"
-    },
-    {
-        "key": "cmd+f",
-        "command": "-actions.find",
-        "when": "editorFocus || editorIsOpen"
-    },
-    // TODO inSearchEditor
-    // https://github.com/ravenxrz/dotfiles/blob/a58c20cf867fb8620217d94d5533a73d84d36e7c/vscode/keybindings.json#L62
-    // focus on searching result
-    {
-        "command": "search.action.focusSearchList",
-        "key": "tab",
-        // https://code.visualstudio.com/api/references/when-clause-contexts#visiblefocused-view-when-clause-context
-        // "when": "focusedView == 'workbench.view.search' && !listFocus" // alternative
-        "when": "searchViewletFocus && !listFocus"
-    },
-    // TODO focus on search input box
-    {
-        "command": "search.focus.previousInputBox",
-        "key": "tab",
-        // FIXME when
-        "when": "searchViewletFocus && listFocus"
+  {
+    "key": "shift+;",
+    "command": "vim.showQuickpickCmdLine",
+    "when": "inZenMode && vim.mode != 'Insert'"
+  },
+  // `nmap ; :` for zen mode
+  // {
+  //     "key": ";",
+  //     "command": "vim.showQuickpickCmdLine",
+  //     "when": "inZenMode && vim.mode != 'Insert'"
+  // },
+  {
+    "key": "alt+j",
+    "command": "editor.action.moveLinesDownAction",
+    "when": "textInputFocus"
+  },
+  {
+    "key": "alt+k",
+    "command": "editor.action.moveLinesUpAction",
+    "when": "textInputFocus"
+  },
+  // https://gist.github.com/MasoodGit/1cc302c61622e777ca09f8bf4ae84adc
+  // https://github.com/magidc/dotfiles/blob/3a20bc944187fbf459e9c16de0c3e50d7b3800a9/vscode/keybindings.json#L321
+  {
+    "key": "ctrl+h",
+    "command": "workbench.action.navigateLeft"
+    // can be used with extension: markdown-preview-enhanced
+    // "when": "vim.active && vim.mode != 'Insert'"
+  },
+  {
+    "key": "ctrl+l",
+    "command": "workbench.action.navigateRight",
+    // "when": "vim.active && vim.mode != 'Insert'"
+    "when": "!terminalFocus" // ctrl+l clear terminal
+  },
+  {
+    "key": "ctrl+k",
+    "command": "workbench.action.navigateUp"
+    // "when": "editorTextFocus && vim.active && vim.mode != 'Insert'"
+  },
+  {
+    "key": "ctrl+j",
+    "command": "workbench.action.navigateDown"
+    // "when": "editorTextFocus && vim.active && vim.mode != 'Insert'"
+  },
+  // https://code.visualstudio.com/docs/getstarted/keybindings#_running-multiple-commands
+  {
+    "key": "escape",
+    "command": "runCommands",
+    "args": {
+      "commands": [
+        "workbench.action.focusActiveEditorGroup",
+        "workbench.action.closeSidebar",
+        "workbench.action.closePanel"
+      ]
+    },
+    // && !listFocus
+    "when": "!editorFocus && !terminalFocus"
+  },
+  {
+    "key": "shift+escape",
+    "command": "runCommands",
+    "args": {
+      "commands": [
+        "workbench.action.focusActiveEditorGroup",
+        "workbench.action.closeSidebar",
+        "workbench.action.closePanel"
+      ]
     }
-    // TODO leader 配置到 keybindings.json 中（在 settings.json 中配置的缺点：只有 editorFocus 时才能触发）
-    // {
-    //     "key": "space l",
-    //     "command": "workbench.action.toggleSidebarVisibility",
-    //     "when": "vim.active && vim.mode != 'Insert'"
+    // "when": "terminalFocus"
+  },
+  // https://github.com/LeeLaffan/vscode_config_compile/blob/8233dd269a58781f47e90494bd53c8e80479fba8/input/find.json#L6
+  {
+    "key": "escape",
+    "command": "workbench.action.closeActiveEditor",
+    "when": "inSearchEditor && searchInputBoxFocus"
+  },
+  {
+    "key": "escape",
+    "command": "search.action.focusQueryEditorWidget",
+    "when": "inSearchEditor && !searchInputBoxFocus"
+  },
+  {
+    "key": "enter",
+    // alternative
+    // "command": "extension.multiCommand.execute",
+    // "args": {
+    //     "sequence": [
+    //         "search.action.focusNextSearchResult",
+    //         "extension.vim_escape"
+    //     ]
     // },
+    "command": "runCommands",
+    "args": {
+      "commands": [
+        "search.action.focusNextSearchResult",
+        "extension.vim_escape"
+      ]
+    },
+    "when": "inSearchEditor && searchInputBoxFocus"
+  },
+  // already map <enter> to `gd` in settings.json
+  // https://github.com/nikitavoloboev/config/blob/master/vscode/keybindings.json
+  // {
+  //     "key": "enter",
+  //     "command": "editor.action.goToDeclaration",
+  //     "when": "inSearchEditor && editorTextFocus && vim.mode == 'Normal'"
+  // },
+  // https://github.com/vscode-neovim/vscode-neovim/blob/02d13f0e119afbec8f68fe5add0f2c2a1072ec49/package.json#L1453
+  {
+    "key": "j",
+    "command": "list.focusDown",
+    "when": "listFocus && !inputFocus"
+  },
+  {
+    "key": "k",
+    "command": "list.focusUp",
+    "when": "listFocus && !inputFocus"
+  },
+  {
+    "key": "h",
+    "command": "list.collapse",
+    "when": "listFocus && !inputFocus"
+  },
+  {
+    "key": "l",
+    "command": "list.select",
+    "when": "listFocus && !inputFocus"
+  },
+  {
+    "key": "enter",
+    "command": "list.select",
+    "when": "listFocus && !inputFocus && !notebookCellListFocused"
+  },
+  {
+    "key": "g g",
+    "command": "list.focusFirst",
+    "when": "listFocus && !inputFocus"
+  },
+  {
+    "key": "shift+g",
+    "command": "list.focusLast",
+    "when": "listFocus && !inputFocus"
+  },
+  {
+    "key": "o",
+    "command": "list.toggleExpand",
+    "when": "listFocus && !inputFocus"
+  },
+  {
+    "key": "ctrl+u",
+    "command": "list.focusPageUp",
+    "when": "listFocus && !inputFocus"
+  },
+  {
+    "key": "ctrl+d",
+    "command": "list.focusPageDown",
+    "when": "listFocus && !inputFocus"
+  },
+  {
+    "key": "/",
+    "command": "list.find",
+    "when": "listFocus && listSupportsFind && !inputFocus"
+  },
+  {
+    "key": "enter",
+    "command": "list.closeFind",
+    "when": "listFocus && treeFindOpen && inputFocus"
+  },
+  {
+    "key": "space",
+    "command": "list.toggleSelection",
+    "when": "listFocus && !inputFocus"
+  },
+  // 文件资源管理器
+  {
+    "key": "r",
+    "command": "renameFile",
+    "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus"
+  },
+  // https://github.com/KhoaLee/KleeVSCodeSettings/blob/ca245c366dbe6efbce34fb5907bc684481687f85/keybindings.json#L138
+  {
+    "key": "d",
+    "command": "moveFileToTrash",
+    "when": "explorerResourceMoveableToTrash && explorerViewletVisible && filesExplorerFocus && !explorerResourceReadonly && !inputFocus"
+  },
+  {
+    "key": "shift+d",
+    "command": "deleteFile",
+    "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceReadonly && !inputFocus"
+  },
+  {
+    "key": "y",
+    "command": "filesExplorer.copy",
+    "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !inputFocus"
+  },
+  {
+    "key": "x",
+    "command": "filesExplorer.cut",
+    "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !inputFocus"
+  },
+  {
+    "key": "p",
+    "command": "filesExplorer.paste",
+    "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceReadonly && !inputFocus"
+  },
+  {
+    "key": "v",
+    "command": "explorer.openToSide",
+    "when": "explorerViewletFocus && explorerViewletVisible && !inputFocus"
+  },
+  {
+    "key": "a",
+    // To create a folder add a slash at the end of the name.
+    "command": "explorer.newFile",
+    "when": "filesExplorerFocus && !inputFocus"
+  },
+  {
+    "key": "shift+a",
+    "command": "explorer.newFolder",
+    "when": "filesExplorerFocus && !inputFocus"
+  },
+  {
+    "key": "shift+r",
+    "command": "workbench.files.action.refreshFilesExplorer",
+    "when": "filesExplorerFocus && !inputFocus"
+  },
+  {
+    "key": "q",
+    "command": "runCommands",
+    "args": {
+      "commands": [
+        "workbench.action.focusActiveEditorGroup",
+        "workbench.action.closeSidebar"
+      ]
+    },
+    "when": "(filesExplorerFocus || searchViewletFocus) && !inputFocus"
+  },
+  {
+    "key": "z o",
+    "command": "list.expand",
+    "when": "!editorTextFocus && !inputFocus"
+  },
+  {
+    "key": "z shift+o",
+    "command": "list.expand",
+    "when": "!editorTextFocus && !inputFocus"
+  },
+  {
+    "key": "z c",
+    "command": "list.collapse",
+    "when": "!editorTextFocus && !inputFocus"
+  },
+  {
+    "key": "z shift+c",
+    "command": "list.collapseAllToFocus",
+    "when": "!editorTextFocus && !inputFocus"
+  },
+  {
+    "key": "z a",
+    "command": "list.toggleExpand",
+    "when": "!editorTextFocus && !inputFocus"
+  },
+  {
+    "key": "z shift+a",
+    "command": "list.toggleExpand",
+    "when": "!editorTextFocus && !inputFocus"
+  },
+  {
+    "key": "z m",
+    "command": "list.collapseAll",
+    "when": "!editorTextFocus && !inputFocus"
+  },
+  {
+    "key": "z shift+m",
+    "command": "list.collapseAll",
+    "when": "!editorTextFocus && !inputFocus"
+  },
+  // referenceSearch can be activated by `g d`
+  {
+    "key": "tab",
+    "command": "togglePeekWidgetFocus",
+    "when": "inReferenceSearchEditor && vim.mode == 'Normal' || referenceSearchVisible"
+  },
+  // hover
+  // first K show hover, second K focus hover
+  {
+    "command": "editor.action.showHover",
+    "key": "shift+k",
+    "when": "vim.mode == 'Normal' && editorTextFocus && editorHoverVisible"
+  },
+  {
+    "command": "editor.action.pageDownHover",
+    "key": "ctrl+f",
+    "when": "editorHoverFocused"
+  },
+  {
+    "command": "editor.action.pageUpHover",
+    "key": "ctrl+b",
+    "when": "editorHoverFocused"
+  },
+  {
+    "command": "editor.action.pageDownHover",
+    "key": "ctrl+d",
+    "when": "editorHoverFocused"
+  },
+  {
+    "command": "editor.action.pageUpHover",
+    "key": "ctrl+u",
+    "when": "editorHoverFocused"
+  },
+  {
+    "command": "editor.action.scrollDownHover",
+    "key": "j",
+    "when": "editorHoverFocused"
+  },
+  {
+    "command": "editor.action.scrollUpHover",
+    "key": "k",
+    "when": "editorHoverFocused"
+  },
+  {
+    "command": "editor.action.scrollLeftHover",
+    "key": "h",
+    "when": "editorHoverFocused"
+  },
+  {
+    "command": "editor.action.scrollRightHover",
+    "key": "l",
+    "when": "editorHoverFocused"
+  },
+  {
+    "command": "editor.action.goToTopHover",
+    "key": "g g",
+    "when": "editorHoverFocused"
+  },
+  {
+    "command": "editor.action.goToBottomHover",
+    "key": "shift+g",
+    "when": "editorHoverFocused"
+  },
+  // with tmux and karabiner-elements
+  {
+    "key": "ctrl+b",
+    "command": "workbench.action.toggleMaximizedPanel",
+    "when": "!terminalFocus && !view.terminal.visible"
+  },
+  {
+    "key": "ctrl+b",
+    "command": "runCommands",
+    "args": {
+      "commands": [
+        "workbench.action.toggleMaximizedPanel",
+        "workbench.action.terminal.focus"
+      ]
+    },
+    "when": "!terminalFocus && view.terminal.visible"
+  },
+  // https://code.visualstudio.com/docs/terminal/advanced#_custom-sequence-keybindings
+  {
+    "key": "cmd+shift+]",
+    "command": "workbench.action.terminal.sendSequence",
+    "args": {
+      // send ctrl+b ctrl+l to tmux: next-window
+      "text": "\u0002\u000c"
+    },
+    "when": "terminalFocus"
+  },
+  {
+    "key": "cmd+shift+[",
+    "command": "workbench.action.terminal.sendSequence",
+    "args": {
+      // send ctrl+b ctrl+h to tmux: previous-window
+      "text": "\u0002\u0008"
+    },
+    "when": "terminalFocus"
+  },
+  // https://github.com/nikitavoloboev/config/blob/master/vscode/keybindings.json
+  {
+    "key": "cmd+.",
+    "command": "workbench.action.terminal.focus",
+    "when": "!terminalFocus"
+  },
+  {
+    "key": "cmd+.",
+    "command": "runCommands",
+    "args": {
+      "commands": [
+        "workbench.action.focusActiveEditorGroup",
+        "workbench.action.closePanel"
+      ]
+    },
+    "when": "terminalFocus"
+  },
+  {
+    "command": "workbench.action.compareEditor.nextChange",
+    "key": "] ]",
+    "when": "textCompareEditorVisible"
+  },
+  {
+    "command": "workbench.action.compareEditor.previousChange",
+    "key": "[ [",
+    "when": "textCompareEditorVisible"
+  },
+  {
+    "command": "editor.action.marker.next",
+    "key": "] d",
+    "when": "textCompareEditorVisible"
+  },
+  {
+    "command": "editor.action.marker.prev",
+    "key": "[ d",
+    "when": "textCompareEditorVisible"
+  },
+  {
+    "command": "workbench.action.compareEditor.nextChange",
+    "key": "] c",
+    "when": "textCompareEditorVisible"
+  },
+  {
+    "command": "workbench.action.compareEditor.previousChange",
+    "key": "[ c",
+    "when": "textCompareEditorVisible"
+  },
+  // find & replace
+  {
+    "key": "cmd+f",
+    "command": "editor.action.startFindReplaceAction",
+    "when": "editorFocus || editorIsOpen"
+  },
+  {
+    "key": "cmd+f",
+    "command": "-actions.find",
+    "when": "editorFocus || editorIsOpen"
+  },
+  // TODO inSearchEditor
+  // https://github.com/ravenxrz/dotfiles/blob/a58c20cf867fb8620217d94d5533a73d84d36e7c/vscode/keybindings.json#L62
+  // focus on searching result
+  {
+    "command": "search.action.focusSearchList",
+    "key": "tab",
+    // https://code.visualstudio.com/api/references/when-clause-contexts#visiblefocused-view-when-clause-context
+    // "when": "focusedView == 'workbench.view.search' && !listFocus" // alternative
+    "when": "searchViewletFocus && !listFocus"
+  },
+  // TODO focus on search input box
+  {
+    "command": "search.focus.previousInputBox",
+    "key": "tab",
+    // FIXME when
+    "when": "searchViewletFocus && listFocus"
+  }
+  // TODO leader 配置到 keybindings.json 中（在 settings.json 中配置的缺点：只有 editorFocus 时才能触发）
+  // {
+  //     "key": "space l",
+  //     "command": "workbench.action.toggleSidebarVisibility",
+  //     "when": "vim.active && vim.mode != 'Insert'"
+  // },
 ]

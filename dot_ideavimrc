@@ -240,15 +240,17 @@ nmap ]c <Action>(VcsShowNextChangeMarker)
 nmap [c <Action>(VcsShowPrevChangeMarker)
 " nmap [c <Action>(JumpToLastChange)
 " nmap ]c <Action>(JumpToNextChange)
-map ]e <Action>(GotoNextError)
-map [e <Action>(GotoPreviousError)
+map ]d <Action>(GotoNextError)
+map [d <Action>(GotoPreviousError)
 
 map <M-j> <Action>(MoveStatementDown)
 map <M-k> <Action>(MoveStatementUp)
 
 " behaves like Vimium (with goku vim-s-mode rules)
-map <up> <Action>(MethodUp)
-map <down> <Action>(MethodDown)
+" map <up> <Action>(MethodUp)
+" map <down> <Action>(MethodDown)
+map <down> gt
+map <up> gT
 " map <left> <Action>(JumpToLastChange)
 " map <left> <C-o>
 map <left> <Action>(Back)

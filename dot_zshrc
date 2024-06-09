@@ -242,6 +242,7 @@ function m() {
 # https://github.com/wofr06/lesspipe#511-syntax-highlighting-choices
 # https://stackoverflow.com/questions/43702876/creating-an-alias-in-bash-to-less-sh-less-vim
 # https://neovim.io/doc/user/various.html#less
+# https://github.com/neovim/neovim/blob/master/runtime/macros/less.sh
 lessc () { /usr/share/vim/vim90/macros/less.sh "$@"}
 
 # brew search vim

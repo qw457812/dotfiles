@@ -1041,3 +1041,4 @@ nnoremap <wait> <space>czz :execute 'cd' fnameescape(system('chezmoi source-path
 " https://github.com/wofr06/lesspipe#4-supported-file-formats
 " https://github.com/wofr06/lesspipe#5-colorizing-the-output
 " https://github.com/eth-p/bat-extras/blob/master/doc/batpipe.md#built-in-viewers
+" https://github.com/sharkdp/bat/blob/master/doc/alternatives.md
