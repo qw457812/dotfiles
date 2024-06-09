@@ -1,0 +1,20 @@
+# https://alacritty.org/config-alacritty.html
+[window]
+# "Full" | "None" | "Transparent" | "Buttonless"
+decorations = "Buttonless"
+# "Windowed" | "Maximized" | "Fullscreen" | "SimpleFullscreen"
+startup_mode = "Maximized"
+
+[font]
+# "JetBrainsMono Nerd Font", "Hack Nerd Font", "MesloLGM Nerd Font"
+normal = { family = "MesloLGM Nerd Font", style = "Regular" }
+size = 13.0
+
+[selection]
+save_to_clipboard = true
+
+[mouse]
+bindings = [
+{ mouse = "Right", action = "Paste" },
+]
+
