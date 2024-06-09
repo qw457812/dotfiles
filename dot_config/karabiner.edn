@@ -1397,8 +1397,10 @@
            [:!Qh :!Ograve_accent_and_tilde :WeWork] ; AltTab.app
            [:!Qj [:open "/Applications/Brave Browser.app"] :!Brave]
            [:!Qj :same_wind_app :Brave]
-           [:!Qk [:open "/Applications/kitty.app"] :!Kitty]
-           [:!Qk :same_wind_app :Kitty]
+           ; [:!Qk [:open "/Applications/kitty.app"] :!Kitty]
+           ; [:!Qk :same_wind_app :Kitty]
+           [:!Qk [:open "/Applications/Alacritty.app"] :!Alacritty]
+           [:!Qk :same_wind_app :Alacritty]
            [:!Ql [:open "/Applications/Visual Studio Code.app"] :!VSCode]
            [:!Ql :same_wind_app :VSCode]
            [:!Qsemicolon [:open "/Library/Application Support/Citrix Receiver/Citrix Viewer.app"]] ; Citrix Workspace.app
@@ -1512,7 +1514,7 @@
   {:des   "left option alone -> tmux prefix"
    :rules [[:condi :!niz-x87-wired :!glove80]
            ;; [:left_option :left_option :!Terminals {:alone [:!!f18]}] ; left option alone -> hyper+f18 (iTerm2 Hotkey Window)
-           [:#Pleft_option :left_option [:!tmux-autostart-terminals :!VSCode] {:alone [:open "/Applications/kitty.app"]}]
+           [:#Pleft_option :left_option [:!tmux-autostart-terminals :!VSCode] {:alone [:open "/Applications/Alacritty.app"]}]
            [:#Pleft_option :left_option :tmux-autostart-terminals {:alone [:!Tb]}] ; tmux prefix
            [:#Pleft_option :left_option :VSCode {:alone [:!Tb]}] ; tmux prefix
            ]}
@@ -1711,7 +1713,7 @@
            ;; [:##left_shift :left_command nil {:alone :prev_app}]
            [:##left_shift :delete_or_backspace] ; see lshift-cmd-mode simlayer above
            [:##right_shift :right_command nil {:alone :escape}]
-           [:##left_option :left_option [:!tmux-autostart-terminals :!VSCode] {:alone [:open "/Applications/kitty.app"]}]
+           [:##left_option :left_option [:!tmux-autostart-terminals :!VSCode] {:alone [:open "/Applications/Alacritty.app"]}]
            [:##left_option :left_option :tmux-autostart-terminals {:alone [:!Tb]}] ; tmux prefix
            [:##left_option :left_option :VSCode {:alone [:!Tb]}] ; tmux prefix
            [:##right_option :right_option nil {:alone [:hs ["mouseCenterClick"]]}]
@@ -1780,8 +1782,10 @@
            [:!Wh :same_wind_app :WeWork]
            [:!Wj [:left_command [:open "/Applications/Brave Browser.app"]] :!Brave]
            [:!Wj :same_wind_app :Brave]
-           [:!Wk [:left_command [:open "/Applications/kitty.app"]] :!Kitty]
-           [:!Wk :same_wind_app :Kitty]
+           ; [:!Wk [:left_command [:open "/Applications/kitty.app"]] :!Kitty]
+           ; [:!Wk :same_wind_app :Kitty]
+           [:!Wk [:left_command [:open "/Applications/Alacritty.app"]] :!Alacritty]
+           [:!Wk :same_wind_app :Alacritty]
            [:!Wl [:left_command [:open "/Applications/Visual Studio Code.app"]] :!VSCode]
            [:!Wl :same_wind_app :VSCode]
            [:!Wsemicolon [:left_command [:open "/Library/Application Support/Citrix Receiver/Citrix Viewer.app"]]] ; Citrix Workspace.app
@@ -1860,7 +1864,7 @@
            :niz-x87-wired
            [:##left_option :left_command nil {:alone :prev_app}] ; left_command, see "left cmd alone" above
            ;; [:##left_command :left_option :!Terminals {:alone [:!!f18]}] ; left_option, see "left option alone" above
-           [:##left_command :left_option [:!tmux-autostart-terminals :!VSCode] {:alone [:open "/Applications/kitty.app"]}] ; left_option, see "left option alone" above
+           [:##left_command :left_option [:!tmux-autostart-terminals :!VSCode] {:alone [:open "/Applications/Alacritty.app"]}] ; left_option, see "left option alone" above
            [:##left_command :left_option :tmux-autostart-terminals {:alone [:!Tb]}] ; left_option, see "left option alone" above
            [:##left_command :left_option :VSCode {:alone [:!Tb]}] ; left_option, see "left option alone" above
            [:##right_option :right_command nil {:alone [:hs ["mouseCenterClick"]]}] ; right_command, see "right cmd alone" above
@@ -2116,7 +2120,7 @@
    "^com\\.p5sys\\.jump\\.mac\\.viewer\\.web$" "^com\\.teamviewer\\.TeamViewer$"
    "^com\\.vmware\\.horizon$" "^com\\.2X\\.Client\\.Mac$"
    "^com\\.apple\\.Terminal$" "^com\\.googlecode\\.iterm2$"
-   "^co\\.zeit\\.hyperterm$" "^co\\.zeit\\.hyper$" "^io\\.alacritty$"
+   "^co\\.zeit\\.hyperterm$" "^co\\.zeit\\.hyper$" "^io\\.alacritty$" "^org\\.alacritty$"
    "^com\\.github\\.wez\\.wezterm$" "^net\\.kovidgoyal\\.kitty$" "^org\\.vim\\."
    "^com\\.qvacua\\.VimR$" "^com\\.vmware\\.fusion$" "^com\\.vmware\\.horizon$"
    "^com\\.vmware\\.view$" "^com\\.parallels\\.desktop$"
@@ -2132,7 +2136,7 @@
    "^md\\.obsidian$" "^com\\.tidgi$"]
   :vim-mode-disabled-application
   ["^com\\.apple\\.Terminal$" "^com\\.googlecode\\.iterm2$"
-   "^co\\.zeit\\.hyperterm$" "^co\\.zeit\\.hyper$" "^io\\.alacritty$"
+   "^co\\.zeit\\.hyperterm$" "^co\\.zeit\\.hyper$" "^io\\.alacritty$" "^org\\.alacritty$"
    "^com\\.github\\.wez\\.wezterm$" "^net\\.kovidgoyal\\.kitty$" "^org\\.vim\\."
    "^com\\.qvacua\\.VimR$"
    "^com\\.microsoft\\.VSCode(Insiders)?$"
@@ -2154,12 +2158,13 @@
    "^com\\.apple\\.Safari$"
    "^com\\.jetbrains\\.intellij\\.ce$" "^com\\.jetbrains\\.pycharm\\.ce(-EAP)?$"]
   :tmux-autostart-terminals
-  ["^net\\.kovidgoyal\\.kitty$"]
+  ["^org\\.alacritty$" "^net\\.kovidgoyal\\.kitty$"]
   :Emacs            ["^org\\.gnu\\.Emacs$" "^org\\.gnu\\.AquamacsEmacs$"
                      "^org\\.gnu\\.Aquamacs$"]
   :VSCode           ["^com\\.microsoft\\.VSCode$"]
   :IntelliJ         ["^com\\.jetbrains\\.intellij\\.ce$"]
   :PyCharm          ["^com\\.jetbrains\\.pycharm\\.ce(-EAP)?$"]
+  :Alacritty        ["^org\\.alacritty$"]
   :Kitty            ["^net\\.kovidgoyal\\.kitty$"]
   :iTerm            ["^com\\.googlecode\\.iterm2$"]
   :Finder           ["^com\\.apple\\.finder$"]
@@ -2181,7 +2186,7 @@
   :Terminals        ["^com\\.apple\\.Terminal$"
                      "^com\\.googlecode\\.iterm2$"
                      "^co\\.zeit\\.hyperterm$" "^co\\.zeit\\.hyper$"
-                     "^io\\.alacritty$"
+                     "^io\\.alacritty$" "^org\\.alacritty$"
                      "^com\\.github\\.wez\\.wezterm$"
                      "^net\\.kovidgoyal\\.kitty$"
                      ;; "^dev\\.warp\\.Warp.*"
