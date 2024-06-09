@@ -170,27 +170,32 @@ export LC_ALL=en_US.UTF-8
 # You may need to manually set your language environment
 export LANG=en_US.UTF-8
 
-
 # export LESS='-R'
 # https://github.com/infokiller/config-public/blob/939e5c3735762ba15c298d8ce37a1b48461d2e72/.config/lesskey
 # https://github.com/infokiller/config-public/blob/939e5c3735762ba15c298d8ce37a1b48461d2e72/.profile#L318
 # https://github.com/PatrickF1/dotfiles/blob/b9d08e85a606dbd8be997e6a1cdba1e1dcf08b12/.config/lesskey#L23
 # https://github.com/christian-oudard/dotfiles/blob/4c92919d514611aa70b4f33beb933dfdb4cf391a/dot_config/lesskey#L121
+# https://github.com/sharkdp/bat#indentation
 # --status-column --status-col-width=1
 # --underline-special
-# --tabs=4
 # --shift=10
-# --color=d+b$ --color=s+y$ --color=u+g$ (--use-color not required)
-# https://explainshell.com/explain?cmd=less+-RiMS
-export LESS='--RAW-CONTROL-CHARS --ignore-case --LONG-PROMPT --chop-long-lines --incsearch --use-color --intr=c$ --save-marks --status-line'
-
-# brew info lesspipe
-export LESSOPEN="|/opt/homebrew/bin/lesspipe.sh %s"
+# --color=d+b$ --color=s+y$ --color=u+g$ (--use-color not required in this case)
+# https://explainshell.com/explain?cmd=less+-RiMSx4
+export LESS='--RAW-CONTROL-CHARS --ignore-case --LONG-PROMPT --chop-long-lines --incsearch --use-color --tabs=4 --intr=c$ --save-marks --status-line'
 
 # https://github.com/sharkdp/bat
 # bat --list-themes | fzf --preview="bat --theme={} --color=always ~/.zshrc"
 export BAT_THEME="TwoDark"
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+# https://neovim.io/doc/user/filetype.html#ft-man-plugin
+# `:help :Man` in nvim
+# outline via `gO`, copy via `y`
+# export MANPAGER='nvim +Man!'
+vman() {
+    # MANPAGER='nvim +Man!' man "$1"
+    # alternative
+    nvim "+hide Man $1"
+}
 # plain: disables all available components. | bat --help
 export BAT_STYLE="plain"
 h() {
@@ -200,6 +205,44 @@ h() {
 # Be aware that in some cases, -h may not be a shorthand of --help (for example with ls).
 # alias -g -- -h='-h 2>&1 | bat --language=help --style=plain'
 alias -g -- --help='--help 2>&1 | bat --language=help --style=plain'
+alias cat='bat --paging=never'
+
+# brew info lesspipe
+# export LESSOPEN="|/opt/homebrew/bin/lesspipe.sh %s"
+
+# https://github.com/eth-p/bat-extras/blob/master/doc/batpipe.md#usage
+eval "$(batpipe)"
+
+# more
+# alias m='less'
+# alias m='bat --paging=always'
+function m() {
+  if [ $# -eq 0 ]; then
+    # --quit-if-one-screen to match `bat` behavior
+    less -F .;
+  elif [ $# -eq 1 ]; then
+    # sometimes lesspipe or batpipe not colorize the output
+
+    # TODO `--paging=always` cause `[bat error]: '.' is a directory.` piped to pager when call `m .`
+    # bat --paging=always "$@" || less "$@";
+    # Is this `[bat error]` stderr or stdout?
+    # Both `bat . > /dev/null` and `bat . 2> /dev/null` can't suppress the error,
+    # Only `bat . > /dev/null 2>&1` can, but the expected output is suppressed too.
+    # bat "$@" 2> /dev/null || less "$@"; # can't suppress the error, why?
+
+    bat "$@" || less -F "$@";
+  else
+    # bat combine multiple files into one
+    # batpipe + less not colorize the output when multiple files
+    # so use lesspipe + less
+    LESSOPEN="|/opt/homebrew/bin/lesspipe.sh %s" less -F "$@";
+  fi;
+}
+
+# https://github.com/wofr06/lesspipe#511-syntax-highlighting-choices
+# https://stackoverflow.com/questions/43702876/creating-an-alias-in-bash-to-less-sh-less-vim
+# https://neovim.io/doc/user/various.html#less
+lessc () { /usr/share/vim/vim90/macros/less.sh "$@"}
 
 # brew search vim
 # Warning: Error searching on GitHub: GitHub API Error: Requires authentication
@@ -350,20 +393,6 @@ function o() {
 function tre() {
   tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX;
 }
-
-# more
-# alias m='less'
-# alias m='bat --paging=always'
-# zsh completions for function?
-function m() {
-  if [ $# -eq 0 ]; then
-    less .;
-  else
-    less "$@";
-  fi;
-}
-
-alias cat='bat --paging=never'
 
 # deal this warning from `doom doctor`: "! The installed grep binary was not built with support for PCRE lookaheads"
 # brew info grep
