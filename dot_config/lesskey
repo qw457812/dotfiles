@@ -1,3 +1,5 @@
+# man lesskey
+
 # https://github.com/infokiller/config-public/blob/939e5c3735762ba15c298d8ce37a1b48461d2e72/.config/lesskey
 # https://github.com/chrisgrieser/.config/blob/2926ac0071d947ccb5e9be876bed38b3534349ab/less/lesskey
 # https://github.com/jamesrayman/dotfiles/blob/7495d797b84b329831eb2b13cff18b4c87f76700/.config/less/lesskey
@@ -37,6 +39,8 @@ L toggle-option N
 # color marked line
 ,m toggle-option --status-line\n
 
+# TAB
+\t next-file
 ^N next-file
 ^P prev-file
 
