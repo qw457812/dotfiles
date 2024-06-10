@@ -1,20 +1,62 @@
 # https://alacritty.org/config-alacritty.html
+# man 5 alacritty
+
+# GENERAL
+# import = [
+# # https://github.com/alacritty/alacritty-theme
+# # catppuccin_mocha doom_one one_dark papercolor_dark google kanagawa_dragon monokai_charcoal solarized_osaka
+# "~/.config/alacritty/themes/themes/kanagawa_dragon.toml"
+# ]
+
+[env]
+TERM = "xterm-256color"
+
 [window]
 # "Full" | "None" | "Transparent" | "Buttonless"
-decorations = "Buttonless"
+decorations = "None"
 # "Windowed" | "Maximized" | "Fullscreen" | "SimpleFullscreen"
 startup_mode = "Maximized"
+# "OnlyLeft" | "OnlyRight" | "Both" | "None" # (macos only)
+option_as_alt = "OnlyLeft"
 
 [font]
-# "JetBrainsMono Nerd Font", "Hack Nerd Font", "MesloLGM Nerd Font"
-normal = { family = "MesloLGM Nerd Font", style = "Regular" }
+# family: "JetBrainsMono Nerd Font", "Hack Nerd Font", "MesloLGM Nerd Font", "FiraCode Nerd Font"
+# style: "Light", "Regular"
+normal = { family = "JetBrainsMono Nerd Font", style = "Light" }
 size = 13.0
+
+[colors]
+# for nvim
+# Default: { text = "CellBackground", cursor = "CellForeground" }
+cursor = { text = "CellBackground", cursor = "#d8d8d8" }
+# "#ff00ff", "#264f78", "#6a9fb5", "#f4bf75"
+# Default: { text = "CellBackground", cursor = "CellForeground" }
+vi_mode_cursor = { text = "CellBackground", cursor = "#ff00ff" }
+# Default: { foreground = "None", background = "None" }
+line_indicator = { foreground = "None", background = "#ff00ff" }
+# Default: { foreground = "#181818", background = "#d8d8d8" }
+footer_bar = { foreground = "#181818", background = "#ff00ff" }
+# Default: { text = "CellBackground", background = "CellForeground" }
+selection = { text = "CellBackground", background = "#ff00ff" }
 
 [selection]
 save_to_clipboard = true
 
+[cursor]
+# blinking = "Never" | "Off" | "On" | "Always"
+vi_mode_style = { shape = "Block", blinking = "Off" }
+
 [mouse]
 bindings = [
 { mouse = "Right", action = "Paste" },
+]
+
+# https://alacritty.org/config-alacritty-bindings.html
+[keyboard]
+bindings = [
+{ key = "Space", mods = "Control", mode = "~Search", action = "ToggleViMode" },
+{ key = "J", mods = "Command", mode = "~Search", action = "ToggleViMode" },
+{ key = "H", mods = "Shift", mode = "Vi|~Search", action = "FirstOccupied" },
+{ key = "L", mods = "Shift", mode = "Vi|~Search", action = "Last" },
 ]
 
