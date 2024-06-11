@@ -1,10 +1,11 @@
 # https://alacritty.org/config-alacritty.html
 # man 5 alacritty
 
-# GENERAL
+# Default theme is better for me
+# # GENERAL
 # import = [
 # # https://github.com/alacritty/alacritty-theme
-# # catppuccin_mocha doom_one one_dark papercolor_dark google kanagawa_dragon monokai_charcoal solarized_osaka
+# # catppuccin_mocha doom_one one_dark papercolor_dark google kanagawa_dragon monokai_charcoal solarized_osaka breeze
 # "~/.config/alacritty/themes/themes/kanagawa_dragon.toml"
 # ]
 
@@ -25,24 +26,32 @@ option_as_alt = "OnlyLeft"
 normal = { family = "JetBrainsMono Nerd Font", style = "Light" }
 size = 13.0
 
+# Make mutable colors immutable
 [colors]
-# for nvim
 # Default: { text = "CellBackground", cursor = "CellForeground" }
-cursor = { text = "CellBackground", cursor = "#d8d8d8" }
-# "#ff00ff", "#264f78", "#6a9fb5", "#f4bf75"
+# cursor = { text = "#000000", cursor = "#52ad70" } # From https://github.com/rockyzhang24/dotfiles/blob/dff8a17c2d5ca70b1233402f6ee7036f787d7be5/.config/alacritty/alacritty.toml#L19
+cursor = { text = "#181818", cursor = "#d8d8d8" } # For nvim, from themes/base16_default_dark.toml
 # Default: { text = "CellBackground", cursor = "CellForeground" }
-vi_mode_cursor = { text = "CellBackground", cursor = "#ff00ff" }
+vi_mode_cursor = { text = "#181818", cursor = "#ff00ff" } # For Alacritty's features
 # Default: { foreground = "None", background = "None" }
-line_indicator = { foreground = "None", background = "#ff00ff" }
+line_indicator = { foreground = "#181818", background = "#ff00ff" } # For Alacritty's features
 # Default: { foreground = "#181818", background = "#d8d8d8" }
-footer_bar = { foreground = "#181818", background = "#ff00ff" }
+# footer_bar = { foreground = "#181818", background = "#ff00ff" } # For Alacritty's features
+footer_bar = { foreground = "#ffffff", background = "#731d8b" } # From themes/baitong.toml
 # Default: { text = "CellBackground", background = "CellForeground" }
-selection = { text = "CellBackground", background = "#ff00ff" }
+# selection = { text = "#24273A", background = "#F4DBD6" } # From themes/catppuccin_mocha.toml
+# selection = { text = "CellForeground", background = "#264f78" } # From https://github.com/rockyzhang24/dotfiles/blob/dff8a17c2d5ca70b1233402f6ee7036f787d7be5/.config/alacritty/alacritty.toml#L22
+# selection = { text = "CellForeground", background = "#0d486e" } # From themes/night_owl.toml
+selection = { text = "CellForeground", background = "#265b75" } # From themes/seashells.toml
 
 [selection]
 save_to_clipboard = true
 
 [cursor]
+# Values for `shape`:
+#   - ▇ Block
+#   - _ Underline
+#   - | Beam
 # blinking = "Never" | "Off" | "On" | "Always"
 vi_mode_style = { shape = "Block", blinking = "Off" }
 
@@ -51,12 +60,41 @@ bindings = [
 { mouse = "Right", action = "Paste" },
 ]
 
+[[hints.enabled]]
+# command = "xdg-open" # On Linux/BSD
+command = "open" # On macOS
+# command = { program = "cmd", args = [ "/c", "start", "" ] } # On Windows
+hyperlinks = true
+post_processing = true
+persist = false
+mouse.enabled = true
+binding = { key = "U", mods = "Command" }
+regex = "(ipfs:|ipns:|magnet:|mailto:|gemini://|gopher://|https://|http://|news:|file:|git://|ssh:|ftp://)[^\u0000-\u001F\u007F-\u009F<>\"\\s{-}\\^⟨⟩`]+"
+
 # https://alacritty.org/config-alacritty-bindings.html
 [keyboard]
 bindings = [
+# Launch Alacritty's Vi Mode
 { key = "Space", mods = "Control", mode = "~Search", action = "ToggleViMode" },
+{ key = "Space", mods = "Control", mode = "Vi|~Search", action = "ScrollToBottom" },
 { key = "J", mods = "Command", mode = "~Search", action = "ToggleViMode" },
+{ key = "J", mods = "Command", mode = "Vi|~Search", action = "ScrollToBottom" },
+# Same behavior as "esc" in https://github.com/gpakosz/.tmux
+{ key = "Escape", mode = "Vi|~Search", action = "ClearSelection" },
+{ key = "Escape", mode = "Vi|~Search", action = "ToggleViMode" },
+# Same behavior as "y" in https://github.com/gpakosz/.tmux
+{ key = "Y", mode = "Vi|~Search", action = "Copy" },
+{ key = "Y", mode = "Vi|~Search", action = "ClearSelection" },
+{ key = "Y", mode = "Vi|~Search", action = "ToggleViMode" },
+# Same behavior as "space" in https://github.com/gpakosz/.tmux
+{ key = "Space", mode = "Vi|~Search", action = "ClearSelection" },
+{ key = "Space", mode = "Vi|~Search", action = "ToggleNormalSelection" },
+# My vim bindings
 { key = "H", mods = "Shift", mode = "Vi|~Search", action = "FirstOccupied" },
 { key = "L", mods = "Shift", mode = "Vi|~Search", action = "Last" },
+# Use cmd+, to edit this file with chezmoi
+# https://github.com/alacritty/alacritty/issues/1047#issuecomment-362233176
+# send tmux key binding, see `bind C-]` in ~/.tmux.conf.local
+{ key = ",", mods = "Command", chars = "\u0002\u001d" },
 ]
 
