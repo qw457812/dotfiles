@@ -4,13 +4,13 @@ local M = {}
 M.general = {
   n = {
     -- [";"] = { ":", "enter command mode", opts = { nowait = true } },
-    -- xyq https://nvchad.com/docs/config/mappings
-    -- [":"] = { ";", "repeat previous f, t, F or T movement (swap ; and : by xyq)", opts = { nowait = true } },
+    -- my | https://nvchad.com/docs/config/mappings
+    -- [":"] = { ";", "repeat previous f, t, F or T movement (swap ; and :)", opts = { nowait = true } },
 
     ["H"] = { "^", "Start of line"},
     ["L"] = { "$", "End of line"},
 
-    ["<leader>q"] = { ":q <CR>", "Quit" },
+    ["<leader>q"] = { ":qa <CR>", "Quit" },
     ["<leader>Q"] = { ":q! <CR>", "Quit without save" },
     ["<leader>fs"] = { "<cmd> w <CR>", "Save file" },
     -- ["<leader>x"] = { "<cmd> x <CR>", "Save file and quit" },
@@ -18,8 +18,9 @@ M.general = {
     ["<leader>D"] = { ":w !diff % - <CR>", "View diff before save", opts = { silent = true } },
 
     ["<leader>tz"] = { ":ZenMode <CR>", "Toggle Zen Mode", opts = { silent = true } },
-    ["<leader>tt"] = { ":Translate ZH <CR>", "Translate current line", opts = { silent = true } },
-    ["<leader>tw"] = { "mmviw:Translate ZH <CR>`m", "Translate current word", opts = { silent = true } },
+    ["<leader>tw"] = { ":set wrap! <CR>", "Toggle line wrapping", opts = { silent = true } },
+    ["<leader>T"] = { ":Translate ZH <CR>", "Translate current line", opts = { silent = true } },
+    -- ["<leader>tw"] = { "mmviw:Translate ZH <CR>`m", "Translate current word", opts = { silent = true } },
     ["<leader>rr"] = { ":RnvimrToggle <CR>", "Toggle Ranger", opts = { silent = true } },
   },
   i = {
@@ -28,7 +29,11 @@ M.general = {
     ["H"] = { "^", "Start of line"},
     ["L"] = { "$", "End of line"},
 
-    ["<leader>t"] = { "mm:Translate ZH <CR>`m", "Translate", opts = { silent = true } },
+    ["<leader>T"] = { "mm:Translate ZH <CR>`m", "Translate", opts = { silent = true } },
+  },
+  o = {
+    ["H"] = { "^", "Start of line"},
+    ["L"] = { "$", "End of line"},
   },
 }
 

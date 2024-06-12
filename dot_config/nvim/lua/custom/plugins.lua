@@ -32,7 +32,7 @@ local plugins = {
   --   "nvim-treesitter/nvim-treesitter",
   --   opts = overrides.treesitter,
   -- },
-  -- xyq https://nvchad.com/docs/config/syntax
+  -- my | https://nvchad.com/docs/config/syntax
   {
     "nvim-treesitter/nvim-treesitter",
     opts = {
@@ -81,7 +81,7 @@ local plugins = {
     "max397574/better-escape.nvim",
     event = "InsertEnter",
     config = function()
-      -- xyq
+      -- my
       -- require("better_escape").setup()
       require("better_escape").setup {
         mapping = { "jk", "jj", "kj" }, -- a table with mappings to use
@@ -98,7 +98,7 @@ local plugins = {
   --   enabled = false
   -- },
 
-  -- xyq
+  -- my
   {
     -- https://www.lunarvim.org/docs/configuration/plugins/example-configurations
     "phaazon/hop.nvim",

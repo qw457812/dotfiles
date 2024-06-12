@@ -315,7 +315,7 @@
 ;;       immersive-translate-chatgpt-host "api.openai.com")
 ;; use translate-shell
 (setq immersive-translate-backend 'trans)
-(map! :leader :desc "Translate" :n "tt" #'immersive-translate-paragraph)
+(map! :leader :desc "Translate" :n "T" #'immersive-translate-paragraph)
 
 ;; TODO not work
 ;; https://github.com/hlissner/.doom.d/blob/master/config.el
