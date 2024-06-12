@@ -6,8 +6,12 @@ local autocmd = vim.api.nvim_create_autocmd
 --   command = "tabdo wincmd =",
 -- })
 
--- xyq
+-- my
 local g = vim.g
+local opt = vim.opt
+
+-- :set nowrap
+opt.wrap = false
 
 -- :help copilot
 -- https://github.com/LunarVim/LunarVim/issues/1856#issuecomment-954224770

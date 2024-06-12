@@ -416,22 +416,18 @@ bind C-l next-window     # select next window
 
 # edit configuration with chezmoi
 bind e new-window -n "czea #{TMUX_CONF_LOCAL}" -e EDITOR="$EDITOR" sh -c 'chezmoi edit --apply --verbose "$TMUX_CONF_LOCAL" && "$TMUX_PROGRAM" ${TMUX_SOCKET:+-S "$TMUX_SOCKET"} source "$TMUX_CONF" \; display "$TMUX_CONF_LOCAL sourced"'
+
 # edit alacritty configuration with chezmoi
 # https://stackoverflow.com/questions/30680362/how-to-use-ctrl-semicolon-for-prefix-in-tmux
-bind C-] new-window -n "czea ~/.config/alacritty/alacritty.toml" -e EDITOR="$EDITOR" sh -c 'chezmoi edit --apply --verbose ~/.config/alacritty/alacritty.toml'
-
-# enter copy mode
-# bind C-b copy-mode
-# bind B send-prefix
-# bind C-a copy-mode
-# bind A send-prefix -2
+# TODO `--verbose` not work
+bind C-] new-window -n "chezmoi edit --apply ~/.config/alacritty/alacritty.toml" -e EDITOR="$EDITOR" sh -c 'chezmoi edit --apply ~/.config/alacritty/alacritty.toml'
 
 # session navigation
 bind ` switch-client -l  # move to last session
 
+# swap space and enter
 # enter copy mode
 bind Space copy-mode
-
 # select next layout
 bind Enter next-layout
 

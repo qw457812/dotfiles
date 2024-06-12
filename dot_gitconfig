@@ -1,0 +1,49 @@
+[user]
+    name = qw457812
+    email = 37494864+qw457812@users.noreply.github.com
+
+[core]
+    editor = nvim
+    ; pager = diff-so-fancy | less --tabs=4 -RF
+    pager = delta
+    excludesfile = ~/.gitignore_global
+
+[interactive]
+    ; diffFilter = diff-so-fancy --patch
+    diffFilter = delta --color-only --features=interactive
+
+[delta]
+    # use n and N to move between diff sections
+    navigate = true
+    dark = true
+    ; side-by-side = true
+
+    ; syntax-theme = Dracula
+
+    diff-so-fancy = true
+    # delta --diff-highlight --show-config
+    minus-emph-style = reverse red
+    plus-emph-style = reverse green
+    hunk-header-style = line-number syntax
+
+    ; diff-highlight = true
+    ; file-style = bold yellow
+    ; file-decoration-style = yellow ol ul
+    # https://dandavison.github.io/delta/configuration.html
+    ; hunk-header-decoration-style = blue box
+    ; hunk-header-style = line-number syntax
+
+[diff]
+    colorMoved = default
+
+[merge]
+    conflictstyle = diff3
+
+[commit]
+    template = ~/.stCommitMsg
+
+[filter "lfs"]
+    process = git-lfs filter-process
+    required = true
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f

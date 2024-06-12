@@ -389,6 +389,7 @@
     },
     "when": "terminalFocus"
   },
+  // also see default key binding `cmd+j`
   // https://github.com/nikitavoloboev/config/blob/master/vscode/keybindings.json
   {
     "key": "cmd+.",

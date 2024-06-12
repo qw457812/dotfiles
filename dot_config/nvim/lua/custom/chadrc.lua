@@ -12,7 +12,7 @@ M.ui = {
   hl_add = highlights.add,
 
 
-  -- xyq https://nvchad.com/docs/config/nvchad_ui
+  -- my | https://nvchad.com/docs/config/nvchad_ui
   statusline = {
     theme = "default", -- default/vscode/vscode_colored/minimal
 

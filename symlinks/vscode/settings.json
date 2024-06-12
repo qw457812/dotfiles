@@ -123,8 +123,8 @@
     "markdown": true,
     "scminput": false
   },
-  "markdown-preview-enhanced.previewTheme": "github-light.css",
-  "markdown-preview-enhanced.codeBlockTheme": "github.css",
+  "markdown-preview-enhanced.previewTheme": "github-dark.css",
+  "markdown-preview-enhanced.codeBlockTheme": "github-dark.css",
   "markdown-preview-enhanced.enablePreviewZenMode": true,
   "zenMode.fullScreen": false,
   "zenMode.hideLineNumbers": true,
@@ -173,6 +173,7 @@
     // editor.unfold
     // breadcrumbs.focusAndSelect
     // gitlens.showQuickFileHistory
+    // editor.action.triggerParameterHints
 
     // https://github.com/VSCodeVim/Vim#-faq
     // {
@@ -347,6 +348,11 @@
     {
       "before": ["leader", "9"],
       "commands": ["workbench.action.openEditorAtIndex9"]
+    },
+    // TODO https://github.com/VSpaceCode/vspacecode.github.io/blob/a6ca6080f284a90d7b734e51304dc8fa1453b18a/docs/default-keybindings.md?plain=1#L2529
+    {
+      "before": ["leader", "r", "r"],
+      "commands": ["python.execInTerminal"]
     },
     {
       "before": ["leader", "r", "n"],
