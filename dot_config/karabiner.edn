@@ -1400,7 +1400,8 @@
            ; [:!Qk [:open "/Applications/kitty.app"] :!Kitty]
            ; [:!Qk :same_wind_app :Kitty]
            [:!Qk [:open "/Applications/Alacritty.app"] :!Alacritty]
-           [:!Qk :same_wind_app :Alacritty]
+           ; [:!Qk :same_wind_app :Alacritty]
+           [:!Qk [:open "/Applications/kitty.app"] :Alacritty]
            [:!Ql [:open "/Applications/Visual Studio Code.app"] :!VSCode]
            [:!Ql :same_wind_app :VSCode]
            [:!Qsemicolon [:open "/Library/Application Support/Citrix Receiver/Citrix Viewer.app"]] ; Citrix Workspace.app
@@ -1785,7 +1786,8 @@
            ; [:!Wk [:left_command [:open "/Applications/kitty.app"]] :!Kitty]
            ; [:!Wk :same_wind_app :Kitty]
            [:!Wk [:left_command [:open "/Applications/Alacritty.app"]] :!Alacritty]
-           [:!Wk :same_wind_app :Alacritty]
+           ; [:!Wk :same_wind_app :Alacritty]
+           [:!Wk [:left_command [:open "/Applications/kitty.app"]] :Alacritty]
            [:!Wl [:left_command [:open "/Applications/Visual Studio Code.app"]] :!VSCode]
            [:!Wl :same_wind_app :VSCode]
            [:!Wsemicolon [:left_command [:open "/Library/Application Support/Citrix Receiver/Citrix Viewer.app"]]] ; Citrix Workspace.app
