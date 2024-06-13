@@ -79,6 +79,13 @@ zstyle ':omz:update' frequency 13
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(git tmux zsh-vi-mode aliases)
 
+# https://docs.brew.sh/Shell-Completion
+FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+
+# `vv` of zsh-vi-mode
+export EDITOR='nvim'
+export VISUAL='nvim'
+
 # https://github.com/nebrelbug/dotfiles/blob/17f714ea090bcaf1d7105070eed0bd012e86e5af/.zshrc
 # https://github.com/OnurKader/.dotfiles/blob/9ffc1692cbfbaba225df7c0ff1d49173d7a023e2/.zshrc
 # run `zellij setup --generate-auto-start zsh`, observe different between `zellij attach -c` and `zellij attach -c main`
@@ -128,13 +135,6 @@ case "${__CFBundleIdentifier}" in
     #     ZSH_TMUX_DEFAULT_SESSION_NAME="vscode:$PWD"
     #     ;;
 esac
-
-# https://docs.brew.sh/Shell-Completion
-FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
-
-# `vv` of zsh-vi-mode
-export EDITOR='nvim'
-export VISUAL='nvim'
 
 source $ZSH/oh-my-zsh.sh
 

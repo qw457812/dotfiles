@@ -431,6 +431,9 @@ bind Space copy-mode
 # select next layout
 bind Enter next-layout
 
+# behave like vimium, alacritty
+bind -T copy-mode-vi i send -X cancel
+
 # TODO https://github.com/samoshkin/tmux-config#key-bindings
 
 
