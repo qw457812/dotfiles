@@ -9,7 +9,7 @@ Hack keyboard use [Karabiner](https://github.com/pqrs-org/Karabiner-Elements), a
 > Head over to [nikitavoloboev](https://github.com/nikitavoloboev)'s ***[personal wiki](https://wiki.nikiv.dev/macOS/apps/karabiner/)*** to learn more about karabiner and goku.
 
 <details>
-<summary><strong>Here are some settings</strong> (click to see)</summary>
+<summary><strong>Here are some settings</strong> (outdated, click to see)</summary>
 
 | Type              | From                         | To                                                                | Comment                                                                                                                                                                    | Favorite | Todo                                       |
 |-------------------|------------------------------|-------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|--------------------------------------------|
@@ -55,13 +55,13 @@ Using [WhatPulse](https://whatpulse.org/) to track keyboard input.
 
 ## [Neovim](https://neovim.io/)
 
-[My neovim config](dot_config/nvim) based on [NvChad](https://github.com/NvChad/NvChad).
+[My neovim config](dot_config/nvim) powered by [LazyVim](https://github.com/LazyVim/LazyVim).
 
 > Very poor, need to be improved.
 
 TODO:
 
-1. [ ] Try [LazyVim](https://github.com/LazyVim/LazyVim), [Kickstart](https://github.com/nvim-lua/kickstart.nvim), [AstroNvim](https://github.com/AstroNvim/AstroNvim) by [Lazyman](https://github.com/doctorfree/nvim-lazyman), configure them and compare with NvChad.
+1. [ ] Try [NvChad](https://github.com/NvChad/NvChad), [LazyVim](https://github.com/LazyVim/LazyVim), [Kickstart](https://github.com/nvim-lua/kickstart.nvim), [AstroNvim](https://github.com/AstroNvim/AstroNvim) by [Lazyman](https://github.com/doctorfree/nvim-lazyman).
 2. [ ] Find out a set of keybindings that can be used everywhere, [equivalent mapping configurations for other IDEs VIM integrations](https://github.com/magidc/nvim-config#equivalent-mapping-configurations-for-other-ides-vim-integrations): IdeaVim, VSCodeVim.
 
 Tips:
@@ -76,7 +76,7 @@ Tips:
 
    See [.macos](backup/.macos).
 
-3. When leaving insert mode, auto switch to english input source (if necessary).
+3. When leaving insert mode, auto switch to English input source (if necessary).
 
    - By [Rime](https://rime.im/)'s [vim_mode](https://github.com/rime/home/blob/11bbdb85d2acbb6789433064711b03b4952aa7f5/blog/source/release/squirrel/index.md?plain=1#L256) app option, see [squirrel.custom.yaml](private_Library/Rime/squirrel.custom.yaml).
 
