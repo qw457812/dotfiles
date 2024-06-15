@@ -10,7 +10,8 @@ M.general = {
     ["H"] = { "^", "Start of line"},
     ["L"] = { "$", "End of line"},
 
-    ["<leader>q"] = { ":qa <CR>", "Quit" },
+    ["<BS>"] = { ":q <CR>", "Quit" },
+    ["<leader>q"] = { ":qa <CR>", "Quit all" },
     ["<leader>Q"] = { ":q! <CR>", "Quit without save" },
     ["<leader>fs"] = { "<cmd> w <CR>", "Save file" },
     -- ["<leader>x"] = { "<cmd> x <CR>", "Save file and quit" },

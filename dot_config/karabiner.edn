@@ -1414,7 +1414,9 @@
            [:!Qu [:open "/Applications/Neovide.app"]] ; pronounce
            [:!Qi [:open "/Applications/IntelliJ IDEA CE.app"] :!IntelliJ]
            [:!Qi :same_wind_app :IntelliJ]
-           [:!Qo [:open "/Applications/LibreOffice.app"]] ; office
+           [:!Qo [:open "/Applications/wpsoffice.app"]] ; office
+           ; [:!Qo [:open "/Applications/LibreOffice.app"] :!LibreOffice] ; office
+           ; [:!Qo :same_wind_app :LibreOffice]
            [:!Qp [:open "/System/Applications/Preview.app"] :!Preview]
            [:!Qp :same_wind_app :Preview]
            [:!Qn [:open "http://127.0.0.1:8080/"] nil {:delayed {:invoked [:escape]} :params {:delay 800}}] ; note
@@ -1639,6 +1641,11 @@
            [:!Tj :!COdown_arrow] ; select next unread chat message
            ]}
 
+  {:des   "WPSOffice: paste without formatting"
+   :rules [:WPSOffice
+           [:!Qv :!COSv] ; 粘贴剪贴板内容并匹配周围文本的格式
+           ]}
+
   {:des   "Spotify: play navigation"
    :rules [:Spotify
            [:!Tj :!Cright_arrow] ; next
@@ -1812,8 +1819,9 @@
            [:!Wu [:left_command [:open "/Applications/Neovide.app"]]] ; pronounce
            [:!Wi [:left_command [:open "/Applications/IntelliJ IDEA CE.app"]] :!IntelliJ]
            [:!Wi :same_wind_app :IntelliJ]
-           ; [:!Wo [:open "/Applications/wpsoffice.app"]] ; office
-           [:!Wo [:left_command [:open "/Applications/LibreOffice.app"]]] ; office
+           [:!Wo [:left_command [:open "/Applications/wpsoffice.app"]]] ; office
+           ; [:!Wo [:left_command [:open "/Applications/LibreOffice.app"]] :!LibreOffice] ; office
+           ; [:!Wo :same_wind_app :LibreOffice]
            [:!Wp [:left_command [:open "/System/Applications/Preview.app"]] :!Preview]
            [:!Wp :same_wind_app :Preview]
            [:!Wv [:left_command [:open "/Applications/Karabiner-EventViewer.app"]]]
@@ -2180,6 +2188,7 @@
   :CitrixViewer     ["^com\\.citrix\\.receiver\\.icaviewer\\.mac$"]
   :ChatGPT          ["^com\\.lencx\\.chatgpt$"]
   :WPSOffice        ["^com\\.kingsoft\\.wpsoffice\\.mac$"]
+  :LibreOffice      ["^org\\.libreoffice\\.script$"]
   :Chrome           ["^com\\.google\\.Chrome$"]
   :Brave            ["^com\\.brave\\.Browser$"]
   :Safari           ["^com\\.apple\\.Safari$"]
