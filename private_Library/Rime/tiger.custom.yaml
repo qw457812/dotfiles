@@ -190,15 +190,15 @@ patch:
       #- { when: composing, accept: Return, send: Escape } # 回车清屏编码
       #- { accept: space, send: space, when: has_menu } # 有候选时空格上屏首选
       #- { accept: space, send: Escape, when: composing } # 无候选(空码）时空格清屏编码
-      - { accept: semicolon, send: 2, when: has_menu } # 分号次选
       # swap : and ; by karabiner
+      - { accept: semicolon, send: 2, when: has_menu } # 分号次选
       # https://github.com/LEOYoon-Tsaw/Rime_collections/blob/master/Rime_description.md#%E5%85%AB%E5%85%B6%E5%AE%83
-      # `colon` or `"Shift+semicolon"` not work, but `"Shift+colon"` works
-      # - { accept: colon, send: 2, when: has_menu } # 冒号次选
-      # - { accept: "Shift+semicolon", send: 2, when: has_menu } # 冒号次选
-      - { accept: "Shift+colon", send: 2, when: has_menu } # 冒号次选
+      # - { accept: colon, send: 2, when: has_menu } # 冒号次选 (not work)
+      # - { accept: "Shift+semicolon", send: 2, when: has_menu } # 冒号次选 (not work)
+      - { accept: "Shift+colon", send: 2, when: has_menu } # 冒号次选 (works)
       - { when: has_menu, accept: apostrophe, send: 3 } # 引号三选
-      - { when: composing, accept: Tab, send: Escape } # tab清屏
+      # - { when: composing, accept: Tab, send: Escape } # tab清屏
+      - { when: composing, accept: Tab, toggle: chaifen } # tab 拆分滤镜开关
       - { when: has_menu, accept: minus, send: Page_Up } # - 向后翻页
       - { when: has_menu, accept: equal, send: Page_Down } # = 向前翻页
       # - { when: composing, accept: bracketleft, send: Page_Up } # [ 后翻
@@ -261,7 +261,8 @@ patch:
   style/spacing: 12 # 拼音与候选项之间的距离 （inline_preedit: false）
   # 鼠须管盲打，嵌入首选
   # style/alpha: 0.0001 # 隐藏候选框只需将alpha设为0.00001即可 | https://github.com/rime/squirrel/issues/576
-  style/alpha: 0 # https://github.com/rime/squirrel/releases/tag/0.18
+  # style/alpha: 0 # https://github.com/rime/squirrel/releases/tag/0.18
+  style/alpha: 0.4
   style/inline_candidate: true # https://github.com/rime/squirrel/pull/577
 
 # ------------------------------------------------------------------------------------------

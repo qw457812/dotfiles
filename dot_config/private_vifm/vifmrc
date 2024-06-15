@@ -666,6 +666,11 @@ vnoremap <silent> W :togglepane<cr>gv
 " Quit vifm
 " nnoremap q :q<cr>
 nnoremap q :wqall<cr>
+" not work
+" nnoremap <bs> :wqall<cr>
+" Also sometimes neither of them might work and it's <del> key which corresponds to your backspace (don't mind the name). | https://vifm.info/manual.shtml
+" Note: <del> here actually means <bs>
+nnoremap <del> :wqall<cr>
 
 " edit forward search pattern in editor
 nnoremap ,/ q/

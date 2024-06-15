@@ -51,6 +51,8 @@
     "files.trimTrailingWhitespace": false,
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "workbench.activityBar.location": "top",
+  "workbench.layoutControl.type": "menu",
   "workbench.startupEditor": "newUntitledFile",
   // TODO what is this?
   // "python.analysis.autoImportCompletions": true,
@@ -77,6 +79,7 @@
     "editor.wordHighlightStrongBorder": "#cccccc" // #FF9800 #17E5E6 #cccccc #b7b7b7
   },
   // "workbench.colorTheme": "One Dark Pro",
+  "explorer.confirmDelete": false,
   "terminal.integrated.fontFamily": "MesloLGM Nerd Font", // JetBrainsMono Nerd Font, Hack Nerd Font, MesloLGM Nerd Font, MesloLGS Nerd Font Mono
   "terminal.integrated.copyOnSelection": true,
   "terminal.integrated.rightClickBehavior": "paste",
@@ -302,6 +305,10 @@
         {
           "command": "workbench.action.closePanel",
           "args": []
+        },
+        {
+          "command": "workbench.action.closeAuxiliaryBar",
+          "args": []
         }
       ]
     },
@@ -479,6 +486,11 @@
       "commands": ["workbench.action.toggleFullScreen"]
     },
     {
+      "before": ["leader", "t", "b"],
+      // workbench.action.activityBarLocation.hide
+      "commands": ["workbench.action.toggleActivityBarVisibility"]
+    },
+    {
       "before": ["leader", "s", "s"],
       "commands": ["search.action.openEditor"]
     },
@@ -574,7 +586,8 @@
         ":nohl",
         // "workbench.action.maximizeEditorHideSidebar",
         "workbench.action.closeSidebar",
-        "workbench.action.closePanel"
+        "workbench.action.closePanel",
+        "workbench.action.closeAuxiliaryBar"
       ],
       "silent": true
     },
@@ -791,6 +804,5 @@
       "after": ["^"]
     }
   ],
-  "vim.commandLineModeKeyBindings": [],
-  "explorer.confirmDelete": false
+  "vim.commandLineModeKeyBindings": []
 }
