@@ -507,11 +507,14 @@ alias bd='brew doctor'
 alias -g H='| head'
 alias -g T='| tail'
 alias -g G='| grep'
-alias -g L="| less"
-alias -g LL="2>&1 | less"
-alias -g B="| bat --paging=always"
+# alias -g L="| less" # not paging
+alias -g L="| bat --style=plain --paging=always"
+# alias -g LL="2>&1 | less"
+alias -g LL="2>&1 | bat --style=plain --paging=always"
 alias -g C="| clipcopy"
 alias -g F='| fzf'
+# https://askubuntu.com/questions/510890/how-do-i-redirect-command-output-to-vim-in-bash
+alias -g V='| nvim -R +"nnoremap q :q<cr>" -'
 alias rm='rm -i'
 alias cp='cp -i'
 alias mv='mv -i'
