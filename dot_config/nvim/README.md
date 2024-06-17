@@ -5,7 +5,7 @@ Refer to the [documentation](https://lazyvim.github.io/installation) to get star
 
 ## TODO
 
-- [ ] [Recipes](https://www.lazyvim.org/configuration/recipes)
+- [ ] [DAP](https://www.lazyvim.org/extras/dap/core)
 
 ## Awesome LazyVim
 
