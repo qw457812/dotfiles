@@ -50,4 +50,9 @@ return {
       filetypes = { ["*"] = true },
     },
   },
+
+  -- TODO keymaps of mini.surround with flash or leap
+  -- https://www.lazyvim.org/extras/coding/mini-surround
+  -- https://www.reddit.com/r/neovim/comments/1bl3dwz/whats_your_best_remap_for_flash_or_leap/
+  -- https://github.com/ggandor/leap.nvim/discussions/59
 }

@@ -1,16 +1,9 @@
 return {
+  -- https://www.lazyvim.org/configuration/examples
+  -- https://github.com/folke/dot/blob/master/nvim/lua/plugins/telescope.lua
+  -- https://github.com/craftzdog/dotfiles-public/blob/master/.config/nvim/lua/plugins/editor.lua
   {
     "nvim-telescope/telescope.nvim",
-    dependencies = {
-      -- https://www.chezmoi.io/user-guide/tools/editor/#use-chezmoi-with-vim
-      -- choose one of xvzc/chezmoi.nvim or GianniBYoung/chezmoi-telescope.nvim, not both
-      -- note that `../config/autocmds.lua` use xvzc/chezmoi.nvim no matter which one chosen here
-      { "xvzc/chezmoi.nvim", dependencies = { "nvim-lua/plenary.nvim" } },
-      -- { "GianniBYoung/chezmoi-telescope.nvim" },
-    },
-    -- https://www.lazyvim.org/configuration/examples
-    -- https://github.com/folke/dot/blob/master/nvim/lua/plugins/telescope.lua
-    -- https://github.com/craftzdog/dotfiles-public/blob/master/.config/nvim/lua/plugins/editor.lua
     keys = {
       {
         "<leader>fp",
@@ -41,21 +34,6 @@ return {
         end,
         desc = "Find Lazy Plugin Spec",
       },
-      {
-        "<leader>fz",
-        function()
-          local telescope = require("telescope")
-          -- depends on the chosen above
-          if LazyVim.has("chezmoi-telescope.nvim") then
-            -- by GianniBYoung/chezmoi-telescope.nvim
-            telescope.extensions.chezmoi.dotfiles()
-          else
-            -- by xvzc/chezmoi.nvim
-            telescope.extensions.chezmoi.find_files()
-          end
-        end,
-        desc = "Find Chezmoi Dotfiles",
-      },
     },
     opts = {
       defaults = {
@@ -65,12 +43,5 @@ return {
         winblend = 0,
       },
     },
-    -- https://github.com/LazyVim/LazyVim/issues/283#issuecomment-1433352997
-    config = function(_, opts)
-      local telescope = require("telescope")
-      telescope.setup(opts)
-      -- load xvzc/chezmoi.nvim or GianniBYoung/chezmoi-telescope.nvim, both named "chezmoi"
-      telescope.load_extension("chezmoi")
-    end,
   },
 }
