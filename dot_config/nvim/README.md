@@ -5,7 +5,7 @@ Refer to the [documentation](https://lazyvim.github.io/installation) to get star
 
 ## TODO
 
-- [ ] [DAP](https://www.lazyvim.org/extras/dap/core)
+- [ ] [VS Code](https://www.lazyvim.org/extras/vscode)
 
 ## Awesome LazyVim
 
