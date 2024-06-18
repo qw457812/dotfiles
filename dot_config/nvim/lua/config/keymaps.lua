@@ -22,3 +22,6 @@ map("n", "<Left>", "<C-o>", { desc = "Go Back" })
 map("n", "<Right>", "<C-i>", { desc = "Go Forward" })
 -- TODO nnoremap <cr> gd, not working when multiple results
 -- map("n", "<cr>", "<cmd>lua vim.lsp.buf.definition()<cr>", { desc = "Goto Definition", noremap = true })
+
+-- <leader>fy
+-- <leader>fY

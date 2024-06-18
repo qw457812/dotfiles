@@ -6,14 +6,14 @@ return {
     "nvim-telescope/telescope.nvim",
     keys = {
       {
-        "<leader>fp",
+        "<leader>fP",
         function()
           require("telescope.builtin").find_files({ cwd = require("lazy.core.config").options.root })
         end,
         desc = "Find Plugin File",
       },
       {
-        "<leader>fl",
+        "<leader>fL",
         function()
           local files = {} ---@type table<string, string>
           for _, plugin in pairs(require("lazy.core.config").plugins) do
