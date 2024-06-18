@@ -44,4 +44,22 @@ return {
       },
     },
   },
+
+  -- LSP Keymaps
+  -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/editor/telescope.lua
+  -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/editor/inc-rename.lua
+  {
+    "neovim/nvim-lspconfig",
+    opts = function()
+      if LazyVim.pick.want() ~= "telescope" then
+        return
+      end
+      local Keys = require("lazyvim.plugins.lsp.keymaps").get()
+      -- stylua: ignore
+      vim.list_extend(Keys, {
+        { "<cr>", function() require("telescope.builtin").lsp_definitions({ reuse_win = true }) end, desc = "Goto Definition", has = "definition" },
+        -- TODO map <cr> to lsp_references if no definition, like `gd` in vscode and idea
+      })
+    end,
+  },
 }
