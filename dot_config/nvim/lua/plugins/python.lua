@@ -11,6 +11,9 @@ return {
         opts.dap_enabled = true -- makes the debugger work with venv
       end
       return vim.tbl_deep_extend("force", opts, {
+        -- TODO can't detect miniconda3 env
+        -- anaconda_base_path = "~/miniconda3",
+        -- anaconda_envs_path = "~/miniconda3/envs",
         name = {
           "venv",
           ".venv",

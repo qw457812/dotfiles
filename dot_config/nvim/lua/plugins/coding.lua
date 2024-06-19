@@ -51,8 +51,27 @@ return {
     },
   },
 
-  -- TODO keymaps of mini.surround with flash or leap
-  -- https://www.lazyvim.org/extras/coding/mini-surround
+  -- use helix-style mappings to work with flash or leap: ms mr md
+  -- https://www.lazyvim.org/configuration/recipes#change-surround-mappings
   -- https://www.reddit.com/r/neovim/comments/1bl3dwz/whats_your_best_remap_for_flash_or_leap/
   -- https://github.com/ggandor/leap.nvim/discussions/59
+  -- or use kylechui/nvim-surround instead of mini.surround | https://github.com/boltlessengineer/nvim/blob/607ee0c9412be67ba127a4d50ee722be578b5d9f/lua/plugins/coding.lua#L95
+  {
+    "echasnovski/mini.surround",
+    opts = {
+      -- use `''` (empty string) to disable one.
+      mappings = {
+        -- gsa -> ms
+        add = "ms", -- Add surrounding in Normal and Visual modes
+        -- gsd -> md
+        delete = "md", -- Delete surrounding
+        find = "gsf", -- Find surrounding (to the right)
+        find_left = "gsF", -- Find surrounding (to the left)
+        highlight = "gsh", -- Highlight surrounding
+        -- gsr -> mr
+        replace = "mr", -- Replace surrounding
+        update_n_lines = "gsn", -- Update `n_lines`
+      },
+    },
+  },
 }
