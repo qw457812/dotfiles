@@ -51,7 +51,7 @@ return {
     },
   },
 
-  -- use helix-style mappings to work with flash or leap: ms mr md
+  -- use helix-style mappings to prevent conflict with flash or leap: ms md mr
   -- https://www.lazyvim.org/configuration/recipes#change-surround-mappings
   -- https://www.reddit.com/r/neovim/comments/1bl3dwz/whats_your_best_remap_for_flash_or_leap/
   -- https://github.com/ggandor/leap.nvim/discussions/59
@@ -65,12 +65,24 @@ return {
         add = "ms", -- Add surrounding in Normal and Visual modes
         -- gsd -> md
         delete = "md", -- Delete surrounding
-        find = "gsf", -- Find surrounding (to the right)
-        find_left = "gsF", -- Find surrounding (to the left)
-        highlight = "gsh", -- Highlight surrounding
+        -- gsf -> mf
+        find = "mf", -- Find surrounding (to the right)
+        -- gsF -> mF
+        find_left = "mF", -- Find surrounding (to the left)
+        -- gsh -> mh
+        highlight = "mh", -- Highlight surrounding
         -- gsr -> mr
         replace = "mr", -- Replace surrounding
-        update_n_lines = "gsn", -- Update `n_lines`
+        -- gsn -> mn
+        update_n_lines = "mn", -- Update `n_lines`
+      },
+    },
+  },
+  {
+    "folke/which-key.nvim",
+    opts = {
+      defaults = {
+        ["m"] = { name = "+match/surround" },
       },
     },
   },

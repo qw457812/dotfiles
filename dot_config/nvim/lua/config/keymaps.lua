@@ -9,7 +9,6 @@ map({ "n", "x", "o" }, "H", "^", { desc = "Goto line start" })
 map({ "n", "x", "o" }, "L", "$", { desc = "Goto line end" })
 
 -- quit
--- map("n", "<bs>", "<cmd>wincmd q<cr>", { desc = "Close window" })
 map("n", "<bs>", "<cmd>q<cr>", { desc = "Quit" })
 
 -- save file
@@ -26,6 +25,8 @@ map("n", "<Right>", "<C-i>", { desc = "Go Forward" })
 -- match
 -- helix-style mappings | https://github.com/boltlessengineer/nvim/blob/607ee0c9412be67ba127a4d50ee722be578b5d9f/lua/config/keymaps.lua#L103
 map({ "n", "x", "o" }, "mm", "%", { desc = "Goto matching bracket" })
+
+-- map("n", "U", "<C-r>", { desc = "Redo" })
 
 -- TODO
 -- <leader>fy
