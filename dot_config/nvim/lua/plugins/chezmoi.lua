@@ -5,6 +5,7 @@ return {
   -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/editor/refactoring.lua
   -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/ui.lua
   -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/coding/copilot-chat.lua
+  -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/util/project.lua
   {
     "xvzc/chezmoi.nvim",
     event = { "BufReadPre", "BufNewFile" },
@@ -13,7 +14,20 @@ return {
       {
         "<leader>f.",
         function()
-          require("telescope").extensions.chezmoi.find_files()
+          if LazyVim.pick.picker.name == "telescope" then
+            require("telescope").extensions.chezmoi.find_files()
+          elseif LazyVim.pick.picker.name == "fzf" then
+            require("fzf-lua").fzf_exec(require("chezmoi.commands").list({}), {
+              actions = {
+                ["default"] = function(selected)
+                  require("chezmoi.commands").edit({
+                    targets = { "~/" .. selected[1] },
+                    args = { "--watch" },
+                  })
+                end,
+              },
+            })
+          end
         end,
         desc = "Find Chezmoi Source Dotfiles",
       },

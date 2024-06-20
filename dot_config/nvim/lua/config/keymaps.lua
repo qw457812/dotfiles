@@ -10,6 +10,9 @@ map({ "n", "x", "o" }, "L", "$", { desc = "Goto line end" })
 
 -- quit
 map("n", "<bs>", "<cmd>q<cr>", { desc = "Quit" })
+-- map("n", "<bs>", "<cmd>qa<cr>", { desc = "Quit All" })
+-- map("n", "<bs>", LazyVim.ui.bufremove, { desc = "Delete Buffer" })
+-- map("n", "<bs>", "<cmd>:bd<cr>", { desc = "Delete Buffer and Window" })
 
 -- save file
 map("n", "<leader>fs", "<cmd>w<cr><esc>", { desc = "Save File" })
