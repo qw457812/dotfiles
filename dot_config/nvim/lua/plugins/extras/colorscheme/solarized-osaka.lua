@@ -1,7 +1,8 @@
 -- https://github.com/craftzdog/dotfiles-public/blob/master/.config/nvim/lua/plugins/colorscheme.lua
 return {
-  -- disable tokyonight
-  { "folke/tokyonight.nvim", enabled = false },
+  -- disable built-in themes
+  -- { "folke/tokyonight.nvim", enabled = false },
+  -- { "catppuccin/nvim", enabled = false },
 
   -- add solarized-osaka
   {
