@@ -1824,7 +1824,8 @@
            ; [:!Wo :same_wind_app :LibreOffice]
            [:!Wp [:left_command [:open "/System/Applications/Preview.app"]] :!Preview]
            [:!Wp :same_wind_app :Preview]
-           [:!Wv [:left_command [:open "/Applications/Karabiner-EventViewer.app"]]]
+           ;; [:!Wv [:left_command [:open "/Applications/Karabiner-EventViewer.app"]]]
+           [:!Wv [:left_command [:open "/Applications/Hillstone Secure Connect.app"]]] ; temp
            [:!Wb [:left_command [:open "/Applications/JetBrains Toolbox.app"]]]
            [:!Wn [:left_command [:open "http://127.0.0.1:8080/"]] nil {:delayed {:invoked [:escape]} :params {:delay 800}}] ; note
            [:!Wm [:left_command [:open "/Applications/Thunderbird.app"]] :!Thunderbird] ; email

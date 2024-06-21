@@ -18,6 +18,8 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 
 ## TODO
 
+- [ ] [ReplaceWithRegister](https://github.com/inkarkat/vim-ReplaceWithRegister) in nvim, [substitute.nvim](https://github.com/gbprod/substitute.nvim)?
 - [ ] Can I press `esc` enter normal mode in [fzf-lua](https://github.com/ibhagwan/fzf-lua)'s input box like [telescope](https://github.com/nvim-telescope/telescope.nvim)?
-- [ ] Use my own plugins in LazyExtra like Nv's [plugins/extras/](https://github.com/appelgriebsch/Nv/tree/main/lua/plugins/extras) and [lazyvim.json](https://github.com/appelgriebsch/Nv/blob/main/lazyvim.json)
-- [ ] [VS Code](https://www.lazyvim.org/extras/vscode)
+- [ ] Use my own plugins in LazyExtra like Nv's [plugins/extras/](https://github.com/appelgriebsch/Nv/tree/main/lua/plugins/extras) and [lazyvim.json](https://github.com/appelgriebsch/Nv/blob/main/lazyvim.json).
+- [ ] Python `Organize Imports` on save like VSCode.
+- [ ] [VSCode](https://www.lazyvim.org/extras/vscode)
