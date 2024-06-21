@@ -34,3 +34,14 @@ map({ "n", "x", "o" }, "mm", "%", { desc = "Goto matching bracket" })
 -- TODO
 -- <leader>fy
 -- <leader>fY
+
+if vim.g.neovide then
+  -- Paste command mode
+  -- https://neovide.dev/faq.html#how-can-i-use-cmd-ccmd-v-to-copy-and-paste
+  map("c", "<D-v>", "<C-r>+")
+  -- Paste insert, terminal mode (for fzf-lua)
+  -- https://github.com/neovide/neovide/issues/1263#issuecomment-1972013043
+  map({ "i", "t" }, "<D-v>", function()
+    vim.api.nvim_paste(vim.fn.getreg("+"), true, -1)
+  end, { noremap = true, silent = true })
+end

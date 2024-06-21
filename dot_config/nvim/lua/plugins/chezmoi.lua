@@ -65,6 +65,6 @@ return {
     end,
   },
 
-  -- TODO alker0/chezmoi.vim for syntax highlighting
+  -- TODO alker0/chezmoi.vim for syntax highlighting, like ~/.gitconfig
   -- https://github.com/kalocsaibotond/dotfiles/blob/73996ccc05ec53e565250c447e6c1e0d2fb7ef32/home/dot_config/nvim/lua/plugins/chezmoi.lua#L3
 }
