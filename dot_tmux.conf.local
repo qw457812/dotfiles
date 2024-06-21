@@ -434,7 +434,13 @@ bind Enter next-layout
 # behave like vimium, alacritty
 bind -T copy-mode-vi i send -X cancel
 
-# TODO https://github.com/samoshkin/tmux-config#key-bindings
+# split current window vertically
+bind | split-window -h
+
+# TODO
+# https://github.com/samoshkin/tmux-config#key-bindings
+# https://github.com/jabirali/tmux-tilish | https://github.com/folke/dot/blob/master/config/tmux/tmux.conf
+# https://github.com/tmux-plugins/tmux-sensible
 
 
 # -- tpm -----------------------------------------------------------------------
@@ -482,6 +488,9 @@ set -g @plugin 'tmux-plugins/tmux-open'
 set -g @open 'O'
 set -g @open-S 'https://www.google.com/search?q='
 set -g @plugin 'tmux-plugins/tmux-resurrect'
+set -g @resurrect-capture-pane-contents 'on'
+# TODO is this working?
+set -g @resurrect-strategy-nvim 'session'
 # https://github.com/tmux-plugins/tmux-continuum#known-issues
 set -g @plugin 'tmux-plugins/tmux-continuum'
 set -g @continuum-restore 'on'

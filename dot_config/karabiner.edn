@@ -1426,8 +1426,9 @@
            [:!Qgrave_accent_and_tilde [:open "/Applications/YesPlayMusic.app"]]
            [:!Qcomma [:open "/System/Applications/System Settings.app"]] ; cmd+, for setting
            [:!Qperiod [:open "/System/Applications/Launchpad.app"]] ; 启动台
-           [:!Qopen_bracket [[:open "/Applications/企业微信.app/Contents/Frameworks/wwmapp.app"] :same_wind_app] :!WeWork-Meeting] ; 企业微信•会议
-           [:!Qopen_bracket :same_wind_app :WeWork-Meeting]
+           [:!Qopen_bracket [:open "/Applications/Hillstone Secure Connect.app"]]
+           [:!Qclose_bracket [[:open "/Applications/企业微信.app/Contents/Frameworks/wwmapp.app"] :same_wind_app] :!WeWork-Meeting] ; 企业微信•会议
+           [:!Qclose_bracket :same_wind_app :WeWork-Meeting]
            ]}
 
   #_{:des   "Hold cmd+v for clipboard history by Maccy.app"
@@ -1709,9 +1710,6 @@
            ;; launch-mode before remap
            [:!Wdelete_or_backspace [:left_command [:open "/Applications/KeePassXC.app"]]] ; space
            [:!Wescape [:left_command [:open "/Applications/YesPlayMusic.app"]]] ; `
-           ;; 企业微信•会议
-           [:!Wend [:left_command [:open "/Applications/企业微信.app/Contents/Frameworks/wwmapp.app"] :same_wind_app] :!WeWork-Meeting] ; -
-           [:!Wend :same_wind_app :WeWork-Meeting]
 
            ;; TODO delete cmd-c cmd-v rime ` = \ [ ]
            ;; TODO when need to be `:#P` instead of `:##`
@@ -1825,7 +1823,7 @@
            [:!Wp [:left_command [:open "/System/Applications/Preview.app"]] :!Preview]
            [:!Wp :same_wind_app :Preview]
            ;; [:!Wv [:left_command [:open "/Applications/Karabiner-EventViewer.app"]]]
-           [:!Wv [:left_command [:open "/Applications/Hillstone Secure Connect.app"]]] ; temp
+           [:!Wv [:left_command [:open "/Applications/Neovide.app"]]]
            [:!Wb [:left_command [:open "/Applications/JetBrains Toolbox.app"]]]
            [:!Wn [:left_command [:open "http://127.0.0.1:8080/"]] nil {:delayed {:invoked [:escape]} :params {:delay 800}}] ; note
            [:!Wm [:left_command [:open "/Applications/Thunderbird.app"]] :!Thunderbird] ; email
@@ -1833,6 +1831,9 @@
            [:!Wcomma [:left_command [:open "/System/Applications/System Settings.app"]]] ; cmd+, for setting
            [:!Wperiod [:left_command [:open "/System/Applications/Launchpad.app"]]] ; 启动台
            ; [:!Wslash [:open "/Applications/WhatPulse/WhatPulse.app"]]
+           [:!Wopen_bracket [:left_command [:open "/Applications/Hillstone Secure Connect.app"]]]
+           [:!Wclose_bracket [:left_command [:open "/Applications/企业微信.app/Contents/Frameworks/wwmapp.app"] :same_wind_app] :!WeWork-Meeting] ; 企业微信•会议
+           [:!Wclose_bracket :same_wind_app :WeWork-Meeting]
            ; [:!Wx [:open "/Applications/WeChat.app"]]
 
            ;; TODO
