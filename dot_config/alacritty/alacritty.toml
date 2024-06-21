@@ -56,9 +56,7 @@ save_to_clipboard = true
 vi_mode_style = { shape = "Block", blinking = "Off" }
 
 [mouse]
-bindings = [
-{ mouse = "Right", action = "Paste" },
-]
+bindings = [{ mouse = "Right", action = "Paste" }]
 
 [[hints.enabled]]
 # command = "xdg-open" # On Linux/BSD
@@ -74,27 +72,26 @@ regex = "(ipfs:|ipns:|magnet:|mailto:|gemini://|gopher://|https://|http://|news:
 # https://alacritty.org/config-alacritty-bindings.html
 [keyboard]
 bindings = [
-# Launch Alacritty's Vi Mode
-{ key = "Space", mods = "Control", mode = "~Search", action = "ToggleViMode" },
-{ key = "Space", mods = "Control", mode = "Vi|~Search", action = "ScrollToBottom" },
-{ key = "J", mods = "Command", mode = "~Search", action = "ToggleViMode" },
-{ key = "J", mods = "Command", mode = "Vi|~Search", action = "ScrollToBottom" },
-# Same behavior as "esc" in https://github.com/gpakosz/.tmux
-{ key = "Escape", mode = "Vi|~Search", action = "ClearSelection" },
-{ key = "Escape", mode = "Vi|~Search", action = "ToggleViMode" },
-# Same behavior as "y" in https://github.com/gpakosz/.tmux
-{ key = "Y", mode = "Vi|~Search", action = "Copy" },
-{ key = "Y", mode = "Vi|~Search", action = "ClearSelection" },
-{ key = "Y", mode = "Vi|~Search", action = "ToggleViMode" },
-# Same behavior as "space" in https://github.com/gpakosz/.tmux
-{ key = "Space", mode = "Vi|~Search", action = "ClearSelection" },
-{ key = "Space", mode = "Vi|~Search", action = "ToggleNormalSelection" },
-# My vim bindings
-{ key = "H", mods = "Shift", mode = "Vi|~Search", action = "FirstOccupied" },
-{ key = "L", mods = "Shift", mode = "Vi|~Search", action = "Last" },
-# Use cmd+, to edit this file with chezmoi
-# https://github.com/alacritty/alacritty/issues/1047#issuecomment-362233176
-# send tmux key binding, see `bind C-]` in ~/.tmux.conf.local
-{ key = ",", mods = "Command", chars = "\u0002\u001d" },
+  # Launch Alacritty's Vi Mode
+  { key = "Space", mods = "Control", mode = "~Search", action = "ToggleViMode" },
+  { key = "Space", mods = "Control", mode = "Vi|~Search", action = "ScrollToBottom" },
+  { key = "J", mods = "Command", mode = "~Search", action = "ToggleViMode" },
+  { key = "J", mods = "Command", mode = "Vi|~Search", action = "ScrollToBottom" },
+  # Same behavior as "esc" in https://github.com/gpakosz/.tmux
+  { key = "Escape", mode = "Vi|~Search", action = "ClearSelection" },
+  { key = "Escape", mode = "Vi|~Search", action = "ToggleViMode" },
+  # Same behavior as "y" in https://github.com/gpakosz/.tmux
+  { key = "Y", mode = "Vi|~Search", action = "Copy" },
+  { key = "Y", mode = "Vi|~Search", action = "ClearSelection" },
+  { key = "Y", mode = "Vi|~Search", action = "ToggleViMode" },
+  # Same behavior as "space" in https://github.com/gpakosz/.tmux
+  { key = "Space", mode = "Vi|~Search", action = "ClearSelection" },
+  { key = "Space", mode = "Vi|~Search", action = "ToggleNormalSelection" },
+  # My vim bindings
+  { key = "H", mods = "Shift", mode = "Vi|~Search", action = "FirstOccupied" },
+  { key = "L", mods = "Shift", mode = "Vi|~Search", action = "Last" },
+  # Use cmd+, to edit this file with chezmoi
+  # https://github.com/alacritty/alacritty/issues/1047#issuecomment-362233176
+  # send tmux key binding, see `bind C-]` in ~/.tmux.conf.local
+  { key = ",", mods = "Command", chars = "\u0002\u001d" },
 ]
-

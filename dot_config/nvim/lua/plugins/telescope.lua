@@ -28,6 +28,7 @@ return {
       },
     },
   },
+  -- TODO should not add keys if `LazyVim.pick.want() == "fzf"`
   -- https://www.lazyvim.org/configuration/examples
   -- https://github.com/craftzdog/dotfiles-public/blob/master/.config/nvim/lua/plugins/editor.lua
   {
