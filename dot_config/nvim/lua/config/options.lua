@@ -5,6 +5,10 @@ local opt = vim.opt
 
 opt.relativenumber = false -- Relative line numbers
 
+-- https://github.com/folke/dot/blob/master/nvim/lua/config/options.lua
+opt.backup = true
+opt.backupdir = vim.fn.stdpath("state") .. "/backup"
+
 -- https://neovide.dev/configuration.html
 if vim.g.neovide then
   vim.g.neovide_hide_mouse_when_typing = true

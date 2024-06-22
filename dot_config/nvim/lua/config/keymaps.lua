@@ -13,6 +13,7 @@ map("n", "<bs>", "<cmd>q<cr>", { desc = "Quit" })
 -- map("n", "<bs>", "<cmd>qa<cr>", { desc = "Quit All" })
 -- map("n", "<bs>", LazyVim.ui.bufremove, { desc = "Delete Buffer" })
 -- map("n", "<bs>", "<cmd>:bd<cr>", { desc = "Delete Buffer and Window" })
+-- map("n", "<bs>", "<cmd>wincmd q<cr>", { desc = "Close window" })
 
 -- save file
 map("n", "<leader>fs", "<cmd>w<cr><esc>", { desc = "Save File" })
@@ -36,12 +37,11 @@ map({ "n", "x", "o" }, "mm", "%", { desc = "Goto matching bracket" })
 -- <leader>fY
 
 if vim.g.neovide then
-  -- Paste command mode
+  -- fix cmd-v for paste in insert, command, terminal (for fzf-lua) mode
   -- https://neovide.dev/faq.html#how-can-i-use-cmd-ccmd-v-to-copy-and-paste
-  map("c", "<D-v>", "<C-r>+")
-  -- Paste insert, terminal mode (for fzf-lua)
+  -- map("c", "<D-v>", "<C-r>+")
   -- https://github.com/neovide/neovide/issues/1263#issuecomment-1972013043
-  map({ "i", "t" }, "<D-v>", function()
+  map({ "i", "c", "t" }, "<D-v>", function()
     vim.api.nvim_paste(vim.fn.getreg("+"), true, -1)
-  end, { noremap = true, silent = true })
+  end, { desc = "Paste", noremap = true, silent = true })
 end
