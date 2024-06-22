@@ -23,3 +23,4 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] Use my own plugins in LazyExtra like Nv's [plugins/extras/](https://github.com/appelgriebsch/Nv/tree/main/lua/plugins/extras) and [lazyvim.json](https://github.com/appelgriebsch/Nv/blob/main/lazyvim.json).
 - [ ] Python `Organize Imports` on save like VSCode.
 - [ ] [VSCode](https://www.lazyvim.org/extras/vscode)
+- [ ] [Org Mode](https://github.com/topics/orgmode-nvim) in nvim.
