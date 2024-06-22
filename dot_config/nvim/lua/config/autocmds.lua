@@ -3,7 +3,7 @@
 -- Add any additional autocmds here
 
 -- show cursor line only in active window
--- https://github.com/folke/dot/blob/master/nvim/lua/plugins/ui.lua
+-- https://github.com/folke/dot/blob/master/nvim/lua/config/autocmds.lua
 vim.api.nvim_create_autocmd({ "InsertLeave", "WinEnter" }, {
   callback = function()
     if vim.w.auto_cursorline then
@@ -18,6 +18,17 @@ vim.api.nvim_create_autocmd({ "InsertEnter", "WinLeave" }, {
       vim.w.auto_cursorline = true
       vim.wo.cursorline = false
     end
+  end,
+})
+
+-- backups
+vim.api.nvim_create_autocmd("BufWritePre", {
+  group = vim.api.nvim_create_augroup("better_backup", { clear = true }),
+  callback = function(event)
+    local file = vim.uv.fs_realpath(event.match) or event.match
+    local backup = vim.fn.fnamemodify(file, ":p:~:h")
+    backup = backup:gsub("[/\\]", "%%")
+    vim.go.backupext = backup
   end,
 })
 

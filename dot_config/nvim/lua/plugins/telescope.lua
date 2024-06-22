@@ -1,71 +1,63 @@
+local Config = require("lazy.core.config")
+
+-- https://github.com/folke/dot/blob/master/nvim/lua/plugins/telescope.lua
+-- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/util/project.lua
+local pick_plugin_file = function()
+  if LazyVim.pick.picker.name == "telescope" then
+    require("telescope.builtin").find_files({ cwd = Config.options.root })
+  elseif LazyVim.pick.picker.name == "fzf" then
+    require("fzf-lua").files({ cwd = Config.options.root })
+  end
+end
+
+local pick_lazy_plugin_spec = function()
+  if LazyVim.pick.picker.name == "telescope" then
+    local files = {} ---@type table<string, string>
+    for _, plugin in pairs(Config.plugins) do
+      repeat
+        if plugin._.module then
+          local info = vim.loader.find(plugin._.module)[1]
+          if info then
+            files[info.modpath] = info.modpath
+          end
+        end
+        plugin = plugin._.super
+      until not plugin
+    end
+    require("telescope.builtin").live_grep({
+      default_text = "/",
+      search_dirs = vim.tbl_values(files),
+    })
+  elseif LazyVim.pick.picker.name == "fzf" then
+    local dirs = {
+      "~/.config/nvim/lua/plugins",
+      Config.options.root .. "/LazyVim/lua/lazyvim/plugins",
+    }
+    require("fzf-lua").live_grep({
+      filespec = "-- " .. table.concat(vim.tbl_values(dirs), " "),
+      search = "/",
+      formatter = "path.filename_first",
+    })
+  end
+end
+
 return {
-  -- https://github.com/folke/dot/blob/master/nvim/lua/plugins/telescope.lua
   {
     "ibhagwan/fzf-lua",
     optional = true,
     keys = {
-      {
-        "<leader>fP",
-        LazyVim.pick("files", { cwd = require("lazy.core.config").options.root }),
-        desc = "Find Plugin File",
-      },
-      {
-        "<leader>sP",
-        function()
-          -- local dirs = { "~/dot/nvim/lua/plugins", "~/projects/LazyVim/lua/lazyvim/plugins" }
-          -- local dirs = { "~/.config/nvim/lua/plugins", "~/Projects/github/LazyVim/lua/lazyvim/plugins" } -- full extras
-          local dirs = {
-            "~/.config/nvim/lua/plugins",
-            require("lazy.core.config").options.root .. "/LazyVim/lua/lazyvim/plugins",
-          }
-          require("fzf-lua").live_grep({
-            filespec = "-- " .. table.concat(vim.tbl_values(dirs), " "),
-            search = "/",
-            formatter = "path.filename_first",
-          })
-        end,
-        desc = "Find Lazy Plugin Spec",
-      },
+      { "<leader>fP", pick_plugin_file, desc = "Find Plugin File" },
+      { "<leader>sP", pick_lazy_plugin_spec, desc = "Find Lazy Plugin Spec" },
     },
   },
-  -- TODO should not add keys if `LazyVim.pick.want() == "fzf"`
   -- https://www.lazyvim.org/configuration/examples
   -- https://github.com/craftzdog/dotfiles-public/blob/master/.config/nvim/lua/plugins/editor.lua
   {
     "nvim-telescope/telescope.nvim",
     optional = true,
     keys = {
-      {
-        "<leader>fP",
-        function()
-          require("telescope.builtin").find_files({
-            cwd = require("lazy.core.config").options.root,
-          })
-        end,
-        desc = "Find Plugin File",
-      },
-      {
-        "<leader>sP",
-        function()
-          local files = {} ---@type table<string, string>
-          for _, plugin in pairs(require("lazy.core.config").plugins) do
-            repeat
-              if plugin._.module then
-                local info = vim.loader.find(plugin._.module)[1]
-                if info then
-                  files[info.modpath] = info.modpath
-                end
-              end
-              plugin = plugin._.super
-            until not plugin
-          end
-          require("telescope.builtin").live_grep({
-            default_text = "/",
-            search_dirs = vim.tbl_values(files),
-          })
-        end,
-        desc = "Find Lazy Plugin Spec",
-      },
+      { "<leader>fP", pick_plugin_file, desc = "Find Plugin File" },
+      { "<leader>sP", pick_lazy_plugin_spec, desc = "Find Lazy Plugin Spec" },
     },
     opts = {
       defaults = {
