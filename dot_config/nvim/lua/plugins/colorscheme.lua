@@ -21,12 +21,17 @@ return {
           "Outline",
         },
         on_highlights = function(hl, c)
+          -- highlight word/references under cursor
           -- https://github.com/RRethy/vim-illuminate#highlight-groups
           -- ~/.local/share/nvim/lazy/tokyonight.nvim/extras/lua/tokyonight_moon.lua
-          -- #555555
-          hl.IlluminatedWordRead = { bg = "#7e4c8b" }
-          hl.IlluminatedWordText = { bg = "#7e4c8b" }
-          hl.IlluminatedWordWrite = { bg = "#7e4c8b", underline = true }
+          -- #7847bd #8552a1 #7e4c8b #731d8b
+          -- #188092 #35717b #007197 #006a83 #265b75
+          -- #555555 #5b6078 #585b70 #51576d #494d64
+          -- #3760bf
+          hl.IlluminatedWordRead = { bg = "#51576d" }
+          hl.IlluminatedWordText = { bg = "#3b4261" }
+          hl.IlluminatedWordWrite = { bg = "#51576d", underline = true }
+
           do
             return
           end

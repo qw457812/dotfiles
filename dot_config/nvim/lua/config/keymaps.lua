@@ -34,9 +34,28 @@ map({ "n", "x", "o" }, "mm", "%", { desc = "Goto matching bracket" })
 
 -- map("n", "U", "<C-r>", { desc = "Redo" })
 
+-- https://github.com/rstacruz/vimfiles/blob/ee9a3e7e7f022059b6d012eff2e88c95ae24ff97/lua/config/keymaps.lua#L35
+-- :let @+=expand('%:p')<cr>
+map("n", "<leader>fy", function()
+  local path = vim.fn.expand("%:p")
+  vim.fn.setreg("+", path)
+  vim.notify("Copied path: " .. path)
+end, { desc = "Yank file path" })
+
+map("n", "<leader>fY", function()
+  local path = vim.fn.expand("%:.")
+  vim.fn.setreg("+", path)
+  vim.notify("Copied path: " .. path)
+end, { desc = "Yank file path from project" })
+
+-- map("n", "<leader>fY", function()
+--   local name = vim.fn.expand("%:t")
+--   vim.fn.setreg("+", name)
+--   vim.notify("Copied name: " .. name)
+-- end, { desc = "Yank file name" })
+
 -- TODO
--- <leader>fy
--- <leader>fY
+-- -
 
 if vim.g.neovide then
   -- fix cmd-v for paste in insert, command, terminal (for fzf-lua) mode
