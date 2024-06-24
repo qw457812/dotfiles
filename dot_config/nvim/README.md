@@ -16,6 +16,12 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [craftzdog](https://github.com/craftzdog/dotfiles-public/tree/master/.config/nvim)
 - [Nv](https://github.com/appelgriebsch/Nv)
 
+## Awesome Neovim
+
+- [Lazyman](https://github.com/doctorfree/nvim-lazyman)
+- [pkazmier](https://github.com/pkazmier/nvim)
+- [v1nh1shungry](https://github.com/v1nh1shungry/.dotfiles/tree/main/nvim)
+
 ## TODO
 
 - [ ] [ReplaceWithRegister](https://github.com/inkarkat/vim-ReplaceWithRegister) in nvim, [substitute.nvim](https://github.com/gbprod/substitute.nvim)?
@@ -24,3 +30,4 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] Python `Organize Imports` on save like VSCode.
 - [ ] [VSCode](https://www.lazyvim.org/extras/vscode)
 - [ ] [Org Mode](https://github.com/topics/orgmode-nvim) in nvim.
+- [ ] Fix Java DAP timeout problem.

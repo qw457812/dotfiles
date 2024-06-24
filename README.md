@@ -57,8 +57,6 @@ Using [WhatPulse](https://whatpulse.org/) to track keyboard input.
 
 [My neovim config](dot_config/nvim) powered by [LazyVim](https://github.com/LazyVim/LazyVim).
 
-> Very poor, need to be improved.
-
 TODO:
 
 1. [x] Try [NvChad](https://github.com/NvChad/NvChad), [LazyVim](https://github.com/LazyVim/LazyVim), [Kickstart](https://github.com/nvim-lua/kickstart.nvim), [AstroNvim](https://github.com/AstroNvim/AstroNvim) by [Lazyman](https://github.com/doctorfree/nvim-lazyman).
