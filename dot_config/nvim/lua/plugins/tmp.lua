@@ -40,7 +40,7 @@ return {
     event = "VeryLazy",
     ft = { "org" },
     keys = {
-      { "<leader>O", "", desc = "+orgmode" },
+      { "<leader>o", "", desc = "+orgmode" },
     },
     opts = {
       org_agenda_files = "~/org/**/*",
@@ -53,8 +53,7 @@ return {
         --   org_capture = "gC",
         -- },
 
-        -- TODO temp, default is <leader>o
-        prefix = "<Leader>O",
+        -- prefix = "<Leader>o",
       },
     },
   },

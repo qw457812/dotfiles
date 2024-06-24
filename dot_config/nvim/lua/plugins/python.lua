@@ -32,9 +32,13 @@ return {
           end,
         },
         search = {
+          -- see: ~/.local/share/nvim/lazy/venv-selector.nvim/lua/venv-selector/config.lua
+          anaconda_envs = {
+            command = "$FD 'bin/python$' ~/miniconda3/envs --full-path --color never -E /proc",
+            type = "anaconda",
+          },
           anaconda_base = {
-            -- command = "fd /bin/python$ ~/miniconda3 --full-path --color never -E /proc -E /pkgs", -- include `base` of calling `conda env list`
-            command = "fd /bin/python$ ~/miniconda3/envs --full-path --color never -E /proc",
+            command = "$FD '/python$' ~/miniconda3/bin --full-path --color never -E /proc",
             type = "anaconda",
           },
         },

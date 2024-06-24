@@ -383,8 +383,8 @@
            [:t :!Tt]
            [:y :!Ty]
            [:u :!Tu :!Spotify]
-           [:i :!Ti]
-           [:o :!To]
+           [:i :!Ti :!Finder]
+           [:o :!To :!Finder]
            [:p :!Tp]
            [:open_bracket :!Topen_bracket]
            [:close_bracket :!Tclose_bracket]
@@ -394,11 +394,11 @@
            [:d :!Td :!Spotify]
            [:f :!Tf]
            [:g :!Tg]
-           [:h :!Th :!Spotify]
+           [:h :!Th [:!Spotify :!Finder]]
            ;; [:h :delete_or_backspace] ; C-h to backspace
-           [:j :!Tj [:!WeWork :!WeChat :!Spotify]]
-           [:k :!Tk :!Spotify]
-           [:l :!Tl :!Spotify]
+           [:j :!Tj [:!WeWork :!WeChat :!Spotify :!Finder]]
+           [:k :!Tk [:!Spotify :!Finder]]
+           [:l :!Tl [:!Spotify :!Finder]]
            [:semicolon :!Tsemicolon]
            [:quote :!Tquote]
            [:z :!Tz]
@@ -435,6 +435,14 @@
            [:h :!CSleft_arrow :Spotify] ; seek backward
            [:u :!Cup_arrow :Spotify] ; volume up
            [:d :!Cdown_arrow :Spotify] ; volume down
+
+           ;; see "Finder: navigation" below
+           [:j :down_arrow :Finder]
+           [:k :up_arrow :Finder]
+           [:h :!Cup_arrow :Finder] ; Enclosing Folder
+           [:l :!Cdown_arrow :Finder]
+           [:o :!Copen_bracket :Finder] ; Back
+           [:i :!Cclose_bracket :Finder] ; Forward
            ]}
 
   {:des   "delete mode for glove80 (control)"
@@ -458,8 +466,8 @@
            [:t :!Tt]
            [:y :!Ty]
            [:u :!Tu :!Spotify]
-           [:i :!Ti]
-           [:o :!To]
+           [:i :!Ti :!Finder]
+           [:o :!To :!Finder]
            [:p :!Tp]
            [:open_bracket :!Topen_bracket]
            [:close_bracket :!Tclose_bracket]
@@ -469,11 +477,11 @@
            [:d :!Td :!Spotify]
            [:f :!Tf]
            [:g :!Tg]
-           [:h :!Th :!Spotify]
+           [:h :!Th [:!Spotify :!Finder]]
            ;; [:h :delete_or_backspace] ; C-h to backspace
-           [:j :!Tj [:!WeWork :!WeChat :!Spotify]]
-           [:k :!Tk :!Spotify]
-           [:l :!Tl :!Spotify]
+           [:j :!Tj [:!WeWork :!WeChat :!Spotify :!Finder]]
+           [:k :!Tk [:!Spotify :!Finder]]
+           [:l :!Tl [:!Spotify :!Finder]]
            [:semicolon :!Tsemicolon]
            [:quote :!Tquote]
            [:z :!Tz]
@@ -510,6 +518,14 @@
            [:h :!CSleft_arrow :Spotify] ; seek backward
            [:u :!Cup_arrow :Spotify] ; volume up
            [:d :!Cdown_arrow :Spotify] ; volume down
+
+           ;; see "Finder: navigation" below
+           [:j :down_arrow :Finder]
+           [:k :up_arrow :Finder]
+           [:h :!Cup_arrow :Finder] ; Enclosing Folder
+           [:l :!Cdown_arrow :Finder]
+           [:o :!Copen_bracket :Finder] ; Back
+           [:i :!Cclose_bracket :Finder] ; Forward
            ]}
 
   {:des   "m mode (control)"
@@ -529,7 +545,7 @@
            [:q :!Wq]
            [:w :!Ww]
            [:e :!We]
-           [:r :!Wr]
+           [:r :!Wr :!Finder]
            [:t :!Wt]
            [:y :!Wy]
            [:u :!Wu]
@@ -541,9 +557,9 @@
            [:backslash :!Wbackslash]
            [:a :!Wa]
            [:s :!Ws]
-           [:d :!Wd :!Spotify]
+           [:d :!Wd [:!Spotify :!Finder]]
            [:f :!Wf]
-           [:g :!Wg]
+           [:g :!Wg :!Finder]
            [:h :!Wh]
            ;; [:h :delete_or_backspace] ; C-h to backspace
            [:j :!Wj]
@@ -569,11 +585,17 @@
            [:return_or_enter :!Wreturn_or_enter]
            [:tab :!Wtab]
            [:escape :!Wescape]
-           [:grave_accent_and_tilde :!Wgrave_accent_and_tilde]
+           [:grave_accent_and_tilde :!Wgrave_accent_and_tilde :!Finder]
            [:delete_or_backspace :!Wdelete_or_backspace]
 
            ;; see "Spotify: play navigation" below
            [:d :!Cdown_arrow :Spotify] ; volume down
+
+           ;; see "Finder: navigation" below
+           [:g :!CSg :Finder] ; Go To Folder
+           [:grave_accent_and_tilde :!CSh :Finder] ; Home
+           [:r :!CSf :Finder] ; Recents
+           [:d :!COl :Finder] ; Downloads
            ]}
 
   ;; FIXME right_ctrl toggle rime's ascii_mode accidentally
@@ -594,7 +616,7 @@
            [:q :!Wq]
            [:w :!Ww]
            [:e :!We]
-           [:r :!Wr]
+           [:r :!Wr :!Finder]
            [:t :!Wt]
            [:y :!Wy]
            [:u :!Wu]
@@ -606,9 +628,9 @@
            [:backslash :!Wbackslash]
            [:a :!Wa]
            [:s :!Ws]
-           [:d :!Wd :!Spotify]
+           [:d :!Wd [:!Spotify :!Finder]]
            [:f :!Wf]
-           [:g :!Wg]
+           [:g :!Wg :!Finder]
            [:h :!Wh]
            ;; [:h :delete_or_backspace] ; C-h to backspace
            [:j :!Wj]
@@ -635,12 +657,18 @@
            [:tab :!Wtab]
            [:home :!Wequal_sign] ; see "For Glove80" below
            [:end :!Whyphen] ; see "For Glove80" below
-           [:escape :!Wescape]
-           [:grave_accent_and_tilde :!Wgrave_accent_and_tilde]
+           [:escape :!Wgrave_accent_and_tilde :!Finder] ; see "For Glove80" below
+           ;; [:grave_accent_and_tilde :!Wgrave_accent_and_tilde] ; see "For Glove80" below
            [:delete_or_backspace :!Wdelete_or_backspace]
 
            ;; see "Spotify: play navigation" below
            [:d :!Cdown_arrow :Spotify] ; volume down
+
+           ;; see "Finder: navigation" below
+           [:g :!CSg :Finder] ; Go To Folder
+           [:escape :!CSh :Finder] ; Home, see "For Glove80" below
+           [:r :!CSf :Finder] ; Recents
+           [:d :!COl :Finder] ; Downloads
            ]}
 
   {:des   "lshift mode for glove80 (cmd)"
@@ -1632,6 +1660,21 @@
            [:!T#Se :!Cright_arrow]]}
 
   ;; TODO ranger like keybinding for Finder
+  {:des   "Finder: navigation"
+   :rules [:Finder
+           [:!Tj :down_arrow]
+           [:!Tk :up_arrow]
+           [:!Th :!Cup_arrow] ; Enclosing Folder
+           [:!Tl :!Cdown_arrow]
+           ;; [:!To :!Co] ; Open
+           [:!To :!Copen_bracket] ; Back
+           [:!Ti :!Cclose_bracket] ; Forward
+           [:!Tg :!CSg] ; Go To Folder
+           [:!Tgrave_accent_and_tilde :!CSh] ; Home
+           [:!Tr :!CSf] ; Recents
+           [:!Td :!COl] ; Downloads
+           ]}
+
   {:des   "WeWork: chat message navigation"
    :rules [:WeWork
            [:!Tj :!COdown_arrow] ; select next unread chat message

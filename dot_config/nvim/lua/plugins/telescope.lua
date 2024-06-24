@@ -29,10 +29,7 @@ local pick_lazy_plugin_spec = function()
       search_dirs = vim.tbl_values(files),
     })
   elseif LazyVim.pick.picker.name == "fzf" then
-    local dirs = {
-      "~/.config/nvim/lua/plugins",
-      Config.options.root .. "/LazyVim/lua/lazyvim/plugins",
-    }
+    local dirs = { "~/.config/nvim/lua/plugins", Config.options.root .. "/LazyVim/lua/lazyvim/plugins" }
     require("fzf-lua").live_grep({
       filespec = "-- " .. table.concat(vim.tbl_values(dirs), " "),
       search = "/",

@@ -6,7 +6,9 @@ local map = vim.keymap.set
 -- navigate to line start and end from home row
 -- TODO not work in telescope's input box's normal mode
 map({ "n", "x", "o" }, "H", "^", { desc = "Goto line start" })
-map({ "n", "x", "o" }, "L", "$", { desc = "Goto line end" })
+map({ "n", "o" }, "L", "$", { desc = "Goto line end" })
+-- https://github.com/v1nh1shungry/.dotfiles/blob/d8a0f6fd2766d0ec9ce5d5b4ccd55b3cc4130c1a/nvim/lua/dotfiles/core/keymaps.lua#L74
+map("x", "L", "g_", { desc = "Goto line end" })
 
 -- quit
 map("n", "<bs>", "<cmd>q<cr>", { desc = "Quit" })
