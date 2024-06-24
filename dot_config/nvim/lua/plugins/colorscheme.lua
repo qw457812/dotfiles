@@ -21,6 +21,12 @@ return {
           "Outline",
         },
         on_highlights = function(hl, c)
+          -- https://github.com/RRethy/vim-illuminate#highlight-groups
+          -- ~/.local/share/nvim/lazy/tokyonight.nvim/extras/lua/tokyonight_moon.lua
+          -- #555555
+          hl.IlluminatedWordRead = { bg = "#7e4c8b" }
+          hl.IlluminatedWordText = { bg = "#7e4c8b" }
+          hl.IlluminatedWordWrite = { bg = "#7e4c8b", underline = true }
           do
             return
           end

@@ -63,6 +63,8 @@ return {
       mappings = {
         -- gsa -> ms
         add = "ms", -- Add surrounding in Normal and Visual modes
+        -- gsr -> mr
+        replace = "mr", -- Replace surrounding
         -- gsd -> md
         delete = "md", -- Delete surrounding
         -- gsf -> mf
@@ -71,10 +73,8 @@ return {
         find_left = "mF", -- Find surrounding (to the left)
         -- gsh -> mh
         highlight = "mh", -- Highlight surrounding
-        -- gsr -> mr
-        replace = "mr", -- Replace surrounding
-        -- gsn -> mn
-        update_n_lines = "mn", -- Update `n_lines`
+        -- gsn -> m<C-n>
+        update_n_lines = "m<C-n>", -- Update `n_lines`
       },
     },
   },
