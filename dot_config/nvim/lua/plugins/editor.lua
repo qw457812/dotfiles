@@ -18,8 +18,8 @@ return {
       replace = { prefix = "cr" }, -- Replace text with register
       -- gx -> cx
       exchange = { prefix = "cx" }, -- Exchange text regions
-      -- gm -> ""
-      multiply = { prefix = "" }, -- Multiply (duplicate) text
+      -- gm
+      multiply = { prefix = "gm" }, -- Multiply (duplicate) text
       -- g= -> ""
       evaluate = { prefix = "" }, -- Evaluate text and replace with output
       -- gs -> ""
@@ -27,30 +27,12 @@ return {
     },
   },
 
+  -- https://github.com/doctorfree/nvim-lazyman/blob/bb4091c962e646c5eb00a50eca4a86a2d43bcb7c/lua/ecovim/config/plugins.lua#L373
   {
     "folke/flash.nvim",
-    -- -- TODO flash `s`: leap-like 2-char motion ---> label is not stable like leap during typing
-    -- ---@type Flash.Config
-    -- opts = {
-    --   -- https://github.com/justinsgithub/dotfiles/blob/67e4e8ac5cec6e21147b8c13a974e9277b95f92a/neovim/.config/nvim/lua/plugins/motion/_flash.lua#L17
-    --   jump = {
-    --     autojump = true,
-    --   },
-    --   -- https://github.com/folke/flash.nvim/issues/57
-    --   labels = "sdfgqwertyuopzxcvbnm",
-    --   search = {
-    --     max_length = 2,
-    --     incremental = true,
-    --   },
-    --   -- https://github.com/folke/flash.nvim/issues/56
-    --   label = {
-    --     after = false,
-    --     before = { 0, 2 },
-    --   },
-    -- },
     -- stylua: ignore
     keys = {
-      -- r -> <space> (since `r` is used for replace with register in mini.operators)
+      -- r -> <space> (since `cr` is used for replace with register in mini.operators)
       -- https://github.com/rileyshahar/dotfiles/blob/ce20b2ea474f20e4eb7493e84c282645e91a36aa/nvim/lua/plugins/movement.lua#L99
       { "<space>", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
     },
