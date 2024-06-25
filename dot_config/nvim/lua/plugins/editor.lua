@@ -38,9 +38,57 @@ return {
     },
   },
 
+  {
+    "nvim-neo-tree/neo-tree.nvim",
+    opts = {
+      filesystem = {
+        filtered_items = {
+          hide_dotfiles = false,
+          hide_gitignored = false,
+          hide_hidden = false,
+          hide_by_name = {
+            "node_modules",
+            ".git",
+          },
+          never_show = {
+            ".DS_Store",
+            "thumbs.db",
+          },
+        },
+      },
+      window = {
+        mappings = {
+          ["-"] = "close_window", -- toggle neo-tree, see: ~/.config/nvim/lua/config/keymaps.lua
+          ["<bs>"] = "none", -- quit, see: ~/.config/nvim/lua/config/keymaps.lua
+          -- TODO h close_node or navigate_up
+          -- https://github.com/GentleCold/dotfiles/blob/5104ac8fae45b68a33c973a19b1f6a2e0617d400/.config/nvim/lua/plugins/dir_tree.lua
+          ["h"] = "navigate_up",
+          -- TODO l set_root?
+        },
+      },
+      buffers = {
+        window = {
+          mappings = {
+            ["bd"] = "none", -- use `d` instead
+            ["d"] = "buffer_delete",
+          },
+        },
+      },
+      event_handlers = {
+        -- https://github.com/nvim-neo-tree/neo-tree.nvim/wiki/Recipes#auto-close-on-open-file
+        -- alternative: https://github.com/nvim-neo-tree/neo-tree.nvim/issues/344
+        {
+          event = "file_opened",
+          handler = function(file_path)
+            -- auto close
+            require("neo-tree.command").execute({ action = "close" })
+          end,
+        },
+      },
+    },
+  },
+
   -- TODO unify the keybindings of https://github.com/vifm/vifm and neo-tree.nvim (or telescope-file-browser.nvim)
   -- https://www.lazyvim.org/plugins/editor#neo-treenvim
   -- https://github.com/craftzdog/dotfiles-public/blob/bf837d867b1aa153cbcb2e399413ec3bdcce112b/.config/nvim/lua/plugins/editor.lua#L58
-
-  -- TODO add flash treesitter `S` when enabled LazyVim Extras - leap
 }

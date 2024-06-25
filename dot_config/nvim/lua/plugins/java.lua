@@ -1,4 +1,4 @@
--- LazyVim Extras: lang.java
+-- require lazyvim.plugins.extras.lang.java
 -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/lang/java.lua
 return {
   -- add lombok support

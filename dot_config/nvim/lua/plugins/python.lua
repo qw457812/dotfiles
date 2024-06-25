@@ -1,6 +1,6 @@
--- LazyVim Extras: lang.python
--- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/lang/python.lua
 return {
+  -- require lazyvim.plugins.extras.lang.python
+  -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/lang/python.lua
   -- note that LazyVim use the new "regexp" branch: https://github.com/linux-cultist/venv-selector.nvim/tree/regexp
   {
     "linux-cultist/venv-selector.nvim",
@@ -45,4 +45,42 @@ return {
       },
     },
   },
+
+  -- require lazyvim.plugins.extras.formatting.black
+  -- isort
+  {
+    "williamboman/mason.nvim",
+    opts = function(_, opts)
+      table.insert(opts.ensure_installed, "isort")
+    end,
+  },
+  {
+    "nvimtools/none-ls.nvim",
+    optional = true,
+    opts = function(_, opts)
+      local nls = require("null-ls")
+      opts.sources = opts.sources or {}
+      table.insert(opts.sources, nls.builtins.formatting.isort)
+    end,
+  },
+  {
+    "stevearc/conform.nvim",
+    optional = true,
+    opts = {
+      formatters_by_ft = {
+        -- run multiple formatters sequentially
+        ["python"] = { "isort", "black" },
+      },
+    },
+  },
+
+  -- -- TODO should I add this?
+  -- -- correctly setup mason dap extensions
+  -- -- https://github.com/dylanHanger/dotfiles/blob/2289dc2443c1d513117a94d16b0fa7f962e03c6a/.config/nvim/lua/plugins/lang/python.lua#L22
+  -- {
+  --   "jay-babu/mason-nvim-dap.nvim",
+  --   opts = function(_, opts)
+  --     vim.list_extend(opts.ensure_installed, { "debugpy" })
+  --   end,
+  -- },
 }

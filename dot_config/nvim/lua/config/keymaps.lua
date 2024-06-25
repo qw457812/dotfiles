@@ -11,8 +11,8 @@ map({ "n", "o" }, "L", "$", { desc = "Goto line end" })
 map("x", "L", "g_", { desc = "Goto line end" })
 
 -- quit
-map("n", "<bs>", "<cmd>q<cr>", { desc = "Quit" })
--- map("n", "<bs>", "<cmd>qa<cr>", { desc = "Quit All" })
+-- map("n", "<bs>", "<cmd>q<cr>", { desc = "Quit" })
+map("n", "<bs>", "<cmd>qa<cr>", { desc = "Quit All" })
 -- map("n", "<bs>", LazyVim.ui.bufremove, { desc = "Delete Buffer" })
 -- map("n", "<bs>", "<cmd>:bd<cr>", { desc = "Delete Buffer and Window" })
 -- map("n", "<bs>", "<cmd>wincmd q<cr>", { desc = "Close window" })
@@ -54,8 +54,28 @@ end, { desc = "Yank file path from project" })
 --   LazyVim.info("Copied file name: " .. name)
 -- end, { desc = "Yank file name" })
 
--- TODO
--- -
+-- make the `-` key reveal the current file, or if in an unsaved file, the current working directory
+-- :h neo-tree-configuration
+map("n", "-", function()
+  local reveal_file = vim.fn.expand("%:p")
+  if reveal_file == "" then
+    reveal_file = vim.fn.getcwd()
+  else
+    local f = io.open(reveal_file, "r")
+    if f then
+      f.close(f)
+    else
+      reveal_file = vim.fn.getcwd()
+    end
+  end
+  require("neo-tree.command").execute({
+    action = "focus", -- OPTIONAL, this is the default value
+    source = "filesystem", -- OPTIONAL, this is the default value
+    position = "left", -- OPTIONAL, this is the default value
+    reveal_file = reveal_file, -- path to file or folder to reveal
+    reveal_force_cwd = true, -- change cwd without asking if needed
+  })
+end, { desc = "Open neo-tree at current file or working directory" })
 
 if vim.g.neovide then
   -- fix cmd-v for paste in insert, command, terminal (for fzf-lua) mode
