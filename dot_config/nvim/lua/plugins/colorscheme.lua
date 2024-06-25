@@ -6,7 +6,7 @@ return {
     "tokyonight.nvim",
     opts = function()
       return {
-        style = "moon",
+        style = "moon", -- storm, moon, night, day
         -- transparent = true,
         -- styles = {
         --   sidebars = "transparent",

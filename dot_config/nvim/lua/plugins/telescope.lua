@@ -11,25 +11,13 @@ local pick_plugin_file = function()
 end
 
 local pick_lazy_plugin_spec = function()
+  local dirs = { "~/.config/nvim/lua/plugins", Config.options.root .. "/LazyVim/lua/lazyvim/plugins" }
   if LazyVim.pick.picker.name == "telescope" then
-    local files = {} ---@type table<string, string>
-    for _, plugin in pairs(Config.plugins) do
-      repeat
-        if plugin._.module then
-          local info = vim.loader.find(plugin._.module)[1]
-          if info then
-            files[info.modpath] = info.modpath
-          end
-        end
-        plugin = plugin._.super
-      until not plugin
-    end
     require("telescope.builtin").live_grep({
       default_text = "/",
-      search_dirs = vim.tbl_values(files),
+      search_dirs = vim.tbl_values(dirs),
     })
   elseif LazyVim.pick.picker.name == "fzf" then
-    local dirs = { "~/.config/nvim/lua/plugins", Config.options.root .. "/LazyVim/lua/lazyvim/plugins" }
     require("fzf-lua").live_grep({
       filespec = "-- " .. table.concat(vim.tbl_values(dirs), " "),
       search = "/",

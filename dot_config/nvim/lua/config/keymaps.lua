@@ -39,19 +39,19 @@ map({ "n", "x", "o" }, "mm", "%", { desc = "Goto matching bracket" })
 map("n", "<leader>fy", function()
   local path = vim.fn.expand("%:p")
   vim.fn.setreg("+", path)
-  vim.notify("Copied path: " .. path)
+  LazyVim.info("Copied path: " .. path)
 end, { desc = "Yank file path" })
 
 map("n", "<leader>fY", function()
   local path = vim.fn.expand("%:.")
   vim.fn.setreg("+", path)
-  vim.notify("Copied path: " .. path)
+  LazyVim.info("Copied path: " .. path)
 end, { desc = "Yank file path from project" })
 
 -- map("n", "<leader>fY", function()
 --   local name = vim.fn.expand("%:t")
 --   vim.fn.setreg("+", name)
---   vim.notify("Copied name: " .. name)
+--   LazyVim.info("Copied file name: " .. name)
 -- end, { desc = "Yank file name" })
 
 -- TODO
