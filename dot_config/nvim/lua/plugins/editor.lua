@@ -12,6 +12,7 @@ return {
   {
     "echasnovski/mini.operators",
     event = "VeryLazy",
+    vscode = true,
     -- https://github.com/echasnovski/mini.operators/blob/76ac9104d9773927053ea4eb12fc78ccbb5be813/doc/mini-operators.txt#L131
     opts = {
       -- gr -> cr (LazyVim use `gr` for lsp references, `cr` for remote flash by default)
