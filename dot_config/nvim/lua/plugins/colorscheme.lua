@@ -20,17 +20,19 @@ return {
           "startuptime",
           "Outline",
         },
+        -- ~/.local/share/nvim/lazy/tokyonight.nvim/extras/lua/tokyonight_moon.lua
         on_highlights = function(hl, c)
           -- highlight word/references under cursor
+          -- require lazyvim.plugins.extras.editor.illuminate
           -- https://github.com/RRethy/vim-illuminate#highlight-groups
-          -- ~/.local/share/nvim/lazy/tokyonight.nvim/extras/lua/tokyonight_moon.lua
-          -- #7847bd #8552a1 #7e4c8b #731d8b
-          -- #188092 #35717b #007197 #006a83 #265b75
+          -- #3760bf #7847bd #8552a1 #7e4c8b #731d8b
+          -- #35717b #188092 #007197 #006a83 #265b75
           -- #555555 #5b6078 #585b70 #51576d #494d64
-          -- #3760bf
-          hl.IlluminatedWordRead = { bg = "#51576d" }
-          hl.IlluminatedWordText = { bg = "#3b4261" }
-          hl.IlluminatedWordWrite = { bg = "#51576d", underline = true }
+          local illuminate = "#51576d"
+          -- hl.IlluminatedWordText = { bg = "#3b4261" } -- use default
+          hl.IlluminatedWordRead = { bg = illuminate }
+          hl.IlluminatedWordWrite = { bg = illuminate, underline = true }
+          hl.CmpGhostText = { bg = c.bg, fg = "#444a73" }
 
           do
             return
