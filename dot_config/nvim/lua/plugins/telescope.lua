@@ -50,6 +50,13 @@ return {
         layout_config = { prompt_position = "top" },
         sorting_strategy = "ascending",
         winblend = 0,
+        -- ~/.local/share/nvim/lazy/telescope.nvim/lua/telescope/mappings.lua
+        mappings = {
+          n = {
+            ["H"] = { "^", type = "command" },
+            ["L"] = { "$", type = "command" },
+          },
+        },
       },
     },
   },
