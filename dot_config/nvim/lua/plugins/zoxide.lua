@@ -5,41 +5,12 @@ end
 local pick = function()
   -- picker_opts | https://github.com/nvim-telescope/telescope.nvim#customization
   require("telescope").extensions.zoxide.list({
-    layout_config = { width = 0.5, height = 0.7 },
+    -- layout_config = { width = 0.5, height = 0.7 },
   })
 end
 
 -- https://github.com/Matt-FTW/dotfiles/blob/dd62c1c26ef480bb58a13de971e8418ec7181010/.config/nvim/lua/plugins/extras/editor/telescope/zoxide.lua
 return {
-  -- {
-  --   "jvgrootveld/telescope-zoxide",
-  --   -- enabled = function()
-  --   --   return LazyVim.has("telescope.nvim") and vim.fn.executable("zoxide") == 1
-  --   -- end,
-  --   keys = {
-  --     { "<leader>fz", pick, desc = "Zoxide" },
-  --   },
-  --   config = function()
-  --     LazyVim.on_load("telescope.nvim", function()
-  --       require("telescope").setup({
-  --         extensions = {
-  --           zoxide = {
-  --             prompt_title = "Zoxide",
-  --             mappings = {
-  --               default = {
-  --                 after_action = function(selection)
-  --                   require("telescope.builtin").find_files({ cwd = selection.path })
-  --                 end,
-  --               },
-  --             },
-  --           },
-  --         },
-  --       })
-  --       require("telescope").load_extension("zoxide")
-  --     end)
-  --   end,
-  -- },
-
   -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/editor/telescope.lua
   -- https://github.com/craftzdog/dotfiles-public/blob/master/.config/nvim/lua/plugins/editor.lua
   {

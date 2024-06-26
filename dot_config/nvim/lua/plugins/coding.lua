@@ -61,19 +61,19 @@ return {
     opts = {
       -- use `''` (empty string) to disable one.
       mappings = {
-        -- gsa -> ms
+        -- gsa
         add = "ms", -- Add surrounding in Normal and Visual modes
-        -- gsr -> mr
+        -- gsr
         replace = "mr", -- Replace surrounding
-        -- gsd -> md
+        -- gsd
         delete = "md", -- Delete surrounding
-        -- gsf -> mf
-        find = "mf", -- Find surrounding (to the right)
-        -- gsF -> mF
-        find_left = "mF", -- Find surrounding (to the left)
-        -- gsh -> mh
-        highlight = "mh", -- Highlight surrounding
-        -- gsn -> m<C-n>
+        -- gsf
+        find = "", -- Find surrounding (to the right)
+        -- gsF
+        find_left = "", -- Find surrounding (to the left)
+        -- gsh
+        highlight = "", -- Highlight surrounding
+        -- gsn
         update_n_lines = "m<C-n>", -- Update `n_lines`
       },
     },

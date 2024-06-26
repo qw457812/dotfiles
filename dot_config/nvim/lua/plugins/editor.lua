@@ -15,15 +15,15 @@ return {
     vscode = true,
     -- https://github.com/echasnovski/mini.operators/blob/76ac9104d9773927053ea4eb12fc78ccbb5be813/doc/mini-operators.txt#L131
     opts = {
-      -- gr -> cr (LazyVim use `gr` for lsp references, `cr` for remote flash by default)
+      -- gr (LazyVim use `gr` for lsp references, `cr` for remote flash by default)
       replace = { prefix = "cr" }, -- Replace text with register
-      -- gx -> cx
+      -- gx
       exchange = { prefix = "cx" }, -- Exchange text regions
       -- gm
       multiply = { prefix = "gm" }, -- Multiply (duplicate) text
-      -- g= -> ""
+      -- g=
       evaluate = { prefix = "" }, -- Evaluate text and replace with output
-      -- gs -> ""
+      -- gs
       sort = { prefix = "" }, -- Sort text
     },
   },
