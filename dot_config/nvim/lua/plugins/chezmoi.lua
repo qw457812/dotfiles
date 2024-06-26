@@ -1,3 +1,7 @@
+if vim.fn.executable("chezmoi") == 0 then
+  return {}
+end
+
 return {
   -- https://www.chezmoi.io/user-guide/tools/editor/#use-chezmoi-with-vim
   -- https://github.com/rayandrew/dotnvim/blob/8bec4783182dcd59519fa226129b5cb047b12696/lua/rayandrew/plugins/editor.lua#L173
