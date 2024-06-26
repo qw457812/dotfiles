@@ -1,14 +1,6 @@
 -- https://github.com/folke/dot/blob/master/nvim/lua/plugins/tmp.lua
 return {
   {
-    "akinsho/bufferline.nvim",
-    opts = {
-      options = {
-        separator_style = "slope",
-      },
-    },
-  },
-  {
     "2kabhishek/nerdy.nvim",
     cmd = "Nerdy",
     keys = {
@@ -57,4 +49,32 @@ return {
       },
     },
   },
+
+  -- {
+  --   "tris203/precognition.nvim",
+  --   event = "VeryLazy",
+  --   opts = {
+  --     startVisible = true,
+  --     showBlankVirtLine = false,
+  --     highlightColor = { link = "Comment" },
+  --     hints = {
+  --       Caret = { text = "^", prio = 0 },
+  --       Dollar = { text = "$", prio = 0 },
+  --       MatchingPair = { text = "%", prio = 0 },
+  --       Zero = { text = "0", prio = 0 },
+  --       w = { text = "w", prio = 10 },
+  --       b = { text = "b", prio = 9 },
+  --       e = { text = "e", prio = 8 },
+  --       W = { text = "W", prio = 7 },
+  --       B = { text = "B", prio = 6 },
+  --       E = { text = "E", prio = 5 },
+  --     },
+  --     gutterHints = {
+  --       G = { text = "G", prio = 0 },
+  --       gg = { text = "gg", prio = 0 },
+  --       PrevParagraph = { text = "{", prio = 8 },
+  --       NextParagraph = { text = "}", prio = 8 },
+  --     },
+  --   },
+  -- },
 }
