@@ -13,6 +13,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 ## Awesome LazyVim
 
 - [folke](https://github.com/folke/dot/tree/master/nvim)
+- [Matt-FTW](https://github.com/Matt-FTW/dotfiles/tree/main/.config/nvim)
 - [craftzdog](https://github.com/craftzdog/dotfiles-public/tree/master/.config/nvim)
 - [Nv](https://github.com/appelgriebsch/Nv)
 
@@ -27,6 +28,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 
 ## TODO
 
+- [ ] Check out the great [:h lua-guide](https://neovim.io/doc/user/lua-guide.html#lua-guide).
 - [ ] Use my own plugins in LazyExtra like Nv's [plugins/extras/](https://github.com/appelgriebsch/Nv/tree/main/lua/plugins/extras) and [lazyvim.json](https://github.com/appelgriebsch/Nv/blob/main/lazyvim.json).
 - [ ] Map `gd` to both lsp_definition and lsp_references like vscode and idea, maybe give `gr` to ReplaceWithRegister.
 - [ ] Can I use NvChad's theme in LazyVim?
@@ -36,6 +38,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] [ChatGPT.nvim](https://github.com/jackMort/ChatGPT.nvim), eg. AstroCommunity's [config](https://github.com/AstroNvim/astrocommunity/tree/1f3a6ec008b404c72f84093fe25c574ba63fc256/lua/astrocommunity/editing-support/chatgpt-nvim)
 - [ ] [oil.nvim](https://github.com/stevearc/oil.nvim)
 - [ ] [markdown.nvim](https://github.com/MeanderingProgrammer/markdown.nvim)
+- [ ] [telescope-file-browser](https://github.com/nvim-telescope/telescope-file-browser.nvim), eg. [craftzdog](https://github.com/craftzdog/dotfiles-public/blob/master/.config/nvim/lua/plugins/editor.lua)
 - [ ] Keybindings investigation:
   - DoomEmacs
   - [Kickstart](https://github.com/nvim-lua/kickstart.nvim)

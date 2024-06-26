@@ -21,8 +21,10 @@ map("n", "<bs>", "<cmd>qa<cr>", { desc = "Quit All" })
 map("n", "<leader>fs", "<cmd>w<cr><esc>", { desc = "Save File" })
 
 -- buffers
+-- see: akinsho/bufferline.nvim in ~/.config/nvim/lua/plugins/ui.lua
 map("n", "<Up>", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
 map("n", "<Down>", "<cmd>bnext<cr>", { desc = "Next Buffer" })
+map("n", "<leader>ba", "<cmd>bufdo bd<cr>", { desc = "Delete All Buffers" })
 
 -- jumping
 map("n", "<Left>", "<C-o>", { desc = "Go Back" })
@@ -33,6 +35,11 @@ map("n", "<Right>", "<C-i>", { desc = "Go Forward" })
 map({ "n", "x", "o" }, "mm", "%", { desc = "Goto matching bracket" })
 
 -- map("n", "U", "<C-r>", { desc = "Redo" })
+
+-- windows
+map("n", "<leader>wo", "<C-W>o", { desc = "Close Other Windows", remap = true })
+-- https://github.com/gpakosz/.tmux/blob/9cf49731cd785b76cf792046feed0e8275457918/.tmux.conf#L74
+map("n", "<leader>_", "<C-W>v", { desc = "Split Window Right", remap = true })
 
 -- https://github.com/rstacruz/vimfiles/blob/ee9a3e7e7f022059b6d012eff2e88c95ae24ff97/lua/config/keymaps.lua#L35
 -- :let @+=expand('%:p')<cr>

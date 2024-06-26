@@ -6,6 +6,7 @@ return {
   -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/ui.lua
   -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/coding/copilot-chat.lua
   -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/util/project.lua
+  -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/lang/haskell.lua
   {
     "xvzc/chezmoi.nvim",
     event = { "BufReadPre", "BufNewFile" },
