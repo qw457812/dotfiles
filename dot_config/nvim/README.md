@@ -16,6 +16,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [Matt-FTW](https://github.com/Matt-FTW/dotfiles/tree/main/.config/nvim)
 - [craftzdog](https://github.com/craftzdog/dotfiles-public/tree/master/.config/nvim)
 - [Nv](https://github.com/appelgriebsch/Nv)
+- [ian-ie](https://github.com/ian-ie/LazyVim)
 
 ## Awesome Neovim
 
@@ -38,7 +39,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] [ChatGPT.nvim](https://github.com/jackMort/ChatGPT.nvim), eg. AstroCommunity's [config](https://github.com/AstroNvim/astrocommunity/tree/1f3a6ec008b404c72f84093fe25c574ba63fc256/lua/astrocommunity/editing-support/chatgpt-nvim)
 - [ ] [oil.nvim](https://github.com/stevearc/oil.nvim)
 - [ ] [markdown.nvim](https://github.com/MeanderingProgrammer/markdown.nvim)
-- [ ] [telescope-file-browser](https://github.com/nvim-telescope/telescope-file-browser.nvim), eg. [craftzdog](https://github.com/craftzdog/dotfiles-public/blob/master/.config/nvim/lua/plugins/editor.lua)
+- [ ] [telescope-file-browser](https://github.com/nvim-telescope/telescope-file-browser.nvim), eg. [craftzdog](https://github.com/craftzdog/dotfiles-public/blob/master/.config/nvim/lua/plugins/editor.lua), [Matt-FTW](https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/editor/telescope/file-browser.lua)
 - [ ] Keybindings investigation:
   - DoomEmacs
   - [Kickstart](https://github.com/nvim-lua/kickstart.nvim)
@@ -46,3 +47,31 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
   - [Lazyman](https://github.com/doctorfree/nvim-lazyman)
   - [rafi](https://github.com/rafi/vim-config#custom-key-mappings)
   - [modern-neovim](https://github.com/alpha2phi/modern-neovim)
+- [ ] translate
+
+  - [JuanZoran/Trans.nvim](https://github.com/JuanZoran/Trans.nvim)
+  - [voldikss/vim-translator](https://github.com/voldikss/vim-translator)
+  - uga-rosa/translate.nvim
+
+    ```lua
+    {
+      "uga-rosa/translate.nvim",
+      event = "VeryLazy",
+      config = function()
+        require("translate").setup({
+          default = {
+            command = "translate_shell",
+          },
+          preset = {
+            output = {
+              split = {
+                append = true,
+              },
+            },
+          },
+        })
+      end,
+    },
+    ```
+
+- [ ] Refactor patch like [overrides.lua](https://github.com/ian-ie/LazyVim/blob/master/lua/plugins/overrides.lua).

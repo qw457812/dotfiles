@@ -3,6 +3,23 @@
 -- Add any additional keymaps here
 local map = vim.keymap.set
 
+local lazy = require("lazy")
+
+-- lazy/LazyVim
+-- https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/config/keymaps.lua
+map("n", "<leader>l", "<Nop>", { desc = "+lazy/lazyvim" })
+map("n", "<leader>L", "<Nop>")
+map("n", "<leader>ll", "<cmd>Lazy<cr>", { desc = "Lazy" })
+-- stylua: ignore start
+map("n", "<leader>lc", function() LazyVim.news.changelog() end, { desc = "LazyVim Changelog" })
+map("n", "<leader>lx", "<cmd>LazyExtras<cr>", { desc = "Extras" })
+map("n", "<leader>ld", function() vim.fn.system({ "open", "https://lazyvim.org" }) end, { desc = "LazyVim Docs" })
+map("n", "<leader>lr", function() vim.fn.system({ "open", "https://github.com/LazyVim/LazyVim" }) end, { desc = "LazyVim Repo" })
+map("n", "<leader>lu", function() lazy.update() end, { desc = "Lazy Update" })
+map("n", "<leader>ls", function() lazy.sync() end, { desc = "Lazy Sync" })
+map("n", "<leader>lC", function() lazy.check() end, { desc = "Lazy Check" })
+-- stylua: ignore end
+
 -- navigate to line start and end from home row
 -- TODO not work in telescope's input box's normal mode
 map({ "n", "x", "o" }, "H", "^", { desc = "Goto line start" })
