@@ -7,6 +7,7 @@ local lazy = require("lazy")
 
 -- lazy/LazyVim
 -- https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/config/keymaps.lua
+-- vim.keymap.del | https://www.lazyvim.org/configuration/keymaps#global-keymaps
 map("n", "<leader>l", "<Nop>", { desc = "+lazy/lazyvim" })
 map("n", "<leader>L", "<Nop>")
 map("n", "<leader>ll", "<cmd>Lazy<cr>", { desc = "Lazy" })
@@ -36,6 +37,8 @@ map("n", "<bs>", "<cmd>qa<cr>", { desc = "Quit All" })
 
 -- save file
 map("n", "<leader>fs", "<cmd>w<cr><esc>", { desc = "Save File" })
+-- save file without formatting
+map("n", "<leader>fS", "<cmd>noautocmd w<cr>", { desc = "Save File Without Formatting" })
 
 -- buffers
 -- see: akinsho/bufferline.nvim in ~/.config/nvim/lua/plugins/ui.lua
@@ -53,10 +56,28 @@ map({ "n", "x", "o" }, "mm", "%", { desc = "Goto matching bracket" })
 
 -- map("n", "U", "<C-r>", { desc = "Redo" })
 
+-- floating terminal
+-- stylua: ignore
+map("n", "<leader>.", function() LazyVim.terminal(nil, { cwd = vim.fn.expand("%:p:h") }) end, { desc = "Terminal (Buffer Dir)" })
+
 -- windows
 map("n", "<leader>wo", "<C-W>o", { desc = "Close Other Windows", remap = true })
 -- https://github.com/gpakosz/.tmux/blob/9cf49731cd785b76cf792046feed0e8275457918/.tmux.conf#L74
 map("n", "<leader>_", "<C-W>v", { desc = "Split Window Right", remap = true })
+map("n", "<leader>w_", "<C-W>v", { desc = "Split Window Right", remap = true })
+
+-- deleting without yanking empty line
+map("n", "dd", function()
+  local is_empty_line = vim.api.nvim_get_current_line():match("^%s*$")
+  if is_empty_line then
+    return '"_dd'
+  else
+    return "dd"
+  end
+end, { noremap = true, expr = true, desc = "Don't Yank Empty Line to Clipboard" })
+
+-- search inside visually highlighted text
+map("x", "g/", "<esc>/\\%V", { silent = false, desc = "Search Inside Visual Selection" })
 
 -- https://github.com/rstacruz/vimfiles/blob/ee9a3e7e7f022059b6d012eff2e88c95ae24ff97/lua/config/keymaps.lua#L35
 -- :let @+=expand('%:p')<cr>
@@ -77,29 +98,6 @@ end, { desc = "Yank file path from project" })
 --   vim.fn.setreg("+", name)
 --   LazyVim.info("Copied file name: " .. name)
 -- end, { desc = "Yank file name" })
-
--- make the `-` key reveal the current file, or if in an unsaved file, the current working directory
--- :h neo-tree-configuration
-map("n", "-", function()
-  local reveal_file = vim.fn.expand("%:p")
-  if reveal_file == "" then
-    reveal_file = vim.fn.getcwd()
-  else
-    local f = io.open(reveal_file, "r")
-    if f then
-      f.close(f)
-    else
-      reveal_file = vim.fn.getcwd()
-    end
-  end
-  require("neo-tree.command").execute({
-    action = "focus", -- OPTIONAL, this is the default value
-    source = "filesystem", -- OPTIONAL, this is the default value
-    position = "left", -- OPTIONAL, this is the default value
-    reveal_file = reveal_file, -- path to file or folder to reveal
-    reveal_force_cwd = true, -- change cwd without asking if needed
-  })
-end, { desc = "Open neo-tree at current file or working directory" })
 
 if vim.g.neovide then
   -- fix cmd-v for paste in insert, command, terminal (for fzf-lua) mode
