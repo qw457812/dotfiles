@@ -36,3 +36,5 @@ imap jj <Esc>
 nmap Y y$
 vmap H ^
 vmap L $
+
+" TODO https://github.com/chrisgrieser/.config/blob/main/obsidian/vimrc/obsidian-vimrc.vim

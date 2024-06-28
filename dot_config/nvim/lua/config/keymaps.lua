@@ -3,7 +3,8 @@
 -- Add any additional keymaps here
 local map = vim.keymap.set
 
-local lazy = require("lazy")
+local Lazy = require("lazy")
+local LazyUtil = require("lazy.util")
 
 -- lazy/LazyVim
 -- https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/config/keymaps.lua
@@ -14,11 +15,12 @@ map("n", "<leader>ll", "<cmd>Lazy<cr>", { desc = "Lazy" })
 -- stylua: ignore start
 map("n", "<leader>lc", function() LazyVim.news.changelog() end, { desc = "LazyVim Changelog" })
 map("n", "<leader>lx", "<cmd>LazyExtras<cr>", { desc = "Extras" })
-map("n", "<leader>ld", function() vim.fn.system({ "open", "https://lazyvim.org" }) end, { desc = "LazyVim Docs" })
-map("n", "<leader>lr", function() vim.fn.system({ "open", "https://github.com/LazyVim/LazyVim" }) end, { desc = "LazyVim Repo" })
-map("n", "<leader>lu", function() lazy.update() end, { desc = "Lazy Update" })
-map("n", "<leader>ls", function() lazy.sync() end, { desc = "Lazy Sync" })
-map("n", "<leader>lC", function() lazy.check() end, { desc = "Lazy Check" })
+-- alternative: vim.fn.system({ "open", "https://lazyvim.org" }) or vim.cmd("silent !open https://lazyvim.org")
+map("n", "<leader>ld", function() LazyUtil.open("https://lazyvim.org") end, { desc = "LazyVim Docs" })
+map("n", "<leader>lr", function() LazyUtil.open("https://github.com/LazyVim/LazyVim") end, { desc = "LazyVim Repo" })
+map("n", "<leader>lu", function() Lazy.update() end, { desc = "Lazy Update" })
+map("n", "<leader>ls", function() Lazy.sync() end, { desc = "Lazy Sync" })
+map("n", "<leader>lC", function() Lazy.check() end, { desc = "Lazy Check" })
 -- stylua: ignore end
 
 -- navigate to line start and end from home row
@@ -98,6 +100,25 @@ end, { desc = "Yank file path from project" })
 --   vim.fn.setreg("+", name)
 --   LazyVim.info("Copied file name: " .. name)
 -- end, { desc = "Yank file name" })
+
+local function google_search(input)
+  local query = input or vim.fn.expand("<cword>")
+  LazyUtil.open("https://www.google.com/search?q=" .. query)
+end
+map("n", "<leader>?", google_search, { noremap = true, silent = true, desc = "Google Search Current Word" })
+-- local function google_search_input()
+--   local input = vim.fn.input("Google Search: ")
+--   if input ~= "" then
+--     google_search(input)
+--   end
+-- end
+-- map("n", "<leader>?", google_search_input, { noremap = true, silent = true, desc = "Google Search From Input" })
+map("x", "<leader>?", function()
+  local g_orig = vim.fn.getreg("g")
+  vim.cmd([[silent! normal! "gy]])
+  google_search(vim.fn.getreg("g"))
+  vim.fn.setreg("g", g_orig)
+end, { noremap = true, silent = true, desc = "Google Search" })
 
 if vim.g.neovide then
   -- fix cmd-v for paste in insert, command, terminal (for fzf-lua) mode
