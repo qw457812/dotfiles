@@ -167,26 +167,27 @@
 ;; https://github.com/lorniu/go-translate#more-configuration
 ;; https://github.com/lorniu/go-translate/issues/6
 ;; go-translate: https://github.com/lorniu/go-translate
-(after! go-translate
-  (setq gts-translate-list '(("en" "zh")))
-  (setq gts-default-translator
-        (gts-translator
-         ;; :picker (gts-prompt-picker)
-         :picker (gts-noprompt-picker)
-         :engines ; engines, one or more. Provide a parser to give different output.
-         (list
-          (gts-bing-engine)
-          ;;(gts-deepl-engine :auth-key [YOUR_AUTH_KEY] :pro nil)
-          (gts-google-engine :parser (gts-google-summary-parser))
-          (gts-google-rpc-engine))
-         ;; :render (gts-buffer-render)
-         :render (gts-posframe-pop-render)
-         ))
-  ;; disable the evil mode to allow plugin keybindings: https://github.com/lorniu/go-translate/issues/6#issuecomment-700038291
-  (add-hook 'gts-after-buffer-render-hook ;; use 'gts-after-buffer-multiple-render-hook instead if you have multiple engines
-            (defun your-hook-that-disable-evil-mode-in-go-translate-buffer (&rest _)
-              (turn-off-evil-mode)))
-  )
+;; TODO breaking change
+;(after! go-translate
+;  (setq gts-translate-list '(("en" "zh")))
+;  (setq gts-default-translator
+;        (gts-translator
+;         ;; :picker (gts-prompt-picker)
+;         :picker (gts-noprompt-picker)
+;         :engines ; engines, one or more. Provide a parser to give different output.
+;         (list
+;          (gts-bing-engine)
+;          ;;(gts-deepl-engine :auth-key [YOUR_AUTH_KEY] :pro nil)
+;          (gts-google-engine :parser (gts-google-summary-parser))
+;          (gts-google-rpc-engine))
+;         ;; :render (gts-buffer-render)
+;         :render (gts-posframe-pop-render)
+;         ))
+;  ;; disable the evil mode to allow plugin keybindings: https://github.com/lorniu/go-translate/issues/6#issuecomment-700038291
+;  (add-hook 'gts-after-buffer-render-hook ;; use 'gts-after-buffer-multiple-render-hook instead if you have multiple engines
+;            (defun your-hook-that-disable-evil-mode-in-go-translate-buffer (&rest _)
+;              (turn-off-evil-mode)))
+;  )
 ;; (map! :leader :desc "Translate" :nv "T" #'gts-do-translate)
 
 ;; FIXME
@@ -237,6 +238,7 @@
        :internal-border-width 7))
 ;; 自动化设置
 ;; 临时英文模式：其中有任何一个断言的值 **不是** nil 时，会自动使用英文
+;; TODO 在英文字符且有**两个**空格之后，自动切换到中文，且删除一个空格 | https://github.com/OrangeX4/vscode-smart-ime#%E7%89%B9%E6%80%A7
 (setq rime-disable-predicates
       '(rime-predicate-evil-mode-p                   ; 在 evil-mode 的非编辑状态下
         rime-predicate-after-alphabet-char-p         ; 在英文字符串之后（必须为以字母开头的英文字符串）

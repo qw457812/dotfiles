@@ -46,6 +46,7 @@ return {
   -- https://github.com/folke/dot/blob/master/nvim/lua/plugins/coding.lua
   {
     "zbirenbaum/copilot.lua",
+    optional = true,
     opts = {
       filetypes = { ["*"] = true },
     },
@@ -58,6 +59,7 @@ return {
   -- or use kylechui/nvim-surround instead of mini.surround | https://github.com/boltlessengineer/nvim/blob/607ee0c9412be67ba127a4d50ee722be578b5d9f/lua/plugins/coding.lua#L95
   {
     "echasnovski/mini.surround",
+    optional = true,
     opts = {
       -- use `''` (empty string) to disable one.
       mappings = {
