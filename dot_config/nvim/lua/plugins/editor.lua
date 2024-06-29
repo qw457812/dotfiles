@@ -21,7 +21,7 @@ return {
       -- gx
       exchange = { prefix = "cx" }, -- Exchange text regions
       -- gm
-      multiply = { prefix = "gm" }, -- Multiply (duplicate) text
+      multiply = { prefix = "cd" }, -- Multiply (duplicate) text
       -- g=
       evaluate = { prefix = "" }, -- Evaluate text and replace with output
       -- gs
@@ -104,6 +104,7 @@ return {
           },
         },
         -- whether to use for editing directories (e.g. `vim .` or `:e src/`)
+        -- possible values: "open_default" (default), "open_current", "disabled"
         -- hijack_netrw_behavior = "disabled", -- netrw left alone, neo-tree does not handle opening dirs
         window = {
           mappings = {
@@ -134,7 +135,11 @@ return {
                 require("neo-tree.sources.filesystem.commands").open(state)
               end
             end,
-            ["<esc><esc>"] = "clear_filter",
+            ["<esc>"] = function(state)
+              -- "cancel" (original behavior, close preview or floating neo-tree window) + "clear_filter"
+              require("neo-tree.sources.common.commands").cancel(state)
+              require("neo-tree.sources.filesystem.commands").clear_filter(state)
+            end,
           },
         },
       },
