@@ -1,9 +1,9 @@
 return {
   -- require lazyvim.plugins.extras.lang.python
-  -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/lang/python.lua
   -- note that LazyVim use the new "regexp" branch: https://github.com/linux-cultist/venv-selector.nvim/tree/regexp
   {
     "linux-cultist/venv-selector.nvim",
+    optional = true,
     -- TODO temp fix: venv-selector does not work with extras.editor.fzf
     -- https://github.com/LazyVim/LazyVim/issues/3612
     -- https://github.com/linux-cultist/venv-selector.nvim/issues/142
@@ -46,7 +46,6 @@ return {
     },
   },
 
-  -- require lazyvim.plugins.extras.formatting.black
   -- isort
   {
     "williamboman/mason.nvim",
@@ -68,6 +67,7 @@ return {
     optional = true,
     opts = {
       formatters_by_ft = {
+        -- require lazyvim.plugins.extras.formatting.black
         -- run multiple formatters sequentially
         ["python"] = { "isort", "black" },
       },
