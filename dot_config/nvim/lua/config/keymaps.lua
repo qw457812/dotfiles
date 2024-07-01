@@ -26,7 +26,6 @@ map("n", "<leader>lC", function() Lazy.check() end, { desc = "Lazy Check" })
 -- stylua: ignore end
 
 -- navigate to line start and end from home row
--- TODO not work in telescope's input box's normal mode
 map({ "n", "x", "o" }, "H", "^", { desc = "Goto line start" })
 map({ "n", "o" }, "L", "$", { desc = "Goto line end" })
 -- https://github.com/v1nh1shungry/.dotfiles/blob/d8a0f6fd2766d0ec9ce5d5b4ccd55b3cc4130c1a/nvim/lua/dotfiles/core/keymaps.lua#L74
@@ -80,6 +79,7 @@ map("n", "dd", function()
   end
 end, { noremap = true, expr = true, desc = "Don't Yank Empty Line to Clipboard" })
 
+-- TODO search literal | https://vi.stackexchange.com/questions/17465/how-to-search-literally-without-any-regex-pattern
 -- search inside visually highlighted text
 map("x", "g/", "<esc>/\\%V", { silent = false, desc = "Search Inside Visual Selection" })
 

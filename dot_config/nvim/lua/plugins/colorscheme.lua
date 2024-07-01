@@ -34,6 +34,10 @@ return {
           hl.IlluminatedWordWrite = { bg = illuminate, underline = true }
           hl.CmpGhostText = { bg = c.bg, fg = "#444a73" }
 
+          -- https://github.com/tzachar/highlight-undo.nvim#hlgroup
+          hl.HighlightUndo = { link = "IncSearch" }
+          hl.HighlightRedo = { link = "HighlightUndo" }
+
           do
             return
           end

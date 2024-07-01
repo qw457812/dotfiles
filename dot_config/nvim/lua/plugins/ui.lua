@@ -14,6 +14,21 @@ return {
     keys = { { "<leader>z", "<cmd>ZenMode<cr>", desc = "Zen Mode" } },
   },
 
+  {
+    "shortcuts/no-neck-pain.nvim",
+    opts = {},
+    keys = {
+      { "<leader>uN", "<cmd>NoNeckPain<cr>", desc = "No Neck Pain" },
+    },
+  },
+
+  {
+    "tzachar/highlight-undo.nvim",
+    event = "VeryLazy",
+    vscode = true,
+    opts = {},
+  },
+
   -- :h bufferline-configuration
   -- TODO `show_close_icon = false` for `akinsho/bufferline.nvim`
   -- https://github.com/craftzdog/dotfiles-public/blob/bf837d867b1aa153cbcb2e399413ec3bdcce112b/.config/nvim/lua/plugins/ui.lua#L87
