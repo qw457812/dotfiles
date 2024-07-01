@@ -1,8 +1,7 @@
 local Config = require("lazy.core.config")
 
 -- https://github.com/folke/dot/blob/master/nvim/lua/plugins/telescope.lua
--- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/util/project.lua
-local pick_plugin = function()
+local pick_plugin_files = function()
   local root = Config.options.root
   if LazyVim.pick.picker.name == "telescope" then
     require("telescope.builtin").find_files({ cwd = root })
@@ -11,8 +10,11 @@ local pick_plugin = function()
   end
 end
 
-local pick_lazy_spec = function()
-  local dirs = { "~/.config/nvim/lua/plugins", Config.options.root .. "/LazyVim/lua/lazyvim/plugins" }
+local pick_lazy_specs = function()
+  local dirs = {
+    "~/.local/share/chezmoi/dot_config/nvim/lua/plugins",
+    Config.options.root .. "/LazyVim/lua/lazyvim/plugins",
+  }
   if LazyVim.pick.picker.name == "telescope" then
     require("telescope.builtin").live_grep({
       default_text = "/",
@@ -28,7 +30,7 @@ local pick_lazy_spec = function()
 end
 
 -- https://github.com/craftzdog/dotfiles-public/blob/master/.config/nvim/lua/plugins/editor.lua
-local pick_buffer_dir = function()
+local pick_buffer_dir_files = function()
   local buffer_dir = vim.fn.expand("%:p:h")
   if LazyVim.pick.picker.name == "telescope" then
     require("telescope.builtin").find_files({ cwd = buffer_dir })
@@ -42,9 +44,10 @@ return {
     "ibhagwan/fzf-lua",
     optional = true,
     keys = {
-      { "<leader>fP", pick_plugin, desc = "Find Plugin File" },
-      { "<leader>sP", pick_lazy_spec, desc = "Search Lazy Plugin Spec" },
-      { "<leader>F", pick_buffer_dir, desc = "Find Files (Buffer Dir)" },
+      { "<leader>fP", pick_plugin_files, desc = "Find Plugin File" },
+      { "<leader>sP", pick_lazy_specs, desc = "Search Lazy Plugin Spec" },
+      { "<leader>fB", pick_buffer_dir_files, desc = "Find Files (Buffer Dir)" },
+      { "<leader>fc", false }, -- see: ~/.local/share/chezmoi/dot_config/nvim/lua/plugins/chezmoi.lua
     },
   },
   -- https://www.lazyvim.org/configuration/examples
@@ -52,9 +55,10 @@ return {
     "nvim-telescope/telescope.nvim",
     optional = true,
     keys = {
-      { "<leader>fP", pick_plugin, desc = "Find Plugin File" },
-      { "<leader>sP", pick_lazy_spec, desc = "Search Lazy Plugin Spec" },
-      { "<leader>F", pick_buffer_dir, desc = "Find Files (Buffer Dir)" },
+      { "<leader>fP", pick_plugin_files, desc = "Find Plugin File" },
+      { "<leader>sP", pick_lazy_specs, desc = "Search Lazy Plugin Spec" },
+      { "<leader>fB", pick_buffer_dir_files, desc = "Find Files (Buffer Dir)" },
+      { "<leader>fc", false }, -- see: ~/.local/share/chezmoi/dot_config/nvim/lua/plugins/chezmoi.lua
     },
     opts = {
       defaults = {
