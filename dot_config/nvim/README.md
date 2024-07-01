@@ -81,4 +81,3 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] [leetcode](https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/util/leetcode.lua)
   > [awesome-neovim](https://github.com/rockerBOO/awesome-neovim#competitive-programming)
 - [ ] [tmux](https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/util/tmux.lua)
-- [ ] [mini-cursorword](https://github.com/echasnovski/mini.nvim/blob/main/readmes/mini-cursorword.md) vs RRethy/vim-illuminate.
