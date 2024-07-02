@@ -34,6 +34,7 @@ return {
             -- close = "slid",
             interval = 3, -- default value: 12
           },
+          timeout = 5000,
         },
         ---@class TransHoverOpts : TransFrontendOpts
         hover = {
