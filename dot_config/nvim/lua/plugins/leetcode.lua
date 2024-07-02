@@ -1,14 +1,12 @@
 return {
   -- https://github.com/AstroNvim/astrocommunity/blob/90ff9f23f98c4265b37091c6077744b48c19e324/lua/astrocommunity/game/leetcode-nvim/init.lua
+  -- https://github.com/kawre/nvim/blob/e39d243759b5a18cf8eb86c9d761e8fb3e13dcad/lua/plugins/extras/leetcode.lua
   -- https://github.com/search?q=repo%3Akawre%2Fnvim%20leetcode&type=code
-  -- TODO disable copilot (and autoformat?) for leetcode
-  -- https://github.com/kawre/nvim/blob/e39d243759b5a18cf8eb86c9d761e8fb3e13dcad/lua/plugins/extras/leetcode.lua#L52
   -- https://github.com/ofseed/nvim/blob/338f7742db9739eb6fadfebaafcc5e6c7d316e8d/lua/plugins/tool/leetcode.lua#L29
-  -- https://github.com/TobinPalmer/dots/blob/2dd6a633deecd5badd5c5f8d91985ab0d68f1a24/nvim/lua/plugins/misc.lua#L88
-  -- https://github.com/hnbnh/dotfiles/blob/de3fdbeef9aab5ebe91333403d5c579b4915aa43/config/nvim/lua/plugins/misc.lua#L90
   -- https://github.com/m1dsolo/dotfiles/blob/c99eef4184a1afe0ab1c01b060d027e34ad0ea7f/.config/nvim/lua/plugins/leetcode-nvim.lua#L84
-  -- https://github.com/catgoose/nvim/blob/31407a09d932f9307dea720a68ccb84d9faa1f76/lua/plugins/leetcode.lua#L56
-  -- TODO keys
+  -- TODO keys https://github.com/kawre/nvim/blob/e39d243759b5a18cf8eb86c9d761e8fb3e13dcad/lua/plugins/extras/leetcode.lua#L71
+  -- TODO dashboard https://github.com/kawre/nvim/blob/e39d243759b5a18cf8eb86c9d761e8fb3e13dcad/lua/plugins/alpha.lua#L38
+  -- TODO lsp not working sometimes
   {
     "kawre/leetcode.nvim",
     build = ":TSUpdate html",
@@ -32,13 +30,10 @@ return {
       },
     },
     opts = {
-      lang = "java", -- java, python3
-      -- cn = { -- leetcode.cn
-      --   enabled = true,
-      -- },
-      -- plugins = {
-      --   non_standalone = true,
-      -- },
+      lang = "python3", -- java, python3
+      cn = { -- leetcode.cn
+        enabled = true,
+      },
       injector = {
         ["java"] = {
           before = true, -- access default imports via `require("leetcode.config.imports")`
@@ -52,15 +47,15 @@ return {
           pcall(vim.cmd, [[silent! Copilot disable]])
         end,
       },
-      -- keys = {
-      --   toggle = { "q" },
-      --   confirm = { "<CR>" },
-      --
-      --   reset_testcases = "r",
-      --   use_testcase = "U",
-      --   focus_testcases = "H",
-      --   focus_result = "L",
-      -- },
+      keys = {
+        toggle = { "q", "<Esc>" },
+        confirm = { "<CR>" },
+
+        reset_testcases = "R",
+        use_testcase = "U",
+        focus_testcases = "<C-h>",
+        focus_result = "<C-l>",
+      },
     },
     init = function()
       vim.api.nvim_create_autocmd("VimEnter", {
@@ -84,13 +79,4 @@ return {
       })
     end,
   },
-
-  -- https://github.com/kawre/nvim/blob/e39d243759b5a18cf8eb86c9d761e8fb3e13dcad/lua/plugins/extras/copilot.lua#L36
-  -- {
-  --   "zbirenbaum/copilot.lua",
-  --   optional = true,
-  --   opts = {
-  --     filetypes = { ["leetcode.nvim"] = false },
-  --   },
-  -- },
 }
