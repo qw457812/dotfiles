@@ -17,6 +17,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [craftzdog](https://github.com/craftzdog/dotfiles-public/tree/master/.config/nvim)
 - [Nv](https://github.com/appelgriebsch/Nv)
 - [ian-ie](https://github.com/ian-ie/LazyVim)
+- [TobinPalmer](https://github.com/TobinPalmer/dots/tree/main/nvim)
 
 ## Awesome Neovim
 

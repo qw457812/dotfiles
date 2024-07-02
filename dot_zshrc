@@ -372,6 +372,7 @@ alias lzd='lazydocker'
 alias lzg='lazygit'
 
 # alias lg='leetgo'
+alias lc="nvim leetcode.nvim"
 
 # https://github.com/doomemacs/doomemacs#install
 export PATH="$PATH:$HOME/.config/doomemacs/bin"

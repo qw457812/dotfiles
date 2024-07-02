@@ -110,7 +110,7 @@ return {
           hide_gitignored = false,
           hide_hidden = false,
           hide_by_name = {
-            "node_modules",
+            -- "node_modules",
             -- ".git",
           },
           never_show = {
@@ -201,7 +201,7 @@ return {
       delete_to_trash = true,
       -- skip_confirm_for_simple_edits = true,
       -- prompt_save_on_select_new_entry = false,
-      -- experimental_watch_for_changes = true,
+      -- watch_for_changes = true,
       float = {
         max_height = 45,
         max_width = 90,
