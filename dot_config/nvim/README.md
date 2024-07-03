@@ -12,6 +12,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 
 ## Awesome LazyVim
 
+- [Popular Neovim Configurations using LazyVim by Dotfyle](https://dotfyle.com/neovim/configurations/top?plugins=LazyVim/LazyVim)
 - [folke](https://github.com/folke/dot/tree/master/nvim)
 - [Matt-FTW](https://github.com/Matt-FTW/dotfiles/tree/main/.config/nvim)
 - [craftzdog](https://github.com/craftzdog/dotfiles-public/tree/master/.config/nvim)
@@ -23,6 +24,9 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 
 - [Popular Neovim Configurations by Dotfyle](https://dotfyle.com/neovim/configurations/top)
 - [Trending Neovim Plugins by Dotfyle](https://dotfyle.com/neovim/plugins/trending)
+- [Popular Preconfigured plugins by Dotfyle](https://dotfyle.com/neovim/plugins/top?categories=preconfigured)
+- [Trending Preconfigured plugins by Dotfyle](https://dotfyle.com/neovim/plugins/trending?categories=preconfigured)
+- [nvimdots](https://dotfyle.com/plugins/ayamir/nvimdots)
 - [AstroCommunity](https://github.com/AstroNvim/astrocommunity)
 - [Lazyman](https://github.com/doctorfree/nvim-lazyman)
 - [pkazmier](https://github.com/pkazmier/nvim)
@@ -49,36 +53,11 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
   - [Lazyman](https://github.com/doctorfree/nvim-lazyman)
   - [rafi](https://github.com/rafi/vim-config#custom-key-mappings)
   - [modern-neovim](https://github.com/alpha2phi/modern-neovim)
+  - [nvimdots](https://github.com/ayamir/nvimdots)
 - [ ] translate
-
   - [JuanZoran/Trans.nvim](https://github.com/JuanZoran/Trans.nvim)
   - [voldikss/vim-translator](https://github.com/voldikss/vim-translator)
   - uga-rosa/translate.nvim
-
-    ```lua
-    {
-      "uga-rosa/translate.nvim",
-      event = "VeryLazy",
-      config = function()
-        require("translate").setup({
-          default = {
-            command = "translate_shell",
-          },
-          preset = {
-            output = {
-              split = {
-                append = true,
-              },
-            },
-          },
-        })
-      end,
-    },
-    ```
-
 - [ ] Refactor patch like [overrides.lua](https://github.com/ian-ie/LazyVim/blob/master/lua/plugins/overrides.lua).
 - [ ] Check this [keymaps.lua](https://github.com/WillEhrendreich/nvimconfig/blob/7ab5b0d0ee485d58df3cc3e1f55c6446155f29a1/lua/config/keymaps.lua).
 - [ ] Matt-FTW's [vscode.lua](https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/util/vscode.lua), and search `vscode = true` plugins.
-- [ ] [leetcode](https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/util/leetcode.lua)
-  > [awesome-neovim](https://github.com/rockerBOO/awesome-neovim#competitive-programming)
-- [ ] [tmux](https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/util/tmux.lua)

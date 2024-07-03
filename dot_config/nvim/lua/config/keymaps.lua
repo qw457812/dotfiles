@@ -69,6 +69,25 @@ map("n", "<leader>wo", "<C-W>o", { desc = "Close Other Windows", remap = true })
 map("n", "<leader>_", "<C-W>v", { desc = "Split Window Right", remap = true })
 map("n", "<leader>w_", "<C-W>v", { desc = "Split Window Right", remap = true })
 
+-- Move to window
+-- https://github.com/aserowy/tmux.nvim/issues/92#issuecomment-1452428973
+map({ "n", "t" }, "<C-h>", [[<cmd>lua require("tmux").move_left()<cr>]], { desc = "Go to Left Window" })
+map({ "n", "t" }, "<C-j>", [[<cmd>lua require("tmux").move_bottom()<cr>]], { desc = "Go to Lower Window" })
+map({ "n", "t" }, "<C-k>", [[<cmd>lua require("tmux").move_top()<cr>]], { desc = "Go to Upper Window" })
+map({ "n", "t" }, "<C-l>", [[<cmd>lua require("tmux").move_right()<cr>]], { desc = "Go to Right Window" })
+-- Resize window
+-- note: A-hjkl for move lines (by both LazyVim's default keybindings and lazyvim.plugins.extras.editor.mini-move)
+-- map({ "n", "t" }, "<A-h>", [[<cmd>lua require("tmux").resize_left()<cr>]], { desc = "Resize Window Left" })
+-- map({ "n", "t" }, "<A-j>", [[<cmd>lua require("tmux").resize_bottom()<cr>]], { desc = "Resize Window Bottom" })
+-- map({ "n", "t" }, "<A-k>", [[<cmd>lua require("tmux").resize_top()<cr>]], { desc = "Resize Window Top" })
+-- map({ "n", "t" }, "<A-l>", [[<cmd>lua require("tmux").resize_right()<cr>]], { desc = "Resize Window Right" })
+-- note: need to disable macOS keybord shortcuts of mission control
+-- TODO resize LazyVim's terminal
+map({ "n", "t" }, "<C-Left>", [[<cmd>lua require("tmux").resize_left()<cr>]], { desc = "Resize Window Left" })
+map({ "n", "t" }, "<C-Down>", [[<cmd>lua require("tmux").resize_bottom()<cr>]], { desc = "Resize Window Bottom" })
+map({ "n", "t" }, "<C-Up>", [[<cmd>lua require("tmux").resize_top()<cr>]], { desc = "Resize Window Top" })
+map({ "n", "t" }, "<C-Right>", [[<cmd>lua require("tmux").resize_right()<cr>]], { desc = "Resize Window Right" })
+
 -- deleting without yanking empty line
 map("n", "dd", function()
   local is_empty_line = vim.api.nvim_get_current_line():match("^%s*$")
