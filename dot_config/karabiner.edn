@@ -494,8 +494,8 @@
            [:comma :!Tcomma]
            [:period :!Tperiod]
            [:slash :!Tslash]
-           [:down_arrow :!Tdown_arrow]
-           [:up_arrow :!Tup_arrow]
+           [:down_arrow :!Tup_arrow] ; see "For Glove80" below
+           [:up_arrow :!Tdown_arrow] ; see "For Glove80" below
            [:left_arrow :!Tleft_arrow]
            [:right_arrow :!Tright_arrow]
            [:spacebar :!Tspacebar]
@@ -648,8 +648,8 @@
            [:comma :!Wcomma]
            [:period :!Wperiod]
            [:slash :!Wslash]
-           [:down_arrow :!Wdown_arrow]
-           [:up_arrow :!Wup_arrow]
+           [:down_arrow :!Wup_arrow] ; see "For Glove80" below
+           [:up_arrow :!Wdown_arrow] ; see "For Glove80" below
            [:left_arrow :!Wleft_arrow]
            [:right_arrow :!Wright_arrow]
            [:spacebar :!Wspacebar]

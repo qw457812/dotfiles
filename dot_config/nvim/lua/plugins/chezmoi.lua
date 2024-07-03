@@ -17,6 +17,16 @@ local function chezmoi_list(targets)
   return require("chezmoi.commands").list({ targets = targets })
 end
 
+local fzf_exec_opts = {
+  fzf_opts = {},
+  fzf_colors = true,
+  actions = {
+    ["default"] = function(selected)
+      chezmoi_edit("~/" .. selected[1])
+    end,
+  },
+}
+
 return {
   {
     "xvzc/chezmoi.nvim",
@@ -29,13 +39,7 @@ return {
           if LazyVim.pick.picker.name == "telescope" then
             require("telescope").extensions.chezmoi.find_files()
           elseif LazyVim.pick.picker.name == "fzf" then
-            require("fzf-lua").fzf_exec(chezmoi_list(), {
-              actions = {
-                ["default"] = function(selected)
-                  chezmoi_edit("~/" .. selected[1])
-                end,
-              },
-            })
+            require("fzf-lua").fzf_exec(chezmoi_list(), fzf_exec_opts)
           end
         end,
         desc = "Find Chezmoi Source Dotfiles",
@@ -65,13 +69,7 @@ return {
               end,
             })
           elseif LazyVim.pick.picker.name == "fzf" then
-            require("fzf-lua").fzf_exec(chezmoi_list(config_dir), {
-              actions = {
-                ["default"] = function(selected)
-                  chezmoi_edit("~/" .. selected[1])
-                end,
-              },
-            })
+            require("fzf-lua").fzf_exec(chezmoi_list(config_dir), fzf_exec_opts)
           end
         end,
         desc = "Find Config File",
