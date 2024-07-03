@@ -52,7 +52,7 @@ return {
       local button = dashboard.button("z", " " .. " Zoxide", pick)
       button.opts.hl = "AlphaButtons"
       button.opts.hl_shortcut = "AlphaShortcut"
-      table.insert(dashboard.section.buttons.val, 5, button)
+      table.insert(dashboard.section.buttons.val, 11, button)
     end,
   },
 
@@ -85,7 +85,7 @@ return {
       zoxide.desc = zoxide.desc .. string.rep(" ", 43 - #zoxide.desc)
       zoxide.key_format = "  %s"
 
-      table.insert(opts.config.center, 4, zoxide)
+      table.insert(opts.config.center, 10, zoxide)
     end,
   },
 }
