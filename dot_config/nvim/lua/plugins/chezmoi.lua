@@ -1,5 +1,10 @@
 -- require lazyvim.plugins.extras.util.chezmoi
 
+-- do not overwrite <leader>fc if lazyvim.plugins.extras.util.chezmoi not enabled
+if not LazyVim.has("chezmoi.nvim") or vim.fn.executable("chezmoi") == 0 then
+  return {}
+end
+
 ---@param target string
 local function chezmoi_edit(target)
   require("chezmoi.commands").edit({ targets = { target } })
@@ -72,5 +77,16 @@ return {
         desc = "Find Config File",
       },
     },
+  },
+
+  {
+    "ibhagwan/fzf-lua",
+    optional = true,
+    keys = { { "<leader>fc", false } },
+  },
+  {
+    "nvim-telescope/telescope.nvim",
+    optional = true,
+    keys = { { "<leader>fc", false } },
   },
 }

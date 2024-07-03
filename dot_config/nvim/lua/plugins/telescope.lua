@@ -47,7 +47,6 @@ return {
       { "<leader>fP", pick_plugin_files, desc = "Find Plugin File" },
       { "<leader>sP", pick_lazy_specs, desc = "Search Lazy Plugin Spec" },
       { "<leader>fB", pick_buffer_dir_files, desc = "Find Files (Buffer Dir)" },
-      { "<leader>fc", false }, -- see: ~/.local/share/chezmoi/dot_config/nvim/lua/plugins/chezmoi.lua
     },
   },
   -- https://www.lazyvim.org/configuration/examples
@@ -58,7 +57,6 @@ return {
       { "<leader>fP", pick_plugin_files, desc = "Find Plugin File" },
       { "<leader>sP", pick_lazy_specs, desc = "Search Lazy Plugin Spec" },
       { "<leader>fB", pick_buffer_dir_files, desc = "Find Files (Buffer Dir)" },
-      { "<leader>fc", false }, -- see: ~/.local/share/chezmoi/dot_config/nvim/lua/plugins/chezmoi.lua
     },
     opts = {
       defaults = {

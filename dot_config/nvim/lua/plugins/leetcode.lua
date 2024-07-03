@@ -5,6 +5,7 @@ return {
   -- https://github.com/ofseed/nvim/blob/338f7742db9739eb6fadfebaafcc5e6c7d316e8d/lua/plugins/tool/leetcode.lua#L29
   -- https://github.com/m1dsolo/dotfiles/blob/c99eef4184a1afe0ab1c01b060d027e34ad0ea7f/.config/nvim/lua/plugins/leetcode-nvim.lua#L84
   -- TODO lsp not working sometimes
+  -- https://github.com/joshuadanpeterson/nvim/blob/4bc23dfc8e3250d69fe4b118c320a6fe20546730/lua/config/settings.lua#L200
   {
     "kawre/leetcode.nvim",
     build = ":TSUpdate html",
@@ -32,18 +33,22 @@ return {
       { "<leader>Lq", "<cmd>Leet tabs<cr>", desc = "Tabs" },
       { "<leader>Lm", "<cmd>Leet menu<cr>", desc = "Menu" },
       { "<leader>Lc", "<cmd>Leet console<cr>", desc = "Console" },
-      { "<leader>LC", "<cmd>Leet cache update<cr>", desc = "Cache Update" },
       { "<leader>Lh", "<cmd>Leet info<cr>", desc = "Info" },
       { "<leader>Ll", "<cmd>Leet lang<cr>", desc = "Lang" },
-      { "<leader>LL", "<cmd>Leet list<cr>", desc = "List" },
+      { "<leader>LL", "<cmd>Leet list<cr>", desc = "Problem List" },
       { "<leader>Ld", "<cmd>Leet desc<cr>", desc = "Desc" },
-      { "<leader>LD", "<cmd>Leet daily<cr>", desc = "Daily" },
       { "<leader>Lr", "<cmd>Leet run<cr>", desc = "Run" },
-      { "<leader>LR", "<cmd>Leet random<cr>", desc = "Random" }, -- reset, restore
+      { "<leader>LR", "<cmd>Leet restore<cr>", desc = "Restore Layout" }, -- or map to `:Leet reset`
       { "<leader>Ls", "<cmd>Leet submit<cr>", desc = "Submit" },
       { "<leader>LS", "<cmd>Leet last_submit<cr>", desc = "Last Submit" },
       { "<leader>Ly", "<cmd>Leet yank<cr>", desc = "Yank" },
-      { "<leader>Lo", "<cmd>Leet open<cr>", desc = "Open" },
+      { "<leader>Lo", "<cmd>Leet open<cr>", desc = "Open in Browser" },
+      { "<leader>Lp", "<cmd>Leet list<cr>", desc = "Problem List" },
+      { "<leader>LE", "<cmd>Leet list difficulty=Easy<cr>", desc = "Easy Problem List" },
+      { "<leader>LM", "<cmd>Leet list difficulty=Medium<cr>", desc = "Medium Problem List" },
+      { "<leader>LH", "<cmd>Leet list difficulty=Hard<cr>", desc = "Hard Problem List" },
+      { "<leader>Lt", "<cmd>Leet test<cr>", desc = "Test" }, -- same as `:Leet run`
+      { "<leader>Lu", "<cmd>Leet cache update<cr>", desc = "Update Cache" },
     },
     opts = {
       lang = "python3", -- java, python3
@@ -103,8 +108,8 @@ return {
       local leetcode = {
         action = "Leet",
         desc = " LeetCode",
-        icon = " ", -- " ", " "
-        key = "L",
+        icon = " ", -- " "
+        key = "d",
       }
 
       leetcode.desc = leetcode.desc .. string.rep(" ", 43 - #leetcode.desc)
