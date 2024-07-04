@@ -19,7 +19,8 @@ return {
     event = "VeryLazy",
     vscode = true,
     opts = function()
-      vim.api.nvim_set_hl(0, "HighlightUndo", { default = true, link = "IncSearch" })
+      -- link: Search IncSearch Substitute
+      vim.api.nvim_set_hl(0, "HighlightUndo", { default = true, link = "Substitute" })
       vim.api.nvim_set_hl(0, "HighlightRedo", { default = true, link = "HighlightUndo" })
       return {
         --[[add custom config here]]
