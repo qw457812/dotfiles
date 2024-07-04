@@ -45,6 +45,7 @@ map("n", "<leader>fS", "<cmd>noautocmd w<cr>", { desc = "Save File Without Forma
 
 -- buffers
 -- see: akinsho/bufferline.nvim in ~/.config/nvim/lua/plugins/ui.lua
+-- if you change the order of buffers :bnext and :bprevious will not respect the custom ordering
 -- map("n", "<Up>", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
 -- map("n", "<Down>", "<cmd>bnext<cr>", { desc = "Next Buffer" })
 map("n", "<leader>ba", "<cmd>bufdo bd<cr>", { desc = "Delete All Buffers" })
@@ -125,13 +126,6 @@ local function google_search(input)
   LazyUtil.open("https://www.google.com/search?q=" .. query)
 end
 map("n", "<leader>?", google_search, { noremap = true, silent = true, desc = "Google Search Current Word" })
--- local function google_search_input()
---   local input = vim.fn.input("Google Search: ")
---   if input ~= "" then
---     google_search(input)
---   end
--- end
--- map("n", "<leader>?", google_search_input, { noremap = true, silent = true, desc = "Google Search From Input" })
 map("x", "<leader>?", function()
   local g_orig = vim.fn.getreg("g")
   vim.cmd([[silent! normal! "gy]])

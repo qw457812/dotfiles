@@ -25,21 +25,6 @@ return {
         --[[add custom config here]]
       }
     end,
-
-    -- alternative 1:
-    -- -- opts = {},
-    -- -- config = function(_, opts)
-    -- --   vim.api.nvim_set_hl(0, "HighlightUndo", { default = true, link = "IncSearch" })
-    -- --   vim.api.nvim_set_hl(0, "HighlightRedo", { default = true, link = "HighlightUndo" })
-    -- --   require("highlight-undo").setup(opts) -- after `vim.api.nvim_set_hl`
-    -- -- end,
-    --
-    -- alternative 2:
-    -- -- opts = {},
-    -- -- init = function()
-    -- --   vim.api.nvim_set_hl(0, "HighlightUndo", { default = true, link = "IncSearch" })
-    -- --   vim.api.nvim_set_hl(0, "HighlightRedo", { default = true, link = "HighlightUndo" })
-    -- -- end,
   },
 
   {
