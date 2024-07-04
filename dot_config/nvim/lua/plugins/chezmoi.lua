@@ -1,7 +1,6 @@
 -- require lazyvim.plugins.extras.util.chezmoi
-
 -- do not overwrite <leader>fc if lazyvim.plugins.extras.util.chezmoi not enabled
-if not LazyVim.has("chezmoi.nvim") or vim.fn.executable("chezmoi") == 0 then
+if not LazyVim.has_extra("util.chezmoi") or vim.fn.executable("chezmoi") == 0 then
   return {}
 end
 
