@@ -38,6 +38,7 @@
     "lazyvim.plugins.extras.util.project",
     "lazyvim.plugins.extras.util.startuptime",
     "lazyvim.plugins.extras.vscode",
+    "plugins.extras.editor.oil",
     "plugins.extras.util.leetcode",
     "plugins.extras.util.tmux",
     "plugins.extras.util.translate",
