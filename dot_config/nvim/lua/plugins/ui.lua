@@ -1,41 +1,4 @@
 return {
-  -- https://github.com/folke/dot/blob/master/nvim/lua/plugins/ui.lua
-  -- "folke/twilight.nvim",
-  {
-    "folke/zen-mode.nvim",
-    cmd = "ZenMode",
-    opts = {
-      plugins = {
-        gitsigns = true,
-        tmux = true,
-        kitty = { enabled = false, font = "+2" },
-      },
-    },
-    keys = { { "<leader>z", "<cmd>ZenMode<cr>", desc = "Zen Mode" } },
-  },
-
-  {
-    "tzachar/highlight-undo.nvim",
-    event = "VeryLazy",
-    vscode = true,
-    opts = function()
-      -- link: Search IncSearch Substitute
-      vim.api.nvim_set_hl(0, "HighlightUndo", { default = true, link = "Substitute" })
-      vim.api.nvim_set_hl(0, "HighlightRedo", { default = true, link = "HighlightUndo" })
-      return {
-        --[[add custom config here]]
-      }
-    end,
-  },
-
-  {
-    "shortcuts/no-neck-pain.nvim",
-    opts = {},
-    keys = {
-      { "<leader>uN", "<cmd>NoNeckPain<cr>", desc = "No Neck Pain" },
-    },
-  },
-
   -- :h bufferline-configuration
   {
     "akinsho/bufferline.nvim",
@@ -58,6 +21,60 @@ return {
       options = {
         separator_style = "slope",
       },
+    },
+  },
+
+  -- https://github.com/folke/dot/blob/master/nvim/lua/plugins/ui.lua
+  {
+    "folke/twilight.nvim",
+    cmd = "Twilight",
+    opts = {
+      context = 20, -- default value: 10
+    },
+  },
+  {
+    "folke/zen-mode.nvim",
+    cmd = "ZenMode",
+    opts = {
+      plugins = {
+        gitsigns = true,
+        tmux = true,
+        kitty = { enabled = false, font = "+2" },
+        alacritty = { enabled = false, font = "14" },
+        twilight = { enabled = false },
+      },
+    },
+    keys = {
+      { "<leader>z", "<cmd>ZenMode<cr>", desc = "Zen Mode" },
+      {
+        "<leader>Z",
+        function()
+          require("zen-mode").toggle({ plugins = { twilight = { enabled = true } } })
+        end,
+        desc = "Zen Mode (Twilight)",
+      },
+    },
+  },
+
+  {
+    "tzachar/highlight-undo.nvim",
+    event = "VeryLazy",
+    vscode = true,
+    opts = function()
+      -- link: Search IncSearch Substitute
+      vim.api.nvim_set_hl(0, "HighlightUndo", { default = true, link = "Substitute" })
+      vim.api.nvim_set_hl(0, "HighlightRedo", { default = true, link = "HighlightUndo" })
+      return {
+        --[[add custom config here]]
+      }
+    end,
+  },
+
+  {
+    "shortcuts/no-neck-pain.nvim",
+    opts = {},
+    keys = {
+      { "<leader>uN", "<cmd>NoNeckPain<cr>", desc = "No Neck Pain" },
     },
   },
 }
