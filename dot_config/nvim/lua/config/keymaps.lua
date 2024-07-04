@@ -45,8 +45,8 @@ map("n", "<leader>fS", "<cmd>noautocmd w<cr>", { desc = "Save File Without Forma
 
 -- buffers
 -- see: akinsho/bufferline.nvim in ~/.config/nvim/lua/plugins/ui.lua
-map("n", "<Up>", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
-map("n", "<Down>", "<cmd>bnext<cr>", { desc = "Next Buffer" })
+-- map("n", "<Up>", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
+-- map("n", "<Down>", "<cmd>bnext<cr>", { desc = "Next Buffer" })
 map("n", "<leader>ba", "<cmd>bufdo bd<cr>", { desc = "Delete All Buffers" })
 
 -- jumping

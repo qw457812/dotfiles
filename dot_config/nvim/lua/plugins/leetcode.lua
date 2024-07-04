@@ -1,5 +1,6 @@
 return {
   -- https://github.com/AstroNvim/astrocommunity/blob/90ff9f23f98c4265b37091c6077744b48c19e324/lua/astrocommunity/game/leetcode-nvim/init.lua
+  -- https://github.com/AstroNvim/AstroNvim/blob/8fe477244430f91292d0f1a9c3e44ad787091707/lua/astronvim/utils/init.lua#L54
   -- https://github.com/kawre/nvim/blob/e39d243759b5a18cf8eb86c9d761e8fb3e13dcad/lua/plugins/extras/leetcode.lua
   -- https://github.com/search?q=repo%3Akawre%2Fnvim%20leetcode&type=code
   -- https://github.com/ofseed/nvim/blob/338f7742db9739eb6fadfebaafcc5e6c7d316e8d/lua/plugins/tool/leetcode.lua#L29

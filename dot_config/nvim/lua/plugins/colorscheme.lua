@@ -27,16 +27,12 @@ return {
           -- https://github.com/RRethy/vim-illuminate#highlight-groups
           -- #3760bf #7847bd #8552a1 #7e4c8b #731d8b
           -- #35717b #188092 #007197 #006a83 #265b75
-          -- #555555 #5b6078 #585b70 #51576d #494d64
+          -- #5b6078 #585b70 #51576d #494d64 #45475a
           local illuminate = "#51576d"
           -- hl.IlluminatedWordText = { bg = "#3b4261" } -- use default
           hl.IlluminatedWordRead = { bg = illuminate }
           hl.IlluminatedWordWrite = { bg = illuminate, underline = true }
           hl.CmpGhostText = { bg = c.bg, fg = "#444a73" }
-
-          -- https://github.com/tzachar/highlight-undo.nvim#hlgroup
-          hl.HighlightUndo = { link = "IncSearch" }
-          hl.HighlightRedo = { link = "HighlightUndo" }
 
           do
             return
