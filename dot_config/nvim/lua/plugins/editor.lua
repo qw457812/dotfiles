@@ -285,4 +285,15 @@ return {
       end
     end,
   },
+
+  -- {
+  --   "RRethy/vim-illuminate",
+  --   optional = true,
+  --   opts = function()
+  --     local illuminate = "#51576d"
+  --     -- remove `default = true,` to override colorscheme's highlight group
+  --     vim.api.nvim_set_hl(0, "IlluminatedWordRead", { default = true, bg = illuminate })
+  --     vim.api.nvim_set_hl(0, "IlluminatedWordWrite", { default = true, bg = illuminate, underline = true })
+  --   end,
+  -- },
 }
