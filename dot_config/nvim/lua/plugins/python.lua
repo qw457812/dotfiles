@@ -1,5 +1,9 @@
+-- require lazyvim.plugins.extras.lang.python
+if not LazyVim.has_extra("lang.python") then
+  return {}
+end
+
 return {
-  -- require lazyvim.plugins.extras.lang.python
   -- note that LazyVim use the new "regexp" branch: https://github.com/linux-cultist/venv-selector.nvim/tree/regexp
   {
     "linux-cultist/venv-selector.nvim",
@@ -16,16 +20,6 @@ return {
     opts = {
       settings = {
         options = {
-          -- -- missing duplicate name of different path
-          -- on_telescope_result_callback = function(filename)
-          --   filename = filename:gsub("/bin/python", "") ---@type string
-          --   filename = vim.split(filename, "/")
-          --   filename = filename[#filename]
-          --   if filename == "miniconda3" then
-          --     filename = "base"
-          --   end
-          --   return filename
-          -- end,
           -- for linux/mac: replace the home directory with '~' and remove the /bin/python part.
           on_telescope_result_callback = function(filename)
             return filename:gsub(os.getenv("HOME"), "~"):gsub("/bin/python", "")
@@ -65,13 +59,14 @@ return {
   {
     "stevearc/conform.nvim",
     optional = true,
-    opts = {
-      formatters_by_ft = {
-        -- require lazyvim.plugins.extras.formatting.black
+    opts = function(_, opts)
+      -- require lazyvim.plugins.extras.formatting.black
+      if LazyVim.has_extra("formatting.black") then
+        opts.formatters_by_ft = opts.formatters_by_ft or {}
         -- run multiple formatters sequentially
-        ["python"] = { "isort", "black" },
-      },
-    },
+        opts.formatters_by_ft.python = { "isort", "black" }
+      end
+    end,
   },
 
   -- -- TODO should I add this?
