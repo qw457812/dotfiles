@@ -33,6 +33,7 @@ return {
           hl.IlluminatedWordRead = { bg = illuminate }
           hl.IlluminatedWordWrite = { bg = illuminate, underline = true }
           hl.CmpGhostText = { bg = c.bg, fg = "#444a73" }
+          -- TODO unused variables with illuminate highlight can be unreadable
 
           do
             return

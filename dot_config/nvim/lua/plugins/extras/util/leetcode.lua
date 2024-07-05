@@ -110,7 +110,7 @@ return {
         action = "Leet",
         desc = " LeetCode",
         icon = " ", -- " "
-        key = "d",
+        key = "e",
       }
 
       leetcode.desc = leetcode.desc .. string.rep(" ", 43 - #leetcode.desc)

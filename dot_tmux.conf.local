@@ -433,6 +433,18 @@ bind Enter next-layout
 
 # behave like vimium, alacritty
 bind -T copy-mode-vi i send -X cancel
+# https://github.com/lmburns/dotfiles/blob/f7c1f3644337868afc7de8a547565242c409efb6/.config/tmux/tmux.conf#L565
+bind -T copy-mode-vi C-v { send -X rectangle-toggle; send -X begin-selection }
+bind -T copy-mode-vi . send -X select-word
+bind -T copy-mode-vi D send -X copy-end-of-line-and-cancel
+bind -T copy-mode-vi Y send -X copy-line-and-cancel
+bind -T copy-mode-vi S { send -X select-word; send -X copy-selection-and-cancel }  # TODO not working? but map to `s` works?
+bind -T copy-mode-vi m send -X next-matching-bracket  # helix-style mappings
+bind -T copy-mode-vi M send -X set-mark
+bind -T copy-mode-vi "'" send -X jump-to-mark
+# behave like vimium, less
+bind -T copy-mode-vi u send -X halfpage-up
+bind -T copy-mode-vi d send -X halfpage-down
 
 # split current window vertically
 bind | split-window -h

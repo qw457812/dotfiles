@@ -2,6 +2,7 @@
   "extras": [
     "lazyvim.plugins.extras.coding.copilot",
     "lazyvim.plugins.extras.coding.copilot-chat",
+    "lazyvim.plugins.extras.coding.luasnip",
     "lazyvim.plugins.extras.coding.mini-surround",
     "lazyvim.plugins.extras.coding.neogen",
     "lazyvim.plugins.extras.coding.yanky",
@@ -26,6 +27,7 @@
     "lazyvim.plugins.extras.lang.sql",
     "lazyvim.plugins.extras.lang.toml",
     "lazyvim.plugins.extras.lang.yaml",
+    "lazyvim.plugins.extras.lsp.neoconf",
     "lazyvim.plugins.extras.lsp.none-ls",
     "lazyvim.plugins.extras.test.core",
     "lazyvim.plugins.extras.ui.edgy",
@@ -38,6 +40,7 @@
     "lazyvim.plugins.extras.util.project",
     "lazyvim.plugins.extras.util.startuptime",
     "lazyvim.plugins.extras.vscode",
+    "plugins.extras.editor.mini-operators",
     "plugins.extras.editor.oil",
     "plugins.extras.util.leetcode",
     "plugins.extras.util.tmux",
