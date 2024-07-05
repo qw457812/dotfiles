@@ -1,4 +1,10 @@
 return {
+  -- TODO research
+  -- https://github.com/hrsh7th/nvim-cmp/wiki/Example-mappings
+  -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/coding/luasnip.lua
+  -- https://github.com/LazyVim/LazyVim/issues/2533
+  -- https://github.com/LazyVim/starter/commit/0c370f4d5c537e6d41dea31b547accc8d5f70a8a
+  --
   -- https://www.lazyvim.org/configuration/recipes#supertab
   -- use <tab> for completion and snippets
   {

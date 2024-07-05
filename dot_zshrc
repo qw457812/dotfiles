@@ -380,7 +380,18 @@ export PATH="$PATH:$HOME/.config/doomemacs/bin"
 # https://github.com/archidote/best-bash-zsh-alias-for-linux-terminal/blob/master/install.sh
 alias b="cd -"
 alias q="exit"
-alias c="clear"
+# clear both screen and tmux history | https://github.com/gpakosz/.tmux/blob/9cf49731cd785b76cf792046feed0e8275457918/.tmux.conf#L53
+function c() {
+  clear
+  if [[ -n "$TMUX" ]]; then
+    command tmux clear-history
+  fi
+}
+# if [[ -z "$TMUX" ]]; then
+#   alias c="clear"
+# else
+#   alias c="clear && command tmux clear-history"
+# fi
 # alias h="history | less"
 
 # install lsp server jdtls for doomemacs (temporary)
@@ -589,12 +600,12 @@ lf () {
 
 # https://yazi-rs.github.io/docs/quick-start
 function yy() {
-	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
-	yazi "$@" --cwd-file="$tmp"
-	if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-		cd -- "$cwd"
-	fi
-	rm -f -- "$tmp"
+  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
+  yazi "$@" --cwd-file="$tmp"
+  if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+    cd -- "$cwd"
+  fi
+  rm -f -- "$tmp"
 }
 
 # Exit to last working directory (LWD) | https://github.com/kyoheiu/felix

@@ -1,18 +1,4 @@
 return {
-  -- https://github.com/doctorfree/nvim-lazyman/blob/bb4091c962e646c5eb00a50eca4a86a2d43bcb7c/lua/ecovim/config/plugins.lua#L373
-  {
-    "folke/flash.nvim",
-    -- stylua: ignore
-    keys = {
-      -- r -> <space> (since `cr` is used for replace with register in mini.operators)
-      { "r", mode = "o", false },
-      { "R", mode = { "o", "x" }, false },
-      -- https://github.com/rileyshahar/dotfiles/blob/ce20b2ea474f20e4eb7493e84c282645e91a36aa/nvim/lua/plugins/movement.lua#L99
-      { "<space>", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
-      { "<tab>", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
-    },
-  },
-
   -- https://github.com/liubang/nvimrc/blob/e7dbb3f5193728b59dbfff5dcd5b3756c5ed1585/lua/plugins/neo-tree-nvim.lua
   -- https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/editor/neo-tree-extended.lua
   -- https://github.com/GentleCold/dotfiles/blob/5104ac8fae45b68a33c973a19b1f6a2e0617d400/.config/nvim/lua/plugins/dir_tree.lua
@@ -151,6 +137,7 @@ return {
           event = "file_opened",
           handler = function(file_path)
             -- auto close on open file
+            -- TODO toggle auto close by keybinding, with [toggle "-" between close_window and show-without-focus] together, for holding layout like no-neck-pain.nvim sometimes
             require("neo-tree.command").execute({ action = "close" })
           end,
         },
@@ -171,32 +158,13 @@ return {
   --   end,
   -- },
 
-  {
-    "echasnovski/mini.operators",
-    event = "VeryLazy",
-    vscode = true,
-    -- https://github.com/echasnovski/mini.operators/blob/76ac9104d9773927053ea4eb12fc78ccbb5be813/doc/mini-operators.txt#L131
-    opts = {
-      -- gr (LazyVim use `gr` for lsp references, `cr` for remote flash by default)
-      replace = { prefix = "cr" }, -- Replace text with register
-      -- gx
-      exchange = { prefix = "cx" }, -- Exchange text regions
-      -- gm
-      multiply = { prefix = "cd" }, -- Multiply (duplicate) text
-      -- g=
-      evaluate = { prefix = "" }, -- Evaluate text and replace with output
-      -- gs
-      sort = { prefix = "" }, -- Sort text
-    },
-  },
-
   -- for escaping easily from insert mode
   {
     "max397574/better-escape.nvim",
-    event = "InsertCharPre",
-    opts = {
-      mapping = { "jk", "jj", "kj", "kk" },
-      timeout = 300,
-    },
+    event = "VeryLazy",
+    opts = {},
   },
+
+  -- TODO choose motion plugin between: flash, leap, hop
+  -- https://github.com/doctorfree/nvim-lazyman/blob/bb4091c962e646c5eb00a50eca4a86a2d43bcb7c/lua/ecovim/config/plugins.lua#L373
 }
