@@ -2,11 +2,12 @@ return {
   -- https://github.com/liubang/nvimrc/blob/e7dbb3f5193728b59dbfff5dcd5b3756c5ed1585/lua/plugins/neo-tree-nvim.lua
   -- https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/editor/neo-tree-extended.lua
   -- https://github.com/GentleCold/dotfiles/blob/5104ac8fae45b68a33c973a19b1f6a2e0617d400/.config/nvim/lua/plugins/dir_tree.lua
+  -- https://github.com/nvim-lua/kickstart.nvim/blob/master/lua/kickstart/plugins/neo-tree.lua
   {
     "nvim-neo-tree/neo-tree.nvim",
     keys = function(_, keys)
       local mappings = {
-        -- define custom keybindings here
+        --[[add custom keys here]]
       }
 
       local opts = LazyVim.opts("neo-tree.nvim")
