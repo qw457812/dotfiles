@@ -1,4 +1,6 @@
--- TODO see LazyVim.lsp.on_rename in ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/editor.lua and ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/editor/mini-files.lua
+-- TODO see LazyVim.lsp.on_rename in:
+-- - ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/editor.lua
+-- - ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/editor/mini-files.lua
 return {
   -- https://github.com/stevearc/dotfiles/blob/eeb506f9afd32cd8cd9f2366110c76efaae5786c/.config/nvim/lua/plugins/oil.lua
   -- https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/editor/oil.lua
@@ -21,7 +23,12 @@ return {
       keymaps = {
         ["q"] = "actions.close", -- for floating window
         -- ["`"] = "actions.tcd",
-        ["~"] = "<cmd>edit $HOME<CR>",
+        ["~"] = {
+          desc = "<cmd>edit $HOME<CR>",
+          callback = function()
+            require("oil").open(vim.env.HOME)
+          end,
+        },
         ["<leader>."] = {
           desc = "Terminal (Oil Dir)",
           callback = function()
@@ -50,6 +57,7 @@ return {
     keys = function()
       -- stylua: ignore
       local keys = {
+        --[[add custom keys here]]
         -- { "<leader><cr>", function() require("oil").toggle_float() end, desc = "Toggle Float Oil" },
       }
 
