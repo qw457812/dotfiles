@@ -5,7 +5,7 @@ return {
   -- https://github.com/kevinm6/nvim/blob/0c2d0fcb04be1f0837ae8918b46131f649cba775/lua/plugins/editor/oil.lua
   {
     "stevearc/oil.nvim",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
+    dependencies = { "echasnovski/mini.icons", optional = true },
     opts = {
       -- whether to use for editing directories (e.g. `vim .` or `:e src/`)
       -- disabled because neo-tree is used for that
