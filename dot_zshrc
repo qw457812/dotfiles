@@ -308,10 +308,7 @@ export PYENV_VIRTUALENV_DISABLE_PROMPT=1
 if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi
 
 alias v='nvim'
-alias vi="vim"
 alias view="nvim -R"
-# alias n="nvim"
-alias lv='lvim'
 alias rr="ranger"
 
 # use my fork (system clipboard integration) instead: https://github.com/qw457812/zsh-vi-mode
@@ -387,11 +384,6 @@ function c() {
     command tmux clear-history
   fi
 }
-# if [[ -z "$TMUX" ]]; then
-#   alias c="clear"
-# else
-#   alias c="clear && command tmux clear-history"
-# fi
 # alias h="history | less"
 
 # install lsp server jdtls for doomemacs (temporary)

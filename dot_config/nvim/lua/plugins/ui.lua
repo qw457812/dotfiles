@@ -39,6 +39,7 @@ return {
       plugins = {
         gitsigns = true,
         tmux = true,
+        neovide = { enabled = true, scale = 1 },
         kitty = { enabled = false, font = "+2" },
         alacritty = { enabled = false, font = "14" },
         twilight = { enabled = false },

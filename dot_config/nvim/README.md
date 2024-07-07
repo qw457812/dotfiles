@@ -19,6 +19,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [Nv](https://github.com/appelgriebsch/Nv)
 - [ian-ie](https://github.com/ian-ie/LazyVim)
 - [TobinPalmer](https://github.com/TobinPalmer/dots/tree/main/nvim)
+- [wfxr](https://github.com/wfxr/dotfiles/tree/master/vim/nvim)
 
 ## Awesome Neovim
 
@@ -57,8 +58,12 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] translate
   - [JuanZoran/Trans.nvim](https://github.com/JuanZoran/Trans.nvim)
   - [voldikss/vim-translator](https://github.com/voldikss/vim-translator)
-  - uga-rosa/translate.nvim
+  - [uga-rosa/translate.nvim](https://github.com/uga-rosa/translate.nvim)
+  - [lewis6991/hover.nvim](https://github.com/wfxr/dotfiles/blob/661bfabf3b813fd8af79d881cd28b72582d4ccca/vim/nvim/lua/plugins/lsp.lua#L29)
 - [ ] Refactor patch like [overrides.lua](https://github.com/ian-ie/LazyVim/blob/master/lua/plugins/overrides.lua).
 - [ ] Check this [keymaps.lua](https://github.com/WillEhrendreich/nvimconfig/blob/7ab5b0d0ee485d58df3cc3e1f55c6446155f29a1/lua/config/keymaps.lua).
-- [ ] Matt-FTW's [vscode.lua](https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/util/vscode.lua), and search `vscode = true` plugins.
+- [ ] Matt-FTW's [vscode.lua](https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/util/vscode.lua), and [search](https://github.com/search?q=repo%3AMatt-FTW%2Fdotfiles%20vscode%20%3D%20true&type=code) the `vscode = true` plugins.
 - [ ] Remove extras: coding.luasnip, editor.illuminate. (and editor.mini-files?)
+- [ ] [marks](https://github.com/rafi/vim-config#plugin-marks)
+- [ ] [lang/tmux](https://github.com/rafi/vim-config/blob/b9648dcdcc6674b707b963d8de902627fbc887c8/lua/rafi/plugins/extras/lang/tmux.lua)
+- [ ] [vim.g.maplocalleader = ","](https://github.com/wfxr/dotfiles/blob/661bfabf3b813fd8af79d881cd28b72582d4ccca/vim/nvim/lua/config/options.lua#L6)
