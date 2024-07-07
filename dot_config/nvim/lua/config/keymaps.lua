@@ -1,10 +1,24 @@
 -- Keymaps are automatically loaded on the VeryLazy event
 -- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
 -- Add any additional keymaps here
-local map = vim.keymap.set
 
 local Lazy = require("lazy")
 local LazyUtil = require("lazy.util")
+
+-- local map = vim.keymap.set
+-- local del = vim.keymap.del
+
+--- vim.keymap.set, silent by default
+--- https://github.com/folke/dot/blob/5df77fa64728a333f4d58e35d3ca5d8590c4f928/nvim/lua/config/options.lua#L22
+---@param mode string|string[]
+---@param lhs string
+---@param rhs string|function
+---@param opts? vim.keymap.set.Opts
+local function map(mode, lhs, rhs, opts)
+  opts = opts or {}
+  opts.silent = opts.silent ~= false
+  vim.keymap.set(mode, lhs, rhs, opts)
+end
 
 -- lazy/LazyVim
 -- https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/config/keymaps.lua
@@ -79,7 +93,7 @@ if LazyVim.has("tmux.nvim") then
   map({ "n", "t" }, "<C-l>", [[<cmd>lua require("tmux").move_right()<cr>]], { desc = "Go to Right Window" })
   -- Resize window
   -- note: A-hjkl for move lines (by both LazyVim's default keybindings and lazyvim.plugins.extras.editor.mini-move)
-  -- note: need to disable macOS keybord shortcuts of mission control
+  -- need to disable macOS keybord shortcuts of mission control first
   -- TODO resize LazyVim's terminal
   map({ "n", "t" }, "<C-Left>", [[<cmd>lua require("tmux").resize_left()<cr>]], { desc = "Resize Window Left" })
   map({ "n", "t" }, "<C-Down>", [[<cmd>lua require("tmux").resize_bottom()<cr>]], { desc = "Resize Window Bottom" })
@@ -95,11 +109,14 @@ map("n", "dd", function()
   else
     return "dd"
   end
-end, { noremap = true, expr = true, desc = "Don't Yank Empty Line to Clipboard" })
+end, { expr = true, desc = "Don't Yank Empty Line to Clipboard" })
+
+-- https://github.com/wfxr/dotfiles/blob/661bfabf3b813fd8af79d881cd28b72582d4ccca/vim/nvim/lua/config/keymaps.lua#L35
+map("n", "gV", "`[v`]", { desc = "Select last changed or yanked text" })
 
 -- TODO search literal | https://vi.stackexchange.com/questions/17465/how-to-search-literally-without-any-regex-pattern
 -- search inside visually highlighted text
-map("x", "g/", "<esc>/\\%V", { silent = false, desc = "Search Inside Visual Selection" })
+map("x", "g/", "<esc>/\\%V", { desc = "Search Inside Visual Selection" })
 
 -- https://github.com/rstacruz/vimfiles/blob/ee9a3e7e7f022059b6d012eff2e88c95ae24ff97/lua/config/keymaps.lua#L35
 -- :let @+=expand('%:p')<cr>
@@ -125,20 +142,19 @@ local function google_search(input)
   local query = input or vim.fn.expand("<cword>")
   LazyUtil.open("https://www.google.com/search?q=" .. query)
 end
-map("n", "<leader>?", google_search, { noremap = true, silent = true, desc = "Google Search Current Word" })
+map("n", "<leader>?", google_search, { desc = "Google Search Current Word" })
 map("x", "<leader>?", function()
   local g_orig = vim.fn.getreg("g")
   vim.cmd([[silent! normal! "gy]])
   google_search(vim.fn.getreg("g"))
   vim.fn.setreg("g", g_orig)
-end, { noremap = true, silent = true, desc = "Google Search" })
+end, { desc = "Google Search" })
 
 if vim.g.neovide then
   -- fix cmd-v for paste in insert, command, terminal (for fzf-lua) mode
   -- https://neovide.dev/faq.html#how-can-i-use-cmd-ccmd-v-to-copy-and-paste
   -- map("c", "<D-v>", "<C-r>+")
   -- https://github.com/neovide/neovide/issues/1263#issuecomment-1972013043
-  map({ "i", "c", "t" }, "<D-v>", function()
-    vim.api.nvim_paste(vim.fn.getreg("+"), true, -1)
-  end, { desc = "Paste", noremap = true, silent = true })
+  -- stylua: ignore
+  map({ "i", "c", "t" }, "<D-v>", function() vim.api.nvim_paste(vim.fn.getreg("+"), true, -1) end, { desc = "Paste" })
 end
