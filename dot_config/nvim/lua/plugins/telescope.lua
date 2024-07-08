@@ -1,5 +1,8 @@
 local Config = require("lazy.core.config")
 
+local have_chezmoi = LazyVim.has_extra("util.chezmoi") and vim.fn.executable("chezmoi") == 1
+local config_path = have_chezmoi and "~/.local/share/chezmoi/dot_config/nvim" or vim.fn.stdpath("config")
+
 -- https://github.com/folke/dot/blob/master/nvim/lua/plugins/telescope.lua
 local pick_plugin_files = function()
   local root = Config.options.root
@@ -11,14 +14,7 @@ local pick_plugin_files = function()
 end
 
 local pick_lazy_specs = function()
-  local dirs = {
-    Config.options.root .. "/LazyVim/lua/lazyvim/plugins",
-  }
-  if LazyVim.has_extra("util.chezmoi") and vim.fn.executable("chezmoi") == 1 then
-    table.insert(dirs, "~/.local/share/chezmoi/dot_config/nvim/lua/plugins")
-  else
-    table.insert(dirs, vim.fn.stdpath("config") .. "/lua/plugins")
-  end
+  local dirs = { config_path .. "/lua/plugins", Config.options.root .. "/LazyVim/lua/lazyvim/plugins" }
   if LazyVim.pick.picker.name == "telescope" then
     require("telescope.builtin").live_grep({
       default_text = "/",
@@ -28,6 +24,18 @@ local pick_lazy_specs = function()
     require("fzf-lua").live_grep({
       filespec = "-- " .. table.concat(vim.tbl_values(dirs), " "),
       search = "/",
+      formatter = "path.filename_first",
+    })
+  end
+end
+
+local pick_lazy_code = function()
+  local dirs = { config_path .. "/lua", Config.options.root .. "/LazyVim/lua/lazyvim" }
+  if LazyVim.pick.picker.name == "telescope" then
+    require("telescope.builtin").live_grep({ search_dirs = vim.tbl_values(dirs) })
+  elseif LazyVim.pick.picker.name == "fzf" then
+    require("fzf-lua").live_grep({
+      filespec = "-- " .. table.concat(vim.tbl_values(dirs), " "),
       formatter = "path.filename_first",
     })
   end
@@ -50,6 +58,7 @@ return {
     keys = {
       { "<leader>fP", pick_plugin_files, desc = "Find Plugin File" },
       { "<leader>sP", pick_lazy_specs, desc = "Search Lazy Plugin Spec" },
+      { "<leader>sL", pick_lazy_code, desc = "Search Lazy Code" },
       { "<leader>fB", pick_buffer_dir_files, desc = "Find Files (Buffer Dir)" },
     },
   },
@@ -60,6 +69,7 @@ return {
     keys = {
       { "<leader>fP", pick_plugin_files, desc = "Find Plugin File" },
       { "<leader>sP", pick_lazy_specs, desc = "Search Lazy Plugin Spec" },
+      { "<leader>sL", pick_lazy_code, desc = "Search Lazy Code" },
       { "<leader>fB", pick_buffer_dir_files, desc = "Find Files (Buffer Dir)" },
     },
     opts = {
