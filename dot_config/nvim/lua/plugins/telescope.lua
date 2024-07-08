@@ -12,9 +12,13 @@ end
 
 local pick_lazy_specs = function()
   local dirs = {
-    "~/.local/share/chezmoi/dot_config/nvim/lua/plugins",
     Config.options.root .. "/LazyVim/lua/lazyvim/plugins",
   }
+  if LazyVim.has_extra("util.chezmoi") and vim.fn.executable("chezmoi") == 1 then
+    table.insert(dirs, "~/.local/share/chezmoi/dot_config/nvim/lua/plugins")
+  else
+    table.insert(dirs, vim.fn.stdpath("config") .. "/lua/plugins")
+  end
   if LazyVim.pick.picker.name == "telescope" then
     require("telescope.builtin").live_grep({
       default_text = "/",
