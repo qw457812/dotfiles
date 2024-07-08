@@ -14,9 +14,9 @@ local function pick_lsp_references()
   end
 end
 
----Is the result's location the same as the params location?
----https://github.com/mrcjkb/haskell-tools.nvim/blob/6b6fa211da47582950abfab9e893ab936b6c4298/lua/haskell-tools/lsp/hover.lua#L105
----https://github.com/DNLHC/glance.nvim/blob/51059bcf21016387b6233c89eed220cf47fca752/lua/glance/range.lua#L24
+--- Is the result's location the same as the params location?
+--- https://github.com/mrcjkb/haskell-tools.nvim/blob/6b6fa211da47582950abfab9e893ab936b6c4298/lua/haskell-tools/lsp/hover.lua#L105
+--- https://github.com/DNLHC/glance.nvim/blob/51059bcf21016387b6233c89eed220cf47fca752/lua/glance/range.lua#L24
 ---@param result table LSP result
 ---@param params table LSP location params
 ---@return boolean
@@ -27,7 +27,7 @@ local function is_same_position(result, params)
     return false
   end
   local range = result.targetRange or result.range or result.targetSelectionRange
-  if not range or not range.start or not range["end"] then
+  if not (range and range.start and range["end"]) then
     return false
   end
   if params.position.line < range.start.line or params.position.line > range["end"].line then
@@ -42,36 +42,27 @@ local function is_same_position(result, params)
   return true
 end
 
----Is the results's locations contains the params location?
----@param results table LSP results
----@param params table LSP location params
----@return boolean
-local function contains_position(results, params)
-  for _, result in pairs(results) do
-    if is_same_position(result, params) then
-      return true
-    end
-  end
-  return false
-end
-
---- go to definition or references if already at definition, like `gd` in vscode and idea
+--- Go to definition or references if already at definition, like `gd` in vscode and idea but slightly different.
 --- https://github.com/ray-x/navigator.lua/blob/db3ac40bd4793abf90372687e35ece1c8969acc9/lua/navigator/definition.lua#L62
 --- https://github.com/mrcjkb/haskell-tools.nvim/blob/6b6fa211da47582950abfab9e893ab936b6c4298/lua/haskell-tools/lsp/hover.lua#L188
 --- https://github.com/fcying/dotvim/blob/47c7f8faa600e1045cc4ac856d639f5f23f00cf4/lua/util.lua#L146
+--- https://github.com/mbriggs/nvim-v2/blob/d8526496596f3a4dcab2cde86674ca58eaee65e2/lsp_fixcurrent.lua
 local function pick_lsp_definitions_or_references()
   local params = vim.lsp.util.make_position_params()
-  local results = vim.lsp.buf_request_sync(0, "textDocument/definition", params, 1000)
-  if results == nil or vim.tbl_isempty(results) then
+  local results = vim.lsp.buf_request_sync(0, "textDocument/definition", params)
+  if not results or vim.tbl_isempty(results) then
     -- no definitions found, try references
     pick_lsp_references()
   else
     for _, result in pairs(results) do
-      local definition_results = result.result or {}
-      if contains_position(definition_results, params) then
-        -- already at one of the definitions, go to references
-        pick_lsp_references()
-        return
+      if result.result then
+        for _, definition_result in pairs(result.result) do
+          if is_same_position(definition_result, params) then
+            -- already at one of the definitions, go to references
+            pick_lsp_references()
+            return
+          end
+        end
       end
     end
     -- not at any definition, go to definitions
