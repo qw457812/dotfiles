@@ -37,6 +37,10 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 
 - [ ] Check out the great [:h lua-guide](https://neovim.io/doc/user/lua-guide.html#lua-guide).
 - [ ] Map `gd` to both lsp_definition and lsp_references like vscode and idea, maybe give `gr` to ReplaceWithRegister.
+  - [include_declaration=false](https://github.com/dragove/dotfiles/blob/a66018226251226670d82f681bd21f48362c582f/nvim/.config/nvim/lua/config/keymaps.lua#L9)
+  - [search](https://github.com/search?type=code&auto_enroll=true&q=textDocument%2Fdefinition+vim.lsp.buf_request+language%3Alua) `textDocument/definition` and `vim.lsp.buf_request`
+  - [has](https://github.com/LazyVim/LazyVim/blob/bf9887adacc4b37991aefc2b4514d07a6debb3b4/lua/lazyvim/plugins/lsp/keymaps.lua#L45) `= { "definition", "references" }`
+  - `:h vim.lsp.tagfunc()`
 - [ ] Fix Java DAP timeout problem, see [nvim-jdtls](https://github.com/mfussenegger/nvim-jdtls).
 - [ ] Use my own plugins in LazyExtra like Nv's [plugins/extras/](https://github.com/appelgriebsch/Nv/tree/main/lua/plugins/extras) and [lazyvim.json](https://github.com/appelgriebsch/Nv/blob/main/lazyvim.json).
 - [ ] [Org Mode](https://github.com/topics/orgmode-nvim) in nvim, or neorg like [stevearc](https://github.com/stevearc/dotfiles/blob/eeb506f9afd32cd8cd9f2366110c76efaae5786c/.config/nvim/lua/plugins/neorg.lua).
@@ -63,6 +67,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] Refactor patch like [overrides.lua](https://github.com/ian-ie/LazyVim/blob/master/lua/plugins/overrides.lua).
 - [ ] Check this [keymaps.lua](https://github.com/WillEhrendreich/nvimconfig/blob/7ab5b0d0ee485d58df3cc3e1f55c6446155f29a1/lua/config/keymaps.lua).
 - [ ] Matt-FTW's [vscode.lua](https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/util/vscode.lua), and [search](https://github.com/search?q=repo%3AMatt-FTW%2Fdotfiles%20vscode%20%3D%20true&type=code) the `vscode = true` plugins.
+  - Echasnovski's [vscode.lua](https://github.com/echasnovski/nvim/blob/master/src/vscode.lua).
 - [ ] Remove extras: coding.luasnip, editor.illuminate. (and editor.mini-files?)
 - [ ] [marks](https://github.com/rafi/vim-config#plugin-marks)
 - [ ] [lang/tmux](https://github.com/rafi/vim-config/blob/b9648dcdcc6674b707b963d8de902627fbc887c8/lua/rafi/plugins/extras/lang/tmux.lua)
