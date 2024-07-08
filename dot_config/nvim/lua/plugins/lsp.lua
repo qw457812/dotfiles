@@ -27,18 +27,16 @@ local function is_same_position(result, params)
     return false
   end
   local range = result.targetRange or result.range or result.targetSelectionRange
-  if not range then
+  if not range or not range.start or not range["end"] then
     return false
   end
-  local range_start = range.start or {}
-  local range_end = range["end"] or {}
-  if params.position.line < range_start.line or params.position.line > range_end.line then
+  if params.position.line < range.start.line or params.position.line > range["end"].line then
     return false
   end
-  if params.position.line == range_start.line and params.position.character < range_start.character then
+  if params.position.line == range.start.line and params.position.character < range.start.character then
     return false
   end
-  if params.position.line == range_end.line and params.position.character > range_end.character then
+  if params.position.line == range["end"].line and params.position.character > range["end"].character then
     return false
   end
   return true
@@ -58,44 +56,12 @@ local function contains_position(results, params)
 end
 
 --- go to definition or references if already at definition, like `gd` in vscode and idea
+--- https://github.com/ray-x/navigator.lua/blob/db3ac40bd4793abf90372687e35ece1c8969acc9/lua/navigator/definition.lua#L62
+--- https://github.com/mrcjkb/haskell-tools.nvim/blob/6b6fa211da47582950abfab9e893ab936b6c4298/lua/haskell-tools/lsp/hover.lua#L188
+--- https://github.com/fcying/dotvim/blob/47c7f8faa600e1045cc4ac856d639f5f23f00cf4/lua/util.lua#L146
 local function pick_lsp_definitions_or_references()
-  -- https://github.com/ray-x/navigator.lua/blob/db3ac40bd4793abf90372687e35ece1c8969acc9/lua/navigator/definition.lua#L62
-  -- https://github.com/mrcjkb/haskell-tools.nvim/blob/6b6fa211da47582950abfab9e893ab936b6c4298/lua/haskell-tools/lsp/hover.lua#L188
-  -- https://github.com/fcying/dotvim/blob/47c7f8faa600e1045cc4ac856d639f5f23f00cf4/lua/util.lua#L146
   local params = vim.lsp.util.make_position_params()
   local results = vim.lsp.buf_request_sync(0, "textDocument/definition", params, 1000)
-
-  -- if results == nil or vim.tbl_isempty(results) then
-  --   -- no definitions found, try references
-  --   pick_lsp_references()
-  -- elseif vim.tbl_count(results) == 1 then
-  --   local definition_results = results[next(results)].result or {}
-  --   -- check if the location is same as current
-  --   if #definition_results == 1 and is_same_position(definition_results[1], params) then
-  --     -- already at the only definition, go to references
-  --     pick_lsp_references()
-  --   else
-  --     pick_lsp_definitions()
-  --   end
-  -- else
-  --   pick_lsp_definitions()
-  -- end
-
-  -- if results == nil or vim.tbl_isempty(results) then
-  --   -- no definitions found, try references
-  --   pick_lsp_references()
-  -- elseif vim.tbl_count(results) == 1 then
-  --   local definition_results = results[next(results)].result or {}
-  --   if contains_position(definition_results, params) then
-  --     -- already at one of the definitions, go to references
-  --     pick_lsp_references()
-  --   else
-  --     pick_lsp_definitions()
-  --   end
-  -- else
-  --   pick_lsp_definitions()
-  -- end
-
   if results == nil or vim.tbl_isempty(results) then
     -- no definitions found, try references
     pick_lsp_references()
