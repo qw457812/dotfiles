@@ -1,4 +1,4 @@
-local function pick_lsp_definitions()
+local function pick_definitions()
   if LazyVim.pick.want() == "telescope" then
     require("telescope.builtin").lsp_definitions({ reuse_win = true })
   elseif LazyVim.pick.want() == "fzf" then
@@ -6,7 +6,7 @@ local function pick_lsp_definitions()
   end
 end
 
-local function pick_lsp_references()
+local function pick_references()
   if LazyVim.pick.want() == "telescope" then
     require("telescope.builtin").lsp_references({ include_declaration = false })
   elseif LazyVim.pick.want() == "fzf" then
@@ -47,26 +47,26 @@ end
 --- https://github.com/mrcjkb/haskell-tools.nvim/blob/6b6fa211da47582950abfab9e893ab936b6c4298/lua/haskell-tools/lsp/hover.lua#L188
 --- https://github.com/fcying/dotvim/blob/47c7f8faa600e1045cc4ac856d639f5f23f00cf4/lua/util.lua#L146
 --- https://github.com/mbriggs/nvim-v2/blob/d8526496596f3a4dcab2cde86674ca58eaee65e2/lsp_fixcurrent.lua
-local function pick_lsp_definitions_or_references()
+local function pick_definitions_or_references()
   local params = vim.lsp.util.make_position_params()
   local results = vim.lsp.buf_request_sync(0, "textDocument/definition", params)
   if not results or vim.tbl_isempty(results) then
     -- no definitions found, try references
-    pick_lsp_references()
+    pick_references()
   else
     for _, result in pairs(results) do
       if result.result then
         for _, definition_result in pairs(result.result) do
           if is_same_position(definition_result, params) then
             -- already at one of the definitions, go to references
-            pick_lsp_references()
+            pick_references()
             return
           end
         end
       end
     end
     -- not at any definition, go to definitions
-    pick_lsp_definitions()
+    pick_definitions()
   end
 end
 
@@ -83,7 +83,7 @@ return {
       local Keys = require("lazyvim.plugins.lsp.keymaps").get()
       vim.list_extend(Keys, {
         -- { "gd", pick_lsp_definitions_or_references, desc = "Goto Definition/References", has = "definition" },
-        { "<cr>", pick_lsp_definitions_or_references, desc = "Goto Definition/References", has = "definition" },
+        { "<cr>", pick_definitions_or_references, desc = "Goto Definition/References", has = "definition" },
       })
     end,
   },
