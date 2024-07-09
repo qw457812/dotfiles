@@ -22,19 +22,12 @@ end
 --- https://github.com/mrcjkb/haskell-tools.nvim/blob/6b6fa211da47582950abfab9e893ab936b6c4298/lua/haskell-tools/lsp/hover.lua#L105
 --- https://github.com/DNLHC/glance.nvim/blob/51059bcf21016387b6233c89eed220cf47fca752/lua/glance/range.lua#L24
 --- https://github.com/neovim/neovim/blob/fb6c059dc55c8d594102937be4dd70f5ff51614a/runtime/lua/vim/lsp/_tagfunc.lua#L42
----@param result table LSP result
----@param params table LSP location params
+---@param result lsp.Location|lsp.LocationLink
+---@param params lsp.TextDocumentPositionParams
 ---@return boolean
 local function is_same_position(result, params)
   local uri = result.uri or result.targetUri
   local range = result.range or result.targetSelectionRange
-  if not (uri and range and range.start and range["end"]) then
-    LazyVim.warn(
-      { "Failed to get `uri` or `range.start` or `range.end`.", "", "# LSP Result:", vim.inspect(result) },
-      { title = "LSP" }
-    )
-    return false
-  end
   if uri ~= params.textDocument.uri then
     -- not the same file
     return false
