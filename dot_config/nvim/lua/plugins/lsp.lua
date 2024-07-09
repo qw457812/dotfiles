@@ -1,3 +1,7 @@
+local lsp = vim.lsp
+local util = lsp.util
+local ms = lsp.protocol.Methods
+
 local function pick_definitions()
   if LazyVim.pick.want() == "telescope" then
     require("telescope.builtin").lsp_definitions({ reuse_win = true })
@@ -17,17 +21,22 @@ end
 --- Is the result's location the same as the params location?
 --- https://github.com/mrcjkb/haskell-tools.nvim/blob/6b6fa211da47582950abfab9e893ab936b6c4298/lua/haskell-tools/lsp/hover.lua#L105
 --- https://github.com/DNLHC/glance.nvim/blob/51059bcf21016387b6233c89eed220cf47fca752/lua/glance/range.lua#L24
+--- https://github.com/neovim/neovim/blob/fb6c059dc55c8d594102937be4dd70f5ff51614a/runtime/lua/vim/lsp/_tagfunc.lua#L42
 ---@param result table LSP result
 ---@param params table LSP location params
 ---@return boolean
 local function is_same_position(result, params)
   local uri = result.uri or result.targetUri
-  if uri ~= params.textDocument.uri then
-    -- not the same file
+  local range = result.range or result.targetSelectionRange
+  if not (uri and range and range.start and range["end"]) then
+    LazyVim.warn(
+      { "Failed to get `uri` or `range.start` or `range.end`.", "", "# LSP Result:", vim.inspect(result) },
+      { title = "LSP" }
+    )
     return false
   end
-  local range = result.targetRange or result.range or result.targetSelectionRange
-  if not (range and range.start and range["end"]) then
+  if uri ~= params.textDocument.uri then
+    -- not the same file
     return false
   end
   if params.position.line < range.start.line or params.position.line > range["end"].line then
@@ -47,17 +56,32 @@ end
 --- https://github.com/mrcjkb/haskell-tools.nvim/blob/6b6fa211da47582950abfab9e893ab936b6c4298/lua/haskell-tools/lsp/hover.lua#L188
 --- https://github.com/fcying/dotvim/blob/47c7f8faa600e1045cc4ac856d639f5f23f00cf4/lua/util.lua#L146
 --- https://github.com/mbriggs/nvim-v2/blob/d8526496596f3a4dcab2cde86674ca58eaee65e2/lsp_fixcurrent.lua
+--- https://github.com/neovim/neovim/blob/fb6c059dc55c8d594102937be4dd70f5ff51614a/runtime/lua/vim/lsp/_tagfunc.lua#L25
+--- https://github.com/ibhagwan/fzf-lua/blob/975534f4861e2575396716225c1202572645583d/lua/fzf-lua/providers/lsp.lua#L468
 local function pick_definitions_or_references()
-  local params = vim.lsp.util.make_position_params()
-  local results = vim.lsp.buf_request_sync(0, "textDocument/definition", params)
-  if not results or vim.tbl_isempty(results) then
+  local params = util.make_position_params()
+  local method = ms.textDocument_definition
+  local results_by_client, err = lsp.buf_request_sync(0, method, params, 1000)
+  if err or not results_by_client then
+    LazyVim.error(string.format("Error executing '%s': %s", method, err), { title = "LSP" })
+    return
+  end
+  if vim.tbl_isempty(results_by_client) then
     -- no definitions found, try references
     pick_references()
   else
-    for _, result in pairs(results) do
-      if result.result then
-        for _, definition_result in pairs(result.result) do
-          if is_same_position(definition_result, params) then
+    for _, lsp_results in pairs(results_by_client) do
+      local result = lsp_results.result or {}
+      if result.range then -- Location
+        if is_same_position(result, params) then
+          -- already at one of the definitions, go to references
+          pick_references()
+          return
+        end
+      else
+        result = result --[[@as (lsp.Location[]|lsp.LocationLink[])]]
+        for _, item in pairs(result) do
+          if is_same_position(item, params) then
             -- already at one of the definitions, go to references
             pick_references()
             return
@@ -82,7 +106,7 @@ return {
     opts = function()
       local Keys = require("lazyvim.plugins.lsp.keymaps").get()
       vim.list_extend(Keys, {
-        -- { "gd", pick_lsp_definitions_or_references, desc = "Goto Definition/References", has = "definition" },
+        -- { "gd", pick_definitions_or_references, desc = "Goto Definition/References", has = "definition" },
         { "<cr>", pick_definitions_or_references, desc = "Goto Definition/References", has = "definition" },
       })
     end,
