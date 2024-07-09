@@ -12,8 +12,12 @@ end
 ---@param targets? string|string[]
 ---@return string[]
 local function chezmoi_list(targets)
-  targets = targets or {}
-  return require("chezmoi.commands").list({ targets = targets })
+  return require("chezmoi.commands").list({
+    targets = targets or {},
+    -- files only, do not include directories
+    -- see: ~/.local/share/nvim/lazy/chezmoi.nvim/lua/telescope/_extensions/find_files.lua
+    args = { "--include", "files" },
+  })
 end
 
 local fzf_exec_opts = {
@@ -21,7 +25,9 @@ local fzf_exec_opts = {
   fzf_colors = true,
   actions = {
     ["default"] = function(selected)
-      chezmoi_edit("~/" .. selected[1])
+      if not vim.tbl_isempty(selected) then
+        chezmoi_edit("~/" .. selected[1])
+      end
     end,
   },
 }
@@ -60,7 +66,9 @@ return {
                 local edit_action = function()
                   actions.close(prompt_bufnr)
                   local selection = action_state.get_selected_entry()
-                  chezmoi_edit(config_dir .. "/" .. selection.value)
+                  if selection then
+                    chezmoi_edit(config_dir .. "/" .. selection.value)
+                  end
                 end
 
                 actions.select_default:replace(edit_action)
