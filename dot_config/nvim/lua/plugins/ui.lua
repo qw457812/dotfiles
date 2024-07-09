@@ -58,6 +58,17 @@ return {
   },
 
   {
+    "shortcuts/no-neck-pain.nvim",
+    opts = {
+      width = 120, -- same width as zen-mode.nvim, default value: 100
+    },
+    keys = {
+      { "<leader>uz", "<cmd>NoNeckPain<cr>", desc = "No Neck Pain" },
+      { "<leader>uZ", ":NoNeckPainResize ", desc = "Resize the No-Neck-Pain window" },
+    },
+  },
+
+  {
     "tzachar/highlight-undo.nvim",
     event = "VeryLazy",
     vscode = true,
@@ -69,13 +80,5 @@ return {
         --[[add custom config here]]
       }
     end,
-  },
-
-  {
-    "shortcuts/no-neck-pain.nvim",
-    opts = {},
-    keys = {
-      { "<leader>uN", "<cmd>NoNeckPain<cr>", desc = "No Neck Pain" },
-    },
   },
 }

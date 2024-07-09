@@ -20,6 +20,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ian-ie](https://github.com/ian-ie/LazyVim)
 - [TobinPalmer](https://github.com/TobinPalmer/dots/tree/main/nvim)
 - [wfxr](https://github.com/wfxr/dotfiles/tree/master/vim/nvim)
+- [jellydn](https://github.com/jellydn/lazy-nvim-ide)
 
 ## Awesome Neovim
 
@@ -77,3 +78,6 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] [vim-matchup](https://github.com/andymass/vim-matchup)
 - [ ] `venv-selector.nvim`'s [on_venv_activate_callback](https://github.com/linux-cultist/venv-selector.nvim/tree/regexp?tab=readme-ov-file#run-your-own-code-on-venv-activation-on_venv_activate_callback) like [inogai](https://github.com/inogai/neovim-config-lazy/blob/50f68f6acc0cea283a0e89bddde6f9897680c749/lua/plugins/python.lua) with `toggleterm`
 - [ ] Dashboard logo like [shxfee](https://github.com/shxfee/dotfiles/blob/067e65a3bb43c0646d117a6eac16f862b03a82d6/nvim/lua/shxfee/plugins/temp.lua#L166).
+- [ ] [symbol-usage.nvim](https://github.com/Wansmer/symbol-usage.nvim) like [jellydn](https://github.com/jellydn/lazy-nvim-ide/blob/main/lua/plugins/lsp.lua)
+- [ ] [undotree](https://github.com/mbbill/undotree) like [jellydn](https://github.com/jellydn/lazy-nvim-ide/blob/main/lua/plugins/undotree.lua)
+- [ ] Check this [copilot-chat-v2-fzf.lua](https://github.com/jellydn/lazy-nvim-ide/blob/main/lua/plugins/extras/copilot-chat-v2-fzf.lua).
