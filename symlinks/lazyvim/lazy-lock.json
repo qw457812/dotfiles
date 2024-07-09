@@ -4,7 +4,7 @@
   "SchemaStore.nvim": { "branch": "main", "commit": "a1be387e7c5d5f4f503515b170b79626a0644b4a" },
   "Trans.nvim": { "branch": "v2", "commit": "3ebcd7b785dba7faec577b58606eb8a1c46b6260" },
   "baleia.nvim": { "branch": "main", "commit": "4d3b27dbec65a44ceecd9306f605a980bcf4e9b1" },
-  "better-escape.nvim": { "branch": "master", "commit": "b273bcf75b99529cfe2ef2b1b7fe189cc6216347" },
+  "better-escape.nvim": { "branch": "master", "commit": "3b41a905799577e3259ead9056bcabb72dedf537" },
   "bufferline.nvim": { "branch": "main", "commit": "81820cac7c85e51e4cf179f8a66d13dbf7b032d9" },
   "catppuccin": { "branch": "main", "commit": "2d3419c2aead379b7d1854d32458f20ffaa58562" },
   "chezmoi.nvim": { "branch": "main", "commit": "faf61465718424696269b2647077331b3e4605f1" },
