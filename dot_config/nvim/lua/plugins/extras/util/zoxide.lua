@@ -32,20 +32,11 @@ local tree_previewer = previewers.new_termopen_previewer({
     if p == nil or p == "" then
       return
     end
-    -- https://github.com/nvim-telescope/telescope.nvim/issues/1991
-    -- return {
-    --   "bash",
-    --   "-c",
-    --   "eza --all --level=2 --group-directories-first --ignore-glob='.DS_Store|.git|.svn|.idea|.vscode' --git-ignore --tree --color=always --color-scale all --icons=always --long --time-style=iso --git --no-permissions --no-user "
-    --     .. utils.path_expand(p)
-    --     .. " | bat",
-    -- }
     return {
       "eza",
       "--all",
       "--level=2",
       "--group-directories-first",
-      -- "--ignore-glob='|.DS_Store|.git|.svn|.idea|.vscode|'",
       "--ignore-glob=.DS_Store|.git|.svn|.idea|.vscode",
       "--git-ignore",
       "--tree",
@@ -69,7 +60,6 @@ local pick = function()
   -- ~/.local/share/nvim/lazy/telescope-zoxide/lua/telescope/_extensions/zoxide/list.lua
   telescope.extensions.zoxide.list({
     -- layout_config = { width = 0.5, height = 0.7 }, -- without previewer
-    -- layout_config = { preview_width = 0.5, width = 0.8, height = 0.8 }, -- with previewer
     previewer = tree_previewer,
     -- TODO replace home directory with `~` (`path_display` not working)
   })
