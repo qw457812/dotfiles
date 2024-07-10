@@ -20,9 +20,9 @@ return {
     opts = {
       settings = {
         options = {
-          -- for linux/mac: replace the home directory with '~' and remove the /bin/python part.
+          -- for linux/mac: replace the home directory with `~` and remove the /bin/python part.
           on_telescope_result_callback = function(filename)
-            return filename:gsub(os.getenv("HOME"), "~"):gsub("/bin/python", "")
+            return require("util.path").replace_home_with_tilde(filename):gsub("/bin/python", "")
           end,
         },
         search = {
