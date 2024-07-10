@@ -87,11 +87,75 @@ return {
     opts = {
       defaults = {
         layout_strategy = "horizontal",
-        layout_config = { prompt_position = "top" },
+        layout_config = {
+          horizontal = {
+            prompt_position = "top",
+            preview_width = 0.5,
+          },
+          width = 0.8,
+          height = 0.8,
+          preview_cutoff = 120,
+        },
         sorting_strategy = "ascending",
         winblend = 0,
+        -- see `:help telescope.defaults.path_display`
+        -- path_display = { "truncate" },
+        -- path_display = { truncate = 1, "filename_first" },
+        -- path_display = {
+        --   "truncate",
+        --   filename_first = {
+        --     reverse_directories = true,
+        --   },
+        -- },
+        path_display = function(opts, path)
+          local transformed_path = vim.trim(require("util.path").replace_home_with_tilde(path))
+          -- truncate
+          -- copy from: https://github.com/nvim-telescope/telescope.nvim/blob/bfcc7d5c6f12209139f175e6123a7b7de6d9c18a/lua/telescope/utils.lua#L198
+          -- ~/.local/share/nvim/lazy/telescope.nvim/lua/telescope/utils.lua
+          -- https://github.com/babarot/dotfiles/blob/cab2b7b00aef87efdf068d910e5e02935fecdd98/.config/nvim/lua/plugins/telescope.lua#L5
+          local truncate = require("plenary.strings").truncate
+          local get_status = require("telescope.state").get_status
+          local calc_result_length = function(truncate_len)
+            local status = get_status(vim.api.nvim_get_current_buf())
+            local len = vim.api.nvim_win_get_width(status.layout.results.winid)
+              - status.picker.selection_caret:len()
+              - 2
+            return type(truncate_len) == "number" and len - truncate_len or len
+          end
+          -- local truncate_len = 1
+          local truncate_len = nil
+          if opts.__length == nil then
+            opts.__length = calc_result_length(truncate_len)
+          end
+          if opts.__prefix == nil then
+            opts.__prefix = 0
+          end
+          transformed_path = truncate(transformed_path, opts.__length - opts.__prefix, nil, -1)
+          -- filename_first style
+          local tail = require("telescope.utils").path_tail(path)
+          local path_style = {
+            { { 0, #transformed_path - #tail }, "Comment" }, -- Comment, TelescopeResultsComment
+            -- { { #transformed_path - #tail, #transformed_path }, "Constant" },
+          }
+          return transformed_path, path_style
+        end,
         -- ~/.local/share/nvim/lazy/telescope.nvim/lua/telescope/mappings.lua
+        -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/editor/telescope.lua
         mappings = {
+          i = {
+            -- same as <C-j> and <C-k> in fzf-lua
+            -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/editor/fzf.lua
+            ["<C-j>"] = {
+              require("telescope.actions").move_selection_next,
+              type = "action",
+              opts = { nowait = true, silent = true },
+            },
+            ["<C-k>"] = {
+              require("telescope.actions").move_selection_previous,
+              type = "action",
+              opts = { nowait = true, silent = true },
+            },
+          },
           n = {
             ["H"] = { "^", type = "command" },
             ["L"] = { "$", type = "command" },

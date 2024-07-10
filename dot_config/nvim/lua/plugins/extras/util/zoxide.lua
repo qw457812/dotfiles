@@ -5,7 +5,7 @@ end
 local pick = function()
   -- picker_opts | https://github.com/nvim-telescope/telescope.nvim#customization
   require("telescope").extensions.zoxide.list({
-    -- layout_config = { width = 0.5, height = 0.7 },
+    layout_config = { width = 0.5, height = 0.7 },
   })
 end
 
@@ -31,7 +31,7 @@ return {
                 vim.cmd.cd(selection.path)
               end,
               after_action = function(selection)
-                print("Directory changed to " .. selection.path)
+                LazyVim.info("Directory changed to " .. selection.path, { title = "Zoxide" })
                 -- vim.cmd.edit(selection.path)
                 -- require("neo-tree.command").execute({ dir = selection.path })
                 require("telescope.builtin").find_files({ cwd = selection.path })

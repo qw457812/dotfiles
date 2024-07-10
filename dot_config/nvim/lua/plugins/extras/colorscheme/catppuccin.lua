@@ -20,6 +20,7 @@ return {
           -- IlluminatedWordText = { bg = colors.surface1 }, -- use default
           IlluminatedWordRead = { bg = illuminate },
           IlluminatedWordWrite = { bg = illuminate, underline = true },
+          -- compensate for invisible text caused by custom illuminate highlight
           -- ~/.local/share/nvim/lazy/catppuccin/lua/catppuccin/groups/integrations/cmp.lua
           CmpGhostText = { bg = colors.base, fg = colors.overlay1 },
         }
