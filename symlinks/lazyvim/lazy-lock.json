@@ -6,7 +6,7 @@
   "baleia.nvim": { "branch": "main", "commit": "4d3b27dbec65a44ceecd9306f605a980bcf4e9b1" },
   "better-escape.nvim": { "branch": "master", "commit": "7619e1e582d8ae43c8860dfc183455374a11aa85" },
   "bufferline.nvim": { "branch": "main", "commit": "81820cac7c85e51e4cf179f8a66d13dbf7b032d9" },
-  "catppuccin": { "branch": "main", "commit": "2d3419c2aead379b7d1854d32458f20ffaa58562" },
+  "catppuccin": { "branch": "main", "commit": "47bd419c0cb776cb0a67ebb525891eca44020b59" },
   "chezmoi.nvim": { "branch": "main", "commit": "faf61465718424696269b2647077331b3e4605f1" },
   "chezmoi.vim": { "branch": "main", "commit": "10f2692791b5e512a2c1bb4dc560b42ca5bf71fd" },
   "cmp-buffer": { "branch": "main", "commit": "3022dbc9166796b644a841a02de8dd1cc1d311fa" },
