@@ -437,8 +437,8 @@ fileviewer .git/ git -c color.status=always status --short --branch %d %pu
 "
 " Comment these lines out to use the default builtin tree viewer
 fileviewer {*/,.*/},
-         \ eza --all --level=2 --ignore-glob='.git|.idea' --tree --color=always --color-scale all --long --time-style=iso --git --no-permissions --no-user %c,
-         \ tree -a -L 2 -I '.git|.idea' -C %c,
+         \ eza --all --level=2 --group-directories-first --ignore-glob='.DS_Store|.git|.svn|.idea|.vscode' --tree --color=always --color-scale all --long --time-style=iso --git --no-permissions --no-user %c,
+         \ tree -a -L 2 -I '.DS_Store|.git|.svn|.idea|.vscode' -C --dirsfirst %c,
          \ eza --all --color=always --oneline %c,
          \ ls -A --color=always %c
 
