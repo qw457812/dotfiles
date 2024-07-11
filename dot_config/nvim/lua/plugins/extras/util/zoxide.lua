@@ -10,7 +10,7 @@ local utils = require("telescope.utils")
 
 -- https://github.com/petobens/dotfiles/blob/0e216cdf8048859db5cbec0a1bc5b99d45479817/nvim/lua/plugin-config/telescope_config.lua#L784
 -- ~/.local/share/nvim/lazy/telescope.nvim/lua/telescope/previewers/buffer_previewer.lua
-local less_scroll_fn = function(self, direction)
+local scroll_fn = function(self, direction)
   if not self.state then
     return
   end
@@ -32,27 +32,32 @@ local tree_previewer = previewers.new_termopen_previewer({
     if p == nil or p == "" then
       return
     end
-    return {
-      "eza",
-      "--all",
-      "--level=2",
-      "--group-directories-first",
-      "--ignore-glob=.DS_Store|.git|.svn|.idea|.vscode",
-      "--git-ignore",
-      "--tree",
-      "--color=always",
-      "--color-scale",
-      "all",
-      "--icons=always",
-      "--long",
-      "--time-style=iso",
-      "--git",
-      "--no-permissions",
-      "--no-user",
-      utils.path_expand(p),
-    }
+    local command
+    if vim.fn.executable("eza") == 1 then
+      command = {
+        "eza",
+        "--all",
+        "--level=2",
+        "--group-directories-first",
+        "--ignore-glob=.DS_Store|.git|.svn|.idea|.vscode",
+        "--git-ignore",
+        "--tree",
+        "--color=always",
+        "--color-scale",
+        "all",
+        "--icons=always",
+        "--long",
+        "--time-style=iso",
+        "--git",
+        "--no-permissions",
+        "--no-user",
+      }
+    else
+      command = { "tree", "-a", "-L", "2", "-I", ".DS_Store|.git|.svn|.idea|.vscode", "-C", "--dirsfirst" }
+    end
+    return utils.flatten({ command, "--", utils.path_expand(p) })
   end,
-  scroll_fn = less_scroll_fn,
+  scroll_fn = scroll_fn,
 })
 
 local pick = function()
@@ -60,6 +65,19 @@ local pick = function()
   -- ~/.local/share/nvim/lazy/telescope-zoxide/lua/telescope/_extensions/zoxide/list.lua
   telescope.extensions.zoxide.list({
     -- layout_config = { width = 0.5, height = 0.7 }, -- without previewer
+    layout_config = {
+      horizontal = {
+        preview_width = function(_, cols, _)
+          if cols < 150 then
+            return math.floor(cols * 0.4)
+          else
+            return math.floor(cols * 0.5)
+          end
+        end,
+      },
+      width = 0.8,
+      height = 0.8,
+    }, -- with previewer                                                                                                │
     previewer = tree_previewer,
     -- TODO replace home directory with `~` (`path_display` not working)
   })
@@ -70,7 +88,7 @@ return {
   -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/editor/telescope.lua
   -- https://github.com/craftzdog/dotfiles-public/blob/master/.config/nvim/lua/plugins/editor.lua
   {
-    "telescope.nvim",
+    "nvim-telescope/telescope.nvim",
     optional = true,
     dependencies = { "jvgrootveld/telescope-zoxide" },
     keys = {
@@ -135,7 +153,8 @@ return {
     optional = true,
     opts = function(_, opts)
       local zoxide = {
-        action = pick,
+        -- action = pick, -- TODO How to trigger nvim-telescope/telescope.nvim's lazy load above?
+        action = "Telescope zoxide list",
         desc = " Zoxide",
         icon = " ",
         key = "z",
