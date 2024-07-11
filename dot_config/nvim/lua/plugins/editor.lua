@@ -45,6 +45,7 @@ return {
       return vim.list_extend(mappings, keys)
     end,
     opts = {
+      close_if_last_window = true, -- close Neo-tree if it is the last window left in the tab
       window = {
         mappings = {
           ["-"] = "close_window", -- toggle neo-tree, work with `-` defined in `keys` above
@@ -164,7 +165,31 @@ return {
   {
     "max397574/better-escape.nvim",
     event = "VeryLazy",
-    opts = {},
+    opts = {
+      -- note: lazygit, fzf-lua use terminal mode, `jj` and `jk` make lazygit navigation harder
+      default_mappings = false,
+      mappings = {
+        i = {
+          j = {
+            -- these can all also be functions
+            k = "<Esc>",
+            j = "<Esc>",
+          },
+          k = {
+            j = "<Esc>",
+          },
+        },
+        c = {
+          j = {
+            k = "<Esc>",
+            j = "<Esc>",
+          },
+          k = {
+            j = "<Esc>",
+          },
+        },
+      },
+    },
   },
 
   -- TODO choose motion plugin between: flash, leap, hop
