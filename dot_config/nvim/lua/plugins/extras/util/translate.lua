@@ -60,7 +60,7 @@ return {
               -- "definition", -- 英文注释
               "exchange", -- 词形变化
               "pos", -- 词性
-              "tag",
+              -- "tag",
             },
             -- youdao = {
             --   "title",

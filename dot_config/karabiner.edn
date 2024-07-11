@@ -1687,7 +1687,7 @@
 
   {:des   "WPSOffice: paste without formatting"
    :rules [:WPSOffice
-           [:!Qv :!COSv] ; 粘贴剪贴板内容并匹配周围文本的格式
+           [:!Cv :!COSv] ; 粘贴剪贴板内容并匹配周围文本的格式
            ]}
 
   {:des   "Spotify: play navigation"
