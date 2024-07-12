@@ -65,21 +65,21 @@ local pick = function()
   -- ~/.local/share/nvim/lazy/telescope-zoxide/lua/telescope/_extensions/zoxide/list.lua
   telescope.extensions.zoxide.list({
     -- layout_config = { width = 0.5, height = 0.7 }, -- without previewer
-    layout_config = {
-      horizontal = {
-        preview_width = function(_, cols, _)
-          if cols < 150 then
-            return math.floor(cols * 0.4)
-          else
-            return math.floor(cols * 0.5)
-          end
-        end,
-      },
-      width = 0.8,
-      height = 0.8,
-    }, -- with previewer                                                                                                │
+    -- layout_config = {
+    --   horizontal = {
+    --     preview_width = function(_, cols, _)
+    --       if cols < 150 then
+    --         return math.floor(cols * 0.4)
+    --       else
+    --         return math.floor(cols * 0.5)
+    --       end
+    --     end,
+    --   },
+    --   width = 0.8,
+    --   height = 0.8,
+    -- }, -- with previewer                                                                                                │
+    -- previewer = previewers.vim_buffer_cat.new({}),
     previewer = tree_previewer,
-    -- TODO replace home directory with `~` (`path_display` not working)
   })
 end
 
@@ -91,7 +91,9 @@ return {
   {
     "nvim-telescope/telescope.nvim",
     optional = true,
-    dependencies = { "jvgrootveld/telescope-zoxide" },
+    -- dependencies = { "jvgrootveld/telescope-zoxide" },
+    -- dependencies = { "gczcn/telescope-zoxide" },
+    dependencies = { "qw457812/telescope-zoxide" },
     keys = {
       { "<leader>fz", pick, desc = "Zoxide" },
     },
