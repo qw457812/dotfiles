@@ -84,6 +84,7 @@ local pick = function()
 end
 
 -- https://github.com/Matt-FTW/dotfiles/blob/dd62c1c26ef480bb58a13de971e8418ec7181010/.config/nvim/lua/plugins/extras/editor/telescope/zoxide.lua
+-- https://github.com/jvgrootveld/telescope-zoxide/issues/4#issuecomment-877110133
 return {
   -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/editor/telescope.lua
   -- https://github.com/craftzdog/dotfiles-public/blob/master/.config/nvim/lua/plugins/editor.lua
@@ -103,6 +104,9 @@ return {
             default = {
               action = function(selection)
                 vim.cmd.cd(selection.path)
+                -- https://github.com/jvgrootveld/telescope-zoxide/issues/23
+                -- alternative: https://github.com/jvgrootveld/telescope-zoxide/issues/21#issuecomment-1506606584
+                vim.fn.system({ "zoxide", "add", selection.path })
               end,
               after_action = function(selection)
                 LazyVim.info(
