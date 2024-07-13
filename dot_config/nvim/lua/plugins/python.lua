@@ -14,9 +14,6 @@ return {
     dependencies = {
       { "nvim-telescope/telescope.nvim", dependencies = { "nvim-lua/plenary.nvim" } },
     },
-    -- https://github.com/linux-cultist/venv-selector.nvim/tree/regexp?tab=readme-ov-file#your-own-anaconda-search
-    -- https://github.com/Spreadprism/nvim/blob/c0f60a5dac485651e7a8005155c42ea6fb8b3069/lua/plugins/lsp.lua#L27
-    -- https://github.com/popshia/nvim/blob/0b1567719e2b2cfed0e96d67c804e1379ced9a76/lua/user/plugins/venv-selector.lua#L22
     opts = {
       settings = {
         options = {
@@ -24,17 +21,6 @@ return {
           on_telescope_result_callback = function(filename)
             return require("util.path").replace_home_with_tilde(filename):gsub("/bin/python", "")
           end,
-        },
-        search = {
-          -- see: ~/.local/share/nvim/lazy/venv-selector.nvim/lua/venv-selector/config.lua
-          anaconda_envs = {
-            command = "$FD 'bin/python$' ~/miniconda3/envs --full-path --color never -E /proc",
-            type = "anaconda",
-          },
-          anaconda_base = {
-            command = "$FD '/python$' ~/miniconda3/bin --full-path --color never -E /proc",
-            type = "anaconda",
-          },
         },
       },
     },
