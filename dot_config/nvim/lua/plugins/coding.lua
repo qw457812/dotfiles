@@ -93,8 +93,8 @@ return {
   {
     "folke/which-key.nvim",
     opts = {
-      defaults = {
-        ["m"] = { name = "+match/surround" },
+      spec = {
+        { "m", group = "match/surround" },
       },
     },
   },
