@@ -87,3 +87,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] Bind `<leader>ua` to toggle `mini.animate`.
 - [ ] [mini.bracketed](https://github.com/echasnovski/mini.bracketed)
 - [ ] [flatten.nvim](https://github.com/willothy/flatten.nvim) like [amaanq](https://github.com/amaanq/nvim-config/blob/master/lua/plugins/editor.lua)
+- [ ] `which-key v3` problem with `mini.surround`/`mini.operators`/Helix-style mappings(map `mm` to `%`):
+  - Timeout is too short, e.g. time window between `c` and `r` for `cr`.
+    - Benefit: I can use `m` marks by typing `mm` slowly now.
+  - No popup in normal mode anymore, e.g. `cr`/`ms`.
