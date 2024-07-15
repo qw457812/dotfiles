@@ -94,7 +94,10 @@ return {
     "folke/which-key.nvim",
     opts = {
       spec = {
-        { "m", group = "match/surround" },
+        {
+          mode = { "n", "v" },
+          { "m", group = "match/surround" },
+        },
       },
     },
   },

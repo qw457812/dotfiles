@@ -133,7 +133,7 @@ return {
           transformed_path = truncate(transformed_path, opts.__length - opts.__prefix, nil, -1)
           -- filename_first style
           local tail = require("telescope.utils").path_tail(path)
-          -- highlight group: Comment, TelescopeResultsComment, Constant
+          -- highlight group: Comment, TelescopeResultsComment, Constant, TelescopeResultsNumber
           local path_style = {
             { { 0, #transformed_path - #tail }, "Comment" },
             -- { { #transformed_path - #tail, #transformed_path }, "Constant" },

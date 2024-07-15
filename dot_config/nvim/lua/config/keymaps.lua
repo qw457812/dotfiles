@@ -142,7 +142,8 @@ local function google_search(input)
   local query = input or vim.fn.expand("<cword>")
   LazyUtil.open("https://www.google.com/search?q=" .. query)
 end
-map("n", "<leader>?", google_search, { desc = "Google Search Current Word" })
+-- conflict with "Buffer Local Keymaps (which-key)" defined in ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/editor.lua
+-- map("n", "<leader>?", google_search, { desc = "Google Search Current Word" })
 map("x", "<leader>?", function()
   local g_orig = vim.fn.getreg("g")
   vim.cmd([[silent! normal! "gy]])

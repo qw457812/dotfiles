@@ -33,13 +33,14 @@ local tree_previewer = previewers.new_termopen_previewer({
       return
     end
     local command
+    local ignore_glob = ".DS_Store|.git|.svn|.idea|.vscode|node_modules"
     if vim.fn.executable("eza") == 1 then
       command = {
         "eza",
         "--all",
         "--level=2",
         "--group-directories-first",
-        "--ignore-glob=.DS_Store|.git|.svn|.idea|.vscode",
+        "--ignore-glob=" .. ignore_glob,
         "--git-ignore",
         "--tree",
         "--color=always",
@@ -53,7 +54,7 @@ local tree_previewer = previewers.new_termopen_previewer({
         "--no-user",
       }
     else
-      command = { "tree", "-a", "-L", "2", "-I", ".DS_Store|.git|.svn|.idea|.vscode", "-C", "--dirsfirst" }
+      command = { "tree", "-a", "-L", "2", "-I", ignore_glob, "-C", "--dirsfirst" }
     end
     return utils.flatten({ command, "--", utils.path_expand(p) })
   end,
@@ -92,8 +93,7 @@ return {
     "nvim-telescope/telescope.nvim",
     optional = true,
     -- dependencies = { "jvgrootveld/telescope-zoxide" },
-    -- dependencies = { "gczcn/telescope-zoxide" },
-    dependencies = { "qw457812/telescope-zoxide" },
+    dependencies = { "qw457812/telescope-zoxide" }, -- fork without breaking change
     keys = {
       { "<leader>fz", pick, desc = "Zoxide" },
     },
@@ -102,6 +102,7 @@ return {
       opts.extensions = {
         zoxide = {
           prompt_title = "Zoxide",
+          -- show_score = false, -- fork only
           mappings = {
             default = {
               action = function(selection)
@@ -132,10 +133,10 @@ return {
     "goolord/alpha-nvim",
     optional = true,
     opts = function(_, dashboard)
-      local button = dashboard.button("z", " " .. " Zoxide", pick)
+      local button = dashboard.button("z", " " .. " Zoxide", "<cmd> Telescope zoxide list <cr>")
       button.opts.hl = "AlphaButtons"
       button.opts.hl_shortcut = "AlphaShortcut"
-      table.insert(dashboard.section.buttons.val, 11, button)
+      table.insert(dashboard.section.buttons.val, 10, button)
     end,
   },
 
@@ -146,7 +147,7 @@ return {
       local items = {
         {
           name = "Zoxide",
-          action = pick,
+          action = "Telescope zoxide list",
           section = string.rep(" ", 22) .. "Telescope",
         },
       }
@@ -159,7 +160,6 @@ return {
     optional = true,
     opts = function(_, opts)
       local zoxide = {
-        -- action = pick, -- TODO How to trigger nvim-telescope/telescope.nvim's lazy load above?
         action = "Telescope zoxide list",
         desc = " Zoxide",
         icon = " ",
