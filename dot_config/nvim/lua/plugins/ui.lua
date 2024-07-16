@@ -45,22 +45,46 @@ return {
         desc = "Zen Mode (Twilight)",
       },
     },
-    opts = {
-      plugins = {
-        gitsigns = true,
-        tmux = true,
-        neovide = { enabled = true, scale = 1 },
-        kitty = { enabled = false, font = "+2" },
-        alacritty = { enabled = false, font = "14" },
-        twilight = { enabled = false },
-      },
-      on_open = function()
-        vim.env.NVIM_USER_ZEN_MODE_ON = 1
-      end,
-      on_close = function()
-        vim.env.NVIM_USER_ZEN_MODE_ON = nil
-      end,
-    },
+    opts = function()
+      local zen_mode_group = vim.api.nvim_create_augroup("zen_mode_tmux_status", { clear = true })
+      return {
+        plugins = {
+          gitsigns = true,
+          tmux = true,
+          neovide = { enabled = true, scale = 1 },
+          kitty = { enabled = false, font = "+2" },
+          alacritty = { enabled = false, font = "14" },
+          twilight = { enabled = false },
+        },
+        -- https://github.com/TranThangBin/init.lua/blob/3a357269ecbcb88d2a8b727cb1820541194f3283/lua/tranquangthang/lazy/zen-mode.lua#L39
+        -- https://github.com/folke/zen-mode.nvim/blob/a31cf7113db34646ca320f8c2df22cf1fbfc6f2a/lua/zen-mode/plugins.lua#L96
+        on_open = function()
+          vim.env.NVIM_USER_ZEN_MODE_ON = 1
+          vim.api.nvim_create_autocmd({ "FocusLost", "VimSuspend" }, {
+            group = zen_mode_group,
+            desc = "show tmux status line on neovim focus lost",
+            callback = function()
+              if vim.env.TMUX then
+                vim.fn.system([[tmux set status on]])
+              end
+            end,
+          })
+          vim.api.nvim_create_autocmd({ "FocusGained", "VimResume" }, {
+            group = zen_mode_group,
+            desc = "hide tmux status line on neovim focus gained",
+            callback = function()
+              if vim.env.TMUX then
+                vim.fn.system([[tmux set status off]])
+              end
+            end,
+          })
+        end,
+        on_close = function()
+          vim.env.NVIM_USER_ZEN_MODE_ON = nil
+          vim.api.nvim_clear_autocmds({ group = zen_mode_group })
+        end,
+      }
+    end,
     config = function(_, opts)
       require("zen-mode").setup(opts)
       -- https://github.com/folke/zen-mode.nvim/issues/111
