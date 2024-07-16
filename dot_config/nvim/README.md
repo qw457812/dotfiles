@@ -91,3 +91,4 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
   - Timeout is too short, e.g. time window between `c` and `r` for `cr`.
     - Benefit: I can use `m` marks by typing `mm` slowly now.
   - No popup in normal mode anymore, e.g. `cr`/`ms`.
+  - How to map `Operator to EoL` for `mini.operators`? `vim.keymap.set("n", "cR", "cr$", { desc = "Replace to EoL", remap = true })` doesn't work.
