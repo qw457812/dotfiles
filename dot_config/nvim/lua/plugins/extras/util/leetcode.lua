@@ -30,7 +30,6 @@ return {
       },
     },
     keys = {
-      { "<leader>L", "", desc = "+leetcode" },
       { "<leader>Lq", "<cmd>Leet tabs<cr>", desc = "Tabs" },
       { "<leader>Lm", "<cmd>Leet menu<cr>", desc = "Menu" },
       { "<leader>Lc", "<cmd>Leet console<cr>", desc = "Console" },
@@ -101,6 +100,14 @@ return {
       })
     end,
   },
+  {
+    "folke/which-key.nvim",
+    opts = {
+      spec = {
+        { "<leader>L", group = "leetcode" },
+      },
+    },
+  },
 
   {
     "nvimdev/dashboard-nvim",
@@ -109,7 +116,7 @@ return {
       local leetcode = {
         action = "Leet",
         desc = " LeetCode",
-        icon = " ", -- " "
+        icon = " ", -- " ", " "
         key = "e",
       }
 
