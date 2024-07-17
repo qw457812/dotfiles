@@ -11,9 +11,7 @@ return {
     -- TODO temp fix: venv-selector does not work with extras.editor.fzf
     -- https://github.com/LazyVim/LazyVim/issues/3612
     -- https://github.com/linux-cultist/venv-selector.nvim/issues/142
-    dependencies = {
-      { "nvim-telescope/telescope.nvim", dependencies = { "nvim-lua/plenary.nvim" } },
-    },
+    dependencies = { "nvim-telescope/telescope.nvim" },
     opts = {
       settings = {
         options = {
@@ -50,6 +48,7 @@ return {
       if LazyVim.has_extra("formatting.black") then
         opts.formatters_by_ft = opts.formatters_by_ft or {}
         -- run multiple formatters sequentially
+        -- TODO ruff_format? | https://github.com/fredrikaverpil/dotfiles/blob/be037d3e442b25d356f0bdd18ac2a17c346d71aa/nvim-fredrik/lua/lang/python.lua#L156
         opts.formatters_by_ft.python = { "isort", "black" }
       end
     end,
@@ -64,4 +63,15 @@ return {
   --     vim.list_extend(opts.ensure_installed, { "debugpy" })
   --   end,
   -- },
+  --
+  -- TODO or add debugpy to both jay-babu/mason-nvim-dap.nvim and williamboman/mason.nvim?
+  -- https://github.com/fredrikaverpil/dotfiles/blob/be037d3e442b25d356f0bdd18ac2a17c346d71aa/nvim-fredrik/lua/lang/python.lua#L274
+  --
+  -- TODO get the debugpy path from $VIRTUAL_ENV, then fallback to mason?
+  -- https://github.com/fredrikaverpil/dotfiles/blob/be037d3e442b25d356f0bdd18ac2a17c346d71aa/nvim-fredrik/lua/lang/python.lua#L32
+  -- https://github.com/LazyVim/LazyVim/pull/1031#discussion_r1251566896
+
+  -- TODO mfussenegger/nvim-lint: mypy?
+  -- https://github.com/akthe-at/.dotfiles/blob/49beab5ec32659fba8f3b0c5ca3a6f75cc7a7d8a/nvim/lua/plugins/lint.lua
+  -- https://github.com/fredrikaverpil/dotfiles/blob/be037d3e442b25d356f0bdd18ac2a17c346d71aa/nvim-fredrik/lua/lang/python.lua#L177
 }

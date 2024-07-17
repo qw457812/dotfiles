@@ -12,14 +12,14 @@ return {
         --   sidebars = "transparent",
         --   floats = "transparent",
         -- },
-        sidebars = {
-          "qf",
-          "vista_kind",
-          -- "terminal",
-          "spectre_panel",
-          "startuptime",
-          "Outline",
-        },
+        -- sidebars = {
+        --   "qf",
+        --   "vista_kind",
+        --   -- "terminal",
+        --   "spectre_panel",
+        --   "startuptime",
+        --   "Outline",
+        -- },
         -- ~/.local/share/nvim/lazy/tokyonight.nvim/extras/lua/tokyonight_moon.lua
         on_highlights = function(hl, c)
           -- highlight word/references under cursor

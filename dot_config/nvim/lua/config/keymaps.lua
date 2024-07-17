@@ -79,10 +79,8 @@ map({ "n", "x", "o" }, "mm", "%", { desc = "Goto matching bracket" })
 map("n", "<leader>.", function() LazyVim.terminal(nil, { cwd = vim.fn.expand("%:p:h") }) end, { desc = "Terminal (Buffer Dir)" })
 
 -- windows
-map("n", "<leader>wo", "<C-W>o", { desc = "Close Other Windows", remap = true })
 -- https://github.com/gpakosz/.tmux/blob/9cf49731cd785b76cf792046feed0e8275457918/.tmux.conf#L74
 map("n", "<leader>_", "<C-W>v", { desc = "Split Window Right", remap = true })
-map("n", "<leader>w_", "<C-W>v", { desc = "Split Window Right", remap = true })
 
 if LazyVim.has("tmux.nvim") then
   -- Move to window

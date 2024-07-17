@@ -9,6 +9,9 @@ opt.relativenumber = false
 opt.backup = true
 opt.backupdir = vim.fn.stdpath("state") .. "/backup"
 
+vim.g.lazyvim_python_lsp = "basedpyright"
+vim.g.lazyvim_python_ruff = "ruff"
+
 -- https://neovide.dev/configuration.html
 if vim.g.neovide then
   vim.g.neovide_hide_mouse_when_typing = true
