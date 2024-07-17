@@ -46,8 +46,7 @@ return {
       },
     },
     opts = function()
-      local zen_mode_group = vim.api.nvim_create_augroup("zen_mode_tmux_status", { clear = true })
-      return {
+      local opts = {
         plugins = {
           gitsigns = true,
           tmux = true,
@@ -56,46 +55,60 @@ return {
           alacritty = { enabled = false, font = "14" },
           twilight = { enabled = false },
         },
-        -- https://github.com/TranThangBin/init.lua/blob/3a357269ecbcb88d2a8b727cb1820541194f3283/lua/tranquangthang/lazy/zen-mode.lua#L39
-        -- https://github.com/folke/zen-mode.nvim/blob/a31cf7113db34646ca320f8c2df22cf1fbfc6f2a/lua/zen-mode/plugins.lua#L96
-        on_open = function()
-          vim.env.NVIM_USER_ZEN_MODE_ON = 1
-          vim.api.nvim_create_autocmd({ "FocusLost", "VimSuspend" }, {
-            group = zen_mode_group,
-            desc = "show tmux status line on neovim focus lost",
-            callback = function()
-              if vim.env.TMUX then
-                vim.fn.system([[tmux set status on]])
-              end
-            end,
-          })
-          vim.api.nvim_create_autocmd({ "FocusGained", "VimResume" }, {
-            group = zen_mode_group,
-            desc = "hide tmux status line on neovim focus gained",
-            callback = function()
-              if vim.env.TMUX then
-                vim.fn.system([[tmux set status off]])
-              end
-            end,
-          })
-        end,
-        on_close = function()
-          vim.env.NVIM_USER_ZEN_MODE_ON = nil
-          vim.api.nvim_clear_autocmds({ group = zen_mode_group })
-        end,
       }
+      if not vim.env.TMUX then
+        return opts
+      end
+
+      -- https://github.com/folke/zen-mode.nvim/blob/a31cf7113db34646ca320f8c2df22cf1fbfc6f2a/lua/zen-mode/plugins.lua#L96
+      local function get_tmux_opt(option)
+        local option_raw = vim.fn.system([[tmux show -w ]] .. option)
+        if option_raw == "" then
+          option_raw = vim.fn.system([[tmux show -g ]] .. option)
+        end
+        local opt = vim.split(vim.trim(option_raw), " ")[2]
+        return opt
+      end
+      local tmux_status = get_tmux_opt("status")
+      local group = vim.api.nvim_create_augroup("zen_mode_tmux", { clear = true })
+      -- https://github.com/TranThangBin/init.lua/blob/3a357269ecbcb88d2a8b727cb1820541194f3283/lua/tranquangthang/lazy/zen-mode.lua#L39
+      opts.on_open = function()
+        vim.env.NVIM_USER_ZEN_MODE_ON = 1
+        -- restore tmux status line when switching to another tmux window or ctrl-z
+        vim.api.nvim_create_autocmd({ "FocusLost", "VimSuspend" }, {
+          group = group,
+          desc = "Restore tmux status line on Neovim Focus Lost",
+          callback = function()
+            vim.fn.system(string.format([[tmux set status %s]], tmux_status))
+          end,
+        })
+        vim.api.nvim_create_autocmd({ "FocusGained", "VimResume" }, {
+          group = group,
+          desc = "Hide tmux status line on Neovim Focus Gained",
+          callback = function()
+            vim.fn.system([[tmux set status off]])
+          end,
+        })
+      end
+      opts.on_close = function()
+        vim.env.NVIM_USER_ZEN_MODE_ON = nil
+        vim.api.nvim_clear_autocmds({ group = group })
+      end
+      return opts
     end,
     config = function(_, opts)
       require("zen-mode").setup(opts)
-      -- https://github.com/folke/zen-mode.nvim/issues/111
-      vim.api.nvim_create_autocmd({ "VimLeavePre" }, {
-        desc = "Restore tmux status line when close Neovim in Zen Mode",
-        callback = function()
-          if vim.env.NVIM_USER_ZEN_MODE_ON then
-            require("zen-mode").close()
-          end
-        end,
-      })
+      if vim.env.TMUX then
+        -- https://github.com/folke/zen-mode.nvim/issues/111
+        vim.api.nvim_create_autocmd({ "VimLeavePre" }, {
+          desc = "Restore tmux status line when close Neovim in Zen Mode",
+          callback = function()
+            if vim.env.NVIM_USER_ZEN_MODE_ON then
+              require("zen-mode").close()
+            end
+          end,
+        })
+      end
     end,
   },
 
