@@ -3,7 +3,7 @@ return {
   {
     "aserowy/tmux.nvim",
     event = "VeryLazy",
-    enabled = function()
+    cond = function()
       return vim.env.TMUX ~= nil
     end,
     opts = {
