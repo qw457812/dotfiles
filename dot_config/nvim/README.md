@@ -85,6 +85,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] Dashboard logo like [shxfee](https://github.com/shxfee/dotfiles/blob/067e65a3bb43c0646d117a6eac16f862b03a82d6/nvim/lua/shxfee/plugins/temp.lua#L166).
 - [ ] [symbol-usage.nvim](https://github.com/Wansmer/symbol-usage.nvim) like [jellydn](https://github.com/jellydn/lazy-nvim-ide/blob/main/lua/plugins/lsp.lua)
 - [ ] [undotree](https://github.com/mbbill/undotree) like [jellydn](https://github.com/jellydn/lazy-nvim-ide/blob/main/lua/plugins/undotree.lua)
+  - [telescope-undo.nvim](https://github.com/debugloop/telescope-undo.nvim) like [Nv](https://github.com/appelgriebsch/Nv/blob/56b0ff93056d031666049c9a0d0b5f7b5c36b958/lua/plugins/extras/editor/undo-mode.lua) and [Matt-FTW](https://github.com/Matt-FTW/dotfiles/blob/9c7bd1b3737e3ced5bd97e6df803eaecb7692451/.config/nvim/lua/plugins/extras/editor/telescope/undotree.lua)
 - [ ] Check this [copilot-chat-v2-fzf.lua](https://github.com/jellydn/lazy-nvim-ide/blob/main/lua/plugins/extras/copilot-chat-v2-fzf.lua).
 - [ ] Bind `<leader>ua` to toggle `mini.animate`.
 - [ ] [mini.bracketed](https://github.com/echasnovski/mini.bracketed)
@@ -95,3 +96,5 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
   - No popup in normal mode anymore, e.g. `cr`/`ms`.
   - How to map `Operator to EoL` for `mini.operators`? `vim.keymap.set("n", "cR", "cr$", { desc = "Replace to EoL", remap = true })` doesn't work.
 - [ ] [benlubas/molten-nvim](https://github.com/benlubas/molten-nvim) for jupyter
+- [ ] [grug-far.nvim](https://github.com/MagicDuck/grug-far.nvim)
+  > [b1a4740](https://github.com/LazyVim/LazyVim/commit/b1a4740) feat(edgy): added support for grug-far.nvim

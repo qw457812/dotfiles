@@ -42,6 +42,7 @@
     "lazyvim.plugins.extras.vscode",
     "plugins.extras.editor.mini-operators",
     "plugins.extras.editor.oil",
+    "plugins.extras.editor.undotree",
     "plugins.extras.util.leetcode",
     "plugins.extras.util.tmux",
     "plugins.extras.util.translate",
