@@ -81,51 +81,11 @@ end
 return {
   -- https://github.com/LazyVim/LazyVim/issues/283#issuecomment-1433352997
   -- https://github.com/craftzdog/dotfiles-public/blob/master/.config/nvim/lua/plugins/editor.lua
-  -- {
-  --   "nvim-telescope/telescope.nvim",
-  --   optional = true,
-  --   -- dependencies = { "jvgrootveld/telescope-zoxide" },
-  --   dependencies = { "qw457812/telescope-zoxide" }, -- fork without breaking changes
-  --   keys = {
-  --     { "<leader>fz", pick, desc = "Zoxide" },
-  --   },
-  --   opts = {
-  --     extensions = {
-  --       zoxide = {
-  --         prompt_title = "Zoxide",
-  --         -- show_score = false, -- fork only
-  --         mappings = {
-  --           default = {
-  --             action = function(selection)
-  --               vim.cmd.cd(selection.path)
-  --               -- https://github.com/jvgrootveld/telescope-zoxide/issues/23
-  --               -- alternative: https://github.com/jvgrootveld/telescope-zoxide/issues/21#issuecomment-1506606584
-  --               vim.fn.system({ "zoxide", "add", selection.path })
-  --             end,
-  --             after_action = function(selection)
-  --               LazyVim.info(
-  --                 "Directory changed to " .. require("util.path").replace_home_with_tilde(selection.path),
-  --                 { title = "Zoxide" }
-  --               )
-  --               -- vim.cmd.edit(selection.path)
-  --               -- require("neo-tree.command").execute({ dir = selection.path })
-  --               require("telescope.builtin").find_files({ cwd = selection.path })
-  --             end,
-  --           },
-  --         },
-  --       },
-  --     },
-  --   },
-  --   config = function(_, opts)
-  --     require("telescope").setup(opts)
-  --     require("telescope").load_extension("zoxide")
-  --   end,
-  -- },
-
   {
-    -- "jvgrootveld/telescope-zoxide",
-    "qw457812/telescope-zoxide", -- fork without breaking change
-    dependencies = { "nvim-telescope/telescope.nvim" },
+    "nvim-telescope/telescope.nvim",
+    optional = true,
+    -- dependencies = { "jvgrootveld/telescope-zoxide" },
+    dependencies = { "qw457812/telescope-zoxide" }, -- fork without breaking changes
     keys = {
       { "<leader>fz", pick, desc = "Zoxide" },
     },
@@ -157,10 +117,8 @@ return {
       },
     },
     config = function(_, opts)
-      LazyVim.on_load("telescope.nvim", function()
-        require("telescope").setup(opts)
-        require("telescope").load_extension("zoxide")
-      end)
+      require("telescope").setup(opts)
+      require("telescope").load_extension("zoxide")
     end,
   },
 
