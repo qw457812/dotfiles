@@ -15,25 +15,12 @@ return {
       local undo_actions = require("telescope-undo.actions")
 
       -- https://github.com/emmanueltouzery/nvim_config/blob/cac11a0bdc4ac2fb535189f18fe5cf07538e7810/init.lua#L162
-      -- local yank_additions_with_notify = function(...)
-      --   local base = undo_actions.yank_additions(...)
-      --   local function with_notify()
-      --     local lines = base()
-      --     if lines then
-      --       LazyVim.info("Copied " .. #lines .. " lines", { title = "Undo History" })
-      --     end
-      --     return lines
-      --   end
-      --   return with_notify
-      -- end
-
       ---@param undo_action fun(prompt_bufnr:number):fun():string[]?
       ---@return fun(prompt_bufnr:number):fun():string[]?
       local function notify_wrap(undo_action)
-        return function(...)
-          local args = vim.F.pack_len(...) -- prompt_bufnr
+        return function(prompt_bufnr)
           return function()
-            local lines = undo_action(vim.F.unpack_len(args))()
+            local lines = undo_action(prompt_bufnr)()
             if lines then
               LazyVim.info("Copied " .. #lines .. " lines", { title = "Undo History" })
             end
@@ -76,7 +63,6 @@ return {
               ["y"] = actions.nop,
               ["Y"] = actions.nop,
               ["u"] = actions.nop,
-              -- ["<cr>"] = yank_additions_with_notify,
               ["<cr>"] = notify_wrap(undo_actions.yank_additions),
               ["ya"] = notify_wrap(undo_actions.yank_additions),
               ["yd"] = notify_wrap(undo_actions.yank_deletions),
