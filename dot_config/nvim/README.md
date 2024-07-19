@@ -77,6 +77,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
   - Echasnovski's [vscode.lua](https://github.com/echasnovski/nvim/blob/master/src/vscode.lua).
 - [ ] Remove extras: coding.luasnip, editor.illuminate. (and editor.mini-files?)
 - [ ] [marks](https://github.com/rafi/vim-config#plugin-marks)
+- [ ] Try [smart-splits.nvim](https://github.com/mrjones2014/smart-splits.nvim) instead of tmux.nvim.
 - [ ] [lang/tmux](https://github.com/rafi/vim-config/blob/b9648dcdcc6674b707b963d8de902627fbc887c8/lua/rafi/plugins/extras/lang/tmux.lua)
 - [ ] [vim.g.maplocalleader = ","](https://github.com/wfxr/dotfiles/blob/661bfabf3b813fd8af79d881cd28b72582d4ccca/vim/nvim/lua/config/options.lua#L6) or `,,`, `,e` keymaps.
 - [ ] [rebelot/heirline.nvim](https://github.com/rebelot/heirline.nvim) like [dragove](https://github.com/dragove/dotfiles/blob/master/nvim/.config/nvim/lua/plugins/ui/heirline.lua)
