@@ -11,10 +11,9 @@ return {
       { "<leader>su", "<cmd>Telescope undo<cr>", desc = "Undo History" },
     },
     opts = function(_, opts)
-      local actions = require("telescope.actions")
       local undo_actions = require("telescope-undo.actions")
 
-      -- https://github.com/emmanueltouzery/nvim_config/blob/cac11a0bdc4ac2fb535189f18fe5cf07538e7810/init.lua#L162
+      --- https://github.com/emmanueltouzery/nvim_config/blob/cac11a0bdc4ac2fb535189f18fe5cf07538e7810/init.lua#L162
       ---@param undo_action fun(prompt_bufnr:number):fun():string[]?
       ---@return fun(prompt_bufnr:number):fun():string[]?
       local function notify_wrap(undo_action)
@@ -28,6 +27,8 @@ return {
           end
         end
       end
+      local yank_additions_with_notify = notify_wrap(undo_actions.yank_additions)
+      local yank_deletions_with_notify = notify_wrap(undo_actions.yank_deletions)
 
       opts.extensions = vim.tbl_deep_extend("force", opts.extensions or {}, {
         undo = {
@@ -50,23 +51,24 @@ return {
           mappings = {
             -- ~/.local/share/nvim/lazy/telescope-undo.nvim/lua/telescope/_extensions/undo.lua
             i = {
-              ["<S-cr>"] = actions.nop,
-              ["<C-cr>"] = actions.nop,
-              ["<C-y>"] = actions.nop,
-              ["<C-r>"] = actions.nop,
-              ["<cr>"] = notify_wrap(undo_actions.yank_additions),
-              ["<C-r>a"] = notify_wrap(undo_actions.yank_additions),
-              ["<C-r>d"] = notify_wrap(undo_actions.yank_deletions),
-              ["<C-r>r"] = notify_wrap(undo_actions.restore),
+              ["<S-cr>"] = false,
+              ["<C-cr>"] = false,
+              ["<C-y>"] = false,
+              ["<C-r>"] = false,
+              ["<cr>"] = yank_additions_with_notify,
+              ["<C-r>a"] = yank_additions_with_notify,
+              ["<C-r>d"] = yank_deletions_with_notify,
+              ["<C-r>r"] = undo_actions.restore,
             },
             n = {
-              ["y"] = actions.nop,
-              ["Y"] = actions.nop,
-              ["u"] = actions.nop,
-              ["<cr>"] = notify_wrap(undo_actions.yank_additions),
-              ["ya"] = notify_wrap(undo_actions.yank_additions),
-              ["yd"] = notify_wrap(undo_actions.yank_deletions),
-              ["gr"] = notify_wrap(undo_actions.restore),
+              -- alternative: ["y"] = require("telescope.actions").nop,
+              ["y"] = false,
+              ["Y"] = false,
+              ["u"] = false,
+              ["<cr>"] = yank_additions_with_notify,
+              ["ya"] = yank_additions_with_notify,
+              ["yd"] = yank_deletions_with_notify,
+              ["gr"] = undo_actions.restore,
             },
           },
         },

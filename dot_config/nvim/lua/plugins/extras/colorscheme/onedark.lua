@@ -1,7 +1,7 @@
 return {
   -- disable built-in themes
-  -- { "folke/tokyonight.nvim", enabled = false },
-  -- { "catppuccin/nvim", enabled = false },
+  { "folke/tokyonight.nvim", cond = false },
+  { "catppuccin/nvim", cond = false },
 
   -- add onedark
   {
