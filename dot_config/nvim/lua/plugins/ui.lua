@@ -46,6 +46,7 @@ return {
       },
     },
     opts = function()
+      local minianimate_disable = vim.g.minianimate_disable
       local opts = {
         window = { backdrop = 0.7 },
         plugins = {
@@ -56,6 +57,12 @@ return {
           alacritty = { enabled = false, font = "14" },
           twilight = { enabled = false },
         },
+        on_open = function()
+          vim.g.minianimate_disable = true
+        end,
+        on_close = function()
+          vim.g.minianimate_disable = minianimate_disable
+        end,
       }
       if not vim.env.TMUX then
         return opts
@@ -73,7 +80,9 @@ return {
       local tmux_status = get_tmux_opt("status")
       local group = vim.api.nvim_create_augroup("zen_mode_tmux", { clear = true })
       -- https://github.com/TranThangBin/init.lua/blob/3a357269ecbcb88d2a8b727cb1820541194f3283/lua/tranquangthang/lazy/zen-mode.lua#L39
+      local on_open = opts.on_open or function() end
       opts.on_open = function()
+        on_open()
         vim.env.NVIM_USER_ZEN_MODE_ON = 1
         -- restore tmux status line when switching to another tmux window or ctrl-z
         vim.api.nvim_create_autocmd({ "FocusLost", "VimSuspend" }, {
@@ -91,7 +100,9 @@ return {
           end,
         })
       end
+      local on_close = opts.on_close or function() end
       opts.on_close = function()
+        on_close()
         vim.env.NVIM_USER_ZEN_MODE_ON = nil
         vim.api.nvim_clear_autocmds({ group = group })
       end

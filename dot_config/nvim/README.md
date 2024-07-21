@@ -76,6 +76,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] Matt-FTW's [vscode.lua](https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/util/vscode.lua), and [search](https://github.com/search?q=repo%3AMatt-FTW%2Fdotfiles%20vscode%20%3D%20true&type=code) the `vscode = true` plugins.
   - Echasnovski's [vscode.lua](https://github.com/echasnovski/nvim/blob/master/src/vscode.lua).
 - [ ] Remove extras: coding.luasnip, editor.illuminate. (and editor.mini-files?)
+  > [Document highlights now use native lsp functionality by default](https://www.lazyvim.org/news).
 - [ ] [marks](https://github.com/rafi/vim-config#plugin-marks)
 - [ ] Try [smart-splits.nvim](https://github.com/mrjones2014/smart-splits.nvim) instead of tmux.nvim.
 - [ ] [lang/tmux](https://github.com/rafi/vim-config/blob/b9648dcdcc6674b707b963d8de902627fbc887c8/lua/rafi/plugins/extras/lang/tmux.lua)
