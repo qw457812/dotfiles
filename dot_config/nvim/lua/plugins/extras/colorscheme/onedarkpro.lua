@@ -2,8 +2,8 @@
 -- https://github.com/appelgriebsch/Nv/blob/e9a584090a69a8d691f5eb051e76016b65dfc0b7/lazyvim.json#L25
 return {
   -- disable built-in themes
-  -- { "folke/tokyonight.nvim", enabled = false },
-  -- { "catppuccin/nvim", enabled = false },
+  { "folke/tokyonight.nvim", cond = false },
+  { "catppuccin/nvim", cond = false },
 
   -- add onedarkpro
   {

@@ -366,7 +366,8 @@ alias lt='eza --tree --level=2'
 
 # https://github.com/jesseduffield/lazydocker
 alias lzd='lazydocker'
-alias lzg='lazygit'
+# alias lzg='lazygit'
+alias g='lazygit'
 
 # alias lg='leetgo'
 alias lc="nvim leetcode.nvim"

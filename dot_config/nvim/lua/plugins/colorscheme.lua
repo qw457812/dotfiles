@@ -28,10 +28,15 @@ return {
           -- #3760bf #7847bd #8552a1 #7e4c8b #731d8b
           -- #35717b #188092 #007197 #006a83 #265b75
           -- #5b6078 #585b70 #51576d #494d64 #45475a
-          local illuminate = "#51576d"
+          local ok, ucolors = pcall(require, "catppuccin.utils.colors")
+          local illuminate = ok and ucolors.darken("#585b70", 0.85, c.bg) or "#51576d"
           -- hl.IlluminatedWordText = { bg = "#3b4261" } -- use default
           hl.IlluminatedWordRead = { bg = illuminate }
           hl.IlluminatedWordWrite = { bg = illuminate, underline = true }
+          -- see `:h lsp-highlight`
+          -- hl.LspReferenceText = { bg = "#3b4261" } -- use default
+          hl.LspReferenceRead = { link = "IlluminatedWordRead" }
+          hl.LspReferenceWrite = { link = "IlluminatedWordWrite" }
           -- compensate for invisible text caused by custom illuminate highlight
           hl.CmpGhostText = { bg = c.bg, fg = "#444a73" }
           -- TODO unused variables with illuminate highlight can be unreadable

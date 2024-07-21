@@ -9,8 +9,8 @@ opt.relativenumber = false
 opt.backup = true
 opt.backupdir = vim.fn.stdpath("state") .. "/backup"
 
+-- Python LSP Server: use basedpyright instead of pyright
 vim.g.lazyvim_python_lsp = "basedpyright"
-vim.g.lazyvim_python_ruff = "ruff"
 
 -- https://neovide.dev/configuration.html
 if vim.g.neovide then
