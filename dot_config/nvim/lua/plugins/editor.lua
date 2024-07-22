@@ -148,7 +148,15 @@ return {
     },
   },
 
-  { "folke/which-key.nvim", opts = { preset = "modern" } },
+  -- {
+  --   "folke/which-key.nvim",
+  --   opts = {
+  --     -- preset = "modern",
+  --     -- win = {
+  --     --   no_overlap = false, -- don't allow the popup to overlap with the cursor
+  --     -- },
+  --   },
+  -- },
 
   -- {
   --   "RRethy/vim-illuminate",
