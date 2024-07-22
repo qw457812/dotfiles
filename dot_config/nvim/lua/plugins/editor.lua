@@ -7,6 +7,20 @@ return {
   {
     "nvim-neo-tree/neo-tree.nvim",
     keys = function(_, keys)
+      -- for holding layout like no-neck-pain.nvim when Auto Close is disabled
+      LazyVim.toggle.map("<leader>uz", {
+        name = "NeoTree Auto Close",
+        get = function()
+          return vim.env.NVIM_USER_NEO_TREE_AUTO_CLOSE ~= nil
+        end,
+        set = function(state)
+          vim.env.NVIM_USER_NEO_TREE_AUTO_CLOSE = state and 1 or nil
+          if state then
+            require("neo-tree.command").execute({ action = "close" })
+          end
+        end,
+      })
+
       local mappings = {
         --[[add custom keys here]]
       }
@@ -48,7 +62,18 @@ return {
       close_if_last_window = true, -- close Neo-tree if it is the last window left in the tab
       window = {
         mappings = {
-          ["-"] = "close_window", -- toggle neo-tree, work with `-` defined in `keys` above
+          ["-"] = {
+            function(state)
+              -- toggle neo-tree, work with `-` defined in `keys` above
+              if vim.env.NVIM_USER_NEO_TREE_AUTO_CLOSE then
+                -- alternative: require("neo-tree.sources.common.commands").close_window(state)
+                state.commands["close_window"](state)
+              else
+                vim.cmd("wincmd l")
+              end
+            end,
+            desc = "close_window / go to right window",
+          },
           ["<bs>"] = "none", -- use global mapping defined in keymaps.lua
           ["<tab>"] = {
             function(state)
@@ -139,9 +164,10 @@ return {
         {
           event = "file_opened",
           handler = function(file_path)
-            -- auto close on open file
-            -- TODO toggle auto close by keybinding, with [toggle "-" between close_window and show-without-focus] together, for holding layout like no-neck-pain.nvim sometimes
-            require("neo-tree.command").execute({ action = "close" })
+            if vim.env.NVIM_USER_NEO_TREE_AUTO_CLOSE then
+              -- auto close on open file
+              require("neo-tree.command").execute({ action = "close" })
+            end
           end,
         },
       },
