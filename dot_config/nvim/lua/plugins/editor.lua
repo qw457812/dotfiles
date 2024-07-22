@@ -11,10 +11,10 @@ return {
       LazyVim.toggle.map("<leader>uz", {
         name = "NeoTree Auto Close",
         get = function()
-          return vim.env.NVIM_USER_NEO_TREE_AUTO_CLOSE ~= nil
+          return vim.g.user_neotree_auto_close
         end,
         set = function(state)
-          vim.env.NVIM_USER_NEO_TREE_AUTO_CLOSE = state and 1 or nil
+          vim.g.user_neotree_auto_close = state
           if state then
             require("neo-tree.command").execute({ action = "close" })
           end
@@ -65,7 +65,7 @@ return {
           ["-"] = {
             function(state)
               -- toggle neo-tree, work with `-` defined in `keys` above
-              if vim.env.NVIM_USER_NEO_TREE_AUTO_CLOSE then
+              if vim.g.user_neotree_auto_close then
                 -- alternative: require("neo-tree.sources.common.commands").close_window(state)
                 state.commands["close_window"](state)
               else
@@ -164,7 +164,7 @@ return {
         {
           event = "file_opened",
           handler = function(file_path)
-            if vim.env.NVIM_USER_NEO_TREE_AUTO_CLOSE then
+            if vim.g.user_neotree_auto_close then
               -- auto close on open file
               require("neo-tree.command").execute({ action = "close" })
             end

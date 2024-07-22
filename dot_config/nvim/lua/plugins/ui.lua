@@ -46,7 +46,6 @@ return {
       },
     },
     opts = function()
-      local minianimate_disable = vim.g.minianimate_disable
       local opts = {
         window = { backdrop = 0.7 },
         plugins = {
@@ -57,11 +56,13 @@ return {
           alacritty = { enabled = false, font = "14" },
           twilight = { enabled = false },
         },
+        -- https://github.com/bleek42/dev-env-config-backup/blob/099eb0c4468a03bcafb6c010271818fe8a794816/src/Linux/config/nvim/lua/user/plugins/editor.lua#L27
         on_open = function()
+          vim.g.user_minianimate_disable_old = vim.g.minianimate_disable
           vim.g.minianimate_disable = true
         end,
         on_close = function()
-          vim.g.minianimate_disable = minianimate_disable
+          vim.g.minianimate_disable = vim.g.user_minianimate_disable_old
         end,
       }
       if not vim.env.TMUX then
@@ -83,7 +84,7 @@ return {
       local on_open = opts.on_open or function() end
       opts.on_open = function()
         on_open()
-        vim.env.NVIM_USER_ZEN_MODE_ON = 1
+        vim.g.user_zenmode_on = true
         -- restore tmux status line when switching to another tmux window or ctrl-z
         vim.api.nvim_create_autocmd({ "FocusLost", "VimSuspend" }, {
           group = group,
@@ -103,7 +104,7 @@ return {
       local on_close = opts.on_close or function() end
       opts.on_close = function()
         on_close()
-        vim.env.NVIM_USER_ZEN_MODE_ON = nil
+        vim.g.user_zenmode_on = false
         vim.api.nvim_clear_autocmds({ group = group })
       end
       return opts
@@ -115,7 +116,7 @@ return {
         vim.api.nvim_create_autocmd({ "VimLeavePre" }, {
           desc = "Restore tmux status line when close Neovim in Zen Mode",
           callback = function()
-            if vim.env.NVIM_USER_ZEN_MODE_ON then
+            if vim.g.user_zenmode_on then
               require("zen-mode").close()
             end
           end,
