@@ -32,24 +32,25 @@ vim.api.nvim_create_autocmd("BufWritePre", {
   end,
 })
 
--- disable LazyVim's auto command for wrap and spell checking
+-- disable LazyVim's auto command for wrap
 -- see: ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/config/autocmds.lua
 -- https://github.com/LazyVim/LazyVim/issues/3692
+-- alternative: vim.api.nvim_del_augroup_by_name("lazyvim_wrap_spell")
 vim.api.nvim_clear_autocmds({ group = "lazyvim_wrap_spell" })
--- vim.api.nvim_del_augroup_by_name("lazyvim_wrap_spell") -- works too
 -- create my own
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "gitcommit" },
+  pattern = { "text", "plaintex", "typst", "gitcommit", "markdown" },
   callback = function()
     vim.opt_local.spell = true
   end,
 })
 
--- close some filetypes with <q>
--- https://github.com/appelgriebsch/Nv/blob/main/lua/config/autocmds.lua
+-- -- close some filetypes with <q>
+-- -- https://github.com/appelgriebsch/Nv/blob/main/lua/config/autocmds.lua
 -- vim.api.nvim_create_autocmd("FileType", {
 --   pattern = {
 --     "dap-float",
+--     "httpResult",
 --   },
 --   callback = function(event)
 --     vim.bo[event.buf].buflisted = false
@@ -57,11 +58,11 @@ vim.api.nvim_create_autocmd("FileType", {
 --   end,
 -- })
 
--- disable the concealing in some file formats, the default conceallevel is 3 in LazyVim
--- https://github.com/craftzdog/dotfiles-public/blob/master/.config/nvim/lua/config/autocmds.lua
+-- -- disable the concealing in some file formats
+-- -- https://github.com/craftzdog/dotfiles-public/blob/master/.config/nvim/lua/config/autocmds.lua
 -- vim.api.nvim_create_autocmd("FileType", {
---   pattern = { "json", "jsonc", "markdown" },
+--   pattern = { "markdown" },
 --   callback = function()
---     vim.opt.conceallevel = 0
+--     vim.opt_local.conceallevel = 0
 --   end,
 -- })

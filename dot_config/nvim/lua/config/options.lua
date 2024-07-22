@@ -5,6 +5,8 @@
 local opt = vim.opt
 
 opt.relativenumber = false
+opt.spelllang = { "en", "cjk" } -- exclude East Asian characters from spell checking
+opt.timeoutlen = vim.g.vscode and 1000 or 500 -- increase timeoutlen for mini.operators (`cr` and `cR`) since which-key v3
 -- https://github.com/folke/dot/blob/master/nvim/lua/config/options.lua
 opt.backup = true
 opt.backupdir = vim.fn.stdpath("state") .. "/backup"

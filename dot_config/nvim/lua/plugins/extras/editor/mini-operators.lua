@@ -3,9 +3,16 @@ return {
     "echasnovski/mini.operators",
     event = "VeryLazy",
     vscode = true,
+    -- https://github.com/chrisgrieser/.config/blob/181def43f255a502670af318297289f4e8f49c83/nvim/lua/plugins/editing-support.lua#L108
+    keys = {
+      { "cR", "cr$", desc = "Replace to end of line", remap = true },
+      { "cX", "cx$", desc = "Exchange to end of line", remap = true },
+      { "cD", "cd$", desc = "Multiply to end of line", remap = true },
+    },
     -- https://github.com/echasnovski/mini.operators/blob/76ac9104d9773927053ea4eb12fc78ccbb5be813/doc/mini-operators.txt#L131
     opts = {
       -- gr (LazyVim use `gr` for lsp references, and `cr` for remote flash by default)
+      -- note: `vim.opt.timeoutlen` has increased from 300 to 500 for `cr` and `cR` since which-key v3
       replace = { prefix = "cr" }, -- Replace text with register
       -- gx
       exchange = { prefix = "cx" }, -- Exchange text regions
