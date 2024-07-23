@@ -4,6 +4,7 @@
 
 local Lazy = require("lazy")
 local LazyUtil = require("lazy.util")
+local replace_home = require("util.path").replace_home_with_tilde
 
 -- local map = vim.keymap.set
 -- local del = vim.keymap.del
@@ -119,13 +120,13 @@ map("x", "g/", "<esc>/\\%V", { desc = "Search Inside Visual Selection" })
 -- https://github.com/rstacruz/vimfiles/blob/ee9a3e7e7f022059b6d012eff2e88c95ae24ff97/lua/config/keymaps.lua#L35
 -- :let @+=expand('%:p')<cr>
 map("n", "<leader>fy", function()
-  local path = require("util.path").replace_home_with_tilde(vim.fn.expand("%:p"))
+  local path = replace_home(vim.fn.expand("%:p"))
   vim.fn.setreg("+", path)
   LazyVim.info("Copied path: " .. path)
 end, { desc = "Yank file path" })
 
 map("n", "<leader>fY", function()
-  local path = require("util.path").replace_home_with_tilde(vim.fn.expand("%:."))
+  local path = replace_home(vim.fn.expand("%:."))
   vim.fn.setreg("+", path)
   LazyVim.info("Copied path: " .. path)
 end, { desc = "Yank file path from project" })
