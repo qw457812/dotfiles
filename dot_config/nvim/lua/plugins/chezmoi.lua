@@ -4,33 +4,29 @@ if not LazyVim.has_extra("util.chezmoi") or vim.fn.executable("chezmoi") == 0 th
   return {}
 end
 
----@param target string
-local function chezmoi_edit(target)
-  require("chezmoi.commands").edit({ targets = { target } })
-end
-
 ---@param targets? string|string[]
----@return string[]
-local function chezmoi_list(targets)
-  return require("chezmoi.commands").list({
+local function fzf_chezmoi(targets)
+  local chezmoi = require("chezmoi.commands")
+  local results = chezmoi.list({
     targets = targets or {},
-    -- files only, do not include directories
     -- see: ~/.local/share/nvim/lazy/chezmoi.nvim/lua/telescope/_extensions/find_files.lua
-    args = { "--include", "files" },
+    args = { "--include", "files" }, -- exclude directories
   })
+  local opts = {
+    fzf_opts = {},
+    fzf_colors = true,
+    actions = {
+      ["default"] = function(selected)
+        if not vim.tbl_isempty(selected) then
+          chezmoi.edit({
+            targets = "~/" .. selected[1],
+          })
+        end
+      end,
+    },
+  }
+  require("fzf-lua").fzf_exec(results, opts)
 end
-
-local fzf_exec_opts = {
-  fzf_opts = {},
-  fzf_colors = true,
-  actions = {
-    ["default"] = function(selected)
-      if not vim.tbl_isempty(selected) then
-        chezmoi_edit("~/" .. selected[1])
-      end
-    end,
-  },
-}
 
 return {
   {
@@ -44,7 +40,7 @@ return {
           if LazyVim.pick.picker.name == "telescope" then
             require("telescope").extensions.chezmoi.find_files()
           elseif LazyVim.pick.picker.name == "fzf" then
-            require("fzf-lua").fzf_exec(chezmoi_list(), fzf_exec_opts)
+            fzf_chezmoi()
           end
         end,
         desc = "Find Chezmoi Source Dotfiles",
@@ -56,18 +52,21 @@ return {
           if LazyVim.pick.picker.name == "telescope" then
             local actions = require("telescope.actions")
             local action_state = require("telescope.actions.state")
+            local chezmoi = require("chezmoi.commands")
 
             -- https://github.com/nvim-telescope/telescope.nvim/wiki/Configuration-Recipes#performing-an-arbitrary-command-by-extending-existing-find_files-picker
             -- see: ~/.local/share/nvim/lazy/chezmoi.nvim/lua/telescope/_extensions/chezmoi.lua
             require("telescope.builtin").find_files({
-              prompt_title = "Config files",
+              prompt_title = "Config Files",
               cwd = config_dir,
-              attach_mappings = function(prompt_bufnr, map)
+              attach_mappings = function(prompt_bufnr)
                 local edit_action = function()
                   actions.close(prompt_bufnr)
                   local selection = action_state.get_selected_entry()
                   if selection then
-                    chezmoi_edit(config_dir .. "/" .. selection.value)
+                    chezmoi.edit({
+                      targets = config_dir .. "/" .. selection.value,
+                    })
                   end
                 end
 
@@ -76,7 +75,7 @@ return {
               end,
             })
           elseif LazyVim.pick.picker.name == "fzf" then
-            require("fzf-lua").fzf_exec(chezmoi_list(config_dir), fzf_exec_opts)
+            fzf_chezmoi(config_dir)
           end
         end,
         desc = "Find Config File",

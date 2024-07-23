@@ -223,7 +223,7 @@ export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 # `:help :Man` in nvim
 # outline via `gO`, copy via `y`
 # export MANPAGER='nvim +Man!'
-vman() {
+man() {
     # MANPAGER='nvim +Man!' man "$1"
     # alternative
     nvim "+hide Man $1"

@@ -48,7 +48,7 @@ return {
       if LazyVim.has_extra("formatting.black") then
         opts.formatters_by_ft = opts.formatters_by_ft or {}
         -- run multiple formatters sequentially
-        -- TODO ruff_format? | https://github.com/fredrikaverpil/dotfiles/blob/be037d3e442b25d356f0bdd18ac2a17c346d71aa/nvim-fredrik/lua/lang/python.lua#L156
+        -- TODO ruff_format, ruff_organize_imports, ruff_fix? | https://github.com/fredrikaverpil/dotfiles/blob/be037d3e442b25d356f0bdd18ac2a17c346d71aa/nvim-fredrik/lua/lang/python.lua#L156
         opts.formatters_by_ft.python = { "isort", "black" }
       end
     end,

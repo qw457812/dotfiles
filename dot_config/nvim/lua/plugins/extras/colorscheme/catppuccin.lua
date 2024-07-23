@@ -13,6 +13,8 @@ return {
         -- highlight word/references under cursor
         -- require lazyvim.plugins.extras.editor.illuminate
         -- https://github.com/RRethy/vim-illuminate#highlight-groups
+        -- https://github.com/aimuzov/LazyVimx/blob/af846de01acfaa78320d6564414c629e77d525e1/lua/lazyvimx/colorschemes/catppuccin.lua#L151
+        -- local illuminate = darken(colors.sapphire, 0.25, colors.base)
         -- colors.surface1(#45475a) #494d64 #51576d colors.surface2(#585b70)
         local illuminate = darken(colors.surface2, 0.8, colors.base)
         return {
