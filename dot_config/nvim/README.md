@@ -12,12 +12,15 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 
 ## Awesome LazyVim
 
-- [Popular Neovim Configurations using LazyVim by Dotfyle](https://dotfyle.com/neovim/configurations/top?plugins=LazyVim/LazyVim)
 - [folke](https://github.com/folke/dot/tree/master/nvim)
   > Author of LazyVim.
+- [Popular Neovim Configurations using LazyVim by Dotfyle](https://dotfyle.com/neovim/configurations/top?plugins=LazyVim/LazyVim)
 - [craftzdog](https://github.com/craftzdog/dotfiles-public/tree/master/.config/nvim)
 - [Nv](https://github.com/appelgriebsch/Nv)
   > Contributor of extras.lang.java.
+- [aimuzov](https://github.com/aimuzov/LazyVimx)
+  > Find from this [issue](https://github.com/LazyVim/LazyVim/pull/3503#issuecomment-2177573748), UI looks good.
+  - [lazyvim.json](https://github.com/aimuzov/dotfiles/blob/main/dot_config/nvim/lazyvim.json)
 - [Matt-FTW](https://github.com/Matt-FTW/dotfiles/tree/main/.config/nvim)
 - [amaanq](https://github.com/amaanq/nvim-config)
 - [ian-ie](https://github.com/ian-ie/LazyVim)
@@ -52,10 +55,12 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] Use my own plugins in LazyExtra like Nv's [plugins/extras/](https://github.com/appelgriebsch/Nv/tree/main/lua/plugins/extras) and [lazyvim.json](https://github.com/appelgriebsch/Nv/blob/main/lazyvim.json).
 - [ ] [Org Mode](https://github.com/topics/orgmode-nvim) in nvim, or neorg like [stevearc](https://github.com/stevearc/dotfiles/blob/eeb506f9afd32cd8cd9f2366110c76efaae5786c/.config/nvim/lua/plugins/neorg.lua).
 - [ ] [ChatGPT.nvim](https://github.com/jackMort/ChatGPT.nvim), eg. [AstroCommunity](https://github.com/AstroNvim/astrocommunity/tree/1f3a6ec008b404c72f84093fe25c574ba63fc256/lua/astrocommunity/editing-support/chatgpt-nvim), [Matt-FTW](https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/coding/ai/gpt.lua)
+- [ ] Check this [copilot-chat-v2-fzf.lua](https://github.com/jellydn/lazy-nvim-ide/blob/main/lua/plugins/extras/copilot-chat-v2-fzf.lua).
 - [ ] [Markdown.nvim](https://github.com/MeanderingProgrammer/markdown.nvim) or [markview.nvim](https://github.com/OXY2DEV/markview.nvim).
-- [ ] [Telescope-file-browser](https://github.com/nvim-telescope/telescope-file-browser.nvim), eg. [craftzdog](https://github.com/craftzdog/dotfiles-public/blob/master/.config/nvim/lua/plugins/editor.lua), [Matt-FTW](https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/editor/telescope/file-browser.lua)
+  > Mentioned by this [PR](https://github.com/LazyVim/LazyVim/pull/4139).
 - [ ] Choose a file browser between neo-tree, oil, mini-files, [others](https://github.com/rockerBOO/awesome-neovim#file-explorer).
-- [ ] Fix chezmoi not auto apply if file opened from mini-files.
+  - [Telescope-file-browser](https://github.com/nvim-telescope/telescope-file-browser.nvim), eg. [craftzdog](https://github.com/craftzdog/dotfiles-public/blob/master/.config/nvim/lua/plugins/editor.lua), [Matt-FTW](https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/editor/telescope/file-browser.lua)
+  - Fix chezmoi not auto apply if file opened from mini-files.
 - [ ] Terminal: fix zsh-vi-mode's cursor shape.
 - [ ] [Toggleterm](https://github.com/akinsho/toggleterm.nvim) by this [issue](https://github.com/LazyVim/LazyVim/issues/539).
 - [ ] Keybindings investigation:
@@ -75,8 +80,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] Check this [keymaps.lua](https://github.com/WillEhrendreich/nvimconfig/blob/7ab5b0d0ee485d58df3cc3e1f55c6446155f29a1/lua/config/keymaps.lua).
 - [ ] Matt-FTW's [vscode.lua](https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/util/vscode.lua), and [search](https://github.com/search?q=repo%3AMatt-FTW%2Fdotfiles%20vscode%20%3D%20true&type=code) the `vscode = true` plugins.
   - Echasnovski's [vscode.lua](https://github.com/echasnovski/nvim/blob/master/src/vscode.lua).
-- [ ] Remove extras: coding.luasnip, editor.illuminate. (and editor.mini-files?)
-  > [Document highlights now use native lsp functionality by default](https://www.lazyvim.org/news).
+- [ ] Remove extras: coding.luasnip. (and editor.mini-files?)
 - [ ] [marks](https://github.com/rafi/vim-config#plugin-marks)
 - [ ] Try [smart-splits.nvim](https://github.com/mrjones2014/smart-splits.nvim) instead of tmux.nvim.
 - [ ] [lang/tmux](https://github.com/rafi/vim-config/blob/b9648dcdcc6674b707b963d8de902627fbc887c8/lua/rafi/plugins/extras/lang/tmux.lua)
@@ -86,17 +90,37 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] `venv-selector.nvim`'s [on_venv_activate_callback](https://github.com/linux-cultist/venv-selector.nvim/tree/regexp?tab=readme-ov-file#run-your-own-code-on-venv-activation-on_venv_activate_callback) like [inogai](https://github.com/inogai/neovim-config-lazy/blob/50f68f6acc0cea283a0e89bddde6f9897680c749/lua/plugins/python.lua) with `toggleterm`
 - [ ] Dashboard logo like [shxfee](https://github.com/shxfee/dotfiles/blob/067e65a3bb43c0646d117a6eac16f862b03a82d6/nvim/lua/shxfee/plugins/temp.lua#L166).
 - [ ] [symbol-usage.nvim](https://github.com/Wansmer/symbol-usage.nvim) like [jellydn](https://github.com/jellydn/lazy-nvim-ide/blob/main/lua/plugins/lsp.lua)
-- [ ] [undotree](https://github.com/mbbill/undotree) like [jellydn](https://github.com/jellydn/lazy-nvim-ide/blob/main/lua/plugins/undotree.lua)
-  - [telescope-undo.nvim](https://github.com/debugloop/telescope-undo.nvim) like [Nv](https://github.com/appelgriebsch/Nv/blob/56b0ff93056d031666049c9a0d0b5f7b5c36b958/lua/plugins/extras/editor/undo-mode.lua) and [Matt-FTW](https://github.com/Matt-FTW/dotfiles/blob/9c7bd1b3737e3ced5bd97e6df803eaecb7692451/.config/nvim/lua/plugins/extras/editor/telescope/undotree.lua)
-- [ ] Check this [copilot-chat-v2-fzf.lua](https://github.com/jellydn/lazy-nvim-ide/blob/main/lua/plugins/extras/copilot-chat-v2-fzf.lua).
-- [ ] Bind `<leader>ua` to toggle `mini.animate`.
+- [ ] [telescope-undo.nvim](https://github.com/debugloop/telescope-undo.nvim) or [undotree](https://github.com/mbbill/undotree) like [jellydn](https://github.com/jellydn/lazy-nvim-ide/blob/main/lua/plugins/undotree.lua)
 - [ ] [mini.bracketed](https://github.com/echasnovski/mini.bracketed)
 - [ ] [flatten.nvim](https://github.com/willothy/flatten.nvim) like [amaanq](https://github.com/amaanq/nvim-config/blob/master/lua/plugins/editor.lua)
-- [ ] `which-key v3` problem with `mini.surround`/`mini.operators`/Helix-style mappings(map `mm` to `%`):
-  - Timeout is too short, e.g. time window between `c` and `r` for `cr`.
-    - Benefit: I can use `m` marks by typing `mm` slowly now.
-  - No popup in normal mode anymore, e.g. `cr`/`ms`.
-  - How to map `Operator to EoL` for `mini.operators`? `vim.keymap.set("n", "cR", "cr$", { desc = "Replace to EoL", remap = true })` doesn't work.
 - [ ] [benlubas/molten-nvim](https://github.com/benlubas/molten-nvim) for jupyter
-- [ ] [grug-far.nvim](https://github.com/MagicDuck/grug-far.nvim)
-  > [b1a4740](https://github.com/LazyVim/LazyVim/commit/b1a4740) feat(edgy): added support for grug-far.nvim
+- [ ] Add keybinding for `LspRestart` like [Matt-FTW](https://github.com/Matt-FTW/dotfiles/blob/b12af2bc28c89c7185c48d6b02fb532b6d8be45d/.config/nvim/lua/plugins/extras/lsp/lspconfig-extended.lua#L11).
+- [ ] lang.zsh like [aimuzov](https://github.com/aimuzov/LazyVimx/blob/main/lua/lazyvimx/extras/lang/zsh.lua).
+- [ ] `which-key v3` problem with `mini.surround`/`mini.operators`/Helix-style mappings(map `mm` to `%`):
+
+  1. problem
+     - Timeout is too short, e.g. time window between `c` and `r` for `cr`.
+       - Benefit: I can use `m` marks by typing `mm` slowly now.
+     - No popup in normal mode anymore, e.g. `cr`/`ms`.
+  2. solution
+
+     - Increase `vim.opt.timeoutlen` from 300 to 500.
+     - Use `triggers` opt of which-key:
+
+       ```lua
+       {
+         "folke/which-key.nvim",
+         opts = {
+           triggers = {
+             { "<auto>", mode = "nxsot" }, -- this line is necessary
+             -- https://github.com/echasnovski/mini.nvim/issues/1058
+             -- https://github.com/folke/which-key.nvim/issues/672#issuecomment-2235978897
+             -- 1. Get rid of the `vim.opt.timeoutlen` limit, since `cr` is a little hard to type.
+             -- 2. Fix `cR` for `cr$`, or `cR`.
+             -- 3. TODO Causing Remote Flash broken on `c<space>`.
+             { "c", mode = "n" },
+             -- { "m", mode = { "n", "v" } },
+           },
+         },
+       },
+       ```
