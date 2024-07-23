@@ -1,4 +1,5 @@
 local Config = require("lazy.core.config")
+local replace_home = require("util.path").replace_home_with_tilde
 
 local have_chezmoi = LazyVim.has_extra("util.chezmoi") and vim.fn.executable("chezmoi") == 1
 local config_path = have_chezmoi and "~/.local/share/chezmoi/dot_config/nvim" or vim.fn.stdpath("config")
@@ -108,7 +109,11 @@ return {
         --   },
         -- },
         path_display = function(opts, path)
-          local transformed_path = vim.trim(require("util.path").replace_home_with_tilde(path))
+          local transformed_path = vim.trim(replace_home(path))
+          -- make it shorter
+          transformed_path = transformed_path
+            :gsub(replace_home(config_path) .. "/", " ")
+            :gsub(replace_home(lazyvim_path) .. "/", "󰒲 ")
           -- truncate
           -- copy from: https://github.com/nvim-telescope/telescope.nvim/blob/bfcc7d5c6f12209139f175e6123a7b7de6d9c18a/lua/telescope/utils.lua#L198
           -- ~/.local/share/nvim/lazy/telescope.nvim/lua/telescope/utils.lua
