@@ -53,13 +53,15 @@ return {
             local actions = require("telescope.actions")
             local action_state = require("telescope.actions.state")
             local chezmoi = require("chezmoi.commands")
+            local config = require("chezmoi").config
 
             -- https://github.com/nvim-telescope/telescope.nvim/wiki/Configuration-Recipes#performing-an-arbitrary-command-by-extending-existing-find_files-picker
             -- see: ~/.local/share/nvim/lazy/chezmoi.nvim/lua/telescope/_extensions/chezmoi.lua
             require("telescope.builtin").find_files({
               prompt_title = "Config Files",
               cwd = config_dir,
-              attach_mappings = function(prompt_bufnr)
+              attach_mappings = function(prompt_bufnr, map)
+                -- copied from: https://github.com/xvzc/chezmoi.nvim/blob/faf61465718424696269b2647077331b3e4605f1/lua/telescope/_extensions/find_files.lua#L34
                 local edit_action = function()
                   actions.close(prompt_bufnr)
                   local selection = action_state.get_selected_entry()
@@ -68,6 +70,10 @@ return {
                       targets = config_dir .. "/" .. selection.value,
                     })
                   end
+                end
+
+                for _, v in ipairs(config.telescope.select) do
+                  map("i", v, "select_default")
                 end
 
                 actions.select_default:replace(edit_action)
