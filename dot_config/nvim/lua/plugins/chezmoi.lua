@@ -28,6 +28,61 @@ local function fzf_chezmoi(targets)
   require("fzf-lua").fzf_exec(results, opts)
 end
 
+--- pick nvim config
+local pick_config = function()
+  local chezmoi = require("chezmoi.commands")
+  local config_dir = vim.fn.stdpath("config")
+  local managed_config_files = chezmoi.list({
+    targets = config_dir,
+    args = { "--path-style", "absolute", "--include", "files" },
+  })
+
+  if vim.tbl_isempty(managed_config_files) then
+    LazyVim.pick.config_files()()
+    return
+  end
+
+  if LazyVim.pick.picker.name == "telescope" then
+    local actions = require("telescope.actions")
+    local action_state = require("telescope.actions.state")
+    local config = require("chezmoi").config
+
+    -- https://github.com/nvim-telescope/telescope.nvim/wiki/Configuration-Recipes#performing-an-arbitrary-command-by-extending-existing-find_files-picker
+    -- see: ~/.local/share/nvim/lazy/chezmoi.nvim/lua/telescope/_extensions/chezmoi.lua
+    require("telescope.builtin").find_files({
+      prompt_title = "Config Files",
+      cwd = config_dir,
+      attach_mappings = function(prompt_bufnr, map)
+        -- copied from: https://github.com/xvzc/chezmoi.nvim/blob/faf61465718424696269b2647077331b3e4605f1/lua/telescope/_extensions/find_files.lua#L34
+        local edit_action = function()
+          actions.close(prompt_bufnr)
+          local selection = action_state.get_selected_entry()
+          if selection then
+            chezmoi.edit({
+              targets = config_dir .. "/" .. selection.value,
+            })
+          end
+        end
+
+        for _, v in ipairs(config.telescope.select) do
+          map("i", v, "select_default")
+        end
+
+        -- it's possible that only part of nvim config files are managed with chezmoi
+        -- pick all and just edit if unmanaged
+        actions.select_default:replace_if(function()
+          local selection = action_state.get_selected_entry()
+          return selection and vim.tbl_contains(managed_config_files, config_dir .. "/" .. selection.value)
+        end, edit_action)
+        return true
+      end,
+    })
+  elseif LazyVim.pick.picker.name == "fzf" then
+    -- only pick the managed config files
+    fzf_chezmoi(config_dir)
+  end
+end
+
 return {
   {
     "xvzc/chezmoi.nvim",
@@ -45,47 +100,7 @@ return {
         end,
         desc = "Find Chezmoi Source Dotfiles",
       },
-      {
-        "<leader>fc",
-        function()
-          local config_dir = vim.fn.stdpath("config")
-          if LazyVim.pick.picker.name == "telescope" then
-            local actions = require("telescope.actions")
-            local action_state = require("telescope.actions.state")
-            local chezmoi = require("chezmoi.commands")
-            local config = require("chezmoi").config
-
-            -- https://github.com/nvim-telescope/telescope.nvim/wiki/Configuration-Recipes#performing-an-arbitrary-command-by-extending-existing-find_files-picker
-            -- see: ~/.local/share/nvim/lazy/chezmoi.nvim/lua/telescope/_extensions/chezmoi.lua
-            require("telescope.builtin").find_files({
-              prompt_title = "Config Files",
-              cwd = config_dir,
-              attach_mappings = function(prompt_bufnr, map)
-                -- copied from: https://github.com/xvzc/chezmoi.nvim/blob/faf61465718424696269b2647077331b3e4605f1/lua/telescope/_extensions/find_files.lua#L34
-                local edit_action = function()
-                  actions.close(prompt_bufnr)
-                  local selection = action_state.get_selected_entry()
-                  if selection then
-                    chezmoi.edit({
-                      targets = config_dir .. "/" .. selection.value,
-                    })
-                  end
-                end
-
-                for _, v in ipairs(config.telescope.select) do
-                  map("i", v, "select_default")
-                end
-
-                actions.select_default:replace(edit_action)
-                return true
-              end,
-            })
-          elseif LazyVim.pick.picker.name == "fzf" then
-            fzf_chezmoi(config_dir)
-          end
-        end,
-        desc = "Find Config File",
-      },
+      { "<leader>fc", pick_config, desc = "Find Config File" },
     },
   },
 

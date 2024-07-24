@@ -6,8 +6,7 @@ local Lazy = require("lazy")
 local LazyUtil = require("lazy.util")
 local replace_home = require("util.path").replace_home_with_tilde
 
--- local map = vim.keymap.set
--- local del = vim.keymap.del
+local del = vim.keymap.del
 
 --- vim.keymap.set, silent by default
 --- https://github.com/folke/dot/blob/5df77fa64728a333f4d58e35d3ca5d8590c4f928/nvim/lua/config/options.lua#L22
@@ -23,9 +22,8 @@ end
 
 -- lazy/LazyVim
 -- https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/config/keymaps.lua
--- vim.keymap.del | https://www.lazyvim.org/configuration/keymaps#global-keymaps
-map("n", "<leader>l", "<Nop>", { desc = "+lazy/lazyvim" })
-map("n", "<leader>L", "<Nop>")
+map("n", "<leader>l", "", { desc = "+lazy/lazyvim" })
+del("n", "<leader>L")
 map("n", "<leader>ll", "<cmd>Lazy<cr>", { desc = "Lazy" })
 -- stylua: ignore start
 map("n", "<leader>lc", function() LazyVim.news.changelog() end, { desc = "LazyVim Changelog" })
