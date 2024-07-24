@@ -2,6 +2,8 @@ local Config = require("lazy.core.config")
 local replace_home = require("util.path").replace_home_with_tilde
 
 local have_chezmoi = LazyVim.has_extra("util.chezmoi") and vim.fn.executable("chezmoi") == 1
+---@type string
+---@diagnostic disable-next-line: assign-type-mismatch
 local config_path = have_chezmoi and "~/.local/share/chezmoi/dot_config/nvim" or vim.fn.stdpath("config")
 local lazyvim_path = Config.options.root .. "/LazyVim"
 
