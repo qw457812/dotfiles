@@ -176,15 +176,12 @@ if vim.g.neovide then
       -- https://github.com/folke/zen-mode.nvim/blob/29b292bdc58b76a6c8f294c961a8bf92c5a6ebd6/lua/zen-mode/plugins.lua#L130
       if state then
         for key, _ in pairs(neovide_disable_animations) do
-          -- local old_value = vim.g["user_" .. key .. "_old"]
-          local old_value = neovide_state[key]
-          if old_value then
-            vim.g[key] = old_value
+          if neovide_state[key] then
+            vim.g[key] = neovide_state[key]
           end
         end
       else
         for key, value in pairs(neovide_disable_animations) do
-          -- vim.g["user_" .. key .. "_old"] = vim.g[key]
           neovide_state[key] = vim.g[key]
           vim.g[key] = value
         end
