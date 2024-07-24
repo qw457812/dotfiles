@@ -24,6 +24,57 @@ return {
     },
   },
 
+  -- https://github.com/search?q=repo%3Aaimuzov%2FLazyVimx%20nvim-lualine%2Flualine.nvim&type=code
+  -- https://github.com/aimuzov/LazyVimx/blob/a27d3439b9021d1215ce6471f59d801df32c18d4/lua/lazyvimx/extras/ui/panels/status-line.lua
+  {
+    "nvim-lualine/lualine.nvim",
+    opts = function(_, opts)
+      local icons = LazyVim.config.icons
+      -- https://github.com/aimuzov/LazyVimx/blob/a27d3439b9021d1215ce6471f59d801df32c18d4/lua/lazyvimx/extras/hacks/lazyvim-lualine-pretty-path.lua
+      local pretty_path = function()
+        return function(self)
+          return LazyVim.lualine.pretty_path()(self):gsub("/", "󰿟")
+        end
+      end
+
+      opts.options.component_separators = { left = "", right = "" }
+      opts.options.section_separators = { left = "", right = "" }
+      -- opts.options.section_separators = { left = "", right = "" }
+
+      opts.sections.lualine_c = {
+        LazyVim.lualine.root_dir(),
+        {
+          "diagnostics",
+          symbols = {
+            error = icons.diagnostics.Error,
+            warn = icons.diagnostics.Warn,
+            info = icons.diagnostics.Info,
+            hint = icons.diagnostics.Hint,
+          },
+        },
+        { pretty_path() },
+      }
+
+      -- opts.sections.lualine_y = { "location" }
+      -- opts.sections.lualine_z = {
+      --   { "progress", separator = "" },
+      --   { "filetype", colored = false },
+      -- }
+
+      -- opts.sections.lualine_y = { "filetype" }
+      -- opts.sections.lualine_z = {
+      --   { "progress", separator = " ", padding = { left = 1, right = 0 } },
+      --   { "location", padding = { left = 0, right = 1 } },
+      -- }
+
+      opts.sections.lualine_y = { "filetype" }
+      opts.sections.lualine_z = {
+        { "location", separator = " ", padding = { left = 1, right = 0 } },
+        { "progress", padding = { left = 0, right = 1 } },
+      }
+    end,
+  },
+
   -- https://github.com/folke/dot/blob/master/nvim/lua/plugins/ui.lua
   {
     "folke/twilight.nvim",
