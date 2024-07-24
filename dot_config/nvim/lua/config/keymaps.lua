@@ -155,4 +155,40 @@ if vim.g.neovide then
   -- https://github.com/neovide/neovide/issues/1263#issuecomment-1972013043
   -- stylua: ignore
   map({ "i", "c", "t" }, "<D-v>", function() vim.api.nvim_paste(vim.fn.getreg("+"), true, -1) end, { desc = "Paste" })
+
+  -- https://github.com/folke/zen-mode.nvim/blob/29b292bdc58b76a6c8f294c961a8bf92c5a6ebd6/lua/zen-mode/config.lua#L70
+  local neovide_disable_animations = {
+    neovide_animation_length = 0,
+    neovide_cursor_animate_command_line = false,
+    neovide_scroll_animation_length = 0,
+    neovide_position_animation_length = 0,
+    neovide_cursor_animation_length = 0,
+    neovide_cursor_vfx_mode = "",
+  }
+  local neovide_state = {} ---@type table<string, any>
+  LazyVim.toggle.map("<leader>ua", {
+    name = "Mini/Neovide Animate",
+    get = function()
+      return not vim.g.minianimate_disable
+    end,
+    set = function(state)
+      vim.g.minianimate_disable = not state
+      -- https://github.com/folke/zen-mode.nvim/blob/29b292bdc58b76a6c8f294c961a8bf92c5a6ebd6/lua/zen-mode/plugins.lua#L130
+      if state then
+        for key, _ in pairs(neovide_disable_animations) do
+          -- local old_value = vim.g["user_" .. key .. "_old"]
+          local old_value = neovide_state[key]
+          if old_value then
+            vim.g[key] = old_value
+          end
+        end
+      else
+        for key, value in pairs(neovide_disable_animations) do
+          -- vim.g["user_" .. key .. "_old"] = vim.g[key]
+          neovide_state[key] = vim.g[key]
+          vim.g[key] = value
+        end
+      end
+    end,
+  })
 end
