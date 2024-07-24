@@ -52,6 +52,8 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
     - [Install nvim-java on Lazyvim](https://github.com/nvim-java/nvim-java/wiki/Lazyvim).
 - [ ] Python LSP improvements:
   - Fredrikaverpil's [lang/python.lua](https://github.com/fredrikaverpil/dotfiles/blob/main/nvim-fredrik/lua/lang/python.lua), [contributor](https://github.com/LazyVim/LazyVim/commits?author=fredrikaverpil) of LazyVim.
+  - [moetayuko](https://github.com/moetayuko/nvimrc), Lazyvim [PR](https://github.com/LazyVim/LazyVim/pull/4141) for extras.lang.python.
+    - [overseer/template/user/python.lua](https://github.com/moetayuko/nvimrc/blob/master/lua/overseer/template/user/python.lua)
 - [ ] Use my own plugins in LazyExtra like Nv's [plugins/extras/](https://github.com/appelgriebsch/Nv/tree/main/lua/plugins/extras) and [lazyvim.json](https://github.com/appelgriebsch/Nv/blob/main/lazyvim.json).
 - [ ] [Org Mode](https://github.com/topics/orgmode-nvim) in nvim, or neorg like [stevearc](https://github.com/stevearc/dotfiles/blob/eeb506f9afd32cd8cd9f2366110c76efaae5786c/.config/nvim/lua/plugins/neorg.lua).
 - [ ] [ChatGPT.nvim](https://github.com/jackMort/ChatGPT.nvim), eg. [AstroCommunity](https://github.com/AstroNvim/astrocommunity/tree/1f3a6ec008b404c72f84093fe25c574ba63fc256/lua/astrocommunity/editing-support/chatgpt-nvim), [Matt-FTW](https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/coding/ai/gpt.lua)
@@ -76,6 +78,8 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
   - [voldikss/vim-translator](https://github.com/voldikss/vim-translator)
   - [uga-rosa/translate.nvim](https://github.com/uga-rosa/translate.nvim)
   - [lewis6991/hover.nvim](https://github.com/wfxr/dotfiles/blob/661bfabf3b813fd8af79d881cd28b72582d4ccca/vim/nvim/lua/plugins/lsp.lua#L29)
+- [ ] Chinese input
+  - [h-hg/fcitx.nvim](https://github.com/h-hg/fcitx.nvim) like [moetayuko](https://github.com/moetayuko/nvimrc/blob/ae242cc18559cd386c36feb9f999b1a9596c7d09/lua/plugins/editor.lua#L173)
 - [ ] Refactor patch like [overrides.lua](https://github.com/ian-ie/LazyVim/blob/master/lua/plugins/overrides.lua).
 - [ ] Check this [keymaps.lua](https://github.com/WillEhrendreich/nvimconfig/blob/7ab5b0d0ee485d58df3cc3e1f55c6446155f29a1/lua/config/keymaps.lua).
 - [ ] Matt-FTW's [vscode.lua](https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/util/vscode.lua), and [search](https://github.com/search?q=repo%3AMatt-FTW%2Fdotfiles%20vscode%20%3D%20true&type=code) the `vscode = true` plugins.
