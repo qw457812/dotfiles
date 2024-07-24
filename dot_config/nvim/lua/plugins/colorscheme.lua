@@ -1,9 +1,7 @@
--- see: ~/.config/nvim/lua/plugins/extras/colorscheme/
 return {
-  -- https://github.com/folke/dot/blob/master/nvim/lua/plugins/colorscheme.lua
-  -- https://www.lazyvim.org/configuration/recipes#make-tokyonight-transparent
   {
     "tokyonight.nvim",
+    optional = true,
     opts = function()
       return {
         style = "moon", -- storm, moon, night, day
@@ -12,24 +10,13 @@ return {
         --   sidebars = "transparent",
         --   floats = "transparent",
         -- },
-        -- sidebars = {
-        --   "qf",
-        --   "vista_kind",
-        --   -- "terminal",
-        --   "spectre_panel",
-        --   "startuptime",
-        --   "Outline",
-        -- },
         -- ~/.local/share/nvim/lazy/tokyonight.nvim/extras/lua/tokyonight_moon.lua
         on_highlights = function(hl, c)
           local util = require("tokyonight.util")
           -- highlight word/references under cursor
           -- require lazyvim.plugins.extras.editor.illuminate
-          -- https://github.com/RRethy/vim-illuminate#highlight-groups
-          -- #3760bf #7847bd #8552a1 #7e4c8b #731d8b
-          -- #35717b #188092 #007197 #006a83 #265b75
           -- #5b6078 #585b70 #51576d #494d64 #45475a
-          -- local illuminate = util.blend_bg("#585b70", 0.85)
+          -- util.blend_bg("#585b70", 0.85)
           local illuminate = util.blend_fg("#3b4261", 0.875)
           -- hl.IlluminatedWordText = { bg = "#3b4261" } -- use default
           hl.IlluminatedWordRead = { bg = illuminate }
@@ -58,15 +45,4 @@ return {
       }
     end,
   },
-
-  -- -- https://www.lazyvim.org/plugins/colorscheme
-  -- -- add gruvbox
-  -- { "ellisonleao/gruvbox.nvim" },
-  -- -- configure LazyVim to load gruvbox
-  -- {
-  --   "LazyVim/LazyVim",
-  --   opts = {
-  --     colorscheme = "gruvbox",
-  --   },
-  -- },
 }
