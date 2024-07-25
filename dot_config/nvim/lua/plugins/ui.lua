@@ -24,53 +24,83 @@ return {
     },
   },
 
-  -- https://github.com/search?q=repo%3Aaimuzov%2FLazyVimx%20nvim-lualine%2Flualine.nvim&type=code
   -- https://github.com/aimuzov/LazyVimx/blob/a27d3439b9021d1215ce6471f59d801df32c18d4/lua/lazyvimx/extras/ui/panels/status-line.lua
   {
     "nvim-lualine/lualine.nvim",
     opts = function(_, opts)
-      local icons = LazyVim.config.icons
+      local function cond_always_hidden()
+        return false
+      end
+
       -- https://github.com/aimuzov/LazyVimx/blob/a27d3439b9021d1215ce6471f59d801df32c18d4/lua/lazyvimx/extras/hacks/lazyvim-lualine-pretty-path.lua
-      local pretty_path = function()
+      local function pretty_path(o)
         return function(self)
-          return LazyVim.lualine.pretty_path()(self):gsub("/", "󰿟")
+          return LazyVim.lualine.pretty_path(o)(self):gsub("/", "󰿟")
         end
       end
 
-      -- opts.options.section_separators = ""
-      -- opts.options.component_separators = ""
-      --
+      -- https://github.com/Matt-FTW/dotfiles/blob/b12af2bc28c89c7185c48d6b02fb532b6d8be45d/.config/nvim/lua/plugins/extras/ui/lualine-extended.lua
+      local lsp = function()
+        local buf_clients = vim.lsp.get_clients({ bufnr = 0 })
+        if #buf_clients == 0 then
+          return ""
+        end
+        return " "
+      end
+
+      local formatter = function()
+        local formatters = require("conform").list_formatters(0)
+        if #formatters == 0 then
+          return ""
+        end
+        return "󰛖 "
+      end
+
+      local linter = function()
+        local linters = require("lint").linters_by_ft[vim.bo.filetype]
+        if #linters == 0 then
+          return ""
+        end
+        return "󱉶 "
+      end
+
+      -- "" ┊ |          
       -- opts.options.section_separators = { left = "", right = "" }
       -- opts.options.component_separators = { left = "", right = "" }
-      --
       opts.options.section_separators = { left = "", right = "" }
       opts.options.component_separators = { left = "", right = "" }
 
-      opts.sections.lualine_c = {
-        LazyVim.lualine.root_dir(),
-        {
-          "diagnostics",
-          symbols = {
-            error = icons.diagnostics.Error,
-            warn = icons.diagnostics.Warn,
-            info = icons.diagnostics.Info,
-            hint = icons.diagnostics.Hint,
-          },
-        },
-        { pretty_path() },
+      -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/ui.lua
+      ---@diagnostic disable-next-line: assign-type-mismatch
+      opts.sections.lualine_c[1] = LazyVim.lualine.root_dir({ cwd = true })
+      opts.sections.lualine_c[3].cond = cond_always_hidden -- filetype
+      opts.sections.lualine_c[4] = {
+        pretty_path({
+          relative = "root",
+          directory_hl = "Conceal",
+          length = 6,
+        }),
       }
+      table.insert(opts.sections.lualine_x, 2, lsp)
+      table.insert(opts.sections.lualine_x, 2, formatter)
+      table.insert(opts.sections.lualine_x, 2, linter)
       opts.sections.lualine_y = { "filetype" }
-      -- opts.sections.lualine_z = {
-      --   { "location", separator = " ", padding = { left = 1, right = 0 } },
-      --   { "progress", padding = { left = 0, right = 1 } },
-      -- }
 
-      -- ~/.local/share/nvim/lazy/lualine.nvim/examples/bubbles.lua
-      opts.sections.lualine_a = { { "mode", separator = { left = "" } } }
-      opts.sections.lualine_z = {
-        { "location", separator = { left = "" }, padding = { left = 1, right = 0 } },
-        { "progress", separator = { right = "" } },
-      }
+      local bubbles = true
+      if bubbles then
+        opts.sections.lualine_a = { { "mode", separator = { left = "" } } }
+        opts.sections.lualine_z = {
+          { "location", separator = { left = "" }, padding = { left = 1, right = 0 } },
+          { "progress", separator = { right = "" } },
+        }
+      else
+        opts.sections.lualine_z = {
+          { "location", separator = " ", padding = { left = 1, right = 0 } },
+          { "progress", padding = { left = 0, right = 1 } },
+        }
+      end
+
+      table.insert(opts.extensions, "mason")
     end,
   },
 

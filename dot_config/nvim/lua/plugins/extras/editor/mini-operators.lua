@@ -4,6 +4,7 @@ return {
     event = "VeryLazy",
     vscode = true,
     -- https://github.com/chrisgrieser/.config/blob/181def43f255a502670af318297289f4e8f49c83/nvim/lua/plugins/editing-support.lua#L108
+    -- https://github.com/JulesNP/nvim/blob/36b04ae414b98e67a80f15d335c73744606a33d7/lua/plugins/mini.lua#L656
     keys = {
       { "cR", "cr$", desc = "Replace to end of line", remap = true },
       { "cX", "cx$", desc = "Exchange to end of line", remap = true },
