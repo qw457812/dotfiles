@@ -37,9 +37,14 @@ return {
         end
       end
 
-      opts.options.component_separators = { left = "", right = "" }
-      opts.options.section_separators = { left = "", right = "" }
-      -- opts.options.section_separators = { left = "", right = "" }
+      -- opts.options.section_separators = ""
+      -- opts.options.component_separators = ""
+      --
+      -- opts.options.section_separators = { left = "", right = "" }
+      -- opts.options.component_separators = { left = "", right = "" }
+      --
+      opts.options.section_separators = { left = "", right = "" }
+      opts.options.component_separators = { left = "", right = "" }
 
       opts.sections.lualine_c = {
         LazyVim.lualine.root_dir(),
@@ -54,23 +59,17 @@ return {
         },
         { pretty_path() },
       }
-
-      -- opts.sections.lualine_y = { "location" }
-      -- opts.sections.lualine_z = {
-      --   { "progress", separator = "" },
-      --   { "filetype", colored = false },
-      -- }
-
-      -- opts.sections.lualine_y = { "filetype" }
-      -- opts.sections.lualine_z = {
-      --   { "progress", separator = " ", padding = { left = 1, right = 0 } },
-      --   { "location", padding = { left = 0, right = 1 } },
-      -- }
-
       opts.sections.lualine_y = { "filetype" }
+      -- opts.sections.lualine_z = {
+      --   { "location", separator = " ", padding = { left = 1, right = 0 } },
+      --   { "progress", padding = { left = 0, right = 1 } },
+      -- }
+
+      -- ~/.local/share/nvim/lazy/lualine.nvim/examples/bubbles.lua
+      opts.sections.lualine_a = { { "mode", separator = { left = "" } } }
       opts.sections.lualine_z = {
-        { "location", separator = " ", padding = { left = 1, right = 0 } },
-        { "progress", padding = { left = 0, right = 1 } },
+        { "location", separator = { left = "" }, padding = { left = 1, right = 0 } },
+        { "progress", separator = { right = "" } },
       }
     end,
   },
