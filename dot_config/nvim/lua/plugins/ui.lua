@@ -28,6 +28,8 @@ return {
   {
     "nvim-lualine/lualine.nvim",
     opts = function(_, opts)
+      local is_termux = vim.env.TERMUX_VERSION ~= nil
+
       local function cond_always_hidden()
         return false
       end
@@ -81,10 +83,12 @@ return {
           length = 6,
         }),
       }
-      table.insert(opts.sections.lualine_x, 2, lsp)
-      table.insert(opts.sections.lualine_x, 2, formatter)
-      table.insert(opts.sections.lualine_x, 2, linter)
-      opts.sections.lualine_y = { "filetype" }
+      if not is_termux then
+        table.insert(opts.sections.lualine_x, 2, lsp)
+        table.insert(opts.sections.lualine_x, 2, formatter)
+        table.insert(opts.sections.lualine_x, 2, linter)
+      end
+      opts.sections.lualine_y = { { "filetype", icon_only = is_termux } }
 
       local bubbles = true
       if bubbles then
