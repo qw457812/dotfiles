@@ -27,9 +27,12 @@ return {
   -- isort
   {
     "williamboman/mason.nvim",
-    opts = function(_, opts)
-      table.insert(opts.ensure_installed, "isort")
-    end,
+    opts = {
+      ensure_installed = {
+        "isort",
+        "debugpy", -- required by nvim-dap-python
+      },
+    },
   },
   {
     "nvimtools/none-ls.nvim",
@@ -56,19 +59,6 @@ return {
     end,
   },
 
-  -- -- TODO should I add this?
-  -- -- correctly setup mason dap extensions
-  -- -- https://github.com/dylanHanger/dotfiles/blob/2289dc2443c1d513117a94d16b0fa7f962e03c6a/.config/nvim/lua/plugins/lang/python.lua#L22
-  -- {
-  --   "jay-babu/mason-nvim-dap.nvim",
-  --   opts = function(_, opts)
-  --     vim.list_extend(opts.ensure_installed, { "debugpy" })
-  --   end,
-  -- },
-  --
-  -- TODO or add debugpy to both jay-babu/mason-nvim-dap.nvim and williamboman/mason.nvim?
-  -- https://github.com/fredrikaverpil/dotfiles/blob/be037d3e442b25d356f0bdd18ac2a17c346d71aa/nvim-fredrik/lua/lang/python.lua#L274
-  --
   -- TODO get the debugpy path from $VIRTUAL_ENV, then fallback to mason?
   -- https://github.com/fredrikaverpil/dotfiles/blob/be037d3e442b25d356f0bdd18ac2a17c346d71aa/nvim-fredrik/lua/lang/python.lua#L32
   -- https://github.com/LazyVim/LazyVim/pull/1031#discussion_r1251566896
