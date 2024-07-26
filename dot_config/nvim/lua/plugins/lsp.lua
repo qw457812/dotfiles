@@ -104,4 +104,45 @@ return {
       })
     end,
   },
+
+  -- https://github.com/folke/dot/blob/13b8ed8d40755b58163ffff30e6a000d06fc0be0/nvim/lua/plugins/lsp.lua#L79
+  {
+    "mfussenegger/nvim-lint",
+    opts = {
+      linters_by_ft = {
+        lua = { "selene", "luacheck" },
+      },
+      linters = {
+        selene = {
+          -- `condition` is a LazyVim extension that allows you to dynamically enable/disable linters based on the context
+          condition = function(ctx)
+            local root = LazyVim.root.get({ normalize = true })
+            if root ~= vim.uv.cwd() then
+              return false
+            end
+            return vim.fs.find({ "selene.toml" }, { path = root, upward = true })[1]
+          end,
+        },
+        luacheck = {
+          condition = function(ctx)
+            local root = LazyVim.root.get({ normalize = true })
+            if root ~= vim.uv.cwd() then
+              return false
+            end
+            return vim.fs.find({ ".luacheckrc" }, { path = root, upward = true })[1]
+          end,
+        },
+      },
+    },
+  },
+  {
+    "williamboman/mason.nvim",
+    opts = {
+      -- :=LazyVim.opts("mason.nvim").ensure_installed
+      ensure_installed = {
+        "selene",
+        "luacheck",
+      },
+    },
+  },
 }

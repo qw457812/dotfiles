@@ -43,8 +43,8 @@ return {
 
       -- https://github.com/Matt-FTW/dotfiles/blob/b12af2bc28c89c7185c48d6b02fb532b6d8be45d/.config/nvim/lua/plugins/extras/ui/lualine-extended.lua
       local lsp = function()
-        local buf_clients = vim.lsp.get_clients({ bufnr = 0 })
-        if #buf_clients == 0 then
+        local clients = vim.lsp.get_clients({ bufnr = 0 })
+        if #clients == 0 then
           return ""
         end
         return " "
@@ -59,7 +59,17 @@ return {
       end
 
       local linter = function()
-        local linters = require("lint").linters_by_ft[vim.bo.filetype]
+        local lint = require("lint")
+        -- respect LazyVim extension `condition`
+        -- see: ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/linting.lua
+        local linters = lint._resolve_linter_by_ft(vim.bo.filetype)
+        -- filter out linters that don't exist or don't match the condition
+        local ctx = { filename = vim.api.nvim_buf_get_name(0) }
+        ctx.dirname = vim.fn.fnamemodify(ctx.filename, ":h")
+        linters = vim.tbl_filter(function(name)
+          local linter = lint.linters[name]
+          return linter and not (type(linter) == "table" and linter.condition and not linter.condition(ctx))
+        end, linters)
         if #linters == 0 then
           return ""
         end
@@ -73,12 +83,12 @@ return {
       opts.options.component_separators = { left = "", right = "" }
 
       -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/ui.lua
-      ---@diagnostic disable-next-line: assign-type-mismatch
-      opts.sections.lualine_c[1] = LazyVim.lualine.root_dir({ cwd = true })
+      ------@diagnostic disable-next-line: assign-type-mismatch
+      ---opts.sections.lualine_c[1] = LazyVim.lualine.root_dir({ cwd = true })
       opts.sections.lualine_c[3].cond = cond_always_hidden -- filetype
       opts.sections.lualine_c[4] = {
         pretty_path({
-          relative = "root",
+          -- relative = "root",
           directory_hl = "Conceal",
           length = 6,
         }),
@@ -208,17 +218,6 @@ return {
       end
     end,
   },
-
-  -- {
-  --   "shortcuts/no-neck-pain.nvim",
-  --   opts = {
-  --     width = 120, -- same width as zen-mode.nvim, default value: 100
-  --   },
-  --   keys = {
-  --     { "<leader>uz", "<cmd>NoNeckPain<cr>", desc = "No Neck Pain" },
-  --     { "<leader>uZ", ":NoNeckPainResize ", desc = "Resize the No-Neck-Pain window" },
-  --   },
-  -- },
 
   {
     "tzachar/highlight-undo.nvim",

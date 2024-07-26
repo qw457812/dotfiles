@@ -46,6 +46,8 @@ return {
           -- split_width = 60,
           keymaps = {
             close = "q",
+            pageup = "<C-u>",
+            pagedown = "<C-d>",
           },
           -- order to display translate result
           order = {
