@@ -33,7 +33,6 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 })
 
 -- disable LazyVim's auto command for wrap
--- see: ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/config/autocmds.lua
 -- https://github.com/LazyVim/LazyVim/issues/3692
 -- alternative: vim.api.nvim_del_augroup_by_name("lazyvim_wrap_spell")
 vim.api.nvim_clear_autocmds({ group = "lazyvim_wrap_spell" })
@@ -46,6 +45,7 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 -- -- close some filetypes with <q>
+-- -- see also: ../plugins/close.lua
 -- -- https://github.com/appelgriebsch/Nv/blob/main/lua/config/autocmds.lua
 -- vim.api.nvim_create_autocmd("FileType", {
 --   pattern = {
@@ -54,7 +54,11 @@ vim.api.nvim_create_autocmd("FileType", {
 --   },
 --   callback = function(event)
 --     vim.bo[event.buf].buflisted = false
---     vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = event.buf, silent = true })
+--     vim.keymap.set("n", "q", "<cmd>close<cr>", {
+--       buffer = event.buf,
+--       silent = true,
+--       desc = "Quit buffer",
+--     })
 --   end,
 -- })
 

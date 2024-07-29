@@ -75,7 +75,7 @@ return {
             end,
             desc = "close_window / go to right window",
           },
-          ["<bs>"] = "none", -- use global mapping defined in keymaps.lua
+          -- ["<bs>"] = "none", -- see: close.lua
           ["<tab>"] = {
             function(state)
               local node = state.tree:get_node()
