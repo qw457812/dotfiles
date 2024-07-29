@@ -15,9 +15,14 @@ return {
   {
     "echasnovski/mini.align",
     vscode = true,
-    opts = {},
+    opts = {
+      mappings = {
+        start = "", -- disabled since text-case.nvim uses `ga`
+        start_with_preview = "gA",
+      },
+    },
     keys = {
-      { "ga", mode = { "n", "v" }, desc = "Align" },
+      -- { "ga", mode = { "n", "v" }, desc = "Align" },
       { "gA", mode = { "n", "v" }, desc = "Align with Preview" },
     },
   },
@@ -106,7 +111,7 @@ return {
     event = "VeryLazy",
     ft = { "org" },
     keys = {
-      { "<leader>o", "", desc = "+orgmode" },
+      { "<leader>o", "", desc = "+orgmode" }, -- TODO: conflict with extras.editor.overseer
     },
     opts = {
       org_agenda_files = "~/org/**/*",

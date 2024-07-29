@@ -111,6 +111,36 @@ return {
     },
   },
 
+  -- alternative: gregorias/coerce.nvim
+  -- https://github.com/yutkat/dotfiles/blob/2c95d4f42752c5c245d7642f5c2dbc326bd776c2/.config/nvim/lua/rc/pluginconfig/text-case.lua
+  {
+    "johmsalas/text-case.nvim",
+    -- event = "VeryLazy", -- for `Subs` and `substitude_command_name` command, with interactive feature on first use
+    cmd = "S", -- for `substitude_command_name` command, without interactive feature on first use
+    keys = function()
+      local keys = {
+        { "ga" },
+        { "gar", ":Subs/", mode = { "n", "x" }, desc = "Subs" },
+      }
+      if LazyVim.has("telescope.nvim") then
+        keys[#keys + 1] = { "gaa", "<cmd>TextCaseOpenTelescope<CR>", mode = { "n", "x" }, desc = "Telescope" }
+      end
+      return keys
+    end,
+    opts = {
+      -- an additional command with the passed in name will be created that does the same thing as "Subs" does
+      substitude_command_name = "S",
+    },
+    config = function(_, opts)
+      require("textcase").setup(opts)
+      if LazyVim.has("telescope.nvim") then
+        LazyVim.on_load("telescope.nvim", function()
+          require("telescope").load_extension("textcase")
+        end)
+      end
+    end,
+  },
+
   {
     "Wansmer/treesj",
     keys = {
