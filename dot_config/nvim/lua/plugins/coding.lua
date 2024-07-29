@@ -103,6 +103,15 @@ return {
   },
 
   {
+    "gbprod/yanky.nvim",
+    optional = true,
+    keys = {
+      { "gp", mode = { "n", "x" }, false },
+      { "gP", mode = { "n", "x" }, false },
+    },
+  },
+
+  {
     "Wansmer/treesj",
     keys = {
       { "<leader>J", "<cmd>TSJToggle<cr>", desc = "Join Toggle" },

@@ -110,7 +110,11 @@ map("n", "dd", function()
 end, { expr = true, desc = "Don't Yank Empty Line to Clipboard" })
 
 -- https://github.com/wfxr/dotfiles/blob/661bfabf3b813fd8af79d881cd28b72582d4ccca/vim/nvim/lua/config/keymaps.lua#L35
-map("n", "gV", "`[v`]", { desc = "Select last changed or yanked text" })
+-- map("n", "gV", "`[v`]", { desc = "Select last pasted/yanked/changed text" })
+-- https://github.com/gregorias/coerce.nvim#tips--tricks
+map("n", "gp", function()
+  vim.api.nvim_feedkeys("`[" .. vim.fn.strpart(vim.fn.getregtype(), 0, 1) .. "`]", "n", false)
+end, { desc = "Select last pasted/yanked/changed text" })
 
 -- TODO search literal | https://vi.stackexchange.com/questions/17465/how-to-search-literally-without-any-regex-pattern
 -- search inside visually highlighted text
