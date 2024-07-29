@@ -100,4 +100,18 @@ return {
       },
     },
   },
+
+  {
+    "nvim-telescope/telescope.nvim",
+    optional = true,
+    opts = {
+      defaults = {
+        mappings = {
+          n = {
+            [close_key] = "close",
+          },
+        },
+      },
+    },
+  },
 }
