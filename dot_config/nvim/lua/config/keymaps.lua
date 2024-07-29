@@ -45,8 +45,9 @@ map({ "n", "o" }, "L", "$", { desc = "Goto line end" })
 map("x", "L", "g_", { desc = "Goto line end" })
 
 -- quit
+-- see: ../plugins/close.lua
 -- map("n", "<bs>", "<cmd>q<cr>", { desc = "Quit" })
-map("n", "<bs>", "<cmd>qa<cr>", { desc = "Quit All" })
+-- map("n", "<bs>", "<cmd>qa<cr>", { desc = "Quit All" })
 -- map("n", "<bs>", LazyVim.ui.bufremove, { desc = "Delete Buffer" })
 -- map("n", "<bs>", "<cmd>:bd<cr>", { desc = "Delete Buffer and Window" })
 -- map("n", "<bs>", "<cmd>wincmd q<cr>", { desc = "Close window" })
