@@ -116,13 +116,14 @@ return {
   {
     "johmsalas/text-case.nvim",
     -- event = "VeryLazy", -- for `Subs` and `substitude_command_name` command, with interactive feature on first use
+    vscode = true,
     cmd = "S", -- for `substitude_command_name` command, without interactive feature on first use
     keys = function()
       local keys = {
         { "ga" },
         { "gar", ":Subs/", mode = { "n", "x" }, desc = "Subs" },
       }
-      if LazyVim.has("telescope.nvim") then
+      if LazyVim.has("telescope.nvim") or vim.g.vscode then
         keys[#keys + 1] = { "gaa", "<cmd>TextCaseOpenTelescope<CR>", mode = { "n", "x" }, desc = "Telescope" }
       end
       return keys
