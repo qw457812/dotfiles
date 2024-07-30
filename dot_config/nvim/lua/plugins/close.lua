@@ -38,6 +38,21 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = {
+    "dashboard", -- NOTE: not working in ../config/autocmds.lua, but works here or `opts` function of Lazy Plugin Spec
+    "leetcode.nvim", -- kawre/leetcode.nvim
+  },
+  callback = function(event)
+    vim.bo[event.buf].buflisted = false
+    vim.keymap.set("n", close_key, "<cmd>qa<cr>", {
+      buffer = event.buf,
+      silent = true,
+      desc = "Quit",
+    })
+  end,
+})
+
 return {
   -- TODO: see LazyVim.ui.bufremove
   {
@@ -60,23 +75,6 @@ return {
         end,
       },
     },
-  },
-
-  {
-    "nvimdev/dashboard-nvim",
-    optional = true,
-    opts = function()
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = "dashboard",
-        callback = function(event)
-          vim.keymap.set("n", close_key, "<cmd>qa<cr>", {
-            buffer = event.buf,
-            silent = true,
-            desc = "Quit",
-          })
-        end,
-      })
-    end,
   },
 
   {
@@ -114,4 +112,6 @@ return {
       },
     },
   },
+
+  -- TODO: lazygit
 }
