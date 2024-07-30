@@ -7,7 +7,9 @@ return {
       return vim.env.TMUX ~= nil
     end,
     opts = {
-      -- to work with yanky.nvim, see: https://github.com/moetayuko/nvimrc/blob/ae242cc18559cd386c36feb9f999b1a9596c7d09/lua/plugins/tmux.lua
+      -- To work with yanky.nvim, see:
+      -- https://github.com/moetayuko/nvimrc/blob/ae242cc18559cd386c36feb9f999b1a9596c7d09/lua/plugins/tmux.lua
+      -- https://github.com/aserowy/tmux.nvim/pull/123
       copy_sync = {
         -- sync all registers
         enable = false,
