@@ -8,6 +8,29 @@ end
 -- see: ~/.local/share/nvim/lazy/chezmoi.nvim/lua/telescope/_extensions/find_files.lua
 local chezmoi_list_args = { "--include", "files", "--exclude", "externals" }
 
+local pick_chezmoi = function()
+  if LazyVim.pick.picker.name == "telescope" then
+    require("telescope").extensions.chezmoi.find_files()
+  elseif LazyVim.pick.picker.name == "fzf" then
+    local chezmoi = require("chezmoi.commands")
+    local results = chezmoi.list({ args = chezmoi_list_args })
+    local opts = {
+      prompt = " ",
+      fzf_opts = {},
+      fzf_colors = true,
+      actions = {
+        ["default"] = function(selected)
+          if not vim.tbl_isempty(selected) then
+            chezmoi.edit({ targets = "~/" .. selected[1] })
+          end
+        end,
+      },
+      -- TODO: previewer
+    }
+    require("fzf-lua").fzf_exec(results, opts)
+  end
+end
+
 --- pick nvim config
 local pick_config = function()
   local chezmoi = require("chezmoi.commands")
@@ -64,7 +87,12 @@ local pick_config = function()
             return
           end
 
-          local file = require("fzf-lua.path").entry_to_file(selected[1], opts).path
+          -- copied from: https://github.com/ibhagwan/fzf-lua/blob/81e7345697d65f6083c681995d230b2d73492233/lua/fzf-lua/actions.lua#L123
+          local path = require("fzf-lua.path")
+          local file = path.entry_to_file(selected[1], opts).path
+          -- if not path.is_absolute(file) then
+          --   file = path.join({ opts.cwd or opts._cwd or vim.uv.cwd(), file })
+          -- end
           if vim.tbl_contains(managed_config_files, file) then
             chezmoi.edit({ targets = file })
           else
@@ -82,32 +110,7 @@ return {
     optional = true,
     keys = {
       { "<leader>sz", false },
-      {
-        "<leader>f.",
-        function()
-          if LazyVim.pick.picker.name == "telescope" then
-            require("telescope").extensions.chezmoi.find_files()
-          elseif LazyVim.pick.picker.name == "fzf" then
-            local chezmoi = require("chezmoi.commands")
-            local results = chezmoi.list({ args = chezmoi_list_args })
-            local opts = {
-              prompt = " ",
-              fzf_opts = {},
-              fzf_colors = true,
-              actions = {
-                ["default"] = function(selected)
-                  if not vim.tbl_isempty(selected) then
-                    chezmoi.edit({ targets = "~/" .. selected[1] })
-                  end
-                end,
-              },
-              -- TODO: previewer
-            }
-            require("fzf-lua").fzf_exec(results, opts)
-          end
-        end,
-        desc = "Find Chezmoi Source Dotfiles",
-      },
+      { "<leader>f.", pick_chezmoi, desc = "Find Chezmoi Source Dotfiles" },
       { "<leader>fc", pick_config, desc = "Find Config File" },
     },
   },
@@ -121,5 +124,25 @@ return {
     "nvim-telescope/telescope.nvim",
     optional = true,
     keys = { { "<leader>fc", false } },
+  },
+
+  {
+    "nvimdev/dashboard-nvim",
+    optional = true,
+    opts = function(_, opts)
+      local managed_config_files = require("chezmoi.commands").list({
+        targets = vim.fn.stdpath("config"),
+        args = chezmoi_list_args,
+      })
+      if not vim.tbl_isempty(managed_config_files) then
+        -- replace lazyvim config action
+        for _, button in ipairs(opts.config.center) do
+          if button.key == "c" then
+            button.action = pick_config
+            break
+          end
+        end
+      end
+    end,
   },
 }
