@@ -53,6 +53,15 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
+if vim.g.vscode then
+  vim.api.nvim_create_autocmd("User", {
+    pattern = "LazyVimKeymaps",
+    callback = function()
+      vim.keymap.set("n", "<bs>", [[<cmd>call VSCodeNotify('workbench.action.closeActiveEditor')<cr>]])
+    end,
+  })
+end
+
 return {
   -- TODO: see LazyVim.ui.bufremove
   {
