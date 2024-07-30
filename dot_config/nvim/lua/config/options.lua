@@ -14,6 +14,9 @@ opt.backupdir = vim.fn.stdpath("state") .. "/backup"
 -- Python LSP Server: use basedpyright instead of pyright
 vim.g.lazyvim_python_lsp = "basedpyright"
 
+vim.g.user_is_termux = vim.env.TERMUX_VERSION ~= nil
+vim.g.user_neotree_auto_close = vim.g.user_is_termux
+
 -- https://neovide.dev/configuration.html
 if vim.g.neovide then
   vim.g.neovide_hide_mouse_when_typing = true
