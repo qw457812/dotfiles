@@ -134,13 +134,11 @@ return {
         targets = vim.fn.stdpath("config"),
         args = chezmoi_list_args,
       })
-      if not vim.tbl_isempty(managed_config_files) then
-        -- replace lazyvim config action
-        for _, button in ipairs(opts.config.center) do
-          if button.key == "c" then
-            button.action = pick_config
-            break
-          end
+      -- replace lazyvim config action
+      for _, button in ipairs(opts.config.center) do
+        if button.key == "c" then
+          button.action = vim.tbl_isempty(managed_config_files) and LazyVim.pick.config_files() or pick_config
+          break
         end
       end
     end,
