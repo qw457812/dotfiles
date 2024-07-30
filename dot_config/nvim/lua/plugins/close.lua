@@ -25,7 +25,8 @@ vim.api.nvim_create_autocmd("User", {
   pattern = "LazyVimKeymaps",
   callback = function()
     vim.keymap.set("n", close_key, close_buffer_or_exit, { desc = "Delete Buffer or Exit" })
-    -- TODO: Map `<leader><bs>` to `:qa`? Already used by which-key.
+    -- NOTE: conflict with "go up one level" of which-key
+    vim.keymap.set("n", "<leader>" .. close_key, "<cmd>qa<cr>", { desc = "Quit All" })
   end,
 })
 
@@ -49,7 +50,7 @@ vim.api.nvim_create_autocmd("FileType", {
     "neotest-output-panel",
     "dbout",
     "gitsigns.blame",
-    -- close_key only
+    -- close_key
     "lazy",
     "mason",
     "Trans", -- JuanZoran/Trans.nvim
