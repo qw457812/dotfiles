@@ -79,34 +79,6 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
--- if close_key == "<bs>" then
---   local timeoutlen ---@type number
---   vim.api.nvim_create_autocmd("TermOpen", {
---     pattern = "*lazygit",
---     callback = function(event)
---       timeoutlen = vim.opt.timeoutlen
---       vim.opt.timeoutlen = 100
---       vim.keymap.set("t", close_key, "q", {
---         buffer = event.buf,
---         silent = true,
---         desc = "Quit Lazygit",
---       })
---       -- make <bs> available when typing commit message
---       vim.keymap.set("t", close_key .. close_key, close_key .. close_key, {
---         buffer = event.buf,
---         silent = true,
---         desc = "Hold " .. close_key .. " as " .. close_key .. " in Lazygit",
---       })
---     end,
---   })
---   vim.api.nvim_create_autocmd("TermClose", {
---     pattern = "*lazygit",
---     callback = function(event)
---       vim.opt.timeoutlen = timeoutlen or vim.opt.timeoutlen
---     end,
---   })
--- end
-
 if close_key == "<bs>" then
   vim.api.nvim_create_autocmd("TermOpen", {
     pattern = "*lazygit",
