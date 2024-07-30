@@ -56,7 +56,7 @@ vim.api.nvim_create_autocmd("FileType", {
     "Trans", -- JuanZoran/Trans.nvim
   },
   callback = function(event)
-    vim.bo[event.buf].buflisted = false
+    -- vim.bo[event.buf].buflisted = false
     vim.keymap.set("n", close_key, "<cmd>close<cr>", {
       buffer = event.buf,
       silent = true,
@@ -71,7 +71,6 @@ vim.api.nvim_create_autocmd("FileType", {
     "leetcode.nvim", -- kawre/leetcode.nvim
   },
   callback = function(event)
-    vim.bo[event.buf].buflisted = false
     vim.keymap.set("n", close_key, "<cmd>qa<cr>", {
       buffer = event.buf,
       silent = true,
@@ -79,6 +78,49 @@ vim.api.nvim_create_autocmd("FileType", {
     })
   end,
 })
+
+-- if close_key == "<bs>" then
+--   local timeoutlen ---@type number
+--   vim.api.nvim_create_autocmd("TermOpen", {
+--     pattern = "*lazygit",
+--     callback = function(event)
+--       timeoutlen = vim.opt.timeoutlen
+--       vim.opt.timeoutlen = 100
+--       vim.keymap.set("t", close_key, "q", {
+--         buffer = event.buf,
+--         silent = true,
+--         desc = "Quit Lazygit",
+--       })
+--       -- make <bs> available when typing commit message
+--       vim.keymap.set("t", close_key .. close_key, close_key .. close_key, {
+--         buffer = event.buf,
+--         silent = true,
+--         desc = "Hold " .. close_key .. " as " .. close_key .. " in Lazygit",
+--       })
+--     end,
+--   })
+--   vim.api.nvim_create_autocmd("TermClose", {
+--     pattern = "*lazygit",
+--     callback = function(event)
+--       vim.opt.timeoutlen = timeoutlen or vim.opt.timeoutlen
+--     end,
+--   })
+-- end
+
+if close_key == "<bs>" then
+  vim.api.nvim_create_autocmd("TermOpen", {
+    pattern = "*lazygit",
+    callback = function(event)
+      -- mapped <c-h> to quit in lazygit/config.yml via `quitWithoutChangingDirectory: <backspace>`
+      -- when typing a commit message in lazygit, <c-h> and <bs> do the same thing
+      vim.keymap.set("t", close_key, "<C-h>", {
+        buffer = event.buf,
+        silent = true,
+        desc = "Quit Lazygit",
+      })
+    end,
+  })
+end
 
 return {
   -- -- Use the `close_buffer_or_exit` defined above instead of `psjay/buffer-closer.nvim`,
@@ -140,6 +182,4 @@ return {
       },
     },
   },
-
-  -- TODO: lazygit
 }
