@@ -1,7 +1,33 @@
 -- close buffers, windows, or exit vim with the same single keypress
 local close_key = "<bs>"
 
--- TODO: Map `<leader><bs>` to `:qa`? Used by which-key.
+-- alternative to psjay/buffer-closer.nvim
+local function close_buffer_or_exit()
+  if vim.g.vscode then
+    vim.cmd([[call VSCodeNotify('workbench.action.closeActiveEditor')]])
+    return
+  end
+
+  -- copied from: https://github.com/psjay/buffer-closer.nvim/blob/74fec63c4c238b2cf6f61c40b47f869d442a8988/lua/buffer-closer/init.lua#L10
+  local listed_buffers = vim.tbl_filter(function(b)
+    return vim.bo[b].buflisted and vim.api.nvim_buf_is_valid(b)
+  end, vim.api.nvim_list_bufs())
+
+  if #listed_buffers > 1 then
+    -- vim.cmd("bd") -- Delete Buffer and Window
+    LazyVim.ui.bufremove() -- Delete Buffer
+  else
+    vim.cmd("qa")
+  end
+end
+
+vim.api.nvim_create_autocmd("User", {
+  pattern = "LazyVimKeymaps",
+  callback = function()
+    vim.keymap.set("n", close_key, close_buffer_or_exit, { desc = "Delete Buffer or Exit" })
+    -- TODO: Map `<leader><bs>` to `:qa`? Already used by which-key.
+  end,
+})
 
 -- close some filetypes with close_key
 -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/config/autocmds.lua
@@ -53,26 +79,18 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
-if vim.g.vscode then
-  vim.api.nvim_create_autocmd("User", {
-    pattern = "LazyVimKeymaps",
-    callback = function()
-      vim.keymap.set("n", "<bs>", [[<cmd>call VSCodeNotify('workbench.action.closeActiveEditor')<cr>]])
-    end,
-  })
-end
-
 return {
-  -- TODO: see LazyVim.ui.bufremove
-  {
-    "psjay/buffer-closer.nvim",
-    keys = {
-      { close_key, desc = "Close buffer/window or Exit" },
-    },
-    opts = {
-      close_key = close_key,
-    },
-  },
+  -- -- Use the `close_buffer_or_exit` defined above instead of `psjay/buffer-closer.nvim`,
+  -- -- since it's not working in java's library files.
+  -- {
+  --   "psjay/buffer-closer.nvim",
+  --   keys = {
+  --     { close_key, desc = "Close buffer/window or Exit" },
+  --   },
+  --   opts = {
+  --     close_key = close_key,
+  --   },
+  -- },
 
   {
     "folke/edgy.nvim",
