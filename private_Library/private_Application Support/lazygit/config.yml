@@ -1,6 +1,11 @@
 # https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md
 # https://github.com/jesseduffield/lazygit/blob/master/docs/Custom_Pagers.md
+# https://github.com/jesseduffield/lazygit/blob/master/docs/keybindings/Custom_Keybindings.md
 git:
   paging:
     colorArg: always
     pager: delta --dark --paging=never
+keybinding:
+  universal:
+    # quitWithoutChangingDirectory: Q
+    quitWithoutChangingDirectory: <backspace> # not working, but <c-h> works
