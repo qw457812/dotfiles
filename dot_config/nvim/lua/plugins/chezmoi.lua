@@ -70,7 +70,7 @@ local pick_config = function()
         end
 
         -- it's possible that only part of nvim config files are managed with chezmoi
-        -- pick all and just edit if unmanaged
+        -- pick them all and edit with or without chezmoi
         actions.select_default:replace_if(function()
           local selection = action_state.get_selected_entry()
           return selection and vim.tbl_contains(managed_config_files, config_dir .. "/" .. selection.value)
@@ -131,12 +131,25 @@ return {
     optional = true,
     opts = function(_, opts)
       -- replace lazyvim config action
-      for _, button in ipairs(opts.config.center) do
+      local config_idx = 6
+      for i, button in ipairs(opts.config.center) do
         if button.key == "c" then
+          config_idx = i
           button.action = pick_config
           break
         end
       end
+
+      -- add chezmoi button
+      local chezmoi = {
+        action = pick_chezmoi,
+        desc = " Chezmoi",
+        icon = "󰠦 ",
+        key = ".",
+      }
+      chezmoi.desc = chezmoi.desc .. string.rep(" ", 43 - #chezmoi.desc)
+      chezmoi.key_format = "  %s"
+      table.insert(opts.config.center, config_idx + 1, chezmoi)
     end,
   },
 }
