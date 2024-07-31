@@ -1,5 +1,7 @@
 -- close buffers, windows, or exit vim with the same single keypress
-local close_key = "<bs>"
+local close_key = "<bs>" -- easy to reach for Glove80
+-- exit nvim
+local exit_key = "<leader>" .. close_key -- NOTE: conflict with "go up one level" of which-key
 
 -- alternative to psjay/buffer-closer.nvim
 local function close_buffer_or_exit()
@@ -25,8 +27,7 @@ vim.api.nvim_create_autocmd("User", {
   pattern = "LazyVimKeymaps",
   callback = function()
     vim.keymap.set("n", close_key, close_buffer_or_exit, { desc = "Delete Buffer or Exit" })
-    -- NOTE: conflict with "go up one level" of which-key
-    vim.keymap.set("n", "<leader>" .. close_key, "<cmd>qa<cr>", { desc = "Quit All" })
+    vim.keymap.set("n", exit_key, "<cmd>qa<cr>", { desc = "Quit All" })
   end,
 })
 

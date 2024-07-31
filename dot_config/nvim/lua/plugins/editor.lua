@@ -61,20 +61,31 @@ return {
     end,
     opts = {
       close_if_last_window = true, -- close Neo-tree if it is the last window left in the tab
+      commands = {
+        unfocus_window = function(state)
+          if state.current_position == "left" then
+            vim.cmd("wincmd l")
+          end
+        end,
+        close_or_unfocus_window = function(state)
+          state.commands[vim.g.user_neotree_auto_close and "close_window" or "unfocus_window"](state)
+        end,
+      },
       window = {
         mappings = {
-          ["-"] = {
-            function(state)
-              -- toggle neo-tree, work with `-` defined in `keys` above
-              if vim.g.user_neotree_auto_close then
-                -- alternative: require("neo-tree.sources.common.commands").close_window(state)
-                state.commands["close_window"](state)
-              else
-                vim.cmd("wincmd l")
-              end
-            end,
-            desc = "close_window / go to right window",
-          },
+          -- ["-"] = {
+          --   function(state)
+          --     -- toggle neo-tree, work with `-` defined in `keys` above
+          --     if vim.g.user_neotree_auto_close then
+          --       -- alternative: require("neo-tree.sources.common.commands").close_window(state)
+          --       state.commands["close_window"](state)
+          --     else
+          --       state.commands["unfocus_window"](state)
+          --     end
+          --   end,
+          --   desc = "close_window / unfocus_window",
+          -- },
+          ["-"] = "close_or_unfocus_window", -- toggle neo-tree, work with `-` defined in `keys` above
           -- ["<bs>"] = "none", -- see: close.lua
           ["<tab>"] = {
             function(state)
@@ -141,12 +152,38 @@ return {
               end,
               desc = "expand node / focus first child / open",
             },
+            -- ["<esc>"] = {
+            --   function(state)
+            --     require("neo-tree.sources.common.commands").cancel(state) -- close preview or floating neo-tree window
+            --     require("neo-tree.sources.filesystem.commands").clear_filter(state)
+            --   end,
+            --   desc = "cancel + clear_filter",
+            -- },
             ["<esc>"] = {
               function(state)
-                require("neo-tree.sources.common.commands").cancel(state) -- close preview or floating neo-tree window
-                require("neo-tree.sources.filesystem.commands").clear_filter(state)
+                local preview = require("neo-tree.sources.common.preview")
+                -- copied from: https://github.com/nvim-neo-tree/neo-tree.nvim/blob/206241e451c12f78969ff5ae53af45616ffc9b72/lua/neo-tree/sources/common/commands.lua#L653
+                local has_preview = preview.is_active()
+                local has_floating = state.current_position == "float"
+                local has_filter = state.search_pattern
+                if has_preview or has_floating or has_filter then
+                  -- original behavior of <esc> is `cancel`: close preview or floating neo-tree window
+                  -- require("neo-tree.sources.common.commands").cancel(state)
+                  if has_preview then
+                    preview.hide()
+                  end
+                  if has_floating then
+                    require("neo-tree.ui.renderer").close_all_floating_windows()
+                  end
+                  if has_filter then
+                    require("neo-tree.sources.filesystem.commands").clear_filter(state)
+                  end
+                else
+                  -- close_or_unfocus_window if nothing to do
+                  state.commands["close_or_unfocus_window"](state)
+                end
               end,
-              desc = "cancel + clear_filter",
+              desc = "(cancel + clear_filter) / close_or_unfocus_window",
             },
           },
         },
