@@ -73,18 +73,6 @@ return {
       },
       window = {
         mappings = {
-          -- ["-"] = {
-          --   function(state)
-          --     -- toggle neo-tree, work with `-` defined in `keys` above
-          --     if vim.g.user_neotree_auto_close then
-          --       -- alternative: require("neo-tree.sources.common.commands").close_window(state)
-          --       state.commands["close_window"](state)
-          --     else
-          --       state.commands["unfocus_window"](state)
-          --     end
-          --   end,
-          --   desc = "close_window / unfocus_window",
-          -- },
           ["-"] = "close_or_unfocus_window", -- toggle neo-tree, work with `-` defined in `keys` above
           -- ["<bs>"] = "none", -- see: close.lua
           ["<tab>"] = {
