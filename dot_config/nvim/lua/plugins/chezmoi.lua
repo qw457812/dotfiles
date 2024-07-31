@@ -130,14 +130,10 @@ return {
     "nvimdev/dashboard-nvim",
     optional = true,
     opts = function(_, opts)
-      local managed_config_files = require("chezmoi.commands").list({
-        targets = vim.fn.stdpath("config"),
-        args = chezmoi_list_args,
-      })
       -- replace lazyvim config action
       for _, button in ipairs(opts.config.center) do
         if button.key == "c" then
-          button.action = vim.tbl_isempty(managed_config_files) and LazyVim.pick.config_files() or pick_config
+          button.action = pick_config
           break
         end
       end
