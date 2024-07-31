@@ -79,7 +79,6 @@ end
 -- https://github.com/Matt-FTW/dotfiles/blob/dd62c1c26ef480bb58a13de971e8418ec7181010/.config/nvim/lua/plugins/extras/editor/telescope/zoxide.lua
 -- https://github.com/jvgrootveld/telescope-zoxide/issues/4#issuecomment-877110133
 return {
-  -- https://github.com/LazyVim/LazyVim/issues/283#issuecomment-1433352997
   -- https://github.com/craftzdog/dotfiles-public/blob/master/.config/nvim/lua/plugins/editor.lua
   {
     "nvim-telescope/telescope.nvim",
@@ -89,8 +88,8 @@ return {
     keys = {
       { "<leader>fz", pick, desc = "Zoxide" },
     },
-    opts = {
-      extensions = {
+    opts = function(_, opts)
+      opts.extensions = vim.tbl_deep_extend("force", opts.extensions or {}, {
         zoxide = {
           prompt_title = "Zoxide",
           -- show_score = false, -- fork only
@@ -114,11 +113,12 @@ return {
             },
           },
         },
-      },
-    },
-    config = function(_, opts)
-      require("telescope").setup(opts)
-      require("telescope").load_extension("zoxide")
+      })
+
+      LazyVim.on_load("telescope.nvim", function()
+        require("telescope").setup(opts)
+        require("telescope").load_extension("zoxide")
+      end)
     end,
   },
 

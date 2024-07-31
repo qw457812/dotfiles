@@ -21,6 +21,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [aimuzov](https://github.com/aimuzov/LazyVimx)
   > Find from this [issue](https://github.com/LazyVim/LazyVim/pull/3503#issuecomment-2177573748), UI looks good.
   - [lazyvim.json](https://github.com/aimuzov/dotfiles/blob/main/dot_config/nvim/lazyvim.json)
+- [jacquin236](https://github.com/jacquin236/minimal-nvim)
 - [moetayuko](https://github.com/moetayuko/nvimrc)
   > [Contributor](https://github.com/aserowy/tmux.nvim/pull/123) of `aserowy/tmux.nvim`.
 - [Matt-FTW](https://github.com/Matt-FTW/dotfiles/tree/main/.config/nvim)
@@ -41,6 +42,10 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [Lazyman](https://github.com/doctorfree/nvim-lazyman)
 - [pkazmier](https://github.com/pkazmier/nvim)
 - [v1nh1shungry](https://github.com/v1nh1shungry/.dotfiles/tree/main/nvim)
+
+## Lazy Tips
+
+- [If you have multiple specs for the same plugin, then all `opts` will be evaluated, but only the last `config`](https://github.com/LazyVim/LazyVim/pull/4122#issuecomment-2241563662).
 
 ## TODO
 

@@ -73,10 +73,20 @@ return {
           },
         },
       })
-    end,
-    config = function(_, opts)
-      require("telescope").setup(opts)
-      require("telescope").load_extension("undo")
+
+      -- https://github.com/jacquin236/minimal-nvim/blob/baacb78adce67d704d17c3ad01dd7035c5abeca3/lua/plugins/editor/telescope-extras.lua#L5
+      -- NOTE:
+      -- 1. The `setup` and `load_extension` below can be skipped, but tab completions `:Telescope |<tab>` will not be available right away.
+      --    https://github.com/nvim-telescope/telescope.nvim/blob/10b8a82b042caf50b78e619d92caf0910211973d/README.md?plain=1#L598
+      -- 2. Seems to be that `load_extension` needs to be called after the `setup`.
+      --    https://github.com/LazyVim/LazyVim/issues/283#issuecomment-1433352997
+      -- 3. The reason of using `opts` function instead of `config` function:
+      --    If you have multiple specs for the same plugin, then all `opts` will be evaluated, but only the last `config`.
+      --    https://github.com/LazyVim/LazyVim/pull/4122#issuecomment-2241563662
+      LazyVim.on_load("telescope.nvim", function()
+        require("telescope").setup(opts)
+        require("telescope").load_extension("undo")
+      end)
     end,
   },
 }
