@@ -161,6 +161,16 @@ return {
         return opts
       end
 
+      -- https://github.com/folke/zen-mode.nvim/issues/111
+      vim.api.nvim_create_autocmd("VimLeavePre", {
+        desc = "Restore tmux status line when close Neovim in Zen Mode",
+        callback = function()
+          if vim.g.user_zenmode_on then
+            require("zen-mode").close()
+          end
+        end,
+      })
+
       -- https://github.com/folke/zen-mode.nvim/blob/a31cf7113db34646ca320f8c2df22cf1fbfc6f2a/lua/zen-mode/plugins.lua#L96
       local function get_tmux_opt(option)
         local option_raw = vim.fn.system([[tmux show -w ]] .. option)
@@ -200,20 +210,6 @@ return {
         vim.api.nvim_clear_autocmds({ group = group })
       end
       return opts
-    end,
-    config = function(_, opts)
-      require("zen-mode").setup(opts)
-      if vim.env.TMUX then
-        -- https://github.com/folke/zen-mode.nvim/issues/111
-        vim.api.nvim_create_autocmd({ "VimLeavePre" }, {
-          desc = "Restore tmux status line when close Neovim in Zen Mode",
-          callback = function()
-            if vim.g.user_zenmode_on then
-              require("zen-mode").close()
-            end
-          end,
-        })
-      end
     end,
   },
 
