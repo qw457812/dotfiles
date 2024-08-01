@@ -9,7 +9,7 @@ return {
   -- https://github.com/search?q=repo%3Akawre%2Fnvim%20leetcode&type=code
   -- https://github.com/ofseed/nvim/blob/338f7742db9739eb6fadfebaafcc5e6c7d316e8d/lua/plugins/tool/leetcode.lua#L29
   -- https://github.com/m1dsolo/dotfiles/blob/c99eef4184a1afe0ab1c01b060d027e34ad0ea7f/.config/nvim/lua/plugins/leetcode-nvim.lua#L84
-  -- TODO lsp not working sometimes
+  -- TODO: lsp not working sometimes
   -- https://github.com/joshuadanpeterson/nvim/blob/4bc23dfc8e3250d69fe4b118c320a6fe20546730/lua/config/settings.lua#L200
   {
     "kawre/leetcode.nvim",

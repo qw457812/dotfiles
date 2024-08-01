@@ -129,7 +129,7 @@ if LazyVim.has("tmux.nvim") then
   -- Resize window
   -- note: A-hjkl for move lines (by both LazyVim's default keybindings and lazyvim.plugins.extras.editor.mini-move)
   -- need to disable macOS keybord shortcuts of mission control first
-  -- TODO resize LazyVim's terminal
+  -- TODO: resize LazyVim's terminal
   map({ "n", "t" }, "<C-Left>", [[<cmd>lua require("tmux").resize_left()<cr>]], { desc = "Resize Window Left" })
   map({ "n", "t" }, "<C-Down>", [[<cmd>lua require("tmux").resize_bottom()<cr>]], { desc = "Resize Window Bottom" })
   map({ "n", "t" }, "<C-Up>", [[<cmd>lua require("tmux").resize_top()<cr>]], { desc = "Resize Window Top" })
@@ -153,8 +153,8 @@ map("n", "gp", function()
   vim.api.nvim_feedkeys("`[" .. vim.fn.strpart(vim.fn.getregtype(), 0, 1) .. "`]", "n", false)
 end, { desc = "Select last pasted/yanked/changed text" })
 
--- TODO search literal | https://vi.stackexchange.com/questions/17465/how-to-search-literally-without-any-regex-pattern
 -- search inside visually highlighted text
+-- TODO: search literal | https://vi.stackexchange.com/questions/17465/how-to-search-literally-without-any-regex-pattern
 map("x", "g/", "<esc>/\\%V", { desc = "Search Inside Visual Selection" })
 
 -- https://github.com/rstacruz/vimfiles/blob/ee9a3e7e7f022059b6d012eff2e88c95ae24ff97/lua/config/keymaps.lua#L35
