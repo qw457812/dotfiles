@@ -153,7 +153,7 @@ return {
                 -- copied from: https://github.com/nvim-neo-tree/neo-tree.nvim/blob/206241e451c12f78969ff5ae53af45616ffc9b72/lua/neo-tree/sources/common/commands.lua#L653
                 local has_preview = preview.is_active()
                 local has_floating = state.current_position == "float"
-                local has_filter = state.search_pattern
+                local has_filter = state.search_pattern ~= nil
                 if has_preview or has_floating or has_filter then
                   -- original behavior of <esc> is `cancel`: close preview or floating neo-tree window
                   -- require("neo-tree.sources.common.commands").cancel(state)

@@ -21,7 +21,7 @@ vim.g.user_neotree_auto_close = vim.g.user_is_termux
 if vim.g.neovide then
   vim.g.neovide_hide_mouse_when_typing = true
   -- both, only_left, only_right, none
-  vim.g.neovide_input_macos_option_key_is_meta = "only_left"
+  vim.g.neovide_input_macos_option_key_is_meta = "both"
   -- railgun, torpedo, pixiedust
   vim.g.neovide_cursor_vfx_mode = "railgun"
 end
