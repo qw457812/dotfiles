@@ -211,7 +211,8 @@ if vim.g.neovide then
   LazyVim.toggle.map("<leader>ua", {
     name = "Mini/Neovide Animate",
     get = function()
-      return not vim.g.minianimate_disable
+      -- return not vim.g.minianimate_disable -- extras.ui.mini-animate might not enabled
+      return vim.g.neovide_cursor_animate_command_line
     end,
     set = function(state)
       vim.g.minianimate_disable = not state

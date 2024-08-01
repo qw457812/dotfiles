@@ -1,6 +1,6 @@
 return {
-  { "folke/tokyonight.nvim", cond = false },
-  { "catppuccin/nvim", cond = false },
+  -- { "folke/tokyonight.nvim", cond = false },
+  -- { "catppuccin/nvim", cond = false },
 
   {
     "sainnhe/sonokai",
