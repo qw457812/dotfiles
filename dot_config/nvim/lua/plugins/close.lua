@@ -16,6 +16,7 @@ local function close_buffer_or_exit()
   end, vim.api.nvim_list_bufs())
 
   if #listed_buffers > 1 then
+    -- TODO: always use `vim.cmd("bd")` for floating windows. eg. LazyVim.news.changelog() by ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/view/float.lua
     -- vim.cmd("bd") -- Delete Buffer and Window
     LazyVim.ui.bufremove() -- Delete Buffer
   else
@@ -97,7 +98,7 @@ end
 
 return {
   -- -- Use the `close_buffer_or_exit` defined above instead of `psjay/buffer-closer.nvim`,
-  -- -- since it's not working in java's library files.
+  -- -- since it doesn't work in java's library files.
   -- {
   --   "psjay/buffer-closer.nvim",
   --   keys = {

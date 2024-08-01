@@ -1,6 +1,7 @@
 local lsp = vim.lsp
 local util = lsp.util
 local ms = lsp.protocol.Methods
+local replace_home = require("util.path").replace_home_with_tilde
 
 local function pick_definitions()
   if LazyVim.pick.want() == "telescope" then
@@ -98,11 +99,31 @@ return {
     "neovim/nvim-lspconfig",
     opts = function()
       local Keys = require("lazyvim.plugins.lsp.keymaps").get()
+      -- stylua: ignore
       vim.list_extend(Keys, {
         -- { "gd", pick_definitions_or_references, desc = "Goto Definition/References", has = "definition" },
         { "<cr>", pick_definitions_or_references, desc = "Goto Definition/References", has = "definition" },
+        -- https://github.com/jacquin236/minimal-nvim/blob/baacb78adce67d704d17c3ad01dd7035c5abeca3/lua/plugins/lsp.lua
+        { "<leader>cl", false },
+        { "<leader>il", "<cmd>LspInfo<cr>", desc = "Lsp" },
+        { "<leader>clr", "<cmd>LspRestart<cr>", desc = "Restart Lsp" },
+        { "<leader>cls", "<cmd>LspStart<cr>", desc = "Start Lsp" },
+        { "<leader>clS", "<cmd>LspStop<cr>", desc = "Stop Lsp" },
+        { "<leader>clW", function() vim.lsp.buf.remove_workspace_folder() end, desc = "Remove Workspace" },
+        { "<leader>clw", function() vim.lsp.buf.add_workspace_folder() end, desc = "Add Workspace" },
+        { "<leader>clL", function()
+          LazyVim.info(vim.tbl_map(replace_home, vim.lsp.buf.list_workspace_folders()), { title = "Lsp Workspaces" })
+        end, desc = "List Workspace" },
       })
     end,
+  },
+  {
+    "folke/which-key.nvim",
+    opts = {
+      spec = {
+        { "<leader>cl", group = "Lsp", icon = " " },
+      },
+    },
   },
 
   -- https://github.com/folke/dot/blob/13b8ed8d40755b58163ffff30e6a000d06fc0be0/nvim/lua/plugins/lsp.lua#L79
