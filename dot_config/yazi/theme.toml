@@ -1,19 +1,19 @@
-# https://yazi-rs.github.io/docs/faq#dont-like-nerd-fonts
+# # https://yazi-rs.github.io/docs/faq#dont-like-nerd-fonts
 # [status]
-# separator_open  = ""
+# separator_open = ""
 # separator_close = ""
+#
+# [icon]
+# rules = []
 
-[icon]
-rules = []
-
-# git clone https://github.com/yazi-rs/flavors.git ~/.config/yazi/flavors
+# # git clone https://github.com/yazi-rs/flavors.git ~/.config/yazi/flavors
 # [flavor]
 # use = "catppuccin-latte"
 # use = "catppuccin-frappe"
 # use = "catppuccin-macchiato"
 # use = "catppuccin-mocha"
 
-# https://github.com/Mellbourn/ls-colors.yazi/blob/main/theme.toml
+# # https://github.com/Mellbourn/ls-colors.yazi/blob/main/theme.toml
 # [filetype]
 # rules = [
 #     { name = "*", is = "block", fg = "#5f87d7" },
