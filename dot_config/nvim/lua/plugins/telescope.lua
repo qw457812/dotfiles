@@ -62,29 +62,58 @@ local pick_find_buffer_dir_files = function()
   end
 end
 
+local pick_colorschemes = function()
+  if LazyVim.pick.picker.name == "telescope" then
+    local colors = {}
+    -- :=vim.g.colors_name
+    if LazyVim.has("tokyonight.nvim") then
+      vim.list_extend(colors, {
+        -- "tokyonight-day", -- light
+        -- "tokyonight", -- same as `tokyonight-moon`
+        "tokyonight-moon",
+        "tokyonight-storm",
+        "tokyonight-night",
+      })
+    end
+    if LazyVim.has("catppuccin") then
+      vim.list_extend(colors, {
+        -- "catppuccin-latte", -- light
+        "catppuccin-frappe",
+        "catppuccin-macchiato",
+        -- "catppuccin", -- same as `catppuccin-mocha`
+        "catppuccin-mocha",
+      })
+    end
+    require("telescope.builtin").colorscheme({
+      colors = colors,
+      enable_preview = true,
+      ignore_builtins = true,
+    })
+  elseif LazyVim.pick.picker.name == "fzf" then
+    require("fzf-lua").colorschemes()
+  end
+end
+
+local keys = {
+  { "<leader>fP", pick_find_plugin_files, desc = "Find Plugin File" },
+  { "<leader>sP", pick_search_lazy_specs, desc = "Search Lazy Plugin Spec" },
+  { "<leader>fL", pick_find_lazy_files, desc = "Find Lazy File" },
+  { "<leader>sL", pick_search_lazy_codes, desc = "Search Lazy Code" },
+  { "<leader>fB", pick_find_buffer_dir_files, desc = "Find Files (Buffer Dir)" },
+  { "<leader>uC", pick_colorschemes, desc = "Colorscheme with Preview" },
+}
+
 return {
   {
     "ibhagwan/fzf-lua",
     optional = true,
-    keys = {
-      { "<leader>fP", pick_find_plugin_files, desc = "Find Plugin File" },
-      { "<leader>sP", pick_search_lazy_specs, desc = "Search Lazy Plugin Spec" },
-      { "<leader>fL", pick_find_lazy_files, desc = "Find Lazy File" },
-      { "<leader>sL", pick_search_lazy_codes, desc = "Search Lazy Code" },
-      { "<leader>fB", pick_find_buffer_dir_files, desc = "Find Files (Buffer Dir)" },
-    },
+    keys = keys,
   },
   -- https://www.lazyvim.org/configuration/examples
   {
     "nvim-telescope/telescope.nvim",
     optional = true,
-    keys = {
-      { "<leader>fP", pick_find_plugin_files, desc = "Find Plugin File" },
-      { "<leader>sP", pick_search_lazy_specs, desc = "Search Lazy Plugin Spec" },
-      { "<leader>fL", pick_find_lazy_files, desc = "Find Lazy File" },
-      { "<leader>sL", pick_search_lazy_codes, desc = "Search Lazy Code" },
-      { "<leader>fB", pick_find_buffer_dir_files, desc = "Find Files (Buffer Dir)" },
-    },
+    keys = keys,
     opts = {
       defaults = {
         layout_strategy = "horizontal",

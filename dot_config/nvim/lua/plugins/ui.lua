@@ -116,6 +116,27 @@ return {
     end,
   },
 
+  {
+    "echasnovski/mini.animate",
+    optional = true,
+    opts = function(_, opts)
+      local animate = require("mini.animate")
+      opts.cursor = {
+        timing = animate.gen_timing.linear({ duration = 80, unit = "total" }),
+        -- timing = animate.gen_timing.exponential({ easing = "out", duration = 80, unit = "total" }),
+        -- path = animate.gen_path.line({
+        --   predicate = function()
+        --     return true
+        --   end,
+        -- }),
+      }
+      opts.scroll = {
+        -- enable = false,
+        timing = animate.gen_timing.linear({ duration = 20, unit = "total" }),
+      }
+    end,
+  },
+
   -- https://github.com/folke/dot/blob/master/nvim/lua/plugins/ui.lua
   {
     "folke/twilight.nvim",

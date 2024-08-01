@@ -1,6 +1,6 @@
 -- https://github.com/aimuzov/LazyVimx/blob/af846de01acfaa78320d6564414c629e77d525e1/lua/lazyvimx/colorschemes/catppuccin.lua
 return {
-  { "folke/tokyonight.nvim", cond = false },
+  -- { "folke/tokyonight.nvim", cond = false },
 
   {
     "catppuccin/nvim",
