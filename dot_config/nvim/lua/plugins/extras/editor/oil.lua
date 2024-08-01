@@ -1,4 +1,4 @@
--- TODO see LazyVim.lsp.on_rename in:
+-- TODO: see LazyVim.lsp.on_rename in:
 -- - ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/editor.lua
 -- - ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/editor/mini-files.lua
 return {

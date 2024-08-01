@@ -1,4 +1,3 @@
--- require lazyvim.plugins.extras.lang.python
 if not LazyVim.has_extra("lang.python") then
   return {}
 end
@@ -8,14 +7,13 @@ return {
   {
     "linux-cultist/venv-selector.nvim",
     optional = true,
-    -- TODO temp fix: venv-selector does not work with extras.editor.fzf
-    -- https://github.com/LazyVim/LazyVim/issues/3612
-    -- https://github.com/linux-cultist/venv-selector.nvim/issues/142
+    -- TODO: temporary fix: venv-selector does not work with extras.editor.fzf
+    -- - https://github.com/LazyVim/LazyVim/issues/3612
+    -- - https://github.com/linux-cultist/venv-selector.nvim/issues/142
     dependencies = { "nvim-telescope/telescope.nvim" },
     opts = {
       settings = {
         options = {
-          -- for linux/mac: replace the home directory with `~` and remove the /bin/python part.
           on_telescope_result_callback = function(filename)
             return require("util.path").replace_home_with_tilde(filename):gsub("/bin/python", "")
           end,
@@ -47,11 +45,10 @@ return {
     "stevearc/conform.nvim",
     optional = true,
     opts = function(_, opts)
-      -- require lazyvim.plugins.extras.formatting.black
       if LazyVim.has_extra("formatting.black") then
         opts.formatters_by_ft = opts.formatters_by_ft or {}
         -- run multiple formatters sequentially
-        -- TODO ruff_format, ruff_organize_imports, ruff_fix?
+        -- TODO: ruff_format, ruff_organize_imports, ruff_fix?
         -- https://github.com/stevearc/conform.nvim#options
         -- https://github.com/fredrikaverpil/dotfiles/blob/be037d3e442b25d356f0bdd18ac2a17c346d71aa/nvim-fredrik/lua/lang/python.lua#L156
         opts.formatters_by_ft.python = { "isort", "black" }
@@ -59,11 +56,11 @@ return {
     end,
   },
 
-  -- TODO get the debugpy path from $VIRTUAL_ENV, then fallback to mason?
+  -- TODO: get the debugpy path from $VIRTUAL_ENV, then fallback to mason?
   -- https://github.com/fredrikaverpil/dotfiles/blob/be037d3e442b25d356f0bdd18ac2a17c346d71aa/nvim-fredrik/lua/lang/python.lua#L32
   -- https://github.com/LazyVim/LazyVim/pull/1031#discussion_r1251566896
 
-  -- TODO mfussenegger/nvim-lint: mypy?
+  -- TODO: mfussenegger/nvim-lint: mypy?
   -- https://github.com/akthe-at/.dotfiles/blob/49beab5ec32659fba8f3b0c5ca3a6f75cc7a7d8a/nvim/lua/plugins/lint.lua
   -- https://github.com/fredrikaverpil/dotfiles/blob/be037d3e442b25d356f0bdd18ac2a17c346d71aa/nvim-fredrik/lua/lang/python.lua#L177
 }

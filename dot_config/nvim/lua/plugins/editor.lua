@@ -107,11 +107,12 @@ return {
         -- possible values: "open_default" (default), "open_current", "disabled"
         -- hijack_netrw_behavior = "disabled", -- netrw left alone, neo-tree does not handle opening dirs
         window = {
-          -- TODO unify the keybindings of https://github.com/vifm/vifm and neo-tree.nvim (or telescope-file-browser.nvim)
+          -- TODO: unify the keybindings of https://github.com/vifm/vifm and neo-tree.nvim (or telescope-file-browser.nvim)
           -- https://github.com/craftzdog/dotfiles-public/blob/bf837d867b1aa153cbcb2e399413ec3bdcce112b/.config/nvim/lua/plugins/editor.lua#L58
+          -- https://github.com/jacquin236/minimal-nvim/blob/baacb78adce67d704d17c3ad01dd7035c5abeca3/lua/plugins/editor/telescope-extras.lua#L3
           mappings = {
-            -- TODO same behavior hjkl navigation for buffers and git_status
             -- https://github.com/nvim-neo-tree/neo-tree.nvim/wiki/Tips#navigation-with-hjkl
+            -- TODO: same behavior hjkl navigation, <esc> unfocus for buffers and git_status
             ["h"] = {
               function(state)
                 local node = state.tree:get_node()
@@ -254,6 +255,6 @@ return {
     },
   },
 
-  -- TODO choose motion plugin between: flash, leap, hop
+  -- TODO: choose motion plugin between: flash, leap, hop
   -- https://github.com/doctorfree/nvim-lazyman/blob/bb4091c962e646c5eb00a50eca4a86a2d43bcb7c/lua/ecovim/config/plugins.lua#L373
 }

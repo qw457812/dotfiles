@@ -1,5 +1,5 @@
 return {
-  -- TODO research
+  -- TODO: research
   -- https://github.com/hrsh7th/nvim-cmp/wiki/Example-mappings
   -- https://github.com/LazyVim/LazyVim/blob/330d2e470b79eb31f884685b331d5d255776de90/lua/lazyvim/plugins/compat/nvim-0_9.lua#L3
   -- https://github.com/LazyVim/LazyVim/blob/330d2e470b79eb31f884685b331d5d255776de90/lua/lazyvim/plugins/coding.lua#L109

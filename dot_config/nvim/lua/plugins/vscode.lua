@@ -1,4 +1,3 @@
--- require lazyvim.plugins.extras.vscode
 if not vim.g.vscode or not LazyVim.has_extra("vscode") then
   return {}
 end
