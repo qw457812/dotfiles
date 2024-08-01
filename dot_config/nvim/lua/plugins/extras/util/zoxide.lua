@@ -60,17 +60,17 @@ local pick = function()
 
   -- ~/.local/share/nvim/lazy/telescope-zoxide/lua/telescope/_extensions/zoxide/list.lua
   telescope.extensions.zoxide.list({
-    layout_config = {
-      horizontal = {
-        preview_width = function(_, max_columns, _)
-          if max_columns < 150 then
-            return math.floor(max_columns * 0.4)
-          else
-            return math.floor(max_columns * 0.5)
-          end
-        end,
-      },
-    },
+    -- layout_config = {
+    --   horizontal = {
+    --     preview_width = function(_, max_columns, _)
+    --       if max_columns < 150 then
+    --         return math.floor(max_columns * 0.4)
+    --       else
+    --         return math.floor(max_columns * 0.5)
+    --       end
+    --     end,
+    --   },
+    -- },
     -- previewer = previewers.vim_buffer_cat.new({}),
     previewer = tree_previewer,
   })

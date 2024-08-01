@@ -6,9 +6,7 @@ local Lazy = require("lazy")
 local LazyUtil = require("lazy.util")
 local replace_home = require("util.path").replace_home_with_tilde
 
-local del = vim.keymap.del
-
---- vim.keymap.set, silent by default
+--- Wrapper around vim.keymap.set that will set `silent` to true by default.
 --- https://github.com/folke/dot/blob/5df77fa64728a333f4d58e35d3ca5d8590c4f928/nvim/lua/config/options.lua#L22
 ---@param mode string|string[]
 ---@param lhs string
@@ -19,15 +17,16 @@ local function map(mode, lhs, rhs, opts)
   opts.silent = opts.silent ~= false
   vim.keymap.set(mode, lhs, rhs, opts)
 end
+local map_del = vim.keymap.del
 
 -- lazy/LazyVim
 -- https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/config/keymaps.lua
 map("n", "<leader>l", "", { desc = "+lazy/lazyvim" })
-del("n", "<leader>L")
+map_del("n", "<leader>L")
 map("n", "<leader>ll", "<cmd>Lazy<cr>", { desc = "Lazy" })
--- stylua: ignore start
-map("n", "<leader>lc", function() LazyVim.news.changelog() end, { desc = "LazyVim Changelog" })
 map("n", "<leader>lx", "<cmd>LazyExtras<cr>", { desc = "Extras" })
+-- stylua: ignore start
+map("n", "<leader>lL", function() LazyVim.news.changelog() end, { desc = "LazyVim Changelog" })
 -- alternative: vim.fn.system({ "open", "https://lazyvim.org" }) or vim.cmd("silent !open https://lazyvim.org")
 map("n", "<leader>ld", function() LazyUtil.open("https://lazyvim.org") end, { desc = "LazyVim Docs" })
 map("n", "<leader>lD", function() LazyUtil.open("https://lazy.folke.io") end, { desc = "lazy.nvim Docs" })
@@ -35,8 +34,45 @@ map("n", "<leader>lr", function() LazyUtil.open("https://github.com/LazyVim/Lazy
 map("n", "<leader>lR", function() LazyUtil.open("https://github.com/folke/lazy.nvim") end, { desc = "lazy.nvim Repo" })
 map("n", "<leader>lu", function() Lazy.update() end, { desc = "Lazy Update" })
 map("n", "<leader>ls", function() Lazy.sync() end, { desc = "Lazy Sync" })
-map("n", "<leader>lC", function() Lazy.check() end, { desc = "Lazy Check" })
+map("n", "<leader>lc", function() Lazy.check() end, { desc = "Lazy Check" })
 -- stylua: ignore end
+
+-- plugin info
+-- https://github.com/jacquin236/minimal-nvim/blob/main/lua/config/keymaps.lua
+map("n", "<leader>i", "", { desc = "+info" })
+map("n", "<leader>if", "<cmd>LazyFormatInfo<cr>", { desc = "Format" })
+map("n", "<leader>ic", "<cmd>ConformInfo<cr>", { desc = "Conform" })
+map("n", "<leader>ir", "<cmd>LazyRoot<cr>", { desc = "Root", remap = true })
+local function lint_info()
+  local lint = require("lint")
+  -- see: ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/linting.lua
+  local linters = lint._resolve_linter_by_ft(vim.bo.filetype)
+  linters = vim.tbl_filter(function(name)
+    local exists = lint.linters[name] ~= nil
+    if not exists then
+      LazyVim.warn("Linter not found: " .. name, { title = "Linters" })
+    end
+    return exists
+  end, linters)
+  if vim.tbl_isempty(linters) then
+    LazyVim.warn("No linters available", { title = "Linters" })
+    return
+  end
+
+  local ctx = { filename = vim.api.nvim_buf_get_name(0) }
+  ctx.dirname = vim.fn.fnamemodify(ctx.filename, ":h")
+  -- LazyVim extension `condition`
+  local function cond(name)
+    local linter = lint.linters[name]
+    return not (type(linter) == "table" and linter.condition and not linter.condition(ctx))
+  end
+  local lines = { "# Condition" }
+  for _, linter in ipairs(linters) do
+    lines[#lines + 1] = ("- [%s] **%s**"):format(cond(linter) and "x" or " ", linter)
+  end
+  LazyVim.info(lines, { title = "Linters" })
+end
+map("n", "<leader>iL", lint_info, { desc = "Lint" })
 
 -- navigate to line start and end from home row
 map({ "n", "x", "o" }, "H", "^", { desc = "Goto line start" })
@@ -56,6 +92,7 @@ map("x", "L", "g_", { desc = "Goto line end" })
 map("n", "<leader>fs", "<cmd>w<cr><esc>", { desc = "Save File" })
 -- save file without formatting
 map("n", "<leader>fS", "<cmd>noautocmd w<cr>", { desc = "Save File Without Formatting" })
+map("n", "<a-s>", "<cmd>noautocmd w<cr>", { desc = "Save File Without Formatting" })
 
 -- buffers
 -- see: akinsho/bufferline.nvim in ~/.config/nvim/lua/plugins/ui.lua
