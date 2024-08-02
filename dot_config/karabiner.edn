@@ -243,7 +243,7 @@
            [:left_arrow :!Sleft_arrow]
            [:right_arrow :!Sright_arrow]
            ;; [:spacebar :!Sspacebar]
-           [:return_or_enter :!Sreturn_or_enter]
+           [:return_or_enter :!Sreturn_or_enter :!WeWork]
            [:tab :!Stab]
            [:home :!Shome :!glove80]
            [:end :!Send :!glove80]
@@ -271,6 +271,9 @@
            [:w :!C0 :Preview] ; Actual Size (doomemacs pdf-view-fit-width-to-window)
            [:h :!C9 :Preview] ; Zoom to Fit (doomemacs pdf-view-fit-height-to-window)
            [:p :!C9 :Preview] ; Zoom to Fit (doomemacs pdf-view-fit-page-to-window)
+
+           ; see "WeWork: chat message navigation" below
+           [:return_or_enter :!Creturn_or_enter :WeWork] ; new line in Sheet cells
 
            ;; Glove80 only
            [:down_arrow :!Sup_arrow :glove80] ; see "For Glove80" below
@@ -340,7 +343,7 @@
            [:left_arrow :!Sleft_arrow]
            [:right_arrow :!Sright_arrow]
            ;; [:spacebar :!Sspacebar]
-           [:return_or_enter :!Sreturn_or_enter]
+           [:return_or_enter :!Sreturn_or_enter :!WeWork]
            [:tab :!Stab]
            [:home :!Sequal_sign] ; see "For Glove80" below
            [:end :!Shyphen] ; see "For Glove80" below
@@ -354,6 +357,9 @@
            [:w :!C0 :Preview] ; Actual Size (doomemacs pdf-view-fit-width-to-window)
            [:h :!C9 :Preview] ; Zoom to Fit (doomemacs pdf-view-fit-height-to-window)
            [:p :!C9 :Preview] ; Zoom to Fit (doomemacs pdf-view-fit-page-to-window)
+
+           ; see "WeWork: chat message navigation" below
+           [:return_or_enter :!Creturn_or_enter :WeWork] ; new line in Sheet cells
 
            ;; Glove80 only
            [:right_control :!Tgrave_accent_and_tilde] ; rime 方案选单
@@ -1678,6 +1684,7 @@
   {:des   "WeWork: chat message navigation"
    :rules [:WeWork
            [:!Tj :!COdown_arrow] ; select next unread chat message
+           [:!Sreturn_or_enter :!Creturn_or_enter] ; new line in Sheet cells
            ]}
 
   {:des   "WeChat: chat message navigation"
