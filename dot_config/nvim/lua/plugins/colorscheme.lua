@@ -4,7 +4,7 @@ return {
     optional = true,
     opts = function()
       return {
-        style = "moon", -- storm, moon, night, day
+        style = "storm", -- storm, moon(default), night, day
         -- transparent = true,
         -- styles = {
         --   sidebars = "transparent",
@@ -17,7 +17,7 @@ return {
           -- require lazyvim.plugins.extras.editor.illuminate
           -- #5b6078 #585b70 #51576d #494d64 #45475a
           -- util.blend_bg("#585b70", 0.85)
-          local illuminate = util.blend_fg("#3b4261", 0.875)
+          local illuminate = util.blend_fg(hl.IlluminatedWordRead.bg, 0.875)
           -- hl.IlluminatedWordText = { bg = "#3b4261" } -- use default
           hl.IlluminatedWordRead = { bg = illuminate }
           hl.IlluminatedWordWrite = { bg = illuminate, underline = true }
@@ -26,7 +26,7 @@ return {
           hl.LspReferenceRead = { link = "IlluminatedWordRead" }
           hl.LspReferenceWrite = { link = "IlluminatedWordWrite" }
           -- compensate for invisible text caused by custom illuminate highlight
-          hl.CmpGhostText = { bg = c.bg, fg = "#444a73" }
+          hl.CmpGhostText = { bg = c.bg, fg = util.blend_fg(hl.CmpGhostText.fg, 0.85) }
           -- unused variable
           hl.DiagnosticUnnecessary = { fg = util.blend_fg(c.terminal_black, 0.7) }
 
@@ -51,6 +51,9 @@ return {
     "catppuccin/nvim",
     optional = true,
     opts = {
+      background = {
+        dark = "frappe", -- frappe, macchiato, mocha(default)
+      },
       -- ~/.local/share/nvim/lazy/catppuccin/lua/catppuccin/palettes/mocha.lua
       custom_highlights = function(colors)
         local U = require("catppuccin.utils.colors")
