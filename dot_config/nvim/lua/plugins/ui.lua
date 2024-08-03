@@ -27,9 +27,18 @@ return {
   },
 
   -- https://github.com/aimuzov/LazyVimx/blob/a27d3439b9021d1215ce6471f59d801df32c18d4/lua/lazyvimx/extras/ui/panels/status-line.lua
+  -- https://github.com/jacquin236/minimal-nvim/blob/b74208114eae6cd724c276e0d966bf811822bcd5/lua/util/lualine.lua
   {
     "nvim-lualine/lualine.nvim",
     opts = function(_, opts)
+      local function ft_icon()
+        -- require("mini.icons").get("file", vim.fn.expand("%:t"))
+        local icon, hl, is_default = require("mini.icons").get("filetype", vim.bo.filetype) --[[@as string, string, boolean]]
+        if not is_default then
+          return icon .. " ", hl
+        end
+      end
+
       local function cond_always_hidden()
         return false
       end
@@ -44,18 +53,26 @@ return {
       -- https://github.com/Matt-FTW/dotfiles/blob/b12af2bc28c89c7185c48d6b02fb532b6d8be45d/.config/nvim/lua/plugins/extras/ui/lualine-extended.lua
       local lsp = function()
         local clients = vim.lsp.get_clients({ bufnr = 0 })
+        clients = vim.tbl_filter(function(client)
+          local ignored = { "null-ls", "copilot" }
+          return not vim.list_contains(ignored, client.name)
+        end, clients)
         if #clients == 0 then
           return ""
         end
-        return " "
+        return ft_icon() or " " -- 
       end
 
       local formatter = function()
-        local formatters = require("conform").list_formatters(0)
+        local ok, conform = pcall(require, "conform")
+        if not ok then
+          return ""
+        end
+        local formatters = conform.list_formatters(0)
         if #formatters == 0 then
           return ""
         end
-        return "󰛖 "
+        return " " -- 󰛖 
       end
 
       local linter = function()
@@ -73,41 +90,52 @@ return {
         if #linters == 0 then
           return ""
         end
-        return "󱉶 "
+        return "󰁨 " -- 󱉶
       end
 
-      -- "" ┊ |          
-      -- opts.options.section_separators = { left = "", right = "" }
-      -- opts.options.component_separators = { left = "", right = "" }
-      opts.options.section_separators = { left = "", right = "" }
-      opts.options.component_separators = { left = "", right = "" }
-
-      -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/ui.lua
-      ------@diagnostic disable-next-line: assign-type-mismatch
-      ---opts.sections.lualine_c[1] = LazyVim.lualine.root_dir({ cwd = true })
+      -- see: ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/ui.lua
+      ---@diagnostic disable-next-line: assign-type-mismatch
+      opts.sections.lualine_c[1] = LazyVim.lualine.root_dir({ cwd = true })
       opts.sections.lualine_c[3].cond = cond_always_hidden -- filetype
       opts.sections.lualine_c[4] = {
         pretty_path({
           -- relative = "root",
           directory_hl = "Conceal",
-          length = 6,
+          -- length = 6,
         }),
       }
       if not vim.g.user_is_termux then
-        table.insert(opts.sections.lualine_x, 2, lsp)
-        table.insert(opts.sections.lualine_x, 2, formatter)
-        table.insert(opts.sections.lualine_x, 2, linter)
+        table.insert(opts.sections.lualine_x, 2, {
+          lsp,
+          color = function()
+            -- local _, hl = ft_icon()
+            -- return LazyVim.ui.fg(hl and hl ~= "MiniIconsGrey" and hl or "MiniIconsOrange")
+            return LazyVim.ui.fg(select(2, ft_icon()) or "MiniIconsOrange")
+          end,
+        })
+        -- hl: Identifier DiagnosticOk Function Label Operator Type
+        -- stylua: ignore
+        table.insert(opts.sections.lualine_x, 2, { formatter, color = function() return LazyVim.ui.fg("WhichKeyIconCyan") end })
+        -- stylua: ignore
+        table.insert(opts.sections.lualine_x, 2, { linter, color = function() return LazyVim.ui.fg("WhichKeyIconGreen") end })
       end
       opts.sections.lualine_y = { { "filetype", icon_only = vim.g.user_is_termux } }
 
-      local bubbles = true
+      local bubbles = false
       if bubbles then
+        -- "" ┊ |          
+        opts.options.section_separators = { left = "", right = "" }
+        opts.options.component_separators = { left = "", right = "" }
+
         opts.sections.lualine_a = { { "mode", separator = { left = "" } } }
         opts.sections.lualine_z = {
           { "location", separator = { left = "" }, padding = { left = 1, right = 0 } },
           { "progress", separator = { right = "" } },
         }
       else
+        opts.options.section_separators = { left = "", right = "" }
+        opts.options.component_separators = { left = "", right = "" }
+
         opts.sections.lualine_z = {
           { "location", separator = " ", padding = { left = 1, right = 0 } },
           { "progress", padding = { left = 0, right = 1 } },
