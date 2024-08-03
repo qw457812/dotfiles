@@ -18,7 +18,7 @@ decorations = "None"
 # "Windowed" | "Maximized" | "Fullscreen" | "SimpleFullscreen"
 startup_mode = "Maximized"
 # "OnlyLeft" | "OnlyRight" | "Both" | "None" # (macos only)
-option_as_alt = "OnlyLeft"
+option_as_alt = "Both"
 
 [font]
 # family: "JetBrainsMono Nerd Font", "Hack Nerd Font", "MesloLGM Nerd Font", "FiraCode Nerd Font"
