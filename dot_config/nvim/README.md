@@ -100,6 +100,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] Try [smart-splits.nvim](https://github.com/mrjones2014/smart-splits.nvim) instead of tmux.nvim.
 - [ ] [lang/tmux](https://github.com/rafi/vim-config/blob/b9648dcdcc6674b707b963d8de902627fbc887c8/lua/rafi/plugins/extras/lang/tmux.lua)
 - [ ] [vim.g.maplocalleader = ","](https://github.com/wfxr/dotfiles/blob/661bfabf3b813fd8af79d881cd28b72582d4ccca/vim/nvim/lua/config/options.lua#L6) or `,,`, `,e` keymaps.
+  > [grug-far use `localleader` by default](https://github.com/MagicDuck/grug-far.nvim#%EF%B8%8F-configuration) as that is the vim [recommended](https://learnvimscriptthehardway.stevelosh.com/chapters/11.html#local-leader) way for plugins.
 - [ ] [rebelot/heirline.nvim](https://github.com/rebelot/heirline.nvim) like [dragove](https://github.com/dragove/dotfiles/blob/master/nvim/.config/nvim/lua/plugins/ui/heirline.lua)
 - [ ] [vim-matchup](https://github.com/andymass/vim-matchup) like [amaanq](https://github.com/amaanq/nvim-config/blob/master/lua/plugins/coding.lua)
 - [ ] `venv-selector.nvim`'s [on_venv_activate_callback](https://github.com/linux-cultist/venv-selector.nvim/tree/regexp?tab=readme-ov-file#run-your-own-code-on-venv-activation-on_venv_activate_callback) like [inogai](https://github.com/inogai/neovim-config-lazy/blob/50f68f6acc0cea283a0e89bddde6f9897680c749/lua/plugins/python.lua) with `toggleterm`

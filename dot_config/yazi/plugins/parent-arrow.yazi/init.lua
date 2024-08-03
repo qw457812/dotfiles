@@ -11,6 +11,7 @@ local function entry(_, args)
 		return ya.err(args[1], "is not a number")
 	end
 
+	-- Skip files
 	local start = parent.cursor + 1 + offset
 	local end_ = offset < 0 and 1 or #parent.files
 	local step = offset < 0 and -1 or 1
