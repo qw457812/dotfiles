@@ -10,13 +10,20 @@ local function close_buffer_or_exit()
     return
   end
 
+  -- see `close_with_q` in ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/config/autocmds.lua
+  -- other non-listed buffers: lazy, mason, LazyVim.news.changelog(), JuanZoran/Trans.nvim
+  if not vim.bo.buflisted then
+    vim.cmd("close") -- Close Window
+    return
+  end
+
   -- copied from: https://github.com/psjay/buffer-closer.nvim/blob/74fec63c4c238b2cf6f61c40b47f869d442a8988/lua/buffer-closer/init.lua#L10
   local listed_buffers = vim.tbl_filter(function(b)
     return vim.bo[b].buflisted and vim.api.nvim_buf_is_valid(b)
   end, vim.api.nvim_list_bufs())
 
   if #listed_buffers > 1 then
-    -- TODO: always use `vim.cmd("bd")` for floating windows. eg. LazyVim.news.changelog() by ~/.local/share/nvim/lazy/lazy.nvim/lua/lazy/view/float.lua
+    -- TODO: Always use `vim.cmd("bd")` for floating windows?
     -- vim.cmd("bd") -- Delete Buffer and Window
     LazyVim.ui.bufremove() -- Delete Buffer
   else
@@ -32,40 +39,40 @@ vim.api.nvim_create_autocmd("User", {
   end,
 })
 
--- close some filetypes with close_key
--- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/config/autocmds.lua
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = {
-    -- close_with_q by LazyVim
-    "PlenaryTestPopup",
-    "grug-far",
-    "help",
-    "lspinfo",
-    "notify",
-    "qf",
-    "spectre_panel",
-    "startuptime",
-    "tsplayground",
-    "neotest-output",
-    "checkhealth",
-    "neotest-summary",
-    "neotest-output-panel",
-    "dbout",
-    "gitsigns.blame",
-    -- close_key
-    "lazy",
-    "mason",
-    "Trans", -- JuanZoran/Trans.nvim
-  },
-  callback = function(event)
-    -- vim.bo[event.buf].buflisted = false
-    vim.keymap.set("n", close_key, "<cmd>close<cr>", {
-      buffer = event.buf,
-      silent = true,
-      desc = "Quit buffer",
-    })
-  end,
-})
+-- -- close some filetypes with close_key
+-- -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/config/autocmds.lua
+-- vim.api.nvim_create_autocmd("FileType", {
+--   pattern = {
+--     -- close_with_q by LazyVim
+--     "PlenaryTestPopup",
+--     "grug-far",
+--     "help",
+--     "lspinfo",
+--     "notify",
+--     "qf",
+--     "spectre_panel",
+--     "startuptime",
+--     "tsplayground",
+--     "neotest-output",
+--     "checkhealth",
+--     "neotest-summary",
+--     "neotest-output-panel",
+--     "dbout",
+--     "gitsigns.blame",
+--     -- close_key
+--     "lazy",
+--     "mason",
+--     "Trans", -- JuanZoran/Trans.nvim
+--   },
+--   callback = function(event)
+--     -- vim.bo[event.buf].buflisted = false
+--     vim.keymap.set("n", close_key, "<cmd>close<cr>", {
+--       buffer = event.buf,
+--       silent = true,
+--       desc = "Quit buffer",
+--     })
+--   end,
+-- })
 
 vim.api.nvim_create_autocmd("FileType", {
   pattern = {
