@@ -11,11 +11,10 @@ return {
       }
 
       -- for i = 1, 9 do
-      --   table.insert(mappings, {
-      --     "<leader>b" .. i,
-      --     "<cmd>BufferLineGoToBuffer " .. i .. "<cr>",
-      --     desc = "Goto Buffer " .. i,
-      --   })
+      --   table.insert(
+      --     mappings,
+      --     { "<leader>b" .. i, "<cmd>BufferLineGoToBuffer " .. i .. "<cr>", desc = "Goto Buffer " .. i }
+      --   )
       -- end
       return vim.list_extend(mappings, keys)
     end,
