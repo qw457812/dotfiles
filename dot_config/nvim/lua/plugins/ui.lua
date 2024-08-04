@@ -39,9 +39,8 @@ return {
         end
       end
 
-      local function cond_always_hidden()
-        return false
-      end
+      -- stylua: ignore
+      local function cond_always_hidden() return false end
 
       -- https://github.com/aimuzov/LazyVimx/blob/a27d3439b9021d1215ce6471f59d801df32c18d4/lua/lazyvimx/extras/hacks/lazyvim-lualine-pretty-path.lua
       local function pretty_path(o)
@@ -51,30 +50,6 @@ return {
       end
 
       -- https://github.com/Matt-FTW/dotfiles/blob/b12af2bc28c89c7185c48d6b02fb532b6d8be45d/.config/nvim/lua/plugins/extras/ui/lualine-extended.lua
-      local lsp = function()
-        local clients = vim.lsp.get_clients({ bufnr = 0 })
-        clients = vim.tbl_filter(function(client)
-          local ignored = { "null-ls", "copilot" }
-          return not vim.list_contains(ignored, client.name)
-        end, clients)
-        if #clients == 0 then
-          return ""
-        end
-        return ft_icon() or " " -- 
-      end
-
-      local formatter = function()
-        local ok, conform = pcall(require, "conform")
-        if not ok then
-          return ""
-        end
-        local formatters = conform.list_formatters(0)
-        if #formatters == 0 then
-          return ""
-        end
-        return " " -- 󰛖 
-      end
-
       local linter = function()
         local lint = require("lint")
         -- respect LazyVim extension `condition`
@@ -93,6 +68,30 @@ return {
         return "󰁨 " -- 󱉶
       end
 
+      local formatter = function()
+        local ok, conform = pcall(require, "conform")
+        if not ok then
+          return ""
+        end
+        local formatters = conform.list_formatters(0)
+        if #formatters == 0 then
+          return ""
+        end
+        return " " -- 󰛖 
+      end
+
+      local lsp = function()
+        local clients = vim.lsp.get_clients({ bufnr = 0 })
+        clients = vim.tbl_filter(function(client)
+          local ignored = { "null-ls", "copilot" }
+          return not vim.list_contains(ignored, client.name)
+        end, clients)
+        if #clients == 0 then
+          return ""
+        end
+        return ft_icon() or " " -- 
+      end
+
       -- see: ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/ui.lua
       ---@diagnostic disable-next-line: assign-type-mismatch
       opts.sections.lualine_c[1] = LazyVim.lualine.root_dir({ cwd = true })
@@ -101,23 +100,16 @@ return {
         pretty_path({
           -- relative = "root",
           directory_hl = "Conceal",
-          -- length = 6,
+          length = vim.g.user_is_termux and 2 or 3,
         }),
       }
       if not vim.g.user_is_termux then
-        table.insert(opts.sections.lualine_x, 2, {
-          lsp,
-          color = function()
-            -- local _, hl = ft_icon()
-            -- return LazyVim.ui.fg(hl and hl ~= "MiniIconsGrey" and hl or "MiniIconsOrange")
-            return LazyVim.ui.fg(select(2, ft_icon()) or "MiniIconsOrange")
-          end,
+        -- stylua: ignore
+        vim.list_extend(opts.sections.lualine_x, {
+          { linter, color = function() return LazyVim.ui.fg("WhichKeyIconGreen") end },
+          { formatter, color = function() return LazyVim.ui.fg("WhichKeyIconCyan") end },
+          { lsp, color = function() return LazyVim.ui.fg(select(2, ft_icon()) or "Special") end }, -- Identifier
         })
-        -- hl: Identifier DiagnosticOk Function Label Operator Type
-        -- stylua: ignore
-        table.insert(opts.sections.lualine_x, 2, { formatter, color = function() return LazyVim.ui.fg("WhichKeyIconCyan") end })
-        -- stylua: ignore
-        table.insert(opts.sections.lualine_x, 2, { linter, color = function() return LazyVim.ui.fg("WhichKeyIconGreen") end })
       end
       opts.sections.lualine_y = { { "filetype", icon_only = vim.g.user_is_termux } }
 

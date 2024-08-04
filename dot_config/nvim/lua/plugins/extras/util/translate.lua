@@ -46,8 +46,8 @@ return {
           -- split_width = 60,
           keymaps = {
             close = "q",
-            pageup = "<C-u>",
-            pagedown = "<C-d>",
+            pageup = "<C-b>", -- same as Lsp Hover Doc Scrolling
+            pagedown = "<C-f>",
           },
           -- order to display translate result
           order = {

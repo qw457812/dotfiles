@@ -8,7 +8,6 @@ return {
   {
     "nvim-neo-tree/neo-tree.nvim",
     keys = function(_, keys)
-      -- for holding layout like no-neck-pain.nvim when Auto Close is disabled
       LazyVim.toggle.map("<leader>uz", {
         name = "NeoTree Auto Close",
         get = function()
