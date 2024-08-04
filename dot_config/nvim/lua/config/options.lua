@@ -5,17 +5,17 @@
 local opt = vim.opt
 
 opt.relativenumber = false
-opt.spelllang = { "en", "cjk" } -- exclude East Asian characters from spell checking
+opt.spelllang:append("cjk") -- exclude East Asian characters from spell checking
 opt.timeoutlen = vim.g.vscode and 1000 or 500 -- increase timeoutlen for mini.operators (`cr` and `cR`) since which-key v3
 -- https://github.com/folke/dot/blob/master/nvim/lua/config/options.lua
 opt.backup = true
 opt.backupdir = vim.fn.stdpath("state") .. "/backup"
 
--- Python LSP Server: use basedpyright instead of pyright
 vim.g.lazyvim_python_lsp = "basedpyright"
-
 vim.g.user_is_termux = vim.env.TERMUX_VERSION ~= nil
+-- For holding layout like no-neck-pain.nvim when Auto Close is disabled
 vim.g.user_neotree_auto_close = vim.g.user_is_termux
+vim.g.trouble_lualine = not vim.g.user_is_termux
 
 -- https://neovide.dev/configuration.html
 if vim.g.neovide then
