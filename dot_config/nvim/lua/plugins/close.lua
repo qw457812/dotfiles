@@ -11,18 +11,18 @@ local function close_buffer_or_window_or_exit()
     return
   end
 
+  local function listed_buffers()
+    return vim.tbl_filter(function(b)
+      return vim.bo[b].buflisted and vim.api.nvim_buf_is_valid(b)
+    end, vim.api.nvim_list_bufs())
+  end
+
   -- valid and not floating
   -- https://github.com/echasnovski/mini.nvim/blob/af673d8523c5c2c5ff0a53b1e42a296ca358dcc7/lua/mini/animate.lua#L1397
   local function normal_windows()
     return vim.tbl_filter(function(w)
       return vim.api.nvim_win_is_valid(w) and vim.api.nvim_win_get_config(w).relative == ""
     end, vim.api.nvim_list_wins())
-  end
-
-  local function listed_buffers()
-    return vim.tbl_filter(function(b)
-      return vim.bo[b].buflisted and vim.api.nvim_buf_is_valid(b)
-    end, vim.api.nvim_list_bufs())
   end
 
   if vim.bo.buflisted then
@@ -105,16 +105,6 @@ return {
   },
 
   {
-    "stevearc/oil.nvim",
-    optional = true,
-    opts = {
-      keymaps = {
-        [close_key] = "actions.close",
-      },
-    },
-  },
-
-  {
     "nvim-telescope/telescope.nvim",
     optional = true,
     opts = {
@@ -124,6 +114,16 @@ return {
             [close_key] = "close",
           },
         },
+      },
+    },
+  },
+
+  {
+    "stevearc/oil.nvim",
+    optional = true,
+    opts = {
+      keymaps = {
+        [close_key] = "actions.close",
       },
     },
   },

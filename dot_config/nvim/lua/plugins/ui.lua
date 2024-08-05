@@ -74,7 +74,11 @@ return {
         end
         local formatters = conform.list_formatters(0)
         if #formatters == 0 then
-          return ""
+          local lsp_format = require("conform.lsp_format")
+          local lsp_clients = lsp_format.get_format_clients({ bufnr = vim.api.nvim_get_current_buf() })
+          if #lsp_clients == 0 then
+            return ""
+          end
         end
         return " " -- 󰛖 
       end
@@ -102,6 +106,25 @@ return {
           length = vim.g.user_is_termux and 2 or 3,
         }),
       }
+      -- if vim.g.trouble_lualine and LazyVim.has("trouble.nvim") then
+      --   local trouble = require("trouble")
+      --   local symbols = trouble.statusline({
+      --     mode = "symbols", -- lsp_document_symbols
+      --     groups = {},
+      --     title = false,
+      --     filter = { range = true },
+      --     format = "{kind_icon}{symbol.name:Normal}",
+      --     hl_group = "lualine_c_normal",
+      --     -- max_items = 5,
+      --   })
+      --   opts.sections.lualine_c[#opts.sections.lualine_c] = {
+      --     symbols and symbols.get,
+      --     cond = function()
+      --       return vim.b.trouble_lualine ~= false and symbols.has()
+      --     end,
+      --   }
+      -- end
+
       if not vim.g.user_is_termux then
         -- stylua: ignore
         vim.list_extend(opts.sections.lualine_x, {
@@ -223,7 +246,7 @@ return {
         return opt
       end
       local tmux_status = get_tmux_opt("status")
-      local group = vim.api.nvim_create_augroup("zen_mode_tmux", { clear = true })
+      local group = vim.api.nvim_create_augroup("zenmode_tmux", { clear = true })
       -- https://github.com/TranThangBin/init.lua/blob/3a357269ecbcb88d2a8b727cb1820541194f3283/lua/tranquangthang/lazy/zen-mode.lua#L39
       local on_open = opts.on_open or function() end
       opts.on_open = function()

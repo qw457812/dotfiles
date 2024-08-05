@@ -88,6 +88,9 @@ map("x", "L", "g_", { desc = "Goto line end" })
 -- map("n", "<bs>", "<cmd>:bd<cr>", { desc = "Delete Buffer and Window" })
 -- map("n", "<bs>", "<cmd>wincmd q<cr>", { desc = "Close window" })
 
+map_del({ "n", "x", "o" }, "n")
+map_del({ "n", "x", "o" }, "N")
+
 -- save file
 map("n", "<leader>fs", "<cmd>w<cr><esc>", { desc = "Save File" })
 -- save file without formatting
