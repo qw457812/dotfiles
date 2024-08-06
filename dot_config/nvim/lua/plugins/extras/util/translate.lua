@@ -1,7 +1,6 @@
 return {
   {
     "JuanZoran/Trans.nvim",
-    event = "VeryLazy",
     dependencies = { "kkharji/sqlite.lua" },
     build = function()
       -- https://github.com/JuanZoran/Trans.nvim/issues/52#issuecomment-1869952281
