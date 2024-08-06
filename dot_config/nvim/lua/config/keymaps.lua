@@ -149,16 +149,16 @@ map("n", "dd", function()
   end
 end, { expr = true, desc = "Don't Yank Empty Line to Clipboard" })
 
--- https://github.com/wfxr/dotfiles/blob/661bfabf3b813fd8af79d881cd28b72582d4ccca/vim/nvim/lua/config/keymaps.lua#L35
--- map("n", "gV", "`[v`]", { desc = "Select last pasted/yanked/changed text" })
+-- Reselect latest changed, put, or yanked text
+-- https://github.com/echasnovski/mini.nvim/blob/af673d8523c5c2c5ff0a53b1e42a296ca358dcc7/lua/mini/basics.lua#L589
+-- map("n", "gV", '"`[" . strpart(getregtype(), 0, 1) . "`]"', { expr = true, replace_keycodes = false, desc = "Visually select changed text" })
 -- https://github.com/gregorias/coerce.nvim#tips--tricks
-map("n", "gp", function()
-  vim.api.nvim_feedkeys("`[" .. vim.fn.strpart(vim.fn.getregtype(), 0, 1) .. "`]", "n", false)
-end, { desc = "Select last pasted/yanked/changed text" })
+-- stylua: ignore
+map("n", "gp", function() vim.api.nvim_feedkeys("`[" .. vim.fn.strpart(vim.fn.getregtype(), 0, 1) .. "`]", "n", false) end, { desc = "Reselect last put/yanked/changed text" })
 
--- search inside visually highlighted text
+-- Search inside visually highlighted text. Use `silent = false` for it to make effect immediately.
 -- TODO: search literal | https://vi.stackexchange.com/questions/17465/how-to-search-literally-without-any-regex-pattern
-map("x", "g/", "<esc>/\\%V", { desc = "Search Inside Visual Selection" })
+map("x", "g/", "<esc>/\\%V", { silent = false, desc = "Search inside visual selection" })
 
 -- https://github.com/rstacruz/vimfiles/blob/ee9a3e7e7f022059b6d012eff2e88c95ae24ff97/lua/config/keymaps.lua#L35
 -- :let @+=expand('%:p')<cr>

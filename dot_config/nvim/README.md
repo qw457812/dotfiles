@@ -39,6 +39,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [Trending Preconfigured plugins by Dotfyle](https://dotfyle.com/neovim/plugins/trending?categories=preconfigured)
 - [nvimdots](https://dotfyle.com/plugins/ayamir/nvimdots)
 - [AstroCommunity](https://github.com/AstroNvim/astrocommunity)
+- [mini.basics](https://github.com/echasnovski/mini.nvim/blob/main/lua/mini/basics.lua): [Common configuration presets](https://github.com/echasnovski/mini.nvim#modules)
 - [Lazyman](https://github.com/doctorfree/nvim-lazyman)
 - [pkazmier](https://github.com/pkazmier/nvim)
 - [v1nh1shungry](https://github.com/v1nh1shungry/.dotfiles/tree/main/nvim)

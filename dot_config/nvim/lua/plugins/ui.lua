@@ -161,6 +161,20 @@ return {
   },
 
   {
+    "nvimdev/dashboard-nvim",
+    optional = true,
+    opts = function(_, opts)
+      -- do not `startinsert` for "New File"
+      for _, button in ipairs(opts.config.center) do
+        if button.key == "n" then
+          button.action = "ene"
+          break
+        end
+      end
+    end,
+  },
+
+  {
     "echasnovski/mini.animate",
     optional = true,
     opts = function(_, opts)

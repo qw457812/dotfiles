@@ -10,6 +10,16 @@ opt.timeoutlen = vim.g.vscode and 1000 or 500 -- increase timeoutlen for mini.op
 -- https://github.com/folke/dot/blob/master/nvim/lua/config/options.lua
 opt.backup = true
 opt.backupdir = vim.fn.stdpath("state") .. "/backup"
+-- https://github.com/echasnovski/mini.nvim/blob/af673d8523c5c2c5ff0a53b1e42a296ca358dcc7/lua/mini/basics.lua#L535
+-- stylua: ignore
+local win_borders_fillchars = {
+  bold   = 'vert:┃,horiz:━,horizdown:┳,horizup:┻,verthoriz:╋,vertleft:┫,vertright:┣',
+  dot    = 'vert:·,horiz:·,horizdown:·,horizup:·,verthoriz:·,vertleft:·,vertright:·',
+  double = 'vert:║,horiz:═,horizdown:╦,horizup:╩,verthoriz:╬,vertleft:╣,vertright:╠',
+  single = 'vert:│,horiz:─,horizdown:┬,horizup:┴,verthoriz:┼,vertleft:┤,vertright:├',
+  solid  = 'vert: ,horiz: ,horizdown: ,horizup: ,verthoriz: ,vertleft: ,vertright: ',
+}
+opt.fillchars:append(win_borders_fillchars["bold"])
 
 vim.g.lazyvim_python_lsp = "basedpyright"
 vim.g.user_is_termux = vim.env.TERMUX_VERSION ~= nil
