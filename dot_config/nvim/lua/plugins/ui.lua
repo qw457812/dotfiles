@@ -96,10 +96,16 @@ return {
       end
 
       -- see: ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/ui.lua
+      local lualine_c = opts.sections.lualine_c
+      for _, comp in ipairs(lualine_c) do
+        if comp[1] == "filetype" then
+          comp.cond = cond_always_hidden
+          break
+        end
+      end
       ---@diagnostic disable-next-line: assign-type-mismatch
-      opts.sections.lualine_c[1] = LazyVim.lualine.root_dir({ cwd = true })
-      opts.sections.lualine_c[3].cond = cond_always_hidden -- filetype
-      opts.sections.lualine_c[4] = {
+      lualine_c[1] = LazyVim.lualine.root_dir({ cwd = true })
+      lualine_c[4] = {
         pretty_path({
           -- relative = "root",
           directory_hl = "Conceal",
@@ -117,7 +123,7 @@ return {
       --     hl_group = "lualine_c_normal",
       --     -- max_items = 5,
       --   })
-      --   opts.sections.lualine_c[#opts.sections.lualine_c] = {
+      --   lualine_c[#lualine_c] = {
       --     symbols and symbols.get,
       --     cond = function()
       --       return vim.b.trouble_lualine ~= false and symbols.has()

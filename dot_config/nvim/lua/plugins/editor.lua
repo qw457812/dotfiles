@@ -200,6 +200,42 @@ return {
     },
   },
 
+  -- https://github.com/linkarzu/dotfiles-latest/blob/66c7304d34c713e8c7d6066d924ac2c3a9c0c9e8/neovim/neobean/lua/plugins/mini-files.lua
+  -- https://github.com/mrjones2014/dotfiles/blob/62cd7b9c034b04daff4a2b38ad9eac0c9dcb43e1/nvim/lua/my/configure/mini_files.lua
+  {
+    "echasnovski/mini.files",
+    optional = true,
+    opts = function(_, opts)
+      opts.mappings = vim.tbl_deep_extend("force", opts.mappings or {}, {
+        go_in = "L",
+        go_in_plus = "l", -- go_in + close explorer after opening a file
+        go_out = "H",
+        go_out_plus = "h", -- go_out + trim right part of branch
+        -- -- don't use `h`/`l` for easier cursor navigation during text edit
+        -- go_in = "",
+        -- go_in_plus = "L",
+        -- go_out = "",
+        -- go_out_plus = "H",
+      })
+      -- opts.windows = vim.tbl_deep_extend("force", opts.windows or {}, {
+      --   width_preview = 60,
+      -- })
+
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "MiniFilesBufferCreate",
+        callback = function(args)
+          local buf_id = args.data.buf_id
+
+          -- stylua: ignore start
+          vim.keymap.set("n", "<cr>", function() require("mini.files").go_in({ close_on_file = true }) end, { buffer = buf_id, desc = "Go in plus (mini.files)" })
+          vim.keymap.set("n", "<leader>fs", function() require("mini.files").synchronize() end, { buffer = buf_id, desc = "Synchronize (mini.files)" })
+          vim.keymap.set("n", "<C-s>", function() require("mini.files").synchronize() end, { buffer = buf_id, desc = "Synchronize (mini.files)" })
+          -- stylua: ignore end
+        end,
+      })
+    end,
+  },
+
   -- {
   --   "folke/which-key.nvim",
   --   opts = {
