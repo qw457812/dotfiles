@@ -17,29 +17,37 @@ local function close_buffer_or_window_or_exit()
     end, vim.api.nvim_list_bufs())
   end
 
+  ---https://github.com/folke/which-key.nvim/blob/6c1584eb76b55629702716995cca4ae2798a9cca/lua/which-key/extras.lua#L53
+  ---@param win number?
+  local function is_window_floating(win)
+    return vim.api.nvim_win_get_config(win or 0).relative ~= ""
+  end
+
   -- valid and not floating
   -- https://github.com/echasnovski/mini.nvim/blob/af673d8523c5c2c5ff0a53b1e42a296ca358dcc7/lua/mini/animate.lua#L1397
   local function normal_windows()
     return vim.tbl_filter(function(w)
-      return vim.api.nvim_win_is_valid(w) and vim.api.nvim_win_get_config(w).relative == ""
+      return vim.api.nvim_win_is_valid(w) and not is_window_floating(w)
     end, vim.api.nvim_list_wins())
   end
 
+  -- 1. For floating windows
+  if is_window_floating() then
+    -- eg. open lazy (non-listed) via dashboard (non-listed)
+    vim.cmd("close")
+    return
+  end
+
   if vim.bo.buflisted then
-    -- 1. For listed buffers
+    -- 2. For listed buffers
     if #listed_buffers() > 1 then
-      -- https://github.com/folke/which-key.nvim/blob/6c1584eb76b55629702716995cca4ae2798a9cca/lua/which-key/extras.lua#L53
-      local is_float = vim.api.nvim_win_get_config(0).relative ~= ""
-      if is_float then
-        vim.cmd("bd") -- Delete Buffer and Window
-      else
-        LazyVim.ui.bufremove() -- Delete Buffer
-      end
+      -- vim.cmd("bd") -- Delete Buffer and Window
+      LazyVim.ui.bufremove() -- Delete Buffer
     else
       vim.cmd("qa")
     end
   else
-    -- 2. For non-listed buffers, including:
+    -- 3. For non-listed buffers, including:
     --    - some filetypes maintained by `close_with_q` autocmd-groups, see: ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/config/autocmds.lua
     --    - manpages, see: https://github.com/LazyVim/LazyVim/blob/12818a6cb499456f4903c5d8e68af43753ebc869/lua/lazyvim/config/autocmds.lua#L84
     --    - dashboard, leetcode.nvim
@@ -48,7 +56,7 @@ local function close_buffer_or_window_or_exit()
       vim.cmd("close") -- Close Window (Cannot close last window)
     elseif #listed_buffers() > 0 then
       -- eg. open manpage file directly while having other listed buffers
-      vim.cmd("bd") -- Delete Buffer and Window
+      vim.cmd("bd")
     else
       -- eg. dashboard or open a single manpage file directly
       vim.cmd("qa")
@@ -126,5 +134,20 @@ return {
         [close_key] = "actions.close",
       },
     },
+  },
+
+  {
+    "echasnovski/mini.files",
+    optional = true,
+    opts = function()
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "MiniFilesBufferCreate",
+        callback = function(args)
+          local buf_id = args.data.buf_id
+          -- stylua: ignore
+          vim.keymap.set("n", close_key, function() require("mini.files").close() end, { buffer = buf_id, desc = "Close (mini.files)" })
+        end,
+      })
+    end,
   },
 }

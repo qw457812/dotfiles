@@ -91,6 +91,11 @@ map("x", "L", "g_", { desc = "Goto line end" })
 map_del({ "n", "x", "o" }, "n")
 map_del({ "n", "x", "o" }, "N")
 
+-- it breaks dot-repeat
+map_del("i", ",")
+map_del("i", ".")
+map_del("i", ";")
+
 -- save file
 map("n", "<leader>fs", "<cmd>w<cr><esc>", { desc = "Save File" })
 -- save file without formatting
