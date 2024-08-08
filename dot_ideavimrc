@@ -35,7 +35,7 @@ let mapleader=' '
 set easymotion
 " https://github.com/Mishkun/ideavim-sneak#usage
 " s{char}{char}    s/S    ;/,
-set sneak
+" set sneak
 " https://plugins.jetbrains.com/plugin/19417-ideavim-quickscope
 " f/F/t/T
 " set quickscope
@@ -135,8 +135,8 @@ let g:EasyMotion_do_mapping = 0
 " nmap mm <Plug>(easymotion-s)
 " nmap mm :action KJumpAction.Word0<cr>
 
-" map s <Plug>(easymotion-s)
-" map S :action KJumpAction.Word0<cr>
+map s <Plug>(easymotion-s)
+map S :action KJumpAction.Word0<cr>
 
 " https://github.com/Mishkun/ideavim-sneak/issues/16
 " Press `S` in normal mode to activate AceJump mode before the caret
@@ -144,9 +144,30 @@ let g:EasyMotion_do_mapping = 0
 " Press `s` in normal mode to activate AceJump mode after the caret
 " nmap s <Action>(AceForwardAction)
 
+let g:textobj_entire_no_default_key_mappings = 1
+omap ag <Plug>textobj-entire-a
+xmap ag <Plug>textobj-entire-a
+omap ig <Plug>textobj-entire-i
+xmap ig <Plug>textobj-entire-i
+
 let g:NERDTreeMapActivateNode = "l"
-" TODO not work
+" TODO: not work
 let g:NERDTreeMapNewFile = "a"
+
+nmap cr <Plug>ReplaceWithRegisterOperator
+nmap crr <Plug>ReplaceWithRegisterLine
+" xmap cr <Plug>ReplaceWithRegisterVisual " `v_p`
+nmap cR cr$
+
+" helix-style mappings
+map mm %
+" surround
+nmap ms ys
+xmap ms S
+nmap mr cs
+nmap md ds
+
+omap e ds
 
 """ Common settings -------------------------
 " :h 'clipboard'
@@ -189,7 +210,7 @@ nmap \a <Action>(VimFindActionIdAction)
 " nmap \t :action ActivateTerminalToolWindow<CR>
 nmap \t <Action>(Terminal.OpenInTerminal)
 nmap \g <Action>(Generate)
-nmap \l <Action>(ReformatCode)
+" nmap \l <Action>(ReformatCode)
 nmap \f <Action>(FindInPath)
 nmap \o <Action>(SelectAllOccurrences)
 nmap \hc <Action>(CallHierarchy)
@@ -210,8 +231,6 @@ nmap Y y$
 " map 0 ^
 map H ^
 map L $
-
-map mm %
 
 nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
@@ -240,8 +259,10 @@ nnoremap x "_x
 " sneak Plugin use `s`
 " nnoremap s "_s
 
-" nmap [[ <Action>(MethodUp)
-" nmap ]] <Action>(MethodDown)
+nmap [f <Action>(MethodUp)
+nmap ]f <Action>(MethodDown)
+nmap [m <Action>(MethodUp)
+nmap ]m <Action>(MethodDown)
 " `h` for hunk
 nmap ]h <Action>(VcsShowNextChangeMarker)
 nmap [h <Action>(VcsShowPrevChangeMarker)
@@ -265,6 +286,10 @@ map <left> <Action>(Back)
 " map <right> <C-i>
 map <right> <Action>(Forward)
 
+nmap <BS> <Action>(CloseContent)
+" nmap <CR> <Action>(GotoDeclaration)
+nmap <CR> gd
+
 " github copilot <TAB> (behaves like zsh-autosuggestions)
 imap <C-l> <Action>(copilot.applyInlays)
 " nmap <C-l> <Action>(copilot.applyInlays)
@@ -284,30 +309,54 @@ imap <C-k> <Action>(copilot.cyclePrevInlays)
 " nmap ' <Action>(ShowBookmarks)
 " nmap m <Action>(ToggleBookmarkWithMnemonic)
 
+" map gd <Action>(GotoDeclarationOnly)
+" map gr <Action>(FindUsages)
+map gr gd
 map gI <Action>(GotoImplementation)
 " map gI <Action>(QuickImplementations)
 " execute hover on gh
-map gh <Action>(ShowErrorDescription)
-map gb <Action>(Back)
+" map gh <Action>(ShowErrorDescription)
+" map K <Action>(ShowHoverInfo)
+map gK <Action>(ShowErrorDescription)
 map gy <Action>(GotoTypeDeclaration)
-map gf <Action>(Forward)
+" map gb <Action>(Back)
+" map gf <Action>(Forward)
 map gs <Action>(GotoSuperMethod)
 
-" TODO https://github.com/q843705423/ideavimrc/blob/master/.ideavimrc
-" TODO https://gist.github.com/SakuraWald/fa80eb949412e1a8c806512ad5f8a847
-" TODO https://github.com/ruohola/dotfiles/blob/master/vim/.ideavimrc
-" TODO https://github.com/JaimeArboleda/jet_brains_settings/blob/main/.ideavimrc
-" TODO https://github.com/magidc/dotfiles/blob/master/jetbrains/ideavimrc | https://github.com/magidc/nvim-config
+" TODO:
+" https://github.com/q843705423/ideavimrc/blob/master/.ideavimrc
+" https://gist.github.com/SakuraWald/fa80eb949412e1a8c806512ad5f8a847
+" https://github.com/ruohola/dotfiles/blob/master/vim/.ideavimrc
+" https://github.com/JaimeArboleda/jet_brains_settings/blob/main/.ideavimrc
+" https://github.com/magidc/dotfiles/blob/master/jetbrains/ideavimrc | https://github.com/magidc/nvim-config
+" https://github.com/axieax/dotconfig/blob/main/intellij/.ideavimrc
+" https://github.com/yunxiaoxiao11/nvimlazy/blob/3adac839389dc83bfe6bba6b60a3ae5bae9e09f6/jetbrains/.ideavimrc
 
 " -----------------------------------------------------常用--------------------------------------------------------
+" keys: https://ideavim.sourceforge.net/vim/intro.html
+map <Leader><Space> <Action>(GotoFile)
 " CloseEditor 关不掉 Compare.LastVersion
 " map <leader>bd <Action>(CloseEditor)
 map <leader>bd <Action>(CloseContent)
+map <leader>bo <Action>(CloseAllEditorsButActive)
+map <leader>bh <Action>(CloseAllToTheLeft)
+map <leader>bl <Action>(CloseAllToTheRight)
+map <leader>ca <Action>(QuickActions)
+" map <leader>cf <Action>(ReformatCode)
+map <leader>cf <Action>(ReformatCode) \| <Action>(OptimizeImports)
+map <leader>cr <Action>(RenameElement)
+map <leader>cR <Action>(RenameFile)
+map <Leader>fc :e ~/.ideavimrc<CR>
+map <Leader>fC :source ~/.ideavimrc<CR>
+" map <leader>fp <Action>(RecentProjectListGroup)
+map <leader>fp <Action>(ManageRecentProjects)
+map <leader>ss <Action>(FileStructurePopup)
+map <Leader>sS <Action>(GotoSymbol)
+
 map <leader>ba <Action>(CloseAllEditors)
 map <leader>bk <Action>(CloseContent)
 " Kill all buffers
 map <leader>bK <Action>(CloseAllEditors)
-map <leader>bo <Action>(CloseAllEditorsButActive)
 map <leader>bn <Action>(NextTab)
 map <leader>bp <Action>(PreviousTab)
 map <leader>cc <Action>(copilot.chat.show)
@@ -319,7 +368,7 @@ map <leader>cL <Action>(copilot.loginGitHub)
 map <leader>cp <Action>(CopyAbsolutePath)
 map <leader>cP :action CloseProject<CR>
 map <leader>cs <Action>(EditorCompleteStatement)
-map <leader>cr <Action>(CopyReference)
+" map <leader>cr <Action>(CopyReference)
 map <leader>cu <Action>(CheckForUpdate)
 map <leader>dd <Action>(Debug)
 map <leader>db <Action>(ToggleLineBreakpoint)
@@ -332,7 +381,7 @@ map <Leader>ei :action ExtractInterface<CR>
 map <Leader>fd :action FixDocComment<CR>
 map <leader>ff <Action>(FindInPath)
 map <leader>fu <Action>(FindUsages)
-map <Leader>fp :action ShowFilePath<CR>
+" map <Leader>fp :action ShowFilePath<CR>
 map <leader>fs <Action>(FileStructurePopup)
 " yank file path (doomemacs keybinding)
 map <leader>fy <Action>(CopyAbsolutePath)
@@ -341,7 +390,7 @@ map <leader>gg :action Generate<CR>
 map <Leader>ga :action GotoAction<CR>
 map <Leader>gc :action GotoClass<CR>
 map <Leader>gf :action GotoFile<CR>
-map <Leader>gs :action GotoSymbol<CR>
+" map <Leader>gs :action GotoSymbol<CR>
 " Highlight usages, use CMD+G/Shift+CMD+G to iterate
 map <leader>hu <Action>(HighlightUsagesInFile)
 map <leader>hl <Action>(HighlightUsagesInFile)
@@ -350,8 +399,8 @@ map <leader>ic <Action>(IntroduceConstant)
 map <leader>im <Action>(ImplementMethods)
 map <leader>iv <Action>(IntroduceVariable)
 " Reformat the current line only
-map <leader>ll V<Action>(ReformatCode)
-map <leader>L <Action>(ReformatCode)
+" map <leader>ll V<Action>(ReformatCode)
+" map <leader>L <Action>(ReformatCode)
 map <leader>lh <Action>(LocalHistory.ShowHistory)
 map <leader>lw <Action>(JumpToLastWindow)
 map <leader>mh <Action>(MethodHierarchy)
@@ -371,7 +420,7 @@ map <Leader>pO <Action>(TextEditorWithPreview.Layout.PreviewOnly)
 " CloseEditor 关不掉 Compare.LastVersion
 map <leader>qq <Action>(CloseContent)
 map <Leader>qa :action CloseAllEditors<CR>
-map <leader>qd <Action>(QuickJavaDoc)
+" map <leader>qd <Action>(QuickJavaDoc) " `K`
 " quick fix
 map <leader>qf <Action>(ShowIntentionActions)
 map <leader>qi <Action>(QuickImplementations)
@@ -381,7 +430,7 @@ map <leader>qS :set noquickscope<CR>
 map <Leader>rc :action ChooseRunConfiguration<CR>
 map <leader>rf <Action>(RecentFiles)
 map <leader>rl <Action>(RecentLocations)
-map <leader>rn <Action>(RenameElement)
+" map <leader>rn <Action>(RenameElement)
 map <leader>rp <Action>(ManageRecentProjects)
 map <leader>rq :action Refactorings.QuickListPopupAction<CR>
 map <leader>rr <Action>(Run)
@@ -397,7 +446,7 @@ map <leader>uw <Action>(Unwrap)
 " add
 map <leader>va <Action>(ChangesView.AddUnversioned)
 " blame
-map <leader>vb <Action>(Annotate)
+map <leader>gb <Action>(Annotate)
 " commit
 map <leader>vc <Action>(CheckinProject)
 map <leader>vC <Action>(CheckinFiles)
@@ -438,8 +487,6 @@ map <leader>9 <Action>(GoToTab9)
 " quick fix
 " 仅map <CR>影响重命名时的回车确认
 map <leader><CR> <Action>(ShowIntentionActions)
-" keys: https://ideavim.sourceforge.net/vim/intro.html
-map <Leader><Space> <Action>(GotoFile)
 map <leader><TAB> <Action>(EditorCompleteStatement)
 
 " insert模式无效，已设置为IDEA快捷键，Code Completion - Basic
@@ -450,7 +497,7 @@ nmap <TAB><CR> <Action>(GotoNextError)
 nmap <TAB>a <Action>(VimFindActionIdAction)
 nmap <TAB>j gt
 nmap <TAB>k gT
-nmap <TAB>l <Action>(ReformatCode) \| <Action>(OptimizeImports)
+" nmap <TAB>l <Action>(ReformatCode) \| <Action>(OptimizeImports)
 nmap <TAB>r :source ~/.ideavimrc<CR>
 nmap <TAB>t <Action>(Terminal.OpenInTerminal)
 nmap <TAB>v <Action>(Vcs.QuickListPopupAction)
@@ -458,9 +505,6 @@ nmap <TAB>v <Action>(Vcs.QuickListPopupAction)
 " TODO more Leader key like `<BS>`, `,` | https://github.com/rockyzhang24/dotfiles/tree/master/.config/nvim#-key-mappings
 
 map <S-Space> <Action>(GotoNextError)
-
-nmap <CR> gd
-nmap <BS> <Action>(CloseContent)
 
 " https://gist.github.com/PisecesPeng/9fabf2a1c1834bd35bf02c2bcb904708
 " 选择模式扩大选择范围 opt+up_arrow
