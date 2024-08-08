@@ -290,6 +290,27 @@ return {
     },
   },
 
+  -- better `:substitute`
+  {
+    "chrisgrieser/nvim-rip-substitute",
+    cmd = "RipSubstitute",
+    keys = {
+      {
+        "<leader>sf",
+        function()
+          require("rip-substitute").sub()
+        end,
+        mode = { "n", "x" },
+        desc = " rip substitute",
+      },
+    },
+    -- opts = {
+    --   popupWin = {
+    --     position = "top",
+    --   },
+    -- },
+  },
+
   -- TODO: choose motion plugin between: flash, leap, hop
   -- https://github.com/doctorfree/nvim-lazyman/blob/bb4091c962e646c5eb00a50eca4a86a2d43bcb7c/lua/ecovim/config/plugins.lua#L373
 }

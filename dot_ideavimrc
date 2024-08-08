@@ -133,7 +133,7 @@ let g:EasyMotion_do_mapping = 0
 " map s <Plug>(easymotion-f)
 " map S <Plug>(easymotion-F)
 " nmap mm <Plug>(easymotion-s)
-nmap mm :action KJumpAction.Word0<cr>
+" nmap mm :action KJumpAction.Word0<cr>
 
 " map s <Plug>(easymotion-s)
 " map S :action KJumpAction.Word0<cr>
@@ -143,6 +143,10 @@ nmap mm :action KJumpAction.Word0<cr>
 " nmap S <Action>(AceBackwardAction)
 " Press `s` in normal mode to activate AceJump mode after the caret
 " nmap s <Action>(AceForwardAction)
+
+let g:NERDTreeMapActivateNode = "l"
+" TODO not work
+let g:NERDTreeMapNewFile = "a"
 
 """ Common settings -------------------------
 " :h 'clipboard'
@@ -207,6 +211,8 @@ nmap Y y$
 map H ^
 map L $
 
+map mm %
+
 nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
@@ -236,8 +242,9 @@ nnoremap x "_x
 
 " nmap [[ <Action>(MethodUp)
 " nmap ]] <Action>(MethodDown)
-nmap ]c <Action>(VcsShowNextChangeMarker)
-nmap [c <Action>(VcsShowPrevChangeMarker)
+" `h` for hunk
+nmap ]h <Action>(VcsShowNextChangeMarker)
+nmap [h <Action>(VcsShowPrevChangeMarker)
 " nmap [c <Action>(JumpToLastChange)
 " nmap ]c <Action>(JumpToNextChange)
 map ]d <Action>(GotoNextError)
@@ -277,12 +284,12 @@ imap <C-k> <Action>(copilot.cyclePrevInlays)
 " nmap ' <Action>(ShowBookmarks)
 " nmap m <Action>(ToggleBookmarkWithMnemonic)
 
-map gi <Action>(GotoImplementation)
-map gI <Action>(QuickImplementations)
+map gI <Action>(GotoImplementation)
+" map gI <Action>(QuickImplementations)
 " execute hover on gh
 map gh <Action>(ShowErrorDescription)
 map gb <Action>(Back)
-map gD <Action>(GotoTypeDeclaration)
+map gy <Action>(GotoTypeDeclaration)
 map gf <Action>(Forward)
 map gs <Action>(GotoSuperMethod)
 
@@ -432,7 +439,7 @@ map <leader>9 <Action>(GoToTab9)
 " 仅map <CR>影响重命名时的回车确认
 map <leader><CR> <Action>(ShowIntentionActions)
 " keys: https://ideavim.sourceforge.net/vim/intro.html
-map <leader><Space> gd
+map <Leader><Space> <Action>(GotoFile)
 map <leader><TAB> <Action>(EditorCompleteStatement)
 
 " insert模式无效，已设置为IDEA快捷键，Code Completion - Basic
