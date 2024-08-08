@@ -110,6 +110,8 @@ map("n", "<a-s>", "<cmd>noautocmd w<cr>", { desc = "Save File Without Formatting
 map("n", "<leader>ba", "<cmd>bufdo bd<cr>", { desc = "Delete All Buffers" })
 
 -- jumping
+-- map("n", "gk", "<C-o>", { desc = "Go Back" })
+-- map("n", "gj", "<C-i>", { desc = "Go Forward" })
 map("n", "<Left>", "<C-o>", { desc = "Go Back" })
 map("n", "<Right>", "<C-i>", { desc = "Go Forward" })
 

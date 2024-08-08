@@ -629,14 +629,14 @@ f()
     cd "$dst"
 }
 
-# comment out unused aliases in ~/.config/nvim-Lazyman/.lazymanrc: less, tree
-# https://github.com/doctorfree/nvim-lazyman
-# Source the Lazyman shell initialization for aliases and nvims selector
-# shellcheck source=.config/nvim-Lazyman/.lazymanrc
-[ -f ~/.config/nvim-Lazyman/.lazymanrc ] && source ~/.config/nvim-Lazyman/.lazymanrc
-# Source the Lazyman .nvimsbind for nvims key binding
-# shellcheck source=.config/nvim-Lazyman/.nvimsbind
-[ -f ~/.config/nvim-Lazyman/.nvimsbind ] && source ~/.config/nvim-Lazyman/.nvimsbind
+# # comment out unused aliases in ~/.config/nvim-Lazyman/.lazymanrc: less, tree
+# # https://github.com/doctorfree/nvim-lazyman
+# # Source the Lazyman shell initialization for aliases and nvims selector
+# # shellcheck source=.config/nvim-Lazyman/.lazymanrc
+# [ -f ~/.config/nvim-Lazyman/.lazymanrc ] && source ~/.config/nvim-Lazyman/.lazymanrc
+# # Source the Lazyman .nvimsbind for nvims key binding
+# # shellcheck source=.config/nvim-Lazyman/.nvimsbind
+# [ -f ~/.config/nvim-Lazyman/.nvimsbind ] && source ~/.config/nvim-Lazyman/.nvimsbind
 
 # https://github.com/clash-verge-rev/clash-verge-rev
 # export https_proxy=http://127.0.0.1:7897 http_proxy=http://127.0.0.1:7897 all_proxy=socks5://127.0.0.1:7897
