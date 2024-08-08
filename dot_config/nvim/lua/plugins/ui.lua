@@ -27,6 +27,7 @@ return {
 
   -- https://github.com/aimuzov/LazyVimx/blob/a27d3439b9021d1215ce6471f59d801df32c18d4/lua/lazyvimx/extras/ui/panels/status-line.lua
   -- https://github.com/jacquin236/minimal-nvim/blob/b74208114eae6cd724c276e0d966bf811822bcd5/lua/util/lualine.lua
+  -- https://github.com/chrisgrieser/.config/blob/main/nvim/lua/plugins/lualine.lua
   {
     "nvim-lualine/lualine.nvim",
     opts = function(_, opts)
@@ -144,6 +145,7 @@ return {
       local bubbles = false
       if bubbles then
         -- "" ┊ |          
+        -- nerdfont-powerline icons prefix: `ple-`
         opts.options.section_separators = { left = "", right = "" }
         opts.options.component_separators = { left = "", right = "" }
 

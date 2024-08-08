@@ -12,18 +12,26 @@ return {
     },
     -- https://github.com/echasnovski/mini.operators/blob/76ac9104d9773927053ea4eb12fc78ccbb5be813/doc/mini-operators.txt#L131
     opts = {
-      -- gr (LazyVim use `gr` for lsp references, and `cr` for remote flash by default)
+      -- gr (LazyVim use `gr` for lsp references, `cr` for remote flash by default, and `gss` conflicts with `gs` + `s` for flash)
       -- note: `vim.opt.timeoutlen` has increased from 300 to 500 for `cr` and `cR` since which-key v3
-      replace = { prefix = "cr" }, -- Replace text with register
+      replace = { prefix = "" }, -- Replace text with register
       -- gx
-      exchange = { prefix = "cx" }, -- Exchange text regions
+      exchange = { prefix = "" }, -- Exchange text regions
       -- gm (note that `cmm` is used for `c%` by custom helix-style mappings)
-      multiply = { prefix = "cd" }, -- Multiply (duplicate) text
+      multiply = { prefix = "" }, -- Multiply (duplicate) text
       -- g=
-      evaluate = { prefix = "" }, -- Evaluate text and replace with output
+      -- evaluate = { prefix = "" }, -- Evaluate text and replace with output
       -- gs
       sort = { prefix = "" }, -- Sort text
     },
+    config = function(_, opts)
+      local operators = require("mini.operators")
+      operators.setup(opts)
+      -- do not delay `v_c`
+      operators.make_mappings("replace", { textobject = "cr", line = "crr", selection = "" }) -- disable `v_cr` since we have `v_p`
+      operators.make_mappings("exchange", { textobject = "cx", line = "cxx", selection = "X" }) -- https://github.com/tommcdo/vim-exchange#mappings
+      operators.make_mappings("multiply", { textobject = "cd", line = "cdd", selection = "" })
+    end,
   },
 
   {

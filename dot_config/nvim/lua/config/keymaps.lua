@@ -154,7 +154,37 @@ map("n", "dd", function()
   end
 end, { expr = true, desc = "Don't Yank Empty Line to Clipboard" })
 
+-- Add empty lines before and after cursor line supporting dot-repeat
+-- https://github.com/JulesNP/nvim/blob/36b04ae414b98e67a80f15d335c73744606a33d7/lua/keymaps.lua#L80
+-- map("n", "gO", function() vim.cmd("normal! m`" .. vim.v.count .. vim.api.nvim_replace_termcodes("O<esc>``", true, true, true)) end, { desc = "Put empty line above" })
+-- map("n", "go", function() vim.cmd("normal! m`" .. vim.v.count .. vim.api.nvim_replace_termcodes("o<esc>``", true, true, true)) end, { desc = "Put empty line below" })
+-- https://github.com/echasnovski/mini.nvim/blob/af673d8523c5c2c5ff0a53b1e42a296ca358dcc7/lua/mini/basics.lua#L579
+local MiniBasics = {}
+_G.MiniBasics = MiniBasics
+MiniBasics.put_empty_line = function(put_above)
+  -- This has a typical workflow for enabling dot-repeat:
+  -- - On first call it sets `operatorfunc`, caches data, and calls
+  --   `operatorfunc` on current cursor position.
+  -- - On second call it performs task: puts `v:count1` empty lines
+  --   above/below current line.
+  if type(put_above) == "boolean" then
+    vim.o.operatorfunc = "v:lua.MiniBasics.put_empty_line"
+    MiniBasics.cache_empty_line = { put_above = put_above }
+    return "g@l"
+  end
+  local target_line = vim.fn.line(".") - (MiniBasics.cache_empty_line.put_above and 1 or 0)
+  vim.fn.append(target_line, vim.fn["repeat"]({ "" }, vim.v.count1))
+end
+-- NOTE: if you don't want to support dot-repeat, use this snippet:
+-- ```
+-- map('n', 'gO', "<Cmd>call append(line('.') - 1, repeat([''], v:count1))<CR>")
+-- map('n', 'go', "<Cmd>call append(line('.'),     repeat([''], v:count1))<CR>")
+-- ```
+map("n", "gO", "v:lua.MiniBasics.put_empty_line(v:true)", { expr = true, desc = "Put empty line above" })
+map("n", "go", "v:lua.MiniBasics.put_empty_line(v:false)", { expr = true, desc = "Put empty line below" })
+
 -- Reselect latest changed, put, or yanked text
+-- `[v`]
 -- https://github.com/echasnovski/mini.nvim/blob/af673d8523c5c2c5ff0a53b1e42a296ca358dcc7/lua/mini/basics.lua#L589
 -- map("n", "gV", '"`[" . strpart(getregtype(), 0, 1) . "`]"', { expr = true, replace_keycodes = false, desc = "Visually select changed text" })
 -- https://github.com/gregorias/coerce.nvim#tips--tricks
@@ -167,6 +197,7 @@ map("x", "g/", "<esc>/\\%V", { silent = false, desc = "Search inside visual sele
 
 -- https://github.com/rstacruz/vimfiles/blob/ee9a3e7e7f022059b6d012eff2e88c95ae24ff97/lua/config/keymaps.lua#L35
 -- :let @+=expand('%:p')<cr>
+-- <cmd>call setreg('+', expand('%:p'))<cr>
 map("n", "<leader>fy", function()
   local path = replace_home(vim.fn.expand("%:p"))
   vim.fn.setreg("+", path)

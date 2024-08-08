@@ -111,6 +111,15 @@ return {
     },
   },
 
+  {
+    "Wansmer/treesj",
+    vscode = true,
+    keys = {
+      { "<leader>J", "<cmd>TSJToggle<cr>", desc = "Join Toggle" },
+    },
+    opts = { use_default_keymaps = false, max_join_length = 150 },
+  },
+
   -- alternative: gregorias/coerce.nvim
   -- https://github.com/yutkat/dotfiles/blob/2c95d4f42752c5c245d7642f5c2dbc326bd776c2/.config/nvim/lua/rc/pluginconfig/text-case.lua
   {
@@ -143,11 +152,22 @@ return {
   },
 
   {
-    "Wansmer/treesj",
-    vscode = true,
+    "dmtrKovalenko/caps-word.nvim",
+    lazy = true,
     keys = {
-      { "<leader>J", "<cmd>TSJToggle<cr>", desc = "Join Toggle" },
+      {
+        mode = { "i", "n" },
+        "<A-c>",
+        "<cmd>lua require('caps-word').toggle()<CR>",
+      },
     },
-    opts = { use_default_keymaps = false, max_join_length = 150 },
+    opts = {
+      enter_callback = function()
+        vim.notify("Caps Word: On", "info", { title = "Caps Word" })
+      end,
+      exit_callback = function()
+        vim.notify("Caps Word: Off", "info", { title = "Caps Word" })
+      end,
+    },
   },
 }

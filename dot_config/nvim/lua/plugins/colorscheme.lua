@@ -71,6 +71,9 @@ return {
           -- compensate for invisible text caused by custom illuminate highlight
           CmpGhostText = { bg = colors.base, fg = colors.overlay1 },
           DiagnosticUnnecessary = { fg = U.lighten(colors.overlay0, 0.9) },
+
+          -- for flash treesitter search
+          FlashLabel = { fg = colors.base, bg = colors.green, style = { "bold" } },
         }
       end,
     },
