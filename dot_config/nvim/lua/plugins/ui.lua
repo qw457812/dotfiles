@@ -177,10 +177,34 @@ return {
     optional = true,
     opts = function(_, opts)
       -- do not `startinsert` for "New File"
-      for _, button in ipairs(opts.config.center) do
+      local center = opts.config.center
+      for _, button in ipairs(center) do
         if button.key == "n" then
           button.action = "ene"
           break
+        end
+      end
+
+      -- remove some blank lines if the dashboard is too high
+      local header = opts.config.header
+      -- #opts.config.footer() == 1
+      local invisible_lines = #header + #center * 2 + 1 - vim.o.lines + 1
+      for i = #header - 2, 1, -1 do
+        if invisible_lines <= 0 then
+          break
+        end
+        if header[i]:match("^%s*$") then
+          table.remove(header, i)
+          invisible_lines = invisible_lines - 1
+        end
+      end
+      for i = #header, #header - 1, -1 do
+        if invisible_lines <= 0 then
+          break
+        end
+        if header[i]:match("^%s*$") then
+          table.remove(header, i)
+          invisible_lines = invisible_lines - 1
         end
       end
     end,
