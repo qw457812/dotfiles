@@ -46,6 +46,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [pkazmier](https://github.com/pkazmier/nvim)
 - [v1nh1shungry](https://github.com/v1nh1shungry/.dotfiles/tree/main/nvim)
 - [chrisgrieser](https://github.com/chrisgrieser/.config/tree/main/nvim)
+- [sxyazi](https://github.com/sxyazi/dotfiles/tree/main/nvim)
 
 ## Lazy Tips
 

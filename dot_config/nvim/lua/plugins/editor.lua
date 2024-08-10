@@ -200,6 +200,15 @@ return {
     },
   },
 
+  -- {
+  --   "folke/which-key.nvim",
+  --   opts = {
+  --     win = {
+  --       no_overlap = false, -- don't allow the popup to overlap with the cursor
+  --     },
+  --   },
+  -- },
+
   -- https://github.com/linkarzu/dotfiles-latest/blob/66c7304d34c713e8c7d6066d924ac2c3a9c0c9e8/neovim/neobean/lua/plugins/mini-files.lua
   -- https://github.com/mrjones2014/dotfiles/blob/62cd7b9c034b04daff4a2b38ad9eac0c9dcb43e1/nvim/lua/my/configure/mini_files.lua
   {
@@ -235,16 +244,6 @@ return {
       })
     end,
   },
-
-  -- {
-  --   "folke/which-key.nvim",
-  --   opts = {
-  --     -- preset = "modern",
-  --     -- win = {
-  --     --   no_overlap = false, -- don't allow the popup to overlap with the cursor
-  --     -- },
-  --   },
-  -- },
 
   -- {
   --   "RRethy/vim-illuminate",
