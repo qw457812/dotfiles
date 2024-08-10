@@ -42,6 +42,7 @@ local function close_buffer_or_window_or_exit()
     -- 2. For listed buffers
     if #listed_buffers() > 1 then
       -- vim.cmd("bd") -- Delete Buffer and Window
+      -- TODO: error when closing `q:`
       LazyVim.ui.bufremove() -- Delete Buffer
     else
       vim.cmd("qa")

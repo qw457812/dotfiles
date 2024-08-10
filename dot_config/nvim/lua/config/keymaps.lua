@@ -4,6 +4,7 @@
 
 local Lazy = require("lazy")
 local LazyUtil = require("lazy.util")
+local LazyViewConfig = require("lazy.view.config")
 local replace_home = require("util.path").replace_home_with_tilde
 
 --- Wrapper around vim.keymap.set that will set `silent` to true by default.
@@ -79,6 +80,10 @@ map({ "n", "x", "o" }, "H", "^", { desc = "Goto line start" })
 map({ "n", "o" }, "L", "$", { desc = "Goto line end" })
 -- https://github.com/v1nh1shungry/.dotfiles/blob/d8a0f6fd2766d0ec9ce5d5b4ccd55b3cc4130c1a/nvim/lua/dotfiles/core/keymaps.lua#L74
 map("x", "L", "g_", { desc = "Goto line end" })
+-- https://github.com/folke/lazy.nvim/issues/411
+-- https://github.com/folke/lazy.nvim/issues/133
+LazyViewConfig.commands.home.key = "gH"
+LazyViewConfig.commands.log.key = "gL"
 
 -- quit
 -- see: ../plugins/close.lua
@@ -117,7 +122,8 @@ map("n", "<Right>", "<C-i>", { desc = "Go Forward" })
 
 -- match
 -- helix-style mappings | https://github.com/boltlessengineer/nvim/blob/607ee0c9412be67ba127a4d50ee722be578b5d9f/lua/config/keymaps.lua#L103
-map({ "n", "x", "o" }, "mm", "%", { desc = "Goto matching bracket" })
+-- remap to matchit
+map({ "n", "x", "o" }, "mm", "%", { desc = "Goto matching bracket", remap = true })
 
 -- map("n", "U", "<C-r>", { desc = "Redo" })
 
