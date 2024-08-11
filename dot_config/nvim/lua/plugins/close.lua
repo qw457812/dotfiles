@@ -42,7 +42,6 @@ local function close_buffer_or_window_or_exit()
     -- 2. For listed buffers
     if #listed_buffers() > 1 then
       -- vim.cmd("bd") -- Delete Buffer and Window
-      -- TODO: error when closing `q:`
       LazyVim.ui.bufremove() -- Delete Buffer
     else
       vim.cmd("qa")
@@ -70,6 +69,17 @@ vim.api.nvim_create_autocmd("User", {
   callback = function()
     vim.keymap.set("n", close_key, close_buffer_or_window_or_exit, { desc = "Close buffer/window or Exit" })
     vim.keymap.set("n", exit_key, "<cmd>qa<cr>", { desc = "Quit All" })
+  end,
+})
+
+-- see: `:h q:`
+vim.api.nvim_create_autocmd("CmdWinEnter", {
+  callback = function(event)
+    vim.keymap.set("n", close_key, "<cmd>q<cr>", {
+      buffer = event.buf,
+      silent = true,
+      desc = "Close command-line window",
+    })
   end,
 })
 

@@ -117,6 +117,8 @@ map("n", "<leader>ba", "<cmd>bufdo bd<cr>", { desc = "Delete All Buffers" })
 -- jumping
 -- map("n", "gk", "<C-o>", { desc = "Go Back" })
 -- map("n", "gj", "<C-i>", { desc = "Go Forward" })
+-- map("n", ",", "<C-o>", { desc = "Go Back" })
+-- map("n", ";", "<C-i>", { desc = "Go Forward" })
 map("n", "<Left>", "<C-o>", { desc = "Go Back" })
 map("n", "<Right>", "<C-i>", { desc = "Go Forward" })
 
@@ -202,6 +204,13 @@ map("n", "gp", function() vim.api.nvim_feedkeys("`[" .. vim.fn.strpart(vim.fn.ge
 -- Search inside visually highlighted text. Use `silent = false` for it to make effect immediately.
 -- TODO: search literal | https://vi.stackexchange.com/questions/17465/how-to-search-literally-without-any-regex-pattern
 map("x", "g/", "<esc>/\\%V", { silent = false, desc = "Search inside visual selection" })
+
+map("n", "g/", "q/", { desc = "command-line window (forward search)" })
+map("n", "g?", "q?", { desc = "command-line window (backward search)" })
+map({ "n", "x" }, "g:", "q:", { desc = "command-line window (Ex command)" })
+
+-- map("n", "<leader>.", "@:", { desc = "Repeat last command-line" })
+map("n", "g.", "@:", { desc = "Repeat last command-line" })
 
 -- https://github.com/rstacruz/vimfiles/blob/ee9a3e7e7f022059b6d012eff2e88c95ae24ff97/lua/config/keymaps.lua#L35
 -- :let @+=expand('%:p')<cr>
