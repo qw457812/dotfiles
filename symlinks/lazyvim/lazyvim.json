@@ -28,7 +28,6 @@
     "lazyvim.plugins.extras.lang.toml",
     "lazyvim.plugins.extras.lang.yaml",
     "lazyvim.plugins.extras.lsp.neoconf",
-    "lazyvim.plugins.extras.lsp.none-ls",
     "lazyvim.plugins.extras.test.core",
     "lazyvim.plugins.extras.ui.edgy",
     "lazyvim.plugins.extras.ui.mini-animate",
@@ -53,7 +52,8 @@
     "plugins.extras.util.zoxide"
   ],
   "news": {
-    "NEWS.md": "6520"
+    "NEWS.md": "6520",
+    "doc/news.txt": "24450"
   },
   "version": 6
 }
