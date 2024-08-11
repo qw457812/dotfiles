@@ -6,23 +6,12 @@ local M = {}
 ---@param path string?
 ---@return string?
 function M.replace_home_with_tilde(path)
-  if not path then
-    return nil
-  end
-
-  -- vim.env.HOME
+  -- stylua: ignore
+  if not path then return nil end
   -- os.getenv("HOME")
   local home = (vim.uv or vim.loop).os_homedir()
-  if not home then
-    return path
-  end
-
-  -- if vim.startswith(path, home) then
-  --   local p = require("plenary.path"):new(path):make_relative(home)
-  --   path = p == "." and "~" or "~/" .. p
-  -- end
-  path = path:gsub("^" .. vim.pesc(home), "~")
-  return path
+  -- require("plenary.path"):new(path):make_relative(home)
+  return home and path:gsub("^" .. vim.pesc(home), "~") or path
 end
 
 return M

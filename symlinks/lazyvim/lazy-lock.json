@@ -7,7 +7,7 @@
   "better-escape.nvim": { "branch": "master", "commit": "d337e02b140d909345441392de47a42d283747c1" },
   "bufferline.nvim": { "branch": "main", "commit": "0b2fd861eee7595015b6561dade52fb060be10c4" },
   "caps-word.nvim": { "branch": "main", "commit": "564548ef557e4f873b2e67f0ea91f25042cedfe8" },
-  "catppuccin": { "branch": "main", "commit": "bfdd6b3833e991fa45c3d5931ffed853dca60fab" },
+  "catppuccin": { "branch": "main", "commit": "18bab5ec4c782cdf7d7525dbe89c60bfa02fc195" },
   "chezmoi.nvim": { "branch": "main", "commit": "e5d2b2f534d2a1701ea2f9a8849732b28ea4c8c3" },
   "chezmoi.vim": { "branch": "main", "commit": "abf37336437867cbd99ce2f8849b717415391cc3" },
   "cmp-buffer": { "branch": "main", "commit": "3022dbc9166796b644a841a02de8dd1cc1d311fa" },
@@ -108,6 +108,6 @@
   "vim-startuptime": { "branch": "master", "commit": "ac2cccb5be617672add1f4f3c0a55ce99ba34e01" },
   "which-key.nvim": { "branch": "main", "commit": "6c1584eb76b55629702716995cca4ae2798a9cca" },
   "yanky.nvim": { "branch": "main", "commit": "73215b77d22ebb179cef98e7e1235825431d10e4" },
-  "yazi.nvim": { "branch": "main", "commit": "9ac5eaf27099864c7e4d408ecd2ddf638f8f3325" },
+  "yazi.nvim": { "branch": "main", "commit": "e3d4c782a12bced97bf8824527cdc82c383a88b6" },
   "zen-mode.nvim": { "branch": "main", "commit": "29b292bdc58b76a6c8f294c961a8bf92c5a6ebd6" }
 }
