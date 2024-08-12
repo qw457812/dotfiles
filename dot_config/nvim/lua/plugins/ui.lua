@@ -328,6 +328,80 @@ return {
     end,
   },
 
+  -- https://github.com/jacquin236/minimal-nvim/blob/8942639a07e2ac633c259be0386299a00cdef1be/lua/plugins/editor/dropbar.lua
+  -- https://github.com/LazyVim/LazyVim/pull/3503/files
+  {
+    "Bekaboo/dropbar.nvim",
+    event = "VeryLazy",
+    dependencies = { "nvim-telescope/telescope-fzf-native.nvim", optional = true },
+    keys = {
+      -- stylua: ignore
+      { "<leader>wp", function() require("dropbar.api").pick() end, desc = "Winbar Pick" },
+    },
+    init = function()
+      vim.api.nvim_set_hl(0, "DropBarIconUISeparator", { default = true, link = "Delimiter" })
+      vim.api.nvim_set_hl(0, "DropBarMenuNormalFloat", { default = true, link = "Pmenu" })
+    end,
+    opts = function(_, opts)
+      local menu_utils = require("dropbar.utils.menu")
+
+      local function close()
+        local menu = menu_utils.get_current()
+        while menu and menu.prev_menu do
+          menu = menu.prev_menu
+        end
+        if menu then
+          menu:close()
+        end
+      end
+
+      opts.menu = vim.tbl_deep_extend("force", opts.menu or {}, {
+        keymaps = {
+          ["q"] = close,
+          ["<esc>"] = close,
+          -- navigate back to the parent menu
+          ["h"] = "<C-w>q",
+          -- expands entry if possible
+          ["l"] = function()
+            local menu = menu_utils.get_current()
+            if not menu then
+              return
+            end
+            local cursor = vim.api.nvim_win_get_cursor(menu.win)
+            local component = menu.entries[cursor[1]]:first_clickable(cursor[2])
+            if component then
+              menu:click_on(component, nil, 1, "l")
+            end
+          end,
+          -- jump and close
+          ["o"] = function()
+            local menu = menu_utils.get_current()
+            if not menu then
+              return
+            end
+            local cursor = vim.api.nvim_win_get_cursor(menu.win)
+            local entry = menu.entries[cursor[1]]
+            local component = entry:first_clickable(entry.padding.left + entry.components[1]:bytewidth())
+            if component then
+              menu:click_on(component, nil, 1, "l")
+            end
+          end,
+        },
+      })
+    end,
+  },
+  -- https://github.com/Bekaboo/dropbar.nvim/issues/19#issuecomment-1574760272
+  {
+    "nvim-lualine/lualine.nvim",
+    dependencies = { "Bekaboo/dropbar.nvim" },
+    opts = function(_, opts)
+      opts.winbar = {
+        -- lualine_c = { "%{%v:lua.dropbar.get_dropbar_str()%}" },
+        lualine_c = { dropbar.get_dropbar_str },
+      }
+    end,
+  },
+
   {
     "tzachar/highlight-undo.nvim",
     event = "VeryLazy",

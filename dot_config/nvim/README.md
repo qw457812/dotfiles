@@ -54,7 +54,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 
 ## TODO
 
-- [ ] Check out the great [:h lua-guide](https://neovim.io/doc/user/lua-guide.html#lua-guide).
+- [x] Check out the great [:h lua-guide](https://neovim.io/doc/user/lua-guide.html#lua-guide).
 - [ ] Map `gd` to both lsp_definition and lsp_references like vscode and idea, maybe give `gr` to ReplaceWithRegister.
 - [ ] Fix Java DAP timeout problem, see [nvim-jdtls](https://github.com/mfussenegger/nvim-jdtls).
   - Use [nvim-java/nvim-java](https://github.com/nvim-java/nvim-java) instead of `nvim-jdtls`.
@@ -66,7 +66,11 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
   - Fredrikaverpil's [lang/python.lua](https://github.com/fredrikaverpil/dotfiles/blob/main/nvim-fredrik/lua/lang/python.lua), [contributor](https://github.com/LazyVim/LazyVim/commits?author=fredrikaverpil) of LazyVim.
   - [moetayuko](https://github.com/moetayuko/nvimrc), Lazyvim [PR](https://github.com/LazyVim/LazyVim/pull/4141) for extras.lang.python.
     - [overseer/template/user/python.lua](https://github.com/moetayuko/nvimrc/blob/master/lua/overseer/template/user/python.lua)
-- [ ] Use my own plugins in LazyExtra like Nv's [plugins/extras/](https://github.com/appelgriebsch/Nv/tree/main/lua/plugins/extras) and [lazyvim.json](https://github.com/appelgriebsch/Nv/blob/main/lazyvim.json).
+- [x] Use my own plugins in LazyExtra like Nv's [plugins/extras/](https://github.com/appelgriebsch/Nv/tree/main/lua/plugins/extras) and [lazyvim.json](https://github.com/appelgriebsch/Nv/blob/main/lazyvim.json).
+- [ ] `;`/`,` and `f`/`F`/`t`/`T`
+  - [flash.nvim](https://github.com/folke/flash.nvim): clever-f style, get rid of `;`/`,`.
+  - [demicolon.nvim](https://github.com/mawkler/demicolon.nvim): repeat diagnostic jumps (`]d`/`[d`) and nvim-treesitter-textobjects jumps (`]f`/`[f`) with `;`/`,`.
+  - [eyeliner.nvim](https://github.com/jinh0/eyeliner.nvim): enhance `f`/`F`/`t`/`T`, like quick-scope.
 - [ ] [Org Mode](https://github.com/topics/orgmode-nvim) in nvim, or neorg like [stevearc](https://github.com/stevearc/dotfiles/blob/eeb506f9afd32cd8cd9f2366110c76efaae5786c/.config/nvim/lua/plugins/neorg.lua).
 - [ ] [ChatGPT.nvim](https://github.com/jackMort/ChatGPT.nvim), eg. [AstroCommunity](https://github.com/AstroNvim/astrocommunity/tree/1f3a6ec008b404c72f84093fe25c574ba63fc256/lua/astrocommunity/editing-support/chatgpt-nvim), [Matt-FTW](https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/coding/ai/gpt.lua)
 - [ ] Check this [copilot-chat-v2-fzf.lua](https://github.com/jellydn/lazy-nvim-ide/blob/main/lua/plugins/extras/copilot-chat-v2-fzf.lua).
@@ -77,6 +81,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
   - Fix chezmoi not auto apply if file opened from mini-files.
 - [ ] Terminal: fix zsh-vi-mode's cursor shape.
 - [ ] [Toggleterm](https://github.com/akinsho/toggleterm.nvim) by this [issue](https://github.com/LazyVim/LazyVim/issues/539).
+  - [toggleterm-manager.nvim](https://github.com/ryanmsnyder/toggleterm-manager.nvim)
 - [ ] Keybindings investigation:
   - DoomEmacs
   - [Kickstart](https://github.com/nvim-lua/kickstart.nvim)

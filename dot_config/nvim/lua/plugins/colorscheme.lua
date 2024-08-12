@@ -54,6 +54,16 @@ return {
       background = {
         dark = "frappe", -- frappe, macchiato, mocha(default)
       },
+      integrations = {
+        mini = {
+          enabled = true,
+          indentscope_color = "subtext0",
+        },
+        dropbar = {
+          enabled = true,
+          color_mode = true,
+        },
+      },
       -- ~/.local/share/nvim/lazy/catppuccin/lua/catppuccin/palettes/mocha.lua
       custom_highlights = function(colors)
         local U = require("catppuccin.utils.colors")

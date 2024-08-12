@@ -161,4 +161,24 @@ return {
       })
     end,
   },
+
+  {
+    "Bekaboo/dropbar.nvim",
+    optional = true,
+    opts = {
+      menu = {
+        keymaps = {
+          [close_key] = function()
+            local menu = require("dropbar.utils.menu").get_current()
+            while menu and menu.prev_menu do
+              menu = menu.prev_menu
+            end
+            if menu then
+              menu:close()
+            end
+          end,
+        },
+      },
+    },
+  },
 }

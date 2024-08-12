@@ -84,4 +84,16 @@ return {
     optional = true,
     opts = { preview_config = { border = "rounded" } },
   },
+
+  {
+    "Bekaboo/dropbar.nvim",
+    optional = true,
+    opts = {
+      menu = {
+        win_configs = {
+          border = "rounded",
+        },
+      },
+    },
+  },
 }
