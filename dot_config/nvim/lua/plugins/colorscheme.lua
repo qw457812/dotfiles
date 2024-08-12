@@ -72,7 +72,7 @@ return {
           CmpGhostText = { bg = colors.base, fg = colors.overlay1 },
           DiagnosticUnnecessary = { fg = U.lighten(colors.overlay0, 0.9) },
 
-          -- for flash treesitter search
+          -- for flash treesitter search, not necessary after using `{ label = { rainbow = { enabled = true } } }` opts
           FlashLabel = { fg = colors.base, bg = colors.green, style = { "bold" } },
         }
       end,

@@ -44,7 +44,7 @@ return {
       { "R", mode = { "o", "x" }, false },
       -- https://github.com/rileyshahar/dotfiles/blob/ce20b2ea474f20e4eb7493e84c282645e91a36aa/nvim/lua/plugins/movement.lua#L99
       { "<space>", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
-      { "<tab>", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
+      { "<tab>", mode = { "o", "x" }, function() require("flash").treesitter_search({ label = { rainbow = { enabled = true } } }) end, desc = "Treesitter Search" },
     },
   },
 }
