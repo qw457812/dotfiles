@@ -200,6 +200,47 @@ return {
     },
   },
 
+  {
+    "folke/flash.nvim",
+    optional = true,
+    keys = function(_, keys)
+      -- https://github.com/JoseConseco/nvim_config/blob/23dbf5f8b9779d792643ab5274ebe8dabe79c0c0/lua/plugins.lua#L1049
+      -- https://github.com/mfussenegger/nvim-treehopper
+      ---@param skip_first_match? boolean
+      local function treesitter(skip_first_match)
+        require("flash").treesitter({
+          ---@param matches Flash.Match.TS[]
+          filter = function(matches)
+            if skip_first_match then
+              -- before removing first match, match[n+1] should use previous match[n] label
+              for i = #matches, 2, -1 do
+                matches[i].label = matches[i - 1].label
+              end
+              -- remove first match, as it is same as word under cursor (not always) thus redundant with word motion
+              table.remove(matches, 1)
+            end
+            return matches
+          end,
+          label = { rainbow = { enabled = true } },
+        })
+      end
+
+      -- stylua: ignore
+      return vim.list_extend(keys, {
+        { "S", mode = { "n", "o", "x" }, function() treesitter() end, desc = "Flash Treesitter" },
+        { "u", mode = { "o", "x" }, function() treesitter(true) end, desc = "Flash Treesitter" }, -- unit textobject
+        -- {
+        --   "R",
+        --   mode = { "o", "x" },
+        --   function()
+        --     require("flash").treesitter_search({ label = { rainbow = { enabled = true } } })
+        --   end,
+        --   desc = "Treesitter Search",
+        -- },
+      })
+    end,
+  },
+
   -- {
   --   "folke/which-key.nvim",
   --   opts = {
