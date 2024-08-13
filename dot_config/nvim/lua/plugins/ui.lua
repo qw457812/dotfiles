@@ -32,14 +32,19 @@ return {
   -- https://github.com/aimuzov/LazyVimx/blob/a27d3439b9021d1215ce6471f59d801df32c18d4/lua/lazyvimx/extras/ui/panels/status-line.lua
   -- https://github.com/jacquin236/minimal-nvim/blob/b74208114eae6cd724c276e0d966bf811822bcd5/lua/util/lualine.lua
   -- https://github.com/chrisgrieser/.config/blob/main/nvim/lua/plugins/lualine.lua
+  -- https://github.com/barryblando/dotfiles/blob/078543ccb0be6c57284400c2a1b1af4a9dd46aa4/neovim/.config/nvim/lua/plugins/lualine.lua
   {
     "nvim-lualine/lualine.nvim",
     opts = function(_, opts)
+      local function hl_text(text, hl)
+        return "%#" .. hl .. "#" .. text .. "%*"
+      end
+
       local function ft_icon()
         -- require("mini.icons").get("file", vim.fn.expand("%:t"))
         local icon, hl, is_default = require("mini.icons").get("filetype", vim.bo.filetype) --[[@as string, string, boolean]]
         if not is_default then
-          return icon .. " ", hl
+          return hl_text(icon .. " ", hl)
         end
       end
 
@@ -69,7 +74,7 @@ return {
         if #linters == 0 then
           return ""
         end
-        return "󰁨 " -- 󱉶
+        return hl_text("󰁨 ", "WhichKeyIconGreen") -- 󱉶
       end
 
       local formatter = function()
@@ -85,7 +90,7 @@ return {
             return ""
           end
         end
-        return " " -- 󰛖 
+        return hl_text(" ", "WhichKeyIconCyan") -- 󰛖 
       end
 
       local lsp = function()
@@ -97,7 +102,7 @@ return {
         if #clients == 0 then
           return ""
         end
-        return ft_icon() or " " -- 
+        return ft_icon() or hl_text(" ", "Special") --  Identifier
       end
 
       -- see: ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/ui.lua
@@ -137,12 +142,7 @@ return {
       -- end
 
       if not vim.g.user_is_termux then
-        -- stylua: ignore
-        vim.list_extend(opts.sections.lualine_x, {
-          { linter, color = function() return LazyVim.ui.fg("WhichKeyIconGreen") end },
-          { formatter, color = function() return LazyVim.ui.fg("WhichKeyIconCyan") end },
-          { lsp, color = function() return LazyVim.ui.fg(select(2, ft_icon()) or "Special") end }, -- Identifier
-        })
+        vim.list_extend(opts.sections.lualine_x, { { linter }, { formatter }, { lsp } })
       end
       opts.sections.lualine_y = { { "filetype", icon_only = vim.g.user_is_termux } }
 
@@ -267,9 +267,12 @@ return {
         on_open = function()
           vim.g.user_minianimate_disable_old = vim.g.minianimate_disable
           vim.g.minianimate_disable = true
+          vim.g.user_winbar_old = vim.wo.winbar
+          vim.wo.winbar = nil
         end,
         on_close = function()
           vim.g.minianimate_disable = vim.g.user_minianimate_disable_old
+          vim.wo.winbar = vim.g.user_winbar_old
         end,
       }
       if not vim.env.TMUX then
@@ -330,6 +333,7 @@ return {
 
   -- https://github.com/jacquin236/minimal-nvim/blob/8942639a07e2ac633c259be0386299a00cdef1be/lua/plugins/editor/dropbar.lua
   -- https://github.com/LazyVim/LazyVim/pull/3503/files
+  -- https://github.com/JuanZoran/myVimrc/blob/cc60c2a2d3ad51b4d6b34a187d85cbe0ce40ae45/lua/plugins/ui/extra/lualine.lua
   {
     "Bekaboo/dropbar.nvim",
     event = "VeryLazy",
@@ -338,10 +342,6 @@ return {
       -- stylua: ignore
       { "<leader>wp", function() require("dropbar.api").pick() end, desc = "Winbar Pick" },
     },
-    init = function()
-      vim.api.nvim_set_hl(0, "DropBarIconUISeparator", { default = true, link = "Delimiter" })
-      vim.api.nvim_set_hl(0, "DropBarMenuNormalFloat", { default = true, link = "Pmenu" })
-    end,
     opts = function(_, opts)
       local menu_utils = require("dropbar.utils.menu")
 
@@ -355,37 +355,43 @@ return {
         end
       end
 
-      opts.menu = vim.tbl_deep_extend("force", opts.menu or {}, {
-        keymaps = {
-          ["q"] = close,
-          ["<esc>"] = close,
-          -- navigate back to the parent menu
-          ["h"] = "<C-w>q",
-          -- expands entry if possible
-          ["l"] = function()
-            local menu = menu_utils.get_current()
-            if not menu then
-              return
-            end
-            local cursor = vim.api.nvim_win_get_cursor(menu.win)
-            local component = menu.entries[cursor[1]]:first_clickable(cursor[2])
-            if component then
-              menu:click_on(component, nil, 1, "l")
-            end
-          end,
-          -- jump and close
-          ["o"] = function()
-            local menu = menu_utils.get_current()
-            if not menu then
-              return
-            end
-            local cursor = vim.api.nvim_win_get_cursor(menu.win)
-            local entry = menu.entries[cursor[1]]
-            local component = entry:first_clickable(entry.padding.left + entry.components[1]:bytewidth())
-            if component then
-              menu:click_on(component, nil, 1, "l")
-            end
-          end,
+      return vim.tbl_deep_extend("force", opts, {
+        general = {
+          enable = false, -- using lualine.nvim
+          update_interval = 20, -- performance for holding down `j`: 17 ~ 20
+        },
+        menu = {
+          keymaps = {
+            ["q"] = close,
+            ["<esc>"] = close,
+            -- navigate back to the parent menu
+            ["h"] = "<C-w>q",
+            -- expands entry if possible
+            ["l"] = function()
+              local menu = menu_utils.get_current()
+              if not menu then
+                return
+              end
+              local cursor = vim.api.nvim_win_get_cursor(menu.win)
+              local component = menu.entries[cursor[1]]:first_clickable(cursor[2])
+              if component then
+                menu:click_on(component, nil, 1, "l")
+              end
+            end,
+            -- jump and close
+            ["o"] = function()
+              local menu = menu_utils.get_current()
+              if not menu then
+                return
+              end
+              local cursor = vim.api.nvim_win_get_cursor(menu.win)
+              local entry = menu.entries[cursor[1]]
+              local component = entry:first_clickable(entry.padding.left + entry.components[1]:bytewidth())
+              if component then
+                menu:click_on(component, nil, 1, "l")
+              end
+            end,
+          },
         },
       })
     end,
@@ -396,8 +402,15 @@ return {
     dependencies = { "Bekaboo/dropbar.nvim" },
     opts = function(_, opts)
       opts.winbar = {
-        -- lualine_c = { "%{%v:lua.dropbar.get_dropbar_str()%}" },
-        lualine_c = { dropbar.get_dropbar_str },
+        lualine_c = {
+          {
+            "%{%v:lua.dropbar.get_dropbar_str()%}", -- dropbar.get_dropbar_str
+            cond = function()
+              -- disable for neo-tree
+              return vim.bo.buflisted
+            end,
+          },
+        },
       }
     end,
   },

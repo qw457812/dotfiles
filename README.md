@@ -53,6 +53,13 @@ Using [Glove80](https://www.moergo.com/) keyboard.
 
 Using [WhatPulse](https://whatpulse.org/) to track keyboard input.
 
+TODO:
+
+- [ ] Try [Glove80 Layout Editor](https://my.glove80.com/).
+- [ ] Try [ZMK](https://zmk.dev/) or [QMK](https://docs.qmk.fm/).
+  - [qmk.nvim](https://github.com/codethread/qmk.nvim)
+  - [keymap-editor](https://github.com/nickcoutsos/keymap-editor)
+
 ## [Neovim](https://neovim.io/)
 
 [My neovim config](dot_config/nvim) powered by [LazyVim](https://github.com/LazyVim/LazyVim).
@@ -60,13 +67,20 @@ Using [WhatPulse](https://whatpulse.org/) to track keyboard input.
 TODO:
 
 1. [x] Try [NvChad](https://github.com/NvChad/NvChad), [LazyVim](https://github.com/LazyVim/LazyVim), [Kickstart](https://github.com/nvim-lua/kickstart.nvim), [AstroNvim](https://github.com/AstroNvim/AstroNvim) by [Lazyman](https://github.com/doctorfree/nvim-lazyman).
-2. [ ] Find out a set of keybindings that can be used everywhere, [equivalent mapping configurations for other IDEs VIM integrations](https://github.com/magidc/nvim-config#equivalent-mapping-configurations-for-other-ides-vim-integrations): [IdeaVim](#ideavim), [VSCodeVim](#vscodevim), [Doom Emacs](#doom-emacs), maybe even [zsh-vi-mode](#oh-my-zsh), [tmux-copy-mode](#oh-my-tmux), [less](dot_config/lesskey).
-   - [ ] Leader key
-   - [ ] File manager specifically
+2. Find out a set of keybindings that can be used everywhere, [equivalent mapping configurations for other VIM integrations](https://github.com/magidc/nvim-config#equivalent-mapping-configurations-for-other-ides-vim-integrations):
+   - IDE
+     - [ ] [IdeaVim](#ideavim)
+     - [ ] [VSCodeVim or vscode-neovim](#vscodevim)
+     - [ ] [Doom Emacs](#doom-emacs)
+   - File manager
      - [ ] Terminal: [Vifm](#vifm) or [Yazi](https://github.com/sxyazi/yazi)
      - [ ] Neovim: [neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim) or [telescope-file-browser.nvim](https://github.com/nvim-telescope/telescope-file-browser.nvim)
-     - [ ] [VSCode](#vscodevim): Explorer view
+     - [ ] [VSCode](#vscodevim): Built-in Explorer view
      - [ ] [IdeaVim](#ideavim): [NERDTree](https://github.com/JetBrains/ideavim/wiki/NERDTree-support)
+   - Others
+     - [ ] [zsh-vi-mode](#oh-my-zsh)
+     - [ ] [tmux-copy-mode](#oh-my-tmux)
+     - [ ] [less](dot_config/lesskey)
 
 Tips:
 
@@ -100,6 +114,10 @@ Tips:
 
 [keybindings.json](symlinks/vscode/keybindings.json)
 
+TODO:
+
+- [ ] Migrate to [vscode-neovim](https://github.com/vscode-neovim/vscode-neovim).
+
 ## [Doom Emacs](https://github.com/doomemacs/doomemacs)
 
 [DOOMDIR](dot_config/doom)
@@ -110,6 +128,10 @@ Using [Emacs Plus](https://github.com/d12frosted/homebrew-emacs-plus).
 
 [.zshrc](dot_zshrc)
 
+TODO:
+
+- [ ] Try [fish](https://fishshell.com).
+
 ## [Oh my tmux!](https://github.com/gpakosz/.tmux)
 
 [.tmux.conf.local](dot_tmux.conf.local)
@@ -117,6 +139,10 @@ Using [Emacs Plus](https://github.com/d12frosted/homebrew-emacs-plus).
 ## [Vifm](https://github.com/vifm/vifm)
 
 [vifmrc](dot_config/private_vifm/vifmrc)
+
+TODO:
+
+- [ ] Try [Yazi](https://github.com/sxyazi/yazi).
 
 ## [rime-ice](https://github.com/iDvel/rime-ice)
 
@@ -135,6 +161,10 @@ Using [emacs-rime](https://github.com/DogLooksGood/emacs-rime) in Doom Emacs.
 ## [yabai](https://github.com/koekeishiya/yabai)
 
 [.yabairc](executable_dot_yabairc)
+
+TODO:
+
+- [ ] Try [AeroSpace](https://github.com/nikitabobko/AeroSpace).
 
 ## [zathura](https://github.com/zegervdv/homebrew-zathura)
 

@@ -41,7 +41,9 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [Trending Preconfigured plugins by Dotfyle](https://dotfyle.com/neovim/plugins/trending?categories=preconfigured)
 - [nvimdots](https://dotfyle.com/plugins/ayamir/nvimdots)
 - [AstroCommunity](https://github.com/AstroNvim/astrocommunity)
-- [mini.basics](https://github.com/echasnovski/mini.nvim/blob/main/lua/mini/basics.lua): [Common configuration presets](https://github.com/echasnovski/mini.nvim#modules)
+- [echasnovski](https://github.com/echasnovski/nvim)
+  > Author of [mini.nvim](https://github.com/echasnovski/mini.nvim).
+  - [mini.basics](https://github.com/echasnovski/mini.nvim/blob/main/lua/mini/basics.lua): [Common configuration presets](https://github.com/echasnovski/mini.nvim#modules)
 - [Lazyman](https://github.com/doctorfree/nvim-lazyman)
 - [pkazmier](https://github.com/pkazmier/nvim)
 - [v1nh1shungry](https://github.com/v1nh1shungry/.dotfiles/tree/main/nvim)
@@ -51,6 +53,15 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 ## Lazy Tips
 
 - [If you have multiple specs for the same plugin, then all `opts` will be evaluated, but only the last `config`](https://github.com/LazyVim/LazyVim/pull/4122#issuecomment-2241563662).
+
+## Performance
+
+### Holding down `j`
+
+| Plugin                                                                                | bigtime |
+| ------------------------------------------------------------------------------------- | ------- |
+| [nvim-treesitter-context](https://github.com/nvim-treesitter/nvim-treesitter-context) | yes     |
+| [dropbar.nvim](https://github.com/Bekaboo/dropbar.nvim)                               | no      |
 
 ## TODO
 
@@ -90,6 +101,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
   - [rafi](https://github.com/rafi/vim-config#custom-key-mappings)
   - [modern-neovim](https://github.com/alpha2phi/modern-neovim)
   - [nvimdots](https://github.com/ayamir/nvimdots)
+  - echasnovski's [mappings-leader.lua](https://github.com/echasnovski/nvim/blob/master/src/mappings-leader.lua)
 - [ ] translate
   - [JuanZoran/Trans.nvim](https://github.com/JuanZoran/Trans.nvim)
   - [voldikss/vim-translator](https://github.com/voldikss/vim-translator)
