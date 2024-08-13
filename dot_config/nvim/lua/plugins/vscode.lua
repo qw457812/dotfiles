@@ -59,6 +59,7 @@ vim.api.nvim_create_autocmd("User", {
     vscode_map({ "n", "v" }, "<leader>cf", "editor.action.formatDocument", { desc = "Format" })
 
     -- TODO:
+    -- https://github.com/echasnovski/nvim/blob/b84cec54e0a46c9de824820fa8698b5bba43eb81/src/vscode.lua
     -- https://github.com/pojokcodeid/nvim-lazy/blob/ab014bb8b52ded6bc053f5b224574ac89bd18af9/init.lua
     -- https://github.com/kshenoy/dotfiles/blob/bd29a03df3c1f2df4273cb19dc54ed79eecaa5a5/nvim/lua/vscode-only/keybindings.lua
     -- https://github.com/Virgiel/my-config/blob/64c5c60c0be4a5f67fc7709017b3dd34ddc33376/config/nvim.lua#L25

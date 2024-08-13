@@ -10,7 +10,7 @@ return {
         --   sidebars = "transparent",
         --   floats = "transparent",
         -- },
-        -- ~/.local/share/nvim/lazy/tokyonight.nvim/extras/lua/tokyonight_moon.lua
+        -- ~/.local/share/nvim/lazy/tokyonight.nvim/extras/lua/tokyonight_storm.lua
         on_highlights = function(hl, c)
           local util = require("tokyonight.util")
           -- highlight word/references under cursor
@@ -29,6 +29,9 @@ return {
           hl.CmpGhostText = { bg = c.bg, fg = util.blend_fg(hl.CmpGhostText.fg, 0.85) }
           -- unused variable
           hl.DiagnosticUnnecessary = { fg = util.blend_fg(c.terminal_black, 0.7) }
+
+          -- filename highlighting
+          hl.DropBarKindFile = { fg = c.red }
 
           do
             return
@@ -61,10 +64,10 @@ return {
         },
         dropbar = {
           enabled = true,
-          color_mode = true,
+          -- color_mode = true,
         },
       },
-      -- ~/.local/share/nvim/lazy/catppuccin/lua/catppuccin/palettes/mocha.lua
+      -- ~/.local/share/nvim/lazy/catppuccin/lua/catppuccin/palettes/frappe.lua
       custom_highlights = function(colors)
         local U = require("catppuccin.utils.colors")
         -- highlight word/references under cursor
@@ -84,6 +87,9 @@ return {
 
           -- for flash treesitter search, not necessary after using `{ label = { rainbow = { enabled = true } } }` opts
           FlashLabel = { fg = colors.base, bg = colors.green, style = { "bold" } },
+
+          -- filename highlighting
+          DropBarKindFile = { fg = colors.red },
         }
       end,
     },
