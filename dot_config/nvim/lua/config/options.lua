@@ -25,7 +25,6 @@ vim.g.lazyvim_python_lsp = "basedpyright"
 vim.g.user_is_termux = vim.env.TERMUX_VERSION ~= nil
 -- For holding layout like no-neck-pain.nvim when Auto Close is disabled
 vim.g.user_neotree_auto_close = vim.g.user_is_termux
-vim.g.trouble_lualine = not vim.g.user_is_termux
 
 -- https://neovide.dev/configuration.html
 if vim.g.neovide then

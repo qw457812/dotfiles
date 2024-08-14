@@ -30,9 +30,6 @@ return {
           -- unused variable
           hl.DiagnosticUnnecessary = { fg = util.blend_fg(c.terminal_black, 0.7) }
 
-          -- filename highlighting
-          hl.DropBarKindFile = { fg = c.red }
-
           do
             return
           end
@@ -88,8 +85,8 @@ return {
           -- for flash treesitter search, not necessary after using `{ label = { rainbow = { enabled = true } } }` opts
           FlashLabel = { fg = colors.base, bg = colors.green, style = { "bold" } },
 
-          -- filename highlighting
-          DropBarKindFile = { fg = colors.red },
+          -- custom
+          -- DropBarFileName = { fg = U.lighten(colors.text, 0.8), style = { "bold" } },
         }
       end,
     },
