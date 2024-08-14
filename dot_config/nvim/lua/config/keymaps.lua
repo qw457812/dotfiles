@@ -240,10 +240,10 @@ end
 -- conflict with "Buffer Local Keymaps (which-key)" defined in ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/editor.lua
 -- map("n", "<leader>?", google_search, { desc = "Google Search Current Word" })
 map("x", "<leader>?", function()
-  local g_orig = vim.fn.getreg("g")
-  vim.cmd([[silent! normal! "gy]])
-  google_search(vim.fn.getreg("g"))
-  vim.fn.setreg("g", g_orig)
+  local cache_z_reg = vim.fn.getreginfo("z")
+  vim.cmd([[silent normal! "zy]])
+  google_search(vim.fn.getreg("z"))
+  vim.fn.setreg("z", cache_z_reg)
 end, { desc = "Google Search" })
 
 if vim.g.neovide then

@@ -115,31 +115,19 @@ return {
       end
       ---@diagnostic disable-next-line: assign-type-mismatch
       lualine_c[1] = LazyVim.lualine.root_dir({ cwd = true })
+      -- lualine_c[4] = {
+      --   pretty_path({
+      --     -- relative = "root",
+      --     directory_hl = "Conceal",
+      --     length = vim.g.user_is_termux and 2 or 3,
+      --   }),
+      -- }
       lualine_c[4] = {
-        pretty_path({
-          -- relative = "root",
-          directory_hl = "Conceal",
-          length = vim.g.user_is_termux and 2 or 3,
-        }),
+        function(self)
+          local path = LazyVim.lualine.pretty_path({ length = 0 })(self)
+          return vim.fn.fnamemodify(path, ":t")
+        end,
       }
-      -- if vim.g.trouble_lualine and LazyVim.has("trouble.nvim") then
-      --   local trouble = require("trouble")
-      --   local symbols = trouble.statusline({
-      --     mode = "symbols", -- lsp_document_symbols
-      --     groups = {},
-      --     title = false,
-      --     filter = { range = true },
-      --     format = "{kind_icon}{symbol.name:Normal}",
-      --     hl_group = "lualine_c_normal",
-      --     -- max_items = 5,
-      --   })
-      --   lualine_c[#lualine_c] = {
-      --     symbols and symbols.get,
-      --     cond = function()
-      --       return vim.b.trouble_lualine ~= false and symbols.has()
-      --     end,
-      --   }
-      -- end
 
       if not vim.g.user_is_termux then
         vim.list_extend(opts.sections.lualine_x, { { linter }, { formatter }, { lsp } })
@@ -334,16 +322,67 @@ return {
   -- https://github.com/jacquin236/minimal-nvim/blob/8942639a07e2ac633c259be0386299a00cdef1be/lua/plugins/editor/dropbar.lua
   -- https://github.com/LazyVim/LazyVim/pull/3503/files
   -- https://github.com/JuanZoran/myVimrc/blob/cc60c2a2d3ad51b4d6b34a187d85cbe0ce40ae45/lua/plugins/ui/extra/lualine.lua
+  -- https://github.com/nghialm269/dotfiles/blob/26d814f697229cccdb01439e7a5c556f0539da47/nvim/.config/nvim/lua/plugins/ui.lua#L197
   {
     "Bekaboo/dropbar.nvim",
     event = "VeryLazy",
     dependencies = { "nvim-telescope/telescope-fzf-native.nvim", optional = true },
+    init = function()
+      vim.g.trouble_lualine = false
+    end,
     keys = {
       -- stylua: ignore
       { "<leader>wp", function() require("dropbar.api").pick() end, desc = "Winbar Pick" },
     },
     opts = function(_, opts)
+      local sources = require("dropbar.sources")
+      -- local utils = require("dropbar.utils")
       local menu_utils = require("dropbar.utils.menu")
+
+      -- stylua: ignore start
+      vim.api.nvim_set_hl(0, "DropBarFileName", { default = true, fg = LazyVim.ui.color("DropBarKindFile"), bold = true })
+      vim.api.nvim_set_hl(0, "DropBarFileNameModified", { default = true, fg = LazyVim.ui.color("MatchParen"), bold = true })
+      vim.api.nvim_set_hl(0, "DropBarSymbolName", { default = true, link = "Conceal" })
+      -- stylua: ignore end
+
+      local source_path = {
+        get_symbols = function(buff, win, cursor)
+          local symbols = sources.path.get_symbols(buff, win, cursor)
+          -- filename highlighting
+          for i, symbol in ipairs(symbols) do
+            symbol.name_hl = i == #symbols and "DropBarFileName" or "DropBarSymbolName"
+          end
+          if vim.bo[buff].modified then
+            symbols[#symbols].name_hl = "DropBarFileNameModified"
+          end
+          return symbols
+        end,
+      }
+
+      local source_markdown = {
+        get_symbols = function(buff, win, cursor)
+          local symbols = sources.markdown.get_symbols(buff, win, cursor)
+          for _, symbol in ipairs(symbols) do
+            symbol.name_hl = "DropBarSymbolName"
+          end
+          return symbols
+        end,
+      }
+
+      -- local source_lsp_or_treesitter = {
+      --   get_symbols = function(buff, win, cursor)
+      --     local symbols = utils.source
+      --       .fallback({
+      --         sources.lsp,
+      --         sources.treesitter,
+      --       })
+      --       .get_symbols(buff, win, cursor)
+      --     for _, symbol in ipairs(symbols) do
+      --       symbol.name_hl = "DropBarSymbolName"
+      --     end
+      --     return symbols
+      --   end,
+      -- }
 
       local function close()
         local menu = menu_utils.get_current()
@@ -359,6 +398,18 @@ return {
         general = {
           enable = false, -- using lualine.nvim
           update_interval = 20, -- performance for holding down `j`: 17 ~ 20
+        },
+        bar = {
+          sources = function(buf, _)
+            if vim.bo[buf].ft == "markdown" then
+              return { source_path, source_markdown }
+            end
+            if vim.bo[buf].buftype == "terminal" then
+              return {}
+            end
+            -- return { source_path, source_lsp_or_treesitter }
+            return { source_path } -- using trouble.nvim's symbols instead, because it's shorter
+          end,
         },
         menu = {
           keymaps = {
@@ -393,6 +444,13 @@ return {
             end,
           },
         },
+        sources = {
+          path = {
+            relative_to = function(buf, _)
+              return LazyVim.root.get({ normalize = true, buf = buf })
+            end,
+          },
+        },
       })
     end,
   },
@@ -401,17 +459,54 @@ return {
     "nvim-lualine/lualine.nvim",
     dependencies = { "Bekaboo/dropbar.nvim" },
     opts = function(_, opts)
+      local dropbar_default_opts = require("dropbar.configs").opts
+
+      -- :ene
+      local function is_unnamed_buffer()
+        return vim.api.nvim_buf_get_name(0) == ""
+      end
+
+      -- disable winbar for unnamed buffers and neo-tree
+      local function cond_show_winbar()
+        return not is_unnamed_buffer() and vim.bo.buflisted
+      end
+
       opts.winbar = {
         lualine_c = {
           {
-            "%{%v:lua.dropbar.get_dropbar_str()%}", -- dropbar.get_dropbar_str
-            cond = function()
-              -- disable for neo-tree
-              return vim.bo.buflisted
+            -- "%{%v:lua.dropbar.get_dropbar_str()%}",
+            function()
+              return dropbar.get_dropbar_str():gsub("%%X %%%*", "%%X%%%*") -- remove last space: "%X %*"
             end,
+            cond = cond_show_winbar,
+            padding = { left = 1, right = 0 },
           },
         },
       }
+
+      if LazyVim.has("trouble.nvim") then
+        local trouble = require("trouble")
+        local symbols = trouble.statusline({
+          mode = "symbols", -- "lsp_document_symbols"
+          groups = {},
+          title = false,
+          filter = { range = true },
+          format = "{hl:DropBarIconUISeparator}"
+            .. dropbar_default_opts.icons.ui.bar.separator
+            .. "{hl}{kind_icon}{symbol.name:DropBarSymbolName}",
+          hl_group = "lualine_c_normal",
+          -- max_items = 5,
+        })
+        table.insert(opts.winbar.lualine_c, {
+          function()
+            return symbols and symbols.get():gsub("%%* %%#", "%%*%%#") or "" -- remove sep spaces
+          end,
+          cond = function()
+            return cond_show_winbar() and vim.bo.ft ~= "markdown" and symbols.has()
+          end,
+          padding = { left = 0, right = 1 },
+        })
+      end
     end,
   },
 
