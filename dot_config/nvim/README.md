@@ -136,10 +136,19 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] [flatten.nvim](https://github.com/willothy/flatten.nvim) like [amaanq](https://github.com/amaanq/nvim-config/blob/master/lua/plugins/editor.lua)
 - [ ] [benlubas/molten-nvim](https://github.com/benlubas/molten-nvim) for jupyter
 - [ ] [nvim-recorder](https://github.com/chrisgrieser/nvim-recorder)
+- [ ] [rasulomaroff/reactive.nvim](https://github.com/rasulomaroff/reactive.nvim)
 - [ ] lang.zsh like [aimuzov](https://github.com/aimuzov/LazyVimx/blob/main/lua/lazyvimx/extras/lang/zsh.lua).
 - [ ] Create a `state` util to cache the state (like [zen-mode.nvim](https://github.com/folke/zen-mode.nvim/blob/29b292bdc58b76a6c8f294c961a8bf92c5a6ebd6/lua/zen-mode/plugins.lua#L137)) instead of using `vim.g.user_...`
   - [vim.g.user_zenmode_on](lua/plugins/ui.lua), [vim.g.user_minianimate_disable_old](lua/plugins/ui.lua)
   - [local neovide_state = {}](lua/config/keymaps.lua)
+- [ ] Create utils/functions:
+  - `has_extra` for user extras
+    - [LazyVim.has("dropbar.nvim")](lua/plugins/ui.lua)
+  - `map`
+    - [keymaps.lua](lua/config/keymaps.lua)
+    - [vscode.lua](lua/plugins/vscode.lua)
+  - `get_visual` by reg
+    - `<leader>?` in [keymaps.lua](lua/config/keymaps.lua)
 - [ ] `which-key v3` problem with `mini.surround`/`mini.operators`/Helix-style mappings(map `mm` to `%`):
 
   1. problem

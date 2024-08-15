@@ -51,12 +51,12 @@ return {
       -- stylua: ignore
       local function cond_always_hidden() return false end
 
-      -- -- https://github.com/aimuzov/LazyVimx/blob/a27d3439b9021d1215ce6471f59d801df32c18d4/lua/lazyvimx/extras/hacks/lazyvim-lualine-pretty-path.lua
-      -- local function pretty_path(o)
-      --   return function(self)
-      --     return LazyVim.lualine.pretty_path(o)(self):gsub("/", "󰿟")
-      --   end
-      -- end
+      -- https://github.com/aimuzov/LazyVimx/blob/a27d3439b9021d1215ce6471f59d801df32c18d4/lua/lazyvimx/extras/hacks/lazyvim-lualine-pretty-path.lua
+      local function pretty_path(o)
+        return function(self)
+          return LazyVim.lualine.pretty_path(o)(self):gsub("/", "󰿟")
+        end
+      end
 
       -- https://github.com/Matt-FTW/dotfiles/blob/b12af2bc28c89c7185c48d6b02fb532b6d8be45d/.config/nvim/lua/plugins/extras/ui/lualine-extended.lua
       local linter = function()
@@ -115,19 +115,22 @@ return {
       end
       ---@diagnostic disable-next-line: assign-type-mismatch
       lualine_c[1] = LazyVim.lualine.root_dir({ cwd = true })
-      -- lualine_c[4] = {
-      --   pretty_path({
-      --     -- relative = "root",
-      --     directory_hl = "Conceal",
-      --     length = vim.g.user_is_termux and 2 or 3,
-      --   }),
-      -- }
-      lualine_c[4] = {
-        function(self)
-          local path = LazyVim.lualine.pretty_path({ length = 0 })(self)
-          return vim.fn.fnamemodify(path, ":t") -- filename only
-        end,
-      }
+      if LazyVim.has("dropbar.nvim") then
+        lualine_c[4] = {
+          function(self)
+            local path = LazyVim.lualine.pretty_path({ length = 0 })(self)
+            return vim.fn.fnamemodify(path, ":t") -- filename only
+          end,
+        }
+      else
+        lualine_c[4] = {
+          pretty_path({
+            -- relative = "root",
+            directory_hl = "Conceal",
+            length = vim.g.user_is_termux and 2 or 3,
+          }),
+        }
+      end
 
       if not vim.g.user_is_termux then
         vim.list_extend(opts.sections.lualine_x, { { linter }, { formatter }, { lsp } })
@@ -248,7 +251,7 @@ return {
           neovide = { enabled = true, scale = 1 },
           kitty = { enabled = false, font = "+2" },
           alacritty = { enabled = false, font = "14" },
-          twilight = { enabled = false },
+          twilight = { enabled = false }, -- bad performance
         },
         -- https://github.com/bleek42/dev-env-config-backup/blob/099eb0c4468a03bcafb6c010271818fe8a794816/src/Linux/config/nvim/lua/user/plugins/editor.lua#L27
         on_open = function()
@@ -322,6 +325,7 @@ return {
   -- https://github.com/LazyVim/LazyVim/pull/3503/files
   -- https://github.com/JuanZoran/myVimrc/blob/cc60c2a2d3ad51b4d6b34a187d85cbe0ce40ae45/lua/plugins/ui/extra/lualine.lua
   -- https://github.com/nghialm269/dotfiles/blob/26d814f697229cccdb01439e7a5c556f0539da47/nvim/.config/nvim/lua/plugins/ui.lua#L197
+  -- TODO: move to extras/ui/dropbar.lua
   {
     "Bekaboo/dropbar.nvim",
     event = "VeryLazy",
@@ -355,6 +359,7 @@ return {
           if vim.bo[buff].modified then
             symbols[#symbols].name_hl = "DropBarFileNameModified"
           end
+          -- TODO: replace home with ~
           return symbols
         end,
       }
