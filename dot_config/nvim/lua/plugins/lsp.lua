@@ -121,7 +121,7 @@ return {
     "folke/which-key.nvim",
     opts = {
       spec = {
-        { "<leader>cl", group = "Lsp", icon = { icon = " ", color = "orange" } },
+        { "<leader>cl", group = "Lsp", icon = { icon = " ", color = "purple" } },
       },
     },
   },

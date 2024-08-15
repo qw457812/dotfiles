@@ -51,12 +51,12 @@ return {
       -- stylua: ignore
       local function cond_always_hidden() return false end
 
-      -- https://github.com/aimuzov/LazyVimx/blob/a27d3439b9021d1215ce6471f59d801df32c18d4/lua/lazyvimx/extras/hacks/lazyvim-lualine-pretty-path.lua
-      local function pretty_path(o)
-        return function(self)
-          return LazyVim.lualine.pretty_path(o)(self):gsub("/", "󰿟")
-        end
-      end
+      -- -- https://github.com/aimuzov/LazyVimx/blob/a27d3439b9021d1215ce6471f59d801df32c18d4/lua/lazyvimx/extras/hacks/lazyvim-lualine-pretty-path.lua
+      -- local function pretty_path(o)
+      --   return function(self)
+      --     return LazyVim.lualine.pretty_path(o)(self):gsub("/", "󰿟")
+      --   end
+      -- end
 
       -- https://github.com/Matt-FTW/dotfiles/blob/b12af2bc28c89c7185c48d6b02fb532b6d8be45d/.config/nvim/lua/plugins/extras/ui/lualine-extended.lua
       local linter = function()
@@ -125,7 +125,7 @@ return {
       lualine_c[4] = {
         function(self)
           local path = LazyVim.lualine.pretty_path({ length = 0 })(self)
-          return vim.fn.fnamemodify(path, ":t")
+          return vim.fn.fnamemodify(path, ":t") -- filename only
         end,
       }
 
@@ -213,7 +213,6 @@ return {
         -- }),
       }
       opts.scroll = {
-        -- enable = false,
         timing = animate.gen_timing.linear({ duration = 20, unit = "total" }),
       }
     end,
@@ -336,13 +335,14 @@ return {
     },
     opts = function(_, opts)
       local sources = require("dropbar.sources")
-      -- local utils = require("dropbar.utils")
       local menu_utils = require("dropbar.utils.menu")
 
+      -- custom highlight-groups
       -- stylua: ignore start
       vim.api.nvim_set_hl(0, "DropBarFileName", { default = true, fg = LazyVim.ui.color("DropBarKindFile"), bold = true })
       vim.api.nvim_set_hl(0, "DropBarFileNameModified", { default = true, fg = LazyVim.ui.color("MatchParen"), bold = true })
-      vim.api.nvim_set_hl(0, "DropBarSymbolName", { default = true, link = "Conceal" })
+      vim.api.nvim_set_hl(0, "DropBarFolderName", { default = true, link = "Conceal" })
+      vim.api.nvim_set_hl(0, "DropBarSymbolName", { default = true, link = "DropBarFolderName" })
       -- stylua: ignore end
 
       local source_path = {
@@ -350,7 +350,7 @@ return {
           local symbols = sources.path.get_symbols(buff, win, cursor)
           -- filename highlighting
           for i, symbol in ipairs(symbols) do
-            symbol.name_hl = i == #symbols and "DropBarFileName" or "DropBarSymbolName"
+            symbol.name_hl = i == #symbols and "DropBarFileName" or "DropBarFolderName"
           end
           if vim.bo[buff].modified then
             symbols[#symbols].name_hl = "DropBarFileNameModified"
@@ -368,21 +368,6 @@ return {
           return symbols
         end,
       }
-
-      -- local source_lsp_or_treesitter = {
-      --   get_symbols = function(buff, win, cursor)
-      --     local symbols = utils.source
-      --       .fallback({
-      --         sources.lsp,
-      --         sources.treesitter,
-      --       })
-      --       .get_symbols(buff, win, cursor)
-      --     for _, symbol in ipairs(symbols) do
-      --       symbol.name_hl = "DropBarSymbolName"
-      --     end
-      --     return symbols
-      --   end,
-      -- }
 
       local function close()
         local menu = menu_utils.get_current()
@@ -407,7 +392,6 @@ return {
             if vim.bo[buf].buftype == "terminal" then
               return {}
             end
-            -- return { source_path, source_lsp_or_treesitter }
             return { source_path } -- using trouble.nvim's symbols instead, because it's shorter
           end,
         },

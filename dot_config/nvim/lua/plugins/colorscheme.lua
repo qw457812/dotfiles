@@ -84,9 +84,6 @@ return {
 
           -- for flash treesitter search, not necessary after using `{ label = { rainbow = { enabled = true } } }` opts
           FlashLabel = { fg = colors.base, bg = colors.green, style = { "bold" } },
-
-          -- custom
-          -- DropBarFileName = { fg = U.lighten(colors.text, 0.8), style = { "bold" } },
         }
       end,
     },
