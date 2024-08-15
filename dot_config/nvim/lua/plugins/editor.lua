@@ -22,41 +22,61 @@ return {
       })
 
       local mappings = {
-        --[[add custom keys here]]
+        {
+          "<leader>fe",
+          function()
+            -- reveal the current file in root directory, or if in an unsaved file, the current working directory
+            -- :h neo-tree-configuration
+            local command = require("neo-tree.command")
+            local root = LazyVim.root()
+            local cwd = vim.fn.getcwd()
+            local reveal_file = vim.fn.expand("%:p")
+            if reveal_file == "" then
+              reveal_file = cwd
+            else
+              -- alternative to `vim.fn.filereadable(reveal_file)`?
+              local f = io.open(reveal_file, "r")
+              if f then
+                f.close(f)
+              else
+                reveal_file = cwd
+              end
+            end
+
+            local function execute(action)
+              command.execute({
+                action = action,
+                -- reveal = true, -- using `reveal_file` to reveal cwd if unsaved
+                reveal_file = reveal_file, -- path to file or folder to reveal
+                reveal_force_cwd = true, -- change cwd without asking if needed
+                dir = root,
+              })
+            end
+
+            -- workaround for `reveal_force_cwd` + `dir`, execute twice to properly set root dir
+            execute("show")
+            vim.defer_fn(function()
+              execute("focus")
+            end, 100)
+          end,
+          desc = "Explorer NeoTree (Root Dir)",
+        },
+        {
+          "<leader>fE",
+          function()
+            require("neo-tree.command").execute({ dir = vim.uv.cwd() })
+          end,
+          desc = "Explorer NeoTree (cwd)",
+        },
       }
 
       local opts = LazyVim.opts("neo-tree.nvim")
       if opts.filesystem.hijack_netrw_behavior ~= "disabled" then
         vim.list_extend(mappings, {
-          -- make the `-` key reveal the current file, or if in an unsaved file, the current working directory
-          -- :h neo-tree-configuration
-          {
-            "-",
-            function()
-              local reveal_file = vim.fn.expand("%:p")
-              if reveal_file == "" then
-                reveal_file = vim.fn.getcwd()
-              else
-                local f = io.open(reveal_file, "r")
-                if f then
-                  f.close(f)
-                else
-                  reveal_file = vim.fn.getcwd()
-                end
-              end
-              require("neo-tree.command").execute({
-                action = "focus", -- OPTIONAL, this is the default value
-                source = "filesystem", -- OPTIONAL, this is the default value
-                position = "left", -- OPTIONAL, this is the default value
-                reveal_file = reveal_file, -- path to file or folder to reveal
-                reveal_force_cwd = true, -- change cwd without asking if needed
-              })
-            end,
-            desc = "Open neo-tree at current file or working directory",
-          },
+          { "-", "<leader>fe", desc = "Explorer NeoTree (Root Dir)", remap = true },
         })
       end
-      return vim.list_extend(mappings, keys)
+      return vim.list_extend(keys, mappings)
     end,
     opts = {
       close_if_last_window = true, -- close Neo-tree if it is the last window left in the tab
@@ -194,6 +214,14 @@ return {
               -- auto close on open file
               require("neo-tree.command").execute({ action = "close" })
             end
+          end,
+        },
+        {
+          event = "neo_tree_popup_input_ready",
+          ---@param args { bufnr: integer, winid: integer }
+          handler = function(args)
+            -- map <esc> to enter normal mode of NuiInput (by default closes prompt)
+            vim.keymap.set("i", "<esc>", vim.cmd.stopinsert, { noremap = true, buffer = args.bufnr })
           end,
         },
       },
@@ -353,4 +381,5 @@ return {
 
   -- TODO: choose motion plugin between: flash, leap, hop
   -- https://github.com/doctorfree/nvim-lazyman/blob/bb4091c962e646c5eb00a50eca4a86a2d43bcb7c/lua/ecovim/config/plugins.lua#L373
+  -- "remote flash" for leap: https://github.com/rasulomaroff/telepath.nvim
 }
