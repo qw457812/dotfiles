@@ -476,7 +476,7 @@ return {
           {
             -- "%{%v:lua.dropbar.get_dropbar_str()%}",
             function()
-              return dropbar.get_dropbar_str():gsub("%%X %%%*", "%%X%%%*") -- remove last space: "%X %*"
+              return dropbar.get_dropbar_str():gsub("%s%%%*$", "%%%*") -- remove last space in end_str, eval `vim.pesc(" %*")`
             end,
             cond = cond_show_winbar,
             padding = { left = 1, right = 0 },
@@ -499,7 +499,7 @@ return {
         })
         table.insert(opts.winbar.lualine_c, {
           function()
-            return symbols and symbols.get():gsub("%%* %%#", "%%*%%#") or "" -- remove sep spaces
+            return symbols and symbols.get():gsub("%%%*%s%%#", "%%%*%%#") or "" -- remove sep spaces, eval `vim.pesc("%* %#")`
           end,
           cond = function()
             return cond_show_winbar() and vim.bo.ft ~= "markdown" and symbols.has()
