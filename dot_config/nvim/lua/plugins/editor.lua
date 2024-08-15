@@ -15,9 +15,7 @@ return {
         end,
         set = function(state)
           vim.g.user_neotree_auto_close = state
-          if state then
-            require("neo-tree.command").execute({ action = "close" })
-          end
+          require("neo-tree.command").execute({ action = state and "close" or "show" })
         end,
       })
 
