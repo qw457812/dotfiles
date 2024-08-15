@@ -117,7 +117,7 @@ return {
     keys = keys,
     opts = {
       defaults = {
-        layout_strategy = "horizontal",
+        layout_strategy = vim.g.user_is_termux and "vertical" or "horizontal",
         layout_config = {
           horizontal = {
             width = 0.8,
@@ -125,6 +125,18 @@ return {
             prompt_position = "top",
             preview_cutoff = 120,
             preview_width = 0.5,
+          },
+          vertical = {
+            width = function(_, max_columns, _)
+              return vim.g.user_is_termux and max_columns or math.floor(max_columns * 0.8)
+            end,
+            height = function(_, _, max_lines)
+              return vim.g.user_is_termux and max_lines or math.floor(max_lines * 0.8)
+            end,
+            preview_cutoff = 30,
+            preview_height = function(_, _, max_lines)
+              return math.max(max_lines - 12, math.floor(max_lines * 0.6))
+            end,
           },
         },
         sorting_strategy = "ascending",

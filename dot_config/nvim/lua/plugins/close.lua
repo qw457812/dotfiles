@@ -18,6 +18,7 @@ local function close_buffer_or_window_or_exit()
   end
 
   ---https://github.com/folke/which-key.nvim/blob/6c1584eb76b55629702716995cca4ae2798a9cca/lua/which-key/extras.lua#L53
+  ---https://github.com/nvim-neo-tree/neo-tree.nvim/blob/206241e451c12f78969ff5ae53af45616ffc9b72/lua/neo-tree/sources/manager.lua#L141
   ---@param win number?
   local function is_window_floating(win)
     return vim.api.nvim_win_get_config(win or 0).relative ~= ""
