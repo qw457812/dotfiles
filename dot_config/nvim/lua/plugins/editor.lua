@@ -21,6 +21,7 @@ return {
         end,
       })
 
+      local last_root ---@type string?
       local mappings = {
         {
           "<leader>fe",
@@ -28,7 +29,6 @@ return {
             -- reveal the current file in root directory, or if in an unsaved file, the current working directory
             -- :h neo-tree-configuration
             local command = require("neo-tree.command")
-            local root = LazyVim.root()
             local cwd = vim.fn.getcwd()
             local reveal_file = vim.fn.expand("%:p")
             if reveal_file == "" then
@@ -43,6 +43,23 @@ return {
               end
             end
 
+            local function reveal_without_set_root()
+              command.execute({ reveal_file = reveal_file, reveal_force_cwd = true })
+            end
+
+            -- workaround below not working in termux
+            if vim.g.user_is_termux then
+              reveal_without_set_root()
+              return
+            end
+
+            local root = LazyVim.root()
+            if not vim.startswith(reveal_file, root) then
+              last_root = nil -- neo-tree's root will change after reveal
+              reveal_without_set_root() -- wrong root, reveal only
+              return
+            end
+
             local function execute(action)
               command.execute({
                 action = action,
@@ -53,11 +70,16 @@ return {
               })
             end
 
-            -- workaround for `reveal_force_cwd` + `dir`, execute twice to properly set root dir
-            execute("show")
-            vim.defer_fn(function()
-              execute("focus")
-            end, 100)
+            if last_root == root then
+              execute()
+            else
+              last_root = root -- cache
+              -- workaround for `reveal_force_cwd` + `dir`, execute twice to properly set root dir (base on my test only)
+              execute("show")
+              vim.defer_fn(function()
+                execute()
+              end, 100)
+            end
           end,
           desc = "Explorer NeoTree (Root Dir)",
         },
