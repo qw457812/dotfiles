@@ -112,8 +112,7 @@ return {
       -- see: ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/ui.lua
       local lualine_c = opts.sections.lualine_c
       lualine_c[1] = LazyVim.lualine.root_dir({ cwd = not vim.g.user_is_termux })
-      lualine_c[4] = vim.g.user_is_termux
-        or LazyVim.has("dropbar.nvim") and { pretty_filename() }
+      lualine_c[4] = (vim.g.user_is_termux or LazyVim.has("dropbar.nvim")) and { pretty_filename() }
         or {
           pretty_path({
             -- relative = "root",
