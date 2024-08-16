@@ -48,13 +48,17 @@ return {
         end
       end
 
-      -- stylua: ignore
-      local function cond_always_hidden() return false end
-
       -- https://github.com/aimuzov/LazyVimx/blob/a27d3439b9021d1215ce6471f59d801df32c18d4/lua/lazyvimx/extras/hacks/lazyvim-lualine-pretty-path.lua
       local function pretty_path(o)
         return function(self)
           return LazyVim.lualine.pretty_path(o)(self):gsub("/", "󰿟")
+        end
+      end
+
+      local function pretty_filename()
+        return function(self)
+          local path = LazyVim.lualine.pretty_path({ length = 0 })(self)
+          return vim.fn.fnamemodify(path, ":t")
         end
       end
 
@@ -107,55 +111,42 @@ return {
 
       -- see: ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/ui.lua
       local lualine_c = opts.sections.lualine_c
-      for _, comp in ipairs(lualine_c) do
-        if comp[1] == "filetype" then
-          comp.cond = cond_always_hidden
-          break
-        end
-      end
-      ---@diagnostic disable-next-line: assign-type-mismatch
-      lualine_c[1] = LazyVim.lualine.root_dir({ cwd = true })
-      if vim.g.user_is_termux or LazyVim.has("dropbar.nvim") then
-        lualine_c[4] = {
-          function(self)
-            local path = LazyVim.lualine.pretty_path({ length = 0 })(self)
-            return vim.fn.fnamemodify(path, ":t") -- filename only
-          end,
-        }
-      else
-        lualine_c[4] = {
+      lualine_c[1] = LazyVim.lualine.root_dir({ cwd = not vim.g.user_is_termux })
+      lualine_c[4] = vim.g.user_is_termux
+        or LazyVim.has("dropbar.nvim") and { pretty_filename() }
+        or {
           pretty_path({
             -- relative = "root",
             directory_hl = "Conceal",
           }),
         }
-      end
 
       if not vim.g.user_is_termux then
         vim.list_extend(opts.sections.lualine_x, { { linter }, { formatter }, { lsp } })
       end
-      opts.sections.lualine_y = { { "filetype", icon_only = vim.g.user_is_termux } }
+
+      opts.sections.lualine_y = {
+        {
+          "bo:filetype",
+          cond = function()
+            return not vim.g.user_is_termux
+          end,
+        },
+        { "progress" },
+      }
+
+      -- "" ┊ |          
+      -- nerdfont-powerline icons prefix: `ple-`
+      opts.options.component_separators = { left = "", right = "" }
 
       local bubbles = false
       if bubbles then
-        -- "" ┊ |          
-        -- nerdfont-powerline icons prefix: `ple-`
         opts.options.section_separators = { left = "", right = "" }
-        opts.options.component_separators = { left = "", right = "" }
-
         opts.sections.lualine_a = { { "mode", separator = { left = "" } } }
-        opts.sections.lualine_z = {
-          { "location", separator = { left = "" }, padding = { left = 1, right = 0 } },
-          { "progress", separator = { right = "" } },
-        }
+        opts.sections.lualine_z = { { "location", separator = { right = "" } } }
       else
         opts.options.section_separators = { left = "", right = "" }
-        opts.options.component_separators = { left = "", right = "" }
-
-        opts.sections.lualine_z = {
-          { "location", separator = " ", padding = { left = 1, right = 0 } },
-          { "progress", padding = { left = 0, right = 1 } },
-        }
+        opts.sections.lualine_z = { { "location" } }
       end
 
       table.insert(opts.extensions, "mason")
