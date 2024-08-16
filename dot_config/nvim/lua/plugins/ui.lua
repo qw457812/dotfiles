@@ -115,7 +115,7 @@ return {
       end
       ---@diagnostic disable-next-line: assign-type-mismatch
       lualine_c[1] = LazyVim.lualine.root_dir({ cwd = true })
-      if LazyVim.has("dropbar.nvim") then
+      if vim.g.user_is_termux or LazyVim.has("dropbar.nvim") then
         lualine_c[4] = {
           function(self)
             local path = LazyVim.lualine.pretty_path({ length = 0 })(self)
@@ -127,7 +127,6 @@ return {
           pretty_path({
             -- relative = "root",
             directory_hl = "Conceal",
-            length = vim.g.user_is_termux and 2 or 3,
           }),
         }
       end
