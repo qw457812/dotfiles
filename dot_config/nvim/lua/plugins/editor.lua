@@ -27,17 +27,16 @@ return {
             -- reveal the current file in root directory, or if in an unsaved file, the current working directory
             -- :h neo-tree-configuration
             local command = require("neo-tree.command")
-            local cwd = vim.fn.getcwd()
             local reveal_file = vim.fn.expand("%:p")
             if reveal_file == "" then
-              reveal_file = cwd
+              reveal_file = vim.fn.getcwd()
             else
               -- alternative to `vim.fn.filereadable(reveal_file)`?
               local f = io.open(reveal_file, "r")
               if f then
                 f.close(f)
               else
-                reveal_file = cwd
+                reveal_file = vim.fn.getcwd()
               end
             end
 
