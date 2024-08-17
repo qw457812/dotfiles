@@ -73,6 +73,7 @@ vim.api.nvim_create_autocmd("User", {
 
     -- TODO:
     -- https://code.visualstudio.com/docs/getstarted/keybindings
+    -- https://github.com/jellydn/my-nvim-ide/blob/e880b780c8d0efcebcaaf7d1443e7226d8d87804/lua/plugins/vscode.lua
     -- https://github.com/echasnovski/nvim/blob/b84cec54e0a46c9de824820fa8698b5bba43eb81/src/vscode.lua
     -- https://github.com/pojokcodeid/nvim-lazy/blob/ab014bb8b52ded6bc053f5b224574ac89bd18af9/init.lua
     -- https://github.com/kshenoy/dotfiles/blob/bd29a03df3c1f2df4273cb19dc54ed79eecaa5a5/nvim/lua/vscode-only/keybindings.lua
