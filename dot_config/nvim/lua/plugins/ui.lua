@@ -33,18 +33,19 @@ return {
   -- https://github.com/jacquin236/minimal-nvim/blob/b74208114eae6cd724c276e0d966bf811822bcd5/lua/util/lualine.lua
   -- https://github.com/chrisgrieser/.config/blob/main/nvim/lua/plugins/lualine.lua
   -- https://github.com/barryblando/dotfiles/blob/078543ccb0be6c57284400c2a1b1af4a9dd46aa4/neovim/.config/nvim/lua/plugins/lualine.lua
+  -- https://github.com/minusfive/dotfiles/blob/897c9596471854842cae52d774f7e43426287e58/.config/nvim/lua/plugins/ui.lua#L152
   {
     "nvim-lualine/lualine.nvim",
     opts = function(_, opts)
-      local function hl_text(text, hl)
-        return "%#" .. hl .. "#" .. text .. "%*"
-      end
+      -- local function hl_text(text, hl)
+      --   return "%#" .. hl .. "#" .. text .. "%*"
+      -- end
 
       local function ft_icon()
         -- require("mini.icons").get("file", vim.fn.expand("%:t"))
         local icon, hl, is_default = require("mini.icons").get("filetype", vim.bo.filetype) --[[@as string, string, boolean]]
         if not is_default then
-          return hl_text(icon .. " ", hl)
+          return icon .. " ", hl
         end
       end
 
@@ -63,65 +64,76 @@ return {
       end
 
       -- https://github.com/Matt-FTW/dotfiles/blob/b12af2bc28c89c7185c48d6b02fb532b6d8be45d/.config/nvim/lua/plugins/extras/ui/lualine-extended.lua
-      local linter = function()
-        local lint = require("lint")
-        -- respect LazyVim extension `condition`
-        -- see: ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/linting.lua
-        local linters = lint._resolve_linter_by_ft(vim.bo.filetype)
-        -- filter out linters that don't exist or don't match the condition
-        local ctx = { filename = vim.api.nvim_buf_get_name(0) }
-        ctx.dirname = vim.fn.fnamemodify(ctx.filename, ":h")
-        linters = vim.tbl_filter(function(name)
-          local linter = lint.linters[name]
-          return linter and not (type(linter) == "table" and linter.condition and not linter.condition(ctx))
-        end, linters)
-        if #linters == 0 then
-          return ""
-        end
-        return hl_text("󰁨 ", "WhichKeyIconGreen") -- 󱉶
-      end
+      local linter = {
+        function()
+          return "󰁨 " -- 󱉶
+        end,
+        cond = function()
+          local lint = require("lint")
+          -- respect LazyVim extension `condition`
+          -- see: ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/linting.lua
+          local linters = lint._resolve_linter_by_ft(vim.bo.filetype)
+          -- filter out linters that don't exist or don't match the condition
+          local ctx = { filename = vim.api.nvim_buf_get_name(0) }
+          ctx.dirname = vim.fn.fnamemodify(ctx.filename, ":h")
+          linters = vim.tbl_filter(function(name)
+            local l = lint.linters[name]
+            return l and not (type(l) == "table" and l.condition and not l.condition(ctx))
+          end, linters)
+          return #linters > 0
+        end,
+        color = LazyVim.ui.fg("WhichKeyIconGreen"),
+      }
 
-      local formatter = function()
-        local ok, conform = pcall(require, "conform")
-        if not ok then
-          return ""
-        end
-        local formatters = conform.list_formatters(0)
-        if #formatters == 0 then
+      local formatter = {
+        function()
+          return " " -- 󰛖 
+        end,
+        cond = function()
+          local ok, conform = pcall(require, "conform")
+          if not ok then
+            return false
+          end
+          local formatters = conform.list_formatters(0)
+          if #formatters > 0 then
+            return true
+          end
           local lsp_format = require("conform.lsp_format")
           local lsp_clients = lsp_format.get_format_clients({ bufnr = vim.api.nvim_get_current_buf() })
-          if #lsp_clients == 0 then
-            return ""
-          end
-        end
-        return hl_text(" ", "WhichKeyIconCyan") -- 󰛖 
-      end
+          return #lsp_clients > 0
+        end,
+        color = LazyVim.ui.fg("WhichKeyIconCyan"),
+      }
 
-      local lsp = function()
-        local clients = vim.lsp.get_clients({ bufnr = 0 })
-        clients = vim.tbl_filter(function(client)
-          local ignored = { "null-ls", "copilot" }
-          return not vim.list_contains(ignored, client.name)
-        end, clients)
-        if #clients == 0 then
-          return ""
-        end
-        return ft_icon() or hl_text(" ", "Special") --  Identifier
-      end
+      local lsp = {
+        function()
+          return ft_icon() or " " -- 
+        end,
+        cond = function()
+          local clients = vim.lsp.get_clients({ bufnr = 0 })
+          clients = vim.tbl_filter(function(client)
+            local ignored = { "null-ls", "copilot" }
+            return not vim.list_contains(ignored, client.name)
+          end, clients)
+          return #clients > 0
+        end,
+        color = function()
+          return LazyVim.ui.fg(select(2, ft_icon()) or "Special") -- Identifier
+        end,
+      }
 
       -- see: ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/ui.lua
       local lualine_c = opts.sections.lualine_c
       lualine_c[1] = LazyVim.lualine.root_dir({ cwd = not vim.g.user_is_termux })
-      lualine_c[4] = (vim.g.user_is_termux or LazyVim.has("dropbar.nvim")) and { pretty_filename() }
-        or {
-          pretty_path({
-            -- relative = "root",
-            directory_hl = "Conceal",
-          }),
-        }
+      lualine_c[4] = {
+        (vim.g.user_is_termux or LazyVim.has("dropbar.nvim")) and pretty_filename() or pretty_path({
+          -- relative = "root",
+          directory_hl = "Conceal",
+        }),
+      }
 
       if not vim.g.user_is_termux then
-        vim.list_extend(opts.sections.lualine_x, { { linter }, { formatter }, { lsp } })
+        vim.list_extend(opts.sections.lualine_x, { linter, formatter, lsp })
       end
 
       opts.sections.lualine_y = {
@@ -439,15 +451,28 @@ return {
     opts = function(_, opts)
       local dropbar_default_opts = require("dropbar.configs").opts
 
-      -- :ene
+      -- unsaved file by `:ene`
       local function is_unnamed_buffer()
         return vim.api.nvim_buf_get_name(0) == ""
       end
 
-      -- disable winbar for unnamed buffers and neo-tree
+      -- disable winbar for unnamed or non-listed buffers
       local function cond_show_winbar()
-        return not is_unnamed_buffer() and vim.bo.buflisted
+        return not is_unnamed_buffer() and (vim.bo.buflisted or vim.bo.filetype == "oil")
       end
+
+      opts.options.disabled_filetypes.winbar = vim.deepcopy(opts.options.disabled_filetypes.statusline)
+      vim.list_extend(opts.options.disabled_filetypes.winbar, {
+        "neo-tree",
+        "lazyterm",
+        "noice",
+        "trouble",
+        "qf",
+        "help",
+        "man",
+        "gitcommit",
+        "grug-far",
+      })
 
       opts.winbar = {
         lualine_c = {
