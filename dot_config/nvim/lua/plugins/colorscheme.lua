@@ -54,6 +54,24 @@ return {
       background = {
         dark = "frappe", -- frappe, macchiato, mocha(default)
       },
+      -- https://github.com/catppuccin/nvim/discussions/323#discussioncomment-8653291
+      -- https://github.com/catppuccin/nvim/discussions/323#discussioncomment-6631874
+      -- https://github.com/catppuccin/nvim/discussions/323#discussioncomment-8105066
+      -- https://github.com/catppuccin/nvim/discussions/323#discussioncomment-5287724
+      color_overrides = {
+        -- https://github.com/catppuccin/nvim/discussions/323#discussioncomment-4018074
+        -- https://github.com/navarasu/onedark.nvim/blob/fae34f7c635797f4bf62fb00e7d0516efa8abe37/lua/onedark/palette.lua
+        frappe = {
+          base = "#31353f", -- #303446
+          mantle = "#282c34", -- #292c3c
+          crust = "#21252b", -- #232634
+        },
+        macchiato = {
+          base = "#282c34", -- #24273a
+          mantle = "#21252b", -- #1e2030
+          crust = "#181a1f", -- #181926
+        },
+      },
       integrations = {
         mini = {
           enabled = true,
