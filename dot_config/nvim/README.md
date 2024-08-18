@@ -52,7 +52,8 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 
 ## Lazy Tips
 
-- [If you have multiple specs for the same plugin, then all `opts` will be evaluated, but only the last `config`](https://github.com/LazyVim/LazyVim/pull/4122#issuecomment-2241563662).
+- [`opts`, `dependencies`, `cmd`, `event`, `ft` and `keys` are always merged with the parent spec. Any other property will override the property from the parent spec.](https://lazy.folke.io/usage/structuring)
+  > [If you have multiple specs for the same plugin, then all `opts` will be evaluated, but only the last `config`.](https://github.com/LazyVim/LazyVim/pull/4122#issuecomment-2241563662)
 
 ## Performance
 
@@ -147,7 +148,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
   - `map`
     - [keymaps.lua](lua/config/keymaps.lua)
     - [vscode.lua](lua/plugins/vscode.lua)
-  - `get_visual` by reg
+  - `get_visual_selection` by reg
     - `<leader>?` in [keymaps.lua](lua/config/keymaps.lua)
 - [ ] `which-key v3` problem with `mini.surround`/`mini.operators`/Helix-style mappings(map `mm` to `%`):
 
