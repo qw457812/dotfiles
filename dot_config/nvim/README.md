@@ -22,6 +22,9 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
   > Find from this [issue](https://github.com/LazyVim/LazyVim/pull/3503#issuecomment-2177573748), UI looks good.
   - [lazyvim.json](https://github.com/aimuzov/dotfiles/blob/main/dot_config/nvim/lazyvim.json)
 - [jacquin236](https://github.com/jacquin236/minimal-nvim)
+  > [Python](https://github.com/jacquin236/minimal-nvim/blob/11f4bc2c82da3f84b5a29266db9bdb09962bca24/lua/plugins/lang/python.lua)
+- [aaronlifton](https://github.com/aaronlifton/.config/tree/main/.config/nvim)
+  > [Python](https://github.com/aaronlifton/.config/blob/main/.config/nvim/lua/plugins/extras/lang/python-extended.lua)
 - [moetayuko](https://github.com/moetayuko/nvimrc)
   > [Contributor](https://github.com/aserowy/tmux.nvim/pull/123) of `aserowy/tmux.nvim`.
 - [Matt-FTW](https://github.com/Matt-FTW/dotfiles/tree/main/.config/nvim)
