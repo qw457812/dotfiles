@@ -170,8 +170,11 @@ return {
         highlights = {
           IlluminatedWordRead = { bg = illuminate },
           IlluminatedWordWrite = { bg = illuminate, fmt = "underline" },
+          LspReferenceRead = { bg = illuminate },
+          LspReferenceWrite = { bg = illuminate, fmt = "underline" },
           CmpGhostText = { bg = "$bg0", fg = "$grey", fmt = "italic" },
           DiagnosticUnnecessary = { fg = util.lighten(colors.grey, 0.7), fmt = "italic" },
+          MatchParen = { bg = "$grey", fg = "$orange", fmt = "bold" }, -- for LazyVim.lualine.pretty_path() and DropBarFileNameModified
           -- TelescopePromptTitle = { bg = "$dark_cyan", fg = "white", fmt = "bold" },
           -- TelescopeResultsTitle = { bg = "$dark_purple", fg = "white", fmt = "bold" },
           -- TelescopePreviewTitle = { bg = "$dark_red", fg = "white", fmt = "bold" },

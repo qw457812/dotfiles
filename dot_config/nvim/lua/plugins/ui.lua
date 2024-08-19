@@ -346,7 +346,7 @@ return {
       -- stylua: ignore start
       vim.api.nvim_set_hl(0, "DropBarFileName", { default = true, fg = LazyVim.ui.color("DropBarKindFile"), bold = true })
       vim.api.nvim_set_hl(0, "DropBarFileNameModified", { default = true, fg = LazyVim.ui.color("MatchParen"), bold = true })
-      vim.api.nvim_set_hl(0, "DropBarFolderName", { default = true, link = "Conceal" })
+      vim.api.nvim_set_hl(0, "DropBarFolderName", { default = true, fg = LazyVim.ui.color("Conceal") })
       vim.api.nvim_set_hl(0, "DropBarSymbolName", { default = true, link = "DropBarFolderName" })
       -- stylua: ignore end
 
