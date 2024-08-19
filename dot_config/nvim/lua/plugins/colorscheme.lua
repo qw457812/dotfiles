@@ -38,7 +38,10 @@ return {
         --   floats = "transparent",
         -- },
         -- ~/.local/share/nvim/lazy/tokyonight.nvim/extras/lua/tokyonight_storm.lua
+        -- ~/.local/share/nvim/lazy/tokyonight.nvim/lua/tokyonight/groups/base.lua
         on_colors = function(c)
+          -- more neutral background rather than bluish tint
+          -- https://github.com/navarasu/onedark.nvim/blob/fae34f7c635797f4bf62fb00e7d0516efa8abe37/lua/onedark/palette.lua
           c.bg = "#282c34"
           c.bg_dark = "#21252b"
           c.bg_float = c.bg_dark
@@ -46,6 +49,12 @@ return {
           c.bg_popup = c.bg_dark
           c.bg_sidebar = c.bg_dark
           c.bg_statusline = c.bg_dark
+
+          -- gitcommit, mini.diff
+          c.diff.add = util.blend(c.diff.add, 0.925, c.git.add)
+          c.diff.change = util.blend(c.diff.change, 0.925, c.git.change)
+          c.diff.delete = util.blend(c.diff.delete, 0.925, c.git.delete)
+          c.diff.text = util.blend(c.diff.text, 0.925, c.git.ignore)
         end,
         on_highlights = function(hl, c)
           -- highlight word/references under cursor
