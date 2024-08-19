@@ -85,6 +85,11 @@ local pick_colorschemes = function()
         "catppuccin-mocha",
       })
     end
+    if LazyVim.has("onedark.nvim") then
+      vim.list_extend(colors, {
+        "onedark",
+      })
+    end
     require("telescope.builtin").colorscheme({
       colors = colors,
       enable_preview = true,
