@@ -21,7 +21,7 @@ local function selectColorSchemeByTime()
   }
   local idx = tonumber(os.date("%S")) % #themes + 1
   local colorscheme = themes[idx]
-  LazyVim.info(colorscheme, { title = "ColorScheme" })
+  -- LazyVim.info(colorscheme, { title = "ColorScheme" })
   return colorscheme
 end
 
