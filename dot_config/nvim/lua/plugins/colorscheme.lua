@@ -1,8 +1,35 @@
+--- Check if it's day time
+--- https://github.com/jellydn/lazy-nvim-ide/blob/530aaf4d0aaafa639935da913816ec94be2054be/lua/plugins/colorscheme.lua#L10
+---@return boolean
+local function is_day_time()
+  local hour = tonumber(os.date("%H"))
+  return hour >= 9 and hour < 19
+end
+
+--- Select color scheme based on the time, and load it with LazyVim
+---@return string
+local function selectColorSchemeByTime()
+  local themes = is_day_time() and {
+    "tokyonight-moon",
+    "catppuccin-frappe",
+  } or {
+    "tokyonight-storm",
+    -- "tokyonight-night", -- similar to `tokyonight-storm` after `on_colors` opt
+    "catppuccin-macchiato",
+    "catppuccin-mocha",
+  }
+  local idx = tonumber(os.date("%S")) % #themes + 1
+  local colorscheme = themes[idx]
+  LazyVim.info(colorscheme, { title = "ColorScheme" })
+  return colorscheme
+end
+
 return {
   {
     "tokyonight.nvim",
     optional = true,
     opts = function()
+      local util = require("tokyonight.util")
       return {
         style = "storm", -- storm, moon(default), night, day
         -- transparent = true,
@@ -11,8 +38,16 @@ return {
         --   floats = "transparent",
         -- },
         -- ~/.local/share/nvim/lazy/tokyonight.nvim/extras/lua/tokyonight_storm.lua
+        on_colors = function(c)
+          c.bg = "#282c34"
+          c.bg_dark = "#21252b"
+          c.bg_float = c.bg_dark
+          c.bg_highlight = util.blend_fg(c.bg, 0.935)
+          c.bg_popup = c.bg_dark
+          c.bg_sidebar = c.bg_dark
+          c.bg_statusline = c.bg_dark
+        end,
         on_highlights = function(hl, c)
-          local util = require("tokyonight.util")
           -- highlight word/references under cursor
           -- require lazyvim.plugins.extras.editor.illuminate
           -- #5b6078 #585b70 #51576d #494d64 #45475a
@@ -52,12 +87,9 @@ return {
     optional = true,
     opts = {
       background = {
-        dark = "frappe", -- frappe, macchiato, mocha(default)
+        dark = "macchiato", -- frappe, macchiato, mocha(default)
       },
-      -- https://github.com/catppuccin/nvim/discussions/323#discussioncomment-8653291
-      -- https://github.com/catppuccin/nvim/discussions/323#discussioncomment-6631874
-      -- https://github.com/catppuccin/nvim/discussions/323#discussioncomment-8105066
-      -- https://github.com/catppuccin/nvim/discussions/323#discussioncomment-5287724
+      -- ~/.local/share/nvim/lazy/catppuccin/lua/catppuccin/palettes/macchiato.lua
       color_overrides = {
         -- https://github.com/catppuccin/nvim/discussions/323#discussioncomment-4018074
         -- https://github.com/navarasu/onedark.nvim/blob/fae34f7c635797f4bf62fb00e7d0516efa8abe37/lua/onedark/palette.lua
@@ -71,6 +103,12 @@ return {
           mantle = "#21252b", -- #1e2030
           crust = "#181a1f", -- #181926
         },
+        -- https://github.com/doctorfree/nvim-lazyman/blob/bb4091c962e646c5eb00a50eca4a86a2d43bcb7c/lua/themes/catppuccin.lua#L17
+        mocha = {
+          base = "#1D2021", -- #1e1e2e
+          mantle = "#191C1D", -- #181825
+          crust = "#151819", -- #11111b
+        },
       },
       integrations = {
         mini = {
@@ -82,7 +120,6 @@ return {
           -- color_mode = true,
         },
       },
-      -- ~/.local/share/nvim/lazy/catppuccin/lua/catppuccin/palettes/frappe.lua
       custom_highlights = function(colors)
         local U = require("catppuccin.utils.colors")
         -- highlight word/references under cursor
@@ -104,6 +141,13 @@ return {
           FlashLabel = { fg = colors.base, bg = colors.green, style = { "bold" } },
         }
       end,
+    },
+  },
+
+  {
+    "LazyVim/LazyVim",
+    opts = {
+      colorscheme = selectColorSchemeByTime(),
     },
   },
 }
