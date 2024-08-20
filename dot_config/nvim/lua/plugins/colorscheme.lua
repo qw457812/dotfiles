@@ -139,16 +139,20 @@ return {
         return {
           -- IlluminatedWordText = { bg = U.darken(colors.surface1, 0.7, colors.base) }, -- use default
           IlluminatedWordRead = { bg = illuminate },
-          IlluminatedWordWrite = { bg = illuminate, underline = true },
+          IlluminatedWordWrite = { bg = illuminate, style = { "underline" } },
           -- LspReferenceText = { bg = colors.surface1 }, -- use default
           LspReferenceRead = { link = "IlluminatedWordRead" },
           LspReferenceWrite = { link = "IlluminatedWordWrite" },
           -- compensate for invisible text caused by custom illuminate highlight
           CmpGhostText = { bg = colors.base, fg = colors.overlay1 },
           DiagnosticUnnecessary = { fg = U.lighten(colors.overlay0, 0.9) },
+          -- Visual = { bg = U.blend(colors.surface1, "#2d3f76", 0.25), style = { "bold" } }, -- from tokyonight-moon
 
           -- for flash treesitter search, not necessary after using `{ label = { rainbow = { enabled = true } } }` opts
           FlashLabel = { fg = colors.base, bg = colors.green, style = { "bold" } },
+
+          TelescopePromptBorder = { fg = colors.peach },
+          TelescopePromptTitle = { fg = colors.peach },
         }
       end,
     },
@@ -175,9 +179,15 @@ return {
           CmpGhostText = { bg = "$bg0", fg = "$grey", fmt = "italic" },
           DiagnosticUnnecessary = { fg = util.lighten(colors.grey, 0.7), fmt = "italic" },
           MatchParen = { bg = "$grey", fg = "$orange", fmt = "bold" }, -- for LazyVim.lualine.pretty_path() and DropBarFileNameModified
-          -- TelescopePromptTitle = { bg = "$dark_cyan", fg = "white", fmt = "bold" },
-          -- TelescopeResultsTitle = { bg = "$dark_purple", fg = "white", fmt = "bold" },
-          -- TelescopePreviewTitle = { bg = "$dark_red", fg = "white", fmt = "bold" },
+          -- Visual = { bg = util.blend(colors.bg3, "#2d3f76", 0.25) }, -- from tokyonight-moon
+          Visual = { bg = util.lighten(colors.bg3, 0.975), fmt = "bold" },
+
+          NeoTreeEndOfBuffer = { bg = "none" },
+
+          TelescopePromptBorder = { fg = "$orange" },
+          TelescopePromptTitle = { fg = "$orange" },
+          TelescopeResultsTitle = { fg = "$cyan" },
+          TelescopePreviewTitle = { fg = "$cyan" },
         },
       }
     end,

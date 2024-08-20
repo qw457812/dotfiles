@@ -96,7 +96,6 @@ LazyViewConfig.commands.log.key = "gL"
 map_del({ "n", "x", "o" }, "n")
 map_del({ "n", "x", "o" }, "N")
 
--- it breaks dot-repeat
 map_del("i", ",")
 map_del("i", ".")
 map_del("i", ";")
