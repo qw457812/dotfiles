@@ -1,27 +1,16 @@
---- Check if it's day time
---- https://github.com/jellydn/lazy-nvim-ide/blob/530aaf4d0aaafa639935da913816ec94be2054be/lua/plugins/colorscheme.lua#L10
----@return boolean
-local function is_day_time()
-  local hour = tonumber(os.date("%H"))
-  return hour >= 9 and hour < 19
-end
-
---- Select color scheme based on the time, and load it with LazyVim
----@return string
-local function selectColorSchemeByTime()
-  local themes = is_day_time() and {
+local function randomColorScheme()
+  local themes = {
     "tokyonight-moon",
-    "catppuccin-frappe",
-  } or {
     "tokyonight-storm",
     -- "tokyonight-night", -- similar to `tokyonight-storm` after `on_colors` opt
+    "catppuccin-frappe",
     "catppuccin-macchiato",
     "catppuccin-mocha",
     "onedark",
   }
   local idx = tonumber(os.date("%S")) % #themes + 1
   local colorscheme = themes[idx]
-  -- LazyVim.info(colorscheme, { title = "ColorScheme" })
+  LazyVim.info(colorscheme, { title = "Random ColorScheme" })
   return colorscheme
 end
 
@@ -39,14 +28,12 @@ return {
         --   floats = "transparent",
         -- },
         -- ~/.local/share/nvim/lazy/tokyonight.nvim/extras/lua/tokyonight_storm.lua
-        -- ~/.local/share/nvim/lazy/tokyonight.nvim/lua/tokyonight/groups/base.lua
         on_colors = function(c)
           -- more neutral background rather than bluish tint
-          -- https://github.com/navarasu/onedark.nvim/blob/fae34f7c635797f4bf62fb00e7d0516efa8abe37/lua/onedark/palette.lua
-          c.bg = "#282c34"
-          c.bg_dark = "#21252b"
+          c.bg = "#242424" -- #24283b
+          c.bg_dark = "#1f1f1f" -- #1f2335
           c.bg_float = c.bg_dark
-          c.bg_highlight = util.blend_fg(c.bg, 0.935)
+          c.bg_highlight = "#292929" -- #292e42
           c.bg_popup = c.bg_dark
           c.bg_sidebar = c.bg_dark
           c.bg_statusline = c.bg_dark
@@ -100,24 +87,23 @@ return {
         dark = "macchiato", -- frappe, macchiato, mocha(default)
       },
       -- ~/.local/share/nvim/lazy/catppuccin/lua/catppuccin/palettes/macchiato.lua
+      -- https://github.com/catppuccin/nvim/discussions/323
+      -- https://github.com/tm157/dotfiles/blob/8a32eb599c4850a96a41a012fa3ba54c81111001/nvim/lua/user/colorscheme.lua#L31
       color_overrides = {
-        -- https://github.com/catppuccin/nvim/discussions/323#discussioncomment-4018074
-        -- https://github.com/navarasu/onedark.nvim/blob/fae34f7c635797f4bf62fb00e7d0516efa8abe37/lua/onedark/palette.lua
         frappe = {
-          base = "#31353f", -- #303446
-          mantle = "#282c34", -- #292c3c
-          crust = "#21252b", -- #232634
+          base = "#303030", -- #303446
+          mantle = "#292929", -- #292c3c
+          crust = "#232323", -- #232634
         },
         macchiato = {
-          base = "#282c34", -- #24273a
-          mantle = "#21252b", -- #1e2030
-          crust = "#181a1f", -- #181926
+          base = "#242424", -- #24273a
+          mantle = "#1e1e1e", -- #1e2030
+          crust = "#181818", -- #181926
         },
-        -- https://github.com/doctorfree/nvim-lazyman/blob/bb4091c962e646c5eb00a50eca4a86a2d43bcb7c/lua/themes/catppuccin.lua#L17
         mocha = {
-          base = "#1D2021", -- #1e1e2e
-          mantle = "#191C1D", -- #181825
-          crust = "#151819", -- #11111b
+          base = "#1e1e1e", -- #1e1e2e
+          mantle = "#181818", -- #181825
+          crust = "#111111", -- #11111b
         },
       },
       integrations = {
@@ -196,7 +182,7 @@ return {
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = selectColorSchemeByTime(),
+      colorscheme = randomColorScheme(),
     },
   },
 }
