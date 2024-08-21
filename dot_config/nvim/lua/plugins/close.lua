@@ -1,7 +1,7 @@
 -- close buffers, windows, or exit vim with the same single keypress
 local close_key = "<bs>" -- easy to reach for Glove80
 -- exit nvim
-local exit_key = "<leader>" .. close_key -- NOTE: would overwrite "go up one level" of which-key
+local exit_key = "<leader>" .. close_key -- NOTE: would overwrite "go up one level" of which-key, use `<S-bs>`?
 
 -- alternative to psjay/buffer-closer.nvim
 -- copied from: https://github.com/psjay/buffer-closer.nvim/blob/74fec63c4c238b2cf6f61c40b47f869d442a8988/lua/buffer-closer/init.lua#L10
@@ -17,32 +17,20 @@ local function close_buffer_or_window_or_exit()
     end, vim.api.nvim_list_bufs())
   end
 
-  ---https://github.com/folke/which-key.nvim/blob/6c1584eb76b55629702716995cca4ae2798a9cca/lua/which-key/extras.lua#L53
   ---https://github.com/nvim-neo-tree/neo-tree.nvim/blob/206241e451c12f78969ff5ae53af45616ffc9b72/lua/neo-tree/sources/manager.lua#L141
+  ---https://github.com/echasnovski/mini.nvim/blob/af673d8523c5c2c5ff0a53b1e42a296ca358dcc7/lua/mini/animate.lua#L1397
   ---@param win number?
   local function is_floating(win)
     return vim.api.nvim_win_get_config(win or 0).relative ~= ""
   end
 
-  ---@param win number?
-  local function is_edgy(win)
-    if not LazyVim.has("edgy.nvim") then
-      return false
-    end
-    win = win or 0
-    win = win == 0 and vim.api.nvim_get_current_win() or win
-    local edgy_wins = require("edgy.editor").list_wins().edgy
-    return vim.tbl_contains(edgy_wins, win)
-  end
-
-  -- known window types: main, floating and edgy | https://github.com/folke/edgy.nvim/blob/ebb77fde6f5cb2745431c6c0fe57024f66471728/lua/edgy/editor.lua#L82
+  -- known window types: main, floating and edgy
   -- use `:close` for floating and edgy (redundant with edgy's Lazy Spec below)
-  -- use `:bd` or `:qa` for main
-  if
-    is_floating() -- eg. open lazy (non-listed) via dashboard (non-listed)
-    -- or is_edgy() -- using Lazy Spec below
-  then
-    vim.cmd("close")
+  -- use `:bd` (or `:qa` if no listed buffer left) for main
+  -- https://github.com/folke/edgy.nvim/blob/ebb77fde6f5cb2745431c6c0fe57024f66471728/lua/edgy/editor.lua#L82
+  -- https://github.com/mudox/neovim-config/blob/a4f1020213fd17e6b8c1804153b9bf7683bfa690/lua/mudox/lab/close.lua#L7
+  if is_floating() then
+    vim.cmd("close") -- Close Window (Cannot close last window)
   elseif #listed_buffers() > (vim.bo.buflisted and 1 or 0) then
     -- vim.cmd("bd") -- Delete Buffer and Window
     LazyVim.ui.bufremove() -- Delete Buffer
