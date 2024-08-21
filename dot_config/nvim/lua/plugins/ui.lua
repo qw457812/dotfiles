@@ -177,6 +177,26 @@ return {
         end
       end
 
+      -- https://github.com/nicknisi/dotfiles/blob/5ba5a46d2cb5fc6d6c9415300f04f57a20bb2f30/config/nvim/lua/nisi/assets.lua#L144
+      opts.config.header = {
+        [[                                                     ]],
+        [[                                                     ]],
+        [[                                                     ]],
+        [[                                                     ]],
+        [[                                                     ]],
+        [[                                                     ]],
+        [[                                                     ]],
+        [[                                                     ]],
+        [[  ███╗   ██╗███████╗ ██████╗ ██╗   ██╗██╗███╗   ███╗ ]],
+        [[  ████╗  ██║██╔════╝██╔═══██╗██║   ██║██║████╗ ████║ ]],
+        [[  ██╔██╗ ██║█████╗  ██║   ██║██║   ██║██║██╔████╔██║ ]],
+        [[  ██║╚██╗██║██╔══╝  ██║   ██║╚██╗ ██╔╝██║██║╚██╔╝██║ ]],
+        [[  ██║ ╚████║███████╗╚██████╔╝ ╚████╔╝ ██║██║ ╚═╝ ██║ ]],
+        [[  ╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝ ]],
+        [[                                                     ]],
+        [[                                                     ]],
+      }
+
       -- remove some blank lines if the dashboard is too high
       local header = opts.config.header
       -- #opts.config.footer() == 1

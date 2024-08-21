@@ -104,7 +104,8 @@ map_del("i", ";")
 map("n", "<leader>fs", "<cmd>w<cr><esc>", { desc = "Save File" })
 -- save file without formatting
 map("n", "<leader>fS", "<cmd>noautocmd w<cr>", { desc = "Save File Without Formatting" })
-map("n", "<a-s>", "<cmd>noautocmd w<cr>", { desc = "Save File Without Formatting" })
+map({ "i", "x", "n", "s" }, "<a-s>", "<cmd>noautocmd w<cr><esc>", { desc = "Save File Without Formatting" })
+map({ "i", "x", "n", "s" }, "<D-s>", "<cmd>w<cr><esc>", { desc = "Save File" })
 
 -- buffers
 -- see: akinsho/bufferline.nvim in ~/.config/nvim/lua/plugins/ui.lua

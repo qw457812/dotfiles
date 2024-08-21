@@ -1,8 +1,9 @@
 local function randomColorScheme()
   local themes = {
+    "tokyonight", -- custom, `tokyonight-custom` not working
     "tokyonight-moon",
     "tokyonight-storm",
-    -- "tokyonight-night", -- similar to `tokyonight-storm` after `on_colors` opt
+    "tokyonight-night",
     "catppuccin-frappe",
     "catppuccin-macchiato",
     "catppuccin-mocha",
@@ -14,6 +15,19 @@ local function randomColorScheme()
   return colorscheme
 end
 
+---@param hex string
+local function hex_to_rgb(hex)
+  hex = string.lower(hex)
+  return tonumber(hex:sub(2, 3), 16), tonumber(hex:sub(4, 5), 16), tonumber(hex:sub(6, 7), 16)
+end
+
+---@param hex string
+local function to_neutral_gray(hex)
+  local r, g, b = hex_to_rgb(hex)
+  local avg = math.floor((r + g + b) / 3)
+  return string.format("#%02x%02x%02x", avg, avg, avg)
+end
+
 return {
   {
     "tokyonight.nvim",
@@ -21,7 +35,7 @@ return {
     opts = function()
       local util = require("tokyonight.util")
       return {
-        style = "storm", -- storm, moon(default), night, day
+        style = "custom", -- storm, moon(default), night, day, custom
         -- transparent = true,
         -- styles = {
         --   sidebars = "transparent",
@@ -30,10 +44,10 @@ return {
         -- ~/.local/share/nvim/lazy/tokyonight.nvim/extras/lua/tokyonight_storm.lua
         on_colors = function(c)
           -- more neutral background rather than bluish tint
-          c.bg = "#242424" -- #24283b
-          c.bg_dark = "#1f1f1f" -- #1f2335
+          c.bg = to_neutral_gray(c.bg)
+          c.bg_dark = to_neutral_gray(c.bg_dark)
           c.bg_float = c.bg_dark
-          c.bg_highlight = "#292929" -- #292e42
+          c.bg_highlight = to_neutral_gray(c.bg_highlight)
           c.bg_popup = c.bg_dark
           c.bg_sidebar = c.bg_dark
           c.bg_statusline = c.bg_dark
@@ -76,72 +90,133 @@ return {
         end,
       }
     end,
+    config = function(_, opts)
+      -- https://github.com/folke/tokyonight.nvim/issues/595
+      -- https://github.com/jdujava/nvim-jd/blob/ef39817500b7565dbd9978f54e83d21380c49c17/lua/plugins/colorscheme.lua#L86
+      local styles = require("tokyonight.colors").styles
+
+      -- change the colors for your new palette here
+      -- stylua: ignore
+      ---@type Palette
+      local modified_colors = {
+        bg_darker    = "#1a1a1a",
+        bg_dark      = "#1e1e1e",
+        bg           = "#1e1e1e",
+        dark2        = "#212121",
+        bg_context   = "#262626",
+        bg_highlight = "#2a2a2a",
+        fg_gutter    = "#2a2a2a",
+        bg_blue      = "#073642",
+        dark3        = "#3e4452",
+        dark4        = "#454e53",
+        dark5        = "#5c6370",
+        fg_bright    = "#f5ebd9",
+        fg_dark      = "#98a8b4",
+        fg           = "#abb2bf",
+        purple       = "#fca7ea",
+        magenta      = "#c586c0",
+        magenta2     = "#934669",
+        blue0        = "#569cd6",
+        blue         = "#7ecbff",
+        cyan         = "#7dcfff",
+        blue1        = "#6bafe5",
+        blue2        = "#9cdcfe",
+        blue5        = "#89ddff",
+        blue6        = "#b4f9f8",
+        blue7        = "#394b70",
+        orange       = "#e6b089",
+        orange2      = "#faa069",
+        yellow       = "#dcdcaa",
+        green        = "#c3e88d",
+        -- green1    = "#4ec9b0",
+        green1       = "#89dcf4",
+        green2       = "#2f563a",
+        green3       = "#204533",
+        teal         = "#4ec9b0",
+        comment      = "#608b4e",
+      }
+      -- save as `custom` style (by extending the `storm` style)
+      styles.custom = vim.tbl_extend("force", styles.storm --[[@as Palette]], modified_colors)
+
+      -- load custom style (be sure to have opts.style = "custom")
+      -- check `:=require("tokyonight.colors").setup({ style = "custom" })`
+      -- https://github.com/folke/lazy.nvim/blob/077102c5bfc578693f12377846d427f49bc50076/lua/lazy/minit.lua#L90
+      require("tokyonight").setup(opts)
+      require("tokyonight").load()
+    end,
   },
 
   -- https://github.com/aimuzov/LazyVimx/blob/af846de01acfaa78320d6564414c629e77d525e1/lua/lazyvimx/colorschemes/catppuccin.lua
   {
     "catppuccin/nvim",
     optional = true,
-    opts = {
-      background = {
-        dark = "macchiato", -- frappe, macchiato, mocha(default)
-      },
-      -- ~/.local/share/nvim/lazy/catppuccin/lua/catppuccin/palettes/macchiato.lua
-      -- https://github.com/catppuccin/nvim/discussions/323
-      -- https://github.com/tm157/dotfiles/blob/8a32eb599c4850a96a41a012fa3ba54c81111001/nvim/lua/user/colorscheme.lua#L31
-      color_overrides = {
-        frappe = {
-          base = "#303030", -- #303446
-          mantle = "#292929", -- #292c3c
-          crust = "#232323", -- #232634
+    opts = function(_, opts)
+      local palettes = require("catppuccin.palettes")
+      local frappe = palettes.get_palette("frappe")
+      local macchiato = palettes.get_palette("macchiato")
+      local mocha = palettes.get_palette("mocha")
+      return vim.tbl_deep_extend("force", opts, {
+        background = {
+          dark = "macchiato", -- frappe, macchiato, mocha(default)
         },
-        macchiato = {
-          base = "#242424", -- #24273a
-          mantle = "#1e1e1e", -- #1e2030
-          crust = "#181818", -- #181926
+        -- ~/.local/share/nvim/lazy/catppuccin/lua/catppuccin/palettes/macchiato.lua
+        -- https://github.com/catppuccin/nvim/discussions/323
+        -- https://github.com/tm157/dotfiles/blob/8a32eb599c4850a96a41a012fa3ba54c81111001/nvim/lua/user/colorscheme.lua#L31
+        color_overrides = {
+          frappe = {
+            base = to_neutral_gray(frappe.base),
+            mantle = to_neutral_gray(frappe.mantle),
+            crust = to_neutral_gray(frappe.crust),
+          },
+          macchiato = {
+            base = to_neutral_gray(macchiato.base),
+            mantle = to_neutral_gray(macchiato.mantle),
+            crust = to_neutral_gray(macchiato.crust),
+          },
+          mocha = {
+            base = to_neutral_gray(mocha.base),
+            mantle = to_neutral_gray(mocha.mantle),
+            crust = to_neutral_gray(mocha.crust),
+          },
         },
-        mocha = {
-          base = "#1e1e1e", -- #1e1e2e
-          mantle = "#181818", -- #181825
-          crust = "#111111", -- #11111b
+        integrations = {
+          mini = {
+            enabled = true,
+            indentscope_color = "subtext0",
+          },
+          dropbar = {
+            enabled = true,
+            -- color_mode = true,
+          },
         },
-      },
-      integrations = {
-        mini = {
-          enabled = true,
-          indentscope_color = "subtext0",
-        },
-        dropbar = {
-          enabled = true,
-          -- color_mode = true,
-        },
-      },
-      custom_highlights = function(colors)
-        local U = require("catppuccin.utils.colors")
-        -- highlight word/references under cursor
-        -- require lazyvim.plugins.extras.editor.illuminate
-        -- colors.surface1(#45475a) #494d64 #51576d colors.surface2(#585b70)
-        local illuminate = U.darken(colors.surface2, 0.8, colors.base)
-        return {
-          -- IlluminatedWordText = { bg = U.darken(colors.surface1, 0.7, colors.base) }, -- use default
-          IlluminatedWordRead = { bg = illuminate },
-          IlluminatedWordWrite = { bg = illuminate, style = { "underline" } },
-          -- LspReferenceText = { bg = colors.surface1 }, -- use default
-          LspReferenceRead = { link = "IlluminatedWordRead" },
-          LspReferenceWrite = { link = "IlluminatedWordWrite" },
-          -- compensate for invisible text caused by custom illuminate highlight
-          CmpGhostText = { bg = colors.base, fg = colors.overlay1 },
-          DiagnosticUnnecessary = { fg = U.lighten(colors.overlay0, 0.9) },
-          -- Visual = { bg = U.blend(colors.surface1, "#2d3f76", 0.25), style = { "bold" } }, -- from tokyonight-moon
+        custom_highlights = function(colors)
+          local U = require("catppuccin.utils.colors")
+          -- highlight word/references under cursor
+          -- require lazyvim.plugins.extras.editor.illuminate
+          -- colors.surface1(#45475a) #494d64 #51576d colors.surface2(#585b70)
+          local illuminate = U.darken(colors.surface2, 0.8, colors.base)
+          return {
+            -- IlluminatedWordText = { bg = U.darken(colors.surface1, 0.7, colors.base) }, -- use default
+            IlluminatedWordRead = { bg = illuminate },
+            IlluminatedWordWrite = { bg = illuminate, style = { "underline" } },
+            -- LspReferenceText = { bg = colors.surface1 }, -- use default
+            LspReferenceRead = { link = "IlluminatedWordRead" },
+            LspReferenceWrite = { link = "IlluminatedWordWrite" },
+            -- compensate for invisible text caused by custom illuminate highlight
+            CmpGhostText = { bg = colors.base, fg = colors.overlay1 },
+            DiagnosticUnnecessary = { fg = U.lighten(colors.overlay0, 0.9) },
+            -- require("tokyonight.colors").setup({style = "moon"}).bg_visual -- #2d3f76
+            -- Visual = { bg = U.blend(colors.surface1, "#2d3f76", 0.25), style = { "bold" } },
 
-          -- for flash treesitter search, not necessary after using `{ label = { rainbow = { enabled = true } } }` opts
-          FlashLabel = { fg = colors.base, bg = colors.green, style = { "bold" } },
+            -- for flash treesitter search, not necessary after using `{ label = { rainbow = { enabled = true } } }` opts
+            FlashLabel = { fg = colors.base, bg = colors.green, style = { "bold" } },
 
-          TelescopePromptBorder = { fg = colors.peach },
-          TelescopePromptTitle = { fg = colors.peach },
-        }
-      end,
-    },
+            TelescopePromptBorder = { fg = colors.peach },
+            TelescopePromptTitle = { fg = colors.peach },
+          }
+        end,
+      })
+    end,
   },
 
   -- https://github.com/dhruvinsh/nvim/blob/bcc368b9e5013485fb01d46dfb2ea0037a2c9fc8/lua/orion/plugins/colors.lua#L9
@@ -165,7 +240,8 @@ return {
           CmpGhostText = { bg = "$bg0", fg = "$grey", fmt = "italic" },
           DiagnosticUnnecessary = { fg = util.lighten(colors.grey, 0.7), fmt = "italic" },
           MatchParen = { bg = "$grey", fg = "$orange", fmt = "bold" }, -- for LazyVim.lualine.pretty_path() and DropBarFileNameModified
-          -- Visual = { bg = util.blend(colors.bg3, "#2d3f76", 0.25) }, -- from tokyonight-moon
+          -- require("tokyonight.colors").setup({style = "moon"}).bg_visual -- #2d3f76
+          -- Visual = { bg = util.blend(colors.bg3, "#2d3f76", 0.25) },
           Visual = { bg = util.lighten(colors.bg3, 0.975), fmt = "bold" },
 
           NeoTreeEndOfBuffer = { bg = "none" },
