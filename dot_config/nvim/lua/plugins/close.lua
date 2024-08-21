@@ -24,11 +24,12 @@ local function close_buffer_or_window_or_exit()
     return vim.api.nvim_win_get_config(win or 0).relative ~= ""
   end
 
-  -- valid and not floating
+  -- not edgy and valid and not floating
   -- https://github.com/echasnovski/mini.nvim/blob/af673d8523c5c2c5ff0a53b1e42a296ca358dcc7/lua/mini/animate.lua#L1397
   local function normal_windows()
+    local edgy_wins = LazyVim.has("edgy.nvim") and require("edgy.editor").list_wins().edgy or {}
     return vim.tbl_filter(function(w)
-      return vim.api.nvim_win_is_valid(w) and not is_window_floating(w)
+      return not edgy_wins[w] and vim.api.nvim_win_is_valid(w) and not is_window_floating(w)
     end, vim.api.nvim_list_wins())
   end
 
@@ -53,7 +54,10 @@ local function close_buffer_or_window_or_exit()
     --    - manpages, see: https://github.com/LazyVim/LazyVim/blob/12818a6cb499456f4903c5d8e68af43753ebc869/lua/lazyvim/config/autocmds.lua#L84
     --    - dashboard, leetcode.nvim
     --    - others: lazy, mason, LazyVim.news.changelog(), JuanZoran/Trans.nvim, ...
-    if #normal_windows() > 1 then
+    local normal_wins = normal_windows()
+    -- https://github.com/mudox/neovim-config/blob/a4f1020213fd17e6b8c1804153b9bf7683bfa690/lua/mudox/lab/close.lua#L7
+    if #normal_wins > 1 or not vim.list_contains(normal_wins, vim.api.nvim_get_current_win()) then
+      -- eg. edgy windows
       vim.cmd("close") -- Close Window (Cannot close last window)
     elseif #listed_buffers() > 0 then
       -- eg. open manpage file directly while having other listed buffers
