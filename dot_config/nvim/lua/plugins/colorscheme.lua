@@ -1,3 +1,25 @@
+local tokyonight_custom_style = "custom"
+
+-- mark the style in colors, useful for `on_colors` and `on_highlights`
+local function mark_tokyonight_style(colors, style)
+  -- stylua: ignore
+  if type(colors) ~= "table" then return end
+
+  -- local styles = { [tokyonight_custom_style] = "#000000", moon = "#000001", storm = "#000002", night = "#000003" }
+  local styles = { [tokyonight_custom_style] = "#000000" } -- only works for custom
+
+  if style then
+    -- set
+    colors.style = styles[style]
+  else
+    -- get
+    for k, v in pairs(styles) do
+      -- stylua: ignore
+      if colors.style == v then return k end
+    end
+  end
+end
+
 local function randomColorScheme()
   local themes = {
     "tokyonight", -- custom, `tokyonight-custom` not working
@@ -35,7 +57,7 @@ return {
     opts = function()
       local util = require("tokyonight.util")
       return {
-        style = "custom", -- storm, moon(default), night, day, custom
+        style = tokyonight_custom_style, -- storm, moon(default), night, day, custom
         -- transparent = true,
         -- styles = {
         --   sidebars = "transparent",
@@ -57,7 +79,7 @@ return {
           c.diff.delete = util.blend_bg(c.red1, 0.35)
           c.diff.change = util.blend_bg(c.blue7, 0.35)
 
-          if c.style == "custom" then
+          if mark_tokyonight_style(c) == tokyonight_custom_style then
             c.bg_visual = c.dark3
           end
         end,
@@ -79,28 +101,31 @@ return {
           -- unused variable
           hl.DiagnosticUnnecessary = { fg = util.blend_fg(c.terminal_black, 0.7) }
 
-          if c.style == "custom" then
+          hl.TelescopeSelectionCaret =
+            { fg = (hl.TelescopePromptPrefix or hl.Identifier).fg, bg = (hl.TelescopeSelection or hl.Visual).bg }
+
+          if mark_tokyonight_style(c) == tokyonight_custom_style then
             hl.String = { fg = c.orange }
             hl.Character = { fg = c.orange2 }
             hl.Function = { fg = c.yellow }
             hl["@variable.parameter"] = { fg = c.fg_bright }
-            hl["@variable.latex"] = { fg = c.fg_bright }
             hl.Operator = { fg = c.magenta }
             hl["@operator"] = { fg = c.magenta }
             hl["@label.markdown"] = { link = "NonText" }
             hl["@markup.raw.delimiter.markdown"] = { link = "NonText" }
 
-            hl.Search = { bg = hl.Search.bg, fg = util.blend_bg(hl.Search.fg, 0.25) }
-
+            hl.Search = { bg = hl.Search.bg, fg = util.blend_bg(hl.Search.fg, 0.15) }
             hl.Folded = { fg = c.blue, bg = c.bg_blue }
             hl.LineNr = { fg = c.dark5 }
             hl.LineNrAbove = { fg = c.dark5 }
             hl.LineNrBelow = { fg = c.dark5 }
-            -- hl.CursorLineNr = { fg = c.fg_dark }
-
+            hl.CursorLineNr = { fg = c.fg_dark }
+            hl.TelescopeSelection = { fg = c.fg_bright, bg = c.bg_highlight, bold = true }
+            hl.TelescopeSelectionCaret = { fg = hl.TelescopeSelectionCaret.fg, bg = hl.TelescopeSelection.bg }
             hl.CmpItemKindSnippet = { fg = c.fg_bright }
             -- hl.PmenuThumb = { bg = c.border_highlight }
             -- hl.PmenuSel = { bg = c.bg_highlight, bold = true }
+            -- TODO: lualine_a_normal
           end
 
           do
@@ -126,18 +151,18 @@ return {
       -- stylua: ignore
       ---@type Palette
       local modified_colors = {
-        bg_darker    = "#1a1a1a",
+        bg_darker    = "#1a1a1a", --
         bg_dark      = "#1e1e1e",
         bg           = "#1e1e1e",
-        dark2        = "#212121",
-        bg_context   = "#262626",
+        dark2        = "#212121", --
+        bg_context   = "#262626", --
         bg_highlight = "#2a2a2a",
         fg_gutter    = "#2a2a2a",
-        bg_blue      = "#073642",
+        bg_blue      = "#073642", --
         dark3        = "#3e4452",
-        dark4        = "#454e53",
+        dark4        = "#454e53", --
         dark5        = "#5c6370",
-        fg_bright    = "#f5ebd9",
+        fg_bright    = "#f5ebd9", --
         fg_dark      = "#98a8b4",
         fg           = "#abb2bf",
         purple       = "#fca7ea",
@@ -152,21 +177,21 @@ return {
         blue6        = "#b4f9f8",
         blue7        = "#394b70",
         orange       = "#e6b089",
-        orange2      = "#faa069",
+        orange2      = "#faa069", --
         yellow       = "#dcdcaa",
         green        = "#c3e88d",
         -- green1    = "#4ec9b0",
         green1       = "#89dcf4",
         green2       = "#2f563a",
-        green3       = "#204533",
+        green3       = "#204533", --
         teal         = "#4ec9b0",
         comment      = "#608b4e",
       }
-      -- save as `custom` style (by extending the `storm` style)
-      styles.custom = vim.tbl_extend("force", styles.storm --[[@as Palette]], modified_colors)
 
-      ---@diagnostic disable-next-line: inject-field
-      styles.custom.style = "custom" -- for `on_colors` and `on_highlights` opts above
+      mark_tokyonight_style(modified_colors, tokyonight_custom_style) -- for `on_colors` and `on_highlights` opts above
+
+      -- save as `custom` style (by extending the `storm` style)
+      styles[tokyonight_custom_style] = vim.tbl_extend("force", styles.storm --[[@as Palette]], modified_colors)
 
       -- load custom style (be sure to have opts.style = "custom")
       -- check `:=require("tokyonight.colors").setup({ style = "custom" })`
