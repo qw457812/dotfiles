@@ -53,10 +53,13 @@ return {
           c.bg_statusline = c.bg_dark
 
           -- gitcommit, mini.diff
-          c.diff.add = util.blend(c.diff.add, 0.925, c.git.add)
-          c.diff.change = util.blend(c.diff.change, 0.925, c.git.change)
-          c.diff.delete = util.blend(c.diff.delete, 0.925, c.git.delete)
-          c.diff.text = util.blend(c.diff.text, 0.925, c.git.ignore)
+          c.diff.add = util.blend_bg(c.green2, 0.35)
+          c.diff.delete = util.blend_bg(c.red1, 0.35)
+          c.diff.change = util.blend_bg(c.blue7, 0.35)
+
+          if c.style == "custom" then
+            c.bg_visual = c.dark3
+          end
         end,
         on_highlights = function(hl, c)
           -- highlight word/references under cursor
@@ -75,6 +78,30 @@ return {
           hl.CmpGhostText = { bg = c.bg, fg = util.blend_fg(hl.CmpGhostText.fg, 0.85) }
           -- unused variable
           hl.DiagnosticUnnecessary = { fg = util.blend_fg(c.terminal_black, 0.7) }
+
+          if c.style == "custom" then
+            hl.String = { fg = c.orange }
+            hl.Character = { fg = c.orange2 }
+            hl.Function = { fg = c.yellow }
+            hl["@variable.parameter"] = { fg = c.fg_bright }
+            hl["@variable.latex"] = { fg = c.fg_bright }
+            hl.Operator = { fg = c.magenta }
+            hl["@operator"] = { fg = c.magenta }
+            hl["@label.markdown"] = { link = "NonText" }
+            hl["@markup.raw.delimiter.markdown"] = { link = "NonText" }
+
+            hl.Search = { bg = hl.Search.bg, fg = util.blend_bg(hl.Search.fg, 0.25) }
+
+            hl.Folded = { fg = c.blue, bg = c.bg_blue }
+            hl.LineNr = { fg = c.dark5 }
+            hl.LineNrAbove = { fg = c.dark5 }
+            hl.LineNrBelow = { fg = c.dark5 }
+            -- hl.CursorLineNr = { fg = c.fg_dark }
+
+            hl.CmpItemKindSnippet = { fg = c.fg_bright }
+            -- hl.PmenuThumb = { bg = c.border_highlight }
+            -- hl.PmenuSel = { bg = c.bg_highlight, bold = true }
+          end
 
           do
             return
@@ -137,6 +164,9 @@ return {
       }
       -- save as `custom` style (by extending the `storm` style)
       styles.custom = vim.tbl_extend("force", styles.storm --[[@as Palette]], modified_colors)
+
+      ---@diagnostic disable-next-line: inject-field
+      styles.custom.style = "custom" -- for `on_colors` and `on_highlights` opts above
 
       -- load custom style (be sure to have opts.style = "custom")
       -- check `:=require("tokyonight.colors").setup({ style = "custom" })`
