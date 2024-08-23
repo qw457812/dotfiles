@@ -2,26 +2,26 @@ return {
   -- :h bufferline-configuration
   {
     "akinsho/bufferline.nvim",
-    keys = {
-      { "<Up>", "<cmd>BufferLineCyclePrev<cr>", desc = "Prev Buffer" },
-      { "<Down>", "<cmd>BufferLineCycleNext<cr>", desc = "Next Buffer" },
-      { "gj", "<cmd>BufferLineCycleNext<cr>", desc = "Next Buffer" },
-      { "gk", "<cmd>BufferLineCyclePrev<cr>", desc = "Prev Buffer" },
-      { "<leader>bH", "<cmd>BufferLineGoToBuffer 1<cr>", desc = "Goto First Buffer" },
-      -- { "<leader>b1", "<cmd>BufferLineGoToBuffer 1<cr>", desc = "Goto Buffer 1" },
-      -- { "<leader>b2", "<cmd>BufferLineGoToBuffer 2<cr>", desc = "Goto Buffer 2" },
-      -- { "<leader>b3", "<cmd>BufferLineGoToBuffer 3<cr>", desc = "Goto Buffer 3" },
-      -- { "<leader>b4", "<cmd>BufferLineGoToBuffer 4<cr>", desc = "Goto Buffer 4" },
-      -- { "<leader>b5", "<cmd>BufferLineGoToBuffer 5<cr>", desc = "Goto Buffer 5" },
-      -- { "<leader>b6", "<cmd>BufferLineGoToBuffer 6<cr>", desc = "Goto Buffer 6" },
-      -- { "<leader>b7", "<cmd>BufferLineGoToBuffer 7<cr>", desc = "Goto Buffer 7" },
-      -- { "<leader>b8", "<cmd>BufferLineGoToBuffer 8<cr>", desc = "Goto Buffer 8" },
-      -- { "<leader>b9", "<cmd>BufferLineGoToBuffer 9<cr>", desc = "Goto Buffer 9" },
-      { "<leader>bL", "<cmd>BufferLineGoToBuffer -1<cr>", desc = "Goto Last Buffer" },
-      { "<leader>bh", "<Cmd>BufferLineCloseLeft<CR>", desc = "Delete Buffers to the Left" },
-      { "<leader>br", false },
-      { "<leader>bl", "<Cmd>BufferLineCloseRight<CR>", desc = "Delete Buffers to the Right" },
-    },
+    keys = function(_, keys)
+      local mappings = {
+        { "<Up>", "<cmd>BufferLineCyclePrev<cr>", desc = "Prev Buffer" },
+        { "<Down>", "<cmd>BufferLineCycleNext<cr>", desc = "Next Buffer" },
+        { "gj", "<cmd>BufferLineCycleNext<cr>", desc = "Next Buffer" },
+        { "gk", "<cmd>BufferLineCyclePrev<cr>", desc = "Prev Buffer" },
+        { "<leader>bH", "<cmd>BufferLineGoToBuffer 1<cr>", desc = "Goto First Buffer" },
+        { "<leader>bL", "<cmd>BufferLineGoToBuffer -1<cr>", desc = "Goto Last Buffer" },
+        { "<leader>bh", "<Cmd>BufferLineCloseLeft<CR>", desc = "Delete Buffers to the Left" },
+        { "<leader>br", false },
+        { "<leader>bl", "<Cmd>BufferLineCloseRight<CR>", desc = "Delete Buffers to the Right" },
+      }
+      for i = 1, 9 do
+        table.insert(
+          mappings,
+          { "<leader>b" .. i, "<cmd>BufferLineGoToBuffer " .. i .. "<cr>", desc = "Goto Buffer " .. i }
+        )
+      end
+      vim.list_extend(keys, mappings)
+    end,
     opts = {
       options = {
         separator_style = "slant", -- slope
