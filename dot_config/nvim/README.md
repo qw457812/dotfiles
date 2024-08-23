@@ -153,6 +153,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
     - [vscode.lua](lua/plugins/vscode.lua)
   - `get_visual_selection` by reg
     - `<leader>?` in [keymaps.lua](lua/config/keymaps.lua)
+  - [list_insert_unique](https://github.com/AstroNvim/astrocommunity/blob/90ff9f23f98c4265b37091c6077744b48c19e324/lua/astrocommunity/game/leetcode-nvim/init.lua#L18)
 - [ ] `which-key v3` problem with `mini.surround`/`mini.operators`/Helix-style mappings(map `mm` to `%`):
 
   1. problem

@@ -336,13 +336,26 @@ return {
   -- {
   --   "RRethy/vim-illuminate",
   --   optional = true,
-  --   opts = function()
-  --     -- base on tokyonight-moon
-  --     local illuminate = "#51576d"
-  --     -- remove `default = true,` to override colorscheme's highlight group
-  --     vim.api.nvim_set_hl(0, "IlluminatedWordText", { default = true, bg = "#3b4261" })
-  --     vim.api.nvim_set_hl(0, "IlluminatedWordRead", { default = true, bg = illuminate })
-  --     vim.api.nvim_set_hl(0, "IlluminatedWordWrite", { default = true, bg = illuminate, underline = true })
+  --   opts = function(_, opts)
+  --     -- -- base on tokyonight-moon
+  --     -- local illuminate = "#51576d"
+  --     -- -- remove `default = true,` to override colorscheme's highlight group
+  --     -- vim.api.nvim_set_hl(0, "IlluminatedWordText", { default = true, bg = "#3b4261" })
+  --     -- vim.api.nvim_set_hl(0, "IlluminatedWordRead", { default = true, bg = illuminate })
+  --     -- vim.api.nvim_set_hl(0, "IlluminatedWordWrite", { default = true, bg = illuminate, underline = true })
+  --     opts.filetypes_denylist = vim.list_extend(opts.filetypes_denylist or { "dirbuf", "dirvish", "fugitive" }, {
+  --       "lazy",
+  --       "mason",
+  --       "harpoon",
+  --       "qf",
+  --       "netrw",
+  --       "neo-tree",
+  --       "oil",
+  --       "minifiles",
+  --       "trouble",
+  --       "notify",
+  --       "TelescopePrompt",
+  --     })
   --   end,
   -- },
 
