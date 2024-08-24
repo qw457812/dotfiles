@@ -12,6 +12,8 @@ return {
   -- https://github.com/VTantillo/lazyvim/blob/c0483343983da2da16261d2b6bab1bbd9e6a1922/lua/plugins/python.lua#L19
   -- https://github.com/yujinyuz/dotfiles/blob/afe5e42ad59f7b53d829ba612e71ed34673a6130/dot_config/nvim/lua/my/plugins/lspconfig.lua
   -- https://github.com/horta/nvim/blob/f12aa915aadffe82eb5fa9ff635e2835a5d63ad1/lua/plugins/python.lua#L15
+  -- https://github.com/a1401358759/TurboNvim/blob/1dc06655e998d560d0238f30465b3d58c083c506/lua/lspservers/basedpyright.lua
+  -- https://github.com/a1401358759/TurboNvim/blob/1dc06655e998d560d0238f30465b3d58c083c506/lua/lspservers/ruff.lua
   --
   -- https://github.com/jacquin236/minimal-nvim/blob/11f4bc2c82da3f84b5a29266db9bdb09962bca24/lua/plugins/lang/python.lua
   -- https://github.com/aaronlifton/.config/blob/0a60c13c51c3dd102d0f8770f02b1822acb1bb92/.config/nvim/lua/plugins/extras/lang/python-extended.lua
@@ -19,7 +21,12 @@ return {
     "neovim/nvim-lspconfig",
     opts = {
       servers = {
+        -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#basedpyright
+        -- https://docs.basedpyright.com/#/settings
+        -- https://docs.basedpyright.com/#/configuration
+        -- https://github.com/DetachHead/basedpyright/blob/main/packages/vscode-pyright/package.json
         basedpyright = {
+          -- -- TODO: not sure what it's for
           -- capabilities = {
           --   textDocument = {
           --     publishDiagnostics = {
@@ -32,25 +39,29 @@ return {
           settings = {
             basedpyright = {
               disableOrganizeImports = true, -- using ruff
-              -- https://github.com/DetachHead/basedpyright/issues/203
-              typeCheckingMode = "off", -- using ruff
-              -- analysis = {
-              --   diagnosticSeverityOverrides = {
-              --     reportUnusedCallResult = "information",
-              --     reportUnusedExpression = "information",
-              --     reportUnknownMemberType = "none",
-              --     reportUnknownLambdaType = "none",
-              --     reportUnknownParameterType = "none",
-              --     reportMissingParameterType = "none",
-              --     reportUnknownVariableType = "none",
-              --     reportUnknownArgumentType = "none",
-              --     reportAny = "none",
-              --   },
-              -- },
+              analysis = {
+                -- https://github.com/DetachHead/basedpyright/issues/203
+                -- typeCheckingMode = "off", -- using ruff
+                typeCheckingMode = "standard", -- off, basic, standard, strict, all(default)
+                -- -- https://github.com/detachhead/basedpyright/blob/main/docs/configuration.md#diagnostic-settings-defaults
+                -- diagnosticSeverityOverrides = {
+                --   reportUnusedCallResult = "information",
+                --   reportUnusedExpression = "information",
+                --   reportUnknownMemberType = "none",
+                --   reportUnknownLambdaType = "none",
+                --   reportUnknownParameterType = "none",
+                --   reportMissingParameterType = "none",
+                --   reportUnknownVariableType = "none",
+                --   reportUnknownArgumentType = "none",
+                --   reportAny = "none",
+                -- },
+              },
             },
           },
         },
+        -- https://github.com/microsoft/pyright/blob/main/packages/vscode-pyright/package.json
         pyright = {
+          -- -- TODO: not sure what it's for
           -- capabilities = {
           --   textDocument = {
           --     publishDiagnostics = {
@@ -64,29 +75,76 @@ return {
             pyright = {
               disableOrganizeImports = true, -- using ruff
             },
-            -- verboseOutput = true,
-            -- autoImportCompletion = true,
             python = {
               analysis = {
                 ignore = { "*" }, -- using ruff
+                -- typeCheckingMode = "strict", -- off, basic, standard(default), strict
+                -- -- https://github.com/microsoft/pyright/blob/main/docs/configuration.md#diagnostic-settings-defaults
                 -- diagnosticSeverityOverrides = {
                 --   reportWildcardImportFromLibrary = "none",
                 --   reportUnusedImport = "information",
                 --   reportUnusedClass = "information",
                 --   reportUnusedFunction = "information",
                 -- },
-                -- typeCheckingMode = "strict",
-                -- autoSearchPaths = true,
-                -- useLibraryCodeForTypes = true,
-                -- diagnosticMode = "openFilesOnly",
-                -- indexing = true,
               },
             },
           },
         },
-        -- [ruff] = {
-        --   handlers = {
-        --     ["textDocument/publishDiagnostics"] = function() end,
+        -- ruff = {
+        --   -- -- TODO: not sure what it's for
+        --   -- handlers = {
+        --   --   ["textDocument/publishDiagnostics"] = function() end,
+        --   -- },
+        --   init_options = {
+        --     settings = {
+        --       -- https://docs.astral.sh/ruff/editors/settings/#ignore
+        --       lint = {
+        --         -- https://github.com/DetachHead/basedpyright/issues/203
+        --         -- https://github.com/DetachHead/basedpyright/blob/06368d488b93c0378520067546b286c0b4f5472c/pyproject.toml#L218
+        --         extendSelect = { "ALL" },
+        --         -- stylua: ignore
+        --         ignore = {
+        --           "ANN",     -- flake8-annotations (covered by pyright)
+        --           "EM",      -- flake8-errmsg
+        --           "FIX",     -- flake8-fixme
+        --           "PLR0913", -- Too many arguments to function call
+        --           "PLR0912", -- Too many branches
+        --           "PLR0915", -- Too many statements
+        --           "PLR2004", -- Magic value used in comparison
+        --           "PLR1722", -- Use `sys.exit()` instead of `exit`
+        --           "PLW2901", -- `for` loop variable overwritten by assignment target
+        --           "PLE0605", -- Invalid format for `__all__`, must be `tuple` or `list` (covered by pyright)
+        --           "PLR0911", -- Too many return statements
+        --           "PLW0603", -- Using the global statement is discouraged
+        --           "PLC0105", -- `TypeVar` name does not reflect its covariance
+        --           "PLC0414", -- Import alias does not rename original package (used by pyright for explicit re-export)
+        --           "RUF013",  -- PEP 484 prohibits implicit Optional (covered by pyright)
+        --           "RUF016",  -- Slice in indexed access to type (covered by pyright)
+        --           "TRY002",  -- Create your own exception
+        --           "TRY003",  -- Avoid specifying long messages outside the exception class
+        --           "D10",     -- Missing docstring
+        --           "D203",    -- 1 blank line required before class docstring
+        --           "D205",    -- 1 blank line required between summary line and description
+        --           "D209",    -- Multi-line docstring closing quotes should be on a separate line
+        --           "D212",    -- Multi-line docstring summary should start at the first line
+        --           "D213",    -- Multi-line docstring summary should start at the second line
+        --           "D400",    -- First line should end with a period
+        --           "D401",    -- First line should be in imperative mood
+        --           "D403",    -- First word of the first line should be properly capitalized
+        --           "D404",    -- First word of the docstring should not be `This`
+        --           "D405",    -- Section name should be properly capitalized
+        --           "D406",    -- Section name should end with a newline
+        --           "D415",    -- First line should end with a period, question mark, or exclamation point
+        --           "D418",    -- Function/Method decorated with @overload shouldn't contain a docstring (vscode supports it)
+        --           "PT013",   -- Found incorrect import of pytest, use simple import pytest instead (only for bad linters that can't check the qualname)
+        --           "TD002",   -- Missing author in TODO
+        --           "CPY001",  -- missing-copyright-notice
+        --           "C901",    -- max-complexity
+        --           "ISC001",  -- single-line-implicit-string-concatenation (conflicts with formatter)
+        --           "COM812",  -- missing-trailing-comma (conflicts with formatter)
+        --         },
+        --       },
+        --     },
         --   },
         -- },
       },
