@@ -438,7 +438,7 @@ bind -T copy-mode-vi C-v { send -X rectangle-toggle; send -X begin-selection }
 bind -T copy-mode-vi . send -X select-word
 bind -T copy-mode-vi D send -X copy-end-of-line-and-cancel
 bind -T copy-mode-vi Y send -X copy-line-and-cancel
-bind -T copy-mode-vi S { send -X select-word; send -X copy-selection-and-cancel }  # TODO not working? but map to `s` works?
+bind -T copy-mode-vi S { send -X select-word; send -X copy-selection-and-cancel }
 bind -T copy-mode-vi m send -X next-matching-bracket  # helix-style mappings
 bind -T copy-mode-vi M send -X set-mark
 bind -T copy-mode-vi "'" send -X jump-to-mark
