@@ -5,7 +5,6 @@
 local Lazy = require("lazy")
 local LazyUtil = require("lazy.util")
 local LazyViewConfig = require("lazy.view.config")
-local replace_home = require("util.path").replace_home_with_tilde
 
 --- Wrapper around vim.keymap.set that will set `silent` to true by default.
 --- https://github.com/folke/dot/blob/5df77fa64728a333f4d58e35d3ca5d8590c4f928/nvim/lua/config/options.lua#L22
@@ -213,19 +212,20 @@ map({ "n", "x" }, "g:", "q:", { desc = "command-line window (Ex command)" })
 map("n", "g.", "@:", { desc = "Repeat last command-line" })
 
 -- https://github.com/rstacruz/vimfiles/blob/ee9a3e7e7f022059b6d012eff2e88c95ae24ff97/lua/config/keymaps.lua#L35
--- :let @+=expand('%:p')<cr>
--- <cmd>call setreg('+', expand('%:p'))<cr>
+-- https://github.com/nvim-lualine/lualine.nvim/blob/b431d228b7bbcdaea818bdc3e25b8cdbe861f056/lua/lualine/components/filename.lua#L74
+-- :let @+=expand('%:p:~')<cr>
+-- <cmd>call setreg('+', expand('%:p:~'))<cr>
 map("n", "<leader>fy", function()
-  local path = replace_home(vim.fn.expand("%:p"))
+  local path = vim.fn.expand("%:p:~")
   vim.fn.setreg("+", path)
   LazyVim.info("Copied path: " .. path)
-end, { desc = "Yank file path" })
+end, { desc = "Yank file absolute path" })
 
 map("n", "<leader>fY", function()
-  local path = replace_home(vim.fn.expand("%:."))
+  local path = vim.fn.expand("%:~:.")
   vim.fn.setreg("+", path)
   LazyVim.info("Copied path: " .. path)
-end, { desc = "Yank file path from project" })
+end, { desc = "Yank file relative path" })
 
 -- map("n", "<leader>fY", function()
 --   local name = vim.fn.expand("%:t")

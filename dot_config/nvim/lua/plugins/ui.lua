@@ -56,13 +56,6 @@ return {
         end
       end
 
-      local function pretty_filename()
-        return function(self)
-          local path = LazyVim.lualine.pretty_path({ length = 0 })(self)
-          return vim.fn.fnamemodify(path, ":t")
-        end
-      end
-
       -- https://github.com/Matt-FTW/dotfiles/blob/b12af2bc28c89c7185c48d6b02fb532b6d8be45d/.config/nvim/lua/plugins/extras/ui/lualine-extended.lua
       local linter = {
         function()
@@ -125,12 +118,33 @@ return {
       -- see: ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/ui.lua
       local lualine_c = opts.sections.lualine_c
       lualine_c[1] = LazyVim.lualine.root_dir({ cwd = not vim.g.user_is_termux })
-      lualine_c[4] = {
-        (vim.g.user_is_termux or LazyVim.has("dropbar.nvim")) and pretty_filename() or pretty_path({
-          -- relative = "root",
-          directory_hl = "Conceal",
-        }),
-      }
+      if vim.g.user_is_termux or LazyVim.has("dropbar.nvim") then
+        lualine_c[4] = {
+          "filename",
+          file_status = true,
+          newfile_status = true, -- `nvim new_file`
+          symbols = {
+            modified = "",
+            readonly = " 󰌾 ",
+          },
+          color = function()
+            local fg
+            if vim.bo.modified then
+              fg = LazyVim.ui.color("MatchParen")
+            elseif vim.bo.modifiable == false or vim.bo.readonly == true then
+              fg = LazyVim.ui.color("DiagnosticError")
+            end
+            return { fg = fg, gui = "bold" }
+          end,
+        }
+      else
+        lualine_c[4] = {
+          pretty_path({
+            -- relative = "root",
+            directory_hl = "Conceal",
+          }),
+        }
+      end
 
       if not vim.g.user_is_termux then
         vim.list_extend(opts.sections.lualine_x, { linter, formatter, lsp })
@@ -179,22 +193,22 @@ return {
 
       -- https://github.com/nicknisi/dotfiles/blob/5ba5a46d2cb5fc6d6c9415300f04f57a20bb2f30/config/nvim/lua/nisi/assets.lua#L144
       opts.config.header = {
-        [[                                                     ]],
-        [[                                                     ]],
-        [[                                                     ]],
-        [[                                                     ]],
-        [[                                                     ]],
-        [[                                                     ]],
-        [[                                                     ]],
-        [[                                                     ]],
-        [[  ███╗   ██╗███████╗ ██████╗ ██╗   ██╗██╗███╗   ███╗ ]],
-        [[  ████╗  ██║██╔════╝██╔═══██╗██║   ██║██║████╗ ████║ ]],
-        [[  ██╔██╗ ██║█████╗  ██║   ██║██║   ██║██║██╔████╔██║ ]],
-        [[  ██║╚██╗██║██╔══╝  ██║   ██║╚██╗ ██╔╝██║██║╚██╔╝██║ ]],
-        [[  ██║ ╚████║███████╗╚██████╔╝ ╚████╔╝ ██║██║ ╚═╝ ██║ ]],
-        [[  ╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝ ]],
-        [[                                                     ]],
-        [[                                                     ]],
+        [[                                                    ]],
+        [[                                                    ]],
+        [[                                                    ]],
+        [[                                                    ]],
+        [[                                                    ]],
+        [[                                                    ]],
+        [[                                                    ]],
+        [[                                                    ]],
+        [[ ███╗   ██╗███████╗ ██████╗ ██╗   ██╗██╗███╗   ███╗ ]],
+        [[ ████╗  ██║██╔════╝██╔═══██╗██║   ██║██║████╗ ████║ ]],
+        [[ ██╔██╗ ██║█████╗  ██║   ██║██║   ██║██║██╔████╔██║ ]],
+        [[ ██║╚██╗██║██╔══╝  ██║   ██║╚██╗ ██╔╝██║██║╚██╔╝██║ ]],
+        [[ ██║ ╚████║███████╗╚██████╔╝ ╚████╔╝ ██║██║ ╚═╝ ██║ ]],
+        [[ ╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝ ]],
+        [[                                                    ]],
+        [[                                                    ]],
       }
 
       -- remove some blank lines if the dashboard is too high
@@ -362,7 +376,7 @@ return {
       local sources = require("dropbar.sources")
       local menu_utils = require("dropbar.utils.menu")
 
-      -- custom highlight-groups
+      -- custom highlight
       -- stylua: ignore start
       vim.api.nvim_set_hl(0, "DropBarFileName", { default = true, fg = LazyVim.ui.color("DropBarKindFile"), bold = true })
       vim.api.nvim_set_hl(0, "DropBarFileNameModified", { default = true, fg = LazyVim.ui.color("MatchParen"), bold = true })
@@ -370,17 +384,33 @@ return {
       vim.api.nvim_set_hl(0, "DropBarSymbolName", { default = true, link = "DropBarFolderName" })
       -- stylua: ignore end
 
+      -- local home_parts = vim.tbl_filter(function(part)
+      --   return part ~= ""
+      -- end, require("plenary.path"):new(home):_split())
+      ---@diagnostic disable-next-line: param-type-mismatch
+      local home_parts = vim.split((vim.uv or vim.loop).os_homedir(), "/", { trimempty = true })
       local source_path = {
         get_symbols = function(buff, win, cursor)
           local symbols = sources.path.get_symbols(buff, win, cursor)
           -- filename highlighting
-          for i, symbol in ipairs(symbols) do
-            symbol.name_hl = i == #symbols and "DropBarFileName" or "DropBarFolderName"
+          for i = 1, #symbols - 1 do
+            symbols[i].name_hl = "DropBarFolderName"
           end
-          if vim.bo[buff].modified then
-            symbols[#symbols].name_hl = "DropBarFileNameModified"
+          symbols[#symbols].name_hl = vim.bo[buff].modified and "DropBarFileNameModified" or "DropBarFileName"
+          -- replace home dir with ~
+          local start_with_home = true
+          for i, home_part in ipairs(home_parts) do
+            if symbols[i].name ~= home_part then
+              start_with_home = false
+              break
+            end
           end
-          -- TODO: replace home with ~
+          if start_with_home then
+            symbols[#home_parts].name = "~"
+            for i = #home_parts - 1, 1, -1 do
+              table.remove(symbols, i)
+            end
+          end
           return symbols
         end,
       }
