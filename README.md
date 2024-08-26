@@ -67,7 +67,7 @@ TODO:
 TODO:
 
 1. [x] Try [NvChad](https://github.com/NvChad/NvChad), [LazyVim](https://github.com/LazyVim/LazyVim), [Kickstart](https://github.com/nvim-lua/kickstart.nvim), [AstroNvim](https://github.com/AstroNvim/AstroNvim) by [Lazyman](https://github.com/doctorfree/nvim-lazyman).
-2. Find out a set of keybindings that can be used everywhere, [equivalent mapping configurations for other VIM integrations](https://github.com/magidc/nvim-config#equivalent-mapping-configurations-for-other-ides-vim-integrations):
+2. [ ] Find out a set of keybindings that can be used everywhere, [equivalent mapping configurations for other VIM integrations](https://github.com/magidc/nvim-config#equivalent-mapping-configurations-for-other-ides-vim-integrations):
    - IDE
      - [ ] [IdeaVim](#ideavim)
      - [ ] [VSCodeVim or vscode-neovim](#vscodevim)
