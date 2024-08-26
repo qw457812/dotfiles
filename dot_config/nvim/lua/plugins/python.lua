@@ -26,16 +26,6 @@ return {
         -- https://docs.basedpyright.com/#/configuration
         -- https://github.com/DetachHead/basedpyright/blob/main/packages/vscode-pyright/package.json
         basedpyright = {
-          -- -- TODO: not sure what it's for
-          -- capabilities = {
-          --   textDocument = {
-          --     publishDiagnostics = {
-          --       tagSupport = {
-          --         valueSet = { 2 },
-          --       },
-          --     },
-          --   },
-          -- },
           settings = {
             basedpyright = {
               disableOrganizeImports = true, -- using ruff
@@ -45,15 +35,6 @@ return {
                 typeCheckingMode = "standard", -- off, basic, standard, strict, all(default)
                 -- -- https://github.com/detachhead/basedpyright/blob/main/docs/configuration.md#diagnostic-settings-defaults
                 -- diagnosticSeverityOverrides = {
-                --   reportUnusedCallResult = "information",
-                --   reportUnusedExpression = "information",
-                --   reportUnknownMemberType = "none",
-                --   reportUnknownLambdaType = "none",
-                --   reportUnknownParameterType = "none",
-                --   reportMissingParameterType = "none",
-                --   reportUnknownVariableType = "none",
-                --   reportUnknownArgumentType = "none",
-                --   reportAny = "none",
                 -- },
               },
             },
@@ -81,10 +62,6 @@ return {
                 -- typeCheckingMode = "strict", -- off, basic, standard(default), strict
                 -- -- https://github.com/microsoft/pyright/blob/main/docs/configuration.md#diagnostic-settings-defaults
                 -- diagnosticSeverityOverrides = {
-                --   reportWildcardImportFromLibrary = "none",
-                --   reportUnusedImport = "information",
-                --   reportUnusedClass = "information",
-                --   reportUnusedFunction = "information",
                 -- },
               },
             },
@@ -204,6 +181,7 @@ return {
   --   },
   -- },
 
+  -- TODO: bad performance
   {
     "MeanderingProgrammer/py-requirements.nvim",
     event = "BufRead requirements.txt",
