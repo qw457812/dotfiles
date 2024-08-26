@@ -14,12 +14,12 @@ return {
         { "<leader>br", false },
         { "<leader>bl", "<Cmd>BufferLineCloseRight<CR>", desc = "Delete Buffers to the Right" },
       }
-      for i = 1, 9 do
-        table.insert(
-          mappings,
-          { "<leader>b" .. i, "<cmd>BufferLineGoToBuffer " .. i .. "<cr>", desc = "Goto Buffer " .. i }
-        )
-      end
+      -- for i = 1, 9 do
+      --   table.insert(
+      --     mappings,
+      --     { "<leader>b" .. i, "<cmd>BufferLineGoToBuffer " .. i .. "<cr>", desc = "Goto Buffer " .. i }
+      --   )
+      -- end
       vim.list_extend(keys, mappings)
     end,
     opts = {
@@ -57,6 +57,26 @@ return {
       end
 
       -- https://github.com/Matt-FTW/dotfiles/blob/b12af2bc28c89c7185c48d6b02fb532b6d8be45d/.config/nvim/lua/plugins/extras/ui/lualine-extended.lua
+      local formatter = {
+        function()
+          return " " -- 󰛖 
+        end,
+        cond = function()
+          local ok, conform = pcall(require, "conform")
+          if not ok then
+            return false
+          end
+          local formatters = conform.list_formatters(0)
+          if #formatters > 0 then
+            return true
+          end
+          local lsp_format = require("conform.lsp_format")
+          local lsp_clients = lsp_format.get_format_clients({ bufnr = vim.api.nvim_get_current_buf() })
+          return #lsp_clients > 0
+        end,
+        color = LazyVim.ui.fg("WhichKeyIconCyan"),
+      }
+
       local linter = {
         function()
           return "󰁨 " -- 󱉶
@@ -76,26 +96,6 @@ return {
           return #linters > 0
         end,
         color = LazyVim.ui.fg("WhichKeyIconGreen"),
-      }
-
-      local formatter = {
-        function()
-          return " " -- 󰛖 
-        end,
-        cond = function()
-          local ok, conform = pcall(require, "conform")
-          if not ok then
-            return false
-          end
-          local formatters = conform.list_formatters(0)
-          if #formatters > 0 then
-            return true
-          end
-          local lsp_format = require("conform.lsp_format")
-          local lsp_clients = lsp_format.get_format_clients({ bufnr = vim.api.nvim_get_current_buf() })
-          return #lsp_clients > 0
-        end,
-        color = LazyVim.ui.fg("WhichKeyIconCyan"),
       }
 
       local lsp = {
@@ -147,7 +147,7 @@ return {
       end
 
       if not vim.g.user_is_termux then
-        vim.list_extend(opts.sections.lualine_x, { linter, formatter, lsp })
+        vim.list_extend(opts.sections.lualine_x, { formatter, linter, lsp })
       end
 
       opts.sections.lualine_y = {

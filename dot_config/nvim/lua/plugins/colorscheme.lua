@@ -1,5 +1,17 @@
 local tokyonight_custom_style = "custom"
 
+-- :=vim.g.colors_name
+local colorschemes = {
+  "tokyonight", -- custom, `tokyonight-custom` not working
+  "tokyonight-moon",
+  "tokyonight-storm",
+  "tokyonight-night",
+  "catppuccin-frappe",
+  "catppuccin-macchiato",
+  "catppuccin-mocha",
+  "onedark",
+}
+
 -- mark the style in colors, useful for `on_colors` and `on_highlights`
 local function mark_tokyonight_style(colors, style)
   -- stylua: ignore
@@ -20,19 +32,9 @@ local function mark_tokyonight_style(colors, style)
   end
 end
 
-local function randomColorScheme()
-  local themes = {
-    "tokyonight", -- custom, `tokyonight-custom` not working
-    "tokyonight-moon",
-    "tokyonight-storm",
-    "tokyonight-night",
-    "catppuccin-frappe",
-    "catppuccin-macchiato",
-    "catppuccin-mocha",
-    "onedark",
-  }
-  local idx = tonumber(os.date("%S")) % #themes + 1
-  local colorscheme = themes[idx]
+local function random_colorscheme()
+  local idx = tonumber(os.date("%S")) % #colorschemes + 1
+  local colorscheme = colorschemes[idx]
   LazyVim.info(colorscheme, { title = "Random ColorScheme" })
   return colorscheme
 end
@@ -313,7 +315,27 @@ return {
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = randomColorScheme(),
+      colorscheme = random_colorscheme(),
     },
+  },
+
+  {
+    "nvim-telescope/telescope.nvim",
+    optional = true,
+    keys = function(_, keys)
+      if LazyVim.pick.picker.name == "telescope" then
+        table.insert(keys, {
+          "<leader>uC",
+          function()
+            require("telescope.builtin").colorscheme({
+              colors = colorschemes,
+              enable_preview = true,
+              ignore_builtins = true,
+            })
+          end,
+          desc = "Colorscheme with Preview",
+        })
+      end
+    end,
   },
 }
