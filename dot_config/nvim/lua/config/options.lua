@@ -21,8 +21,11 @@ local win_borders_fillchars = {
 }
 opt.fillchars:append(win_borders_fillchars["bold"])
 
-vim.g.lazyvim_python_lsp = "basedpyright"
 vim.g.user_is_termux = vim.env.TERMUX_VERSION ~= nil
+-- failed to install basedpyright on Termux
+if not vim.g.user_is_termux then
+  vim.g.lazyvim_python_lsp = "basedpyright"
+end
 -- For holding layout like no-neck-pain.nvim when Auto Close is disabled
 vim.g.user_neotree_auto_close = vim.g.user_is_termux
 
