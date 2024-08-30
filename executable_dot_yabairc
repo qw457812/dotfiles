@@ -86,8 +86,8 @@ yabai -m signal --add event=window_minimized active=yes action="yabai -m query -
 # https://github.com/dgrebb/macos-customs/blob/ce2099cd1caa5a8a24e0ee6ca96538a777a07b47/.config/yabai/_signals.sh#L12
 # https://github.com/deferred/dotfiles/blob/8fb702437d59a9fb4f4a7b416824cd4b2ff02e1c/private_dot_config/yabai/executable_yabairc#L45
 # https://github.com/koekeishiya/yabai/wiki/Tips-and-tricks#quickly-restart-the-yabai-launch-agent
-yabai -m signal --add event=display_added action="sleep 10; brew services stop felixkratz/formulae/borders > /dev/null 2>&1; yabai --restart-service"
-yabai -m signal --add event=display_removed action="sleep 10; brew services stop felixkratz/formulae/borders > /dev/null 2>&1; yabai --restart-service"
+yabai -m signal --add event=display_added action="sleep 5; brew services stop felixkratz/formulae/borders > /dev/null 2>&1; yabai --restart-service"
+yabai -m signal --add event=display_removed action="sleep 5; brew services stop felixkratz/formulae/borders > /dev/null 2>&1; yabai --restart-service"
 
 # input source auto switch can be done here
 # https://github.com/Juggeli/nixos-config/blob/9524faf66ebbcc168319fb062713a8ad06304e9e/modules/darwin/desktop/yabai.nix#L81
