@@ -54,16 +54,17 @@ return {
     },
   },
 
-  {
-    "folke/edgy.nvim",
-    optional = true,
-    opts = function(_, opts)
-      opts.right = opts.right or {}
-      -- stylua: ignore
-      vim.list_extend(opts.right, {
-        { ft = "Avante",      title = "Avante",       size = { width = 50, height = 0.775 } },
-        { ft = "AvanteInput", title = "Avante Input", size = { width = 50, height = 0.225 } },
-      })
-    end,
-  },
+  -- -- not working well with `<leader>aa`
+  -- {
+  --   "folke/edgy.nvim",
+  --   optional = true,
+  --   opts = function(_, opts)
+  --     opts.right = opts.right or {}
+  --     -- stylua: ignore
+  --     vim.list_extend(opts.right, {
+  --       { ft = "Avante",      title = "Avante",       size = { width = 50, height = 0.775 } },
+  --       { ft = "AvanteInput", title = "Avante Input", size = { width = 50, height = 0.225 } },
+  --     })
+  --   end,
+  -- },
 }
