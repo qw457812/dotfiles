@@ -44,6 +44,17 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
+-- revert `lazyvim_close_with_q` auto command for help files that we're editing
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "help",
+  callback = function(event)
+    if vim.bo[event.buf].buftype ~= "help" then
+      vim.bo[event.buf].buflisted = true
+      pcall(vim.keymap.del, "n", "q", { buffer = event.buf })
+    end
+  end,
+})
+
 -- -- close some filetypes with <q>
 -- -- see also: ../plugins/close.lua
 -- -- https://github.com/appelgriebsch/Nv/blob/main/lua/config/autocmds.lua
