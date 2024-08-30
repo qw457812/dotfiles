@@ -47,6 +47,21 @@ vim.api.nvim_create_autocmd("User", {
   end,
 })
 
+-- close some filetypes with close_key
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = {
+    "Avante",
+    "AvanteInput",
+  },
+  callback = function(event)
+    vim.keymap.set("n", close_key, "<cmd>close<cr>", {
+      buffer = event.buf,
+      silent = true,
+      desc = "Quit buffer",
+    })
+  end,
+})
+
 -- see: `:h q:`
 vim.api.nvim_create_autocmd("CmdWinEnter", {
   callback = function(event)
