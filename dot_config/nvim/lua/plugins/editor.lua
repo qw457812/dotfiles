@@ -98,6 +98,7 @@ return {
       return vim.list_extend(keys, mappings)
     end,
     opts = {
+      sources = { "filesystem" },
       close_if_last_window = true, -- close Neo-tree if it is the last window left in the tab
       commands = {
         unfocus_window = function(state)

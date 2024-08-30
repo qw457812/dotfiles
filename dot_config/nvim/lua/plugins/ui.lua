@@ -256,6 +256,20 @@ return {
     end,
   },
 
+  {
+    "folke/edgy.nvim",
+    optional = true,
+    opts = function(_, opts)
+      opts.right = opts.right or {}
+      for _, view in ipairs(opts.right) do
+        if view.ft == "dbui" and view.pinned then
+          view.pinned = false
+          break
+        end
+      end
+    end,
+  },
+
   -- https://github.com/folke/dot/blob/master/nvim/lua/plugins/ui.lua
   {
     "folke/twilight.nvim",
