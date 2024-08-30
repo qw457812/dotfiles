@@ -53,4 +53,17 @@ return {
       { "<leader>ac", mode = { "n", "v" }, function() return require("CopilotChat").toggle() end, desc = "Toggle (CopilotChat)" },
     },
   },
+
+  {
+    "folke/edgy.nvim",
+    optional = true,
+    opts = function(_, opts)
+      opts.right = opts.right or {}
+      -- stylua: ignore
+      vim.list_extend(opts.right, {
+        { ft = "Avante",      title = "Avante",       size = { width = 50, height = 0.775 } },
+        { ft = "AvanteInput", title = "Avante Input", size = { width = 50, height = 0.225 } },
+      })
+    end,
+  },
 }
