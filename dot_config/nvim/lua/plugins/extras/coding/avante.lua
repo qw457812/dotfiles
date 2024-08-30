@@ -8,24 +8,22 @@ return {
     dependencies = {
       "stevearc/dressing.nvim",
       "MunifTanjim/nui.nvim",
-      "zbirenbaum/copilot.lua", -- for providers='copilot'
+      "zbirenbaum/copilot.lua", -- for `provider = "copilot"`
       { "echasnovski/mini.icons", optional = true },
-      -- {
-      --   -- support for image pasting
-      --   "HakonHarnes/img-clip.nvim",
-      --   event = "VeryLazy",
-      --   opts = {
-      --     default = {
-      --       embed_image_as_base64 = false,
-      --       prompt_for_file_name = false,
-      --       drag_and_drop = {
-      --         insert_mode = true,
-      --       },
-      --       -- required for Windows users
-      --       use_absolute_path = true,
-      --     },
-      --   },
-      -- },
+      {
+        "HakonHarnes/img-clip.nvim", -- support for image pasting
+        event = "VeryLazy",
+        opts = {
+          default = {
+            embed_image_as_base64 = false,
+            prompt_for_file_name = false,
+            drag_and_drop = {
+              insert_mode = true,
+            },
+            use_absolute_path = true, -- required for Windows users
+          },
+        },
+      },
       {
         "MeanderingProgrammer/markdown.nvim",
         optional = true,
@@ -35,30 +33,11 @@ return {
         ft = render_markdown_ft,
       },
     },
+    -- stylua: ignore
     keys = {
-      {
-        "<leader>aa",
-        function()
-          require("avante.api").ask()
-        end,
-        desc = "Ask (Avante)",
-        mode = { "n", "v" },
-      },
-      {
-        "<leader>ar",
-        function()
-          require("avante.api").refresh()
-        end,
-        desc = "Refresh (Avante)",
-      },
-      {
-        "<leader>ae",
-        function()
-          require("avante.api").edit()
-        end,
-        desc = "Edit (Avante)",
-        mode = "v",
-      },
+      { "<leader>aa", mode = { "n", "v" }, function() require("avante.api").ask() end, desc = "Ask (Avante)" },
+      { "<leader>ar", function() require("avante.api").refresh() end, desc = "Refresh (Avante)" },
+      { "<leader>ae", mode = "v", function() require("avante.api").edit() end, desc = "Edit (Avante)" },
     },
     opts = {
       provider = "copilot", -- claude(recommend), openai, azure, gemini, cohere, copilot
@@ -70,14 +49,8 @@ return {
     optional = true,
     keys = {
       { "<leader>aa", mode = { "n", "v" }, false },
-      {
-        "<leader>ac",
-        function()
-          return require("CopilotChat").toggle()
-        end,
-        desc = "Toggle (CopilotChat)",
-        mode = { "n", "v" },
-      },
+      -- stylua: ignore
+      { "<leader>ac", mode = { "n", "v" }, function() return require("CopilotChat").toggle() end, desc = "Toggle (CopilotChat)" },
     },
   },
 }
