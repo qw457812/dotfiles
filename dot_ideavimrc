@@ -81,7 +81,7 @@ set notimeout
 """ Plugin settings -------------------------
 let g:argtextobj_pairs="[:],(:),<:>"
 
-let g:highlightedyank_highlight_duration = "500"
+let g:highlightedyank_highlight_duration = "150"
 let g:highlightedyank_highlight_color = "rgba(57, 197, 187, 155)"
 
 " <C-n> seems to me as a better solution than <M-n>,
@@ -247,6 +247,8 @@ nmap # #zz
 nmap n nzz
 nmap N Nzz
 
+nnoremap - :NERDTree<CR>
+
 " https://github.com/JetBrains/ideavim/discussions/357#discussioncomment-1189455
 nnoremap cn *Ncgn
 
@@ -335,25 +337,62 @@ map gs <Action>(GotoSuperMethod)
 " -----------------------------------------------------常用--------------------------------------------------------
 " keys: https://ideavim.sourceforge.net/vim/intro.html
 map <Leader><Space> <Action>(GotoFile)
+map <leader>/ <Action>(FindInPath)
+map <leader>` :e #<CR>
+map <leader>- <C-W>s
+map <leader>_ <C-W>v
+" map <leader>\| <C-W>v
+map <leader>e :NERDTree<CR>
+
+" buffer
+map <leader>bb :e #<CR>
 " CloseEditor 关不掉 Compare.LastVersion
 " map <leader>bd <Action>(CloseEditor)
 map <leader>bd <Action>(CloseContent)
 map <leader>bo <Action>(CloseAllEditorsButActive)
 map <leader>bh <Action>(CloseAllToTheLeft)
 map <leader>bl <Action>(CloseAllToTheRight)
+map <leader>ba <Action>(CloseAllEditors)
+
+" code
 map <leader>ca <Action>(QuickActions)
 " map <leader>cf <Action>(ReformatCode)
 map <leader>cf <Action>(ReformatCode) \| <Action>(OptimizeImports)
+map <leader>co <Action>(OptimizeImports)
 map <leader>cr <Action>(RenameElement)
 map <leader>cR <Action>(RenameFile)
+
+" file/find
+map <leader>fr <Action>(RecentFiles)
 map <Leader>fc :e ~/.ideavimrc<CR>
 map <Leader>fC :source ~/.ideavimrc<CR>
 " map <leader>fp <Action>(RecentProjectListGroup)
 map <leader>fp <Action>(ManageRecentProjects)
+" yank file path (doomemacs keybinding)
+map <leader>fy <Action>(CopyAbsolutePath)
+
+" search
 map <leader>ss <Action>(FileStructurePopup)
 map <Leader>sS <Action>(GotoSymbol)
 
-map <leader>ba <Action>(CloseAllEditors)
+" refactor
+map <leader>rx <Action>(IntroduceVariable)
+map <Leader>rf <Action>(ExtractMethod)
+map <Leader>rI <Action>(ExtractInterface)
+
+" windows
+map <leader>ww <c-w>w
+map <leader>wh <c-w>h
+map <leader>wj <c-w>j
+map <leader>wk <c-w>k
+map <leader>wl <c-w>l
+map <leader>wo <c-w>o
+map <leader>ws <c-w>s
+map <leader>wv <c-w>v
+map <leader>wd <C-W>c
+
+" ----------------------------------------------------- TODO: nvim key-mappings --------------------------------------------------------
+
 map <leader>bk <Action>(CloseContent)
 " Kill all buffers
 map <leader>bK <Action>(CloseAllEditors)
@@ -375,16 +414,11 @@ map <leader>db <Action>(ToggleLineBreakpoint)
 map <Leader>dv :action ViewBreakpoints<CR>
 map <Leader>dc :action ChooseDebugConfiguration<CR>
 map <leader>ds <Action>(Stop)
-map <leader>ee :NERDTree<CR>
-map <Leader>em :action ExtractMethod<CR>
-map <Leader>ei :action ExtractInterface<CR>
 map <Leader>fd :action FixDocComment<CR>
 map <leader>ff <Action>(FindInPath)
 map <leader>fu <Action>(FindUsages)
 " map <Leader>fp :action ShowFilePath<CR>
-map <leader>fs <Action>(FileStructurePopup)
-" yank file path (doomemacs keybinding)
-map <leader>fy <Action>(CopyAbsolutePath)
+" map <leader>fs <Action>(FileStructurePopup)
 map <leader>gg :action Generate<CR>
 " 打开 IdeaVim: Track Action Ids
 map <Leader>ga :action GotoAction<CR>
@@ -397,7 +431,6 @@ map <leader>hl <Action>(HighlightUsagesInFile)
 map <leader>hw <Action>(HideAllWindows)
 map <leader>ic <Action>(IntroduceConstant)
 map <leader>im <Action>(ImplementMethods)
-map <leader>iv <Action>(IntroduceVariable)
 " Reformat the current line only
 " map <leader>ll V<Action>(ReformatCode)
 " map <leader>L <Action>(ReformatCode)
@@ -428,9 +461,7 @@ map <leader>qi <Action>(QuickImplementations)
 map <leader>qs :set quickscope<CR>
 map <leader>qS :set noquickscope<CR>
 map <Leader>rc :action ChooseRunConfiguration<CR>
-map <leader>rf <Action>(RecentFiles)
 map <leader>rl <Action>(RecentLocations)
-" map <leader>rn <Action>(RenameElement)
 map <leader>rp <Action>(ManageRecentProjects)
 map <leader>rq :action Refactorings.QuickListPopupAction<CR>
 map <leader>rr <Action>(Run)
@@ -458,18 +489,18 @@ map <leader>vR <Action>(ChangesView.Revert)
 map <leader>vr <Action>(Vcs.RollbackChangedLines)
 map <leader>vu <Action>(UpdateFiles)
 " map <leader>w <Action>(CloseContent)
-map <leader>wd <Action>(ActivateDebugToolWindow)
-map <leader>ww <Action>(JumpToLastWindow)
-map <leader>wt <Action>(ActivateTerminalToolWindow)
+" map <leader>wd <Action>(ActivateDebugToolWindow)
+" map <leader>ww <Action>(JumpToLastWindow)
+" map <leader>wt <Action>(ActivateTerminalToolWindow)
 " https://youtrack.jetbrains.com/issue/VIM-2666/How-to-use-vim-bindings-in-Tool-Windows-like-Run-Structure-etc..
 " https://youtrack.jetbrains.com/issue/VIM-2313/Normal-mode-doesnt-get-activated-in-the-log-panel
-map <leader>wr <Action>(ActivateRunToolWindow)
+" map <leader>wr <Action>(ActivateRunToolWindow)
 " use CMD+A to active ideavim in RunToolWindow
 " https://stackoverflow.com/questions/60760660/how-to-ideavim-combine-two-action
 " map <leader>wr :action ActivateRunToolWindow \| action $SelectAll<CR>
 " https://youtrack.jetbrains.com/issue/VIM-2134/feature-request-Add-multiple-actions-to-a-single-key-binding
 " map <leader>wr <Action>(ActivateRunToolWindow)<Action>($SelectAll)
-map <leader>wm <Action>(MaximizeToolWindow)
+" map <leader>wm <Action>(MaximizeToolWindow)
 map <leader>x <Action>(HideAllWindows)
 map <leader>z <Action>(ToggleDistractionFreeMode)
 
