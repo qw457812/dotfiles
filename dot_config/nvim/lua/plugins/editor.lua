@@ -359,6 +359,50 @@ return {
   --   end,
   -- },
 
+  {
+    "LazyVim/LazyVim",
+    dependencies = {
+      { "debugloop/layers.nvim", opts = {} },
+    },
+    keys = {
+      -- stylua: ignore
+      { "M", function() PAGER_MODE:toggle() end, desc = "Pager Mode" },
+    },
+    opts = function()
+      ---@diagnostic disable-next-line: undefined-global
+      PAGER_MODE = Layers.mode.new()
+      PAGER_MODE:auto_show_help()
+      PAGER_MODE:keymaps({
+        n = {
+          { "u", "<C-u>", { desc = "Scroll Up" } },
+          { "d", "<C-d>", { desc = "Scroll Down" } },
+          -- stylua: ignore
+          { "<esc>", function() PAGER_MODE:deactivate() end, { desc = "Exit" } },
+        },
+      })
+      local orig_dd_keymap ---@type table<string,any>
+      local orig_minianimate_disable ---@type boolean?
+      PAGER_MODE:add_hook(function(active)
+        if active then
+          -- remove `dd` mapping, defined in ../config/keymaps.lua
+          -- https://github.com/debugloop/layers.nvim/blob/67666f59a2dbe36a469766be6a4c484ae98c4895/lua/layers/map.lua#L52
+          orig_dd_keymap = vim.fn.maparg("dd", "n", false, true) --[[@as table<string,any>]]
+          if not vim.tbl_isempty(orig_dd_keymap) then
+            vim.keymap.del("n", "dd")
+          end
+          -- disable mini.animate
+          orig_minianimate_disable = vim.g.minianimate_disable
+          vim.g.minianimate_disable = true
+        else
+          if not vim.tbl_isempty(orig_dd_keymap) then
+            vim.fn.mapset(orig_dd_keymap)
+          end
+          vim.g.minianimate_disable = orig_minianimate_disable
+        end
+      end)
+    end,
+  },
+
   -- for escaping easily from insert mode
   {
     "max397574/better-escape.nvim",
