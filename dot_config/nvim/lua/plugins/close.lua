@@ -113,6 +113,15 @@ return {
   },
 
   {
+    "folke/trouble.nvim",
+    opts = {
+      keys = {
+        [close_key] = "close",
+      },
+    },
+  },
+
+  {
     "stevearc/oil.nvim",
     optional = true,
     opts = {
