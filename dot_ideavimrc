@@ -167,7 +167,6 @@ xmap ms S
 nmap mr cs
 nmap md ds
 
-omap e ds
 
 """ Common settings -------------------------
 " :h 'clipboard'
