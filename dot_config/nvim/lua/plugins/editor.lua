@@ -25,7 +25,11 @@ return {
           "<leader>fe",
           function()
             if vim.bo.filetype == "neo-tree" then
-              vim.cmd("wincmd p")
+              if vim.g.user_neotree_auto_close then
+                require("neo-tree.command").execute({ action = "close" })
+              else
+                vim.cmd("wincmd p")
+              end
               return
             end
 
