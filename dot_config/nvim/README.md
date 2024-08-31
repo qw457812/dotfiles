@@ -88,7 +88,6 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
   - [demicolon.nvim](https://github.com/mawkler/demicolon.nvim): repeat diagnostic jumps (`]d`/`[d`) and nvim-treesitter-textobjects jumps (`]f`/`[f`) with `;`/`,`.
   - [eyeliner.nvim](https://github.com/jinh0/eyeliner.nvim): enhance `f`/`F`/`t`/`T`, like quick-scope.
 - [ ] [Org Mode](https://github.com/topics/orgmode-nvim) in nvim, or neorg like [stevearc](https://github.com/stevearc/dotfiles/blob/eeb506f9afd32cd8cd9f2366110c76efaae5786c/.config/nvim/lua/plugins/neorg.lua).
-- [ ] [avante.nvim](https://github.com/yetone/avante.nvim)
 - [ ] [codecompanion.nvim](https://github.com/olimorris/codecompanion.nvim)
 - [ ] [ChatGPT.nvim](https://github.com/jackMort/ChatGPT.nvim), eg. [AstroCommunity](https://github.com/AstroNvim/astrocommunity/tree/1f3a6ec008b404c72f84093fe25c574ba63fc256/lua/astrocommunity/editing-support/chatgpt-nvim), [Matt-FTW](https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/coding/ai/gpt.lua)
 - [ ] Check this [copilot-chat-v2-fzf.lua](https://github.com/jellydn/lazy-nvim-ide/blob/main/lua/plugins/extras/copilot-chat-v2-fzf.lua).
@@ -144,6 +143,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] [nvim-recorder](https://github.com/chrisgrieser/nvim-recorder)
 - [ ] [rasulomaroff/reactive.nvim](https://github.com/rasulomaroff/reactive.nvim)
 - [ ] lang.zsh like [aimuzov](https://github.com/aimuzov/LazyVimx/blob/main/lua/lazyvimx/extras/lang/zsh.lua).
+- [ ] Map `u`/`d`/`q`, and unmap `dd` for `man` filetype.
 - [ ] Create a `state` util to cache the state (like [zen-mode.nvim](https://github.com/folke/zen-mode.nvim/blob/29b292bdc58b76a6c8f294c961a8bf92c5a6ebd6/lua/zen-mode/plugins.lua#L137)) instead of using `vim.g.user_...`
   - [vim.g.user_zenmode_on](lua/plugins/ui.lua), [vim.g.user_minianimate_disable_old](lua/plugins/ui.lua)
   - [local neovide_state = {}](lua/config/keymaps.lua)
