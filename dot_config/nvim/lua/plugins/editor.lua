@@ -24,6 +24,11 @@ return {
         {
           "<leader>fe",
           function()
+            if vim.bo.filetype == "neo-tree" then
+              vim.cmd("wincmd p")
+              return
+            end
+
             -- reveal the current file in root directory, or if in an unsaved file, the current working directory
             -- :h neo-tree-configuration
             local command = require("neo-tree.command")
@@ -87,6 +92,8 @@ return {
           end,
           desc = "Explorer NeoTree (cwd)",
         },
+        { "<leader>ge", false },
+        { "<leader>be", false },
       }
 
       local opts = LazyVim.opts("neo-tree.nvim")
@@ -101,10 +108,8 @@ return {
       sources = { "filesystem" },
       close_if_last_window = true, -- close Neo-tree if it is the last window left in the tab
       commands = {
-        unfocus_window = function(state)
-          if state.current_position == "left" then
-            vim.cmd("wincmd l")
-          end
+        unfocus_window = function()
+          vim.cmd("wincmd p")
         end,
         close_or_unfocus_window = function(state)
           state.commands[vim.g.user_neotree_auto_close and "close_window" or "unfocus_window"](state)
@@ -216,14 +221,14 @@ return {
           },
         },
       },
-      buffers = {
-        window = {
-          mappings = {
-            ["bd"] = "none", -- use `d` instead
-            ["d"] = "buffer_delete",
-          },
-        },
-      },
+      -- buffers = {
+      --   window = {
+      --     mappings = {
+      --       ["bd"] = "none", -- use `d` instead
+      --       ["d"] = "buffer_delete",
+      --     },
+      --   },
+      -- },
       event_handlers = {
         -- https://github.com/nvim-neo-tree/neo-tree.nvim/wiki/Recipes#auto-close-on-open-file
         -- alternative: https://github.com/nvim-neo-tree/neo-tree.nvim/issues/344
@@ -370,6 +375,10 @@ return {
       { "M", function() PAGER_MODE:toggle() end, desc = "Pager Mode" },
     },
     opts = function()
+      if vim.g.vscode then
+        return
+      end
+
       ---@diagnostic disable-next-line: undefined-global
       PAGER_MODE = Layers.mode.new()
       PAGER_MODE:auto_show_help()
