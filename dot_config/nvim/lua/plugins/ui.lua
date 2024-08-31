@@ -25,6 +25,19 @@ return {
     opts = {
       options = {
         separator_style = "slant", -- slope
+        offsets = {
+          {
+            filetype = "neo-tree",
+            text = function()
+              -- vim.fn.getcwd()
+              local cwd = LazyVim.root.cwd()
+              local root = LazyVim.root.get({ normalize = true })
+              return cwd == root and "Explorer" or require("util.path").replace_home_with_tilde(cwd)
+            end,
+            highlight = "Directory",
+            text_align = "left",
+          },
+        },
       },
     },
   },
@@ -260,8 +273,17 @@ return {
     "folke/edgy.nvim",
     optional = true,
     opts = function(_, opts)
-      opts.right = opts.right or {}
-      for _, view in ipairs(opts.right) do
+      opts.animate = opts.animate or {}
+      opts.animate.enabled = false
+
+      for _, view in ipairs(opts.left or {}) do
+        if view.ft == "neo-tree" then
+          view.title = "Neo-Tree"
+          break
+        end
+      end
+
+      for _, view in ipairs(opts.right or {}) do
         if view.ft == "dbui" and view.pinned then
           view.pinned = false
           break
