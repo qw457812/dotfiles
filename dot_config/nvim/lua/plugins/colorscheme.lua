@@ -35,7 +35,9 @@ end
 local function random_colorscheme()
   local idx = tonumber(os.date("%S")) % #colorschemes + 1
   local colorscheme = colorschemes[idx]
-  LazyVim.info(colorscheme, { title = "Random ColorScheme" })
+  if not vim.g.vscode then
+    LazyVim.info(colorscheme, { title = "Random ColorScheme" })
+  end
   return colorscheme
 end
 
