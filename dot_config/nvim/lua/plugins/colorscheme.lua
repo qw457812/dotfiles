@@ -10,6 +10,7 @@ local colorschemes = {
   "catppuccin-macchiato",
   "catppuccin-mocha",
   "onedark",
+  "obscure",
 }
 
 -- mark the style in colors, useful for `on_colors` and `on_highlights`
@@ -309,6 +310,36 @@ return {
           TelescopePromptTitle = { fg = "$orange" },
           TelescopeResultsTitle = { fg = "$cyan" },
           TelescopePreviewTitle = { fg = "$cyan" },
+        },
+      }
+    end,
+  },
+
+  {
+    "killitar/obscure.nvim",
+    lazy = true,
+    opts = function()
+      local p = require("obscure.palettes").get_palette("obscure")
+      -- ~/.local/share/nvim/lazy/obscure.nvim/lua/obscure/palettes/obscure.lua
+      local illuminate = p.gray3
+      return {
+        highlight_overrides = {
+          IlluminatedWordRead = { bg = illuminate },
+          IlluminatedWordWrite = { bg = illuminate, underline = true },
+          LspReferenceRead = { bg = illuminate },
+          LspReferenceWrite = { bg = illuminate, underline = true },
+
+          Conceal = { fg = p.subtext4 },
+
+          FlashLabel = { fg = p.bg, bg = p.bright_green, bold = true },
+
+          TelescopePromptBorder = { fg = p.yellow },
+          TelescopePromptTitle = { fg = p.yellow },
+          TelescopeResultsTitle = { fg = p.blue },
+          TelescopePreviewTitle = { fg = p.blue },
+          TelescopeBorder = { fg = p.blue },
+
+          MiniIndentscopeSymbol = { fg = p.subtext2 },
         },
       }
     end,
