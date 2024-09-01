@@ -151,6 +151,17 @@ if LazyVim.has("tmux.nvim") then
   map({ "n", "t" }, "<C-Down>", [[<cmd>lua require("tmux").resize_bottom()<cr>]], { desc = "Resize Window Bottom" })
   map({ "n", "t" }, "<C-Up>", [[<cmd>lua require("tmux").resize_top()<cr>]], { desc = "Resize Window Top" })
   map({ "n", "t" }, "<C-Right>", [[<cmd>lua require("tmux").resize_right()<cr>]], { desc = "Resize Window Right" })
+elseif LazyVim.has("smart-splits.nvim") then
+  -- Move to window
+  map({ "n", "t" }, "<C-h>", require("smart-splits").move_cursor_left)
+  map({ "n", "t" }, "<C-j>", require("smart-splits").move_cursor_down)
+  map({ "n", "t" }, "<C-k>", require("smart-splits").move_cursor_up)
+  map({ "n", "t" }, "<C-l>", require("smart-splits").move_cursor_right)
+  -- Resize window
+  map("n", "<C-Left>", require("smart-splits").resize_left)
+  map("n", "<C-Down>", require("smart-splits").resize_down)
+  map("n", "<C-Up>", require("smart-splits").resize_up)
+  map("n", "<C-Right>", require("smart-splits").resize_right)
 end
 
 -- deleting without yanking empty line
