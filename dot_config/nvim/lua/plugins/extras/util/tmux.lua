@@ -23,4 +23,12 @@ return {
       },
     },
   },
+
+  {
+    "mrjones2014/smart-splits.nvim",
+    enabled = false,
+    event = "VeryLazy",
+    cond = vim.env.TMUX ~= nil,
+    opts = {},
+  },
 }
