@@ -406,7 +406,7 @@ return {
     end,
     keys = {
       -- stylua: ignore
-      { "<leader>wp", function() require("dropbar.api").pick() end, desc = "Winbar Pick" },
+      { "<leader>wP", function() require("dropbar.api").pick() end, desc = "Winbar Pick" },
     },
     opts = function(_, opts)
       local sources = require("dropbar.sources")
