@@ -89,6 +89,7 @@ local function pick_definitions_or_references()
 end
 
 return {
+  { "saecki/live-rename.nvim", lazy = true },
   -- LSP Keymaps
   -- https://www.lazyvim.org/plugins/lsp#%EF%B8%8F-customizing-lsp-keymaps
   -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/editor/telescope.lua
@@ -103,6 +104,7 @@ return {
       vim.list_extend(Keys, {
         -- { "gd", pick_definitions_or_references, desc = "Goto Definition/References", has = "definition" },
         { "<cr>", pick_definitions_or_references, desc = "Goto Definition/References", has = "definition" },
+        { "<leader>cr", function() require("live-rename").rename() end, desc = "Rename (live-rename.nvim)", has = "rename" },
         -- https://github.com/jacquin236/minimal-nvim/blob/baacb78adce67d704d17c3ad01dd7035c5abeca3/lua/plugins/lsp.lua
         { "<leader>cl", false },
         { "<leader>il", "<cmd>LspInfo<cr>", desc = "Lsp" },
