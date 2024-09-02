@@ -35,6 +35,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [jellydn](https://github.com/jellydn/lazy-nvim-ide)
 - [eslam-allam](https://github.com/eslam-allam/nvim-lazy)
   > Java
+- [xzbdmw](https://github.com/xzbdmw/nvimconfig)
 
 ## Awesome Neovim
 

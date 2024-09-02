@@ -244,6 +244,31 @@ end, { desc = "Yank file relative path" })
 --   LazyVim.info("Copied file name: " .. name)
 -- end, { desc = "Yank file name" })
 
+-- toggle options
+-- https://github.com/xzbdmw/nvimconfig/blob/0be9805dac4661803e17265b435060956daee757/lua/config/keymaps.lua#L49
+-- https://github.com/LazyVim/LazyVim/blob/3dbace941ee935c89c73fd774267043d12f57fe2/lua/lazyvim/plugins/lsp/init.lua#L18
+_G.has_diagnostic = true
+LazyVim.toggle.map("<leader>ud", {
+  name = "Diagnostics",
+  get = function()
+    return has_diagnostic
+  end,
+  set = function(state)
+    _G.has_diagnostic = state
+    if state then
+      vim.diagnostic.config({
+        virtual_text = {
+          spacing = 4,
+          source = "if_many",
+          prefix = "●",
+        },
+      })
+    else
+      vim.diagnostic.config({ virtual_text = false })
+    end
+  end,
+})
+
 local function google_search(input)
   local query = input or vim.fn.expand("<cword>")
   LazyUtil.open("https://www.google.com/search?q=" .. query)
