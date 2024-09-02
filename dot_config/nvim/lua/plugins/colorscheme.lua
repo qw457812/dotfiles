@@ -51,8 +51,19 @@ end
 ---@param hex string
 local function to_neutral_gray(hex)
   local r, g, b = hex_to_rgb(hex)
-  local avg = math.floor((r + g + b) / 3)
-  return string.format("#%02x%02x%02x", avg, avg, avg)
+
+  -- local avg = math.floor((r + g + b) / 3)
+  -- return string.format("#%02x%02x%02x", avg, avg, avg)
+
+  -- https://github.com/killitar/obscure.nvim/blob/0e61b96a2c8551e73f8520b1f086d63f50d71bbd/lua/obscure/palettes/obscure.lua#L2
+  -- https://github.com/mellow-theme/mellow.nvim/blob/5c8b4eaadf190f646f201322f96f00140b6b1a0b/lua/mellow/colors.lua#L5
+  local base_r, base_g, base_b = hex_to_rgb("#161617")
+  return string.format(
+    "#%02x%02x%02x",
+    math.floor(base_r / (base_r + base_g + base_b) * (r + g + b)),
+    math.floor(base_g / (base_r + base_g + base_b) * (r + g + b)),
+    math.floor(base_b / (base_r + base_g + base_b) * (r + g + b))
+  )
 end
 
 return {
@@ -130,7 +141,6 @@ return {
             hl.CmpItemKindSnippet = { fg = c.fg_bright }
             -- hl.PmenuThumb = { bg = c.border_highlight }
             -- hl.PmenuSel = { bg = c.bg_highlight, bold = true }
-            -- TODO: lualine_a_normal
           end
 
           do
@@ -321,15 +331,17 @@ return {
     opts = function()
       local p = require("obscure.palettes").get_palette("obscure")
       -- ~/.local/share/nvim/lazy/obscure.nvim/lua/obscure/palettes/obscure.lua
-      local illuminate = p.gray3
+      local illuminate = p.gray4
       return {
         highlight_overrides = {
+          IlluminatedWordText = { bg = p.gray3 },
           IlluminatedWordRead = { bg = illuminate },
           IlluminatedWordWrite = { bg = illuminate, underline = true },
           LspReferenceRead = { bg = illuminate },
           LspReferenceWrite = { bg = illuminate, underline = true },
 
-          Conceal = { fg = p.subtext4 },
+          Conceal = { fg = p.subtext4 }, -- for DropBarFolderName
+          Search = { fg = p.bright_yellow, bg = p.subtext4 },
 
           FlashLabel = { fg = p.bg, bg = p.bright_green, bold = true },
 
