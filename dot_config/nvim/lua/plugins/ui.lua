@@ -38,6 +38,10 @@ return {
             text_align = "left",
           },
         },
+        -- hide extension
+        name_formatter = function(buf)
+          return buf.name:match("(.+)%..+$")
+        end,
       },
     },
   },
