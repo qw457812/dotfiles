@@ -2,6 +2,11 @@
 -- Default autocmds that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/autocmds.lua
 -- Add any additional autocmds here
 
+local function lazyvim_augroup(name)
+  -- return "lazyvim_" .. name
+  return vim.api.nvim_create_augroup("lazyvim_" .. name, { clear = false })
+end
+
 -- show cursor line only in active window
 -- https://github.com/folke/dot/blob/master/nvim/lua/config/autocmds.lua
 vim.api.nvim_create_autocmd({ "InsertLeave", "WinEnter" }, {
@@ -33,14 +38,33 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 })
 
 -- disable LazyVim's auto command for wrap
+local wrap_spell_opts = { group = lazyvim_augroup("wrap_spell"), event = "FileType" }
+local wrap_spell_pattern = vim.tbl_map(function(autocmd)
+  return autocmd.pattern
+end, vim.api.nvim_get_autocmds(wrap_spell_opts))
 -- https://github.com/LazyVim/LazyVim/issues/3692
 -- alternative: vim.api.nvim_del_augroup_by_name("lazyvim_wrap_spell")
-vim.api.nvim_clear_autocmds({ group = "lazyvim_wrap_spell" })
+vim.api.nvim_clear_autocmds(wrap_spell_opts)
 -- create my own
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "text", "plaintex", "typst", "gitcommit", "markdown" },
+  pattern = wrap_spell_pattern,
   callback = function()
     vim.opt_local.spell = true
+  end,
+})
+
+-- disable wrap for some filetypes
+vim.api.nvim_create_autocmd("FileType", {
+  -- pattern = vim.list_extend({
+  --   "lazy",
+  -- }, wrap_spell_pattern),
+  pattern = {
+    "lazy", -- Lazy Extras
+  },
+  callback = function()
+    vim.defer_fn(function()
+      vim.opt_local.wrap = false
+    end, 100)
   end,
 })
 

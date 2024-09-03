@@ -34,7 +34,7 @@ require("lazy").setup({
   },
   install = { colorscheme = { "tokyonight", "habamax" } },
   ui = {
-    wrap = vim.env.TERMUX_VERSION == nil, -- wrap the lines in the ui
+    wrap = false, -- wrap the lines in the ui
     border = "rounded",
   },
   diff = { cmd = "terminal_git" },
