@@ -32,10 +32,10 @@ map("n", "<leader>ld", function() LazyUtil.open("https://lazyvim.org") end, { de
 map("n", "<leader>lD", function() LazyUtil.open("https://lazy.folke.io") end, { desc = "lazy.nvim Docs" })
 map("n", "<leader>lr", function() LazyUtil.open("https://github.com/LazyVim/LazyVim") end, { desc = "LazyVim Repo" })
 map("n", "<leader>lR", function() LazyUtil.open("https://github.com/folke/lazy.nvim") end, { desc = "lazy.nvim Repo" })
-map("n", "<leader>lu", function() Lazy.update() end, { desc = "Lazy Update" })
-map("n", "<leader>ls", function() Lazy.sync() end, { desc = "Lazy Sync" })
-map("n", "<leader>lc", function() Lazy.check() end, { desc = "Lazy Check" })
 -- stylua: ignore end
+map("n", "<leader>lu", Lazy.update, { desc = "Lazy Update" })
+map("n", "<leader>ls", Lazy.sync, { desc = "Lazy Sync" })
+map("n", "<leader>lc", Lazy.check, { desc = "Lazy Check" })
 
 -- plugin info
 -- https://github.com/jacquin236/minimal-nvim/blob/main/lua/config/keymaps.lua
@@ -152,16 +152,16 @@ if LazyVim.has("tmux.nvim") then
   map({ "n", "t" }, "<C-Up>", [[<cmd>lua require("tmux").resize_top()<cr>]], { desc = "Resize Window Top" })
   map({ "n", "t" }, "<C-Right>", [[<cmd>lua require("tmux").resize_right()<cr>]], { desc = "Resize Window Right" })
 elseif LazyVim.has("smart-splits.nvim") then
-  -- Move to window
-  map({ "n", "t" }, "<C-h>", require("smart-splits").move_cursor_left)
-  map({ "n", "t" }, "<C-j>", require("smart-splits").move_cursor_down)
-  map({ "n", "t" }, "<C-k>", require("smart-splits").move_cursor_up)
-  map({ "n", "t" }, "<C-l>", require("smart-splits").move_cursor_right)
-  -- Resize window
-  map("n", "<C-Left>", require("smart-splits").resize_left)
-  map("n", "<C-Down>", require("smart-splits").resize_down)
-  map("n", "<C-Up>", require("smart-splits").resize_up)
-  map("n", "<C-Right>", require("smart-splits").resize_right)
+  -- stylua: ignore start
+  map({ "n", "t" }, "<C-h>", function() require("smart-splits").move_cursor_left() end)
+  map({ "n", "t" }, "<C-j>", function() require("smart-splits").move_cursor_down() end)
+  map({ "n", "t" }, "<C-k>", function() require("smart-splits").move_cursor_up() end)
+  map({ "n", "t" }, "<C-l>", function() require("smart-splits").move_cursor_right() end)
+  map("n", "<C-Left>", function() require("smart-splits").resize_left() end)
+  map("n", "<C-Down>", function() require("smart-splits").resize_down() end)
+  map("n", "<C-Up>", function() require("smart-splits").resize_up() end)
+  map("n", "<C-Right>", function() require("smart-splits").resize_right() end)
+  -- stylua: ignore end
 end
 
 -- deleting without yanking empty line
