@@ -5,6 +5,7 @@ table.insert(render_markdown_ft, "Avante")
 return {
   {
     "yetone/avante.nvim",
+    build = ":AvanteBuild",
     dependencies = {
       "stevearc/dressing.nvim",
       "MunifTanjim/nui.nvim",
@@ -48,6 +49,18 @@ return {
       { "<leader>aa", mode = { "n", "v" }, function() require("avante.api").ask() end, desc = "Ask (Avante)" },
       { "<leader>ar", function() require("avante.api").refresh() end, desc = "Refresh (Avante)" },
       { "<leader>ae", mode = "v", function() require("avante.api").edit() end, desc = "Edit (Avante)" },
+      {
+        "<leader>aP",
+        function()
+          -- https://github.com/yetone/avante.nvim/blob/962dd0a759d9cba7214dbc954780c5ada5799449/lua/avante/init.lua#L47
+          vim.ui.select(require("avante.config").providers, { prompt = "Select Avante Provider:" }, function(choice)
+            if choice then
+              require("avante.api").switch_provider(choice)
+            end
+          end)
+        end,
+        desc = "Switch Provider (Avante)",
+      },
     },
     opts = {
       provider = "copilot", -- claude(recommend), openai, azure, gemini, cohere, copilot
