@@ -27,6 +27,8 @@ map("n", "<leader>ll", "<cmd>Lazy<cr>", { desc = "Lazy" })
 map("n", "<leader>lx", "<cmd>LazyExtras<cr>", { desc = "Extras" })
 -- stylua: ignore start
 map("n", "<leader>lL", function() LazyVim.news.changelog() end, { desc = "LazyVim Changelog" })
+-- use `:h news` instead of `LazyVim.news.neovim()`
+map("n", "<leader>lN", function() LazyVim.news.lazyvim() end, { desc = "LazyVim News" })
 -- alternative: vim.fn.system({ "open", "https://lazyvim.org" }) or vim.cmd("silent !open https://lazyvim.org")
 map("n", "<leader>ld", function() LazyUtil.open("https://lazyvim.org") end, { desc = "LazyVim Docs" })
 map("n", "<leader>lD", function() LazyUtil.open("https://lazy.folke.io") end, { desc = "lazy.nvim Docs" })
