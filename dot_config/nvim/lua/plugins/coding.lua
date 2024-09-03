@@ -103,6 +103,23 @@ return {
   },
 
   {
+    "echasnovski/mini.ai",
+    optional = true,
+    opts = {
+      mappings = {
+        -- next/last variants
+        around_next = "", -- an
+        inside_next = "", -- in
+        around_last = "", -- al
+        inside_last = "", -- il
+        -- move cursor to corresponding edge of `a` textobject
+        goto_left = "", -- g[
+        goto_right = "", -- g]
+      },
+    },
+  },
+
+  {
     "gbprod/yanky.nvim",
     optional = true,
     keys = {
@@ -122,7 +139,36 @@ return {
 
   {
     "chrisgrieser/nvim-various-textobjs",
+    vscode = true,
     keys = {
+      -- stylua: ignore start
+      { "im", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").chainMember("inner")<CR>]], desc = "chain member .foo(param)" }, -- i.
+      { "am", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").chainMember("outer")<CR>]], desc = "chain member .foo(param)" }, -- a.
+      { "ik", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").key("inner")<CR>]], desc = "key-value, assignment" },
+      { "ak", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").key("outer")<CR>]], desc = "key-value, assignment" },
+      { "iv", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").value("inner")<CR>]], desc = "key-value, assignment" },
+      { "av", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").value("outer")<CR>]], desc = "key-value, assignment" },
+      -- { "U", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").url()<CR>]], desc = "url" },
+      { "il", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").url()<CR>]], desc = "url link" },
+      { "al", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").url()<CR>]], desc = "url link" },
+      -- markdown
+      { "il", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").mdlink("inner")<CR>]], desc = "md link [title](url)", ft = { "markdown", "toml" } },
+      { "al", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").mdlink("outer")<CR>]], desc = "md link [title](url)", ft = { "markdown", "toml" } },
+      -- TODO: https://github.com/chrisgrieser/nvim-various-textobjs/issues/78
+      { "iC", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").mdFencedCodeBlock("inner")<CR>]], desc = "md code block ```", ft = { "markdown" } },
+      { "aC", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").mdFencedCodeBlock("outer")<CR>]], desc = "md code block ```", ft = { "markdown" } },
+      { "iE", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").mdEmphasis("inner")<CR>]], desc = "md emphasis *_~=", ft = { "markdown" } },
+      { "aE", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").mdEmphasis("outer")<CR>]], desc = "md emphasis *_~=", ft = { "markdown" } },
+      -- python
+      { "iy", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").pyTripleQuotes("inner")<CR>]], desc = [[py triple quotes """]], ft = { "python" } },
+      { "ay", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").pyTripleQuotes("outer")<CR>]], desc = [[py triple quotes """]], ft = { "python" } },
+      -- lua, shell, org, neorg, markdown
+      { "iD", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").doubleSquareBrackets("inner")<CR>]], desc = "double square brackets [[]]", ft = { "lua", "org", "norg", "sh", "fish", "zsh", "bash", "markdown" } },
+      { "aD", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").doubleSquareBrackets("outer")<CR>]], desc = "double square brackets [[]]", ft = { "lua", "org", "norg", "sh", "fish", "zsh", "bash", "markdown" } },
+      -- shell
+      { "iP", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").shellPipe("inner")<CR>]], desc = "shell pipe |", ft = { "sh", "bash", "zsh", "fish" } },
+      { "aP", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").shellPipe("outer")<CR>]], desc = "shell pipe |", ft = { "sh", "bash", "zsh", "fish" } },
+      -- stylua: ignore end
       -- https://github.com/chrisgrieser/nvim-various-textobjs#smarter-gx
       {
         "gx",
@@ -159,7 +205,7 @@ return {
       },
       -- https://github.com/chrisgrieser/nvim-various-textobjs#delete-surrounding-indentation
       {
-        "mdi",
+        "mdi", -- :=LazyVim.opts("mini.surround").mappings.delete
         function()
           -- select outer indentation
           require("various-textobjs").indentation("outer", "outer")
