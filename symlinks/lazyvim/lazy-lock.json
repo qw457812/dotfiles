@@ -85,6 +85,7 @@
   "nvim-treesitter-sexp": { "branch": "master", "commit": "32509f4071f9c8ba5655bf2e1ccf1f1cd8447da0" },
   "nvim-treesitter-textobjects": { "branch": "master", "commit": "3a3c6244553f13fdd92d312c82722b57ce6c4bec" },
   "nvim-ts-autotag": { "branch": "main", "commit": "e239a560f338be31337e7abc3ee42515daf23f5e" },
+  "nvim-various-textobjs": { "branch": "main", "commit": "8dbc655f794202f45ab6a1cac1cb323a218ac6a1" },
   "obscure.nvim": { "branch": "main", "commit": "0e61b96a2c8551e73f8520b1f086d63f50d71bbd" },
   "octo.nvim": { "branch": "master", "commit": "418b9f7d35a1e5e940eeb636932b6217a67395ab" },
   "oil.nvim": { "branch": "master", "commit": "1fe476daf0b3c108cb8ee1fc1226cc282fa2c9c1" },

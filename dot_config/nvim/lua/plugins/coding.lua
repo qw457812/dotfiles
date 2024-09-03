@@ -120,6 +120,78 @@ return {
     opts = { use_default_keymaps = false, max_join_length = 150 },
   },
 
+  {
+    "chrisgrieser/nvim-various-textobjs",
+    keys = {
+      -- https://github.com/chrisgrieser/nvim-various-textobjs#smarter-gx
+      {
+        "gx",
+        function()
+          require("various-textobjs").url()
+          local foundURL = vim.fn.mode():find("v")
+          if foundURL then
+            local cache_z_reg = vim.fn.getreginfo("z")
+            vim.cmd.normal('"zy')
+            local url = vim.fn.getreg("z")
+            vim.fn.setreg("z", cache_z_reg)
+            vim.ui.open(url)
+          else
+            -- find all URLs in buffer
+            local urlPattern = require("various-textobjs.charwise-textobjs").urlPattern
+            local bufText = table.concat(vim.api.nvim_buf_get_lines(0, 0, -1, false), "\n")
+            local urls = {}
+            for url in bufText:gmatch(urlPattern) do
+              table.insert(urls, url)
+            end
+            if #urls == 0 then
+              return
+            end
+
+            -- select one, use a plugin like dressing.nvim for nicer UI for `vim.ui.select`
+            vim.ui.select(urls, { prompt = "Select URL:" }, function(choice)
+              if choice then
+                vim.ui.open(choice)
+              end
+            end)
+          end
+        end,
+        desc = "URL Opener",
+      },
+      -- https://github.com/chrisgrieser/nvim-various-textobjs#delete-surrounding-indentation
+      {
+        "mdi",
+        function()
+          -- select outer indentation
+          require("various-textobjs").indentation("outer", "outer")
+
+          -- plugin only switches to visual mode when a textobj has been found
+          local indentationFound = vim.fn.mode():find("V")
+          if not indentationFound then
+            return
+          end
+
+          -- dedent indentation
+          vim.cmd.normal({ "<", bang = true })
+
+          -- delete surrounding lines
+          local endBorderLn = vim.api.nvim_buf_get_mark(0, ">")[1]
+          local startBorderLn = vim.api.nvim_buf_get_mark(0, "<")[1]
+          vim.cmd(tostring(endBorderLn) .. " delete") -- delete end first so line index is not shifted
+          vim.cmd(tostring(startBorderLn) .. " delete")
+        end,
+        desc = "Delete Surrounding Indentation",
+      },
+    },
+  },
+  {
+    "folke/which-key.nvim",
+    opts = {
+      spec = {
+        { "gx", desc = "URL Opener" },
+      },
+    },
+  },
+
   -- alternative: gregorias/coerce.nvim
   -- https://github.com/yutkat/dotfiles/blob/2c95d4f42752c5c245d7642f5c2dbc326bd776c2/.config/nvim/lua/rc/pluginconfig/text-case.lua
   {
