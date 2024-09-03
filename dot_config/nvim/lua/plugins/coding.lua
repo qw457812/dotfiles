@@ -140,94 +140,94 @@ return {
   {
     "chrisgrieser/nvim-various-textobjs",
     vscode = true,
-    keys = {
-      -- stylua: ignore start
-      { "im", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").chainMember("inner")<CR>]], desc = "chain member .foo(param)" }, -- i.
-      { "am", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").chainMember("outer")<CR>]], desc = "chain member .foo(param)" }, -- a.
-      { "ik", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").key("inner")<CR>]], desc = "key-value, assignment" },
-      { "ak", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").key("outer")<CR>]], desc = "key-value, assignment" },
-      { "iv", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").value("inner")<CR>]], desc = "key-value, assignment" },
-      { "av", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").value("outer")<CR>]], desc = "key-value, assignment" },
-      -- { "U", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").url()<CR>]], desc = "url" },
-      { "il", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").url()<CR>]], desc = "url link" },
-      { "al", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").url()<CR>]], desc = "url link" },
-      -- markdown
-      { "il", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").mdlink("inner")<CR>]], desc = "md link [title](url)", ft = { "markdown", "toml" } },
-      { "al", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").mdlink("outer")<CR>]], desc = "md link [title](url)", ft = { "markdown", "toml" } },
-      -- TODO: https://github.com/chrisgrieser/nvim-various-textobjs/issues/78
-      { "iC", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").mdFencedCodeBlock("inner")<CR>]], desc = "md code block ```", ft = { "markdown" } },
-      { "aC", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").mdFencedCodeBlock("outer")<CR>]], desc = "md code block ```", ft = { "markdown" } },
-      { "iE", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").mdEmphasis("inner")<CR>]], desc = "md emphasis *_~=", ft = { "markdown" } },
-      { "aE", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").mdEmphasis("outer")<CR>]], desc = "md emphasis *_~=", ft = { "markdown" } },
-      -- python
-      { "iy", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").pyTripleQuotes("inner")<CR>]], desc = [[py triple quotes """]], ft = { "python" } },
-      { "ay", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").pyTripleQuotes("outer")<CR>]], desc = [[py triple quotes """]], ft = { "python" } },
-      -- lua, shell, org, neorg, markdown
-      { "iD", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").doubleSquareBrackets("inner")<CR>]], desc = "double square brackets [[]]", ft = { "lua", "org", "norg", "sh", "fish", "zsh", "bash", "markdown" } },
-      { "aD", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").doubleSquareBrackets("outer")<CR>]], desc = "double square brackets [[]]", ft = { "lua", "org", "norg", "sh", "fish", "zsh", "bash", "markdown" } },
-      -- shell
-      { "iP", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").shellPipe("inner")<CR>]], desc = "shell pipe |", ft = { "sh", "bash", "zsh", "fish" } },
-      { "aP", mode = { "o", "x" }, [[<cmd>lua require("various-textobjs").shellPipe("outer")<CR>]], desc = "shell pipe |", ft = { "sh", "bash", "zsh", "fish" } },
-      -- stylua: ignore end
-      -- https://github.com/chrisgrieser/nvim-various-textobjs#smarter-gx
-      {
-        "gx",
-        function()
-          require("various-textobjs").url()
-          local foundURL = vim.fn.mode():find("v")
-          if foundURL then
-            local cache_z_reg = vim.fn.getreginfo("z")
-            vim.cmd.normal('"zy')
-            local url = vim.fn.getreg("z")
-            vim.fn.setreg("z", cache_z_reg)
-            vim.ui.open(url)
-          else
-            -- find all URLs in buffer
-            local urlPattern = require("various-textobjs.charwise-textobjs").urlPattern
-            local bufText = table.concat(vim.api.nvim_buf_get_lines(0, 0, -1, false), "\n")
-            local urls = {}
-            for url in bufText:gmatch(urlPattern) do
-              table.insert(urls, url)
+    keys = function()
+      local keys = {
+        -- https://github.com/chrisgrieser/nvim-various-textobjs#smarter-gx
+        {
+          "gx",
+          function()
+            require("various-textobjs").url()
+            local foundURL = vim.fn.mode():find("v")
+            if foundURL then
+              local cache_z_reg = vim.fn.getreginfo("z")
+              vim.cmd.normal('"zy')
+              local url = vim.fn.getreg("z")
+              vim.fn.setreg("z", cache_z_reg)
+              vim.ui.open(url)
+            else
+              -- find all URLs in buffer
+              local urlPattern = require("various-textobjs.charwise-textobjs").urlPattern
+              local bufText = table.concat(vim.api.nvim_buf_get_lines(0, 0, -1, false), "\n")
+              local urls = {}
+              for url in bufText:gmatch(urlPattern) do
+                table.insert(urls, url)
+              end
+              if #urls == 0 then
+                return
+              end
+
+              -- select one, use a plugin like dressing.nvim for nicer UI for `vim.ui.select`
+              vim.ui.select(urls, { prompt = "Select URL:" }, function(choice)
+                if choice then
+                  vim.ui.open(choice)
+                end
+              end)
             end
-            if #urls == 0 then
+          end,
+          desc = "URL Opener",
+        },
+        -- https://github.com/chrisgrieser/nvim-various-textobjs#delete-surrounding-indentation
+        {
+          "mdi", -- :=LazyVim.opts("mini.surround").mappings.delete
+          function()
+            -- select outer indentation
+            require("various-textobjs").indentation("outer", "outer")
+            -- plugin only switches to visual mode when a textobj has been found
+            local indentationFound = vim.fn.mode():find("V")
+            if not indentationFound then
               return
             end
 
-            -- select one, use a plugin like dressing.nvim for nicer UI for `vim.ui.select`
-            vim.ui.select(urls, { prompt = "Select URL:" }, function(choice)
-              if choice then
-                vim.ui.open(choice)
-              end
-            end)
-          end
-        end,
-        desc = "URL Opener",
-      },
-      -- https://github.com/chrisgrieser/nvim-various-textobjs#delete-surrounding-indentation
-      {
-        "mdi", -- :=LazyVim.opts("mini.surround").mappings.delete
-        function()
-          -- select outer indentation
-          require("various-textobjs").indentation("outer", "outer")
+            -- dedent indentation
+            vim.cmd.normal({ "<", bang = true })
+            -- delete surrounding lines
+            local endBorderLn = vim.api.nvim_buf_get_mark(0, ">")[1]
+            local startBorderLn = vim.api.nvim_buf_get_mark(0, "<")[1]
+            vim.cmd(tostring(endBorderLn) .. " delete") -- delete end first so line index is not shifted
+            vim.cmd(tostring(startBorderLn) .. " delete")
+          end,
+          desc = "Delete Surrounding Indentation",
+        },
+        -- { "U", [[<cmd>lua require("various-textobjs").url()<CR>]], mode = { "o", "x" }, desc = "url" },
+      }
 
-          -- plugin only switches to visual mode when a textobj has been found
-          local indentationFound = vim.fn.mode():find("V")
-          if not indentationFound then
-            return
-          end
+      -- stylua: ignore
+      local ai_textobjs = {
+        { name = "chainMember",          map = "m", desc = "chain member .foo(param)" }, -- map = "."
+        { name = "key",                  map = "k", desc = "key-value, assignment" },
+        { name = "value",                map = "v", desc = "key-value, assignment" },
+        { name = "url",                  map = "l", desc = "url link" },
+        -- markdown
+        { name = "mdlink",               map = "l", desc = "md link [title](url)",   ft = { "markdown", "toml" } },
+        { name = "mdFencedCodeBlock",    map = "C", desc = "md code block ```",      ft = "markdown" },
+        { name = "mdEmphasis",           map = "E", desc = "md emphasis *_~=",       ft = "markdown" },
+        -- python
+        { name = "pyTripleQuotes",       map = "y", desc = [[py triple quotes """]], ft = "python" },
+        -- lua, shell, org, neorg, markdown
+        { name = "doubleSquareBrackets", map = "D", desc = "[[]] block",             ft = { "lua", "sh", "bash", "zsh", "fish", "org", "norg", "markdown" } },
+        -- shell
+        { name = "shellPipe",            map = "P", desc = "shell pipe |",           ft = { "sh", "bash", "zsh", "fish" } },
+      }
 
-          -- dedent indentation
-          vim.cmd.normal({ "<", bang = true })
-
-          -- delete surrounding lines
-          local endBorderLn = vim.api.nvim_buf_get_mark(0, ">")[1]
-          local startBorderLn = vim.api.nvim_buf_get_mark(0, "<")[1]
-          vim.cmd(tostring(endBorderLn) .. " delete") -- delete end first so line index is not shifted
-          vim.cmd(tostring(startBorderLn) .. " delete")
-        end,
-        desc = "Delete Surrounding Indentation",
-      },
-    },
+      for _, tobj in pairs(ai_textobjs) do
+        -- stylua: ignore
+        vim.list_extend(keys, {
+          { "a" .. tobj.map, [[<cmd>lua require("various-textobjs").]] .. tobj.name .. [[("outer")<CR>]], mode = { "o", "x" }, desc = tobj.desc, ft = tobj.ft },
+          { "i" .. tobj.map, [[<cmd>lua require("various-textobjs").]] .. tobj.name .. [[("inner")<CR>]], mode = { "o", "x" }, desc = tobj.desc, ft = tobj.ft },
+        })
+      end
+      return keys
+    end,
   },
   {
     "folke/which-key.nvim",
@@ -271,13 +271,9 @@ return {
 
   {
     "dmtrKovalenko/caps-word.nvim",
-    lazy = true,
     keys = {
-      {
-        mode = { "i", "n" },
-        "<A-c>",
-        "<cmd>lua require('caps-word').toggle()<CR>",
-      },
+      -- stylua: ignore
+      { "<A-c>", "<cmd>lua require('caps-word').toggle()<CR>", mode = { "i", "n" }, desc = "Toggle Caps Word" },
     },
     opts = {
       enter_callback = function()
