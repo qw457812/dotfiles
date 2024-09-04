@@ -1,9 +1,9 @@
 local Config = require("lazy.core.config")
 local replace_home = require("util.path").replace_home_with_tilde
 
-local have_chezmoi = LazyVim.has_extra("util.chezmoi") and vim.fn.executable("chezmoi") == 1
+local has_chezmoi = LazyVim.has_extra("util.chezmoi") and vim.fn.executable("chezmoi") == 1
 local chezmoi_source_path = "~/.local/share/chezmoi"
-local config_path = have_chezmoi and chezmoi_source_path .. "/dot_config/nvim" or vim.fn.stdpath("config") --[[@as string]]
+local config_path = has_chezmoi and chezmoi_source_path .. "/dot_config/nvim" or vim.fn.stdpath("config") --[[@as string]]
 local lazyvim_path = Config.options.root .. "/LazyVim"
 
 -- https://github.com/folke/dot/blob/master/nvim/lua/plugins/telescope.lua

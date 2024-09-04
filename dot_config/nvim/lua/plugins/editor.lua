@@ -314,14 +314,12 @@ return {
     optional = true,
     opts = function(_, opts)
       opts.mappings = vim.tbl_deep_extend("force", opts.mappings or {}, {
-        go_in = "L",
+        go_in = "",
+        go_out = "",
         go_in_plus = "l", -- go_in + close explorer after opening a file
-        go_out = "H",
         go_out_plus = "h", -- go_out + trim right part of branch
         -- -- don't use `h`/`l` for easier cursor navigation during text edit
-        -- go_in = "",
         -- go_in_plus = "L",
-        -- go_out = "",
         -- go_out_plus = "H",
       })
       -- opts.windows = vim.tbl_deep_extend("force", opts.windows or {}, {
@@ -338,6 +336,33 @@ return {
           vim.keymap.set("n", "<leader>fs", function() require("mini.files").synchronize() end, { buffer = buf_id, desc = "Synchronize (mini.files)" })
           vim.keymap.set("n", "<C-s>", function() require("mini.files").synchronize() end, { buffer = buf_id, desc = "Synchronize (mini.files)" })
           -- stylua: ignore end
+          -- cursor navigation during text edit
+          vim.keymap.set("n", "H", "h", { buffer = buf_id, desc = "<Left>" })
+          vim.keymap.set("n", "L", "l", { buffer = buf_id, desc = "<Right>" })
+        end,
+      })
+
+      -- set custom bookmarks
+      local set_mark = function(id, path, desc)
+        MiniFiles.set_bookmark(id, path, { desc = desc })
+      end
+      -- TODO: duplicate code with telescope.lua
+      local has_chezmoi = LazyVim.has_extra("util.chezmoi") and vim.fn.executable("chezmoi") == 1
+      local chezmoi_source_path = "~/.local/share/chezmoi"
+      local config_path = has_chezmoi and chezmoi_source_path .. "/dot_config/nvim" or vim.fn.stdpath("config")
+      local lazyvim_path = require("lazy.core.config").options.root .. "/LazyVim"
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "MiniFilesExplorerOpen",
+        callback = function()
+          set_mark("c", config_path, "Config") -- path
+          set_mark("w", vim.fn.getcwd, "cwd") -- callable
+          set_mark("h", "~", "Home")
+          -- stylua: ignore
+          set_mark("r", function() return LazyVim.root.get({ normalize = true }) end, "Root")
+          set_mark("l", lazyvim_path, "LazyVim")
+          if has_chezmoi then
+            set_mark("z", chezmoi_source_path, "Chezmoi")
+          end
         end,
       })
     end,
