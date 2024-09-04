@@ -198,7 +198,7 @@ return {
           end,
           desc = "Delete Surrounding Indentation",
         },
-        -- { "U", [[<cmd>lua require("various-textobjs").url()<CR>]], mode = { "o", "x" }, desc = "url" },
+        -- { "U", [[<cmd>lua require("various-textobjs").url()<CR>]], mode = { "o", "x" }, desc = "url" }, -- conflict with gUU
       }
 
       -- stylua: ignore
