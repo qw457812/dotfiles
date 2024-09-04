@@ -59,7 +59,7 @@ vim.api.nvim_create_autocmd("FileType", {
   --   "lazy",
   -- }, wrap_spell_pattern),
   pattern = {
-    "lazy", -- Lazy Extras
+    "lazy", -- Lazy Extras, alternative: https://github.com/aimuzov/LazyVimx/blob/00d45b2d746c36101b4cf1c5fe0b46d53cb6774a/lua/lazyvimx/extras/hacks/lazyvim-remove-extras-title.lua
   },
   callback = function()
     vim.defer_fn(function()
