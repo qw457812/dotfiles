@@ -347,8 +347,10 @@ return {
         MiniFiles.set_bookmark(id, path, { desc = desc })
       end
       -- TODO: duplicate code with telescope.lua
-      local has_chezmoi = LazyVim.has_extra("util.chezmoi") and vim.fn.executable("chezmoi") == 1
       local chezmoi_source_path = "~/.local/share/chezmoi"
+      local has_chezmoi = LazyVim.has_extra("util.chezmoi")
+        and vim.fn.executable("chezmoi") == 1
+        and vim.fn.isdirectory(chezmoi_source_path) == 1
       local config_path = has_chezmoi and chezmoi_source_path .. "/dot_config/nvim" or vim.fn.stdpath("config")
       local lazyvim_path = require("lazy.core.config").options.root .. "/LazyVim"
       vim.api.nvim_create_autocmd("User", {
