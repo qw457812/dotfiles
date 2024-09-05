@@ -104,7 +104,7 @@ local pick_config = function()
 end
 
 return {
-  -- TODO: After discard changes in lazygit, chezmoi apply does not work.
+  -- TODO: How to trigger chezmoi apply after discard changes in lazygit?
   {
     "xvzc/chezmoi.nvim",
     optional = true,
@@ -113,6 +113,20 @@ return {
       { "<leader>f.", pick_chezmoi, desc = "Find Chezmoi Source Dotfiles" },
       { "<leader>fc", pick_config, desc = "Find Config File" },
     },
+    init = function()
+      -- run chezmoi edit on file enter
+      -- https://github.com/xvzc/chezmoi.nvim/pull/20
+      vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+        pattern = { os.getenv("HOME") .. "/.local/share/chezmoi/*" },
+        callback = function(event)
+          local bufnr = event.buf
+          local edit_watch = function()
+            require("chezmoi.commands.__edit").watch(bufnr)
+          end
+          vim.schedule(edit_watch)
+        end,
+      })
+    end,
   },
 
   {

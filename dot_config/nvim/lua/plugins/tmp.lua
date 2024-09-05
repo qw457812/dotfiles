@@ -129,18 +129,6 @@ return {
     },
   },
 
-  -- -- https://github.com/sxyazi/dotfiles/blob/18ce3eda7792df659cb248d9636b8d7802844831/nvim/lua/plugins/ui.lua#L646
-  -- {
-  --   "mikavilpas/yazi.nvim",
-  --   keys = {
-  --     { "<leader>-", "<cmd>Yazi<cr>", desc = "Open yazi at the current file" },
-  --   },
-  --   opts = {
-  --     use_ya_for_events_reading = true,
-  --     use_yazi_client_id_flag = true,
-  --   },
-  -- },
-
   -- {
   --   "akinsho/toggleterm.nvim",
   --   version = "*",

@@ -2,6 +2,8 @@ if not vim.g.vscode or not LazyVim.has_extra("vscode") then
   return {}
 end
 
+local vscode = require("vscode")
+
 ---@param mode string|string[]
 ---@param lhs string
 ---@param rhs string|function
@@ -17,7 +19,15 @@ end
 ---@param command string
 ---@param opts? vim.keymap.set.Opts
 local function vscode_map(mode, key, command, opts)
-  map(mode, key, "<cmd>call VSCodeNotify('" .. command .. "')<cr>", opts)
+  -- https://github.com/vscode-neovim/vscode-neovim#%EF%B8%8F-api
+  -- stylua: ignore
+  map(mode, key, function() vscode.action(command) end, opts)
+end
+
+-- https://github.com/LazyVim/LazyVim/pull/4392
+function LazyVim.terminal()
+  -- workbench.action.terminal.focus
+  require("vscode").action("workbench.action.terminal.toggleTerminal")
 end
 
 vim.api.nvim_create_autocmd("User", {
@@ -40,7 +50,7 @@ vim.api.nvim_create_autocmd("User", {
     vscode_map("n", "<leader>e", "workbench.view.explorer", { desc = "Explorer" })
     vscode_map("n", "<leader>:", "workbench.action.showCommands", { desc = "All Commands" })
     vscode_map("n", "<leader>,", "workbench.action.showAllEditors", { desc = "All Editors" })
-    vscode_map("n", "<leader>.", "workbench.action.terminal.focus", { desc = "Terminal" })
+    -- vscode_map("n", "<leader>.", "workbench.action.terminal.focus", { desc = "Terminal" })
 
     vscode_map("n", "<leader>bd", "workbench.action.closeActiveEditor", { desc = "Close Editor" })
     vscode_map("n", "<leader>bo", "workbench.action.closeOtherEditors", { desc = "Close Other Editors" })
@@ -50,7 +60,7 @@ vim.api.nvim_create_autocmd("User", {
     vscode_map("n", "<leader>fc", "workbench.action.openSettingsJson", { desc = "Config File: Settings" })
     vscode_map("n", "<leader>fk", "workbench.action.openGlobalKeybindingsFile", { desc = "Config File: Keybindings" })
     vscode_map("n", "<leader>fn", "workbench.action.files.newUntitledFile", { desc = "New File" })
-    vscode_map("n", "<leader>ft", "workbench.action.terminal.focus", { desc = "Terminal" })
+    -- vscode_map("n", "<leader>ft", "workbench.action.terminal.focus", { desc = "Terminal" })
     vscode_map("n", "<leader>fr", "workbench.action.showAllEditorsByMostRecentlyUsed", { desc = "Recent" }) -- workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup
     vscode_map("n", "<leader>fy", "workbench.action.files.copyPathOfActiveFile", { desc = "Yank file path" })
     vscode_map("n", "<leader>fY", "copyRelativeFilePath", { desc = "Yank file path from project" })
