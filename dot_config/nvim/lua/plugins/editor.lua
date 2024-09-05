@@ -417,7 +417,8 @@ return {
       PAGER_MODE:keymaps({
         n = {
           { "u", "<C-u>", { desc = "Scroll Up" } },
-          { "d", "<C-d>", { desc = "Scroll Down", nowait = true } },
+          -- { "d", "<C-d>", { desc = "Scroll Down", nowait = true } },
+          { "d", "<C-d>", { desc = "Scroll Down" } },
           -- stylua: ignore
           { "<esc>", function() PAGER_MODE:deactivate() end, { desc = "Exit" } },
         },
@@ -449,7 +450,7 @@ return {
   {
     "mikavilpas/yazi.nvim",
     keys = {
-      { "<leader><cr>", "<cmd>Yazi<cr>", desc = "Open yazi at the current file" },
+      { "<leader><cr>", "<cmd>Yazi<cr>", desc = "Yazi (Buffer Dir)" },
     },
     opts = function()
       vim.api.nvim_create_autocmd("TermOpen", {

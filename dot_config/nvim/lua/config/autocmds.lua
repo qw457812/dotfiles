@@ -80,7 +80,8 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 -- make it easier to scroll man/help files when opened inline with `<leader>sM`, `<leader>sh`, `:h`
--- TODO: maybe for all non-modifiable/readonly buffers?
+-- maybe use BufRead/BufReadPost to map/safe_map(tzachar/highlight-undo.nvim?) `u`/`d` for all non-modifiable/readonly buffers?
+-- for safe_map, check `LazyVim.safe_keymap_set` or `vim.tbl_isempty(vim.fn.maparg("u", "n", false, true))`
 vim.api.nvim_create_autocmd("FileType", {
   pattern = { "man", "help" },
   callback = function(event)
