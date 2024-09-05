@@ -5,7 +5,7 @@ table.insert(render_markdown_ft, "Avante")
 return {
   {
     "yetone/avante.nvim",
-    build = ":AvanteBuild",
+    build = "make",
     dependencies = {
       "stevearc/dressing.nvim",
       "MunifTanjim/nui.nvim",
@@ -44,27 +44,37 @@ return {
         ft = render_markdown_ft,
       },
     },
-    -- stylua: ignore
-    keys = {
-      { "<leader>aa", mode = { "n", "v" }, function() require("avante.api").ask() end, desc = "Ask (Avante)" },
-      { "<leader>ar", function() require("avante.api").refresh() end, desc = "Refresh (Avante)" },
-      { "<leader>ae", mode = "v", function() require("avante.api").edit() end, desc = "Edit (Avante)" },
-      {
-        "<leader>aP",
-        function()
-          -- https://github.com/yetone/avante.nvim/blob/962dd0a759d9cba7214dbc954780c5ada5799449/lua/avante/init.lua#L47
-          vim.ui.select(require("avante.config").providers, { prompt = "Select Avante Provider:" }, function(choice)
-            if choice then
-              require("avante.api").switch_provider(choice)
-            end
-          end)
-        end,
-        desc = "Switch Provider (Avante)",
-      },
-    },
+    -- https://github.com/yetone/avante.nvim/wiki#keymaps-and-api-i-guess
+    -- ~/.local/share/nvim/lazy/avante.nvim/lua/avante/init.lua
+    keys = function(_, keys)
+      local opts_mappings = LazyVim.opts("avante.nvim").mappings or {}
+      -- stylua: ignore
+      local mappings = {
+        { opts_mappings.ask or "<leader>aa", mode = { "n", "v" }, function() require("avante.api").ask() end, desc = "Ask (Avante)" },
+        { opts_mappings.edit or "<leader>ae", mode = "v", function() require("avante.api").edit() end, desc = "Edit (Avante)" },
+        { opts_mappings.refresh or "<leader>ar", function() require("avante.api").refresh() end, desc = "Refresh (Avante)" },
+        {
+          "<leader>aP",
+          function()
+            -- https://github.com/yetone/avante.nvim/blob/962dd0a759d9cba7214dbc954780c5ada5799449/lua/avante/init.lua#L47
+            vim.ui.select(require("avante.config").providers, { prompt = "Select Avante Provider:" }, function(choice)
+              if choice then
+                require("avante.api").switch_provider(choice)
+              end
+            end)
+          end,
+          desc = "Switch Provider (Avante)",
+        },
+      }
+      vim.list_extend(keys, mappings)
+    end,
     opts = {
-      provider = "copilot", -- claude(recommend), openai, azure, gemini, cohere, copilot
-      -- provider = "groq",
+      mappings = {
+        toggle = {
+          debug = "<leader>aD",
+        },
+      },
+      provider = "copilot", -- claude(recommend), openai, azure, gemini, cohere, copilot, groq(custom)
       -- https://github.com/yetone/avante.nvim/wiki#custom-providers
       vendors = {
         ---@type AvanteProvider
