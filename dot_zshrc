@@ -224,9 +224,13 @@ export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 # outline via `gO`, copy via `y`
 # export MANPAGER='nvim +Man!'
 man() {
-    # MANPAGER='nvim +Man!' man "$1"
+    # MANPAGER='nvim +Man!' command man "$1"
+    MANPAGER='nvim -c "nnoremap d <C-d>|lua vim.defer_fn(function() vim.api.nvim_command(\"silent! nunmap dd|nnoremap u <C-u>\") end, 500)" +Man!' command man "$1"
     # alternative
-    nvim "+hide Man $1"
+    # nvim "+hide Man $1"
+    # see `:verbose nmap u`(tzachar/highlight-undo.nvim), `:verbose nmap d`(Don't Yank Empty Line, `dd` defined in keymaps.lua), `:verbose nmap q`(ftplugin/man.vim)
+    # TODO: use autocmd to `nunmap <buffer> q` when jump to another man page by `K` (BufReadPost not triggered)
+    # nvim -c "nnoremap <silent> q :q<CR>|nnoremap d <C-d>|lua vim.defer_fn(function() vim.api.nvim_command('silent! nunmap dd|nnoremap u <C-u>|silent! nunmap <buffer> q') end, 500)" "+hide Man $1"
 }
 # plain: disables all available components. | bat --help
 export BAT_STYLE="plain"
