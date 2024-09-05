@@ -79,6 +79,25 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
+-- make it easier to scroll man/help files when opened inline with `<leader>sM`, `<leader>sh`, `:h`
+-- TODO: maybe for all non-modifiable/readonly buffers?
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "man", "help" },
+  callback = function(event)
+    local buf = event.buf
+    -- don't change the keymaps for help files that we're editing
+    if vim.bo[buf].filetype == "help" and vim.bo[buf].buftype ~= "help" then
+      return
+    end
+    -- note that /etc/hosts (vim.bo.readonly == true) can be changed with warning "Changing a readonly file", but files where vim.bo.modifiable == false can't
+    if vim.bo[buf].modifiable == false or vim.bo[buf].readonly == true then
+      vim.keymap.set("n", "u", "<C-u>", { buffer = buf, silent = true, desc = "Scroll Up" })
+      -- add `nowait = true` since we have a `dd` mapping defined in keymaps.lua
+      vim.keymap.set("n", "d", "<C-d>", { buffer = buf, silent = true, desc = "Scroll Down", nowait = true })
+    end
+  end,
+})
+
 -- -- close some filetypes with <q>
 -- -- see also: ../plugins/close.lua
 -- -- https://github.com/appelgriebsch/Nv/blob/main/lua/config/autocmds.lua

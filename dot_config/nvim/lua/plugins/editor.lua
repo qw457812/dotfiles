@@ -396,6 +396,7 @@ return {
   --   end,
   -- },
 
+  -- alternative: https://github.com/xzbdmw/nvimconfig/blob/0be9805dac4661803e17265b435060956daee757/lua/theme/dark.lua#L23
   {
     "LazyVim/LazyVim",
     dependencies = {
@@ -416,7 +417,7 @@ return {
       PAGER_MODE:keymaps({
         n = {
           { "u", "<C-u>", { desc = "Scroll Up" } },
-          { "d", "<C-d>", { desc = "Scroll Down" } },
+          { "d", "<C-d>", { desc = "Scroll Down", nowait = true } },
           -- stylua: ignore
           { "<esc>", function() PAGER_MODE:deactivate() end, { desc = "Exit" } },
         },
@@ -441,6 +442,30 @@ return {
           vim.g.minianimate_disable = orig_minianimate_disable
         end
       end)
+    end,
+  },
+
+  -- https://github.com/sxyazi/dotfiles/blob/18ce3eda7792df659cb248d9636b8d7802844831/nvim/lua/plugins/ui.lua#L646
+  {
+    "mikavilpas/yazi.nvim",
+    keys = {
+      { "<leader><cr>", "<cmd>Yazi<cr>", desc = "Open yazi at the current file" },
+    },
+    opts = function()
+      vim.api.nvim_create_autocmd("TermOpen", {
+        callback = function(event)
+          local buf = event.buf
+          if vim.bo[buf].filetype == "yazi" then
+            -- esc_esc = false
+            vim.keymap.set("t", "<esc>", "<esc>", { buffer = buf, nowait = true })
+            -- ctrl_hjkl = false
+            vim.keymap.set("t", "<c-h>", "<c-h>", { buffer = buf, nowait = true })
+            vim.keymap.set("t", "<c-j>", "<c-j>", { buffer = buf, nowait = true })
+            vim.keymap.set("t", "<c-k>", "<c-k>", { buffer = buf, nowait = true })
+            vim.keymap.set("t", "<c-l>", "<c-l>", { buffer = buf, nowait = true })
+          end
+        end,
+      })
     end,
   },
 
