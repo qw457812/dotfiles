@@ -347,7 +347,7 @@ return {
         MiniFiles.set_bookmark(id, path, { desc = desc })
       end
       -- TODO: duplicate code with telescope.lua
-      local chezmoi_source_path = "~/.local/share/chezmoi"
+      local chezmoi_source_path = os.getenv("HOME") .. "/.local/share/chezmoi"
       local has_chezmoi = LazyVim.has_extra("util.chezmoi")
         and vim.fn.executable("chezmoi") == 1
         and vim.fn.isdirectory(chezmoi_source_path) == 1
