@@ -91,13 +91,11 @@ return {
           end,
           desc = "Explorer NeoTree (Root Dir)",
         },
-        {
-          "<leader>fE",
-          function()
-            require("neo-tree.command").execute({ dir = vim.uv.cwd() })
-          end,
-          desc = "Explorer NeoTree (cwd)",
-        },
+        -- stylua: ignore start
+        { "<leader>fE", function() require("neo-tree.command").execute({ dir = vim.uv.cwd() }) end, desc = "Explorer NeoTree (cwd)" },
+        -- { "<leader>ge", function() require("neo-tree.command").execute({ source = "git_status" }) end, desc = "Git Explorer" },
+        -- { "<leader>be", function() require("neo-tree.command").execute({ source = "buffers" }) end, desc = "Buffer Explorer" },
+        -- stylua: ignore end
         { "<leader>ge", false },
         { "<leader>be", false },
       }
@@ -138,14 +136,112 @@ return {
         unfocus_window = function(state)
           vim.cmd.wincmd(state.current_position == "left" and "l" or "p")
         end,
-        close_or_unfocus_window = function(state)
+        close_or_unfocus = function(state)
           state.commands[vim.g.user_neotree_auto_close and "close_window" or "unfocus_window"](state)
+        end,
+        cancel_or_close_or_unfocus = function(state)
+          local preview = require("neo-tree.sources.common.preview")
+          -- copied from: https://github.com/nvim-neo-tree/neo-tree.nvim/blob/206241e451c12f78969ff5ae53af45616ffc9b72/lua/neo-tree/sources/common/commands.lua#L653
+          local has_preview = preview.is_active()
+          local has_floating = state.current_position == "float"
+          local has_filter = state.name == "filesystem" and state.search_pattern ~= nil
+          if has_preview or has_floating or has_filter then
+            -- original behavior of <esc> is `cancel`: close preview or floating neo-tree window
+            -- require("neo-tree.sources.common.commands").cancel(state)
+            if has_preview then
+              preview.hide()
+            end
+            if has_floating then
+              require("neo-tree.ui.renderer").close_all_floating_windows()
+            end
+            if has_filter then
+              require("neo-tree.sources.filesystem.commands").clear_filter(state)
+            end
+          else
+            -- close_or_unfocus if nothing to do
+            -- like Lazygit's `quitOnTopLevelReturn`: https://github.com/jesseduffield/lazygit/blob/753b16b6970dbfcbe2c4349bbcdea85587ea51f7/docs/Config.md?plain=1#L386
+            state.commands["close_or_unfocus"](state)
+          end
+        end,
+        -- https://github.com/AstroNvim/AstroNvim/blob/c7abf1c198f633574060807a181c6ce4d1c53a2c/lua/astronvim/plugins/neo-tree.lua#L113
+        parent_or_close = function(state)
+          local node = state.tree:get_node()
+          if node:has_children() and node:is_expanded() then
+            state.commands.toggle_node(state)
+          else
+            require("neo-tree.ui.renderer").focus_node(state, node:get_parent_id())
+          end
+        end,
+        child_or_open = function(state)
+          local node = state.tree:get_node()
+          if node:has_children() then
+            if not node:is_expanded() then -- if unexpanded, expand
+              state.commands.toggle_node(state)
+            else -- if expanded and has children, seleect the next child
+              if node.type == "file" then
+                state.commands.open(state)
+              else
+                require("neo-tree.ui.renderer").focus_node(state, node:get_child_ids()[1])
+              end
+            end
+          else -- if has no children
+            state.commands.open(state)
+          end
+        end,
+        copy_selector = function(state)
+          local node = state.tree:get_node()
+          local filepath = node:get_id()
+          local filename = node.name
+          local modify = vim.fn.fnamemodify
+
+          local vals = {
+            ["BASENAME"] = modify(filename, ":r"),
+            ["EXTENSION"] = modify(filename, ":e"),
+            ["FILENAME"] = filename,
+            ["PATH (CWD)"] = modify(filepath, ":."),
+            ["PATH (HOME)"] = modify(filepath, ":~"),
+            ["PATH"] = filepath,
+            ["URI"] = vim.uri_from_fname(filepath),
+          }
+
+          local options = vim.tbl_filter(function(val)
+            return vals[val] ~= ""
+          end, vim.tbl_keys(vals))
+          if vim.tbl_isempty(options) then
+            LazyVim.warn("No values to copy", { title = "Neo-tree" })
+            return
+          end
+          table.sort(options)
+          vim.ui.select(options, {
+            prompt = "Choose to copy to clipboard:",
+            format_item = function(item)
+              return ("%s: %s"):format(item, vals[item])
+            end,
+          }, function(choice)
+            local result = vals[choice]
+            if result then
+              LazyVim.info(("Copied: `%s`"):format(result), { title = "Neo-tree" })
+              vim.fn.setreg("+", result)
+            end
+          end)
+        end,
+        find_in_dir = function(state)
+          local node = state.tree:get_node()
+          local path = node.type == "file" and node:get_parent_id() or node:get_id()
+          LazyVim.pick("files", { cwd = path })()
         end,
       },
       window = {
         mappings = {
-          ["-"] = "close_or_unfocus_window", -- toggle neo-tree, work with `-` defined in `keys` above
-          -- ["<bs>"] = "none", -- see: close.lua
+          ["-"] = "close_or_unfocus", -- toggle neo-tree, work with `-` defined in `keys` above
+          ["<esc>"] = {
+            "cancel_or_close_or_unfocus",
+            desc = "cancel / close_or_unfocus",
+          },
+          ["h"] = "parent_or_close",
+          ["l"] = "child_or_open",
+          ["Y"] = "copy_selector",
+          ["F"] = "find_in_dir",
           ["<tab>"] = {
             function(state)
               local node = state.tree:get_node()
@@ -158,6 +254,10 @@ return {
             end,
             desc = "Open without focus",
           },
+        },
+        fuzzy_finder_mappings = { -- define keymaps for filter popup window in fuzzy_finder_mode
+          ["<C-j>"] = "move_cursor_down",
+          ["<C-k>"] = "move_cursor_up",
         },
       },
       filesystem = {
@@ -178,12 +278,22 @@ return {
         -- possible values: "open_default" (default), "open_current", "disabled"
         -- hijack_netrw_behavior = "disabled", -- netrw left alone, neo-tree does not handle opening dirs
         window = {
-          -- TODO: unify the keybindings of https://github.com/vifm/vifm and neo-tree.nvim (or telescope-file-browser.nvim)
+          -- TODO: unify the keybindings of vifm (or yazi) and neo-tree.nvim (or telescope-file-browser.nvim)
           -- https://github.com/craftzdog/dotfiles-public/blob/bf837d867b1aa153cbcb2e399413ec3bdcce112b/.config/nvim/lua/plugins/editor.lua#L58
           -- https://github.com/jacquin236/minimal-nvim/blob/baacb78adce67d704d17c3ad01dd7035c5abeca3/lua/plugins/editor/telescope-extras.lua#L3
           mappings = {
+            -- ["<esc>"] = {
+            --   function(state)
+            --     require("neo-tree.sources.common.commands").cancel(state) -- close preview or floating neo-tree window
+            --     require("neo-tree.sources.filesystem.commands").clear_filter(state)
+            --   end,
+            --   desc = "cancel + clear_filter",
+            -- },
+            ["<esc>"] = {
+              "cancel_or_close_or_unfocus",
+              desc = "(cancel + clear_filter) / close_or_unfocus",
+            },
             -- https://github.com/nvim-neo-tree/neo-tree.nvim/wiki/Tips#navigation-with-hjkl
-            -- TODO: same behavior hjkl navigation, <esc> unfocus for buffers and git_status
             ["h"] = {
               function(state)
                 local node = state.tree:get_node()
@@ -211,40 +321,6 @@ return {
                 end
               end,
               desc = "expand node / focus first child / open",
-            },
-            -- ["<esc>"] = {
-            --   function(state)
-            --     require("neo-tree.sources.common.commands").cancel(state) -- close preview or floating neo-tree window
-            --     require("neo-tree.sources.filesystem.commands").clear_filter(state)
-            --   end,
-            --   desc = "cancel + clear_filter",
-            -- },
-            ["<esc>"] = {
-              function(state)
-                local preview = require("neo-tree.sources.common.preview")
-                -- copied from: https://github.com/nvim-neo-tree/neo-tree.nvim/blob/206241e451c12f78969ff5ae53af45616ffc9b72/lua/neo-tree/sources/common/commands.lua#L653
-                local has_preview = preview.is_active()
-                local has_floating = state.current_position == "float"
-                local has_filter = state.search_pattern ~= nil
-                if has_preview or has_floating or has_filter then
-                  -- original behavior of <esc> is `cancel`: close preview or floating neo-tree window
-                  -- require("neo-tree.sources.common.commands").cancel(state)
-                  if has_preview then
-                    preview.hide()
-                  end
-                  if has_floating then
-                    require("neo-tree.ui.renderer").close_all_floating_windows()
-                  end
-                  if has_filter then
-                    require("neo-tree.sources.filesystem.commands").clear_filter(state)
-                  end
-                else
-                  -- close_or_unfocus_window if nothing to do
-                  -- like Lazygit's `quitOnTopLevelReturn`: https://github.com/jesseduffield/lazygit/blob/753b16b6970dbfcbe2c4349bbcdea85587ea51f7/docs/Config.md?plain=1#L386
-                  state.commands["close_or_unfocus_window"](state)
-                end
-              end,
-              desc = "(cancel + clear_filter) / close_or_unfocus_window",
             },
           },
         },
