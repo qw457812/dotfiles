@@ -7,6 +7,7 @@ return {
   -- https://github.com/aimuzov/LazyVimx/blob/789dafed84f6f61009f13b4054f12208842df225/lua/lazyvimx/extras/ui/panels/explorer.lua
   {
     "nvim-neo-tree/neo-tree.nvim",
+    dependencies = { "echasnovski/mini.icons" },
     keys = function(_, keys)
       LazyVim.toggle.map("<leader>uz", {
         name = "NeoTree Auto Close",
@@ -111,6 +112,27 @@ return {
     opts = {
       sources = { "filesystem" },
       close_if_last_window = true, -- close Neo-tree if it is the last window left in the tab
+      default_component_configs = {
+        -- use mini.icons instead of nvim-web-devicons
+        -- https://github.com/nvim-neo-tree/neo-tree.nvim/pull/1527#issuecomment-2233186777
+        icon = {
+          provider = function(icon, node)
+            if node.type == "file" or node.type == "directory" then
+              local text, hl = require("mini.icons").get(node.type, node.name)
+              icon.highlight = hl
+              -- for directory, only set the icon text if it is not expanded
+              if node.type == "file" or not node:is_expanded() then
+                icon.text = text
+              end
+            end
+          end,
+        },
+        kind_icon = {
+          provider = function(icon, node)
+            icon.text, icon.highlight = require("mini.icons").get("lsp", node.extra.kind.name)
+          end,
+        },
+      },
       commands = {
         unfocus_window = function()
           vim.cmd("wincmd p")
