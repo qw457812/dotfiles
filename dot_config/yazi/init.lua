@@ -2,6 +2,14 @@
 require("full-border"):setup()
 -- https://github.com/yazi-rs/plugins/tree/main/git.yazi
 require("git"):setup()
+-- https://github.com/llanosrocas/githead.yazi
+require("githead"):setup({
+	-- eza style
+	branch_prefix = "",
+	branch_color = "#54d100",
+	branch_symbol = "",
+	branch_borders = "",
+})
 -- https://github.com/dedukun/bookmarks.yazi
 require("bookmarks"):setup({
 	last_directory = { enable = true, persist = false },
@@ -14,3 +22,4 @@ require("bookmarks"):setup({
 -- TODO:
 -- https://github.com/Matt-FTW/dotfiles/blob/main/.config/yazi/init.lua
 -- https://github.com/llanosrocas/yaziline.yazi
+-- https://github.com/yazi-rs/plugins/tree/main/mactag.yazi
