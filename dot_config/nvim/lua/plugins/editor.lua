@@ -217,6 +217,7 @@ return {
                   end
                 else
                   -- close_or_unfocus_window if nothing to do
+                  -- like Lazygit's `quitOnTopLevelReturn`: https://github.com/jesseduffield/lazygit/blob/753b16b6970dbfcbe2c4349bbcdea85587ea51f7/docs/Config.md?plain=1#L386
                   state.commands["close_or_unfocus_window"](state)
                 end
               end,
