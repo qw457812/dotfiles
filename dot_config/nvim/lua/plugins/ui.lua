@@ -282,6 +282,7 @@ return {
 
       for _, view in ipairs(opts.left or {}) do
         if view.ft == "neo-tree" then
+          view.size = { width = 40 }
           view.title = "Neo-Tree"
           break
         end
