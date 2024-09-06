@@ -25,6 +25,7 @@ return {
         {
           "<leader>fe",
           function()
+            -- https://github.com/AstroNvim/AstroNvim/blob/c7abf1c198f633574060807a181c6ce4d1c53a2c/lua/astronvim/plugins/neo-tree.lua#L14
             if vim.bo.filetype == "neo-tree" then
               if vim.g.user_neotree_auto_close then
                 require("neo-tree.command").execute({ action = "close" })
@@ -134,8 +135,8 @@ return {
         },
       },
       commands = {
-        unfocus_window = function()
-          vim.cmd("wincmd p")
+        unfocus_window = function(state)
+          vim.cmd.wincmd(state.current_position == "left" and "l" or "p")
         end,
         close_or_unfocus_window = function(state)
           state.commands[vim.g.user_neotree_auto_close and "close_window" or "unfocus_window"](state)
