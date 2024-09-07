@@ -407,6 +407,16 @@ return {
   },
 
   {
+    "OXY2DEV/helpview.nvim",
+    lazy = false,
+    -- ft = "help",
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    keys = {
+      { "<leader>uH", "<cmd>Helpview toggleAll<cr>", desc = "Helpview" },
+    },
+  },
+
+  {
     "tzachar/highlight-undo.nvim",
     event = "VeryLazy",
     vscode = true,
