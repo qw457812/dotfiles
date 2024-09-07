@@ -132,6 +132,15 @@ return {
         end,
       }
 
+      local mode = { "mode" }
+      if vim.g.user_is_termux then
+        mode.fmt = function(str)
+          return str:sub(1, 1)
+        end
+      end
+      opts.sections.lualine_a = { mode }
+      opts.sections.lualine_b = { { "branch", icons_enabled = not vim.g.user_is_termux } }
+
       -- see: ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/ui.lua
       local lualine_c = opts.sections.lualine_c
       lualine_c[1] = LazyVim.lualine.root_dir({ cwd = not vim.g.user_is_termux })
@@ -184,7 +193,7 @@ return {
       local bubbles = false
       if bubbles then
         opts.options.section_separators = { left = "", right = "" }
-        opts.sections.lualine_a = { { "mode", separator = { left = "" } } }
+        mode.separator = { left = "" }
         opts.sections.lualine_z = { { "location", separator = { right = "" } } }
       else
         opts.options.section_separators = { left = "", right = "" }
