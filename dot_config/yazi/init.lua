@@ -21,5 +21,8 @@ require("bookmarks"):setup({
 
 -- TODO:
 -- https://github.com/Matt-FTW/dotfiles/blob/main/.config/yazi/init.lua
--- https://github.com/llanosrocas/yaziline.yazi
+-- https://github.com/imsi32/yatline.yazi
+-- https://github.com/imsi32/yatline-githead.yazi
 -- https://github.com/yazi-rs/plugins/tree/main/mactag.yazi
+-- https://github.com/sxyazi/yazi/issues/51
+-- https://github.com/AnirudhG07/awesome-yazi

@@ -2,4 +2,4 @@
 deps = [{ use = "yazi-rs/plugins:full-border", rev = "9a1129c" }, { use = "yazi-rs/plugins:smart-filter", rev = "9a1129c" }, { use = "yazi-rs/plugins:git", rev = "9a1129c" }, { use = "dedukun/bookmarks", rev = "ae06e0c" }, { use = "orhnk/system-clipboard", rev = "7775a80" }, { use = "llanosrocas/githead", rev = "bf150f3" }]
 
 [flavor]
-deps = []
+deps = [{ use = "yazi-rs/flavors:catppuccin-frappe", rev = "d479f67" }]
