@@ -1,20 +1,31 @@
-local tokyonight_custom_style = "custom"
+local to_neutral_gray = U.color.to_neutral_gray
 
--- :=vim.g.colors_name
 local colorschemes = {
-  "tokyonight", -- custom, `tokyonight-custom` not working
+  -- "tokyonight", -- custom, `tokyonight-custom` not working
   "tokyonight-moon",
   "tokyonight-storm",
   "tokyonight-night",
   "catppuccin-frappe",
   "catppuccin-macchiato",
   "catppuccin-mocha",
-  "onedark",
-  "obscure",
+  -- "onedark",
+  -- "obscure",
 }
 
+-- :=vim.g.colors_name
+local function random_colorscheme()
+  local idx = tonumber(os.date("%S")) % #colorschemes + 1
+  return colorschemes[idx]
+end
+
+local tokyonight_custom_style = "custom"
+
+local function tokyonight_has_custom_style()
+  return vim.list_contains(colorschemes, "tokyonight")
+end
+
 -- mark the style in colors, useful for `on_colors` and `on_highlights`
-local function mark_tokyonight_style(colors, style)
+local function tokyonight_mark_style(colors, style)
   -- stylua: ignore
   if type(colors) ~= "table" then return end
 
@@ -33,39 +44,6 @@ local function mark_tokyonight_style(colors, style)
   end
 end
 
-local function random_colorscheme()
-  local idx = tonumber(os.date("%S")) % #colorschemes + 1
-  local colorscheme = colorschemes[idx]
-  if not vim.g.vscode then
-    LazyVim.info(colorscheme, { title = "Random ColorScheme" })
-  end
-  return colorscheme
-end
-
----@param hex string
-local function hex_to_rgb(hex)
-  hex = string.lower(hex)
-  return tonumber(hex:sub(2, 3), 16), tonumber(hex:sub(4, 5), 16), tonumber(hex:sub(6, 7), 16)
-end
-
----@param hex string
-local function to_neutral_gray(hex)
-  local r, g, b = hex_to_rgb(hex)
-
-  -- local avg = math.floor((r + g + b) / 3)
-  -- return string.format("#%02x%02x%02x", avg, avg, avg)
-
-  -- https://github.com/killitar/obscure.nvim/blob/0e61b96a2c8551e73f8520b1f086d63f50d71bbd/lua/obscure/palettes/obscure.lua#L2
-  -- https://github.com/mellow-theme/mellow.nvim/blob/5c8b4eaadf190f646f201322f96f00140b6b1a0b/lua/mellow/colors.lua#L5
-  local base_r, base_g, base_b = hex_to_rgb("#161617")
-  return string.format(
-    "#%02x%02x%02x",
-    math.floor(base_r / (base_r + base_g + base_b) * (r + g + b)),
-    math.floor(base_g / (base_r + base_g + base_b) * (r + g + b)),
-    math.floor(base_b / (base_r + base_g + base_b) * (r + g + b))
-  )
-end
-
 return {
   {
     "tokyonight.nvim",
@@ -73,7 +51,7 @@ return {
     opts = function()
       local util = require("tokyonight.util")
       return {
-        style = tokyonight_custom_style, -- storm, moon(default), night, day, custom
+        style = tokyonight_has_custom_style() and tokyonight_custom_style or "storm", -- storm, moon(default), night, day, custom
         -- transparent = true,
         -- styles = {
         --   sidebars = "transparent",
@@ -95,7 +73,7 @@ return {
           c.diff.delete = util.blend_bg(c.red1, 0.35)
           c.diff.change = util.blend_bg(c.blue7, 0.35)
 
-          if mark_tokyonight_style(c) == tokyonight_custom_style then
+          if tokyonight_has_custom_style() and tokyonight_mark_style(c) == tokyonight_custom_style then
             c.bg_visual = c.dark3
           end
         end,
@@ -120,7 +98,7 @@ return {
           hl.TelescopeSelectionCaret =
             { fg = (hl.TelescopePromptPrefix or hl.Identifier).fg, bg = (hl.TelescopeSelection or hl.Visual).bg }
 
-          if mark_tokyonight_style(c) == tokyonight_custom_style then
+          if tokyonight_has_custom_style() and tokyonight_mark_style(c) == tokyonight_custom_style then
             hl.String = { fg = c.orange }
             hl.Character = { fg = c.orange2 }
             hl.Function = { fg = c.yellow }
@@ -158,6 +136,11 @@ return {
       }
     end,
     config = function(_, opts)
+      if not tokyonight_has_custom_style() then
+        require("tokyonight").setup(opts)
+        return
+      end
+
       -- https://github.com/folke/tokyonight.nvim/issues/595
       -- https://github.com/jdujava/nvim-jd/blob/ef39817500b7565dbd9978f54e83d21380c49c17/lua/plugins/colorscheme.lua#L86
       local styles = require("tokyonight.colors").styles
@@ -203,7 +186,7 @@ return {
         comment      = "#608b4e",
       }
 
-      mark_tokyonight_style(modified_colors, tokyonight_custom_style) -- for `on_colors` and `on_highlights` opts above
+      tokyonight_mark_style(modified_colors, tokyonight_custom_style) -- for `on_colors` and `on_highlights` opts above
 
       -- save as `custom` style (by extending the `storm` style)
       styles[tokyonight_custom_style] = vim.tbl_extend("force", styles.storm --[[@as Palette]], modified_colors)
@@ -293,6 +276,7 @@ return {
   -- alternative: olimorris/onedarkpro.nvim | https://github.com/appelgriebsch/Nv/blob/e9a584090a69a8d691f5eb051e76016b65dfc0b7/lua/plugins/extras/ui/onedarkpro-theme.lua
   {
     "navarasu/onedark.nvim",
+    cond = vim.list_contains(colorschemes, "onedark"),
     lazy = true,
     opts = function()
       local style = "dark" -- dark(default), darker, cool, deep, warm, warmer, light
@@ -327,6 +311,7 @@ return {
 
   {
     "killitar/obscure.nvim",
+    cond = vim.list_contains(colorschemes, "obscure"),
     lazy = true,
     opts = function()
       local p = require("obscure.palettes").get_palette("obscure")

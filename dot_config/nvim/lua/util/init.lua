@@ -1,5 +1,6 @@
 ---@class util
 ---@field path util.path
+---@field color util.color
 local M = {}
 
 setmetatable(M, {
