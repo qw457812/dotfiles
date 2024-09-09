@@ -446,24 +446,17 @@ return {
       local set_mark = function(id, path, desc)
         MiniFiles.set_bookmark(id, path, { desc = desc })
       end
-      -- TODO: duplicate code with telescope.lua
-      local chezmoi_source_path = os.getenv("HOME") .. "/.local/share/chezmoi"
-      local has_chezmoi = LazyVim.has_extra("util.chezmoi")
-        and vim.fn.executable("chezmoi") == 1
-        and vim.fn.isdirectory(chezmoi_source_path) == 1
-      local config_path = has_chezmoi and chezmoi_source_path .. "/dot_config/nvim" or vim.fn.stdpath("config")
-      local lazyvim_path = require("lazy.core.config").options.root .. "/LazyVim"
       vim.api.nvim_create_autocmd("User", {
         pattern = "MiniFilesExplorerOpen",
         callback = function()
-          set_mark("c", config_path, "Config") -- path
+          set_mark("c", U.path.config, "Config") -- path
           set_mark("w", vim.fn.getcwd, "cwd") -- callable
           set_mark("h", "~", "Home")
           -- stylua: ignore
           set_mark("r", function() return LazyVim.root.get({ normalize = true }) end, "Root")
-          set_mark("l", lazyvim_path, "LazyVim")
-          if has_chezmoi then
-            set_mark("z", chezmoi_source_path, "Chezmoi")
+          set_mark("l", U.path.lazyvim, "LazyVim")
+          if U.path.chezmoi then
+            set_mark("z", U.path.chezmoi, "Chezmoi")
           end
         end,
       })
