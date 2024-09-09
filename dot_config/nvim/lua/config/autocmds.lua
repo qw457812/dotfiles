@@ -2,9 +2,8 @@
 -- Default autocmds that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/autocmds.lua
 -- Add any additional autocmds here
 
-local function lazyvim_augroup(name)
-  -- return "lazyvim_" .. name
-  return vim.api.nvim_create_augroup("lazyvim_" .. name, { clear = false })
+local function lazyvim_augroup(name, clear)
+  return vim.api.nvim_create_augroup("lazyvim_" .. name, { clear = clear or false })
 end
 
 -- show cursor line only in active window
@@ -68,17 +67,6 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
--- revert `lazyvim_close_with_q` auto command for help files that we're editing
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "help",
-  callback = function(event)
-    if vim.bo[event.buf].buftype ~= "help" then
-      vim.bo[event.buf].buflisted = true
-      pcall(vim.keymap.del, "n", "q", { buffer = event.buf })
-    end
-  end,
-})
-
 -- make it easier to scroll man/help files when opened inline with `<leader>sM`, `<leader>sh`, `:h`
 -- maybe use BufRead/BufReadPost to map/safe_map(tzachar/highlight-undo.nvim?) `u`/`d` for all non-modifiable/readonly buffers?
 -- for safe_map, check `LazyVim.safe_keymap_set` or `vim.tbl_isempty(vim.fn.maparg("u", "n", false, true))`
@@ -99,23 +87,59 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
--- -- close some filetypes with <q>
--- -- see also: ../plugins/close.lua
--- -- https://github.com/appelgriebsch/Nv/blob/main/lua/config/autocmds.lua
+-- -- revert `lazyvim_close_with_q` auto command for help files that we're editing
 -- vim.api.nvim_create_autocmd("FileType", {
---   pattern = {
---     "dap-float",
---     "httpResult",
---   },
+--   pattern = "help",
 --   callback = function(event)
---     vim.bo[event.buf].buflisted = false
---     vim.keymap.set("n", "q", "<cmd>close<cr>", {
---       buffer = event.buf,
---       silent = true,
---       desc = "Quit buffer",
---     })
+--     if vim.bo[event.buf].buftype ~= "help" then
+--       vim.bo[event.buf].buflisted = true
+--       pcall(vim.keymap.del, "n", "q", { buffer = event.buf })
+--     end
 --   end,
 -- })
+--
+-- overwrite `lazyvim_close_with_q` auto command
+-- copied from: https://github.com/AstroNvim/AstroNvim/blob/d771094986abced8c3ceae29a5a55585ecb0523a/lua/astronvim/plugins/_astrocore_autocmds.lua#L245
+vim.api.nvim_create_autocmd("BufWinEnter", {
+  group = lazyvim_augroup("close_with_q", true),
+  desc = "Make q close help, man, quickfix, dap floats",
+  callback = function(args)
+    -- Add cache for buffers that have already had mappings created
+    if not vim.g.q_close_windows then
+      vim.g.q_close_windows = {}
+    end
+    -- If the buffer has been checked already, skip
+    if vim.g.q_close_windows[args.buf] then
+      return
+    end
+    -- Mark the buffer as checked
+    vim.g.q_close_windows[args.buf] = true
+    -- Check to see if `q` is already mapped to the buffer (avoids overwriting)
+    for _, map in ipairs(vim.api.nvim_buf_get_keymap(args.buf, "n")) do
+      if map.lhs == "q" then
+        return
+      end
+    end
+    -- If there is no q mapping already and the buftype is a non-real file, create one
+    if vim.tbl_contains({ "help", "nofile", "quickfix" }, vim.bo[args.buf].buftype) then
+      vim.keymap.set("n", "q", "<Cmd>close<CR>", {
+        desc = "Close window",
+        buffer = args.buf,
+        silent = true,
+        nowait = true,
+      })
+    end
+  end,
+})
+vim.api.nvim_create_autocmd("BufDelete", {
+  group = lazyvim_augroup("close_with_q"),
+  desc = "Clean up q_close_windows cache",
+  callback = function(args)
+    if vim.g.q_close_windows then
+      vim.g.q_close_windows[args.buf] = nil
+    end
+  end,
+})
 
 -- -- disable the concealing in some file formats
 -- -- https://github.com/craftzdog/dotfiles-public/blob/master/.config/nvim/lua/config/autocmds.lua
