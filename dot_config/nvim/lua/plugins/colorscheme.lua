@@ -260,13 +260,13 @@ return {
           },
         },
         custom_highlights = function(colors)
-          local U = require("catppuccin.utils.colors")
+          local util = require("catppuccin.utils.colors")
           -- highlight word/references under cursor
           -- require lazyvim.plugins.extras.editor.illuminate
           -- colors.surface1(#45475a) #494d64 #51576d colors.surface2(#585b70)
-          local illuminate = U.darken(colors.surface2, 0.8, colors.base)
+          local illuminate = util.darken(colors.surface2, 0.8, colors.base)
           return {
-            -- IlluminatedWordText = { bg = U.darken(colors.surface1, 0.7, colors.base) }, -- use default
+            -- IlluminatedWordText = { bg = util.darken(colors.surface1, 0.7, colors.base) }, -- use default
             IlluminatedWordRead = { bg = illuminate },
             IlluminatedWordWrite = { bg = illuminate, style = { "underline" } },
             -- LspReferenceText = { bg = colors.surface1 }, -- use default
@@ -274,9 +274,9 @@ return {
             LspReferenceWrite = { link = "IlluminatedWordWrite" },
             -- compensate for invisible text caused by custom illuminate highlight
             CmpGhostText = { bg = colors.base, fg = colors.overlay1 },
-            DiagnosticUnnecessary = { fg = U.lighten(colors.overlay0, 0.9) },
+            DiagnosticUnnecessary = { fg = util.lighten(colors.overlay0, 0.9) },
             -- require("tokyonight.colors").setup({style = "moon"}).bg_visual -- #2d3f76
-            -- Visual = { bg = U.blend(colors.surface1, "#2d3f76", 0.25), style = { "bold" } },
+            -- Visual = { bg = util.blend(colors.surface1, "#2d3f76", 0.25), style = { "bold" } },
 
             -- for flash treesitter search, not necessary after using `{ label = { rainbow = { enabled = true } } }` opts
             FlashLabel = { fg = colors.base, bg = colors.green, style = { "bold" } },

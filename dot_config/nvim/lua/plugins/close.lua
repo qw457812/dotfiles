@@ -7,7 +7,7 @@ local exit_key = "<leader>" .. close_key -- NOTE: would overwrite "go up one lev
 -- copied from: https://github.com/psjay/buffer-closer.nvim/blob/74fec63c4c238b2cf6f61c40b47f869d442a8988/lua/buffer-closer/init.lua#L10
 local function close_buffer_or_window_or_exit()
   if vim.g.vscode then
-    vim.cmd([[call VSCodeNotify('workbench.action.closeActiveEditor')]])
+    require("vscode").action("workbench.action.closeActiveEditor")
     return
   end
 

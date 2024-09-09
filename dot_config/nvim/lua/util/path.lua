@@ -1,3 +1,4 @@
+---@class util.path
 local M = {}
 
 --- Replace home directory with '~'

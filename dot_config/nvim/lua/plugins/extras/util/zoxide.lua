@@ -103,7 +103,7 @@ return {
               end,
               after_action = function(selection)
                 LazyVim.info(
-                  "Directory changed to " .. require("util.path").replace_home_with_tilde(selection.path),
+                  "Directory changed to " .. U.path.replace_home_with_tilde(selection.path),
                   { title = "Zoxide" }
                 )
                 -- vim.cmd.edit(selection.path)

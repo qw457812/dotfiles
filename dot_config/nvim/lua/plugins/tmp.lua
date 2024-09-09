@@ -12,20 +12,6 @@ return {
     event = "BufRead *.log",
     opts = {},
   },
-  {
-    "echasnovski/mini.align",
-    vscode = true,
-    opts = {
-      mappings = {
-        start = "", -- disabled since text-case.nvim uses `ga`
-        start_with_preview = "gA",
-      },
-    },
-    keys = {
-      -- { "ga", mode = { "n", "v" }, desc = "Align" },
-      { "gA", mode = { "n", "v" }, desc = "Align with Preview" },
-    },
-  },
 
   -- using MeanderingProgrammer/markdown.nvim now | https://github.com/LazyVim/LazyVim/commit/264abdf
   -- {
