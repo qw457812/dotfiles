@@ -1,23 +1,10 @@
-local Config = require("lazy.core.config")
 local replace_home = U.path.replace_home_with_tilde
 
-local chezmoi_source_path = os.getenv("HOME") .. "/.local/share/chezmoi"
-local has_chezmoi = LazyVim.has_extra("util.chezmoi")
-  and vim.fn.executable("chezmoi") == 1
-  and vim.fn.isdirectory(chezmoi_source_path) == 1
-local config_path = has_chezmoi and chezmoi_source_path .. "/dot_config/nvim" or vim.fn.stdpath("config") --[[@as string]]
-local lazyvim_path = Config.options.root .. "/LazyVim"
+local chezmoi_path = U.path.chezmoi
+local config_path = U.path.config
+local lazyvim_path = U.path.lazyvim
 
 -- https://github.com/folke/dot/blob/master/nvim/lua/plugins/telescope.lua
-local pick_find_plugin_files = function()
-  local root = Config.options.root
-  if LazyVim.pick.picker.name == "telescope" then
-    require("telescope.builtin").find_files({ cwd = root })
-  elseif LazyVim.pick.picker.name == "fzf" then
-    require("fzf-lua").files({ cwd = root })
-  end
-end
-
 local pick_search_lazy_specs = function()
   local dirs = { config_path .. "/lua/plugins", lazyvim_path .. "/lua/lazyvim/plugins" }
   if LazyVim.pick.picker.name == "telescope" then
@@ -66,7 +53,8 @@ local pick_find_buffer_dir_files = function()
 end
 
 local keys = {
-  { "<leader>fP", pick_find_plugin_files, desc = "Find Plugin File" },
+  -- stylua: ignore
+  { "<leader>fP", LazyVim.pick("files", { cwd = require("lazy.core.config").options.root }), desc = "Find Plugin File" },
   { "<leader>sP", pick_search_lazy_specs, desc = "Search Lazy Plugin Spec" },
   { "<leader>fL", pick_find_lazy_files, desc = "Find Lazy File" },
   { "<leader>sL", pick_search_lazy_codes, desc = "Search Lazy Code" },
@@ -125,8 +113,10 @@ return {
           local dir_icons = {
             { config_path, " " },
             { lazyvim_path, "󰒲 " },
-            { chezmoi_source_path, "󰠦 " },
           }
+          if chezmoi_path then
+            table.insert(dir_icons, { chezmoi_path, "󰠦 " })
+          end
           for _, dir_icon in ipairs(dir_icons) do
             transformed_path = transformed_path:gsub("^" .. vim.pesc(replace_home(dir_icon[1])) .. "/", dir_icon[2])
           end
