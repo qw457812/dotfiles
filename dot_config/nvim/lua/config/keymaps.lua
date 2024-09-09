@@ -6,17 +6,7 @@ local Lazy = require("lazy")
 local LazyUtil = require("lazy.util")
 local LazyViewConfig = require("lazy.view.config")
 
---- Wrapper around vim.keymap.set that will set `silent` to true by default.
---- https://github.com/folke/dot/blob/5df77fa64728a333f4d58e35d3ca5d8590c4f928/nvim/lua/config/options.lua#L22
----@param mode string|string[]
----@param lhs string
----@param rhs string|function
----@param opts? vim.keymap.set.Opts
-local function map(mode, lhs, rhs, opts)
-  opts = opts or {}
-  opts.silent = opts.silent ~= false
-  vim.keymap.set(mode, lhs, rhs, opts)
-end
+local map = U.keymap
 local map_del = vim.keymap.del
 
 -- lazy/LazyVim
@@ -277,12 +267,8 @@ local function google_search(input)
 end
 -- conflict with "Buffer Local Keymaps (which-key)" defined in ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/editor.lua
 -- map("n", "<leader>?", google_search, { desc = "Google Search Current Word" })
-map("x", "<leader>?", function()
-  local cache_z_reg = vim.fn.getreginfo("z")
-  vim.cmd([[silent normal! "zy]])
-  google_search(vim.fn.getreg("z"))
-  vim.fn.setreg("z", cache_z_reg)
-end, { desc = "Google Search" })
+-- stylua: ignore
+map("x", "<leader>?", function() google_search(U.get_visual_selection()) end, { desc = "Google Search" })
 
 if vim.g.neovide then
   -- fix cmd-v for paste in insert, command, terminal (for fzf-lua) mode

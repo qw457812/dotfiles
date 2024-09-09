@@ -622,6 +622,20 @@ return {
     -- },
   },
 
+  {
+    "tzachar/highlight-undo.nvim",
+    event = "VeryLazy",
+    vscode = true,
+    opts = function()
+      -- link: Search IncSearch Substitute
+      vim.api.nvim_set_hl(0, "HighlightUndo", { default = true, link = "Substitute" })
+      vim.api.nvim_set_hl(0, "HighlightRedo", { default = true, link = "HighlightUndo" })
+      return {
+        --[[add custom config here]]
+      }
+    end,
+  },
+
   -- TODO: choose motion plugin between: flash, leap, hop
   -- https://github.com/doctorfree/nvim-lazyman/blob/bb4091c962e646c5eb00a50eca4a86a2d43bcb7c/lua/ecovim/config/plugins.lua#L373
   -- "remote flash" for leap: https://github.com/rasulomaroff/telepath.nvim

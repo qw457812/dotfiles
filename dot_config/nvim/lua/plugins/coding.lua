@@ -149,10 +149,7 @@ return {
             require("various-textobjs").url()
             local foundURL = vim.fn.mode():find("v")
             if foundURL then
-              local cache_z_reg = vim.fn.getreginfo("z")
-              vim.cmd.normal('"zy')
-              local url = vim.fn.getreg("z")
-              vim.fn.setreg("z", cache_z_reg)
+              local url = U.get_visual_selection()
               vim.ui.open(url)
             else
               -- find all URLs in buffer
@@ -267,6 +264,21 @@ return {
         end)
       end
     end,
+  },
+
+  {
+    "echasnovski/mini.align",
+    vscode = true,
+    opts = {
+      mappings = {
+        start = "", -- disabled since text-case.nvim uses `ga`
+        start_with_preview = "gA",
+      },
+    },
+    keys = {
+      -- { "ga", mode = { "n", "v" }, desc = "Align" },
+      { "gA", mode = { "n", "v" }, desc = "Align with Preview" },
+    },
   },
 
   {

@@ -1,7 +1,6 @@
 local lsp = vim.lsp
 local util = lsp.util
 local ms = lsp.protocol.Methods
-local replace_home = require("util.path").replace_home_with_tilde
 
 local function pick_definitions()
   if LazyVim.pick.want() == "telescope" then
@@ -114,7 +113,7 @@ return {
         { "<leader>clW", function() vim.lsp.buf.remove_workspace_folder() end, desc = "Remove Workspace" },
         { "<leader>clw", function() vim.lsp.buf.add_workspace_folder() end, desc = "Add Workspace" },
         { "<leader>clL", function()
-          LazyVim.info(vim.tbl_map(replace_home, vim.lsp.buf.list_workspace_folders()), { title = "Lsp Workspaces" })
+          LazyVim.info(vim.tbl_map(U.path.replace_home_with_tilde, vim.lsp.buf.list_workspace_folders()), { title = "Lsp Workspaces" })
         end, desc = "List Workspace" },
       })
     end,

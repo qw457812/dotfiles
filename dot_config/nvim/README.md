@@ -105,6 +105,8 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
   - DoomEmacs
   - [Kickstart](https://github.com/nvim-lua/kickstart.nvim)
   - [AstroNvim](https://github.com/AstroNvim/AstroNvim)
+    - [astrocore_mappings.lua](https://github.com/AstroNvim/AstroNvim/blob/main/lua/astronvim/plugins/_astrocore_mappings.lua)
+    - [astrolsp_mappings.lua](https://github.com/AstroNvim/AstroNvim/blob/main/lua/astronvim/plugins/_astrolsp_mappings.lua)
   - [Lazyman](https://github.com/doctorfree/nvim-lazyman)
   - [rafi](https://github.com/rafi/vim-config#custom-key-mappings)
   - [modern-neovim](https://github.com/alpha2phi/modern-neovim)
@@ -148,15 +150,6 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] Create a `state` util to cache the state (like [zen-mode.nvim](https://github.com/folke/zen-mode.nvim/blob/29b292bdc58b76a6c8f294c961a8bf92c5a6ebd6/lua/zen-mode/plugins.lua#L137)) instead of using `vim.g.user_...`
   - [vim.g.user_zenmode_on](lua/plugins/ui.lua), [vim.g.user_minianimate_disable_old](lua/plugins/ui.lua)
   - [local neovide_state = {}](lua/config/keymaps.lua)
-- [ ] Create utils/functions:
-  - `has_extra` for user extras
-    - [LazyVim.has("dropbar.nvim")](lua/plugins/ui.lua)
-  - `map`
-    - [keymaps.lua](lua/config/keymaps.lua)
-    - [vscode.lua](lua/plugins/vscode.lua)
-  - `get_visual_selection` by reg
-    - `<leader>?` in [keymaps.lua](lua/config/keymaps.lua)
-  - [list_insert_unique](https://github.com/AstroNvim/astrocommunity/blob/90ff9f23f98c4265b37091c6077744b48c19e324/lua/astrocommunity/game/leetcode-nvim/init.lua#L18)
 - [ ] `which-key v3` problem with `mini.surround`/`mini.operators`/Helix-style mappings(map `mm` to `%`):
 
   1. problem

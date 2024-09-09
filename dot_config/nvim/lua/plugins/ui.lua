@@ -32,7 +32,7 @@ return {
               -- vim.fn.getcwd()
               local cwd = LazyVim.root.cwd()
               local root = LazyVim.root.get({ normalize = true })
-              return cwd == root and "Explorer" or require("util.path").replace_home_with_tilde(cwd)
+              return cwd == root and "Explorer" or U.path.replace_home_with_tilde(cwd)
             end,
             highlight = "Directory",
             text_align = "left",
@@ -144,7 +144,7 @@ return {
       -- see: ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/ui.lua
       local lualine_c = opts.sections.lualine_c
       lualine_c[1] = LazyVim.lualine.root_dir({ cwd = not vim.g.user_is_termux })
-      if vim.g.user_is_termux or LazyVim.has("dropbar.nvim") then
+      if vim.g.user_is_termux or U.has_user_extra("ui.dropbar") then
         lualine_c[4] = {
           "filename",
           file_status = true,
@@ -403,30 +403,6 @@ return {
         vim.api.nvim_clear_autocmds({ group = group })
       end
       return opts
-    end,
-  },
-
-  {
-    "OXY2DEV/helpview.nvim",
-    lazy = false,
-    -- ft = "help",
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
-    keys = {
-      { "<leader>uH", "<cmd>Helpview toggleAll<cr>", desc = "Helpview" },
-    },
-  },
-
-  {
-    "tzachar/highlight-undo.nvim",
-    event = "VeryLazy",
-    vscode = true,
-    opts = function()
-      -- link: Search IncSearch Substitute
-      vim.api.nvim_set_hl(0, "HighlightUndo", { default = true, link = "Substitute" })
-      vim.api.nvim_set_hl(0, "HighlightRedo", { default = true, link = "HighlightUndo" })
-      return {
-        --[[add custom config here]]
-      }
     end,
   },
 }

@@ -11,4 +11,18 @@ return {
       })
     end,
   },
+
+  {
+    "OXY2DEV/helpview.nvim",
+    ft = "help",
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter",
+      opts = function(_, opts)
+        table.insert(opts.ensure_installed, "vimdoc")
+      end,
+    },
+    keys = {
+      { "<leader>uH", "<cmd>Helpview toggleAll<cr>", desc = "Helpview" },
+    },
+  },
 }

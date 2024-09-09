@@ -1,5 +1,5 @@
 local Config = require("lazy.core.config")
-local replace_home = require("util.path").replace_home_with_tilde
+local replace_home = U.path.replace_home_with_tilde
 
 local chezmoi_source_path = os.getenv("HOME") .. "/.local/share/chezmoi"
 local has_chezmoi = LazyVim.has_extra("util.chezmoi")

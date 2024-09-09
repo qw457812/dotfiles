@@ -24,9 +24,7 @@ return {
         "nvim-treesitter/nvim-treesitter",
         optional = true,
         opts = function(_, opts)
-          if opts.ensure_installed ~= "all" and not vim.list_contains(opts.ensure_installed, "html") then
-            table.insert(opts.ensure_installed, "html")
-          end
+          table.insert(opts.ensure_installed, "html")
         end,
       },
     },
