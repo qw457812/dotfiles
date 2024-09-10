@@ -24,6 +24,13 @@ local function close_buffer_or_window_or_exit()
     return vim.api.nvim_win_get_config(win or 0).relative ~= ""
   end
 
+  -- the buftype is a non-real file
+  -- https://github.com/AstroNvim/AstroNvim/blob/d771094986abced8c3ceae29a5a55585ecb0523a/lua/astronvim/plugins/_astrocore_autocmds.lua#L245
+  local function non_real_file()
+    -- return vim.bo.buftype ~= ""
+    return vim.tbl_contains({ "help", "nofile", "quickfix" }, vim.bo.buftype)
+  end
+
   -- known window types: main, floating and edgy
   -- use `:close` for floating and edgy (redundant with edgy's Lazy Spec below)
   -- use `:bd` (or `:qa` if no listed buffer left) for main
@@ -32,8 +39,11 @@ local function close_buffer_or_window_or_exit()
   if is_floating() then
     vim.cmd("close") -- Close Window (Cannot close last window)
   elseif #listed_buffers() > (vim.bo.buflisted and 1 or 0) then
-    -- vim.cmd("bd") -- Delete Buffer and Window
-    LazyVim.ui.bufremove() -- Delete Buffer
+    if non_real_file() then
+      vim.cmd("bd") -- Delete Buffer and Window
+    else
+      LazyVim.ui.bufremove() -- Delete Buffer
+    end
   else
     vim.cmd("qa")
   end

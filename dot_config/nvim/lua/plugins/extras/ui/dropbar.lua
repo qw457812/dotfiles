@@ -30,7 +30,7 @@ return {
       --   return part ~= ""
       -- end, require("plenary.path"):new(home):_split())
       ---@diagnostic disable-next-line: param-type-mismatch
-      local home_parts = vim.split((vim.uv or vim.loop).os_homedir(), "/", { trimempty = true })
+      local home_parts = vim.split(vim.uv.os_homedir(), "/", { trimempty = true })
       local source_path = {
         get_symbols = function(buff, win, cursor)
           local symbols = sources.path.get_symbols(buff, win, cursor)
