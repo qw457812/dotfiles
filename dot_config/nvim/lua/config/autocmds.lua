@@ -141,11 +141,10 @@ vim.api.nvim_create_autocmd("BufDelete", {
   end,
 })
 
--- -- disable the concealing in some file formats
--- -- https://github.com/craftzdog/dotfiles-public/blob/master/.config/nvim/lua/config/autocmds.lua
+-- -- colorcolumn
 -- vim.api.nvim_create_autocmd("FileType", {
 --   pattern = { "markdown" },
 --   callback = function()
---     vim.opt_local.conceallevel = 0
+--     vim.opt_local.colorcolumn = "80"
 --   end,
 -- })

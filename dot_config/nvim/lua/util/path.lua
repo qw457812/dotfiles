@@ -2,7 +2,7 @@
 local M = {}
 
 -- os.getenv("HOME")
-M.home = (vim.uv or vim.loop).os_homedir()
+M.home = vim.uv.os_homedir()
 
 --- Chezmoi source path
 M.chezmoi = (function()
