@@ -208,7 +208,7 @@ return {
     "nvimdev/dashboard-nvim",
     optional = true,
     opts = function(_, opts)
-      -- do not `startinsert` for "New File"
+      -- do not `:startinsert` for "New File"
       local center = opts.config.center
       for _, button in ipairs(center) do
         if button.key == "n" then

@@ -278,9 +278,7 @@ return {
         -- possible values: "open_default" (default), "open_current", "disabled"
         -- hijack_netrw_behavior = "disabled", -- netrw left alone, neo-tree does not handle opening dirs
         window = {
-          -- TODO: unify the keybindings of vifm (or yazi) and neo-tree.nvim (or telescope-file-browser.nvim)
-          -- https://github.com/craftzdog/dotfiles-public/blob/bf837d867b1aa153cbcb2e399413ec3bdcce112b/.config/nvim/lua/plugins/editor.lua#L58
-          -- https://github.com/jacquin236/minimal-nvim/blob/baacb78adce67d704d17c3ad01dd7035c5abeca3/lua/plugins/editor/telescope-extras.lua#L3
+          -- TODO: unify the keybindings of vifm (or yazi) and neo-tree.nvim
           mappings = {
             -- ["<esc>"] = {
             --   function(state)
