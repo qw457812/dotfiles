@@ -366,6 +366,10 @@ return {
               icon.text, icon.highlight = require("mini.icons").get("lsp", node.extra.kind.name)
             end,
           },
+          -- annoying when `toggle_auto_expand_width`
+          file_size = { enabled = false },
+          type = { enabled = false },
+          last_modified = { enabled = false },
         },
         commands = {
           unfocus_window = function(state)

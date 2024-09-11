@@ -48,7 +48,11 @@ return {
             end
           end
           if start_with_home then
-            symbols[#home_parts].name = "~"
+            local symbol_home = symbols[#home_parts]
+            symbol_home.name = "~"
+            local home_icon, home_icon_hl = require("mini.icons").get("directory", "home")
+            symbol_home.icon = home_icon .. " "
+            symbol_home.icon_hl = home_icon_hl
             for i = #home_parts - 1, 1, -1 do
               table.remove(symbols, i)
             end
