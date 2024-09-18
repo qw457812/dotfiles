@@ -22,13 +22,19 @@ end
 --- Wrapper around vim.keymap.set that will set `silent` to true by default.
 --- https://github.com/folke/dot/blob/5df77fa64728a333f4d58e35d3ca5d8590c4f928/nvim/lua/config/options.lua#L22
 ---@param mode string|string[]
----@param lhs string
+---@param lhs string|string[]
 ---@param rhs string|function
 ---@param opts? vim.keymap.set.Opts
 function M.keymap(mode, lhs, rhs, opts)
   opts = opts or {}
   opts.silent = opts.silent ~= false
-  vim.keymap.set(mode, lhs, rhs, opts)
+
+  ---@cast lhs string[]
+  lhs = type(lhs) == "string" and { lhs } or lhs
+
+  for _, l in ipairs(lhs) do
+    vim.keymap.set(mode, l, rhs, opts)
+  end
 end
 
 --- Get visually selected lines.

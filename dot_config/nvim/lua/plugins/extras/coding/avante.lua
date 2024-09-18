@@ -44,6 +44,9 @@ return {
         ft = render_markdown_ft,
       },
     },
+    init = function()
+      require("avante_lib").load()
+    end,
     -- https://github.com/yetone/avante.nvim/wiki#keymaps-and-api-i-guess
     -- ~/.local/share/nvim/lazy/avante.nvim/lua/avante/init.lua
     keys = function(_, keys)
@@ -107,6 +110,7 @@ return {
           end,
         },
       },
+      hints = { enabled = false },
     },
   },
 

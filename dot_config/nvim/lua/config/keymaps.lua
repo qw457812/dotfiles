@@ -99,11 +99,13 @@ map({ "i", "x", "n", "s" }, "<a-s>", "<cmd>noautocmd w<cr><esc>", { desc = "Save
 map({ "i", "x", "n", "s" }, "<D-s>", "<cmd>w<cr><esc>", { desc = "Save File" })
 
 -- buffers
--- see: akinsho/bufferline.nvim in ~/.config/nvim/lua/plugins/ui.lua
--- if you change the order of buffers :bnext and :bprevious will not respect the custom ordering
+-- -- see: akinsho/bufferline.nvim in ~/.config/nvim/lua/plugins/ui.lua
+-- -- if you change the order of buffers :bnext and :bprevious will not respect the custom ordering
 -- map("n", "<Up>", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
 -- map("n", "<Down>", "<cmd>bnext<cr>", { desc = "Next Buffer" })
-map("n", "<leader>ba", "<cmd>bufdo bd<cr>", { desc = "Delete All Buffers" })
+-- ":e #" doesn't work if the alternate buffer doesn't have a file name, while CTRL-^ still works then
+map("n", { "<leader>`", "<leader>bb" }, "<C-^>", { desc = "Switch to Other Buffer" })
+map("n", "<leader>bA", "<cmd>bufdo bd<cr>", { desc = "Delete All Buffers" })
 
 -- jumping
 -- map("n", "gk", "<C-o>", { desc = "Go Back" })
