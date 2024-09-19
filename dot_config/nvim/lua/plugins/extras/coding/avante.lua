@@ -36,7 +36,7 @@ return {
         },
       },
       {
-        "MeanderingProgrammer/markdown.nvim",
+        "MeanderingProgrammer/render-markdown.nvim",
         optional = true,
         opts = {
           file_types = render_markdown_ft,
