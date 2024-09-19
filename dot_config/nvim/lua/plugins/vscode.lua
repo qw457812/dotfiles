@@ -8,12 +8,6 @@ local map = U.keymap
 -- vim.notify = vscode.notify
 -- vim.g.clipboard = vim.g.vscode_clipboard
 
--- https://github.com/LazyVim/LazyVim/pull/4392
-function LazyVim.terminal()
-  -- workbench.action.terminal.focus
-  require("vscode").action("workbench.action.terminal.toggleTerminal")
-end
-
 ---@param mode string|string[]
 ---@param key string|string[]
 ---@param command string|string[]
@@ -45,6 +39,7 @@ vim.api.nvim_create_autocmd("User", {
     vscode_map("n", "]h", "editor.action.dirtydiff.next", { desc = "Next Hunk" })
 
     -- vscode_map("n", "gd", "editor.action.revealDefinition", { desc = "Goto Definition" })
+    map("n", "<cr>", "gd", { desc = "Goto Definition/References", remap = true })
     vscode_map("n", "gr", "editor.action.goToReferences", { desc = "References" })
     vscode_map("n", "gy", "editor.action.goToTypeDefinition", { desc = "Goto T[y]pe Definition" })
     vscode_map("n", "gI", "editor.action.goToImplementation", { desc = "Goto Implementation" })
@@ -74,6 +69,9 @@ vim.api.nvim_create_autocmd("User", {
     vscode_map("n", "<leader>bl", "workbench.action.closeEditorsToTheRight", { desc = "Close Editors to the Right" })
     vscode_map("n", "<leader>bH", "workbench.action.firstEditorInGroup", { desc = "Goto First Editor" })
     vscode_map("n", "<leader>bL", "workbench.action.lastEditorInGroup", { desc = "Goto Last Editor" })
+    for i = 1, 9 do
+      vscode_map("n", "<leader>b" .. i, "workbench.action.openEditorAtIndex" .. i, { desc = "Goto Editor " .. i })
+    end
 
     vscode_map("n", "<leader>fc", "workbench.action.openSettingsJson", { desc = "Config File: Settings" })
     vscode_map("n", "<leader>fk", "workbench.action.openGlobalKeybindingsFile", { desc = "Config File: Keybindings" })
