@@ -718,14 +718,14 @@ return {
       vim.api.nvim_create_autocmd("User", {
         pattern = "MiniFilesExplorerOpen",
         callback = function()
-          set_mark("c", U.path.config, "Config") -- path
+          set_mark("c", U.path.CONFIG, "Config") -- path
           set_mark("w", vim.fn.getcwd, "cwd") -- callable
           set_mark("h", "~", "Home")
           -- stylua: ignore
           set_mark("r", function() return LazyVim.root.get({ normalize = true }) end, "Root")
-          set_mark("l", U.path.lazyvim, "LazyVim")
-          if U.path.chezmoi then
-            set_mark("z", U.path.chezmoi, "Chezmoi")
+          set_mark("l", U.path.LAZYVIM, "LazyVim")
+          if U.path.CHEZMOI then
+            set_mark("z", U.path.CHEZMOI, "Chezmoi")
           end
         end,
       })

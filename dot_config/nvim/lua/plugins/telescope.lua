@@ -1,8 +1,8 @@
 local replace_home = U.path.replace_home_with_tilde
 
-local chezmoi_path = U.path.chezmoi
-local config_path = U.path.config
-local lazyvim_path = U.path.lazyvim
+local chezmoi_path = U.path.CHEZMOI
+local config_path = U.path.CONFIG
+local lazyvim_path = U.path.LAZYVIM
 
 -- https://github.com/folke/dot/blob/master/nvim/lua/plugins/telescope.lua
 local pick_search_lazy_specs = function()

@@ -2,20 +2,20 @@
 local M = {}
 
 -- os.getenv("HOME")
-M.home = vim.uv.os_homedir()
+M.HOME = vim.uv.os_homedir()
 
 --- Chezmoi source path
-M.chezmoi = (function()
-  local path = M.home .. "/.local/share/chezmoi"
+M.CHEZMOI = (function()
+  local path = M.HOME .. "/.local/share/chezmoi"
   return vim.fn.isdirectory(path) == 1 and path or nil
 end)()
 
-M.config = (function()
-  local has_chezmoi = M.chezmoi and LazyVim.has_extra("util.chezmoi") and vim.fn.executable("chezmoi") == 1
-  return has_chezmoi and M.chezmoi .. "/dot_config/nvim" or vim.fn.stdpath("config") --[[@as string]]
+M.CONFIG = (function()
+  local has_chezmoi = M.CHEZMOI and LazyVim.has_extra("util.chezmoi") and vim.fn.executable("chezmoi") == 1
+  return has_chezmoi and M.CHEZMOI .. "/dot_config/nvim" or vim.fn.stdpath("config") --[[@as string]]
 end)()
 
-M.lazyvim = require("lazy.core.config").options.root .. "/LazyVim"
+M.LAZYVIM = require("lazy.core.config").options.root .. "/LazyVim"
 
 --- Replace home directory with '~'
 --- https://github.com/echasnovski/mini.files/blob/10ed64157ec45f176decefbdb0e2ba10cccd187f/lua/mini/files.lua#L2365
@@ -24,7 +24,7 @@ M.lazyvim = require("lazy.core.config").options.root .. "/LazyVim"
 ---@return string
 function M.replace_home_with_tilde(path)
   -- require("plenary.path"):new(path):make_relative(M.home)
-  return M.home and path:gsub("^" .. vim.pesc(M.home), "~") or path
+  return M.HOME and path:gsub("^" .. vim.pesc(M.HOME), "~") or path
 end
 
 return M
