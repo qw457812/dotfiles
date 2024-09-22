@@ -48,6 +48,12 @@ return {
             end
           end,
         },
+        ["<leader>sr"] = {
+          desc = "Search and Replace in Directory (Oil)",
+          callback = function()
+            U.explorer.grug_far(require("oil").get_current_dir())
+          end,
+        },
       },
       view_options = {
         show_hidden = true,

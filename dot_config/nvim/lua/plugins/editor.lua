@@ -112,7 +112,7 @@ return {
       local renderer = require("neo-tree.ui.renderer")
 
       -- https://github.com/nvim-neo-tree/neo-tree.nvim/wiki/Recipes#find-with-telescope
-      local function getTelescopeOpts(state)
+      local function get_telescope_opts(state)
         local node = state.tree:get_node()
         local path = node.type == "file" and node:get_parent_id() or node:get_id()
         return {
@@ -469,11 +469,10 @@ return {
             local path = node.type == "file" and node:get_parent_id() or node:get_id()
             LazyVim.pick("files", { cwd = path })()
           end,
-          telescope_find = function(state)
-            require("telescope.builtin").find_files(getTelescopeOpts(state))
-          end,
-          telescope_grep = function(state)
-            require("telescope.builtin").live_grep(getTelescopeOpts(state))
+          grug_far = function(state)
+            local node = state.tree:get_node()
+            local path = node.type == "directory" and node:get_id() or vim.fn.fnamemodify(node:get_id(), ":h")
+            U.explorer.grug_far(path)
           end,
         },
         window = {
@@ -503,6 +502,7 @@ return {
             ["dd"] = "delete",
             ["y"] = "none",
             ["yy"] = "copy_to_clipboard",
+            ["<leader>sr"] = "grug_far",
           },
           fuzzy_finder_mappings = { -- define keymaps for filter popup window in fuzzy_finder_mode
             ["<C-j>"] = "move_cursor_down",
@@ -526,6 +526,14 @@ return {
           -- whether to use for editing directories (e.g. `vim .` or `:e src/`)
           -- possible values: "open_default" (default), "open_current", "disabled"
           -- hijack_netrw_behavior = "disabled", -- netrw left alone, neo-tree does not handle opening dirs
+          commands = {
+            telescope_find = function(state)
+              require("telescope.builtin").find_files(get_telescope_opts(state))
+            end,
+            telescope_grep = function(state)
+              require("telescope.builtin").live_grep(get_telescope_opts(state))
+            end,
+          },
           window = {
             -- TODO: unify the keybindings of vifm (or yazi) and neo-tree.nvim
             mappings = {
@@ -634,27 +642,27 @@ return {
       -- https://github.com/mfussenegger/nvim-treehopper
       ---@param skip_first_match? boolean
       local function treesitter(skip_first_match)
-        require("flash").treesitter({
+        ---@type Flash.State.Config
+        local opts = { label = { rainbow = { enabled = true } } }
+        if skip_first_match then
           ---@param matches Flash.Match.TS[]
-          filter = function(matches)
-            if skip_first_match then
-              -- before removing first match, match[n+1] should use previous match[n] label
-              for i = #matches, 2, -1 do
-                matches[i].label = matches[i - 1].label
-              end
-              -- remove first match, as it is same as word under cursor (not always) thus redundant with word motion
-              table.remove(matches, 1)
+          opts.filter = function(matches)
+            -- before removing first match, match[n+1] should use previous match[n] label
+            for i = #matches, 2, -1 do
+              matches[i].label = matches[i - 1].label
             end
+            -- remove first match, as it is same as word under cursor (not always) thus redundant with word motion
+            table.remove(matches, 1)
             return matches
-          end,
-          label = { rainbow = { enabled = true } },
-        })
+          end
+        end
+        require("flash").treesitter(opts)
       end
 
       -- stylua: ignore
       return vim.list_extend(keys, {
         { "S", mode = { "n", "o", "x" }, function() treesitter() end, desc = "Flash Treesitter" },
-        { "u", mode = { "o", "x" }, function() treesitter(true) end, desc = "Flash Treesitter" }, -- unit textobject
+        -- { "u", mode = { "o", "x" }, function() treesitter(true) end, desc = "Flash Treesitter" }, -- unit textobject, conflict with guu
         -- {
         --   "R",
         --   mode = { "o", "x" },
@@ -705,6 +713,13 @@ return {
           vim.keymap.set("n", "<leader>fs", function() require("mini.files").synchronize() end, { buffer = buf_id, desc = "Synchronize (mini.files)" })
           vim.keymap.set("n", "<C-s>", function() require("mini.files").synchronize() end, { buffer = buf_id, desc = "Synchronize (mini.files)" })
           -- stylua: ignore end
+          vim.keymap.set("n", "<leader>sr", function()
+            local files = require("mini.files")
+            -- works only if cursor is on the valid file system entry
+            local cur_entry_path = files.get_fs_entry().path
+            files.close()
+            U.explorer.grug_far(vim.fs.dirname(cur_entry_path))
+          end, { buffer = buf_id, desc = "Search and Replace in Directory (mini.files)" })
           -- cursor navigation during text edit
           vim.keymap.set("n", "H", "h", { buffer = buf_id, desc = "<Left>" })
           vim.keymap.set("n", "L", "l", { buffer = buf_id, desc = "<Right>" })

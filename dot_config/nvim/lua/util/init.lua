@@ -1,6 +1,7 @@
 ---@class util
----@field path util.path
 ---@field color util.color
+---@field explorer util.explorer
+---@field path util.path
 local M = {}
 
 setmetatable(M, {
@@ -38,7 +39,9 @@ function M.keymap(mode, lhs, rhs, opts)
 end
 
 --- Get visually selected lines.
---- alternative: https://github.com/ibhagwan/fzf-lua/blob/f39de2d77755e90a7a80989b007f0bf2ca13b0dd/lua/fzf-lua/utils.lua#L770
+--- alternative:
+--- https://github.com/ibhagwan/fzf-lua/blob/f39de2d77755e90a7a80989b007f0bf2ca13b0dd/lua/fzf-lua/utils.lua#L770
+--- https://github.com/MagicDuck/grug-far.nvim/blob/308e357be687197605cf19222f843fbb331f50f5/lua/grug-far.lua#L448
 ---@param stop_visual_mode? boolean
 function M.get_visual_selection(stop_visual_mode)
   local mode = vim.fn.mode(true)
