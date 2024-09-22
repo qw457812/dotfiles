@@ -65,8 +65,8 @@
       "commands": [
         "workbench.action.focusActiveEditorGroup",
         "workbench.action.closeSidebar",
-        "workbench.action.closePanel",
-        "workbench.action.closeAuxiliaryBar"
+        "workbench.action.closePanel"
+        // "workbench.action.closeAuxiliaryBar" // cursor: command 'workbench.action.closeAuxiliaryBar' not found
       ]
     },
     // && !listFocus
@@ -79,8 +79,8 @@
       "commands": [
         "workbench.action.focusActiveEditorGroup",
         "workbench.action.closeSidebar",
-        "workbench.action.closePanel",
-        "workbench.action.closeAuxiliaryBar"
+        "workbench.action.closePanel"
+        // "workbench.action.closeAuxiliaryBar"
       ]
     }
     // "when": "terminalFocus"
