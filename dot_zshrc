@@ -187,12 +187,12 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-eval $(thefuck --alias)
+# eval $(thefuck --alias)
 
 # https://github.com/cheat/cheat
 export CHEAT_USE_FZF=true
 
-source $HOME/.config/broot/launcher/bash/br
+# source $HOME/.config/broot/launcher/bash/br
 
 # To initialize zoxide, add this to your configuration (usually ~/.zshrc):
 eval "$(zoxide init zsh)"
@@ -293,7 +293,7 @@ lessc () { /usr/share/vim/vim90/macros/less.sh "$@"}
 #   --disturl=https://npmmirror.com/mirrors/node \
 #   --userconfig=$HOME/.cnpmrc"
 
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+# test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
 # https://github.com/pyenv/pyenv#set-up-your-shell-environment-for-pyenv
 export PYENV_ROOT="$HOME/.pyenv"
@@ -313,7 +313,6 @@ if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -
 
 alias v='nvim'
 alias view="nvim -R"
-alias rr="ranger"
 
 # use my fork (system clipboard integration) instead: https://github.com/qw457812/zsh-vi-mode
 # https://github.com/jeffreytse/zsh-vi-mode | brew info zsh-vi-mode
@@ -337,7 +336,7 @@ function zvm_after_init() {
   # https://github.com/atuinsh/atuin#shell-plugin
   eval "$(atuin init zsh)"
   # bind ctrl-r to zsh-vi-mode's insert mode
-  bindkey '^r' atuin-search
+  # bindkey '^r' atuin-search
   # bindkey -M vicmd '^r' atuin-search # disable in zsh-vi-mode's normal mode
   # bind up arrow to zsh-vi-mode's insert mode
   # run `cat -v` to observe up arrow key codes | https://github.com/zsh-users/zsh-history-substring-search
@@ -346,14 +345,15 @@ function zvm_after_init() {
 }
 # Always starting with insert mode for each command line
 ZVM_LINE_INIT_MODE=$ZVM_MODE_INSERT
-ZVM_VI_INSERT_ESCAPE_BINDKEY=jj
-ZVM_KEYTIMEOUT=0.3
+ZVM_VI_SURROUND_BINDKEY="helix"
+# ZVM_VI_INSERT_ESCAPE_BINDKEY=jj
+# ZVM_KEYTIMEOUT=0.3
 
 # https://github.com/starship/starship
 # eval "$(starship init zsh)"
 
-# https://github.com/asdf-vm/asdf
-. $(brew --prefix asdf)/libexec/asdf.sh
+# # https://github.com/asdf-vm/asdf
+# . $(brew --prefix asdf)/libexec/asdf.sh
 
 # https://github.com/DarrinTisdale/zsh-aliases-exa
 # l='ls -lah'
@@ -452,9 +452,9 @@ function tre() {
 # brew info grep
 # PATH="/opt/homebrew/opt/grep/libexec/gnubin:$PATH"
 
-# open emacs in terminal
-# https://github.com/yqrashawn/yqdotfiles/blob/master/modules/yqrashawn/home-manager/dotfiles/.zsh.d/.alias.zsh
-alias e='emacsclient -t'
+# # open emacs in terminal
+# # https://github.com/yqrashawn/yqdotfiles/blob/master/modules/yqrashawn/home-manager/dotfiles/.zsh.d/.alias.zsh
+# alias e='emacsclient -t'
 
 # doomemacs by chemacs2
 # function de() {
@@ -568,38 +568,38 @@ export SDKMAN_DIR="$HOME/.sdkman"
 # set python command if 'py' not installed | https://github.com/ohmyzsh/ohmyzsh/blob/master/plugins/python/python.plugin.zsh
 builtin which py > /dev/null || alias py='python3'
 
-# https://github.com/jarun/nnn/wiki/Basic-use-cases#configure-cd-on-quit
-# https://github.com/jarun/nnn/blob/master/misc/quitcd/quitcd.bash_sh_zsh
-nn ()
-{
-    # Block nesting of nnn in subshells
-    [ "${NNNLVL:-0}" -eq 0 ] || {
-        echo "nnn is already running"
-        return
-    }
-
-    # The behaviour is set to cd on quit (nnn checks if NNN_TMPFILE is set)
-    # If NNN_TMPFILE is set to a custom path, it must be exported for nnn to
-    # see. To cd on quit only on ^G, remove the "export" and make sure not to
-    # use a custom path, i.e. set NNN_TMPFILE *exactly* as follows:
-    #      NNN_TMPFILE="${XDG_CONFIG_HOME:-$HOME/.config}/nnn/.lastd"
-    export NNN_TMPFILE="${XDG_CONFIG_HOME:-$HOME/.config}/nnn/.lastd"
-
-    # Unmask ^Q (, ^V etc.) (if required, see `stty -a`) to Quit nnn
-    # stty start undef
-    # stty stop undef
-    # stty lwrap undef
-    # stty lnext undef
-
-    # The command builtin allows one to alias nnn to n, if desired, without
-    # making an infinitely recursive alias
-    command nnn "$@"
-
-    [ ! -f "$NNN_TMPFILE" ] || {
-        . "$NNN_TMPFILE"
-        rm -f -- "$NNN_TMPFILE" > /dev/null
-    }
-}
+# # https://github.com/jarun/nnn/wiki/Basic-use-cases#configure-cd-on-quit
+# # https://github.com/jarun/nnn/blob/master/misc/quitcd/quitcd.bash_sh_zsh
+# nn ()
+# {
+#     # Block nesting of nnn in subshells
+#     [ "${NNNLVL:-0}" -eq 0 ] || {
+#         echo "nnn is already running"
+#         return
+#     }
+#
+#     # The behaviour is set to cd on quit (nnn checks if NNN_TMPFILE is set)
+#     # If NNN_TMPFILE is set to a custom path, it must be exported for nnn to
+#     # see. To cd on quit only on ^G, remove the "export" and make sure not to
+#     # use a custom path, i.e. set NNN_TMPFILE *exactly* as follows:
+#     #      NNN_TMPFILE="${XDG_CONFIG_HOME:-$HOME/.config}/nnn/.lastd"
+#     export NNN_TMPFILE="${XDG_CONFIG_HOME:-$HOME/.config}/nnn/.lastd"
+#
+#     # Unmask ^Q (, ^V etc.) (if required, see `stty -a`) to Quit nnn
+#     # stty start undef
+#     # stty stop undef
+#     # stty lwrap undef
+#     # stty lnext undef
+#
+#     # The command builtin allows one to alias nnn to n, if desired, without
+#     # making an infinitely recursive alias
+#     command nnn "$@"
+#
+#     [ ! -f "$NNN_TMPFILE" ] || {
+#         . "$NNN_TMPFILE"
+#         rm -f -- "$NNN_TMPFILE" > /dev/null
+#     }
+# }
 
 # https://github.com/gokcehan/lf/blob/master/etc/lfcd.sh
 lf () {
@@ -607,8 +607,8 @@ lf () {
     cd "$(command lf -print-last-dir "$@")"
 }
 
-# https://yazi-rs.github.io/docs/quick-start
-function yy() {
+# https://yazi-rs.github.io/docs/quick-start/#shell-wrapper
+function y() {
   local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
   yazi "$@" --cwd-file="$tmp"
   if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
@@ -617,10 +617,10 @@ function yy() {
   rm -f -- "$tmp"
 }
 
-# Exit to last working directory (LWD) | https://github.com/kyoheiu/felix
-# source <(command fx --init)
-# https://github.com/kyoheiu/felix/issues/41
-alias felix='~/.cargo/bin/fx'
+# # Exit to last working directory (LWD) | https://github.com/kyoheiu/felix
+# # source <(command fx --init)
+# # https://github.com/kyoheiu/felix/issues/41
+# alias felix='~/.cargo/bin/fx'
 
 # https://wiki.vifm.info/index.php/How_to_set_shell_working_directory_after_leaving_Vifm
 f()
