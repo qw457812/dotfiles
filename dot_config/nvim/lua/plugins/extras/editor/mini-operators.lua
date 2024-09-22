@@ -30,7 +30,7 @@ return {
       -- do not delay `v_c`
       operators.make_mappings("replace", { textobject = "cr", line = "crr", selection = "" }) -- disable `v_cr` since we have `v_p`
       operators.make_mappings("exchange", { textobject = "cx", line = "cxx", selection = "X" }) -- https://github.com/tommcdo/vim-exchange#mappings
-      operators.make_mappings("multiply", { textobject = "cd", line = "cdd", selection = "" })
+      operators.make_mappings("multiply", { textobject = "cd", line = "cdd", selection = "D" }) -- NOTE: overwrite `v_D`
     end,
   },
 
