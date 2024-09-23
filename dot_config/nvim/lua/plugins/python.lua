@@ -181,9 +181,9 @@ return {
   --   },
   -- },
 
-  -- TODO: bad performance
   {
     "MeanderingProgrammer/py-requirements.nvim",
+    cond = false, -- TODO: bad performance
     event = "BufRead requirements.txt",
     dependencies = {
       {

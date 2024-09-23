@@ -472,6 +472,9 @@ return {
           grug_far = function(state)
             local node = state.tree:get_node()
             local path = node.type == "directory" and node:get_id() or vim.fn.fnamemodify(node:get_id(), ":h")
+            if vim.g.user_neotree_auto_close then
+              state.commands.close_window(state)
+            end
             U.explorer.grug_far(path)
           end,
         },
@@ -630,6 +633,40 @@ return {
             end,
           },
         },
+      })
+    end,
+  },
+
+  {
+    "MagicDuck/grug-far.nvim",
+    optional = true,
+    keys = {
+      {
+        "<leader>sf",
+        function()
+          local grug = require("grug-far")
+          grug.open({
+            transient = true,
+            prefills = {
+              paths = vim.fn.expand("%"),
+              flags = "--fixed-strings",
+            },
+          })
+        end,
+        mode = { "n", "v" },
+        desc = "Search and Replace in current file",
+      },
+    },
+    opts = function()
+      -- https://github.com/MagicDuck/grug-far.nvim#create-a-buffer-local-keybinding-to-toggle---fixed-strings-flag
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "grug-far",
+        callback = function()
+          vim.keymap.set("n", "<localleader>w", function()
+            local state = unpack(require("grug-far").toggle_flags({ "--fixed-strings" }))
+            vim.notify("grug-far: toggled --fixed-strings " .. (state and "ON" or "OFF"))
+          end, { buffer = true, desc = "Grug Far: Toggle --fixed-strings" })
+        end,
       })
     end,
   },
@@ -884,7 +921,7 @@ return {
     cmd = "RipSubstitute",
     keys = {
       {
-        "<leader>sf",
+        "<leader>sF",
         function()
           require("rip-substitute").sub()
         end,
