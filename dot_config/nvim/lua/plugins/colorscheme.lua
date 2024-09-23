@@ -13,9 +13,11 @@ local colorschemes = {
 }
 
 -- :=vim.g.colors_name
+-- https://github.com/Styzex/RandTheme.nvim/blob/f96818619d9dcfa179f6d15eb67b04cae6ed31c7/lua/randtheme/theme_manager.lua#L62
 local function random_colorscheme()
-  local idx = tonumber(os.date("%S")) % #colorschemes + 1
-  return colorschemes[idx]
+  -- math.randomseed(os.time())
+  -- return colorschemes[math.random(#colorschemes)]
+  return colorschemes[tonumber(os.date("%S")) % #colorschemes + 1]
 end
 
 local tokyonight_custom_style = "custom"

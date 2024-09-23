@@ -7,6 +7,7 @@ return {
     "yetone/avante.nvim",
     build = "make",
     dependencies = {
+      "nvim-treesitter/nvim-treesitter",
       "stevearc/dressing.nvim",
       "MunifTanjim/nui.nvim",
       "zbirenbaum/copilot.lua", -- for `provider = "copilot"`
