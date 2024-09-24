@@ -206,7 +206,6 @@ map("n", "go", "v:lua.MiniBasics.put_empty_line(v:false)", { expr = true, desc =
 map("n", "gp", function() vim.api.nvim_feedkeys("`[" .. vim.fn.strpart(vim.fn.getregtype(), 0, 1) .. "`]", "n", false) end, { desc = "Reselect last put/yanked/changed text" })
 
 -- Search inside visually highlighted text. Use `silent = false` for it to make effect immediately.
--- TODO: search literal | https://vi.stackexchange.com/questions/17465/how-to-search-literally-without-any-regex-pattern
 map("x", "g/", "<esc>/\\%V", { silent = false, desc = "Search inside visual selection" })
 
 map("n", "g/", "q/", { desc = "command-line window (forward search)" })
