@@ -184,6 +184,9 @@ return {
         },
       }
 
+      -- for saecki/live-rename.nvim
+      opts.inactive_winbar = vim.deepcopy(opts.winbar)
+
       if LazyVim.has("trouble.nvim") then
         local trouble = require("trouble")
         local symbols = trouble.statusline({
