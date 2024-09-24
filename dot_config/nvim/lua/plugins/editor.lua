@@ -644,17 +644,19 @@ return {
       {
         "<leader>sf",
         function()
-          local grug = require("grug-far")
-          grug.open({
+          require("grug-far").open({
             transient = true,
             prefills = {
               paths = vim.fn.expand("%"),
+              -- https://vi.stackexchange.com/questions/17465/how-to-search-literally-without-any-regex-pattern
               flags = "--fixed-strings",
+              search = vim.fn.expand("<cword>"),
             },
+            minSearchChars = 1,
           })
         end,
         mode = { "n", "v" },
-        desc = "Search and Replace in current file",
+        desc = "Search and Replace in Current File",
       },
     },
     opts = function()
@@ -664,7 +666,7 @@ return {
         callback = function()
           vim.keymap.set("n", "<localleader>w", function()
             local state = unpack(require("grug-far").toggle_flags({ "--fixed-strings" }))
-            vim.notify("grug-far: toggled --fixed-strings " .. (state and "ON" or "OFF"))
+            LazyVim.info(("Toggled `--fixed-strings`: **%s**"):format(state and "ON" or "OFF"), { title = "Grug Far" })
           end, { buffer = true, desc = "Grug Far: Toggle --fixed-strings" })
         end,
       })

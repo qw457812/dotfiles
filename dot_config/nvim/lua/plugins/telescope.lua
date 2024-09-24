@@ -265,4 +265,43 @@ return {
       end)
     end,
   },
+
+  {
+    "nvim-telescope/telescope.nvim",
+    optional = true,
+    dependencies = {
+      {
+        "danielfalk/smart-open.nvim",
+        branch = "0.2.x",
+        dependencies = {
+          "kkharji/sqlite.lua",
+          "nvim-telescope/telescope-fzf-native.nvim",
+        },
+      },
+    },
+    keys = {
+      {
+        "<leader>[", -- TODO: better keymap
+        function()
+          require("telescope").extensions.smart_open.smart_open({
+            -- cwd_only = true, -- TODO: <leader>fF
+            -- filename_first = false,
+          })
+        end,
+        desc = "Smart Open",
+      },
+    },
+    opts = function(_, opts)
+      opts.extensions = vim.tbl_deep_extend("force", opts.extensions or {}, {
+        smart_open = {
+          match_algorithm = "fzf",
+        },
+      })
+
+      LazyVim.on_load("telescope.nvim", function()
+        require("telescope").setup(opts)
+        require("telescope").load_extension("smart_open")
+      end)
+    end,
+  },
 }

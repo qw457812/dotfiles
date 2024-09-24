@@ -97,7 +97,6 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
   > Mentioned by this [PR](https://github.com/LazyVim/LazyVim/pull/4139).
 - [ ] Choose a file browser between neo-tree, oil, mini-files, [others](https://github.com/rockerBOO/awesome-neovim#file-explorer).
   - [Telescope-file-browser](https://github.com/nvim-telescope/telescope-file-browser.nvim), eg. [craftzdog](https://github.com/craftzdog/dotfiles-public/blob/master/.config/nvim/lua/plugins/editor.lua), [Matt-FTW](https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/editor/telescope/file-browser.lua)
-  - Fix chezmoi not auto apply if file opened from mini-files.
 - [ ] Terminal: fix zsh-vi-mode's cursor shape.
 - [ ] [Toggleterm](https://github.com/akinsho/toggleterm.nvim) by this [issue](https://github.com/LazyVim/LazyVim/issues/539).
   - [toggleterm-manager.nvim](https://github.com/ryanmsnyder/toggleterm-manager.nvim)
@@ -147,6 +146,13 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] lang.zsh like [aimuzov](https://github.com/aimuzov/LazyVimx/blob/main/lua/lazyvimx/extras/lang/zsh.lua).
 - [ ] [tiny-inline-diagnostic.nvim](https://github.com/rachartier/tiny-inline-diagnostic.nvim) like [aimuzov](https://github.com/search?q=repo%3Aaimuzov%2FLazyVimx%20tiny-inline-diagnostic.nvim&type=code).
 - [ ] Map `u`/`d`/`q`, and unmap `dd` for `man` filetype.
+- [ ] Maybe press `]b]]][[]` instead of `]b]b]b]b[b[b]b` by [hydra.nvim](https://github.com/anuvyklack/hydra.nvim).
+- [ ] `<D-s>` not working in alacritty.
+- [ ] Better terminal keymaps than `<leader>.`.
+- [ ] Better `M`/`m<space>` keymaps.
+- [ ] Better `<leader>ff` keymaps since we have `<leader><space>`.
+- [ ] Map `esc` for some buffers (maybe floating windows?) in [close.lua](lua/plugins/close.lua).
+- [ ] Check this [util/path.lua](https://github.com/sakakibara/dotfiles/blob/f281ed9865623e204becbc3b87b3983045421422/dot_config/nvim/lua/util/path.lua).
 - [ ] Create a `state` util to cache the state (like [zen-mode.nvim](https://github.com/folke/zen-mode.nvim/blob/29b292bdc58b76a6c8f294c961a8bf92c5a6ebd6/lua/zen-mode/plugins.lua#L137)) instead of using `vim.g.user_...`
   - [vim.g.user_zenmode_on](lua/plugins/ui.lua), [vim.g.user_minianimate_disable_old](lua/plugins/ui.lua)
   - [local neovide_state = {}](lua/config/keymaps.lua)
