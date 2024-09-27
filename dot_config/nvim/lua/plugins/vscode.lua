@@ -29,6 +29,12 @@ end
 vim.api.nvim_create_autocmd("User", {
   pattern = "LazyVimKeymaps",
   callback = function()
+    vscode_map("n", "u", "undo", { desc = "VSCode Undo" })
+    vscode_map("n", "<C-r>", "redo", { desc = "VSCode Redo" })
+
+    vscode_map("n", "<Left>", "workbench.action.navigateBack", { desc = "Go Back" })
+    vscode_map("n", "<Right>", "workbench.action.navigateForward", { desc = "Go Forward" })
+
     vscode_map("n", { "<Up>", "[b", "gk" }, "workbench.action.previousEditor", { desc = "Prev Editor" })
     vscode_map("n", { "<Down>", "]b", "gj" }, "workbench.action.nextEditor", { desc = "Next Editor" })
     vscode_map("n", "[B", "workbench.action.moveEditorLeftInGroup", { desc = "Move Editor Prev" })
