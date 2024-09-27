@@ -260,6 +260,8 @@ return {
             -- compensate for invisible text caused by custom illuminate highlight
             CmpGhostText = { bg = colors.base, fg = colors.overlay1 },
             DiagnosticUnnecessary = { fg = util.lighten(colors.overlay0, 0.9) },
+            -- revert https://github.com/catppuccin/nvim/pull/768
+            Comment = { fg = colors.overlay0, style = { "italic" } },
             -- require("tokyonight.colors").setup({style = "moon"}).bg_visual -- #2d3f76
             -- Visual = { bg = util.blend(colors.surface1, "#2d3f76", 0.25), style = { "bold" } },
 

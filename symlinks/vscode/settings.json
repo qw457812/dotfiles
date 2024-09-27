@@ -33,12 +33,12 @@
     "editor.formatOnSave": true,
     // https://github.com/astral-sh/ruff-vscode#configuring-vs-code
     "editor.codeActionsOnSave": {
-      // "source.fixAll": "explicit", // eg. remove unused imports
+      "source.fixAll": "explicit", // eg. remove unused imports
       "source.organizeImports": "explicit" // sort imports by ruff
     },
     // https://code.visualstudio.com/docs/python/formatting
-    "editor.defaultFormatter": "ms-python.black-formatter"
-    // "editor.defaultFormatter": "charliermarsh.ruff"
+    // "editor.defaultFormatter": "ms-python.black-formatter"
+    "editor.defaultFormatter": "charliermarsh.ruff"
   },
   "[jsonc]": {
     "editor.formatOnSave": true,

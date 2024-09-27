@@ -1,4 +1,4 @@
- # squirrel.yaml的补丁文件是squirrel.custom.yaml
+# squirrel.yaml的补丁文件是squirrel.custom.yaml
 patch:
   # ascii_mode、inline、no_inline、vim_mode 等等设定
   # 可参考 /Library/Input Methods/Squirrel.app/Contents/SharedSupport/squirrel.yaml
@@ -11,6 +11,8 @@ patch:
       # no_inline: true   # 不使用行內編輯
       vim_mode: true    # 退出VIM插入模式自動切換輸入法狀態
     com.microsoft.VSCode:
+      vim_mode: true
+    com.todesktop.230313mzl4w4u92: # Cursor
       vim_mode: true
     com.googlecode.iterm2:
       vim_mode: true
