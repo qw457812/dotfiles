@@ -190,4 +190,21 @@ return {
       },
     },
   },
+
+  {
+    "oysandvik94/curl.nvim",
+    optional = true,
+    opts = function()
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "curl",
+        callback = function(event)
+          vim.keymap.set("n", close_key, "<cmd>CurlClose<cr>", {
+            buffer = event.buf,
+            silent = true,
+            desc = "Close (curl.nvim)",
+          })
+        end,
+      })
+    end,
+  },
 }
