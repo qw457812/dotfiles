@@ -5,6 +5,9 @@ return {
     "echasnovski/mini.files",
     optional = true,
     opts = function(_, opts)
+      opts.options = vim.tbl_deep_extend("force", opts.options or {}, {
+        use_as_default_explorer = vim.g.user_default_explorer == "mini.files",
+      })
       opts.mappings = vim.tbl_deep_extend("force", opts.mappings or {}, {
         go_in = "",
         go_out = "",

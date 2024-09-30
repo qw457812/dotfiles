@@ -530,6 +530,7 @@ return {
           -- whether to use for editing directories (e.g. `vim .` or `:e src/`)
           -- possible values: "open_default" (default), "open_current", "disabled"
           -- hijack_netrw_behavior = "disabled", -- netrw left alone, neo-tree does not handle opening dirs
+          hijack_netrw_behavior = vim.g.user_default_explorer == "neo-tree.nvim" and "open_default" or "disabled",
           commands = {
             telescope_find = function(state)
               require("telescope.builtin").find_files(get_telescope_opts(state))

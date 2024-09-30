@@ -20,6 +20,10 @@ return {
           end
         end,
       })
+
+      return {
+        open_for_directories = vim.g.user_default_explorer == "yazi.nvim",
+      }
     end,
   },
 }
