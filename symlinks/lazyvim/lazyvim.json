@@ -41,7 +41,6 @@
     "lazyvim.plugins.extras.vscode",
     "plugins.extras.coding.avante",
     "plugins.extras.editor.mini-operators",
-    "plugins.extras.editor.oil",
     "plugins.extras.editor.undotree",
     "plugins.extras.ui.border",
     "plugins.extras.ui.dropbar",
