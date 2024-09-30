@@ -371,19 +371,19 @@ alias lt='eza --tree --level=2'
 # https://github.com/jesseduffield/lazydocker
 alias lzd='lazydocker'
 # alias lzg='lazygit'
-# alias g='lazygit'
-unalias g
-g()
-{
-  export LAZYGIT_NEW_DIR_FILE=~/.lazygit/newdir
-
-  lazygit "$@"
-
-  if [ -f $LAZYGIT_NEW_DIR_FILE ]; then
-    cd "$(cat $LAZYGIT_NEW_DIR_FILE)"
-    rm -f $LAZYGIT_NEW_DIR_FILE > /dev/null
-  fi
-}
+alias g='lazygit'
+# unalias g
+# g()
+# {
+#   export LAZYGIT_NEW_DIR_FILE=~/.lazygit/newdir
+#
+#   lazygit "$@"
+#
+#   if [ -f $LAZYGIT_NEW_DIR_FILE ]; then
+#     cd "$(cat $LAZYGIT_NEW_DIR_FILE)"
+#     rm -f $LAZYGIT_NEW_DIR_FILE > /dev/null
+#   fi
+# }
 
 # alias lg='leetgo'
 alias lc="nvim leetcode.nvim"
