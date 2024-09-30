@@ -3,6 +3,8 @@ local close_key = "<bs>" -- easy to reach for Glove80
 -- exit nvim
 local exit_key = "<leader>" .. close_key -- NOTE: would overwrite "go up one level" of which-key, use `<S-bs>`?
 
+local augroup = vim.api.nvim_create_augroup("close_with_" .. close_key, { clear = true })
+
 -- alternative to psjay/buffer-closer.nvim
 -- copied from: https://github.com/psjay/buffer-closer.nvim/blob/74fec63c4c238b2cf6f61c40b47f869d442a8988/lua/buffer-closer/init.lua#L10
 local function close_buffer_or_window_or_exit()
@@ -50,6 +52,7 @@ local function close_buffer_or_window_or_exit()
 end
 
 vim.api.nvim_create_autocmd("User", {
+  group = augroup,
   pattern = "LazyVimKeymaps",
   callback = function()
     vim.keymap.set("n", close_key, close_buffer_or_window_or_exit, { desc = "Close buffer/window or Exit" })
@@ -59,6 +62,7 @@ vim.api.nvim_create_autocmd("User", {
 
 -- close some filetypes with close_key
 vim.api.nvim_create_autocmd("FileType", {
+  group = augroup,
   pattern = {
     "Avante",
     "AvanteInput",
@@ -74,6 +78,7 @@ vim.api.nvim_create_autocmd("FileType", {
 
 -- see: `:h q:`
 vim.api.nvim_create_autocmd("CmdWinEnter", {
+  group = augroup,
   callback = function(event)
     vim.keymap.set("n", close_key, "<cmd>q<cr>", {
       buffer = event.buf,
@@ -85,6 +90,7 @@ vim.api.nvim_create_autocmd("CmdWinEnter", {
 
 if close_key == "<bs>" then
   vim.api.nvim_create_autocmd("TermOpen", {
+    group = augroup,
     pattern = "*lazygit",
     callback = function(event)
       -- mapped <c-h> to quit in lazygit/config.yml via `quitWithoutChangingDirectory: <backspace>`
@@ -161,6 +167,7 @@ return {
     optional = true,
     opts = function()
       vim.api.nvim_create_autocmd("User", {
+        group = augroup,
         pattern = "MiniFilesBufferCreate",
         callback = function(args)
           local buf_id = args.data.buf_id
@@ -196,6 +203,7 @@ return {
     optional = true,
     opts = function()
       vim.api.nvim_create_autocmd("FileType", {
+        group = augroup,
         pattern = "curl",
         callback = function(event)
           vim.keymap.set("n", close_key, "<cmd>CurlClose<cr>", {
