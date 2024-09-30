@@ -38,6 +38,9 @@ require("lazy").setup({
   ui = {
     wrap = false, -- wrap the lines in the ui
     border = "rounded",
+    icons = {
+      keys = "󰥻 ",
+    },
   },
   diff = { cmd = "terminal_git" },
   checker = { enabled = true }, -- automatically check for plugin updates
