@@ -28,6 +28,8 @@ vim.g.user_is_termux = vim.env.TERMUX_VERSION ~= nil
 if not vim.g.user_is_termux then
   vim.g.lazyvim_python_lsp = "basedpyright"
 end
+-- hijack_netrw: neo-tree.nvim, oil.nvim, mini.files, yazi.nvim, telescope-file-browser.nvim
+vim.g.user_default_explorer = "oil.nvim"
 -- For holding layout like no-neck-pain.nvim when Auto Close is disabled
 vim.g.user_neotree_auto_close = vim.g.user_is_termux
 

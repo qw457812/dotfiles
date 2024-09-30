@@ -34,7 +34,7 @@ return {
       opts.extensions = vim.tbl_deep_extend("force", opts.extensions or {}, {
         file_browser = {
           -- theme = "ivy",
-          -- hijack_netrw = true,
+          hijack_netrw = vim.g.user_default_explorer == "telescope-file-browser.nvim",
           -- ~/.local/share/nvim/lazy/telescope-file-browser.nvim/lua/telescope/_extensions/file_browser/config.lua
           -- ~/.local/share/nvim/lazy/telescope.nvim/lua/telescope/mappings.lua
           initial_mode = "normal",
