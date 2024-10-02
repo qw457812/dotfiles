@@ -5,6 +5,12 @@ return {
     keys = {
       { "<leader><cr>", "<cmd>Yazi<cr>", desc = "Yazi (Buffer Dir)" },
     },
+    init = function(plugin)
+      local opts = LazyVim.opts("yazi.nvim")
+      if opts.open_for_directories then
+        U.explorer.load_on_directory(plugin.name)
+      end
+    end,
     opts = function()
       vim.api.nvim_create_autocmd("TermOpen", {
         callback = function(event)

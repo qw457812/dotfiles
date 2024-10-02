@@ -110,8 +110,6 @@ return {
       return vim.list_extend(keys, mappings)
     end,
     opts = function(_, opts)
-      local renderer = require("neo-tree.ui.renderer")
-
       -- https://github.com/nvim-neo-tree/neo-tree.nvim/wiki/Recipes#find-with-telescope
       local function get_telescope_opts(state)
         local node = state.tree:get_node()
@@ -178,7 +176,7 @@ return {
           recursive_open(state, node, node:get_depth() + vim.v.count1)
         end
 
-        renderer.redraw(state)
+        require("neo-tree.ui.renderer").redraw(state)
       end
 
       --- Recursively open the current folder and all folders it contains.
@@ -222,6 +220,7 @@ return {
           end
         end
 
+        local renderer = require("neo-tree.ui.renderer")
         local last = recursive_close(state, node, max_depth)
         renderer.redraw(state)
         renderer.focus_node(state, last:get_id())
@@ -282,10 +281,11 @@ return {
       --- Refresh the tree UI after a change of depthlevel.
       -- @bool stay Keep the current node revealed and selected
       local function redraw_after_depthlevel_change(state, stay)
+        local renderer = require("neo-tree.ui.renderer")
         local node = state.tree:get_node()
 
         if stay then
-          require("neo-tree.ui.renderer").expand_to_node(state.tree, node)
+          renderer.expand_to_node(state.tree, node)
         else
           -- Find the closest parent that is still visible.
           local parent = state.tree:get_node(node:get_parent_id())

@@ -34,6 +34,9 @@ return {
       local source_path = {
         get_symbols = function(buff, win, cursor)
           local symbols = sources.path.get_symbols(buff, win, cursor)
+          if vim.tbl_isempty(symbols) then
+            return symbols
+          end
           -- filename highlighting
           for i = 1, #symbols - 1 do
             symbols[i].name_hl = "DropBarFolderName"
@@ -154,13 +157,15 @@ return {
       end
 
       -- disable winbar for unnamed or non-listed buffers
-      local function cond_show_winbar()
+      local function cond_winbar()
         return not is_unnamed_buffer() and (vim.bo.buflisted or vim.bo.filetype == "oil")
       end
 
       opts.options.disabled_filetypes.winbar = vim.deepcopy(opts.options.disabled_filetypes.statusline)
       vim.list_extend(opts.options.disabled_filetypes.winbar, {
         "neo-tree",
+        "minifiles",
+        "yazi",
         "lazyterm",
         "noice",
         "trouble",
@@ -178,7 +183,7 @@ return {
             function()
               return dropbar.get_dropbar_str():gsub("%s%%%*$", "%%%*") -- remove last space in end_str, eval `vim.pesc(" %*")`
             end,
-            cond = cond_show_winbar,
+            cond = cond_winbar,
             padding = { left = 1, right = 0 },
           },
         },
@@ -205,7 +210,7 @@ return {
             return symbols and symbols.get():gsub("%%%*%s%%#", "%%%*%%#") or "" -- remove sep spaces, eval `vim.pesc("%* %#")`
           end,
           cond = function()
-            return cond_show_winbar() and vim.bo.ft ~= "markdown" and symbols.has()
+            return cond_winbar() and vim.bo.ft ~= "markdown" and symbols.has()
           end,
           padding = { left = 0, right = 1 },
         })
