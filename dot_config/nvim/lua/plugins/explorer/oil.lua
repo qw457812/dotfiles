@@ -92,31 +92,19 @@ return {
         return
       end
 
-      -- make oil handle `nvim .` correctly (bad alternative: `lazy = false`)
       -- https://github.com/stevearc/oil.nvim/issues/300#issuecomment-1950541064
       -- https://github.com/stevearc/oil.nvim/issues/268#issuecomment-1880161152
-      if vim.fn.argc() == 1 then
-        local argv = tostring(vim.fn.argv(0))
-        local stat = vim.uv.fs_stat(argv)
-
-        local remote_dir_args = vim.startswith(argv, "ssh")
-          or vim.startswith(argv, "sftp")
-          or vim.startswith(argv, "scp")
-
-        if stat and stat.type == "directory" or remote_dir_args then
-          require("lazy").load({ plugins = { plugin.name } })
+      local has_ssh_arg = false
+      for _, arg in ipairs(vim.fn.argv()) do
+        if vim.startswith(arg, "oil-ssh://") then
+          has_ssh_arg = true
+          break
         end
       end
-      if not require("lazy.core.config").plugins[plugin.name]._.loaded then
-        vim.api.nvim_create_autocmd("BufNew", {
-          callback = function()
-            if vim.fn.isdirectory(vim.fn.expand("<afile>")) == 1 then
-              require("lazy").load({ plugins = { "oil.nvim" } })
-              -- once oil is loaded, we can delete this autocmd
-              return true
-            end
-          end,
-        })
+      if has_ssh_arg then
+        require("lazy").load({ plugins = { plugin.name } })
+      else
+        U.explorer.load_on_directory(plugin.name)
       end
     end,
   },

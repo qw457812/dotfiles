@@ -4,10 +4,16 @@ local M = {}
 -- os.getenv("HOME")
 M.HOME = vim.uv.os_homedir()
 
+function M.is_directory(directory)
+  -- vim.fn.isdirectory(directory) == 1
+  local stat = vim.uv.fs_stat(directory)
+  return stat and stat.type == "directory"
+end
+
 --- Chezmoi source path
 M.CHEZMOI = (function()
   local path = M.HOME .. "/.local/share/chezmoi"
-  return vim.fn.isdirectory(path) == 1 and path or nil
+  return M.is_directory(path) and path or nil
 end)()
 
 M.CONFIG = (function()

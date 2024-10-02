@@ -4,6 +4,13 @@ return {
   {
     "echasnovski/mini.files",
     optional = true,
+    init = function(plugin)
+      local opts = LazyVim.opts("mini.files")
+      if opts.options and opts.options.use_as_default_explorer == false then
+        return
+      end
+      U.explorer.load_on_directory(plugin.name)
+    end,
     opts = function(_, opts)
       opts.options = vim.tbl_deep_extend("force", opts.options or {}, {
         use_as_default_explorer = vim.g.user_default_explorer == "mini.files",
