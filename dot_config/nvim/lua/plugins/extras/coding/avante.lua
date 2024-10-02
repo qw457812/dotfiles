@@ -1,7 +1,3 @@
--- :=require("render-markdown").default_config.file_types
-local render_markdown_ft = LazyVim.opts("markdown.nvim").file_types or { "markdown" }
-table.insert(render_markdown_ft, "Avante")
-
 return {
   {
     "yetone/avante.nvim",
@@ -39,10 +35,14 @@ return {
       {
         "MeanderingProgrammer/render-markdown.nvim",
         optional = true,
-        opts = {
-          file_types = render_markdown_ft,
-        },
-        ft = render_markdown_ft,
+        ft = (function()
+          local plugin = LazyVim.get_plugin("render-markdown.nvim")
+          -- :=require("render-markdown").default_config.file_types
+          local ft = plugin and plugin.ft or { "markdown" }
+          ft = type(ft) == "string" and { ft } or ft
+          table.insert(ft, "Avante")
+          return ft
+        end)(),
       },
     },
     init = function()
