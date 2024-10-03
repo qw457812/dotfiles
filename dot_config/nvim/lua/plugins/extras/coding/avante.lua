@@ -38,8 +38,10 @@ return {
         ft = (function()
           local plugin = LazyVim.get_plugin("render-markdown.nvim")
           -- :=require("render-markdown").default_config.file_types
+          -- local ft = plugin and require("lazy.core.plugin").values(plugin, "ft", false) or { "markdown" }
           local ft = plugin and plugin.ft or { "markdown" }
-          ft = type(ft) == "string" and { ft } or ft
+          ft = type(ft) == "table" and ft or { ft }
+          ft = vim.deepcopy(ft)
           table.insert(ft, "Avante")
           return ft
         end)(),
