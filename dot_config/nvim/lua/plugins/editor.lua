@@ -60,10 +60,12 @@ return {
         require("flash").treesitter(opts)
       end
 
+      -- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/keybindings.lua#L150
+      vim.keymap.set("n", "guu", "guu") -- prevent `omap u` from overwriting `guu`
       -- stylua: ignore
       return vim.list_extend(keys, {
         { "S", mode = { "n", "o", "x" }, function() treesitter() end, desc = "Flash Treesitter" },
-        -- { "u", mode = { "o", "x" }, function() treesitter(true) end, desc = "Flash Treesitter" }, -- unit textobject, conflict with guu
+        { "u", mode = { "o", "x" }, function() treesitter(true) end, desc = "Flash Treesitter" }, -- unit textobject, conflict with `guu`
         -- {
         --   "R",
         --   mode = { "o", "x" },

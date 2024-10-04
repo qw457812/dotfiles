@@ -98,6 +98,24 @@ vim.api.nvim_create_autocmd("FileType", {
 --   end,
 -- })
 --
+-- unlisted some filetypes (e.g. qf, checkhealth) in favor of bufferline.nvim
+local close_with_q_pattern = vim.tbl_map(function(autocmd)
+  return autocmd.pattern
+end, vim.api.nvim_get_autocmds({ group = lazyvim_augroup("close_with_q"), event = "FileType" }))
+vim.api.nvim_create_autocmd("FileType", {
+  group = vim.api.nvim_create_augroup("unlisted", { clear = true }),
+  -- pattern = vim.tbl_filter(function(pattern)
+  --   return pattern ~= "help"
+  -- end, close_with_q_pattern),
+  pattern = close_with_q_pattern,
+  callback = function(event)
+    -- don't unlisted help files that we're editing
+    if vim.bo[event.buf].filetype == "help" and vim.bo[event.buf].buftype ~= "help" then
+      return
+    end
+    vim.bo[event.buf].buflisted = false
+  end,
+})
 -- overwrite `lazyvim_close_with_q` auto command
 -- copied from: https://github.com/AstroNvim/AstroNvim/blob/d771094986abced8c3ceae29a5a55585ecb0523a/lua/astronvim/plugins/_astrocore_autocmds.lua#L245
 vim.api.nvim_create_autocmd("BufWinEnter", {

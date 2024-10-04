@@ -29,6 +29,8 @@ end
 function M.keymap(mode, lhs, rhs, opts)
   opts = opts or {}
   opts.silent = opts.silent ~= false
+  -- -- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/utils.lua#L17
+  -- opts.unique = opts.unique ~= false
 
   ---@cast lhs string[]
   lhs = type(lhs) == "string" and { lhs } or lhs
