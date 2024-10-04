@@ -107,10 +107,16 @@ vim.api.nvim_create_autocmd("FileType", {
   -- pattern = vim.tbl_filter(function(pattern)
   --   return pattern ~= "help"
   -- end, close_with_q_pattern),
-  pattern = close_with_q_pattern,
+  pattern = vim.list_extend({
+    "vim", -- :h command-line-window
+  }, close_with_q_pattern),
   callback = function(event)
     -- don't unlisted help files that we're editing
     if vim.bo[event.buf].filetype == "help" and vim.bo[event.buf].buftype ~= "help" then
+      return
+    end
+    -- only unlisted command-line window
+    if vim.bo[event.buf].filetype == "vim" and vim.bo[event.buf].buftype ~= "nofile" then
       return
     end
     vim.bo[event.buf].buflisted = false
@@ -156,6 +162,20 @@ vim.api.nvim_create_autocmd("BufDelete", {
     if vim.g.q_close_windows then
       vim.g.q_close_windows[args.buf] = nil
     end
+  end,
+})
+
+-- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/keybindings.lua#L288
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "qf",
+  callback = function(event)
+    vim.keymap.set("n", "dd", function()
+      local qf_items = vim.fn.getqflist()
+      local lnum = vim.api.nvim_win_get_cursor(0)[1]
+      table.remove(qf_items, lnum)
+      vim.fn.setqflist(qf_items, "r")
+      vim.api.nvim_win_set_cursor(0, { lnum, 0 })
+    end, { buffer = event.buf, silent = true, desc = "Remove quickfix entry" })
   end,
 })
 
