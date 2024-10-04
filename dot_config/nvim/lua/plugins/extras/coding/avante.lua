@@ -47,9 +47,9 @@ return {
         end)(),
       },
     },
-    init = function()
-      require("avante_lib").load()
-    end,
+    -- init = function()
+    --   require("avante_lib").load() -- TODO: break lazy loading
+    -- end,
     -- https://github.com/yetone/avante.nvim/wiki#keymaps-and-api-i-guess
     -- ~/.local/share/nvim/lazy/avante.nvim/lua/avante/init.lua
     keys = function(_, keys)
