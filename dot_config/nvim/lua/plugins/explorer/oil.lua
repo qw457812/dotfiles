@@ -25,11 +25,21 @@ return {
       keymaps = {
         ["q"] = "actions.close", -- for floating window
         -- ["`"] = "actions.tcd",
-        ["~"] = {
-          desc = "<cmd>edit $HOME<CR>",
-          callback = function()
-            require("oil").open(vim.env.HOME)
-          end,
+        -- ["~"] = {
+        --   desc = "<cmd>edit $HOME<CR>",
+        --   callback = function()
+        --     require("oil").open(vim.env.HOME)
+        --   end,
+        -- },
+        ["~"] = false,
+        ["<C-h>"] = false,
+        ["<C-l>"] = false,
+        ["<C-s>"] = false,
+        ["<leader>wv"] = { "actions.select", opts = { vertical = true }, desc = "Open the entry in a vertical split" },
+        ["<leader>ws"] = {
+          "actions.select",
+          opts = { horizontal = true },
+          desc = "Open the entry in a horizontal split",
         },
         ["<leader>."] = {
           desc = "Terminal (Oil Dir)",
