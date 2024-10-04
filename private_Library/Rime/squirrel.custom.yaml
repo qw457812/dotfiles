@@ -18,6 +18,8 @@ patch:
       vim_mode: true
     org.alacritty:
       vim_mode: true
+    com.github.wez.wezterm:
+      vim_mode: true
     net.kovidgoyal.kitty:
       vim_mode: true
     org.gnu.Emacs:

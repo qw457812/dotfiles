@@ -74,6 +74,7 @@ return {
     keys = keys,
     opts = {
       defaults = {
+        prompt_prefix = "", -- in favor of `p` on startup
         layout_strategy = vim.g.user_is_termux and "vertical" or "horizontal",
         layout_config = {
           horizontal = {
