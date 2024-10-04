@@ -151,6 +151,16 @@ map("n", "<leader>.", function() LazyVim.terminal(nil, { cwd = vim.fn.expand("%:
 -- https://github.com/gpakosz/.tmux/blob/9cf49731cd785b76cf792046feed0e8275457918/.tmux.conf#L74
 map("n", "<leader>_", "<C-W>v", { desc = "Split Window Right", remap = true })
 
+-- tabs
+map_del("n", "<leader><tab>f")
+map_del("n", "<leader><tab>l")
+map_del("n", "<leader><tab>]")
+map_del("n", "<leader><tab>[")
+map("n", "<leader><tab>H", "<cmd>tabfirst<cr>", { desc = "First Tab" })
+map("n", "<leader><tab>L", "<cmd>tablast<cr>", { desc = "Last Tab" })
+map("n", "]<tab>", "<cmd>tabnext<cr>", { desc = "Next Tab" })
+map("n", "[<tab>", "<cmd>tabprevious<cr>", { desc = "Previous Tab" })
+
 if LazyVim.has("tmux.nvim") then
   -- Move to window
   -- https://github.com/aserowy/tmux.nvim/issues/92#issuecomment-1452428973
