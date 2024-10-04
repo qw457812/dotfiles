@@ -7,6 +7,7 @@ local augroup = vim.api.nvim_create_augroup("close_with_" .. close_key, { clear 
 
 -- alternative to psjay/buffer-closer.nvim
 -- copied from: https://github.com/psjay/buffer-closer.nvim/blob/74fec63c4c238b2cf6f61c40b47f869d442a8988/lua/buffer-closer/init.lua#L10
+-- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/funcs/alt-alt.lua#L42
 local function close_buffer_or_window_or_exit()
   if vim.g.vscode then
     require("vscode").action("workbench.action.closeActiveEditor")
@@ -14,6 +15,7 @@ local function close_buffer_or_window_or_exit()
   end
 
   local function listed_buffers()
+    -- return vim.fn.getbufinfo({ buflisted = 1 })
     return vim.tbl_filter(function(b)
       return vim.bo[b].buflisted and vim.api.nvim_buf_is_valid(b)
     end, vim.api.nvim_list_bufs())
@@ -57,6 +59,13 @@ vim.api.nvim_create_autocmd("User", {
   callback = function()
     vim.keymap.set("n", close_key, close_buffer_or_window_or_exit, { desc = "Close buffer/window or Exit" })
     vim.keymap.set("n", exit_key, "<cmd>qa<cr>", { desc = "Quit All" })
+    if close_key:lower() == "<bs>" then
+      vim.keymap.set("c", close_key, function()
+        if vim.fn.getcmdline() ~= "" then
+          return close_key
+        end
+      end, { expr = true, desc = "<bs> does not leave cmdline" })
+    end
   end,
 })
 
@@ -88,7 +97,7 @@ vim.api.nvim_create_autocmd("CmdWinEnter", {
   end,
 })
 
-if close_key == "<bs>" then
+if close_key:lower() == "<bs>" then
   vim.api.nvim_create_autocmd("TermOpen", {
     group = augroup,
     pattern = "*lazygit",

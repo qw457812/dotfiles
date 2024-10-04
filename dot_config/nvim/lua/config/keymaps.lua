@@ -67,7 +67,9 @@ end
 map("n", "<leader>iL", lint_info, { desc = "Lint" })
 
 -- navigate to line start and end from home row
-map({ "n", "x", "o" }, "H", "^", { desc = "Goto line start" })
+-- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/keybindings.lua#L19
+map({ "n", "x" }, "H", "0^", { desc = "Goto line start" }) -- scroll fully to the left
+map("o", "H", "^", { desc = "Goto line start" })
 map({ "n", "o" }, "L", "$", { desc = "Goto line end" })
 -- https://github.com/v1nh1shungry/.dotfiles/blob/d8a0f6fd2766d0ec9ce5d5b4ccd55b3cc4130c1a/nvim/lua/dotfiles/core/keymaps.lua#L74
 map("x", "L", "g_", { desc = "Goto line end" })
@@ -81,7 +83,7 @@ LazyViewConfig.commands.log.key = "gL"
 -- map("n", "<bs>", "<cmd>q<cr>", { desc = "Quit" })
 -- map("n", "<bs>", "<cmd>qa<cr>", { desc = "Quit All" })
 -- map("n", "<bs>", LazyVim.ui.bufremove, { desc = "Delete Buffer" })
--- map("n", "<bs>", "<cmd>:bd<cr>", { desc = "Delete Buffer and Window" })
+-- map("n", "<bs>", "<cmd>bd<cr>", { desc = "Delete Buffer and Window" })
 -- map("n", "<bs>", "<cmd>wincmd q<cr>", { desc = "Close window" })
 
 map_del({ "n", "x", "o" }, "n")
@@ -97,6 +99,26 @@ map("n", "<leader>fs", "<cmd>w<cr><esc>", { desc = "Save File" })
 map("n", "<leader>fS", "<cmd>noautocmd w<cr>", { desc = "Save File Without Formatting" })
 map({ "i", "x", "n", "s" }, "<a-s>", "<cmd>noautocmd w<cr><esc>", { desc = "Save File Without Formatting" })
 map({ "i", "x", "n", "s" }, "<D-s>", "<cmd>w<cr><esc>", { desc = "Save File" })
+
+map("n", "<D-r>", vim.cmd.edit, { desc = "Reload File" })
+
+-- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/keybindings.lua#L234
+map("n", "<cr>", "gd", { desc = "Goto local Declaration" })
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "qf",
+  callback = function()
+    -- restore default behavior of `<cr>`, which is overridden by my mapping above
+    map("n", "<cr>", "<cr>", { buffer = true })
+
+    map("n", "dd", function()
+      local qf_items = vim.fn.getqflist()
+      local lnum = vim.api.nvim_win_get_cursor(0)[1]
+      table.remove(qf_items, lnum)
+      vim.fn.setqflist(qf_items, "r")
+      vim.api.nvim_win_set_cursor(0, { lnum, 0 })
+    end, { buffer = true, desc = "Remove quickfix entry" })
+  end,
+})
 
 -- buffers
 -- -- see: akinsho/bufferline.nvim in ~/.config/nvim/lua/plugins/ui.lua
@@ -158,15 +180,14 @@ elseif LazyVim.has("smart-splits.nvim") then
   -- stylua: ignore end
 end
 
+local function is_empty_line()
+  return vim.api.nvim_get_current_line():match("^%s*$")
+end
 -- deleting without yanking empty line
-map("n", "dd", function()
-  local is_empty_line = vim.api.nvim_get_current_line():match("^%s*$")
-  if is_empty_line then
-    return '"_dd'
-  else
-    return "dd"
-  end
-end, { expr = true, desc = "Don't Yank Empty Line to Clipboard" })
+-- stylua: ignore start
+map("n", "dd", function() return is_empty_line() and '"_dd' or "dd" end, { expr = true, desc = "Don't Yank Empty Line to Clipboard" })
+map("n", "i",  function() return is_empty_line() and '"_cc' or "i" end,  { expr = true, desc = "Indented i on Empty Line" })
+-- stylua: ignore end
 
 -- Add empty lines before and after cursor line supporting dot-repeat
 -- https://github.com/JulesNP/nvim/blob/36b04ae414b98e67a80f15d335c73744606a33d7/lua/keymaps.lua#L80
@@ -214,6 +235,9 @@ map({ "n", "x" }, "g:", "q:", { desc = "command-line window (Ex command)" })
 
 -- map("n", "<leader>.", "@:", { desc = "Repeat last command-line" })
 map("n", "g.", "@:", { desc = "Repeat last command-line" })
+
+-- works even with `spell=false`
+map("n", "z.", "1z=", { desc = "Fix Spelling" })
 
 -- https://github.com/rstacruz/vimfiles/blob/ee9a3e7e7f022059b6d012eff2e88c95ae24ff97/lua/config/keymaps.lua#L35
 -- https://github.com/nvim-lualine/lualine.nvim/blob/b431d228b7bbcdaea818bdc3e25b8cdbe861f056/lua/lualine/components/filename.lua#L74
