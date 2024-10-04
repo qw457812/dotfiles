@@ -104,19 +104,18 @@ map("n", "<D-r>", vim.cmd.edit, { desc = "Reload File" })
 
 -- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/keybindings.lua#L234
 map("n", "<cr>", "gd", { desc = "Goto local Declaration" })
+-- restore default behavior of `<cr>`, which is overridden by my mapping above
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = "qf",
-  callback = function()
-    -- restore default behavior of `<cr>`, which is overridden by my mapping above
-    map("n", "<cr>", "<cr>", { buffer = true })
-
-    map("n", "dd", function()
-      local qf_items = vim.fn.getqflist()
-      local lnum = vim.api.nvim_win_get_cursor(0)[1]
-      table.remove(qf_items, lnum)
-      vim.fn.setqflist(qf_items, "r")
-      vim.api.nvim_win_set_cursor(0, { lnum, 0 })
-    end, { buffer = true, desc = "Remove quickfix entry" })
+  pattern = {
+    "qf",
+    "vim", -- :h command-line-window
+  },
+  callback = function(event)
+    -- only restore `<cr>` for command-line window
+    if vim.bo[event.buf].filetype == "vim" and vim.bo[event.buf].buftype ~= "nofile" then
+      return
+    end
+    map("n", "<cr>", "<cr>", { buffer = event.buf })
   end,
 })
 
