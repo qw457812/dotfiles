@@ -1435,7 +1435,8 @@
            ; [:!Qk :same_wind_app :Kitty]
            [:!Qk [:open "/Applications/Alacritty.app"] :!Alacritty]
            ; [:!Qk :same_wind_app :Alacritty]
-           [:!Qk [:open "/Applications/kitty.app"] :Alacritty]
+           ;; [:!Qk [:open "/Applications/kitty.app"] :Alacritty]
+           [:!Qk [:open "/Applications/WezTerm.app"] :Alacritty]
            [:!Ql [:open "/Applications/Visual Studio Code.app"] :!VSCode]
            [:!Ql :same_wind_app :VSCode]
            [:!Qsemicolon [:open "/Library/Application Support/Citrix Receiver/Citrix Viewer.app"]] ; Citrix Workspace.app
@@ -1844,7 +1845,8 @@
            ; [:!Wk :same_wind_app :Kitty]
            [:!Wk [:left_command [:open "/Applications/Alacritty.app"]] :!Alacritty]
            ; [:!Wk :same_wind_app :Alacritty]
-           [:!Wk [:left_command [:open "/Applications/kitty.app"]] :Alacritty]
+           ;; [:!Wk [:left_command [:open "/Applications/kitty.app"]] :Alacritty]
+           [:!Wk [:left_command [:open "/Applications/WezTerm.app"]] :Alacritty]
            [:!Wl [:left_command [:open "/Applications/Visual Studio Code.app"]] :!VSCode]
            [:!Wl :same_wind_app :VSCode]
            [:!Wsemicolon [:left_command [:open "/Library/Application Support/Citrix Receiver/Citrix Viewer.app"]]] ; Citrix Workspace.app
@@ -2226,7 +2228,7 @@
    "^com\\.apple\\.Safari$"
    "^com\\.jetbrains\\.intellij\\.ce$" "^com\\.jetbrains\\.pycharm\\.ce(-EAP)?$"]
   :tmux-autostart-terminals
-  ["^org\\.alacritty$" "^net\\.kovidgoyal\\.kitty$"]
+  ["^org\\.alacritty$" "^com\\.github\\.wez\\.wezterm$" "^net\\.kovidgoyal\\.kitty$"]
   :Emacs            ["^org\\.gnu\\.Emacs$" "^org\\.gnu\\.AquamacsEmacs$"
                      "^org\\.gnu\\.Aquamacs$"]
   :VSCode           ["^com\\.microsoft\\.VSCode$"]
@@ -2234,6 +2236,7 @@
   :IntelliJ         ["^com\\.jetbrains\\.intellij\\.ce$"]
   :PyCharm          ["^com\\.jetbrains\\.pycharm\\.ce(-EAP)?$"]
   :Alacritty        ["^org\\.alacritty$"]
+  :WezTerm          ["^com\\.github\\.wez\\.wezterm$"]
   :Kitty            ["^net\\.kovidgoyal\\.kitty$"]
   :iTerm            ["^com\\.googlecode\\.iterm2$"]
   :Finder           ["^com\\.apple\\.finder$"]

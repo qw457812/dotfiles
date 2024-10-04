@@ -123,8 +123,9 @@ function start_zellij() {
 # outside of tmux, `$TERM` must be set to `xterm-256color` | https://github.com/gpakosz/.tmux
 export TERM='xterm-256color'
 # run `env | less` on kitty and iterm2
+# $TERM_PROGRAM
 case "${__CFBundleIdentifier}" in
-    "org.alacritty")
+    "org.alacritty"|"com.github.wez.wezterm")
         ZSH_TMUX_AUTOSTART=true
         # ZSH_TMUX_AUTOQUIT=false
         ;;
