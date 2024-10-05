@@ -27,6 +27,17 @@ return {
         end,
       })
 
+      -- TODO:
+      -- vim.api.nvim_create_autocmd("User", {
+      --   pattern = "YaziRenamedOrMoved",
+      --   callback = function(event)
+      --     LazyVim.info("Just received a YaziRenamedOrMoved event!\n" .. vim.inspect(event.data), { title = "Yazi" })
+      --     for from, to in pairs(event.data.changes or {}) do
+      --       LazyVim.lsp.on_rename(from, to)
+      --     end
+      --   end,
+      -- })
+
       return {
         open_for_directories = vim.g.user_default_explorer == "yazi.nvim",
       }

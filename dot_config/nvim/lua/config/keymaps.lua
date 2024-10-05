@@ -118,10 +118,10 @@ vim.api.nvim_create_autocmd("CmdWinEnter", {
 })
 
 -- buffers
--- -- see: akinsho/bufferline.nvim in ~/.config/nvim/lua/plugins/ui.lua
--- -- if you change the order of buffers :bnext and :bprevious will not respect the custom ordering
--- map("n", "<Up>", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
--- map("n", "<Down>", "<cmd>bnext<cr>", { desc = "Next Buffer" })
+-- see: akinsho/bufferline.nvim in ~/.config/nvim/lua/plugins/ui.lua
+-- if you change the order of buffers :bnext and :bprevious will not respect the custom ordering
+LazyVim.safe_keymap_set("n", "<Up>", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
+LazyVim.safe_keymap_set("n", "<Down>", "<cmd>bnext<cr>", { desc = "Next Buffer" })
 -- ":e #" doesn't work if the alternate buffer doesn't have a file name, while CTRL-^ still works then
 map("n", { "<leader>`", "<leader>bb" }, "<C-^>", { desc = "Switch to Other Buffer" })
 map("n", "<leader>bA", "<cmd>bufdo bd<cr>", { desc = "Delete All Buffers" })

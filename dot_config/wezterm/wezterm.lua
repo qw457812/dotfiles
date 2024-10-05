@@ -23,7 +23,7 @@ config.font_size = 13
 -- config.cell_width = 0.9 -- effectively like letter-spacing
 
 -- Cursor
-config.force_reverse_video_cursor = true
+-- config.force_reverse_video_cursor = true
 -- config.underline_thickness = "0.07cell"
 -- config.underline_position = -6
 config.cursor_thickness = "0.07cell"

@@ -407,9 +407,13 @@ set -g mode-keys vi
 
 
 # -- my bindings ---------------------------------------------------------------
+# https://github.com/gpakosz/.tmux/issues/53#issuecomment-276544577
+set -gu prefix2
+unbind C-a
+
 # window navigation
-# bind -r p previous-window # select previous window
-# bind -r n next-window     # select next window
+bind -r p previous-window # select previous window
+bind -r n next-window     # select next window
 # with karabiner-elements, the -r flag causes delay
 bind C-h previous-window # select previous window
 bind C-l next-window     # select next window
