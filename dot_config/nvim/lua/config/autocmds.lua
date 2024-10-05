@@ -103,22 +103,23 @@ local close_with_q_pattern = vim.tbl_map(function(autocmd)
   return autocmd.pattern
 end, vim.api.nvim_get_autocmds({ group = lazyvim_augroup("close_with_q"), event = "FileType" }))
 vim.api.nvim_create_autocmd("FileType", {
-  group = vim.api.nvim_create_augroup("unlisted", { clear = true }),
+  group = vim.api.nvim_create_augroup("buf_unlisted", { clear = true }),
   -- pattern = vim.tbl_filter(function(pattern)
   --   return pattern ~= "help"
   -- end, close_with_q_pattern),
-  pattern = vim.list_extend({
-    "vim", -- :h command-line-window
-  }, close_with_q_pattern),
+  pattern = close_with_q_pattern,
   callback = function(event)
     -- don't unlisted help files that we're editing
     if vim.bo[event.buf].filetype == "help" and vim.bo[event.buf].buftype ~= "help" then
       return
     end
-    -- only unlisted command-line window
-    if vim.bo[event.buf].filetype == "vim" and vim.bo[event.buf].buftype ~= "nofile" then
-      return
-    end
+    vim.bo[event.buf].buflisted = false
+  end,
+})
+-- unlisted command-line window
+vim.api.nvim_create_autocmd("CmdWinEnter", {
+  group = vim.api.nvim_create_augroup("buf_unlisted", { clear = false }),
+  callback = function(event)
     vim.bo[event.buf].buflisted = false
   end,
 })

@@ -106,15 +106,13 @@ map("n", "<D-r>", vim.cmd.edit, { desc = "Reload File" })
 map("n", "<cr>", "gd", { desc = "Goto local Declaration" })
 -- restore default behavior of `<cr>`, which is overridden by my mapping above
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = {
-    "qf",
-    "vim", -- :h command-line-window
-  },
+  pattern = { "qf" },
   callback = function(event)
-    -- only restore `<cr>` for command-line window
-    if vim.bo[event.buf].filetype == "vim" and vim.bo[event.buf].buftype ~= "nofile" then
-      return
-    end
+    map("n", "<cr>", "<cr>", { buffer = event.buf })
+  end,
+})
+vim.api.nvim_create_autocmd("CmdWinEnter", {
+  callback = function(event)
     map("n", "<cr>", "<cr>", { buffer = event.buf })
   end,
 })
