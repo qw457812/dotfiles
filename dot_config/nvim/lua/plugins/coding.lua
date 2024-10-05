@@ -217,7 +217,7 @@ return {
         { name = "shellPipe",            map = "P", desc = "shell pipe |",           ft = { "sh", "bash", "zsh", "fish" } },
       }
 
-      for _, tobj in pairs(ai_textobjs) do
+      for _, tobj in ipairs(ai_textobjs) do
         -- stylua: ignore
         vim.list_extend(keys, {
           { "a" .. tobj.map, [[<cmd>lua require("various-textobjs").]] .. tobj.name .. [[("outer")<CR>]], mode = { "o", "x" }, desc = tobj.desc, ft = tobj.ft },

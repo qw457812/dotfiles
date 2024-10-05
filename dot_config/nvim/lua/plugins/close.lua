@@ -174,7 +174,7 @@ return {
   {
     "echasnovski/mini.files",
     optional = true,
-    opts = function()
+    opts = function(_, opts)
       vim.api.nvim_create_autocmd("User", {
         group = augroup,
         pattern = "MiniFilesBufferCreate",
@@ -184,6 +184,11 @@ return {
           vim.keymap.set("n", close_key, function() require("mini.files").close() end, { buffer = buf_id, desc = "Close (mini.files)" })
         end,
       })
+
+      opts.mappings = opts.mappings or {}
+      if not opts.mappings.reset or opts.mappings.reset:lower() == close_key:lower() then
+        opts.mappings.reset = ""
+      end
     end,
   },
 
