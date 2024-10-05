@@ -195,8 +195,9 @@ return {
           end,
           desc = "Delete Surrounding Indentation",
         },
-        -- { "U", [[<cmd>lua require("various-textobjs").url()<CR>]], mode = { "o", "x" }, desc = "url" }, -- conflict with gUU
+        { "U", [[<cmd>lua require("various-textobjs").url()<CR>]], mode = { "o", "x" }, desc = "url" }, -- conflict with gUU
       }
+      vim.keymap.set("n", "gUU", "gUU") -- prevent `omap U` from overwriting `gUU`
 
       -- stylua: ignore
       local ai_textobjs = {
