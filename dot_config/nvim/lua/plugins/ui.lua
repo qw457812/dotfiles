@@ -29,6 +29,8 @@ return {
         name_formatter = function(buf)
           return buf.name:match("(.+)%..+$")
         end,
+        show_buffer_close_icons = false,
+        show_close_icon = false,
       },
     },
   },
