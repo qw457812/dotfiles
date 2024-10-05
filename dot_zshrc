@@ -569,39 +569,6 @@ export SDKMAN_DIR="$HOME/.sdkman"
 # set python command if 'py' not installed | https://github.com/ohmyzsh/ohmyzsh/blob/master/plugins/python/python.plugin.zsh
 builtin which py > /dev/null || alias py='python3'
 
-# # https://github.com/jarun/nnn/wiki/Basic-use-cases#configure-cd-on-quit
-# # https://github.com/jarun/nnn/blob/master/misc/quitcd/quitcd.bash_sh_zsh
-# nn ()
-# {
-#     # Block nesting of nnn in subshells
-#     [ "${NNNLVL:-0}" -eq 0 ] || {
-#         echo "nnn is already running"
-#         return
-#     }
-#
-#     # The behaviour is set to cd on quit (nnn checks if NNN_TMPFILE is set)
-#     # If NNN_TMPFILE is set to a custom path, it must be exported for nnn to
-#     # see. To cd on quit only on ^G, remove the "export" and make sure not to
-#     # use a custom path, i.e. set NNN_TMPFILE *exactly* as follows:
-#     #      NNN_TMPFILE="${XDG_CONFIG_HOME:-$HOME/.config}/nnn/.lastd"
-#     export NNN_TMPFILE="${XDG_CONFIG_HOME:-$HOME/.config}/nnn/.lastd"
-#
-#     # Unmask ^Q (, ^V etc.) (if required, see `stty -a`) to Quit nnn
-#     # stty start undef
-#     # stty stop undef
-#     # stty lwrap undef
-#     # stty lnext undef
-#
-#     # The command builtin allows one to alias nnn to n, if desired, without
-#     # making an infinitely recursive alias
-#     command nnn "$@"
-#
-#     [ ! -f "$NNN_TMPFILE" ] || {
-#         . "$NNN_TMPFILE"
-#         rm -f -- "$NNN_TMPFILE" > /dev/null
-#     }
-# }
-
 # https://github.com/gokcehan/lf/blob/master/etc/lfcd.sh
 lf () {
     # `command` is needed in case `lfcd` is aliased to `lf`
@@ -633,15 +600,6 @@ f()
     fi
     cd "$dst"
 }
-
-# # comment out unused aliases in ~/.config/nvim-Lazyman/.lazymanrc: less, tree
-# # https://github.com/doctorfree/nvim-lazyman
-# # Source the Lazyman shell initialization for aliases and nvims selector
-# # shellcheck source=.config/nvim-Lazyman/.lazymanrc
-# [ -f ~/.config/nvim-Lazyman/.lazymanrc ] && source ~/.config/nvim-Lazyman/.lazymanrc
-# # Source the Lazyman .nvimsbind for nvims key binding
-# # shellcheck source=.config/nvim-Lazyman/.nvimsbind
-# [ -f ~/.config/nvim-Lazyman/.nvimsbind ] && source ~/.config/nvim-Lazyman/.nvimsbind
 
 # https://github.com/clash-verge-rev/clash-verge-rev
 # export https_proxy=http://127.0.0.1:7897 http_proxy=http://127.0.0.1:7897 all_proxy=socks5://127.0.0.1:7897

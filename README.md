@@ -74,7 +74,7 @@ TODO:
      - [ ] [Doom Emacs](#doom-emacs)
    - File manager
      - [ ] Terminal: [Vifm](#vifm) or [Yazi](https://github.com/sxyazi/yazi)
-     - [ ] Neovim: [neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim) or [telescope-file-browser.nvim](https://github.com/nvim-telescope/telescope-file-browser.nvim)
+     - [ ] Neovim: [neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim)
      - [ ] [VSCode](#vscodevim): Built-in Explorer view
      - [ ] [IdeaVim](#ideavim): [NERDTree](https://github.com/JetBrains/ideavim/wiki/NERDTree-support)
    - Others
@@ -135,6 +135,10 @@ TODO:
 ## [Oh my tmux!](https://github.com/gpakosz/.tmux)
 
 [.tmux.conf.local](dot_tmux.conf.local)
+
+TODO:
+
+- [ ] Try [WezTerm](https://wezfurlong.org/wezterm/).
 
 ## [Vifm](https://github.com/vifm/vifm)
 
