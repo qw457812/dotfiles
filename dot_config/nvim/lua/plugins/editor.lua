@@ -4,7 +4,8 @@ return {
     optional = true,
     keys = {
       {
-        "<leader>sf",
+        "<leader>sF",
+        mode = { "n", "v" },
         function()
           require("grug-far").open({
             transient = true,
@@ -17,22 +18,62 @@ return {
             minSearchChars = 1,
           })
         end,
-        mode = { "n", "v" },
         desc = "Search and Replace in Current File",
       },
     },
-    opts = function()
+    opts = function(_, opts)
       -- https://github.com/MagicDuck/grug-far.nvim#create-a-buffer-local-keybinding-to-toggle---fixed-strings-flag
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "grug-far",
         callback = function()
-          vim.keymap.set("n", "<localleader>w", function()
+          vim.keymap.set("n", "<localleader>f", function()
             local state = unpack(require("grug-far").toggle_flags({ "--fixed-strings" }))
             LazyVim.info(("Toggled `--fixed-strings`: **%s**"):format(state and "ON" or "OFF"), { title = "Grug Far" })
           end, { buffer = true, desc = "Grug Far: Toggle --fixed-strings" })
         end,
       })
+
+      opts.keymaps = vim.tbl_deep_extend("force", opts.keymaps or {}, {
+        refresh = { n = "<localleader>R" },
+      })
     end,
+  },
+
+  -- better `:substitute`
+  {
+    "chrisgrieser/nvim-rip-substitute",
+    cmd = "RipSubstitute",
+    keys = {
+      {
+        "<leader>sf",
+        mode = { "n", "x" },
+        function()
+          -- popup overlap by nvim-notify or noice.nvim when `opts.popupWin.position == "top"`
+          local ok, notify = pcall(require, "notify")
+          if ok then
+            notify.dismiss({ silent = true, pending = true })
+          end
+
+          require("rip-substitute").sub()
+        end,
+        desc = "Rip Substitute",
+      },
+    },
+    opts = {
+      popupWin = {
+        position = "top",
+      },
+      keymaps = {
+        abort = "<esc>",
+        insertModeConfirm = "<C-s>",
+        toggleFixedStrings = "<localleader>f",
+        toggleIgnoreCase = "<localleader>c",
+      },
+      regexOptions = {
+        startWithFixedStringsOn = true,
+        -- startWithIgnoreCase = true,
+      },
+    },
   },
 
   {
@@ -192,27 +233,6 @@ return {
         },
       },
     },
-  },
-
-  -- better `:substitute`
-  {
-    "chrisgrieser/nvim-rip-substitute",
-    cmd = "RipSubstitute",
-    keys = {
-      {
-        "<leader>sF",
-        function()
-          require("rip-substitute").sub()
-        end,
-        mode = { "n", "x" },
-        desc = " rip substitute",
-      },
-    },
-    -- opts = {
-    --   popupWin = {
-    --     position = "top",
-    --   },
-    -- },
   },
 
   {
