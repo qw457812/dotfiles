@@ -1,0 +1,38 @@
+-- https://wezfurlong.org/wezterm/config/mouse.html#gotcha-on-binding-an-up-event-only
+
+local wezterm = require("wezterm")
+local act = wezterm.action
+
+local M = {}
+
+function M.setup(config)
+	config.mouse_bindings = {
+		-- Right click to paste
+		{
+			event = { Down = { streak = 1, button = "Right" } },
+			mods = "NONE",
+			action = act.PasteFrom("PrimarySelection"),
+		},
+
+		-- Change the default click behavior so that it only selects text and doesn't open hyperlinks
+		{
+			event = { Up = { streak = 1, button = "Left" } },
+			mods = "NONE",
+			action = act.CompleteSelection("ClipboardAndPrimarySelection"),
+		},
+		-- And bind 'Up' event of SUPER-Click to open hyperlinks
+		{
+			event = { Up = { streak = 1, button = "Left" } },
+			mods = "SUPER",
+			action = act.CompleteSelectionOrOpenLinkAtMouseCursor("ClipboardAndPrimarySelection"),
+		},
+		-- Disable the 'Down' event of SUPER-Click to avoid weird program behaviors
+		{
+			event = { Down = { streak = 1, button = "Left" } },
+			mods = "SUPER",
+			action = act.Nop,
+		},
+	}
+end
+
+return M
