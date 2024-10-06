@@ -318,30 +318,30 @@ return {
     cond = vim.list_contains(colorschemes, "obscure"),
     lazy = true,
     opts = function()
-      local p = require("obscure.palettes").get_palette("obscure")
+      local util = require("obscure.util")
       -- ~/.local/share/nvim/lazy/obscure.nvim/lua/obscure/palettes/obscure.lua
-      local illuminate = p.gray4
       return {
-        highlight_overrides = {
-          IlluminatedWordText = { bg = p.gray3 },
-          IlluminatedWordRead = { bg = illuminate },
-          IlluminatedWordWrite = { bg = illuminate, underline = true },
-          LspReferenceRead = { bg = illuminate },
-          LspReferenceWrite = { bg = illuminate, underline = true },
+        on_highlights = function(hl, c)
+          local illuminate = util.lighten(c.gray4, 0.925, c.fg)
+          hl.IlluminatedWordText = { bg = c.gray3 }
+          hl.IlluminatedWordRead = { bg = illuminate }
+          hl.IlluminatedWordWrite = { bg = illuminate, underline = true }
+          hl.LspReferenceRead = { bg = illuminate }
+          hl.LspReferenceWrite = { bg = illuminate, underline = true }
 
-          Conceal = { fg = p.subtext4 }, -- for DropBarFolderName
-          Search = { fg = p.bright_yellow, bg = p.subtext4 },
+          hl.Conceal = { fg = c.subtext4 } -- for DropBarFolderName
+          hl.Search = { fg = c.bright_yellow, bg = c.subtext4 }
 
-          FlashLabel = { fg = p.bg, bg = p.bright_green, bold = true },
+          hl.FlashLabel = { fg = c.bg, bg = c.bright_green, bold = true }
 
-          TelescopePromptBorder = { fg = p.yellow },
-          TelescopePromptTitle = { fg = p.yellow },
-          TelescopeResultsTitle = { fg = p.blue },
-          TelescopePreviewTitle = { fg = p.blue },
-          TelescopeBorder = { fg = p.blue },
+          hl.TelescopePromptBorder = { fg = c.yellow }
+          hl.TelescopePromptTitle = { fg = c.yellow }
+          hl.TelescopeResultsTitle = { fg = c.blue }
+          hl.TelescopePreviewTitle = { fg = c.blue }
+          hl.TelescopeBorder = { fg = c.blue }
 
-          MiniIndentscopeSymbol = { fg = p.subtext2 },
-        },
+          hl.MiniIndentscopeSymbol = { fg = c.subtext2, nocombine = true }
+        end,
       }
     end,
   },
