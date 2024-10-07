@@ -508,6 +508,7 @@ set -g @open-S 'https://www.google.com/search?q='
 # https://github.com/aserowy/tmux.nvim#tpm
 # note: C-l for clear-history not working anymore
 set -g @plugin 'aserowy/tmux.nvim'
+set -g @tmux-nvim-navigation-cycle false
 set -g @tmux-nvim-resize-keybinding-left 'C-Left'
 set -g @tmux-nvim-resize-keybinding-down 'C-Down'
 set -g @tmux-nvim-resize-keybinding-up 'C-Up'

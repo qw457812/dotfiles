@@ -30,6 +30,8 @@ return {
       },
       -- define keybindings in ../config/keymaps.lua to override LazyVim's default keybindings
       navigation = {
+        -- cycles to opposite pane while navigating into the border
+        cycle_navigation = false,
         -- enables default keybindings (C-hjkl) for normal mode
         enable_default_keybindings = false,
       },
