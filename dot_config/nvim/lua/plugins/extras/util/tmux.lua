@@ -68,4 +68,122 @@ return {
       disable_multiplexer_nav_when_zoomed = false,
     },
   },
+
+  {
+    "willothy/wezterm.nvim",
+    lazy = true,
+    cond = vim.env.WEZTERM_UNIX_SOCKET ~= nil,
+    opts = {
+      create_commands = false,
+    },
+  },
+
+  {
+    "folke/zen-mode.nvim",
+    optional = true,
+    opts = function(_, opts)
+      if not vim.env.TMUX and not vim.env.WEZTERM_UNIX_SOCKET then
+        return
+      end
+
+      -- https://github.com/folke/zen-mode.nvim/issues/111
+      vim.api.nvim_create_autocmd("VimLeavePre", {
+        desc = "Restore tmux status line and wezterm pane zoom state when close Neovim in Zen Mode",
+        callback = function()
+          if vim.g.user_zenmode_on then
+            require("zen-mode").close()
+          end
+        end,
+      })
+
+      local on_open = opts.on_open or function() end
+      local on_close = opts.on_close or function() end
+
+      local on_open_tmux = function() end
+      local on_close_tmux = function() end
+
+      if vim.env.TMUX then
+        -- https://github.com/folke/zen-mode.nvim/blob/a31cf7113db34646ca320f8c2df22cf1fbfc6f2a/lua/zen-mode/plugins.lua#L96
+        local function get_tmux_opt(option)
+          local option_raw = vim.fn.system([[tmux show -w ]] .. option)
+          if option_raw == "" then
+            option_raw = vim.fn.system([[tmux show -g ]] .. option)
+          end
+          local opt = vim.split(vim.trim(option_raw), " ")[2]
+          return opt
+        end
+
+        local tmux_status = get_tmux_opt("status")
+        local augroup = vim.api.nvim_create_augroup("zenmode_tmux", { clear = true })
+        -- https://github.com/TranThangBin/.dotfiles/blob/01a5013b351aaf2b79aa7d771fdc2cec5d861799/nvim/.config/nvim/lua/tranquangthang/lazy/zen-mode.lua#L39
+        on_open_tmux = function()
+          -- restore tmux status line when switching to another tmux window or ctrl-z
+          vim.api.nvim_create_autocmd({ "FocusLost", "VimSuspend" }, {
+            group = augroup,
+            desc = "Restore tmux status line on Neovim Focus Lost",
+            callback = function()
+              vim.fn.system(string.format([[tmux set status %s]], tmux_status))
+            end,
+          })
+          vim.api.nvim_create_autocmd({ "FocusGained", "VimResume" }, {
+            group = augroup,
+            desc = "Hide tmux status line on Neovim Focus Gained",
+            callback = function()
+              vim.fn.system([[tmux set status off]])
+            end,
+          })
+        end
+        on_close_tmux = function()
+          vim.api.nvim_clear_autocmds({ group = augroup })
+        end
+      end
+
+      local on_open_wezterm = function() end
+      local on_close_wezterm = function() end
+
+      if vim.env.WEZTERM_UNIX_SOCKET then
+        local wezterm = require("wezterm")
+
+        local function get_pane_zoom_state()
+          local panes = wezterm.list_panes()
+          if not panes then
+            return
+          end
+          local is_zoomed = false
+          for _, p in ipairs(panes) do
+            if p.is_zoomed then
+              is_zoomed = true
+              break
+            end
+          end
+          return is_zoomed
+        end
+
+        local is_zoomed
+        on_open_wezterm = function()
+          is_zoomed = get_pane_zoom_state()
+          if not is_zoomed then
+            wezterm.zoom_pane(nil, { zoom = true })
+          end
+        end
+        on_close_wezterm = function()
+          -- restore zoom state
+          if not is_zoomed then
+            wezterm.zoom_pane(nil, { unzoom = true })
+          end
+        end
+      end
+
+      opts.on_open = function()
+        on_open()
+        on_open_tmux()
+        on_open_wezterm()
+      end
+      opts.on_close = function()
+        on_close()
+        on_close_tmux()
+        on_close_wezterm()
+      end
+    end,
+  },
 }
