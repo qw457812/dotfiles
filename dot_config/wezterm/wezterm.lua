@@ -2,6 +2,10 @@
 --
 -- https://github.com/folke/dot/blob/master/config/wezterm/wezterm.lua
 -- https://github.com/chrisgrieser/.config/blob/main/wezterm/wezterm.lua
+-- https://github.com/KevinSilvester/wezterm-config
+--
+-- TODO:
+-- https://github.com/MLFlexer/resurrect.wezterm
 
 local wezterm = require("wezterm")
 -- wezterm.plugin.update_all()
@@ -40,6 +44,6 @@ config.command_palette_font_size = 15
 config.cursor_thickness = "0.07cell"
 
 -- Scrollback
-config.scrollback_lines = 10000
+config.scrollback_lines = 50000
 
 return config

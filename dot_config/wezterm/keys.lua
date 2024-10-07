@@ -30,6 +30,22 @@ local next_pane_or_tab_or_window = wezterm.action_callback(function(win, pane)
 	end
 end)
 
+local open_url = wezterm.action.QuickSelectArgs({
+	label = "open url",
+	patterns = {
+		"\\((https?://\\S+)\\)",
+		"\\[(https?://\\S+)\\]",
+		"\\{(https?://\\S+)\\}",
+		"<(https?://\\S+)>",
+		"\\bhttps?://\\S+[)/a-zA-Z0-9-]+",
+	},
+	action = wezterm.action_callback(function(window, pane)
+		local url = window:get_selection_text_for_pane(pane)
+		wezterm.log_info("opening: " .. url)
+		wezterm.open_with(url)
+	end),
+})
+
 -- https://github.com/mrjones2014/smart-splits.nvim#wezterm
 -- https://github.com/mrjones2014/smart-splits.nvim/blob/master/plugin/init.lua
 -- Do *NOT* lazy-loading smart-splits.nvim
@@ -91,7 +107,7 @@ function M.apply_to_config(config)
 	-- wezterm show-keys
 	config.keys = {
 		-- Send "CTRL-B" to the terminal when pressing CTRL-B, CTRL-B
-		{ key = "b", mods = "LEADER|CTRL", action = act.SendKey({ key = "b", mods = "CTRL" }) },
+		{ mods = "LEADER|CTRL", key = "b", action = act.SendKey({ key = "b", mods = "CTRL" }) },
 		-- resize panes
 		split_nav("resize", "CTRL", "LeftArrow", "Left"),
 		split_nav("resize", "CTRL", "RightArrow", "Right"),
@@ -102,8 +118,9 @@ function M.apply_to_config(config)
 		split_nav("move", "CTRL", "j", "Down"),
 		split_nav("move", "CTRL", "k", "Up"),
 		split_nav("move", "CTRL", "l", "Right"),
-		-- cycles panes, then tabs, then windows
-		{ mods = M.super, key = "w", action = next_pane_or_tab_or_window },
+		-- -- cycles panes, then tabs, then windows
+		-- { mods = M.super, key = "w", action = next_pane_or_tab_or_window },
+		{ mods = M.super, key = "w", action = act.CloseCurrentPane({ confirm = false }) },
 		-- Splits
 		{ mods = M.super, key = "Enter", action = smart_split },
 		{ mods = M.super, key = "\\", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
@@ -115,14 +132,16 @@ function M.apply_to_config(config)
 		-- Tabs
 		{ mods = M.super, key = "j", action = act({ ActivateTabRelative = 1 }) },
 		{ mods = M.super, key = "k", action = act({ ActivateTabRelative = -1 }) },
-		-- Scrollback
-		{ mods = M.super, key = "u", action = act.ScrollByPage(-0.5) },
-		{ mods = M.super, key = "d", action = act.ScrollByPage(0.5) },
+		-- -- Scrollback
+		-- { mods = M.super, key = "u", action = act.ScrollByPage(-0.5) },
+		-- { mods = M.super, key = "d", action = act.ScrollByPage(0.5) },
 		-- Others
 		{ mods = M.super, key = "x", action = act.ActivateCopyMode },
 		{ mods = M.super, key = "s", action = act.QuickSelect },
 		{ mods = M.super, key = ":", action = act.ActivateCommandPalette },
-		{ mods = M.super, key = ".", action = act.ShowDebugOverlay },
+		{ mods = M.super, key = "d", action = act.ShowDebugOverlay },
+		{ mods = M.super, key = "u", action = open_url },
+		{ mods = M.super, key = "f", action = act.Search({ CaseInSensitiveString = "" }) },
 	}
 end
 
