@@ -2162,6 +2162,9 @@
   ;; swap 后 shift+; 会触发鼠须管 shift 切换中英文
   {:des   "swap : and ;"
    :rules [[:#Psemicolon :!Ssemicolon]
+           [:#Csemicolon :!Ssemicolon]
+           [:#Tsemicolon :!Ssemicolon]
+           [:#Osemicolon :!Ssemicolon]
            [:!Ssemicolon :semicolon]]}
 
   ;; swap " and '

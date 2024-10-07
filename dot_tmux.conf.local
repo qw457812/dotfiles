@@ -405,12 +405,14 @@ set -g mode-keys vi
 # move status line to top
 #set -g status-position top
 
+# https://wezfurlong.org/wezterm/shell-integration.html#user-vars
+set -g allow-passthrough on
 
-# -- my bindings ---------------------------------------------------------------
 # https://github.com/gpakosz/.tmux/issues/53#issuecomment-276544577
 set -gu prefix2
 unbind C-a
 
+# -- my bindings ---------------------------------------------------------------
 # window navigation
 bind -r p previous-window # select previous window
 bind -r n next-window     # select next window

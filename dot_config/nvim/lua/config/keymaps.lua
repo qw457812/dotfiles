@@ -134,6 +134,10 @@ map("n", "<leader>bA", "<cmd>bufdo bd<cr>", { desc = "Delete All Buffers" })
 map("n", "<Left>", "<C-o>", { desc = "Go Back" })
 map("n", "<Right>", "<C-i>", { desc = "Go Forward" })
 
+if LazyVim.has("noice.nvim") then
+  map("n", "<esc>", "<cmd>noh<bar>Noice dismiss<cr><esc>", { desc = "Escape and Clear hlsearch/notifications" })
+end
+
 -- match
 -- helix-style mappings | https://github.com/boltlessengineer/nvim/blob/607ee0c9412be67ba127a4d50ee722be578b5d9f/lua/config/keymaps.lua#L103
 -- remap to matchit
@@ -158,34 +162,6 @@ map("n", "<leader><tab>H", "<cmd>tabfirst<cr>", { desc = "First Tab" })
 map("n", "<leader><tab>L", "<cmd>tablast<cr>", { desc = "Last Tab" })
 map("n", "]<tab>", "<cmd>tabnext<cr>", { desc = "Next Tab" })
 map("n", "[<tab>", "<cmd>tabprevious<cr>", { desc = "Previous Tab" })
-
-if LazyVim.has("tmux.nvim") then
-  -- Move to window
-  -- https://github.com/aserowy/tmux.nvim/issues/92#issuecomment-1452428973
-  map({ "n", "t" }, "<C-h>", [[<cmd>lua require("tmux").move_left()<cr>]], { desc = "Go to Left Window" })
-  map({ "n", "t" }, "<C-j>", [[<cmd>lua require("tmux").move_bottom()<cr>]], { desc = "Go to Lower Window" })
-  map({ "n", "t" }, "<C-k>", [[<cmd>lua require("tmux").move_top()<cr>]], { desc = "Go to Upper Window" })
-  map({ "n", "t" }, "<C-l>", [[<cmd>lua require("tmux").move_right()<cr>]], { desc = "Go to Right Window" })
-  -- Resize window
-  -- note: A-hjkl for move lines (by both LazyVim's default keybindings and lazyvim.plugins.extras.editor.mini-move)
-  -- need to disable macOS keybord shortcuts of mission control first
-  -- TODO: resize LazyVim's terminal
-  map({ "n", "t" }, "<C-Left>", [[<cmd>lua require("tmux").resize_left()<cr>]], { desc = "Resize Window Left" })
-  map({ "n", "t" }, "<C-Down>", [[<cmd>lua require("tmux").resize_bottom()<cr>]], { desc = "Resize Window Bottom" })
-  map({ "n", "t" }, "<C-Up>", [[<cmd>lua require("tmux").resize_top()<cr>]], { desc = "Resize Window Top" })
-  map({ "n", "t" }, "<C-Right>", [[<cmd>lua require("tmux").resize_right()<cr>]], { desc = "Resize Window Right" })
-elseif LazyVim.has("smart-splits.nvim") then
-  -- stylua: ignore start
-  map({ "n", "t" }, "<C-h>", function() require("smart-splits").move_cursor_left() end)
-  map({ "n", "t" }, "<C-j>", function() require("smart-splits").move_cursor_down() end)
-  map({ "n", "t" }, "<C-k>", function() require("smart-splits").move_cursor_up() end)
-  map({ "n", "t" }, "<C-l>", function() require("smart-splits").move_cursor_right() end)
-  map("n", "<C-Left>", function() require("smart-splits").resize_left() end)
-  map("n", "<C-Down>", function() require("smart-splits").resize_down() end)
-  map("n", "<C-Up>", function() require("smart-splits").resize_up() end)
-  map("n", "<C-Right>", function() require("smart-splits").resize_right() end)
-  -- stylua: ignore end
-end
 
 local function is_empty_line()
   return vim.api.nvim_get_current_line():match("^%s*$")

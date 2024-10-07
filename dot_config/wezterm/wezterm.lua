@@ -4,10 +4,13 @@
 -- https://github.com/chrisgrieser/.config/blob/main/wezterm/wezterm.lua
 
 local wezterm = require("wezterm")
+-- wezterm.plugin.update_all()
 local config = wezterm.config_builder()
+wezterm.log_info("reloading")
 
-require("mouse").setup(config)
-require("links").setup(config)
+require("mouse").apply_to_config(config)
+require("links").apply_to_config(config)
+require("keys").apply_to_config(config)
 
 -- Window
 config.window_decorations = "RESIZE"
@@ -36,6 +39,7 @@ config.command_palette_font_size = 15
 -- config.underline_position = -6
 config.cursor_thickness = "0.07cell"
 
--- config.scrollback_lines = 10000
+-- Scrollback
+config.scrollback_lines = 10000
 
 return config
