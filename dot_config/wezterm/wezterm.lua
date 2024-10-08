@@ -29,9 +29,9 @@ config.color_scheme = "tokyonight_night"
 
 -- Fonts
 config.font = wezterm.font_with_fallback({
-	"JetBrainsMonoNL Nerd Font", -- "FiraCode Nerd Font"
-	-- Chinese
-	"Sarasa Mono SC", -- "LXGW WenKai Mono"
+  "JetBrainsMonoNL Nerd Font", -- "FiraCode Nerd Font"
+  -- Chinese
+  "Sarasa Mono SC", -- "LXGW WenKai Mono"
 }) -- wezterm ls-fonts --list-system
 config.font_size = 13
 config.command_palette_font_size = 15

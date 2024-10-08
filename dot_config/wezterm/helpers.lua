@@ -11,10 +11,10 @@ local M = {}
 ---@param finish integer? Final index on src. Defaults to `#src`
 ---@return T dst
 function M.list_extend(dst, src, start, finish)
-	for i = start or 1, finish or #src do
-		table.insert(dst, src[i])
-	end
-	return dst
+  for i = start or 1, finish or #src do
+    table.insert(dst, src[i])
+  end
+  return dst
 end
 
 return M
