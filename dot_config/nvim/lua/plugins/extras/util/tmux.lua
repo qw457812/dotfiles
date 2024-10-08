@@ -12,7 +12,7 @@ return {
       { "<C-k>", mode = { "n", "t" }, [[<cmd>lua require("tmux").move_top()<cr>]], desc = "Go to Upper Window" },
       { "<C-l>", mode = { "n", "t" }, [[<cmd>lua require("tmux").move_right()<cr>]], desc = "Go to Right Window" },
       -- Resize window
-      -- note: A-hjkl for move lines (by both LazyVim's default keybindings and lazyvim.plugins.extras.editor.mini-move)
+      -- note: A-hjkl is used for move lines (by both LazyVim's default keybindings and extras.editor.mini-move)
       -- need to disable macOS keybord shortcuts of mission control first
       -- TODO: resize LazyVim's terminal
       { "<C-Left>", mode = { "n", "t" }, [[<cmd>lua require("tmux").resize_left()<cr>]], desc = "Resize Window Left" },
@@ -28,15 +28,11 @@ return {
         -- sync all registers
         enable = false,
       },
-      -- define keybindings in ../config/keymaps.lua to override LazyVim's default keybindings
       navigation = {
-        -- cycles to opposite pane while navigating into the border
         cycle_navigation = false,
-        -- enables default keybindings (C-hjkl) for normal mode
         enable_default_keybindings = false,
       },
       resize = {
-        -- enables default keybindings (A-hjkl) for normal mode
         enable_default_keybindings = false,
       },
     },
@@ -99,6 +95,7 @@ return {
       local on_open = opts.on_open or function() end
       local on_close = opts.on_close or function() end
 
+      -- toggle tmux status line
       local on_open_tmux = function() end
       local on_close_tmux = function() end
 
@@ -138,38 +135,45 @@ return {
         end
       end
 
+      -- toggle wezterm pane zoom state
       local on_open_wezterm = function() end
       local on_close_wezterm = function() end
 
       if vim.env.WEZTERM_UNIX_SOCKET then
         local wezterm = require("wezterm")
+        local smart_splits_wezterm = require("smart-splits.mux.wezterm")
 
-        local function get_pane_zoom_state()
-          local panes = wezterm.list_panes()
-          if not panes then
-            return
-          end
-          local is_zoomed = false
-          for _, p in ipairs(panes) do
-            if p.is_zoomed then
-              is_zoomed = true
-              break
-            end
-          end
-          return is_zoomed
-        end
+        -- local function get_pane_zoom_state()
+        --   -- https://github.com/wez/wezterm/issues/3413#issuecomment-1491870672
+        --   -- local pane_id = wezterm.get_current_pane()
+        --   local pane_id = smart_splits_wezterm.current_pane_id()
+        --   local panes = wezterm.list_panes()
+        --   if not panes or not pane_id then
+        --     return
+        --   end
+        --
+        --   for _, p in ipairs(panes) do
+        --     if p.pane_id == pane_id then
+        --       return p.is_zoomed
+        --     end
+        --   end
+        -- end
 
+        -- NOTE: using `wezterm cli list-clients --format=json` instead of `$WEZTERM_PANE` to get real pane_id
+        -- https://github.com/wez/wezterm/issues/3413#issuecomment-1491870672
+        local pane_id = smart_splits_wezterm.current_pane_id()
         local is_zoomed
         on_open_wezterm = function()
-          is_zoomed = get_pane_zoom_state()
-          if not is_zoomed then
-            wezterm.zoom_pane(nil, { zoom = true })
+          -- is_zoomed = get_pane_zoom_state()
+          is_zoomed = smart_splits_wezterm.current_pane_is_zoomed()
+          if is_zoomed == false then
+            wezterm.zoom_pane(pane_id, { zoom = true })
           end
         end
         on_close_wezterm = function()
           -- restore zoom state
-          if not is_zoomed then
-            wezterm.zoom_pane(nil, { unzoom = true })
+          if is_zoomed == false then
+            wezterm.zoom_pane(pane_id, { unzoom = true })
           end
         end
       end
