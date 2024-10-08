@@ -51,6 +51,20 @@ M.action = {
 			wezterm.open_with(url)
 		end),
 	}),
+
+	clear_selection_and_clear_pattern_and_close_and_paste = wezterm.action_callback(function(window, pane)
+		local actions = {}
+		if window:get_selection_text_for_pane(pane) ~= "" then
+			table.insert(actions, act.ClearSelection)
+			table.insert(actions, act.CopyMode("ClearSelectionMode"))
+		end
+		if wezterm.GLOBAL.tmux_search_directions[tostring(pane)] then
+			table.insert(actions, wez_tmux.action.ClearPattern)
+		end
+		table.insert(actions, act.CopyMode("Close"))
+		table.insert(actions, act.PasteFrom("Clipboard"))
+		window:perform_action(act.Multiple(actions), pane)
+	end),
 }
 
 -- https://github.com/mrjones2014/smart-splits.nvim#wezterm
@@ -179,6 +193,7 @@ function M.apply_to_config(config)
 					act.CopyMode("ClearSelectionMode"),
 				}),
 			},
+			{ mods = "NONE", key = "p", action = M.action.clear_selection_and_clear_pattern_and_close_and_paste },
 			{ mods = "NONE", key = "/", action = wez_tmux.action.SearchForward },
 			{ mods = "NONE", key = "?", action = wez_tmux.action.SearchBackward },
 			{ mods = "NONE", key = "n", action = wez_tmux.action.NextMatch },
