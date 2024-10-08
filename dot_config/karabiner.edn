@@ -284,7 +284,7 @@
            [:escape :!Sgrave_accent_and_tilde :glove80] ; see "For Glove80" below
            [:grave_accent_and_tilde :left_shift :glove80] ; see "For Glove80" below
            ;; 左右互击
-           [:delete_or_backspace :!Cspacebar :glove80] ; raycast
+           [:delete_or_backspace :!!spacebar :glove80] ; raycast
            [:left_shift :delete_forward :glove80] ; delete_forward, see "For Glove80" below
            [:delete_forward :!Stab :glove80]
            ]}
@@ -365,7 +365,7 @@
            ;; Glove80 only
            [:right_control :!Tgrave_accent_and_tilde] ; rime 方案选单
            ;; 左右互击
-           [:spacebar :!Cspacebar] ; raycast
+           [:spacebar :!!spacebar] ; raycast
            [:right_shift :!Sescape] ; see "For Glove80" below
            ]}
 
@@ -715,7 +715,8 @@
            [:j :!Cj]
            [:k :!Ck]
            [:l :!Cl]
-           [:semicolon :!Csemicolon]
+           ;; [:semicolon :!Csemicolon]
+           [:semicolon :!CSsemicolon] ; see "swap : and ;" below
            [:quote :!Cquote]
            [:z :!Cz]
            [:x :!Cx]
@@ -1357,7 +1358,7 @@
            ;; [[:j :k] :escape nil {:params {:sim 50}}] ; sim 值越大, j 延迟越高
            ;; [[:k :l] :return_or_enter]
 
-           [[:j :l] :!!spacebar] ; Alfred Hotkey
+           ;; [[:j :l] :!!spacebar] ; Alfred Hotkey
 
            ;; TODO left-hand mode
            [[:m :k] :!!backslash] ; raycast://extensions/isfeng/easydict/easydict
@@ -1485,10 +1486,10 @@
   {:des   "right cmd alone -> toggle rime chinese/english"
    :rules [[:condi :!niz-x87-bt :!glove80]
            ;; [:#Pright_command :right_command nil {:alone [:hs ["mouseCenterClick"]]}]
-           ;; TODO `:##` or `:#P`
+           ;; `:##` or `:#P` ---> only `:#P` work for "For Apple-Internal-Keyboard\n- left cmd + right cmd -> raycast" below
            ;; [:##right_command :right_command :!Emacs {:alone :left_shift}] ; rime
-           [:##right_command :right_command :!Emacs {:alone :right_control}] ; rime
-           [:##right_command :right_command :Emacs {:alone :!Tbackslash}] ; emacs-rime
+           [:#Pright_command :right_command :!Emacs {:alone :right_control}] ; rime
+           [:#Pright_command :right_command :Emacs {:alone :!Tbackslash}] ; emacs-rime
            ]}
 
   ;; TODO or press f twice to switch rime's english/chinese input? see "Double colon triggers emoji search" above
@@ -1757,6 +1758,11 @@
            [:slash :!COf] ; Filter Processes
            ]}
 
+  {:des   "For Apple-Internal-Keyboard\n- left cmd + right cmd -> raycast"
+   :rules [:macbook-internal
+           [:!C#Pright_command :!!spacebar]
+           [:!Q#Pleft_command :!!spacebar]]}
+
   ;; TODO \
   {:des   "For Glove80\n- backspace to space"
    :rules [:glove80
@@ -1829,7 +1835,9 @@
            [:!T#Pm :!TSOspacebar] ; maximize
 
            ;; right_control -> rime: toggle ascii punct | ~/Library/Rime/default.custom.yaml
-           [:##right_control :right_control :Emacs {:alone [:right_control :!Tbackslash]}] ; emacs-rime
+           ;; TODO `:##` or `:#P`
+           ;; [:##right_control :right_control :Emacs {:alone [:right_control :!Tbackslash]}] ; emacs-rime
+           [:#Pright_control :right_control :Emacs {:alone :!Tbackslash}] ; emacs-rime
            ;; TODO launch-mode
            ;; TODO h, j, k, l -> yabai
            ;; TODO a, s, d, g, v
