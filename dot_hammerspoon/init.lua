@@ -8,103 +8,102 @@ hs.alert.show("Hammerspoon Config loaded")
 hs.loadSpoon("AClock")
 spoon.AClock:init()
 hs.urlevent.bind("toggleAClock", function(eventName, params)
-    spoon.AClock:toggleShow()
+  spoon.AClock:toggleShow()
 end)
 
 -- Move Mouse to center and click | https://gist.github.com/imjma/51710df48cf6110e758f
 function mouseCenterClick()
-    local screen = hs.mouse.getCurrentScreen()
-    local rect = screen:fullFrame()
-    local center = hs.geometry.rectMidPoint(rect)
-    -- https://www.hammerspoon.org/docs/hs.mouse.html#absolutePosition
-    -- hs.mouse.absolutePosition(center)
-    -- https://www.hammerspoon.org/docs/hs.eventtap.html#leftClick
-    hs.eventtap.leftClick(center)
+  local screen = hs.mouse.getCurrentScreen()
+  local rect = screen:fullFrame()
+  local center = hs.geometry.rectMidPoint(rect)
+  -- https://www.hammerspoon.org/docs/hs.mouse.html#absolutePosition
+  -- hs.mouse.absolutePosition(center)
+  -- https://www.hammerspoon.org/docs/hs.eventtap.html#leftClick
+  hs.eventtap.leftClick(center)
 end
 hs.urlevent.bind("mouseCenterClick", function(eventName, params)
-    mouseCenterClick()
+  mouseCenterClick()
 end)
 
 function maximizeWindow()
-    -- local win = hs.window.focusedWindow()
-    -- local f = win:frame()
-    -- local screen = win:screen()
-    -- local max = screen:frame()
-    -- f.x = max.x
-    -- f.y = max.y
-    -- f.w = max.w
-    -- f.h = max.h
-    -- win:setFrame(f, 0)
+  -- local win = hs.window.focusedWindow()
+  -- local f = win:frame()
+  -- local screen = win:screen()
+  -- local max = screen:frame()
+  -- f.x = max.x
+  -- f.y = max.y
+  -- f.w = max.w
+  -- f.h = max.h
+  -- win:setFrame(f, 0)
 
-    -- Maximize Window use Rectangle.app, note that not work with yabai
-    -- https://www.hammerspoon.org/docs/hs.eventtap.html#keyStroke
-    -- https://www.hammerspoon.org/docs/hs.keycodes.html#map
-    hs.eventtap.keyStroke({"ctrl", "alt", "shift"}, "space")
+  -- Maximize Window use Rectangle.app, note that not work with yabai
+  -- https://www.hammerspoon.org/docs/hs.eventtap.html#keyStroke
+  -- https://www.hammerspoon.org/docs/hs.keycodes.html#map
+  hs.eventtap.keyStroke({ "ctrl", "alt", "shift" }, "space")
 end
 hs.urlevent.bind("mouseCenterClickThenMaximizeWindow", function(eventName, params)
-    mouseCenterClick()
-    maximizeWindow()
+  mouseCenterClick()
+  maximizeWindow()
 end)
 
 function cmdTab(repeatTimes)
-    -- problem: act like cmd+tab, but not release cmd
-    -- hs.eventtap.keyStroke({"cmd"}, "tab")
+  -- problem: act like cmd+tab, but not release cmd
+  -- hs.eventtap.keyStroke({"cmd"}, "tab")
 
-    -- problem: wired behavior with delay
-    -- https://www.hammerspoon.org/docs/hs.window.switcher.html
-    -- hs.window.switcher.nextWindow()
-    -- hs.window.switcher.new():next()
+  -- problem: wired behavior with delay
+  -- https://www.hammerspoon.org/docs/hs.window.switcher.html
+  -- hs.window.switcher.nextWindow()
+  -- hs.window.switcher.new():next()
 
-    -- https://www.hammerspoon.org/docs/hs.eventtap.event.html#newKeyEvent
-    hs.eventtap.event.newKeyEvent(hs.keycodes.map.cmd, true):post()
+  -- https://www.hammerspoon.org/docs/hs.eventtap.event.html#newKeyEvent
+  hs.eventtap.event.newKeyEvent(hs.keycodes.map.cmd, true):post()
 
-    for _ = 1, repeatTimes do
-        hs.eventtap.event.newKeyEvent(hs.keycodes.map.tab, true):post()
-        hs.eventtap.event.newKeyEvent(hs.keycodes.map.tab, false):post()
-    end
+  for _ = 1, repeatTimes do
+    hs.eventtap.event.newKeyEvent(hs.keycodes.map.tab, true):post()
+    hs.eventtap.event.newKeyEvent(hs.keycodes.map.tab, false):post()
+  end
 
-    hs.eventtap.event.newKeyEvent(hs.keycodes.map.cmd, false):post()
+  hs.eventtap.event.newKeyEvent(hs.keycodes.map.cmd, false):post()
 end
 hs.urlevent.bind("cmdTab", function(eventName, params)
-    cmdTab(1)
+  cmdTab(1)
 end)
 
 function prevApp()
-    cmdTab(1)
+  cmdTab(1)
 
-    -- Note:
-    -- After `defaults write com.apple.finder QuitMenuItem -bool true`, Finder can be quit by cmd+q.
-    -- As long as Finder stays quit, the following code won't be needed that much.
+  -- Note:
+  -- After `defaults write com.apple.finder QuitMenuItem -bool true`, Finder can be quit by cmd+q.
+  -- As long as Finder stays quit, the following code won't be needed that much.
 
-    -- Wait for the cmd+tab event to complete, maybe including the animation when
-    -- switching between a full-screen app and a non-full-screen app.
-    -- Ensure the `app` below is obtained after the cmd+tab event.
-    -- https://www.hammerspoon.org/docs/hs.timer.html#doAfter
-    hs.timer.doAfter(0.3, function()
-        -- alternative: hs.window.focusedWindow():application()
-        local app = hs.application.frontmostApplication()
+  -- Wait for the cmd+tab event to complete, maybe including the animation when
+  -- switching between a full-screen app and a non-full-screen app.
+  -- Ensure the `app` below is obtained after the cmd+tab event.
+  -- https://www.hammerspoon.org/docs/hs.timer.html#doAfter
+  hs.timer.doAfter(0.3, function()
+    -- alternative: hs.window.focusedWindow():application()
+    local app = hs.application.frontmostApplication()
 
-        -- Do not focus Finder when no open window on cmd+tab
-        if (app:name() == "Finder") then
-            -- https://www.hammerspoon.org/docs/hs.application.html#allWindows
-            local windows = app:allWindows()
-            -- For Finder, when no open window, both allWindows and visibleWindows are 1
-            if #windows == 1 then
-                -- Use another cmd+tab+tab to skip Finder
-                cmdTab(2)
-            end
-        end
-    end)
+    -- Do not focus Finder when no open window on cmd+tab
+    if app:name() == "Finder" then
+      -- https://www.hammerspoon.org/docs/hs.application.html#allWindows
+      local windows = app:allWindows()
+      -- For Finder, when no open window, both allWindows and visibleWindows are 1
+      if #windows == 1 then
+        -- Use another cmd+tab+tab to skip Finder
+        cmdTab(2)
+      end
+    end
+  end)
 end
 
-
 hs.urlevent.bind("prevApp", function(eventName, params)
-    local _, status = hs.execute("/opt/homebrew/bin/yabai -m window --focus recent")
+  local _, status = hs.execute("/opt/homebrew/bin/yabai -m window --focus recent")
 
-    -- fallback to cmd+tab on yabai failed
-    if not status then
-        prevApp()
-    end
+  -- fallback to cmd+tab on yabai failed
+  if not status then
+    prevApp()
+  end
 end)
 
 -- function applicationWatcher(appName, eventType, appObject)
@@ -135,31 +134,31 @@ end)
 mouseCircle = nil
 mouseCircleTimer = nil
 function mouseHighlight()
-    -- Delete an existing highlight if it exists
-    if mouseCircle then
-        mouseCircle:delete()
-        if mouseCircleTimer then
-            mouseCircleTimer:stop()
-        end
+  -- Delete an existing highlight if it exists
+  if mouseCircle then
+    mouseCircle:delete()
+    if mouseCircleTimer then
+      mouseCircleTimer:stop()
     end
-    -- Get the current co-ordinates of the mouse pointer
-    mousepoint = hs.mouse.absolutePosition()
-    -- Prepare a big red circle around the mouse pointer
-    mouseCircle = hs.drawing.circle(hs.geometry.rect(mousepoint.x-40, mousepoint.y-40, 80, 80))
-    mouseCircle:setStrokeColor({["red"]=1,["blue"]=0,["green"]=0,["alpha"]=1})
-    mouseCircle:setFill(false)
-    mouseCircle:setStrokeWidth(5)
-    mouseCircle:show()
+  end
+  -- Get the current co-ordinates of the mouse pointer
+  mousepoint = hs.mouse.absolutePosition()
+  -- Prepare a big red circle around the mouse pointer
+  mouseCircle = hs.drawing.circle(hs.geometry.rect(mousepoint.x - 40, mousepoint.y - 40, 80, 80))
+  mouseCircle:setStrokeColor({ ["red"] = 1, ["blue"] = 0, ["green"] = 0, ["alpha"] = 1 })
+  mouseCircle:setFill(false)
+  mouseCircle:setStrokeWidth(5)
+  mouseCircle:show()
 
-    -- Set a timer to delete the circle after 3 seconds
-    mouseCircleTimer = hs.timer.doAfter(3, function()
-      mouseCircle:delete()
-      mouseCircle = nil
-    end)
+  -- Set a timer to delete the circle after 3 seconds
+  mouseCircleTimer = hs.timer.doAfter(3, function()
+    mouseCircle:delete()
+    mouseCircle = nil
+  end)
 end
 -- hs.hotkey.bind({"cmd", "alt", "ctrl", "shift"}, "D", mouseHighlight)
 hs.urlevent.bind("mouseHighlight", function(eventName, params)
-    mouseHighlight()
+  mouseHighlight()
 end)
 
 --[[

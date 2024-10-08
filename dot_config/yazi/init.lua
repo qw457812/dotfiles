@@ -4,19 +4,19 @@ require("full-border"):setup()
 require("git"):setup()
 -- https://github.com/llanosrocas/githead.yazi
 require("githead"):setup({
-	-- eza style
-	branch_prefix = "",
-	branch_color = "#54d100",
-	branch_symbol = "",
-	branch_borders = "",
+  -- eza style
+  branch_prefix = "",
+  branch_color = "#54d100",
+  branch_symbol = "",
+  branch_borders = "",
 })
 -- https://github.com/dedukun/bookmarks.yazi
 require("bookmarks"):setup({
-	last_directory = { enable = true, persist = false },
-	persist = "all", -- none(default), all, vim
-	desc_format = "full", -- full(default), parent
-	file_pick_mode = "parent", -- hover(default), parent
-	notify = { enable = true },
+  last_directory = { enable = true, persist = false },
+  persist = "all", -- none(default), all, vim
+  desc_format = "full", -- full(default), parent
+  file_pick_mode = "parent", -- hover(default), parent
+  notify = { enable = true },
 })
 
 -- TODO:
