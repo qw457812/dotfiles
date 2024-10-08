@@ -94,7 +94,9 @@ local function split_nav(resize_or_move, mods, key, direction)
 					-- -- wezterm.log_info("dir: " .. dir)
 					-- -- win:perform_action({ ActivatePaneDirection = dir }, pane)
 					win:perform_action({ ActivatePaneDirection = direction }, pane)
-					-- win:perform_action({ SetPaneZoomState = is_zoomed }, pane)
+					-- if is_zoomed then
+					-- 	win:perform_action({ SetPaneZoomState = is_zoomed }, pane)
+					-- end
 				end
 			end
 		end),
