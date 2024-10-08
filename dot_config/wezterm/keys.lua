@@ -1,51 +1,57 @@
 -- https://wezfurlong.org/wezterm/config/keys.html
 -- https://wezfurlong.org/wezterm/config/lua/keyassignment/index.html
+--
+-- https://github.com/zidhuss/dotfiles/blob/16ea5fc60f20e7ec132cca59bb694a5d54696bb6/wezterm/.config/wezterm/plugins/wez-tmux/init.lua
 
 local wezterm = require("wezterm")
 local helpers = require("helpers")
 local act = wezterm.action
+
+local wez_tmux = wezterm.plugin.require("https://github.com/sei40kr/wez-tmux")
 
 local M = {}
 
 M.super = "SUPER"
 M.leader = "LEADER"
 
-local smart_split = wezterm.action_callback(function(win, pane)
-	local dim = pane:get_dimensions()
-	if dim.pixel_height > dim.pixel_width then
-		win:perform_action(act.SplitVertical({ domain = "CurrentPaneDomain" }), pane)
-	else
-		win:perform_action(act.SplitHorizontal({ domain = "CurrentPaneDomain" }), pane)
-	end
-end)
-
-local next_pane_or_tab_or_window = wezterm.action_callback(function(win, pane)
-	local pane_count = #pane:tab():panes()
-	local tab_count = #win:mux_window():tabs()
-	if pane_count > 1 then
-		win:perform_action(act.ActivatePaneDirection("Next"), pane)
-	elseif tab_count > 1 then
-		win:perform_action(act.ActivateTabRelative(1), pane)
-	else
-		win:perform_action(act.ActivateWindowRelative(1), pane)
-	end
-end)
-
-local open_url = wezterm.action.QuickSelectArgs({
-	label = "open url",
-	patterns = {
-		"\\((https?://\\S+)\\)",
-		"\\[(https?://\\S+)\\]",
-		"\\{(https?://\\S+)\\}",
-		"<(https?://\\S+)>",
-		"\\bhttps?://\\S+[)/a-zA-Z0-9-]+",
-	},
-	action = wezterm.action_callback(function(window, pane)
-		local url = window:get_selection_text_for_pane(pane)
-		wezterm.log_info("opening: " .. url)
-		wezterm.open_with(url)
+M.action = {
+	smart_split = wezterm.action_callback(function(win, pane)
+		local dim = pane:get_dimensions()
+		if dim.pixel_height > dim.pixel_width then
+			win:perform_action(act.SplitVertical({ domain = "CurrentPaneDomain" }), pane)
+		else
+			win:perform_action(act.SplitHorizontal({ domain = "CurrentPaneDomain" }), pane)
+		end
 	end),
-})
+
+	next_pane_or_tab_or_window = wezterm.action_callback(function(win, pane)
+		local pane_count = #pane:tab():panes()
+		local tab_count = #win:mux_window():tabs()
+		if pane_count > 1 then
+			win:perform_action(act.ActivatePaneDirection("Next"), pane)
+		elseif tab_count > 1 then
+			win:perform_action(act.ActivateTabRelative(1), pane)
+		else
+			win:perform_action(act.ActivateWindowRelative(1), pane)
+		end
+	end),
+
+	open_url = wezterm.action.QuickSelectArgs({
+		label = "open url",
+		patterns = {
+			"\\((https?://\\S+)\\)",
+			"\\[(https?://\\S+)\\]",
+			"\\{(https?://\\S+)\\}",
+			"<(https?://\\S+)>",
+			"\\bhttps?://\\S+[)/a-zA-Z0-9-]+",
+		},
+		action = wezterm.action_callback(function(window, pane)
+			local url = window:get_selection_text_for_pane(pane)
+			wezterm.log_info("opening: " .. url)
+			wezterm.open_with(url)
+		end),
+	}),
+}
 
 -- https://github.com/mrjones2014/smart-splits.nvim#wezterm
 -- https://github.com/mrjones2014/smart-splits.nvim/blob/master/plugin/init.lua
@@ -123,10 +129,11 @@ function M.apply_to_config(config)
 		split_nav("move", "CTRL", "k", "Up"),
 		split_nav("move", "CTRL", "l", "Right"),
 		-- -- cycles panes, then tabs, then windows
-		{ mods = M.super, key = "o", action = next_pane_or_tab_or_window },
+		{ mods = M.super, key = "o", action = M.action.next_pane_or_tab_or_window },
 		{ mods = M.super, key = "w", action = act.CloseCurrentPane({ confirm = false }) },
 		-- Splits
-		{ mods = M.super, key = "s", action = smart_split },
+		{ mods = M.super, key = "s", action = M.action.smart_split },
+		{ mods = M.leader, key = "s", action = wez_tmux.action.WorkspaceSelect },
 		{ mods = M.super, key = "\\", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
 		{ mods = M.leader, key = "\\", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
 		{ mods = M.super, key = "-", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
@@ -145,25 +152,51 @@ function M.apply_to_config(config)
 		{ mods = M.super, key = ":", action = act.ActivateCommandPalette },
 		{ mods = M.super, key = "p", action = act.QuickSelect },
 		{ mods = M.super, key = "d", action = act.ShowDebugOverlay },
-		{ mods = M.super, key = "u", action = open_url },
+		{ mods = M.super, key = "u", action = M.action.open_url },
 		{ mods = M.super, key = "f", action = act.Search({ CaseInSensitiveString = "" }) },
 	}
 
 	config.key_tables = {}
 
-	-- Copy Mode
 	-- https://wezfurlong.org/wezterm/config/lua/wezterm.gui/default_key_tables.html
 	if wezterm.gui then
+		-- Copy Mode
 		config.key_tables.copy_mode = helpers.list_extend(wezterm.gui.default_key_tables().copy_mode, {
-			{ mods = "SHIFT", key = "H", action = act.CopyMode("MoveToStartOfLineContent") },
-			{ mods = "SHIFT", key = "L", action = act.CopyMode("MoveToEndOfLineContent") },
+			{ mods = "NONE", key = "H", action = act.CopyMode("MoveToStartOfLineContent") },
+			{ mods = "NONE", key = "L", action = act.CopyMode("MoveToEndOfLineContent") },
 			{ mods = "NONE", key = "u", action = act.CopyMode({ MoveByPage = -0.5 }) },
 			{ mods = "NONE", key = "d", action = act.CopyMode({ MoveByPage = 0.5 }) },
 			{ mods = "CTRL", key = "u", action = act.CopyMode({ MoveByPage = -0.5 }) },
 			{ mods = "CTRL", key = "d", action = act.CopyMode({ MoveByPage = 0.5 }) },
-			{ mods = "NONE", key = "/", action = act.Search({ CaseInSensitiveString = "" }) },
-			{ mods = "NONE", key = "n", action = act.CopyMode("NextMatch") },
-			{ mods = "SHIFT", key = "N", action = act.CopyMode("PriorMatch") },
+			-- https://github.com/sei40kr/wez-tmux/blob/bec87155863baf161e2358862d001f237f7ea968/plugin/init.lua
+			{ mods = "NONE", key = "Escape", action = wez_tmux.action.ClearSelectionOrClearPatternOrClose },
+			{
+				mods = "NONE",
+				key = "y",
+				action = act.Multiple({
+					act.CopyTo("Clipboard"),
+					act.ClearSelection,
+					act.CopyMode("ClearSelectionMode"),
+				}),
+			},
+			{ mods = "NONE", key = "/", action = wez_tmux.action.SearchForward },
+			{ mods = "NONE", key = "?", action = wez_tmux.action.SearchBackward },
+			{ mods = "NONE", key = "n", action = wez_tmux.action.NextMatch },
+			{ mods = "NONE", key = "N", action = wez_tmux.action.PriorMatch },
+		})
+
+		-- Search Mode
+		config.key_tables.search_mode = helpers.list_extend(wezterm.gui.default_key_tables().search_mode, {
+			{
+				mods = "NONE",
+				key = "Enter",
+				action = act.Multiple({
+					act.CopyMode("AcceptPattern"),
+					act.ClearSelection,
+					act.CopyMode("ClearSelectionMode"),
+				}),
+			},
+			{ mods = "NONE", key = "Escape", action = wez_tmux.action.ClearPattern },
 		})
 	end
 end
