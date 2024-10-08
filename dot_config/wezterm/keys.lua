@@ -52,17 +52,25 @@ M.action = {
     end),
   }),
 
-  clear_selection_and_clear_pattern_and_close_and_paste = wezterm.action_callback(function(window, pane)
+  clear_selection_and_clear_pattern_or_close = wezterm.action_callback(function(window, pane)
     local actions = {}
-    if window:get_selection_text_for_pane(pane) ~= "" then
-      table.insert(actions, act.ClearSelection)
-      table.insert(actions, act.CopyMode("ClearSelectionMode"))
+
+    local has_selection = window:get_selection_text_for_pane(pane) ~= ""
+    local has_pattern = wezterm.GLOBAL.tmux_search_directions[tostring(pane)]
+
+    -- clear selection and pattern at one time, save one `esc` press
+    if has_selection or has_pattern then
+      if has_selection then
+        table.insert(actions, act.ClearSelection)
+        table.insert(actions, act.CopyMode("ClearSelectionMode"))
+      end
+      if has_pattern then
+        table.insert(actions, wez_tmux.action.ClearPattern)
+      end
+    else
+      table.insert(actions, act.CopyMode("Close"))
     end
-    if wezterm.GLOBAL.tmux_search_directions[tostring(pane)] then
-      table.insert(actions, wez_tmux.action.ClearPattern)
-    end
-    table.insert(actions, act.CopyMode("Close"))
-    table.insert(actions, act.PasteFrom("Clipboard"))
+
     window:perform_action(act.Multiple(actions), pane)
   end),
 }
@@ -126,7 +134,7 @@ end
 
 function M.apply_to_config(config)
   -- -- tmux like
-  -- config.leader = { key = "b", mods = "CTRL", timeout_milliseconds = 1000 }
+  -- config.leader = { mods = "CTRL", key = "b", timeout_milliseconds = 1000 }
 
   -- wezterm show-keys
   config.keys = {
@@ -162,12 +170,29 @@ function M.apply_to_config(config)
     -- { mods = M.super, key = "u", action = act.ScrollByPage(-0.5) },
     -- { mods = M.super, key = "d", action = act.ScrollByPage(0.5) },
     -- Others
-    { mods = M.super, key = "Space", action = act.ActivateCopyMode },
+    {
+      mods = M.super,
+      key = "Space",
+      -- action = act.ActivateCopyMode,
+      action = act.Multiple({
+        act.Search({ CaseInSensitiveString = "" }), -- just to ignore case in copy mode
+        act.ActivateCopyMode,
+      }),
+    },
     { mods = M.super, key = ":", action = act.ActivateCommandPalette },
     { mods = M.super, key = "p", action = act.QuickSelect },
     { mods = M.super, key = "d", action = act.ShowDebugOverlay },
     { mods = M.super, key = "u", action = M.action.open_url },
-    { mods = M.super, key = "f", action = act.Search({ CaseInSensitiveString = "" }) },
+    {
+      mods = M.super,
+      key = "f",
+      -- action = act.Search({ CaseInSensitiveString = "" }),
+      action = act.Multiple({
+        act.Search({ CaseInSensitiveString = "" }), -- just to ignore case in copy mode
+        act.ActivateCopyMode,
+        wez_tmux.action.SearchForward,
+      }),
+    },
   }
 
   config.key_tables = {}
@@ -182,8 +207,8 @@ function M.apply_to_config(config)
       { mods = "NONE", key = "d", action = act.CopyMode({ MoveByPage = 0.5 }) },
       { mods = "CTRL", key = "u", action = act.CopyMode({ MoveByPage = -0.5 }) },
       { mods = "CTRL", key = "d", action = act.CopyMode({ MoveByPage = 0.5 }) },
-      -- https://github.com/sei40kr/wez-tmux/blob/bec87155863baf161e2358862d001f237f7ea968/plugin/init.lua
-      { mods = "NONE", key = "Escape", action = wez_tmux.action.ClearSelectionOrClearPatternOrClose },
+      -- { mods = "NONE", key = "Escape", action = wez_tmux.action.ClearSelectionOrClearPatternOrClose },
+      { mods = "NONE", key = "Escape", action = M.action.clear_selection_and_clear_pattern_or_close },
       {
         mods = "NONE",
         key = "y",
@@ -192,8 +217,42 @@ function M.apply_to_config(config)
           act.ClearSelection,
           act.CopyMode("ClearSelectionMode"),
         }),
+        -- -- leave copy mode on `y`
+        -- action = wezterm.action_callback(function(window, pane)
+        --   wezterm.GLOBAL.tmux_search_directions[tostring(pane)] = nil
+        --   window:perform_action(
+        --     act.Multiple({
+        --       act.CopyTo("Clipboard"),
+        --       act.ClearSelection,
+        --       act.CopyMode("ClearSelectionMode"),
+        --       act.CopyMode("ClearPattern"),
+        --       act.CopyMode("AcceptPattern"),
+        --       act.CopyMode("Close"),
+        --     }),
+        --     pane
+        --   )
+        -- end),
       },
-      { mods = "NONE", key = "p", action = M.action.clear_selection_and_clear_pattern_and_close_and_paste },
+      -- if `y` does not leave copy mode, `p` can be used
+      {
+        mods = "NONE",
+        key = "p",
+        action = wezterm.action_callback(function(window, pane)
+          -- `wez_tmux.action.ClearPattern` | https://github.com/sei40kr/wez-tmux/blob/bec87155863baf161e2358862d001f237f7ea968/plugin/init.lua#L15
+          wezterm.GLOBAL.tmux_search_directions[tostring(pane)] = nil
+          window:perform_action(
+            act.Multiple({
+              act.ClearSelection,
+              act.CopyMode("ClearSelectionMode"),
+              act.CopyMode("ClearPattern"),
+              act.CopyMode("AcceptPattern"),
+              act.CopyMode("Close"),
+              act.PasteFrom("Clipboard"),
+            }),
+            pane
+          )
+        end),
+      },
       { mods = "NONE", key = "/", action = wez_tmux.action.SearchForward },
       { mods = "NONE", key = "?", action = wez_tmux.action.SearchBackward },
       { mods = "NONE", key = "n", action = wez_tmux.action.NextMatch },
@@ -211,7 +270,16 @@ function M.apply_to_config(config)
           act.CopyMode("ClearSelectionMode"),
         }),
       },
-      { mods = "NONE", key = "Escape", action = wez_tmux.action.ClearPattern },
+      {
+        mods = "NONE",
+        key = "Escape",
+        -- action = wez_tmux.action.ClearPattern,
+        action = act.Multiple({
+          wez_tmux.action.ClearPattern,
+          act.ClearSelection,
+          act.CopyMode("ClearSelectionMode"),
+        }),
+      },
     })
   end
 end

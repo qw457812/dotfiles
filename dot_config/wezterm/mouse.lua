@@ -8,7 +8,7 @@ local M = {}
 
 function M.apply_to_config(config)
   config.mouse_bindings = {
-    -- Right click to paste
+    -- Paste on right click
     {
       event = { Down = { streak = 1, button = "Right" } },
       mods = "NONE",
