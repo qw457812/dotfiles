@@ -240,9 +240,9 @@ return {
   -- https://github.com/yutkat/dotfiles/blob/2c95d4f42752c5c245d7642f5c2dbc326bd776c2/.config/nvim/lua/rc/pluginconfig/text-case.lua
   {
     "johmsalas/text-case.nvim",
-    event = "VeryLazy", -- for `Subs` and `substitude_command_name` command, with interactive feature on first use
+    -- event = "VeryLazy", -- for `Subs` and `substitude_command_name` command, with interactive feature on first use
     vscode = true,
-    cmd = "S", -- for `substitude_command_name` command, without interactive feature on first use
+    -- cmd = "S", -- for `substitude_command_name` command, without interactive feature on first use
     keys = function()
       local keys = {
         { "ga" },
@@ -254,8 +254,8 @@ return {
       return keys
     end,
     opts = {
-      -- an additional command with the passed in name will be created that does the same thing as "Subs" does
-      substitude_command_name = "S",
+      -- -- an additional command with the passed in name will be created that does the same thing as "Subs" does
+      -- substitude_command_name = "S",
     },
     config = function(_, opts)
       require("textcase").setup(opts)
