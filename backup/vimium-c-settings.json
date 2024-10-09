@@ -1,7 +1,7 @@
 {
 	"name": "Vimium C",
-	"@time": "10/9/2024, 12:12:09 PM",
-	"time": 1728447129464,
+	"@time": "10/9/2024, 12:29:25 PM",
+	"time": 1728448165837,
 	"environment": {
 		"extension": "2.11.3",
 		"platform": "mac",
@@ -37,6 +37,11 @@
 		"# https://github.com/gdh1995/vimium-c/blob/master/settings-template.json",
 		"# https://github.com/chrisgrieser/.config/blob/main/%2B%20browser-extension-configs/vimium-c-settings.json",
 		"# ------------------------------------------------------",
+		"# Modes",
+		"map i passNextKey",
+		"map I enterInsertMode",
+		"# this is similar to WezTerm's QuickSelect mode",
+		"map v LinkHints.activateSelect",
 		"# copy github part of an url",
 		"map yg copyCurrentUrl sed=\"s=https?://github.com/(.+?/.[^/?]+).*=$1=\"",
 		"# copy as markdown link",
