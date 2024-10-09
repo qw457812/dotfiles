@@ -59,8 +59,54 @@ return {
     },
     opts = {
       ignored_filetypes = { "NvimTree", "neo-tree" },
-      -- TODO: maybe use `at_edge` function to navigation between tmux and wezterm
-      at_edge = "stop",
+      --- for tmux in wezterm: navigate from tmux panes to wezterm panes
+      --- https://github.com/mrjones2014/smart-splits.nvim/blob/0523920a07c54eea7610f342ca8c1bddbee4b626/lua/smart-splits/api.lua#L382
+      ---@param ctx SmartSplitsContext
+      at_edge = function(ctx)
+        local config = require("smart-splits.lazy").require_on_index("smart-splits.config") --[[@as SmartSplitsConfig]]
+        local types = require("smart-splits.types")
+        local AtEdgeBehavior = types.AtEdgeBehavior
+        local Multiplexer = types.Multiplexer
+
+        local at_edge = AtEdgeBehavior.split -- config here: wrap, split, stop
+
+        local function wrap_or_split_or_stop()
+          if at_edge == AtEdgeBehavior.wrap then
+            ---@diagnostic disable-next-line: undefined-field
+            ctx.wrap()
+          elseif at_edge == AtEdgeBehavior.split then
+            if
+              vim.tbl_contains(config.ignored_buftypes, vim.bo.buftype)
+              or vim.tbl_contains(config.ignored_filetypes, vim.bo.filetype)
+            then
+              return -- just stop
+            end
+            ctx.split()
+          elseif at_edge == AtEdgeBehavior.stop then
+            return
+          end
+        end
+
+        if not ctx.mux or ctx.mux.type ~= Multiplexer.tmux then
+          -- wezterm without tmux, original at_edge behavior
+          wrap_or_split_or_stop()
+          return
+        end
+
+        -- tmux in wezterm
+        local mux_wezterm = require("smart-splits.mux.wezterm")
+        local real_at_edge = mux_wezterm.current_pane_at_edge(ctx.direction)
+        if real_at_edge then
+          wrap_or_split_or_stop()
+        else
+          -- require("wezterm").switch_pane.direction(ctx.direction, mux_wezterm.current_pane_id())
+          local ok = mux_wezterm.next_pane(ctx.direction)
+          if not ok then
+            wrap_or_split_or_stop()
+          end
+        end
+      end,
+      -- float_win_behavior = "mux",
       disable_multiplexer_nav_when_zoomed = false,
     },
   },
@@ -92,13 +138,9 @@ return {
         end,
       })
 
-      local on_open = opts.on_open or function() end
-      local on_close = opts.on_close or function() end
-
       -- toggle tmux status line
       local on_open_tmux = function() end
       local on_close_tmux = function() end
-
       if vim.env.TMUX then
         -- https://github.com/folke/zen-mode.nvim/blob/a31cf7113db34646ca320f8c2df22cf1fbfc6f2a/lua/zen-mode/plugins.lua#L96
         local function get_tmux_opt(option)
@@ -138,46 +180,51 @@ return {
       -- toggle wezterm pane zoom state
       local on_open_wezterm = function() end
       local on_close_wezterm = function() end
-
       if vim.env.WEZTERM_UNIX_SOCKET then
         local wezterm = require("wezterm")
-        local smart_splits_wezterm = require("smart-splits.mux.wezterm")
+        if wezterm.list_clients() then -- sometimes `wezterm cli` went wrong in tmux, check it
+          local smart_splits_wezterm = require("smart-splits.mux.wezterm")
 
-        -- local function get_pane_zoom_state()
-        --   -- https://github.com/wez/wezterm/issues/3413#issuecomment-1491870672
-        --   -- local pane_id = wezterm.get_current_pane()
-        --   local pane_id = smart_splits_wezterm.current_pane_id()
-        --   local panes = wezterm.list_panes()
-        --   if not panes or not pane_id then
-        --     return
-        --   end
-        --
-        --   for _, p in ipairs(panes) do
-        --     if p.pane_id == pane_id then
-        --       return p.is_zoomed
-        --     end
-        --   end
-        -- end
+          -- local function pane_is_zoomed(pane_id)
+          --   if not pane_id then
+          --     return
+          --   end
+          --
+          --   local panes = wezterm.list_panes()
+          --   if not panes then
+          --     return
+          --   end
+          --
+          --   for _, p in ipairs(panes) do
+          --     if p.pane_id == pane_id then
+          --       return p.is_zoomed
+          --     end
+          --   end
+          -- end
 
-        -- NOTE: using `wezterm cli list-clients --format=json` instead of `$WEZTERM_PANE` to get real pane_id
-        -- https://github.com/wez/wezterm/issues/3413#issuecomment-1491870672
-        local pane_id = smart_splits_wezterm.current_pane_id()
-        local is_zoomed
-        on_open_wezterm = function()
-          -- is_zoomed = get_pane_zoom_state()
-          is_zoomed = smart_splits_wezterm.current_pane_is_zoomed()
-          if is_zoomed == false then
-            wezterm.zoom_pane(pane_id, { zoom = true })
+          -- NOTE: using `wezterm cli list-clients --format=json` instead of `$WEZTERM_PANE` to get real pane_id
+          -- https://github.com/wez/wezterm/issues/3413#issuecomment-1491870672
+          -- local pane_id = wezterm.get_current_pane()
+          local pane_id = smart_splits_wezterm.current_pane_id() -- will pane_id change?
+          local is_zoomed
+          on_open_wezterm = function()
+            -- is_zoomed = pane_is_zoomed(pane_id)
+            is_zoomed = smart_splits_wezterm.current_pane_is_zoomed()
+            if is_zoomed == false then
+              wezterm.zoom_pane(pane_id, { zoom = true })
+            end
           end
-        end
-        on_close_wezterm = function()
-          -- restore zoom state
-          if is_zoomed == false then
-            wezterm.zoom_pane(pane_id, { unzoom = true })
+          on_close_wezterm = function()
+            -- restore zoom state
+            if is_zoomed == false then
+              wezterm.zoom_pane(pane_id, { unzoom = true })
+            end
           end
         end
       end
 
+      local on_open = opts.on_open or function() end
+      local on_close = opts.on_close or function() end
       opts.on_open = function()
         on_open()
         on_open_tmux()
