@@ -1,0 +1,88 @@
+{
+	"name": "Vimium C",
+	"@time": "10/9/2024, 12:12:09 PM",
+	"time": 1728447129464,
+	"environment": {
+		"extension": "2.11.3",
+		"platform": "mac",
+		"chromium": 129
+	},
+	"exclusionRules": [
+		{
+			"passKeys": "",
+			"pattern": ":https://mail.google.com/"
+		},
+		{
+			"passKeys": "",
+			"pattern": ":https://excalidraw.com/"
+		},
+		{
+			"passKeys": "? ",
+			"pattern": ":https://github.com/"
+		},
+		{
+			"passKeys": "c j k ",
+			"pattern": ":https://www.google.com/"
+		}
+	],
+	"keyLayout": 2,
+	"keyMappings": [
+		"#!no-check",
+		"# Combine commands: https://github.com/gdh1995/vimium-c/wiki/Auto-run-a-tree-of-commands#open-vomnibar-after-creating-a-new-tab",
+		"# Info on Vimium-C mapping Syntax: https://github.com/gdh1995/vimium-c/issues/873",
+		"# Google excludes `c` (cycle/copy) for Grepper https://www.grepper.com/documentation.php#using_keyboard_shortcuts",
+		"# Default Key Mappings: https://github.com/gdh1995/vimium-c/blob/fd4b10aacd417ac8f4ed0950b5744ad759ce872a/background/key_mappings.ts#L612",
+		"#",
+		"# Configs:",
+		"# https://github.com/gdh1995/vimium-c/blob/master/settings-template.json",
+		"# https://github.com/chrisgrieser/.config/blob/main/%2B%20browser-extension-configs/vimium-c-settings.json",
+		"# ------------------------------------------------------",
+		"# copy github part of an url",
+		"map yg copyCurrentUrl sed=\"s=https?://github.com/(.+?/.[^/?]+).*=$1=\"",
+		"# copy as markdown link",
+		"map ym copyCurrentUrl format=\"[${title}](${url})\"",
+		"map , focusOrLaunch url=\"chrome-extension://hfjbmagddngcpeloejdejnfgbamkjaeg/pages/options.html\"",
+		"map q moveTabLeft",
+		"map w moveTabRight",
+		"map <backspace> removeTab mayClose",
+		"# Safari Extension Vimari",
+		"# map q previousTab",
+		"# map w nextTab",
+		"map h goBack",
+		"map l goForward",
+		"map H scrollLeft",
+		"map L scrollRight",
+		"map ' Marks.activateGotoMode",
+		"map s LinkHints.activateOpenInNewForegroundTab",
+		"# https://github.com/philc/vimium/wiki/Key-Mappings#helix",
+		"map zh scrollToLeft",
+		"map zl scrollToRight",
+		"map gh firstTab",
+		"# map gp previousTab",
+		"# map gn nextTab",
+		"map ga visitPreviousTab",
+		"map gl lastTab",
+		"map e Vomnibar.activateEditUrl",
+		"map E Vomnibar.activateEditUrlInNewTab",
+		"map \\ passNextKey",
+		"map ch closeTabsOnLeft",
+		"map cl closeTabsOnRight",
+		"map co closeOtherTabs",
+		"# map <space> scrollPageDown",
+		"# [left hand mode](https://github.com/philc/vimium/issues/1455#issuecomment-80618649)",
+		"map a Vomnibar.activateTabSelection",
+		"map : Vomnibar.activateInNewTab",
+		"map J nextTab",
+		"map K previousTab",
+		"map gp goPrevious",
+		"map gn goNext",
+		"unmap <a-p>",
+		"map <c-p> togglePinTab",
+		"unmap <a-m>",
+		"map <c-m> toggleMuteTab",
+		"unmap <a-f>",
+		"map <c-f> LinkHints.activateWithQueue",
+		""
+	],
+	"vimSync": true
+}
