@@ -153,7 +153,31 @@ return {
   },
 
   {
+    "folke/noice.nvim",
+    optional = true,
+    opts = function(_, opts)
+      local defaults_views = require("noice.config.views").defaults
+      opts.views = vim.tbl_deep_extend("force", {
+        split = {
+          close = {
+            keys = vim.deepcopy(defaults_views.split.close.keys),
+          },
+        },
+        popup = {
+          close = {
+            keys = vim.deepcopy(defaults_views.popup.close.keys),
+          },
+        },
+      }, opts.views or {})
+
+      table.insert(opts.views.split.close.keys, close_key)
+      table.insert(opts.views.popup.close.keys, close_key)
+    end,
+  },
+
+  {
     "folke/trouble.nvim",
+    optional = true,
     opts = {
       keys = {
         [close_key] = "close",
