@@ -12,21 +12,24 @@ return {
       U.explorer.load_on_directory(plugin.name)
     end,
     opts = function(_, opts)
-      opts.options = vim.tbl_deep_extend("force", opts.options or {}, {
-        use_as_default_explorer = vim.g.user_default_explorer == "mini.files",
+      -- set custom bookmarks
+      local set_mark = function(id, path, desc)
+        MiniFiles.set_bookmark(id, path, { desc = desc })
+      end
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "MiniFilesExplorerOpen",
+        callback = function()
+          set_mark("c", U.path.CONFIG, "Config") -- path
+          set_mark("w", vim.fn.getcwd, "cwd") -- callable
+          set_mark("h", "~", "Home")
+          -- stylua: ignore
+          set_mark("r", function() return LazyVim.root.get({ normalize = true }) end, "Root")
+          set_mark("l", U.path.LAZYVIM, "LazyVim")
+          if U.path.CHEZMOI then
+            set_mark("z", U.path.CHEZMOI, "Chezmoi")
+          end
+        end,
       })
-      opts.mappings = vim.tbl_deep_extend("force", opts.mappings or {}, {
-        go_in = "",
-        go_out = "",
-        go_in_plus = "l", -- go_in + close explorer after opening a file
-        go_out_plus = "h", -- go_out + trim right part of branch
-        -- -- don't use `h`/`l` for easier cursor navigation during text edit
-        -- go_in_plus = "L",
-        -- go_out_plus = "H",
-      })
-      -- opts.windows = vim.tbl_deep_extend("force", opts.windows or {}, {
-      --   width_preview = 60,
-      -- })
 
       vim.api.nvim_create_autocmd("User", {
         pattern = "MiniFilesBufferCreate",
@@ -51,23 +54,22 @@ return {
         end,
       })
 
-      -- set custom bookmarks
-      local set_mark = function(id, path, desc)
-        MiniFiles.set_bookmark(id, path, { desc = desc })
-      end
-      vim.api.nvim_create_autocmd("User", {
-        pattern = "MiniFilesExplorerOpen",
-        callback = function()
-          set_mark("c", U.path.CONFIG, "Config") -- path
-          set_mark("w", vim.fn.getcwd, "cwd") -- callable
-          set_mark("h", "~", "Home")
-          -- stylua: ignore
-          set_mark("r", function() return LazyVim.root.get({ normalize = true }) end, "Root")
-          set_mark("l", U.path.LAZYVIM, "LazyVim")
-          if U.path.CHEZMOI then
-            set_mark("z", U.path.CHEZMOI, "Chezmoi")
-          end
-        end,
+      return vim.tbl_deep_extend("force", opts, {
+        options = {
+          use_as_default_explorer = vim.g.user_default_explorer == "mini.files",
+        },
+        mappings = {
+          go_in = "",
+          go_out = "",
+          go_in_plus = "l", -- go_in + close explorer after opening a file
+          go_out_plus = "h", -- go_out + trim right part of branch
+          -- -- don't use `h`/`l` for easier cursor navigation during text edit
+          -- go_in_plus = "L",
+          -- go_out_plus = "H",
+        },
+        -- windows = {
+        --   width_preview = 60,
+        -- },
       })
     end,
   },
