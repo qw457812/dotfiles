@@ -1,8 +1,11 @@
+local is_tmux = vim.env.TMUX ~= nil
+local is_wezterm = vim.env.WEZTERM_UNIX_SOCKET ~= nil
+
 return {
   -- https://github.com/arturgoms/nvim/blob/045c55460e36e1d4163b426b2ac66bd710721ac5/lua/3thparty/plugins/tmux.lua
   {
     "aserowy/tmux.nvim",
-    cond = vim.env.TMUX ~= nil and vim.env.WEZTERM_UNIX_SOCKET == nil, -- tmux but not in wezterm
+    cond = is_tmux and not is_wezterm, -- tmux but not in wezterm
     -- stylua: ignore
     keys = {
       -- Move to window
@@ -41,7 +44,7 @@ return {
   {
     "mrjones2014/smart-splits.nvim",
     lazy = false,
-    cond = vim.env.WEZTERM_UNIX_SOCKET ~= nil,
+    cond = is_wezterm,
     -- stylua: ignore
     keys = {
       { "<C-h>", mode = { "n", "t" }, function() require("smart-splits").move_cursor_left() end, desc = "Go to Left Window" },
@@ -68,7 +71,7 @@ return {
         local AtEdgeBehavior = types.AtEdgeBehavior
         local Multiplexer = types.Multiplexer
 
-        local at_edge = AtEdgeBehavior.split -- config here: wrap, split, stop
+        local at_edge = AtEdgeBehavior.stop -- config here: wrap(not recommend), split, stop
 
         local function wrap_or_split_or_stop()
           if at_edge == AtEdgeBehavior.wrap then
@@ -87,34 +90,73 @@ return {
           end
         end
 
-        if not ctx.mux or ctx.mux.type ~= Multiplexer.tmux then
-          -- wezterm without tmux, original at_edge behavior
+        if not (is_wezterm and ctx.mux and ctx.mux.type == Multiplexer.tmux) then
+          -- "wezterm without tmux" or "tmux not in wezterm" or "not in any mux", original at_edge behavior
           wrap_or_split_or_stop()
           return
         end
 
-        -- tmux in wezterm
+        -- (nvim in) tmux in wezterm: currently at the edge of tmux, we will check whether it's at the edge of wezterm as well
         local mux_wezterm = require("smart-splits.mux.wezterm")
-        local real_at_edge = mux_wezterm.current_pane_at_edge(ctx.direction)
-        if real_at_edge then
+        local wezterm = require("wezterm")
+
+        -- NOTE: `$WEZTERM_PANE` could be wrong when getting wezterm pane_id in tmux, use `wezterm cli list-clients --format=json` instead
+        -- See: https://github.com/wez/wezterm/issues/3413#issuecomment-1491870672
+        -- In this case, we need to specify the `--pane-id` for `wezterm cli get-pane-direction`, otherwise it will use `$WEZTERM_PANE`
+        -- See: `wezterm cli get-pane-direction --help`
+        -- local wezterm_pane_id = wezterm.get_current_pane() -- `$WEZTERM_PANE` could be wrong
+        local wezterm_pane_id = mux_wezterm.current_pane_id()
+        -- local at_edge_of_wezterm = mux_wezterm.current_pane_at_edge(ctx.direction) -- missing `--pane-id`
+        ---@diagnostic disable-next-line: param-type-mismatch
+        local at_edge_of_wezterm = wezterm.get_pane_direction(ctx.direction, wezterm_pane_id) == nil
+        if at_edge_of_wezterm then
+          -- at the edge of both tmux and wezterm, original at_edge behavior
           wrap_or_split_or_stop()
         else
-          -- require("wezterm").switch_pane.direction(ctx.direction, mux_wezterm.current_pane_id())
-          local ok = mux_wezterm.next_pane(ctx.direction)
-          if not ok then
-            wrap_or_split_or_stop()
-          end
+          -- at the edge of tmux, but not at the edge of wezterm, navigate to wezterm
+          -- local ok = mux_wezterm.next_pane(ctx.direction) -- missing `--pane-id`
+          -- if not ok then
+          --   wrap_or_split_or_stop()
+          -- end
+          ---@diagnostic disable-next-line: param-type-mismatch
+          wezterm.switch_pane.direction(ctx.direction, wezterm_pane_id)
         end
       end,
       -- float_win_behavior = "mux",
       disable_multiplexer_nav_when_zoomed = false,
     },
+    -- -- NOTE: For tmux in wezterm, smart-splits.nvim treats tmux as the multiplexer.
+    -- -- It will only handle tmux's startup/shutdown events in `setup`, but not wezterm's, which results in the lack of `SetUserVar=IS_NVIM` for wezterm.
+    -- -- See: https://github.com/mrjones2014/smart-splits.nvim/blob/0523920a07c54eea7610f342ca8c1bddbee4b626/lua/smart-splits/mux/utils.lua#L59
+    -- -- In `wezterm/keys.lua`, we pass the C-hjkl keys through to whether nvim or tmux, so it's ok to not set `SetUserVar=IS_NVIM` for wezterm and let it treat as tmux.
+    -- config = function(_, opts)
+    --   require("smart-splits").setup(opts)
+    --
+    --   local mux = require("smart-splits.mux").get()
+    --   local Multiplexer = require("smart-splits.types").Multiplexer
+    --
+    --   -- tmux in wezterm
+    --   if is_wezterm and mux and mux.type == Multiplexer.tmux then
+    --     local mux_wezterm = require("smart-splits.mux.wezterm")
+    --     mux_wezterm.on_init() -- require("wezterm").set_user_var("IS_NVIM", true)
+    --     vim.api.nvim_create_autocmd("VimResume", {
+    --       callback = function()
+    --         mux_wezterm.on_init()
+    --       end,
+    --     })
+    --     vim.api.nvim_create_autocmd({ "VimSuspend", "VimLeavePre" }, {
+    --       callback = function()
+    --         mux_wezterm.on_exit()
+    --       end,
+    --     })
+    --   end
+    -- end,
   },
 
   {
     "willothy/wezterm.nvim",
     lazy = true,
-    cond = vim.env.WEZTERM_UNIX_SOCKET ~= nil,
+    cond = is_wezterm,
     opts = {
       create_commands = false,
     },
@@ -124,7 +166,7 @@ return {
     "folke/zen-mode.nvim",
     optional = true,
     opts = function(_, opts)
-      if not vim.env.TMUX and not vim.env.WEZTERM_UNIX_SOCKET then
+      if not is_tmux and not is_wezterm then
         return
       end
 
@@ -141,7 +183,7 @@ return {
       -- toggle tmux status line
       local on_open_tmux = function() end
       local on_close_tmux = function() end
-      if vim.env.TMUX then
+      if is_tmux then
         -- https://github.com/folke/zen-mode.nvim/blob/a31cf7113db34646ca320f8c2df22cf1fbfc6f2a/lua/zen-mode/plugins.lua#L96
         local function get_tmux_opt(option)
           local option_raw = vim.fn.system([[tmux show -w ]] .. option)
@@ -180,7 +222,7 @@ return {
       -- toggle wezterm pane zoom state
       local on_open_wezterm = function() end
       local on_close_wezterm = function() end
-      if vim.env.WEZTERM_UNIX_SOCKET then
+      if is_wezterm then
         local wezterm = require("wezterm")
         if wezterm.list_clients() then -- sometimes `wezterm cli` went wrong in tmux, check it
           local smart_splits_wezterm = require("smart-splits.mux.wezterm")
@@ -202,13 +244,10 @@ return {
           --   end
           -- end
 
-          -- NOTE: using `wezterm cli list-clients --format=json` instead of `$WEZTERM_PANE` to get real pane_id
-          -- https://github.com/wez/wezterm/issues/3413#issuecomment-1491870672
-          -- local pane_id = wezterm.get_current_pane()
-          local pane_id = smart_splits_wezterm.current_pane_id() -- will pane_id change?
+          local pane_id = smart_splits_wezterm.current_pane_id() -- will pane_id change during nvim session?
           local is_zoomed
           on_open_wezterm = function()
-            -- is_zoomed = pane_is_zoomed(pane_id)
+            -- is_zoomed = pane_is_zoomed(pane_id) -- alternative
             is_zoomed = smart_splits_wezterm.current_pane_is_zoomed()
             if is_zoomed == false then
               wezterm.zoom_pane(pane_id, { zoom = true })
