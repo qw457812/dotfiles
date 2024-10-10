@@ -455,6 +455,97 @@ bind -T copy-mode-vi d send -X halfpage-down
 # split current window vertically
 bind | split-window -h
 
+# https://github.com/aserowy/tmux.nvim#navigation
+# https://github.com/aserowy/tmux.nvim/blob/main/tmux.nvim.tmux
+# https://github.com/mrjones2014/smart-splits.nvim#tmux
+is_vim="ps -o state= -o comm= -t '#{pane_tty}' | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?\.?(view|n?vim?x?)(-wrapped)?(diff)?$'"
+is_wezterm='test -n "$WEZTERM_UNIX_SOCKET"'
+# bind-key -n 'C-x' if-shell "$is_wezterm" 'display-message "true"' 'display-message "false"'
+
+# bind-key -n 'C-h' if-shell "$is_vim" 'send-keys C-h' { if -F '#{pane_at_left}' '' 'select-pane -L' }
+# bind-key -n 'C-j' if-shell "$is_vim" 'send-keys C-j' { if -F '#{pane_at_bottom}' '' 'select-pane -D' }
+# bind-key -n 'C-k' if-shell "$is_vim" 'send-keys C-k' { if -F '#{pane_at_top}' '' 'select-pane -U' }
+# bind-key -n 'C-l' if-shell "$is_vim" 'send-keys C-l' { if -F '#{pane_at_right}' '' 'select-pane -R' }
+#
+# bind-key -n 'C-h' if-shell "$is_vim" 'send-keys C-h' \
+#   { if -F '#{pane_at_left}' \
+#     { if-shell "$is_wezterm" 'run-shell "wezterm cli activate-pane-direction Left"' '' } \
+#     'select-pane -L' }
+# bind-key -n 'C-j' if-shell "$is_vim" 'send-keys C-j' \
+#   { if -F '#{pane_at_bottom}' \
+#     { if-shell "$is_wezterm" 'run-shell "wezterm cli activate-pane-direction Down"' '' } \
+#     'select-pane -D' }
+# bind-key -n 'C-k' if-shell "$is_vim" 'send-keys C-k' \
+#   { if -F '#{pane_at_top}' \
+#     { if-shell "$is_wezterm" 'run-shell "wezterm cli activate-pane-direction Up"' '' } \
+#     'select-pane -U' }
+# bind-key -n 'C-l' if-shell "$is_vim" 'send-keys C-l' \
+#   { if -F '#{pane_at_right}' \
+#     { if-shell "$is_wezterm" 'run-shell "wezterm cli activate-pane-direction Right"' '' } \
+#     'select-pane -R' }
+#
+# NOTE: `$WEZTERM_PANE` could be wrong when getting wezterm pane_id in tmux, use `wezterm cli list-clients --format=json` instead
+# See: https://github.com/wez/wezterm/issues/3413#issuecomment-1491870672
+# In this case, we need to specify the `--pane-id` for `wezterm cli activate-pane-direction`, otherwise it will use `$WEZTERM_PANE`
+# See: `wezterm cli activate-pane-direction --help`
+bind-key -n 'C-h' if-shell "$is_vim" 'send-keys C-h' \
+  { if -F '#{pane_at_left}' \
+    { if-shell "$is_wezterm" "run-shell \"wezterm cli activate-pane-direction --pane-id \$(wezterm cli list-clients --format json | jq -r 'sort_by(.idle_time.nanos) | .[0].focused_pane_id') Left\"" '' } \
+    'select-pane -L' }
+bind-key -n 'C-j' if-shell "$is_vim" 'send-keys C-j' \
+  { if -F '#{pane_at_bottom}' \
+    { if-shell "$is_wezterm" "run-shell \"wezterm cli activate-pane-direction --pane-id \$(wezterm cli list-clients --format json | jq -r 'sort_by(.idle_time.nanos) | .[0].focused_pane_id') Down\"" '' } \
+    'select-pane -D' }
+bind-key -n 'C-k' if-shell "$is_vim" 'send-keys C-k' \
+  { if -F '#{pane_at_top}' \
+    { if-shell "$is_wezterm" "run-shell \"wezterm cli activate-pane-direction --pane-id \$(wezterm cli list-clients --format json | jq -r 'sort_by(.idle_time.nanos) | .[0].focused_pane_id') Up\"" '' } \
+    'select-pane -U' }
+bind-key -n 'C-l' if-shell "$is_vim" 'send-keys C-l' \
+  { if -F '#{pane_at_right}' \
+    { if-shell "$is_wezterm" "run-shell \"wezterm cli activate-pane-direction --pane-id \$(wezterm cli list-clients --format json | jq -r 'sort_by(.idle_time.nanos) | .[0].focused_pane_id') Right\"" '' } \
+    'select-pane -R' }
+
+# bind-key -T copy-mode-vi 'C-h' if -F '#{pane_at_left}' '' 'select-pane -L'
+# bind-key -T copy-mode-vi 'C-j' if -F '#{pane_at_bottom}' '' 'select-pane -D'
+# bind-key -T copy-mode-vi 'C-k' if -F '#{pane_at_top}' '' 'select-pane -U'
+# bind-key -T copy-mode-vi 'C-l' if -F '#{pane_at_right}' '' 'select-pane -R'
+#
+# bind-key -T copy-mode-vi 'C-h' if -F '#{pane_at_left}' \
+#   { if-shell "$is_wezterm" 'run-shell "wezterm cli activate-pane-direction Left"' '' } \
+#   'select-pane -L'
+# bind-key -T copy-mode-vi 'C-j' if -F '#{pane_at_bottom}' \
+#   { if-shell "$is_wezterm" 'run-shell "wezterm cli activate-pane-direction Down"' '' } \
+#   'select-pane -D'
+# bind-key -T copy-mode-vi 'C-k' if -F '#{pane_at_top}' \
+#   { if-shell "$is_wezterm" 'run-shell "wezterm cli activate-pane-direction Up"' '' } \
+#   'select-pane -U'
+# bind-key -T copy-mode-vi 'C-l' if -F '#{pane_at_right}' \
+#   { if-shell "$is_wezterm" 'run-shell "wezterm cli activate-pane-direction Right"' '' } \
+#   'select-pane -R'
+#
+bind-key -T copy-mode-vi 'C-h' if -F '#{pane_at_left}' \
+  { if-shell "$is_wezterm" "run-shell \"wezterm cli activate-pane-direction --pane-id \$(wezterm cli list-clients --format json | jq -r 'sort_by(.idle_time.nanos) | .[0].focused_pane_id') Left\"" '' } \
+  'select-pane -L'
+bind-key -T copy-mode-vi 'C-j' if -F '#{pane_at_bottom}' \
+  { if-shell "$is_wezterm" "run-shell \"wezterm cli activate-pane-direction --pane-id \$(wezterm cli list-clients --format json | jq -r 'sort_by(.idle_time.nanos) | .[0].focused_pane_id') Down\"" '' } \
+  'select-pane -D'
+bind-key -T copy-mode-vi 'C-k' if -F '#{pane_at_top}' \
+  { if-shell "$is_wezterm" "run-shell \"wezterm cli activate-pane-direction --pane-id \$(wezterm cli list-clients --format json | jq -r 'sort_by(.idle_time.nanos) | .[0].focused_pane_id') Up\"" '' } \
+  'select-pane -U'
+bind-key -T copy-mode-vi 'C-l' if -F '#{pane_at_right}' \
+  { if-shell "$is_wezterm" "run-shell \"wezterm cli activate-pane-direction --pane-id \$(wezterm cli list-clients --format json | jq -r 'sort_by(.idle_time.nanos) | .[0].focused_pane_id') Right\"" '' } \
+  'select-pane -R'
+
+bind -n 'C-Left' if-shell "$is_vim" 'send-keys C-Left' 'resize-pane -L 1'
+bind -n 'C-Down' if-shell "$is_vim" 'send-keys C-Down' 'resize-pane -D 1'
+bind -n 'C-Up' if-shell "$is_vim" 'send-keys C-Up' 'resize-pane -U 1'
+bind -n 'C-Right' if-shell "$is_vim" 'send-keys C-Right' 'resize-pane -R 1'
+
+bind-key -T copy-mode-vi C-Left resize-pane -L 1
+bind-key -T copy-mode-vi C-Down resize-pane -D 1
+bind-key -T copy-mode-vi C-Up resize-pane -U 1
+bind-key -T copy-mode-vi C-Right resize-pane -R 1
+
 # TODO
 # https://github.com/samoshkin/tmux-config#key-bindings
 # https://github.com/jabirali/tmux-tilish | https://github.com/folke/dot/blob/master/config/tmux/tmux.conf
@@ -505,14 +596,14 @@ set -g @plugin 'MunifTanjim/tmux-mode-indicator'
 set -g @plugin 'tmux-plugins/tmux-open'
 set -g @open 'O'
 set -g @open-S 'https://www.google.com/search?q='
-# https://github.com/aserowy/tmux.nvim#tpm
-# note: C-l for clear-history not working anymore
-set -g @plugin 'aserowy/tmux.nvim'
-set -g @tmux-nvim-navigation-cycle false
-set -g @tmux-nvim-resize-keybinding-left 'C-Left'
-set -g @tmux-nvim-resize-keybinding-down 'C-Down'
-set -g @tmux-nvim-resize-keybinding-up 'C-Up'
-set -g @tmux-nvim-resize-keybinding-right 'C-Right'
+# # https://github.com/aserowy/tmux.nvim#tpm
+# # note: C-l for clear-history not working anymore
+# set -g @plugin 'aserowy/tmux.nvim'
+# set -g @tmux-nvim-navigation-cycle false
+# set -g @tmux-nvim-resize-keybinding-left 'C-Left'
+# set -g @tmux-nvim-resize-keybinding-down 'C-Down'
+# set -g @tmux-nvim-resize-keybinding-up 'C-Up'
+# set -g @tmux-nvim-resize-keybinding-right 'C-Right'
 set -g @plugin 'tmux-plugins/tmux-resurrect'
 set -g @resurrect-capture-pane-contents 'on'
 # TODO is this working?
