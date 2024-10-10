@@ -71,12 +71,12 @@ return {
         local AtEdgeBehavior = types.AtEdgeBehavior
         local Multiplexer = types.Multiplexer
 
-        local at_edge = AtEdgeBehavior.stop -- config here: wrap(not recommend), split, stop
+        local at_edge = AtEdgeBehavior.stop -- config here: wrap(not recommended), split, stop
 
         local function wrap_or_split_or_stop()
           if at_edge == AtEdgeBehavior.wrap then
             ---@diagnostic disable-next-line: undefined-field
-            ctx.wrap()
+            ctx.wrap() -- not yet integrated with multiplexer
           elseif at_edge == AtEdgeBehavior.split then
             if
               vim.tbl_contains(config.ignored_buftypes, vim.bo.buftype)
@@ -84,7 +84,7 @@ return {
             then
               return -- just stop
             end
-            ctx.split()
+            ctx.split() -- not yet integrated with multiplexer
           elseif at_edge == AtEdgeBehavior.stop then
             return
           end
@@ -128,7 +128,8 @@ return {
     -- -- NOTE: For tmux in wezterm, smart-splits.nvim treats tmux as the multiplexer.
     -- -- It will only handle tmux's startup/shutdown events in `setup`, but not wezterm's, which results in the lack of `SetUserVar=IS_NVIM` for wezterm.
     -- -- See: https://github.com/mrjones2014/smart-splits.nvim/blob/0523920a07c54eea7610f342ca8c1bddbee4b626/lua/smart-splits/mux/utils.lua#L59
-    -- -- In `wezterm/keys.lua`, we pass the C-hjkl keys through to whether nvim or tmux, so it's ok to not set `SetUserVar=IS_NVIM` for wezterm and let it treat as tmux.
+    -- -- The following code fails to set `IS_NVIM` for wezterm.
+    -- -- But in `wezterm/keys.lua`, we pass the C-hjkl keys through to either nvim or tmux, so it's OK to not set `IS_NVIM` and let wezterm treat it as tmux.
     -- config = function(_, opts)
     --   require("smart-splits").setup(opts)
     --
@@ -138,7 +139,10 @@ return {
     --   -- tmux in wezterm
     --   if is_wezterm and mux and mux.type == Multiplexer.tmux then
     --     local mux_wezterm = require("smart-splits.mux.wezterm")
-    --     mux_wezterm.on_init() -- require("wezterm").set_user_var("IS_NVIM", true)
+    --     -- alternative to `mux_wezterm.on_init()`:
+    --     -- - require("wezterm").set_user_var("IS_NVIM", true)
+    --     -- - https://github.com/folke/dot/blob/39602b7edc7222213bce762080d8f46352167434/nvim/lua/util/init.lua#L152
+    --     mux_wezterm.on_init()
     --     vim.api.nvim_create_autocmd("VimResume", {
     --       callback = function()
     --         mux_wezterm.on_init()
