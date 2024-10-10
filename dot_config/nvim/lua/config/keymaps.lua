@@ -250,7 +250,7 @@ LazyVim.toggle.map("<leader>ul", LazyVim.toggle("number", { name = "Line Number"
 -- https://github.com/LazyVim/LazyVim/blob/3dbace941ee935c89c73fd774267043d12f57fe2/lua/lazyvim/plugins/lsp/init.lua#L18
 _G.has_diagnostic = true
 LazyVim.toggle.map("<leader>ud", {
-  name = "Diagnostics",
+  name = "Diagnostic Virtual Text",
   get = function()
     return has_diagnostic
   end,
@@ -269,6 +269,7 @@ LazyVim.toggle.map("<leader>ud", {
     end
   end,
 })
+LazyVim.toggle.map("<leader>uD", LazyVim.toggle.diagnostics)
 
 local function google_search(input)
   local query = input or vim.fn.expand("<cword>")

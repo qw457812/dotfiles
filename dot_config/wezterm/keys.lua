@@ -200,6 +200,7 @@ function M.apply_to_config(config)
   -- https://wezfurlong.org/wezterm/config/lua/wezterm.gui/default_key_tables.html
   if wezterm.gui then
     -- Copy Mode
+    -- TODO: https://wezfurlong.org/wezterm/copymode.html#configurable-key-assignments
     config.key_tables.copy_mode = helpers.list_extend(wezterm.gui.default_key_tables().copy_mode, {
       { mods = "NONE", key = "H", action = act.CopyMode("MoveToStartOfLineContent") },
       { mods = "NONE", key = "L", action = act.CopyMode("MoveToEndOfLineContent") },

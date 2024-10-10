@@ -78,8 +78,8 @@ TODO:
      - [ ] [VSCode](#vscodevim): Built-in Explorer view
      - [ ] [IdeaVim](#ideavim): [NERDTree](https://github.com/JetBrains/ideavim/wiki/NERDTree-support)
    - Others
-     - [ ] [zsh-vi-mode](#oh-my-zsh)
-     - [ ] [tmux-copy-mode](#oh-my-tmux)
+     - [ ] [zsh-vi-mode](#oh-my-zsh) or [fish_vi_key_bindings](https://fishshell.com/docs/current/cmds/fish_vi_key_bindings.html).
+     - [ ] [tmux-copy-mode](#oh-my-tmux) or [wezterm-copy-mode](https://wezfurlong.org/wezterm/copymode.html).
      - [ ] [less](dot_config/lesskey)
 
 Tips:

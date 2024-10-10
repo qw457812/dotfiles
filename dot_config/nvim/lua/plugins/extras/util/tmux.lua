@@ -43,8 +43,8 @@ return {
 
   {
     "mrjones2014/smart-splits.nvim",
-    lazy = false,
     cond = is_wezterm,
+    lazy = false, -- required
     -- stylua: ignore
     keys = {
       { "<C-h>", mode = { "n", "t" }, function() require("smart-splits").move_cursor_left() end, desc = "Go to Left Window" },
@@ -159,8 +159,8 @@ return {
 
   {
     "willothy/wezterm.nvim",
-    lazy = true,
     cond = is_wezterm,
+    lazy = true,
     opts = {
       create_commands = false,
     },

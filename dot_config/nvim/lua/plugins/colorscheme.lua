@@ -1,15 +1,21 @@
-local to_neutral_gray = U.color.to_neutral_gray
-
 local colorschemes = {
-  -- "tokyonight", -- custom, `tokyonight-custom` not working
+  "tokyonight", -- custom, `tokyonight-custom` not working
   "tokyonight-moon",
   "tokyonight-storm",
   "tokyonight-night",
   "catppuccin-frappe",
   "catppuccin-macchiato",
   "catppuccin-mocha",
-  -- "onedark",
-  -- "obscure",
+  "onedark",
+  "obscure",
+
+  "kanagawa-dragon",
+  "kanagawa-wave",
+  "nightfox",
+  "nordfox",
+  "neon-cherrykiss-night",
+  "neon-punkpeach-night",
+  "astrodark",
 }
 
 -- :=vim.g.colors_name
@@ -19,6 +25,17 @@ local function random_colorscheme()
   -- return colorschemes[math.random(#colorschemes)]
   return colorschemes[tonumber(os.date("%S")) % #colorschemes + 1]
 end
+
+local function cond_colorscheme(pattern)
+  for _, c in ipairs(colorschemes) do
+    if c:match(pattern) then
+      return true
+    end
+  end
+  return false
+end
+
+local to_neutral_gray = U.color.to_neutral_gray
 
 local tokyonight_custom_style = "custom"
 
@@ -280,7 +297,7 @@ return {
   -- alternative: olimorris/onedarkpro.nvim | https://github.com/appelgriebsch/Nv/blob/e9a584090a69a8d691f5eb051e76016b65dfc0b7/lua/plugins/extras/ui/onedarkpro-theme.lua
   {
     "navarasu/onedark.nvim",
-    cond = vim.list_contains(colorschemes, "onedark"),
+    cond = cond_colorscheme("^onedark$"),
     lazy = true,
     opts = function()
       local style = "dark" -- dark(default), darker, cool, deep, warm, warmer, light
@@ -315,7 +332,7 @@ return {
 
   {
     "killitar/obscure.nvim",
-    cond = vim.list_contains(colorschemes, "obscure"),
+    cond = cond_colorscheme("^obscure$"),
     lazy = true,
     opts = function()
       local util = require("obscure.util")
@@ -346,12 +363,53 @@ return {
     end,
   },
 
+  -- TODO:
+  {
+    "rebelot/kanagawa.nvim",
+    cond = cond_colorscheme("^kanagawa"),
+    lazy = true,
+  },
+  {
+    "EdenEast/nightfox.nvim",
+    cond = cond_colorscheme("fox$"),
+    lazy = true,
+  },
+  {
+    "Zeioth/neon.nvim",
+    cond = cond_colorscheme("^neon"),
+    lazy = true,
+  },
+  {
+    "AstroNvim/astrotheme",
+    cond = cond_colorscheme("^astro"),
+    lazy = true,
+    opts = {},
+  },
+
   {
     "LazyVim/LazyVim",
-    opts = {
-      colorscheme = random_colorscheme(),
-    },
+    opts = function(_, opts)
+      opts = opts or {}
+      opts.colorscheme = random_colorscheme()
+
+      vim.keymap.set("n", "<leader>iC", function()
+        LazyVim.info(vim.g.colors_name, { title = "ColorScheme" })
+      end, { desc = "ColorScheme" })
+    end,
   },
+
+  -- {
+  --   "folke/styler.nvim",
+  --   event = "VeryLazy",
+  --   opts = function()
+  --     return {
+  --       themes = {
+  --         markdown = { colorscheme = "catppuccin" },
+  --         help = { colorscheme = "catppuccin" },
+  --       },
+  --     }
+  --   end,
+  -- },
 
   {
     "nvim-telescope/telescope.nvim",
