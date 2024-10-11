@@ -8,7 +8,6 @@ local colorschemes = {
   "catppuccin-mocha",
   "onedark",
   "obscure",
-
   "kanagawa-dragon",
   "kanagawa-wave",
   "nightfox",
@@ -363,27 +362,54 @@ return {
     end,
   },
 
-  -- TODO:
   {
     "rebelot/kanagawa.nvim",
     cond = cond_colorscheme("^kanagawa"),
     lazy = true,
   },
+
   {
     "EdenEast/nightfox.nvim",
     cond = cond_colorscheme("fox$"),
     lazy = true,
   },
+
   {
     "Zeioth/neon.nvim",
     cond = cond_colorscheme("^neon"),
     lazy = true,
   },
+
   {
     "AstroNvim/astrotheme",
     cond = cond_colorscheme("^astro"),
     lazy = true,
     opts = {},
+  },
+
+  -- custom illuminate highlight for all colorschemes which don't customize it
+  {
+    "RRethy/vim-illuminate",
+    optional = true,
+    opts = function()
+      local hl = vim.api.nvim_get_hl(0, { name = "IlluminatedWordWrite", link = false, create = false })
+      if not (hl.bg and hl.underline) then
+        local bg = LazyVim.ui.color("Normal", true)
+        local visual = LazyVim.ui.color("Visual", true)
+        local comment = LazyVim.ui.color("Comment")
+
+        local illuminate = U.color.lighten(visual, 0.925)
+        -- add `default = true` to avoid overriding colorscheme's highlight group
+        vim.api.nvim_set_hl(0, "IlluminatedWordText", { bg = U.color.darken(visual, 0.9) })
+        vim.api.nvim_set_hl(0, "IlluminatedWordRead", { bg = illuminate })
+        vim.api.nvim_set_hl(0, "IlluminatedWordWrite", { bg = illuminate, underline = true })
+
+        -- compensate for invisible text caused by custom illuminate highlight
+        vim.api.nvim_set_hl(0, "CmpGhostText", { bg = bg, fg = U.color.lighten(comment, 0.85) })
+        -- stylua: ignore
+        vim.api.nvim_set_hl(0, "DiagnosticUnnecessary", { fg = U.color.lighten(LazyVim.ui.color("DiagnosticUnnecessary") or comment, 0.7) })
+      end
+    end,
   },
 
   {

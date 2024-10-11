@@ -151,35 +151,25 @@ return {
     },
   },
 
-  {
-    "RRethy/vim-illuminate",
-    optional = true,
-    opts = function(_, opts)
-      -- opts.filetypes_denylist = vim.list_extend(opts.filetypes_denylist or { "dirbuf", "dirvish", "fugitive" }, {
-      --   "lazy",
-      --   "mason",
-      --   "harpoon",
-      --   "qf",
-      --   "netrw",
-      --   "neo-tree",
-      --   "oil",
-      --   "minifiles",
-      --   "trouble",
-      --   "notify",
-      --   "TelescopePrompt",
-      -- })
-
-      local hl = vim.api.nvim_get_hl(0, { name = "IlluminatedWordWrite", link = false, create = false })
-      if not (hl.bg and hl.underline) then
-        local visual = LazyVim.ui.color("Visual", true)
-        local illuminate = U.color.lighten(visual, 0.925)
-        -- add `default = true` to avoid overriding colorscheme's highlight group
-        vim.api.nvim_set_hl(0, "IlluminatedWordText", { bg = U.color.darken(visual, 0.9) })
-        vim.api.nvim_set_hl(0, "IlluminatedWordRead", { bg = illuminate })
-        vim.api.nvim_set_hl(0, "IlluminatedWordWrite", { bg = illuminate, underline = true })
-      end
-    end,
-  },
+  -- {
+  --   "RRethy/vim-illuminate",
+  --   optional = true,
+  --   opts = function(_, opts)
+  --     opts.filetypes_denylist = vim.list_extend(opts.filetypes_denylist or { "dirbuf", "dirvish", "fugitive" }, {
+  --       "lazy",
+  --       "mason",
+  --       "harpoon",
+  --       "qf",
+  --       "netrw",
+  --       "neo-tree",
+  --       "oil",
+  --       "minifiles",
+  --       "trouble",
+  --       "notify",
+  --       "TelescopePrompt",
+  --     })
+  --   end,
+  -- },
 
   -- alternative: https://github.com/xzbdmw/nvimconfig/blob/0be9805dac4661803e17265b435060956daee757/lua/theme/dark.lua#L23
   {
