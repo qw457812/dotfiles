@@ -418,9 +418,27 @@ return {
       opts = opts or {}
       opts.colorscheme = random_colorscheme()
 
-      vim.keymap.set("n", "<leader>iC", function()
-        LazyVim.info(vim.g.colors_name, { title = "ColorScheme" })
-      end, { desc = "ColorScheme" })
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "LazyVimKeymaps",
+        callback = function()
+          vim.keymap.set("n", "<leader>iC", function()
+            LazyVim.info(vim.g.colors_name, { title = "ColorScheme" })
+          end, { desc = "ColorScheme" })
+
+          vim.keymap.set("n", "<leader>ur", function()
+            local random = random_colorscheme()
+            vim.cmd.colorscheme(random)
+            LazyVim.info(random, { title = "Random ColorScheme" })
+          end, { desc = "Random ColorScheme" })
+
+          vim.keymap.set(
+            "n",
+            "<leader>uR",
+            "<Cmd>nohlsearch<Bar>diffupdate<Bar>normal! <C-L><CR>",
+            { desc = "Redraw / Clear hlsearch / Diff Update" }
+          )
+        end,
+      })
     end,
   },
 
