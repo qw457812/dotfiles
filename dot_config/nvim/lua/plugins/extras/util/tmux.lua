@@ -71,12 +71,12 @@ return {
         local AtEdgeBehavior = types.AtEdgeBehavior
         local Multiplexer = types.Multiplexer
 
-        local at_edge = AtEdgeBehavior.stop -- config here: wrap(not recommended), split, stop
+        local at_edge = AtEdgeBehavior.stop -- config here: wrap, split, stop
 
         local function wrap_or_split_or_stop()
           if at_edge == AtEdgeBehavior.wrap then
             ---@diagnostic disable-next-line: undefined-field
-            ctx.wrap() -- not yet integrated with multiplexer
+            ctx.wrap()
           elseif at_edge == AtEdgeBehavior.split then
             if
               vim.tbl_contains(config.ignored_buftypes, vim.bo.buftype)
@@ -84,7 +84,7 @@ return {
             then
               return -- just stop
             end
-            ctx.split() -- not yet integrated with multiplexer
+            ctx.split()
           elseif at_edge == AtEdgeBehavior.stop then
             return
           end
@@ -157,6 +157,7 @@ return {
     -- end,
   },
 
+  -- library
   {
     "willothy/wezterm.nvim",
     cond = is_wezterm,
