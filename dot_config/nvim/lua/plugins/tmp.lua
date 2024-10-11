@@ -7,11 +7,6 @@ return {
       { "<leader>ci", "<cmd>Nerdy<cr>", desc = "Pick Icon" },
     },
   },
-  {
-    "fei6409/log-highlight.nvim",
-    event = "BufRead *.log",
-    opts = {},
-  },
 
   -- https://github.com/nvim-orgmode/orgmode/blob/master/DOCS.md#mappings
   -- https://github.com/ales-tsurko/neovim-config/blob/f6d6e86c8d1b545d4de110513e2758edb9a31d6b/lua/extensions/orgmode.lua

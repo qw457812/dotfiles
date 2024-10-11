@@ -35,12 +35,14 @@ prepend_keymap = [
   ], desc = "Exit visual mode, clear selected, or cancel search, or cancel yank status" },
 
   # Operation
+  # TODO: `y` in visual mode
   { on = [
     "y",
     "y",
   ], run = "yank", desc = "Yank selected files (copy)" },
   # https://github.com/orhnk/system-clipboard.yazi
   { on = "Y", run = "plugin system-clipboard", desc = "Cancel the yank status" },
+  # TODO: `d` in visual mode
   { on = [
     "d",
     "d",

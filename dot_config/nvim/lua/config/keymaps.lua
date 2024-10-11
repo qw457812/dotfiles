@@ -212,9 +212,9 @@ map("n", "gp", function() vim.api.nvim_feedkeys("`[" .. vim.fn.strpart(vim.fn.ge
 -- Search inside visually highlighted text. Use `silent = false` for it to make effect immediately.
 map("x", "g/", "<esc>/\\%V", { silent = false, desc = "Search inside visual selection" })
 
-map("n", "g/", "q/", { desc = "command-line window (forward search)" })
-map("n", "g?", "q?", { desc = "command-line window (backward search)" })
-map({ "n", "x" }, "g:", "q:", { desc = "command-line window (Ex command)" })
+map("n", "g/", "q/G", { desc = "command-line window (forward search)" })
+map("n", "g?", "q?G", { desc = "command-line window (backward search)" })
+map({ "n", "x" }, "g:", "q:G", { desc = "command-line window (Ex command)" })
 
 -- map("n", "<leader>.", "@:", { desc = "Repeat last command-line" })
 map("n", "g.", "@:", { desc = "Repeat last command-line" })

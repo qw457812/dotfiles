@@ -576,23 +576,13 @@ lf () {
     cd "$(command lf -print-last-dir "$@")"
 }
 
-# https://yazi-rs.github.io/docs/quick-start/#shell-wrapper
-function y() {
-  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
-  yazi "$@" --cwd-file="$tmp"
-  if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-    builtin cd -- "$cwd"
-  fi
-  rm -f -- "$tmp"
-}
-
 # # Exit to last working directory (LWD) | https://github.com/kyoheiu/felix
 # # source <(command fx --init)
 # # https://github.com/kyoheiu/felix/issues/41
 # alias felix='~/.cargo/bin/fx'
 
 # https://wiki.vifm.info/index.php/How_to_set_shell_working_directory_after_leaving_Vifm
-f()
+ff()
 {
     local dst="$(command vifm --choose-dir - "$@")"
     if [ -z "$dst" ]; then
@@ -600,6 +590,16 @@ f()
         return 1
     fi
     cd "$dst"
+}
+
+# https://yazi-rs.github.io/docs/quick-start/#shell-wrapper
+function f() {
+  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
+  yazi "$@" --cwd-file="$tmp"
+  if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+    builtin cd -- "$cwd"
+  fi
+  rm -f -- "$tmp"
 }
 
 # https://github.com/clash-verge-rev/clash-verge-rev

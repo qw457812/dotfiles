@@ -25,4 +25,11 @@ return {
       { "<leader>uH", "<cmd>Helpview toggleAll<cr>", desc = "Helpview" },
     },
   },
+
+  -- https://github.com/folke/dot/blob/39602b7edc7222213bce762080d8f46352167434/nvim/lua/plugins/tmp.lua#L112
+  {
+    "fei6409/log-highlight.nvim",
+    event = "BufRead *.log",
+    opts = {},
+  },
 }
