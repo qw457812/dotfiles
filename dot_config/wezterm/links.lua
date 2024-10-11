@@ -1,6 +1,6 @@
 -- https://wezfurlong.org/wezterm/config/lua/config/hyperlink_rules.html
 
-local wezterm = require("wezterm")
+local wezterm = require("wezterm") --[[@as Wezterm]]
 
 local M = {}
 
