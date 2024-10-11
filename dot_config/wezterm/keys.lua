@@ -3,7 +3,7 @@
 --
 -- https://github.com/zidhuss/dotfiles/blob/16ea5fc60f20e7ec132cca59bb694a5d54696bb6/wezterm/.config/wezterm/plugins/wez-tmux/init.lua
 
-local wezterm = require("wezterm")
+local wezterm = require("wezterm") --[[@as Wezterm]]
 local helpers = require("helpers")
 local act = wezterm.action
 

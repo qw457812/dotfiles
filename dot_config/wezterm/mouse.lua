@@ -1,6 +1,6 @@
 -- https://wezfurlong.org/wezterm/config/mouse.html#gotcha-on-binding-an-up-event-only
 
-local wezterm = require("wezterm")
+local wezterm = require("wezterm") --[[@as Wezterm]]
 local keys = require("keys")
 local act = wezterm.action
 

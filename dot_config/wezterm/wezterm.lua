@@ -7,8 +7,8 @@
 -- TODO:
 -- https://github.com/MLFlexer/resurrect.wezterm
 
-local wezterm = require("wezterm")
--- wezterm.plugin.update_all()
+local wezterm = require("wezterm") --[[@as Wezterm]]
+-- wezterm.plugin.update_all() -- bad performance
 local config = wezterm.config_builder()
 wezterm.log_info("reloading")
 
