@@ -208,8 +208,8 @@ function M.apply_to_config(config)
       { mods = "NONE", key = "d", action = act.CopyMode({ MoveByPage = 0.5 }) },
       { mods = "CTRL", key = "u", action = act.CopyMode({ MoveByPage = -0.5 }) },
       { mods = "CTRL", key = "d", action = act.CopyMode({ MoveByPage = 0.5 }) },
-      -- { mods = "NONE", key = "Escape", action = wez_tmux.action.ClearSelectionOrClearPatternOrClose },
-      { mods = "NONE", key = "Escape", action = M.action.clear_selection_and_clear_pattern_or_close },
+      { mods = "NONE", key = "Escape", action = wez_tmux.action.ClearSelectionOrClearPatternOrClose },
+      -- { mods = "NONE", key = "Escape", action = M.action.clear_selection_and_clear_pattern_or_close },
       {
         mods = "NONE",
         key = "y",
