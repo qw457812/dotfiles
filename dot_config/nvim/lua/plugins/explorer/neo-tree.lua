@@ -10,7 +10,7 @@ return {
     optional = true,
     dependencies = { "echasnovski/mini.icons" },
     keys = function(_, keys)
-      LazyVim.toggle.map("<leader>uz", {
+      U.toggle.map("<leader>uz", {
         name = "NeoTree Auto Close",
         get = function()
           return vim.g.user_neotree_auto_close
