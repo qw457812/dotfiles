@@ -625,3 +625,6 @@ compdef _gitignoreio gi
 if [ -f /Applications/Wezterm.app/Contents/Resources/wezterm.sh ]; then
   source "/Applications/WezTerm.app/Contents/Resources/wezterm.sh"
 fi
+
+# # https://github.com/wlh320/rime-ls#macos
+# export DYLD_LIBRARY_PATH=$HOME/rime-ls/librime/dist/lib

@@ -246,29 +246,46 @@ end, { desc = "Yank file relative path" })
 
 -- toggle options
 LazyVim.toggle.map("<leader>ul", LazyVim.toggle("number", { name = "Line Number" }))
+-- toggle diagnostic virtual text
 -- https://github.com/xzbdmw/nvimconfig/blob/0be9805dac4661803e17265b435060956daee757/lua/config/keymaps.lua#L49
--- https://github.com/LazyVim/LazyVim/blob/3dbace941ee935c89c73fd774267043d12f57fe2/lua/lazyvim/plugins/lsp/init.lua#L18
-_G.has_diagnostic = true
+local toggle_diagnostics_set_orig = LazyVim.toggle.diagnostics.set
+_G.has_diagnostic_virtual_text = LazyVim.toggle.diagnostics.get()
+local function toggle_diagnostic_virtual_text_set(state)
+  _G.has_diagnostic_virtual_text = state
+  if LazyVim.has("tiny-inline-diagnostic.nvim") then
+    if state then
+      require("tiny-inline-diagnostic").enable()
+    else
+      require("tiny-inline-diagnostic").disable()
+    end
+  else
+    -- https://github.com/LazyVim/LazyVim/blob/3dbace941ee935c89c73fd774267043d12f57fe2/lua/lazyvim/plugins/lsp/init.lua#L18
+    vim.diagnostic.config({
+      virtual_text = state and {
+        spacing = 4,
+        source = "if_many",
+        prefix = "●",
+      } or false,
+    })
+  end
+  if state and not LazyVim.toggle.diagnostics.get() then
+    toggle_diagnostics_set_orig(state)
+  end
+end
 LazyVim.toggle.map("<leader>ud", {
   name = "Diagnostic Virtual Text",
   get = function()
-    return has_diagnostic
+    return has_diagnostic_virtual_text
   end,
-  set = function(state)
-    _G.has_diagnostic = state
-    if state then
-      vim.diagnostic.config({
-        virtual_text = {
-          spacing = 4,
-          source = "if_many",
-          prefix = "●",
-        },
-      })
-    else
-      vim.diagnostic.config({ virtual_text = false })
-    end
-  end,
+  set = toggle_diagnostic_virtual_text_set,
 })
+-- toggle diagnostics and it's virtual text
+LazyVim.toggle.diagnostics.set = function(state)
+  toggle_diagnostic_virtual_text_set(state)
+  if not state then
+    toggle_diagnostics_set_orig(state)
+  end
+end
 LazyVim.toggle.map("<leader>uD", LazyVim.toggle.diagnostics)
 
 local function google_search(input)

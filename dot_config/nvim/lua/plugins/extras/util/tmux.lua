@@ -176,6 +176,7 @@ return {
         return
       end
 
+      -- opts.debug = true
       opts.library = opts.library or {}
       if LazyVim.has("wezterm.nvim") then
         table.insert(opts.library, { path = "wezterm-types", words = { "%-%-%[%[@as Wezterm%]%]" } })

@@ -1,5 +1,15 @@
+local obsidian_vaults = {
+  personal = U.path.HOME .. "/Documents/vaults/personal",
+  work = U.path.HOME .. "/Documents/vaults/work",
+}
+
 -- https://github.com/folke/dot/blob/master/nvim/lua/plugins/tmp.lua
 return {
+  {
+    "iguanacucumber/magazine.nvim",
+    name = "nvim-cmp",
+  },
+
   {
     "2kabhishek/nerdy.nvim",
     cmd = "Nerdy",
@@ -37,6 +47,32 @@ return {
     },
   },
 
+  {
+    "epwalsh/obsidian.nvim",
+    -- version = "*",
+    event = (function()
+      local events = {}
+      for _, path in pairs(obsidian_vaults) do
+        table.insert(events, "BufReadPre " .. path .. "/*.md")
+        table.insert(events, "BufNewFile " .. path .. "/*.md")
+      end
+      return events
+    end)(),
+    opts = function(_, opts)
+      if LazyVim.has("render-markdown.nvim") then
+        -- https://github.com/MeanderingProgrammer/render-markdown.nvim#obsidiannvim
+        opts.ui = { enable = false }
+      end
+
+      opts.workspaces = opts.workspaces or {}
+      for name, path in pairs(obsidian_vaults) do
+        table.insert(opts.workspaces, { name = name, path = path })
+      end
+
+      -- TODO: `:verbose nmap <cr>`, overlaps with "Goto Definition/References" defined in lsp.lua
+    end,
+  },
+
   -- {
   --   "akinsho/toggleterm.nvim",
   --   version = "*",
@@ -55,4 +91,24 @@ return {
   -- --     { "<leader>ft", "<cmd>Telescope toggleterm_manager<cr>", desc = "Terminals" },
   -- --   },
   -- -- },
+
+  -- TODO: not working
+  -- -- https://github.com/wlh320/rime-ls
+  -- -- https://github.com/wlh320/rime-ls/blob/master/doc/nvim.md
+  -- -- https://github.com/liubianshi/cmp-lsp-rimels
+  -- {
+  --   "liubianshi/cmp-lsp-rimels",
+  --   dependencies = {
+  --     "neovim/nvim-lspconfig",
+  --     "hrsh7th/nvim-cmp",
+  --     "hrsh7th/cmp-nvim-lsp",
+  --   },
+  --   keys = { { "<localleader>f", mode = "i" } },
+  --   config = function()
+  --     vim.system({ "rime_ls", "--listen", "127.0.0.1:9257" })
+  --     require("rimels").setup({
+  --       cmd = vim.lsp.rpc.connect("127.0.0.1", 9257),
+  --     })
+  --   end,
+  -- },
 }
