@@ -2,6 +2,7 @@
 ---@field color util.color
 ---@field explorer util.explorer
 ---@field path util.path
+---@field toggle util.toggle
 local M = {}
 
 setmetatable(M, {

@@ -245,48 +245,9 @@ end, { desc = "Yank file relative path" })
 -- end, { desc = "Yank file name" })
 
 -- toggle options
-LazyVim.toggle.map("<leader>ul", LazyVim.toggle("number", { name = "Line Number" }))
--- toggle diagnostic virtual text
--- https://github.com/xzbdmw/nvimconfig/blob/0be9805dac4661803e17265b435060956daee757/lua/config/keymaps.lua#L49
-local toggle_diagnostics_set_orig = LazyVim.toggle.diagnostics.set
-_G.has_diagnostic_virtual_text = LazyVim.toggle.diagnostics.get()
-local function toggle_diagnostic_virtual_text_set(state)
-  _G.has_diagnostic_virtual_text = state
-  if LazyVim.has("tiny-inline-diagnostic.nvim") then
-    if state then
-      require("tiny-inline-diagnostic").enable()
-    else
-      require("tiny-inline-diagnostic").disable()
-    end
-  else
-    -- https://github.com/LazyVim/LazyVim/blob/3dbace941ee935c89c73fd774267043d12f57fe2/lua/lazyvim/plugins/lsp/init.lua#L18
-    vim.diagnostic.config({
-      virtual_text = state and {
-        spacing = 4,
-        source = "if_many",
-        prefix = "●",
-      } or false,
-    })
-  end
-  if state and not LazyVim.toggle.diagnostics.get() then
-    toggle_diagnostics_set_orig(state)
-  end
-end
-LazyVim.toggle.map("<leader>ud", {
-  name = "Diagnostic Virtual Text",
-  get = function()
-    return has_diagnostic_virtual_text
-  end,
-  set = toggle_diagnostic_virtual_text_set,
-})
--- toggle diagnostics and it's virtual text
-LazyVim.toggle.diagnostics.set = function(state)
-  toggle_diagnostic_virtual_text_set(state)
-  if not state then
-    toggle_diagnostics_set_orig(state)
-  end
-end
-LazyVim.toggle.map("<leader>uD", LazyVim.toggle.diagnostics)
+U.toggle.map("<leader>ul", U.toggle("number", { name = "Line Number" }))
+U.toggle.map("<leader>ud", U.toggle.diagnostic_virtual_text)
+U.toggle.map("<leader>uD", U.toggle.diagnostics)
 
 local function google_search(input)
   local query = input or vim.fn.expand("<cword>")
@@ -315,7 +276,7 @@ if vim.g.neovide then
     neovide_cursor_vfx_mode = "",
   }
   local neovide_state = {} ---@type table<string, any>
-  LazyVim.toggle.map("<leader>ua", {
+  U.toggle.map("<leader>ua", {
     name = "Mini/Neovide Animate",
     get = function()
       -- return not vim.g.minianimate_disable -- extras.ui.mini-animate might not enabled

@@ -1,20 +1,20 @@
 local colorschemes = {
-  "tokyonight", -- custom, `tokyonight-custom` not working
+  -- "tokyonight", -- custom, `tokyonight-custom` not working
   "tokyonight-moon",
   "tokyonight-storm",
   "tokyonight-night",
   "catppuccin-frappe",
   "catppuccin-macchiato",
   "catppuccin-mocha",
-  "onedark",
-  "obscure",
-  "kanagawa-dragon",
-  "kanagawa-wave",
-  "nightfox",
-  "nordfox",
-  "neon-cherrykiss-night",
+  -- "onedark",
+  -- "obscure",
+  "neon-punkpeach-storm",
   "neon-punkpeach-night",
-  "astrodark",
+  "kanagawa-wave",
+  -- "kanagawa-dragon",
+  "nightfox",
+  -- "nordfox",
+  -- "astrodark",
 }
 
 -- :=vim.g.colors_name
@@ -362,6 +362,39 @@ return {
     end,
   },
 
+  -- variants of tokyonight
+  {
+    "Zeioth/neon.nvim",
+    cond = cond_colorscheme("^neon"),
+    lazy = true,
+    opts = function()
+      local util = require("neon.util")
+      return {
+        -- ~/.local/share/nvim/lazy/neon.nvim/lua/neon/colors/punkpeach-storm.lua
+        on_colors = function(c)
+          c.bg = to_neutral_gray(c.bg)
+          c.bg_dark = to_neutral_gray(c.bg_dark)
+          c.bg_float = c.bg_dark
+          c.bg_highlight = to_neutral_gray(c.bg_highlight)
+          c.bg_popup = c.bg_dark
+          c.bg_sidebar = c.bg_dark
+          c.bg_statusline = c.bg_dark
+
+          -- gitcommit, mini.diff
+          c.diff.add = util.blend_bg(c.green2, 0.35)
+          c.diff.delete = util.blend_bg(c.red1, 0.35)
+          c.diff.change = util.blend_bg(c.blue7, 0.35)
+
+          c.green1 = util.blend_bg(c.green1, 0.9)
+        end,
+        on_highlights = function(hl, c)
+          hl.TelescopeSelectionCaret =
+            { fg = (hl.TelescopePromptPrefix or hl.Identifier).fg, bg = (hl.TelescopeSelection or hl.Visual).bg }
+        end,
+      }
+    end,
+  },
+
   {
     "rebelot/kanagawa.nvim",
     cond = cond_colorscheme("^kanagawa"),
@@ -371,12 +404,6 @@ return {
   {
     "EdenEast/nightfox.nvim",
     cond = cond_colorscheme("fox$"),
-    lazy = true,
-  },
-
-  {
-    "Zeioth/neon.nvim",
-    cond = cond_colorscheme("^neon"),
     lazy = true,
   },
 
