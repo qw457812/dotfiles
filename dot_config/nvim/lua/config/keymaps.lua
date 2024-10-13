@@ -65,6 +65,9 @@ local function lint_info()
   LazyVim.info(lines, { title = "Linters" })
 end
 map("n", "<leader>iL", lint_info, { desc = "Lint" })
+map("n", "<leader>iC", function()
+  LazyVim.info(vim.g.colors_name, { title = "ColorScheme" })
+end, { desc = "ColorScheme" })
 
 -- navigate to line start and end from home row
 -- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/keybindings.lua#L19

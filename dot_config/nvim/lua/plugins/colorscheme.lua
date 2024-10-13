@@ -1,18 +1,18 @@
 local colorschemes = {
-  -- "tokyonight", -- custom, `tokyonight-custom` not working
+  -- "tokyonight", -- custom style, `tokyonight-custom` not working
   "tokyonight-moon",
   "tokyonight-storm",
   "tokyonight-night",
   "catppuccin-frappe",
   "catppuccin-macchiato",
   "catppuccin-mocha",
-  -- "onedark",
-  -- "obscure",
   "neon-punkpeach-storm",
   "neon-punkpeach-night",
-  "kanagawa-wave",
+  -- "onedark",
+  -- "obscure",
+  -- "kanagawa-wave",
   -- "kanagawa-dragon",
-  "nightfox",
+  -- "nightfox",
   -- "nordfox",
   -- "astrodark",
 }
@@ -292,6 +292,47 @@ return {
     end,
   },
 
+  -- variants of tokyonight
+  {
+    "Zeioth/neon.nvim",
+    cond = cond_colorscheme("^neon"),
+    lazy = true,
+    opts = function()
+      local util = require("neon.util")
+      return {
+        -- ~/.local/share/nvim/lazy/neon.nvim/lua/neon/colors/punkpeach-storm.lua
+        on_colors = function(c)
+          c.bg = to_neutral_gray(c.bg)
+          c.bg_dark = to_neutral_gray(c.bg_dark)
+          c.bg_float = c.bg_dark
+          c.bg_highlight = to_neutral_gray(c.bg_highlight)
+          c.bg_popup = c.bg_dark
+          c.bg_sidebar = c.bg_dark
+          c.bg_statusline = c.bg_dark
+
+          -- gitcommit, mini.diff
+          c.diff.add = util.blend_bg(c.green2, 0.35)
+          c.diff.delete = util.blend_bg(c.red1, 0.35)
+          c.diff.change = util.blend_bg(c.blue7, 0.35)
+
+          c.green1 = util.blend_bg(c.green1, 0.9)
+        end,
+        on_highlights = function(hl, c)
+          local illuminate = util.blend_fg(hl.IlluminatedWordRead.bg, 0.875)
+          hl.IlluminatedWordRead = { bg = illuminate }
+          hl.IlluminatedWordWrite = { bg = illuminate, underline = true }
+          hl.LspReferenceRead = { link = "IlluminatedWordRead" }
+          hl.LspReferenceWrite = { link = "IlluminatedWordWrite" }
+          hl.CmpGhostText = { bg = c.bg, fg = util.blend_fg(hl.CmpGhostText.fg, 0.85) }
+          hl.DiagnosticUnnecessary = { fg = util.blend_fg(c.terminal_black, 0.7) }
+
+          hl.TelescopeSelectionCaret =
+            { fg = (hl.TelescopePromptPrefix or hl.Identifier).fg, bg = (hl.TelescopeSelection or hl.Visual).bg }
+        end,
+      }
+    end,
+  },
+
   -- https://github.com/dhruvinsh/nvim/blob/bcc368b9e5013485fb01d46dfb2ea0037a2c9fc8/lua/orion/plugins/colors.lua#L9
   -- alternative: olimorris/onedarkpro.nvim | https://github.com/appelgriebsch/Nv/blob/e9a584090a69a8d691f5eb051e76016b65dfc0b7/lua/plugins/extras/ui/onedarkpro-theme.lua
   {
@@ -362,39 +403,6 @@ return {
     end,
   },
 
-  -- variants of tokyonight
-  {
-    "Zeioth/neon.nvim",
-    cond = cond_colorscheme("^neon"),
-    lazy = true,
-    opts = function()
-      local util = require("neon.util")
-      return {
-        -- ~/.local/share/nvim/lazy/neon.nvim/lua/neon/colors/punkpeach-storm.lua
-        on_colors = function(c)
-          c.bg = to_neutral_gray(c.bg)
-          c.bg_dark = to_neutral_gray(c.bg_dark)
-          c.bg_float = c.bg_dark
-          c.bg_highlight = to_neutral_gray(c.bg_highlight)
-          c.bg_popup = c.bg_dark
-          c.bg_sidebar = c.bg_dark
-          c.bg_statusline = c.bg_dark
-
-          -- gitcommit, mini.diff
-          c.diff.add = util.blend_bg(c.green2, 0.35)
-          c.diff.delete = util.blend_bg(c.red1, 0.35)
-          c.diff.change = util.blend_bg(c.blue7, 0.35)
-
-          c.green1 = util.blend_bg(c.green1, 0.9)
-        end,
-        on_highlights = function(hl, c)
-          hl.TelescopeSelectionCaret =
-            { fg = (hl.TelescopePromptPrefix or hl.Identifier).fg, bg = (hl.TelescopeSelection or hl.Visual).bg }
-        end,
-      }
-    end,
-  },
-
   {
     "rebelot/kanagawa.nvim",
     cond = cond_colorscheme("^kanagawa"),
@@ -447,14 +455,16 @@ return {
 
       vim.api.nvim_create_autocmd("User", {
         pattern = "LazyVimKeymaps",
+        once = true,
         callback = function()
-          vim.keymap.set("n", "<leader>iC", function()
-            LazyVim.info(vim.g.colors_name, { title = "ColorScheme" })
-          end, { desc = "ColorScheme" })
-
+          local cur_theme = opts.colorscheme
           vim.keymap.set("n", "<leader>ur", function()
-            local random = random_colorscheme()
+            local random
+            repeat
+              random = random_colorscheme()
+            until random ~= cur_theme and random ~= vim.g.colors_name
             vim.cmd.colorscheme(random)
+            cur_theme = random
             LazyVim.info(random, { title = "Random ColorScheme" })
           end, { desc = "Random ColorScheme" })
 
