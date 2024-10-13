@@ -1,4 +1,4 @@
-LazyVimToggle = LazyVim.toggle
+local LazyVimToggle = LazyVim.toggle
 
 ---@class util.toggle
 ---@field wrap fun(toggle:lazyvim.Toggle):lazyvim.Toggle.wrap
