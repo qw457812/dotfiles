@@ -62,10 +62,19 @@ function M.get_visual_selection(stop_visual_mode)
   return selection
 end
 
+--- Merge extended options with a default table of options
+--- copied from: https://github.com/AstroNvim/astrocore/blob/d687e4b66b93783dfdafee1e64d363b7706056ff/lua/astrocore/init.lua#L25
+---@param default? table The default table that you want to merge into
+---@param opts? table The new options that should be merged with the default table
+---@return table # The merged table
+function M.extend_tbl(default, opts)
+  opts = opts or {}
+  return default and vim.tbl_deep_extend("force", default, opts) or opts
+end
+
 --- Insert one or more values into a list like table and maintain that you do not insert non-unique values (THIS MODIFIES `dst`)
---- copied from: https://github.com/AstroNvim/astrocore/blob/cf5823e2b59aa9666445e3f3531296ad8f417b7c/lua/astrocore/init.lua#L50
 ---@param dst any[]|nil The list like table that you want to insert into
----@param src any[] Values to be inserted
+---@param src any Value(s) to be inserted
 ---@return any[] # The modified list like table
 function M.list_insert_unique(dst, src)
   if not dst then
@@ -76,6 +85,7 @@ function M.list_insert_unique(dst, src)
   for _, val in ipairs(dst) do
     added[val] = true
   end
+  src = type(src) == "table" and src or { src }
   for _, val in ipairs(src) do
     if not added[val] then
       table.insert(dst, val)
@@ -83,6 +93,30 @@ function M.list_insert_unique(dst, src)
     end
   end
   return dst
+end
+
+--- Monkey patch into an existing function
+---
+--- Example from `:h vim.paste()`
+--- ```lua
+--- vim.paste = require("util").patch_func(vim.paste, function(orig, lines, phase)
+---   for i, line in ipairs(lines) do
+---     -- Scrub ANSI color codes from paste input.
+---     lines[i] = line:gsub('\27%[[0-9;mK]+', '')
+---   end
+---   return orig(lines, phase)
+--- end)
+--- ```
+---@param orig? function the original function to override, if `nil` is provided then an empty function is passed
+---@param override fun(orig:function, ...):... the override function
+---@return function the new function with the patch applied
+function M.patch_func(orig, override)
+  if not orig then
+    orig = function() end
+  end
+  return function(...)
+    return override(orig, ...)
+  end
 end
 
 return M

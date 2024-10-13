@@ -12,12 +12,13 @@ return {
     },
     -- https://github.com/echasnovski/mini.operators/blob/76ac9104d9773927053ea4eb12fc78ccbb5be813/doc/mini-operators.txt#L131
     opts = {
-      -- gr (LazyVim use `gr` for lsp references, `cr` for remote flash by default, and `gss` conflicts with `gs` + `s` for flash)
+      -- gr (LazyVim use `gr` for lsp references, `cr` for remote flash `o_r` by default, and `gs` conflicts with lsp goto super, `gss` conflicts with flash)
       -- note: `vim.opt.timeoutlen` has increased from 300 to 500 for `cr` and `cR` since which-key v3
+      -- TODO: s gr gs gp cr cp yr
       replace = { prefix = "" }, -- Replace text with register
       -- gx
       exchange = { prefix = "" }, -- Exchange text regions
-      -- gm (note that `cmm` is used for `c%` by custom helix-style mappings)
+      -- gm (note that `gmm`/`cmm` is used for `g%`/`c%` by custom helix-style mapping `o_mm`)
       multiply = { prefix = "" }, -- Multiply (duplicate) text
       -- g=
       -- evaluate = { prefix = "" }, -- Evaluate text and replace with output

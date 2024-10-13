@@ -56,6 +56,7 @@ end
 vim.api.nvim_create_autocmd("User", {
   group = augroup,
   pattern = "LazyVimKeymaps",
+  once = true,
   callback = function()
     vim.keymap.set("n", close_key, close_buffer_or_window_or_exit, { desc = "Close buffer/window or Exit" })
     vim.keymap.set("n", exit_key, "<cmd>qa<cr>", { desc = "Quit All" })

@@ -28,6 +28,7 @@ end
 
 vim.api.nvim_create_autocmd("User", {
   pattern = "LazyVimKeymaps",
+  once = true,
   callback = function()
     vscode_map("n", "u", "undo", { desc = "VSCode Undo" })
     vscode_map("n", "<C-r>", "redo", { desc = "VSCode Redo" })
