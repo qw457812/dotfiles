@@ -14,19 +14,20 @@
 [
   {
     "key": "ctrl+s",
-    "command": "workbench.action.files.save"
+    "command": "workbench.action.files.save",
+    "when": "editorTextFocus && !neovim.init"
+  },
+  {
+    "key": "ctrl+s",
+    "command": "vscode-neovim.send",
+    "args": "<C-s>",
+    "when": "editorTextFocus && neovim.init"
   },
   {
     "key": "shift+;",
     "command": "vim.showQuickpickCmdLine",
-    "when": "inZenMode && vim.mode != 'Insert'"
+    "when": "inZenMode && vim.active && vim.mode != 'Insert'"
   },
-  // `nmap ; :` for zen mode
-  // {
-  //     "key": ";",
-  //     "command": "vim.showQuickpickCmdLine",
-  //     "when": "inZenMode && vim.mode != 'Insert'"
-  // },
   {
     "key": "alt+j",
     "command": "editor.action.moveLinesDownAction",
@@ -47,9 +48,9 @@
   },
   {
     "key": "ctrl+l",
-    "command": "workbench.action.navigateRight",
+    "command": "workbench.action.navigateRight"
     // "when": "vim.active && vim.mode != 'Insert'"
-    "when": "!terminalFocus" // ctrl+l clear terminal
+    // "when": "!terminalFocus" // ctrl+l clear terminal
   },
   {
     "key": "ctrl+k",
@@ -67,9 +68,9 @@
     "command": "runCommands",
     "args": {
       "commands": [
-        "workbench.action.focusActiveEditorGroup",
-        "workbench.action.closeSidebar",
-        "workbench.action.closePanel"
+        "workbench.action.focusActiveEditorGroup"
+        // "workbench.action.closeSidebar",
+        // "workbench.action.closePanel"
         // "workbench.action.closeAuxiliaryBar" // cursor: command 'workbench.action.closeAuxiliaryBar' not found
       ]
     },
@@ -117,7 +118,18 @@
         "extension.vim_escape"
       ]
     },
-    "when": "inSearchEditor && searchInputBoxFocus"
+    "when": "inSearchEditor && searchInputBoxFocus && vim.active"
+  },
+  {
+    "key": "enter",
+    "command": "runCommands",
+    "args": {
+      "commands": [
+        "search.action.focusNextSearchResult",
+        "vscode-neovim.escape"
+      ]
+    },
+    "when": "inSearchEditor && searchInputBoxFocus && neovim.init"
   },
   // already map <enter> to `gd` in settings.json
   // https://github.com/nikitavoloboev/config/blob/master/vscode/keybindings.json
@@ -257,6 +269,17 @@
     "when": "(filesExplorerFocus || searchViewletFocus) && !inputFocus"
   },
   {
+    "key": "backspace",
+    "command": "runCommands",
+    "args": {
+      "commands": [
+        "workbench.action.focusActiveEditorGroup",
+        "workbench.action.closeSidebar"
+      ]
+    },
+    "when": "(filesExplorerFocus || searchViewletFocus) && !inputFocus"
+  },
+  {
     "key": "z o",
     "command": "list.expand",
     "when": "!editorTextFocus && !inputFocus"
@@ -300,14 +323,14 @@
   {
     "key": "tab",
     "command": "togglePeekWidgetFocus",
-    "when": "inReferenceSearchEditor && vim.mode == 'Normal' || referenceSearchVisible"
+    "when": "inReferenceSearchEditor && vim.active && vim.mode == 'Normal' || referenceSearchVisible"
   },
   // hover
   // first K show hover, second K focus hover
   {
     "command": "editor.action.showHover",
     "key": "shift+k",
-    "when": "vim.mode == 'Normal' && editorTextFocus && editorHoverVisible"
+    "when": "vim.active && vim.mode == 'Normal' && editorTextFocus && editorHoverVisible"
   },
   {
     "command": "editor.action.pageDownHover",
@@ -362,7 +385,8 @@
   // with tmux and karabiner-elements
   {
     "key": "ctrl+b",
-    "command": "workbench.action.toggleMaximizedPanel",
+    // "command": "workbench.action.toggleMaximizedPanel",
+    "command": "workbench.action.terminal.focus",
     "when": "!terminalFocus && !view.terminal.visible"
   },
   {
@@ -435,12 +459,12 @@
   },
   {
     "command": "workbench.action.compareEditor.nextChange",
-    "key": "] c",
+    "key": "] h",
     "when": "textCompareEditorVisible"
   },
   {
     "command": "workbench.action.compareEditor.previousChange",
-    "key": "[ c",
+    "key": "[ h",
     "when": "textCompareEditorVisible"
   },
   // find & replace
