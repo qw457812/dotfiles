@@ -40,6 +40,13 @@
     // "editor.defaultFormatter": "ms-python.black-formatter"
     "editor.defaultFormatter": "charliermarsh.ruff"
   },
+  // Pylance
+  "python.analysis.typeCheckingMode": "standard", // off(default), basic, standard, strict
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.inlayHints.functionReturnTypes": true,
+  "python.analysis.inlayHints.callArgumentNames": "partial", // off(default), partial, all
+  "python.analysis.inlayHints.variableTypes": true,
+  "python.analysis.inlayHints.pytestParameters": true,
   "[jsonc]": {
     "editor.formatOnSave": true,
     // "editor.defaultFormatter": "vscode.json-language-features" // built-in
@@ -54,8 +61,6 @@
   "workbench.activityBar.location": "top",
   "workbench.layoutControl.type": "menu",
   "workbench.startupEditor": "newUntitledFile",
-  // TODO what is this?
-  // "python.analysis.autoImportCompletions": true,
   "workbench.editor.enablePreview": false,
   "workbench.editor.tabActionCloseVisibility": false,
   "workbench.editor.highlightModifiedTabs": true,
