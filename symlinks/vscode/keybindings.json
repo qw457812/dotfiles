@@ -13,6 +13,10 @@
 // https://github.com/forivall/dotfiles/blob/fa4dd764a14d81d864482ed4807564320c859e2b/vscode/keybindings.json
 [
   {
+    "key": "ctrl+s",
+    "command": "workbench.action.files.save"
+  },
+  {
     "key": "shift+;",
     "command": "vim.showQuickpickCmdLine",
     "when": "inZenMode && vim.mode != 'Insert'"
