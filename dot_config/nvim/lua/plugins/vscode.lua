@@ -54,7 +54,8 @@ vim.api.nvim_create_autocmd("User", {
     vscode_map("n", "<leader>e", "workbench.view.explorer", { desc = "Explorer" })
     vscode_map("n", "<leader>z", "workbench.action.toggleZenMode", { desc = "Zen Mode" })
 
-    map("n", { "<leader><space>", "<leader>ff" }, "<cmd>Find<cr>", { desc = "Find Files" })
+    -- map("n", { "<leader><space>", "<leader>ff" }, "<cmd>Find<cr>", { desc = "Find Files" })
+    vscode_map("n", { "<leader><space>", "<leader>ff" }, "workbench.action.quickOpen", { desc = "Find Files" })
     vscode_map("n", { "<leader>/", "<leader>sg" }, "workbench.action.findInFiles", { desc = "Grep" })
     -- https://github.com/vscode-neovim/vscode-neovim/issues/987#issuecomment-1201951589
     vscode_map(
@@ -83,24 +84,36 @@ vim.api.nvim_create_autocmd("User", {
     vscode_map("n", "<leader>fc", "workbench.action.openSettingsJson", { desc = "Config File: Settings" })
     vscode_map("n", "<leader>fk", "workbench.action.openGlobalKeybindingsFile", { desc = "Config File: Keybindings" })
     vscode_map("n", "<leader>fn", "workbench.action.files.newUntitledFile", { desc = "New File" })
+    -- stylua: ignore
+    vscode_map("n", "<leader>fS", "workbench.action.files.saveWithoutFormatting", { desc = "Save File Without Formatting" })
     -- vscode_map("n", "<leader>ft", "workbench.action.terminal.focus", { desc = "Terminal" })
     vscode_map("n", "<leader>fr", "workbench.action.showAllEditorsByMostRecentlyUsed", { desc = "Recent" })
     vscode_map("n", "<leader>fy", "workbench.action.files.copyPathOfActiveFile", { desc = "Yank file path" })
     vscode_map("n", "<leader>fY", "copyRelativeFilePath", { desc = "Yank file path from project" })
-    -- https://marketplace.visualstudio.com/items?itemName=alefragnani.project-manager
-    vscode_map("n", "<leader>fp", "projectManager.listProjectsNewWindow", { desc = "Projects" })
+    -- -- https://marketplace.visualstudio.com/items?itemName=alefragnani.project-manager
+    -- vscode_map("n", "<leader>fp", "projectManager.listProjectsNewWindow", { desc = "Projects" })
+    vscode_map("n", "<leader>fp", "workbench.action.openRecent", { desc = "Projects" })
 
     vscode_map("n", "<leader>sk", "workbench.action.openGlobalKeybindings", { desc = "Key Maps" })
     vscode_map("n", "<leader>sC", "workbench.action.showCommands", { desc = "Commands" })
     vscode_map("n", "<leader>ss", "workbench.action.gotoSymbol", { desc = "Goto Symbol" })
     -- vscode_map("n", "<leader>sS", "workbench.action.showAllSymbols", { desc = "Goto Symbol (Workspace)" })
+    vscode_map("n", "<leader>sna", "notifications.showList", { desc = "Noice All" })
 
     vscode_map("n", "<leader>gg", "workbench.view.scm", { desc = "SCM" })
 
-    vscode_map("n", "<leader>ca", "editor.action.codeAction", { desc = "Code Action" })
+    -- editor.action.codeAction = editor.action.quickFix + editor.action.refactor
+    vscode_map({ "n", "v" }, "<leader>ca", "editor.action.codeAction", { desc = "Code Action" })
+    vscode_map("n", "<leader>cA", "editor.action.sourceAction", { desc = "Source Action" })
     vscode_map("n", "<leader>cr", "editor.action.rename", { desc = "Rename" })
     vscode_map({ "n", "v" }, "<leader>cf", "editor.action.formatDocument", { desc = "Format" })
     vscode_map("n", "<leader>co", "editor.action.organizeImports", { desc = "Organize Imports" })
+
+    vscode_map("v", "<leader>rs", "editor.action.refactor", { desc = "Refactor" })
+    -- https://code.visualstudio.com/docs/editor/refactoring#_keybindings-for-code-actions
+    map("v", "<leader>rx", function()
+      vscode.action("editor.action.codeAction", { args = { kind = "refactor.extract.variable" } })
+    end, { desc = "Extract Variable" })
 
     vscode_map("n", "<leader>db", "editor.debug.action.toggleBreakpoint", { desc = "Toggle Breakpoint" })
 
@@ -125,12 +138,14 @@ vim.api.nvim_create_autocmd("User", {
 
     -- TODO:
     -- https://code.visualstudio.com/docs/getstarted/keybindings
+    -- https://github.com/AstroNvim/astrocommunity/blob/main/lua/astrocommunity/recipes/vscode/init.lua
     -- https://github.com/jellydn/my-nvim-ide/blob/e880b780c8d0efcebcaaf7d1443e7226d8d87804/lua/plugins/vscode.lua
     -- https://github.com/echasnovski/nvim/blob/b84cec54e0a46c9de824820fa8698b5bba43eb81/src/vscode.lua
     -- https://github.com/pojokcodeid/nvim-lazy/blob/ab014bb8b52ded6bc053f5b224574ac89bd18af9/init.lua
     -- https://github.com/kshenoy/dotfiles/blob/bd29a03df3c1f2df4273cb19dc54ed79eecaa5a5/nvim/lua/vscode-only/keybindings.lua
     -- https://github.com/Virgiel/my-config/blob/64c5c60c0be4a5f67fc7709017b3dd34ddc33376/config/nvim.lua#L25
     -- https://github.com/Matt-FTW/dotfiles/blob/7f14ad9d58fa5ee2aa971b77da4570c52f9aaa01/.config/nvim/lua/plugins/extras/util/vscode.lua
+    -- https://github.com/jellydn/vscode-like-pro/blob/main/vscode.lua
   end,
 })
 
