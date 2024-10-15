@@ -2,12 +2,12 @@ local colorschemes = {
   -- "tokyonight", -- custom style, `tokyonight-custom` not working
   "tokyonight-moon",
   "tokyonight-storm",
-  "tokyonight-night",
-  "catppuccin-frappe",
+  -- "tokyonight-night",
+  -- "catppuccin-frappe",
   "catppuccin-macchiato",
-  "catppuccin-mocha",
-  "neon-punkpeach-storm",
-  "neon-punkpeach-night",
+  -- "catppuccin-mocha",
+  -- "neon-punkpeach-storm",
+  -- "neon-punkpeach-night",
   -- "onedark",
   -- "obscure",
   -- "kanagawa-wave",
@@ -17,12 +17,23 @@ local colorschemes = {
   -- "astrodark",
 }
 
--- :=vim.g.colors_name
+local last_random ---@type string?
+
 -- https://github.com/Styzex/RandTheme.nvim/blob/f96818619d9dcfa179f6d15eb67b04cae6ed31c7/lua/randtheme/theme_manager.lua#L62
+---@return string?
 local function random_colorscheme()
-  -- math.randomseed(os.time())
-  -- return colorschemes[math.random(#colorschemes)]
-  return colorschemes[tonumber(os.date("%S")) % #colorschemes + 1]
+  local themes = vim.tbl_filter(function(v)
+    return v ~= last_random and v ~= vim.g.colors_name
+  end, colorschemes)
+  if #themes == 0 then
+    return nil
+  end
+  -- return themes[tonumber(os.date("%S")) % #themes + 1]
+  -- generate random config with initialized random seed (otherwise it won't be random during startup)
+  math.randomseed(vim.uv.hrtime())
+  local random = themes[math.random(#themes)]
+  last_random = random
+  return random
 end
 
 local function cond_colorscheme(pattern)
@@ -457,15 +468,12 @@ return {
         pattern = "LazyVimKeymaps",
         once = true,
         callback = function()
-          local cur_theme = opts.colorscheme
           vim.keymap.set("n", "<leader>ur", function()
-            local random
-            repeat
-              random = random_colorscheme()
-            until random ~= cur_theme and random ~= vim.g.colors_name
-            vim.cmd.colorscheme(random)
-            cur_theme = random
-            LazyVim.info(random, { title = "Random ColorScheme" })
+            local random = random_colorscheme()
+            if random then
+              vim.cmd.colorscheme(random)
+              LazyVim.info(random, { title = "Random ColorScheme" })
+            end
           end, { desc = "Random ColorScheme" })
 
           vim.keymap.set(
@@ -501,7 +509,7 @@ return {
           "<leader>uC",
           function()
             require("telescope.builtin").colorscheme({
-              colors = colorschemes,
+              colors = vim.deepcopy(colorschemes),
               enable_preview = true,
               ignore_builtins = true,
             })
