@@ -136,6 +136,7 @@ return {
       end
 
       -- https://github.com/nvim-neo-tree/neo-tree.nvim/wiki/Recipes#emulating-vims-fold-commands
+      -- TODO: https://github.com/nvim-neo-tree/neo-tree.nvim/discussions/368
       -- Expand a node and load filesystem info if needed.
       local function open_dir(state, dir_node)
         local fs = require("neo-tree.sources.filesystem")
@@ -591,18 +592,19 @@ return {
               ["<leader><space>"] = "telescope_find",
               ["<leader>/"] = "telescope_grep",
               ["z"] = "none",
-              ["zo"] = neotree_zo,
-              ["zO"] = neotree_zO,
-              ["zc"] = neotree_zc,
-              ["zC"] = neotree_zC,
-              ["za"] = neotree_za,
-              ["zA"] = neotree_zA,
-              ["zx"] = neotree_zx,
-              ["zX"] = neotree_zX,
-              ["zm"] = neotree_zm,
-              ["zM"] = neotree_zM,
-              ["zr"] = neotree_zr,
-              ["zR"] = neotree_zR,
+              -- https://github.com/folke/trouble.nvim/blob/254145ffd528b98eb20be894338e2d5c93fa02c2/README.md?plain=1#L184
+              ["zo"] = { neotree_zo, desc = "fold_open" },
+              ["zO"] = { neotree_zO, desc = "fold_open_recursive" },
+              ["zc"] = { neotree_zc, desc = "fold_close" },
+              ["zC"] = { neotree_zC, desc = "fold_close_recursive" },
+              ["za"] = { neotree_za, desc = "fold_toggle" },
+              ["zA"] = { neotree_zA, desc = "fold_toggle_recursive" },
+              ["zx"] = { neotree_zx, desc = "fold_update" },
+              ["zX"] = { neotree_zX, desc = "fold_update_all" },
+              ["zm"] = { neotree_zm, desc = "fold_more" },
+              ["zM"] = { neotree_zM, desc = "fold_close_all" },
+              ["zr"] = { neotree_zr, desc = "fold_reduce" },
+              ["zR"] = { neotree_zR, desc = "fold_open_all" },
             },
           },
         },
