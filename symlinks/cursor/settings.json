@@ -38,17 +38,45 @@
   "workbench.editor.enablePreview": false,
   "workbench.editor.tabActionCloseVisibility": false,
   "workbench.editor.highlightModifiedTabs": true,
+  // "workbench.colorTheme": "Default Dark Modern",
+  "workbench.colorTheme": "Catppuccin Macchiato",
+  "workbench.iconTheme": "catppuccin-macchiato",
+  "editor.semanticHighlighting.enabled": true,
+  "terminal.integrated.minimumContrastRatio": 1,
+  "window.titleBarStyle": "custom",
+  "catppuccin.accentColor": "pink",
+  "catppuccin.colorOverrides": {
+    "macchiato": {
+      "base": "#2b2b2d",
+      "mantle": "#242425",
+      "crust": "#1c1c1d"
+    }
+  },
+  "catppuccin.customUIColors": {
+    "macchiato": {
+      "tab.activeBorder": "accent",
+      "tab.activeBorderTop": "base",
+      "tab.activeModifiedBorder": "yellow",
+      "editor.selectionBackground": "overlay2 0.3",
+      "editor.selectionHighlightBackground": "overlay2 0.25",
+      "editor.wordHighlightBackground": "overlay2 0.35",
+      "editor.wordHighlightStrongBackground": "overlay2 0.35",
+      "editor.wordHighlightStrongBorder": "subtext0"
+    }
+  },
   "workbench.colorCustomizations": {
-    "tab.activeBorder": "#40d4e7",
-    "tab.activeBorderTop": "#00000000",
-    "tab.activeModifiedBorder": "#e61c58",
-    "editor.selectionBackground": "#e788ff7c",
-    "editor.selectionHighlightBackground": "#ff00005b",
-    "editor.findMatchBackground": "#00cc44a8",
-    "editor.findMatchHighlightBackground": "#ff7b00a1",
-    "editor.wordHighlightBackground": "#8888",
-    "editor.wordHighlightStrongBackground": "#8888",
-    "editor.wordHighlightStrongBorder": "#cccccc"
+    "[Default Dark Modern]": {
+      "tab.activeBorder": "#40d4e7",
+      "tab.activeBorderTop": "#00000000",
+      "tab.activeModifiedBorder": "#e61c58",
+      "editor.selectionBackground": "#e788ff7c",
+      "editor.selectionHighlightBackground": "#ff00005b",
+      "editor.findMatchBackground": "#00cc44a8",
+      "editor.findMatchHighlightBackground": "#ff7b00a1",
+      "editor.wordHighlightBackground": "#8888",
+      "editor.wordHighlightStrongBackground": "#8888",
+      "editor.wordHighlightStrongBorder": "#cccccc"
+    }
   },
   "explorer.confirmDelete": false,
   "terminal.integrated.fontFamily": "MesloLGM Nerd Font",
