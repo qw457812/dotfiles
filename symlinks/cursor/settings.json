@@ -683,5 +683,6 @@
     }
   ],
   "vim.commandLineModeKeyBindings": [],
-  "cursor.cpp.disabledLanguages": ["scminput"]
+  "cursor.cpp.disabledLanguages": ["scminput"],
+  "workbench.activityBar.orientation": "vertical"
 }
