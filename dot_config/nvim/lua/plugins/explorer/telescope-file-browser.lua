@@ -76,10 +76,10 @@ return {
                   current_picker:reset_prompt()
                 end
               end,
-              ["d"] = false,
-              ["dd"] = fb_actions.remove,
-              ["y"] = false,
-              ["yy"] = fb_actions.copy,
+              -- ["d"] = false,
+              -- ["dd"] = fb_actions.remove,
+              -- ["y"] = false,
+              -- ["yy"] = fb_actions.copy,
               ["m"] = false,
               ["x"] = fb_actions.move,
               ["e"] = false,

@@ -10,7 +10,9 @@ local augroup = vim.api.nvim_create_augroup("close_with_" .. close_key, { clear 
 -- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/funcs/alt-alt.lua#L42
 local function close_buffer_or_window_or_exit()
   if vim.g.vscode then
-    require("vscode").action("workbench.action.closeActiveEditor")
+    local vscode = require("vscode")
+    vscode.call("workbench.action.unpinEditor")
+    vscode.action("workbench.action.closeActiveEditor") -- can not close pinned editor
     return
   end
 
