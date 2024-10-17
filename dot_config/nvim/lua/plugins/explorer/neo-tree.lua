@@ -110,6 +110,8 @@ return {
       return vim.list_extend(keys, mappings)
     end,
     opts = function(_, opts)
+      local is_default_explorer = vim.g.user_default_explorer == "neo-tree.nvim"
+
       -- https://github.com/nvim-neo-tree/neo-tree.nvim/wiki/Recipes#find-with-telescope
       local function get_telescope_opts(state)
         local node = state.tree:get_node()
@@ -482,7 +484,15 @@ return {
         },
         window = {
           mappings = {
-            ["-"] = "close_or_unfocus", -- toggle neo-tree, work with `-` defined in `keys` above
+            -- ["-"] = "close_or_unfocus", -- toggle neo-tree, work with `-` defined in `keys` above
+            ["-"] = is_default_explorer and "close_or_unfocus" or {
+              function(state)
+                local node = state.tree:get_node()
+                local path = node.type == "file" and node:get_parent_id() or node:get_id()
+                vim.cmd.edit(path)
+              end,
+              desc = "Open with default explorer",
+            },
             ["<esc>"] = {
               "cancel_or_close_or_unfocus",
               desc = "cancel / close_or_unfocus",
@@ -503,10 +513,10 @@ return {
               end,
               desc = "Open without focus",
             },
-            ["d"] = "none",
-            ["dd"] = "delete",
-            ["y"] = "none",
-            ["yy"] = "copy_to_clipboard",
+            -- ["d"] = "none",
+            -- ["dd"] = "delete",
+            -- ["y"] = "none",
+            -- ["yy"] = "copy_to_clipboard",
             ["<leader>sr"] = "grug_far",
           },
           fuzzy_finder_mappings = { -- define keymaps for filter popup window in fuzzy_finder_mode
@@ -530,8 +540,7 @@ return {
           },
           -- whether to use for editing directories (e.g. `vim .` or `:e src/`)
           -- possible values: "open_default" (default), "open_current", "disabled"
-          -- hijack_netrw_behavior = "disabled", -- netrw left alone, neo-tree does not handle opening dirs
-          hijack_netrw_behavior = vim.g.user_default_explorer == "neo-tree.nvim" and "open_default" or "disabled",
+          hijack_netrw_behavior = is_default_explorer and "open_default" or "disabled",
           commands = {
             telescope_find = function(state)
               require("telescope.builtin").find_files(get_telescope_opts(state))

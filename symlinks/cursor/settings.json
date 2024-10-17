@@ -38,7 +38,6 @@
   "workbench.editor.enablePreview": false,
   "workbench.editor.tabActionCloseVisibility": false,
   "workbench.editor.highlightModifiedTabs": true,
-  // "workbench.colorTheme": "Default Dark Modern",
   "workbench.colorTheme": "Catppuccin Macchiato",
   "workbench.iconTheme": "catppuccin-macchiato",
   "editor.semanticHighlighting.enabled": true,
