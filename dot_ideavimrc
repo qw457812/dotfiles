@@ -99,11 +99,11 @@ xmap <C-p> <Plug>RemoveOccurrence
 let g:WhichKey_ShowVimActions = "true"
 " https://github.com/JaimeArboleda/jet_brains_settings/blob/main/.ideavimrc
 " let g:WhichKey_FontSize = 16
-let g:WhichKey_CommandColor = "#41ead4"
-let g:WhichKey_PrefixColor = "#f335b2"
+let g:WhichKey_CommandColor = "#f5bde6"
+let g:WhichKey_PrefixColor = "#8aadf4"
 let g:WhichKey_SortOrder = "by_key_prefix_first"
-let g:WhichKeyDesc_leader = "<leader> Leader key"
-let g:WhichKey_DefaultDelay = 200
+" let g:WhichKeyDesc_leader = "<leader> Leader key"
+let g:WhichKey_DefaultDelay = 150
 
 " https://github.com/justinmk/vim-sneak
 " let g:sneak#label = 1
@@ -150,9 +150,26 @@ xmap ag <Plug>textobj-entire-a
 omap ig <Plug>textobj-entire-i
 xmap ig <Plug>textobj-entire-i
 
+" https://github.com/JetBrains/ideavim/wiki/NERDTree-support#supported-commands
+" https://youtrack.jetbrains.com/issue/VIM-3539/More-NERDTree-commands
+" https://youtrack.jetbrains.com/issue/VIM-3488/New-commands-in-NERDTree
+" https://github.com/JetBrains/ideavim/blob/34fe09c8f9bc5425280daa04211d3695fa99fd3a/src/main/java/com/maddyhome/idea/vim/extension/nerdtree/NerdTree.kt#L279
+" let g:NERDTreeMapCloseDir = "h"
+let g:NERDTreeMapJumpParent = "h"
 let g:NERDTreeMapActivateNode = "l"
-" TODO: not work
+let g:NERDTreeMapQuit = "<BS>"
+let g:NERDTreeMapPreview = "<TAB>"
+let g:NERDTreeMapPaste = "p"
 let g:NERDTreeMapNewFile = "a"
+let g:NERDTreeMapNewDir = "A"
+let g:NERDTreeMapRefresh = "<C-r>"
+let g:NERDTreeMapRename = "r"
+let g:NERDTreeMapToggleHidden = "g."
+let g:NERDTreeMapOpenRecursively = "zO"
+let g:NERDTreeMapCloseDir = "zc"
+let g:NERDTreeMapCloseChildren = "zC"
+let g:NERDTreeMapToggleZoom = "Z"
+let g:NERDTreeMapMenu = ","
 
 nmap cr <Plug>ReplaceWithRegisterOperator
 nmap crr <Plug>ReplaceWithRegisterLine
@@ -227,9 +244,12 @@ imap jk <esc>
 imap kj <esc>
 nmap Y y$
 " nmap U <C-r>
-" map 0 ^
-map H ^
-map L $
+nmap H 0^
+xmap H 0^
+omap H ^
+nmap L $
+xmap L g_
+omap L $
 
 nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
@@ -241,10 +261,10 @@ nnoremap <C-l> <C-w>l
 nmap j gj
 nmap k gk
 
-nmap * *zz
-nmap # #zz
-nmap n nzz
-nmap N Nzz
+" nmap * *zz
+" nmap # #zz
+" nmap n nzz
+" nmap N Nzz
 
 nnoremap - :NERDTree<CR>
 
@@ -256,10 +276,12 @@ nnoremap cn *Ncgn
 " nmap <C-i> <Action>(Forward)
 
 " Do not overwrite unnamed register with x and s
-nnoremap x "_x
+" nnoremap x "_x
 " sneak Plugin use `s`
 " nnoremap s "_s
 
+nmap [b <Action>(PreviousTab)
+nmap ]b <Action>(NextTab)
 nmap [f <Action>(MethodUp)
 nmap ]f <Action>(MethodDown)
 nmap [m <Action>(MethodUp)
@@ -288,6 +310,7 @@ map <left> <Action>(Back)
 map <right> <Action>(Forward)
 
 nmap <BS> <Action>(CloseContent)
+nmap <leader><BS> <Action>(CloseProject)
 " nmap <CR> <Action>(GotoDeclaration)
 nmap <CR> gd
 
@@ -352,7 +375,7 @@ map <leader>bd <Action>(CloseContent)
 map <leader>bo <Action>(CloseAllEditorsButActive)
 map <leader>bh <Action>(CloseAllToTheLeft)
 map <leader>bl <Action>(CloseAllToTheRight)
-map <leader>ba <Action>(CloseAllEditors)
+map <leader>bA <Action>(CloseAllEditors)
 
 " code
 map <leader>ca <Action>(QuickActions)
@@ -363,7 +386,9 @@ map <leader>cr <Action>(RenameElement)
 map <leader>cR <Action>(RenameFile)
 
 " file/find
+map <Leader>fn <Action>(NewFile)
 map <leader>fr <Action>(RecentFiles)
+" map <Leader>fc :e ~/.local/share/chezmoi/dot_ideavimrc<CR>
 map <Leader>fc :e ~/.ideavimrc<CR>
 map <Leader>fC :source ~/.ideavimrc<CR>
 " map <leader>fp <Action>(RecentProjectListGroup)
@@ -390,6 +415,8 @@ map <leader>wo <c-w>o
 map <leader>ws <c-w>s
 map <leader>wv <c-w>v
 map <leader>wd <C-W>c
+
+map <leader>qq <Action>(CloseProject)
 
 " ----------------------------------------------------- TODO: nvim key-mappings --------------------------------------------------------
 
@@ -450,9 +477,9 @@ map <Leader>pr <Action>(ExternalSystem.ProjectRefreshAction)
 map <Leader>pc <Action>(TextEditorWithPreview.Layout.EditorOnly)
 map <Leader>po <Action>(TextEditorWithPreview.Layout.EditorAndPreview)
 map <Leader>pO <Action>(TextEditorWithPreview.Layout.PreviewOnly)
-" CloseEditor 关不掉 Compare.LastVersion
-map <leader>qq <Action>(CloseContent)
-map <Leader>qa :action CloseAllEditors<CR>
+" " CloseEditor 关不掉 Compare.LastVersion
+" map <leader>qq <Action>(CloseContent)
+" map <Leader>qa :action CloseAllEditors<CR>
 " map <leader>qd <Action>(QuickJavaDoc) " `K`
 " quick fix
 map <leader>qf <Action>(ShowIntentionActions)
