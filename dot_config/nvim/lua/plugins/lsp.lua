@@ -116,6 +116,11 @@ return {
           LazyVim.info(vim.tbl_map(U.path.replace_home_with_tilde, vim.lsp.buf.list_workspace_folders()), { title = "Lsp Workspaces" })
         end, desc = "List Workspace" },
       })
+
+      if vim.g.user_is_termux then
+        opts.servers.lua_ls = opts.servers.lua_ls or {}
+        opts.servers.lua_ls.mason = false -- pkg install lua-language-server
+      end
     end,
   },
   {
