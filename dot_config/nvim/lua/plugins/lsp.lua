@@ -97,7 +97,7 @@ return {
   -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/editor/inc-rename.lua
   {
     "neovim/nvim-lspconfig",
-    opts = function()
+    opts = function(_, opts)
       local Keys = require("lazyvim.plugins.lsp.keymaps").get()
       -- stylua: ignore
       vim.list_extend(Keys, {
