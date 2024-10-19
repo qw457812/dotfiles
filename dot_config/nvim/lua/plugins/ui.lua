@@ -2,6 +2,7 @@ return {
   -- :h bufferline-configuration
   {
     "akinsho/bufferline.nvim",
+    optional = true,
     keys = function(_, keys)
       local mappings = {
         { "<Up>", "<cmd>BufferLineCyclePrev<cr>", desc = "Prev Buffer" },
@@ -42,6 +43,7 @@ return {
   -- https://github.com/minusfive/dotfiles/blob/897c9596471854842cae52d774f7e43426287e58/.config/nvim/lua/plugins/ui.lua#L152
   {
     "nvim-lualine/lualine.nvim",
+    optional = true,
     opts = function(_, opts)
       -- local function hl_text(text, hl)
       --   return "%#" .. hl .. "#" .. text .. "%*"
@@ -191,6 +193,14 @@ return {
 
       table.insert(opts.extensions, "mason")
     end,
+  },
+
+  {
+    "nvim-treesitter/nvim-treesitter-context",
+    optional = true,
+    opts = {
+      multiwindow = true,
+    },
   },
 
   {
