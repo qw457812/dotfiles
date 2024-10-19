@@ -35,6 +35,7 @@ require("lazy").setup({
     version = false, -- always use the latest git commit
     -- version = "*", -- try installing the latest stable version for plugins that support semver
   },
+  concurrency = (jit.os:find("Windows") or vim.env.TERMUX_VERSION) and (vim.uv.available_parallelism() * 2) or nil,
   install = { colorscheme = { "tokyonight", "habamax" } },
   ui = {
     wrap = false, -- wrap the lines in the ui
