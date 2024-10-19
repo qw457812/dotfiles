@@ -230,15 +230,17 @@ map("n", "z.", "1z=", { desc = "Fix Spelling" })
 -- :let @+=expand('%:p:~')<cr>
 -- <cmd>call setreg('+', expand('%:p:~'))<cr>
 map("n", "<leader>fy", function()
-  local path = vim.fn.expand("%:p:~")
+  -- local path = vim.fn.expand("%:p:~")
+  local path = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":p:~") or ""
   vim.fn.setreg("+", path)
-  LazyVim.info(("Copied path: `%s`"):format(path))
+  LazyVim.info(path, { title = "Copied Path" })
 end, { desc = "Yank file absolute path" })
 
 map("n", "<leader>fY", function()
-  local path = vim.fn.expand("%:~:.")
+  -- local path = vim.fn.expand("%:~:.")
+  local path = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":~:.") or ""
   vim.fn.setreg("+", path)
-  LazyVim.info(("Copied path: `%s`"):format(path))
+  LazyVim.info(path, { title = "Copied Relative Path" })
 end, { desc = "Yank file relative path" })
 
 -- map("n", "<leader>fY", function()
