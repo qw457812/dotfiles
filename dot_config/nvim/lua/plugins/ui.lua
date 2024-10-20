@@ -15,17 +15,29 @@ return {
         { "<leader>br", false },
         { "<leader>bl", "<Cmd>BufferLineCloseRight<CR>", desc = "Delete Buffers to the Right" },
       }
-      -- for i = 1, 9 do
-      --   table.insert(
-      --     mappings,
-      --     { "<leader>b" .. i, "<cmd>BufferLineGoToBuffer " .. i .. "<cr>", desc = "Goto Buffer " .. i }
-      --   )
-      -- end
+      for i = 1, 9 do
+        table.insert(
+          mappings,
+          { "<leader>b" .. i, "<cmd>BufferLineGoToBuffer " .. i .. "<cr>", desc = "Goto Buffer " .. i }
+        )
+      end
       vim.list_extend(keys, mappings)
     end,
     opts = {
       options = {
         separator_style = "slant", -- slope
+        -- in favor of `BufferLineGoToBuffer`
+        numbers = function(opts)
+          ---@type bufferline.State
+          local state = require("bufferline.state")
+          for i, item in ipairs(state.visible_components) do
+            if item.id == opts.id then
+              -- return tostring(i)
+              return opts.raise(i)
+            end
+          end
+          return ""
+        end,
         -- hide extension
         name_formatter = function(buf)
           return buf.name:match("(.+)%..+$")

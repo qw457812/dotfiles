@@ -126,6 +126,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
   - [EasonMo](https://github.com/EasonMo/myLazyVim)
   - [yunxiaoxiao11](https://github.com/yunxiaoxiao11/nvimlazy) with [.ideavimrc](https://github.com/yunxiaoxiao11/nvimlazy/blob/main/jetbrains/.ideavimrc).
   - [zooeywm](https://github.com/zooeywm/dotfiles/tree/main/LazyVim)
+  - [JensenQi](https://github.com/JensenQi/nvim)
 - [ ] Refactor patch like [overrides.lua](https://github.com/ian-ie/LazyVim/blob/master/lua/plugins/overrides.lua).
 - [ ] Check this [keymaps.lua](https://github.com/WillEhrendreich/nvimconfig/blob/7ab5b0d0ee485d58df3cc3e1f55c6446155f29a1/lua/config/keymaps.lua).
 - [ ] Matt-FTW's [vscode.lua](https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/util/vscode.lua), and [search](https://github.com/search?q=repo%3AMatt-FTW%2Fdotfiles%20vscode%20%3D%20true&type=code) the `vscode = true` plugins.
@@ -143,6 +144,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] [mini.bracketed](https://github.com/echasnovski/mini.bracketed)
 - [ ] [flatten.nvim](https://github.com/willothy/flatten.nvim) like [amaanq](https://github.com/amaanq/nvim-config/blob/master/lua/plugins/editor.lua)
 - [ ] [benlubas/molten-nvim](https://github.com/benlubas/molten-nvim) for jupyter
+- [ ] Alternative to markdown-preview.nvim: [toppair/peek.nvim](https://github.com/toppair/peek.nvim) like [dpetka2001](https://github.com/dpetka2001/dotfiles/blob/4ae0b9e9a67e2a37a4fee7773a8c876d1ac890f3/dot_config/nvim/lua/plugins/tools.lua#L107).
 - [ ] [nvim-recorder](https://github.com/chrisgrieser/nvim-recorder)
 - [ ] [rasulomaroff/reactive.nvim](https://github.com/rasulomaroff/reactive.nvim)
 - [ ] lang.zsh like [aimuzov](https://github.com/aimuzov/LazyVimx/blob/main/lua/lazyvimx/extras/lang/zsh.lua).
@@ -154,6 +156,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] Better `M`/`m<space>` keymaps.
 - [ ] Better `<leader>ff` keymaps since we have `<leader><space>`.
 - [ ] Map `esc` for some buffers (maybe floating windows?) in [close.lua](lua/plugins/close.lua).
+  - Maybe map `q` to close window like [rafi](https://github.com/rafi/vim-config/blob/814f312d92e97282913f4c3ef5f09712840b5604/lua/rafi/config/keymaps.lua#L374), and map `<C-q>` for macros.
 - [ ] Check this [util/path.lua](https://github.com/sakakibara/dotfiles/blob/f281ed9865623e204becbc3b87b3983045421422/dot_config/nvim/lua/util/path.lua).
 - [ ] Use [olimorris/persisted.nvim](https://github.com/olimorris/persisted.nvim) instead of `folke/persistence.nvim` like [Matt-FTW](https://github.com/Matt-FTW/dotfiles/blob/ccaa72f977f207cc63ee9798003021534d3053c6/.config/nvim/lua/plugins/extras/util/persisted.lua#L3).
   - Or [stevearc/resession.nvim](https://github.com/stevearc/resession.nvim) mentioned in [astrocore](https://github.com/AstroNvim/astrocore#-installation).

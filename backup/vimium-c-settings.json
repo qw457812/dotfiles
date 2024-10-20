@@ -1,11 +1,11 @@
 {
 	"name": "Vimium C",
-	"@time": "10/9/2024, 12:29:25 PM",
-	"time": 1728448165837,
+	"@time": "10/20/2024, 1:58:15 PM",
+	"time": 1729403895652,
 	"environment": {
 		"extension": "2.11.3",
 		"platform": "mac",
-		"chromium": 129
+		"chromium": 130
 	},
 	"exclusionRules": [
 		{
@@ -21,7 +21,7 @@
 			"pattern": ":https://github.com/"
 		},
 		{
-			"passKeys": "c j k ",
+			"passKeys": "c ",
 			"pattern": ":https://www.google.com/"
 		}
 	],
