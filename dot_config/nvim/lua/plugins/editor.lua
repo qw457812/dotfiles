@@ -254,8 +254,8 @@ return {
 
   {
     "tzachar/highlight-undo.nvim",
-    event = "VeryLazy",
     -- vscode = true,
+    keys = { { "u" }, { "<C-r>" } },
     opts = function()
       -- link: Search IncSearch Substitute
       vim.api.nvim_set_hl(0, "HighlightUndo", { default = true, link = "Substitute" })
