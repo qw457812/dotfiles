@@ -45,7 +45,11 @@ require("lazy").setup({
     },
   },
   diff = { cmd = "terminal_git" },
-  checker = { enabled = true }, -- automatically check for plugin updates
+  checker = {
+    -- automatically check for plugin updates
+    enabled = true,
+    concurrency = vim.env.TERMUX_VERSION and 1 or nil,
+  },
   performance = {
     rtp = {
       -- disable some rtp plugins
