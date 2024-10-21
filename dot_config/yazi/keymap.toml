@@ -69,6 +69,17 @@ prepend_keymap = [
     "<Space>",
     "<Backspace>",
   ], run = "quit", desc = "Exit the process" },
+  # TODO: c
+  { on = [
+    "<Space>",
+    "f",
+    "y",
+  ], run = "copy path", desc = "Copy the file path" },
+  { on = [
+    "<Space>",
+    "f",
+    "Y",
+  ], run = "copy filename", desc = "Copy the filename" },
 ]
 
 append_keymap = [

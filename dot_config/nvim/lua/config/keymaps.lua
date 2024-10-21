@@ -34,7 +34,7 @@ map("n", "<leader>lc", Lazy.check, { desc = "Lazy Check" })
 map("n", "<leader>i", "", { desc = "+info" })
 map("n", "<leader>if", "<cmd>LazyFormatInfo<cr>", { desc = "Format" })
 map("n", "<leader>ic", "<cmd>ConformInfo<cr>", { desc = "Conform" })
-map("n", "<leader>ir", "<cmd>LazyRoot<cr>", { desc = "Root", remap = true })
+map("n", "<leader>ir", "<cmd>LazyRoot<cr>", { desc = "Root" })
 local function lint_info()
   local lint = require("lint")
   -- see: ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/linting.lua
@@ -123,8 +123,12 @@ vim.api.nvim_create_autocmd("CmdWinEnter", {
 -- buffers
 -- see: akinsho/bufferline.nvim in ~/.config/nvim/lua/plugins/ui.lua
 -- if you change the order of buffers :bnext and :bprevious will not respect the custom ordering
-LazyVim.safe_keymap_set("n", "<Up>", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
 LazyVim.safe_keymap_set("n", "<Down>", "<cmd>bnext<cr>", { desc = "Next Buffer" })
+LazyVim.safe_keymap_set("n", "<Up>", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
+LazyVim.safe_keymap_set("n", "J", "<cmd>bnext<cr>", { desc = "Next Buffer" })
+LazyVim.safe_keymap_set("n", "K", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
+map({ "n", "x" }, "gj", "J", { desc = "Join Lines" })
+map({ "n", "x" }, "gk", "K", { desc = "Keywordprg" }) -- not necessary
 -- ":e #" doesn't work if the alternate buffer doesn't have a file name, while CTRL-^ still works then
 map("n", { "<leader>`", "<leader>bb" }, "<C-^>", { desc = "Switch to Other Buffer" })
 map("n", "<leader>bA", "<cmd>bufdo bd<cr>", { desc = "Delete All Buffers" })

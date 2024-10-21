@@ -45,3 +45,6 @@ map [fullscreen] i recolor
 
 # map [normal]     f toggle_fullscreen
 # map [fullscreen] f toggle_fullscreen
+
+map [normal]     <BackSpace> quit
+map [fullscreen] <BackSpace> quit

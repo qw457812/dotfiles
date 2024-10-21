@@ -12,6 +12,13 @@
 // https://github.com/halafi/dotfiles/blob/master/vscode/keybindings.json
 // https://github.com/forivall/dotfiles/blob/fa4dd764a14d81d864482ed4807564320c859e2b/vscode/keybindings.json
 [
+  // https://github.com/vscode-neovim/vscode-neovim/blob/c3e8387a9e9f923ec39c28af6cb8985ca431e438/package.json#L1682
+  {
+    "command": "editor.action.showHover",
+    // "key": "shift+k",
+    "key": "g k",
+    "when": "neovim.init && neovim.mode == normal && editorTextFocus && editorHoverVisible"
+  },
   {
     "key": "ctrl+s",
     "command": "workbench.action.files.save",

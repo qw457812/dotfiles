@@ -36,8 +36,9 @@ vim.api.nvim_create_autocmd("User", {
     vscode_map("n", "<Left>", "workbench.action.navigateBack", { desc = "Go Back" })
     vscode_map("n", "<Right>", "workbench.action.navigateForward", { desc = "Go Forward" })
 
-    vscode_map("n", { "<Up>", "[b", "gk" }, "workbench.action.previousEditor", { desc = "Prev Editor" })
-    vscode_map("n", { "<Down>", "]b", "gj" }, "workbench.action.nextEditor", { desc = "Next Editor" })
+    vscode_map("n", { "<Up>", "K", "[b" }, "workbench.action.previousEditor", { desc = "Prev Editor" })
+    vscode_map("n", { "<Down>", "J", "]b" }, "workbench.action.nextEditor", { desc = "Next Editor" })
+    vscode_map({ "n", "v" }, "gk", "editor.action.showHover", { desc = "Hover" })
     vscode_map("n", "[B", "workbench.action.moveEditorLeftInGroup", { desc = "Move Editor Prev" })
     vscode_map("n", "]B", "workbench.action.moveEditorRightInGroup", { desc = "Move Editor Next" })
     vscode_map("n", "[d", "editor.action.marker.prevInFiles", { desc = "Prev Diagnostic" })
