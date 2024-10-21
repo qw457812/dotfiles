@@ -4,6 +4,20 @@
 [manager]
 show_hidden = true
 
+[opener]
+zathura = [
+  { run = 'zathura "$@"', orphan = true, desc = "zathura", for = "unix" },
+]
+
+[open]
+prepend_rules = [
+  { mime = "application/pdf", use = [
+    "zathura",
+    "open",
+    "reveal",
+  ] },
+]
+
 [plugin]
 prepend_fetchers = [
   # https://github.com/yazi-rs/plugins/tree/main/git.yazi

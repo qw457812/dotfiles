@@ -149,6 +149,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] [rasulomaroff/reactive.nvim](https://github.com/rasulomaroff/reactive.nvim)
 - [ ] lang.zsh like [aimuzov](https://github.com/aimuzov/LazyVimx/blob/main/lua/lazyvimx/extras/lang/zsh.lua).
 - [x] [tiny-inline-diagnostic.nvim](https://github.com/rachartier/tiny-inline-diagnostic.nvim) like [aimuzov](https://github.com/search?q=repo%3Aaimuzov%2FLazyVimx%20tiny-inline-diagnostic.nvim&type=code).
+- [ ] Fix lazy loading: telescope-undo.nvim, telescope-zoxide, telescope-file-browser.nvim, smart-open.nvim
 - [ ] Map `u`/`d`/`q`, and unmap `dd` for `man` filetype.
 - [ ] Maybe press `]b]]][[]` instead of `]b]b]b]b[b[b]b` by [hydra.nvim](https://github.com/anuvyklack/hydra.nvim).
 - [ ] `<D-s>` not working in alacritty.
