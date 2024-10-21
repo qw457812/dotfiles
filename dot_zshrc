@@ -359,11 +359,11 @@ ZVM_VI_SURROUND_BINDKEY="helix"
 
 # https://github.com/DarrinTisdale/zsh-aliases-exa
 # l='ls -lah'
-alias l='eza --all --color=always --color-scale all --long --group --time-style=iso --git'
+alias l='eza --all --group-directories-first --color=always --color-scale all --icons=auto --long --group --time-style=iso --git'
 # la='ls -lAh'
-alias la='eza --all --color=always --color-scale all --long --binary --group --header --modified --accessed --created --time-style=iso --git'
+alias la='eza --all --group-directories-first --color=always --color-scale all --icons=auto --long --binary --group --header --modified --accessed --created --time-style=iso --git'
 # llm
-alias lm='eza --all --sort=modified --color=always --color-scale all --long --binary --group --header --modified --accessed --created --changed --time-style=iso --git'
+alias lm='eza --all --sort=modified --color=always --color-scale all --icons=auto --long --binary --group --header --modified --accessed --created --changed --time-style=iso --git'
 alias lS='eza -1' # one column, just names
 alias lt='eza --tree --level=2'
 # ll='ls -lh'

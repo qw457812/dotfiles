@@ -173,18 +173,13 @@ return {
 
   -- alternative: https://github.com/xzbdmw/nvimconfig/blob/0be9805dac4661803e17265b435060956daee757/lua/theme/dark.lua#L23
   {
-    "LazyVim/LazyVim",
-    dependencies = {
-      { "debugloop/layers.nvim", opts = {} },
-    },
+    "debugloop/layers.nvim",
     keys = {
       -- stylua: ignore
       { "M", function() PAGER_MODE:toggle() end, desc = "Pager Mode" },
     },
-    opts = function()
-      if vim.g.vscode then
-        return
-      end
+    config = function(_, opts)
+      require("layers").setup(opts)
 
       ---@diagnostic disable-next-line: undefined-global
       PAGER_MODE = Layers.mode.new()
@@ -224,7 +219,7 @@ return {
   -- for escaping easily from insert mode
   {
     "max397574/better-escape.nvim",
-    event = "VeryLazy",
+    event = { "InsertEnter", "CmdlineEnter" },
     opts = {
       -- note: lazygit, fzf-lua use terminal mode, `jj` and `jk` make lazygit navigation harder
       default_mappings = false,

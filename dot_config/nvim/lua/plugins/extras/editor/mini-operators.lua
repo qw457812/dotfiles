@@ -1,14 +1,19 @@
 return {
   {
     "echasnovski/mini.operators",
-    event = "VeryLazy",
     vscode = true,
     -- https://github.com/chrisgrieser/.config/blob/181def43f255a502670af318297289f4e8f49c83/nvim/lua/plugins/editing-support.lua#L108
     -- https://github.com/JulesNP/nvim/blob/36b04ae414b98e67a80f15d335c73744606a33d7/lua/plugins/mini.lua#L656
     keys = {
-      { "cR", "cr$", desc = "Replace to end of line", remap = true },
-      { "cX", "cx$", desc = "Exchange to end of line", remap = true },
-      { "cD", "cd$", desc = "Multiply to end of line", remap = true },
+      { "cr", desc = "Replace Operator" },
+      { "cR", "cr$", desc = "Replace to EoL", remap = true },
+      { "cx", desc = "Exchange Operator" },
+      { "X", mode = "x", desc = "Exchange Selection" },
+      { "cX", "cx$", desc = "Exchange to EoL", remap = true },
+      { "cd", desc = "Multiply Operator" },
+      { "D", mode = "x", desc = "Multiply Selection" },
+      { "cD", "cd$", desc = "Multiply to EoL", remap = true },
+      { "g=", mode = { "n", "x" }, desc = "Evaluate Operator" },
     },
     -- https://github.com/echasnovski/mini.operators/blob/76ac9104d9773927053ea4eb12fc78ccbb5be813/doc/mini-operators.txt#L131
     opts = {
