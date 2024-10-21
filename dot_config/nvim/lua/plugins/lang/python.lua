@@ -2,7 +2,7 @@ if not LazyVim.has_extra("lang.python") then
   return {}
 end
 
--- local ruff = vim.g.lazyvim_python_ruff or "ruff"
+local ruff = vim.g.lazyvim_python_ruff or "ruff"
 local has_black = LazyVim.has_extra("formatting.black")
 
 return {
@@ -135,6 +135,18 @@ return {
       --   end,
       -- },
     },
+  },
+
+  -- temporary fix
+  {
+    "neovim/nvim-lspconfig",
+    opts = function()
+      LazyVim.lsp.on_attach(function(client, _)
+        vim.defer_fn(function()
+          LazyVim.toggle.diagnostics.set(true)
+        end, 100)
+      end, ruff)
+    end,
   },
 
   -- (isort + black) or ruff
