@@ -89,7 +89,13 @@
       "editor.selectionHighlightBackground": "overlay2 0.25",
       "editor.wordHighlightBackground": "overlay2 0.35",
       "editor.wordHighlightStrongBackground": "overlay2 0.35",
-      "editor.wordHighlightStrongBorder": "subtext0"
+      "editor.wordHighlightStrongBorder": "subtext0",
+      // https://github.com/catppuccin/nvim/blob/ea02cc8c3c053c6c1c574e0791d743338e3e788f/lua/catppuccin/groups/integrations/native_lsp.lua#L98
+      "editorInlayHint.background": "surface0 0.64",
+      "editorInlayHint.typeForeground": "overlay0",
+      "editorInlayHint.typeBackground": "surface0 0.64",
+      "editorInlayHint.parameterForeground": "overlay0",
+      "editorInlayHint.parameterBackground": "surface0 0.64"
     }
   },
   // https://code.visualstudio.com/api/references/theme-color

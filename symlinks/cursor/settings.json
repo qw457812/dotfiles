@@ -60,7 +60,12 @@
       "editor.selectionHighlightBackground": "overlay2 0.25",
       "editor.wordHighlightBackground": "overlay2 0.35",
       "editor.wordHighlightStrongBackground": "overlay2 0.35",
-      "editor.wordHighlightStrongBorder": "subtext0"
+      "editor.wordHighlightStrongBorder": "subtext0",
+      "editorInlayHint.background": "surface0 0.64",
+      "editorInlayHint.typeForeground": "overlay0",
+      "editorInlayHint.typeBackground": "surface0 0.64",
+      "editorInlayHint.parameterForeground": "overlay0",
+      "editorInlayHint.parameterBackground": "surface0 0.64"
     }
   },
   "workbench.colorCustomizations": {

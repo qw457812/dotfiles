@@ -261,8 +261,8 @@ nnoremap <C-l> <C-w>l
 
 " Have j and k navigate visual lines rather than logical ones
 " Notice: just for fix ideavim bug ---> when meet folded @SuppressWarnings("unchecked") like /unchecked/, jjj... will not walk through (but gj not work well when soft-wrap is on)
-nmap j gj
-nmap k gk
+nnoremap j gj
+nnoremap k gk
 
 " nmap * *zz
 " nmap # #zz
@@ -305,6 +305,15 @@ map <M-k> <Action>(MoveStatementUp)
 " map <down> <Action>(MethodDown)
 map <down> gt
 map <up> gT
+nnoremap J gt
+nnoremap K gT
+nnoremap gj J
+xnoremap gj J
+" `<Action>(ShowHoverInfo)` can be closed by `hjkl` but `K` can't
+" nnoremap gk K
+nmap gk <Action>(ShowHoverInfo)
+nnoremap <leader>K K
+
 " map <left> <Action>(JumpToLastChange)
 " map <left> <C-o>
 map <left> <Action>(Back)

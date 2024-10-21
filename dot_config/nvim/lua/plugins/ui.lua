@@ -5,10 +5,10 @@ return {
     optional = true,
     keys = function(_, keys)
       local mappings = {
-        { "<Up>", "<cmd>BufferLineCyclePrev<cr>", desc = "Prev Buffer" },
         { "<Down>", "<cmd>BufferLineCycleNext<cr>", desc = "Next Buffer" },
-        { "gj", "<cmd>BufferLineCycleNext<cr>", desc = "Next Buffer" },
-        { "gk", "<cmd>BufferLineCyclePrev<cr>", desc = "Prev Buffer" },
+        { "<Up>", "<cmd>BufferLineCyclePrev<cr>", desc = "Prev Buffer" },
+        { "J", "<cmd>BufferLineCycleNext<cr>", desc = "Next Buffer" },
+        { "K", "<cmd>BufferLineCyclePrev<cr>", desc = "Prev Buffer" },
         { "<leader>bH", "<cmd>BufferLineGoToBuffer 1<cr>", desc = "Goto First Buffer" },
         { "<leader>bL", "<cmd>BufferLineGoToBuffer -1<cr>", desc = "Goto Last Buffer" },
         { "<leader>bh", "<Cmd>BufferLineCloseLeft<CR>", desc = "Delete Buffers to the Left" },
