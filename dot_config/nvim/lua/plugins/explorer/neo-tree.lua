@@ -5,6 +5,7 @@ return {
   -- https://github.com/nvim-lua/kickstart.nvim/blob/master/lua/kickstart/plugins/neo-tree.lua
   -- https://github.com/rafi/vim-config/blob/b9648dcdcc6674b707b963d8de902627fbc887c8/lua/rafi/plugins/neo-tree.lua
   -- https://github.com/aimuzov/LazyVimx/blob/789dafed84f6f61009f13b4054f12208842df225/lua/lazyvimx/extras/ui/panels/explorer.lua
+  -- https://github.com/rafi/vim-config/blob/master/lua/rafi/plugins/neo-tree.lua
   {
     "nvim-neo-tree/neo-tree.nvim",
     optional = true,
