@@ -70,12 +70,16 @@ map("n", "<leader>iC", function()
 end, { desc = "ColorScheme" })
 
 -- navigate to line start and end from home row
--- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/keybindings.lua#L19
-map({ "n", "x" }, "H", "0^", { desc = "Goto line start" }) -- scroll fully to the left
-map("o", "H", "^", { desc = "Goto line start" })
-map({ "n", "o" }, "L", "$", { desc = "Goto line end" })
--- https://github.com/v1nh1shungry/.dotfiles/blob/d8a0f6fd2766d0ec9ce5d5b4ccd55b3cc4130c1a/nvim/lua/dotfiles/core/keymaps.lua#L74
-map("x", "L", "g_", { desc = "Goto line end" })
+-- -- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/keybindings.lua#L19
+-- map({ "n", "x" }, "H", "0^", { desc = "Goto line start" }) -- scroll fully to the left
+-- map("o", "H", "^", { desc = "Goto line start" })
+-- map({ "n", "o" }, "L", "$", { desc = "Goto line end" })
+-- -- https://github.com/v1nh1shungry/.dotfiles/blob/d8a0f6fd2766d0ec9ce5d5b4ccd55b3cc4130c1a/nvim/lua/dotfiles/core/keymaps.lua#L74
+-- map("x", "L", "g_", { desc = "Goto line end" })
+map({ "n", "x" }, "H", "&wrap ? 'g^' : '0^'", { desc = "Goto line start", expr = true }) -- scroll fully to the left
+map("o", "H", "&wrap ? 'g^' : '^'", { desc = "Goto line start", expr = true })
+map({ "n", "o" }, "L", "v:count ? '$' : &wrap ? 'g$' : '$'", { desc = "Goto line end", expr = true })
+map("x", "L", "v:count ? 'g_' : &wrap ? 'g$' : 'g_'", { desc = "Goto line end", expr = true }) -- TODO: to the last non-blank character of the line when wrapped
 -- https://github.com/folke/lazy.nvim/issues/411
 -- https://github.com/folke/lazy.nvim/issues/133
 LazyViewConfig.commands.home.key = "gH"
@@ -134,8 +138,6 @@ map("n", { "<leader>`", "<leader>bb" }, "<C-^>", { desc = "Switch to Other Buffe
 map("n", "<leader>bA", "<cmd>bufdo bd<cr>", { desc = "Delete All Buffers" })
 
 -- jumping
--- map("n", "gk", "<C-o>", { desc = "Go Back" })
--- map("n", "gj", "<C-i>", { desc = "Go Forward" })
 -- map("n", ",", "<C-o>", { desc = "Go Back" })
 -- map("n", ";", "<C-i>", { desc = "Go Forward" })
 map("n", "<Left>", "<C-o>", { desc = "Go Back" })
@@ -144,6 +146,32 @@ map("n", "<Right>", "<C-i>", { desc = "Go Forward" })
 if LazyVim.has("noice.nvim") then
   map("n", "<esc>", "<cmd>noh<bar>Noice dismiss<cr><esc>", { desc = "Escape and Clear hlsearch/notifications" })
 end
+-- -- https://github.com/gabs712/dotfiles/blob/d73212ee9c55bb9c4b6f88bf2175b349d59205a7/nvim/.config/nvim/lua/core/keymaps.lua#L2
+-- map("n", "<esc>", function()
+--   vim.cmd("nohlsearch")
+--
+--   -- dismiss notifications by nvim-notify or noice.nvim
+--   local ok, notify = pcall(require, "notify")
+--   if ok then
+--     notify.dismiss({ silent = true, pending = true })
+--   end
+--
+--   -- TODO: do not close zen mode (floating window)
+--
+--   -- -- close all floating windows
+--   -- for _, win in ipairs(vim.api.nvim_list_wins()) do
+--   --   if vim.api.nvim_win_is_valid(win) and vim.api.nvim_win_get_config(win).relative ~= "" then
+--   --     vim.api.nvim_win_close(win, false)
+--   --   end
+--   -- end
+--
+--   -- close current floating window
+--   if vim.api.nvim_win_is_valid(0) and vim.api.nvim_win_get_config(0).relative ~= "" then
+--     vim.api.nvim_win_close(0, false)
+--   end
+--
+--   -- TODO: missing <esc>, is it necessary?
+-- end, { desc = "Clear hlsearch/notifications and Close floating window" })
 
 -- match
 -- helix-style mappings | https://github.com/boltlessengineer/nvim/blob/607ee0c9412be67ba127a4d50ee722be578b5d9f/lua/config/keymaps.lua#L103
