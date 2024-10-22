@@ -53,6 +53,7 @@ local pick_find_buffer_dir_files = function()
 end
 
 local keys = {
+  { "<leader>sR", false },
   -- stylua: ignore
   { "<leader>fP", LazyVim.pick("files", { cwd = require("lazy.core.config").options.root }), desc = "Find Plugin File" },
   { "<leader>sP", pick_search_lazy_specs, desc = "Search Lazy Plugin Spec" },
@@ -65,13 +66,21 @@ return {
   {
     "ibhagwan/fzf-lua",
     optional = true,
-    keys = keys,
+    keys = {
+      { "<leader>s.", "<cmd>FzfLua resume<cr>", desc = "Resume" },
+      unpack(keys),
+    },
   },
   -- https://www.lazyvim.org/configuration/examples
   {
     "nvim-telescope/telescope.nvim",
     optional = true,
-    keys = keys,
+    keys = {
+      { "<leader>s.", "<cmd>Telescope resume<cr>", desc = "Resume" },
+      { "<leader>ff", false },
+      { "<leader>fF", false },
+      unpack(keys),
+    },
     opts = {
       defaults = {
         prompt_prefix = "", -- in favor of `p` on startup
@@ -194,14 +203,23 @@ return {
     },
     keys = {
       {
-        "<leader>[", -- TODO: better keymap
+        "<leader>ff",
         function()
           require("telescope").extensions.smart_open.smart_open({
-            -- cwd_only = true, -- TODO: <leader>fF
             -- filename_first = false,
           })
         end,
         desc = "Smart Open",
+      },
+      {
+        "<leader>fF",
+        function()
+          require("telescope").extensions.smart_open.smart_open({
+            cwd_only = true,
+            -- filename_first = false,
+          })
+        end,
+        desc = "Smart Open (cwd)",
       },
     },
     opts = function(_, opts)

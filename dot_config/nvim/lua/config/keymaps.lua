@@ -133,6 +133,7 @@ LazyVim.safe_keymap_set("n", "J", "<cmd>bnext<cr>", { desc = "Next Buffer" })
 LazyVim.safe_keymap_set("n", "K", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
 map({ "n", "x" }, "gj", "J", { desc = "Join Lines" })
 map({ "n", "x" }, "gk", "K", { desc = "Keywordprg" }) -- not necessary
+LazyViewConfig.keys.hover = "gk"
 -- ":e #" doesn't work if the alternate buffer doesn't have a file name, while CTRL-^ still works then
 map("n", { "<leader>`", "<leader>bb" }, "<C-^>", { desc = "Switch to Other Buffer" })
 map("n", "<leader>bA", "<cmd>bufdo bd<cr>", { desc = "Delete All Buffers" })

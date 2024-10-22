@@ -43,6 +43,42 @@ require("lazy").setup({
     icons = {
       keys = "󰥻 ",
     },
+    custom_keys = {
+      ["<leader><space>"] = {
+        function(plugin)
+          vim.cmd.close()
+          LazyVim.pick("files", { cwd = plugin.dir, prompt_title = plugin.name })()
+        end,
+        desc = "Find Plugin File",
+      },
+      ["<leader>/"] = {
+        function(plugin)
+          vim.cmd.close()
+          LazyVim.pick("live_grep", { cwd = plugin.dir, prompt_title = plugin.name })()
+        end,
+        desc = "Search Plugin Code",
+      },
+      ["gx"] = {
+        function(plugin)
+          vim.ui.open(plugin.url:gsub("%.git$", ""))
+        end,
+        desc = "Plugin Repo",
+      },
+      ["gi"] = {
+        function(plugin)
+          local url = plugin.url:gsub("%.git$", "")
+          local line = vim.api.nvim_get_current_line()
+          local issue = line:match("#(%d+)")
+          local commit = line:match("%f[%w](" .. string.rep("[a-f0-9]", 7) .. ")%f[%W]")
+          if issue then
+            vim.ui.open(url .. "/issues/" .. issue)
+          elseif commit then
+            vim.ui.open(url .. "/commit/" .. commit)
+          end
+        end,
+        desc = "Open Issue / Commit",
+      },
+    },
   },
   diff = { cmd = "terminal_git" },
   checker = {
