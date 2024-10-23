@@ -81,21 +81,21 @@ return {
       local util = require("tokyonight.util")
       return {
         style = tokyonight_has_custom_style() and tokyonight_custom_style or "storm", -- storm, moon(default), night, day, custom
-        -- transparent = true,
-        -- styles = {
-        --   sidebars = "transparent",
-        --   floats = "transparent",
-        -- },
+        transparent = vim.g.user_transparent_background,
+        styles = {
+          sidebars = vim.g.user_transparent_background and "transparent" or nil,
+          floats = vim.g.user_transparent_background and "transparent" or nil,
+        },
         -- ~/.local/share/nvim/lazy/tokyonight.nvim/extras/lua/tokyonight_storm.lua
         on_colors = function(c)
           -- more neutral background rather than bluish tint
           c.bg = to_neutral_gray(c.bg)
           c.bg_dark = to_neutral_gray(c.bg_dark)
-          c.bg_float = c.bg_dark
+          c.bg_float = to_neutral_gray(c.bg_float)
           c.bg_highlight = to_neutral_gray(c.bg_highlight)
-          c.bg_popup = c.bg_dark
-          c.bg_sidebar = c.bg_dark
-          c.bg_statusline = c.bg_dark
+          c.bg_popup = to_neutral_gray(c.bg_popup)
+          c.bg_sidebar = to_neutral_gray(c.bg_sidebar)
+          c.bg_statusline = to_neutral_gray(c.bg_statusline)
 
           -- gitcommit, mini.diff
           c.diff.add = util.blend_bg(c.green2, 0.35)
@@ -241,6 +241,7 @@ return {
         background = {
           dark = "macchiato", -- frappe, macchiato, mocha(default)
         },
+        transparent_background = vim.g.user_transparent_background,
         -- ~/.local/share/nvim/lazy/catppuccin/lua/catppuccin/palettes/macchiato.lua
         -- https://github.com/catppuccin/nvim/discussions/323
         -- https://github.com/tm157/dotfiles/blob/8a32eb599c4850a96a41a012fa3ba54c81111001/nvim/lua/user/colorscheme.lua#L31
@@ -311,15 +312,20 @@ return {
     opts = function()
       local util = require("neon.util")
       return {
+        transparent = vim.g.user_transparent_background,
+        styles = {
+          sidebars = vim.g.user_transparent_background and "transparent" or nil,
+          floats = vim.g.user_transparent_background and "transparent" or nil,
+        },
         -- ~/.local/share/nvim/lazy/neon.nvim/lua/neon/colors/punkpeach-storm.lua
         on_colors = function(c)
           c.bg = to_neutral_gray(c.bg)
           c.bg_dark = to_neutral_gray(c.bg_dark)
-          c.bg_float = c.bg_dark
+          c.bg_float = to_neutral_gray(c.bg_float)
           c.bg_highlight = to_neutral_gray(c.bg_highlight)
-          c.bg_popup = c.bg_dark
-          c.bg_sidebar = c.bg_dark
-          c.bg_statusline = c.bg_dark
+          c.bg_popup = to_neutral_gray(c.bg_popup)
+          c.bg_sidebar = to_neutral_gray(c.bg_sidebar)
+          c.bg_statusline = to_neutral_gray(c.bg_statusline)
 
           -- gitcommit, mini.diff
           c.diff.add = util.blend_bg(c.green2, 0.35)

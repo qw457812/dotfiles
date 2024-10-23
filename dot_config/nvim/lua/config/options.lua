@@ -23,6 +23,7 @@ local win_borders_fillchars = {
 }
 opt.fillchars:append(win_borders_fillchars["bold"])
 
+vim.g.user_transparent_background = true
 vim.g.user_is_termux = vim.env.TERMUX_VERSION ~= nil
 -- failed to install basedpyright on Termux
 if not vim.g.user_is_termux then

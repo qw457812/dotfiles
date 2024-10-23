@@ -57,6 +57,10 @@ end
 
 ---@param hex string
 function M.to_neutral_gray(hex)
+  if not hex or hex:upper() == "NONE" then
+    return hex
+  end
+
   local r, g, b = M.hex2rgb(hex)
 
   -- local avg = math.floor((r + g + b) / 3)
