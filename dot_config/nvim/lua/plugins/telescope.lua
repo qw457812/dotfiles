@@ -5,6 +5,24 @@ local config_path = U.path.CONFIG
 local lazyvim_path = U.path.LAZYVIM
 
 -- https://github.com/folke/dot/blob/master/nvim/lua/plugins/telescope.lua
+-- alternative: https://github.com/tsakirist/telescope-lazy.nvim
+local pick_find_plugin_files = function()
+  -- LazyVim.pick("files", { cwd = require("lazy.core.config").options.root })()
+
+  -- https://github.com/chrisgrieser/.config/blob/41c33a44e9c02bd04ea7cedcaed0f5547129e83c/nvim/lua/config/lazy.lua#L170
+  vim.ui.select(require("lazy").plugins(), {
+    prompt = "Select Plugin",
+    format_item = function(plugin)
+      return plugin.name
+    end,
+  }, function(plugin)
+    if not plugin then
+      return
+    end
+    LazyVim.pick("files", { cwd = plugin.dir, prompt_title = plugin.name })()
+  end)
+end
+
 local pick_search_lazy_specs = function()
   local dirs = { config_path .. "/lua/plugins", lazyvim_path .. "/lua/lazyvim/plugins" }
   if LazyVim.pick.picker.name == "telescope" then
@@ -55,8 +73,7 @@ end
 local keys = {
   { "<leader>sR", false },
   -- stylua: ignore
-  { "<leader>fP", LazyVim.pick("files", { cwd = require("lazy.core.config").options.root }), desc = "Find Plugin File" },
-  { "<leader>sP", pick_search_lazy_specs, desc = "Search Lazy Plugin Spec" },
+  { "<leader>fP", pick_find_plugin_files, desc = "Find Plugin File" },
   { "<leader>fL", pick_find_lazy_files, desc = "Find Lazy File" },
   { "<leader>sL", pick_search_lazy_codes, desc = "Search Lazy Code" },
   { "<leader>fB", pick_find_buffer_dir_files, desc = "Find Files (Buffer Dir)" },
@@ -68,6 +85,7 @@ return {
     optional = true,
     keys = {
       { "<leader>s.", "<cmd>FzfLua resume<cr>", desc = "Resume" },
+      { "<leader>sP", pick_search_lazy_specs, desc = "Search Lazy Plugin Spec" },
       unpack(keys),
     },
   },
@@ -83,8 +101,9 @@ return {
     },
     opts = {
       defaults = {
-        prompt_prefix = "", -- in favor of `p` on startup
-        layout_strategy = vim.g.user_is_termux and "vertical" or "horizontal",
+        prompt_prefix = "", -- in favor of `p` in normal mode on startup
+        -- layout_strategy = vim.g.user_is_termux and "vertical" or "horizontal",
+        layout_strategy = "flex",
         layout_config = {
           horizontal = {
             width = 0.8,
@@ -101,9 +120,7 @@ return {
               return vim.g.user_is_termux and max_lines or math.floor(max_lines * 0.8)
             end,
             preview_cutoff = 20,
-            preview_height = function(_, _, max_lines)
-              return math.max(max_lines - 12, math.floor(max_lines * 0.6))
-            end,
+            preview_height = 0.5,
           },
         },
         sorting_strategy = "ascending",
@@ -185,6 +202,26 @@ return {
           },
         },
       },
+    },
+  },
+
+  -- alternative: https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/lazy.lua#L129
+  {
+    "nvim-telescope/telescope.nvim",
+    optional = true,
+    dependencies = {
+      {
+        "polirritmico/telescope-lazy-plugins.nvim",
+        -- lazy loading | https://github.com/polirritmico/telescope-lazy-plugins.nvim/blob/main/README.md?plain=1#L273
+        init = function()
+          LazyVim.on_load("telescope.nvim", function()
+            require("telescope").load_extension("lazy_plugins")
+          end)
+        end,
+      },
+    },
+    keys = {
+      { "<leader>sP", "<Cmd>Telescope lazy_plugins<CR>", desc = "Search Lazy Plugin Spec" },
     },
   },
 

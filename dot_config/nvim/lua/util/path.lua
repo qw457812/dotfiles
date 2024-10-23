@@ -21,7 +21,8 @@ M.CONFIG = (function()
   return has_chezmoi and M.CHEZMOI .. "/dot_config/nvim" or vim.fn.stdpath("config") --[[@as string]]
 end)()
 
-M.LAZYVIM = require("lazy.core.config").options.root .. "/LazyVim"
+-- require("lazy.core.config").options.root .. "/LazyVim"
+M.LAZYVIM = LazyVim.get_plugin_path("LazyVim")
 
 --- Replace home directory with '~'
 --- https://github.com/echasnovski/mini.files/blob/10ed64157ec45f176decefbdb0e2ba10cccd187f/lua/mini/files.lua#L2365

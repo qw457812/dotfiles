@@ -7,7 +7,7 @@ end
 -- see: ~/.local/share/nvim/lazy/chezmoi.nvim/lua/telescope/_extensions/find_files.lua
 local chezmoi_list_args = { "--include", "files", "--exclude", "externals" }
 
-local pick_chezmoi = function()
+local function pick_chezmoi()
   if LazyVim.pick.picker.name == "telescope" then
     require("telescope").extensions.chezmoi.find_files()
   elseif LazyVim.pick.picker.name == "fzf" then
@@ -30,19 +30,23 @@ local pick_chezmoi = function()
   end
 end
 
---- pick nvim config
-local pick_config = function()
-  local chezmoi = require("chezmoi.commands")
-  local config_dir = vim.fn.stdpath("config")
-  local managed_config_files = chezmoi.list({
-    targets = config_dir,
+local function chezmoi_list_config_files()
+  return require("chezmoi.commands").list({
+    targets = vim.fn.stdpath("config"),
     args = { "--path-style", "absolute", unpack(chezmoi_list_args) },
   })
+end
 
+--- pick nvim config
+local function pick_config()
+  local managed_config_files = chezmoi_list_config_files()
   if vim.tbl_isempty(managed_config_files) then
     LazyVim.pick.config_files()()
     return
   end
+
+  local chezmoi = require("chezmoi.commands")
+  local config_dir = vim.fn.stdpath("config")
 
   if LazyVim.pick.picker.name == "telescope" then
     local actions = require("telescope.actions")
@@ -104,7 +108,6 @@ local pick_config = function()
 end
 
 return {
-  -- TODO: How to trigger chezmoi apply after discard changes in lazygit?
   {
     "xvzc/chezmoi.nvim",
     optional = true,
@@ -138,6 +141,32 @@ return {
     "nvim-telescope/telescope.nvim",
     optional = true,
     keys = { { "<leader>fc", false } },
+    opts = function(_, opts)
+      local function chezmoi_edit(prompt_bufnr)
+        local lp_actions = require("telescope._extensions.lazy_plugins.actions")
+        lp_actions.custom_action(prompt_bufnr, "filepath", function(bufnr, entry)
+          if vim.tbl_contains(chezmoi_list_config_files(), entry.filepath) then
+            lp_actions.append_to_telescope_history(bufnr)
+            lp_actions.close(bufnr)
+            require("chezmoi.commands").edit({ targets = entry.filepath })
+            vim.api.nvim_win_set_cursor(0, { entry.line, 0 })
+            vim.cmd("norm! zt")
+          else
+            lp_actions.open(prompt_bufnr) -- original action
+          end
+        end)
+      end
+
+      opts.extensions = vim.tbl_deep_extend("force", opts.extensions or {}, {
+        -- polirritmico/telescope-lazy-plugins.nvim
+        lazy_plugins = {
+          mappings = {
+            ["i"] = { ["<cr>"] = chezmoi_edit },
+            ["n"] = { ["<cr>"] = chezmoi_edit },
+          },
+        },
+      })
+    end,
   },
 
   {
