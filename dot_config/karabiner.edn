@@ -1058,7 +1058,7 @@
            ;; [:s :!Cc nil {:delayed {:invoked [:open "https://translate.google.com/?sl=en&tl=zh-CN&text=$(pbpaste)&op=translate"]} :params {:delay 30}}]
            ;; [:s [:open "https://translate.google.com/?sl=en&tl=zh-CN&text=$(pbpaste)&op=translate"]]
            ; [:s [:open "https://translate.google.com/?sl=en&tl=zh-CN&op=translate"]]
-           [:s [:open "https://github.com/search?type=code&auto_enroll=true"]] ; https://github.com/features/code-search
+           [:s [:open "https://github.com/search?type=code"]] ; https://github.com/features/code-search
            [:b :!!hyphen] ; raycast://extensions/Codely/google-chrome/search-bookmarks
            [:h :!!f9] ; raycast://extensions/Codely/google-chrome/search-history
            [:t :!!f8] ; raycast://extensions/Codely/google-chrome/search-tab
