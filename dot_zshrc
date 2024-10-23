@@ -357,6 +357,7 @@ ZVM_VI_SURROUND_BINDKEY="helix"
 # # https://github.com/asdf-vm/asdf
 # . $(brew --prefix asdf)/libexec/asdf.sh
 
+export EZA_CONFIG_DIR="$HOME/.config/eza"
 # https://github.com/DarrinTisdale/zsh-aliases-exa
 # l='ls -lah'
 alias l='eza --all --group-directories-first --color=always --color-scale all --icons=auto --long --group --time-style=iso --git'
