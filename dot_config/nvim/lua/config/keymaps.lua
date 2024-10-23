@@ -287,14 +287,19 @@ U.toggle.map("<leader>ul", U.toggle("number", { name = "Line Number" }))
 U.toggle.map("<leader>ud", U.toggle.diagnostic_virtual_text)
 U.toggle.map("<leader>uD", U.toggle.diagnostics)
 
-local function google_search(input)
-  local query = input or vim.fn.expand("<cword>")
-  LazyUtil.open("https://www.google.com/search?q=" .. query)
+-- local function google_search(input)
+--   local query = input or vim.fn.expand("<cword>")
+--   LazyUtil.open("https://www.google.com/search?q=" .. query)
+-- end
+-- -- conflict with "Buffer Local Keymaps (which-key)" defined in ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/editor.lua
+-- -- map("n", "<leader>?", google_search, { desc = "Google Search Current Word" })
+-- -- stylua: ignore
+-- map("x", "<leader>?", function() google_search(U.get_visual_selection()) end, { desc = "Google Search" })
+
+if vim.g.user_is_termux then
+  -- stylua: ignore
+  map({ "i", "c", "t" }, "<C-v>", function() vim.api.nvim_paste(vim.fn.getreg("+"), true, -1) end, { desc = "Paste" })
 end
--- conflict with "Buffer Local Keymaps (which-key)" defined in ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/editor.lua
--- map("n", "<leader>?", google_search, { desc = "Google Search Current Word" })
--- stylua: ignore
-map("x", "<leader>?", function() google_search(U.get_visual_selection()) end, { desc = "Google Search" })
 
 if vim.g.neovide then
   -- fix cmd-v for paste in insert, command, terminal (for fzf-lua) mode
