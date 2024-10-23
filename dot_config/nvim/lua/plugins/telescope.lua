@@ -5,6 +5,22 @@ local config_path = U.path.CONFIG
 local lazyvim_path = U.path.LAZYVIM
 
 -- https://github.com/folke/dot/blob/master/nvim/lua/plugins/telescope.lua
+local pick_search_lazy_specs = function()
+  local dirs = { config_path .. "/lua/plugins", lazyvim_path .. "/lua/lazyvim/plugins" }
+  if LazyVim.pick.picker.name == "telescope" then
+    require("telescope.builtin").live_grep({
+      default_text = "/",
+      search_dirs = vim.tbl_values(dirs),
+    })
+  elseif LazyVim.pick.picker.name == "fzf" then
+    require("fzf-lua").live_grep({
+      filespec = "-- " .. table.concat(vim.tbl_values(dirs), " "),
+      search = "/",
+      formatter = "path.filename_first",
+    })
+  end
+end
+
 -- alternative: https://github.com/tsakirist/telescope-lazy.nvim
 local pick_find_plugin_files = function()
   -- LazyVim.pick("files", { cwd = require("lazy.core.config").options.root })()
@@ -23,20 +39,20 @@ local pick_find_plugin_files = function()
   end)
 end
 
-local pick_search_lazy_specs = function()
-  local dirs = { config_path .. "/lua/plugins", lazyvim_path .. "/lua/lazyvim/plugins" }
-  if LazyVim.pick.picker.name == "telescope" then
-    require("telescope.builtin").live_grep({
-      default_text = "/",
-      search_dirs = vim.tbl_values(dirs),
-    })
-  elseif LazyVim.pick.picker.name == "fzf" then
-    require("fzf-lua").live_grep({
-      filespec = "-- " .. table.concat(vim.tbl_values(dirs), " "),
-      search = "/",
-      formatter = "path.filename_first",
-    })
-  end
+local pick_search_plugin_codes = function()
+  -- LazyVim.pick("live_grep", { cwd = require("lazy.core.config").options.root })()
+
+  vim.ui.select(require("lazy").plugins(), {
+    prompt = "Select Plugin",
+    format_item = function(plugin)
+      return plugin.name
+    end,
+  }, function(plugin)
+    if not plugin then
+      return
+    end
+    LazyVim.pick("live_grep", { cwd = plugin.dir, prompt_title = plugin.name })()
+  end)
 end
 
 local pick_find_lazy_files = function()
@@ -60,23 +76,15 @@ local pick_search_lazy_codes = function()
   end
 end
 
--- https://github.com/craftzdog/dotfiles-public/blob/master/.config/nvim/lua/plugins/editor.lua
-local pick_find_buffer_dir_files = function()
-  local buffer_dir = vim.fn.expand("%:p:h")
-  if LazyVim.pick.picker.name == "telescope" then
-    require("telescope.builtin").find_files({ cwd = buffer_dir })
-  elseif LazyVim.pick.picker.name == "fzf" then
-    require("fzf-lua").files({ cwd = buffer_dir })
-  end
-end
-
+-- stylua: ignore
 local keys = {
   { "<leader>sR", false },
-  -- stylua: ignore
   { "<leader>fP", pick_find_plugin_files, desc = "Find Plugin File" },
+  { "<leader>sP", pick_search_plugin_codes, desc = "Search Plugin Code" },
   { "<leader>fL", pick_find_lazy_files, desc = "Find Lazy File" },
   { "<leader>sL", pick_search_lazy_codes, desc = "Search Lazy Code" },
-  { "<leader>fB", pick_find_buffer_dir_files, desc = "Find Files (Buffer Dir)" },
+  { "<leader>fB", function() LazyVim.pick("files", { cwd = vim.fn.expand("%:p:h") })() end, desc = "Find Files (Buffer Dir)" },
+  { "<leader>sB", function() LazyVim.pick("live_grep", { cwd = vim.fn.expand("%:p:h") })() end, desc = "Grep (Buffer Dir)" },
 }
 
 return {
@@ -85,7 +93,7 @@ return {
     optional = true,
     keys = {
       { "<leader>s.", "<cmd>FzfLua resume<cr>", desc = "Resume" },
-      { "<leader>sP", pick_search_lazy_specs, desc = "Search Lazy Plugin Spec" },
+      { "<leader>sp", pick_search_lazy_specs, desc = "Search Lazy Plugin Spec" },
       unpack(keys),
     },
   },
@@ -221,7 +229,7 @@ return {
       },
     },
     keys = {
-      { "<leader>sP", "<Cmd>Telescope lazy_plugins<CR>", desc = "Search Lazy Plugin Spec" },
+      { "<leader>sp", "<Cmd>Telescope lazy_plugins<CR>", desc = "Search Lazy Plugin Spec" },
     },
   },
 

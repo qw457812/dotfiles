@@ -4,7 +4,7 @@ require("full-border"):setup()
 require("git"):setup()
 -- https://github.com/llanosrocas/githead.yazi
 require("githead"):setup({
-  -- eza style
+  -- powerlevel10k style
   branch_prefix = "",
   branch_color = "#54d100",
   branch_symbol = "",

@@ -13,6 +13,7 @@ return {
   -- use <tab> for completion and snippets (supertab)
   {
     "hrsh7th/nvim-cmp",
+    optional = true,
     ---@param opts cmp.ConfigSchema
     opts = function(_, opts)
       local has_words_before = function()

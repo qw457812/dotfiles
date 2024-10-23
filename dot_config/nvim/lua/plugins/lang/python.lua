@@ -206,6 +206,7 @@ return {
       },
       {
         "hrsh7th/nvim-cmp",
+        optional = true,
         opts = function(_, opts)
           table.insert(opts.sources, { name = "py-requirements" })
         end,
