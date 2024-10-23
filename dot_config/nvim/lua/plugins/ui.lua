@@ -25,7 +25,7 @@ return {
     end,
     opts = {
       options = {
-        separator_style = "slant", -- slope
+        separator_style = vim.g.user_transparent_background and { "", "" } or "slant", -- slope
         -- in favor of `BufferLineGoToBuffer`
         numbers = function(opts)
           ---@type bufferline.State
