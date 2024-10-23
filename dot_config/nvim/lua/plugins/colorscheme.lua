@@ -1,15 +1,16 @@
 local colorschemes = {
   -- "tokyonight", -- custom style, `tokyonight-custom` not working
   "tokyonight-moon",
-  "tokyonight-storm",
+  -- "tokyonight-storm",
   -- "tokyonight-night",
-  -- "catppuccin-frappe",
-  "catppuccin-macchiato",
+  "catppuccin-frappe",
+  -- "catppuccin-macchiato",
   -- "catppuccin-mocha",
   -- "neon-punkpeach-storm",
   -- "neon-punkpeach-night",
   -- "onedark",
   -- "obscure",
+  "cyberdream",
   -- "kanagawa-wave",
   -- "kanagawa-dragon",
   -- "nightfox",
@@ -416,6 +417,33 @@ return {
 
           hl.MiniIndentscopeSymbol = { fg = c.subtext2, nocombine = true }
         end,
+      }
+    end,
+  },
+
+  {
+    "scottmckendry/cyberdream.nvim",
+    cond = cond_colorscheme("^cyberdream$"),
+    lazy = true,
+    opts = function()
+      local util = require("cyberdream.util")
+      return {
+        transparent = vim.g.user_transparent_background,
+        borderless_telescope = false,
+        theme = {
+          -- ~/.local/share/nvim/lazy/cyberdream.nvim/lua/cyberdream/colors.lua
+          overrides = function(c)
+            local illuminate = util.blend(c.bgHighlight, c.fg, 0.875)
+            return {
+              IlluminatedWordRead = { bg = illuminate },
+              IlluminatedWordWrite = { bg = illuminate, underline = true },
+              LspReferenceRead = { link = "IlluminatedWordRead" },
+              LspReferenceWrite = { link = "IlluminatedWordWrite" },
+              CmpGhostText = { bg = c.bg, fg = util.blend(c.grey, c.fg, 0.85) },
+              DiagnosticUnnecessary = { fg = util.blend(c.grey, c.fg, 0.7) },
+            }
+          end,
+        },
       }
     end,
   },

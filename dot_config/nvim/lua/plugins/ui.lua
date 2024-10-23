@@ -194,7 +194,10 @@ return {
       opts.options.component_separators = { left = "", right = "" }
 
       local bubbles = false
-      if bubbles then
+      if vim.g.colors_name == "cyberdream" and vim.g.user_transparent_background then
+        opts.options.section_separators = { left = "", right = "" }
+        opts.sections.lualine_z = { { "location" } }
+      elseif bubbles then
         opts.options.section_separators = { left = "", right = "" }
         mode.separator = { left = "" }
         opts.sections.lualine_z = { { "location", separator = { right = "" } } }

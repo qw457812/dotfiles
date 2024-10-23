@@ -23,6 +23,7 @@
   "copilot.lua": { "branch": "master", "commit": "f8d8d872bb319f640d5177dad5fbf01f7a16d7d0" },
   "csgithub.nvim": { "branch": "master", "commit": "695f7c30433c87fc45d0af116fd5bfdc65d1b7fe" },
   "curl.nvim": { "branch": "main", "commit": "e3e70d8b2cce6b45291a25156fbb50921e3ae941" },
+  "cyberdream.nvim": { "branch": "main", "commit": "7e6feb49d2ec47a742215754ec0ecc51eebba55a" },
   "dashboard-nvim": { "branch": "master", "commit": "d2c5a4d1341f5ca1ed2ecb4ecfcff2bc8ea18b14" },
   "dial.nvim": { "branch": "master", "commit": "ed4d6a5bbd5e479b4c4a3019d148561a2e6c1490" },
   "dressing.nvim": { "branch": "master", "commit": "1b7921eecc65af1baf8ac1dc06f0794934cbcfb2" },
