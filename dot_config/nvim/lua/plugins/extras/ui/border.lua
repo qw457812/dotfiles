@@ -60,7 +60,6 @@ return {
       popup_border_style = "rounded",
       default_component_configs = {
         indent = {
-          -- indent_marker = "│",
           last_indent_marker = "╰",
         },
       },

@@ -159,6 +159,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] Map `esc` for some buffers (maybe floating windows?) in [close.lua](lua/plugins/close.lua).
   - Maybe map `q` to close window like [rafi](https://github.com/rafi/vim-config/blob/814f312d92e97282913f4c3ef5f09712840b5604/lua/rafi/config/keymaps.lua#L374), and map `<C-q>` for macros.
 - [ ] Check this [util/path.lua](https://github.com/sakakibara/dotfiles/blob/f281ed9865623e204becbc3b87b3983045421422/dot_config/nvim/lua/util/path.lua).
+- [ ] Use `<leader>f,` instead of `<leader>fc` like [chrisgrieser](https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/lazy.lua#L129).
 - [ ] Use [olimorris/persisted.nvim](https://github.com/olimorris/persisted.nvim) instead of `folke/persistence.nvim` like [Matt-FTW](https://github.com/Matt-FTW/dotfiles/blob/ccaa72f977f207cc63ee9798003021534d3053c6/.config/nvim/lua/plugins/extras/util/persisted.lua#L3).
   - Or [stevearc/resession.nvim](https://github.com/stevearc/resession.nvim) mentioned in [astrocore](https://github.com/AstroNvim/astrocore#-installation).
 - [ ] Highlight trailing whitespace and inline double space.
