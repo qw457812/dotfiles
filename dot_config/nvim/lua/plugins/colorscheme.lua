@@ -499,23 +499,31 @@ return {
     "RRethy/vim-illuminate",
     optional = true,
     opts = function()
-      local hl = vim.api.nvim_get_hl(0, { name = "IlluminatedWordWrite", link = false, create = false })
-      if not (hl.bg and hl.underline) then
-        local bg = LazyVim.ui.color("Normal", true)
-        local visual = LazyVim.ui.color("Visual", true)
-        local comment = LazyVim.ui.color("Comment")
+      local function set_illuminate_hl()
+        local hl = vim.api.nvim_get_hl(0, { name = "IlluminatedWordWrite", link = false, create = false })
+        if not (hl.bg and hl.underline) then
+          local bg = LazyVim.ui.color("Normal", true)
+          local visual = LazyVim.ui.color("Visual", true)
+          local comment = LazyVim.ui.color("Comment")
 
-        local illuminate = U.color.lighten(visual, 0.925)
-        -- add `default = true` to avoid overriding colorscheme's highlight group
-        vim.api.nvim_set_hl(0, "IlluminatedWordText", { bg = U.color.darken(visual, 0.9) })
-        vim.api.nvim_set_hl(0, "IlluminatedWordRead", { bg = illuminate })
-        vim.api.nvim_set_hl(0, "IlluminatedWordWrite", { bg = illuminate, underline = true })
+          local illuminate = U.color.lighten(visual, 0.925)
+          -- add `default = true` to avoid overriding colorscheme's highlight group
+          vim.api.nvim_set_hl(0, "IlluminatedWordText", { bg = U.color.darken(visual, 0.9) })
+          vim.api.nvim_set_hl(0, "IlluminatedWordRead", { bg = illuminate })
+          vim.api.nvim_set_hl(0, "IlluminatedWordWrite", { bg = illuminate, underline = true })
 
-        -- compensate for invisible text caused by custom illuminate highlight
-        vim.api.nvim_set_hl(0, "CmpGhostText", { bg = bg, fg = U.color.lighten(comment, 0.85) })
-        -- stylua: ignore
-        vim.api.nvim_set_hl(0, "DiagnosticUnnecessary", { fg = U.color.lighten(LazyVim.ui.color("DiagnosticUnnecessary") or comment, 0.7) })
+          -- compensate for invisible text caused by custom illuminate highlight
+          vim.api.nvim_set_hl(0, "CmpGhostText", { bg = bg, fg = U.color.lighten(comment, 0.85) })
+          -- stylua: ignore
+          vim.api.nvim_set_hl(0, "DiagnosticUnnecessary", { fg = U.color.lighten(LazyVim.ui.color("DiagnosticUnnecessary") or comment, 0.7) })
+        end
       end
+
+      set_illuminate_hl()
+
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        callback = set_illuminate_hl,
+      })
     end,
   },
 
