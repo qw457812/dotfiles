@@ -188,22 +188,20 @@ return {
         },
         { "progress" },
       }
+      local location = { "location" }
+      opts.sections.lualine_z = { location }
 
       -- "" ┊ |          
       -- nerdfont-powerline icons prefix: `ple-`
       opts.options.component_separators = { left = "", right = "" }
 
       local bubbles = false
-      if vim.g.colors_name == "cyberdream" and vim.g.user_transparent_background then
-        opts.options.section_separators = { left = "", right = "" }
-        opts.sections.lualine_z = { { "location" } }
-      elseif bubbles then
+      if bubbles then
         opts.options.section_separators = { left = "", right = "" }
         mode.separator = { left = "" }
-        opts.sections.lualine_z = { { "location", separator = { right = "" } } }
+        location.separator = { right = "" }
       else
         opts.options.section_separators = { left = "", right = "" }
-        opts.sections.lualine_z = { { "location" } }
       end
 
       table.insert(opts.extensions, "mason")

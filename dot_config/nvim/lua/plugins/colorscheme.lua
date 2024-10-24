@@ -24,6 +24,7 @@ local last_random ---@type string?
 ---@return string?
 local function random_colorscheme()
   local themes = vim.tbl_filter(function(v)
+    -- vim.fn.execute("colorscheme")
     return v ~= last_random and v ~= vim.g.colors_name
   end, colorschemes)
   if #themes == 0 then
@@ -425,10 +426,36 @@ return {
     "scottmckendry/cyberdream.nvim",
     cond = cond_colorscheme("^cyberdream$"),
     lazy = true,
+    init = function()
+      local lualine_section_separators_orig
+      local is_lualine_section_separators_modified = false
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        callback = function(event)
+          -- https://github.com/scottmckendry/cyberdream.nvim/blob/7e6feb49d2ec47a742215754ec0ecc51eebba55a/lua/cyberdream/util.lua#L257
+          local ok, lualine = pcall(require, "lualine")
+          if not ok then
+            return
+          end
+
+          local lualine_opts = lualine.get_config()
+          if event.match == "cyberdream" and vim.g.user_transparent_background then
+            lualine_section_separators_orig = lualine_section_separators_orig or lualine_opts.options.section_separators
+            lualine_opts.options.section_separators = { left = "", right = "" }
+            is_lualine_section_separators_modified = true
+          elseif is_lualine_section_separators_modified then
+            lualine_opts.options.section_separators = lualine_section_separators_orig
+          else
+            return
+          end
+          lualine.setup(lualine_opts)
+        end,
+      })
+    end,
     opts = function()
       local util = require("cyberdream.util")
       return {
         transparent = vim.g.user_transparent_background,
+        italic_comments = true,
         borderless_telescope = false,
         theme = {
           -- ~/.local/share/nvim/lazy/cyberdream.nvim/lua/cyberdream/colors.lua
