@@ -1,21 +1,27 @@
-local colorschemes = {
-  -- "tokyonight", -- custom style, `tokyonight-custom` not working
+-- tokyonight (custom style, `tokyonight-custom` not working)
+-- tokyonight-moon
+-- tokyonight-storm
+-- tokyonight-night
+-- catppuccin-frappe
+-- catppuccin-macchiato
+-- catppuccin-mocha
+-- neon-punkpeach-storm
+-- neon-punkpeach-night
+-- onedark
+-- obscure
+-- cyberdream
+-- kanagawa-wave
+-- kanagawa-dragon
+-- nightfox
+-- nordfox
+-- astrodark
+local colorschemes = vim.g.user_transparent_background and {
   "tokyonight-moon",
-  -- "tokyonight-storm",
-  -- "tokyonight-night",
   "catppuccin-frappe",
-  -- "catppuccin-macchiato",
-  -- "catppuccin-mocha",
-  -- "neon-punkpeach-storm",
-  -- "neon-punkpeach-night",
-  -- "onedark",
-  -- "obscure",
-  "cyberdream",
-  -- "kanagawa-wave",
-  -- "kanagawa-dragon",
-  -- "nightfox",
-  -- "nordfox",
-  -- "astrodark",
+} or {
+  "tokyonight-moon",
+  "tokyonight-storm",
+  "catppuccin-macchiato",
 }
 
 local last_random ---@type string?
@@ -47,7 +53,9 @@ local function cond_colorscheme(pattern)
   return false
 end
 
-local to_neutral_gray = U.color.to_neutral_gray
+local function to_neutral_gray(color)
+  return vim.g.user_transparent_background and color or U.color.to_neutral_gray(color)
+end
 
 local tokyonight_custom_style = "custom"
 
