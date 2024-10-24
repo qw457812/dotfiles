@@ -57,8 +57,9 @@ return {
     "nvim-lualine/lualine.nvim",
     optional = true,
     opts = function(_, opts)
-      -- local function hl_text(text, hl)
-      --   return "%#" .. hl .. "#" .. text .. "%*"
+      -- -- https://github.com/Bekaboo/dropbar.nvim/blob/998441a88476af2ec77d8cb1b21bae62c9f548c1/lua/dropbar/utils/bar.lua#L11
+      -- local function hl_str(str, hl)
+      --   return "%#" .. hl .. "#" .. str .. "%*"
       -- end
 
       local function ft_icon()

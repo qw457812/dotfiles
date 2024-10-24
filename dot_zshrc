@@ -330,7 +330,7 @@ alias view="nvim -R"
 function zvm_after_init() {
   # https://github.com/junegunn/fzf#setting-up-shell-integration
   # Set up fzf key bindings and fuzzy completion
-  eval "$(fzf --zsh)"
+  source <(fzf --zsh)
 
   # downside vs fzf: atuin do not highlight the matched text like fzf do: https://github.com/atuinsh/atuin/issues/503
   # https://docs.atuin.sh/configuration/key-binding/
