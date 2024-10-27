@@ -221,7 +221,7 @@
            [:s :!Ss]
            [:d :!Sd]
            [:f :!Sf]
-           [:g :!Sg]
+           [:g :!Sg :!Preview]
            [:h :!Sh :!Preview]
            [:j :!Sj]
            [:k :!Sk]
@@ -269,9 +269,10 @@
            [:left_control :!Sescape :hhkb-bt] ; shift+esc for IntelliJ IDEA, Raycast
 
            ;; see "Preview: doomemacs like keybindings" below
-           [:w :!C0 :Preview] ; Actual Size (doomemacs pdf-view-fit-width-to-window)
-           [:h :!C9 :Preview] ; Zoom to Fit (doomemacs pdf-view-fit-height-to-window)
-           [:p :!C9 :Preview] ; Zoom to Fit (doomemacs pdf-view-fit-page-to-window)
+           [:g :!Cdown_arrow :Preview]
+           [:w :!C9 :Preview] ; Actual Size (doomemacs pdf-view-fit-width-to-window)
+           [:h :!C0 :Preview] ; Zoom to Fit (doomemacs pdf-view-fit-height-to-window)
+           [:p :!C0 :Preview] ; Zoom to Fit (doomemacs pdf-view-fit-page-to-window)
 
            ; see "WeWork: chat message navigation" below
            [:return_or_enter :!Creturn_or_enter :WeWork] ; new line in Sheet cells
@@ -321,7 +322,7 @@
            [:s :!Ss]
            [:d :!Sd]
            [:f :!Sf]
-           [:g :!Sg]
+           [:g :!Sg :!Preview]
            [:h :!Sh :!Preview]
            [:j :!Sj]
            [:k :!Sk]
@@ -355,9 +356,10 @@
            [:grave_accent_and_tilde :vk_none] ; see "For Glove80" below
 
            ;; see "Preview: doomemacs like keybindings" below
-           [:w :!C0 :Preview] ; Actual Size (doomemacs pdf-view-fit-width-to-window)
-           [:h :!C9 :Preview] ; Zoom to Fit (doomemacs pdf-view-fit-height-to-window)
-           [:p :!C9 :Preview] ; Zoom to Fit (doomemacs pdf-view-fit-page-to-window)
+           [:g :!Cdown_arrow :Preview]
+           [:w :!C9 :Preview] ; Actual Size (doomemacs pdf-view-fit-width-to-window)
+           [:h :!C0 :Preview] ; Zoom to Fit (doomemacs pdf-view-fit-height-to-window)
+           [:p :!C0 :Preview] ; Zoom to Fit (doomemacs pdf-view-fit-page-to-window)
 
            ; see "WeWork: chat message navigation" below
            [:return_or_enter :!Creturn_or_enter :WeWork] ; new line in Sheet cells
@@ -390,8 +392,8 @@
            [:t :!Tt]
            [:y :!Ty]
            [:u :!Tu :!Spotify]
-           [:i :!Ti :!Finder]
-           [:o :!To :!Finder]
+           [:i :!Ti [:!Finder :!Preview]]
+           [:o :!To [:!Finder :!Preview]]
            [:p :!Tp]
            [:open_bracket :!Topen_bracket]
            [:close_bracket :!Tclose_bracket]
@@ -450,6 +452,10 @@
            [:l :!Cdown_arrow :Finder]
            [:o :!Copen_bracket :Finder] ; Back
            [:i :!Cclose_bracket :Finder] ; Forward
+
+           ;; see "Preview: doomemacs like keybindings" below
+           [:o :!Copen_bracket :Preview] ; previous position
+           [:i :!Cclose_bracket :Preview] ; next position
            ]}
 
   {:des   "delete mode for glove80 (control)"
@@ -473,8 +479,8 @@
            [:t :!Tt]
            [:y :!Ty]
            [:u :!Tu :!Spotify]
-           [:i :!Ti :!Finder]
-           [:o :!To :!Finder]
+           [:i :!Ti [:!Finder :!Preview]]
+           [:o :!To [:!Finder :!Preview]]
            [:p :!Tp]
            [:open_bracket :!Topen_bracket]
            [:close_bracket :!Tclose_bracket]
@@ -533,6 +539,10 @@
            [:l :!Cdown_arrow :Finder]
            [:o :!Copen_bracket :Finder] ; Back
            [:i :!Cclose_bracket :Finder] ; Forward
+
+           ;; see "Preview: doomemacs like keybindings" below
+           [:o :!Copen_bracket :Preview] ; previous position
+           [:i :!Cclose_bracket :Preview] ; next position
            ]}
 
   ;; use `:!T1` instead of `:!W1` to avoid toggling rime's ascii_mode by right_control
@@ -1719,38 +1729,46 @@
            ]}
 
   ;; behaves like doomemacs pdf-tools | ~/.config/doomemacs/.local/straight/repos/pdf-tools/lisp/pdf-view.el
+  ;; https://github.com/xrisk/preview-vim/blob/master/preview-vim.json
   {:des   "Preview: doomemacs like keybindings"
    :rules [:Preview
            [:j :down_arrow]
            [:k :up_arrow]
            [:h :left_arrow]
            [:l :right_arrow]
-           ;; page_up/page_down not work, use arrow + scroll
-           [:u [:up_arrow :up_arrow :up_arrow :up_arrow :up_arrow
-                :up_arrow :up_arrow :up_arrow :up_arrow :up_arrow
-                :up_arrow :up_arrow :up_arrow :up_arrow :up_arrow
-                {:mkey {:vwheel 32}}]]
-           ;; scroll down's delay is higher than scroll up
-           [:d [:down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
-                :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
-                :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
-                :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
-                :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
-                :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
-                :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
-                :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
-                {:mkey {:vwheel -32}}]]
+           ;; ;; page_up/page_down not work, use arrow + scroll
+           ;; [:u [:up_arrow :up_arrow :up_arrow :up_arrow :up_arrow
+           ;;      :up_arrow :up_arrow :up_arrow :up_arrow :up_arrow
+           ;;      :up_arrow :up_arrow :up_arrow :up_arrow :up_arrow
+           ;;      {:mkey {:vwheel 32}}]]
+           ;; ;; scroll down's delay is higher than scroll up
+           ;; [:d [:down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
+           ;;      :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
+           ;;      :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
+           ;;      :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
+           ;;      :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
+           ;;      :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
+           ;;      :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
+           ;;      :down_arrow :down_arrow :down_arrow :down_arrow :down_arrow
+           ;;      {:mkey {:vwheel -32}}]]
+           [:u :!Oup_arrow] ; next page
+           [:d :!Odown_arrow] ; previous page
+           [:g :!Cup_arrow] ; first page
+           [:!Rg :!Cdown_arrow] ; last page
+           [:!To :!Copen_bracket] ; previous position
+           [:!Ti :!Cclose_bracket] ; next position
            [:equal_sign :!Cequal_sign] ; Zoom In
            [:hyphen :!Chyphen] ; Zoom Out
-           [:!Rw :!C0] ; Actual Size (doomemacs pdf-view-fit-width-to-window)
-           [:!Sw :!C0] ; Actual Size
-           [:w :!C0] ; Actual Size
-           [:!Sh :!C9] ; Zoom to Fit (doomemacs pdf-view-fit-height-to-window)
-           [:!Sp :!C9] ; Zoom to Fit (doomemacs pdf-view-fit-page-to-window)
-           [:p :!C9] ; Zoom to Fit
-           [:0 :!C9] ; Zoom to Fit (doomemacs pdf-view-scale-reset)
+           [:!Rw :!C9] ; Actual Size (doomemacs pdf-view-fit-width-to-window)
+           [:!Sw :!C9] ; Actual Size
+           [:w :!C9] ; Actual Size
+           [:!Sh :!C0] ; Zoom to Fit (doomemacs pdf-view-fit-height-to-window)
+           [:!Sp :!C0] ; Zoom to Fit (doomemacs pdf-view-fit-page-to-window)
+           [:p :!C0] ; Zoom to Fit
+           [:0 :!C0] ; Zoom to Fit (doomemacs pdf-view-scale-reset)
            [:q :!Cq] ; Quit
            [:x :!Cw] ; Close Window
+           [:delete_or_backspace :!Cw] ; Close Window
            ]}
 
   {:des   "Activity Monitor: / -> filter"
@@ -1776,7 +1794,8 @@
            ;; [:##delete_forward :delete_or_backspace]
            [:##delete_forward :tab]
            ;; [:##left_shift :left_command nil {:alone :prev_app}]
-           [:##left_shift :delete_or_backspace] ; see lshift-cmd-mode simlayer above
+           [:##left_shift :delete_or_backspace :!Preview] ; see lshift-cmd-mode simlayer above
+           [:##left_shift :!Cw :Preview] ; see "Preview: doomemacs like keybindings" above
            [:##right_shift :right_command nil {:alone :escape}]
            [:##left_option :left_option [:!tmux-autostart-terminals :!VSCode :!Cursor] {:alone :open-default-terminal}]
            [:##left_option :left_option :tmux-autostart-terminals {:alone [:!Tb]}] ; tmux prefix
