@@ -6,7 +6,10 @@ return {
   {
     "Bekaboo/dropbar.nvim",
     event = "VeryLazy",
-    dependencies = { "nvim-telescope/telescope-fzf-native.nvim", optional = true },
+    dependencies = {
+      "echasnovski/mini.icons",
+      { "nvim-telescope/telescope-fzf-native.nvim", optional = true },
+    },
     init = function()
       vim.g.trouble_lualine = false
     end,
@@ -17,6 +20,7 @@ return {
     opts = function(_, opts)
       local sources = require("dropbar.sources")
       local menu_utils = require("dropbar.utils.menu")
+      local dropbar_default_opts = require("dropbar.configs").opts
 
       -- custom highlight
       -- stylua: ignore start
@@ -87,9 +91,9 @@ return {
       return vim.tbl_deep_extend("force", opts, {
         general = {
           enable = false, -- using lualine.nvim
-          update_interval = 20, -- performance for holding down `j`: 17 ~ 20
         },
         bar = {
+          update_debounce = 20, -- performance for holding down `j`: 17 ~ 20
           sources = function(buf, _)
             if vim.bo[buf].ft == "markdown" then
               return { source_path, source_markdown }
@@ -99,6 +103,27 @@ return {
             end
             return { source_path } -- using trouble.nvim's symbols instead, because it's shorter
           end,
+        },
+        icons = {
+          kinds = {
+            ---@type fun(path: string): string, string?|false
+            dir_icon = function(path)
+              local icon, hl, is_default = require("mini.icons").get("directory", path)
+              if not is_default then
+                return icon .. " ", hl
+              end
+              return dropbar_default_opts.icons.kinds.dir_icon(path)
+            end,
+            -- not necessary
+            ---@type fun(path: string): string, string?|false
+            file_icon = function(path)
+              local icon, hl, is_default = require("mini.icons").get("file", path)
+              if not is_default then
+                return icon .. " ", hl
+              end
+              return dropbar_default_opts.icons.kinds.file_icon(path)
+            end,
+          },
         },
         menu = {
           keymaps = {
