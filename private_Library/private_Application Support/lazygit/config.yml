@@ -7,6 +7,8 @@ git:
     pager: delta --dark --paging=never
 # exit Lazygit when the user presses escape in a context where there is nothing to cancel/close
 quitOnTopLevelReturn: true
+notARepository: skip
+promptToReturnFromSubprocess: false
 keybinding:
   universal:
     # not working, but <c-h> works
