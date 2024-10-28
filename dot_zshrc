@@ -629,3 +629,12 @@ fi
 
 # # https://github.com/wlh320/rime-ls#macos
 # export DYLD_LIBRARY_PATH=$HOME/rime-ls/librime/dist/lib
+
+# reload network
+function newloc() {
+  local old="$(networksetup -getcurrentlocation)"
+  local new="tmp_$(date '+%Y%m%d_%H%M%S')"
+  if networksetup -createlocation "$new" populate >/dev/null && networksetup -switchtolocation "$new" >/dev/null && [[ "$old" == "tmp_"* ]]; then
+    networksetup -deletelocation "$old" >/dev/null
+  fi
+}
