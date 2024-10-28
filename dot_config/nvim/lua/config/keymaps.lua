@@ -93,8 +93,12 @@ LazyViewConfig.commands.log.key = "gL"
 -- map("n", "<bs>", "<cmd>bd<cr>", { desc = "Delete Buffer and Window" })
 -- map("n", "<bs>", "<cmd>wincmd q<cr>", { desc = "Close window" })
 
-map_del({ "n", "x", "o" }, "n")
-map_del({ "n", "x", "o" }, "N")
+map_del({ "x", "o" }, "n")
+map_del({ "x", "o" }, "N")
+if not LazyVim.has("nvim-hlslens") then
+  map_del("n", "n")
+  map_del("n", "N")
+end
 
 map_del("i", ",")
 map_del("i", ".")

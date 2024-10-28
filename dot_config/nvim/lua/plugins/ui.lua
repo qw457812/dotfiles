@@ -364,4 +364,38 @@ return {
       })
     end,
   },
+
+  {
+    "kevinhwang91/nvim-hlslens",
+    keys = {
+      { "n", [[<Cmd>execute('normal! ' . v:count1 . 'n')<CR><Cmd>lua require('hlslens').start()<CR>]] },
+      { "N", [[<Cmd>execute('normal! ' . v:count1 . 'N')<CR><Cmd>lua require('hlslens').start()<CR>]] },
+      { "*", [[*<Cmd>lua require('hlslens').start()<CR>]] },
+      { "#", [[#<Cmd>lua require('hlslens').start()<CR>]] },
+      { "g*", [[g*<Cmd>lua require('hlslens').start()<CR>]] },
+      { "g#", [[g#<Cmd>lua require('hlslens').start()<CR>]] },
+    },
+    opts = {
+      nearest_only = true,
+      -- https://github.com/fjchen7/dotfiles/blob/a45b0a2778c18d82d5b3cba88de05e9351bee713/config/nvim/lua/plugins/ui/hlslens.lua#L16
+      override_lens = function(render, posList, nearest, idx, relIdx)
+        -- -- only show len of the nearest matched, redundant with `nearest_only`
+        -- if not nearest then
+        --   return
+        -- end
+
+        -- only show len when the cursor at the start of position range of the nearest matched
+        if relIdx ~= 0 then
+          return
+        end
+
+        local lnum, col = unpack(posList[idx])
+        local cnt = #posList
+        local text = ("[%d/%d]"):format(idx, cnt)
+        local hl = nearest and "HlSearchLensNear" or "HlSearchLens"
+        local chunks = { { " " }, { text, hl } }
+        render.setVirt(0, lnum - 1, col - 1, chunks, nearest)
+      end,
+    },
+  },
 }
