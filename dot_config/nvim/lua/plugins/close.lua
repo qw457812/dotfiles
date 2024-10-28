@@ -256,4 +256,22 @@ return {
       })
     end,
   },
+
+  {
+    "potamides/pantran.nvim",
+    optional = true,
+    opts = function(_, opts)
+      local actions = require("pantran.ui.actions")
+
+      opts.controls = vim.tbl_deep_extend("force", {
+        mappings = {
+          edit = {
+            n = {
+              [close_key] = actions.close,
+            },
+          },
+        },
+      }, opts.controls or {})
+    end,
+  },
 }
