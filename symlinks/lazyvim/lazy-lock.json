@@ -99,6 +99,7 @@
   "oil.nvim": { "branch": "master", "commit": "cca1631d5ea450c09ba72f3951a9e28105a3632c" },
   "onedark.nvim": { "branch": "master", "commit": "fae34f7c635797f4bf62fb00e7d0516efa8abe37" },
   "orgmode": { "branch": "master", "commit": "c6540955acbec33a0d0b4b1cb97da3e0bf99b4e1" },
+  "pantran.nvim": { "branch": "main", "commit": "250b1d8e81f83e6aff061f4c75db008c684f5971" },
   "persistence.nvim": { "branch": "main", "commit": "f6aad7dde7fcf54148ccfc5f622c6d5badd0cc3d" },
   "plenary.nvim": { "branch": "master", "commit": "2d9b06177a975543726ce5c73fca176cedbffe9d" },
   "project.nvim": { "branch": "main", "commit": "8c6bad7d22eef1b71144b401c9f74ed01526a4fb" },

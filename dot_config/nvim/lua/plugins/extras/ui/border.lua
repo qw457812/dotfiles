@@ -95,4 +95,16 @@ return {
       },
     },
   },
+
+  {
+    "potamides/pantran.nvim",
+    optional = true,
+    opts = {
+      window = {
+        window_config = {
+          border = "rounded",
+        },
+      },
+    },
+  },
 }

@@ -10,11 +10,16 @@ return {
       require("Trans").install()
     end,
     keys = {
-      -- mm
-      { "m<space>", mode = { "n", "x" }, "<Cmd>Translate<CR>", desc = "󰊿 Translate" },
-      -- { "mk", mode = { "n", "x" }, "<Cmd>TransPlay<CR>", desc = " Auto Play" },
-      -- mi
-      { "m<tab>", "<Cmd>TranslateInput<CR>", desc = "󰊿 Translate From Input" },
+      {
+        "m<space>",
+        mode = {
+          "n",
+          -- "x",
+        },
+        "<Cmd>Translate<CR>",
+        desc = "󰊿 Translate",
+      },
+      -- { "m<tab>", "<Cmd>TranslateInput<CR>", desc = "󰊿 Translate From Input" },
     },
     -- baidu, youdao settings: ~/.local/share/nvim/lazy/Trans.nvim/Trans.json
     opts = {
@@ -77,5 +82,68 @@ return {
         },
       },
     },
+  },
+
+  {
+    "potamides/pantran.nvim",
+    keys = {
+      {
+        "m<space>",
+        mode = {
+          -- "n",
+          "x",
+        },
+        function()
+          -- return require("pantran").motion_translate({ mode = "hover" })
+          return require("pantran").motion_translate()
+        end,
+        expr = true,
+        desc = "Translate Motion",
+      },
+      -- {
+      --   "m<space><space>",
+      --   function()
+      --     return require("pantran").motion_translate() .. "_"
+      --   end,
+      --   expr = true,
+      --   desc = "Translate Motion",
+      -- },
+      { "m<tab>", "<cmd>Pantran<CR>i", desc = "Translate Prompt" },
+    },
+    opts = function(_, opts)
+      local actions = require("pantran.ui.actions")
+
+      return U.extend_tbl(opts, {
+        -- command = {
+        --   default_mode = "hover",
+        -- },
+        default_engine = "google",
+        engines = {
+          google = {
+            default_source = "auto",
+            default_target = "zh-CN",
+            fallback = {
+              default_source = "auto",
+              default_target = "zh-CN",
+            },
+          },
+        },
+        controls = {
+          mappings = {
+            edit = {
+              i = {
+                ["<C-c>"] = function(ui)
+                  vim.cmd("stopinsert")
+                  actions.close(ui)
+                end,
+              },
+            },
+          },
+        },
+        window = {
+          title_border = { "", "" },
+        },
+      })
+    end,
   },
 }
