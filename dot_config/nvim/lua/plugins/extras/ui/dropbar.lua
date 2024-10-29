@@ -89,10 +89,8 @@ return {
       end
 
       return vim.tbl_deep_extend("force", opts, {
-        general = {
-          enable = false, -- using lualine.nvim
-        },
         bar = {
+          enable = false, -- using lualine.nvim
           update_debounce = 20, -- performance for holding down `j`: 17 ~ 20
           sources = function(buf, _)
             if vim.bo[buf].ft == "markdown" then
