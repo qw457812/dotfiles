@@ -367,6 +367,7 @@ return {
 
   {
     "kevinhwang91/nvim-hlslens",
+    event = "CmdlineEnter",
     keys = {
       { "n", [[<Cmd>execute('normal! ' . v:count1 . 'n')<CR><Cmd>lua require('hlslens').start()<CR>]] },
       { "N", [[<Cmd>execute('normal! ' . v:count1 . 'N')<CR><Cmd>lua require('hlslens').start()<CR>]] },
@@ -376,26 +377,52 @@ return {
       { "g#", [[g#<Cmd>lua require('hlslens').start()<CR>]] },
     },
     opts = {
+      calm_down = true,
       nearest_only = true,
       -- https://github.com/fjchen7/dotfiles/blob/a45b0a2778c18d82d5b3cba88de05e9351bee713/config/nvim/lua/plugins/ui/hlslens.lua#L16
       override_lens = function(render, posList, nearest, idx, relIdx)
-        -- -- only show len of the nearest matched, redundant with `nearest_only`
+        -- -- only show lens of the nearest matched, redundant with `nearest_only`
         -- if not nearest then
         --   return
         -- end
 
-        -- only show len when the cursor at the start of position range of the nearest matched
-        if relIdx ~= 0 then
-          return
-        end
+        -- -- only show lens when the cursor at the start of position range of the nearest matched
+        -- if relIdx ~= 0 then
+        --   return
+        -- end
 
+        local indicator = vim.v.searchforward == 0 and "▲" or ""
         local lnum, col = unpack(posList[idx])
         local cnt = #posList
-        local text = ("[%d/%d]"):format(idx, cnt)
+        local text
+        if nearest and indicator ~= "" then
+          text = ("[%s %d/%d]"):format(indicator, idx, cnt)
+        else
+          text = ("[%d/%d]"):format(idx, cnt)
+        end
         local hl = nearest and "HlSearchLensNear" or "HlSearchLens"
         local chunks = { { " " }, { text, hl } }
         render.setVirt(0, lnum - 1, col - 1, chunks, nearest)
       end,
     },
+    config = function(_, opts)
+      require("hlslens").setup(opts)
+
+      local Render = require("hlslens.render")
+      -- HACK: `calm_down` lens only, keep the hlsearch
+      -- copied from: https://github.com/kevinhwang91/nvim-hlslens/blob/07afd4dd14405ad14b142a501a3abea6ae44b21b/lua/hlslens/render/init.lua#L53
+      function Render:doNohAndStop(defer)
+        local function f()
+          -- vim.cmd("noh")
+          self:stop()
+        end
+
+        if defer then
+          vim.schedule(f)
+        else
+          f()
+        end
+      end
+    end,
   },
 }
