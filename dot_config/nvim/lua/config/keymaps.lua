@@ -78,7 +78,10 @@ end, { desc = "ColorScheme" })
 -- map("x", "L", "g_", { desc = "Goto line end" })
 map({ "n", "x" }, "H", "&wrap ? 'g^' : '0^'", { desc = "Goto line start", expr = true }) -- scroll fully to the left
 map("o", "H", "&wrap ? 'g^' : '^'", { desc = "Goto line start", expr = true })
-map({ "n", "o" }, "L", "v:count ? '$' : &wrap ? 'g$' : '$'", { desc = "Goto line end", expr = true })
+map("n", "l", "foldclosed('.') != -1 ? 'zo' : 'l'", { expr = true })
+-- stylua: ignore
+map("n", "L", "foldclosed('.') != -1 ? 'zO' : v:count ? '$' : &wrap ? 'g$' : '$'", { desc = "Goto line end", expr = true })
+map("o", "L", "v:count ? '$' : &wrap ? 'g$' : '$'", { desc = "Goto line end", expr = true })
 map("x", "L", "v:count ? 'g_' : &wrap ? 'g$' : 'g_'", { desc = "Goto line end", expr = true }) -- TODO: to the last non-blank character of the line when wrapped
 -- https://github.com/folke/lazy.nvim/issues/411
 -- https://github.com/folke/lazy.nvim/issues/133
