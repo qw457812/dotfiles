@@ -368,6 +368,7 @@ map gs <Action>(GotoSuperMethod)
 " https://github.com/axieax/dotconfig/blob/main/intellij/.ideavimrc
 " https://github.com/yunxiaoxiao11/nvimlazy/blob/3adac839389dc83bfe6bba6b60a3ae5bae9e09f6/jetbrains/.ideavimrc
 " https://github.com/orhnk/dotideavimrc/blob/master/.ideavimrc
+" https://github.com/kevinhwang91/dotfiles/blob/main/ideavim/ideavimrc
 
 " -----------------------------------------------------常用--------------------------------------------------------
 " keys: https://ideavim.sourceforge.net/vim/intro.html
