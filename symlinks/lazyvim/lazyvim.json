@@ -42,6 +42,7 @@
     "plugins.extras.coding.avante",
     "plugins.extras.editor.mini-operators",
     "plugins.extras.editor.undotree",
+    "plugins.extras.lsp.tiny-code-action",
     "plugins.extras.lsp.tiny-inline-diagnostic",
     "plugins.extras.ui.border",
     "plugins.extras.ui.dropbar",
