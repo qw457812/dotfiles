@@ -55,6 +55,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [chrisgrieser](https://github.com/chrisgrieser/.config/tree/main/nvim)
 - [sxyazi](https://github.com/sxyazi/dotfiles/tree/main/nvim)
 - [willothy](https://github.com/willothy/nvim-config)
+- [yetone](https://github.com/yetone/cosmos-nvim)
 
 ## Lazy Tips
 
@@ -152,6 +153,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] Fix lazy loading: telescope-undo.nvim, telescope-zoxide, telescope-file-browser.nvim, smart-open.nvim
 - [ ] Map `u`/`d`/`q`, and unmap `dd` for `man` filetype.
 - [ ] Maybe press `]b]]][[]` instead of `]b]b]b]b[b[b]b` by [hydra.nvim](https://github.com/anuvyklack/hydra.nvim).
+  - [pogyomo/submode.nvim](https://github.com/pogyomo/submode.nvim)
 - [ ] `<D-s>` not working in alacritty.
 - [ ] Better terminal keymaps than `<leader>.`.
 - [ ] Better `M`/`m<space>` keymaps.

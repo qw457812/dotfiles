@@ -268,6 +268,12 @@ return {
     end,
   },
 
+  {
+    "nacro90/numb.nvim",
+    event = "CmdlineEnter",
+    opts = {},
+  },
+
   -- TODO: choose motion plugin between: flash, leap, hop
   -- https://github.com/doctorfree/nvim-lazyman/blob/bb4091c962e646c5eb00a50eca4a86a2d43bcb7c/lua/ecovim/config/plugins.lua#L373
   -- "remote flash" for leap: https://github.com/rasulomaroff/telepath.nvim
