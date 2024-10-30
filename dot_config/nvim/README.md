@@ -147,6 +147,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] [benlubas/molten-nvim](https://github.com/benlubas/molten-nvim) for jupyter
 - [ ] Alternative to markdown-preview.nvim: [toppair/peek.nvim](https://github.com/toppair/peek.nvim) like [dpetka2001](https://github.com/dpetka2001/dotfiles/blob/4ae0b9e9a67e2a37a4fee7773a8c876d1ac890f3/dot_config/nvim/lua/plugins/tools.lua#L107).
 - [ ] [nvim-recorder](https://github.com/chrisgrieser/nvim-recorder)
+- [ ] [nvim-ufo](https://github.com/kevinhwang91/nvim-ufo)
 - [ ] [rasulomaroff/reactive.nvim](https://github.com/rasulomaroff/reactive.nvim)
 - [ ] lang.zsh like [aimuzov](https://github.com/aimuzov/LazyVimx/blob/main/lua/lazyvimx/extras/lang/zsh.lua).
 - [x] [tiny-inline-diagnostic.nvim](https://github.com/rachartier/tiny-inline-diagnostic.nvim) like [aimuzov](https://github.com/search?q=repo%3Aaimuzov%2FLazyVimx%20tiny-inline-diagnostic.nvim&type=code).
