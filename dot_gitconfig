@@ -56,4 +56,4 @@
     c = commit --verbose
     p = push
     # https://github.com/folke/dot/blob/3d97483b2a900849bc2dcacc8d86460155d2abc3/config/.gitconfig#L20
-    lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --decorate --date=short --color --decorate
+    l = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --decorate --date=short --color --decorate
