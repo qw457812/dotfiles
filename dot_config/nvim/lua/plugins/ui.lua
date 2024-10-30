@@ -365,16 +365,17 @@ return {
     end,
   },
 
+  -- see `:h noh` and `:h shortmess`
   {
     "kevinhwang91/nvim-hlslens",
     event = "CmdlineEnter",
     keys = {
       { "n", [[<Cmd>execute('normal! ' . v:count1 . 'n')<CR>zv<Cmd>lua require('hlslens').start()<CR>]] },
       { "N", [[<Cmd>execute('normal! ' . v:count1 . 'N')<CR>zv<Cmd>lua require('hlslens').start()<CR>]] },
-      { "*", [[*<Cmd>lua require('hlslens').start()<CR>]] },
-      { "#", [[#<Cmd>lua require('hlslens').start()<CR>]] },
-      { "g*", [[g*<Cmd>lua require('hlslens').start()<CR>]] },
-      { "g#", [[g#<Cmd>lua require('hlslens').start()<CR>]] },
+      { "*", [[*zv<Cmd>lua require('hlslens').start()<CR>]] },
+      { "#", [[#zv<Cmd>lua require('hlslens').start()<CR>]] },
+      { "g*", [[g*zv<Cmd>lua require('hlslens').start()<CR>]] },
+      { "g#", [[g#zv<Cmd>lua require('hlslens').start()<CR>]] },
     },
     opts = {
       calm_down = true,
