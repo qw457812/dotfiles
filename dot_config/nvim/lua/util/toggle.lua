@@ -1,4 +1,5 @@
-local LazyVimToggle = LazyVim.toggle
+local LazyToggle = LazyVim.toggle
+local LazyToggleDiag = LazyToggle.diagnostics
 
 ---@class util.toggle
 ---@field wrap fun(toggle:lazyvim.Toggle):lazyvim.Toggle.wrap
@@ -7,12 +8,12 @@ local M = {}
 
 setmetatable(M, {
   __index = function(_, k)
-    if LazyVimToggle[k] then
-      return LazyVimToggle[k]
+    if LazyToggle[k] then
+      return LazyToggle[k]
     end
   end,
   __call = function(_, ...)
-    return LazyVimToggle(...)
+    return LazyToggle(...)
   end,
 })
 
@@ -32,7 +33,7 @@ M.diagnostic_virtual_text = M.wrap({
   name = "Diagnostic Virtual Text",
   get = function()
     if has_diagnostic_virtual_text == nil then
-      return LazyVimToggle.diagnostics.get()
+      return LazyToggleDiag.get()
     end
     return has_diagnostic_virtual_text
   end,
@@ -54,8 +55,8 @@ M.diagnostic_virtual_text = M.wrap({
         } or false,
       })
     end
-    if state and not LazyVimToggle.diagnostics.get() then
-      LazyVimToggle.diagnostics.set(state)
+    if state and not LazyToggleDiag.get() then
+      LazyToggleDiag.set(state)
     end
   end,
 })
@@ -63,11 +64,11 @@ M.diagnostic_virtual_text = M.wrap({
 -- toggle diagnostics and it's virtual text
 M.diagnostics = M.wrap({
   name = "Diagnostics",
-  get = LazyVimToggle.diagnostics.get,
+  get = LazyToggleDiag.get,
   set = function(state)
     M.diagnostic_virtual_text.set(state)
     if not state then
-      LazyVimToggle.diagnostics.set(state)
+      LazyToggleDiag.set(state)
     end
   end,
 })
