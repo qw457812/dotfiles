@@ -26,6 +26,7 @@
     minus-emph-style = reverse red
     plus-emph-style = reverse green
     hunk-header-style = line-number syntax
+    ; hunk-header-decoration-style = omit
 
     ; diff-highlight = true
     ; file-style = bold yellow
