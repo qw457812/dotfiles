@@ -370,8 +370,8 @@ return {
     "kevinhwang91/nvim-hlslens",
     event = "CmdlineEnter",
     keys = {
-      { "n", [[<Cmd>execute('normal! ' . v:count1 . 'n')<CR>zv<Cmd>lua require('hlslens').start()<CR>]] },
-      { "N", [[<Cmd>execute('normal! ' . v:count1 . 'N')<CR>zv<Cmd>lua require('hlslens').start()<CR>]] },
+      { "n", [[<Cmd>execute('normal! ' . v:count1 . 'nzv')<CR><Cmd>lua require('hlslens').start()<CR>]] },
+      { "N", [[<Cmd>execute('normal! ' . v:count1 . 'Nzv')<CR><Cmd>lua require('hlslens').start()<CR>]] },
       { "*", [[*zv<Cmd>lua require('hlslens').start()<CR>]] },
       { "#", [[#zv<Cmd>lua require('hlslens').start()<CR>]] },
       { "g*", [[g*zv<Cmd>lua require('hlslens').start()<CR>]] },
