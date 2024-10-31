@@ -365,17 +365,25 @@ return {
     end,
   },
 
-  -- see `:h noh` and `:h shortmess`
   {
     "kevinhwang91/nvim-hlslens",
+    dependencies = {
+      -- https://github.com/kevinhwang91/nvim-hlslens/issues/64#issuecomment-1606196924
+      -- alternative: https://github.com/rapan931/lasterisk.nvim
+      { "haya14busa/vim-asterisk" },
+    },
     event = "CmdlineEnter",
     keys = {
       { "n", [[<Cmd>execute('normal! ' . v:count1 . 'nzv')<CR><Cmd>lua require('hlslens').start()<CR>]] },
       { "N", [[<Cmd>execute('normal! ' . v:count1 . 'Nzv')<CR><Cmd>lua require('hlslens').start()<CR>]] },
-      { "*", [[*zv<Cmd>lua require('hlslens').start()<CR>]] },
-      { "#", [[#zv<Cmd>lua require('hlslens').start()<CR>]] },
-      { "g*", [[g*zv<Cmd>lua require('hlslens').start()<CR>]] },
-      { "g#", [[g#zv<Cmd>lua require('hlslens').start()<CR>]] },
+      -- { "*", [[*zv<Cmd>lua require('hlslens').start()<CR>]] },
+      -- { "#", [[#zv<Cmd>lua require('hlslens').start()<CR>]] },
+      -- { "g*", [[g*zv<Cmd>lua require('hlslens').start()<CR>]] },
+      -- { "g#", [[g#zv<Cmd>lua require('hlslens').start()<CR>]] },
+      { "*", mode = { "n", "x" }, [[<Plug>(asterisk-*)zv<Cmd>lua require('hlslens').start()<CR>]] },
+      { "#", mode = { "n", "x" }, [[<Plug>(asterisk-#)zv<Cmd>lua require('hlslens').start()<CR>]] },
+      { "g*", mode = { "n", "x" }, [[<Plug>(asterisk-g*)zv<Cmd>lua require('hlslens').start()<CR>]] },
+      { "g#", mode = { "n", "x" }, [[<Plug>(asterisk-g#)zv<Cmd>lua require('hlslens').start()<CR>]] },
     },
     opts = {
       calm_down = true,
@@ -425,5 +433,15 @@ return {
         end
       end
     end,
+  },
+  -- also see `:h noh` and `:h shortmess`
+  {
+    "folke/noice.nvim",
+    optional = true,
+    opts = {
+      messages = {
+        view_search = false, -- using kevinhwang91/nvim-hlslens
+      },
+    },
   },
 }
