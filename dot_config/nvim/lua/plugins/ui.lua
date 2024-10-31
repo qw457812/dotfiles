@@ -371,6 +371,7 @@ return {
       -- https://github.com/kevinhwang91/nvim-hlslens/issues/64#issuecomment-1606196924
       -- alternative: https://github.com/rapan931/lasterisk.nvim
       { "haya14busa/vim-asterisk" },
+      { "petertriho/nvim-scrollbar", optional = true },
     },
     event = "CmdlineEnter",
     keys = {
@@ -415,7 +416,11 @@ return {
       end,
     },
     config = function(_, opts)
-      require("hlslens").setup(opts)
+      if LazyVim.has("nvim-scrollbar") then
+        require("scrollbar.handlers.search").setup(opts)
+      else
+        require("hlslens").setup(opts)
+      end
 
       local Render = require("hlslens.render")
       -- HACK: `calm_down` lens only, keep the hlsearch
