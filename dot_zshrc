@@ -638,3 +638,13 @@ function newloc() {
     networksetup -deletelocation "$old" >/dev/null
   fi
 }
+
+alias sva='svn add'
+alias svc='svn commit'
+alias svs='svn status'
+alias svu='svn update'
+alias svl='svn log -v'
+function svd() {
+  # --file-style omit --hunk-header-style omit
+  svn diff -x -p "$@" | svn_strip_diff_header | delta --line-numbers;
+}

@@ -143,6 +143,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] [symbol-usage.nvim](https://github.com/Wansmer/symbol-usage.nvim) like [jellydn](https://github.com/jellydn/lazy-nvim-ide/blob/main/lua/plugins/lsp.lua)
 - [x] [telescope-undo.nvim](https://github.com/debugloop/telescope-undo.nvim) or [undotree](https://github.com/mbbill/undotree) like [jellydn](https://github.com/jellydn/lazy-nvim-ide/blob/main/lua/plugins/undotree.lua)
 - [ ] [mini.bracketed](https://github.com/echasnovski/mini.bracketed)
+- [ ] [keymap-amend.nvim](anuvyklack/keymap-amend.nvim)
 - [ ] [flatten.nvim](https://github.com/willothy/flatten.nvim) like [amaanq](https://github.com/amaanq/nvim-config/blob/master/lua/plugins/editor.lua)
 - [ ] [benlubas/molten-nvim](https://github.com/benlubas/molten-nvim) for jupyter
 - [ ] Alternative to markdown-preview.nvim: [toppair/peek.nvim](https://github.com/toppair/peek.nvim) like [dpetka2001](https://github.com/dpetka2001/dotfiles/blob/4ae0b9e9a67e2a37a4fee7773a8c876d1ac890f3/dot_config/nvim/lua/plugins/tools.lua#L107).
@@ -168,6 +169,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] Highlight trailing whitespace and inline double space.
 - [x] More keymaps for lazy like [chrisgrieser](https://github.com/chrisgrieser/.config/blob/main/nvim/lua/config/lazy.lua).
 - [ ] [blink.cmp](https://github.com/Saghen/blink.cmp) found [here](https://github.com/catppuccin/nvim/pull/777).
+- [ ] [kndndrj/nvim-dbee](https://github.com/kndndrj/nvim-dbee)
 - [ ] Create a `state` util to cache the state (like [zen-mode.nvim](https://github.com/folke/zen-mode.nvim/blob/29b292bdc58b76a6c8f294c961a8bf92c5a6ebd6/lua/zen-mode/plugins.lua#L137)) instead of using `vim.g.user_...`
   - [vim.g.user_zenmode_on](lua/plugins/ui.lua), [vim.g.user_minianimate_disable_old](lua/plugins/ui.lua)
   - [local neovide_state = {}](lua/config/keymaps.lua)

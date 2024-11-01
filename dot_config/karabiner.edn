@@ -731,7 +731,8 @@
            [:z :!Cz]
            [:x :!Cx]
            [:c :!Cc]
-           [:v :!Cv [:!WPSOffice :!CitrixViewer]]
+           ;; [:v :!Cv [:!WPSOffice :!CitrixViewer]]
+           [:v :!Cv :!CitrixViewer]
            [:b :!Cb]
            [:n :!Cn]
            [:m :!Cm]
@@ -754,7 +755,7 @@
            [:page_up :!Cpage_up]
            [:page_down :!Cpage_down]
 
-           [:v :!COSv :WPSOffice] ; see "WPSOffice: paste without formatting" below
+           ;; [:v :!COSv :WPSOffice] ; see "WPSOffice: paste without formatting" below, comment out for paste in search bar
            [:v :!Sinsert :CitrixViewer] ; for MTPuTTY
            ]}
 

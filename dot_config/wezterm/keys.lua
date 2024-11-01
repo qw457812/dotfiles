@@ -138,6 +138,7 @@ function M.apply_to_config(config)
 
   -- wezterm show-keys
   config.keys = {
+    { mods = "CTRL", key = "-", action = act.DisableDefaultAssignment }, -- disable this (DecreaseFontSize) for terminal in nvim
     -- Send "CTRL-B" to the terminal when pressing CTRL-B, CTRL-B
     { mods = "LEADER|CTRL", key = "b", action = act.SendKey({ key = "b", mods = "CTRL" }) },
     -- resize panes
