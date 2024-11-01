@@ -151,35 +151,39 @@ map("n", "<leader>bA", "<cmd>bufdo bd<cr>", { desc = "Delete All Buffers" })
 map("n", "<Left>", "<C-o>", { desc = "Go Back" })
 map("n", "<Right>", "<C-i>", { desc = "Go Forward" })
 
-if LazyVim.has("noice.nvim") then
-  map("n", "<esc>", "<cmd>noh<bar>Noice dismiss<cr><esc>", { desc = "Escape and Clear hlsearch/notifications" })
-end
--- -- https://github.com/gabs712/dotfiles/blob/d73212ee9c55bb9c4b6f88bf2175b349d59205a7/nvim/.config/nvim/lua/core/keymaps.lua#L2
--- map("n", "<esc>", function()
---   vim.cmd("nohlsearch")
---
---   -- dismiss notifications by nvim-notify or noice.nvim
---   local ok, notify = pcall(require, "notify")
---   if ok then
---     notify.dismiss({ silent = true, pending = true })
---   end
---
---   -- TODO: do not close zen mode (floating window)
---
---   -- -- close all floating windows
---   -- for _, win in ipairs(vim.api.nvim_list_wins()) do
---   --   if vim.api.nvim_win_is_valid(win) and vim.api.nvim_win_get_config(win).relative ~= "" then
---   --     vim.api.nvim_win_close(win, false)
---   --   end
---   -- end
---
---   -- close current floating window
---   if vim.api.nvim_win_is_valid(0) and vim.api.nvim_win_get_config(0).relative ~= "" then
---     vim.api.nvim_win_close(0, false)
---   end
---
---   -- TODO: missing <esc>, is it necessary?
--- end, { desc = "Clear hlsearch/notifications and Close floating window" })
+-- or <leader><esc>
+map("n", "<esc>", function()
+  local function has_notifications()
+    return not vim.tbl_isempty(vim.tbl_filter(function(b)
+      return vim.bo[b].filetype == "notify" and vim.api.nvim_buf_is_valid(b)
+    end, vim.api.nvim_list_bufs()))
+  end
+
+  if vim.v.hlsearch == 1 then
+    vim.cmd("nohlsearch")
+    -- petertriho/nvim-scrollbar & kevinhwang91/nvim-hlslens
+    if package.loaded["scrollbar"] then
+      require("scrollbar.handlers.search").nohlsearch()
+    end
+  elseif package.loaded["noice"] and has_notifications() then
+    -- dismiss notifications
+    require("noice").cmd("dismiss")
+  elseif not vim.g.user_zenmode_on then
+    if vim.api.nvim_win_get_config(0).relative ~= "" then
+      -- close current floating window
+      vim.api.nvim_win_close(0, false)
+    else
+      -- close all floating windows
+      for _, win in ipairs(vim.api.nvim_list_wins()) do
+        if vim.api.nvim_win_is_valid(win) and vim.api.nvim_win_get_config(win).relative ~= "" then
+          vim.api.nvim_win_close(win, false)
+        end
+      end
+    end
+  end
+
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<esc>", true, true, true), "n", false)
+end, { desc = "Escape and Clear hlsearch or notifications or Close floating window(s)" })
 
 -- match
 -- helix-style mappings | https://github.com/boltlessengineer/nvim/blob/607ee0c9412be67ba127a4d50ee722be578b5d9f/lua/config/keymaps.lua#L103

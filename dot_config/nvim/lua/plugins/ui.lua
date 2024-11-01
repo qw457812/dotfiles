@@ -36,7 +36,7 @@ return {
               return opts.raise(i)
             end
           end
-          return ""
+          return opts.raise(0)
         end,
         -- hide extension
         name_formatter = function(buf)
@@ -44,6 +44,11 @@ return {
         end,
         show_buffer_close_icons = false,
         show_close_icon = false,
+        groups = {
+          items = {
+            require("bufferline.groups").builtin.pinned:with({ icon = "" }),
+          },
+        },
       },
     },
   },

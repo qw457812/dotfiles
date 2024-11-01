@@ -1,0 +1,30 @@
+#!/usr/bin/awk -f
+
+# copied from: https://github.com/HarrisonMc555/dotfiles/blob/09a1b2b78506aab39db572042dd70257d4f59125/bin/svn_strip_diff_header
+
+BEGIN {
+    found_header = 0
+    first = 1
+}
+
+/^Index: / {
+    found_header = 1
+}
+
+{
+    if (found_header > 2) {
+        found_header = 0
+        if (first) {
+            first = 0
+        } else {
+            print ""
+        }
+    }
+
+    if (found_header) {
+        found_header++
+    } else {
+        print
+    }
+
+}

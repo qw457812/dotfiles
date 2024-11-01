@@ -54,9 +54,8 @@ return {
         mode = { "n", "x" },
         function()
           -- popup overlap by nvim-notify or noice.nvim when `opts.popupWin.position == "top"`
-          local ok, notify = pcall(require, "notify")
-          if ok then
-            notify.dismiss({ silent = true, pending = true })
+          if package.loaded["notify"] then
+            require("notify").dismiss({ silent = true, pending = true })
           end
 
           require("rip-substitute").sub()
