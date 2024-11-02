@@ -331,7 +331,12 @@ return {
       ---@param opts? ZenOptions
       local function toggle(opts)
         if vim.bo.filetype == "neo-tree" then
-          vim.cmd("wincmd p") -- unfocus neo-tree first
+          -- close or unfocus neo-tree first
+          if vim.g.user_neotree_auto_close then
+            require("neo-tree.command").execute({ action = "close" })
+          else
+            vim.cmd("wincmd p")
+          end
         end
         require("zen-mode").toggle(opts)
       end
