@@ -198,7 +198,7 @@ return {
       vim.api.nvim_create_autocmd("VimLeavePre", {
         desc = "Restore tmux status line and wezterm pane zoom state when close Neovim in Zen Mode",
         callback = function()
-          if vim.g.user_zenmode_on then
+          if package.loaded["zen-mode"] and require("zen-mode.view").is_open() then
             require("zen-mode").close()
           end
         end,

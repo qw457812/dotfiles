@@ -152,11 +152,18 @@ map("n", "<Left>", "<C-o>", { desc = "Go Back" })
 map("n", "<Right>", "<C-i>", { desc = "Go Forward" })
 
 -- or <leader><esc>
+-- https://github.com/megalithic/dotfiles/blob/fce3172e3cb1389de22bf97ccbf29805c2262525/config/nvim/lua/mega/mappings.lua#L143
 map("n", "<esc>", function()
   local function has_notifications()
     return not vim.tbl_isempty(vim.tbl_filter(function(b)
-      return vim.bo[b].filetype == "notify" and vim.api.nvim_buf_is_valid(b)
+      return vim.api.nvim_buf_is_valid(b) and vim.tbl_contains({ "notify", "noice" }, vim.bo[b].filetype)
     end, vim.api.nvim_list_bufs()))
+  end
+
+  local function is_floating(win)
+    -- don't close zen-mode on esc
+    return vim.api.nvim_win_get_config(win or 0).relative ~= ""
+      and (not vim.g.user_zenmode_win or vim.g.user_zenmode_win ~= (win or vim.api.nvim_get_current_win()))
   end
 
   if vim.v.hlsearch == 1 then
@@ -165,19 +172,20 @@ map("n", "<esc>", function()
     if package.loaded["scrollbar"] then
       require("scrollbar.handlers.search").nohlsearch()
     end
-  elseif package.loaded["noice"] and has_notifications() then
-    -- dismiss notifications
-    require("noice").cmd("dismiss")
-  elseif not vim.g.user_zenmode_on then
-    if vim.api.nvim_win_get_config(0).relative ~= "" then
-      -- close current floating window
-      vim.api.nvim_win_close(0, false)
-    else
-      -- close all floating windows
-      for _, win in ipairs(vim.api.nvim_list_wins()) do
-        if vim.api.nvim_win_is_valid(win) and vim.api.nvim_win_get_config(win).relative ~= "" then
-          vim.api.nvim_win_close(win, false)
-        end
+  elseif has_notifications() then
+    if package.loaded["noice"] then
+      require("noice").cmd("dismiss") -- including lsp progress (floating windows)
+    elseif package.loaded["notify"] then
+      require("notify").dismiss({ silent = true, pending = true })
+    end
+  elseif is_floating() then
+    -- close current floating window
+    vim.api.nvim_win_close(0, false)
+  else
+    -- close all floating windows
+    for _, win in ipairs(vim.api.nvim_list_wins()) do
+      if vim.api.nvim_win_is_valid(win) and is_floating(win) then
+        vim.api.nvim_win_close(win, false)
       end
     end
   end
