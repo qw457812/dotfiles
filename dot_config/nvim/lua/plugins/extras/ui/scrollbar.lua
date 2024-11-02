@@ -15,6 +15,8 @@ return {
           "notify",
           "rip-substitute",
           "qf",
+          "lazy",
+          "mason",
         }),
       }
     end,

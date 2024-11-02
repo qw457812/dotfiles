@@ -352,9 +352,10 @@ return {
           twilight = { enabled = false }, -- bad performance
         },
         -- https://github.com/bleek42/dev-env-config-backup/blob/099eb0c4468a03bcafb6c010271818fe8a794816/src/Linux/config/nvim/lua/user/plugins/editor.lua#L27
-        on_open = function()
+        on_open = function(win)
           on_open()
-          vim.g.user_zenmode_on = true
+          -- vim.g.user_zenmode_on = true -- require("zen-mode.view").is_open()
+          vim.g.user_zenmode_win = win -- require("zen-mode.view").win
           vim.g.user_minianimate_disable_old = vim.g.minianimate_disable
           vim.g.minianimate_disable = true
           vim.g.user_winbar_old = vim.wo.winbar
@@ -362,7 +363,8 @@ return {
         end,
         on_close = function()
           on_close()
-          vim.g.user_zenmode_on = false
+          -- vim.g.user_zenmode_on = false
+          vim.g.user_zenmode_win = nil
           vim.g.minianimate_disable = vim.g.user_minianimate_disable_old
           vim.wo.winbar = vim.g.user_winbar_old
         end,

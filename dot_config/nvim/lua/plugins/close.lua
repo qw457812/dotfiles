@@ -19,7 +19,7 @@ local function close_buffer_or_window_or_exit()
   local function listed_buffers()
     -- return vim.fn.getbufinfo({ buflisted = 1 })
     return vim.tbl_filter(function(b)
-      return vim.bo[b].buflisted and vim.api.nvim_buf_is_valid(b)
+      return vim.api.nvim_buf_is_valid(b) and vim.bo[b].buflisted
     end, vim.api.nvim_list_bufs())
   end
 
