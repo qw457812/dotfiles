@@ -646,6 +646,18 @@ return {
               vim.keymap.set("i", "<esc>", vim.cmd.stopinsert, { noremap = true, buffer = args.bufnr })
             end,
           },
+          {
+            event = "neo_tree_window_after_open",
+            handler = function()
+              vim.g.user_neotree_opened = true
+            end,
+          },
+          {
+            event = "neo_tree_window_before_close",
+            handler = function()
+              vim.g.user_neotree_opened = false
+            end,
+          },
         },
       })
     end,
