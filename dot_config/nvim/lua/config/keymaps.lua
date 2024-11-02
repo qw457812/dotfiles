@@ -160,12 +160,6 @@ map("n", "<esc>", function()
     end, vim.api.nvim_list_bufs()))
   end
 
-  local function is_floating(win)
-    -- don't close zen-mode on esc
-    return vim.api.nvim_win_get_config(win or 0).relative ~= ""
-      and (not vim.g.user_zenmode_win or vim.g.user_zenmode_win ~= (win or vim.api.nvim_get_current_win()))
-  end
-
   if vim.v.hlsearch == 1 then
     vim.cmd("nohlsearch")
     -- petertriho/nvim-scrollbar & kevinhwang91/nvim-hlslens
@@ -178,13 +172,13 @@ map("n", "<esc>", function()
     elseif package.loaded["notify"] then
       require("notify").dismiss({ silent = true, pending = true })
     end
-  elseif is_floating() then
-    -- close current floating window
+  elseif U.is_floating(0, false) then
+    -- close current floating window (won't close zen-mode)
     vim.api.nvim_win_close(0, false)
   else
-    -- close all floating windows
+    -- close all floating windows (won't close zen-mode)
     for _, win in ipairs(vim.api.nvim_list_wins()) do
-      if vim.api.nvim_win_is_valid(win) and is_floating(win) then
+      if vim.api.nvim_win_is_valid(win) and U.is_floating(win, false) then
         vim.api.nvim_win_close(win, false)
       end
     end

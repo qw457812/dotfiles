@@ -23,13 +23,6 @@ local function close_buffer_or_window_or_exit()
     end, vim.api.nvim_list_bufs())
   end
 
-  ---https://github.com/nvim-neo-tree/neo-tree.nvim/blob/206241e451c12f78969ff5ae53af45616ffc9b72/lua/neo-tree/sources/manager.lua#L141
-  ---https://github.com/echasnovski/mini.nvim/blob/af673d8523c5c2c5ff0a53b1e42a296ca358dcc7/lua/mini/animate.lua#L1397
-  ---@param win number?
-  local function is_floating(win)
-    return vim.api.nvim_win_get_config(win or 0).relative ~= ""
-  end
-
   -- the buftype is a non-real file
   -- https://github.com/AstroNvim/AstroNvim/blob/d771094986abced8c3ceae29a5a55585ecb0523a/lua/astronvim/plugins/_astrocore_autocmds.lua#L245
   local function non_real_file()
@@ -42,7 +35,7 @@ local function close_buffer_or_window_or_exit()
   -- use `:bd` (or `:qa` if no listed buffer left) for main
   -- https://github.com/folke/edgy.nvim/blob/ebb77fde6f5cb2745431c6c0fe57024f66471728/lua/edgy/editor.lua#L82
   -- https://github.com/mudox/neovim-config/blob/a4f1020213fd17e6b8c1804153b9bf7683bfa690/lua/mudox/lab/close.lua#L7
-  if is_floating() then
+  if U.is_floating() then
     vim.cmd("close") -- Close Window (Cannot close last window)
   elseif #listed_buffers() > (vim.bo.buflisted and 1 or 0) then
     if non_real_file() then

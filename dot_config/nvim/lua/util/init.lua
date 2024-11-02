@@ -41,6 +41,22 @@ function M.keymap(mode, lhs, rhs, opts)
   end
 end
 
+---@param win? integer default 0
+---@param zenmode_as_floating? boolean default true
+---@return boolean
+function M.is_floating(win, zenmode_as_floating)
+  win = win or 0
+  local is_float = vim.api.nvim_win_get_config(win).relative ~= ""
+  if is_float and zenmode_as_floating == false and package.loaded["zen-mode"] then
+    local zen_mode = require("zen-mode.view")
+    if zen_mode.is_open() then
+      win = win == 0 and vim.api.nvim_get_current_win() or win
+      is_float = win ~= zen_mode.win and win ~= zen_mode.bg_win
+    end
+  end
+  return is_float
+end
+
 --- Get visually selected lines.
 --- alternative:
 --- https://github.com/ibhagwan/fzf-lua/blob/f39de2d77755e90a7a80989b007f0bf2ca13b0dd/lua/fzf-lua/utils.lua#L770
