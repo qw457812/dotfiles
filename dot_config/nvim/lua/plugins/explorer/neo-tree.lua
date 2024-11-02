@@ -649,13 +649,13 @@ return {
           {
             event = "neo_tree_window_after_open",
             handler = function()
-              vim.g.user_neotree_opened = true
+              vim.g.user_neotree_visible = true
             end,
           },
           {
             event = "neo_tree_window_before_close",
             handler = function()
-              vim.g.user_neotree_opened = false
+              vim.g.user_neotree_visible = false
             end,
           },
         },
