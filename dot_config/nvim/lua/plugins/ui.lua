@@ -371,8 +371,8 @@ return {
           vim.wo.winbar = nil
           -- show bufferline in zen mode
           if package.loaded["bufferline"] and require("bufferline.utils").get_buf_count() > 1 then
-            vim.g.user_neotree_opened_old = vim.g.user_neotree_opened
-            if vim.g.user_neotree_opened then
+            vim.g.user_neotree_visible_old = vim.g.user_neotree_visible
+            if vim.g.user_neotree_visible then
               require("neo-tree.command").execute({ action = "close" })
             end
             local view = require("zen-mode.view")
@@ -395,7 +395,7 @@ return {
           -- vim.g.user_zenmode_on = false
           vim.g.minianimate_disable = vim.g.user_minianimate_disable_old
           vim.wo.winbar = vim.g.user_winbar_old
-          if vim.g.user_neotree_opened_old then
+          if vim.g.user_neotree_visible_old then
             require("neo-tree.command").execute({ action = "show" })
           end
         end,
