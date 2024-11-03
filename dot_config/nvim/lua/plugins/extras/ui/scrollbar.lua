@@ -21,4 +21,26 @@ return {
       }
     end,
   },
+
+  {
+    "folke/zen-mode.nvim",
+    optional = true,
+    opts = function(_, opts)
+      local on_open = opts.on_open or function() end
+      local on_close = opts.on_close or function() end
+
+      opts.on_open = function()
+        on_open()
+        if package.loaded["scrollbar"] then
+          vim.cmd("ScrollbarHide")
+        end
+      end
+      opts.on_close = function()
+        on_close()
+        if package.loaded["scrollbar"] then
+          vim.cmd("ScrollbarShow")
+        end
+      end
+    end,
+  },
 }

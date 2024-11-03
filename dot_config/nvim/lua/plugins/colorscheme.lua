@@ -130,7 +130,7 @@ return {
           hl.LspReferenceRead = { link = "IlluminatedWordRead" }
           hl.LspReferenceWrite = { link = "IlluminatedWordWrite" }
           -- compensate for invisible text caused by custom illuminate highlight
-          hl.CmpGhostText = { bg = c.bg, fg = util.blend_fg(hl.CmpGhostText.fg, 0.85) }
+          hl.CmpGhostText = { bg = c.bg, fg = util.blend_fg((hl.CmpGhostText or hl.Comment).fg, 0.85) }
           -- unused variable
           hl.DiagnosticUnnecessary = { fg = util.blend_fg(c.terminal_black, 0.7) }
 
@@ -350,7 +350,7 @@ return {
           hl.IlluminatedWordWrite = { bg = illuminate, underline = true }
           hl.LspReferenceRead = { link = "IlluminatedWordRead" }
           hl.LspReferenceWrite = { link = "IlluminatedWordWrite" }
-          hl.CmpGhostText = { bg = c.bg, fg = util.blend_fg(hl.CmpGhostText.fg, 0.85) }
+          hl.CmpGhostText = { bg = c.bg, fg = util.blend_fg((hl.CmpGhostText or hl.Comment).fg, 0.85) }
           hl.DiagnosticUnnecessary = { fg = util.blend_fg(c.terminal_black, 0.7) }
 
           hl.TelescopeSelectionCaret =

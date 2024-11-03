@@ -6,11 +6,6 @@ local obsidian_vaults = {
 -- https://github.com/folke/dot/blob/master/nvim/lua/plugins/tmp.lua
 return {
   {
-    "iguanacucumber/magazine.nvim",
-    name = "nvim-cmp",
-  },
-
-  {
     "2kabhishek/nerdy.nvim",
     cmd = "Nerdy",
     keys = {
@@ -108,25 +103,6 @@ return {
       -- TODO: `:verbose nmap <cr>`, overlaps with "Goto Definition/References" defined in lsp.lua
     end,
   },
-
-  -- {
-  --   "akinsho/toggleterm.nvim",
-  --   version = "*",
-  --   opts = {
-  --     open_mapping = [[<c-\>]],
-  --     -- direction = "float", -- "vertical" | "horizontal" | "tab" | "float"
-  --     float_opts = {
-  --       border = "rounded",
-  --     },
-  --   },
-  -- },
-  -- -- {
-  -- --   "ryanmsnyder/toggleterm-manager.nvim",
-  -- --   opts = {},
-  -- --   keys = {
-  -- --     { "<leader>ft", "<cmd>Telescope toggleterm_manager<cr>", desc = "Terminals" },
-  -- --   },
-  -- -- },
 
   -- TODO: not working
   -- -- https://github.com/wlh320/rime-ls
