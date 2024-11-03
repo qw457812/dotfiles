@@ -53,6 +53,11 @@ return {
       })
     end,
   },
+  -- nvim-cmp fork
+  {
+    "iguanacucumber/magazine.nvim",
+    name = "nvim-cmp",
+  },
 
   -- https://github.com/folke/dot/blob/master/nvim/lua/plugins/coding.lua
   {

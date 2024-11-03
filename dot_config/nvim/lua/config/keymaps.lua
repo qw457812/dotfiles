@@ -74,15 +74,31 @@ end, { desc = "ColorScheme" })
 -- map({ "n", "x" }, "H", "0^", { desc = "Goto line start" }) -- scroll fully to the left
 -- map("o", "H", "^", { desc = "Goto line start" })
 -- map({ "n", "o" }, "L", "$", { desc = "Goto line end" })
--- -- https://github.com/v1nh1shungry/.dotfiles/blob/d8a0f6fd2766d0ec9ce5d5b4ccd55b3cc4130c1a/nvim/lua/dotfiles/core/keymaps.lua#L74
 -- map("x", "L", "g_", { desc = "Goto line end" })
 map({ "n", "x" }, "H", "&wrap ? 'g^' : '0^'", { desc = "Goto line start", expr = true }) -- scroll fully to the left
 map("o", "H", "&wrap ? 'g^' : '^'", { desc = "Goto line start", expr = true })
-map("n", "l", "foldclosed('.') != -1 ? 'zo' : 'l'", { expr = true })
+-- map("n", "l", "foldclosed('.') != -1 ? 'zo' : 'l'", { expr = true })
+-- https://github.com/folke/flash.nvim/blob/34c7be146a91fec3555c33fe89c7d643f6ef5cf1/lua/flash/jump.lua#L204
+local unfold_l = function(is_visual)
+  local count1 = vim.v.count1
+  local first_folded_line = vim.fn.foldclosed(vim.fn.line("."))
+  if first_folded_line ~= -1 then
+    vim.api.nvim_win_set_cursor(0, { first_folded_line, 0 })
+    vim.cmd("normal! zo") -- this stop visual mode
+    if is_visual then
+      vim.cmd("normal! gv")
+    end
+  end
+  vim.cmd("normal! " .. count1 .. "l")
+end
+map("n", "l", unfold_l)
 -- stylua: ignore
-map("n", "L", "foldclosed('.') != -1 ? 'zO' : v:count ? '$' : &wrap ? 'g$' : '$'", { desc = "Goto line end", expr = true })
+map("x", "l", function() unfold_l(true) end)
+-- -- stylua: ignore
+-- map("n", "L", "foldclosed('.') != -1 ? 'zO' : v:count ? '$' : &wrap ? 'g$' : '$'", { desc = "Goto line end", expr = true })
+map("n", "L", "(v:count ? '$' : &wrap ? 'g$' : '$').'zv'", { desc = "Goto line end", expr = true })
 map("o", "L", "v:count ? '$' : &wrap ? 'g$' : '$'", { desc = "Goto line end", expr = true })
-map("x", "L", "v:count ? 'g_' : &wrap ? 'g$' : 'g_'", { desc = "Goto line end", expr = true }) -- TODO: to the last non-blank character of the line when wrapped
+map("x", "L", "(v:count ? 'g_' : &wrap ? 'g$' : 'g_').'zv'", { desc = "Goto line end", expr = true }) -- TODO: to the last non-blank character of the line when wrapped
 -- https://github.com/folke/lazy.nvim/issues/411
 -- https://github.com/folke/lazy.nvim/issues/133
 LazyViewConfig.commands.home.key = "gH"

@@ -14,6 +14,30 @@ return {
     end,
   },
 
+  -- https://github.com/AstroNvim/astrocommunity/blob/6166e840d19b0f6665c8e02c76cba500fa4179b0/lua/astrocommunity/completion/blink-cmp/init.lua#L15
+  {
+    "Saghen/blink.cmp",
+    optional = true,
+    ---@module 'blink.cmp'
+    ---@type blink.cmp.Config
+    opts = {
+      windows = {
+        autocomplete = {
+          border = "rounded",
+          -- winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder,CursorLine:PmenuSel,Search:None",
+        },
+        documentation = {
+          border = "rounded",
+          -- winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder,CursorLine:PmenuSel,Search:None",
+        },
+        signature_help = {
+          border = "rounded",
+          -- winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder",
+        },
+      },
+    },
+  },
+
   {
     "neovim/nvim-lspconfig",
     optional = true,
@@ -104,6 +128,16 @@ return {
         window_config = {
           border = "rounded",
         },
+      },
+    },
+  },
+
+  {
+    "akinsho/toggleterm.nvim",
+    optional = true,
+    opts = {
+      float_opts = {
+        border = "rounded",
       },
     },
   },
