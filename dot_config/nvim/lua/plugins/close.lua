@@ -54,6 +54,7 @@ vim.api.nvim_create_autocmd("User", {
   once = true,
   callback = function()
     vim.keymap.set("n", close_key, close_buffer_or_window_or_exit, { desc = "Close buffer/window or Exit" })
+    vim.keymap.set("x", close_key, "<esc>", { desc = "Stop Visual Mode" })
     vim.keymap.set("n", exit_key, "<cmd>qa<cr>", { desc = "Quit All" })
     if close_key:lower() == "<bs>" then
       vim.keymap.set("c", close_key, function()

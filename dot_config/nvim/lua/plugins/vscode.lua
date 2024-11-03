@@ -26,6 +26,20 @@ local function vscode_map(mode, key, command, opts)
   end, opts)
 end
 
+vim.api.nvim_create_autocmd("BufEnter", {
+  callback = function()
+    vim.defer_fn(function()
+      -- fix: start visual mode after editor.action.goToReferences
+      -- TODO: editor.action.goToReferences jumps to the same file
+      local mode = vim.fn.mode(true)
+      local is_visual = mode == "v" or mode == "V" or mode == "\22"
+      if is_visual then
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<esc>", true, true, true), "n", false)
+      end
+    end, 100)
+  end,
+})
+
 vim.api.nvim_create_autocmd("User", {
   pattern = "LazyVimKeymaps",
   once = true,
