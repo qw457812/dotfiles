@@ -29,12 +29,13 @@ end
 vim.api.nvim_create_autocmd("BufEnter", {
   callback = function()
     vim.defer_fn(function()
-      -- fix: start visual mode after editor.action.goToReferences
-      -- TODO: editor.action.goToReferences jumps to the same file
       local mode = vim.fn.mode(true)
-      local is_visual = mode == "v" or mode == "V" or mode == "\22"
-      if is_visual then
+      if mode == "v" or mode == "V" or mode == "\22" then
+        -- fix: start visual mode after editor.action.goToReferences
+        -- TODO: editor.action.goToReferences jumps to the same file
         vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<esc>", true, true, true), "n", false)
+      elseif mode == "i" then
+        vim.cmd("stopinsert")
       end
     end, 100)
   end,
@@ -63,8 +64,14 @@ vim.api.nvim_create_autocmd("User", {
     -- vscode_map("n", "gd", "editor.action.revealDefinition", { desc = "Goto Definition" })
     map("n", "<cr>", "gd", { desc = "Goto Definition/References", remap = true })
     vscode_map("n", "gr", "editor.action.goToReferences", { desc = "References" })
+    -- vscode_map("n", "gr", "editor.action.referenceSearch.trigger", { desc = "References" })
     vscode_map("n", "gy", "editor.action.goToTypeDefinition", { desc = "Goto T[y]pe Definition" })
     vscode_map("n", "gI", "editor.action.goToImplementation", { desc = "Goto Implementation" })
+
+    vscode_map("n", "<C-Down>", "workbench.action.increaseViewHeight")
+    vscode_map("n", "<C-Up>", "workbench.action.decreaseViewHeight")
+    vscode_map("n", "<C-Left>", "workbench.action.decreaseViewWidth")
+    vscode_map("n", "<C-Right>", "workbench.action.increaseViewWidth")
 
     vscode_map("n", "<leader>e", "workbench.view.explorer", { desc = "Explorer" })
     vscode_map("n", "<leader>z", "workbench.action.toggleZenMode", { desc = "Zen Mode" })
@@ -132,7 +139,58 @@ vim.api.nvim_create_autocmd("User", {
 
     vscode_map("n", "<leader>db", "editor.debug.action.toggleBreakpoint", { desc = "Toggle Breakpoint" })
 
-    vscode_map("n", "<leader>uw", "editor.action.toggleWordWrap", { desc = "Wrap" })
+    -- vscode_map("n", "<leader>uw", "editor.action.toggleWordWrap", { desc = "Wrap" })
+    local wrap = false
+    local orig_keymaps = { n = {}, x = {} } ---@type table<string,table<string,table<string,any>>>
+    map("n", "<leader>uw", function()
+      wrap = not wrap
+      vscode.action("editor.action.toggleWordWrap")
+      if wrap then
+        for mode, keymaps in pairs(orig_keymaps) do
+          for _, lhs in ipairs({ "j", "k" }) do
+            keymaps[lhs] = vim.fn.maparg(lhs, mode, false, true) --[[@as table<string,any>]]
+          end
+        end
+        -- fix: gj/gk doesn't work with editor.action.toggleWordWrap
+        vscode_map("n", "j", "cursorDown", { desc = "VSCode Down" })
+        vscode_map("n", "k", "cursorUp", { desc = "VSCode Up" })
+        -- https://github.com/vscode-neovim/vscode-neovim/issues/576#issuecomment-1835799743
+        -- https://github.com/vscode-neovim/vscode-neovim/blob/bb0389ac13c5215280cd0f66b32e80e3c916055c/runtime/vscode/overrides/vscode-motion.vim#L15
+        local function move(d)
+          return function()
+            -- only works in charwise visual mode
+            if vim.api.nvim_get_mode().mode ~= "v" then
+              return "g" .. d
+            end
+            local count = vim.v.count
+            local execute = count > 0 and vscode.call or vscode.action
+            execute("cursorMove", {
+              args = {
+                {
+                  to = d == "j" and "down" or "up",
+                  by = count > 0 and nil or "wrappedLine",
+                  value = count > 0 and count or 1,
+                  select = true,
+                },
+              },
+            })
+            return count > 0 and "g" .. d or "<Ignore>"
+          end
+        end
+        map("x", "j", move("j"), { desc = "VSCode Down", expr = true })
+        map("x", "k", move("k"), { desc = "VSCode Up", expr = true })
+      else
+        for mode, keymaps in pairs(orig_keymaps) do
+          for lhs, keymap in pairs(keymaps) do
+            if vim.tbl_isempty(keymap) then
+              vim.keymap.del(mode, lhs)
+            else
+              vim.fn.mapset(keymap)
+            end
+          end
+        end
+      end
+    end, { desc = "Wrap" })
     vscode_map("n", "<leader>uC", "workbench.action.selectTheme", { desc = "Colorscheme with Preview" })
 
     vscode_map("n", "<leader>xx", "workbench.actions.view.problems", { desc = "Diagnostics" })
