@@ -131,9 +131,12 @@ return {
             return assert(path)
           end
           for _, action in ipairs(args.data.actions) do
+            ---@cast action oil.Action
             if action.type == "move" then
+              ---@cast action oil.MoveAction
               LazyVim.lsp.on_rename(parse_url(action.src_url), parse_url(action.dest_url))
             elseif action.type == "delete" then
+              ---@cast action oil.DeleteAction
               local bufnr = vim.fn.bufnr(parse_url(action.url))
               if bufnr ~= -1 then
                 -- LazyVim.ui.bufremove(bufnr)

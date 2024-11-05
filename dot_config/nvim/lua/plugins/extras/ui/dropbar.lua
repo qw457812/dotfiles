@@ -119,14 +119,16 @@ return {
               end
               return dropbar_default_opts.icons.kinds.dir_icon(path)
             end,
-            -- not necessary
             ---@type fun(path: string): string, string?|false
             file_icon = function(path)
-              local icon, hl, is_default = require("mini.icons").get("file", path)
+              local is_oil = vim.startswith(path, "oil:")
+              path = is_oil and path:sub(#"oil:" + 1) or path -- remove oil: prefix
+              local icon, hl, is_default = require("mini.icons").get(is_oil and "directory" or "file", path)
               if not is_default then
                 return icon .. " ", hl
               end
-              return dropbar_default_opts.icons.kinds.file_icon(path)
+              local kinds = dropbar_default_opts.icons.kinds
+              return is_oil and kinds.dir_icon(path) or kinds.file_icon(path)
             end,
           },
         },
