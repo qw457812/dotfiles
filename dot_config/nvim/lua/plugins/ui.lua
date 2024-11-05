@@ -64,6 +64,17 @@ return {
     "nvim-lualine/lualine.nvim",
     optional = true,
     opts = function(_, opts)
+      local is_termux = vim.g.user_is_termux
+      local has_dropbar = U.has_user_extra("ui.dropbar")
+
+      local function remove_component(sections, comp_name)
+        for i, comp in ipairs(sections) do
+          if type(comp) == "table" and comp[1] == comp_name then
+            return table.remove(sections, i)
+          end
+        end
+      end
+
       -- -- https://github.com/Bekaboo/dropbar.nvim/blob/998441a88476af2ec77d8cb1b21bae62c9f548c1/lua/dropbar/utils/bar.lua#L11
       -- local function hl_str(str, hl)
       --   return "%#" .. hl .. "#" .. str .. "%*"
@@ -144,46 +155,55 @@ return {
       }
 
       local mode = { "mode" }
-      if vim.g.user_is_termux then
+      if is_termux then
         mode.fmt = function(str)
           return str:sub(1, 1)
         end
       end
       opts.sections.lualine_a = { mode }
-      opts.sections.lualine_b = { { "branch", icons_enabled = not vim.g.user_is_termux } }
+      opts.sections.lualine_b = { { "branch", icons_enabled = not is_termux } }
 
       -- see: ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/ui.lua
       local lualine_c = opts.sections.lualine_c
-      lualine_c[1] = LazyVim.lualine.root_dir({ cwd = not vim.g.user_is_termux })
-      if vim.g.user_is_termux or U.has_user_extra("ui.dropbar") then
-        lualine_c[4] = {
-          "filename",
-          file_status = true,
-          newfile_status = true, -- `nvim new_file`
-          symbols = {
-            modified = "",
-            readonly = " 󰌾 ",
-          },
-          color = function()
-            local fg
-            if vim.bo.modified then
-              fg = LazyVim.ui.color("MatchParen")
-            elseif vim.bo.modifiable == false or vim.bo.readonly == true then
-              fg = LazyVim.ui.color("DiagnosticError")
-            end
-            return { fg = fg, gui = "bold" }
-          end,
-        }
-      else
-        lualine_c[4] = {
+      lualine_c[1] = LazyVim.lualine.root_dir({ cwd = not is_termux, icon = is_termux and "" or nil })
+      lualine_c[4] = (is_termux or has_dropbar)
+          and {
+            "filename",
+            file_status = true,
+            newfile_status = true, -- `nvim new_file`
+            symbols = {
+              modified = "",
+              readonly = " 󰌾 ",
+            },
+            color = function()
+              local fg
+              if vim.bo.modified then
+                fg = LazyVim.ui.color("MatchParen")
+              elseif vim.bo.modifiable == false or vim.bo.readonly == true then
+                fg = LazyVim.ui.color("DiagnosticError")
+              end
+              return { fg = fg, gui = "bold" }
+            end,
+          }
+        or {
           pretty_path({
             -- relative = "root",
             directory_hl = "Conceal",
           }),
         }
+      if is_termux then
+        remove_component(lualine_c, "filetype")
+      end
+      if is_termux or has_dropbar then
+        local diagnostics = remove_component(lualine_c, "diagnostics")
+        if not is_termux then
+          table.insert(lualine_c, diagnostics)
+        end
       end
 
-      if not vim.g.user_is_termux then
+      if is_termux then
+        remove_component(opts.sections.lualine_x, "diff")
+      else
         vim.list_extend(opts.sections.lualine_x, { formatter, linter, lsp })
       end
 
@@ -191,7 +211,7 @@ return {
         {
           "bo:filetype",
           cond = function()
-            return not vim.g.user_is_termux
+            return not is_termux
           end,
         },
         { "progress" },
