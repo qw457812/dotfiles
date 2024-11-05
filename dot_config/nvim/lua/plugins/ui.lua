@@ -36,6 +36,7 @@ return {
               return opts.raise(i)
             end
           end
+          -- return "0"
           return opts.raise(0)
         end,
         -- hide extension
@@ -44,6 +45,7 @@ return {
         end,
         show_buffer_close_icons = false,
         show_close_icon = false,
+        diagnostics = false,
         groups = {
           items = {
             require("bufferline.groups").builtin.pinned:with({ icon = "" }),
