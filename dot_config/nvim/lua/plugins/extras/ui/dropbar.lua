@@ -23,39 +23,48 @@ return {
       local dropbar_default_opts = require("dropbar.configs").opts
 
       -- custom highlight
-      -- stylua: ignore start
-      vim.api.nvim_set_hl(0, "DropBarFileName", { default = true, fg = LazyVim.ui.color("DropBarKindFile"), bold = true })
-      vim.api.nvim_set_hl(0, "DropBarFileNameModified", { default = true, fg = LazyVim.ui.color("MatchParen"), bold = true })
-      vim.api.nvim_set_hl(0, "DropBarFolderName", { default = true, fg = LazyVim.ui.color("Conceal") })
-      vim.api.nvim_set_hl(0, "DropBarSymbolName", { default = true, link = "DropBarFolderName" })
-      -- stylua: ignore end
+      -- stylua: ignore
+      local function set_dropbar_hl()
+        vim.api.nvim_set_hl(0, "DropBarFileName", { default = true, fg = LazyVim.ui.color("DropBarKindFile"), bold = true })
+        vim.api.nvim_set_hl(0, "DropBarFileNameModified", { default = true, fg = LazyVim.ui.color("MatchParen"), bold = true })
+        vim.api.nvim_set_hl(0, "DropBarFolderName", { default = true, fg = LazyVim.ui.color("Conceal") })
+        vim.api.nvim_set_hl(0, "DropBarSymbolName", { default = true, link = "DropBarFolderName" })
+      end
+
+      set_dropbar_hl()
+      vim.api.nvim_create_autocmd("ColorScheme", { callback = set_dropbar_hl })
 
       -- local home_parts = vim.tbl_filter(function(part)
       --   return part ~= ""
       -- end, require("plenary.path"):new(home):_split())
       ---@diagnostic disable-next-line: param-type-mismatch
       local home_parts = vim.split(vim.uv.os_homedir(), "/", { trimempty = true })
+      local oil_prefix = "oil:"
       local source_path = {
         get_symbols = function(buff, win, cursor)
           local symbols = sources.path.get_symbols(buff, win, cursor)
           if vim.tbl_isempty(symbols) then
             return symbols
           end
+
           -- filename highlighting
           for i = 1, #symbols - 1 do
             symbols[i].name_hl = "DropBarFolderName"
           end
           symbols[#symbols].name_hl = vim.bo[buff].modified and "DropBarFileNameModified" or "DropBarFileName"
+
           -- replace home dir with ~
           local symbol_oil_prefix
-          if vim.bo[buff].filetype == "oil" and symbols[1].name == "oil:" then
+          if vim.bo[buff].filetype == "oil" and #symbols > 1 and symbols[1].name == oil_prefix then
             symbol_oil_prefix = table.remove(symbols, 1)
           end
-          local start_with_home = true
-          for i, home_part in ipairs(home_parts) do
-            if symbols[i].name ~= home_part then
-              start_with_home = false
-              break
+          local start_with_home = #symbols >= #home_parts
+          if start_with_home then
+            for i, home_part in ipairs(home_parts) do
+              if symbols[i].name ~= home_part then
+                start_with_home = false
+                break
+              end
             end
           end
           if start_with_home then
@@ -71,6 +80,7 @@ return {
           if symbol_oil_prefix then
             table.insert(symbols, 1, symbol_oil_prefix)
           end
+
           return symbols
         end,
       }
@@ -98,7 +108,7 @@ return {
       return vim.tbl_deep_extend("force", opts, {
         bar = {
           enable = false, -- using lualine.nvim
-          update_debounce = 20, -- performance for holding down `j`: 17 ~ 20
+          -- update_debounce = 20, -- performance for holding down `j`: 17 ~ 20, commented out in favor of oil
           sources = function(buf, _)
             if vim.bo[buf].ft == "markdown" then
               return { source_path, source_markdown }
@@ -121,14 +131,22 @@ return {
             end,
             ---@type fun(path: string): string, string?|false
             file_icon = function(path)
-              local is_oil = vim.startswith(path, "oil:")
-              path = is_oil and path:sub(#"oil:" + 1) or path -- remove oil: prefix
-              local icon, hl, is_default = require("mini.icons").get(is_oil and "directory" or "file", path)
-              if not is_default then
-                return icon .. " ", hl
+              local function mini_icons_get(category, name, fallback)
+                local icon, hl, is_default = require("mini.icons").get(category, name)
+                if is_default and fallback then
+                  return fallback(name)
+                else
+                  return icon .. " ", hl
+                end
               end
-              local kinds = dropbar_default_opts.icons.kinds
-              return is_oil and kinds.dir_icon(path) or kinds.file_icon(path)
+
+              if path == oil_prefix then
+                return mini_icons_get("filetype", "oil")
+              elseif vim.startswith(path, oil_prefix) then
+                return mini_icons_get("directory", path:sub(#oil_prefix + 1), dropbar_default_opts.icons.kinds.dir_icon)
+              else
+                return mini_icons_get("file", path, dropbar_default_opts.icons.kinds.file_icon)
+              end
             end,
           },
         },

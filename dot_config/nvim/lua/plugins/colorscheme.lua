@@ -528,10 +528,7 @@ return {
       end
 
       set_illuminate_hl()
-
-      vim.api.nvim_create_autocmd("ColorScheme", {
-        callback = set_illuminate_hl,
-      })
+      vim.api.nvim_create_autocmd("ColorScheme", { callback = set_illuminate_hl })
     end,
   },
 
