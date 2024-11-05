@@ -54,6 +54,15 @@ return {
         end,
       })
 
+      -- https://github.com/alexpasmantier/pymple.nvim/blob/eff337420a294e68180c5ee87f03994c0b176dd4/lua/pymple/hooks.lua#L69
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "MiniFilesActionMove",
+        ---@param event {data: {action: string, from: string, to: string}}
+        callback = function(event)
+          LazyVim.lsp.on_rename(event.data.from, event.data.to)
+        end,
+      })
+
       return vim.tbl_deep_extend("force", opts, {
         options = {
           use_as_default_explorer = vim.g.user_default_explorer == "mini.files",

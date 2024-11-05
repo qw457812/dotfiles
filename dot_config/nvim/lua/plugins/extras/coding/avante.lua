@@ -48,7 +48,7 @@ return {
       },
     },
     -- init = function()
-    --   require("avante_lib").load() -- TODO: break lazy loading
+    --   require("avante_lib").load() -- this break lazy loading
     -- end,
     -- https://github.com/yetone/avante.nvim/wiki#keymaps-and-api-i-guess
     -- ~/.local/share/nvim/lazy/avante.nvim/lua/avante/init.lua
@@ -81,12 +81,17 @@ return {
         },
       },
       provider = "copilot", -- claude(recommend), openai, azure, gemini, cohere, copilot, groq(custom)
+      auto_suggestions_provider = "copilot", -- high-frequency
+      -- behaviour = {
+      --   auto_suggestions = true, -- experimental
+      -- },
       -- https://github.com/yetone/avante.nvim/wiki#custom-providers
+      -- https://github.com/yetone/avante.nvim/pull/159
       vendors = {
         ---@type AvanteProvider
         groq = {
           endpoint = "https://api.groq.com/openai/v1/chat/completions",
-          model = "llama-3.1-70b-versatile",
+          model = "llama-3.2-90b-text-preview",
           api_key_name = "GROQ_API_KEY",
           parse_curl_args = function(opts, code_opts)
             return {
@@ -98,12 +103,13 @@ return {
               },
               body = {
                 model = opts.model,
-                messages = { -- you can make your own message, but this is very advanced
-                  { role = "system", content = code_opts.system_prompt },
-                  { role = "user", content = require("avante.providers.openai").get_user_message(code_opts) },
-                },
+                -- messages = { -- you can make your own message, but this is very advanced
+                --   { role = "system", content = code_opts.system_prompt },
+                --   { role = "user", content = require("avante.providers.openai").get_user_message(code_opts) },
+                -- },
+                messages = require("avante.providers.openai").parse_messages(code_opts),
                 temperature = 0,
-                max_tokens = 4096,
+                max_tokens = 8000,
                 stream = true, -- this will be set by default.
               },
             }
@@ -126,18 +132,4 @@ return {
       { "<leader>ac", mode = { "n", "v" }, function() return require("CopilotChat").toggle() end, desc = "Toggle (CopilotChat)" },
     },
   },
-
-  -- -- not working well with `<leader>aa`
-  -- {
-  --   "folke/edgy.nvim",
-  --   optional = true,
-  --   opts = function(_, opts)
-  --     opts.right = opts.right or {}
-  --     -- stylua: ignore
-  --     vim.list_extend(opts.right, {
-  --       { ft = "Avante",      title = "Avante",       size = { width = 50, height = 0.775 } },
-  --       { ft = "AvanteInput", title = "Avante Input", size = { width = 50, height = 0.225 } },
-  --     })
-  --   end,
-  -- },
 }
