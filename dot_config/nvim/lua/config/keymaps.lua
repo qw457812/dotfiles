@@ -277,9 +277,19 @@ map("n", "gp", function() vim.api.nvim_feedkeys("`[" .. vim.fn.strpart(vim.fn.ge
 -- Search inside visually highlighted text. Use `silent = false` for it to make effect immediately.
 map("x", "g/", "<esc>/\\%V", { silent = false, desc = "Search inside visual selection" })
 
-map("n", "g/", "q/G", { desc = "command-line window (forward search)" })
-map("n", "g?", "q?G", { desc = "command-line window (backward search)" })
-map({ "n", "x" }, "g:", "q:G", { desc = "command-line window (Ex command)" })
+-- TODO: try https://github.com/notomo/cmdbuf.nvim
+local cmd_win = function(keys)
+  return function()
+    if package.loaded["zen-mode"] and require("zen-mode.view").is_open() then
+      require("zen-mode").close()
+    end
+    -- vim.api.nvim_feedkeys(keys .. "G", "n", true)
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(keys .. "G", true, true, true), "n", false)
+  end
+end
+map("n", "g/", cmd_win("q/"), { desc = "command-line window (forward search)" })
+map("n", "g?", cmd_win("q?"), { desc = "command-line window (backward search)" })
+map({ "n", "x" }, "g:", cmd_win("q:"), { desc = "command-line window (Ex command)" })
 
 -- map("n", "<leader>.", "@:", { desc = "Repeat last command-line" })
 map("n", "g.", "@:", { desc = "Repeat last command-line" })
