@@ -4,6 +4,24 @@ return {
     event = "VeryLazy",
     opts = function()
       local config = require("scrollbar.config").get()
+
+      -- local enabled = true
+      U.toggle.map("<leader>uS", {
+        name = "Scroll Bar",
+        get = function()
+          return require("scrollbar.config").get().show
+          -- return enabled
+        end,
+        set = function(state)
+          -- enabled = state
+          if state then
+            vim.cmd("ScrollbarShow")
+          else
+            vim.cmd("ScrollbarHide")
+          end
+        end,
+      })
+
       return {
         excluded_filetypes = vim.list_extend(vim.deepcopy(config.excluded_filetypes), {
           "dashboard",
@@ -17,6 +35,9 @@ return {
           "qf",
           "lazy",
           "mason",
+          "Avante",
+          "AvanteInput",
+          "copilot-chat",
         }),
       }
     end,

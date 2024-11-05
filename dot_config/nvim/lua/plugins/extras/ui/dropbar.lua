@@ -47,6 +47,10 @@ return {
           end
           symbols[#symbols].name_hl = vim.bo[buff].modified and "DropBarFileNameModified" or "DropBarFileName"
           -- replace home dir with ~
+          local symbol_oil_prefix
+          if vim.bo[buff].filetype == "oil" and symbols[1].name == "oil:" then
+            symbol_oil_prefix = table.remove(symbols, 1)
+          end
           local start_with_home = true
           for i, home_part in ipairs(home_parts) do
             if symbols[i].name ~= home_part then
@@ -63,6 +67,9 @@ return {
             for i = #home_parts - 1, 1, -1 do
               table.remove(symbols, i)
             end
+          end
+          if symbol_oil_prefix then
+            table.insert(symbols, 1, symbol_oil_prefix)
           end
           return symbols
         end,

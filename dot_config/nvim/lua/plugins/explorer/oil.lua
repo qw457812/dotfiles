@@ -1,6 +1,3 @@
--- TODO: see LazyVim.lsp.on_rename in:
--- - ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/editor.lua
--- - ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/editor/mini-files.lua
 return {
   -- https://github.com/stevearc/dotfiles/blob/eeb506f9afd32cd8cd9f2366110c76efaae5786c/.config/nvim/lua/plugins/oil.lua
   -- https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/editor/oil.lua
@@ -116,6 +113,36 @@ return {
       else
         U.explorer.load_on_directory(plugin.name)
       end
+    end,
+    config = function(_, opts)
+      require("oil").setup(opts)
+
+      -- https://github.com/alexpasmantier/pymple.nvim/blob/eff337420a294e68180c5ee87f03994c0b176dd4/lua/pymple/hooks.lua#L35
+      -- https://github.com/stevearc/oil.nvim/issues/310#issuecomment-2019214285
+      -- https://github.com/AstroNvim/astrocommunity/blob/6166e840d19b0f6665c8e02c76cba500fa4179b0/lua/astrocommunity/file-explorer/oil-nvim/init.lua#L23
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "OilActionsPost",
+        callback = function(args)
+          if args.data.err then
+            return
+          end
+          local parse_url = function(url)
+            local _, path = require("oil.util").parse_url(url)
+            return assert(path)
+          end
+          for _, action in ipairs(args.data.actions) do
+            if action.type == "move" then
+              LazyVim.lsp.on_rename(parse_url(action.src_url), parse_url(action.dest_url))
+            elseif action.type == "delete" then
+              local bufnr = vim.fn.bufnr(parse_url(action.url))
+              if bufnr ~= -1 then
+                -- LazyVim.ui.bufremove(bufnr)
+                vim.cmd(("silent! bwipeout! %d"):format(bufnr))
+              end
+            end
+          end
+        end,
+      })
     end,
   },
 }

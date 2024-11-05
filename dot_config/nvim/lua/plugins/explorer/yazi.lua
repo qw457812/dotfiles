@@ -13,6 +13,7 @@ return {
     end,
     opts = function()
       vim.api.nvim_create_autocmd("TermOpen", {
+        pattern = "term://*yazi*",
         callback = function(event)
           local buf = event.buf
           if vim.bo[buf].filetype == "yazi" then
@@ -27,16 +28,16 @@ return {
         end,
       })
 
-      -- TODO:
-      -- vim.api.nvim_create_autocmd("User", {
-      --   pattern = "YaziRenamedOrMoved",
-      --   callback = function(event)
-      --     LazyVim.info("Just received a YaziRenamedOrMoved event!\n" .. vim.inspect(event.data), { title = "Yazi" })
-      --     for from, to in pairs(event.data.changes or {}) do
-      --       LazyVim.lsp.on_rename(from, to)
-      --     end
-      --   end,
-      -- })
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "YaziRenamedOrMoved",
+        ---@module 'yazi'
+        ---@param event {data: YaziNeovimEvent.YaziRenamedOrMovedData}
+        callback = function(event)
+          for from, to in pairs(event.data.changes) do
+            LazyVim.lsp.on_rename(from, to)
+          end
+        end,
+      })
 
       return {
         open_for_directories = vim.g.user_default_explorer == "yazi.nvim",
