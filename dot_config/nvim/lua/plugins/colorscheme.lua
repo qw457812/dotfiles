@@ -26,9 +26,8 @@ local colorschemes = vim.g.user_transparent_background and {
 
 local borderless_telescope = vim.g.user_transparent_background
 
-local last_random ---@type string?
-
 -- https://github.com/Styzex/RandTheme.nvim/blob/f96818619d9dcfa179f6d15eb67b04cae6ed31c7/lua/randtheme/theme_manager.lua#L62
+local last_random ---@type string?
 ---@return string?
 local function random_colorscheme()
   local themes = vim.tbl_filter(function(v)
@@ -168,7 +167,7 @@ return {
             hl.LineNrBelow = { fg = c.dark5 }
             hl.CursorLineNr = { fg = c.fg_dark }
             hl.TelescopeSelection = { fg = c.fg_bright, bg = c.bg_highlight, bold = true }
-            hl.TelescopeSelectionCaret = { fg = hl.TelescopeSelectionCaret.fg, bg = hl.TelescopeSelection.bg }
+            hl.TelescopeSelectionCaret = U.extend_tbl(hl.TelescopeSelectionCaret, { bg = hl.TelescopeSelection.bg })
             hl.CmpItemKindSnippet = { fg = c.fg_bright }
             -- hl.PmenuThumb = { bg = c.border_highlight }
             -- hl.PmenuSel = { bg = c.bg_highlight, bold = true }
@@ -455,9 +454,10 @@ return {
     "scottmckendry/cyberdream.nvim",
     cond = cond_colorscheme("^cyberdream$"),
     lazy = true,
+    dependencies = { "nvim-lualine/lualine.nvim", optional = true },
     init = function()
-      local lualine_section_separators_orig
-      local is_lualine_section_separators_modified = false
+      local lualine_sep_orig
+      local is_lualine_modified = false
       vim.api.nvim_create_autocmd("ColorScheme", {
         callback = function(event)
           -- https://github.com/scottmckendry/cyberdream.nvim/blob/7e6feb49d2ec47a742215754ec0ecc51eebba55a/lua/cyberdream/util.lua#L257
@@ -468,11 +468,11 @@ return {
 
           local lualine_opts = lualine.get_config()
           if event.match == "cyberdream" and vim.g.user_transparent_background then
-            lualine_section_separators_orig = lualine_section_separators_orig or lualine_opts.options.section_separators
+            lualine_sep_orig = lualine_sep_orig or lualine_opts.options.section_separators
             lualine_opts.options.section_separators = { left = "", right = "" }
-            is_lualine_section_separators_modified = true
-          elseif is_lualine_section_separators_modified then
-            lualine_opts.options.section_separators = lualine_section_separators_orig
+            is_lualine_modified = true
+          elseif is_lualine_modified then
+            lualine_opts.options.section_separators = lualine_sep_orig
           else
             return
           end
