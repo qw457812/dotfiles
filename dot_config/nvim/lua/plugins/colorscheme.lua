@@ -24,6 +24,8 @@ local colorschemes = vim.g.user_transparent_background and {
   "catppuccin-macchiato",
 }
 
+local borderless_telescope = vim.g.user_transparent_background
+
 local last_random ---@type string?
 
 -- https://github.com/Styzex/RandTheme.nvim/blob/f96818619d9dcfa179f6d15eb67b04cae6ed31c7/lua/randtheme/theme_manager.lua#L62
@@ -137,6 +139,18 @@ return {
           hl.TelescopeSelectionCaret =
             { fg = (hl.TelescopePromptPrefix or hl.Identifier).fg, bg = (hl.TelescopeSelection or hl.Visual).bg }
 
+          if borderless_telescope then
+            local prompt = "#2d3149" -- c.bg_dark
+            hl.TelescopeNormal = { bg = c.bg_dark, fg = c.fg }
+            hl.TelescopeBorder = { bg = c.bg_dark, fg = c.bg_dark }
+            hl.TelescopePromptNormal = { bg = prompt }
+            hl.TelescopePromptBorder = { bg = prompt, fg = prompt }
+            -- hl.TelescopePromptTitle = { bg = c.fg_gutter, fg = c.orange }
+            hl.TelescopePromptTitle = { bg = c.red }
+            hl.TelescopePreviewTitle = { bg = c.bg_dark, fg = c.bg_dark }
+            hl.TelescopeResultsTitle = { bg = c.bg_dark, fg = c.bg_dark }
+          end
+
           if tokyonight_has_custom_style() and tokyonight_mark_style(c) == tokyonight_custom_style then
             hl.String = { fg = c.orange }
             hl.Character = { fg = c.orange2 }
@@ -159,18 +173,6 @@ return {
             -- hl.PmenuThumb = { bg = c.border_highlight }
             -- hl.PmenuSel = { bg = c.bg_highlight, bold = true }
           end
-
-          do
-            return
-          end
-          local prompt = "#2d3149"
-          hl.TelescopeNormal = { bg = c.bg_dark, fg = c.fg }
-          hl.TelescopeBorder = { bg = c.bg_dark, fg = c.bg_dark }
-          hl.TelescopePromptNormal = { bg = prompt }
-          hl.TelescopePromptBorder = { bg = prompt, fg = prompt }
-          hl.TelescopePromptTitle = { bg = c.fg_gutter, fg = c.orange }
-          hl.TelescopePreviewTitle = { bg = c.bg_dark, fg = c.bg_dark }
-          hl.TelescopeResultsTitle = { bg = c.bg_dark, fg = c.bg_dark }
         end,
       }
     end,
@@ -252,6 +254,20 @@ return {
           dark = "macchiato", -- frappe, macchiato, mocha(default)
         },
         transparent_background = vim.g.user_transparent_background,
+        integrations = {
+          mini = {
+            enabled = true,
+            indentscope_color = "subtext0",
+          },
+          dropbar = {
+            enabled = true,
+            -- color_mode = true,
+          },
+          -- telescope = {
+          --   enabled = true,
+          --   style = borderless_telescope and "nvchad" or nil, -- not working when transparent
+          -- },
+        },
         -- ~/.local/share/nvim/lazy/catppuccin/lua/catppuccin/palettes/macchiato.lua
         -- https://github.com/catppuccin/nvim/discussions/323
         -- https://github.com/tm157/dotfiles/blob/8a32eb599c4850a96a41a012fa3ba54c81111001/nvim/lua/user/colorscheme.lua#L31
@@ -272,23 +288,13 @@ return {
             crust = to_neutral_gray(mocha.crust),
           },
         },
-        integrations = {
-          mini = {
-            enabled = true,
-            indentscope_color = "subtext0",
-          },
-          dropbar = {
-            enabled = true,
-            -- color_mode = true,
-          },
-        },
         custom_highlights = function(colors)
           local util = require("catppuccin.utils.colors")
           -- highlight word/references under cursor
           -- require lazyvim.plugins.extras.editor.illuminate
           -- colors.surface1(#45475a) #494d64 #51576d colors.surface2(#585b70)
           local illuminate = util.darken(colors.surface2, 0.8, colors.base)
-          return {
+          local custom_highlights = {
             -- IlluminatedWordText = { bg = util.darken(colors.surface1, 0.7, colors.base) }, -- use default
             IlluminatedWordRead = { bg = illuminate },
             IlluminatedWordWrite = { bg = illuminate, style = { "underline" } },
@@ -305,10 +311,25 @@ return {
 
             -- for flash treesitter search, not necessary after using `{ label = { rainbow = { enabled = true } } }` opts
             FlashLabel = { fg = colors.base, bg = colors.green, style = { "bold" } },
+          }
 
+          return vim.tbl_deep_extend("force", custom_highlights, borderless_telescope and {
+            -- copied from: https://github.com/catppuccin/nvim/blob/35d8057137af463c9f41f169539e9b190d57d269/lua/catppuccin/groups/integrations/telescope.lua#L6
+            TelescopeBorder = { fg = colors.mantle, bg = colors.mantle },
+            TelescopeMatching = { fg = colors.blue },
+            TelescopeNormal = { bg = colors.mantle },
+            TelescopePromptBorder = { fg = colors.surface0, bg = colors.surface0 },
+            TelescopePromptNormal = { fg = colors.text, bg = colors.surface0 },
+            TelescopePromptPrefix = { fg = colors.flamingo, bg = colors.surface0 },
+            TelescopePreviewTitle = { fg = colors.base, bg = colors.green },
+            TelescopePromptTitle = { fg = colors.base, bg = colors.red },
+            TelescopeResultsTitle = { fg = colors.mantle, bg = colors.lavender },
+            TelescopeSelection = { fg = colors.text, bg = colors.surface0, style = { "bold" } },
+            TelescopeSelectionCaret = { fg = colors.flamingo },
+          } or {
             TelescopePromptBorder = { fg = colors.peach },
             TelescopePromptTitle = { fg = colors.peach },
-          }
+          })
         end,
       })
     end,
@@ -464,7 +485,10 @@ return {
       return {
         transparent = vim.g.user_transparent_background,
         italic_comments = true,
-        borderless_telescope = false,
+        borderless_telescope = {
+          border = not borderless_telescope,
+          -- style = "nvchad",
+        },
         theme = {
           -- ~/.local/share/nvim/lazy/cyberdream.nvim/lua/cyberdream/colors.lua
           overrides = function(c)

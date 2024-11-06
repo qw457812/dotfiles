@@ -27,7 +27,7 @@ return {
       options = {
         separator_style = vim.g.user_transparent_background and { "", "" } or "slant", -- slope
         -- in favor of `BufferLineGoToBuffer`
-        numbers = function(opts)
+        numbers = vim.g.user_is_termux and "none" or function(opts)
           ---@type bufferline.State
           local state = require("bufferline.state")
           for i, item in ipairs(state.visible_components) do
