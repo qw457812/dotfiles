@@ -43,8 +43,9 @@ end
 
 ---@param win? integer default 0
 ---@param zenmode_as_floating? boolean default true
+---@param treesitter_context_as_floating? boolean default true
 ---@return boolean
-function M.is_floating(win, zenmode_as_floating)
+function M.is_floating(win, zenmode_as_floating, treesitter_context_as_floating)
   win = win or 0
   local is_float = vim.api.nvim_win_get_config(win).relative ~= ""
   if is_float and zenmode_as_floating == false and package.loaded["zen-mode"] then
@@ -53,6 +54,10 @@ function M.is_floating(win, zenmode_as_floating)
       win = win == 0 and vim.api.nvim_get_current_win() or win
       is_float = win ~= zen_mode.win and win ~= zen_mode.bg_win
     end
+  end
+  if is_float and treesitter_context_as_floating == false and package.loaded["treesitter-context"] then
+    -- see: https://github.com/nvim-treesitter/nvim-treesitter-context/blob/a2a334900d3643de585ac5c6140b03403454124f/lua/treesitter-context/render.lua#L56
+    is_float = not (vim.w[win].treesitter_context or vim.w[win].treesitter_context_line_number)
   end
   return is_float
 end

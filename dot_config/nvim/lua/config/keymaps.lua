@@ -188,17 +188,25 @@ map("n", "<esc>", function()
     elseif package.loaded["notify"] then
       require("notify").dismiss({ silent = true, pending = true })
     end
-  elseif U.is_floating(0, false) then
+  elseif U.is_floating(0, false, false) then
     -- close current floating window (won't close zen-mode)
     vim.api.nvim_win_close(0, false)
   else
+    -- can't close other windows when the command-line window is open
+    if vim.fn.getcmdwintype() ~= "" then
+      return
+    end
     -- close all floating windows (won't close zen-mode)
     for _, win in ipairs(vim.api.nvim_list_wins()) do
-      if vim.api.nvim_win_is_valid(win) and U.is_floating(win, false) then
+      if vim.api.nvim_win_is_valid(win) and U.is_floating(win, false, false) then
         vim.api.nvim_win_close(win, false)
       end
     end
   end
+
+  vim.cmd("diffupdate")
+  -- vim.cmd.redraw({ bang = true })
+  vim.cmd("normal! <C-L>") -- redraw
 
   vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<esc>", true, true, true), "n", false)
 end, { desc = "Escape and Clear hlsearch or notifications or Close floating window(s)" })
