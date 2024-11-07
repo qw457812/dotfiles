@@ -59,6 +59,7 @@ return {
           end
 
           require("rip-substitute").sub()
+          vim.cmd("stopinsert")
         end,
         desc = "Rip Substitute",
       },
@@ -76,6 +77,10 @@ return {
       regexOptions = {
         startWithFixedStringsOn = true,
         -- startWithIgnoreCase = true,
+      },
+      prefill = {
+        startInReplaceLineIfPrefill = true,
+        alsoPrefillReplaceLine = true,
       },
     },
   },
