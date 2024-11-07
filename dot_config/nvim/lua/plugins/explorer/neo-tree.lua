@@ -669,7 +669,7 @@ return {
     opts = function(_, opts)
       for _, view in ipairs(opts.left or {}) do
         if view.ft == "neo-tree" then
-          view.size = { width = 40 }
+          view.size = { width = math.max(35, math.min(50, math.floor(vim.o.columns * 0.25))) }
           view.title = "Neo-Tree"
           break
         end
