@@ -151,7 +151,7 @@ return {
             -- hl.TelescopePreviewTitle = { bg = bg, fg = bg }
             -- hl.TelescopeResultsTitle = { bg = bg, fg = bg }
             -- cyberdream flat style: https://github.com/scottmckendry/cyberdream.nvim/blob/28cde1cf8b792e6dffe51f0d98632b361baa972b/lua/cyberdream/extensions/telescope.lua#L40
-            hl.TelescopePromptTitle = { bg = util.blend_bg(c.red, 0.8), fg = c.black, bold = true }
+            hl.TelescopePromptTitle = { fg = c.black, bg = util.blend_bg(c.red, 0.8), bold = true }
             hl.TelescopePreviewTitle = { fg = c.black, bg = util.blend_bg(c.green, 0.75), bold = true }
             hl.TelescopeResultsTitle = { fg = util.blend_bg(c.red, 0.8), bg = bg, bold = true }
           end
@@ -316,21 +316,25 @@ return {
 
             -- for flash treesitter search, not necessary after using `{ label = { rainbow = { enabled = true } } }` opts
             FlashLabel = { fg = colors.base, bg = colors.green, style = { "bold" } },
+
+            TelescopeSelection = { fg = colors.text, bg = colors.surface0, style = { "bold" } },
+            TelescopeSelectionCaret = { fg = colors.flamingo, bg = colors.surface0 },
           }
 
+          local borderless_telescope_bg = require("util.color").to_neutral_gray(colors.mantle)
           return vim.tbl_deep_extend("force", custom_highlights, borderless_telescope and {
             -- copied from: https://github.com/catppuccin/nvim/blob/35d8057137af463c9f41f169539e9b190d57d269/lua/catppuccin/groups/integrations/telescope.lua#L6
-            TelescopeBorder = { fg = colors.mantle, bg = colors.mantle },
-            TelescopeMatching = { fg = colors.blue },
-            TelescopeNormal = { bg = colors.mantle },
-            TelescopePromptBorder = { fg = colors.surface0, bg = colors.surface0 },
-            TelescopePromptNormal = { fg = colors.text, bg = colors.surface0 },
-            TelescopePromptPrefix = { fg = colors.flamingo, bg = colors.surface0 },
+            TelescopeBorder = { fg = borderless_telescope_bg, bg = borderless_telescope_bg },
+            TelescopeNormal = { bg = borderless_telescope_bg },
+            -- TelescopePromptBorder = { fg = colors.surface0, bg = colors.surface0 },
+            -- TelescopePromptNormal = { fg = colors.text, bg = colors.surface0 },
+            TelescopePromptBorder = { fg = borderless_telescope_bg, bg = borderless_telescope_bg },
+            TelescopePromptNormal = { fg = colors.text, bg = borderless_telescope_bg },
+            -- TelescopePromptPrefix = { fg = colors.flamingo, bg = colors.surface0 },
             TelescopePreviewTitle = { fg = colors.base, bg = colors.green },
             TelescopePromptTitle = { fg = colors.base, bg = colors.red },
-            TelescopeResultsTitle = { fg = colors.mantle, bg = colors.lavender },
-            TelescopeSelection = { fg = colors.text, bg = colors.surface0, style = { "bold" } },
-            TelescopeSelectionCaret = { fg = colors.flamingo },
+            -- TelescopeResultsTitle = { fg = borderless_telescope_bg, bg = colors.lavender },
+            TelescopeResultsTitle = { fg = colors.red, bg = borderless_telescope_bg },
           } or {
             TelescopePromptBorder = { fg = colors.peach },
             TelescopePromptTitle = { fg = colors.peach },
