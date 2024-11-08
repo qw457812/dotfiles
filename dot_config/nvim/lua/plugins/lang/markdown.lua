@@ -11,6 +11,9 @@ return {
         -- toggling this plugin should also toggle conceallevel
         conceallevel = { default = 0 },
       },
+      -- code = {
+      --   disable_background = vim.g.user_transparent_background,
+      -- },
     },
   },
 }

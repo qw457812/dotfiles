@@ -2,7 +2,9 @@ return {
   -- https://github.com/search?q=repo%3Aaimuzov%2FLazyVimx%20tiny-inline-diagnostic.nvim&type=code
   {
     "rachartier/tiny-inline-diagnostic.nvim",
-    event = "VeryLazy", -- LspAttach
+    -- priority = 1000,
+    lazy = false,
+    -- event = "VeryLazy", -- LspAttach
     dependencies = {
       "neovim/nvim-lspconfig",
       -- for `vim.diagnostic.config({ virtual_text = false })`

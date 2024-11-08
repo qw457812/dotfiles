@@ -2,6 +2,7 @@
 ---@field color util.color
 ---@field explorer util.explorer
 ---@field path util.path
+---@field telescope util.telescope
 ---@field toggle util.toggle
 local M = {}
 
