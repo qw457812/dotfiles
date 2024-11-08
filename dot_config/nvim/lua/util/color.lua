@@ -55,6 +55,42 @@ function M.is_dark(hex)
   return luminance <= 0.5
 end
 
+function M.increase_saturation(hex, percentage)
+  local rgb = { M.hex2rgb(hex) }
+
+  local saturation_float = percentage
+
+  table.sort(rgb)
+  local rgb_intensity = {
+    min = rgb[1] / 255,
+    mid = rgb[2] / 255,
+    max = rgb[3] / 255,
+  }
+
+  if rgb_intensity.max == rgb_intensity.min then
+    -- all colors have same intensity, which means
+    -- the original color is gray, so we can't change saturation.
+    return hex
+  end
+
+  local new_intensities = {}
+  new_intensities.max = rgb_intensity.max
+  new_intensities.min = rgb_intensity.max * (1 - saturation_float)
+
+  if rgb_intensity.mid == rgb_intensity.min then
+    new_intensities.mid = new_intensities.min
+  else
+    local intensity_proportion = (rgb_intensity.max - rgb_intensity.mid) / (rgb_intensity.mid - rgb_intensity.min)
+    new_intensities.mid = (intensity_proportion * new_intensities.min + rgb_intensity.max) / (intensity_proportion + 1)
+  end
+
+  for i, v in pairs(new_intensities) do
+    new_intensities[i] = math.floor(v * 255)
+  end
+  table.sort(new_intensities)
+  return (M.rgb2hex(new_intensities.max, new_intensities.min, new_intensities.mid))
+end
+
 ---@param hex string
 function M.to_neutral_gray(hex)
   if not hex or hex:upper() == "NONE" then

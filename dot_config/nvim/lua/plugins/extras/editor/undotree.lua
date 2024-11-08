@@ -12,6 +12,7 @@ return {
     },
     opts = function(_, opts)
       local undo_actions = require("telescope-undo.actions")
+      local undo_previewer = require("telescope-undo.previewer")
 
       --- https://github.com/emmanueltouzery/nvim_config/blob/cac11a0bdc4ac2fb535189f18fe5cf07538e7810/init.lua#L162
       ---@param undo_action fun(prompt_bufnr:number):fun():string[]?
@@ -32,7 +33,14 @@ return {
 
       opts.extensions = vim.tbl_deep_extend("force", opts.extensions or {}, {
         undo = {
-          side_by_side = true,
+          -- -- side_by_side = true,
+          -- -- use `--side-by-side` or `--paging never` to wrap lines
+          -- use_custom_command = {
+          --   "bash",
+          --   "-c",
+          --   -- "echo '$DIFF' | delta --file-style omit --hunk-header-style omit --paging never", -- can't scroll, see hack below
+          --   "echo '$DIFF' | delta --file-style omit --hunk-header-style omit --side-by-side",
+          -- },
           layout_strategy = "vertical",
           layout_config = {
             preview_cutoff = 1, -- preview should always show
@@ -79,6 +87,28 @@ return {
           },
         },
       })
+
+      if vim.fn.executable("delta") == 1 then
+        -- HACK: scroll for `delta --paging never`
+        ---@diagnostic disable-next-line: unused-local
+        function undo_previewer.get_previewer(o)
+          return U.telescope.never_paging_term_previewer({
+            -- copied from:
+            -- https://github.com/debugloop/telescope-undo.nvim/blob/2971cc9f193ec09e0c5de3563f99cbea16b63f10/lua/telescope-undo/previewer.lua
+            -- https://github.com/rachartier/tiny-code-action.nvim/blob/b389735000946367e357e006102c11b46ee808f3/lua/tiny-code-action/backend/delta.lua#L80
+            get_command = function(entry, _)
+              return {
+                "bash",
+                "-c",
+                "echo '"
+                  .. entry.value.diff:gsub("'", [['"'"']])
+                  .. string.rep("\n", vim.o.lines) -- HACK: to prevent `Process exited` message
+                  .. "' | delta --file-style omit --hunk-header-style omit --paging never",
+              }
+            end,
+          })
+        end
+      end
 
       -- https://github.com/jacquin236/minimal-nvim/blob/baacb78adce67d704d17c3ad01dd7035c5abeca3/lua/plugins/editor/telescope-extras.lua#L5
       -- NOTE:

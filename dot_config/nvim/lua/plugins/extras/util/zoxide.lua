@@ -4,12 +4,11 @@ end
 
 local pick = function()
   local telescope = require("telescope")
-  local previewers = require("telescope.previewers")
   local from_entry = require("telescope.from_entry")
   local utils = require("telescope.utils")
 
   -- https://github.com/petobens/dotfiles/blob/0e216cdf8048859db5cbec0a1bc5b99d45479817/nvim/lua/plugin-config/telescope_config.lua#L784
-  local tree_previewer = previewers.new_termopen_previewer({
+  local tree_previewer = U.telescope.never_paging_term_previewer({
     title = "Tree Preview",
     get_command = function(entry)
       local p = from_entry.path(entry, true, false)
@@ -41,20 +40,6 @@ local pick = function()
         command = { "tree", "-a", "-L", "2", "-I", ignore_glob, "-C", "--dirsfirst" }
       end
       return utils.flatten({ command, "--", utils.path_expand(p) })
-    end,
-    -- ~/.local/share/nvim/lazy/telescope.nvim/lua/telescope/previewers/buffer_previewer.lua
-    scroll_fn = function(self, direction)
-      if not self.state then
-        return
-      end
-      -- local input = direction > 0 and string.char(0x05) or string.char(0x19)
-      -- local input = direction > 0 and [[]] or [[]]
-      -- https://github.com/nvim-telescope/telescope.nvim/issues/2933#issuecomment-1958504220
-      local input = vim.api.nvim_replace_termcodes(direction > 0 and "<C-e>" or "<C-y>", true, false, true)
-      local count = math.abs(direction)
-      vim.api.nvim_win_call(vim.fn.bufwinid(self.state.termopen_bufnr), function()
-        vim.cmd([[normal! ]] .. count .. input)
-      end)
     end,
   })
 

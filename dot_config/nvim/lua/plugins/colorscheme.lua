@@ -55,6 +55,7 @@ local function cond_colorscheme(pattern)
 end
 
 local function to_neutral_gray(color)
+  -- transparent: CursorLine
   return vim.g.user_transparent_background and color or U.color.to_neutral_gray(color)
 end
 
@@ -139,15 +140,20 @@ return {
             { fg = (hl.TelescopePromptPrefix or hl.Identifier).fg, bg = (hl.TelescopeSelection or hl.Visual).bg }
 
           if borderless_telescope then
-            local prompt = "#2d3149" -- c.bg_dark
-            hl.TelescopeNormal = { bg = c.bg_dark, fg = c.fg }
-            hl.TelescopeBorder = { bg = c.bg_dark, fg = c.bg_dark }
+            local bg = U.color.to_neutral_gray(c.bg_dark) -- c.bg_dark
+            local prompt = bg -- "#2d3149"
+            hl.TelescopeNormal = { bg = bg, fg = c.fg }
+            hl.TelescopeBorder = { bg = bg, fg = bg }
             hl.TelescopePromptNormal = { bg = prompt }
             hl.TelescopePromptBorder = { bg = prompt, fg = prompt }
-            -- hl.TelescopePromptTitle = { bg = c.fg_gutter, fg = c.orange }
-            hl.TelescopePromptTitle = { bg = c.red }
-            hl.TelescopePreviewTitle = { bg = c.bg_dark, fg = c.bg_dark }
-            hl.TelescopeResultsTitle = { bg = c.bg_dark, fg = c.bg_dark }
+            -- -- hl.TelescopePromptTitle = { bg = c.fg_gutter, fg = c.orange }
+            -- hl.TelescopePromptTitle = { bg = prompt, fg = c.orange }
+            -- hl.TelescopePreviewTitle = { bg = bg, fg = bg }
+            -- hl.TelescopeResultsTitle = { bg = bg, fg = bg }
+            -- cyberdream flat style: https://github.com/scottmckendry/cyberdream.nvim/blob/28cde1cf8b792e6dffe51f0d98632b361baa972b/lua/cyberdream/extensions/telescope.lua#L40
+            hl.TelescopePromptTitle = { bg = util.blend_bg(c.red, 0.8), fg = c.black, bold = true }
+            hl.TelescopePreviewTitle = { fg = c.black, bg = util.blend_bg(c.green, 0.75), bold = true }
+            hl.TelescopeResultsTitle = { fg = util.blend_bg(c.red, 0.8), bg = bg, bold = true }
           end
 
           if tokyonight_has_custom_style() and tokyonight_mark_style(c) == tokyonight_custom_style then
@@ -487,7 +493,7 @@ return {
         italic_comments = true,
         borderless_telescope = {
           border = not borderless_telescope,
-          -- style = "nvchad",
+          style = "flat", -- nvchad
         },
         theme = {
           -- ~/.local/share/nvim/lazy/cyberdream.nvim/lua/cyberdream/colors.lua

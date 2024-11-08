@@ -103,11 +103,7 @@ return {
               },
               body = {
                 model = opts.model,
-                -- messages = { -- you can make your own message, but this is very advanced
-                --   { role = "system", content = code_opts.system_prompt },
-                --   { role = "user", content = require("avante.providers.openai").get_user_message(code_opts) },
-                -- },
-                messages = require("avante.providers.openai").parse_messages(code_opts),
+                messages = require("avante.providers.openai").parse_messages(code_opts), -- you can make your own message, but this is very advanced
                 temperature = 0,
                 max_tokens = 8000,
                 stream = true, -- this will be set by default.
