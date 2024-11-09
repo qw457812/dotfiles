@@ -11,16 +11,18 @@ return {
     optional = true,
     dependencies = { "echasnovski/mini.icons" },
     keys = function(_, keys)
-      U.toggle.map("<leader>uz", {
-        name = "NeoTree Auto Close",
-        get = function()
-          return vim.g.user_neotree_auto_close
-        end,
-        set = function(state)
-          vim.g.user_neotree_auto_close = state
-          require("neo-tree.command").execute({ action = state and "close" or "show" })
-        end,
-      })
+      require("snacks")
+        .toggle({
+          name = "NeoTree Auto Close",
+          get = function()
+            return vim.g.user_neotree_auto_close
+          end,
+          set = function(state)
+            vim.g.user_neotree_auto_close = state
+            require("neo-tree.command").execute({ action = state and "close" or "show" })
+          end,
+        })
+        :map("<leader>uz")
 
       local last_root ---@type string?
       local mappings = {

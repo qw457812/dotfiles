@@ -53,8 +53,10 @@ return {
         "<leader>sf",
         mode = { "n", "x" },
         function()
-          -- popup overlap by nvim-notify or noice.nvim when `opts.popupWin.position == "top"`
-          if package.loaded["notify"] then
+          -- popup overlap by noice.nvim (snacks.nvim or nvim-notify) when `opts.popupWin.position == "top"`
+          if package.loaded["snacks"] then
+            Snacks.notifier.hide()
+          elseif package.loaded["notify"] then
             require("notify").dismiss({ silent = true, pending = true })
           end
 

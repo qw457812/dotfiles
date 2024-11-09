@@ -170,10 +170,22 @@ map("n", "<Right>", "<C-i>", { desc = "Go Forward" })
 -- or <leader><esc>
 -- https://github.com/megalithic/dotfiles/blob/fce3172e3cb1389de22bf97ccbf29805c2262525/config/nvim/lua/mega/mappings.lua#L143
 map("n", "<esc>", function()
-  local function has_notifications()
-    return not vim.tbl_isempty(vim.tbl_filter(function(b)
-      return vim.api.nvim_buf_is_valid(b) and vim.tbl_contains({ "notify", "noice" }, vim.bo[b].filetype)
-    end, vim.api.nvim_list_bufs()))
+  -- -- TODO: snacks_notif always exists?
+  -- local function has_notif()
+  --   return not vim.tbl_isempty(vim.tbl_filter(function(b)
+  --     return vim.api.nvim_buf_is_valid(b)
+  --       and vim.tbl_contains({ "snacks_notif", "notify", "noice" }, vim.bo[b].filetype)
+  --   end, vim.api.nvim_list_bufs()))
+  -- end
+
+  local function dismiss_notif()
+    if package.loaded["noice"] then
+      require("noice").cmd("dismiss") -- including lsp progress (floating windows)
+    elseif package.loaded["snacks"] then
+      Snacks.notifier.hide()
+    elseif package.loaded["notify"] then
+      require("notify").dismiss({ silent = true, pending = true })
+    end
   end
 
   local is_cmd_win = vim.fn.getcmdwintype() ~= ""
@@ -184,12 +196,8 @@ map("n", "<esc>", function()
     if package.loaded["scrollbar"] then
       require("scrollbar.handlers.search").nohlsearch()
     end
-  elseif has_notifications() then
-    if package.loaded["noice"] then
-      require("noice").cmd("dismiss") -- including lsp progress (floating windows)
-    elseif package.loaded["notify"] then
-      require("notify").dismiss({ silent = true, pending = true })
-    end
+  -- elseif has_notif() then
+  --   dismiss_notif()
   elseif U.is_floating(0, false, false) then
     -- close floating window
     vim.api.nvim_win_close(0, false)
@@ -202,6 +210,7 @@ map("n", "<esc>", function()
     end
   end
 
+  dismiss_notif()
   if not is_cmd_win then
     vim.cmd("diffupdate")
   end
@@ -329,9 +338,9 @@ end, { desc = "Yank file relative path" })
 -- end, { desc = "Yank file name" })
 
 -- toggle options
-U.toggle.map("<leader>ul", U.toggle("number", { name = "Line Number" }))
-U.toggle.map("<leader>ud", U.toggle.diagnostic_virtual_text)
-U.toggle.map("<leader>uD", U.toggle.diagnostics)
+Snacks.toggle.option("number", { name = "Line Number" }):map("<leader>ul")
+U.toggle.diagnostic_virtual_text:map("<leader>ud")
+U.toggle.diagnostics:map("<leader>uD")
 
 -- local function google_search(input)
 --   local query = input or vim.fn.expand("<cword>")
@@ -365,7 +374,7 @@ if vim.g.neovide then
     neovide_cursor_vfx_mode = "",
   }
   local neovide_state = {} ---@type table<string, any>
-  U.toggle.map("<leader>ua", {
+  Snacks.toggle({
     name = "Mini/Neovide Animate",
     get = function()
       -- return not vim.g.minianimate_disable -- extras.ui.mini-animate might not enabled
@@ -387,5 +396,5 @@ if vim.g.neovide then
         end
       end
     end,
-  })
+  }):map("<leader>ua")
 end

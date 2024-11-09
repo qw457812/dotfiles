@@ -1,39 +1,16 @@
-local LazyToggle = LazyVim.toggle
-local LazyToggleDiag = LazyToggle.diagnostics
+local SnacksToggle = require("snacks.toggle")
+local SnacksToggleDiag = SnacksToggle.diagnostics()
 
 ---@class util.toggle
----@field wrap fun(toggle:lazyvim.Toggle):lazyvim.Toggle.wrap
----@field wk fun(lhs:string, toggle:lazyvim.Toggle)
 local M = {}
-
-setmetatable(M, {
-  __index = function(_, k)
-    if LazyToggle[k] then
-      return LazyToggle[k]
-    end
-  end,
-  __call = function(_, ...)
-    return LazyToggle(...)
-  end,
-})
-
----@param lhs string
----@param toggle lazyvim.Toggle
-function M.map(lhs, toggle)
-  local t = M.wrap(toggle)
-  U.keymap("n", lhs, function()
-    t()
-  end, { desc = "Toggle " .. toggle.name })
-  M.wk(lhs, toggle)
-end
 
 -- https://github.com/xzbdmw/nvimconfig/blob/0be9805dac4661803e17265b435060956daee757/lua/config/keymaps.lua#L49
 local has_diagnostic_virtual_text = nil
-M.diagnostic_virtual_text = M.wrap({
+M.diagnostic_virtual_text = SnacksToggle.new({
   name = "Diagnostic Virtual Text",
   get = function()
     if has_diagnostic_virtual_text == nil then
-      return LazyToggleDiag.get()
+      return SnacksToggleDiag:get()
     end
     return has_diagnostic_virtual_text
   end,
@@ -55,20 +32,22 @@ M.diagnostic_virtual_text = M.wrap({
         } or false,
       })
     end
-    if state and not LazyToggleDiag.get() then
-      LazyToggleDiag.set(state)
+    if state and not SnacksToggleDiag:get() then
+      SnacksToggleDiag:set(state)
     end
   end,
 })
 
 -- toggle diagnostics and it's virtual text
-M.diagnostics = M.wrap({
+M.diagnostics = SnacksToggle.new({
   name = "Diagnostics",
-  get = LazyToggleDiag.get,
+  get = function()
+    return SnacksToggleDiag:get()
+  end,
   set = function(state)
-    M.diagnostic_virtual_text.set(state)
+    M.diagnostic_virtual_text:set(state)
     if not state then
-      LazyToggleDiag.set(state)
+      SnacksToggleDiag:set(state)
     end
   end,
 })
