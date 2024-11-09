@@ -59,7 +59,7 @@ return {
         pattern = "MiniFilesActionMove",
         ---@param event {data: {action: string, from: string, to: string}}
         callback = function(event)
-          LazyVim.lsp.on_rename(event.data.from, event.data.to)
+          Snacks.rename.on_rename_file(event.data.from, event.data.to)
         end,
       })
 

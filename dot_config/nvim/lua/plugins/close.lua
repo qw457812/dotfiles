@@ -41,7 +41,7 @@ local function close_buffer_or_window_or_exit()
     if non_real_file() then
       vim.cmd("bd") -- Delete Buffer and Window
     else
-      LazyVim.ui.bufremove() -- Delete Buffer
+      Snacks.bufdelete() -- Delete Buffer
     end
   else
     vim.cmd("qa")
