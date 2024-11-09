@@ -6,7 +6,7 @@ return {
       local config = require("scrollbar.config").get()
 
       -- local enabled = true
-      U.toggle.map("<leader>uS", {
+      Snacks.toggle({
         name = "Scroll Bar",
         get = function()
           return require("scrollbar.config").get().show
@@ -20,7 +20,7 @@ return {
             vim.cmd("ScrollbarHide")
           end
         end,
-      })
+      }):map("<leader>uS")
 
       return {
         excluded_filetypes = vim.list_extend(vim.deepcopy(config.excluded_filetypes), {

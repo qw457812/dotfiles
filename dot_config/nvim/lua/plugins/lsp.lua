@@ -102,7 +102,7 @@ return {
       -- stylua: ignore
       vim.list_extend(Keys, {
         { "K", false },
-        { "gk", vim.lsp.buf.hover, desc = "Hover" },
+        { "gk", function() return vim.lsp.buf.hover() end, desc = "Hover" },
         -- { "gd", pick_definitions_or_references, desc = "Goto Definition/References", has = "definition" },
         { "<cr>", pick_definitions_or_references, desc = "Goto Definition/References", has = "definition" },
         { "<leader>cr", function() require("live-rename").rename() end, desc = "Rename (live-rename.nvim)", has = "rename" },
