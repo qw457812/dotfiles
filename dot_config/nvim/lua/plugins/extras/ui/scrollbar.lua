@@ -31,6 +31,7 @@ return {
           "edgy",
           "trouble",
           "notify",
+          "snacks_notif",
           "rip-substitute",
           "qf",
           "lazy",

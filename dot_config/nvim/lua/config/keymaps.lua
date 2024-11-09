@@ -228,7 +228,7 @@ map({ "n", "x", "o" }, "mm", "%", { desc = "Goto matching bracket", remap = true
 
 -- floating terminal
 -- stylua: ignore
-map("n", "<leader>.", function() LazyVim.terminal(nil, { cwd = vim.fn.expand("%:p:h") }) end, { desc = "Terminal (Buffer Dir)" })
+map("n", "<leader>.", function() Snacks.terminal(nil, { cwd = vim.fn.expand("%:p:h") }) end, { desc = "Terminal (Buffer Dir)" })
 
 -- windows
 -- https://github.com/gpakosz/.tmux/blob/9cf49731cd785b76cf792046feed0e8275457918/.tmux.conf#L74

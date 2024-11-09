@@ -34,7 +34,7 @@ return {
         ---@param event {data: YaziNeovimEvent.YaziRenamedOrMovedData}
         callback = function(event)
           for from, to in pairs(event.data.changes) do
-            LazyVim.lsp.on_rename(from, to)
+            Snacks.rename.on_rename_file(from, to)
           end
         end,
       })
