@@ -143,7 +143,7 @@ return {
     opts = function()
       LazyVim.lsp.on_attach(function(client, _)
         vim.defer_fn(function()
-          LazyVim.toggle.diagnostics.set(true)
+          U.toggle.diagnostics:set(true)
         end, 100)
       end, ruff)
     end,

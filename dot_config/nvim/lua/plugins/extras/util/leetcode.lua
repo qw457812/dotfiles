@@ -18,6 +18,14 @@ return {
     dependencies = {
       { "nvim-telescope/telescope.nvim" },
       { "MunifTanjim/nui.nvim" },
+      {
+        "3rd/image.nvim",
+        lazy = true,
+        build = false,
+        opts = {
+          processor = "magick_cli",
+        },
+      },
       { "rcarriga/nvim-notify", optional = true },
       { "nvim-tree/nvim-web-devicons", optional = true },
       {
@@ -51,6 +59,7 @@ return {
     },
     opts = {
       lang = "python3", -- java, python3
+      image_support = true,
       cn = { -- leetcode.cn
         enabled = true,
       },
@@ -68,7 +77,10 @@ return {
         end,
       },
       keys = {
-        toggle = { "q", "<Esc>" },
+        toggle = {
+          "q",
+          -- "<Esc>",
+        },
         confirm = { "<CR>" },
 
         reset_testcases = "R",

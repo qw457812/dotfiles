@@ -39,6 +39,7 @@ return {
           "Avante",
           "AvanteInput",
           "copilot-chat",
+          "leetcode.nvim",
         }),
       }
     end,

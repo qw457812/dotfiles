@@ -268,4 +268,14 @@ return {
       }, opts.controls or {})
     end,
   },
+
+  {
+    "kawre/leetcode.nvim",
+    optional = true,
+    opts = function(_, opts)
+      opts.keys = opts.keys or {}
+      opts.keys.toggle = type(opts.keys.toggle) == "table" and opts.keys.toggle or { opts.keys.toggle or "q" }
+      table.insert(opts.keys.toggle, close_key)
+    end,
+  },
 }
