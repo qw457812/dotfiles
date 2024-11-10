@@ -139,8 +139,8 @@ return {
               ---@cast action oil.DeleteAction
               local bufnr = vim.fn.bufnr(parse_url(action.url))
               if bufnr ~= -1 then
-                -- LazyVim.ui.bufremove(bufnr)
-                vim.cmd(("silent! bwipeout! %d"):format(bufnr))
+                -- vim.cmd(("silent! bwipeout! %d"):format(bufnr))
+                Snacks.bufdelete({ buf = bufnr, wipe = true })
               end
             end
           end
