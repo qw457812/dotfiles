@@ -20,6 +20,7 @@ return {
       { "MunifTanjim/nui.nvim" },
       {
         "3rd/image.nvim",
+        cond = vim.g.user_is_wezterm, -- not vim.g.neovide
         lazy = true,
         build = false,
         opts = {
@@ -57,38 +58,40 @@ return {
       { "<leader>Lt", "<cmd>Leet test<cr>", desc = "Test" }, -- same as `:Leet run`
       { "<leader>Lu", "<cmd>Leet cache update<cr>", desc = "Update Cache" },
     },
-    opts = {
-      lang = "python3", -- java, python3
-      image_support = true,
-      cn = { -- leetcode.cn
-        enabled = true,
-      },
-      injector = {
-        ["java"] = {
-          before = true, -- access default imports via `require("leetcode.config.imports")`
+    opts = function(_, opts)
+      return U.extend_tbl(opts, {
+        lang = "python3", -- java, python3
+        image_support = LazyVim.has("image.nvim"),
+        cn = { -- leetcode.cn
+          enabled = true,
         },
-        ["python3"] = {
-          before = true,
+        injector = {
+          ["java"] = {
+            before = true, -- access default imports via `require("leetcode.config.imports")`
+          },
+          ["python3"] = {
+            before = true,
+          },
         },
-      },
-      hooks = {
-        ["enter"] = function()
-          pcall(vim.cmd, [[silent! Copilot disable]])
-        end,
-      },
-      keys = {
-        toggle = {
-          "q",
-          -- "<Esc>",
+        hooks = {
+          ["enter"] = function()
+            pcall(vim.cmd, [[silent! Copilot disable]])
+          end,
         },
-        confirm = { "<CR>" },
+        keys = {
+          toggle = {
+            "q",
+            -- "<Esc>",
+          },
+          confirm = { "<CR>" },
 
-        reset_testcases = "R",
-        use_testcase = "U",
-        focus_testcases = "<C-h>",
-        focus_result = "<C-l>",
-      },
-    },
+          reset_testcases = "R",
+          use_testcase = "U",
+          focus_testcases = "<C-h>",
+          focus_result = "<C-l>",
+        },
+      })
+    end,
     init = function()
       vim.api.nvim_create_autocmd("VimEnter", {
         group = vim.api.nvim_create_augroup("leetcode_autostart", { clear = true }),
