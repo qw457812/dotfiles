@@ -1,5 +1,5 @@
-local is_tmux = vim.env.TMUX ~= nil
-local is_wezterm = vim.env.WEZTERM_UNIX_SOCKET ~= nil
+local is_tmux = vim.g.user_is_tmux
+local is_wezterm = vim.g.user_is_wezterm
 
 return {
   -- https://github.com/arturgoms/nvim/blob/045c55460e36e1d4163b426b2ac66bd710721ac5/lua/3thparty/plugins/tmux.lua
@@ -167,24 +167,24 @@ return {
     },
   },
 
-  -- Manage wezterm types for ~/.config/wezterm/*.lua with lazy. Plugin will never be loaded
-  { "justinsgithub/wezterm-types", cond = is_wezterm, lazy = true },
-  {
-    "folke/lazydev.nvim",
-    opts = function(_, opts)
-      if not is_wezterm then
-        return
-      end
-
-      -- opts.debug = true
-      opts.library = opts.library or {}
-      if LazyVim.has("wezterm.nvim") then
-        table.insert(opts.library, { path = "wezterm-types", words = { "%-%-%[%[@as Wezterm%]%]" } })
-      else
-        table.insert(opts.library, { path = "wezterm-types", mods = { "wezterm" } }) -- conflicts with willothy/wezterm.nvim
-      end
-    end,
-  },
+  -- -- Manage wezterm types for ~/.config/wezterm/*.lua with lazy. Plugin will never be loaded
+  -- { "justinsgithub/wezterm-types", cond = is_wezterm, lazy = true },
+  -- {
+  --   "folke/lazydev.nvim",
+  --   opts = function(_, opts)
+  --     if not is_wezterm then
+  --       return
+  --     end
+  --
+  --     -- opts.debug = true
+  --     opts.library = opts.library or {}
+  --     if LazyVim.has("wezterm.nvim") then
+  --       table.insert(opts.library, { path = "wezterm-types", words = { "%-%-%[%[@as Wezterm%]%]" } })
+  --     else
+  --       table.insert(opts.library, { path = "wezterm-types", mods = { "wezterm" } }) -- conflicts with willothy/wezterm.nvim
+  --     end
+  --   end,
+  -- },
 
   {
     "folke/zen-mode.nvim",

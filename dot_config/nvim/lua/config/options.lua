@@ -23,15 +23,15 @@ local win_borders_fillchars = {
 }
 opt.fillchars:append(win_borders_fillchars["bold"])
 
-vim.g.user_transparent_background = vim.env.WEZTERM_UNIX_SOCKET ~= nil
+vim.g.user_is_wezterm = vim.env.WEZTERM_UNIX_SOCKET ~= nil
+vim.g.user_is_tmux = vim.env.TMUX ~= nil
 vim.g.user_is_termux = vim.env.TERMUX_VERSION ~= nil
--- failed to install basedpyright on Termux
-if not vim.g.user_is_termux then
-  vim.g.lazyvim_python_lsp = "basedpyright"
-end
+vim.g.user_transparent_background = vim.g.user_is_wezterm
+-- failed to install basedpyright on termux via mason
+vim.g.lazyvim_python_lsp = vim.g.user_is_termux and nil or "basedpyright"
 -- hijack_netrw: neo-tree.nvim, oil.nvim, mini.files, yazi.nvim, telescope-file-browser.nvim
 vim.g.user_default_explorer = "oil.nvim"
--- For holding layout like no-neck-pain.nvim when Auto Close is disabled
+-- holding layout like no-neck-pain.nvim by disabling neo-tree auto close
 vim.g.user_neotree_auto_close = vim.g.user_is_termux
 
 -- https://neovide.dev/configuration.html
@@ -41,4 +41,7 @@ if vim.g.neovide then
   vim.g.neovide_input_macos_option_key_is_meta = "both"
   -- railgun, torpedo, pixiedust
   vim.g.neovide_cursor_vfx_mode = "railgun"
+  if vim.g.user_transparent_background then
+    vim.g.neovide_transparency = 0.0
+  end
 end

@@ -365,6 +365,7 @@ if vim.g.neovide then
   map({ "i", "c", "t" }, "<D-v>", function() vim.api.nvim_paste(vim.fn.getreg("+"), true, -1) end, { desc = "Paste" })
 
   -- https://github.com/folke/zen-mode.nvim/blob/29b292bdc58b76a6c8f294c961a8bf92c5a6ebd6/lua/zen-mode/config.lua#L70
+  -- https://neovide.dev/faq.html#how-to-turn-off-all-animations
   local neovide_disable_animations = {
     neovide_animation_length = 0,
     neovide_cursor_animate_command_line = false,
@@ -372,6 +373,9 @@ if vim.g.neovide then
     neovide_position_animation_length = 0,
     neovide_cursor_animation_length = 0,
     neovide_cursor_vfx_mode = "",
+    neovide_cursor_trail_size = 0,
+    neovide_cursor_animate_in_insert_mode = false,
+    neovide_scroll_animation_far_lines = 0,
   }
   local neovide_state = {} ---@type table<string, any>
   Snacks.toggle({
