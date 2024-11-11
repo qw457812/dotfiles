@@ -321,6 +321,15 @@ return {
             TelescopeSelectionCaret = { fg = colors.flamingo, bg = colors.surface0 },
           }
 
+          if vim.g.user_transparent_background then
+            custom_highlights = vim.tbl_deep_extend("force", custom_highlights, {
+              VertSplit = { fg = colors.crust },
+              NeoTreeVertSplit = { link = "VertSplit" },
+              WinSeparator = { fg = colors.crust, style = { "bold" } },
+              NeoTreeWinSeparator = { link = "WinSeparator" },
+            })
+          end
+
           local borderless_telescope_bg = require("util.color").to_neutral_gray(colors.mantle)
           return vim.tbl_deep_extend("force", custom_highlights, borderless_telescope and {
             -- copied from: https://github.com/catppuccin/nvim/blob/35d8057137af463c9f41f169539e9b190d57d269/lua/catppuccin/groups/integrations/telescope.lua#L6
@@ -338,6 +347,7 @@ return {
           } or {
             TelescopePromptBorder = { fg = colors.peach },
             TelescopePromptTitle = { fg = colors.peach },
+            TelescopeBorder = { fg = colors.sapphire },
           })
         end,
       })
