@@ -256,8 +256,10 @@ return {
   {
     "tzachar/highlight-undo.nvim",
     -- vscode = true,
-    keys = { { "u" }, { "<C-r>" } },
+    keys = { { "u" }, { "U" }, { "<C-r>" } },
     opts = function()
+      local hl_undo = require("highlight-undo")
+
       local function set_undo_hl()
         -- link: Search IncSearch Substitute
         vim.api.nvim_set_hl(0, "HighlightUndo", { default = true, link = "Substitute" })
@@ -267,8 +269,12 @@ return {
       set_undo_hl()
       vim.api.nvim_create_autocmd("ColorScheme", { callback = set_undo_hl })
 
+      local redo_U = vim.deepcopy(hl_undo.config.keymaps.redo)
+      redo_U.lhs = "U"
+
       return {
         keymaps = {
+          redo_U = redo_U,
           paste = {
             disabled = true,
           },

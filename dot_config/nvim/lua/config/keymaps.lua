@@ -224,7 +224,8 @@ end, { desc = "Escape and Clear hlsearch or notifications or Close floating wind
 -- remap to matchit
 map({ "n", "x", "o" }, "mm", "%", { desc = "Goto matching bracket", remap = true })
 
--- map("n", "U", "<C-r>", { desc = "Redo" })
+-- highlight-undo.nvim
+LazyVim.safe_keymap_set("n", "U", "<C-r>", { desc = "Redo" })
 
 -- floating terminal
 -- stylua: ignore
@@ -252,6 +253,8 @@ end
 map("n", "dd", function() return is_empty_line() and '"_dd' or "dd" end, { expr = true, desc = "Don't Yank Empty Line to Clipboard" })
 map("n", "i",  function() return is_empty_line() and '"_cc' or "i" end,  { expr = true, desc = "Indented i on Empty Line" })
 -- stylua: ignore end
+
+map("s", "<bs>", "<C-o>s", { desc = "Inside a snippet (nvim-cmp), use backspace to remove the placeholder" })
 
 -- Add empty lines before and after cursor line supporting dot-repeat
 -- https://github.com/JulesNP/nvim/blob/36b04ae414b98e67a80f15d335c73744606a33d7/lua/keymaps.lua#L80

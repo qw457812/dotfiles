@@ -9,7 +9,7 @@ return {
     "2kabhishek/nerdy.nvim",
     cmd = "Nerdy",
     keys = {
-      { "<leader>ci", "<cmd>Nerdy<cr>", desc = "Pick Icon" },
+      { "<leader>fI", "<cmd>Nerdy<cr>", desc = "Icons" },
     },
   },
 
@@ -37,17 +37,17 @@ return {
     },
   },
 
-  {
-    "nvchad/showkeys",
-    enabled = false,
-    cmd = "ShowkeysToggle",
-    opts = {
-      -- timeout = 1,
-      maxkeys = 5,
-      show_count = true,
-      position = "top-right",
-    },
-  },
+  -- {
+  --   "nvchad/showkeys",
+  --   enabled = false,
+  --   cmd = "ShowkeysToggle",
+  --   opts = {
+  --     -- timeout = 1,
+  --     maxkeys = 5,
+  --     show_count = true,
+  --     position = "top-right",
+  --   },
+  -- },
 
   -- https://github.com/nvim-orgmode/orgmode/blob/master/DOCS.md#mappings
   -- https://github.com/ales-tsurko/neovim-config/blob/f6d6e86c8d1b545d4de110513e2758edb9a31d6b/lua/extensions/orgmode.lua

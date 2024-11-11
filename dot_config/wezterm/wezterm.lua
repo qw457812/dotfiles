@@ -23,6 +23,12 @@ config.window_padding = { left = 0, right = 0, top = 0, bottom = 0 }
 -- Tabs
 -- config.enable_tab_bar = false
 config.hide_tab_bar_if_only_one_tab = true
+-- wezterm.on("format-tab-title", function(tab)
+--   local process = string.gsub(tab.active_pane.foreground_process_name, "(.*[/\\])(.*)", "%2")
+--   local cwd = tab.active_pane.current_working_dir
+--   cwd = cwd and string.format("%s ", cwd.file_path:gsub(os.getenv("HOME"), "~")) or ""
+--   return string.format("(%d %s) %s", tab.tab_index + 1, process, cwd)
+-- end)
 
 -- Colorscheme
 config.color_scheme = "tokyonight_night"

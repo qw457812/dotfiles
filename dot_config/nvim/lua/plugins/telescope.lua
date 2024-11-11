@@ -280,4 +280,20 @@ return {
       end)
     end,
   },
+
+  {
+    "piersolenski/telescope-import.nvim",
+    cond = function()
+      return LazyVim.has("telescope.nvim")
+    end,
+    dependencies = "nvim-telescope/telescope.nvim",
+    keys = {
+      { "<leader>ci", "<cmd>Telescope import<cr>", desc = "Pick Import" },
+    },
+    config = function()
+      LazyVim.on_load("telescope.nvim", function()
+        require("telescope").load_extension("import")
+      end)
+    end,
+  },
 }

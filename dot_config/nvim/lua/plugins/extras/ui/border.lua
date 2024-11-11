@@ -141,4 +141,18 @@ return {
       },
     },
   },
+
+  {
+    "echasnovski/mini.files",
+    optional = true,
+    opts = function()
+      -- https://github.com/MariaSolOs/dotfiles/blob/ca5623259e415996f59c89d98a1db15ade205b44/.config/nvim/lua/plugins/minifiles.lua#L125
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "MiniFilesWindowOpen",
+        callback = function(args)
+          vim.api.nvim_win_set_config(args.data.win_id, { border = "rounded" })
+        end,
+      })
+    end,
+  },
 }
