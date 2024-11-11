@@ -1,7 +1,7 @@
 {
   "extras": [
-    "lazyvim.plugins.extras.coding.copilot",
-    "lazyvim.plugins.extras.coding.copilot-chat",
+    "lazyvim.plugins.extras.ai.copilot",
+    "lazyvim.plugins.extras.ai.copilot-chat",
     "lazyvim.plugins.extras.coding.mini-surround",
     "lazyvim.plugins.extras.coding.neogen",
     "lazyvim.plugins.extras.coding.yanky",
@@ -38,7 +38,7 @@
     "lazyvim.plugins.extras.util.rest",
     "lazyvim.plugins.extras.util.startuptime",
     "lazyvim.plugins.extras.vscode",
-    "plugins.extras.coding.avante",
+    "plugins.extras.ai.avante",
     "plugins.extras.editor.mini-operators",
     "plugins.extras.editor.undotree",
     "plugins.extras.lsp.tiny-code-action",
@@ -55,5 +55,5 @@
     "NEWS.md": "7107",
     "doc/news.txt": "24450"
   },
-  "version": 6
+  "version": 7
 }
