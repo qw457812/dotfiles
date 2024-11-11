@@ -25,6 +25,7 @@ return {
     end,
     opts = {
       options = {
+        -- indicator = { style = "underline" },
         separator_style = vim.g.user_transparent_background and { "", "" } or "slant", -- slope
         -- in favor of `BufferLineGoToBuffer`
         numbers = vim.g.user_is_termux and "none" or function(opts)

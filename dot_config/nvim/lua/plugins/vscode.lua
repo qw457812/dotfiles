@@ -47,6 +47,7 @@ vim.api.nvim_create_autocmd("User", {
   callback = function()
     vscode_map("n", "u", "undo", { desc = "VSCode Undo" })
     vscode_map("n", "<C-r>", "redo", { desc = "VSCode Redo" })
+    vscode_map("n", "U", "redo", { desc = "VSCode Redo" })
 
     vscode_map("n", "<Left>", "workbench.action.navigateBack", { desc = "Go Back" })
     vscode_map("n", "<Right>", "workbench.action.navigateForward", { desc = "Go Forward" })

@@ -24,7 +24,7 @@ local colorschemes = vim.g.user_transparent_background and {
   "catppuccin-macchiato",
 }
 
-local borderless_telescope = vim.g.user_transparent_background
+local borderless_telescope = false -- vim.g.user_transparent_background
 
 -- https://github.com/Styzex/RandTheme.nvim/blob/f96818619d9dcfa179f6d15eb67b04cae6ed31c7/lua/randtheme/theme_manager.lua#L62
 local last_random ---@type string?
@@ -347,6 +347,7 @@ return {
   -- variants of tokyonight
   {
     "Zeioth/neon.nvim",
+    enabled = false,
     cond = cond_colorscheme("^neon"),
     lazy = true,
     opts = function()
@@ -394,6 +395,7 @@ return {
   -- alternative: olimorris/onedarkpro.nvim | https://github.com/appelgriebsch/Nv/blob/e9a584090a69a8d691f5eb051e76016b65dfc0b7/lua/plugins/extras/ui/onedarkpro-theme.lua
   {
     "navarasu/onedark.nvim",
+    enabled = false,
     cond = cond_colorscheme("^onedark$"),
     lazy = true,
     opts = function()
@@ -429,6 +431,7 @@ return {
 
   {
     "killitar/obscure.nvim",
+    enabled = false,
     cond = cond_colorscheme("^obscure$"),
     lazy = true,
     opts = function()
@@ -462,6 +465,7 @@ return {
 
   {
     "scottmckendry/cyberdream.nvim",
+    enabled = false,
     cond = cond_colorscheme("^cyberdream$"),
     lazy = true,
     dependencies = { "nvim-lualine/lualine.nvim", optional = true },
@@ -517,24 +521,24 @@ return {
     end,
   },
 
-  {
-    "rebelot/kanagawa.nvim",
-    cond = cond_colorscheme("^kanagawa"),
-    lazy = true,
-  },
-
-  {
-    "EdenEast/nightfox.nvim",
-    cond = cond_colorscheme("fox$"),
-    lazy = true,
-  },
-
-  {
-    "AstroNvim/astrotheme",
-    cond = cond_colorscheme("^astro"),
-    lazy = true,
-    opts = {},
-  },
+  -- {
+  --   "rebelot/kanagawa.nvim",
+  --   cond = cond_colorscheme("^kanagawa"),
+  --   lazy = true,
+  -- },
+  --
+  -- {
+  --   "EdenEast/nightfox.nvim",
+  --   cond = cond_colorscheme("fox$"),
+  --   lazy = true,
+  -- },
+  --
+  -- {
+  --   "AstroNvim/astrotheme",
+  --   cond = cond_colorscheme("^astro"),
+  --   lazy = true,
+  --   opts = {},
+  -- },
 
   -- custom illuminate highlight for all colorschemes which don't customize it
   {
@@ -584,12 +588,12 @@ return {
             end
           end, { desc = "Random ColorScheme" })
 
-          vim.keymap.set(
-            "n",
-            "<leader>uR",
-            "<Cmd>nohlsearch<Bar>diffupdate<Bar>normal! <C-L><CR>",
-            { desc = "Redraw / Clear hlsearch / Diff Update" }
-          )
+          -- vim.keymap.set(
+          --   "n",
+          --   "<leader>uR",
+          --   "<Cmd>nohlsearch<Bar>diffupdate<Bar>normal! <C-L><CR>",
+          --   { desc = "Redraw / Clear hlsearch / Diff Update" }
+          -- )
         end,
       })
     end,
