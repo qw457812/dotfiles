@@ -20,7 +20,7 @@ return {
         max_width = 100, -- 90 ~ 120
       },
       keymaps = {
-        ["q"] = "actions.close", -- for floating window
+        -- ["q"] = "actions.close", -- for floating window
         -- ["`"] = "actions.tcd",
         -- ["~"] = {
         --   desc = "<cmd>edit $HOME<CR>",
@@ -41,7 +41,7 @@ return {
         ["<leader>."] = {
           desc = "Terminal (Oil Dir)",
           callback = function()
-            LazyVim.terminal(nil, { cwd = require("oil").get_current_dir() })
+            Snacks.terminal(nil, { cwd = require("oil").get_current_dir() })
           end,
         },
         ["gd"] = {
