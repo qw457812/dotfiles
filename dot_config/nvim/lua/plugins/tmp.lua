@@ -14,6 +14,15 @@ return {
   },
 
   {
+    "tpope/vim-dadbod",
+    optional = true,
+    init = function()
+      -- The OceanBase I am using does not work with MySQL >9.0
+      vim.env.PATH = "/opt/homebrew/opt/mysql@8.4/bin:" .. vim.env.PATH
+    end,
+  },
+
+  {
     "thenbe/csgithub.nvim",
     keys = {
       {

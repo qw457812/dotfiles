@@ -37,6 +37,7 @@ return {
         end,
       },
     },
+    -- or localleader
     keys = {
       { "<leader>Lq", "<cmd>Leet tabs<cr>", desc = "Tabs" },
       { "<leader>Lm", "<cmd>Leet menu<cr>", desc = "Menu" },
@@ -75,7 +76,11 @@ return {
         },
         hooks = {
           ["enter"] = function()
+            vim.g.user_is_leetcode = true
             pcall(vim.cmd, [[silent! Copilot disable]])
+          end,
+          ["leave"] = function()
+            vim.g.user_is_leetcode = false
           end,
         },
         keys = {
