@@ -317,6 +317,10 @@ return {
             -- for flash treesitter search, not necessary after using `{ label = { rainbow = { enabled = true } } }` opts
             FlashLabel = { fg = colors.base, bg = colors.green, style = { "bold" } },
 
+            -- highlight-undo.nvim
+            HighlightUndo = { link = "CurSearch" },
+            HighlightRedo = { link = "HighlightUndo" },
+
             TelescopeSelection = { fg = colors.text, bg = colors.surface0, style = { "bold" } },
             TelescopeSelectionCaret = { fg = colors.flamingo, bg = colors.surface0 },
           }
@@ -555,7 +559,7 @@ return {
     "RRethy/vim-illuminate",
     optional = true,
     opts = function()
-      local function set_illuminate_hl()
+      local function set_hl()
         local hl = vim.api.nvim_get_hl(0, { name = "IlluminatedWordWrite", link = false, create = false })
         if not (hl.bg and hl.underline) then
           local bg = LazyVim.ui.color("Normal", true)
@@ -574,9 +578,8 @@ return {
           vim.api.nvim_set_hl(0, "DiagnosticUnnecessary", { fg = U.color.lighten(LazyVim.ui.color("DiagnosticUnnecessary") or comment, 0.7) })
         end
       end
-
-      set_illuminate_hl()
-      vim.api.nvim_create_autocmd("ColorScheme", { callback = set_illuminate_hl })
+      set_hl()
+      vim.api.nvim_create_autocmd("ColorScheme", { callback = set_hl })
     end,
   },
 
