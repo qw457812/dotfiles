@@ -170,8 +170,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
   - Or [stevearc/resession.nvim](https://github.com/stevearc/resession.nvim) mentioned in [astrocore](https://github.com/AstroNvim/astrocore#-installation).
 - [ ] Highlight trailing whitespace and inline double space.
 - [x] More keymaps for lazy like [chrisgrieser](https://github.com/chrisgrieser/.config/blob/main/nvim/lua/config/lazy.lua).
-- [ ] [blink.cmp](https://github.com/Saghen/blink.cmp) found [here](https://github.com/catppuccin/nvim/pull/777).
-- [ ] [kndndrj/nvim-dbee](https://github.com/kndndrj/nvim-dbee)
+- [ ] Try [colortils.nvim](https://github.com/max397574/colortils.nvim).
 - [ ] [firenvim](https://github.com/glacambre/firenvim) like [megalithic](https://github.com/megalithic/dotfiles/blob/main/config/nvim/lua/plugins/extended/firenvim.lua).
 - [ ] Create a `state` util to cache the state (like [zen-mode.nvim](https://github.com/folke/zen-mode.nvim/blob/29b292bdc58b76a6c8f294c961a8bf92c5a6ebd6/lua/zen-mode/plugins.lua#L137)) instead of using `vim.g.user_...`
   - [vim.g.user_zenmode_on](lua/plugins/ui.lua), [vim.g.user_minianimate_disable_old](lua/plugins/ui.lua)

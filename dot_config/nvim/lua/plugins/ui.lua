@@ -494,6 +494,7 @@ return {
       }
     end,
     opts = {
+      -- enable_incsearch = false,
       calm_down = true,
       nearest_only = true,
       -- https://github.com/fjchen7/dotfiles/blob/a45b0a2778c18d82d5b3cba88de05e9351bee713/config/nvim/lua/plugins/ui/hlslens.lua#L16
@@ -512,6 +513,12 @@ return {
         local lnum, col = unpack(posList[idx])
         local cnt = #posList
         local text
+        -- -- noice style
+        -- if nearest then
+        --   text = ("%s%s    [%d/%d]"):format(vim.v.searchforward == 0 and "?" or "/", vim.fn.getreg("/"), idx, cnt)
+        -- else
+        --   text = ("[%d/%d]"):format(idx, cnt)
+        -- end
         if nearest and indicator ~= "" then
           text = ("[%s %d/%d]"):format(indicator, idx, cnt)
         else
@@ -553,7 +560,7 @@ return {
     optional = true,
     opts = {
       messages = {
-        view_search = false, -- using kevinhwang91/nvim-hlslens
+        view_search = false, -- using nvim-hlslens
       },
     },
   },

@@ -260,14 +260,13 @@ return {
     opts = function()
       local hl_undo = require("highlight-undo")
 
-      local function set_undo_hl()
+      local function set_hl()
         -- link: Search IncSearch Substitute
         vim.api.nvim_set_hl(0, "HighlightUndo", { default = true, link = "Substitute" })
         vim.api.nvim_set_hl(0, "HighlightRedo", { default = true, link = "HighlightUndo" })
       end
-
-      set_undo_hl()
-      vim.api.nvim_create_autocmd("ColorScheme", { callback = set_undo_hl })
+      set_hl()
+      vim.api.nvim_create_autocmd("ColorScheme", { callback = set_hl })
 
       local redo_U = vim.deepcopy(hl_undo.config.keymaps.redo)
       redo_U.lhs = "U"
