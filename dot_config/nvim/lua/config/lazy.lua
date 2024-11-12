@@ -41,6 +41,7 @@ require("lazy").setup({
   },
   install = { colorscheme = { "tokyonight", "habamax" } },
   ui = {
+    size = vim.env.TERMUX_VERSION and { width = 1, height = 1 } or nil,
     wrap = false,
     border = "rounded",
     icons = {
