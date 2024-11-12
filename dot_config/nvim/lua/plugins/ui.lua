@@ -463,18 +463,36 @@ return {
       { "petertriho/nvim-scrollbar", optional = true },
     },
     event = "CmdlineEnter",
-    keys = {
-      { "n", [[<Cmd>execute('normal! ' . v:count1 . 'nzv')<CR><Cmd>lua require('hlslens').start()<CR>]] },
-      { "N", [[<Cmd>execute('normal! ' . v:count1 . 'Nzv')<CR><Cmd>lua require('hlslens').start()<CR>]] },
-      -- { "*", [[*zv<Cmd>lua require('hlslens').start()<CR>]] },
-      -- { "#", [[#zv<Cmd>lua require('hlslens').start()<CR>]] },
-      -- { "g*", [[g*zv<Cmd>lua require('hlslens').start()<CR>]] },
-      -- { "g#", [[g#zv<Cmd>lua require('hlslens').start()<CR>]] },
-      { "*", mode = { "n", "x" }, [[<Plug>(asterisk-*)zv<Cmd>lua require('hlslens').start()<CR>]] },
-      { "#", mode = { "n", "x" }, [[<Plug>(asterisk-#)zv<Cmd>lua require('hlslens').start()<CR>]] },
-      { "g*", mode = { "n", "x" }, [[<Plug>(asterisk-g*)zv<Cmd>lua require('hlslens').start()<CR>]] },
-      { "g#", mode = { "n", "x" }, [[<Plug>(asterisk-g#)zv<Cmd>lua require('hlslens').start()<CR>]] },
-    },
+    keys = function()
+      -- -- https://github.com/kevinhwang91/nvim-hlslens#nvim-ufo
+      -- local function nN(char)
+      --   local ok, winid = require("hlslens").nNPeekWithUFO(char)
+      --   if ok and winid then
+      --     vim.keymap.set(
+      --       "n",
+      --       "<CR>",
+      --       "<Tab><CR>",
+      --       { buffer = true, remap = true, desc = "Switch to nvim-ufo preview window and fire `trace` action" }
+      --     )
+      --   end
+      -- end
+
+      -- stylua: ignore
+      return {
+        -- { "n", function() nN("n") end },
+        -- { "N", function() nN("N") end },
+        { "n", [[<Cmd>execute('normal! ' . v:count1 . 'nzv')<CR><Cmd>lua require('hlslens').start()<CR>]] },
+        { "N", [[<Cmd>execute('normal! ' . v:count1 . 'Nzv')<CR><Cmd>lua require('hlslens').start()<CR>]] },
+        -- { "*", [[*zv<Cmd>lua require('hlslens').start()<CR>]] },
+        -- { "#", [[#zv<Cmd>lua require('hlslens').start()<CR>]] },
+        -- { "g*", [[g*zv<Cmd>lua require('hlslens').start()<CR>]] },
+        -- { "g#", [[g#zv<Cmd>lua require('hlslens').start()<CR>]] },
+        { "*", mode = { "n", "x" }, [[<Plug>(asterisk-*)zv<Cmd>lua require('hlslens').start()<CR>]] },
+        { "#", mode = { "n", "x" }, [[<Plug>(asterisk-#)zv<Cmd>lua require('hlslens').start()<CR>]] },
+        { "g*", mode = { "n", "x" }, [[<Plug>(asterisk-g*)zv<Cmd>lua require('hlslens').start()<CR>]] },
+        { "g#", mode = { "n", "x" }, [[<Plug>(asterisk-g#)zv<Cmd>lua require('hlslens').start()<CR>]] },
+      }
+    end,
     opts = {
       calm_down = true,
       nearest_only = true,
@@ -512,6 +530,7 @@ return {
       end
 
       local Render = require("hlslens.render")
+
       -- HACK: `calm_down` lens only, keep the hlsearch
       -- copied from: https://github.com/kevinhwang91/nvim-hlslens/blob/07afd4dd14405ad14b142a501a3abea6ae44b21b/lua/hlslens/render/init.lua#L53
       function Render:doNohAndStop(defer)

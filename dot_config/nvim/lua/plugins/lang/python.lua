@@ -137,13 +137,16 @@ return {
     },
   },
 
-  -- temporary fix
   {
     "neovim/nvim-lspconfig",
     opts = function()
       LazyVim.lsp.on_attach(function(client, _)
         vim.defer_fn(function()
+          -- fix: diagnostic for python not enabled by default
           U.toggle.diagnostics:set(true)
+          if vim.g.user_is_leetcode then
+            U.toggle.diagnostic_virtual_text:set(false)
+          end
         end, 100)
       end, ruff)
     end,
