@@ -87,6 +87,9 @@ return {
     },
   },
 
+  -- TODO: choose motion plugin between: flash, leap, hop
+  -- https://github.com/doctorfree/nvim-lazyman/blob/bb4091c962e646c5eb00a50eca4a86a2d43bcb7c/lua/ecovim/config/plugins.lua#L373
+  -- "remote flash" for leap: https://github.com/rasulomaroff/telepath.nvim
   {
     "folke/flash.nvim",
     optional = true,
@@ -177,82 +180,6 @@ return {
   --   end,
   -- },
 
-  -- alternative: https://github.com/xzbdmw/nvimconfig/blob/0be9805dac4661803e17265b435060956daee757/lua/theme/dark.lua#L23
-  {
-    "debugloop/layers.nvim",
-    keys = {
-      -- stylua: ignore
-      { "M", function() PAGER_MODE:toggle() end, desc = "Pager Mode" },
-    },
-    config = function(_, opts)
-      require("layers").setup(opts)
-
-      ---@diagnostic disable-next-line: undefined-global
-      PAGER_MODE = Layers.mode.new()
-      PAGER_MODE:auto_show_help()
-      PAGER_MODE:keymaps({
-        n = {
-          { "u", "<C-u>", { desc = "Scroll Up" } },
-          -- { "d", "<C-d>", { desc = "Scroll Down", nowait = true } },
-          { "d", "<C-d>", { desc = "Scroll Down" } },
-          -- stylua: ignore
-          { "<esc>", function() PAGER_MODE:deactivate() end, { desc = "Exit" } },
-        },
-      })
-      local orig_dd_keymap ---@type table<string,any>
-      local orig_minianimate_disable ---@type boolean?
-      PAGER_MODE:add_hook(function(active)
-        if active then
-          -- remove `dd` mapping, defined in ../config/keymaps.lua
-          -- https://github.com/debugloop/layers.nvim/blob/67666f59a2dbe36a469766be6a4c484ae98c4895/lua/layers/map.lua#L52
-          orig_dd_keymap = vim.fn.maparg("dd", "n", false, true) --[[@as table<string,any>]]
-          if not vim.tbl_isempty(orig_dd_keymap) then
-            vim.keymap.del("n", "dd")
-          end
-          -- disable mini.animate
-          orig_minianimate_disable = vim.g.minianimate_disable
-          vim.g.minianimate_disable = true
-        else
-          if not vim.tbl_isempty(orig_dd_keymap) then
-            vim.fn.mapset(orig_dd_keymap)
-          end
-          vim.g.minianimate_disable = orig_minianimate_disable
-        end
-      end)
-    end,
-  },
-
-  -- for escaping easily from insert mode
-  {
-    "max397574/better-escape.nvim",
-    event = { "InsertEnter", "CmdlineEnter" },
-    opts = {
-      -- note: lazygit, fzf-lua use terminal mode, `jj` and `jk` make lazygit navigation harder
-      default_mappings = false,
-      mappings = {
-        i = {
-          j = {
-            -- these can all also be functions
-            k = "<Esc>",
-            j = "<Esc>",
-          },
-          k = {
-            j = "<Esc>",
-          },
-        },
-        c = {
-          j = {
-            k = "<Esc>",
-            j = "<Esc>",
-          },
-          k = {
-            j = "<Esc>",
-          },
-        },
-      },
-    },
-  },
-
   {
     "tzachar/highlight-undo.nvim",
     -- vscode = true,
@@ -283,6 +210,117 @@ return {
         },
       }
     end,
+  },
+
+  {
+    "kevinhwang91/nvim-hlslens",
+    dependencies = {
+      -- https://github.com/kevinhwang91/nvim-hlslens/issues/64#issuecomment-1606196924
+      -- alternative: https://github.com/rapan931/lasterisk.nvim
+      { "haya14busa/vim-asterisk" },
+      { "petertriho/nvim-scrollbar", optional = true },
+    },
+    event = "CmdlineEnter",
+    keys = function()
+      -- -- https://github.com/kevinhwang91/nvim-hlslens#nvim-ufo
+      -- local function nN(char)
+      --   local ok, winid = require("hlslens").nNPeekWithUFO(char)
+      --   if ok and winid then
+      --     vim.keymap.set(
+      --       "n",
+      --       "<CR>",
+      --       "<Tab><CR>",
+      --       { buffer = true, remap = true, desc = "Switch to nvim-ufo preview window and fire `trace` action" }
+      --     )
+      --   end
+      -- end
+
+      -- stylua: ignore
+      return {
+        -- { "n", function() nN("n") end },
+        -- { "N", function() nN("N") end },
+        { "n", [[<Cmd>execute('normal! ' . v:count1 . 'nzv')<CR><Cmd>lua require('hlslens').start()<CR>]] },
+        { "N", [[<Cmd>execute('normal! ' . v:count1 . 'Nzv')<CR><Cmd>lua require('hlslens').start()<CR>]] },
+        -- { "*", [[*zv<Cmd>lua require('hlslens').start()<CR>]] },
+        -- { "#", [[#zv<Cmd>lua require('hlslens').start()<CR>]] },
+        -- { "g*", [[g*zv<Cmd>lua require('hlslens').start()<CR>]] },
+        -- { "g#", [[g#zv<Cmd>lua require('hlslens').start()<CR>]] },
+        { "*", mode = { "n", "x" }, [[<Plug>(asterisk-*)zv<Cmd>lua require('hlslens').start()<CR>]] },
+        { "#", mode = { "n", "x" }, [[<Plug>(asterisk-#)zv<Cmd>lua require('hlslens').start()<CR>]] },
+        { "g*", mode = { "n", "x" }, [[<Plug>(asterisk-g*)zv<Cmd>lua require('hlslens').start()<CR>]] },
+        { "g#", mode = { "n", "x" }, [[<Plug>(asterisk-g#)zv<Cmd>lua require('hlslens').start()<CR>]] },
+      }
+    end,
+    opts = {
+      -- enable_incsearch = false,
+      calm_down = true,
+      nearest_only = true,
+      -- https://github.com/fjchen7/dotfiles/blob/a45b0a2778c18d82d5b3cba88de05e9351bee713/config/nvim/lua/plugins/ui/hlslens.lua#L16
+      override_lens = function(render, posList, nearest, idx, relIdx)
+        -- -- only show lens of the nearest matched, redundant with `nearest_only`
+        -- if not nearest then
+        --   return
+        -- end
+
+        -- -- only show lens when the cursor at the start of position range of the nearest matched
+        -- if relIdx ~= 0 then
+        --   return
+        -- end
+
+        local indicator = vim.v.searchforward == 0 and "▲" or ""
+        local lnum, col = unpack(posList[idx])
+        local cnt = #posList
+        local text
+        -- -- noice style
+        -- if nearest then
+        --   text = ("%s%s    [%d/%d]"):format(vim.v.searchforward == 0 and "?" or "/", vim.fn.getreg("/"), idx, cnt)
+        -- else
+        --   text = ("[%d/%d]"):format(idx, cnt)
+        -- end
+        if nearest and indicator ~= "" then
+          text = ("[%s %d/%d]"):format(indicator, idx, cnt)
+        else
+          text = ("[%d/%d]"):format(idx, cnt)
+        end
+        local hl = nearest and "HlSearchLensNear" or "HlSearchLens"
+        local chunks = { { " " }, { text, hl } }
+        render.setVirt(0, lnum - 1, col - 1, chunks, nearest)
+      end,
+    },
+    config = function(_, opts)
+      if LazyVim.has("nvim-scrollbar") then
+        require("scrollbar.handlers.search").setup(opts)
+      else
+        require("hlslens").setup(opts)
+      end
+
+      local Render = require("hlslens.render")
+
+      -- HACK: `calm_down` lens only, keep the hlsearch
+      -- copied from: https://github.com/kevinhwang91/nvim-hlslens/blob/07afd4dd14405ad14b142a501a3abea6ae44b21b/lua/hlslens/render/init.lua#L53
+      function Render:doNohAndStop(defer)
+        local function f()
+          -- vim.cmd("noh")
+          self:stop()
+        end
+
+        if defer then
+          vim.schedule(f)
+        else
+          f()
+        end
+      end
+    end,
+  },
+  -- also see `:h noh` and `:h shortmess`
+  {
+    "folke/noice.nvim",
+    optional = true,
+    opts = {
+      messages = {
+        view_search = false, -- using nvim-hlslens
+      },
+    },
   },
 
   {
@@ -339,12 +377,83 @@ return {
   },
 
   {
+    "max397574/better-escape.nvim",
+    event = { "InsertEnter", "CmdlineEnter" },
+    opts = {
+      -- note: lazygit, fzf-lua use terminal mode, `jj` and `jk` make lazygit navigation harder
+      default_mappings = false,
+      mappings = {
+        i = {
+          j = {
+            -- these can all also be functions
+            k = "<Esc>",
+            j = "<Esc>",
+          },
+          k = {
+            j = "<Esc>",
+          },
+        },
+        c = {
+          j = {
+            k = "<Esc>",
+            j = "<Esc>",
+          },
+          k = {
+            j = "<Esc>",
+          },
+        },
+      },
+    },
+  },
+
+  -- alternative: https://github.com/xzbdmw/nvimconfig/blob/0be9805dac4661803e17265b435060956daee757/lua/theme/dark.lua#L23
+  {
+    "debugloop/layers.nvim",
+    keys = {
+      -- stylua: ignore
+      { "M", function() PAGER_MODE:toggle() end, desc = "Pager Mode" },
+    },
+    config = function(_, opts)
+      require("layers").setup(opts)
+
+      ---@diagnostic disable-next-line: undefined-global
+      PAGER_MODE = Layers.mode.new()
+      PAGER_MODE:auto_show_help()
+      PAGER_MODE:keymaps({
+        n = {
+          { "u", "<C-u>", { desc = "Scroll Up" } },
+          -- { "d", "<C-d>", { desc = "Scroll Down", nowait = true } },
+          { "d", "<C-d>", { desc = "Scroll Down" } },
+          -- stylua: ignore
+          { "<esc>", function() PAGER_MODE:deactivate() end, { desc = "Exit" } },
+        },
+      })
+      local orig_dd_keymap ---@type table<string,any>
+      local orig_minianimate_disable ---@type boolean?
+      PAGER_MODE:add_hook(function(active)
+        if active then
+          -- remove `dd` mapping, defined in ../config/keymaps.lua
+          -- https://github.com/debugloop/layers.nvim/blob/67666f59a2dbe36a469766be6a4c484ae98c4895/lua/layers/map.lua#L52
+          orig_dd_keymap = vim.fn.maparg("dd", "n", false, true) --[[@as table<string,any>]]
+          if not vim.tbl_isempty(orig_dd_keymap) then
+            vim.keymap.del("n", "dd")
+          end
+          -- disable mini.animate
+          orig_minianimate_disable = vim.g.minianimate_disable
+          vim.g.minianimate_disable = true
+        else
+          if not vim.tbl_isempty(orig_dd_keymap) then
+            vim.fn.mapset(orig_dd_keymap)
+          end
+          vim.g.minianimate_disable = orig_minianimate_disable
+        end
+      end)
+    end,
+  },
+
+  {
     "nacro90/numb.nvim",
     event = "CmdlineEnter",
     opts = {},
   },
-
-  -- TODO: choose motion plugin between: flash, leap, hop
-  -- https://github.com/doctorfree/nvim-lazyman/blob/bb4091c962e646c5eb00a50eca4a86a2d43bcb7c/lua/ecovim/config/plugins.lua#L373
-  -- "remote flash" for leap: https://github.com/rasulomaroff/telepath.nvim
 }
