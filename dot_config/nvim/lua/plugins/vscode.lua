@@ -89,7 +89,6 @@ vim.api.nvim_create_autocmd("User", {
     )
     vscode_map("n", "<leader>,", "workbench.action.showAllEditors", { desc = "Switch Editor" })
     vscode_map("n", { "<leader>:", "<leader>sc" }, "workbench.action.showCommands", { desc = "Commands" })
-    -- vscode_map("n", "<leader>.", "workbench.action.terminal.focus", { desc = "Terminal" })
 
     vscode_map("n", "<leader>bd", "workbench.action.closeActiveEditor", { desc = "Close Editor" })
     vscode_map("n", "<leader>bo", "workbench.action.closeOtherEditors", { desc = "Close Other Editors" })
@@ -110,6 +109,7 @@ vim.api.nvim_create_autocmd("User", {
     -- stylua: ignore
     vscode_map("n", "<leader>fS", "workbench.action.files.saveWithoutFormatting", { desc = "Save File Without Formatting" })
     -- vscode_map("n", "<leader>ft", "workbench.action.terminal.focus", { desc = "Terminal" })
+    vscode_map("n", "<leader>ft", "workbench.action.terminal.toggleTerminal", { desc = "Terminal" })
     vscode_map("n", "<leader>fr", "workbench.action.showAllEditorsByMostRecentlyUsed", { desc = "Recent" })
     vscode_map("n", "<leader>fy", "workbench.action.files.copyPathOfActiveFile", { desc = "Yank file path" })
     vscode_map("n", "<leader>fY", "copyRelativeFilePath", { desc = "Yank file path from project" })

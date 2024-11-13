@@ -159,6 +159,16 @@ return {
       { "<leader>xQ", "<cmd>Trouble qflist toggle focus=true<cr>", desc = "Quickfix List (Trouble)" },
     },
   },
+  {
+    "folke/todo-comments.nvim",
+    optional = true,
+    -- stylua: ignore
+    keys = {
+      -- add `focus=true`
+      { "<leader>xt", "<cmd>Trouble todo toggle focus=true<cr>", desc = "Todo (Trouble)" },
+      { "<leader>xT", "<cmd>Trouble todo toggle focus=true filter = {tag = {TODO,FIX,FIXME}}<cr>", desc = "Todo/Fix/Fixme (Trouble)" },
+    },
+  },
 
   -- {
   --   "RRethy/vim-illuminate",

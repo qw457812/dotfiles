@@ -229,7 +229,8 @@ LazyVim.safe_keymap_set("n", "U", "<C-r>", { desc = "Redo" })
 
 -- floating terminal
 -- stylua: ignore
-map("n", "<leader>.", function() Snacks.terminal(nil, { cwd = vim.fn.expand("%:p:h") }) end, { desc = "Terminal (Buffer Dir)" })
+map("n", "<c-space>", function() Snacks.terminal(nil, { cwd = vim.fn.expand("%:p:h") }) end, { desc = "Terminal (Buffer Dir)" })
+map("t", "<c-space>", "<cmd>close<cr>", { desc = "Hide Terminal" })
 
 -- windows
 -- https://github.com/gpakosz/.tmux/blob/9cf49731cd785b76cf792046feed0e8275457918/.tmux.conf#L74
@@ -329,7 +330,8 @@ end, { desc = "Yank file absolute path" })
 
 map("n", "<leader>fY", function()
   -- local path = vim.fn.expand("%:~:.")
-  local path = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":~:.") or ""
+  -- local path = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":~:.") or ""
+  local path = require("plenary.path"):new(vim.api.nvim_buf_get_name(0)):make_relative(LazyVim.root())
   vim.fn.setreg("+", path)
   LazyVim.info(path, { title = "Copied Relative Path" })
 end, { desc = "Yank file relative path" })

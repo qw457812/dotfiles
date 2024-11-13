@@ -17,7 +17,7 @@
   "luacheck": "1.1.0",
   "markdown-toc": "1.2.0",
   "markdownlint": "0.42.0",
-  "markdownlint-cli2": "0.14.0",
+  "markdownlint-cli2": "0.15.0",
   "marksman": "2024-10-07",
   "prettier": "3.3.3",
   "pyright": "1.1.388",
@@ -30,6 +30,6 @@
   "stylua": "v0.20.0",
   "taplo": "0.9.3",
   "terraform-ls": "v0.35.0",
-  "tflint": "v0.53.0",
+  "tflint": "v0.54.0",
   "yaml-language-server": "1.15.0"
 }

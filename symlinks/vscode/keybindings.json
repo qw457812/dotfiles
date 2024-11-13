@@ -429,12 +429,12 @@
   // also see default key binding `cmd+j`
   // https://github.com/nikitavoloboev/config/blob/master/vscode/keybindings.json
   {
-    "key": "cmd+.",
+    "key": "ctrl+/",
     "command": "workbench.action.terminal.focus",
     "when": "!terminalFocus"
   },
   {
-    "key": "cmd+.",
+    "key": "ctrl+/",
     "command": "runCommands",
     "args": {
       "commands": [
@@ -443,6 +443,10 @@
       ]
     },
     "when": "terminalFocus"
+  },
+  {
+    "key": "ctrl+space",
+    "command": "workbench.action.terminal.toggleTerminal"
   },
   {
     "command": "workbench.action.compareEditor.nextChange",
