@@ -159,9 +159,9 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] Maybe press `]b]]][[]` instead of `]b]b]b]b[b[b]b` by [hydra.nvim](https://github.com/anuvyklack/hydra.nvim).
   - [pogyomo/submode.nvim](https://github.com/pogyomo/submode.nvim)
 - [ ] `<D-s>` not working in alacritty.
-- [ ] Better terminal keymaps than `<leader>.`.
+- [x] Better terminal keymaps than `<leader>.`.
 - [ ] Better `M`/`m<space>` keymaps.
-- [ ] Better `<leader>ff` keymaps since we have `<leader><space>`.
+- [x] Better `<leader>ff` keymaps since we have `<leader><space>`.
 - [ ] Map `esc` for some buffers (maybe floating windows?) in [close.lua](lua/plugins/close.lua).
   - Maybe map `q` to close window like [rafi](https://github.com/rafi/vim-config/blob/814f312d92e97282913f4c3ef5f09712840b5604/lua/rafi/config/keymaps.lua#L374), and map `<C-q>` for macros.
 - [ ] Check this [util/path.lua](https://github.com/sakakibara/dotfiles/blob/f281ed9865623e204becbc3b87b3983045421422/dot_config/nvim/lua/util/path.lua).

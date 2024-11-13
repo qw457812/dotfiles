@@ -38,7 +38,7 @@ return {
           opts = { horizontal = true },
           desc = "Open the entry in a horizontal split",
         },
-        ["<leader>."] = {
+        ["<c-space>"] = {
           desc = "Terminal (Oil Dir)",
           callback = function()
             Snacks.terminal(nil, { cwd = require("oil").get_current_dir() })
