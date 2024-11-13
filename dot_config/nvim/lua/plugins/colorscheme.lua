@@ -132,7 +132,11 @@ return {
           hl.LspReferenceRead = { link = "IlluminatedWordRead" }
           hl.LspReferenceWrite = { link = "IlluminatedWordWrite" }
           -- compensate for invisible text caused by custom illuminate highlight
-          hl.CmpGhostText = { bg = c.bg, fg = util.blend_fg((hl.CmpGhostText or hl.Comment).fg, 0.85) }
+          hl.CmpGhostText = {
+            -- bg = vim.g.user_transparent_background and "#000000" or c.bg,
+            bg = c.bg,
+            fg = util.blend_fg((hl.CmpGhostText or hl.Comment).fg, vim.g.user_transparent_background and 0.5 or 0.85),
+          }
           -- unused variable
           hl.DiagnosticUnnecessary = { fg = util.blend_fg(c.terminal_black, 0.7) }
 
@@ -307,7 +311,11 @@ return {
             LspReferenceRead = { link = "IlluminatedWordRead" },
             LspReferenceWrite = { link = "IlluminatedWordWrite" },
             -- compensate for invisible text caused by custom illuminate highlight
-            CmpGhostText = { bg = colors.base, fg = colors.overlay1 },
+            CmpGhostText = {
+              -- bg = vim.g.user_transparent_background and "#000000" or colors.base,
+              bg = colors.base,
+              fg = vim.g.user_transparent_background and util.lighten(colors.overlay1, 0.875) or colors.overlay1,
+            },
             DiagnosticUnnecessary = { fg = util.lighten(colors.overlay0, 0.9) },
             -- revert https://github.com/catppuccin/nvim/pull/768
             Comment = { fg = colors.overlay0, style = { "italic" } },
