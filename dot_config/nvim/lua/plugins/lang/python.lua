@@ -2,7 +2,8 @@ if not LazyVim.has_extra("lang.python") then
   return {}
 end
 
-local ruff = vim.g.lazyvim_python_ruff or "ruff"
+local lsp = vim.g.lazyvim_python_lsp or "pyright"
+-- local ruff = vim.g.lazyvim_python_ruff or "ruff"
 local has_black = LazyVim.has_extra("formatting.black")
 
 return {
@@ -58,8 +59,8 @@ return {
             },
             python = {
               analysis = {
-                ignore = { "*" }, -- using ruff
-                -- typeCheckingMode = "strict", -- off, basic, standard(default), strict
+                -- ignore = { "*" }, -- using ruff
+                typeCheckingMode = "standard", -- off, basic, standard(default), strict
                 -- -- https://github.com/microsoft/pyright/blob/main/docs/configuration.md#diagnostic-settings-defaults
                 -- diagnosticSeverityOverrides = {
                 -- },
@@ -137,18 +138,17 @@ return {
     },
   },
 
+  -- fix: diagnostic for python is not enabled on startup
   {
     "neovim/nvim-lspconfig",
     opts = function()
-      LazyVim.lsp.on_attach(function(client, _)
-        vim.defer_fn(function()
-          -- fix: diagnostic for python not enabled by default
-          U.toggle.diagnostics:set(true)
-          if vim.g.user_is_leetcode then
-            U.toggle.diagnostic_virtual_text:set(false)
-          end
-        end, 100)
-      end, ruff)
+      if lsp == "basedpyright" then
+        LazyVim.lsp.on_attach(function()
+          Snacks.toggle.diagnostics():set(true)
+          ---@diagnostic disable-next-line: redundant-return-value
+          return true -- don't mess up toggle
+        end, lsp)
+      end
     end,
   },
 

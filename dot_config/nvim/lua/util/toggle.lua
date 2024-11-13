@@ -5,17 +5,17 @@ local SnacksToggleDiag = SnacksToggle.diagnostics()
 local M = {}
 
 -- https://github.com/xzbdmw/nvimconfig/blob/0be9805dac4661803e17265b435060956daee757/lua/config/keymaps.lua#L49
-local has_diagnostic_virtual_text = nil
+M.has_diagnostic_virtual_text = nil ---@type boolean?
 M.diagnostic_virtual_text = SnacksToggle.new({
   name = "Diagnostic Virtual Text",
   get = function()
-    if has_diagnostic_virtual_text == nil then
+    if M.has_diagnostic_virtual_text == nil then
       return SnacksToggleDiag:get()
     end
-    return has_diagnostic_virtual_text
+    return M.has_diagnostic_virtual_text
   end,
   set = function(state)
-    has_diagnostic_virtual_text = state
+    M.has_diagnostic_virtual_text = state
     if LazyVim.has("tiny-inline-diagnostic.nvim") then
       if state then
         require("tiny-inline-diagnostic").enable()

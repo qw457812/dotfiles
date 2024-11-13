@@ -60,6 +60,7 @@ return {
       { "<leader>Lu", "<cmd>Leet cache update<cr>", desc = "Update Cache" },
     },
     opts = function(_, opts)
+      local augroup = vim.api.nvim_create_augroup("leetcode_diagnostic", { clear = true })
       return U.extend_tbl(opts, {
         lang = "python3", -- java, python3
         image_support = LazyVim.has("image.nvim"),
@@ -76,11 +77,21 @@ return {
         },
         hooks = {
           ["enter"] = function()
-            vim.g.user_is_leetcode = true
+            -- vim.g.user_is_leetcode = true
             pcall(vim.cmd, [[silent! Copilot disable]])
+            vim.api.nvim_create_autocmd("LspAttach", {
+              group = augroup,
+              desc = "Disable diagnostic virtual text for leetcode by default",
+              callback = function()
+                if U.toggle.has_diagnostic_virtual_text == nil then
+                  U.toggle.diagnostic_virtual_text:set(false)
+                end
+              end,
+            })
           end,
           ["leave"] = function()
-            vim.g.user_is_leetcode = false
+            -- vim.g.user_is_leetcode = false
+            vim.api.nvim_clear_autocmds({ group = augroup })
           end,
         },
         keys = {
