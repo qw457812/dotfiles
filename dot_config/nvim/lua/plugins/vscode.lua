@@ -169,7 +169,7 @@ vim.api.nvim_create_autocmd("User", {
               args = {
                 {
                   to = d == "j" and "down" or "up",
-                  by = count > 0 and nil or "wrappedLine",
+                  by = count == 0 and "wrappedLine" or nil,
                   value = count > 0 and count or 1,
                   select = true,
                 },
