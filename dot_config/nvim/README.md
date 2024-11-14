@@ -171,6 +171,8 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] Highlight trailing whitespace and inline double space.
 - [x] More keymaps for lazy like [chrisgrieser](https://github.com/chrisgrieser/.config/blob/main/nvim/lua/config/lazy.lua).
 - [ ] Try [colortils.nvim](https://github.com/max397574/colortils.nvim).
+- [ ] Check this [Telescope.lua](https://github.com/xzbdmw/nvimlazy/blob/e4c7da89a726a5b048574e014b5ea2b1aeda67f9/lua/plugins/Telescope.lua).
+- [ ] Try [nvim-focus/focus.nvim](https://github.com/nvim-focus/focus.nvim).
 - [ ] [firenvim](https://github.com/glacambre/firenvim) like [megalithic](https://github.com/megalithic/dotfiles/blob/main/config/nvim/lua/plugins/extended/firenvim.lua).
 - [ ] Create a `state` util to cache the state (like [zen-mode.nvim](https://github.com/folke/zen-mode.nvim/blob/29b292bdc58b76a6c8f294c961a8bf92c5a6ebd6/lua/zen-mode/plugins.lua#L137)) instead of using `vim.g.user_...`
   - [vim.g.user_zenmode_on](lua/plugins/ui.lua), [vim.g.user_minianimate_disable_old](lua/plugins/ui.lua)

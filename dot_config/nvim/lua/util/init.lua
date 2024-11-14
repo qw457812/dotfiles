@@ -42,6 +42,11 @@ function M.keymap(mode, lhs, rhs, opts)
   end
 end
 
+-- https://github.com/neovide/neovide/issues/1263#issuecomment-1972013043
+function M.paste()
+  vim.api.nvim_paste(vim.fn.getreg("+"), true, -1)
+end
+
 ---@param win? integer default 0
 ---@param zenmode_as_floating? boolean default true
 ---@param treesitter_context_as_floating? boolean default true

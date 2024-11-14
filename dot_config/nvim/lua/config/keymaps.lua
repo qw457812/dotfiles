@@ -357,53 +357,13 @@ U.toggle.diagnostics:map("<leader>uD")
 -- map("x", "<leader>?", function() google_search(U.get_visual_selection()) end, { desc = "Google Search" })
 
 if vim.g.user_is_termux then
-  -- stylua: ignore
-  map({ "i", "c", "t" }, "<C-v>", function() vim.api.nvim_paste(vim.fn.getreg("+"), true, -1) end, { desc = "Paste" })
+  map({ "i", "c", "t" }, "<C-v>", U.paste, { desc = "Paste" })
 end
 
 if vim.g.neovide then
   -- fix cmd-v for paste in insert, command, terminal (for fzf-lua) mode
   -- https://neovide.dev/faq.html#how-can-i-use-cmd-ccmd-v-to-copy-and-paste
   -- map("c", "<D-v>", "<C-r>+")
-  -- https://github.com/neovide/neovide/issues/1263#issuecomment-1972013043
-  -- stylua: ignore
-  map({ "i", "c", "t" }, "<D-v>", function() vim.api.nvim_paste(vim.fn.getreg("+"), true, -1) end, { desc = "Paste" })
-
-  -- https://github.com/folke/zen-mode.nvim/blob/29b292bdc58b76a6c8f294c961a8bf92c5a6ebd6/lua/zen-mode/config.lua#L70
-  -- https://neovide.dev/faq.html#how-to-turn-off-all-animations
-  local neovide_disable_animations = {
-    neovide_animation_length = 0,
-    neovide_cursor_animate_command_line = false,
-    neovide_scroll_animation_length = 0,
-    neovide_position_animation_length = 0,
-    neovide_cursor_animation_length = 0,
-    neovide_cursor_vfx_mode = "",
-    neovide_cursor_trail_size = 0,
-    neovide_cursor_animate_in_insert_mode = false,
-    neovide_scroll_animation_far_lines = 0,
-  }
-  local neovide_state = {} ---@type table<string, any>
-  Snacks.toggle({
-    name = "Mini/Neovide Animate",
-    get = function()
-      -- return not vim.g.minianimate_disable -- extras.ui.mini-animate might not enabled
-      return vim.g.neovide_cursor_animate_command_line
-    end,
-    set = function(state)
-      vim.g.minianimate_disable = not state
-      -- https://github.com/folke/zen-mode.nvim/blob/29b292bdc58b76a6c8f294c961a8bf92c5a6ebd6/lua/zen-mode/plugins.lua#L130
-      if state then
-        for key, _ in pairs(neovide_disable_animations) do
-          if neovide_state[key] then
-            vim.g[key] = neovide_state[key]
-          end
-        end
-      else
-        for key, value in pairs(neovide_disable_animations) do
-          neovide_state[key] = vim.g[key]
-          vim.g[key] = value
-        end
-      end
-    end,
-  }):map("<leader>ua")
+  map({ "i", "c", "t" }, "<D-v>", U.paste, { desc = "Paste" })
+  U.toggle.neovide_animations:map("<leader>ua")
 end

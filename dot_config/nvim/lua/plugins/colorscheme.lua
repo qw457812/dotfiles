@@ -160,6 +160,10 @@ return {
             hl.TelescopeResultsTitle = { fg = util.blend_bg(c.red, 0.8), bg = bg, bold = true }
           end
 
+          if not vim.g.user_transparent_background then
+            hl.NeoTreeWinSeparator = { fg = c.bg, bg = c.bg }
+          end
+
           if tokyonight_has_custom_style() and tokyonight_mark_style(c) == tokyonight_custom_style then
             hl.String = { fg = c.orange }
             hl.Character = { fg = c.orange2 }
