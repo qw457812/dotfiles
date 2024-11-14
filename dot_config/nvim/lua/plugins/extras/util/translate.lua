@@ -147,8 +147,8 @@ return {
           },
         },
         ui = {
-          width_percentage = vim.g.user_is_termux and 1 or 0.8,
-          height_percentage = vim.g.user_is_termux and 1 or 0.8,
+          width_percentage = vim.g.user_is_termux and 0.95 or 0.8,
+          height_percentage = vim.g.user_is_termux and 0.9 or 0.8,
         },
         window = {
           title_border = { "", "" },
