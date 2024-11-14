@@ -28,7 +28,7 @@ vim.g.user_is_tmux = vim.env.TMUX ~= nil
 vim.g.user_is_termux = vim.env.TERMUX_VERSION ~= nil
 vim.g.user_transparent_background = vim.g.user_is_wezterm
 -- failed to install basedpyright on termux via mason
-vim.g.lazyvim_python_lsp = vim.g.user_is_termux and nil or "basedpyright"
+vim.g.lazyvim_python_lsp = not vim.g.user_is_termux and "basedpyright" or nil
 -- hijack_netrw: neo-tree.nvim, oil.nvim, mini.files, yazi.nvim, telescope-file-browser.nvim
 vim.g.user_default_explorer = "oil.nvim"
 -- holding layout like no-neck-pain.nvim by disabling neo-tree auto close
