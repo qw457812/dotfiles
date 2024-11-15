@@ -1,7 +1,0 @@
-# conda config --describe [Conda configuration](https://conda.io/projects/conda/en/stable/configuration.html?highlight=auto_activate_base#conda-configuration)
-
-# https://stackoverflow.com/questions/57640272/how-can-i-install-anaconda-aside-an-existing-pyenv-installation-on-osx
-# # auto_activate_base (bool)
-# #   Automatically activate the base environment during shell initialization.
-# auto_activate_base: true
-auto_activate_base: false
