@@ -574,9 +574,9 @@ return {
       local function set_hl()
         local hl = vim.api.nvim_get_hl(0, { name = "IlluminatedWordWrite", link = false, create = false })
         if not (hl.bg and hl.underline) then
-          local bg = LazyVim.ui.color("Normal", true)
-          local visual = LazyVim.ui.color("Visual", true)
-          local comment = LazyVim.ui.color("Comment")
+          local bg = U.color.from_hl("Normal", true)
+          local visual = U.color.from_hl("Visual", true)
+          local comment = U.color.from_hl("Comment")
 
           local illuminate = U.color.lighten(visual, 0.925)
           -- add `default = true` to avoid overriding colorscheme's highlight group
@@ -587,7 +587,7 @@ return {
           -- compensate for invisible text caused by custom illuminate highlight
           vim.api.nvim_set_hl(0, "CmpGhostText", { bg = bg, fg = U.color.lighten(comment, 0.85) })
           -- stylua: ignore
-          vim.api.nvim_set_hl(0, "DiagnosticUnnecessary", { fg = U.color.lighten(LazyVim.ui.color("DiagnosticUnnecessary") or comment, 0.7) })
+          vim.api.nvim_set_hl(0, "DiagnosticUnnecessary", { fg = U.color.lighten(U.color.from_hl("DiagnosticUnnecessary") or comment, 0.7) })
         end
       end
       set_hl()

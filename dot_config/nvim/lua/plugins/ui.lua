@@ -179,9 +179,9 @@ return {
             color = function()
               local fg
               if vim.bo.modified then
-                fg = LazyVim.ui.color("MatchParen")
+                fg = U.color.from_hl("MatchParen")
               elseif vim.bo.modifiable == false or vim.bo.readonly == true then
-                fg = LazyVim.ui.color("DiagnosticError")
+                fg = U.color.from_hl("DiagnosticError")
               end
               return { fg = fg, gui = "bold" }
             end,

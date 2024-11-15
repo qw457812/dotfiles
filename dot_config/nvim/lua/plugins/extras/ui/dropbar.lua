@@ -25,9 +25,9 @@ return {
       -- custom highlight
       -- stylua: ignore
       local function set_hl()
-        vim.api.nvim_set_hl(0, "DropBarFileName", { default = true, fg = LazyVim.ui.color("DropBarKindFile"), bold = true })
-        vim.api.nvim_set_hl(0, "DropBarFileNameModified", { default = true, fg = LazyVim.ui.color("MatchParen"), bold = true })
-        vim.api.nvim_set_hl(0, "DropBarFolderName", { default = true, fg = LazyVim.ui.color("Conceal") })
+        vim.api.nvim_set_hl(0, "DropBarFileName", { default = true, fg = U.color.from_hl("DropBarKindFile"), bold = true })
+        vim.api.nvim_set_hl(0, "DropBarFileNameModified", { default = true, fg = U.color.from_hl("MatchParen"), bold = true })
+        vim.api.nvim_set_hl(0, "DropBarFolderName", { default = true, fg = U.color.from_hl("Conceal") })
         vim.api.nvim_set_hl(0, "DropBarSymbolName", { default = true, link = "DropBarFolderName" })
       end
       set_hl()
