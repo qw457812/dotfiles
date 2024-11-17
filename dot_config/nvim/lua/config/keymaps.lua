@@ -214,6 +214,7 @@ map("n", "<esc>", function()
   if not is_cmd_win then
     vim.cmd("diffupdate")
   end
+  -- vim.cmd("syntax sync fromstart")
   vim.cmd("normal! <C-L>") -- vim.cmd.redraw({ bang = true })
 
   vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<esc>", true, true, true), "n", false)

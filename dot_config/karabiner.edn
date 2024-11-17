@@ -408,7 +408,7 @@
            [:j :!Tj [:!WeWork :!WeChat :!Spotify :!Finder]]
            [:k :!Tk [:!Spotify :!Finder]]
            [:l :!Tl [:!Spotify :!Finder]]
-           [:semicolon :!Tsemicolon]
+           [:semicolon :!TSsemicolon] ; see "swap : and ;" below
            [:quote :!Tquote]
            [:z :!Tz]
            [:x :!Tx]
@@ -495,7 +495,7 @@
            [:j :!Tj [:!WeWork :!WeChat :!Spotify :!Finder]]
            [:k :!Tk [:!Spotify :!Finder]]
            [:l :!Tl [:!Spotify :!Finder]]
-           [:semicolon :!Tsemicolon]
+           [:semicolon :!TSsemicolon] ; see "swap : and ;" below
            [:quote :!Tquote]
            [:z :!Tz]
            [:x :!Tx]
