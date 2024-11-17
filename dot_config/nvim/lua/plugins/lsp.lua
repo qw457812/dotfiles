@@ -104,7 +104,23 @@ return {
         { "K", false },
         { "gk", function() return vim.lsp.buf.hover() end, desc = "Hover" },
         -- { "gd", pick_definitions_or_references, desc = "Goto Definition/References", has = "definition" },
-        { "<cr>", pick_definitions_or_references, desc = "Goto Definition/References", has = "definition" },
+        {
+          "<cr>",
+          pick_definitions_or_references,
+          desc = "Goto Definition/References",
+          has = "definition",
+          -- for yarospace/lua-console.nvim
+          cond = function()
+            -- Check to see if `<cr>` is already mapped to the buffer (avoids overwriting)
+            for _, map in ipairs(vim.api.nvim_buf_get_keymap(0, "n")) do
+              ---@diagnostic disable-next-line: undefined-field
+              if map.lhs and map.lhs:lower() == "<cr>" then
+                return false
+              end
+            end
+            return true
+          end,
+        },
         { "<leader>cr", function() require("live-rename").rename() end, desc = "Rename (live-rename.nvim)", has = "rename" },
         -- https://github.com/jacquin236/minimal-nvim/blob/baacb78adce67d704d17c3ad01dd7035c5abeca3/lua/plugins/lsp.lua
         { "<leader>cl", false },

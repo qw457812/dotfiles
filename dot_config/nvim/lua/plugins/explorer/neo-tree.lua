@@ -486,6 +486,7 @@ return {
           end,
         },
         window = {
+          width = math.max(35, math.min(50, math.floor(vim.o.columns * 0.25))),
           mappings = {
             -- ["-"] = "close_or_unfocus", -- toggle neo-tree, work with `-` defined in `keys` above
             ["-"] = is_default_explorer and "close_or_unfocus" or {
@@ -671,7 +672,9 @@ return {
     opts = function(_, opts)
       for _, view in ipairs(opts.left or {}) do
         if view.ft == "neo-tree" then
-          view.size = { width = math.max(35, math.min(50, math.floor(vim.o.columns * 0.25))) }
+          local window = LazyVim.opts("neo-tree.nvim").window or {}
+          -- :=require("neo-tree.defaults").window.width
+          view.size = { width = window.width or 40 }
           view.title = "Neo-Tree"
           break
         end
