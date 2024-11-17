@@ -132,20 +132,20 @@ map({ "i", "x", "n", "s" }, "<D-s>", "<cmd>w<cr><esc>", { desc = "Save File" })
 
 map("n", "<D-r>", vim.cmd.edit, { desc = "Reload File" })
 
--- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/keybindings.lua#L234
-map("n", "<cr>", "gd", { desc = "Goto local Declaration" })
--- restore default behavior of `<cr>`, which is overridden by my mapping above
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "qf", "neo-tree-popup" },
-  callback = function(event)
-    map("n", "<cr>", "<cr>", { buffer = event.buf })
-  end,
-})
-vim.api.nvim_create_autocmd("CmdWinEnter", {
-  callback = function(event)
-    map("n", "<cr>", "<cr>", { buffer = event.buf })
-  end,
-})
+-- -- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/keybindings.lua#L234
+-- map("n", "<cr>", "gd", { desc = "Goto local Declaration" })
+-- -- restore default behavior of `<cr>`, which is overridden by my mapping above
+-- vim.api.nvim_create_autocmd("FileType", {
+--   pattern = { "qf", "neo-tree-popup" },
+--   callback = function(event)
+--     map("n", "<cr>", "<cr>", { buffer = event.buf })
+--   end,
+-- })
+-- vim.api.nvim_create_autocmd("CmdWinEnter", {
+--   callback = function(event)
+--     map("n", "<cr>", "<cr>", { buffer = event.buf })
+--   end,
+-- })
 
 -- buffers
 -- see: akinsho/bufferline.nvim in ~/.config/nvim/lua/plugins/ui.lua

@@ -73,7 +73,7 @@ return {
       sign = { text = "" },
       action_kinds = { "quickfix", "refactor" },
       ignore = {
-        clients = { "null-ls", "marksman" },
+        clients = { "null-ls", "marksman", "lua_ls" },
         actions_without_kind = true,
       },
     },
