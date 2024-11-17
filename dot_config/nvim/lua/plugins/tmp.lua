@@ -6,6 +6,26 @@ local obsidian_vaults = {
 -- https://github.com/folke/dot/blob/master/nvim/lua/plugins/tmp.lua
 return {
   {
+    "yarospace/lua-console.nvim",
+    keys = {
+      { "<leader>.", desc = "Lua Console" },
+    },
+    opts = {
+      window = {
+        border = "rounded",
+      },
+      mappings = {
+        toggle = "<leader>.",
+        clear = "<localleader>c",
+        messages = "<localleader>m",
+        save = "<C-s>",
+        load = "<leader>fr",
+        help = "g?",
+      },
+    },
+  },
+
+  {
     "2kabhishek/nerdy.nvim",
     cmd = "Nerdy",
     keys = {
