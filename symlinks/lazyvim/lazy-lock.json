@@ -21,6 +21,7 @@
   "copilot-cmp": { "branch": "master", "commit": "b6e5286b3d74b04256d0a7e3bd2908eabec34b44" },
   "copilot.lua": { "branch": "master", "commit": "f8d8d872bb319f640d5177dad5fbf01f7a16d7d0" },
   "csgithub.nvim": { "branch": "master", "commit": "695f7c30433c87fc45d0af116fd5bfdc65d1b7fe" },
+  "csvview.nvim": { "branch": "main", "commit": "f68cb7950c811f2b2b6b19818812f3b4c5624f03" },
   "curl.nvim": { "branch": "main", "commit": "e3e70d8b2cce6b45291a25156fbb50921e3ae941" },
   "cyberdream.nvim": { "branch": "main", "commit": "7e6feb49d2ec47a742215754ec0ecc51eebba55a" },
   "dashboard-nvim": { "branch": "master", "commit": "ae309606940d26d8c9df8b048a6e136b6bbec478" },
