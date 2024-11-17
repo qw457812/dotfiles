@@ -113,6 +113,22 @@ return {
     end,
   },
 
+  -- {
+  --   "akinsho/toggleterm.nvim",
+  --   keys = { { "<c-space>" } },
+  --   opts = {
+  --     open_mapping = "<c-space>",
+  --     -- direction = "float",
+  --   },
+  -- },
+  -- -- {
+  -- --   "ryanmsnyder/toggleterm-manager.nvim",
+  -- --   opts = {},
+  -- --   keys = {
+  -- --     { "<leader>ft", "<cmd>Telescope toggleterm_manager<cr>", desc = "Terminals" },
+  -- --   },
+  -- -- },
+
   -- TODO: not working
   -- -- https://github.com/wlh320/rime-ls
   -- -- https://github.com/wlh320/rime-ls/blob/master/doc/nvim.md
