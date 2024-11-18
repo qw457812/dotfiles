@@ -241,7 +241,7 @@ return {
       -- for saecki/live-rename.nvim
       opts.inactive_winbar = vim.deepcopy(opts.winbar)
 
-      if LazyVim.has("trouble.nvim") then
+      if not vim.g.user_is_termux and LazyVim.has("trouble.nvim") then
         local trouble = require("trouble")
         local symbols = trouble.statusline({
           mode = "symbols", -- "lsp_document_symbols"
