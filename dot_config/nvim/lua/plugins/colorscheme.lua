@@ -280,6 +280,7 @@ return {
           --   enabled = true,
           --   style = borderless_telescope and "nvchad" or nil, -- not working when transparent
           -- },
+          treesitter_context = false,
         },
         -- ~/.local/share/nvim/lazy/catppuccin/lua/catppuccin/palettes/macchiato.lua
         -- https://github.com/catppuccin/nvim/discussions/323
@@ -325,6 +326,11 @@ return {
             Comment = { fg = colors.overlay0, style = { "italic" } },
             -- require("tokyonight.colors").setup({style = "moon"}).bg_visual -- #2d3f76
             -- Visual = { bg = util.blend(colors.surface1, "#2d3f76", 0.25), style = { "bold" } },
+
+            TreesitterContext = {
+              bg = vim.g.user_transparent_background and util.darken(colors.surface0, 0.5, colors.base)
+                or util.darken(colors.surface1, 0.7, colors.base),
+            },
 
             -- for flash treesitter search, not necessary after using `{ label = { rainbow = { enabled = true } } }` opts
             FlashLabel = { fg = colors.base, bg = colors.green, style = { "bold" } },
