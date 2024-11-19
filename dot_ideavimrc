@@ -252,6 +252,9 @@ nmap L $
 xmap L g_
 omap L $
 
+vnoremap < <gv
+vnoremap > >gv
+
 nnoremap Q @q
 
 nnoremap <C-h> <C-w>h
@@ -314,6 +317,12 @@ xnoremap gj J
 nmap gk <Action>(ShowHoverInfo)
 nnoremap <leader>K K
 
+nnoremap gO m`O<esc>``
+nnoremap go m`o<esc>``
+
+" nnoremap <expr> gp '`[' . strpart(getregtype(), 0, 1) . '`]'
+nnoremap gp `[v`]
+
 " map <left> <Action>(JumpToLastChange)
 " map <left> <C-o>
 map <left> <Action>(Back)
@@ -369,6 +378,9 @@ map gs <Action>(GotoSuperMethod)
 " https://github.com/yunxiaoxiao11/nvimlazy/blob/3adac839389dc83bfe6bba6b60a3ae5bae9e09f6/jetbrains/.ideavimrc
 " https://github.com/orhnk/dotideavimrc/blob/master/.ideavimrc
 " https://github.com/kevinhwang91/dotfiles/blob/main/ideavim/ideavimrc
+" https://github.com/triyangle/dotfiles/blob/master/config/home/.ideavimrc
+" https://github.com/mmrzax/dots/blob/bbec0d1a0549cb1c7b74438bf99e1a4169251377/.ideavimrc
+" https://github.com/phisco/configs/blob/ceab3ac5a0761b91b631d85f96de085b232c2faf/.ideavimrc
 
 " -----------------------------------------------------常用--------------------------------------------------------
 " keys: https://ideavim.sourceforge.net/vim/intro.html
@@ -412,6 +424,7 @@ map <leader>cr <Action>(RenameElement)
 map <leader>cR <Action>(RenameFile)
 
 " file/find
+map <Leader>ff <Action>(SearchEverywhere)
 map <Leader>fn <Action>(NewFile)
 map <leader>fr <Action>(RecentFiles)
 " map <Leader>fc :e ~/.local/share/chezmoi/dot_ideavimrc<CR>
@@ -472,7 +485,6 @@ map <Leader>dv :action ViewBreakpoints<CR>
 map <Leader>dc :action ChooseDebugConfiguration<CR>
 map <leader>ds <Action>(Stop)
 map <Leader>fd :action FixDocComment<CR>
-map <leader>ff <Action>(FindInPath)
 map <leader>fu <Action>(FindUsages)
 " map <Leader>fp :action ShowFilePath<CR>
 " map <leader>fs <Action>(FileStructurePopup)

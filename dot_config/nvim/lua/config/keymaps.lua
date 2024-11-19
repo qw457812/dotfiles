@@ -7,6 +7,7 @@ local LazyUtil = require("lazy.util")
 local LazyViewConfig = require("lazy.view.config")
 
 local map = U.keymap
+local safe_map = LazyVim.safe_keymap_set
 local map_del = vim.keymap.del
 
 -- lazy/LazyVim
@@ -19,7 +20,7 @@ map("n", "<leader>lx", "<cmd>LazyExtras<cr>", { desc = "Extras" })
 map("n", "<leader>lL", function() LazyVim.news.changelog() end, { desc = "LazyVim Changelog" })
 -- use `:h news` instead of `LazyVim.news.neovim()`
 map("n", "<leader>lN", function() LazyVim.news.lazyvim() end, { desc = "LazyVim News" })
--- alternative: vim.fn.system({ "open", "https://lazyvim.org" }) or vim.cmd("silent !open https://lazyvim.org")
+-- alternative: vim.ui.open("https://lazyvim.org")
 map("n", "<leader>ld", function() LazyUtil.open("https://lazyvim.org") end, { desc = "LazyVim Docs" })
 map("n", "<leader>lD", function() LazyUtil.open("https://lazy.folke.io") end, { desc = "lazy.nvim Docs" })
 map("n", "<leader>lr", function() LazyUtil.open("https://github.com/LazyVim/LazyVim") end, { desc = "LazyVim Repo" })
@@ -150,10 +151,10 @@ map("n", "<D-r>", vim.cmd.edit, { desc = "Reload File" })
 -- buffers
 -- see: akinsho/bufferline.nvim in ~/.config/nvim/lua/plugins/ui.lua
 -- if you change the order of buffers :bnext and :bprevious will not respect the custom ordering
-LazyVim.safe_keymap_set("n", "<Down>", "<cmd>bnext<cr>", { desc = "Next Buffer" })
-LazyVim.safe_keymap_set("n", "<Up>", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
-LazyVim.safe_keymap_set("n", "J", "<cmd>bnext<cr>", { desc = "Next Buffer" })
-LazyVim.safe_keymap_set("n", "K", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
+safe_map("n", "<Down>", "<cmd>bnext<cr>", { desc = "Next Buffer" })
+safe_map("n", "<Up>", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
+safe_map("n", "J", "<cmd>bnext<cr>", { desc = "Next Buffer" })
+safe_map("n", "K", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
 map({ "n", "x" }, "gj", "J", { desc = "Join Lines" })
 map({ "n", "x" }, "gk", "K", { desc = "Keywordprg" }) -- not necessary
 LazyViewConfig.keys.hover = "gk"
@@ -226,7 +227,7 @@ end, { desc = "Escape and Clear hlsearch or notifications or Close floating wind
 map({ "n", "x", "o" }, "mm", "%", { desc = "Goto matching bracket", remap = true })
 
 -- highlight-undo.nvim
-LazyVim.safe_keymap_set("n", "U", "<C-r>", { desc = "Redo" })
+safe_map("n", "U", "<C-r>", { desc = "Redo" })
 
 -- floating terminal
 -- stylua: ignore
