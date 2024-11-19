@@ -84,14 +84,21 @@ return {
         -- auto_suggestions = true, -- experimental
         auto_apply_diff_after_generation = true,
       },
-      provider = "copilot", -- only recommend using claude
-      auto_suggestions_provider = "copilot", -- high-frequency, can be expensive
-      copilot = {
-        model = "claude-3.5-sonnet",
-      },
+      provider = "copilot-claude", -- only recommend using claude
+      auto_suggestions_provider = "copilot-claude", -- high-frequency, can be expensive if enabled
+      -- copilot = {
+      --   model = "claude-3.5-sonnet",
+      -- },
       -- https://github.com/yetone/avante.nvim/wiki/Custom-providers
-      -- https://github.com/yetone/avante.nvim/pull/159
       vendors = {
+        -- be able to switch between copilot (gpt-4o) and copilot-claude
+        ---@type AvanteSupportedProvider
+        ["copilot-claude"] = {
+          __inherited_from = "copilot",
+          -- https://github.com/CopilotC-Nvim/CopilotChat.nvim#models
+          model = "claude-3.5-sonnet",
+        },
+        -- https://github.com/yetone/avante.nvim/pull/159
         ---@type AvanteSupportedProvider
         groq = {
           __inherited_from = "openai",
@@ -99,8 +106,7 @@ return {
           endpoint = "https://api.groq.com/openai/v1/",
           -- https://console.groq.com/docs/models
           -- curl -X GET "https://api.groq.com/openai/v1/models" -H "Authorization: Bearer $GROQ_API_KEY" -H "Content-Type: application/json" | jq .
-          model = "llama-3.2-90b-text-preview",
-          max_tokens = 8000,
+          model = "llama-3.1-70b-versatile",
         },
       },
       hints = { enabled = false },

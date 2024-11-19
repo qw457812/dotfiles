@@ -59,7 +59,7 @@ return {
               command.execute({ reveal_file = reveal_file, reveal_force_cwd = true })
             end
 
-            -- workaround below not working in termux
+            -- work-around below not working in termux
             if vim.g.user_is_termux then
               reveal_without_set_root()
               return
@@ -86,7 +86,7 @@ return {
               execute()
             else
               last_root = root -- cache
-              -- workaround for `reveal_force_cwd` + `dir`, execute twice to properly set root dir (base on my test only)
+              -- work-around for `reveal_force_cwd` + `dir`, execute twice to properly set root dir (base on my test only)
               execute("show")
               vim.defer_fn(function()
                 execute()
