@@ -1,3 +1,4 @@
+-- https://github.com/AstroNvim/astrocommunity/blob/main/lua/astrocommunity/completion/avante-nvim/init.lua
 return {
   {
     "yetone/avante.nvim",
@@ -47,11 +48,9 @@ return {
         end)(),
       },
     },
-    -- init = function()
-    --   require("avante_lib").load() -- this break lazy loading
-    -- end,
     -- https://github.com/yetone/avante.nvim/wiki#keymaps-and-api-i-guess
     -- ~/.local/share/nvim/lazy/avante.nvim/lua/avante/init.lua
+    -- TODO: https://github.com/yetone/avante.nvim/wiki/Recipe-and-Tricks
     keys = function(_, keys)
       local opts_mappings = LazyVim.opts("avante.nvim").mappings or {}
       -- stylua: ignore
@@ -74,45 +73,34 @@ return {
       }
       vim.list_extend(keys, mappings)
     end,
+    ---@type avante.Config
     opts = {
       mappings = {
         toggle = {
           debug = "<leader>aD",
         },
       },
-      provider = "copilot", -- claude(recommend), openai, azure, gemini, cohere, copilot, groq(custom)
-      auto_suggestions_provider = "copilot", -- high-frequency
-      -- behaviour = {
-      --   auto_suggestions = true, -- experimental
-      -- },
-      -- https://github.com/yetone/avante.nvim/wiki#custom-providers
+      behaviour = {
+        -- auto_suggestions = true, -- experimental
+        auto_apply_diff_after_generation = true,
+      },
+      provider = "copilot", -- only recommend using claude
+      auto_suggestions_provider = "copilot", -- high-frequency, can be expensive
+      copilot = {
+        model = "claude-3.5-sonnet",
+      },
+      -- https://github.com/yetone/avante.nvim/wiki/Custom-providers
       -- https://github.com/yetone/avante.nvim/pull/159
       vendors = {
-        ---@type AvanteProvider
+        ---@type AvanteSupportedProvider
         groq = {
-          endpoint = "https://api.groq.com/openai/v1/chat/completions",
-          model = "llama-3.2-90b-text-preview",
+          __inherited_from = "openai",
           api_key_name = "GROQ_API_KEY",
-          parse_curl_args = function(opts, code_opts)
-            return {
-              url = opts.endpoint,
-              headers = {
-                ["Accept"] = "application/json",
-                ["Content-Type"] = "application/json",
-                ["Authorization"] = "Bearer " .. os.getenv(opts.api_key_name),
-              },
-              body = {
-                model = opts.model,
-                messages = require("avante.providers.openai").parse_messages(code_opts), -- you can make your own message, but this is very advanced
-                temperature = 0,
-                max_tokens = 8000,
-                stream = true, -- this will be set by default.
-              },
-            }
-          end,
-          parse_response_data = function(data_stream, event_state, opts)
-            require("avante.providers").openai.parse_response(data_stream, event_state, opts)
-          end,
+          endpoint = "https://api.groq.com/openai/v1/",
+          -- https://console.groq.com/docs/models
+          -- curl -X GET "https://api.groq.com/openai/v1/models" -H "Authorization: Bearer $GROQ_API_KEY" -H "Content-Type: application/json" | jq .
+          model = "llama-3.2-90b-text-preview",
+          max_tokens = 8000,
         },
       },
       hints = { enabled = false },
