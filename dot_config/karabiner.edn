@@ -69,6 +69,7 @@
              ; :prev_app                {:shell "/opt/homebrew/bin/yabai -m window --focus recent || open -g hammerspoon://cmdTab"}
              :prev_app                {:shell "open -g hammerspoon://prevApp"}
              :open-default-terminal   {:shell "open /Applications/WezTerm.app"} ; Alacritty.app, kitty.app, WezTerm.app
+             :open-default-browser    {:shell "open \"/Applications/Brave Browser.app\""} ; Brave Browser.app, Google Chrome.app
              :home_dir                [{:key  :grave_accent_and_tilde
                                         :modi [:left_shift]
                                         :lazy true} {:key :slash}]
@@ -1446,8 +1447,8 @@
   {:des   "right_command with right-hand keys to launch-mode"
    :rules [[:!Qh [:open "/Applications/企业微信.app"] :!WeWork]
            [:!Qh :!Ograve_accent_and_tilde :WeWork] ; AltTab.app
-           [:!Qj [:open "/Applications/Brave Browser.app"] :!Brave]
-           [:!Qj :same_wind_app :Brave]
+           [:!Qj :open-default-browser :!default-browser]
+           [:!Qj :same_wind_app :default-browser]
            ; [:!Qk [:open "/Applications/kitty.app"] :!Kitty]
            ; [:!Qk :same_wind_app :Kitty]
            [:!Qk :open-default-terminal :!default-terminal]
@@ -1874,8 +1875,8 @@
            [:!Wh [:left_command [:open "/Applications/企业微信.app"]] :!WeWork]
            ; [:!Wh :!Ograve_accent_and_tilde :WeWork] ; AltTab.app (toggle rime's ascii_mode accidentally)
            [:!Wh :same_wind_app :WeWork]
-           [:!Wj [:left_command [:open "/Applications/Brave Browser.app"]] :!Brave]
-           [:!Wj :same_wind_app :Brave]
+           [:!Wj [:left_command :open-default-browser] :!default-browser]
+           [:!Wj :same_wind_app :default-browser]
            ; [:!Wk [:left_command [:open "/Applications/kitty.app"]] :!Kitty]
            ; [:!Wk :same_wind_app :Kitty]
            [:!Wk [:left_command :open-default-terminal] :!default-terminal]
@@ -1893,7 +1894,7 @@
            ; [:!Wg [:open "/Applications/ChatGPT.app"] :!ChatGPT]
            ; [:!Wg :same_wind_app :ChatGPT]
            ;; pin https://chatgpt.com/ to first tab
-           [:!Wg [:left_command [:open "/Applications/Brave Browser.app"]] nil {:delayed {:invoked [:!C1 :!CSo :!Cr]} :params {:delay 800}}]
+           [:!Wg [:left_command :open-default-browser] nil {:delayed {:invoked [:!C1 :!CSo :!Cr]} :params {:delay 800}}]
            [:!We [:left_command [:open "/Applications/Emacs.app"]] :!Emacs]
            [:!We :same_wind_app :Emacs]
            [:!Wr [:left_command [:open "/Applications/Safari.app"]] :!Safari]
@@ -2267,6 +2268,7 @@
   :tmux-autostart-terminals
   ["^org\\.alacritty$" "^com\\.github\\.wez\\.wezterm$" "^net\\.kovidgoyal\\.kitty$"]
   :default-terminal ["^com\\.github\\.wez\\.wezterm$"]
+  :default-browser  ["^com\\.brave\\.Browser$"]
   :Terminals        ["^com\\.apple\\.Terminal$"
                      "^com\\.googlecode\\.iterm2$"
                      "^co\\.zeit\\.hyperterm$" "^co\\.zeit\\.hyper$"
