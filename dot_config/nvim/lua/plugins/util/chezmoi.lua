@@ -1,5 +1,5 @@
 -- do not overwrite <leader>fc if lazyvim.plugins.extras.util.chezmoi not enabled
-if not LazyVim.has_extra("util.chezmoi") or vim.fn.executable("chezmoi") == 0 then
+if not (LazyVim.has_extra("util.chezmoi") and vim.fn.executable("chezmoi") == 1 and U.path.CHEZMOI) then
   return {}
 end
 
@@ -120,13 +120,11 @@ return {
       -- run chezmoi edit on file enter
       -- https://github.com/xvzc/chezmoi.nvim/pull/20
       vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
-        pattern = { os.getenv("HOME") .. "/.local/share/chezmoi/*" },
+        pattern = U.path.CHEZMOI .. "/*",
         callback = function(event)
-          local bufnr = event.buf
-          local edit_watch = function()
-            require("chezmoi.commands.__edit").watch(bufnr)
-          end
-          vim.schedule(edit_watch)
+          vim.schedule(function()
+            require("chezmoi.commands.__edit").watch(event.buf)
+          end)
         end,
       })
     end,
