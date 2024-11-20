@@ -195,4 +195,25 @@ return {
       table.insert(opts.config.center, config_idx + 1, chezmoi)
     end,
   },
+
+  {
+    "folke/noice.nvim",
+    optional = true,
+    opts = function(_, opts)
+      opts.routes = vim.list_extend(opts.routes or {}, {
+        {
+          filter = {
+            event = "msg_show",
+            find = string.format(
+              [[%s.+ chezmoi: %s.+: not in source state$]],
+              vim.pesc(LazyVim.get_plugin_path("chezmoi.nvim")),
+              vim.pesc(U.path.CHEZMOI)
+            ),
+          },
+          view = "mini",
+        },
+      })
+      return opts
+    end,
+  },
 }
