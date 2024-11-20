@@ -44,6 +44,7 @@ return {
       vim.env.PATH = "/opt/homebrew/opt/mysql@8.4/bin:" .. vim.env.PATH
 
       -- :=vim.fn['db#url#encode']('my_password')
+      -- https://github.com/mistweaverco/kulala.nvim/blob/1c4156b8204137ff683d7c61b94218ca1cfbf801/lua/kulala/utils/string.lua#L22
       local url_encode = function(str)
         local function to_hex(char)
           return string.format("%%%02X", string.byte(char))
