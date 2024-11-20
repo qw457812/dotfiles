@@ -80,6 +80,21 @@ prepend_keymap = [
     "f",
     "Y",
   ], run = "copy filename", desc = "Copy the filename" },
+  { on = [
+    "<Space>",
+    "g",
+    "g",
+  ], run = "shell lazygit --block --confirm", desc = "Lazygit" },
+  { on = [
+    "<Space>",
+    "g",
+    "f",
+  ], run = 'shell "lazygit -f \"$0\"" --block --confirm', desc = "Lazygit Current File History" },
+  { on = [
+    "<Space>",
+    "g",
+    "l",
+  ], run = 'shell "lazygit log" --block --confirm', desc = "Lazygit Log" },
 ]
 
 append_keymap = [
@@ -108,6 +123,16 @@ append_keymap = [
     "g",
     ".",
   ], run = "hidden toggle", desc = "Toggle the visibility of hidden files" },
+
+  # https://github.com/mikavilpas/yazi.nvim/blob/main/documentation/yazi-keymappings.md#define-a-keymap-in-yazis-config-1
+  # Augment https://yazi-rs.github.io/docs/tips/#cd-to-git-root
+  # go to the nvim cwd when neovim is open, and to the git root when it is not
+  { on = [
+    "g",
+    "r",
+  ], run = '''
+      shell 'ya pub dds-cd --str "${NVIM_CWD:-$(git rev-parse --show-toplevel 2>/dev/null)}"' --confirm
+    ''', desc = "Toggle the visibility of hidden files" },
 
   # https://github.com/dedukun/bookmarks.yazi
   { on = [
@@ -259,6 +284,8 @@ append_keymap = [
   # Line-wise movement
   { on = "H", run = "move -999", desc = "Move to the BOL" },
   { on = "L", run = "move 999", desc = "Move to the EOL" },
+
+  { on = "U", run = "redo", desc = "Redo the last operation" },
 ]
 
 [completion]

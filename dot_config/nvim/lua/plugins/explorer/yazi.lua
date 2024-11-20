@@ -1,5 +1,6 @@
 return {
   -- https://github.com/sxyazi/dotfiles/blob/18ce3eda7792df659cb248d9636b8d7802844831/nvim/lua/plugins/ui.lua#L646
+  -- https://github.com/mikavilpas/dotfiles/blob/main/.config/nvim/lua/plugins/my-file-manager.lua
   {
     "mikavilpas/yazi.nvim",
     keys = {
