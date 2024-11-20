@@ -21,7 +21,7 @@
   "marksman": "2024-10-07",
   "prettier": "3.3.3",
   "pyright": "1.1.389",
-  "ruff": "0.7.2",
+  "ruff": "0.7.4",
   "ruff-lsp": "0.0.58",
   "selene": "0.27.1",
   "shellcheck": "v0.10.0",
@@ -29,7 +29,7 @@
   "sqlfluff": "3.2.5",
   "stylua": "v0.20.0",
   "taplo": "0.9.3",
-  "terraform-ls": "v0.35.0",
+  "terraform-ls": "v0.36.0",
   "tflint": "v0.54.0",
   "yaml-language-server": "1.15.0"
 }
