@@ -338,7 +338,7 @@ return {
           any = {
             -- { find = "^[/?].*" }, -- search up/down when pattern not found
             -- { find = "^E486: Pattern not found:" }, -- search pattern not found
-            { find = "^%s*W?%s%[%d+/%d+%]$" }, -- search count by */#/g*/g# in both normal and visual mode
+            { find = "^%s*W? %[%d+/%d+%]$" }, -- search count by */#/g*/g# in both normal and visual mode
           },
         },
         -- opts = { skip = true },

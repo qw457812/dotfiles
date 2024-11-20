@@ -1,7 +1,7 @@
 -- close buffers, windows, or exit vim with the same single keypress
 local close_key = "<bs>" -- easy to reach for Glove80
 -- exit nvim
-local exit_key = "<leader>" .. close_key -- NOTE: would overwrite "go up one level" of which-key, use `<S-bs>`?
+local exit_key = "<leader>" .. close_key -- would overwrite "go up one level" of which-key, use `<S-bs>` if needed
 
 local augroup = vim.api.nvim_create_augroup("close_with_" .. close_key, { clear = true })
 
@@ -109,6 +109,24 @@ if close_key:lower() == "<bs>" then
     end,
   })
 end
+
+vim.defer_fn(function()
+  if vim.g.db_ui_tmp_query_location then
+    vim.api.nvim_create_autocmd("BufNewFile", {
+      pattern = vim.g.db_ui_tmp_query_location .. "/*",
+      callback = function(event)
+        vim.keymap.set("n", close_key, function()
+          -- do not ask for saving changes
+          Snacks.bufdelete({ buf = event.buf, force = true })
+        end, {
+          buffer = event.buf,
+          silent = true,
+          desc = "Quit buffer",
+        })
+      end,
+    })
+  end
+end, 100) -- wait for vim-dadbod-ui to `init`, otherwise vim.g.db_ui_tmp_query_location is nil
 
 return {
   {
@@ -277,5 +295,14 @@ return {
       opts.keys.toggle = type(opts.keys.toggle) == "table" and opts.keys.toggle or { opts.keys.toggle or "q" }
       table.insert(opts.keys.toggle, close_key)
     end,
+  },
+
+  {
+    "kristijanhusak/vim-dadbod-ui",
+    optional = true,
+    keys = {
+      { close_key, "<Plug>(DBUI_Quit)", desc = "Quit (dadbod)", ft = "dbui" },
+      { close_key, "<cmd>bd<cr>", desc = "Close (dadbod)", ft = "dbout" },
+    },
   },
 }
