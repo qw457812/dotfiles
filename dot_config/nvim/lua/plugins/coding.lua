@@ -59,15 +59,6 @@ return {
     name = "nvim-cmp",
   },
 
-  -- https://github.com/folke/dot/blob/master/nvim/lua/plugins/coding.lua
-  {
-    "zbirenbaum/copilot.lua",
-    optional = true,
-    opts = {
-      filetypes = { ["*"] = true },
-    },
-  },
-
   -- use helix-style mappings to prevent conflict with flash or leap: ms md mr
   -- https://www.lazyvim.org/configuration/recipes#change-surround-mappings
   -- https://www.reddit.com/r/neovim/comments/1bl3dwz/whats_your_best_remap_for_flash_or_leap/
