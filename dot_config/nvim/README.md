@@ -162,6 +162,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [x] Better terminal keymaps than `<leader>.`.
 - [ ] Better `M`/`m<space>` keymaps.
 - [x] Better `<leader>ff` keymaps since we have `<leader><space>`.
+- [ ] Check [lsp_signature.nvim config of AstroNvim](https://github.com/AstroNvim/astrocommunity/blob/aaaa844e45420cd7b5f11b7c399bee919513d1d5/lua/astrocommunity/lsp/lsp-signature-nvim/init.lua).
 - [ ] Map `esc` for some buffers (maybe floating windows?) in [close.lua](lua/plugins/close.lua).
   - Maybe map `q` to close window like [rafi](https://github.com/rafi/vim-config/blob/814f312d92e97282913f4c3ef5f09712840b5604/lua/rafi/config/keymaps.lua#L374), and map `<C-q>` for macros.
 - [ ] Check this [util/path.lua](https://github.com/sakakibara/dotfiles/blob/f281ed9865623e204becbc3b87b3983045421422/dot_config/nvim/lua/util/path.lua).
