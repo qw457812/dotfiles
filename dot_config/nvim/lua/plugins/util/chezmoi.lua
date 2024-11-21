@@ -122,8 +122,9 @@ return {
       vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
         pattern = U.path.CHEZMOI .. "/*",
         callback = function(event)
+          local buf = event.buf
           vim.schedule(function()
-            require("chezmoi.commands.__edit").watch(event.buf)
+            require("chezmoi.commands.__edit").watch(buf)
           end)
         end,
       })

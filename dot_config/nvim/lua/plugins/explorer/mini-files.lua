@@ -44,9 +44,11 @@ return {
           vim.keymap.set("n", "<leader>sr", function()
             local files = require("mini.files")
             -- works only if cursor is on the valid file system entry
-            local cur_entry_path = files.get_fs_entry().path
-            files.close()
-            U.explorer.grug_far(vim.fs.dirname(cur_entry_path))
+            local fs_entry = files.get_fs_entry()
+            if fs_entry then
+              files.close()
+              U.explorer.grug_far(vim.fs.dirname(fs_entry.path))
+            end
           end, { buffer = buf_id, desc = "Search and Replace in Directory (mini.files)" })
           -- cursor navigation during text edit
           vim.keymap.set("n", "H", "h", { buffer = buf_id, desc = "<Left>" })

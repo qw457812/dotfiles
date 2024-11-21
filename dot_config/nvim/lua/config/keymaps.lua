@@ -189,6 +189,10 @@ map("n", "<esc>", function()
     end
   end
 
+  local function is_floating_win(win)
+    return U.is_floating_win(win, { zen = false, tsc = false })
+  end
+
   local is_cmd_win = vim.fn.getcmdwintype() ~= ""
 
   if vim.v.hlsearch == 1 then
@@ -199,13 +203,12 @@ map("n", "<esc>", function()
     end
   -- elseif has_notif() then
   --   dismiss_notif()
-  elseif U.is_floating(0, false, false) then
-    -- close floating window
+  elseif is_floating_win() then
     vim.api.nvim_win_close(0, false)
   elseif not is_cmd_win then
     -- close all floating windows (can't close other windows when the command-line window is open)
     for _, win in ipairs(vim.api.nvim_list_wins()) do
-      if vim.api.nvim_win_is_valid(win) and U.is_floating(win, false, false) then
+      if vim.api.nvim_win_is_valid(win) and is_floating_win(win) then
         vim.api.nvim_win_close(win, false)
       end
     end
