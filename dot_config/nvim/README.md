@@ -37,6 +37,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
   > Java
 - [xzbdmw](https://github.com/xzbdmw/nvimconfig)
 - [rafi](https://github.com/rafi/vim-config)
+- [Saiiru](https://github.com/Saiiru/neovim)
 
 ## Awesome Neovim
 
@@ -58,6 +59,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [yetone](https://github.com/yetone/cosmos-nvim)
 - [MasouShizuka](https://github.com/MasouShizuka/config/tree/main/neovim)
   > With Chinese comments.
+- [razak17](https://github.com/razak17/nvim)
 
 ## Lazy Tips
 

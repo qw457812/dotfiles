@@ -61,4 +61,6 @@ return {
       return opts
     end,
   },
+
+  { "jsborjesson/vim-uppercase-sql", ft = "sql" },
 }
