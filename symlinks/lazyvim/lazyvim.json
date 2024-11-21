@@ -46,6 +46,7 @@
     "plugins.extras.lsp.tiny-inline-diagnostic",
     "plugins.extras.ui.border",
     "plugins.extras.ui.dropbar",
+    "plugins.extras.ui.hide-hints-in-insert-mode",
     "plugins.extras.util.leetcode",
     "plugins.extras.util.tmux",
     "plugins.extras.util.translate",
