@@ -54,6 +54,7 @@ return {
 
           -- replace home dir with ~
           local symbol_oil_prefix
+          -- require("oil.util").is_oil_bufnr(buff)
           if vim.bo[buff].filetype == "oil" and #symbols > 1 and symbols[1].name == oil_prefix then
             symbol_oil_prefix = table.remove(symbols, 1)
           end

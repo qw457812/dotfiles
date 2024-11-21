@@ -48,23 +48,30 @@ function M.paste()
 end
 
 ---@param win? integer default 0
----@param zenmode_as_floating? boolean default true
----@param treesitter_context_as_floating? boolean default true
+---@param opts? { zen?: boolean, tsc?: boolean } whether to treat zen-mode and nvim-treesitter-context as floating windows, default true
 ---@return boolean
-function M.is_floating(win, zenmode_as_floating, treesitter_context_as_floating)
+function M.is_floating_win(win, opts)
   win = win or 0
+  opts = vim.tbl_deep_extend("keep", opts or {}, {
+    zen = true,
+    tsc = true,
+  })
+
   local is_float = vim.api.nvim_win_get_config(win).relative ~= ""
-  if is_float and zenmode_as_floating == false and package.loaded["zen-mode"] then
+
+  if is_float and not opts.zen and package.loaded["zen-mode"] then
     local zen_mode = require("zen-mode.view")
     if zen_mode.is_open() then
       win = win == 0 and vim.api.nvim_get_current_win() or win
       is_float = win ~= zen_mode.win and win ~= zen_mode.bg_win
     end
   end
-  if is_float and treesitter_context_as_floating == false and package.loaded["treesitter-context"] then
+
+  if is_float and not opts.tsc and package.loaded["treesitter-context"] then
     -- see: https://github.com/nvim-treesitter/nvim-treesitter-context/blob/a2a334900d3643de585ac5c6140b03403454124f/lua/treesitter-context/render.lua#L56
     is_float = not (vim.w[win].treesitter_context or vim.w[win].treesitter_context_line_number)
   end
+
   return is_float
 end
 
@@ -72,7 +79,7 @@ end
 --- alternative:
 --- https://github.com/ibhagwan/fzf-lua/blob/f39de2d77755e90a7a80989b007f0bf2ca13b0dd/lua/fzf-lua/utils.lua#L770
 --- https://github.com/MagicDuck/grug-far.nvim/blob/308e357be687197605cf19222f843fbb331f50f5/lua/grug-far.lua#L448
----@param stop_visual_mode? boolean
+---@param stop_visual_mode? boolean default true
 function M.get_visual_selection(stop_visual_mode)
   local mode = vim.fn.mode(true)
   -- VISUAL 'v', VISUAL LINE 'V' and VISUAL BLOCK '\22'

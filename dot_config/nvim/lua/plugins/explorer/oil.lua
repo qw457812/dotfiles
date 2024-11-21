@@ -59,7 +59,10 @@ return {
         ["<leader>sr"] = {
           desc = "Search and Replace in Directory (Oil)",
           callback = function()
-            U.explorer.grug_far(require("oil").get_current_dir())
+            local dir = require("oil").get_current_dir()
+            if dir then
+              U.explorer.grug_far(dir)
+            end
           end,
         },
       },

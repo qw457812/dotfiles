@@ -35,7 +35,7 @@ local function close_buffer_or_window_or_exit()
   -- use `:bd` (or `:qa` if no listed buffer left) for main
   -- https://github.com/folke/edgy.nvim/blob/ebb77fde6f5cb2745431c6c0fe57024f66471728/lua/edgy/editor.lua#L82
   -- https://github.com/mudox/neovim-config/blob/a4f1020213fd17e6b8c1804153b9bf7683bfa690/lua/mudox/lab/close.lua#L7
-  if U.is_floating() then
+  if U.is_floating_win() then
     vim.cmd("close") -- Close Window (Cannot close last window)
   elseif #listed_buffers() > (vim.bo.buflisted and 1 or 0) then
     if non_real_file() then
@@ -205,7 +205,11 @@ return {
     optional = true,
     opts = {
       keymaps = {
-        [close_key] = "actions.close",
+        [close_key] = {
+          "actions.close",
+          opts = { exit_if_last_buf = true },
+          desc = "Close or Exit",
+        },
       },
     },
   },
