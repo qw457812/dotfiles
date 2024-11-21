@@ -170,6 +170,29 @@ return {
     },
   },
 
+  {
+    "ThePrimeagen/harpoon",
+    optional = true,
+    dependencies = { "nvim-telescope/telescope.nvim", optional = true },
+    keys = function(_, keys)
+      if LazyVim.has("telescope.nvim") then
+        table.insert(keys, { "<leader>fh", "<Cmd>Telescope harpoon marks<CR>", desc = "Harpoon Files" })
+      end
+      -- stylua: ignore
+      vim.list_extend(keys, {
+        { "<C-n>", function() require("harpoon"):list():next() end, desc = "Next Harpoon File" },
+        { "<C-p>", function() require("harpoon"):list():prev() end, desc = "Prev Harpoon File" },
+      })
+    end,
+    specs = {
+      {
+        "catppuccin",
+        optional = true,
+        opts = { integrations = { harpoon = true } },
+      },
+    },
+  },
+
   -- {
   --   "RRethy/vim-illuminate",
   --   optional = true,
