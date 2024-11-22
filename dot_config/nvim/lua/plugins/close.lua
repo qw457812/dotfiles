@@ -1,7 +1,6 @@
 -- close buffers, windows, or exit vim with the same single keypress
 local close_key = vim.g.user_close_key or "<bs>" -- easy to reach for Glove80
 local is_bs = close_key:lower() == "<bs>"
-
 -- exit nvim
 local exit_key = vim.g.user_exit_key or ("<leader>" .. close_key) -- would overwrite "go up one level" of which-key, use `<S-bs>` if needed
 
@@ -60,73 +59,36 @@ return {
       { exit_key, "<cmd>qa<cr>", desc = "Quit All" },
     },
     opts = function()
-      -- vim.api.nvim_create_autocmd("User", {
-      --   group = augroup,
-      --   pattern = "LazyVimKeymaps",
-      --   once = true,
-      --   callback = function()
-      --     if is_bs then
-      --       if not package.loaded["mini.pairs"] then
-      --         vim.keymap.set("c", "<bs>", function()
-      --           if vim.fn.getcmdline() ~= "" then
-      --             return "<bs>"
-      --           end
-      --         end, { expr = true, desc = "<bs> does not leave cmdline" })
-      --       end
-      --
-      --       if LazyVim.has("mini.pairs") then
-      --         LazyVim.on_load(
-      --           "mini.pairs",
-      --           vim.schedule_wrap(function()
-      --             local pairs = require("mini.pairs")
-      --             local c_pairs_bs = pairs.config.modes.command
-      --             -- see: https://github.com/echasnovski/mini.pairs/blob/7e834c5937d95364cc1740e20d673afe2d034cdb/lua/mini/pairs.lua#L574C5-L576C54
-      --             vim.keymap.set("c", "<bs>", function()
-      --               if vim.fn.getcmdline() ~= "" then
-      --                 return c_pairs_bs and pairs.bs() or "<bs>"
-      --               end
-      --             end, {
-      --               expr = true,
-      --               silent = false,
-      --               replace_keycodes = not c_pairs_bs,
-      --               desc = string.format("%s does not leave cmdline", c_pairs_bs and "MiniPairs.bs()" or "<bs>"),
-      --             })
-      --           end)
-      --         )
-      --       end
-      --     end
-      --   end,
-      -- })
-
       if is_bs then
-        -- if not package.loaded["mini.pairs"] then
-        --   vim.keymap.set("c", "<bs>", function()
-        --     if vim.fn.getcmdline() ~= "" then
-        --       return "<bs>"
-        --     end
-        --   end, { expr = true, desc = "<bs> does not leave cmdline" })
-        -- end
-        --
-        -- if LazyVim.has("mini.pairs") then
-        --   LazyVim.on_load(
-        --     "mini.pairs",
-        --     vim.schedule_wrap(function()
-        --       local pairs = require("mini.pairs")
-        --       local c_pairs_bs = pairs.config.modes.command
-        --       -- see: https://github.com/echasnovski/mini.pairs/blob/7e834c5937d95364cc1740e20d673afe2d034cdb/lua/mini/pairs.lua#L574C5-L576C54
-        --       vim.keymap.set("c", "<bs>", function()
-        --         if vim.fn.getcmdline() ~= "" then
-        --           return c_pairs_bs and pairs.bs() or "<bs>"
-        --         end
-        --       end, {
-        --         expr = true,
-        --         silent = false,
-        --         replace_keycodes = not c_pairs_bs,
-        --         desc = string.format("%s does not leave cmdline", c_pairs_bs and "MiniPairs.bs()" or "<bs>"),
-        --       })
-        --     end)
-        --   )
-        -- end
+        if not package.loaded["mini.pairs"] then
+          vim.keymap.set("c", "<bs>", function()
+            if vim.fn.getcmdline() ~= "" then
+              return "<bs>"
+            end
+          end, { expr = true, desc = "<bs> does not leave cmdline" })
+        end
+
+        if LazyVim.has("mini.pairs") then
+          -- or use `LazyVimKeymaps` User Event
+          LazyVim.on_load(
+            "mini.pairs",
+            vim.schedule_wrap(function()
+              local pairs = require("mini.pairs")
+              local c_pairs_bs = pairs.config.modes.command
+              -- see: https://github.com/echasnovski/mini.pairs/blob/7e834c5937d95364cc1740e20d673afe2d034cdb/lua/mini/pairs.lua#L574C5-L576C54
+              vim.keymap.set("c", "<bs>", function()
+                if vim.fn.getcmdline() ~= "" then
+                  return c_pairs_bs and pairs.bs() or "<bs>"
+                end
+              end, {
+                expr = true,
+                silent = false,
+                replace_keycodes = not c_pairs_bs,
+                desc = string.format("%s does not leave cmdline", c_pairs_bs and "MiniPairs.bs()" or "<bs>"),
+              })
+            end)
+          )
+        end
 
         vim.api.nvim_create_autocmd("TermOpen", {
           group = augroup,
@@ -193,36 +155,6 @@ return {
       end
     end,
   },
-
-  -- {
-  --   "echasnovski/mini.pairs",
-  --   optional = true,
-  --   opts = function(_, opts)
-  --     if not is_bs then
-  --       return
-  --     end
-  --
-  --     LazyVim.on_load(
-  --       "mini.pairs",
-  --       vim.schedule_wrap(function()
-  --         local pairs = require("mini.pairs")
-  --         local c_pairs_bs = (opts.modes or {}).command or pairs.config.modes.command
-  --
-  --         -- see: https://github.com/echasnovski/mini.pairs/blob/7e834c5937d95364cc1740e20d673afe2d034cdb/lua/mini/pairs.lua#L574C5-L576C54
-  --         vim.keymap.set("c", "<bs>", function()
-  --           if vim.fn.getcmdline() ~= "" then
-  --             return c_pairs_bs and pairs.bs() or "<bs>"
-  --           end
-  --         end, {
-  --           expr = true,
-  --           silent = false,
-  --           replace_keycodes = not c_pairs_bs,
-  --           desc = string.format("%s does not leave cmdline", c_pairs_bs and "MiniPairs.bs()" or "<bs>"),
-  --         })
-  --       end)
-  --     )
-  --   end,
-  -- },
 
   {
     "folke/edgy.nvim",
