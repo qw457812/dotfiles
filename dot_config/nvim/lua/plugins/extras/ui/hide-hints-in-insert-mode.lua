@@ -1,11 +1,11 @@
 local augroup = vim.api.nvim_create_augroup("hide_hints_in_insert_mode", { clear = true })
 
----@class HintsInsertToggle.Opts
+---@class AutoToggle.Opts
 ---@field get fun(event:vim.api.create_autocmd.callback.args):boolean
 ---@field set fun(state:boolean,event:vim.api.create_autocmd.callback.args)
 
----@param opts HintsInsertToggle.Opts
-local function toggle(opts)
+---@param opts AutoToggle.Opts
+local function auto_toggle(opts)
   local enabled
   vim.api.nvim_create_autocmd("InsertEnter", {
     group = augroup,
@@ -32,7 +32,7 @@ return {
     "neovim/nvim-lspconfig",
     optional = true,
     opts = function()
-      toggle({
+      auto_toggle({
         get = function(event)
           return vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf })
         end,
@@ -49,7 +49,7 @@ return {
     opts = function()
       local tsc = require("treesitter-context")
 
-      toggle({
+      auto_toggle({
         get = tsc.enabled,
         set = function(state)
           if state then
@@ -66,7 +66,7 @@ return {
     "echasnovski/mini.indentscope",
     optional = true,
     opts = function()
-      toggle({
+      auto_toggle({
         get = function()
           return not vim.b.miniindentscope_disable
         end,
@@ -84,7 +84,7 @@ return {
       local ibl = require("ibl")
       local conf = require("ibl.config")
 
-      toggle({
+      auto_toggle({
         get = function(event)
           return conf.get_config(event.buf).enabled
         end,
@@ -102,7 +102,7 @@ return {
       local vc = require("virt-column")
       local conf = require("virt-column.config")
 
-      toggle({
+      auto_toggle({
         get = function(event)
           return conf.get_config(event.buf).enabled
         end,
@@ -117,7 +117,7 @@ return {
     "Wansmer/symbol-usage.nvim",
     optional = true,
     opts = function()
-      toggle({
+      auto_toggle({
         get = function(event)
           return next(require("symbol-usage.state").get_buf_workers(event.buf)) ~= nil
         end,

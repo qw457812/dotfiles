@@ -78,6 +78,11 @@ set matchit
 set which-key
 set notimeout
 " set timeoutlen=5000
+" https://github.com/junegunn/vim-peekaboo
+" peek registers: " <C-r>
+set peekaboo
+" af if
+set functiontextobj
 
 """ Plugin settings -------------------------
 let g:argtextobj_pairs="[:],(:),<:>"
@@ -136,8 +141,12 @@ let g:EasyMotion_do_mapping = 0
 " nmap mm <Plug>(easymotion-s)
 " nmap mm :action KJumpAction.Word0<cr>
 
-map s <Plug>(easymotion-s)
-map S :action KJumpAction.Word0<cr>
+" map s <Plug>(easymotion-s)
+" map S :action KJumpAction.Word0<cr>
+
+" https://github.com/yelog/vim-flash
+map s <Action>(flash.search)
+map S <Plug>(easymotion-bd-w)
 
 " https://github.com/Mishkun/ideavim-sneak/issues/16
 " Press `S` in normal mode to activate AceJump mode before the caret
@@ -176,15 +185,19 @@ nmap cr <Plug>ReplaceWithRegisterOperator
 nmap crr <Plug>ReplaceWithRegisterLine
 " xmap cr <Plug>ReplaceWithRegisterVisual " `v_p`
 nmap cR cr$
+nmap cdd yyp
 
 " helix-style mappings
 map mm %
 " surround
-nmap ms ys
-xmap ms S
-nmap mr cs
-nmap md ds
-
+nmap ms <Plug>YSurround
+vmap ms <Plug>VSurround
+nmap mr <Plug>CSurround
+nmap md <Plug>DSurround
+" nunmap ys
+" " vunmap S
+" nunmap cs
+" nunmap ds
 
 """ Common settings -------------------------
 " :h 'clipboard'
@@ -224,10 +237,8 @@ nmap \e :e ~/.ideavimrc<CR>
 nmap \r :source ~/.ideavimrc<CR>
 " nmap \r <Action>(IdeaVim.ReloadVimRc.reload)
 nmap \a <Action>(VimFindActionIdAction)
-" nmap \t :action ActivateTerminalToolWindow<CR>
 nmap \t <Action>(Terminal.OpenInTerminal)
 nmap \g <Action>(Generate)
-" nmap \l <Action>(ReformatCode)
 nmap \f <Action>(FindInPath)
 nmap \o <Action>(SelectAllOccurrences)
 nmap \hc <Action>(CallHierarchy)
@@ -262,6 +273,9 @@ nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
 
+map <C-/> <Action>(ActivateTerminalToolWindow)
+map <C-space> <Action>(ActivateTerminalToolWindow)
+
 " Have j and k navigate visual lines rather than logical ones
 " Notice: just for fix ideavim bug ---> when meet folded @SuppressWarnings("unchecked") like /unchecked/, jjj... will not walk through (but gj not work well when soft-wrap is on)
 nnoremap j gj
@@ -272,6 +286,7 @@ nnoremap k gk
 " nmap n nzz
 " nmap N Nzz
 
+" nmap - <action>(ActivateProjectToolWindow)
 nnoremap - :NERDTree<CR>
 
 " https://github.com/JetBrains/ideavim/discussions/357#discussioncomment-1189455
@@ -306,8 +321,8 @@ map <M-k> <Action>(MoveStatementUp)
 " behaves like Vimium (with goku vim-s-mode rules)
 " map <up> <Action>(MethodUp)
 " map <down> <Action>(MethodDown)
-map <down> gt
-map <up> gT
+map <down> :tabnext<cr>
+map <up> :tabprevious<cr>
 nnoremap J gt
 nnoremap K gT
 nnoremap gj J
@@ -381,14 +396,17 @@ map gs <Action>(GotoSuperMethod)
 " https://github.com/triyangle/dotfiles/blob/master/config/home/.ideavimrc
 " https://github.com/mmrzax/dots/blob/bbec0d1a0549cb1c7b74438bf99e1a4169251377/.ideavimrc
 " https://github.com/phisco/configs/blob/ceab3ac5a0761b91b631d85f96de085b232c2faf/.ideavimrc
+" https://github.com/helmerdavila/dotfiles/blob/main/dot_ideavimrc
 
 " -----------------------------------------------------常用--------------------------------------------------------
 " keys: https://ideavim.sourceforge.net/vim/intro.html
 map <Leader><Space> <Action>(GotoFile)
+map <leader>, <Action>(RecentFiles)
 map <leader>/ <Action>(FindInPath)
 map <leader>` :e #<CR>
 map <leader>- <C-W>s
 map <leader>_ <C-W>v
+map <leader>: <Action>(GotoAction)
 " map <leader>\| <C-W>v
 map <leader>e :NERDTree<CR>
 " map <leader>z <Action>(ToggleZenMode)
@@ -417,15 +435,19 @@ map <leader>b9 <Action>(GoToTab9)
 
 " code
 map <leader>ca <Action>(QuickActions)
-" map <leader>cf <Action>(ReformatCode)
-map <leader>cf <Action>(ReformatCode) \| <Action>(OptimizeImports)
+map <leader>cf <Action>(ReformatCode)
+" map <leader>cf <Action>(ReformatCode) \| <Action>(OptimizeImports)
 map <leader>co <Action>(OptimizeImports)
 map <leader>cr <Action>(RenameElement)
 map <leader>cR <Action>(RenameFile)
 
+" debug
+map <leader>db <Action>(ToggleLineBreakpoint)
+
 " file/find
 map <Leader>ff <Action>(SearchEverywhere)
 map <Leader>fn <Action>(NewFile)
+" map <Leader>fn <Action>(NewScratchFile)
 map <leader>fr <Action>(RecentFiles)
 " map <Leader>fc :e ~/.local/share/chezmoi/dot_ideavimrc<CR>
 map <Leader>fc :e ~/.ideavimrc<CR>
@@ -434,15 +456,25 @@ map <Leader>fC :source ~/.ideavimrc<CR>
 map <leader>fp <Action>(ManageRecentProjects)
 " yank file path (doomemacs keybinding)
 map <leader>fy <Action>(CopyAbsolutePath)
+map <leader>ft <Action>(ActivateTerminalToolWindow)
 
-" search
-map <leader>ss <Action>(FileStructurePopup)
-map <Leader>sS <Action>(GotoSymbol)
+" git
+map <leader>gg <Action>(ActivateVersionControlToolWindow)
 
 " refactor
 map <leader>rx <Action>(IntroduceVariable)
 map <Leader>rf <Action>(ExtractMethod)
 map <Leader>rI <Action>(ExtractInterface)
+
+" search
+map <leader>sb <Action>(Find)
+map <leader>ss <Action>(FileStructurePopup)
+map <Leader>sS <Action>(GotoSymbol)
+map <Leader>sm <Action>(ShowBookmarks)
+
+" test
+map <leader>tl <Action>(Run)
+map <leader>tc <Action>(Coverage)
 
 " windows
 map <leader>ww <c-w>w
@@ -458,7 +490,11 @@ map <leader>wd <C-W>c
 " ui
 map <leader>uw <Action>(EditorToggleUseSoftWraps)
 map <leader>ug <Action>(EditorToggleShowIndentLines)
+map <leader>ul :set number!<cr>
+map <leader>uL :set relativenumber!<cr>
 
+" quit
+" nmap <leader>qq <Action>(Exit)
 map <leader>qq <Action>(CloseProject)
 
 " ----------------------------------------------------- TODO: nvim key-mappings --------------------------------------------------------
@@ -480,7 +516,6 @@ map <leader>cs <Action>(EditorCompleteStatement)
 " map <leader>cr <Action>(CopyReference)
 map <leader>cu <Action>(CheckForUpdate)
 map <leader>dd <Action>(Debug)
-map <leader>db <Action>(ToggleLineBreakpoint)
 map <Leader>dv :action ViewBreakpoints<CR>
 map <Leader>dc :action ChooseDebugConfiguration<CR>
 map <leader>ds <Action>(Stop)
@@ -488,11 +523,9 @@ map <Leader>fd :action FixDocComment<CR>
 map <leader>fu <Action>(FindUsages)
 " map <Leader>fp :action ShowFilePath<CR>
 " map <leader>fs <Action>(FileStructurePopup)
-map <leader>gg :action Generate<CR>
+" map <leader>gg :action Generate<CR>
 " 打开 IdeaVim: Track Action Ids
-map <Leader>ga :action GotoAction<CR>
 map <Leader>gc :action GotoClass<CR>
-map <Leader>gf :action GotoFile<CR>
 " map <Leader>gs :action GotoSymbol<CR>
 " Highlight usages, use CMD+G/Shift+CMD+G to iterate
 map <leader>hu <Action>(HighlightUsagesInFile)
@@ -539,9 +572,7 @@ map <leader>sd <Action>(SafeDelete)
 map <leader>si <Action>(SelectIn)
 map <leader>su <Action>(ShowUsages)
 map <Leader>sw :action SurroundWith<CR>
-map <Leader>sm <Action>(ShowBookmarks)
 map <leader>th <Action>(TypeHierarchy)
-map <leader>tt <Action>(ActivateTerminalToolWindow)
 " add
 map <leader>va <Action>(ChangesView.AddUnversioned)
 " blame
@@ -559,7 +590,6 @@ map <leader>vu <Action>(UpdateFiles)
 " map <leader>w <Action>(CloseContent)
 " map <leader>wd <Action>(ActivateDebugToolWindow)
 " map <leader>ww <Action>(JumpToLastWindow)
-" map <leader>wt <Action>(ActivateTerminalToolWindow)
 " https://youtrack.jetbrains.com/issue/VIM-2666/How-to-use-vim-bindings-in-Tool-Windows-like-Run-Structure-etc..
 " https://youtrack.jetbrains.com/issue/VIM-2313/Normal-mode-doesnt-get-activated-in-the-log-panel
 " map <leader>wr <Action>(ActivateRunToolWindow)
