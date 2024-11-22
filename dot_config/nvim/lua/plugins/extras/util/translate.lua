@@ -113,11 +113,7 @@ return {
     opts = function(_, opts)
       local actions = require("pantran.ui.actions")
 
-      local function set_hl()
-        vim.api.nvim_set_hl(0, "PantranBorder", { link = "FloatBorder" })
-      end
-      set_hl()
-      vim.api.nvim_create_autocmd("ColorScheme", { callback = set_hl })
+      Snacks.util.set_hl({ PantranBorder = "FloatBorder" }, { default = false })
 
       return U.extend_tbl(opts, {
         -- command = {

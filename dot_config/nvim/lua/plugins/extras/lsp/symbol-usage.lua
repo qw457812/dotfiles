@@ -43,14 +43,12 @@ return {
     "Wansmer/symbol-usage.nvim",
     event = "LspAttach",
     opts = function()
-      local function set_hl()
-        vim.api.nvim_set_hl(0, "SymbolUsageContent", { fg = U.color.from_hl("Comment"), italic = true })
-        vim.api.nvim_set_hl(0, "SymbolUsageRef", { fg = U.color.from_hl("Function"), italic = true })
-        vim.api.nvim_set_hl(0, "SymbolUsageDef", { fg = U.color.from_hl("Type"), italic = true })
-        vim.api.nvim_set_hl(0, "SymbolUsageImpl", { fg = U.color.from_hl("@keyword"), italic = true })
-      end
-      set_hl()
-      vim.api.nvim_create_autocmd("ColorScheme", { callback = set_hl })
+      Snacks.util.set_hl({
+        SymbolUsageContent = { fg = Snacks.util.color("Comment"), italic = true },
+        SymbolUsageRef = { fg = Snacks.util.color("Function"), italic = true },
+        SymbolUsageDef = { fg = Snacks.util.color("Type"), italic = true },
+        SymbolUsageImpl = { fg = Snacks.util.color("@keyword"), italic = true },
+      }, { default = false })
 
       return {
         vt_position = "end_of_line",
