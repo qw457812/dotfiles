@@ -27,11 +27,11 @@ return {
       frontend = {
         ---@class TransFrontendOpts
         default = {
-          title = vim.fn.has("nvim-0.9") == 1 and {
+          title = {
             { "", "TransTitleRound" },
             { "󰊿 Translation", "TransTitle" },
             { "", "TransTitleRound" },
-          } or nil, -- need nvim-0.9+
+          },
           ---@type {open: string | boolean, close: string | boolean, interval: integer} Hover Window Animation
           animation = {
             -- open = "slid", -- 'fold', 'slid'
@@ -148,6 +148,9 @@ return {
         },
         window = {
           title_border = { "", "" },
+          options = {
+            filetype = "pantran",
+          },
         },
       })
     end,

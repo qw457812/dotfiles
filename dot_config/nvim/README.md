@@ -172,6 +172,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] Use [olimorris/persisted.nvim](https://github.com/olimorris/persisted.nvim) instead of `folke/persistence.nvim` like [Matt-FTW](https://github.com/Matt-FTW/dotfiles/blob/ccaa72f977f207cc63ee9798003021534d3053c6/.config/nvim/lua/plugins/extras/util/persisted.lua#L3).
   - Or [stevearc/resession.nvim](https://github.com/stevearc/resession.nvim) mentioned in [astrocore](https://github.com/AstroNvim/astrocore#-installation).
 - [ ] Highlight trailing whitespace and inline double space.
+- [ ] Check this PR [feat(format): format mode (file | hunks)](https://github.com/LazyVim/LazyVim/pull/4801/files).
 - [x] More keymaps for lazy like [chrisgrieser](https://github.com/chrisgrieser/.config/blob/main/nvim/lua/config/lazy.lua).
 - [ ] Try [colortils.nvim](https://github.com/max397574/colortils.nvim).
 - [ ] Check this [Telescope.lua](https://github.com/xzbdmw/nvimlazy/blob/e4c7da89a726a5b048574e014b5ea2b1aeda67f9/lua/plugins/Telescope.lua).
