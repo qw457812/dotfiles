@@ -147,14 +147,14 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] [symbol-usage.nvim](https://github.com/Wansmer/symbol-usage.nvim) like [jellydn](https://github.com/jellydn/lazy-nvim-ide/blob/main/lua/plugins/lsp.lua)
 - [x] [telescope-undo.nvim](https://github.com/debugloop/telescope-undo.nvim) or [undotree](https://github.com/mbbill/undotree) like [jellydn](https://github.com/jellydn/lazy-nvim-ide/blob/main/lua/plugins/undotree.lua)
 - [ ] [mini.bracketed](https://github.com/echasnovski/mini.bracketed)
-- [ ] [keymap-amend.nvim](anuvyklack/keymap-amend.nvim)
+- [ ] [keymap-amend.nvim](https://github.com/anuvyklack/keymap-amend.nvim)
 - [ ] [flatten.nvim](https://github.com/willothy/flatten.nvim) like [amaanq](https://github.com/amaanq/nvim-config/blob/master/lua/plugins/editor.lua)
 - [ ] [benlubas/molten-nvim](https://github.com/benlubas/molten-nvim) for jupyter
 - [ ] Alternative to markdown-preview.nvim: [toppair/peek.nvim](https://github.com/toppair/peek.nvim) like [dpetka2001](https://github.com/dpetka2001/dotfiles/blob/4ae0b9e9a67e2a37a4fee7773a8c876d1ac890f3/dot_config/nvim/lua/plugins/tools.lua#L107).
 - [ ] [nvim-recorder](https://github.com/chrisgrieser/nvim-recorder)
-- [ ] [nvim-ufo](https://github.com/kevinhwang91/nvim-ufo)
+- [x] [nvim-ufo](https://github.com/kevinhwang91/nvim-ufo)
 - [ ] [rasulomaroff/reactive.nvim](https://github.com/rasulomaroff/reactive.nvim)
-- [ ] lang.zsh like [aimuzov](https://github.com/aimuzov/LazyVimx/blob/main/lua/lazyvimx/extras/lang/zsh.lua).
+- [x] lang.zsh like [aimuzov](https://github.com/aimuzov/LazyVimx/blob/main/lua/lazyvimx/extras/lang/zsh.lua).
 - [x] [tiny-inline-diagnostic.nvim](https://github.com/rachartier/tiny-inline-diagnostic.nvim) like [aimuzov](https://github.com/search?q=repo%3Aaimuzov%2FLazyVimx%20tiny-inline-diagnostic.nvim&type=code).
 - [ ] Fix lazy loading: telescope-undo.nvim, telescope-zoxide, telescope-file-browser.nvim, smart-open.nvim
 - [ ] Map `u`/`d`/`q`, and unmap `dd` for `man` filetype.
@@ -165,7 +165,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] Better `M`/`m<space>` keymaps.
 - [x] Better `<leader>ff` keymaps since we have `<leader><space>`.
 - [ ] Check [lsp_signature.nvim config of AstroNvim](https://github.com/AstroNvim/astrocommunity/blob/aaaa844e45420cd7b5f11b7c399bee919513d1d5/lua/astrocommunity/lsp/lsp-signature-nvim/init.lua).
-- [ ] Map `esc` for some buffers (maybe floating windows?) in [close.lua](lua/plugins/close.lua).
+- [x] Map `esc` for some buffers (maybe floating windows?) in [close.lua](lua/plugins/close.lua).
   - Maybe map `q` to close window like [rafi](https://github.com/rafi/vim-config/blob/814f312d92e97282913f4c3ef5f09712840b5604/lua/rafi/config/keymaps.lua#L374), and map `<C-q>` for macros.
 - [ ] Check this [util/path.lua](https://github.com/sakakibara/dotfiles/blob/f281ed9865623e204becbc3b87b3983045421422/dot_config/nvim/lua/util/path.lua).
 - [ ] Use `<leader>f,` instead of `<leader>fc` like [chrisgrieser](https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/lazy.lua#L129).

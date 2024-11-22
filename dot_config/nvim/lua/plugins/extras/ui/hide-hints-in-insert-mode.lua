@@ -1,11 +1,11 @@
-local augroup = vim.api.nvim_create_augroup("hide_hints_in_insert_mode", { clear = true })
-
 ---@class AutoToggle.Opts
 ---@field get fun(event:vim.api.create_autocmd.callback.args):boolean
 ---@field set fun(state:boolean,event:vim.api.create_autocmd.callback.args)
 
 ---@param opts AutoToggle.Opts
 local function auto_toggle(opts)
+  local augroup = vim.api.nvim_create_augroup("hide_hints_in_insert_mode", { clear = false })
+
   local enabled
   vim.api.nvim_create_autocmd("InsertEnter", {
     group = augroup,
