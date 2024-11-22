@@ -179,9 +179,9 @@ return {
             color = function()
               local fg
               if vim.bo.modified then
-                fg = U.color.from_hl("MatchParen")
+                fg = Snacks.util.color("MatchParen")
               elseif vim.bo.modifiable == false or vim.bo.readonly == true then
-                fg = U.color.from_hl("DiagnosticError")
+                fg = Snacks.util.color("DiagnosticError")
               end
               return { fg = fg, gui = "bold" }
             end,

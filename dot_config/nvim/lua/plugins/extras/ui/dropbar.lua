@@ -23,15 +23,12 @@ return {
       local dropbar_default_opts = require("dropbar.configs").opts
 
       -- custom highlight
-      -- stylua: ignore
-      local function set_hl()
-        vim.api.nvim_set_hl(0, "DropBarFileName", { default = true, fg = U.color.from_hl("DropBarKindFile"), bold = true })
-        vim.api.nvim_set_hl(0, "DropBarFileNameModified", { default = true, fg = U.color.from_hl("MatchParen"), bold = true })
-        vim.api.nvim_set_hl(0, "DropBarFolderName", { default = true, fg = U.color.from_hl("Conceal") })
-        vim.api.nvim_set_hl(0, "DropBarSymbolName", { default = true, link = "DropBarFolderName" })
-      end
-      set_hl()
-      vim.api.nvim_create_autocmd("ColorScheme", { callback = set_hl })
+      Snacks.util.set_hl({
+        DropBarFileName = { fg = Snacks.util.color("DropBarKindFile"), bold = true },
+        DropBarFileNameModified = { fg = Snacks.util.color("MatchParen"), bold = true },
+        DropBarFolderName = { fg = Snacks.util.color("Conceal") },
+        DropBarSymbolName = "DropBarFolderName",
+      }, { default = true })
 
       -- local home_parts = vim.tbl_filter(function(part)
       --   return part ~= ""
