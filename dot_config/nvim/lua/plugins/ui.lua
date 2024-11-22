@@ -347,6 +347,26 @@ return {
   },
 
   {
+    "echasnovski/mini.indentscope",
+    optional = true,
+    opts = function()
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = {
+          "rip-substitute",
+          "dbui",
+          "dbout",
+          "harpoon",
+          "Trans",
+          "pantran",
+        },
+        callback = function()
+          vim.b.miniindentscope_disable = true
+        end,
+      })
+    end,
+  },
+
+  {
     "folke/edgy.nvim",
     optional = true,
     opts = function(_, opts)

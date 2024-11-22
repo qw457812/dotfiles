@@ -3,12 +3,11 @@
   "bash-language-server": "5.4.2",
   "beautysh": "6.2.1",
   "black": "24.10.0",
-  "debugpy": "1.8.8",
   "docker-compose-language-service": "0.2.0",
   "dockerfile-language-server": "0.13.0",
   "eslint-lsp": "4.10.0",
   "gitui": "v0.26.3",
-  "google-java-format": "v1.24.0",
+  "google-java-format": "v1.25.0",
   "hadolint": "v2.12.0",
   "isort": "5.13.2",
   "java-debug-adapter": "0.58.0",
@@ -33,5 +32,6 @@
   "taplo": "0.9.3",
   "terraform-ls": "v0.36.0",
   "tflint": "v0.54.0",
-  "yaml-language-server": "1.15.0"
+  "yaml-language-server": "1.15.0",
+
 }
