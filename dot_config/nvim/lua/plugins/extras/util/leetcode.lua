@@ -156,4 +156,17 @@ return {
       table.insert(opts.config.center, 10, leetcode)
     end,
   },
+
+  {
+    "folke/snacks.nvim",
+    optional = true,
+    opts = function(_, opts)
+      table.insert(opts.dashboard.preset.keys, 10, {
+        action = ":set nobuflisted | Leet",
+        desc = "LeetCode",
+        icon = " ",
+        key = "e",
+      })
+    end,
+  },
 }

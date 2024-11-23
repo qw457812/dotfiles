@@ -5,6 +5,7 @@ local M = {}
 M.HOME = vim.uv.os_homedir()
 
 function M.is_directory(directory)
+  -- -- https://github.com/folke/snacks.nvim/pull/136#issuecomment-2492044614
   -- vim.fn.isdirectory(directory) == 1
   local stat = vim.uv.fs_stat(directory)
   return stat and stat.type == "directory"
