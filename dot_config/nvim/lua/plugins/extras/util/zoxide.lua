@@ -150,4 +150,17 @@ return {
       table.insert(opts.config.center, 10, zoxide)
     end,
   },
+
+  {
+    "folke/snacks.nvim",
+    optional = true,
+    opts = function(_, opts)
+      table.insert(opts.dashboard.preset.keys, 10, {
+        action = ":Telescope zoxide list",
+        desc = "Zoxide",
+        icon = " ",
+        key = "z",
+      })
+    end,
+  },
 }

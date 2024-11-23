@@ -196,6 +196,30 @@ return {
   },
 
   {
+    "folke/snacks.nvim",
+    optional = true,
+    opts = function(_, opts)
+      -- replace lazyvim config action
+      local config_idx = 6
+      for i, key in ipairs(opts.dashboard.preset.keys) do
+        if key.key == "c" then
+          config_idx = i
+          key.action = pick_config
+          break
+        end
+      end
+
+      -- add chezmoi
+      table.insert(opts.dashboard.preset.keys, config_idx + 1, {
+        action = pick_chezmoi,
+        desc = "Chezmoi",
+        icon = "󰠦 ",
+        key = ".",
+      })
+    end,
+  },
+
+  {
     "folke/noice.nvim",
     optional = true,
     opts = function(_, opts)

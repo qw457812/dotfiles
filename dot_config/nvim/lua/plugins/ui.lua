@@ -327,6 +327,30 @@ return {
   },
 
   {
+    "folke/snacks.nvim",
+    optional = true,
+    opts = function(_, opts)
+      -- do not `:startinsert` for "New File"
+      local keys = opts.dashboard.preset.keys
+      for _, key in ipairs(keys) do
+        if key.key == "n" then
+          key.action = ":ene"
+          break
+        end
+      end
+
+      opts.dashboard.preset.header = [[
+███╗   ██╗███████╗ ██████╗ ██╗   ██╗██╗███╗   ███╗
+████╗  ██║██╔════╝██╔═══██╗██║   ██║██║████╗ ████║
+██╔██╗ ██║█████╗  ██║   ██║██║   ██║██║██╔████╔██║
+██║╚██╗██║██╔══╝  ██║   ██║╚██╗ ██╔╝██║██║╚██╔╝██║
+██║ ╚████║███████╗╚██████╔╝ ╚████╔╝ ██║██║ ╚═╝ ██║
+╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝
+]]
+    end,
+  },
+
+  {
     "echasnovski/mini.animate",
     optional = true,
     opts = function(_, opts)
