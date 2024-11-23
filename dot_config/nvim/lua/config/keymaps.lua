@@ -205,8 +205,10 @@ map("n", "<esc>", function()
   --   dismiss_notif()
   elseif is_floating_win() then
     vim.api.nvim_win_close(0, false)
-  elseif not is_cmd_win then
-    -- close all floating windows (can't close other windows when the command-line window is open)
+  elseif not is_cmd_win and vim.bo.filetype ~= "snacks_dashboard" then
+    -- close all floating windows, note that:
+    -- 1. can't close other windows when the command-line window is open
+    -- 2. we don't want to close the terminal sections of snacks_dashboard
     for _, win in ipairs(vim.api.nvim_list_wins()) do
       if vim.api.nvim_win_is_valid(win) and is_floating_win(win) then
         vim.api.nvim_win_close(win, false)

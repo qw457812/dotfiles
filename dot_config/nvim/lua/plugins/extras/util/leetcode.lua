@@ -162,7 +162,8 @@ return {
     optional = true,
     opts = function(_, opts)
       table.insert(opts.dashboard.preset.keys, 10, {
-        action = ":set nobuflisted | Leet",
+        -- action = ":set nobuflisted | Leet",
+        action = ":Leet",
         desc = "LeetCode",
         icon = " ",
         key = "e",
