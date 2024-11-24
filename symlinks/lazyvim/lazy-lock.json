@@ -127,7 +127,7 @@
   "telescope.nvim": { "branch": "master", "commit": "85922dde3767e01d42a08e750a773effbffaea3e" },
   "text-case.nvim": { "branch": "main", "commit": "e898cfd46fa6cde0e83abb624a16e67d2ffc6457" },
   "tiny-code-action.nvim": { "branch": "main", "commit": "25bd59dfcca187a7d91362a484515ed8baa3fc7b" },
-  "tiny-inline-diagnostic.nvim": { "branch": "main", "commit": "86050f39a62de48734f1a2876d70d179b75deb7c" },
+  "tiny-inline-diagnostic.nvim": { "branch": "main", "commit": "7ec90c63692d78032d4a3355dd25811f9b587663" },
   "tmux.nvim": { "branch": "main", "commit": "307bad95a1274f7288aaee09694c25c8cbcd6f1a" },
   "todo-comments.nvim": { "branch": "main", "commit": "ae0a2afb47cf7395dc400e5dc4e05274bf4fb9e0" },
   "tokyonight.nvim": { "branch": "main", "commit": "c2725eb6d086c8c9624456d734bd365194660017" },

@@ -343,6 +343,15 @@ return {
       table.insert(keys, 3, { icon = " ", key = "i", action = ":ene | startinsert", desc = "New File (Insert)" })
       table.insert(keys, 4, { icon = " ", key = "p", action = ":ene | normal p", desc = "New File (Paste)" })
 
+      opts.dashboard.preset.header = [[
+                                                                   
+      ████ ██████           █████      ██                    
+     ███████████             █████                            
+     █████████ ███████████████████ ███   ███████████  
+    █████████  ███    █████████████ █████ ██████████████  
+   █████████ ██████████ █████████ █████ █████ ████ █████  
+ ███████████ ███    ███ █████████ █████ █████ ████ █████ 
+██████  █████████████████████ ████ █████ █████ ████ ██████]]
       opts.dashboard.preset.header = nil
 
       local show_header = not vim.g.user_is_termux

@@ -22,6 +22,11 @@ return {
         end,
       },
     },
+    opts = {
+      notifier = {
+        style = "fancy",
+      },
+    },
     init = function()
       LazyVim.on_very_lazy(function()
         _G.dd = function(...)
