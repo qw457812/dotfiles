@@ -330,28 +330,27 @@ return {
     "folke/snacks.nvim",
     optional = true,
     opts = function(_, opts)
-      -- do not `:startinsert` for "New File"
       local keys = opts.dashboard.preset.keys
       for _, key in ipairs(keys) do
         if key.key == "n" then
-          key.action = ":ene"
-          break
+          key.action = ":ene" -- do not startinsert
+        elseif key.key == "p" then
+          key.key = "o" -- o for projects, p for paste
+        elseif key.key == "c" and vim.g.user_is_termux then
+          key.action = ":lua LazyVim.pick.config_files()()"
         end
       end
-
-      -- table.insert(opts.dashboard.preset.keys, 3, {
-      --   icon = " ",
-      --   key = "p",
-      --   action = ':ene | normal "+p',
-      --   desc = "New from Clipboard",
-      -- })
+      table.insert(keys, 3, { icon = " ", key = "i", action = ":ene | startinsert", desc = "New File (Insert)" })
+      table.insert(keys, 4, { icon = " ", key = "p", action = ":ene | normal p", desc = "New File (Paste)" })
 
       opts.dashboard.preset.header = nil
 
+      local show_header = not vim.g.user_is_termux
       opts.dashboard.sections = {
-        {}, -- top padding for header
-        { section = "header", enabled = not vim.g.user_is_termux, padding = 1 },
-        { icon = " ", title = "Keymaps", section = "keys", indent = 2, padding = 1 },
+        { enabled = show_header }, -- top padding for header
+        { section = "header", enabled = show_header, padding = 1 },
+        -- { icon = " ", title = "Keymaps", section = "keys", indent = 2, padding = 1 },
+        { section = "keys", padding = 1 },
         { icon = " ", title = "Recent Files", section = "recent_files", indent = 2, padding = 1 },
         { icon = " ", title = "Projects", section = "projects", indent = 2, padding = 1 },
         { section = "startup" },
