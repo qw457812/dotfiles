@@ -349,34 +349,12 @@ return {
       opts.dashboard.preset.header = nil
 
       opts.dashboard.sections = {
-        { section = "header" },
-        { section = "keys", gap = 1, padding = 1 },
+        {}, -- top padding for header
+        { section = "header", enabled = not vim.g.user_is_termux, padding = 1 },
+        { icon = " ", title = "Keymaps", section = "keys", indent = 2, padding = 1 },
+        { icon = " ", title = "Recent Files", section = "recent_files", indent = 2, padding = 1 },
+        { icon = " ", title = "Projects", section = "projects", indent = 2, padding = 1 },
         { section = "startup" },
-        {
-          pane = 2,
-          {
-            section = "terminal",
-            enabled = vim.fn.executable("fortune") == 1 and vim.fn.executable("cowsay") == 1,
-            cmd = "fortune -s | cowsay",
-            random = 10,
-            hl = "header",
-            padding = 1,
-            indent = 8,
-          },
-          { icon = " ", title = "Recent Files", section = "recent_files", indent = 2, padding = 1 },
-          { icon = " ", title = "Projects", section = "projects", indent = 2, padding = 1 },
-          {
-            icon = " ",
-            title = "Git Status",
-            section = "terminal",
-            enabled = Snacks.git.get_root() ~= nil,
-            cmd = "git status --short --branch --renames",
-            height = 5,
-            padding = 1,
-            ttl = 5 * 60,
-            indent = 3,
-          },
-        },
       }
 
       Snacks.config.style("dashboard", {
