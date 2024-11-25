@@ -30,6 +30,7 @@ return {
           "<leader>fe",
           function()
             -- https://github.com/AstroNvim/AstroNvim/blob/c7abf1c198f633574060807a181c6ce4d1c53a2c/lua/astronvim/plugins/neo-tree.lua#L14
+            -- alternative: https://github.com/nvim-neo-tree/neo-tree.nvim/issues/872#issuecomment-1510551968
             if vim.bo.filetype == "neo-tree" then
               if vim.g.user_neotree_auto_close then
                 require("neo-tree.command").execute({ action = "close" })
@@ -352,7 +353,7 @@ return {
 
       return vim.tbl_deep_extend("force", opts, {
         sources = { "filesystem" },
-        close_if_last_window = true, -- close Neo-tree if it is the last window left in the tab
+        -- close_if_last_window = true, -- disabled as it causes `:bd` to exit vim in java library buffer when neo-tree opened, see #241
         default_component_configs = {
           -- use mini.icons instead of nvim-web-devicons
           -- https://github.com/nvim-neo-tree/neo-tree.nvim/pull/1527#issuecomment-2233186777
