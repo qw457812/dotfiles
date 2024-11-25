@@ -179,6 +179,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] Replace `vim.endswith` and `vim.startswith` with `string.match` since I found [this commit of oil.nvim](https://github.com/stevearc/oil.nvim/commit/4de3025).
 - [ ] Try [nvim-focus/focus.nvim](https://github.com/nvim-focus/focus.nvim).
 - [ ] [firenvim](https://github.com/glacambre/firenvim) like [megalithic](https://github.com/megalithic/dotfiles/blob/main/config/nvim/lua/plugins/extended/firenvim.lua).
+- [ ] Check this [chezmoi.lua.tmpl](https://github.com/Nitestack/dotfiles/blob/506b895c45b8ed012a2cb0c35fe62058d8b6dbc4/config/private_dot_config/exact_nvim/lua/exact_plugins/chezmoi.lua.tmpl).
 - [ ] Create a `state` util to cache the state (like [zen-mode.nvim](https://github.com/folke/zen-mode.nvim/blob/29b292bdc58b76a6c8f294c961a8bf92c5a6ebd6/lua/zen-mode/plugins.lua#L137)) instead of using `vim.g.user_...`
   - [vim.g.user_zenmode_on](lua/plugins/ui.lua), [vim.g.user_minianimate_disable_old](lua/plugins/ui.lua)
   - [local neovide_state = {}](lua/config/keymaps.lua)
