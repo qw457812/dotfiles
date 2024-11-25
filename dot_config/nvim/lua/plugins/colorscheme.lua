@@ -270,7 +270,7 @@ return {
         integrations = {
           mini = {
             enabled = true,
-            indentscope_color = "subtext0",
+            -- indentscope_color = "subtext0",
           },
           dropbar = {
             enabled = true,
@@ -332,6 +332,8 @@ return {
               bg = vim.g.user_transparent_background and util.darken(colors.surface0, 0.5, colors.base)
                 or util.darken(colors.surface1, 0.7, colors.base),
             },
+
+            MiniIndentscopeSymbol = { fg = util.blend(colors.green, colors.sapphire, 0.75) },
 
             -- for flash treesitter search, not necessary after using `{ label = { rainbow = { enabled = true } } }` opts
             FlashLabel = { fg = colors.base, bg = colors.green, style = { "bold" } },
