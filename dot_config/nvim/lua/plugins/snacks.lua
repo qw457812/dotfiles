@@ -22,9 +22,17 @@ return {
         end,
       },
     },
+    ---@module "snacks"
+    ---@type snacks.Config
     opts = {
       notifier = {
         style = "fancy",
+      },
+      terminal = {
+        win = {
+          -- style = "float",
+          position = "float",
+        },
       },
     },
     init = function()

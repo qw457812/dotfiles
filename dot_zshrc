@@ -387,6 +387,7 @@ alias g='lazygit'
 #     rm -f $LAZYGIT_NEW_DIR_FILE > /dev/null
 #   fi
 # }
+alias gcl1='git clone --depth 1'
 
 # alias lg='leetgo'
 alias lc="nvim leetcode.nvim"
