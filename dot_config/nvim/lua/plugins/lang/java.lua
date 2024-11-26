@@ -2,6 +2,34 @@ if not LazyVim.has_extra("lang.java") and not U.has_user_extra("lang.nvim-java")
   return {}
 end
 
+-- https://github.com/sykesm/dotfiles/blob/92169d9a6ca596fddc58ce1771d708e92d779dec/.config/nvim/lua/sykesm/plugins/nvim-jdtls.lua#L39
+local function java_runtimes()
+  local function java_home_macos(version)
+    local java_home = "/usr/libexec/java_home"
+    if vim.fn.has("macunix") == 0 or vim.fn.executable(java_home) == 0 then
+      return
+    end
+    local res = vim.system({ java_home, "-F", "-v", version }, { text = true }):wait()
+    return res.code == 0 and res.stdout:gsub("[\r\n]+$", "")
+  end
+
+  local runtimes = {}
+  for i = 8, 23 do
+    local version = tostring(i)
+    local home = java_home_macos(version)
+    if not home and version == "8" then
+      home = java_home_macos("1.8")
+    end
+    if home then
+      table.insert(runtimes, {
+        name = "JavaSE-" .. (version == "8" and "1.8" or version),
+        path = home,
+      })
+    end
+  end
+  return runtimes
+end
+
 return {
   {
     "LazyVim/LazyVim",
@@ -21,20 +49,31 @@ return {
   {
     "mfussenegger/nvim-jdtls",
     optional = true,
-    opts = {
-      -- https://github.com/eclipse-jdtls/eclipse.jdt.ls/wiki/Running-the-JAVA-LS-server-from-the-command-line#initialize-request
-      -- https://github.com/doctorfree/nvim-lazyman/blob/bbecf74deb10a0483742196b23b91858f823f632/ftplugin/java.lua#L84
-      settings = {
-        java = {
-          saveActions = {
-            organizeImports = true,
+    opts = function(_, opts)
+      local runtimes = java_runtimes()
+      return U.extend_tbl(opts, {
+        -- https://github.com/eclipse-jdtls/eclipse.jdt.ls/wiki/Running-the-JAVA-LS-server-from-the-command-line#initialize-request
+        -- https://github.com/doctorfree/nvim-lazyman/blob/bbecf74deb10a0483742196b23b91858f823f632/ftplugin/java.lua#L84
+        settings = {
+          java = {
+            configuration = {
+              runtimes = vim.tbl_isempty(runtimes) and nil or runtimes,
+            },
+            saveActions = {
+              organizeImports = true,
+            },
           },
         },
-      },
-      ------@param args vim.api.create_autocmd.callback.args
-      ---on_attach = function(args)
-      ---  --[[add custom keys here]]
-      ---end,
-    },
+        ---@param args vim.api.create_autocmd.callback.args
+        on_attach = function(args)
+          vim.keymap.set(
+            "n",
+            "<localleader>r",
+            require("jdtls").set_runtime,
+            { buffer = args.buf, desc = "Pick Java Runtime" }
+          )
+        end,
+      })
+    end,
   },
 }
