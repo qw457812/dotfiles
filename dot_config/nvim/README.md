@@ -86,6 +86,8 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
       - Lazyvim [PR](https://github.com/LazyVim/LazyVim/pull/2211) for nvim-java.
     - Like [dragove](https://github.com/dragove/dotfiles/blob/master/nvim/.config/nvim/lua/plugins/lang/java.lua), [contributor](https://github.com/LazyVim/LazyVim/commit/61fae7d23f5689a9112b265f4bfb8468a131ae66) of extras.lang.java.
     - [Install nvim-java on Lazyvim](https://github.com/nvim-java/nvim-java/wiki/Lazyvim).
+    - [nvim-java/starter-lazyvim](https://github.com/nvim-java/starter-lazyvim)
+  - [ ] Check [issue #97 of lsp_signature.nvim](https://github.com/ray-x/lsp_signature.nvim/issues/97#issuecomment-1960919483).
 - [ ] Python LSP improvements:
   - Fredrikaverpil's [lang/python.lua](https://github.com/fredrikaverpil/dotfiles/blob/main/nvim-fredrik/lua/lang/python.lua), [contributor](https://github.com/LazyVim/LazyVim/commits?author=fredrikaverpil) of LazyVim.
   - [moetayuko](https://github.com/moetayuko/nvimrc), Lazyvim [PR](https://github.com/LazyVim/LazyVim/pull/4141) for extras.lang.python.
