@@ -35,7 +35,8 @@ return {
       -- end, require("plenary.path"):new(home):_split())
       ---@diagnostic disable-next-line: param-type-mismatch
       local home_parts = vim.split(vim.uv.os_homedir(), "/", { trimempty = true })
-      local oil_prefix = "oil:"
+      local oil_prefix = "oil:" -- oil.nvim
+      local jdt_prefix = "jdt:" -- nvim-jdtls
       local source_path = {
         get_symbols = function(buff, win, cursor)
           local symbols = sources.path.get_symbols(buff, win, cursor)
@@ -48,6 +49,19 @@ return {
             symbols[i].name_hl = "DropBarFolderName"
           end
           symbols[#symbols].name_hl = vim.bo[buff].modified and "DropBarFileNameModified" or "DropBarFileName"
+
+          -- fix path for java library
+          if vim.bo[buff].filetype == "java" and #symbols > 1 and symbols[1].name == jdt_prefix then
+            for i = #symbols, 2, -1 do
+              if not symbols[i].name:find("%.class%?=") then
+                table.remove(symbols, i)
+              else
+                symbols[i].name = symbols[i].name:match("^(.+%.class)%?=")
+                break
+              end
+            end
+            return symbols
+          end
 
           -- replace home dir with ~
           local symbol_oil_prefix
@@ -128,6 +142,9 @@ return {
             end,
             ---@type fun(path: string): string, string?|false
             file_icon = function(path)
+              local default_file_icon = dropbar_default_opts.icons.kinds.file_icon
+              local default_dir_icon = dropbar_default_opts.icons.kinds.dir_icon
+
               local function mini_icons_get(category, name, fallback)
                 local icon, hl, is_default = require("mini.icons").get(category, name)
                 if is_default and fallback then
@@ -139,10 +156,21 @@ return {
 
               if path == oil_prefix then
                 return mini_icons_get("filetype", "oil")
+              elseif path == jdt_prefix then
+                return mini_icons_get("filetype", "java")
               elseif vim.startswith(path, oil_prefix) then
-                return mini_icons_get("directory", path:sub(#oil_prefix + 1), dropbar_default_opts.icons.kinds.dir_icon)
+                return mini_icons_get("directory", path:sub(#oil_prefix + 1), default_dir_icon)
+              elseif vim.startswith(path, jdt_prefix) then
+                path = path:sub(#jdt_prefix + 1):gsub("%?=.*$", "")
+                if vim.endswith(path, ".jar") then
+                  return mini_icons_get("extension", "tar")
+                elseif vim.endswith(path, ".class") then
+                  return mini_icons_get("file", path, default_file_icon)
+                else
+                  return mini_icons_get("directory", path, default_dir_icon)
+                end
               else
-                return mini_icons_get("file", path, dropbar_default_opts.icons.kinds.file_icon)
+                return mini_icons_get("file", path, default_file_icon)
               end
             end,
           },
