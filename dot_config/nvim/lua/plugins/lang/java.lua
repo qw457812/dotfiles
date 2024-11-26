@@ -17,4 +17,24 @@ return {
       })
     end,
   },
+
+  {
+    "mfussenegger/nvim-jdtls",
+    optional = true,
+    opts = {
+      -- https://github.com/eclipse-jdtls/eclipse.jdt.ls/wiki/Running-the-JAVA-LS-server-from-the-command-line#initialize-request
+      -- https://github.com/doctorfree/nvim-lazyman/blob/bbecf74deb10a0483742196b23b91858f823f632/ftplugin/java.lua#L84
+      settings = {
+        java = {
+          saveActions = {
+            organizeImports = true,
+          },
+        },
+      },
+      ------@param args vim.api.create_autocmd.callback.args
+      ---on_attach = function(args)
+      ---  --[[add custom keys here]]
+      ---end,
+    },
+  },
 }
