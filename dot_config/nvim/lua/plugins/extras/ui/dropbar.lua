@@ -44,24 +44,23 @@ return {
             return symbols
           end
 
+          -- fix path for java library
+          if vim.bo[buff].filetype == "java" and #symbols > 1 and symbols[1].name == jdt_prefix then
+            for i = #symbols, 2, -1 do
+              if symbols[i].name:find("%.class%?=") then
+                symbols[i].name = symbols[i].name:match("^(.+%.class)%?=")
+                break
+              else
+                table.remove(symbols, i)
+              end
+            end
+          end
+
           -- filename highlighting
           for i = 1, #symbols - 1 do
             symbols[i].name_hl = "DropBarFolderName"
           end
           symbols[#symbols].name_hl = vim.bo[buff].modified and "DropBarFileNameModified" or "DropBarFileName"
-
-          -- fix path for java library
-          if vim.bo[buff].filetype == "java" and #symbols > 1 and symbols[1].name == jdt_prefix then
-            for i = #symbols, 2, -1 do
-              if not symbols[i].name:find("%.class%?=") then
-                table.remove(symbols, i)
-              else
-                symbols[i].name = symbols[i].name:match("^(.+%.class)%?=")
-                break
-              end
-            end
-            return symbols
-          end
 
           -- replace home dir with ~
           local symbol_oil_prefix
@@ -163,7 +162,7 @@ return {
               elseif vim.startswith(path, jdt_prefix) then
                 path = path:sub(#jdt_prefix + 1):gsub("%?=.*$", "")
                 if vim.endswith(path, ".jar") then
-                  return mini_icons_get("extension", "tar")
+                  return mini_icons_get("extension", "zip"), "MiniIconsRed"
                 elseif vim.endswith(path, ".class") then
                   return mini_icons_get("file", path, default_file_icon)
                 else
