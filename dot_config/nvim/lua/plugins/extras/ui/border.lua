@@ -41,14 +41,6 @@ return {
   {
     "neovim/nvim-lspconfig",
     optional = true,
-    opts = function()
-      require("lspconfig.ui.windows").default_options.border = "rounded"
-    end,
-  },
-
-  {
-    "neovim/nvim-lspconfig",
-    optional = true,
     opts = {
       diagnostics = {
         float = { border = "rounded" },

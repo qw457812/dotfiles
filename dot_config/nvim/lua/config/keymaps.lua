@@ -160,7 +160,10 @@ map({ "n", "x" }, "gk", "K", { desc = "Keywordprg" }) -- not necessary
 LazyViewConfig.keys.hover = "gk"
 -- ":e #" doesn't work if the alternate buffer doesn't have a file name, while CTRL-^ still works then
 map("n", { "<leader>`", "<leader>bb" }, "<C-^>", { desc = "Switch to Other Buffer" })
-map("n", "<leader>bA", "<cmd>bufdo bd<cr>", { desc = "Delete All Buffers" })
+-- alternative: "<cmd>bufdo bd<cr>"
+map("n", "<leader>bA", function()
+  Snacks.bufdelete.all()
+end, { desc = "Delete All Buffers" })
 
 -- jumping
 -- map("n", ",", "<C-o>", { desc = "Go Back" })
