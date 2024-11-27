@@ -21,6 +21,7 @@ local function java_runtimes()
       home = java_home_macos("1.8")
     end
     if home then
+      -- note that the field `name` must be a valid `ExecutionEnvironment`
       table.insert(runtimes, {
         name = "JavaSE-" .. (version == "8" and "1.8" or version),
         path = home,
@@ -57,11 +58,12 @@ return {
         settings = {
           java = {
             configuration = {
-              runtimes = vim.tbl_isempty(runtimes) and nil or runtimes,
+              runtimes = not vim.tbl_isempty(runtimes) and runtimes or nil,
             },
-            saveActions = {
-              organizeImports = true,
-            },
+            -- saveActions = {
+            --   -- TODO: respect <leader>uf toggle
+            --   organizeImports = vim.g.autoformat,
+            -- },
           },
         },
         ---@param args vim.api.create_autocmd.callback.args

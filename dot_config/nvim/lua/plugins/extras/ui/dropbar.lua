@@ -277,7 +277,7 @@ return {
             .. dropbar_default_opts.icons.ui.bar.separator
             .. "{hl}{kind_icon}{symbol.name:DropBarSymbolName}",
           -- hl_group = "lualine_c_normal",
-          -- max_items = 5,
+          max_items = 5,
         })
         table.insert(opts.winbar.lualine_c, {
           function()
