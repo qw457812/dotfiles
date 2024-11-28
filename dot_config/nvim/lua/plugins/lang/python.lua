@@ -245,7 +245,7 @@ return {
       settings = {
         options = {
           on_telescope_result_callback = function(filename)
-            return U.path.replace_home_with_tilde(filename):gsub("/bin/python", "")
+            return U.path.home_to_tilde(filename):gsub("/bin/python", "")
           end,
         },
       },

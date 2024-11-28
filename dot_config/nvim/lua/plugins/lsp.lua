@@ -131,7 +131,7 @@ return {
         { "<leader>clW", function() vim.lsp.buf.remove_workspace_folder() end, desc = "Remove Workspace" },
         { "<leader>clw", function() vim.lsp.buf.add_workspace_folder() end, desc = "Add Workspace" },
         { "<leader>clL", function()
-          LazyVim.info(vim.tbl_map(U.path.replace_home_with_tilde, vim.lsp.buf.list_workspace_folders()), { title = "Lsp Workspaces" })
+          LazyVim.info(vim.tbl_map(U.path.home_to_tilde, vim.lsp.buf.list_workspace_folders()), { title = "Lsp Workspaces" })
         end, desc = "List Workspace" },
       })
 

@@ -695,7 +695,7 @@ return {
               -- vim.fn.getcwd()
               local cwd = LazyVim.root.cwd()
               local root = LazyVim.root.get({ normalize = true })
-              return cwd == root and "Explorer" or "󱞊 " .. U.path.replace_home_with_tilde(cwd)
+              return cwd == root and "Explorer" or "󱞊 " .. U.path.home_to_tilde(cwd)
             end,
             highlight = "NeoTreeRootName", -- Directory
             text_align = "left",

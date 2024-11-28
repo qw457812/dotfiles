@@ -155,7 +155,7 @@ return {
                 LazyVim.info("Successfully added", { title = "Chezmoi" })
               else
                 LazyVim.error(
-                  ("Failed to add `%s`:\n%s"):format(U.path.replace_home_with_tilde(event.file), res.stderr),
+                  ("Failed to add `%s`:\n%s"):format(U.path.home_to_tilde(event.file), res.stderr),
                   { title = "Chezmoi" }
                 )
               end

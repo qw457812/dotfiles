@@ -87,10 +87,7 @@ return {
                 vim.fn.system({ "zoxide", "add", selection.path })
               end,
               after_action = function(selection)
-                LazyVim.info(
-                  "Directory changed to " .. U.path.replace_home_with_tilde(selection.path),
-                  { title = "Zoxide" }
-                )
+                LazyVim.info("Directory changed to " .. U.path.home_to_tilde(selection.path), { title = "Zoxide" })
                 -- vim.cmd.edit(selection.path)
                 -- require("neo-tree.command").execute({ dir = selection.path })
                 require("telescope.builtin").find_files({ cwd = selection.path })
