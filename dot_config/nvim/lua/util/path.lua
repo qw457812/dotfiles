@@ -4,17 +4,17 @@ local M = {}
 -- os.getenv("HOME")
 M.HOME = vim.uv.os_homedir()
 
-function M.is_directory(directory)
+function M.is_dir(directory)
   -- -- https://github.com/folke/snacks.nvim/pull/136#issuecomment-2492044614
   -- vim.fn.isdirectory(directory) == 1
   local stat = vim.uv.fs_stat(directory)
-  return stat and stat.type == "directory"
+  return stat and stat.type == "directory" or false
 end
 
 --- Chezmoi source path
 M.CHEZMOI = (function()
   local path = M.HOME .. "/.local/share/chezmoi"
-  return M.is_directory(path) and path or nil
+  return M.is_dir(path) and path or nil
 end)()
 
 M.CONFIG = (function()
@@ -31,7 +31,7 @@ M.LAZYVIM = LazyVim.get_plugin_path("LazyVim")
 --- https://github.com/nvim-lualine/lualine.nvim/blob/b431d228b7bbcdaea818bdc3e25b8cdbe861f056/lua/lualine/extensions/nerdtree.lua#L4
 ---@param path string
 ---@return string
-function M.replace_home_with_tilde(path)
+function M.home_to_tilde(path)
   -- vim.fn.fnamemodify(path, ":~")
   -- require("plenary.path"):new(path):make_relative(M.home)
   return M.HOME and path:gsub("^" .. vim.pesc(M.HOME), "~") or path
