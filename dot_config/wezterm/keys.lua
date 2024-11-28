@@ -236,6 +236,27 @@ function M.apply_to_config(config)
       -- { mods = "NONE", key = "Escape", action = M.action.clear_selection_and_clear_pattern_or_close },
       -- { mods = "NONE", key = "Escape", action = wez_tmux.action.ClearSelectionOrClearPatternOrClose },
       { mods = "NONE", key = "Escape", action = M.action.clear_selection_or_clear_pattern_or_close },
+      -- -- leave copy mode on `y`
+      -- {
+      --   mods = "NONE",
+      --   key = "y",
+      --   action = wezterm.action_callback(function(window, pane)
+      --     wezterm.GLOBAL.tmux_search_directions[tostring(pane)] = nil
+      --     window:perform_action(
+      --       act.Multiple({
+      --         act.CopyTo("Clipboard"),
+      --         act.ClearSelection,
+      --         act.CopyMode("ClearSelectionMode"),
+      --         act.CopyMode("ClearPattern"),
+      --         act.CopyMode("AcceptPattern"),
+      --         act.CopyMode("Close"),
+      --         act.ScrollToBottom,
+      --       }),
+      --       pane
+      --     )
+      --   end),
+      -- },
+      -- `y` does not leave copy mode
       {
         mods = "NONE",
         key = "y",
@@ -244,23 +265,8 @@ function M.apply_to_config(config)
           act.ClearSelection,
           act.CopyMode("ClearSelectionMode"),
         }),
-        -- -- leave copy mode on `y`
-        -- action = wezterm.action_callback(function(window, pane)
-        --   wezterm.GLOBAL.tmux_search_directions[tostring(pane)] = nil
-        --   window:perform_action(
-        --     act.Multiple({
-        --       act.CopyTo("Clipboard"),
-        --       act.ClearSelection,
-        --       act.CopyMode("ClearSelectionMode"),
-        --       act.CopyMode("ClearPattern"),
-        --       act.CopyMode("AcceptPattern"),
-        --       act.CopyMode("Close"),
-        --     }),
-        --     pane
-        --   )
-        -- end),
       },
-      -- if `y` does not leave copy mode, `p` can be used
+      -- if `y` does not leave copy mode, then `p` can be used
       {
         mods = "NONE",
         key = "p",
