@@ -214,7 +214,6 @@ function M.apply_to_config(config)
       { mods = "CTRL", key = "d", action = act.CopyMode({ MoveByPage = 0.5 }) },
       { mods = "NONE", key = "Escape", action = wez_tmux.action.ClearSelectionOrClearPatternOrClose },
       -- { mods = "NONE", key = "Escape", action = M.action.clear_selection_and_clear_pattern_or_close },
-      -- TODO: `i` quit copy mode
       {
         mods = "NONE",
         key = "y",
@@ -254,6 +253,24 @@ function M.apply_to_config(config)
               act.CopyMode("AcceptPattern"),
               act.CopyMode("Close"),
               act.PasteFrom("Clipboard"),
+            }),
+            pane
+          )
+        end),
+      },
+      -- leave copy mode on `i` (insert)
+      {
+        mods = "NONE",
+        key = "i",
+        action = wezterm.action_callback(function(window, pane)
+          wezterm.GLOBAL.tmux_search_directions[tostring(pane)] = nil
+          window:perform_action(
+            act.Multiple({
+              act.ClearSelection,
+              act.CopyMode("ClearSelectionMode"),
+              act.CopyMode("ClearPattern"),
+              act.CopyMode("AcceptPattern"),
+              act.CopyMode("Close"),
             }),
             pane
           )
