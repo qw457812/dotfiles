@@ -69,9 +69,30 @@ M.action = {
       end
     else
       table.insert(actions, act.CopyMode("Close"))
+      table.insert(actions, act.ScrollToBottom)
     end
 
     window:perform_action(act.Multiple(actions), pane)
+  end),
+
+  clear_selection_or_clear_pattern_or_close = wezterm.action_callback(function(window, pane)
+    local action
+
+    if window:get_selection_text_for_pane(pane) ~= "" then
+      action = act.Multiple({
+        act.ClearSelection,
+        act.CopyMode("ClearSelectionMode"),
+      })
+    elseif wezterm.GLOBAL.tmux_search_directions[tostring(pane)] then
+      action = wez_tmux.action.ClearPattern
+    else
+      action = act.Multiple({
+        act.CopyMode("Close"),
+        act.ScrollToBottom,
+      })
+    end
+
+    window:perform_action(action, pane)
   end),
 }
 
@@ -212,8 +233,9 @@ function M.apply_to_config(config)
       { mods = "NONE", key = "d", action = act.CopyMode({ MoveByPage = 0.5 }) },
       { mods = "CTRL", key = "u", action = act.CopyMode({ MoveByPage = -0.5 }) },
       { mods = "CTRL", key = "d", action = act.CopyMode({ MoveByPage = 0.5 }) },
-      { mods = "NONE", key = "Escape", action = wez_tmux.action.ClearSelectionOrClearPatternOrClose },
       -- { mods = "NONE", key = "Escape", action = M.action.clear_selection_and_clear_pattern_or_close },
+      -- { mods = "NONE", key = "Escape", action = wez_tmux.action.ClearSelectionOrClearPatternOrClose },
+      { mods = "NONE", key = "Escape", action = M.action.clear_selection_or_clear_pattern_or_close },
       {
         mods = "NONE",
         key = "y",
@@ -271,6 +293,7 @@ function M.apply_to_config(config)
               act.CopyMode("ClearPattern"),
               act.CopyMode("AcceptPattern"),
               act.CopyMode("Close"),
+              act.ScrollToBottom,
             }),
             pane
           )
