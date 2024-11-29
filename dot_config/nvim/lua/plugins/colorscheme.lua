@@ -56,7 +56,7 @@ end
 
 local function to_neutral_gray(color)
   -- transparent: CursorLine
-  return vim.g.user_transparent_background and color or U.color.to_neutral_gray(color)
+  return vim.g.user_transparent_background and color or require("util.color").to_neutral_gray(color)
 end
 
 local tokyonight_custom_style = "custom"
@@ -144,7 +144,7 @@ return {
             { fg = (hl.TelescopePromptPrefix or hl.Identifier).fg, bg = (hl.TelescopeSelection or hl.Visual).bg }
 
           if borderless_telescope then
-            local bg = U.color.to_neutral_gray(c.bg_dark) -- c.bg_dark
+            local bg = to_neutral_gray(c.bg_dark) -- c.bg_dark
             local prompt = bg -- "#2d3149"
             hl.TelescopeNormal = { bg = bg, fg = c.fg }
             hl.TelescopeBorder = { bg = bg, fg = bg }
@@ -355,7 +355,7 @@ return {
             })
           end
 
-          local borderless_telescope_bg = require("util.color").to_neutral_gray(colors.mantle)
+          local borderless_telescope_bg = to_neutral_gray(colors.mantle)
           return vim.tbl_deep_extend("force", custom_highlights, borderless_telescope and {
             -- copied from: https://github.com/catppuccin/nvim/blob/35d8057137af463c9f41f169539e9b190d57d269/lua/catppuccin/groups/integrations/telescope.lua#L6
             TelescopeBorder = { fg = borderless_telescope_bg, bg = borderless_telescope_bg },

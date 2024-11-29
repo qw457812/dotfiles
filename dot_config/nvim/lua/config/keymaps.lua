@@ -99,7 +99,10 @@ map("x", "l", function() unfold_l(true) end)
 -- map("n", "L", "foldclosed('.') != -1 ? 'zO' : v:count ? '$' : &wrap ? 'g$' : '$'", { desc = "Goto line end", expr = true })
 map("n", "L", "(v:count ? '$' : &wrap ? 'g$' : '$').'zv'", { desc = "Goto line end", expr = true })
 map("o", "L", "v:count ? '$' : &wrap ? 'g$' : '$'", { desc = "Goto line end", expr = true })
-map("x", "L", "(v:count ? 'g_' : &wrap ? 'g$' : 'g_').'zv'", { desc = "Goto line end", expr = true }) -- TODO: to the last non-blank character of the line when wrapped
+-- see `:h v_$` for <C-v>$
+-- TODO: to the last non-blank character of the line when wrapped
+-- stylua: ignore
+map("x", "L", "(mode() == nr2char(22) ? '$' : v:count ? 'g_' : &wrap ? 'g$' : 'g_').'zv'", { desc = "Goto line end", expr = true })
 -- https://github.com/folke/lazy.nvim/issues/411
 -- https://github.com/folke/lazy.nvim/issues/133
 LazyViewConfig.commands.home.key = "gH"
@@ -327,6 +330,23 @@ map("n", "g.", "@:", { desc = "Repeat last command-line" })
 -- works even with `spell=false`
 map("n", "z.", "1z=", { desc = "Fix Spelling" })
 
+-- Better block-wise operations on selected area
+-- https://github.com/rafi/vim-config/blob/3689ae1ba113e2b8c6d12f17281fd14d91e58027/lua/rafi/config/keymaps.lua#L122
+local blockwise_force = function(key)
+  local c_v = vim.api.nvim_replace_termcodes("<C-v>", true, false, true)
+  local keyseq = {
+    I = { v = "<C-v>I", V = "<C-v>^o^I", [c_v] = "I" },
+    A = { v = "<C-v>A", V = "<C-v>0o$A", [c_v] = "A" },
+    gI = { v = "<C-v>0I", V = "<C-v>0o$I", [c_v] = "0I" },
+  }
+  return function()
+    return keyseq[key][vim.fn.mode()]
+  end
+end
+map("x", "I", blockwise_force("I"), { expr = true, noremap = true, desc = "Blockwise Insert" })
+map("x", "gI", blockwise_force("gI"), { expr = true, noremap = true, desc = "Blockwise Insert" })
+map("x", "A", blockwise_force("A"), { expr = true, noremap = true, desc = "Blockwise Append" })
+
 -- https://github.com/rstacruz/vimfiles/blob/ee9a3e7e7f022059b6d012eff2e88c95ae24ff97/lua/config/keymaps.lua#L35
 -- https://github.com/nvim-lualine/lualine.nvim/blob/b431d228b7bbcdaea818bdc3e25b8cdbe861f056/lua/lualine/components/filename.lua#L74
 -- :let @+=expand('%:p:~')<cr>
@@ -356,6 +376,11 @@ end, { desc = "Yank file relative path" })
 Snacks.toggle.option("number", { name = "Line Number" }):map("<leader>ul")
 U.toggle.diagnostic_virtual_text:map("<leader>ud")
 U.toggle.diagnostics:map("<leader>uD")
+if not LazyVim.has("nvim-scrollbar") then
+  Snacks.toggle
+    .option("laststatus", { off = 0, on = vim.o.laststatus > 0 and vim.o.laststatus or 3, name = "Status Line" })
+    :map("<leader>uS")
+end
 
 -- local function google_search(input)
 --   local query = input or vim.fn.expand("<cword>")

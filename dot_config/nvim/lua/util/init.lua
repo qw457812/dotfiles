@@ -9,7 +9,9 @@ local M = {}
 setmetatable(M, {
   __index = function(t, k)
     t[k] = require("util." .. k)
-    return t[k]
+    -- https://github.com/folke/snacks.nvim/commit/d0794dc
+    -- return t[k]
+    return rawget(t, k)
   end,
 })
 
@@ -82,7 +84,7 @@ end
 ---@param stop_visual_mode? boolean default true
 function M.get_visual_selection(stop_visual_mode)
   local mode = vim.fn.mode(true)
-  -- VISUAL 'v', VISUAL LINE 'V' and VISUAL BLOCK '\22'
+  -- eval `vim.api.nvim_replace_termcodes("<C-v>", true, false, true)` or `vim.fn.nr2char(22)`
   local is_visual = mode == "v" or mode == "V" or mode == "\22"
   assert(is_visual, "Not in Visual mode")
 
