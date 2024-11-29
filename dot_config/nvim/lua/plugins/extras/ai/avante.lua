@@ -8,6 +8,7 @@ return {
       "stevearc/dressing.nvim",
       "MunifTanjim/nui.nvim",
       "zbirenbaum/copilot.lua", -- for `provider = "copilot"`
+      { "hrsh7th/nvim-cmp", optional = true },
       { "echasnovski/mini.icons", optional = true },
       {
         "HakonHarnes/img-clip.nvim", -- support for image pasting

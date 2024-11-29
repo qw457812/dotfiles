@@ -97,7 +97,7 @@ require("lazy").setup({
         "gzip",
         -- "matchit",
         -- "matchparen",
-        -- "netrwPlugin",
+        "netrwPlugin", -- using oil.nvim
         "tarPlugin",
         "tohtml",
         "tutor",

@@ -114,7 +114,7 @@ return {
       return vim.list_extend(keys, mappings)
     end,
     opts = function(_, opts)
-      local is_default_explorer = vim.g.user_default_explorer == "neo-tree.nvim"
+      local hijack_netrw = vim.g.user_hijack_netrw == "neo-tree.nvim"
 
       -- https://github.com/nvim-neo-tree/neo-tree.nvim/wiki/Recipes#find-with-telescope
       local function get_telescope_opts(state)
@@ -490,7 +490,7 @@ return {
           width = math.max(35, math.min(50, math.floor(vim.o.columns * 0.25))),
           mappings = {
             -- ["-"] = "close_or_unfocus", -- toggle neo-tree, work with `-` defined in `keys` above
-            ["-"] = is_default_explorer and "close_or_unfocus" or {
+            ["-"] = hijack_netrw and "close_or_unfocus" or {
               function(state)
                 local node = state.tree:get_node()
                 local path = node.type == "file" and node:get_parent_id() or node:get_id()
@@ -545,7 +545,7 @@ return {
           },
           -- whether to use for editing directories (e.g. `vim .` or `:e src/`)
           -- possible values: "open_default" (default), "open_current", "disabled"
-          hijack_netrw_behavior = is_default_explorer and "open_default" or "disabled",
+          hijack_netrw_behavior = hijack_netrw and "open_default" or "disabled",
           commands = {
             telescope_find = function(state)
               require("telescope.builtin").find_files(get_telescope_opts(state))

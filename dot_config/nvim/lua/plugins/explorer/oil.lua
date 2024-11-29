@@ -10,7 +10,7 @@ return {
       -- whether to use for editing directories (e.g. `vim .` or `:e src/`)
       -- disabled because neo-tree is used for that
       -- default_file_explorer = false, -- default value: true
-      default_file_explorer = vim.g.user_default_explorer == "oil.nvim",
+      default_file_explorer = vim.g.user_hijack_netrw == "oil.nvim",
       delete_to_trash = true,
       -- skip_confirm_for_simple_edits = true,
       -- prompt_save_on_select_new_entry = false,
