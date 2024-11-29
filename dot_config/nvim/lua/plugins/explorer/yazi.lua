@@ -41,7 +41,7 @@ return {
       })
 
       return {
-        open_for_directories = vim.g.user_default_explorer == "yazi.nvim",
+        open_for_directories = vim.g.user_hijack_netrw == "yazi.nvim",
       }
     end,
   },

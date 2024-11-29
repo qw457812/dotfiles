@@ -67,7 +67,7 @@ return {
 
       return vim.tbl_deep_extend("force", opts, {
         options = {
-          use_as_default_explorer = vim.g.user_default_explorer == "mini.files",
+          use_as_default_explorer = vim.g.user_hijack_netrw == "mini.files",
         },
         mappings = {
           go_in = "",
