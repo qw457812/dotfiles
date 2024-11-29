@@ -4,17 +4,20 @@ local M = {}
 -- os.getenv("HOME")
 M.HOME = vim.uv.os_homedir()
 
-function M.is_dir(directory)
-  -- -- https://github.com/folke/snacks.nvim/pull/136#issuecomment-2492044614
-  -- vim.fn.isdirectory(directory) == 1
-  local stat = vim.uv.fs_stat(directory)
-  return stat and stat.type == "directory" or false
-end
+-- function M.is_dir(path)
+--   -- -- https://github.com/folke/snacks.nvim/pull/136#issuecomment-2492044614
+--   -- return (vim.uv.fs_stat(path) or {}).type == "directory"
+--   return vim.fn.isdirectory(path) == 1
+-- end
+
+-- function M.is_file(path)
+--   return (vim.uv.fs_stat(path) or {}).type == "file"
+-- end
 
 --- Chezmoi source path
 M.CHEZMOI = (function()
   local path = M.HOME .. "/.local/share/chezmoi"
-  return M.is_dir(path) and path or nil
+  return vim.fn.isdirectory(path) == 1 and path or nil
 end)()
 
 M.CONFIG = (function()
