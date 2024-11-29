@@ -38,7 +38,7 @@ function M.load_on_directory(hijack_netrw_plugin)
   local has_dir_arg = false
   ---@diagnostic disable-next-line: param-type-mismatch
   for _, arg in ipairs(vim.fn.argv()) do
-    if U.path.is_dir(arg) then
+    if vim.fn.isdirectory(arg) == 1 then
       has_dir_arg = true
       break
     end
@@ -58,8 +58,8 @@ function M.load_on_directory(hijack_netrw_plugin)
           return true
         end
 
-        -- is_directory(vim.fn.expand("<afile>"))
-        if U.path.is_dir(vim.api.nvim_buf_get_name(event.buf)) then
+        -- vim.fn.isdirectory(vim.fn.expand("<afile>")) == 1
+        if vim.fn.isdirectory(vim.api.nvim_buf_get_name(event.buf)) == 1 then
           load()
           -- once plugin is loaded, we can delete this autocmd
           return true
