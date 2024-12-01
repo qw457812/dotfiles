@@ -381,9 +381,6 @@ return {
         bo = {
           buflisted = false, -- leetcode.nvim
         },
-        wo = {
-          foldcolumn = "0", -- nvim-ufo
-        },
       })
     end,
   },

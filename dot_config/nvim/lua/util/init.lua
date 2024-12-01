@@ -3,6 +3,7 @@
 ---@field explorer util.explorer
 ---@field path util.path
 ---@field telescope util.telescope
+---@field terminal util.terminal
 ---@field toggle util.toggle
 local M = {}
 
