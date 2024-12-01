@@ -68,12 +68,11 @@ if vim.g.neovide then
   }
   local cache_animations = {} ---@type table<string, any>
   M.neovide_animations = SnacksToggle.new({
-    name = "Neovide/Mini Animate",
+    name = "Neovide Animate",
     get = function()
       return vim.g.neovide_cursor_animate_command_line
     end,
     set = function(state)
-      vim.g.minianimate_disable = not state -- toggle mini.animate
       -- https://github.com/folke/zen-mode.nvim/blob/29b292bdc58b76a6c8f294c961a8bf92c5a6ebd6/lua/zen-mode/plugins.lua#L130
       if state then
         for key, _ in pairs(disable_animations) do

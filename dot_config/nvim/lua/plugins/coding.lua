@@ -1,3 +1,8 @@
+local function has_words_before()
+  local line, col = (unpack or table.unpack)(vim.api.nvim_win_get_cursor(0))
+  return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+end
+
 return {
   -- TODO: research
   -- https://github.com/hrsh7th/nvim-cmp/wiki/Example-mappings
@@ -16,12 +21,6 @@ return {
     optional = true,
     ---@param opts cmp.ConfigSchema
     opts = function(_, opts)
-      local has_words_before = function()
-        unpack = unpack or table.unpack
-        local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-        return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
-      end
-
       local cmp = require("cmp")
 
       opts.mapping = vim.tbl_extend("force", opts.mapping, {
@@ -57,6 +56,7 @@ return {
   {
     "iguanacucumber/magazine.nvim",
     name = "nvim-cmp",
+    optional = true,
     dependencies = {
       { "iguanacucumber/mag-nvim-lsp", name = "cmp-nvim-lsp", opts = {} },
       { "iguanacucumber/mag-nvim-lua", name = "cmp-nvim-lua" },
@@ -64,6 +64,38 @@ return {
       { "iguanacucumber/mag-cmdline", name = "cmp-cmdline" },
       { "https://codeberg.org/FelipeLema/cmp-async-path", name = "cmp-path" },
     },
+  },
+
+  {
+    "saghen/blink.cmp",
+    optional = true,
+    opts = function(_, opts)
+      -- copied from: https://github.com/AstroNvim/astrocommunity/blob/bb7988ac0efe0c17936c350c6da19051765f0e71/lua/astrocommunity/completion/blink-cmp/init.lua#L29
+      opts.keymap = vim.tbl_extend("force", opts.keymap, {
+        ["<Tab>"] = {
+          function(cmp)
+            if cmp.windows.autocomplete.win:is_open() then
+              return cmp.select_next()
+            elseif cmp.is_in_snippet() then
+              return cmp.snippet_forward()
+            elseif has_words_before() then
+              return cmp.show()
+            end
+          end,
+          "fallback",
+        },
+        ["<S-Tab>"] = {
+          function(cmp)
+            if cmp.windows.autocomplete.win:is_open() then
+              return cmp.select_prev()
+            elseif cmp.is_in_snippet() then
+              return cmp.snippet_backward()
+            end
+          end,
+          "fallback",
+        },
+      })
+    end,
   },
 
   -- use helix-style mappings to prevent conflict with flash or leap: ms md mr

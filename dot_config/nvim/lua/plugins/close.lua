@@ -169,6 +169,21 @@ return {
   },
 
   {
+    "folke/snacks.nvim",
+    ---@module "snacks"
+    ---@type snacks.Config
+    opts = {
+      win = {
+        keys = {
+          -- trigger opts.autowrite of Snacks.scratch
+          [close_key] = "close",
+          ["<esc>"] = "close",
+        },
+      },
+    },
+  },
+
+  {
     "nvim-neo-tree/neo-tree.nvim",
     optional = true,
     opts = {
