@@ -281,7 +281,6 @@ return {
           --   style = borderless_telescope and "nvchad" or nil, -- not working when transparent
           -- },
           treesitter_context = false,
-          snacks = true,
         },
         -- ~/.local/share/nvim/lazy/catppuccin/lua/catppuccin/palettes/macchiato.lua
         -- https://github.com/catppuccin/nvim/discussions/323

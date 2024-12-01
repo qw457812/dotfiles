@@ -35,7 +35,6 @@ return {
   {
     "LazyVim/LazyVim",
     opts = function()
-      -- TODO: use ftplugin
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "java",
         callback = function()
@@ -60,20 +59,23 @@ return {
             configuration = {
               runtimes = not vim.tbl_isempty(runtimes) and runtimes or nil,
             },
-            -- saveActions = {
-            --   -- TODO: respect <leader>uf toggle
-            --   organizeImports = vim.g.autoformat,
-            -- },
+            saveActions = {
+              -- TODO: respect <leader>uf toggle
+              organizeImports = vim.g.autoformat,
+            },
           },
         },
         ---@param args vim.api.create_autocmd.callback.args
         on_attach = function(args)
-          vim.keymap.set(
-            "n",
-            "<localleader>r",
-            require("jdtls").set_runtime,
-            { buffer = args.buf, desc = "Pick Java Runtime" }
-          )
+          require("which-key").add({
+            {
+              mode = "n",
+              buffer = args.buf,
+              { "gs", require("jdtls").super_implementation, desc = "Goto Super" },
+              { "gS", require("jdtls.tests").goto_subjects, desc = "Goto Subjects" },
+              { "<localleader>r", require("jdtls").set_runtime, desc = "Pick Java Runtime" },
+            },
+          })
         end,
       })
     end,

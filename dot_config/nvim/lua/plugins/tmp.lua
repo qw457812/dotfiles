@@ -5,17 +5,20 @@ local obsidian_vaults = {
 
 -- https://github.com/folke/dot/blob/master/nvim/lua/plugins/tmp.lua
 return {
+  -- { "folke/lazy.nvim", version = false },
+  -- { "LazyVim/LazyVim", version = false },
+
   {
     "yarospace/lua-console.nvim",
     keys = {
-      { "<leader>.", desc = "Lua Console" },
+      { "<leader>[", desc = "Lua Console" },
     },
     opts = {
       window = {
         border = "rounded",
       },
       mappings = {
-        toggle = "<leader>.",
+        toggle = "<leader>[",
         clear = "<localleader>c",
         messages = "<localleader>m",
         save = "<C-s>",

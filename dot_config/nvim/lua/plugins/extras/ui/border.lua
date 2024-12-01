@@ -14,7 +14,7 @@ return {
     end,
   },
 
-  -- https://github.com/AstroNvim/astrocommunity/blob/6166e840d19b0f6665c8e02c76cba500fa4179b0/lua/astrocommunity/completion/blink-cmp/init.lua#L15
+  -- copied from: https://github.com/AstroNvim/astrocommunity/blob/6166e840d19b0f6665c8e02c76cba500fa4179b0/lua/astrocommunity/completion/blink-cmp/init.lua#L15
   {
     "Saghen/blink.cmp",
     optional = true,
@@ -24,15 +24,15 @@ return {
       windows = {
         autocomplete = {
           border = "rounded",
-          -- winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder,CursorLine:PmenuSel,Search:None",
+          winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder,CursorLine:PmenuSel,Search:None",
         },
         documentation = {
           border = "rounded",
-          -- winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder,CursorLine:PmenuSel,Search:None",
+          winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder,CursorLine:PmenuSel,Search:None",
         },
         signature_help = {
           border = "rounded",
-          -- winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder",
+          winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder",
         },
       },
     },
