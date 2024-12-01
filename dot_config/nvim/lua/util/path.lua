@@ -11,7 +11,8 @@ M.HOME = vim.uv.os_homedir()
 -- end
 
 -- function M.is_file(path)
---   return (vim.uv.fs_stat(path) or {}).type == "file"
+--   -- return (vim.uv.fs_stat(path) or {}).type == "file"
+--   return vim.fn.getftype(path) == "file"
 -- end
 
 --- Chezmoi source path

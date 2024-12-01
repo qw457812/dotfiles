@@ -177,7 +177,30 @@ return {
         keys = {
           -- trigger opts.autowrite of Snacks.scratch
           [close_key] = "close",
-          ["<esc>"] = "close",
+          ["<esc>"] = function(self)
+            if vim.v.hlsearch == 1 then
+              vim.cmd("nohlsearch")
+            else
+              self:close()
+            end
+            Snacks.notifier.hide()
+          end,
+        },
+      },
+      terminal = {
+        win = {
+          keys = {
+            -- do not exit terminal
+            [close_key] = "hide",
+            ["<esc>"] = function(self)
+              if vim.v.hlsearch == 1 then
+                vim.cmd("nohlsearch")
+              else
+                self:hide()
+              end
+              Snacks.notifier.hide()
+            end,
+          },
         },
       },
     },
