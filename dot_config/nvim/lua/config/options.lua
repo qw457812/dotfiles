@@ -35,15 +35,14 @@ vim.g.user_neotree_auto_close = vim.g.user_is_termux
 -- https://github.com/ahmedkhalf/project.nvim/blob/8c6bad7d22eef1b71144b401c9f74ed01526a4fb/lua/project_nvim/config.lua#L17
 vim.g.root_spec = { "lsp", { ".git", "lua", ".svn" }, "cwd" }
 -- failed to install basedpyright on termux via mason
-vim.g.lazyvim_python_lsp = not vim.g.user_is_termux and "basedpyright" or nil
+vim.g.lazyvim_python_lsp = not vim.g.user_is_termux and "basedpyright" or vim.g.lazyvim_python_lsp
+vim.g.deprecation_warnings = true
 
 -- https://neovide.dev/configuration.html
 if vim.g.neovide then
   vim.g.neovide_hide_mouse_when_typing = true
-  -- both, only_left, only_right, none
   vim.g.neovide_input_macos_option_key_is_meta = "both"
-  -- railgun, torpedo, pixiedust
-  vim.g.neovide_cursor_vfx_mode = "railgun"
+  vim.g.neovide_cursor_vfx_mode = "railgun" -- railgun, torpedo, pixiedust
   if vim.g.user_transparent_background then
     vim.g.neovide_transparency = 0.0
   end
