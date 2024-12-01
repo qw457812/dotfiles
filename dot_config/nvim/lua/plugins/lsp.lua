@@ -149,6 +149,20 @@ return {
       },
     },
   },
+  {
+    "folke/noice.nvim",
+    optional = true,
+    opts = function(_, opts)
+      opts.routes = opts.routes or {}
+      table.insert(opts.routes, {
+        filter = {
+          event = "notify",
+          find = "^No information available$", -- hover by `K`
+        },
+        view = "mini",
+      })
+    end,
+  },
 
   -- https://github.com/folke/dot/blob/13b8ed8d40755b58163ffff30e6a000d06fc0be0/nvim/lua/plugins/lsp.lua#L79
   {
