@@ -343,9 +343,9 @@ local blockwise_force = function(key)
     return keyseq[key][vim.fn.mode()]
   end
 end
-map("x", "I", blockwise_force("I"), { expr = true, noremap = true, desc = "Blockwise Insert" })
-map("x", "gI", blockwise_force("gI"), { expr = true, noremap = true, desc = "Blockwise Insert" })
-map("x", "A", blockwise_force("A"), { expr = true, noremap = true, desc = "Blockwise Append" })
+map("x", "I", blockwise_force("I"), { expr = true, desc = "Blockwise Insert" })
+map("x", "gI", blockwise_force("gI"), { expr = true, desc = "Blockwise Insert" })
+map("x", "A", blockwise_force("A"), { expr = true, desc = "Blockwise Append" })
 
 -- https://github.com/rstacruz/vimfiles/blob/ee9a3e7e7f022059b6d012eff2e88c95ae24ff97/lua/config/keymaps.lua#L35
 -- https://github.com/nvim-lualine/lualine.nvim/blob/b431d228b7bbcdaea818bdc3e25b8cdbe861f056/lua/lualine/components/filename.lua#L74
