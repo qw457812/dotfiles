@@ -590,9 +590,6 @@ function f() {
   rm -f -- "$tmp"
 }
 
-# https://github.com/clash-verge-rev/clash-verge-rev
-# export https_proxy=http://127.0.0.1:7897 http_proxy=http://127.0.0.1:7897 all_proxy=socks5://127.0.0.1:7897
-
 # https://docs.gitignore.io/install/command-line
 function gi() { curl -sLw "\n" https://www.toptal.com/developers/gitignore/api/$@ ;}
 # https://docs.gitignore.io/use/advanced-command-line
@@ -624,6 +621,27 @@ function newloc() {
   if networksetup -createlocation "$new" populate >/dev/null && networksetup -switchtolocation "$new" >/dev/null && [[ "$old" == "tmp_"* ]]; then
     networksetup -deletelocation "$old" >/dev/null
   fi
+}
+
+# https://github.com/clash-verge-rev/clash-verge-rev
+alias term_proxy_on='export https_proxy=http://127.0.0.1:7897 http_proxy=http://127.0.0.1:7897 all_proxy=socks5://127.0.0.1:7897'
+term_proxy_on
+alias term_proxy_off='unset https_proxy http_proxy all_proxy'
+function sys_proxy_on() {
+  local proxy_ip="127.0.0.1"
+  local http_proxy_port="7897"
+  local socks_proxy_port="7897"
+  networksetup -setwebproxy Wi-Fi "$proxy_ip" "$http_proxy_port"
+  networksetup -setsecurewebproxy Wi-Fi "$proxy_ip" "$http_proxy_port"
+  networksetup -setsocksfirewallproxy Wi-Fi "$proxy_ip" "$socks_proxy_port"
+  networksetup -setwebproxystate Wi-Fi on
+  networksetup -setsecurewebproxystate Wi-Fi on
+  networksetup -setsocksfirewallproxystate Wi-Fi on
+}
+function sys_proxy_off() {
+  networksetup -setwebproxystate Wi-Fi off
+  networksetup -setsecurewebproxystate Wi-Fi off
+  networksetup -setsocksfirewallproxystate Wi-Fi off
 }
 
 alias sva='svn add'

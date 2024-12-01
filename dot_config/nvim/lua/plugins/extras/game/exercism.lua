@@ -28,6 +28,14 @@ return {
       default_language = "python",
     },
   },
+  {
+    "folke/which-key.nvim",
+    opts = {
+      spec = {
+        { "<leader>E", group = "exercism", icon = { icon = "󰘦 ", color = "purple" } },
+      },
+    },
+  },
 
   {
     "nvim-neo-tree/neo-tree.nvim",
