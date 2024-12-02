@@ -1,6 +1,7 @@
 ---@class util
 ---@field color util.color
 ---@field explorer util.explorer
+---@field keymap util.keymap
 ---@field path util.path
 ---@field telescope util.telescope
 ---@field terminal util.terminal
@@ -23,31 +24,6 @@ function M.has_user_extra(extra)
   local modname = "plugins.extras." .. extra
   return vim.tbl_contains(require("lazy.core.config").spec.modules, modname)
     or vim.tbl_contains(Config.json.data.extras, modname)
-end
-
---- Wrapper around vim.keymap.set that will set `silent` to true by default.
---- https://github.com/folke/dot/blob/5df77fa64728a333f4d58e35d3ca5d8590c4f928/nvim/lua/config/options.lua#L22
----@param mode string|string[]
----@param lhs string|string[]
----@param rhs string|function
----@param opts? vim.keymap.set.Opts
-function M.keymap(mode, lhs, rhs, opts)
-  opts = opts or {}
-  opts.silent = opts.silent ~= false
-  -- -- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/utils.lua#L17
-  -- opts.unique = opts.unique ~= false
-
-  ---@cast lhs string[]
-  lhs = type(lhs) == "string" and { lhs } or lhs
-
-  for _, l in ipairs(lhs) do
-    vim.keymap.set(mode, l, rhs, opts)
-  end
-end
-
--- https://github.com/neovide/neovide/issues/1263#issuecomment-1972013043
-function M.paste()
-  vim.api.nvim_paste(vim.fn.getreg("+"), true, -1)
 end
 
 ---@param win? integer default 0
