@@ -177,29 +177,38 @@ return {
         keys = {
           -- trigger opts.autowrite of Snacks.scratch
           [close_key] = "close",
-          ["<esc>"] = function(self)
-            if vim.v.hlsearch == 1 then
-              vim.cmd("nohlsearch")
-            else
-              self:close()
-            end
-            Snacks.notifier.hide()
-          end,
-        },
-      },
-      terminal = {
-        win = {
-          keys = {
-            -- do not exit terminal
-            [close_key] = "hide",
-            ["<esc>"] = function(self)
+          noh_or_close = {
+            "<esc>",
+            function(self)
               if vim.v.hlsearch == 1 then
                 vim.cmd("nohlsearch")
               else
-                self:hide()
+                self:close()
               end
               Snacks.notifier.hide()
             end,
+            desc = "Noh or Close",
+          },
+        },
+      },
+      -- override the opts.win.keys to avoid exiting terminal
+      terminal = {
+        win = {
+          keys = {
+            [close_key] = "hide",
+            -- use the same `noh_or_close` name to ensure overwriting
+            noh_or_close = {
+              "<esc>",
+              function(self)
+                if vim.v.hlsearch == 1 then
+                  vim.cmd("nohlsearch")
+                else
+                  self:hide()
+                end
+                Snacks.notifier.hide()
+              end,
+              desc = "Noh or Hide",
+            },
           },
         },
       },
