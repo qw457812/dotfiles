@@ -339,10 +339,14 @@ return {
           key.key = "o" -- o for projects, p for paste
         elseif key.key == "c" and vim.g.user_is_termux then
           key.action = ":lua LazyVim.pick.config_files()()"
+          -- elseif key.key == "q" then
+          --   key.hidden = true
         end
       end
-      table.insert(keys, 3, { icon = " ", key = "i", action = ":ene | startinsert", desc = "New File (Insert)" })
-      table.insert(keys, 4, { icon = " ", key = "p", action = ":ene | normal p", desc = "New File (Paste)" })
+      -- stylua: ignore start
+      table.insert(keys, 3, { icon = " ", key = "i", action = ":ene | startinsert", desc = "New File (Insert)", hidden = true })
+      table.insert(keys, 4, { icon = " ", key = "p", action = ":ene | normal p", desc = "New File (Paste)", hidden = true })
+      -- stylua: ignore end
 
       opts.dashboard.preset.header = [[
   ⣴⣶⣤⡤⠦⣤⣀⣤⠆     ⣈⣭⣿⣶⣿⣦⣼⣆         
@@ -370,7 +374,7 @@ return {
       local show_header = not vim.g.user_is_termux
       opts.dashboard.sections = {
         { enabled = show_header }, -- top padding for header
-        { section = "header", enabled = show_header, padding = 1 },
+        { section = "header", enabled = show_header },
         -- { icon = " ", title = "Keymaps", section = "keys", indent = 2, padding = 1 },
         { section = "keys", padding = 1 },
         { icon = " ", title = "Recent Files", section = "recent_files", indent = 2, padding = 1 },
