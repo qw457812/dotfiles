@@ -2,12 +2,24 @@
 -- https://github.com/consoleaf/nvim-config/blob/ebcd80b5accbf7e2a5ae568c9c157a7a880411a8/lua/plugins/round.lua
 return {
   {
+    "folke/snacks.nvim",
+    optional = true,
+    ---@module "snacks"
+    ---@type snacks.Config
+    opts = {
+      -- https://github.com/Nitestack/dotfiles/blob/506b895c45b8ed012a2cb0c35fe62058d8b6dbc4/config/private_dot_config/exact_nvim/lua/exact_plugins/snacks.lua#L9
+      win = { border = "rounded" },
+    },
+  },
+
+  {
     "hrsh7th/nvim-cmp",
     optional = true,
     ---@param opts cmp.ConfigSchema
     opts = function(_, opts)
       local cmp = require("cmp")
       opts.window = {
+        -- TODO: transparent bg like blink
         completion = cmp.config.window.bordered(),
         documentation = cmp.config.window.bordered(),
       }
@@ -58,16 +70,6 @@ return {
       --     opts = { win_options = { winhighlight = "NormalFloat:Float" } },
       --   },
       -- },
-    },
-  },
-
-  {
-    "folke/snacks.nvim",
-    ---@module "snacks"
-    ---@type snacks.Config
-    opts = {
-      -- https://github.com/Nitestack/dotfiles/blob/506b895c45b8ed012a2cb0c35fe62058d8b6dbc4/config/private_dot_config/exact_nvim/lua/exact_plugins/snacks.lua#L9
-      win = { border = "rounded" },
     },
   },
 

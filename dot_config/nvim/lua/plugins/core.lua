@@ -1,28 +1,11 @@
 return {
+  { "folke/lazy.nvim", version = false },
+  { "LazyVim/LazyVim", version = false },
   {
     "folke/snacks.nvim",
-    optional = true,
     keys = {
       -- stylua: ignore
       { "<leader>.", function() Snacks.scratch({ ft = vim.bo.filetype }) end, desc = "Toggle Scratch Buffer" },
-      {
-        "<leader>iN",
-        desc = "Neovim News",
-        function()
-          Snacks.win({
-            file = vim.api.nvim_get_runtime_file("doc/news.txt", false)[1],
-            width = 0.6,
-            height = 0.6,
-            wo = {
-              spell = false,
-              wrap = false,
-              signcolumn = "yes",
-              statuscolumn = " ",
-              conceallevel = 3,
-            },
-          })
-        end,
-      },
     },
     ---@module "snacks"
     ---@type snacks.Config
@@ -32,8 +15,7 @@ return {
       },
       terminal = {
         win = {
-          -- style = "float",
-          position = "float",
+          position = "float", -- alternative: style = "float"
         },
       },
     },

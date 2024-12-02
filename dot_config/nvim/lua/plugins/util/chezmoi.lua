@@ -263,9 +263,8 @@ return {
           filter = {
             event = "msg_show",
             find = string.format(
-              [[%s.+ chezmoi: %s.+: not in source state$]],
-              vim.pesc(LazyVim.get_plugin_path("chezmoi.nvim")),
-              vim.pesc(U.path.CHEZMOI)
+              [[%s.+ chezmoi: .*: not in source state$]],
+              vim.pesc(LazyVim.get_plugin_path("chezmoi.nvim"))
             ),
           },
           view = "mini",
