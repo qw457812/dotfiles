@@ -11,9 +11,11 @@ return {
         -- toggling this plugin should also toggle conceallevel
         conceallevel = { default = 0 },
       },
-      -- code = {
-      --   disable_background = vim.g.user_transparent_background,
-      -- },
+      code = {
+        -- https://github.com/MeanderingProgrammer/render-markdown.nvim/issues/246#issuecomment-2510220411
+        disable_background = vim.g.user_transparent_background,
+        border = vim.g.user_transparent_background and "none" or nil,
+      },
     },
   },
 

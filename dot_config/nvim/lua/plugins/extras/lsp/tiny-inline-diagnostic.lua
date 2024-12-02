@@ -14,11 +14,15 @@ return {
     opts = {
       signs = {
         left = " ",
-        right = " ",
+        right = "",
         arrow = "  ",
         up_arrow = "  ",
       },
-      -- options = { virt_texts = { priority = 5000 } },
+      -- options = {
+      --   multilines = true,
+      --   -- show_source = true,
+      --   -- virt_texts = { priority = 5000 },
+      -- },
     },
     config = function(_, opts)
       require("tiny-inline-diagnostic").setup(opts)

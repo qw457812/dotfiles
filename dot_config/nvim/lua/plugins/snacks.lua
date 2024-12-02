@@ -3,6 +3,8 @@ return {
     "folke/snacks.nvim",
     optional = true,
     keys = {
+      -- stylua: ignore
+      { "<leader>.", function() Snacks.scratch({ ft = vim.bo.filetype }) end, desc = "Toggle Scratch Buffer" },
       {
         "<leader>iN",
         desc = "Neovim News",

@@ -123,7 +123,7 @@ return {
           -- require lazyvim.plugins.extras.editor.illuminate
           -- #5b6078 #585b70 #51576d #494d64 #45475a
           -- util.blend_bg("#585b70", 0.85)
-          local illuminate = util.blend_fg(hl.IlluminatedWordRead.bg, 0.875)
+          local illuminate = util.blend_fg(hl.IlluminatedWordRead and hl.IlluminatedWordRead.bg or "#3b4261", 0.875)
           -- hl.IlluminatedWordText = { bg = "#3b4261" } -- use default
           hl.IlluminatedWordRead = { bg = illuminate }
           hl.IlluminatedWordWrite = { bg = illuminate, underline = true }
