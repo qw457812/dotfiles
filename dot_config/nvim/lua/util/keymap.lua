@@ -71,15 +71,11 @@ end
 
 -- https://github.com/folke/flash.nvim/blob/34c7be146a91fec3555c33fe89c7d643f6ef5cf1/lua/flash/jump.lua#L204
 -- https://github.com/folke/snacks.nvim/blob/6b98aa11d31227081f780d6321ea7dfd97f1da59/lua/snacks/words.lua#L115
-function M.foldopen_l(is_visual)
+function M.foldopen_l()
   local count1 = vim.v.count1
   local first_folded_line = vim.fn.foldclosed(vim.fn.line("."))
   if first_folded_line ~= -1 then
     vim.api.nvim_win_set_cursor(0, { first_folded_line, 0 })
-    -- vim.cmd("normal! zo") -- this stop visual mode
-    -- if is_visual then
-    --   vim.cmd("normal! gv")
-    -- end
     vim.cmd.normal({ "zv", bang = true })
   end
   vim.cmd("normal! " .. count1 .. "l")
