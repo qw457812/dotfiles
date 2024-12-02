@@ -31,6 +31,13 @@ return {
         end,
       })
 
+      local yank_path = function()
+        local path = (MiniFiles.get_fs_entry() or {}).path
+        if path == nil then
+          return vim.notify("Cursor is not on valid entry")
+        end
+        vim.fn.setreg(vim.v.register, U.path.home_to_tilde(path))
+      end
       vim.api.nvim_create_autocmd("User", {
         pattern = "MiniFilesBufferCreate",
         callback = function(args)
@@ -41,6 +48,7 @@ return {
           vim.keymap.set("n", "<leader>fs", function() require("mini.files").synchronize() end, { buffer = buf_id, desc = "Synchronize (mini.files)" })
           vim.keymap.set("n", "<C-s>", function() require("mini.files").synchronize() end, { buffer = buf_id, desc = "Synchronize (mini.files)" })
           -- stylua: ignore end
+          vim.keymap.set("n", "<leader>fy", yank_path, { buffer = buf_id, desc = "Yank path" })
           vim.keymap.set("n", "<leader>sr", function()
             local files = require("mini.files")
             -- works only if cursor is on the valid file system entry

@@ -345,7 +345,8 @@ return {
       end
       -- stylua: ignore start
       table.insert(keys, 3, { icon = " ", key = "i", action = ":ene | startinsert", desc = "New File (Insert)", hidden = true })
-      table.insert(keys, 4, { icon = " ", key = "p", action = ":ene | normal p", desc = "New File (Paste)", hidden = true })
+      table.insert(keys, 4, { icon = " ", key = "a", action = ":ene | startinsert", desc = "New File (Append)", hidden = true })
+      table.insert(keys, 5, { icon = " ", key = "p", action = ":ene | normal p", desc = "New File (Paste)", hidden = true })
       -- stylua: ignore end
 
       opts.dashboard.preset.header = [[
@@ -369,12 +370,11 @@ return {
    █████████ ██████████ █████████ █████ █████ ████ █████  
  ███████████ ███    ███ █████████ █████ █████ ████ █████ 
 ██████  █████████████████████ ████ █████ █████ ████ ██████]]
-      opts.dashboard.preset.header = nil
+      opts.dashboard.preset.header = vim.g.user_is_termux and "NEOVIM" or nil
 
-      local show_header = not vim.g.user_is_termux
       opts.dashboard.sections = {
-        { enabled = show_header }, -- top padding for header
-        { section = "header", enabled = show_header },
+        {}, -- top padding for header
+        { section = "header" },
         -- { icon = " ", title = "Keymaps", section = "keys", indent = 2, padding = 1 },
         { section = "keys", padding = 1 },
         { icon = " ", title = "Recent Files", section = "recent_files", indent = 2, padding = 1 },

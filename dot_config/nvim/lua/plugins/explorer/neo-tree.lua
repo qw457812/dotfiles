@@ -468,7 +468,7 @@ return {
               local result = vals[choice]
               if result then
                 LazyVim.info(("Copied: `%s`"):format(result), { title = "Neo-tree" })
-                vim.fn.setreg("+", result)
+                vim.fn.setreg(vim.v.register, result)
               end
             end)
           end,
@@ -504,7 +504,15 @@ return {
             },
             ["h"] = "parent_or_close",
             ["l"] = "child_or_open",
-            ["Y"] = "copy_selector",
+            ["<leader>fy"] = {
+              function(state)
+                local node = state.tree:get_node()
+                local path = node:get_id()
+                vim.fn.setreg(vim.v.register, U.path.home_to_tilde(path), "c")
+              end,
+              desc = "Copy Path to Clipboard",
+            },
+            ["<leader>fY"] = "copy_selector",
             ["F"] = "find_in_dir",
             ["<tab>"] = {
               function(state)
