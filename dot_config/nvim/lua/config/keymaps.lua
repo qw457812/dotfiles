@@ -265,22 +265,10 @@ map("n", "<leader>iC", function() LazyVim.info(vim.g.colors_name, { title = "Col
 -- alternative: `:h news` or `LazyVim.news.neovim()`
 map("n", "<leader>iN", news, { desc = "Neovim News" })
 
--- del("i", { ",", ".", ";" })
-
--- quit
--- see: ../plugins/close.lua
--- map("n", "<bs>", "<cmd>q<cr>", { desc = "Quit" })
--- map("n", "<bs>", "<cmd>qa<cr>", { desc = "Quit All" })
--- map("n", "<bs>", function() Snacks.bufdelete() end, { desc = "Delete Buffer" })
--- map("n", "<bs>", "<cmd>bd<cr>", { desc = "Delete Buffer and Window" })
--- map("n", "<bs>", "<cmd>wincmd q<cr>", { desc = "Close window" })
-
 -- local function google_search(input)
 --   local query = input or vim.fn.expand("<cword>")
 --   LazyUtil.open("https://www.google.com/search?q=" .. query)
 -- end
--- -- conflict with "Buffer Local Keymaps (which-key)" defined in ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/editor.lua
--- -- map("n", "<leader>?", google_search, { desc = "Google Search Current Word" })
 -- -- stylua: ignore
 -- map("x", "<leader>?", function() google_search(U.get_visual_selection()) end, { desc = "Google Search" })
 
