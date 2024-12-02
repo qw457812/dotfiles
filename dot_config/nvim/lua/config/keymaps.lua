@@ -136,19 +136,19 @@ map("n", "<D-r>", vim.cmd.edit, { desc = "Reload File" })
 map("n", "<leader>fy", function()
   -- local path = vim.fn.expand("%:p:~")
   local path = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":p:~") or ""
-  vim.fn.setreg("+", path)
+  vim.fn.setreg(vim.v.register, path)
   LazyVim.info(path, { title = "Copied Path" })
 end, { desc = "Yank file absolute path" })
 map("n", "<leader>fY", function()
   -- local path = vim.fn.expand("%:~:.")
   -- local path = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":~:.") or ""
   local path = require("plenary.path"):new(vim.api.nvim_buf_get_name(0)):make_relative(LazyVim.root())
-  vim.fn.setreg("+", path)
+  vim.fn.setreg(vim.v.register, path)
   LazyVim.info(path, { title = "Copied Relative Path" })
 end, { desc = "Yank file relative path" })
 -- map("n", "<leader>fY", function()
 --   local name = vim.fn.expand("%:t")
---   vim.fn.setreg("+", name)
+--   vim.fn.setreg(vim.v.register, name)
 --   LazyVim.info(("Copied file name: `%s`"):format(name))
 -- end, { desc = "Yank file name" })
 
@@ -274,7 +274,7 @@ map("n", "<leader>iN", news, { desc = "Neovim News" })
 
 -- https://github.com/neovide/neovide/issues/1263#issuecomment-1972013043
 local function paste()
-  vim.api.nvim_paste(vim.fn.getreg("+"), true, -1)
+  vim.api.nvim_paste(vim.fn.getreg(vim.v.register), true, -1)
 end
 
 if vim.g.user_is_termux then
