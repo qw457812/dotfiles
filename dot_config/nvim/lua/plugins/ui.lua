@@ -416,7 +416,6 @@ return {
     opts = function()
       vim.api.nvim_create_autocmd("FileType", {
         pattern = {
-          "snacks_dashboard",
           "rip-substitute",
           "dbui",
           "dbout",

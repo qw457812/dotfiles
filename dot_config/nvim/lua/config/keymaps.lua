@@ -18,7 +18,6 @@ map("n", "<leader>ll", "<cmd>Lazy<cr>", { desc = "Lazy" })
 map("n", "<leader>lx", "<cmd>LazyExtras<cr>", { desc = "Extras" })
 -- stylua: ignore start
 map("n", "<leader>lL", function() LazyVim.news.changelog() end, { desc = "LazyVim Changelog" })
--- use `:h news` instead of `LazyVim.news.neovim()`
 map("n", "<leader>lN", function() LazyVim.news.lazyvim() end, { desc = "LazyVim News" })
 -- alternative: vim.ui.open("https://lazyvim.org")
 map("n", "<leader>ld", function() LazyUtil.open("https://lazyvim.org") end, { desc = "LazyVim Docs" })
@@ -69,6 +68,21 @@ map("n", "<leader>iL", lint_info, { desc = "Lint" })
 map("n", "<leader>iC", function()
   LazyVim.info(vim.g.colors_name, { title = "ColorScheme" })
 end, { desc = "ColorScheme" })
+-- alternative: `:h news` or `LazyVim.news.neovim()`
+map("n", "<leader>iN", function()
+  Snacks.win({
+    file = vim.api.nvim_get_runtime_file("doc/news.txt", false)[1],
+    width = 0.6,
+    height = 0.6,
+    wo = {
+      spell = false,
+      wrap = false,
+      signcolumn = "yes",
+      statuscolumn = " ",
+      conceallevel = 3,
+    },
+  })
+end, { desc = "Neovim News" })
 
 -- navigate to line start and end from home row
 -- -- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/keybindings.lua#L19

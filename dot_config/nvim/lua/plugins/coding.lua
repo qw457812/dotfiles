@@ -24,6 +24,7 @@ return {
       local cmp = require("cmp")
 
       opts.mapping = vim.tbl_extend("force", opts.mapping, {
+        -- TODO: LazyVim.cmp.map
         ["<Tab>"] = cmp.mapping(function(fallback)
           if cmp.visible() then
             -- You could replace select_next_item() with confirm({ select = true }) to get VS Code autocompletion behavior
@@ -72,6 +73,7 @@ return {
     opts = function(_, opts)
       -- copied from: https://github.com/AstroNvim/astrocommunity/blob/bb7988ac0efe0c17936c350c6da19051765f0e71/lua/astrocommunity/completion/blink-cmp/init.lua#L29
       opts.keymap = vim.tbl_extend("force", opts.keymap, {
+        -- TODO: LazyVim.cmp.map
         ["<Tab>"] = {
           function(cmp)
             if cmp.windows.autocomplete.win:is_open() then
