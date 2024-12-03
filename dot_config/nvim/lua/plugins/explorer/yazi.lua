@@ -29,16 +29,17 @@ return {
         end,
       })
 
-      vim.api.nvim_create_autocmd("User", {
-        pattern = "YaziRenamedOrMoved",
-        ---@module 'yazi'
-        ---@param event {data: YaziNeovimEvent.YaziRenamedOrMovedData}
-        callback = function(event)
-          for from, to in pairs(event.data.changes) do
-            Snacks.rename.on_rename_file(from, to)
-          end
-        end,
-      })
+      -- -- already done, see: https://github.com/mikavilpas/yazi.nvim/blob/d09f94e79fc0a28f7242ff94af17ca96d8a41878/lua/yazi/event_handling/yazi_event_handling.lua#L76
+      -- vim.api.nvim_create_autocmd("User", {
+      --   pattern = "YaziRenamedOrMoved",
+      --   ---@module 'yazi'
+      --   ---@param event {data: YaziNeovimEvent.YaziRenamedOrMovedData}
+      --   callback = function(event)
+      --     for from, to in pairs(event.data.changes) do
+      --       Snacks.rename.on_rename_file(from, to)
+      --     end
+      --   end,
+      -- })
 
       return {
         open_for_directories = vim.g.user_hijack_netrw == "yazi.nvim",
