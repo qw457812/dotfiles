@@ -109,9 +109,13 @@ return {
           pick_definitions_or_references,
           desc = "Goto Definition/References",
           has = "definition",
-          -- for yarospace/lua-console.nvim
           cond = function()
-            -- Check to see if `<cr>` is already mapped to the buffer (avoids overwriting)
+            if vim.bo.filetype == "markdown" then
+              -- for gaoDean/autolist.nvim
+              return false
+            end
+            -- check to see if `<cr>` is already mapped to the buffer (avoids overwriting)
+            -- for yarospace/lua-console.nvim
             for _, map in ipairs(vim.api.nvim_buf_get_keymap(0, "n")) do
               ---@diagnostic disable-next-line: undefined-field
               if map.lhs and map.lhs:lower() == "<cr>" then
