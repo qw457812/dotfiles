@@ -18,7 +18,7 @@ return {
       { "MunifTanjim/nui.nvim" },
       {
         "3rd/image.nvim",
-        cond = vim.g.user_is_wezterm, -- not vim.g.neovide
+        cond = vim.g.user_is_wezterm and vim.fn.executable("magick") == 1, -- not vim.g.neovide
         lazy = true,
         build = false,
         opts = {
@@ -36,15 +36,14 @@ return {
     },
     -- or localleader
     keys = {
-      { "<leader>Lm", "<cmd>Leet<cr>", desc = "Menu" }, -- same as `:Leet menu`, also works for non_standalone
-      { "<leader>Lq", "<cmd>Leet tabs<cr>", desc = "Tabs" },
+      { "<leader>LL", "<cmd>Leet<cr>", desc = "Menu" }, -- same as `:Leet menu`, also works for non_standalone
+      { "<leader>Lq", "<cmd>Leet exit<cr>", desc = "exit" }, -- for non_standalone
+      { "<leader>Ll", "<cmd>Leet lang<cr>", desc = "Lang" },
       { "<leader>Lc", "<cmd>Leet console<cr>", desc = "Console" },
       { "<leader>Lh", "<cmd>Leet info<cr>", desc = "Info" },
-      { "<leader>Ll", "<cmd>Leet lang<cr>", desc = "Lang" },
-      { "<leader>LL", "<cmd>Leet list<cr>", desc = "Problem List" },
       { "<leader>Ld", "<cmd>Leet desc<cr>", desc = "Desc" },
-      { "<leader>Lr", "<cmd>Leet run<cr>", desc = "Run" },
-      { "<leader>LR", "<cmd>Leet restore<cr>", desc = "Restore Layout" }, -- or map to `:Leet reset`
+      { "<leader>Lr", "<cmd>Leet restore<cr>", desc = "Restore Layout" },
+      { "<leader>LR", "<cmd>Leet reset<cr>", desc = "Reset Code" },
       { "<leader>Ls", "<cmd>Leet submit<cr>", desc = "Submit" },
       { "<leader>LS", "<cmd>Leet last_submit<cr>", desc = "Last Submit" },
       { "<leader>Ly", "<cmd>Leet yank<cr>", desc = "Yank" },
@@ -54,6 +53,7 @@ return {
       { "<leader>LM", "<cmd>Leet list difficulty=Medium<cr>", desc = "Medium Problem List" },
       { "<leader>LH", "<cmd>Leet list difficulty=Hard<cr>", desc = "Hard Problem List" },
       { "<leader>Lt", "<cmd>Leet test<cr>", desc = "Test" }, -- same as `:Leet run`
+      { "<leader>LT", "<cmd>Leet tabs<cr>", desc = "Tabs" },
       { "<leader>Lu", "<cmd>Leet cache update<cr>", desc = "Update Cache" },
     },
     opts = function(_, opts)
