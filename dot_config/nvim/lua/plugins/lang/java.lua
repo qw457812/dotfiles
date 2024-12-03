@@ -60,6 +60,13 @@ return {
               runtimes = not vim.tbl_isempty(runtimes) and runtimes or nil,
             },
             saveActions = {
+              -- To disable format and organize imports on save for specific projects,
+              -- create a `.lazy.lua` file in your project with following content:
+              -- ```lua
+              --    vim.g.autoformat = false
+              --
+              --    return {}
+              -- ```
               -- TODO: respect <leader>uf toggle
               organizeImports = vim.g.autoformat,
             },

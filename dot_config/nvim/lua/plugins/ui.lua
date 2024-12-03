@@ -370,7 +370,8 @@ return {
    █████████ ██████████ █████████ █████ █████ ████ █████  
  ███████████ ███    ███ █████████ █████ █████ ████ █████ 
 ██████  █████████████████████ ████ █████ █████ ████ ██████]]
-      opts.dashboard.preset.header = vim.g.user_is_termux and "NEOVIM" or nil
+      local v = vim.version()
+      opts.dashboard.preset.header = vim.g.user_is_termux and ("NVIM v%s.%s.%s"):format(v.major, v.minor, v.patch) or nil
 
       opts.dashboard.sections = {
         {}, -- top padding for header
