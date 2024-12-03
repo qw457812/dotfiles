@@ -11,6 +11,9 @@ return {
       { "nvim-telescope/telescope-fzf-native.nvim", optional = true },
     },
     init = function()
+      -- respect vim.g.trouble_lualine: whether to enable trouble document symbols in winbar.lualine_c
+      vim.g.user_trouble_lualine_old = vim.g.trouble_lualine
+      -- disable trouble document symbols in sections.lualine_c
       vim.g.trouble_lualine = false
     end,
     keys = {
@@ -97,6 +100,10 @@ return {
 
       local source_markdown = {
         get_symbols = function(buff, win, cursor)
+          if vim.b[buff].trouble_lualine == false then
+            return {}
+          end
+
           local symbols = sources.markdown.get_symbols(buff, win, cursor)
           for _, symbol in ipairs(symbols) do
             symbol.name_hl = "DropBarSymbolName"
@@ -121,7 +128,7 @@ return {
           -- update_debounce = 20, -- performance for holding down `j`: 17 ~ 20, commented out in favor of oil
           sources = function(buf, _)
             if vim.bo[buf].ft == "markdown" then
-              return { source_path, source_markdown }
+              return vim.g.user_trouble_lualine_old and { source_path, source_markdown } or { source_path }
             end
             if vim.bo[buf].buftype == "terminal" then
               return {}
@@ -266,7 +273,7 @@ return {
       -- for saecki/live-rename.nvim
       opts.inactive_winbar = vim.deepcopy(opts.winbar)
 
-      if not vim.g.user_is_termux and LazyVim.has("trouble.nvim") then
+      if not vim.g.user_is_termux and vim.g.user_trouble_lualine_old and LazyVim.has("trouble.nvim") then
         local trouble = require("trouble")
         local symbols = trouble.statusline({
           mode = "symbols", -- "lsp_document_symbols"
@@ -284,7 +291,7 @@ return {
             return symbols and symbols.get():gsub("%%%*%s%%#", "%%%*%%#") or "" -- remove sep spaces, eval `vim.pesc("%* %#")`
           end,
           cond = function()
-            return cond_winbar() and vim.bo.ft ~= "markdown" and symbols.has()
+            return cond_winbar() and vim.bo.ft ~= "markdown" and vim.b.trouble_lualine ~= false and symbols.has()
           end,
           padding = { left = 0, right = 1 },
         })

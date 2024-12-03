@@ -2,11 +2,14 @@
 -- Adds a pathwatcher to automatically reload hammerspoon configuration on changes | http://www.hammerspoon.org/Spoons/ReloadConfiguration.html
 hs.loadSpoon("ReloadConfiguration")
 spoon.ReloadConfiguration:start()
-hs.alert.show("Hammerspoon Config loaded")
 
 -- Just another clock, floating above all | https://www.hammerspoon.org/Spoons/AClock.html
 hs.loadSpoon("AClock")
 spoon.AClock:init()
+-- https://github.com/akermen/.hammerspoon/blob/f333eec7b0b71d3d35389112a09ee25d2d72aecc/init.lua#L387
+spoon.AClock.format = "%H:%M:%S"
+spoon.AClock.width = 512
+spoon.AClock.showDuration = 1
 hs.urlevent.bind("toggleAClock", function(eventName, params)
   spoon.AClock:toggleShow()
 end)
@@ -25,26 +28,26 @@ hs.urlevent.bind("mouseCenterClick", function(eventName, params)
   mouseCenterClick()
 end)
 
-function maximizeWindow()
-  -- local win = hs.window.focusedWindow()
-  -- local f = win:frame()
-  -- local screen = win:screen()
-  -- local max = screen:frame()
-  -- f.x = max.x
-  -- f.y = max.y
-  -- f.w = max.w
-  -- f.h = max.h
-  -- win:setFrame(f, 0)
-
-  -- Maximize Window use Rectangle.app, note that not work with yabai
-  -- https://www.hammerspoon.org/docs/hs.eventtap.html#keyStroke
-  -- https://www.hammerspoon.org/docs/hs.keycodes.html#map
-  hs.eventtap.keyStroke({ "ctrl", "alt", "shift" }, "space")
-end
-hs.urlevent.bind("mouseCenterClickThenMaximizeWindow", function(eventName, params)
-  mouseCenterClick()
-  maximizeWindow()
-end)
+-- function maximizeWindow()
+--   -- local win = hs.window.focusedWindow()
+--   -- local f = win:frame()
+--   -- local screen = win:screen()
+--   -- local max = screen:frame()
+--   -- f.x = max.x
+--   -- f.y = max.y
+--   -- f.w = max.w
+--   -- f.h = max.h
+--   -- win:setFrame(f, 0)
+--
+--   -- Maximize Window use Rectangle.app, note that not work with yabai
+--   -- https://www.hammerspoon.org/docs/hs.eventtap.html#keyStroke
+--   -- https://www.hammerspoon.org/docs/hs.keycodes.html#map
+--   hs.eventtap.keyStroke({ "ctrl", "alt", "shift" }, "space")
+-- end
+-- hs.urlevent.bind("mouseCenterClickThenMaximizeWindow", function(eventName, params)
+--   mouseCenterClick()
+--   maximizeWindow()
+-- end)
 
 function cmdTab(repeatTimes)
   -- problem: act like cmd+tab, but not release cmd
@@ -211,3 +214,5 @@ vim:bindHotKeys({ enter = { {"ctrl", "alt", "cmd", "shift"}, 'f19' } })
 -- END VIM CONFIG
 --------------------------------
 --]]
+
+hs.alert.show("Hammerspoon Config loaded")

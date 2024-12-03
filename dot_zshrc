@@ -647,6 +647,11 @@ function sys_proxy_off() {
   networksetup -setsocksfirewallproxystate Wi-Fi off
 }
 
+# alias myip="dig +short myip.opendns.com @resolver1.opendns.com"
+# alias myip="curl http://icanhazip.com"
+# alias myip="curl ipecho.net/plain; echo"
+alias myip="curl https://ipinfo.io/json"
+
 alias sva='svn add'
 alias svc='svn commit'
 alias svs='svn status'

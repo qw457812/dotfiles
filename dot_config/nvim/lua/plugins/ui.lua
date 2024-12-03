@@ -156,6 +156,30 @@ return {
         end,
       }
 
+      local hlsearch = {
+        function()
+          return "󱩾 " -- 󱎸 󰺯 󰺮
+        end,
+        cond = function()
+          return vim.v.hlsearch == 1
+        end,
+        color = function()
+          return { fg = Snacks.util.color("CurSearch", "bg") }
+        end,
+      }
+
+      local wrap = {
+        function()
+          return "󰖶 " -- 
+        end,
+        cond = function()
+          return vim.wo.wrap
+        end,
+        color = function()
+          return LazyVim.ui.fg("MiniIconsYellow")
+        end,
+      }
+
       local mode = { "mode" }
       if is_termux then
         mode.fmt = function(str)
@@ -189,14 +213,14 @@ return {
           }
         or {
           pretty_path({
-            -- relative = "root",
+            relative = "root",
             directory_hl = "Conceal",
           }),
         }
       if is_termux then
         remove_component(lualine_c, "filetype")
       end
-      if is_termux or has_dropbar then
+      if is_termux or has_dropbar or vim.g.trouble_lualine == false then
         local diagnostics = remove_component(lualine_c, "diagnostics")
         if not is_termux then
           table.insert(lualine_c, diagnostics)
@@ -207,6 +231,8 @@ return {
         remove_component(opts.sections.lualine_x, "diff")
       else
         vim.list_extend(opts.sections.lualine_x, { formatter, linter, lsp })
+        table.insert(opts.sections.lualine_x, 2, wrap)
+        table.insert(opts.sections.lualine_x, 2, hlsearch)
       end
 
       opts.sections.lualine_y = {
@@ -339,8 +365,8 @@ return {
           key.key = "o" -- o for projects, p for paste
         elseif key.key == "c" and vim.g.user_is_termux then
           key.action = ":lua LazyVim.pick.config_files()()"
-          -- elseif key.key == "q" then
-          --   key.hidden = true
+        elseif key.key == "q" then
+          key.hidden = true
         end
       end
       -- stylua: ignore start
@@ -371,7 +397,8 @@ return {
  ███████████ ███    ███ █████████ █████ █████ ████ █████ 
 ██████  █████████████████████ ████ █████ █████ ████ ██████]]
       local v = vim.version()
-      opts.dashboard.preset.header = vim.g.user_is_termux and ("NVIM v%s.%s.%s"):format(v.major, v.minor, v.patch) or nil
+      opts.dashboard.preset.header = vim.g.user_is_termux and ("NVIM v%s.%s.%s"):format(v.major, v.minor, v.patch)
+        or nil
 
       opts.dashboard.sections = {
         {}, -- top padding for header
