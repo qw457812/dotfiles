@@ -3,10 +3,6 @@ return {
   { "LazyVim/LazyVim", version = false },
   {
     "folke/snacks.nvim",
-    keys = {
-      -- stylua: ignore
-      { "<leader>.", function() Snacks.scratch({ ft = vim.bo.filetype }) end, desc = "Toggle Scratch Buffer" },
-    },
     ---@module "snacks"
     ---@type snacks.Config
     opts = {

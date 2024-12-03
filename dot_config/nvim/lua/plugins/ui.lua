@@ -381,12 +381,6 @@ return {
         { icon = " ", title = "Projects", section = "projects", indent = 2, padding = 1 },
         { section = "startup" },
       }
-
-      Snacks.config.style("dashboard", {
-        bo = {
-          buflisted = false, -- leetcode.nvim
-        },
-      })
     end,
   },
 
@@ -420,6 +414,7 @@ return {
           "dbui",
           "dbout",
           "harpoon",
+          "leetcode.nvim",
           "Trans",
           "pantran",
         },

@@ -18,11 +18,12 @@ return {
         arrow = "  ",
         up_arrow = "  ",
       },
-      -- options = {
-      --   multilines = true,
-      --   -- show_source = true,
-      --   -- virt_texts = { priority = 5000 },
-      -- },
+      options = {
+        virt_texts = { priority = 5000 }, -- symbol-usage.nvim
+        -- multilines = true, -- not just current line
+        -- show_source = true,
+        -- use_icons_from_diagnostic = true,
+      },
     },
     config = function(_, opts)
       require("tiny-inline-diagnostic").setup(opts)

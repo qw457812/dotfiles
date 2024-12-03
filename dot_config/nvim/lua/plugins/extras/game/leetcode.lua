@@ -9,8 +9,6 @@ return {
   -- https://github.com/search?q=repo%3Akawre%2Fnvim%20leetcode&type=code
   -- https://github.com/ofseed/nvim/blob/338f7742db9739eb6fadfebaafcc5e6c7d316e8d/lua/plugins/tool/leetcode.lua#L29
   -- https://github.com/m1dsolo/dotfiles/blob/c99eef4184a1afe0ab1c01b060d027e34ad0ea7f/.config/nvim/lua/plugins/leetcode-nvim.lua#L84
-  -- TODO: lsp not working sometimes
-  -- https://github.com/joshuadanpeterson/nvim/blob/4bc23dfc8e3250d69fe4b118c320a6fe20546730/lua/config/settings.lua#L200
   {
     "kawre/leetcode.nvim",
     build = ":TSUpdate html",
@@ -27,7 +25,6 @@ return {
           processor = "magick_cli",
         },
       },
-      { "rcarriga/nvim-notify", optional = true },
       { "nvim-tree/nvim-web-devicons", optional = true },
       {
         "nvim-treesitter/nvim-treesitter",
@@ -39,8 +36,8 @@ return {
     },
     -- or localleader
     keys = {
+      { "<leader>Lm", "<cmd>Leet<cr>", desc = "Menu" }, -- same as `:Leet menu`, also works for non_standalone
       { "<leader>Lq", "<cmd>Leet tabs<cr>", desc = "Tabs" },
-      { "<leader>Lm", "<cmd>Leet menu<cr>", desc = "Menu" },
       { "<leader>Lc", "<cmd>Leet console<cr>", desc = "Console" },
       { "<leader>Lh", "<cmd>Leet info<cr>", desc = "Info" },
       { "<leader>Ll", "<cmd>Leet lang<cr>", desc = "Lang" },
@@ -66,6 +63,9 @@ return {
         image_support = LazyVim.has("image.nvim"),
         cn = { -- leetcode.cn
           enabled = true,
+        },
+        plugins = {
+          non_standalone = true,
         },
         injector = {
           ["java"] = {
@@ -114,11 +114,11 @@ return {
         desc = "Start leetcode.nvim on startup",
         nested = true,
         callback = function()
-          if vim.fn.argc() ~= 1 then
+          if vim.fn.argc(-1) ~= 1 then
             return
           end -- return if more than one argument given
           local arg = vim.tbl_get(LazyVim.opts("leetcode.nvim"), "arg") or "leetcode.nvim"
-          if vim.fn.argv()[1] ~= arg then
+          if vim.fn.argv(0, -1) ~= arg then
             return
           end -- return if argument doesn't match trigger
           local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
