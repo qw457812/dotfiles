@@ -16,15 +16,7 @@ return {
     dependencies = {
       { "nvim-telescope/telescope.nvim" },
       { "MunifTanjim/nui.nvim" },
-      {
-        "3rd/image.nvim",
-        cond = vim.g.user_is_wezterm and vim.fn.executable("magick") == 1, -- not vim.g.neovide
-        lazy = true,
-        build = false,
-        opts = {
-          processor = "magick_cli",
-        },
-      },
+      { "3rd/image.nvim", optional = true },
       { "nvim-tree/nvim-web-devicons", optional = true },
       {
         "nvim-treesitter/nvim-treesitter",
