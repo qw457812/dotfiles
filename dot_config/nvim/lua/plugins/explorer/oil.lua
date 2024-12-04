@@ -1,3 +1,5 @@
+local preview_enabled = true
+
 return {
   -- https://github.com/stevearc/dotfiles/blob/eeb506f9afd32cd8cd9f2366110c76efaae5786c/.config/nvim/lua/plugins/oil.lua
   -- https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/editor/oil.lua
@@ -8,35 +10,34 @@ return {
     dependencies = { "echasnovski/mini.icons", optional = true },
     opts = {
       -- whether to use for editing directories (e.g. `vim .` or `:e src/`)
-      -- disabled because neo-tree is used for that
-      -- default_file_explorer = false, -- default value: true
-      default_file_explorer = vim.g.user_hijack_netrw == "oil.nvim",
+      default_file_explorer = vim.g.user_hijack_netrw == "oil.nvim", -- default value: true
       delete_to_trash = true,
       -- skip_confirm_for_simple_edits = true,
       -- prompt_save_on_select_new_entry = false,
       -- watch_for_changes = true,
-      float = {
-        max_height = 30, -- 30 ~ 45
-        max_width = 100, -- 90 ~ 120
-      },
       keymaps = {
-        -- ["q"] = "actions.close", -- for floating window
-        -- ["`"] = "actions.tcd",
+        ["`"] = false,
+        ["~"] = false,
+        ["<C-h>"] = false,
+        ["<C-l>"] = false,
+        ["<C-s>"] = false,
         -- ["~"] = {
         --   desc = "<cmd>edit $HOME<CR>",
         --   callback = function()
         --     require("oil").open(vim.env.HOME)
         --   end,
         -- },
-        ["~"] = false,
-        ["<C-h>"] = false,
-        ["<C-l>"] = false,
-        ["<C-s>"] = false,
-        ["<leader>wv"] = { "actions.select", opts = { vertical = true }, desc = "Open the entry in a vertical split" },
-        ["<leader>ws"] = {
-          "actions.select",
-          opts = { horizontal = true },
-          desc = "Open the entry in a horizontal split",
+        ["gc"] = { "actions.cd", mode = "n" },
+        ["gC"] = { "actions.cd", opts = { scope = "tab" }, mode = "n" },
+        ["gr"] = "actions.refresh",
+        ["<leader>wv"] = { "actions.select", opts = { vertical = true } },
+        ["<leader>ws"] = { "actions.select", opts = { horizontal = true } },
+        ["<C-p>"] = {
+          desc = "Open the entry under the cursor in a preview window, or close the preview window if already open",
+          callback = function()
+            require("oil.actions").preview.callback()
+            preview_enabled = not preview_enabled
+          end,
         },
         ["<c-space>"] = {
           desc = "Terminal (Oil Dir)",
@@ -156,6 +157,10 @@ return {
       vim.api.nvim_create_autocmd("User", {
         pattern = "OilEnter",
         callback = vim.schedule_wrap(function(args)
+          -- respect <C-p> toggle
+          if not preview_enabled then
+            return
+          end
           local oil = require("oil")
           if vim.api.nvim_get_current_buf() == args.data.buf and oil.get_cursor_entry() then
             oil.open_preview()
