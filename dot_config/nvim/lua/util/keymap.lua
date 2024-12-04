@@ -105,6 +105,7 @@ function M.clear_ui_esc()
     return U.is_floating_win(win, { zen = false, tsc = false })
   end
 
+  local ft = vim.bo.filetype
   local is_cmd_win = vim.fn.getcmdwintype() ~= ""
 
   if vim.v.hlsearch == 1 then
@@ -116,8 +117,14 @@ function M.clear_ui_esc()
   -- elseif has_notif() then
   --   dismiss_notif()
   elseif is_floating_win() then
-    vim.api.nvim_win_close(0, false)
-  elseif not is_cmd_win and vim.bo.filetype ~= "snacks_dashboard" then
+    if ft == "oil" then
+      require("oil").close()
+    elseif ft == "minifiles" then
+      require("mini.files").close()
+    else
+      vim.api.nvim_win_close(0, false)
+    end
+  elseif not is_cmd_win and ft ~= "snacks_dashboard" then
     -- close all floating windows, note that:
     -- 1. can't close other windows when the command-line window is open
     -- 2. we don't want to close the terminal sections of snacks_dashboard

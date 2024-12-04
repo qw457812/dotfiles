@@ -283,6 +283,7 @@ return {
         [close_key] = {
           "actions.close",
           opts = { exit_if_last_buf = true },
+          mode = "n",
           desc = "Close or Exit",
         },
       },
