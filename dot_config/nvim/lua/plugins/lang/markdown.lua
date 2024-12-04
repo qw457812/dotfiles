@@ -2,6 +2,8 @@ if not LazyVim.has_extra("lang.markdown") then
   return {}
 end
 
+local show_image = false
+
 return {
   {
     "MeanderingProgrammer/render-markdown.nvim",
@@ -59,6 +61,44 @@ return {
         end,
       })
     end,
+  },
+
+  {
+    "3rd/image.nvim",
+    optional = true,
+    ft = function(_, ft)
+      if show_image then
+        vim.list_extend(ft, { "markdown" })
+      end
+    end,
+    opts = {
+      integrations = {
+        markdown = {
+          enabled = show_image,
+          clear_in_insert_mode = true,
+          only_render_image_at_cursor = true,
+          -- download_remote_images = false,
+        },
+      },
+    },
+  },
+
+  {
+    "3rd/diagram.nvim",
+    cond = function()
+      return show_image and LazyVim.has("image.nvim") and vim.fn.executable("mmdc") == 1
+    end,
+    dependencies = { "3rd/image.nvim", optional = true },
+    ft = "markdown",
+    opts = {
+      renderer_options = {
+        mermaid = {
+          background = vim.g.user_transparent_background and "transparent" or nil,
+          theme = "dark",
+          -- scale = 2,
+        },
+      },
+    },
   },
 
   {
