@@ -94,6 +94,15 @@ return {
             table.insert(symbols, 1, symbol_oil_prefix)
           end
 
+          -- same behavior as `length` of `LazyVim.lualine.pretty_path()`
+          local max_symbols = vim.g.user_is_termux and 5 or 10
+          if #symbols > max_symbols then
+            local symbol_ellipsis = symbols[2]
+            symbol_ellipsis.name = "…"
+            symbol_ellipsis.icon = ""
+            symbols = { symbols[1], symbol_ellipsis, unpack(symbols, #symbols - max_symbols + 2, #symbols) }
+          end
+
           return symbols
         end,
       }

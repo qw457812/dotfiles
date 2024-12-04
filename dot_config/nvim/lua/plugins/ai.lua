@@ -26,6 +26,19 @@ return {
     end,
   },
 
+  {
+    "nvim-cmp",
+    optional = true,
+    opts = function(_, opts)
+      for _, source in ipairs(opts.sources or {}) do
+        if source.name == "codeium" then
+          source.priority = 99 -- lower than copilot
+          break
+        end
+      end
+    end,
+  },
+
   -- https://github.com/AstroNvim/astrocommunity/blob/main/lua/astrocommunity/editing-support/copilotchat-nvim/init.lua
   {
     "CopilotC-Nvim/CopilotChat.nvim",
