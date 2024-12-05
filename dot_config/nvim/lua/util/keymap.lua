@@ -21,18 +21,6 @@ function M.map(mode, lhs, rhs, opts)
   end
 end
 
----@param modes string|string[]
----@param lhs string|string[]
----@param opts? vim.keymap.del.Opts
-function M.del(modes, lhs, opts)
-  ---@cast lhs string[]
-  lhs = type(lhs) == "string" and { lhs } or lhs
-
-  for _, l in ipairs(lhs) do
-    vim.keymap.del(modes, l, opts)
-  end
-end
-
 -- Wrapper around vim.keymap.set that will
 -- not create a keymap if a lazy key handler exists.
 -- It will also set `silent` to true by default.
@@ -46,6 +34,18 @@ function M.safe_map(mode, lhs, rhs, opts)
 
   for _, l in ipairs(lhs) do
     LazyVim.safe_keymap_set(mode, l, rhs, opts)
+  end
+end
+
+---@param modes string|string[]
+---@param lhs string|string[]
+---@param opts? vim.keymap.del.Opts
+function M.del(modes, lhs, opts)
+  ---@cast lhs string[]
+  lhs = type(lhs) == "string" and { lhs } or lhs
+
+  for _, l in ipairs(lhs) do
+    vim.keymap.del(modes, l, opts)
   end
 end
 
@@ -81,8 +81,27 @@ function M.foldopen_l()
   vim.cmd("normal! " .. count1 .. "l")
 end
 
--- https://github.com/megalithic/dotfiles/blob/fce3172e3cb1389de22bf97ccbf29805c2262525/config/nvim/lua/mega/mappings.lua#L143
-function M.clear_ui_esc()
+---https://github.com/megalithic/dotfiles/blob/fce3172e3cb1389de22bf97ccbf29805c2262525/config/nvim/lua/mega/mappings.lua#L143
+---@param opts? {close?: function|false, popups?: boolean, esc?: boolean}
+function M.clear_ui_esc(opts)
+  local cleared = false
+  local ft = vim.bo.filetype
+  local is_cmdwin = vim.fn.getcmdwintype() ~= ""
+
+  opts = vim.tbl_deep_extend("keep", opts or {}, {
+    close = function()
+      if ft == "oil" then
+        require("oil").close()
+      elseif ft == "minifiles" then
+        require("mini.files").close()
+      else
+        vim.api.nvim_win_close(0, false)
+      end
+    end,
+    popups = ft ~= "snacks_dashboard", -- prevent closing terminal sections
+    esc = true,
+  })
+
   -- -- TODO: snacks_notif always exists?
   -- local function has_notif()
   --   return not vim.tbl_isempty(vim.tbl_filter(function(b)
@@ -105,44 +124,43 @@ function M.clear_ui_esc()
     return U.is_floating_win(win, { zen = false, tsc = false })
   end
 
-  local ft = vim.bo.filetype
-  local is_cmd_win = vim.fn.getcmdwintype() ~= ""
-
   if vim.v.hlsearch == 1 then
     vim.cmd("nohlsearch")
-    -- petertriho/nvim-scrollbar & kevinhwang91/nvim-hlslens
+    -- nvim-scrollbar & nvim-hlslens
     if package.loaded["scrollbar"] then
       require("scrollbar.handlers.search").nohlsearch()
     end
+    cleared = true
   -- elseif has_notif() then
   --   dismiss_notif()
-  elseif is_floating_win() then
-    if ft == "oil" then
-      require("oil").close()
-    elseif ft == "minifiles" then
-      require("mini.files").close()
-    else
-      vim.api.nvim_win_close(0, false)
-    end
-  elseif not is_cmd_win and ft ~= "snacks_dashboard" then
-    -- close all floating windows, note that:
-    -- 1. can't close other windows when the command-line window is open
-    -- 2. we don't want to close the terminal sections of snacks_dashboard
-    for _, win in ipairs(vim.api.nvim_list_wins()) do
-      if vim.api.nvim_win_is_valid(win) and is_floating_win(win) then
-        vim.api.nvim_win_close(win, false)
+  --   cleared = true
+  elseif opts.close then
+    if is_floating_win() then
+      opts.close()
+      cleared = true
+    elseif opts.popups and not is_cmdwin then
+      -- close all floating windows (can't close other windows when the command-line window is open)
+      for _, win in ipairs(vim.api.nvim_list_wins()) do
+        if vim.api.nvim_win_is_valid(win) and is_floating_win(win) then
+          vim.api.nvim_win_close(win, false)
+          cleared = true
+        end
       end
     end
   end
 
   dismiss_notif()
-  if not is_cmd_win then
+  if not is_cmdwin then
     vim.cmd("diffupdate")
   end
   -- vim.cmd("syntax sync fromstart")
   vim.cmd("normal! <C-L>") -- vim.cmd.redraw({ bang = true })
 
-  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<esc>", true, true, true), "n", false)
+  if opts.esc then
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<esc>", true, true, true), "n", false)
+  end
+
+  return cleared
 end
 
 return M
