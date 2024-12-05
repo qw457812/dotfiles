@@ -661,3 +661,9 @@ function svd() {
   # --file-style omit --hunk-header-style omit
   svn diff -x -p "$@" | svn_strip_diff_header | delta --line-numbers;
 }
+function svld() {
+  svn log -v --diff "$@" | svn_strip_diff_header | delta --line-numbers;
+}
+function svldr() {
+  svn log -v --diff -r "$@" | svn_strip_diff_header | delta --line-numbers;
+}
