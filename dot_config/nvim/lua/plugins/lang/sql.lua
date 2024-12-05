@@ -23,9 +23,11 @@ return {
         {
           "<esc>",
           function()
-            vim.cmd(vim.v.hlsearch == 1 and "nohlsearch" or "wincmd p")
+            if not U.keymap.clear_ui_esc() then
+              vim.cmd("wincmd p")
+            end
           end,
-          desc = "Clear hlsearch or Unfocus (dadbod)",
+          desc = "Clear UI or Unfocus (dadbod)",
           ft = { "dbui", "dbout" },
         },
       })

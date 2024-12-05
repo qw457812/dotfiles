@@ -269,6 +269,16 @@ return {
           },
           view = "mini",
         },
+        {
+          filter = {
+            event = "notify",
+            any = {
+              { find = "^Edit: Opened a chezmoi%-managed file$" },
+              { find = "^Edit: Successfully applied$" },
+            },
+          },
+          view = "mini",
+        },
       })
       return opts
     end,

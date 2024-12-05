@@ -25,11 +25,15 @@ local function close_buffer_or_window_or_exit()
     end, vim.api.nvim_list_bufs())
   end
 
-  -- the buftype is a non-real file
   -- https://github.com/AstroNvim/AstroNvim/blob/d771094986abced8c3ceae29a5a55585ecb0523a/lua/astronvim/plugins/_astrocore_autocmds.lua#L245
+  -- https://github.com/nvim-neo-tree/neo-tree.nvim/blob/42caaf5c3b7ca346ab278201151bb878006a6031/lua/neo-tree/utils/init.lua#L533
   local function non_real_file()
-    -- return vim.bo.buftype ~= ""
-    return vim.tbl_contains({ "help", "nofile", "quickfix" }, vim.bo.buftype)
+    return vim.bo.buftype ~= ""
+  end
+
+  -- https://github.com/nvim-neo-tree/neo-tree.nvim/blob/42caaf5c3b7ca346ab278201151bb878006a6031/lua/neo-tree/utils/init.lua#L520
+  local function is_winfixbuf()
+    return vim.fn.exists("&winfixbuf") == 1 and vim.wo.winfixbuf
   end
 
   -- known window types: main, floating and edgy
@@ -40,7 +44,7 @@ local function close_buffer_or_window_or_exit()
   if U.is_floating_win() then
     vim.cmd("close") -- Close Window (Cannot close last window)
   elseif #listed_buffers() > (vim.bo.buflisted and 1 or 0) then
-    if non_real_file() then
+    if non_real_file() or is_winfixbuf() then
       vim.cmd("bd") -- Delete Buffer and Window
     else
       Snacks.bufdelete() -- Delete Buffer
@@ -181,14 +185,14 @@ return {
           noh_or_close = {
             "<esc>",
             function(self)
-              if vim.v.hlsearch == 1 then
-                vim.cmd("nohlsearch")
-              else
-                self:close()
-              end
-              Snacks.notifier.hide()
+              U.keymap.clear_ui_esc({
+                close = function()
+                  self:close()
+                end,
+                esc = false,
+              })
             end,
-            desc = "Noh or Close",
+            desc = "Clear UI",
           },
         },
       },
@@ -201,14 +205,14 @@ return {
             noh_or_close = {
               "<esc>",
               function(self)
-                if vim.v.hlsearch == 1 then
-                  vim.cmd("nohlsearch")
-                else
-                  self:hide()
-                end
-                Snacks.notifier.hide()
+                U.keymap.clear_ui_esc({
+                  close = function()
+                    self:hide()
+                  end,
+                  esc = false,
+                })
               end,
-              desc = "Noh or Hide",
+              desc = "Clear UI",
             },
           },
         },

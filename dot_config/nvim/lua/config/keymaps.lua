@@ -10,13 +10,13 @@ local map = U.keymap.map
 local safe_map = U.keymap.safe_map
 local del = U.keymap.del
 
-local cmd_win = function(keys)
+local cmdwin = function(type)
   return function()
     if package.loaded["zen-mode"] and require("zen-mode.view").is_open() then
       require("zen-mode").close()
     end
-    -- vim.api.nvim_feedkeys(keys .. "G", "n", true)
-    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(keys .. "G", true, true, true), "n", false)
+    -- vim.api.nvim_feedkeys("q" .. type .. "G", "n", true)
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("q" .. type .. "G", true, true, true), "n", false)
   end
 end
 
@@ -171,9 +171,9 @@ map("n", "gp", function() vim.api.nvim_feedkeys("`[" .. vim.fn.strpart(vim.fn.ge
 -- use `silent = false` for it to make effect immediately
 map("x", "g/", "<esc>/\\%V", { silent = false, desc = "Search inside visual selection" })
 
-map("n", "g/", cmd_win("q/"), { desc = "command-line window (forward search)" })
-map("n", "g?", cmd_win("q?"), { desc = "command-line window (backward search)" })
-map({ "n", "x" }, "g:", cmd_win("q:"), { desc = "command-line window (Ex command)" })
+map("n", "g/", cmdwin("/"), { desc = "command-line window (forward search)" })
+map("n", "g?", cmdwin("?"), { desc = "command-line window (backward search)" })
+map({ "n", "x" }, "g:", cmdwin(":"), { desc = "command-line window (Ex command)" })
 
 map("n", "g.", "@:", { desc = "Repeat last command-line" })
 

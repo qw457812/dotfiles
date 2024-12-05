@@ -91,16 +91,14 @@ return {
           pattern = "rip-substitute",
           callback = function(event)
             vim.keymap.set("n", "<esc>", function()
-              if vim.v.hlsearch == 1 then
-                vim.cmd("nohlsearch")
-              else
+              if not U.keymap.clear_ui_esc({ close = false, popups = false, esc = false }) then
                 -- simulate `q` keypress to abort
                 vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(opts_keymaps_abort, true, false, true), "m", false)
               end
             end, {
               buffer = event.buf,
               silent = true,
-              desc = "Abort (Rip Substitute)",
+              desc = "Clear UI or Abort (Rip Substitute)",
             })
           end,
         })
@@ -114,7 +112,7 @@ return {
       opts.routes = vim.list_extend(opts.routes or {}, {
         {
           filter = {
-            event = "msg_show",
+            event = { "msg_show", "notify" },
             cond = function()
               return vim.bo.filetype == "rip-substitute"
             end,
