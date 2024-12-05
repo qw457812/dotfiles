@@ -53,15 +53,12 @@ return {
         "<leader>sf",
         mode = { "n", "x" },
         function()
-          -- popup overlap by noice.nvim (snacks.nvim or nvim-notify) when `opts.popupWin.position == "top"`
-          if package.loaded["snacks"] then
-            Snacks.notifier.hide()
-          elseif package.loaded["notify"] then
-            require("notify").dismiss({ silent = true, pending = true })
-          end
-
+          -- popup overlaps when `opts.popupWin.position == "top"`
+          Snacks.notifier.hide()
           require("rip-substitute").sub()
-          vim.cmd("stopinsert")
+          if vim.api.nvim_get_current_line() ~= "" then
+            vim.cmd("stopinsert")
+          end
         end,
         desc = "Rip Substitute",
       },
@@ -71,7 +68,6 @@ return {
         position = "top",
       },
       keymaps = {
-        abort = "<esc>",
         insertModeConfirm = "<C-s>",
         toggleFixedStrings = "<localleader>f",
         toggleIgnoreCase = "<localleader>c",
@@ -85,6 +81,49 @@ return {
         alsoPrefillReplaceLine = true,
       },
     },
+    config = function(_, opts)
+      require("rip-substitute").setup(opts)
+
+      -- use `opts.keymaps.abort = "<esc>"` will abort on <esc> in visual mode
+      local opts_keymaps_abort = vim.tbl_get(opts, "keymaps", "abort") or "q"
+      if opts_keymaps_abort:lower() ~= "<esc>" then
+        vim.api.nvim_create_autocmd("FileType", {
+          pattern = "rip-substitute",
+          callback = function(event)
+            vim.keymap.set("n", "<esc>", function()
+              if vim.v.hlsearch == 1 then
+                vim.cmd("nohlsearch")
+              else
+                -- simulate `q` keypress to abort
+                vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(opts_keymaps_abort, true, false, true), "m", false)
+              end
+            end, {
+              buffer = event.buf,
+              silent = true,
+              desc = "Abort (Rip Substitute)",
+            })
+          end,
+        })
+      end
+    end,
+  },
+  {
+    "folke/noice.nvim",
+    optional = true,
+    opts = function(_, opts)
+      opts.routes = vim.list_extend(opts.routes or {}, {
+        {
+          filter = {
+            event = "msg_show",
+            cond = function()
+              return vim.bo.filetype == "rip-substitute"
+            end,
+          },
+          view = "mini",
+        },
+      })
+      return opts
+    end,
   },
 
   -- TODO: choose motion plugin between: flash, leap, hop

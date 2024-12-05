@@ -8,6 +8,7 @@ return {
     opts = {
       notifier = {
         style = "fancy",
+        -- top_down = false,
       },
       terminal = {
         win = {
