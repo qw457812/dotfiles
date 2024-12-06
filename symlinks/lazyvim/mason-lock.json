@@ -1,5 +1,5 @@
 {
-  "basedpyright": "1.22.0",
+  "basedpyright": "1.22.1",
   "bash-language-server": "5.4.2",
   "debugpy": "1.8.9",
   "docker-compose-language-service": "0.2.0",
@@ -13,8 +13,8 @@
   "luacheck": "1.1.0",
   "markdown-toc": "1.2.0",
   "markdownlint-cli2": "0.15.0",
-  "marksman": "2024-11-20",
-  "prettier": "3.4.1",
+  "marksman": "2024-12-04",
+  "prettier": "3.4.2",
   "ruff": "0.8.1",
   "selene": "0.27.1",
   "shellcheck": "v0.10.0",

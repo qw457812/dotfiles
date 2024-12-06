@@ -76,9 +76,11 @@ return {
         -- TODO: LazyVim.cmp.map
         ["<Tab>"] = {
           function(cmp)
-            if cmp.windows.autocomplete.win:is_open() then
+            ---@module 'blink.cmp'
+            cmp = cmp
+            if require("blink.cmp.completion.windows.menu").win:is_open() then
               return cmp.select_next()
-            elseif cmp.is_in_snippet() then
+            elseif cmp.snippet_active({ direction = 1 }) then
               return cmp.snippet_forward()
             elseif has_words_before() then
               return cmp.show()
@@ -88,9 +90,11 @@ return {
         },
         ["<S-Tab>"] = {
           function(cmp)
-            if cmp.windows.autocomplete.win:is_open() then
+            ---@module 'blink.cmp'
+            cmp = cmp
+            if require("blink.cmp.completion.windows.menu").win:is_open() then
               return cmp.select_prev()
-            elseif cmp.is_in_snippet() then
+            elseif cmp.snippet_active({ direction = -1 }) then
               return cmp.snippet_backward()
             end
           end,
