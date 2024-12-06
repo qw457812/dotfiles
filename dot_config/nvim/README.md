@@ -75,6 +75,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 | [nvim-treesitter-context](https://github.com/nvim-treesitter/nvim-treesitter-context) | yes     |
 | [dropbar.nvim](https://github.com/Bekaboo/dropbar.nvim)                               | no      |
 | [twilight.nvim](https://github.com/folke/twilight.nvim)                               | yes     |
+| [3rd/image.nvim](https://github.com/3rd/image.nvim)                                   | yes     |
 
 ## TODO
 
