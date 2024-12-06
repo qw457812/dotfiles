@@ -358,7 +358,8 @@ return {
     optional = true,
     opts = function(_, opts)
       local keys = opts.dashboard.preset.keys
-      for _, key in ipairs(keys) do
+      local lazy_idx
+      for i, key in ipairs(keys) do
         if key.key == "n" then
           key.action = ":ene" -- do not startinsert
         elseif key.key == "p" then
@@ -367,8 +368,11 @@ return {
           key.action = ":lua LazyVim.pick.config_files()()"
         elseif key.key == "q" then
           key.hidden = true
+        elseif key.key == "l" then
+          lazy_idx = i
         end
       end
+      table.insert(keys, (lazy_idx or #keys) + 1, { icon = "󱌢 ", key = "m", action = ":Mason", desc = "Mason" })
       -- stylua: ignore start
       table.insert(keys, 3, { icon = " ", key = "i", action = ":ene | startinsert", desc = "New File (Insert)", hidden = true })
       table.insert(keys, 4, { icon = " ", key = "a", action = ":ene | startinsert", desc = "New File (Append)", hidden = true })

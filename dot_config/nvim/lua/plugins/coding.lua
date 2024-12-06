@@ -100,6 +100,19 @@ return {
           end,
           "fallback",
         },
+        -- https://github.com/y3owk1n/nix-system-config-v2/blob/ae72dd82a92894a1ca8c5ff4243e0208dfc33a5d/config/nvim/lua/plugins/blink-cmp.lua#L19
+        ["<Esc>"] = {
+          function(cmp)
+            ---@module 'blink.cmp'
+            cmp = cmp
+            if require("blink.cmp.completion.windows.menu").win:is_open() then
+              if cmp.snippet_active() then
+                return cmp.hide()
+              end
+            end
+          end,
+          "fallback",
+        },
       })
     end,
   },
