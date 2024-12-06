@@ -24,7 +24,6 @@ return {
       local cmp = require("cmp")
 
       opts.mapping = vim.tbl_extend("force", opts.mapping, {
-        -- TODO: LazyVim.cmp.map
         ["<Tab>"] = cmp.mapping(function(fallback)
           if cmp.visible() then
             -- You could replace select_next_item() with confirm({ select = true }) to get VS Code autocompletion behavior
@@ -73,7 +72,6 @@ return {
     opts = function(_, opts)
       -- copied from: https://github.com/AstroNvim/astrocommunity/blob/bb7988ac0efe0c17936c350c6da19051765f0e71/lua/astrocommunity/completion/blink-cmp/init.lua#L29
       opts.keymap = vim.tbl_extend("force", opts.keymap, {
-        -- TODO: LazyVim.cmp.map
         ["<Tab>"] = {
           function(cmp)
             ---@module 'blink.cmp'
@@ -100,19 +98,19 @@ return {
           end,
           "fallback",
         },
-        -- https://github.com/y3owk1n/nix-system-config-v2/blob/ae72dd82a92894a1ca8c5ff4243e0208dfc33a5d/config/nvim/lua/plugins/blink-cmp.lua#L19
-        ["<Esc>"] = {
-          function(cmp)
-            ---@module 'blink.cmp'
-            cmp = cmp
-            if require("blink.cmp.completion.windows.menu").win:is_open() then
-              if cmp.snippet_active() then
-                return cmp.hide()
-              end
-            end
-          end,
-          "fallback",
-        },
+        -- -- https://github.com/y3owk1n/nix-system-config-v2/blob/ae72dd82a92894a1ca8c5ff4243e0208dfc33a5d/config/nvim/lua/plugins/blink-cmp.lua#L19
+        -- ["<Esc>"] = {
+        --   function(cmp)
+        --     ---@module 'blink.cmp'
+        --     cmp = cmp
+        --     if require("blink.cmp.completion.windows.menu").win:is_open() then
+        --       if cmp.snippet_active() then
+        --         return cmp.hide()
+        --       end
+        --     end
+        --   end,
+        --   "fallback",
+        -- },
       })
     end,
   },

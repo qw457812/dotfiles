@@ -27,16 +27,12 @@ return {
       frontend = {
         ---@class TransFrontendOpts
         default = {
-          title = {
-            { "", "TransTitleRound" },
-            { "󰊿 Translation", "TransTitle" },
-            { "", "TransTitleRound" },
-          },
+          title = "", -- disable title
           ---@type {open: string | boolean, close: string | boolean, interval: integer} Hover Window Animation
           animation = {
             -- open = "slid", -- 'fold', 'slid'
             -- close = "slid",
-            interval = 3, -- default value: 12
+            interval = 1, -- default value: 12
           },
           timeout = 5000,
         },
@@ -77,11 +73,35 @@ return {
           },
           icon = {
             star = "󰓎",
-            notfound = "",
+            notfound = "", -- 
+            yes = "",
+            no = "",
+            translation = "",
           },
         },
       },
     },
+    config = function(_, opts)
+      local Trans = require("Trans")
+      Trans.setup(opts)
+
+      -- fix: on colorscheme change
+      local highlights = Trans.style.theme[opts.theme or "default"]
+      Snacks.util.set_hl(highlights, { default = false })
+
+      local node = Trans.util.node
+      ---@diagnostic disable-next-line: undefined-field
+      local item = node.item
+      -- HACK: icon only
+      ---@diagnostic disable-next-line: inject-field
+      function node.prompt(str)
+        return {
+          item({ "", "TransTitleRound" }),
+          item({ str:match("^%S+") or "", "MiniIconsAzure" }),
+          item({ "", "TransTitleRound" }),
+        }
+      end
+    end,
   },
 
   {
