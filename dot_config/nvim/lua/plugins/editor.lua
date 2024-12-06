@@ -372,7 +372,7 @@ return {
       -- copied from: https://github.com/kevinhwang91/nvim-hlslens/blob/07afd4dd14405ad14b142a501a3abea6ae44b21b/lua/hlslens/render/init.lua#L53
       function Render:doNohAndStop(defer)
         local function f()
-          -- vim.cmd("noh")
+          -- vim.cmd("noh") -- commented out this line
           self:stop()
         end
 

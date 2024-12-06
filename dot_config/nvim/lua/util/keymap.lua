@@ -83,6 +83,7 @@ end
 
 ---https://github.com/megalithic/dotfiles/blob/fce3172e3cb1389de22bf97ccbf29805c2262525/config/nvim/lua/mega/mappings.lua#L143
 ---@param opts? {close?: function|false, popups?: boolean, esc?: boolean}
+---@return boolean
 function M.clear_ui_esc(opts)
   local cleared = false
   local ft = vim.bo.filetype
