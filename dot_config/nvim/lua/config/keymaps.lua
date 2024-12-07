@@ -53,6 +53,14 @@ end
 -- })
 
 -- basics
+if vim.g.user_is_wezterm then
+  -- To distinguish <C-I> and <Tab>, you could map another key, say <M-I>, to <C-I> in neovim,
+  -- and then map ctrl+i to send <M-I> key sequence in your terminal setting.
+  -- See: `:h tui-input`
+  map({ "n", "i", "c", "v", "o", "t" }, "<M-i>", "<C-i>", { desc = "<C-i>" })
+  map("n", "<tab>", "<c-w>w", { desc = "Switch to Other Window", remap = true })
+end
+
 -- map("n", "l", "foldclosed('.') != -1 ? 'zo' : 'l'", { expr = true })
 map({ "n", "x" }, "l", U.keymap.foldopen_l, { desc = "Right" })
 
