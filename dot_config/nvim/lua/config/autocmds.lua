@@ -180,6 +180,42 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
+-- copied from:
+-- https://github.com/echasnovski/mini.nvim/blob/73bbcbfa7839c4b00a64965fb504f87461abefbd/lua/mini/misc.lua#L194
+-- https://github.com/mrbeardad/nvim/blob/916d17211cc67d082ece6476bdfffe1a9fc41d22/lua/user/configs/autocmds.lua#L61
+if vim.g.user_auto_root and not vim.o.autochdir then
+  local function set_root(buf)
+    local root = LazyVim.root.get({ normalize = true, buf = buf })
+    if root ~= vim.uv.cwd() then
+      vim.fn.chdir(root)
+    end
+  end
+
+  local current_buf = 0
+  vim.api.nvim_create_autocmd("BufEnter", {
+    group = vim.api.nvim_create_augroup("auto_root", {}),
+    desc = "Find root and change current directory",
+    callback = function(event)
+      current_buf = event.buf
+      if vim.bo[current_buf].buftype == "" then
+        vim.defer_fn(function()
+          set_root(current_buf)
+        end, 100) -- wait till lazyvim_root_cache augroup clear cache
+      end
+    end,
+  })
+  vim.api.nvim_create_autocmd({ "LspAttach", "BufWritePost" }, {
+    group = vim.api.nvim_create_augroup("auto_root", { clear = false }),
+    callback = function(event)
+      if event.buf == current_buf then
+        vim.defer_fn(function()
+          set_root(current_buf)
+        end, 100)
+      end
+    end,
+  })
+end
+
 -- -- colorcolumn
 -- vim.api.nvim_create_autocmd("FileType", {
 --   pattern = { "markdown" },
