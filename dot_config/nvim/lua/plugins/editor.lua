@@ -311,8 +311,8 @@ return {
       return {
         -- { "n", function() nN("n") end },
         -- { "N", function() nN("N") end },
-        { "n", [[<Cmd>execute('normal! ' . v:count1 . 'nzv')<CR><Cmd>lua require('hlslens').start()<CR>]] },
-        { "N", [[<Cmd>execute('normal! ' . v:count1 . 'Nzv')<CR><Cmd>lua require('hlslens').start()<CR>]] },
+        { "n", [[<Cmd>execute('normal! ' . v:count1 . 'nzv') | lua require('hlslens').start()<CR>]] }, -- see: #65
+        { "N", [[<Cmd>execute('normal! ' . v:count1 . 'Nzv') | lua require('hlslens').start()<CR>]] },
         -- { "*", [[*zv<Cmd>lua require('hlslens').start()<CR>]] },
         -- { "#", [[#zv<Cmd>lua require('hlslens').start()<CR>]] },
         -- { "g*", [[g*zv<Cmd>lua require('hlslens').start()<CR>]] },
