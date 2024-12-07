@@ -200,29 +200,30 @@ return {
           "gx",
           function()
             require("various-textobjs").url()
-            local foundURL = vim.fn.mode():find("v")
+            local foundURL = vim.fn.mode() == "v"
             if foundURL then
               local url = U.get_visual_selection()
               vim.ui.open(url)
-            else
-              -- find all URLs in buffer
-              local urlPattern = require("various-textobjs.charwise-textobjs").urlPattern
-              local bufText = table.concat(vim.api.nvim_buf_get_lines(0, 0, -1, false), "\n")
-              local urls = {}
-              for url in bufText:gmatch(urlPattern) do
-                table.insert(urls, url)
-              end
-              if #urls == 0 then
-                return
-              end
-
-              -- select one, use a plugin like dressing.nvim for nicer UI for `vim.ui.select`
-              vim.ui.select(urls, { prompt = "Select URL:" }, function(choice)
-                if choice then
-                  vim.ui.open(choice)
-                end
-              end)
+              return
             end
+
+            -- find all URLs in buffer
+            local urlPattern = "%l%l%l-://[^%s)]+"
+            local bufText = table.concat(vim.api.nvim_buf_get_lines(0, 0, -1, false), "\n")
+            local urls = {}
+            for url in bufText:gmatch(urlPattern) do
+              table.insert(urls, url)
+            end
+            if #urls == 0 then
+              return
+            end
+
+            -- select one, use a plugin like dressing.nvim for nicer UI for `vim.ui.select`
+            vim.ui.select(urls, { prompt = "Select URL:" }, function(choice)
+              if choice then
+                vim.ui.open(choice)
+              end
+            end)
           end,
           desc = "URL Opener",
         },
