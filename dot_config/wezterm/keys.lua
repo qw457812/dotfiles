@@ -162,6 +162,14 @@ function M.apply_to_config(config)
 
   -- wezterm show-keys
   config.keys = {
+    -- To distinguish <C-I> and <Tab> in neovim
+    {
+      mods = "CTRL",
+      key = "i",
+      action = wezterm.action_callback(function(win, pane)
+        win:perform_action({ SendKey = { mods = is_nvim(pane) and "ALT" or "CTRL", key = "i" } }, pane)
+      end),
+    },
     { mods = "CTRL", key = "-", action = act.DisableDefaultAssignment }, -- disable this (DecreaseFontSize) for terminal in nvim
     -- Send "CTRL-B" to the terminal when pressing CTRL-B, CTRL-B
     { mods = "LEADER|CTRL", key = "b", action = act.SendKey({ key = "b", mods = "CTRL" }) },
