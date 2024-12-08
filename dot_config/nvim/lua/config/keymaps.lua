@@ -61,7 +61,11 @@ if vim.g.user_is_wezterm then
   map("n", "<tab>", "<c-w>w", { desc = "Switch to Other Window", remap = true })
 end
 
--- map("n", "l", "foldclosed('.') != -1 ? 'zo' : 'l'", { expr = true })
+-- map({ "n", "x" }, "h", "col('.') == 1 && foldlevel(line('.')) > 0 ? 'za' : 'h'", { expr = true })
+-- map("n", "h", "col('.') == 1 && foldlevel(line('.')) > 0 ? 'zc' : 'h'", { expr = true })
+-- map("x", "h", "col('.') == 1 && foldlevel(line('.')) > 0 ? 'zcgv' : 'h'", { expr = true })
+-- map("n", "l", "foldclosed(line('.')) != -1 ? 'zo0' : 'l'", { expr = true })
+-- map("x", "l", "foldclosed(line('.')) != -1 ? 'zogv0' : 'l'", { expr = true })
 map({ "n", "x" }, "l", U.keymap.foldopen_l, { desc = "Right" })
 
 -- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/keybindings.lua#L19
