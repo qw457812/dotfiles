@@ -91,10 +91,14 @@ return {
           pattern = "rip-substitute",
           callback = function(event)
             vim.keymap.set("n", "<esc>", function()
-              if not U.keymap.clear_ui_esc({ close = false, popups = false, esc = false }) then
-                -- simulate `q` keypress to abort
-                vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(opts_keymaps_abort, true, false, true), "m", false)
-              end
+              U.keymap.clear_ui_esc({
+                close = function()
+                  -- simulate `q` keypress to abort
+                  -- stylua: ignore
+                  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(opts_keymaps_abort, true, false, true), "m", false)
+                end,
+                esc = false,
+              })
             end, {
               buffer = event.buf,
               silent = true,
@@ -286,6 +290,7 @@ return {
 
   {
     "kevinhwang91/nvim-hlslens",
+    vscode = true,
     dependencies = {
       -- https://github.com/kevinhwang91/nvim-hlslens/issues/64#issuecomment-1606196924
       -- alternative: https://github.com/rapan931/lasterisk.nvim

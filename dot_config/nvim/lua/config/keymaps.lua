@@ -38,7 +38,7 @@ local function is_empty_line()
 end
 
 -- -- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/keybindings.lua#L234
--- map("n", "<cr>", "gd", { desc = "Goto local Declaration" })
+-- map("n", "<cr>", function() return vim.fn.pumvisible() == 1 and "<cr>" or "gd" end, { expr = true, desc = "Goto local Declaration" })
 -- -- restore default behavior of `<cr>`, which is overridden by my mapping above
 -- vim.api.nvim_create_autocmd("FileType", {
 --   pattern = { "qf", "neo-tree-popup" },

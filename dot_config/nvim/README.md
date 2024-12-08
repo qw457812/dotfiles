@@ -186,6 +186,8 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] Try [nvim-focus/focus.nvim](https://github.com/nvim-focus/focus.nvim).
 - [ ] [firenvim](https://github.com/glacambre/firenvim) like [megalithic](https://github.com/megalithic/dotfiles/blob/main/config/nvim/lua/plugins/extended/firenvim.lua).
 - [ ] Check this [chezmoi.lua.tmpl](https://github.com/Nitestack/dotfiles/blob/506b895c45b8ed012a2cb0c35fe62058d8b6dbc4/config/private_dot_config/exact_nvim/lua/exact_plugins/chezmoi.lua.tmpl).
+- [x] Map `<M-i>` to `<C-i>` in nvim, and map `<C-i>` to `<M-i>` in terminal.
+  - Like mrbeardad: [nvim](https://github.com/mrbeardad/nvim/blob/master/lua%2Fuser%2Fconfigs%2Fkeymaps.lua#L69) and [terminal](https://github.com/mrbeardad/MyIDE/blob/0792378a80e3eb72ce47de8e78d9df6c37002bbf/wt/settings.json#L425).
 - [ ] Create a `state` util to cache the state (like [zen-mode.nvim](https://github.com/folke/zen-mode.nvim/blob/29b292bdc58b76a6c8f294c961a8bf92c5a6ebd6/lua/zen-mode/plugins.lua#L137)) instead of using `vim.g.user_...`
   - [vim.g.user_zenmode_on](lua/plugins/ui.lua), [vim.g.user_minianimate_disable_old](lua/plugins/ui.lua)
   - [local neovide_state = {}](lua/config/keymaps.lua)
