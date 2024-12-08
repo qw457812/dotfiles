@@ -9,10 +9,10 @@ return {
     "MeanderingProgrammer/render-markdown.nvim",
     optional = true,
     opts = {
-      win_options = {
-        -- toggling this plugin should also toggle conceallevel
-        conceallevel = { default = 0 },
-      },
+      -- win_options = {
+      --   -- toggling this plugin should also toggle conceallevel
+      --   conceallevel = { default = 0 },
+      -- },
       code = {
         -- https://github.com/MeanderingProgrammer/render-markdown.nvim/issues/246#issuecomment-2510220411
         disable_background = vim.g.user_transparent_background,
