@@ -95,6 +95,8 @@ return {
         style = tokyonight_has_custom_style() and tokyonight_custom_style or "storm", -- storm, moon(default), night, day, custom
         transparent = vim.g.user_transparent_background,
         styles = {
+          comments = vim.g.user_is_termux and { italic = false } or nil,
+          keywords = vim.g.user_is_termux and { italic = false } or nil,
           sidebars = vim.g.user_transparent_background and "transparent" or nil,
           floats = vim.g.user_transparent_background and "transparent" or nil,
         },
@@ -267,6 +269,7 @@ return {
           dark = "macchiato", -- frappe, macchiato, mocha(default)
         },
         transparent_background = vim.g.user_transparent_background,
+        no_italic = vim.g.user_is_termux and true or nil,
         integrations = {
           mini = {
             enabled = true,
