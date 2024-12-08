@@ -85,25 +85,25 @@ end
 ---@param opts? {close?: function|false, popups?: boolean, esc?: boolean}
 ---@return boolean
 function M.clear_ui_esc(opts)
-  local cleared = false
-  local ft = vim.bo.filetype
-  local is_cmdwin = vim.fn.getcmdwintype() ~= ""
-
   opts = vim.tbl_deep_extend("keep", opts or {}, {
     close = function()
-      if ft == "oil" then
-        require("oil").close()
-      elseif ft == "minifiles" then
-        require("mini.files").close()
-      else
-        vim.api.nvim_win_close(0, false)
-      end
+      -- local ft = vim.bo.filetype
+      -- if ft == "oil" then
+      --   require("oil").close()
+      -- elseif ft == "minifiles" then
+      --   require("mini.files").close()
+      -- else
+      --   vim.api.nvim_win_close(0, false)
+      -- end
+
+      -- stylua: ignore
+      vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(vim.g.user_close_key or "<bs>", true, false, true), "m", false)
     end,
-    popups = ft ~= "snacks_dashboard", -- prevent closing terminal sections
+    popups = true, -- use `vim.bo.filetype ~= "snacks_dashboard"` to prevent closing terminal sections
     esc = true,
   })
 
-  -- -- TODO: snacks_notif always exists?
+  -- -- TODO: always true
   -- local function has_notif()
   --   return not vim.tbl_isempty(vim.tbl_filter(function(b)
   --     return vim.api.nvim_buf_is_valid(b)
@@ -113,55 +113,48 @@ function M.clear_ui_esc(opts)
 
   local function dismiss_notif()
     if package.loaded["noice"] then
-      require("noice").cmd("dismiss") -- including lsp progress (floating windows)
-    elseif package.loaded["snacks"] then
-      Snacks.notifier.hide()
-    elseif package.loaded["notify"] then
-      require("notify").dismiss({ silent = true, pending = true })
+      require("noice").cmd("dismiss") -- including mini view like lsp progress (floating windows)
     end
   end
 
-  local function is_floating_win(win)
-    return U.is_floating_win(win, { zen = false, tsc = false })
-  end
+  local something_done = false
+  local is_cmdwin = vim.fn.getcmdwintype() ~= ""
+  dismiss_notif()
 
-  if vim.v.hlsearch == 1 then
+  if
+    vim.v.hlsearch == 1
+    -- or has_notif()
+  then
+    -- dismiss_notif()
     vim.cmd("nohlsearch")
-    -- nvim-scrollbar & nvim-hlslens
     if package.loaded["scrollbar"] then
-      require("scrollbar.handlers.search").nohlsearch()
+      require("scrollbar.handlers.search").nohlsearch() -- nvim-scrollbar & nvim-hlslens
     end
-    cleared = true
-  -- elseif has_notif() then
-  --   dismiss_notif()
-  --   cleared = true
+    something_done = true
   elseif opts.close then
-    if is_floating_win() then
+    if U.is_floating_win(0, { zen = false }) then
       opts.close()
-      cleared = true
+      something_done = true
     elseif opts.popups and not is_cmdwin then
       -- close all floating windows (can't close other windows when the command-line window is open)
       for _, win in ipairs(vim.api.nvim_list_wins()) do
-        if vim.api.nvim_win_is_valid(win) and is_floating_win(win) then
+        if vim.api.nvim_win_is_valid(win) and U.is_floating_win(win, { zen = false, tsc = false }) then
           vim.api.nvim_win_close(win, false)
-          cleared = true
+          something_done = true
         end
       end
     end
   end
 
-  dismiss_notif()
   if not is_cmdwin then
     vim.cmd("diffupdate")
   end
   -- vim.cmd("syntax sync fromstart")
   vim.cmd("normal! <C-L>") -- vim.cmd.redraw({ bang = true })
-
   if opts.esc then
     vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<esc>", true, true, true), "n", false)
   end
-
-  return cleared
+  return something_done
 end
 
 return M

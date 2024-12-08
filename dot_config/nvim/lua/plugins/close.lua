@@ -182,17 +182,15 @@ return {
         keys = {
           -- trigger opts.autowrite of Snacks.scratch
           [close_key] = "close",
-          noh_or_close = {
+          clear_ui_or_close = {
             "<esc>",
             function(self)
               U.keymap.clear_ui_esc({
-                close = function()
-                  self:close()
-                end,
+                -- close = function() self:close() end,
                 esc = false,
               })
             end,
-            desc = "Clear UI",
+            desc = "Clear UI or Close",
           },
         },
       },
@@ -201,18 +199,16 @@ return {
         win = {
           keys = {
             [close_key] = "hide",
-            -- use the same `noh_or_close` name to ensure overwriting
-            noh_or_close = {
+            -- use the same `clear_ui_or_close` name to ensure overwriting
+            clear_ui_or_close = {
               "<esc>",
               function(self)
                 U.keymap.clear_ui_esc({
-                  close = function()
-                    self:hide()
-                  end,
+                  -- close = function() self:hide() end,
                   esc = false,
                 })
               end,
-              desc = "Clear UI",
+              desc = "Clear UI or Close",
             },
           },
         },
