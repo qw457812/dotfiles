@@ -7,6 +7,7 @@ return {
     ---@type snacks.Config
     opts = {
       notifier = {
+        width = vim.g.user_is_termux and { min = 20, max = 0.7 } or nil,
         style = "fancy",
         -- top_down = false,
       },
