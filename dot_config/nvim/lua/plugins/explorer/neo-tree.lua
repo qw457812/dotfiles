@@ -11,19 +11,6 @@ return {
     optional = true,
     dependencies = { "echasnovski/mini.icons" },
     keys = function(_, keys)
-      require("snacks")
-        .toggle({
-          name = "NeoTree Auto Close",
-          get = function()
-            return vim.g.user_neotree_auto_close
-          end,
-          set = function(state)
-            vim.g.user_neotree_auto_close = state
-            require("neo-tree.command").execute({ action = state and "close" or "show" })
-          end,
-        })
-        :map("<leader>uz")
-
       local last_root ---@type string?
       local mappings = {
         {
@@ -115,6 +102,19 @@ return {
     end,
     opts = function(_, opts)
       local hijack_netrw = vim.g.user_hijack_netrw == "neo-tree.nvim"
+
+      require("snacks")
+        .toggle({
+          name = "NeoTree Auto Close",
+          get = function()
+            return vim.g.user_neotree_auto_close
+          end,
+          set = function(state)
+            vim.g.user_neotree_auto_close = state
+            require("neo-tree.command").execute({ action = state and "close" or "show" })
+          end,
+        })
+        :map("<leader>uz")
 
       -- https://github.com/nvim-neo-tree/neo-tree.nvim/wiki/Recipes#find-with-telescope
       local function get_telescope_opts(state)
@@ -514,18 +514,6 @@ return {
             },
             ["<leader>fY"] = "copy_selector",
             ["F"] = "find_in_dir",
-            ["<tab>"] = {
-              function(state)
-                local node = state.tree:get_node()
-                if require("neo-tree.utils").is_expandable(node) then
-                  state.commands["toggle_node"](state)
-                else
-                  state.commands["open"](state)
-                  vim.cmd("Neotree reveal")
-                end
-              end,
-              desc = "Open without focus",
-            },
             -- ["d"] = "none",
             -- ["dd"] = "delete",
             -- ["y"] = "none",
@@ -605,6 +593,20 @@ return {
                 end,
                 desc = "expand node / focus first child / open",
               },
+              ["<cr>"] = { -- <tab> is mapped to <C-w>w
+                function(state)
+                  local node = state.tree:get_node()
+                  if require("neo-tree.utils").is_expandable(node) then
+                    state.commands["toggle_node"](state)
+                  else
+                    state.commands["open"](state)
+                    vim.cmd("Neotree reveal")
+                  end
+                end,
+                desc = "Open without focus",
+              },
+              ["i"] = "none",
+              ["gk"] = "show_file_details",
               ["H"] = "none",
               ["g."] = "toggle_hidden", -- TODO: not working
               ["[g"] = "none",
