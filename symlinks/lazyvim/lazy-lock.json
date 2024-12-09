@@ -149,6 +149,6 @@
   "wezterm.nvim": { "branch": "main", "commit": "032c33b621b96cc7228955b4352b48141c482098" },
   "which-key.nvim": { "branch": "main", "commit": "9b365a6428a9633e3eeb34dbef1b791511c54f70" },
   "yanky.nvim": { "branch": "main", "commit": "f9b905994cccf3c55f41af3a0a1f4c76c844e411" },
-  "yazi.nvim": { "branch": "main", "commit": "14ba86dbfa97361428ef2413f0cb207e968cc58e" },
+  "yazi.nvim": { "branch": "main", "commit": "a084a008c1479b9e50259995fe0192714d641c44" },
   "zen-mode.nvim": { "branch": "main", "commit": "29b292bdc58b76a6c8f294c961a8bf92c5a6ebd6" }
 }

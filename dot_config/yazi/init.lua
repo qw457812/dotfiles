@@ -1,3 +1,7 @@
+-- -- https://github.com/yazi-rs/plugins/tree/main/smart-enter.yazi
+-- require("smart-enter"):setup({
+--   open_multi = true,
+-- })
 -- https://yazi-rs.github.io/docs/dds/#session.lua
 require("session"):setup({
   sync_yanked = true,
