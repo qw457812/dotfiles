@@ -162,7 +162,7 @@ function M.apply_to_config(config)
 
   -- wezterm show-keys
   config.keys = {
-    -- To distinguish <C-I> and <Tab> in neovim
+    -- To distinguish <C-I> and <Tab> in neovim (note that mapping <M-i> to <C-i> in neovim is required)
     {
       mods = "CTRL",
       key = "i",

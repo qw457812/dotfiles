@@ -109,7 +109,7 @@ return {
         })
       end
 
-      -- see: `:h q:`
+      -- see `:h q:`
       vim.api.nvim_create_autocmd("CmdWinEnter", {
         group = augroup,
         callback = function(event)

@@ -81,7 +81,7 @@ return {
     "folke/which-key.nvim",
     optional = true,
     opts = {
-      preset = vim.g.user_is_termux and "helix" or "modern",
+      preset = "helix", -- vim.g.user_is_termux and "helix" or "modern"
     },
   },
 

@@ -3,7 +3,7 @@ if not vim.g.vscode or not LazyVim.has_extra("vscode") then
 end
 
 local vscode = require("vscode")
-local map = U.keymap
+local map = U.keymap.map
 
 -- vim.notify = vscode.notify
 -- vim.g.clipboard = vim.g.vscode_clipboard
