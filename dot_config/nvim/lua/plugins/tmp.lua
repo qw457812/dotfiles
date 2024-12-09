@@ -7,7 +7,10 @@ local obsidian_vaults = {
 return {
   {
     "yarospace/lua-console.nvim",
-    keys = { { "<leader>[" }, { "<leader>]" } },
+    keys = {
+      { "<leader>[", desc = "Toggle Lua console" },
+      { "<leader>]", desc = "Attach Lua console to buffer" },
+    },
     opts = {
       mappings = {
         toggle = "<leader>[",

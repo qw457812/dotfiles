@@ -43,7 +43,7 @@ config.window_background_image_hsb = {
 
 -- Fonts
 config.font = wezterm.font_with_fallback({
-  "JetBrainsMonoNL Nerd Font", -- "FiraCode Nerd Font"
+  "JetBrainsMono Nerd Font", -- "JetBrainsMonoNL Nerd Font", "FiraCode Nerd Font"
   -- Chinese
   "Sarasa Mono SC", -- "LXGW WenKai Mono"
 }) -- wezterm ls-fonts --list-system
