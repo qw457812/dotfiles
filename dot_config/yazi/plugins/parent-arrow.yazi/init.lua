@@ -1,14 +1,13 @@
--- https://yazi-rs.github.io/docs/tips#parent-arrow
--- Navigation in the parent directory without leaving the CWD
-local function entry(_, args)
+--- @sync entry
+local function entry(_, job)
   local parent = cx.active.parent
   if not parent then
     return
   end
 
-  local offset = tonumber(args[1])
+  local offset = tonumber(job.args[1])
   if not offset then
-    return ya.err(args[1], "is not a number")
+    return ya.err(job.args[1], "is not a number")
   end
 
   -- Skip files
@@ -23,4 +22,6 @@ local function entry(_, args)
   end
 end
 
+-- https://yazi-rs.github.io/docs/tips#parent-arrow
+-- Navigation in the parent directory without leaving the CWD
 return { entry = entry }

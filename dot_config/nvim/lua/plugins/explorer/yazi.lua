@@ -41,8 +41,16 @@ return {
       --   end,
       -- })
 
+      ---@type YaziConfig
       return {
         open_for_directories = vim.g.user_hijack_netrw == "yazi.nvim",
+        open_multiple_tabs = true,
+        keymaps = {
+          show_help = "~", -- use `g?` for yazi help
+        },
+        future_features = {
+          ya_emit_reveal = true,
+        },
       }
     end,
   },

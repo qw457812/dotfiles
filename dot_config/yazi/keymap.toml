@@ -1,33 +1,58 @@
-# https://github.com/sxyazi/yazi/blob/main/yazi-config/preset/keymap.toml
+# https://github.com/sxyazi/yazi/blob/shipped/yazi-config/preset/keymap-default.toml
 # https://yazi-rs.github.io/docs/configuration/keymap
 
 [manager]
 
 prepend_keymap = [
   # https://yazi-rs.github.io/docs/tips/#dropping-to-shell
-  # Dropping to the shell <C-s>
-  { on = "s", run = 'shell "$SHELL" --block --confirm', desc = "Open shell here" },
+  { on = "s", run = 'shell "$SHELL" --block', desc = "Open shell here" },
 
   # https://yazi-rs.github.io/docs/tips/#smart-enter
   # https://yazi-rs.github.io/docs/faq#why-separate-open-enter
-  { on = "l", run = "plugin --sync smart-enter", desc = "Enter the child directory, or open the file" },
+  { on = "l", run = "plugin smart-enter", desc = "Enter the child directory, or open the file" },
 
   # # https://yazi-rs.github.io/docs/tips#navigation-wraparound
-  # { on = "k", run = "plugin --sync arrow --args=-1", desc = "Move cursor up (wraparound)" },
-  # { on = "j", run = "plugin --sync arrow --args=1", desc = "Move cursor down (wraparound)" },
+  # { on = "k", run = "plugin arrow --args=-1", desc = "Move cursor up (wraparound)" },
+  # { on = "j", run = "plugin arrow --args=1", desc = "Move cursor down (wraparound)" },
 
   # # https://yazi-rs.github.io/docs/tips#parent-arrow
-  # { on = "K", run = "plugin --sync parent-arrow --args=-1", desc = "Navigation in the parent directory without leaving the CWD" },
-  # { on = "J", run = "plugin --sync parent-arrow --args=1", desc = "Navigation in the parent directory without leaving the CWD" },
+  # { on = "K", run = "plugin parent-arrow --args=-1", desc = "Navigation in the parent directory without leaving the CWD" },
+  # { on = "J", run = "plugin parent-arrow --args=1", desc = "Navigation in the parent directory without leaving the CWD" },
 
   { on = "<C-o>", run = "back", desc = "Go back to the previous directory" },
   { on = "<Tab>", run = "forward", desc = "Go forward to the next directory (<C-i>)" },
   { on = "<Left>", run = "back", desc = "Go back to the previous directory" },
   { on = "<Right>", run = "forward", desc = "Go forward to the next directory" },
 
+  # Spotting
+  { on = [
+    "g",
+    "k",
+  ], run = "spot", desc = "Spot hovered file" },
+
   # https://github.com/dedukun/bookmarks.yazi
+  # h: ~
+  # d: ~/Downloads
+  # c: ~/.local/share/chezmoi/dot_config
+  # C: ~/.config
+  # n: ~/.local/share/chezmoi/dot_config/nvim
+  # N: ~/.config/nvim
+  # l: ~/.local/share/nvim/lazy/LazyVim
+  # z: ~/.local/share/chezmoi
   { on = "m", run = "plugin bookmarks --args=save", desc = "Save current position as a bookmark" },
   { on = "'", run = "plugin bookmarks --args=jump", desc = "Jump to a bookmark" },
+  { on = [
+    "g",
+    "h",
+  ], run = "noop" },
+  { on = [
+    "g",
+    "c",
+  ], run = "noop" },
+  { on = [
+    "g",
+    "d",
+  ], run = "noop" },
 
   { on = "<Esc>", run = [
     "escape",
@@ -51,7 +76,7 @@ prepend_keymap = [
 
   # Selection
   { on = ",", run = [
-    "select --state=none",
+    "toggle",
     "arrow 1",
   ], desc = "Toggle the current selection state" },
 
@@ -59,22 +84,29 @@ prepend_keymap = [
   { on = [
     "<Space>",
     "<Space>",
-  ], run = "search fd", desc = "Search files by name using fd" },
+  ], run = "search --via=fd", desc = "Search files by name via fd" },
   # TODO: S
   { on = [
     "<Space>",
     "/",
-  ], run = "search rg", desc = "Search files by content using ripgrep" },
+  ], run = "search --via=rg", desc = "Search files by content via ripgrep" },
   { on = [
     "<Space>",
     "<Backspace>",
   ], run = "quit", desc = "Exit the process" },
-  # TODO: c
+  { on = [
+    "c",
+    "c",
+  ], run = "noop" },
   { on = [
     "<Space>",
     "f",
     "y",
   ], run = "copy path", desc = "Copy the file path" },
+  { on = [
+    "c",
+    "f",
+  ], run = "noop" },
   { on = [
     "<Space>",
     "f",
@@ -84,17 +116,17 @@ prepend_keymap = [
     "<Space>",
     "g",
     "g",
-  ], run = "shell lazygit --block --confirm", desc = "Lazygit" },
+  ], run = "shell lazygit --block", desc = "Lazygit" },
   { on = [
     "<Space>",
     "g",
     "f",
-  ], run = 'shell "lazygit -f \"$0\"" --block --confirm', desc = "Lazygit Current File History" },
+  ], run = 'shell "lazygit -f \"$0\"" --block', desc = "Lazygit Current File History" },
   { on = [
     "<Space>",
     "g",
     "l",
-  ], run = 'shell "lazygit log" --block --confirm', desc = "Lazygit Log" },
+  ], run = 'shell "lazygit log" --block', desc = "Lazygit Log" },
 ]
 
 append_keymap = [
@@ -102,16 +134,10 @@ append_keymap = [
   { on = "F", run = "plugin smart-filter", desc = "Smart filter" },
 
   # https://yazi-rs.github.io/docs/configuration/keymap#manager.shell
-  { on = "e", run = 'shell "${EDITOR:=vi} \"$@\"" --block --confirm', desc = "Edit the selected files use $EDITOR" },
-  { on = "E", run = 'shell "open -a /Applications/Emacs.app \"$@\"" --confirm', desc = "Edit the selected files use Emacs.app" },
+  { on = "e", run = 'shell "${EDITOR:=vi} \"$@\"" --block', desc = "Edit the selected files use $EDITOR" },
+  { on = "E", run = 'shell "open -a /Applications/Emacs.app \"$@\""', desc = "Edit the selected files use Emacs.app" },
 
   { on = "<Backspace>", run = "close", desc = "Close the current tab, or quit if it is last tab" },
-
-  # TODO: since we have bookmarks: gh gc gd
-  # { on = [
-  #   "g",
-  #   "z",
-  # ], run = "cd ~/.local/share/chezmoi", desc = "Go to the chezmoi source directory" },
 
   { on = [
     "g",
@@ -131,7 +157,7 @@ append_keymap = [
     "g",
     "r",
   ], run = '''
-      shell 'ya pub dds-cd --str "${NVIM_CWD:-$(git rev-parse --show-toplevel 2>/dev/null)}"' --confirm
+      shell 'ya emit cd "${NVIM_CWD:-$(git rev-parse --show-toplevel 2>/dev/null)}"'
     ''', desc = "Toggle the visibility of hidden files" },
 
   # https://github.com/dedukun/bookmarks.yazi
@@ -149,32 +175,32 @@ append_keymap = [
     "g",
     "m",
     "s",
-  ], run = "linemode size", desc = "Set linemode to size" },
+  ], run = "linemode size", desc = "Linemode: size" },
   { on = [
     "g",
     "m",
     "p",
-  ], run = "linemode permissions", desc = "Set linemode to permissions" },
+  ], run = "linemode permissions", desc = "Linemode: permissions" },
   { on = [
     "g",
     "m",
-    "c",
-  ], run = "linemode ctime", desc = "Set linemode to ctime" },
+    "b",
+  ], run = "linemode btime", desc = "Linemode: btime" },
   { on = [
     "g",
     "m",
     "m",
-  ], run = "linemode mtime", desc = "Set linemode to mtime" },
+  ], run = "linemode mtime", desc = "Linemode: mtime" },
   { on = [
     "g",
     "m",
     "o",
-  ], run = "linemode owner", desc = "Set linemode to owner" },
+  ], run = "linemode owner", desc = "Linemode: owner" },
   { on = [
     "g",
     "m",
     "n",
-  ], run = "linemode none", desc = "Set linemode to none" },
+  ], run = "linemode none", desc = "Linemode: none" },
 
   # Sorting
   { on = [
@@ -182,7 +208,7 @@ append_keymap = [
     "s",
     "m",
   ], run = [
-    "sort modified --reverse=no",
+    "sort mtime --reverse=no",
     "linemode mtime",
   ], desc = "Sort by modified time" },
   { on = [
@@ -190,25 +216,25 @@ append_keymap = [
     "s",
     "M",
   ], run = [
-    "sort modified --reverse",
+    "sort mtime --reverse",
     "linemode mtime",
   ], desc = "Sort by modified time (reverse)" },
   { on = [
     "g",
     "s",
-    "c",
+    "b",
   ], run = [
-    "sort created --reverse=no",
-    "linemode ctime",
-  ], desc = "Sort by created time" },
+    "sort btime --reverse=no",
+    "linemode btime",
+  ], desc = "Sort by birth time" },
   { on = [
     "g",
     "s",
-    "C",
+    "B",
   ], run = [
-    "sort created --reverse",
-    "linemode ctime",
-  ], desc = "Sort by created time (reverse)" },
+    "sort btime --reverse",
+    "linemode btime",
+  ], desc = "Sort by birth time (reverse)" },
   { on = [
     "g",
     "s",
@@ -264,18 +290,53 @@ append_keymap = [
 
 [tasks]
 
-append_keymap = [{ on = ["g", "?"], run = "help", desc = "Open help" }]
+append_keymap = [
+  { on = "<Backspace>", run = "close", desc = "Close task manager" },
 
-[select]
+  { on = [
+    "g",
+    "?",
+  ], run = "help", desc = "Open help" },
+]
 
-append_keymap = [{ on = ["g", "?"], run = "help", desc = "Open help" }]
+[spot]
+
+prepend_keymap = [
+  # Copy
+  { on = ["c", "c"], run = "noop" },
+  { on = ["y", "y"], run = "copy cell", desc = "Copy selected cell" },
+]
+
+append_keymap = [
+  { on = "<Backspace>", run = "close", desc = "Close the spot" },
+  { on = [
+    "g",
+    "k",
+  ], run = "close", desc = "Close the spot" },
+
+  { on = [
+    "g",
+    "?",
+  ], run = "help", desc = "Open help" },
+]
+
+[pick]
+
+append_keymap = [
+  { on = "<Backspace>", run = "close", desc = "Cancel pick" },
+
+  { on = [
+    "g",
+    "?",
+  ], run = "help", desc = "Open help" },
+]
 
 [input]
 
 prepend_keymap = [
   # # https://yazi-rs.github.io/docs/tips/#close-input-by-esc
   # # Close input by once `Esc` press (without entering Vi mode)
-  # { on = "<Esc>", run = 'close', desc = "Cancel input" },
+  # { on = "<Esc>", run = "close", desc = "Cancel input" },
 ]
 
 append_keymap = [
@@ -288,6 +349,17 @@ append_keymap = [
   { on = "U", run = "redo", desc = "Redo the last operation" },
 ]
 
+[confirm]
+
+append_keymap = [
+  { on = "<Backspace>", run = "close", desc = "Cancel the confirm" },
+
+  { on = [
+    "g",
+    "?",
+  ], run = "help", desc = "Open help" },
+]
+
 [completion]
 
 append_keymap = [{ on = ["g", "?"], run = "help", desc = "Open help" }]
@@ -295,5 +367,14 @@ append_keymap = [{ on = ["g", "?"], run = "help", desc = "Open help" }]
 [help]
 
 append_keymap = [
-  { on = "<Backspace>", run = "close", desc = "Exit the process" },
+  { on = "<Backspace>", run = "close", desc = "Hide the help" },
+  { on = "~", run = "close", desc = "Hide the help" },
+  { on = ["g", "?"], run = "close", desc = "Hide the help" },
+
+  # Navigation
+  { on = ["g", "g"], run = "arrow -99999999", desc = "Move cursor to the top" },
+  { on = "G", run = "arrow 99999999", desc = "Move cursor to the bottom" },
+
+  # Filtering
+  { on = "/", run = "filter", desc = "Apply a filter for the help items" },
 ]
