@@ -98,6 +98,9 @@ if not LazyVim.has("nvim-hlslens") then
   del("n", { "n", "N" })
 end
 del({ "x", "o" }, { "n", "N" })
+-- safe_map({ "n", "x" }, "gw", "*``", { desc = "Search word under cursor" }) -- nvim-hlslens
+map("n", "cn", "*``cgn", { desc = "Change cword (Search forward)" })
+map("n", "cN", "*``cgN", { desc = "Change cword (Search backward)" })
 
 if vim.g.user_is_wezterm then
   -- To distinguish <C-I> and <Tab>, you could map another key, say <M-I>, to <C-I> in neovim,
@@ -189,8 +192,8 @@ map("n", "gp", function() vim.api.nvim_feedkeys("`[" .. vim.fn.strpart(vim.fn.ge
 -- use `silent = false` for it to make effect immediately
 map("x", "g/", "<esc>/\\%V", { silent = false, desc = "Search inside visual selection" })
 
-map("n", "g/", cmdwin("/"), { desc = "command-line window (forward search)" })
-map("n", "g?", cmdwin("?"), { desc = "command-line window (backward search)" })
+map("n", "g/", cmdwin("/"), { desc = "command-line window (Search forward)" })
+map("n", "g?", cmdwin("?"), { desc = "command-line window (Search backward)" })
 map({ "n", "x" }, "g:", cmdwin(":"), { desc = "command-line window (Ex command)" })
 
 map("n", "g.", "@:", { desc = "Repeat last command-line" })

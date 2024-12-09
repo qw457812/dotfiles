@@ -80,6 +80,11 @@ return {
         toggle = {
           debug = "<leader>aD",
         },
+        sidebar = {
+          -- disable since <tab> is mapped to <C-w>w
+          switch_windows = "<A-Down>",
+          reverse_switch_windows = "<A-Up>",
+        },
       },
       behaviour = {
         -- auto_suggestions = true, -- experimental

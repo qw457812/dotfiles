@@ -326,6 +326,7 @@ return {
         { "#", mode = { "n", "x" }, [[<Plug>(asterisk-#)zv<Cmd>lua require('hlslens').start()<CR>]] },
         { "g*", mode = { "n", "x" }, [[<Plug>(asterisk-g*)zv<Cmd>lua require('hlslens').start()<CR>]] },
         { "g#", mode = { "n", "x" }, [[<Plug>(asterisk-g#)zv<Cmd>lua require('hlslens').start()<CR>]] },
+        { "gw", mode = { "n", "x" }, [[<Plug>(asterisk-z*)<Cmd>lua require('hlslens').start()<CR>]], desc = "Search word under cursor" },
       }
     end,
     opts = {
@@ -406,6 +407,8 @@ return {
             -- { find = "^[/?].*" }, -- search up/down when pattern not found
             -- { find = "^E486: Pattern not found:" }, -- search pattern not found
             { find = "^%s*W? %[%d+/%d+%]$" }, -- search count by */#/g*/g# in both normal and visual mode
+            { find = [[^\<.+\>$]] }, -- <Plug>(asterisk-z*)
+            { find = [[^\V.+]] }, -- <Plug>(asterisk-z*)
           },
         },
         -- opts = { skip = true },
