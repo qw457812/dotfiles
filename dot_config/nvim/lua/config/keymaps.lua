@@ -53,14 +53,6 @@ end
 -- })
 
 -- basics
-if vim.g.user_is_wezterm then
-  -- To distinguish <C-I> and <Tab>, you could map another key, say <M-I>, to <C-I> in neovim,
-  -- and then map ctrl+i to send <M-I> key sequence in your terminal setting.
-  -- See: `:h tui-input`
-  map({ "n", "i", "c", "v", "o", "t" }, "<M-i>", "<C-i>", { desc = "<C-i>" })
-  map("n", "<tab>", "<c-w>w", { desc = "Switch to Other Window", remap = true })
-end
-
 -- map({ "n", "x" }, "h", "col('.') == 1 && foldlevel(line('.')) > 0 ? 'za' : 'h'", { expr = true })
 -- map("n", "h", "col('.') == 1 && foldlevel(line('.')) > 0 ? 'zc' : 'h'", { expr = true })
 -- map("x", "h", "col('.') == 1 && foldlevel(line('.')) > 0 ? 'zcgv' : 'h'", { expr = true })
@@ -102,15 +94,25 @@ map("n", "dd", function() return is_empty_line() and '"_dd' or "dd" end, { expr 
 map("n", "i",  function() return is_empty_line() and '"_cc' or "i" end,  { expr = true, desc = "Indented i on Empty Line" })
 -- stylua: ignore end
 
--- Better block-wise operations on selected area
-map("x", "I", blockwise_force("I"), { expr = true, desc = "Blockwise Insert" })
-map("x", "gI", blockwise_force("gI"), { expr = true, desc = "Blockwise Insert" })
-map("x", "A", blockwise_force("A"), { expr = true, desc = "Blockwise Append" })
-
 if not LazyVim.has("nvim-hlslens") then
   del("n", { "n", "N" })
 end
 del({ "x", "o" }, { "n", "N" })
+
+if vim.g.user_is_wezterm then
+  -- To distinguish <C-I> and <Tab>, you could map another key, say <M-I>, to <C-I> in neovim,
+  -- and then map CTRL-i to send <M-I> key sequence in your terminal setting.
+  -- See `:h tui-input`
+  map({ "n", "i", "c", "v", "o", "t" }, "<M-i>", "<C-i>", { desc = "<C-i>" })
+  -- options: "<C-w>w", "za", ">>"
+  map("n", "<tab>", "<C-w>w", { desc = "Next Window", remap = true })
+  map("n", "<S-tab>", "<C-w>W", { desc = "Prev Window", remap = true })
+end
+
+-- Better block-wise operations on selected area
+map("x", "I", blockwise_force("I"), { expr = true, desc = "Blockwise Insert" })
+map("x", "gI", blockwise_force("gI"), { expr = true, desc = "Blockwise Insert" })
+map("x", "A", blockwise_force("A"), { expr = true, desc = "Blockwise Append" })
 
 -- buffers
 -- ":e #" doesn't work if the alternate buffer doesn't have a file name, while CTRL-^ still works then
@@ -120,7 +122,11 @@ safe_map("n", "<leader>ba", "<cmd>bufdo bd<cr>", { desc = "Delete All Buffers" }
 map("n", "<leader>bA", function() Snacks.bufdelete.all() end, { desc = "Delete All Buffers" })
 
 -- windows
-map("n", "<leader>_", "<C-W>v", { desc = "Split Window Right", remap = true })
+map("n", "vv", "<C-w>v", { desc = "Split Window Right", remap = true })
+-- map("n", "vs", "<C-w>s", { desc = "Split Window Below", remap = true }) -- conflict with flash.nvim
+-- map("n", "vd", "<C-w>c", { desc = "Delete Window", remap = true })
+-- map("n", "vo", "<C-w>o", { desc = "Delete Other Windows", remap = true })
+map("n", "<leader>_", "<C-w>v", { desc = "Split Window Right", remap = true })
 
 -- tabs
 del("n", { "<leader><tab>f", "<leader><tab>l", "<leader><tab>]", "<leader><tab>[" })

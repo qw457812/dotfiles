@@ -7,20 +7,19 @@ local obsidian_vaults = {
 return {
   {
     "yarospace/lua-console.nvim",
-    keys = {
-      { "<leader>[", desc = "Lua Console" },
-    },
+    keys = { { "<leader>[" }, { "<leader>]" } },
     opts = {
-      window = {
-        border = "rounded",
-      },
       mappings = {
         toggle = "<leader>[",
+        attach = "<leader>]",
         clear = "<localleader>c",
         messages = "<localleader>m",
         save = "<C-s>",
         load = "<leader>fr",
         help = "g?",
+      },
+      window = {
+        border = "rounded",
       },
     },
   },
