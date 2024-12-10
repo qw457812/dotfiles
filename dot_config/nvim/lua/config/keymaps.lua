@@ -139,8 +139,15 @@ map("n", "]<tab>", "<cmd>tabnext<cr>", { desc = "Next Tab" })
 map("n", "[<tab>", "<cmd>tabprevious<cr>", { desc = "Previous Tab" })
 
 -- terminal
--- stylua: ignore
-map("n", "<c-space>", function() Snacks.terminal(nil, { cwd = vim.fn.expand("%:p:h") }) end, { desc = "Terminal (Buffer Dir)" })
+-- stylua: ignore start
+safe_map("n", "<leader>fT", function() U.terminal() end, { desc = "Terminal (cwd)" })
+safe_map("n", { "<leader>ft", "<c-/>" }, function() U.terminal(nil, { cwd = LazyVim.root() }) end, { desc = "Terminal (Root Dir)" })
+safe_map("n", "<c-_>", function() U.terminal(nil, { cwd = LazyVim.root() }) end, { desc = "which_key_ignore" })
+-- stylua: ignore end
+map("n", "<c-space>", function()
+  local filepath = vim.fn.expand("%:p:h")
+  U.terminal(nil, { cwd = vim.fn.isdirectory(filepath) == 1 and filepath or LazyVim.root() })
+end, { desc = "Terminal (Buffer Dir)" })
 map("t", "<c-space>", "<cmd>close<cr>", { desc = "Hide Terminal" })
 
 -- files
