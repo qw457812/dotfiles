@@ -25,6 +25,13 @@ return {
       local menu_utils = require("dropbar.utils.menu")
       local dropbar_default_opts = require("dropbar.configs").opts
 
+      local function truncate_string(str, max_length)
+        if #str <= max_length then
+          return str
+        end
+        return str:sub(1, max_length - 1) .. "…"
+      end
+
       -- custom highlight
       Snacks.util.set_hl({
         DropBarFileName = { fg = Snacks.util.color("DropBarKindFile"), bold = true },
@@ -101,6 +108,11 @@ return {
             symbol_ellipsis.name = "…"
             symbol_ellipsis.icon = ""
             symbols = { symbols[1], symbol_ellipsis, unpack(symbols, #symbols - max_symbols + 2, #symbols) }
+          end
+
+          local max_symbol_len = vim.g.user_is_termux and 10 or 20
+          for i = 2, #symbols - 1 do
+            symbols[i].name = truncate_string(symbols[i].name, max_symbol_len)
           end
 
           return symbols
