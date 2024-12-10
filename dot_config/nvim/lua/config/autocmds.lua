@@ -216,6 +216,25 @@ if vim.g.user_auto_root and not vim.o.autochdir then
   })
 end
 
+if vim.o.shell:find("zsh") then
+  -- work-around for zsh-vi-mode auto insert
+  vim.api.nvim_create_autocmd("TermEnter", {
+    group = vim.api.nvim_create_augroup("zsh_vi_mode", {}),
+    pattern = "term://*" .. vim.o.shell,
+    desc = "Enter zsh-vi-mode's insert mode",
+    callback = function(event)
+      if vim.bo[event.buf].filetype ~= "snacks_terminal" then
+        return
+      end
+      vim.schedule(function()
+        if vim.api.nvim_get_current_line() == "❮ " then
+          vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("i", true, true, true), "n", false)
+        end
+      end)
+    end,
+  })
+end
+
 -- -- colorcolumn
 -- vim.api.nvim_create_autocmd("FileType", {
 --   pattern = { "markdown" },
