@@ -535,6 +535,9 @@ alias rm='rm -i'
 alias cp='cp -i'
 alias mv='mv -i'
 
+# https://github.com/folke/dot/blob/48a708fa10ff0a15a84483483c039cc2791c0e3b/config/fish/config.fish#L94
+alias vimpager='nvim - -c "lua U.terminal.colorize()"'
+
 # # some letters are missing colors
 # export DELTA_PAGER='nvim - -c "lua U.terminal.colorize()"'
 

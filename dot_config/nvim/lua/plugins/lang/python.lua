@@ -144,7 +144,9 @@ return {
     opts = function()
       if lsp == "basedpyright" then
         LazyVim.lsp.on_attach(function()
-          Snacks.toggle.diagnostics():set(true)
+          vim.schedule(function()
+            Snacks.toggle.diagnostics():set(true)
+          end)
           ---@diagnostic disable-next-line: redundant-return-value
           return true -- don't mess up toggle
         end, lsp)

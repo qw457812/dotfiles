@@ -19,10 +19,10 @@ return {
         up_arrow = "  ",
       },
       options = {
-        virt_texts = { priority = 5000 }, -- symbol-usage.nvim
+        virt_texts = { priority = 5000 }, -- set higher than symbol-usage.nvim
+        use_icons_from_diagnostic = true,
         -- multilines = true, -- not just current line
         -- show_source = true,
-        -- use_icons_from_diagnostic = true,
       },
     },
     config = function(_, opts)

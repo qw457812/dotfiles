@@ -94,6 +94,21 @@ M.action = {
 
     window:perform_action(action, pane)
   end),
+
+  close_copy_mode = wezterm.action_callback(function(window, pane)
+    wezterm.GLOBAL.tmux_search_directions[tostring(pane)] = nil
+    window:perform_action(
+      act.Multiple({
+        act.ClearSelection,
+        act.CopyMode("ClearSelectionMode"),
+        act.CopyMode("ClearPattern"),
+        act.CopyMode("AcceptPattern"),
+        act.CopyMode("Close"),
+        act.ScrollToBottom,
+      }),
+      pane
+    )
+  end),
 }
 
 -- https://github.com/mrjones2014/smart-splits.nvim#wezterm
@@ -295,24 +310,8 @@ function M.apply_to_config(config)
         end),
       },
       -- leave copy mode on `i` (insert)
-      {
-        mods = "NONE",
-        key = "i",
-        action = wezterm.action_callback(function(window, pane)
-          wezterm.GLOBAL.tmux_search_directions[tostring(pane)] = nil
-          window:perform_action(
-            act.Multiple({
-              act.ClearSelection,
-              act.CopyMode("ClearSelectionMode"),
-              act.CopyMode("ClearPattern"),
-              act.CopyMode("AcceptPattern"),
-              act.CopyMode("Close"),
-              act.ScrollToBottom,
-            }),
-            pane
-          )
-        end),
-      },
+      { mods = "NONE", key = "i", action = M.action.close_copy_mode },
+      { mods = "NONE", key = "Backspace", action = M.action.close_copy_mode },
       { mods = "NONE", key = "/", action = wez_tmux.action.SearchForward },
       { mods = "NONE", key = "?", action = wez_tmux.action.SearchBackward },
       { mods = "NONE", key = "n", action = wez_tmux.action.NextMatch },

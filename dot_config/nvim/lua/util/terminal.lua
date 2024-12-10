@@ -1,5 +1,21 @@
 ---@class util.terminal
-local M = {}
+---@overload fun(cmd?: string|string[], opts?: snacks.terminal.Opts): snacks.terminal
+local M = setmetatable({}, {
+  __call = function(t, ...)
+    return t.toggle(...)
+  end,
+})
+
+---@param cmd? string | string[]
+---@param opts? snacks.terminal.Opts
+function M.toggle(cmd, opts)
+  if vim.bo.filetype == "snacks_terminal" then
+    vim.cmd("close")
+    return
+  end
+
+  Snacks.terminal(cmd, opts)
+end
 
 --- pager
 function M.colorize()
