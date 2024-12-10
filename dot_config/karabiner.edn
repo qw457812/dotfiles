@@ -287,7 +287,8 @@
            [:grave_accent_and_tilde :left_shift :glove80] ; see "For Glove80" below
            ;; 左右互击
            [:delete_or_backspace :!!spacebar :glove80] ; raycast
-           [:left_shift :delete_forward :glove80] ; delete_forward, see "For Glove80" below
+           ;; [:left_shift :delete_forward :glove80] ; delete_forward, see "For Glove80" below
+           [:left_shift :!Sdelete_or_backspace :glove80] ; see "For Glove80" below
            [:delete_forward :!Stab :glove80]
            ]}
 

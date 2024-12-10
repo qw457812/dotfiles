@@ -3,6 +3,8 @@ local close_key = vim.g.user_close_key or "<bs>" -- easy to reach for Glove80
 local is_bs = close_key:lower() == "<bs>"
 -- exit nvim
 local exit_key = vim.g.user_exit_key or ("<leader>" .. close_key) -- would overwrite "go up one level" of which-key, use `<S-bs>` if needed
+-- close terminals
+local term_close_key = vim.g.user_term_close_key or "<S-bs>"
 
 -- do not use `clear = true` at the top-level, it will be triggered by lazy.nvim on `Config Change Detected. Reloading...`
 local augroup = vim.api.nvim_create_augroup("close_with_" .. close_key, { clear = false })
@@ -61,6 +63,7 @@ return {
       { close_key, close_buffer_or_window_or_exit, desc = "Close buffer/window or Exit" },
       { close_key, mode = "x", "<esc>", desc = "Stop Visual Mode" },
       { exit_key, "<cmd>qa<cr>", desc = "Quit All" },
+      { term_close_key, mode = "t", "<cmd>bd!<cr>", desc = "Close terminal" }, -- <cmd>close<cr>
     },
     opts = function()
       if is_bs then
@@ -209,6 +212,14 @@ return {
                 })
               end,
               desc = "Clear UI or Close",
+            },
+            term_close = {
+              term_close_key,
+              function(self)
+                self:hide()
+              end,
+              mode = "t",
+              desc = "Close",
             },
           },
         },
