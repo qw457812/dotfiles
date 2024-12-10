@@ -2,6 +2,7 @@
 ---@field color util.color
 ---@field explorer util.explorer
 ---@field keymap util.keymap
+---@field markdown util.markdown
 ---@field path util.path
 ---@field telescope util.telescope
 ---@field terminal util.terminal

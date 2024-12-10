@@ -8,7 +8,7 @@ return {
       "stevearc/dressing.nvim",
       "MunifTanjim/nui.nvim",
       "zbirenbaum/copilot.lua", -- for `provider = "copilot"`
-      { "hrsh7th/nvim-cmp", optional = true },
+      { "nvim-cmp", optional = true },
       { "echasnovski/mini.icons", optional = true },
       {
         "HakonHarnes/img-clip.nvim", -- support for image pasting
@@ -37,16 +37,7 @@ return {
       {
         "MeanderingProgrammer/render-markdown.nvim",
         optional = true,
-        ft = (function()
-          local plugin = LazyVim.get_plugin("render-markdown.nvim")
-          -- :=require("render-markdown").default_config.file_types
-          -- local ft = plugin and require("lazy.core.plugin").values(plugin, "ft", false) or { "markdown" }
-          local ft = plugin and plugin.ft or { "markdown" }
-          ft = type(ft) == "table" and ft or { ft }
-          ft = vim.deepcopy(ft)
-          table.insert(ft, "Avante")
-          return ft
-        end)(),
+        ft = U.markdown.render_markdown_ft("Avante"),
       },
     },
     -- https://github.com/yetone/avante.nvim/wiki#keymaps-and-api-i-guess

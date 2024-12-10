@@ -121,6 +121,7 @@ return {
   {
     "xvzc/chezmoi.nvim",
     optional = true,
+    event = "LazyFile", -- for augroup: chezmoi_add
     keys = {
       { "<leader>sz", false },
       { "<leader>f.", pick_chezmoi, desc = "Find Chezmoi Source Dotfiles" },
@@ -139,7 +140,8 @@ return {
           end)
         end,
       })
-
+    end,
+    opts = function()
       -- https://github.com/dsully/nvim/blob/a6a7a29707e5209c6bf14be0f178d3cd1141b5ff/lua/plugins/util.lua#L104
       -- https://github.com/amuuname/dotfiles/blob/462579dbf4e9452a22cc268a3cb244172d9142aa/dot_config/nvim/plugin/autocmd.lua#L52
       vim.schedule(function()
@@ -175,7 +177,16 @@ return {
     "nvim-telescope/telescope.nvim",
     optional = true,
     keys = { { "<leader>fc", false } },
+  },
+
+  {
+    "nvim-telescope/telescope.nvim",
+    optional = true,
     opts = function(_, opts)
+      if not LazyVim.has("telescope-lazy-plugins.nvim") then
+        return
+      end
+
       local function chezmoi_edit(prompt_bufnr)
         local lp_actions = require("telescope._extensions.lazy_plugins.actions")
         lp_actions.custom_action(prompt_bufnr, "filepath", function(bufnr, entry)
@@ -192,7 +203,6 @@ return {
       end
 
       opts.extensions = vim.tbl_deep_extend("force", opts.extensions or {}, {
-        -- polirritmico/telescope-lazy-plugins.nvim
         lazy_plugins = {
           mappings = {
             ["i"] = { ["<cr>"] = chezmoi_edit },
@@ -208,7 +218,7 @@ return {
     optional = true,
     opts = function(_, opts)
       -- replace lazyvim config action
-      local config_idx = 6
+      local config_idx
       for i, button in ipairs(opts.config.center) do
         if button.key == "c" then
           config_idx = i
@@ -218,15 +228,9 @@ return {
       end
 
       -- add chezmoi button
-      local chezmoi = {
-        action = pick_chezmoi,
-        desc = " Chezmoi",
-        icon = "󰠦 ",
-        key = ".",
-      }
+      local chezmoi = { action = pick_chezmoi, desc = " Chezmoi", icon = "󰠦 ", key = ".", key_format = "  %s" }
       chezmoi.desc = chezmoi.desc .. string.rep(" ", 43 - #chezmoi.desc)
-      chezmoi.key_format = "  %s"
-      table.insert(opts.config.center, config_idx + 1, chezmoi)
+      table.insert(opts.config.center, (config_idx or #opts.config.center) + 1, chezmoi)
     end,
   },
 
@@ -234,9 +238,11 @@ return {
     "folke/snacks.nvim",
     optional = true,
     opts = function(_, opts)
+      local keys = opts.dashboard.preset.keys
+
       -- replace lazyvim config action
-      local config_idx = 6
-      for i, key in ipairs(opts.dashboard.preset.keys) do
+      local config_idx
+      for i, key in ipairs(keys) do
         if key.key == "c" then
           config_idx = i
           key.action = pick_config
@@ -245,12 +251,11 @@ return {
       end
 
       -- add chezmoi
-      table.insert(opts.dashboard.preset.keys, config_idx + 1, {
-        action = pick_chezmoi,
-        desc = "Chezmoi",
-        icon = "󰠦 ",
-        key = ".",
-      })
+      table.insert(
+        keys,
+        (config_idx or #keys) + 1,
+        { action = pick_chezmoi, desc = "Chezmoi", icon = "󰠦 ", key = "." }
+      )
     end,
   },
 

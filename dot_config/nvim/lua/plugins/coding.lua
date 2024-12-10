@@ -17,7 +17,7 @@ return {
   -- https://www.lazyvim.org/configuration/recipes#supertab
   -- use <tab> for completion and snippets (supertab)
   {
-    "hrsh7th/nvim-cmp",
+    "nvim-cmp",
     optional = true,
     ---@param opts cmp.ConfigSchema
     opts = function(_, opts)
@@ -51,19 +51,6 @@ return {
         end, { "i", "s" }),
       })
     end,
-  },
-  -- nvim-cmp fork
-  {
-    "iguanacucumber/magazine.nvim",
-    name = "nvim-cmp",
-    optional = true,
-    dependencies = {
-      { "iguanacucumber/mag-nvim-lsp", name = "cmp-nvim-lsp", opts = {} },
-      { "iguanacucumber/mag-nvim-lua", name = "cmp-nvim-lua" },
-      { "iguanacucumber/mag-buffer", name = "cmp-buffer" },
-      { "iguanacucumber/mag-cmdline", name = "cmp-cmdline" },
-      { "https://codeberg.org/FelipeLema/cmp-async-path", name = "cmp-path" },
-    },
   },
 
   {

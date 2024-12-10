@@ -196,6 +196,7 @@ return {
   --   },
   -- },
 
+  -- https://github.com/MeanderingProgrammer/dotfiles/blob/3f48b647453dff09b9c9d39bead797082b445175/.config/nvim/lua/mp/plugins/lang/python.lua#L23
   {
     "MeanderingProgrammer/py-requirements.nvim",
     cond = false, -- TODO: bad performance
@@ -208,7 +209,7 @@ return {
         end,
       },
       {
-        "hrsh7th/nvim-cmp",
+        "nvim-cmp",
         optional = true,
         opts = function(_, opts)
           table.insert(opts.sources, { name = "py-requirements" })

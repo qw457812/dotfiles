@@ -55,6 +55,7 @@ return {
       return U.extend_tbl(opts, {
         -- https://github.com/eclipse-jdtls/eclipse.jdt.ls/wiki/Running-the-JAVA-LS-server-from-the-command-line#initialize-request
         -- https://github.com/doctorfree/nvim-lazyman/blob/bbecf74deb10a0483742196b23b91858f823f632/ftplugin/java.lua#L84
+        -- https://github.com/MeanderingProgrammer/dotfiles/blob/main/.config/nvim/lua/mp/plugins/lang/java.lua
         settings = {
           java = {
             configuration = {
