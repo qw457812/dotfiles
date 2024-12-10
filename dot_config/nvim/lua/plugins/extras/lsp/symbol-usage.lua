@@ -48,7 +48,7 @@ return {
         SymbolUsageRef = { fg = Snacks.util.color("Function"), italic = true },
         SymbolUsageDef = { fg = Snacks.util.color("Type"), italic = true },
         SymbolUsageImpl = { fg = Snacks.util.color("@keyword"), italic = true },
-      }, { default = false })
+      })
 
       return {
         vt_position = "end_of_line",

@@ -195,7 +195,7 @@ return {
             end
 
             -- find all URLs in buffer
-            local urlPattern = "%l%l%l-://[^%s)]+"
+            local urlPattern = [=[%l%l%l-://[^%s)"'`]+]=] -- excludes: )"'` and whitespace
             local bufText = table.concat(vim.api.nvim_buf_get_lines(0, 0, -1, false), "\n")
             local urls = {}
             for url in bufText:gmatch(urlPattern) do

@@ -150,7 +150,7 @@ function M.clear_ui_esc(opts)
     vim.cmd("diffupdate")
   end
   -- vim.cmd("syntax sync fromstart")
-  vim.cmd("normal! <C-L>") -- vim.cmd.redraw({ bang = true })
+  Snacks.util.redraw(vim.api.nvim_get_current_win()) -- vim.cmd("normal! <C-L>") -- vim.cmd.redraw({ bang = true })
   if opts.esc then
     vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<esc>", true, true, true), "n", false)
   end

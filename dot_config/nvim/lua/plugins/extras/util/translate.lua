@@ -87,7 +87,7 @@ return {
 
       -- fix: on colorscheme change
       local highlights = Trans.style.theme[opts.theme or "default"]
-      Snacks.util.set_hl(highlights, { default = false })
+      Snacks.util.set_hl(highlights)
 
       local node = Trans.util.node
       ---@diagnostic disable-next-line: undefined-field
@@ -133,7 +133,7 @@ return {
     opts = function(_, opts)
       local actions = require("pantran.ui.actions")
 
-      Snacks.util.set_hl({ PantranBorder = "FloatBorder" }, { default = false })
+      Snacks.util.set_hl({ PantranBorder = "FloatBorder" })
 
       return U.extend_tbl(opts, {
         -- command = {

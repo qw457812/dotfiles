@@ -3,7 +3,6 @@
 -- Add any additional keymaps here
 
 local Lazy = require("lazy")
-local LazyUtil = require("lazy.util")
 local LazyViewConfig = require("lazy.view.config")
 
 local map = U.keymap.map
@@ -230,11 +229,11 @@ del("n", "<leader>L")
 -- stylua: ignore start
 map("n", "<leader>lL", function() LazyVim.news.changelog() end, { desc = "LazyVim Changelog" })
 map("n", "<leader>lN", function() LazyVim.news.lazyvim() end, { desc = "LazyVim News" })
--- alternative: vim.ui.open("https://lazyvim.org")
-map("n", "<leader>ld", function() LazyUtil.open("https://lazyvim.org") end, { desc = "LazyVim Docs" })
-map("n", "<leader>lD", function() LazyUtil.open("https://lazy.folke.io") end, { desc = "lazy.nvim Docs" })
-map("n", "<leader>lr", function() LazyUtil.open("https://github.com/LazyVim/LazyVim") end, { desc = "LazyVim Repo" })
-map("n", "<leader>lR", function() LazyUtil.open("https://github.com/folke/lazy.nvim") end, { desc = "lazy.nvim Repo" })
+-- alternative: require("lazy.util").open("https://lazyvim.org")
+map("n", "<leader>ld", function() vim.ui.open("https://lazyvim.org") end, { desc = "LazyVim Docs" })
+map("n", "<leader>lD", function() vim.ui.open("https://lazy.folke.io") end, { desc = "lazy.nvim Docs" })
+map("n", "<leader>lr", function() vim.ui.open("https://github.com/LazyVim/LazyVim") end, { desc = "LazyVim Repo" })
+map("n", "<leader>lR", function() vim.ui.open("https://github.com/folke/lazy.nvim") end, { desc = "lazy.nvim Repo" })
 -- stylua: ignore end
 
 local function lint_info()
