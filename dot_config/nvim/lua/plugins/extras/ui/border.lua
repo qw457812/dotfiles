@@ -13,7 +13,7 @@ return {
   },
 
   {
-    "hrsh7th/nvim-cmp",
+    "nvim-cmp",
     optional = true,
     ---@param opts cmp.ConfigSchema
     opts = function(_, opts)

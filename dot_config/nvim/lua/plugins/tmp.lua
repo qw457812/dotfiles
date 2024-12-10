@@ -186,8 +186,8 @@ return {
   --   "liubianshi/cmp-lsp-rimels",
   --   dependencies = {
   --     "neovim/nvim-lspconfig",
-  --     "hrsh7th/nvim-cmp",
-  --     "hrsh7th/cmp-nvim-lsp",
+  --     "nvim-cmp",
+  --     "cmp-nvim-lsp",
   --   },
   --   keys = { { "<localleader>f", mode = "i" } },
   --   config = function()

@@ -2,12 +2,14 @@ if not LazyVim.has_extra("lang.markdown") then
   return {}
 end
 
-local show_image = false
+local show_image = false -- bad performance
 
 return {
+  -- https://github.com/MeanderingProgrammer/dotfiles/blob/845016440183396f4f6d524cdd001828dbbdecba/.config/nvim/lua/mp/plugins/lang/markdown.lua#L47
   {
     "MeanderingProgrammer/render-markdown.nvim",
     optional = true,
+    ft = U.markdown.render_markdown_ft("gitcommit"),
     opts = {
       -- win_options = {
       --   -- toggling this plugin should also toggle conceallevel
@@ -19,6 +21,13 @@ return {
         border = vim.g.user_transparent_background and "none" or nil,
       },
     },
+  },
+  {
+    "nvim-cmp",
+    optional = true,
+    opts = function(_, opts)
+      table.insert(opts.sources, { name = "render-markdown" })
+    end,
   },
 
   {

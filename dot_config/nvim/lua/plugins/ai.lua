@@ -47,14 +47,7 @@ return {
       {
         "MeanderingProgrammer/render-markdown.nvim",
         optional = true,
-        ft = (function()
-          local plugin = LazyVim.get_plugin("render-markdown.nvim")
-          local ft = plugin and plugin.ft or { "markdown" }
-          ft = type(ft) == "table" and ft or { ft }
-          ft = vim.deepcopy(ft)
-          table.insert(ft, "copilot-chat")
-          return ft
-        end)(),
+        ft = U.markdown.render_markdown_ft("copilot-chat"),
       },
     },
     opts = {
