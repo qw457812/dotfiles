@@ -10,8 +10,8 @@ return {
     "zbirenbaum/copilot.lua",
     optional = true,
     opts = function()
-      Snacks.toggle({
-        name = "Copilot Completion",
+      U.toggle.ai_cmps.copilot = Snacks.toggle({
+        name = "Copilot",
         get = function()
           return not require("copilot.client").is_disabled()
         end,
@@ -22,7 +22,35 @@ return {
             require("copilot.command").disable()
           end
         end,
-      }):map("<leader>uA")
+      })
+    end,
+  },
+
+  {
+    "Exafunction/codeium.nvim",
+    optional = true,
+    opts = function()
+      local Source = require("codeium.source")
+
+      U.toggle.ai_cmps.codeium = Snacks.toggle({
+        name = "Codeium",
+        get = function()
+          return not vim.g.user_codeium_disable
+        end,
+        set = function(state)
+          vim.g.user_codeium_disable = not state
+        end,
+      })
+
+      -- local orig_is_available = Source.is_available
+      -- ---@diagnostic disable-next-line: duplicate-set-field
+      -- function Source:is_available()
+      --   return not vim.g.user_codeium_disable and orig_is_available(self)
+      -- end
+      -- HACK: toggle, see: https://github.com/Exafunction/codeium.nvim/issues/136#issuecomment-2127891793
+      Source.is_available = U.patch_func(Source.is_available, function(orig, self)
+        return not vim.g.user_codeium_disable and orig(self)
+      end)
     end,
   },
 

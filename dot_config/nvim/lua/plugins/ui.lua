@@ -264,6 +264,17 @@ return {
     end,
   },
 
+  -- {
+  --   "folke/noice.nvim",
+  --   optional = true,
+  --   opts = {
+  --     presets = {
+  --       bottom_search = false,
+  --       -- command_palette = false,
+  --     },
+  --   },
+  -- },
+
   {
     "nvim-treesitter/nvim-treesitter-context",
     optional = true,

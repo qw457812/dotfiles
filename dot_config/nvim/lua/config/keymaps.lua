@@ -211,8 +211,11 @@ map("s", "<bs>", "<C-o>s", { desc = "Inside a snippet (nvim-cmp), use backspace 
 
 -- toggle options
 Snacks.toggle.option("number", { name = "Line Number" }):map("<leader>ul")
-U.toggle.diagnostic_virtual_text:map("<leader>ud")
+U.toggle.diagnostic_virt:map("<leader>ud")
 U.toggle.diagnostics:map("<leader>uD")
+U.toggle.ai_cmp:map("<leader>uA")
+-- stylua: ignore
+Snacks.toggle.option("showtabline", { off = 0, on = vim.o.showtabline > 0 and vim.o.showtabline or 2, name = "Tabline" }):map("<leader>u<tab>")
 if not LazyVim.has("nvim-scrollbar") then
   -- stylua: ignore
   Snacks.toggle.option("laststatus", { off = 0, on = vim.o.laststatus > 0 and vim.o.laststatus or 3, name = "Status Line" }):map("<leader>uS")
