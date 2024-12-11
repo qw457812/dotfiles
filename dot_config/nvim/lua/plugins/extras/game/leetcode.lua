@@ -75,8 +75,8 @@ return {
               group = augroup,
               desc = "Disable diagnostic virtual text for leetcode by default",
               callback = function()
-                if U.toggle.has_diagnostic_virtual_text == nil then
-                  U.toggle.diagnostic_virtual_text:set(false)
+                if U.toggle.is_diagnostic_virt_enabled == nil then
+                  U.toggle.diagnostic_virt:set(false)
                 end
               end,
             })

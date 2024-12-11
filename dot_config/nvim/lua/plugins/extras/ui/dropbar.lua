@@ -25,6 +25,7 @@ return {
       local menu_utils = require("dropbar.utils.menu")
       local dropbar_default_opts = require("dropbar.configs").opts
 
+      -- https://github.com/MunifTanjim/nui.nvim/blob/HEAD/lua/nui/utils/init.lua#L206
       local function truncate_string(str, max_length)
         if #str <= max_length then
           return str

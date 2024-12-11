@@ -1,21 +1,21 @@
-local SnacksToggle = require("snacks.toggle")
-local SnacksToggleDiag = SnacksToggle.diagnostics()
+local st = require("snacks.toggle")
+local st_diag = st.diagnostics()
 
 ---@class util.toggle
 local M = {}
 
 -- https://github.com/xzbdmw/nvimconfig/blob/0be9805dac4661803e17265b435060956daee757/lua/config/keymaps.lua#L49
-M.has_diagnostic_virtual_text = nil ---@type boolean?
-M.diagnostic_virtual_text = SnacksToggle.new({
+M.is_diagnostic_virt_enabled = nil ---@type boolean?
+M.diagnostic_virt = st({
   name = "Diagnostic Virtual Text",
   get = function()
-    if M.has_diagnostic_virtual_text == nil then
-      return SnacksToggleDiag:get()
+    if M.is_diagnostic_virt_enabled == nil then
+      return st_diag:get()
     end
-    return M.has_diagnostic_virtual_text
+    return M.is_diagnostic_virt_enabled
   end,
   set = function(state)
-    M.has_diagnostic_virtual_text = state
+    M.is_diagnostic_virt_enabled = state
     if LazyVim.has("tiny-inline-diagnostic.nvim") then
       if state then
         require("tiny-inline-diagnostic").enable()
@@ -32,22 +32,38 @@ M.diagnostic_virtual_text = SnacksToggle.new({
         } or false,
       })
     end
-    if state and not SnacksToggleDiag:get() then
-      SnacksToggleDiag:set(state)
+    if state and not st_diag:get() then
+      st_diag:set(state)
     end
   end,
 })
 
 -- toggle diagnostics and it's virtual text
-M.diagnostics = SnacksToggle.new({
+M.diagnostics = st({
   name = "Diagnostics",
   get = function()
-    return SnacksToggleDiag:get()
+    return st_diag:get()
   end,
   set = function(state)
-    M.diagnostic_virtual_text:set(state)
+    M.diagnostic_virt:set(state)
     if not state then
-      SnacksToggleDiag:set(state)
+      st_diag:set(state)
+    end
+  end,
+})
+
+---@type table<string, snacks.toggle.Class>
+M.ai_cmps = {}
+M.ai_cmp = st({
+  name = "AI Completion",
+  get = function()
+    return vim.tbl_count(vim.tbl_filter(function(ai)
+      return ai:get()
+    end, M.ai_cmps)) > 0
+  end,
+  set = function(state)
+    for _, ai in pairs(M.ai_cmps) do
+      ai:set(state)
     end
   end,
 })
@@ -67,7 +83,7 @@ if vim.g.neovide then
     neovide_scroll_animation_far_lines = 0,
   }
   local cache_animations = {} ---@type table<string, any>
-  M.neovide_animations = SnacksToggle.new({
+  M.neovide_animations = st({
     name = "Neovide Animate",
     get = function()
       return vim.g.neovide_cursor_animate_command_line

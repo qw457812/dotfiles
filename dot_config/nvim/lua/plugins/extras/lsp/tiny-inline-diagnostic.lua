@@ -33,10 +33,10 @@ return {
       vim.api.nvim_create_autocmd("ModeChanged", {
         pattern = "[vV\x16is]*:*",
         callback = function()
-          if U.toggle.has_diagnostic_virtual_text == false then
-            vim.defer_fn(function()
-              U.toggle.diagnostic_virtual_text:set(false)
-            end, 0)
+          if U.toggle.is_diagnostic_virt_enabled == false then
+            vim.schedule(function()
+              U.toggle.diagnostic_virt:set(false)
+            end)
           end
         end,
       })
