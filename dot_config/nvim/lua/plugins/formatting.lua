@@ -2,16 +2,24 @@ return {
   {
     "echasnovski/mini.align",
     vscode = true,
+    keys = {
+      -- { "ga", mode = { "n", "x" }, desc = "Align" },
+      -- { "gA", mode = { "n", "x" }, desc = "Align with Preview" },
+      { "gA", mode = "x", desc = "Align with Preview" },
+    },
     opts = {
       mappings = {
         start = "", -- disabled since text-case.nvim uses `ga`
         start_with_preview = "gA",
       },
     },
-    keys = {
-      -- { "ga", mode = { "n", "v" }, desc = "Align" },
-      { "gA", mode = { "n", "v" }, desc = "Align with Preview" },
-    },
+    config = function(_, opts)
+      local orig_gA_keymap = vim.fn.maparg("gA", "n", false, true) --[[@as table<string,any>]]
+      require("mini.align").setup(opts)
+      if not vim.tbl_isempty(orig_gA_keymap) then
+        vim.fn.mapset(orig_gA_keymap) -- orgmode uses `gA`
+      end
+    end,
   },
 
   {

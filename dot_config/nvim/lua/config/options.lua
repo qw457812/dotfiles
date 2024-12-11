@@ -24,6 +24,7 @@ local win_borders_fillchars = {
 opt.fillchars:append(win_borders_fillchars["bold"])
 
 vim.g.user_is_wezterm = vim.env.WEZTERM_UNIX_SOCKET ~= nil
+vim.g.user_is_kitty = vim.env.KITTY_PID ~= nil
 vim.g.user_is_tmux = vim.env.TMUX ~= nil
 vim.g.user_is_termux = vim.env.TERMUX_VERSION ~= nil
 vim.g.user_transparent_background = vim.g.user_is_wezterm
