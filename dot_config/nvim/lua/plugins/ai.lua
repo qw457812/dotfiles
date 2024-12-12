@@ -53,7 +53,6 @@ return {
       end)
     end,
   },
-
   {
     "nvim-cmp",
     optional = true,
@@ -64,6 +63,28 @@ return {
           break
         end
       end
+    end,
+  },
+  {
+    "folke/noice.nvim",
+    optional = true,
+    opts = function(_, opts)
+      opts.routes = vim.list_extend(opts.routes or {}, {
+        {
+          filter = {
+            event = "msg_show",
+            find = "^%[codeium/codeium%] ",
+          },
+          view = "mini",
+        },
+        {
+          filter = {
+            event = "notify",
+            find = "^completion request failed$",
+          },
+          opts = { skip = true },
+        },
+      })
     end,
   },
 
