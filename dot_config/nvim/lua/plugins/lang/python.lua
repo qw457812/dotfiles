@@ -198,6 +198,20 @@ return {
   --   },
   -- },
 
+  {
+    "linux-cultist/venv-selector.nvim",
+    optional = true,
+    opts = {
+      settings = {
+        options = {
+          on_telescope_result_callback = function(filename)
+            return U.path.home_to_tilde(filename):gsub("/bin/python", "")
+          end,
+        },
+      },
+    },
+  },
+
   -- https://github.com/MeanderingProgrammer/dotfiles/blob/3f48b647453dff09b9c9d39bead797082b445175/.config/nvim/lua/mp/plugins/lang/python.lua#L23
   {
     "MeanderingProgrammer/py-requirements.nvim",
@@ -232,25 +246,6 @@ return {
       spec = {
         { "<leader>P", group = "packages/dependencies", icon = " " },
         { "<leader>Pp", group = "python", icon = " " },
-      },
-    },
-  },
-
-  -- note that LazyVim use the new "regexp" branch: https://github.com/linux-cultist/venv-selector.nvim/tree/regexp
-  {
-    "linux-cultist/venv-selector.nvim",
-    optional = true,
-    -- TODO: temporary fix: venv-selector does not work with extras.editor.fzf
-    -- - https://github.com/LazyVim/LazyVim/issues/3612
-    -- - https://github.com/linux-cultist/venv-selector.nvim/issues/142
-    dependencies = { "nvim-telescope/telescope.nvim" },
-    opts = {
-      settings = {
-        options = {
-          on_telescope_result_callback = function(filename)
-            return U.path.home_to_tilde(filename):gsub("/bin/python", "")
-          end,
-        },
       },
     },
   },

@@ -137,7 +137,7 @@ return {
     keys = function(_, keys)
       -- https://github.com/JoseConseco/nvim_config/blob/23dbf5f8b9779d792643ab5274ebe8dabe79c0c0/lua/plugins.lua#L1049
       -- https://github.com/mfussenegger/nvim-treehopper
-      ---@param skip_first_match? boolean
+      ---@param skip_first_match? boolean default false
       local function treesitter(skip_first_match)
         ---@type Flash.State.Config
         local opts = { label = { rainbow = { enabled = true } } }
@@ -158,30 +158,12 @@ return {
 
       -- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/keybindings.lua#L150
       vim.keymap.set("n", "guu", "guu") -- prevent `omap u` from overwriting `guu`
-      -- stylua: ignore
       return vim.list_extend(keys, {
-        { "S", mode = { "n", "o", "x" }, function() treesitter() end, desc = "Flash Treesitter" },
-        { "u", mode = { "o", "x" }, function() treesitter(true) end, desc = "Flash Treesitter" }, -- unit textobject, conflict with `guu`
-        -- {
-        --   "R",
-        --   mode = { "o", "x" },
-        --   function()
-        --     require("flash").treesitter_search({ label = { rainbow = { enabled = true } } })
-        --   end,
-        --   desc = "Treesitter Search",
-        -- },
+        { "S", mode = { "n", "o", "x" }, treesitter, desc = "Flash Treesitter" },
+        { "u", mode = { "o", "x" }, treesitter, desc = "Flash Treesitter" }, -- unit textobject, conflict with `guu`
       })
     end,
   },
-
-  -- {
-  --   "folke/which-key.nvim",
-  --   opts = {
-  --     win = {
-  --       no_overlap = false, -- don't allow the popup to overlap with the cursor
-  --     },
-  --   },
-  -- },
 
   {
     "folke/trouble.nvim",

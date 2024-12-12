@@ -78,14 +78,6 @@ return {
   },
 
   {
-    "folke/which-key.nvim",
-    optional = true,
-    opts = {
-      preset = "helix", -- vim.g.user_is_termux and "helix" or "modern"
-    },
-  },
-
-  {
     "nvim-neo-tree/neo-tree.nvim",
     optional = true,
     opts = {

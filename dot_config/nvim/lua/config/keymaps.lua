@@ -209,6 +209,7 @@ map("n", "z.", "1z=", { desc = "Fix Spelling" })
 map("s", "<bs>", "<C-o>s", { desc = "Inside a snippet (nvim-cmp), use backspace to remove the placeholder" })
 
 -- toggle options
+Snacks.toggle.zen():map("<leader>z")
 Snacks.toggle.option("number", { name = "Line Number" }):map("<leader>ul")
 U.toggle.diagnostic_virt:map("<leader>ud")
 U.toggle.diagnostics:map("<leader>uD")

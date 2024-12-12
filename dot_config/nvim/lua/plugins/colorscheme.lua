@@ -257,7 +257,7 @@ return {
 
   -- https://github.com/aimuzov/LazyVimx/blob/af846de01acfaa78320d6564414c629e77d525e1/lua/lazyvimx/colorschemes/catppuccin.lua
   {
-    "catppuccin/nvim",
+    "catppuccin",
     optional = true,
     opts = function(_, opts)
       local palettes = require("catppuccin.palettes")
