@@ -97,7 +97,7 @@ function M.clear_ui_esc(opts)
       -- end
 
       -- stylua: ignore
-      vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(vim.g.user_close_key or "<bs>", true, false, true), "m", false)
+      vim.api.nvim_feedkeys(vim.keycode(vim.g.user_close_key), "m", false)
     end,
     popups = true,
     esc = true,
@@ -154,7 +154,7 @@ function M.clear_ui_esc(opts)
   -- vim.cmd("syntax sync fromstart")
   Snacks.util.redraw(vim.api.nvim_get_current_win()) -- vim.cmd("normal! <C-L>") -- vim.cmd.redraw({ bang = true })
   if opts.esc then
-    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<esc>", true, true, true), "n", false)
+    vim.api.nvim_feedkeys(vim.keycode("<esc>"), "n", false)
   end
   return something_done
 end

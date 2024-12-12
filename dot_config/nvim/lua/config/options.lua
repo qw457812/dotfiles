@@ -23,6 +23,12 @@ local win_borders_fillchars = {
 }
 opt.fillchars:append(win_borders_fillchars["bold"])
 
+-- close buffers, windows, or exit vim with the same single keypress
+vim.g.user_close_key = "<bs>" -- easy to reach for Glove80
+-- exit nvim
+vim.g.user_exit_key = "<leader>" .. vim.g.user_close_key -- would overwrite "go up one level" of which-key
+-- close terminals
+vim.g.user_term_close_key = "<S-bs>"
 vim.g.user_is_wezterm = vim.env.WEZTERM_UNIX_SOCKET ~= nil
 vim.g.user_is_kitty = vim.env.KITTY_PID ~= nil
 vim.g.user_is_tmux = vim.env.TMUX ~= nil

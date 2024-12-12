@@ -26,6 +26,14 @@ return {
             vim.keymap.set("t", "<c-k>", "<c-k>", { buffer = buf, nowait = true })
             vim.keymap.set("t", "<c-l>", "<c-l>", { buffer = buf, nowait = true })
           end
+
+          -- after closing `show_help` by <bs>, yazi goes to normal mode
+          vim.api.nvim_create_autocmd("BufEnter", {
+            buffer = buf,
+            callback = function()
+              vim.cmd.startinsert()
+            end,
+          })
         end,
       })
 
@@ -46,10 +54,11 @@ return {
         open_for_directories = vim.g.user_hijack_netrw == "yazi.nvim",
         open_multiple_tabs = true,
         keymaps = {
-          show_help = "~", -- use `g?` for yazi help
+          show_help = "~", -- `~` for yazi.nvim and `g?` for yazi
         },
         future_features = {
           ya_emit_reveal = true,
+          ya_emit_open = true,
         },
       }
     end,

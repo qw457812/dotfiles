@@ -14,14 +14,13 @@ local cmdwin = function(type)
     if package.loaded["zen-mode"] and require("zen-mode.view").is_open() then
       require("zen-mode").close()
     end
-    -- vim.api.nvim_feedkeys("q" .. type .. "G", "n", true)
-    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("q" .. type .. "G", true, true, true), "n", false)
+    vim.api.nvim_feedkeys(vim.keycode("q" .. type .. "G"), "n", false)
   end
 end
 
 -- https://github.com/rafi/vim-config/blob/3689ae1ba113e2b8c6d12f17281fd14d91e58027/lua/rafi/config/keymaps.lua#L122
 local blockwise_force = function(key)
-  local c_v = vim.api.nvim_replace_termcodes("<C-v>", true, false, true)
+  local c_v = vim.keycode("<C-v>")
   local keyseq = {
     I = { v = "<C-v>I", V = "<C-v>^o^I", [c_v] = "I" },
     A = { v = "<C-v>A", V = "<C-v>0o$A", [c_v] = "A" },

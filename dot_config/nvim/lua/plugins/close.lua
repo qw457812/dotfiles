@@ -1,10 +1,7 @@
--- close buffers, windows, or exit vim with the same single keypress
-local close_key = vim.g.user_close_key or "<bs>" -- easy to reach for Glove80
+local close_key = vim.g.user_close_key
 local is_bs = close_key:lower() == "<bs>"
--- exit nvim
-local exit_key = vim.g.user_exit_key or ("<leader>" .. close_key) -- would overwrite "go up one level" of which-key, use `<S-bs>` if needed
--- close terminals
-local term_close_key = vim.g.user_term_close_key or "<S-bs>"
+local exit_key = vim.g.user_exit_key
+local term_close_key = vim.g.user_term_close_key
 
 -- do not use `clear = true` at the top-level, it will be triggered by lazy.nvim on `Config Change Detected. Reloading...`
 local augroup = vim.api.nvim_create_augroup("close_with_" .. close_key, { clear = false })
