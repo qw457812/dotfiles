@@ -95,7 +95,7 @@ return {
                 close = function()
                   -- simulate `q` keypress to abort
                   -- stylua: ignore
-                  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(opts_keymaps_abort, true, false, true), "m", false)
+                  vim.api.nvim_feedkeys(vim.keycode(opts_keymaps_abort), "m", false)
                 end,
                 esc = false,
               })

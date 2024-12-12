@@ -16,7 +16,7 @@ function M.never_paging_term_previewer(opts)
       -- local input = direction > 0 and string.char(0x05) or string.char(0x19)
       -- local input = direction > 0 and [[]] or [[]]
       -- https://github.com/nvim-telescope/telescope.nvim/issues/2933#issuecomment-1958504220
-      local input = vim.api.nvim_replace_termcodes(direction > 0 and "<C-e>" or "<C-y>", true, false, true)
+      local input = vim.keycode(direction > 0 and "<C-e>" or "<C-y>")
       local count = math.abs(direction)
 
       vim.api.nvim_win_call(vim.fn.bufwinid(self.state.termopen_bufnr), function()

@@ -230,7 +230,7 @@ if vim.o.shell:find("zsh") then
         -- powerlevel10k prompt_char for zsh-vi-mode normal mode: "❮ "
         if vim.api.nvim_get_current_line():match("^❮ .*") then
           -- use `a` instead of `i` to restore cursor position
-          vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("a", true, true, true), "n", false)
+          vim.api.nvim_feedkeys(vim.keycode("a"), "n", false)
         end
       end)
     end,

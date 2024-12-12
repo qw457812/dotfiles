@@ -37,7 +37,7 @@ return {
             if mode == "v" or mode == "V" or mode == "\22" then
               -- fix: start visual mode after editor.action.goToReferences
               -- TODO: editor.action.goToReferences jumps to the same file
-              vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<esc>", true, true, true), "n", false)
+              vim.api.nvim_feedkeys(vim.keycode("<esc>"), "n", false)
             elseif mode == "i" then
               vim.cmd("stopinsert")
             end
@@ -50,7 +50,7 @@ return {
         once = true,
         callback = function()
           vscode_map("n", "u", "undo", { desc = "VSCode Undo" })
-          vscode_map("n", {"<C-r>", "U"}, "redo", { desc = "VSCode Redo" })
+          vscode_map("n", { "<C-r>", "U" }, "redo", { desc = "VSCode Redo" })
 
           vscode_map("n", "<Left>", "workbench.action.navigateBack", { desc = "Go Back" })
           vscode_map("n", "<Right>", "workbench.action.navigateForward", { desc = "Go Forward" })
