@@ -9,6 +9,7 @@
   "java-test": "0.41.1",
   "jdtls": "v1.41.0",
   "json-lsp": "4.10.0",
+  "lemminx": "0.27.2",
   "lua-language-server": "3.13.2",
   "luacheck": "1.1.0",
   "markdown-toc": "1.2.0",
