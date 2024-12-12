@@ -46,6 +46,9 @@ return {
     end,
   },
 
+  -- https://github.com/AstroNvim/astrocommunity/tree/main/lua/astrocommunity/pack/java
+  -- https://github.com/MeanderingProgrammer/dotfiles/blob/d29d911a30eb5371c620f543e336bcbc628d45b0/.config/nvim/lua/mp/plugins/lang/java.lua
+  -- https://github.com/doctorfree/nvim-lazyman/blob/bbecf74deb10a0483742196b23b91858f823f632/ftplugin/java.lua
   {
     "mfussenegger/nvim-jdtls",
     commit = vim.g.user_is_termux and "e129398e171e87c0d9e94dd5bea7eb4730473ffc" or nil,
@@ -54,13 +57,17 @@ return {
       local runtimes = java_runtimes()
       return U.extend_tbl(opts, {
         -- https://github.com/eclipse-jdtls/eclipse.jdt.ls/wiki/Running-the-JAVA-LS-server-from-the-command-line#initialize-request
-        -- https://github.com/doctorfree/nvim-lazyman/blob/bbecf74deb10a0483742196b23b91858f823f632/ftplugin/java.lua#L84
-        -- https://github.com/MeanderingProgrammer/dotfiles/blob/main/.config/nvim/lua/mp/plugins/lang/java.lua
         settings = {
           java = {
             configuration = {
               runtimes = not vim.tbl_isempty(runtimes) and runtimes or nil,
             },
+            -- format = {
+            --   settings = { -- you can use your preferred format style
+            --     url = "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml",
+            --     profile = "GoogleStyle",
+            --   },
+            -- },
             saveActions = {
               -- To disable format and organize imports on save for specific projects,
               -- create a `.lazy.lua` file in your project with following content:

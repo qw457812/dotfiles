@@ -28,31 +28,47 @@ function M.has_user_extra(extra)
 end
 
 ---@param win? integer default 0
----@param opts? { zen?: boolean, tsc?: boolean } whether to treat zen-mode and nvim-treesitter-context as floating windows, default true
+---@param opts? { zen?: boolean, tsc?: boolean, dashboard?: boolean } whether to treat zen-mode, nvim-treesitter-context and snacks_dashboard terminal sections as floating windows, default true
 ---@return boolean
 function M.is_floating_win(win, opts)
   win = win or 0
   opts = vim.tbl_deep_extend("keep", opts or {}, {
     zen = true,
     tsc = true,
+    dashboard = true,
   })
 
-  local is_float = vim.api.nvim_win_get_config(win).relative ~= ""
+  if vim.api.nvim_win_get_config(win).relative == "" then
+    return false
+  end
 
-  if is_float and not opts.zen and package.loaded["zen-mode"] then
+  -- zen-mode.nvim
+  if not opts.zen and package.loaded["zen-mode"] then
     local zen_mode = require("zen-mode.view")
     if zen_mode.is_open() then
       win = win == 0 and vim.api.nvim_get_current_win() or win
-      is_float = win ~= zen_mode.win and win ~= zen_mode.bg_win
+      if win == zen_mode.win or win == zen_mode.bg_win then
+        return false
+      end
     end
   end
 
-  if is_float and not opts.tsc and package.loaded["treesitter-context"] then
-    -- see: https://github.com/nvim-treesitter/nvim-treesitter-context/blob/a2a334900d3643de585ac5c6140b03403454124f/lua/treesitter-context/render.lua#L56
-    is_float = not (vim.w[win].treesitter_context or vim.w[win].treesitter_context_line_number)
+  -- nvim-treesitter-context
+  -- see: https://github.com/nvim-treesitter/nvim-treesitter-context/blob/a2a334900d3643de585ac5c6140b03403454124f/lua/treesitter-context/render.lua#L56
+  if
+    not opts.tsc
+    and package.loaded["treesitter-context"]
+    and (vim.w[win].treesitter_context or vim.w[win].treesitter_context_line_number)
+  then
+    return false
   end
 
-  return is_float
+  -- snacks_dashboard terminal sections
+  if not opts.dashboard and vim.bo[vim.api.nvim_win_get_buf(win)].filetype == "snacks_dashboard" then
+    return false
+  end
+
+  return true
 end
 
 --- Get visually selected lines.

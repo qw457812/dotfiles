@@ -99,7 +99,7 @@ function M.clear_ui_esc(opts)
       -- stylua: ignore
       vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(vim.g.user_close_key or "<bs>", true, false, true), "m", false)
     end,
-    popups = true, -- use `vim.bo.filetype ~= "snacks_dashboard"` to prevent closing terminal sections
+    popups = true,
     esc = true,
   })
 
@@ -138,7 +138,9 @@ function M.clear_ui_esc(opts)
     elseif opts.popups and not is_cmdwin then
       -- close all floating windows (can't close other windows when the command-line window is open)
       for _, win in ipairs(vim.api.nvim_list_wins()) do
-        if vim.api.nvim_win_is_valid(win) and U.is_floating_win(win, { zen = false, tsc = false }) then
+        if
+          vim.api.nvim_win_is_valid(win) and U.is_floating_win(win, { zen = false, tsc = false, dashboard = false })
+        then
           vim.api.nvim_win_close(win, false)
           something_done = true
         end
