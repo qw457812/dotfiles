@@ -7,8 +7,20 @@ return {
     ---@module "snacks"
     ---@type snacks.Config
     opts = {
-      -- https://github.com/Nitestack/dotfiles/blob/506b895c45b8ed012a2cb0c35fe62058d8b6dbc4/config/private_dot_config/exact_nvim/lua/exact_plugins/snacks.lua#L9
-      win = { border = "rounded" },
+      -- -- https://github.com/Nitestack/dotfiles/blob/506b895c45b8ed012a2cb0c35fe62058d8b6dbc4/config/private_dot_config/exact_nvim/lua/exact_plugins/snacks.lua#L9
+      -- win = {
+      --   border = "rounded",
+      -- },
+      terminal = {
+        win = {
+          border = "rounded",
+        },
+      },
+      zen = {
+        win = {
+          border = "none",
+        },
+      },
     },
   },
 

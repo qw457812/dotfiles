@@ -42,13 +42,20 @@ function M.is_floating_win(win, opts)
     return false
   end
 
-  -- zen-mode.nvim
-  if not opts.zen and package.loaded["zen-mode"] then
-    local zen_mode = require("zen-mode.view")
-    if zen_mode.is_open() then
-      win = win == 0 and vim.api.nvim_get_current_win() or win
-      if win == zen_mode.win or win == zen_mode.bg_win then
+  -- Snacks zen or zen-mode.nvim
+  if not opts.zen then
+    win = win == 0 and vim.api.nvim_get_current_win() or win
+    if Snacks.toggle.get("zen"):get() then
+      if win == Snacks.zen.win.win or win == vim.tbl_get(Snacks.zen.win, "backdrop", "win") then
         return false
+      end
+    end
+    if package.loaded["zen-mode"] then
+      local zen_mode = require("zen-mode.view")
+      if zen_mode.is_open() then
+        if win == zen_mode.win or win == zen_mode.bg_win then
+          return false
+        end
       end
     end
   end

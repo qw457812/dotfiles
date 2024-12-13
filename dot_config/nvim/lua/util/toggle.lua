@@ -1,5 +1,6 @@
 local st = require("snacks.toggle")
 local st_diag = st.diagnostics()
+local st_zen = assert(Snacks.toggle.get("zen"))
 
 ---@class util.toggle
 local M = {}
@@ -48,6 +49,55 @@ M.diagnostics = st({
     M.diagnostic_virt:set(state)
     if not state then
       st_diag:set(state)
+    end
+  end,
+})
+
+M.neotree_auto_close = st({
+  name = "NeoTree Auto Close",
+  get = function()
+    return vim.g.user_neotree_auto_close
+  end,
+  set = function(state)
+    vim.g.user_neotree_auto_close = state
+    require("neo-tree.command").execute({ action = state and "close" or "show" })
+  end,
+})
+
+M.zen = st({
+  name = "Zen Mode",
+  get = function()
+    return st_zen:get() or (package.loaded["zen-mode"] and require("zen-mode.view").is_open())
+  end,
+  set = function(state)
+    if state then
+      local function open()
+        -- close or unfocus neo-tree first
+        if vim.bo.filetype == "neo-tree" then
+          if vim.g.user_neotree_auto_close then
+            require("neo-tree.command").execute({ action = "close" })
+          else
+            vim.cmd("wincmd p")
+          end
+        end
+        if LazyVim.has("zen-mode.nvim") then
+          require("zen-mode").open()
+        else
+          st_zen:set(true)
+        end
+      end
+      if vim.fn.getcmdwintype() ~= "" then
+        vim.cmd("q")
+        vim.schedule(open)
+      else
+        open()
+      end
+    else
+      if st_zen:get() then
+        st_zen:set(false)
+      else
+        require("zen-mode").close()
+      end
     end
   end,
 })

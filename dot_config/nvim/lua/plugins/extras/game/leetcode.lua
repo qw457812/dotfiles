@@ -1,7 +1,3 @@
-if not LazyVim.has("telescope.nvim") then
-  return {}
-end
-
 return {
   -- https://github.com/AstroNvim/astrocommunity/blob/90ff9f23f98c4265b37091c6077744b48c19e324/lua/astrocommunity/game/leetcode-nvim/init.lua
   -- https://github.com/AstroNvim/AstroNvim/blob/8fe477244430f91292d0f1a9c3e44ad787091707/lua/astronvim/utils/init.lua#L54
@@ -14,7 +10,6 @@ return {
     build = ":TSUpdate html",
     cmd = "Leet",
     dependencies = {
-      { "nvim-telescope/telescope.nvim" },
       { "MunifTanjim/nui.nvim" },
       { "3rd/image.nvim", optional = true },
       { "nvim-tree/nvim-web-devicons", optional = true },

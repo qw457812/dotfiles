@@ -30,7 +30,6 @@
     "lazyvim.plugins.extras.lsp.neoconf",
     "lazyvim.plugins.extras.test.core",
     "lazyvim.plugins.extras.ui.edgy",
-    "lazyvim.plugins.extras.ui.mini-animate",
     "lazyvim.plugins.extras.ui.treesitter-context",
     "lazyvim.plugins.extras.util.chezmoi",
     "lazyvim.plugins.extras.util.dot",
@@ -56,7 +55,7 @@
     "plugins.extras.util.zoxide"
   ],
   "news": {
-    "NEWS.md": "10931",
+    "NEWS.md": "10948",
     "doc/news.txt": "24450"
   },
   "version": 7
