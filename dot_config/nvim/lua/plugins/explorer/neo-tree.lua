@@ -27,58 +27,67 @@ return {
               return
             end
 
-            -- reveal the current file in root directory, or if in an unsaved file, the current working directory
-            -- :h neo-tree-configuration
-            local command = require("neo-tree.command")
-            local reveal_file = vim.fn.expand("%:p")
-            if reveal_file == "" then
-              reveal_file = vim.fn.getcwd()
-            else
-              -- alternative to `vim.fn.filereadable(reveal_file)`?
-              local f = io.open(reveal_file, "r")
-              if f then
-                f.close(f)
-              else
+            local function open()
+              -- reveal the current file in root directory, or if in an unsaved file, the current working directory
+              -- :h neo-tree-configuration
+              local command = require("neo-tree.command")
+              local reveal_file = vim.fn.expand("%:p")
+              if reveal_file == "" then
                 reveal_file = vim.fn.getcwd()
+              else
+                -- alternative to `vim.fn.filereadable(reveal_file)`?
+                local f = io.open(reveal_file, "r")
+                if f then
+                  f.close(f)
+                else
+                  reveal_file = vim.fn.getcwd()
+                end
+              end
+
+              local function reveal_without_set_root()
+                command.execute({ reveal_file = reveal_file, reveal_force_cwd = true })
+              end
+
+              -- work-around below not working in termux
+              if vim.g.user_is_termux then
+                reveal_without_set_root()
+                return
+              end
+
+              local root = LazyVim.root()
+              if not vim.startswith(reveal_file, root) then
+                last_root = nil -- neo-tree's root will change after reveal
+                reveal_without_set_root() -- wrong root, reveal only
+                return
+              end
+
+              local function execute(action)
+                command.execute({
+                  action = action,
+                  -- reveal = true, -- using `reveal_file` to reveal cwd if unsaved
+                  reveal_file = reveal_file, -- path to file or folder to reveal
+                  reveal_force_cwd = true, -- change cwd without asking if needed
+                  dir = root,
+                })
+              end
+
+              if last_root == root then
+                execute()
+              else
+                last_root = root -- cache
+                -- work-around for `reveal_force_cwd` + `dir`, execute twice to properly set root dir (base on my test only)
+                execute("show")
+                vim.defer_fn(function()
+                  execute()
+                end, 100)
               end
             end
 
-            local function reveal_without_set_root()
-              command.execute({ reveal_file = reveal_file, reveal_force_cwd = true })
-            end
-
-            -- work-around below not working in termux
-            if vim.g.user_is_termux then
-              reveal_without_set_root()
-              return
-            end
-
-            local root = LazyVim.root()
-            if not vim.startswith(reveal_file, root) then
-              last_root = nil -- neo-tree's root will change after reveal
-              reveal_without_set_root() -- wrong root, reveal only
-              return
-            end
-
-            local function execute(action)
-              command.execute({
-                action = action,
-                -- reveal = true, -- using `reveal_file` to reveal cwd if unsaved
-                reveal_file = reveal_file, -- path to file or folder to reveal
-                reveal_force_cwd = true, -- change cwd without asking if needed
-                dir = root,
-              })
-            end
-
-            if last_root == root then
-              execute()
+            if U.toggle.zen:get() then
+              U.toggle.zen:set(false)
+              vim.schedule(open)
             else
-              last_root = root -- cache
-              -- work-around for `reveal_force_cwd` + `dir`, execute twice to properly set root dir (base on my test only)
-              execute("show")
-              vim.defer_fn(function()
-                execute()
-              end, 100)
+              open()
             end
           end,
           desc = "Explorer NeoTree (Root Dir)",
@@ -102,19 +111,6 @@ return {
     end,
     opts = function(_, opts)
       local hijack_netrw = vim.g.user_hijack_netrw == "neo-tree.nvim"
-
-      require("snacks")
-        .toggle({
-          name = "NeoTree Auto Close",
-          get = function()
-            return vim.g.user_neotree_auto_close
-          end,
-          set = function(state)
-            vim.g.user_neotree_auto_close = state
-            require("neo-tree.command").execute({ action = state and "close" or "show" })
-          end,
-        })
-        :map("<leader>uz")
 
       -- https://github.com/nvim-neo-tree/neo-tree.nvim/wiki/Recipes#find-with-telescope
       local function get_telescope_opts(state)

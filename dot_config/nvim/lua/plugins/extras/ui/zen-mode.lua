@@ -9,31 +9,15 @@ return {
   {
     "folke/zen-mode.nvim",
     cmd = "ZenMode",
-    keys = function()
-      ---@param opts? ZenOptions
-      local function toggle(opts)
-        if vim.bo.filetype == "neo-tree" then
-          -- close or unfocus neo-tree first
-          if vim.g.user_neotree_auto_close then
-            require("neo-tree.command").execute({ action = "close" })
-          else
-            vim.cmd("wincmd p")
-          end
-        end
-        require("zen-mode").toggle(opts)
-      end
-
-      return {
-        { "<leader>z", toggle, desc = "Zen Mode" },
-        {
-          "<leader>Z",
-          function()
-            toggle({ plugins = { twilight = { enabled = true } } })
-          end,
-          desc = "Zen Mode (Twilight)",
-        },
-      }
-    end,
+    keys = {
+      {
+        "<leader>Z",
+        function()
+          require("zen-mode").toggle({ plugins = { twilight = { enabled = true } } })
+        end,
+        desc = "Zen Mode (Twilight)",
+      },
+    },
     opts = function(_, opts)
       local on_open = opts.on_open or function() end
       local on_close = opts.on_close or function() end

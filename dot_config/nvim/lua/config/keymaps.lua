@@ -10,11 +10,16 @@ local safe_map = U.keymap.safe_map
 local del = U.keymap.del
 
 local cmdwin = function(type)
-  return function()
-    if package.loaded["zen-mode"] and require("zen-mode.view").is_open() then
-      require("zen-mode").close()
-    end
+  local function open()
     vim.api.nvim_feedkeys(vim.keycode("q" .. type .. "G"), "n", false)
+  end
+  return function()
+    if U.toggle.zen:get() then
+      U.toggle.zen:set(false)
+      vim.schedule(open) -- schedule for snacks zen
+    else
+      open()
+    end
   end
 end
 
@@ -209,11 +214,12 @@ map("n", "z.", "1z=", { desc = "Fix Spelling" })
 map("s", "<bs>", "<C-o>s", { desc = "Inside a snippet (nvim-cmp), use backspace to remove the placeholder" })
 
 -- toggle options
-Snacks.toggle.zen():map("<leader>z")
-Snacks.toggle.option("number", { name = "Line Number" }):map("<leader>ul")
+U.toggle.zen:map("<leader>z")
+U.toggle.neotree_auto_close:map("<leader>uz")
 U.toggle.diagnostic_virt:map("<leader>ud")
 U.toggle.diagnostics:map("<leader>uD")
 U.toggle.ai_cmp:map("<leader>uA")
+Snacks.toggle.option("number", { name = "Line Number" }):map("<leader>ul")
 -- stylua: ignore
 Snacks.toggle.option("showtabline", { off = 0, on = vim.o.showtabline > 0 and vim.o.showtabline or 2, name = "Tabline" }):map("<leader>u<tab>")
 if not LazyVim.has("nvim-scrollbar") then
