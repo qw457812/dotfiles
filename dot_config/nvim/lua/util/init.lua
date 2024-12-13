@@ -32,21 +32,26 @@ end
 ---@return boolean
 function M.is_floating_win(win, opts)
   win = win or 0
+  if vim.api.nvim_win_get_config(win).relative == "" then
+    return false
+  end
+
+  win = win == 0 and vim.api.nvim_get_current_win() or win
   opts = vim.tbl_deep_extend("keep", opts or {}, {
     zen = true,
     tsc = true,
     dashboard = true,
   })
+  local ft = vim.bo[vim.api.nvim_win_get_buf(win)].filetype
 
-  if vim.api.nvim_win_get_config(win).relative == "" then
-    return false
-  end
-
-  -- Snacks zen or zen-mode.nvim
+  -- snacks zen or zen-mode.nvim
   if not opts.zen then
-    win = win == 0 and vim.api.nvim_get_current_win() or win
     if Snacks.toggle.get("zen"):get() then
-      if win == Snacks.zen.win.win or win == vim.tbl_get(Snacks.zen.win, "backdrop", "win") then
+      if
+        win == Snacks.zen.win.win
+        or win == vim.tbl_get(Snacks.zen.win, "backdrop", "win")
+        or ft == "snacks_zen_zoom_indicator"
+      then
         return false
       end
     end
@@ -71,7 +76,7 @@ function M.is_floating_win(win, opts)
   end
 
   -- snacks_dashboard terminal sections
-  if not opts.dashboard and vim.bo[vim.api.nvim_win_get_buf(win)].filetype == "snacks_dashboard" then
+  if not opts.dashboard and ft == "snacks_dashboard" then
     return false
   end
 

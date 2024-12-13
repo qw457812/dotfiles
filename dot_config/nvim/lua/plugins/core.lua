@@ -29,4 +29,14 @@ return {
       end)
     end,
   },
+  {
+    "folke/snacks.nvim",
+    opts = function()
+      Snacks.config.style("zoom_indicator", {
+        bo = {
+          filetype = "snacks_zen_zoom_indicator",
+        },
+      })
+    end,
+  },
 }

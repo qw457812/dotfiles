@@ -195,7 +195,7 @@ return {
             end
 
             -- find all URLs in buffer
-            local urlPattern = [=[%l%l%l-://[^%s)"'`]+]=] -- excludes: )"'` and whitespace
+            local urlPattern = [[%l%l%l-://[^%s)"'`]+]]
             local bufText = table.concat(vim.api.nvim_buf_get_lines(0, 0, -1, false), "\n")
             local urls = {}
             for url in bufText:gmatch(urlPattern) do
@@ -205,7 +205,7 @@ return {
               return
             end
 
-            -- select one, use a plugin like dressing.nvim for nicer UI for `vim.ui.select`
+            -- select one
             vim.ui.select(urls, { prompt = "Select URL:" }, function(choice)
               if choice then
                 vim.ui.open(choice)
