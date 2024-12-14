@@ -5,6 +5,8 @@ return {
     keys = {
       { "<leader>C", "<cmd>CurlOpen<cr>", desc = "Open Curl (cwd)" },
     },
-    opts = {},
+    opts = {
+      -- open_with = "vsplit",
+    },
   },
 }
