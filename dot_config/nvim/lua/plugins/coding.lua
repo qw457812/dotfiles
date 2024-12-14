@@ -63,7 +63,7 @@ return {
           function(cmp)
             ---@module 'blink.cmp'
             cmp = cmp
-            if require("blink.cmp.completion.windows.menu").win:is_open() then
+            if cmp.is_visible() then
               return cmp.select_next()
             elseif cmp.snippet_active({ direction = 1 }) then
               return cmp.snippet_forward()
@@ -77,7 +77,7 @@ return {
           function(cmp)
             ---@module 'blink.cmp'
             cmp = cmp
-            if require("blink.cmp.completion.windows.menu").win:is_open() then
+            if cmp.is_visible() then
               return cmp.select_prev()
             elseif cmp.snippet_active({ direction = -1 }) then
               return cmp.snippet_backward()
@@ -90,7 +90,7 @@ return {
         --   function(cmp)
         --     ---@module 'blink.cmp'
         --     cmp = cmp
-        --     if require("blink.cmp.completion.windows.menu").win:is_open() then
+        --     if cmp.is_visible() then
         --       if cmp.snippet_active() then
         --         return cmp.hide()
         --       end

@@ -6,10 +6,27 @@ return {
     ---@module "snacks"
     ---@type snacks.Config
     opts = {
+      input = {
+        win = {
+          keys = {
+            i_c_c = { "<C-c>", { "cmp_close", "cancel" }, mode = "i" },
+            i_esc = { "<esc>", "stopinsert", mode = "i" },
+            esc = { "<esc>", "cancel" },
+            cr = { "<cr>", "confirm" },
+          },
+        },
+      },
       notifier = {
         width = vim.g.user_is_termux and { min = 20, max = 0.7 } or nil,
-        style = "fancy",
+        sort = { "added" }, -- sort only by time
+        icons = { error = "󰅚", warn = "", info = "󰋽", debug = "󰃤", trace = "󰓗" },
+        -- style = "fancy",
         -- top_down = false,
+      },
+      scroll = {
+        animate = {
+          duration = { step = 10, total = 100 },
+        },
       },
       terminal = {
         win = {

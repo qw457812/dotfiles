@@ -139,6 +139,7 @@ return {
             bg = c.bg,
             fg = util.blend_fg((hl.CmpGhostText or hl.Comment).fg, vim.g.user_transparent_background and 0.5 or 0.85),
           }
+          hl.BlinkCmpGhostText = { link = "CmpGhostText" }
           -- unused variable
           hl.DiagnosticUnnecessary = { fg = util.blend_fg(c.terminal_black, 0.7) }
 
@@ -324,6 +325,7 @@ return {
               bg = colors.base,
               fg = vim.g.user_transparent_background and util.lighten(colors.overlay1, 0.875) or colors.overlay1,
             },
+            BlinkCmpGhostText = { link = "CmpGhostText" },
             DiagnosticUnnecessary = { fg = util.lighten(colors.overlay0, 0.9) },
             -- revert https://github.com/catppuccin/nvim/pull/768
             Comment = { fg = colors.overlay0, style = { "italic" } },
@@ -597,6 +599,7 @@ return {
 
           -- compensate for invisible text caused by custom illuminate highlight
           vim.api.nvim_set_hl(0, "CmpGhostText", { bg = bg, fg = U.color.lighten(comment, 0.85) })
+          vim.api.nvim_set_hl(0, "BlinkCmpGhostText", { link = "CmpGhostText" })
           -- stylua: ignore
           vim.api.nvim_set_hl(0, "DiagnosticUnnecessary", { fg = U.color.lighten(Snacks.util.color("DiagnosticUnnecessary") or comment, 0.7) })
         end

@@ -68,6 +68,7 @@ return {
     ---@type avante.Config
     opts = {
       mappings = {
+        focus = "<leader>aF",
         toggle = {
           debug = "<leader>aD",
         },
@@ -75,6 +76,9 @@ return {
           -- disable since <tab> is mapped to <C-w>w
           switch_windows = "<A-Down>",
           reverse_switch_windows = "<A-Up>",
+        },
+        files = {
+          add_current = "<leader>af",
         },
       },
       behaviour = {
