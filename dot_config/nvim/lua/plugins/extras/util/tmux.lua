@@ -11,15 +11,25 @@ local function get_tmux_opt(option)
   return opt
 end
 
-local function zen()
+---@param snacks? boolean
+---@return {autocmds:function,on_open:function,on_close:function}
+local function zen(snacks)
   -- toggle tmux status line
   local on_open_tmux = function() end
   local on_close_tmux = function() end
   if is_tmux then
-    local tmux_status = get_tmux_opt("status")
+    local tmux_status
+    local tmux_pane
     local augroup = vim.api.nvim_create_augroup("zenmode_tmux", { clear = true })
     -- https://github.com/TranThangBin/.dotfiles/blob/01a5013b351aaf2b79aa7d771fdc2cec5d861799/nvim/.config/nvim/lua/tranquangthang/lazy/zen-mode.lua#L39
     on_open_tmux = function()
+      tmux_status = get_tmux_opt("status")
+      if snacks then
+        tmux_pane = get_tmux_opt("pane-border-status")
+        vim.fn.system([[tmux set -w pane-border-status off]])
+        vim.fn.system([[tmux set status off]])
+        vim.fn.system([[tmux list-panes -F '\#F' | grep -q Z || tmux resize-pane -Z]])
+      end
       -- restore tmux status line when switching to another tmux window or ctrl-z
       vim.api.nvim_create_autocmd({ "FocusLost", "VimSuspend" }, {
         group = augroup,
@@ -37,6 +47,15 @@ local function zen()
       })
     end
     on_close_tmux = function()
+      if snacks then
+        if type(tmux_pane) == "string" then
+          vim.fn.system(string.format([[tmux set -w pane-border-status %s]], tmux_pane))
+        else
+          vim.fn.system([[tmux set -uw pane-border-status]])
+        end
+        vim.fn.system(string.format([[tmux set status %s]], tmux_status))
+        vim.fn.system([[tmux list-panes -F '\#F' | grep -q Z && tmux resize-pane -Z]])
+      end
       vim.api.nvim_clear_autocmds({ group = augroup })
     end
   end
@@ -322,10 +341,9 @@ return {
     "folke/snacks.nvim",
     optional = true,
     opts = function(_, opts)
-      local z = zen()
+      local z = zen(true)
       z.autocmds()
       opts.zen = opts.zen or {}
-      -- TODO: tmux zoom: https://github.com/folke/zen-mode.nvim/blob/a31cf7113db34646ca320f8c2df22cf1fbfc6f2a/lua/zen-mode/plugins.lua#L96
       local on_open = opts.zen.on_open or function() end
       local on_close = opts.zen.on_close or function() end
       opts.zen.on_open = function()
