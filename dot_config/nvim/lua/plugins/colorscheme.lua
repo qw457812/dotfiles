@@ -312,6 +312,7 @@ return {
           -- require lazyvim.plugins.extras.editor.illuminate
           -- colors.surface1(#45475a) #494d64 #51576d colors.surface2(#585b70)
           local illuminate = util.darken(colors.surface2, 0.8, colors.base)
+          local indent_scope = util.blend(colors.green, colors.sapphire, 0.75)
           local custom_highlights = {
             -- IlluminatedWordText = { bg = util.darken(colors.surface1, 0.7, colors.base) }, -- use default
             IlluminatedWordRead = { bg = illuminate },
@@ -337,7 +338,9 @@ return {
                 or util.darken(colors.surface1, 0.7, colors.base),
             },
 
-            MiniIndentscopeSymbol = { fg = util.blend(colors.green, colors.sapphire, 0.75) },
+            MiniIndentscopeSymbol = { fg = indent_scope },
+            SnacksIndent = { fg = colors.surface0, style = { "nocombine" } }, -- IblIndent
+            SnacksIndentScope = { fg = indent_scope, style = { "nocombine" } },
 
             -- for flash treesitter search, not necessary after using `{ label = { rainbow = { enabled = true } } }` opts
             FlashLabel = { fg = colors.base, bg = colors.green, style = { "bold" } },
