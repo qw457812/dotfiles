@@ -121,7 +121,6 @@ function M.clear_ui_esc(opts)
   local is_cmdwin = vim.fn.getcmdwintype() ~= ""
   dismiss_notif()
 
-  -- TODO: break by https://github.com/LazyVim/LazyVim/commit/15c81fdbb839f0c657fe4c077114475e82f423fe
   if
     vim.v.hlsearch == 1 or vim.snippet.active()
     -- or has_notif()

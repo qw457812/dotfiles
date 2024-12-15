@@ -73,7 +73,6 @@ return {
         end
 
         if LazyVim.has("mini.pairs") then
-          -- or use `LazyVimKeymaps` User Event
           LazyVim.on_load(
             "mini.pairs",
             vim.schedule_wrap(function()
