@@ -1,6 +1,6 @@
 local st = require("snacks.toggle")
 local st_diag = st.diagnostics()
-local st_zen = assert(Snacks.toggle.get("zen"))
+local st_zen = assert(st.get("zen"))
 
 ---@class util.toggle
 local M = {}
@@ -95,7 +95,7 @@ M.zen = st({
     else
       if st_zen:get() then
         st_zen:set(false)
-      else
+      elseif package.loaded["zen-mode"] and require("zen-mode.view").is_open() then
         require("zen-mode").close()
       end
     end

@@ -182,16 +182,16 @@ return {
         keys = {
           -- trigger opts.autowrite of Snacks.scratch
           [close_key] = "close",
-          clear_ui_or_close = {
-            "<esc>",
-            function(self)
-              U.keymap.clear_ui_esc({
-                -- close = function() self:close() end,
-                esc = false,
-              })
-            end,
-            desc = "Clear UI or Close",
-          },
+          -- clear_ui_or_close = {
+          --   "<esc>",
+          --   function(self)
+          --     U.keymap.clear_ui_esc({
+          --       -- close = function() self:close() end,
+          --       esc = false,
+          --     })
+          --   end,
+          --   desc = "Clear UI or Close",
+          -- },
         },
       },
       -- override the opts.win.keys to avoid exiting terminal
@@ -199,23 +199,43 @@ return {
         win = {
           keys = {
             [close_key] = "hide",
-            -- use the same `clear_ui_or_close` name to ensure overwriting
-            clear_ui_or_close = {
-              "<esc>",
-              function(self)
-                U.keymap.clear_ui_esc({
-                  -- close = function() self:hide() end,
-                  esc = false,
-                })
-              end,
-              desc = "Clear UI or Close",
-            },
+            -- -- use the same `clear_ui_or_close` name to ensure overwriting
+            -- clear_ui_or_close = {
+            --   "<esc>",
+            --   function(self)
+            --     U.keymap.clear_ui_esc({
+            --       -- close = function() self:hide() end,
+            --       esc = false,
+            --     })
+            --   end,
+            --   desc = "Clear UI or Close",
+            -- },
             term_close = {
               term_close_key,
               function(self)
                 self:hide()
               end,
               mode = "t",
+              desc = "Close",
+            },
+          },
+        },
+      },
+      -- fix: close_key not working after closing zen
+      zen = {
+        win = {
+          keys = {
+            [close_key] = false, -- disable opts.win.keys[close_key]
+            zen_close = {
+              close_key,
+              function(self)
+                if vim.api.nvim_get_current_win() == self.win then
+                  -- Snacks.toggle.get("zen"):set(false)
+                  self:close()
+                else
+                  close_buffer_or_window_or_exit()
+                end
+              end,
               desc = "Close",
             },
           },
