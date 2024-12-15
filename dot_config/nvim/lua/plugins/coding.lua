@@ -99,6 +99,13 @@ return {
         --   "fallback",
         -- },
       })
+
+      -- blink is broken in cmdwin
+      vim.api.nvim_create_autocmd("CmdWinEnter", {
+        callback = function(event)
+          vim.b[event.buf].completion = false
+        end,
+      })
     end,
   },
 

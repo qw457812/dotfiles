@@ -33,6 +33,11 @@ return {
           position = "float", -- alternative: style = "float"
         },
       },
+      -- zen = {
+      --   show = {
+      --     tabline = true,
+      --   },
+      -- },
     },
     init = function()
       LazyVim.on_very_lazy(function()
@@ -48,7 +53,20 @@ return {
   },
   {
     "folke/snacks.nvim",
-    opts = function()
+    opts = function(_, opts)
+      opts.zen = opts.zen or {}
+      local on_open = opts.zen.on_open or function() end
+      local on_close = opts.zen.on_close or function() end
+      opts.zen.on_open = function()
+        on_open()
+        vim.g.user_winbar_old = vim.wo.winbar
+        vim.wo.winbar = nil
+      end
+      opts.zen.on_close = function()
+        on_close()
+        vim.wo.winbar = vim.g.user_winbar_old
+      end
+
       Snacks.config.style("zoom_indicator", {
         bo = {
           filetype = "snacks_zen_zoom_indicator",

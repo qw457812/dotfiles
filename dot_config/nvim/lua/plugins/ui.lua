@@ -64,6 +64,7 @@ return {
   -- https://github.com/minusfive/dotfiles/blob/897c9596471854842cae52d774f7e43426287e58/.config/nvim/lua/plugins/ui.lua#L152
   {
     "nvim-lualine/lualine.nvim",
+    dependencies = { "echasnovski/mini.icons" },
     optional = true,
     opts = function(_, opts)
       local is_termux = vim.g.user_is_termux
@@ -115,7 +116,7 @@ return {
           local lsp_clients = lsp_format.get_format_clients({ bufnr = vim.api.nvim_get_current_buf() })
           return #lsp_clients > 0
         end,
-        color = { fg = Snacks.util.color("WhichKeyIconCyan") },
+        color = { fg = Snacks.util.color("MiniIconsCyan") },
       }
 
       local linter = {
@@ -136,7 +137,7 @@ return {
           end, linters)
           return #linters > 0
         end,
-        color = { fg = Snacks.util.color("WhichKeyIconGreen") },
+        color = { fg = Snacks.util.color("MiniIconsGreen") },
       }
 
       local lsp = {
