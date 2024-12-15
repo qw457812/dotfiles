@@ -2,6 +2,28 @@ return {
   { "folke/lazy.nvim", version = false },
   { "LazyVim/LazyVim", version = false },
   {
+    "LazyVim/LazyVim",
+    opts = function()
+      -- HACK: undo https://github.com/LazyVim/LazyVim/commit/15c81fd in favor of U.keymap.clear_ui_esc
+      local orig_on_key
+      LazyVim.on_load("snacks.nvim", function()
+        orig_on_key = Snacks.util.on_key
+        function Snacks.util.on_key(key, cb)
+          if key:lower() == "<esc>" then
+            return
+          end
+          orig_on_key(key, cb)
+        end
+      end)
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "LazyVimKeymapsDefaults",
+        callback = function()
+          Snacks.util.on_key = orig_on_key
+        end,
+      })
+    end,
+  },
+  {
     "folke/snacks.nvim",
     ---@module "snacks"
     ---@type snacks.Config
@@ -56,15 +78,19 @@ return {
     opts = function(_, opts)
       opts.zen = opts.zen or {}
       local on_open = opts.zen.on_open or function() end
-      local on_close = opts.zen.on_close or function() end
-      opts.zen.on_open = function()
-        on_open()
-        vim.g.user_winbar_old = vim.wo.winbar
-        vim.wo.winbar = nil
-      end
-      opts.zen.on_close = function()
-        on_close()
-        vim.wo.winbar = vim.g.user_winbar_old
+      ---@param win snacks.win
+      opts.zen.on_open = function(win)
+        on_open(win)
+        vim.wo[win.win].winbar = nil
+        vim.api.nvim_create_autocmd("BufWinEnter", {
+          group = win.augroup,
+          callback = function()
+            if not vim.api.nvim_win_is_valid(win.win) then
+              return true
+            end
+            vim.wo[win.win].winbar = nil
+          end,
+        })
       end
 
       Snacks.config.style("zoom_indicator", {

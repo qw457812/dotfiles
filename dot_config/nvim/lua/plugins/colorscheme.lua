@@ -629,13 +629,6 @@ return {
               LazyVim.info(random, { title = "Random ColorScheme" })
             end
           end, { desc = "Random ColorScheme" })
-
-          -- vim.keymap.set(
-          --   "n",
-          --   "<leader>uR",
-          --   "<Cmd>nohlsearch<Bar>diffupdate<Bar>normal! <C-L><CR>",
-          --   { desc = "Redraw / Clear hlsearch / Diff Update" }
-          -- )
         end,
       })
     end,
