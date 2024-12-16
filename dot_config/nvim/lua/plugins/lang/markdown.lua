@@ -29,6 +29,21 @@ return {
       table.insert(opts.sources, { name = "render-markdown" })
     end,
   },
+  {
+    "saghen/blink.cmp",
+    optional = true,
+    opts = {
+      sources = {
+        default = { "markdown" },
+        providers = {
+          markdown = {
+            name = "RenderMarkdown",
+            module = "render-markdown.integ.blink",
+          },
+        },
+      },
+    },
+  },
 
   {
     "gaoDean/autolist.nvim",

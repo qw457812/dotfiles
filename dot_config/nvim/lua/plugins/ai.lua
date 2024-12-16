@@ -66,6 +66,15 @@ return {
     end,
   },
   {
+    "saghen/blink.cmp",
+    optional = true,
+    opts = function(_, opts)
+      if vim.tbl_get(opts, "sources", "providers", "codeium", "score_offset") then
+        opts.sources.providers.codeium.score_offset = 99 -- lower than copilot
+      end
+    end,
+  },
+  {
     "folke/noice.nvim",
     optional = true,
     opts = function(_, opts)
