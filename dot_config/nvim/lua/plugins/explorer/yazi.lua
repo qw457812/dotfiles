@@ -56,6 +56,10 @@ return {
         keymaps = {
           show_help = "~", -- `~` for yazi.nvim and `g?` for yazi
         },
+        integrations = LazyVim.pick.picker.name == "fzf" and {
+          grep_in_directory = "fzf-lua",
+          grep_in_selected_files = "fzf-lua",
+        } or nil,
         future_features = {
           ya_emit_reveal = true,
           ya_emit_open = true,

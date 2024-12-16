@@ -96,7 +96,6 @@ function M.clear_ui_esc(opts)
       --   vim.api.nvim_win_close(0, false)
       -- end
 
-      -- stylua: ignore
       vim.api.nvim_feedkeys(vim.keycode(vim.g.user_close_key), "m", false)
     end,
     popups = true,
