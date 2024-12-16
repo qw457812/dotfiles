@@ -2,28 +2,6 @@ return {
   { "folke/lazy.nvim", version = false },
   { "LazyVim/LazyVim", version = false },
   {
-    "LazyVim/LazyVim",
-    opts = function()
-      -- HACK: undo https://github.com/LazyVim/LazyVim/commit/15c81fd in favor of U.keymap.clear_ui_esc
-      local orig_on_key
-      LazyVim.on_load("snacks.nvim", function()
-        orig_on_key = Snacks.util.on_key
-        function Snacks.util.on_key(key, cb)
-          if key:lower() == "<esc>" then
-            return
-          end
-          orig_on_key(key, cb)
-        end
-      end)
-      vim.api.nvim_create_autocmd("User", {
-        pattern = "LazyVimKeymapsDefaults",
-        callback = function()
-          Snacks.util.on_key = orig_on_key
-        end,
-      })
-    end,
-  },
-  {
     "folke/snacks.nvim",
     ---@module "snacks"
     ---@type snacks.Config
@@ -75,10 +53,10 @@ return {
   },
   {
     "folke/snacks.nvim",
+    ---@param opts snacks.Config
     opts = function(_, opts)
       opts.zen = opts.zen or {}
       local on_open = opts.zen.on_open or function() end
-      ---@param win snacks.win
       opts.zen.on_open = function(win)
         on_open(win)
         vim.wo[win.win].winbar = nil

@@ -94,7 +94,6 @@ return {
               U.keymap.clear_ui_esc({
                 close = function()
                   -- simulate `q` keypress to abort
-                  -- stylua: ignore
                   vim.api.nvim_feedkeys(vim.keycode(opts_keymaps_abort), "m", false)
                 end,
                 esc = false,
