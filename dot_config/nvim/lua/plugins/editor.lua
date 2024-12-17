@@ -215,32 +215,25 @@ return {
     },
   },
 
-  {
-    "RRethy/vim-illuminate",
-    optional = true,
-    -- opts = function(_, opts)
-    --   opts.filetypes_denylist = vim.list_extend(opts.filetypes_denylist or { "dirbuf", "dirvish", "fugitive" }, {
-    --     "lazy",
-    --     "mason",
-    --     "harpoon",
-    --     "qf",
-    --     "netrw",
-    --     "neo-tree",
-    --     "oil",
-    --     "minifiles",
-    --     "trouble",
-    --     "notify",
-    --     "TelescopePrompt",
-    --   })
-    -- end,
-    specs = {
-      {
-        "folke/snacks.nvim",
-        optional = true,
-        opts = { words = { enabled = false } },
-      },
-    },
-  },
+  -- {
+  --   "RRethy/vim-illuminate",
+  --   optional = true,
+  --   opts = function(_, opts)
+  --     opts.filetypes_denylist = vim.list_extend(opts.filetypes_denylist or { "dirbuf", "dirvish", "fugitive" }, {
+  --       "lazy",
+  --       "mason",
+  --       "harpoon",
+  --       "qf",
+  --       "netrw",
+  --       "neo-tree",
+  --       "oil",
+  --       "minifiles",
+  --       "trouble",
+  --       "notify",
+  --       "TelescopePrompt",
+  --     })
+  --   end,
+  -- },
 
   {
     "tzachar/highlight-undo.nvim",

@@ -230,6 +230,7 @@ return {
               function(self)
                 if vim.api.nvim_get_current_win() == self.win then
                   -- Snacks.toggle.get("zen"):set(false)
+                  -- Snacks.zen.zen()
                   self:close()
                 else
                   close_buffer_or_window_or_exit()
