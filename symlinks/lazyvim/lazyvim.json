@@ -43,6 +43,7 @@
     "plugins.extras.game.exercism",
     "plugins.extras.game.leetcode",
     "plugins.extras.lang.xml",
+    "plugins.extras.lsp.mason-lock",
     "plugins.extras.lsp.symbol-usage",
     "plugins.extras.lsp.tiny-code-action",
     "plugins.extras.lsp.tiny-inline-diagnostic",
