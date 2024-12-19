@@ -130,13 +130,13 @@ case "${__CFBundleIdentifier}" in
         ZSH_TMUX_AUTOSTART=true
         # ZSH_TMUX_AUTOQUIT=false
         ;;
-    "net.kovidgoyal.kitty")
-        # https://zellij.dev/documentation/integration
-        ZELLIJ_AUTO_ATTACH=true
-        ZELLIJ_AUTO_EXIT=true
-        # eval "$(zellij setup --generate-auto-start zsh)" # not work well
-        start_zellij
-        ;;
+    # "net.kovidgoyal.kitty")
+    #     # https://zellij.dev/documentation/integration
+    #     ZELLIJ_AUTO_ATTACH=true
+    #     ZELLIJ_AUTO_EXIT=true
+    #     # eval "$(zellij setup --generate-auto-start zsh)" # not work well
+    #     start_zellij
+    #     ;;
     # TODO can not attach to the existing session, use vscode setting `terminal.integrated.defaultProfile.osx` instead for now
     # "com.microsoft.VSCode")
     #     ZSH_TMUX_AUTOSTART=true

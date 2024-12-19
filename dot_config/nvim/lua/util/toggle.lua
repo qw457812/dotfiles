@@ -107,9 +107,9 @@ M.ai_cmps = {}
 M.ai_cmp = st({
   name = "AI Completion",
   get = function()
-    return vim.tbl_count(vim.tbl_filter(function(ai)
+    return not vim.tbl_isempty(vim.tbl_filter(function(ai)
       return ai:get()
-    end, M.ai_cmps)) > 0
+    end, M.ai_cmps))
   end,
   set = function(state)
     for _, ai in pairs(M.ai_cmps) do
