@@ -30,6 +30,9 @@ set -x MANPAGER 'nvim -c "nnoremap d <C-d>|lua vim.defer_fn(function() vim.api.n
 set -x BAT_THEME TwoDark
 set -x BAT_STYLE plain
 set -x EZA_CONFIG_DIR "$HOME/.config/eza"
+set -x https_proxy http://127.0.0.1:7897
+set -x http_proxy http://127.0.0.1:7897
+set -x all_proxy socks5://127.0.0.1:7897
 
 abbr b "cd -"
 abbr q exit
@@ -171,7 +174,9 @@ eval (batpipe)
 
 fzf --fish | source
 
-pyenv init - | source
-
 set -gx ATUIN_NOBIND true
 atuin init fish | source
+
+pyenv init - | source
+set -gx PYENV_VIRTUALENV_DISABLE_PROMPT 1
+status --is-interactive; and pyenv virtualenv-init - | source
