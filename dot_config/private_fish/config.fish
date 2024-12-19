@@ -13,6 +13,7 @@ set -gx fish_cursor_replace_one underscore
 set -x fish_user_paths
 fish_add_path /opt/homebrew/bin
 fish_add_path /opt/homebrew/sbin
+fish_add_path ~/.local/bin
 
 set -g fish_greeting
 
@@ -32,7 +33,12 @@ set -x EZA_CONFIG_DIR "$HOME/.config/eza"
 
 abbr b "cd -"
 abbr q exit
-abbr c clear
+function c
+    clear
+    if set -q TMUX
+        command tmux clear-history
+    end
+end
 
 # Files & Directories
 alias l 'eza --all --group-directories-first --color=always --color-scale all --icons=auto --long --group --time-style=iso --git'
@@ -45,6 +51,23 @@ abbr rm "rm -i"
 abbr mkdir "mkdir -vp"
 abbr pwdc "pwd | tr -d '\n' | pbcopy"
 abbr ncdu "ncdu --color dark"
+abbr dl "cd ~/Downloads"
+abbr ... 'cd ../..'
+abbr .... 'cd ../../..'
+abbr ..... 'cd ../../../..'
+function mkd
+    mkdir -p $argv && cd $argv[-1]
+end
+function cdf
+    cd (osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')
+end
+function o
+    if test (count $argv) -eq 0
+        open .
+    else
+        open $argv
+    end
+end
 
 # Editor
 abbr vim nvim
@@ -55,6 +78,17 @@ alias vimpager 'nvim - -c "lua require(\'util.terminal\').colorize()"'
 # Bat
 alias cat 'bat --paging=never'
 abbr -a --position anywhere --set-cursor -- -h "-h 2>&1 | bat --plain --language=help"
+
+abbr -a --position anywhere H '| head'
+abbr -a --position anywhere T '| tail'
+abbr -a --position anywhere G '| grep'
+abbr -a --position anywhere L "| bat --style=plain --paging=always"
+abbr -a --position anywhere LL "2>&1 | bat --style=plain --paging=always"
+abbr -a --position anywhere C "| clipcopy"
+abbr -a --position anywhere F '| fzf'
+abbr -a --position anywhere V '| nvim - -c "lua U.terminal.colorize()"'
+abbr -a --position anywhere J '| jq'
+abbr -a --position anywhere W '| wc -l'
 
 # Tmux
 abbr t tmux
@@ -82,6 +116,22 @@ abbr gp "git pull"
 abbr gcl "git clone --recurse-submodules"
 abbr grv "git remote --verbose"
 
+# SVN
+abbr sva 'svn add'
+abbr svc 'svn commit'
+abbr svs 'svn status'
+abbr svu 'svn update'
+abbr svl 'svn log -v'
+function svd
+    svn diff -x -p $argv | svn_strip_diff_header | delta --line-numbers
+end
+function svld
+    svn log -v --diff $argv | svn_strip_diff_header | delta --line-numbers
+end
+function svldr
+    svn log -v --diff -r $argv | svn_strip_diff_header | delta --line-numbers
+end
+
 # Chezmoi
 abbr cz chezmoi
 abbr cze 'chezmoi edit'
@@ -93,6 +143,18 @@ abbr czea 'chezmoi edit --apply --verbose'
 abbr czz 'cd ~/.local/share/chezmoi'
 abbr czm 'chezmoi managed .'
 abbr czum 'chezmoi unmanaged .'
+
+# Homebrew
+abbr bo 'brew update && brew outdated'
+abbr bu 'brew upgrade'
+abbr bi 'brew info'
+abbr bI 'brew install'
+abbr bl 'brew list'
+abbr bs 'brew services'
+abbr bsr 'brew services restart'
+abbr bsk 'brew services kill'
+abbr bS 'brew search'
+abbr bd 'brew doctor'
 
 # Other
 abbr fda "fd -IH"
@@ -107,4 +169,9 @@ abbr py python3
 # https://github.com/eth-p/bat-extras/blob/master/doc/batpipe.md#usage
 eval (batpipe)
 
+fzf --fish | source
+
 pyenv init - | source
+
+set -gx ATUIN_NOBIND true
+atuin init fish | source
