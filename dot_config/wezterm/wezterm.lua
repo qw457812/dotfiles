@@ -16,6 +16,8 @@ require("mouse").apply_to_config(config)
 require("links").apply_to_config(config)
 require("keys").apply_to_config(config)
 
+config.default_prog = { "/opt/homebrew/bin/fish", "-l" }
+
 -- Window
 config.window_decorations = "RESIZE"
 config.window_padding = { left = 0, right = 0, top = 0, bottom = 0 }

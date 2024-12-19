@@ -413,6 +413,9 @@ set -g allow-passthrough on
 set -gu prefix2
 unbind C-a
 
+set -g default-shell /opt/homebrew/bin/fish
+set -g default-command /opt/homebrew/bin/fish
+
 # -- my bindings ---------------------------------------------------------------
 # window navigation
 bind -r p previous-window # select previous window

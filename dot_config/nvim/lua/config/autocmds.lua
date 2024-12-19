@@ -216,18 +216,18 @@ if vim.g.user_auto_root and not vim.o.autochdir then
   })
 end
 
-if vim.o.shell:find("zsh") then
-  -- work-around for zsh-vi-mode auto insert
+-- work-around for zsh-vi-mode/fish_vi_key_bindings auto insert
+if vim.o.shell:find("zsh") or vim.o.shell:find("fish") then
   vim.api.nvim_create_autocmd("TermEnter", {
-    group = vim.api.nvim_create_augroup("zsh_vi_mode", {}),
+    group = vim.api.nvim_create_augroup("shell_vi_mode", {}),
     pattern = "term://*" .. vim.o.shell,
-    desc = "Enter zsh-vi-mode's insert mode",
+    desc = "Enter insert mode of zsh-vi-mode or fish_vi_key_bindings",
     callback = function(event)
       if vim.bo[event.buf].filetype ~= "snacks_terminal" then
         return
       end
       vim.schedule(function()
-        -- powerlevel10k prompt_char for zsh-vi-mode normal mode: "❮ "
+        -- powerlevel10k for zsh-vi-mode or starship for fish_vi_key_bindings
         if vim.api.nvim_get_current_line():match("^❮ .*") then
           -- use `a` instead of `i` to restore cursor position
           vim.api.nvim_feedkeys(vim.keycode("a"), "n", false)
