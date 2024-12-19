@@ -10,9 +10,7 @@ return {
         win = {
           keys = {
             i_c_c = { "<C-c>", { "cmp_close", "cancel" }, mode = "i" },
-            i_esc = { "<esc>", "stopinsert", mode = "i" },
-            esc = { "<esc>", "cancel" },
-            cr = { "<cr>", "confirm" },
+            n_cr = { "<cr>", "confirm", mode = "n" },
           },
         },
       },

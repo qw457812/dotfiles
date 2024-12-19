@@ -30,9 +30,6 @@ set -x MANPAGER 'nvim -c "nnoremap d <C-d>|lua vim.defer_fn(function() vim.api.n
 set -x BAT_THEME TwoDark
 set -x BAT_STYLE plain
 set -x EZA_CONFIG_DIR "$HOME/.config/eza"
-set -x https_proxy http://127.0.0.1:7897
-set -x http_proxy http://127.0.0.1:7897
-set -x all_proxy socks5://127.0.0.1:7897
 
 abbr b "cd -"
 abbr q exit
@@ -166,6 +163,34 @@ abbr show-cursor "tput cnorm"
 abbr hide-cursor "tput civis"
 abbr lzd lazydocker
 abbr py python3
+
+# reload network
+function newloc
+    set -l old (networksetup -getcurrentlocation)
+    set -l new "tmp_"(date '+%Y%m%d_%H%M%S')
+    if networksetup -createlocation $new populate >/dev/null; and networksetup -switchtolocation $new >/dev/null; and string match -q "tmp_*" $old
+        networksetup -deletelocation $old >/dev/null
+    end
+end
+alias term_proxy_on='set -gx https_proxy http://127.0.0.1:7897; set -gx http_proxy http://127.0.0.1:7897; set -gx all_proxy socks5://127.0.0.1:7897'
+term_proxy_on
+alias term_proxy_off='set -e https_proxy; set -e http_proxy; set -e all_proxy'
+function sys_proxy_on
+    set -l proxy_ip "127.0.0.1"
+    set -l http_proxy_port 7897
+    set -l socks_proxy_port 7897
+    networksetup -setwebproxy Wi-Fi $proxy_ip $http_proxy_port
+    networksetup -setsecurewebproxy Wi-Fi $proxy_ip $http_proxy_port
+    networksetup -setsocksfirewallproxy Wi-Fi $proxy_ip $socks_proxy_port
+    networksetup -setwebproxystate Wi-Fi on
+    networksetup -setsecurewebproxystate Wi-Fi on
+    networksetup -setsocksfirewallproxystate Wi-Fi on
+end
+function sys_proxy_off
+    networksetup -setwebproxystate Wi-Fi off
+    networksetup -setsecurewebproxystate Wi-Fi off
+    networksetup -setsocksfirewallproxystate Wi-Fi off
+end
 
 # # brew info lesspipe
 # set -x LESSOPEN "|/opt/homebrew/bin/lesspipe.sh %s"
