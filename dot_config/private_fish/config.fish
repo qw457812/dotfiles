@@ -33,12 +33,6 @@ set -x EZA_CONFIG_DIR "$HOME/.config/eza"
 
 abbr b "cd -"
 abbr q exit
-function c
-    clear
-    if set -q TMUX
-        command tmux clear-history
-    end
-end
 
 # Files & Directories
 alias l 'eza --all --group-directories-first --color=always --color-scale all --icons=auto --long --group --time-style=iso --git'
@@ -52,22 +46,6 @@ abbr mkdir "mkdir -vp"
 abbr pwdc "pwd | tr -d '\n' | pbcopy"
 abbr ncdu "ncdu --color dark"
 abbr dl "cd ~/Downloads"
-abbr ... 'cd ../..'
-abbr .... 'cd ../../..'
-abbr ..... 'cd ../../../..'
-function mkd
-    mkdir -p $argv && cd $argv[-1]
-end
-function cdf
-    cd (osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')
-end
-function o
-    if test (count $argv) -eq 0
-        open .
-    else
-        open $argv
-    end
-end
 
 # Editor
 abbr vim nvim
@@ -92,8 +70,6 @@ abbr -a --position anywhere W '| wc -l'
 
 # Tmux
 abbr t tmux
-abbr tc 'tmux attach'
-abbr ta 'tmux attach -t'
 abbr tad 'tmux attach -d -t'
 abbr ts 'tmux new -s'
 abbr tl 'tmux ls'
@@ -122,15 +98,6 @@ abbr svc 'svn commit'
 abbr svs 'svn status'
 abbr svu 'svn update'
 abbr svl 'svn log -v'
-function svd
-    svn diff -x -p $argv | svn_strip_diff_header | delta --line-numbers
-end
-function svld
-    svn log -v --diff $argv | svn_strip_diff_header | delta --line-numbers
-end
-function svldr
-    svn log -v --diff -r $argv | svn_strip_diff_header | delta --line-numbers
-end
 
 # Chezmoi
 abbr cz chezmoi
@@ -149,12 +116,34 @@ abbr bo 'brew update && brew outdated'
 abbr bu 'brew upgrade'
 abbr bi 'brew info'
 abbr bI 'brew install'
-abbr bl 'brew list'
+abbr bl 'brew list | fzf'
 abbr bs 'brew services'
 abbr bsr 'brew services restart'
 abbr bsk 'brew services kill'
 abbr bS 'brew search'
 abbr bd 'brew doctor'
+
+# Fzf
+# `--height 100%` is required, see https://github.com/wez/wezterm/discussions/4101
+# --cycle
+set -x FZF_DEFAULT_OPTS "$FZF_DEFAULT_OPTS 
+  --height=100%
+  --layout=reverse
+  --ansi
+  --scrollbar="▐"
+  --preview-window=border-left
+  --bind=ctrl-j:down,ctrl-k:up
+  --bind=ctrl-f:page-down,ctrl-b:page-up
+  --bind=ctrl-s:jump
+  --bind=ctrl-u:preview-page-up,ctrl-d:preview-page-down
+  --bind=ctrl-a:beginning-of-line,ctrl-e:end-of-line
+"
+set fzf_diff_highlighter delta --paging=never --width=20
+fzf_configure_bindings \
+    --directory=\ct \
+    --git_log=\cg \
+    --git_status=\cs \
+    --processes=\cp
 
 # Other
 abbr fda "fd -IH"
@@ -195,13 +184,15 @@ end
 # # brew info lesspipe
 # set -x LESSOPEN "|/opt/homebrew/bin/lesspipe.sh %s"
 # https://github.com/eth-p/bat-extras/blob/master/doc/batpipe.md#usage
-eval (batpipe)
-
-fzf --fish | source
+if command -q batpipe
+    eval (batpipe)
+end
 
 set -gx ATUIN_NOBIND true
 atuin init fish | source
 
-pyenv init - | source
-set -gx PYENV_VIRTUALENV_DISABLE_PROMPT 1
-status --is-interactive; and pyenv virtualenv-init - | source
+if command -q pyenv
+    pyenv init - | source
+    set -gx PYENV_VIRTUALENV_DISABLE_PROMPT 1
+    status --is-interactive; and pyenv virtualenv-init - | source
+end

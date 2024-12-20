@@ -10,4 +10,6 @@ function fish_user_key_bindings
     bind H beginning-of-line
     bind -M visual L end-of-line
     bind -M visual H beginning-of-line
+    bind -m visual V beginning-of-line begin-selection end-of-line repaint-mode
+    bind -M visual V end-selection beginning-of-line begin-selection end-of-line
 end

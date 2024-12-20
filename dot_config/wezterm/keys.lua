@@ -116,13 +116,21 @@ M.action = {
 -- Do *NOT* lazy-loading smart-splits.nvim
 local function is_nvim(pane)
   -- this is set by the Neovim plugin on launch, and unset on ExitPre in Neovim
-  return pane:get_user_vars().IS_NVIM == "true"
+  return pane:get_user_vars().IS_NVIM == "true" -- or pane:get_foreground_process_name():find("n?vim")
 end
 
 local function is_tmux(pane)
   -- https://wezfurlong.org/wezterm/shell-integration.html#user-vars
   -- require `source "/Applications/WezTerm.app/Contents/Resources/wezterm.sh"` in ~/.zshrc
   return pane:get_user_vars().WEZTERM_IN_TMUX == "1"
+end
+
+local function is_fzf(pane)
+  -- https://wezfurlong.org/wezterm/config/lua/pane/get_foreground_process_name.html
+  local process_basename = string.gsub(pane:get_foreground_process_name(), "(.*[/\\])(.*)", "%2")
+  -- `--height 100%` is required for is_alt_screen_active, see https://github.com/wez/wezterm/discussions/4101
+  return process_basename == "fzf"
+    or (pane:is_alt_screen_active() and (process_basename == "zsh" or process_basename == "fish"))
 end
 
 ---@param resize_or_move "resize"|"move"
@@ -136,8 +144,8 @@ local function split_nav(resize_or_move, mods, key, direction)
     key = key,
     mods = mods,
     action = wezterm.action_callback(function(win, pane)
-      if is_nvim(pane) or is_tmux(pane) then
-        -- pass the keys through to nvim/tmux
+      if is_nvim(pane) or is_tmux(pane) or ((key == "j" or key == "k") and is_fzf(pane)) then
+        -- pass the keys through to nvim/tmux/fzf
         win:perform_action({ SendKey = { key = key, mods = mods } }, pane)
       else
         if resize_or_move == "resize" then

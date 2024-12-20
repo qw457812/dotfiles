@@ -291,6 +291,7 @@ nnoremap - :NERDTree<CR>
 
 " https://github.com/JetBrains/ideavim/discussions/357#discussioncomment-1189455
 nnoremap cn *Ncgn
+nnoremap gw *N
 
 " TODO is this better or not?
 " nmap <C-o> <Action>(Back)
