@@ -5,7 +5,8 @@
 
 prepend_keymap = [
   # https://yazi-rs.github.io/docs/tips/#dropping-to-shell
-  { on = "s", run = 'shell "$SHELL" --block', desc = "Open shell here" },
+  # { on = "s", run = 'shell "$SHELL" --block', desc = "Open shell here" },
+  { on = "s", run = 'shell fish --block', desc = "Open shell here" },
 
   # https://yazi-rs.github.io/docs/tips/#smart-enter
   # https://yazi-rs.github.io/docs/faq#why-separate-open-enter
@@ -100,10 +101,22 @@ prepend_keymap = [
     "<Space>",
     "/",
   ], run = "search --via=rg", desc = "Search files by content via ripgrep" },
+  # https://yazi-rs.github.io/docs/tips/#macos-quick-look
+  { on = [
+    "<Space>",
+    ",",
+  ], run = '''
+      shell 'qlmanage -p "$@"'
+    ''', desc = "Macos Quick Look" },
   { on = [
     "<Space>",
     "<Backspace>",
   ], run = "quit", desc = "Exit the process" },
+  # https://github.com/yazi-rs/plugins/tree/main/diff.yazi
+  { on = [
+    "<Space>",
+    "D",
+  ], run = 'plugin diff', desc = "Diff the selected with the hovered file" },
   { on = [
     "c",
     "c",
