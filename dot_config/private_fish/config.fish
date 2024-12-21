@@ -1,7 +1,3 @@
-if status is-interactive
-    # Commands to run in interactive sessions can go here
-end
-
 # Cursor styles
 set -gx fish_vi_force_cursor 1
 set -gx fish_cursor_default block
@@ -21,8 +17,7 @@ set -gx EDITOR (which nvim)
 set -gx VISUAL $EDITOR
 
 # Exports
-# https://github.com/gpakosz/.tmux
-set -x TERM xterm-256color
+set -x TERM xterm-256color # https://github.com/gpakosz/.tmux
 set -x LESS '--RAW-CONTROL-CHARS --ignore-case --LONG-PROMPT --chop-long-lines --incsearch --use-color --tabs=4 --intr=c$ --save-marks --status-line'
 # set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
 set -x MANPAGER 'nvim -c "nnoremap d <C-d>|lua vim.defer_fn(function() vim.api.nvim_command(\"silent! nunmap dd|nnoremap u <C-u>\") end, 500)" +Man!'
@@ -118,10 +113,7 @@ abbr bi 'brew info'
 abbr bI 'brew install'
 abbr bl 'brew list | fzf'
 abbr bs 'brew services'
-abbr bsr 'brew services restart'
-abbr bsk 'brew services kill'
 abbr bS 'brew search'
-abbr bd 'brew doctor'
 
 # Fzf
 # `--height 100%` is required, see https://github.com/wez/wezterm/discussions/4101
@@ -161,13 +153,21 @@ function newloc
         networksetup -deletelocation $old >/dev/null
     end
 end
-alias term_proxy_on='set -gx https_proxy http://127.0.0.1:7897; set -gx http_proxy http://127.0.0.1:7897; set -gx all_proxy socks5://127.0.0.1:7897'
-term_proxy_on
-alias term_proxy_off='set -e https_proxy; set -e http_proxy; set -e all_proxy'
+
+set -g proxy_ip "127.0.0.1"
+set -g http_proxy_port 7897
+set -g socks_proxy_port 7897
+function term_proxy_on
+    set -gx https_proxy "http://$proxy_ip:$http_proxy_port"
+    set -gx http_proxy "http://$proxy_ip:$http_proxy_port"
+    set -gx all_proxy "socks5://$proxy_ip:$socks_proxy_port"
+end
+function term_proxy_off
+    set -e https_proxy
+    set -e http_proxy
+    set -e all_proxy
+end
 function sys_proxy_on
-    set -l proxy_ip "127.0.0.1"
-    set -l http_proxy_port 7897
-    set -l socks_proxy_port 7897
     networksetup -setwebproxy Wi-Fi $proxy_ip $http_proxy_port
     networksetup -setsecurewebproxy Wi-Fi $proxy_ip $http_proxy_port
     networksetup -setsocksfirewallproxy Wi-Fi $proxy_ip $socks_proxy_port
@@ -181,18 +181,22 @@ function sys_proxy_off
     networksetup -setsocksfirewallproxystate Wi-Fi off
 end
 
-# # brew info lesspipe
-# set -x LESSOPEN "|/opt/homebrew/bin/lesspipe.sh %s"
-# https://github.com/eth-p/bat-extras/blob/master/doc/batpipe.md#usage
-if command -q batpipe
-    eval (batpipe)
-end
+if status is-interactive
+    if type -q atuin
+        set -gx ATUIN_NOBIND true
+        atuin init fish | source
+    end
 
-set -gx ATUIN_NOBIND true
-atuin init fish | source
+    # set -x LESSOPEN "|/opt/homebrew/bin/lesspipe.sh %s"
+    if type -q batpipe
+        eval (batpipe)
+    end
 
-if command -q pyenv
-    pyenv init - | source
-    set -gx PYENV_VIRTUALENV_DISABLE_PROMPT 1
-    status --is-interactive; and pyenv virtualenv-init - | source
+    if type -q pyenv
+        pyenv init - | source
+        set -gx PYENV_VIRTUALENV_DISABLE_PROMPT 1
+        pyenv virtualenv-init - | source
+    end
+
+    term_proxy_on
 end
