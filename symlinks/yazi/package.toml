@@ -1,5 +1,5 @@
 [plugin]
-deps = [{ use = "yazi-rs/plugins:full-border", rev = "ec97f88" }, { use = "yazi-rs/plugins:smart-filter", rev = "ec97f88" }, { use = "yazi-rs/plugins:git", rev = "ec97f88" }, { use = "dedukun/bookmarks", rev = "20ece7e" }, { use = "orhnk/system-clipboard", rev = "7775a80" }, { use = "llanosrocas/githead", rev = "bf150f3" }, { use = "yazi-rs/plugins:smart-enter", rev = "ec97f88" }]
+deps = [{ use = "yazi-rs/plugins:full-border", rev = "7afba3a" }, { use = "yazi-rs/plugins:smart-filter", rev = "7afba3a" }, { use = "yazi-rs/plugins:git", rev = "7afba3a" }, { use = "dedukun/bookmarks", rev = "35da107" }, { use = "orhnk/system-clipboard", rev = "7775a80" }, { use = "llanosrocas/githead", rev = "bf150f3" }, { use = "yazi-rs/plugins:smart-enter", rev = "7afba3a" }, { use = "yazi-rs/plugins:diff", rev = "7afba3a" }]
 
 [flavor]
 deps = [{ use = "yazi-rs/flavors:catppuccin-frappe", rev = "8458d25" }]

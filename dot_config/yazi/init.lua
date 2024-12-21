@@ -6,6 +6,8 @@ require("smart-enter"):setup({
 require("session"):setup({
   sync_yanked = true,
 })
+-- https://yazi-rs.github.io/docs/tips/#folder-rules
+require("folder-rules"):setup()
 -- https://github.com/yazi-rs/plugins/tree/main/full-border.yazi
 require("full-border"):setup()
 -- https://github.com/yazi-rs/plugins/tree/main/git.yazi
