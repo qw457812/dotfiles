@@ -1,5 +1,6 @@
 #include "cpu.h"
 // clone https://github.com/FelixKratz/SketchyBarHelper.git to ~/.config/sketchybar/helper/SketchyBarHelper
+// commit: 2cceae5
 #include "SketchyBarHelper/sketchybar.h"
 
 struct cpu g_cpu;
