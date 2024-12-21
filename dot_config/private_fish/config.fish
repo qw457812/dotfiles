@@ -18,6 +18,8 @@ set -gx VISUAL $EDITOR
 
 # Exports
 set -x TERM xterm-256color # https://github.com/gpakosz/.tmux
+set -x LC_ALL "en_US.UTF-8"
+set -x LANG "en_US.UTF-8"
 set -x LESS '--RAW-CONTROL-CHARS --ignore-case --LONG-PROMPT --chop-long-lines --incsearch --use-color --tabs=4 --intr=c$ --save-marks --status-line'
 # set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
 set -x MANPAGER 'nvim -c "nnoremap d <C-d>|lua vim.defer_fn(function() vim.api.nvim_command(\"silent! nunmap dd|nnoremap u <C-u>\") end, 500)" +Man!'
