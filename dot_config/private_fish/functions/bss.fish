@@ -1,4 +1,4 @@
-function bss
+function bss --wraps='brew services start'
     if test (count $argv) -eq 0
         brew services
     else
@@ -10,3 +10,5 @@ function bss
         end
     end
 end
+
+# complete -c bss -f -a "(brew services list --json | jq -r '.[].name')"

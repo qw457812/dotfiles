@@ -5,3 +5,9 @@ function ta
         tmux attach -t $argv
     end
 end
+
+function __complete_ta
+    tmux list-sessions -F '#S' 2>/dev/null
+end
+
+complete -c ta -f -a "(__complete_ta)"

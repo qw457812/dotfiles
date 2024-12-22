@@ -1454,7 +1454,7 @@
            ; [:!Qk :same_wind_app :Kitty]
            [:!Qk :open-default-terminal :!default-terminal]
            ; [:!Qk :same_wind_app :default-terminal]
-           [:!Qk [:open "/Applications/Alacritty.app"] :default-terminal] ; kitty.app
+           [:!Qk [:open "/Applications/kitty.app"] :default-terminal]
            [:!Ql [:open "/Applications/Visual Studio Code.app"] :!VSCode]
            [:!Ql :same_wind_app :VSCode]
            [:!Qsemicolon [:open "/Library/Application Support/Citrix Receiver/Citrix Viewer.app"]] ; Citrix Workspace.app
@@ -1882,7 +1882,7 @@
            ; [:!Wk :same_wind_app :Kitty]
            [:!Wk [:left_command :open-default-terminal] :!default-terminal]
            ; [:!Wk :same_wind_app :default-terminal]
-           [:!Wk [:left_command [:open "/Applications/Alacritty.app"]] :default-terminal] ; kitty.app
+           [:!Wk [:left_command [:open "/Applications/kitty.app"]] :default-terminal]
            [:!Wl [:left_command [:open "/Applications/Visual Studio Code.app"]] :!VSCode]
            [:!Wl :same_wind_app :VSCode]
            [:!Wsemicolon [:left_command [:open "/Library/Application Support/Citrix Receiver/Citrix Viewer.app"]]] ; Citrix Workspace.app
