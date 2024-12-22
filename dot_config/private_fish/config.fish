@@ -50,7 +50,6 @@ abbr vim nvim
 abbr vi nvim
 abbr v nvim
 alias vimpager 'nvim - -c "lua require(\'util.terminal\').colorize()"'
-alias vless "nvim -u $(brew --prefix)/share/nvim/runtime/macros/less.vim"
 alias cat 'bat --paging=never'
 abbr -a --position anywhere --set-cursor -- -h "% -h 2>&1 | bat --plain --language=help"
 abbr -a --position anywhere --set-cursor L "% | bat --style=plain --paging=always"
@@ -216,6 +215,8 @@ if status is-interactive
         abbr dl 'cd ~/storage/downloads'
         abbr rime 'cd ~/storage/shared/Android/rime'
     else
+        alias vless "nvim -u $(brew --prefix)/share/nvim/runtime/macros/less.vim"
+
         term_proxy_on
     end
 end
