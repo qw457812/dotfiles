@@ -1,4 +1,4 @@
-function o
+function o --wraps=open
     if test (count $argv) -eq 0
         open .
     else

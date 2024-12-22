@@ -9,7 +9,7 @@ local map = U.keymap.map
 local safe_map = U.keymap.safe_map
 local del = U.keymap.del
 
-local cmdwin = function(type)
+local function cmdwin(type)
   local function open()
     vim.api.nvim_feedkeys(vim.keycode("q" .. type .. "G"), "n", false)
   end
@@ -24,7 +24,7 @@ local cmdwin = function(type)
 end
 
 -- https://github.com/rafi/vim-config/blob/3689ae1ba113e2b8c6d12f17281fd14d91e58027/lua/rafi/config/keymaps.lua#L122
-local blockwise_force = function(key)
+local function blockwise_force(key)
   local c_v = vim.keycode("<C-v>")
   local keyseq = {
     I = { v = "<C-v>I", V = "<C-v>^o^I", [c_v] = "I" },
@@ -79,7 +79,7 @@ LazyViewConfig.commands.log.key = "gL"
 safe_map("n", { "J", "<Down>" }, "<cmd>bnext<cr>", { desc = "Next Buffer" })
 safe_map("n", { "K", "<Up>" }, "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
 map({ "n", "x" }, "gj", "J", { desc = "Join Lines" })
-map({ "n", "x" }, "gk", "K", { desc = "Keywordprg" }) -- not necessary
+map({ "n", "x" }, "gk", "K", { desc = "Keywordprg" }) -- see `:h :Man`
 LazyViewConfig.keys.hover = "gk"
 
 map("n", "<Left>", "<C-o>", { desc = "Go Back" })

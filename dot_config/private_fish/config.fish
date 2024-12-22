@@ -32,38 +32,39 @@ abbr b "cd -"
 abbr q exit
 
 # Files & Directories
-alias l 'eza --all --group-directories-first --color=always --color-scale all --icons=auto --long --group --time-style=iso --git'
-alias la 'eza --all --group-directories-first --color=always --color-scale all --icons=auto --long --binary --group --header --modified --accessed --created --time-style=iso --git'
-alias lm 'eza --all --sort=modified --color=always --color-scale all --icons=auto --long --binary --group --header --modified --accessed --created --changed --time-style=iso --git'
+alias l 'eza --all --group-directories-first --color=always --color-scale all --icons=always --long --group --time-style=iso --git'
+alias la 'eza --all --group-directories-first --color=always --color-scale all --icons=always --long --binary --group --header --modified --accessed --created --time-style=iso --git'
+alias lm 'eza --all --sort=modified --color=always --color-scale all --icons=always --long --binary --group --header --modified --accessed --created --changed --time-style=iso --git'
 alias lt 'eza --tree --level=2'
 abbr mv "mv -iv"
 abbr cp "cp -riv"
 abbr rm "rm -i"
 abbr mkdir "mkdir -vp"
-abbr pwdc "pwd | tr -d '\n' | pbcopy"
 abbr ncdu "ncdu --color dark"
+abbr pwdc "pwd | tr -d '\n' | fish_clipboard_copy"
+alias path "echo $PATH | tr ':' '\n'"
 abbr dl "cd ~/Downloads"
 
-# Editor
+# Editor & Pager
 abbr vim nvim
 abbr vi nvim
 abbr v nvim
 alias vimpager 'nvim - -c "lua require(\'util.terminal\').colorize()"'
-
-# Bat
+alias vless "nvim -u $(brew --prefix)/share/nvim/runtime/macros/less.vim"
 alias cat 'bat --paging=never'
-abbr -a --position anywhere --set-cursor -- -h "-h 2>&1 | bat --plain --language=help"
-
+abbr -a --position anywhere --set-cursor -- -h "% -h 2>&1 | bat --plain --language=help"
+abbr -a --position anywhere --set-cursor L "% | bat --style=plain --paging=always"
+abbr -a --position anywhere --set-cursor LL "% 2>&1 | bat --style=plain --paging=always"
+abbr -a --position anywhere --set-cursor V '% | nvim - -c "lua U.terminal.colorize()"'
+abbr -a --position anywhere --set-cursor C "% | fish_clipboard_copy"
+abbr -a --position anywhere --set-cursor F '% | fzf'
+abbr -a --position anywhere --set-cursor W '% | wc -l'
+abbr -a --position anywhere --set-cursor NE '% 2> /dev/null'
+abbr -a --position anywhere --set-cursor NUL '% > /dev/null 2>&1'
 abbr -a --position anywhere H '| head'
 abbr -a --position anywhere T '| tail'
 abbr -a --position anywhere G '| grep'
-abbr -a --position anywhere L "| bat --style=plain --paging=always"
-abbr -a --position anywhere LL "2>&1 | bat --style=plain --paging=always"
-abbr -a --position anywhere C "| clipcopy"
-abbr -a --position anywhere F '| fzf'
-abbr -a --position anywhere V '| nvim - -c "lua U.terminal.colorize()"'
 abbr -a --position anywhere J '| jq'
-abbr -a --position anywhere W '| wc -l'
 
 # Tmux
 abbr t tmux
@@ -88,6 +89,7 @@ abbr gpp "git push"
 abbr gp "git pull"
 abbr gcl "git clone --recurse-submodules"
 abbr grv "git remote --verbose"
+abbr gprav "git pull --rebase --autostash -v"
 
 # SVN
 abbr sva 'svn add'
@@ -119,17 +121,18 @@ abbr bS 'brew search'
 
 # Fzf
 # `--height 100%` is required, see https://github.com/wez/wezterm/discussions/4101
-# --cycle
+# --cycle --border --info=inline-right
 set -x FZF_DEFAULT_OPTS "$FZF_DEFAULT_OPTS 
   --height=100%
   --layout=reverse
   --ansi
   --scrollbar="▐"
+	--ellipsis="…"
   --preview-window=border-left
   --bind=ctrl-j:down,ctrl-k:up
-  --bind=ctrl-f:page-down,ctrl-b:page-up
+  --bind=ctrl-u:half-page-up,ctrl-d:half-page-down
   --bind=ctrl-s:jump
-  --bind=ctrl-u:preview-page-up,ctrl-d:preview-page-down
+  --bind=ctrl-f:preview-half-page-down,ctrl-b:preview-half-page-up
   --bind=ctrl-a:beginning-of-line,ctrl-e:end-of-line
 "
 set fzf_diff_highlighter delta --paging=never --width=20
@@ -140,21 +143,14 @@ fzf_configure_bindings \
     --processes=\cp
 
 # Other
+abbr reload "exec fish -l"
 abbr fda "fd -IH"
 abbr rga "rg -uu"
 abbr show-cursor "tput cnorm"
 abbr hide-cursor "tput civis"
 abbr lzd lazydocker
+abbr zj zellij
 abbr py python3
-
-# reload network
-function newloc
-    set -l old (networksetup -getcurrentlocation)
-    set -l new "tmp_"(date '+%Y%m%d_%H%M%S')
-    if networksetup -createlocation $new populate >/dev/null; and networksetup -switchtolocation $new >/dev/null; and string match -q "tmp_*" $old
-        networksetup -deletelocation $old >/dev/null
-    end
-end
 
 set -g proxy_ip "127.0.0.1"
 set -g http_proxy_port 7897
@@ -195,10 +191,31 @@ if status is-interactive
     end
 
     if type -q pyenv
+        set -Ux PYENV_ROOT $HOME/.pyenv
+        fish_add_path $PYENV_ROOT/bin
         pyenv init - | source
         set -gx PYENV_VIRTUALENV_DISABLE_PROMPT 1
         pyenv virtualenv-init - | source
     end
 
-    term_proxy_on
+    if set -q TERMUX_VERSION
+        fish_add_path ~/go/bin
+
+        # https://github.com/sharkdp/bat/issues/1517
+        function man --wraps='man'
+            command man $argv | eval $MANPAGER
+        end
+
+        abbr pkgu 'pkg update && pkg upgrade'
+        abbr pkgi 'pkg install'
+        abbr pkgs 'pkg search'
+        abbr pkgl 'pkg list-installed'
+        abbr open termux-open
+        alias l 'eza --all --group-directories-first --color=always --color-scale all --icons=always --long --time-style=iso --no-user --git'
+        alias ll 'eza --all --group-directories-first --color=always --color-scale all --icons=always --long --group --time-style=iso --git'
+        abbr dl 'cd ~/storage/downloads'
+        abbr rime 'cd ~/storage/shared/Android/rime'
+    else
+        term_proxy_on
+    end
 end
