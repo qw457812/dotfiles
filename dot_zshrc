@@ -15,7 +15,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="robbyrussell"
+ZSH_THEME="powerlevel10k/powerlevel10k"
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -33,10 +33,10 @@ ZSH_THEME="robbyrussell"
 # Uncomment one of the following lines to change the auto-update behavior
 # zstyle ':omz:update' mode disabled  # disable automatic updates
 # zstyle ':omz:update' mode auto      # update automatically without asking
-zstyle ':omz:update' mode reminder  # just remind me to update when it's time
+# zstyle ':omz:update' mode reminder  # just remind me to update when it's time
 
 # Uncomment the following line to change how often to auto-update (in days).
-zstyle ':omz:update' frequency 13
+# zstyle ':omz:update' frequency 13
 
 # Uncomment the following line if pasting URLs and other text is messed up.
 # DISABLE_MAGIC_FUNCTIONS="true"
@@ -82,22 +82,21 @@ plugins=(
   tmux
   zsh-vi-mode
   you-should-use
+  zsh-autosuggestions
+  zsh-syntax-highlighting # must be the last plugin sourced
 )
-
-# https://docs.brew.sh/Shell-Completion
-FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
 
 # `vv` of zsh-vi-mode
 export EDITOR='nvim'
 export VISUAL='nvim'
+# outside of tmux, `$TERM` must be set to `xterm-256color` | https://github.com/gpakosz/.tmux
+export TERM='xterm-256color'
 
-# https://github.com/nebrelbug/dotfiles/blob/17f714ea090bcaf1d7105070eed0bd012e86e5af/.zshrc
-# https://github.com/OnurKader/.dotfiles/blob/9ffc1692cbfbaba225df7c0ff1d49173d7a023e2/.zshrc
-# run `zellij setup --generate-auto-start zsh`, observe different between `zellij attach -c` and `zellij attach -c main`
+# see output of `zellij setup --generate-auto-start zsh`
 function start_zellij() {
     if [[ -z "$ZELLIJ" ]]; then
         if [[ "$ZELLIJ_AUTO_ATTACH" == "true" ]]; then
-            zellij attach -c main
+            zellij attach -c main # add `main`
         else
             zellij
         fi
@@ -108,39 +107,17 @@ function start_zellij() {
     fi
 }
 
-# you have to add the `ZSH...=...` assignment before the line `source $ZSH/oh-my-zsh.sh`, from https://github.com/ohmyzsh/ohmyzsh/issues/3676#issuecomment-77806736
-# https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/tmux
-# https://github.com/ohmyzsh/ohmyzsh/issues/7420
-# if [ "$TERMINAL_EMULATOR" != "JetBrains-JediTerm" ]; then
-#     ZSH_TMUX_AUTOSTART=true
-#     # ZSH_TMUX_AUTOCONNECT=false
-# fi
-# -z "$INTELLIJ_ENVIRONMENT_READER" | https://github.com/ohmyzsh/ohmyzsh/pull/11927
-# 防止影响JetBrains, emacs, vscode内的终端
-# if [[ "$TERM" == "xterm-kitty" ]]; then
-#     ZSH_TMUX_AUTOSTART=true
-# fi
-# outside of tmux, `$TERM` must be set to `xterm-256color` | https://github.com/gpakosz/.tmux
-export TERM='xterm-256color'
-# run `env | less` on kitty and iterm2
-# $TERM_PROGRAM
+# you have to add the `ZSH...=...` assignment before the line `source $ZSH/oh-my-zsh.sh`, see https://github.com/ohmyzsh/ohmyzsh/issues/3676#issuecomment-77806736
+# prevent from affecting the terminal in JetBrains, emacs, vscode | https://github.com/ohmyzsh/ohmyzsh/issues/7420
 case "${__CFBundleIdentifier}" in
-    # "org.alacritty"|"com.github.wez.wezterm")
     "org.alacritty")
         ZSH_TMUX_AUTOSTART=true
         # ZSH_TMUX_AUTOQUIT=false
         ;;
     # "net.kovidgoyal.kitty")
-    #     # https://zellij.dev/documentation/integration
     #     ZELLIJ_AUTO_ATTACH=true
     #     ZELLIJ_AUTO_EXIT=true
-    #     # eval "$(zellij setup --generate-auto-start zsh)" # not work well
-    #     start_zellij
-    #     ;;
-    # TODO can not attach to the existing session, use vscode setting `terminal.integrated.defaultProfile.osx` instead for now
-    # "com.microsoft.VSCode")
-    #     ZSH_TMUX_AUTOSTART=true
-    #     ZSH_TMUX_DEFAULT_SESSION_NAME="vscode:$PWD"
+    #     start_zellij # eval "$(zellij setup --generate-auto-start zsh)" # not work well
     #     ;;
 esac
 
@@ -171,376 +148,95 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-source ~/powerlevel10k/powerlevel10k.zsh-theme
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+export PATH="$PATH:$HOME/.local/bin"
+export PATH="$PATH:$HOME/.config/doomemacs/bin"
 
-# zsh-syntax-highlighting
-source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-
-# zsh-autosuggestions
-source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-
-# https://docs.brew.sh/Homebrew-and-Python
-export PATH="$(brew --prefix python)/libexec/bin:$PATH"
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-# eval $(thefuck --alias)
-
-# https://github.com/cheat/cheat
-export CHEAT_USE_FZF=true
-
-# source $HOME/.config/broot/launcher/bash/br
-
-# To initialize zoxide, add this to your configuration (usually ~/.zshrc):
-eval "$(zoxide init zsh)"
-
-# https://stackoverflow.com/questions/14189134/how-to-change-git-from-chinese-to-english-in-mac
 export LC_ALL=en_US.UTF-8
-# You may need to manually set your language environment
 export LANG=en_US.UTF-8
 
-# export LESS='-R'
-# https://github.com/infokiller/config-public/blob/939e5c3735762ba15c298d8ce37a1b48461d2e72/.config/lesskey
-# https://github.com/infokiller/config-public/blob/939e5c3735762ba15c298d8ce37a1b48461d2e72/.profile#L318
-# https://github.com/PatrickF1/dotfiles/blob/b9d08e85a606dbd8be997e6a1cdba1e1dcf08b12/.config/lesskey#L23
-# https://github.com/christian-oudard/dotfiles/blob/4c92919d514611aa70b4f33beb933dfdb4cf391a/dot_config/lesskey#L121
-# https://github.com/sharkdp/bat#indentation
 # --status-column --status-col-width=1
 # --underline-special
 # --shift=10
 # --color=d+b$ --color=s+y$ --color=u+g$ (--use-color not required in this case)
 # https://explainshell.com/explain?cmd=less+-RiMSx4
 export LESS='--RAW-CONTROL-CHARS --ignore-case --LONG-PROMPT --chop-long-lines --incsearch --use-color --tabs=4 --intr=c$ --save-marks --status-line'
-
-# https://github.com/sharkdp/bat
-# bat --list-themes | fzf --preview="bat --theme={} --color=always ~/.zshrc"
 export BAT_THEME="TwoDark"
-export MANPAGER="sh -c 'col -bx | bat -l man -p'"
-# https://neovim.io/doc/user/filetype.html#ft-man-plugin
-# `:help :Man` in nvim
-# outline via `gO`, copy via `y`
-# export MANPAGER='nvim +Man!'
-man() {
-    # MANPAGER='nvim +Man!' command man "$1"
-    MANPAGER='nvim -c "nnoremap d <C-d>|lua vim.defer_fn(function() vim.api.nvim_command(\"silent! nunmap dd|nnoremap u <C-u>\") end, 500)" +Man!' command man "$1"
-    # alternative
-    # nvim "+hide Man $1"
-    # see `:verbose nmap u`(tzachar/highlight-undo.nvim), `:verbose nmap d`(Don't Yank Empty Line, `dd` defined in keymaps.lua), `:verbose nmap q`(ftplugin/man.vim)
-    # TODO: use autocmd to `nunmap <buffer> q` when jump to another man page by `K` (BufReadPost not triggered)
-    # nvim -c "nnoremap <silent> q :q<CR>|nnoremap d <C-d>|lua vim.defer_fn(function() vim.api.nvim_command('silent! nunmap dd|nnoremap u <C-u>|silent! nunmap <buffer> q') end, 500)" "+hide Man $1"
-}
-# plain: disables all available components. | bat --help
 export BAT_STYLE="plain"
-h() {
-    "$@" --help 2>&1 | bat --plain --language=help
-}
-# use global aliases to override -h and --help entirely:
-# Be aware that in some cases, -h may not be a shorthand of --help (for example with ls).
-# alias -g -- -h='-h 2>&1 | bat --language=help --style=plain'
-alias -g -- --help='--help 2>&1 | bat --language=help --style=plain'
-alias cat='bat --paging=never'
+# export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+export MANPAGER='nvim -c "nnoremap d <C-d>|lua vim.defer_fn(function() vim.api.nvim_command(\"silent! nunmap dd|nnoremap u <C-u>\") end, 500)" +Man!'
+export EZA_CONFIG_DIR="$HOME/.config/eza"
 
-# brew info lesspipe
-# export LESSOPEN="|/opt/homebrew/bin/lesspipe.sh %s"
-
-# https://github.com/eth-p/bat-extras/blob/master/doc/batpipe.md#usage
-eval "$(batpipe)"
-
-# more
-# alias m='less'
-# alias m='bat --paging=always'
-function m() {
-  if [ $# -eq 0 ]; then
-    # --quit-if-one-screen to match `bat` behavior
-    less -F .;
-  elif [ $# -eq 1 ]; then
-    # sometimes lesspipe or batpipe not colorize the output
-
-    # TODO `--paging=always` cause `[bat error]: '.' is a directory.` piped to pager when call `m .`
-    # bat --paging=always "$@" || less "$@";
-    # Is this `[bat error]` stderr or stdout?
-    # Both `bat . > /dev/null` and `bat . 2> /dev/null` can't suppress the error,
-    # Only `bat . > /dev/null 2>&1` can, but the expected output is suppressed too.
-    # bat "$@" 2> /dev/null || less "$@"; # can't suppress the error, why?
-
-    bat "$@" || less -F "$@";
-  else
-    # bat combine multiple files into one
-    # batpipe + less not colorize the output when multiple files
-    # so use lesspipe + less
-    LESSOPEN="|/opt/homebrew/bin/lesspipe.sh %s" less -F "$@";
-  fi;
-}
-
-# https://github.com/wofr06/lesspipe#511-syntax-highlighting-choices
-# https://stackoverflow.com/questions/43702876/creating-an-alias-in-bash-to-less-sh-less-vim
-# https://neovim.io/doc/user/various.html#less
-lessc () { /usr/share/vim/vim90/macros/less.sh "$@"}
-alias vless="nvim -u $(brew --prefix)/share/nvim/runtime/macros/less.vim"
-
-# brew search vim
-# Warning: Error searching on GitHub: GitHub API Error: Requires authentication
-# Create a GitHub personal access token: https://github.com/settings/tokens/new?scopes=gist,repo,workflow&description=Homebrew
-# export HOMEBREW_GITHUB_API_TOKEN=
-
-# http://www.npmmirror.com/
-# alias for cnpm
-# alias cnpm="npm --registry=https://registry.npmmirror.com \
-#   --cache=$HOME/.npm/.cache/cnpm \
-#   --disturl=https://npmmirror.com/mirrors/node \
-#   --userconfig=$HOME/.cnpmrc"
-
-# test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-
-# https://github.com/pyenv/pyenv#set-up-your-shell-environment-for-pyenv
-export PYENV_ROOT="$HOME/.pyenv"
-command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
-
-# https://github.com/chubin/cheat.sh
-export PATH="$PATH:$HOME/.local/bin"
-fpath=(~/.zsh.d/ $fpath)
-
-# pyenv-virtualenv: prompt changing will be removed from future release. configure `export PYENV_VIRTUALENV_DISABLE_PROMPT=1' to simulate the behavior.
-export PYENV_VIRTUALENV_DISABLE_PROMPT=1
-# https://github.com/pyenv/pyenv-virtualenv
-# eval "$(pyenv virtualenv-init -)"
-# To enable auto-activation add to your profile: | brew info pyenv-virtualenv
-if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi
-
-alias v='nvim'
-alias view="nvim -R"
-
-# use my fork (system clipboard integration) instead: https://github.com/qw457812/zsh-vi-mode
-# https://github.com/jeffreytse/zsh-vi-mode | brew info zsh-vi-mode
-# source $(brew --prefix)/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
-#
-# Since the default [initialization mode](https://github.com/jeffreytse/zsh-vi-mode#initialization-mode), this plugin
-# will overwrite the previous key bindings, this causes the key bindings of
-# other plugins (i.e. `fzf`, `zsh-autocomplete`, etc.) to fail.
-#
-# You can solve the compatibility issue as below:
-#
-# The plugin will auto execute this zvm_after_init function
+# zsh-vi-mode
+export ZVM_LINE_INIT_MODE=$ZVM_MODE_INSERT
+export ZVM_VI_SURROUND_BINDKEY="helix"
+# key bindings goes here, see https://github.com/jeffreytse/zsh-vi-mode#execute-extra-commands
 function zvm_after_init() {
-  # export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS --bind=ctrl-j:down,ctrl-k:up"
-  # https://github.com/junegunn/fzf#setting-up-shell-integration
-  # Set up fzf key bindings and fuzzy completion
+  export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS 
+    --height=100%
+    --layout=reverse
+    --ansi
+    --scrollbar="▐"
+    --ellipsis="…"
+    --preview-window=border-left
+    --bind=ctrl-j:down,ctrl-k:up
+    --bind=ctrl-u:half-page-up,ctrl-d:half-page-down
+    --bind=ctrl-s:jump
+    --bind=ctrl-f:preview-half-page-down,ctrl-b:preview-half-page-up
+    --bind=ctrl-a:beginning-of-line,ctrl-e:end-of-line
+  "
   source <(fzf --zsh)
 
   # downside vs fzf: atuin do not highlight the matched text like fzf do: https://github.com/atuinsh/atuin/issues/503
-  # https://docs.atuin.sh/configuration/key-binding/
   export ATUIN_NOBIND="true"
-  # https://github.com/atuinsh/atuin#shell-plugin
   eval "$(atuin init zsh)"
-  # bind ctrl-r to zsh-vi-mode's insert mode
   # bindkey '^r' atuin-search
-  # bindkey -M vicmd '^r' atuin-search # disable in zsh-vi-mode's normal mode
-  # bind up arrow to zsh-vi-mode's insert mode
-  # run `cat -v` to observe up arrow key codes | https://github.com/zsh-users/zsh-history-substring-search
-  # bindkey '^[[A' atuin-up-search
-  # bindkey -M vicmd 'k' atuin-up-search # disable in zsh-vi-mode's normal mode
+  # bindkey -M vicmd '^r' atuin-search
+  # bindkey '^[[A' atuin-up-search # up arrow, run `cat -v` to observe key codes
+  # bindkey -M vicmd 'k' atuin-up-search
 }
-# Always starting with insert mode for each command line
-ZVM_LINE_INIT_MODE=$ZVM_MODE_INSERT
-ZVM_VI_SURROUND_BINDKEY="helix"
-# ZVM_VI_INSERT_ESCAPE_BINDKEY=jj
-# ZVM_KEYTIMEOUT=0.3
 
-# https://github.com/starship/starship
-# eval "$(starship init zsh)"
-
-# # https://github.com/asdf-vm/asdf
-# . $(brew --prefix asdf)/libexec/asdf.sh
-
-export EZA_CONFIG_DIR="$HOME/.config/eza"
-# https://github.com/DarrinTisdale/zsh-aliases-exa
-# l='ls -lah'
-alias l='eza --all --group-directories-first --color=always --color-scale all --icons=auto --long --group --time-style=iso --git'
-# la='ls -lAh'
-alias la='eza --all --group-directories-first --color=always --color-scale all --icons=auto --long --binary --group --header --modified --accessed --created --time-style=iso --git'
-# llm
-alias lm='eza --all --sort=modified --color=always --color-scale all --icons=auto --long --binary --group --header --modified --accessed --created --changed --time-style=iso --git'
-alias lS='eza -1' # one column, just names
-alias lt='eza --tree --level=2'
-# ll='ls -lh'
-# ls='ls -G'
-# lsa='ls -lah'
-
-# https://github.com/jesseduffield/lazydocker
-alias lzd='lazydocker'
-# alias lzg='lazygit'
-alias g='lazygit'
-# unalias g
-# g()
-# {
-#   export LAZYGIT_NEW_DIR_FILE=~/.lazygit/newdir
-#
-#   lazygit "$@"
-#
-#   if [ -f $LAZYGIT_NEW_DIR_FILE ]; then
-#     cd "$(cat $LAZYGIT_NEW_DIR_FILE)"
-#     rm -f $LAZYGIT_NEW_DIR_FILE > /dev/null
-#   fi
-# }
-alias gcl1='git clone --depth 1'
-
-# alias lg='leetgo'
-alias lc="nvim leetcode.nvim"
-
-# https://github.com/doomemacs/doomemacs#install
-export PATH="$PATH:$HOME/.config/doomemacs/bin"
-
-# https://github.com/archidote/best-bash-zsh-alias-for-linux-terminal/blob/master/install.sh
 alias b="cd -"
 alias q="exit"
-# clear both screen and tmux history | https://github.com/gpakosz/.tmux/blob/9cf49731cd785b76cf792046feed0e8275457918/.tmux.conf#L53
-function c() {
-  clear
-  if [[ -n "$TMUX" ]]; then
-    command tmux clear-history
-  fi
-}
-# alias h="history | less"
 
-# install lsp server jdtls for doomemacs (temporary)
-# export JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home
-# export JAVA_HOME=/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home
-# `sudo ln -sfn /opt/homebrew/opt/openjdk/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk.jdk` (brew info openjdk)
-# `sudo unlink /Library/Java/JavaVirtualMachines/openjdk.jdk`
-# export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
+alias v='nvim'
+alias view="nvim -R"
+alias vimpager='nvim - -c "lua U.terminal.colorize()"'
+# https://github.com/wofr06/lesspipe#511-syntax-highlighting-choices
+# https://stackoverflow.com/questions/43702876/creating-an-alias-in-bash-to-less-sh-less-vim
+# alias vless="/usr/share/vim/vim91/macros/less.sh"
+alias vless="nvim -u $(brew --prefix)/share/nvim/runtime/macros/less.vim"
+alias cat='bat --paging=never'
 
-# https://github.com/mathiasbynens/dotfiles/blob/main/.aliases
-# Shortcuts
-alias dl="cd ~/Downloads"
-# Trim new lines and copy to clipboard
-# alias c="tr -d '\n' | pbcopy"
-# Reload the shell (i.e. invoke as a login shell)
-alias reload="exec ${SHELL} -l"
-# Print each PATH entry on a separate line
+alias l='eza --all --group-directories-first --color=always --color-scale all --icons=auto --long --group --time-style=iso --git'
+alias la='eza --all --group-directories-first --color=always --color-scale all --icons=auto --long --binary --group --header --modified --accessed --created --time-style=iso --git'
+alias lm='eza --all --sort=modified --color=always --color-scale all --icons=auto --long --binary --group --header --modified --accessed --created --changed --time-style=iso --git'
+alias lt='eza --tree --level=2'
+alias mv='mv -iv'
+alias cp='cp -riv'
+alias rm='rm -i'
+alias mkdir="mkdir -vp"
+alias ncdu="ncdu --color dark"
+alias pwdc="pwd | tr -d '\n' | clipcopy"
 alias path='echo -e ${PATH//:/\\n}'
+alias dl="cd ~/Downloads"
 
-alias pwdc="pwd | tr -d '\n' | pbcopy"
+alias gg='lazygit'
+alias gcl1='git clone --depth 1'
 
-# https://github.com/mathiasbynens/dotfiles/blob/main/.functions
-# Create a new directory and enter it
-function mkd() {
-  mkdir -p "$@" && cd "$_";
-}
-# Change working directory to the top-most Finder window location
-function cdf() { # short for `cdfinder`
-  cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')";
-}
-# `o` with no arguments opens the current directory, otherwise opens the given
-# location
-function o() {
-  if [ $# -eq 0 ]; then
-    open .;
-  else
-    open "$@";
-  fi;
-}
-# `tre` is a shorthand for `tree` with hidden files and color enabled, ignoring
-# the `.git` directory, listing directories first. The output gets piped into
-# `less` with options to preserve color and line numbers, unless the output is
-# small enough for one screen.
-function tre() {
-  tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX;
-}
-
-# deal this warning from `doom doctor`: "! The installed grep binary was not built with support for PCRE lookaheads"
-# brew info grep
-# PATH="/opt/homebrew/opt/grep/libexec/gnubin:$PATH"
-
-# # open emacs in terminal
-# # https://github.com/yqrashawn/yqdotfiles/blob/master/modules/yqrashawn/home-manager/dotfiles/.zsh.d/.alias.zsh
-# alias e='emacsclient -t'
-
-# doomemacs by chemacs2
-# function de() {
-#   echo 'default' > ~/.emacs-profile && e "$@"
-# }
-# spacemacs by chemacs2
-# function se() {
-#   echo 'spacemacs' > ~/.emacs-profile && e "$@"
-# }
-
-# brew install jenv
-export PATH="$HOME/.jenv/bin:$PATH"
-eval "$(jenv init -)"
-
-# https://superuser.com/questions/786956/how-to-remove-zsh-alias
-# unalias grep
-
-# brew install mysql@8.0
-# export PATH="/opt/homebrew/opt/mysql@8.0/bin:$PATH"
-
-# https://github.com/FelixKratz/dotfiles/blob/master/.zshrc
-# Sketchybar interactivity overloads
-function brew() {
-  command brew "$@"
-
-  if [[ $* =~ "upgrade" ]] || [[ $* =~ "update" ]] || [[ $* =~ "outdated" ]]; then
-    sketchybar --trigger brew_update
-  fi
-}
-
-alias bo='brew update && brew outdated'
-alias bu='brew upgrade'
-alias bi='brew info'
-alias bI='brew install'
-alias bl='brew list'
-alias bs='brew services'
-function bss() {
-  # echo "$(brew services info $@ --json | jq '.[0] | .status')"
-  # cheat jq
-  if [ $# -eq 0 ]; then
-    brew services
-  else
-    if [ -z "$(brew services info $@ --json | jq '.[] | select(.status == "started")')" ]; then
-      brew services start "$@";
-    else
-      brew services stop "$@";
-    fi;
-  fi;
-}
-alias bsr='brew services restart'
-alias bsk='brew services kill'
-alias bS='brew search'
-alias bd='brew doctor'
-
-# fix "Too many open files" for goku: 256 -> 2048
-# ulimit -S -n 2048
-
+alias -g -- -h='-h 2>&1 | bat --language=help --style=plain'
+alias -g -- --help='--help 2>&1 | bat --language=help --style=plain'
 # $ZSH/plugins/common-aliases/common-aliases.plugin.zsh
-# alias zshrc='${=EDITOR} ${ZDOTDIR:-$HOME}/.zshrc' # Quick access to the .zshrc file
-# Command line head / tail shortcuts
 alias -g H='| head'
 alias -g T='| tail'
 alias -g G='| grep'
-# alias -g L="| less" # not paging
 alias -g L="| bat --style=plain --paging=always"
-# alias -g LL="2>&1 | less"
 alias -g LL="2>&1 | bat --style=plain --paging=always"
 alias -g C="| clipcopy"
 alias -g F='| fzf'
-# https://askubuntu.com/questions/510890/how-do-i-redirect-command-output-to-vim-in-bash
-# alias -g V='| nvim -R +"nnoremap q :q<cr>" -'
 alias -g V='| nvim - -c "lua U.terminal.colorize()"'
-alias rm='rm -i'
-alias cp='cp -i'
-alias mv='mv -i'
-
-# https://github.com/folke/dot/blob/48a708fa10ff0a15a84483483c039cc2791c0e3b/config/fish/config.fish#L94
-alias vimpager='nvim - -c "lua U.terminal.colorize()"'
-
-# # some letters are missing colors
-# export DELTA_PAGER='nvim - -c "lua U.terminal.colorize()"'
+alias -g NE="2> /dev/null"
+alias -g NUL="> /dev/null 2>&1"
 
 # https://github.com/posquit0/zshrc/blob/9a33d6e3194dd9f2667e407029ef537b8ce74b41/aliases.zshrc
 alias cz=chezmoi
@@ -552,42 +248,93 @@ alias czea='chezmoi edit --apply --verbose'
 alias czz='chezmoi cd'
 alias czm='cz managed .'
 alias czum='cz unmanaged .'
-alias czgoku='chezmoi edit --apply --verbose $HOME/.config/karabiner.edn && goku'
-alias czzshrc='chezmoi edit --apply --verbose ${ZDOTDIR:-$HOME}/.zshrc && exec ${SHELL} -l'
-# https://www.reddit.com/r/KittyTerminal/comments/rzpjed/easier_ways_to_reload_kitty/
-# You can reload the config file within kitty by sending kitty the SIGUSR1 signal with `kill -SIGUSR1 $KITTY_PID`. | https://sw.kovidgoyal.net/kitty/conf/
-alias czkitty='chezmoi edit --apply --verbose $HOME/.config/kitty/kitty.conf && kill -SIGUSR1 $(pgrep -a kitty)'
+# alias czgoku='chezmoi edit --apply --verbose $HOME/.config/karabiner.edn && goku'
+# alias czzshrc='chezmoi edit --apply --verbose ${ZDOTDIR:-$HOME}/.zshrc && exec ${SHELL} -l'
+# alias czkitty='chezmoi edit --apply --verbose $HOME/.config/kitty/kitty.conf && kill -SIGUSR1 $(pgrep -a kitty)'
 
-#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-export SDKMAN_DIR="$HOME/.sdkman"
-[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
-
-# set python command if 'py' not installed | https://github.com/ohmyzsh/ohmyzsh/blob/master/plugins/python/python.plugin.zsh
+alias reload="exec ${SHELL} -l"
+alias fda="fd -IH"
+alias rga="rg -uu"
+alias zj="zellij"
+alias lzd='lazydocker'
 builtin which py > /dev/null || alias py='python3'
+# alias myip="dig +short myip.opendns.com @resolver1.opendns.com"
+# alias myip="curl http://icanhazip.com"
+# alias myip="curl ipecho.net/plain; echo"
+alias myip="curl https://ipinfo.io/json"
 
-# https://github.com/gokcehan/lf/blob/master/etc/lfcd.sh
-lf () {
-    # `command` is needed in case `lfcd` is aliased to `lf`
-    cd "$(command lf -print-last-dir "$@")"
+# https://github.com/gpakosz/.tmux/blob/9cf49731cd785b76cf792046feed0e8275457918/.tmux.conf#L53
+function c() {
+  clear
+  if [[ -n "$TMUX" ]]; then
+    command tmux clear-history
+  fi
+}
+function o() {
+  if [ $# -eq 0 ]; then
+    open .;
+  else
+    open "$@";
+  fi;
+}
+function h() {
+    "$@" --help 2>&1 | bat --plain --language=help
+}
+function mkd() {
+  mkdir -p "$@" && cd "$_";
+}
+function cdf() { # short for `cdfinder`
+  cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')";
+}
+function tre() {
+  tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX;
 }
 
-# # Exit to last working directory (LWD) | https://github.com/kyoheiu/felix
-# # source <(command fx --init)
-# # https://github.com/kyoheiu/felix/issues/41
-# alias felix='~/.cargo/bin/fx'
-
-# https://wiki.vifm.info/index.php/How_to_set_shell_working_directory_after_leaving_Vifm
-ff()
-{
-    local dst="$(command vifm --choose-dir - "$@")"
-    if [ -z "$dst" ]; then
-        echo 'Directory picking cancelled/failed'
-        return 1
-    fi
-    cd "$dst"
+# Sketchybar interactivity overloads
+function brew() {
+  command brew "$@"
+  if [[ $* =~ "upgrade" ]] || [[ $* =~ "update" ]] || [[ $* =~ "outdated" ]]; then
+    sketchybar --trigger brew_update
+  fi
+}
+alias bo='brew update && brew outdated'
+alias bu='brew upgrade'
+alias bi='brew info'
+alias bI='brew install'
+alias bl='brew list'
+alias bs='brew services'
+alias bS='brew search'
+alias bd='brew doctor'
+function bss() {
+  if [ $# -eq 0 ]; then
+    brew services
+  else
+    if [ -z "$(brew services info $@ --json | jq '.[] | select(.status == "started")')" ]; then
+      brew services start "$@";
+    else
+      brew services stop "$@";
+    fi;
+  fi;
 }
 
-# https://yazi-rs.github.io/docs/quick-start/#shell-wrapper
+alias sva='svn add'
+alias svc='svn commit'
+alias svs='svn status'
+alias svu='svn update'
+alias svl='svn log -v'
+function svd() {
+  # --file-style omit --hunk-header-style omit
+  svn diff -x -p "$@" | svn_strip_diff_header | delta --line-numbers;
+}
+function svld() {
+  if [[ -z $1 ]] || [[ ${1:0:1} == '-' ]]
+  then
+    svn log -v --diff "$@" | svn_strip_diff_header | delta --line-numbers;
+  else
+    svn log -v --diff -r "$@" | svn_strip_diff_header | delta --line-numbers;
+  fi
+}
+
 function f() {
   local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
   yazi "$@" --cwd-file="$tmp"
@@ -597,9 +344,19 @@ function f() {
   rm -f -- "$tmp"
 }
 
+# https://wiki.vifm.info/index.php/How_to_set_shell_working_directory_after_leaving_Vifm
+function ff() {
+  local dst="$(command vifm --choose-dir - "$@")"
+  if [ -z "$dst" ]; then
+    echo 'Directory picking cancelled/failed'
+    return 1
+  fi
+  cd "$dst"
+}
+
 # https://docs.gitignore.io/install/command-line
 function gi() { curl -sLw "\n" https://www.toptal.com/developers/gitignore/api/$@ ;}
-# https://docs.gitignore.io/use/advanced-command-line
+# https://docs.gitignore.io/use/advanced-command-line#oh-my-zsh
 _gitignoreio_get_command_list() {
   curl -sL https://www.toptal.com/developers/gitignore/api/list | tr "," "\n"
 }
@@ -608,18 +365,6 @@ _gitignoreio () {
   compadd -S '' `_gitignoreio_get_command_list`
 }
 compdef _gitignoreio gi
-
-# https://wezfurlong.org/wezterm/shell-integration.html
-# https://github.com/wez/wezterm/blob/main/assets/shell-integration/wezterm.sh
-# https://github.com/VeeBop/dotfiles/blob/42d7e5205a8753f2593b51b3be11de47779c15ca/dot_zshrc.tmpl#L68
-# Wezterm shell integration
-# This is only automatically installed via brew on MacOS
-if [ -f /Applications/Wezterm.app/Contents/Resources/wezterm.sh ]; then
-  source "/Applications/WezTerm.app/Contents/Resources/wezterm.sh"
-fi
-
-# # https://github.com/wlh320/rime-ls#macos
-# export DYLD_LIBRARY_PATH=$HOME/rime-ls/librime/dist/lib
 
 # reload network
 function newloc() {
@@ -630,9 +375,7 @@ function newloc() {
   fi
 }
 
-# https://github.com/clash-verge-rev/clash-verge-rev
 alias term_proxy_on='export https_proxy=http://127.0.0.1:7897 http_proxy=http://127.0.0.1:7897 all_proxy=socks5://127.0.0.1:7897'
-term_proxy_on
 alias term_proxy_off='unset https_proxy http_proxy all_proxy'
 function sys_proxy_on() {
   local proxy_ip="127.0.0.1"
@@ -651,23 +394,75 @@ function sys_proxy_off() {
   networksetup -setsocksfirewallproxystate Wi-Fi off
 }
 
-# alias myip="dig +short myip.opendns.com @resolver1.opendns.com"
-# alias myip="curl http://icanhazip.com"
-# alias myip="curl ipecho.net/plain; echo"
-alias myip="curl https://ipinfo.io/json"
+# alias e='emacsclient -t'
+# # doomemacs by chemacs2
+# function de() {
+#   echo 'default' > ~/.emacs-profile && e "$@"
+# }
+# # spacemacs by chemacs2
+# function se() {
+#   echo 'spacemacs' > ~/.emacs-profile && e "$@"
+# }
 
-alias sva='svn add'
-alias svc='svn commit'
-alias svs='svn status'
-alias svu='svn update'
-alias svl='svn log -v'
-function svd() {
-  # --file-style omit --hunk-header-style omit
-  svn diff -x -p "$@" | svn_strip_diff_header | delta --line-numbers;
+# # https://github.com/wlh320/rime-ls#macos
+# export DYLD_LIBRARY_PATH=$HOME/rime-ls/librime/dist/lib
+
+# https://wezfurlong.org/wezterm/shell-integration.html
+# https://github.com/wez/wezterm/blob/main/assets/shell-integration/wezterm.sh
+# https://github.com/VeeBop/dotfiles/blob/42d7e5205a8753f2593b51b3be11de47779c15ca/dot_zshrc.tmpl#L68
+if [ -f /Applications/Wezterm.app/Contents/Resources/wezterm.sh ]; then
+  source "/Applications/WezTerm.app/Contents/Resources/wezterm.sh"
+fi
+
+# export LESSOPEN="|/opt/homebrew/bin/lesspipe.sh %s"
+if which batpipe > /dev/null; then eval "$(batpipe)"; fi
+function m() {
+  if [ $# -eq 0 ]; then
+    less -F .;
+  elif [ $# -eq 1 ]; then
+    # sometimes lesspipe or batpipe not colorize the output
+    bat "$@" || less -F "$@";
+  else
+    # bat combine multiple files into one, batpipe can not colorize the output when multiple files
+    LESSOPEN="|/opt/homebrew/bin/lesspipe.sh %s" less -F "$@";
+  fi;
 }
-function svld() {
-  svn log -v --diff "$@" | svn_strip_diff_header | delta --line-numbers;
-}
-function svldr() {
-  svn log -v --diff -r "$@" | svn_strip_diff_header | delta --line-numbers;
-}
+
+eval "$(zoxide init zsh)"
+
+export PYENV_ROOT="$HOME/.pyenv"
+command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
+export PYENV_VIRTUALENV_DISABLE_PROMPT=1
+if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi
+
+export PATH="$HOME/.jenv/bin:$PATH"
+if which jenv > /dev/null; then eval "$(jenv init -)"; fi
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+if [[ -v TERMUX_VERSION ]]; then
+  export PATH=$PATH:$HOME/go/bin
+
+  # https://github.com/sharkdp/bat/issues/1517
+  function man() {
+    command man "$@" | eval ${MANPAGER}
+  }
+
+  alias pkgu='pkg update && pkg upgrade'
+  alias pkgi='pkg install'
+  alias pkgs='pkg search'
+  alias pkgl='pkg list-installed'
+  alias open="termux-open"
+  alias l='eza --all --group-directories-first --color=always --color-scale all --icons=always --long --time-style=iso --no-user --git'
+  alias ll='eza --all --group-directories-first --color=always --color-scale all --icons=always --long --group --time-style=iso --git'
+  alias dl='cd ~/storage/downloads'
+  alias rime='cd ~/storage/shared/Android/rime'
+else
+    term_proxy_on
+fi
