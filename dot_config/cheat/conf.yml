@@ -1,7 +1,7 @@
 ---
 # The editor to use with 'cheat -e <sheet>'. Defaults to $EDITOR or $VISUAL.
 # editor: /usr/bin/nano
-editor: /opt/homebrew/bin/nvim
+editor: nvim
 
 # Should 'cheat' always colorize output?
 # colorize: false
