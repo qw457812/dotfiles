@@ -1,7 +1,7 @@
 function o --wraps=open
-    if test (count $argv) -eq 0
-        open .
-    else
+    if set -q argv[1]
         open $argv
+    else
+        open .
     end
 end

@@ -282,9 +282,9 @@ return {
       opts.winbar = {
         lualine_c = {
           {
-            -- "%{%v:lua.dropbar.get_dropbar_str()%}",
+            -- "%{%v:lua.dropbar()%}",
             function()
-              return dropbar.get_dropbar_str():gsub("%s%%%*$", "%%%*") -- remove last space in end_str, eval `vim.pesc(" %*")`
+              return dropbar():gsub("%s%%%*$", "%%%*") -- remove last space in end_str, eval `vim.pesc(" %*")`
             end,
             cond = cond_winbar,
             padding = { left = 1, right = 0 },

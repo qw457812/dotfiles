@@ -486,13 +486,12 @@ return {
       require("layers").setup(opts)
 
       ---@diagnostic disable-next-line: undefined-global
-      PAGER_MODE = Layers.mode.new()
+      PAGER_MODE = Layers.mode.new("Pager Mode")
       PAGER_MODE:auto_show_help()
       PAGER_MODE:keymaps({
         n = {
           { "u", "<C-u>", { desc = "Scroll Up" } },
-          -- { "d", "<C-d>", { desc = "Scroll Down", nowait = true } },
-          { "d", "<C-d>", { desc = "Scroll Down" } },
+          { "d", "<C-d>", { desc = "Scroll Down", nowait = true } },
           -- stylua: ignore
           { "<esc>", function() PAGER_MODE:deactivate() end, { desc = "Exit" } },
         },

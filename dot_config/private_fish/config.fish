@@ -10,16 +10,19 @@ set -x fish_user_paths
 fish_add_path /opt/homebrew/bin
 fish_add_path /opt/homebrew/sbin
 fish_add_path ~/.local/bin
+fish_add_path ~/go/bin
 
+# Fish
 set -g fish_greeting
+set fish_emoji_width 2
 
+set -gx TERM xterm-256color # https://github.com/gpakosz/.tmux
+set -gx LANG "en_US.UTF-8"
+set -gx LC_ALL "en_US.UTF-8"
 set -gx EDITOR (which nvim)
 set -gx VISUAL $EDITOR
 
 # Exports
-set -x TERM xterm-256color # https://github.com/gpakosz/.tmux
-set -x LC_ALL "en_US.UTF-8"
-set -x LANG "en_US.UTF-8"
 set -x LESS '--RAW-CONTROL-CHARS --ignore-case --LONG-PROMPT --chop-long-lines --incsearch --use-color --tabs=4 --intr=c$ --save-marks --status-line'
 # set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
 set -x MANPAGER 'nvim -c "nnoremap d <C-d>|lua vim.defer_fn(function() vim.api.nvim_command(\"silent! nunmap dd|nnoremap u <C-u>\") end, 500)" +Man!'
@@ -27,9 +30,6 @@ set -x MANPAGER 'nvim -c "nnoremap d <C-d>|lua vim.defer_fn(function() vim.api.n
 set -x BAT_THEME TwoDark
 set -x BAT_STYLE plain
 set -x EZA_CONFIG_DIR "$HOME/.config/eza"
-
-abbr b "cd -"
-abbr q exit
 
 # Files & Directories
 alias l 'eza --all --group-directories-first --color=always --color-scale all --icons=always --long --group --time-style=iso --git'
@@ -143,6 +143,8 @@ fzf_configure_bindings \
     --processes=\cp
 
 # Other
+abbr b "cd -"
+abbr q exit
 abbr reload "exec fish -l"
 abbr fda "fd -IH"
 abbr rga "rg -uu"
@@ -152,13 +154,13 @@ abbr lzd lazydocker
 abbr zj zellij
 abbr py python3
 
-set -g proxy_ip "127.0.0.1"
-set -g http_proxy_port 7897
-set -g socks_proxy_port 7897
+set -g __proxy_ip "127.0.0.1"
+set -g __http_proxy_port 7897
+set -g __socks_proxy_port 7897
 function term_proxy_on
-    set -gx https_proxy "http://$proxy_ip:$http_proxy_port"
-    set -gx http_proxy "http://$proxy_ip:$http_proxy_port"
-    set -gx all_proxy "socks5://$proxy_ip:$socks_proxy_port"
+    set -gx https_proxy "http://$__proxy_ip:$__http_proxy_port"
+    set -gx http_proxy "http://$__proxy_ip:$__http_proxy_port"
+    set -gx all_proxy "socks5://$__proxy_ip:$__socks_proxy_port"
 end
 function term_proxy_off
     set -e https_proxy
@@ -166,9 +168,9 @@ function term_proxy_off
     set -e all_proxy
 end
 function sys_proxy_on
-    networksetup -setwebproxy Wi-Fi $proxy_ip $http_proxy_port
-    networksetup -setsecurewebproxy Wi-Fi $proxy_ip $http_proxy_port
-    networksetup -setsocksfirewallproxy Wi-Fi $proxy_ip $socks_proxy_port
+    networksetup -setwebproxy Wi-Fi $__proxy_ip $__http_proxy_port
+    networksetup -setsecurewebproxy Wi-Fi $__proxy_ip $__http_proxy_port
+    networksetup -setsocksfirewallproxy Wi-Fi $__proxy_ip $__socks_proxy_port
     networksetup -setwebproxystate Wi-Fi on
     networksetup -setsecurewebproxystate Wi-Fi on
     networksetup -setsocksfirewallproxystate Wi-Fi on
@@ -199,8 +201,6 @@ if status is-interactive
     end
 
     if set -q TERMUX_VERSION
-        fish_add_path ~/go/bin
-
         # https://github.com/sharkdp/bat/issues/1517
         function man --wraps='man'
             command man $argv | eval $MANPAGER
