@@ -108,15 +108,11 @@ Tips:
 
 [.ideavimrc](dot_ideavimrc)
 
-## [VSCodeVim](https://github.com/VSCodeVim/Vim)
+## [VSCode Neovim](https://github.com/vscode-neovim/vscode-neovim)
 
 [settings.json](symlinks/vscode/settings.json)
 
 [keybindings.json](symlinks/vscode/keybindings.json)
-
-TODO:
-
-- [ ] Migrate to [vscode-neovim](https://github.com/vscode-neovim/vscode-neovim).
 
 ## [Doom Emacs](https://github.com/doomemacs/doomemacs)
 
@@ -124,29 +120,17 @@ TODO:
 
 Using [Emacs Plus](https://github.com/d12frosted/homebrew-emacs-plus).
 
-## [Oh My Zsh](https://ohmyz.sh/)
+## [Fish](https://fishshell.com)
 
-[.zshrc](dot_zshrc)
-
-TODO:
-
-- [ ] Try [fish](https://fishshell.com).
+[fish config](dot_config/private_fish)
 
 ## [Oh my tmux!](https://github.com/gpakosz/.tmux)
 
 [.tmux.conf.local](dot_tmux.conf.local)
 
-TODO:
+## [Yazi](https://github.com/sxyazi/yazi)
 
-- [ ] Try [WezTerm](https://wezfurlong.org/wezterm/).
-
-## [Vifm](https://github.com/vifm/vifm)
-
-[vifmrc](dot_config/private_vifm/vifmrc)
-
-TODO:
-
-- [ ] Try [Yazi](https://github.com/sxyazi/yazi).
+[yazi config](dot_config/yazi)
 
 ## [rime-ice](https://github.com/iDvel/rime-ice)
 
