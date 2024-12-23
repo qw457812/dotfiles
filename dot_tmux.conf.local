@@ -272,7 +272,11 @@ tmux_conf_theme_right_separator_sub="|"
 tmux_conf_theme_status_left=" ❐ #S "
 # tmux_conf_theme_status_right=" #{prefix}#{mouse}#{pairing}#{synchronized}#{?battery_status,#{battery_status},}#{?battery_bar, #{battery_bar},}#{?battery_percentage, #{battery_percentage},} , %R , %d %b | #{username}#{root} | #{hostname} "
 # tmux_conf_theme_status_right=" #{prefix}#{mouse}#{pairing}#{synchronized} %R | #{username}#{root} | #{hostname} "
+%if #{TERMUX_VERSION}
+tmux_conf_theme_status_right=" #{prefix}#{mouse}#{pairing}#{synchronized} "
+%else
 tmux_conf_theme_status_right=" #{prefix}#{mouse}#{pairing}#{synchronized} %R #{tmux_mode_indicator}| #{username}#{root} | #{hostname} "
+%endif
 
 # status left style
 tmux_conf_theme_status_left_fg="$tmux_conf_theme_colour_6,$tmux_conf_theme_colour_7,$tmux_conf_theme_colour_8"
@@ -366,8 +370,7 @@ tmux_conf_theme_clock_style="24"
 #   - disabled
 # on Linux, this requires xsel, xclip or wl-copy
 # tmux_conf_copy_to_os_clipboard=false
-# for terminal inside vscode
-tmux_conf_copy_to_os_clipboard=true
+tmux_conf_copy_to_os_clipboard=true # for terminal inside vscode
 
 
 # -- urlscan -------------------------------------------------------------------
@@ -387,6 +390,9 @@ set -g history-limit 50000
 
 # start with mouse mode enabled
 #set -g mouse on
+%if #{TERMUX_VERSION}
+set -g mouse on
+%endif
 
 # force Vi mode
 #   really you should export VISUAL or EDITOR environment variable, see manual
@@ -413,8 +419,8 @@ set -g allow-passthrough on
 set -gu prefix2
 unbind C-a
 
-set -g default-shell /opt/homebrew/bin/fish
-set -g default-command /opt/homebrew/bin/fish
+set -g default-shell fish
+set -g default-command fish
 
 # -- my bindings ---------------------------------------------------------------
 # window navigation
