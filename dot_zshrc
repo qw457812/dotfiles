@@ -221,7 +221,7 @@ alias rm='rm -i'
 alias mkdir="mkdir -vp"
 alias ncdu="ncdu --color dark"
 alias pwdc="pwd | tr -d '\n' | clipcopy"
-alias path='echo -e ${PATH//:/\\n}'
+alias paths='echo -e ${PATH//:/\\n}'
 alias dl="cd ~/Downloads"
 
 alias gg='lazygit'

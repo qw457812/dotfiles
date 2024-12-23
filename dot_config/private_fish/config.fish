@@ -42,7 +42,7 @@ abbr rm "rm -i"
 abbr mkdir "mkdir -vp"
 abbr ncdu "ncdu --color dark"
 abbr pwdc "pwd | tr -d '\n' | fish_clipboard_copy"
-alias path "echo $PATH | tr ':' '\n'"
+abbr paths 'echo $PATH | tr " " "\n" | nl'
 abbr dl "cd ~/Downloads"
 
 # Editor & Pager
@@ -88,6 +88,7 @@ abbr gpp "git push"
 abbr gp "git pull"
 abbr gcl "git clone --recurse-submodules"
 abbr grv "git remote --verbose"
+abbr glgp "git log --stat --patch"
 abbr gprav "git pull --rebase --autostash -v"
 
 # SVN
