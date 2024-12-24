@@ -643,7 +643,6 @@ return {
             event = "file_opened",
             handler = function(file_path)
               if vim.g.user_neotree_auto_close then
-                -- auto close on open file
                 require("neo-tree.command").execute({ action = "close" })
               end
             end,
@@ -656,18 +655,18 @@ return {
               vim.keymap.set("i", "<esc>", vim.cmd.stopinsert, { noremap = true, buffer = args.bufnr })
             end,
           },
-          {
-            event = "neo_tree_window_after_open",
-            handler = function()
-              vim.g.user_neotree_visible = true
-            end,
-          },
-          {
-            event = "neo_tree_window_before_close",
-            handler = function()
-              vim.g.user_neotree_visible = false
-            end,
-          },
+          -- {
+          --   event = "neo_tree_window_after_open",
+          --   handler = function()
+          --     vim.g.user_neotree_visible = true
+          --   end,
+          -- },
+          -- {
+          --   event = "neo_tree_window_before_close",
+          --   handler = function()
+          --     vim.g.user_neotree_visible = false
+          --   end,
+          -- },
         },
       })
     end,
@@ -698,10 +697,9 @@ return {
           {
             filetype = "neo-tree",
             text = function()
-              -- vim.fn.getcwd()
               local cwd = LazyVim.root.cwd()
               local root = LazyVim.root.get({ normalize = true })
-              return cwd == root and "Explorer" or "󱞊 " .. U.path.home_to_tilde(cwd)
+              return cwd == root and " Explorer" or " 󱞊 " .. U.path.home_to_tilde(cwd)
             end,
             highlight = "NeoTreeRootName", -- Directory
             text_align = "left",

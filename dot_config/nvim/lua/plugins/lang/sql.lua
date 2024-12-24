@@ -64,5 +64,18 @@ return {
     end,
   },
 
+  {
+    "folke/edgy.nvim",
+    optional = true,
+    opts = function(_, opts)
+      for _, view in ipairs(opts.right or {}) do
+        if view.ft == "dbui" and view.pinned then
+          view.pinned = false
+          break
+        end
+      end
+    end,
+  },
+
   { "jsborjesson/vim-uppercase-sql", ft = "sql" },
 }
