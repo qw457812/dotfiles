@@ -20,9 +20,6 @@ Library/
 .config/kitty/
 .config/wezterm/
 .config/neovide/
-.config/nvim/lazyvim.json
-.config/nvim/lazy-lock.json
-.config/nvim/mason-lock.json
 .local/bin/vscode-tmux
 {{ end }}
 
