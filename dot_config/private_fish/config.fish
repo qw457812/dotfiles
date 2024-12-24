@@ -101,15 +101,18 @@ abbr svll 'svn log -l'
 
 # Chezmoi
 abbr cz chezmoi
-abbr cze 'chezmoi edit'
-abbr czd 'chezmoi diff'
+abbr czz 'cd (chezmoi source-path)' # chezmoi cd
 abbr czs 'chezmoi status'
-abbr cza 'chezmoi -v apply'
-abbr czea 'chezmoi edit --apply --verbose'
-# abbr czz 'chezmoi cd'
-abbr czz 'cd ~/.local/share/chezmoi'
-abbr czm 'chezmoi managed .'
-abbr czum 'chezmoi unmanaged .'
+abbr cza 'chezmoi add'
+abbr czd 'chezmoi diff'
+abbr czap 'chezmoi apply'
+abbr czapv 'chezmoi apply -v'
+abbr cze 'chezmoi edit'
+abbr czeap 'chezmoi edit --apply'
+abbr czeapv 'chezmoi edit --apply --verbose'
+abbr czu 'chezmoi update'
+abbr czm 'chezmoi managed --path-style=absolute .'
+abbr czum 'chezmoi unmanaged --path-style=absolute .'
 
 # Homebrew
 abbr bo 'brew update && brew outdated'
