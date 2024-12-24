@@ -84,7 +84,7 @@ return {
             event = "msg_show",
             find = "^%[codeium/codeium%] ",
           },
-          view = "mini",
+          opts = { skip = true },
         },
         {
           filter = {
