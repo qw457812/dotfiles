@@ -3,20 +3,20 @@ stylua.toml
 symlinks/
 backup/
 {{ if ne .chezmoi.os "darwin" }}
-private_Library
-dot_hammerspoon
-executable_dot_macos
-executable_dot_yabairc
-dot_config/yabai
-dot_config/sketchybar
-dot_config/karabiner.edn
+Library
+.hammerspoon
+.macos
+.yabairc
+.config/yabai
+.config/sketchybar
+.config/karabiner.edn
 {{ end }}
 {{ if ne .chezmoi.os "android" }}
-private_dot_termux
+.termux
 {{ else }}
-dot_config/alacritty
-dot_config/kitty
-dot_config/wezterm
-dot_config/neovide
+.config/alacritty
+.config/kitty
+.config/wezterm
+.config/neovide
 {{ end }}
 
