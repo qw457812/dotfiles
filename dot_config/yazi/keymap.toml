@@ -23,6 +23,8 @@ prepend_keymap = [
   # Tabs
   { on = "K", run = "tab_switch -1 --relative", desc = "Switch to the previous tab" },
   { on = "J", run = "tab_switch 1 --relative", desc = "Switch to the next tab" },
+  { on = "<Up>", run = "tab_switch -1 --relative", desc = "Switch to the previous tab" },
+  { on = "<Down>", run = "tab_switch 1 --relative", desc = "Switch to the next tab" },
   { on = "[", run = "tab_swap -1", desc = "Swap current tab with previous tab" },
   { on = "]", run = "tab_swap 1", desc = "Swap current tab with next tab" },
 

@@ -1,85 +1,47 @@
 return {
-  -- https://github.com/liubang/nvimrc/blob/e7dbb3f5193728b59dbfff5dcd5b3756c5ed1585/lua/plugins/neo-tree-nvim.lua
   -- https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/editor/neo-tree-extended.lua
-  -- https://github.com/GentleCold/dotfiles/blob/5104ac8fae45b68a33c973a19b1f6a2e0617d400/.config/nvim/lua/plugins/dir_tree.lua
-  -- https://github.com/nvim-lua/kickstart.nvim/blob/master/lua/kickstart/plugins/neo-tree.lua
-  -- https://github.com/rafi/vim-config/blob/b9648dcdcc6674b707b963d8de902627fbc887c8/lua/rafi/plugins/neo-tree.lua
-  -- https://github.com/aimuzov/LazyVimx/blob/789dafed84f6f61009f13b4054f12208842df225/lua/lazyvimx/extras/ui/panels/explorer.lua
+  -- https://github.com/aimuzov/LazyVimx/blob/main/lua/lazyvimx/extras/ui/panels/explorer.lua
   -- https://github.com/rafi/vim-config/blob/master/lua/rafi/plugins/neo-tree.lua
   {
-    "nvim-neo-tree/neo-tree.nvim",
+    -- "nvim-neo-tree/neo-tree.nvim",
+    "qw457812/neo-tree.nvim", -- see: https://github.com/nvim-neo-tree/neo-tree.nvim/pull/1501#issuecomment-2560778895
     optional = true,
     dependencies = { "echasnovski/mini.icons" },
     keys = function(_, keys)
-      local last_root ---@type string?
       local mappings = {
         {
           "<leader>fe",
           function()
+            local command = require("neo-tree.command")
+
             -- https://github.com/AstroNvim/AstroNvim/blob/c7abf1c198f633574060807a181c6ce4d1c53a2c/lua/astronvim/plugins/neo-tree.lua#L14
             -- alternative: https://github.com/nvim-neo-tree/neo-tree.nvim/issues/872#issuecomment-1510551968
             if vim.bo.filetype == "neo-tree" then
               if vim.g.user_neotree_auto_close then
-                require("neo-tree.command").execute({ action = "close" })
+                command.execute({ action = "close" })
               else
                 vim.cmd("wincmd p")
               end
               return
             end
 
+            -- reveal the current file in root directory, or if in an unsaved file, the current working directory
             local function open()
-              -- reveal the current file in root directory, or if in an unsaved file, the current working directory
-              -- :h neo-tree-configuration
-              local command = require("neo-tree.command")
-              local reveal_file = vim.fn.expand("%:p")
-              if reveal_file == "" then
-                reveal_file = vim.fn.getcwd()
-              else
-                -- alternative to `vim.fn.filereadable(reveal_file)`?
-                local f = io.open(reveal_file, "r")
-                if f then
-                  f.close(f)
-                else
-                  reveal_file = vim.fn.getcwd()
-                end
-              end
-
-              local function reveal_without_set_root()
-                command.execute({ reveal_file = reveal_file, reveal_force_cwd = true })
-              end
-
-              -- work-around below not working in termux
-              if vim.g.user_is_termux then
-                reveal_without_set_root()
-                return
-              end
-
               local root = LazyVim.root()
-              if not vim.startswith(reveal_file, root) then
-                last_root = nil -- neo-tree's root will change after reveal
-                reveal_without_set_root() -- wrong root, reveal only
-                return
+              local reveal_file = vim.fn.expand("%:p")
+              if reveal_file == "" or not vim.uv.fs_stat(reveal_file) then
+                reveal_file = vim.fn.getcwd()
               end
-
-              local function execute(action)
+              if vim.startswith(reveal_file, root) then
                 command.execute({
-                  action = action,
                   -- reveal = true, -- using `reveal_file` to reveal cwd if unsaved
                   reveal_file = reveal_file, -- path to file or folder to reveal
                   reveal_force_cwd = true, -- change cwd without asking if needed
                   dir = root,
                 })
-              end
-
-              if last_root == root then
-                execute()
               else
-                last_root = root -- cache
-                -- work-around for `reveal_force_cwd` + `dir`, execute twice to properly set root dir (base on my test only)
-                execute("show")
-                vim.defer_fn(function()
-                  execute()
-                end, 100)
+                -- wrong root, reveal only
+                command.execute({ reveal_file = reveal_file, reveal_force_cwd = true })
               end
             end
 
@@ -547,7 +509,7 @@ return {
             end,
           },
           window = {
-            -- TODO: unify the keybindings of vifm (or yazi) and neo-tree.nvim
+            -- TODO: unify the keybindings of yazi and neo-tree.nvim
             mappings = {
               -- ["<esc>"] = {
               --   function(state)
