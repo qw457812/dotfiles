@@ -472,16 +472,10 @@ return {
   {
     "folke/edgy.nvim",
     optional = true,
-    opts = function(_, opts)
-      opts.animate = opts.animate or {}
-      opts.animate.enabled = false
-
-      for _, view in ipairs(opts.right or {}) do
-        if view.ft == "dbui" and view.pinned then
-          view.pinned = false
-          break
-        end
-      end
-    end,
+    opts = {
+      animate = {
+        enabled = false,
+      },
+    },
   },
 }

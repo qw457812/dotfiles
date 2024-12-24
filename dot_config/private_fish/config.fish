@@ -97,6 +97,7 @@ abbr svc 'svn commit'
 abbr svs 'svn status'
 abbr svu 'svn update'
 abbr svl 'svn log -v'
+abbr svll 'svn log -l'
 
 # Chezmoi
 abbr cz chezmoi
