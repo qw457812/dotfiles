@@ -1,1 +1,5 @@
-{{ .chezmoi.sourceDir }}/symlinks/lazyvim/lazy-lock.json
+{{ if eq .chezmoi.os "android" }}
+{{ .chezmoi.sourceDir }}/symlinks/termux/nvim/lazy-lock.json
+{{ else }}
+{{ .chezmoi.sourceDir }}/symlinks/nvim/lazy-lock.json
+{{ end }}

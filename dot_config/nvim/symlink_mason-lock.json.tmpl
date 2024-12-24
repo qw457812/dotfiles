@@ -1,1 +1,5 @@
-{{ .chezmoi.sourceDir }}/symlinks/lazyvim/mason-lock.json
+{{ if eq .chezmoi.os "android" }}
+{{ .chezmoi.sourceDir }}/symlinks/termux/nvim/mason-lock.json
+{{ else }}
+{{ .chezmoi.sourceDir }}/symlinks/nvim/mason-lock.json
+{{ end }}
