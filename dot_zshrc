@@ -243,14 +243,18 @@ alias -g NUL="> /dev/null 2>&1"
 
 # https://github.com/posquit0/zshrc/blob/9a33d6e3194dd9f2667e407029ef537b8ce74b41/aliases.zshrc
 alias cz=chezmoi
-alias cze='chezmoi edit'
-alias czd='chezmoi diff'
+alias czz='cd $(chezmoi source-path)' # chezmoi cd
 alias czs='chezmoi status'
-alias cza='chezmoi -v apply'
-alias czea='chezmoi edit --apply --verbose'
-alias czz='chezmoi cd'
-alias czm='cz managed .'
-alias czum='cz unmanaged .'
+alias cza='chezmoi add'
+alias czd='chezmoi diff'
+alias czap='chezmoi apply'
+alias czapv='chezmoi apply -v'
+alias cze='chezmoi edit'
+alias czeap='chezmoi edit --apply'
+alias czeapv='chezmoi edit --apply --verbose'
+alias czu='chezmoi update'
+alias czm='chezmoi managed --path-style=absolute .'
+alias czum='chezmoi unmanaged --path-style=absolute .'
 # alias czgoku='chezmoi edit --apply --verbose $HOME/.config/karabiner.edn && goku'
 # alias czzshrc='chezmoi edit --apply --verbose ${ZDOTDIR:-$HOME}/.zshrc && exec ${SHELL} -l'
 # alias czkitty='chezmoi edit --apply --verbose $HOME/.config/kitty/kitty.conf && kill -SIGUSR1 $(pgrep -a kitty)'

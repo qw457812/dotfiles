@@ -1,22 +1,28 @@
-README.md
-stylua.toml
 symlinks/
 backup/
+README.md
+stylua.toml
 {{ if ne .chezmoi.os "darwin" }}
-Library
-.hammerspoon
+Library/
+.hammerspoon/
 .macos
 .yabairc
-.config/yabai
-.config/sketchybar
+.config/yabai/
+.config/sketchybar/
 .config/karabiner.edn
+.local/bin/e
 {{ end }}
 {{ if ne .chezmoi.os "android" }}
-.termux
+.termux/
 {{ else }}
-.config/alacritty
-.config/kitty
-.config/wezterm
-.config/neovide
+.ideavimrc
+.config/alacritty/
+.config/kitty/
+.config/wezterm/
+.config/neovide/
+.config/nvim/lazyvim.json
+.config/nvim/lazy-lock.json
+.config/nvim/mason-lock.json
+.local/bin/vscode-tmux
 {{ end }}
 
