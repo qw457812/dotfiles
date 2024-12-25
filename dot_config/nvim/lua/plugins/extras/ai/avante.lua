@@ -107,7 +107,7 @@ return {
           endpoint = "https://api.groq.com/openai/v1/",
           -- https://console.groq.com/docs/models
           -- curl -X GET "https://api.groq.com/openai/v1/models" -H "Authorization: Bearer $GROQ_API_KEY" -H "Content-Type: application/json" | jq .
-          model = "llama-3.1-70b-versatile",
+          model = "llama-3.3-70b-versatile",
         },
       },
       hints = { enabled = false },
