@@ -36,6 +36,12 @@ vim.api.nvim_create_autocmd("BufWritePre", {
   end,
 })
 
+vim.api.nvim_create_autocmd("QuickFixCmdPost", {
+  callback = function()
+    vim.cmd([[Trouble qflist open]])
+  end,
+})
+
 -- disable LazyVim's auto command for wrap
 local wrap_spell_opts = { group = lazyvim_augroup("wrap_spell"), event = "FileType" }
 local wrap_spell_pattern = vim.tbl_map(function(autocmd)

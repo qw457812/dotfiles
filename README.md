@@ -70,16 +70,16 @@ TODO:
 2. [ ] Find out a set of keybindings that can be used everywhere, [equivalent mapping configurations for other VIM integrations](https://github.com/magidc/nvim-config#equivalent-mapping-configurations-for-other-ides-vim-integrations):
    - IDE
      - [ ] [IdeaVim](#ideavim)
-     - [ ] [VSCodeVim or vscode-neovim](#vscodevim)
+     - [ ] [VSCode Neovim](#vscode-neovimhttpsgithubcomvscode-neovimvscode-neovim)
      - [ ] [Doom Emacs](#doom-emacs)
    - File manager
-     - [ ] Terminal: [Vifm](#vifm) or [Yazi](https://github.com/sxyazi/yazi)
+     - [ ] Terminal: [Yazi](#yazihttpsgithubcomsxyaziyazi)
      - [ ] Neovim: [neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim)
-     - [ ] [VSCode](#vscodevim): Built-in Explorer view
+     - [ ] [VSCode](#vscode-neovimhttpsgithubcomvscode-neovimvscode-neovim): Built-in Explorer view
      - [ ] [IdeaVim](#ideavim): [NERDTree](https://github.com/JetBrains/ideavim/wiki/NERDTree-support)
    - Others
-     - [ ] [zsh-vi-mode](#oh-my-zsh) or [fish_vi_key_bindings](https://fishshell.com/docs/current/cmds/fish_vi_key_bindings.html).
-     - [ ] [tmux-copy-mode](#oh-my-tmux) or [wezterm-copy-mode](https://wezfurlong.org/wezterm/copymode.html).
+     - [ ] [fish_vi_key_bindings](https://fishshell.com/docs/current/cmds/fish_vi_key_bindings.html)
+     - [ ] [tmux-copy-mode](#oh-my-tmuxhttpsgithubcomgpakosztmux) or [wezterm-copy-mode](https://wezfurlong.org/wezterm/copymode.html)
      - [ ] [less](dot_config/lesskey)
 
 Tips:
@@ -92,7 +92,7 @@ Tips:
 
 2. Turn up `Key repeat rate` and turn down `Delay until repeat` in `System Settings` -> `Keyboard`.
 
-   See [.macos](backup/.macos).
+   See [.macos](executable_dot_macos).
 
 3. When leaving insert mode, auto switch to English input source (if necessary).
 

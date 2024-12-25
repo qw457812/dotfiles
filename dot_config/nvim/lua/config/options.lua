@@ -48,6 +48,13 @@ vim.g.trouble_lualine = false
 -- failed to install basedpyright on termux via mason
 vim.g.lazyvim_python_lsp = not vim.g.user_is_termux and "basedpyright" or vim.g.lazyvim_python_lsp
 vim.g.deprecation_warnings = true
+-- better coop with fzf-lua
+vim.env.FZF_DEFAULT_OPTS = ""
+
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
+vim.g.loaded_node_provider = 0
 
 -- https://neovide.dev/configuration.html
 if vim.g.neovide then
