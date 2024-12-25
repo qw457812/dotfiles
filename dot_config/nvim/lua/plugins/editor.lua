@@ -84,7 +84,6 @@ return {
     config = function(_, opts)
       require("rip-substitute").setup(opts)
 
-      -- use `opts.keymaps.abort = "<esc>"` will abort on <esc> in visual mode
       local opts_keymaps_abort = vim.tbl_get(opts, "keymaps", "abort") or "q"
       if opts_keymaps_abort:lower() ~= "<esc>" then
         vim.api.nvim_create_autocmd("FileType", {
