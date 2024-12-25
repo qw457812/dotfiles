@@ -125,13 +125,14 @@ abbr bS 'brew search'
 
 # Fzf
 # `--height 100%` is required, see https://github.com/wez/wezterm/discussions/4101
-# --cycle --border --info=inline-right
+# --border --info=inline-right
 set -x FZF_DEFAULT_OPTS "$FZF_DEFAULT_OPTS 
   --height=100%
+  --cycle
   --layout=reverse
   --ansi
   --scrollbar="▐"
-	--ellipsis="…"
+  --ellipsis="…"
   --preview-window=border-left
   --bind=ctrl-j:down,ctrl-k:up
   --bind=ctrl-u:half-page-up,ctrl-d:half-page-down
@@ -160,7 +161,7 @@ abbr py python3
 
 set -g __proxy_ip "127.0.0.1"
 set -g __http_proxy_port 7897
-set -g __socks_proxy_port 7897
+set -g __socks_proxy_port $__http_proxy_port
 function term_proxy_on
     set -gx https_proxy "http://$__proxy_ip:$__http_proxy_port"
     set -gx http_proxy "http://$__proxy_ip:$__http_proxy_port"

@@ -46,6 +46,7 @@ require("lazy").setup({
   git = {
     log = { "--since=7 days ago" }, -- show commits from the last x days
   },
+  rocks = { hererocks = true },
   install = { colorscheme = { "tokyonight", "habamax" } },
   ui = {
     size = vim.env.TERMUX_VERSION and { width = 1, height = 1 } or nil,
@@ -89,6 +90,9 @@ require("lazy").setup({
         end,
         desc = "Open Issue / Commit",
       },
+      ["<localleader>d"] = function(plugin)
+        dd(plugin)
+      end,
     },
   },
   diff = { cmd = "terminal_git" },

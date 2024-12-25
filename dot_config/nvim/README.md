@@ -7,8 +7,8 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 
 ## Chezmoi Symlinks
 
-- [lazyvim.json](../../symlinks/lazyvim/lazy-lock.json)
-- [lazy-lock.json](../../symlinks/lazyvim/lazyvim.json)
+- [lazyvim.json](../../symlinks/nvim/lazy-lock.json)
+- [lazy-lock.json](../../symlinks/nvim/lazyvim.json)
 
 ## Awesome LazyVim
 
