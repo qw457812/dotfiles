@@ -59,6 +59,10 @@ function __fish_title_icon
             set cmd "🌲 "
         case pacman paru
             set cmd "📦 "
+        case brew
+            set cmd "🍺 "
+        case yazi
+            set cmd "🐤 "
     end
     echo $cmd
 end
