@@ -36,6 +36,8 @@ alias l 'eza --all --group-directories-first --color=always --color-scale all --
 alias la 'eza --all --group-directories-first --color=always --color-scale all --icons=always --long --binary --group --header --modified --accessed --created --time-style=iso --git'
 alias lm 'eza --all --sort=modified --color=always --color-scale all --icons=always --long --binary --group --header --modified --accessed --created --changed --time-style=iso --git'
 alias lt 'eza --tree --level=2'
+abbr f yazi
+abbr ff vifm
 abbr mv "mv -iv"
 abbr cp "cp -riv"
 abbr rm "rm -i"
