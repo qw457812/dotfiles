@@ -19,6 +19,7 @@ set fish_emoji_width 2
 set -gx TERM xterm-256color # https://github.com/gpakosz/.tmux
 set -gx LANG "en_US.UTF-8"
 set -gx LC_ALL "en_US.UTF-8"
+set -q XDG_CONFIG_HOME; or set -gx XDG_CONFIG_HOME "$HOME/.config"
 set -gx EDITOR (which nvim)
 set -gx VISUAL $EDITOR
 
