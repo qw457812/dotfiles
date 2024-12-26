@@ -1,5 +1,4 @@
 return {
-  -- https://github.com/jacquin236/minimal-nvim/blob/8942639a07e2ac633c259be0386299a00cdef1be/lua/plugins/editor/dropbar.lua
   -- https://github.com/LazyVim/LazyVim/pull/3503/files
   -- https://github.com/JuanZoran/myVimrc/blob/cc60c2a2d3ad51b4d6b34a187d85cbe0ce40ae45/lua/plugins/ui/extra/lualine.lua
   -- https://github.com/nghialm269/dotfiles/blob/26d814f697229cccdb01439e7a5c556f0539da47/nvim/.config/nvim/lua/plugins/ui.lua#L197

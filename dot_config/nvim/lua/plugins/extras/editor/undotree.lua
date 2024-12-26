@@ -110,7 +110,6 @@ return {
         end
       end
 
-      -- https://github.com/jacquin236/minimal-nvim/blob/baacb78adce67d704d17c3ad01dd7035c5abeca3/lua/plugins/editor/telescope-extras.lua#L5
       -- NOTE:
       -- 1. The `setup` and `load_extension` below can be skipped, but tab completions `:Telescope |<tab>` will not be available right away.
       --    https://github.com/nvim-telescope/telescope.nvim/blob/10b8a82b042caf50b78e619d92caf0910211973d/README.md?plain=1#L598

@@ -128,7 +128,6 @@ return {
           end,
         },
         { "<leader>cr", function() require("live-rename").rename() end, desc = "Rename (live-rename.nvim)", has = "rename" },
-        -- https://github.com/jacquin236/minimal-nvim/blob/baacb78adce67d704d17c3ad01dd7035c5abeca3/lua/plugins/lsp.lua
         { "<leader>cl", false },
         { "<leader>il", "<cmd>checkhealth lspconfig<cr>", desc = "Lsp" },
         { "<leader>clr", "<cmd>LspRestart<cr>", desc = "Restart Lsp" },

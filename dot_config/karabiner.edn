@@ -1805,7 +1805,7 @@
            [:##left_shift :!Cw :Preview] ; see "Preview: doomemacs like keybindings" above
            [:##right_shift :right_command nil {:alone :escape}]
            [:!Qv :!COSv :WPSOffice] ; see "WPSOffice: paste without formatting" above
-           [:!Qv [:left_option :!Sinsert] :CitrixViewer] ; for MTPuTTY, add left_option to prevent switching IME with cmd+shift
+           [:!Qv [:left_command :!Sinsert] :CitrixViewer] ; for MTPuTTY, add left_command to prevent switching IME with cmd+shift
            [:##left_option :left_option [:!tmux-autostart-terminals :!VSCode :!Cursor] {:alone :open-default-terminal}]
            [:##left_option :left_option :tmux-autostart-terminals {:alone [:!Tb]}] ; tmux prefix
            [:##left_option :left_option :VSCode {:alone [:!Tb]}] ; tmux prefix

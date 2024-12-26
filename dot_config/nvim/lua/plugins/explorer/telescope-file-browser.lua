@@ -2,7 +2,6 @@ local hijack_netrw = vim.g.user_hijack_netrw == "telescope-file-browser.nvim"
 
 return {
   -- https://github.com/craftzdog/dotfiles-public/blob/bf837d867b1aa153cbcb2e399413ec3bdcce112b/.config/nvim/lua/plugins/editor.lua#L58
-  -- https://github.com/jacquin236/minimal-nvim/blob/baacb78adce67d704d17c3ad01dd7035c5abeca3/lua/plugins/editor/telescope-extras.lua#L3
   {
     "nvim-telescope/telescope.nvim",
     optional = true,
