@@ -16,7 +16,6 @@ return {
   -- https://github.com/a1401358759/TurboNvim/blob/1dc06655e998d560d0238f30465b3d58c083c506/lua/lspservers/basedpyright.lua
   -- https://github.com/a1401358759/TurboNvim/blob/1dc06655e998d560d0238f30465b3d58c083c506/lua/lspservers/ruff.lua
   --
-  -- https://github.com/jacquin236/minimal-nvim/blob/11f4bc2c82da3f84b5a29266db9bdb09962bca24/lua/plugins/lang/python.lua
   -- https://github.com/aaronlifton/.config/blob/0a60c13c51c3dd102d0f8770f02b1822acb1bb92/.config/nvim/lua/plugins/extras/lang/python-extended.lua
   {
     "neovim/nvim-lspconfig",
