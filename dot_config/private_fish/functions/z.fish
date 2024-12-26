@@ -1,3 +1,4 @@
+# https://github.com/sxyazi/yazi/blob/shipped/yazi-plugin/preset/plugins/zoxide.lua
 set -x _ZO_FZF_OPTS \
     "$FZF_DEFAULT_OPTS --keep-right --exit-0 --select-1" \
     "--preview='command eza --group-directories-first --color=always --icons=always {2..}'" \

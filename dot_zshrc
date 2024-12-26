@@ -158,6 +158,7 @@ export PATH="$PATH:$HOME/.config/doomemacs/bin"
 
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
+[ -z "$XDG_CONFIG_HOME" ] && export XDG_CONFIG_HOME="$HOME/.config"
 
 # --status-column --status-col-width=1
 # --underline-special
