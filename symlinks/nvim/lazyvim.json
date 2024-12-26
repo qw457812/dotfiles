@@ -36,6 +36,7 @@
     "lazyvim.plugins.extras.util.mini-hipatterns",
     "lazyvim.plugins.extras.util.project",
     "lazyvim.plugins.extras.util.rest",
+    "plugins.extras.ai.aider",
     "plugins.extras.ai.avante",
     "plugins.extras.editor.mini-operators",
     "plugins.extras.editor.undotree",

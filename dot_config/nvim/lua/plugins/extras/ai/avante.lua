@@ -71,6 +71,7 @@ return {
         focus = "<leader>aF",
         toggle = {
           debug = "<leader>aD",
+          suggestion = "<leader>aS",
         },
         sidebar = {
           -- disable since <tab> is mapped to <C-w>w
