@@ -89,6 +89,8 @@ abbr gm "git branch -l main | rg main > /dev/null 2>&1 && git checkout main || g
 abbr gcp "git commit -p"
 abbr gpp "git push"
 abbr gp "git pull"
+abbr ga "git add"
+abbr gaa "git add --all"
 abbr gcl "git clone --recurse-submodules"
 abbr grv "git remote --verbose"
 abbr glgp "git log --stat --patch"
