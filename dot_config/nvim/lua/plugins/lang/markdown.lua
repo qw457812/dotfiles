@@ -112,7 +112,7 @@ return {
     cond = function()
       return show_image and LazyVim.has("image.nvim") and vim.fn.executable("mmdc") == 1
     end,
-    dependencies = { "3rd/image.nvim", optional = true },
+    dependencies = { "3rd/image.nvim" },
     ft = "markdown",
     opts = {
       renderer_options = {

@@ -33,8 +33,9 @@ return {
         args = vim.list_extend(vim.deepcopy(defaults.args), {
           "--dark-mode",
           "--vim",
+          -- "--verbose",
           "--model",
-          "groq/llama-3.3-70b-versatile",
+          "groq/llama-3.3-70b-versatile", -- "gemini/gemini-1.5-pro-latest"
         }),
         ---@module "snacks"
         ---@type snacks.win.Config

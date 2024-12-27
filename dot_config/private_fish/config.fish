@@ -125,8 +125,7 @@ abbr bu 'brew upgrade'
 abbr bi 'brew info'
 abbr bI 'brew install'
 abbr bl 'brew list | fzf'
-abbr bs 'brew services'
-abbr bS 'brew search'
+abbr bs 'brew search'
 
 # Fzf
 # `--height 100%` is required, see https://github.com/wez/wezterm/discussions/4101
