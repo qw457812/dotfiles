@@ -1,3 +1,5 @@
+-- vim:foldmethod=marker
+
 return {
   -- https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/editor/neo-tree-extended.lua
   -- https://github.com/aimuzov/LazyVimx/blob/main/lua/lazyvimx/extras/ui/panels/explorer.lua
@@ -98,6 +100,8 @@ return {
           end,
         }
       end
+
+      -- Fold {{{
 
       -- https://github.com/nvim-neo-tree/neo-tree.nvim/wiki/Recipes#emulating-vims-fold-commands
       -- TODO: https://github.com/nvim-neo-tree/neo-tree.nvim/discussions/368
@@ -308,6 +312,8 @@ return {
         vim.b.neotree_depthlevel = max_depth
         redraw_after_depthlevel_change(state, false)
       end
+
+      -- }}}
 
       return vim.tbl_deep_extend("force", opts, {
         sources = { "filesystem" },
