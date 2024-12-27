@@ -18,22 +18,20 @@ return {
         callback = function(event)
           local buf = event.buf
           if vim.bo[buf].filetype == "yazi" then
-            -- esc_esc = false
-            vim.keymap.set("t", "<esc>", "<esc>", { buffer = buf, nowait = true })
-            -- ctrl_hjkl = false
+            -- vim.keymap.set("t", "<esc>", "<esc>", { buffer = buf, nowait = true })
             vim.keymap.set("t", "<c-h>", "<c-h>", { buffer = buf, nowait = true })
             vim.keymap.set("t", "<c-j>", "<c-j>", { buffer = buf, nowait = true })
             vim.keymap.set("t", "<c-k>", "<c-k>", { buffer = buf, nowait = true })
             vim.keymap.set("t", "<c-l>", "<c-l>", { buffer = buf, nowait = true })
-          end
 
-          -- after closing `show_help` by <bs>, yazi goes to normal mode
-          vim.api.nvim_create_autocmd("BufEnter", {
-            buffer = buf,
-            callback = function()
-              vim.cmd.startinsert()
-            end,
-          })
+            -- after closing `show_help` by <bs>, yazi goes to normal mode
+            vim.api.nvim_create_autocmd("BufEnter", {
+              buffer = buf,
+              callback = function()
+                vim.cmd.startinsert()
+              end,
+            })
+          end
         end,
       })
 
