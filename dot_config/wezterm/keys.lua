@@ -185,6 +185,14 @@ function M.apply_to_config(config)
 
   -- wezterm show-keys
   config.keys = {
+    -- -- Send "CTRL-B" to the terminal when pressing CTRL-B, CTRL-B
+    -- { mods = "LEADER|CTRL", key = "b", action = act.SendKey({ key = "b", mods = "CTRL" }) },
+    -- { mods = M.leader, key = "s", action = wez_tmux.action.WorkspaceSelect },
+    -- { mods = M.leader, key = "-", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
+    -- { mods = "LEADER|SHIFT", key = "_", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
+    -- { mods = M.leader, key = "z", action = act.TogglePaneZoomState },
+    -- { mods = M.leader, key = "x", action = act.CloseCurrentPane({ confirm = false }) },
+
     -- To distinguish <C-I> and <Tab> in neovim (note that mapping <M-i> to <C-i> in neovim is required)
     {
       mods = "CTRL",
@@ -193,9 +201,8 @@ function M.apply_to_config(config)
         win:perform_action({ SendKey = { mods = is_nvim(pane) and "ALT" or "CTRL", key = "i" } }, pane)
       end),
     },
+
     { mods = "CTRL", key = "-", action = act.DisableDefaultAssignment }, -- disable this (DecreaseFontSize) for terminal in nvim
-    -- Send "CTRL-B" to the terminal when pressing CTRL-B, CTRL-B
-    { mods = "LEADER|CTRL", key = "b", action = act.SendKey({ key = "b", mods = "CTRL" }) },
     -- resize panes
     split_nav("resize", "CTRL", "LeftArrow", "Left"),
     split_nav("resize", "CTRL", "RightArrow", "Right"),
@@ -207,18 +214,12 @@ function M.apply_to_config(config)
     split_nav("move", "CTRL", "k", "Up"),
     split_nav("move", "CTRL", "l", "Right"),
     -- -- cycles panes, then tabs, then windows
-    { mods = M.super, key = "o", action = M.action.next_pane_or_tab_or_window },
+    -- { mods = M.super, key = "n", action = M.action.next_pane_or_tab_or_window },
     { mods = M.super, key = "w", action = act.CloseCurrentPane({ confirm = false }) },
     -- Splits
-    { mods = M.super, key = "s", action = M.action.smart_split },
-    { mods = M.leader, key = "s", action = wez_tmux.action.WorkspaceSelect },
-    -- { mods = M.super, key = "\\", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
-    -- { mods = M.leader, key = "\\", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
-    -- { mods = M.super, key = "-", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
-    -- { mods = M.leader, key = "-", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
-    { mods = M.super, key = "z", action = act.TogglePaneZoomState },
-    { mods = M.leader, key = "z", action = act.TogglePaneZoomState },
-    { mods = M.super, key = "Enter", action = act.RotatePanes("Clockwise") },
+    { mods = M.super, key = "Enter", action = M.action.smart_split },
+    { mods = M.super, key = "m", action = act.TogglePaneZoomState },
+    { mods = M.super, key = "r", action = act.RotatePanes("Clockwise") },
     -- Tabs
     { mods = M.super, key = "j", action = act({ ActivateTabRelative = 1 }) },
     { mods = M.super, key = "k", action = act({ ActivateTabRelative = -1 }) },
@@ -236,9 +237,17 @@ function M.apply_to_config(config)
       }),
     },
     { mods = M.super, key = ":", action = act.ActivateCommandPalette },
-    { mods = M.super, key = "p", action = act.QuickSelect },
-    { mods = M.super, key = "d", action = act.ShowDebugOverlay },
+    { mods = M.super, key = "y", action = act.QuickSelect },
+    { mods = M.super, key = "Escape", action = act.ShowDebugOverlay },
     { mods = M.super, key = "u", action = M.action.open_url },
+    { -- copy [o]ption (e.g. from a man page)
+      mods = M.super,
+      key = "o",
+      action = act.QuickSelectArgs({
+        patterns = { "--[\\w=-]+", "(?<= )-\\w" }, -- long option, short option
+        label = "Copy shell option",
+      }),
+    },
     {
       mods = M.super,
       key = "f",
@@ -249,6 +258,21 @@ function M.apply_to_config(config)
         wez_tmux.action.SearchForward,
       }),
     },
+    { -- open current location in Finder
+      mods = M.super,
+      key = "l",
+      action = wezterm.action_callback(function(_, pane)
+        local cwd = pane:get_current_working_dir().file_path
+        wezterm.open_with(cwd, "Finder")
+      end),
+    },
+    -- {
+    --   mods = M.super,
+    --   key = ",",
+    --   action = wezterm.action_callback(function()
+    --     wezterm.open_with(wezterm.config_file)
+    --   end),
+    -- },
   }
 
   config.key_tables = {}
