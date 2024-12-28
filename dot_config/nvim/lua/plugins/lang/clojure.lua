@@ -45,9 +45,6 @@ return {
       -- "sql",
       -- "python",
     },
-    opts = function()
-      vim.g["conjure#mapping#doc_word"] = "gk"
-    end,
   },
 
   {

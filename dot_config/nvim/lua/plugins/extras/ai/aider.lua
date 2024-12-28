@@ -35,7 +35,7 @@ return {
           "--vim",
           -- "--verbose",
           "--model",
-          "groq/llama-3.3-70b-versatile", -- "gemini/gemini-1.5-pro-latest"
+          "deepseek/deepseek-chat", -- "gemini/gemini-1.5-pro-latest", "groq/llama-3.3-70b-versatile"
         }),
         ---@module "snacks"
         ---@type snacks.win.Config
