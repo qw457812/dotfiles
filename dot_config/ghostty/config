@@ -1,0 +1,12 @@
+mouse-hide-while-typing = true
+
+cursor-invert-fg-bg = true
+macos-titlebar-style = hidden
+
+keybind = ctrl+h=goto_split:left
+keybind = ctrl+j=goto_split:bottom
+keybind = ctrl+k=goto_split:top
+keybind = ctrl+l=goto_split:right
+keybind = super+enter=new_split:auto
+
+copy-on-select = clipboard
