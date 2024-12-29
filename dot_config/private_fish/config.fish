@@ -49,9 +49,9 @@ set -x FZF_DEFAULT_OPTS "$FZF_DEFAULT_OPTS
   --ellipsis="…"
   --preview-window=border-left
   --bind=ctrl-j:down,ctrl-k:up
-  --bind=ctrl-u:half-page-up,ctrl-d:half-page-down
+  --bind=ctrl-f:page-down,ctrl-b:page-up
   --bind=ctrl-s:jump
-  --bind=ctrl-f:preview-half-page-down,ctrl-b:preview-half-page-up
+  --bind=ctrl-u:preview-half-page-up,ctrl-d:preview-half-page-down
   --bind=ctrl-a:beginning-of-line,ctrl-e:end-of-line
 "
 set fzf_diff_highlighter delta --paging=never --width=20
