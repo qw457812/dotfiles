@@ -468,7 +468,10 @@ bind | split-window -h
 # https://github.com/aserowy/tmux.nvim#navigation
 # https://github.com/aserowy/tmux.nvim/blob/main/tmux.nvim.tmux
 # https://github.com/mrjones2014/smart-splits.nvim#tmux
-is_vim="ps -o state= -o comm= -t '#{pane_tty}' | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?\.?(view|n?vim?x?)(-wrapped)?(diff)?$'"
+#
+# https://github.com/junegunn/fzf/pull/582
+# https://github.com/christoomey/vim-tmux-navigator#tmux
+is_vim="ps -o state= -o comm= -t '#{pane_tty}' | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?\.?(view|n?vim?x?|fzf)(-wrapped)?(diff)?$'"
 is_wezterm='test -n "$WEZTERM_UNIX_SOCKET"'
 # bind-key -n 'C-x' if-shell "$is_wezterm" 'display-message "true"' 'display-message "false"'
 
