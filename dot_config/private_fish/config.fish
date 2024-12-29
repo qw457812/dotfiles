@@ -23,6 +23,10 @@ set -q XDG_CONFIG_HOME; or set -gx XDG_CONFIG_HOME "$HOME/.config"
 set -gx EDITOR (which nvim)
 set -gx VISUAL $EDITOR
 
+set -g __proxy_ip "127.0.0.1"
+set -g __http_proxy_port 7897
+set -g __socks_proxy_port $__http_proxy_port
+
 # Exports
 set -x LESS '--RAW-CONTROL-CHARS --ignore-case --LONG-PROMPT --chop-long-lines --incsearch --use-color --tabs=4 --intr=c$ --save-marks --status-line'
 # set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
@@ -31,6 +35,36 @@ set -x MANPAGER 'nvim -c "nnoremap d <C-d>|lua vim.defer_fn(function() vim.api.n
 set -x BAT_THEME TwoDark
 set -x BAT_STYLE plain
 set -x EZA_CONFIG_DIR "$HOME/.config/eza"
+
+# Fzf
+# `--height 100%` is required, see https://github.com/wez/wezterm/discussions/4101
+# --border --info=inline-right
+set -x FZF_DEFAULT_OPTS "$FZF_DEFAULT_OPTS 
+  --height=100%
+  --tmux=100%
+  --cycle
+  --layout=reverse
+  --ansi
+  --scrollbar="▐"
+  --ellipsis="…"
+  --preview-window=border-left
+  --bind=ctrl-j:down,ctrl-k:up
+  --bind=ctrl-u:half-page-up,ctrl-d:half-page-down
+  --bind=ctrl-s:jump
+  --bind=ctrl-f:preview-half-page-down,ctrl-b:preview-half-page-up
+  --bind=ctrl-a:beginning-of-line,ctrl-e:end-of-line
+"
+set fzf_diff_highlighter delta --paging=never --width=20
+fzf_configure_bindings \
+    --directory=\ct \
+    --git_log=\cg \
+    --git_status=\cs \
+    --processes=\cp
+# https://github.com/sxyazi/yazi/blob/shipped/yazi-plugin/preset/plugins/zoxide.lua
+set -x _ZO_FZF_OPTS \
+    "$FZF_DEFAULT_OPTS --keep-right --exit-0 --select-1" \
+    "--preview='command eza --group-directories-first --color=always --icons=always {2..}'" \
+    "--preview-window=down,30%,sharp"
 
 # Files & Directories
 alias l 'eza --all --group-directories-first --color=always --color-scale all --icons=always --long --group --time-style=iso --git'
@@ -127,35 +161,6 @@ abbr bI 'brew install'
 abbr bl 'brew list | fzf'
 abbr bs 'brew search'
 
-# Fzf
-# `--height 100%` is required, see https://github.com/wez/wezterm/discussions/4101
-# --border --info=inline-right
-set -x FZF_DEFAULT_OPTS "$FZF_DEFAULT_OPTS 
-  --height=100%
-  --cycle
-  --layout=reverse
-  --ansi
-  --scrollbar="▐"
-  --ellipsis="…"
-  --preview-window=border-left
-  --bind=ctrl-j:down,ctrl-k:up
-  --bind=ctrl-u:half-page-up,ctrl-d:half-page-down
-  --bind=ctrl-s:jump
-  --bind=ctrl-f:preview-half-page-down,ctrl-b:preview-half-page-up
-  --bind=ctrl-a:beginning-of-line,ctrl-e:end-of-line
-"
-set fzf_diff_highlighter delta --paging=never --width=20
-fzf_configure_bindings \
-    --directory=\ct \
-    --git_log=\cg \
-    --git_status=\cs \
-    --processes=\cp
-# https://github.com/sxyazi/yazi/blob/shipped/yazi-plugin/preset/plugins/zoxide.lua
-set -x _ZO_FZF_OPTS \
-    "$FZF_DEFAULT_OPTS --keep-right --exit-0 --select-1" \
-    "--preview='command eza --group-directories-first --color=always --icons=always {2..}'" \
-    "--preview-window=down,30%,sharp"
-
 # Other
 abbr b "cd -"
 abbr q exit
@@ -167,33 +172,6 @@ abbr hide-cursor "tput civis"
 abbr lzd lazydocker
 abbr zj zellij
 abbr py python3
-
-set -g __proxy_ip "127.0.0.1"
-set -g __http_proxy_port 7897
-set -g __socks_proxy_port $__http_proxy_port
-function term_proxy_on
-    set -gx https_proxy "http://$__proxy_ip:$__http_proxy_port"
-    set -gx http_proxy "http://$__proxy_ip:$__http_proxy_port"
-    set -gx all_proxy "socks5://$__proxy_ip:$__socks_proxy_port"
-end
-function term_proxy_off
-    set -e https_proxy
-    set -e http_proxy
-    set -e all_proxy
-end
-function sys_proxy_on
-    networksetup -setwebproxy Wi-Fi $__proxy_ip $__http_proxy_port
-    networksetup -setsecurewebproxy Wi-Fi $__proxy_ip $__http_proxy_port
-    networksetup -setsocksfirewallproxy Wi-Fi $__proxy_ip $__socks_proxy_port
-    networksetup -setwebproxystate Wi-Fi on
-    networksetup -setsecurewebproxystate Wi-Fi on
-    networksetup -setsocksfirewallproxystate Wi-Fi on
-end
-function sys_proxy_off
-    networksetup -setwebproxystate Wi-Fi off
-    networksetup -setsecurewebproxystate Wi-Fi off
-    networksetup -setsocksfirewallproxystate Wi-Fi off
-end
 
 if status is-interactive
     if type -q atuin
@@ -215,11 +193,6 @@ if status is-interactive
     end
 
     if set -q TERMUX_VERSION
-        # https://github.com/sharkdp/bat/issues/1517
-        function man --wraps='man'
-            command man $argv | eval $MANPAGER
-        end
-
         abbr pkgu 'pkg update && pkg upgrade'
         abbr pkgi 'pkg install'
         abbr pkgs 'pkg search'
