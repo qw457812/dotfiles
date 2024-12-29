@@ -202,6 +202,10 @@ if status is-interactive
         alias ll 'eza --all --group-directories-first --color=always --color-scale all --icons=always --long --group --time-style=iso --git'
         abbr dl 'cd ~/storage/downloads'
         abbr rime 'cd ~/storage/shared/Android/rime'
+
+        if not set -q TMUX
+            tmux attach || tmux
+        end
     else
         alias vless "nvim -u $(brew --prefix)/share/nvim/runtime/macros/less.vim"
 
