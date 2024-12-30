@@ -1,0 +1,12 @@
+# https://aider.chat/docs/config/aider_conf.html
+
+# model: groq/llama-3.3-70b-versatile
+# model: gemini/gemini-1.5-pro-latest
+# deepseek: true
+model: deepseek/deepseek-chat
+
+auto-commits: false
+
+dark-mode: true
+vim: true
+# verbose: true
