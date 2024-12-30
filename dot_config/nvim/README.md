@@ -187,6 +187,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] [firenvim](https://github.com/glacambre/firenvim) like [megalithic](https://github.com/megalithic/dotfiles/blob/main/config/nvim/lua/plugins/extended/firenvim.lua).
 - [ ] Check this [chezmoi.lua.tmpl](https://github.com/Nitestack/dotfiles/blob/506b895c45b8ed012a2cb0c35fe62058d8b6dbc4/config/private_dot_config/exact_nvim/lua/exact_plugins/chezmoi.lua.tmpl).
 - [ ] Check this [LspProgress autocmds](https://github.com/folke/snacks.nvim/blob/main/docs/notifier.md#-examples).
+- [ ] Check [damoye](https://github.com/damoye/nvim/tree/lazyvim).
 - [ ] [j/k navigation](https://github.com/ibhagwan/fzf-lua/issues/501#issuecomment-1219594641) for fzf-lua.
 - [x] Map `<M-i>` to `<C-i>` in nvim, and map `<C-i>` to `<M-i>` in terminal.
   - Like mrbeardad: [nvim](https://github.com/mrbeardad/nvim/blob/master/lua%2Fuser%2Fconfigs%2Fkeymaps.lua#L69) and [terminal](https://github.com/mrbeardad/MyIDE/blob/0792378a80e3eb72ce47de8e78d9df6c37002bbf/wt/settings.json#L425).
