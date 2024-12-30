@@ -19,6 +19,7 @@ Library/
 .config/alacritty/
 .config/kitty/
 .config/wezterm/
+.config/ghostty/
 .config/neovide/
 .local/bin/vscode-tmux
 {{ end }}
