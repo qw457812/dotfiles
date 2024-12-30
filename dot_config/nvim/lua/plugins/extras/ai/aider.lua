@@ -27,16 +27,17 @@ return {
     },
 
     opts = function()
-      local defaults = require("nvim_aider.config").defaults
+      -- local defaults = require("nvim_aider.config").defaults
 
       return {
-        args = vim.list_extend(vim.deepcopy(defaults.args), {
-          "--dark-mode",
-          "--vim",
-          -- "--verbose",
-          "--model",
-          "deepseek/deepseek-chat", -- "gemini/gemini-1.5-pro-latest", "groq/llama-3.3-70b-versatile"
-        }),
+        -- -- moved to ~/.aider.conf.yml
+        -- args = vim.list_extend(vim.deepcopy(defaults.args), {
+        --   "--dark-mode",
+        --   "--vim",
+        --   -- "--verbose",
+        --   "--model",
+        --   "deepseek/deepseek-chat",
+        -- }),
         ---@module "snacks"
         ---@type snacks.win.Config
         ---@diagnostic disable-next-line: missing-fields
