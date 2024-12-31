@@ -1,7 +1,6 @@
 # https://github.com/wez/wezterm/blob/6f375e29a2c4d70b8b51956edd494693196c6692/assets/shell-integration/wezterm.sh
 
 # This file hooks up shell integration for wezterm.
-# It is suitable for fish.
 #
 # Although wezterm is mentioned here, the sequences used are not wezterm
 # specific and may provide the same functionality for other terminals.  Most
@@ -9,8 +8,8 @@
 # if not there are some bypasses:
 #
 # WEZTERM_SHELL_SKIP_ALL - disables all
-# TODO: WEZTERM_SHELL_SKIP_SEMANTIC_ZONES - disables zones
-# TODO: WEZTERM_SHELL_SKIP_CWD - disables OSC 7 cwd setting
+# WEZTERM_SHELL_SKIP_SEMANTIC_ZONES - disables zones
+# WEZTERM_SHELL_SKIP_CWD - disables OSC 7 cwd setting
 # WEZTERM_SHELL_SKIP_USER_VARS - disable user vars that capture information
 #                                about running programs
 
@@ -49,8 +48,8 @@ end
 
 if test -z "$WEZTERM_SHELL_SKIP_USER_VARS"
     function __wezterm_user_vars_precmd --on-event fish_prompt
-        __wezterm_set_user_var WEZTERM_PROG ""
-        __wezterm_set_user_var WEZTERM_USER (id -un)
+        # __wezterm_set_user_var WEZTERM_PROG ""
+        # __wezterm_set_user_var WEZTERM_USER (id -un)
 
         # Indicate whether this pane is running inside tmux or not
         if test -n "$TMUX"
@@ -59,21 +58,21 @@ if test -z "$WEZTERM_SHELL_SKIP_USER_VARS"
             __wezterm_set_user_var WEZTERM_IN_TMUX 0
         end
 
-        # You may set WEZTERM_HOSTNAME to a name you want to use instead
-        # of calling out to the hostname executable on every prompt print.
-        if test -z "$WEZTERM_HOSTNAME"
-            if hash hostname 2>/dev/null
-                __wezterm_set_user_var WEZTERM_HOST (hostname)
-            else if hash hostnamectl 2>/dev/null
-                __wezterm_set_user_var WEZTERM_HOST (hostnamectl hostname)
-            end
-        else
-            __wezterm_set_user_var WEZTERM_HOST "$WEZTERM_HOSTNAME"
-        end
+        # # You may set WEZTERM_HOSTNAME to a name you want to use instead
+        # # of calling out to the hostname executable on every prompt print.
+        # if test -z "$WEZTERM_HOSTNAME"
+        #     if hash hostname 2>/dev/null
+        #         __wezterm_set_user_var WEZTERM_HOST (hostname)
+        #     else if hash hostnamectl 2>/dev/null
+        #         __wezterm_set_user_var WEZTERM_HOST (hostnamectl hostname)
+        #     end
+        # else
+        #     __wezterm_set_user_var WEZTERM_HOST "$WEZTERM_HOSTNAME"
+        # end
     end
 
-    function __wezterm_user_vars_preexec --on-event fish_preexec
-        # Tell wezterm the full command that is being run
-        __wezterm_set_user_var WEZTERM_PROG "$argv[1]"
-    end
+    # function __wezterm_user_vars_preexec --on-event fish_preexec
+    #     # Tell wezterm the full command that is being run
+    #     __wezterm_set_user_var WEZTERM_PROG "$argv[1]"
+    # end
 end

@@ -35,6 +35,7 @@ config.hide_tab_bar_if_only_one_tab = true
 -- Colorscheme
 config.color_scheme = "tokyonight_night"
 config.colors = {
+  indexed = { [241] = "#65bcff" },
   -- https://github.com/folke/tokyonight.nvim/blob/19f39b53ef5e148bf94ea3696df36175af7e31e6/extras/wezterm/tokyonight_night.toml#L3
   background = "#1d1d1f", -- #1a1b26
 }

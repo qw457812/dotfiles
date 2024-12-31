@@ -11,14 +11,14 @@ return {
       -- win = {
       --   border = "rounded",
       -- },
+      -- zen = {
+      --   win = {
+      --     border = "none",
+      --   },
+      -- },
       terminal = {
         win = {
           border = "rounded",
-        },
-      },
-      zen = {
-        win = {
-          border = "none",
         },
       },
     },

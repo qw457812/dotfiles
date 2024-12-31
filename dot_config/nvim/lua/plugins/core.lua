@@ -9,8 +9,8 @@ return {
       input = {
         win = {
           keys = {
-            i_c_c = { "<C-c>", { "cmp_close", "cancel" }, mode = "i" },
-            n_cr = { "<cr>", "confirm", mode = "n" },
+            i_c_c = { "<C-c>", { "cmp_close", "cancel" }, mode = "i", expr = true },
+            n_cr = { "<cr>", "confirm", mode = "n", expr = true },
           },
         },
       },

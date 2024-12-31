@@ -12,14 +12,16 @@ fish_add_path /opt/homebrew/sbin
 fish_add_path /opt/homebrew/opt/rustup/bin
 fish_add_path ~/.local/bin
 fish_add_path ~/go/bin
+fish_add_path "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
 
 # Fish
 set -g fish_greeting
 set fish_emoji_width 2
 
 set -gx TERM xterm-256color # https://github.com/gpakosz/.tmux
-set -gx LANG "en_US.UTF-8"
-set -gx LC_ALL "en_US.UTF-8"
+set -gx LANG en_US.UTF-8
+set -gx LC_ALL en_US.UTF-8
+set -gx LC_CTYPE en_US.UTF-8
 set -q XDG_CONFIG_HOME; or set -gx XDG_CONFIG_HOME "$HOME/.config"
 set -gx EDITOR (which nvim)
 set -gx VISUAL $EDITOR
@@ -36,10 +38,11 @@ set -x MANPAGER 'nvim -c "nnoremap d <C-d>|lua vim.defer_fn(function() vim.api.n
 set -x BAT_THEME TwoDark
 set -x BAT_STYLE plain
 set -x EZA_CONFIG_DIR "$HOME/.config/eza"
+set -x EZA_MIN_LUMINANCE 50
 
 # Fzf
 # `--height 100%` is required, see https://github.com/wez/wezterm/discussions/4101
-# --border --info=inline-right
+# https://github.com/folke/tokyonight.nvim/blob/45d22cf0e1b93476d3b6d362d720412b3d34465c/extras/fzf/tokyonight_moon.sh
 set -x FZF_DEFAULT_OPTS "$FZF_DEFAULT_OPTS 
   --height=100%
   --tmux=100%
@@ -54,6 +57,19 @@ set -x FZF_DEFAULT_OPTS "$FZF_DEFAULT_OPTS
   --bind=ctrl-s:jump
   --bind=ctrl-u:preview-half-page-up,ctrl-d:preview-half-page-down
   --bind=ctrl-a:beginning-of-line,ctrl-e:end-of-line
+  --highlight-line
+  --info=inline-right
+  --border=none
+  --color=border:#589ed7
+  --color=gutter:#1e2030
+  --color=header:#ff966c
+  --color=marker:#ff007c
+  --color=pointer:#ff007c
+  --color=prompt:#65bcff
+  --color=query:#c8d3f5:regular
+  --color=scrollbar:#589ed7
+  --color=separator:#ff966c
+  --color=spinner:#ff007c
 "
 set fzf_diff_highlighter delta --paging=never --width=20
 fzf_configure_bindings \
@@ -68,10 +84,11 @@ set -x _ZO_FZF_OPTS \
     "--preview-window=down,30%,sharp"
 
 # Files & Directories
-alias l 'eza --all --group-directories-first --color=always --color-scale all --icons=always --long --group --time-style=iso --git'
-alias la 'eza --all --group-directories-first --color=always --color-scale all --icons=always --long --binary --group --header --modified --accessed --created --time-style=iso --git'
-alias lm 'eza --all --sort=modified --color=always --color-scale all --icons=always --long --binary --group --header --modified --accessed --created --changed --time-style=iso --git'
+set -l ll_cmd 'eza --all --color=always --color-scale all --icons=always --long --group --time-style=iso --git'
+alias ll "$ll_cmd --group-directories-first"
+alias lm "$ll_cmd --sort=modified --classify --header --modified --created"
 alias lt 'eza --tree --level=2'
+alias l ll
 abbr f yazi
 abbr ff vifm
 abbr mv "mv -iv"
@@ -199,8 +216,7 @@ if status is-interactive
         abbr pkgs 'pkg search'
         abbr pkgl 'pkg list-installed'
         abbr open termux-open
-        alias l 'eza --all --group-directories-first --color=always --color-scale all --icons=always --long --time-style=iso --no-user --git'
-        alias ll 'eza --all --group-directories-first --color=always --color-scale all --icons=always --long --group --time-style=iso --git'
+        alias l 'eza --all --group-directories-first --color=always --color-scale all --icons=always --long --time-style=iso --git --no-user'
         abbr dl 'cd ~/storage/downloads'
         abbr rime 'cd ~/storage/shared/Android/rime'
 

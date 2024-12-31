@@ -19,7 +19,10 @@ function M.never_paging_term_previewer(opts)
       local input = vim.keycode(direction > 0 and "<C-e>" or "<C-y>")
       local count = math.abs(direction)
 
-      vim.api.nvim_win_call(vim.fn.bufwinid(self.state.termopen_bufnr), function()
+      -- vim.api.nvim_win_call(vim.fn.bufwinid(self.state.termopen_bufnr), function()
+      --   vim.cmd([[normal! ]] .. count .. input)
+      -- end)
+      vim.api.nvim_buf_call(self.state.termopen_bufnr, function()
         vim.cmd([[normal! ]] .. count .. input)
       end)
     end
