@@ -30,9 +30,9 @@ vim.g.user_close_key = "<bs>" -- easy to reach for Glove80
 vim.g.user_exit_key = "<leader>" .. vim.g.user_close_key -- would overwrite "go up one level" of which-key
 -- close terminals
 vim.g.user_term_close_key = "<S-bs>"
-vim.g.user_is_wezterm = vim.env.WEZTERM_UNIX_SOCKET ~= nil
-vim.g.user_is_kitty = vim.env.KITTY_PID ~= nil
-vim.g.user_is_tmux = vim.env.TMUX ~= nil
+vim.g.user_is_wezterm = not vim.g.neovide and vim.env.WEZTERM_UNIX_SOCKET ~= nil
+vim.g.user_is_kitty = not vim.g.neovide and vim.env.KITTY_PID ~= nil
+vim.g.user_is_tmux = not vim.g.neovide and vim.env.TMUX ~= nil
 vim.g.user_is_termux = vim.env.TERMUX_VERSION ~= nil
 vim.g.user_transparent_background = vim.g.user_is_wezterm or vim.g.user_is_kitty
 vim.g.user_hijack_netrw = "oil.nvim" -- neo-tree.nvim, oil.nvim, mini.files, yazi.nvim, telescope-file-browser.nvim

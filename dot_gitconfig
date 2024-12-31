@@ -2,6 +2,9 @@
     name = qw457812
     email = 37494864+qw457812@users.noreply.github.com
 
+[color]
+    ui = true
+
 [core]
     editor = nvim
     ; pager = diff-so-fancy | less --tabs=4 -RF
@@ -12,6 +15,9 @@
     ; diffFilter = diff-so-fancy --patch
     diffFilter = delta --color-only --features=interactive
 
+; [include]
+;     path = ~/.config/tokyonight.nvim/extras/delta/tokyonight_moon.gitconfig
+
 [delta]
     # use n and N to move between diff sections
     navigate = true
@@ -20,6 +26,7 @@
     line-numbers = true
 
     ; syntax-theme = Dracula
+    ; syntax-theme = tokyonight_moon
 
     diff-so-fancy = true
     # delta --diff-highlight --show-config
@@ -40,6 +47,12 @@
 
 [merge]
     conflictstyle = diff3
+
+[pull]
+    rebase = true
+
+[rebase]
+    autoStash = true
 
 [commit]
     template = ~/.stCommitMsg

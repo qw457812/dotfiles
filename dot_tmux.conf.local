@@ -627,12 +627,11 @@ set -g @open-S 'https://www.google.com/search?q='
 # set -g @tmux-nvim-resize-keybinding-up 'C-Up'
 # set -g @tmux-nvim-resize-keybinding-right 'C-Right'
 set -g @plugin 'tmux-plugins/tmux-resurrect'
-set -g @resurrect-capture-pane-contents 'on'
-# TODO is this working?
-set -g @resurrect-strategy-nvim 'session'
+# set -g @resurrect-capture-pane-contents 'on'
+# set -g @resurrect-strategy-nvim 'session'
 # https://github.com/tmux-plugins/tmux-continuum#known-issues
 set -g @plugin 'tmux-plugins/tmux-continuum'
-set -g @continuum-restore 'on'
+# set -g @continuum-restore 'on'
 
 
 # -- custom variables ----------------------------------------------------------

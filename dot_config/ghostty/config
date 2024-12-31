@@ -8,5 +8,6 @@ keybind = ctrl+j=goto_split:bottom
 keybind = ctrl+k=goto_split:top
 keybind = ctrl+l=goto_split:right
 keybind = super+enter=new_split:auto
+keybind = super+space=write_screen_file:open
 
 copy-on-select = clipboard

@@ -84,12 +84,17 @@ defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
 # Expand the following File Info panes:
 # “General”, “Open with”, and “Sharing & Permissions”
 defaults write com.apple.finder FXInfoPanesExpanded -dict \
-	General -bool true \
-	OpenWith -bool true \
-	Privileges -bool true
+  General -bool true \
+  OpenWith -bool true \
+  Privileges -bool true
 
-killall Finder &> /dev/null
+killall Finder &>/dev/null
 
 # Increase window resize speed for Cocoa applications
 defaults write NSGlobalDomain NSWindowResizeTime -float 0.001
 
+# https://github.com/ghostty-org/ghostty/issues/189#issuecomment-2565845911
+defaults write com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers -array-add '{
+    LSHandlerContentType = "public.plain-text";
+    LSHandlerRoleAll = "com.neovide.neovide";
+}'
