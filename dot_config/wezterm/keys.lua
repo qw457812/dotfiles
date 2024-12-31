@@ -238,7 +238,7 @@ function M.apply_to_config(config)
     },
     { mods = M.super, key = ":", action = act.ActivateCommandPalette },
     { mods = M.super, key = "y", action = act.QuickSelect },
-    { mods = M.super, key = "Escape", action = act.ShowDebugOverlay },
+    { mods = M.super, key = "d", action = act.ShowDebugOverlay },
     { mods = M.super, key = "u", action = M.action.open_url },
     { -- copy [o]ption (e.g. from a man page)
       mods = M.super,
