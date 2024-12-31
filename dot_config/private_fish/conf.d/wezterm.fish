@@ -14,7 +14,7 @@
 # WEZTERM_SHELL_SKIP_USER_VARS - disable user vars that capture information
 #                                about running programs
 
-if not string match -q "$TERM_PROGRAM" WezTerm
+if not set -q WEZTERM_UNIX_SOCKET
     exit
 end
 
