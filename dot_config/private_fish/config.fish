@@ -37,7 +37,6 @@ set -x MANPAGER 'nvim -c "nnoremap d <C-d>|lua vim.defer_fn(function() vim.api.n
 # set -x MANROFFOPT -c
 set -x BAT_THEME TwoDark
 set -x BAT_STYLE plain
-set -x EZA_CONFIG_DIR "$HOME/.config/eza"
 set -x EZA_MIN_LUMINANCE 50
 
 # Fzf
@@ -218,7 +217,9 @@ if status is-interactive
         abbr pkgs 'pkg search'
         abbr pkgl 'pkg list-installed'
         abbr open termux-open
-        alias l 'eza --all --group-directories-first --color=always --color-scale all --icons=always --long --time-style=iso --git --no-user'
+        set ll_cmd 'eza --all --color=always --color-scale all --icons=always --long --time-style=iso --git --no-user'
+        alias l "$ll_cmd --group-directories-first"
+        alias lm "$ll_cmd --sort=modified --classify"
         abbr dl 'cd ~/storage/downloads'
         abbr rime 'cd ~/storage/shared/Android/rime'
 
