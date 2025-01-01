@@ -60,9 +60,8 @@ return {
       -- copied from: https://github.com/AstroNvim/astrocommunity/blob/bb7988ac0efe0c17936c350c6da19051765f0e71/lua/astrocommunity/completion/blink-cmp/init.lua#L29
       opts.keymap = vim.tbl_extend("force", opts.keymap, {
         ["<Tab>"] = {
+          ---@param cmp blink.cmp.API
           function(cmp)
-            ---@module 'blink.cmp'
-            cmp = cmp
             if cmp.is_visible() then
               return cmp.select_next()
             elseif cmp.snippet_active({ direction = 1 }) then
@@ -74,9 +73,8 @@ return {
           "fallback",
         },
         ["<S-Tab>"] = {
+          ---@param cmp blink.cmp.API
           function(cmp)
-            ---@module 'blink.cmp'
-            cmp = cmp
             if cmp.is_visible() then
               return cmp.select_prev()
             elseif cmp.snippet_active({ direction = -1 }) then
@@ -87,9 +85,8 @@ return {
         },
         -- -- https://github.com/y3owk1n/nix-system-config-v2/blob/ae72dd82a92894a1ca8c5ff4243e0208dfc33a5d/config/nvim/lua/plugins/blink-cmp.lua#L19
         -- ["<Esc>"] = {
+        --   ---@param cmp blink.cmp.API
         --   function(cmp)
-        --     ---@module 'blink.cmp'
-        --     cmp = cmp
         --     if cmp.is_visible() then
         --       if cmp.snippet_active() then
         --         return cmp.hide()
