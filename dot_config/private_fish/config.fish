@@ -72,6 +72,8 @@ set -x FZF_DEFAULT_OPTS "$FZF_DEFAULT_OPTS
   --color=spinner:#ff007c
 "
 set fzf_diff_highlighter delta --paging=never --width=20
+set fzf_history_opts --preview-window=border-rounded
+set fzf_processes_opts --preview-window=border-rounded
 fzf_configure_bindings \
     --directory=\ct \
     --git_log=\cg \
@@ -81,7 +83,7 @@ fzf_configure_bindings \
 set -x _ZO_FZF_OPTS \
     "$FZF_DEFAULT_OPTS --keep-right --exit-0 --select-1" \
     "--preview='command eza --group-directories-first --color=always --icons=always {2..}'" \
-    "--preview-window=down,30%,sharp"
+    "--preview-window=down,30%,border-rounded"
 
 # Files & Directories
 set -l ll_cmd 'eza --all --color=always --color-scale all --icons=always --long --group --time-style=iso --git'
