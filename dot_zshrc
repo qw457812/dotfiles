@@ -170,7 +170,8 @@ export BAT_THEME="TwoDark"
 export BAT_STYLE="plain"
 # export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 export MANPAGER='nvim -c "nnoremap d <C-d>|lua vim.defer_fn(function() vim.api.nvim_command(\"silent! nunmap dd|nnoremap u <C-u>\") end, 500)" +Man!'
-export EZA_CONFIG_DIR="$HOME/.config/eza"
+export EZA_MIN_LUMINANCE=50
+export DYLD_LIBRARY_PATH=/opt/homebrew/opt/librime/lib # https://github.com/wlh320/rime-ls#macos
 
 # zsh-vi-mode
 export ZVM_LINE_INIT_MODE=$ZVM_MODE_INSERT
@@ -411,9 +412,6 @@ function sys_proxy_off() {
 # function se() {
 #   echo 'spacemacs' > ~/.emacs-profile && e "$@"
 # }
-
-# # https://github.com/wlh320/rime-ls#macos
-# export DYLD_LIBRARY_PATH=$HOME/rime-ls/librime/dist/lib
 
 # https://wezfurlong.org/wezterm/shell-integration.html
 # https://github.com/wez/wezterm/blob/main/assets/shell-integration/wezterm.sh
