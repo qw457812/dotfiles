@@ -1,5 +1,10 @@
 ---@class util.keymap
-local M = {}
+---@overload fun(mode: string|string[], lhs: string|string[], rhs: string|function, opts?: vim.keymap.set.Opts)
+local M = setmetatable({}, {
+  __call = function(t, ...)
+    return t.map(...)
+  end,
+})
 
 --- Wrapper around vim.keymap.set that will set `silent` to true by default.
 --- https://github.com/folke/dot/blob/5df77fa64728a333f4d58e35d3ca5d8590c4f928/nvim/lua/config/options.lua#L22
