@@ -38,6 +38,7 @@ set -x MANPAGER 'nvim -c "nnoremap d <C-d>|lua vim.defer_fn(function() vim.api.n
 set -x BAT_THEME TwoDark
 set -x BAT_STYLE plain
 set -x EZA_MIN_LUMINANCE 50
+set -x DYLD_LIBRARY_PATH /opt/homebrew/opt/librime/lib # https://github.com/wlh320/rime-ls#macos
 
 # Fzf
 # `--height 100%` is required, see https://github.com/wez/wezterm/discussions/4101

@@ -131,7 +131,7 @@ return {
 
   {
     "epwalsh/obsidian.nvim",
-    -- version = "*",
+    cond = not vim.g.user_is_termux,
     event = (function()
       local events = {}
       for _, path in pairs(obsidian_vaults) do
@@ -160,25 +160,5 @@ return {
   --     open_mapping = "<c-space>",
   --     -- direction = "float",
   --   },
-  -- },
-
-  -- TODO: not working
-  -- -- https://github.com/wlh320/rime-ls
-  -- -- https://github.com/wlh320/rime-ls/blob/master/doc/nvim.md
-  -- -- https://github.com/liubianshi/cmp-lsp-rimels
-  -- {
-  --   "liubianshi/cmp-lsp-rimels",
-  --   dependencies = {
-  --     "neovim/nvim-lspconfig",
-  --     "nvim-cmp",
-  --     "cmp-nvim-lsp",
-  --   },
-  --   keys = { { "<localleader>f", mode = "i" } },
-  --   config = function()
-  --     vim.system({ "rime_ls", "--listen", "127.0.0.1:9257" })
-  --     require("rimels").setup({
-  --       cmd = vim.lsp.rpc.connect("127.0.0.1", 9257),
-  --     })
-  --   end,
   -- },
 }
