@@ -128,6 +128,9 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
   - [h-hg/fcitx.nvim](https://github.com/h-hg/fcitx.nvim) like [moetayuko](https://github.com/moetayuko/nvimrc/blob/ae242cc18559cd386c36feb9f999b1a9596c7d09/lua/plugins/editor.lua#L173)
   - [wlh320/rime-ls](https://github.com/wlh320/rime-ls/blob/master/doc/nvim.md)
     - [liubianshi/cmp-lsp-rimels](https://github.com/liubianshi/cmp-lsp-rimels)
+    - [Kaiser-Yang](https://github.com/Kaiser-Yang/dotfiles/tree/main/.config/nvim), the author of [blink-cmp-dictionary](https://github.com/Kaiser-Yang/blink-cmp-dictionary).
+      - [rime_ls.lua](https://github.com/Kaiser-Yang/dotfiles/blob/bdda941b06cce5c7505bc725f09dd3fa17763730/.config/nvim/lua/plugins/rime_ls.lua)
+      - [blink_cmp.lua](https://github.com/Kaiser-Yang/dotfiles/blob/main/.config/nvim/lua/plugins/blink_cmp.lua)
   - [im-select.nvim](https://github.com/keaising/im-select.nvim)
 - [ ] LazyVim with Chinese comment:
   - [EasonMo](https://github.com/EasonMo/myLazyVim)
