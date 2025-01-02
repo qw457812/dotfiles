@@ -36,7 +36,7 @@ M.lualine = {
   end,
 }
 
----@param item blink.cmp.CompletionItem
+---@param item? blink.cmp.CompletionItem
 function M.is_rime_item(item)
   if item == nil or item.source_name ~= "LSP" then
     return false
@@ -45,10 +45,13 @@ function M.is_rime_item(item)
   return client ~= nil and client.name == "rime_ls"
 end
 
+---@param item blink.cmp.CompletionItem
 function M.rime_item_acceptable(item)
   return not contains_unacceptable_character(item.label)
 end
 
+---@param n integer
+---@param items? blink.cmp.CompletionItem[]
 function M.get_n_rime_item_index(n, items)
   if items == nil then
     items = require("blink.cmp.completion.list").items
@@ -69,10 +72,12 @@ function M.get_n_rime_item_index(n, items)
 end
 
 --- @class RimeSetupOpts
---- @field filetype string|string[]
+--- @field filetype? string|string[]
 
---- @param opts RimeSetupOpts
+--- @param opts? RimeSetupOpts
 function M.setup(opts)
+  assert(LazyVim.has("blink.cmp"), "blink.cmp is required")
+
   local configs = require("lspconfig.configs")
   vim.g.rime_enabled = false
   configs.rime_ls = {

@@ -3,7 +3,7 @@ if not (vim.fn.executable("rime_ls") == 1 and LazyVim.has("blink.cmp")) then
   return {}
 end
 
-local toggle_key = "<c-space>" -- TODO:
+local toggle_key = "<c-.>" -- TODO: better keymap
 
 local function rime_on_attach(client, _)
   vim.api.nvim_create_user_command("RimeToggle", function()
@@ -15,16 +15,15 @@ local function rime_on_attach(client, _)
   end, { nargs = 0 })
 
   local max_code = 4
-
-  -- TODO: there is no 'z' in the alphabet
-  local alphabet = "abcdefghijklmnopqrstuvwxy"
+  local alphabet = "abcdefghijklmnopqrstuvwxyz"
+  local reverse_lookup_prefix = "`"
   local mapped_punc = {
     [","] = "，",
     ["."] = "。",
-    [":"] = "：",
+    [";"] = "；",
     ["?"] = "？",
     ["\\"] = "、",
-    [";"] = "；",
+    -- [":"] = "：", -- disable it in favor of secondary election
   }
 
   local function match_alphabet(txt)
@@ -47,17 +46,16 @@ local function rime_on_attach(client, _)
     require("blink.cmp").accept({ index = rime_item_index[1] })
   end)
 
-  -- Toggle rime
-  -- This will toggle Chinese punctuations too
+  -- Toggle rime, this will toggle Chinese punctuations too
   U.keymap({ "n", "i" }, toggle_key, function()
     -- We must check the status before the toggle
     if vim.g.rime_enabled then
       for k, _ in pairs(mapped_punc) do
-        vim.keymap.del({ "i" }, k .. "<space>")
+        vim.keymap.del("i", k .. "<space>")
       end
     else
       for k, v in pairs(mapped_punc) do
-        U.keymap({ "i" }, k .. "<space>", v)
+        U.keymap("i", k .. "<space>", v)
       end
     end
     vim.cmd("RimeToggle")
@@ -66,15 +64,15 @@ local function rime_on_attach(client, _)
   -- Select first entry when typing more than max_code
   for i = 1, #alphabet do
     local k = alphabet:sub(i, i)
-    U.keymap({ "i" }, k, function()
+    U.keymap("i", k, function()
       local cursor_column = vim.api.nvim_win_get_cursor(0)[2]
       local confirmed = false
       if vim.g.rime_enabled and cursor_column >= max_code then
         local content_before_cursor = string.sub(vim.api.nvim_get_current_line(), 1, cursor_column)
         local code = string.sub(content_before_cursor, cursor_column - max_code + 1, cursor_column)
         if match_alphabet(code) then
-          -- TODO: This is for wubi users using 'z' as reverse look up
-          if not string.match(content_before_cursor, "z[" .. alphabet .. "]*$") then
+          -- This is for tiger-code users using '`' as reverse look up
+          if not string.match(content_before_cursor, reverse_lookup_prefix .. "[" .. alphabet .. "]*$") then
             local first_rime_item_index = U.rime_ls.get_n_rime_item_index(1)
             if #first_rime_item_index ~= 1 then
               -- clear the wrong code
@@ -125,6 +123,15 @@ return {
           U.rime_ls.setup({
             filetype = vim.g.rime_ls_support_filetype,
           })
+
+          -- HACK: rime_ls is visible in blink.cmp on startup
+          LazyVim.lsp.on_attach(function()
+            vim.schedule(function()
+              vim.cmd("RimeToggle")
+            end)
+            ---@diagnostic disable-next-line: redundant-return-value
+            return true -- don't mess up toggle
+          end, "rime_ls")
         end,
       },
     },
@@ -150,7 +157,7 @@ return {
           end,
           "fallback",
         },
-        [":"] = { -- TODO: not working
+        [":"] = { -- TODO: not working when binding :<space> to other key
           function(cmp)
             if not vim.g.rime_enabled then
               return false
@@ -190,9 +197,11 @@ return {
               end
 
               -- filter out text items, since we have the buffer source
+              -- filter out non-acceptable rime items
               ---@param item blink.cmp.CompletionItem
               return vim.tbl_filter(function(item)
-                return item.kind ~= require("blink.cmp.types").CompletionItemKind.Text or U.rime_ls.is_rime_item(item)
+                return item.kind ~= require("blink.cmp.types").CompletionItemKind.Text
+                  or (U.rime_ls.is_rime_item(item) and U.rime_ls.rime_item_acceptable(item))
               end, items)
             end,
           },
