@@ -56,50 +56,10 @@ return {
   {
     "saghen/blink.cmp",
     optional = true,
+    ---@module 'blink.cmp'
+    ---@param opts blink.cmp.Config
     opts = function(_, opts)
-      -- copied from: https://github.com/AstroNvim/astrocommunity/blob/bb7988ac0efe0c17936c350c6da19051765f0e71/lua/astrocommunity/completion/blink-cmp/init.lua#L29
-      opts.keymap = vim.tbl_extend("force", opts.keymap, {
-        ["<Tab>"] = {
-          ---@param cmp blink.cmp.API
-          function(cmp)
-            if cmp.is_visible() then
-              return cmp.select_next()
-            elseif cmp.snippet_active({ direction = 1 }) then
-              return cmp.snippet_forward()
-            elseif has_words_before() then
-              return cmp.show()
-            end
-          end,
-          "fallback",
-        },
-        ["<S-Tab>"] = {
-          ---@param cmp blink.cmp.API
-          function(cmp)
-            if cmp.is_visible() then
-              return cmp.select_prev()
-            elseif cmp.snippet_active({ direction = -1 }) then
-              return cmp.snippet_backward()
-            end
-          end,
-          "fallback",
-        },
-        -- -- https://github.com/y3owk1n/nix-system-config-v2/blob/ae72dd82a92894a1ca8c5ff4243e0208dfc33a5d/config/nvim/lua/plugins/blink-cmp.lua#L19
-        -- ["<Esc>"] = {
-        --   ---@param cmp blink.cmp.API
-        --   function(cmp)
-        --     if cmp.is_visible() then
-        --       if cmp.snippet_active() then
-        --         return cmp.hide()
-        --       end
-        --     end
-        --   end,
-        --   "fallback",
-        -- },
-        ["<C-j>"] = { "select_next", "fallback" },
-        ["<C-k>"] = { "select_prev", "fallback" },
-        ["<C-u>"] = { "scroll_documentation_up", "fallback" },
-        ["<C-d>"] = { "scroll_documentation_down", "fallback" },
-      })
+      local menu_default = require("blink.cmp.config.completion.menu").default
 
       -- blink is broken in cmdwin
       vim.api.nvim_create_autocmd("CmdWinEnter", {
@@ -107,7 +67,118 @@ return {
           vim.b[event.buf].completion = false
         end,
       })
+
+      ---@type blink.cmp.Config
+      local o = {
+        -- copied from: https://github.com/AstroNvim/astrocommunity/blob/31e12fdbcba1ae7094d8b027c6e65d01e6f133e9/lua/astrocommunity/completion/blink-cmp/init.lua#L66
+        keymap = {
+          ["<Tab>"] = {
+            ---@param cmp blink.cmp.API
+            function(cmp)
+              if cmp.is_visible() then
+                return cmp.select_next()
+              elseif cmp.snippet_active({ direction = 1 }) then
+                return cmp.snippet_forward()
+              elseif has_words_before() then
+                return cmp.show()
+              end
+            end,
+            "fallback",
+          },
+          ["<S-Tab>"] = {
+            ---@param cmp blink.cmp.API
+            function(cmp)
+              if cmp.is_visible() then
+                return cmp.select_prev()
+              elseif cmp.snippet_active({ direction = -1 }) then
+                return cmp.snippet_backward()
+              end
+            end,
+            "fallback",
+          },
+          -- -- https://github.com/y3owk1n/nix-system-config-v2/blob/ae72dd82a92894a1ca8c5ff4243e0208dfc33a5d/config/nvim/lua/plugins/blink-cmp.lua#L19
+          -- ["<Esc>"] = {
+          --   ---@param cmp blink.cmp.API
+          --   function(cmp)
+          --     if cmp.is_visible() then
+          --       if cmp.snippet_active() then
+          --         return cmp.hide()
+          --       end
+          --     end
+          --   end,
+          --   "fallback",
+          -- },
+          ["<C-j>"] = { "select_next", "fallback" },
+          ["<C-k>"] = { "select_prev", "fallback" },
+          ["<C-u>"] = { "scroll_documentation_up", "fallback" },
+          ["<C-d>"] = { "scroll_documentation_down", "fallback" },
+        },
+        completion = {
+          menu = {
+            draw = {
+              columns = vim.list_extend(vim.deepcopy(assert(menu_default.draw.columns)), {
+                { "source_name" },
+              }),
+              components = {
+                source_name = {
+                  text = function(ctx)
+                    return "[" .. ctx.source_name .. "]"
+                  end,
+                },
+              },
+            },
+          },
+        },
+      }
+
+      return U.extend_tbl(opts, o)
     end,
+  },
+
+  {
+    "saghen/blink.cmp",
+    optional = true,
+    dependencies = {
+      "Kaiser-Yang/blink-cmp-dictionary",
+    },
+    ---@type blink.cmp.Config
+    opts = {
+      sources = {
+        default = { "dictionary" },
+        providers = {
+          dictionary = {
+            module = "blink-cmp-dictionary",
+            name = "Dict",
+            max_items = 5,
+            score_offset = -5,
+            --- @module 'blink-cmp-dictionary'
+            --- @type blink-cmp-dictionary.Options
+            opts = {
+              prefix_min_len = 3,
+              get_command = {
+                "rg",
+                "--color=never",
+                "--no-line-number",
+                "--no-messages",
+                "--no-filename",
+                "--ignore-case",
+                "--",
+                "${prefix}",
+                vim.fn.stdpath("data") .. "/cmp-dictionary/dict/aspell_en.dict", -- aspell -d en_US dump master | aspell -l en expand | sed 's/\s\+/\n/g' > aspell_en.dict
+              },
+              documentation = {
+                enable = vim.fn.executable("wn") == 1,
+                get_command = {
+                  "wn",
+                  "${word}",
+                  "-over",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   },
 
   -- use helix-style mappings to prevent conflict with flash or leap: ms md mr
