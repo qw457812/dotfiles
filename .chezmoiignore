@@ -1,7 +1,6 @@
 symlinks/
 backup/
 README.md
-stylua.toml
 {{ if ne .chezmoi.os "darwin" }}
 Library/
 .hammerspoon/
