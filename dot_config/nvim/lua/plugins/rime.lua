@@ -99,6 +99,7 @@ end
 
 -- https://github.com/wlh320/rime-ls/blob/4986d4d765870846f689e1e06dc9baa2ac2aff34/doc/nvim-with-blink.md
 -- https://github.com/Kaiser-Yang/dotfiles/tree/bdda941b06cce5c7505bc725f09dd3fa17763730
+-- https://github.com/wlh320/wlh-dotfiles/blob/85d41a30588642617177374b4cea2ec96c1b2740/config/nvim/lua/rime.lua
 -- https://github.com/liubianshi/cmp-lsp-rimels/tree/blink.cmp
 return {
   {
@@ -109,7 +110,7 @@ return {
           init_options = {
             enabled = vim.g.rime_enabled,
             shared_data_dir = "/Library/Input Methods/Squirrel.app/Contents/SharedSupport",
-            user_data_dir = vim.fn.expand("~/.local/share/rime-ls"),
+            user_data_dir = vim.fn.expand("~/.local/share/rime-ls"), -- https://github.com/zhhmn/huma-rime
             log_dir = vim.fn.expand("~/.local/share/rime-ls"),
             max_tokens = 4,
             always_incomplete = true,
@@ -139,6 +140,7 @@ return {
 
   {
     "saghen/blink.cmp",
+    commit = not vim.g.user_is_termux and "4c63b4e29738268950911bb0c70ffaaba26b53d7", -- broken when using rime or cmdwin
     optional = true,
     ---@module 'blink.cmp'
     ---@type blink.cmp.Config

@@ -19,6 +19,7 @@ return {
         -- https://github.com/MeanderingProgrammer/render-markdown.nvim/issues/246#issuecomment-2510220411
         disable_background = vim.g.user_transparent_background,
         border = vim.g.user_transparent_background and "none" or nil,
+        inline_pad = 1,
       },
     },
   },

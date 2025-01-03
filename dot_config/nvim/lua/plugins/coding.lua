@@ -61,12 +61,12 @@ return {
     opts = function(_, opts)
       local menu_default = require("blink.cmp.config.completion.menu").default
 
-      -- blink is broken in cmdwin
-      vim.api.nvim_create_autocmd("CmdWinEnter", {
-        callback = function(event)
-          vim.b[event.buf].completion = false
-        end,
-      })
+      -- -- blink is broken in cmdwin
+      -- vim.api.nvim_create_autocmd("CmdWinEnter", {
+      --   callback = function(event)
+      --     vim.b[event.buf].completion = false
+      --   end,
+      -- })
 
       ---@type blink.cmp.Config
       local o = {
@@ -117,9 +117,19 @@ return {
           menu = {
             draw = {
               columns = vim.list_extend(vim.deepcopy(assert(menu_default.draw.columns)), {
+                -- { "kind" },
                 { "source_name" },
               }),
               components = {
+                kind_icon = {
+                  text = function(ctx)
+                    if ctx.item.source_name == "LSP" and ctx.kind then
+                      local icon, _, is_default = require("mini.icons").get("lsp", ctx.kind)
+                      ctx.kind_icon = is_default and ctx.kind_icon or icon
+                    end
+                    return menu_default.draw.components.kind_icon.text(ctx)
+                  end,
+                },
                 source_name = {
                   text = function(ctx)
                     return "[" .. ctx.source_name .. "]"

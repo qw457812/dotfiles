@@ -149,6 +149,7 @@ abbr gcl "git clone --recurse-submodules"
 abbr grv "git remote --verbose"
 abbr glgp "git log --stat --patch"
 abbr gprav "git pull --rebase --autostash -v"
+abbr gf "git fetch"
 
 # SVN
 abbr sva 'svn add'
