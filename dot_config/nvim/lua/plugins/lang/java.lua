@@ -59,8 +59,31 @@ return {
         -- https://github.com/eclipse-jdtls/eclipse.jdt.ls/wiki/Running-the-JAVA-LS-server-from-the-command-line#initialize-request
         settings = {
           java = {
+            eclipse = { downloadSources = true },
             configuration = {
+              updateBuildConfiguration = "interactive",
               runtimes = not vim.tbl_isempty(runtimes) and runtimes or nil,
+            },
+            maven = { downloadSources = true },
+            implementationsCodeLens = { enabled = true },
+            referencesCodeLens = { enabled = true },
+            signatureHelp = { enabled = true },
+            -- completion = {
+            --   favoriteStaticMembers = {
+            --     "org.hamcrest.MatcherAssert.assertThat",
+            --     "org.hamcrest.Matchers.*",
+            --     "org.hamcrest.CoreMatchers.*",
+            --     "org.junit.jupiter.api.Assertions.*",
+            --     "java.util.Objects.requireNonNull",
+            --     "java.util.Objects.requireNonNullElse",
+            --     "org.mockito.Mockito.*",
+            --   },
+            -- },
+            sources = {
+              organizeImports = {
+                starThreshold = 9999,
+                staticStarThreshold = 9999,
+              },
             },
             -- format = {
             --   settings = { -- you can use your preferred format style
@@ -81,6 +104,9 @@ return {
             },
           },
         },
+        -- jdtls = function(config)
+        --   require("snacks.debug").inspect(config)
+        -- end,
         ---@param args vim.api.create_autocmd.callback.args
         on_attach = function(args)
           require("which-key").add({
