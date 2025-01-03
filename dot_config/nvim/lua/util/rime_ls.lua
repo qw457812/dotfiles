@@ -76,18 +76,29 @@ end
 
 --- @param opts? RimeSetupOpts
 function M.setup(opts)
+  assert(vim.fn.executable("rime_ls") == 1, "rime_ls is required")
   assert(LazyVim.has("blink.cmp"), "blink.cmp is required")
+
+  vim.system({ "rime_ls", "--listen", "127.0.0.1:9257" }, { detach = true })
 
   local configs = require("lspconfig.configs")
   vim.g.rime_enabled = false
   configs.rime_ls = {
     default_config = {
       name = "rime_ls",
-      cmd = { "rime_ls" },
+      -- cmd = { "rime_ls" },
+      cmd = vim.lsp.rpc.connect("127.0.0.1", 9257),
       filetypes = opts and opts.filetype or { "*" },
       single_file_support = true,
     },
     settings = {},
+    docs = {
+      description = [[
+https://github.com/wlh320/rime-ls
+
+A language server for librime
+]],
+    },
   }
 end
 
