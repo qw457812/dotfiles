@@ -9,6 +9,8 @@ return {
     "kristijanhusak/vim-dadbod-ui",
     optional = true,
     keys = function(_, keys)
+      vim.g.db_ui_disable_info_notifications = 1
+
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "dbui",
         callback = function(event)
@@ -38,19 +40,19 @@ return {
     optional = true,
     opts = function(_, opts)
       opts.routes = vim.list_extend(opts.routes or {}, {
-        -- vim-dadbod-ui
-        {
-          filter = {
-            event = "notify",
-            any = {
-              { find = "^Connecting to db .+%.%.%.$" },
-              { find = "^Connected to db .+ after .+ sec%.$" },
-              { find = "^Executing query%.%.%.$" },
-              { find = "^Done after .+ sec%.$" },
-            },
-          },
-          view = "mini",
-        },
+        -- -- vim-dadbod-ui
+        -- {
+        --   filter = {
+        --     event = "notify",
+        --     any = {
+        --       { find = "^Connecting to db .+%.%.%.$" },
+        --       { find = "^Connected to db .+ after .+ sec%.$" },
+        --       { find = "^Executing query%.%.%.$" },
+        --       { find = "^Done after .+ sec%.$" },
+        --     },
+        --   },
+        --   view = "mini",
+        -- },
         -- vim-dadbod
         {
           filter = {
