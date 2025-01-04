@@ -5,8 +5,7 @@ return {
   -- https://github.com/aimuzov/LazyVimx/blob/main/lua/lazyvimx/extras/ui/panels/explorer.lua
   -- https://github.com/rafi/vim-config/blob/master/lua/rafi/plugins/neo-tree.lua
   {
-    -- "nvim-neo-tree/neo-tree.nvim",
-    "qw457812/neo-tree.nvim", -- see: https://github.com/nvim-neo-tree/neo-tree.nvim/pull/1501#issuecomment-2560778895
+    "nvim-neo-tree/neo-tree.nvim",
     optional = true,
     dependencies = { "echasnovski/mini.icons" },
     keys = function(_, keys)
@@ -27,24 +26,18 @@ return {
               return
             end
 
-            -- reveal the current file in root directory, or if in an unsaved file, the current working directory
+            -- reveal the current file in root directory
             local function open()
               local root = LazyVim.root()
               local reveal_file = vim.fn.expand("%:p")
               if reveal_file == "" or not vim.uv.fs_stat(reveal_file) then
                 reveal_file = vim.fn.getcwd()
               end
-              if vim.startswith(reveal_file, root) then
-                command.execute({
-                  -- reveal = true, -- using `reveal_file` to reveal cwd if unsaved
-                  reveal_file = reveal_file, -- path to file or folder to reveal
-                  reveal_force_cwd = true, -- change cwd without asking if needed
-                  dir = root,
-                })
-              else
-                -- wrong root, reveal only
-                command.execute({ reveal_file = reveal_file, reveal_force_cwd = true })
-              end
+              command.execute({
+                reveal_file = reveal_file, -- using `reveal_file` instead of `reveal` to reveal cwd for an unsaved file
+                reveal_force_cwd = true,
+                dir = vim.startswith(reveal_file, root) and root or nil, -- `dir = root` works too
+              })
             end
 
             if U.toggle.zen:get() then
