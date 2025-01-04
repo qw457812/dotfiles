@@ -68,6 +68,7 @@ return {
     end,
     opts = function(_, opts)
       local hijack_netrw = vim.g.user_hijack_netrw == "neo-tree.nvim"
+      local last_root ---@type string?
 
       -- https://github.com/nvim-neo-tree/neo-tree.nvim/wiki/Recipes#find-with-telescope
       local function get_telescope_opts(state)
@@ -499,6 +500,7 @@ return {
           -- whether to use for editing directories (e.g. `vim .` or `:e src/`)
           -- possible values: "open_default" (default), "open_current", "disabled"
           hijack_netrw_behavior = hijack_netrw and "open_default" or "disabled",
+          follow_current_file = { enabled = false }, -- see vim_buffer_enter event below
           commands = {
             telescope_find = function(state)
               require("telescope.builtin").find_files(get_telescope_opts(state))
@@ -616,18 +618,43 @@ return {
               vim.keymap.set("i", "<esc>", vim.cmd.stopinsert, { noremap = true, buffer = args.bufnr })
             end,
           },
-          -- {
-          --   event = "neo_tree_window_after_open",
-          --   handler = function()
-          --     vim.g.user_neotree_visible = true
-          --   end,
-          -- },
-          -- {
-          --   event = "neo_tree_window_before_close",
-          --   handler = function()
-          --     vim.g.user_neotree_visible = false
-          --   end,
-          -- },
+          {
+            event = "neo_tree_window_after_open",
+            handler = function()
+              vim.g.user_neotree_visible = true
+            end,
+          },
+          {
+            event = "neo_tree_window_before_close",
+            handler = function()
+              vim.g.user_neotree_visible = false
+            end,
+          },
+          -- copied from: https://github.com/nvim-neo-tree/neo-tree.nvim/blob/e6645ecfcba3e064446a6def1c10d788c9873f51/lua/neo-tree/sources/filesystem/init.lua#L378
+          {
+            event = "vim_buffer_enter",
+            ---@param args { afile: string }
+            handler = function(args)
+              local utils = require("neo-tree.utils")
+              -- enhanced follow_current_file
+              if utils.is_real_file(args.afile) then
+                local root = LazyVim.root({ buf = vim.fn.bufnr(args.afile) })
+                if last_root ~= root then
+                  local afile = vim.uv.fs_realpath(args.afile) or args.afile
+                  if vim.g.user_neotree_visible and utils.is_subpath(root, afile) then
+                    require("neo-tree.command").execute({
+                      action = "show",
+                      reveal_file = afile,
+                      reveal_force_cwd = true,
+                      dir = root,
+                    })
+                  end
+                  last_root = root
+                end
+                require("neo-tree.sources.filesystem").follow()
+              end
+            end,
+          },
         },
       })
     end,
