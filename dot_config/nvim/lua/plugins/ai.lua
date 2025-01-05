@@ -74,28 +74,28 @@ return {
       end
     end,
   },
-  {
-    "folke/noice.nvim",
-    optional = true,
-    opts = function(_, opts)
-      opts.routes = vim.list_extend(opts.routes or {}, {
-        {
-          filter = {
-            event = "msg_show",
-            find = "^%[codeium/codeium%] ",
-          },
-          opts = { skip = true },
-        },
-        {
-          filter = {
-            event = "notify",
-            find = "^completion request failed$",
-          },
-          opts = { skip = true },
-        },
-      })
-    end,
-  },
+  -- {
+  --   "folke/noice.nvim",
+  --   optional = true,
+  --   opts = function(_, opts)
+  --     opts.routes = vim.list_extend(opts.routes or {}, {
+  --       {
+  --         filter = {
+  --           event = "msg_show",
+  --           find = "^%[codeium/codeium%] ",
+  --         },
+  --         opts = { skip = true },
+  --       },
+  --       {
+  --         filter = {
+  --           event = "notify",
+  --           find = "^completion request failed$",
+  --         },
+  --         opts = { skip = true },
+  --       },
+  --     })
+  --   end,
+  -- },
 
   -- https://github.com/AstroNvim/astrocommunity/blob/main/lua/astrocommunity/editing-support/copilotchat-nvim/init.lua
   {

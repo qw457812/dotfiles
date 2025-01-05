@@ -55,6 +55,7 @@ return {
 
   {
     "saghen/blink.cmp",
+    -- commit = not vim.g.user_is_termux and "4c63b4e29738268950911bb0c70ffaaba26b53d7", -- broken when using cmdwin
     optional = true,
     ---@module 'blink.cmp'
     ---@param opts blink.cmp.Config

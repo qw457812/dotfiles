@@ -127,9 +127,9 @@ return {
 
           -- HACK: rime_ls is visible in blink.cmp on startup
           LazyVim.lsp.on_attach(function()
-            vim.schedule(function()
+            vim.defer_fn(function()
               vim.cmd("RimeToggle")
-            end)
+            end, 100)
             ---@diagnostic disable-next-line: redundant-return-value
             return true -- don't mess up toggle
           end, "rime_ls")
@@ -140,7 +140,6 @@ return {
 
   {
     "saghen/blink.cmp",
-    commit = not vim.g.user_is_termux and "4c63b4e29738268950911bb0c70ffaaba26b53d7", -- broken when using rime or cmdwin
     optional = true,
     ---@module 'blink.cmp'
     ---@type blink.cmp.Config
