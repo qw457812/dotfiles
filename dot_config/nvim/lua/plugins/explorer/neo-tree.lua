@@ -70,6 +70,21 @@ return {
       local hijack_netrw = vim.g.user_hijack_netrw == "neo-tree.nvim"
       local last_root ---@type string?
 
+      -- https://github.com/nvim-neo-tree/neo-tree.nvim/issues/639#issuecomment-1345617435
+      local function is_visible()
+        -- neo_tree_window_before_close event not triggered on `<C-w>o`
+        if not vim.g.user_neotree_visible then
+          return false
+        end
+        for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+          if vim.bo[vim.api.nvim_win_get_buf(win)].filetype == "neo-tree" then
+            return true
+          end
+        end
+        vim.g.user_neotree_visible = false
+        return false
+      end
+
       -- https://github.com/nvim-neo-tree/neo-tree.nvim/wiki/Recipes#find-with-telescope
       local function get_telescope_opts(state)
         local node = state.tree:get_node()
@@ -630,28 +645,32 @@ return {
               vim.g.user_neotree_visible = false
             end,
           },
+          -- enhance follow_current_file to adapt to root changes
           -- copied from: https://github.com/nvim-neo-tree/neo-tree.nvim/blob/e6645ecfcba3e064446a6def1c10d788c9873f51/lua/neo-tree/sources/filesystem/init.lua#L378
           {
             event = "vim_buffer_enter",
             ---@param args { afile: string }
             handler = function(args)
               local utils = require("neo-tree.utils")
-              -- enhanced follow_current_file
-              if utils.is_real_file(args.afile) then
-                local root = LazyVim.root({ buf = vim.fn.bufnr(args.afile) })
-                if last_root ~= root then
-                  local afile = vim.uv.fs_realpath(args.afile) or args.afile
-                  if vim.g.user_neotree_visible and utils.is_subpath(root, afile) then
-                    require("neo-tree.command").execute({
-                      action = "show",
-                      reveal_file = afile,
-                      reveal_force_cwd = true,
-                      dir = root,
-                    })
+              local follow = require("neo-tree.sources.filesystem").follow
+
+              if not utils.is_real_file(args.afile) then
+                return
+              end
+
+              if is_visible() then
+                utils.debounce("neo-tree-follow-root", function()
+                  local root = LazyVim.root({ normalize = true, buf = vim.fn.bufnr(args.afile) })
+                  if last_root ~= root and utils.is_subpath(root, vim.uv.fs_realpath(args.afile) or args.afile) then
+                    -- root changed, navigate to the new root first
+                    require("neo-tree.command").execute({ action = "show", dir = root })
                   end
                   last_root = root
-                end
-                require("neo-tree.sources.filesystem").follow()
+                  follow()
+                end, 100, utils.debounce_strategy.CALL_LAST_ONLY)
+              else
+                last_root = nil
+                follow() -- original follow_current_file behavior
               end
             end,
           },
