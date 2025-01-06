@@ -46,7 +46,7 @@ return {
       ---@diagnostic disable-next-line: param-type-mismatch
       local home_parts = vim.split(vim.uv.os_homedir(), "/", { trimempty = true })
       local oil_prefix = "oil:" -- oil.nvim
-      local jdt_prefix = "jdt:" -- nvim-jdtls
+      -- local jdt_prefix = "jdt:" -- nvim-jdtls
       local source_path = {
         get_symbols = function(buff, win, cursor)
           local symbols = sources.path.get_symbols(buff, win, cursor)
@@ -54,16 +54,20 @@ return {
             return symbols
           end
 
-          -- fix path for java library
-          if vim.bo[buff].filetype == "java" and #symbols > 1 and symbols[1].name == jdt_prefix then
-            for i = #symbols, 2, -1 do
-              if symbols[i].name:find("%.class%?=") then
-                symbols[i].name = symbols[i].name:match("^(.+%.class)%?=")
-                break
-              else
-                table.remove(symbols, i)
-              end
-            end
+          -- -- fix path for java library
+          -- -- TODO: https://github.com/mfussenegger/nvim-jdtls/issues/423#issuecomment-1429184022
+          -- if vim.bo[buff].filetype == "java" and #symbols > 1 and symbols[1].name == jdt_prefix then
+          --   for i = #symbols, 2, -1 do
+          --     if symbols[i].name:find("%.class%?=") then
+          --       symbols[i].name = symbols[i].name:match("^(.+%.class)%?=")
+          --       break
+          --     else
+          --       table.remove(symbols, i)
+          --     end
+          --   end
+          -- end
+          if vim.startswith(vim.api.nvim_buf_get_name(buff), "jdt://") then
+            return {}
           end
 
           -- filename highlighting
@@ -183,19 +187,19 @@ return {
 
               if path == oil_prefix then
                 return mini_icons_get("filetype", "oil")
-              elseif path == jdt_prefix then
-                return mini_icons_get("filetype", "java")
+              -- elseif path == jdt_prefix then
+              --   return mini_icons_get("filetype", "java")
               elseif vim.startswith(path, oil_prefix) then
                 return mini_icons_get("directory", path:sub(#oil_prefix + 1), default_dir_icon)
-              elseif vim.startswith(path, jdt_prefix) then
-                path = path:sub(#jdt_prefix + 1):gsub("%?=.*$", "")
-                if vim.endswith(path, ".jar") then
-                  return mini_icons_get("extension", "zip"), "MiniIconsRed"
-                elseif vim.endswith(path, ".class") then
-                  return mini_icons_get("file", path, default_file_icon)
-                else
-                  return mini_icons_get("directory", path, default_dir_icon)
-                end
+              -- elseif vim.startswith(path, jdt_prefix) then
+              --   path = path:sub(#jdt_prefix + 1):gsub("%?=.*$", "")
+              --   if vim.endswith(path, ".jar") then
+              --     return mini_icons_get("extension", "zip"), "MiniIconsRed"
+              --   elseif vim.endswith(path, ".class") then
+              --     return mini_icons_get("file", path, default_file_icon)
+              --   else
+              --     return mini_icons_get("directory", path, default_dir_icon)
+              --   end
               else
                 return mini_icons_get("file", path, default_file_icon)
               end

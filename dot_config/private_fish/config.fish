@@ -11,6 +11,7 @@ fish_add_path /opt/homebrew/bin
 fish_add_path /opt/homebrew/sbin
 fish_add_path /opt/homebrew/opt/rustup/bin
 fish_add_path ~/.local/bin
+fish_add_path ~/.local/share/bob/nvim-bin
 fish_add_path ~/go/bin
 fish_add_path "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
 
