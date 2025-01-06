@@ -1,7 +1,3 @@
-local lsp = vim.lsp
-local util = lsp.util
-local ms = lsp.protocol.Methods
-
 local function pick_definitions()
   if LazyVim.pick.want() == "telescope" then
     require("telescope.builtin").lsp_definitions({ reuse_win = true })
@@ -52,9 +48,9 @@ end
 --- https://github.com/neovim/neovim/blob/fb6c059dc55c8d594102937be4dd70f5ff51614a/runtime/lua/vim/lsp/_tagfunc.lua#L25
 --- https://github.com/ibhagwan/fzf-lua/blob/975534f4861e2575396716225c1202572645583d/lua/fzf-lua/providers/lsp.lua#L468
 local function pick_definitions_or_references()
-  local params = util.make_position_params()
-  local method = ms.textDocument_definition
-  local results_by_client, err = lsp.buf_request_sync(0, method, params, 1000)
+  local params = vim.lsp.util.make_position_params()
+  local method = vim.lsp.protocol.Methods.textDocument_definition
+  local results_by_client, err = vim.lsp.buf_request_sync(0, method, params, 1000)
   if err or not results_by_client then
     LazyVim.error(string.format("Error executing '%s': %s", method, err), { title = "LSP" })
     return

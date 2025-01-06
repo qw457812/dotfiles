@@ -189,6 +189,8 @@ vim.api.nvim_create_autocmd("FileType", {
 -- copied from:
 -- https://github.com/echasnovski/mini.nvim/blob/73bbcbfa7839c4b00a64965fb504f87461abefbd/lua/mini/misc.lua#L194
 -- https://github.com/mrbeardad/nvim/blob/916d17211cc67d082ece6476bdfffe1a9fc41d22/lua/user/configs/autocmds.lua#L61
+--
+-- TODO: this messes up Restore Session
 if vim.g.user_auto_root and not vim.o.autochdir then
   local function set_root(buf)
     local root = LazyVim.root.get({ normalize = true, buf = buf })

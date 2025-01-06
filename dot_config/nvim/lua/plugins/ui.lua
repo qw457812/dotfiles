@@ -210,6 +210,16 @@ return {
               end
               return { fg = fg, gui = "bold" }
             end,
+            fmt = function(name, context)
+              -- https://github.com/mfussenegger/nvim-jdtls/issues/423#issuecomment-1429184022
+              local fname = vim.api.nvim_buf_get_name(0)
+              if vim.startswith(fname, "jdt://") then
+                local package = fname:match("contents/[%a%d._-]+/([%a%d._-]+)") or ""
+                local class = fname:match("contents/[%a%d._-]+/[%a%d._-]+/([%a%d$]+).class") or ""
+                return string.format("%s::%s %s", package, class, context.options.symbols.readonly)
+              end
+              return name
+            end,
           }
         or {
           pretty_path({
