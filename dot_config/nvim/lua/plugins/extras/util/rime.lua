@@ -1,5 +1,5 @@
 -- https://github.com/wlh320/rime-ls
-if not (vim.fn.executable("rime_ls") == 1 and LazyVim.has("blink.cmp")) then
+if not U.rime_ls.cond() then
   return {}
 end
 

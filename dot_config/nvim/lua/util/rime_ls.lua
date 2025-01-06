@@ -131,10 +131,14 @@ function M.on_attach(client)
   U.keymap({ "n", "i" }, "<c-.>", function() M.toggle(client) end, { desc = "Toggle Rime" })
 end
 
+---@return boolean
+function M.cond()
+  return vim.fn.executable("rime_ls") == 1 and LazyVim.has("blink.cmp")
+end
+
 ---@param opts? { filetypes?: string[] }
 function M.setup(opts)
-  assert(vim.fn.executable("rime_ls") == 1, "rime_ls is required")
-  assert(LazyVim.has("blink.cmp"), "blink.cmp is required")
+  assert(M.cond(), "rime_ls and blink.cmp are required")
 
   vim.system({ "rime_ls", "--listen", "127.0.0.1:9257" }, { detach = true })
 
