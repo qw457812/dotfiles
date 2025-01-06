@@ -658,7 +658,7 @@ return {
                 return
               end
 
-              if is_visible() then
+              if is_visible() and not vim.g.user_neotree_auto_close then
                 utils.debounce("neo-tree-follow-root", function()
                   local root = LazyVim.root({ normalize = true, buf = vim.fn.bufnr(args.afile) })
                   if last_root ~= root and utils.is_subpath(root, vim.uv.fs_realpath(args.afile) or args.afile) then
