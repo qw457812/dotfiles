@@ -14,7 +14,7 @@ return {
       servers = {
         rime_ls = {
           init_options = {
-            enabled = vim.g.rime_enabled,
+            enabled = vim.g.rime_enabled == true,
             shared_data_dir = "/Library/Input Methods/Squirrel.app/Contents/SharedSupport",
             user_data_dir = vim.fn.expand("~/.local/share/rime-ls"), -- https://github.com/zhhmn/huma-rime
             log_dir = vim.fn.expand("~/.local/share/rime-ls"),
@@ -51,7 +51,7 @@ return {
           end,
           "fallback",
         },
-        [":"] = { -- TODO: not working when binding :<space> to other key
+        [":"] = { -- TODO: not working when mapping `:<space>` to `：` (Chinese punctuation)
           function(cmp)
             if not vim.g.rime_enabled then
               return false
@@ -91,11 +91,9 @@ return {
               end
 
               -- filter out text items, since we have the buffer source
-              -- filter out non-acceptable rime items
               ---@param item blink.cmp.CompletionItem
               return vim.tbl_filter(function(item)
-                return item.kind ~= require("blink.cmp.types").CompletionItemKind.Text
-                  or U.rime_ls.is_valid_rime_item(item)
+                return item.kind ~= require("blink.cmp.types").CompletionItemKind.Text or U.rime_ls.is_rime_item(item)
               end, items)
             end,
           },
@@ -108,7 +106,17 @@ return {
     "nvim-lualine/lualine.nvim",
     optional = true,
     opts = function(_, opts)
-      table.insert(opts.sections.lualine_x, 2, U.rime_ls.lualine)
+      table.insert(opts.sections.lualine_x, 2, {
+        function()
+          return "ㄓ"
+        end,
+        cond = function()
+          return vim.g.rime_enabled
+        end,
+        color = function()
+          return { fg = Snacks.util.color("MiniIconsRed") }
+        end,
+      })
     end,
   },
 }
