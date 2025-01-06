@@ -66,9 +66,6 @@ return {
           --     end
           --   end
           -- end
-          if vim.startswith(vim.api.nvim_buf_get_name(buff), "jdt://") then
-            return {}
-          end
 
           -- filename highlighting
           for i = 1, #symbols - 1 do
@@ -101,9 +98,6 @@ return {
               table.remove(symbols, i)
             end
           end
-          if symbol_oil_prefix then
-            table.insert(symbols, 1, symbol_oil_prefix)
-          end
 
           -- same behavior as `length` of `LazyVim.lualine.pretty_path()`
           local max_symbols = vim.g.user_is_termux and 5 or 10
@@ -119,6 +113,9 @@ return {
             symbols[i].name = truncate_string(symbols[i].name, max_symbol_len)
           end
 
+          if symbol_oil_prefix then
+            table.insert(symbols, 1, symbol_oil_prefix)
+          end
           return symbols
         end,
       }
@@ -155,7 +152,7 @@ return {
             if vim.bo[buf].ft == "markdown" then
               return vim.g.user_trouble_lualine_old and { source_path, source_markdown } or { source_path }
             end
-            if vim.bo[buf].buftype == "terminal" then
+            if vim.bo[buf].buftype == "terminal" or vim.startswith(vim.api.nvim_buf_get_name(buf), "jdt://") then
               return {}
             end
             return { source_path } -- using trouble.nvim's symbols instead, because it's shorter
