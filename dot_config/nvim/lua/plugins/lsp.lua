@@ -102,7 +102,8 @@ return {
       -- stylua: ignore
       vim.list_extend(Keys, {
         { "K", false },
-        { "gk", function() return vim.lsp.buf.hover() end, desc = "Hover" },
+        -- add `has = "hover"` to prevent rime_ls from overwriting `gk` in help pages
+        { "gk", function() return vim.lsp.buf.hover() end, desc = "Hover", has = "hover" },
         { "<c-k>", mode = "i", false }, -- <c-k> for cmp navigation
         { "<c-h>", function() return vim.lsp.buf.signature_help() end, mode = "i", desc = "Signature Help", has = "signatureHelp" },
         -- { "gd", pick_definitions_or_references, desc = "Goto Definition/References", has = "definition" },
