@@ -26,15 +26,17 @@ return {
     "echasnovski/mini.trailspace",
     event = { "BufReadPost", "BufNewFile" },
     opts = function()
-      -- vim.api.nvim_create_autocmd("FileType", {
-      --   pattern = { "dashboard" },
-      --   callback = function(event)
-      --     if package.loaded["mini.trailspace"] then
-      --       vim.b[event.buf].minitrailspace_disable = true
-      --       vim.api.nvim_buf_call(event.buf, require("mini.trailspace").unhighlight)
-      --     end
-      --   end,
-      -- })
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = {
+          "gitcommit", -- git commit --verbose
+        },
+        callback = function(event)
+          vim.b[event.buf].minitrailspace_disable = true
+          -- if package.loaded["mini.trailspace"] then
+          --   vim.api.nvim_buf_call(event.buf, require("mini.trailspace").unhighlight)
+          -- end
+        end,
+      })
     end,
   },
 }
