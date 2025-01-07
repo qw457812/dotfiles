@@ -1,8 +1,7 @@
 ---@class util.path
 local M = {}
 
--- os.getenv("HOME")
-M.HOME = vim.uv.os_homedir()
+M.HOME = assert(vim.uv.os_homedir()) -- os.getenv("HOME")
 
 -- function M.is_dir(path)
 --   -- -- https://github.com/folke/snacks.nvim/pull/136#issuecomment-2492044614
@@ -38,8 +37,8 @@ M.LAZYVIM = LazyVim.get_plugin_path("LazyVim")
 ---@return string
 function M.home_to_tilde(path)
   -- vim.fn.fnamemodify(path, ":~")
-  -- require("plenary.path"):new(path):make_relative(M.home)
-  return M.HOME and path:gsub("^" .. vim.pesc(M.HOME), "~") or path
+  -- require("plenary.path"):new(path):make_relative(M.HOME)
+  return (path:gsub("^" .. vim.pesc(M.HOME), "~"))
 end
 
 return M
