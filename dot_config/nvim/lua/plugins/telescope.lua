@@ -17,36 +17,40 @@ end
 
 -- alternative: https://github.com/tsakirist/telescope-lazy.nvim
 local pick_find_plugin_files = function()
-  -- LazyVim.pick("files", { cwd = require("lazy.core.config").options.root })()
-
-  -- https://github.com/chrisgrieser/.config/blob/41c33a44e9c02bd04ea7cedcaed0f5547129e83c/nvim/lua/config/lazy.lua#L170
-  vim.ui.select(require("lazy").plugins(), {
-    prompt = "Select Plugin",
-    format_item = function(plugin)
-      return plugin.name
-    end,
-  }, function(plugin)
-    if not plugin then
-      return
-    end
-    LazyVim.pick("files", { cwd = plugin.dir, prompt_title = plugin.name })()
-  end)
+  if LazyVim.pick.picker.name == "telescope" then
+    -- https://github.com/chrisgrieser/.config/blob/41c33a44e9c02bd04ea7cedcaed0f5547129e83c/nvim/lua/config/lazy.lua#L170
+    vim.ui.select(require("lazy").plugins(), {
+      prompt = "Select Plugin",
+      format_item = function(plugin)
+        return plugin.name
+      end,
+    }, function(plugin)
+      if not plugin then
+        return
+      end
+      LazyVim.pick("files", { cwd = plugin.dir, prompt_title = plugin.name })()
+    end)
+  elseif LazyVim.pick.picker.name == "fzf" then
+    LazyVim.pick("files", { cwd = require("lazy.core.config").options.root })()
+  end
 end
 
 local pick_search_plugin_codes = function()
-  -- LazyVim.pick("live_grep", { cwd = require("lazy.core.config").options.root })()
-
-  vim.ui.select(require("lazy").plugins(), {
-    prompt = "Select Plugin",
-    format_item = function(plugin)
-      return plugin.name
-    end,
-  }, function(plugin)
-    if not plugin then
-      return
-    end
-    LazyVim.pick("live_grep", { cwd = plugin.dir, prompt_title = plugin.name })()
-  end)
+  if LazyVim.pick.picker.name == "telescope" then
+    vim.ui.select(require("lazy").plugins(), {
+      prompt = "Select Plugin",
+      format_item = function(plugin)
+        return plugin.name
+      end,
+    }, function(plugin)
+      if not plugin then
+        return
+      end
+      LazyVim.pick("live_grep", { cwd = plugin.dir, prompt_title = plugin.name })()
+    end)
+  elseif LazyVim.pick.picker.name == "fzf" then
+    LazyVim.pick("live_grep", { cwd = require("lazy.core.config").options.root })()
+  end
 end
 
 local pick_find_lazy_files = function()

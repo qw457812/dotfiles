@@ -3,15 +3,15 @@ if not (LazyVim.has_extra("util.chezmoi") and vim.fn.executable("chezmoi") == 1 
   return {}
 end
 
----@param opts? { targets?: string|string[], use_absolute_path?: boolean }
+---@param opts? { targets?: string|string[], path_style_absolute?: boolean, include_symlinks?: boolean }
 ---@return string[]
 local function chezmoi_list_files(opts)
   opts = opts or {}
 
   -- exclude directories and externals
   -- see: ~/.local/share/nvim/lazy/chezmoi.nvim/lua/telescope/_extensions/find_files.lua
-  local args = { "--include", "files", "--exclude", "externals" }
-  if opts.use_absolute_path then
+  local args = { "--include", "files" .. (opts.include_symlinks and ",symlinks" or ""), "--exclude", "externals" }
+  if opts.path_style_absolute then
     vim.list_extend(args, { "--path-style", "absolute" })
   end
 
@@ -25,26 +25,34 @@ local function pick_chezmoi()
   if LazyVim.pick.picker.name == "telescope" then
     require("telescope").extensions.chezmoi.find_files()
   elseif LazyVim.pick.picker.name == "fzf" then
-    local results = chezmoi_list_files()
-    local opts = {
-      prompt = " ",
-      fzf_opts = {},
-      fzf_colors = true,
+    -- local results = chezmoi_list_files({ include_symlinks = true })
+    -- local opts = {
+    --   prompt = " ",
+    --   fzf_opts = {},
+    --   fzf_colors = true,
+    --   actions = {
+    --     ["default"] = function(selected)
+    --       if not vim.tbl_isempty(selected) then
+    --         require("chezmoi.commands").edit({ targets = "~/" .. selected[1] })
+    --       end
+    --     end,
+    --   },
+    -- }
+    -- require("fzf-lua").fzf_exec(results, opts)
+
+    require("fzf-lua").files({
+      cmd = "chezmoi managed --path-style=absolute --include=files,symlinks --exclude=externals",
       actions = {
-        ["default"] = function(selected)
-          if not vim.tbl_isempty(selected) then
-            require("chezmoi.commands").edit({ targets = "~/" .. selected[1] })
-          end
+        ["default"] = function(selected, opts)
+          require("fzf-lua.actions").vimcmd_entry("ChezmoiEdit", selected, opts)
         end,
       },
-      -- TODO: previewer
-    }
-    require("fzf-lua").fzf_exec(results, opts)
+    })
   end
 end
 
 local function chezmoi_list_config_files()
-  return chezmoi_list_files({ targets = vim.fn.stdpath("config"), use_absolute_path = true })
+  return chezmoi_list_files({ targets = vim.fn.stdpath("config"), path_style_absolute = true })
 end
 
 --- pick nvim config
@@ -122,6 +130,7 @@ return {
     "xvzc/chezmoi.nvim",
     optional = true,
     event = "LazyFile", -- for augroup: chezmoi_add
+    cmd = "ChezmoiEdit",
     keys = {
       { "<leader>sz", false },
       { "<leader>f.", pick_chezmoi, desc = "Find Chezmoi Source Dotfiles" },
@@ -145,7 +154,7 @@ return {
       -- https://github.com/dsully/nvim/blob/a6a7a29707e5209c6bf14be0f178d3cd1141b5ff/lua/plugins/util.lua#L104
       -- https://github.com/amuuname/dotfiles/blob/462579dbf4e9452a22cc268a3cb244172d9142aa/dot_config/nvim/plugin/autocmd.lua#L52
       vim.schedule(function()
-        local ok, managed_files = pcall(chezmoi_list_files, { use_absolute_path = true })
+        local ok, managed_files = pcall(chezmoi_list_files, { path_style_absolute = true })
         if ok and not vim.tbl_isempty(managed_files) then
           vim.api.nvim_create_autocmd("BufWritePost", {
             group = vim.api.nvim_create_augroup("chezmoi_add", { clear = true }),
