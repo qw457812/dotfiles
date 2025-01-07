@@ -80,6 +80,20 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 
 - [x] Check out the great [:h lua-guide](https://neovim.io/doc/user/lua-guide.html#lua-guide).
 - [ ] Map `gd` to both lsp_definition and lsp_references like vscode and idea, maybe give `gr` to ReplaceWithRegister.
+
+  ```lua
+  {
+    "folke/zen-mode.nvim",
+    opts = function(_, opts)
+      local on_open = opts.on_open or function() end
+      opts.on_open = function()
+        on_open() -- <cr> not working here: "No LSP References found", should go to definition
+        -- something else
+      end
+    end,
+  }
+  ```
+
 - [ ] Fix Java DAP timeout problem, see [nvim-jdtls](https://github.com/mfussenegger/nvim-jdtls).
   - Use [nvim-java/nvim-java](https://github.com/nvim-java/nvim-java) instead of `nvim-jdtls`.
     - Like appelgriebsch's [plugins/lang.lua](https://github.com/appelgriebsch/Nv/blob/main/lua/plugins/lang.lua) and [plugins/extras/lang/nvim-java.lua](https://github.com/appelgriebsch/Nv/blob/main/lua/plugins/extras/lang/nvim-java.lua), [contributor](https://github.com/LazyVim/LazyVim/pull/1192/commits/69a96525ebd3fcbb0128549104d3821803bb8948) of extras.lang.java.

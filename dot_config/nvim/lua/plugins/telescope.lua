@@ -187,25 +187,24 @@ return {
           return transformed_path, path_style
         end,
         -- ~/.local/share/nvim/lazy/telescope.nvim/lua/telescope/mappings.lua
-        -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/editor/telescope.lua
         mappings = {
           i = {
-            -- same as <C-j> and <C-k> in fzf-lua
-            -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/editor/fzf.lua
-            ["<C-j>"] = {
-              require("telescope.actions").move_selection_next,
-              type = "action",
-              opts = { nowait = true, silent = true },
-            },
-            ["<C-k>"] = {
-              require("telescope.actions").move_selection_previous,
-              type = "action",
-              opts = { nowait = true, silent = true },
-            },
+            ["<C-j>"] = "move_selection_next",
+            ["<C-k>"] = "move_selection_previous",
+            ["<C-Left>"] = "preview_scrolling_left",
+            ["<C-Right>"] = "preview_scrolling_right",
           },
           n = {
             ["H"] = { "^", type = "command" },
             ["L"] = { "$", type = "command" },
+            ["<C-j>"] = "move_selection_next",
+            ["<C-k>"] = "move_selection_previous",
+            ["<C-f>"] = "preview_scrolling_down",
+            ["<C-b>"] = "preview_scrolling_up",
+            ["<Left>"] = "preview_scrolling_left",
+            ["<Right>"] = "preview_scrolling_right",
+            ["<C-Left>"] = "preview_scrolling_left",
+            ["<C-Right>"] = "preview_scrolling_right",
           },
         },
       },

@@ -200,7 +200,6 @@ return {
   {
     "williamboman/mason.nvim",
     opts = {
-      -- :=LazyVim.opts("mason.nvim").ensure_installed
       ensure_installed = {
         "selene",
         "luacheck",
