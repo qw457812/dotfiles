@@ -1,50 +1,9 @@
-if not LazyVim.has("telescope.nvim") or vim.fn.executable("zoxide") == 0 then
+if vim.fn.executable("zoxide") == 0 then
   return {}
 end
 
 local pick = function()
-  local telescope = require("telescope")
-  local from_entry = require("telescope.from_entry")
-  local utils = require("telescope.utils")
-
-  -- https://github.com/petobens/dotfiles/blob/0e216cdf8048859db5cbec0a1bc5b99d45479817/nvim/lua/plugin-config/telescope_config.lua#L784
-  local tree_previewer = U.telescope.never_paging_term_previewer({
-    title = "Tree Preview",
-    get_command = function(entry)
-      local p = from_entry.path(entry, true, false)
-      if p == nil or p == "" then
-        return
-      end
-      local command
-      local ignore_glob = ".DS_Store|.git|.svn|.idea|.vscode|node_modules"
-      if vim.fn.executable("eza") == 1 then
-        command = {
-          "eza",
-          "--all",
-          "--level=2",
-          "--group-directories-first",
-          "--ignore-glob=" .. ignore_glob,
-          "--git-ignore",
-          "--tree",
-          "--color=always",
-          "--color-scale",
-          "all",
-          "--icons=always",
-          "--long",
-          "--time-style=iso",
-          "--git",
-          "--no-permissions",
-          "--no-user",
-        }
-      else
-        command = { "tree", "-a", "-L", "2", "-I", ignore_glob, "-C", "--dirsfirst" }
-      end
-      return utils.flatten({ command, "--", utils.path_expand(p) })
-    end,
-  })
-
-  -- ~/.local/share/nvim/lazy/telescope-zoxide/lua/telescope/_extensions/zoxide/list.lua
-  telescope.extensions.zoxide.list({
+  require("telescope").extensions.zoxide.list({
     -- layout_config = {
     --   horizontal = {
     --     preview_width = function(_, max_columns, _)
@@ -57,7 +16,7 @@ local pick = function()
     --   },
     -- },
     -- previewer = previewers.vim_buffer_cat.new({}),
-    previewer = tree_previewer,
+    previewer = U.telescope.tree_previewer(),
   })
 end
 
@@ -105,53 +64,13 @@ return {
   },
 
   {
-    "goolord/alpha-nvim",
-    optional = true,
-    opts = function(_, dashboard)
-      local button = dashboard.button("z", " " .. " Zoxide", "<cmd> Telescope zoxide list <cr>")
-      button.opts.hl = "AlphaButtons"
-      button.opts.hl_shortcut = "AlphaShortcut"
-      table.insert(dashboard.section.buttons.val, 10, button)
-    end,
-  },
-
-  {
-    "echasnovski/mini.starter",
-    optional = true,
-    opts = function(_, opts)
-      local items = {
-        {
-          name = "Zoxide",
-          action = "Telescope zoxide list",
-          section = string.rep(" ", 22) .. "Telescope",
-        },
-      }
-      vim.list_extend(opts.items, items)
-    end,
-  },
-
-  {
-    "nvimdev/dashboard-nvim",
-    optional = true,
-    opts = function(_, opts)
-      local zoxide = {
-        action = "Telescope zoxide list",
-        desc = " Zoxide",
-        icon = " ",
-        key = "z",
-      }
-
-      zoxide.desc = zoxide.desc .. string.rep(" ", 43 - #zoxide.desc)
-      zoxide.key_format = "  %s"
-
-      table.insert(opts.config.center, 10, zoxide)
-    end,
-  },
-
-  {
     "folke/snacks.nvim",
     optional = true,
     opts = function(_, opts)
+      if not LazyVim.has("telescope-zoxide") then
+        return
+      end
+
       table.insert(opts.dashboard.preset.keys, 10, {
         action = ":Telescope zoxide list",
         desc = "Zoxide",
@@ -160,4 +79,44 @@ return {
       })
     end,
   },
+
+  -- {
+  --   "goolord/alpha-nvim",
+  --   optional = true,
+  --   opts = function(_, dashboard)
+  --     local button = dashboard.button("z", " " .. " Zoxide", "<cmd> Telescope zoxide list <cr>")
+  --     button.opts.hl = "AlphaButtons"
+  --     button.opts.hl_shortcut = "AlphaShortcut"
+  --     table.insert(dashboard.section.buttons.val, 10, button)
+  --   end,
+  -- },
+  -- {
+  --   "echasnovski/mini.starter",
+  --   optional = true,
+  --   opts = function(_, opts)
+  --     local items = {
+  --       {
+  --         name = "Zoxide",
+  --         action = "Telescope zoxide list",
+  --         section = string.rep(" ", 22) .. "Telescope",
+  --       },
+  --     }
+  --     vim.list_extend(opts.items, items)
+  --   end,
+  -- },
+  -- {
+  --   "nvimdev/dashboard-nvim",
+  --   optional = true,
+  --   opts = function(_, opts)
+  --     local zoxide = {
+  --       action = "Telescope zoxide list",
+  --       desc = " Zoxide",
+  --       icon = " ",
+  --       key = "z",
+  --     }
+  --     zoxide.desc = zoxide.desc .. string.rep(" ", 43 - #zoxide.desc)
+  --     zoxide.key_format = "  %s"
+  --     table.insert(opts.config.center, 10, zoxide)
+  --   end,
+  -- },
 }

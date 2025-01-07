@@ -1,17 +1,12 @@
-if not (LazyVim.has("telescope.nvim") and vim.fn.executable("aider") == 1) then
-  return {}
-end
-
 local toggle_key = "<C-cr>"
 
--- https://github.com/LazyVim/LazyVim/pull/5233
 return {
   {
     "GeorgesAlkhouri/nvim-aider",
-    dependencies = {
-      "folke/snacks.nvim",
-      "nvim-telescope/telescope.nvim",
-    },
+    enabled = function()
+      return LazyVim.has("telescope.nvim") and vim.fn.executable("aider") == 1
+    end,
+    dependencies = "folke/snacks.nvim",
     cmd = {
       "AiderTerminalToggle",
     },

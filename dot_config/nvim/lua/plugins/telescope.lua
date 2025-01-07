@@ -243,10 +243,9 @@ return {
 
   {
     "piersolenski/telescope-import.nvim",
-    cond = function()
+    enabled = function()
       return LazyVim.has("telescope.nvim")
     end,
-    dependencies = "nvim-telescope/telescope.nvim",
     keys = {
       { "<leader>ci", "<cmd>Telescope import<cr>", desc = "Pick Import" },
     },
