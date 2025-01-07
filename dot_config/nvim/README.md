@@ -119,7 +119,6 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
   > Mentioned by this [PR](https://github.com/LazyVim/LazyVim/pull/4139).
 - [x] Choose a file browser between neo-tree, oil, mini-files, [others](https://github.com/rockerBOO/awesome-neovim#file-explorer).
   - [Telescope-file-browser](https://github.com/nvim-telescope/telescope-file-browser.nvim), eg. [craftzdog](https://github.com/craftzdog/dotfiles-public/blob/master/.config/nvim/lua/plugins/editor.lua), [Matt-FTW](https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/editor/telescope/file-browser.lua)
-- [ ] Terminal: fix zsh-vi-mode's cursor shape.
 - [ ] [Toggleterm](https://github.com/akinsho/toggleterm.nvim) by this [issue](https://github.com/LazyVim/LazyVim/issues/539).
   - [toggleterm-manager.nvim](https://github.com/ryanmsnyder/toggleterm-manager.nvim)
 - [ ] Keybindings investigation:

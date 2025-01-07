@@ -1,7 +1,3 @@
-if not LazyVim.has("telescope.nvim") then
-  return {}
-end
-
 local telescope_opts = {
   layout_strategy = "vertical",
   layout_config = {
@@ -17,7 +13,9 @@ local telescope_opts = {
 return {
   {
     "rachartier/tiny-code-action.nvim",
-    dependencies = { "nvim-telescope/telescope.nvim" },
+    enabled = function()
+      return LazyVim.has("telescope.nvim")
+    end,
     event = "LspAttach",
     opts = {
       backend = "delta",
@@ -38,7 +36,9 @@ return {
   },
   -- {
   --   "aznhe21/actions-preview.nvim",
-  --   dependencies = { "nvim-telescope/telescope.nvim" },
+  --   enabled = function()
+  --     return LazyVim.has("telescope.nvim")
+  --   end,
   --   event = "LspAttach",
   --   opts = function()
   --     return {
@@ -52,6 +52,10 @@ return {
   {
     "neovim/nvim-lspconfig",
     opts = function()
+      if not LazyVim.has("tiny-code-action.nvim") then
+        return
+      end
+
       local function code_action()
         require("tiny-code-action").code_action()
         -- require("actions-preview").code_actions()

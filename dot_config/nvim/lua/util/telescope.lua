@@ -105,4 +105,42 @@ function M.never_paging_term_previewer(opts)
   return require("telescope.previewers").new_termopen_previewer(opts)
 end
 
+-- https://github.com/petobens/dotfiles/blob/0e216cdf8048859db5cbec0a1bc5b99d45479817/nvim/lua/plugin-config/telescope_config.lua#L784
+function M.tree_previewer()
+  return M.never_paging_term_previewer({
+    title = "Tree Preview",
+    get_command = function(entry)
+      local from_entry = require("telescope.from_entry")
+      local utils = require("telescope.utils")
+
+      local p = from_entry.path(entry, true, false)
+      if p == nil or p == "" then
+        return
+      end
+      local ignore_glob = ".DS_Store|.git|.svn|.idea|.vscode|node_modules"
+      local command = vim.fn.executable("eza") == 1
+          and {
+            "eza",
+            "--all",
+            "--level=2",
+            "--group-directories-first",
+            "--ignore-glob=" .. ignore_glob,
+            "--git-ignore",
+            "--tree",
+            "--color=always",
+            "--color-scale",
+            "all",
+            "--icons=always",
+            "--long",
+            "--time-style=iso",
+            "--git",
+            "--no-permissions",
+            "--no-user",
+          }
+        or { "tree", "-a", "-L", "2", "-I", ignore_glob, "-C", "--dirsfirst" }
+      return utils.flatten({ command, "--", utils.path_expand(p) })
+    end,
+  })
+end
+
 return M

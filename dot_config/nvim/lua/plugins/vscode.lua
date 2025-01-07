@@ -1,4 +1,4 @@
-if not vim.g.vscode or not LazyVim.has_extra("vscode") then
+if not vim.g.vscode then
   return {}
 end
 
