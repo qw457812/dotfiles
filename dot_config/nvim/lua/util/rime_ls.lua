@@ -13,6 +13,7 @@ M.cmp = {
     local client = vim.lsp.get_client_by_id(item.client_id)
     return client ~= nil and client.name == "rime_ls"
   end,
+
   ---@param n integer
   ---@param items? blink.cmp.CompletionItem[]
   ---@return integer[]
@@ -29,6 +30,7 @@ M.cmp = {
     end
     return res
   end,
+
   ---@param n integer
   ---@return blink.cmp.KeymapCommand[]
   accept_n = function(n)
