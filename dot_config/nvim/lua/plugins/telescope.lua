@@ -1,10 +1,6 @@
-local chezmoi_path = U.path.CHEZMOI
-local config_path = U.path.CONFIG
-local lazyvim_path = U.path.LAZYVIM
-
 -- https://github.com/folke/dot/blob/master/nvim/lua/plugins/telescope.lua
 local pick_search_lazy_specs = function()
-  local dirs = { config_path .. "/lua/plugins", lazyvim_path .. "/lua/lazyvim/plugins" }
+  local dirs = { U.path.CONFIG .. "/lua/plugins", U.path.LAZYVIM .. "/lua/lazyvim/plugins" }
   if LazyVim.pick.picker.name == "telescope" then
     require("telescope.builtin").live_grep({
       default_text = "/",
@@ -54,7 +50,7 @@ local pick_search_plugin_codes = function()
 end
 
 local pick_find_lazy_files = function()
-  local dirs = { config_path .. "/lua", lazyvim_path .. "/lua" }
+  local dirs = { U.path.CONFIG .. "/lua", U.path.LAZYVIM .. "/lua" }
   if LazyVim.pick.picker.name == "telescope" then
     require("telescope.builtin").find_files({ search_dirs = dirs })
   elseif LazyVim.pick.picker.name == "fzf" then
@@ -63,7 +59,7 @@ local pick_find_lazy_files = function()
 end
 
 local pick_search_lazy_codes = function()
-  local dirs = { config_path .. "/lua", lazyvim_path .. "/lua" }
+  local dirs = { U.path.CONFIG .. "/lua", U.path.LAZYVIM .. "/lua" }
   if LazyVim.pick.picker.name == "telescope" then
     require("telescope.builtin").live_grep({ search_dirs = vim.tbl_values(dirs) })
   elseif LazyVim.pick.picker.name == "fzf" then
@@ -131,80 +127,42 @@ return {
         },
         sorting_strategy = "ascending",
         winblend = 0,
-        -- see `:help telescope.defaults.path_display`
+        -- -- see `:help telescope.defaults.path_display`
         -- path_display = { "truncate" },
         -- path_display = { truncate = 1, "filename_first" },
-        -- path_display = {
-        --   "truncate",
-        --   filename_first = {
-        --     reverse_directories = true,
-        --   },
-        -- },
-        path_display = function(opts, path)
-          local transformed_path = vim.trim(U.path.home_to_tilde(path))
-          -- make path shorter
-          local dir_icons = {
-            { config_path, " " },
-            { lazyvim_path, "󰒲 " },
-          }
-          if chezmoi_path then
-            table.insert(dir_icons, { chezmoi_path, "󰠦 " })
-          end
-          for _, dir_icon in ipairs(dir_icons) do
-            transformed_path =
-              transformed_path:gsub("^" .. vim.pesc(U.path.home_to_tilde(dir_icon[1])) .. "/", dir_icon[2])
-          end
-          -- truncate
-          -- copy from: https://github.com/nvim-telescope/telescope.nvim/blob/bfcc7d5c6f12209139f175e6123a7b7de6d9c18a/lua/telescope/utils.lua#L198
-          -- ~/.local/share/nvim/lazy/telescope.nvim/lua/telescope/utils.lua
-          -- https://github.com/babarot/dotfiles/blob/cab2b7b00aef87efdf068d910e5e02935fecdd98/.config/nvim/lua/plugins/telescope.lua#L5
-          local truncate = require("plenary.strings").truncate
-          local get_status = require("telescope.state").get_status
-          local calc_result_length = function(truncate_len)
-            local status = get_status(vim.api.nvim_get_current_buf())
-            local len = vim.api.nvim_win_get_width(status.layout.results.winid)
-              - status.picker.selection_caret:len()
-              - 2
-            return type(truncate_len) == "number" and len - truncate_len or len
-          end
-          -- local truncate_len = 1
-          local truncate_len = nil
-          if opts.__length == nil then
-            opts.__length = calc_result_length(truncate_len)
-          end
-          if opts.__prefix == nil then
-            opts.__prefix = 0
-          end
-          transformed_path = truncate(transformed_path, opts.__length - opts.__prefix, nil, -1)
-          -- filename_first style
-          local tail = require("telescope.utils").path_tail(path)
-          -- highlight group: Comment, TelescopeResultsComment, Constant, TelescopeResultsNumber, TelescopeResultsIdentifier
-          local path_style = {
-            { { 0, #transformed_path - #tail }, "Comment" },
-            -- { { #transformed_path - #tail, #transformed_path }, "TelescopeResultsIdentifier" },
-            { { #transformed_path, 999 }, "TelescopeResultsComment" },
-          }
-          return transformed_path, path_style
-        end,
+        -- path_display = { "truncate", filename_first = { reverse_directories = true } },
+        path_display = U.telescope.path_display,
         -- ~/.local/share/nvim/lazy/telescope.nvim/lua/telescope/mappings.lua
         mappings = {
           i = {
             ["<C-j>"] = "move_selection_next",
             ["<C-k>"] = "move_selection_previous",
+            ["<C-u>"] = U.telescope.actions.results_half_page_up,
+            ["<C-d>"] = U.telescope.actions.results_half_page_down,
             ["<C-Left>"] = "preview_scrolling_left",
             ["<C-Right>"] = "preview_scrolling_right",
+            ["<M-Left>"] = "results_scrolling_left",
+            ["<M-Right>"] = "results_scrolling_right",
           },
           n = {
             ["H"] = { "^", type = "command" },
             ["L"] = { "$", type = "command" },
             ["<C-j>"] = "move_selection_next",
             ["<C-k>"] = "move_selection_previous",
+            ["<C-u>"] = U.telescope.actions.results_half_page_up,
+            ["<C-d>"] = U.telescope.actions.results_half_page_down,
             ["<C-f>"] = "preview_scrolling_down",
             ["<C-b>"] = "preview_scrolling_up",
+            ["<Down>"] = "cycle_history_next",
+            ["<Up>"] = "cycle_history_prev",
+            ["<C-Down>"] = "cycle_history_next",
+            ["<C-Up>"] = "cycle_history_prev",
             ["<Left>"] = "preview_scrolling_left",
             ["<Right>"] = "preview_scrolling_right",
             ["<C-Left>"] = "preview_scrolling_left",
             ["<C-Right>"] = "preview_scrolling_right",
+            ["<M-Left>"] = "results_scrolling_left",
+            ["<M-Right>"] = "results_scrolling_right",
           },
         },
       },

@@ -110,8 +110,8 @@ return {
           -- },
           ["<C-j>"] = { "select_next", "fallback" },
           ["<C-k>"] = { "select_prev", "fallback" },
-          ["<C-u>"] = { "scroll_documentation_up", "fallback" },
-          ["<C-d>"] = { "scroll_documentation_down", "fallback" },
+          -- ["<C-u>"] = { "scroll_documentation_up", "fallback" },
+          -- ["<C-d>"] = { "scroll_documentation_down", "fallback" },
         },
         completion = {
           menu = {
