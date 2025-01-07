@@ -15,6 +15,11 @@ return {
       --   -- toggling this plugin should also toggle conceallevel
       --   conceallevel = { default = 0 },
       -- },
+      heading = {
+        icons = function(sections)
+          return ("%s%s "):format(table.concat(sections, "."), #sections > 1 and "" or ".")
+        end,
+      },
       code = {
         -- https://github.com/MeanderingProgrammer/render-markdown.nvim/issues/246#issuecomment-2510220411
         disable_background = vim.g.user_transparent_background,
