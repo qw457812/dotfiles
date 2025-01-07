@@ -38,45 +38,10 @@ return {
     ---@type blink.cmp.Config
     opts = {
       keymap = {
-        ["<space>"] = {
-          function(cmp)
-            if not vim.g.rime_enabled then
-              return false
-            end
-            local indices = U.rime_ls.top_k_rime_item_indices(1)
-            if #indices ~= 1 then
-              return false
-            end
-            return cmp.accept({ index = indices[1] })
-          end,
-          "fallback",
-        },
-        [":"] = { -- TODO: not working when mapping `:<space>` to `：` (Chinese punctuation)
-          function(cmp)
-            if not vim.g.rime_enabled then
-              return false
-            end
-            local indices = U.rime_ls.top_k_rime_item_indices(2)
-            if #indices ~= 2 then
-              return false
-            end
-            return cmp.accept({ index = indices[2] })
-          end,
-          "fallback",
-        },
-        ["'"] = {
-          function(cmp)
-            if not vim.g.rime_enabled then
-              return false
-            end
-            local indices = U.rime_ls.top_k_rime_item_indices(3)
-            if #indices ~= 3 then
-              return false
-            end
-            return cmp.accept({ index = indices[3] })
-          end,
-          "fallback",
-        },
+        ["<space>"] = U.rime_ls.cmp.accept_n(1),
+        -- TODO: not working when mapping `:<space>` to `：` (Chinese punctuation)
+        [":"] = U.rime_ls.cmp.accept_n(2),
+        ["'"] = U.rime_ls.cmp.accept_n(3),
       },
       sources = {
         providers = {
@@ -93,7 +58,7 @@ return {
               -- filter out text items, since we have the buffer source
               ---@param item blink.cmp.CompletionItem
               return vim.tbl_filter(function(item)
-                return item.kind ~= require("blink.cmp.types").CompletionItemKind.Text or U.rime_ls.is_rime_item(item)
+                return item.kind ~= require("blink.cmp.types").CompletionItemKind.Text or U.rime_ls.cmp.is_rime(item)
               end, items)
             end,
           },
