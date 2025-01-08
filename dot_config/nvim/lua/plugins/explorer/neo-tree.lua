@@ -77,13 +77,40 @@ return {
           return false
         end
         for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-          if vim.bo[vim.api.nvim_win_get_buf(win)].filetype == "neo-tree" then
-            return true
+          local buf = vim.api.nvim_win_get_buf(win)
+          if vim.bo[buf].filetype == "neo-tree" then
+            return true, buf, win
           end
         end
-        vim.g.user_neotree_visible = false
+        vim.g.user_neotree_visible = false -- fix the case when neo-tree window is closed by `<C-w>o`
         return false
       end
+
+      vim.api.nvim_create_autocmd("WinResized", {
+        group = vim.api.nvim_create_augroup("resize_neotree_auto_close", {}),
+        callback = function(event)
+          if vim.g.user_neotree_auto_close then
+            return
+          end
+          local win = event.match + 0
+          if vim.api.nvim_win_get_config(win).relative ~= "" then
+            return
+          end
+          local buf = vim.fn.winbufnr(win)
+          if vim.bo[buf].filetype == "neo-tree" then
+            return
+          end
+
+          local min_width = 100
+          -- call is_visible() first to fix vim.g.user_neotree_visible
+          if is_visible() and (vim.o.columns < min_width or vim.api.nvim_win_get_width(win) < min_width) then
+            local utils = require("neo-tree.utils")
+            utils.debounce("resize-neotree-auto-close", function()
+              require("neo-tree.command").execute({ action = "close" })
+            end, 100, utils.debounce_strategy.CALL_LAST_ONLY)
+          end
+        end,
+      })
 
       -- https://github.com/nvim-neo-tree/neo-tree.nvim/wiki/Recipes#find-with-telescope
       local function get_telescope_opts(state)
@@ -658,6 +685,7 @@ return {
                 return
               end
 
+              -- call is_visible() first to fix vim.g.user_neotree_visible
               if is_visible() and not vim.g.user_neotree_auto_close then
                 utils.debounce("neo-tree-follow-root", function()
                   local root = LazyVim.root({ normalize = true, buf = vim.fn.bufnr(args.afile) })
