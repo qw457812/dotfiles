@@ -94,7 +94,21 @@ return {
       { "<leader>sp", pick_search_lazy_specs, desc = "Search Lazy Plugin Spec" },
       unpack(keys),
     },
+    opts = {
+      -- defaults = { formatter = "path.filename_first" },
+      winopts = {
+        width = vim.g.user_is_termux and 1 or nil,
+        height = vim.g.user_is_termux and 1 or nil,
+        preview = {
+          horizontal = "right:50%",
+        },
+      },
+      -- files = { path_shorten = 1 },
+      -- grep = { path_shorten = 1 },
+      -- fzf_opts = { ["--keep-right"] = "" },
+    },
   },
+
   -- https://www.lazyvim.org/configuration/examples
   {
     "nvim-telescope/telescope.nvim",
