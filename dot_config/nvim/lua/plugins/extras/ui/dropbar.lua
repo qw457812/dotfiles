@@ -20,6 +20,7 @@ return {
       { "<leader>wP", function() require("dropbar.api").pick() end, desc = "Winbar Pick" },
     },
     opts = function(_, opts)
+      local bar = require("dropbar.bar")
       local sources = require("dropbar.sources")
       local menu_utils = require("dropbar.utils.menu")
       local dropbar_default_opts = require("dropbar.configs").opts
@@ -49,6 +50,37 @@ return {
       -- local jdt_prefix = "jdt:" -- nvim-jdtls
       local source_path = {
         get_symbols = function(buff, win, cursor)
+          local mini_icons = require("mini.icons")
+
+          -- fix path for java library
+          local jar, pkg, class = U.java.parse_jdt_uri(vim.api.nvim_buf_get_name(buff))
+          if jar and pkg and class then
+            local jar_icon = mini_icons.get("extension", "zip")
+            local pkg_icon, pkg_icon_hl = mini_icons.get("lsp", "package")
+            local class_icon, class_icon_hl = mini_icons.get("filetype", "java")
+            return {
+              bar.dropbar_symbol_t:new({
+                icon = jar_icon .. " ",
+                icon_hl = "MiniIconsRed",
+                name = jar,
+                name_hl = "DropBarFolderName",
+              }),
+              bar.dropbar_symbol_t:new({
+                icon = pkg_icon .. " ",
+                icon_hl = pkg_icon_hl,
+                name = pkg,
+                name_hl = "DropBarFolderName",
+              }),
+              bar.dropbar_symbol_t:new({
+                icon = class_icon .. " ",
+                icon_hl = class_icon_hl,
+                name = class .. ".class",
+                name_hl = "DropBarFileName",
+              }),
+            }
+          end
+
+          -- original symbols
           local symbols = sources.path.get_symbols(buff, win, cursor)
           if vim.tbl_isempty(symbols) then
             return symbols
@@ -89,9 +121,9 @@ return {
             end
           end
           if start_with_home then
+            local home_icon, home_icon_hl = mini_icons.get("directory", "home")
             local symbol_home = symbols[#home_parts]
             symbol_home.name = "~"
-            local home_icon, home_icon_hl = require("mini.icons").get("directory", "home")
             symbol_home.icon = home_icon .. " "
             symbol_home.icon_hl = home_icon_hl
             for i = #home_parts - 1, 1, -1 do
@@ -152,7 +184,7 @@ return {
             if vim.bo[buf].ft == "markdown" then
               return vim.g.user_trouble_lualine_old and { source_path, source_markdown } or { source_path }
             end
-            if vim.bo[buf].buftype == "terminal" or vim.startswith(vim.api.nvim_buf_get_name(buf), "jdt://") then
+            if vim.bo[buf].buftype == "terminal" then
               return {}
             end
             return { source_path } -- using trouble.nvim's symbols instead, because it's shorter

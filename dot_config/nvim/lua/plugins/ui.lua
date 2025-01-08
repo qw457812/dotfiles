@@ -43,7 +43,8 @@ return {
         end,
         -- hide extension
         name_formatter = function(buf)
-          return buf.name:match("(.+)%..+$")
+          local _, _, class = U.java.parse_jdt_uri(buf.path)
+          return class or buf.name:match("(.+)%..+$")
         end,
         show_buffer_close_icons = false,
         show_close_icon = false,
@@ -211,14 +212,8 @@ return {
               return { fg = fg, gui = "bold" }
             end,
             fmt = function(name, context)
-              -- https://github.com/mfussenegger/nvim-jdtls/issues/423#issuecomment-1429184022
-              local fname = vim.api.nvim_buf_get_name(0)
-              if vim.startswith(fname, "jdt://") then
-                local package = fname:match("contents/[%a%d._-]+/([%a%d._-]+)") or ""
-                local class = fname:match("contents/[%a%d._-]+/[%a%d._-]+/([%a%d$]+).class") or ""
-                return string.format("%s::%s %s", package, class, context.options.symbols.readonly)
-              end
-              return name
+              local _, _, class = U.java.parse_jdt_uri(vim.api.nvim_buf_get_name(0))
+              return class and ("%s.class %s"):format(class, context.options.symbols.readonly) or name
             end,
           }
         or {

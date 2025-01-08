@@ -1,6 +1,7 @@
 ---@class util
 ---@field color util.color
 ---@field explorer util.explorer
+---@field java util.java
 ---@field keymap util.keymap
 ---@field markdown util.markdown
 ---@field path util.path
