@@ -69,26 +69,33 @@ return {
             implementationsCodeLens = { enabled = true },
             referencesCodeLens = { enabled = true },
             signatureHelp = { enabled = true },
-            -- completion = {
-            --   favoriteStaticMembers = {
-            --     "org.hamcrest.MatcherAssert.assertThat",
-            --     "org.hamcrest.Matchers.*",
-            --     "org.hamcrest.CoreMatchers.*",
-            --     "org.junit.jupiter.api.Assertions.*",
-            --     "java.util.Objects.requireNonNull",
-            --     "java.util.Objects.requireNonNullElse",
-            --     "org.mockito.Mockito.*",
-            --   },
-            -- },
+            completion = {
+              favoriteStaticMembers = {
+                "org.hamcrest.MatcherAssert.assertThat",
+                "org.hamcrest.Matchers.*",
+                "org.hamcrest.CoreMatchers.*",
+                "org.junit.jupiter.api.Assertions.*",
+                "java.util.Objects.requireNonNull",
+                "java.util.Objects.requireNonNullElse",
+                "org.mockito.Mockito.*",
+              },
+            },
+            contentProvider = { preferred = "fernflower" },
             sources = {
               organizeImports = {
                 starThreshold = 9999,
                 staticStarThreshold = 9999,
               },
             },
+            codeGeneration = {
+              toString = {
+                template = "${object.className}{${member.name()}=${member.value}, ${otherMembers}}",
+              },
+              useBlocks = true,
+            },
             -- format = {
             --   settings = { -- you can use your preferred format style
-            --     url = "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml",
+            --     url = "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml", -- intellij-java-google-style.xml
             --     profile = "GoogleStyle",
             --   },
             -- },
@@ -100,14 +107,17 @@ return {
               --
               --    return {}
               -- ```
-              -- TODO: respect <leader>uf toggle
-              organizeImports = vim.g.autoformat,
+              organizeImports = vim.g.autoformat, -- TODO: respect <leader>uf toggle
             },
           },
         },
-        -- jdtls = function(config)
-        --   dd(config)
-        -- end,
+        jdtls = function(config)
+          config.cmd = vim.list_extend(vim.deepcopy(config.cmd), {
+            "--jvm-arg=-Xms8g",
+            "--jvm-arg=-Xmx8g",
+          })
+          -- dd(config)
+        end,
         ---@param args vim.api.create_autocmd.callback.args
         on_attach = function(args)
           require("which-key").add({
