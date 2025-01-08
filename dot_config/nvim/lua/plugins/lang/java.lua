@@ -106,7 +106,7 @@ return {
           },
         },
         -- jdtls = function(config)
-        --   require("snacks.debug").inspect(config)
+        --   dd(config)
         -- end,
         ---@param args vim.api.create_autocmd.callback.args
         on_attach = function(args)
