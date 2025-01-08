@@ -133,6 +133,9 @@ return {
     opts = function(_, opts)
       local actions = require("pantran.ui.actions")
 
+      -- HACK: fix "Must specify 'relative' or 'external' when creating a float" for nvim-0.11
+      require("pantran.ui.window")
+
       Snacks.util.set_hl({ PantranBorder = "FloatBorder" })
 
       return U.extend_tbl(opts, {
