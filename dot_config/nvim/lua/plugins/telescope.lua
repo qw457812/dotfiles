@@ -172,6 +172,16 @@ return {
       },
     },
   },
+  {
+    "stevearc/dressing.nvim",
+    optional = true,
+    opts = function(_, opts)
+      -- we have snacks input
+      opts = U.extend_tbl(opts, { input = { enabled = false } })
+      -- fzf as picker and dressing.nvim as dependency of other plugins like avante.nvim
+      return LazyVim.pick.want() == "telescope" and opts or U.extend_tbl(opts, { select = { enabled = false } })
+    end,
+  },
 
   -- alternative: https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/lazy.lua#L129
   {
