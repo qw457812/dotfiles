@@ -114,6 +114,57 @@ return {
       hints = { enabled = false },
     },
   },
+  {
+    "yetone/avante.nvim",
+    optional = true,
+    opts = function(_, opts)
+      if LazyVim.pick.want() == "fzf" then
+        return U.extend_tbl(opts, {
+          file_selector = {
+            ---@type FileSelectorProvider
+            provider = "fzf",
+          },
+        })
+      end
+    end,
+  },
+
+  {
+    "saghen/blink.cmp",
+    optional = true,
+    dependencies = {
+      {
+        "saghen/blink.compat",
+        opts = function()
+          -- HACK: monkeypatch cmp.ConfirmBehavior for Avante
+          require("cmp").ConfirmBehavior = {
+            Insert = "insert",
+            Replace = "replace",
+          }
+        end,
+      },
+    },
+    opts = {
+      sources = {
+        compat = {
+          "avante_commands",
+          "avante_mentions",
+          -- "avante_files",
+        },
+        providers = {
+          avante_commands = {
+            score_offset = 90,
+          },
+          avante_mentions = {
+            score_offset = 1000,
+          },
+          -- avante_files = {
+          --   score_offset = 100,
+          -- },
+        },
+      },
+    },
+  },
 
   {
     "CopilotC-Nvim/CopilotChat.nvim",
