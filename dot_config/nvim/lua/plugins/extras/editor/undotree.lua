@@ -63,7 +63,6 @@ return {
             },
           },
           mappings = {
-            -- ~/.local/share/nvim/lazy/telescope-undo.nvim/lua/telescope/_extensions/undo.lua
             i = {
               ["<S-cr>"] = false,
               ["<C-cr>"] = false,
@@ -92,7 +91,7 @@ return {
         -- HACK: scroll for `delta --paging never`
         ---@diagnostic disable-next-line: unused-local
         function undo_previewer.get_previewer(o)
-          return U.telescope.never_paging_term_previewer({
+          return U.telescope.previewers.never_paging_term({
             -- copied from:
             -- https://github.com/debugloop/telescope-undo.nvim/blob/2971cc9f193ec09e0c5de3563f99cbea16b63f10/lua/telescope-undo/previewer.lua
             -- https://github.com/rachartier/tiny-code-action.nvim/blob/b389735000946367e357e006102c11b46ee808f3/lua/tiny-code-action/backend/delta.lua#L80
