@@ -3,6 +3,27 @@ local M = {}
 
 -- copied from: https://github.com/Kaiser-Yang/dotfiles/blob/bdda941b06cce5c7505bc725f09dd3fa17763730/.config/nvim/lua/plugins/rime_ls.lua
 
+local function contains_unacceptable_character(content)
+  if content == nil then
+    return true
+  end
+  local ignored_head_number = false
+  for i = 1, #content do
+    local b = string.byte(content, i)
+    if b >= 48 and b <= 57 or b == 32 or b == 46 then
+      -- number dot and space
+      if ignored_head_number then
+        return true
+      end
+    elseif b <= 127 then
+      return true
+    else
+      ignored_head_number = true
+    end
+  end
+  return false
+end
+
 M.cmp = {
   ---@param item? blink.cmp.CompletionItem
   ---@return boolean
@@ -11,7 +32,7 @@ M.cmp = {
       return false
     end
     local client = vim.lsp.get_client_by_id(item.client_id)
-    return client ~= nil and client.name == "rime_ls"
+    return client ~= nil and client.name == "rime_ls" and not contains_unacceptable_character(item.label)
   end,
 
   ---@param n integer
