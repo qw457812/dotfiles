@@ -111,6 +111,11 @@ M.action = {
   end),
 }
 
+-- https://wezfurlong.org/wezterm/config/lua/pane/get_foreground_process_name.html
+local function get_foreground_process_basename(pane)
+  return string.gsub(pane:get_foreground_process_name(), "(.*[/\\])(.*)", "%2")
+end
+
 -- https://github.com/mrjones2014/smart-splits.nvim#wezterm
 -- https://github.com/mrjones2014/smart-splits.nvim/blob/master/plugin/init.lua
 -- Do *NOT* lazy-loading smart-splits.nvim
@@ -126,11 +131,15 @@ local function is_tmux(pane)
 end
 
 local function is_fzf(pane)
-  -- https://wezfurlong.org/wezterm/config/lua/pane/get_foreground_process_name.html
-  local process_basename = string.gsub(pane:get_foreground_process_name(), "(.*[/\\])(.*)", "%2")
+  local process_basename = get_foreground_process_basename(pane)
   -- `--height 100%` is required for is_alt_screen_active, see https://github.com/wez/wezterm/discussions/4101
   return process_basename == "fzf"
     or (pane:is_alt_screen_active() and (process_basename == "zsh" or process_basename == "fish"))
+end
+
+local function is_lazygit(pane)
+  -- should be nvim instead of lazygit after using `e` in lazygit
+  return get_foreground_process_basename(pane) == "lazygit" and not is_nvim(pane)
 end
 
 ---@param resize_or_move "resize"|"move"
@@ -144,7 +153,12 @@ local function split_nav(resize_or_move, mods, key, direction)
     key = key,
     mods = mods,
     action = wezterm.action_callback(function(win, pane)
-      if is_nvim(pane) or is_tmux(pane) or ((key == "j" or key == "k") and is_fzf(pane)) then
+      if
+        is_nvim(pane)
+        or is_tmux(pane)
+        or ((key == "j" or key == "k") and is_fzf(pane))
+        -- or (key == "h" and is_lazygit(pane)) -- make <c-h> close the lazygit
+      then
         -- pass the keys through to nvim/tmux/fzf
         win:perform_action({ SendKey = { key = key, mods = mods } }, pane)
       else
@@ -199,6 +213,17 @@ function M.apply_to_config(config)
       key = "i",
       action = wezterm.action_callback(function(win, pane)
         win:perform_action({ SendKey = { mods = is_nvim(pane) and "ALT" or "CTRL", key = "i" } }, pane)
+      end),
+    },
+
+    -- make <bs> close the lazygit
+    -- mapped <c-h> to quit in lazygit/config.yml via `quitWithoutChangingDirectory: <backspace>`
+    -- when typing a commit message in lazygit, <c-h> and <bs> do the same thing
+    {
+      key = "Backspace",
+      action = wezterm.action_callback(function(win, pane)
+        local send_key = is_lazygit(pane) and { mods = "CTRL", key = "h" } or { key = "Backspace" }
+        win:perform_action({ SendKey = send_key }, pane)
       end),
     },
 
