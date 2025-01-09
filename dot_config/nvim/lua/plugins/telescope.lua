@@ -95,7 +95,10 @@ return {
       unpack(keys),
     },
     opts = {
-      -- defaults = { formatter = "path.filename_first" },
+      -- defaults = {
+      --   formatter = "path.filename_first",
+      --   -- formatter = { "path.filename_first", 2 },
+      -- },
       winopts = {
         width = vim.g.user_is_termux and 1 or nil,
         height = vim.g.user_is_termux and 1 or nil,
@@ -103,9 +106,18 @@ return {
           horizontal = "right:50%",
         },
       },
-      -- files = { path_shorten = 1 },
-      -- grep = { path_shorten = 1 },
-      -- fzf_opts = { ["--keep-right"] = "" },
+      fzf_opts = {
+        ["--ellipsis"] = "…",
+        -- ["--keep-right"] = "",
+      },
+      previewers = {
+        codeaction_native = {
+          pager = [[delta --width=$COLUMNS --hunk-header-style="omit" --file-style="omit"]],
+        },
+      },
+      -- files = { path_shorten = vim.g.user_is_termux and 10 or 20 },
+      -- grep = { path_shorten = vim.g.user_is_termux and 10 or 20 },
+      -- buffers = { path_shorten = vim.g.user_is_termux and 10 or 20 },
     },
   },
 

@@ -89,6 +89,26 @@ return {
   },
 
   {
+    "ibhagwan/fzf-lua",
+    optional = true,
+    specs = {
+      {
+        "neovim/nvim-lspconfig",
+        opts = function()
+          local Keys = require("lazyvim.plugins.lsp.keymaps").get()
+          table.insert(Keys, {
+            "<leader>ca",
+            "<cmd>FzfLua lsp_code_actions<cr>",
+            desc = "Code Action Preview",
+            mode = { "n", "v" },
+            has = "codeAction",
+          })
+        end,
+      },
+    },
+  },
+
+  {
     "kosayoda/nvim-lightbulb",
     event = "LspAttach",
     opts = {

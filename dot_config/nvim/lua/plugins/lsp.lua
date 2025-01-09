@@ -1,15 +1,15 @@
 local function pick_definitions()
-  if LazyVim.pick.want() == "telescope" then
+  if LazyVim.pick.picker.name == "telescope" then
     require("telescope.builtin").lsp_definitions({ reuse_win = true })
-  elseif LazyVim.pick.want() == "fzf" then
+  elseif LazyVim.pick.picker.name == "fzf" then
     require("fzf-lua").lsp_definitions({ jump_to_single_result = true, ignore_current_line = true })
   end
 end
 
 local function pick_references()
-  if LazyVim.pick.want() == "telescope" then
+  if LazyVim.pick.picker.name == "telescope" then
     require("telescope.builtin").lsp_references({ include_declaration = false })
-  elseif LazyVim.pick.want() == "fzf" then
+  elseif LazyVim.pick.picker.name == "fzf" then
     require("fzf-lua").lsp_references({ jump_to_single_result = true, ignore_current_line = true })
   end
 end
