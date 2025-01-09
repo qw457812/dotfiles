@@ -26,6 +26,7 @@ set -gx LC_CTYPE en_US.UTF-8
 set -q XDG_CONFIG_HOME; or set -gx XDG_CONFIG_HOME "$HOME/.config"
 set -gx EDITOR (which nvim)
 set -gx VISUAL $EDITOR
+set -gx SUDO_EDITOR $EDITOR
 
 set -g __proxy_ip "127.0.0.1"
 set -g __http_proxy_port 7897
@@ -40,6 +41,7 @@ set -x BAT_THEME TwoDark
 set -x BAT_STYLE plain
 set -x EZA_MIN_LUMINANCE 50
 set -x DYLD_LIBRARY_PATH /opt/homebrew/opt/librime/lib # https://github.com/wlh320/rime-ls#macos
+set -x LG_CONFIG_FILE $HOME/.config/lazygit/config.yml,$HOME/.cache/nvim/lazygit-theme.yml
 
 # Fzf
 # `--height 100%` is required, see https://github.com/wez/wezterm/discussions/4101
