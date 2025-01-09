@@ -16,7 +16,7 @@ local pick = function()
     --   },
     -- },
     -- previewer = previewers.vim_buffer_cat.new({}),
-    previewer = U.telescope.tree_previewer(),
+    previewer = U.telescope.previewers.tree(),
   })
 end
 

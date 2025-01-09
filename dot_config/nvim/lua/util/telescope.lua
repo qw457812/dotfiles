@@ -29,6 +29,76 @@ M.actions = {
   end,
 }
 
+M.previewers = {
+  --- set `scroll_fn` for never paging command by default
+  ---@param opts table
+  never_paging_term = function(opts)
+    if not opts.scroll_fn then
+      -- copied from:
+      -- https://github.com/petobens/dotfiles/blob/0e216cdf8048859db5cbec0a1bc5b99d45479817/nvim/lua/plugin-config/telescope_config.lua#L35
+      -- https://github.com/nvim-telescope/telescope.nvim/blob/85922dde3767e01d42a08e750a773effbffaea3e/lua/telescope/previewers/buffer_previewer.lua#L310
+      function opts.scroll_fn(self, direction)
+        if not self.state then
+          return
+        end
+
+        -- local input = direction > 0 and string.char(0x05) or string.char(0x19)
+        -- local input = direction > 0 and [[]] or [[]]
+        -- https://github.com/nvim-telescope/telescope.nvim/issues/2933#issuecomment-1958504220
+        local input = vim.keycode(direction > 0 and "<C-e>" or "<C-y>")
+        local count = math.abs(direction)
+
+        -- vim.api.nvim_win_call(vim.fn.bufwinid(self.state.termopen_bufnr), function()
+        --   vim.cmd([[normal! ]] .. count .. input)
+        -- end)
+        vim.api.nvim_buf_call(self.state.termopen_bufnr, function()
+          vim.cmd([[normal! ]] .. count .. input)
+        end)
+      end
+    end
+
+    return require("telescope.previewers").new_termopen_previewer(opts)
+  end,
+
+  -- https://github.com/petobens/dotfiles/blob/0e216cdf8048859db5cbec0a1bc5b99d45479817/nvim/lua/plugin-config/telescope_config.lua#L784
+  tree = function()
+    return M.previewers.never_paging_term({
+      title = "Tree Preview",
+      get_command = function(entry)
+        local from_entry = require("telescope.from_entry")
+        local utils = require("telescope.utils")
+
+        local p = from_entry.path(entry, true, false)
+        if p == nil or p == "" then
+          return
+        end
+        local ignore_glob = ".DS_Store|.git|.svn|.idea|.vscode|node_modules"
+        local command = vim.fn.executable("eza") == 1
+            and {
+              "eza",
+              "--all",
+              "--level=2",
+              "--group-directories-first",
+              "--ignore-glob=" .. ignore_glob,
+              "--git-ignore",
+              "--tree",
+              "--color=always",
+              "--color-scale",
+              "all",
+              "--icons=always",
+              "--long",
+              "--time-style=iso",
+              "--git",
+              "--no-permissions",
+              "--no-user",
+            }
+          or { "tree", "-a", "-L", "2", "-I", ignore_glob, "-C", "--dirsfirst" }
+        return utils.flatten({ command, "--", utils.path_expand(p) })
+      end,
+    })
+  end,
+}
+
 ---@param opts table
 ---@param path string
 ---@return string, table?
@@ -73,74 +143,6 @@ function M.path_display(opts, path)
     { { #transformed_path, 999 }, "TelescopeResultsComment" },
   }
   return transformed_path, path_style
-end
-
---- set `scroll_fn` for never paging command by default
----@param opts table
-function M.never_paging_term_previewer(opts)
-  if not opts.scroll_fn then
-    -- copied from:
-    -- https://github.com/petobens/dotfiles/blob/0e216cdf8048859db5cbec0a1bc5b99d45479817/nvim/lua/plugin-config/telescope_config.lua#L35
-    -- https://github.com/nvim-telescope/telescope.nvim/blob/85922dde3767e01d42a08e750a773effbffaea3e/lua/telescope/previewers/buffer_previewer.lua#L310
-    function opts.scroll_fn(self, direction)
-      if not self.state then
-        return
-      end
-
-      -- local input = direction > 0 and string.char(0x05) or string.char(0x19)
-      -- local input = direction > 0 and [[]] or [[]]
-      -- https://github.com/nvim-telescope/telescope.nvim/issues/2933#issuecomment-1958504220
-      local input = vim.keycode(direction > 0 and "<C-e>" or "<C-y>")
-      local count = math.abs(direction)
-
-      -- vim.api.nvim_win_call(vim.fn.bufwinid(self.state.termopen_bufnr), function()
-      --   vim.cmd([[normal! ]] .. count .. input)
-      -- end)
-      vim.api.nvim_buf_call(self.state.termopen_bufnr, function()
-        vim.cmd([[normal! ]] .. count .. input)
-      end)
-    end
-  end
-
-  return require("telescope.previewers").new_termopen_previewer(opts)
-end
-
--- https://github.com/petobens/dotfiles/blob/0e216cdf8048859db5cbec0a1bc5b99d45479817/nvim/lua/plugin-config/telescope_config.lua#L784
-function M.tree_previewer()
-  return M.never_paging_term_previewer({
-    title = "Tree Preview",
-    get_command = function(entry)
-      local from_entry = require("telescope.from_entry")
-      local utils = require("telescope.utils")
-
-      local p = from_entry.path(entry, true, false)
-      if p == nil or p == "" then
-        return
-      end
-      local ignore_glob = ".DS_Store|.git|.svn|.idea|.vscode|node_modules"
-      local command = vim.fn.executable("eza") == 1
-          and {
-            "eza",
-            "--all",
-            "--level=2",
-            "--group-directories-first",
-            "--ignore-glob=" .. ignore_glob,
-            "--git-ignore",
-            "--tree",
-            "--color=always",
-            "--color-scale",
-            "all",
-            "--icons=always",
-            "--long",
-            "--time-style=iso",
-            "--git",
-            "--no-permissions",
-            "--no-user",
-          }
-        or { "tree", "-a", "-L", "2", "-I", ignore_glob, "-C", "--dirsfirst" }
-      return utils.flatten({ command, "--", utils.path_expand(p) })
-    end,
-  })
 end
 
 return M

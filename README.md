@@ -4,9 +4,9 @@
 
 ## [Goku](https://github.com/yqrashawn/GokuRakuJoudo)
 
-Hack keyboard use [Karabiner](https://github.com/pqrs-org/Karabiner-Elements), and maintain **_[my karabiner config](dot_config/karabiner.edn)_** with Goku.
+Hack my keyboard via [Karabiner](https://github.com/pqrs-org/Karabiner-Elements) and maintain its [config](dot_config/karabiner.edn) with Goku.
 
-> Head over to [nikitavoloboev](https://github.com/nikitavoloboev)'s **_[personal wiki](https://wiki.nikiv.dev/macOS/apps/karabiner/)_** to learn more about karabiner and goku.
+> Head over to [nikitavoloboev](https://github.com/nikitavoloboev)'s [personal wiki](https://wiki.nikiv.dev/macOS/apps/karabiner/) to learn more about karabiner and goku.
 
 <details>
 <summary><strong>Here are some settings</strong> (outdated, click to see)</summary>
@@ -94,15 +94,16 @@ Tips:
 
    See [.macos](executable_dot_macos).
 
-3. When leaving insert mode, auto switch to English input source (if necessary).
+3. When leaving insert mode, auto switch IME to English (if necessary).
 
    - By [Rime](https://rime.im/)'s [vim_mode](https://github.com/rime/home/blob/11bbdb85d2acbb6789433064711b03b4952aa7f5/blog/source/release/squirrel/index.md?plain=1#L256) app option, see [squirrel.custom.yaml](private_Library/Rime/squirrel.custom.yaml).
+   - Use [vim.g.neovide_input_ime](https://neovide.dev/configuration.html#ime) with `autocmd` in [Neovide](https://neovide.dev/).
 
 4. Remap `shift` (optional).
 
    - For all keyboard: remap `space` to `shift` by karabiner.
 
-     > Don't worry, the original tap and hold (repeat) functions of `space` are retained.
+     > The original tap and hold (repeat) functions of `space` are still available.
 
 ## [IdeaVim](https://github.com/JetBrains/ideavim)
 
@@ -132,15 +133,15 @@ Using [Emacs Plus](https://github.com/d12frosted/homebrew-emacs-plus).
 
 [yazi config](dot_config/yazi)
 
-## [rime-ice](https://github.com/iDvel/rime-ice)
+## [RIME](https://rime.im/)
 
-[My rime config](private_Library/Rime) for Chinese input based on rime-ice and powered by [TigerCode](https://tiger-code.com/).
+[My rime config](private_Library/Rime) for Chinese input based on [rime-ice](https://github.com/iDvel/rime-ice) and [TigerCode](https://tiger-code.com/).
 
 Using [KeyboardHolder](https://keyboardholder.leavesc.com/zh-cn/) to keep [Squirrel](https://github.com/rime/squirrel) as the only input source on macOS, instead of ABC.
 
 And using [ShowyEdge](https://github.com/pqrs-org/ShowyEdge) to notice when input source automatically changes to ABC.
 
-Using [emacs-rime](https://github.com/DogLooksGood/emacs-rime) in Doom Emacs.
+Using [emacs-rime](https://github.com/DogLooksGood/emacs-rime) in Doom Emacs and [rime-ls](https://github.com/wlh320/rime-ls) in Neovim.
 
 ## [SketchyBar](https://github.com/FelixKratz/SketchyBar)
 
