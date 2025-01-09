@@ -16,7 +16,8 @@ return {
     enabled = function()
       return LazyVim.has("telescope.nvim")
     end,
-    event = "LspAttach",
+    lazy = true,
+    -- event = "LspAttach",
     opts = {
       backend = "delta",
       backend_opts = {
@@ -33,40 +34,58 @@ return {
       },
       telescope_opts = telescope_opts,
     },
+    specs = {
+      {
+        "neovim/nvim-lspconfig",
+        opts = function()
+          local Keys = require("lazyvim.plugins.lsp.keymaps").get()
+          table.insert(Keys, {
+            "<leader>ca",
+            function()
+              require("tiny-code-action").code_action({})
+            end,
+            desc = "Code Action Preview",
+            mode = { "n", "v" },
+            has = "codeAction",
+          })
+        end,
+      },
+    },
   },
-  -- {
-  --   "aznhe21/actions-preview.nvim",
-  --   enabled = function()
-  --     return LazyVim.has("telescope.nvim")
-  --   end,
-  --   event = "LspAttach",
-  --   opts = function()
-  --     return {
-  --       highlight_command = {
-  --         require("actions-preview.highlight").delta(),
-  --       },
-  --       telescope = telescope_opts,
-  --     }
-  --   end,
-  -- },
+
   {
-    "neovim/nvim-lspconfig",
-    opts = function()
-      if not LazyVim.has("tiny-code-action.nvim") then
-        return
-      end
-
-      local function code_action()
-        require("tiny-code-action").code_action()
-        -- require("actions-preview").code_actions()
-      end
-
-      local Keys = require("lazyvim.plugins.lsp.keymaps").get()
-      table.insert(
-        Keys,
-        { "<leader>ca", code_action, desc = "Code Action Preview", mode = { "n", "v" }, has = "codeAction" }
-      )
+    "aznhe21/actions-preview.nvim",
+    enabled = function()
+      return LazyVim.has("telescope.nvim")
     end,
+    lazy = true,
+    -- event = "LspAttach *.java",
+    opts = function()
+      return {
+        highlight_command = {
+          require("actions-preview.highlight").delta(),
+        },
+        telescope = telescope_opts,
+      }
+    end,
+    specs = {
+      {
+        "neovim/nvim-lspconfig",
+        opts = function()
+          local Keys = require("lazyvim.plugins.lsp.keymaps").get()
+          table.insert(Keys, {
+            "<leader>ca",
+            function()
+              require("actions-preview").code_actions()
+            end,
+            desc = "Code Action Preview",
+            mode = { "n", "v" },
+            has = "codeAction",
+            ft = "java", -- tiny-code-action.nvim failed to run "Generate toString()..." from jdtls
+          })
+        end,
+      },
+    },
   },
 
   {
