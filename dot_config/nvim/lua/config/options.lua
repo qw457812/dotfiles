@@ -26,9 +26,7 @@ opt.fillchars:append(win_borders_fillchars["bold"])
 
 -- close buffers, windows, or exit vim with the same single keypress
 vim.g.user_close_key = "<bs>" -- easy to reach for Glove80
--- exit nvim
 vim.g.user_exit_key = "<leader>" .. vim.g.user_close_key -- would overwrite "go up one level" of which-key
--- close terminals
 vim.g.user_term_close_key = "<S-bs>"
 vim.g.user_is_wezterm = not vim.g.neovide and vim.env.WEZTERM_UNIX_SOCKET ~= nil
 vim.g.user_is_kitty = not vim.g.neovide and vim.env.KITTY_PID ~= nil
@@ -57,10 +55,9 @@ vim.g.loaded_node_provider = 0
 
 -- https://neovide.dev/configuration.html
 if vim.g.neovide then
+  vim.g.snacks_animate = false
   vim.g.neovide_hide_mouse_when_typing = true
   vim.g.neovide_input_macos_option_key_is_meta = "both"
   vim.g.neovide_cursor_vfx_mode = "railgun" -- railgun, torpedo, pixiedust
-  if vim.g.user_transparent_background then
-    vim.g.neovide_transparency = 0.0
-  end
+  vim.g.neovide_transparency = vim.g.user_transparent_background and 0.0 or vim.g.neovide_transparency
 end
