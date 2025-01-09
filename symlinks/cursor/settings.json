@@ -131,7 +131,6 @@
     "vscodevim.vim": 1,
     "asvetliakov.vscode-neovim": 1
   },
-  "vscode-neovim.neovimExecutablePaths.darwin": "/opt/homebrew/bin/nvim",
   "vscode-neovim.compositeKeys": {
     "jj": {
       "command": "vscode-neovim.escape"
