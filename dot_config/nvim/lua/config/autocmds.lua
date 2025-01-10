@@ -2,6 +2,9 @@
 -- Default autocmds that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/autocmds.lua
 -- Add any additional autocmds here
 
+---@param name string
+---@param clear? boolean
+---@return integer
 local function lazyvim_augroup(name, clear)
   return vim.api.nvim_create_augroup("lazyvim_" .. name, { clear = clear or false })
 end
@@ -66,9 +69,20 @@ vim.api.nvim_create_autocmd("FileType", {
   pattern = {
     "lazy", -- Lazy Extras, alternative: https://github.com/aimuzov/LazyVimx/blob/00d45b2d746c36101b4cf1c5fe0b46d53cb6774a/lua/lazyvimx/extras/hacks/lazyvim-remove-extras-title.lua
   },
-  callback = function()
+  callback = function(event)
     vim.defer_fn(function()
       vim.opt_local.wrap = false
+
+      local buf = event.buf
+      if vim.bo[buf].modifiable == false then
+        for _, map in ipairs(vim.api.nvim_buf_get_keymap(buf, "n")) do
+          if vim.list_contains({ "u", "d" }, map.lhs) then
+            return
+          end
+        end
+        vim.keymap.set("n", "u", "<C-u>", { buffer = buf, silent = true, desc = "Scroll Up" })
+        vim.keymap.set("n", "d", "<C-d>", { buffer = buf, silent = true, desc = "Scroll Down", nowait = true })
+      end
     end, 100)
   end,
 })
@@ -189,8 +203,6 @@ vim.api.nvim_create_autocmd("FileType", {
 -- copied from:
 -- https://github.com/echasnovski/mini.nvim/blob/73bbcbfa7839c4b00a64965fb504f87461abefbd/lua/mini/misc.lua#L194
 -- https://github.com/mrbeardad/nvim/blob/916d17211cc67d082ece6476bdfffe1a9fc41d22/lua/user/configs/autocmds.lua#L61
---
--- TODO: this messes up Restore Session
 if vim.g.user_auto_root and not vim.o.autochdir then
   local function set_root(buf)
     local root = LazyVim.root.get({ normalize = true, buf = buf })

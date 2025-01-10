@@ -112,6 +112,9 @@ return {
           },
         },
         jdtls = function(config)
+          if vim.g.user_is_termux then
+            return
+          end
           config.cmd = vim.list_extend(vim.deepcopy(config.cmd), {
             "--jvm-arg=-Xms8g",
             "--jvm-arg=-Xmx8g",
