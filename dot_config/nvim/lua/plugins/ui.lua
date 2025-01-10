@@ -24,38 +24,50 @@ return {
       end
       vim.list_extend(keys, mappings)
     end,
-    opts = {
-      options = {
-        -- indicator = { style = "underline" },
-        separator_style = vim.g.user_transparent_background and { "", "" } or "slant", -- slope
-        -- in favor of `BufferLineGoToBuffer`
-        numbers = vim.g.user_is_termux and "none" or function(opts)
-          ---@type bufferline.State
-          local state = require("bufferline.state")
-          for i, item in ipairs(state.visible_components) do
-            if item.id == opts.id then
-              -- return tostring(i)
-              return opts.raise(i)
+    opts = function(_, opts)
+      local get_element_icon = vim.tbl_get(opts, "options", "get_element_icon")
+      get_element_icon = vim.is_callable(get_element_icon) and get_element_icon or function(_) end
+
+      return U.extend_tbl(opts, {
+        options = {
+          -- indicator = { style = "underline" },
+          separator_style = vim.g.user_transparent_background and { "", "" } or "slant", -- slope
+          -- in favor of `BufferLineGoToBuffer`
+          numbers = vim.g.user_is_termux and "none" or function(o)
+            ---@type bufferline.State
+            local state = require("bufferline.state")
+            for i, item in ipairs(state.visible_components) do
+              if item.id == o.id then
+                -- return tostring(i)
+                return o.raise(i)
+              end
             end
-          end
-          -- return "0"
-          return opts.raise(0)
-        end,
-        -- hide extension
-        name_formatter = function(buf)
-          local _, _, class = U.java.parse_jdt_uri(buf.path)
-          return class or buf.name:match("(.+)%..+$")
-        end,
-        show_buffer_close_icons = false,
-        show_close_icon = false,
-        diagnostics = false,
-        groups = {
-          items = {
-            require("bufferline.groups").builtin.pinned:with({ icon = "" }),
+            -- return "0"
+            return o.raise(0)
+          end,
+          -- hide extension
+          name_formatter = function(buf)
+            local _, _, class = U.java.parse_jdt_uri(buf.path)
+            return class or buf.name:match("(.+)%..+$")
+          end,
+          ---@param o bufferline.IconFetcherOpts
+          get_element_icon = function(o)
+            if vim.startswith(o.path, "jdt://") then
+              return require("mini.icons").get("filetype", "javacc")
+            end
+            return get_element_icon(o)
+          end,
+          show_buffer_close_icons = false,
+          show_close_icon = false,
+          diagnostics = false,
+          groups = {
+            items = {
+              require("bufferline.groups").builtin.pinned:with({ icon = "" }),
+            },
           },
         },
-      },
-    },
+      })
+    end,
   },
 
   -- https://github.com/aimuzov/LazyVimx/blob/a27d3439b9021d1215ce6471f59d801df32c18d4/lua/lazyvimx/extras/ui/panels/status-line.lua
@@ -147,7 +159,7 @@ return {
         cond = function()
           local clients = vim.lsp.get_clients({ bufnr = 0 })
           clients = vim.tbl_filter(function(client)
-            local ignored = { "null-ls", "copilot" }
+            local ignored = { "null-ls", "copilot", "rime_ls" }
             return not vim.list_contains(ignored, client.name)
           end, clients)
           return #clients > 0
@@ -190,7 +202,6 @@ return {
       opts.sections.lualine_a = { mode }
       opts.sections.lualine_b = { { "branch", icons_enabled = not is_termux } }
 
-      -- see: ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/ui.lua
       local lualine_c = opts.sections.lualine_c
       lualine_c[1] = LazyVim.lualine.root_dir({ cwd = not is_termux, icon = is_termux and "" or nil })
       lualine_c[4] = (is_termux or has_dropbar)
@@ -382,6 +393,9 @@ return {
           key.key = "o" -- o for projects, p for paste
         elseif key.key == "c" and vim.g.user_is_termux then
           key.action = ":lua LazyVim.pick.config_files()()"
+        elseif key.key == "s" and vim.g.user_auto_root then
+          key.section = false
+          key.action = ":lua require('persistence').load({ last = true })"
         elseif key.key == "q" then
           key.hidden = true
         elseif key.key == "l" then

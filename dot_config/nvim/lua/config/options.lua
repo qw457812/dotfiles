@@ -53,9 +53,11 @@ vim.g.loaded_perl_provider = 0
 vim.g.loaded_ruby_provider = 0
 vim.g.loaded_node_provider = 0
 
--- https://neovide.dev/configuration.html
 if vim.g.neovide then
+  vim.g.user_auto_root = true -- what's the point of using "/" as cwd?
+  vim.g.user_auto_session = true
   vim.g.snacks_animate = false
+
   vim.g.neovide_hide_mouse_when_typing = true
   vim.g.neovide_input_macos_option_key_is_meta = "both"
   vim.g.neovide_cursor_vfx_mode = "railgun" -- railgun, torpedo, pixiedust

@@ -57,7 +57,7 @@ return {
           if jar and pkg and class then
             local jar_icon = mini_icons.get("extension", "zip")
             local pkg_icon, pkg_icon_hl = mini_icons.get("lsp", "package")
-            local class_icon, class_icon_hl = mini_icons.get("filetype", "java")
+            local class_icon, class_icon_hl = mini_icons.get("filetype", "javacc")
             return {
               bar.dropbar_symbol_t:new({
                 icon = jar_icon .. " ",
@@ -140,7 +140,7 @@ return {
             symbols = { symbols[1], symbol_ellipsis, unpack(symbols, #symbols - max_symbols + 2, #symbols) }
           end
 
-          local max_symbol_len = vim.g.user_is_termux and 10 or 20
+          local max_symbol_len = vim.g.user_is_termux and 10 or 18
           for i = 2, #symbols - 1 do
             symbols[i].name = truncate_string(symbols[i].name, max_symbol_len)
           end
