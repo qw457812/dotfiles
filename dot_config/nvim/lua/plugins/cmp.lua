@@ -159,31 +159,14 @@ return {
           dictionary = {
             module = "blink-cmp-dictionary",
             name = "Dict",
-            max_items = 5,
-            score_offset = -5,
+            min_keyword_length = 3,
+            max_items = 3,
+            score_offset = -10,
             --- @module 'blink-cmp-dictionary'
             --- @type blink-cmp-dictionary.Options
             opts = {
-              prefix_min_len = 3,
-              get_command = {
-                "rg",
-                "--color=never",
-                "--no-line-number",
-                "--no-messages",
-                "--no-filename",
-                "--ignore-case",
-                "--",
-                "${prefix}",
-                vim.fn.stdpath("data") .. "/cmp-dictionary/dict/aspell_en.dict", -- aspell -d en_US dump master | aspell -l en expand | sed 's/\s\+/\n/g' > aspell_en.dict
-              },
-              documentation = {
-                enable = vim.fn.executable("wn") == 1,
-                get_command = {
-                  "wn",
-                  "${word}",
-                  "-over",
-                },
-              },
+              -- aspell -d en_US dump master | aspell -l en expand | sed 's/\s\+/\n/g' > aspell_en.txt
+              dictionary_directories = { vim.fn.stdpath("data") .. "/cmp-dictionary/dict" },
             },
           },
         },
