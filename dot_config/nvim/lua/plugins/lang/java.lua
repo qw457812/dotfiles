@@ -52,7 +52,6 @@ return {
   -- https://github.com/doctorfree/nvim-lazyman/blob/bbecf74deb10a0483742196b23b91858f823f632/ftplugin/java.lua
   {
     "mfussenegger/nvim-jdtls",
-    commit = vim.g.user_is_termux and "e129398e171e87c0d9e94dd5bea7eb4730473ffc" or nil,
     optional = true,
     opts = function(_, opts)
       local runtimes = java_runtimes()
