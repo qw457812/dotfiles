@@ -11,6 +11,7 @@
   "blink-cmp-copilot": { "branch": "main", "commit": "c5c5cbce5748d21073f1d5348a92ebe6ce63f387" },
   "blink-cmp-dictionary": { "branch": "master", "commit": "5f13fc08dd757241cb310e5d39870aaa2bb5ee31" },
   "blink-cmp-git": { "branch": "master", "commit": "cce2774d1b43c2f0eba53c2709ee12b5916965dc" },
+  "blink-ripgrep.nvim": { "branch": "main", "commit": "705069a57566a5e7427025264451c581f0bfb9c4" },
   "blink.cmp": { "branch": "main", "commit": "64cb8877e2a6d82592761856220f4811edee4f5f" },
   "blink.compat": { "branch": "main", "commit": "5ca8848c8cc32abdc980e5db4f0eb7bb8fbf84dc" },
   "bufferline.nvim": { "branch": "main", "commit": "9f0826ae6adfd836a23bf8a4910e3c07450211f4" },
