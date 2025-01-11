@@ -149,6 +149,45 @@ return {
     "saghen/blink.cmp",
     optional = true,
     dependencies = {
+      "mikavilpas/blink-ripgrep.nvim",
+    },
+    ---@module 'blink.cmp'
+    ---@type blink.cmp.Config
+    opts = {
+      sources = {
+        default = { "ripgrep" },
+        providers = {
+          ripgrep = {
+            module = "blink-ripgrep",
+            name = "RG",
+            min_keyword_length = 3, -- same as `prefix_min_len`
+            max_items = 3,
+            score_offset = -5,
+            enabled = function()
+              -- CPU usage
+              return LazyVim.root({ normalize = true }) ~= U.path.HOME
+            end,
+            ---@module "blink-ripgrep"
+            ---@type blink-ripgrep.Options
+            opts = {
+              prefix_min_len = 3, -- same as `min_keyword_length`
+              -- search_casing = "--smart-case",
+
+              -- or use custom `get_command` function
+              project_root_marker = function(_, path)
+                return path == LazyVim.root({ normalize = true })
+              end,
+            },
+          },
+        },
+      },
+    },
+  },
+
+  {
+    "saghen/blink.cmp",
+    optional = true,
+    dependencies = {
       "Kaiser-Yang/blink-cmp-dictionary",
     },
     ---@type blink.cmp.Config
@@ -199,7 +238,7 @@ return {
               git = {
                 module = "blink-cmp-git",
                 name = "Git",
-                score_offset = 99,
+                score_offset = 100,
                 enabled = function()
                   return vim.list_contains({
                     "gitcommit",

@@ -37,6 +37,11 @@ return {
     ---@module 'blink.cmp'
     ---@type blink.cmp.Config
     opts = {
+      -- completion = {
+      --   accept = {
+      --     create_undo_point = false,
+      --   },
+      -- },
       keymap = {
         ["<space>"] = U.rime_ls.cmp.accept_n(1),
         -- TODO: not working when mapping `:<space>` to `：` (Chinese punctuation)
