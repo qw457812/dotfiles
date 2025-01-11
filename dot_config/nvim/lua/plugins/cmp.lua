@@ -165,8 +165,8 @@ return {
             --- @module 'blink-cmp-dictionary'
             --- @type blink-cmp-dictionary.Options
             opts = {
-              -- aspell -d en_US dump master | aspell -l en expand | sed 's/\s\+/\n/g' > aspell_en.txt
-              dictionary_directories = { vim.fn.stdpath("data") .. "/cmp-dictionary/dict" },
+              -- aspell -d en_US dump master | aspell -l en expand | sed 's/\s\+/\n/g' > aspell_en.dict
+              dictionary_files = { vim.fn.stdpath("data") .. "/cmp-dictionary/dict/aspell_en.dict" },
               separate_output = vim.fn.executable("wn") == 0 and function(output)
                 local items = {}
                 for line in output:gmatch("[^\r\n]+") do
