@@ -183,4 +183,36 @@ return {
       },
     },
   },
+
+  vim.fn.executable("gh") == 1
+      and {
+        "saghen/blink.cmp",
+        optional = true,
+        dependencies = {
+          "Kaiser-Yang/blink-cmp-git",
+        },
+        ---@type blink.cmp.Config
+        opts = {
+          sources = {
+            default = { "git" },
+            providers = {
+              git = {
+                module = "blink-cmp-git",
+                name = "Git",
+                score_offset = 99,
+                enabled = function()
+                  return vim.list_contains({
+                    "gitcommit",
+                    -- "markdown",
+                  }, vim.bo.filetype)
+                end,
+                ---@module 'blink-cmp-git'
+                ---@type blink-cmp-git.Options
+                opts = {},
+              },
+            },
+          },
+        },
+      }
+    or nil,
 }
