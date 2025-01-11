@@ -167,6 +167,16 @@ return {
             opts = {
               -- aspell -d en_US dump master | aspell -l en expand | sed 's/\s\+/\n/g' > aspell_en.txt
               dictionary_directories = { vim.fn.stdpath("data") .. "/cmp-dictionary/dict" },
+              separate_output = vim.fn.executable("wn") == 0 and function(output)
+                local items = {}
+                for line in output:gmatch("[^\r\n]+") do
+                  table.insert(items, {
+                    label = line,
+                    insert_text = line,
+                  })
+                end
+                return items
+              end or nil,
             },
           },
         },
