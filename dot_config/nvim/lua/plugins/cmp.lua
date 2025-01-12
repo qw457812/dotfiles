@@ -240,6 +240,7 @@ return {
                 name = "Git",
                 score_offset = 100,
                 enabled = function()
+                  -- or use `opts.sources.per_filetype`?
                   return vim.list_contains({
                     "gitcommit",
                     -- "markdown",

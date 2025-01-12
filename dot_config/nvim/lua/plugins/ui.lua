@@ -292,6 +292,27 @@ return {
   -- },
 
   {
+    "echasnovski/mini.icons",
+    optional = true,
+    opts = {
+      -- file = {
+      --   -- ["init.lua"] = { glyph = "󰢱" }, -- see: #1384
+      --   README = { glyph = "" },
+      --   ["README.md"] = { glyph = "" },
+      --   ["README.txt"] = { glyph = "" },
+      -- },
+      filetype = {
+        -- plugin filetypes
+        ["snacks_terminal"] = { glyph = "", hl = "MiniIconsCyan" },
+        ["snacks_input"] = { glyph = "󰏫", hl = "MiniIconsAzure" },
+        ["snacks_notif"] = { glyph = "󰎟", hl = "MiniIconsYellow" },
+        ["noice"] = { glyph = "󰎟", hl = "MiniIconsYellow" },
+        ["rip-substitute"] = { glyph = "", hl = "MiniIconsGreen" },
+      },
+    },
+  },
+
+  {
     "nvim-treesitter/nvim-treesitter-context",
     optional = true,
     opts = {
