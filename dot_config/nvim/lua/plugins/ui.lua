@@ -312,13 +312,13 @@ return {
     },
   },
 
-  {
-    "nvim-treesitter/nvim-treesitter-context",
-    optional = true,
-    opts = {
-      multiwindow = true,
-    },
-  },
+  -- {
+  --   "nvim-treesitter/nvim-treesitter-context",
+  --   optional = true,
+  --   opts = {
+  --     multiwindow = true,
+  --   },
+  -- },
 
   {
     "nvimdev/dashboard-nvim",
