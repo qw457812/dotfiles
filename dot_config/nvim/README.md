@@ -197,6 +197,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] Try [cmdbuf.nvim](https://github.com/notomo/cmdbuf.nvim).
 - [ ] Try [grapple.nvim](https://github.com/cbochs/grapple.nvim).
 - [ ] Try [neominimap.nvim](https://github.com/Isrothy/neominimap.nvim).
+- [ ] Try [chrisgrieser/nvim-scissors](https://github.com/chrisgrieser/nvim-scissors).
 - [ ] Check this [Telescope.lua](https://github.com/xzbdmw/nvimlazy/blob/e4c7da89a726a5b048574e014b5ea2b1aeda67f9/lua/plugins/Telescope.lua).
 - [ ] Replace `vim.endswith` and `vim.startswith` with `string.match` since I found [this commit of oil.nvim](https://github.com/stevearc/oil.nvim/commit/4de3025).
 - [ ] Try [nvim-focus/focus.nvim](https://github.com/nvim-focus/focus.nvim).
