@@ -113,7 +113,8 @@ M.action = {
 
 -- https://wezfurlong.org/wezterm/config/lua/pane/get_foreground_process_name.html
 local function get_foreground_process_basename(pane)
-  return string.gsub(pane:get_foreground_process_name(), "(.*[/\\])(.*)", "%2")
+  local name = pane:get_foreground_process_name()
+  return name and string.gsub(name, "(.*[/\\])(.*)", "%2") or nil
 end
 
 -- https://github.com/mrjones2014/smart-splits.nvim#wezterm
@@ -134,7 +135,7 @@ local function is_fzf(pane)
   local process_basename = get_foreground_process_basename(pane)
   -- `--height 100%` is required for is_alt_screen_active, see https://github.com/wez/wezterm/discussions/4101
   return process_basename == "fzf"
-    or (pane:is_alt_screen_active() and (process_basename == "zsh" or process_basename == "fish"))
+    or ((process_basename == "zsh" or process_basename == "fish") and pane:is_alt_screen_active())
 end
 
 local function is_lazygit(pane)
