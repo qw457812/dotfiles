@@ -15,8 +15,44 @@ local pick = function()
     --     end,
     --   },
     -- },
-    -- previewer = previewers.vim_buffer_cat.new({}),
+    -- previewer = require("telescope.previewers").vim_buffer_cat.new({}),
     previewer = U.telescope.previewers.tree(),
+    path_display = function(opts, path) -- fork only
+      local transformed_path = vim.trim(path)
+
+      -- Replace home with ~
+      local home = (vim.uv or vim.loop).os_homedir()
+      transformed_path = home and transformed_path:gsub("^" .. vim.pesc(home), "~") or transformed_path
+
+      -- Directory icon
+      local icon, icon_hl = require("mini.icons").get("directory", path)
+      icon = icon .. " "
+      local icon_width = require("plenary.strings").strdisplaywidth(icon)
+
+      -- Truncate
+      local calc_result_length = function(truncate_len)
+        local status = require("telescope.state").get_status(vim.api.nvim_get_current_buf())
+        local len = vim.api.nvim_win_get_width(status.layout.results.winid) - status.picker.selection_caret:len() - 2
+        return type(truncate_len) == "number" and len - truncate_len or len
+      end
+      local truncate_len = nil
+      if opts.__length == nil then
+        opts.__length = calc_result_length(truncate_len)
+      end
+      if opts.__prefix == nil then
+        opts.__prefix = 0
+      end
+      transformed_path = icon
+        .. require("plenary.strings").truncate(transformed_path, opts.__length - opts.__prefix - icon_width, nil, -1)
+
+      -- Dim parent directories
+      local tail = require("telescope.utils").path_tail(path)
+      local path_style = {
+        { { 0, icon_width }, icon_hl },
+        { { icon_width, #transformed_path - #tail }, "Comment" },
+      }
+      return transformed_path, path_style
+    end,
   })
 end
 
