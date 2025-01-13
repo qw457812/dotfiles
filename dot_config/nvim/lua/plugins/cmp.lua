@@ -239,6 +239,9 @@ return {
                 module = "blink-cmp-git",
                 name = "Git",
                 score_offset = 100,
+                enabled = function()
+                  return Snacks.git.get_root() ~= nil
+                end,
                 should_show_items = function()
                   return vim.list_contains({
                     "gitcommit",

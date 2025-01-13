@@ -53,6 +53,7 @@ return {
 
   {
     "gaoDean/autolist.nvim",
+    cond = false, -- imap conflicts with blink.cmp
     ft = "markdown",
     -- stylua: ignore
     keys = {
