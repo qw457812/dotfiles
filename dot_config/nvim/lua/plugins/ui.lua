@@ -55,7 +55,11 @@ return {
             if vim.startswith(o.path, "jdt://") then
               return require("mini.icons").get("filetype", "javacc")
             end
-            return get_element_icon(o)
+            local icon, hl = get_element_icon(o)
+            if icon then
+              return icon, hl
+            end
+            return require("mini.icons").get(o.directory and "directory" or "file", o.path)
           end,
           show_buffer_close_icons = false,
           show_close_icon = false,
