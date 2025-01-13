@@ -211,6 +211,9 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] Create a `state` util to cache the state (like [zen-mode.nvim](https://github.com/folke/zen-mode.nvim/blob/29b292bdc58b76a6c8f294c961a8bf92c5a6ebd6/lua/zen-mode/plugins.lua#L137)) instead of using `vim.g.user_...`
   - [vim.g.user_zenmode_on](lua/plugins/ui.lua), [vim.g.user_minianimate_disable_old](lua/plugins/ui.lua)
   - [local neovide_state = {}](lua/config/keymaps.lua)
+- [ ] Preview scroll up/down: `<C-u>`/`<C-d>` or `<C-f>`/`<C-b>`?
+  - `<C-f>`/`<C-b>`: fzf, telescope, lsp-hover-doc, blink-cmp-doc, which-key-popup, yazi, trans.nvim
+  - `<C-u>`/`<C-d>`: lazygit
 - [ ] `which-key v3` problem with `mini.surround`/`mini.operators`/Helix-style mappings(map `mm` to `%`):
 
   1. problem
