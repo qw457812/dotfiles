@@ -3,6 +3,15 @@ return {
   { "LazyVim/LazyVim", version = false },
   {
     "folke/snacks.nvim",
+    keys = {
+      {
+        "<leader>ft",
+        function()
+          Snacks.scratch({ icon = " ", name = "Todo", ft = "markdown", file = "~/TODO.md" })
+        end,
+        desc = "Todo List",
+      },
+    },
     ---@module "snacks"
     ---@type snacks.Config
     opts = {

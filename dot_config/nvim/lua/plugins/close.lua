@@ -180,7 +180,18 @@ return {
       win = {
         keys = {
           -- trigger opts.autowrite of Snacks.scratch
-          [close_key] = "close",
+          [close_key] = {
+            close_key,
+            function(self)
+              -- fix: close_key not working after closing zen
+              if vim.api.nvim_get_current_win() == self.win then
+                self:close()
+              else
+                close_buffer_or_window_or_exit()
+              end
+            end,
+            desc = "Close",
+          },
           -- clear_ui_or_close = {
           --   "<esc>",
           --   function(self)
@@ -215,27 +226,6 @@ return {
                 self:hide()
               end,
               mode = "t",
-              desc = "Close",
-            },
-          },
-        },
-      },
-      -- fix: close_key not working after closing zen
-      zen = {
-        win = {
-          keys = {
-            [close_key] = false, -- disable opts.win.keys[close_key]
-            zen_close = {
-              close_key,
-              function(self)
-                if vim.api.nvim_get_current_win() == self.win then
-                  -- Snacks.toggle.get("zen"):set(false)
-                  -- Snacks.zen.zen()
-                  self:close()
-                else
-                  close_buffer_or_window_or_exit()
-                end
-              end,
               desc = "Close",
             },
           },
