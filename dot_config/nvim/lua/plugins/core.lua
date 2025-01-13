@@ -36,6 +36,21 @@ return {
       --     tabline = true,
       --   },
       -- },
+      styles = {
+        zoom_indicator = {
+          bo = { filetype = "snacks_zen_zoom_indicator" },
+        },
+        notification_history = {
+          zindex = 99, -- lower than notification
+          width = 0.95,
+          height = 0.95,
+          wo = { wrap = true },
+          keys = {
+            scroll_up = { "u", "<C-u>", expr = true, desc = "Scroll Up" },
+            scroll_down = { "d", "<C-d>", expr = true, desc = "Scroll Down" },
+          },
+        },
+      },
     },
   },
   {
@@ -57,12 +72,6 @@ return {
           end,
         })
       end
-
-      Snacks.config.style("zoom_indicator", {
-        bo = {
-          filetype = "snacks_zen_zoom_indicator",
-        },
-      })
     end,
   },
 }
