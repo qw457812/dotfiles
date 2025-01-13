@@ -164,6 +164,16 @@ return {
   },
 
   {
+    "folke/which-key.nvim",
+    opts = {
+      keys = {
+        scroll_down = "<c-f>",
+        scroll_up = "<c-b>",
+      },
+    },
+  },
+
+  {
     "folke/trouble.nvim",
     optional = true,
     -- opts = {
@@ -490,11 +500,22 @@ return {
       -- stylua: ignore
       { "M", function() PAGER_MODE:toggle() end, desc = "Pager Mode" },
     },
+    ---@type layers.setup_opts
+    opts = {
+      mode = {
+        window = {
+          config = {
+            zindex = 500,
+            title_pos = "center",
+          },
+        },
+      },
+    },
     config = function(_, opts)
       require("layers").setup(opts)
 
       ---@diagnostic disable-next-line: undefined-global
-      PAGER_MODE = Layers.mode.new("Pager Mode")
+      PAGER_MODE = Layers.mode.new(" Pager Mode ")
       PAGER_MODE:auto_show_help()
       PAGER_MODE:keymaps({
         n = {

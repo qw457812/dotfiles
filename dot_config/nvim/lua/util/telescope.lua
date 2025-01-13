@@ -103,6 +103,10 @@ M.previewers = {
 ---@param path string
 ---@return string, table?
 function M.path_display(opts, path)
+  local utils = require("telescope.utils")
+  local get_status = require("telescope.state").get_status
+  local truncate = require("plenary.strings").truncate
+
   local transformed_path = vim.trim(U.path.home_to_tilde(path))
 
   -- make path shorter
@@ -117,14 +121,11 @@ function M.path_display(opts, path)
   -- truncate
   -- copy from: https://github.com/nvim-telescope/telescope.nvim/blob/bfcc7d5c6f12209139f175e6123a7b7de6d9c18a/lua/telescope/utils.lua#L198
   -- https://github.com/babarot/dotfiles/blob/cab2b7b00aef87efdf068d910e5e02935fecdd98/.config/nvim/lua/plugins/telescope.lua#L5
-  local truncate = require("plenary.strings").truncate
-  local get_status = require("telescope.state").get_status
   local calc_result_length = function(truncate_len)
     local status = get_status(vim.api.nvim_get_current_buf())
     local len = vim.api.nvim_win_get_width(status.layout.results.winid) - status.picker.selection_caret:len() - 2
     return type(truncate_len) == "number" and len - truncate_len or len
   end
-  -- local truncate_len = 1
   local truncate_len = nil
   if opts.__length == nil then
     opts.__length = calc_result_length(truncate_len)
@@ -135,7 +136,7 @@ function M.path_display(opts, path)
   transformed_path = truncate(transformed_path, opts.__length - opts.__prefix, nil, -1)
 
   -- filename_first style
-  local tail = require("telescope.utils").path_tail(path)
+  local tail = utils.path_tail(path)
   -- highlight group: Comment, TelescopeResultsComment, Constant, TelescopeResultsNumber, TelescopeResultsIdentifier
   local path_style = {
     { { 0, #transformed_path - #tail }, "Comment" },
