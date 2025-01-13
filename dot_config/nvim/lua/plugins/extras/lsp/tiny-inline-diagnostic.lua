@@ -14,13 +14,14 @@ return {
     opts = {
       signs = {
         left = " ",
-        right = "",
+        right = " ",
         arrow = "  ",
         up_arrow = "  ",
       },
       options = {
         virt_texts = { priority = 5000 }, -- set higher than symbol-usage.nvim
         use_icons_from_diagnostic = true,
+        -- multiple_diag_under_cursor = true,
         -- multilines = true, -- not just current line
         -- show_source = true,
       },
