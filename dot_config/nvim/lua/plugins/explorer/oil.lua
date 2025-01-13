@@ -185,4 +185,12 @@ return {
       })
     end,
   },
+
+  -- {
+  --   "nvim-lualine/lualine.nvim",
+  --   optional = true,
+  --   opts = function(_, opts)
+  --     table.insert(opts.extensions, "oil")
+  --   end,
+  -- },
 }

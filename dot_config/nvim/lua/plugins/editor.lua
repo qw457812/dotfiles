@@ -392,6 +392,15 @@ return {
   },
 
   {
+    "wurli/visimatch.nvim",
+    event = "ModeChanged *:[vV]",
+    opts = {
+      chars_lower_limit = 2,
+      buffers = "all",
+    },
+  },
+
+  {
     "kevinhwang91/nvim-ufo",
     dependencies = "kevinhwang91/promise-async",
     event = "VeryLazy",
