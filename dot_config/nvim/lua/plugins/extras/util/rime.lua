@@ -23,6 +23,17 @@ return {
             long_filter_text = true,
           },
           on_attach = U.rime_ls.on_attach,
+          handlers = {
+            -- https://github.com/liubianshi/.nvim/blob/6fb24895acc36e4b0a2576af6683caf8c852d2bd/Plugins/nvim-lspconfig.lua#L117
+            ["window/showMessage"] = function(err, res, ctx)
+              if
+                res.type == vim.lsp.protocol.MessageType.Info and res.message == "Use an initialized rime instance."
+              then
+                return
+              end
+              vim.lsp.handlers["window/showMessage"](err, res, ctx)
+            end,
+          },
         },
       },
       setup = {
@@ -86,22 +97,6 @@ return {
         color = function()
           return { fg = Snacks.util.color("MiniIconsRed") }
         end,
-      })
-    end,
-  },
-
-  {
-    "folke/noice.nvim",
-    optional = true,
-    opts = function(_, opts)
-      opts.routes = vim.list_extend(opts.routes or {}, {
-        {
-          filter = {
-            event = "msg_show",
-            find = "^LSP%[rime_ls%]%[Info%] Use an initialized rime instance%.$",
-          },
-          view = "mini",
-        },
       })
     end,
   },
