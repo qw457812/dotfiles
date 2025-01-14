@@ -272,6 +272,22 @@ return {
   },
 
   {
+    "rachartier/tiny-glimmer.nvim",
+    event = "TextYankPost",
+    opts = {
+      transparency_color = vim.g.user_transparent_background and "#000000" or nil,
+    },
+    init = function()
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "LazyVimAutocmdsDefaults",
+        callback = function()
+          vim.api.nvim_del_augroup_by_name("lazyvim_highlight_yank")
+        end,
+      })
+    end,
+  },
+
+  {
     "kevinhwang91/nvim-hlslens",
     vscode = true,
     dependencies = {
