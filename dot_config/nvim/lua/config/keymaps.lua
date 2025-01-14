@@ -105,7 +105,8 @@ del({ "x", "o" }, { "n", "N" })
 map("n", "cn", "*``cgn", { desc = "Change cword (Search forward)" })
 map("n", "cN", "*``cgN", { desc = "Change cword (Search backward)" })
 
-if vim.g.user_is_wezterm then
+-- using karabiner for neovide
+if vim.g.user_is_wezterm or vim.g.neovide then
   -- To distinguish <C-I> and <Tab>, you could map another key, say <M-I>, to <C-I> in neovim,
   -- and then map CTRL-i to send <M-I> key sequence in your terminal setting.
   -- See `:h tui-input`

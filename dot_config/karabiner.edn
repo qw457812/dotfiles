@@ -394,7 +394,7 @@
            [:t :!Tt]
            [:y :!Ty]
            [:u :!Tu :!Spotify]
-           [:i :!Ti [:!Finder :!Preview]]
+           [:i :!Ti [:!Neovide :!Finder :!Preview]]
            [:o :!To [:!Finder :!Preview]]
            [:p :!Tp]
            [:open_bracket :!Topen_bracket]
@@ -458,6 +458,9 @@
            ;; see "Preview: doomemacs like keybindings" below
            [:o :!Copen_bracket :Preview] ; previous position
            [:i :!Cclose_bracket :Preview] ; next position
+
+           ;; see "Neovide: distinguish <C-i> and <Tab>" below
+           [:i :!Oi :Neovide]
            ]}
 
   {:des   "delete mode for glove80 (control)"
@@ -481,7 +484,7 @@
            [:t :!Tt]
            [:y :!Ty]
            [:u :!Tu :!Spotify]
-           [:i :!Ti [:!Finder :!Preview]]
+           [:i :!Ti [:!Neovide :!Finder :!Preview]]
            [:o :!To [:!Finder :!Preview]]
            [:p :!Tp]
            [:open_bracket :!Topen_bracket]
@@ -545,6 +548,9 @@
            ;; see "Preview: doomemacs like keybindings" below
            [:o :!Copen_bracket :Preview] ; previous position
            [:i :!Cclose_bracket :Preview] ; next position
+
+           ;; see "Neovide: distinguish <C-i> and <Tab>" below
+           [:i :!Oi :Neovide]
            ]}
 
   ;; use `:!T1` instead of `:!W1` to avoid toggling rime's ascii_mode by right_control
@@ -569,7 +575,7 @@
            [:t :!Tt]
            [:y :!Ty]
            [:u :!Tu]
-           [:i :!Ti]
+           [:i :!Ti :!Neovide]
            [:o :!To]
            [:p :!Tp]
            [:open_bracket :!Topen_bracket]
@@ -616,6 +622,9 @@
            [:grave_accent_and_tilde :!CSh :Finder] ; Home
            [:r :!CSf :Finder] ; Recents
            [:d :!COl :Finder] ; Downloads
+
+           ;; see "Neovide: distinguish <C-i> and <Tab>" below
+           [:i :!Oi :Neovide]
            ]}
 
   ;; use `:!T1` instead of `:!W1` to avoid toggling rime's ascii_mode by right_control
@@ -640,7 +649,7 @@
            [:t :!Tt]
            [:y :!Ty]
            [:u :!Tu]
-           [:i :!Ti]
+           [:i :!Ti :!Neovide]
            [:o :!To]
            [:p :!Tp]
            [:open_bracket :!Topen_bracket]
@@ -689,6 +698,9 @@
            [:escape :!CSh :Finder] ; Home, see "For Glove80" below
            [:r :!CSf :Finder] ; Recents
            [:d :!COl :Finder] ; Downloads
+
+           ;; see "Neovide: distinguish <C-i> and <Tab>" below
+           [:i :!Oi :Neovide]
            ]}
 
   {:des   "lshift mode for glove80 (cmd)"
@@ -1783,6 +1795,12 @@
            [:slash :!COf] ; Filter Processes
            ]}
 
+  {:des   "Neovide: distinguish <C-i> and <Tab>"
+   :rules [:Neovide
+           [:!Ti :!Oi]
+           [:!Wi :!Oi]
+           ]}
+
   {:des   "For Apple-Internal-Keyboard\n- left cmd + right cmd -> raycast"
    :rules [:macbook-internal
            [:!C#Pright_command :!!spacebar]
@@ -2282,6 +2300,7 @@
   :Kitty            ["^net\\.kovidgoyal\\.kitty$"]
   :WezTerm          ["^com\\.github\\.wez\\.wezterm$"]
   :iTerm            ["^com\\.googlecode\\.iterm2$"]
+  :Neovide          ["^com\\.neovide\\.neovide$"]
   :Emacs            ["^org\\.gnu\\.Emacs$" "^org\\.gnu\\.AquamacsEmacs$"
                      "^org\\.gnu\\.Aquamacs$"]
   :VSCode           ["^com\\.microsoft\\.VSCode$"]
