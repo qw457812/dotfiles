@@ -87,7 +87,7 @@ return {
         auto_apply_diff_after_generation = true,
       },
       provider = "copilot-claude", -- only recommend using claude
-      auto_suggestions_provider = "copilot-claude", -- high-frequency, can be expensive if enabled
+      auto_suggestions_provider = "deepseek", -- high-frequency, can be expensive if enabled
       -- copilot = {
       --   model = "claude-3.5-sonnet",
       -- },
@@ -100,13 +100,20 @@ return {
           -- https://github.com/CopilotC-Nvim/CopilotChat.nvim#models
           model = "claude-3.5-sonnet",
         },
+        ---@type AvanteSupportedProvider
+        deepseek = {
+          __inherited_from = "openai",
+          api_key_name = "DEEPSEEK_API_KEY",
+          endpoint = "https://api.deepseek.com",
+          -- curl -L -X GET "https://api.deepseek.com/models" -H "Accept: application/json" -H "Authorization: Bearer $DEEPSEEK_API_KEY" | jq .
+          model = "deepseek-chat", -- deepseek-coder
+        },
         -- https://github.com/yetone/avante.nvim/pull/159
         ---@type AvanteSupportedProvider
         groq = {
           __inherited_from = "openai",
           api_key_name = "GROQ_API_KEY",
           endpoint = "https://api.groq.com/openai/v1/",
-          -- https://console.groq.com/docs/models
           -- curl -X GET "https://api.groq.com/openai/v1/models" -H "Authorization: Bearer $GROQ_API_KEY" -H "Content-Type: application/json" | jq .
           model = "llama-3.3-70b-versatile",
         },

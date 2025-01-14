@@ -56,34 +56,32 @@ return {
     end,
   },
 
-  {
-    "akinsho/bufferline.nvim",
-    optional = true,
-    opts = {
-      options = {
-        -- https://github.com/rafi/vim-config/blob/0feb5daebc9f5297f01dc2304f81156318b8616b/lua/rafi/plugins/ui.lua#L72
-        custom_areas = vim.g.user_auto_session
-            and not vim.g.user_is_termux
-            and {
-              right = function()
-                local utils = require("bufferline.utils")
-
-                local result = {}
-                local root = LazyVim.root({ normalize = true })
-                table.insert(result, {
-                  text = " " .. utils.truncate_name(vim.fn.fnamemodify(root, ":t"), 18) .. " ",
-                  link = "BufferLineTab",
-                })
-
-                -- session indicator
-                if vim.v.this_session ~= "" then
-                  table.insert(result, { text = " ", link = "BufferLineTab" })
-                end
-                return result
-              end,
-            }
-          or nil,
-      },
-    },
-  },
+  -- {
+  --   "akinsho/bufferline.nvim",
+  --   optional = true,
+  --   opts = {
+  --     options = {
+  --       -- https://github.com/rafi/vim-config/blob/0feb5daebc9f5297f01dc2304f81156318b8616b/lua/rafi/plugins/ui.lua#L72
+  --       custom_areas = vim.g.user_auto_session
+  --           and not vim.g.user_is_termux
+  --           and {
+  --             right = function()
+  --               local result = {}
+  --               local root = LazyVim.root({ normalize = true })
+  --               table.insert(result, {
+  --                 text = " " .. require("bufferline.utils").truncate_name(vim.fn.fnamemodify(root, ":t"), 18) .. " ",
+  --                 link = "BufferLineTab",
+  --               })
+  --
+  --               -- session indicator
+  --               if vim.v.this_session ~= "" then
+  --                 table.insert(result, { text = " ", link = "BufferLineTab" })
+  --               end
+  --               return result
+  --             end,
+  --           }
+  --         or nil,
+  --     },
+  --   },
+  -- },
 }
