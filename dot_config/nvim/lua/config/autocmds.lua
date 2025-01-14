@@ -45,6 +45,27 @@ vim.api.nvim_create_autocmd("QuickFixCmdPost", {
   end,
 })
 
+-- make it easier to scroll man/help files when opened inline with `<leader>sM`, `<leader>sh`, `:h`
+vim.api.nvim_create_autocmd("FileType", {
+  group = vim.api.nvim_create_augroup("pager_nomodifiable", { clear = true }),
+  callback = function(event)
+    local buf = event.buf
+    vim.defer_fn(function()
+      -- note that /etc/hosts (vim.bo.readonly == true) can be changed with warning "Changing a readonly file", but files where vim.bo.modifiable == false can't
+      if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].modifiable == false then
+        for _, map in ipairs(vim.api.nvim_buf_get_keymap(buf, "n")) do
+          if vim.list_contains({ "u", "d" }, map.lhs) then
+            return
+          end
+        end
+        vim.keymap.set("n", "u", "<C-u>", { buffer = buf, silent = true, desc = "Scroll Up" })
+        -- add `nowait = true` since we have a `dd` mapping defined in keymaps.lua
+        vim.keymap.set("n", "d", "<C-d>", { buffer = buf, silent = true, desc = "Scroll Down", nowait = true })
+      end
+    end, 100)
+  end,
+})
+
 -- disable LazyVim's auto command for wrap
 local wrap_spell_opts = { group = lazyvim_augroup("wrap_spell"), event = "FileType" }
 local wrap_spell_pattern = vim.tbl_map(function(autocmd)
@@ -72,38 +93,7 @@ vim.api.nvim_create_autocmd("FileType", {
   callback = function(event)
     vim.defer_fn(function()
       vim.opt_local.wrap = false
-
-      local buf = event.buf
-      if vim.bo[buf].modifiable == false then
-        for _, map in ipairs(vim.api.nvim_buf_get_keymap(buf, "n")) do
-          if vim.list_contains({ "u", "d" }, map.lhs) then
-            return
-          end
-        end
-        vim.keymap.set("n", "u", "<C-u>", { buffer = buf, silent = true, desc = "Scroll Up" })
-        vim.keymap.set("n", "d", "<C-d>", { buffer = buf, silent = true, desc = "Scroll Down", nowait = true })
-      end
     end, 100)
-  end,
-})
-
--- make it easier to scroll man/help files when opened inline with `<leader>sM`, `<leader>sh`, `:h`
--- maybe use BufRead/BufReadPost to map/safe_map(tzachar/highlight-undo.nvim?) `u`/`d` for all non-modifiable/readonly buffers?
--- for safe_map, check `LazyVim.safe_keymap_set` or `vim.tbl_isempty(vim.fn.maparg("u", "n", false, true))`
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "man", "help" },
-  callback = function(event)
-    local buf = event.buf
-    -- don't change the keymaps for help files that we're editing
-    if vim.bo[buf].filetype == "help" and vim.bo[buf].buftype ~= "help" then
-      return
-    end
-    -- note that /etc/hosts (vim.bo.readonly == true) can be changed with warning "Changing a readonly file", but files where vim.bo.modifiable == false can't
-    if vim.bo[buf].modifiable == false or vim.bo[buf].readonly == true then
-      vim.keymap.set("n", "u", "<C-u>", { buffer = buf, silent = true, desc = "Scroll Up" })
-      -- add `nowait = true` since we have a `dd` mapping defined in keymaps.lua
-      vim.keymap.set("n", "d", "<C-d>", { buffer = buf, silent = true, desc = "Scroll Down", nowait = true })
-    end
   end,
 })
 
