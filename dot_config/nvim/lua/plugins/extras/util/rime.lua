@@ -91,6 +91,22 @@ return {
   },
 
   {
+    "folke/noice.nvim",
+    optional = true,
+    opts = function(_, opts)
+      opts.routes = vim.list_extend(opts.routes or {}, {
+        {
+          filter = {
+            event = "msg_show",
+            find = "^LSP%[rime_ls%]%[Info%] Use an initialized rime instance%.$",
+          },
+          view = "mini",
+        },
+      })
+    end,
+  },
+
+  {
     "Wansmer/symbol-usage.nvim",
     optional = true,
     opts = function(_, opts)

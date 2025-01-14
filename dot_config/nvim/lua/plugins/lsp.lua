@@ -48,7 +48,7 @@ end
 --- https://github.com/neovim/neovim/blob/fb6c059dc55c8d594102937be4dd70f5ff51614a/runtime/lua/vim/lsp/_tagfunc.lua#L25
 --- https://github.com/ibhagwan/fzf-lua/blob/975534f4861e2575396716225c1202572645583d/lua/fzf-lua/providers/lsp.lua#L468
 local function pick_definitions_or_references()
-  local params = vim.lsp.util.make_position_params()
+  local params = vim.lsp.util.make_position_params(0, "utf-16")
   local method = vim.lsp.protocol.Methods.textDocument_definition
   local results_by_client, err = vim.lsp.buf_request_sync(0, method, params, 1000)
   if err or not results_by_client then
@@ -163,6 +163,23 @@ return {
         },
         view = "mini",
       })
+
+      if vim.fn.has("nvim-0.11") == 1 then
+        table.insert(opts.routes, {
+          filter = {
+            event = "notify",
+            any = {
+              {
+                find = "^position_encoding param is required in vim%.lsp%.util%.make_position_params%. Defaulting to position encoding of the first client%.$",
+              },
+              {
+                find = "^warning: multiple different client offset_encodings detected for buffer, vim%.lsp%.util%._get_offset_encoding%(%) uses the offset_encoding from the first client$",
+              },
+            },
+          },
+          view = "mini",
+        })
+      end
     end,
   },
 

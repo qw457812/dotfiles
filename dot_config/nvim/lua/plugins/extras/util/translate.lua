@@ -134,7 +134,9 @@ return {
       local actions = require("pantran.ui.actions")
 
       -- HACK: fix "Must specify 'relative' or 'external' when creating a float" for nvim-0.11
-      require("pantran.ui.window")
+      if vim.fn.has("nvim-0.11") == 1 then
+        require("pantran.ui.window")
+      end
 
       Snacks.util.set_hl({ PantranBorder = "FloatBorder" })
 

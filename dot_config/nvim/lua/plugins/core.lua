@@ -1,6 +1,15 @@
 return {
   { "folke/lazy.nvim", version = false },
-  { "LazyVim/LazyVim", version = false },
+  {
+    "LazyVim/LazyVim",
+    version = false,
+    opts = {
+      news = {
+        lazyvim = true,
+        neovim = true,
+      },
+    },
+  },
   {
     "folke/snacks.nvim",
     keys = {
@@ -54,10 +63,6 @@ return {
           width = 0.95,
           height = 0.95,
           wo = { wrap = true },
-          keys = {
-            scroll_up = { "u", "<C-u>", expr = true, desc = "Scroll Up" },
-            scroll_down = { "d", "<C-d>", expr = true, desc = "Scroll Down" },
-          },
         },
       },
     },
