@@ -111,14 +111,21 @@ return {
           },
         },
         jdtls = function(config)
-          if vim.g.user_is_termux then
-            return
+          if not vim.g.user_is_termux then
+            config.cmd = vim.list_extend(vim.deepcopy(config.cmd), {
+              "--jvm-arg=-Xms8g",
+              "--jvm-arg=-Xmx16g",
+            })
           end
-          config.cmd = vim.list_extend(vim.deepcopy(config.cmd), {
-            "--jvm-arg=-Xms8g",
-            "--jvm-arg=-Xmx8g",
-          })
-          -- dd(config)
+
+          -- https://github.com/LazyVim/LazyVim/pull/5218
+          config.capabilities = config.capabilities
+            or LazyVim.has("blink.cmp") and require("blink.cmp").get_lsp_capabilities()
+            or nil
+
+          config.handlers = config.handlers or {}
+          -- mute; having progress reports is enough
+          config.handlers["language/status"] = function() end
         end,
         ---@param args vim.api.create_autocmd.callback.args
         on_attach = function(args)
