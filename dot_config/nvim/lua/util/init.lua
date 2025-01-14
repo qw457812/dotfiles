@@ -163,4 +163,18 @@ function M.patch_func(orig, override)
   end
 end
 
+--- copied from: https://github.com/folke/noice.nvim/blob/eaed6cc9c06aa2013b5255349e4f26a6b17ab70f/lua/noice/util/init.lua#L104
+---@param ms integer
+---@param fn function
+function M.debounce(ms, fn)
+  local timer = (vim.uv or vim.loop).new_timer()
+  return function(...)
+    local argv = vim.F.pack_len(...)
+    timer:start(ms, 0, function()
+      timer:stop()
+      vim.schedule_wrap(fn)(vim.F.unpack_len(argv))
+    end)
+  end
+end
+
 return M
