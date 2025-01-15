@@ -174,7 +174,7 @@ end, { desc = "Yank file absolute path" })
 map("n", "<leader>fY", function()
   -- local path = vim.fn.expand("%:~:.")
   -- local path = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":~:.") or ""
-  local path = require("plenary.path"):new(vim.api.nvim_buf_get_name(0)):make_relative(LazyVim.root())
+  local path = U.path.relative_to_root(vim.api.nvim_buf_get_name(0))
   vim.fn.setreg(vim.v.register, path)
   LazyVim.info(path, { title = "Copied Relative Path" })
 end, { desc = "Yank file relative path" })

@@ -62,7 +62,7 @@ return {
           zindex = 99, -- lower than notification
           width = 0.95,
           height = 0.95,
-          wo = { wrap = true },
+          wo = { wrap = true, conceallevel = 0 },
         },
       },
     },
