@@ -37,8 +37,35 @@ M.LAZYVIM = LazyVim.get_plugin_path("LazyVim")
 ---@return string
 function M.home_to_tilde(path)
   -- vim.fn.fnamemodify(path, ":~")
-  -- require("plenary.path"):new(path):make_relative(M.HOME)
   return (path:gsub("^" .. vim.pesc(M.HOME), "~"))
+end
+
+---@param path string
+---@return string
+function M.relative_to_home(path)
+  return require("plenary.path"):new(path):make_relative(M.HOME)
+end
+
+---@param path string
+---@return string
+function M.relative_to_root(path)
+  return require("plenary.path"):new(path):make_relative(LazyVim.root({ normalize = true }))
+end
+
+---@param path string
+---@return string
+function M.shorten(path)
+  path = M.home_to_tilde(path)
+
+  local dir_icons = { { M.CONFIG, " " }, { M.LAZYVIM, "󰒲 " } }
+  if M.CHEZMOI then
+    table.insert(dir_icons, { M.CHEZMOI, "󰠦 " })
+  end
+  for _, dir_icon in ipairs(dir_icons) do
+    path = path:gsub("^" .. vim.pesc(M.home_to_tilde(dir_icon[1])) .. "/", dir_icon[2])
+  end
+
+  return U.java.path_shorten(path)
 end
 
 return M

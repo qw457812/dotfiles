@@ -49,11 +49,31 @@ local function pick_chezmoi()
       },
     })
   elseif LazyVim.pick.picker.name == "snacks" then
+    local function path_shorten(path)
+      local dir_icons = { { vim.fn.stdpath("config"), " " } }
+      for _, dir_icon in ipairs(dir_icons) do
+        path = path:gsub("^" .. vim.pesc(U.path.home_to_tilde(dir_icon[1])) .. "/", dir_icon[2])
+      end
+      return path
+    end
+
+    local function format(...)
+      local ret = Snacks.picker.format.file(...)
+      for _, line in ipairs(ret) do
+        if line[2] == "SnacksPickerDir" then
+          line[1] = path_shorten(line[1])
+          break
+        end
+      end
+      return ret
+    end
+
     local managed_files = chezmoi_list_files({ include_symlinks = true, path_style_absolute = true })
     Snacks.picker.pick({
       items = vim.tbl_map(function(file)
         return { file = file, text = U.path.home_to_tilde(file) }
       end, managed_files),
+      format = format,
       confirm = function(picker, item)
         picker:close()
         if item then
@@ -139,6 +159,9 @@ local function pick_config()
     ---@diagnostic disable-next-line: missing-fields
     Snacks.picker.files({
       cwd = config_dir,
+      hidden = true,
+      ignored = true,
+      follow = true,
       confirm = function(picker, item)
         picker:close()
         if item then

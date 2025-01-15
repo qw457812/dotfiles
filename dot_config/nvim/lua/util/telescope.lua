@@ -107,16 +107,7 @@ function M.path_display(opts, path)
   local get_status = require("telescope.state").get_status
   local truncate = require("plenary.strings").truncate
 
-  local transformed_path = vim.trim(U.path.home_to_tilde(path))
-
-  -- make path shorter
-  local dir_icons = { { U.path.CONFIG, " " }, { U.path.LAZYVIM, "󰒲 " } }
-  if U.path.CHEZMOI then
-    table.insert(dir_icons, { U.path.CHEZMOI, "󰠦 " })
-  end
-  for _, dir_icon in ipairs(dir_icons) do
-    transformed_path = transformed_path:gsub("^" .. vim.pesc(U.path.home_to_tilde(dir_icon[1])) .. "/", dir_icon[2])
-  end
+  local transformed_path = U.path.shorten(vim.trim(path))
 
   -- truncate
   -- copy from: https://github.com/nvim-telescope/telescope.nvim/blob/bfcc7d5c6f12209139f175e6123a7b7de6d9c18a/lua/telescope/utils.lua#L198

@@ -24,7 +24,7 @@ local pick = function()
     -- previewer = require("telescope.previewers").vim_buffer_cat.new({}),
     previewer = U.telescope.previewers.tree(),
     path_display = function(opts, path) -- fork only
-      local transformed_path = vim.trim(U.path.home_to_tilde(path))
+      local transformed_path = vim.trim(U.path.shorten(path))
 
       -- dir icon
       local icon, icon_hl = mini_icons.get("directory", path)
@@ -97,6 +97,17 @@ return {
         require("telescope").setup(opts)
         require("telescope").load_extension("zoxide")
       end)
+    end,
+  },
+
+  {
+    "folke/snacks.nvim",
+    optional = true,
+    keys = function(_, keys)
+      if LazyVim.pick.want() == "snacks" then
+        -- stylua: ignore
+        table.insert(keys, { "<leader>fz", function() Snacks.picker.zoxide() end, desc = "Zoxide" })
+      end
     end,
   },
 

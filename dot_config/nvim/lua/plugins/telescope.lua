@@ -125,6 +125,24 @@ return {
       },
     },
   },
+  {
+    "folke/snacks.nvim",
+    optional = true,
+    opts = function()
+      --HACK: shorten dir | https://github.com/folke/snacks.nvim/blob/HEAD/lua/snacks/picker/format.lua#L43
+      local filename_orig = Snacks.picker.format.filename
+      Snacks.picker.format.filename = function(...)
+        local ret = filename_orig(...)
+        for _, line in ipairs(ret) do
+          if line[2] == "SnacksPickerDir" then
+            line[1] = U.path.shorten(line[1])
+            break
+          end
+        end
+        return ret
+      end
+    end,
+  },
 
   {
     "ibhagwan/fzf-lua",
