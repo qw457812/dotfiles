@@ -211,7 +211,7 @@ return {
             group = vim.api.nvim_create_augroup("chezmoi_add", { clear = true }),
             pattern = managed_files,
             desc = "chezmoi add for target-path",
-            callback = function(event)
+            callback = U.debounce(500, function(event)
               local res = vim.system({ "chezmoi", "add", event.file }, { text = true }):wait()
               if res.code == 0 then
                 LazyVim.info("Successfully added", { title = "Chezmoi" })
@@ -221,13 +221,18 @@ return {
                   { title = "Chezmoi" }
                 )
               end
-            end,
+            end),
           })
         end
       end)
     end,
   },
 
+  {
+    "folke/snacks.nvim",
+    optional = true,
+    keys = { { "<leader>fc", false } },
+  },
   {
     "ibhagwan/fzf-lua",
     optional = true,
