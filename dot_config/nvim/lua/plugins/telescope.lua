@@ -12,6 +12,8 @@ local pick_search_lazy_specs = function()
       search = "/",
       formatter = "path.filename_first",
     })
+  elseif LazyVim.pick.picker.name == "snacks" then
+    Snacks.picker.grep({ search = "/", dirs = dirs })
   end
 end
 
@@ -30,7 +32,7 @@ local pick_find_plugin_files = function()
       end
       LazyVim.pick("files", { cwd = plugin.dir, prompt_title = plugin.name })()
     end)
-  elseif LazyVim.pick.picker.name == "fzf" then
+  elseif vim.list_contains({ "fzf", "snacks" }, LazyVim.pick.picker.name) then
     LazyVim.pick("files", { cwd = require("lazy.core.config").options.root })()
   end
 end
@@ -48,7 +50,7 @@ local pick_search_plugin_codes = function()
       end
       LazyVim.pick("live_grep", { cwd = plugin.dir, prompt_title = plugin.name })()
     end)
-  elseif LazyVim.pick.picker.name == "fzf" then
+  elseif vim.list_contains({ "fzf", "snacks" }, LazyVim.pick.picker.name) then
     LazyVim.pick("live_grep", { cwd = require("lazy.core.config").options.root })()
   end
 end
@@ -59,6 +61,8 @@ local pick_find_lazy_files = function()
     require("telescope.builtin").find_files({ search_dirs = dirs })
   elseif LazyVim.pick.picker.name == "fzf" then
     require("fzf-lua").files({ cmd = "rg --files " .. table.concat(vim.tbl_values(dirs), " ") })
+  elseif LazyVim.pick.picker.name == "snacks" then
+    Snacks.picker.files({ dirs = dirs })
   end
 end
 
@@ -71,6 +75,8 @@ local pick_search_lazy_codes = function()
       filespec = "-- " .. table.concat(vim.tbl_values(dirs), " "),
       formatter = "path.filename_first",
     })
+  elseif LazyVim.pick.picker.name == "snacks" then
+    Snacks.picker.grep({ dirs = dirs })
   end
 end
 
@@ -86,6 +92,16 @@ local keys = {
 }
 
 return {
+  {
+    "folke/snacks.nvim",
+    keys = {
+      -- stylua: ignore
+      { "<leader>s.", function() Snacks.picker.resume() end, desc = "Resume" },
+      { "<leader>sp", pick_search_lazy_specs, desc = "Search Lazy Plugin Spec" },
+      unpack(keys),
+    },
+  },
+
   {
     "ibhagwan/fzf-lua",
     optional = true,

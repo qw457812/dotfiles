@@ -3,6 +3,8 @@ local function pick_definitions()
     require("telescope.builtin").lsp_definitions({ reuse_win = true })
   elseif LazyVim.pick.picker.name == "fzf" then
     require("fzf-lua").lsp_definitions({ jump_to_single_result = true, ignore_current_line = true })
+  elseif LazyVim.pick.picker.name == "snacks" then
+    Snacks.picker.lsp_definitions()
   end
 end
 
@@ -11,6 +13,8 @@ local function pick_references()
     require("telescope.builtin").lsp_references({ include_declaration = false })
   elseif LazyVim.pick.picker.name == "fzf" then
     require("fzf-lua").lsp_references({ jump_to_single_result = true, ignore_current_line = true })
+  elseif LazyVim.pick.picker.name == "snacks" then
+    Snacks.picker.lsp_references()
   end
 end
 
