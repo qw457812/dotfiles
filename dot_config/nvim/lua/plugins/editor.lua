@@ -274,9 +274,27 @@ return {
   {
     "rachartier/tiny-glimmer.nvim",
     event = "TextYankPost",
-    opts = {
-      transparency_color = vim.g.user_transparent_background and "#000000" or nil,
-    },
+    opts = function()
+      local function get_opts()
+        local from_color = Snacks.util.color("CurSearch", "bg")
+        local to_color = Snacks.util.color("Visual", "bg")
+        return {
+          transparency_color = vim.g.user_transparent_background and "#000000" or nil,
+          animations = {
+            fade = {
+              from_color = from_color,
+              to_color = to_color,
+            },
+          },
+        }
+      end
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        callback = function()
+          require("tiny-glimmer").setup(get_opts())
+        end,
+      })
+      return get_opts()
+    end,
     init = function()
       vim.api.nvim_create_autocmd("User", {
         pattern = "LazyVimAutocmdsDefaults",
