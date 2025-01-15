@@ -46,7 +46,7 @@ return {
       -- end, require("plenary.path"):new(home):_split())
       ---@diagnostic disable-next-line: param-type-mismatch
       local home_parts = vim.split(vim.uv.os_homedir(), "/", { trimempty = true })
-      local oil_prefix = "oil:" -- oil.nvim
+      -- local oil_prefix = "oil:" -- oil.nvim
       -- local jdt_prefix = "jdt:" -- nvim-jdtls
       local source_path = {
         get_symbols = function(buff, win, cursor)
@@ -106,11 +106,11 @@ return {
           symbols[#symbols].name_hl = vim.bo[buff].modified and "DropBarFileNameModified" or "DropBarFileName"
 
           -- replace home dir with ~
-          local symbol_oil_prefix
-          -- require("oil.util").is_oil_bufnr(buff)
-          if vim.bo[buff].filetype == "oil" and #symbols > 1 and symbols[1].name == oil_prefix then
-            symbol_oil_prefix = table.remove(symbols, 1)
-          end
+          -- local symbol_oil_prefix
+          -- -- require("oil.util").is_oil_bufnr(buff)
+          -- if vim.bo[buff].filetype == "oil" and #symbols > 1 and symbols[1].name == oil_prefix then
+          --   symbol_oil_prefix = table.remove(symbols, 1)
+          -- end
           local start_with_home = #symbols >= #home_parts
           if start_with_home then
             for i, home_part in ipairs(home_parts) do
@@ -145,9 +145,9 @@ return {
             symbols[i].name = truncate_string(symbols[i].name, max_symbol_len)
           end
 
-          if symbol_oil_prefix then
-            table.insert(symbols, 1, symbol_oil_prefix)
-          end
+          -- if symbol_oil_prefix then
+          --   table.insert(symbols, 1, symbol_oil_prefix)
+          -- end
           return symbols
         end,
       }
@@ -203,7 +203,7 @@ return {
             ---@type fun(path: string): string, string?|false
             file_icon = function(path)
               local default_file_icon = dropbar_default_opts.icons.kinds.file_icon
-              local default_dir_icon = dropbar_default_opts.icons.kinds.dir_icon
+              -- local default_dir_icon = dropbar_default_opts.icons.kinds.dir_icon
 
               local function mini_icons_get(category, name, fallback)
                 local icon, hl, is_default = require("mini.icons").get(category, name)
@@ -214,24 +214,25 @@ return {
                 end
               end
 
-              if path == oil_prefix then
-                return mini_icons_get("filetype", "oil")
-              -- elseif path == jdt_prefix then
-              --   return mini_icons_get("filetype", "java")
-              elseif vim.startswith(path, oil_prefix) then
-                return mini_icons_get("directory", path:sub(#oil_prefix + 1), default_dir_icon)
-              -- elseif vim.startswith(path, jdt_prefix) then
-              --   path = path:sub(#jdt_prefix + 1):gsub("%?=.*$", "")
-              --   if vim.endswith(path, ".jar") then
-              --     return mini_icons_get("extension", "zip"), "MiniIconsRed"
-              --   elseif vim.endswith(path, ".class") then
-              --     return mini_icons_get("file", path, default_file_icon)
-              --   else
-              --     return mini_icons_get("directory", path, default_dir_icon)
-              --   end
-              else
-                return mini_icons_get("file", path, default_file_icon)
-              end
+              -- if path == oil_prefix then
+              --   return mini_icons_get("filetype", "oil")
+              -- -- elseif path == jdt_prefix then
+              -- --   return mini_icons_get("filetype", "java")
+              -- elseif vim.startswith(path, oil_prefix) then
+              --   return mini_icons_get("directory", path:sub(#oil_prefix + 1), default_dir_icon)
+              -- -- elseif vim.startswith(path, jdt_prefix) then
+              -- --   path = path:sub(#jdt_prefix + 1):gsub("%?=.*$", "")
+              -- --   if vim.endswith(path, ".jar") then
+              -- --     return mini_icons_get("extension", "zip"), "MiniIconsRed"
+              -- --   elseif vim.endswith(path, ".class") then
+              -- --     return mini_icons_get("file", path, default_file_icon)
+              -- --   else
+              -- --     return mini_icons_get("directory", path, default_dir_icon)
+              -- --   end
+              -- else
+              --   return mini_icons_get("file", path, default_file_icon)
+              -- end
+              return mini_icons_get("file", path, default_file_icon)
             end,
           },
         },
@@ -271,6 +272,20 @@ return {
         sources = {
           path = {
             relative_to = function(buf, _)
+              -- -- show full path in oil buffers
+              -- local bufname = vim.api.nvim_buf_get_name(buf)
+              -- -- alternative: package.loaded["oil"] and require("oil.util").is_oil_bufnr(buf)
+              -- if vim.startswith(bufname, "oil://") then
+              --   local root = bufname:gsub("^%S+://", "", 1)
+              --   while root and root ~= vim.fs.dirname(root) do
+              --     root = vim.fs.dirname(root)
+              --   end
+              --   return root
+              -- end
+              if vim.bo[buf].filetype == "oil" then
+                return "/"
+              end
+
               return LazyVim.root.get({ normalize = true, buf = buf })
             end,
           },
