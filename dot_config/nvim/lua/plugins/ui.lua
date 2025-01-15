@@ -309,6 +309,9 @@ return {
         -- plugin filetypes
         ["snacks_terminal"] = { glyph = "", hl = "MiniIconsCyan" },
         ["snacks_input"] = { glyph = "󰏫", hl = "MiniIconsAzure" },
+        ["snacks_picker_input"] = { glyph = "󰏫", hl = "MiniIconsAzure" },
+        ["snacks_picker_list"] = { glyph = "󰷐", hl = "MiniIconsAzure" },
+        ["snacks_picker_preview"] = { glyph = "", hl = "MiniIconsAzure" },
         ["snacks_notif"] = { glyph = "󰎟", hl = "MiniIconsYellow" },
         ["noice"] = { glyph = "󰎟", hl = "MiniIconsYellow" },
         ["rip-substitute"] = { glyph = "", hl = "MiniIconsGreen" },

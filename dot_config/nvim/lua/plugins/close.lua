@@ -231,6 +231,25 @@ return {
           },
         },
       },
+      picker = {
+        win = {
+          input = {
+            keys = {
+              [close_key] = "close",
+            },
+          },
+          list = {
+            keys = {
+              [close_key] = "close",
+            },
+          },
+          preview = {
+            keys = {
+              [close_key] = "close",
+            },
+          },
+        },
+      },
     },
   },
 

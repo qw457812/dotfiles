@@ -100,6 +100,30 @@ return {
       { "<leader>sp", pick_search_lazy_specs, desc = "Search Lazy Plugin Spec" },
       unpack(keys),
     },
+    opts = {
+      picker = {
+        win = {
+          input = {
+            keys = {
+              ["<Up>"] = "history_back",
+              ["<Down>"] = "history_forward",
+              i_up = { "<Up>", "list_up", mode = "i", expr = true },
+              i_down = { "<Down>", "list_down", mode = "i", expr = true },
+            },
+          },
+          list = {
+            keys = {
+              ["<Esc>"] = "toggle_focus",
+            },
+          },
+          preview = {
+            keys = {
+              ["<Esc>"] = "toggle_focus",
+            },
+          },
+        },
+      },
+    },
   },
 
   {

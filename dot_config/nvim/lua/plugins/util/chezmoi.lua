@@ -48,6 +48,19 @@ local function pick_chezmoi()
         end,
       },
     })
+  elseif LazyVim.pick.picker.name == "snacks" then
+    local managed_files = chezmoi_list_files({ include_symlinks = true, path_style_absolute = true })
+    Snacks.picker.pick({
+      items = vim.tbl_map(function(file)
+        return { file = file, text = U.path.home_to_tilde(file) }
+      end, managed_files),
+      confirm = function(picker, item)
+        picker:close()
+        if item then
+          require("chezmoi.commands").edit({ targets = assert(Snacks.picker.util.path(item)) })
+        end
+      end,
+    })
   end
 end
 
@@ -121,6 +134,21 @@ local function pick_config()
           end
         end,
       },
+    })
+  elseif LazyVim.pick.picker.name == "snacks" then
+    ---@diagnostic disable-next-line: missing-fields
+    Snacks.picker.files({
+      cwd = config_dir,
+      confirm = function(picker, item)
+        picker:close()
+        if item then
+          if vim.tbl_contains(managed_config_files, item.cwd .. "/" .. item.file) then
+            require("chezmoi.commands").edit({ targets = assert(Snacks.picker.util.path(item)) })
+          else
+            Snacks.picker.actions.edit(picker)
+          end
+        end
+      end,
     })
   end
 end
