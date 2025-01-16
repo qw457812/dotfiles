@@ -42,8 +42,8 @@ return {
     "tpope/vim-dadbod",
     optional = true,
     init = function()
-      -- The OceanBase I am using does not work with MySQL >9.0
-      vim.env.PATH = "/opt/homebrew/opt/mysql@8.4/bin:" .. vim.env.PATH
+      -- -- The OceanBase I am using does not work with MySQL >9.0
+      -- vim.env.PATH = "/opt/homebrew/opt/mysql@8.4/bin:" .. vim.env.PATH
 
       -- :=vim.fn['db#url#encode']('my_password')
       -- https://github.com/mistweaverco/kulala.nvim/blob/1c4156b8204137ff683d7c61b94218ca1cfbf801/lua/kulala/utils/string.lua#L22

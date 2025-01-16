@@ -34,7 +34,6 @@
     "lazyvim.plugins.extras.util.dot",
     "lazyvim.plugins.extras.util.mini-hipatterns",
     "lazyvim.plugins.extras.util.project",
-    "lazyvim.plugins.extras.util.rest",
     "plugins.extras.ai.aider",
     "plugins.extras.ai.avante",
     "plugins.extras.editor.mini-operators",
@@ -43,8 +42,6 @@
     "plugins.extras.game.leetcode",
     "plugins.extras.lang.xml",
     "plugins.extras.lsp.mason-lock",
-    "plugins.extras.lsp.symbol-usage",
-    "plugins.extras.lsp.tiny-code-action",
     "plugins.extras.lsp.tiny-inline-diagnostic",
     "plugins.extras.ui.border",
     "plugins.extras.ui.dropbar",
@@ -57,7 +54,7 @@
   ],
   "news": {
     "NEWS.md": "10960",
-    "doc/news.txt": "19740"
+    "doc/news.txt": "19761"
   },
   "version": 7
 }
