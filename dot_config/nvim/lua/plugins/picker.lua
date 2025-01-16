@@ -81,7 +81,7 @@ local pick_search_lazy_codes = function()
 end
 
 -- stylua: ignore
-local keys = {
+local mappings = {
   { "<leader>sR", false },
   { "<leader>fP", pick_find_plugin_files, desc = "Find Plugin File" },
   { "<leader>sP", pick_search_plugin_codes, desc = "Search Plugin Code" },
@@ -94,12 +94,16 @@ local keys = {
 return {
   {
     "folke/snacks.nvim",
-    keys = {
-      -- stylua: ignore
-      { "<leader>s.", function() Snacks.picker.resume() end, desc = "Resume" },
-      { "<leader>sp", pick_search_lazy_specs, desc = "Search Lazy Plugin Spec" },
-      unpack(keys),
-    },
+    keys = function(_, keys)
+      if LazyVim.pick.picker.name == "snacks" then
+        vim.list_extend(keys, {
+          -- stylua: ignore
+          { "<leader>s.", function() Snacks.picker.resume() end, desc = "Resume" },
+          { "<leader>sp", pick_search_lazy_specs, desc = "Search Lazy Plugin Spec" },
+          unpack(mappings),
+        })
+      end
+    end,
     ---@module "snacks"
     ---@type snacks.Config
     opts = {
@@ -157,7 +161,7 @@ return {
     keys = {
       { "<leader>s.", "<cmd>FzfLua resume<cr>", desc = "Resume" },
       { "<leader>sp", pick_search_lazy_specs, desc = "Search Lazy Plugin Spec" },
-      unpack(keys),
+      unpack(mappings),
     },
     opts = {
       -- defaults = {
@@ -194,7 +198,7 @@ return {
       { "<leader>s.", "<cmd>Telescope resume<cr>", desc = "Resume" },
       { "<leader>ff", false },
       { "<leader>fF", false },
-      unpack(keys),
+      unpack(mappings),
     },
     opts = {
       defaults = {
@@ -227,7 +231,6 @@ return {
         -- path_display = { truncate = 1, "filename_first" },
         -- path_display = { "truncate", filename_first = { reverse_directories = true } },
         path_display = U.telescope.path_display,
-        -- ~/.local/share/nvim/lazy/telescope.nvim/lua/telescope/mappings.lua
         mappings = {
           i = {
             ["<C-j>"] = "move_selection_next",

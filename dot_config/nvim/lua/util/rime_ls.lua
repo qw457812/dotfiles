@@ -138,10 +138,13 @@ function M.toggle(client)
     return
   end
   client.request("workspace/executeCommand", { command = "rime-ls.toggle-rime" }, function(_, res, ctx, _)
-    if ctx.client_id == client.id then
-      vim.g.rime_enabled = res
-      toggle_keymaps(res)
+    if ctx.client_id ~= client.id or vim.g.rime_enabled == res then
+      return
     end
+    vim.g.rime_enabled = res
+    toggle_keymaps(res)
+    -- see: https://github.com/Saghen/blink.cmp/blob/c32eca4f2fbd3d01a0628007797a3121ba9b8673/lua/blink/cmp/completion/accept/init.lua#L33
+    require("blink.cmp.config").completion.accept.create_undo_point = not res
   end)
 end
 

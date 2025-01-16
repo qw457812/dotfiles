@@ -139,15 +139,15 @@ return {
                 { "source_name" },
               }),
               components = {
-                kind_icon = {
-                  text = function(ctx)
-                    if ctx.item.source_name == "LSP" and ctx.kind then
-                      local icon, _, is_default = require("mini.icons").get("lsp", ctx.kind)
-                      ctx.kind_icon = is_default and ctx.kind_icon or icon
-                    end
-                    return menu_default.draw.components.kind_icon.text(ctx)
-                  end,
-                },
+                -- kind_icon = {
+                --   text = function(ctx)
+                --     if ctx.item.source_name == "LSP" and ctx.kind then
+                --       local icon, _, is_default = require("mini.icons").get("lsp", ctx.kind)
+                --       ctx.kind_icon = is_default and ctx.kind_icon or icon
+                --     end
+                --     return menu_default.draw.components.kind_icon.text(ctx)
+                --   end,
+                -- },
                 source_name = {
                   text = function(ctx)
                     return "[" .. ctx.source_name .. "]"
