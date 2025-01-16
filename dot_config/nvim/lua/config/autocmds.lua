@@ -45,6 +45,20 @@ vim.api.nvim_create_autocmd("QuickFixCmdPost", {
   end,
 })
 
+-- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/keybindings.lua#L288
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "qf",
+  callback = function(event)
+    vim.keymap.set("n", "dd", function()
+      local qf_items = vim.fn.getqflist()
+      local lnum = vim.api.nvim_win_get_cursor(0)[1]
+      table.remove(qf_items, lnum)
+      vim.fn.setqflist(qf_items, "r")
+      vim.api.nvim_win_set_cursor(0, { lnum, 0 })
+    end, { buffer = event.buf, silent = true, desc = "Remove quickfix entry" })
+  end,
+})
+
 -- make it easier to scroll man/help files when opened inline with `<leader>sM`, `<leader>sh`, `:h`
 vim.api.nvim_create_autocmd("FileType", {
   group = vim.api.nvim_create_augroup("pager_nomodifiable", { clear = true }),
@@ -54,7 +68,8 @@ vim.api.nvim_create_autocmd("FileType", {
       -- note that /etc/hosts (vim.bo.readonly == true) can be changed with warning "Changing a readonly file", but files where vim.bo.modifiable == false can't
       if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].modifiable == false then
         for _, map in ipairs(vim.api.nvim_buf_get_keymap(buf, "n")) do
-          if vim.list_contains({ "u", "d" }, map.lhs) then
+          -- `dd` mapped for quickfix
+          if vim.list_contains({ "u", "d", "dd" }, map.lhs) then
             return
           end
         end
@@ -173,20 +188,6 @@ vim.api.nvim_create_autocmd("BufDelete", {
     if vim.g.q_close_windows then
       vim.g.q_close_windows[args.buf] = nil
     end
-  end,
-})
-
--- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/keybindings.lua#L288
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "qf",
-  callback = function(event)
-    vim.keymap.set("n", "dd", function()
-      local qf_items = vim.fn.getqflist()
-      local lnum = vim.api.nvim_win_get_cursor(0)[1]
-      table.remove(qf_items, lnum)
-      vim.fn.setqflist(qf_items, "r")
-      vim.api.nvim_win_set_cursor(0, { lnum, 0 })
-    end, { buffer = event.buf, silent = true, desc = "Remove quickfix entry" })
   end,
 })
 
