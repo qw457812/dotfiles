@@ -566,14 +566,25 @@ return {
         n = {
           { "u", "<C-u>", { desc = "Scroll Up" } },
           { "d", "<C-d>", { desc = "Scroll Down", nowait = true } },
-          -- stylua: ignore
-          { "<esc>", function() PAGER_MODE:deactivate() end, { desc = "Exit" } },
+          {
+            "<esc>",
+            function()
+              if not U.keymap.clear_ui_esc() then
+                PAGER_MODE:deactivate()
+              end
+            end,
+            { desc = "Exit" },
+          },
         },
       })
       local orig_dd_keymap ---@type table<string,any>
       local orig_minianimate_disable ---@type boolean?
       PAGER_MODE:add_hook(function(active)
         if active then
+          -- set filetype
+          if PAGER_MODE._win ~= nil then
+            vim.bo[vim.fn.winbufnr(PAGER_MODE._win)].filetype = "layers_help"
+          end
           -- remove `dd` mapping, defined in ../config/keymaps.lua
           -- https://github.com/debugloop/layers.nvim/blob/67666f59a2dbe36a469766be6a4c484ae98c4895/lua/layers/map.lua#L52
           orig_dd_keymap = vim.fn.maparg("dd", "n", false, true) --[[@as table<string,any>]]

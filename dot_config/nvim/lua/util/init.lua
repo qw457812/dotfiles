@@ -30,7 +30,7 @@ function M.has_user_extra(extra)
 end
 
 ---@param win? integer default 0
----@param opts? { zen?: boolean, tsc?: boolean, dashboard?: boolean } whether to treat zen-mode, nvim-treesitter-context and snacks_dashboard terminal sections as floating windows, default true
+---@param opts? { zen?: boolean, tsc?: boolean, dashboard?: boolean, layers?: boolean } whether to treat zen-mode, nvim-treesitter-context, snacks_dashboard terminal sections and layers help as floating windows, default true
 ---@return boolean
 function M.is_floating_win(win, opts)
   win = win or 0
@@ -43,6 +43,7 @@ function M.is_floating_win(win, opts)
     zen = true,
     tsc = true,
     dashboard = true,
+    layers = true,
   })
   local ft = vim.bo[vim.api.nvim_win_get_buf(win)].filetype
 
@@ -79,6 +80,11 @@ function M.is_floating_win(win, opts)
 
   -- snacks_dashboard terminal sections
   if not opts.dashboard and ft == "snacks_dashboard" then
+    return false
+  end
+
+  -- layers.nvim help
+  if not opts.layers and ft == "layers_help" then
     return false
   end
 
