@@ -1,8 +1,60 @@
+-- https://github.com/yetone/avante.nvim/wiki/Recipe-and-Tricks
+local prompt = {
+  grammar_correction = "Correct the text to standard English, but keep any code blocks inside intact.",
+  code_readability_analysis = [[
+  You must identify any readability issues in the code snippet.
+  Some readability issues to consider:
+  - Unclear naming
+  - Unclear purpose
+  - Redundant or obvious comments
+  - Lack of comments
+  - Long or complex one liners
+  - Too much nesting
+  - Long variable names
+  - Inconsistent naming and code style.
+  - Code repetition
+  You may identify additional problems. The user submits a small section of code from a larger file.
+  Only list lines with readability issues, in the format <line_num>|<issue and proposed solution>
+  If there's no issues with code respond with only: <OK>
+]],
+  optimize_code = "Optimize the following code",
+  summarize = "Summarize the following text",
+  translate = "Translate this into Chinese, but keep any code blocks inside intact",
+  explain_code = "Explain the following code",
+  complete_code = function()
+    return "Complete the following codes written in " .. vim.bo.filetype
+  end,
+  add_docstring = "Add docstring to the following codes",
+  fix_bugs = "Fix the bugs inside the following codes if any",
+  add_tests = "Implement tests for the following code",
+}
+
+local function ask(question)
+  return function()
+    question = vim.is_callable(question) and question() or question
+    require("avante.api").ask({ question = question })
+  end
+end
+
+-- prefill edit window with common scenarios to avoid repeating query and submit immediately
+local function edit_submit(question)
+  return function()
+    question = vim.is_callable(question) and question() or question
+    require("avante.api").edit()
+    vim.api.nvim_buf_set_lines(vim.api.nvim_get_current_buf(), 0, -1, false, { question })
+    -- optionally set the cursor position to the end of the input
+    vim.api.nvim_win_set_cursor(vim.api.nvim_get_current_win(), { 1, #question + 1 })
+    -- simulate ctrl+s keypress to submit
+    vim.api.nvim_feedkeys(vim.keycode("<C-s>"), "m", false)
+  end
+end
+
 -- https://github.com/AstroNvim/astrocommunity/blob/main/lua/astrocommunity/completion/avante-nvim/init.lua
 return {
   {
     "yetone/avante.nvim",
-    build = "make",
+    lazy = false, -- see: https://github.com/yetone/avante.nvim/issues/561#issuecomment-2342550208
+    build = "make BUILD_FROM_SOURCE=true",
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
       "stevearc/dressing.nvim",
@@ -40,9 +92,6 @@ return {
         ft = U.markdown.render_markdown_ft("Avante"),
       },
     },
-    -- https://github.com/yetone/avante.nvim/wiki#keymaps-and-api-i-guess
-    -- ~/.local/share/nvim/lazy/avante.nvim/lua/avante/init.lua
-    -- TODO: https://github.com/yetone/avante.nvim/wiki/Recipe-and-Tricks
     keys = function(_, keys)
       local opts_mappings = LazyVim.opts("avante.nvim").mappings or {}
       -- stylua: ignore
@@ -62,6 +111,23 @@ return {
           end,
           desc = "Switch Provider (Avante)",
         },
+        { "<leader>av", "", desc = "+avante", mode = { "n", "v" } },
+        { "<leader>avg", ask(prompt.grammar_correction),         desc = "Grammar Correction (Ask)",        mode = { "n", "v" } },
+        { "<leader>avG", edit_submit(prompt.grammar_correction), desc = "Grammar Correction (Edit)",       mode = "v" },
+        { "<leader>avr", ask(prompt.code_readability_analysis),  desc = "Code Readability Analysis (Ask)", mode = { "n", "v" } },
+        { "<leader>avo", ask(prompt.optimize_code),              desc = "Optimize Code (Ask)",             mode = { "n", "v" } },
+        { "<leader>avO", edit_submit(prompt.optimize_code),      desc = "Optimize Code (Edit)",            mode = "v" },
+        { "<leader>avs", ask(prompt.summarize),                  desc = "Summarize text (Ask)",            mode = { "n", "v" } },
+        { "<leader>avt", ask(prompt.translate),                  desc = "Translate text (Ask)",            mode = { "n", "v" } },
+        { "<leader>ave", ask(prompt.explain_code),               desc = "Explain Code (Ask)",              mode = { "n", "v" } },
+        { "<leader>avc", ask(prompt.complete_code()),            desc = "Complete Code (Ask)",             mode = { "n", "v" } },
+        { "<leader>avC", edit_submit(prompt.complete_code),      desc = "Complete Code (Edit)",            mode = "v" },
+        { "<leader>avd", ask(prompt.add_docstring),              desc = "Docstring (Ask)",                 mode = { "n", "v" } },
+        { "<leader>avD", edit_submit(prompt.add_docstring),      desc = "Docstring (Edit)",                mode = "v" },
+        { "<leader>avf", ask(prompt.fix_bugs),                   desc = "Fix Bugs (Ask)",                  mode = { "n", "v" } },
+        { "<leader>avF", edit_submit(prompt.fix_bugs),           desc = "Fix Bugs (Edit)",                 mode = "v" },
+        { "<leader>avu", ask(prompt.add_tests),                  desc = "Add Tests (Ask)",                 mode = { "n", "v" } },
+        { "<leader>avU", edit_submit(prompt.add_tests),          desc = "Add Tests (Edit)",                mode = "v" },
       }
       vim.list_extend(keys, mappings)
     end,
@@ -86,11 +152,10 @@ return {
         -- auto_suggestions = true, -- experimental
         auto_apply_diff_after_generation = true,
       },
-      provider = "copilot-claude", -- only recommend using claude
-      auto_suggestions_provider = "deepseek", -- high-frequency, can be expensive if enabled
-      -- copilot = {
-      --   model = "claude-3.5-sonnet",
-      -- },
+      -- TODO: https://github.com/yetone/avante.nvim/issues/1089
+      provider = "copilot", -- only recommend using claude
+      -- auto_suggestions_provider = "deepseek", -- high-frequency, can be expensive if enabled
+      -- copilot = { model = "claude-3.5-sonnet" },
       -- https://github.com/yetone/avante.nvim/wiki/Custom-providers
       vendors = {
         -- be able to switch between copilot (gpt-4o) and copilot-claude
