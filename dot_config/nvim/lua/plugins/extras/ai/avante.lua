@@ -49,43 +49,50 @@ local function edit_submit(question)
   end
 end
 
+local function switch_provider()
+  -- https://github.com/yetone/avante.nvim/blob/962dd0a759d9cba7214dbc954780c5ada5799449/lua/avante/init.lua#L47
+  vim.ui.select(require("avante.config").providers, { prompt = "Select Avante Provider:" }, function(choice)
+    if choice then
+      require("avante.api").switch_provider(choice)
+    end
+  end)
+end
+
 -- https://github.com/AstroNvim/astrocommunity/blob/main/lua/astrocommunity/completion/avante-nvim/init.lua
 return {
   {
     "yetone/avante.nvim",
     lazy = false, -- see: https://github.com/yetone/avante.nvim/issues/561#issuecomment-2342550208
-    build = "make BUILD_FROM_SOURCE=true",
+    build = "make",
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
       "stevearc/dressing.nvim",
       "MunifTanjim/nui.nvim",
       "zbirenbaum/copilot.lua", -- for `provider = "copilot"`
-      { "nvim-cmp", optional = true },
-      { "echasnovski/mini.icons", optional = true },
-      {
-        "HakonHarnes/img-clip.nvim", -- support for image pasting
-        cmd = "PasteImage",
-        keys = {
-          {
-            '"i',
-            function()
-              return vim.bo.filetype == "AvanteInput" and require("avante.clipboard").paste_image()
-                or require("img-clip").paste_image()
-            end,
-            desc = "Paste Image (img-clip)",
-          },
-        },
-        opts = {
-          default = {
-            embed_image_as_base64 = false,
-            prompt_for_file_name = false,
-            drag_and_drop = {
-              insert_mode = true,
-            },
-            use_absolute_path = true, -- required for Windows users
-          },
-        },
-      },
+      -- {
+      --   "HakonHarnes/img-clip.nvim", -- support for image pasting
+      --   cmd = "PasteImage",
+      --   keys = {
+      --     {
+      --       '"i',
+      --       function()
+      --         return vim.bo.filetype == "AvanteInput" and require("avante.clipboard").paste_image()
+      --           or require("img-clip").paste_image()
+      --       end,
+      --       desc = "Paste Image (img-clip)",
+      --     },
+      --   },
+      --   opts = {
+      --     default = {
+      --       embed_image_as_base64 = false,
+      --       prompt_for_file_name = false,
+      --       drag_and_drop = {
+      --         insert_mode = true,
+      --       },
+      --       use_absolute_path = true, -- required for Windows users
+      --     },
+      --   },
+      -- },
       {
         "MeanderingProgrammer/render-markdown.nvim",
         optional = true,
@@ -96,21 +103,10 @@ return {
       local opts_mappings = LazyVim.opts("avante.nvim").mappings or {}
       -- stylua: ignore
       local mappings = {
-        { opts_mappings.ask or "<leader>aa", mode = { "n", "v" }, function() require("avante.api").ask() end, desc = "Ask (Avante)" },
-        { opts_mappings.edit or "<leader>ae", mode = "v", function() require("avante.api").edit() end, desc = "Edit (Avante)" },
+        { opts_mappings.ask or "<leader>aa", function() require("avante.api").ask() end, desc = "Ask (Avante)", mode = { "n", "v" } },
+        { opts_mappings.edit or "<leader>ae", function() require("avante.api").edit() end, desc = "Edit (Avante)", mode = "v" },
         { opts_mappings.refresh or "<leader>ar", function() require("avante.api").refresh() end, desc = "Refresh (Avante)" },
-        {
-          "<leader>aP",
-          function()
-            -- https://github.com/yetone/avante.nvim/blob/962dd0a759d9cba7214dbc954780c5ada5799449/lua/avante/init.lua#L47
-            vim.ui.select(require("avante.config").providers, { prompt = "Select Avante Provider:" }, function(choice)
-              if choice then
-                require("avante.api").switch_provider(choice)
-              end
-            end)
-          end,
-          desc = "Switch Provider (Avante)",
-        },
+        { "<leader>aP", switch_provider, desc = "Switch Provider (Avante)" },
         { "<leader>av", "", desc = "+avante", mode = { "n", "v" } },
         { "<leader>avg", ask(prompt.grammar_correction),         desc = "Grammar Correction (Ask)",        mode = { "n", "v" } },
         { "<leader>avG", edit_submit(prompt.grammar_correction), desc = "Grammar Correction (Edit)",       mode = "v" },
@@ -152,9 +148,8 @@ return {
         -- auto_suggestions = true, -- experimental
         auto_apply_diff_after_generation = true,
       },
-      -- TODO: https://github.com/yetone/avante.nvim/issues/1089
-      provider = "copilot", -- only recommend using claude
-      -- auto_suggestions_provider = "deepseek", -- high-frequency, can be expensive if enabled
+      provider = "copilot-claude", -- only recommend using claude
+      auto_suggestions_provider = "deepseek", -- high-frequency, can be expensive if enabled
       -- copilot = { model = "claude-3.5-sonnet" },
       -- https://github.com/yetone/avante.nvim/wiki/Custom-providers
       vendors = {
