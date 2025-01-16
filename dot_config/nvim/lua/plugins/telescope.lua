@@ -100,8 +100,15 @@ return {
       { "<leader>sp", pick_search_lazy_specs, desc = "Search Lazy Plugin Spec" },
       unpack(keys),
     },
+    ---@module "snacks"
+    ---@type snacks.Config
     opts = {
       picker = {
+        previewers = {
+          git = {
+            native = true,
+          },
+        },
         win = {
           input = {
             keys = {

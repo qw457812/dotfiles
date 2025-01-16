@@ -275,25 +275,25 @@ return {
     "rachartier/tiny-glimmer.nvim",
     event = "TextYankPost",
     opts = function()
-      local function get_opts()
-        local from_color = Snacks.util.color("CurSearch", "bg")
-        local to_color = Snacks.util.color("Visual", "bg")
-        return {
-          transparency_color = vim.g.user_transparent_background and "#000000" or nil,
-          animations = {
-            fade = {
-              from_color = from_color,
-              to_color = to_color,
-            },
+      -- TODO: https://github.com/rachartier/tiny-glimmer.nvim/issues/5
+      local from_color = Snacks.util.color("CurSearch", "bg")
+      local to_color = Snacks.util.color("Visual", "bg")
+      return {
+        overwrite = {
+          auto_map = false,
+          -- TODO: kevinhwang91/nvim-hlslens integration
+          search = { enabled = false },
+          -- TODO: gbprod/yanky.nvim integration
+          paste = { enabled = false },
+        },
+        transparency_color = vim.g.user_transparent_background and "#000000" or nil,
+        animations = {
+          fade = {
+            from_color = from_color,
+            to_color = to_color,
           },
-        }
-      end
-      vim.api.nvim_create_autocmd("ColorScheme", {
-        callback = function()
-          require("tiny-glimmer").setup(get_opts())
-        end,
-      })
-      return get_opts()
+        },
+      }
     end,
     init = function()
       vim.api.nvim_create_autocmd("User", {
