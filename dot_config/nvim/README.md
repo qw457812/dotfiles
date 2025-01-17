@@ -146,6 +146,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
     - [Kaiser-Yang](https://github.com/Kaiser-Yang/dotfiles/tree/main/.config/nvim), the author of [blink-cmp-dictionary](https://github.com/Kaiser-Yang/blink-cmp-dictionary).
       - [rime_ls.lua](https://github.com/Kaiser-Yang/dotfiles/blob/bdda941b06cce5c7505bc725f09dd3fa17763730/.config/nvim/lua/plugins/rime_ls.lua)
       - [blink_cmp.lua](https://github.com/Kaiser-Yang/dotfiles/blob/main/.config/nvim/lua/plugins/blink_cmp.lua)
+    - [ ] [MACOS_nvim_config](https://github.com/pxwg/MACOS_nvim_config) and [LM-nvim](https://github.com/pxwg/LM-nvim) of pxwg, find from this [issue](https://github.com/Saghen/blink.cmp/issues/936).
   - [im-select.nvim](https://github.com/keaising/im-select.nvim)
 - [ ] LazyVim with Chinese comment:
   - [EasonMo](https://github.com/EasonMo/myLazyVim)
@@ -200,6 +201,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] Try [grapple.nvim](https://github.com/cbochs/grapple.nvim).
 - [ ] Try [neominimap.nvim](https://github.com/Isrothy/neominimap.nvim).
 - [ ] Try [chrisgrieser/nvim-scissors](https://github.com/chrisgrieser/nvim-scissors).
+- [ ] Try [chrisgrieser/nvim-lsp-endhints](https://github.com/chrisgrieser/nvim-lsp-endhints), not working with `nvim-jdtls`.
 - [ ] Check this [Telescope.lua](https://github.com/xzbdmw/nvimlazy/blob/e4c7da89a726a5b048574e014b5ea2b1aeda67f9/lua/plugins/Telescope.lua).
 - [ ] Replace `vim.endswith` and `vim.startswith` with `string.match` since I found [this commit of oil.nvim](https://github.com/stevearc/oil.nvim/commit/4de3025).
 - [ ] Try [nvim-focus/focus.nvim](https://github.com/nvim-focus/focus.nvim).

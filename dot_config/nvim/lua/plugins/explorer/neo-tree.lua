@@ -381,7 +381,8 @@ return {
         },
         commands = {
           unfocus_window = function(state)
-            vim.cmd.wincmd(state.current_position == "left" and "l" or "p")
+            -- vim.cmd.wincmd(state.current_position == "left" and "l" or "p") -- bad for :vsplit
+            vim.cmd.wincmd("p")
           end,
           close_or_unfocus = function(state)
             state.commands[vim.g.user_neotree_auto_close and "close_window" or "unfocus_window"](state)
