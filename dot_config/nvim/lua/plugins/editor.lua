@@ -84,8 +84,8 @@ return {
     config = function(_, opts)
       require("rip-substitute").setup(opts)
 
-      local opts_keymaps_abort = vim.tbl_get(opts, "keymaps", "abort") or "q"
-      if opts_keymaps_abort:lower() ~= "<esc>" then
+      local abort_key = vim.keycode(vim.tbl_get(opts, "keymaps", "abort") or "q")
+      if abort_key ~= vim.keycode("<esc>") then
         vim.api.nvim_create_autocmd("FileType", {
           pattern = "rip-substitute",
           callback = function(event)
@@ -93,7 +93,7 @@ return {
               U.keymap.clear_ui_esc({
                 close = function()
                   -- simulate `q` keypress to abort
-                  vim.api.nvim_feedkeys(vim.keycode(opts_keymaps_abort), "m", false)
+                  vim.api.nvim_feedkeys(abort_key, "m", false)
                 end,
                 esc = false,
               })

@@ -143,7 +143,7 @@ function M.toggle(client)
     end
     vim.g.rime_enabled = res
     toggle_keymaps(res)
-    -- see: https://github.com/Saghen/blink.cmp/blob/c32eca4f2fbd3d01a0628007797a3121ba9b8673/lua/blink/cmp/completion/accept/init.lua#L33
+    -- HACK: see: https://github.com/Saghen/blink.cmp/blob/c32eca4f2fbd3d01a0628007797a3121ba9b8673/lua/blink/cmp/completion/accept/init.lua#L33
     require("blink.cmp.config").completion.accept.create_undo_point = not res
   end)
 end

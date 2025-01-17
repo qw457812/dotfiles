@@ -1,7 +1,9 @@
 local close_key = vim.g.user_close_key
-local is_bs = close_key:lower() == "<bs>"
 local exit_key = vim.g.user_exit_key
 local term_close_key = vim.g.user_term_close_key
+if not (close_key and exit_key and term_close_key) then
+  return {}
+end
 
 -- do not use `clear = true` at the top-level, it will be triggered by lazy.nvim on `Config Change Detected. Reloading...`
 local augroup = vim.api.nvim_create_augroup("close_with_" .. close_key, { clear = false })
@@ -63,7 +65,7 @@ return {
       { term_close_key, mode = "t", "<cmd>bd!<cr>", desc = "Close terminal" }, -- <cmd>close<cr>
     },
     opts = function()
-      if is_bs then
+      if vim.keycode(close_key) == vim.keycode("<bs>") then
         if not package.loaded["mini.pairs"] then
           vim.keymap.set("c", "<bs>", function()
             if vim.fn.getcmdline() ~= "" then
@@ -342,7 +344,7 @@ return {
       })
 
       opts.mappings = opts.mappings or {}
-      if not opts.mappings.reset or opts.mappings.reset:lower() == close_key:lower() then
+      if not opts.mappings.reset or vim.keycode(opts.mappings.reset) == vim.keycode(close_key) then
         opts.mappings.reset = ""
       end
     end,

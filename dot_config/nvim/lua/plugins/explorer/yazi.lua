@@ -4,7 +4,7 @@ return {
   {
     "mikavilpas/yazi.nvim",
     keys = {
-      { "<leader><cr>", "<cmd>Yazi<cr>", desc = "Yazi (Buffer Dir)" },
+      { "<leader><cr>", mode = { "n", "v" }, "<cmd>Yazi<cr>", desc = "Yazi (Buffer Dir)" },
     },
     init = function(plugin)
       local opts = LazyVim.opts("yazi.nvim")

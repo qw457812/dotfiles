@@ -385,6 +385,7 @@ map gy <Action>(GotoTypeDeclaration)
 map gs <Action>(GotoSuperMethod)
 
 " TODO:
+" https://github.com/sei40kr/idea-LazyVim
 " https://github.com/q843705423/ideavimrc/blob/master/.ideavimrc
 " https://gist.github.com/SakuraWald/fa80eb949412e1a8c806512ad5f8a847
 " https://github.com/ruohola/dotfiles/blob/master/vim/.ideavimrc
