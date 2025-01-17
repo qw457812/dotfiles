@@ -1,9 +1,11 @@
-local close_key = vim.g.user_close_key
-local exit_key = vim.g.user_exit_key
-local term_close_key = vim.g.user_term_close_key
+-- use `keytrans` to prevent duplicate key warnings from snacks picker
+local close_key = vim.g.user_close_key and vim.fn.keytrans(vim.keycode(vim.g.user_close_key))
+local exit_key, term_close_key = vim.g.user_exit_key, vim.g.user_term_close_key
 if not (close_key and exit_key and term_close_key) then
   return {}
 end
+
+-- TODO: find a key to close window(/buffer or exit)
 
 -- do not use `clear = true` at the top-level, it will be triggered by lazy.nvim on `Config Change Detected. Reloading...`
 local augroup = vim.api.nvim_create_augroup("close_with_" .. close_key, { clear = false })
@@ -63,6 +65,7 @@ return {
       { close_key, mode = "x", "<esc>", desc = "Stop Visual Mode" },
       { exit_key, "<cmd>qa<cr>", desc = "Quit All" },
       { term_close_key, mode = "t", "<cmd>bd!<cr>", desc = "Close terminal" }, -- <cmd>close<cr>
+      { term_close_key, close_key, desc = "Close buffer/window or Exit", remap = true },
     },
     opts = function()
       if vim.keycode(close_key) == vim.keycode("<bs>") then
@@ -128,6 +131,7 @@ return {
         pattern = {
           "Avante",
           "AvanteInput",
+          "AvanteSelectedFiles",
         },
         callback = function(event)
           vim.keymap.set("n", close_key, "<cmd>close<cr>", {
@@ -211,7 +215,7 @@ return {
         win = {
           keys = {
             [close_key] = "hide",
-            -- -- use the same `clear_ui_or_close` name to ensure overwriting
+            -- -- use the same `clear_ui_or_close` key to ensure overwriting
             -- clear_ui_or_close = {
             --   "<esc>",
             --   function(self)

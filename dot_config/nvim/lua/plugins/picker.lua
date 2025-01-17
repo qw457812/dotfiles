@@ -116,6 +116,11 @@ return {
         win = {
           input = {
             keys = {
+              -- use the same `["<Esc>"]` key to ensure overwriting
+              ["<Esc>"] = { "<Esc>", U.keymap.clear_ui_esc, desc = "Clear UI or Close" },
+              ["/"] = false, -- highlights text in the preview
+              ["<leader><space>"] = "toggle_focus",
+              ["<leader><tab>"] = "cycle_win", -- toggle focus between input and preview
               ["<Up>"] = "history_back",
               ["<Down>"] = "history_forward",
               i_up = { "<Up>", "list_up", mode = "i", expr = true },
@@ -124,12 +129,35 @@ return {
           },
           list = {
             keys = {
-              ["<Esc>"] = "toggle_focus",
+              -- ["<Esc>"] = "toggle_focus",
+              ["<Esc>"] = {
+                "<Esc>",
+                function(self)
+                  if not U.keymap.clear_ui_esc({ close = false }) then
+                    self:execute("toggle_focus")
+                  end
+                end,
+                desc = "Clear UI or Toggle Focus",
+              },
+              ["/"] = false,
+              ["<leader><space>"] = "toggle_focus",
+              -- TODO: <leader><tab> to focus preview
             },
           },
           preview = {
             keys = {
-              ["<Esc>"] = "toggle_focus",
+              -- ["<Esc>"] = "toggle_focus",
+              ["<Esc>"] = {
+                "<Esc>",
+                function(self)
+                  if not U.keymap.clear_ui_esc({ close = false }) then
+                    self:execute("toggle_focus")
+                  end
+                end,
+                desc = "Clear UI or Toggle Focus",
+              },
+              ["<leader><tab>"] = "toggle_focus",
+              -- TODO: <leader><space> to focus list
             },
           },
         },

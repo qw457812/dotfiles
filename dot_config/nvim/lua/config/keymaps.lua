@@ -87,6 +87,11 @@ map("n", "<Right>", "<C-i>", { desc = "Go Forward" })
 
 -- stylua: ignore
 map("n", "<esc>", U.keymap.clear_ui_esc, { desc = "Escape and Clear hlsearch or notifications or Close floating window(s)" })
+map({ "i", "s" }, "<esc>", function()
+  -- vim.cmd("noh")
+  LazyVim.cmp.actions.snippet_stop()
+  return "<esc>"
+end, { expr = true, desc = "Escape and Stop Snippet" })
 
 -- helix-style mappings | https://github.com/boltlessengineer/nvim/blob/607ee0c9412be67ba127a4d50ee722be578b5d9f/lua/config/keymaps.lua#L103
 map({ "n", "x", "o" }, "mm", "%", { desc = "Goto matching bracket", remap = true }) -- remap to matchit
@@ -129,7 +134,7 @@ safe_map("n", "<leader>ba", "<cmd>bufdo bd<cr>", { desc = "Delete All Buffers" }
 map("n", "<leader>bA", function() Snacks.bufdelete.all() end, { desc = "Delete All Buffers" })
 
 -- windows
-map("n", "vv", "<C-w>v", { desc = "Split Window Right", remap = true })
+map("n", "vv", "<C-w>v<cmd>e #<cr>", { desc = "Split Window Right", remap = true })
 -- map("n", "vs", "<C-w>s", { desc = "Split Window Below", remap = true }) -- conflict with flash.nvim
 -- map("n", "vd", "<C-w>c", { desc = "Delete Window", remap = true })
 -- map("n", "vo", "<C-w>o", { desc = "Delete Other Windows", remap = true })
