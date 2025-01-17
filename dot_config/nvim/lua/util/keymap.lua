@@ -54,6 +54,42 @@ function M.del(modes, lhs, opts)
   end
 end
 
+--- copied from: https://github.com/chipsenkbeil/org-roam.nvim/blob/6458d3cc3389716a9c69a81ab78658454738427a/spec/utils.lua#L386
+--- Checks if a buffer-local mapping exists. Returns true/false and an array
+--- of `maparg()` dictionaries describing the mappings.
+---@param buf integer
+---@param mode string
+---@param lhs string|string[]
+---@return boolean exists, table|nil mapping
+function M.buffer_local_mapping_exists(buf, mode, lhs)
+  ---@cast lhs string[]
+  lhs = type(lhs) == "string" and { lhs } or lhs
+  local lhs_keycode = vim.tbl_map(vim.keycode, lhs)
+  for _, map in ipairs(vim.api.nvim_buf_get_keymap(buf, mode)) do
+    if map.lhs and vim.list_contains(lhs, map.lhs) or vim.list_contains(lhs_keycode, vim.keycode(map.lhs)) then
+      return true, map
+    end
+  end
+  return false
+end
+
+--- Checks if a global mapping exists. Returns true/false and an array
+--- of `maparg()` dictionaries describing the mappings.
+---@param mode string
+---@param lhs string|string[]
+---@return boolean exists, table|nil mapping
+function M.global_mapping_exists(mode, lhs)
+  ---@cast lhs string[]
+  lhs = type(lhs) == "string" and { lhs } or lhs
+  local lhs_keycode = vim.tbl_map(vim.keycode, lhs)
+  for _, map in ipairs(vim.api.nvim_get_keymap(mode)) do
+    if map.lhs and vim.list_contains(lhs, map.lhs) or vim.list_contains(lhs_keycode, vim.keycode(map.lhs)) then
+      return true, map
+    end
+  end
+  return false
+end
+
 -- copied from: https://github.com/echasnovski/mini.nvim/blob/ad46fda7862153107124f95d4ea0e510eafc1dd8/lua/mini/basics.lua#L558
 local cache_empty_line
 ---Add empty lines before and after cursor line supporting dot-repeat

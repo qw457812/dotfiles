@@ -66,13 +66,11 @@ vim.api.nvim_create_autocmd("FileType", {
     local buf = event.buf
     vim.defer_fn(function()
       -- note that /etc/hosts (vim.bo.readonly == true) can be changed with warning "Changing a readonly file", but files where vim.bo.modifiable == false can't
-      if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].modifiable == false then
-        for _, map in ipairs(vim.api.nvim_buf_get_keymap(buf, "n")) do
-          -- `dd` mapped for quickfix
-          if vim.list_contains({ "u", "d", "dd" }, map.lhs) then
-            return
-          end
-        end
+      if
+        vim.api.nvim_buf_is_valid(buf)
+        and vim.bo[buf].modifiable == false
+        and not U.keymap.buffer_local_mapping_exists(buf, "n", { "u", "d", "dd" }) -- `dd` mapped for quickfix
+      then
         vim.keymap.set("n", "u", "<C-u>", { buffer = buf, silent = true, desc = "Scroll Up" })
         -- add `nowait = true` since we have a `dd` mapping defined in keymaps.lua
         vim.keymap.set("n", "d", "<C-d>", { buffer = buf, silent = true, desc = "Scroll Down", nowait = true })
@@ -165,10 +163,8 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     -- Mark the buffer as checked
     vim.g.q_close_windows[args.buf] = true
     -- Check to see if `q` is already mapped to the buffer (avoids overwriting)
-    for _, map in ipairs(vim.api.nvim_buf_get_keymap(args.buf, "n")) do
-      if map.lhs == "q" then
-        return
-      end
+    if U.keymap.buffer_local_mapping_exists(args.buf, "n", "q") then
+      return
     end
     -- If there is no q mapping already and the buftype is a non-real file, create one
     if vim.tbl_contains({ "help", "nofile", "quickfix" }, vim.bo[args.buf].buftype) then

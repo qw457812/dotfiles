@@ -119,13 +119,7 @@ return {
             end
             -- check to see if `<cr>` is already mapped to the buffer (avoids overwriting)
             -- for yarospace/lua-console.nvim
-            for _, map in ipairs(vim.api.nvim_buf_get_keymap(0, "n")) do
-              ---@diagnostic disable-next-line: undefined-field
-              if map.lhs and map.lhs:lower() == "<cr>" then
-                return false
-              end
-            end
-            return true
+            return not U.keymap.buffer_local_mapping_exists(0, "n","<cr>")
           end,
         },
         { "<leader>cr", function() require("live-rename").rename() end, desc = "Rename (live-rename.nvim)", has = "rename" },

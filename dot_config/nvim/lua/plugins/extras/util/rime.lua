@@ -1,4 +1,3 @@
--- https://github.com/wlh320/rime-ls
 if not U.rime_ls.cond() then
   return {}
 end
