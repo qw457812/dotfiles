@@ -112,6 +112,26 @@ return {
         end,
       })
 
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "neo-tree-popup",
+        callback = function(event)
+          vim.defer_fn(function()
+            vim.keymap.set("n", "<Esc>", function()
+              U.keymap.clear_ui_esc({
+                close = function()
+                  vim.api.nvim_win_close(0, true)
+                end,
+              })
+            end, { buffer = event.buf })
+            vim.keymap.set("n", "h", "h", { buffer = event.buf })
+            vim.keymap.set("n", "j", "j", { buffer = event.buf })
+            vim.keymap.set("n", "k", "k", { buffer = event.buf })
+            vim.keymap.set("n", "l", "l", { buffer = event.buf })
+            vim.keymap.set("n", "/", "/", { buffer = event.buf })
+          end, 100)
+        end,
+      })
+
       -- https://github.com/nvim-neo-tree/neo-tree.nvim/wiki/Recipes#find-with-telescope
       local function get_telescope_opts(state)
         local node = state.tree:get_node()
@@ -381,8 +401,13 @@ return {
         },
         commands = {
           unfocus_window = function(state)
-            -- vim.cmd.wincmd(state.current_position == "left" and "l" or "p") -- bad for :vsplit
+            local win = vim.api.nvim_get_current_win()
             vim.cmd.wincmd("p")
+            if win == vim.api.nvim_get_current_win() then
+              if state.current_position == "left" then
+                vim.cmd.wincmd("l")
+              end
+            end
           end,
           close_or_unfocus = function(state)
             state.commands[vim.g.user_neotree_auto_close and "close_window" or "unfocus_window"](state)
