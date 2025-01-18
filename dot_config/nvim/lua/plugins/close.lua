@@ -1,6 +1,4 @@
--- use `keytrans` to prevent duplicate key warnings from snacks picker
-local close_key = vim.g.user_close_key and vim.fn.keytrans(vim.keycode(vim.g.user_close_key))
-local exit_key, term_close_key = vim.g.user_exit_key, vim.g.user_term_close_key
+local close_key, exit_key, term_close_key = vim.g.user_close_key, vim.g.user_exit_key, vim.g.user_term_close_key
 if not (close_key and exit_key and term_close_key) then
   return {}
 end
@@ -68,7 +66,7 @@ return {
       { term_close_key, close_key, desc = "Close buffer/window or Exit", remap = true },
     },
     opts = function()
-      if vim.keycode(close_key) == vim.keycode("<bs>") then
+      if close_key:upper() == "<BS>" then
         if not package.loaded["mini.pairs"] then
           vim.keymap.set("c", "<bs>", function()
             if vim.fn.getcmdline() ~= "" then
@@ -348,7 +346,7 @@ return {
       })
 
       opts.mappings = opts.mappings or {}
-      if not opts.mappings.reset or vim.keycode(opts.mappings.reset) == vim.keycode(close_key) then
+      if not opts.mappings.reset or Snacks.util.normkey(opts.mappings.reset) == Snacks.util.normkey(close_key) then
         opts.mappings.reset = ""
       end
     end,

@@ -14,6 +14,14 @@ return {
     "folke/snacks.nvim",
     keys = {
       {
+        "<leader>n",
+        function()
+          Snacks.notifier.hide()
+          Snacks.notifier.show_history()
+        end,
+        desc = "Notification History",
+      },
+      {
         "<leader>ft",
         function()
           Snacks.scratch({ icon = " ", name = "Todo", ft = "markdown", file = "~/TODO.md" })

@@ -62,9 +62,9 @@ end
 function M.buffer_local_mapping_exists(buf, mode, lhs)
   ---@cast lhs string[]
   lhs = type(lhs) == "string" and { lhs } or lhs
-  local lhs_keycode = vim.tbl_map(vim.keycode, lhs)
+  local lhs_norm = vim.tbl_map(Snacks.util.normkey, lhs)
   for _, map in ipairs(vim.api.nvim_buf_get_keymap(buf, mode)) do
-    if map.lhs and vim.list_contains(lhs_keycode, vim.keycode(map.lhs)) then
+    if map.lhs and vim.list_contains(lhs_norm, Snacks.util.normkey(map.lhs)) then
       return true, map
     end
   end
@@ -77,9 +77,9 @@ end
 function M.global_mapping_exists(mode, lhs)
   ---@cast lhs string[]
   lhs = type(lhs) == "string" and { lhs } or lhs
-  local lhs_keycode = vim.tbl_map(vim.keycode, lhs)
+  local lhs_norm = vim.tbl_map(Snacks.util.normkey, lhs)
   for _, map in ipairs(vim.api.nvim_get_keymap(mode)) do
-    if map.lhs and vim.list_contains(lhs_keycode, vim.keycode(map.lhs)) then
+    if map.lhs and vim.list_contains(lhs_norm, Snacks.util.normkey(map.lhs)) then
       return true, map
     end
   end

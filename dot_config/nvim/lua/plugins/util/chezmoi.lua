@@ -9,7 +9,6 @@ local function chezmoi_list_files(opts)
   opts = opts or {}
 
   -- exclude directories and externals
-  -- see: ~/.local/share/nvim/lazy/chezmoi.nvim/lua/telescope/_extensions/find_files.lua
   local args = { "--include", "files" .. (opts.include_symlinks and ",symlinks" or ""), "--exclude", "externals" }
   if opts.path_style_absolute then
     vim.list_extend(args, { "--path-style", "absolute" })
@@ -77,7 +76,7 @@ local function pick_chezmoi()
       confirm = function(picker, item)
         picker:close()
         if item then
-          require("chezmoi.commands").edit({ targets = assert(Snacks.picker.util.path(item)) })
+          require("chezmoi.commands").edit({ targets = item.file })
         end
       end,
     })
@@ -105,7 +104,6 @@ local function pick_config()
     local config = require("chezmoi").config
 
     -- https://github.com/nvim-telescope/telescope.nvim/wiki/Configuration-Recipes#performing-an-arbitrary-command-by-extending-existing-find_files-picker
-    -- see: ~/.local/share/nvim/lazy/chezmoi.nvim/lua/telescope/_extensions/chezmoi.lua
     require("telescope.builtin").find_files({
       prompt_title = "Config Files",
       cwd = config_dir,
@@ -165,8 +163,9 @@ local function pick_config()
       confirm = function(picker, item)
         picker:close()
         if item then
-          if vim.tbl_contains(managed_config_files, item.cwd .. "/" .. item.file) then
-            require("chezmoi.commands").edit({ targets = assert(Snacks.picker.util.path(item)) })
+          local file = assert(Snacks.picker.util.path(item))
+          if vim.tbl_contains(managed_config_files, file) then
+            require("chezmoi.commands").edit({ targets = file })
           else
             Snacks.picker.actions.edit(picker)
           end
@@ -188,15 +187,13 @@ return {
       { "<leader>fc", pick_config, desc = "Find Config File" },
     },
     init = function()
-      -- https://github.com/xvzc/chezmoi.nvim/pull/20
       vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
         group = vim.api.nvim_create_augroup("chezmoi_apply", { clear = true }),
         pattern = U.path.CHEZMOI .. "/*",
         desc = "chezmoi apply for source-path",
         callback = function(event)
-          local buf = event.buf
           vim.schedule(function()
-            require("chezmoi.commands.__edit").watch(buf)
+            require("chezmoi.commands.__edit").watch(event.buf)
           end)
         end,
       })
@@ -279,27 +276,6 @@ return {
   },
 
   {
-    "nvimdev/dashboard-nvim",
-    optional = true,
-    opts = function(_, opts)
-      -- replace lazyvim config action
-      local config_idx
-      for i, button in ipairs(opts.config.center) do
-        if button.key == "c" then
-          config_idx = i
-          button.action = pick_config
-          break
-        end
-      end
-
-      -- add chezmoi button
-      local chezmoi = { action = pick_chezmoi, desc = " Chezmoi", icon = "󰠦 ", key = ".", key_format = "  %s" }
-      chezmoi.desc = chezmoi.desc .. string.rep(" ", 43 - #chezmoi.desc)
-      table.insert(opts.config.center, (config_idx or #opts.config.center) + 1, chezmoi)
-    end,
-  },
-
-  {
     "folke/snacks.nvim",
     optional = true,
     opts = function(_, opts)
@@ -353,4 +329,25 @@ return {
       return opts
     end,
   },
+
+  -- {
+  --   "nvimdev/dashboard-nvim",
+  --   optional = true,
+  --   opts = function(_, opts)
+  --     -- replace lazyvim config action
+  --     local config_idx
+  --     for i, button in ipairs(opts.config.center) do
+  --       if button.key == "c" then
+  --         config_idx = i
+  --         button.action = pick_config
+  --         break
+  --       end
+  --     end
+  --
+  --     -- add chezmoi button
+  --     local chezmoi = { action = pick_chezmoi, desc = " Chezmoi", icon = "󰠦 ", key = ".", key_format = "  %s" }
+  --     chezmoi.desc = chezmoi.desc .. string.rep(" ", 43 - #chezmoi.desc)
+  --     table.insert(opts.config.center, (config_idx or #opts.config.center) + 1, chezmoi)
+  --   end,
+  -- },
 }
