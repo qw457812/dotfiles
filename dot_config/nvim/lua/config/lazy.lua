@@ -57,14 +57,14 @@ require("lazy").setup({
       ["<leader><space>"] = {
         function(plugin)
           vim.cmd.close()
-          LazyVim.pick("files", { cwd = plugin.dir, prompt_title = plugin.name })()
+          LazyVim.pick("files", { cwd = plugin.dir })()
         end,
         desc = "Find Plugin File",
       },
       ["<leader>/"] = {
         function(plugin)
           vim.cmd.close()
-          LazyVim.pick("live_grep", { cwd = plugin.dir, prompt_title = plugin.name })()
+          LazyVim.pick("live_grep", { cwd = plugin.dir })()
         end,
         desc = "Search Plugin Code",
       },
@@ -95,7 +95,7 @@ require("lazy").setup({
   },
   diff = { cmd = "terminal_git" },
   checker = {
-    enabled = vim.env.TERMUX_VERSION == nil, -- check for plugin updates periodically
+    enabled = true, -- check for plugin updates periodically
     notify = false, -- notify on update
     -- concurrency = vim.env.TERMUX_VERSION and 1 or nil,
   }, -- automatically check for plugin updates
