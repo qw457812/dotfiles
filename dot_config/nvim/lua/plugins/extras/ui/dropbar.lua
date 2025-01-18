@@ -258,7 +258,13 @@ return {
 
       -- disable winbar for unnamed or non-listed buffers
       local function cond_winbar()
-        return not is_unnamed_buffer() and (vim.bo.buflisted or vim.bo.filetype == "oil")
+        return not is_unnamed_buffer()
+          and (
+            vim.bo.buflisted
+            -- https://github.com/stevearc/oil.nvim/blob/09fa1d22f5edf0730824d2b222d726c8c81bbdc9/lua/oil/init.lua#L572
+            -- alternative to vim.w.oil_preview: vim.wo.previewwindow
+            or vim.bo.filetype == "oil" and not vim.w.oil_preview and vim.api.nvim_win_get_config(0).relative == ""
+          )
       end
 
       opts.options.disabled_filetypes.winbar = vim.deepcopy(opts.options.disabled_filetypes.statusline)

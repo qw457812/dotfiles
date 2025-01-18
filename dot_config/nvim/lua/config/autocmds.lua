@@ -75,7 +75,7 @@ vim.api.nvim_create_autocmd("FileType", {
         -- add `nowait = true` since we have a `dd` mapping defined in keymaps.lua
         vim.keymap.set("n", "d", "<C-d>", { buffer = buf, silent = true, desc = "Scroll Down", nowait = true })
       end
-    end, 100)
+    end, 500)
   end,
 })
 

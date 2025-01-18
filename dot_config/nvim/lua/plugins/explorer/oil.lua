@@ -1,5 +1,3 @@
-local preview_enabled = true
-
 -- Declare a global function to retrieve the current directory
 -- https://github.com/stevearc/oil.nvim/blob/master/doc/recipes.md#show-cwd-in-the-winbar
 function _G.get_oil_winbar()
@@ -13,6 +11,38 @@ function _G.get_oil_winbar()
   end
 end
 
+local function preview_visible()
+  return require("oil.util").get_preview_win() ~= nil
+end
+
+local preview_enabled ---@type boolean?
+
+local function toggle_preview()
+  preview_enabled = not preview_visible()
+  require("oil.actions").preview.callback()
+end
+
+local function auto_preview()
+  -- respect <C-p> toggle
+  if preview_enabled ~= false and require("oil").get_cursor_entry() then
+    require("oil").open_preview()
+  end
+end
+
+local function open(...)
+  local argv = { ... }
+  return function()
+    require("oil").open(unpack(argv))
+
+    -- HACK: sometimes `OilEnter` not triggered
+    vim.defer_fn(function()
+      if not preview_visible() then
+        auto_preview()
+      end
+    end, 100)
+  end
+end
+
 return {
   -- https://github.com/stevearc/dotfiles/blob/eeb506f9afd32cd8cd9f2366110c76efaae5786c/.config/nvim/lua/plugins/oil.lua
   -- https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/editor/oil.lua
@@ -21,13 +51,16 @@ return {
   {
     "stevearc/oil.nvim",
     dependencies = { "echasnovski/mini.icons", optional = true },
+    cmd = "Oil",
+    ---@module 'oil'
+    ---@type oil.SetupOpts
     opts = {
       -- whether to use for editing directories (e.g. `vim .` or `:e src/`)
       default_file_explorer = vim.g.user_hijack_netrw == "oil.nvim", -- default value: true
       delete_to_trash = true,
-      -- skip_confirm_for_simple_edits = true,
+      skip_confirm_for_simple_edits = true,
       -- prompt_save_on_select_new_entry = false,
-      -- watch_for_changes = true,
+      watch_for_changes = true,
       win_options = {
         winbar = not U.has_user_extra("ui.dropbar") and "%!v:lua.get_oil_winbar()" or nil,
       },
@@ -50,10 +83,7 @@ return {
         ["<leader>ws"] = { "actions.select", opts = { horizontal = true } },
         ["<C-p>"] = {
           desc = "Open the entry under the cursor in a preview window, or close the preview window if already open",
-          callback = function()
-            require("oil.actions").preview.callback()
-            preview_enabled = not preview_enabled
-          end,
+          callback = toggle_preview,
         },
         ["<c-space>"] = {
           desc = "Terminal (Oil Dir)",
@@ -71,6 +101,26 @@ return {
             else
               oil.set_columns({ "icon" })
             end
+          end,
+        },
+        ["<leader><space>"] = {
+          desc = "Find Files (Oil Dir)",
+          function()
+            local dir = require("oil").get_current_dir()
+            if vim.api.nvim_win_get_config(0).relative ~= "" then
+              vim.api.nvim_win_close(0, true)
+            end
+            Snacks.picker.files({ cwd = dir, hidden = true, ignored = true, follow = true })
+          end,
+        },
+        ["<leader>/"] = {
+          desc = "Grep (Oil Dir)",
+          function()
+            local dir = require("oil").get_current_dir()
+            if vim.api.nvim_win_get_config(0).relative ~= "" then
+              vim.api.nvim_win_close(0, true)
+            end
+            LazyVim.pick("live_grep", { cwd = dir })()
           end,
         },
         ["<leader>sr"] = {
@@ -91,24 +141,20 @@ return {
       },
     },
     keys = function()
-      -- stylua: ignore
       local keys = {
         --[[add custom keys here]]
-        -- { "<leader><cr>", function() require("oil").toggle_float() end, desc = "Toggle Float Oil" },
       }
 
       local opts = LazyVim.opts("oil.nvim")
-      if opts.default_file_explorer == nil or opts.default_file_explorer == true then
-        -- stylua: ignore
+      if opts.default_file_explorer == false then
         vim.list_extend(keys, {
-          { "-", function() require("oil").open() end, desc = "Open parent directory (Oil)" },
-          { "_", function() require("oil").open(vim.fn.getcwd()) end, desc = "Open cwd (Oil)" },
+          -- stylua: ignore
+          { "_", function() require("oil").toggle_float() end, desc = "Toggle Float Oil" },
         })
       else
-        -- stylua: ignore
         vim.list_extend(keys, {
-          -- { "_", function() require("oil").open() end, desc = "Open parent directory (Oil)" },
-          { "_", function() require("oil").toggle_float() end, desc = "Toggle Float Oil" },
+          { "-", open(), desc = "Open parent directory (Oil)" },
+          { "_", open(vim.fn.getcwd()), desc = "Open cwd (Oil)" },
         })
       end
       return keys
@@ -136,6 +182,18 @@ return {
     end,
     config = function(_, opts)
       require("oil").setup(opts)
+
+      -- auto open preview
+      -- https://github.com/stevearc/oil.nvim/issues/87#issuecomment-2179322405
+      -- https://github.com/stevearc/oil.nvim/issues/357#issuecomment-2071054399
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "OilEnter",
+        callback = vim.schedule_wrap(function(args)
+          if args.data.buf == vim.api.nvim_get_current_buf() then
+            auto_preview()
+          end
+        end),
+      })
 
       -- https://github.com/alexpasmantier/pymple.nvim/blob/eff337420a294e68180c5ee87f03994c0b176dd4/lua/pymple/hooks.lua#L35
       -- https://github.com/stevearc/oil.nvim/issues/310#issuecomment-2019214285
@@ -166,31 +224,14 @@ return {
           end
         end,
       })
-
-      -- auto open preview
-      -- https://github.com/stevearc/oil.nvim/issues/87#issuecomment-2179322405
-      -- https://github.com/stevearc/oil.nvim/issues/357#issuecomment-2071054399
-      vim.api.nvim_create_autocmd("User", {
-        pattern = "OilEnter",
-        callback = vim.schedule_wrap(function(args)
-          -- respect <C-p> toggle
-          if not preview_enabled then
-            return
-          end
-          local oil = require("oil")
-          if vim.api.nvim_get_current_buf() == args.data.buf and oil.get_cursor_entry() then
-            oil.open_preview()
-          end
-        end),
-      })
     end,
   },
 
-  -- {
-  --   "nvim-lualine/lualine.nvim",
-  --   optional = true,
-  --   opts = function(_, opts)
-  --     table.insert(opts.extensions, "oil")
-  --   end,
-  -- },
+  {
+    "nvim-lualine/lualine.nvim",
+    optional = true,
+    opts = function(_, opts)
+      table.insert(opts.extensions, "oil")
+    end,
+  },
 }
