@@ -86,30 +86,30 @@ return {
         return false
       end
 
+      ---@param win? integer
+      local function close_if_too_narrow(win)
+        win = win or 0
+        local min_width = 100
+        if vim.o.columns < min_width or vim.api.nvim_win_get_width(win) < min_width then
+          require("neo-tree.command").execute({ action = "close" })
+        end
+      end
+
       vim.api.nvim_create_autocmd("WinResized", {
         group = vim.api.nvim_create_augroup("resize_neotree_auto_close", {}),
-        callback = function(event)
-          if vim.g.user_neotree_auto_close then
-            return
-          end
+        callback = U.debounce(50, function(event)
           local win = event.match + 0
-          if vim.api.nvim_win_get_config(win).relative ~= "" then
+          if
+            not is_visible() -- call is_visible() first to fix vim.g.user_neotree_visible
+            or vim.g.user_neotree_auto_close
+            or not vim.api.nvim_win_is_valid(win)
+            or vim.api.nvim_win_get_config(win).relative ~= ""
+            or vim.bo[vim.fn.winbufnr(win)].filetype == "neo-tree"
+          then
             return
           end
-          local buf = vim.fn.winbufnr(win)
-          if vim.bo[buf].filetype == "neo-tree" then
-            return
-          end
-
-          local min_width = 100
-          -- call is_visible() first to fix vim.g.user_neotree_visible
-          if is_visible() and (vim.o.columns < min_width or vim.api.nvim_win_get_width(win) < min_width) then
-            local utils = require("neo-tree.utils")
-            utils.debounce("resize-neotree-auto-close", function()
-              require("neo-tree.command").execute({ action = "close" })
-            end, 100, utils.debounce_strategy.CALL_LAST_ONLY)
-          end
-        end,
+          close_if_too_narrow(win)
+        end),
       })
 
       vim.api.nvim_create_autocmd("FileType", {
@@ -412,7 +412,12 @@ return {
             end
           end,
           close_or_unfocus = function(state)
-            state.commands[vim.g.user_neotree_auto_close and "close_window" or "unfocus_window"](state)
+            if vim.g.user_neotree_auto_close then
+              state.commands["close_window"](state)
+            else
+              state.commands["unfocus_window"](state)
+              close_if_too_narrow()
+            end
           end,
           cancel_or_close_or_unfocus = function(state)
             local preview = require("neo-tree.sources.common.preview")
@@ -679,7 +684,7 @@ return {
           -- alternative: https://github.com/nvim-neo-tree/neo-tree.nvim/issues/344
           {
             event = "file_opened",
-            handler = function(file_path)
+            handler = function()
               if vim.g.user_neotree_auto_close then
                 require("neo-tree.command").execute({ action = "close" })
               end
@@ -691,6 +696,22 @@ return {
             handler = function(args)
               -- map <esc> to enter normal mode of NuiInput (by default closes prompt)
               vim.keymap.set("i", "<esc>", vim.cmd.stopinsert, { noremap = true, buffer = args.bufnr })
+            end,
+          },
+          {
+            event = "neo_tree_window_after_open",
+            handler = function(args)
+              if args.position == "left" then
+                vim.cmd("wincmd =")
+              end
+            end,
+          },
+          {
+            event = "neo_tree_window_after_close",
+            handler = function(args)
+              if args.position == "left" then
+                vim.cmd("wincmd =")
+              end
             end,
           },
           {
@@ -710,30 +731,30 @@ return {
           {
             event = "vim_buffer_enter",
             ---@param args { afile: string }
-            handler = function(args)
+            handler = U.debounce(100, function(args)
               local utils = require("neo-tree.utils")
-              local follow = require("neo-tree.sources.filesystem").follow
-
-              if not utils.is_real_file(args.afile) then
+              if
+                not is_visible() -- call is_visible() first to fix vim.g.user_neotree_visible
+                or vim.g.user_neotree_auto_close
+                or not utils.is_real_file(args.afile)
+                or vim.fn.bufnr(args.afile) ~= vim.api.nvim_get_current_buf()
+              then
+                last_root = nil
                 return
               end
 
-              -- call is_visible() first to fix vim.g.user_neotree_visible
-              if is_visible() and not vim.g.user_neotree_auto_close then
-                utils.debounce("neo-tree-follow-root", function()
-                  local root = LazyVim.root({ normalize = true, buf = vim.fn.bufnr(args.afile) })
-                  if last_root ~= root and utils.is_subpath(root, vim.uv.fs_realpath(args.afile) or args.afile) then
-                    -- root changed, navigate to the new root first
-                    require("neo-tree.command").execute({ action = "show", dir = root })
-                  end
+              local root = LazyVim.root({ normalize = true })
+              if root ~= last_root then
+                if utils.is_subpath(root, vim.uv.fs_realpath(args.afile) or args.afile) then
+                  -- root changed, navigate to the new root first
+                  require("neo-tree.command").execute({ action = "show", dir = root })
                   last_root = root
-                  follow()
-                end, 100, utils.debounce_strategy.CALL_LAST_ONLY)
-              else
-                last_root = nil
-                follow() -- original follow_current_file behavior
+                else
+                  last_root = nil
+                end
               end
-            end,
+              require("neo-tree.sources.filesystem").follow()
+            end),
           },
         },
       })

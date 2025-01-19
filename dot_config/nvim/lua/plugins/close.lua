@@ -66,7 +66,7 @@ return {
       { term_close_key, close_key, desc = "Close buffer/window or Exit", remap = true },
     },
     opts = function()
-      if close_key:upper() == "<BS>" then
+      if close_key:lower() == "<bs>" then
         if not package.loaded["mini.pairs"] then
           vim.keymap.set("c", "<bs>", function()
             if vim.fn.getcmdline() ~= "" then
