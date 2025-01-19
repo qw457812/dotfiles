@@ -21,15 +21,15 @@ require("lazy").setup({
     -- import/override with your plugins
     { import = "plugins" },
     -- import plugins.lang, plugins.util, etc.
-    unpack((function(dir)
+    unpack((function()
       local specs = {}
-      for name, type in vim.fs.dir(vim.fn.stdpath("config") .. "/lua/" .. dir) do
-        if type == "directory" and name ~= "extras" then
-          table.insert(specs, { import = dir .. "." .. name })
+      for name, type in vim.fs.dir(vim.fn.stdpath("config") .. "/lua/plugins") do
+        if type == "directory" and name ~= "specs" and name ~= "extras" then
+          table.insert(specs, { import = "plugins." .. name })
         end
       end
       return specs
-    end)("plugins")),
+    end)()),
   },
   defaults = {
     -- By default, only LazyVim plugins will be lazy-loaded. Your custom plugins will load during startup.
