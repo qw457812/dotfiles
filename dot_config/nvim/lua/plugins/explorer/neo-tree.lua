@@ -125,31 +125,6 @@ return {
         end,
       })
 
-      -- https://github.com/nvim-neo-tree/neo-tree.nvim/wiki/Recipes#find-with-telescope
-      local function get_telescope_opts(state)
-        local node = state.tree:get_node()
-        local path = node.type == "file" and node:get_parent_id() or node:get_id()
-        return {
-          cwd = path,
-          search_dirs = { path },
-          attach_mappings = function(prompt_bufnr, map)
-            local actions = require("telescope.actions")
-            actions.select_default:replace(function()
-              actions.close(prompt_bufnr)
-              local action_state = require("telescope.actions.state")
-              local selection = action_state.get_selected_entry()
-              local filename = selection.filename
-              if filename == nil then
-                filename = selection[1]
-              end
-              -- any way to open the file without triggering auto-close event of neo-tree?
-              require("neo-tree.sources.filesystem").navigate(state, state.path, filename)
-            end)
-            return true
-          end,
-        }
-      end
-
       -- Fold {{{
 
       -- https://github.com/nvim-neo-tree/neo-tree.nvim/wiki/Recipes#emulating-vims-fold-commands
@@ -498,10 +473,16 @@ return {
               end
             end)
           end,
+          -- alternative: https://github.com/nvim-neo-tree/neo-tree.nvim/wiki/Recipes#find-with-telescope
           find_in_dir = function(state)
             local node = state.tree:get_node()
             local path = node.type == "file" and node:get_parent_id() or node:get_id()
-            LazyVim.pick("files", { cwd = path })()
+            Snacks.picker.files({ cwd = path, hidden = true, ignored = true, follow = true })
+          end,
+          grep_in_dir = function(state)
+            local node = state.tree:get_node()
+            local path = node.type == "file" and node:get_parent_id() or node:get_id()
+            LazyVim.pick("live_grep", { cwd = path })()
           end,
           grug_far = function(state)
             local node = state.tree:get_node()
@@ -539,7 +520,16 @@ return {
               desc = "Copy Path to Clipboard",
             },
             ["<leader>fY"] = "copy_selector",
-            ["F"] = "find_in_dir",
+            ["<leader><space>"] = "find_in_dir",
+            ["<leader>/"] = "grep_in_dir",
+            ["<c-space>"] = {
+              function(state)
+                local node = state.tree:get_node()
+                local path = node.type == "file" and node:get_parent_id() or node:get_id()
+                Snacks.terminal(nil, { cwd = path })
+              end,
+              desc = "Terminal (NeoTree Dir)",
+            },
             -- ["d"] = "none",
             -- ["dd"] = "delete",
             -- ["y"] = "none",
@@ -569,14 +559,7 @@ return {
           -- possible values: "open_default" (default), "open_current", "disabled"
           hijack_netrw_behavior = hijack_netrw and "open_default" or "disabled",
           follow_current_file = { enabled = false }, -- see vim_buffer_enter event below
-          commands = {
-            telescope_find = function(state)
-              require("telescope.builtin").find_files(get_telescope_opts(state))
-            end,
-            telescope_grep = function(state)
-              require("telescope.builtin").live_grep(get_telescope_opts(state))
-            end,
-          },
+          -- commands = {},
           window = {
             -- TODO: unify the keybindings of yazi and neo-tree.nvim
             mappings = {
@@ -640,8 +623,6 @@ return {
               ["]g"] = "none",
               ["[h"] = "prev_git_modified",
               ["]h"] = "next_git_modified",
-              ["<leader><space>"] = "telescope_find",
-              ["<leader>/"] = "telescope_grep",
               ["z"] = "none",
               -- https://github.com/folke/trouble.nvim/blob/254145ffd528b98eb20be894338e2d5c93fa02c2/README.md?plain=1#L184
               ["zo"] = { neotree_zo, desc = "fold_open" },
