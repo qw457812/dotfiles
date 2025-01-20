@@ -97,9 +97,12 @@ return {
     keys = function(_, keys)
       if LazyVim.pick.picker.name == "snacks" then
         vim.list_extend(keys, {
-          -- stylua: ignore
+          -- stylua: ignore start
           { "<leader>s.", function() Snacks.picker.resume() end, desc = "Resume" },
           { "<leader>sp", pick_search_lazy_specs, desc = "Search Lazy Plugin Spec" },
+          { "<leader>ff", function() Snacks.picker.smart() end, desc = "Smart" },
+          { "<leader>fp", function() Snacks.picker.projects() end, desc = "Recent Projects" },
+          -- stylua: ignore end
           unpack(mappings),
         })
       end
