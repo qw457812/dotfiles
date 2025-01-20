@@ -111,6 +111,7 @@ return {
   {
     "nvim-orgmode/orgmode",
     ft = { "org", "orgagenda" },
+    cmd = "Org",
     keys = {
       { "gA", '<Cmd>lua require("orgmode").action("agenda.prompt")<CR>', desc = "org agenda" },
       { "gC", '<Cmd>lua require("orgmode").action("capture.prompt")<CR>', desc = "org capture" },

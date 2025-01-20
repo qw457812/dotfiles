@@ -411,6 +411,8 @@ return {
   {
     "folke/snacks.nvim",
     optional = true,
+    ---@module "snacks"
+    ---@param opts snacks.Config
     opts = function(_, opts)
       local keys = opts.dashboard.preset.keys
       local lazy_idx
@@ -419,11 +421,11 @@ return {
           key.action = ":ene" -- do not startinsert
         elseif key.key == "p" then
           key.key = "o" -- o for projects, p for paste
+          key.action = LazyVim.pick.want() == "snacks" and ":lua Snacks.picker.projects()" or key.action
         elseif key.key == "c" and vim.g.user_is_termux then
           key.action = ":lua LazyVim.pick.config_files()()"
         elseif key.key == "s" and vim.g.user_auto_root then
-          key.section = false
-          key.action = ":lua require('persistence').load({ last = true })"
+          key.section, key.action = false, ":lua require('persistence').load({ last = true })"
         elseif key.key == "q" then
           key.hidden = true
         elseif key.key == "l" then
@@ -467,7 +469,16 @@ return {
         { section = "header" },
         -- { icon = " ", title = "Keymaps", section = "keys", indent = 2, padding = 1 },
         { section = "keys", padding = 1 },
-        { icon = " ", title = "Recent Files", section = "recent_files", indent = 2, padding = 1 },
+        {
+          icon = " ",
+          title = "Recent Files",
+          section = "recent_files",
+          indent = 2,
+          padding = 1,
+          filter = function(file)
+            return not file:match("COMMIT_EDITMSG$")
+          end,
+        },
         { icon = " ", title = "Projects", section = "projects", indent = 2, padding = 1 },
         { icon = " ", section = "startup" },
       }
