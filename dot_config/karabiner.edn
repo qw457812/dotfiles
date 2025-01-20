@@ -1881,6 +1881,11 @@
            ;; resize window, remap Rectangle.app
            [:!T#Pm :!TSOspacebar] ; maximize
 
+           ;; right_control -> rime: toggle ascii punct | ~/Library/Rime/default.custom.yaml
+           ;; TODO `:##` or `:#P`
+           ;; [:##right_control :right_control :Emacs {:alone [:right_control :!Tbackslash]}] ; emacs-rime
+           [:#Pright_control :right_control :Emacs {:alone :!Tbackslash}] ; emacs-rime
+           [:#Pright_control :right_control :Neovide {:alone [:right_control :!Tperiod]}] ; rime-ls
            ;; TODO launch-mode
            ;; TODO h, j, k, l -> yabai
            ;; TODO a, s, d, g, v
@@ -1949,12 +1954,6 @@
 
            [:##equal_sign :f11]
            [:##hyphen :f12]
-
-           ;; right_control -> rime: toggle ascii punct | ~/Library/Rime/default.custom.yaml
-           ;; TODO `:##` or `:#P`
-           ;; [:##right_control :right_control :Emacs {:alone [:right_control :!Tbackslash]}] ; emacs-rime
-           [:#Pright_control :right_control :Emacs {:alone :!Tbackslash}] ; emacs-rime
-           [:#Pright_control :left_control :Neovide {:alone :!Tperiod}] ; rime-ls
            ]}
 
   {:des   "For Not HHKB\n- caps_lock to esc when pressed alone, to control as modifier\n- left_control to cmd+v when pressed alone, to hyper as modifier"
