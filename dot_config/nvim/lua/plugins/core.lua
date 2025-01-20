@@ -4,10 +4,7 @@ return {
     "LazyVim/LazyVim",
     version = false,
     opts = {
-      news = {
-        lazyvim = true,
-        neovim = true,
-      },
+      news = { lazyvim = true, neovim = true },
     },
   },
   {
@@ -46,6 +43,9 @@ return {
         icons = { error = "󰅚", warn = "", info = "󰋽", debug = "󰃤", trace = "󰓗" },
         -- style = "fancy",
         -- top_down = false,
+        filter = function(notif)
+          return notif.msg ~= "" -- notif.title == "chezmoi.nvim"
+        end,
       },
       scroll = {
         animate = {
