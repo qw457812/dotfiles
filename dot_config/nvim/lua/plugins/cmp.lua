@@ -157,6 +157,16 @@ return {
             },
           },
         },
+        sources = {
+          providers = {
+            path = {
+              ---@type blink.cmp.PathOpts
+              opts = {
+                show_hidden_files_by_default = true,
+              },
+            },
+          },
+        },
       }
 
       return U.extend_tbl(opts, o)
@@ -181,20 +191,18 @@ return {
             min_keyword_length = 3, -- same as `prefix_min_len`
             max_items = 3,
             score_offset = -5,
-            enabled = function()
-              -- CPU usage
-              return LazyVim.root({ normalize = true }) ~= U.path.HOME
-            end,
             ---@module "blink-ripgrep"
             ---@type blink-ripgrep.Options
             opts = {
               prefix_min_len = 3, -- same as `min_keyword_length`
+              ignore_paths = { vim.uv.os_homedir() }, -- CPU usage
               -- search_casing = "--smart-case",
 
               -- or use custom `get_command` function
               project_root_marker = function(_, path)
                 return path == LazyVim.root({ normalize = true })
               end,
+              project_root_fallback = false,
             },
           },
         },
@@ -241,38 +249,38 @@ return {
     },
   },
 
-  vim.fn.executable("gh") == 1
-      and {
-        "saghen/blink.cmp",
-        optional = true,
-        dependencies = {
-          "Kaiser-Yang/blink-cmp-git",
-        },
-        ---@type blink.cmp.Config
-        opts = {
-          sources = {
-            default = { "git" },
-            providers = {
-              git = {
-                module = "blink-cmp-git",
-                name = "Git",
-                score_offset = 100,
-                enabled = function()
-                  return Snacks.git.get_root() ~= nil
-                end,
-                should_show_items = function()
-                  return vim.list_contains({
-                    "gitcommit",
-                    -- "markdown",
-                  }, vim.bo.filetype)
-                end,
-                ---@module 'blink-cmp-git'
-                ---@type blink-cmp-git.Options
-                opts = {},
-              },
-            },
-          },
-        },
-      }
-    or nil,
+  -- vim.fn.executable("gh") == 1
+  --     and {
+  --       "saghen/blink.cmp",
+  --       optional = true,
+  --       dependencies = {
+  --         "Kaiser-Yang/blink-cmp-git",
+  --       },
+  --       ---@type blink.cmp.Config
+  --       opts = {
+  --         sources = {
+  --           default = { "git" },
+  --           providers = {
+  --             git = {
+  --               module = "blink-cmp-git",
+  --               name = "Git",
+  --               score_offset = 100,
+  --               enabled = function()
+  --                 return Snacks.git.get_root() ~= nil
+  --               end,
+  --               should_show_items = function()
+  --                 return vim.list_contains({
+  --                   "gitcommit",
+  --                   -- "markdown",
+  --                 }, vim.bo.filetype)
+  --               end,
+  --               ---@module 'blink-cmp-git'
+  --               ---@type blink-cmp-git.Options
+  --               opts = {},
+  --             },
+  --           },
+  --         },
+  --       },
+  --     }
+  --   or nil,
 }

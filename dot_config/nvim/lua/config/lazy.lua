@@ -57,14 +57,14 @@ require("lazy").setup({
       ["<leader><space>"] = {
         function(plugin)
           vim.cmd.close()
-          LazyVim.pick("files", { cwd = plugin.dir })()
+          LazyVim.pick("files", { cwd = plugin.dir, title = plugin.name })() -- `title` for snacks picker
         end,
         desc = "Find Plugin File",
       },
       ["<leader>/"] = {
         function(plugin)
           vim.cmd.close()
-          LazyVim.pick("live_grep", { cwd = plugin.dir })()
+          LazyVim.pick("live_grep", { cwd = plugin.dir, title = plugin.name })()
         end,
         desc = "Search Plugin Code",
       },
