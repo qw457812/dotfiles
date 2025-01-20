@@ -2,72 +2,85 @@ if vim.fn.executable("zoxide") == 0 then
   return {}
 end
 
-local pick = function()
-  local mini_icons = require("mini.icons")
-  local utils = require("telescope.utils")
-  local get_status = require("telescope.state").get_status
-  local truncate = require("plenary.strings").truncate
-  local strdisplaywidth = require("plenary.strings").strdisplaywidth
-
-  require("telescope").extensions.zoxide.list({
-    -- layout_config = {
-    --   horizontal = {
-    --     preview_width = function(_, max_columns, _)
-    --       if max_columns < 150 then
-    --         return math.floor(max_columns * 0.4)
-    --       else
-    --         return math.floor(max_columns * 0.5)
-    --       end
-    --     end,
-    --   },
-    -- },
-    -- previewer = require("telescope.previewers").vim_buffer_cat.new({}),
-    previewer = U.telescope.previewers.tree(),
-    path_display = function(opts, path) -- fork only
-      local transformed_path = vim.trim(U.path.shorten(path))
-
-      -- dir icon
-      local icon, icon_hl = mini_icons.get("directory", path)
-      icon = icon .. " "
-
-      -- truncate
-      local calc_result_length = function(truncate_len)
-        local status = get_status(vim.api.nvim_get_current_buf())
-        local len = vim.api.nvim_win_get_width(status.layout.results.winid) - status.picker.selection_caret:len() - 2
-        return type(truncate_len) == "number" and len - truncate_len or len
-      end
-      local truncate_len = nil
-      if opts.__length == nil then
-        opts.__length = calc_result_length(truncate_len)
-      end
-      if opts.__prefix == nil then
-        opts.__prefix = 0
-      end
-      transformed_path = icon
-        .. truncate(transformed_path, opts.__length - opts.__prefix - strdisplaywidth(icon), nil, -1)
-
-      -- dim parent directories
-      local tail = utils.path_tail(path)
-      local path_style = {
-        { { 0, #icon }, icon_hl },
-        { { #icon, #transformed_path - #tail }, "Comment" },
-      }
-      return transformed_path, path_style
-    end,
-  })
-end
-
--- https://github.com/Matt-FTW/dotfiles/blob/dd62c1c26ef480bb58a13de971e8418ec7181010/.config/nvim/lua/plugins/extras/editor/telescope/zoxide.lua
--- https://github.com/jvgrootveld/telescope-zoxide/issues/4#issuecomment-877110133
 return {
-  -- https://github.com/craftzdog/dotfiles-public/blob/master/.config/nvim/lua/plugins/editor.lua
+  {
+    "folke/snacks.nvim",
+    optional = true,
+    keys = function(_, keys)
+      if LazyVim.pick.want() == "snacks" then
+        -- stylua: ignore
+        table.insert(keys, { "<leader>fz", function() Snacks.picker.zoxide() end, desc = "Zoxide" })
+      end
+    end,
+  },
+
+  -- https://github.com/Matt-FTW/dotfiles/blob/dd62c1c26ef480bb58a13de971e8418ec7181010/.config/nvim/lua/plugins/extras/editor/telescope/zoxide.lua
   {
     "nvim-telescope/telescope.nvim",
     optional = true,
     -- dependencies = { "jvgrootveld/telescope-zoxide" },
     dependencies = { "qw457812/telescope-zoxide" }, -- fork without breaking changes
     keys = {
-      { "<leader>fz", pick, desc = "Zoxide" },
+      {
+        "<leader>fz",
+        function()
+          local mini_icons = require("mini.icons")
+          local utils = require("telescope.utils")
+          local get_status = require("telescope.state").get_status
+          local truncate = require("plenary.strings").truncate
+          local strdisplaywidth = require("plenary.strings").strdisplaywidth
+
+          require("telescope").extensions.zoxide.list({
+            -- layout_config = {
+            --   horizontal = {
+            --     preview_width = function(_, max_columns, _)
+            --       if max_columns < 150 then
+            --         return math.floor(max_columns * 0.4)
+            --       else
+            --         return math.floor(max_columns * 0.5)
+            --       end
+            --     end,
+            --   },
+            -- },
+            -- previewer = require("telescope.previewers").vim_buffer_cat.new({}),
+            previewer = U.telescope.previewers.tree(),
+            path_display = function(opts, path) -- fork only
+              local transformed_path = vim.trim(U.path.shorten(path))
+
+              -- dir icon
+              local icon, icon_hl = mini_icons.get("directory", path)
+              icon = icon .. " "
+
+              -- truncate
+              local calc_result_length = function(truncate_len)
+                local status = get_status(vim.api.nvim_get_current_buf())
+                local len = vim.api.nvim_win_get_width(status.layout.results.winid)
+                  - status.picker.selection_caret:len()
+                  - 2
+                return type(truncate_len) == "number" and len - truncate_len or len
+              end
+              local truncate_len = nil
+              if opts.__length == nil then
+                opts.__length = calc_result_length(truncate_len)
+              end
+              if opts.__prefix == nil then
+                opts.__prefix = 0
+              end
+              transformed_path = icon
+                .. truncate(transformed_path, opts.__length - opts.__prefix - strdisplaywidth(icon), nil, -1)
+
+              -- dim parent directories
+              local tail = utils.path_tail(path)
+              local path_style = {
+                { { 0, #icon }, icon_hl },
+                { { #icon, #transformed_path - #tail }, "Comment" },
+              }
+              return transformed_path, path_style
+            end,
+          })
+        end,
+        desc = "Zoxide",
+      },
     },
     opts = function(_, opts)
       opts.extensions = vim.tbl_deep_extend("force", opts.extensions or {}, {
@@ -103,24 +116,9 @@ return {
   {
     "folke/snacks.nvim",
     optional = true,
-    keys = function(_, keys)
-      if LazyVim.pick.want() == "snacks" then
-        -- stylua: ignore
-        table.insert(keys, { "<leader>fz", function() Snacks.picker.zoxide() end, desc = "Zoxide" })
-      end
-    end,
-  },
-
-  {
-    "folke/snacks.nvim",
-    optional = true,
     opts = function(_, opts)
-      if not LazyVim.has("telescope-zoxide") then
-        return
-      end
-
       table.insert(opts.dashboard.preset.keys, 10, {
-        action = ":Telescope zoxide list",
+        action = LazyVim.has("telescope-zoxide") and ":Telescope zoxide list" or ":lua Snacks.picker.zoxide()",
         desc = "Zoxide",
         icon = " ",
         key = "z",

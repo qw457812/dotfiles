@@ -536,10 +536,6 @@ return {
             -- ["yy"] = "copy_to_clipboard",
             ["<leader>sr"] = "grug_far",
           },
-          fuzzy_finder_mappings = { -- define keymaps for filter popup window in fuzzy_finder_mode
-            ["<C-j>"] = "move_cursor_down",
-            ["<C-k>"] = "move_cursor_up",
-          },
         },
         filesystem = {
           filtered_items = {
@@ -639,6 +635,8 @@ return {
               ["zR"] = { neotree_zR, desc = "fold_open_all" },
             },
             fuzzy_finder_mappings = {
+              ["<C-j>"] = "move_cursor_down",
+              ["<C-k>"] = "move_cursor_up",
               ["<esc>"] = function()
                 vim.cmd.stopinsert()
               end,

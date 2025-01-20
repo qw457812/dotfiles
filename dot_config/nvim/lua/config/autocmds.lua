@@ -71,6 +71,8 @@ vim.api.nvim_create_autocmd("FileType", {
         and vim.bo[buf].modifiable == false
         and not U.keymap.buffer_local_mapping_exists(buf, "n", { "u", "d", "dd" }) -- `dd` mapped for quickfix
       then
+        vim.b[buf].minianimate_disable = true
+        vim.b[buf].snacks_animate = false
         vim.keymap.set("n", "u", "<C-u>", { buffer = buf, silent = true, desc = "Scroll Up" })
         -- add `nowait = true` since we have a `dd` mapping defined in keymaps.lua
         vim.keymap.set("n", "d", "<C-d>", { buffer = buf, silent = true, desc = "Scroll Down", nowait = true })

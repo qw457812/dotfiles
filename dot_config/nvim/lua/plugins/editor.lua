@@ -559,9 +559,9 @@ return {
     config = function(_, opts)
       require("layers").setup(opts)
 
-      ---@diagnostic disable-next-line: undefined-global
-      PAGER_MODE = Layers.mode.new(" Pager Mode ")
+      _G.PAGER_MODE = Layers.mode.new(" Pager Mode ")
       PAGER_MODE:auto_show_help()
+      local esc_timer
       PAGER_MODE:keymaps({
         n = {
           { "u", "<C-u>", { desc = "Scroll Up" } },
@@ -569,16 +569,22 @@ return {
           {
             "<esc>",
             function()
-              if not U.keymap.clear_ui_esc() then
+              esc_timer = esc_timer or vim.uv.new_timer()
+              if esc_timer:is_active() then
+                esc_timer:stop()
                 PAGER_MODE:deactivate()
+              else
+                esc_timer:start(200, 0, function() end)
+                U.keymap.clear_ui_esc()
               end
             end,
-            { desc = "Exit" },
+            { desc = "Double to Exit" },
           },
         },
       })
       local orig_dd_keymap ---@type table<string,any>
       local orig_minianimate_disable ---@type boolean?
+      local orig_snacks_animate ---@type boolean?
       PAGER_MODE:add_hook(function(active)
         if active then
           -- set filetype
@@ -591,14 +597,17 @@ return {
           if not vim.tbl_isempty(orig_dd_keymap) then
             vim.keymap.del("n", "dd")
           end
-          -- disable mini.animate
+          -- disable animate
           orig_minianimate_disable = vim.g.minianimate_disable
           vim.g.minianimate_disable = true
+          orig_snacks_animate = vim.g.snacks_animate
+          vim.g.snacks_animate = false
         else
           if not vim.tbl_isempty(orig_dd_keymap) then
             vim.fn.mapset(orig_dd_keymap)
           end
           vim.g.minianimate_disable = orig_minianimate_disable
+          vim.g.snacks_animate = orig_snacks_animate
         end
       end)
     end,
