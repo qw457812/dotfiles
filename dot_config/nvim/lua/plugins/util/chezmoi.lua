@@ -167,7 +167,7 @@ local function pick_config()
           if vim.tbl_contains(managed_config_files, file) then
             require("chezmoi.commands").edit({ targets = file })
           else
-            Snacks.picker.actions.edit(picker)
+            vim.cmd.edit(file)
           end
         end
       end,
@@ -208,7 +208,7 @@ return {
             group = vim.api.nvim_create_augroup("chezmoi_add", { clear = true }),
             pattern = managed_files,
             desc = "chezmoi add for target-path",
-            callback = U.debounce(500, function(event)
+            callback = U.debounce_wrap(500, function(event)
               local res = vim.system({ "chezmoi", "add", event.file }, { text = true }):wait()
               if res.code == 0 then
                 LazyVim.info("Successfully added", { title = "Chezmoi" })

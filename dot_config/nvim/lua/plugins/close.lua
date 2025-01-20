@@ -268,6 +268,24 @@ return {
       },
     },
   },
+  {
+    "nvim-neo-tree/neo-tree.nvim",
+    optional = true,
+    opts = function()
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "neo-tree-popup",
+        callback = function(event)
+          vim.defer_fn(function()
+            vim.keymap.set("n", close_key, function()
+              -- HACK: trigger `BufLeave` of nui to close
+              -- https://github.com/nvim-neo-tree/neo-tree.nvim/blob/d175a0ce24bcb022ec1c93635841c043d764418e/lua/neo-tree/sources/filesystem/lib/filter.lua#L203
+              vim.cmd("wincmd p")
+            end, { buffer = event.buf, desc = "Close (NeoTree Popup)" })
+          end, 100)
+        end,
+      })
+    end,
+  },
 
   {
     "nvim-telescope/telescope.nvim",

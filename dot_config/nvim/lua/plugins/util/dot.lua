@@ -27,7 +27,7 @@ return {
         vim.api.nvim_create_autocmd("BufWritePost", {
           pattern = "karabiner.edn",
           -- wait till "chezmoi apply" done
-          callback = U.debounce(500, function()
+          callback = U.debounce_wrap(500, function()
             local res = vim.system({ "goku" }, { text = true }):wait()
             if res.code == 0 then
               LazyVim.info("karabiner.json updated", { title = "Goku" })

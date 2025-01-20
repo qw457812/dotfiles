@@ -172,7 +172,8 @@ end
 --- copied from: https://github.com/folke/noice.nvim/blob/eaed6cc9c06aa2013b5255349e4f26a6b17ab70f/lua/noice/util/init.lua#L104
 ---@param ms integer
 ---@param fn function
-function M.debounce(ms, fn)
+---@return function
+function M.debounce_wrap(ms, fn)
   local timer = (vim.uv or vim.loop).new_timer()
   return function(...)
     local argv = vim.F.pack_len(...)
@@ -181,6 +182,21 @@ function M.debounce(ms, fn)
       vim.schedule_wrap(fn)(vim.F.unpack_len(argv))
     end)
   end
+end
+
+local timers = {}
+
+--- alternative: https://github.com/CopilotC-Nvim/CopilotChat.nvim/blob/2ebe591cff06018e265263e71e1dbc4c5aa8281e/lua/CopilotChat/utils.lua#L157
+---@param id string
+---@param ms integer
+---@param fn function
+function M.debounce(id, ms, fn)
+  timers[id] = timers[id] or vim.uv.new_timer()
+  local timer = timers[id]
+  timer:start(ms, 0, function()
+    timer:stop()
+    vim.schedule(fn)
+  end)
 end
 
 return M

@@ -155,7 +155,6 @@ return {
       return vim.tbl_deep_extend("force", opts, {
         bar = {
           enable = false, -- using lualine.nvim
-          -- update_debounce = 20, -- performance for holding down `j`: 17 ~ 20, commented out in favor of oil
           sources = function(buf, _)
             if vim.bo[buf].ft == "markdown" then
               return vim.g.user_trouble_lualine_old and { source_path, source_markdown } or { source_path }
