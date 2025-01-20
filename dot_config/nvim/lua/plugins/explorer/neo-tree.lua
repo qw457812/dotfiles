@@ -87,49 +87,40 @@ return {
       end
 
       ---@param win? integer
-      local function close_if_too_narrow(win)
-        win = win or 0
+      local function too_narrow(win)
         local min_width = 100
-        if vim.o.columns < min_width or vim.api.nvim_win_get_width(win) < min_width then
-          require("neo-tree.command").execute({ action = "close" })
-        end
+        return vim.o.columns < min_width or vim.api.nvim_win_get_width(win or 0) < min_width
       end
 
       vim.api.nvim_create_autocmd("WinResized", {
         group = vim.api.nvim_create_augroup("resize_neotree_auto_close", {}),
-        callback = U.debounce(50, function(event)
+        callback = function(event)
           local win = event.match + 0
           if
-            not is_visible() -- call is_visible() first to fix vim.g.user_neotree_visible
-            or vim.g.user_neotree_auto_close
-            or not vim.api.nvim_win_is_valid(win)
+            vim.g.user_neotree_auto_close
             or vim.api.nvim_win_get_config(win).relative ~= ""
+            or not too_narrow(win)
             or vim.bo[vim.fn.winbufnr(win)].filetype == "neo-tree"
           then
             return
           end
-          close_if_too_narrow(win)
-        end),
+
+          U.debounce("resize-neotree-auto-close", 50, function()
+            if is_visible() then
+              require("neo-tree.command").execute({ action = "close" })
+            end
+          end)
+        end,
       })
 
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "neo-tree-popup",
         callback = function(event)
           vim.defer_fn(function()
-            vim.keymap.set("n", "<Esc>", function()
-              U.keymap.clear_ui_esc({
-                close = function()
-                  -- HACK: trigger `BufLeave` of nui to close
-                  -- https://github.com/nvim-neo-tree/neo-tree.nvim/blob/d175a0ce24bcb022ec1c93635841c043d764418e/lua/neo-tree/sources/filesystem/lib/filter.lua#L203
-                  vim.cmd("wincmd p")
-                end,
-              })
-            end, { buffer = event.buf })
-            vim.keymap.set("n", "h", "h", { buffer = event.buf })
-            vim.keymap.set("n", "j", "j", { buffer = event.buf })
-            vim.keymap.set("n", "k", "k", { buffer = event.buf })
-            vim.keymap.set("n", "l", "l", { buffer = event.buf })
-            vim.keymap.set("n", "/", "/", { buffer = event.buf })
+            for _, key in ipairs({ "h", "l", "/", "y" }) do
+              vim.keymap.set("n", key, key, { buffer = event.buf })
+            end
+            vim.keymap.set("n", "<Esc>", U.keymap.clear_ui_esc, { buffer = event.buf })
           end, 100)
         end,
       })
@@ -416,7 +407,9 @@ return {
               state.commands["close_window"](state)
             else
               state.commands["unfocus_window"](state)
-              close_if_too_narrow()
+              if too_narrow() then
+                state.commands["close_window"](state)
+              end
             end
           end,
           cancel_or_close_or_unfocus = function(state)
@@ -685,7 +678,7 @@ return {
           {
             event = "file_opened",
             handler = function()
-              if vim.g.user_neotree_auto_close then
+              if vim.g.user_neotree_auto_close or too_narrow() then
                 require("neo-tree.command").execute({ action = "close" })
               end
             end,
@@ -727,34 +720,36 @@ return {
             end,
           },
           -- enhance follow_current_file to adapt to root changes
-          -- copied from: https://github.com/nvim-neo-tree/neo-tree.nvim/blob/e6645ecfcba3e064446a6def1c10d788c9873f51/lua/neo-tree/sources/filesystem/init.lua#L378
+          -- see: https://github.com/nvim-neo-tree/neo-tree.nvim/blob/e6645ecfcba3e064446a6def1c10d788c9873f51/lua/neo-tree/sources/filesystem/init.lua#L378
           {
             event = "vim_buffer_enter",
             ---@param args { afile: string }
-            handler = U.debounce(100, function(args)
+            handler = function(args)
               local utils = require("neo-tree.utils")
-              if
-                not is_visible() -- call is_visible() first to fix vim.g.user_neotree_visible
-                or vim.g.user_neotree_auto_close
-                or not utils.is_real_file(args.afile)
-                or vim.fn.bufnr(args.afile) ~= vim.api.nvim_get_current_buf()
-              then
+              if vim.g.user_neotree_auto_close or not utils.is_real_file(args.afile) or utils.is_floating() then
                 last_root = nil
                 return
               end
 
-              local root = LazyVim.root({ normalize = true })
-              if root ~= last_root then
-                if utils.is_subpath(root, vim.uv.fs_realpath(args.afile) or args.afile) then
-                  -- root changed, navigate to the new root first
-                  require("neo-tree.command").execute({ action = "show", dir = root })
-                  last_root = root
-                else
+              U.debounce("neo-tree-follow-root", 100, function()
+                -- call is_visible() first to fix vim.g.user_neotree_visible
+                if not is_visible() or vim.fn.bufnr(args.afile) ~= vim.api.nvim_get_current_buf() then
                   last_root = nil
+                  return
                 end
-              end
-              require("neo-tree.sources.filesystem").follow()
-            end),
+                local root = LazyVim.root({ normalize = true })
+                if root ~= last_root then
+                  if utils.is_subpath(root, vim.uv.fs_realpath(args.afile) or args.afile) then
+                    -- root changed, navigate to the new root first
+                    require("neo-tree.command").execute({ action = "show", dir = root })
+                    last_root = root
+                  else
+                    last_root = nil
+                  end
+                end
+                require("neo-tree.sources.filesystem").follow()
+              end)
+            end,
           },
         },
       })
