@@ -45,6 +45,18 @@ vim.api.nvim_create_autocmd("QuickFixCmdPost", {
   end,
 })
 
+vim.api.nvim_create_autocmd("BufReadPost", {
+  pattern = { "*.env", "*.env.*" },
+  desc = "Disable diagnostics on .env files",
+  group = vim.api.nvim_create_augroup("disable_diagnostics_on_env", {}),
+  callback = function(event)
+    -- https://github.com/LazyVim/LazyVim/blob/1e83b4f843f88678189df81b1c88a400c53abdbc/lua/lazyvim/plugins/extras/util/dot.lua#L44
+    if vim.bo[event.buf].filetype == "sh" then
+      vim.diagnostic.enable(false, { bufnr = event.buf })
+    end
+  end,
+})
+
 -- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/keybindings.lua#L288
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "qf",

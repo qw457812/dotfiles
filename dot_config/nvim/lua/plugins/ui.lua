@@ -425,7 +425,7 @@ return {
         elseif key.key == "c" and vim.g.user_is_termux then
           key.action = ":lua LazyVim.pick.config_files()()"
         elseif key.key == "s" and vim.g.user_auto_root then
-          key.section, key.action = false, ":lua require('persistence').load({ last = true })"
+          key.section, key.action = nil, ":lua require('persistence').load({ last = true })"
         elseif key.key == "q" then
           key.hidden = true
         elseif key.key == "l" then

@@ -1,8 +1,10 @@
+---@diagnostic disable: missing-fields
 return {
   { "folke/lazy.nvim", version = false },
   {
     "LazyVim/LazyVim",
     version = false,
+    ---@type LazyVimOptions
     opts = {
       news = { lazyvim = true, neovim = true },
     },
@@ -34,6 +36,8 @@ return {
           keys = {
             i_c_c = { "<C-c>", { "cmp_close", "cancel" }, mode = "i", expr = true },
             n_cr = { "<cr>", "confirm", mode = "n", expr = true },
+            n_k = { "k", { "hist_up" }, mode = "n" },
+            n_j = { "j", { "hist_down" }, mode = "n" },
           },
         },
       },

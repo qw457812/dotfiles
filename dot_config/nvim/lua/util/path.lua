@@ -37,15 +37,18 @@ M.LAZYVIM = LazyVim.get_plugin_path("LazyVim")
 ---@return string
 function M.home_to_tilde(path)
   -- vim.fn.fnamemodify(path, ":~")
-  return (path:gsub("^" .. vim.pesc(M.HOME), "~"))
+  M._HOME_PATTERN = M._HOME_PATTERN or ("^" .. vim.pesc(M.HOME))
+  return (path:gsub(M._HOME_PATTERN, "~"))
 end
 
+-- need to expand "~/" before calling this
 ---@param path string
 ---@return string
 function M.relative_to_home(path)
   return require("plenary.path"):new(path):make_relative(M.HOME)
 end
 
+-- need to expand "~/" before calling this
 ---@param path string
 ---@return string
 function M.relative_to_root(path)

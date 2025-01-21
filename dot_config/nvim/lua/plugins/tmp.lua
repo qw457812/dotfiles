@@ -3,22 +3,31 @@ local obsidian_vaults = {
   work = U.path.HOME .. "/Documents/vaults/work",
 }
 
--- https://github.com/folke/dot/blob/master/nvim/lua/plugins/tmp.lua
 return {
   {
     "yarospace/lua-console.nvim",
     keys = {
-      { "<leader>[", desc = "Toggle Lua console" },
+      {
+        "<leader>[",
+        function()
+          local foldcolumn = vim.o.foldcolumn
+          require("lua-console").toggle_console()
+          if Lua_console.win then
+            vim.wo[Lua_console.win].foldcolumn = foldcolumn
+          end
+        end,
+        desc = "Toggle Lua console",
+      },
       { "<leader>]", desc = "Attach Lua console to buffer" },
     },
     opts = {
       mappings = {
-        toggle = "<leader>[",
+        toggle = false, -- "<leader>["
         attach = "<leader>]",
         clear = "<localleader>c",
         messages = "<localleader>m",
-        save = "<C-s>",
-        load = "<leader>fr",
+        save = "<localleader>s",
+        load = "<localleader>l",
         help = "g?",
       },
       window = {
