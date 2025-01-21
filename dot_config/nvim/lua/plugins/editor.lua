@@ -584,7 +584,7 @@ return {
       })
       local orig_dd_keymap ---@type table<string,any>
       local orig_minianimate_disable ---@type boolean?
-      local orig_snacks_animate ---@type boolean?
+      -- local orig_snacks_scroll ---@type boolean?
       PAGER_MODE:add_hook(function(active)
         if active then
           -- set filetype
@@ -597,17 +597,17 @@ return {
           if not vim.tbl_isempty(orig_dd_keymap) then
             vim.keymap.del("n", "dd")
           end
-          -- disable animate
+          -- disable scroll animate
           orig_minianimate_disable = vim.g.minianimate_disable
           vim.g.minianimate_disable = true
-          orig_snacks_animate = vim.g.snacks_animate
-          vim.g.snacks_animate = false
+          -- orig_snacks_scroll = vim.g.snacks_scroll
+          -- vim.g.snacks_scroll = false
         else
           if not vim.tbl_isempty(orig_dd_keymap) then
             vim.fn.mapset(orig_dd_keymap)
           end
           vim.g.minianimate_disable = orig_minianimate_disable
-          vim.g.snacks_animate = orig_snacks_animate
+          -- vim.g.snacks_scroll = orig_snacks_scroll
         end
       end)
     end,

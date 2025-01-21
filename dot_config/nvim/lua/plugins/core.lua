@@ -51,6 +51,9 @@ return {
         animate = {
           duration = { step = 10, total = 100 },
         },
+        animate_repeat = {
+          duration = { step = 0, total = 0 }, -- holding down `<C-d>`
+        },
       },
       terminal = {
         win = {
