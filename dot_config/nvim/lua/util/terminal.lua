@@ -25,7 +25,7 @@ function M.colorize()
 
   vim.b[buf].minianimate_disable = true
   vim.b[buf].miniindentscope_disable = true
-  vim.b[buf].snacks_animate = false
+  -- vim.b[buf].snacks_scroll = false
 
   vim.keymap.set("n", "u", "<C-u>", { silent = true, buffer = buf, desc = "Scroll Up" })
   vim.keymap.set("n", "d", "<C-d>", { silent = true, buffer = buf, nowait = true, desc = "Scroll Down" })
