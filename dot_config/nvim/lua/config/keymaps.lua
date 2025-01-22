@@ -162,6 +162,9 @@ map("t", "<c-space>", "<cmd>close<cr>", { desc = "Hide Terminal" })
 -- files
 map("n", "<leader>fs", "<cmd>w<cr><esc>", { desc = "Save File" })
 map("n", "<leader>fS", "<cmd>noautocmd w<cr>", { desc = "Save File Without Formatting" })
+-- adding `redraw` helps with `cmdheight=0` if buffer is not modified
+map("n", "<C-S>", "<Cmd>silent! update | redraw<CR>", { desc = "Save" })
+map({ "i", "x" }, "<C-S>", "<Esc><Cmd>silent! update | redraw<CR>", { desc = "Save and go to Normal mode" })
 map({ "i", "x", "n", "s" }, "<a-s>", "<cmd>noautocmd w<cr><esc>", { desc = "Save File Without Formatting" })
 map({ "i", "x", "n", "s" }, "<D-s>", "<cmd>w<cr><esc>", { desc = "Save File" })
 map("n", "<D-r>", vim.cmd.edit, { desc = "Reload File" })
