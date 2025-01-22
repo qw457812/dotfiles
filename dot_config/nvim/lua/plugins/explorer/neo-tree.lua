@@ -88,8 +88,7 @@ return {
 
       ---@param win? integer
       local function too_narrow(win)
-        local min_width = 100
-        return vim.o.columns < min_width or vim.api.nvim_win_get_width(win or 0) < min_width
+        return vim.o.columns < 120 or vim.api.nvim_win_get_width(win or 0) < 120
       end
 
       vim.api.nvim_create_autocmd("WinResized", {
