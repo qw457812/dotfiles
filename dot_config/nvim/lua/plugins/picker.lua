@@ -110,6 +110,31 @@ return {
     ---@type snacks.Config
     opts = {
       picker = {
+        layout = function()
+          return vim.o.columns >= 120 and "default" or "narrow"
+        end,
+        layouts = {
+          narrow = {
+            layout = {
+              backdrop = false,
+              width = 0.5,
+              min_width = 80,
+              height = 0.8,
+              min_height = 30,
+              border = "none",
+              box = "vertical",
+              { win = "preview", title = "{preview}", height = 0.4, border = "rounded" },
+              {
+                box = "vertical",
+                border = "rounded",
+                title = "{title} {live} {flags}",
+                title_pos = "center",
+                { win = "input", height = 1, border = "bottom" },
+                { win = "list", border = "none" },
+              },
+            },
+          },
+        },
         previewers = {
           git = {
             native = true,
@@ -193,23 +218,31 @@ return {
       end
     end,
   },
+
   {
     "nvim-lualine/lualine.nvim",
     optional = true,
     opts = function(_, opts)
+      if LazyVim.pick.picker.name ~= "snacks" then
+        return
+      end
+
       local snacks_picker = {
         sections = {
-          lualine_a = {
+          lualine_a = not vim.g.user_is_termux and {
             function()
-              return "snacks picker"
+              return "snacks"
             end,
-          },
-          lualine_b = {
-            function()
-              local picker = Snacks.picker.current
-              return picker and picker.list.cursor .. "/" .. picker.input.totals or ""
-            end,
-          },
+          } or nil,
+          lualine_b = not vim.g.user_is_termux
+              and {
+                function()
+                  local picker = Snacks.picker.current
+                  -- return picker and picker.list.cursor .. "/" .. picker.input.totals or ""
+                  return picker and picker.list.cursor .. "/" .. picker.list:count() or ""
+                end,
+              }
+            or nil,
           lualine_y = {
             function()
               local picker = Snacks.picker.current
@@ -221,7 +254,7 @@ return {
           lualine_z = {
             function()
               local picker = Snacks.picker.current
-              return picker and picker.opts.source or ""
+              return picker and picker.opts.source or "custom"
             end,
           },
         },
