@@ -110,9 +110,11 @@ return {
     ---@type snacks.Config
     opts = {
       picker = {
-        layout = function()
-          return vim.o.columns >= 120 and "default" or "narrow"
-        end,
+        layout = {
+          preset = function()
+            return vim.o.columns >= 120 and "default" or "narrow"
+          end,
+        },
         layouts = {
           narrow = {
             layout = {
