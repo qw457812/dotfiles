@@ -220,6 +220,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
     - `<C-b>` used for tmux prefix.
   - `<C-u>`/`<C-d>`: lazygit
     - `i_CTRL-U` used for unix-line-discard in fzf.
+    - `<C-u>` used for list_scroll_up.
 - [ ] `which-key v3` problem with `mini.surround`/`mini.operators`/Helix-style mappings(map `mm` to `%`):
 
   1. problem

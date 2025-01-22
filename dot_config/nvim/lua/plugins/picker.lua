@@ -118,6 +118,7 @@ return {
         sources = {
           files = {
             hidden = true,
+            follow = true,
           },
         },
         win = {
@@ -190,6 +191,44 @@ return {
         end
         return ret
       end
+    end,
+  },
+  {
+    "nvim-lualine/lualine.nvim",
+    optional = true,
+    opts = function(_, opts)
+      local snacks_picker = {
+        sections = {
+          lualine_a = {
+            function()
+              return "snacks picker"
+            end,
+          },
+          lualine_b = {
+            function()
+              local picker = Snacks.picker.current
+              return picker and picker.list.cursor .. "/" .. picker.input.totals or ""
+            end,
+          },
+          lualine_y = {
+            function()
+              local picker = Snacks.picker.current
+              local item = picker and picker:current()
+              local path = item and Snacks.picker.util.path(item)
+              return path and U.path.shorten(path) or ""
+            end,
+          },
+          lualine_z = {
+            function()
+              local picker = Snacks.picker.current
+              return picker and picker.opts.source or ""
+            end,
+          },
+        },
+        filetypes = { "snacks_picker_input" }, -- snacks_picker_list snacks_picker_preview
+      }
+
+      table.insert(opts.extensions, snacks_picker)
     end,
   },
 
