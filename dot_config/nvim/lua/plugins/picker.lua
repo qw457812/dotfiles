@@ -111,6 +111,7 @@ return {
     opts = {
       picker = {
         layout = {
+          -- cycle = false,
           preset = function()
             return vim.o.columns >= 120 and "default" or "narrow"
           end,
@@ -153,7 +154,7 @@ return {
             keys = {
               -- use the same `["<Esc>"]` key to ensure overwriting
               ["<Esc>"] = { "<Esc>", U.keymap.clear_ui_esc, desc = "Clear UI or Close" },
-              ["/"] = false, -- highlights text in the preview
+              ["/"] = false, -- highlights text in preview
               ["<leader><space>"] = "toggle_focus",
               ["<leader><tab>"] = "cycle_win", -- toggle focus between input and preview
               ["<Up>"] = "history_back",
@@ -206,13 +207,29 @@ return {
     "folke/snacks.nvim",
     optional = true,
     opts = function()
-      --HACK: shorten dir | https://github.com/folke/snacks.nvim/blob/HEAD/lua/snacks/picker/format.lua#L43
+      local strings = require("plenary.strings")
+      local truncate, strdisplaywidth = strings.truncate, strings.strdisplaywidth
+
+      --HACK: shorten & truncate dir | https://github.com/folke/snacks.nvim/blob/f7d07bcbc2b79e00088e8b71729b74dd39037280/lua/snacks/picker/format.lua#L51
       local filename_orig = Snacks.picker.format.filename
       Snacks.picker.format.filename = function(...)
         local ret = filename_orig(...)
-        for _, line in ipairs(ret) do
-          if line[2] == "SnacksPickerDir" then
-            line[1] = U.path.shorten(line[1])
+
+        local dir_trunc_len = vim.api.nvim_win_get_width(Snacks.picker.current.list.win.win) - 2
+        for _, text in ipairs(ret) do
+          if text[2] ~= "SnacksPickerDir" then
+            dir_trunc_len = dir_trunc_len - strdisplaywidth(text[1])
+            if text[2] == "SnacksPickerFile" then
+              break
+            end
+          end
+        end
+
+        for _, text in ipairs(ret) do
+          if text[2] == "SnacksPickerDir" then
+            text[1] = U.path.shorten(text[1])
+            -- PERF: Snacks.picker.util.truncate
+            text[1] = truncate(text[1], dir_trunc_len, nil, -1)
             break
           end
         end
@@ -245,6 +262,7 @@ return {
                 end,
               }
             or nil,
+          lualine_x = { U.lualine.hlsearch }, -- esc
           lualine_y = {
             function()
               local picker = Snacks.picker.current

@@ -94,109 +94,6 @@ return {
         end
       end
 
-      -- -- https://github.com/Bekaboo/dropbar.nvim/blob/998441a88476af2ec77d8cb1b21bae62c9f548c1/lua/dropbar/utils/bar.lua#L11
-      -- local function hl_str(str, hl)
-      --   return "%#" .. hl .. "#" .. str .. "%*"
-      -- end
-
-      local function ft_icon()
-        -- require("mini.icons").get("file", vim.fn.expand("%:t"))
-        local icon, hl, is_default = require("mini.icons").get("filetype", vim.bo.filetype) --[[@as string, string, boolean]]
-        if not is_default then
-          return icon .. " ", hl
-        end
-      end
-
-      -- https://github.com/aimuzov/LazyVimx/blob/a27d3439b9021d1215ce6471f59d801df32c18d4/lua/lazyvimx/extras/hacks/lazyvim-lualine-pretty-path.lua
-      local function pretty_path(o)
-        return function(self)
-          return LazyVim.lualine.pretty_path(o)(self):gsub("/", "󰿟")
-        end
-      end
-
-      -- https://github.com/Matt-FTW/dotfiles/blob/b12af2bc28c89c7185c48d6b02fb532b6d8be45d/.config/nvim/lua/plugins/extras/ui/lualine-extended.lua
-      local formatter = {
-        function()
-          return " " -- 󰛖 
-        end,
-        cond = function()
-          local ok, conform = pcall(require, "conform")
-          if not ok then
-            return false
-          end
-          local formatters = conform.list_formatters(0)
-          if #formatters > 0 then
-            return true
-          end
-          local lsp_format = require("conform.lsp_format")
-          local lsp_clients = lsp_format.get_format_clients({ bufnr = vim.api.nvim_get_current_buf() })
-          return #lsp_clients > 0
-        end,
-        color = { fg = Snacks.util.color("MiniIconsCyan") },
-      }
-
-      local linter = {
-        function()
-          return "󰁨 " -- 󱉶
-        end,
-        cond = function()
-          local lint = require("lint")
-          -- respect LazyVim extension `condition`
-          -- see: ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/linting.lua
-          local linters = lint._resolve_linter_by_ft(vim.bo.filetype)
-          -- filter out linters that don't exist or don't match the condition
-          local ctx = { filename = vim.api.nvim_buf_get_name(0) }
-          ctx.dirname = vim.fn.fnamemodify(ctx.filename, ":h")
-          linters = vim.tbl_filter(function(name)
-            local l = lint.linters[name]
-            return l and not (type(l) == "table" and l.condition and not l.condition(ctx))
-          end, linters)
-          return #linters > 0
-        end,
-        color = { fg = Snacks.util.color("MiniIconsGreen") },
-      }
-
-      local lsp = {
-        function()
-          return ft_icon() or " " -- 
-        end,
-        cond = function()
-          local clients = vim.lsp.get_clients({ bufnr = 0 })
-          clients = vim.tbl_filter(function(client)
-            local ignored = { "null-ls", "copilot", "rime_ls" }
-            return not vim.list_contains(ignored, client.name)
-          end, clients)
-          return #clients > 0
-        end,
-        color = function()
-          return { fg = Snacks.util.color(select(2, ft_icon()) or "Special") } -- Identifier
-        end,
-      }
-
-      local hlsearch = {
-        function()
-          return "󱩾 " -- 󱎸 󰺯 󰺮
-        end,
-        cond = function()
-          return vim.v.hlsearch == 1
-        end,
-        color = function()
-          return { fg = Snacks.util.color("CurSearch", "bg") }
-        end,
-      }
-
-      local wrap = {
-        function()
-          return "󰖶 " -- 
-        end,
-        cond = function()
-          return vim.wo.wrap
-        end,
-        color = function()
-          return { fg = Snacks.util.color("MiniIconsYellow") }
-        end,
-      }
-
       local mode = { "mode" }
       if is_termux then
         mode.fmt = function(str)
@@ -208,35 +105,7 @@ return {
 
       local lualine_c = opts.sections.lualine_c
       lualine_c[1] = LazyVim.lualine.root_dir({ cwd = not is_termux, icon = is_termux and "" or nil })
-      lualine_c[4] = (is_termux or has_dropbar)
-          and {
-            "filename",
-            file_status = true,
-            newfile_status = true, -- `nvim new_file`
-            symbols = {
-              modified = "",
-              readonly = " 󰌾 ",
-            },
-            color = function()
-              local fg
-              if vim.bo.modified then
-                fg = Snacks.util.color("MatchParen")
-              elseif vim.bo.modifiable == false or vim.bo.readonly == true then
-                fg = Snacks.util.color("DiagnosticError")
-              end
-              return { fg = fg, gui = "bold" }
-            end,
-            fmt = function(name, context)
-              local _, _, class = U.java.parse_jdt_uri(vim.api.nvim_buf_get_name(0))
-              return class and ("%s.class %s"):format(class, context.options.symbols.readonly) or name
-            end,
-          }
-        or {
-          pretty_path({
-            relative = "root",
-            directory_hl = "Conceal",
-          }),
-        }
+      lualine_c[4] = (is_termux or has_dropbar) and U.lualine.filename or U.lualine.pretty_path
       if is_termux then
         remove_component(lualine_c, "filetype")
       end
@@ -250,9 +119,9 @@ return {
       if is_termux then
         remove_component(opts.sections.lualine_x, "diff")
       else
-        vim.list_extend(opts.sections.lualine_x, { formatter, linter, lsp })
-        table.insert(opts.sections.lualine_x, 2, wrap)
-        table.insert(opts.sections.lualine_x, 2, hlsearch)
+        vim.list_extend(opts.sections.lualine_x, { U.lualine.formatter, U.lualine.linter, U.lualine.lsp })
+        table.insert(opts.sections.lualine_x, 2, U.lualine.wrap)
+        table.insert(opts.sections.lualine_x, 2, U.lualine.hlsearch)
       end
 
       opts.sections.lualine_y = {
