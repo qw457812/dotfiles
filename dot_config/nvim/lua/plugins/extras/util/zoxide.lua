@@ -27,8 +27,8 @@ return {
           local mini_icons = require("mini.icons")
           local utils = require("telescope.utils")
           local get_status = require("telescope.state").get_status
-          local truncate = require("plenary.strings").truncate
-          local strdisplaywidth = require("plenary.strings").strdisplaywidth
+          local strings = require("plenary.strings")
+          local truncate, strdisplaywidth = strings.truncate, strings.strdisplaywidth
 
           require("telescope").extensions.zoxide.list({
             -- layout_config = {
