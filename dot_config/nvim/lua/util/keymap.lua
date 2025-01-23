@@ -132,20 +132,18 @@ function M.clear_ui_esc(opts)
       -- else
       --   vim.api.nvim_win_close(0, false)
       -- end
-
       vim.api.nvim_feedkeys(vim.keycode(vim.g.user_close_key), "m", false)
     end,
     popups = true,
     esc = true,
   })
 
-  -- -- TODO: always true
-  -- local function has_notif()
-  --   return not vim.tbl_isempty(vim.tbl_filter(function(b)
-  --     return vim.api.nvim_buf_is_valid(b)
-  --       and vim.tbl_contains({ "snacks_notif", "notify", "noice" }, vim.bo[b].filetype)
-  --   end, vim.api.nvim_list_bufs()))
-  -- end
+  local function has_notif()
+    return not vim.tbl_isempty(vim.tbl_filter(function(b)
+      return vim.api.nvim_buf_is_valid(b)
+        and vim.tbl_contains({ "snacks_notif", "notify", "noice" }, vim.bo[b].filetype)
+    end, vim.api.nvim_list_bufs()))
+  end
 
   local function dismiss_notif()
     if package.loaded["noice"] then
@@ -154,14 +152,11 @@ function M.clear_ui_esc(opts)
   end
 
   local something_done = false
+  local win = vim.api.nvim_get_current_win()
   local is_cmdwin = vim.fn.getcmdwintype() ~= ""
-  dismiss_notif()
 
-  if
-    vim.v.hlsearch == 1 or vim.snippet.active()
-    -- or has_notif()
-  then
-    -- dismiss_notif()
+  if vim.v.hlsearch == 1 or vim.snippet.active() or has_notif() then
+    dismiss_notif()
     vim.cmd("nohlsearch")
     if package.loaded["scrollbar"] then
       require("scrollbar.handlers.search").nohlsearch() -- nvim-scrollbar & nvim-hlslens
@@ -169,17 +164,14 @@ function M.clear_ui_esc(opts)
     vim.snippet.stop()
     something_done = true
   elseif opts.close then
-    if U.is_floating_win(0, { zen = false }) then
+    if U.is_floating_win(win, { zen = false }) then
       opts.close()
       something_done = true
     elseif opts.popups and not is_cmdwin then
       -- close all floating windows (can't close other windows when the command-line window is open)
-      for _, win in ipairs(vim.api.nvim_list_wins()) do
-        if
-          vim.api.nvim_win_is_valid(win)
-          and U.is_floating_win(win, { zen = false, tsc = false, dashboard = false, layers = false })
-        then
-          vim.api.nvim_win_close(win, false)
+      for _, w in ipairs(vim.api.nvim_list_wins()) do
+        if vim.api.nvim_win_is_valid(w) and U.is_floating_win(w, { zen = false, misc = false }) then
+          vim.api.nvim_win_close(w, false)
           something_done = true
         end
       end
@@ -190,7 +182,7 @@ function M.clear_ui_esc(opts)
     vim.cmd("diffupdate")
   end
   -- vim.cmd("syntax sync fromstart")
-  Snacks.util.redraw(vim.api.nvim_get_current_win()) -- vim.cmd("normal! <C-L>") -- vim.cmd.redraw({ bang = true })
+  Snacks.util.redraw(win) -- vim.cmd("normal! <C-L>") -- vim.cmd.redraw({ bang = true })
   if opts.esc then
     vim.api.nvim_feedkeys(vim.keycode("<esc>"), "n", false)
   end

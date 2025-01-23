@@ -40,8 +40,10 @@ M.filename = {
     local fg
     if vim.bo.modified then
       fg = Snacks.util.color("MatchParen")
-    elseif vim.bo.modifiable == false or vim.bo.readonly == true then
+    elseif vim.bo.modifiable == false then
       fg = Snacks.util.color("DiagnosticError")
+    elseif vim.bo.readonly == true then
+      fg = Snacks.util.color("MiniIconsPurple")
     end
     return { fg = fg, gui = "bold" }
   end,
@@ -79,9 +81,12 @@ M.linter = {
     return "󰁨 " -- 󱉶
   end,
   cond = function()
+    if not package.loaded["lint"] then
+      return false
+    end
     local lint = require("lint")
     -- respect LazyVim extension `condition`
-    -- see: ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/linting.lua
+    -- see: https://github.com/LazyVim/LazyVim/blob/1e83b4f843f88678189df81b1c88a400c53abdbc/lua/lazyvim/plugins/linting.lua#L84
     local linters = lint._resolve_linter_by_ft(vim.bo.filetype)
     -- filter out linters that don't exist or don't match the condition
     local ctx = { filename = vim.api.nvim_buf_get_name(0) }

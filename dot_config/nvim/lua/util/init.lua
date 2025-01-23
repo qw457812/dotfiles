@@ -31,62 +31,52 @@ function M.has_user_extra(extra)
 end
 
 ---@param win? integer default 0
----@param opts? { zen?: boolean, tsc?: boolean, dashboard?: boolean, layers?: boolean } whether to treat zen-mode, nvim-treesitter-context, snacks_dashboard terminal sections and layers help as floating windows, default true
+---@param opts? {zen?: boolean, misc?: boolean} default true
+---      - zen: whether to treat zen-mode as floating window
+---      - misc: whether to treat nvim-treesitter-context, snacks_dashboard terminal sections, layers.nvim help as floating windows
 ---@return boolean
 function M.is_floating_win(win, opts)
   win = win or 0
+
   if vim.api.nvim_win_get_config(win).relative == "" then
     return false
+  elseif not opts then
+    return true
   end
 
   win = win == 0 and vim.api.nvim_get_current_win() or win
-  opts = vim.tbl_deep_extend("keep", opts or {}, {
-    zen = true,
-    tsc = true,
-    dashboard = true,
-    layers = true,
-  })
-  local ft = vim.bo[vim.api.nvim_win_get_buf(win)].filetype
+  opts = vim.tbl_deep_extend("keep", opts, { zen = true, misc = true })
+
+  local buf = vim.api.nvim_win_get_buf(win)
+  local ft = vim.bo[buf].filetype
 
   -- snacks zen or zen-mode.nvim
   if not opts.zen then
-    if Snacks.toggle.get("zen"):get() then
-      if
+    if
+      Snacks.toggle.get("zen"):get()
+      and (
         win == Snacks.zen.win.win
         or win == vim.tbl_get(Snacks.zen.win, "backdrop", "win")
         or ft == "snacks_zen_zoom_indicator"
-      then
-        return false
-      end
+      )
+    then
+      return false
     end
     if package.loaded["zen-mode"] then
       local zen_mode = require("zen-mode.view")
-      if zen_mode.is_open() then
-        if win == zen_mode.win or win == zen_mode.bg_win then
-          return false
-        end
+      if zen_mode.is_open() and (win == zen_mode.win or win == zen_mode.bg_win) then
+        return false
       end
     end
   end
 
-  -- nvim-treesitter-context
-  -- see: https://github.com/nvim-treesitter/nvim-treesitter-context/blob/a2a334900d3643de585ac5c6140b03403454124f/lua/treesitter-context/render.lua#L56
-  if
-    not opts.tsc
-    and package.loaded["treesitter-context"]
-    and (vim.w[win].treesitter_context or vim.w[win].treesitter_context_line_number)
-  then
-    return false
-  end
-
-  -- snacks_dashboard terminal sections
-  if not opts.dashboard and ft == "snacks_dashboard" then
-    return false
-  end
-
-  -- layers.nvim help
-  if not opts.layers and ft == "layers_help" then
-    return false
+  if not opts.misc then
+    -- see: https://github.com/nvim-treesitter/nvim-treesitter-context/blob/a2a334900d3643de585ac5c6140b03403454124f/lua/treesitter-context/render.lua#L56
+    local is_tsc = package.loaded["treesitter-context"]
+      and (vim.w[win].treesitter_context or vim.w[win].treesitter_context_line_number)
+    if is_tsc or vim.tbl_contains({ "snacks_dashboard", "layers_help" }, ft) then
+      return false
+    end
   end
 
   return true
@@ -185,6 +175,7 @@ function M.debounce_wrap(ms, fn)
   end
 end
 
+---@type table<string, uv.uv_timer_t|nil>
 local timers = {}
 
 --- alternative: https://github.com/CopilotC-Nvim/CopilotChat.nvim/blob/2ebe591cff06018e265263e71e1dbc4c5aa8281e/lua/CopilotChat/utils.lua#L157
