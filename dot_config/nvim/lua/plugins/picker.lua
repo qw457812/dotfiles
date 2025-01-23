@@ -210,12 +210,12 @@ return {
       local strings = require("plenary.strings")
       local truncate, strdisplaywidth = strings.truncate, strings.strdisplaywidth
 
-      --HACK: shorten & truncate dir | https://github.com/folke/snacks.nvim/blob/f7d07bcbc2b79e00088e8b71729b74dd39037280/lua/snacks/picker/format.lua#L51
+      -- HACK: shorten & truncate dir | https://github.com/folke/snacks.nvim/blob/2568f18c4de0f43b15b0244cd734dcb5af93e53f/lua/snacks/picker/format.lua#L51
       local filename_orig = Snacks.picker.format.filename
-      Snacks.picker.format.filename = function(...)
-        local ret = filename_orig(...)
+      Snacks.picker.format.filename = function(item, picker)
+        local ret = filename_orig(item, picker)
 
-        local dir_trunc_len = vim.api.nvim_win_get_width(Snacks.picker.current.list.win.win) - 2
+        local dir_trunc_len = vim.api.nvim_win_get_width(picker.list.win.win) - 2
         for _, text in ipairs(ret) do
           if text[2] ~= "SnacksPickerDir" then
             dir_trunc_len = dir_trunc_len - strdisplaywidth(text[1])
@@ -224,11 +224,15 @@ return {
             end
           end
         end
+        if picker.opts.format == "buffer" then
+          -- see: https://github.com/folke/snacks.nvim/blob/2568f18c4de0f43b15b0244cd734dcb5af93e53f/lua/snacks/picker/format.lua#L461-L464
+          dir_trunc_len = dir_trunc_len - 3 - 1 - 2 - 1
+        end
 
         for _, text in ipairs(ret) do
           if text[2] == "SnacksPickerDir" then
             text[1] = U.path.shorten(text[1])
-            -- PERF: Snacks.picker.util.truncate
+            -- PERF: holding down j during grep for large projects
             text[1] = truncate(text[1], dir_trunc_len, nil, -1)
             break
           end
@@ -267,6 +271,7 @@ return {
             function()
               local picker = Snacks.picker.current
               local item = picker and picker:current()
+              -- local path = item and item.file -- better performance
               local path = item and Snacks.picker.util.path(item)
               return path and U.path.shorten(path) or ""
             end,

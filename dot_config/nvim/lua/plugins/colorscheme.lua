@@ -24,7 +24,7 @@ local colorschemes = vim.g.user_transparent_background and {
   "catppuccin-macchiato",
 }
 local borderless_telescope = false -- vim.g.user_transparent_background
-local no_italic = false
+local no_italic = vim.g.user_is_termux
 
 -- https://github.com/Styzex/RandTheme.nvim/blob/f96818619d9dcfa179f6d15eb67b04cae6ed31c7/lua/randtheme/theme_manager.lua#L62
 local last_random ---@type string?
