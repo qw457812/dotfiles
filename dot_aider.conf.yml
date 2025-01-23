@@ -3,7 +3,7 @@
 # model: groq/llama-3.3-70b-versatile
 # model: gemini/gemini-1.5-pro-latest
 # deepseek: true
-model: deepseek/deepseek-chat
+model: deepseek/deepseek-reasoner
 
 auto-commits: false
 

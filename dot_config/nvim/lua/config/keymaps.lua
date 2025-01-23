@@ -97,6 +97,9 @@ end, { expr = true, desc = "Escape and Stop Snippet" })
 map({ "n", "x", "o" }, "mm", "%", { desc = "Goto matching bracket", remap = true }) -- remap to matchit
 safe_map("n", "U", "<C-r>", { desc = "Redo" }) -- highlight-undo.nvim
 
+map("c", "<C-j>", "<C-n>", { silent = false, desc = "Next Command / Completion" })
+map("c", "<C-k>", "<C-p>", { silent = false, desc = "Prev Command / Completion" })
+
 -- stylua: ignore start
 map("n", "dd", function() return is_empty_line() and '"_dd' or "dd" end, { expr = true, desc = "Don't Yank Empty Line to Clipboard" })
 map("n", "i",  function() return is_empty_line() and '"_cc' or "i" end,  { expr = true, desc = "Indented i on Empty Line" })
@@ -134,7 +137,7 @@ safe_map("n", "<leader>ba", "<cmd>bufdo bd<cr>", { desc = "Delete All Buffers" }
 map("n", "<leader>bA", function() Snacks.bufdelete.all() end, { desc = "Delete All Buffers" })
 
 -- windows
-map("n", "vv", "<C-w>v<cmd>e #<cr>", { desc = "Split Window Right", remap = true })
+map("n", "vv", "<C-w>v", { desc = "Split Window Right", remap = true }) -- "<C-w>v<cmd>e #<cr>"
 -- map("n", "vs", "<C-w>s", { desc = "Split Window Below", remap = true }) -- conflict with flash.nvim
 -- map("n", "vd", "<C-w>c", { desc = "Delete Window", remap = true })
 -- map("n", "vo", "<C-w>o", { desc = "Delete Other Windows", remap = true })
@@ -256,7 +259,6 @@ map("n", "<leader>lR", function() vim.ui.open("https://github.com/folke/lazy.nvi
 
 local function lint_info()
   local lint = require("lint")
-  -- see: ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/linting.lua
   local linters = lint._resolve_linter_by_ft(vim.bo.filetype)
   linters = vim.tbl_filter(function(name)
     local exists = lint.linters[name] ~= nil
