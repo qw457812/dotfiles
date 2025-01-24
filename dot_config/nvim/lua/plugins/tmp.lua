@@ -36,14 +36,6 @@ return {
     },
   },
 
-  {
-    "2kabhishek/nerdy.nvim",
-    cmd = "Nerdy",
-    keys = {
-      { "<leader>fI", "<cmd>Nerdy<cr>", desc = "Icons" },
-    },
-  },
-
   -- :echo db#url#encode('my_password')
   -- :echo db#url#parse('my_url')
   -- :echo db#adapter#dispatch("my_url", "interactive")
