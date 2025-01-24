@@ -47,9 +47,7 @@ return {
         icons = { error = "󰅚", warn = "", info = "󰋽", debug = "󰃤", trace = "󰓗" },
         -- style = "fancy",
         -- top_down = false,
-        filter = function(notif)
-          return notif.msg ~= "" -- notif.title == "chezmoi.nvim"
-        end,
+        -- filter = function(notif) return true end,
       },
       scroll = {
         animate = {

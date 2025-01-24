@@ -87,7 +87,7 @@ local mappings = {
   { "<leader>sP", pick_search_plugin_codes, desc = "Search Plugin Code" },
   { "<leader>fL", pick_find_lazy_files, desc = "Find Lazy File" },
   { "<leader>sL", pick_search_lazy_codes, desc = "Search Lazy Code" },
-  { "<leader>fB", function() LazyVim.pick("files", { cwd = vim.fn.expand("%:p:h") })() end, desc = "Find Files (Buffer Dir)" },
+  -- { "<leader>fB", function() LazyVim.pick("files", { cwd = vim.fn.expand("%:p:h") })() end, desc = "Find Files (Buffer Dir)" },
   { "<leader>sB", function() LazyVim.pick("live_grep", { cwd = vim.fn.expand("%:p:h") })() end, desc = "Grep (Buffer Dir)" },
 }
 
@@ -99,7 +99,6 @@ return {
         -- stylua: ignore
         vim.list_extend(keys, {
           { "<leader>s.", function() Snacks.picker.resume() end, desc = "Resume" },
-          { "<leader>sp", pick_search_lazy_specs, desc = "Search Lazy Plugin Spec" },
           { "<leader>ff", function() Snacks.picker.smart() end, desc = "Smart" },
           unpack(mappings),
         })
@@ -202,44 +201,44 @@ return {
       },
     },
   },
-  {
-    "folke/snacks.nvim",
-    optional = true,
-    opts = function()
-      local strings = require("plenary.strings")
-      local truncate, strdisplaywidth = strings.truncate, strings.strdisplaywidth
-
-      -- HACK: shorten & truncate dir | https://github.com/folke/snacks.nvim/blob/2568f18c4de0f43b15b0244cd734dcb5af93e53f/lua/snacks/picker/format.lua#L51
-      local filename_orig = Snacks.picker.format.filename
-      Snacks.picker.format.filename = function(item, picker)
-        local ret = filename_orig(item, picker)
-
-        local dir_trunc_len = vim.api.nvim_win_get_width(picker.list.win.win) - 2
-        for _, text in ipairs(ret) do
-          if text[2] ~= "SnacksPickerDir" then
-            dir_trunc_len = dir_trunc_len - strdisplaywidth(text[1])
-            if text[2] == "SnacksPickerFile" then
-              break
-            end
-          end
-        end
-        if picker.opts.format == "buffer" then
-          -- see: https://github.com/folke/snacks.nvim/blob/2568f18c4de0f43b15b0244cd734dcb5af93e53f/lua/snacks/picker/format.lua#L461-L464
-          dir_trunc_len = dir_trunc_len - 3 - 1 - 2 - 1
-        end
-
-        for _, text in ipairs(ret) do
-          if text[2] == "SnacksPickerDir" then
-            text[1] = U.path.shorten(text[1])
-            -- PERF: holding down j during grep for large projects
-            text[1] = truncate(text[1], dir_trunc_len, nil, -1)
-            break
-          end
-        end
-        return ret
-      end
-    end,
-  },
+  -- {
+  --   "folke/snacks.nvim",
+  --   optional = true,
+  --   opts = function()
+  --     local strings = require("plenary.strings")
+  --     local truncate, strdisplaywidth = strings.truncate, strings.strdisplaywidth
+  --
+  --     -- HACK: shorten & truncate dir | https://github.com/folke/snacks.nvim/blob/2568f18c4de0f43b15b0244cd734dcb5af93e53f/lua/snacks/picker/format.lua#L51
+  --     local filename_orig = Snacks.picker.format.filename
+  --     Snacks.picker.format.filename = function(item, picker)
+  --       local ret = filename_orig(item, picker)
+  --
+  --       local dir_trunc_len = vim.api.nvim_win_get_width(picker.list.win.win) - 2
+  --       for _, text in ipairs(ret) do
+  --         if text[2] ~= "SnacksPickerDir" then
+  --           dir_trunc_len = dir_trunc_len - strdisplaywidth(text[1])
+  --           if text[2] == "SnacksPickerFile" then
+  --             break
+  --           end
+  --         end
+  --       end
+  --       if picker.opts.format == "buffer" then
+  --         -- see: https://github.com/folke/snacks.nvim/blob/2568f18c4de0f43b15b0244cd734dcb5af93e53f/lua/snacks/picker/format.lua#L461-L464
+  --         dir_trunc_len = dir_trunc_len - 3 - 1 - 2 - 1
+  --       end
+  --
+  --       for _, text in ipairs(ret) do
+  --         if text[2] == "SnacksPickerDir" then
+  --           text[1] = U.path.shorten(text[1])
+  --           -- PERF: holding down j during grep for large projects
+  --           text[1] = truncate(text[1], dir_trunc_len, nil, -1)
+  --           break
+  --         end
+  --       end
+  --       return ret
+  --     end
+  --   end,
+  -- },
 
   {
     "nvim-lualine/lualine.nvim",
