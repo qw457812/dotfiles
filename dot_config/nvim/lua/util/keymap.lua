@@ -138,21 +138,30 @@ function M.clear_ui_esc(opts)
     esc = true,
   })
 
-  local function has_notif()
-    return not vim.tbl_isempty(vim.tbl_filter(function(b)
+  local function notif_bufs()
+    return vim.tbl_filter(function(b)
       return vim.api.nvim_buf_is_valid(b)
         and vim.tbl_contains({ "snacks_notif", "notify", "noice" }, vim.bo[b].filetype)
-    end, vim.api.nvim_list_bufs()))
+        and vim.bo[b].buftype == "nofile"
+        and not vim.bo[b].buflisted
+    end, vim.api.nvim_list_bufs())
+  end
+
+  local function has_notif()
+    return not vim.tbl_isempty(notif_bufs())
   end
 
   local function dismiss_notif()
     if package.loaded["noice"] then
       require("noice").cmd("dismiss") -- including mini view like lsp progress (floating windows)
     end
+    -- fix has_notif check
+    for _, b in ipairs(notif_bufs()) do
+      pcall(vim.api.nvim_buf_delete, b, { force = true })
+    end
   end
 
   local something_done = false
-  local win = vim.api.nvim_get_current_win()
   local is_cmdwin = vim.fn.getcmdwintype() ~= ""
 
   if vim.v.hlsearch == 1 or vim.snippet.active() or has_notif() then
@@ -164,7 +173,7 @@ function M.clear_ui_esc(opts)
     vim.snippet.stop()
     something_done = true
   elseif opts.close then
-    if U.is_floating_win(win, { zen = false }) then
+    if U.is_floating_win(0, { zen = false }) then
       opts.close()
       something_done = true
     elseif opts.popups and not is_cmdwin then
@@ -182,7 +191,7 @@ function M.clear_ui_esc(opts)
     vim.cmd("diffupdate")
   end
   -- vim.cmd("syntax sync fromstart")
-  Snacks.util.redraw(win) -- vim.cmd("normal! <C-L>") -- vim.cmd.redraw({ bang = true })
+  Snacks.util.redraw(vim.api.nvim_get_current_win()) -- vim.cmd("normal! <C-L>") -- vim.cmd.redraw({ bang = true })
   if opts.esc then
     vim.api.nvim_feedkeys(vim.keycode("<esc>"), "n", false)
   end
