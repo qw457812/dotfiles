@@ -113,6 +113,22 @@ function M.extend_tbl(default, opts)
   return default and vim.tbl_deep_extend("force", default, opts) or opts
 end
 
+--- https://github.com/echasnovski/mini.files/commit/2756117
+--- vim.cmd.edit(path)
+---@param path
+---@param win_id?
+---@return integer?
+function M.edit(path, win_id)
+  if type(path) ~= "string" then
+    return
+  end
+  local buf_id = vim.fn.bufadd(vim.fn.fnamemodify(path, ":."))
+  -- Showing in window also loads. Use `pcall` to not error with swap messages.
+  pcall(vim.api.nvim_win_set_buf, win_id or 0, buf_id)
+  vim.bo[buf_id].buflisted = true
+  return buf_id
+end
+
 --- Insert one or more values into a list like table and maintain that you do not insert non-unique values (THIS MODIFIES `dst`)
 ---@param dst any[]|nil The list like table that you want to insert into
 ---@param src any Value(s) to be inserted
