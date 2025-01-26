@@ -164,13 +164,13 @@ function M.clear_ui_esc(opts)
   local something_done = false
   local is_cmdwin = vim.fn.getcmdwintype() ~= ""
 
-  if vim.v.hlsearch == 1 or vim.snippet.active() or has_notif() then
+  if vim.v.hlsearch == 1 or LazyVim.cmp.actions.snippet_active() or has_notif() then
     dismiss_notif()
     vim.cmd("nohlsearch")
     if package.loaded["scrollbar"] then
       require("scrollbar.handlers.search").nohlsearch() -- nvim-scrollbar & nvim-hlslens
     end
-    vim.snippet.stop()
+    LazyVim.cmp.actions.snippet_stop()
     something_done = true
   elseif opts.close then
     if U.is_floating_win(0, { zen = false }) then

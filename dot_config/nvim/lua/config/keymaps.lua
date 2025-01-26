@@ -89,7 +89,9 @@ map("n", "<Right>", "<C-i>", { desc = "Go Forward" })
 map("n", "<esc>", U.keymap.clear_ui_esc, { desc = "Escape and Clear hlsearch or notifications or Close floating window(s)" })
 map({ "i", "s" }, "<esc>", function()
   -- vim.cmd("noh")
-  LazyVim.cmp.actions.snippet_stop()
+  if not _G.MiniSnippets then -- by design, <esc> should not stop the session!
+    LazyVim.cmp.actions.snippet_stop()
+  end
   return "<esc>"
 end, { expr = true, desc = "Escape and Stop Snippet" })
 

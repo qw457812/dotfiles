@@ -104,8 +104,8 @@ return {
         { "K", false },
         -- add `has = "hover"` to prevent rime_ls from overwriting `gk` in help pages
         { "gk", function() return vim.lsp.buf.hover() end, desc = "Hover", has = "hover" },
-        { "<c-k>", mode = "i", false }, -- <c-k> for cmp navigation
-        { "<c-h>", function() return vim.lsp.buf.signature_help() end, mode = "i", desc = "Signature Help", has = "signatureHelp" },
+        -- { "<c-k>", mode = "i", false }, -- <c-k> for cmp navigation
+        -- { "<c-h>", function() return vim.lsp.buf.signature_help() end, mode = "i", desc = "Signature Help", has = "signatureHelp" }, -- conflicts with mini.snippets
         -- { "gd", pick_definitions_or_references, desc = "Goto Definition/References", has = "definition" },
         {
           "<cr>",

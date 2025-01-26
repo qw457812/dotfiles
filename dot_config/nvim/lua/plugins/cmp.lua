@@ -1,3 +1,7 @@
+LazyVim.cmp.actions.snippet_active = function()
+  return vim.snippet.active()
+end
+
 local function has_words_before()
   local line, col = (unpack or table.unpack)(vim.api.nvim_win_get_cursor(0))
   return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
@@ -88,32 +92,20 @@ return {
 
       ---@type blink.cmp.Config
       local o = {
-        -- copied from: https://github.com/AstroNvim/astrocommunity/blob/31e12fdbcba1ae7094d8b027c6e65d01e6f133e9/lua/astrocommunity/completion/blink-cmp/init.lua#L66
+        -- copied from: https://github.com/AstroNvim/astrocommunity/blob/0e1cf1178a6c0b2bfbc1e5e0d4a3009911b07649/lua/astrocommunity/completion/blink-cmp/init.lua#L98
         keymap = {
+          -- TODO: better coop with mini.snippets and signature_help
           ["<Tab>"] = {
-            ---@param cmp blink.cmp.API
+            "select_next",
+            "snippet_forward",
             function(cmp)
-              if cmp.is_visible() then
-                return cmp.select_next()
-              elseif cmp.snippet_active({ direction = 1 }) then
-                return cmp.snippet_forward()
-              elseif has_words_before() then
+              if has_words_before() then
                 return cmp.show()
               end
             end,
             "fallback",
           },
-          ["<S-Tab>"] = {
-            ---@param cmp blink.cmp.API
-            function(cmp)
-              if cmp.is_visible() then
-                return cmp.select_prev()
-              elseif cmp.snippet_active({ direction = -1 }) then
-                return cmp.snippet_backward()
-              end
-            end,
-            "fallback",
-          },
+          ["<S-Tab>"] = { "select_prev", "snippet_backward", "fallback" },
           -- -- https://github.com/y3owk1n/nix-system-config-v2/blob/ae72dd82a92894a1ca8c5ff4243e0208dfc33a5d/config/nvim/lua/plugins/blink-cmp.lua#L19
           -- ["<Esc>"] = {
           --   ---@param cmp blink.cmp.API
@@ -126,8 +118,10 @@ return {
           --   end,
           --   "fallback",
           -- },
-          ["<C-j>"] = { "select_next", "fallback" },
-          ["<C-k>"] = { "select_prev", "fallback" },
+          ["<C-n>"] = { "select_next", "show" },
+          ["<C-p>"] = { "select_prev", "show" },
+          -- ["<C-j>"] = { "select_next", "fallback" }, -- conflicts with mini.snippets
+          -- ["<C-k>"] = { "select_prev", "fallback" },
           -- ["<C-u>"] = { "scroll_documentation_up", "fallback" },
           -- ["<C-d>"] = { "scroll_documentation_down", "fallback" },
         },
@@ -170,6 +164,30 @@ return {
       }
 
       return U.extend_tbl(opts, o)
+    end,
+  },
+
+  {
+    "L3MON4D3/LuaSnip",
+    optional = true,
+    opts = function()
+      -- see: https://github.com/Saghen/blink.cmp/blob/f0f34c318af019b44fc8ea347895dcf92b682122/lua/blink/cmp/config/snippets.lua#L34
+      LazyVim.cmp.actions.snippet_active = function()
+        return require("luasnip").in_snippet()
+      end
+    end,
+  },
+  {
+    "echasnovski/mini.snippets",
+    optional = true,
+    opts = function()
+      LazyVim.cmp.actions.snippet_active = function()
+        return MiniSnippets.session.get(false) ~= nil
+      end
+      ---@diagnostic disable-next-line: duplicate-set-field
+      LazyVim.cmp.actions.snippet_stop = function()
+        MiniSnippets.session.stop()
+      end
     end,
   },
 
