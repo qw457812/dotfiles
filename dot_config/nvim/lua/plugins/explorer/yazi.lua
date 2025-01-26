@@ -47,6 +47,12 @@ return {
       --   end,
       -- })
 
+      local picker = ({
+        ["snacks"] = "snacks.picker",
+        ["fzf"] = "fzf-lua",
+        ["telescope"] = "telescope",
+      })[LazyVim.pick.picker.name]
+
       ---@type YaziConfig
       return {
         open_for_directories = vim.g.user_hijack_netrw == "yazi.nvim",
@@ -54,13 +60,9 @@ return {
         keymaps = {
           show_help = "~", -- `~` for yazi.nvim and `g?` for yazi
         },
-        integrations = LazyVim.pick.picker.name == "fzf" and {
-          grep_in_directory = "fzf-lua",
-          grep_in_selected_files = "fzf-lua",
-        } or nil,
-        future_features = {
-          ya_emit_reveal = true,
-          ya_emit_open = true,
+        integrations = {
+          grep_in_directory = picker,
+          grep_in_selected_files = picker,
         },
       }
     end,

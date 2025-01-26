@@ -100,6 +100,8 @@ return {
         vim.list_extend(keys, {
           { "<leader>s.", function() Snacks.picker.resume() end, desc = "Resume" },
           { "<leader>ff", function() Snacks.picker.smart() end, desc = "Smart" },
+          { "<leader>fF", function() Snacks.picker.files({ hidden = true, follow = true, ignored = true }) end, desc = "Find all files" },
+          { "<leader>gC", function() Snacks.picker.git_branches() end, desc = "Git branches" },
           unpack(mappings),
         })
       end
@@ -203,44 +205,67 @@ return {
       },
     },
   },
-  -- {
-  --   "folke/snacks.nvim",
-  --   optional = true,
-  --   opts = function()
-  --     local strings = require("plenary.strings")
-  --     local truncate, strdisplaywidth = strings.truncate, strings.strdisplaywidth
-  --
-  --     -- HACK: shorten & truncate dir | https://github.com/folke/snacks.nvim/blob/2568f18c4de0f43b15b0244cd734dcb5af93e53f/lua/snacks/picker/format.lua#L51
-  --     local filename_orig = Snacks.picker.format.filename
-  --     Snacks.picker.format.filename = function(item, picker)
-  --       local ret = filename_orig(item, picker)
-  --
-  --       local dir_trunc_len = vim.api.nvim_win_get_width(picker.list.win.win) - 2
-  --       for _, text in ipairs(ret) do
-  --         if text[2] ~= "SnacksPickerDir" then
-  --           dir_trunc_len = dir_trunc_len - strdisplaywidth(text[1])
-  --           if text[2] == "SnacksPickerFile" then
-  --             break
-  --           end
-  --         end
-  --       end
-  --       if picker.opts.format == "buffer" then
-  --         -- see: https://github.com/folke/snacks.nvim/blob/2568f18c4de0f43b15b0244cd734dcb5af93e53f/lua/snacks/picker/format.lua#L461-L464
-  --         dir_trunc_len = dir_trunc_len - 3 - 1 - 2 - 1
-  --       end
-  --
-  --       for _, text in ipairs(ret) do
-  --         if text[2] == "SnacksPickerDir" then
-  --           text[1] = U.path.shorten(text[1])
-  --           -- PERF: holding down j during grep for large projects
-  --           text[1] = truncate(text[1], dir_trunc_len, nil, -1)
-  --           break
-  --         end
-  --       end
-  --       return ret
-  --     end
-  --   end,
-  -- },
+  {
+    "folke/snacks.nvim",
+    optional = true,
+    opts = function(_, opts)
+      ---@param text string
+      ---@param width number
+      ---@param direction? -1 | 1
+      local function truncate(text, width, direction)
+        local tw = vim.api.nvim_strwidth(text)
+        if tw > width then
+          return direction == -1 and "…" .. vim.fn.strcharpart(text, tw - width + 1, width - 1)
+            or vim.fn.strcharpart(text, 0, width - 1) .. "…"
+        end
+        return text
+      end
+
+      -- HACK: shorten & truncate dir | https://github.com/folke/snacks.nvim/blob/2568f18c4de0f43b15b0244cd734dcb5af93e53f/lua/snacks/picker/format.lua#L51
+      local filename_orig = Snacks.picker.format.filename
+      Snacks.picker.format.filename = function(item, picker)
+        local ret = filename_orig(item, picker)
+
+        local dir_trunc_len = 40
+        local prefixes = {
+          file = 0,
+          buffer = 7, -- see: https://github.com/folke/snacks.nvim/blob/2568f18c4de0f43b15b0244cd734dcb5af93e53f/lua/snacks/picker/format.lua#L461-L464
+          lsp_symbol = 40,
+        }
+        if vim.tbl_contains(vim.tbl_keys(prefixes), picker.opts.format) then
+          local prefix = 0
+          for _, text in ipairs(ret) do
+            if text[2] ~= "SnacksPickerDir" then
+              prefix = prefix + vim.api.nvim_strwidth(text[1])
+            end
+            if text[2] == "SnacksPickerFile" then
+              break
+            end
+          end
+          dir_trunc_len = vim.api.nvim_win_get_width(picker.list.win.win) - prefix - prefixes[picker.opts.format] - 2
+        end
+
+        for _, text in ipairs(ret) do
+          if text[2] == "SnacksPickerDir" then
+            text[1] = U.path.shorten(text[1])
+            text[1] = dir_trunc_len <= 1 and "" or truncate(text[1], dir_trunc_len, -1)
+            break
+          end
+        end
+        return ret
+      end
+
+      return U.extend_tbl(opts, {
+        picker = {
+          formatters = {
+            file = {
+              truncate = 9999,
+            },
+          },
+        },
+      })
+    end,
+  },
 
   {
     "nvim-lualine/lualine.nvim",

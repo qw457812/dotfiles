@@ -11,36 +11,17 @@ function _G.get_oil_winbar()
   end
 end
 
-local function preview_visible()
-  return require("oil.util").get_preview_win() ~= nil
-end
-
 local preview_enabled ---@type boolean?
 
 local function toggle_preview()
-  preview_enabled = not preview_visible()
+  preview_enabled = not require("oil.util").get_preview_win()
   require("oil.actions").preview.callback()
 end
 
-local function auto_preview()
+---@param dir? string
+local function open(dir)
   -- respect <C-p> toggle
-  if preview_enabled ~= false and require("oil").get_cursor_entry() then
-    require("oil").open_preview()
-  end
-end
-
-local function open(...)
-  local argv = { ... }
-  return function()
-    require("oil").open(unpack(argv))
-
-    -- HACK: sometimes `OilEnter` not triggered
-    vim.defer_fn(function()
-      if not preview_visible() then
-        auto_preview()
-      end
-    end, 100)
-  end
+  require("oil").open(dir, { preview = preview_enabled ~= false and {} or nil })
 end
 
 return {
@@ -146,15 +127,15 @@ return {
       }
 
       local opts = LazyVim.opts("oil.nvim")
+      -- stylua: ignore
       if opts.default_file_explorer == false then
         vim.list_extend(keys, {
-          -- stylua: ignore
           { "_", function() require("oil").toggle_float() end, desc = "Toggle Float Oil" },
         })
       else
         vim.list_extend(keys, {
-          { "-", open(), desc = "Open parent directory (Oil)" },
-          { "_", open(vim.fn.getcwd()), desc = "Open cwd (Oil)" },
+          { "-", function() open() end, desc = "Open parent directory (Oil)" },
+          { "_", function() open(vim.fn.getcwd()) end, desc = "Open cwd (Oil)" },
         })
       end
       return keys
@@ -182,18 +163,6 @@ return {
     end,
     config = function(_, opts)
       require("oil").setup(opts)
-
-      -- auto open preview
-      -- https://github.com/stevearc/oil.nvim/issues/87#issuecomment-2179322405
-      -- https://github.com/stevearc/oil.nvim/issues/357#issuecomment-2071054399
-      vim.api.nvim_create_autocmd("User", {
-        pattern = "OilEnter",
-        callback = vim.schedule_wrap(function(args)
-          if args.data.buf == vim.api.nvim_get_current_buf() then
-            auto_preview()
-          end
-        end),
-      })
 
       -- https://github.com/alexpasmantier/pymple.nvim/blob/eff337420a294e68180c5ee87f03994c0b176dd4/lua/pymple/hooks.lua#L35
       -- https://github.com/stevearc/oil.nvim/issues/310#issuecomment-2019214285

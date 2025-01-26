@@ -451,7 +451,7 @@ return {
     event = "ModeChanged *:[vV]",
     opts = {
       chars_lower_limit = 2,
-      buffers = "all",
+      -- buffers = "all",
     },
   },
 

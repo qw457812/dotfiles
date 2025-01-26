@@ -185,11 +185,12 @@ return {
     "yetone/avante.nvim",
     optional = true,
     opts = function(_, opts)
-      if LazyVim.pick.want() == "fzf" then
+      local picker = LazyVim.pick.want()
+      if picker == "fzf" or picker == "snacks" then
         return U.extend_tbl(opts, {
           file_selector = {
             ---@type FileSelectorProvider
-            provider = "fzf",
+            provider = picker,
           },
         })
       end
