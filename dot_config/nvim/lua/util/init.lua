@@ -129,20 +129,19 @@ function M.edit(path, win_id)
   return buf_id
 end
 
---- Insert one or more values into a list like table and maintain that you do not insert non-unique values (THIS MODIFIES `dst`)
+--- Insert one or more values into a list like table and maintain that you
+--- do not insert non-unique values (THIS MODIFIES `dst`)
 ---@param dst any[]|nil The list like table that you want to insert into
----@param src any Value(s) to be inserted
+---@param src any|any[] Either a list like table of values to be inserted or a single value to be inserted
 ---@return any[] # The modified list like table
 function M.list_insert_unique(dst, src)
-  if not dst then
-    dst = {}
-  end
+  dst = dst or {}
   assert(vim.islist(dst), "Provided table is not a list like table")
+  src = vim.islist(src) and src or { src }
   local added = {}
   for _, val in ipairs(dst) do
     added[val] = true
   end
-  src = type(src) == "table" and src or { src }
   for _, val in ipairs(src) do
     if not added[val] then
       table.insert(dst, val)
@@ -181,7 +180,7 @@ end
 ---@param fn function
 ---@return function
 function M.debounce_wrap(ms, fn)
-  local timer = (vim.uv or vim.loop).new_timer()
+  local timer = assert(vim.uv.new_timer())
   return function(...)
     local argv = vim.F.pack_len(...)
     timer:start(ms, 0, function()
@@ -191,7 +190,7 @@ function M.debounce_wrap(ms, fn)
   end
 end
 
----@type table<string, uv.uv_timer_t|nil>
+---@type table<string, uv.uv_timer_t>
 local timers = {}
 
 --- alternative: https://github.com/CopilotC-Nvim/CopilotChat.nvim/blob/2ebe591cff06018e265263e71e1dbc4c5aa8281e/lua/CopilotChat/utils.lua#L157
@@ -199,7 +198,7 @@ local timers = {}
 ---@param ms integer
 ---@param fn function
 function M.debounce(id, ms, fn)
-  timers[id] = timers[id] or vim.uv.new_timer()
+  timers[id] = timers[id] or assert(vim.uv.new_timer())
   local timer = timers[id]
   timer:start(ms, 0, function()
     timer:stop()

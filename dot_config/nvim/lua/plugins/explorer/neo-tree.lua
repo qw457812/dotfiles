@@ -485,11 +485,25 @@ return {
           end,
           grug_far = function(state)
             local node = state.tree:get_node()
-            local path = node.type == "directory" and node:get_id() or vim.fn.fnamemodify(node:get_id(), ":h")
+            local path = node.type == "directory" and vim.fn.fnameescape(vim.fn.fnamemodify(node:get_id(), ":p"))
+              or vim.fn.fnameescape(vim.fn.fnamemodify(node:get_id(), ":h"))
             if vim.g.user_neotree_auto_close then
               state.commands.close_window(state)
             end
             U.explorer.grug_far(path)
+          end,
+          -- https://github.com/nvim-neo-tree/neo-tree.nvim/blob/fbb631e818f48591d0c3a590817003d36d0de691/doc/neo-tree.txt#L535
+          grug_far_visual = function(state, selected_nodes, callback)
+            local paths = {}
+            for _, node in ipairs(selected_nodes) do
+              local path = node.type == "directory" and vim.fn.fnameescape(vim.fn.fnamemodify(node:get_id(), ":p"))
+                or vim.fn.fnameescape(vim.fn.fnamemodify(node:get_id(), ":h"))
+              U.list_insert_unique(paths, path)
+            end
+            if vim.g.user_neotree_auto_close then
+              state.commands.close_window(state)
+            end
+            U.explorer.grug_far(table.concat(paths, " "))
           end,
         },
         window = {

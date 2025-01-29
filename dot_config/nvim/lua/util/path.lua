@@ -59,15 +59,21 @@ end
 ---@return string
 function M.shorten(path)
   path = M.home_to_tilde(path)
-
-  local dir_icons = { { M.CONFIG, " " }, { M.LAZYVIM, "󰒲 " } }
-  if M.CHEZMOI then
-    table.insert(dir_icons, { M.CHEZMOI, "󰠦 " })
+  if not M._SHORTEN_PATTERNS then
+    local patterns = { { M.CONFIG, " " }, { M.LAZYVIM, "󰒲 " }, { vim.fn.stdpath("data") .. "/lazy", "󰒲 " } }
+    if M.CHEZMOI then
+      table.insert(patterns, { M.CHEZMOI, "󰠦 " })
+      table.insert(patterns, { vim.fn.stdpath("config"), " " })
+    end
+    table.insert(patterns, { vim.env.XDG_CONFIG_HOME or vim.env.HOME .. "/.config", " " })
+    patterns = vim.tbl_map(function(p)
+      return { "^" .. vim.pesc(M.home_to_tilde(p[1])) .. "/", p[2] }
+    end, patterns)
+    M._SHORTEN_PATTERNS = patterns
   end
-  for _, dir_icon in ipairs(dir_icons) do
-    path = path:gsub("^" .. vim.pesc(M.home_to_tilde(dir_icon[1])) .. "/", dir_icon[2])
+  for _, p in ipairs(M._SHORTEN_PATTERNS) do
+    path = path:gsub(p[1], p[2])
   end
-
   return U.java.path_shorten(path)
 end
 
