@@ -418,7 +418,7 @@ return {
       end
     end,
   },
-  -- also see `:h noh` and `:h shortmess`
+  -- see also `:h noh` and `:h shortmess`
   {
     "folke/noice.nvim",
     optional = true,
@@ -457,7 +457,22 @@ return {
 
   {
     "kevinhwang91/nvim-ufo",
-    dependencies = "kevinhwang91/promise-async",
+    dependencies = {
+      "kevinhwang91/promise-async",
+      {
+        "neovim/nvim-lspconfig",
+        opts = {
+          capabilities = {
+            textDocument = {
+              foldingRange = {
+                dynamicRegistration = false,
+                lineFoldingOnly = true,
+              },
+            },
+          },
+        },
+      },
+    },
     event = "VeryLazy",
     init = function()
       -- vim.o.foldcolumn = "0"
@@ -471,8 +486,26 @@ return {
       { "zM", function() require("ufo").closeAllFolds() end },
       { "zr", function() require("ufo").openFoldsExceptKinds() end },
       { "zm", function() require("ufo").closeFoldsWith() end },
+      {
+        "zK",
+        function()
+          local winid = require("ufo").peekFoldedLinesUnderCursor()
+          if not winid then
+            vim.lsp.buf.hover()
+          end
+        end,
+      },
     },
     opts = function()
+      -- -- kitty.conf
+      -- vim.api.nvim_create_autocmd("BufReadPost", {
+      --   callback = vim.schedule_wrap(function()
+      --     if vim.wo.foldmethod == "marker" then
+      --       require("ufo").closeAllFolds()
+      --     end
+      --   end),
+      -- })
+
       -- add number suffix of folded lines
       local function virt_text_handler(virtText, lnum, endLnum, width, truncate)
         local newVirtText = {}
@@ -502,8 +535,66 @@ return {
         return newVirtText
       end
 
+      --- (lsp -> treesitter -> indent) + marker
+      ---@param bufnr number
+      ---@return Promise
+      local function selector(bufnr)
+        local function handleFallbackException(err, providerName)
+          if type(err) == "string" and err:match("UfoFallbackException") then
+            return require("ufo").getFolds(bufnr, providerName)
+          else
+            return require("promise").reject(err)
+          end
+        end
+
+        return require("ufo")
+          .getFolds(bufnr, "lsp")
+          :catch(function(err)
+            return handleFallbackException(err, "treesitter")
+          end)
+          :catch(function(err)
+            return handleFallbackException(err, "indent")
+          end)
+          :thenCall(function(res)
+            -- alternative: require("ufo").getFolds(bufnr, "marker")
+            -- NOTE: https://github.com/kevinhwang91/nvim-ufo/issues/233#issuecomment-2269229978
+            -- PERF: https://github.com/kevinhwang91/nvim-ufo/issues/233#issuecomment-2226902851
+            return res and vim.list_extend(res, require("ufo.provider.marker").getFolds(bufnr) or {})
+          end, function(err)
+            return require("promise").reject(err)
+          end)
+      end
+
       return {
+        open_fold_hl_timeout = 150,
+        provider_selector = function(bufnr, filetype, buftype)
+          -- see also: https://github.com/chrisgrieser/.config/blob/9a3fa5f42f6b402a0eb2468f38b0642bbbe7ccef/nvim/lua/plugin-specs/ufo.lua#L37-L42
+          local ftMap = {
+            vim = "indent",
+            python = { "indent" },
+            git = "",
+          }
+          return ftMap[filetype] or selector
+        end,
+        close_fold_kinds_for_ft = {
+          default = { "imports", "marker" }, -- comment
+          -- json = { "array" },
+          -- markdown = {}, -- avoid everything becoming folded
+          -- toml = {},
+        },
         fold_virt_text_handler = virt_text_handler,
+        preview = {
+          win_config = {
+            -- border = { "", "─", "", "", "", "─", "", "" },
+            winblend = 0,
+          },
+          mappings = {
+            scrollU = "<C-b>",
+            scrollD = "<C-f>",
+            jumpTop = "[",
+            jumpBot = "]",
+          },
+        },
       }
     end,
   },
