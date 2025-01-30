@@ -1,5 +1,3 @@
--- vim:foldmethod=marker
-
 return {
   -- https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/editor/neo-tree-extended.lua
   -- https://github.com/aimuzov/LazyVimx/blob/main/lua/lazyvimx/extras/ui/panels/explorer.lua
