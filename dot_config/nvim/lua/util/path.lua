@@ -1,32 +1,33 @@
 ---@class util.path
 local M = {}
 
-M.HOME = assert(vim.uv.os_homedir()) -- os.getenv("HOME")
+function M.is_dir(path)
+  -- -- https://github.com/folke/snacks.nvim/pull/136#issuecomment-2492044614
+  -- return (vim.uv.fs_stat(path) or {}).type == "directory"
+  return vim.fn.isdirectory(path) == 1
+end
 
--- function M.is_dir(path)
---   -- -- https://github.com/folke/snacks.nvim/pull/136#issuecomment-2492044614
---   -- return (vim.uv.fs_stat(path) or {}).type == "directory"
---   return vim.fn.isdirectory(path) == 1
--- end
+function M.is_file(path)
+  -- -- https://github.com/neovim/nvim-lspconfig/pull/3495
+  -- return vim.fn.getftype(path) == "file"
+  return (vim.uv.fs_stat(path) or {}).type == "file"
+end
 
--- function M.is_file(path)
---   -- -- https://github.com/neovim/nvim-lspconfig/pull/3495
---   -- return vim.fn.getftype(path) == "file"
---   return (vim.uv.fs_stat(path) or {}).type == "file"
--- end
+-- os.getenv("HOME")
+-- vim.fs.normalize("~")
+M.HOME = assert(vim.uv.os_homedir())
 
 --- Chezmoi source path
 M.CHEZMOI = (function()
-  local path = M.HOME .. "/.local/share/chezmoi"
-  return vim.fn.isdirectory(path) == 1 and path or nil
+  if not (LazyVim.has_extra("util.chezmoi") and vim.fn.executable("chezmoi") == 1) then
+    return
+  end
+  local res = vim.system({ "chezmoi", "source-path" }, { text = true }):wait()
+  return res.code == 0 and res.stdout:gsub("[\r\n]+$", "") or nil
 end)()
 
-M.CONFIG = (function()
-  local has_chezmoi = M.CHEZMOI and LazyVim.has_extra("util.chezmoi") and vim.fn.executable("chezmoi") == 1
-  return has_chezmoi and M.CHEZMOI .. "/dot_config/nvim" or vim.fn.stdpath("config") --[[@as string]]
-end)()
+M.CONFIG = M.CHEZMOI and M.CHEZMOI .. "/dot_config/nvim" or vim.fn.stdpath("config") --[[@as string]]
 
--- require("lazy.core.config").options.root .. "/LazyVim"
 M.LAZYVIM = LazyVim.get_plugin_path("LazyVim")
 
 --- Replace home directory with '~'
@@ -60,12 +61,17 @@ end
 function M.shorten(path)
   path = M.home_to_tilde(path)
   if not M._SHORTEN_PATTERNS then
-    local patterns = { { M.CONFIG, " " }, { M.LAZYVIM, "󰒲 " }, { vim.fn.stdpath("data") .. "/lazy", "󰒲 " } }
+    local patterns = {
+      { M.CONFIG, " " },
+      { M.LAZYVIM, "󰒲 " },
+      { require("lazy.core.config").options.root, "󰒲 " },
+    }
     if M.CHEZMOI then
+      table.insert(patterns, { M.CHEZMOI .. "/dot_config", " " })
       table.insert(patterns, { M.CHEZMOI, "󰠦 " })
       table.insert(patterns, { vim.fn.stdpath("config"), " " })
     end
-    table.insert(patterns, { vim.env.XDG_CONFIG_HOME or vim.env.HOME .. "/.config", " " })
+    table.insert(patterns, { vim.env.XDG_CONFIG_HOME or vim.env.HOME .. "/.config", " " })
     patterns = vim.tbl_map(function(p)
       return { "^" .. vim.pesc(M.home_to_tilde(p[1])) .. "/", p[2] }
     end, patterns)

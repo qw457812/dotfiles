@@ -21,6 +21,14 @@ return {
         desc = "Notification History",
       },
       {
+        "<leader>N",
+        function()
+          Snacks.notifier.hide()
+          Snacks.picker.notifications()
+        end,
+        desc = "Notification History",
+      },
+      {
         "<leader>ft",
         function()
           Snacks.scratch({ icon = " ", name = "Todo", ft = "markdown", file = "~/TODO.md" })
