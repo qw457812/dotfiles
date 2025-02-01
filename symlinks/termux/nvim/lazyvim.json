@@ -30,7 +30,6 @@
     "lazyvim.plugins.extras.util.mini-hipatterns",
     "lazyvim.plugins.extras.util.project",
     "plugins.extras.editor.mini-operators",
-    "plugins.extras.editor.undotree",
     "plugins.extras.game.exercism",
     "plugins.extras.lsp.mason-lock",
     "plugins.extras.lsp.tiny-inline-diagnostic",
