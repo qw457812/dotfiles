@@ -1,5 +1,4 @@
--- do not overwrite <leader>fc if lazyvim.plugins.extras.util.chezmoi not enabled
-if not (LazyVim.has_extra("util.chezmoi") and vim.fn.executable("chezmoi") == 1 and U.path.CHEZMOI) then
+if not U.path.CHEZMOI then
   return {}
 end
 

@@ -111,7 +111,7 @@ return {
     opts = {
       picker = {
         layout = {
-          -- cycle = false,
+          cycle = false,
           preset = function()
             return vim.o.columns >= 120 and "default" or "narrow"
           end,
@@ -161,13 +161,14 @@ return {
               ["<Down>"] = "history_forward",
               i_up = { "<Up>", "list_up", mode = "i", expr = true },
               i_down = { "<Down>", "list_down", mode = "i", expr = true },
-              ["<c-h>"] = { "preview_scroll_left", mode = { "i", "n" } },
-              ["<c-l>"] = { "preview_scroll_right", mode = { "i", "n" } },
+              ["<Left>"] = "preview_scroll_left",
+              ["<Right>"] = "preview_scroll_right",
+              ["<C-Left>"] = { "preview_scroll_left", mode = { "i", "n" } },
+              ["<C-Right>"] = { "preview_scroll_right", mode = { "i", "n" } },
             },
           },
           list = {
             keys = {
-              -- ["<Esc>"] = "toggle_focus",
               ["<Esc>"] = {
                 "<Esc>",
                 function(self)
@@ -180,14 +181,18 @@ return {
               ["/"] = false,
               ["<leader><space>"] = "toggle_focus",
               -- TODO: <leader><tab> to focus preview
+              ["<Left>"] = "preview_scroll_left",
+              ["<Right>"] = "preview_scroll_right",
+              ["<C-Left>"] = "preview_scroll_left",
+              ["<C-Right>"] = "preview_scroll_right",
             },
           },
           preview = {
             wo = {
               signcolumn = "no",
+              number = false,
             },
             keys = {
-              -- ["<Esc>"] = "toggle_focus",
               ["<Esc>"] = {
                 "<Esc>",
                 function(self)
@@ -222,13 +227,20 @@ return {
       end
 
       -- HACK: shorten & truncate dir | https://github.com/folke/snacks.nvim/blob/2568f18c4de0f43b15b0244cd734dcb5af93e53f/lua/snacks/picker/format.lua#L51
+      Snacks.picker.util.truncpath = function(path)
+        return path
+      end
       local filename_orig = Snacks.picker.format.filename
       Snacks.picker.format.filename = function(item, picker)
         local ret = filename_orig(item, picker)
+        if picker.opts.formatters.file.filename_only then
+          return ret
+        end
 
         local dir_trunc_len = 40
         local prefixes = {
           file = 0,
+          git_status = 3,
           buffer = 7, -- see: https://github.com/folke/snacks.nvim/blob/2568f18c4de0f43b15b0244cd734dcb5af93e53f/lua/snacks/picker/format.lua#L461-L464
           lsp_symbol = 40,
         }
@@ -238,7 +250,7 @@ return {
             if text[2] ~= "SnacksPickerDir" then
               prefix = prefix + vim.api.nvim_strwidth(text[1])
             end
-            if text[2] == "SnacksPickerFile" then
+            if text[2] == "SnacksPickerFile" or text[2] == "SnacksPickerDirectory" then
               break
             end
           end
@@ -254,16 +266,6 @@ return {
         end
         return ret
       end
-
-      return U.extend_tbl(opts, {
-        picker = {
-          formatters = {
-            file = {
-              truncate = 9999,
-            },
-          },
-        },
-      })
     end,
   },
 
@@ -285,7 +287,7 @@ return {
           lualine_b = not vim.g.user_is_termux
               and {
                 function()
-                  local picker = Snacks.picker.current
+                  local picker = Snacks.picker.get()[1]
                   -- return picker and picker.list.cursor .. "/" .. picker.input.totals or ""
                   return picker and picker.list.cursor .. "/" .. picker.list:count() or ""
                 end,
@@ -294,7 +296,7 @@ return {
           lualine_x = { U.lualine.hlsearch }, -- esc
           lualine_y = {
             function()
-              local picker = Snacks.picker.current
+              local picker = Snacks.picker.get()[1]
               local item = picker and picker:current()
               -- local path = item and item.file -- better performance
               local path = item and Snacks.picker.util.path(item)
@@ -303,7 +305,7 @@ return {
           },
           lualine_z = {
             function()
-              local picker = Snacks.picker.current
+              local picker = Snacks.picker.get()[1]
               return picker and picker.opts.source or "custom"
             end,
           },

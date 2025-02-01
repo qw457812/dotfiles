@@ -116,7 +116,7 @@ return {
         { "<leader>avs", ask(prompt.summarize),                  desc = "Summarize text (Ask)",            mode = { "n", "v" } },
         { "<leader>avt", ask(prompt.translate),                  desc = "Translate text (Ask)",            mode = { "n", "v" } },
         { "<leader>ave", ask(prompt.explain_code),               desc = "Explain Code (Ask)",              mode = { "n", "v" } },
-        { "<leader>avc", ask(prompt.complete_code()),            desc = "Complete Code (Ask)",             mode = { "n", "v" } },
+        { "<leader>avc", ask(prompt.complete_code),              desc = "Complete Code (Ask)",             mode = { "n", "v" } },
         { "<leader>avC", edit_submit(prompt.complete_code),      desc = "Complete Code (Edit)",            mode = "v" },
         { "<leader>avd", ask(prompt.add_docstring),              desc = "Docstring (Ask)",                 mode = { "n", "v" } },
         { "<leader>avD", edit_submit(prompt.add_docstring),      desc = "Docstring (Edit)",                mode = "v" },
@@ -166,7 +166,7 @@ return {
           api_key_name = "DEEPSEEK_API_KEY",
           endpoint = "https://api.deepseek.com",
           -- curl -L -X GET "https://api.deepseek.com/models" -H "Accept: application/json" -H "Authorization: Bearer $DEEPSEEK_API_KEY" | jq .
-          model = "deepseek-chat", -- deepseek-coder
+          model = "deepseek-reasoner",
         },
         -- https://github.com/yetone/avante.nvim/pull/159
         ---@type AvanteSupportedProvider

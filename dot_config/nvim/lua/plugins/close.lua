@@ -123,23 +123,6 @@ return {
         end,
       })
 
-      -- close some filetypes with close_key
-      vim.api.nvim_create_autocmd("FileType", {
-        group = augroup,
-        pattern = {
-          "Avante",
-          "AvanteInput",
-          "AvanteSelectedFiles",
-        },
-        callback = function(event)
-          vim.keymap.set("n", close_key, "<cmd>close<cr>", {
-            buffer = event.buf,
-            silent = true,
-            desc = "Quit buffer",
-          })
-        end,
-      })
-
       if LazyVim.has("vim-dadbod-ui") then
         LazyVim.on_load("vim-dadbod-ui", function()
           if vim.g.db_ui_tmp_query_location then
@@ -443,5 +426,37 @@ return {
       { close_key, "<Plug>(DBUI_Quit)", desc = "Quit (dadbod)", ft = "dbui" },
       { close_key, "<cmd>bd<cr>", desc = "Close (dadbod)", ft = "dbout" },
     },
+  },
+
+  {
+    "yetone/avante.nvim",
+    optional = true,
+    opts = function(_, opts)
+      local defaults = require("avante.config")._defaults
+
+      vim.api.nvim_create_autocmd("FileType", {
+        group = augroup,
+        pattern = {
+          -- "Avante",
+          "AvanteInput",
+          "AvanteSelectedFiles",
+        },
+        callback = function(event)
+          vim.keymap.set("n", close_key, "<cmd>close<cr>", {
+            buffer = event.buf,
+            silent = true,
+            desc = "Quit buffer",
+          })
+        end,
+      })
+
+      return U.extend_tbl(opts, {
+        mappings = {
+          sidebar = {
+            close = vim.list_extend(vim.deepcopy(defaults.mappings.sidebar.close), { close_key }),
+          },
+        },
+      })
+    end,
   },
 }
