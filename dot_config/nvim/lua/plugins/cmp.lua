@@ -194,9 +194,7 @@ return {
   {
     "saghen/blink.cmp",
     optional = true,
-    dependencies = {
-      "mikavilpas/blink-ripgrep.nvim",
-    },
+    dependencies = "mikavilpas/blink-ripgrep.nvim",
     ---@module 'blink.cmp'
     ---@type blink.cmp.Config
     opts = {
@@ -231,9 +229,7 @@ return {
   {
     "saghen/blink.cmp",
     optional = true,
-    dependencies = {
-      "Kaiser-Yang/blink-cmp-dictionary",
-    },
+    dependencies = "Kaiser-Yang/blink-cmp-dictionary",
     ---@type blink.cmp.Config
     opts = {
       sources = {
@@ -267,13 +263,68 @@ return {
     },
   },
 
+  {
+    "saghen/blink.cmp",
+    optional = true,
+    dependencies = "ribru17/blink-cmp-spell",
+    ---@type blink.cmp.Config
+    opts = {
+      sources = {
+        default = { "spell" },
+        providers = {
+          spell = {
+            module = "blink-cmp-spell",
+            name = "Spell",
+            max_items = 3,
+            score_offset = -10,
+            opts = {
+              -- only enable source in `@spell` captures, and disable it in `@nospell` captures
+              enable_in_context = function()
+                local is_spell = false
+                for _, capture in ipairs(vim.treesitter.get_captures_at_cursor(0)) do
+                  if capture == "spell" then
+                    is_spell = true
+                  elseif capture == "nospell" then
+                    return false
+                  end
+                end
+                return is_spell
+              end,
+            },
+          },
+        },
+      },
+    },
+  },
+  {
+    "saghen/blink.cmp",
+    optional = true,
+    opts = function(_, opts)
+      local fuzzy_default = require("blink.cmp.config.fuzzy").default
+
+      ---@type blink.cmp.Config
+      local o = {
+        fuzzy = {
+          sorts = {
+            function(a, b)
+              local sort = require("blink.cmp.fuzzy.sort")
+              if a.source_id == "spell" and b.source_id == "spell" then
+                return sort.label(a, b)
+              end
+            end,
+            unpack(fuzzy_default.sorts),
+          },
+        },
+      }
+      return U.extend_tbl(opts, o)
+    end,
+  },
+
   -- vim.fn.executable("gh") == 1
   --     and {
   --       "saghen/blink.cmp",
   --       optional = true,
-  --       dependencies = {
-  --         "Kaiser-Yang/blink-cmp-git",
-  --       },
+  --       dependencies = "Kaiser-Yang/blink-cmp-git",
   --       ---@type blink.cmp.Config
   --       opts = {
   --         sources = {
