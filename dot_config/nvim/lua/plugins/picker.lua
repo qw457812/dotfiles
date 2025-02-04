@@ -1,3 +1,21 @@
+---@param text string
+---@param width number
+---@param direction? -1 | 1
+local function truncate(text, width, direction)
+  if width <= 0 then
+    return ""
+  end
+  if width == 1 then
+    return "…"
+  end
+  local tw = vim.api.nvim_strwidth(text)
+  if tw > width then
+    return direction == -1 and "…" .. vim.fn.strcharpart(text, tw - width + 1, width - 1)
+      or vim.fn.strcharpart(text, 0, width - 1) .. "…"
+  end
+  return text
+end
+
 -- https://github.com/folke/dot/blob/master/nvim/lua/plugins/telescope.lua
 local pick_search_lazy_specs = function()
   local dirs = { U.path.CONFIG .. "/lua/plugins", U.path.LAZYVIM .. "/lua/lazyvim/plugins" }
@@ -148,6 +166,46 @@ return {
             hidden = true,
             follow = true,
           },
+          lazy = {
+            icons = {
+              files = {
+                enabled = false,
+              },
+            },
+            format = function(item, picker)
+              ---@type snacks.picker.Highlight[]
+              local ret = {}
+
+              local path = Snacks.picker.util.path(item) or item.file
+              local icon, hl
+              if path:match("lua/lazyvim/plugins/") then
+                icon, hl = "󰒲 ", "MiniIconsBlue"
+              else
+                icon, hl = " ", "MiniIconsAzure"
+              end
+              ret[#ret + 1] = { icon, hl, virtual = true }
+
+              -- copied from: https://github.com/folke/snacks.nvim/blob/b773368f8aa6e84a68e979f0e335d23de71f405a/lua/snacks/picker/format.lua#L118-L133
+              vim.list_extend(ret, Snacks.picker.format.filename(item, picker))
+              local trunc_len = 30
+              for _, text in ipairs(ret) do
+                if text[2] == "SnacksPickerDir" then
+                  text[1] = text[1]:gsub("^.*lua/plugins/", ""):gsub("^.*lua/lazyvim/plugins/", "")
+                  local offset = Snacks.picker.highlight.offset(ret, { char_idx = true })
+                  text[1] = truncate(text[1], vim.api.nvim_strwidth(text[1]) - (offset - trunc_len) - 1, -1)
+                  break
+                end
+              end
+
+              if item.line then
+                local offset = Snacks.picker.highlight.offset(ret, { char_idx = true })
+                ret[#ret + 1] = { Snacks.picker.util.align(" ", trunc_len - offset) }
+                Snacks.picker.highlight.format(item, vim.trim(item.line), ret)
+                table.insert(ret, { " " })
+              end
+              return ret
+            end,
+          },
         },
         win = {
           input = {
@@ -213,19 +271,7 @@ return {
   {
     "folke/snacks.nvim",
     optional = true,
-    opts = function(_, opts)
-      ---@param text string
-      ---@param width number
-      ---@param direction? -1 | 1
-      local function truncate(text, width, direction)
-        local tw = vim.api.nvim_strwidth(text)
-        if tw > width then
-          return direction == -1 and "…" .. vim.fn.strcharpart(text, tw - width + 1, width - 1)
-            or vim.fn.strcharpart(text, 0, width - 1) .. "…"
-        end
-        return text
-      end
-
+    opts = function()
       -- HACK: shorten & truncate dir | https://github.com/folke/snacks.nvim/blob/2568f18c4de0f43b15b0244cd734dcb5af93e53f/lua/snacks/picker/format.lua#L51
       Snacks.picker.util.truncpath = function(path)
         return path
