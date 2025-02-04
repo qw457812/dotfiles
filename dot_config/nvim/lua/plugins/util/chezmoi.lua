@@ -47,18 +47,8 @@ local function pick_chezmoi()
       },
     })
   elseif LazyVim.pick.picker.name == "snacks" then
-    local managed_files = chezmoi_list_files({ include_symlinks = true, path_style_absolute = true })
-    Snacks.picker.pick({
-      items = vim.tbl_map(function(file)
-        return { file = file, text = U.path.home_to_tilde(file) }
-      end, managed_files),
-      confirm = function(picker, item)
-        picker:close()
-        if item then
-          require("chezmoi.commands").edit({ targets = item.file })
-        end
-      end,
-    })
+    ---@diagnostic disable-next-line: undefined-field
+    Snacks.picker.chezmoi()
   end
 end
 
@@ -207,6 +197,40 @@ return {
   {
     "folke/snacks.nvim",
     optional = true,
+    ---@type snacks.Config
+    opts = {
+      picker = {
+        sources = {
+          chezmoi = {
+            finder = function()
+              local managed_files = chezmoi_list_files({ include_symlinks = true, path_style_absolute = true })
+              ---@type snacks.picker.finder.Item[]
+              local items = vim.tbl_map(function(file)
+                return { file = file, text = U.path.home_to_tilde(file) }
+              end, managed_files)
+              return items
+            end,
+            format = "file",
+            confirm = function(picker)
+              local items = picker:selected({ fallback = true })
+              picker:close()
+              if #items == 0 then
+                return
+              end
+              local files = vim.tbl_map(function(item)
+                return Snacks.picker.util.path(item)
+              end, items)
+              require("chezmoi.commands").edit({ targets = files })
+            end,
+          },
+        },
+      },
+    },
+  },
+
+  {
+    "folke/snacks.nvim",
+    optional = true,
     keys = { { "<leader>fc", false } },
   },
   {
@@ -218,6 +242,36 @@ return {
     "nvim-telescope/telescope.nvim",
     optional = true,
     keys = { { "<leader>fc", false } },
+  },
+
+  {
+    "folke/snacks.nvim",
+    ---@type snacks.Config
+    opts = {
+      picker = {
+        sources = {
+          lazy = {
+            confirm = function(picker, item, action)
+              picker:close()
+              if item then
+                local file = assert(Snacks.picker.util.path(item))
+                if vim.tbl_contains(chezmoi_list_config_files(), file) then
+                  require("chezmoi.commands").edit({ targets = file })
+                  -- copied from: https://github.com/folke/snacks.nvim/blob/adf93a32ae79b7279e48608fa0705545fc7a36ae/lua/snacks/picker/actions.lua#L105
+                  local pos = item.pos
+                  if pos and pos[1] > 0 then
+                    vim.api.nvim_win_set_cursor(0, { pos[1], pos[2] })
+                    vim.cmd("norm! zzzv")
+                  end
+                else
+                  Snacks.picker.actions.jump(picker, item, action)
+                end
+              end
+            end,
+          },
+        },
+      },
+    },
   },
 
   {
@@ -252,36 +306,6 @@ return {
         },
       })
     end,
-  },
-
-  {
-    "folke/snacks.nvim",
-    ---@type snacks.Config
-    opts = {
-      picker = {
-        sources = {
-          lazy = {
-            confirm = function(picker, item, action)
-              picker:close()
-              if item then
-                local file = assert(Snacks.picker.util.path(item))
-                if vim.tbl_contains(chezmoi_list_config_files(), file) then
-                  require("chezmoi.commands").edit({ targets = file })
-                  -- set the cursor, see: https://github.com/folke/snacks.nvim/blob/adf93a32ae79b7279e48608fa0705545fc7a36ae/lua/snacks/picker/actions.lua#L105
-                  local pos = item.pos
-                  if pos and pos[1] > 0 then
-                    vim.api.nvim_win_set_cursor(0, { pos[1], pos[2] })
-                    vim.cmd("norm! zzzv")
-                  end
-                else
-                  Snacks.picker.actions.jump(picker, item, action)
-                end
-              end
-            end,
-          },
-        },
-      },
-    },
   },
 
   {
