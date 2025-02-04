@@ -241,8 +241,8 @@ return {
             min_keyword_length = 3,
             max_items = 3,
             score_offset = -10,
-            --- @module 'blink-cmp-dictionary'
-            --- @type blink-cmp-dictionary.Options
+            ---@module 'blink-cmp-dictionary'
+            ---@type blink-cmp-dictionary.Options
             opts = {
               -- aspell -d en_US dump master | aspell -l en expand | sed 's/\s\+/\n/g' > aspell_en.dict
               dictionary_files = { vim.fn.stdpath("data") .. "/cmp-dictionary/dict/aspell_en.dict" },
@@ -318,6 +318,27 @@ return {
       }
       return U.extend_tbl(opts, o)
     end,
+  },
+
+  {
+    "saghen/blink.cmp",
+    optional = true,
+    dependencies = "bydlw98/blink-cmp-env",
+    ---@type blink.cmp.Config
+    opts = {
+      sources = {
+        default = { "env" },
+        providers = {
+          env = {
+            module = "blink-cmp-env",
+            name = "Env",
+            min_keyword_length = 3,
+            max_items = 3,
+            score_offset = -10,
+          },
+        },
+      },
+    },
   },
 
   -- vim.fn.executable("gh") == 1

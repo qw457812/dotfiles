@@ -9,6 +9,7 @@
   "better-escape.nvim": { "branch": "master", "commit": "199dcc2643dec5d8dbdab4ec672cf405224dcb3b" },
   "blink-cmp-copilot": { "branch": "main", "commit": "5d4ed42c5d7d144012792bb6cc4ac7899a108169" },
   "blink-cmp-dictionary": { "branch": "master", "commit": "07cc2e49bb52ebff4e8b83d1801ad6441edf90a2" },
+  "blink-cmp-env": { "branch": "main", "commit": "c7686cff20b1e857851a1b5429e32ec0e25cb4f3" },
   "blink-cmp-spell": { "branch": "master", "commit": "38d6797dea6f72baa6e8b3bfca6da96d8fcac64d" },
   "blink-copilot": { "branch": "main", "commit": "02daaf13654e78a6ec63401446d07f8c624f513b" },
   "blink-ripgrep.nvim": { "branch": "main", "commit": "519ac7894113f6a7b517b157c26e31fbd58a0de5" },
