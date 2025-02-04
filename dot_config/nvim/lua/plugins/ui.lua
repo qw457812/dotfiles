@@ -290,9 +290,6 @@ return {
           key.action = ":ene" -- do not startinsert
         elseif key.key == "p" then
           key.key = "o" -- o for projects, p for paste
-          key.action = LazyVim.pick.want() == "snacks" and ":lua Snacks.picker.projects()" or key.action
-        elseif key.key == "c" and vim.g.user_is_termux then
-          key.action = ":lua LazyVim.pick.config_files()()"
         elseif key.key == "s" and vim.g.user_auto_root then
           key.section, key.action = nil, ":lua require('persistence').load({ last = true })"
         elseif key.key == "q" then

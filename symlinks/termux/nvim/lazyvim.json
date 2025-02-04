@@ -28,7 +28,6 @@
     "lazyvim.plugins.extras.util.chezmoi",
     "lazyvim.plugins.extras.util.dot",
     "lazyvim.plugins.extras.util.mini-hipatterns",
-    "lazyvim.plugins.extras.util.project",
     "plugins.extras.editor.mini-operators",
     "plugins.extras.game.exercism",
     "plugins.extras.lsp.mason-lock",
