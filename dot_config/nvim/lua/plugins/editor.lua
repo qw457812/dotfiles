@@ -451,7 +451,9 @@ return {
     event = "ModeChanged *:[vV]",
     opts = {
       chars_lower_limit = 2,
-      -- buffers = "all",
+      buffers = function(buf)
+        return vim.bo[buf].buflisted and vim.bo[buf].buftype == ""
+      end,
     },
   },
 
@@ -547,15 +549,23 @@ return {
           end
         end
 
+        -- snacks bigfile: lsp -> indent
+        local function is_bigfile(buf)
+          return vim.bo[buf].filetype == "bigfile" or vim.b[buf].bigfile
+        end
+
         return require("ufo")
           .getFolds(bufnr, "lsp")
           :catch(function(err)
-            return handleFallbackException(err, "treesitter")
+            return is_bigfile(bufnr) and require("promise").reject(err) or handleFallbackException(err, "treesitter")
           end)
           :catch(function(err)
             return handleFallbackException(err, "indent")
           end)
           :thenCall(function(res)
+            if is_bigfile(bufnr) then
+              return res
+            end
             -- alternative: require("ufo").getFolds(bufnr, "marker")
             -- NOTE: https://github.com/kevinhwang91/nvim-ufo/issues/233#issuecomment-2269229978
             -- PERF: https://github.com/kevinhwang91/nvim-ufo/issues/233#issuecomment-2226902851
