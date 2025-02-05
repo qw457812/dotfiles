@@ -166,6 +166,7 @@ return {
   -- https://github.com/yutkat/dotfiles/blob/a80b83c66c8e2b8fab68b32486a1a02afd3adddb/.config/nvim/lua/rc/pluginconfig/text-case.lua#L14
   {
     "johmsalas/text-case.nvim",
+    enabled = false, -- using gregorias/coerce.nvim
     vscode = true,
     keys = function()
       local keys = {
@@ -186,6 +187,21 @@ return {
         end)
       end
     end,
+  },
+  {
+    "gregorias/coerce.nvim",
+    keys = { { "ga", mode = { "n", "v" } } },
+    ---@module 'coerce'
+    ---@type CoerceConfigUser
+    opts = {
+      default_mode_keymap_prefixes = {
+        normal_mode = "ga",
+        visual_mode = "ga",
+      },
+      default_mode_mask = {
+        motion_mode = false,
+      },
+    },
   },
 
   {
