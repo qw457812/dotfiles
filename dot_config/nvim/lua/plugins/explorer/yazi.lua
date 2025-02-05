@@ -47,11 +47,7 @@ return {
       --   end,
       -- })
 
-      local picker = ({
-        ["snacks"] = "snacks.picker",
-        ["fzf"] = "fzf-lua",
-        ["telescope"] = "telescope",
-      })[LazyVim.pick.picker.name]
+      local picker = ({ snacks = "snacks.picker", fzf = "fzf-lua", telescope = "telescope" })[LazyVim.pick.picker.name]
 
       ---@type YaziConfig
       return {

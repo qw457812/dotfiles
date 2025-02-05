@@ -45,8 +45,6 @@ return {
         file_browser = {
           -- theme = "ivy",
           hijack_netrw = hijack_netrw,
-          -- ~/.local/share/nvim/lazy/telescope-file-browser.nvim/lua/telescope/_extensions/file_browser/config.lua
-          -- ~/.local/share/nvim/lazy/telescope.nvim/lua/telescope/mappings.lua
           initial_mode = "normal",
           mappings = {
             ["i"] = {

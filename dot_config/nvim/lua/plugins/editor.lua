@@ -613,27 +613,15 @@ return {
     "max397574/better-escape.nvim",
     event = { "InsertEnter", "CmdlineEnter" },
     opts = {
-      -- note: lazygit, fzf-lua use terminal mode, `jj` and `jk` make lazygit navigation harder
-      default_mappings = false,
+      default_mappings = false, -- j/k navigation in lazygit and fzf-lua
       mappings = {
         i = {
-          j = {
-            -- these can all also be functions
-            k = "<Esc>",
-            j = "<Esc>",
-          },
-          k = {
-            j = "<Esc>",
-          },
+          j = { j = "<Esc>", k = "<Esc>" },
+          k = { j = "<Esc>" },
         },
         c = {
-          j = {
-            k = "<Esc>",
-            j = "<Esc>",
-          },
-          k = {
-            j = "<Esc>",
-          },
+          j = { j = "<Esc>", k = "<Esc>" },
+          k = { j = "<Esc>" },
         },
       },
     },
@@ -670,7 +658,7 @@ return {
           {
             "<esc>",
             function()
-              esc_timer = esc_timer or vim.uv.new_timer()
+              esc_timer = esc_timer or assert(vim.uv.new_timer())
               if esc_timer:is_active() then
                 esc_timer:stop()
                 PAGER_MODE:deactivate()

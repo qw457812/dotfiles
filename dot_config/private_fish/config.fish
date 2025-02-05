@@ -208,13 +208,13 @@ if status is-interactive
         eval (batpipe)
     end
 
-    if type -q pyenv
-        set -Ux PYENV_ROOT $HOME/.pyenv
-        fish_add_path $PYENV_ROOT/bin
-        pyenv init - | source
-        set -gx PYENV_VIRTUALENV_DISABLE_PROMPT 1
-        pyenv virtualenv-init - | source
-    end
+    # if type -q pyenv
+    #     set -Ux PYENV_ROOT $HOME/.pyenv
+    #     fish_add_path $PYENV_ROOT/bin
+    #     pyenv init - | source
+    #     set -gx PYENV_VIRTUALENV_DISABLE_PROMPT 1
+    #     pyenv virtualenv-init - | source
+    # end
 
     if set -q TERMUX_VERSION
         abbr pkgu 'pkg update && pkg upgrade'

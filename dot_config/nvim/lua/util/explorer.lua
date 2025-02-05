@@ -47,7 +47,6 @@ function M.load_on_directory(hijack_netrw_plugin)
 end
 
 --- Search and Replace from Explorer
---- https://github.com/MagicDuck/grug-far.nvim#add-minifiles-integration-to-open-search-limited-to-focused-directory
 ---@param path string
 function M.grug_far(path)
   local grug = require("grug-far")

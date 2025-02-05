@@ -154,13 +154,4 @@ return {
       end
     end,
   },
-
-  -- {
-  --   "akinsho/toggleterm.nvim",
-  --   keys = { { "<c-space>" } },
-  --   opts = {
-  --     open_mapping = "<c-space>",
-  --     -- direction = "float",
-  --   },
-  -- },
 }

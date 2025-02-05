@@ -38,11 +38,9 @@ return {
             local state = require("bufferline.state")
             for i, item in ipairs(state.visible_components) do
               if item.id == o.id then
-                -- return tostring(i)
                 return o.raise(i)
               end
             end
-            -- return "0"
             return o.raise(0)
           end,
           -- hide extension
@@ -75,7 +73,7 @@ return {
   },
 
   -- https://github.com/aimuzov/LazyVimx/blob/a27d3439b9021d1215ce6471f59d801df32c18d4/lua/lazyvimx/extras/ui/panels/status-line.lua
-  -- https://github.com/chrisgrieser/.config/blob/main/nvim/lua/plugins/lualine.lua
+  -- https://github.com/chrisgrieser/.config/blob/1a51e8e5e2ee78e57b5c1e1495acab287f4db757/nvim/lua/plugin-specs/lualine.lua#L22
   -- https://github.com/barryblando/dotfiles/blob/078543ccb0be6c57284400c2a1b1af4a9dd46aa4/neovim/.config/nvim/lua/plugins/lualine.lua
   -- https://github.com/minusfive/dotfiles/blob/897c9596471854842cae52d774f7e43426287e58/.config/nvim/lua/plugins/ui.lua#L152
   {
@@ -209,30 +207,6 @@ return {
         end
       end
 
-      -- opts.config.header = {
-      --   [[                                                   ]],
-      --   [[                                                   ]],
-      --   [[                        ⢀ ⡠⢠ ⢂⢄⠂⠠⢄⡀⡀               ]],
-      --   [[                     ⣀⢠⠒⠅⠨⢒ ⠧⢀ ⢃⠄ ⠤⠂⠐⠠             ]],
-      --   [[                 ⢀ ⠲⠄⡂⠡⠐⠈⠁⠁⠒⠄ ⠂ ⠠ ⠉⠐ ⠅⠠⢁           ]],
-      --   [[                ⠔⠌⠃⠄⢁⠐ ⠁⠁⠁  ⢈ ⠁ ⡀  ⡀   ⠄⠠          ]],
-      --   [[             ⣀⢘⠉⡀⠂⡑⢈⠠⠐⠈     ⠄⠁        ⠠  ⠐         ]],
-      --   [[            ⡐⠁⠂⠠⢀⠂⡀⠂      ⠐⠈ ⠐   ⡀       ⠅         ]],
-      --   [[          ⠠⠈⠠⠁⠠⠁⡐⢐⡐     ⠐⠆⢀              ⠠         ]],
-      --   [[          ⠌⡁⠐⢀ ⠡⢈⠬⣂⢀⠄⠄⠊⠂            ⠈    ⠂         ]],
-      --   [[         ⠰ ⠄  ⠈ ⠐  ⠉  ⠐     ⠈          ⠂           ]],
-      --   [[         ⠢  ⠈  ⠂  ⠁    ⢀       ⢀       ⢀⠄          ]],
-      --   [[         ⠌ ⠂ ⢀    ⡀                                ]],
-      --   [[         ⠠⢀              ⡀        ⠂                ]],
-      --   [[             ⠠    ⢀                ⠆               ]],
-      --   [[           ⠁               ⠄                       ]],
-      --   [[              ⠈     ⠂       ⠐                      ]],
-      --   [[                     ⠈                             ]],
-      --   [[                                                   ]],
-      --   [[                                                   ]],
-      -- }
-
-      -- https://github.com/nicknisi/dotfiles/blob/5ba5a46d2cb5fc6d6c9415300f04f57a20bb2f30/config/nvim/lua/nisi/assets.lua#L144
       opts.config.header = {
         [[                                                    ]],
         [[                                                    ]],
@@ -306,18 +280,6 @@ return {
       -- stylua: ignore end
 
       opts.dashboard.preset.header = [[
-  ⣴⣶⣤⡤⠦⣤⣀⣤⠆     ⣈⣭⣿⣶⣿⣦⣼⣆         
-   ⠉⠻⢿⣿⠿⣿⣿⣶⣦⠤⠄⡠⢾⣿⣿⡿⠋⠉⠉⠻⣿⣿⡛⣦      
-         ⠈⢿⣿⣟⠦ ⣾⣿⣿⣷    ⠻⠿⢿⣿⣧⣄    
-          ⣸⣿⣿⢧ ⢻⠻⣿⣿⣷⣄⣀⠄⠢⣀⡀⠈⠙⠿⠄   
-         ⢠⣿⣿⣿⠈    ⣻⣿⣿⣿⣿⣿⣿⣿⣛⣳⣤⣀⣀  
-  ⢠⣧⣶⣥⡤⢄ ⣸⣿⣿⠘  ⢀⣴⣿⣿⡿⠛⣿⣿⣧⠈⢿⠿⠟⠛⠻⠿⠄ 
- ⣰⣿⣿⠛⠻⣿⣿⡦⢹⣿⣷   ⢊⣿⣿⡏  ⢸⣿⣿⡇ ⢀⣠⣄⣾⠄  
-⣠⣿⠿⠛ ⢀⣿⣿⣷⠘⢿⣿⣦⡀ ⢸⢿⣿⣿⣄ ⣸⣿⣿⡇⣪⣿⡿⠿⣿⣷⡄ 
-⠙⠃   ⣼⣿⡟  ⠈⠻⣿⣿⣦⣌⡇⠻⣿⣿⣷⣿⣿⣿ ⣿⣿⡇ ⠛⠻⢷⣄
-     ⢻⣿⣿⣄   ⠈⠻⣿⣿⣿⣷⣿⣿⣿⣿⣿⡟ ⠫⢿⣿⡆    
-      ⠻⣿⣿⣿⣿⣶⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⡟⢀⣀⣤⣾⡿⠃    ]]
-      opts.dashboard.preset.header = [[
                                                                    
       ████ ██████           █████      ██                    
      ███████████             █████                            
@@ -333,7 +295,6 @@ return {
       opts.dashboard.sections = {
         {}, -- top padding for header
         { section = "header" },
-        -- { icon = " ", title = "Keymaps", section = "keys", indent = 2, padding = 1 },
         { section = "keys", padding = 1 },
         {
           icon = " ",

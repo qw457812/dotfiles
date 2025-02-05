@@ -10,11 +10,6 @@
 -- onedark
 -- obscure
 -- cyberdream
--- kanagawa-wave
--- kanagawa-dragon
--- nightfox
--- nordfox
--- astrodark
 local colorschemes = vim.g.user_transparent_background and {
   "tokyonight-moon",
   "catppuccin-frappe",
@@ -563,25 +558,6 @@ return {
     end,
   },
 
-  -- {
-  --   "rebelot/kanagawa.nvim",
-  --   cond = cond_colorscheme("^kanagawa"),
-  --   lazy = true,
-  -- },
-  --
-  -- {
-  --   "EdenEast/nightfox.nvim",
-  --   cond = cond_colorscheme("fox$"),
-  --   lazy = true,
-  -- },
-  --
-  -- {
-  --   "AstroNvim/astrotheme",
-  --   cond = cond_colorscheme("^astro"),
-  --   lazy = true,
-  --   opts = {},
-  -- },
-
   -- custom illuminate highlight for all colorschemes which don't customize it
   {
     "RRethy/vim-illuminate",
@@ -633,19 +609,6 @@ return {
       })
     end,
   },
-
-  -- {
-  --   "folke/styler.nvim",
-  --   event = "VeryLazy",
-  --   opts = function()
-  --     return {
-  --       themes = {
-  --         markdown = { colorscheme = "catppuccin" },
-  --         help = { colorscheme = "catppuccin" },
-  --       },
-  --     }
-  --   end,
-  -- },
 
   {
     "nvim-telescope/telescope.nvim",

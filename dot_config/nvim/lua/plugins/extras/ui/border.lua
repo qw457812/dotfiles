@@ -31,7 +31,6 @@ return {
     opts = function(_, opts)
       local cmp = require("cmp")
       opts.window = {
-        -- TODO: transparent bg like blink
         completion = cmp.config.window.bordered(),
         documentation = cmp.config.window.bordered(),
       }

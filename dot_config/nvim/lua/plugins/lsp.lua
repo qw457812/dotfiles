@@ -1,4 +1,6 @@
-local function pick_definitions()
+local H = {}
+
+function H.pick_definitions()
   if LazyVim.pick.picker.name == "telescope" then
     require("telescope.builtin").lsp_definitions({ reuse_win = true })
   elseif LazyVim.pick.picker.name == "fzf" then
@@ -8,7 +10,7 @@ local function pick_definitions()
   end
 end
 
-local function pick_references()
+function H.pick_references()
   if LazyVim.pick.picker.name == "telescope" then
     require("telescope.builtin").lsp_references({ include_declaration = false })
   elseif LazyVim.pick.picker.name == "fzf" then
@@ -25,7 +27,7 @@ end
 ---@param result lsp.Location|lsp.LocationLink
 ---@param params lsp.TextDocumentPositionParams
 ---@return boolean
-local function is_same_position(result, params)
+function H.is_same_position(result, params)
   local uri = result.uri or result.targetUri
   local range = result.range or result.targetSelectionRange
   if uri ~= params.textDocument.uri then
@@ -51,7 +53,7 @@ end
 --- https://github.com/mbriggs/nvim-v2/blob/d8526496596f3a4dcab2cde86674ca58eaee65e2/lsp_fixcurrent.lua
 --- https://github.com/neovim/neovim/blob/fb6c059dc55c8d594102937be4dd70f5ff51614a/runtime/lua/vim/lsp/_tagfunc.lua#L25
 --- https://github.com/ibhagwan/fzf-lua/blob/975534f4861e2575396716225c1202572645583d/lua/fzf-lua/providers/lsp.lua#L468
-local function pick_definitions_or_references()
+function H.pick_definitions_or_references()
   local params = vim.lsp.util.make_position_params(0, "utf-16")
   local method = vim.lsp.protocol.Methods.textDocument_definition
   local results_by_client, err = vim.lsp.buf_request_sync(0, method, params, 1000)
@@ -61,40 +63,34 @@ local function pick_definitions_or_references()
   end
   if vim.tbl_isempty(results_by_client) then
     -- no definitions found, try references
-    pick_references()
+    H.pick_references()
   else
     for _, lsp_results in pairs(results_by_client) do
       local result = lsp_results.result or {}
       if result.range then -- Location
-        if is_same_position(result, params) then
+        if H.is_same_position(result, params) then
           -- already at one of the definitions, go to references
-          pick_references()
+          H.pick_references()
           return
         end
       else
         result = result --[[@as (lsp.Location[]|lsp.LocationLink[])]]
         for _, item in pairs(result) do
-          if is_same_position(item, params) then
+          if H.is_same_position(item, params) then
             -- already at one of the definitions, go to references
-            pick_references()
+            H.pick_references()
             return
           end
         end
       end
     end
     -- not at any definition, go to definitions
-    pick_definitions()
+    H.pick_definitions()
   end
 end
 
 return {
   { "saecki/live-rename.nvim", lazy = true },
-  -- LSP Keymaps
-  -- https://www.lazyvim.org/plugins/lsp#%EF%B8%8F-customizing-lsp-keymaps
-  -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/editor/telescope.lua
-  -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/editor/fzf.lua
-  -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/lsp/keymaps.lua
-  -- ~/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/editor/inc-rename.lua
   {
     "neovim/nvim-lspconfig",
     opts = function(_, opts)
@@ -106,10 +102,10 @@ return {
         { "gk", function() return vim.lsp.buf.hover() end, desc = "Hover", has = "hover" },
         -- { "<c-k>", mode = "i", false }, -- <c-k> for cmp navigation
         -- { "<c-h>", function() return vim.lsp.buf.signature_help() end, mode = "i", desc = "Signature Help", has = "signatureHelp" }, -- conflicts with mini.snippets
-        -- { "gd", pick_definitions_or_references, desc = "Goto Definition/References", has = "definition" },
+        -- { "gd", H.pick_definitions_or_references, desc = "Goto Definition/References", has = "definition" },
         {
           "<cr>",
-          pick_definitions_or_references,
+          H.pick_definitions_or_references,
           desc = "Goto Definition/References",
           has = "definition",
           cond = function()
