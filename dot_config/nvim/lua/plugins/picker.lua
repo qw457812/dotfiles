@@ -120,6 +120,8 @@ return {
           { "<leader>ff", function() Snacks.picker.smart() end, desc = "Smart" },
           { "<leader>fF", function() Snacks.picker.files({ hidden = true, follow = true, ignored = true }) end, desc = "Find all files" },
           { "<leader>gC", function() Snacks.picker.git_branches() end, desc = "Git branches" },
+          { "<leader>s/", function() Snacks.picker.search_history() end, desc = "Search History" },
+          { "<leader>sD", function() Snacks.picker.diagnostics_buffer() end, desc = "Buffer Diagnostics" },
           unpack(mappings),
         })
       end
@@ -161,6 +163,9 @@ return {
             native = true,
           },
         },
+        on_show = function()
+          vim.cmd("noh") -- clear_ui_esc
+        end,
         sources = {
           files = {
             hidden = true,
@@ -339,7 +344,7 @@ return {
                 end,
               }
             or nil,
-          lualine_x = { U.lualine.hlsearch }, -- esc
+          lualine_x = { U.lualine.hlsearch }, -- clear_ui_esc
           lualine_y = {
             function()
               local picker = Snacks.picker.get()[1]
