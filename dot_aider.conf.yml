@@ -1,11 +1,18 @@
 # https://aider.chat/docs/config/aider_conf.html
 
-# model: groq/llama-3.3-70b-versatile
-# model: gemini/gemini-1.5-pro-latest
-# deepseek: true
-model: deepseek/deepseek-reasoner
+alias:
+  - "r1:openrouter/deepseek/deepseek-r1"
+  - "sonnet:openrouter/anthropic/claude-3.5-sonnet"
+  - "groq:groq/llama-3.3-70b-versatile"
 
+architect: true
+model: openrouter/deepseek/deepseek-r1:free
+editor-model: openrouter/anthropic/claude-3.5-sonnet
+show-model-warnings: false
+
+gitignore: false
 auto-commits: false
+# watch-files: true
 
 dark-mode: true
 vim: true
