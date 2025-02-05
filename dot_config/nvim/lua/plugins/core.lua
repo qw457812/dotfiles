@@ -107,6 +107,13 @@ return {
           end,
         })
       end
+
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "bigfile",
+        callback = function(ev)
+          vim.b[ev.buf].bigfile = true
+        end,
+      })
     end,
   },
 }

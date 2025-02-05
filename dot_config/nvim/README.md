@@ -216,7 +216,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
   - [vim.g.user_zenmode_on](lua/plugins/ui.lua), [vim.g.user_minianimate_disable_old](lua/plugins/ui.lua)
   - [local neovide_state = {}](lua/config/keymaps.lua)
 - [ ] Preview scroll up/down: `<C-u>`/`<C-d>` or `<C-f>`/`<C-b>`?
-  - `<C-f>`/`<C-b>`: fzf, telescope, lsp-hover-doc, blink-cmp-doc, which-key-popup, yazi, trans.nvim
+  - `<C-f>`/`<C-b>`: fzf, telescope, lsp-hover-doc, blink-cmp-doc, which-key-popup, yazi, nvim-ufo, trans.nvim
     - `<C-b>` used for tmux prefix.
   - `<C-u>`/`<C-d>`: lazygit
     - `i_CTRL-U` used for unix-line-discard in fzf.
