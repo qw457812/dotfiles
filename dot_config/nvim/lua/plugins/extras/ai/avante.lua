@@ -187,6 +187,14 @@ return {
           -- curl -X GET "https://api.groq.com/openai/v1/models" -H "Authorization: Bearer $GROQ_API_KEY" -H "Content-Type: application/json" | jq '.data | sort_by(.created)'
           model = "llama-3.3-70b-versatile",
         },
+        ---@type AvanteSupportedProvider
+        ---@diagnostic disable-next-line: missing-fields
+        openrouter = {
+          __inherited_from = "openai",
+          endpoint = "https://openrouter.ai/api/v1",
+          api_key_name = "OPENROUTER_API_KEY",
+          model = "deepseek/deepseek-r1:free",
+        },
       },
       hints = { enabled = false },
     },

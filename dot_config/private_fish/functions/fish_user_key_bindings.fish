@@ -12,4 +12,5 @@ function fish_user_key_bindings
     bind -M visual H beginning-of-line
     bind -m visual V beginning-of-line begin-selection end-of-line repaint-mode
     bind -M visual V end-selection beginning-of-line begin-selection end-of-line
+    # TODO: https://github.com/fish-shell/fish-shell/issues/10807#issuecomment-2427887477
 end
