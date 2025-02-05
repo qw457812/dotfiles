@@ -1,6 +1,5 @@
 return {
   -- use helix-style mappings to prevent conflict with flash or leap: ms md mr
-  -- https://www.lazyvim.org/configuration/recipes#change-surround-mappings
   -- https://www.reddit.com/r/neovim/comments/1bl3dwz/whats_your_best_remap_for_flash_or_leap/
   -- https://github.com/ggandor/leap.nvim/discussions/59
   -- or use kylechui/nvim-surround instead of mini.surround | https://github.com/boltlessengineer/nvim/blob/607ee0c9412be67ba127a4d50ee722be578b5d9f/lua/plugins/coding.lua#L95
@@ -8,22 +7,14 @@ return {
     "echasnovski/mini.surround",
     optional = true,
     opts = {
-      -- use `''` (empty string) to disable one.
       mappings = {
-        -- gsa
-        add = "ms", -- Add surrounding in Normal and Visual modes
-        -- gsr
-        replace = "mr", -- Replace surrounding
-        -- gsd
-        delete = "md", -- Delete surrounding
-        -- gsf
-        find = "", -- Find surrounding (to the right)
-        -- gsF
-        find_left = "", -- Find surrounding (to the left)
-        -- gsh
-        highlight = "", -- Highlight surrounding
-        -- gsn
-        update_n_lines = "m<C-n>", -- Update `n_lines`
+        add = "ms",
+        replace = "mr",
+        delete = "md",
+        find = "",
+        find_left = "",
+        highlight = "",
+        update_n_lines = "m<C-n>",
       },
     },
   },
@@ -44,14 +35,12 @@ return {
     optional = true,
     opts = {
       mappings = {
-        -- next/last variants
-        around_next = "", -- an
-        inside_next = "", -- in
-        around_last = "", -- al
-        inside_last = "", -- il
-        -- move cursor to corresponding edge of `a` textobject
-        goto_left = "", -- g[
-        goto_right = "", -- g]
+        around_next = "",
+        inside_next = "",
+        around_last = "",
+        inside_last = "",
+        goto_left = "",
+        goto_right = "",
       },
     },
   },
@@ -79,7 +68,6 @@ return {
     vscode = true,
     keys = function()
       local keys = {
-        -- https://github.com/chrisgrieser/nvim-various-textobjs#smarter-gx
         {
           "gx",
           function()
@@ -113,9 +101,8 @@ return {
           end,
           desc = "URL Opener",
         },
-        -- https://github.com/chrisgrieser/nvim-various-textobjs#delete-surrounding-indentation
         {
-          "mdi", -- :=LazyVim.opts("mini.surround").mappings.delete
+          "mdi", -- mini.surround
           function()
             -- select outer indentation
             require("various-textobjs").indentation("outer", "outer")
@@ -176,13 +163,10 @@ return {
     },
   },
 
-  -- alternative: gregorias/coerce.nvim
-  -- https://github.com/yutkat/dotfiles/blob/2c95d4f42752c5c245d7642f5c2dbc326bd776c2/.config/nvim/lua/rc/pluginconfig/text-case.lua
+  -- https://github.com/yutkat/dotfiles/blob/a80b83c66c8e2b8fab68b32486a1a02afd3adddb/.config/nvim/lua/rc/pluginconfig/text-case.lua#L14
   {
     "johmsalas/text-case.nvim",
-    -- event = "VeryLazy", -- for `Subs` and `substitude_command_name` command, with interactive feature on first use
     vscode = true,
-    -- cmd = "S", -- for `substitude_command_name` command, without interactive feature on first use
     keys = function()
       local keys = {
         { "ga" },
@@ -193,10 +177,7 @@ return {
       end
       return keys
     end,
-    opts = {
-      -- -- an additional command with the passed in name will be created that does the same thing as "Subs" does
-      -- substitude_command_name = "S",
-    },
+    opts = {},
     config = function(_, opts)
       require("textcase").setup(opts)
       if LazyVim.has("telescope.nvim") then
@@ -210,7 +191,6 @@ return {
   {
     "dmtrKovalenko/caps-word.nvim",
     keys = {
-      -- stylua: ignore
       { "<A-c>", "<cmd>lua require('caps-word').toggle()<CR>", mode = { "i", "n" }, desc = "Toggle Caps Word" },
     },
     opts = {

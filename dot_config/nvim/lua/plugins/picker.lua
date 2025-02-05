@@ -1,12 +1,11 @@
+local H = {}
+
 ---@param text string
 ---@param width number
 ---@param direction? -1 | 1
-local function truncate(text, width, direction)
-  if width <= 0 then
-    return ""
-  end
-  if width == 1 then
-    return "…"
+function H.truncate(text, width, direction)
+  if width <= 1 then
+    return width == 1 and "…" or ""
   end
   local tw = vim.api.nvim_strwidth(text)
   if tw > width then
@@ -16,8 +15,7 @@ local function truncate(text, width, direction)
   return text
 end
 
--- https://github.com/folke/dot/blob/master/nvim/lua/plugins/telescope.lua
-local pick_search_lazy_specs = function()
+function H.pick_search_lazy_specs()
   local dirs = { U.path.CONFIG .. "/lua/plugins", U.path.LAZYVIM .. "/lua/lazyvim/plugins" }
   if LazyVim.pick.picker.name == "telescope" then
     require("telescope.builtin").live_grep({
@@ -35,8 +33,7 @@ local pick_search_lazy_specs = function()
   end
 end
 
--- alternative: https://github.com/tsakirist/telescope-lazy.nvim
-local pick_find_plugin_files = function()
+function H.pick_find_plugin_files()
   if LazyVim.pick.picker.name == "telescope" then
     -- https://github.com/chrisgrieser/.config/blob/41c33a44e9c02bd04ea7cedcaed0f5547129e83c/nvim/lua/config/lazy.lua#L170
     vim.ui.select(require("lazy").plugins(), {
@@ -55,7 +52,7 @@ local pick_find_plugin_files = function()
   end
 end
 
-local pick_search_plugin_codes = function()
+function H.pick_search_plugin_codes()
   if LazyVim.pick.picker.name == "telescope" then
     vim.ui.select(require("lazy").plugins(), {
       prompt = "Select Plugin",
@@ -73,7 +70,7 @@ local pick_search_plugin_codes = function()
   end
 end
 
-local pick_find_lazy_files = function()
+function H.pick_find_lazy_files()
   local dirs = { U.path.CONFIG .. "/lua", U.path.LAZYVIM .. "/lua" }
   if LazyVim.pick.picker.name == "telescope" then
     require("telescope.builtin").find_files({ search_dirs = dirs })
@@ -84,7 +81,7 @@ local pick_find_lazy_files = function()
   end
 end
 
-local pick_search_lazy_codes = function()
+function H.pick_search_lazy_codes()
   local dirs = { U.path.CONFIG .. "/lua", U.path.LAZYVIM .. "/lua" }
   if LazyVim.pick.picker.name == "telescope" then
     require("telescope.builtin").live_grep({ search_dirs = vim.tbl_values(dirs) })
@@ -99,12 +96,12 @@ local pick_search_lazy_codes = function()
 end
 
 -- stylua: ignore
-local mappings = {
+H.mappings = {
   { "<leader>sR", false },
-  { "<leader>fP", pick_find_plugin_files, desc = "Find Plugin File" },
-  { "<leader>sP", pick_search_plugin_codes, desc = "Search Plugin Code" },
-  { "<leader>fL", pick_find_lazy_files, desc = "Find Lazy File" },
-  { "<leader>sL", pick_search_lazy_codes, desc = "Search Lazy Code" },
+  { "<leader>fP", H.pick_find_plugin_files, desc = "Find Plugin File" },
+  { "<leader>sP", H.pick_search_plugin_codes, desc = "Search Plugin Code" },
+  { "<leader>fL", H.pick_find_lazy_files, desc = "Find Lazy File" },
+  { "<leader>sL", H.pick_search_lazy_codes, desc = "Search Lazy Code" },
   -- { "<leader>fB", function() LazyVim.pick("files", { cwd = vim.fn.expand("%:p:h") })() end, desc = "Find Files (Buffer Dir)" },
   { "<leader>sB", function() LazyVim.pick("live_grep", { cwd = vim.fn.expand("%:p:h") })() end, desc = "Grep (Buffer Dir)" },
 }
@@ -120,9 +117,7 @@ return {
           { "<leader>ff", function() Snacks.picker.smart() end, desc = "Smart" },
           { "<leader>fF", function() Snacks.picker.files({ hidden = true, follow = true, ignored = true }) end, desc = "Find all files" },
           { "<leader>gC", function() Snacks.picker.git_branches() end, desc = "Git branches" },
-          { "<leader>s/", function() Snacks.picker.search_history() end, desc = "Search History" },
-          { "<leader>sD", function() Snacks.picker.diagnostics_buffer() end, desc = "Buffer Diagnostics" },
-          unpack(mappings),
+          unpack(H.mappings),
         })
       end
     end,
@@ -197,7 +192,7 @@ return {
                 if text[2] == "SnacksPickerDir" then
                   text[1] = text[1]:gsub("^.*lua/plugins/", ""):gsub("^.*lua/lazyvim/plugins/", "")
                   local offset = Snacks.picker.highlight.offset(ret, { char_idx = true })
-                  text[1] = truncate(text[1], vim.api.nvim_strwidth(text[1]) - (offset - trunc_len) - 1, -1)
+                  text[1] = H.truncate(text[1], vim.api.nvim_strwidth(text[1]) - (offset - trunc_len) - 1, -1)
                   break
                 end
               end
@@ -243,7 +238,6 @@ return {
               },
               ["/"] = false,
               ["<leader><space>"] = "toggle_focus",
-              -- TODO: <leader><tab> to focus preview
               ["<Left>"] = "preview_scroll_left",
               ["<Right>"] = "preview_scroll_right",
               ["<C-Left>"] = "preview_scroll_left",
@@ -266,7 +260,6 @@ return {
                 desc = "Clear UI or Toggle Focus",
               },
               ["<leader><tab>"] = "toggle_focus",
-              -- TODO: <leader><space> to focus list
             },
           },
         },
@@ -311,7 +304,7 @@ return {
         for _, text in ipairs(ret) do
           if text[2] == "SnacksPickerDir" then
             text[1] = U.path.shorten(text[1])
-            text[1] = dir_trunc_len <= 1 and "" or truncate(text[1], dir_trunc_len, -1)
+            text[1] = dir_trunc_len <= 1 and "" or H.truncate(text[1], dir_trunc_len, -1)
             break
           end
         end
@@ -373,8 +366,8 @@ return {
     optional = true,
     keys = {
       { "<leader>s.", "<cmd>FzfLua resume<cr>", desc = "Resume" },
-      { "<leader>sp", pick_search_lazy_specs, desc = "Search Lazy Plugin Spec" },
-      unpack(mappings),
+      { "<leader>sp", H.pick_search_lazy_specs, desc = "Search Lazy Plugin Spec" },
+      unpack(H.mappings),
     },
     opts = {
       -- defaults = {
@@ -411,7 +404,7 @@ return {
       { "<leader>s.", "<cmd>Telescope resume<cr>", desc = "Resume" },
       { "<leader>ff", false },
       { "<leader>fF", false },
-      unpack(mappings),
+      unpack(H.mappings),
     },
     opts = {
       defaults = {
@@ -557,19 +550,4 @@ return {
       end)
     end,
   },
-
-  -- {
-  --   "piersolenski/telescope-import.nvim",
-  --   enabled = function()
-  --     return LazyVim.has("telescope.nvim")
-  --   end,
-  --   keys = {
-  --     { "<leader>ci", "<cmd>Telescope import<cr>", desc = "Pick Import" },
-  --   },
-  --   config = function()
-  --     LazyVim.on_load("telescope.nvim", function()
-  --       require("telescope").load_extension("import")
-  --     end)
-  --   end,
-  -- },
 }

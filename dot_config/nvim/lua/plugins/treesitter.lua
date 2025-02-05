@@ -9,7 +9,6 @@ return {
     },
     opts = function(_, opts)
       -- https://github.com/nvim-treesitter/nvim-treesitter#supported-languages
-      -- :=vim.list_contains(LazyVim.opts("nvim-treesitter").ensure_installed, "org")
       vim.list_extend(opts.ensure_installed, {
         -- "org",
         "mermaid",
@@ -50,7 +49,6 @@ return {
     },
   },
 
-  -- https://github.com/folke/dot/blob/39602b7edc7222213bce762080d8f46352167434/nvim/lua/plugins/tmp.lua#L112
   {
     "fei6409/log-highlight.nvim",
     event = "BufRead *.log",

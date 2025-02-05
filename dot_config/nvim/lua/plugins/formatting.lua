@@ -4,12 +4,18 @@ return {
     vscode = true,
     keys = {
       -- { "ga", mode = { "n", "x" }, desc = "Align" },
-      -- { "gA", mode = { "n", "x" }, desc = "Align with Preview" },
-      { "gA", mode = "x", desc = "Align with Preview" },
+      {
+        "gA",
+        mode = {
+          -- "n",
+          "x",
+        },
+        desc = "Align with Preview",
+      },
     },
     opts = {
       mappings = {
-        start = "", -- disabled since text-case.nvim uses `ga`
+        start = "", -- disabled since text-case.nvim or coerce.nvim uses `ga`
         start_with_preview = "gA",
       },
     },

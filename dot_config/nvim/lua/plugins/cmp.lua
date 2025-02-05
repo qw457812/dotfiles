@@ -8,17 +8,6 @@ local function has_words_before()
 end
 
 return {
-  -- TODO: research
-  -- https://github.com/hrsh7th/nvim-cmp/wiki/Example-mappings
-  -- https://github.com/LazyVim/LazyVim/blob/330d2e470b79eb31f884685b331d5d255776de90/lua/lazyvim/plugins/compat/nvim-0_9.lua#L3
-  -- https://github.com/LazyVim/LazyVim/blob/330d2e470b79eb31f884685b331d5d255776de90/lua/lazyvim/plugins/coding.lua#L109
-  -- https://github.com/garymjr/nvim-snippets#installation
-  -- https://github.com/LazyVim/LazyVim/blob/330d2e470b79eb31f884685b331d5d255776de90/lua/lazyvim/plugins/extras/coding/luasnip.lua#L41
-  -- https://github.com/L3MON4D3/LuaSnip#keymaps
-  -- https://github.com/LazyVim/LazyVim/issues/2533
-  -- https://github.com/LazyVim/starter/commit/0c370f4d5c537e6d41dea31b547accc8d5f70a8a
-  --
-  -- https://www.lazyvim.org/configuration/recipes#supertab
   -- use <tab> for completion and snippets (supertab)
   {
     "nvim-cmp",

@@ -1,4 +1,5 @@
 -- https://github.com/yetone/avante.nvim/wiki/Recipe-and-Tricks
+---@type table<string, string|fun():string>
 local prompt = {
   grammar_correction = "Correct the text to standard English, but keep any code blocks inside intact.",
   code_readability_analysis = [[
@@ -29,16 +30,22 @@ local prompt = {
   add_tests = "Implement tests for the following code",
 }
 
+---@param question string|fun():string
+---@return function
 local function ask(question)
   return function()
+    ---@cast question string
     question = vim.is_callable(question) and question() or question
     require("avante.api").ask({ question = question })
   end
 end
 
 -- prefill edit window with common scenarios to avoid repeating query and submit immediately
+---@param question string|fun():string
+---@return function
 local function edit_submit(question)
   return function()
+    ---@cast question string
     question = vim.is_callable(question) and question() or question
     require("avante.api").edit()
     vim.api.nvim_buf_set_lines(vim.api.nvim_get_current_buf(), 0, -1, false, { question })
@@ -155,12 +162,14 @@ return {
       vendors = {
         -- be able to switch between copilot (gpt-4o) and copilot-claude
         ---@type AvanteSupportedProvider
+        ---@diagnostic disable-next-line: missing-fields
         ["copilot-claude"] = {
           __inherited_from = "copilot",
           -- https://github.com/CopilotC-Nvim/CopilotChat.nvim#models
           model = "claude-3.5-sonnet",
         },
         ---@type AvanteSupportedProvider
+        ---@diagnostic disable-next-line: missing-fields
         deepseek = {
           __inherited_from = "openai",
           api_key_name = "DEEPSEEK_API_KEY",
@@ -170,11 +179,12 @@ return {
         },
         -- https://github.com/yetone/avante.nvim/pull/159
         ---@type AvanteSupportedProvider
+        ---@diagnostic disable-next-line: missing-fields
         groq = {
           __inherited_from = "openai",
           api_key_name = "GROQ_API_KEY",
           endpoint = "https://api.groq.com/openai/v1/",
-          -- curl -X GET "https://api.groq.com/openai/v1/models" -H "Authorization: Bearer $GROQ_API_KEY" -H "Content-Type: application/json" | jq .
+          -- curl -X GET "https://api.groq.com/openai/v1/models" -H "Authorization: Bearer $GROQ_API_KEY" -H "Content-Type: application/json" | jq '.data | sort_by(.created)'
           model = "llama-3.3-70b-versatile",
         },
       },

@@ -179,16 +179,17 @@ return {
           end
           for _, action in ipairs(args.data.actions) do
             ---@cast action oil.Action
-            if action.type == "move" then
-              ---@cast action oil.MoveAction
-              Snacks.rename.on_rename_file(parse_url(action.src_url), parse_url(action.dest_url))
-            elseif action.type == "delete" then
+            if action.type == "delete" then
               ---@cast action oil.DeleteAction
               local bufnr = vim.fn.bufnr(parse_url(action.url))
               if bufnr ~= -1 then
                 -- vim.cmd(("silent! bwipeout! %d"):format(bufnr))
                 Snacks.bufdelete({ buf = bufnr, wipe = true })
               end
+              -- -- already done, see: https://github.com/stevearc/oil.nvim/issues/184
+              -- elseif action.type == "move" then
+              --   ---@cast action oil.MoveAction
+              --   Snacks.rename.on_rename_file(parse_url(action.src_url), parse_url(action.dest_url))
             end
           end
         end,

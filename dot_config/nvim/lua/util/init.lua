@@ -15,8 +15,7 @@ local M = {}
 setmetatable(M, {
   __index = function(t, k)
     t[k] = require("util." .. k)
-    -- https://github.com/folke/snacks.nvim/commit/d0794dc
-    -- return t[k]
+    -- return t[k] -- https://github.com/folke/snacks.nvim/commit/d0794dc
     return rawget(t, k)
   end,
 })
