@@ -129,12 +129,13 @@ return {
           hl.LspReferenceRead = { link = "IlluminatedWordRead" }
           hl.LspReferenceWrite = { link = "IlluminatedWordWrite" }
           -- compensate for invisible text caused by custom illuminate highlight
-          hl.CmpGhostText = {
-            -- bg = vim.g.user_transparent_background and "#000000" or c.bg,
-            bg = c.bg,
-            fg = util.blend_fg((hl.CmpGhostText or hl.Comment).fg, vim.g.user_transparent_background and 0.5 or 0.85),
-          }
-          hl.BlinkCmpGhostText = { link = "CmpGhostText" }
+          -- -- not necessary after disabling vim-illuminate in insert mode
+          -- hl.CmpGhostText = {
+          --   -- bg = vim.g.user_transparent_background and "#000000" or c.bg,
+          --   bg = c.bg,
+          --   fg = util.blend_fg((hl.CmpGhostText or hl.Comment).fg, vim.g.user_transparent_background and 0.5 or 0.85),
+          -- }
+          -- hl.BlinkCmpGhostText = { link = "CmpGhostText" }
           -- unused variable
           hl.DiagnosticUnnecessary = { fg = util.blend_fg(c.terminal_black, 0.7) }
 
@@ -316,12 +317,13 @@ return {
             LspReferenceRead = { link = "IlluminatedWordRead" },
             LspReferenceWrite = { link = "IlluminatedWordWrite" },
             -- compensate for invisible text caused by custom illuminate highlight
-            CmpGhostText = {
-              -- bg = vim.g.user_transparent_background and "#000000" or colors.base,
-              bg = colors.base,
-              fg = vim.g.user_transparent_background and util.lighten(colors.overlay1, 0.875) or colors.overlay1,
-            },
-            BlinkCmpGhostText = { link = "CmpGhostText" },
+            -- -- not necessary after disabling vim-illuminate in insert mode
+            -- CmpGhostText = {
+            --   -- bg = vim.g.user_transparent_background and "#000000" or colors.base,
+            --   bg = colors.base,
+            --   fg = vim.g.user_transparent_background and util.lighten(colors.overlay1, 0.875) or colors.overlay1,
+            -- },
+            -- BlinkCmpGhostText = { link = "CmpGhostText" },
             DiagnosticUnnecessary = { fg = util.lighten(colors.overlay0, 0.9) },
             -- revert https://github.com/catppuccin/nvim/pull/768
             Comment = { fg = colors.overlay0, style = { "italic" } },
@@ -418,7 +420,7 @@ return {
           hl.IlluminatedWordWrite = { bg = illuminate, underline = true }
           hl.LspReferenceRead = { link = "IlluminatedWordRead" }
           hl.LspReferenceWrite = { link = "IlluminatedWordWrite" }
-          hl.CmpGhostText = { bg = c.bg, fg = util.blend_fg((hl.CmpGhostText or hl.Comment).fg, 0.85) }
+          -- hl.CmpGhostText = { bg = c.bg, fg = util.blend_fg((hl.CmpGhostText or hl.Comment).fg, 0.85) }
           hl.DiagnosticUnnecessary = { fg = util.blend_fg(c.terminal_black, 0.7) }
 
           hl.TelescopeSelectionCaret =
@@ -448,7 +450,7 @@ return {
           IlluminatedWordWrite = { bg = illuminate, fmt = "underline" },
           LspReferenceRead = { bg = illuminate },
           LspReferenceWrite = { bg = illuminate, fmt = "underline" },
-          CmpGhostText = { bg = "$bg0", fg = "$grey", fmt = "italic" },
+          -- CmpGhostText = { bg = "$bg0", fg = "$grey", fmt = "italic" },
           DiagnosticUnnecessary = { fg = util.lighten(colors.grey, 0.7), fmt = "italic" },
           MatchParen = { bg = "$grey", fg = "$orange", fmt = "bold" }, -- for LazyVim.lualine.pretty_path() and DropBarFileNameModified
           -- require("tokyonight.colors").setup({style = "moon"}).bg_visual -- #2d3f76
@@ -549,7 +551,7 @@ return {
               IlluminatedWordWrite = { bg = illuminate, underline = true },
               LspReferenceRead = { link = "IlluminatedWordRead" },
               LspReferenceWrite = { link = "IlluminatedWordWrite" },
-              CmpGhostText = { bg = c.bg, fg = util.blend(c.grey, c.fg, 0.85) },
+              -- CmpGhostText = { bg = c.bg, fg = util.blend(c.grey, c.fg, 0.85) },
               DiagnosticUnnecessary = { fg = util.blend(c.grey, c.fg, 0.7) },
             }
           end,
@@ -566,7 +568,7 @@ return {
       local function set_hl()
         local hl = vim.api.nvim_get_hl(0, { name = "IlluminatedWordWrite", link = false, create = false })
         if not (hl.bg and hl.underline) then
-          local bg = Snacks.util.color("Normal", "bg")
+          -- local bg = Snacks.util.color("Normal", "bg")
           local visual = Snacks.util.color("Visual", "bg")
           local comment = Snacks.util.color("Comment")
 
@@ -577,10 +579,14 @@ return {
           vim.api.nvim_set_hl(0, "IlluminatedWordWrite", { bg = illuminate, underline = true })
 
           -- compensate for invisible text caused by custom illuminate highlight
-          vim.api.nvim_set_hl(0, "CmpGhostText", { bg = bg, fg = U.color.lighten(comment, 0.85) })
-          vim.api.nvim_set_hl(0, "BlinkCmpGhostText", { link = "CmpGhostText" })
-          -- stylua: ignore
-          vim.api.nvim_set_hl(0, "DiagnosticUnnecessary", { fg = U.color.lighten(Snacks.util.color("DiagnosticUnnecessary") or comment, 0.7) })
+          -- -- not necessary after disabling vim-illuminate in insert mode
+          -- vim.api.nvim_set_hl(0, "CmpGhostText", { bg = bg, fg = U.color.lighten(comment, 0.85) })
+          -- vim.api.nvim_set_hl(0, "BlinkCmpGhostText", { link = "CmpGhostText" })
+          vim.api.nvim_set_hl(
+            0,
+            "DiagnosticUnnecessary",
+            { fg = U.color.lighten(Snacks.util.color("DiagnosticUnnecessary") or comment, 0.7) }
+          )
         end
       end
       set_hl()
