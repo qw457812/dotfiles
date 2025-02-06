@@ -25,9 +25,10 @@ return {
       })
     end,
   },
-  { "giuxtaposition/blink-cmp-copilot", enabled = false },
+  { "giuxtaposition/blink-cmp-copilot", optional = true, enabled = false },
   {
     "saghen/blink.cmp",
+    optional = true,
     dependencies = { "fang2hou/blink-copilot" },
     opts = {
       sources = {

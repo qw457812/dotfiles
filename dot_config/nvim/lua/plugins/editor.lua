@@ -174,11 +174,38 @@ return {
   },
 
   {
+    "lewis6991/gitsigns.nvim",
+    optional = true,
+    opts = function(_, opts)
+      local on_attach = opts.on_attach or function(_) end
+      opts.on_attach = function(buffer)
+        on_attach(buffer)
+
+        local gs = package.loaded.gitsigns
+
+        local function map(mode, l, r, desc)
+          vim.keymap.set(mode, l, r, { buffer = buffer, desc = desc })
+        end
+
+        -- mini.diff like mappings
+        map({ "n", "v" }, "gh", ":Gitsigns stage_hunk<CR>", "Stage Hunk")
+        map({ "n", "v" }, "gH", ":Gitsigns reset_hunk<CR>", "Reset Hunk")
+        map("o", "gh", ":<C-U>Gitsigns select_hunk<CR>", "GitSigns Select Hunk")
+        map("n", "<leader>go", function()
+          gs.diffthis("~")
+          map("n", vim.g.user_close_key, function()
+            vim.cmd.only()
+            vim.keymap.del("n", vim.g.user_close_key, { buffer = buffer })
+          end, "Close Diff (Gitsigns)")
+        end, "Diff This ~")
+      end
+    end,
+  },
+
+  {
     "folke/trouble.nvim",
     optional = true,
-    -- opts = {
-    --   focus = true,
-    -- },
+    -- opts = { focus = true },
     -- stylua: ignore
     keys = {
       -- add `focus=true`
@@ -208,6 +235,9 @@ return {
     keys = function(_, keys)
       if LazyVim.has("telescope.nvim") then
         table.insert(keys, { "<leader>fh", "<Cmd>Telescope harpoon marks<CR>", desc = "Harpoon Files" })
+      end
+      for i = 1, 5 do
+        table.insert(keys, { "<leader>" .. i, false })
       end
       -- stylua: ignore
       vim.list_extend(keys, {
