@@ -453,7 +453,10 @@ return {
       return U.extend_tbl(opts, {
         mappings = {
           sidebar = {
-            close = vim.list_extend(vim.deepcopy(defaults.mappings.sidebar.close), { close_key }),
+            close = vim.list_extend(
+              vim.tbl_get(opts, "mappings", "sidebar", "close") or vim.deepcopy(defaults.mappings.sidebar.close),
+              { close_key }
+            ),
           },
         },
       })

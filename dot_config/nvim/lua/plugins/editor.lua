@@ -190,7 +190,7 @@ return {
         -- mini.diff like mappings
         map({ "n", "v" }, "gh", ":Gitsigns stage_hunk<CR>", "Stage Hunk")
         map({ "n", "v" }, "gH", ":Gitsigns reset_hunk<CR>", "Reset Hunk")
-        map("o", "gh", ":<C-U>Gitsigns select_hunk<CR>", "GitSigns Select Hunk")
+        map("o", "gh", "<cmd>Gitsigns select_hunk<CR>", "GitSigns Select Hunk")
         map("n", "<leader>go", function()
           gs.diffthis("~")
           map("n", vim.g.user_close_key, function()
@@ -254,25 +254,29 @@ return {
     },
   },
 
-  -- {
-  --   "RRethy/vim-illuminate",
-  --   optional = true,
-  --   opts = function(_, opts)
-  --     opts.filetypes_denylist = vim.list_extend(opts.filetypes_denylist or { "dirbuf", "dirvish", "fugitive" }, {
-  --       "lazy",
-  --       "mason",
-  --       "harpoon",
-  --       "qf",
-  --       "netrw",
-  --       "neo-tree",
-  --       "oil",
-  --       "minifiles",
-  --       "trouble",
-  --       "notify",
-  --       "TelescopePrompt",
-  --     })
-  --   end,
-  -- },
+  {
+    "RRethy/vim-illuminate",
+    optional = true,
+    opts = function(_, opts)
+      -- opts.under_cursor = false
+      opts.modes_allowlist = { "n", "no", "nt" }
+      -- opts.filetypes_denylist =
+      --   vim.list_extend(opts.filetypes_denylist or vim.deepcopy(require("illuminate.config").filetypes_denylist()), {
+      --     "lazy",
+      --     "mason",
+      --     "harpoon",
+      --     "qf",
+      --     "netrw",
+      --     "neo-tree",
+      --     "oil",
+      --     "minifiles",
+      --     "trouble",
+      --     "notify",
+      --     "TelescopePrompt",
+      --     "snacks_picker_input",
+      --   })
+    end,
+  },
 
   {
     "tzachar/highlight-undo.nvim",

@@ -144,13 +144,16 @@ return {
         refresh = mapping_disabled_prefix .. "r",
         focus = mapping_disabled_prefix .. "f",
         toggle = {
+          default = mapping_disabled_prefix .. "t",
           debug = mapping_disabled_prefix .. "d",
+          hint = mapping_disabled_prefix .. "h",
           suggestion = "<leader>aS",
         },
         sidebar = {
           -- disable since <tab> is mapped to <C-w>w
           switch_windows = "<A-Down>",
           reverse_switch_windows = "<A-Up>",
+          close = { "q" },
         },
         files = {
           add_current = "<leader>af",
