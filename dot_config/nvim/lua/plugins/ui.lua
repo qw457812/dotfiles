@@ -9,8 +9,8 @@ return {
         { "<Up>", "<cmd>BufferLineCyclePrev<cr>", desc = "Prev Buffer" },
         { "J", "<cmd>BufferLineCycleNext<cr>", desc = "Next Buffer" },
         { "K", "<cmd>BufferLineCyclePrev<cr>", desc = "Prev Buffer" },
-        { "<leader>bH", "<cmd>BufferLineGoToBuffer 1<cr>", desc = "Goto First Buffer" },
-        { "<leader>bL", "<cmd>BufferLineGoToBuffer -1<cr>", desc = "Goto Last Buffer" },
+        { "<leader>bH", "<cmd>lua require('bufferline').go_to(1, true)<cr>", desc = "Goto First Buffer" },
+        { "<leader>bL", "<cmd>lua require('bufferline').go_to(-1, true)<cr>", desc = "Goto Last Buffer" },
         { "<leader>bh", "<Cmd>BufferLineCloseLeft<CR>", desc = "Delete Buffers to the Left" },
         { "<leader>br", false },
         { "<leader>bl", "<Cmd>BufferLineCloseRight<CR>", desc = "Delete Buffers to the Right" },
@@ -19,7 +19,7 @@ return {
       for i = 1, 9 do
         table.insert(
           mappings,
-          { "<leader>b" .. i, "<cmd>BufferLineGoToBuffer " .. i .. "<cr>", desc = "Goto Buffer " .. i }
+          { "<leader>" .. i, "<cmd>BufferLineGoToBuffer " .. i .. "<cr>", desc = "Goto Buffer " .. i }
         )
       end
       vim.list_extend(keys, mappings)
