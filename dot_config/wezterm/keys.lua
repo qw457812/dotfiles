@@ -133,9 +133,10 @@ end
 
 local function is_fzf(pane)
   local process_basename = get_foreground_process_basename(pane)
-  -- `--height 100%` is required for is_alt_screen_active, see https://github.com/wez/wezterm/discussions/4101
+  -- `--height 100%` is required for is_alt_screen_active (tui check), see https://github.com/wez/wezterm/discussions/4101
+  -- fish for patrickf1/fzf.fish, gh for meiji163/gh-notify
   return process_basename == "fzf"
-    or ((process_basename == "zsh" or process_basename == "fish") and pane:is_alt_screen_active())
+    or (helpers.list_contains({ "zsh", "fish", "yazi", "gh" }, process_basename) and pane:is_alt_screen_active())
 end
 
 local function is_lazygit(pane)

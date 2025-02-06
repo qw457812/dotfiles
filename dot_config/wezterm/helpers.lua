@@ -17,4 +17,20 @@ function M.list_extend(dst, src, start, finish)
   return dst
 end
 
+--- Checks if a list-like table (integer keys without gaps) contains `value`.
+---
+---@param t table Table to check (must be list-like, not validated)
+---@param value any Value to compare
+---@return boolean `true` if `t` contains `value`
+function M.list_contains(t, value)
+  --- @cast t table<any,any>
+
+  for _, v in ipairs(t) do
+    if v == value then
+      return true
+    end
+  end
+  return false
+end
+
 return M
