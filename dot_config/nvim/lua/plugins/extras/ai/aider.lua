@@ -3,24 +3,24 @@ local toggle_key = "<C-cr>"
 return {
   {
     "GeorgesAlkhouri/nvim-aider",
-    enabled = function()
-      return LazyVim.has("telescope.nvim") and vim.fn.executable("aider") == 1
-    end,
+    enabled = vim.fn.executable("aider") == 1,
     dependencies = "folke/snacks.nvim",
-    cmd = {
-      "AiderTerminalToggle",
-    },
-    -- stylua: ignore
+    cmd = "AiderTerminalToggle",
     keys = {
-      { toggle_key,   "<cmd>AiderTerminalToggle<cr>",   desc = "Open Terminal (Aider)" },
-      { "<leader>ai", "<cmd>AiderTerminalToggle<cr>",   desc = "Open Terminal (Aider)" },
-      { "<leader>as", "<cmd>AiderTerminalSend<cr>",     desc = "Send (Aider)", mode = { "n", "v" } },
-      { "<leader>a/", "<cmd>AiderQuickSendCommand<cr>", desc = "Send Command (Aider)" },
-      { "<leader>ab", "<cmd>AiderQuickSendBuffer<cr>",  desc = "Send Buffer (Aider)" },
-      { "<leader>a+", "<cmd>AiderQuickAddFile<cr>",     desc = "Add File (Aider)" },
-      { "<leader>a-", "<cmd>AiderQuickDropFile<cr>",    desc = "Drop File (Aider)" },
+      { toggle_key, "<cmd>AiderTerminalToggle<cr>", desc = "Open Terminal (Aider)" },
+      { "<leader>as", "<cmd>AiderTerminalSend<cr>", desc = "Send (Aider)", mode = { "n", "v" } },
+      -- { "<leader>a/", "<cmd>AiderQuickSendCommand<cr>", desc = "Send Command (Aider)" }, -- telescope.nvim is required
+      { "<leader>ab", "<cmd>AiderQuickSendBuffer<cr>", desc = "Send Buffer (Aider)" },
+      { "<leader>a+", "<cmd>AiderQuickAddFile<cr>", desc = "Add File (Aider)" },
+      { "<leader>a-", "<cmd>AiderQuickDropFile<cr>", desc = "Drop File (Aider)" },
+      { "<leader>ar", "<cmd>AiderQuickReadOnlyFile<cr>", desc = "Add Read-Only File (Aider)" },
     },
-
+    init = function()
+      if not LazyVim.has("telescope.nvim") then
+        -- HACK: disable loading nvim_aider.ui since it requires telescope.nvim, `AiderQuickSendCommand` will not be available
+        package.loaded["nvim_aider.ui"] = true
+      end
+    end,
     opts = function()
       -- local defaults = require("nvim_aider.config").defaults
 

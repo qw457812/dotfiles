@@ -33,6 +33,7 @@
     "lazyvim.plugins.extras.util.chezmoi",
     "lazyvim.plugins.extras.util.dot",
     "lazyvim.plugins.extras.util.mini-hipatterns",
+    "plugins.extras.ai.aider",
     "plugins.extras.ai.avante",
     "plugins.extras.editor.mini-operators",
     "plugins.extras.game.exercism",

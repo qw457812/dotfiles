@@ -1,3 +1,5 @@
+local mapping_disabled_prefix = "<leader>av<localleader>"
+
 -- https://github.com/yetone/avante.nvim/wiki/Recipe-and-Tricks
 ---@type table<string, string|fun():string>
 local prompt = {
@@ -110,9 +112,11 @@ return {
       local opts_mappings = LazyVim.opts("avante.nvim").mappings or {}
       -- stylua: ignore
       local mappings = {
+        { mapping_disabled_prefix, "", desc = "+disabled" },
         { opts_mappings.ask or "<leader>aa", function() require("avante.api").ask() end, desc = "Ask (Avante)", mode = { "n", "v" } },
         { opts_mappings.edit or "<leader>ae", function() require("avante.api").edit() end, desc = "Edit (Avante)", mode = "v" },
         { opts_mappings.refresh or "<leader>ar", function() require("avante.api").refresh() end, desc = "Refresh (Avante)" },
+        { opts_mappings.focus or "<leader>af", function() require("avante.api").focus() end, desc = "Focus (Avante)" },
         { "<leader>aP", switch_provider, desc = "Switch Provider (Avante)" },
         { "<leader>av", "", desc = "+avante", mode = { "n", "v" } },
         { "<leader>avg", ask(prompt.grammar_correction),         desc = "Grammar Correction (Ask)",        mode = { "n", "v" } },
@@ -137,9 +141,10 @@ return {
     ---@type avante.Config
     opts = {
       mappings = {
-        focus = "<leader>aF",
+        refresh = mapping_disabled_prefix .. "r",
+        focus = mapping_disabled_prefix .. "f",
         toggle = {
-          debug = "<leader>aD",
+          debug = mapping_disabled_prefix .. "d",
           suggestion = "<leader>aS",
         },
         sidebar = {
