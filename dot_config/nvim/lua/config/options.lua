@@ -13,6 +13,9 @@ opt.shell = "fish"
 -- https://github.com/folke/dot/blob/master/nvim/lua/config/options.lua
 opt.backup = true
 opt.backupdir = vim.fn.stdpath("state") .. "/backup"
+-- ignore builtin colorschemes for Snacks.picker.colorschemes(), see #969
+-- alternative: vim.opt.wildignore:append(vim.api.nvim_get_runtime_file("colors/*.{vim,lua}", true))
+vim.opt.wildignore:append({ vim.env.VIMRUNTIME .. "/colors/*.vim", vim.env.VIMRUNTIME .. "/colors/*.lua" })
 -- https://github.com/echasnovski/mini.nvim/blob/af673d8523c5c2c5ff0a53b1e42a296ca358dcc7/lua/mini/basics.lua#L535
 -- stylua: ignore
 local win_borders_fillchars = {

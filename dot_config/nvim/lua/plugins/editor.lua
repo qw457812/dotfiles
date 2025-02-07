@@ -486,7 +486,7 @@ return {
     opts = {
       chars_lower_limit = 2,
       buffers = function(buf)
-        return vim.bo[buf].buflisted and vim.bo[buf].buftype == ""
+        return vim.bo[buf].buflisted and vim.bo[buf].buftype == "" or buf == vim.api.nvim_win_get_buf(0)
       end,
     },
   },

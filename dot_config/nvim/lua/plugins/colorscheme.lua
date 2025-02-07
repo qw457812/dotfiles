@@ -18,8 +18,39 @@ local colorschemes = vim.g.user_transparent_background and {
   "tokyonight-storm",
   "catppuccin-macchiato",
 }
+local has_tokyonight_custom_style = vim.list_contains(colorschemes, "tokyonight")
+-- for picker
+local ignored_colorschemes = vim.list_extend({
+  "tokyonight-day",
+  "catppuccin", -- redundant with catppuccin-macchiato
+  "catppuccin-latte",
+}, has_tokyonight_custom_style and {} or { "tokyonight" })
+
+-- options
 local borderless_telescope = false -- vim.g.user_transparent_background
 local no_italic = vim.g.user_is_termux
+
+local tokyonight_custom_style = "custom"
+
+-- mark the style in colors, useful for `on_colors` and `on_highlights`
+local function tokyonight_mark_style(colors, style)
+  -- stylua: ignore
+  if type(colors) ~= "table" then return end
+
+  -- local styles = { [tokyonight_custom_style] = "#000000", moon = "#000001", storm = "#000002", night = "#000003" }
+  local styles = { [tokyonight_custom_style] = "#000000" } -- only works for custom
+
+  if style then
+    -- set
+    colors.style = styles[style]
+  else
+    -- get
+    for k, v in pairs(styles) do
+      -- stylua: ignore
+      if colors.style == v then return k end
+    end
+  end
+end
 
 -- https://github.com/Styzex/RandTheme.nvim/blob/f96818619d9dcfa179f6d15eb67b04cae6ed31c7/lua/randtheme/theme_manager.lua#L62
 local last_random ---@type string?
@@ -49,35 +80,9 @@ local function cond_colorscheme(pattern)
   return false
 end
 
-local function to_neutral_gray(color)
+local function to_gray(color)
   -- transparent: CursorLine
-  return vim.g.user_transparent_background and color or require("util.color").to_neutral_gray(color)
-end
-
-local tokyonight_custom_style = "custom"
-
-local function tokyonight_has_custom_style()
-  return vim.list_contains(colorschemes, "tokyonight")
-end
-
--- mark the style in colors, useful for `on_colors` and `on_highlights`
-local function tokyonight_mark_style(colors, style)
-  -- stylua: ignore
-  if type(colors) ~= "table" then return end
-
-  -- local styles = { [tokyonight_custom_style] = "#000000", moon = "#000001", storm = "#000002", night = "#000003" }
-  local styles = { [tokyonight_custom_style] = "#000000" } -- only works for custom
-
-  if style then
-    -- set
-    colors.style = styles[style]
-  else
-    -- get
-    for k, v in pairs(styles) do
-      -- stylua: ignore
-      if colors.style == v then return k end
-    end
-  end
+  return vim.g.user_transparent_background and color or require("util.color").to_gray(color)
 end
 
 return {
@@ -87,7 +92,7 @@ return {
     opts = function()
       local util = require("tokyonight.util")
       return {
-        style = tokyonight_has_custom_style() and tokyonight_custom_style or "storm", -- storm, moon(default), night, day, custom
+        style = has_tokyonight_custom_style and tokyonight_custom_style or "storm", -- storm, moon(default), night, day, custom
         transparent = vim.g.user_transparent_background,
         styles = {
           comments = { italic = not no_italic },
@@ -98,20 +103,20 @@ return {
         -- ~/.local/share/nvim/lazy/tokyonight.nvim/extras/lua/tokyonight_storm.lua
         on_colors = function(c)
           -- more neutral background rather than bluish tint
-          c.bg = to_neutral_gray(c.bg)
-          c.bg_dark = to_neutral_gray(c.bg_dark)
-          c.bg_float = to_neutral_gray(c.bg_float)
-          c.bg_highlight = to_neutral_gray(c.bg_highlight)
-          c.bg_popup = to_neutral_gray(c.bg_popup)
-          c.bg_sidebar = to_neutral_gray(c.bg_sidebar)
-          c.bg_statusline = to_neutral_gray(c.bg_statusline)
+          c.bg = to_gray(c.bg)
+          c.bg_dark = to_gray(c.bg_dark)
+          c.bg_float = to_gray(c.bg_float)
+          c.bg_highlight = to_gray(c.bg_highlight)
+          c.bg_popup = to_gray(c.bg_popup)
+          c.bg_sidebar = to_gray(c.bg_sidebar)
+          c.bg_statusline = to_gray(c.bg_statusline)
 
           -- gitcommit, mini.diff
           c.diff.add = util.blend_bg(c.green2, 0.35)
           c.diff.delete = util.blend_bg(c.red1, 0.35)
           c.diff.change = util.blend_bg(c.blue7, 0.35)
 
-          if tokyonight_has_custom_style() and tokyonight_mark_style(c) == tokyonight_custom_style then
+          if has_tokyonight_custom_style and tokyonight_mark_style(c) == tokyonight_custom_style then
             c.bg_visual = c.dark3
           end
         end,
@@ -143,7 +148,7 @@ return {
             { fg = (hl.TelescopePromptPrefix or hl.Identifier).fg, bg = (hl.TelescopeSelection or hl.Visual).bg }
 
           if borderless_telescope then
-            local bg = to_neutral_gray(c.bg_dark) -- c.bg_dark
+            local bg = to_gray(c.bg_dark) -- c.bg_dark
             local prompt = bg -- "#2d3149"
             hl.TelescopeNormal = { bg = bg, fg = c.fg }
             hl.TelescopeBorder = { bg = bg, fg = bg }
@@ -163,7 +168,7 @@ return {
             hl.NeoTreeWinSeparator = { fg = c.bg, bg = c.bg }
           end
 
-          if tokyonight_has_custom_style() and tokyonight_mark_style(c) == tokyonight_custom_style then
+          if has_tokyonight_custom_style and tokyonight_mark_style(c) == tokyonight_custom_style then
             hl.String = { fg = c.orange }
             hl.Character = { fg = c.orange2 }
             hl.Function = { fg = c.yellow }
@@ -189,7 +194,7 @@ return {
       }
     end,
     config = function(_, opts)
-      if not tokyonight_has_custom_style() then
+      if not has_tokyonight_custom_style then
         require("tokyonight").setup(opts)
         return
       end
@@ -201,6 +206,7 @@ return {
       -- change the colors for your new palette here
       -- stylua: ignore
       ---@type Palette
+      ---@diagnostic disable-next-line: missing-fields
       local modified_colors = {
         bg_darker    = "#1a1a1a", --
         bg_dark      = "#1e1e1e",
@@ -287,19 +293,19 @@ return {
         -- https://github.com/tm157/dotfiles/blob/8a32eb599c4850a96a41a012fa3ba54c81111001/nvim/lua/user/colorscheme.lua#L31
         color_overrides = {
           frappe = {
-            base = to_neutral_gray(frappe.base),
-            mantle = to_neutral_gray(frappe.mantle),
-            crust = to_neutral_gray(frappe.crust),
+            base = to_gray(frappe.base),
+            mantle = to_gray(frappe.mantle),
+            crust = to_gray(frappe.crust),
           },
           macchiato = {
-            base = to_neutral_gray(macchiato.base),
-            mantle = to_neutral_gray(macchiato.mantle),
-            crust = to_neutral_gray(macchiato.crust),
+            base = to_gray(macchiato.base),
+            mantle = to_gray(macchiato.mantle),
+            crust = to_gray(macchiato.crust),
           },
           mocha = {
-            base = to_neutral_gray(mocha.base),
-            mantle = to_neutral_gray(mocha.mantle),
-            crust = to_neutral_gray(mocha.crust),
+            base = to_gray(mocha.base),
+            mantle = to_gray(mocha.mantle),
+            crust = to_gray(mocha.crust),
           },
         },
         custom_highlights = function(colors)
@@ -359,7 +365,7 @@ return {
             })
           end
 
-          local borderless_telescope_bg = to_neutral_gray(colors.mantle)
+          local borderless_telescope_bg = to_gray(colors.mantle)
           return vim.tbl_deep_extend("force", custom_highlights, borderless_telescope and {
             -- copied from: https://github.com/catppuccin/nvim/blob/35d8057137af463c9f41f169539e9b190d57d269/lua/catppuccin/groups/integrations/telescope.lua#L6
             TelescopeBorder = { fg = borderless_telescope_bg, bg = borderless_telescope_bg },
@@ -399,13 +405,13 @@ return {
         },
         -- ~/.local/share/nvim/lazy/neon.nvim/lua/neon/colors/punkpeach-storm.lua
         on_colors = function(c)
-          c.bg = to_neutral_gray(c.bg)
-          c.bg_dark = to_neutral_gray(c.bg_dark)
-          c.bg_float = to_neutral_gray(c.bg_float)
-          c.bg_highlight = to_neutral_gray(c.bg_highlight)
-          c.bg_popup = to_neutral_gray(c.bg_popup)
-          c.bg_sidebar = to_neutral_gray(c.bg_sidebar)
-          c.bg_statusline = to_neutral_gray(c.bg_statusline)
+          c.bg = to_gray(c.bg)
+          c.bg_dark = to_gray(c.bg_dark)
+          c.bg_float = to_gray(c.bg_float)
+          c.bg_highlight = to_gray(c.bg_highlight)
+          c.bg_popup = to_gray(c.bg_popup)
+          c.bg_sidebar = to_gray(c.bg_sidebar)
+          c.bg_statusline = to_gray(c.bg_statusline)
 
           -- gitcommit, mini.diff
           c.diff.add = util.blend_bg(c.green2, 0.35)
@@ -614,6 +620,26 @@ return {
         end,
       })
     end,
+  },
+
+  {
+    "folke/snacks.nvim",
+    optional = true,
+    ---@module "snacks"
+    ---@type snacks.Config
+    opts = {
+      picker = {
+        sources = {
+          colorschemes = {
+            transform = function(item)
+              if vim.list_contains(ignored_colorschemes, item.text) then
+                return false
+              end
+            end,
+          },
+        },
+      },
+    },
   },
 
   {
