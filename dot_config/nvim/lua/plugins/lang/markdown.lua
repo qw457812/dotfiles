@@ -16,8 +16,8 @@ return {
       --   conceallevel = { default = 0 },
       -- },
       heading = {
-        icons = function(sections)
-          return ("%s%s "):format(table.concat(sections, "."), #sections > 1 and "" or ".")
+        icons = function(ctx)
+          return ("%s%s "):format(table.concat(ctx.sections, "."), #ctx.sections > 1 and "" or ".")
         end,
       },
       code = {

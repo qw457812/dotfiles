@@ -342,40 +342,56 @@ return {
     end,
   },
 
+  -- https://github.com/mawkler/nvim/blob/30bd7ac8de8ff028c1c35a384d4eccdb49696f1a/lua/configs/tiny-glimmer.lua
   {
     "rachartier/tiny-glimmer.nvim",
+    dependencies = {
+      {
+        "gbprod/yanky.nvim",
+        optional = true,
+        keys = { { "p", false }, { "P", false } },
+        opts = { highlight = { on_put = false, on_yank = false } },
+      },
+    },
     event = "TextYankPost",
-    opts = function()
-      local animation = "fade"
-      local function from_color()
-        return Snacks.util.color("CurSearch", "bg")
+    keys = { { "p" }, { "P" } },
+    opts = function(_, opts)
+      local function animations()
+        return {
+          fade = {
+            from_color = Snacks.util.color("CurSearch", "bg"),
+            to_color = Snacks.util.color("Visual", "bg"),
+          },
+          reverse_fade = {
+            from_color = U.color.darken(Snacks.util.color("FlashLabel", "bg"), 0.5),
+            to_color = Snacks.util.color("Visual", "bg"),
+          },
+        }
       end
-      local function to_color()
-        return Snacks.util.color("Visual", "bg")
-      end
+
       vim.api.nvim_create_autocmd("ColorScheme", {
         callback = function()
-          require("tiny-glimmer").change_hl(animation, { from_color = from_color(), to_color = to_color() })
+          for animation, hl in pairs(animations()) do
+            require("tiny-glimmer").change_hl(animation, hl)
+          end
         end,
       })
 
-      return {
+      local has_yanky = LazyVim.has("yanky.nvim")
+
+      return U.extend_tbl(opts, {
         overwrite = {
-          auto_map = false,
           -- TODO: kevinhwang91/nvim-hlslens integration
           search = { enabled = false },
-          -- TODO: gbprod/yanky.nvim integration
-          paste = { enabled = false },
-        },
-        default_animation = animation,
-        transparency_color = vim.g.user_transparent_background and "#000000" or nil,
-        animations = {
-          [animation] = {
-            from_color = from_color(),
-            to_color = to_color(),
+          paste = {
+            enabled = true,
+            paste_mapping = has_yanky and "<Plug>(YankyPutAfter)" or "p",
+            Paste_mapping = has_yanky and "<Plug>(YankyPutBefore)" or "P",
           },
         },
-      }
+        transparency_color = vim.g.user_transparent_background and "#000000" or nil,
+        animations = animations(),
+      })
     end,
     init = function()
       vim.api.nvim_create_autocmd("User", {
