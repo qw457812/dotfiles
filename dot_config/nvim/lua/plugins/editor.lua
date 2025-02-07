@@ -160,6 +160,7 @@ return {
       return vim.list_extend(keys, {
         { "u", mode = { "o", "x" }, treesitter, desc = "Flash Treesitter" }, -- unit textobject, conflict with `guu`
         -- { "S", mode = { "n", "o", "x" }, treesitter, desc = "Flash Treesitter" }, -- conflict with mini.operators, use `vu` instead
+        { "<c-s>", mode = { "c" }, false },
       })
     end,
   },
@@ -182,23 +183,58 @@ return {
       opts.on_attach = function(buffer)
         on_attach(buffer)
 
+        ---@module 'gitsigns'
         local gs = package.loaded.gitsigns
 
         local function map(mode, l, r, desc)
           vim.keymap.set(mode, l, r, { buffer = buffer, desc = desc })
         end
 
+        -- HACK: redraw to update the signs
+        local function redraw()
+          vim.defer_fn(function()
+            Snacks.util.redraw(vim.api.nvim_get_current_win())
+          end, 500)
+        end
+
         -- mini.diff like mappings
-        map({ "n", "v" }, "gh", ":Gitsigns stage_hunk<CR>", "Stage Hunk")
-        map({ "n", "v" }, "gH", ":Gitsigns reset_hunk<CR>", "Reset Hunk")
-        map("o", "gh", "<cmd>Gitsigns select_hunk<CR>", "GitSigns Select Hunk")
+        map("n", "gh", function()
+          gs.stage_hunk()
+          redraw()
+        end, "Stage Hunk")
+        map("v", "gh", function()
+          gs.stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
+          redraw()
+        end, "Stage Hunk")
+        map("o", "gh", "<cmd>Gitsigns select_hunk<CR>", "Hunk Textobj")
+        map("n", "gH", gs.reset_hunk, "Reset Hunk")
+        map("v", "gH", function()
+          gs.reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
+        end, "Reset Hunk")
+        -- https://github.com/chrisgrieser/.config/blob/9bc8b38e0e9282b6f55d0b6335f98e2bf9510a7c/nvim/lua/plugin-specs/gitsigns.lua#L46
         map("n", "<leader>go", function()
+          gs.toggle_deleted()
+          gs.toggle_word_diff()
+          gs.toggle_linehl()
+          redraw()
+        end, "Toggle Diff Overlay (GitSigns)")
+
+        map("n", "<leader>ghh", function()
+          gs.stage_buffer()
+          redraw()
+        end, "Stage Buffer")
+        map("n", "<leader>ghu", function()
+          gs.undo_stage_hunk()
+          redraw()
+        end, "Undo Stage Hunk")
+        map("n", "<leader>gD", function()
           gs.diffthis("~")
           map("n", vim.g.user_close_key, function()
             vim.cmd.only()
             vim.keymap.del("n", vim.g.user_close_key, { buffer = buffer })
           end, "Close Diff (Gitsigns)")
         end, "Diff This ~")
+        map("n", "<leader>g?", gs.toggle_current_line_blame, "Toggle Blame Line (GitSigns)")
       end
     end,
   },

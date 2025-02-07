@@ -94,7 +94,6 @@ return {
       { "S", mode = { "n", "o", "x" }, false },
       { "r", mode = "o", false },
       { "R", mode = { "o", "x" }, false },
-      { "<c-s>", mode = { "c" },  false },
       { "<space>", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
       { "<tab>", mode = { "o", "x" }, function() require("flash").treesitter_search({ label = { rainbow = { enabled = true } } }) end, desc = "Treesitter Search" },
     },
