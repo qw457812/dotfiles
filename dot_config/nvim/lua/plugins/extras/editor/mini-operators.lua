@@ -44,6 +44,15 @@ end
 return {
   {
     "echasnovski/mini.operators",
+    dependencies = {
+      {
+        "rachartier/tiny-glimmer.nvim",
+        optional = true,
+        opts = {
+          support = { substitute = { enabled = true } },
+        },
+      },
+    },
     vscode = true,
     -- https://github.com/chrisgrieser/.config/blob/9bc8b38e0e9282b6f55d0b6335f98e2bf9510a7c/nvim/lua/plugin-specs/mini-operators.lua
     -- https://github.com/JulesNP/nvim/blob/cfcda023287fb58e584d970c1b71330262eaf3ed/lua/plugins/mini.lua#L725
@@ -74,7 +83,16 @@ return {
     config = function(_, opts)
       local operators = require("mini.operators")
       operators.setup(opts)
-      operators.make_mappings("replace", { textobject = "s", line = "ss", selection = "" }) -- disable `v_s` since we have `v_P`
+
+      if LazyVim.has("tiny-glimmer.nvim") then
+        vim.keymap.set("n", "s", function()
+          require("tiny-glimmer.support.substitute").substitute_cb({ register = vim.v.register })
+          return operators.replace()
+        end, { expr = true, replace_keycodes = false, silent = true, desc = "Replace Operator" })
+        vim.keymap.set("n", "ss", "s_", { remap = true, silent = true, desc = "Replace Line" })
+      else
+        operators.make_mappings("replace", { textobject = "s", line = "ss", selection = "" }) -- disable `v_s` since we have `v_P`
+      end
       -- do not delay `v_c`
       operators.make_mappings("exchange", { textobject = "cx", line = "cxx", selection = "X" }) -- https://github.com/tommcdo/vim-exchange#mappings
       -- Do not set `multiply` mapping for line, since we use our own, as
