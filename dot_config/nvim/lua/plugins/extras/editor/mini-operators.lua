@@ -66,6 +66,7 @@ return {
       { "sdd", H.smartDuplicate, desc = "Duplicate Line" },
       { "sD", "sd$", desc = "Multiply to EoL", remap = true },
       { "g=", mode = { "n", "x" }, desc = "Evaluate Operator" },
+      { "so", mode = { "n", "x" }, desc = "Sort Operator" },
     },
     opts = {
       -- candidates: s gr gs gp cr cp yr
@@ -78,7 +79,7 @@ return {
       exchange = { prefix = "" },
       -- conflicts: `gmm`/`cmm` is used for `g%`/`c%` by custom helix-style mapping `o_mm`
       multiply = { prefix = "" },
-      sort = { prefix = "" },
+      sort = { prefix = "so" },
     },
     config = function(_, opts)
       local operators = require("mini.operators")
@@ -106,14 +107,9 @@ return {
   {
     "folke/flash.nvim",
     optional = true,
-    -- stylua: ignore
     keys = {
       { "s", mode = { "n", "x", "o" }, false },
       { "S", mode = { "n", "o", "x" }, false },
-      { "r", mode = "o", false },
-      { "R", mode = { "o", "x" }, false },
-      { "<space>", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
-      { "<tab>", mode = { "o", "x" }, function() require("flash").treesitter_search({ label = { rainbow = { enabled = true } } }) end, desc = "Treesitter Search" },
     },
     specs = {
       {
@@ -122,9 +118,7 @@ return {
           picker = {
             win = {
               input = {
-                keys = {
-                  ["s"] = false,
-                },
+                keys = { ["s"] = false },
               },
             },
           },

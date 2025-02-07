@@ -160,7 +160,24 @@ return {
       return vim.list_extend(keys, {
         { "u", mode = { "o", "x" }, treesitter, desc = "Flash Treesitter" }, -- unit textobject, conflict with `guu`
         -- { "S", mode = { "n", "o", "x" }, treesitter, desc = "Flash Treesitter" }, -- conflict with mini.operators, use `vu` instead
-        { "<c-s>", mode = { "c" }, false },
+        { "r", mode = "o", false },
+        { "R", mode = { "o", "x" }, false },
+        {
+          "<space>",
+          mode = "o",
+          function()
+            require("flash").remote()
+          end,
+          desc = "Remote Flash",
+        },
+        {
+          "<tab>",
+          mode = { "o", "x" },
+          function()
+            require("flash").treesitter_search({ label = { rainbow = { enabled = true } } })
+          end,
+          desc = "Treesitter Search",
+        },
       })
     end,
   },
@@ -295,7 +312,7 @@ return {
     "RRethy/vim-illuminate",
     optional = true,
     opts = function(_, opts)
-      -- opts.under_cursor = false
+      opts.under_cursor = false
       opts.modes_allowlist = { "n", "no", "nt" }
       -- opts.filetypes_denylist =
       --   vim.list_extend(opts.filetypes_denylist or vim.deepcopy(require("illuminate.config").filetypes_denylist()), {
@@ -357,14 +374,15 @@ return {
     keys = { { "p" }, { "P" } },
     opts = function(_, opts)
       local function animations()
+        local visual = Snacks.util.color("Visual", "bg")
         return {
           fade = {
             from_color = Snacks.util.color("CurSearch", "bg"),
-            to_color = Snacks.util.color("Visual", "bg"),
+            to_color = visual,
           },
           reverse_fade = {
             from_color = U.color.darken(Snacks.util.color("FlashLabel", "bg"), 0.5),
-            to_color = Snacks.util.color("Visual", "bg"),
+            to_color = visual,
           },
         }
       end
@@ -724,6 +742,7 @@ return {
     ---@type layers.setup_opts
     opts = {
       mode = {
+        ---@diagnostic disable-next-line: missing-fields
         window = {
           config = {
             zindex = 500,
