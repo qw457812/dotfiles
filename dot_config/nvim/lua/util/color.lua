@@ -92,7 +92,7 @@ function M.increase_saturation(hex, percentage)
 end
 
 ---@param hex string
-function M.to_neutral_gray(hex)
+function M.to_gray(hex)
   if not hex or hex:upper() == "NONE" then
     return hex
   end
