@@ -1,42 +1,87 @@
+local H = {}
+
+-- copied from: https://github.com/chrisgrieser/.config/blob/9bc8b38e0e9282b6f55d0b6335f98e2bf9510a7c/nvim/lua/personal-plugins/misc.lua#L109
+function H.smartDuplicate()
+  local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+  local line = vim.api.nvim_get_current_line()
+
+  -- FILETYPE-SPECIFIC TWEAKS
+  if vim.bo.ft == "css" then
+    local newLine = line
+    if line:find("top:") then
+      newLine = line:gsub("top:", "bottom:")
+    end
+    if line:find("bottom:") then
+      newLine = line:gsub("bottom:", "top:")
+    end
+    if line:find("right:") then
+      newLine = line:gsub("right:", "left:")
+    end
+    if line:find("left:") then
+      newLine = line:gsub("left:", "right:")
+    end
+    line = newLine
+  elseif vim.bo.ft == "javascript" or vim.bo.ft == "typescript" then
+    line = line:gsub("^(%s*)if(.+{)$", "%1} else if%2")
+  elseif vim.bo.ft == "lua" then
+    line = line:gsub("^(%s*)if( .* then)$", "%1elseif%2")
+  elseif vim.bo.ft == "zsh" or vim.bo.ft == "bash" then
+    line = line:gsub("^(%s*)if( .* then)$", "%1elif%2")
+  elseif vim.bo.ft == "python" then
+    line = line:gsub("^(%s*)if( .*:)$", "%1elif%2")
+  end
+
+  -- INSERT DUPLICATED LINE
+  vim.api.nvim_buf_set_lines(0, row, row, false, { line })
+
+  -- MOVE CURSOR DOWN, AND TO VALUE/FIELD (IF EXISTS)
+  local _, luadocFieldPos = line:find("%-%-%-@%w+ ")
+  local _, valuePos = line:find("[:=][:=]? ")
+  local targetCol = luadocFieldPos or valuePos or col
+  vim.api.nvim_win_set_cursor(0, { row + 1, targetCol })
+end
+
 return {
   {
     "echasnovski/mini.operators",
     vscode = true,
-    -- https://github.com/chrisgrieser/.config/blob/181def43f255a502670af318297289f4e8f49c83/nvim/lua/plugins/editing-support.lua#L108
-    -- https://github.com/JulesNP/nvim/blob/36b04ae414b98e67a80f15d335c73744606a33d7/lua/plugins/mini.lua#L656
+    -- https://github.com/chrisgrieser/.config/blob/9bc8b38e0e9282b6f55d0b6335f98e2bf9510a7c/nvim/lua/plugin-specs/mini-operators.lua
+    -- https://github.com/JulesNP/nvim/blob/cfcda023287fb58e584d970c1b71330262eaf3ed/lua/plugins/mini.lua#L725
     keys = {
-      { "cr", desc = "Replace Operator" },
-      { "cR", "cr$", desc = "Replace to EoL", remap = true },
+      { "s", desc = "Replace Operator" },
+      { "S", "s$", desc = "Replace to EoL", remap = true },
       { "cx", desc = "Exchange Operator" },
+      { "cX", "cx$", desc = "Exchange to EoL", remap = true }, -- `vim.opt.timeoutlen` has increased from 300 to 500 for `cX` since which-key v3
       { "X", mode = "x", desc = "Exchange Selection" },
-      { "cX", "cx$", desc = "Exchange to EoL", remap = true },
-      { "cd", desc = "Multiply Operator" },
-      { "D", mode = "x", desc = "Multiply Selection" },
-      { "cD", "cd$", desc = "Multiply to EoL", remap = true },
+      { "sd", mode = { "n", "x" }, desc = "Multiply Operator" },
+      { "sdd", H.smartDuplicate, desc = "Duplicate Line" },
+      { "sD", "sd$", desc = "Multiply to EoL", remap = true },
       { "g=", mode = { "n", "x" }, desc = "Evaluate Operator" },
     },
-    -- https://github.com/echasnovski/mini.operators/blob/76ac9104d9773927053ea4eb12fc78ccbb5be813/doc/mini-operators.txt#L131
     opts = {
-      -- gr (LazyVim use `gr` for lsp references, `cr` for remote flash `o_r` by default, and `gs` conflicts with lsp goto super, `gss` conflicts with flash)
-      -- note: `vim.opt.timeoutlen` has increased from 300 to 500 for `cr` and `cR` since which-key v3
-      -- TODO: s gr gs gp cr cp yr
-      replace = { prefix = "" }, -- Replace text with register
-      -- gx
-      exchange = { prefix = "" }, -- Exchange text regions
-      -- gm (note that `gmm`/`cmm` is used for `g%`/`c%` by custom helix-style mapping `o_mm`)
-      multiply = { prefix = "" }, -- Multiply (duplicate) text
-      -- g=
-      -- evaluate = { prefix = "" }, -- Evaluate text and replace with output
-      -- gs
-      sort = { prefix = "" }, -- Sort text
+      -- candidates: s gr gs gp cr cp yr
+      -- conflicts:
+      -- * gr: lsp reference
+      -- * cr: remote flash `o_r`
+      -- * gs: lsp goto super
+      -- * gss: flash
+      replace = { prefix = "" },
+      exchange = { prefix = "" },
+      -- conflicts: `gmm`/`cmm` is used for `g%`/`c%` by custom helix-style mapping `o_mm`
+      multiply = { prefix = "" },
+      sort = { prefix = "" },
     },
     config = function(_, opts)
       local operators = require("mini.operators")
       operators.setup(opts)
+      operators.make_mappings("replace", { textobject = "s", line = "ss", selection = "" }) -- disable `v_s` since we have `v_P`
       -- do not delay `v_c`
-      operators.make_mappings("replace", { textobject = "cr", line = "crr", selection = "" }) -- disable `v_cr` since we have `v_p`
       operators.make_mappings("exchange", { textobject = "cx", line = "cxx", selection = "X" }) -- https://github.com/tommcdo/vim-exchange#mappings
-      operators.make_mappings("multiply", { textobject = "cd", line = "cdd", selection = "D" }) -- NOTE: overwrite `v_D`
+      -- Do not set `multiply` mapping for line, since we use our own, as
+      -- multiply's transformation function only supports pre-duplication
+      -- changes, which prevents us from doing post-duplication cursor
+      -- movements.
+      operators.make_mappings("multiply", { textobject = "sd", line = "", selection = "sd" })
     end,
   },
 
@@ -45,12 +90,29 @@ return {
     optional = true,
     -- stylua: ignore
     keys = {
-      -- r -> <space> (since `cr` is used for replace with register in mini.operators)
+      { "s", mode = { "n", "x", "o" }, false },
+      { "S", mode = { "n", "o", "x" }, false },
       { "r", mode = "o", false },
       { "R", mode = { "o", "x" }, false },
-      -- https://github.com/rileyshahar/dotfiles/blob/ce20b2ea474f20e4eb7493e84c282645e91a36aa/nvim/lua/plugins/movement.lua#L99
+      { "<c-s>", mode = { "c" },  false },
       { "<space>", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
       { "<tab>", mode = { "o", "x" }, function() require("flash").treesitter_search({ label = { rainbow = { enabled = true } } }) end, desc = "Treesitter Search" },
+    },
+    specs = {
+      {
+        "folke/snacks.nvim",
+        opts = {
+          picker = {
+            win = {
+              input = {
+                keys = {
+                  ["s"] = false,
+                },
+              },
+            },
+          },
+        },
+      },
     },
   },
 }

@@ -138,6 +138,7 @@ return {
       ---@param skip_first_match? boolean default false
       local function treesitter(skip_first_match)
         ---@type Flash.State.Config
+        ---@diagnostic disable-next-line: missing-fields
         local opts = { label = { rainbow = { enabled = true } } }
         if skip_first_match then
           ---@param matches Flash.Match.TS[]
@@ -157,8 +158,8 @@ return {
       -- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/keybindings.lua#L150
       vim.keymap.set("n", "guu", "guu") -- prevent `omap u` from overwriting `guu`
       return vim.list_extend(keys, {
-        { "S", mode = { "n", "o", "x" }, treesitter, desc = "Flash Treesitter" },
         { "u", mode = { "o", "x" }, treesitter, desc = "Flash Treesitter" }, -- unit textobject, conflict with `guu`
+        -- { "S", mode = { "n", "o", "x" }, treesitter, desc = "Flash Treesitter" }, -- conflict with mini.operators, use `vu` instead
       })
     end,
   },
@@ -727,7 +728,7 @@ return {
           -- vim.g.snacks_scroll = false
         else
           if not vim.tbl_isempty(orig_dd_keymap) then
-            vim.fn.mapset(orig_dd_keymap)
+            vim.fn.mapset("n", false, orig_dd_keymap)
           end
           vim.g.minianimate_disable = orig_minianimate_disable
           -- vim.g.snacks_scroll = orig_snacks_scroll
