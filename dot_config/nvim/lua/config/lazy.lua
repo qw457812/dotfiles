@@ -18,6 +18,8 @@ require("lazy").setup({
   spec = {
     -- add LazyVim and import its plugins
     { "LazyVim/LazyVim", import = "lazyvim.plugins" },
+    -- https://github.com/neovim/neovim/issues/28906
+    { import = "lazyvim.plugins.extras.editor.mini-diff", enabled = vim.fn.has("nvim-0.11") == 0 },
     -- import/override with your plugins
     { import = "plugins" },
     -- import plugins.lang, plugins.util, etc.
