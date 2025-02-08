@@ -312,8 +312,12 @@ return {
     "RRethy/vim-illuminate",
     optional = true,
     opts = function(_, opts)
-      opts.under_cursor = false
-      opts.modes_allowlist = { "n", "no", "nt" }
+      -- opts.under_cursor = false
+      opts.modes_allowlist = {
+        "n",
+        "nt",
+        -- "no", -- vim.hl.on_yank()
+      }
       -- opts.filetypes_denylist =
       --   vim.list_extend(opts.filetypes_denylist or vim.deepcopy(require("illuminate.config").filetypes_denylist()), {
       --     "lazy",
