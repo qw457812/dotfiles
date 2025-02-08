@@ -88,7 +88,9 @@ set functiontextobj
 let g:argtextobj_pairs="[:],(:),<:>"
 
 let g:highlightedyank_highlight_duration = "150"
-let g:highlightedyank_highlight_color = "rgba(57, 197, 187, 155)"
+" let g:highlightedyank_highlight_color = "rgba(57, 197, 187, 155)"
+let g:highlightedyank_highlight_color = "rgba(163, 190, 140, 155)"
+" let g:highlightedyank_highlight_foreground_color = "rgba(0, 0, 0, 255)"
 
 " <C-n> seems to me as a better solution than <M-n>,
 " map <C-n> <Plug>NextWholeOccurrence
@@ -145,8 +147,8 @@ let g:EasyMotion_do_mapping = 0
 " map S :action KJumpAction.Word0<cr>
 
 " https://github.com/yelog/vim-flash
-map s <Action>(flash.search)
-map S <Plug>(easymotion-bd-w)
+" map s <Action>(flash.search)
+" map S <Plug>(easymotion-bd-w)
 
 " https://github.com/Mishkun/ideavim-sneak/issues/16
 " Press `S` in normal mode to activate AceJump mode before the caret
@@ -181,11 +183,11 @@ let g:NERDTreeMapCloseChildren = "zC"
 let g:NERDTreeMapToggleZoom = "Z"
 let g:NERDTreeMapMenu = ","
 
-nmap cr <Plug>ReplaceWithRegisterOperator
-nmap crr <Plug>ReplaceWithRegisterLine
-" xmap cr <Plug>ReplaceWithRegisterVisual " `v_p`
-nmap cR cr$
-nmap cdd yyp
+nmap s <Plug>ReplaceWithRegisterOperator
+nmap ss <Plug>ReplaceWithRegisterLine
+" xmap s <Plug>ReplaceWithRegisterVisual " `v_P`
+nmap S s$
+nmap sdd yyp
 
 " helix-style mappings
 map mm %
@@ -304,6 +306,8 @@ nnoremap gw *N
 
 nmap [b <Action>(PreviousTab)
 nmap ]b <Action>(NextTab)
+nnoremap [B :tabm -1<cr>
+nnoremap ]B :tabm +1<cr>
 nmap [f <Action>(MethodUp)
 nmap ]f <Action>(MethodDown)
 nmap [m <Action>(MethodUp)
@@ -315,6 +319,8 @@ nmap [h <Action>(VcsShowPrevChangeMarker)
 " nmap ]c <Action>(JumpToNextChange)
 map ]d <Action>(GotoNextError)
 map [d <Action>(GotoPreviousError)
+nmap [t ?TODO<cr>
+nmap ]t /TODO<cr>
 
 map <M-j> <Action>(MoveStatementDown)
 map <M-k> <Action>(MoveStatementUp)
@@ -335,6 +341,9 @@ nnoremap <leader>K K
 
 nnoremap gO m`O<esc>``
 nnoremap go m`o<esc>``
+
+nmap gco o<c-o>gcc<c-o>A<Space>
+nmap gcO O<c-o>gcc<c-o>A<Space>
 
 " nnoremap <expr> gp '`[' . strpart(getregtype(), 0, 1) . '`]'
 nnoremap gp `[v`]
@@ -383,9 +392,13 @@ map gy <Action>(GotoTypeDeclaration)
 " map gb <Action>(Back)
 " map gf <Action>(Forward)
 map gs <Action>(GotoSuperMethod)
+nmap gD <Action>(GotoDeclaration)
+nmap gK <Action>(ParameterInfo)
+imap <C-k> <C-o><Action>(ParameterInfo)
 
 " TODO:
 " https://github.com/sei40kr/idea-LazyVim
+" https://github.com/deifyed/dotfiles/blob/f5e86c22a6fdb688ea00f7a6fd5e8330f505b53b/dot_ideavimrc
 " https://github.com/q843705423/ideavimrc/blob/master/.ideavimrc
 " https://gist.github.com/SakuraWald/fa80eb949412e1a8c806512ad5f8a847
 " https://github.com/ruohola/dotfiles/blob/master/vim/.ideavimrc
@@ -403,16 +416,24 @@ map gs <Action>(GotoSuperMethod)
 " -----------------------------------------------------常用--------------------------------------------------------
 " keys: https://ideavim.sourceforge.net/vim/intro.html
 map <Leader><Space> <Action>(GotoFile)
-map <leader>, <Action>(RecentFiles)
+map <leader>, <Action>(Switcher)
 map <leader>/ <Action>(FindInPath)
 map <leader>` :e #<CR>
 map <leader>- <C-W>s
 map <leader>_ <C-W>v
+" nmap <leader>: :history<cr>
 map <leader>: <Action>(GotoAction)
+nmap <leader>. <Action>(NewScratchBuffer)
+nmap <leader>S <Action>(Scratch.ShowFilesPopup)
+nmap <leader>n <Action>(ActivateNotificationsToolWindow)
 " map <leader>\| <C-W>v
 map <leader>e :NERDTree<CR>
+nmap <leader>E <Action>(SelectInProjectView)
+nmap <leader>fe <Action>(ActivateProjectToolWindow)
 " map <leader>z <Action>(ToggleZenMode)
 map <leader>z <Action>(ToggleDistractionFreeMode)
+
+nmap <leader>K :help<space><C-r><C-w><CR>
 
 " buffer
 map <leader>bb :e #<CR>
@@ -425,23 +446,30 @@ map <leader>bl <Action>(CloseAllToTheRight)
 map <leader>bA <Action>(CloseAllEditors)
 map <leader>bp <Action>(PinActiveTabToggle)
 map <leader>bP <Action>(CloseAllUnpinnedEditors)
-map <leader>b1 <Action>(GoToTab1)
-map <leader>b2 <Action>(GoToTab2)
-map <leader>b3 <Action>(GoToTab3)
-map <leader>b4 <Action>(GoToTab4)
-map <leader>b5 <Action>(GoToTab5)
-map <leader>b6 <Action>(GoToTab6)
-map <leader>b7 <Action>(GoToTab7)
-map <leader>b8 <Action>(GoToTab8)
-map <leader>b9 <Action>(GoToTab9)
+map <leader>ba <Action>(CloseAllUnpinnedEditors)
+map <leader>1 <Action>(GoToTab1)
+map <leader>2 <Action>(GoToTab2)
+map <leader>3 <Action>(GoToTab3)
+map <leader>4 <Action>(GoToTab4)
+map <leader>5 <Action>(GoToTab5)
+map <leader>6 <Action>(GoToTab6)
+map <leader>7 <Action>(GoToTab7)
+map <leader>8 <Action>(GoToTab8)
+map <leader>9 <Action>(GoToTab9)
+nmap <leader>bH <Action>(GoToTab1)
+nmap <leader>bL <Action>(GoToLastTab)
 
 " code
-map <leader>ca <Action>(QuickActions)
+" map <leader>ca <Action>(QuickActions)
+map <leader>ca <Action>(RefactoringMenu)
+nmap <leader>cA <Action>(ShowIntentionActions)
 map <leader>cf <Action>(ReformatCode)
 " map <leader>cf <Action>(ReformatCode) \| <Action>(OptimizeImports)
 map <leader>co <Action>(OptimizeImports)
 map <leader>cr <Action>(RenameElement)
 map <leader>cR <Action>(RenameFile)
+map <leader>cn <Action>(FixDocComment)
+nmap <leader>cs <Action>(ActivateStructureToolWindow)
 
 " debug
 map <leader>db <Action>(ToggleLineBreakpoint)
@@ -451,6 +479,7 @@ map <Leader>ff <Action>(SearchEverywhere)
 map <Leader>fn <Action>(NewFile)
 " map <Leader>fn <Action>(NewScratchFile)
 map <leader>fr <Action>(RecentFiles)
+map <leader>fb <Action>(Switcher)
 " map <Leader>fc :e ~/.local/share/chezmoi/dot_ideavimrc<CR>
 map <Leader>fc :e ~/.ideavimrc<CR>
 map <Leader>fC :source ~/.ideavimrc<CR>
@@ -462,23 +491,39 @@ map <leader>ft <Action>(ActivateTerminalToolWindow)
 
 " git
 map <leader>gg <Action>(ActivateVersionControlToolWindow)
+map <leader>gG <Action>(Vcs.QuickListPopupAction)
+map <leader>gb <Action>(Annotate)
+nmap <leader>gl <Action>(Vcs.Show.Log)
 
 " refactor
 map <leader>rx <Action>(IntroduceVariable)
 map <Leader>rf <Action>(ExtractMethod)
 map <Leader>rI <Action>(ExtractInterface)
+nmap <leader>ri <Action>(Inline)
+vmap <leader>ri :action Inline<cr>
 
 " search
+nmap <leader>sg <Action>(FindInPath)
 map <leader>sb <Action>(Find)
 map <leader>ss <Action>(FileStructurePopup)
 map <Leader>sS <Action>(GotoSymbol)
+" nmap <leader>sm :marks<cr>
+" nmap <leader>sm <Action>(Bookmarks.Goto)
 map <Leader>sm <Action>(ShowBookmarks)
+nmap <leader>sd <Action>(ActivateProblemsViewToolWindow)
+nmap <leader>sh <Action>(HelpTopics)
+nmap <leader>sj <Action>(RecentLocations)
+nmap <leader>st <Action>(ActivateTODOToolWindow)
+nmap <leader>sk :map<cr>
+nmap <leader>s" :registers<cr>
+nmap <leader>sc :history<cr>
 
 " test
 map <leader>tl <Action>(Run)
 map <leader>tc <Action>(Coverage)
 
 " windows
+nmap vv <c-w>v
 map <leader>ww <c-w>w
 map <leader>wh <c-w>h
 map <leader>wj <c-w>j
@@ -494,10 +539,18 @@ map <leader>uw <Action>(EditorToggleUseSoftWraps)
 map <leader>ug <Action>(EditorToggleShowIndentLines)
 map <leader>ul :set number!<cr>
 map <leader>uL :set relativenumber!<cr>
+" nmap <leader>uC <Action>(QuickChangeScheme)
+nmap <leader>uC <Action>(ChangeLaf)
+
+" notif
+nmap <leader>un <Action>(ClearAllNotifications)
+nmap <leader>snd <Action>(ClearAllNotifications)
 
 " quit
 " nmap <leader>qq <Action>(Exit)
 map <leader>qq <Action>(CloseProject)
+
+nmap <leader>ll <Action>(WelcomeScreen.Plugins)
 
 " ----------------------------------------------------- TODO: nvim key-mappings --------------------------------------------------------
 
@@ -514,7 +567,7 @@ map <leader>ch :action CallHierarchy<CR>
 map <leader>cL <Action>(copilot.loginGitHub)
 map <leader>cp <Action>(CopyAbsolutePath)
 map <leader>cP :action CloseProject<CR>
-map <leader>cs <Action>(EditorCompleteStatement)
+" map <leader>cs <Action>(EditorCompleteStatement)
 " map <leader>cr <Action>(CopyReference)
 map <leader>cu <Action>(CheckForUpdate)
 map <leader>dd <Action>(Debug)
@@ -541,10 +594,8 @@ map <leader>im <Action>(ImplementMethods)
 map <leader>lh <Action>(LocalHistory.ShowHistory)
 map <leader>lw <Action>(JumpToLastWindow)
 map <leader>mh <Action>(MethodHierarchy)
-map <Leader>nb :action ShowNavBar<CR>
-map <Leader>nc :action NewClass<CR>
-map <Leader>ne <Action>(GotoNextError)
-map <Leader>nf <Action>(NewFile)
+" map <Leader>nb :action ShowNavBar<CR>
+" map <Leader>nc :action NewClass<CR>
 map <leader>of <Action>(OpenFile)
 map <Leader>oi <Action>(OptimizeImports)
 map <Leader>om :action OverrideMethods<CR>
@@ -570,15 +621,13 @@ map <leader>rp <Action>(ManageRecentProjects)
 map <leader>rq :action Refactorings.QuickListPopupAction<CR>
 map <leader>rr <Action>(Run)
 map <leader>rs <Action>(Stop)
-map <leader>sd <Action>(SafeDelete)
+" map <leader>sd <Action>(SafeDelete)
 map <leader>si <Action>(SelectIn)
 map <leader>su <Action>(ShowUsages)
-map <Leader>sw :action SurroundWith<CR>
+" map <Leader>sw :action SurroundWith<CR>
 map <leader>th <Action>(TypeHierarchy)
 " add
 map <leader>va <Action>(ChangesView.AddUnversioned)
-" blame
-map <leader>gb <Action>(Annotate)
 " commit
 map <leader>vc <Action>(CheckinProject)
 map <leader>vC <Action>(CheckinFiles)
@@ -603,8 +652,6 @@ map <leader>vu <Action>(UpdateFiles)
 " map <leader>wm <Action>(MaximizeToolWindow)
 map <leader>x <Action>(HideAllWindows)
 
-" map <leader>1 <Action>(SelectInProjectView)
-
 " quick fix
 " 仅map <CR>影响重命名时的回车确认
 map <leader><CR> <Action>(ShowIntentionActions)
@@ -612,20 +659,11 @@ map <leader><TAB> <Action>(EditorCompleteStatement)
 
 " insert模式无效，已设置为IDEA快捷键，Code Completion - Basic
 " map <TAB> <Action>(CodeCompletion)
-" use <TAB> as second Leader key
-nmap <TAB><TAB> <Action>(CodeCompletion)
-nmap <TAB><CR> <Action>(GotoNextError)
-nmap <TAB>a <Action>(VimFindActionIdAction)
-nmap <TAB>j gt
-nmap <TAB>k gT
-" nmap <TAB>l <Action>(ReformatCode) \| <Action>(OptimizeImports)
-nmap <TAB>r :source ~/.ideavimrc<CR>
-nmap <TAB>t <Action>(Terminal.OpenInTerminal)
-nmap <TAB>v <Action>(Vcs.QuickListPopupAction)
+nmap <TAB> <c-w>w
 
-" TODO more Leader key like `<BS>`, `,` | https://github.com/rockyzhang24/dotfiles/tree/master/.config/nvim#-key-mappings
+" TODO more Leader key like `,` | https://github.com/rockyzhang24/dotfiles/tree/master/.config/nvim#-key-mappings
 
-map <S-Space> <Action>(GotoNextError)
+" map <S-Space> <Action>(GotoNextError)
 
 " https://gist.github.com/PisecesPeng/9fabf2a1c1834bd35bf02c2bcb904708
 " 选择模式扩大选择范围 opt+up_arrow
