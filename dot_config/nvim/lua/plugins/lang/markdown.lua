@@ -52,6 +52,22 @@ return {
   },
 
   {
+    "wurli/contextindent.nvim",
+    dependencies = {
+      {
+        "nvim-treesitter/nvim-treesitter",
+        opts = {
+          indent = {
+            disable = { "markdown" },
+          },
+        },
+      },
+    },
+    ft = "markdown",
+    opts = { pattern = "*.md" },
+  },
+
+  {
     "gaoDean/autolist.nvim",
     enabled = false, -- imap conflicts with blink.cmp
     ft = "markdown",
