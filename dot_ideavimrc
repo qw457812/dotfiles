@@ -337,6 +337,7 @@ xnoremap gj J
 " `<Action>(ShowHoverInfo)` can be closed by `hjkl` but `K` can't
 " nnoremap gk K
 nmap gk <Action>(ShowHoverInfo)
+" nmap <leader>K :help<space><C-r><C-w><CR>
 nnoremap <leader>K K
 
 nnoremap gO m`O<esc>``
@@ -432,8 +433,6 @@ nmap <leader>E <Action>(SelectInProjectView)
 nmap <leader>fe <Action>(ActivateProjectToolWindow)
 " map <leader>z <Action>(ToggleZenMode)
 map <leader>z <Action>(ToggleDistractionFreeMode)
-
-nmap <leader>K :help<space><C-r><C-w><CR>
 
 " buffer
 map <leader>bb :e #<CR>
@@ -546,58 +545,46 @@ nmap <leader>uC <Action>(ChangeLaf)
 nmap <leader>un <Action>(ClearAllNotifications)
 nmap <leader>snd <Action>(ClearAllNotifications)
 
+" ai
+map <leader>aa <Action>(copilot.chat.show)
+
 " quit
 " nmap <leader>qq <Action>(Exit)
 map <leader>qq <Action>(CloseProject)
 
 nmap <leader>ll <Action>(WelcomeScreen.Plugins)
+nmap <leader>lc <Action>(CheckForUpdate)
 
 " ----------------------------------------------------- TODO: nvim key-mappings --------------------------------------------------------
 
-" map <leader>bk <Action>(CloseContent)
-" " Kill all buffers
-" map <leader>bK <Action>(CloseAllEditors)
-" map <leader>bn <Action>(NextTab)
-" map <leader>bp <Action>(PreviousTab)
-map <leader>cc <Action>(copilot.chat.show)
-map <leader>cC <Action>(de.netnexus.CamelCasePlugin.ToggleCamelCase)
-map <leader>cD <Action>(copilot.disableCopilot)
-map <leader>cE <Action>(copilot.enableCopilot)
+map ga <Action>(de.netnexus.CamelCasePlugin.ToggleCamelCase)
+map <leader>uA <Action>(copilot.disableCopilot)
+map <leader>ua <Action>(copilot.enableCopilot)
 map <leader>ch :action CallHierarchy<CR>
-map <leader>cL <Action>(copilot.loginGitHub)
-map <leader>cp <Action>(CopyAbsolutePath)
-map <leader>cP :action CloseProject<CR>
+" map <leader>cL <Action>(copilot.loginGitHub)
 " map <leader>cs <Action>(EditorCompleteStatement)
 " map <leader>cr <Action>(CopyReference)
-map <leader>cu <Action>(CheckForUpdate)
 map <leader>dd <Action>(Debug)
 map <Leader>dv :action ViewBreakpoints<CR>
 map <Leader>dc :action ChooseDebugConfiguration<CR>
 map <leader>ds <Action>(Stop)
-map <Leader>fd :action FixDocComment<CR>
 map <leader>fu <Action>(FindUsages)
 " map <Leader>fp :action ShowFilePath<CR>
 " map <leader>fs <Action>(FileStructurePopup)
 " map <leader>gg :action Generate<CR>
 " 打开 IdeaVim: Track Action Ids
 map <Leader>gc :action GotoClass<CR>
-" map <Leader>gs :action GotoSymbol<CR>
 " Highlight usages, use CMD+G/Shift+CMD+G to iterate
 map <leader>hu <Action>(HighlightUsagesInFile)
 map <leader>hl <Action>(HighlightUsagesInFile)
-map <leader>hw <Action>(HideAllWindows)
 map <leader>ic <Action>(IntroduceConstant)
 map <leader>im <Action>(ImplementMethods)
-" Reformat the current line only
-" map <leader>ll V<Action>(ReformatCode)
-" map <leader>L <Action>(ReformatCode)
 map <leader>lh <Action>(LocalHistory.ShowHistory)
 map <leader>lw <Action>(JumpToLastWindow)
 map <leader>mh <Action>(MethodHierarchy)
 " map <Leader>nb :action ShowNavBar<CR>
 " map <Leader>nc :action NewClass<CR>
 map <leader>of <Action>(OpenFile)
-map <Leader>oi <Action>(OptimizeImports)
 map <Leader>om :action OverrideMethods<CR>
 map <Leader>pm :action ShowPopupMenu<CR>
 map <Leader>pr <Action>(ExternalSystem.ProjectRefreshAction)
@@ -605,9 +592,6 @@ map <Leader>pr <Action>(ExternalSystem.ProjectRefreshAction)
 map <Leader>pc <Action>(TextEditorWithPreview.Layout.EditorOnly)
 map <Leader>po <Action>(TextEditorWithPreview.Layout.EditorAndPreview)
 map <Leader>pO <Action>(TextEditorWithPreview.Layout.PreviewOnly)
-" " CloseEditor 关不掉 Compare.LastVersion
-" map <leader>qq <Action>(CloseContent)
-" map <Leader>qa :action CloseAllEditors<CR>
 " map <leader>qd <Action>(QuickJavaDoc) " `K`
 " quick fix
 map <leader>qf <Action>(ShowIntentionActions)
@@ -638,7 +622,6 @@ map <leader>vq <Action>(Vcs.QuickListPopupAction)
 map <leader>vR <Action>(ChangesView.Revert)
 map <leader>vr <Action>(Vcs.RollbackChangedLines)
 map <leader>vu <Action>(UpdateFiles)
-" map <leader>w <Action>(CloseContent)
 " map <leader>wd <Action>(ActivateDebugToolWindow)
 " map <leader>ww <Action>(JumpToLastWindow)
 " https://youtrack.jetbrains.com/issue/VIM-2666/How-to-use-vim-bindings-in-Tool-Windows-like-Run-Structure-etc..
@@ -663,15 +646,7 @@ nmap <TAB> <c-w>w
 
 " TODO more Leader key like `,` | https://github.com/rockyzhang24/dotfiles/tree/master/.config/nvim#-key-mappings
 
-" map <S-Space> <Action>(GotoNextError)
-
 " https://gist.github.com/PisecesPeng/9fabf2a1c1834bd35bf02c2bcb904708
-" 选择模式扩大选择范围 opt+up_arrow
-" vmap v <Action>(EditorSelectWord)
-" 选择模式缩小选择范围 opt+down_arrow
-" vmap V <Action>(EditorUnSelectWord)
-" https://github.com/VSCodeVim/Vim#-vscodevim-tricks
-" vmap af <Action>(EditorSelectWord)
 " https://github.com/terryma/vim-expand-region#mapping
 vmap K <Action>(EditorSelectWord)
 vmap J <Action>(EditorUnSelectWord)

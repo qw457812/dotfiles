@@ -7,7 +7,7 @@ return {
     "folke/snacks.nvim",
     optional = true,
     keys = function(_, keys)
-      if LazyVim.pick.want() == "snacks" then
+      if LazyVim.pick.picker.name == "snacks" then
         -- stylua: ignore
         table.insert(keys, { "<leader>fz", function() Snacks.picker.zoxide() end, desc = "Zoxide" })
       end

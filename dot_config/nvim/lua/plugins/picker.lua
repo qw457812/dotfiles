@@ -479,7 +479,7 @@ return {
       -- we have snacks input
       opts = U.extend_tbl(opts, { input = { enabled = false } })
       -- fzf as picker and dressing.nvim as dependency of other plugins like avante.nvim
-      return LazyVim.pick.want() == "telescope" and opts or U.extend_tbl(opts, { select = { enabled = false } })
+      return LazyVim.pick.picker.name == "telescope" and opts or U.extend_tbl(opts, { select = { enabled = false } })
     end,
   },
 

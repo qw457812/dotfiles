@@ -35,10 +35,6 @@ return {
         providers = {
           copilot = {
             module = "blink-copilot",
-            opts = {
-              max_completions = 3,
-              max_attempts = 4,
-            },
           },
         },
       },
@@ -141,7 +137,7 @@ return {
             LazyVim.warn("No prompt found on the current line")
             return
           end
-          local picker = ({ telescope = "telescope", fzf = "fzflua", snacks = "snacks" })[LazyVim.pick.want()]
+          local picker = ({ telescope = "telescope", fzf = "fzflua", snacks = "snacks" })[LazyVim.pick.picker.name]
           require("CopilotChat.integrations." .. picker).pick(items)
         end,
         desc = "Prompt Actions (CopilotChat)",
