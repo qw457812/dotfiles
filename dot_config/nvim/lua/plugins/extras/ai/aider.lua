@@ -9,18 +9,12 @@ return {
     keys = {
       { toggle_key, "<cmd>AiderTerminalToggle<cr>", desc = "Open Terminal (Aider)" },
       { "<leader>as", "<cmd>AiderTerminalSend<cr>", desc = "Send (Aider)", mode = { "n", "v" } },
-      -- { "<leader>a/", "<cmd>AiderQuickSendCommand<cr>", desc = "Send Command (Aider)" }, -- telescope.nvim is required
+      { "<leader>a/", "<cmd>AiderQuickSendCommand<cr>", desc = "Send Command (Aider)" },
       { "<leader>ab", "<cmd>AiderQuickSendBuffer<cr>", desc = "Send Buffer (Aider)" },
       { "<leader>a+", "<cmd>AiderQuickAddFile<cr>", desc = "Add File (Aider)" },
       { "<leader>a-", "<cmd>AiderQuickDropFile<cr>", desc = "Drop File (Aider)" },
       { "<leader>ar", "<cmd>AiderQuickReadOnlyFile<cr>", desc = "Add Read-Only File (Aider)" },
     },
-    init = function()
-      if not LazyVim.has("telescope.nvim") then
-        -- HACK: disable loading nvim_aider.ui since it requires telescope.nvim, `AiderQuickSendCommand` will not be available
-        package.loaded["nvim_aider.ui"] = true
-      end
-    end,
     opts = function()
       -- local defaults = require("nvim_aider.config").defaults
 
@@ -38,9 +32,10 @@ return {
         ---@diagnostic disable-next-line: missing-fields
         win = {
           position = "float",
+          wo = { winbar = "" },
           keys = {
             aider_close = {
-              toggle_key, -- <esc>
+              toggle_key,
               function(self)
                 self:hide()
               end,
@@ -51,6 +46,7 @@ return {
             term_normal = {
               "<esc>",
               function(self)
+                ---@diagnostic disable-next-line: inject-field
                 self.esc_timer = self.esc_timer or (vim.uv or vim.loop).new_timer()
                 if self.esc_timer:is_active() then
                   self.esc_timer:stop()
