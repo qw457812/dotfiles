@@ -75,6 +75,42 @@ return {
       --     tabline = true,
       --   },
       -- },
+      gitbrowse = {
+        url_patterns = {
+          ["github%.com"] = {
+            file = function(fields)
+              ---@param cmd string[]
+              ---@param err string
+              local function system(cmd, err)
+                local proc = vim.fn.system(cmd)
+                if vim.v.shell_error ~= 0 then
+                  Snacks.notify.error({ err, proc }, { title = "Git Browse" })
+                  error("__ignore__")
+                end
+                return vim.split(vim.trim(proc), "\n")
+              end
+
+              local file = vim.api.nvim_buf_get_name(0) ---@type string?
+              file = file and (vim.uv.fs_stat(file) or {}).type == "file" and vim.fs.normalize(file) or nil
+              local cwd = file and vim.fn.fnamemodify(file, ":h") or vim.fn.getcwd()
+              -- copied from: https://github.com/folke/snacks.nvim/pull/438
+              fields.commit = fields.commit
+                or system(
+                  { "git", "-C", cwd, "log", "-n", "1", "--pretty=format:%H", "--", file },
+                  "Failed to get latest commit of file"
+                )[1]
+
+              local pattern = "/blob/{commit}/{file}#L{line_start}-L{line_end}"
+              -- copied from: https://github.com/folke/snacks.nvim/blob/140204fde53531dd5dc5bd222975a9ff350747ad/lua/snacks/gitbrowse.lua#L97-L99
+              return (
+                pattern:gsub("(%b{})", function(key)
+                  return fields[key:sub(2, -2)] or key
+                end)
+              )
+            end,
+          },
+        },
+      },
       styles = {
         zoom_indicator = {
           bo = { filetype = "snacks_zen_zoom_indicator" },

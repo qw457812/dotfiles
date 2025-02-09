@@ -67,11 +67,11 @@ function M.shorten(path)
       { require("lazy.core.config").options.root, "󰒲 " },
     }
     if M.CHEZMOI then
-      table.insert(patterns, { M.CHEZMOI .. "/dot_config", " " })
+      table.insert(patterns, { M.CHEZMOI .. "/dot_config", "󱁿 " }) -- 󰒓
       table.insert(patterns, { M.CHEZMOI, "󰠦 " })
-      table.insert(patterns, { vim.fn.stdpath("config"), " " })
+      table.insert(patterns, { vim.fn.stdpath("config"), " " }) -- 
     end
-    table.insert(patterns, { vim.env.XDG_CONFIG_HOME or vim.env.HOME .. "/.config", " " })
+    table.insert(patterns, { vim.env.XDG_CONFIG_HOME or vim.env.HOME .. "/.config", "󱁿 " })
     patterns = vim.tbl_map(function(p)
       return { "^" .. vim.pesc(M.home_to_tilde(p[1])) .. "/", p[2] }
     end, patterns)

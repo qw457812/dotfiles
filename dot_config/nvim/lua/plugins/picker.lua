@@ -116,7 +116,12 @@ return {
           { "<leader>s.", function() Snacks.picker.resume() end, desc = "Resume" },
           { "<leader>ff", function() Snacks.picker.smart() end, desc = "Smart" },
           { "<leader>fF", function() Snacks.picker.files({ hidden = true, follow = true, ignored = true }) end, desc = "Find all files" },
-          { "<leader>gC", function() Snacks.picker.git_branches() end, desc = "Git branches" },
+          -- git
+          { "<leader>gc", function() Snacks.picker.git_log({ cwd = LazyVim.root.git() }) end, desc = "Git Log" },
+          { "<leader>gC", function() Snacks.picker.git_branches({ cwd = LazyVim.root.git() }) end, desc = "Git Branches" },
+          { "<leader>gd", function() Snacks.picker.git_diff({ cwd = LazyVim.root.git() }) end, desc = "Git Diff (hunks)" },
+          { "<leader>gs", function() Snacks.picker.git_status({ cwd = LazyVim.root.git() }) end, desc = "Git Status" },
+          { "<leader>gS", function() Snacks.picker.git_stash({ cwd = LazyVim.root.git() }) end, desc = "Git Stash" },
           unpack(H.mappings),
         })
       end
@@ -167,6 +172,7 @@ return {
             follow = true,
           },
           lazy = {
+            ---@diagnostic disable-next-line: missing-fields
             icons = {
               files = {
                 enabled = false,
@@ -283,12 +289,20 @@ return {
 
         local dir_trunc_len = 40
         local prefixes = {
-          file = 0,
-          git_status = 3,
-          buffer = 7, -- see: https://github.com/folke/snacks.nvim/blob/2568f18c4de0f43b15b0244cd734dcb5af93e53f/lua/snacks/picker/format.lua#L461-L464
-          lsp_symbol = 40,
+          format = {
+            file = 0,
+            git_status = 3, -- https://github.com/folke/snacks.nvim/blob/48302be42f9c7035b70974cefe787e5410da3f3b/lua/snacks/picker/format.lua#L542-L543
+            buffer = 7, -- https://github.com/folke/snacks.nvim/blob/48302be42f9c7035b70974cefe787e5410da3f3b/lua/snacks/picker/format.lua#L602-L605
+            lsp_symbol = 40, -- https://github.com/folke/snacks.nvim/blob/48302be42f9c7035b70974cefe787e5410da3f3b/lua/snacks/picker/format.lua#L305-L305
+          },
+          source = {
+            todo_comments = 9, -- https://github.com/folke/todo-comments.nvim/blob/304a8d204ee787d2544d8bc23cd38d2f929e7cc5/lua/todo-comments/snacks.lua#L34-L36
+          },
         }
-        if vim.tbl_contains(vim.tbl_keys(prefixes), picker.opts.format) then
+        if
+          vim.tbl_contains(vim.tbl_keys(prefixes.format), picker.opts.format)
+          or vim.tbl_contains(vim.tbl_keys(prefixes.source), picker.opts.source)
+        then
           local prefix = 0
           for _, text in ipairs(ret) do
             if text[2] ~= "SnacksPickerDir" then
@@ -298,7 +312,10 @@ return {
               break
             end
           end
-          dir_trunc_len = vim.api.nvim_win_get_width(picker.list.win.win) - prefix - prefixes[picker.opts.format] - 2
+          dir_trunc_len = vim.api.nvim_win_get_width(picker.list.win.win)
+            - prefix
+            - (prefixes.format[picker.opts.format] or prefixes.source[picker.opts.source])
+            - 2
         end
 
         for _, text in ipairs(ret) do
