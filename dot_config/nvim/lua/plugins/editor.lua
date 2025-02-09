@@ -246,10 +246,12 @@ return {
         end, "Undo Stage Hunk")
         map("n", "<leader>gD", function()
           gs.diffthis("~")
-          map("n", vim.g.user_close_key, function()
-            vim.cmd.only()
-            vim.keymap.del("n", vim.g.user_close_key, { buffer = buffer })
-          end, "Close Diff (Gitsigns)")
+          if vim.g.user_close_key then
+            map("n", vim.g.user_close_key, function()
+              vim.keymap.del("n", vim.g.user_close_key, { buffer = buffer })
+              vim.cmd.only()
+            end, "Close Diff (Gitsigns)")
+          end
         end, "Diff This ~")
         map("n", "<leader>g?", gs.toggle_current_line_blame, "Toggle Blame Line (GitSigns)")
       end

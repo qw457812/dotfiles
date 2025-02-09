@@ -288,24 +288,20 @@ return {
   {
     "saghen/blink.cmp",
     optional = true,
+    ---@param opts blink.cmp.Config
     opts = function(_, opts)
       local fuzzy_default = require("blink.cmp.config.fuzzy").default
 
-      ---@type blink.cmp.Config
-      local o = {
-        fuzzy = {
-          sorts = {
-            function(a, b)
-              local sort = require("blink.cmp.fuzzy.sort")
-              if a.source_id == "spell" and b.source_id == "spell" then
-                return sort.label(a, b)
-              end
-            end,
-            unpack(fuzzy_default.sorts),
-          },
-        },
+      opts.fuzzy = opts.fuzzy or {}
+      opts.fuzzy.sorts = {
+        function(a, b)
+          local sort = require("blink.cmp.fuzzy.sort")
+          if a.source_id == "spell" and b.source_id == "spell" then
+            return sort.label(a, b)
+          end
+        end,
+        unpack(opts.fuzzy.sorts or fuzzy_default.sorts),
       }
-      return U.extend_tbl(opts, o)
     end,
   },
 

@@ -274,6 +274,10 @@ nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
+" nmap <C-Up> <Action>(IncrementWindowHeight)
+" nmap <C-Down> <Action>(DecrementWindowHeight)
+" nmap <C-Left> <Action>(DecrementWindowWidth)
+" nmap <C-Right> <Action>(IncrementWindowWidth)
 
 map <C-/> <Action>(ActivateTerminalToolWindow)
 map <C-space> <Action>(ActivateTerminalToolWindow)
@@ -516,6 +520,10 @@ nmap <leader>st <Action>(ActivateTODOToolWindow)
 nmap <leader>sk :map<cr>
 nmap <leader>s" :registers<cr>
 nmap <leader>sc :history<cr>
+" nmap <leader>sC :commands<cr>
+" nmap <leader>sw <Action>(FindWordAtCaret)
+" nmap <leader>sM <Action>(ShowDocumentation)
+" nmap <leader>so <Action>(ShowSettings)
 
 " test
 map <leader>tl <Action>(Run)

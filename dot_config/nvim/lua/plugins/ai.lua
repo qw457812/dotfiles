@@ -127,23 +127,6 @@ return {
         ft = U.markdown.render_markdown_ft("copilot-chat"),
       },
     },
-    keys = {
-      {
-        "<leader>ap",
-        function()
-          local actions = require("CopilotChat.actions")
-          local items = actions["prompt_actions"]()
-          if not items then
-            LazyVim.warn("No prompt found on the current line")
-            return
-          end
-          local picker = ({ telescope = "telescope", fzf = "fzflua", snacks = "snacks" })[LazyVim.pick.picker.name]
-          require("CopilotChat.integrations." .. picker).pick(items)
-        end,
-        desc = "Prompt Actions (CopilotChat)",
-        mode = { "n", "v" },
-      },
-    },
     opts = {
       -- -- render-markdown integration | https://github.com/CopilotC-Nvim/CopilotChat.nvim#tips
       -- highlight_headers = false,
