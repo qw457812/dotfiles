@@ -124,15 +124,18 @@ end
 function M.clear_ui_esc(opts)
   opts = vim.tbl_deep_extend("keep", opts or {}, {
     close = function()
-      -- local ft = vim.bo.filetype
-      -- if ft == "oil" then
-      --   require("oil").close()
-      -- elseif ft == "minifiles" then
-      --   require("mini.files").close()
-      -- else
-      --   vim.api.nvim_win_close(0, false)
-      -- end
-      vim.api.nvim_feedkeys(vim.keycode(vim.g.user_close_key), "m", false)
+      if vim.g.user_close_key then
+        vim.api.nvim_feedkeys(vim.keycode(vim.g.user_close_key), "m", false)
+      else
+        local ft = vim.bo.filetype
+        if ft == "oil" then
+          require("oil").close()
+        elseif ft == "minifiles" then
+          require("mini.files").close()
+        else
+          vim.api.nvim_win_close(0, false)
+        end
+      end
     end,
     popups = true,
     esc = true,

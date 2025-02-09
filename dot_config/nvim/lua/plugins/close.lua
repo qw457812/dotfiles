@@ -1,5 +1,6 @@
 local close_key, exit_key, term_close_key = vim.g.user_close_key, vim.g.user_exit_key, vim.g.user_term_close_key
-if not (close_key and exit_key and term_close_key) then
+if not close_key then
+  vim.notify("`vim.g.user_close_key` is required", "warn", { title = "Close" })
   return {}
 end
 
@@ -58,13 +59,21 @@ end
 return {
   {
     "LazyVim/LazyVim",
-    keys = {
-      { close_key, close_buffer_or_window_or_exit, desc = "Close buffer/window or Exit" },
-      { close_key, mode = "x", "<esc>", desc = "Stop Visual Mode" },
-      { exit_key, "<cmd>qa<cr>", desc = "Quit All" },
-      { term_close_key, mode = "t", "<cmd>bd!<cr>", desc = "Close terminal" }, -- <cmd>close<cr>
-      { term_close_key, close_key, desc = "Close buffer/window or Exit", remap = true },
-    },
+    keys = function(_, keys)
+      vim.list_extend(keys, {
+        { close_key, close_buffer_or_window_or_exit, desc = "Close buffer/window or Exit" },
+        { close_key, mode = "x", "<esc>", desc = "Stop Visual Mode" },
+      })
+      if exit_key then
+        table.insert(keys, { exit_key, "<cmd>qa<cr>", desc = "Quit All" })
+      end
+      if term_close_key then
+        vim.list_extend(keys, {
+          { term_close_key, mode = "t", "<cmd>bd!<cr>", desc = "Close terminal" }, -- <cmd>close<cr>
+          { term_close_key, close_key, desc = "Close buffer/window or Exit", remap = true },
+        })
+      end
+    end,
     opts = function()
       if close_key:lower() == "<bs>" then
         if not package.loaded["mini.pairs"] then
@@ -207,14 +216,14 @@ return {
             --   end,
             --   desc = "Clear UI or Close",
             -- },
-            term_close = {
+            term_close = term_close_key and {
               term_close_key,
               function(self)
                 self:hide()
               end,
               mode = "t",
               desc = "Close",
-            },
+            } or nil,
           },
         },
       },
