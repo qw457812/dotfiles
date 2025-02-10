@@ -52,6 +52,20 @@ local function pick_chezmoi()
   end
 end
 
+local function pick_chezmoi_all()
+  if LazyVim.pick.picker.name == "snacks" then
+    Snacks.picker.files({
+      cwd = U.path.CHEZMOI,
+      hidden = true,
+      -- ignored = true,
+      follow = true,
+      title = "Chezmoi",
+    })
+  else
+    LazyVim.pick("files", { cwd = U.path.CHEZMOI })()
+  end
+end
+
 local function chezmoi_list_config_files()
   return chezmoi_list_files({ targets = vim.fn.stdpath("config"), path_style_absolute = true })
 end
@@ -153,6 +167,7 @@ return {
     keys = {
       { "<leader>sz", false },
       { "<leader>f.", pick_chezmoi, desc = "Find Chezmoi Source Dotfiles" },
+      { "<leader>f,", pick_chezmoi_all, desc = "Find Chezmoi Files (All)" },
       { "<leader>fc", pick_config, desc = "Find Config File" },
     },
     init = function()

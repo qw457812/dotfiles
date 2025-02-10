@@ -81,6 +81,13 @@ function M.is_floating_win(win, opts)
   return true
 end
 
+function M.stop_visual_mode()
+  local mode = vim.fn.mode():sub(1, 1) ---@type string
+  if vim.tbl_contains({ "v", "V", vim.keycode("<C-v>") }, mode) then
+    vim.cmd("normal! " .. mode)
+  end
+end
+
 --- Get visually selected lines.
 --- alternative:
 --- https://github.com/ibhagwan/fzf-lua/blob/f39de2d77755e90a7a80989b007f0bf2ca13b0dd/lua/fzf-lua/utils.lua#L770

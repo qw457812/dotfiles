@@ -6,7 +6,7 @@ alias:
   - "groq:groq/llama-3.3-70b-versatile"
 
 architect: true
-model: openrouter/deepseek/deepseek-r1:free
+model: openrouter/deepseek/deepseek-r1
 editor-model: openrouter/anthropic/claude-3.5-sonnet
 show-model-warnings: false
 

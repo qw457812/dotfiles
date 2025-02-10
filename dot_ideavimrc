@@ -187,7 +187,7 @@ nmap s <Plug>ReplaceWithRegisterOperator
 nmap ss <Plug>ReplaceWithRegisterLine
 " xmap s <Plug>ReplaceWithRegisterVisual " `v_P`
 nmap S s$
-nmap sdd yyp
+nmap sdd "zyy"zp
 
 " helix-style mappings
 map mm %
@@ -481,6 +481,7 @@ map <leader>db <Action>(ToggleLineBreakpoint)
 map <Leader>ff <Action>(SearchEverywhere)
 map <Leader>fn <Action>(NewFile)
 " map <Leader>fn <Action>(NewScratchFile)
+map <Leader>fN <Action>(NewClass)
 map <leader>fr <Action>(RecentFiles)
 map <leader>fb <Action>(Switcher)
 " map <Leader>fc :e ~/.local/share/chezmoi/dot_ideavimrc<CR>
@@ -591,7 +592,6 @@ map <leader>lh <Action>(LocalHistory.ShowHistory)
 map <leader>lw <Action>(JumpToLastWindow)
 map <leader>mh <Action>(MethodHierarchy)
 " map <Leader>nb :action ShowNavBar<CR>
-" map <Leader>nc :action NewClass<CR>
 map <leader>of <Action>(OpenFile)
 map <Leader>om :action OverrideMethods<CR>
 map <Leader>pm :action ShowPopupMenu<CR>
@@ -608,8 +608,6 @@ map <leader>qi <Action>(QuickImplementations)
 map <leader>qs :set quickscope<CR>
 map <leader>qS :set noquickscope<CR>
 map <Leader>rc :action ChooseRunConfiguration<CR>
-map <leader>rl <Action>(RecentLocations)
-map <leader>rp <Action>(ManageRecentProjects)
 map <leader>rq :action Refactorings.QuickListPopupAction<CR>
 map <leader>rr <Action>(Run)
 map <leader>rs <Action>(Stop)
