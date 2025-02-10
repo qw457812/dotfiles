@@ -218,7 +218,15 @@ return {
   {
     "saghen/blink.cmp",
     optional = true,
-    dependencies = "Kaiser-Yang/blink-cmp-dictionary",
+    dependencies = {
+      "Kaiser-Yang/blink-cmp-dictionary",
+      -- TODO: add dict downloading to build
+      init = function()
+        LazyVim.on_load("mini.icons", function()
+          Snacks.util.set_hl({ BlinkCmpKindDict = "MiniIconsRed" })
+        end)
+      end,
+    },
     ---@type blink.cmp.Config
     opts = {
       sources = {
@@ -233,8 +241,12 @@ return {
             ---@module 'blink-cmp-dictionary'
             ---@type blink-cmp-dictionary.Options
             opts = {
-              -- aspell -d en_US dump master | aspell -l en expand | sed 's/\s\+/\n/g' > aspell_en.dict
-              dictionary_files = { vim.fn.stdpath("data") .. "/cmp-dictionary/dict/aspell_en.dict" },
+              dictionary_files = {
+                -- aspell -d en_US dump master | aspell -l en expand | sed 's/\s\+/\n/g' > aspell_en.dict
+                vim.fn.stdpath("data") .. "/cmp-dictionary/dict/aspell_en.dict",
+                -- -- https://github.com/dwyl/english-words/blob/8179fe68775df3f553ef19520db065228e65d1d3/words_alpha.txt
+                -- vim.fn.stdpath("data") .. "/cmp-dictionary/dict/words_alpha.txt",
+              },
               separate_output = vim.fn.executable("wn") == 0 and function(output)
                 local items = {}
                 for line in output:gmatch("[^\r\n]+") do

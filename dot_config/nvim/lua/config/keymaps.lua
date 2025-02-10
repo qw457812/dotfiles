@@ -107,11 +107,10 @@ map("n", "dd", function() return is_empty_line() and '"_dd' or "dd" end, { expr 
 map("n", "i",  function() return is_empty_line() and '"_cc' or "i" end,  { expr = true, desc = "Indented i on Empty Line" })
 -- stylua: ignore end
 
-if not LazyVim.has("nvim-hlslens") then
-  del("n", { "n", "N" })
-end
+safe_map("n", "n", "nzv") -- nvim-hlslens
+safe_map("n", "N", "Nzv")
 del({ "x", "o" }, { "n", "N" })
--- safe_map({ "n", "x" }, "gw", "*``", { desc = "Search word under cursor" }) -- nvim-hlslens
+safe_map("n", "gw", "*``", { desc = "Search word under cursor" }) -- nvim-hlslens
 map("n", "cn", "*``cgn", { desc = "Change cword (Search forward)" })
 map("n", "cN", "*``cgN", { desc = "Change cword (Search backward)" })
 
