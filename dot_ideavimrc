@@ -417,6 +417,7 @@ imap <C-k> <C-o><Action>(ParameterInfo)
 " https://github.com/mmrzax/dots/blob/bbec0d1a0549cb1c7b74438bf99e1a4169251377/.ideavimrc
 " https://github.com/phisco/configs/blob/ceab3ac5a0761b91b631d85f96de085b232c2faf/.ideavimrc
 " https://github.com/helmerdavila/dotfiles/blob/main/dot_ideavimrc
+" https://github.com/dengzhizhi/dotfiles/blob/fbb6e4179abe82b1307b74a723cb77f3e66afa19/.ideavimrc
 
 " -----------------------------------------------------常用--------------------------------------------------------
 " keys: https://ideavim.sourceforge.net/vim/intro.html
@@ -473,6 +474,7 @@ map <leader>cr <Action>(RenameElement)
 map <leader>cR <Action>(RenameFile)
 map <leader>cn <Action>(FixDocComment)
 nmap <leader>cs <Action>(ActivateStructureToolWindow)
+map <leader>cY <Action>(CopyReference)
 
 " debug
 map <leader>db <Action>(ToggleLineBreakpoint)
@@ -537,10 +539,16 @@ map <leader>wh <c-w>h
 map <leader>wj <c-w>j
 map <leader>wk <c-w>k
 map <leader>wl <c-w>l
-map <leader>wo <c-w>o
-map <leader>ws <c-w>s
-map <leader>wv <c-w>v
-map <leader>wd <C-W>c
+" map <leader>wo <c-w>o
+" nmap <leader>wo <action>(UnsplitAll) \| <action>(HideAllWindows)
+nmap <leader>wo <action>(UnsplitAll)
+" map <leader>ws <c-w>s
+nmap <leader>ws <action>(SplitHorizontally)
+" map <leader>wv <c-w>v
+nmap <leader>wv <action>(SplitVertically)
+" map <leader>wd <C-W>c
+nmap <leader>wd <action>(Unsplit)
+nmap <leader>wm <Action>(ToggleZenMode)
 
 " ui
 map <leader>uw <Action>(EditorToggleUseSoftWraps)
@@ -572,7 +580,6 @@ map <leader>ua <Action>(copilot.enableCopilot)
 map <leader>ch :action CallHierarchy<CR>
 " map <leader>cL <Action>(copilot.loginGitHub)
 " map <leader>cs <Action>(EditorCompleteStatement)
-" map <leader>cr <Action>(CopyReference)
 map <leader>dd <Action>(Debug)
 map <Leader>dv :action ViewBreakpoints<CR>
 map <Leader>dc :action ChooseDebugConfiguration<CR>
