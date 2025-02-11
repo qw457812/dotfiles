@@ -44,6 +44,7 @@
     "plugins.extras.ui.border",
     "plugins.extras.ui.dropbar",
     "plugins.extras.ui.hide-hints-in-insert-mode",
+    "plugins.extras.util.harper",
     "plugins.extras.util.image",
     "plugins.extras.util.rime",
     "plugins.extras.util.tmux",
