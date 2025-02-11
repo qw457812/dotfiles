@@ -471,4 +471,19 @@ return {
       })
     end,
   },
+
+  {
+    "ThePrimeagen/harpoon",
+    optional = true,
+    keys = {
+      {
+        close_key,
+        function()
+          require("harpoon").ui:toggle_quick_menu()
+        end,
+        desc = "Close (Harpoon)",
+        ft = "harpoon",
+      },
+    },
+  },
 }
