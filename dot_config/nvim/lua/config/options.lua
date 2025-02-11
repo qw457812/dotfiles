@@ -43,7 +43,7 @@ vim.g.user_neotree_auto_close = vim.g.user_is_termux
 -- https://github.com/monoira/.dotfiles/blob/bd69b59d228f4b23a3e190cbd3c67a79e6a396e2/nvim/.config/nvim/lua/config/options.lua#L36
 -- https://github.com/ahmedkhalf/project.nvim/blob/8c6bad7d22eef1b71144b401c9f74ed01526a4fb/lua/project_nvim/config.lua#L17
 vim.g.root_spec = { "lsp", { ".git", "lua", ".svn", "pom.xml" }, "cwd" }
-vim.g.root_lsp_ignore = vim.list_extend(vim.g.root_lsp_ignore or {}, { "rime_ls" })
+vim.g.root_lsp_ignore = vim.list_extend(vim.g.root_lsp_ignore or {}, { "rime_ls", "harper_ls" })
 -- vim.g.deprecation_warnings = true
 vim.g.trouble_lualine = false
 vim.g.lazyvim_blink_main = not vim.g.user_is_termux

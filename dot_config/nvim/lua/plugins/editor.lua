@@ -196,6 +196,8 @@ return {
     "lewis6991/gitsigns.nvim",
     optional = true,
     opts = function(_, opts)
+      opts.attach_to_untracked = true
+
       local on_attach = opts.on_attach or function(_) end
       opts.on_attach = function(buffer)
         on_attach(buffer)
@@ -300,6 +302,11 @@ return {
         { "<C-n>", function() require("harpoon"):list():next() end, desc = "Next Harpoon File" },
         { "<C-p>", function() require("harpoon"):list():prev() end, desc = "Prev Harpoon File" },
       })
+    end,
+    opts = function()
+      local harpoon = require("harpoon")
+      local harpoon_extensions = require("harpoon.extensions")
+      harpoon:extend(harpoon_extensions.builtins.highlight_current_file())
     end,
     specs = {
       {

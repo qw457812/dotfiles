@@ -109,7 +109,7 @@ M.lsp = {
   cond = function()
     local clients = vim.lsp.get_clients({ bufnr = 0 })
     clients = vim.tbl_filter(function(client)
-      local ignored = { "null-ls", "copilot", "rime_ls" }
+      local ignored = { "null-ls", "copilot", "rime_ls", "harper_ls" }
       return not vim.list_contains(ignored, client.name)
     end, clients)
     return #clients > 0
