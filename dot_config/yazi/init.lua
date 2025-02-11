@@ -2,6 +2,9 @@
 require("smart-enter"):setup({
   open_multi = true,
 })
+require("zoxide"):setup({
+  update_db = true,
+})
 -- https://yazi-rs.github.io/docs/dds/#session.lua
 require("session"):setup({
   sync_yanked = true,
@@ -30,6 +33,7 @@ require("bookmarks"):setup({
 })
 
 -- TODO:
+-- https://github.com/hankertrix/augment-command.yazi
 -- https://github.com/Matt-FTW/dotfiles/blob/main/.config/yazi/init.lua
 -- https://github.com/imsi32/yatline.yazi
 -- https://github.com/imsi32/yatline-githead.yazi
