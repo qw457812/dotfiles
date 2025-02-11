@@ -53,12 +53,15 @@ return {
 
   {
     "wurli/contextindent.nvim",
+    enabled = false, -- wrong indent on `o` in nested list
     dependencies = {
       {
         "nvim-treesitter/nvim-treesitter",
         opts = {
           indent = {
-            disable = { "markdown" },
+            disable = function(lang, buf)
+              return lang == "markdown" or vim.bo[buf].filetype == "markdown"
+            end,
           },
         },
       },

@@ -74,7 +74,22 @@ return {
     lazy = false, -- see: https://github.com/yetone/avante.nvim/issues/561#issuecomment-2342550208
     build = "make",
     dependencies = {
-      "nvim-treesitter/nvim-treesitter",
+      {
+        "nvim-treesitter/nvim-treesitter",
+        opts = {
+          -- copied from: https://github.com/yetone/avante.nvim/pull/1181
+          highlight = {
+            disable = function(_, buf)
+              if vim.bo[buf].filetype == "Avante" then
+                local sidebar = require("avante").get()
+                if sidebar and sidebar.is_generating then
+                  return true
+                end
+              end
+            end,
+          },
+        },
+      },
       "stevearc/dressing.nvim",
       "MunifTanjim/nui.nvim",
       "zbirenbaum/copilot.lua", -- for `provider = "copilot"`
@@ -110,10 +125,21 @@ return {
     },
     keys = function(_, keys)
       local opts_mappings = LazyVim.opts("avante.nvim").mappings or {}
-      -- stylua: ignore
       local mappings = {
         { mapping_disabled_prefix, "", desc = "+disabled" },
-        { opts_mappings.ask or "<leader>aa", function() require("avante.api").ask() end, desc = "Ask (Avante)", mode = { "n", "v" } },
+        {
+          opts_mappings.ask or "<leader>aa",
+          function()
+            require("avante.api").ask()
+            local sidebar = require("avante").get()
+            if sidebar and sidebar:is_open() then
+              sidebar:focus_input()
+            end
+          end,
+          desc = "Ask (Avante)",
+          mode = { "n", "v" },
+        },
+        -- stylua: ignore start
         { opts_mappings.edit or "<leader>ae", function() require("avante.api").edit() end, desc = "Edit (Avante)", mode = "v" },
         { opts_mappings.refresh or "<leader>ar", function() require("avante.api").refresh() end, desc = "Refresh (Avante)" },
         { opts_mappings.focus or "<leader>af", function() require("avante.api").focus() end, desc = "Focus (Avante)" },
@@ -135,6 +161,7 @@ return {
         { "<leader>avF", edit_submit(prompt.fix_bugs),           desc = "Fix Bugs (Edit)",                 mode = "v" },
         { "<leader>avu", ask(prompt.add_tests),                  desc = "Add Tests (Ask)",                 mode = { "n", "v" } },
         { "<leader>avU", edit_submit(prompt.add_tests),          desc = "Add Tests (Edit)",                mode = "v" },
+        -- stylua: ignore end
       }
       vim.list_extend(keys, mappings)
     end,

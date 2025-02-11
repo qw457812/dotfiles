@@ -10,6 +10,7 @@ return {
     optional = true,
     keys = function(_, keys)
       vim.g.db_ui_disable_info_notifications = 1
+      vim.g.db_ui_disable_mappings_sql = 1
 
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "dbui",
@@ -21,7 +22,11 @@ return {
       return vim.list_extend(keys, {
         { "<cr>", mode = { "n", "v" }, "<Plug>(DBUI_ExecuteQuery)", desc = "Execute Query (dadbod)", ft = sql_ft },
         { "<leader>fs", "<Plug>(DBUI_SaveQuery)", desc = "Save Query (dadbod)", ft = sql_ft },
+        { "<localleader>e", "<Plug>(DBUI_EditBindParameters)", desc = "Edit Bind Parameters (dadbod)", ft = sql_ft },
+        { "a", "<Plug>(DBUI_AddConnection)", desc = "Add Connection (dadbod)", ft = "dbui" },
         { "gd", "<Plug>(DBUI_ToggleDetails)", desc = "Toggle Details (dadbod)", ft = "dbui" },
+        { "<localleader>f", "<Plug>(DBUI_JumpToForeignKey)", desc = "Jump To Foreign Key (dadbod)", ft = "dbout" },
+        { "<localleader>r", "<Plug>(DBUI_ToggleResultLayout)", desc = "Toggle Result Layout (dadbod)", ft = "dbout" },
         {
           "<esc>",
           function()
@@ -57,7 +62,10 @@ return {
         {
           filter = {
             event = "msg_show",
-            find = "^DB: Query .+ finished in .+s$",
+            any = {
+              { find = "^DB: Query .+ finished in .+s$" },
+              { find = "^DB: Running query%.%.%.$" },
+            },
           },
           view = "mini",
         },
