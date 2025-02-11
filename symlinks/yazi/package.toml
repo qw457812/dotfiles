@@ -1,5 +1,49 @@
-[plugin]
-deps = [{ use = "yazi-rs/plugins:full-border", rev = "02d18be" }, { use = "yazi-rs/plugins:smart-filter", rev = "02d18be" }, { use = "yazi-rs/plugins:git", rev = "02d18be" }, { use = "dedukun/bookmarks", rev = "202e450" }, { use = "orhnk/system-clipboard", rev = "7775a80" }, { use = "llanosrocas/githead", rev = "45bd61e" }, { use = "yazi-rs/plugins:smart-enter", rev = "02d18be" }, { use = "yazi-rs/plugins:diff", rev = "02d18be" }]
+[[plugin.deps]]
+use = "yazi-rs/plugins:full-border"
+rev = "8945e54"
+hash = "ae9e1d0c6bfd68cdebc98cc684c22b45"
 
-[flavor]
-deps = [{ use = "yazi-rs/flavors:catppuccin-frappe", rev = "fd85060" }]
+[[plugin.deps]]
+use = "yazi-rs/plugins:smart-filter"
+rev = "8945e54"
+hash = "b482f4f2d3c4e0aa3f8db89a95699439"
+
+[[plugin.deps]]
+use = "yazi-rs/plugins:git"
+rev = "8945e54"
+hash = "771f18427fb75fb19990ce602bb322f4"
+
+[[plugin.deps]]
+use = "dedukun/bookmarks"
+rev = "202e450"
+hash = "9e2f6f7381542d3adb3080b394b431b4"
+
+[[plugin.deps]]
+use = "orhnk/system-clipboard"
+rev = "7775a80"
+hash = "9b8f2573da54334b04747e51556040cc"
+
+[[plugin.deps]]
+use = "llanosrocas/githead"
+rev = "45bd61e"
+hash = "49f2baf77a7e779d06b7521a02ebc253"
+
+[[plugin.deps]]
+use = "yazi-rs/plugins:smart-enter"
+rev = "8945e54"
+hash = "aef2b1a805b80cce573bb766f1459d88"
+
+[[plugin.deps]]
+use = "yazi-rs/plugins:diff"
+rev = "8945e54"
+hash = "7a08e303167d5b655c06da6d570f0333"
+
+[[plugin.deps]]
+use = "yazi-rs/plugins:mount"
+rev = "8945e54"
+hash = "f3ade4dba8fb56b85e8363b66f677f9"
+
+[[flavor.deps]]
+use = "yazi-rs/flavors:catppuccin-frappe"
+rev = "fd85060"
+hash = "e88895e8f8b7926f20946f273ecc7348"

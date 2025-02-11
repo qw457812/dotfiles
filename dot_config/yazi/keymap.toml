@@ -13,12 +13,12 @@ prepend_keymap = [
   { on = "l", run = "plugin smart-enter", desc = "Enter the child directory, or open the file" },
 
   # # https://yazi-rs.github.io/docs/tips#navigation-wraparound
-  # { on = "k", run = "plugin arrow --args=-1", desc = "Move cursor up (wraparound)" },
-  # { on = "j", run = "plugin arrow --args=1", desc = "Move cursor down (wraparound)" },
+  # { on = "k", run = "plugin arrow -1", desc = "Move cursor up (wraparound)" },
+  # { on = "j", run = "plugin arrow 1", desc = "Move cursor down (wraparound)" },
 
   # # https://yazi-rs.github.io/docs/tips#parent-arrow
-  # { on = "K", run = "plugin parent-arrow --args=-1", desc = "Navigation in the parent directory without leaving the CWD" },
-  # { on = "J", run = "plugin parent-arrow --args=1", desc = "Navigation in the parent directory without leaving the CWD" },
+  # { on = "K", run = "plugin parent-arrow -1", desc = "Navigation in the parent directory without leaving the CWD" },
+  # { on = "J", run = "plugin parent-arrow 1", desc = "Navigation in the parent directory without leaving the CWD" },
 
   # Tabs
   { on = "K", run = "tab_switch -1 --relative", desc = "Switch to the previous tab" },
@@ -52,8 +52,8 @@ prepend_keymap = [
   # N: ~/.config/nvim
   # l: ~/.local/share/nvim/lazy/LazyVim
   # z: ~/.local/share/chezmoi
-  { on = "m", run = "plugin bookmarks --args=save", desc = "Save current position as a bookmark" },
-  { on = "'", run = "plugin bookmarks --args=jump", desc = "Jump to a bookmark" },
+  { on = "m", run = "plugin bookmarks save", desc = "Save current position as a bookmark" },
+  { on = "'", run = "plugin bookmarks jump", desc = "Jump to a bookmark" },
   { on = [
     "g",
     "h",
@@ -107,9 +107,7 @@ prepend_keymap = [
   { on = [
     "<Space>",
     ",",
-  ], run = '''
-      shell 'qlmanage -p "$@"'
-    ''', desc = "Macos Quick Look" },
+  ], run = 'shell -- qlmanage -p "$@"', desc = "Macos Quick Look" },
   { on = [
     "<Space>",
     "<Backspace>",
@@ -141,17 +139,17 @@ prepend_keymap = [
     "<Space>",
     "g",
     "g",
-  ], run = "shell lazygit --block", desc = "Lazygit" },
+  ], run = "shell --block lazygit", desc = "Lazygit" },
   { on = [
     "<Space>",
     "g",
     "f",
-  ], run = 'shell "lazygit -f \"$0\"" --block', desc = "Lazygit Current File History" },
+  ], run = 'shell --block -- lazygit -f "$0"', desc = "Lazygit Current File History" },
   { on = [
     "<Space>",
     "g",
     "l",
-  ], run = 'shell "lazygit log" --block', desc = "Lazygit Log" },
+  ], run = 'shell --block -- lazygit log', desc = "Lazygit Log" },
 ]
 
 append_keymap = [
@@ -159,9 +157,12 @@ append_keymap = [
   { on = "F", run = "plugin smart-filter", desc = "Smart filter" },
 
   # https://yazi-rs.github.io/docs/configuration/keymap#manager.shell
-  { on = "e", run = 'shell "${EDITOR:=vi} \"$@\"" --block', desc = "Edit the selected files use $EDITOR" },
-  { on = "E", run = 'shell "open -a /Applications/Emacs.app \"$@\""', desc = "Edit the selected files use Emacs.app" },
+  { on = "e", run = 'shell --block -- ${EDITOR:=vi} "$@"', desc = "Edit the selected files use $EDITOR" },
+  { on = "E", run = 'shell -- open -a /Applications/Emacs.app "$@"', desc = "Edit the selected files use Emacs.app" },
 
+  { on = "M", run = 'plugin mount', desc = "Mount Manager" },
+
+  # https://github.com/yazi-rs/plugins/tree/main/mount.yazi
   { on = "<Backspace>", run = "close", desc = "Close the current tab, or quit if it is last tab" },
 
   # TODO: cc A
@@ -186,19 +187,17 @@ append_keymap = [
   { on = [
     "g",
     "r",
-  ], run = '''
-      shell 'ya emit cd "${NVIM_CWD:-$(git rev-parse --show-toplevel 2>/dev/null)}"'
-    ''', desc = "Toggle the visibility of hidden files" },
+  ], run = 'shell -- ya emit cd "${NVIM_CWD:-$(git rev-parse --show-toplevel 2>/dev/null)}"', desc = "Toggle the visibility of hidden files" },
 
   # https://github.com/dedukun/bookmarks.yazi
   { on = [
     "b",
     "d",
-  ], run = "plugin bookmarks --args=delete", desc = "Delete a bookmark" },
+  ], run = "plugin bookmarks delete", desc = "Delete a bookmark" },
   { on = [
     "b",
     "D",
-  ], run = "plugin bookmarks --args=delete_all", desc = "Delete all bookmarks" },
+  ], run = "plugin bookmarks delete_all", desc = "Delete all bookmarks" },
 
   # Linemode
   { on = [
@@ -370,11 +369,14 @@ prepend_keymap = [
 ]
 
 append_keymap = [
-  { on = ["g", "?"], run = "help", desc = "Open help" },
+  { on = [
+    "g",
+    "?",
+  ], run = "help", desc = "Open help" },
 
   # Line-wise movement
-  { on = "H", run = "move -999", desc = "Move to the BOL" },
-  { on = "L", run = "move 999", desc = "Move to the EOL" },
+  { on = "H", run = "move first-char", desc = "Move to the first non-whitespace character" },
+  { on = "L", run = "move eol", desc = "Move to the EOL" },
 
   { on = "U", run = "redo", desc = "Redo the last operation" },
 ]
