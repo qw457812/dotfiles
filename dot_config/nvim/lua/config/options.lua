@@ -9,7 +9,7 @@ local opt = vim.opt
 opt.relativenumber = false
 opt.spelllang:append("cjk") -- exclude East Asian characters from spell checking
 opt.timeoutlen = vim.g.vscode and 1000 or 500 -- increase timeoutlen for mini.operators `cX` since which-key v3
-opt.shell = "fish"
+-- opt.shell = vim.fn.executable("fish") == 1 and "fish" or opt.shell
 -- https://github.com/folke/dot/blob/master/nvim/lua/config/options.lua
 opt.backup = true
 opt.backupdir = vim.fn.stdpath("state") .. "/backup"
@@ -44,7 +44,7 @@ vim.g.user_neotree_auto_close = vim.g.user_is_termux
 -- https://github.com/ahmedkhalf/project.nvim/blob/8c6bad7d22eef1b71144b401c9f74ed01526a4fb/lua/project_nvim/config.lua#L17
 vim.g.root_spec = { "lsp", { ".git", "lua", ".svn", "pom.xml" }, "cwd" }
 vim.g.root_lsp_ignore = vim.list_extend(vim.g.root_lsp_ignore or {}, { "rime_ls", "harper_ls" })
--- vim.g.deprecation_warnings = true
+vim.g.deprecation_warnings = true
 vim.g.trouble_lualine = false
 vim.g.lazyvim_blink_main = not vim.g.user_is_termux
 -- failed to install basedpyright on termux via mason

@@ -18,8 +18,10 @@ fish_add_path "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
 # Fish
 set -g fish_greeting
 set fish_emoji_width 2
+alias ssh "TERM=xterm-256color command ssh"
+alias mosh "TERM=xterm-256color command mosh"
 
-set -gx TERM xterm-256color # https://github.com/gpakosz/.tmux
+# set -gx TERM xterm-256color # https://github.com/gpakosz/.tmux
 set -gx LANG en_US.UTF-8
 set -gx LC_ALL en_US.UTF-8
 set -gx LC_CTYPE en_US.UTF-8
@@ -46,7 +48,7 @@ set -x LG_CONFIG_FILE $HOME/.config/lazygit/config.yml,$HOME/.cache/nvim/lazygit
 # Fzf
 # `--height 100%` is required, see https://github.com/wez/wezterm/discussions/4101
 # https://github.com/folke/tokyonight.nvim/blob/45d22cf0e1b93476d3b6d362d720412b3d34465c/extras/fzf/tokyonight_moon.sh
-set -x FZF_DEFAULT_OPTS "$FZF_DEFAULT_OPTS 
+set -x FZF_DEFAULT_OPTS "
   --height=100%
   --tmux=100%
   --cycle
@@ -126,6 +128,7 @@ abbr -a --position anywhere G '| grep'
 abbr -a --position anywhere J '| jq'
 
 # Tmux
+alias tmux "TERM=xterm-256color command tmux" # https://github.com/gpakosz/.tmux
 abbr t tmux
 abbr tad 'tmux attach -d -t'
 abbr ts 'tmux new -s'
@@ -134,6 +137,7 @@ abbr tk 'tmux kill-session -t'
 
 # Git
 abbr g git
+alias lazygit "TERM=xterm-256color command lazygit"
 abbr gg lazygit
 abbr gl 'git l --color'
 abbr gs "git st"
@@ -176,6 +180,7 @@ abbr czeapv 'chezmoi edit --apply --verbose'
 abbr czu 'chezmoi update'
 abbr czm 'chezmoi managed --path-style=absolute .'
 abbr czum 'chezmoi unmanaged --path-style=absolute .'
+abbr czg 'chezmoi git --'
 
 # Homebrew
 abbr bo 'brew update && brew outdated'

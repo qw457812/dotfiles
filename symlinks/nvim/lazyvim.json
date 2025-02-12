@@ -10,6 +10,7 @@
     "lazyvim.plugins.extras.editor.dial",
     "lazyvim.plugins.extras.editor.harpoon2",
     "lazyvim.plugins.extras.editor.illuminate",
+    "lazyvim.plugins.extras.editor.mini-diff",
     "lazyvim.plugins.extras.editor.mini-files",
     "lazyvim.plugins.extras.editor.mini-move",
     "lazyvim.plugins.extras.editor.refactoring",
@@ -54,7 +55,7 @@
   "install_version": 7,
   "news": {
     "NEWS.md": "10960",
-    "doc/news.txt": "21733"
+    "doc/news.txt": "22156"
   },
   "version": 8
 }

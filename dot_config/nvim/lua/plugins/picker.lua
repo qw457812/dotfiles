@@ -414,7 +414,6 @@ return {
     },
   },
 
-  -- https://www.lazyvim.org/configuration/examples
   {
     "nvim-telescope/telescope.nvim",
     optional = true,
@@ -496,7 +495,7 @@ return {
     opts = function(_, opts)
       -- we have snacks input
       opts = U.extend_tbl(opts, { input = { enabled = false } })
-      -- fzf as picker and dressing.nvim as dependency of other plugins like avante.nvim
+      -- fzf/snacks as picker and dressing.nvim as dependency of other plugins like avante.nvim
       return LazyVim.pick.picker.name == "telescope" and opts or U.extend_tbl(opts, { select = { enabled = false } })
     end,
   },

@@ -1,11 +1,10 @@
 # https://github.com/folke/dot/blob/56d310467f3f962e506810b710a1562cee03b75e/config/starship.toml
-
-# [custom.shell]
-# command = "echo $STARSHIP_SHELL"                # shows output of command
-# when = """ test "$STARSHIP_SHELL" != "fish" """
-# style = "dimmed blue"
-# format = "[$output]($style)"
-# shell = ["bash"]
+[custom.shell]
+command = "echo $STARSHIP_SHELL"                                                # shows output of command
+when = """ test "$STARSHIP_SHELL" != "" && test "$STARSHIP_SHELL" != "fish" """ # check "" for Rolv-Apneseth/starship.yazi
+style = "dimmed blue"
+format = "[$output]($style)"
+shell = ["bash"]
 
 # [custom.neovim]
 # command = 'bob ls | rg Used | awk "{print \$2}"' # shows output of command
@@ -28,7 +27,6 @@ format = '([$all_status$ahead_behind]($style))'
 disabled = false
 
 # starship preset nerd-font-symbols -o ~/.config/starship.toml
-
 [aws]
 symbol = "  "
 
