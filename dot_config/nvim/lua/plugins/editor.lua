@@ -299,8 +299,8 @@ return {
       end
       -- stylua: ignore
       vim.list_extend(keys, {
-        { "<C-n>", function() require("harpoon"):list():next() end, desc = "Next Harpoon File" },
-        { "<C-p>", function() require("harpoon"):list():prev() end, desc = "Prev Harpoon File" },
+        { "<C-n>", function() require("harpoon"):list():next({ ui_nav_wrap = true }) end, desc = "Next Harpoon File" },
+        { "<C-p>", function() require("harpoon"):list():prev({ ui_nav_wrap = true }) end, desc = "Prev Harpoon File" },
       })
     end,
     opts = function()

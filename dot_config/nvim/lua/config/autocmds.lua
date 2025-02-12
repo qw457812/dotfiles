@@ -117,7 +117,7 @@ vim.api.nvim_create_autocmd("FileType", {
   pattern = {
     "lazy", -- Lazy Extras, alternative: https://github.com/aimuzov/LazyVimx/blob/00d45b2d746c36101b4cf1c5fe0b46d53cb6774a/lua/lazyvimx/extras/hacks/lazyvim-remove-extras-title.lua
   },
-  callback = function(event)
+  callback = function()
     vim.defer_fn(function()
       vim.opt_local.wrap = false
     end, 100)
@@ -258,7 +258,6 @@ if vim.o.shell:find("zsh") or vim.o.shell:find("fish") then
   })
 end
 
--- -- colorcolumn
 -- vim.api.nvim_create_autocmd("FileType", {
 --   pattern = { "markdown" },
 --   callback = function()
