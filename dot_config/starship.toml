@@ -1,17 +1,18 @@
 # https://github.com/folke/dot/blob/56d310467f3f962e506810b710a1562cee03b75e/config/starship.toml
-[custom.shell]
-command = "echo $STARSHIP_SHELL"                # shows output of command
-when = """ test "$STARSHIP_SHELL" != "fish" """
-style = "dimmed blue"
-format = "[$output]($style)"
-shell = ["bash"]
 
-[custom.neovim]
-command = 'bob ls | rg Used | awk "{print \$2}"' # shows output of command
-detect_folders = ["lua"]
-style = "green"
-format = "[ $output ]($style)"
-shell = ["bash"]
+# [custom.shell]
+# command = "echo $STARSHIP_SHELL"                # shows output of command
+# when = """ test "$STARSHIP_SHELL" != "fish" """
+# style = "dimmed blue"
+# format = "[$output]($style)"
+# shell = ["bash"]
+
+# [custom.neovim]
+# command = 'bob ls | rg Used | awk "{print \$2}"' # shows output of command
+# detect_folders = ["lua"]
+# style = "green"
+# format = "[ $output ]($style)"
+# shell = ["bash"]
 
 [git_status]
 untracked = '[ $count](bold yellow) '
@@ -26,10 +27,8 @@ format = '([$all_status$ahead_behind]($style))'
 [git_metrics]
 disabled = false
 
-[[battery.display]]
-threshold = 50
-
 # starship preset nerd-font-symbols -o ~/.config/starship.toml
+
 [aws]
 symbol = "  "
 
