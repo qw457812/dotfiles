@@ -19,7 +19,7 @@ return {
       for i = 1, 9 do
         table.insert(
           mappings,
-          { "<leader>" .. i, "<cmd>BufferLineGoToBuffer " .. i .. "<cr>", desc = "Goto Buffer " .. i }
+          { "<leader>" .. i, "<cmd>BufferLineGoToBuffer " .. i .. "<cr>", desc = "which_key_ignore" }
         )
       end
       vim.list_extend(keys, mappings)
