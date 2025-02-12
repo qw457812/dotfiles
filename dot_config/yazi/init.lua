@@ -15,14 +15,16 @@ require("folder-rules"):setup()
 require("full-border"):setup()
 -- https://github.com/yazi-rs/plugins/tree/main/git.yazi
 require("git"):setup()
--- https://github.com/llanosrocas/githead.yazi
-require("githead"):setup({
-  -- powerlevel10k style
-  branch_prefix = "",
-  branch_color = "#54d100",
-  branch_symbol = "",
-  branch_borders = "",
-})
+-- -- https://github.com/llanosrocas/githead.yazi
+-- require("githead"):setup({
+--   -- powerlevel10k style
+--   branch_prefix = "",
+--   branch_color = "#54d100",
+--   branch_symbol = "",
+--   branch_borders = "",
+-- })
+-- https://github.com/Rolv-Apneseth/starship.yazi
+require("starship"):setup()
 -- https://github.com/dedukun/bookmarks.yazi
 require("bookmarks"):setup({
   last_directory = { enable = true, persist = false },

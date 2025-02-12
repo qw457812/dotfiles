@@ -24,11 +24,6 @@ rev = "7775a80"
 hash = "9b8f2573da54334b04747e51556040cc"
 
 [[plugin.deps]]
-use = "llanosrocas/githead"
-rev = "45bd61e"
-hash = "49f2baf77a7e779d06b7521a02ebc253"
-
-[[plugin.deps]]
 use = "yazi-rs/plugins:smart-enter"
 rev = "8945e54"
 hash = "aef2b1a805b80cce573bb766f1459d88"
@@ -42,6 +37,11 @@ hash = "7a08e303167d5b655c06da6d570f0333"
 use = "yazi-rs/plugins:mount"
 rev = "8945e54"
 hash = "f3ade4dba8fb56b85e8363b66f677f9"
+
+[[plugin.deps]]
+use = "Rolv-Apneseth/starship"
+rev = "d1cd0a3"
+hash = "d1fee6d0f74cb52d4e031dc6b9207f31"
 
 [[flavor.deps]]
 use = "yazi-rs/flavors:catppuccin-frappe"
