@@ -254,6 +254,7 @@ return {
             wo = {
               signcolumn = "no",
               number = false,
+              winbar = "", -- disable dropbar.nvim for Snacks.picker.buffers()
             },
             keys = {
               ["<Esc>"] = {

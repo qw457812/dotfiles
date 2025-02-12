@@ -2,35 +2,6 @@ if not LazyVim.has_extra("lang.java") and not U.has_user_extra("lang.nvim-java")
   return {}
 end
 
--- https://github.com/sykesm/dotfiles/blob/92169d9a6ca596fddc58ce1771d708e92d779dec/.config/nvim/lua/sykesm/plugins/nvim-jdtls.lua#L39
-local function java_runtimes()
-  local function java_home_macos(version)
-    local java_home = "/usr/libexec/java_home"
-    if vim.fn.has("macunix") == 0 or vim.fn.executable(java_home) == 0 then
-      return
-    end
-    local res = vim.system({ java_home, "-F", "-v", version }, { text = true }):wait()
-    return res.code == 0 and res.stdout:gsub("[\r\n]+$", "")
-  end
-
-  local runtimes = {}
-  for i = 8, 23 do
-    local version = tostring(i)
-    local home = java_home_macos(version)
-    if not home and version == "8" then
-      home = java_home_macos("1.8")
-    end
-    if home then
-      -- note that the field `name` must be a valid `ExecutionEnvironment`
-      table.insert(runtimes, {
-        name = "JavaSE-" .. (version == "8" and "1.8" or version),
-        path = home,
-      })
-    end
-  end
-  return runtimes
-end
-
 return {
   {
     "LazyVim/LazyVim",
@@ -54,7 +25,6 @@ return {
     "mfussenegger/nvim-jdtls",
     optional = true,
     opts = function(_, opts)
-      local runtimes = java_runtimes()
       return U.extend_tbl(opts, {
         -- https://github.com/eclipse-jdtls/eclipse.jdt.ls/wiki/Running-the-JAVA-LS-server-from-the-command-line#initialize-request
         settings = {
@@ -62,7 +32,7 @@ return {
             eclipse = { downloadSources = true },
             configuration = {
               updateBuildConfiguration = "interactive",
-              runtimes = not vim.tbl_isempty(runtimes) and runtimes or nil,
+              runtimes = U.java.jdt_java_runtimes(),
             },
             maven = { downloadSources = true },
             implementationsCodeLens = { enabled = true },
@@ -129,13 +99,28 @@ return {
         end,
         ---@param args vim.api.create_autocmd.callback.args
         on_attach = function(args)
-          require("which-key").add({
+          local wk = require("which-key")
+          wk.add({
             {
               mode = "n",
               buffer = args.buf,
+              { "<leader>cgs", desc = "which_key_ignore" },
+              { "<leader>cgS", desc = "which_key_ignore" },
               { "gs", require("jdtls").super_implementation, desc = "Goto Super" },
               { "gS", require("jdtls.tests").goto_subjects, desc = "Goto Subjects" },
+              { "<leader>rx", require("jdtls").extract_variable_all, desc = "Extract Variable" },
+              { "<leader>rC", require("jdtls").extract_constant, desc = "Extract Constant" },
               { "<localleader>r", require("jdtls").set_runtime, desc = "Pick Java Runtime" },
+            },
+          })
+          -- stylua: ignore
+          wk.add({
+            {
+              mode = "v",
+              buffer = args.buf,
+              { "<leader>rf", [[<ESC><CMD>lua require('jdtls').extract_method(true)<CR>]], desc = "Extract Method" },
+              { "<leader>rx", [[<ESC><CMD>lua require('jdtls').extract_variable_all(true)<CR>]], desc = "Extract Variable" },
+              { "<leader>rC", [[<ESC><CMD>lua require('jdtls').extract_constant(true)<CR>]], desc = "Extract Constant" },
             },
           })
         end,
