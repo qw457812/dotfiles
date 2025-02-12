@@ -31,6 +31,12 @@ return {
     optional = true,
     dependencies = { "fang2hou/blink-copilot" },
     opts = {
+      completion = {
+        accept = {
+          -- see: https://github.com/saghen/blink.cmp/blob/754a684f5aa31126dfd537ab4888abe8c441fd3e/lua/blink/cmp/lib/text_edits.lua#L301-L304
+          dot_repeat = false,
+        },
+      },
       sources = {
         providers = {
           copilot = {
