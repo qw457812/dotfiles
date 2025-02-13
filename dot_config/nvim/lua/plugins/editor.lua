@@ -379,8 +379,10 @@ return {
     end,
   },
 
+  -- alternative: https://github.com/aileot/emission.nvim
   {
     "tzachar/highlight-undo.nvim",
+    commit = "795fc36f8bb7e4cf05e31bd7e354b86d27643a9e",
     -- vscode = true,
     keys = { { "u" }, { "U" }, { "<C-r>" } },
     opts = function()
