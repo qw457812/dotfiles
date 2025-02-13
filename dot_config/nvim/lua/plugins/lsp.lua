@@ -166,10 +166,9 @@ return {
               picker.matcher.task:on(
                 "done",
                 vim.schedule_wrap(function()
-                  local symbols = picker:items()
-                  for i = #symbols, 1, -1 do
-                    if H.cursor_in_range(cursor, symbols[i].range) then
-                      picker.list.cursor = symbols[i].idx
+                  for symbol in vim.iter(picker:items()):rev() do
+                    if H.cursor_in_range(cursor, symbol.range) then
+                      picker.list:move(symbol.idx, true)
                       return
                     end
                   end
