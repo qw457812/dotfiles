@@ -259,6 +259,40 @@ return {
       end
     end,
   },
+  {
+    "echasnovski/mini.diff",
+    optional = true,
+    keys = function(_, keys)
+      -- HACK: redraw to update the signs
+      local function redraw(delay)
+        vim.defer_fn(function()
+          Snacks.util.redraw(vim.api.nvim_get_current_win())
+        end, delay or 500)
+      end
+
+      vim.list_extend(keys, {
+        -- {
+        --   "gh",
+        --   function()
+        --     redraw() -- not working
+        --     return require("mini.diff").operator("apply")
+        --   end,
+        --   expr = true,
+        --   silent = true,
+        --   desc = "Apply hunks",
+        --   mode = { "n", "x" },
+        -- },
+        {
+          "<leader>go",
+          function()
+            require("mini.diff").toggle_overlay(0)
+            redraw(200)
+          end,
+          desc = "Toggle mini.diff overlay",
+        },
+      })
+    end,
+  },
 
   {
     "folke/trouble.nvim",
