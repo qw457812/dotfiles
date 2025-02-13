@@ -1,5 +1,26 @@
 local H = {}
 
+---Check if cursor is in range
+---copied from: https://github.com/Bekaboo/dropbar.nvim/blob/5439d2f02bb744cecb878aaa23c6c6f8b21a351c/lua/dropbar/sources/lsp.lua#L97-L115
+---@param cursor integer[] cursor position (line, character); (1, 0)-based
+---@param range lsp_range_t 0-based range
+---@return boolean
+function H.cursor_in_range(cursor, range)
+  local cursor0 = { cursor[1] - 1, cursor[2] }
+  -- stylua: ignore start
+  return (
+    cursor0[1] > range.start.line
+    or (cursor0[1] == range.start.line
+        and cursor0[2] >= range.start.character)
+  )
+    and (
+      cursor0[1] < range['end'].line
+      or (cursor0[1] == range['end'].line
+          and cursor0[2] <= range['end'].character)
+    )
+  -- stylua: ignore end
+end
+
 function H.pick_definitions()
   if LazyVim.pick.picker.name == "telescope" then
     require("telescope.builtin").lsp_definitions({ reuse_win = true })
@@ -131,6 +152,35 @@ return {
           LazyVim.info(vim.tbl_map(U.path.home_to_tilde, vim.lsp.buf.list_workspace_folders()), { title = "Lsp Workspaces" })
         end, desc = "List Workspace" },
       })
+
+      if LazyVim.pick.picker.name == "snacks" then
+        vim.list_extend(Keys, {
+          {
+            "<leader>ss",
+            function()
+              -- see: https://github.com/folke/snacks.nvim/issues/1057#issuecomment-2652052218
+              -- copied from: https://github.com/disrupted/dotfiles/blob/60e5eff02e2f4aff30dae259cdebdfe172b8e6fe/.config/nvim/lua/plugins/plugins.lua#L181-L253
+              local cursor = vim.api.nvim_win_get_cursor(0)
+              local picker = Snacks.picker.lsp_symbols({ filter = LazyVim.config.kind_filter })
+              -- focus the symbol at the cursor position
+              picker.matcher.task:on(
+                "done",
+                vim.schedule_wrap(function()
+                  local symbols = picker:items()
+                  for i = #symbols, 1, -1 do
+                    if H.cursor_in_range(cursor, symbols[i].range) then
+                      picker.list.cursor = symbols[i].idx
+                      return
+                    end
+                  end
+                end)
+              )
+            end,
+            desc = "LSP Symbols",
+            has = "documentSymbol",
+          },
+        })
+      end
 
       return U.extend_tbl(opts, {
         -- setting `vim.diagnostic.config({ virtual_text = false })` for tiny-inline-diagnostic.nvim
