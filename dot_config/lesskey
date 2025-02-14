@@ -5,8 +5,21 @@
 # https://github.com/jamesrayman/dotfiles/blob/7495d797b84b329831eb2b13cff18b4c87f76700/.config/less/lesskey
 
 #command
-h left-scroll
-l right-scroll
+# h left-scroll
+# l right-scroll
+h noaction 1\e(
+l noaction 1\e)
+H noaction 40\e(
+L noaction 40\e)
+# J forw-screen
+# K back-screen
+
+~ help
+\eh help
+
+# ESC
+# \e\e undo-hilite
+\e\e quit
 
 # &pattern: display only lines which match the pattern
 f filter
@@ -23,15 +36,17 @@ t toggle-option
 
 # --ignore-case: smart case for search
 i toggle-option i
+,c toggle-option i
 
 I toggle-option --incsearch\n
+,i toggle-option --incsearch\n
 
 # --chop-long-lines: wrap
 w toggle-option S
+,w toggle-option S
 
 # --LINE-NUMBERS
-L toggle-option N
-,n toggle-option N
+,l toggle-option N
 
 # --status-column: display a status column, showing search results and marks
 ,s toggle-option J
@@ -43,9 +58,11 @@ L toggle-option N
 \t next-file
 ^N next-file
 ^P prev-file
+J next-file
+K prev-file
 
-# map `esc` to `nohlsearch`
-# \e undo-hilite
+#line-edit
+\e\e abort
 
 #env
 # do this in `~/.zshrc` file

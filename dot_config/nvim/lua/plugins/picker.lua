@@ -184,7 +184,7 @@ return {
 
               local path = Snacks.picker.util.path(item) or item.file
               local icon, hl
-              if path:match("lua/lazyvim/plugins/") then
+              if path:find("lua/lazyvim/plugins/") then
                 icon, hl = "󰒲 ", "MiniIconsBlue"
               else
                 icon, hl = " ", "MiniIconsAzure"
