@@ -163,8 +163,8 @@ abbr sva 'svn add'
 abbr svc 'svn commit'
 abbr svs 'svn status'
 abbr svu 'svn update'
-abbr svl 'svn log -v'
-abbr svll 'svn log -l'
+abbr svl --set-cursor 'svn log -v % | vimpager'
+abbr svll --set-cursor 'svn log -l % | vimpager'
 
 # Chezmoi
 abbr cz chezmoi
