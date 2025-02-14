@@ -1,4 +1,6 @@
 return {
+  { "tzachar/highlight-undo.nvim", optional = true, enabled = false },
+
   -- https://github.com/mawkler/nvim/blob/30bd7ac8de8ff028c1c35a384d4eccdb49696f1a/lua/configs/tiny-glimmer.lua
   {
     "rachartier/tiny-glimmer.nvim",
@@ -6,17 +8,12 @@ return {
       {
         "gbprod/yanky.nvim",
         optional = true,
-        -- keys = { { "p", false }, { "P", false } },
-        opts = {
-          highlight = {
-            on_yank = false,
-            -- on_put = false,
-          },
-        },
+        keys = { { "p", false }, { "P", false } },
+        opts = { highlight = { on_yank = false, on_put = false } },
       },
     },
     event = "TextYankPost",
-    -- keys = { { "p" }, { "P" } },
+    keys = { { "p" }, { "P" }, { "u" }, { "U" }, { "<C-r>" } },
     opts = function(_, opts)
       local function animations()
         local visual = Snacks.util.color("Visual", "bg")
@@ -39,21 +36,37 @@ return {
           end
         end,
       })
+      Snacks.util.set_hl({ HighlightUndo = "Substitute", HighlightRedo = "HighlightUndo" }, { default = true })
 
-      -- local has_yanky = LazyVim.has("yanky.nvim")
+      if LazyVim.has("yanky.nvim") then
+        -- for tiny-glimmer.nvim to hijack
+        vim.keymap.set("n", "p", "<Plug>(YankyPutAfter)", { desc = "Put Text After Cursor" })
+        vim.keymap.set("n", "P", "<Plug>(YankyPutBefore)", { desc = "Put Text Before Cursor" })
+      end
+      vim.keymap.set("n", "U", "<C-r>", { remap = true, silent = true, desc = "Redo" })
 
       return U.extend_tbl(opts, {
         overwrite = {
           -- TODO: kevinhwang91/nvim-hlslens integration
           search = { enabled = false },
-          paste = {
-            -- TODO: https://github.com/rachartier/tiny-glimmer.nvim/issues/21
-            enabled = false,
-            -- paste_mapping = has_yanky and "<Plug>(YankyPutAfter)" or "p",
-            -- Paste_mapping = has_yanky and "<Plug>(YankyPutBefore)" or "P",
+          paste = { enabled = true },
+          undo = {
+            enabled = true,
+            default_animation = {
+              settings = {
+                from_color = "HighlightUndo",
+              },
+            },
+          },
+          redo = {
+            enabled = true,
+            default_animation = {
+              settings = {
+                from_color = "HighlightRedo",
+              },
+            },
           },
         },
-        transparency_color = vim.g.user_transparent_background and "#000000" or nil,
         animations = animations(),
       })
     end,
