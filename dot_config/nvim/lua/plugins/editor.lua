@@ -415,12 +415,17 @@ return {
       {
         "gbprod/yanky.nvim",
         optional = true,
-        keys = { { "p", false }, { "P", false } },
-        opts = { highlight = { on_put = false, on_yank = false } },
+        -- keys = { { "p", false }, { "P", false } },
+        opts = {
+          highlight = {
+            on_yank = false,
+            -- on_put = false,
+          },
+        },
       },
     },
     event = "TextYankPost",
-    keys = { { "p" }, { "P" } },
+    -- keys = { { "p" }, { "P" } },
     opts = function(_, opts)
       local function animations()
         local visual = Snacks.util.color("Visual", "bg")
@@ -444,16 +449,17 @@ return {
         end,
       })
 
-      local has_yanky = LazyVim.has("yanky.nvim")
+      -- local has_yanky = LazyVim.has("yanky.nvim")
 
       return U.extend_tbl(opts, {
         overwrite = {
           -- TODO: kevinhwang91/nvim-hlslens integration
           search = { enabled = false },
           paste = {
-            enabled = true,
-            paste_mapping = has_yanky and "<Plug>(YankyPutAfter)" or "p",
-            Paste_mapping = has_yanky and "<Plug>(YankyPutBefore)" or "P",
+            -- TODO: https://github.com/rachartier/tiny-glimmer.nvim/issues/21
+            enabled = false,
+            -- paste_mapping = has_yanky and "<Plug>(YankyPutAfter)" or "p",
+            -- Paste_mapping = has_yanky and "<Plug>(YankyPutBefore)" or "P",
           },
         },
         transparency_color = vim.g.user_transparent_background and "#000000" or nil,

@@ -166,4 +166,14 @@ return {
       })
     end,
   },
+
+  {
+    "nvchad/showkeys",
+    optional = true,
+    opts = {
+      winopts = {
+        border = "rounded",
+      },
+    },
+  },
 }
