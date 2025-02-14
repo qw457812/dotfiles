@@ -36,6 +36,30 @@ return {
     },
   },
 
+  {
+    "thenbe/csgithub.nvim",
+    keys = {
+      {
+        "<leader>/",
+        mode = "x",
+        function()
+          local csgithub = require("csgithub")
+          csgithub.open(csgithub.search())
+        end,
+        desc = "GitHub Code Search (extension)",
+      },
+      {
+        "<leader>?",
+        mode = "x",
+        function()
+          local csgithub = require("csgithub")
+          csgithub.open(csgithub.search({ includeFilename = true }))
+        end,
+        desc = "GitHub Code Search (filename)",
+      },
+    },
+  },
+
   -- :echo db#url#encode('my_password')
   -- :echo db#url#parse('my_url')
   -- :echo db#adapter#dispatch("my_url", "interactive")
@@ -71,42 +95,6 @@ return {
       })
     end,
   },
-
-  {
-    "thenbe/csgithub.nvim",
-    keys = {
-      {
-        "<leader>/",
-        mode = "x",
-        function()
-          local csgithub = require("csgithub")
-          csgithub.open(csgithub.search())
-        end,
-        desc = "GitHub Code Search (extension)",
-      },
-      {
-        "<leader>?",
-        mode = "x",
-        function()
-          local csgithub = require("csgithub")
-          csgithub.open(csgithub.search({ includeFilename = true }))
-        end,
-        desc = "GitHub Code Search (filename)",
-      },
-    },
-  },
-
-  -- {
-  --   "nvchad/showkeys",
-  --   enabled = false,
-  --   cmd = "ShowkeysToggle",
-  --   opts = {
-  --     -- timeout = 1,
-  --     maxkeys = 5,
-  --     show_count = true,
-  --     position = "top-right",
-  --   },
-  -- },
 
   -- https://github.com/nvim-orgmode/orgmode/blob/master/DOCS.md#mappings
   {
