@@ -95,6 +95,11 @@ return {
           position = "float", -- alternative: style = "float"
         },
       },
+      image = {
+        -- markdown = {
+        --   inline = false,
+        -- },
+      },
       -- zen = {
       --   show = {
       --     tabline = true,
