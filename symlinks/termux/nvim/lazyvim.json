@@ -30,6 +30,7 @@
     "lazyvim.plugins.extras.util.dot",
     "lazyvim.plugins.extras.util.mini-hipatterns",
     "plugins.extras.editor.mini-operators",
+    "plugins.extras.editor.tiny-glimmer",
     "plugins.extras.game.exercism",
     "plugins.extras.lsp.mason-lock",
     "plugins.extras.lsp.tiny-inline-diagnostic",
