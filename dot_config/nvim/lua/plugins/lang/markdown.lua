@@ -2,7 +2,8 @@ if not LazyVim.has_extra("lang.markdown") then
   return {}
 end
 
-local show_image = false -- bad performance
+local use_image_nvim = false -- use image.nvim instead of snacks
+local image_cursor_only = false
 
 return {
   -- https://github.com/MeanderingProgrammer/dotfiles/blob/845016440183396f4f6d524cdd001828dbbdecba/.config/nvim/lua/mp/plugins/lang/markdown.lua#L47
@@ -114,19 +115,33 @@ return {
   },
 
   {
+    "folke/snacks.nvim",
+    ---@module "snacks"
+    ---@type snacks.Config
+    opts = {
+      image = {
+        markdown = {
+          enabled = not use_image_nvim,
+          inline = not image_cursor_only,
+        },
+      },
+    },
+  },
+
+  {
     "3rd/image.nvim",
     optional = true,
     ft = function(_, ft)
-      if show_image then
+      if use_image_nvim then
         vim.list_extend(ft, { "markdown" })
       end
     end,
     opts = {
       integrations = {
         markdown = {
-          enabled = show_image,
+          enabled = use_image_nvim,
+          only_render_image_at_cursor = image_cursor_only,
           clear_in_insert_mode = true,
-          only_render_image_at_cursor = true,
           -- download_remote_images = false,
         },
       },
@@ -135,8 +150,9 @@ return {
 
   {
     "3rd/diagram.nvim",
+    enabled = false, -- bad performance
     cond = function()
-      return show_image and LazyVim.has("image.nvim") and vim.fn.executable("mmdc") == 1
+      return use_image_nvim and not image_cursor_only and LazyVim.has("image.nvim") and vim.fn.executable("mmdc") == 1
     end,
     dependencies = { "3rd/image.nvim" },
     ft = "markdown",
