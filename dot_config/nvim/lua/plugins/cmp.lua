@@ -223,7 +223,7 @@ return {
       -- TODO: add dict downloading to build
       init = function()
         LazyVim.on_load("mini.icons", function()
-          Snacks.util.set_hl({ BlinkCmpKindDict = "MiniIconsRed" })
+          require("snacks.util").set_hl({ BlinkCmpKindDict = "MiniIconsRed" })
         end)
       end,
     },
