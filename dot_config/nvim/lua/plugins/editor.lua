@@ -509,33 +509,35 @@ return {
         end
       end
     end,
-  },
-  -- see also `:h noh` and `:h shortmess`
-  {
-    "folke/noice.nvim",
-    optional = true,
-    opts = function(_, opts)
-      opts.messages = opts.messages or {}
-      opts.messages.view_search = false -- using nvim-hlslens
+    specs = {
+      -- see also `:h noh` and `:h shortmess`
+      {
+        "folke/noice.nvim",
+        optional = true,
+        opts = function(_, opts)
+          opts.messages = opts.messages or {}
+          opts.messages.view_search = false -- using nvim-hlslens
 
-      -- opts.debug = true
-      opts.routes = opts.routes or {}
-      table.insert(opts.routes, {
-        filter = {
-          event = "msg_show",
-          any = {
-            -- { find = "^[/?].*" }, -- search up/down when pattern not found
-            -- { find = "^E486: Pattern not found:" }, -- search pattern not found
-            { find = "^%s*W? %[%d+/%d+%]$" }, -- search count by */#/g*/g# in both normal and visual mode
-            { find = [[^\<.+\>$]] }, -- <Plug>(asterisk-z*)
-            { find = [[^\V.+]] }, -- <Plug>(asterisk-z*)
-          },
-        },
-        -- opts = { skip = true },
-        view = "mini",
-      })
-      return opts
-    end,
+          -- opts.debug = true
+          opts.routes = opts.routes or {}
+          table.insert(opts.routes, {
+            filter = {
+              event = "msg_show",
+              any = {
+                -- { find = "^[/?].*" }, -- search up/down when pattern not found
+                -- { find = "^E486: Pattern not found:" }, -- search pattern not found
+                { find = "^%s*W? %[%d+/%d+%]$" }, -- search count by */#/g*/g# in both normal and visual mode
+                { find = [[^\<.+\>$]] }, -- <Plug>(asterisk-z*)
+                { find = [[^\V.+]] }, -- <Plug>(asterisk-z*)
+              },
+            },
+            -- opts = { skip = true },
+            view = "mini",
+          })
+          return opts
+        end,
+      },
+    },
   },
 
   {

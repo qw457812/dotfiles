@@ -31,10 +31,6 @@ return {
     optional = true,
     dependencies = { "fang2hou/blink-copilot" },
     opts = {
-      completion = {
-        -- see: https://github.com/saghen/blink.cmp/blob/754a684f5aa31126dfd537ab4888abe8c441fd3e/lua/blink/cmp/lib/text_edits.lua#L301-L304
-        accept = vim.g.lazyvim_blink_main and { dot_repeat = false } or nil,
-      },
       sources = {
         providers = {
           copilot = {

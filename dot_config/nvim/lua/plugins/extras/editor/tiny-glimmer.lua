@@ -1,7 +1,6 @@
 return {
   { "tzachar/highlight-undo.nvim", optional = true, enabled = false },
 
-  -- https://github.com/mawkler/nvim/blob/30bd7ac8de8ff028c1c35a384d4eccdb49696f1a/lua/configs/tiny-glimmer.lua
   {
     "rachartier/tiny-glimmer.nvim",
     dependencies = {
@@ -29,6 +28,13 @@ return {
         }
       end
 
+      vim.keymap.set("n", "U", "<C-r>", { remap = true, silent = true, desc = "Redo" })
+      if LazyVim.has("yanky.nvim") then
+        -- for tiny-glimmer.nvim to hijack
+        vim.keymap.set("n", "p", "<Plug>(YankyPutAfter)")
+        vim.keymap.set("n", "P", "<Plug>(YankyPutBefore)")
+      end
+      Snacks.util.set_hl({ HighlightUndo = "Substitute", HighlightRedo = "HighlightUndo" }, { default = true })
       vim.api.nvim_create_autocmd("ColorScheme", {
         callback = function()
           for animation, hl in pairs(animations()) do
@@ -36,18 +42,9 @@ return {
           end
         end,
       })
-      Snacks.util.set_hl({ HighlightUndo = "Substitute", HighlightRedo = "HighlightUndo" }, { default = true })
 
-      if LazyVim.has("yanky.nvim") then
-        -- for tiny-glimmer.nvim to hijack
-        vim.keymap.set("n", "p", "<Plug>(YankyPutAfter)", { desc = "Put Text After Cursor" })
-        vim.keymap.set("n", "P", "<Plug>(YankyPutBefore)", { desc = "Put Text Before Cursor" })
-      end
-      vim.keymap.set("n", "U", "<C-r>", { remap = true, silent = true, desc = "Redo" })
-
-      return U.extend_tbl(opts, {
+      return vim.tbl_deep_extend("force", opts, {
         overwrite = {
-          -- TODO: kevinhwang91/nvim-hlslens integration
           search = { enabled = false },
           paste = { enabled = true },
           undo = {
