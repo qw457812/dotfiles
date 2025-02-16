@@ -53,14 +53,30 @@ M.diagnostics = st({
   end,
 })
 
-M.neotree_auto_close = st({
-  name = "NeoTree Auto Close",
+M.explorer_auto_close = st({
+  name = "Explorer Auto Close",
   get = function()
-    return vim.g.user_neotree_auto_close
+    return vim.g.user_explorer_auto_close
   end,
   set = function(state)
-    vim.g.user_neotree_auto_close = state
-    require("neo-tree.command").execute({ action = state and "close" or "show" })
+    vim.g.user_explorer_auto_close = state
+    if LazyVim.has("neo-tree.nvim") then
+      require("neo-tree.command").execute({ action = state and "close" or "show" })
+    elseif Snacks.config.explorer.enabled then
+      if state then
+        local picker = Snacks.picker.get({ source = "explorer" })[1]
+        if picker then
+          picker:close()
+        end
+      else
+        Snacks.explorer({
+          cwd = LazyVim.root(),
+          on_show = vim.schedule_wrap(function()
+            vim.cmd("wincmd p")
+          end),
+        })
+      end
+    end
   end,
 })
 
@@ -74,7 +90,7 @@ M.zen = st({
       local function open()
         -- close or unfocus neo-tree first
         if vim.bo.filetype == "neo-tree" then
-          if vim.g.user_neotree_auto_close then
+          if vim.g.user_explorer_auto_close then
             require("neo-tree.command").execute({ action = "close" })
           else
             vim.cmd("wincmd p")

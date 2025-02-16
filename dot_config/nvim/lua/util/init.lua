@@ -73,7 +73,21 @@ function M.is_floating_win(win, opts)
     -- see: https://github.com/nvim-treesitter/nvim-treesitter-context/blob/a2a334900d3643de585ac5c6140b03403454124f/lua/treesitter-context/render.lua#L56
     local is_tsc = package.loaded["treesitter-context"]
       and (vim.w[win].treesitter_context or vim.w[win].treesitter_context_line_number)
-    if is_tsc or vim.tbl_contains({ "snacks_dashboard", "layers_help" }, ft) then
+
+    local is_snacks_explorer = (function()
+      local picker = Snacks.picker.get({ source = "explorer" })[1]
+      if not picker then
+        return false
+      end
+      for _, w in pairs(picker.layout.wins or {}) do
+        if w.win == win then
+          return true
+        end
+      end
+      return false
+    end)()
+
+    if is_tsc or is_snacks_explorer or vim.list_contains({ "snacks_dashboard", "layers_help" }, ft) then
       return false
     end
   end

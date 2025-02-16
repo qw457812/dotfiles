@@ -16,7 +16,7 @@ return {
             -- https://github.com/AstroNvim/AstroNvim/blob/c7abf1c198f633574060807a181c6ce4d1c53a2c/lua/astronvim/plugins/neo-tree.lua#L14
             -- alternative: https://github.com/nvim-neo-tree/neo-tree.nvim/issues/872#issuecomment-1510551968
             if vim.bo.filetype == "neo-tree" then
-              if vim.g.user_neotree_auto_close then
+              if vim.g.user_explorer_auto_close then
                 command.execute({ action = "close" })
               else
                 vim.cmd("wincmd p")
@@ -94,7 +94,7 @@ return {
         callback = function(event)
           local win = event.match + 0
           if
-            vim.g.user_neotree_auto_close
+            vim.g.user_explorer_auto_close
             or vim.api.nvim_win_get_config(win).relative ~= ""
             or not too_narrow(win)
             or vim.bo[vim.fn.winbufnr(win)].filetype == "neo-tree"
@@ -375,7 +375,7 @@ return {
             end
           end,
           close_or_unfocus = function(state)
-            if vim.g.user_neotree_auto_close then
+            if vim.g.user_explorer_auto_close then
               state.commands["close_window"](state)
             else
               state.commands["unfocus_window"](state)
@@ -485,7 +485,7 @@ return {
             local node = state.tree:get_node()
             local path = node.type == "directory" and vim.fn.fnameescape(vim.fn.fnamemodify(node:get_id(), ":p"))
               or vim.fn.fnameescape(vim.fn.fnamemodify(node:get_id(), ":h"))
-            if vim.g.user_neotree_auto_close then
+            if vim.g.user_explorer_auto_close then
               state.commands.close_window(state)
             end
             U.explorer.grug_far(path)
@@ -498,7 +498,7 @@ return {
                 or vim.fn.fnameescape(vim.fn.fnamemodify(node:get_id(), ":h"))
               U.list_insert_unique(paths, path)
             end
-            if vim.g.user_neotree_auto_close then
+            if vim.g.user_explorer_auto_close then
               state.commands.close_window(state)
             end
             U.explorer.grug_far(table.concat(paths, " "))
@@ -668,7 +668,7 @@ return {
           {
             event = "file_opened",
             handler = function()
-              if vim.g.user_neotree_auto_close or too_narrow() then
+              if vim.g.user_explorer_auto_close or too_narrow() then
                 require("neo-tree.command").execute({ action = "close" })
               end
             end,
@@ -716,7 +716,7 @@ return {
             ---@param args { afile: string }
             handler = function(args)
               local utils = require("neo-tree.utils")
-              if vim.g.user_neotree_auto_close or not utils.is_real_file(args.afile) or utils.is_floating() then
+              if vim.g.user_explorer_auto_close or not utils.is_real_file(args.afile) or utils.is_floating() then
                 last_root = nil
                 return
               end
