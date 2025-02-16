@@ -2,7 +2,7 @@ if not LazyVim.has_extra("lang.markdown") then
   return {}
 end
 
-local use_image_nvim = false -- use image.nvim instead of snacks
+local use_image_nvim = false -- use image.nvim instead of snacks image
 local image_cursor_only = false
 
 return {
@@ -112,20 +112,6 @@ return {
         end,
       })
     end,
-  },
-
-  {
-    "folke/snacks.nvim",
-    ---@module "snacks"
-    ---@type snacks.Config
-    opts = {
-      image = {
-        markdown = {
-          enabled = not use_image_nvim,
-          inline = not image_cursor_only,
-        },
-      },
-    },
   },
 
   {

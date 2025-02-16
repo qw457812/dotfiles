@@ -11,7 +11,10 @@ return {
         opts = { highlight = { on_yank = false, on_put = false } },
       },
     },
-    event = "TextYankPost",
+    event = {
+      "TextYankPost",
+      "WinEnter", -- for pulsar
+    },
     keys = { { "p" }, { "P" }, { "u" }, { "U" }, { "<C-r>" } },
     opts = function(_, opts)
       local function animations()
@@ -34,7 +37,13 @@ return {
         vim.keymap.set("n", "p", "<Plug>(YankyPutAfter)")
         vim.keymap.set("n", "P", "<Plug>(YankyPutBefore)")
       end
-      Snacks.util.set_hl({ HighlightUndo = "Substitute", HighlightRedo = "HighlightUndo" }, { default = true })
+
+      Snacks.util.set_hl({
+        TinyGlimmerUndoFrom = "Substitute",
+        TinyGlimmerRedoFrom = "TinyGlimmerUndoFrom",
+        TinyGlimmerPulsarFrom = "Visual",
+        TinyGlimmerPulsarTo = "Visual",
+      })
       vim.api.nvim_create_autocmd("ColorScheme", {
         callback = function()
           for animation, hl in pairs(animations()) do
@@ -46,12 +55,13 @@ return {
       return vim.tbl_deep_extend("force", opts, {
         overwrite = {
           search = { enabled = false },
+          yank = { enabled = true },
           paste = { enabled = true },
           undo = {
             enabled = true,
             default_animation = {
               settings = {
-                from_color = "HighlightUndo",
+                from_color = "TinyGlimmerUndoFrom",
               },
             },
           },
@@ -59,7 +69,21 @@ return {
             enabled = true,
             default_animation = {
               settings = {
-                from_color = "HighlightRedo",
+                from_color = "TinyGlimmerRedoFrom",
+              },
+            },
+          },
+        },
+        presets = {
+          pulsar = {
+            enabled = true,
+            on_event = { "WinEnter" },
+            default_animation = {
+              settings = {
+                max_duration = 80,
+                min_duration = 80,
+                from_color = "TinyGlimmerPulsarFrom",
+                to_color = "TinyGlimmerPulsarTo",
               },
             },
           },

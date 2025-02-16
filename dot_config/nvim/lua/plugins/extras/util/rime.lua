@@ -61,15 +61,8 @@ return {
       sources = {
         providers = {
           lsp = {
-            -- copied from: https://github.com/Saghen/blink.cmp/blob/00ad008cbea4d0d2b5880e7c7386caa9fc4e5e2b/lua/blink/cmp/config/sources.lua#L65
+            -- copied from: https://github.com/saghen/blink.cmp/blob/035e1bae395b2b34c6cf0234f4270bf9481905b4/lua/blink/cmp/config/sources.lua#L56-L62
             transform_items = function(_, items)
-              -- demote snippets
-              for _, item in ipairs(items) do
-                if item.kind == require("blink.cmp.types").CompletionItemKind.Snippet then
-                  item.score_offset = item.score_offset - 3
-                end
-              end
-
               -- filter out text items, since we have the buffer source
               ---@param item blink.cmp.CompletionItem
               return vim.tbl_filter(function(item)
