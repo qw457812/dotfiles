@@ -13,7 +13,7 @@ return {
     },
     event = {
       "TextYankPost",
-      "WinEnter", -- for pulsar
+      -- "WinEnter", -- for pulsar
     },
     keys = { { "p" }, { "P" }, { "u" }, { "U" }, { "<C-r>" } },
     opts = function(_, opts)
@@ -76,7 +76,7 @@ return {
         },
         presets = {
           pulsar = {
-            enabled = true,
+            enabled = false,
             on_event = { "WinEnter" },
             default_animation = {
               settings = {
