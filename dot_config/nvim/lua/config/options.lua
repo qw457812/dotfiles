@@ -36,9 +36,9 @@ vim.g.user_is_kitty = not vim.g.neovide and vim.env.KITTY_PID ~= nil
 vim.g.user_is_tmux = not vim.g.neovide and vim.env.TMUX ~= nil
 vim.g.user_is_termux = vim.env.TERMUX_VERSION ~= nil
 vim.g.user_transparent_background = vim.g.user_is_wezterm or vim.g.user_is_kitty
-vim.g.user_hijack_netrw = "oil.nvim" ---@type "neo-tree.nvim"|"oil.nvim"|"mini.files"|"yazi.nvim"|"telescope-file-browser.nvim"
+vim.g.user_hijack_netrw = "oil.nvim" ---@type "neo-tree.nvim"|"snacks.nvim"|"oil.nvim"|"mini.files"|"yazi.nvim"|"telescope-file-browser.nvim"
 -- holding layout like no-neck-pain.nvim by disabling neo-tree auto close
-vim.g.user_neotree_auto_close = vim.g.user_is_termux
+vim.g.user_explorer_auto_close = vim.g.user_is_termux
 
 -- https://github.com/monoira/.dotfiles/blob/bd69b59d228f4b23a3e190cbd3c67a79e6a396e2/nvim/.config/nvim/lua/config/options.lua#L36
 -- https://github.com/ahmedkhalf/project.nvim/blob/8c6bad7d22eef1b71144b401c9f74ed01526a4fb/lua/project_nvim/config.lua#L17

@@ -245,6 +245,17 @@ return {
             },
           },
         },
+        sources = {
+          explorer = {
+            win = {
+              list = {
+                keys = {
+                  [close_key] = "close",
+                },
+              },
+            },
+          },
+        },
       },
     },
   },

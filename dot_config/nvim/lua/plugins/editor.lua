@@ -25,16 +25,23 @@ return {
       vim.api.nvim_create_autocmd("FileType", {
         group = vim.api.nvim_create_augroup("grug_far_keymap", { clear = true }),
         pattern = "grug-far",
-        callback = function()
+        callback = function(ev)
           -- https://github.com/MagicDuck/grug-far.nvim#create-a-buffer-local-keybinding-to-toggle---fixed-strings-flag
           vim.keymap.set("n", "<localleader>f", function()
             local state = unpack(require("grug-far").toggle_flags({ "--fixed-strings" }) or {})
             LazyVim.info(("Toggled `--fixed-strings`: **%s**"):format(state and "ON" or "OFF"), { title = "Grug Far" })
-          end, { buffer = true, desc = "Grug Far: Toggle --fixed-strings" })
+          end, { buffer = ev.buf, desc = "Toggle --fixed-strings" })
 
           vim.keymap.set("n", "<left>", function()
             vim.api.nvim_win_set_cursor(vim.fn.bufwinid(0), { 3, 0 })
-          end, { buffer = true, desc = "Grug Far: Jump Back to Search Input" })
+          end, { buffer = ev.buf, desc = "Jump Back to Search Input (Grug Far)" })
+
+          vim.keymap.set(
+            "n",
+            "<C-S>",
+            vim.tbl_get(opts, "keymaps", "syncLocations", "n") or "<localleader>s",
+            { buffer = ev.buf, remap = true, desc = "Sync All" }
+          )
         end,
       })
 
