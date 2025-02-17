@@ -57,7 +57,8 @@ return {
         -- TODO: not working when mapping `:<space>` to `：` (Chinese punctuation)
         [":"] = U.rime_ls.cmp.accept_n(2),
         ["'"] = U.rime_ls.cmp.accept_n(3),
-        ["<esc>"] = U.rime_ls.cmp.clear(),
+        ["<esc>"] = U.rime_ls.cmp.esc_clear(),
+        ["<cr>"] = U.rime_ls.cmp.enter_commit_code(),
       },
       sources = {
         providers = {

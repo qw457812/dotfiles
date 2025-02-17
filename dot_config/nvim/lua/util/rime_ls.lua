@@ -72,7 +72,7 @@ M.cmp = {
   end,
 
   ---@return blink.cmp.KeymapCommand[]
-  clear = function()
+  esc_clear = function()
     return {
       ---@param cmp blink.cmp.API
       function(cmp)
@@ -93,6 +93,26 @@ M.cmp = {
           end
         end
       end,
+      "fallback",
+    }
+  end,
+
+  ---@return blink.cmp.KeymapCommand[]
+  enter_commit_code = function()
+    return {
+      ---@param cmp blink.cmp.API
+      function(cmp)
+        if not (vim.g.rime_enabled and cmp.is_visible()) then
+          return
+        end
+        local items = require("blink.cmp.completion.list").items
+        for _, item in ipairs(items) do
+          if M.cmp.is_rime(item) then
+            return cmp.cancel()
+          end
+        end
+      end,
+      "accept",
       "fallback",
     }
   end,
