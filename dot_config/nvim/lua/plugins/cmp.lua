@@ -97,7 +97,6 @@ return {
           ["<S-Tab>"] = { "select_prev", "snippet_backward", "fallback" },
           -- -- https://github.com/y3owk1n/nix-system-config-v2/blob/ae72dd82a92894a1ca8c5ff4243e0208dfc33a5d/config/nvim/lua/plugins/blink-cmp.lua#L19
           -- ["<Esc>"] = {
-          --   ---@param cmp blink.cmp.API
           --   function(cmp)
           --     if cmp.is_visible() then
           --       if cmp.snippet_active() then
