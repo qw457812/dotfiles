@@ -1,6 +1,8 @@
 return {
   { "tzachar/highlight-undo.nvim", optional = true, enabled = false },
 
+  { "y3owk1n/undo-glow.nvim", optional = true, enabled = false },
+
   {
     "rachartier/tiny-glimmer.nvim",
     dependencies = {
