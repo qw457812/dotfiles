@@ -56,15 +56,42 @@ M.cmp = {
   ---@return blink.cmp.KeymapCommand[]
   accept_n = function(n)
     return {
+      ---@param cmp blink.cmp.API
       function(cmp)
         if not vim.g.rime_enabled then
-          return false
+          return
         end
         local indices = M.cmp.top_n_indices(n)
         if #indices ~= n then
-          return false
+          return
         end
         return cmp.accept({ index = indices[n] })
+      end,
+      "fallback",
+    }
+  end,
+
+  ---@return blink.cmp.KeymapCommand[]
+  clear = function()
+    return {
+      ---@param cmp blink.cmp.API
+      function(cmp)
+        if not (vim.g.rime_enabled and cmp.is_visible()) then
+          return
+        end
+        local items = require("blink.cmp.completion.list").items
+        for _, item in ipairs(items) do
+          if M.cmp.is_rime(item) then
+            return item.textEdit
+              and cmp.cancel({
+                callback = function()
+                  for _ = 1, item.textEdit.range["end"].character - item.textEdit.range.start.character do
+                    vim.api.nvim_feedkeys(vim.keycode("<bs>"), "n", false)
+                  end
+                end,
+              })
+          end
+        end
       end,
       "fallback",
     }
