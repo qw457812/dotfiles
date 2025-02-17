@@ -386,9 +386,12 @@ return {
     end,
   },
 
-  -- alternative: https://github.com/aileot/emission.nvim
+  -- alternative:
+  -- * https://github.com/aileot/emission.nvim
+  -- * https://github.com/y3owk1n/undo-glow.nvim
   {
     "tzachar/highlight-undo.nvim",
+    enabled = false,
     commit = "795fc36f8bb7e4cf05e31bd7e354b86d27643a9e",
     -- vscode = true,
     keys = { { "u" }, { "U" }, { "<C-r>" } },
@@ -411,6 +414,24 @@ return {
             disabled = true,
           },
         },
+      }
+    end,
+  },
+  {
+    "y3owk1n/undo-glow.nvim",
+    -- stylua: ignore
+    keys = {
+      { "u", function() require("undo-glow").undo() end },
+      { "U", function() require("undo-glow").redo() end },
+      { "<C-r>", function() require("undo-glow").redo() end },
+    },
+    opts = function()
+      Snacks.util.set_hl({ UgUndo = "Substitute", UgRedo = "UgUndo" }, { default = true })
+
+      ---@type UndoGlow.Config
+      ---@diagnostic disable-next-line: missing-fields
+      return {
+        duration = 200,
       }
     end,
   },
