@@ -247,16 +247,6 @@ return {
                 -- -- https://github.com/dwyl/english-words/blob/8179fe68775df3f553ef19520db065228e65d1d3/words_alpha.txt
                 -- vim.fn.stdpath("data") .. "/cmp-dictionary/dict/words_alpha.txt",
               },
-              separate_output = vim.fn.executable("wn") == 0 and function(output)
-                local items = {}
-                for line in output:gmatch("[^\r\n]+") do
-                  table.insert(items, {
-                    label = line,
-                    insert_text = line,
-                  })
-                end
-                return items
-              end or nil,
             },
           },
         },
