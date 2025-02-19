@@ -15,8 +15,8 @@ hash = "771f18427fb75fb19990ce602bb322f4"
 
 [[plugin.deps]]
 use = "dedukun/bookmarks"
-rev = "202e450"
-hash = "9e2f6f7381542d3adb3080b394b431b4"
+rev = "fe0b1de"
+hash = "221ed40593a5cb5bd80f963f05c556f"
 
 [[plugin.deps]]
 use = "orhnk/system-clipboard"
@@ -40,10 +40,10 @@ hash = "5c4d8080367dd2561a18c1cf5a1dd295"
 
 [[plugin.deps]]
 use = "Rolv-Apneseth/starship"
-rev = "d1cd0a3"
-hash = "d1fee6d0f74cb52d4e031dc6b9207f31"
+rev = "f6939fb"
+hash = "8ae899541dc7accb680ee4fd382a09c"
 
 [[flavor.deps]]
 use = "yazi-rs/flavors:catppuccin-frappe"
-rev = "302c0d5"
+rev = "1a419b2"
 hash = "e88895e8f8b7926f20946f273ecc7348"

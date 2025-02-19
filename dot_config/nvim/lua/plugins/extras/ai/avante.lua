@@ -189,9 +189,11 @@ return {
       behaviour = {
         -- auto_suggestions = true, -- experimental
         auto_apply_diff_after_generation = true,
+        -- enable_cursor_planning_mode = true,
       },
       provider = "copilot-claude", -- only recommend using claude
-      auto_suggestions_provider = "deepseek", -- high-frequency, can be expensive if enabled
+      auto_suggestions_provider = "groq", -- high-frequency, can be expensive if enabled
+      -- cursor_applying_provider = "groq",
       -- copilot = { model = "claude-3.5-sonnet" },
       -- https://github.com/yetone/avante.nvim/wiki/Custom-providers
       vendors = {
@@ -220,7 +222,8 @@ return {
           api_key_name = "GROQ_API_KEY",
           endpoint = "https://api.groq.com/openai/v1/",
           -- curl -X GET "https://api.groq.com/openai/v1/models" -H "Authorization: Bearer $GROQ_API_KEY" -H "Content-Type: application/json" | jq '.data | sort_by(.created)'
-          model = "llama-3.3-70b-versatile",
+          model = "qwen-2.5-coder-32b",
+          max_tokens = 8192,
         },
         ---@type AvanteSupportedProvider
         ---@diagnostic disable-next-line: missing-fields
@@ -250,38 +253,54 @@ return {
     end,
   },
 
+  -- {
+  --   "saghen/blink.cmp",
+  --   optional = true,
+  --   dependencies = {
+  --     {
+  --       "saghen/blink.compat",
+  --       opts = function()
+  --         -- HACK: monkeypatch cmp.ConfirmBehavior for Avante
+  --         require("cmp").ConfirmBehavior = {
+  --           Insert = "insert",
+  --           Replace = "replace",
+  --         }
+  --       end,
+  --     },
+  --   },
+  --   opts = {
+  --     sources = {
+  --       compat = {
+  --         "avante_commands",
+  --         "avante_mentions",
+  --         -- "avante_files",
+  --       },
+  --       providers = {
+  --         avante_commands = {
+  --           score_offset = 90,
+  --         },
+  --         avante_mentions = {
+  --           score_offset = 1000,
+  --         },
+  --         -- avante_files = {
+  --         --   score_offset = 100,
+  --         -- },
+  --       },
+  --     },
+  --   },
+  -- },
   {
     "saghen/blink.cmp",
     optional = true,
-    dependencies = {
-      {
-        "saghen/blink.compat",
-        opts = function()
-          -- HACK: monkeypatch cmp.ConfirmBehavior for Avante
-          require("cmp").ConfirmBehavior = {
-            Insert = "insert",
-            Replace = "replace",
-          }
-        end,
-      },
-    },
+    dependencies = "Kaiser-Yang/blink-cmp-avante",
     opts = {
       sources = {
-        compat = {
-          "avante_commands",
-          "avante_mentions",
-          -- "avante_files",
-        },
+        default = { "avante" },
         providers = {
-          avante_commands = {
-            score_offset = 90,
+          avante = {
+            module = "blink-cmp-avante",
+            name = "Avante",
           },
-          avante_mentions = {
-            score_offset = 1000,
-          },
-          -- avante_files = {
-          --   score_offset = 100,
-          -- },
         },
       },
     },

@@ -95,7 +95,9 @@ return {
           position = "float", -- alternative: style = "float"
         },
       },
-      image = {},
+      image = {
+        enabled = vim.g.user_is_wezterm or vim.g.user_is_kitty,
+      },
       -- zen = {
       --   show = {
       --     tabline = true,
