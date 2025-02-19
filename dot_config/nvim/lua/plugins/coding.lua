@@ -133,7 +133,7 @@ return {
         { name = "value",                map = "v", desc = "key-value, assignment" },
         { name = "url",                  map = "l", desc = "url link" },
         -- markdown
-        { name = "mdlink",               map = "l", desc = "md link [title](url)",   ft = { "markdown", "toml" } },
+        { name = "mdLink",               map = "l", desc = "md link [title](url)",   ft = { "markdown", "toml" } },
         { name = "mdFencedCodeBlock",    map = "C", desc = "md code block ```",      ft = "markdown" },
         { name = "mdEmphasis",           map = "E", desc = "md emphasis *_~=",       ft = "markdown" },
         -- python
