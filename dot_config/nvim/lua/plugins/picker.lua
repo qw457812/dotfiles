@@ -159,8 +159,12 @@ return {
           },
         },
         previewers = {
+          diff = {
+            builtin = false,
+            cmd = { "delta", "--file-style", "omit ", "--hunk-header-style", "omit" },
+          },
           git = {
-            native = true,
+            builtin = false,
           },
         },
         on_show = function()

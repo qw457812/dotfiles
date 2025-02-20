@@ -168,6 +168,9 @@ return {
       resize = {
         enable_default_keybindings = false,
       },
+      swap = {
+        enable_default_keybindings = false,
+      },
     },
   },
 

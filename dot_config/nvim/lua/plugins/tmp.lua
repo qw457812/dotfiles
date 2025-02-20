@@ -38,26 +38,30 @@ return {
 
   {
     "thenbe/csgithub.nvim",
-    keys = {
-      {
-        "<leader>/",
-        mode = "x",
-        function()
-          local csgithub = require("csgithub")
-          csgithub.open(csgithub.search())
-        end,
-        desc = "GitHub Code Search (extension)",
-      },
-      {
-        "<leader>?",
-        mode = "x",
-        function()
-          local csgithub = require("csgithub")
-          csgithub.open(csgithub.search({ includeFilename = true }))
-        end,
-        desc = "GitHub Code Search (filename)",
-      },
-    },
+    keys = function()
+      local function search(args)
+        local csgithub = require("csgithub")
+        local url = csgithub.search(args)
+        if url and vim.g.user_is_termux then
+          vim.fn.setreg(vim.v.register, url)
+          LazyVim.info(url, { title = "Copied URL" })
+        else
+          csgithub.open(url)
+        end
+      end
+
+      return {
+        { "<leader>/", mode = "x", search, desc = "GitHub Code Search (extension)" },
+        {
+          "<leader>?",
+          mode = "x",
+          function()
+            search({ includeFilename = true })
+          end,
+          desc = "GitHub Code Search (filename)",
+        },
+      }
+    end,
   },
 
   -- :echo db#url#encode('my_password')
