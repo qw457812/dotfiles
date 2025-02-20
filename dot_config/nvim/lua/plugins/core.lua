@@ -98,6 +98,13 @@ return {
       image = {
         enabled = vim.g.user_is_wezterm or vim.g.user_is_kitty,
       },
+      lazygit = {
+        win = vim.g.user_is_termux and {
+          height = vim.o.lines,
+          width = vim.o.columns,
+          border = "none",
+        } or nil,
+      },
       -- zen = {
       --   show = {
       --     tabline = true,
