@@ -49,6 +49,32 @@ return {
   {
     "saghen/blink.cmp",
     optional = true,
+    dependencies = "xzbdmw/colorful-menu.nvim",
+    ---@module 'blink.cmp'
+    ---@type blink.cmp.Config
+    opts = {
+      completion = {
+        menu = {
+          draw = {
+            columns = { { "kind_icon" }, { "label", gap = 1 } },
+            components = {
+              label = {
+                text = function(ctx)
+                  return require("colorful-menu").blink_components_text(ctx)
+                end,
+                highlight = function(ctx)
+                  return require("colorful-menu").blink_components_highlight(ctx)
+                end,
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  {
+    "saghen/blink.cmp",
+    optional = true,
     ---@module 'blink.cmp'
     ---@param opts blink.cmp.Config
     opts = function(_, opts)
@@ -116,10 +142,13 @@ return {
         completion = {
           menu = {
             draw = {
-              columns = vim.list_extend(vim.deepcopy(assert(menu_default.draw.columns)), {
-                -- { "kind" },
-                { "source_name" },
-              }),
+              columns = vim.list_extend(
+                vim.tbl_get(opts, "completion", "menu", "draw", "columns") or vim.deepcopy(menu_default.draw.columns),
+                {
+                  -- { "kind" },
+                  { "source_name" },
+                }
+              ),
               components = {
                 -- kind_icon = {
                 --   text = function(ctx)
@@ -134,6 +163,7 @@ return {
                   text = function(ctx)
                     return "[" .. ctx.source_name .. "]"
                   end,
+                  highlight = "NonText",
                 },
               },
             },
