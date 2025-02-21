@@ -304,11 +304,8 @@ return {
             todo_comments = 9, -- https://github.com/folke/todo-comments.nvim/blob/304a8d204ee787d2544d8bc23cd38d2f929e7cc5/lua/todo-comments/snacks.lua#L34-L36
           },
         }
-        if
-          vim.tbl_contains(vim.tbl_keys(prefixes.format), picker.opts.format)
-          or vim.tbl_contains(vim.tbl_keys(prefixes.source), picker.opts.source)
-        then
-          local prefix = 0
+        local prefix = prefixes.format[picker.opts.format] or prefixes.source[picker.opts.source]
+        if prefix then
           for _, text in ipairs(ret) do
             if text[2] ~= "SnacksPickerDir" then
               prefix = prefix + vim.api.nvim_strwidth(text[1])
@@ -317,10 +314,7 @@ return {
               break
             end
           end
-          dir_trunc_len = vim.api.nvim_win_get_width(picker.list.win.win)
-            - prefix
-            - (prefixes.format[picker.opts.format] or prefixes.source[picker.opts.source])
-            - 2
+          dir_trunc_len = vim.api.nvim_win_get_width(picker.list.win.win) - prefix - 2
         end
 
         for _, text in ipairs(ret) do
