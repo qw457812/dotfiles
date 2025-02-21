@@ -188,8 +188,8 @@ return {
       },
       behaviour = {
         -- auto_suggestions = true, -- experimental
-        auto_apply_diff_after_generation = true,
         -- enable_cursor_planning_mode = true,
+        auto_apply_diff_after_generation = true,
       },
       provider = "copilot-claude", -- only recommend using claude
       auto_suggestions_provider = "groq", -- high-frequency, can be expensive if enabled

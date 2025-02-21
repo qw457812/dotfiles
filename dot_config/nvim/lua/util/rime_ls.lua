@@ -39,7 +39,7 @@ M.cmp = {
   ---@param items? blink.cmp.CompletionItem[]
   ---@return integer[]
   top_n_indices = function(n, items)
-    items = items or require("blink.cmp.completion.list").items
+    items = items or require("blink.cmp").get_items()
     local res = {}
     for i, item in ipairs(items) do
       if M.cmp.is_rime(item) then
@@ -79,7 +79,7 @@ M.cmp = {
         if not (vim.g.rime_enabled and cmp.is_visible()) then
           return
         end
-        local items = require("blink.cmp.completion.list").items
+        local items = require("blink.cmp").get_items()
         for _, item in ipairs(items) do
           if M.cmp.is_rime(item) then
             return item.textEdit
@@ -105,7 +105,7 @@ M.cmp = {
         if not (vim.g.rime_enabled and cmp.is_visible()) then
           return
         end
-        local items = require("blink.cmp.completion.list").items
+        local items = require("blink.cmp").get_items()
         for _, item in ipairs(items) do
           if M.cmp.is_rime(item) then
             return cmp.cancel()
