@@ -78,7 +78,8 @@ prepend_keymap = [
   #   "y",
   # ], run = "yank", desc = "Yank selected files (copy)" }, # TODO: `y` in visual mode
   # https://github.com/orhnk/system-clipboard.yazi
-  { on = "Y", run = "plugin system-clipboard", desc = "Cancel the yank status" },
+  { on = "<C-y>", run = "plugin system-clipboard", desc = "Yank to clipboard" },      # candidates: Y <C-y> gy
+  { on = "<C-p>", run = "shell --block -- cb paste", desc = "Paste from clipboard" }, # candidates: P <C-p> gp
   # { on = [
   #   "d",
   #   "d",
