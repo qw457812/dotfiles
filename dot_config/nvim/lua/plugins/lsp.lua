@@ -136,7 +136,7 @@ return {
             end
             -- check to see if `<cr>` is already mapped to the buffer (avoids overwriting)
             -- for yarospace/lua-console.nvim
-            return not U.keymap.buffer_local_mapping_exists(0, "n","<cr>")
+            return not U.keymap.buffer_local_mapping_exists(0, "n", "<cr>")
           end,
         },
         { "<leader>cr", function() require("live-rename").rename() end, desc = "Rename (live-rename.nvim)", has = "rename" },
@@ -148,9 +148,13 @@ return {
         { "<leader>clS", "<cmd>LspStop<cr>", desc = "Stop Lsp" },
         { "<leader>clW", function() vim.lsp.buf.remove_workspace_folder() end, desc = "Remove Workspace" },
         { "<leader>clw", function() vim.lsp.buf.add_workspace_folder() end, desc = "Add Workspace" },
-        { "<leader>clL", function()
-          LazyVim.info(vim.tbl_map(U.path.home_to_tilde, vim.lsp.buf.list_workspace_folders()), { title = "Lsp Workspaces" })
-        end, desc = "List Workspace" },
+        {
+          "<leader>clL",
+          function()
+            LazyVim.info(vim.tbl_map(U.path.home_to_tilde, vim.lsp.buf.list_workspace_folders()), { title = "Lsp Workspaces" })
+          end,
+          desc = "List Workspace",
+        },
       })
 
       if LazyVim.pick.picker.name == "snacks" then
