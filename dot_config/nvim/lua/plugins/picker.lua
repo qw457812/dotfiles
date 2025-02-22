@@ -175,6 +175,38 @@ return {
             hidden = true,
             follow = true,
           },
+          grep = {
+            actions = {
+              filter_extension = function(picker)
+                local default = "*."
+                Snacks.input.input({
+                  prompt = "Filter By Extension",
+                  default = default,
+                }, function(glob)
+                  glob = not vim.list_contains({ default, "" }, vim.trim(glob or "")) and glob or nil
+                  local opts = picker.opts
+                  ---@cast opts snacks.picker.grep.Config
+                  -- see: https://github.com/folke/snacks.nvim/blob/bc902f7032df305df7dc48104cfa4e37967b3bdf/lua/snacks/picker/source/grep.lua#L57-L62
+                  if opts.glob ~= glob then
+                    opts.glob = glob
+                    picker:find()
+                  end
+                end)
+              end,
+            },
+            win = {
+              input = {
+                keys = {
+                  ["<C-e>"] = { "filter_extension", mode = { "i", "n" } },
+                },
+              },
+              list = {
+                keys = {
+                  ["<C-e>"] = { "filter_extension", mode = { "i", "n" } },
+                },
+              },
+            },
+          },
           lazy = {
             ---@diagnostic disable-next-line: missing-fields
             icons = {
