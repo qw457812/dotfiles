@@ -1,3 +1,9 @@
+local H = {}
+
+function H.build_plugin(plugin)
+  require("yazi.plugin").build_plugin(plugin)
+end
+
 return {
   -- https://github.com/sxyazi/dotfiles/blob/18ce3eda7792df659cb248d9636b8d7802844831/nvim/lua/plugins/ui.lua#L646
   -- https://github.com/mikavilpas/dotfiles/blob/main/.config/nvim/lua/plugins/my-file-manager.lua
@@ -62,5 +68,37 @@ return {
         },
       }
     end,
+    -- use lazy.nvim instead of `ya pack` package manager
+    specs = {
+      {
+        "yazi-rs/flavors",
+        name = "yazi-rs-flavors",
+        lazy = true,
+        build = function(plugin)
+          require("yazi.plugin").build_flavor(plugin, { sub_dir = "catppuccin-frappe.yazi" })
+        end,
+      },
+      {
+        "yazi-rs/plugins",
+        name = "yazi-rs-plugins",
+        lazy = true,
+        build = function(plugin)
+          local sub_dirs = {
+            "smart-enter.yazi",
+            "full-border.yazi",
+            "git.yazi",
+            "smart-filter.yazi",
+            "diff.yazi",
+            "mount.yazi",
+          }
+          for _, sub_dir in ipairs(sub_dirs) do
+            require("yazi.plugin").build_plugin(plugin, { sub_dir = sub_dir })
+          end
+        end,
+      },
+      { "Rolv-Apneseth/starship.yazi", lazy = true, build = H.build_plugin },
+      { "dedukun/bookmarks.yazi", lazy = true, build = H.build_plugin },
+      { "orhnk/system-clipboard.yazi", lazy = true, build = H.build_plugin },
+    },
   },
 }

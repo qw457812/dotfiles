@@ -1,49 +1,5 @@
-[[plugin.deps]]
-use = "yazi-rs/plugins:full-border"
-rev = "781a798"
-hash = "ae9e1d0c6bfd68cdebc98cc684c22b45"
+[plugin]
+deps = []
 
-[[plugin.deps]]
-use = "yazi-rs/plugins:smart-filter"
-rev = "781a798"
-hash = "b482f4f2d3c4e0aa3f8db89a95699439"
-
-[[plugin.deps]]
-use = "yazi-rs/plugins:git"
-rev = "781a798"
-hash = "771f18427fb75fb19990ce602bb322f4"
-
-[[plugin.deps]]
-use = "dedukun/bookmarks"
-rev = "fe0b1de"
-hash = "221ed40593a5cb5bd80f963f05c556f"
-
-[[plugin.deps]]
-use = "orhnk/system-clipboard"
-rev = "7775a80"
-hash = "9b8f2573da54334b04747e51556040cc"
-
-[[plugin.deps]]
-use = "yazi-rs/plugins:smart-enter"
-rev = "781a798"
-hash = "aef2b1a805b80cce573bb766f1459d88"
-
-[[plugin.deps]]
-use = "yazi-rs/plugins:diff"
-rev = "781a798"
-hash = "7a08e303167d5b655c06da6d570f0333"
-
-[[plugin.deps]]
-use = "yazi-rs/plugins:mount"
-rev = "781a798"
-hash = "5c4d8080367dd2561a18c1cf5a1dd295"
-
-[[plugin.deps]]
-use = "Rolv-Apneseth/starship"
-rev = "f6939fb"
-hash = "8ae899541dc7accb680ee4fd382a09c"
-
-[[flavor.deps]]
-use = "yazi-rs/flavors:catppuccin-frappe"
-rev = "1a419b2"
-hash = "e88895e8f8b7926f20946f273ecc7348"
+[flavor]
+deps = []
