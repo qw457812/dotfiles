@@ -34,8 +34,7 @@ return {
                 -- typeCheckingMode = "off", -- using ruff
                 typeCheckingMode = "standard", -- off, basic, standard, strict, all(default)
                 -- -- https://github.com/detachhead/basedpyright/blob/main/docs/configuration.md#diagnostic-settings-defaults
-                -- diagnosticSeverityOverrides = {
-                -- },
+                -- diagnosticSeverityOverrides = {},
               },
             },
           },
@@ -61,69 +60,69 @@ return {
                 -- ignore = { "*" }, -- using ruff
                 typeCheckingMode = "standard", -- off, basic, standard(default), strict
                 -- -- https://github.com/microsoft/pyright/blob/main/docs/configuration.md#diagnostic-settings-defaults
-                -- diagnosticSeverityOverrides = {
-                -- },
+                -- diagnosticSeverityOverrides = {},
               },
             },
           },
         },
-        -- ruff = {
-        --   -- -- TODO: not sure what it's for
-        --   -- handlers = {
-        --   --   ["textDocument/publishDiagnostics"] = function() end,
-        --   -- },
-        --   init_options = {
-        --     settings = {
-        --       -- https://docs.astral.sh/ruff/editors/settings/#ignore
-        --       lint = {
-        --         -- https://github.com/DetachHead/basedpyright/issues/203
-        --         -- https://github.com/DetachHead/basedpyright/blob/06368d488b93c0378520067546b286c0b4f5472c/pyproject.toml#L218
-        --         extendSelect = { "ALL" },
-        --         -- stylua: ignore
-        --         ignore = {
-        --           "ANN",     -- flake8-annotations (covered by pyright)
-        --           "EM",      -- flake8-errmsg
-        --           "FIX",     -- flake8-fixme
-        --           "PLR0913", -- Too many arguments to function call
-        --           "PLR0912", -- Too many branches
-        --           "PLR0915", -- Too many statements
-        --           "PLR2004", -- Magic value used in comparison
-        --           "PLR1722", -- Use `sys.exit()` instead of `exit`
-        --           "PLW2901", -- `for` loop variable overwritten by assignment target
-        --           "PLE0605", -- Invalid format for `__all__`, must be `tuple` or `list` (covered by pyright)
-        --           "PLR0911", -- Too many return statements
-        --           "PLW0603", -- Using the global statement is discouraged
-        --           "PLC0105", -- `TypeVar` name does not reflect its covariance
-        --           "PLC0414", -- Import alias does not rename original package (used by pyright for explicit re-export)
-        --           "RUF013",  -- PEP 484 prohibits implicit Optional (covered by pyright)
-        --           "RUF016",  -- Slice in indexed access to type (covered by pyright)
-        --           "TRY002",  -- Create your own exception
-        --           "TRY003",  -- Avoid specifying long messages outside the exception class
-        --           "D10",     -- Missing docstring
-        --           "D203",    -- 1 blank line required before class docstring
-        --           "D205",    -- 1 blank line required between summary line and description
-        --           "D209",    -- Multi-line docstring closing quotes should be on a separate line
-        --           "D212",    -- Multi-line docstring summary should start at the first line
-        --           "D213",    -- Multi-line docstring summary should start at the second line
-        --           "D400",    -- First line should end with a period
-        --           "D401",    -- First line should be in imperative mood
-        --           "D403",    -- First word of the first line should be properly capitalized
-        --           "D404",    -- First word of the docstring should not be `This`
-        --           "D405",    -- Section name should be properly capitalized
-        --           "D406",    -- Section name should end with a newline
-        --           "D415",    -- First line should end with a period, question mark, or exclamation point
-        --           "D418",    -- Function/Method decorated with @overload shouldn't contain a docstring (vscode supports it)
-        --           "PT013",   -- Found incorrect import of pytest, use simple import pytest instead (only for bad linters that can't check the qualname)
-        --           "TD002",   -- Missing author in TODO
-        --           "CPY001",  -- missing-copyright-notice
-        --           "C901",    -- max-complexity
-        --           "ISC001",  -- single-line-implicit-string-concatenation (conflicts with formatter)
-        --           "COM812",  -- missing-trailing-comma (conflicts with formatter)
-        --         },
-        --       },
-        --     },
-        --   },
-        -- },
+        ruff = {
+          mason = not vim.g.user_is_termux and nil, -- run `pkg install ruff` on termux
+          -- -- -- TODO: not sure what it's for
+          -- -- handlers = {
+          -- --   ["textDocument/publishDiagnostics"] = function() end,
+          -- -- },
+          -- init_options = {
+          --   settings = {
+          --     -- https://docs.astral.sh/ruff/editors/settings/#ignore
+          --     lint = {
+          --       -- https://github.com/DetachHead/basedpyright/issues/203
+          --       -- https://github.com/DetachHead/basedpyright/blob/06368d488b93c0378520067546b286c0b4f5472c/pyproject.toml#L218
+          --       extendSelect = { "ALL" },
+          --       -- stylua: ignore
+          --       ignore = {
+          --         "ANN",     -- flake8-annotations (covered by pyright)
+          --         "EM",      -- flake8-errmsg
+          --         "FIX",     -- flake8-fixme
+          --         "PLR0913", -- Too many arguments to function call
+          --         "PLR0912", -- Too many branches
+          --         "PLR0915", -- Too many statements
+          --         "PLR2004", -- Magic value used in comparison
+          --         "PLR1722", -- Use `sys.exit()` instead of `exit`
+          --         "PLW2901", -- `for` loop variable overwritten by assignment target
+          --         "PLE0605", -- Invalid format for `__all__`, must be `tuple` or `list` (covered by pyright)
+          --         "PLR0911", -- Too many return statements
+          --         "PLW0603", -- Using the global statement is discouraged
+          --         "PLC0105", -- `TypeVar` name does not reflect its covariance
+          --         "PLC0414", -- Import alias does not rename original package (used by pyright for explicit re-export)
+          --         "RUF013",  -- PEP 484 prohibits implicit Optional (covered by pyright)
+          --         "RUF016",  -- Slice in indexed access to type (covered by pyright)
+          --         "TRY002",  -- Create your own exception
+          --         "TRY003",  -- Avoid specifying long messages outside the exception class
+          --         "D10",     -- Missing docstring
+          --         "D203",    -- 1 blank line required before class docstring
+          --         "D205",    -- 1 blank line required between summary line and description
+          --         "D209",    -- Multi-line docstring closing quotes should be on a separate line
+          --         "D212",    -- Multi-line docstring summary should start at the first line
+          --         "D213",    -- Multi-line docstring summary should start at the second line
+          --         "D400",    -- First line should end with a period
+          --         "D401",    -- First line should be in imperative mood
+          --         "D403",    -- First word of the first line should be properly capitalized
+          --         "D404",    -- First word of the docstring should not be `This`
+          --         "D405",    -- Section name should be properly capitalized
+          --         "D406",    -- Section name should end with a newline
+          --         "D415",    -- First line should end with a period, question mark, or exclamation point
+          --         "D418",    -- Function/Method decorated with @overload shouldn't contain a docstring (vscode supports it)
+          --         "PT013",   -- Found incorrect import of pytest, use simple import pytest instead (only for bad linters that can't check the qualname)
+          --         "TD002",   -- Missing author in TODO
+          --         "CPY001",  -- missing-copyright-notice
+          --         "C901",    -- max-complexity
+          --         "ISC001",  -- single-line-implicit-string-concatenation (conflicts with formatter)
+          --         "COM812",  -- missing-trailing-comma (conflicts with formatter)
+          --       },
+          --     },
+          --   },
+          -- },
+        },
       },
       -- setup = {
       --   [ruff] = function()
