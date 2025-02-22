@@ -6,6 +6,15 @@ local use_image_nvim = false -- use image.nvim instead of snacks image
 local image_cursor_only = false
 
 return {
+  {
+    "neovim/nvim-lspconfig",
+    opts = function(_, opts)
+      if vim.g.user_is_termux then
+        opts.servers.marksman = nil
+      end
+    end,
+  },
+
   -- https://github.com/MeanderingProgrammer/dotfiles/blob/845016440183396f4f6d524cdd001828dbbdecba/.config/nvim/lua/mp/plugins/lang/markdown.lua#L47
   {
     "MeanderingProgrammer/render-markdown.nvim",
