@@ -29,6 +29,7 @@ return {
       get_element_icon = vim.is_callable(get_element_icon) and get_element_icon or function(_) end
 
       return U.extend_tbl(opts, {
+        ---@type bufferline.Options
         options = {
           -- indicator = { style = "underline" },
           separator_style = vim.g.user_transparent_background and { "", "" } or "slant", -- slope

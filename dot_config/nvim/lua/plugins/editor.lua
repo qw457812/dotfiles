@@ -419,20 +419,119 @@ return {
   },
   {
     "y3owk1n/undo-glow.nvim",
-    -- stylua: ignore
+    dependencies = {
+      {
+        "gbprod/yanky.nvim",
+        optional = true,
+        keys = { { "p", false }, { "P", false } },
+        opts = { highlight = { on_yank = false, on_put = false } },
+      },
+    },
+    event = "TextYankPost",
     keys = {
-      { "u", function() require("undo-glow").undo() end },
-      { "U", function() require("undo-glow").redo() end },
-      { "<C-r>", function() require("undo-glow").redo() end },
+      {
+        "u",
+        function()
+          require("undo-glow").undo()
+        end,
+        desc = "Undo (undo-glow)",
+      },
+      {
+        "<C-r>",
+        function()
+          require("undo-glow").redo()
+        end,
+        desc = "Redo (undo-glow)",
+      },
+      { "U", "<C-r>", desc = "Redo (undo-glow)", remap = true },
+      {
+        "p",
+        function()
+          -- copied from: https://github.com/y3owk1n/undo-glow.nvim/blob/7a224dead8cc94fee57d753b188413910dd5b98c/lua/undo-glow/init.lua#L138
+          local opts = require("undo-glow.utils").merge_command_opts("UgPaste")
+          require("undo-glow").highlight_changes(opts)
+          return "<Plug>(YankyPutAfter)"
+        end,
+        desc = "Put Text After Cursor (undo-glow)",
+        expr = true,
+      },
+      {
+        "P",
+        function()
+          -- copied from: https://github.com/y3owk1n/undo-glow.nvim/blob/7a224dead8cc94fee57d753b188413910dd5b98c/lua/undo-glow/init.lua#L145
+          local opts = require("undo-glow.utils").merge_command_opts("UgPaste")
+          require("undo-glow").highlight_changes(opts)
+          return "<Plug>(YankyPutBefore)"
+        end,
+        desc = "Put Text Before Cursor (undo-glow)",
+        expr = true,
+      },
+      {
+        "gc",
+        function()
+          local pos = vim.fn.getpos(".")
+          vim.schedule(function()
+            vim.fn.setpos(".", pos)
+          end)
+          return require("undo-glow").comment()
+        end,
+        mode = { "n", "x" },
+        desc = "Toggle comment (undo-glow)",
+        expr = true,
+      },
+      -- {
+      --   "gc",
+      --   function()
+      --     require("undo-glow").comment_textobject()
+      --   end,
+      --   mode = "o",
+      --   desc = "Comment textobject (undo-glow)",
+      -- },
+      {
+        "gcc",
+        function()
+          return require("undo-glow").comment_line()
+        end,
+        desc = "Toggle comment line (undo-glow)",
+        expr = true,
+      },
     },
     opts = function()
-      Snacks.util.set_hl({ UgUndo = "Substitute", UgRedo = "UgUndo" }, { default = true })
+      Snacks.util.set_hl({
+        UgUndo = "Substitute",
+        UgRedo = "UgUndo",
+        UgYank = "IncSearch",
+        UgPaste = "Search",
+        UgComment = "IlluminatedWordText",
+      }, { default = true })
 
+      ---@module 'undo-glow'
       ---@type UndoGlow.Config
-      ---@diagnostic disable-next-line: missing-fields
       return {
-        duration = 200,
+        animation = {
+          enabled = true,
+          duration = 200,
+        },
       }
+    end,
+    init = function()
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "LazyVimAutocmdsDefaults",
+        callback = function()
+          vim.api.nvim_del_augroup_by_name("lazyvim_highlight_yank")
+        end,
+      })
+      vim.api.nvim_create_autocmd("TextYankPost", {
+        group = vim.api.nvim_create_augroup("undo_glow_highlight_yank", { clear = true }),
+        callback = function()
+          -- copied from: https://github.com/neovim/neovim/blob/c3337e357a838aadf0ac40dd5bbc4dd0d1909b32/runtime/lua/vim/hl.lua#L170-L172
+          local event = vim.v.event
+          if event.operator ~= "y" or event.regtype == "" then
+            return
+          end
+          require("undo-glow").yank()
+        end,
+      })
     end,
   },
 
