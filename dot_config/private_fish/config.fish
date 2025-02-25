@@ -1,7 +1,3 @@
-if not status is-interactive
-    exit
-end
-
 # Cursor styles
 set -gx fish_vi_force_cursor 1
 set -gx fish_cursor_default block
@@ -240,5 +236,7 @@ if set -q TERMUX_VERSION
 else
     alias vless "nvim -u $(brew --prefix)/share/nvim/runtime/macros/less.vim"
 
-    term_proxy_on
+    if status is-interactive
+        term_proxy_on
+    end
 end
