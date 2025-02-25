@@ -9,6 +9,7 @@ return {
   -- https://github.com/mikavilpas/dotfiles/blob/main/.config/nvim/lua/plugins/my-file-manager.lua
   {
     "mikavilpas/yazi.nvim",
+    dependencies = "folke/snacks.nvim",
     keys = {
       { "<leader><cr>", mode = { "n", "v" }, "<cmd>Yazi<cr>", desc = "Yazi (Buffer Dir)" },
     },

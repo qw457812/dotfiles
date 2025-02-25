@@ -42,4 +42,12 @@ return {
     optional = true,
     keys = { { "<leader>E", false } },
   },
+  {
+    "folke/snacks.nvim",
+    keys = function(_, keys)
+      if LazyVim.has_extra("editor.snacks_explorer") then
+        table.insert(keys, { "<leader>E", false })
+      end
+    end,
+  },
 }

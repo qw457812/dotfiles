@@ -194,7 +194,7 @@ return {
       provider = "copilot-claude", -- only recommend using claude
       auto_suggestions_provider = "groq", -- high-frequency, can be expensive if enabled
       -- cursor_applying_provider = "groq",
-      -- copilot = { model = "claude-3.5-sonnet" },
+      -- copilot = { model = "claude-3.7-sonnet" },
       -- https://github.com/yetone/avante.nvim/wiki/Custom-providers
       vendors = {
         -- be able to switch between copilot (gpt-4o) and copilot-claude
@@ -203,7 +203,7 @@ return {
         ["copilot-claude"] = {
           __inherited_from = "copilot",
           -- https://github.com/CopilotC-Nvim/CopilotChat.nvim#models
-          model = "claude-3.5-sonnet",
+          model = "claude-3.7-sonnet",
         },
         ---@type AvanteSupportedProvider
         ---@diagnostic disable-next-line: missing-fields
