@@ -87,5 +87,5 @@ return {
     end,
   },
 
-  { "jsborjesson/vim-uppercase-sql", ft = "sql" },
+  -- { "jsborjesson/vim-uppercase-sql", ft = "sql" },
 }

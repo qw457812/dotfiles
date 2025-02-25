@@ -2,7 +2,7 @@
 
 alias:
   - "r1:openrouter/deepseek/deepseek-r1"
-  - "sonnet:openrouter/anthropic/claude-3.5-sonnet"
+  - "sonnet:openrouter/anthropic/claude-3.7-sonnet"
   - "groq:groq/llama-3.3-70b-versatile"
 
 architect: true

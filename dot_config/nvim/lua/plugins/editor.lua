@@ -33,7 +33,7 @@ return {
           end, { buffer = ev.buf, desc = "Toggle --fixed-strings" })
 
           vim.keymap.set("n", "<left>", function()
-            vim.api.nvim_win_set_cursor(vim.fn.bufwinid(0), { 3, 0 })
+            vim.api.nvim_win_set_cursor(vim.fn.bufwinid(0), { 2, 0 })
           end, { buffer = ev.buf, desc = "Jump Back to Search Input (Grug Far)" })
 
           vim.keymap.set(
