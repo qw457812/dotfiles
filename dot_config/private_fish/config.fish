@@ -1,3 +1,7 @@
+if not status is-interactive
+    exit
+end
+
 # Cursor styles
 set -gx fish_vi_force_cursor 1
 set -gx fish_cursor_default block
@@ -7,8 +11,6 @@ set -gx fish_cursor_replace_one underscore
 
 # Path
 set -x fish_user_paths
-fish_add_path /opt/homebrew/bin
-fish_add_path /opt/homebrew/sbin
 fish_add_path /opt/homebrew/opt/rustup/bin
 fish_add_path ~/.local/bin
 fish_add_path ~/.local/share/bob/nvim-bin
@@ -202,43 +204,41 @@ abbr lzd lazydocker
 abbr zj zellij
 abbr py python3
 
-if status is-interactive
-    if type -q atuin
-        set -gx ATUIN_NOBIND true
-        atuin init fish | source
+if type -q atuin
+    set -gx ATUIN_NOBIND true
+    atuin init fish | source
+end
+
+# set -x LESSOPEN "|/opt/homebrew/bin/lesspipe.sh %s"
+if type -q batpipe
+    eval (batpipe)
+end
+
+# if type -q pyenv
+#     set -Ux PYENV_ROOT $HOME/.pyenv
+#     fish_add_path $PYENV_ROOT/bin
+#     pyenv init - | source
+#     set -gx PYENV_VIRTUALENV_DISABLE_PROMPT 1
+#     pyenv virtualenv-init - | source
+# end
+
+if set -q TERMUX_VERSION
+    abbr pkgu 'pkg update && pkg upgrade'
+    abbr pkgi 'pkg install'
+    abbr pkgs 'pkg search'
+    abbr pkgl 'pkg list-installed'
+    abbr open termux-open
+    set ll_cmd 'eza --all --color=always --color-scale all --icons=always --long --time-style=iso --git --no-user'
+    alias l "$ll_cmd --group-directories-first"
+    alias lm "$ll_cmd --sort=modified --classify"
+    abbr dl 'cd ~/storage/downloads'
+    abbr rime 'cd ~/storage/shared/Android/rime'
+
+    if not set -q TMUX
+        tmux attach || tmux
     end
+else
+    alias vless "nvim -u $(brew --prefix)/share/nvim/runtime/macros/less.vim"
 
-    # set -x LESSOPEN "|/opt/homebrew/bin/lesspipe.sh %s"
-    if type -q batpipe
-        eval (batpipe)
-    end
-
-    # if type -q pyenv
-    #     set -Ux PYENV_ROOT $HOME/.pyenv
-    #     fish_add_path $PYENV_ROOT/bin
-    #     pyenv init - | source
-    #     set -gx PYENV_VIRTUALENV_DISABLE_PROMPT 1
-    #     pyenv virtualenv-init - | source
-    # end
-
-    if set -q TERMUX_VERSION
-        abbr pkgu 'pkg update && pkg upgrade'
-        abbr pkgi 'pkg install'
-        abbr pkgs 'pkg search'
-        abbr pkgl 'pkg list-installed'
-        abbr open termux-open
-        set ll_cmd 'eza --all --color=always --color-scale all --icons=always --long --time-style=iso --git --no-user'
-        alias l "$ll_cmd --group-directories-first"
-        alias lm "$ll_cmd --sort=modified --classify"
-        abbr dl 'cd ~/storage/downloads'
-        abbr rime 'cd ~/storage/shared/Android/rime'
-
-        if not set -q TMUX
-            tmux attach || tmux
-        end
-    else
-        alias vless "nvim -u $(brew --prefix)/share/nvim/runtime/macros/less.vim"
-
-        term_proxy_on
-    end
+    term_proxy_on
 end
