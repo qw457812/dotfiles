@@ -58,6 +58,12 @@ return {
               U.explorer.grug_far(vim.fs.dirname(fs_entry.path))
             end
           end, { buffer = buf_id, desc = "Search and Replace in Directory (mini.files)" })
+          vim.keymap.set("n", "gx", function()
+            local path = (MiniFiles.get_fs_entry() or {}).path
+            if path then
+              vim.ui.open(path)
+            end
+          end, { buffer = buf_id, desc = "OS open" })
           -- cursor navigation during text edit
           vim.keymap.set("n", "H", "h", { buffer = buf_id, desc = "<Left>" })
           vim.keymap.set("n", "L", "l", { buffer = buf_id, desc = "<Right>" })

@@ -1,7 +1,3 @@
-LazyVim.cmp.actions.snippet_active = function()
-  return vim.snippet.active()
-end
-
 local function has_words_before()
   local line, col = (unpack or table.unpack)(vim.api.nvim_win_get_cursor(0))
   return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
@@ -185,6 +181,14 @@ return {
     end,
   },
 
+  {
+    "LazyVim/LazyVim",
+    opts = function()
+      LazyVim.cmp.actions.snippet_active = function()
+        return vim.snippet.active()
+      end
+    end,
+  },
   {
     "L3MON4D3/LuaSnip",
     optional = true,
