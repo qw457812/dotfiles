@@ -503,6 +503,7 @@ return {
         UgYank = "IncSearch",
         UgPaste = "Search",
         UgComment = "IlluminatedWordText",
+        UgCursor = "Visual",
       }, { default = true })
 
       ---@module 'undo-glow'
@@ -524,14 +525,28 @@ return {
       vim.api.nvim_create_autocmd("TextYankPost", {
         group = vim.api.nvim_create_augroup("undo_glow_highlight_yank", { clear = true }),
         callback = function()
-          -- copied from: https://github.com/neovim/neovim/blob/c3337e357a838aadf0ac40dd5bbc4dd0d1909b32/runtime/lua/vim/hl.lua#L170-L172
+          -- copied from: https://github.com/neovim/neovim/blob/c3337e357a838aadf0ac40dd5bbc4dd0d1909b32/runtime/lua/vim/hl.lua#L163-L175
           local event = vim.v.event
+          local on_macro = false
+          local on_visual = true
+          if not on_macro and vim.fn.reg_executing() ~= "" then
+            return
+          end
           if event.operator ~= "y" or event.regtype == "" then
             return
           end
-          require("undo-glow").yank()
+          if not on_visual and event.visual then
+            return
+          end
+          vim.schedule(require("undo-glow").yank)
         end,
       })
+      -- vim.api.nvim_create_autocmd("CursorMoved", {
+      --   group = vim.api.nvim_create_augroup("undo_glow_highlight_cursor_moved", { clear = true }),
+      --   callback = function()
+      --     vim.schedule(require("undo-glow").cursor_moved)
+      --   end,
+      -- })
     end,
   },
 

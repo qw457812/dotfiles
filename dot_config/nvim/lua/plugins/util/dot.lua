@@ -46,7 +46,7 @@ return {
           vim.bo[event.buf].modeline = false
         end,
       })
-      if LazyVim.has("chezmoi.vim") then
+      if LazyVim.has("chezmoi.vim") and vim.g["chezmoi#use_tmp_buffer"] == 1 then
         vim.g["chezmoi#detect_ignore_pattern"] = "dot_aider.conf.yml"
       end
     end,
