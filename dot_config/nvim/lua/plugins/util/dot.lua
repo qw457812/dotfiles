@@ -37,6 +37,18 @@ return {
           end),
         })
       end
+
+      -- fix `vim: true` in ~/.aider.conf.yml
+      vim.api.nvim_create_autocmd("BufReadPre", {
+        pattern = { ".aider.conf.yml", "dot_aider.conf.yml" },
+        callback = function(event)
+          -- vim.opt_local.modelines = 0
+          vim.bo[event.buf].modeline = false
+        end,
+      })
+      if LazyVim.has("chezmoi.vim") then
+        vim.g["chezmoi#detect_ignore_pattern"] = "dot_aider.conf.yml"
+      end
     end,
   },
 
