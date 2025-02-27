@@ -64,6 +64,36 @@ return {
     end,
   },
 
+  -- for java projects using JDK version older than 17
+  {
+    "mfussenegger/nvim-jdtls",
+    optional = true,
+    opts = function(_, opts)
+      table.insert(opts.cmd, "--java-executable=" .. vim.fn.expand("$HOME/.local/share/mise/installs/java/21/bin/java"))
+    end,
+  },
+  -- for scala projects using JDK version older than 17
+  {
+    "neovim/nvim-lspconfig",
+    opts = function(_, opts)
+      if not LazyVim.has_extra("lang.scala") then
+        return
+      end
+
+      -- see: https://github.com/scalameta/nvim-metals/issues/380
+      vim.env.JAVA_HOME = vim.fn.expand("$HOME/.local/share/mise/installs/java/21")
+      -- return U.extend_tbl(opts, {
+      --   servers = {
+      --     metals = {
+      --       settings = {
+      --         javaHome = vim.env.JAVA_HOME,
+      --       },
+      --     },
+      --   },
+      -- })
+    end,
+  },
+
   -- :echo db#url#encode('my_password')
   -- :echo db#url#parse('my_url')
   -- :echo db#adapter#dispatch("my_url", "interactive")
