@@ -48,7 +48,6 @@
     "plugins.extras.ui.dropbar",
     "plugins.extras.ui.hide-hints-in-insert-mode",
     "plugins.extras.util.image",
-    "plugins.extras.util.rime",
     "plugins.extras.util.tmux",
     "plugins.extras.util.translate",
     "plugins.extras.util.zoxide"
