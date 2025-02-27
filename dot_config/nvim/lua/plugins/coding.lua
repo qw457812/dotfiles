@@ -190,6 +190,7 @@ return {
   },
   {
     "gregorias/coerce.nvim",
+    dependencies = "gregorias/coop.nvim",
     keys = { { "ga", mode = { "n", "v" } } },
     ---@module 'coerce'
     ---@type CoerceConfigUser
