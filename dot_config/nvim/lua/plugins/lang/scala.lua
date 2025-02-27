@@ -18,9 +18,19 @@ return {
           group = vim.api.nvim_create_augroup("nvim-metals", { clear = false }),
         })
         if #autocmds > 0 then
+          local metals_did_attach = false
+          LazyVim.lsp.on_attach(function()
+            metals_did_attach = true
+            ---@diagnostic disable-next-line: redundant-return-value
+            return true
+          end, "metals")
           vim.api.nvim_create_autocmd("FileType", {
             pattern = "java",
-            callback = autocmds[1].callback,
+            callback = function()
+              if metals_did_attach then
+                autocmds[1].callback()
+              end
+            end,
             group = vim.api.nvim_create_augroup("nvim-metals-java", { clear = true }),
           })
         end
