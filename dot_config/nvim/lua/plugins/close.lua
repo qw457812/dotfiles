@@ -276,6 +276,7 @@ return {
     optional = true,
     opts = function()
       vim.api.nvim_create_autocmd("FileType", {
+        group = augroup,
         pattern = "neo-tree-popup",
         callback = function(event)
           vim.defer_fn(function()
@@ -496,5 +497,23 @@ return {
         ft = "harpoon",
       },
     },
+  },
+
+  {
+    "mfussenegger/nvim-jdtls",
+    optional = true,
+    opts = function()
+      vim.api.nvim_create_autocmd("FileType", {
+        group = augroup,
+        pattern = "java",
+        callback = function(event)
+          if vim.startswith(vim.api.nvim_buf_get_name(event.buf), "jdt://") then
+            vim.keymap.set("n", close_key, function()
+              Snacks.bufdelete() -- `:bd` acts weirdly when neo-tree is visible
+            end, { buffer = event.buf, desc = "Close (jdtls)" })
+          end
+        end,
+      })
+    end,
   },
 }
