@@ -213,6 +213,8 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [ ] Check this [LspProgress autocmds](https://github.com/folke/snacks.nvim/blob/main/docs/notifier.md#-examples).
 - [ ] Check [damoye](https://github.com/damoye/nvim/tree/lazyvim).
 - [ ] [j/k navigation](https://github.com/ibhagwan/fzf-lua/issues/501#issuecomment-1219594641) for fzf-lua.
+- [x] Disable `lsp.neoconf` extras.
+  - Folke [no longer using neoconf](https://github.com/folke/neoconf.nvim/pull/92#issuecomment-2687169069) himself.
 - [x] Map `<M-i>` to `<C-i>` in nvim, and map `<C-i>` to `<M-i>` in terminal.
   - Like mrbeardad: [nvim](https://github.com/mrbeardad/nvim/blob/master/lua%2Fuser%2Fconfigs%2Fkeymaps.lua#L69) and [terminal](https://github.com/mrbeardad/MyIDE/blob/0792378a80e3eb72ce47de8e78d9df6c37002bbf/wt/settings.json#L425).
 - [ ] Create a `state` util to cache the state (like [zen-mode.nvim](https://github.com/folke/zen-mode.nvim/blob/29b292bdc58b76a6c8f294c961a8bf92c5a6ebd6/lua/zen-mode/plugins.lua#L137)) instead of using `vim.g.user_...`
