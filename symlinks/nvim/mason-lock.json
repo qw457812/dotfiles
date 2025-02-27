@@ -1,5 +1,5 @@
 {
-  "basedpyright": "1.27.1",
+  "basedpyright": "1.28.0",
   "bash-language-server": "5.4.3",
   "debugpy": "1.8.12",
   "docker-compose-language-service": "0.3.0",
