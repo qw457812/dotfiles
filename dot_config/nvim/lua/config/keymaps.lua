@@ -322,7 +322,7 @@ map("n", "<leader>iN", news, { desc = "Neovim News" })
 
 -- https://github.com/neovide/neovide/issues/1263#issuecomment-1972013043
 local function paste()
-  vim.api.nvim_paste(vim.fn.getreg(vim.v.register), true, -1)
+  vim.api.nvim_paste(vim.fn.getreg("+"), true, -1)
 end
 
 if vim.g.user_is_termux then
