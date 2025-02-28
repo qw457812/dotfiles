@@ -69,6 +69,9 @@ return {
     "mfussenegger/nvim-jdtls",
     optional = true,
     opts = function(_, opts)
+      if vim.fn.executable("mise") == 0 then
+        return
+      end
       table.insert(opts.cmd, "--java-executable=" .. vim.fn.expand("$HOME/.local/share/mise/installs/java/21/bin/java"))
     end,
   },
@@ -76,10 +79,9 @@ return {
   {
     "neovim/nvim-lspconfig",
     opts = function(_, opts)
-      if not LazyVim.has_extra("lang.scala") then
+      if not LazyVim.has_extra("lang.scala") or vim.fn.executable("mise") == 0 then
         return
       end
-
       -- see: https://github.com/scalameta/nvim-metals/issues/380
       vim.env.JAVA_HOME = vim.fn.expand("$HOME/.local/share/mise/installs/java/21")
       -- return U.extend_tbl(opts, {
