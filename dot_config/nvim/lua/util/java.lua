@@ -49,8 +49,8 @@ end
 --- jar path of maven local repository
 ---@param uri
 ---@return string?
-function M.jdt_uri_to_maven_path(uri)
-  local jar = uri:match("jdt://.+(%%5C/Users%%5C/.+%%5C/%.m2%%5C/repository%%5C/.+%.jar)=")
+function M.jdt_uri_to_jar_path(uri)
+  local jar = uri:match("jdt://.-(%%5C/.-%.jar)")
   -- replace escaped backslashes with forward slashes
   return jar and jar:gsub("%%5C/", "/")
 end
