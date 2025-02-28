@@ -101,13 +101,47 @@ return {
       --   end,
       -- })
 
+      ---@type table<string, blink.cmp.KeymapCommand>
+      local actions = {
+        accept = function(cmp)
+          -- keep non-listed buffers non-listed to prevent them from showing up in bufferline.nvim
+          -- e.g. command-line window, avante.nvim
+          local buflisted = vim.bo.buflisted
+          return cmp.accept({
+            callback = not buflisted and function()
+              vim.bo.buflisted = buflisted
+            end or nil,
+          })
+        end,
+        select_next = function(cmp)
+          local buflisted = vim.bo.buflisted
+          local ret = cmp.select_next()
+          if not buflisted then
+            vim.schedule(function()
+              vim.bo.buflisted = buflisted
+            end)
+          end
+          return ret
+        end,
+        select_prev = function(cmp)
+          local buflisted = vim.bo.buflisted
+          local ret = cmp.select_prev()
+          if not buflisted then
+            vim.schedule(function()
+              vim.bo.buflisted = buflisted
+            end)
+          end
+          return ret
+        end,
+      }
+
       ---@type blink.cmp.Config
       local o = {
         -- copied from: https://github.com/AstroNvim/astrocommunity/blob/0e1cf1178a6c0b2bfbc1e5e0d4a3009911b07649/lua/astrocommunity/completion/blink-cmp/init.lua#L98
         keymap = {
           -- TODO: better coop with mini.snippets and signature_help
           ["<Tab>"] = {
-            "select_next",
+            actions.select_next,
             "snippet_forward",
             function(cmp)
               if has_words_before() then
@@ -116,7 +150,7 @@ return {
             end,
             "fallback",
           },
-          ["<S-Tab>"] = { "select_prev", "snippet_backward", "fallback" },
+          ["<S-Tab>"] = { actions.select_prev, "snippet_backward", "fallback" },
           -- -- https://github.com/y3owk1n/nix-system-config-v2/blob/ae72dd82a92894a1ca8c5ff4243e0208dfc33a5d/config/nvim/lua/plugins/blink-cmp.lua#L19
           -- ["<Esc>"] = {
           --   function(cmp)
@@ -128,10 +162,11 @@ return {
           --   end,
           --   "fallback",
           -- },
-          ["<C-n>"] = { "select_next", "show" },
-          ["<C-p>"] = { "select_prev", "show" },
-          -- ["<C-j>"] = { "select_next", "fallback" }, -- conflicts with mini.snippets
-          -- ["<C-k>"] = { "select_prev", "fallback" },
+          ["<CR>"] = { actions.accept, "fallback" },
+          ["<C-n>"] = { actions.select_next, "show" },
+          ["<C-p>"] = { actions.select_prev, "show" },
+          -- ["<C-j>"] = { actions.select_next, "fallback" }, -- conflicts with mini.snippets
+          -- ["<C-k>"] = { actions.select_prev, "fallback" },
           -- ["<C-u>"] = { "scroll_documentation_up", "fallback" },
           -- ["<C-d>"] = { "scroll_documentation_down", "fallback" },
         },
@@ -141,7 +176,6 @@ return {
               columns = vim.list_extend(
                 vim.tbl_get(opts, "completion", "menu", "draw", "columns") or vim.deepcopy(menu_default.draw.columns),
                 {
-                  -- { "kind" },
                   { "source_name" },
                 }
               ),
@@ -184,9 +218,10 @@ return {
   {
     "LazyVim/LazyVim",
     opts = function()
-      LazyVim.cmp.actions.snippet_active = function()
-        return vim.snippet.active()
-      end
+      LazyVim.cmp.actions.snippet_active = LazyVim.cmp.actions.snippet_active
+        or function()
+          return vim.snippet.active()
+        end
     end,
   },
   {
