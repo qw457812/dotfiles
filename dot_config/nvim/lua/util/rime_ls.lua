@@ -76,7 +76,7 @@ M.cmp = {
     return {
       ---@param cmp blink.cmp.API
       function(cmp)
-        if not (vim.g.rime_enabled and cmp.is_visible()) then
+        if not (vim.g.rime_enabled and cmp.is_menu_visible()) then
           return
         end
         local items = require("blink.cmp").get_items()
@@ -102,7 +102,7 @@ M.cmp = {
     return {
       ---@param cmp blink.cmp.API
       function(cmp)
-        if not (vim.g.rime_enabled and cmp.is_visible()) then
+        if not (vim.g.rime_enabled and cmp.is_menu_visible()) then
           return
         end
         local items = require("blink.cmp").get_items()
