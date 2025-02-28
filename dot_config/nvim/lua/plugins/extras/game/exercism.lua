@@ -4,7 +4,7 @@ end
 
 local function exercism_workspace()
   local res = vim.system({ "exercism", "workspace" }, { text = true }):wait()
-  return res.code == 0 and res.stdout:gsub("[\r\n]+$", "") or nil
+  return res.code == 0 and res.stdout:gsub("\n+$", "") or nil
 end
 
 return {

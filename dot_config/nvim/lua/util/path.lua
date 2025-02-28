@@ -23,7 +23,7 @@ M.CHEZMOI = (function()
     return
   end
   local res = vim.system({ "chezmoi", "source-path" }, { text = true }):wait()
-  return res.code == 0 and res.stdout:gsub("[\r\n]+$", "") or nil
+  return res.code == 0 and res.stdout:gsub("\n+$", "") or nil
 end)()
 
 M.CONFIG = M.CHEZMOI and M.CHEZMOI .. "/dot_config/nvim" or vim.fn.stdpath("config") --[[@as string]]
