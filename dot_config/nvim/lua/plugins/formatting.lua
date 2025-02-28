@@ -23,7 +23,7 @@ return {
       local orig_gA_keymap = vim.fn.maparg("gA", "n", false, true) --[[@as table<string,any>]]
       require("mini.align").setup(opts)
       if not vim.tbl_isempty(orig_gA_keymap) then
-        vim.fn.mapset(orig_gA_keymap) -- orgmode uses `gA`
+        vim.fn.mapset("n", false, orig_gA_keymap) -- orgmode uses `gA`
       end
     end,
   },
@@ -31,6 +31,9 @@ return {
   {
     "echasnovski/mini.trailspace",
     event = { "BufReadPost", "BufNewFile" },
+    keys = {
+      { "<leader>cw", "<cmd>lua MiniTrailspace.trim()<CR>", desc = "Erase Whitespace" },
+    },
     opts = function()
       vim.api.nvim_create_autocmd("FileType", {
         pattern = {
