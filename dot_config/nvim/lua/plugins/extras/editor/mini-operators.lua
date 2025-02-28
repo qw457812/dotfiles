@@ -91,6 +91,12 @@ return {
           return operators.replace()
         end, { expr = true, replace_keycodes = false, silent = true, desc = "Replace Operator" })
         vim.keymap.set("n", "ss", "s_", { remap = true, silent = true, desc = "Replace Line" })
+      elseif LazyVim.has("undo-glow.nvim") then
+        vim.keymap.set("n", "s", function()
+          require("undo-glow").highlight_changes(require("undo-glow.utils").merge_command_opts("TodoBgNOTE"))
+          return operators.replace()
+        end, { expr = true, replace_keycodes = false, silent = true, desc = "Replace Operator" })
+        vim.keymap.set("n", "ss", "s_", { remap = true, silent = true, desc = "Replace Line" })
       else
         operators.make_mappings("replace", { textobject = "s", line = "ss", selection = "" }) -- disable `v_s` since we have `v_P`
       end

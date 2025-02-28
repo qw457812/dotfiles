@@ -11,7 +11,7 @@ function M.jdt_java_runtimes()
 
   local function java_home(version)
     local res = vim.system({ java_home_macos, "-F", "-v", version }, { text = true }):wait()
-    return res.code == 0 and res.stdout:gsub("[\r\n]+$", "")
+    return res.code == 0 and res.stdout:gsub("\n+$", "")
   end
 
   local runtimes = {}
@@ -46,7 +46,7 @@ function M.parse_jdt_uri(uri)
   end
 end
 
---- jar path of maven local repository
+--- jar path from maven local repository
 ---@param uri
 ---@return string?
 function M.jdt_uri_to_jar_path(uri)

@@ -500,12 +500,13 @@ return {
       },
     },
     opts = function()
+      -- TodoBgPERF
       Snacks.util.set_hl({
         UgUndo = "Substitute",
-        UgRedo = "UgUndo",
+        UgRedo = "FlashLabel",
         UgYank = "IncSearch",
         UgPaste = "Search",
-        UgComment = "IlluminatedWordText",
+        UgComment = "LspReferenceText",
         UgCursor = "Visual",
       }, { default = true })
 
@@ -514,7 +515,7 @@ return {
       return {
         animation = {
           enabled = true,
-          duration = 200,
+          duration = 150,
           animation_type = "desaturate",
         },
       }

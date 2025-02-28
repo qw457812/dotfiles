@@ -350,10 +350,10 @@ return {
 
             -- highlight-undo.nvim
             HighlightUndo = { link = "CurSearch" },
-            HighlightRedo = { link = "HighlightUndo" },
+            -- HighlightRedo = { link = "HighlightUndo" },
             -- undo-glow.nvim
             UgUndo = { link = "CurSearch" },
-            UgRedo = { link = "UgUndo" },
+            -- UgRedo = { link = "UgUndo" },
 
             TelescopeSelection = { fg = colors.text, bg = colors.surface0, style = { "bold" } },
             TelescopeSelectionCaret = { fg = colors.flamingo, bg = colors.surface0 },
