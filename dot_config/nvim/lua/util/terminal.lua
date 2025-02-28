@@ -39,7 +39,7 @@ function M.colorize()
       if not vim.tbl_isempty(orig_dd_keymap) then
         vim.keymap.del("n", "dd")
         vim.api.nvim_create_autocmd("BufEnter", { buffer = buf, callback = function() pcall(vim.keymap.del, "n", "dd") end })
-        vim.api.nvim_create_autocmd("BufLeave", { buffer = buf, callback = function() vim.fn.mapset(orig_dd_keymap) end })
+        vim.api.nvim_create_autocmd("BufLeave", { buffer = buf, callback = function() vim.fn.mapset("n", false, orig_dd_keymap) end })
       end
     end,
   })

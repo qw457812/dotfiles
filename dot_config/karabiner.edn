@@ -1469,7 +1469,9 @@
            [:!Qk [:open "/Applications/kitty.app"] :default-terminal]
            [:!Ql [:open "/Applications/Visual Studio Code.app"] :!VSCode]
            [:!Ql :same_wind_app :VSCode]
-           [:!Qsemicolon [:open "/Library/Application Support/Citrix Receiver/Citrix Viewer.app"]] ; Citrix Workspace.app
+           ;; [:!Qsemicolon [:open "/Library/Application Support/Citrix Receiver/Citrix Viewer.app"]] ; Citrix Workspace.app
+           [:!Qsemicolon "/opt/homebrew/bin/yabai -m window --focus $(/opt/homebrew/bin/yabai -m query --windows | /opt/homebrew/bin/jq -e \"map(select(.app==\\\"RemoteDesktopClient\\\")) | .[0] | .id\") > /dev/null 2>&1 || open /Applications/RuijieWorkSpace.app" :!RuijieWorkSpace]
+           [:!Qsemicolon [:open "/Applications/RuijieWorkSpace.app"] :RuijieWorkSpace]
            ; [:!Qf [:open "/System/Library/CoreServices/Finder.app"] :!Finder]
            ; [:!Qf :same_wind_app :Finder]
            [:!Qe [:open "/Applications/Emacs.app"] :!Emacs]
@@ -1905,7 +1907,9 @@
            [:!Wk [:left_command [:open "/Applications/kitty.app"]] :default-terminal]
            [:!Wl [:left_command [:open "/Applications/Visual Studio Code.app"]] :!VSCode]
            [:!Wl :same_wind_app :VSCode]
-           [:!Wsemicolon [:left_command [:open "/Library/Application Support/Citrix Receiver/Citrix Viewer.app"]]] ; Citrix Workspace.app
+           ;; [:!Wsemicolon [:left_command [:open "/Library/Application Support/Citrix Receiver/Citrix Viewer.app"]]] ; Citrix Workspace.app
+           [:!Wsemicolon [:left_command "/opt/homebrew/bin/yabai -m window --focus $(/opt/homebrew/bin/yabai -m query --windows | /opt/homebrew/bin/jq -e \"map(select(.app==\\\"RemoteDesktopClient\\\")) | .[0] | .id\") > /dev/null 2>&1 || open /Applications/RuijieWorkSpace.app"] :!RuijieWorkSpace]
+           [:!Wsemicolon [:left_command [:open "/Applications/RuijieWorkSpace.app"]] :RuijieWorkSpace]
            ; [:!Wquote [:open "/Applications/SwitchHosts.app"]]
            [:!Wa [:left_command [:open "/System/Applications/Utilities/Activity Monitor.app"]]]
            [:!Ws [:left_command [:open "/Applications/spotube.app"]]]
@@ -2318,6 +2322,7 @@
   :WeWork-Meeting   ["^com\\.tencent\\.wwmapp$"]
   :WeChat           ["^com\\.tencent\\.xinWeChat$"]
   :CitrixViewer     ["^com\\.citrix\\.receiver\\.icaviewer\\.mac$"]
+  :RuijieWorkSpace  ["^cn\\.com\\.ruijie\\.RuijieWorkSpace$"]
   :ChatGPT          ["^com\\.lencx\\.chatgpt$"]
   :WPSOffice        ["^com\\.kingsoft\\.wpsoffice\\.mac$"]
   :LibreOffice      ["^org\\.libreoffice\\.script$"]

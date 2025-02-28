@@ -179,7 +179,9 @@ map("n", "<D-r>", vim.cmd.edit, { desc = "Reload File" })
 -- <cmd>call setreg('+', expand('%:p:~'))<cr>
 map("n", "<leader>fy", function()
   -- local path = vim.fn.expand("%:p:~")
-  local path = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":p:~") or ""
+  local filename = vim.api.nvim_buf_get_name(0)
+  local path = U.java.jdt_uri_to_maven_path(filename) or filename
+  path = vim.fn.fnamemodify(path, ":p:~") or ""
   vim.fn.setreg(vim.v.register, path)
   LazyVim.info(path, { title = "Copied Path" })
 end, { desc = "Yank file absolute path" })

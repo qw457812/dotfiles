@@ -120,13 +120,16 @@ return {
   {
     "CopilotC-Nvim/CopilotChat.nvim",
     optional = true,
-    cmd = "CopilotChatModels",
+    cmd = { "CopilotChatModels", "CopilotChatPrompts", "CopilotChatAgents" },
     dependencies = {
       {
         "MeanderingProgrammer/render-markdown.nvim",
         optional = true,
         ft = U.markdown.render_markdown_ft("copilot-chat"),
       },
+    },
+    keys = {
+      { "<leader>ap", "<cmd>CopilotChatPrompts<cr>", desc = "Prompts (CopilotChat)" },
     },
     opts = {
       -- -- render-markdown integration | https://github.com/CopilotC-Nvim/CopilotChat.nvim#tips

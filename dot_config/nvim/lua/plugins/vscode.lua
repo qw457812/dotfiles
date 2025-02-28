@@ -204,7 +204,7 @@ return {
                   if vim.tbl_isempty(keymap) then
                     vim.keymap.del(mode, lhs)
                   else
-                    vim.fn.mapset(keymap)
+                    vim.fn.mapset(mode, false, keymap)
                   end
                 end
               end

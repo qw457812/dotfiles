@@ -427,7 +427,10 @@ return {
         opts = { highlight = { on_yank = false, on_put = false } },
       },
     },
-    event = "TextYankPost",
+    event = {
+      -- "TextYankPost",
+      "VeryLazy", -- for cursor_moved
+    },
     keys = {
       {
         "u",
@@ -512,6 +515,7 @@ return {
         animation = {
           enabled = true,
           duration = 200,
+          animation_type = "pulse",
         },
       }
     end,
@@ -541,12 +545,12 @@ return {
           vim.schedule(require("undo-glow").yank)
         end,
       })
-      -- vim.api.nvim_create_autocmd("CursorMoved", {
-      --   group = vim.api.nvim_create_augroup("undo_glow_highlight_cursor_moved", { clear = true }),
-      --   callback = function()
-      --     vim.schedule(require("undo-glow").cursor_moved)
-      --   end,
-      -- })
+      vim.api.nvim_create_autocmd("CursorMoved", {
+        group = vim.api.nvim_create_augroup("undo_glow_highlight_cursor_moved", { clear = true }),
+        callback = function()
+          vim.schedule(require("undo-glow").cursor_moved)
+        end,
+      })
     end,
   },
 
