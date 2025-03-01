@@ -52,6 +52,7 @@ return {
           support = { substitute = { enabled = true } },
         },
       },
+      { "y3owk1n/undo-glow.nvim", optional = true },
     },
     vscode = true,
     -- https://github.com/chrisgrieser/.config/blob/9bc8b38e0e9282b6f55d0b6335f98e2bf9510a7c/nvim/lua/plugin-specs/mini-operators.lua
