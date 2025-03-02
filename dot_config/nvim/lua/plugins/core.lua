@@ -68,7 +68,6 @@ return {
         win = {
           keys = {
             i_c_c = { "<C-c>", { "cmp_close", "cancel" }, mode = "i", expr = true },
-            n_cr = { "<cr>", "confirm", mode = "n", expr = true },
             n_k = { "k", { "hist_up" }, mode = "n" },
             n_j = { "j", { "hist_down" }, mode = "n" },
           },

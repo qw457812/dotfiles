@@ -549,9 +549,21 @@ return {
       LazyVim.on_very_lazy(function()
         vim.api.nvim_create_autocmd("CursorMoved", {
           group = vim.api.nvim_create_augroup("undo_glow_highlight_cursor_moved", { clear = true }),
-          callback = function()
-            vim.schedule(require("undo-glow").cursor_moved)
-          end,
+          callback = U.debounce_wrap(20, function(ev)
+            if not vim.api.nvim_buf_is_valid(ev.buf) then
+              return
+            end
+            if not vim.g.ug_ignore_cursor_moved then
+              vim.g.ug_ignore_cursor_moved =
+                Snacks.util.var(ev.buf, "user_ug_cursor_disable", vim.g.ug_ignore_cursor_moved)
+            end
+            require("undo-glow").cursor_moved({
+              animation = {
+                duration = 500,
+                animation_type = "slide",
+              },
+            })
+          end),
         })
       end)
     end,
@@ -920,6 +932,7 @@ return {
       local orig_dd_keymap ---@type table<string,any>
       local orig_minianimate_disable ---@type boolean?
       -- local orig_snacks_scroll ---@type boolean?
+      local orig_user_ug_cursor_disable ---@type boolean?
       PAGER_MODE:add_hook(function(active)
         if active then
           -- set filetype
@@ -937,12 +950,15 @@ return {
           vim.g.minianimate_disable = true
           -- orig_snacks_scroll = vim.g.snacks_scroll
           -- vim.g.snacks_scroll = false
+          orig_user_ug_cursor_disable = vim.g.user_ug_cursor_disable
+          vim.g.user_ug_cursor_disable = true
         else
           if not vim.tbl_isempty(orig_dd_keymap) then
             vim.fn.mapset("n", false, orig_dd_keymap)
           end
           vim.g.minianimate_disable = orig_minianimate_disable
           -- vim.g.snacks_scroll = orig_snacks_scroll
+          vim.g.user_ug_cursor_disable = orig_user_ug_cursor_disable
         end
       end)
     end,
