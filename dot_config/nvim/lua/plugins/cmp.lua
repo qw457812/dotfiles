@@ -193,6 +193,28 @@ return {
           -- ["<C-u>"] = { "scroll_documentation_up", "fallback" },
           -- ["<C-d>"] = { "scroll_documentation_down", "fallback" },
         },
+        cmdline = {
+          enabled = true,
+          keymap = {
+            ["<Tab>"] = { "show_and_insert", "select_next" },
+            ["<Right>"] = {
+              function(cmp)
+                if cmp.is_ghost_text_visible() then
+                  return cmp.accept()
+                end
+              end,
+              "fallback",
+            },
+            ["<Left>"] = {
+              function(cmp)
+                cmp.hide()
+              end,
+              "fallback",
+            },
+            ["<C-j>"] = { "select_next", "fallback" },
+            ["<C-k>"] = { "select_prev", "fallback" },
+          },
+        },
         completion = {
           menu = {
             draw = {
