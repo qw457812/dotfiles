@@ -239,6 +239,59 @@ return {
     end,
   },
 
+  -- HACK: command-line window
+  {
+    "saghen/blink.cmp",
+    optional = true,
+    ---@type blink.cmp.Config
+    opts = {
+      sources = {
+        per_filetype = {
+          vim = { "cmdline" }, -- I don't need to write vimscript anyway
+        },
+        providers = {
+          cmdline = {
+            transform_items = function(ctx, items)
+              if vim.fn.getcmdwintype() == ":" then
+                for _, item in ipairs(items) do
+                  local text_edit = item.textEdit
+                  if text_edit then
+                    -- see: https://github.com/saghen/blink.cmp/blob/f820d64680bb5679aa3f493a1b20a06128fc14e0/lua/blink/cmp/sources/cmdline/init.lua#L155-L168
+                    text_edit.insert.start.line = ctx.cursor[1] - 1
+                    text_edit.insert["end"].line = ctx.cursor[1] - 1
+                    text_edit.replace.start.line = ctx.cursor[1] - 1
+                    text_edit.replace["end"].line = ctx.cursor[1] - 1
+                    text_edit.insert["end"].character = text_edit.replace["end"].character
+
+                    -- see: https://github.com/saghen/blink.cmp/blob/f820d64680bb5679aa3f493a1b20a06128fc14e0/lua/blink/cmp/sources/cmdline/init.lua#L126-L136
+                    local is_lua_expr = ctx.line:sub(1, 1) == "="
+                    if is_lua_expr then
+                      -- copied from: https://github.com/saghen/blink.cmp/blob/f820d64680bb5679aa3f493a1b20a06128fc14e0/lua/blink/cmp/sources/cmdline/init.lua#L24-L32
+                      local arguments = vim.split(ctx.line, " ", { plain = true })
+                      local arg_number = #vim.split(ctx.line:sub(1, ctx.cursor[2]), " ", { plain = true })
+                      local text_before_argument = table.concat(
+                        require("blink.cmp.lib.utils").slice(arguments, 1, arg_number - 1),
+                        " "
+                      ) .. (arg_number > 1 and " " or "")
+
+                      local current_arg = arguments[arg_number]
+                      local keyword_config = require("blink.cmp.config").completion.keyword
+                      local keyword = ctx.get_bounds(keyword_config.range)
+                      local current_arg_prefix = current_arg:sub(1, keyword.start_col - #text_before_argument - 1)
+
+                      text_edit.newText = current_arg_prefix:sub(2, -1) .. text_edit.newText
+                    end
+                  end
+                end
+              end
+              return items
+            end,
+          },
+        },
+      },
+    },
+  },
+
   {
     "LazyVim/LazyVim",
     opts = function()
