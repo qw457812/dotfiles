@@ -547,22 +547,52 @@ return {
         end,
       })
       LazyVim.on_very_lazy(function()
-        vim.api.nvim_create_autocmd("CursorMoved", {
-          group = vim.api.nvim_create_augroup("undo_glow_highlight_cursor_moved", { clear = true }),
-          callback = U.debounce_wrap(20, function(ev)
-            if not vim.api.nvim_buf_is_valid(ev.buf) then
+        -- vim.api.nvim_create_autocmd("CursorMoved", {
+        --   group = vim.api.nvim_create_augroup("undo_glow_highlight_cursor_moved", { clear = true }),
+        --   ---@param ev vim.api.create_autocmd.callback.args
+        --   callback = vim.schedule_wrap(function(ev)
+        --     if not vim.g.ug_ignore_cursor_moved then
+        --       vim.g.ug_ignore_cursor_moved =
+        --         Snacks.util.var(ev.buf, "user_ug_cursor_disable", vim.g.ug_ignore_cursor_moved)
+        --     end
+        --     require("undo-glow").cursor_moved({
+        --       animation = {
+        --         duration = 500,
+        --         animation_type = "slide",
+        --       },
+        --     })
+        --   end),
+        -- })
+        vim.api.nvim_create_autocmd("WinEnter", {
+          group = vim.api.nvim_create_augroup("undo_glow_highlight_win_enter", { clear = true }),
+          ---@param ev vim.api.create_autocmd.callback.args
+          callback = vim.schedule_wrap(function(ev)
+            local buf = ev.buf
+            local win = vim.api.nvim_get_current_win()
+            if
+              not vim.api.nvim_buf_is_loaded(buf)
+              or vim.wo[win].previewwindow
+              or vim.api.nvim_win_get_config(win).relative ~= ""
+              or vim.bo[buf].buftype ~= ""
+            then
               return
             end
-            if not vim.g.ug_ignore_cursor_moved then
-              vim.g.ug_ignore_cursor_moved =
-                Snacks.util.var(ev.buf, "user_ug_cursor_disable", vim.g.ug_ignore_cursor_moved)
-            end
-            require("undo-glow").cursor_moved({
+
+            local opts = require("undo-glow.utils").merge_command_opts("UgCursor", {
               animation = {
                 duration = 500,
                 animation_type = "slide",
               },
             })
+            local lnum = vim.api.nvim_win_get_cursor(0)[1]
+            local line = vim.api.nvim_get_current_line()
+            require("undo-glow").highlight_region(vim.tbl_extend("force", opts, {
+              s_row = lnum - 1,
+              s_col = 0,
+              e_row = lnum - 1,
+              e_col = #line,
+              force_edge = opts.force_edge ~= false,
+            }))
           end),
         })
       end)
@@ -932,7 +962,7 @@ return {
       local orig_dd_keymap ---@type table<string,any>
       local orig_minianimate_disable ---@type boolean?
       -- local orig_snacks_scroll ---@type boolean?
-      local orig_user_ug_cursor_disable ---@type boolean?
+      -- local orig_user_ug_cursor_disable ---@type boolean?
       PAGER_MODE:add_hook(function(active)
         if active then
           -- set filetype
@@ -950,15 +980,15 @@ return {
           vim.g.minianimate_disable = true
           -- orig_snacks_scroll = vim.g.snacks_scroll
           -- vim.g.snacks_scroll = false
-          orig_user_ug_cursor_disable = vim.g.user_ug_cursor_disable
-          vim.g.user_ug_cursor_disable = true
+          -- orig_user_ug_cursor_disable = vim.g.user_ug_cursor_disable
+          -- vim.g.user_ug_cursor_disable = true
         else
           if not vim.tbl_isempty(orig_dd_keymap) then
             vim.fn.mapset("n", false, orig_dd_keymap)
           end
           vim.g.minianimate_disable = orig_minianimate_disable
           -- vim.g.snacks_scroll = orig_snacks_scroll
-          vim.g.user_ug_cursor_disable = orig_user_ug_cursor_disable
+          -- vim.g.user_ug_cursor_disable = orig_user_ug_cursor_disable
         end
       end)
     end,
