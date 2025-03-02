@@ -346,13 +346,13 @@ return {
           ripgrep = {
             module = "blink-ripgrep",
             name = "RG",
-            min_keyword_length = 3, -- same as `prefix_min_len`
-            max_items = 3,
-            score_offset = -5,
+            min_keyword_length = 4, -- same as `prefix_min_len`
+            max_items = 2,
+            score_offset = -10,
             ---@module "blink-ripgrep"
             ---@type blink-ripgrep.Options
             opts = {
-              prefix_min_len = 3, -- same as `min_keyword_length`
+              prefix_min_len = 4, -- same as `min_keyword_length`
               ignore_paths = { vim.uv.os_homedir() }, -- CPU usage
               -- search_casing = "--smart-case",
 
@@ -388,9 +388,9 @@ return {
           dictionary = {
             module = "blink-cmp-dictionary",
             name = "Dict",
-            min_keyword_length = 3,
-            max_items = 3,
-            score_offset = -10,
+            min_keyword_length = 4,
+            max_items = 2,
+            score_offset = -20,
             ---@module 'blink-cmp-dictionary'
             ---@type blink-cmp-dictionary.Options
             opts = {
@@ -419,8 +419,8 @@ return {
           spell = {
             module = "blink-cmp-spell",
             name = "Spell",
-            max_items = 3,
-            score_offset = -10,
+            max_items = 2,
+            score_offset = -20,
             opts = {
               -- only enable source in `@spell` captures, and disable it in `@nospell` captures
               enable_in_context = function()
@@ -472,9 +472,9 @@ return {
           env = {
             module = "blink-cmp-env",
             name = "Env",
-            min_keyword_length = 3,
-            max_items = 3,
-            score_offset = -10,
+            min_keyword_length = 4,
+            max_items = 2,
+            score_offset = -20,
           },
         },
       },
