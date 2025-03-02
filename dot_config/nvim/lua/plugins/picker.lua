@@ -178,6 +178,7 @@ return {
           grep = {
             actions = {
               filter_extension = function(picker)
+                local mode = vim.fn.mode()
                 local default = "*."
                 Snacks.input.input({
                   prompt = "Filter By Extension",
@@ -190,6 +191,9 @@ return {
                   if opts.glob ~= glob then
                     opts.glob = glob
                     picker:find()
+                  end
+                  if mode == "n" then
+                    vim.cmd.stopinsert()
                   end
                 end)
               end,

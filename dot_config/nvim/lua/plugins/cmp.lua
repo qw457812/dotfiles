@@ -4,6 +4,8 @@ local function has_words_before()
 end
 
 return {
+  -- nvim-cmp {{{
+
   -- use <tab> for completion and snippets (supertab)
   {
     "nvim-cmp",
@@ -41,6 +43,8 @@ return {
       })
     end,
   },
+
+  -- }}}
 
   {
     "saghen/blink.cmp",
@@ -81,6 +85,7 @@ return {
         -- Ensure that forced and not configurable `<Tab>` and `<S-Tab>`
         -- buffer-local mappings don't override already present ones
         local expand_orig = vim.snippet.expand
+        ---@diagnostic disable-next-line: duplicate-set-field
         vim.snippet.expand = function(...)
           local tab_map = vim.fn.maparg("<Tab>", "i", false, true)
           local stab_map = vim.fn.maparg("<S-Tab>", "i", false, true)
@@ -133,6 +138,22 @@ return {
           end
           return ret
         end,
+        mini_snippets_expand = function(cmp)
+          if not _G.MiniSnippets then
+            return
+          end
+          local function expand()
+            MiniSnippets.expand()
+            -- HACK: https://github.com/saghen/blink.cmp/blob/cf57b2a708d6b221ab857a8f44f8ca654c5f731c/lua/blink/cmp/config/snippets.lua#L29-L31
+            cmp.resubscribe()
+          end
+          if cmp.is_visible() then
+            cmp.cancel({ callback = expand })
+          else
+            vim.schedule(expand)
+          end
+          return true
+        end,
       }
 
       ---@type blink.cmp.Config
@@ -165,8 +186,10 @@ return {
           ["<CR>"] = { actions.accept, "fallback" },
           ["<C-n>"] = { actions.select_next, "show" },
           ["<C-p>"] = { actions.select_prev, "show" },
-          -- ["<C-j>"] = { actions.select_next, "fallback" }, -- conflicts with mini.snippets
-          -- ["<C-k>"] = { actions.select_prev, "fallback" },
+          ["<C-j>"] = { actions.select_next, actions.mini_snippets_expand, "fallback" },
+          ["<C-k>"] = { actions.select_prev, "fallback" }, -- TODO: conflicts with signatureHelp
+          ["<C-l>"] = { "snippet_forward", actions.mini_snippets_expand, "fallback" },
+          ["<C-h>"] = { "snippet_backward", "fallback" },
           -- ["<C-u>"] = { "scroll_documentation_up", "fallback" },
           -- ["<C-d>"] = { "scroll_documentation_down", "fallback" },
         },
@@ -203,6 +226,7 @@ return {
           providers = {
             path = {
               ---@type blink.cmp.PathOpts
+              ---@diagnostic disable-next-line: missing-fields
               opts = {
                 show_hidden_files_by_default = true,
               },
@@ -237,7 +261,7 @@ return {
   {
     "echasnovski/mini.snippets",
     optional = true,
-    opts = function()
+    opts = function(_, opts)
       LazyVim.cmp.actions.snippet_active = function()
         return MiniSnippets.session.get(false) ~= nil
       end
@@ -245,6 +269,14 @@ return {
       LazyVim.cmp.actions.snippet_stop = function()
         MiniSnippets.session.stop()
       end
+
+      return U.extend_tbl(opts, {
+        mappings = {
+          expand = "",
+          jump_next = "",
+          jump_prev = "",
+        },
+      })
     end,
   },
 
