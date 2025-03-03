@@ -196,6 +196,14 @@ return {
         cmdline = {
           enabled = true,
           keymap = {
+            ["<CR>"] = {
+              function(cmp)
+                if cmp.is_menu_visible() then
+                  return cmp.accept()
+                end
+              end,
+              "fallback",
+            },
             ["<Tab>"] = { "show_and_insert", "select_next" },
             ["<Right>"] = {
               function(cmp)
