@@ -1733,6 +1733,12 @@
            [:!Qv :!COSv]
            ]}
 
+  {:des   "RuijieWorkSpace: f11 -> ctrl + alt + delete"
+   :rules [:RuijieWorkSpace
+           [:f10 :!TOdelete_forward] ; unlock
+           ]}
+
+
   {:des   "Spotify: play navigation"
    :rules [:Spotify
            [:!Tj :!Cright_arrow] ; next

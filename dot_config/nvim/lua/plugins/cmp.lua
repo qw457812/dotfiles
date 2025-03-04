@@ -106,8 +106,10 @@ return {
       --   end,
       -- })
 
+      local H = {}
+
       ---@type table<string, blink.cmp.KeymapCommand>
-      local actions = {
+      H.actions = {
         accept = function(cmp)
           -- keep non-listed buffers non-listed to prevent them from showing up in bufferline.nvim
           -- e.g. command-line window, avante.nvim
@@ -156,13 +158,33 @@ return {
         end,
       }
 
+      ---@type table<string, blink.cmp.KeymapCommand>
+      H.cmdline_actions = {
+        is_selected_item_inserted = function(cmp)
+          local text_edit = cmp.get_selected_item().textEdit
+          if not text_edit then
+            return false
+          end
+          local line_before = vim.fn.getcmdline():sub(1, vim.fn.getcmdpos() - 1)
+          return line_before:match(vim.pesc(text_edit.newText) .. "$") ~= nil
+        end,
+        insert_or_select_next = function(cmp)
+          if H.cmdline_actions.is_selected_item_inserted(cmp) then
+            return cmp.select_next()
+          end
+          -- work-around for insert
+          cmp.select_next({ auto_insert = false })
+          return cmp.select_prev()
+        end,
+      }
+
       ---@type blink.cmp.Config
       local o = {
         -- copied from: https://github.com/AstroNvim/astrocommunity/blob/0e1cf1178a6c0b2bfbc1e5e0d4a3009911b07649/lua/astrocommunity/completion/blink-cmp/init.lua#L98
         keymap = {
           -- TODO: better coop with mini.snippets and signature_help
           ["<Tab>"] = {
-            actions.select_next,
+            H.actions.select_next,
             "snippet_forward",
             function(cmp)
               if has_words_before() then
@@ -171,7 +193,7 @@ return {
             end,
             "fallback",
           },
-          ["<S-Tab>"] = { actions.select_prev, "snippet_backward", "fallback" },
+          ["<S-Tab>"] = { H.actions.select_prev, "snippet_backward", "fallback" },
           -- -- https://github.com/y3owk1n/nix-system-config-v2/blob/ae72dd82a92894a1ca8c5ff4243e0208dfc33a5d/config/nvim/lua/plugins/blink-cmp.lua#L19
           -- ["<Esc>"] = {
           --   function(cmp)
@@ -183,12 +205,12 @@ return {
           --   end,
           --   "fallback",
           -- },
-          ["<CR>"] = { actions.accept, "fallback" },
-          ["<C-n>"] = { actions.select_next, "show" },
-          ["<C-p>"] = { actions.select_prev, "show" },
-          ["<C-j>"] = { actions.select_next, actions.mini_snippets_expand, "fallback" },
-          ["<C-k>"] = { actions.select_prev, "fallback" }, -- TODO: conflicts with signatureHelp
-          ["<C-l>"] = { "snippet_forward", actions.mini_snippets_expand, "fallback" },
+          ["<CR>"] = { H.actions.accept, "fallback" },
+          ["<C-n>"] = { H.actions.select_next, "show" },
+          ["<C-p>"] = { H.actions.select_prev, "show" },
+          ["<C-j>"] = { H.actions.select_next, H.actions.mini_snippets_expand, "fallback" },
+          ["<C-k>"] = { H.actions.select_prev, "fallback" }, -- TODO: conflicts with signatureHelp
+          ["<C-l>"] = { "snippet_forward", H.actions.mini_snippets_expand, "fallback" },
           ["<C-h>"] = { "snippet_backward", "fallback" },
           -- ["<C-u>"] = { "scroll_documentation_up", "fallback" },
           -- ["<C-d>"] = { "scroll_documentation_down", "fallback" },
@@ -198,13 +220,13 @@ return {
           keymap = {
             ["<CR>"] = {
               function(cmp)
-                if cmp.is_menu_visible() then
+                if cmp.is_menu_visible() and not H.cmdline_actions.is_selected_item_inserted(cmp) then
                   return cmp.accept()
                 end
               end,
               "fallback",
             },
-            ["<Tab>"] = { "show_and_insert", "select_next" },
+            ["<Tab>"] = { "show_and_insert", H.cmdline_actions.insert_or_select_next },
             ["<Right>"] = {
               function(cmp)
                 if cmp.is_ghost_text_visible() then
