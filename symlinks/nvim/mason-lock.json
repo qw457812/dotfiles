@@ -1,5 +1,5 @@
 {
-  "basedpyright": "1.28.0",
+  "basedpyright": "1.28.1",
   "bash-language-server": "5.4.3",
   "debugpy": "1.8.12",
   "docker-compose-language-service": "0.3.0",
@@ -19,7 +19,7 @@
   "markdownlint-cli2": "0.17.2",
   "marksman": "2024-12-18",
   "prettier": "3.5.2",
-  "ruff": "0.9.7",
+  "ruff": "0.9.9",
   "selene": "0.28.0",
   "shellcheck": "v0.10.0",
   "shfmt": "v3.10.0",
@@ -27,6 +27,6 @@
   "stylua": "v2.0.2",
   "taplo": "0.9.3",
   "vtsls": "0.2.8",
-  "vue-language-server": "2.2.4",
+  "vue-language-server": "2.2.8",
   "yaml-language-server": "1.16.0"
 }
