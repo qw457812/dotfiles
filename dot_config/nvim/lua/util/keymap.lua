@@ -164,6 +164,11 @@ function M.clear_ui_esc(opts)
     end
   end
 
+  -- -- TODO: esc becomes useless during LSP progress
+  -- local function is_lsp_progressing()
+  --   return vim.lsp.status() ~= ""
+  -- end
+
   local something_done = false
   local is_cmdwin = vim.fn.getcmdwintype() ~= ""
 
