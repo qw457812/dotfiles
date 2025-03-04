@@ -161,12 +161,17 @@ return {
       ---@type table<string, blink.cmp.KeymapCommand>
       H.cmdline_actions = {
         is_selected_item_inserted = function(cmp)
-          local text_edit = cmp.get_selected_item().textEdit
-          if not text_edit then
+          local item = cmp.get_selected_item()
+          if not item then
             return false
           end
           local line_before = vim.fn.getcmdline():sub(1, vim.fn.getcmdpos() - 1)
-          return line_before:match(vim.pesc(text_edit.newText) .. "$") ~= nil
+          -- alternate to `item.source_id == "buffer"`: vim.list_contains({ "/", "?" }, vim.fn.getcmdtype())
+          local item_text = item.source_id == "buffer" and item.insertText or (item.textEdit or {}).newText
+          if not item_text then
+            return false
+          end
+          return line_before:match(vim.pesc(item_text) .. "$") ~= nil
         end,
         insert_or_select_next = function(cmp)
           if H.cmdline_actions.is_selected_item_inserted(cmp) then
