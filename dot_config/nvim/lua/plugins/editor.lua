@@ -476,36 +476,36 @@ return {
           vim.schedule(function()
             vim.fn.setpos(".", pos)
           end)
-          return require("undo-glow").comment()
+          return require("undo-glow").comment({
+            animation = {
+              animation_type = "desaturate",
+            },
+          })
         end,
         mode = { "n", "x" },
         desc = "Toggle comment (undo-glow)",
         expr = true,
       },
-      -- {
-      --   "gc",
-      --   function()
-      --     require("undo-glow").comment_textobject()
-      --   end,
-      --   mode = "o",
-      --   desc = "Comment textobject (undo-glow)",
-      -- },
       {
         "gcc",
         function()
-          return require("undo-glow").comment_line()
+          return require("undo-glow").comment_line({
+            animation = {
+              animation_type = "desaturate",
+            },
+          })
         end,
         desc = "Toggle comment line (undo-glow)",
         expr = true,
       },
     },
     opts = function()
-      -- TodoBgPERF
       Snacks.util.set_hl({
         UgUndo = "Substitute",
         UgRedo = "FlashLabel",
         UgYank = "IncSearch",
         UgPaste = "Search",
+        UgSearch = "TodoBgPERF",
         UgComment = "LspReferenceText",
         UgCursor = "Visual",
       }, { default = true })
@@ -516,7 +516,7 @@ return {
         animation = {
           enabled = true,
           duration = 150,
-          animation_type = "desaturate",
+          animation_type = "zoom",
         },
       }
     end,
@@ -543,14 +543,14 @@ return {
           if not on_visual and event.visual then
             return
           end
-          vim.schedule(require("undo-glow").yank)
+          require("undo-glow").yank()
         end,
       })
+
       LazyVim.on_very_lazy(function()
         -- vim.api.nvim_create_autocmd("CursorMoved", {
         --   group = vim.api.nvim_create_augroup("undo_glow_highlight_cursor_moved", { clear = true }),
-        --   ---@param ev vim.api.create_autocmd.callback.args
-        --   callback = vim.schedule_wrap(function(ev)
+        --   callback = function(ev)
         --     if not vim.g.ug_ignore_cursor_moved then
         --       vim.g.ug_ignore_cursor_moved =
         --         Snacks.util.var(ev.buf, "user_ug_cursor_disable", vim.g.ug_ignore_cursor_moved)
@@ -561,12 +561,11 @@ return {
         --         animation_type = "slide",
         --       },
         --     })
-        --   end),
+        --   end,
         -- })
         vim.api.nvim_create_autocmd("WinEnter", {
           group = vim.api.nvim_create_augroup("undo_glow_highlight_win_enter", { clear = true }),
-          ---@param ev vim.api.create_autocmd.callback.args
-          callback = vim.schedule_wrap(function(ev)
+          callback = function(ev)
             local buf = ev.buf
             local win = vim.api.nvim_get_current_win()
             if
@@ -593,9 +592,22 @@ return {
               e_col = #line,
               force_edge = opts.force_edge ~= false,
             }))
-          end),
+          end,
         })
       end)
+
+      vim.api.nvim_create_autocmd("CmdLineLeave", {
+        group = vim.api.nvim_create_augroup("undo_glow_highlight_search", { clear = true }),
+        pattern = { "/", "?" },
+        callback = function()
+          require("undo-glow").search_cmd({
+            animation = {
+              duration = 200,
+              animation_type = "fade",
+            },
+          })
+        end,
+      })
     end,
   },
 

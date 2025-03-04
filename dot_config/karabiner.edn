@@ -1586,10 +1586,11 @@
   {:des   "left option alone -> tmux prefix"
    :rules [[:condi :!niz-x87-wired :!glove80]
            ;; [:left_option :left_option :!Terminals {:alone [:!!f18]}] ; left option alone -> hyper+f18 (iTerm2 Hotkey Window)
-           [:#Pleft_option :left_option [:!tmux-autostart-terminals :!VSCode :!Cursor] {:alone :open-default-terminal}]
+           [:#Pleft_option :left_option [:!tmux-autostart-terminals :!VSCode :!Cursor :!RuijieWorkSpace] {:alone :open-default-terminal}]
            [:#Pleft_option :left_option :tmux-autostart-terminals {:alone [:!Tb]}] ; tmux prefix
            [:#Pleft_option :left_option :VSCode {:alone [:!Tb]}] ; tmux prefix
            [:#Pleft_option :left_option :Cursor {:alone [:!Tb]}] ; tmux prefix
+           [:#Pleft_option :left_option :RuijieWorkSpace {:alone [:!Tb]}] ; tmux prefix
            ]}
 
   ;; TODO right_option -> hyper/super-hyper(hyper+fn)/translate
@@ -1833,10 +1834,11 @@
            [:##right_shift :right_command nil {:alone :escape}]
            [:!Qv :!COSv :WPSOffice] ; see "WPSOffice: paste without formatting" above
            [:!Qv [:left_command :!Sinsert] :CitrixViewer] ; for MTPuTTY, add left_command to prevent switching IME with cmd+shift
-           [:##left_option :left_option [:!tmux-autostart-terminals :!VSCode :!Cursor] {:alone :open-default-terminal}]
+           [:##left_option :left_option [:!tmux-autostart-terminals :!VSCode :!Cursor :!RuijieWorkSpace] {:alone :open-default-terminal}]
            [:##left_option :left_option :tmux-autostart-terminals {:alone [:!Tb]}] ; tmux prefix
            [:##left_option :left_option :VSCode {:alone [:!Tb]}] ; tmux prefix
            [:##left_option :left_option :Cursor {:alone [:!Tb]}] ; tmux prefix
+           [:##left_option :left_option :RuijieWorkSpace {:alone [:!Tb]}] ; tmux prefix
            [:##right_option :right_option nil {:alone [:hs ["mouseCenterClick"]]}]
            [:##up_arrow :down_arrow]
            [:##down_arrow :up_arrow]
