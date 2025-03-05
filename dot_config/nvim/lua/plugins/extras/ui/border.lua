@@ -176,4 +176,14 @@ return {
       },
     },
   },
+
+  {
+    "yarospace/lua-console.nvim",
+    optional = true,
+    opts = {
+      window = {
+        border = "rounded",
+      },
+    },
+  },
 }

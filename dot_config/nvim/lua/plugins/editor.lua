@@ -579,7 +579,7 @@ return {
 
             local opts = require("undo-glow.utils").merge_command_opts("UgCursor", {
               animation = {
-                duration = 500,
+                duration = 750,
                 animation_type = "slide",
               },
             })

@@ -162,7 +162,7 @@ return {
   {
     "xvzc/chezmoi.nvim",
     optional = true,
-    event = "LazyFile", -- for augroup: chezmoi_add
+    event = "VeryLazy", -- for augroup: chezmoi_add
     cmd = "ChezmoiEdit",
     keys = {
       { "<leader>sz", false },
@@ -175,37 +175,36 @@ return {
         group = vim.api.nvim_create_augroup("chezmoi_apply", { clear = true }),
         pattern = U.path.CHEZMOI .. "/*",
         desc = "chezmoi apply for source-path",
-        callback = function(event)
-          vim.schedule(function()
-            require("chezmoi.commands.__edit").watch(event.buf)
-          end)
-        end,
+        callback = vim.schedule_wrap(function(ev)
+          if vim.bo[ev.buf].buftype == "" then
+            require("chezmoi.commands.__edit").watch(ev.buf)
+          end
+        end),
       })
-    end,
-    opts = function()
       -- https://github.com/dsully/nvim/blob/a6a7a29707e5209c6bf14be0f178d3cd1141b5ff/lua/plugins/util.lua#L104
       -- https://github.com/amuuname/dotfiles/blob/462579dbf4e9452a22cc268a3cb244172d9142aa/dot_config/nvim/plugin/autocmd.lua#L52
-      vim.schedule(function()
+      LazyVim.on_very_lazy(vim.schedule_wrap(function()
         local ok, managed_files = pcall(chezmoi_list_files, { path_style_absolute = true })
-        if ok and not vim.tbl_isempty(managed_files) then
-          vim.api.nvim_create_autocmd("BufWritePost", {
-            group = vim.api.nvim_create_augroup("chezmoi_add", { clear = true }),
-            pattern = managed_files,
-            desc = "chezmoi add for target-path",
-            callback = U.debounce_wrap(500, function(event)
-              local res = vim.system({ "chezmoi", "add", event.file }, { text = true }):wait()
-              if res.code == 0 then
-                LazyVim.info("Successfully added", { title = "Chezmoi" })
-              else
-                LazyVim.error(
-                  ("Failed to add `%s`:\n%s"):format(U.path.home_to_tilde(event.file), res.stderr),
-                  { title = "Chezmoi" }
-                )
-              end
-            end),
-          })
+        if not ok or vim.tbl_isempty(managed_files) then
+          return
         end
-      end)
+        vim.api.nvim_create_autocmd("BufWritePost", {
+          group = vim.api.nvim_create_augroup("chezmoi_add", { clear = true }),
+          pattern = managed_files,
+          desc = "chezmoi add for target-path",
+          callback = U.debounce_wrap(500, function(event)
+            local res = vim.system({ "chezmoi", "add", event.file }, { text = true }):wait()
+            if res.code == 0 then
+              LazyVim.info("Successfully added", { title = "Chezmoi" })
+            else
+              LazyVim.error(
+                ("Failed to add `%s`:\n%s"):format(U.path.home_to_tilde(event.file), res.stderr),
+                { title = "Chezmoi" }
+              )
+            end
+          end),
+        })
+      end))
     end,
   },
 
