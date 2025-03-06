@@ -4,48 +4,6 @@ local function has_words_before()
 end
 
 return {
-  -- nvim-cmp {{{
-
-  -- use <tab> for completion and snippets (supertab)
-  {
-    "nvim-cmp",
-    optional = true,
-    ---@param opts cmp.ConfigSchema
-    opts = function(_, opts)
-      local cmp = require("cmp")
-
-      opts.mapping = vim.tbl_extend("force", opts.mapping, {
-        ["<Tab>"] = cmp.mapping(function(fallback)
-          if cmp.visible() then
-            -- You could replace select_next_item() with confirm({ select = true }) to get VS Code autocompletion behavior
-            cmp.select_next_item()
-          elseif vim.snippet.active({ direction = 1 }) then
-            vim.schedule(function()
-              vim.snippet.jump(1)
-            end)
-          elseif has_words_before() then
-            cmp.complete()
-          else
-            fallback()
-          end
-        end, { "i", "s" }),
-        ["<S-Tab>"] = cmp.mapping(function(fallback)
-          if cmp.visible() then
-            cmp.select_prev_item()
-          elseif vim.snippet.active({ direction = -1 }) then
-            vim.schedule(function()
-              vim.snippet.jump(-1)
-            end)
-          else
-            fallback()
-          end
-        end, { "i", "s" }),
-      })
-    end,
-  },
-
-  -- }}}
-
   {
     "saghen/blink.cmp",
     optional = true,
@@ -403,13 +361,13 @@ return {
           ripgrep = {
             module = "blink-ripgrep",
             name = "RG",
-            min_keyword_length = 4, -- same as `prefix_min_len`
+            min_keyword_length = 3, -- same as `prefix_min_len`
             max_items = 2,
             score_offset = -10,
             ---@module "blink-ripgrep"
             ---@type blink-ripgrep.Options
             opts = {
-              prefix_min_len = 4, -- same as `min_keyword_length`
+              prefix_min_len = 3, -- same as `min_keyword_length`
               ignore_paths = { vim.uv.os_homedir() }, -- CPU usage
               -- search_casing = "--smart-case",
 
@@ -418,6 +376,31 @@ return {
                 return path == LazyVim.root({ normalize = true })
               end,
               project_root_fallback = false,
+            },
+          },
+        },
+      },
+    },
+  },
+
+  {
+    "saghen/blink.cmp",
+    optional = true,
+    dependencies = "ribru17/blink-cmp-spell",
+    ---@type blink.cmp.Config
+    opts = {
+      sources = {
+        default = { "spell" },
+        providers = {
+          spell = {
+            module = "blink-cmp-spell",
+            name = "Spell",
+            min_keyword_length = 2,
+            max_items = 1,
+            score_offset = -10,
+            opts = {
+              preselect_current_word = false,
+              use_cmp_spell_sorting = true,
             },
           },
         },
@@ -445,8 +428,8 @@ return {
           dictionary = {
             module = "blink-cmp-dictionary",
             name = "Dict",
-            min_keyword_length = 4,
-            max_items = 2,
+            min_keyword_length = 3,
+            max_items = 1,
             score_offset = -20,
             ---@module 'blink-cmp-dictionary'
             ---@type blink-cmp-dictionary.Options
@@ -467,59 +450,6 @@ return {
   {
     "saghen/blink.cmp",
     optional = true,
-    dependencies = "ribru17/blink-cmp-spell",
-    ---@type blink.cmp.Config
-    opts = {
-      sources = {
-        default = { "spell" },
-        providers = {
-          spell = {
-            module = "blink-cmp-spell",
-            name = "Spell",
-            max_items = 2,
-            score_offset = -20,
-            opts = {
-              -- only enable source in `@spell` captures, and disable it in `@nospell` captures
-              enable_in_context = function()
-                local is_spell = false
-                for _, capture in ipairs(vim.treesitter.get_captures_at_cursor(0)) do
-                  if capture == "spell" then
-                    is_spell = true
-                  elseif capture == "nospell" then
-                    return false
-                  end
-                end
-                return is_spell
-              end,
-            },
-          },
-        },
-      },
-    },
-  },
-  {
-    "saghen/blink.cmp",
-    optional = true,
-    ---@param opts blink.cmp.Config
-    opts = function(_, opts)
-      local fuzzy_default = require("blink.cmp.config.fuzzy").default
-
-      opts.fuzzy = opts.fuzzy or {}
-      opts.fuzzy.sorts = {
-        function(a, b)
-          local sort = require("blink.cmp.fuzzy.sort")
-          if a.source_id == "spell" and b.source_id == "spell" then
-            return sort.label(a, b)
-          end
-        end,
-        unpack(opts.fuzzy.sorts or fuzzy_default.sorts),
-      }
-    end,
-  },
-
-  {
-    "saghen/blink.cmp",
-    optional = true,
     dependencies = "bydlw98/blink-cmp-env",
     ---@type blink.cmp.Config
     opts = {
@@ -529,45 +459,54 @@ return {
           env = {
             module = "blink-cmp-env",
             name = "Env",
-            min_keyword_length = 4,
-            max_items = 2,
-            score_offset = -20,
+            min_keyword_length = 3,
+            max_items = 3,
+            score_offset = -25,
           },
         },
       },
     },
   },
 
-  -- vim.fn.executable("gh") == 1
-  --     and {
-  --       "saghen/blink.cmp",
-  --       optional = true,
-  --       dependencies = "Kaiser-Yang/blink-cmp-git",
-  --       ---@type blink.cmp.Config
-  --       opts = {
-  --         sources = {
-  --           default = { "git" },
-  --           providers = {
-  --             git = {
-  --               module = "blink-cmp-git",
-  --               name = "Git",
-  --               score_offset = 100,
-  --               enabled = function()
-  --                 return Snacks.git.get_root() ~= nil
-  --               end,
-  --               should_show_items = function()
-  --                 return vim.list_contains({
-  --                   "gitcommit",
-  --                   -- "markdown",
-  --                 }, vim.bo.filetype)
-  --               end,
-  --               ---@module 'blink-cmp-git'
-  --               ---@type blink-cmp-git.Options
-  --               opts = {},
-  --             },
-  --           },
-  --         },
-  --       },
-  --     }
-  --   or nil,
+  -- nvim-cmp {{{
+
+  -- use <tab> for completion and snippets (supertab)
+  {
+    "nvim-cmp",
+    optional = true,
+    ---@param opts cmp.ConfigSchema
+    opts = function(_, opts)
+      local cmp = require("cmp")
+
+      opts.mapping = vim.tbl_extend("force", opts.mapping, {
+        ["<Tab>"] = cmp.mapping(function(fallback)
+          if cmp.visible() then
+            -- You could replace select_next_item() with confirm({ select = true }) to get VS Code autocompletion behavior
+            cmp.select_next_item()
+          elseif vim.snippet.active({ direction = 1 }) then
+            vim.schedule(function()
+              vim.snippet.jump(1)
+            end)
+          elseif has_words_before() then
+            cmp.complete()
+          else
+            fallback()
+          end
+        end, { "i", "s" }),
+        ["<S-Tab>"] = cmp.mapping(function(fallback)
+          if cmp.visible() then
+            cmp.select_prev_item()
+          elseif vim.snippet.active({ direction = -1 }) then
+            vim.schedule(function()
+              vim.snippet.jump(-1)
+            end)
+          else
+            fallback()
+          end
+        end, { "i", "s" }),
+      })
+    end,
+  },
+
+  -- }}}
 }
