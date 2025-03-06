@@ -1834,6 +1834,16 @@
            [:##right_shift :right_command nil {:alone :escape}]
            [:!Qv :!COSv :WPSOffice] ; see "WPSOffice: paste without formatting" above
            [:!Qv [:left_command :!Sinsert] :CitrixViewer] ; for MTPuTTY, add left_command to prevent switching IME with cmd+shift
+           ;; TODO: better way to cmd -> ctrl for RuijieWorkSpace
+           [:!Qc :!Tc :RuijieWorkSpace] ; copy
+           [:!Qv :!Tv :RuijieWorkSpace] ; paste
+           [:!Qx :!Tx :RuijieWorkSpace]
+           [:!Qa :!Ta :RuijieWorkSpace]
+           [:!Qz :!Tz :RuijieWorkSpace]
+           [:!Qw :!Tw :RuijieWorkSpace]
+           [:!Qs :!Ts :RuijieWorkSpace]
+           [:!Qf :!Tf :RuijieWorkSpace]
+           [:!Qr :!Tr :RuijieWorkSpace]
            [:##left_option :left_option [:!tmux-autostart-terminals :!VSCode :!Cursor :!RuijieWorkSpace] {:alone :open-default-terminal}]
            [:##left_option :left_option :tmux-autostart-terminals {:alone [:!Tb]}] ; tmux prefix
            [:##left_option :left_option :VSCode {:alone [:!Tb]}] ; tmux prefix
