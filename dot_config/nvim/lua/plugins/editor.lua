@@ -517,6 +517,7 @@ return {
           enabled = true,
           duration = 150,
           animation_type = "zoom",
+          window_scoped = true,
         },
       }
     end,
@@ -565,11 +566,12 @@ return {
         -- })
         vim.api.nvim_create_autocmd("WinEnter", {
           group = vim.api.nvim_create_augroup("undo_glow_highlight_win_enter", { clear = true }),
-          callback = function(ev)
+          callback = U.debounce_wrap(20, function(ev)
             local buf = ev.buf
             local win = vim.api.nvim_get_current_win()
             if
-              not vim.api.nvim_buf_is_loaded(buf)
+              not vim.api.nvim_buf_is_valid(buf)
+              or not vim.api.nvim_buf_is_loaded(buf)
               or vim.wo[win].previewwindow
               or vim.api.nvim_win_get_config(win).relative ~= ""
               or vim.bo[buf].buftype ~= ""
@@ -579,7 +581,7 @@ return {
 
             local opts = require("undo-glow.utils").merge_command_opts("UgCursor", {
               animation = {
-                duration = 750,
+                duration = 500,
                 animation_type = "slide",
               },
             })
@@ -592,7 +594,7 @@ return {
               e_col = #line,
               force_edge = opts.force_edge ~= false,
             }))
-          end,
+          end),
         })
       end)
 
