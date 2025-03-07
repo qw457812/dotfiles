@@ -17,7 +17,7 @@ return {
     },
     keys = {
       {
-        "<leader>'",
+        "<leader>-",
         function()
           local dir_icon, dir_icon_hl = require("mini.icons").get("default", "directory")
           require("telescope").extensions.file_browser.file_browser({
