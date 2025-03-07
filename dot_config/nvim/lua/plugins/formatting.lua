@@ -1,4 +1,16 @@
 return {
+  -- {
+  --   "stevearc/conform.nvim",
+  --   optional = true,
+  --   ---@module "conform"
+  --   ---@type conform.setupOpts
+  --   opts = {
+  --     default_format_opts = {
+  --       timeout_ms = 30000, -- sqlfluff
+  --     },
+  --   },
+  -- },
+
   {
     "echasnovski/mini.align",
     vscode = true,
