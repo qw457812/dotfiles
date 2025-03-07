@@ -3,7 +3,7 @@ return {
     "yarospace/lua-console.nvim",
     keys = {
       {
-        "<leader>[",
+        "<leader>'",
         function()
           local foldcolumn = vim.o.foldcolumn
           require("lua-console").toggle_console()
@@ -11,15 +11,14 @@ return {
             vim.wo[Lua_console.win].foldcolumn = foldcolumn
           end
         end,
-        desc = "Toggle Lua console",
+        desc = "Toggle Lua Console",
       },
-      { "<leader>]", desc = "Attach Lua console to buffer" },
     },
     opts = {
       mappings = {
-        toggle = false, -- "<leader>["
-        attach = "<leader>]",
-        clear = "<localleader>c",
+        toggle = false,
+        attach = false,
+        kill_ps = false,
         messages = "<localleader>m",
         save = "<localleader>s",
         load = "<localleader>l",
