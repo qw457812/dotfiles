@@ -2,6 +2,7 @@ local H = {}
 
 ---Check if cursor is in range
 ---copied from: https://github.com/Bekaboo/dropbar.nvim/blob/5439d2f02bb744cecb878aaa23c6c6f8b21a351c/lua/dropbar/sources/lsp.lua#L97-L115
+---@module 'dropbar'
 ---@param cursor integer[] cursor position (line, character); (1, 0)-based
 ---@param range lsp_range_t 0-based range
 ---@return boolean
@@ -123,7 +124,6 @@ return {
         { "gk", function() return vim.lsp.buf.hover() end, desc = "Hover", has = "hover" },
         -- { "<c-k>", mode = "i", false }, -- <c-k> for cmp navigation
         -- { "<c-h>", function() return vim.lsp.buf.signature_help() end, mode = "i", desc = "Signature Help", has = "signatureHelp" }, -- conflicts with mini.snippets
-        -- { "gd", H.pick_definitions_or_references, desc = "Goto Definition/References", has = "definition" },
         {
           "<cr>",
           H.pick_definitions_or_references,
