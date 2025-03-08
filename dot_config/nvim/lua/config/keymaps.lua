@@ -139,9 +139,9 @@ map("n", "<leader>bA", function() Snacks.bufdelete.all() end, { desc = "Delete A
 
 -- windows
 map("n", "vv", "<C-w>v", { desc = "Split Window Right", remap = true }) -- "<C-w>v<cmd>e #<cr>"
--- map("n", "vs", "<C-w>s", { desc = "Split Window Below", remap = true }) -- conflict with flash.nvim
--- map("n", "vd", "<C-w>c", { desc = "Delete Window", remap = true })
--- map("n", "vo", "<C-w>o", { desc = "Delete Other Windows", remap = true })
+map("n", "vs", "<C-w>s", { desc = "Split Window Below", remap = true }) -- conflict with flash.nvim
+map("n", "vd", "<C-w>c", { desc = "Delete Window", remap = true })
+map("n", "vo", "<C-w>o", { desc = "Delete Other Windows", remap = true })
 map("n", "<leader>_", "<C-w>v", { desc = "Split Window Right", remap = true })
 
 -- tabs

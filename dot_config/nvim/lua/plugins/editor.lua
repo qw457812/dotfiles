@@ -429,6 +429,7 @@ return {
     },
     event = {
       "TextYankPost",
+      "CmdLineLeave",
       "VeryLazy", -- for cursor_moved
     },
     keys = {
@@ -544,7 +545,20 @@ return {
           if not on_visual and event.visual then
             return
           end
-          require("undo-glow").yank()
+          vim.schedule(require("undo-glow").yank)
+        end,
+      })
+
+      vim.api.nvim_create_autocmd("CmdLineLeave", {
+        group = vim.api.nvim_create_augroup("undo_glow_highlight_search", { clear = true }),
+        pattern = { "/", "?" },
+        callback = function()
+          require("undo-glow").search_cmd({
+            animation = {
+              duration = 200,
+              animation_type = "fade",
+            },
+          })
         end,
       })
 
@@ -597,19 +611,6 @@ return {
           end),
         })
       end)
-
-      vim.api.nvim_create_autocmd("CmdLineLeave", {
-        group = vim.api.nvim_create_augroup("undo_glow_highlight_search", { clear = true }),
-        pattern = { "/", "?" },
-        callback = function()
-          require("undo-glow").search_cmd({
-            animation = {
-              duration = 200,
-              animation_type = "fade",
-            },
-          })
-        end,
-      })
     end,
   },
 
