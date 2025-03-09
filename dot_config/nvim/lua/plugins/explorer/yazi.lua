@@ -69,11 +69,11 @@ return {
         },
       }
     end,
-    -- use lazy.nvim instead of `ya pack` package manager
+    -- use lazy.nvim instead of `ya pack` as package manager
     specs = {
       {
         "yazi-rs/flavors",
-        name = "yazi-rs-flavors",
+        name = "yazi-flavors",
         lazy = true,
         build = function(plugin)
           require("yazi.plugin").build_flavor(plugin, { sub_dir = "catppuccin-frappe.yazi" })
@@ -81,13 +81,14 @@ return {
       },
       {
         "yazi-rs/plugins",
-        name = "yazi-rs-plugins",
+        name = "yazi-plugins",
         lazy = true,
         build = function(plugin)
           local sub_dirs = {
             "smart-enter.yazi",
             "full-border.yazi",
             "git.yazi",
+            "vcs-files.yazi",
             "smart-filter.yazi",
             "diff.yazi",
             "mount.yazi",
