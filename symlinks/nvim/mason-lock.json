@@ -19,7 +19,7 @@
   "markdownlint-cli2": "0.17.2",
   "marksman": "2024-12-18",
   "prettier": "3.5.3",
-  "ruff": "0.9.9",
+  "ruff": "0.9.10",
   "selene": "0.28.0",
   "shellcheck": "v0.10.0",
   "shfmt": "v3.11.0",
