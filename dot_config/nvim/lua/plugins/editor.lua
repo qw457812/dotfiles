@@ -580,7 +580,7 @@ return {
         --     })
         --   end,
         -- })
-        vim.api.nvim_create_autocmd("WinEnter", {
+        vim.api.nvim_create_autocmd({ "WinEnter", "FocusGained" }, {
           group = vim.api.nvim_create_augroup("undo_glow_highlight_win_enter", { clear = true }),
           callback = U.debounce_wrap(20, function(ev)
             -- copied from: https://github.com/y3owk1n/undo-glow.nvim/blob/41010d31181d75123c87916a25e4796e0e7c20f8/lua/undo-glow/commands.lua#L212-L268
