@@ -127,19 +127,8 @@ return {
       local opts_mappings = LazyVim.opts("avante.nvim").mappings or {}
       local mappings = {
         { mapping_disabled_prefix, "", desc = "+disabled" },
-        {
-          opts_mappings.ask or "<leader>aa",
-          function()
-            require("avante.api").ask()
-            local sidebar = require("avante").get()
-            if sidebar and sidebar:is_open() then
-              sidebar:focus_input()
-            end
-          end,
-          desc = "Ask (Avante)",
-          mode = { "n", "v" },
-        },
         -- stylua: ignore start
+        { opts_mappings.ask or "<leader>aa", function() require("avante.api").ask() end, desc = "Ask (Avante)", mode = { "n", "v" } },
         { opts_mappings.edit or "<leader>ae", function() require("avante.api").edit() end, desc = "Edit (Avante)", mode = "v" },
         { opts_mappings.refresh or "<leader>ar", function() require("avante.api").refresh() end, desc = "Refresh (Avante)" },
         { opts_mappings.focus or "<leader>af", function() require("avante.api").focus() end, desc = "Focus (Avante)" },
@@ -181,6 +170,9 @@ return {
           switch_windows = "<A-Down>",
           reverse_switch_windows = "<A-Up>",
           close = { "q" },
+          close_from_input = {
+            insert = "<C-c>",
+          },
         },
         files = {
           add_current = "<leader>af",
@@ -204,6 +196,7 @@ return {
           __inherited_from = "copilot",
           -- https://github.com/CopilotC-Nvim/CopilotChat.nvim#models
           model = "claude-3.7-sonnet",
+          max_tokens = 8192,
         },
         ---@type AvanteSupportedProvider
         ---@diagnostic disable-next-line: missing-fields

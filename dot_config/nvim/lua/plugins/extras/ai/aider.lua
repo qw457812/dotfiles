@@ -4,59 +4,7 @@ return {
   {
     "GeorgesAlkhouri/nvim-aider",
     enabled = vim.fn.executable("aider") == 1,
-    dependencies = {
-      "folke/snacks.nvim",
-      {
-        "nvim-neo-tree/neo-tree.nvim",
-        optional = true,
-        opts = {
-          filesystem = {
-            commands = {
-              -- copied from: https://github.com/GeorgesAlkhouri/nvim-aider/blob/3554ffdd7f0f91167f83ab3e3475ba08a090061f/lua/nvim_aider/neo_tree.lua#L64-L97
-              -- the `require("nvim_aider.neo_tree").setup(opts)` way breaks the lazy loading of both nvim-aider and neo-tree.nvim
-              nvim_aider_add = function(state)
-                local node = state.tree:get_node()
-                require("nvim_aider.terminal").command(require("nvim_aider.commands").add.value, node.path)
-              end,
-              nvim_aider_add_visual = function(_, selected_nodes)
-                local nodeNames = {}
-                for _, node in pairs(selected_nodes) do
-                  table.insert(nodeNames, node.path)
-                end
-                if #nodeNames > 0 then
-                  require("nvim_aider.terminal").command(
-                    require("nvim_aider.commands").add.value,
-                    table.concat(nodeNames, " ")
-                  )
-                end
-              end,
-              nvim_aider_drop = function(state)
-                local node = state.tree:get_node()
-                require("nvim_aider.terminal").command(require("nvim_aider.commands").drop.value, node.path)
-              end,
-              nvim_aider_drop_visual = function(_, selected_nodes)
-                local nodeNames = {}
-                for _, node in pairs(selected_nodes) do
-                  table.insert(nodeNames, node.path)
-                end
-                if #nodeNames > 0 then
-                  require("nvim_aider.terminal").command(
-                    require("nvim_aider.commands").drop.value,
-                    table.concat(nodeNames, " ")
-                  )
-                end
-              end,
-            },
-            window = {
-              mappings = {
-                ["+"] = { "nvim_aider_add", desc = "add to aider" },
-                ["-"] = { "nvim_aider_drop", desc = "drop from aider" },
-              },
-            },
-          },
-        },
-      },
-    },
+    dependencies = "folke/snacks.nvim",
     cmd = "AiderTerminalToggle",
     keys = {
       { toggle_key, "<cmd>AiderTerminalToggle<cr>", desc = "Open Terminal (Aider)" },
@@ -117,5 +65,56 @@ return {
         },
       }
     end,
+  },
+
+  {
+    "nvim-neo-tree/neo-tree.nvim",
+    optional = true,
+    opts = {
+      filesystem = {
+        commands = {
+          -- copied from: https://github.com/GeorgesAlkhouri/nvim-aider/blob/3554ffdd7f0f91167f83ab3e3475ba08a090061f/lua/nvim_aider/neo_tree.lua#L64-L97
+          -- the `require("nvim_aider.neo_tree").setup(opts)` way breaks the lazy loading of both nvim-aider and neo-tree.nvim
+          nvim_aider_add = function(state)
+            local node = state.tree:get_node()
+            require("nvim_aider.terminal").command(require("nvim_aider.commands").add.value, node.path)
+          end,
+          nvim_aider_add_visual = function(_, selected_nodes)
+            local nodeNames = {}
+            for _, node in pairs(selected_nodes) do
+              table.insert(nodeNames, node.path)
+            end
+            if #nodeNames > 0 then
+              require("nvim_aider.terminal").command(
+                require("nvim_aider.commands").add.value,
+                table.concat(nodeNames, " ")
+              )
+            end
+          end,
+          nvim_aider_drop = function(state)
+            local node = state.tree:get_node()
+            require("nvim_aider.terminal").command(require("nvim_aider.commands").drop.value, node.path)
+          end,
+          nvim_aider_drop_visual = function(_, selected_nodes)
+            local nodeNames = {}
+            for _, node in pairs(selected_nodes) do
+              table.insert(nodeNames, node.path)
+            end
+            if #nodeNames > 0 then
+              require("nvim_aider.terminal").command(
+                require("nvim_aider.commands").drop.value,
+                table.concat(nodeNames, " ")
+              )
+            end
+          end,
+        },
+        window = {
+          mappings = {
+            ["+"] = { "nvim_aider_add", desc = "add to aider" },
+            ["-"] = { "nvim_aider_drop", desc = "drop from aider" },
+          },
+        },
+      },
+    },
   },
 }
