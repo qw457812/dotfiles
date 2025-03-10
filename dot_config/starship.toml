@@ -6,6 +6,15 @@ style = "dimmed blue"
 format = "[$output]($style)"
 shell = ["bash"]
 
+# https://github.com/Sonico98/yazi-prompt.sh#starship
+[custom.yazi]
+command = """ [[ "$YAZI_LEVEL" == "1" ]] && echo "" || echo "$YAZI_LEVEL" """
+symbol = "󰇥"
+when = """ test -n "$YAZI_LEVEL" """
+style = "bright-yellow"
+format = "[$symbol $output ]($style)"
+shell = ["bash"]
+
 # [custom.neovim]
 # command = 'bob ls | rg Used | awk "{print \$2}"' # shows output of command
 # detect_folders = ["lua"]
