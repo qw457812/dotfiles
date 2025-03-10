@@ -26,10 +26,12 @@ defaults write NSGlobalDomain InitialKeyRepeat -int 12
 # defaults read NSGlobalDomain AppleKeyboardUIMode ---> 1
 defaults write NSGlobalDomain AppleKeyboardUIMode -int 3
 
-# https://wiki.nikiv.dev/macOS/#code
-# Remove dock animation. https://www.reddit.com/r/apple/comments/6xg9xq/tip_of_the_day_one_thing_i_cant_live_without_in/
-defaults write com.apple.dock autohide-delay -int 0
-defaults write com.apple.dock autohide-time-modifier -float 0.4
+# # Remove the auto-hiding Dock delay. https://wiki.nikiv.dev/macOS/#code
+# defaults write com.apple.dock autohide-delay -float 0
+# Permanently Hide Dock
+defaults write com.apple.dock autohide-delay -float 9999
+# Remove the animation when hiding/showing the Dock
+defaults write com.apple.dock autohide-time-modifier -float 0
 killall Dock
 
 # https://stackoverflow.com/questions/77248249/disable-macos-sonoma-text-insertion-point-cursor-caps-lock-indicator
