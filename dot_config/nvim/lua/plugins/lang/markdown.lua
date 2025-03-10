@@ -36,28 +36,7 @@ return {
         border = vim.g.user_transparent_background and "none" or nil,
         inline_pad = 1,
       },
-    },
-  },
-  {
-    "nvim-cmp",
-    optional = true,
-    opts = function(_, opts)
-      table.insert(opts.sources, { name = "render-markdown" })
-    end,
-  },
-  {
-    "saghen/blink.cmp",
-    optional = true,
-    opts = {
-      sources = {
-        default = { "markdown" },
-        providers = {
-          markdown = {
-            name = "RenderMarkdown",
-            module = "render-markdown.integ.blink",
-          },
-        },
-      },
+      completions = { lsp = { enabled = true } },
     },
   },
 
