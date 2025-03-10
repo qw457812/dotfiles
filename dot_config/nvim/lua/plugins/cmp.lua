@@ -98,6 +98,28 @@ return {
           end
           return ret
         end,
+        -- https://github.com/folke/snacks.nvim/blob/78f0ad6ce7283b0e2d6ac2b9b82ac731c7c30b93/lua/snacks/input.lua#L195-L209
+        pum_next = function()
+          if vim.fn.pumvisible() == 0 then
+            return
+          end
+          vim.api.nvim_feedkeys(vim.keycode("<C-n>"), "n", false)
+          return true
+        end,
+        pum_prev = function()
+          if vim.fn.pumvisible() == 0 then
+            return
+          end
+          vim.api.nvim_feedkeys(vim.keycode("<C-p>"), "n", false)
+          return true
+        end,
+        pum_accept = function()
+          if vim.fn.pumvisible() == 0 then
+            return
+          end
+          vim.api.nvim_feedkeys(vim.keycode("<C-y>"), "n", false)
+          return true
+        end,
         mini_snippets_expand = function(cmp)
           if not _G.MiniSnippets then
             return
@@ -149,6 +171,7 @@ return {
           ["<Tab>"] = {
             H.actions.select_next,
             "snippet_forward",
+            H.actions.pum_next,
             function(cmp)
               if has_words_before() then
                 return cmp.show()
@@ -156,7 +179,7 @@ return {
             end,
             "fallback",
           },
-          ["<S-Tab>"] = { H.actions.select_prev, "snippet_backward", "fallback" },
+          ["<S-Tab>"] = { H.actions.select_prev, "snippet_backward", H.actions.pum_prev, "fallback" },
           -- -- https://github.com/y3owk1n/nix-system-config-v2/blob/ae72dd82a92894a1ca8c5ff4243e0208dfc33a5d/config/nvim/lua/plugins/blink-cmp.lua#L19
           -- ["<Esc>"] = {
           --   function(cmp)
@@ -168,11 +191,11 @@ return {
           --   end,
           --   "fallback",
           -- },
-          ["<CR>"] = { H.actions.accept, "fallback" },
+          ["<CR>"] = { H.actions.accept, H.actions.pum_accept, "fallback" },
           ["<C-n>"] = { H.actions.select_next, "show" },
           ["<C-p>"] = { H.actions.select_prev, "show" },
-          ["<C-j>"] = { H.actions.select_next, H.actions.mini_snippets_expand, "fallback" },
-          ["<C-k>"] = { H.actions.select_prev, "fallback" }, -- TODO: conflicts with signatureHelp
+          ["<C-j>"] = { H.actions.select_next, H.actions.pum_next, H.actions.mini_snippets_expand, "fallback" },
+          ["<C-k>"] = { H.actions.select_prev, H.actions.pum_prev, "fallback" }, -- TODO: conflicts with signatureHelp
           ["<C-l>"] = { "snippet_forward", H.actions.mini_snippets_expand, "fallback" },
           ["<C-h>"] = { "snippet_backward", "fallback" },
           -- ["<C-u>"] = { "scroll_documentation_up", "fallback" },
