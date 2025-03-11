@@ -328,6 +328,76 @@ return {
   },
 
   {
+    "ThePrimeagen/refactoring.nvim",
+    optional = true,
+    keys = {
+      {
+        "<leader>ri",
+        function()
+          return require("refactoring").refactor("Inline Variable")
+        end,
+        mode = { "n", "v" },
+        desc = "Inline Variable",
+        expr = true,
+      },
+      {
+        "<leader>rI",
+        function()
+          return require("refactoring").refactor("Inline Function")
+        end,
+        mode = { "n", "v" },
+        desc = "Inline Function",
+        expr = true,
+      },
+      {
+        "<leader>rb",
+        function()
+          return require("refactoring").refactor("Extract Block")
+        end,
+        mode = { "n", "v" },
+        desc = "Extract Block",
+        expr = true,
+      },
+      {
+        "<leader>rB",
+        function()
+          return require("refactoring").refactor("Extract Block To File")
+        end,
+        mode = { "n", "v" },
+        desc = "Extract Block To File",
+        expr = true,
+      },
+      {
+        "<leader>rf",
+        function()
+          return require("refactoring").refactor("Extract Function")
+        end,
+        mode = { "n", "v" },
+        desc = "Extract Function",
+        expr = true,
+      },
+      {
+        "<leader>rF",
+        function()
+          return require("refactoring").refactor("Extract Function To File")
+        end,
+        mode = { "n", "v" },
+        desc = "Extract Function To File",
+        expr = true,
+      },
+      {
+        "<leader>rx",
+        function()
+          return require("refactoring").refactor("Extract Variable")
+        end,
+        mode = { "n", "v" },
+        desc = "Extract Variable",
+        expr = true,
+      },
+    },
+  },
+
+  {
     "ThePrimeagen/harpoon",
     optional = true,
     dependencies = { "nvim-telescope/telescope.nvim", optional = true },

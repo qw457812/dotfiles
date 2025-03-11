@@ -171,6 +171,7 @@ return {
           reverse_switch_windows = "<A-Up>",
           close = { "q" },
           close_from_input = {
+            normal = "<Esc>",
             insert = "<C-c>",
           },
         },

@@ -64,6 +64,7 @@ return {
       end
       return vim.list_extend(keys, mappings)
     end,
+    ---@param opts neotree.Config
     opts = function(_, opts)
       local hijack_netrw = vim.g.user_hijack_netrw == "neo-tree.nvim"
       local last_root ---@type string?
@@ -335,6 +336,9 @@ return {
       end
 
       -- }}}
+
+      -- https://github.com/LazyVim/LazyVim/pull/5763
+      table.insert(opts.open_files_do_not_replace_types, "edgy")
 
       return vim.tbl_deep_extend("force", opts, {
         sources = { "filesystem" },
