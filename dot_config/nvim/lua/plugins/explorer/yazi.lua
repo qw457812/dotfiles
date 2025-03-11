@@ -100,7 +100,6 @@ return {
       },
       { "Rolv-Apneseth/starship.yazi", lazy = true, build = H.build_plugin },
       { "dedukun/bookmarks.yazi", lazy = true, build = H.build_plugin },
-      { "orhnk/system-clipboard.yazi", lazy = true, build = H.build_plugin },
     },
   },
 }
