@@ -12,7 +12,7 @@ return {
       if vim.fn.executable("mise") == 0 then
         return
       end
-      table.insert(opts.cmd, "--java-executable=" .. vim.fn.expand("$HOME/.local/share/mise/installs/java/21/bin/java"))
+      table.insert(opts.cmd, "--java-executable=" .. vim.fn.expand("$HOME/.local/share/mise/installs/java/23/bin/java"))
     end,
   },
   -- for scala projects using JDK version older than 17
@@ -23,7 +23,7 @@ return {
         return
       end
       -- see: https://github.com/scalameta/nvim-metals/issues/380
-      vim.env.JAVA_HOME = vim.fn.expand("$HOME/.local/share/mise/installs/java/21")
+      vim.env.JAVA_HOME = vim.fn.expand("$HOME/.local/share/mise/installs/java/23")
       -- return U.extend_tbl(opts, {
       --   servers = {
       --     metals = {
