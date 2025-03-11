@@ -111,7 +111,6 @@
   "snacks.nvim": { "branch": "main", "commit": "bc0630e43be5699bb94dadc302c0d21615421d93" },
   "sqlite.lua": { "branch": "master", "commit": "b487fcc8937b683942a1f7d9662fcf50ca5acd58" },
   "starship.yazi": { "branch": "main", "commit": "6c639b474aabb17f5fecce18a4c97bf90b016512" },
-  "system-clipboard.yazi": { "branch": "master", "commit": "7775a80e8d3391e0b3da19ba143196960a4efc48" },
   "text-case.nvim": { "branch": "main", "commit": "e898cfd46fa6cde0e83abb624a16e67d2ffc6457" },
   "tiny-inline-diagnostic.nvim": { "branch": "main", "commit": "de01d4c9cd032d4dac69bf64d5a184fbe62e1fd1" },
   "todo-comments.nvim": { "branch": "main", "commit": "304a8d204ee787d2544d8bc23cd38d2f929e7cc5" },
