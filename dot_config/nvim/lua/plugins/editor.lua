@@ -2,6 +2,7 @@ return {
   {
     "MagicDuck/grug-far.nvim",
     optional = true,
+    cmd = "GrugFarWithin",
     keys = {
       {
         "<leader>sF",
@@ -19,6 +20,23 @@ return {
           })
         end,
         desc = "Search and Replace in Current File",
+      },
+      -- { "<leader>ss", mode = "x", ":'<,'>GrugFarWithin<CR>", desc = "Search and Replace Within Range" },
+      {
+        "<leader>ss",
+        mode = "x",
+        function()
+          if vim.fn.mode() == vim.keycode("<C-v>") then
+            vim.api.nvim_feedkeys(vim.keycode([[<Esc>:'<,'>GrugFarWithin<CR>]]), "n", false)
+          else
+            -- not working for <C-v>
+            require("grug-far").open({
+              visualSelectionUsage = "operate-within-range",
+              minSearchChars = 1,
+            })
+          end
+        end,
+        desc = "Search and Replace Within Range",
       },
     },
     opts = function(_, opts)
