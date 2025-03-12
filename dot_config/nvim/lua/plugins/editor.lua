@@ -27,7 +27,8 @@ return {
         mode = "x",
         function()
           if vim.fn.mode() == vim.keycode("<C-v>") then
-            vim.api.nvim_feedkeys(vim.keycode([[<Esc>:'<,'>GrugFarWithin<CR>]]), "n", false)
+            -- vim.api.nvim_feedkeys(vim.keycode([[<Esc>:'<,'>GrugFarWithin<CR>]]), "n", false)
+            vim.api.nvim_feedkeys(vim.keycode([[:GrugFarWithin<CR>]]), "n", false)
           else
             -- not working for <C-v>
             require("grug-far").open({
@@ -348,70 +349,24 @@ return {
   {
     "ThePrimeagen/refactoring.nvim",
     optional = true,
+    -- stylua: ignore
     keys = {
-      {
-        "<leader>ri",
-        function()
-          return require("refactoring").refactor("Inline Variable")
-        end,
-        mode = { "n", "v" },
-        desc = "Inline Variable",
-        expr = true,
-      },
-      {
-        "<leader>rI",
-        function()
-          return require("refactoring").refactor("Inline Function")
-        end,
-        mode = { "n", "v" },
-        desc = "Inline Function",
-        expr = true,
-      },
-      {
-        "<leader>rb",
-        function()
-          return require("refactoring").refactor("Extract Block")
-        end,
-        mode = { "n", "v" },
-        desc = "Extract Block",
-        expr = true,
-      },
-      {
-        "<leader>rB",
-        function()
-          return require("refactoring").refactor("Extract Block To File")
-        end,
-        mode = { "n", "v" },
-        desc = "Extract Block To File",
-        expr = true,
-      },
-      {
-        "<leader>rf",
-        function()
-          return require("refactoring").refactor("Extract Function")
-        end,
-        mode = { "n", "v" },
-        desc = "Extract Function",
-        expr = true,
-      },
-      {
-        "<leader>rF",
-        function()
-          return require("refactoring").refactor("Extract Function To File")
-        end,
-        mode = { "n", "v" },
-        desc = "Extract Function To File",
-        expr = true,
-      },
-      {
-        "<leader>rx",
-        function()
-          return require("refactoring").refactor("Extract Variable")
-        end,
-        mode = { "n", "v" },
-        desc = "Extract Variable",
-        expr = true,
-      },
+      {"<leader>rx", function() return require("refactoring").refactor("Extract Variable") end, mode = {"n", "v"}, desc = "Extract Variable", expr = true},
+      {"<leader>ri", function() return require("refactoring").refactor("Inline Variable") end, mode = {"n", "v"}, desc = "Inline Variable", expr = true},
+      {"<leader>rI", function() return require("refactoring").refactor("Inline Function") end, mode = {"n", "v"}, desc = "Inline Function", expr = true},
+      {"<leader>rf", function() return require("refactoring").refactor("Extract Function") end, mode = {"n", "v"}, desc = "Extract Function", expr = true},
+      {"<leader>rF", function() return require("refactoring").refactor("Extract Function To File") end, mode = {"n", "v"}, desc = "Extract Function To File", expr = true},
+      {"<leader>rb", function() return require("refactoring").refactor("Extract Block") end, mode = {"n", "v"}, desc = "Extract Block", expr = true},
+      {"<leader>rB", function() return require("refactoring").refactor("Extract Block To File") end, mode = {"n", "v"}, desc = "Extract Block To File", expr = true},
+      {"<leader>rP", false},
+      {"<leader>rp", false},
+      {"<leader>rc", false},
+      {"<leader>rp", false, mode = "v"},
+      {"<leader>rd", "", desc = "+debug", mode = {"n", "v"}},
+      {"<leader>rdd", function() require("refactoring").debug.print_var({}) end, desc = "Debug Print Variable", mode = {"n", "v"}},
+      {"<leader>rd<space>", function() require("refactoring").debug.cleanup({}) end, desc = "Debug Cleanup"},
+      {"<leader>rdp", function() require("refactoring").debug.printf({below = true}) end, desc = "Debug Print Below"},
+      {"<leader>rdP", function() require("refactoring").debug.printf({below = false}) end, desc = "Debug Print Above"},
     },
   },
 
