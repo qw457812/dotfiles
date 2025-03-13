@@ -123,6 +123,7 @@ return {
         ft = U.markdown.render_markdown_ft("Avante"),
       },
     },
+    cmd = "AvanteModels",
     keys = function(_, keys)
       local opts_mappings = LazyVim.opts("avante.nvim").mappings or {}
       local mappings = {
