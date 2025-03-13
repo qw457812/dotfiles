@@ -351,6 +351,8 @@ return {
     optional = true,
     -- stylua: ignore
     keys = {
+      {"<leader>rs", false, mode = "v"},
+      {"<leader>rr", function() require('refactoring').select_refactor() end, mode = {"n", "v"}, desc = "Refactor"},
       {"<leader>rx", function() return require("refactoring").refactor("Extract Variable") end, mode = {"n", "v"}, desc = "Extract Variable", expr = true},
       {"<leader>ri", function() return require("refactoring").refactor("Inline Variable") end, mode = {"n", "v"}, desc = "Inline Variable", expr = true},
       {"<leader>rI", function() return require("refactoring").refactor("Inline Function") end, mode = {"n", "v"}, desc = "Inline Function", expr = true},

@@ -68,7 +68,7 @@
              ;; problem: can switch to Finder.app's closed window
              ; :prev_app                {:shell "/opt/homebrew/bin/yabai -m window --focus recent || open -g hammerspoon://cmdTab"}
              :prev_app                {:shell "open -g hammerspoon://prevApp"}
-             :open-default-terminal   {:shell "open /Applications/WezTerm.app"} ; Alacritty.app, kitty.app, WezTerm.app
+             :open-default-terminal   {:shell "open /Applications/kitty.app"} ; kitty.app, WezTerm.app
              :open-default-browser    {:shell "open \"/Applications/Brave Browser.app\""} ; Brave Browser.app, Google Chrome.app
              :home_dir                [{:key  :grave_accent_and_tilde
                                         :modi [:left_shift]
@@ -1466,7 +1466,7 @@
            ; [:!Qk :same_wind_app :Kitty]
            [:!Qk :open-default-terminal :!default-terminal]
            ; [:!Qk :same_wind_app :default-terminal]
-           [:!Qk [:open "/Applications/kitty.app"] :default-terminal]
+           [:!Qk [:open "/Applications/WezTerm.app"] :default-terminal]
            [:!Ql [:open "/Applications/Visual Studio Code.app"] :!VSCode]
            [:!Ql :same_wind_app :VSCode]
            ;; [:!Qsemicolon [:open "/Library/Application Support/Citrix Receiver/Citrix Viewer.app"]] ; Citrix Workspace.app
@@ -1922,7 +1922,7 @@
            ; [:!Wk :same_wind_app :Kitty]
            [:!Wk [:left_command :open-default-terminal] :!default-terminal]
            ; [:!Wk :same_wind_app :default-terminal]
-           [:!Wk [:left_command [:open "/Applications/kitty.app"]] :default-terminal]
+           [:!Wk [:left_command [:open "/Applications/WezTerm.app"]] :default-terminal]
            [:!Wl [:left_command [:open "/Applications/Visual Studio Code.app"]] :!VSCode]
            [:!Wl :same_wind_app :VSCode]
            ;; [:!Wsemicolon [:left_command [:open "/Library/Application Support/Citrix Receiver/Citrix Viewer.app"]]] ; Citrix Workspace.app

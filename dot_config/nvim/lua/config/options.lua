@@ -59,7 +59,7 @@ vim.g.loaded_node_provider = 0
 
 if vim.g.neovide then
   vim.g.user_auto_root = true -- what's the point of using "/" as cwd?
-  vim.g.user_auto_session = true
+  -- vim.g.user_auto_session = true
   vim.g.snacks_animate = false
 
   vim.g.neovide_hide_mouse_when_typing = true
