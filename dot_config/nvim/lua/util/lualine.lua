@@ -102,6 +102,20 @@ M.linter = {
   end,
 }
 
+-- M.lsp = {
+--   "lsp_status",
+--   icon = "",
+--   symbols = { done = "" },
+--   ignore_lsp = { "null-ls", "copilot", "rime_ls", "harper_ls", "render-markdown" },
+--   color = function()
+--     return { fg = Snacks.util.color(select(2, ft_icon()) or "Special") }
+--   end,
+--   fmt = function(str)
+--     local spinner = vim.split(str, " ", { trimempty = true })[2]
+--     return (ft_icon() or " ") .. (spinner and " " .. spinner .. " " or "")
+--   end,
+-- }
+
 M.lsp = {
   function()
     return ft_icon() or " " -- 
@@ -109,7 +123,7 @@ M.lsp = {
   cond = function()
     local clients = vim.lsp.get_clients({ bufnr = 0 })
     clients = vim.tbl_filter(function(client)
-      local ignored = { "null-ls", "copilot", "rime_ls", "harper_ls" }
+      local ignored = { "null-ls", "copilot", "rime_ls", "harper_ls", "render-markdown" }
       return not vim.list_contains(ignored, client.name)
     end, clients)
     return #clients > 0
