@@ -49,6 +49,14 @@ return {
       if LazyVim.has("chezmoi.vim") and vim.g["chezmoi#use_tmp_buffer"] == 1 then
         vim.g["chezmoi#detect_ignore_pattern"] = "dot_aider.conf.yml"
       end
+
+      -- fix `Option 'commentstring' is empty.` sometimes occurs in kitty.conf
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "kitty",
+        callback = function()
+          vim.opt_local.commentstring = "# %s"
+        end,
+      })
     end,
   },
 
