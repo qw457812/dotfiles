@@ -199,6 +199,12 @@ return {
             },
             ["<C-j>"] = { "select_next", "fallback" },
             ["<C-k>"] = { "select_prev", "fallback" },
+            ["<C-a>"] = {
+              function(cmp)
+                cmp.hide()
+              end,
+              "fallback",
+            },
             ["<C-e>"] = { "cancel", "fallback" },
           },
         },
