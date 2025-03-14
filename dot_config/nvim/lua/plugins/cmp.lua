@@ -68,36 +68,6 @@ return {
 
       ---@type table<string, blink.cmp.KeymapCommand>
       H.actions = {
-        accept = function(cmp)
-          -- keep non-listed buffers non-listed to prevent them from showing up in bufferline.nvim
-          -- e.g. command-line window, avante.nvim
-          local buflisted = vim.bo.buflisted
-          return cmp.accept({
-            callback = not buflisted and function()
-              vim.bo.buflisted = buflisted
-            end or nil,
-          })
-        end,
-        select_next = function(cmp)
-          local buflisted = vim.bo.buflisted
-          local ret = cmp.select_next()
-          if not buflisted then
-            vim.schedule(function()
-              vim.bo.buflisted = buflisted
-            end)
-          end
-          return ret
-        end,
-        select_prev = function(cmp)
-          local buflisted = vim.bo.buflisted
-          local ret = cmp.select_prev()
-          if not buflisted then
-            vim.schedule(function()
-              vim.bo.buflisted = buflisted
-            end)
-          end
-          return ret
-        end,
         -- https://github.com/folke/snacks.nvim/blob/78f0ad6ce7283b0e2d6ac2b9b82ac731c7c30b93/lua/snacks/input.lua#L195-L209
         pum_next = function()
           if vim.fn.pumvisible() == 0 then
@@ -169,7 +139,7 @@ return {
         keymap = {
           -- TODO: better coop with mini.snippets and signature_help
           ["<Tab>"] = {
-            H.actions.select_next,
+            "select_next",
             "snippet_forward",
             H.actions.pum_next,
             function(cmp)
@@ -179,7 +149,7 @@ return {
             end,
             "fallback",
           },
-          ["<S-Tab>"] = { H.actions.select_prev, "snippet_backward", H.actions.pum_prev, "fallback" },
+          ["<S-Tab>"] = { "select_prev", "snippet_backward", H.actions.pum_prev, "fallback" },
           -- -- https://github.com/y3owk1n/nix-system-config-v2/blob/ae72dd82a92894a1ca8c5ff4243e0208dfc33a5d/config/nvim/lua/plugins/blink-cmp.lua#L19
           -- ["<Esc>"] = {
           --   function(cmp)
@@ -191,11 +161,11 @@ return {
           --   end,
           --   "fallback",
           -- },
-          ["<CR>"] = { H.actions.accept, H.actions.pum_accept, "fallback" },
-          ["<C-n>"] = { H.actions.select_next, "show" },
-          ["<C-p>"] = { H.actions.select_prev, "show" },
-          ["<C-j>"] = { H.actions.select_next, H.actions.pum_next, H.actions.mini_snippets_expand, "fallback" },
-          ["<C-k>"] = { H.actions.select_prev, H.actions.pum_prev, "fallback" }, -- TODO: conflicts with signatureHelp
+          ["<CR>"] = { "accept", H.actions.pum_accept, "fallback" },
+          ["<C-n>"] = { "select_next", "show" },
+          ["<C-p>"] = { "select_prev", "show" },
+          ["<C-j>"] = { "select_next", H.actions.pum_next, H.actions.mini_snippets_expand, "fallback" },
+          ["<C-k>"] = { "select_prev", H.actions.pum_prev, "fallback" }, -- TODO: conflicts with signatureHelp
           ["<C-l>"] = { "snippet_forward", H.actions.mini_snippets_expand, "fallback" },
           ["<C-h>"] = { "snippet_backward", "fallback" },
           -- ["<C-u>"] = { "scroll_documentation_up", "fallback" },
