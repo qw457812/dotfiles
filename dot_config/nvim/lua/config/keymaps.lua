@@ -75,6 +75,10 @@ map("x", "L", "(mode() == nr2char(22) ? '$' : v:count ? 'g_' : &wrap ? 'g$' : 'g
 LazyViewConfig.commands.home.key = "gH" -- see: #411 #133
 LazyViewConfig.commands.log.key = "gL"
 
+map("c", "<C-a>", "<C-b>", { silent = false, desc = "Goto line start" })
+map("i", "<C-a>", "<Home>", { desc = "Goto line start" })
+map("i", "<C-e>", "<End>", { desc = "Goto line end" })
+
 -- bufferline.nvim: if you change the order of buffers :bnext and :bprevious will not respect the custom ordering
 safe_map("n", { "J", "<Down>" }, "<cmd>bnext<cr>", { desc = "Next Buffer" })
 safe_map("n", { "K", "<Up>" }, "<cmd>bprevious<cr>", { desc = "Prev Buffer" })

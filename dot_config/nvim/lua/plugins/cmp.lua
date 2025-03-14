@@ -199,6 +199,7 @@ return {
             },
             ["<C-j>"] = { "select_next", "fallback" },
             ["<C-k>"] = { "select_prev", "fallback" },
+            ["<C-e>"] = { "cancel", "fallback" },
           },
         },
         completion = {
