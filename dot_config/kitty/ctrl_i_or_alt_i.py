@@ -1,3 +1,5 @@
+import re
+
 from kittens.tui.handler import result_handler
 from kitty.boss import Boss
 from kitty.key_encoding import KeyEvent, parse_shortcut
@@ -31,8 +33,10 @@ def handle_result(
     if w is None:
         return
 
-    # make <bs> close the lazygit
-    # mapped <c-h> to quit in lazygit/config.yml via `quitWithoutChangingDirectory: <backspace>`
-    # when typing a commit message in lazygit, <c-h> and <bs> do the same thing
-    key = "ctrl+h" if w.child.foreground_cmdline[0] == "lazygit" else "backspace"
+    # To distinguish <C-I> and <Tab> in neovim (note that mapping <M-i> to <C-i> in neovim is required)
+    key = (
+        "alt+i"
+        if re.search("n?vim", w.child.foreground_cmdline[0], re.I) is not None
+        else "ctrl+i"
+    )
     w.write_to_child(encode_key_mapping(w, key))
