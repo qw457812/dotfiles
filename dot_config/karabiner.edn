@@ -2310,7 +2310,7 @@
    "^com\\.jetbrains\\.intellij\\.ce$" "^com\\.jetbrains\\.pycharm\\.ce(-EAP)?$"]
   :tmux-autostart-terminals
   ["^org\\.alacritty$" "^com\\.github\\.wez\\.wezterm$" "^net\\.kovidgoyal\\.kitty$"]
-  :default-terminal ["^com\\.github\\.wez\\.wezterm$"]
+  :default-terminal ["^net\\.kovidgoyal\\.kitty$"]
   :default-browser  ["^com\\.brave\\.Browser$"]
   :Terminals        ["^com\\.apple\\.Terminal$"
                      "^com\\.googlecode\\.iterm2$"
