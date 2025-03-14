@@ -664,11 +664,12 @@ return {
 
   {
     "kevinhwang91/nvim-hlslens",
+    kitty_scrollback = true,
     vscode = true,
     dependencies = {
       -- https://github.com/kevinhwang91/nvim-hlslens/issues/64#issuecomment-1606196924
       -- alternative: https://github.com/rapan931/lasterisk.nvim
-      { "haya14busa/vim-asterisk" },
+      { "haya14busa/vim-asterisk", kitty_scrollback = true },
       { "petertriho/nvim-scrollbar", optional = true },
     },
     event = "CmdlineEnter",
@@ -796,6 +797,7 @@ return {
 
   {
     "wurli/visimatch.nvim",
+    kitty_scrollback = true,
     event = "ModeChanged *:[vV]",
     opts = {
       chars_lower_limit = 2,

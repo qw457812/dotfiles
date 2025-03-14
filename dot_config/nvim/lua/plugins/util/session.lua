@@ -1,4 +1,4 @@
-if false then
+if lazyvim_docs then
   -- Enable to autoload session on startup, unless:
   -- * neovim was started with files as arguments
   -- * stdin has been provided

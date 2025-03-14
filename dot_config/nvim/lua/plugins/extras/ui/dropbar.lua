@@ -246,8 +246,12 @@ return {
   -- https://github.com/Bekaboo/dropbar.nvim/issues/19#issuecomment-1574760272
   {
     "nvim-lualine/lualine.nvim",
-    dependencies = { "Bekaboo/dropbar.nvim" },
+    dependencies = { "Bekaboo/dropbar.nvim", optional = true },
     opts = function(_, opts)
+      if not LazyVim.has("dropbar") then
+        return
+      end
+
       local dropbar_default_opts = require("dropbar.configs").opts
 
       -- unsaved file by `:ene`

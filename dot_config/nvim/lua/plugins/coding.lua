@@ -65,6 +65,7 @@ return {
 
   {
     "chrisgrieser/nvim-various-textobjs",
+    kitty_scrollback = true,
     vscode = true,
     keys = function()
       local keys = {

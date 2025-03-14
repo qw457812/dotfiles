@@ -29,9 +29,11 @@ return {
 
   {
     "thenbe/csgithub.nvim",
+    kitty_scrollback = true,
     keys = function()
       local function search(args)
         local csgithub = require("csgithub")
+        args = vim.g.kitty_scrollback and { includeExtension = false } or args
         local url = csgithub.search(args)
         if url and vim.g.user_is_termux then
           vim.fn.setreg(vim.v.register, url)

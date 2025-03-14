@@ -97,7 +97,7 @@ return {
 
   {
     "epwalsh/obsidian.nvim",
-    cond = not vim.g.user_is_termux,
+    enabled = not vim.g.user_is_termux,
     event = (function()
       local events = {}
       for _, path in pairs(obsidian_vaults) do
