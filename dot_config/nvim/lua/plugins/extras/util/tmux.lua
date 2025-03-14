@@ -176,6 +176,7 @@ return {
 
   {
     "mrjones2014/smart-splits.nvim",
+    kitty_scrollback = true,
     cond = is_wezterm or is_kitty,
     -- build = "./kitty/install-kittens.bash", -- ~/.config/kitty/neighboring_window.py has been modified to adapt to tmux in kitty
     lazy = false, -- required
