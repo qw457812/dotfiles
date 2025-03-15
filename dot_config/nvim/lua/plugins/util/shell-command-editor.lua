@@ -45,23 +45,25 @@ Config.options.defaults.cond = function(plugin)
 end
 vim.g.snacks_animate = false
 
-vim.api.nvim_create_autocmd("BufRead", {
-  group = vim.api.nvim_create_augroup("shell_command_editor_autowrite", { clear = true }),
-  pattern = (vim.env.TMPDIR or "/tmp/") .. "tmp.*.fish",
-  callback = function(ev)
-    local buf = ev.buf
-    vim.api.nvim_create_autocmd({ "InsertLeave", "TextChanged" }, {
-      group = vim.api.nvim_create_augroup("shell_command_editor_autowrite", { clear = false }),
-      buffer = buf,
-      callback = function()
-        vim.api.nvim_buf_call(buf, function()
-          vim.cmd("silent! write")
-        end)
-      end,
-    })
-    return true
-  end,
-})
+if vim.o.shell:find("fish") then
+  local augroup = vim.api.nvim_create_augroup("shell_command_editor_autowrite", { clear = true })
+  vim.api.nvim_create_autocmd("BufRead", {
+    group = augroup,
+    pattern = (vim.env.TMPDIR or "/tmp"):gsub("/$", "") .. "/tmp.*.fish",
+    callback = function(ev)
+      vim.api.nvim_create_autocmd({ "InsertLeave", "TextChanged" }, {
+        group = augroup,
+        buffer = ev.buf,
+        callback = function()
+          vim.api.nvim_buf_call(ev.buf, function()
+            vim.cmd("silent! write")
+          end)
+        end,
+      })
+      return true
+    end,
+  })
+end
 
 return {
   {
