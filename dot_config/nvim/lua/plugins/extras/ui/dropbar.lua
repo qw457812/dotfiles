@@ -248,7 +248,7 @@ return {
     "nvim-lualine/lualine.nvim",
     dependencies = { "Bekaboo/dropbar.nvim", optional = true },
     opts = function(_, opts)
-      if not LazyVim.has("dropbar") then
+      if not LazyVim.has("dropbar.nvim") then
         return
       end
 

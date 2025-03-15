@@ -7,7 +7,7 @@ return {
   {
     "saghen/blink.cmp",
     optional = true,
-    dependencies = "xzbdmw/colorful-menu.nvim",
+    dependencies = { "xzbdmw/colorful-menu.nvim", shell_command_editor = true },
     ---@module 'blink.cmp'
     ---@type blink.cmp.Config
     opts = {
@@ -351,7 +351,7 @@ return {
   {
     "saghen/blink.cmp",
     optional = true,
-    dependencies = "mikavilpas/blink-ripgrep.nvim",
+    dependencies = { "mikavilpas/blink-ripgrep.nvim", shell_command_editor = true },
     ---@module 'blink.cmp'
     ---@type blink.cmp.Config
     opts = {
@@ -386,7 +386,7 @@ return {
   {
     "saghen/blink.cmp",
     optional = true,
-    dependencies = "ribru17/blink-cmp-spell",
+    dependencies = { "ribru17/blink-cmp-spell", shell_command_editor = true },
     ---@type blink.cmp.Config
     opts = {
       sources = {
@@ -413,6 +413,7 @@ return {
     optional = true,
     dependencies = {
       "Kaiser-Yang/blink-cmp-dictionary",
+      shell_command_editor = true,
       -- TODO: add dict downloading to build
       init = function()
         LazyVim.on_load("mini.icons", function()
@@ -450,7 +451,7 @@ return {
   {
     "saghen/blink.cmp",
     optional = true,
-    dependencies = "bydlw98/blink-cmp-env",
+    dependencies = { "bydlw98/blink-cmp-env", shell_command_editor = true },
     ---@type blink.cmp.Config
     opts = {
       sources = {

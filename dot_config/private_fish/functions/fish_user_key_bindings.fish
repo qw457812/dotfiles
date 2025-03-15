@@ -1,3 +1,8 @@
+function __edit_command_buffer
+    set -lx SHELL_COMMAND_EDITOR 1
+    edit_command_buffer
+end
+
 function fish_user_key_bindings
     set -g fish_key_bindings fish_vi_key_bindings
     fish_default_key_bindings -M insert
@@ -8,7 +13,7 @@ function fish_user_key_bindings
     bind p 'set -g fish_cursor_end_mode exclusive' forward-char 'set -g fish_cursor_end_mode inclusive' fish_clipboard_paste
     bind P fish_clipboard_paste
 
-    bind -M visual -m default v 'edit_command_buffer; commandline -f end-selection repaint-mode'
+    bind -M visual -m default v '__edit_command_buffer; commandline -f end-selection repaint-mode'
     bind -m visual V beginning-of-line begin-selection end-of-line repaint-mode
     bind -M visual V end-selection beginning-of-line begin-selection end-of-line
 
