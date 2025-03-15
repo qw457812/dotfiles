@@ -44,6 +44,7 @@ end
 return {
   {
     "echasnovski/mini.operators",
+    shell_command_editor = true,
     dependencies = {
       {
         "rachartier/tiny-glimmer.nvim",

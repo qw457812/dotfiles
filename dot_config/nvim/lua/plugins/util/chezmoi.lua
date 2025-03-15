@@ -351,6 +351,10 @@ return {
     "folke/noice.nvim",
     optional = true,
     opts = function(_, opts)
+      if not LazyVim.has("chezmoi.nvim") then
+        return
+      end
+
       opts.routes = vim.list_extend(opts.routes or {}, {
         {
           filter = {

@@ -69,7 +69,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 
 ## Performance
 
-### Holding down `j`
+### Holding Down `j`
 
 | Plugin                                                                                | bigtime |
 | ------------------------------------------------------------------------------------- | ------- |
@@ -77,6 +77,16 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 | [dropbar.nvim](https://github.com/Bekaboo/dropbar.nvim)                               | no      |
 | [twilight.nvim](https://github.com/folke/twilight.nvim)                               | yes     |
 | [3rd/image.nvim](https://github.com/3rd/image.nvim)                                   | yes     |
+
+### Startup Time
+
+```
+time vim -u NONE -c exit
+time nvim -u NONE -c exit
+time nvim --cmd "lua vim.g.kitty_scrollback = true" -c exit
+time SHELL_COMMAND_EDITOR=1 nvim -c exit
+time nvim -c exit
+```
 
 ## TODO
 

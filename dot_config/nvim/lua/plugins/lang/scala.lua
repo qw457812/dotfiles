@@ -7,6 +7,10 @@ return {
   {
     "neovim/nvim-lspconfig",
     opts = function(_, opts)
+      if not LazyVim.has("nvim-metals") then
+        return
+      end
+
       -- HACK: add java to filetypes
       -- see: https://github.com/LazyVim/LazyVim/blob/859646f628ff0d99e6afe835ba0a48faed2972af/lua/lazyvim/plugins/extras/lang/scala.lua#L55-L69
       local setup_metals_orig = opts.setup.metals

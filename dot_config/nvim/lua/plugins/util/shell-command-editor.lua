@@ -1,4 +1,4 @@
-if not vim.g.kitty_scrollback then
+if not vim.g.shell_command_editor then
   return {}
 end
 
@@ -7,7 +7,13 @@ local enabled = {
   "lazy.nvim",
   "snacks.nvim",
   "mini.ai",
-  -- the plugins below are optional
+  "mini.move",
+  "mini.pairs",
+  "mini.surround",
+  "nvim-treesitter",
+  "nvim-treesitter-textobjects",
+  "ts-comments.nvim",
+  "dial.nvim",
   "yanky.nvim",
   "which-key.nvim",
   "tokyonight.nvim",
@@ -16,13 +22,26 @@ local enabled = {
   "noice.nvim",
   "nui.nvim", -- for noice.nvim
   "vim-illuminate",
+  "blink.cmp",
+  "blink.compat",
+  "friendly-snippets",
+  "mini.snippets",
+  "copilot.lua",
+  "blink-copilot",
+  "plenary.nvim", -- for blink.cmp
+  "conform.nvim",
+  "nvim-lint",
+  -- -- bash
+  -- "nvim-lspconfig",
+  -- "mason.nvim", -- for nvim-lspconfig
+  -- "mason-lspconfig.nvim",
 }
 
 local Config = require("lazy.core.config")
 Config.options.checker.enabled = false
 Config.options.change_detection.enabled = false
 Config.options.defaults.cond = function(plugin)
-  return vim.tbl_contains(enabled, plugin.name) or plugin.kitty_scrollback
+  return vim.tbl_contains(enabled, plugin.name) or plugin.shell_command_editor
 end
 vim.g.snacks_animate = false
 
@@ -36,17 +55,10 @@ return {
       local o = {
         bigfile = { enabled = false },
         dashboard = { enabled = false },
-        indent = { enabled = false },
-        input = { enabled = false },
-        quickfile = { enabled = false },
         scroll = { enabled = false },
         image = { enabled = false },
-        scope = { enabled = false },
         words = { enabled = false },
-        -- notifier = { enabled = false }, -- enabled for noice.nvim
-        -- picker = { enabled = false }, -- enabled `vim.ui.select` for `gx` via nvim-various-textobjs
       }
-      -- copied from: https://github.com/LazyVim/LazyVim/blob/ba632c500da56532c122539c45fe3511fd894a05/lua/lazyvim/plugins/init.lua#L22-L28
       local notify = vim.notify
       require("snacks").setup(vim.tbl_deep_extend("force", opts, o))
       if LazyVim.has("noice.nvim") then
@@ -66,12 +78,12 @@ return {
     optional = true,
     config = function(_, opts)
       -- stylua: ignore start
-      opts.sections.lualine_a = { { function() return "kitty" end } }
-      opts.sections.lualine_b = { { function() return "scrollback" end } }
+      opts.sections.lualine_a = { { function() return vim.o.shell:match("[^/]+$") end } }
+      opts.sections.lualine_b = { { function() return "command" end } }
       opts.sections.lualine_c = {
         {
-          function() return "󰄛 " end,
-          color = function() return { fg = Snacks.util.color("MiniIconsYellow") } end,
+          function() return " " end,
+          color = function() return { fg = Snacks.util.color("MiniIconsGreen") } end,
         },
       }
       opts.sections.lualine_x = {
@@ -88,4 +100,28 @@ return {
     end,
   },
   { "RRethy/vim-illuminate", optional = true, event = "VeryLazy" },
+  {
+    "saghen/blink.cmp",
+    optional = true,
+    ---@module 'blink.cmp'
+    ---@param opts blink.cmp.Config
+    opts = function(_, opts)
+      local sources_default = opts.sources.default
+      if type(sources_default) ~= "table" then
+        return
+      end
+      for i = #sources_default, 1, -1 do
+        if vim.list_contains({ "lazydev", "dadbod", "avante" }, sources_default[i]) then
+          table.remove(sources_default, i)
+        end
+      end
+    end,
+  },
+  {
+    "neovim/nvim-lspconfig",
+    optional = true,
+    opts = function(_, opts)
+      opts.setup.metals = nil
+    end,
+  },
 }
