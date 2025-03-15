@@ -75,6 +75,10 @@ return {
         if not vim.g.user_neotree_visible then
           return false
         end
+        -- local state = require("neo-tree.sources.manager").get_state("filesystem")
+        -- if state and state.winid and state.bufnr then
+        --   return true, state.bufnr, state.winid
+        -- end
         for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
           local buf = vim.api.nvim_win_get_buf(win)
           if vim.bo[buf].filetype == "neo-tree" then

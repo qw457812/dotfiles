@@ -83,7 +83,7 @@ return {
       opts.sections.lualine_c = {
         {
           function() return " " end,
-          color = function() return { fg = Snacks.util.color("MiniIconsGreen") } end,
+          color = function() return { fg = Snacks.util.color(vim.bo.modified and "MatchParen" or "MiniIconsGreen") } end,
         },
       }
       opts.sections.lualine_x = {
