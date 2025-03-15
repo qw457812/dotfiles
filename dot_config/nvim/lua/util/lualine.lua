@@ -141,7 +141,7 @@ M.hlsearch = {
     return vim.v.hlsearch == 1
   end,
   color = function()
-    return { fg = Snacks.util.color("CurSearch", "bg") }
+    return { fg = Snacks.util.color(vim.v.searchforward == 0 and "FlashLabel" or "CurSearch", "bg") }
   end,
 }
 
