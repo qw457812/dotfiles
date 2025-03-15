@@ -1,4 +1,4 @@
-if not vim.g.kitty_scrollback then
+if not (vim.g.kitty_scrollback or vim.g.manpager) then
   return {}
 end
 
@@ -66,11 +66,15 @@ return {
     optional = true,
     config = function(_, opts)
       -- stylua: ignore start
-      opts.sections.lualine_a = { { function() return "kitty" end } }
-      opts.sections.lualine_b = { { function() return "scrollback" end } }
+      opts.sections.lualine_a = { { function() return vim.g.manpager and "man" or "kitty" end } }
+      opts.sections.lualine_b = {
+        {
+          function() return vim.g.manpager and vim.api.nvim_buf_get_name(0):match("man://(.*)") or "scrollback" end,
+        },
+      }
       opts.sections.lualine_c = {
         {
-          function() return "󰄛 " end,
+          function() return vim.g.manpager and "󰗚 " or "󰄛 " end,
           color = function() return { fg = Snacks.util.color("MiniIconsYellow") } end,
         },
       }
