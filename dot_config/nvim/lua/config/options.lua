@@ -42,6 +42,8 @@ vim.g.user_explorer_auto_close = vim.g.user_is_termux
 if lazyvim_docs then
   -- set in kitty.conf via `scrollback_pager nvim --cmd "lua vim.g.kitty_scrollback = true"`
   vim.g.kitty_scrollback = false
+  -- set in config.fish via `set -x MANPAGER 'nvim --cmd "lua vim.g.manpager = true" +Man!'`
+  vim.g.manpager = false
 end
 if vim.env.SHELL_COMMAND_EDITOR then
   -- set in fish_user_key_bindings.fish before calling `edit_command_buffer`
