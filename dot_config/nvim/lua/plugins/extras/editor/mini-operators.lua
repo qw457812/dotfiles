@@ -94,8 +94,9 @@ return {
         end, { expr = true, replace_keycodes = false, silent = true, desc = "Replace Operator" })
         vim.keymap.set("n", "ss", "s_", { remap = true, silent = true, desc = "Replace Line" })
       elseif LazyVim.has("undo-glow.nvim") then
+        Snacks.util.set_hl({ UgSubstitute = { fg = "#000000", bg = Snacks.util.color("DiagnosticHint"), bold = true } }) -- TodoBgNOTE
         vim.keymap.set("n", "s", function()
-          require("undo-glow").highlight_changes(require("undo-glow.utils").merge_command_opts("TodoBgNOTE"))
+          require("undo-glow").highlight_changes(require("undo-glow.utils").merge_command_opts("UgSubstitute"))
           return operators.replace()
         end, { expr = true, replace_keycodes = false, silent = true, desc = "Replace Operator" })
         vim.keymap.set("n", "ss", "s_", { remap = true, silent = true, desc = "Replace Line" })

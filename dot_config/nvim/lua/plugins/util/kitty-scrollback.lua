@@ -26,6 +26,19 @@ Config.options.defaults.cond = function(plugin)
 end
 vim.g.snacks_animate = false
 
+vim.api.nvim_create_autocmd("User", {
+  pattern = "LazyVimKeymaps",
+  once = true,
+  callback = function()
+    vim.keymap.set("n", "i", "<cmd>qa<cr>", { desc = "Quit" })
+    vim.keymap.set("n", "<Esc>", function()
+      if not U.keymap.clear_ui_esc({ close = false }) then
+        vim.cmd("qa")
+      end
+    end, { desc = "Clear UI or Quit" })
+  end,
+})
+
 return {
   {
     "snacks.nvim",
@@ -79,6 +92,7 @@ return {
         },
       }
       opts.sections.lualine_x = {
+        U.lualine.hlsearch,
         {
           function() return require("noice").api.status.command.get() end,
           cond = function() return package.loaded["noice"] and require("noice").api.status.command.has() end,
