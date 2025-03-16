@@ -28,6 +28,19 @@ M.pretty_path = {
   }),
 }
 
+-- copied from: https://github.com/LazyVim/LazyVim/blob/2b3bcf36b2392bef94afefc07e2fcf32960960d7/lua/lazyvim/plugins/ui.lua#L113-L117
+M.command = {
+  function()
+    return require("noice").api.status.command.get()
+  end,
+  cond = function()
+    return package.loaded["noice"] and require("noice").api.status.command.has()
+  end,
+  color = function()
+    return { fg = Snacks.util.color("Statement") }
+  end,
+}
+
 M.filename = {
   "filename",
   file_status = true,
