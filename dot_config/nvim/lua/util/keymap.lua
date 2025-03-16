@@ -118,6 +118,36 @@ function M.foldopen_l()
   vim.cmd("normal! " .. count1 .. "l")
 end
 
+function M.indented_i()
+  local count1 = vim.v.count1
+  if count1 > 1 or not vim.api.nvim_get_current_line():match("^%s*$") then
+    vim.api.nvim_feedkeys(vim.keycode(count1 .. "i"), "n", false)
+    return
+  end
+
+  local orig_modified = vim.bo.modified
+  local orig_lnum, orig_line ---@type integer, string
+  if not orig_modified then
+    orig_lnum, orig_line = vim.fn.line("."), vim.fn.getline(".")
+  end
+  vim.api.nvim_feedkeys(vim.keycode('"_cc'), "n", false)
+  -- prevent `"_cc` from changing `vim.bo.modified`
+  if not orig_modified then
+    vim.api.nvim_create_autocmd("InsertLeave", {
+      buffer = 0,
+      once = true,
+      callback = function()
+        if vim.fn.line(".") == orig_lnum and vim.fn.getline(".") == orig_line then
+          vim.cmd("silent undo")
+          if vim.bo.modified then
+            vim.cmd("silent redo")
+          end
+        end
+      end,
+    })
+  end
+end
+
 ---https://github.com/megalithic/dotfiles/blob/fce3172e3cb1389de22bf97ccbf29805c2262525/config/nvim/lua/mega/mappings.lua#L143
 ---@param opts? {close?: function|false, popups?: boolean, esc?: boolean}
 ---@return boolean

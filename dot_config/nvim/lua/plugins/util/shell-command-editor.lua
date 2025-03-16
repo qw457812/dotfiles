@@ -50,6 +50,7 @@ if vim.o.shell:find("fish") then
   vim.api.nvim_create_autocmd("BufRead", {
     group = augroup,
     pattern = (vim.env.TMPDIR or "/tmp"):gsub("/$", "") .. "/tmp.*.fish",
+    once = true,
     callback = function(ev)
       vim.api.nvim_create_autocmd({ "InsertLeave", "TextChanged" }, {
         group = augroup,
@@ -60,7 +61,6 @@ if vim.o.shell:find("fish") then
           end)
         end,
       })
-      return true
     end,
   })
 end
