@@ -110,5 +110,5 @@
   "yanky.nvim": { "branch": "main", "commit": "80d9385dbebe7049fd1961d7909b835a58ce9dcc" },
   "yazi-flavors": { "branch": "main", "commit": "68326b4ca4b5b66da3d4a4cce3050e5e950aade5" },
   "yazi-plugins": { "branch": "main", "commit": "cb6165b25515b653a70f72a67889579d190facfe" },
-  "yazi.nvim": { "branch": "main", "commit": "88f5a8420aed3cd7dd5ec1be117cdddcb5f14448" }
+  "yazi.nvim": { "branch": "main", "commit": "a438483e00b1f29694b5afee5578b16073471c7c" }
 }

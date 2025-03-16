@@ -36,10 +36,6 @@ local function blockwise_force(key)
   end
 end
 
-local function is_empty_line()
-  return vim.api.nvim_get_current_line():match("^%s*$")
-end
-
 -- -- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/keybindings.lua#L234
 -- map("n", "<cr>", function() return vim.fn.pumvisible() == 1 and "<cr>" or "gd" end, { expr = true, desc = "Goto local Declaration" })
 -- -- restore default behavior of `<cr>`, which is overridden by my mapping above
@@ -101,15 +97,16 @@ end, { expr = true, desc = "Escape and Stop Snippet" })
 
 -- helix-style mappings | https://github.com/boltlessengineer/nvim/blob/607ee0c9412be67ba127a4d50ee722be578b5d9f/lua/config/keymaps.lua#L103
 map({ "n", "x", "o" }, "mm", "%", { desc = "Goto matching bracket", remap = true }) -- remap to matchit
-safe_map("n", "U", "<C-r>", { desc = "Redo" }) -- highlight-undo.nvim
+safe_map("n", "U", "<C-r>", { desc = "Redo" }) -- undo-glow.nvim
+map("n", "<leader>U", "U", { desc = "Undo all changes on one line" })
 
 map("c", "<C-j>", "<C-n>", { silent = false, desc = "Next Command / Completion" })
 map("c", "<C-k>", "<C-p>", { silent = false, desc = "Prev Command / Completion" })
 
--- stylua: ignore start
-map("n", "dd", function() return is_empty_line() and '"_dd' or "dd" end, { expr = true, desc = "Don't Yank Empty Line to Clipboard" })
-map("n", "i",  function() return is_empty_line() and '"_cc' or "i" end,  { expr = true, desc = "Indented i on Empty Line" })
--- stylua: ignore end
+map("n", "dd", function()
+  return vim.api.nvim_get_current_line():match("^%s*$") and '"_dd' or "dd"
+end, { expr = true, desc = "Don't Yank Empty Line to Clipboard" })
+map("n", "i", U.keymap.indented_i, { desc = "Indented i on Empty Line" })
 
 safe_map("n", "n", "nzv") -- nvim-hlslens
 safe_map("n", "N", "Nzv")
