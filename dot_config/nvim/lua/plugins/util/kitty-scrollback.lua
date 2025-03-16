@@ -63,7 +63,7 @@ return {
         callback = function()
           vim.keymap.set("n", "i", "<cmd>qa<cr>", { desc = "Quit" })
           vim.keymap.set("n", "<Esc>", function()
-            if not U.keymap.clear_ui_esc({ close = false }) then
+            if not U.keymap.clear_ui_esc() then
               vim.cmd("qa")
             end
           end, { desc = "Clear UI or Quit" })
