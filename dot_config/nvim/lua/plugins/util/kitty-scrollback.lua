@@ -26,19 +26,6 @@ Config.options.defaults.cond = function(plugin)
 end
 vim.g.snacks_animate = false
 
-vim.api.nvim_create_autocmd("User", {
-  pattern = "LazyVimKeymaps",
-  once = true,
-  callback = function()
-    vim.keymap.set("n", "i", "<cmd>qa<cr>", { desc = "Quit" })
-    vim.keymap.set("n", "<Esc>", function()
-      if not U.keymap.clear_ui_esc({ close = false }) then
-        vim.cmd("qa")
-      end
-    end, { desc = "Clear UI or Quit" })
-  end,
-})
-
 return {
   {
     "snacks.nvim",
@@ -69,6 +56,20 @@ return {
   },
   {
     "LazyVim/LazyVim",
+    opts = function()
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "LazyVimKeymaps",
+        once = true,
+        callback = function()
+          vim.keymap.set("n", "i", "<cmd>qa<cr>", { desc = "Quit" })
+          vim.keymap.set("n", "<Esc>", function()
+            if not U.keymap.clear_ui_esc({ close = false }) then
+              vim.cmd("qa")
+            end
+          end, { desc = "Clear UI or Quit" })
+        end,
+      })
+    end,
     config = function(_, opts)
       opts.colorscheme = LazyVim.has("tokyonight.nvim") and "tokyonight-moon" or function() end
       require("lazyvim").setup(opts)
@@ -91,15 +92,8 @@ return {
           color = function() return { fg = Snacks.util.color("MiniIconsYellow") } end,
         },
       }
-      opts.sections.lualine_x = {
-        U.lualine.hlsearch,
-        {
-          function() return require("noice").api.status.command.get() end,
-          cond = function() return package.loaded["noice"] and require("noice").api.status.command.has() end,
-          color = function() return { fg = Snacks.util.color("Statement") } end,
-        },
-      }
       -- stylua: ignore end
+      opts.sections.lualine_x = { U.lualine.hlsearch, U.lualine.command }
       opts.sections.lualine_y = { { "progress" } }
       opts.extensions = {}
       require("lualine").setup(opts)
