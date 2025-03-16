@@ -191,6 +191,9 @@ return {
             -- hl.PmenuSel = { bg = c.bg_highlight, bold = true }
           end
         end,
+        plugins = {
+          flash = true, -- FlashLabel is used by other plugins
+        },
       }
     end,
     config = function(_, opts)

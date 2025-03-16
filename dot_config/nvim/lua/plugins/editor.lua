@@ -465,6 +465,8 @@ return {
   },
   {
     "y3owk1n/undo-glow.nvim",
+    kitty_scrollback = true,
+    shell_command_editor = true,
     dependencies = {
       {
         "gbprod/yanky.nvim",
@@ -473,11 +475,7 @@ return {
         opts = { highlight = { on_yank = false, on_put = false } },
       },
     },
-    event = {
-      "TextYankPost",
-      "CmdLineLeave",
-      "VeryLazy", -- for cursor_moved
-    },
+    event = { "TextYankPost", "CmdLineLeave" },
     keys = function(_, keys)
       -- stylua: ignore
       vim.list_extend(keys, {
@@ -554,7 +552,7 @@ return {
         UgRedo = "FlashLabel",
         UgYank = "IncSearch",
         UgPaste = "Search",
-        UgSearch = "TodoBgPERF",
+        UgSearch = { fg = "#000000", bg = Snacks.util.color("Identifier"), bold = true }, -- TodoBgPERF
         UgComment = "LspReferenceText",
         UgCursor = "Visual",
       }, { default = true })

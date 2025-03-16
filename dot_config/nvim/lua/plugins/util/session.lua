@@ -12,7 +12,7 @@ return {
     "folke/persistence.nvim",
     optional = true,
     opts = {
-      branch = false,
+      -- branch = false,
     },
     init = function()
       -- detect if stdin has been provided
