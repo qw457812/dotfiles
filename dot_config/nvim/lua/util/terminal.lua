@@ -18,6 +18,7 @@ function M.toggle(cmd, opts)
 end
 
 --- pager
+--- see `:h terminal-scrollback-pager`
 function M.colorize()
   Snacks.terminal.colorize()
 
