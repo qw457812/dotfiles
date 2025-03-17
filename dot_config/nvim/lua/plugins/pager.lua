@@ -1,4 +1,4 @@
-if not (vim.g.kitty_scrollback or vim.g.manpager) then
+if not (vim.g.pager or vim.g.manpager or vim.g.terminal_scrollback_pager) then
   return {}
 end
 
@@ -22,7 +22,7 @@ local Config = require("lazy.core.config")
 Config.options.checker.enabled = false
 Config.options.change_detection.enabled = false
 Config.options.defaults.cond = function(plugin)
-  return vim.tbl_contains(enabled, plugin.name) or plugin.kitty_scrollback
+  return vim.tbl_contains(enabled, plugin.name) or plugin.pager
 end
 vim.g.snacks_animate = false
 
@@ -61,12 +61,14 @@ return {
         pattern = "LazyVimKeymaps",
         once = true,
         callback = function()
-          vim.keymap.set("n", "i", "<cmd>qa<cr>", { desc = "Quit" })
           vim.keymap.set("n", "<Esc>", function()
             if not U.keymap.clear_ui_esc() then
-              vim.cmd("qa")
+              vim.cmd([[quit]])
             end
           end, { desc = "Clear UI or Quit" })
+          if vim.g.terminal_scrollback_pager then
+            vim.keymap.set("n", "i", "<cmd>qa<cr>", { desc = "Quit All" })
+          end
         end,
       })
     end,
@@ -79,20 +81,36 @@ return {
     "nvim-lualine/lualine.nvim",
     optional = true,
     config = function(_, opts)
-      -- stylua: ignore start
-      opts.sections.lualine_a = { { function() return vim.g.manpager and "man" or "kitty" end } }
+      opts.sections.lualine_a = {
+        {
+          function()
+            return vim.g.terminal_scrollback_pager and (vim.g.user_is_kitty and "KITTY" or "TERM")
+              or vim.g.manpager and "MAN"
+              or "PAGER"
+          end,
+        },
+      }
       opts.sections.lualine_b = {
         {
-          function() return vim.g.manpager and vim.api.nvim_buf_get_name(0):match("man://(.*)") or "scrollback" end,
+          function()
+            return vim.g.terminal_scrollback_pager and "scrollback"
+              or vim.g.manpager and vim.api.nvim_buf_get_name(0):match("man://(.*)")
+              or ""
+          end,
         },
       }
       opts.sections.lualine_c = {
         {
-          function() return vim.g.manpager and "󰗚 " or "󰄛 " end,
-          color = function() return { fg = Snacks.util.color("MiniIconsYellow") } end,
+          function()
+            return vim.g.terminal_scrollback_pager and (vim.g.user_is_kitty and "󰄛 " or "")
+              or vim.g.manpager and "󰗚 "
+              or ""
+          end,
+          color = function()
+            return { fg = Snacks.util.color("MiniIconsYellow") }
+          end,
         },
       }
-      -- stylua: ignore end
       opts.sections.lualine_x = { U.lualine.hlsearch, U.lualine.command }
       opts.sections.lualine_y = { { "progress" } }
       opts.extensions = {}

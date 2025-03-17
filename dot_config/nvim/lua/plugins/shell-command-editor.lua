@@ -95,7 +95,7 @@ return {
         callback = function()
           vim.keymap.set("n", "<Esc>", function()
             if not U.keymap.clear_ui_esc() then
-              vim.cmd("qa")
+              vim.cmd([[quit]])
             end
           end, { desc = "Clear UI or Quit" })
         end,
@@ -111,7 +111,7 @@ return {
     optional = true,
     config = function(_, opts)
       -- stylua: ignore start
-      opts.sections.lualine_a = { { function() return vim.o.shell:match("[^/]+$") end } }
+      opts.sections.lualine_a = { { function() return (vim.o.shell:match("[^/]+$") or "shell"):upper() end } }
       opts.sections.lualine_b = { { function() return "command" end } }
       opts.sections.lualine_c = {
         {

@@ -135,6 +135,7 @@ return {
   -- https://github.com/arturgoms/nvim/blob/045c55460e36e1d4163b426b2ac66bd710721ac5/lua/3thparty/plugins/tmux.lua
   {
     "aserowy/tmux.nvim",
+    pager = true,
     cond = is_tmux and not (is_wezterm or is_kitty), -- tmux but not in wezterm/kitty
     -- stylua: ignore
     keys = {
@@ -176,7 +177,7 @@ return {
 
   {
     "mrjones2014/smart-splits.nvim",
-    kitty_scrollback = true,
+    pager = true,
     cond = is_wezterm or is_kitty,
     -- build = "./kitty/install-kittens.bash", -- ~/.config/kitty/neighboring_window.py has been modified to adapt to tmux in kitty
     lazy = false, -- required

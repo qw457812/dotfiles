@@ -83,7 +83,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 ```bash
 time vim -u NONE -c exit
 time nvim -u NONE -c exit
-time nvim --cmd "lua vim.g.kitty_scrollback = true" -c exit
+time nvim --cmd "lua vim.g.pager = true" -c exit
 time SHELL_COMMAND_EDITOR=1 nvim -c exit
 time nvim -c exit
 ```

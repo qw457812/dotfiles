@@ -109,8 +109,7 @@ abbr dl "cd ~/Downloads"
 abbr vim nvim
 abbr vi nvim
 abbr v nvim
-# TODO: better name for vim.g
-alias vimpager 'nvim - --cmd "lua vim.g.kitty_scrollback = true" -c "lua require(\'util.terminal\').colorize()"'
+alias vimpager 'nvim - --cmd "lua vim.g.pager = true" -c "lua require(\'util.terminal\').colorize()"'
 alias cat 'bat --paging=never'
 abbr -a --position anywhere --set-cursor -- -h "% -h 2>&1 | bat --plain --language=help"
 abbr -a --position anywhere --set-cursor L "% | bat --style=plain --paging=always"

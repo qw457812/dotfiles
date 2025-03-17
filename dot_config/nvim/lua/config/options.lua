@@ -39,15 +39,17 @@ vim.g.user_transparent_background = vim.g.user_is_wezterm or vim.g.user_is_kitty
 vim.g.user_hijack_netrw = "oil.nvim" ---@type "neo-tree.nvim"|"snacks.nvim"|"oil.nvim"|"mini.files"|"yazi.nvim"|"telescope-file-browser.nvim"
 -- holding layout like no-neck-pain.nvim by disabling neo-tree auto close
 vim.g.user_explorer_auto_close = vim.g.user_is_termux
-if lazyvim_docs then
-  -- set in kitty.conf via `scrollback_pager nvim --cmd "lua vim.g.kitty_scrollback = true"`
-  vim.g.kitty_scrollback = false
-  -- set in config.fish via `set -x MANPAGER 'nvim --cmd "lua vim.g.manpager = true" +Man!'`
-  vim.g.manpager = false
-end
 if vim.env.SHELL_COMMAND_EDITOR then
   -- set in fish_user_key_bindings.fish before calling `edit_command_buffer`
   vim.g.shell_command_editor = true
+end
+if lazyvim_docs then
+  -- set in config.fish via `alias vimpager 'nvim - --cmd "lua vim.g.pager = true" -c "lua require(\'util.terminal\').colorize()"'`
+  vim.g.pager = false
+  -- set in config.fish via `set -x MANPAGER 'nvim --cmd "lua vim.g.manpager = true" +Man!'`
+  vim.g.manpager = false
+  -- set in kitty.conf via `scrollback_pager nvim --cmd "lua vim.g.terminal_scrollback_pager = true" -c "lua require('util.terminal').colorize()"`
+  vim.g.terminal_scrollback_pager = false
 end
 
 -- https://github.com/monoira/.dotfiles/blob/bd69b59d228f4b23a3e190cbd3c67a79e6a396e2/nvim/.config/nvim/lua/config/options.lua#L36
