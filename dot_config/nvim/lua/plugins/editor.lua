@@ -669,7 +669,7 @@ return {
     dependencies = {
       -- https://github.com/kevinhwang91/nvim-hlslens/issues/64#issuecomment-1606196924
       -- alternative: https://github.com/rapan931/lasterisk.nvim
-      { "haya14busa/vim-asterisk", pager = true, shell_command_editor = true },
+      { "haya14busa/vim-asterisk", pager = true, shell_command_editor = true, vscode = true },
       { "petertriho/nvim-scrollbar", optional = true },
     },
     event = "CmdlineEnter",

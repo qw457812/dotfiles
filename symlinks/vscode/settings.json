@@ -19,7 +19,9 @@
 {
   "window.density.editorTabHeight": "compact",
   "editor.accessibilitySupport": "off",
-  "editor.fontLigatures": false,
+  "editor.fontFamily": "Maple Mono NF CN",
+  // https://github.com/subframe7536/maple-font/blob/variable/source/features/README.md
+  "editor.fontLigatures": "'calt', 'cv01', 'cv35', 'ss06'",
   "editor.fontWeight": "normal",
   "editor.wordWrap": "off",
   "editor.minimap.enabled": false,
@@ -120,7 +122,8 @@
     }
   },
   "explorer.confirmDelete": false,
-  "terminal.integrated.fontFamily": "MesloLGM Nerd Font", // JetBrainsMono Nerd Font, Hack Nerd Font, MesloLGM Nerd Font, MesloLGS Nerd Font Mono
+  // "terminal.integrated.fontFamily": "MesloLGM Nerd Font", // JetBrainsMono Nerd Font, Hack Nerd Font, MesloLGM Nerd Font, MesloLGS Nerd Font Mono
+  "terminal.integrated.fontLigatures.enabled": true,
   "terminal.integrated.copyOnSelection": true,
   "terminal.integrated.rightClickBehavior": "paste",
   "terminal.integrated.focusAfterRun": "terminal",
@@ -189,28 +192,28 @@
     "asvetliakov.vscode-neovim": 1
   },
   // "vscode-neovim.neovimExecutablePaths.darwin": "/opt/homebrew/bin/nvim",
-  "vscode-neovim.compositeKeys": {
-    "jj": {
-      "command": "vscode-neovim.escape"
-    },
-    "jk": {
-      // Use lua to execute any logic
-      "command": "vscode-neovim.lua",
-      "args": [
-        [
-          "local code = require('vscode')",
-          "code.action('vscode-neovim.escape')"
-          // "code.action('workbench.action.files.save')"
-        ]
-      ]
-    },
-    "kj": {
-      "command": "vscode-neovim.escape"
-    },
-    "kk": {
-      "command": "vscode-neovim.escape"
-    }
-  },
+  // "vscode-neovim.compositeKeys": {
+  //   "jj": {
+  //     "command": "vscode-neovim.escape"
+  //   },
+  //   "jk": {
+  //     // Use lua to execute any logic
+  //     "command": "vscode-neovim.lua",
+  //     "args": [
+  //       [
+  //         "local code = require('vscode')",
+  //         "code.action('vscode-neovim.escape')"
+  //         // "code.action('workbench.action.files.save')"
+  //       ]
+  //     ]
+  //   },
+  //   "kj": {
+  //     "command": "vscode-neovim.escape"
+  //   },
+  //   "kk": {
+  //     "command": "vscode-neovim.escape"
+  //   }
+  // },
   "vim.useSystemClipboard": true,
   "vim.hlsearch": true,
   "vim.visualstar": true,

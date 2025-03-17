@@ -65,7 +65,13 @@ return {
         { close_key, mode = "x", "<esc>", desc = "Stop Visual Mode" },
       })
       if exit_key then
-        table.insert(keys, { exit_key, "<cmd>qa<cr>", desc = "Quit All" })
+        table.insert(keys, {
+          exit_key,
+          vim.g.vscode and function()
+            require("vscode").action("workbench.action.closeWindow")
+          end or "<cmd>qa<cr>",
+          desc = "Quit All",
+        })
       end
       if term_close_key then
         vim.list_extend(keys, {

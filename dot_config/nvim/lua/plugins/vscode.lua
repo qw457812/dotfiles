@@ -5,7 +5,7 @@ end
 local vscode = require("vscode")
 local map = U.keymap.map
 
--- vim.notify = vscode.notify
+vim.notify = vscode.notify
 -- vim.g.clipboard = vim.g.vscode_clipboard
 
 ---@param mode string|string[]
@@ -27,6 +27,29 @@ local function vscode_map(mode, key, command, opts)
 end
 
 return {
+  {
+    "snacks.nvim",
+    ---@module "snacks"
+    ---@param opts snacks.Config
+    config = function(_, opts)
+      ---@type snacks.Config
+      local o = {
+        bigfile = { enabled = false },
+        dashboard = { enabled = false },
+        indent = { enabled = false },
+        input = { enabled = false },
+        notifier = { enabled = false },
+        picker = { enabled = false },
+        quickfile = { enabled = false },
+        scroll = { enabled = false },
+        statuscolumn = { enabled = false },
+        image = { enabled = false },
+        scope = { enabled = false },
+        words = { enabled = false },
+      }
+      require("snacks").setup(vim.tbl_deep_extend("force", opts, o))
+    end,
+  },
   {
     "LazyVim/LazyVim",
     opts = function()
@@ -72,17 +95,20 @@ return {
           vscode_map("n", "gy", "editor.action.goToTypeDefinition", { desc = "Goto T[y]pe Definition" })
           vscode_map("n", "gI", "editor.action.goToImplementation", { desc = "Goto Implementation" })
 
+          map({ "i", "x", "n", "s" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Save File" })
+
           vscode_map("n", "<C-Down>", "workbench.action.increaseViewHeight")
           vscode_map("n", "<C-Up>", "workbench.action.decreaseViewHeight")
           vscode_map("n", "<C-Left>", "workbench.action.decreaseViewWidth")
           vscode_map("n", "<C-Right>", "workbench.action.increaseViewWidth")
 
           vscode_map("n", "<leader>e", "workbench.view.explorer", { desc = "Explorer" })
+          vscode_map("n", "<leader>n", "notifications.showList", { desc = "Notification History" })
           vscode_map("n", "<leader>z", "workbench.action.toggleZenMode", { desc = "Zen Mode" })
 
           -- map("n", { "<leader><space>", "<leader>ff" }, "<cmd>Find<cr>", { desc = "Find Files" })
           vscode_map("n", { "<leader><space>", "<leader>ff" }, "workbench.action.quickOpen", { desc = "Find Files" })
-          vscode_map("n", { "<leader>/", "<leader>sg" }, "workbench.action.findInFiles", { desc = "Grep" })
+          vscode_map("n", "<leader>/", "workbench.action.findInFiles", { desc = "Grep" })
           -- https://github.com/vscode-neovim/vscode-neovim/issues/987#issuecomment-1201951589
           vscode_map(
             "n",
@@ -93,41 +119,26 @@ return {
           vscode_map("n", "<leader>,", "workbench.action.showAllEditors", { desc = "Switch Editor" })
           vscode_map("n", { "<leader>:", "<leader>sc" }, "workbench.action.showCommands", { desc = "Commands" })
 
+          for i = 1, 9 do
+            vscode_map("n", "<leader>" .. i, "workbench.action.openEditorAtIndex" .. i, { desc = "Goto Editor " .. i })
+          end
           vscode_map("n", "<leader>bd", "workbench.action.closeActiveEditor", { desc = "Close Editor" })
           vscode_map("n", "<leader>bo", "workbench.action.closeOtherEditors", { desc = "Close Other Editors" })
           vscode_map("n", "<leader>bA", "workbench.action.closeAllEditors", { desc = "Close All Editors" })
           vscode_map("n", "<leader>bp", "workbench.action.pinEditor", { desc = "Pin Editor" })
           vscode_map("n", "<leader>bP", "workbench.action.unpinEditor", { desc = "Unpin Editor" })
-          vscode_map(
-            "n",
-            "<leader>bh",
-            "workbench.action.closeEditorsToTheLeft",
-            { desc = "Close Editors to the Left" }
-          )
-          vscode_map(
-            "n",
-            "<leader>bl",
-            "workbench.action.closeEditorsToTheRight",
-            { desc = "Close Editors to the Right" }
-          )
+          -- stylua: ignore start
+          vscode_map("n", "<leader>bh", "workbench.action.closeEditorsToTheLeft", { desc = "Close Editors to the Left" })
+          vscode_map("n", "<leader>bl", "workbench.action.closeEditorsToTheRight", { desc = "Close Editors to the Right" })
           vscode_map("n", "<leader>bH", "workbench.action.firstEditorInGroup", { desc = "Goto First Editor" })
           vscode_map("n", "<leader>bL", "workbench.action.lastEditorInGroup", { desc = "Goto Last Editor" })
-          for i = 1, 9 do
-            vscode_map("n", "<leader>b" .. i, "workbench.action.openEditorAtIndex" .. i, { desc = "Goto Editor " .. i })
-          end
 
           vscode_map("n", "<leader>fc", "workbench.action.openSettingsJson", { desc = "Config File: Settings" })
-          vscode_map(
-            "n",
-            "<leader>fk",
-            "workbench.action.openGlobalKeybindingsFile",
-            { desc = "Config File: Keybindings" }
-          )
+          vscode_map("n", "<leader>fk", "workbench.action.openGlobalKeybindingsFile", { desc = "Config File: Keybindings" })
           vscode_map("n", "<leader>fn", "workbench.action.files.newUntitledFile", { desc = "New File" })
-          -- stylua: ignore
           vscode_map("n", "<leader>fS", "workbench.action.files.saveWithoutFormatting", { desc = "Save File Without Formatting" })
-          -- vscode_map("n", "<leader>ft", "workbench.action.terminal.focus", { desc = "Terminal" })
-          vscode_map("n", "<leader>ft", "workbench.action.terminal.toggleTerminal", { desc = "Terminal" })
+          -- stylua: ignore end
+          -- vscode_map("n", "<leader>ft", "workbench.action.terminal.toggleTerminal", { desc = "Terminal" }) -- workbench.action.terminal.focus
           vscode_map("n", "<leader>fr", "workbench.action.showAllEditorsByMostRecentlyUsed", { desc = "Recent" })
           vscode_map("n", "<leader>fy", "workbench.action.files.copyPathOfActiveFile", { desc = "Yank file path" })
           vscode_map("n", "<leader>fY", "copyRelativeFilePath", { desc = "Yank file path from project" })
@@ -135,10 +146,11 @@ return {
           -- vscode_map("n", "<leader>fp", "projectManager.listProjectsNewWindow", { desc = "Projects" })
           vscode_map("n", "<leader>fp", "workbench.action.openRecent", { desc = "Projects" })
 
+          vscode_map("n", "<leader>sg", "workbench.action.quickTextSearch", { desc = "Quick text search" })
           vscode_map("n", "<leader>sk", "workbench.action.openGlobalKeybindings", { desc = "Key Maps" })
           vscode_map("n", "<leader>sC", "workbench.action.showCommands", { desc = "Commands" })
           vscode_map("n", "<leader>ss", "workbench.action.gotoSymbol", { desc = "Goto Symbol" })
-          -- vscode_map("n", "<leader>sS", "workbench.action.showAllSymbols", { desc = "Goto Symbol (Workspace)" })
+          vscode_map("n", "<leader>sS", "workbench.action.showAllSymbols", { desc = "Goto Symbol (Workspace)" })
           vscode_map("n", "<leader>sna", "notifications.showList", { desc = "Noice All" })
 
           vscode_map("n", "<leader>gg", "workbench.view.scm", { desc = "SCM" })
@@ -150,13 +162,15 @@ return {
           vscode_map({ "n", "v" }, "<leader>cf", "editor.action.formatDocument", { desc = "Format" })
           vscode_map("n", "<leader>co", "editor.action.organizeImports", { desc = "Organize Imports" })
 
-          vscode_map("v", "<leader>rs", "editor.action.refactor", { desc = "Refactor" })
-          -- https://code.visualstudio.com/docs/editor/refactoring#_keybindings-for-code-actions
+          vscode_map("v", "<leader>rr", "editor.action.refactor", { desc = "Refactor" })
+          -- https://code.visualstudio.com/docs/editor/refactoring#_keyboard-shortcuts-for-code-actions
           map("v", "<leader>rx", function()
             vscode.action("editor.action.codeAction", { args = { kind = "refactor.extract.variable" } })
           end, { desc = "Extract Variable" })
 
           vscode_map("n", "<leader>db", "editor.debug.action.toggleBreakpoint", { desc = "Toggle Breakpoint" })
+
+          -- Toggle Wrap {{{
 
           -- vscode_map("n", "<leader>uw", "editor.action.toggleWordWrap", { desc = "Wrap" })
           local wrap = false
@@ -210,19 +224,20 @@ return {
               end
             end
           end, { desc = "Wrap" })
+
+          -- }}}
+
           vscode_map("n", "<leader>uC", "workbench.action.selectTheme", { desc = "Colorscheme with Preview" })
 
           vscode_map("n", "<leader>xx", "workbench.actions.view.problems", { desc = "Diagnostics" })
 
+          vscode_map("n", "<leader>qq", "workbench.action.closeWindow", { desc = "Quit All" })
+
           vim.api.nvim_create_autocmd("FileType", {
             pattern = "markdown",
             callback = function(event)
-              vscode_map(
-                "n",
-                "<leader>cp",
-                "markdown.showPreviewToSide",
-                { buffer = event.buf, desc = "Markdown Preview" }
-              )
+              -- stylua: ignore
+              vscode_map("n", "<leader>cp", "markdown.showPreviewToSide", { buffer = event.buf, desc = "Markdown Preview" })
             end,
           })
 
