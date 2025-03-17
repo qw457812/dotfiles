@@ -59,8 +59,8 @@ local function edit_submit(question)
 end
 
 local function switch_provider()
-  -- https://github.com/yetone/avante.nvim/blob/962dd0a759d9cba7214dbc954780c5ada5799449/lua/avante/init.lua#L47
-  vim.ui.select(require("avante.config").providers, { prompt = "Select Avante Provider:" }, function(choice)
+  -- https://github.com/yetone/avante.nvim/blob/931a364dad7b4ff9cc583646c3fd5ae69d3dcc61/plugin/avante.lua#L110-L118
+  vim.ui.select(require("avante.config").provider_names, { prompt = "Select Avante Provider:" }, function(choice)
     if choice then
       require("avante.api").switch_provider(choice)
     end
@@ -198,7 +198,6 @@ return {
           __inherited_from = "copilot",
           -- https://github.com/CopilotC-Nvim/CopilotChat.nvim#models
           model = "claude-3.7-sonnet",
-          max_tokens = 8192,
         },
         ---@type AvanteSupportedProvider
         ---@diagnostic disable-next-line: missing-fields
