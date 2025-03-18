@@ -164,7 +164,12 @@ return {
             hl.TelescopeResultsTitle = { fg = util.blend_bg(c.red, 0.8), bg = bg, bold = true }
           end
 
-          if not vim.g.user_transparent_background then
+          if vim.g.user_transparent_background then
+            hl.StatusLine = { fg = hl.StatusLine.fg }
+            hl.StatusLineNC = { fg = hl.StatusLineNC.fg }
+            hl.TabLine = { fg = hl.TabLine.fg }
+            hl.TabLineFill = {}
+          else
             hl.NeoTreeWinSeparator = { fg = c.bg, bg = c.bg }
           end
 
