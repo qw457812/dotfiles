@@ -217,7 +217,7 @@ return {
           endpoint = "https://api.groq.com/openai/v1/",
           -- curl -X GET "https://api.groq.com/openai/v1/models" -H "Authorization: Bearer $GROQ_API_KEY" -H "Content-Type: application/json" | jq '.data | sort_by(.created)'
           model = "llama-3.3-70b-versatile",
-          max_tokens = 32768,
+          max_completion_tokens = 32768,
         },
         ---@type AvanteSupportedProvider
         ---@diagnostic disable-next-line: missing-fields

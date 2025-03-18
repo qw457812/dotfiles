@@ -283,6 +283,9 @@ return {
         "man",
         "gitcommit",
         "grug-far",
+        "Avante", -- avante.nvim has its own winbar
+        "AvanteInput",
+        "AvanteSelectedFiles",
       })
 
       opts.winbar = {

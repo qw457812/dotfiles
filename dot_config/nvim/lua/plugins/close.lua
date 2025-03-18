@@ -459,34 +459,34 @@ return {
     "yetone/avante.nvim",
     optional = true,
     opts = function(_, opts)
-      local defaults = require("avante.config")._defaults
+      -- local defaults = require("avante.config")._defaults
 
       vim.api.nvim_create_autocmd("FileType", {
         group = augroup,
         pattern = {
-          -- "Avante",
+          "Avante",
           "AvanteInput",
           "AvanteSelectedFiles",
         },
         callback = function(event)
-          vim.keymap.set("n", close_key, "<cmd>close<cr>", {
+          vim.keymap.set("n", close_key, require("avante").close_sidebar, {
             buffer = event.buf,
             silent = true,
-            desc = "Quit buffer",
+            desc = "Close (Avante)",
           })
         end,
       })
 
-      return U.extend_tbl(opts, {
-        mappings = {
-          sidebar = {
-            close = vim.list_extend(
-              vim.tbl_get(opts, "mappings", "sidebar", "close") or vim.deepcopy(defaults.mappings.sidebar.close),
-              { close_key }
-            ),
-          },
-        },
-      })
+      -- return U.extend_tbl(opts, {
+      --   mappings = {
+      --     sidebar = {
+      --       close = vim.list_extend(
+      --         vim.tbl_get(opts, "mappings", "sidebar", "close") or vim.deepcopy(defaults.mappings.sidebar.close),
+      --         { close_key }
+      --       ),
+      --     },
+      --   },
+      -- })
     end,
   },
 
