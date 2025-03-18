@@ -370,6 +370,7 @@ return {
           filter = {
             event = "notify",
             any = {
+              { find = "^chezmoi: .*: not in source state$" },
               { find = "^Edit: Opened a chezmoi%-managed file$" },
               { find = "^Edit: Successfully applied$" },
             },
