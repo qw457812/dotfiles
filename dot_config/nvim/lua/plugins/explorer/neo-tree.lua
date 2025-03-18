@@ -64,6 +64,7 @@ return {
       end
       return vim.list_extend(keys, mappings)
     end,
+    ---@module "neo-tree"
     ---@param opts neotree.Config
     opts = function(_, opts)
       local hijack_netrw = vim.g.user_hijack_netrw == "neo-tree.nvim"
@@ -341,10 +342,8 @@ return {
 
       -- }}}
 
-      -- https://github.com/LazyVim/LazyVim/pull/5763
-      table.insert(opts.open_files_do_not_replace_types, "edgy")
-
-      return vim.tbl_deep_extend("force", opts, {
+      ---@type neotree.Config
+      local o = {
         sources = { "filesystem" },
         -- close_if_last_window = true, -- disabled as it causes `:bd` to exit vim in java library buffer when neo-tree opened, see #241
         default_component_configs = {
@@ -750,7 +749,12 @@ return {
             end,
           },
         },
-      })
+      }
+
+      -- https://github.com/LazyVim/LazyVim/pull/5763
+      table.insert(opts.open_files_do_not_replace_types, "edgy")
+
+      return vim.tbl_deep_extend("force", opts, o)
     end,
   },
 

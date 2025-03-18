@@ -390,7 +390,6 @@ return {
         providers = {
           spell = {
             module = "blink-cmp-spell",
-            name = "Spell",
             min_keyword_length = 2,
             max_items = 1,
             score_offset = -10,
@@ -455,7 +454,6 @@ return {
         providers = {
           env = {
             module = "blink-cmp-env",
-            name = "Env",
             min_keyword_length = 3,
             max_items = 3,
             score_offset = -25,

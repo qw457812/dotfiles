@@ -257,7 +257,6 @@ return {
   --       providers = {
   --         avante = {
   --           module = "blink-cmp-avante",
-  --           name = "Avante",
   --         },
   --       },
   --     },

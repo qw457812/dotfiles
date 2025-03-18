@@ -91,6 +91,8 @@ return {
   {
     "nvim-neo-tree/neo-tree.nvim",
     optional = true,
+    ---@module "neo-tree"
+    ---@type neotree.Config
     opts = {
       popup_border_style = "rounded",
       default_component_configs = {
