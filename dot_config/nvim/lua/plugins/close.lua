@@ -269,6 +269,8 @@ return {
   {
     "nvim-neo-tree/neo-tree.nvim",
     optional = true,
+    ---@module "neo-tree"
+    ---@type neotree.Config
     opts = {
       window = {
         mappings = {
