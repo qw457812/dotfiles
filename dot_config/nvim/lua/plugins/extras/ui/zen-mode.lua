@@ -39,7 +39,7 @@ return {
           vim.g.user_minianimate_disable_old = vim.g.minianimate_disable
           vim.g.minianimate_disable = true
           vim.g.user_winbar_old = vim.wo.winbar
-          vim.wo.winbar = nil
+          vim.wo.winbar = ""
           -- -- show bufferline in zen mode
           -- if package.loaded["bufferline"] and require("bufferline.utils").get_buf_count() > 1 then
           --   vim.g.user_neotree_visible_old = vim.g.user_neotree_visible

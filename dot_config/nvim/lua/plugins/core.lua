@@ -130,14 +130,14 @@ return {
       local on_open = opts.zen.on_open or function() end
       opts.zen.on_open = function(win)
         on_open(win)
-        vim.wo[win.win].winbar = nil
+        vim.wo[win.win].winbar = ""
         vim.api.nvim_create_autocmd("BufWinEnter", {
           group = win.augroup,
           callback = function()
             if not vim.api.nvim_win_is_valid(win.win) then
               return true
             end
-            vim.wo[win.win].winbar = nil
+            vim.wo[win.win].winbar = ""
           end,
         })
       end
