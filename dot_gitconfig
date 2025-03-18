@@ -13,7 +13,7 @@
 
 [interactive]
     ; diffFilter = diff-so-fancy --patch
-    diffFilter = delta --color-only --features=interactive
+    diffFilter = delta --color-only
 
 ; [include]
 ;     path = ~/.config/tokyonight.nvim/extras/delta/tokyonight_moon.gitconfig
@@ -46,16 +46,22 @@
     colorMoved = default
 
 [merge]
-    conflictstyle = diff3
+    conflictstyle = zdiff3
 
 [pull]
     rebase = true
+
+; [push]
+;     default = upstream
 
 [rebase]
     autoStash = true
 
 [commit]
     template = ~/.stCommitMsg
+
+[init]
+    defaultBranch = main
 
 [filter "lfs"]
     process = git-lfs filter-process
