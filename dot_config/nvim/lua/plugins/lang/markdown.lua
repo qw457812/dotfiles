@@ -7,6 +7,35 @@ local image_cursor_only = false
 
 return {
   {
+    "LazyVim/LazyVim",
+    opts = function()
+      if vim.fn.has("nvim-0.11") == 1 then
+        vim.api.nvim_create_autocmd("FileType", {
+          pattern = "markdown",
+          callback = function(ev)
+            local buf = ev.buf
+            vim.defer_fn(function()
+              if not vim.api.nvim_buf_is_valid(buf) then
+                return
+              end
+
+              -- see: https://github.com/neovim/neovim/blob/eefd72fff753e923abf88ac85b1de0859cf24635/runtime/ftplugin/markdown.lua
+              vim.keymap.del("n", "gO", { buffer = buf })
+              -- see: https://github.com/LazyVim/LazyVim/blob/0b6d1c00506a6ea6af51646e6ec7212ac89f86e5/lua/lazyvim/plugins/extras/editor/illuminate.lua#L45-L52
+              vim.keymap.set("n", "]]", function()
+                require("vim.treesitter._headings").jump({ count = 1 })
+              end, { buffer = buf, silent = false, desc = "Jump to next section" })
+              vim.keymap.set("n", "[[", function()
+                require("vim.treesitter._headings").jump({ count = -1 })
+              end, { buffer = buf, silent = false, desc = "Jump to previous section" })
+            end, 100)
+          end,
+        })
+      end
+    end,
+  },
+
+  {
     "neovim/nvim-lspconfig",
     opts = function(_, opts)
       if vim.g.user_is_termux then
