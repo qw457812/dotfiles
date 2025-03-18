@@ -37,8 +37,6 @@ set -x LESS '--RAW-CONTROL-CHARS --ignore-case --LONG-PROMPT --chop-long-lines -
 # set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
 set -x MANPAGER 'nvim --cmd "lua vim.g.manpager = true" -c "nnoremap d <C-d>|lua vim.defer_fn(function() vim.api.nvim_command(\"silent! nunmap dd|nnoremap u <C-u>\") end, 500)" +Man!'
 # set -x MANROFFOPT -c
-set -x BAT_THEME TwoDark
-set -x BAT_STYLE plain
 set -x EZA_MIN_LUMINANCE 50
 set -x DYLD_LIBRARY_PATH /opt/homebrew/opt/librime/lib # https://github.com/wlh320/rime-ls#macos
 set -x LG_CONFIG_FILE $HOME/.config/lazygit/config.yml,$HOME/.cache/nvim/lazygit-theme.yml
