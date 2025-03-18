@@ -47,7 +47,7 @@ return {
         callback = function(ev)
           -- https://github.com/MagicDuck/grug-far.nvim#create-a-buffer-local-keybinding-to-toggle---fixed-strings-flag
           vim.keymap.set("n", "<localleader>f", function()
-            local state = unpack(require("grug-far").toggle_flags({ "--fixed-strings" }) or {})
+            local state = unpack(require("grug-far").toggle_flags({ "--fixed-strings" }))
             LazyVim.info(("Toggled `--fixed-strings`: **%s**"):format(state and "ON" or "OFF"), { title = "Grug Far" })
           end, { buffer = ev.buf, desc = "Toggle --fixed-strings" })
 
