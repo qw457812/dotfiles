@@ -53,7 +53,7 @@ https://github.com/Julow/Unexpected-Keyboard/issues/362#issuecomment-1544958429
     <key key0="j" key1="loc accent_trema" key2="loc accent_circonflexe" key4="}" key3="{"/>
     <key key0="k" key1="loc accent_double_aigu" key3="[" key4="]"/>
     <key key0="l" key2="|" key3="\\"/>
-    <key key0="shift" key2="loc capslock"/> <!-- my -->
+    <key key0="esc"/> <!-- my -->
   </row>
   <row>
     <!-- <key width="1.5" key0="shift" key2="loc capslock"/> -->
@@ -67,7 +67,7 @@ https://github.com/Julow/Unexpected-Keyboard/issues/362#issuecomment-1544958429
     <key key0="b" key2="\?" key3="/"/>
     <key key0="n" key1="loc accent_tilde" key2=":" key3=";"/>
     <key key0="m" key2="&quot;" key3="'"/>
-    <key key0="esc"/> <!-- my -->
+    <key key0="shift" key2="loc capslock"/> <!-- my -->
     <!-- <key width="1.5" key0="backspace" key2="delete"/> -->
     <key width="2" key0="backspace" key2="delete"/> <!-- my -->
   </row>
