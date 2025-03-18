@@ -1131,9 +1131,9 @@ preset_keyboards:
       # - {click: j, swipe_up: _Keyboard_clip_script, key_text_color: TEXX, key_back_color: TEEX, key_symbol_color: TEX, hilited_key_back_color: TTEX, key_border_color: BKYS, long_click: '#', key_back_color: JJJ}
       - {click: Vim_j, swipe_up: Page_Down, key_text_color: TEXX, key_back_color: TEEX, key_symbol_color: TEX, hilited_key_back_color: TTEX, key_border_color: BKYS, key_back_color: JJJ}
       # - {click: k, key_text_color: TEX, key_symbol_color: TEX,  key_border_color: BKYS, long_click: '"', key_back_color: KKK, swipe_left: q_lssz}
-      - {click: Vim_k, swipe_up: Page_Up, key_text_color: TEX, key_symbol_color: TEX,  key_border_color: BKYS, key_back_color: KKK, swipe_left: q_lssz}
+      - {click: Vim_k, swipe_up: Page_Up, key_text_color: TEX, key_symbol_color: TEX,  key_border_color: BKYS, key_back_color: KKK}
       # - {click: l, swipe_up: End, key_text_color: TEX, key_symbol_color: TEX,  key_border_color: BKYS, long_click: '\', swipe_left: q_lssz, key_back_color: LLL}
-      - {click: Vim_l, swipe_up: End, key_text_color: TEX, key_symbol_color: TEX,  key_border_color: BKYS, swipe_left: q_lssz, key_back_color: LLL}
+      - {click: Vim_l, swipe_up: End, key_text_color: TEX, key_symbol_color: TEX,  key_border_color: BKYS, key_back_color: LLL}
       # - {click: Shift_L, shift_lock : long, label: Shift, key_text_size: 12, composing: Escape, swipe_up: Hide, key_symbol_color: ssy, key_back_color: shb, key_text_color: SHt, hilited_key_back_color: shift, key_border_color: BKYSS, width: 10}
       # - {width: 5}
       # - {width: 10}

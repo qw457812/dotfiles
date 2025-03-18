@@ -256,35 +256,34 @@ return {
           vscode_map("n", "<leader>xx", "workbench.actions.view.problems", { desc = "Diagnostics" })
 
           vscode_map("n", "<leader>qq", "workbench.action.closeWindow", { desc = "Quit All" })
-
-          vim.api.nvim_create_autocmd("FileType", {
-            pattern = "markdown",
-            callback = function(event)
-              -- stylua: ignore
-              vscode_map("n", "<leader>cp", "markdown.showPreviewToSide", { buffer = event.buf, desc = "Markdown Preview" })
-            end,
-          })
-
-          vim.api.nvim_create_autocmd("FileType", {
-            pattern = "python",
-            callback = function(event)
-              vscode_map("n", "<leader>cv", "python.setInterpreter", { buffer = event.buf, desc = "Select VirtualEnv" })
-            end,
-          })
-
-          -- TODO:
-          -- https://code.visualstudio.com/docs/getstarted/keybindings
-          -- https://github.com/archilkarchava/astronvim_config/blob/e4173cc3059c8aeca710b54c877533c7d5f8fc46/lua/plugins/vscode.lua
-          -- https://github.com/AstroNvim/astrocommunity/blob/main/lua/astrocommunity/recipes/vscode/init.lua
-          -- https://github.com/jellydn/my-nvim-ide/blob/e880b780c8d0efcebcaaf7d1443e7226d8d87804/lua/plugins/vscode.lua
-          -- https://github.com/echasnovski/nvim/blob/b84cec54e0a46c9de824820fa8698b5bba43eb81/src/vscode.lua
-          -- https://github.com/pojokcodeid/nvim-lazy/blob/ab014bb8b52ded6bc053f5b224574ac89bd18af9/init.lua
-          -- https://github.com/kshenoy/dotfiles/blob/bd29a03df3c1f2df4273cb19dc54ed79eecaa5a5/nvim/lua/vscode-only/keybindings.lua
-          -- https://github.com/Virgiel/my-config/blob/64c5c60c0be4a5f67fc7709017b3dd34ddc33376/config/nvim.lua#L25
-          -- https://github.com/Matt-FTW/dotfiles/blob/7f14ad9d58fa5ee2aa971b77da4570c52f9aaa01/.config/nvim/lua/plugins/extras/util/vscode.lua
-          -- https://github.com/jellydn/vscode-like-pro/blob/main/vscode.lua
         end,
       })
+
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "markdown",
+        callback = function(event)
+          vscode_map("n", "<leader>cp", "markdown.showPreviewToSide", { buffer = event.buf, desc = "Markdown Preview" })
+        end,
+      })
+
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "python",
+        callback = function(event)
+          vscode_map("n", "<leader>cv", "python.setInterpreter", { buffer = event.buf, desc = "Select VirtualEnv" })
+        end,
+      })
+
+      -- TODO:
+      -- https://code.visualstudio.com/docs/getstarted/keybindings
+      -- https://github.com/archilkarchava/astronvim_config/blob/e4173cc3059c8aeca710b54c877533c7d5f8fc46/lua/plugins/vscode.lua
+      -- https://github.com/AstroNvim/astrocommunity/blob/main/lua/astrocommunity/recipes/vscode/init.lua
+      -- https://github.com/jellydn/my-nvim-ide/blob/e880b780c8d0efcebcaaf7d1443e7226d8d87804/lua/plugins/vscode.lua
+      -- https://github.com/echasnovski/nvim/blob/b84cec54e0a46c9de824820fa8698b5bba43eb81/src/vscode.lua
+      -- https://github.com/pojokcodeid/nvim-lazy/blob/ab014bb8b52ded6bc053f5b224574ac89bd18af9/init.lua
+      -- https://github.com/kshenoy/dotfiles/blob/bd29a03df3c1f2df4273cb19dc54ed79eecaa5a5/nvim/lua/vscode-only/keybindings.lua
+      -- https://github.com/Virgiel/my-config/blob/64c5c60c0be4a5f67fc7709017b3dd34ddc33376/config/nvim.lua#L25
+      -- https://github.com/Matt-FTW/dotfiles/blob/7f14ad9d58fa5ee2aa971b77da4570c52f9aaa01/.config/nvim/lua/plugins/extras/util/vscode.lua
+      -- https://github.com/jellydn/vscode-like-pro/blob/main/vscode.lua
     end,
   },
 }
