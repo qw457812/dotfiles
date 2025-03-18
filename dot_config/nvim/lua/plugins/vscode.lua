@@ -90,6 +90,21 @@ return {
 
           -- vscode_map("n", "gd", "editor.action.revealDefinition", { desc = "Goto Definition" })
           map("n", "<cr>", "gd", { desc = "Goto Definition/References", remap = true })
+          -- map("n", "gr", function()
+          --   vscode.action("editor.action.goToReferences", {
+          --     callback = function()
+          --       -- FIXME: first `v` after references not working
+          --       vim.api.nvim_create_autocmd("ModeChanged", {
+          --         group = vim.api.nvim_create_augroup("fix_auto_visual_after_references", { clear = true }),
+          --         pattern = "n:v",
+          --         once = true,
+          --         callback = function()
+          --           vim.cmd("normal! v")
+          --         end,
+          --       })
+          --     end,
+          --   })
+          -- end, { desc = "References" })
           vscode_map("n", "gr", "editor.action.goToReferences", { desc = "References" })
           -- vscode_map("n", "gr", "editor.action.referenceSearch.trigger", { desc = "References" })
           vscode_map("n", "gy", "editor.action.goToTypeDefinition", { desc = "Goto T[y]pe Definition" })
@@ -119,6 +134,11 @@ return {
           vscode_map("n", "<leader>,", "workbench.action.showAllEditors", { desc = "Switch Editor" })
           vscode_map("n", { "<leader>:", "<leader>sc" }, "workbench.action.showCommands", { desc = "Commands" })
 
+          -- github.copilot.chat.attachFile
+          -- github.copilot.chat.attachSelection
+          vscode_map({ "n", "v" }, "<leader>aa", "workbench.action.chat.openInSidebar", { desc = "Copilot Chat" })
+          vscode_map({ "n", "v" }, "<leader>ae", "inlineChat.start", { desc = "Inline Chat" })
+
           for i = 1, 9 do
             vscode_map("n", "<leader>" .. i, "workbench.action.openEditorAtIndex" .. i, { desc = "Goto Editor " .. i })
           end
@@ -146,6 +166,10 @@ return {
           -- vscode_map("n", "<leader>fp", "projectManager.listProjectsNewWindow", { desc = "Projects" })
           vscode_map("n", "<leader>fp", "workbench.action.openRecent", { desc = "Projects" })
 
+          map("n", "<leader>sw", function()
+            vscode.action("workbench.action.findInFiles", { args = { query = vim.fn.expand("<cword>") } })
+          end, { desc = "Grep Word" })
+          vscode_map("v", "<leader>sw", "workbench.action.findInFiles", { desc = "Grep Visual Selection" })
           vscode_map("n", "<leader>sg", "workbench.action.quickTextSearch", { desc = "Quick text search" })
           vscode_map("n", "<leader>sk", "workbench.action.openGlobalKeybindings", { desc = "Key Maps" })
           vscode_map("n", "<leader>sC", "workbench.action.showCommands", { desc = "Commands" })
@@ -250,6 +274,7 @@ return {
 
           -- TODO:
           -- https://code.visualstudio.com/docs/getstarted/keybindings
+          -- https://github.com/archilkarchava/astronvim_config/blob/e4173cc3059c8aeca710b54c877533c7d5f8fc46/lua/plugins/vscode.lua
           -- https://github.com/AstroNvim/astrocommunity/blob/main/lua/astrocommunity/recipes/vscode/init.lua
           -- https://github.com/jellydn/my-nvim-ide/blob/e880b780c8d0efcebcaaf7d1443e7226d8d87804/lua/plugins/vscode.lua
           -- https://github.com/echasnovski/nvim/blob/b84cec54e0a46c9de824820fa8698b5bba43eb81/src/vscode.lua
