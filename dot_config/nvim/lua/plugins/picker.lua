@@ -143,10 +143,10 @@ return {
               width = 0.5,
               min_width = 80,
               height = 0.8,
-              min_height = 30,
+              min_height = math.min(35, vim.o.lines - 1), -- 1 for lualine.nvim
               border = "none",
               box = "vertical",
-              { win = "preview", title = "{preview}", height = 0.4, border = "rounded" },
+              { win = "preview", title = "{preview}", height = 0.45, border = "rounded" },
               {
                 box = "vertical",
                 border = "rounded",
