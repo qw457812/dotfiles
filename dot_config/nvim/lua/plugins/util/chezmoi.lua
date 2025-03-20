@@ -2,9 +2,11 @@ if not U.path.CHEZMOI then
   return {}
 end
 
+local H = {}
+
 ---@param opts? { targets?: string|string[], path_style_absolute?: boolean, include_symlinks?: boolean }
 ---@return string[]
-local function chezmoi_list_files(opts)
+function H.chezmoi_list_files(opts)
   opts = opts or {}
 
   -- exclude directories and externals
@@ -19,11 +21,11 @@ local function chezmoi_list_files(opts)
   })
 end
 
-local function pick_chezmoi()
+function H.pick_chezmoi()
   if LazyVim.pick.picker.name == "telescope" then
     require("telescope").extensions.chezmoi.find_files()
   elseif LazyVim.pick.picker.name == "fzf" then
-    -- local results = chezmoi_list_files({ include_symlinks = true })
+    -- local results = H.chezmoi_list_files({ include_symlinks = true })
     -- local opts = {
     --   prompt = " ",
     --   fzf_opts = {},
@@ -52,7 +54,7 @@ local function pick_chezmoi()
   end
 end
 
-local function pick_chezmoi_all()
+function H.pick_chezmoi_all()
   if LazyVim.pick.picker.name == "snacks" then
     Snacks.picker.files({
       cwd = U.path.CHEZMOI,
@@ -66,13 +68,13 @@ local function pick_chezmoi_all()
   end
 end
 
-local function chezmoi_list_config_files()
-  return chezmoi_list_files({ targets = vim.fn.stdpath("config"), path_style_absolute = true })
+function H.chezmoi_list_config_files()
+  return H.chezmoi_list_files({ targets = vim.fn.stdpath("config"), path_style_absolute = true })
 end
 
 --- pick nvim config
-local function pick_config()
-  local managed_config_files = chezmoi_list_config_files()
+function H.pick_config()
+  local managed_config_files = H.chezmoi_list_config_files()
   if vim.tbl_isempty(managed_config_files) then
     LazyVim.pick.config_files()()
     return
@@ -166,9 +168,9 @@ return {
     cmd = "ChezmoiEdit",
     keys = {
       { "<leader>sz", false },
-      { "<leader>f.", pick_chezmoi, desc = "Find Chezmoi Source Dotfiles" },
-      { "<leader>f,", pick_chezmoi_all, desc = "Find Chezmoi Files (All)" },
-      { "<leader>fc", pick_config, desc = "Find Config File" },
+      { "<leader>f.", H.pick_chezmoi, desc = "Find Chezmoi Source Dotfiles" },
+      { "<leader>f,", H.pick_chezmoi_all, desc = "Find Chezmoi Files (All)" },
+      { "<leader>fc", H.pick_config, desc = "Find Config File" },
     },
     init = function()
       vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
@@ -184,7 +186,7 @@ return {
       -- https://github.com/dsully/nvim/blob/a6a7a29707e5209c6bf14be0f178d3cd1141b5ff/lua/plugins/util.lua#L104
       -- https://github.com/amuuname/dotfiles/blob/462579dbf4e9452a22cc268a3cb244172d9142aa/dot_config/nvim/plugin/autocmd.lua#L52
       LazyVim.on_very_lazy(vim.schedule_wrap(function()
-        local ok, managed_files = pcall(chezmoi_list_files, { path_style_absolute = true })
+        local ok, managed_files = pcall(H.chezmoi_list_files, { path_style_absolute = true })
         if not ok or vim.tbl_isempty(managed_files) then
           return
         end
@@ -217,7 +219,7 @@ return {
         sources = {
           chezmoi = {
             finder = function()
-              local managed_files = chezmoi_list_files({ include_symlinks = true, path_style_absolute = true })
+              local managed_files = H.chezmoi_list_files({ include_symlinks = true, path_style_absolute = true })
               ---@type snacks.picker.finder.Item[]
               local items = vim.tbl_map(function(file)
                 return { file = file, text = U.path.home_to_tilde(file) }
@@ -269,7 +271,7 @@ return {
               picker:close()
               if item then
                 local file = assert(Snacks.picker.util.path(item))
-                if vim.tbl_contains(chezmoi_list_config_files(), file) then
+                if vim.tbl_contains(H.chezmoi_list_config_files(), file) then
                   require("chezmoi.commands").edit({ targets = file })
                   -- copied from: https://github.com/folke/snacks.nvim/blob/adf93a32ae79b7279e48608fa0705545fc7a36ae/lua/snacks/picker/actions.lua#L105
                   local pos = item.pos
@@ -299,7 +301,7 @@ return {
       local function chezmoi_edit(prompt_bufnr)
         local lp_actions = require("telescope._extensions.lazy_plugins.actions")
         lp_actions.custom_action(prompt_bufnr, "filepath", function(bufnr, entry)
-          if vim.tbl_contains(chezmoi_list_config_files(), entry.filepath) then
+          if vim.tbl_contains(H.chezmoi_list_config_files(), entry.filepath) then
             lp_actions.append_to_telescope_history(bufnr)
             lp_actions.close(bufnr)
             require("chezmoi.commands").edit({ targets = entry.filepath })
@@ -333,7 +335,7 @@ return {
       for i, key in ipairs(keys) do
         if key.key == "c" then
           config_idx = i
-          key.action = pick_config
+          key.action = H.pick_config
           break
         end
       end
@@ -342,7 +344,7 @@ return {
       table.insert(
         keys,
         (config_idx or #keys) + 1,
-        { action = pick_chezmoi, desc = "Chezmoi", icon = "󰠦 ", key = "." }
+        { action = H.pick_chezmoi, desc = "Chezmoi", icon = "󰠦 ", key = "." }
       )
     end,
   },
@@ -391,13 +393,13 @@ return {
   --     for i, button in ipairs(opts.config.center) do
   --       if button.key == "c" then
   --         config_idx = i
-  --         button.action = pick_config
+  --         button.action = H.pick_config
   --         break
   --       end
   --     end
   --
   --     -- add chezmoi button
-  --     local chezmoi = { action = pick_chezmoi, desc = " Chezmoi", icon = "󰠦 ", key = ".", key_format = "  %s" }
+  --     local chezmoi = { action = H.pick_chezmoi, desc = " Chezmoi", icon = "󰠦 ", key = ".", key_format = "  %s" }
   --     chezmoi.desc = chezmoi.desc .. string.rep(" ", 43 - #chezmoi.desc)
   --     table.insert(opts.config.center, (config_idx or #opts.config.center) + 1, chezmoi)
   --   end,
