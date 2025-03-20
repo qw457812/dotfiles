@@ -1,7 +1,8 @@
 return {
   {
     "JuanZoran/Trans.nvim",
-    dependencies = { "kkharji/sqlite.lua" },
+    pager = true,
+    dependencies = { "kkharji/sqlite.lua", pager = true },
     build = function()
       -- https://github.com/JuanZoran/Trans.nvim/issues/52#issuecomment-1869952281
       -- Download https://github.com/skywind3000/ECDICT-ultimate/releases/download/1.0.0/ecdict-ultimate-sqlite.zip,
@@ -106,6 +107,7 @@ return {
 
   {
     "potamides/pantran.nvim",
+    pager = true,
     keys = {
       {
         "m<space>",
