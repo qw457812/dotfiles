@@ -4,21 +4,25 @@ end
 
 local H = {}
 
+---@type table<string, string[]>
+H.cache = {}
+
 ---@param opts? { targets?: string|string[], path_style_absolute?: boolean, include_symlinks?: boolean }
 ---@return string[]
 function H.chezmoi_list_files(opts)
   opts = opts or {}
-
-  -- exclude directories and externals
-  local args = { "--include", "files" .. (opts.include_symlinks and ",symlinks" or ""), "--exclude", "externals" }
-  if opts.path_style_absolute then
-    vim.list_extend(args, { "--path-style", "absolute" })
+  local hashed_cache_key = vim.fn.sha256(vim.json.encode(opts))
+  local ret = H.cache[hashed_cache_key]
+  if not ret then
+    -- exclude directories and externals
+    local args = { "--include", "files" .. (opts.include_symlinks and ",symlinks" or ""), "--exclude", "externals" }
+    if opts.path_style_absolute then
+      vim.list_extend(args, { "--path-style", "absolute" })
+    end
+    ret = require("chezmoi.commands").list({ targets = opts.targets or {}, args = args })
+    H.cache[hashed_cache_key] = ret
   end
-
-  return require("chezmoi.commands").list({
-    targets = opts.targets or {},
-    args = args,
-  })
+  return ret
 end
 
 function H.pick_chezmoi()
@@ -183,9 +187,10 @@ return {
           end
         end),
       })
+
       -- https://github.com/dsully/nvim/blob/a6a7a29707e5209c6bf14be0f178d3cd1141b5ff/lua/plugins/util.lua#L104
       -- https://github.com/amuuname/dotfiles/blob/462579dbf4e9452a22cc268a3cb244172d9142aa/dot_config/nvim/plugin/autocmd.lua#L52
-      LazyVim.on_very_lazy(vim.schedule_wrap(function()
+      local function autocmd_chezmoi_add()
         local ok, managed_files = pcall(H.chezmoi_list_files, { path_style_absolute = true })
         if not ok or vim.tbl_isempty(managed_files) then
           return
@@ -206,7 +211,17 @@ return {
             end
           end),
         })
-      end))
+      end
+
+      LazyVim.on_very_lazy(autocmd_chezmoi_add)
+
+      vim.api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
+        group = vim.api.nvim_create_augroup("chezmoi_managed_cache", { clear = true }),
+        callback = function()
+          H.cache = {}
+          U.debounce("autocmd-chezmoi-add", 500, autocmd_chezmoi_add)
+        end,
+      })
     end,
   },
 
