@@ -1,3 +1,7 @@
+-- if vim.fn.has("nvim-0.11") == 1 then
+--   vim.o.winborder = "rounded"
+-- end
+
 -- https://github.com/aimuzov/LazyVimx/blob/main/lua/lazyvimx/extras/ui/style/popups/rounded.lua
 -- https://github.com/consoleaf/nvim-config/blob/ebcd80b5accbf7e2a5ae568c9c157a7a880411a8/lua/plugins/round.lua
 return {
@@ -184,6 +188,16 @@ return {
     optional = true,
     opts = {
       window = {
+        border = "rounded",
+      },
+    },
+  },
+
+  {
+    "chrisgrieser/nvim-rip-substitute",
+    optional = true,
+    opts = {
+      popupWin = {
         border = "rounded",
       },
     },
