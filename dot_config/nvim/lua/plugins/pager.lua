@@ -114,6 +114,15 @@ return {
       opts.sections.lualine_x = { U.lualine.hlsearch, U.lualine.command }
       opts.sections.lualine_y = { { "progress" } }
       opts.extensions = {}
+      if
+        vim.g.terminal_scrollback_pager
+        and LazyVim.has("tokyonight.nvim")
+        and vim.startswith(vim.g.colors_name, "tokyonight")
+      then
+        local tokyonight = require("lualine.themes.tokyonight")
+        tokyonight.normal.a.bg, tokyonight.normal.b.fg = tokyonight.replace.a.bg, tokyonight.replace.b.fg
+        opts.options.theme = tokyonight
+      end
       require("lualine").setup(opts)
     end,
   },
