@@ -94,6 +94,7 @@ return {
       return {
         style = has_tokyonight_custom_style and tokyonight_custom_style or "storm", -- storm, moon(default), night, day, custom
         transparent = vim.g.user_transparent_background,
+        lualine_bold = true,
         styles = {
           comments = { italic = not no_italic },
           keywords = { italic = not no_italic },
@@ -109,7 +110,7 @@ return {
           c.bg_highlight = to_gray(c.bg_highlight)
           c.bg_popup = to_gray(c.bg_popup)
           c.bg_sidebar = to_gray(c.bg_sidebar)
-          c.bg_statusline = to_gray(c.bg_statusline)
+          c.bg_statusline = vim.g.user_transparent_background and c.none or to_gray(c.bg_statusline)
 
           -- gitcommit, mini.diff
           c.diff.add = util.blend_bg(c.green2, 0.35)
@@ -165,9 +166,6 @@ return {
           end
 
           if vim.g.user_transparent_background then
-            hl.StatusLine = { fg = hl.StatusLine.fg }
-            hl.StatusLineNC = { fg = hl.StatusLineNC.fg }
-            hl.TabLine = { fg = hl.TabLine.fg }
             hl.TabLineFill = {}
           else
             hl.NeoTreeWinSeparator = { fg = c.bg, bg = c.bg }

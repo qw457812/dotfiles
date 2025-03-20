@@ -20,7 +20,7 @@ return {
               end
 
               -- see: https://github.com/neovim/neovim/blob/eefd72fff753e923abf88ac85b1de0859cf24635/runtime/ftplugin/markdown.lua
-              vim.keymap.del("n", "gO", { buffer = buf })
+              pcall(vim.keymap.del, "n", "gO", { buffer = buf })
               -- see: https://github.com/LazyVim/LazyVim/blob/0b6d1c00506a6ea6af51646e6ec7212ac89f86e5/lua/lazyvim/plugins/extras/editor/illuminate.lua#L45-L52
               vim.keymap.set("n", "]]", function()
                 require("vim.treesitter._headings").jump({ count = 1 })
