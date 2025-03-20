@@ -71,24 +71,24 @@ end
 return {
   {
     "yetone/avante.nvim",
-    lazy = false, -- see: https://github.com/yetone/avante.nvim/issues/561#issuecomment-2342550208
+    -- lazy = false, -- see: https://github.com/yetone/avante.nvim/issues/561#issuecomment-2342550208
     build = "make",
     dependencies = {
       {
         "nvim-treesitter/nvim-treesitter",
-        opts = {
-          -- copied from: https://github.com/yetone/avante.nvim/pull/1181
-          highlight = {
-            disable = function(_, buf)
-              if vim.bo[buf].filetype == "Avante" then
-                local sidebar = require("avante").get()
-                if sidebar and sidebar.is_generating then
-                  return true
-                end
-              end
-            end,
-          },
-        },
+        -- opts = {
+        --   -- copied from: https://github.com/yetone/avante.nvim/pull/1181
+        --   highlight = {
+        --     disable = function(_, buf)
+        --       if vim.bo[buf].filetype == "Avante" then
+        --         local sidebar = require("avante").get()
+        --         if sidebar and sidebar.is_generating then
+        --           return true
+        --         end
+        --       end
+        --     end,
+        --   },
+        -- },
       },
       "stevearc/dressing.nvim",
       "MunifTanjim/nui.nvim",
@@ -133,6 +133,8 @@ return {
         { opts_mappings.edit or "<leader>ae", function() require("avante.api").edit() end, desc = "Edit (Avante)", mode = "v" },
         { opts_mappings.refresh or "<leader>ar", function() require("avante.api").refresh() end, desc = "Refresh (Avante)" },
         { opts_mappings.focus or "<leader>af", function() require("avante.api").focus() end, desc = "Focus (Avante)" },
+        { opts_mappings.select_model or "<leader>a?", function() require("avante.api").select_model() end, desc = "Switch Model (Avante)" },
+        { opts_mappings.select_history or "<leader>ah", function() require("avante.api").select_history() end, desc = "Pick History (Avante)" },
         { "<leader>aP", switch_provider, desc = "Switch Provider (Avante)" },
         { "<leader>av", "", desc = "+avante", mode = { "n", "v" } },
         { "<leader>avg", ask(prompt.grammar_correction),         desc = "Grammar Correction (Ask)",        mode = { "n", "v" } },
