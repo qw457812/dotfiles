@@ -36,7 +36,9 @@ return {
         if path == nil then
           return vim.notify("Cursor is not on valid entry")
         end
-        vim.fn.setreg(vim.v.register, U.path.home_to_tilde(path))
+        path = U.path.home_to_tilde(path)
+        vim.fn.setreg(vim.v.register, path)
+        LazyVim.info(path, { title = "Copied Path (mini.files)" })
       end
       vim.api.nvim_create_autocmd("User", {
         pattern = "MiniFilesBufferCreate",

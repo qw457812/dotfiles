@@ -3,6 +3,10 @@ return {
     "zbirenbaum/copilot.lua",
     optional = true,
     opts = {
+      copilot_model = "gpt-4o-copilot",
+      root_dir = function()
+        return LazyVim.root({ normalize = true })
+      end,
       filetypes = { ["*"] = true },
     },
   },
