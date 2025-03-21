@@ -20,7 +20,7 @@ end
 
 ---@param dir? string
 local function open(dir)
-  -- respect <C-p> toggle
+  -- respect preview toggle
   require("oil").open(dir, { preview = preview_enabled ~= false and {} or nil })
 end
 
@@ -62,16 +62,18 @@ return {
         ["gr"] = "actions.refresh",
         ["<leader>wv"] = { "actions.select", opts = { vertical = true } },
         ["<leader>ws"] = { "actions.select", opts = { horizontal = true } },
-        ["<C-p>"] = {
+        ["<leader>up"] = {
           desc = "Open the entry under the cursor in a preview window, or close the preview window if already open",
           callback = toggle_preview,
         },
-        ["<c-space>"] = {
+        ["<C-space>"] = {
           desc = "Terminal (Oil Dir)",
           callback = function()
             Snacks.terminal(nil, { cwd = require("oil").get_current_dir() })
           end,
         },
+        ["<C-y>"] = "actions.copy_to_system_clipboard",
+        ["<C-p>"] = "actions.paste_from_system_clipboard",
         ["gd"] = {
           desc = "Toggle detail view",
           callback = function()
@@ -111,6 +113,20 @@ return {
             if dir then
               U.explorer.grug_far(dir)
             end
+          end,
+        },
+        ["<leader>fy"] = {
+          desc = "Yank Path (Oil)",
+          callback = function()
+            local oil = require("oil")
+            local entry = oil.get_cursor_entry()
+            local dir = oil.get_current_dir()
+            if not entry or not dir then
+              return
+            end
+            local path = U.path.home_to_tilde(vim.fs.joinpath(dir, entry.name))
+            vim.fn.setreg(vim.v.register, path)
+            LazyVim.info(path, { title = "Copied Path (Oil)" })
           end,
         },
       },

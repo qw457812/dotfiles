@@ -532,8 +532,9 @@ return {
             ["<leader>fy"] = {
               function(state)
                 local node = state.tree:get_node()
-                local path = node:get_id()
-                vim.fn.setreg(vim.v.register, U.path.home_to_tilde(path), "c")
+                local path = U.path.home_to_tilde(node:get_id())
+                vim.fn.setreg(vim.v.register, path, "c")
+                LazyVim.info(path, { title = "Copied Path (NeoTree)" })
               end,
               desc = "Copy Path to Clipboard",
             },
