@@ -163,11 +163,14 @@ return {
     "echasnovski/mini.files",
     optional = true,
     opts = function()
-      -- https://github.com/MariaSolOs/dotfiles/blob/ca5623259e415996f59c89d98a1db15ade205b44/.config/nvim/lua/plugins/minifiles.lua#L125
+      -- copied from: https://github.com/echasnovski/mini.files/blob/7a377fa4645a361ceaa0aee2f830112a9d046b5b/lua/mini/files.lua#L381-L397
       vim.api.nvim_create_autocmd("User", {
         pattern = "MiniFilesWindowOpen",
         callback = function(args)
-          vim.api.nvim_win_set_config(args.data.win_id, { border = "rounded" })
+          local win_id = args.data.win_id
+          local config = vim.api.nvim_win_get_config(win_id)
+          config.border = "rounded"
+          vim.api.nvim_win_set_config(win_id, config)
         end,
       })
     end,

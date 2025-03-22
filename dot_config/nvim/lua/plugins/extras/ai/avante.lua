@@ -237,6 +237,13 @@ return {
     "yetone/avante.nvim",
     optional = true,
     opts = function(_, opts)
+      LazyVim.on_load("avante.nvim", function()
+        require("snacks.util").set_hl({
+          AvanteSidebarWinSeparator = "WinSeparator",
+          -- TODO: AvanteSidebarWinHorizontalSeparator
+        })
+      end)
+
       local picker = LazyVim.pick.picker.name
       if picker == "fzf" or picker == "snacks" then
         return U.extend_tbl(opts, {
