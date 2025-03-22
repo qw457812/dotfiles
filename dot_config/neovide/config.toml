@@ -1,3 +1,10 @@
 # https://neovide.dev/config-file.html
 # https://neovide.dev/command-line-reference.html#frame
 frame = "none"
+
+[font]
+normal = ["Maple Mono NF CN", "Symbols Nerd Font Mono"]
+size = 14.0
+
+[font.features]
+"Maple Mono NF CN" = ["+cv01", "+cv35", "+ss06"]
