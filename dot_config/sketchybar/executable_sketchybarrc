@@ -12,7 +12,8 @@ source "$CONFIG_DIR/icons.sh" # Loads all defined icons
 # Setting up and starting the helper process
 source "$HOME/.config/sketchybar/helper/helper.sh"
 
-FONT="JetBrainsMono Nerd Font"
+# FONT="JetBrainsMono Nerd Font"
+FONT="Maple Mono NF CN"
 
 PLUGIN_DIR="$CONFIG_DIR/plugins"
 

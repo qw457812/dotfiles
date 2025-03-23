@@ -1520,7 +1520,7 @@
            ;; [:##right_command :right_command :!Emacs {:alone :left_shift}] ; rime
            [:#Pright_command :right_command [:!Emacs :!Neovide] {:alone :right_control}] ; rime
            [:#Pright_command :right_command :Emacs {:alone :!Tbackslash}] ; emacs-rime
-           [:#Pright_command :right_command :Neovide {:alone :!Tperiod}] ; rime-ls
+           ;; [:#Pright_command :right_command :Neovide {:alone :!Tperiod}] ; rime-ls
            ]}
 
   ;; TODO or press f twice to switch rime's english/chinese input? see "Double colon triggers emoji search" above
@@ -1905,7 +1905,7 @@
            ;; TODO `:##` or `:#P`
            ;; [:##right_control :right_control :Emacs {:alone [:right_control :!Tbackslash]}] ; emacs-rime
            [:#Pright_control :right_control :Emacs {:alone :!Tbackslash}] ; emacs-rime
-           [:#Pright_control :right_control :Neovide {:alone [:right_control :!Tperiod]}] ; rime-ls
+           ;; [:#Pright_control :right_control :Neovide {:alone [:right_control :!Tperiod]}] ; rime-ls
            ;; TODO launch-mode
            ;; TODO h, j, k, l -> yabai
            ;; TODO a, s, d, g, v

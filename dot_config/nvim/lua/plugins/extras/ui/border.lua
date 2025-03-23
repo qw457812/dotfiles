@@ -1,4 +1,4 @@
--- if vim.fn.has("nvim-0.11") == 1 then
+-- if vim.fn.exists("+winborder") == 1 then
 --   vim.o.winborder = "rounded"
 -- end
 

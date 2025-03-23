@@ -184,8 +184,19 @@ function M.clear_ui_esc(opts)
     return not vim.tbl_isempty(notif_bufs())
   end
 
+  local function is_lsp_progressing()
+    return vim.lsp.status() ~= ""
+  end
+
   local function dismiss_notif()
     if package.loaded["noice"] then
+      if is_lsp_progressing() then
+        -- dismiss lsp progress for two second, otherwise esc becomes useless during lsp progress
+        vim.g.user_dismiss_lsp_progress = true
+        vim.defer_fn(function()
+          vim.g.user_dismiss_lsp_progress = nil
+        end, 2000)
+      end
       require("noice").cmd("dismiss") -- including mini view like lsp progress (floating windows)
     end
     -- fix has_notif check
@@ -193,11 +204,6 @@ function M.clear_ui_esc(opts)
       pcall(vim.api.nvim_buf_delete, b, { force = true })
     end
   end
-
-  -- -- TODO: esc becomes useless during LSP progress
-  -- local function is_lsp_progressing()
-  --   return vim.lsp.status() ~= ""
-  -- end
 
   local something_done = false
   local is_cmdwin = vim.fn.getcmdwintype() ~= ""
