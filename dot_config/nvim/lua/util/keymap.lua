@@ -191,7 +191,7 @@ function M.clear_ui_esc(opts)
   local function dismiss_notif()
     if package.loaded["noice"] then
       if is_lsp_progressing() then
-        -- dismiss lsp progress for two second, otherwise esc becomes useless during lsp progress
+        -- dismiss lsp progress for two seconds, otherwise esc becomes useless during lsp progress
         vim.g.user_dismiss_lsp_progress = true
         vim.defer_fn(function()
           vim.g.user_dismiss_lsp_progress = nil
