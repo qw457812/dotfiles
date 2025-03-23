@@ -243,6 +243,18 @@ return {
     optional = true,
     opts = function(_, opts)
       opts.routes = opts.routes or {}
+      -- https://github.com/folke/noice.nvim/wiki/Configuration-Recipes#ignore-certain-lsp-servers-for-progress-messages
+      table.insert(opts.routes, {
+        filter = {
+          event = "lsp",
+          kind = "progress",
+          cond = function(message)
+            -- dd(vim.tbl_get(message.opts, "progress"))
+            return vim.g.user_dismiss_lsp_progress == true
+          end,
+        },
+        opts = { skip = true },
+      })
       table.insert(opts.routes, {
         filter = {
           event = "notify",

@@ -181,5 +181,23 @@ return {
         },
       })
     end,
+    specs = {
+      {
+        "folke/noice.nvim",
+        optional = true,
+        opts = function(_, opts)
+          opts.routes = opts.routes or {}
+          if vim.fn.has("nvim-0.11") == 1 then
+            table.insert(opts.routes, {
+              filter = {
+                event = "msg_show",
+                find = '^vim%.tbl_add_reverse_lookup is deprecated%. Run ":checkhealth vim%.deprecated" for more information$',
+              },
+              view = "mini",
+            })
+          end
+        end,
+      },
+    },
   },
 }

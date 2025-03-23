@@ -154,16 +154,23 @@ return {
     end,
   },
 
-  -- {
-  --   "folke/noice.nvim",
-  --   optional = true,
-  --   opts = {
-  --     presets = {
-  --       bottom_search = false,
-  --       -- command_palette = false,
-  --     },
-  --   },
-  -- },
+  {
+    "folke/noice.nvim",
+    optional = true,
+    opts = {
+      -- presets = {
+      --   bottom_search = false,
+      --   -- command_palette = false,
+      -- },
+      views = {
+        cmdline_popup = {
+          size = {
+            min_width = math.min(60, math.floor(2 * vim.o.columns / 3)),
+          },
+        },
+      },
+    },
+  },
 
   {
     "echasnovski/mini.icons",
