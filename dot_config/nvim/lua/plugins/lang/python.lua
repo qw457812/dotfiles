@@ -198,6 +198,7 @@ return {
 
   {
     "linux-cultist/venv-selector.nvim",
+    enabled = true,
     optional = true,
     opts = {
       settings = {
