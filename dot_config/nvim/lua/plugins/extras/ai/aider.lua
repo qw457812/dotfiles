@@ -77,7 +77,7 @@ return {
           -- the `require("nvim_aider.neo_tree").setup(opts)` way breaks the lazy loading of both nvim-aider and neo-tree.nvim
           nvim_aider_add = function(state)
             local node = state.tree:get_node()
-            require("nvim_aider.terminal").command(require("nvim_aider.commands").add.value, node.path)
+            require("nvim_aider").api.add_file(node.path)
           end,
           nvim_aider_add_visual = function(_, selected_nodes)
             local nodeNames = {}
@@ -85,15 +85,12 @@ return {
               table.insert(nodeNames, node.path)
             end
             if #nodeNames > 0 then
-              require("nvim_aider.terminal").command(
-                require("nvim_aider.commands").add.value,
-                table.concat(nodeNames, " ")
-              )
+              require("nvim_aider").api.add_file(table.concat(nodeNames, " "))
             end
           end,
           nvim_aider_drop = function(state)
             local node = state.tree:get_node()
-            require("nvim_aider.terminal").command(require("nvim_aider.commands").drop.value, node.path)
+            require("nvim_aider").api.drop_file(node.path)
           end,
           nvim_aider_drop_visual = function(_, selected_nodes)
             local nodeNames = {}
@@ -101,10 +98,7 @@ return {
               table.insert(nodeNames, node.path)
             end
             if #nodeNames > 0 then
-              require("nvim_aider.terminal").command(
-                require("nvim_aider.commands").drop.value,
-                table.concat(nodeNames, " ")
-              )
+              require("nvim_aider").api.drop_file(table.concat(nodeNames, " "))
             end
           end,
         },

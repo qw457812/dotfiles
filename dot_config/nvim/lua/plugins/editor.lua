@@ -5,6 +5,21 @@ return {
     cmd = "GrugFarWithin",
     keys = {
       {
+        "<leader>sr",
+        function()
+          local ext = vim.bo.buftype == "" and vim.fn.expand("%:e")
+          require("grug-far").open({
+            transient = true,
+            prefills = {
+              filesFilter = ext and ext ~= "" and "*." .. ext or nil,
+              paths = LazyVim.root(),
+            },
+          })
+        end,
+        mode = { "n", "v" },
+        desc = "Search and Replace",
+      },
+      {
         "<leader>sF",
         mode = { "n", "v" },
         function()

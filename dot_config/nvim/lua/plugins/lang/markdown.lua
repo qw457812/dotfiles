@@ -65,6 +65,9 @@ return {
         border = vim.g.user_transparent_background and "none" or nil,
         inline_pad = 1,
       },
+      -- checkbox = {
+      --   enabled = true,
+      -- },
       completions = {
         -- blink = { enabled = true },
         lsp = { enabled = true },
