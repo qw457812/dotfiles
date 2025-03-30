@@ -71,6 +71,11 @@ return {
       completions = {
         -- blink = { enabled = true },
         lsp = { enabled = true },
+        filter = {
+          callout = function(value)
+            return value.category ~= "obsidian"
+          end,
+        },
       },
     },
   },
