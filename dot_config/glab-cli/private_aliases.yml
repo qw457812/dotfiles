@@ -1,0 +1,6 @@
+ci: pipeline ci
+co: mr checkout
+pr: mr
+o: repo view --web
+mro: mr view --web
+pro: mr view --web

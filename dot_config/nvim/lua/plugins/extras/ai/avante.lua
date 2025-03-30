@@ -219,7 +219,7 @@ return {
           endpoint = "https://api.groq.com/openai/v1/",
           -- curl -X GET "https://api.groq.com/openai/v1/models" -H "Authorization: Bearer $GROQ_API_KEY" -H "Content-Type: application/json" | jq '.data | sort_by(.created)'
           model = "llama-3.3-70b-versatile",
-          max_completion_tokens = 32768,
+          max_tokens = 32768,
         },
         ---@type AvanteSupportedProvider
         ---@diagnostic disable-next-line: missing-fields
@@ -259,14 +259,35 @@ return {
   -- {
   --   "saghen/blink.cmp",
   --   optional = true,
-  --   dependencies = "Kaiser-Yang/blink-cmp-avante",
+  --   dependencies = {
+  --     {
+  --       "saghen/blink.compat",
+  --       opts = function()
+  --         -- HACK: monkeypatch cmp.ConfirmBehavior for Avante
+  --         require("cmp").ConfirmBehavior = {
+  --           Insert = "insert",
+  --           Replace = "replace",
+  --         }
+  --       end,
+  --     },
+  --   },
   --   opts = {
   --     sources = {
-  --       default = { "avante" },
+  --       compat = {
+  --         "avante_commands",
+  --         "avante_mentions",
+  --         -- "avante_files",
+  --       },
   --       providers = {
-  --         avante = {
-  --           module = "blink-cmp-avante",
+  --         avante_commands = {
+  --           score_offset = 90,
   --         },
+  --         avante_mentions = {
+  --           score_offset = 100,
+  --         },
+  --         -- avante_files = {
+  --         --   score_offset = 100,
+  --         -- },
   --       },
   --     },
   --   },
@@ -274,35 +295,14 @@ return {
   {
     "saghen/blink.cmp",
     optional = true,
-    dependencies = {
-      {
-        "saghen/blink.compat",
-        opts = function()
-          -- HACK: monkeypatch cmp.ConfirmBehavior for Avante
-          require("cmp").ConfirmBehavior = {
-            Insert = "insert",
-            Replace = "replace",
-          }
-        end,
-      },
-    },
+    dependencies = "Kaiser-Yang/blink-cmp-avante",
     opts = {
       sources = {
-        compat = {
-          "avante_commands",
-          "avante_mentions",
-          -- "avante_files",
-        },
+        default = { "avante" },
         providers = {
-          avante_commands = {
-            score_offset = 90,
+          avante = {
+            module = "blink-cmp-avante",
           },
-          avante_mentions = {
-            score_offset = 1000,
-          },
-          -- avante_files = {
-          --   score_offset = 100,
-          -- },
         },
       },
     },

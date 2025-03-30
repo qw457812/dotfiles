@@ -1,5 +1,5 @@
 {
-  "basedpyright": "1.28.3",
+  "basedpyright": "1.28.4",
   "bash-language-server": "5.4.3",
   "debugpy": "1.8.13",
   "docker-compose-language-service": "0.3.0",
@@ -8,7 +8,7 @@
   "hadolint": "v2.12.0",
   "java-debug-adapter": "0.58.1",
   "java-test": "0.43.0",
-  "jdtls": "v1.44.0",
+  "jdtls": "v1.46.0",
   "joker": "v1.4.1",
   "js-debug-adapter": "v1.97.1",
   "json-lsp": "4.10.0",
