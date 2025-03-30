@@ -1,29 +1,29 @@
+local java_home = vim.g.user_is_termux and "/data/data/com.termux/files/usr/lib/jvm/java-21-openjdk"
+  or vim.fn.expand("$HOME/.local/share/mise/installs/java/23")
+
 local obsidian_vaults = {
   personal = U.path.HOME .. "/Documents/vaults/personal",
   work = U.path.HOME .. "/Documents/vaults/work",
 }
 
 return {
-  -- for java projects using JDK version older than 17
+  -- for java projects using JDK version older than 21
   {
     "mfussenegger/nvim-jdtls",
     optional = true,
     opts = function(_, opts)
-      if vim.fn.executable("mise") == 0 then
-        return
-      end
-      table.insert(opts.cmd, "--java-executable=" .. vim.fn.expand("$HOME/.local/share/mise/installs/java/23/bin/java"))
+      table.insert(opts.cmd, "--java-executable=" .. java_home .. "/bin/java")
     end,
   },
-  -- for scala projects using JDK version older than 17
+  -- for scala projects using JDK version older than 21
   {
     "neovim/nvim-lspconfig",
     opts = function(_, opts)
-      if not LazyVim.has_extra("lang.scala") or vim.fn.executable("mise") == 0 then
+      if not LazyVim.has_extra("lang.scala") then
         return
       end
       -- see: https://github.com/scalameta/nvim-metals/issues/380
-      vim.env.JAVA_HOME = vim.fn.expand("$HOME/.local/share/mise/installs/java/23")
+      vim.env.JAVA_HOME = java_home
       -- return U.extend_tbl(opts, {
       --   servers = {
       --     metals = {
