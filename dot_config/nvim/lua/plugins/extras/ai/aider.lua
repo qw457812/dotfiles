@@ -32,7 +32,12 @@ return {
         ---@diagnostic disable-next-line: missing-fields
         win = {
           position = "float",
-          wo = { winbar = "" },
+          wo = {
+            winbar = "",
+          },
+          b = {
+            user_lualine_filename = "nvim-aider",
+          },
           keys = {
             aider_close = {
               toggle_key,
