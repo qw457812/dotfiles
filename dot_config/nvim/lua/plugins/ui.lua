@@ -46,8 +46,7 @@ return {
           end,
           -- hide extension
           name_formatter = function(buf)
-            local _, _, class = U.java.parse_jdt_uri(buf.path)
-            return class or buf.name:match("(.+)%..+$")
+            return vim.b[buf.bufnr].user_bufferline_name or buf.name:match("(.+)%..+$")
           end,
           ---@param o bufferline.IconFetcherOpts
           get_element_icon = function(o)

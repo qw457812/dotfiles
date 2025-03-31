@@ -61,8 +61,15 @@ M.filename = {
     return { fg = fg, gui = "bold" }
   end,
   fmt = function(name, context)
-    local _, _, class = U.java.parse_jdt_uri(vim.api.nvim_buf_get_name(0))
-    return class and ("%s.class %s"):format(class, context.options.symbols.readonly) or name
+    local filename = vim.b.user_lualine_filename
+    if not filename then
+      return name
+    end
+
+    if vim.bo.modifiable == false or vim.bo.readonly == true then
+      filename = filename .. " " .. context.options.symbols.readonly
+    end
+    return filename
   end,
 }
 

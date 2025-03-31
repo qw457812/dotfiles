@@ -8,10 +8,16 @@ return {
     opts = function()
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "java",
-        callback = function()
+        callback = function(ev)
           vim.opt_local.shiftwidth = 4
           vim.opt_local.tabstop = 4
           vim.opt_local.softtabstop = 4
+
+          local _, _, class = U.java.parse_jdt_uri(ev.file)
+          if class then
+            vim.b[ev.buf].user_lualine_filename = class .. ".class"
+            vim.b[ev.buf].user_bufferline_name = class
+          end
         end,
       })
     end,
