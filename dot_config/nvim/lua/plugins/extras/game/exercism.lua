@@ -12,7 +12,6 @@ return {
     "2kabhishek/exercism.nvim",
     dependencies = {
       "2kabhishek/utils.nvim",
-      { "stevearc/dressing.nvim", optional = true },
       -- "2kabhishek/termim.nvim", -- optional, better UI for ExercismTest
     },
     cmd = { "ExercismLanguages", "ExercismList", "ExercismSubmit", "ExercismTest" },

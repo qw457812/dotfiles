@@ -1,11 +1,6 @@
 local java_home = vim.g.user_is_termux and "/data/data/com.termux/files/usr/lib/jvm/java-21-openjdk"
   or vim.fn.expand("$HOME/.local/share/mise/installs/java/23")
 
-local obsidian_vaults = {
-  personal = U.path.HOME .. "/Documents/vaults/personal",
-  work = U.path.HOME .. "/Documents/vaults/work",
-}
-
 return {
   -- for java projects using JDK version older than 21
   {
@@ -69,61 +64,6 @@ return {
           url = url.mysql("root", "root", "localhost", "3306", ""),
         },
       })
-    end,
-  },
-
-  -- https://github.com/nvim-orgmode/orgmode/blob/master/DOCS.md#mappings
-  {
-    "nvim-orgmode/orgmode",
-    ft = { "org", "orgagenda" },
-    cmd = "Org",
-    keys = {
-      { "gA", '<Cmd>lua require("orgmode").action("agenda.prompt")<CR>', desc = "org agenda" },
-      { "gC", '<Cmd>lua require("orgmode").action("capture.prompt")<CR>', desc = "org capture" },
-    },
-    opts = {
-      org_agenda_files = "~/org/**/*",
-      org_default_notes_file = "~/org/refile.org",
-      mappings = {
-        -- disable_all = true,
-        global = {
-          org_agenda = false,
-          org_capture = false,
-        },
-        prefix = "<localleader>",
-      },
-    },
-  },
-
-  {
-    "obsidian-nvim/obsidian.nvim",
-    enabled = not vim.g.user_is_termux,
-    event = (function()
-      local events = {}
-      for _, path in pairs(obsidian_vaults) do
-        table.insert(events, "BufReadPre " .. path .. "/*.md")
-        table.insert(events, "BufNewFile " .. path .. "/*.md")
-      end
-      return events
-    end)(),
-    opts = function()
-      local workspaces = {}
-      for name, path in pairs(obsidian_vaults) do
-        table.insert(workspaces, { name = name, path = path })
-      end
-
-      return {
-        -- https://github.com/MeanderingProgrammer/render-markdown.nvim#obsidiannvim
-        ui = { enable = not LazyVim.has("render-markdown.nvim") },
-        workspaces = workspaces,
-        completion = {
-          nvim_cmp = LazyVim.has_extra("coding.nvim-cmp"),
-          blink = LazyVim.has("blink.cmp"),
-        },
-        picker = {
-          name = ({ snacks = "snacks.pick", fzf = "fzf-lua", telescope = "telescope.nvim" })[LazyVim.pick.picker.name],
-        },
-      }
     end,
   },
 }
