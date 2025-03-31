@@ -213,20 +213,20 @@ return {
         },
         sources = {
           providers = {
-            lsp = {
-              -- copied from:
-              -- * https://github.com/saghen/blink.cmp/blob/6a9de53872a98a9c496f0650bcf50e452aac6a6d/doc/recipes.md#L189-L207
-              -- * https://github.com/saghen/blink.cmp/blob/335045136a8f2924c04aefd13207dd6874df654e/lua/blink/cmp/config/sources.lua#L56-L62
-              transform_items = function(_, items)
-                return vim.tbl_filter(function(item)
-                  -- filter out text items, since we have the buffer source
-                  return item.kind ~= require("blink.cmp.types").CompletionItemKind.Text
-                    -- Removes language keywords/constants (if, else, while, etc.) provided by the language server from completion results.
-                    -- Useful if you prefer to use builtin or custom snippets for such constructs.
-                    and item.kind ~= require("blink.cmp.types").CompletionItemKind.Keyword
-                end, items)
-              end,
-            },
+            -- lsp = {
+            --   -- copied from:
+            --   -- * https://github.com/saghen/blink.cmp/blob/6a9de53872a98a9c496f0650bcf50e452aac6a6d/doc/recipes.md#L189-L207
+            --   -- * https://github.com/saghen/blink.cmp/blob/335045136a8f2924c04aefd13207dd6874df654e/lua/blink/cmp/config/sources.lua#L56-L62
+            --   transform_items = function(_, items)
+            --     return vim.tbl_filter(function(item)
+            --       -- filter out text items, since we have the buffer source
+            --       return item.kind ~= require("blink.cmp.types").CompletionItemKind.Text
+            --         -- Removes language keywords/constants (if, else, while, etc.) provided by the language server from completion results.
+            --         -- Useful if you prefer to use builtin or custom snippets for such constructs.
+            --         and item.kind ~= require("blink.cmp.types").CompletionItemKind.Keyword
+            --     end, items)
+            --   end,
+            -- },
             path = {
               ---@type blink.cmp.PathOpts
               ---@diagnostic disable-next-line: missing-fields

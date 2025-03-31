@@ -169,9 +169,9 @@ return {
           suggestion = "<leader>aS",
         },
         sidebar = {
-          -- disable since <tab> is mapped to <C-w>w
-          switch_windows = "<A-Down>",
-          reverse_switch_windows = "<A-Up>",
+          -- -- disable since <tab> is mapped to <C-w>w
+          -- switch_windows = "<A-Down>",
+          -- reverse_switch_windows = "<A-Up>",
           close = { "q" },
           close_from_input = {
             normal = "<Esc>",
