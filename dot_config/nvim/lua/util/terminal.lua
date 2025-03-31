@@ -23,10 +23,12 @@ function M.colorize()
   Snacks.terminal.colorize()
 
   local buf = vim.api.nvim_get_current_buf()
+  local win = vim.api.nvim_get_current_win()
 
   vim.b[buf].minianimate_disable = true
   vim.b[buf].miniindentscope_disable = true
   -- vim.b[buf].snacks_scroll = false
+  vim.wo[win].sidescrolloff = 0
 
   vim.keymap.set("n", "u", "<C-u>", { silent = true, buffer = buf, desc = "Scroll Up" })
   vim.keymap.set("n", "d", "<C-d>", { silent = true, buffer = buf, nowait = true, desc = "Scroll Down" })
