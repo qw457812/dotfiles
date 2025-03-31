@@ -13,7 +13,7 @@
   "blink-cmp-spell": { "branch": "master", "commit": "782bc76be09c0c5dd08e3edd04e4ec1054c3158e" },
   "blink-copilot": { "branch": "main", "commit": "71102fe2fa1616353f8cb315bb8b85db0812a218" },
   "blink-ripgrep.nvim": { "branch": "main", "commit": "d4af981745ea67b2c29bcd25f9843dbeedc580ed" },
-  "blink.cmp": { "branch": "main", "commit": "70c73033c510ee3641393a4a081d3c85db91a641" },
+  "blink.cmp": { "branch": "main", "commit": "033fbcc7ec55546aa0c3889aa50b6e76915c3f62" },
   "bookmarks.yazi": { "branch": "main", "commit": "95b2c586f4a40da8b6a079ec9256058ad0292e47" },
   "bufferline.nvim": { "branch": "main", "commit": "655133c3b4c3e5e05ec549b9f8cc2894ac6f51b3" },
   "caps-word.nvim": { "branch": "main", "commit": "564548ef557e4f873b2e67f0ea91f25042cedfe8" },
