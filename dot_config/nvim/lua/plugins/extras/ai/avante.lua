@@ -276,6 +276,7 @@ return {
           end, { buffer = buf, desc = "Clear UI or Unfocus (Avante)" })
 
           if is_input then
+            vim.b[buf].user_blink_path = false
             vim.keymap.set("i", "<C-h>", "<Esc><C-w>h", { buffer = buf, desc = "Go to Left Window", remap = true })
             vim.keymap.set("i", "<C-k>", "<Esc><C-w>k", { buffer = buf, desc = "Go to Upper Window", remap = true })
           else

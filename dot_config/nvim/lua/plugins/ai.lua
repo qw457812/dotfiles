@@ -132,36 +132,26 @@ return {
         ft = U.markdown.render_markdown_ft("copilot-chat"),
       },
     },
-    opts = {
-      -- -- render-markdown integration | https://github.com/CopilotC-Nvim/CopilotChat.nvim#tips
-      -- highlight_headers = false,
-      -- separator = "---",
-      -- error_header = "> [!ERROR] Error",
-      error_header = LazyVim.config.icons.diagnostics.Error .. " Error ",
-      question_header = "  User ",
-      -- model = "claude-3.7-sonnet",
-      -- show_help = false,
-    },
-    specs = {
-      -- copied from: https://github.com/LazyVim/LazyVim/pull/5754
-      {
-        "saghen/blink.cmp",
-        optional = true,
-        ---@module 'blink.cmp'
-        ---@type blink.cmp.Config
-        opts = {
-          sources = {
-            providers = {
-              path = {
-                -- path sources triggered by "/" interfere with CopilotChat commands
-                enabled = function()
-                  return vim.bo.filetype ~= "copilot-chat"
-                end,
-              },
-            },
-          },
-        },
-      },
-    },
+    opts = function(_, opts)
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "copilot-chat",
+        callback = function(ev)
+          -- see: https://github.com/LazyVim/LazyVim/pull/5754
+          -- path sources triggered by "/" interfere with CopilotChat commands
+          vim.b[ev.buf].user_blink_path = false
+        end,
+      })
+
+      return U.extend_tbl(opts, {
+        -- -- render-markdown integration | https://github.com/CopilotC-Nvim/CopilotChat.nvim#tips
+        -- highlight_headers = false,
+        -- separator = "---",
+        -- error_header = "> [!ERROR] Error",
+        error_header = LazyVim.config.icons.diagnostics.Error .. " Error ",
+        question_header = "  User ",
+        -- model = "claude-3.7-sonnet",
+        -- show_help = false,
+      })
+    end,
   },
 }

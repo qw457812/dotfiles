@@ -228,6 +228,9 @@ return {
             --   end,
             -- },
             path = {
+              enabled = function()
+                return vim.b.user_blink_path ~= false
+              end,
               ---@type blink.cmp.PathOpts
               ---@diagnostic disable-next-line: missing-fields
               opts = {
