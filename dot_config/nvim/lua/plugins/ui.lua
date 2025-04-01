@@ -167,6 +167,14 @@ return {
             min_width = math.min(60, math.floor(2 * vim.o.columns / 3)),
           },
         },
+        split = {
+          enter = true,
+          size = "70%",
+          win_options = {
+            scrolloff = 4,
+            sidescrolloff = 8,
+          },
+        },
       },
     },
   },
