@@ -1,4 +1,15 @@
 return {
+  {
+    "echasnovski/mini.pairs",
+    optional = true,
+    opts = {
+      mappings = {
+        ["<"] = { action = "open", pair = "<>", neigh_pattern = "[^\\].", register = { cr = false } },
+        [">"] = { action = "close", pair = "<>", neigh_pattern = "[^\\].", register = { cr = false } },
+      },
+    },
+  },
+
   -- use helix-style mappings to prevent conflict with flash or leap: ms md mr
   -- https://www.reddit.com/r/neovim/comments/1bl3dwz/whats_your_best_remap_for_flash_or_leap/
   -- https://github.com/ggandor/leap.nvim/discussions/59
