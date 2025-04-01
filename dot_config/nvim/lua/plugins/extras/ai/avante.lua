@@ -67,6 +67,13 @@ local function switch_provider()
   end)
 end
 
+local function focus_input()
+  local sidebar = require("avante").get()
+  if sidebar then
+    sidebar:focus_input()
+  end
+end
+
 -- https://github.com/AstroNvim/astrocommunity/blob/main/lua/astrocommunity/completion/avante-nvim/init.lua
 return {
   {
@@ -128,8 +135,16 @@ return {
       local opts_mappings = LazyVim.opts("avante.nvim").mappings or {}
       local mappings = {
         { mapping_disabled_prefix, "", desc = "+disabled" },
+        {
+          opts_mappings.ask or "<leader>aa",
+          function()
+            require("avante.api").ask()
+            focus_input()
+          end,
+          desc = "Ask (Avante)",
+          mode = { "n", "v" },
+        },
         -- stylua: ignore start
-        { opts_mappings.ask or "<leader>aa", function() require("avante.api").ask() end, desc = "Ask (Avante)", mode = { "n", "v" } },
         { opts_mappings.edit or "<leader>ae", function() require("avante.api").edit() end, desc = "Edit (Avante)", mode = "v" },
         { opts_mappings.refresh or "<leader>ar", function() require("avante.api").refresh() end, desc = "Refresh (Avante)" },
         { opts_mappings.focus or "<leader>af", function() require("avante.api").focus() end, desc = "Focus (Avante)" },
@@ -174,7 +189,7 @@ return {
           -- reverse_switch_windows = "<A-Up>",
           close = { "q" },
           close_from_input = {
-            normal = "<Esc>",
+            normal = "q", -- <Esc>
             insert = "<C-c>",
           },
         },
@@ -238,11 +253,47 @@ return {
     optional = true,
     opts = function(_, opts)
       LazyVim.on_load("avante.nvim", function()
-        require("snacks.util").set_hl({
+        local snacks_util = require("snacks.util")
+        local bg = vim.g.user_transparent_background and "#2f3a2f" or snacks_util.color("Normal", "bg")
+        snacks_util.set_hl({
           AvanteSidebarWinSeparator = "WinSeparator",
-          -- TODO: AvanteSidebarWinHorizontalSeparator
+          AvanteSidebarWinHorizontalSeparator = { fg = bg },
         })
       end)
+
+      local augroup = vim.api.nvim_create_augroup("avante_keymaps", { clear = true })
+      vim.api.nvim_create_autocmd("FileType", {
+        group = augroup,
+        pattern = { "Avante", "AvanteInput", "AvanteSelectedFiles" },
+        callback = function(ev)
+          local buf = ev.buf
+          local is_input = vim.bo[buf].filetype == "AvanteInput"
+
+          vim.keymap.set("n", "<Esc>", function()
+            if not U.keymap.clear_ui_esc({ popups = not is_input }) then
+              vim.cmd("wincmd h")
+            end
+          end, { buffer = buf, desc = "Clear UI or Unfocus (Avante)" })
+
+          if is_input then
+            vim.keymap.set("i", "<C-h>", "<Esc><C-w>h", { buffer = buf, desc = "Go to Left Window", remap = true })
+            vim.keymap.set("i", "<C-k>", "<Esc><C-w>k", { buffer = buf, desc = "Go to Upper Window", remap = true })
+          else
+            vim.keymap.set("n", "i", focus_input, { buffer = buf, desc = "Focus Input (Avante)" })
+            vim.api.nvim_create_autocmd("BufEnter", {
+              group = augroup,
+              buffer = buf,
+              callback = function()
+                vim.defer_fn(function()
+                  if vim.api.nvim_get_current_buf() == buf and vim.api.nvim_get_mode().mode == "i" then
+                    vim.cmd("stopinsert")
+                  end
+                end, 350)
+              end,
+            })
+          end
+        end,
+      })
 
       local picker = LazyVim.pick.picker.name
       if picker == "fzf" or picker == "snacks" then
