@@ -86,9 +86,9 @@ vim.api.nvim_create_autocmd("FileType", {
         vim.b[buf].minianimate_disable = true
         -- vim.b[buf].snacks_scroll = false
         -- vim.b[buf].user_ug_cursor_disable = true
-        vim.keymap.set("n", "u", "<C-u>", { buffer = buf, silent = true, desc = "Scroll Up" })
+        vim.keymap.set({ "n", "x" }, "u", "<C-u>", { buffer = buf, silent = true, desc = "Scroll Up" })
         -- add `nowait = true` since we have a `dd` mapping defined in keymaps.lua
-        vim.keymap.set("n", "d", "<C-d>", { buffer = buf, silent = true, desc = "Scroll Down", nowait = true })
+        vim.keymap.set({ "n", "x" }, "d", "<C-d>", { buffer = buf, silent = true, desc = "Scroll Down", nowait = true })
       end
     end, 500)
   end,
