@@ -412,13 +412,6 @@ return {
           },
           view = "mini",
         },
-        {
-          filter = {
-            event = "msg_show",
-            find = '^vim%.tbl_flatten is deprecated%. Run ":checkhealth vim%.deprecated" for more information$',
-          },
-          view = "mini",
-        },
       })
       return opts
     end,
