@@ -172,6 +172,9 @@ end
 # end
 
 if set -q TERMUX_VERSION
+    # # https://github.com/nvim-lua/plenary.nvim/issues/536#issuecomment-1799807408
+    # set -q XDG_RUNTIME_DIR; or set -gx XDG_RUNTIME_DIR "$PREFIX/tmp"
+
     abbr pkgu 'pkg update && pkg upgrade'
     abbr pkgi 'pkg install'
     abbr pkgs 'pkg search'

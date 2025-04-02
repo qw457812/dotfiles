@@ -1,6 +1,7 @@
 {
   "extras": [
     "lazyvim.plugins.extras.ai.copilot",
+    "lazyvim.plugins.extras.ai.copilot-chat",
     "lazyvim.plugins.extras.coding.mini-snippets",
     "lazyvim.plugins.extras.coding.mini-surround",
     "lazyvim.plugins.extras.coding.neogen",
@@ -33,6 +34,7 @@
     "lazyvim.plugins.extras.util.mini-hipatterns",
     "plugins.extras.editor.mini-operators",
     "plugins.extras.game.exercism",
+    "plugins.extras.game.leetcode",
     "plugins.extras.lsp.mason-lock",
     "plugins.extras.lsp.tiny-inline-diagnostic",
     "plugins.extras.ui.border",
