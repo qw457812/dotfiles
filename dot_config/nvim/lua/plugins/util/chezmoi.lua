@@ -164,11 +164,36 @@ function H.pick_config()
   end
 end
 
+-- https://github.com/dsully/nvim/blob/a6a7a29707e5209c6bf14be0f178d3cd1141b5ff/lua/plugins/util.lua#L104
+-- https://github.com/amuuname/dotfiles/blob/462579dbf4e9452a22cc268a3cb244172d9142aa/dot_config/nvim/plugin/autocmd.lua#L52
+function H.autocmd_chezmoi_add()
+  local managed_files = H.chezmoi_list_files({ path_style_absolute = true })
+  if vim.tbl_isempty(managed_files) then
+    return
+  end
+  vim.api.nvim_create_autocmd("BufWritePost", {
+    group = vim.api.nvim_create_augroup("chezmoi_add", { clear = true }),
+    pattern = managed_files,
+    desc = "chezmoi add for target-path",
+    callback = U.debounce_wrap(500, function(event)
+      local res = vim.system({ "chezmoi", "add", event.file }, { text = true }):wait()
+      if res.code == 0 then
+        LazyVim.info("Successfully added", { title = "Chezmoi" })
+      else
+        LazyVim.error(
+          ("Failed to add `%s`:\n%s"):format(U.path.home_to_tilde(event.file), res.stderr),
+          { title = "Chezmoi" }
+        )
+      end
+    end),
+  })
+end
+
 return {
   {
     "xvzc/chezmoi.nvim",
     optional = true,
-    event = "VeryLazy", -- for augroup: chezmoi_add
+    event = "LazyFile", -- for augroup: chezmoi_add
     cmd = "ChezmoiEdit",
     keys = {
       { "<leader>sz", false },
@@ -187,39 +212,15 @@ return {
           end
         end),
       })
-
-      -- https://github.com/dsully/nvim/blob/a6a7a29707e5209c6bf14be0f178d3cd1141b5ff/lua/plugins/util.lua#L104
-      -- https://github.com/amuuname/dotfiles/blob/462579dbf4e9452a22cc268a3cb244172d9142aa/dot_config/nvim/plugin/autocmd.lua#L52
-      local function autocmd_chezmoi_add()
-        local ok, managed_files = pcall(H.chezmoi_list_files, { path_style_absolute = true })
-        if not ok or vim.tbl_isempty(managed_files) then
-          return
-        end
-        vim.api.nvim_create_autocmd("BufWritePost", {
-          group = vim.api.nvim_create_augroup("chezmoi_add", { clear = true }),
-          pattern = managed_files,
-          desc = "chezmoi add for target-path",
-          callback = U.debounce_wrap(500, function(event)
-            local res = vim.system({ "chezmoi", "add", event.file }, { text = true }):wait()
-            if res.code == 0 then
-              LazyVim.info("Successfully added", { title = "Chezmoi" })
-            else
-              LazyVim.error(
-                ("Failed to add `%s`:\n%s"):format(U.path.home_to_tilde(event.file), res.stderr),
-                { title = "Chezmoi" }
-              )
-            end
-          end),
-        })
-      end
-
-      LazyVim.on_very_lazy(autocmd_chezmoi_add)
+    end,
+    opts = function()
+      H.autocmd_chezmoi_add()
 
       vim.api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
         group = vim.api.nvim_create_augroup("chezmoi_managed_cache", { clear = true }),
         callback = function()
           H.cache = {}
-          U.debounce("autocmd-chezmoi-add", 500, autocmd_chezmoi_add)
+          U.debounce("autocmd-chezmoi-add", 500, H.autocmd_chezmoi_add)
         end,
       })
     end,
@@ -391,6 +392,13 @@ return {
               { find = "^Edit: Opened a chezmoi%-managed file$" },
               { find = "^Edit: Successfully applied$" },
             },
+          },
+          view = "mini",
+        },
+        {
+          filter = {
+            event = "msg_show",
+            find = '^vim%.tbl_flatten is deprecated%. Run ":checkhealth vim%.deprecated" for more information$',
           },
           view = "mini",
         },
