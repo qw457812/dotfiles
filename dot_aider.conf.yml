@@ -1,12 +1,14 @@
 # https://aider.chat/docs/config/aider_conf.html
+# https://aider.chat/docs/leaderboards/
 
 alias:
   - "r1:openrouter/deepseek/deepseek-r1"
   - "sonnet:openrouter/anthropic/claude-3.7-sonnet"
   - "groq:groq/llama-3.3-70b-versatile"
 
-architect: true
-model: openrouter/deepseek/deepseek-r1
+# architect: true
+# model: openrouter/deepseek/deepseek-r1
+model: openrouter/google/gemini-2.5-pro-exp-03-25:free
 editor-model: openrouter/anthropic/claude-3.7-sonnet
 show-model-warnings: false
 
@@ -15,5 +17,9 @@ auto-commits: false
 # watch-files: true
 
 dark-mode: true
+completion-menu-color: "#c0caf5"
+completion-menu-bg-color: "#1a1b26"
+completion-menu-current-color: "#1a1b26"
+completion-menu-current-bg-color: "#c0caf5"
 vim: true
 # verbose: true
