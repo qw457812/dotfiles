@@ -193,7 +193,6 @@ return {
   {
     "xvzc/chezmoi.nvim",
     optional = true,
-    event = "LazyFile", -- for augroup: chezmoi_add
     cmd = "ChezmoiEdit",
     keys = {
       { "<leader>sz", false },
@@ -202,20 +201,38 @@ return {
       { "<leader>fc", H.pick_config, desc = "Find Config File" },
     },
     init = function()
+      local very_very_lazy = false
+      LazyVim.on_very_lazy(function()
+        vim.defer_fn(function()
+          very_very_lazy = true
+          H.autocmd_chezmoi_add()
+        end, 200)
+      end)
+
       vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
         group = vim.api.nvim_create_augroup("chezmoi_apply", { clear = true }),
         pattern = U.path.CHEZMOI .. "/*",
         desc = "chezmoi apply for source-path",
-        callback = vim.schedule_wrap(function(ev)
-          if vim.bo[ev.buf].buftype == "" then
-            require("chezmoi.commands.__edit").watch(ev.buf)
+        callback = function(ev)
+          local buf = ev.buf
+          if vim.bo[buf].buftype ~= "" then
+            return
           end
-        end),
+
+          local function watch()
+            if vim.api.nvim_buf_is_valid(buf) then
+              require("chezmoi.commands.__edit").watch(buf)
+            end
+          end
+          if very_very_lazy then
+            vim.schedule(watch)
+          else
+            vim.defer_fn(watch, 200)
+          end
+        end,
       })
     end,
     opts = function()
-      H.autocmd_chezmoi_add()
-
       vim.api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
         group = vim.api.nvim_create_augroup("chezmoi_managed_cache", { clear = true }),
         callback = function()
