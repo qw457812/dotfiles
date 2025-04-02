@@ -156,27 +156,39 @@ return {
   {
     "folke/noice.nvim",
     optional = true,
-    opts = {
-      -- presets = {
-      --   bottom_search = false,
-      --   -- command_palette = false,
-      -- },
-      views = {
-        cmdline_popup = {
-          size = {
-            min_width = math.min(60, math.floor(2 * vim.o.columns / 3)),
+    opts = function(_, opts)
+      if vim.g.deprecation_warnings then
+        table.insert(opts.routes, {
+          filter = {
+            event = "msg_show",
+            find = '.+ is deprecated%. Run ":checkhealth vim%.deprecated" for more information$',
+          },
+          view = "mini",
+        })
+      end
+
+      return U.extend_tbl(opts, {
+        -- presets = {
+        --   bottom_search = false,
+        --   -- command_palette = false,
+        -- },
+        views = {
+          cmdline_popup = {
+            size = {
+              min_width = math.min(60, math.floor(2 * vim.o.columns / 3)),
+            },
+          },
+          split = {
+            enter = true,
+            size = "70%",
+            win_options = {
+              scrolloff = 4,
+              sidescrolloff = 8,
+            },
           },
         },
-        split = {
-          enter = true,
-          size = "70%",
-          win_options = {
-            scrolloff = 4,
-            sidescrolloff = 8,
-          },
-        },
-      },
-    },
+      })
+    end,
   },
 
   {
