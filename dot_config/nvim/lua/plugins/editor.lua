@@ -944,6 +944,7 @@ return {
           end)
       end
 
+      ---@type UfoConfig
       return {
         open_fold_hl_timeout = 150,
         provider_selector = function(bufnr, filetype, buftype)
@@ -1039,6 +1040,10 @@ return {
             end,
             { desc = "Double to Exit" },
           },
+        },
+        x = {
+          { "u", "<C-u>", { desc = "Scroll Up" } },
+          { "d", "<C-d>", { desc = "Scroll Down" } },
         },
       })
       local orig_dd_keymap ---@type table<string,any>
