@@ -7,4 +7,5 @@ normal = ["Maple Mono NF CN", "Symbols Nerd Font Mono"]
 size = 14.0
 
 [font.features]
-"Maple Mono NF CN" = ["+cv01", "+cv35", "+ss06"]
+# +cv01
+"Maple Mono NF CN" = ["+cv35", "+ss06"]
