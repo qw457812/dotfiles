@@ -84,7 +84,8 @@ return {
 
       ---@type table<string, blink.cmp.KeymapCommand>
       H.cmdline_actions = {
-        is_selected_item_inserted = function(cmp)
+        -- is current (selected) item inserted
+        is_inserted = function(cmp)
           local item = cmp.get_selected_item()
           if not item then
             return false
@@ -97,13 +98,18 @@ return {
           end
           return line_before:match(vim.pesc(item_text) .. "$") ~= nil
         end,
-        insert_or_select_next = function(cmp)
-          if H.cmdline_actions.is_selected_item_inserted(cmp) then
-            return cmp.select_next()
+        -- insert current (selected) item
+        insert = function(cmp)
+          if H.cmdline_actions.is_inserted(cmp) then
+            return
           end
-          -- work-around for insert
-          cmp.select_next({ auto_insert = false })
-          return cmp.select_prev()
+          -- work-around for insert current
+          if #cmp.get_items() > 1 then
+            cmp.select_next({ auto_insert = false })
+            return cmp.select_prev({ auto_insert = true })
+          else
+            return cmp.select_next({ auto_insert = true }) -- alternate to `cmp.insert_next()`
+          end
         end,
       }
 
@@ -150,16 +156,16 @@ return {
           keymap = {
             ["<CR>"] = {
               function(cmp)
-                if cmp.is_menu_visible() and not H.cmdline_actions.is_selected_item_inserted(cmp) then
+                if cmp.is_menu_visible() and not H.cmdline_actions.is_inserted(cmp) then
                   return cmp.accept()
                 end
               end,
               "fallback",
             },
-            ["<Tab>"] = { "show_and_insert", H.cmdline_actions.insert_or_select_next },
+            ["<Tab>"] = { "show_and_insert", H.cmdline_actions.insert, "select_next" },
             ["<Right>"] = {
               function(cmp)
-                if cmp.is_ghost_text_visible() and not H.cmdline_actions.is_selected_item_inserted(cmp) then
+                if cmp.is_ghost_text_visible() and not H.cmdline_actions.is_inserted(cmp) then
                   return cmp.accept()
                 end
               end,
