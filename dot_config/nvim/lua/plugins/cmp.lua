@@ -159,9 +159,12 @@ return {
             ["<Tab>"] = { "show_and_insert", H.cmdline_actions.insert_or_select_next },
             ["<Right>"] = {
               function(cmp)
-                if cmp.is_ghost_text_visible() then
+                if cmp.is_ghost_text_visible() and not H.cmdline_actions.is_selected_item_inserted(cmp) then
                   return cmp.accept()
                 end
+              end,
+              function(cmp)
+                cmp.hide() -- in favor of `fallback`
               end,
               "fallback",
             },
