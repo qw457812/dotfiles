@@ -15,17 +15,15 @@ local function ft_icon()
 end
 
 -- https://github.com/aimuzov/LazyVimx/blob/a27d3439b9021d1215ce6471f59d801df32c18d4/lua/lazyvimx/extras/hacks/lazyvim-lualine-pretty-path.lua
-local function pretty_path(o)
-  return function(self)
-    return LazyVim.lualine.pretty_path(o)(self):gsub("/", "󰿟")
-  end
-end
-
 M.pretty_path = {
-  pretty_path({
-    relative = "root",
-    directory_hl = "Conceal",
-  }),
+  function(self)
+    return LazyVim.lualine
+      .pretty_path({
+        relative = "root",
+        directory_hl = "Conceal",
+      })(self)
+      :gsub("/", "󰿟")
+  end,
 }
 
 -- copied from: https://github.com/LazyVim/LazyVim/blob/2b3bcf36b2392bef94afefc07e2fcf32960960d7/lua/lazyvim/plugins/ui.lua#L113-L117
