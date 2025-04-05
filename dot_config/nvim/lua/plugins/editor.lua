@@ -62,13 +62,13 @@ return {
         callback = function(ev)
           -- https://github.com/MagicDuck/grug-far.nvim#create-a-buffer-local-keybinding-to-toggle---fixed-strings-flag
           vim.keymap.set("n", "<localleader>f", function()
-            local state = unpack(require("grug-far").toggle_flags({ "--fixed-strings" }))
+            local state = unpack(require("grug-far").get_instance(0):toggle_flags({ "--fixed-strings" }))
             LazyVim.info(("Toggled `--fixed-strings`: **%s**"):format(state and "ON" or "OFF"), { title = "Grug Far" })
           end, { buffer = ev.buf, desc = "Toggle --fixed-strings" })
 
           vim.keymap.set("n", "<left>", function()
             -- vim.api.nvim_win_set_cursor(vim.fn.bufwinid(0), { 2, 0 })
-            require("grug-far").goto_first_input()
+            require("grug-far").get_instance(0):goto_first_input()
           end, { buffer = ev.buf, desc = "Jump Back to Search Input (Grug Far)" })
 
           vim.keymap.set(
@@ -227,6 +227,17 @@ return {
 
   {
     "folke/which-key.nvim",
+    keys = {
+      -- HACK: fix the popup not showing on `<localleader>`
+      -- https://github.com/folke/which-key.nvim/issues/172#issuecomment-2002609310
+      {
+        "<localleader>?",
+        function()
+          require("which-key").show({ global = false })
+        end,
+        desc = "Buffer Keymaps (which-key)",
+      },
+    },
     opts = {
       keys = {
         scroll_down = "<c-f>",
