@@ -79,7 +79,7 @@ map("i", "<C-e>", "<End>", { desc = "Goto line end" })
 safe_map("n", { "J", "<Down>" }, "<cmd>bnext<cr>", { desc = "Next Buffer" })
 safe_map("n", { "K", "<Up>" }, "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
 map({ "n", "x" }, "gj", "J", { desc = "Join Lines" })
-map({ "n", "x" }, "gk", "K", { desc = "Keywordprg" }) -- see `:h :Man`
+safe_map({ "n", "x" }, "gk", "K", { desc = "Keywordprg" }) -- nvim-ufo
 LazyViewConfig.keys.hover = "gk"
 
 map("n", "<Left>", "<C-o>", { desc = "Go Back" })
