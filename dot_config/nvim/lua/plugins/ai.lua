@@ -14,6 +14,10 @@ return {
     "zbirenbaum/copilot.lua",
     optional = true,
     opts = function()
+      -- HACK: https://github.com/LazyVim/LazyVim/blob/8f4e9b8c1e43e354d91529484aedca54f04bdcf6/lua/lazyvim/plugins/extras/ai/copilot.lua#L54
+      ---@diagnostic disable-next-line: inject-field
+      require("copilot.api").status = require("copilot.status")
+
       U.toggle.ai_cmps.copilot = Snacks.toggle({
         name = "Copilot",
         get = function()

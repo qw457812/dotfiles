@@ -81,6 +81,7 @@ return {
       },
       {
         "yazi-rs/plugins",
+        commit = "273019910c1111a388dd20e057606016f4bd0d17",
         name = "yazi-plugins",
         lazy = true,
         build = function(plugin)
