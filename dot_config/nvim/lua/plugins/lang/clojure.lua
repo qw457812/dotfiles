@@ -10,6 +10,8 @@ return {
     optional = true,
     lazy = true,
   },
+  -- alternative: julienvincent/nvim-paredit
+  -- see: https://github.com/LazyVim/LazyVim/pull/5876
   {
     "PaterJason/nvim-treesitter-sexp",
     optional = true,

@@ -37,6 +37,7 @@
     "plugins.extras.ai.aider",
     "plugins.extras.ai.avante",
     "plugins.extras.editor.mini-operators",
+    "plugins.extras.editor.visual-whitespace",
     "plugins.extras.game.exercism",
     "plugins.extras.game.leetcode",
     "plugins.extras.lang.xml",
