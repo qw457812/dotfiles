@@ -868,15 +868,6 @@ return {
       { "zM", function() require("ufo").closeAllFolds() end },
       { "zr", function() require("ufo").openFoldsExceptKinds() end },
       { "zm", function() require("ufo").closeFoldsWith() end },
-      {
-        "zK",
-        function()
-          local winid = require("ufo").peekFoldedLinesUnderCursor()
-          if not winid then
-            vim.lsp.buf.hover()
-          end
-        end,
-      },
     },
     opts = function()
       -- -- kitty.conf
@@ -976,7 +967,7 @@ return {
         fold_virt_text_handler = virt_text_handler,
         preview = {
           win_config = {
-            -- border = { "", "─", "", "", "", "─", "", "" },
+            border = { "", "─", "", "", "", "─", "", "" },
             winblend = 0,
           },
           mappings = {
@@ -987,6 +978,35 @@ return {
           },
         },
       }
+    end,
+  },
+  {
+    "kevinhwang91/nvim-ufo",
+    keys = {
+      {
+        "gk",
+        function()
+          local ufo_preview_win = require("ufo").peekFoldedLinesUnderCursor()
+          if ufo_preview_win then
+            vim.bo[vim.api.nvim_win_get_buf(ufo_preview_win)].filetype = "ufo_preview" -- for augroup: pager_nomodifiable
+          elseif require("lazyvim.plugins.lsp.keymaps").has(0, "hover") then
+            vim.lsp.buf.hover()
+          else
+            vim.api.nvim_feedkeys(vim.keycode("K"), "n", false)
+          end
+        end,
+        desc = "Peek Fold (UFO) / Hover / Keywordprg",
+      },
+    },
+    opts = function(_, opts)
+      table.insert(require("lazyvim.plugins.lsp.keymaps").get(), { "gk", false })
+      return U.extend_tbl(opts, {
+        preview = {
+          mappings = {
+            switch = "gk",
+          },
+        },
+      })
     end,
   },
 
