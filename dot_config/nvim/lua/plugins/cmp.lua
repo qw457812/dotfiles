@@ -469,6 +469,7 @@ return {
     },
   },
 
+  -- TODO: https://github.com/philosofonusus/ecolog.nvim
   {
     "saghen/blink.cmp",
     optional = true,

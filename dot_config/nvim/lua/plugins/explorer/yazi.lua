@@ -62,7 +62,7 @@ return {
       return {
         open_for_directories = vim.g.user_hijack_netrw == "yazi.nvim",
         open_multiple_tabs = true,
-        floating_window_scaling_factor = vim.g.user_is_termux and 1 or nil,
+        floating_window_scaling_factor = vim.g.user_is_termux and 1 or { height = 0.875, width = 0.9 },
         yazi_floating_window_border = vim.g.user_is_termux and "none" or nil,
         keymaps = {
           show_help = "~", -- `~` for yazi.nvim and `g?` for yazi
