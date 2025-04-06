@@ -346,6 +346,17 @@ return {
         },
       })
     end,
+    opts = function()
+      -- copied from: https://github.com/echasnovski/mini.nvim/issues/1319#issuecomment-2761528147
+      Snacks.util.set_hl({
+        MiniDiffOverAdd = { bg = "#104010" }, -- regular green
+        MiniDiffOverChange = { bg = "#600000" }, -- saturated red
+        MiniDiffOverChangeBuf = { bg = "#006000" }, -- saturated green
+        MiniDiffOverContext = { bg = "#401010" }, -- regular red
+        MiniDiffOverContextBuf = { bg = "#104010" }, -- regular green
+        MiniDiffOverDelete = { bg = "#401010" }, -- regular red
+      })
+    end,
   },
 
   {
