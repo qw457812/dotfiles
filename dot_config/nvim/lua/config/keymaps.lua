@@ -57,7 +57,7 @@ end
 -- map("x", "h", "col('.') == 1 && foldlevel(line('.')) > 0 ? 'zcgv' : 'h'", { expr = true })
 -- map("n", "l", "foldclosed(line('.')) != -1 ? 'zo0' : 'l'", { expr = true })
 -- map("x", "l", "foldclosed(line('.')) != -1 ? 'zogv0' : 'l'", { expr = true })
-map({ "n", "x" }, "l", U.keymap.foldopen_l, { desc = "Right" })
+safe_map({ "n", "x" }, "l", U.keymap.foldopen_l, { desc = "Right" }) -- nvim-origami
 
 -- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/keybindings.lua#L19
 map({ "n", "x" }, "H", "&wrap ? 'g^' : '0^'", { desc = "Goto line start", expr = true }) -- use 0^ to scroll fully to the left

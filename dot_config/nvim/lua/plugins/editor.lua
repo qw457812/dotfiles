@@ -868,6 +868,11 @@ return {
       { "zM", function() require("ufo").closeAllFolds() end },
       { "zr", function() require("ufo").openFoldsExceptKinds() end },
       { "zm", function() require("ufo").closeFoldsWith() end },
+      { "z1", function() require("ufo").closeFoldsWith(1) end, desc = "Close L1 folds" },
+      { "z2", function() require("ufo").closeFoldsWith(2) end, desc = "Close L2 folds" },
+      { "z3", function() require("ufo").closeFoldsWith(3) end, desc = "Close L3 folds" },
+      { "z4", function() require("ufo").closeFoldsWith(4) end, desc = "Close L4 folds" },
+      { "<leader>iF", vim.cmd.UfoInspect, desc = "Fold" },
     },
     opts = function()
       -- -- kitty.conf
@@ -882,7 +887,7 @@ return {
       -- add number suffix of folded lines
       local function virt_text_handler(virtText, lnum, endLnum, width, truncate)
         local newVirtText = {}
-        local suffix = (" ⋯ %d "):format(endLnum - lnum)
+        local suffix = (" ⋯ %d "):format(endLnum - lnum) -- 󰘖 
         local sufWidth = vim.fn.strdisplaywidth(suffix)
         local targetWidth = width - sufWidth
         local curWidth = 0
@@ -959,7 +964,7 @@ return {
           return ftMap[filetype] or selector
         end,
         close_fold_kinds_for_ft = {
-          default = { "imports", "marker" }, -- comment
+          default = { "imports", "comment", "marker" },
           -- json = { "array" },
           -- markdown = {}, -- avoid everything becoming folded
           -- toml = {},
@@ -1007,6 +1012,72 @@ return {
           },
         },
       })
+    end,
+  },
+  {
+    "chrisgrieser/nvim-origami",
+    event = "VeryLazy",
+    dependencies = {
+      "kevinhwang91/nvim-ufo",
+      optional = true,
+      keys = { { "<leader>iF", false } },
+    },
+    init = function()
+      if LazyVim.has("nvim-ufo") then
+        return
+      end
+
+      -- -- copied from: https://github.com/chrisgrieser/.config/blob/832fa40a0648b31780658b59138379851a5231ec/nvim/lua/config/options.lua#L161-L181
+      -- vim.o.foldlevel = 99 -- do not auto-fold
+      vim.o.foldlevelstart = 99
+      -- vim.o.foldtext = "" -- empty string keeps text (overwritten by nvim-origami)
+
+      -- -- LSP -> Treesitter
+      -- vim.o.foldmethod = "expr"
+      -- vim.o.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+      vim.api.nvim_create_autocmd("LspAttach", {
+        desc = "User: Prefer LSP folding if client supports it",
+        callback = function(args)
+          local client = vim.lsp.get_client_by_id(args.data.client_id)
+          if client and client:supports_method("textDocument/foldingRange") then
+            local win = vim.api.nvim_get_current_win()
+            vim.wo[win][0].foldexpr = "v:lua.vim.lsp.foldexpr()"
+          end
+        end,
+      })
+    end,
+    -- stylua: ignore
+    keys = {
+      { "h", function() require("origami").h() end, desc = "Left (Origami)" },
+      { "l", function() require("origami").l() end, desc = "Right (Origami)" },
+      {
+        "<leader>iF",
+        function()
+          if LazyVim.has("nvim-ufo") then
+            vim.cmd.UfoInspect()
+          end
+          require("origami").inspectLspFolds("special")
+        end,
+        desc = "Fold",
+      },
+    },
+    opts = function()
+      local has_ufo = LazyVim.has("nvim-ufo")
+      return {
+        keepFoldsAcrossSessions = has_ufo,
+        foldtextWithLineCount = {
+          enabled = not has_ufo,
+          template = "  󰘖 %s",
+        },
+        foldKeymaps = {
+          setup = false,
+          hOnlyOpensOnFirstColumn = true,
+        },
+        autoFold = {
+          enabled = not has_ufo,
+          kinds = { "imports", "comment" }, ---@type lsp.FoldingRangeKind[]
+        },
+      }
     end,
   },
 
