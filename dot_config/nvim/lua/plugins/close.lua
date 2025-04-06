@@ -465,17 +465,11 @@ return {
 
       vim.api.nvim_create_autocmd("FileType", {
         group = augroup,
-        pattern = {
-          "Avante",
-          "AvanteInput",
-          "AvanteSelectedFiles",
-        },
+        pattern = { "Avante", "AvanteInput", "AvanteSelectedFiles" },
         callback = function(event)
-          vim.keymap.set("n", close_key, require("avante").close_sidebar, {
-            buffer = event.buf,
-            silent = true,
-            desc = "Close (Avante)",
-          })
+          vim.keymap.set("n", close_key, function()
+            require("avante").close_sidebar()
+          end, { buffer = event.buf, silent = true, desc = "Close (Avante)" })
         end,
       })
 

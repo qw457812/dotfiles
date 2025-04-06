@@ -149,24 +149,26 @@ return {
         })
       end
     end,
-  },
-  {
-    "folke/noice.nvim",
-    optional = true,
-    opts = function(_, opts)
-      opts.routes = vim.list_extend(opts.routes or {}, {
-        {
-          filter = {
-            event = { "msg_show", "notify" },
-            cond = function()
-              return vim.bo.filetype == "rip-substitute"
-            end,
-          },
-          view = "mini",
-        },
-      })
-      return opts
-    end,
+    specs = {
+      {
+        "folke/noice.nvim",
+        optional = true,
+        opts = function(_, opts)
+          opts.routes = vim.list_extend(opts.routes or {}, {
+            {
+              filter = {
+                event = { "msg_show", "notify" },
+                cond = function()
+                  return vim.bo.filetype == "rip-substitute"
+                end,
+              },
+              view = "mini",
+            },
+          })
+          return opts
+        end,
+      },
+    },
   },
 
   -- TODO: choose motion plugin between: flash, leap, hop
@@ -965,6 +967,7 @@ return {
       ---@type UfoConfig
       return {
         open_fold_hl_timeout = 150,
+        -- enable_get_fold_virt_text = true, -- see: https://github.com/kevinhwang91/nvim-ufo/issues/26
         provider_selector = function(bufnr, filetype, buftype)
           -- see also: https://github.com/chrisgrieser/.config/blob/9a3fa5f42f6b402a0eb2468f38b0642bbbe7ccef/nvim/lua/plugin-specs/ufo.lua#L37-L42
           local ftMap = {
