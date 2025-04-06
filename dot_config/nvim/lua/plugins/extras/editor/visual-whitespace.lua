@@ -9,7 +9,6 @@ return {
           bg = Snacks.util.color("Visual", "bg"),
         },
       })
-
       return {
         nl_char = "",
       }

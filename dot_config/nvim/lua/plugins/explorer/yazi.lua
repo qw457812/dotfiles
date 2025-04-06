@@ -24,21 +24,23 @@ return {
         pattern = "term://*yazi*",
         callback = function(event)
           local buf = event.buf
-          if vim.bo[buf].filetype == "yazi" then
-            -- vim.keymap.set("t", "<esc>", "<esc>", { buffer = buf, nowait = true })
-            vim.keymap.set("t", "<c-h>", "<c-h>", { buffer = buf, nowait = true })
-            vim.keymap.set("t", "<c-j>", "<c-j>", { buffer = buf, nowait = true })
-            vim.keymap.set("t", "<c-k>", "<c-k>", { buffer = buf, nowait = true })
-            vim.keymap.set("t", "<c-l>", "<c-l>", { buffer = buf, nowait = true })
-
-            -- after closing `show_help` by <bs>, yazi goes to normal mode
-            vim.api.nvim_create_autocmd("BufEnter", {
-              buffer = buf,
-              callback = function()
-                vim.cmd.startinsert()
-              end,
-            })
+          if vim.bo[buf].filetype ~= "yazi" then
+            return
           end
+
+          vim.b[buf].user_lualine_filename = "yazi"
+          -- vim.keymap.set("t", "<esc>", "<esc>", { buffer = buf, nowait = true })
+          vim.keymap.set("t", "<c-h>", "<c-h>", { buffer = buf, nowait = true })
+          vim.keymap.set("t", "<c-j>", "<c-j>", { buffer = buf, nowait = true })
+          vim.keymap.set("t", "<c-k>", "<c-k>", { buffer = buf, nowait = true })
+          vim.keymap.set("t", "<c-l>", "<c-l>", { buffer = buf, nowait = true })
+          -- after closing `show_help` by <bs>, yazi goes to normal mode
+          vim.api.nvim_create_autocmd("BufEnter", {
+            buffer = buf,
+            callback = function()
+              vim.cmd.startinsert()
+            end,
+          })
         end,
       })
 
@@ -60,6 +62,8 @@ return {
       return {
         open_for_directories = vim.g.user_hijack_netrw == "yazi.nvim",
         open_multiple_tabs = true,
+        floating_window_scaling_factor = vim.g.user_is_termux and 1 or nil,
+        yazi_floating_window_border = vim.g.user_is_termux and "none" or nil,
         keymaps = {
           show_help = "~", -- `~` for yazi.nvim and `g?` for yazi
         },
