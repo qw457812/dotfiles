@@ -2,8 +2,10 @@
 # https://aider.chat/docs/leaderboards/
 
 alias:
-  - "r1:openrouter/deepseek/deepseek-r1"
   - "sonnet:openrouter/anthropic/claude-3.7-sonnet"
+  - "gemini:openrouter/google/gemini-2.5-pro-preview-03-25"
+  - "gemini-exp:openrouter/google/gemini-2.5-pro-exp-03-25:free"
+  - "r1:openrouter/deepseek/deepseek-r1"
   - "groq:groq/llama-3.3-70b-versatile"
 
 # architect: true
