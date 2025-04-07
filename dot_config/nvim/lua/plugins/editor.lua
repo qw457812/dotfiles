@@ -1060,21 +1060,45 @@ return {
         end,
       })
     end,
-    -- stylua: ignore
-    keys = {
-      { "h", function() require("origami").h() end, desc = "Left (Origami)" },
-      { "l", function() require("origami").l() end, desc = "Right (Origami)" },
-      {
-        "<leader>iF",
-        function()
-          if LazyVim.has("nvim-ufo") then
-            pcall(vim.cmd.UfoInspect)
-          end
-          require("origami").inspectLspFolds("special")
-        end,
-        desc = "Fold",
-      },
-    },
+    keys = function()
+      -- https://github.com/folke/snacks.nvim/blob/4c52b7f25da0ce6b2b830ce060dbd162706acf33/lua/snacks/scroll.lua#L275-L282
+      local repeat_delay = 100
+      local last = 0
+      return {
+        {
+          "h",
+          function()
+            local count1 = vim.v.count1
+            local now = vim.uv.hrtime()
+            local repeat_delta = (now - last) / 1e6
+            last = now
+            if repeat_delta <= repeat_delay then
+              vim.cmd("normal! " .. count1 .. "h")
+            else
+              require("origami").h()
+            end
+          end,
+          desc = "Left (Origami)",
+        },
+        {
+          "l",
+          function()
+            require("origami").l()
+          end,
+          desc = "Right (Origami)",
+        },
+        {
+          "<leader>iF",
+          function()
+            if LazyVim.has("nvim-ufo") then
+              pcall(vim.cmd.UfoInspect)
+            end
+            require("origami").inspectLspFolds("special")
+          end,
+          desc = "Fold",
+        },
+      }
+    end,
     opts = function()
       local has_ufo = LazyVim.has("nvim-ufo")
       return {
