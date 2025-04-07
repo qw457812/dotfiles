@@ -359,14 +359,4 @@ return {
       },
     },
   },
-
-  {
-    "CopilotC-Nvim/CopilotChat.nvim",
-    optional = true,
-    keys = {
-      { "<leader>aa", mode = { "n", "v" }, false },
-      -- stylua: ignore
-      { "<leader>ac", mode = { "n", "v" }, function() return require("CopilotChat").toggle() end, desc = "Toggle (CopilotChat)" },
-    },
-  },
 }
