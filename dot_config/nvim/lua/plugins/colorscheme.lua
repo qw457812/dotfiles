@@ -145,6 +145,8 @@ return {
           -- unused variable
           hl.DiagnosticUnnecessary = { fg = util.blend_fg(c.terminal_black, 0.7) }
 
+          hl.UfoFoldedEllipsis = { bg = c.blue, fg = c.bg_dark }
+
           hl.TelescopeSelectionCaret =
             { fg = (hl.TelescopePromptPrefix or hl.Identifier).fg, bg = (hl.TelescopeSelection or hl.Visual).bg }
 
@@ -341,6 +343,8 @@ return {
             Comment = { fg = colors.overlay0, style = { "italic" } },
             -- require("tokyonight.colors").setup({style = "moon"}).bg_visual -- #2d3f76
             -- Visual = { bg = util.blend(colors.surface1, "#2d3f76", 0.25), style = { "bold" } },
+
+            Folded = vim.g.user_transparent_background and { fg = colors.blue, bg = colors.surface1 } or nil,
 
             TreesitterContext = {
               bg = vim.g.user_transparent_background and util.darken(colors.surface0, 0.5, colors.base)

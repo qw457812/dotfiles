@@ -81,7 +81,7 @@ return {
               buffer = ev.buf,
               callback = function()
                 vim.api.nvim_buf_call(ev.buf, function()
-                  vim.cmd("silent! write")
+                  vim.cmd("silent! noautocmd lockmarks write")
                 end)
               end,
             })

@@ -1068,7 +1068,7 @@ return {
         "<leader>iF",
         function()
           if LazyVim.has("nvim-ufo") then
-            vim.cmd.UfoInspect()
+            pcall(vim.cmd.UfoInspect)
           end
           require("origami").inspectLspFolds("special")
         end,
