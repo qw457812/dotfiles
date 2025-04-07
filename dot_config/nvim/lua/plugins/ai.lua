@@ -136,6 +136,11 @@ return {
         ft = U.markdown.render_markdown_ft("copilot-chat"),
       },
     },
+    keys = {
+      { "<leader>aa", mode = { "n", "v" }, false },
+      -- stylua: ignore
+      { "<leader>ac", mode = { "n", "v" }, function() require("CopilotChat").open() end, desc = "Open (CopilotChat)" },
+    },
     opts = function(_, opts)
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "copilot-chat",
@@ -143,6 +148,12 @@ return {
           -- see: https://github.com/LazyVim/LazyVim/pull/5754
           -- path sources triggered by "/" interfere with CopilotChat commands
           vim.b[ev.buf].user_blink_path = false
+
+          vim.keymap.set("n", "<Esc>", function()
+            if not U.keymap.clear_ui_esc() then
+              vim.cmd("wincmd h")
+            end
+          end, { buffer = ev.buf, desc = "Clear UI or Unfocus (CopilotChat)" })
         end,
       })
 
