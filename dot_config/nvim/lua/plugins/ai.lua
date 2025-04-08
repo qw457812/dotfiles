@@ -1,6 +1,17 @@
 return {
   {
     "zbirenbaum/copilot.lua",
+    commit = vim.g.user_is_termux and "0b40947" or nil,
+    optional = true,
+    opts = function()
+      if vim.g.user_is_termux then
+        ---@diagnostic disable-next-line: inject-field
+        require("copilot.api").status = require("copilot.status")
+      end
+    end,
+  },
+  {
+    "zbirenbaum/copilot.lua",
     optional = true,
     opts = {
       copilot_model = "gpt-4o-copilot",
@@ -147,7 +158,7 @@ return {
 
           vim.keymap.set("n", "<Esc>", function()
             if not U.keymap.clear_ui_esc() then
-              vim.cmd("wincmd h")
+              vim.cmd("wincmd p")
             end
           end, { buffer = ev.buf, desc = "Clear UI or Unfocus (CopilotChat)" })
         end,
@@ -162,6 +173,11 @@ return {
         question_header = "  User ",
         -- model = "claude-3.7-sonnet",
         -- show_help = false,
+        window = {
+          layout = function()
+            return vim.o.columns >= 120 and "vertical" or "horizontal"
+          end,
+        },
       })
     end,
   },

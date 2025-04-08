@@ -61,8 +61,10 @@ vim.g.trouble_lualine = false
 vim.g.lazyvim_blink_main = not vim.g.user_is_termux
 -- failed to install basedpyright on termux via mason
 vim.g.lazyvim_python_lsp = not vim.g.user_is_termux and "basedpyright" or vim.g.lazyvim_python_lsp
--- better coop with fzf-lua
-vim.env.FZF_DEFAULT_OPTS = ""
+if LazyVim.has("fzf-lua") then
+  -- better coop with fzf-lua
+  vim.env.FZF_DEFAULT_OPTS = ""
+end
 if vim.g.user_is_termux then
   -- https://github.com/nvim-lua/plenary.nvim/issues/536#issuecomment-1799807408
   -- https://github.com/nvim-lua/plenary.nvim/blob/f031bef84630f556c2fb81215826ea419d81f4e9/lua/plenary/curl.lua#L81
