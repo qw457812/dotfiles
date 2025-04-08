@@ -1,5 +1,6 @@
 # https://github.com/sxyazi/yazi/blob/shipped/yazi-config/preset/keymap-default.toml
 # https://yazi-rs.github.io/docs/configuration/keymap
+"$schema" = "https://yazi-rs.github.io/schemas/keymap.json"
 
 [manager]
 
@@ -12,9 +13,9 @@ prepend_keymap = [
   # https://yazi-rs.github.io/docs/faq#why-separate-open-enter
   { on = "l", run = "plugin smart-enter", desc = "Enter the child directory, or open the file" },
 
-  # # https://yazi-rs.github.io/docs/tips#navigation-wraparound
-  # { on = "k", run = "plugin arrow -1", desc = "Move cursor up (wraparound)" },
-  # { on = "j", run = "plugin arrow 1", desc = "Move cursor down (wraparound)" },
+  # disable wraparound navigation
+  { on = "k", run = "arrow -1", desc = "Previous file" },
+  { on = "j", run = "arrow 1", desc = "Next file" },
 
   # # https://yazi-rs.github.io/docs/tips#parent-arrow
   # { on = "K", run = "plugin parent-arrow -1", desc = "Navigation in the parent directory without leaving the CWD" },
@@ -88,6 +89,13 @@ prepend_keymap = [
   { on = ":", run = "shell --interactive", desc = "Run a shell command" },
   { on = ";", run = "shell --block --interactive", desc = "Run a shell command (block until finishes)" },
 
+  { on = "r", run = [
+    "rename --cursor=before_ext",
+    "input:escape",
+  ], desc = "Rename selected file(s)" },
+  { on = "z", run = "plugin zoxide", desc = "Jump to a directory via zoxide" },
+  { on = "Z", run = "plugin fzf", desc = "Jump to a file/directory via fzf" },
+
   # Selection
   { on = ",", run = [
     "toggle",
@@ -98,6 +106,11 @@ prepend_keymap = [
   { on = [
     "<Space>",
     "<Space>",
+  ], run = "plugin fzf", desc = "Jump to a file/directory via fzf" },
+  { on = [
+    "<Space>",
+    "f",
+    "f",
   ], run = "search --via=fd", desc = "Search files by name via fd" },
   # TODO: S
   { on = [
@@ -342,6 +355,11 @@ append_keymap = [
 
 [tasks]
 
+prepend_keymap = [
+  { on = "k", run = "arrow -1", desc = "Previous task" },
+  { on = "j", run = "arrow 1", desc = "Next task" },
+]
+
 append_keymap = [
   { on = "<Backspace>", run = "close", desc = "Close task manager" },
 
@@ -354,6 +372,9 @@ append_keymap = [
 [spot]
 
 prepend_keymap = [
+  { on = "k", run = "arrow -1", desc = "Previous line" },
+  { on = "j", run = "arrow 1", desc = "Next line" },
+
   # Copy
   { on = ["c", "c"], run = "noop" },
   { on = ["y", "y"], run = "copy cell", desc = "Copy selected cell" },
@@ -368,11 +389,22 @@ append_keymap = [
 
   { on = [
     "g",
+    "g",
+  ], run = "arrow top", desc = "Go to top" },
+  { on = "G", run = "arrow bot", desc = "Go to bottom" },
+
+  { on = [
+    "g",
     "?",
   ], run = "help", desc = "Open help" },
 ]
 
 [pick]
+
+prepend_keymap = [
+  { on = "k", run = "arrow -1", desc = "Previous option" },
+  { on = "j", run = "arrow 1", desc = "Next option" },
+]
 
 append_keymap = [
   { on = "<Backspace>", run = "close", desc = "Cancel pick" },
@@ -406,6 +438,11 @@ append_keymap = [
 
 [confirm]
 
+prepend_keymap = [
+  { on = "k", run = "arrow -1", desc = "Previous line" },
+  { on = "j", run = "arrow 1", desc = "Next line" },
+]
+
 append_keymap = [
   { on = "<Backspace>", run = "close", desc = "Cancel the confirm" },
 
@@ -415,11 +452,24 @@ append_keymap = [
   ], run = "help", desc = "Open help" },
 ]
 
-[completion]
+[cmp]
 
-append_keymap = [{ on = ["g", "?"], run = "help", desc = "Open help" }]
+append_keymap = [
+  { on = "<C-k>", run = "arrow prev", desc = "Previous item" },
+  { on = "<C-j>", run = "arrow next", desc = "Next item" },
+
+  { on = [
+    "g",
+    "?",
+  ], run = "help", desc = "Open help" },
+]
 
 [help]
+
+prepend_keymap = [
+  { on = "k", run = "arrow -1", desc = "Previous line" },
+  { on = "j", run = "arrow 1", desc = "Next line" },
+]
 
 append_keymap = [
   { on = "<Backspace>", run = "close", desc = "Hide the help" },
@@ -427,8 +477,8 @@ append_keymap = [
   { on = ["g", "?"], run = "close", desc = "Hide the help" },
 
   # Navigation
-  { on = ["g", "g"], run = "arrow -99999999", desc = "Move cursor to the top" },
-  { on = "G", run = "arrow 99999999", desc = "Move cursor to the bottom" },
+  { on = ["g", "g"], run = "arrow top", desc = "Go to top" },
+  { on = "G", run = "arrow bot", desc = "Go to bottom" },
 
   # Filtering
   { on = "/", run = "filter", desc = "Apply a filter for the help items" },
