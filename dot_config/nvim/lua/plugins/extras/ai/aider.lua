@@ -5,15 +5,15 @@ return {
     "GeorgesAlkhouri/nvim-aider",
     enabled = vim.fn.executable("aider") == 1,
     dependencies = "folke/snacks.nvim",
-    cmd = "AiderTerminalToggle",
+    cmd = "Aider",
     keys = {
-      { toggle_key, "<cmd>AiderTerminalToggle<cr>", desc = "Open Terminal (Aider)" },
-      { "<leader>as", "<cmd>AiderTerminalSend<cr>", desc = "Send (Aider)", mode = { "n", "v" } },
-      { "<leader>a/", "<cmd>AiderQuickSendCommand<cr>", desc = "Send Command (Aider)" },
-      { "<leader>ab", "<cmd>AiderQuickSendBuffer<cr>", desc = "Send Buffer (Aider)" },
-      { "<leader>a+", "<cmd>AiderQuickAddFile<cr>", desc = "Add File (Aider)" },
-      { "<leader>a-", "<cmd>AiderQuickDropFile<cr>", desc = "Drop File (Aider)" },
-      { "<leader>ar", "<cmd>AiderQuickReadOnlyFile<cr>", desc = "Add Read-Only File (Aider)" },
+      { toggle_key, "<cmd>Aider toggle<cr>", desc = "Open (Aider)" },
+      { "<leader>as", "<cmd>Aider send<cr>", desc = "Send (Aider)", mode = { "n", "v" } },
+      { "<leader>a/", "<cmd>Aider command<cr>", desc = "Commands (Aider)" },
+      { "<leader>ab", "<cmd>Aider buffer<cr>", desc = "Send Buffer (Aider)" },
+      { "<leader>a+", "<cmd>Aider add<cr>", desc = "Add File (Aider)" },
+      { "<leader>a-", "<cmd>Aider drop<cr>", desc = "Drop File (Aider)" },
+      { "<leader>ar", "<cmd>Aider add readonly<cr>", desc = "Add Read-Only File (Aider)" },
     },
     opts = function()
       -- local defaults = require("nvim_aider.config").defaults
