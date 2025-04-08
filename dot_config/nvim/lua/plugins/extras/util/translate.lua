@@ -135,13 +135,7 @@ return {
     opts = function(_, opts)
       local actions = require("pantran.ui.actions")
 
-      -- HACK: fix "Must specify 'relative' or 'external' when creating a float" for nvim-0.11
-      if vim.fn.has("nvim-0.11") == 1 then
-        require("pantran.ui.window")
-      end
-
       Snacks.util.set_hl({ PantranBorder = "FloatBorder" })
-
       return U.extend_tbl(opts, {
         -- command = {
         --   default_mode = "hover",
@@ -180,6 +174,15 @@ return {
           },
         },
       })
+    end,
+    config = function(_, opts)
+      require("pantran").setup(opts)
+
+      -- NOTE: do not require modules of pantran in `opts` function except require("pantran.ui.actions")
+      -- see: https://github.com/potamides/pantran.nvim/blob/b87c3ae48cba4659587fb75abd847e5b7a7c9ca0/lua/pantran/ui/actions.lua#L1-L4
+      local fallback_google = require("pantran.engines.fallback.google")
+      -- HACK: increase title width after customize `title_border`
+      fallback_google.name = fallback_google.name .. "    "
     end,
   },
 }
