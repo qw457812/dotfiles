@@ -355,8 +355,8 @@ return {
         MiniDiffOverChange = { bg = "#600000" }, -- saturated red
         MiniDiffOverChangeBuf = { bg = "#006000" }, -- saturated green
         MiniDiffOverContext = { bg = "#401010" }, -- regular red
-        MiniDiffOverContextBuf = { bg = "#104010" }, -- regular green
-        MiniDiffOverDelete = { bg = "#401010" }, -- regular red
+        MiniDiffOverContextBuf = "MiniDiffOverAdd",
+        MiniDiffOverDelete = "MiniDiffOverContext",
       })
     end,
   },
