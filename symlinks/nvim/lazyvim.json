@@ -39,6 +39,7 @@
     "plugins.extras.ai.avante",
     "plugins.extras.editor.auto-save",
     "plugins.extras.editor.mini-operators",
+    "plugins.extras.editor.ufo",
     "plugins.extras.game.exercism",
     "plugins.extras.game.leetcode",
     "plugins.extras.lang.xml",

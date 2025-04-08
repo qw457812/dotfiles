@@ -50,11 +50,16 @@ local function edit_submit(question)
     ---@cast question string
     question = vim.is_callable(question) and question() or question
     require("avante.api").edit()
-    vim.api.nvim_buf_set_lines(vim.api.nvim_get_current_buf(), 0, -1, false, { question })
-    -- optionally set the cursor position to the end of the input
-    vim.api.nvim_win_set_cursor(vim.api.nvim_get_current_win(), { 1, #question + 1 })
-    -- simulate ctrl+s keypress to submit
-    vim.api.nvim_feedkeys(vim.keycode("<C-s>"), "m", false)
+    vim.schedule(function()
+      local buf = vim.api.nvim_get_current_buf()
+      if vim.bo[buf].filetype == "AvanteInput" then
+        vim.api.nvim_buf_set_lines(buf, 0, -1, false, { question })
+        -- optionally set the cursor position to the end of the input
+        vim.api.nvim_win_set_cursor(vim.api.nvim_get_current_win(), { 1, #question + 1 })
+        -- simulate ctrl+s keypress to submit
+        vim.api.nvim_feedkeys(vim.keycode("<C-s>"), "m", false)
+      end
+    end)
   end
 end
 
@@ -201,6 +206,8 @@ return {
         -- auto_suggestions = true, -- experimental
         -- enable_cursor_planning_mode = true,
         auto_apply_diff_after_generation = true,
+        enable_token_counting = false,
+        enable_claude_text_editor_tool_mode = true,
       },
       provider = "copilot-claude", -- only recommend using claude
       auto_suggestions_provider = "groq", -- high-frequency, can be expensive if enabled
@@ -350,7 +357,7 @@ return {
     dependencies = "Kaiser-Yang/blink-cmp-avante",
     opts = {
       sources = {
-        default = { "avante" },
+        -- default = { "avante" }, -- https://github.com/Kaiser-Yang/blink-cmp-avante/issues/3
         providers = {
           avante = {
             module = "blink-cmp-avante",

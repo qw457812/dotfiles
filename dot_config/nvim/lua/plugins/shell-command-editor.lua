@@ -76,6 +76,7 @@ return {
           pattern = (vim.env.TMPDIR or "/tmp"):gsub("/$", "") .. "/tmp.*.fish",
           once = true,
           callback = function(ev)
+            -- https://github.com/chrisgrieser/.config/blob/052cf97e9e38a37b8d8ca921c3b6626851f98043/nvim/lua/config/autocmds.lua#L51-L74
             vim.api.nvim_create_autocmd({ "InsertLeave", "TextChanged" }, {
               group = augroup,
               buffer = ev.buf,
