@@ -37,6 +37,7 @@
     "lazyvim.plugins.extras.util.mini-hipatterns",
     "plugins.extras.ai.aider",
     "plugins.extras.ai.avante",
+    "plugins.extras.ai.mcphub",
     "plugins.extras.editor.auto-save",
     "plugins.extras.editor.mini-operators",
     "plugins.extras.editor.ufo",
