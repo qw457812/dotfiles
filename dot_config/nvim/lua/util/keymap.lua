@@ -18,8 +18,8 @@ function M.map(mode, lhs, rhs, opts)
   -- -- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/utils.lua#L17
   -- opts.unique = opts.unique ~= false
 
-  ---@cast lhs string[]
   lhs = type(lhs) == "string" and { lhs } or lhs
+  ---@cast lhs string[]
 
   for _, l in ipairs(lhs) do
     vim.keymap.set(mode, l, rhs, opts)
@@ -34,8 +34,8 @@ end
 ---@param rhs string|function
 ---@param opts? vim.keymap.set.Opts
 function M.safe_map(mode, lhs, rhs, opts)
-  ---@cast lhs string[]
   lhs = type(lhs) == "string" and { lhs } or lhs
+  ---@cast lhs string[]
 
   for _, l in ipairs(lhs) do
     LazyVim.safe_keymap_set(mode, l, rhs, opts)
@@ -46,8 +46,8 @@ end
 ---@param lhs string|string[]
 ---@param opts? vim.keymap.del.Opts
 function M.del(modes, lhs, opts)
-  ---@cast lhs string[]
   lhs = type(lhs) == "string" and { lhs } or lhs
+  ---@cast lhs string[]
 
   for _, l in ipairs(lhs) do
     vim.keymap.del(modes, l, opts)
@@ -60,8 +60,8 @@ end
 ---@param lhs string|string[]
 ---@return boolean exists, vim.api.keyset.get_keymap|nil mapping
 function M.buffer_local_mapping_exists(buf, mode, lhs)
-  ---@cast lhs string[]
   lhs = type(lhs) == "string" and { lhs } or lhs
+  ---@cast lhs string[]
   local lhs_norm = vim.tbl_map(Snacks.util.normkey, lhs)
   for _, map in ipairs(vim.api.nvim_buf_get_keymap(buf, mode)) do
     if map.lhs and vim.list_contains(lhs_norm, Snacks.util.normkey(map.lhs)) then
@@ -75,8 +75,8 @@ end
 ---@param lhs string|string[]
 ---@return boolean exists, vim.api.keyset.get_keymap|nil mapping
 function M.global_mapping_exists(mode, lhs)
-  ---@cast lhs string[]
   lhs = type(lhs) == "string" and { lhs } or lhs
+  ---@cast lhs string[]
   local lhs_norm = vim.tbl_map(Snacks.util.normkey, lhs)
   for _, map in ipairs(vim.api.nvim_get_keymap(mode)) do
     if map.lhs and vim.list_contains(lhs_norm, Snacks.util.normkey(map.lhs)) then

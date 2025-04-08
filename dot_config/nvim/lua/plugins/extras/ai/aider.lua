@@ -85,12 +85,11 @@ return {
             require("nvim_aider").api.add_file(node.path)
           end,
           nvim_aider_add_visual = function(_, selected_nodes)
-            local nodeNames = {}
-            for _, node in pairs(selected_nodes) do
-              table.insert(nodeNames, node.path)
-            end
-            if #nodeNames > 0 then
-              require("nvim_aider").api.add_file(table.concat(nodeNames, " "))
+            local paths = vim.tbl_map(function(node)
+              return node.path
+            end, selected_nodes)
+            if #paths > 0 then
+              require("nvim_aider").api.add_file(table.concat(paths, " "))
             end
           end,
           nvim_aider_drop = function(state)
@@ -98,12 +97,14 @@ return {
             require("nvim_aider").api.drop_file(node.path)
           end,
           nvim_aider_drop_visual = function(_, selected_nodes)
-            local nodeNames = {}
-            for _, node in pairs(selected_nodes) do
-              table.insert(nodeNames, node.path)
-            end
-            if #nodeNames > 0 then
-              require("nvim_aider").api.drop_file(table.concat(nodeNames, " "))
+            local paths = vim
+              .iter(selected_nodes)
+              :map(function(node)
+                return node.path
+              end)
+              :join(" ")
+            if paths ~= "" then
+              require("nvim_aider").api.drop_file(paths)
             end
           end,
         },
