@@ -131,6 +131,7 @@ return {
           -- json = { "array" },
           -- markdown = {}, -- avoid everything becoming folded
           -- toml = {},
+          gitcommit = {},
         },
         fold_virt_text_handler = virt_text_handler,
         preview = {
