@@ -13,8 +13,8 @@ vim.notify = vscode.notify
 ---@param command string|string[]
 ---@param opts? vim.keymap.set.Opts
 local function vscode_map(mode, key, command, opts)
-  ---@cast command string[]
   command = type(command) == "string" and { command } or command
+  ---@cast command string[]
 
   -- https://github.com/vscode-neovim/vscode-neovim#%EF%B8%8F-api
   local execute = #command == 1 and vscode.action or vscode.call

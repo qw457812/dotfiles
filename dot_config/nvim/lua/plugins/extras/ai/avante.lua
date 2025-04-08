@@ -32,13 +32,28 @@ local prompt = {
   add_tests = "Implement tests for the following code",
 }
 
----@param question string|fun():string
+local function focus_input()
+  local sidebar = require("avante").get()
+  if sidebar then
+    sidebar:focus_input()
+    vim.cmd("noautocmd startinsert!")
+  end
+end
+
+---@param question? string|fun():string
 ---@return function
 local function ask(question)
   return function()
-    ---@cast question string
+    ---@diagnostic disable-next-line: need-check-nil
     question = vim.is_callable(question) and question() or question
+    ---@cast question string
     require("avante.api").ask({ question = question })
+    vim.schedule(function()
+      U.stop_visual_mode()
+      if not question then
+        focus_input()
+      end
+    end)
   end
 end
 
@@ -47,17 +62,17 @@ end
 ---@return function
 local function edit_submit(question)
   return function()
-    ---@cast question string
     question = vim.is_callable(question) and question() or question
+    ---@cast question string
     require("avante.api").edit()
     vim.schedule(function()
       local buf = vim.api.nvim_get_current_buf()
-      if vim.bo[buf].filetype == "AvanteInput" then
+      if vim.bo[buf].filetype == "AvantePromptInput" then
+        vim.cmd("stopinsert")
         vim.api.nvim_buf_set_lines(buf, 0, -1, false, { question })
-        -- optionally set the cursor position to the end of the input
         vim.api.nvim_win_set_cursor(vim.api.nvim_get_current_win(), { 1, #question + 1 })
-        -- simulate ctrl+s keypress to submit
-        vim.api.nvim_feedkeys(vim.keycode("<C-s>"), "m", false)
+        -- simulate <CR> keypress to submit
+        vim.api.nvim_feedkeys(vim.keycode("<CR>"), "m", false)
       end
     end)
   end
@@ -70,13 +85,6 @@ local function switch_provider()
       require("avante.api").switch_provider(choice)
     end
   end)
-end
-
-local function focus_input()
-  local sidebar = require("avante").get()
-  if sidebar then
-    sidebar:focus_input()
-  end
 end
 
 -- https://github.com/AstroNvim/astrocommunity/blob/main/lua/astrocommunity/completion/avante-nvim/init.lua
@@ -138,18 +146,10 @@ return {
     cmd = "AvanteModels",
     keys = function(_, keys)
       local opts_mappings = LazyVim.opts("avante.nvim").mappings or {}
+      -- stylua: ignore
       local mappings = {
         { mapping_disabled_prefix, "", desc = "+disabled" },
-        {
-          opts_mappings.ask or "<leader>aa",
-          function()
-            require("avante.api").ask()
-            focus_input()
-          end,
-          desc = "Ask (Avante)",
-          mode = { "n", "v" },
-        },
-        -- stylua: ignore start
+        { opts_mappings.ask or "<leader>aa", ask(), desc = "Ask (Avante)", mode = { "n", "v" } },
         { opts_mappings.edit or "<leader>ae", function() require("avante.api").edit() end, desc = "Edit (Avante)", mode = "v" },
         { opts_mappings.refresh or "<leader>ar", function() require("avante.api").refresh() end, desc = "Refresh (Avante)" },
         { opts_mappings.focus or "<leader>af", function() require("avante.api").focus() end, desc = "Focus (Avante)" },
@@ -173,7 +173,6 @@ return {
         { "<leader>avF", edit_submit(prompt.fix_bugs),           desc = "Fix Bugs (Edit)",                 mode = "v" },
         { "<leader>avu", ask(prompt.add_tests),                  desc = "Add Tests (Ask)",                 mode = { "n", "v" } },
         { "<leader>avU", edit_submit(prompt.add_tests),          desc = "Add Tests (Edit)",                mode = "v" },
-        -- stylua: ignore end
       }
       vim.list_extend(keys, mappings)
     end,
@@ -209,32 +208,43 @@ return {
         enable_token_counting = false,
         enable_claude_text_editor_tool_mode = true,
       },
-      provider = "copilot-claude", -- only recommend using claude
+      provider = "copilot_claude", -- only recommend using claude
       auto_suggestions_provider = "groq", -- high-frequency, can be expensive if enabled
       -- cursor_applying_provider = "groq",
       -- copilot = { model = "claude-3.7-sonnet" },
       -- https://github.com/yetone/avante.nvim/wiki/Custom-providers
+      -- https://github.com/yetone/cosmos-nvim/blob/64ffc3f90f33eb4049f1495ba49f086280dc8a1c/lua/layers/completion/plugins.lua#L249
       vendors = {
-        -- be able to switch between copilot (gpt-4o) and copilot-claude
+        -- be able to switch between copilot (gpt-4o) and copilot_claude
         ---@type AvanteSupportedProvider
-        ---@diagnostic disable-next-line: missing-fields
-        ["copilot-claude"] = {
+        copilot_claude = {
           __inherited_from = "copilot",
           -- https://github.com/CopilotC-Nvim/CopilotChat.nvim#models
           model = "claude-3.7-sonnet",
         },
         ---@type AvanteSupportedProvider
-        ---@diagnostic disable-next-line: missing-fields
+        copilot_claude_thought = {
+          __inherited_from = "copilot",
+          model = "claude-3.7-sonnet-thought",
+          temperature = 1,
+          max_tokens = 20000,
+        },
+        ---@type AvanteSupportedProvider
+        copilot_gemini = {
+          __inherited_from = "copilot",
+          model = "gemini-2.0-flash-001",
+        },
+        ---@type AvanteSupportedProvider
         deepseek = {
           __inherited_from = "openai",
           api_key_name = "DEEPSEEK_API_KEY",
           endpoint = "https://api.deepseek.com",
           -- curl -L -X GET "https://api.deepseek.com/models" -H "Accept: application/json" -H "Authorization: Bearer $DEEPSEEK_API_KEY" | jq .
           model = "deepseek-reasoner",
+          disable_tools = true,
         },
         -- https://github.com/yetone/avante.nvim/pull/159
         ---@type AvanteSupportedProvider
-        ---@diagnostic disable-next-line: missing-fields
         groq = {
           __inherited_from = "openai",
           api_key_name = "GROQ_API_KEY",
@@ -242,14 +252,14 @@ return {
           -- curl -X GET "https://api.groq.com/openai/v1/models" -H "Authorization: Bearer $GROQ_API_KEY" -H "Content-Type: application/json" | jq '.data | sort_by(.created)'
           model = "llama-3.3-70b-versatile",
           max_tokens = 32768,
+          disable_tools = true,
         },
         ---@type AvanteSupportedProvider
-        ---@diagnostic disable-next-line: missing-fields
-        openrouter = {
+        openrouter_claude = {
           __inherited_from = "openai",
           endpoint = "https://openrouter.ai/api/v1",
           api_key_name = "OPENROUTER_API_KEY",
-          model = "deepseek/deepseek-r1",
+          model = "anthropic/claude-3.7-sonnet",
         },
       },
       hints = { enabled = false },
