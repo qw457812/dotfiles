@@ -43,6 +43,8 @@ require("lazy").setup({
   concurrency = (jit.os:find("Windows") or vim.env.TERMUX_VERSION) and (vim.uv.available_parallelism() * 2) or nil,
   git = {
     log = { "--since=7 days ago" }, -- show commits from the last x days
+    -- building some plugins on termux can take a long time
+    timeout = vim.env.TERMUX_VERSION and 600 or nil, -- kill processes that take more than x seconds
   },
   rocks = { hererocks = true },
   install = { colorscheme = { "tokyonight", "habamax" } },

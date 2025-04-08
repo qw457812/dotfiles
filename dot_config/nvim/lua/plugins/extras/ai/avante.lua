@@ -92,6 +92,7 @@ return {
   {
     "yetone/avante.nvim",
     -- lazy = false, -- see: https://github.com/yetone/avante.nvim/issues/561#issuecomment-2342550208
+    -- build = "make BUILD_FROM_SOURCE=true",
     build = "make",
     dependencies = {
       {
@@ -269,6 +270,13 @@ return {
           model = "google/gemini-2.5-pro-preview-03-25",
         },
       },
+      windows = {
+        ---@type AvantePosition
+        position = "smart",
+        sidebar_header = {
+          align = vim.g.user_is_termux and "right" or nil,
+        },
+      },
       hints = { enabled = false },
     },
   },
@@ -295,7 +303,7 @@ return {
 
           vim.keymap.set("n", "<Esc>", function()
             if not U.keymap.clear_ui_esc({ popups = not is_input }) then
-              vim.cmd("wincmd h")
+              vim.cmd.wincmd(vim.g.user_is_termux and "3k" or "h")
             end
           end, { buffer = buf, desc = "Clear UI or Unfocus (Avante)" })
 

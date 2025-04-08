@@ -458,6 +458,21 @@ return {
   },
 
   {
+    "CopilotC-Nvim/CopilotChat.nvim",
+    optional = true,
+    opts = function()
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "copilot-chat",
+        callback = function(ev)
+          vim.keymap.set("n", close_key, function()
+            require("CopilotChat").close()
+          end, { buffer = ev.buf, silent = true, desc = "Close (CopilotChat)" })
+        end,
+      })
+    end,
+  },
+
+  {
     "yetone/avante.nvim",
     optional = true,
     opts = function(_, opts)
