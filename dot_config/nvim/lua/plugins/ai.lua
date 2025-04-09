@@ -131,6 +131,7 @@ return {
     end,
   },
 
+  -- https://github.com/deathbeam/dotfiles/blob/7eec2354e79a3389f5dfb8b3ba01c69ee96a19ad/nvim/.config/nvim/lua/config/copilot.lua
   -- https://github.com/AstroNvim/astrocommunity/blob/main/lua/astrocommunity/editing-support/copilotchat-nvim/init.lua
   {
     "CopilotC-Nvim/CopilotChat.nvim",
@@ -171,7 +172,7 @@ return {
         -- error_header = "> [!ERROR] Error",
         error_header = LazyVim.config.icons.diagnostics.Error .. " Error ",
         question_header = "  User ",
-        -- model = "claude-3.7-sonnet",
+        model = "claude-3.7-sonnet",
         -- show_help = false,
         window = {
           layout = function()
