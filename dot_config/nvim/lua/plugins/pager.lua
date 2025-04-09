@@ -22,6 +22,7 @@ local Config = require("lazy.core.config")
 Config.options.checker.enabled = false
 Config.options.change_detection.enabled = false
 Config.options.defaults.cond = function(plugin)
+  ---@diagnostic disable-next-line: undefined-field
   return vim.tbl_contains(enabled, plugin.name) or plugin.pager
 end
 vim.g.snacks_animate = false
@@ -68,6 +69,7 @@ return {
           end, { desc = "Clear UI or Quit" })
           if vim.g.terminal_scrollback_pager then
             vim.keymap.set("n", "i", "<cmd>qa<cr>", { desc = "Quit All" })
+            vim.keymap.set("n", "<C-c>", "<cmd>qa<cr>", { desc = "Quit All" })
           end
         end,
       })

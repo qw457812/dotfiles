@@ -213,29 +213,25 @@ return {
       auto_suggestions_provider = "groq", -- high-frequency, can be expensive if enabled
       -- cursor_applying_provider = "groq",
       -- copilot = { model = "claude-3.7-sonnet" },
-      -- https://github.com/yetone/avante.nvim/wiki/Custom-providers
       -- https://github.com/yetone/cosmos-nvim/blob/64ffc3f90f33eb4049f1495ba49f086280dc8a1c/lua/layers/completion/plugins.lua#L249
+      ---@type table<string, AvanteSupportedProvider>
       vendors = {
         -- be able to switch between copilot (gpt-4o) and copilot_claude
-        ---@type AvanteSupportedProvider
         copilot_claude = {
           __inherited_from = "copilot",
           -- https://github.com/CopilotC-Nvim/CopilotChat.nvim#models
           model = "claude-3.7-sonnet",
         },
-        ---@type AvanteSupportedProvider
         copilot_claude_thought = {
           __inherited_from = "copilot",
           model = "claude-3.7-sonnet-thought",
           temperature = 1,
           max_tokens = 20000,
         },
-        ---@type AvanteSupportedProvider
         copilot_gemini = {
           __inherited_from = "copilot",
           model = "gemini-2.0-flash-001",
         },
-        ---@type AvanteSupportedProvider
         deepseek = {
           __inherited_from = "openai",
           api_key_name = "DEEPSEEK_API_KEY",
@@ -244,8 +240,6 @@ return {
           model = "deepseek-reasoner",
           disable_tools = true,
         },
-        -- https://github.com/yetone/avante.nvim/pull/159
-        ---@type AvanteSupportedProvider
         groq = {
           __inherited_from = "openai",
           api_key_name = "GROQ_API_KEY",
@@ -255,14 +249,12 @@ return {
           max_tokens = 32768,
           disable_tools = true,
         },
-        ---@type AvanteSupportedProvider
         openrouter_claude = {
           __inherited_from = "openai",
           endpoint = "https://openrouter.ai/api/v1",
           api_key_name = "OPENROUTER_API_KEY",
           model = "anthropic/claude-3.7-sonnet",
         },
-        ---@type AvanteSupportedProvider
         openrouter_gemini = {
           __inherited_from = "openai",
           endpoint = "https://openrouter.ai/api/v1",
@@ -376,7 +368,6 @@ return {
       },
     },
   },
-  -- -- https://github.com/Kaiser-Yang/blink-cmp-avante/issues/3
   -- {
   --   "saghen/blink.cmp",
   --   optional = true,

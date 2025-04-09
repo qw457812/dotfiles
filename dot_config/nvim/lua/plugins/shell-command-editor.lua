@@ -41,6 +41,7 @@ local Config = require("lazy.core.config")
 Config.options.checker.enabled = false
 Config.options.change_detection.enabled = false
 Config.options.defaults.cond = function(plugin)
+  ---@diagnostic disable-next-line: undefined-field
   return vim.tbl_contains(enabled, plugin.name) or plugin.shell_command_editor
 end
 vim.g.snacks_animate = false
@@ -138,7 +139,16 @@ return {
         return
       end
       for i = #sources_default, 1, -1 do
-        if vim.list_contains({ "lazydev", "dadbod", "avante" }, sources_default[i]) then
+        if
+          vim.list_contains({
+            "lazydev",
+            "dadbod",
+            "avante",
+            "avante_commands",
+            "avante_mentions",
+            "avante_files",
+          }, sources_default[i])
+        then
           table.remove(sources_default, i)
         end
       end
