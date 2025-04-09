@@ -30,8 +30,12 @@ def is_tmux(cmd):
     return cmd == "tmux"
 
 
-def is_fzf(cmd):
-    return cmd == "fzf"
+def is_fzf(window):
+    fp = window.child.foreground_processes
+    return any(
+        p.get("cmdline") and len(p["cmdline"]) > 0 and p["cmdline"][0] == "fzf"
+        for p in fp
+    )
 
 
 def main():
@@ -63,7 +67,7 @@ def handle_result(
     if w.screen.is_main_linebuf() or not (
         is_nvim(cmd)
         or is_tmux(cmd)
-        or ((key == "ctrl+j" or key == "ctrl+k") and is_fzf(cmd))
+        or ((key == "ctrl+j" or key == "ctrl+k") and is_fzf(w))
     ):
         # # kitten @ focus-window --match=neighbor:bottom
         # boss.call_remote_control(w, ("focus-window", f"--match=neighbor:{direction}"))
