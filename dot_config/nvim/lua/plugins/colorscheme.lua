@@ -147,6 +147,8 @@ return {
 
           hl.UfoFoldedEllipsis = { bg = c.blue, fg = c.bg_dark }
 
+          hl.DropBarIconUISeparator = { fg = hl.Comment.fg }
+
           hl.TelescopeSelectionCaret =
             { fg = (hl.TelescopePromptPrefix or hl.Identifier).fg, bg = (hl.TelescopeSelection or hl.Visual).bg }
 
