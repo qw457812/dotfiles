@@ -205,14 +205,22 @@ return {
       behaviour = {
         -- auto_suggestions = true, -- experimental
         -- enable_cursor_planning_mode = true,
-        auto_apply_diff_after_generation = true,
+        -- auto_apply_diff_after_generation = true,
         enable_token_counting = false,
         enable_claude_text_editor_tool_mode = true,
       },
       provider = "copilot_claude", -- only recommend using claude
-      auto_suggestions_provider = "groq", -- high-frequency, can be expensive if enabled
-      -- cursor_applying_provider = "groq",
-      -- copilot = { model = "claude-3.7-sonnet" },
+      auto_suggestions_provider = "ollama", -- high-frequency, can be expensive if enabled
+      cursor_applying_provider = "groq",
+      memory_summary_provider = "copilot_gpt_4o_mini",
+      ---@type AvanteSupportedProvider
+      copilot = {
+        model = "gpt-4o",
+      },
+      ---@type AvanteSupportedProvider
+      ollama = {
+        model = "llama3.2",
+      },
       -- https://github.com/yetone/cosmos-nvim/blob/64ffc3f90f33eb4049f1495ba49f086280dc8a1c/lua/layers/completion/plugins.lua#L249
       ---@type table<string, AvanteSupportedProvider>
       vendors = {
@@ -231,6 +239,10 @@ return {
         copilot_gemini = {
           __inherited_from = "copilot",
           model = "gemini-2.0-flash-001",
+        },
+        copilot_gpt_4o_mini = {
+          __inherited_from = "copilot",
+          model = "gpt-4o-mini",
         },
         deepseek = {
           __inherited_from = "openai",
@@ -261,6 +273,13 @@ return {
           api_key_name = "OPENROUTER_API_KEY",
           model = "google/gemini-2.5-pro-preview-03-25",
         },
+      },
+      rag_service = {
+        -- enabled = vim.fn.executable("docker") == 1 and vim.fn.executable("ollama") == 1,
+        provider = "ollama",
+        llm_model = "llama3.2",
+        embed_model = "nomic-embed-text",
+        endpoint = "http://localhost:11434",
       },
       windows = {
         ---@type AvantePosition
