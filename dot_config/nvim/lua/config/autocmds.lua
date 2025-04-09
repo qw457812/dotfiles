@@ -79,6 +79,7 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.defer_fn(function()
       if vim.api.nvim_buf_is_valid(ev.buf) and vim.api.nvim_get_current_win() == win then
         vim.api.nvim_win_set_cursor(win, { 1, 0 })
+        vim.cmd("startinsert")
       end
     end, 50)
   end,

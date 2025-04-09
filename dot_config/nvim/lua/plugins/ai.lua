@@ -172,7 +172,7 @@ return {
         -- error_header = "> [!ERROR] Error",
         error_header = LazyVim.config.icons.diagnostics.Error .. " Error ",
         question_header = "  User ",
-        model = "claude-3.7-sonnet",
+        -- model = "claude-3.7-sonnet",
         -- show_help = false,
         window = {
           layout = function()
