@@ -1,5 +1,5 @@
 {
-  "basedpyright": "1.28.4",
+  "basedpyright": "1.28.5",
   "bash-language-server": "5.4.3",
   "debugpy": "1.8.13",
   "docker-compose-language-service": "0.3.0",
@@ -13,7 +13,7 @@
   "js-debug-adapter": "v1.97.1",
   "json-lsp": "4.10.0",
   "lemminx": "0.28.0",
-  "lua-language-server": "3.13.9",
+  "lua-language-server": "3.14.0",
   "luacheck": "1.1.0",
   "markdown-toc": "1.2.0",
   "markdownlint-cli2": "0.17.2",

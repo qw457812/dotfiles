@@ -3,8 +3,8 @@ return {
   {
     "rachartier/tiny-inline-diagnostic.nvim",
     -- priority = 1000,
-    lazy = false,
-    -- event = "VeryLazy", -- LspAttach
+    -- lazy = false,
+    event = "VeryLazy", -- LspAttach
     opts = {
       signs = {
         left = " ",
