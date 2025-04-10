@@ -36,7 +36,9 @@ local function focus_input()
   local sidebar = require("avante").get()
   if sidebar then
     sidebar:focus_input()
-    vim.cmd("noautocmd startinsert!")
+    if vim.bo.filetype == "AvanteInput" then
+      vim.cmd("noautocmd startinsert!")
+    end
   end
 end
 
@@ -47,9 +49,25 @@ local function ask(question)
     ---@diagnostic disable-next-line: need-check-nil
     question = vim.is_callable(question) and question() or question
     ---@cast question string
+
+    local is_visual = vim.list_contains({ "v", "V", vim.keycode("<C-v>") }, vim.fn.mode():sub(1, 1))
+    local sidebar = require("avante").get()
+    if sidebar and sidebar:is_open() and not is_visual and not question then
+      focus_input()
+      return
+    end
+
+    local input_orig = is_visual and sidebar and sidebar:get_input_value()
     require("avante.api").ask({ question = question })
     vim.schedule(function()
-      U.stop_visual_mode()
+      if is_visual then
+        U.stop_visual_mode()
+        -- restore original input value for `v_<leader>aa`
+        sidebar = require("avante").get()
+        if sidebar and sidebar:get_input_value() == "" and input_orig then
+          sidebar:set_input_value(input_orig)
+        end
+      end
       if not question then
         focus_input()
       end
@@ -92,8 +110,7 @@ return {
   {
     "yetone/avante.nvim",
     -- lazy = false, -- see: https://github.com/yetone/avante.nvim/issues/561#issuecomment-2342550208
-    -- build = "make BUILD_FROM_SOURCE=true",
-    build = "make",
+    build = vim.g.user_is_termux and "make BUILD_FROM_SOURCE=true" or "make",
     dependencies = {
       {
         "nvim-treesitter/nvim-treesitter",
