@@ -228,7 +228,9 @@ if vim.g.user_explorer_auto_open then
       end
       if vim.api.nvim_win_get_width(0) - vim.g.user_explorer_width >= 120 then
         vim.schedule(function()
-          U.explorer.open({ focus = false })
+          if not vim.g.user_explorer_visible then
+            U.explorer.open({ focus = false })
+          end
           -- clear both BufReadPost and BufNewFile, `return true` can only clear one
           vim.api.nvim_clear_autocmds({ group = augroup })
         end)
