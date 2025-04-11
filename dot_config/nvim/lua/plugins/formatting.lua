@@ -58,6 +58,23 @@ return {
           -- end
         end,
       })
+
+      Snacks.toggle({
+        name = "Mini Trailspace",
+        get = function()
+          return not vim.g.minitrailspace_disable
+        end,
+        set = function(state)
+          vim.g.minitrailspace_disable = not state
+          if package.loaded["mini.trailspace"] then
+            if state then
+              require("mini.trailspace").highlight()
+            else
+              require("mini.trailspace").unhighlight()
+            end
+          end
+        end,
+      }):map("<leader>u<space>")
     end,
   },
 }

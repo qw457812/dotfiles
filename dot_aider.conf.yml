@@ -1,6 +1,9 @@
 # https://aider.chat/docs/config/aider_conf.html
 # https://aider.chat/docs/leaderboards/
 
+read:
+  - ~/.config/aider/CONVENTIONS_GLOBAL.md
+
 alias:
   - "sonnet:openrouter/anthropic/claude-3.7-sonnet"
   - "gemini:openrouter/google/gemini-2.5-pro-preview-03-25"

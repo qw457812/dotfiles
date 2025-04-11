@@ -89,25 +89,57 @@ abbr tk 'tmux kill-session -t'
 # Git
 abbr g git
 alias lazygit "TERM=xterm-256color command lazygit"
+alias glab "env -u https_proxy -u http_proxy -u all_proxy command glab"
 abbr gg lazygit
 abbr gl 'git l --color'
 abbr gs "git st"
-abbr gb "git checkout -b"
-abbr gc "git commit --verbose"
-# abbr gpr "hub pr checkout"
-abbr gd "git diff"
-abbr gds "git diff --staged"
-abbr gm "git branch -l main | rg main > /dev/null 2>&1 && git checkout main || git checkout master"
-abbr gcp "git commit -p"
-abbr gpp "git push"
 abbr gp "git pull"
+abbr gpp "git push"
+# abbr gcp "git commit -p"
+# abbr gpr "hub pr checkout"
+# abbr gcm "git branch -l main | rg main > /dev/null 2>&1 && git checkout main || git checkout master"
+# copied from: https://github.com/ohmyzsh/ohmyzsh/blob/750d3ac4b493dca13ef0ced55fa6a2cd02dc7ee8/plugins/git/git.plugin.zsh
 abbr ga "git add"
 abbr gaa "git add --all"
+abbr gb "git branch"
+abbr gba "git branch --all"
+abbr gbd "git branch --delete"
+abbr gbm "git branch --move"
+abbr gbnm "git branch --no-merged"
+abbr gbr 'git branch --remote'
+abbr gc "git commit --verbose"
+abbr gcb "git checkout -b"
+abbr gcf "git config --list | vimpager"
 abbr gcl "git clone --recurse-submodules"
-abbr grv "git remote --verbose"
-abbr glgp "git log --stat --patch"
-abbr gprav "git pull --rebase --autostash -v"
+abbr gcl1 "git clone --depth 1"
+abbr gcm 'git checkout (git_main_branch)'
+abbr gco "git checkout"
+abbr gcp "git cherry-pick"
+abbr gcpa "git cherry-pick --abort"
+abbr gcpc "git cherry-pick --continue"
+abbr gd "git diff"
+abbr gds "git diff --staged"
+abbr gdw "git diff --word-diff"
 abbr gf "git fetch"
+abbr ghh "git help"
+abbr glg "git log --stat"
+abbr glgp "git log --stat --patch"
+abbr gm 'git merge'
+abbr gma 'git merge --abort'
+abbr gmc 'git merge --continue'
+abbr gmom 'git merge origin/(git_main_branch)'
+abbr gms 'git merge --squash'
+abbr gmum 'git merge upstream/(git_main_branch)'
+abbr gprav "git pull --rebase --autostash -v"
+abbr grb 'git rebase'
+abbr grba 'git rebase --abort'
+abbr grbc 'git rebase --continue'
+abbr grbm 'git rebase (git_main_branch)'
+abbr grbo 'git rebase --onto'
+abbr grbom 'git rebase origin/(git_main_branch)'
+abbr grbs 'git rebase --skip'
+abbr grbum 'git rebase upstream/(git_main_branch)'
+abbr grv "git remote --verbose"
 
 # SVN
 abbr sva 'svn add'

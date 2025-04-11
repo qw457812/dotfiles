@@ -11,6 +11,7 @@ return {
       { "<leader>as", "<cmd>Aider send<cr>", desc = "Send (Aider)", mode = { "n", "v" } },
       { "<leader>a/", "<cmd>Aider command<cr>", desc = "Commands (Aider)" },
       { "<leader>ab", "<cmd>Aider buffer<cr>", desc = "Send Buffer (Aider)" },
+      { "<leader>a.", "<cmd>Aider add<cr>", desc = "Add File (Aider)" },
       { "<leader>a+", "<cmd>Aider add<cr>", desc = "Add File (Aider)" },
       { "<leader>a-", "<cmd>Aider drop<cr>", desc = "Drop File (Aider)" },
       { "<leader>ar", "<cmd>Aider add readonly<cr>", desc = "Add Read-Only File (Aider)" },
