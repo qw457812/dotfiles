@@ -37,7 +37,11 @@ vim.g.user_is_tmux = not vim.g.neovide and vim.env.TMUX ~= nil
 vim.g.user_is_termux = vim.env.TERMUX_VERSION ~= nil
 vim.g.user_transparent_background = vim.g.user_is_wezterm or vim.g.user_is_kitty
 vim.g.user_hijack_netrw = "oil.nvim" ---@type "neo-tree.nvim"|"snacks.nvim"|"oil.nvim"|"mini.files"|"yazi.nvim"|"telescope-file-browser.nvim"
--- holding layout like no-neck-pain.nvim by disabling neo-tree auto close
+-- TODO: Snacks.explorer
+vim.g.user_explorer_width = math.max(35, math.min(50, math.floor(vim.o.columns * 0.25)))
+-- holding layout like no-neck-pain.nvim
+-- the `vim.g.user_explorer_auto_open` setting will be ignored if `vim.g.user_explorer_auto_close` is set to true
+vim.g.user_explorer_auto_open = vim.o.columns - vim.g.user_explorer_width >= 120
 vim.g.user_explorer_auto_close = vim.g.user_is_termux
 if vim.env.SHELL_COMMAND_EDITOR then
   -- set in fish_user_key_bindings.fish before calling `edit_command_buffer`

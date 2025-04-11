@@ -1,6 +1,44 @@
 ---@class util.explorer
 local M = {}
 
+-- reveal the current file in root directory
+---@param opts? {focus?: boolean}
+function M.open(opts)
+  opts = opts or {}
+  local focus = opts.focus ~= false
+  local root = LazyVim.root()
+  if LazyVim.has("neo-tree.nvim") then
+    local reveal_file = vim.fn.expand("%:p")
+    if reveal_file == "" or not vim.uv.fs_stat(reveal_file) then
+      reveal_file = vim.fn.getcwd()
+    end
+    require("neo-tree.command").execute({
+      action = focus and "focus" or "show",
+      reveal_file = reveal_file, -- using `reveal_file` instead of `reveal` to reveal cwd for an unsaved file
+      reveal_force_cwd = true,
+      dir = vim.startswith(reveal_file, root) and root or nil, -- `dir = root` works too
+    })
+  elseif Snacks.config.explorer.enabled then
+    Snacks.explorer.open({
+      cwd = root,
+      on_show = not focus and vim.schedule_wrap(function()
+        vim.cmd("wincmd p")
+      end) or nil,
+    })
+  end
+end
+
+function M.close()
+  if LazyVim.has("neo-tree.nvim") then
+    require("neo-tree.command").execute({ action = "close" })
+  elseif Snacks.config.explorer.enabled then
+    local picker = Snacks.picker.get({ source = "explorer" })[1]
+    if picker then
+      picker:close()
+    end
+  end
+end
+
 --- Make hijack-netrw plugins handle `nvim .` and `:e .` correctly (bad alternative: `lazy = false`)
 --- https://github.com/AstroNvim/AstroNvim/blob/4fd4781ab0c2d9c876acef1fc5b3f01773c78be6/lua/astronvim/plugins/neo-tree.lua#L23
 --- https://github.com/stevearc/oil.nvim/issues/300#issuecomment-1950541064
@@ -55,9 +93,9 @@ function M.grug_far(path)
   local instance = "explorer"
   -- instance check
   if grug.has_instance(instance) then
-    grug.open_instance(instance)
+    grug.get_instance(instance):open()
     -- updating the prefills without clearing the search and other fields
-    grug.update_instance_prefills(instance, prefills, false)
+    grug.get_instance(instance):update_input_values(prefills, false)
   else
     grug.open({
       instanceName = instance,

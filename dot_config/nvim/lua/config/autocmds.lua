@@ -217,6 +217,27 @@ vim.api.nvim_create_autocmd("BufDelete", {
   end,
 })
 
+-- auto open explorer if the window is too wide
+if vim.g.user_explorer_auto_open then
+  local augroup = vim.api.nvim_create_augroup("explorer_auto_open", { clear = true })
+  vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
+    group = augroup,
+    callback = function(ev)
+      if vim.g.user_explorer_auto_close and vim.bo[ev.buf].buftype ~= "" then
+        return
+      end
+      if vim.api.nvim_win_get_width(0) - vim.g.user_explorer_width >= 120 then
+        vim.schedule(function()
+          U.explorer.open({ focus = false })
+          -- clear both BufReadPost and BufNewFile, `return true` can only clear one
+          vim.api.nvim_clear_autocmds({ group = augroup })
+        end)
+        return true -- let WinResized event to handle the rest
+      end
+    end,
+  })
+end
+
 -- copied from:
 -- https://github.com/echasnovski/mini.nvim/blob/73bbcbfa7839c4b00a64965fb504f87461abefbd/lua/mini/misc.lua#L194
 -- https://github.com/mrbeardad/nvim/blob/916d17211cc67d082ece6476bdfffe1a9fc41d22/lua/user/configs/autocmds.lua#L61

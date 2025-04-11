@@ -24,25 +24,11 @@ return {
               return
             end
 
-            -- reveal the current file in root directory
-            local function open()
-              local root = LazyVim.root()
-              local reveal_file = vim.fn.expand("%:p")
-              if reveal_file == "" or not vim.uv.fs_stat(reveal_file) then
-                reveal_file = vim.fn.getcwd()
-              end
-              command.execute({
-                reveal_file = reveal_file, -- using `reveal_file` instead of `reveal` to reveal cwd for an unsaved file
-                reveal_force_cwd = true,
-                dir = vim.startswith(reveal_file, root) and root or nil, -- `dir = root` works too
-              })
-            end
-
             if U.toggle.zen:get() then
               U.toggle.zen:set(false)
-              vim.schedule(open)
+              vim.schedule(U.explorer.open)
             else
-              open()
+              U.explorer.open()
             end
           end,
           desc = "Explorer NeoTree (Root Dir)",
@@ -73,7 +59,7 @@ return {
       -- https://github.com/nvim-neo-tree/neo-tree.nvim/issues/639#issuecomment-1345617435
       local function is_visible()
         -- neo_tree_window_before_close event not triggered on `<C-w>o`
-        if not vim.g.user_neotree_visible then
+        if not vim.g.user_explorer_visible then
           return false
         end
         -- local state = require("neo-tree.sources.manager").get_state("filesystem")
@@ -86,7 +72,7 @@ return {
             return true, buf, win
           end
         end
-        vim.g.user_neotree_visible = false -- fix the case when neo-tree window is closed by `<C-w>o`
+        vim.g.user_explorer_visible = false -- fix the case when neo-tree window is closed by `<C-w>o`
         return false
       end
 
@@ -95,22 +81,35 @@ return {
         return vim.o.columns < 120 or vim.api.nvim_win_get_width(win or 0) < 120
       end
 
+      ---@param win? integer
+      local function too_wide(win)
+        return vim.api.nvim_win_get_width(win or 0) - vim.g.user_explorer_width >= 120
+      end
+
       vim.api.nvim_create_autocmd("WinResized", {
-        group = vim.api.nvim_create_augroup("resize_neotree_auto_close", {}),
+        group = vim.api.nvim_create_augroup("resize_neotree_auto_open_or_close", {}),
         callback = function(event)
-          local win = event.match + 0
-          if
-            vim.g.user_explorer_auto_close
-            or vim.api.nvim_win_get_config(win).relative ~= ""
-            or not too_narrow(win)
-            or vim.bo[vim.fn.winbufnr(win)].filetype == "neo-tree"
-          then
+          local function should_ignore(buf, win)
+            return vim.api.nvim_win_get_config(win or 0).relative ~= "" or vim.bo[buf or 0].filetype == "neo-tree"
+          end
+
+          -- If `vim.g.user_explorer_auto_close` is set to true,
+          -- then the resize-neotree-auto-close feature will not be needed,
+          -- and the resize-neotree-auto-open feature will be ignored.
+          if vim.g.user_explorer_auto_close or should_ignore(event.buf, event.match + 0) then
             return
           end
 
-          U.debounce("resize-neotree-auto-close", 50, function()
+          U.debounce("resize-neotree-auto-open-or-close", 50, function()
+            if should_ignore() then
+              return
+            end
             if is_visible() then
-              require("neo-tree.command").execute({ action = "close" })
+              if too_narrow() then
+                require("neo-tree.command").execute({ action = "close" })
+              end
+            elseif vim.g.user_explorer_auto_open and too_wide() then
+              U.explorer.open({ focus = false })
             end
           end)
         end,
@@ -512,7 +511,7 @@ return {
           end,
         },
         window = {
-          width = math.max(35, math.min(50, math.floor(vim.o.columns * 0.25))),
+          width = vim.g.user_explorer_width,
           mappings = {
             -- ["-"] = "close_or_unfocus", -- toggle neo-tree, work with `-` defined in `keys` above
             ["-"] = hijack_netrw and "close_or_unfocus" or {
@@ -708,13 +707,13 @@ return {
           {
             event = "neo_tree_window_after_open",
             handler = function()
-              vim.g.user_neotree_visible = true
+              vim.g.user_explorer_visible = true
             end,
           },
           {
             event = "neo_tree_window_before_close",
             handler = function()
-              vim.g.user_neotree_visible = false
+              vim.g.user_explorer_visible = false
             end,
           },
           -- enhance follow_current_file to adapt to root changes
@@ -730,7 +729,7 @@ return {
               end
 
               U.debounce("neo-tree-follow-root", 100, function()
-                -- call is_visible() first to fix vim.g.user_neotree_visible
+                -- call is_visible() first to fix vim.g.user_explorer_visible
                 if not is_visible() or vim.fn.bufnr(args.afile) ~= vim.api.nvim_get_current_buf() then
                   last_root = nil
                   return
@@ -765,9 +764,8 @@ return {
     opts = function(_, opts)
       for _, view in ipairs(opts.left or {}) do
         if view.ft == "neo-tree" then
-          local window = LazyVim.opts("neo-tree.nvim").window or {}
-          -- :=require("neo-tree.defaults").window.width
-          view.size = { width = window.width or 40 }
+          -- (LazyVim.opts("neo-tree.nvim").window or {}).width or 40
+          view.size = { width = vim.g.user_explorer_width }
           view.title = "Neo-Tree"
           break
         end
