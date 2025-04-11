@@ -60,22 +60,36 @@ M.explorer_auto_close = st({
   end,
   set = function(state)
     vim.g.user_explorer_auto_close = state
-    if LazyVim.has("neo-tree.nvim") then
-      require("neo-tree.command").execute({ action = state and "close" or "show" })
-    elseif Snacks.config.explorer.enabled then
-      if state then
-        local picker = Snacks.picker.get({ source = "explorer" })[1]
-        if picker then
-          picker:close()
-        end
-      else
-        Snacks.explorer({
-          cwd = LazyVim.root(),
-          on_show = vim.schedule_wrap(function()
-            vim.cmd("wincmd p")
-          end),
-        })
+    if state then
+      U.explorer.close()
+    else
+      U.explorer.open({ focus = false })
+    end
+  end,
+})
+
+M.explorer_auto_open = st({
+  name = "Explorer Auto Open",
+  get = function()
+    return vim.g.user_explorer_auto_open
+  end,
+  set = function(state)
+    vim.g.user_explorer_auto_open = state
+    if vim.g.user_explorer_auto_close then
+      vim.schedule(function()
+        LazyVim.warn(
+          "`Explorer Auto Close` is enabled, `Explorer Auto Open` will not work.",
+          { title = "Explorer Auto Open" }
+        )
+      end)
+      return
+    end
+    if state then
+      if vim.api.nvim_win_get_width(0) - vim.g.user_explorer_width >= 120 then
+        U.explorer.open({ focus = false })
       end
+    else
+      U.explorer.close()
     end
   end,
 })
