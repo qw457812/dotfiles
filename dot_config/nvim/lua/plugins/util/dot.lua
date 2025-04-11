@@ -63,6 +63,16 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     opts = function()
+      vim.filetype.add({
+        filename = {
+          [".aider.model.metadata.json"] = "jsonc",
+          ["dot_aider.model.metadata.json"] = "jsonc", -- chezmoi
+        },
+        pattern = {
+          [".*/vscode/settings%.json"] = "jsonc",
+          [".*/vscode/keybindings%.json"] = "jsonc",
+        },
+      })
       vim.treesitter.language.register("vim", "vifm")
     end,
   },
