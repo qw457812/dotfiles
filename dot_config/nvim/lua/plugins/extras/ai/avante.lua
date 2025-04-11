@@ -50,21 +50,25 @@ local function ask(question)
     question = vim.is_callable(question) and question() or question
     ---@cast question string
 
-    local is_visual = vim.list_contains({ "v", "V", vim.keycode("<C-v>") }, vim.fn.mode():sub(1, 1))
     local sidebar = require("avante").get()
-    if sidebar and sidebar:is_open() and not is_visual and not question then
-      focus_input()
-      return
+    local input_orig ---@type string?
+    local is_visual = vim.list_contains({ "v", "V", vim.keycode("<C-v>") }, vim.fn.mode():sub(1, 1))
+    if sidebar and sidebar:is_open() then
+      if is_visual then
+        input_orig = sidebar:get_input_value()
+      elseif not question then
+        focus_input()
+        return
+      end
     end
 
-    local input_orig = is_visual and sidebar and sidebar:get_input_value()
     require("avante.api").ask({ question = question })
     vim.schedule(function()
       if is_visual then
         U.stop_visual_mode()
         -- restore original input value for `v_<leader>aa`
         sidebar = require("avante").get()
-        if sidebar and sidebar:get_input_value() == "" and input_orig then
+        if sidebar and sidebar:is_open() and sidebar:get_input_value() == "" and input_orig then
           sidebar:set_input_value(input_orig)
         end
       end
@@ -223,6 +227,7 @@ return {
         -- auto_suggestions = true, -- experimental
         -- enable_cursor_planning_mode = true,
         -- auto_apply_diff_after_generation = true,
+        -- auto_focus_on_diff_view = true,
         enable_token_counting = false,
         enable_claude_text_editor_tool_mode = true,
       },
