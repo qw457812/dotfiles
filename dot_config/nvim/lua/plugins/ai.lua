@@ -182,4 +182,26 @@ return {
       })
     end,
   },
+  {
+    "folke/edgy.nvim",
+    optional = true,
+    opts = function(_, opts)
+      if vim.o.columns >= 120 then
+        return
+      end
+      opts.right = opts.right or {}
+      local copilot_chat_view
+      for i, view in ipairs(opts.right) do
+        if view.ft == "copilot-chat" then
+          copilot_chat_view = table.remove(opts.right, i)
+          break
+        end
+      end
+      if copilot_chat_view then
+        opts.bottom = opts.bottom or {}
+        copilot_chat_view.size = { height = 0.4 }
+        table.insert(opts.bottom, copilot_chat_view)
+      end
+    end,
+  },
 }

@@ -95,6 +95,24 @@ function M.is_floating_win(win, opts)
   return true
 end
 
+-- see: https://github.com/folke/edgy.nvim/blob/e94e851f9dc296c2949d4c524b1be7de2340306e/lua/edgy/editor.lua#L80-L109
+---@param win? integer
+---@return boolean
+function M.is_edgy_win(win)
+  if not package.loaded["edgy"] then
+    return false
+  end
+  win = win == 0 and vim.api.nvim_get_current_win() or win or 0
+  for _, edgebar in pairs(require("edgy.config").layout) do
+    for _, w in ipairs(edgebar.wins) do
+      if w.win == win then
+        return true
+      end
+    end
+  end
+  return false
+end
+
 function M.stop_visual_mode()
   local mode = vim.fn.mode():sub(1, 1) ---@type string
   if vim.tbl_contains({ "v", "V", vim.keycode("<C-v>") }, mode) then
