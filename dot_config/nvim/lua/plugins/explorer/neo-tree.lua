@@ -11,13 +11,11 @@ return {
         {
           "<leader>fe",
           function()
-            local command = require("neo-tree.command")
-
             -- https://github.com/AstroNvim/AstroNvim/blob/c7abf1c198f633574060807a181c6ce4d1c53a2c/lua/astronvim/plugins/neo-tree.lua#L14
             -- alternative: https://github.com/nvim-neo-tree/neo-tree.nvim/issues/872#issuecomment-1510551968
             if vim.bo.filetype == "neo-tree" then
               if vim.g.user_explorer_auto_close then
-                command.execute({ action = "close" })
+                require("neo-tree.command").execute({ action = "close" })
               else
                 vim.cmd("wincmd p")
               end
@@ -90,7 +88,9 @@ return {
         group = vim.api.nvim_create_augroup("resize_neotree_auto_open_or_close", {}),
         callback = function(event)
           local function should_ignore(buf, win)
-            return vim.api.nvim_win_get_config(win or 0).relative ~= "" or vim.bo[buf or 0].filetype == "neo-tree"
+            return vim.api.nvim_win_get_config(win or 0).relative ~= ""
+              or vim.bo[buf or 0].filetype == "neo-tree"
+              or U.is_edgy_win(win)
           end
 
           -- If `vim.g.user_explorer_auto_close` is set to true,
