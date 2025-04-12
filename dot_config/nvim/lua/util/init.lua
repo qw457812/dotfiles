@@ -102,10 +102,11 @@ function M.is_edgy_win(win)
   if not package.loaded["edgy"] then
     return false
   end
-  win = win == 0 and vim.api.nvim_get_current_win() or win or 0
+  win = win or 0
+  win = win == 0 and vim.api.nvim_get_current_win() or win
   for _, edgebar in pairs(require("edgy.config").layout) do
     for _, w in ipairs(edgebar.wins) do
-      if w.win == win then
+      if win == w.win then
         return true
       end
     end
