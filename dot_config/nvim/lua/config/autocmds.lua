@@ -219,23 +219,25 @@ vim.api.nvim_create_autocmd("BufDelete", {
 
 -- auto open explorer if the window is too wide
 if vim.g.user_explorer_auto_open then
-  local augroup = vim.api.nvim_create_augroup("explorer_auto_open", { clear = true })
-  vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
-    group = augroup,
+  vim.api.nvim_create_autocmd(LazyVim.plugin.lazy_file_events, {
+    group = vim.api.nvim_create_augroup("explorer_auto_open", { clear = true }),
     callback = function(ev)
-      if vim.g.user_explorer_auto_close and vim.bo[ev.buf].buftype ~= "" then
-        return
-      end
-      if vim.api.nvim_win_get_width(0) - vim.g.user_explorer_width >= 120 then
-        vim.schedule(function()
-          if not vim.g.user_explorer_visible then
-            U.explorer.open({ focus = false })
-          end
-          -- clear both BufReadPost and BufNewFile, `return true` can only clear one
-          vim.api.nvim_clear_autocmds({ group = augroup })
-        end)
+      -- TODO: Snacks.explorer
+      if package.loaded["neo-tree"] then
         return true -- let WinResized event to handle the rest
       end
+      if vim.g.user_explorer_auto_close or vim.bo[ev.buf].buftype ~= "" then
+        return
+      end
+      vim.schedule(function()
+        if
+          not vim.g.user_explorer_visible
+          and not U.is_edgy_win()
+          and vim.api.nvim_win_get_width(0) - vim.g.user_explorer_width >= 120
+        then
+          U.explorer.open({ focus = false })
+        end
+      end)
     end,
   })
 end

@@ -109,6 +109,7 @@ return {
                 require("neo-tree.command").execute({ action = "close" })
               end
             elseif vim.g.user_explorer_auto_open and too_wide() then
+              -- see also: explorer_auto_open augroup
               U.explorer.open({ focus = false })
             end
           end)
