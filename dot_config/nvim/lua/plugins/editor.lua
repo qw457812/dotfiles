@@ -924,7 +924,7 @@ return {
     opts = function()
       local has_ufo = LazyVim.has("nvim-ufo")
       return {
-        keepFoldsAcrossSessions = has_ufo,
+        keepFoldsAcrossSessions = false, -- has_ufo
         foldtextWithLineCount = {
           enabled = not has_ufo,
           template = "  󰘖 %s",
