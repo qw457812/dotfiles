@@ -23,7 +23,7 @@ return {
       local bar = require("dropbar.bar")
       local sources = require("dropbar.sources")
       local menu_utils = require("dropbar.utils.menu")
-      local dropbar_default_opts = require("dropbar.configs").opts
+      local default_opts = require("dropbar.configs").opts
 
       -- https://github.com/MunifTanjim/nui.nvim/blob/HEAD/lua/nui/utils/init.lua#L206
       local function truncate_string(str, max_length)
@@ -111,6 +111,14 @@ return {
             end
           end
 
+          if #symbols == 1 then
+            return symbols
+          end
+
+          -- truncate
+          -- TODO: win width based
+          local win_width = vim.api.nvim_win_get_width(win)
+
           -- same behavior as `length` of `LazyVim.lualine.pretty_path()`
           local max_symbols = vim.g.user_is_termux and 5 or 10
           if #symbols > max_symbols then
@@ -124,6 +132,12 @@ return {
           for i = 2, #symbols - 1 do
             symbols[i].name = truncate_string(symbols[i].name, max_symbol_len)
           end
+
+          -- alternative to `opts.sources.path.min_widths`
+          -- see: https://github.com/Bekaboo/dropbar.nvim/commit/a64fc20
+          symbols[#symbols - 1].min_width = 5 -- parent dir
+          symbols[1].min_width = 10 -- first dir
+          symbols[#symbols].min_width = math.max(win_width - 20, 20) -- filename
           return symbols
         end,
       }
@@ -165,6 +179,27 @@ return {
             return { source_path } -- using trouble.nvim's symbols instead, because it's shorter
           end,
         },
+        sources = {
+          path = {
+            relative_to = function(buf, _)
+              -- -- show full path in oil buffers
+              -- local bufname = vim.api.nvim_buf_get_name(buf)
+              -- -- alternative: package.loaded["oil"] and require("oil.util").is_oil_bufnr(buf)
+              -- if vim.startswith(bufname, "oil://") then
+              --   local root = bufname:gsub("^%S+://", "", 1)
+              --   while root and root ~= vim.fs.dirname(root) do
+              --     root = vim.fs.dirname(root)
+              --   end
+              --   return root
+              -- end
+              if vim.bo[buf].filetype == "oil" then
+                return "/"
+              end
+
+              return LazyVim.root.get({ normalize = true, buf = buf })
+            end,
+          },
+        },
         icons = {
           kinds = {
             ---@type fun(path: string): string, string?|false
@@ -173,7 +208,7 @@ return {
               if not is_default then
                 return icon .. " ", hl
               end
-              return dropbar_default_opts.icons.kinds.dir_icon(path)
+              return default_opts.icons.kinds.dir_icon(path)
             end,
             ---@type fun(path: string): string, string?|false
             file_icon = function(path)
@@ -181,7 +216,7 @@ return {
               if not is_default then
                 return icon .. " ", hl
               end
-              return dropbar_default_opts.icons.kinds.file_icon(path)
+              return default_opts.icons.kinds.file_icon(path)
             end,
           },
         },
@@ -218,27 +253,6 @@ return {
             end,
           },
         },
-        sources = {
-          path = {
-            relative_to = function(buf, _)
-              -- -- show full path in oil buffers
-              -- local bufname = vim.api.nvim_buf_get_name(buf)
-              -- -- alternative: package.loaded["oil"] and require("oil.util").is_oil_bufnr(buf)
-              -- if vim.startswith(bufname, "oil://") then
-              --   local root = bufname:gsub("^%S+://", "", 1)
-              --   while root and root ~= vim.fs.dirname(root) do
-              --     root = vim.fs.dirname(root)
-              --   end
-              --   return root
-              -- end
-              if vim.bo[buf].filetype == "oil" then
-                return "/"
-              end
-
-              return LazyVim.root.get({ normalize = true, buf = buf })
-            end,
-          },
-        },
       })
     end,
   },
@@ -252,7 +266,7 @@ return {
         return
       end
 
-      local dropbar_default_opts = require("dropbar.configs").opts
+      local default_opts = require("dropbar.configs").opts
 
       -- unsaved file by `:ene`
       local function is_unnamed_buffer()
@@ -312,7 +326,7 @@ return {
           title = false,
           filter = { range = true },
           format = "{hl:DropBarIconUISeparator}"
-            .. dropbar_default_opts.icons.ui.bar.separator
+            .. default_opts.icons.ui.bar.separator
             .. "{hl}{kind_icon}{symbol.name:DropBarSymbolName}",
           -- hl_group = "lualine_c_normal",
           max_items = 5,
