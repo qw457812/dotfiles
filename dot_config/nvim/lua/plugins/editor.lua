@@ -109,6 +109,7 @@ return {
     opts = {
       popupWin = {
         position = "top",
+        disableCompletions = false,
       },
       keymaps = {
         insertModeConfirm = "<C-s>",
