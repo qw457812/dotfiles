@@ -502,6 +502,26 @@ return {
   },
 
   {
+    "olimorris/codecompanion.nvim",
+    optional = true,
+    opts = function()
+      vim.api.nvim_create_autocmd("FileType", {
+        group = augroup,
+        pattern = "codecompanion",
+        callback = function(event)
+          local key = require("codecompanion.config").strategies.chat.keymaps.close.modes.n
+          vim.keymap.set(
+            "n",
+            close_key,
+            type(key) == "table" and key[1] or key,
+            { buffer = event.buf, remap = true, silent = true, desc = "Close (CodeCompanion)" }
+          )
+        end,
+      })
+    end,
+  },
+
+  {
     "ThePrimeagen/harpoon",
     optional = true,
     keys = {
