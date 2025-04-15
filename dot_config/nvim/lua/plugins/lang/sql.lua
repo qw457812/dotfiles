@@ -15,7 +15,9 @@ return {
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "dbui",
         callback = function(event)
-          vim.keymap.del("n", "H", { buffer = event.buf }) -- original <Plug>(DBUI_ToggleDetails)
+          for _, key in ipairs({ "H", "<c-j>", "<c-k>" }) do
+            pcall(vim.keymap.del, "n", key, { buffer = event.buf })
+          end
         end,
       })
 
@@ -31,7 +33,11 @@ return {
           "<esc>",
           function()
             if not U.keymap.clear_ui_esc() then
+              local win = vim.api.nvim_get_current_win()
               vim.cmd("wincmd p")
+              if vim.api.nvim_get_current_win() == win then
+                vim.cmd("wincmd w")
+              end
             end
           end,
           desc = "Clear UI or Unfocus (dadbod)",

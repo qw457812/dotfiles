@@ -36,7 +36,8 @@ vim.g.user_is_kitty = not vim.g.neovide and vim.env.KITTY_PID ~= nil
 vim.g.user_is_tmux = not vim.g.neovide and vim.env.TMUX ~= nil
 vim.g.user_is_termux = vim.env.TERMUX_VERSION ~= nil
 vim.g.user_transparent_background = vim.g.user_is_wezterm or vim.g.user_is_kitty
-vim.g.user_hijack_netrw = "oil.nvim" ---@type "neo-tree.nvim"|"snacks.nvim"|"oil.nvim"|"mini.files"|"yazi.nvim"|"telescope-file-browser.nvim"
+---@type "neo-tree.nvim"|"snacks.nvim"|"oil.nvim"|"mini.files"|"yazi.nvim"|"telescope-file-browser.nvim"
+vim.g.user_hijack_netrw = LazyVim.has("oil.nvim") and "oil.nvim" or "snacks.nvim"
 -- TODO: Snacks.explorer
 vim.g.user_explorer_width = math.max(35, math.min(50, math.floor(vim.o.columns * 0.25)))
 -- holding layout like no-neck-pain.nvim

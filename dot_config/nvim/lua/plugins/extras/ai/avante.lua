@@ -310,13 +310,17 @@ return {
           align = vim.g.user_is_termux and "right" or nil,
         },
       },
+      file_selector = {
+        ---@type FileSelectorProvider
+        provider = ({ snacks = "snacks", fzf = "fzf_lua" })[LazyVim.pick.picker.name],
+      },
       hints = { enabled = false },
     },
   },
   {
     "yetone/avante.nvim",
     optional = true,
-    opts = function(_, opts)
+    opts = function()
       LazyVim.on_load("avante.nvim", function()
         local snacks_util = require("snacks.util")
         local bg = vim.g.user_transparent_background and "#2f3a2f" or snacks_util.color("Normal", "bg")
@@ -360,16 +364,6 @@ return {
           end
         end,
       })
-
-      local picker = LazyVim.pick.picker.name
-      if picker == "fzf" or picker == "snacks" then
-        return U.extend_tbl(opts, {
-          file_selector = {
-            ---@type FileSelectorProvider
-            provider = picker,
-          },
-        })
-      end
     end,
   },
 
