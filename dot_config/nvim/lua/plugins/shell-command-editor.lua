@@ -71,15 +71,21 @@ return {
     "LazyVim/LazyVim",
     opts = function()
       if vim.o.shell:find("fish") then
-        local augroup = vim.api.nvim_create_augroup("shell_command_editor_autowrite", { clear = true })
         vim.api.nvim_create_autocmd("BufRead", {
-          group = augroup,
+          group = vim.api.nvim_create_augroup("shell_command_buffer", { clear = true }),
+          -- see: https://github.com/fish-shell/fish-shell/blob/85ea9eefc62aced087a5f694dfcc76154fc1171b/share/functions/edit_command_buffer.fish#L2-L16
           pattern = (vim.env.TMPDIR or "/tmp"):gsub("/$", "") .. "/tmp.*.fish",
           once = true,
           callback = function(ev)
+            vim.keymap.set("n", "<Esc>", function()
+              if not U.keymap.clear_ui_esc() then
+                vim.cmd([[quitall]])
+              end
+            end, { buffer = ev.buf, desc = "Clear UI or Exit" })
+
             -- https://github.com/chrisgrieser/.config/blob/052cf97e9e38a37b8d8ca921c3b6626851f98043/nvim/lua/config/autocmds.lua#L51-L74
             vim.api.nvim_create_autocmd({ "InsertLeave", "TextChanged" }, {
-              group = augroup,
+              group = vim.api.nvim_create_augroup("shell_command_buffer_autowrite", { clear = true }),
               buffer = ev.buf,
               callback = function()
                 vim.api.nvim_buf_call(ev.buf, function()

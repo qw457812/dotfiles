@@ -388,9 +388,11 @@ return {
           unfocus_window = function(state)
             local win = vim.api.nvim_get_current_win()
             vim.cmd.wincmd("p")
-            if win == vim.api.nvim_get_current_win() then
+            if vim.api.nvim_get_current_win() == win then
               if state.current_position == "left" then
                 vim.cmd.wincmd("l")
+              else
+                vim.cmd.wincmd("w")
               end
             end
           end,

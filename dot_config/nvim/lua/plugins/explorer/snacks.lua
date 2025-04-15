@@ -120,7 +120,8 @@ return {
       },
     },
     keys = function(_, keys)
-      if not LazyVim.has_extra("editor.snacks_explorer") then
+      -- use snacks explorer when vim.g.shell_command_editor is true without lazyvim.plugins.extras.editor.snacks_explorer
+      if LazyVim.has("neo-tree.nvim") then
         return
       end
 
@@ -145,6 +146,8 @@ return {
           desc = "Explorer Snacks (root dir)",
         },
         { "<leader>fE", toggle, desc = "Explorer Snacks (cwd)" },
+        { "<leader>e", "<leader>fe", desc = "Explorer Snacks (root dir)", remap = true },
+        { "<leader>E", "<leader>fE", desc = "Explorer Snacks (cwd)", remap = true },
       })
     end,
   },
