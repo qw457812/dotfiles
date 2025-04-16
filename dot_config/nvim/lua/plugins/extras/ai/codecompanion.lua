@@ -79,6 +79,7 @@ return {
           start_in_insert_mode = true,
           window = {
             layout = vim.o.columns >= 120 and "vertical" or "horizontal",
+            height = 0.5,
             width = 0.4,
           },
         },
