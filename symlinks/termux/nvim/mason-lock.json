@@ -1,6 +1,6 @@
 {
   "bash-language-server": "5.4.3",
-  "debugpy": "1.8.13",
+  "debugpy": "1.8.14",
   "dockerfile-language-server": "0.13.0",
   "eslint-lsp": "4.10.0",
   "hadolint": "v2.12.0",
@@ -14,7 +14,7 @@
   "markdownlint": "0.44.0",
   "markdownlint-cli2": "0.17.2",
   "prettier": "3.5.3",
-  "pyright": "1.1.398",
+  "pyright": "1.1.399",
   "shellcheck": "v0.10.0",
   "shfmt": "v3.11.0",
   "sqlfluff": "3.3.1",
