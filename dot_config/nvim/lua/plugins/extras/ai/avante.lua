@@ -203,6 +203,7 @@ return {
       mappings = {
         refresh = mapping_disabled_prefix .. "r",
         focus = mapping_disabled_prefix .. "f",
+        stop = "<leader>as",
         toggle = {
           default = mapping_disabled_prefix .. "t",
           debug = mapping_disabled_prefix .. "d",
@@ -213,9 +214,8 @@ return {
           -- -- disable since <tab> is mapped to <C-w>w
           -- switch_windows = "<A-Down>",
           -- reverse_switch_windows = "<A-Up>",
-          close = { "q" },
           close_from_input = {
-            normal = "q", -- <Esc>
+            normal = "q",
             insert = "<C-c>",
           },
         },
@@ -306,12 +306,12 @@ return {
       windows = {
         ---@type AvantePosition
         position = "smart",
+        height = 50,
         sidebar_header = {
           align = vim.g.user_is_termux and "right" or nil,
         },
       },
-      file_selector = {
-        ---@type FileSelectorProvider
+      selector = {
         provider = ({ snacks = "snacks", fzf = "fzf_lua" })[LazyVim.pick.picker.name],
       },
       hints = { enabled = false },
