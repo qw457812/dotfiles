@@ -116,6 +116,8 @@ return {
           { "<leader>s.", function() Snacks.picker.resume() end, desc = "Resume" },
           { "<leader>ff", function() Snacks.picker.smart() end, desc = "Smart" },
           { "<leader>fF", function() Snacks.picker.files({ hidden = true, follow = true, ignored = true }) end, desc = "Find all files" },
+          { "<leader>,", function() Snacks.picker.buffers({ current = false }) end, desc = "Buffers" },
+          { "<leader>fC", function() Snacks.picker.buffers({ modified = true }) end, desc = "Buffers (changed)" },
           -- git
           { "<leader>gc", function() Snacks.picker.git_log({ cwd = LazyVim.root.git() }) end, desc = "Git Log" },
           { "<leader>gC", function() Snacks.picker.git_branches({ cwd = LazyVim.root.git() }) end, desc = "Git Branches" },
