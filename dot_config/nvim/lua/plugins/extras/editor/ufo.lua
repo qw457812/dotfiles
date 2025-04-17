@@ -127,7 +127,11 @@ return {
           return ftMap[filetype] or selector
         end,
         close_fold_kinds_for_ft = {
-          default = { "imports", "comment", "marker" },
+          default = {
+            "imports",
+            -- "comment",
+            "marker",
+          },
           -- json = { "array" },
           -- markdown = {}, -- avoid everything becoming folded
           -- toml = {},

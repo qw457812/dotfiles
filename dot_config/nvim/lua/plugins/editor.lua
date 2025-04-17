@@ -936,7 +936,10 @@ return {
         },
         autoFold = {
           enabled = not has_ufo,
-          kinds = { "imports", "comment" }, ---@type lsp.FoldingRangeKind[]
+          kinds = {
+            "imports",
+            -- "comment",
+          }, ---@type lsp.FoldingRangeKind[]
         },
       }
     end,
