@@ -125,6 +125,24 @@ return {
         return
       end
 
+      -- fixes: `ZZ`/`:wq` won't exit nvim when snacks explorer is visible
+      vim.api.nvim_create_autocmd("QuitPre", {
+        group = vim.api.nvim_create_augroup("close_snacks_explorer_before_quit", { clear = true }),
+        callback = function()
+          local win = vim.api.nvim_get_current_win()
+          local picker = Snacks.picker.get({ source = "explorer" })[1]
+          if picker then
+            picker:close()
+            if vim.api.nvim_get_current_win() == win then
+              vim.schedule(function()
+                vim.cmd([[quit]])
+              end)
+            else
+            end
+          end
+        end,
+      })
+
       ---@param opts? snacks.picker.explorer.Config|{}
       local function toggle(opts)
         local picker = Snacks.picker.get({ source = "explorer" })[1]
