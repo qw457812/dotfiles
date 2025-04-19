@@ -166,7 +166,7 @@ map("t", "<c-space>", "<cmd>close<cr>", { desc = "Hide Terminal" })
 
 -- files
 map("n", "<leader>fs", "<cmd>w<cr><esc>", { desc = "Save File" })
-map("n", "<leader>fS", "<cmd>noautocmd w<cr>", { desc = "Save File Without Formatting" })
+map("n", "<leader>fS", U.keymap.save_without_format, { desc = "Save File Without Formatting" })
 -- -- adding `redraw` helps with `cmdheight=0` if buffer is not modified
 -- map("n", "<C-S>", "<Cmd>silent! update | redraw<CR>", { desc = "Save" })
 -- map({ "i", "x" }, "<C-S>", "<Esc><Cmd>silent! update | redraw<CR>", { desc = "Save and go to Normal mode" })
@@ -175,17 +175,9 @@ map("x", "<C-s>", function()
   if vim.list_contains({ "v", "V" }, vim.fn.mode():sub(1, 1)) then
     LazyVim.format({ force = true })
   end
-
-  -- alternate: vim.cmd("noautocmd write")
-  local baf_orig = vim.b.autoformat
-  vim.b.autoformat = false
-  vim.cmd("write")
-  vim.b.autoformat = baf_orig
-
-  -- stop visual mode
-  vim.api.nvim_feedkeys(vim.keycode("<esc>"), "n", false)
+  U.keymap.save_without_format()
 end, { desc = "Format Selection and Save File" })
-map({ "i", "x", "n", "s" }, "<a-s>", "<cmd>noautocmd w<cr><esc>", { desc = "Save File Without Formatting" })
+map({ "i", "x", "n", "s" }, "<a-s>", U.keymap.save_without_format, { desc = "Save File Without Formatting" })
 map({ "i", "x", "n", "s" }, "<D-s>", "<cmd>w<cr><esc>", { desc = "Save File" })
 map("n", "<D-r>", vim.cmd.edit, { desc = "Reload File" })
 
@@ -263,8 +255,10 @@ end
 if vim.fn.executable("lazygit") == 1 then
   ---@param opts? snacks.lazygit.Config
   local function lazygit(opts)
-    -- add `$SHELL` env to fix `e` in lazygit, see: https://github.com/jesseduffield/lazygit/issues/4153#issuecomment-2574856055
-    opts = vim.tbl_deep_extend("force", { env = { SHELL = vim.fn.exepath("bash") } }, opts or {})
+    if vim.o.shell:find("fish") then
+      -- add `$SHELL` env to fix `e` in lazygit, see: https://github.com/jesseduffield/lazygit/issues/4153#issuecomment-2574856055
+      opts = vim.tbl_deep_extend("force", { env = { SHELL = vim.fn.exepath("bash") } }, opts or {})
+    end
     ---@diagnostic disable-next-line: missing-fields
     Snacks.lazygit(opts)
   end
