@@ -106,6 +106,19 @@ function M.put_empty_line(put_above)
   vim.fn.append(target_line, vim.fn["repeat"]({ "" }, vim.v.count1))
 end
 
+-- alternate: vim.cmd("noautocmd write")
+function M.save_without_format()
+  local baf_orig = vim.b.autoformat
+  vim.b.autoformat = false
+  vim.cmd("write")
+  vim.b.autoformat = baf_orig
+
+  -- stop insert/visual mode
+  if vim.fn.mode() ~= "n" then
+    vim.api.nvim_feedkeys(vim.keycode("<esc>"), "n", false)
+  end
+end
+
 -- https://github.com/folke/flash.nvim/blob/34c7be146a91fec3555c33fe89c7d643f6ef5cf1/lua/flash/jump.lua#L204
 -- https://github.com/folke/snacks.nvim/blob/6b98aa11d31227081f780d6321ea7dfd97f1da59/lua/snacks/words.lua#L115
 function M.foldopen_l()
