@@ -113,7 +113,12 @@ return {
         --   tabline = true,
         -- },
         win = {
-          height = 0.9,
+          -- -- copied from: https://github.com/AstroNvim/AstroNvim/blob/f8f67b007407c06065e535874dd8dc32d241b0c1/lua/astronvim/plugins/snacks.lua#L88-L92
+          -- height = 0.9,
+          backdrop = {
+            transparent = false,
+            -- win = { wo = { winhighlight = "Normal:Normal" } },
+          },
           wo = {
             winbar = "",
             -- number = false,
