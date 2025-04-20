@@ -104,11 +104,31 @@ return {
           border = "none",
         } or nil,
       },
-      -- zen = {
-      --   show = {
-      --     tabline = true,
-      --   },
-      -- },
+      zen = {
+        toggles = {
+          dim = false,
+          inlay_hints = false,
+        },
+        -- show = {
+        --   tabline = true,
+        -- },
+        win = {
+          height = 0.9,
+          wo = {
+            winbar = "",
+            -- number = false,
+            -- list = false,
+          },
+        },
+        zoom = {
+          win = {
+            height = 0, -- full width, overrides `opts.zen.win.height`, in favor of zoom_indicator
+            w = {
+              snacks_zen_zoom = true,
+            },
+          },
+        },
+      },
       styles = {
         zoom_indicator = {
           bo = { filetype = "snacks_zen_zoom_indicator" },
@@ -130,16 +150,25 @@ return {
       local on_open = opts.zen.on_open or function() end
       opts.zen.on_open = function(win)
         on_open(win)
-        vim.wo[win.win].winbar = ""
-        vim.api.nvim_create_autocmd("BufWinEnter", {
-          group = win.augroup,
-          callback = function()
-            if not vim.api.nvim_win_is_valid(win.win) then
-              return true
-            end
-            vim.wo[win.win].winbar = ""
-          end,
-        })
+        -- vim.wo[win.win].winbar = ""
+        -- vim.api.nvim_create_autocmd("BufWinEnter", {
+        --   group = win.augroup,
+        --   callback = function()
+        --     if not vim.api.nvim_win_is_valid(win.win) then
+        --       return true
+        --     end
+        --     vim.wo[win.win].winbar = ""
+        --   end,
+        -- })
+        vim.b[win.buf].snacks_indent_old = vim.b[win.buf].snacks_indent
+        if not vim.w[win.win].snacks_zen_zoom then
+          vim.b[win.buf].snacks_indent = false
+        end
+      end
+      local on_close = opts.zen.on_close or function() end
+      opts.zen.on_close = function(win)
+        on_close(win)
+        vim.b[win.buf].snacks_indent = vim.b[win.buf].snacks_indent_old
       end
 
       vim.api.nvim_create_autocmd("FileType", {

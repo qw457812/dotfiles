@@ -238,7 +238,7 @@ map("s", "<bs>", "<C-o>s", { desc = "Inside a snippet (nvim-cmp), use backspace 
 
 -- toggle options
 U.toggle.zen:map("<leader>z")
-Snacks.toggle.zoom():map("<leader>Z") -- TODO: map `<leader>Z` to Snacks.zen without dim
+Snacks.toggle.zoom():map("<leader>Z") -- TODO: map `<leader>Z` to Snacks.zen with dim
 U.toggle.explorer_auto_close:map("<leader>uz")
 U.toggle.explorer_auto_open:map("<leader>uZ")
 U.toggle.diagnostic_virt:map("<leader>ud")
