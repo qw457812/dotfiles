@@ -127,7 +127,7 @@ return {
         },
         zoom = {
           win = {
-            height = 0, -- full width, overrides `opts.zen.win.height`, in favor of zoom_indicator
+            -- height = 0, -- full width, overrides `opts.zen.win.height`, in favor of zoom_indicator
             w = {
               snacks_zen_zoom = true,
             },
