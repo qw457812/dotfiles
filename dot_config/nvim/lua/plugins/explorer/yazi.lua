@@ -65,6 +65,7 @@ return {
         floating_window_scaling_factor = vim.g.user_is_termux and 1 or { height = 0.875, width = 0.9 },
         yazi_floating_window_border = vim.g.user_is_termux and "none" or nil,
         keymaps = {
+          cycle_open_buffers = false, -- see: https://github.com/mikavilpas/yazi.nvim/pull/894
           show_help = "~", -- `~` for yazi.nvim and `g?` for yazi
         },
         integrations = {
