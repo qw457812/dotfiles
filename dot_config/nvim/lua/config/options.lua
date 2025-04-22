@@ -74,16 +74,19 @@ vim.g.lazyvim_blink_main = not vim.g.user_is_termux
 -- failed to install basedpyright on termux via mason
 vim.g.lazyvim_python_lsp = not vim.g.user_is_termux and "basedpyright" or vim.g.lazyvim_python_lsp
 -- vim.env.FZF_DEFAULT_OPTS = "" -- better coop with fzf-lua
-if vim.g.user_is_termux then
-  -- https://github.com/nvim-lua/plenary.nvim/issues/536#issuecomment-1799807408
-  -- https://github.com/nvim-lua/plenary.nvim/blob/f031bef84630f556c2fb81215826ea419d81f4e9/lua/plenary/curl.lua#L81
-  vim.env.XDG_RUNTIME_DIR = vim.env.XDG_RUNTIME_DIR or vim.env.PREFIX .. "/tmp"
-end
 
 vim.g.loaded_python3_provider = 0
 vim.g.loaded_perl_provider = 0
 vim.g.loaded_ruby_provider = 0
 vim.g.loaded_node_provider = 0
+
+if vim.g.user_is_termux then
+  opt.swapfile = false
+
+  -- https://github.com/nvim-lua/plenary.nvim/issues/536#issuecomment-1799807408
+  -- https://github.com/nvim-lua/plenary.nvim/blob/f031bef84630f556c2fb81215826ea419d81f4e9/lua/plenary/curl.lua#L81
+  vim.env.XDG_RUNTIME_DIR = vim.env.XDG_RUNTIME_DIR or vim.env.PREFIX .. "/tmp"
+end
 
 if vim.g.neovide then
   vim.g.user_auto_root = true -- what's the point of using "/" as cwd?
