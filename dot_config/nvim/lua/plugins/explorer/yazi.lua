@@ -10,6 +10,7 @@ return {
   {
     "mikavilpas/yazi.nvim",
     dependencies = "folke/snacks.nvim",
+    cmd = "Yazi",
     keys = {
       { "<leader><cr>", mode = { "n", "v" }, "<cmd>Yazi<cr>", desc = "Yazi (Buffer Dir)" },
     },
