@@ -187,7 +187,7 @@ function M.clear_ui_esc(opts)
   local function notif_bufs()
     return vim.tbl_filter(function(b)
       return vim.api.nvim_buf_is_valid(b)
-        and vim.tbl_contains({ "snacks_notif", "notify", "noice" }, vim.bo[b].filetype)
+        and vim.list_contains({ "snacks_notif", "notify", "noice" }, vim.bo[b].filetype)
         and vim.bo[b].buftype == "nofile"
         and not vim.bo[b].buflisted
     end, vim.api.nvim_list_bufs())
