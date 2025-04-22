@@ -98,10 +98,10 @@ end
 -- stylua: ignore
 H.mappings = {
   { "<leader>sR", false },
-  { "<leader>fP", H.pick_find_plugin_files, desc = "Find Plugin File" },
-  { "<leader>sP", H.pick_search_plugin_codes, desc = "Search Plugin Code" },
-  { "<leader>fL", H.pick_find_lazy_files, desc = "Find Lazy File" },
-  { "<leader>sL", H.pick_search_lazy_codes, desc = "Search Lazy Code" },
+  { "<leader>fP", H.pick_find_plugin_files, desc = "Plugin File" },
+  { "<leader>sP", H.pick_search_plugin_codes, desc = "Plugin Code" },
+  { "<leader>f,", H.pick_find_lazy_files, desc = "LazyVim File" },
+  { "<leader>s,", H.pick_search_lazy_codes, desc = "LazyVim Code" },
   -- { "<leader>fB", function() LazyVim.pick("files", { cwd = vim.fn.expand("%:p:h") })() end, desc = "Find Files (Buffer Dir)" },
   { "<leader>sB", function() LazyVim.pick("live_grep", { cwd = vim.fn.expand("%:p:h") })() end, desc = "Grep (Buffer Dir)" },
 }
@@ -424,7 +424,7 @@ return {
     optional = true,
     keys = {
       { "<leader>s.", "<cmd>FzfLua resume<cr>", desc = "Resume" },
-      { "<leader>sp", H.pick_search_lazy_specs, desc = "Search Lazy Plugin Spec" },
+      { "<leader>sp", H.pick_search_lazy_specs, desc = "Lazy Plugin Spec" },
       unpack(H.mappings),
     },
     opts = {

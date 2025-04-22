@@ -287,7 +287,7 @@ return {
     ---@param opts snacks.Config
     opts = function(_, opts)
       local keys = opts.dashboard.preset.keys
-      local lazy_idx
+      local lazy_idx, config_idx
       for i, key in ipairs(keys) do
         if key.key == "n" then
           key.action = ":ene" -- do not startinsert
@@ -299,10 +299,13 @@ return {
           key.hidden = true
         elseif key.key == "l" then
           lazy_idx = i
+        elseif key.key == "c" then
+          config_idx = i
         end
       end
-      table.insert(keys, (lazy_idx or #keys) + 1, { icon = "󱌢 ", key = "m", action = ":Mason", desc = "Mason" })
       -- stylua: ignore start
+      table.insert(keys, (lazy_idx or #keys) + 1, { icon = "󱌢 ", key = "m", action = ":Mason", desc = "Mason" })
+      table.insert(keys, (config_idx or #keys) + 1, { icon = "󰒲 ", key = ",", action = "<leader>f,", desc = "LazyVim Config" })
       table.insert(keys, 3, { icon = " ", key = "i", action = ":ene | startinsert", desc = "New File (Insert)", hidden = true })
       table.insert(keys, 4, { icon = " ", key = "a", action = ":ene | startinsert", desc = "New File (Append)", hidden = true })
       table.insert(keys, 5, { icon = " ", key = "p", action = ":ene | normal p", desc = "New File (Paste)", hidden = true })
