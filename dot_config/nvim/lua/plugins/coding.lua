@@ -4,6 +4,7 @@ return {
     optional = true,
     opts = {
       mappings = {
+        ["`"] = { neigh_pattern = "[^\\`]." }, -- better deal with markdown code blocks in non-markdown files
         ["<"] = { action = "open", pair = "<>", neigh_pattern = "[^\\].", register = { cr = false } },
         [">"] = { action = "close", pair = "<>", neigh_pattern = "[^\\].", register = { cr = false } },
       },
