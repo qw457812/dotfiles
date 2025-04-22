@@ -196,9 +196,9 @@ return {
     cmd = "ChezmoiEdit",
     keys = {
       { "<leader>sz", false },
-      { "<leader>f.", H.pick_chezmoi, desc = "Find Chezmoi Source Dotfiles" },
-      { "<leader>f,", H.pick_chezmoi_all, desc = "Find Chezmoi Files (All)" },
-      { "<leader>fc", H.pick_config, desc = "Find Config File" },
+      { "<leader>f.", H.pick_chezmoi, desc = "Chezmoi Source Dotfiles" },
+      { "<leader>f>", H.pick_chezmoi_all, desc = "Chezmoi Files (All)" },
+      { "<leader>fc", H.pick_config, desc = "Config File" },
     },
     init = function()
       local very_very_lazy = false

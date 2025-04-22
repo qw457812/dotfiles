@@ -138,6 +138,20 @@ return {
         end,
       })
 
+      vim.api.nvim_create_autocmd("FileType", {
+        group = augroup,
+        pattern = "gitcommit",
+        callback = function(ev)
+          if vim.fn.fnamemodify(ev.file, ":t") == "COMMIT_EDITMSG" then
+            vim.keymap.set("n", close_key, function()
+              -- clear any changes (avoid `Save changes to ".git/COMMIT_EDITMSG"?`)
+              vim.cmd("edit! " .. ev.file)
+              close_buffer_or_window_or_exit()
+            end, { buffer = ev.buf, silent = true, desc = "Force Close (Git Commit)" })
+          end
+        end,
+      })
+
       if LazyVim.has("vim-dadbod-ui") then
         LazyVim.on_load("vim-dadbod-ui", function()
           if vim.g.db_ui_tmp_query_location then
@@ -151,7 +165,7 @@ return {
                 end, {
                   buffer = event.buf,
                   silent = true,
-                  desc = "Quit buffer",
+                  desc = "Force Quit",
                 })
               end,
             })
