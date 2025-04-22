@@ -89,7 +89,7 @@ return {
         callback = function(event)
           local function should_ignore(buf, win)
             return vim.api.nvim_win_get_config(win or 0).relative ~= ""
-              or vim.bo[buf or 0].filetype == "neo-tree"
+              or vim.list_contains({ "neo-tree", "gitcommit" }, vim.bo[buf or 0].filetype)
               or U.is_edgy_win(win)
           end
 
