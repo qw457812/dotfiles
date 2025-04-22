@@ -109,7 +109,7 @@ return {
             end
 
             -- find all URLs in buffer
-            local urlPatterns = require("various-textobjs.config").config.textobjs.url.patterns
+            local urlPatterns = require("various-textobjs.config.config").config.textobjs.url.patterns
             local bufText = table.concat(vim.api.nvim_buf_get_lines(0, 0, -1, false), "\n")
             local urls = {}
             for _, urlPattern in ipairs(urlPatterns) do

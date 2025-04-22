@@ -32,18 +32,25 @@ return {
     pager = true,
     keys = function()
       local function search(args)
-        local csgithub = require("csgithub")
         if vim.fn.expand("%:e") == "" then
           args = args or {}
           args.includeExtension = false
         end
-        local url = csgithub.search(args)
-        if url and vim.g.user_is_termux then
-          vim.fn.setreg(vim.v.register, url)
-          LazyVim.info(url, { title = "Copied URL" })
-        else
-          csgithub.open(url)
+        local url = require("csgithub").search(args)
+        -- https://github.com/thenbe/csgithub.nvim/blob/9df37440ba1bbf95f0a328819090353654ca4f55/lua/csgithub/init.lua#L26-L29
+        if not url or url == "" then
+          LazyVim.error("URL is empty!", { title = "Csgithub" })
+          return
         end
+        vim.ui.open(url, vim.g.user_is_termux and {
+          cmd = {
+            "am",
+            "start",
+            "-n",
+            "com.kiwibrowser.browser/com.google.android.apps.chrome.Main",
+            "-d",
+          },
+        } or nil)
       end
 
       return {
