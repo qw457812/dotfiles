@@ -42,6 +42,7 @@ return {
           LazyVim.error("URL is empty!", { title = "Csgithub" })
           return
         end
+        -- https://www.reddit.com/r/termux/comments/gsafc0/comment/fs44i6b/
         vim.ui.open(url, vim.g.user_is_termux and {
           cmd = {
             "am",

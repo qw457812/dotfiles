@@ -130,7 +130,11 @@ prepend_keymap = [
   { on = [
     "<Space>",
     "D",
-  ], run = 'plugin diff', desc = "Diff the selected with the hovered file" },
+  ], run = [
+    "plugin diff",
+    "shell --block -- sleep 0.01 && pbpaste | delta",
+  ], desc = "Diff the selected with the hovered file" },
+
   { on = [
     "c",
     "c",
@@ -234,6 +238,12 @@ append_keymap = [
     "b",
     "D",
   ], run = "plugin bookmarks delete_all", desc = "Delete all bookmarks" },
+
+  # https://github.com/yazi-rs/plugins/tree/main/chmod.yazi
+  { on = [
+    "c",
+    "m",
+  ], run = "plugin chmod", desc = "Chmod on selected files" },
 
   # Linemode
   { on = [
