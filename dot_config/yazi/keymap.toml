@@ -132,7 +132,7 @@ prepend_keymap = [
     "D",
   ], run = [
     "plugin diff",
-    "shell --block -- sleep 0.01 && pbpaste | delta",
+    "shell --block -- sleep 0.05 && (command -v pbpaste >/dev/null && pbpaste || termux-clipboard-get) | delta",
   ], desc = "Diff the selected with the hovered file" },
 
   { on = [
