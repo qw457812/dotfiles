@@ -30,6 +30,10 @@ def is_tmux(cmd):
     return cmd == "tmux"
 
 
+def is_yazi(cmd):
+    return cmd == "yazi"
+
+
 def is_fzf(window):
     fp = window.child.foreground_processes
     return any(
@@ -64,10 +68,11 @@ def handle_result(
 
     cmd = w.child.foreground_cmdline[0]
     # https://github.com/yurikhan/kitty-smart-scroll/blob/8aaa91b9f52527c3dbe395a79a90aea4a879857a/smart_scroll.py#L18
+    # yazi: for cmp like `cd --interactive`
     if w.screen.is_main_linebuf() or not (
         is_nvim(cmd)
         or is_tmux(cmd)
-        or ((key == "ctrl+j" or key == "ctrl+k") and is_fzf(w))
+        or ((key == "ctrl+j" or key == "ctrl+k") and (is_fzf(w) or is_yazi(cmd)))
     ):
         # # kitten @ focus-window --match=neighbor:bottom
         # boss.call_remote_control(w, ("focus-window", f"--match=neighbor:{direction}"))
