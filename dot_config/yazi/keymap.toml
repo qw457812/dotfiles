@@ -44,6 +44,26 @@ prepend_keymap = [
     "k",
   ], run = "spot", desc = "Spot hovered file" },
 
+  # Goto
+  { on = [
+    "c",
+    "d",
+  ], run = "cd --interactive", desc = "Jump interactively" },
+
+  # Copy
+  { on = [
+    "c",
+    "D",
+  ], run = "copy dirname", desc = "Copy the directory path" },
+  { on = [
+    "c",
+    "n",
+  ], run = "noop" },
+  { on = [
+    "c",
+    "N",
+  ], run = "copy name_without_ext", desc = "Copy the filename without extension" },
+
   # https://github.com/dedukun/bookmarks.yazi
   # h: ~
   # d: ~/Downloads
@@ -96,7 +116,7 @@ prepend_keymap = [
   { on = "z", run = "plugin zoxide", desc = "Jump to a directory via zoxide" },
   { on = "Z", run = "plugin fzf", desc = "Jump to a file/directory via fzf" },
 
-  # Selection
+  # Toggle
   { on = ",", run = [
     "toggle",
     "arrow 1",
@@ -126,15 +146,6 @@ prepend_keymap = [
     "<Space>",
     "<Backspace>",
   ], run = "quit", desc = "Exit the process" },
-  # https://github.com/yazi-rs/plugins/tree/main/diff.yazi
-  { on = [
-    "<Space>",
-    "D",
-  ], run = [
-    "plugin diff",
-    "shell --block -- sleep 0.05 && (command -v pbpaste >/dev/null && pbpaste || termux-clipboard-get) | delta",
-  ], desc = "Diff the selected with the hovered file" },
-
   { on = [
     "c",
     "c",
@@ -157,8 +168,22 @@ prepend_keymap = [
   { on = [
     "<Space>",
     "f",
-    "m",
+    "M",
   ], run = "plugin mount", desc = "Mount Manager" },
+  { on = [
+    "<Space>",
+    "f",
+    "d",
+  ], run = "shell --block -- diff -u $1 $0 | delta --paging always", desc = "Diff the selected with the hovered file" },
+  # https://github.com/yazi-rs/plugins/tree/main/diff.yazi
+  { on = [
+    "<Space>",
+    "f",
+    "D",
+  ], run = [
+    "plugin diff",
+    "shell --block -- sleep 0.05 && (command -v pbpaste >/dev/null && pbpaste || termux-clipboard-get) | delta",
+  ], desc = "Diff the selected with the hovered file" },
   { on = [
     "<Space>",
     "g",
@@ -197,7 +222,7 @@ append_keymap = [
 
   # https://yazi-rs.github.io/docs/configuration/keymap#manager.shell
   { on = "e", run = 'shell --block -- ${EDITOR:=vi} "$@"', desc = "Edit the selected files use $EDITOR" },
-  { on = "E", run = 'shell -- open -a /Applications/Emacs.app "$@"', desc = "Edit the selected files use Emacs.app" },
+  # { on = "E", run = 'shell -- open -a /Applications/Emacs.app "$@"', desc = "Edit the selected files use Emacs.app" },
 
   { on = "<Backspace>", run = "close", desc = "Close the current tab, or quit if it is last tab" },
 
@@ -387,7 +412,8 @@ prepend_keymap = [
 
   # Copy
   { on = ["c", "c"], run = "noop" },
-  { on = ["y", "y"], run = "copy cell", desc = "Copy selected cell" },
+  # { on = ["y", "y"], run = "copy cell", desc = "Copy selected cell" },
+  { on = "y", run = "copy cell", desc = "Copy selected cell" },
 ]
 
 append_keymap = [
@@ -465,6 +491,9 @@ append_keymap = [
 [cmp]
 
 append_keymap = [
+  { on = "<C-e>", run = "close", desc = "Cancel completion" },
+  { on = "<C-y>", run = "close --submit", desc = "Submit the completion" },
+
   { on = "<C-k>", run = "arrow prev", desc = "Previous item" },
   { on = "<C-j>", run = "arrow next", desc = "Next item" },
 
