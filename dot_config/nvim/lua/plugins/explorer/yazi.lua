@@ -93,10 +93,11 @@ return {
           local sub_dirs = {
             "smart-enter.yazi",
             "full-border.yazi",
+            "chmod.yazi",
             "git.yazi",
             "vcs-files.yazi",
-            "smart-filter.yazi",
             "diff.yazi",
+            "smart-filter.yazi",
             "mount.yazi",
           }
           for _, sub_dir in ipairs(sub_dirs) do
