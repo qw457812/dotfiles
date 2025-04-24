@@ -46,6 +46,7 @@
     colorMoved = default
 
 [merge]
+    tool = nvimdiff
     conflictstyle = zdiff3
 
 [pull]

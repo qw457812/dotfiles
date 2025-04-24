@@ -77,6 +77,7 @@ abbr -a --position anywhere H '| head'
 abbr -a --position anywhere T '| tail'
 abbr -a --position anywhere G '| grep'
 abbr -a --position anywhere J '| jq'
+abbr -a --position anywhere D '| delta'
 
 # Tmux
 alias tmux "TERM=xterm-256color command tmux" # https://github.com/gpakosz/.tmux
@@ -130,6 +131,7 @@ abbr gma 'git merge --abort'
 abbr gmc 'git merge --continue'
 abbr gmom 'git merge origin/(git_main_branch)'
 abbr gms 'git merge --squash'
+abbr gmtl "git mergetool --no-prompt"
 abbr gmum 'git merge upstream/(git_main_branch)'
 abbr gprav "git pull --rebase --autostash -v"
 abbr grb 'git rebase'
