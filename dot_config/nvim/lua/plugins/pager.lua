@@ -73,6 +73,14 @@ return {
           end
         end,
       })
+
+      if vim.g.terminal_scrollback_pager then
+        LazyVim.on_very_lazy(function()
+          vim.defer_fn(function()
+            vim.cmd("normal! G")
+          end, 100)
+        end)
+      end
     end,
     config = function(_, opts)
       opts.colorscheme = LazyVim.has("tokyonight.nvim") and "tokyonight-moon" or function() end
