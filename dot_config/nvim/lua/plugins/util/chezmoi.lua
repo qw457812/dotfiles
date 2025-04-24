@@ -201,13 +201,7 @@ return {
       { "<leader>fc", H.pick_config, desc = "Config File" },
     },
     init = function()
-      local very_very_lazy = false
-      LazyVim.on_very_lazy(function()
-        vim.defer_fn(function()
-          very_very_lazy = true
-          H.autocmd_chezmoi_add()
-        end, 200)
-      end)
+      U.on_very_very_lazy(H.autocmd_chezmoi_add)
 
       vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
         group = vim.api.nvim_create_augroup("chezmoi_apply", { clear = true }),
@@ -224,7 +218,7 @@ return {
               require("chezmoi.commands.__edit").watch(buf)
             end
           end
-          if very_very_lazy then
+          if vim.g.user_very_very_lazy then
             vim.schedule(watch)
           else
             vim.defer_fn(watch, 200)

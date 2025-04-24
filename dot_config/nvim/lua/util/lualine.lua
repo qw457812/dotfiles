@@ -77,6 +77,9 @@ M.formatter = {
     return " " -- 󰛖 
   end,
   cond = function()
+    if not vim.g.user_very_very_lazy then
+      return false
+    end
     local ok, conform = pcall(require, "conform")
     if not ok then
       return false

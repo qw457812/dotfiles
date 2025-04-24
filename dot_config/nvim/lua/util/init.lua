@@ -29,6 +29,15 @@ function M.has_user_extra(extra)
     or vim.tbl_contains(Config.json.data.extras, modname)
 end
 
+---@param fn fun()
+function M.on_very_very_lazy(fn)
+  LazyVim.on_very_lazy(function()
+    vim.defer_fn(function()
+      fn()
+    end, 200)
+  end)
+end
+
 ---@param win? integer default 0
 ---@param opts? {zen?: boolean, misc?: boolean} default true
 ---      - zen: whether to treat zen-mode as floating window
