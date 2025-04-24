@@ -567,4 +567,25 @@ return {
       })
     end,
   },
+
+  {
+    "sindrets/diffview.nvim",
+    optional = true,
+    opts = function(_, opts)
+      local actions = require("diffview.actions")
+      return U.extend_tbl(opts, {
+        keymaps = {
+          view = {
+            { "n", close_key, actions.close },
+          },
+          file_panel = {
+            { "n", close_key, actions.close },
+          },
+          file_history_panel = {
+            { "n", close_key, "<cmd>DiffviewClose<CR>" },
+          },
+        },
+      })
+    end,
+  },
 }
