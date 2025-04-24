@@ -14,6 +14,7 @@ set -x FZF_DEFAULT_OPTS "
   --bind=ctrl-s:jump
   --bind=ctrl-f:preview-half-page-down,ctrl-b:preview-half-page-up
   --bind=ctrl-a:beginning-of-line,ctrl-e:end-of-line
+  --bind=ctrl-r:toggle-all
   --highlight-line
   --info=inline-right
   --border=none

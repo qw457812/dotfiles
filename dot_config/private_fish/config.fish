@@ -94,7 +94,7 @@ alias lazygit "SHELL=(which bash) TERM=xterm-256color command lazygit"
 alias glab "env -u https_proxy -u http_proxy -u all_proxy command glab"
 abbr gg lazygit
 abbr gl 'git l --color'
-abbr gs "git st"
+abbr gs "git status"
 abbr gp "git pull"
 abbr gpp "git push"
 # abbr gcp "git commit -p"
@@ -143,6 +143,8 @@ abbr grbom 'git rebase origin/(git_main_branch)'
 abbr grbs 'git rebase --skip'
 abbr grbum 'git rebase upstream/(git_main_branch)'
 abbr grv "git remote --verbose"
+abbr gsb "git status --short --branch"
+abbr gss "git status --short"
 
 # SVN
 abbr sva 'svn add'
