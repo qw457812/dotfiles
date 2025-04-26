@@ -1,5 +1,100 @@
 return {
   {
+    "folke/snacks.nvim",
+    keys = function(_, keys)
+      if LazyVim.pick.picker.name == "snacks" then
+        -- stylua: ignore
+        vim.list_extend(keys, {
+          { "<leader>gb", function() Snacks.picker.git_branches({ cwd = LazyVim.root.git() }) end, desc = "Git Branches" },
+          { "<leader>gB", function() Snacks.picker.git_log_line() end, desc = "Git Blame Line" },
+          { "<leader>gc", function() Snacks.picker.git_log({ cwd = LazyVim.root.git() }) end, desc = "Git Log" },
+          { "<leader>gd", function() Snacks.picker.git_diff({ cwd = LazyVim.root.git() }) end, desc = "Git Diff (hunks)" },
+          { "<leader>gs", function() Snacks.picker.git_status({ cwd = LazyVim.root.git() }) end, desc = "Git Status" },
+          { "<leader>gS", function() Snacks.picker.git_stash({ cwd = LazyVim.root.git() }) end, desc = "Git Stash" },
+        })
+      end
+    end,
+    ---@module "snacks"
+    ---@type snacks.Config
+    opts = {
+      picker = {
+        previewers = {
+          diff = {
+            builtin = false,
+            cmd = { "delta", "--file-style", "omit ", "--hunk-header-style", "omit" },
+          },
+          git = {
+            builtin = false,
+          },
+        },
+      },
+    },
+  },
+
+  {
+    "folke/snacks.nvim",
+    keys = function(_, keys)
+      vim.list_extend(keys, {
+        {
+          "<leader>gO",
+          function()
+            Snacks.gitbrowse({ what = "permalink" })
+            U.stop_visual_mode()
+          end,
+          mode = { "n", "x" },
+          desc = "Git Browse (open)",
+        },
+        {
+          "<leader>gY",
+          function()
+            Snacks.gitbrowse({
+              what = "permalink",
+              open = function(url)
+                vim.fn.setreg(vim.v.register, url)
+                U.stop_visual_mode()
+                LazyVim.info(url, { title = "Copied URL" })
+              end,
+              notify = false,
+            })
+          end,
+          mode = { "n", "x" },
+          desc = "Git Browse (copy)",
+        },
+      })
+
+      if vim.fn.executable("lazygit") == 1 then
+        ---@param opts? snacks.lazygit.Config
+        local function lazygit(opts)
+          if vim.o.shell:find("fish") then
+            -- add `$SHELL` env to fix `e` in lazygit, see: https://github.com/jesseduffield/lazygit/issues/4153#issuecomment-2574856055
+            opts = vim.tbl_deep_extend("force", { env = { SHELL = vim.fn.exepath("bash") } }, opts or {})
+          end
+          ---@diagnostic disable-next-line: missing-fields
+          Snacks.lazygit(opts)
+        end
+
+        -- stylua: ignore
+        vim.list_extend(keys, {
+          ---@diagnostic disable-next-line: missing-fields
+          { "<leader>gg", function() lazygit({ cwd = LazyVim.root.git() }) end, desc = "Lazygit (Root Dir)" },
+          { "<leader>gG", lazygit, desc = "Lazygit (cwd)" },
+        })
+      end
+    end,
+    ---@module "snacks"
+    ---@type snacks.Config
+    opts = {
+      lazygit = {
+        win = vim.g.user_is_termux and {
+          height = vim.o.lines,
+          width = vim.o.columns,
+          border = "none",
+        } or nil,
+      },
+    },
+  },
+
+  {
     "lewis6991/gitsigns.nvim",
     optional = true,
     opts = function(_, opts)

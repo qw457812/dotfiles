@@ -35,31 +35,6 @@ return {
         end,
         desc = "Todo List",
       },
-      {
-        "<leader>gO",
-        function()
-          Snacks.gitbrowse({ what = "permalink" })
-          U.stop_visual_mode()
-        end,
-        mode = { "n", "x" },
-        desc = "Git Browse (open)",
-      },
-      {
-        "<leader>gY",
-        function()
-          Snacks.gitbrowse({
-            what = "permalink",
-            open = function(url)
-              vim.fn.setreg(vim.v.register, url)
-              U.stop_visual_mode()
-              LazyVim.info(url, { title = "Copied URL" })
-            end,
-            notify = false,
-          })
-        end,
-        mode = { "n", "x" },
-        desc = "Git Browse (copy)",
-      },
     },
     ---@module "snacks"
     ---@type snacks.Config
@@ -96,13 +71,6 @@ return {
       },
       image = {
         enabled = vim.g.user_is_wezterm or vim.g.user_is_kitty,
-      },
-      lazygit = {
-        win = vim.g.user_is_termux and {
-          height = vim.o.lines,
-          width = vim.o.columns,
-          border = "none",
-        } or nil,
       },
       zen = {
         toggles = {
