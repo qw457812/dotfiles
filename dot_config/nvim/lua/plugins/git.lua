@@ -157,11 +157,11 @@ return {
       })
     end,
     specs = {
-      -- {
-      --   "NeogitOrg/neogit",
-      --   optional = true,
-      --   opts = { integrations = { diffview = true } },
-      -- },
+      {
+        "NeogitOrg/neogit",
+        optional = true,
+        opts = { integrations = { diffview = true } },
+      },
       {
         "folke/which-key.nvim",
         opts = {
@@ -175,19 +175,21 @@ return {
 
   {
     "NeogitOrg/neogit",
-    dependencies = { "nvim-lua/plenary.nvim" },
     cmd = "Neogit",
     keys = {
-      { "<Leader>gnn", "<Cmd>Neogit<CR>", desc = "Neogit" },
+      {
+        "<Leader>gnn",
+        function()
+          require("neogit").open({ cwd = LazyVim.root() })
+        end,
+        desc = "Neogit (Root Dir)",
+      },
+      { "<Leader>gnN", "<Cmd>Neogit<CR>", desc = "Neogit (cwd)" },
       { "<Leader>gnc", "<Cmd>Neogit commit<CR>", desc = "Commit" },
       { "<Leader>gnp", "<Cmd>Neogit pull<CR>", desc = "Pull" },
       { "<Leader>gnP", "<Cmd>Neogit push<CR>", desc = "Push" },
       { "<Leader>gnf", "<Cmd>Neogit fetch<CR>", desc = "Fetch" },
-      { "<Leader>gnC", ":Neogit cwd=", desc = "Neogit Override CWD" },
-      { "<Leader>gnK", ":Neogit kind=", desc = "Neogit Override Kind" },
       { "<Leader>gnF", "<Cmd>Neogit kind=floating<CR>", desc = "Neogit Float" },
-      { "<Leader>gnS", "<Cmd>Neogit kind=split<CR>", desc = "Neogit Horizontal Split" },
-      { "<Leader>gnV", "<Cmd>Neogit kind=vsplit<CR>", desc = "Neogit Vertical Split" },
     },
     opts = function(_, opts)
       return U.extend_tbl(opts, {
@@ -198,10 +200,9 @@ return {
           end
         end,
         integrations = {
-          diffview = LazyVim.has("diffview.nvim"),
+          -- diffview = LazyVim.has("diffview.nvim"),
           telescope = LazyVim.pick.picker.name == "telescope",
           fzf_lua = LazyVim.pick.picker.name == "fzf",
-          mini_pick = false,
         },
       })
     end,
