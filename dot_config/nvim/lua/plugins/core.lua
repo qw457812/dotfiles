@@ -36,7 +36,7 @@ return {
         desc = "Todo List",
       },
       {
-        "<leader>gB",
+        "<leader>gO",
         function()
           Snacks.gitbrowse({ what = "permalink" })
           U.stop_visual_mode()
