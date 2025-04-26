@@ -33,7 +33,7 @@ return {
         "nvim-lualine/lualine.nvim",
         optional = true,
         opts = function(_, opts)
-          table.insert(opts.sections.lualine_x, 2, {
+          table.insert(opts.sections.lualine_x, 4, {
             function()
               local conflict = ""
               if package.loaded["git-conflict"] then

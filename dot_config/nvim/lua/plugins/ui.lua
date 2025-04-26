@@ -115,7 +115,7 @@ return {
       end
 
       -- move copilot to the right of command
-      table.insert(opts.sections.lualine_x, 5, table.remove(opts.sections.lualine_x, 3))
+      table.insert(opts.sections.lualine_x, 4, table.remove(opts.sections.lualine_x, 2))
       if is_termux then
         remove_component(opts.sections.lualine_x, "diff")
       else
