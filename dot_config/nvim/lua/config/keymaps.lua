@@ -252,23 +252,6 @@ if not LazyVim.has("nvim-scrollbar") then
   Snacks.toggle.option("laststatus", { off = 0, on = vim.o.laststatus > 0 and vim.o.laststatus or 3, name = "Status Line" }):map("<leader>uS")
 end
 
-if vim.fn.executable("lazygit") == 1 then
-  ---@param opts? snacks.lazygit.Config
-  local function lazygit(opts)
-    if vim.o.shell:find("fish") then
-      -- add `$SHELL` env to fix `e` in lazygit, see: https://github.com/jesseduffield/lazygit/issues/4153#issuecomment-2574856055
-      opts = vim.tbl_deep_extend("force", { env = { SHELL = vim.fn.exepath("bash") } }, opts or {})
-    end
-    ---@diagnostic disable-next-line: missing-fields
-    Snacks.lazygit(opts)
-  end
-
-  -- stylua: ignore
-  ---@diagnostic disable-next-line: missing-fields
-  map("n", "<leader>gg", function() lazygit({ cwd = LazyVim.root.git() }) end, { desc = "Lazygit (Root Dir)" })
-  map("n", "<leader>gG", lazygit, { desc = "Lazygit (cwd)" })
-end
-
 -- lazy/LazyVim
 map("n", "<leader>l", "", { desc = "+lazy/lazyvim" })
 map("n", "<leader>ll", "<cmd>Lazy<cr>", { desc = "Lazy" })
