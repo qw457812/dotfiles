@@ -122,7 +122,7 @@ if vim.g.user_is_kitty or vim.g.user_is_wezterm or vim.g.neovide then
   -- See `:h tui-input`
   map({ "n", "i", "c", "v", "o", "t" }, "<M-i>", "<C-i>", { desc = "<C-i>" })
   -- options: "<C-w>w", "za", ">>"
-  map("n", "<tab>", "<C-w>w", { desc = "Next Window", remap = true })
+  safe_map("n", "<tab>", "<C-w>w", { desc = "Next Window", remap = true }) -- copilotlsp-nvim/copilot-lsp
   map("n", "<S-tab>", "<C-w>W", { desc = "Prev Window", remap = true })
 end
 

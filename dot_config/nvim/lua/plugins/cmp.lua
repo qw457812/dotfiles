@@ -80,6 +80,14 @@ return {
           end
           return true
         end,
+        copilot_nes = function(cmp)
+          if not (package.loaded["copilot-lsp.nes"] and vim.b.nes_state) then
+            return
+          end
+          local nes = require("copilot-lsp.nes")
+          cmp.hide()
+          return nes.apply_pending_nes() and nes.walk_cursor_end_edit()
+        end,
       }
 
       ---@type table<string, blink.cmp.KeymapCommand>
@@ -119,6 +127,7 @@ return {
         keymap = {
           -- TODO: better coop with mini.snippets and signature_help
           ["<Tab>"] = {
+            H.actions.copilot_nes,
             "select_next",
             "snippet_forward",
             H.actions.pum_next,
