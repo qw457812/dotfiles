@@ -35,6 +35,7 @@
     "plugins.extras.ai.aider",
     "plugins.extras.ai.avante",
     "plugins.extras.ai.codecompanion",
+    "plugins.extras.ai.copilot-lsp",
     "plugins.extras.editor.mini-operators",
     "plugins.extras.lang.xml",
     "plugins.extras.lsp.mason-lock",
