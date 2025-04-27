@@ -1,17 +1,6 @@
 return {
   {
     "zbirenbaum/copilot.lua",
-    commit = vim.g.user_is_termux and "0b40947" or nil,
-    optional = true,
-    opts = function()
-      if vim.g.user_is_termux then
-        ---@diagnostic disable-next-line: inject-field
-        require("copilot.api").status = require("copilot.status")
-      end
-    end,
-  },
-  {
-    "zbirenbaum/copilot.lua",
     optional = true,
     opts = {
       copilot_model = "gpt-4o-copilot",
