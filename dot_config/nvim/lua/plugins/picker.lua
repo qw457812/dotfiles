@@ -103,7 +103,7 @@ H.mappings = {
   { "<leader>f,", H.pick_find_lazy_files, desc = "LazyVim File" },
   { "<leader>s,", H.pick_search_lazy_codes, desc = "LazyVim Code" },
   -- { "<leader>fB", function() LazyVim.pick("files", { cwd = vim.fn.expand("%:p:h") })() end, desc = "Find Files (Buffer Dir)" },
-  { "<leader>sB", function() LazyVim.pick("live_grep", { cwd = vim.fn.expand("%:p:h") })() end, desc = "Grep (Buffer Dir)" },
+  -- { "<leader>sB", function() LazyVim.pick("live_grep", { cwd = vim.fn.expand("%:p:h") })() end, desc = "Grep (Buffer Dir)" },
 }
 
 return {
