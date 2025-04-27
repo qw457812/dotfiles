@@ -26,4 +26,23 @@ return {
       },
     },
   },
+
+  {
+    "nvim-lualine/lualine.nvim",
+    optional = true,
+    opts = function(_, opts)
+      table.insert(
+        opts.sections.lualine_x,
+        2,
+        LazyVim.lualine.status(LazyVim.config.icons.kinds.Copilot, function()
+          local clients = package.loaded["copilot-lsp.nes"]
+              and LazyVim.lsp.get_clients({ name = "copilot_ls", bufnr = 0 })
+            or {}
+          if #clients > 0 then
+            return vim.b.nes_state and "pending" or "ok"
+          end
+        end)
+      )
+    end,
+  },
 }
