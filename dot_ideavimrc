@@ -83,6 +83,8 @@ set notimeout
 set peekaboo
 " af if
 set functiontextobj
+" aq iq ab ib
+set mini-ai
 
 """ Plugin settings -------------------------
 let g:argtextobj_pairs="[:],(:),<:>"
