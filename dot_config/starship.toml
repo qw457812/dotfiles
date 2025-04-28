@@ -1,3 +1,6 @@
+# https://starship.rs/config/
+"$schema" = 'https://starship.rs/config-schema.json'
+
 # https://github.com/folke/dot/blob/56d310467f3f962e506810b710a1562cee03b75e/config/starship.toml
 [custom.shell]
 command = "echo $STARSHIP_SHELL"                                                # shows output of command
@@ -34,6 +37,10 @@ format = '([$all_status$ahead_behind]($style))'
 
 [git_metrics]
 disabled = false
+
+[mise]
+disabled = false
+healthy_symbol = ""
 
 # starship preset nerd-font-symbols -o ~/.config/starship.toml
 [aws]

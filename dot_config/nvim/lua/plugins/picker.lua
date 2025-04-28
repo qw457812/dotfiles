@@ -248,7 +248,7 @@ return {
               ["<Esc>"] = { "<Esc>", U.keymap.clear_ui_esc, desc = "Clear UI or Close" },
               ["/"] = false, -- highlights text in preview
               ["<leader><space>"] = "toggle_focus",
-              ["<leader><tab>"] = "cycle_win", -- toggle focus between input and preview
+              ["<leader>/"] = "cycle_win", -- toggle focus between input and preview
               ["<Up>"] = "history_back",
               ["<Down>"] = "history_forward",
               i_up = { "<Up>", "list_up", mode = "i", expr = true },
@@ -297,7 +297,7 @@ return {
                 end,
                 desc = "Clear UI or Toggle Focus",
               },
-              ["<leader><tab>"] = "toggle_focus",
+              ["<leader>/"] = "toggle_focus",
             },
           },
         },
