@@ -17,8 +17,6 @@ local prompt = {
   - Inconsistent naming and code style.
   - Code repetition
   You may identify additional problems. The user submits a small section of code from a larger file.
-  Only list lines with readability issues, in the format <line_num>|<issue and proposed solution>
-  If there's no issues with code respond with only: <OK>
 ]],
   optimize_code = "Optimize the following code",
   summarize = "Summarize the following text",

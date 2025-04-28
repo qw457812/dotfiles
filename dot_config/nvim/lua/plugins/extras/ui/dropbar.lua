@@ -282,6 +282,7 @@ return {
             -- alternative to vim.w.oil_preview: vim.wo.previewwindow
             or vim.bo.filetype == "oil" and not vim.w.oil_preview and vim.api.nvim_win_get_config(0).relative == ""
           )
+          and not vim.t.user_diffview
       end
 
       opts.options.disabled_filetypes.winbar = vim.deepcopy(opts.options.disabled_filetypes.statusline)
