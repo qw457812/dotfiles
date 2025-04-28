@@ -271,21 +271,24 @@ return {
   {
     "NeogitOrg/neogit",
     cmd = "Neogit",
-    keys = {
-      {
-        "<Leader>gnn",
-        function()
-          require("neogit").open({ cwd = LazyVim.root() })
-        end,
-        desc = "Neogit (Root Dir)",
-      },
-      { "<Leader>gnN", "<Cmd>Neogit<CR>", desc = "Neogit (cwd)" },
-      { "<Leader>gnc", "<Cmd>Neogit commit<CR>", desc = "Commit" },
-      { "<Leader>gnp", "<Cmd>Neogit pull<CR>", desc = "Pull" },
-      { "<Leader>gnP", "<Cmd>Neogit push<CR>", desc = "Push" },
-      { "<Leader>gnf", "<Cmd>Neogit fetch<CR>", desc = "Fetch" },
-      { "<Leader>gnF", "<Cmd>Neogit kind=floating<CR>", desc = "Neogit Float" },
-    },
+    keys = function()
+      ---@param opts OpenOpts|nil
+      local open = function(opts)
+        opts = vim.tbl_deep_extend("force", { cwd = LazyVim.root.git() }, opts or {})
+        require("neogit").open(opts)
+      end
+
+      -- stylua: ignore
+      return {
+        { "<Leader>gnn", open, desc = "Neogit (Root Dir)" },
+        { "<Leader>gnN", "<Cmd>Neogit<CR>", desc = "Neogit (cwd)" },
+        { "<Leader>gnc", function() open({ [1] = "commit" }) end, desc = "Commit" },
+        { "<Leader>gnp", function() open({ [1] = "pull" }) end, desc = "Pull" },
+        { "<Leader>gnP", function() open({ [1] = "push" }) end, desc = "Push" },
+        { "<Leader>gnf", function() open({ [1] = "fetch" }) end, desc = "Fetch" },
+        { "<Leader>gn<space>", function() open({ kind = "floating" }) end, desc = "Neogit Float" },
+      }
+    end,
     opts = function(_, opts)
       return U.extend_tbl(opts, {
         disable_signs = true,
@@ -317,4 +320,17 @@ return {
       },
     },
   },
+
+  -- {
+  --   "harrisoncramer/gitlab.nvim",
+  --   event = "VeryLazy",
+  --   dependencies = {
+  --     "MunifTanjim/nui.nvim",
+  --     "sindrets/diffview.nvim",
+  --   },
+  --   build = function()
+  --     require("gitlab.server").build(true)
+  --   end,
+  --   opts = {},
+  -- },
 }

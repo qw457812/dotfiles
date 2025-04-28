@@ -1,5 +1,5 @@
 {
-  "basedpyright": "1.29.0",
+  "basedpyright": "1.29.1",
   "bash-language-server": "5.6.0",
   "copilot-language-server": "1.310.0",
   "debugpy": "1.8.14",
@@ -20,7 +20,7 @@
   "markdownlint-cli2": "0.17.2",
   "marksman": "2024-12-18",
   "prettier": "3.5.3",
-  "ruff": "0.11.6",
+  "ruff": "0.11.7",
   "selene": "0.28.0",
   "shellcheck": "v0.10.0",
   "shfmt": "v3.11.0",
