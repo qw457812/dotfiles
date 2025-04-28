@@ -573,19 +573,13 @@ return {
     optional = true,
     opts = function(_, opts)
       local actions = require("diffview.actions")
-      return U.extend_tbl(opts, {
-        keymaps = {
-          view = {
-            { "n", close_key, actions.close },
-          },
-          file_panel = {
-            { "n", close_key, actions.close },
-          },
-          file_history_panel = {
-            { "n", close_key, "<cmd>DiffviewClose<CR>" },
-          },
-        },
-      })
+      LazyVim.extend(opts, "keymaps.view", { { "n", close_key, actions.close, { desc = "Close" } } })
+      LazyVim.extend(opts, "keymaps.file_panel", { { "n", close_key, actions.close, { desc = "Close" } } })
+      LazyVim.extend(
+        opts,
+        "keymaps.file_history_panel",
+        { { "n", close_key, "<cmd>DiffviewClose<CR>", { desc = "Close" } } }
+      )
     end,
   },
 }
