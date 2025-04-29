@@ -1,8 +1,3 @@
----@param win? integer
-local function too_narrow(win)
-  return vim.o.columns < 120 or vim.api.nvim_win_get_width(win or 0) < 120
-end
-
 ---@diagnostic disable: missing-fields
 return {
   {
@@ -32,7 +27,7 @@ return {
                   picker:close()
                 else
                   picker:action("unfocus")
-                  if too_narrow() then
+                  if U.too_narrow() then
                     picker:close()
                   end
                 end

@@ -75,11 +75,6 @@ return {
       end
 
       ---@param win? integer
-      local function too_narrow(win)
-        return vim.o.columns < 120 or vim.api.nvim_win_get_width(win or 0) < 120
-      end
-
-      ---@param win? integer
       local function too_wide(win)
         return vim.api.nvim_win_get_width(win or 0) - vim.g.user_explorer_width >= 120
       end
@@ -89,8 +84,9 @@ return {
         callback = function(event)
           local function should_ignore(buf, win)
             return vim.api.nvim_win_get_config(win or 0).relative ~= ""
-              or vim.list_contains({ "neo-tree", "gitcommit" }, vim.bo[buf or 0].filetype)
+              or vim.list_contains({ "neo-tree", "gitcommit", "snacks_dashboard" }, vim.bo[buf or 0].filetype)
               or U.is_edgy_win(win)
+              or vim.t.user_diffview
           end
 
           -- If `vim.g.user_explorer_auto_close` is set to true,
@@ -105,7 +101,7 @@ return {
               return
             end
             if is_visible() then
-              if too_narrow() then
+              if U.too_narrow() then
                 require("neo-tree.command").execute({ action = "close" })
               end
             elseif vim.g.user_explorer_auto_open and too_wide() then
@@ -401,7 +397,7 @@ return {
               state.commands["close_window"](state)
             else
               state.commands["unfocus_window"](state)
-              if too_narrow() then
+              if U.too_narrow() then
                 state.commands["close_window"](state)
               end
             end
@@ -691,7 +687,7 @@ return {
           {
             event = "file_opened",
             handler = function()
-              if is_visible() and (vim.g.user_explorer_auto_close or too_narrow()) then
+              if is_visible() and (vim.g.user_explorer_auto_close or U.too_narrow()) then
                 require("neo-tree.command").execute({ action = "close" })
               end
             end,
