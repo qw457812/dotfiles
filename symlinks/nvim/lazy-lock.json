@@ -39,6 +39,7 @@
   "dropbar.nvim": { "branch": "master", "commit": "cb7c17bb35fe8860d490dfd1d5c45fce40ecba26" },
   "flash.nvim": { "branch": "main", "commit": "3c942666f115e2811e959eabbdd361a025db8b63" },
   "friendly-snippets": { "branch": "main", "commit": "fc8f183479a472df60aa86f00e295462f2308178" },
+  "gitlab.nvim": { "branch": "main", "commit": "a260f648fe92c5d640340e1c2d55db1fe523c8a5" },
   "gitsigns.nvim": { "branch": "main", "commit": "140ac646db125904e456e42ab8b538d28f9607d7" },
   "grug-far.nvim": { "branch": "main", "commit": "631331f9c6611b1a47e887f50b92b7cf450f51e7" },
   "helpview.nvim": { "branch": "main", "commit": "8df486915a29483c7955067a7c17bffdf3b1e5f5" },

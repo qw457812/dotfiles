@@ -387,17 +387,4 @@ return {
       },
     },
   },
-
-  -- {
-  --   "harrisoncramer/gitlab.nvim",
-  --   event = "VeryLazy",
-  --   dependencies = {
-  --     "MunifTanjim/nui.nvim",
-  --     "sindrets/diffview.nvim",
-  --   },
-  --   build = function()
-  --     require("gitlab.server").build(true)
-  --   end,
-  --   opts = {},
-  -- },
 }
