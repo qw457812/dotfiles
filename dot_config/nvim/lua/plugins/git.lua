@@ -230,19 +230,23 @@ return {
           function()
             if not U.keymap.clear_ui_esc() then
               actions.close()
+              vim.cmd("wincmd =")
             end
           end,
           desc = "Clear UI or Close",
         },
-        -- {
-        --   "n",
-        --   "l",
-        --   function()
-        --     actions.select_entry()
-        --     actions.close()
-        --   end,
-        --   { desc = "Open" },
-        -- },
+        {
+          "n",
+          "l",
+          function()
+            actions.select_entry()
+            if vim.g.user_is_termux then
+              actions.close()
+              vim.cmd("wincmd =")
+            end
+          end,
+          { desc = "Open" },
+        },
       })
       LazyVim.extend(opts, "keymaps.file_history_panel", {
         { "n", "q", "<cmd>DiffviewClose<CR>", { desc = "Close" } },

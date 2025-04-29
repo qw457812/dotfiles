@@ -262,7 +262,12 @@ if vim.g.user_explorer_auto_open then
       if package.loaded["neo-tree"] then
         return true -- let WinResized event to handle the rest
       end
-      if vim.g.user_explorer_auto_close or vim.bo[ev.buf].buftype ~= "" or vim.bo[ev.buf].filetype == "gitcommit" then
+      if
+        vim.g.user_explorer_auto_close
+        or vim.bo[ev.buf].buftype ~= ""
+        or vim.bo[ev.buf].filetype == "gitcommit"
+        or vim.t.user_diffview
+      then
         return
       end
       vim.schedule(function()
