@@ -79,49 +79,6 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
--- -- fix cursor position when using `git commit --verbose` with auto-fold
--- vim.api.nvim_create_autocmd("FileType", {
---   pattern = "gitcommit",
---   callback = function(ev)
---     local win = vim.fn.bufwinid(ev.buf)
---     vim.defer_fn(function()
---       if vim.api.nvim_buf_is_valid(ev.buf) and vim.api.nvim_get_current_win() == win then
---         vim.api.nvim_win_set_cursor(win, { 1, 0 })
---         -- vim.cmd("startinsert")
---         vim.cmd("normal! zR")
---       end
---     end, 50)
---   end,
--- })
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "gitcommit",
-  callback = function(ev)
-    if not vim.fn.fnamemodify(ev.file, ":t") == "COMMIT_EDITMSG" then
-      return
-    end
-    local win = vim.fn.bufwinid(ev.buf)
-    vim.schedule(function()
-      if vim.api.nvim_get_current_buf() == ev.buf and vim.api.nvim_get_current_win() == win then
-        vim.api.nvim_win_set_cursor(win, { 1, 0 })
-        vim.cmd("startinsert")
-      end
-    end)
-  end,
-})
-vim.api.nvim_create_autocmd("BufWritePost", {
-  pattern = "COMMIT_EDITMSG",
-  callback = function(ev)
-    if vim.bo[ev.buf].filetype ~= "gitcommit" then
-      return
-    end
-    if vim.g.user_close_key then
-      vim.api.nvim_feedkeys(vim.keycode(vim.g.user_close_key), "m", false)
-    else
-      vim.cmd([[quit]])
-    end
-  end,
-})
-
 -- make it easier to scroll man/help files when opened inline with `<leader>sM`, `<leader>sh`, `:h`
 vim.api.nvim_create_autocmd("FileType", {
   group = vim.api.nvim_create_augroup("pager_nomodifiable", { clear = true }),
