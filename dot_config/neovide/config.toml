@@ -8,4 +8,4 @@ size = 14.0
 
 [font.features]
 # +cv01
-"Maple Mono NF CN" = ["+cv35", "+ss06"]
+"Maple Mono NF CN" = ["+cv35", "+ss06", "+cv61", "+cv62"]
