@@ -2,18 +2,22 @@ return {
   {
     "copilotlsp-nvim/copilot-lsp",
     event = "LazyFile",
-    keys = {
-      {
-        "<tab>",
-        function()
-          local nes = require("copilot-lsp.nes")
-          local _ = nes.walk_cursor_start_edit()
-            or (nes.apply_pending_nes() and nes.walk_cursor_end_edit())
-            or vim.cmd("wincmd w")
-        end,
-        desc = "Jump/Apply Suggestion or Next Window (Copilot LSP)",
-      },
-    },
+    keys = function(_, keys)
+      local function nes_jump_or_apply()
+        local nes = require("copilot-lsp.nes")
+        return nes.walk_cursor_start_edit() or (nes.apply_pending_nes() and nes.walk_cursor_end_edit())
+      end
+
+      if vim.g.user_distinguish_ctrl_i_tab then
+        table.insert(keys, {
+          "<tab>",
+          function()
+            local _ = nes_jump_or_apply() or vim.cmd("wincmd w")
+          end,
+          desc = "Jump/Apply Suggestion or Next Window (Copilot LSP)",
+        })
+      end
+    end,
     init = function()
       vim.g.copilot_nes_debounce = 500
       vim.lsp.enable("copilot_ls")

@@ -29,6 +29,7 @@ return {
         --   "--model",
         --   "deepseek/deepseek-chat",
         -- }),
+        auto_reload = true,
         ---@module "snacks"
         ---@type snacks.win.Config
         ---@diagnostic disable-next-line: missing-fields
@@ -109,11 +110,28 @@ return {
               require("nvim_aider").api.drop_file(paths)
             end
           end,
+          nvim_aider_add_read_only = function(state)
+            local commands = require("nvim_aider.commands_slash")
+            local terminal = require("nvim_aider.terminal")
+            local node = state.tree:get_node()
+            terminal.command(commands["read-only"].value, node.path)
+          end,
+          nvim_aider_add_read_only_visual = function(_, selected_nodes)
+            local commands = require("nvim_aider.commands_slash")
+            local terminal = require("nvim_aider.terminal")
+            local paths = vim.tbl_map(function(node)
+              return node.path
+            end, selected_nodes)
+            if #paths > 0 then
+              terminal.command(commands["read-only"].value, table.concat(paths, " "))
+            end
+          end,
         },
         window = {
           mappings = {
-            ["+"] = { "nvim_aider_add", desc = "add to aider" },
+            ["="] = { "nvim_aider_add", desc = "add to aider" },
             ["-"] = { "nvim_aider_drop", desc = "drop from aider" },
+            ["+"] = { "nvim_aider_add_read_only", desc = "add as read-only to aider" },
           },
         },
       },

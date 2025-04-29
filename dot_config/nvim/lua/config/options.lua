@@ -35,6 +35,7 @@ vim.g.user_is_wezterm = not vim.g.neovide and vim.env.WEZTERM_UNIX_SOCKET ~= nil
 vim.g.user_is_kitty = not vim.g.neovide and vim.env.KITTY_PID ~= nil
 vim.g.user_is_tmux = not vim.g.neovide and vim.env.TMUX ~= nil
 vim.g.user_is_termux = vim.env.TERMUX_VERSION ~= nil
+vim.g.user_distinguish_ctrl_i_tab = vim.g.user_is_kitty or vim.g.user_is_wezterm or vim.g.neovide
 vim.g.user_transparent_background = vim.g.user_is_wezterm or vim.g.user_is_kitty
 -- TODO: Snacks.explorer
 vim.g.user_explorer_width = math.max(35, math.min(50, math.floor(vim.o.columns * 0.25)))

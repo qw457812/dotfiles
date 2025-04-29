@@ -39,6 +39,7 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [huwqchn](https://github.com/huwqchn/.dotfiles/tree/main/config/nvim)
 - [liubianshi](https://github.com/liubianshi/lazyvim)
   > Author of cmp-lsp-rimels.
+- [igorgue](https://github.com/igorgue/dotnvim)
 
 ## Awesome Neovim
 
