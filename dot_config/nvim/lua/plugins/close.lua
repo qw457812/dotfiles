@@ -582,4 +582,24 @@ return {
       )
     end,
   },
+
+  {
+    "NeogitOrg/neogit",
+    optional = true,
+    ---@module "neogit"
+    ---@type NeogitConfig
+    opts = {
+      mappings = {
+        commit_editor = {
+          [close_key] = "Close",
+        },
+        rebase_editor = {
+          [close_key] = "Close",
+        },
+        status = {
+          [close_key] = "Close",
+        },
+      },
+    },
+  },
 }
