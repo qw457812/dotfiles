@@ -86,6 +86,7 @@ return {
         {
           "<leader>gO",
           function()
+            ---@diagnostic disable-next-line: missing-fields
             Snacks.gitbrowse({ what = "permalink" })
             U.stop_visual_mode()
           end,
@@ -95,6 +96,7 @@ return {
         {
           "<leader>gY",
           function()
+            ---@diagnostic disable-next-line: missing-fields
             Snacks.gitbrowse({
               what = "permalink",
               open = function(url)
@@ -350,11 +352,13 @@ return {
           "<Leader>gc",
           function()
             open({ [1] = "commit" })
-            vim.defer_fn(function()
-              if vim.bo.filetype == "NeogitPopup" then
+            vim.api.nvim_create_autocmd("FileType", {
+              pattern = "NeogitPopup",
+              once = true,
+              callback = function()
                 vim.api.nvim_feedkeys(vim.keycode("c"), "m", false)
-              end
-            end, 100)
+              end,
+            })
           end,
           desc = "Commit (Neogit)",
         },
