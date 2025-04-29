@@ -369,6 +369,35 @@ return {
         MiniSnippets.session.stop()
       end
 
+      local augroup = vim.api.nvim_create_augroup("mini_snippets_auto_stop", { clear = true })
+      vim.api.nvim_create_autocmd("BufWritePost", {
+        group = augroup,
+        callback = function()
+          while MiniSnippets.session.get() do
+            MiniSnippets.session.stop()
+          end
+        end,
+      })
+      vim.api.nvim_create_autocmd("User", {
+        group = augroup,
+        pattern = "MiniSnippetsSessionJump",
+        callback = function(args)
+          if args.data.tabstop_to ~= "0" then
+            return
+          end
+          if #MiniSnippets.session.get(true) > 1 then
+            MiniSnippets.session.stop()
+          else
+            vim.api.nvim_create_autocmd("ModeChanged", {
+              group = augroup,
+              pattern = "*:n",
+              once = true,
+              callback = MiniSnippets.session.stop,
+            })
+          end
+        end,
+      })
+
       return U.extend_tbl(opts, {
         mappings = {
           expand = "",
