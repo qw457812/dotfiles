@@ -652,9 +652,11 @@ return {
               ["z"] = "none",
               -- https://github.com/folke/trouble.nvim/blob/254145ffd528b98eb20be894338e2d5c93fa02c2/README.md?plain=1#L184
               ["zo"] = { neotree_zo, desc = "fold_open" },
-              ["zO"] = { neotree_zO, desc = "fold_open_recursive" },
+              ["zO"] = "expand_all_subnodes",
+              -- ["zO"] = { neotree_zO, desc = "fold_open_recursive" },
               ["zc"] = { neotree_zc, desc = "fold_close" },
-              ["zC"] = { neotree_zC, desc = "fold_close_recursive" },
+              ["zC"] = "close_all_subnodes",
+              -- ["zC"] = { neotree_zC, desc = "fold_close_recursive" },
               ["za"] = { neotree_za, desc = "fold_toggle" },
               ["zA"] = { neotree_zA, desc = "fold_toggle_recursive" },
               ["zx"] = { neotree_zx, desc = "fold_update" },
