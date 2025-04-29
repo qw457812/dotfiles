@@ -7,7 +7,7 @@ return {
         vim.list_extend(keys, {
           { "<leader>gb", function() Snacks.picker.git_branches({ cwd = LazyVim.root.git() }) end, desc = "Git Branches" },
           { "<leader>gB", function() Snacks.picker.git_log_line() end, desc = "Git Blame Line" },
-          { "<leader>gc", function() Snacks.picker.git_log({ cwd = LazyVim.root.git() }) end, desc = "Git Log" },
+          -- { "<leader>gc", function() Snacks.picker.git_log({ cwd = LazyVim.root.git() }) end, desc = "Git Log" },
           { "<leader>gd", function() Snacks.picker.git_diff({ cwd = LazyVim.root.git() }) end, desc = "Git Diff (hunks)" },
           { "<leader>gs", function() Snacks.picker.git_status({ cwd = LazyVim.root.git() }) end, desc = "Git Status" },
           { "<leader>gS", function() Snacks.picker.git_stash({ cwd = LazyVim.root.git() }) end, desc = "Git Stash" },
@@ -211,9 +211,9 @@ return {
     "sindrets/diffview.nvim",
     cmd = { "DiffviewOpen", "DiffviewFileHistory" },
     keys = {
-      { "<leader>gvv", "<cmd>DiffviewOpen<CR>", desc = "Diff View" },
-      { "<leader>gvd", "<cmd>DiffviewFileHistory<CR>", desc = "Diff Repo" },
-      { "<leader>gvf", "<cmd>DiffviewFileHistory %<CR>", desc = "File History" },
+      { "<leader>gv", "<cmd>DiffviewOpen<CR>", desc = "Diff View" },
+      { "<leader>gD", "<cmd>DiffviewFileHistory<CR>", desc = "Diff Repo (Diff View)" },
+      { "<leader>gF", "<cmd>DiffviewFileHistory %<CR>", desc = "File History (Diff View)" },
     },
     ---@param opts DiffviewConfig
     opts = function(_, opts)
@@ -282,14 +282,6 @@ return {
         optional = true,
         opts = { integrations = { diffview = true } },
       },
-      {
-        "folke/which-key.nvim",
-        opts = {
-          spec = {
-            { "<Leader>gv", group = "diffview", icon = { icon = " ", color = "yellow" } },
-          },
-        },
-      },
     },
   },
 
@@ -303,15 +295,21 @@ return {
         require("neogit").open(opts)
       end
 
-      -- stylua: ignore
       return {
-        { "<Leader>gnn", open, desc = "Neogit (Root Dir)" },
-        { "<Leader>gnN", "<Cmd>Neogit<CR>", desc = "Neogit (cwd)" },
-        { "<Leader>gnc", function() open({ [1] = "commit" }) end, desc = "Commit" },
-        { "<Leader>gnp", function() open({ [1] = "pull" }) end, desc = "Pull" },
-        { "<Leader>gnP", function() open({ [1] = "push" }) end, desc = "Push" },
-        { "<Leader>gnf", function() open({ [1] = "fetch" }) end, desc = "Fetch" },
-        { "<Leader>gn<space>", function() open({ kind = "floating" }) end, desc = "Neogit Float" },
+        { "<Leader>gn", open, desc = "Neogit (Root Dir)" },
+        { "<Leader>gN", "<Cmd>Neogit<CR>", desc = "Neogit (cwd)" },
+        {
+          "<Leader>gc",
+          function()
+            open({ [1] = "commit" })
+            vim.defer_fn(function()
+              if vim.bo.filetype == "NeogitPopup" then
+                vim.api.nvim_feedkeys(vim.keycode("c"), "m", false)
+              end
+            end, 100)
+          end,
+          desc = "Commit (Neogit)",
+        },
       }
     end,
     opts = function(_, opts)
@@ -330,14 +328,6 @@ return {
       })
     end,
     specs = {
-      {
-        "folke/which-key.nvim",
-        opts = {
-          spec = {
-            { "<Leader>gn", group = "neogit", icon = { icon = "󰰔 ", color = "yellow" } },
-          },
-        },
-      },
       {
         "catppuccin",
         optional = true,
