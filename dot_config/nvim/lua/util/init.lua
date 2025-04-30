@@ -109,6 +109,13 @@ function M.too_narrow(win)
   return vim.o.columns < 120 or vim.api.nvim_win_get_width(win or 0) < 120
 end
 
+-- snacks bigfile
+---@param buf? integer
+function M.is_bigfile(buf)
+  buf = buf or 0
+  return vim.bo[buf].filetype == "bigfile" or vim.b[buf].bigfile
+end
+
 -- see: https://github.com/folke/edgy.nvim/blob/e94e851f9dc296c2949d4c524b1be7de2340306e/lua/edgy/editor.lua#L80-L109
 ---@param win? integer
 ---@return boolean

@@ -90,6 +90,14 @@ return {
     },
   },
   {
+    "folke/which-key.nvim",
+    opts = {
+      spec = {
+        { "<leader>ao", group = "codecompanion" },
+      },
+    },
+  },
+  {
     "olimorris/codecompanion.nvim",
     optional = true,
     opts = function()
