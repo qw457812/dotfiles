@@ -104,7 +104,7 @@ return {
             local foundURL = vim.fn.mode() == "v"
             if foundURL then
               local url = U.get_visual_selection()
-              vim.ui.open(url)
+              U.open_in_browser(url)
               return
             end
 
@@ -124,7 +124,7 @@ return {
             -- select one
             vim.ui.select(urls, { prompt = "Select URL:" }, function(choice)
               if choice then
-                vim.ui.open(choice)
+                U.open_in_browser(choice)
               end
             end)
           end,

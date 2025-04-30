@@ -38,20 +38,11 @@ return {
         end
         local url = require("csgithub").search(args)
         -- https://github.com/thenbe/csgithub.nvim/blob/9df37440ba1bbf95f0a328819090353654ca4f55/lua/csgithub/init.lua#L26-L29
-        if not url or url == "" then
+        if url and url ~= "" then
+          U.open_in_browser(url)
+        else
           LazyVim.error("URL is empty!", { title = "Csgithub" })
-          return
         end
-        -- https://www.reddit.com/r/termux/comments/gsafc0/comment/fs44i6b/
-        vim.ui.open(url, vim.g.user_is_termux and {
-          cmd = {
-            "am",
-            "start",
-            "-n",
-            "com.kiwibrowser.browser/com.google.android.apps.chrome.Main",
-            "-d",
-          },
-        } or nil)
       end
 
       return {

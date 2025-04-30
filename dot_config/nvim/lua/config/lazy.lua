@@ -72,7 +72,7 @@ require("lazy").setup({
       },
       ["gx"] = {
         function(plugin)
-          vim.ui.open(plugin.url:gsub("%.git$", ""))
+          U.open_in_browser(plugin.url:gsub("%.git$", ""))
         end,
         desc = "Plugin Repo",
       },
@@ -83,9 +83,9 @@ require("lazy").setup({
           local issue = line:match("#(%d+)")
           local commit = line:match("%f[%w](" .. string.rep("[a-f0-9]", 7) .. ")%f[%W]")
           if issue then
-            vim.ui.open(url .. "/issues/" .. issue)
+            U.open_in_browser(url .. "/issues/" .. issue)
           elseif commit then
-            vim.ui.open(url .. "/commit/" .. commit)
+            U.open_in_browser(url .. "/commit/" .. commit)
           end
         end,
         desc = "Open Issue / Commit",
