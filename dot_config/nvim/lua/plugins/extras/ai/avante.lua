@@ -1,5 +1,7 @@
 local mapping_disabled_prefix = "<leader>av<localleader>"
 
+local avante_ft = { "Avante", "AvanteInput", "AvanteSelectedFiles" }
+
 -- https://github.com/yetone/avante.nvim/wiki/Recipe-and-Tricks
 ---@type table<string, string|fun():string>
 local prompt = {
@@ -171,11 +173,12 @@ return {
         { mapping_disabled_prefix, "", desc = "+disabled" },
         { opts_mappings.ask or "<leader>aa", ask(), desc = "Ask (Avante)", mode = { "n", "v" } },
         { opts_mappings.edit or "<leader>ae", function() require("avante.api").edit() end, desc = "Edit (Avante)", mode = "v" },
-        { opts_mappings.refresh or "<leader>ar", function() require("avante.api").refresh() end, desc = "Refresh (Avante)" },
-        { opts_mappings.focus or "<leader>af", function() require("avante.api").focus() end, desc = "Focus (Avante)" },
-        { opts_mappings.select_model or "<leader>a?", function() require("avante.api").select_model() end, desc = "Switch Model (Avante)" },
         { opts_mappings.select_history or "<leader>ah", function() require("avante.api").select_history() end, desc = "Pick History (Avante)" },
-        { "<leader>aP", switch_provider, desc = "Switch Provider (Avante)" },
+        { "<localleader>s", function() require("avante.api").stop() end, desc = "Stop", ft = avante_ft },
+        { "<localleader>r", function() require("avante.api").refresh() end, desc = "Refresh", ft = avante_ft },
+        { "<localleader>m", function() require("avante.api").select_model() end, desc = "Switch Model", ft = avante_ft },
+        { "<localleader>c", "<cmd>AvanteClear<cr>", desc = "Clear", ft = avante_ft },
+        { "<localleader>p", switch_provider, desc = "Switch Provider", ft = avante_ft },
         { "<leader>av", "", desc = "+avante", mode = { "n", "v" } },
         { "<leader>avg", ask(prompt.grammar_correction),         desc = "Grammar Correction (Ask)",        mode = { "n", "v" } },
         { "<leader>avG", edit_submit(prompt.grammar_correction), desc = "Grammar Correction (Edit)",       mode = "v" },
@@ -201,7 +204,8 @@ return {
       mappings = {
         refresh = mapping_disabled_prefix .. "r",
         focus = mapping_disabled_prefix .. "f",
-        stop = "<leader>as",
+        select_model = mapping_disabled_prefix .. "m",
+        stop = mapping_disabled_prefix .. "s",
         toggle = {
           default = mapping_disabled_prefix .. "t",
           debug = mapping_disabled_prefix .. "d",
@@ -308,6 +312,7 @@ return {
       },
       selector = {
         provider = ({ snacks = "snacks", fzf = "fzf_lua" })[LazyVim.pick.picker.name],
+        exclude_auto_select = { "neo-tree" },
       },
       hints = { enabled = false },
     },
@@ -328,7 +333,7 @@ return {
       local augroup = vim.api.nvim_create_augroup("avante_keymaps", { clear = true })
       vim.api.nvim_create_autocmd("FileType", {
         group = augroup,
-        pattern = { "Avante", "AvanteInput", "AvanteSelectedFiles" },
+        pattern = avante_ft,
         callback = function(ev)
           local buf = ev.buf
           local is_input = vim.bo[buf].filetype == "AvanteInput"

@@ -108,6 +108,10 @@ return {
               return
             end
 
+            if U.is_bigfile() then
+              return
+            end
+
             -- find all URLs in buffer
             local urlPatterns = require("various-textobjs.config.config").config.textobjs.url.patterns
             local bufText = table.concat(vim.api.nvim_buf_get_lines(0, 0, -1, false), "\n")

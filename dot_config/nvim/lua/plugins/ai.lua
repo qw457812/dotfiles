@@ -133,10 +133,14 @@ return {
         ft = U.markdown.render_markdown_ft("copilot-chat"),
       },
     },
+    -- stylua: ignore
     keys = {
       { "<leader>aa", mode = { "n", "v" }, false },
-      -- stylua: ignore
+      { "<leader>ax", mode = { "n", "v" }, false },
       { "<leader>ac", mode = { "n", "v" }, function() require("CopilotChat").open() end, desc = "Open (CopilotChat)" },
+      { "<localleader>c", mode = { "n", "v" }, function() require("CopilotChat").reset() end, desc = "Clear", ft = "copilot-chat" },
+      { "<localleader>m", "<cmd>CopilotChatModels<cr>", desc = "Switch Model", ft = "copilot-chat" },
+      { "<localleader>s", "<cmd>CopilotChatStop<cr>", desc = "Stop", ft = "copilot-chat" },
     },
     opts = function(_, opts)
       vim.api.nvim_create_autocmd("FileType", {

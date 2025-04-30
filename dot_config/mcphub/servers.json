@@ -1,4 +1,5 @@
 {
+  "nativeMCPServers": [],
   "mcpServers": {
     "fetch": {
       "command": "uvx",
@@ -9,16 +10,9 @@
         "DEBUG": "true"
       }
     },
-    "memory": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-memory"],
-      "env": {
-        "MEMORY_FILE_PATH": "~/.mcphub/servers/memory/memory.json"
-      }
-    },
     "sequentialthinking": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "command": "npx"
     }
   }
 }

@@ -87,21 +87,17 @@ return {
           end
         end
 
-        -- snacks bigfile: lsp -> indent
-        local function is_bigfile(buf)
-          return vim.bo[buf].filetype == "bigfile" or vim.b[buf].bigfile
-        end
-
         return require("ufo")
           .getFolds(bufnr, "lsp")
           :catch(function(err)
-            return is_bigfile(bufnr) and require("promise").reject(err) or handleFallbackException(err, "treesitter")
+            -- snacks bigfile: lsp -> indent
+            return U.is_bigfile(bufnr) and require("promise").reject(err) or handleFallbackException(err, "treesitter")
           end)
           :catch(function(err)
             return handleFallbackException(err, "indent")
           end)
           :thenCall(function(res)
-            if is_bigfile(bufnr) then
+            if U.is_bigfile(bufnr) then
               return res
             end
             -- alternative: require("ufo").getFolds(bufnr, "marker")
