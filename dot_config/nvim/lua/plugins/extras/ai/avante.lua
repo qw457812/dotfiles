@@ -232,7 +232,7 @@ return {
         enable_token_counting = false,
       },
       provider = "copilot_claude", -- only recommend using claude
-      auto_suggestions_provider = "ollama", -- high-frequency, can be expensive if enabled
+      -- auto_suggestions_provider = "ollama", -- high-frequency, can be expensive if enabled
       memory_summary_provider = "copilot_gpt_4o_mini",
       ---@type AvanteSupportedProvider
       copilot = {
@@ -241,7 +241,16 @@ return {
       ---@type AvanteSupportedProvider
       ollama = {
         model = "llama3.2",
+        hide_in_model_selector = true,
       },
+      openai = { hide_in_model_selector = true },
+      azure = { hide_in_model_selector = true },
+      claude = { hide_in_model_selector = true },
+      bedrock = { hide_in_model_selector = true },
+      gemini = { hide_in_model_selector = true },
+      vertex = { hide_in_model_selector = true },
+      cohere = { hide_in_model_selector = true },
+      vertex_claude = { hide_in_model_selector = true },
       -- https://github.com/yetone/cosmos-nvim/blob/64ffc3f90f33eb4049f1495ba49f086280dc8a1c/lua/layers/completion/plugins.lua#L249
       ---@type table<string, AvanteSupportedProvider>
       vendors = {
@@ -259,20 +268,20 @@ return {
         },
         copilot_gemini = {
           __inherited_from = "copilot",
-          model = "gemini-2.0-flash-001",
+          model = "gemini-2.5-pro",
         },
         copilot_gpt_4o_mini = {
           __inherited_from = "copilot",
           model = "gpt-4o-mini",
         },
-        deepseek = {
-          __inherited_from = "openai",
-          api_key_name = "DEEPSEEK_API_KEY",
-          endpoint = "https://api.deepseek.com",
-          -- curl -L -X GET "https://api.deepseek.com/models" -H "Accept: application/json" -H "Authorization: Bearer $DEEPSEEK_API_KEY" | jq .
-          model = "deepseek-reasoner",
-          disable_tools = true,
-        },
+        -- deepseek = {
+        --   __inherited_from = "openai",
+        --   api_key_name = "DEEPSEEK_API_KEY",
+        --   endpoint = "https://api.deepseek.com",
+        --   -- curl -L -X GET "https://api.deepseek.com/models" -H "Accept: application/json" -H "Authorization: Bearer $DEEPSEEK_API_KEY" | jq .
+        --   model = "deepseek-reasoner",
+        --   disable_tools = true,
+        -- },
         groq = {
           __inherited_from = "openai",
           api_key_name = "GROQ_API_KEY",
@@ -294,6 +303,12 @@ return {
           api_key_name = "OPENROUTER_API_KEY",
           model = "google/gemini-2.5-pro-preview-03-25",
         },
+        ["claude-haiku"] = { hide_in_model_selector = true },
+        ["claude-opus"] = { hide_in_model_selector = true },
+        ["openai-gpt-4o-mini"] = { hide_in_model_selector = true },
+        aihubmix = { hide_in_model_selector = true },
+        ["aihubmix-claude"] = { hide_in_model_selector = true },
+        ["bedrock-claude-3.7-sonnet"] = { hide_in_model_selector = true },
       },
       rag_service = {
         -- enabled = vim.fn.executable("docker") == 1 and vim.fn.executable("ollama") == 1,
