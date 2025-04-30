@@ -156,6 +156,20 @@ function M.get_visual_selection(stop_visual_mode)
   return selection
 end
 
+---@param url string
+function M.open_in_browser(url)
+  -- https://www.reddit.com/r/termux/comments/gsafc0/comment/fs44i6b/
+  vim.ui.open(url, vim.g.user_is_termux and {
+    cmd = {
+      "am",
+      "start",
+      "-n",
+      "com.kiwibrowser.browser/com.google.android.apps.chrome.Main",
+      "-d",
+    },
+  } or nil)
+end
+
 --- Merge extended options with a default table of options
 --- copied from: https://github.com/AstroNvim/astrocore/blob/d687e4b66b93783dfdafee1e64d363b7706056ff/lua/astrocore/init.lua#L25
 ---@param default? table The default table that you want to merge into
