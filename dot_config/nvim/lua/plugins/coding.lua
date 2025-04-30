@@ -108,10 +108,26 @@ return {
               return
             end
 
+            -- short url of lazy plugin
+            if vim.bo.filetype == "lua" then
+              local path = vim.fn.expand("%:p")
+              if
+                vim.fn.fnamemodify(path, ":t") == ".lazy.lua"
+                or path:match("^" .. vim.pesc(U.path.CONFIG) .. "/lua/plugins/")
+                or (U.path.CHEZMOI and path:match("^" .. vim.pesc(vim.fn.stdpath("config")) .. "/lua/plugins/"))
+                or path:match("^" .. vim.pesc(U.path.LAZYVIM) .. "/lua/lazyvim/plugins/")
+              then
+                local lazyPlugin = vim.api.nvim_get_current_line():match("['\"]([%w%-%.]+/[%w%-%.]+)['\"]")
+                if lazyPlugin then
+                  U.open_in_browser(("https://github.com/%s.git"):format(lazyPlugin))
+                  return
+                end
+              end
+            end
+
             if U.is_bigfile() then
               return
             end
-
             -- find all URLs in buffer
             local urlPatterns = require("various-textobjs.config.config").config.textobjs.url.patterns
             local bufText = table.concat(vim.api.nvim_buf_get_lines(0, 0, -1, false), "\n")
@@ -124,7 +140,6 @@ return {
             if #urls == 0 then
               return
             end
-
             -- select one
             vim.ui.select(urls, { prompt = "Select URL:" }, function(choice)
               if choice then
