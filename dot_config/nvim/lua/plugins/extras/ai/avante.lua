@@ -223,15 +223,12 @@ return {
       },
       behaviour = {
         -- auto_suggestions = true, -- experimental
-        -- enable_cursor_planning_mode = true,
         -- auto_apply_diff_after_generation = true,
         -- auto_focus_on_diff_view = true,
         enable_token_counting = false,
-        enable_claude_text_editor_tool_mode = true,
       },
       provider = "copilot_claude", -- only recommend using claude
       auto_suggestions_provider = "ollama", -- high-frequency, can be expensive if enabled
-      cursor_applying_provider = "groq",
       memory_summary_provider = "copilot_gpt_4o_mini",
       ---@type AvanteSupportedProvider
       copilot = {

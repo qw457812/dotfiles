@@ -8,7 +8,7 @@ return {
         return nes.walk_cursor_start_edit() or (nes.apply_pending_nes() and nes.walk_cursor_end_edit())
       end
 
-      if vim.g.user_distinguish_ctrl_i_tab then
+      if vim.g.user_distinguish_ctrl_i_tab or vim.g.user_is_termux then
         table.insert(keys, {
           "<tab>",
           function()

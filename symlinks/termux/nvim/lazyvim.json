@@ -32,6 +32,7 @@
     "lazyvim.plugins.extras.util.mini-hipatterns",
     "plugins.extras.ai.avante",
     "plugins.extras.ai.codecompanion",
+    "plugins.extras.ai.copilot-lsp",
     "plugins.extras.editor.mini-operators",
     "plugins.extras.game.exercism",
     "plugins.extras.lsp.mason-lock",
@@ -46,7 +47,7 @@
   "install_version": 7,
   "news": {
     "NEWS.md": "10960",
-    "doc/news.txt": "24170"
+    "doc/news.txt": "24326"
   },
   "version": 8
 }

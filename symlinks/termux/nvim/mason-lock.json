@@ -1,5 +1,6 @@
 {
   "bash-language-server": "5.4.3",
+  "copilot-language-server": "1.310.0",
   "debugpy": "1.8.14",
   "dockerfile-language-server": "0.13.0",
   "eslint-lsp": "4.10.0",
