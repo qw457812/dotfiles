@@ -46,7 +46,11 @@ local function close_buffer_or_window_or_exit()
   if U.is_floating_win() then
     vim.cmd("close") -- Close Window (Cannot close last window)
   elseif #listed_buffers() > (vim.bo.buflisted and 1 or 0) then
-    if non_real_file() or is_winfixbuf() then
+    if
+      non_real_file()
+      or is_winfixbuf()
+      or (#vim.api.nvim_list_tabpages() > 1 and #vim.api.nvim_tabpage_list_wins(0) == 1)
+    then
       vim.cmd("bd") -- Delete Buffer and Window
     else
       Snacks.bufdelete() -- Delete Buffer
