@@ -1,6 +1,7 @@
 return {
   {
     "copilotlsp-nvim/copilot-lsp",
+    shell_command_editor = true,
     event = "LazyFile",
     keys = function(_, keys)
       local function nes_jump_or_apply()
@@ -23,7 +24,7 @@ return {
       vim.lsp.enable("copilot_ls")
     end,
     specs = {
-      { "zbirenbaum/copilot.lua", optional = true, enabled = false },
+      { "zbirenbaum/copilot.lua", optional = true, enabled = false, cond = false },
       {
         "williamboman/mason.nvim",
         opts = { ensure_installed = { "copilot-language-server" } },
