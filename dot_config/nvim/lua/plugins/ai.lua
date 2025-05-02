@@ -137,7 +137,7 @@ return {
     keys = {
       { "<leader>aa", mode = { "n", "v" }, false },
       { "<leader>ax", mode = { "n", "v" }, false },
-      { "<leader>ac", mode = { "n", "v" }, function() require("CopilotChat").open() end, desc = "Open (CopilotChat)" },
+      { "<leader>ac", mode = { "n", "v" }, function() require("CopilotChat").open() end, desc = "CopilotChat" },
       { "<localleader>c", mode = { "n", "v" }, function() require("CopilotChat").reset() end, desc = "Clear", ft = "copilot-chat" },
       { "<localleader>m", "<cmd>CopilotChatModels<cr>", desc = "Switch Model", ft = "copilot-chat" },
       { "<localleader>s", "<cmd>CopilotChatStop<cr>", desc = "Stop", ft = "copilot-chat" },

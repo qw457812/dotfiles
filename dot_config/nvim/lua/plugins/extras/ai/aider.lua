@@ -11,14 +11,14 @@ return {
     cmd = "Aider",
     keys = {
       { toggle_key, "<cmd>Aider toggle<cr>", desc = "Open (Aider)" },
-      { "<leader>as", "<cmd>Aider send<cr>", desc = "Send (Aider)", mode = { "n", "v" } },
-      { "<leader>a/", "<cmd>Aider command<cr>", desc = "Commands (Aider)" },
-      { "<leader>ab", "<cmd>Aider buffer<cr>", desc = "Send Buffer (Aider)" },
-      { "<leader>ad", "<cmd>Aider buffer diagnostics<cr>", desc = "Send Buffer Diagnostics (Aider)" },
       { "<leader>a=", "<cmd>Aider add<cr>", desc = "Add File (Aider)" },
       { "<leader>a-", "<cmd>Aider drop<cr>", desc = "Drop File (Aider)" },
       { "<leader>a+", "<cmd>Aider add readonly<cr>", desc = "Add Read-Only File (Aider)" },
-      { "<leader>aR", "<cmd>Aider reset<cr>", desc = "Reset (Aider)" },
+      { "<leader>aii", "<cmd>Aider send<cr>", desc = "Send", mode = { "n", "v" } },
+      { "<leader>ai/", "<cmd>Aider command<cr>", desc = "Commands" },
+      { "<leader>aib", "<cmd>Aider buffer<cr>", desc = "Send Buffer" },
+      { "<leader>aid", "<cmd>Aider buffer diagnostics<cr>", desc = "Send Buffer Diagnostics" },
+      { "<leader>air", "<cmd>Aider reset<cr>", desc = "Reset" },
     },
     opts = function()
       -- local defaults = require("nvim_aider.config").defaults
@@ -76,6 +76,14 @@ return {
         },
       }
     end,
+  },
+  {
+    "folke/which-key.nvim",
+    opts = {
+      spec = {
+        { "<leader>ai", group = "aider" },
+      },
+    },
   },
 
   {
