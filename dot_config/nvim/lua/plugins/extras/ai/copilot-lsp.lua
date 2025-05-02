@@ -28,6 +28,35 @@ return {
         "williamboman/mason.nvim",
         opts = { ensure_installed = { "copilot-language-server" } },
       },
+      {
+        "saghen/blink.cmp",
+        optional = true,
+        dependencies = {
+          "fang2hou/blink-copilot",
+          opts = function()
+            U.toggle.ai_cmps.blink_copilot = Snacks.toggle({
+              name = "Blink Copilot",
+              get = function()
+                return vim.g.user_blink_copilot ~= false
+              end,
+              set = function(state)
+                vim.g.user_blink_copilot = state
+              end,
+            })
+          end,
+        },
+        opts = {
+          sources = {
+            providers = {
+              copilot = {
+                enabled = function()
+                  return vim.g.user_blink_copilot ~= false
+                end,
+              },
+            },
+          },
+        },
+      },
     },
   },
 

@@ -171,7 +171,7 @@ return {
       -- stylua: ignore
       local mappings = {
         { mapping_disabled_prefix, "", desc = "+disabled" },
-        { opts_mappings.ask or "<leader>aa", ask(), desc = "Ask (Avante)", mode = { "n", "v" } },
+        { opts_mappings.ask or "<leader>aa", ask(), desc = "Avante", mode = { "n", "v" } },
         { opts_mappings.edit or "<leader>ae", function() require("avante.api").edit() end, desc = "Edit (Avante)", mode = "v" },
         { opts_mappings.select_history or "<leader>ah", function() require("avante.api").select_history() end, desc = "Pick History (Avante)" },
         { "<localleader>s", function() require("avante.api").stop() end, desc = "Stop", ft = avante_ft },

@@ -516,6 +516,7 @@ return {
   },
   {
     "stevearc/dressing.nvim",
+    lazy = true,
     optional = true,
     opts = function(_, opts)
       -- we have snacks input
