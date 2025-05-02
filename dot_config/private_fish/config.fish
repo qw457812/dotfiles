@@ -221,6 +221,7 @@ if set -q TERMUX_VERSION
     set ll_cmd 'eza --all --color=always --color-scale all --icons=always --long --time-style=iso --git --no-user'
     alias l "$ll_cmd --group-directories-first"
     alias lm "$ll_cmd --sort=modified --classify"
+    abbr -a --position anywhere --set-cursor ghh 'git help % | eval $MANPAGER'
     abbr dl 'cd ~/storage/downloads'
     abbr rime 'cd ~/storage/shared/Android/rime'
 
