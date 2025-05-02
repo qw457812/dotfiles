@@ -27,7 +27,7 @@ local enabled = {
   "friendly-snippets",
   "mini.snippets",
   "copilot.lua",
-  "blink-copilot",
+  "blink-cmp-copilot",
   "plenary.nvim", -- for blink.cmp
   "conform.nvim",
   "nvim-lint",

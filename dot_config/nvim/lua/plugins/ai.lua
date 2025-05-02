@@ -29,11 +29,11 @@ return {
       })
     end,
   },
-  { "giuxtaposition/blink-cmp-copilot", optional = true, enabled = false },
+  { "giuxtaposition/blink-cmp-copilot", optional = true, enabled = false, cond = false },
   {
     "saghen/blink.cmp",
     optional = true,
-    dependencies = { "fang2hou/blink-copilot" },
+    dependencies = { "fang2hou/blink-copilot", shell_command_editor = true },
     opts = {
       sources = {
         providers = {
