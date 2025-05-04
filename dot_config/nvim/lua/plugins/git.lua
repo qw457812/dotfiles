@@ -111,25 +111,6 @@ return {
           desc = "Git Browse (copy)",
         },
       })
-
-      if vim.fn.executable("lazygit") == 1 then
-        ---@param opts? snacks.lazygit.Config
-        local function lazygit(opts)
-          if vim.o.shell:find("fish") then
-            -- add `$SHELL` env to fix `e` in lazygit, see: https://github.com/jesseduffield/lazygit/issues/4153#issuecomment-2574856055
-            opts = vim.tbl_deep_extend("force", { env = { SHELL = vim.fn.exepath("bash") } }, opts or {})
-          end
-          ---@diagnostic disable-next-line: missing-fields
-          Snacks.lazygit(opts)
-        end
-
-        -- stylua: ignore
-        vim.list_extend(keys, {
-          ---@diagnostic disable-next-line: missing-fields
-          { "<leader>gg", function() lazygit({ cwd = LazyVim.root.git() }) end, desc = "Lazygit (Root Dir)" },
-          { "<leader>gG", lazygit, desc = "Lazygit (cwd)" },
-        })
-      end
     end,
     ---@module "snacks"
     ---@type snacks.Config

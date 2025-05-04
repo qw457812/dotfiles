@@ -90,8 +90,7 @@ abbr tk 'tmux kill-session -t'
 
 # Git
 abbr g git
-# add `SHELL=(which bash)` to fix `e` in lazygit, see: https://github.com/jesseduffield/lazygit/issues/4153#issuecomment-2574856055
-alias lazygit "SHELL=(which bash) TERM=xterm-256color command lazygit"
+alias lazygit "TERM=xterm-256color command lazygit"
 alias glab "env -u https_proxy -u http_proxy -u all_proxy command glab"
 abbr gg lazygit
 abbr gl 'git l --color'
