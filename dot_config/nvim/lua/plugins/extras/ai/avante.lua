@@ -233,7 +233,6 @@ return {
       },
       provider = "copilot_claude", -- only recommend using claude
       -- auto_suggestions_provider = "ollama", -- high-frequency, can be expensive if enabled
-      memory_summary_provider = "copilot_gpt_4o_mini",
       ---@type AvanteSupportedProvider
       copilot = {
         model = "gpt-4o",
