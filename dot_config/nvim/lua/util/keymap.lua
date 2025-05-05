@@ -107,48 +107,48 @@ function M.put_empty_line(put_above)
 end
 
 -- copied from: https://github.com/chrisgrieser/.config/blob/9bc8b38e0e9282b6f55d0b6335f98e2bf9510a7c/nvim/lua/personal-plugins/misc.lua#L109
-function M.smartDuplicate()
+function M.smart_duplicate_line()
   local count1 = vim.v.count1
-
   local row, col = unpack(vim.api.nvim_win_get_cursor(0))
   local line = vim.api.nvim_get_current_line()
 
-  -- FILETYPE-SPECIFIC TWEAKS
-  if vim.bo.ft == "css" then
-    local newLine = line
+  -- filetype-specific tweaks
+  local ft = vim.bo.filetype
+  if ft == "css" then
+    local new_line = line
     if line:find("top:") then
-      newLine = line:gsub("top:", "bottom:")
+      new_line = line:gsub("top:", "bottom:")
     end
     if line:find("bottom:") then
-      newLine = line:gsub("bottom:", "top:")
+      new_line = line:gsub("bottom:", "top:")
     end
     if line:find("right:") then
-      newLine = line:gsub("right:", "left:")
+      new_line = line:gsub("right:", "left:")
     end
     if line:find("left:") then
-      newLine = line:gsub("left:", "right:")
+      new_line = line:gsub("left:", "right:")
     end
-    line = newLine
-  elseif vim.bo.ft == "javascript" or vim.bo.ft == "typescript" then
+    line = new_line
+  elseif ft == "javascript" or ft == "typescript" then
     line = line:gsub("^(%s*)if(.+{)$", "%1} else if%2")
-  elseif vim.bo.ft == "lua" then
+  elseif ft == "lua" then
     line = line:gsub("^(%s*)if( .* then)$", "%1elseif%2")
-  elseif vim.bo.ft == "zsh" or vim.bo.ft == "bash" then
+  elseif ft == "zsh" or ft == "bash" then
     line = line:gsub("^(%s*)if( .* then)$", "%1elif%2")
-  elseif vim.bo.ft == "python" then
+  elseif ft == "python" then
     line = line:gsub("^(%s*)if( .*:)$", "%1elif%2")
   end
 
-  -- INSERT DUPLICATED LINE
+  -- insert duplicated line
   for _ = 1, count1 do
     vim.api.nvim_buf_set_lines(0, row, row, false, { line })
   end
 
-  -- MOVE CURSOR DOWN, AND TO VALUE/FIELD (IF EXISTS)
-  local _, luadocFieldPos = line:find("%-%-%-@%w+ ")
-  local _, valuePos = line:find("[:=][:=]? ")
-  local targetCol = luadocFieldPos or valuePos or col
-  vim.api.nvim_win_set_cursor(0, { row + count1, targetCol })
+  -- move cursor down, and to value/field (if exists)
+  local _, luadoc_field_pos = line:find("%-%-%-@%w+ ")
+  local _, value_pos = line:find("[:=][:=]? ")
+  local target_col = luadoc_field_pos or value_pos or col
+  vim.api.nvim_win_set_cursor(0, { row + count1, target_col })
 end
 
 -- alternate: vim.cmd("noautocmd write")

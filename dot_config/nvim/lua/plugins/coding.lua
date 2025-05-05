@@ -104,8 +104,8 @@ return {
           "gx",
           function()
             require("various-textobjs").url()
-            local foundURL = vim.fn.mode() == "v"
-            if foundURL then
+            local found_url = vim.fn.mode() == "v"
+            if found_url then
               local url = U.get_visual_selection()
               U.open_in_browser(url)
               return
@@ -120,9 +120,9 @@ return {
                 or (U.path.CHEZMOI and path:match("^" .. vim.pesc(vim.fn.stdpath("config")) .. "/lua/plugins/"))
                 or path:match("^" .. vim.pesc(U.path.LAZYVIM) .. "/lua/lazyvim/plugins/")
               then
-                local lazyPlugin = vim.api.nvim_get_current_line():match("['\"]([%w%-%.]+/[%w%-%.]+)['\"]")
-                if lazyPlugin then
-                  U.open_in_browser(("https://github.com/%s.git"):format(lazyPlugin))
+                local lazy_plugin = vim.api.nvim_get_current_line():match("['\"]([%w%-%.]+/[%w%-%.]+)['\"]")
+                if lazy_plugin then
+                  U.open_in_browser(("https://github.com/%s.git"):format(lazy_plugin))
                   return
                 end
               end
@@ -132,11 +132,11 @@ return {
               return
             end
             -- find all URLs in buffer
-            local urlPatterns = require("various-textobjs.config.config").config.textobjs.url.patterns
-            local bufText = table.concat(vim.api.nvim_buf_get_lines(0, 0, -1, false), "\n")
+            local url_patterns = require("various-textobjs.config.config").config.textobjs.url.patterns
+            local buf_text = table.concat(vim.api.nvim_buf_get_lines(0, 0, -1, false), "\n")
             local urls = {}
-            for _, urlPattern in ipairs(urlPatterns) do
-              for url in bufText:gmatch(urlPattern) do
+            for _, url_pattern in ipairs(url_patterns) do
+              for url in buf_text:gmatch(url_pattern) do
                 table.insert(urls, url)
               end
             end
@@ -158,18 +158,18 @@ return {
             -- select outer indentation
             require("various-textobjs").indentation("outer", "outer")
             -- plugin only switches to visual mode when a textobj has been found
-            local indentationFound = vim.fn.mode():find("V")
-            if not indentationFound then
+            local indentation_found = vim.fn.mode():find("V")
+            if not indentation_found then
               return
             end
 
             -- dedent indentation
             vim.cmd.normal({ "<", bang = true })
             -- delete surrounding lines
-            local endBorderLn = vim.api.nvim_buf_get_mark(0, ">")[1]
-            local startBorderLn = vim.api.nvim_buf_get_mark(0, "<")[1]
-            vim.cmd(tostring(endBorderLn) .. " delete") -- delete end first so line index is not shifted
-            vim.cmd(tostring(startBorderLn) .. " delete")
+            local end_border_ln = vim.api.nvim_buf_get_mark(0, ">")[1]
+            local start_border_ln = vim.api.nvim_buf_get_mark(0, "<")[1]
+            vim.cmd(tostring(end_border_ln) .. " delete") -- delete end first so line index is not shifted
+            vim.cmd(tostring(start_border_ln) .. " delete")
           end,
           desc = "Delete Surrounding Indentation",
         },
