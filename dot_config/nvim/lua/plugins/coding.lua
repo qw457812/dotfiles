@@ -5,6 +5,9 @@ return {
     opts = {
       mappings = {
         ["`"] = { neigh_pattern = "[^\\`]." }, -- better deal with markdown code blocks in non-markdown files
+        -- TODO:
+        -- https://www.reddit.com/r/neovim/comments/1kbz9jf/comment/mpzjc7k/
+        -- https://github.com/echasnovski/mini.pairs/blob/69864a2efb36c030877421634487fd90db1e4298/lua/mini/pairs.lua#L57-L76
         ["<"] = { action = "open", pair = "<>", neigh_pattern = "[^\\].", register = { cr = false } },
         [">"] = { action = "close", pair = "<>", neigh_pattern = "[^\\].", register = { cr = false } },
       },
