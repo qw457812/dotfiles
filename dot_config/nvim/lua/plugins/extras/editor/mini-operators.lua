@@ -25,7 +25,7 @@ return {
       {
         "sdd",
         function()
-          vim.o.operatorfunc = "v:lua.require'util.keymap'.smartDuplicate"
+          vim.o.operatorfunc = "v:lua.require'util.keymap'.smart_duplicate_line"
           return "g@l"
         end,
         expr = true,
