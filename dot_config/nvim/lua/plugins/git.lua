@@ -357,6 +357,7 @@ return {
           -- diffview = LazyVim.has("diffview.nvim"),
           telescope = LazyVim.pick.picker.name == "telescope",
           fzf_lua = LazyVim.pick.picker.name == "fzf",
+          snacks = LazyVim.pick.picker.name == "snacks",
         },
       })
     end,
