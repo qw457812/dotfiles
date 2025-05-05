@@ -407,7 +407,16 @@ return {
     keys = function(_, keys)
       -- stylua: ignore
       vim.list_extend(keys, {
-        { "u", function() require("undo-glow").undo() end, desc = "Undo (undo-glow)" },
+        {
+          "u",
+          function()
+            require("undo-glow").undo()
+            if _G.MiniSnippets then
+              MiniSnippets.session.stop()
+            end
+          end,
+          desc = "Undo (undo-glow)",
+        },
         { "<C-r>", function() require("undo-glow").redo() end, desc = "Redo (undo-glow)" },
         { "U", "<C-r>", desc = "Redo (undo-glow)", remap = true },
         {
