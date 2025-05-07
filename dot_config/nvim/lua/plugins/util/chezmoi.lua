@@ -114,7 +114,7 @@ function H.pick_config()
         -- pick them all and edit with or without chezmoi
         actions.select_default:replace_if(function()
           local selection = action_state.get_selected_entry()
-          return selection and vim.tbl_contains(managed_config_files, config_dir .. "/" .. selection.value)
+          return selection and vim.list_contains(managed_config_files, config_dir .. "/" .. selection.value)
         end, edit_action)
         return true
       end,
@@ -134,7 +134,7 @@ function H.pick_config()
           -- if not path.is_absolute(file) then
           --   file = path.join({ opts.cwd or opts._cwd or vim.uv.cwd(), file })
           -- end
-          if vim.tbl_contains(managed_config_files, file) then
+          if vim.list_contains(managed_config_files, file) then
             chezmoi.edit({ targets = file })
           else
             require("fzf-lua.actions").file_edit(selected, opts)
@@ -153,7 +153,7 @@ function H.pick_config()
         picker:close()
         if item then
           local file = assert(Snacks.picker.util.path(item))
-          if vim.tbl_contains(managed_config_files, file) then
+          if vim.list_contains(managed_config_files, file) then
             require("chezmoi.commands").edit({ targets = file })
           else
             vim.cmd.edit(file)
@@ -164,29 +164,69 @@ function H.pick_config()
   end
 end
 
--- https://github.com/dsully/nvim/blob/a6a7a29707e5209c6bf14be0f178d3cd1141b5ff/lua/plugins/util.lua#L104
+---@type string[]
+H.xdg_config_ignore = {}
+
 -- https://github.com/amuuname/dotfiles/blob/462579dbf4e9452a22cc268a3cb244172d9142aa/dot_config/nvim/plugin/autocmd.lua#L52
 function H.autocmd_chezmoi_add()
   local managed_files = H.chezmoi_list_files({ path_style_absolute = true })
-  if vim.tbl_isempty(managed_files) then
-    return
+
+  local re_add_augroup = vim.api.nvim_create_augroup("chezmoi_re_add", { clear = true })
+  if not vim.tbl_isempty(managed_files) then
+    vim.api.nvim_create_autocmd("BufWritePost", {
+      group = re_add_augroup,
+      pattern = managed_files,
+      desc = "chezmoi re-add for target-path",
+      callback = U.debounce_wrap(500, function(event)
+        local res = vim.system({ "chezmoi", "add", event.file }, { text = true }):wait()
+        if res.code == 0 then
+          LazyVim.info("Successfully re-added", { title = "Chezmoi" })
+        else
+          LazyVim.error(
+            ("Failed to re-add `%s`:\n%s"):format(U.path.home_to_tilde(event.file), res.stderr),
+            { title = "Chezmoi" }
+          )
+        end
+      end),
+    })
   end
+
   vim.api.nvim_create_autocmd("BufWritePost", {
-    group = vim.api.nvim_create_augroup("chezmoi_add", { clear = true }),
-    pattern = managed_files,
-    desc = "chezmoi add for target-path",
-    callback = U.debounce_wrap(500, function(event)
-      local res = vim.system({ "chezmoi", "add", event.file }, { text = true }):wait()
-      if res.code == 0 then
-        LazyVim.info("Successfully added", { title = "Chezmoi" })
-      else
-        LazyVim.error(
-          ("Failed to add `%s`:\n%s"):format(U.path.home_to_tilde(event.file), res.stderr),
-          { title = "Chezmoi" }
-        )
+    group = vim.api.nvim_create_augroup("chezmoi_add_xdg_config", { clear = true }),
+    pattern = (vim.env.XDG_CONFIG_HOME or vim.env.HOME .. "/.config") .. "/*",
+    desc = "chezmoi add for XDG_CONFIG_HOME",
+    callback = function(event)
+      -- let chezmoi_re_add augroup handle the re-add
+      if vim.list_contains(managed_files, event.match) or vim.list_contains(H.xdg_config_ignore, event.match) then
+        return
       end
-    end),
+
+      U.debounce("chezmoi-add-xdg-config", 100, function()
+        local file = U.path.home_to_tilde(event.match)
+        local ok, choice = pcall(vim.fn.confirm, ("Add %q to chezmoi?"):format(file), "&Yes\n&No")
+        if not ok then
+          return
+        end
+        if choice == 1 then -- Yes
+          local res = vim.system({ "chezmoi", "add", event.match }, { text = true }):wait()
+          if res.code == 0 then
+            H.reset()
+            LazyVim.info("Successfully added", { title = "Chezmoi" })
+          else
+            LazyVim.error(("Failed to add `%s`:\n%s"):format(file, res.stderr), { title = "Chezmoi" })
+          end
+        elseif choice == 0 or choice == 2 then -- 0 for <Esc> and 2 for No
+          table.insert(H.xdg_config_ignore, event.match)
+        end
+      end)
+    end,
   })
+end
+
+-- reset cache and related autocmds
+function H.reset()
+  H.cache = {}
+  H.autocmd_chezmoi_add()
 end
 
 return {
@@ -229,10 +269,7 @@ return {
     opts = function()
       vim.api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
         group = vim.api.nvim_create_augroup("chezmoi_managed_cache", { clear = true }),
-        callback = function()
-          H.cache = {}
-          U.debounce("autocmd-chezmoi-add", 500, H.autocmd_chezmoi_add)
-        end,
+        callback = U.debounce_wrap(100, H.reset),
       })
     end,
   },
@@ -298,7 +335,7 @@ return {
               picker:close()
               if item then
                 local file = assert(Snacks.picker.util.path(item))
-                if vim.tbl_contains(H.chezmoi_list_config_files(), file) then
+                if vim.list_contains(H.chezmoi_list_config_files(), file) then
                   require("chezmoi.commands").edit({ targets = file })
                   -- copied from: https://github.com/folke/snacks.nvim/blob/adf93a32ae79b7279e48608fa0705545fc7a36ae/lua/snacks/picker/actions.lua#L105
                   local pos = item.pos
@@ -328,7 +365,7 @@ return {
       local function chezmoi_edit(prompt_bufnr)
         local lp_actions = require("telescope._extensions.lazy_plugins.actions")
         lp_actions.custom_action(prompt_bufnr, "filepath", function(bufnr, entry)
-          if vim.tbl_contains(H.chezmoi_list_config_files(), entry.filepath) then
+          if vim.list_contains(H.chezmoi_list_config_files(), entry.filepath) then
             lp_actions.append_to_telescope_history(bufnr)
             lp_actions.close(bufnr)
             require("chezmoi.commands").edit({ targets = entry.filepath })
