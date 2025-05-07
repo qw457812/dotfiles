@@ -9,7 +9,6 @@ end
 -- do not use `clear = true` at the top-level, it will be triggered by lazy.nvim on `Config Change Detected. Reloading...`
 local augroup = vim.api.nvim_create_augroup("close_with_" .. close_key, { clear = false })
 
--- alternative to psjay/buffer-closer.nvim
 -- copied from: https://github.com/psjay/buffer-closer.nvim/blob/74fec63c4c238b2cf6f61c40b47f869d442a8988/lua/buffer-closer/init.lua#L10
 -- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/funcs/alt-alt.lua#L42
 local function close_buffer_or_window_or_exit()
@@ -27,7 +26,6 @@ local function close_buffer_or_window_or_exit()
     end, vim.api.nvim_list_bufs())
   end
 
-  -- https://github.com/AstroNvim/AstroNvim/blob/d771094986abced8c3ceae29a5a55585ecb0523a/lua/astronvim/plugins/_astrocore_autocmds.lua#L245
   -- https://github.com/nvim-neo-tree/neo-tree.nvim/blob/42caaf5c3b7ca346ab278201151bb878006a6031/lua/neo-tree/utils/init.lua#L533
   local function non_real_file()
     return vim.bo.buftype ~= ""
@@ -42,7 +40,6 @@ local function close_buffer_or_window_or_exit()
   -- use `:close` for floating and edgy (redundant with edgy's Lazy Spec below)
   -- use `:bd` (or `:qa` if no listed buffer left) for main
   -- https://github.com/folke/edgy.nvim/blob/ebb77fde6f5cb2745431c6c0fe57024f66471728/lua/edgy/editor.lua#L82
-  -- https://github.com/mudox/neovim-config/blob/a4f1020213fd17e6b8c1804153b9bf7683bfa690/lua/mudox/lab/close.lua#L7
   if U.is_floating_win() then
     vim.cmd("close") -- Close Window (Cannot close last window)
   elseif #listed_buffers() > (vim.bo.buflisted and 1 or 0) then
@@ -130,7 +127,6 @@ return {
         })
       end
 
-      -- see `:h q:`
       vim.api.nvim_create_autocmd("CmdWinEnter", {
         group = augroup,
         callback = function(event)
@@ -212,16 +208,6 @@ return {
             end,
             desc = "Close",
           },
-          -- clear_ui_or_close = {
-          --   "<esc>",
-          --   function(self)
-          --     U.keymap.clear_ui_esc({
-          --       -- close = function() self:close() end,
-          --       esc = false,
-          --     })
-          --   end,
-          --   desc = "Clear UI or Close",
-          -- },
         },
       },
       -- override the opts.win.keys to avoid exiting terminal
@@ -229,17 +215,6 @@ return {
         win = {
           keys = {
             [close_key] = "hide",
-            -- -- use the same `clear_ui_or_close` key to ensure overwriting
-            -- clear_ui_or_close = {
-            --   "<esc>",
-            --   function(self)
-            --     U.keymap.clear_ui_esc({
-            --       -- close = function() self:hide() end,
-            --       esc = false,
-            --     })
-            --   end,
-            --   desc = "Clear UI or Close",
-            -- },
             term_close = term_close_key and {
               term_close_key,
               function(self)
@@ -493,9 +468,7 @@ return {
   {
     "yetone/avante.nvim",
     optional = true,
-    opts = function(_, opts)
-      -- local defaults = require("avante.config")._defaults
-
+    opts = function()
       vim.api.nvim_create_autocmd("FileType", {
         group = augroup,
         pattern = { "Avante", "AvanteInput", "AvanteSelectedFiles" },
@@ -505,17 +478,6 @@ return {
           end, { buffer = event.buf, silent = true, desc = "Close (Avante)" })
         end,
       })
-
-      -- return U.extend_tbl(opts, {
-      --   mappings = {
-      --     sidebar = {
-      --       close = vim.list_extend(
-      --         vim.tbl_get(opts, "mappings", "sidebar", "close") or vim.deepcopy(defaults.mappings.sidebar.close),
-      --         { close_key }
-      --       ),
-      --     },
-      --   },
-      -- })
     end,
   },
 

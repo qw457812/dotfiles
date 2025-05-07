@@ -123,7 +123,6 @@ return {
 
       ---@type blink.cmp.Config
       local o = {
-        -- copied from: https://github.com/AstroNvim/astrocommunity/blob/0e1cf1178a6c0b2bfbc1e5e0d4a3009911b07649/lua/astrocommunity/completion/blink-cmp/init.lua#L98
         keymap = {
           -- TODO: better coop with mini.snippets and signature_help
           ["<Tab>"] = {
@@ -139,17 +138,6 @@ return {
             "fallback",
           },
           ["<S-Tab>"] = { "select_prev", "snippet_backward", H.actions.pum_prev, "fallback" },
-          -- -- https://github.com/y3owk1n/nix-system-config-v2/blob/ae72dd82a92894a1ca8c5ff4243e0208dfc33a5d/config/nvim/lua/plugins/blink-cmp.lua#L19
-          -- ["<Esc>"] = {
-          --   function(cmp)
-          --     if cmp.is_visible() then
-          --       if cmp.snippet_active() then
-          --         return cmp.hide()
-          --       end
-          --     end
-          --   end,
-          --   "fallback",
-          -- },
           ["<CR>"] = { "accept", H.actions.pum_accept, "fallback" },
           ["<C-n>"] = { "select_next", "show" },
           ["<C-p>"] = { "select_prev", "show" },
@@ -231,20 +219,6 @@ return {
         },
         sources = {
           providers = {
-            -- lsp = {
-            --   -- copied from:
-            --   -- * https://github.com/saghen/blink.cmp/blob/6a9de53872a98a9c496f0650bcf50e452aac6a6d/doc/recipes.md#L189-L207
-            --   -- * https://github.com/saghen/blink.cmp/blob/335045136a8f2924c04aefd13207dd6874df654e/lua/blink/cmp/config/sources.lua#L56-L62
-            --   transform_items = function(_, items)
-            --     return vim.tbl_filter(function(item)
-            --       -- filter out text items, since we have the buffer source
-            --       return item.kind ~= require("blink.cmp.types").CompletionItemKind.Text
-            --         -- Removes language keywords/constants (if, else, while, etc.) provided by the language server from completion results.
-            --         -- Useful if you prefer to use builtin or custom snippets for such constructs.
-            --         and item.kind ~= require("blink.cmp.types").CompletionItemKind.Keyword
-            --     end, items)
-            --   end,
-            -- },
             path = {
               enabled = function()
                 return vim.b.user_blink_path ~= false
@@ -270,13 +244,6 @@ return {
     ---@module 'blink.cmp'
     ---@param opts blink.cmp.Config
     opts = function(_, opts)
-      -- -- blink is broken in cmdwin
-      -- vim.api.nvim_create_autocmd("CmdWinEnter", {
-      --   callback = function(event)
-      --     vim.b[event.buf].completion = false
-      --   end,
-      -- })
-
       local cmdline = require("blink.cmp.sources.cmdline")
       local enabled_orig = cmdline.enabled
       if enabled_orig then
@@ -429,9 +396,6 @@ return {
             opts = {
               prefix_min_len = 3, -- same as `min_keyword_length`
               ignore_paths = { vim.uv.os_homedir() }, -- CPU usage
-              -- search_casing = "--smart-case",
-
-              -- or use custom `get_command` function
               project_root_marker = function(_, path)
                 return path == LazyVim.root({ normalize = true })
               end,

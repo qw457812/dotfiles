@@ -10,7 +10,6 @@ opt.relativenumber = false
 opt.spelllang:append("cjk") -- exclude East Asian characters from spell checking
 opt.timeoutlen = vim.g.vscode and 1000 or 500 -- increase timeoutlen for mini.operators `cX` since which-key v3
 -- opt.shell = vim.fn.executable("fish") == 1 and "fish" or opt.shell
--- https://github.com/folke/dot/blob/master/nvim/lua/config/options.lua
 opt.backup = true
 opt.backupdir = vim.fn.stdpath("state") .. "/backup"
 -- ignore builtin colorschemes for Snacks.picker.colorschemes(), see #969
@@ -35,6 +34,7 @@ vim.g.user_is_wezterm = not vim.g.neovide and vim.env.WEZTERM_UNIX_SOCKET ~= nil
 vim.g.user_is_kitty = not vim.g.neovide and vim.env.KITTY_PID ~= nil
 vim.g.user_is_tmux = not vim.g.neovide and vim.env.TMUX ~= nil
 vim.g.user_is_termux = vim.env.TERMUX_VERSION ~= nil
+-- using karabiner for neovide
 vim.g.user_distinguish_ctrl_i_tab = vim.g.user_is_kitty or vim.g.user_is_wezterm or vim.g.neovide
 vim.g.user_transparent_background = vim.g.user_is_wezterm or vim.g.user_is_kitty
 -- TODO: Snacks.explorer

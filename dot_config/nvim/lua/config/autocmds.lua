@@ -10,7 +10,7 @@ local function lazyvim_augroup(name, clear)
 end
 
 -- show cursor line only in active window
--- https://github.com/folke/dot/blob/master/nvim/lua/config/autocmds.lua
+-- https://github.com/folke/dot/blob/56d310467f3f962e506810b710a1562cee03b75e/nvim/lua/config/autocmds.lua#L2-L17
 vim.api.nvim_create_autocmd({ "InsertLeave", "WinEnter" }, {
   callback = function()
     if vim.w.auto_cursorline then
@@ -38,12 +38,6 @@ vim.api.nvim_create_autocmd("BufWritePre", {
     vim.go.backupext = backup
   end,
 })
-
--- vim.api.nvim_create_autocmd("QuickFixCmdPost", {
---   callback = function()
---     vim.cmd([[Trouble qflist open]])
---   end,
--- })
 
 vim.api.nvim_create_autocmd("BufReadPost", {
   group = vim.api.nvim_create_augroup("lazy_plugin_readonly", { clear = true }),
@@ -93,7 +87,6 @@ vim.api.nvim_create_autocmd("FileType", {
       then
         vim.b[buf].minianimate_disable = true
         -- vim.b[buf].snacks_scroll = false
-        -- vim.b[buf].user_ug_cursor_disable = true
         vim.keymap.set({ "n", "x" }, "u", "<C-u>", { buffer = buf, silent = true, desc = "Scroll Up" })
         -- add `nowait = true` since we have a `dd` mapping defined in keymaps.lua
         vim.keymap.set({ "n", "x" }, "d", "<C-d>", { buffer = buf, silent = true, desc = "Scroll Down", nowait = true })
@@ -102,58 +95,40 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
--- disable LazyVim's auto command for wrap
-local wrap_spell_opts = { group = lazyvim_augroup("wrap_spell"), event = "FileType" }
-local wrap_spell_pattern = vim.tbl_map(function(autocmd)
-  return autocmd.pattern
-end, vim.api.nvim_get_autocmds(wrap_spell_opts))
--- https://github.com/LazyVim/LazyVim/issues/3692
--- alternative: vim.api.nvim_del_augroup_by_name("lazyvim_wrap_spell")
-vim.api.nvim_clear_autocmds(wrap_spell_opts)
--- create my own
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = wrap_spell_pattern,
-  callback = function()
-    vim.opt_local.spell = true
-  end,
-})
+do
+  -- disable LazyVim's auto command for wrap
+  local wrap_spell_opts = { group = lazyvim_augroup("wrap_spell"), event = "FileType" }
+  local wrap_spell_pattern = vim.tbl_map(function(autocmd)
+    return autocmd.pattern
+  end, vim.api.nvim_get_autocmds(wrap_spell_opts))
+  -- alternative: vim.api.nvim_del_augroup_by_name("lazyvim_wrap_spell")
+  vim.api.nvim_clear_autocmds(wrap_spell_opts)
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = wrap_spell_pattern,
+    callback = function()
+      vim.opt_local.spell = true
+    end,
+  })
 
--- disable wrap for some filetypes
-vim.api.nvim_create_autocmd("FileType", {
-  -- pattern = vim.list_extend({
-  --   "lazy",
-  -- }, wrap_spell_pattern),
-  pattern = {
-    "lazy", -- Lazy Extras, alternative: https://github.com/aimuzov/LazyVimx/blob/00d45b2d746c36101b4cf1c5fe0b46d53cb6774a/lua/lazyvimx/extras/hacks/lazyvim-remove-extras-title.lua
-  },
-  callback = function()
-    vim.defer_fn(function()
-      vim.opt_local.wrap = false
-    end, 100)
-  end,
-})
+  -- disable wrap for some filetypes
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = {
+      "lazy", -- Lazy Extras, alternative: https://github.com/aimuzov/LazyVimx/blob/00d45b2d746c36101b4cf1c5fe0b46d53cb6774a/lua/lazyvimx/extras/hacks/lazyvim-remove-extras-title.lua
+    },
+    callback = function()
+      vim.defer_fn(function()
+        vim.opt_local.wrap = false
+      end, 100)
+    end,
+  })
+end
 
--- -- revert `lazyvim_close_with_q` auto command for help files that we're editing
--- vim.api.nvim_create_autocmd("FileType", {
---   pattern = "help",
---   callback = function(event)
---     if vim.bo[event.buf].buftype ~= "help" then
---       vim.bo[event.buf].buflisted = true
---       pcall(vim.keymap.del, "n", "q", { buffer = event.buf })
---     end
---   end,
--- })
---
 -- unlisted some filetypes (e.g. qf, checkhealth) in favor of bufferline.nvim
-local close_with_q_pattern = vim.tbl_map(function(autocmd)
-  return autocmd.pattern
-end, vim.api.nvim_get_autocmds({ group = lazyvim_augroup("close_with_q"), event = "FileType" }))
 vim.api.nvim_create_autocmd("FileType", {
   group = vim.api.nvim_create_augroup("buf_unlisted", { clear = true }),
-  -- pattern = vim.tbl_filter(function(pattern)
-  --   return pattern ~= "help"
-  -- end, close_with_q_pattern),
-  pattern = close_with_q_pattern,
+  pattern = vim.tbl_map(function(autocmd)
+    return autocmd.pattern
+  end, vim.api.nvim_get_autocmds({ group = lazyvim_augroup("close_with_q"), event = "FileType" })),
   callback = function(event)
     -- don't unlisted help files that we're editing
     if vim.bo[event.buf].filetype == "help" and vim.bo[event.buf].buftype ~= "help" then
@@ -296,10 +271,3 @@ if vim.o.shell:find("zsh") or vim.o.shell:find("fish") then
     end,
   })
 end
-
--- vim.api.nvim_create_autocmd("FileType", {
---   pattern = { "markdown" },
---   callback = function()
---     vim.opt_local.colorcolumn = "80"
---   end,
--- })

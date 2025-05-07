@@ -14,14 +14,11 @@ return {
     },
   },
 
-  -- use helix-style mappings to prevent conflict with flash or leap: ms md mr
-  -- https://www.reddit.com/r/neovim/comments/1bl3dwz/whats_your_best_remap_for_flash_or_leap/
-  -- https://github.com/ggandor/leap.nvim/discussions/59
-  -- or use kylechui/nvim-surround instead of mini.surround | https://github.com/boltlessengineer/nvim/blob/607ee0c9412be67ba127a4d50ee722be578b5d9f/lua/plugins/coding.lua#L95
   {
     "echasnovski/mini.surround",
     optional = true,
     opts = {
+      -- helix-style mappings
       mappings = {
         add = "ms",
         replace = "mr",
@@ -90,7 +87,10 @@ return {
     keys = {
       { "<leader>J", "<cmd>TSJToggle<cr>", desc = "Join Toggle" },
     },
-    opts = { use_default_keymaps = false, max_join_length = 150 },
+    opts = {
+      use_default_keymaps = false,
+      max_join_length = 150,
+    },
   },
 
   {

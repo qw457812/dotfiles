@@ -268,7 +268,7 @@ return {
                     self:execute("toggle_focus")
                   end
                 end,
-                desc = "Clear UI or Toggle Focus",
+                desc = "Clear UI or Focus Input",
               },
               ["/"] = false,
               ["<leader><space>"] = "toggle_focus",
@@ -295,7 +295,7 @@ return {
                     self:execute("toggle_focus")
                   end
                 end,
-                desc = "Clear UI or Toggle Focus",
+                desc = "Clear UI or Focus Input",
               },
               ["<leader>/"] = "toggle_focus",
             },
@@ -444,14 +444,11 @@ return {
     optional = true,
     keys = {
       { "<leader>s.", "<cmd>Telescope resume<cr>", desc = "Resume" },
-      { "<leader>ff", false },
-      { "<leader>fF", false },
       unpack(H.mappings),
     },
     opts = {
       defaults = {
         prompt_prefix = "", -- in favor of `p` in normal mode on startup
-        -- layout_strategy = vim.g.user_is_termux and "vertical" or "horizontal",
         layout_strategy = "flex",
         layout_config = {
           horizontal = {
@@ -474,10 +471,6 @@ return {
         },
         sorting_strategy = "ascending",
         winblend = 0,
-        -- -- see `:help telescope.defaults.path_display`
-        -- path_display = { "truncate" },
-        -- path_display = { truncate = 1, "filename_first" },
-        -- path_display = { "truncate", filename_first = { reverse_directories = true } },
         path_display = U.telescope.path_display,
         mappings = {
           i = {
@@ -533,7 +526,6 @@ return {
     dependencies = {
       {
         "polirritmico/telescope-lazy-plugins.nvim",
-        -- lazy loading | https://github.com/polirritmico/telescope-lazy-plugins.nvim/blob/main/README.md?plain=1#L273
         init = function()
           LazyVim.on_load("telescope.nvim", function()
             require("telescope").load_extension("lazy_plugins")
@@ -563,19 +555,14 @@ return {
       {
         "<leader>ff",
         function()
-          require("telescope").extensions.smart_open.smart_open({
-            -- filename_first = false,
-          })
+          require("telescope").extensions.smart_open.smart_open()
         end,
         desc = "Smart Open",
       },
       {
         "<leader>fF",
         function()
-          require("telescope").extensions.smart_open.smart_open({
-            cwd_only = true,
-            -- filename_first = false,
-          })
+          require("telescope").extensions.smart_open.smart_open({ cwd_only = true })
         end,
         desc = "Smart Open (cwd)",
       },

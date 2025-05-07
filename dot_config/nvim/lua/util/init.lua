@@ -177,6 +177,17 @@ function M.open_in_browser(url)
   } or nil)
 end
 
+--- copied from: https://github.com/nvim-lua/plenary.nvim/blob/f031bef84630f556c2fb81215826ea419d81f4e9/lua/plenary/curl.lua#L44-L55
+---@param str string
+function M.url_encode(str)
+  str = str:gsub("\r?\n", "\r\n")
+  str = str:gsub("([^%w%-%.%_%~ ])", function(c)
+    return string.format("%%%02X", c:byte())
+  end)
+  str = str:gsub(" ", "+")
+  return str
+end
+
 --- Merge extended options with a default table of options
 --- copied from: https://github.com/AstroNvim/astrocore/blob/d687e4b66b93783dfdafee1e64d363b7706056ff/lua/astrocore/init.lua#L25
 ---@param default? table The default table that you want to merge into
@@ -271,15 +282,15 @@ function M.debounce_wrap(ms, fn)
 end
 
 ---@type table<string, uv.uv_timer_t>
-local timers = {}
+local debounce_timers = {}
 
 --- alternative: https://github.com/CopilotC-Nvim/CopilotChat.nvim/blob/2ebe591cff06018e265263e71e1dbc4c5aa8281e/lua/CopilotChat/utils.lua#L157
 ---@param id string
 ---@param ms integer
 ---@param fn function
 function M.debounce(id, ms, fn)
-  timers[id] = timers[id] or assert(vim.uv.new_timer())
-  local timer = timers[id]
+  debounce_timers[id] = debounce_timers[id] or assert(vim.uv.new_timer())
+  local timer = debounce_timers[id]
   timer:start(ms, 0, function()
     timer:stop()
     vim.schedule(fn)

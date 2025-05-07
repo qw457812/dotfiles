@@ -91,7 +91,6 @@ function M.grug_far(path)
 
   local prefills = { paths = path }
   local instance = "explorer"
-  -- instance check
   if grug.has_instance(instance) then
     grug.get_instance(instance):open()
     -- updating the prefills without clearing the search and other fields

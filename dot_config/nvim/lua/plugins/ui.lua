@@ -1,5 +1,4 @@
 return {
-  -- :h bufferline-configuration
   {
     "akinsho/bufferline.nvim",
     optional = true,
@@ -72,10 +71,6 @@ return {
     end,
   },
 
-  -- https://github.com/aimuzov/LazyVimx/blob/a27d3439b9021d1215ce6471f59d801df32c18d4/lua/lazyvimx/extras/ui/panels/status-line.lua
-  -- https://github.com/chrisgrieser/.config/blob/1a51e8e5e2ee78e57b5c1e1495acab287f4db757/nvim/lua/plugin-specs/lualine.lua#L22
-  -- https://github.com/barryblando/dotfiles/blob/078543ccb0be6c57284400c2a1b1af4a9dd46aa4/neovim/.config/nvim/lua/plugins/lualine.lua
-  -- https://github.com/minusfive/dotfiles/blob/897c9596471854842cae52d774f7e43426287e58/.config/nvim/lua/plugins/ui.lua#L152
   {
     "nvim-lualine/lualine.nvim",
     dependencies = { "echasnovski/mini.icons" },
@@ -170,7 +165,6 @@ return {
       return U.extend_tbl(opts, {
         -- presets = {
         --   bottom_search = false,
-        --   -- command_palette = false,
         -- },
         views = {
           cmdline_popup = {
@@ -214,14 +208,6 @@ return {
       },
     },
   },
-
-  -- {
-  --   "nvim-treesitter/nvim-treesitter-context",
-  --   optional = true,
-  --   opts = {
-  --     multiwindow = true,
-  --   },
-  -- },
 
   {
     "nvimdev/dashboard-nvim",
