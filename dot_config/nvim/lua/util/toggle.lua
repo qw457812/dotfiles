@@ -5,7 +5,6 @@ local st_zen = assert(st.get("zen"))
 ---@class util.toggle
 local M = {}
 
--- https://github.com/xzbdmw/nvimconfig/blob/0be9805dac4661803e17265b435060956daee757/lua/config/keymaps.lua#L49
 M.is_diagnostic_virt_enabled = nil ---@type boolean?
 M.diagnostic_virt = st({
   name = "Diagnostic Virtual Text",

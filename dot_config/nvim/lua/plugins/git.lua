@@ -2,20 +2,6 @@ return {
   {
     "LazyVim/LazyVim",
     opts = function()
-      -- -- fix cursor position when using `git commit --verbose` with auto-fold
-      -- vim.api.nvim_create_autocmd("FileType", {
-      --   pattern = "gitcommit",
-      --   callback = function(ev)
-      --     local win = vim.fn.bufwinid(ev.buf)
-      --     vim.defer_fn(function()
-      --       if vim.api.nvim_buf_is_valid(ev.buf) and vim.api.nvim_get_current_win() == win then
-      --         vim.api.nvim_win_set_cursor(win, { 1, 0 })
-      --         -- vim.cmd("startinsert")
-      --         vim.cmd("normal! zR")
-      --       end
-      --     end, 50)
-      --   end,
-      -- })
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "gitcommit",
         callback = function(ev)
@@ -197,29 +183,18 @@ return {
     optional = true,
     keys = function(_, keys)
       -- HACK: redraw to update the signs
-      local function redraw(delay)
+      local function redraw()
         vim.defer_fn(function()
           Snacks.util.redraw(vim.api.nvim_get_current_win())
-        end, delay or 500)
+        end, 200)
       end
 
       vim.list_extend(keys, {
-        -- {
-        --   "gh",
-        --   function()
-        --     redraw() -- not working
-        --     return require("mini.diff").operator("apply")
-        --   end,
-        --   expr = true,
-        --   silent = true,
-        --   desc = "Apply hunks",
-        --   mode = { "n", "x" },
-        -- },
         {
           "<leader>go",
           function()
             require("mini.diff").toggle_overlay(0)
-            redraw(200)
+            redraw()
           end,
           desc = "Toggle mini.diff overlay",
         },

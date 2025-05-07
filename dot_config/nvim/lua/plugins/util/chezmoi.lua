@@ -407,7 +407,6 @@ return {
           view = "mini",
         },
       })
-      return opts
     end,
   },
 

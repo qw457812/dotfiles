@@ -23,19 +23,6 @@ local function cmdwin(type)
   end
 end
 
--- https://github.com/rafi/vim-config/blob/3689ae1ba113e2b8c6d12f17281fd14d91e58027/lua/rafi/config/keymaps.lua#L122
-local function blockwise_force(key)
-  local c_v = vim.keycode("<C-v>")
-  local keyseq = {
-    I = { v = "<C-v>I", V = "<C-v>^o^I", [c_v] = "I" },
-    A = { v = "<C-v>A", V = "<C-v>0o$A", [c_v] = "A" },
-    gI = { v = "<C-v>0I", V = "<C-v>0o$I", [c_v] = "0I" },
-  }
-  return function()
-    return keyseq[key][vim.fn.mode()]
-  end
-end
-
 -- -- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/keybindings.lua#L234
 -- map("n", "<cr>", function() return vim.fn.pumvisible() == 1 and "<cr>" or "gd" end, { expr = true, desc = "Goto local Declaration" })
 -- -- restore default behavior of `<cr>`, which is overridden by my mapping above
@@ -75,8 +62,7 @@ map("c", "<C-a>", "<C-b>", { silent = false, desc = "Goto line start" })
 map("i", "<C-a>", "<Home>", { desc = "Goto line start" })
 map("i", "<C-e>", "<End>", { desc = "Goto line end" })
 
--- bufferline.nvim: if you change the order of buffers :bnext and :bprevious will not respect the custom ordering
-safe_map("n", { "J", "<Down>" }, "<cmd>bnext<cr>", { desc = "Next Buffer" })
+safe_map("n", { "J", "<Down>" }, "<cmd>bnext<cr>", { desc = "Next Buffer" }) -- bufferline.nvim
 safe_map("n", { "K", "<Up>" }, "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
 map({ "n", "x" }, "gj", "J", { desc = "Join Lines" })
 safe_map({ "n", "x" }, "gk", "K", { desc = "Keywordprg" }) -- nvim-ufo
@@ -115,18 +101,29 @@ safe_map("n", "gw", "*``", { desc = "Search word under cursor" }) -- nvim-hlslen
 map("n", "cn", "*``cgn", { desc = "Change cword (Search forward)" })
 map("n", "cN", "*``cgN", { desc = "Change cword (Search backward)" })
 
--- using karabiner for neovide
 if vim.g.user_distinguish_ctrl_i_tab then
   -- To distinguish <C-I> and <Tab>, you could map another key, say <M-I>, to <C-I> in neovim,
   -- and then map CTRL-i to send <M-I> key sequence in your terminal setting.
   -- See `:h tui-input`
   map({ "n", "i", "c", "v", "o", "t" }, "<M-i>", "<C-i>", { desc = "<C-i>" })
-  -- options: "<C-w>w", "za", ">>"
+  -- candidates: "<C-w>w", "za", ">>"
   safe_map("n", "<tab>", "<C-w>w", { desc = "Next Window", remap = true }) -- copilotlsp-nvim/copilot-lsp
   map("n", "<S-tab>", "<C-w>W", { desc = "Prev Window", remap = true })
 end
 
 -- Better block-wise operations on selected area
+-- https://github.com/rafi/vim-config/blob/3689ae1ba113e2b8c6d12f17281fd14d91e58027/lua/rafi/config/keymaps.lua#L122
+local function blockwise_force(key)
+  local c_v = vim.keycode("<C-v>")
+  local keyseq = {
+    I = { v = "<C-v>I", V = "<C-v>^o^I", [c_v] = "I" },
+    A = { v = "<C-v>A", V = "<C-v>0o$A", [c_v] = "A" },
+    gI = { v = "<C-v>0I", V = "<C-v>0o$I", [c_v] = "0I" },
+  }
+  return function()
+    return keyseq[key][vim.fn.mode()]
+  end
+end
 map("x", "I", blockwise_force("I"), { expr = true, desc = "Blockwise Insert" })
 map("x", "gI", blockwise_force("gI"), { expr = true, desc = "Blockwise Insert" })
 map("x", "A", blockwise_force("A"), { expr = true, desc = "Blockwise Append" })
@@ -181,8 +178,6 @@ map({ "i", "x", "n", "s" }, "<a-s>", U.keymap.save_without_format, { desc = "Sav
 map({ "i", "x", "n", "s" }, "<D-s>", "<cmd>w<cr><esc>", { desc = "Save File" })
 map("n", "<D-r>", vim.cmd.edit, { desc = "Reload File" })
 
--- https://github.com/rstacruz/vimfiles/blob/ee9a3e7e7f022059b6d012eff2e88c95ae24ff97/lua/config/keymaps.lua#L35
--- https://github.com/nvim-lualine/lualine.nvim/blob/b431d228b7bbcdaea818bdc3e25b8cdbe861f056/lua/lualine/components/filename.lua#L74
 -- :let @+=expand('%:p:~')<cr>
 -- <cmd>call setreg('+', expand('%:p:~'))<cr>
 map("n", "<leader>fy", function()
@@ -207,20 +202,15 @@ end, { desc = "Yank file relative path" })
 -- end, { desc = "Yank file name" })
 
 -- Add empty lines before and after cursor line supporting dot-repeat
--- https://github.com/JulesNP/nvim/blob/36b04ae414b98e67a80f15d335c73744606a33d7/lua/keymaps.lua#L80
--- map("n", "gO", function() vim.cmd("normal! m`" .. vim.v.count .. vim.api.nvim_replace_termcodes("O<esc>``", true, true, true)) end, { desc = "Put empty line above" })
--- map("n", "go", function() vim.cmd("normal! m`" .. vim.v.count .. vim.api.nvim_replace_termcodes("o<esc>``", true, true, true)) end, { desc = "Put empty line below" })
 -- https://github.com/echasnovski/mini.nvim/blob/af673d8523c5c2c5ff0a53b1e42a296ca358dcc7/lua/mini/basics.lua#L579
 -- map('n', 'gO', "<Cmd>call append(line('.') - 1, repeat([''], v:count1))<CR>") -- without dot-repeat
--- map('n', 'go', "<Cmd>call append(line('.'),     repeat([''], v:count1))<CR>") -- without dot-repeat
+-- map('n', 'go', "<Cmd>call append(line('.'),     repeat([''], v:count1))<CR>")
 map("n", "gO", "v:lua.require'util.keymap'.put_empty_line(v:true)", { expr = true, desc = "Put empty line above" })
 map("n", "go", "v:lua.require'util.keymap'.put_empty_line(v:false)", { expr = true, desc = "Put empty line below" })
 
 -- https://github.com/echasnovski/mini.nvim/blob/af673d8523c5c2c5ff0a53b1e42a296ca358dcc7/lua/mini/basics.lua#L589
--- map("n", "gV", '"`[" . strpart(getregtype(), 0, 1) . "`]"', { expr = true, replace_keycodes = false, desc = "Visually select changed text" })
--- https://github.com/gregorias/coerce.nvim#tips--tricks
 -- stylua: ignore
-map("n", "gp", function() vim.api.nvim_feedkeys("`[" .. vim.fn.strpart(vim.fn.getregtype(), 0, 1) .. "`]", "n", false) end, { desc = "Reselect last put/yanked/changed text" })
+map("n", "gp", '"`[" . strpart(getregtype(), 0, 1) . "`]"', { expr = true, replace_keycodes = false, desc = "Visually select put/yanked/changed text" })
 
 -- use `silent = false` for it to make effect immediately
 map("x", "g/", "<esc>/\\%V", { silent = false, desc = "Search inside visual selection" })
@@ -252,7 +242,7 @@ if not LazyVim.has("nvim-scrollbar") then
   Snacks.toggle.option("laststatus", { off = 0, on = vim.o.laststatus > 0 and vim.o.laststatus or 3, name = "Status Line" }):map("<leader>uS")
 end
 
--- lazy/LazyVim
+-- lazy.nvim/LazyVim
 map("n", "<leader>l", "", { desc = "+lazy/lazyvim" })
 map("n", "<leader>ll", "<cmd>Lazy<cr>", { desc = "Lazy" })
 map("n", "<leader>lx", "<cmd>LazyExtras<cr>", { desc = "Extras" })
@@ -325,14 +315,13 @@ map("n", "<leader>iC", function() LazyVim.info(vim.g.colors_name, { title = "Col
 -- alternative: `:h news` or `LazyVim.news.neovim()`
 map("n", "<leader>iN", news, { desc = "Neovim News" })
 
--- local function google_search(input)
---   local query = input or vim.fn.expand("<cword>")
---   LazyUtil.open("https://www.google.com/search?q=" .. query)
--- end
--- -- stylua: ignore
--- map("x", "<leader>?", function() google_search(U.get_visual_selection()) end, { desc = "Google Search" })
+local function web_search(query)
+  query = U.url_encode(query or vim.fn.expand("<cword>"))
+  vim.ui.open("https://www.google.com/search?q=" .. query)
+end
+-- stylua: ignore
+safe_map("x", "<leader>?", function() web_search(U.get_visual_selection()) end, { desc = "Web Search" }) -- csgithub.nvim
 
--- https://github.com/neovide/neovide/issues/1263#issuecomment-1972013043
 local function paste()
   vim.api.nvim_paste(vim.fn.getreg("+"), true, -1)
 end
@@ -342,9 +331,7 @@ if vim.g.user_is_termux then
 end
 
 if vim.g.neovide then
-  -- fix cmd-v for paste in insert, command, terminal (for fzf-lua) mode
   -- https://neovide.dev/faq.html#how-can-i-use-cmd-ccmd-v-to-copy-and-paste
-  -- map("c", "<D-v>", "<C-r>+")
   -- https://github.com/neovide/neovide/issues/1263#issuecomment-1972013043
   map({ "i", "c", "t" }, "<D-v>", paste, { desc = "Paste" })
   U.toggle.neovide_animations:map("<leader>ua")

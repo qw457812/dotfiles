@@ -27,7 +27,6 @@ return {
             transient = true,
             prefills = {
               paths = vim.fn.expand("%"),
-              -- https://vi.stackexchange.com/questions/17465/how-to-search-literally-without-any-regex-pattern
               flags = "--fixed-strings",
               search = vim.fn.expand("<cword>"),
             },
@@ -36,13 +35,11 @@ return {
         end,
         desc = "Search and Replace in Current File",
       },
-      -- { "<leader>ss", mode = "x", ":'<,'>GrugFarWithin<CR>", desc = "Search and Replace Within Range" },
       {
         "<leader>ss",
         mode = "x",
         function()
           if vim.fn.mode() == vim.keycode("<C-v>") then
-            -- vim.api.nvim_feedkeys(vim.keycode([[<Esc>:'<,'>GrugFarWithin<CR>]]), "n", false)
             vim.api.nvim_feedkeys(vim.keycode([[:GrugFarWithin<CR>]]), "n", false)
           else
             -- not working for <C-v>
@@ -60,14 +57,12 @@ return {
         group = vim.api.nvim_create_augroup("grug_far_keymap", { clear = true }),
         pattern = "grug-far",
         callback = function(ev)
-          -- https://github.com/MagicDuck/grug-far.nvim#create-a-buffer-local-keybinding-to-toggle---fixed-strings-flag
           vim.keymap.set("n", "<localleader>f", function()
             local state = unpack(require("grug-far").get_instance(0):toggle_flags({ "--fixed-strings" }))
             LazyVim.info(("Toggled `--fixed-strings`: **%s**"):format(state and "ON" or "OFF"), { title = "Grug Far" })
           end, { buffer = ev.buf, desc = "Toggle --fixed-strings" })
 
           vim.keymap.set("n", "<left>", function()
-            -- vim.api.nvim_win_set_cursor(vim.fn.bufwinid(0), { 2, 0 })
             require("grug-far").get_instance(0):goto_first_input()
           end, { buffer = ev.buf, desc = "Jump Back to Search Input (Grug Far)" })
 
@@ -166,21 +161,16 @@ return {
               view = "mini",
             },
           })
-          return opts
         end,
       },
     },
   },
 
-  -- TODO: choose motion plugin between: flash, leap, hop
-  -- https://github.com/doctorfree/nvim-lazyman/blob/bb4091c962e646c5eb00a50eca4a86a2d43bcb7c/lua/ecovim/config/plugins.lua#L373
-  -- "remote flash" for leap: https://github.com/rasulomaroff/telepath.nvim
   {
     "folke/flash.nvim",
     optional = true,
     keys = function(_, keys)
       -- https://github.com/JoseConseco/nvim_config/blob/23dbf5f8b9779d792643ab5274ebe8dabe79c0c0/lua/plugins.lua#L1049
-      -- https://github.com/mfussenegger/nvim-treehopper
       ---@param skip_first_match? boolean default false
       local function treesitter(skip_first_match)
         ---@type Flash.State.Config
@@ -360,37 +350,6 @@ return {
     end,
   },
 
-  -- alternative:
-  -- * https://github.com/aileot/emission.nvim
-  -- * https://github.com/y3owk1n/undo-glow.nvim
-  {
-    "tzachar/highlight-undo.nvim",
-    enabled = false,
-    commit = "795fc36f8bb7e4cf05e31bd7e354b86d27643a9e",
-    -- vscode = true,
-    keys = { { "u" }, { "U" }, { "<C-r>" } },
-    opts = function()
-      local hl_undo = require("highlight-undo")
-
-      -- link: Search IncSearch Substitute
-      Snacks.util.set_hl({ HighlightUndo = "Substitute", HighlightRedo = "HighlightUndo" }, { default = true })
-
-      local redo_U = vim.deepcopy(hl_undo.config.keymaps.redo)
-      redo_U.lhs = "U"
-
-      return {
-        keymaps = {
-          redo_U = redo_U,
-          paste = {
-            disabled = true,
-          },
-          Paste = {
-            disabled = true,
-          },
-        },
-      }
-    end,
-  },
   {
     "y3owk1n/undo-glow.nvim",
     pager = true,
@@ -546,21 +505,6 @@ return {
       })
 
       LazyVim.on_very_lazy(function()
-        -- vim.api.nvim_create_autocmd("CursorMoved", {
-        --   group = vim.api.nvim_create_augroup("undo_glow_highlight_cursor_moved", { clear = true }),
-        --   callback = function(ev)
-        --     if not vim.g.ug_ignore_cursor_moved then
-        --       vim.g.ug_ignore_cursor_moved =
-        --         Snacks.util.var(ev.buf, "user_ug_cursor_disable", vim.g.ug_ignore_cursor_moved)
-        --     end
-        --     require("undo-glow").cursor_moved({
-        --       animation = {
-        --         duration = 500,
-        --         animation_type = "slide",
-        --       },
-        --     })
-        --   end,
-        -- })
         vim.api.nvim_create_autocmd({ "WinEnter", "FocusGained" }, {
           group = vim.api.nvim_create_augroup("undo_glow_highlight_win_enter", { clear = true }),
           callback = U.debounce_wrap(20, function(ev)
@@ -610,37 +554,20 @@ return {
       { "petertriho/nvim-scrollbar", optional = true },
     },
     event = "CmdlineEnter",
-    keys = function()
-      -- -- https://github.com/kevinhwang91/nvim-hlslens#nvim-ufo
-      -- local function nN(char)
-      --   local ok, winid = require("hlslens").nNPeekWithUFO(char)
-      --   if ok and winid then
-      --     vim.keymap.set(
-      --       "n",
-      --       "<CR>",
-      --       "<Tab><CR>",
-      --       { buffer = true, remap = true, desc = "Switch to nvim-ufo preview window and fire `trace` action" }
-      --     )
-      --   end
-      -- end
-
-      -- stylua: ignore
-      return {
-        -- { "n", function() nN("n") end },
-        -- { "N", function() nN("N") end },
-        { "n", [[<Cmd>execute('normal! ' . v:count1 . 'nzv') | lua require('hlslens').start()<CR>]] }, -- see: #65
-        { "N", [[<Cmd>execute('normal! ' . v:count1 . 'Nzv') | lua require('hlslens').start()<CR>]] },
-        -- { "*", [[*zv<Cmd>lua require('hlslens').start()<CR>]] },
-        -- { "#", [[#zv<Cmd>lua require('hlslens').start()<CR>]] },
-        -- { "g*", [[g*zv<Cmd>lua require('hlslens').start()<CR>]] },
-        -- { "g#", [[g#zv<Cmd>lua require('hlslens').start()<CR>]] },
-        { "*", mode = { "n", "x" }, [[<Plug>(asterisk-*)zv<Cmd>lua require('hlslens').start()<CR>]] },
-        { "#", mode = { "n", "x" }, [[<Plug>(asterisk-#)zv<Cmd>lua require('hlslens').start()<CR>]] },
-        { "g*", mode = { "n", "x" }, [[<Plug>(asterisk-g*)zv<Cmd>lua require('hlslens').start()<CR>]] },
-        { "g#", mode = { "n", "x" }, [[<Plug>(asterisk-g#)zv<Cmd>lua require('hlslens').start()<CR>]] },
-        { "gw", mode = { "n", "x" }, [[<Plug>(asterisk-z*)<Cmd>lua require('hlslens').start()<CR>]], desc = "Search word under cursor" },
-      }
-    end,
+    -- stylua: ignore
+    keys = {
+      { "n", [[<Cmd>execute('normal! ' . v:count1 . 'nzv') | lua require('hlslens').start()<CR>]] }, -- see: #65
+      { "N", [[<Cmd>execute('normal! ' . v:count1 . 'Nzv') | lua require('hlslens').start()<CR>]] },
+      -- { "*", [[*zv<Cmd>lua require('hlslens').start()<CR>]] },
+      -- { "#", [[#zv<Cmd>lua require('hlslens').start()<CR>]] },
+      -- { "g*", [[g*zv<Cmd>lua require('hlslens').start()<CR>]] },
+      -- { "g#", [[g#zv<Cmd>lua require('hlslens').start()<CR>]] },
+      { "*", mode = { "n", "x" }, [[<Plug>(asterisk-*)zv<Cmd>lua require('hlslens').start()<CR>]] },
+      { "#", mode = { "n", "x" }, [[<Plug>(asterisk-#)zv<Cmd>lua require('hlslens').start()<CR>]] },
+      { "g*", mode = { "n", "x" }, [[<Plug>(asterisk-g*)zv<Cmd>lua require('hlslens').start()<CR>]] },
+      { "g#", mode = { "n", "x" }, [[<Plug>(asterisk-g#)zv<Cmd>lua require('hlslens').start()<CR>]] },
+      { "gw", mode = { "n", "x" }, [[<Plug>(asterisk-z*)<Cmd>lua require('hlslens').start()<CR>]], desc = "Search word under cursor" },
+    },
     opts = {
       -- enable_incsearch = false,
       calm_down = true,
@@ -702,7 +629,6 @@ return {
       end
     end,
     specs = {
-      -- see also `:h noh` and `:h shortmess`
       {
         "folke/noice.nvim",
         optional = true,
@@ -723,10 +649,8 @@ return {
                 { find = [[^\V.+]] }, -- <Plug>(asterisk-z*)
               },
             },
-            -- opts = { skip = true },
             view = "mini",
           })
-          return opts
         end,
       },
     },
@@ -845,7 +769,7 @@ return {
     "max397574/better-escape.nvim",
     event = { "InsertEnter", "CmdlineEnter" },
     opts = {
-      default_mappings = false, -- j/k navigation in lazygit and fzf-lua
+      default_mappings = false, -- j/k navigation in lazygit/fzf-lua
       mappings = {
         i = {
           j = { j = "<Esc>", k = "<Esc>" },
@@ -913,7 +837,6 @@ return {
       local orig_dd_keymap ---@type table<string,any>
       local orig_minianimate_disable ---@type boolean?
       -- local orig_snacks_scroll ---@type boolean?
-      -- local orig_user_ug_cursor_disable ---@type boolean?
       PAGER_MODE:add_hook(function(active)
         if active then
           -- set filetype
@@ -931,15 +854,12 @@ return {
           vim.g.minianimate_disable = true
           -- orig_snacks_scroll = vim.g.snacks_scroll
           -- vim.g.snacks_scroll = false
-          -- orig_user_ug_cursor_disable = vim.g.user_ug_cursor_disable
-          -- vim.g.user_ug_cursor_disable = true
         else
           if not vim.tbl_isempty(orig_dd_keymap) then
             vim.fn.mapset("n", false, orig_dd_keymap)
           end
           vim.g.minianimate_disable = orig_minianimate_disable
           -- vim.g.snacks_scroll = orig_snacks_scroll
-          -- vim.g.user_ug_cursor_disable = orig_user_ug_cursor_disable
         end
       end)
     end,

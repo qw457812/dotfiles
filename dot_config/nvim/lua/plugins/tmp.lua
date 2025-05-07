@@ -13,21 +13,12 @@ return {
   -- for scala projects using JDK version older than 21
   {
     "neovim/nvim-lspconfig",
-    opts = function(_, opts)
+    opts = function()
       if not LazyVim.has_extra("lang.scala") then
         return
       end
       -- see: https://github.com/scalameta/nvim-metals/issues/380
       vim.env.JAVA_HOME = java_home
-      -- return U.extend_tbl(opts, {
-      --   servers = {
-      --     metals = {
-      --       settings = {
-      --         javaHome = vim.env.JAVA_HOME,
-      --       },
-      --     },
-      --   },
-      -- })
     end,
   },
 

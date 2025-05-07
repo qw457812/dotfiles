@@ -76,7 +76,6 @@ return {
           view = "mini",
         },
       })
-      return opts
     end,
   },
 
@@ -139,6 +138,4 @@ return {
   --     end
   --   end,
   -- },
-
-  -- { "jsborjesson/vim-uppercase-sql", ft = "sql" },
 }

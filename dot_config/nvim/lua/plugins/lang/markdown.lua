@@ -50,10 +50,6 @@ return {
     optional = true,
     ft = U.markdown.render_markdown_ft("gitcommit"),
     opts = {
-      -- win_options = {
-      --   -- toggling this plugin should also toggle conceallevel
-      --   conceallevel = { default = 0 },
-      -- },
       heading = {
         icons = function(ctx)
           return ("%s%s "):format(table.concat(ctx.sections, "."), #ctx.sections > 1 and "" or ".")

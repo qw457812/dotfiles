@@ -61,11 +61,6 @@ return {
         end,
       })
 
-      -- local orig_is_available = Source.is_available
-      -- ---@diagnostic disable-next-line: duplicate-set-field
-      -- function Source:is_available()
-      --   return not vim.g.user_codeium_disable and orig_is_available(self)
-      -- end
       -- HACK: toggle, see: https://github.com/Exafunction/codeium.nvim/issues/136#issuecomment-2127891793
       Source.is_available = U.patch_func(Source.is_available, function(orig, self)
         return not vim.g.user_codeium_disable and orig(self)
@@ -120,8 +115,6 @@ return {
     end,
   },
 
-  -- https://github.com/deathbeam/dotfiles/blob/7eec2354e79a3389f5dfb8b3ba01c69ee96a19ad/nvim/.config/nvim/lua/config/copilot.lua
-  -- https://github.com/AstroNvim/astrocommunity/blob/main/lua/astrocommunity/editing-support/copilotchat-nvim/init.lua
   {
     "CopilotC-Nvim/CopilotChat.nvim",
     optional = true,
@@ -159,10 +152,6 @@ return {
       })
 
       return U.extend_tbl(opts, {
-        -- -- render-markdown integration | https://github.com/CopilotC-Nvim/CopilotChat.nvim#tips
-        -- highlight_headers = false,
-        -- separator = "---",
-        -- error_header = "> [!ERROR] Error",
         error_header = LazyVim.config.icons.diagnostics.Error .. " Error ",
         question_header = "  User ",
         -- model = "claude-3.7-sonnet",
