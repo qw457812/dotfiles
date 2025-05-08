@@ -246,6 +246,8 @@ return {
             keys = {
               -- use the same `["<Esc>"]` key to ensure overwriting
               ["<Esc>"] = { "<Esc>", U.keymap.clear_ui_esc, desc = "Clear UI or Close" },
+              ["J"] = "preview_scroll_down", -- same as lazygit/yazi
+              ["K"] = "preview_scroll_up",
               ["/"] = false, -- highlights text in preview
               ["<leader><space>"] = "toggle_focus",
               ["<leader>/"] = "cycle_win", -- toggle focus between input and preview
@@ -270,6 +272,8 @@ return {
                 end,
                 desc = "Clear UI or Focus Input",
               },
+              ["J"] = "preview_scroll_down",
+              ["K"] = "preview_scroll_up",
               ["/"] = false,
               ["<leader><space>"] = "toggle_focus",
               ["<Left>"] = "preview_scroll_left",

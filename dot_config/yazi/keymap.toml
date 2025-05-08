@@ -22,10 +22,18 @@ prepend_keymap = [
   # { on = "J", run = "plugin parent-arrow 1", desc = "Navigation in the parent directory without leaving the CWD" },
 
   # Tabs
-  { on = "K", run = "tab_switch -1 --relative", desc = "Switch to previous tab" },
-  { on = "J", run = "tab_switch 1 --relative", desc = "Switch to next tab" },
-  { on = "<Up>", run = "tab_switch -1 --relative", desc = "Switch to previous tab" },
+  # { on = "J", run = "tab_switch 1 --relative", desc = "Switch to next tab" },
+  # { on = "K", run = "tab_switch -1 --relative", desc = "Switch to previous tab" },
   { on = "<Down>", run = "tab_switch 1 --relative", desc = "Switch to next tab" },
+  { on = "<Up>", run = "tab_switch -1 --relative", desc = "Switch to previous tab" },
+  { on = [
+    "g",
+    "t",
+  ], run = "tab_switch 1 --relative", desc = "Switch to next tab" },
+  { on = [
+    "g",
+    "T",
+  ], run = "tab_switch -1 --relative", desc = "Switch to previous tab" },
   { on = "[", run = "tab_swap -1", desc = "Swap current tab with previous tab" },
   { on = "]", run = "tab_swap 1", desc = "Swap current tab with next tab" },
 
@@ -518,6 +526,10 @@ append_keymap = [
   # Navigation
   { on = ["g", "g"], run = "arrow top", desc = "Go to top" },
   { on = "G", run = "arrow bot", desc = "Go to bottom" },
+  { on = "<C-u>", run = "arrow -50%", desc = "Move cursor up half page" },
+  { on = "<C-d>", run = "arrow 50%", desc = "Move cursor down half page" },
+  { on = "<C-b>", run = "arrow -100%", desc = "Move cursor up one page" },
+  { on = "<C-f>", run = "arrow 100%", desc = "Move cursor down one page" },
 
   # Filtering
   { on = "/", run = "filter", desc = "Filter help items" },
