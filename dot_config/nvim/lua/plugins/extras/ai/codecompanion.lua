@@ -74,6 +74,9 @@ return {
         inline = { adapter = "copilot" },
       },
       display = {
+        action_palette = {
+          provider = ({ snacks = "snacks", telescope = "telescope" })[LazyVim.pick.picker.name],
+        },
         chat = {
           -- show_settings = true,
           start_in_insert_mode = true,
@@ -125,4 +128,6 @@ return {
       })
     end,
   },
+
+  -- TODO: https://github.com/ravitemer/codecompanion-history.nvim
 }

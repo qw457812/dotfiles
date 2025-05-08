@@ -172,6 +172,7 @@ return {
       local mappings = {
         { mapping_disabled_prefix, "", desc = "+disabled" },
         { opts_mappings.ask or "<leader>aa", ask(), desc = "Avante", mode = { "n", "v" } },
+        { "<leader>aA", function() require("avante.api").ask({ new_chat = true }) end, desc = "Avante New Chat", mode = { "n", "v" } },
         { opts_mappings.edit or "<leader>ae", function() require("avante.api").edit() end, desc = "Edit (Avante)", mode = "v" },
         { opts_mappings.select_history or "<leader>ah", function() require("avante.api").select_history() end, desc = "Pick History (Avante)" },
         { "<localleader>s", function() require("avante.api").stop() end, desc = "Stop", ft = avante_ft },
@@ -202,6 +203,7 @@ return {
     ---@type avante.Config
     opts = {
       mappings = {
+        new_ask = mapping_disabled_prefix .. "n",
         refresh = mapping_disabled_prefix .. "r",
         focus = mapping_disabled_prefix .. "f",
         select_model = mapping_disabled_prefix .. "m",
