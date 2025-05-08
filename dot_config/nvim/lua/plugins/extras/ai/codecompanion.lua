@@ -1,13 +1,8 @@
--- https://github.com/olimorris/dotfiles/blob/07ac630debbbb78a638413381736a8860647e537/.config/nvim/lua/plugins/coding.lua
+-- https://github.com/olimorris/dotfiles/blob/8b81a8acdc8135355c15c3f6ca351c1524a55d17/.config/nvim/lua/plugins/coding.lua
 return {
   {
     "olimorris/codecompanion.nvim",
     dependencies = {
-      -- {
-      --   "Davidyz/VectorCode",
-      --   version = "*",
-      --   build = "pipx upgrade vectorcode",
-      -- },
       {
         "MeanderingProgrammer/render-markdown.nvim",
         optional = true,
@@ -53,7 +48,8 @@ return {
           return require("codecompanion.adapters").extend("copilot", {
             schema = {
               model = {
-                default = "claude-3.7-sonnet",
+                -- default = "claude-3.7-sonnet",
+                default = "gemini-2.5-pro",
               },
             },
           })
@@ -62,20 +58,14 @@ return {
       strategies = {
         chat = {
           adapter = "copilot",
-          -- tools = {
-          --   vectorcode = {
-          --     description = "Run VectorCode to retrieve the project context.",
-          --     callback = function()
-          --       return require("vectorcode.integrations").codecompanion.chat.make_tool()
-          --     end,
-          --   },
-          -- },
         },
-        inline = { adapter = "copilot" },
+        inline = {
+          adapter = "copilot",
+        },
       },
       display = {
         action_palette = {
-          provider = ({ snacks = "snacks", telescope = "telescope" })[LazyVim.pick.picker.name],
+          provider = "default",
         },
         chat = {
           -- show_settings = true,
@@ -126,8 +116,37 @@ return {
           })
         end,
       })
+
+      -- HACK: stop insert mode on send via `i_CTRL-S`
+      -- https://github.com/olimorris/codecompanion.nvim/blob/90e82abf4d65b64b0986a5be0981ba13e84eee8b/lua/codecompanion/strategies/chat/keymaps.lua#L214-L218
+      local chat_keymaps = require("codecompanion.strategies.chat.keymaps")
+      chat_keymaps.send.callback = U.patch_func(chat_keymaps.send.callback, function(orig, ...)
+        orig(...)
+        vim.cmd("stopinsert")
+      end)
     end,
   },
+
+  -- vim.fn.executable("vectorcode") == 1 and {
+  --   "olimorris/codecompanion.nvim",
+  --   dependencies = {
+  --     {
+  --       "Davidyz/VectorCode",
+  --       version = "*",
+  --       build = "pipx upgrade vectorcode",
+  --       cmd = "VectorCode",
+  --     },
+  --   },
+  --   opts = {
+  --     extensions = {
+  --       vectorcode = {
+  --         opts = {
+  --           add_tool = true,
+  --         },
+  --       },
+  --     },
+  --   },
+  -- } or nil,
 
   -- TODO: https://github.com/ravitemer/codecompanion-history.nvim
 }

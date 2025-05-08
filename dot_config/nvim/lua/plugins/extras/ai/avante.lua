@@ -231,7 +231,7 @@ return {
         -- auto_suggestions = true, -- experimental
         -- auto_apply_diff_after_generation = true,
         -- auto_focus_on_diff_view = true,
-        enable_token_counting = false,
+        -- enable_token_counting = false,
       },
       provider = "copilot_claude", -- only recommend using claude
       -- auto_suggestions_provider = "ollama", -- high-frequency, can be expensive if enabled
