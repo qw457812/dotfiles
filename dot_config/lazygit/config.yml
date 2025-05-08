@@ -9,6 +9,10 @@ git:
 quitOnTopLevelReturn: true
 notARepository: skip
 promptToReturnFromSubprocess: false
+os:
+  # use `--remote` instead of `--remote-tab`
+  # copied from: https://github.com/jesseduffield/lazygit/blob/e6bd9d0ae6dd30d04dfe77d2cac15ac54fa18ff6/pkg/config/editor_presets.go#L60
+  edit: 'begin; if test -z "$NVIM"; nvim -- {{filename}}; else; nvim --server "$NVIM" --remote-send "q"; nvim --server "$NVIM" --remote {{filename}}; end; end'
 keybinding:
   universal:
     # not working, but <c-h> works
