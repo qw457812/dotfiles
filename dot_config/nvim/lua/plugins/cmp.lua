@@ -112,7 +112,7 @@ return {
             return
           end
           -- work-around for insert current
-          if #cmp.get_items() > 1 then
+          if #cmp.get_items() > 1 and cmp.get_selected_item_idx() ~= nil then
             cmp.select_next({ auto_insert = false })
             return cmp.select_prev({ auto_insert = true })
           else
