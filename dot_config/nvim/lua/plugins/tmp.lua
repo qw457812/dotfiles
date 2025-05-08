@@ -23,6 +23,7 @@ return {
   },
 
   -- :echo db#url#encode('my_password')
+  -- :=vim.fn['db#url#encode']('my_password')
   -- :echo db#url#parse('my_url')
   -- :echo db#adapter#dispatch("my_url", "interactive")
   {
@@ -32,19 +33,17 @@ return {
       -- -- The OceanBase I am using does not work with MySQL >9.0
       -- vim.env.PATH = "/opt/homebrew/opt/mysql@8.4/bin:" .. vim.env.PATH
 
-      -- :=vim.fn['db#url#encode']('my_password')
-      -- https://github.com/mistweaverco/kulala.nvim/blob/1c4156b8204137ff683d7c61b94218ca1cfbf801/lua/kulala/utils/string.lua#L22
-      local url_encode = function(str)
-        local function to_hex(char)
-          return string.format("%%%02X", string.byte(char))
-        end
-        return string.gsub(str, "[^a-zA-Z0-9_]", to_hex)
-      end
-
       local url = {
         mysql = function(user, password, host, port, database)
           -- mysql://[<user>[:<password>]@][<host>[:<port>]]/[database]
-          return string.format("mysql://%s:%s@%s:%s/%s", url_encode(user), url_encode(password), host, port, database)
+          return string.format(
+            "mysql://%s:%s@%s:%s/%s",
+            U.url_encode(user),
+            U.url_encode(password),
+            host,
+            port,
+            database
+          )
         end,
       }
 
@@ -70,4 +69,7 @@ return {
       end
     end,
   },
+
+  { "mason.nvim", pin = true },
+  { "mason-lspconfig.nvim", pin = true },
 }

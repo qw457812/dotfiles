@@ -178,6 +178,7 @@ function M.open_in_browser(url)
 end
 
 --- copied from: https://github.com/nvim-lua/plenary.nvim/blob/f031bef84630f556c2fb81215826ea419d81f4e9/lua/plenary/curl.lua#L44-L55
+--- https://github.com/mistweaverco/kulala.nvim/blob/1c4156b8204137ff683d7c61b94218ca1cfbf801/lua/kulala/utils/string.lua#L22-L30
 ---@param str string
 function M.url_encode(str)
   str = str:gsub("\r?\n", "\r\n")

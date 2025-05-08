@@ -783,7 +783,11 @@ return {
     },
   },
 
-  -- alternative: https://github.com/xzbdmw/nvimconfig/blob/0be9805dac4661803e17265b435060956daee757/lua/theme/dark.lua#L23
+  -- alternatives:
+  -- * https://github.com/xzbdmw/nvimconfig/blob/0be9805dac4661803e17265b435060956daee757/lua/theme/dark.lua#L23
+  -- * https://github.com/pogyomo/submode.nvim
+  -- * https://github.com/anuvyklack/hydra.nvim
+  -- * https://github.com/echasnovski/mini.nvim/blob/6105b69d79fef0afed5ed576081b1997ef2b4be1/doc/mini-clue.txt#L357
   {
     "debugloop/layers.nvim",
     keys = {

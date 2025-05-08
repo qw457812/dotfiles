@@ -203,6 +203,7 @@ function H.autocmd_chezmoi_add()
 
       U.debounce("chezmoi-add-xdg-config", 100, function()
         local file = U.path.home_to_tilde(event.match)
+        -- alternative to `vim.fn.confirm`: `vim.ui.select` | https://github.com/olimorris/codecompanion.nvim/pull/1354
         local ok, choice = pcall(vim.fn.confirm, ("Add %q to chezmoi?"):format(file), "&Yes\n&No")
         if not ok then
           return
