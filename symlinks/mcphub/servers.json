@@ -1,5 +1,4 @@
 {
-  "nativeMCPServers": [],
   "mcpServers": {
     "fetch": {
       "command": "uvx",
@@ -9,11 +8,8 @@
         "SERVER_URL": null,
         "DEBUG": "true"
       }
-    },
-    "sequentialthinking": {
-      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
-      "command": "npx"
     }
-  }
+  },
+  "nativeMCPServers": []
 }
 
