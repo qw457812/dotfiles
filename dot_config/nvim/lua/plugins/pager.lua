@@ -80,6 +80,13 @@ return {
             vim.cmd("normal! G")
           end, 100)
         end)
+      elseif vim.g.manpager and vim.g.user_is_termux then
+        -- fix the `command man chezmoi | eval $MANPAGER` open a empty buffer
+        LazyVim.on_very_lazy(function()
+          if vim.api.nvim_buf_get_name(0) == "man://" then
+            vim.cmd([[quit]])
+          end
+        end)
       end
     end,
     config = function(_, opts)
