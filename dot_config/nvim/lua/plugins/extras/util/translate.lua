@@ -17,10 +17,12 @@ return {
           "n",
           -- "x",
         },
-        "<Cmd>Translate<CR>",
-        desc = "󰊿 Translate",
+        function()
+          require("Trans").translate() -- `Translate` cmd conflicts with smart-translate.nvim
+        end,
+        desc = "Translate",
       },
-      -- { "m<tab>", "<Cmd>TranslateInput<CR>", desc = "󰊿 Translate From Input" },
+      -- { "m<tab>", "<Cmd>TranslateInput<CR>", desc = "Translate From Input" },
     },
     -- baidu, youdao settings: ~/.local/share/nvim/lazy/Trans.nvim/Trans.json
     opts = {
@@ -102,7 +104,33 @@ return {
           item({ "", "TransTitleRound" }),
         }
       end
+
+      if LazyVim.has("smart-translate.nvim") then
+        local hover = Trans.frontend.hover
+        -- HACK: fallback to smart-translate.nvim, need to disable baidu/youdao first
+        function hover:fallback()
+          -- https://github.com/JuanZoran/Trans.nvim/blob/fcde85544a7bfeda587fb35dd654c30632c48481/lua/Trans/frontend/hover/init.lua#L149-L189
+          Trans.util.main_loop(function()
+            vim.defer_fn(function()
+              self:destroy()
+              require("lazy").load({ plugins = { "smart-translate.nvim" } })
+              vim.cmd(("Translate --handle=float %s"):format(vim.fn.expand("<cword>")))
+            end, 0)
+          end)
+        end
+      end
     end,
+  },
+
+  {
+    "askfiy/smart-translate.nvim",
+    pager = true,
+    dependencies = { "askfiy/http.nvim", pager = true },
+    cmd = "Translate",
+    -- keys = {
+    --   { "m<space>", mode = "x", [[:Translate<CR>]], desc = "Translate" },
+    -- },
+    opts = {},
   },
 
   {
