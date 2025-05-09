@@ -73,7 +73,7 @@ return {
                   end
                 else
                   Snacks.picker.actions.jump(picker, item, action)
-                  if vim.g.user_explorer_auto_close or too_narrow() then
+                  if vim.g.user_explorer_auto_close or U.too_narrow() then
                     picker:close()
                   end
                 end
