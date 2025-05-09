@@ -55,7 +55,7 @@ return {
         previewers = {
           diff = {
             builtin = false,
-            cmd = { "delta", "--file-style", "omit ", "--hunk-header-style", "omit" },
+            cmd = { "delta", "--file-style", "omit", "--hunk-header-style", "omit" },
           },
           git = {
             builtin = false,

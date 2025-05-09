@@ -38,6 +38,7 @@
     "plugins.extras.ai.copilot-lsp",
     "plugins.extras.ai.mcphub",
     "plugins.extras.editor.mini-operators",
+    "plugins.extras.editor.undotree",
     "plugins.extras.git.gitlab",
     "plugins.extras.lang.xml",
     "plugins.extras.lsp.mason-lock",

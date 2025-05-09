@@ -69,6 +69,7 @@ abbr -a --position anywhere --set-cursor -- -h "% -h 2>&1 | bat --plain --langua
 abbr -a --position anywhere --set-cursor L "% | bat --style=plain --paging=always"
 abbr -a --position anywhere --set-cursor LL "% 2>&1 | bat --style=plain --paging=always"
 abbr -a --position anywhere --set-cursor V '% | vimpager'
+abbr -a --position anywhere --set-cursor VV '% 2>&1 | vimpager'
 abbr -a --position anywhere --set-cursor C "% | fish_clipboard_copy"
 abbr -a --position anywhere --set-cursor F '% | fzf'
 abbr -a --position anywhere --set-cursor W '% | wc -l'
@@ -151,8 +152,8 @@ abbr sva 'svn add'
 abbr svc 'svn commit'
 abbr svs 'svn status'
 abbr svu 'svn update'
-abbr svl --set-cursor 'svn log -v % | vimpager'
-abbr svll --set-cursor 'svn log -l % | vimpager'
+abbr svl --set-cursor 'svn log -v % 2>&1 | vimpager'
+abbr svll --set-cursor 'svn log -l % 2>&1 | vimpager'
 
 # Chezmoi
 abbr cz chezmoi
