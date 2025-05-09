@@ -136,6 +136,7 @@ return {
   {
     "potamides/pantran.nvim",
     pager = true,
+    cmd = "Pantran",
     keys = {
       {
         "m<space>",

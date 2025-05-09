@@ -1,6 +1,8 @@
 # https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md
 # https://github.com/jesseduffield/lazygit/blob/master/docs/Custom_Pagers.md
 # https://github.com/jesseduffield/lazygit/blob/master/docs/keybindings/Custom_Keybindings.md
+gui:
+  nerdFontsVersion: "3"
 git:
   paging:
     colorArg: always

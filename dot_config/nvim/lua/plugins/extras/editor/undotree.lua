@@ -1,4 +1,38 @@
 return {
+  {
+    "y3owk1n/time-machine.nvim",
+    cmd = "TimeMachineToggle",
+    keys = {
+      { "<leader>sU", "<cmd>TimeMachineToggle<cr>", desc = "Time Machine" },
+      {
+        "<Esc>",
+        function()
+          if not U.keymap.clear_ui_esc() then
+            local win = vim.api.nvim_get_current_win()
+            vim.cmd("wincmd p")
+            if vim.api.nvim_get_current_win() == win then
+              vim.cmd("wincmd w")
+            end
+          end
+        end,
+        desc = "Clear UI or Unfocus (Time Machine)",
+        ft = "time-machine-list",
+      },
+    },
+    ---@module "time-machine"
+    ---@type TimeMachine.Config
+    opts = {
+      diff_tool = "delta",
+      external_diff_args = {
+        delta = { "--file-style", "omit", "--hunk-header-style", "omit", "--paging", "never" },
+      },
+      keymaps = {
+        redo = "U",
+        preview_sequence_diff = "d",
+      },
+    },
+  },
+
   -- https://github.com/Matt-FTW/dotfiles/blob/9c7bd1b3737e3ced5bd97e6df803eaecb7692451/.config/nvim/lua/plugins/extras/editor/telescope/undotree.lua
   -- https://github.com/appelgriebsch/Nv/blob/56b0ff93056d031666049c9a0d0b5f7b5c36b958/lua/plugins/extras/editor/undo-mode.lua
   -- https://github.com/duckien2346/nvim-config/blob/0c48b6c97dcff9ed62d1ac63e9d3c7668d55b529/lua/plugins/life-saver/telescope-undo.lua

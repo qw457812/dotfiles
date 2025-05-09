@@ -1,7 +1,7 @@
 {
   "basedpyright": "1.29.1",
   "bash-language-server": "5.6.0",
-  "copilot-language-server": "1.316.0",
+  "copilot-language-server": "1.317.0",
   "debugpy": "1.8.14",
   "docker-compose-language-service": "0.4.0",
   "dockerfile-language-server": "0.14.0",
