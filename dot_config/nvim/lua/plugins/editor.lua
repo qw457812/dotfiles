@@ -456,6 +456,7 @@ return {
       ---@module 'undo-glow'
       ---@type UndoGlow.Config
       return {
+        priority = 2048 * 3,
         animation = {
           enabled = true,
           duration = 150,

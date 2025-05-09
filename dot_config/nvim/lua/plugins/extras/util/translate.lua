@@ -125,11 +125,36 @@ return {
   {
     "askfiy/smart-translate.nvim",
     pager = true,
-    dependencies = { "askfiy/http.nvim", pager = true },
+    dependencies = {
+      { "askfiy/http.nvim", pager = true },
+      { "JuanZoran/Trans.nvim", optional = true }, -- HACK: make sure to overwrite the `Translate` command of Trans.nvim
+    },
     cmd = "Translate",
-    -- keys = {
-    --   { "m<space>", mode = "x", [[:Translate<CR>]], desc = "Translate" },
-    -- },
+    keys = {
+      -- {
+      --   "m<space>",
+      --   mode = "x",
+      --   function()
+      --     return (":Translate --handle=%s<CR>"):format(U.is_floating_win() and "float" or "split")
+      --   end,
+      --   expr = true,
+      --   desc = "Translate",
+      -- },
+      {
+        "<Esc>",
+        function()
+          if not U.keymap.clear_ui_esc() then
+            local win = vim.api.nvim_get_current_win()
+            vim.cmd("wincmd p")
+            if vim.api.nvim_get_current_win() == win then
+              vim.cmd("wincmd w")
+            end
+          end
+        end,
+        desc = "Clear UI or Unfocus (Smart Translate)",
+        ft = "translate-split",
+      },
+    },
     opts = {},
   },
 
