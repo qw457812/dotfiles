@@ -6,15 +6,7 @@ return {
       { "<leader>sU", "<cmd>TimeMachineToggle<cr>", desc = "Time Machine" },
       {
         "<Esc>",
-        function()
-          if not U.keymap.clear_ui_esc() then
-            local win = vim.api.nvim_get_current_win()
-            vim.cmd("wincmd p")
-            if vim.api.nvim_get_current_win() == win then
-              vim.cmd("wincmd w")
-            end
-          end
-        end,
+        U.keymap.clear_ui_or_unfocus_esc,
         desc = "Clear UI or Unfocus (Time Machine)",
         ft = "time-machine-list",
       },

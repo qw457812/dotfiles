@@ -29,20 +29,7 @@ return {
         { "gd", "<Plug>(DBUI_ToggleDetails)", desc = "Toggle Details (dadbod)", ft = "dbui" },
         { "<localleader>f", "<Plug>(DBUI_JumpToForeignKey)", desc = "Jump To Foreign Key (dadbod)", ft = "dbout" },
         { "<localleader>r", "<Plug>(DBUI_ToggleResultLayout)", desc = "Toggle Result Layout (dadbod)", ft = "dbout" },
-        {
-          "<esc>",
-          function()
-            if not U.keymap.clear_ui_esc() then
-              local win = vim.api.nvim_get_current_win()
-              vim.cmd("wincmd p")
-              if vim.api.nvim_get_current_win() == win then
-                vim.cmd("wincmd w")
-              end
-            end
-          end,
-          desc = "Clear UI or Unfocus (dadbod)",
-          ft = { "dbui", "dbout" },
-        },
+        { "<esc>", U.keymap.clear_ui_or_unfocus_esc, desc = "Clear UI or Unfocus (dadbod)", ft = { "dbui", "dbout" } },
       })
     end,
   },

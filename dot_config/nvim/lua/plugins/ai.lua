@@ -143,11 +143,12 @@ return {
           -- path sources triggered by "/" interfere with CopilotChat commands
           vim.b[ev.buf].user_blink_path = false
 
-          vim.keymap.set("n", "<Esc>", function()
-            if not U.keymap.clear_ui_esc() then
-              vim.cmd("wincmd p")
-            end
-          end, { buffer = ev.buf, desc = "Clear UI or Unfocus (CopilotChat)" })
+          vim.keymap.set(
+            "n",
+            "<Esc>",
+            U.keymap.clear_ui_or_unfocus_esc,
+            { buffer = ev.buf, desc = "Clear UI or Unfocus (CopilotChat)" }
+          )
         end,
       })
 
