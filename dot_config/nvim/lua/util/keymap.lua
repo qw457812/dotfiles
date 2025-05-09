@@ -206,8 +206,10 @@ function M.indented_i()
   end
 end
 
+---@alias ClearUiEscOpts {close?: function|false, popups?: boolean, esc?: boolean}
+
 ---https://github.com/megalithic/dotfiles/blob/fce3172e3cb1389de22bf97ccbf29805c2262525/config/nvim/lua/mega/mappings.lua#L143
----@param opts? {close?: function|false, popups?: boolean, esc?: boolean}
+---@param opts? ClearUiEscOpts
 ---@return boolean
 function M.clear_ui_esc(opts)
   opts = vim.tbl_deep_extend("keep", opts or {}, {
@@ -301,6 +303,17 @@ function M.clear_ui_esc(opts)
     vim.api.nvim_feedkeys(vim.keycode("<esc>"), "n", false)
   end
   return something_done
+end
+
+---@param opts? ClearUiEscOpts
+function M.clear_ui_or_unfocus_esc(opts)
+  if not M.clear_ui_esc(opts) then
+    local win = vim.api.nvim_get_current_win()
+    vim.cmd("wincmd p")
+    if vim.api.nvim_get_current_win() == win then
+      vim.cmd("wincmd w")
+    end
+  end
 end
 
 return M

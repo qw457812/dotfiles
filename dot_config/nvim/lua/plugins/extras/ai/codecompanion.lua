@@ -100,11 +100,12 @@ return {
         pattern = "codecompanion",
         callback = function(ev)
           local buf = ev.buf
-          vim.keymap.set("n", "<Esc>", function()
-            if not U.keymap.clear_ui_esc() then
-              vim.cmd.wincmd("p")
-            end
-          end, { buffer = buf, desc = "Clear UI or Unfocus (CodeCompanion)" })
+          vim.keymap.set(
+            "n",
+            "<Esc>",
+            U.keymap.clear_ui_or_unfocus_esc,
+            { buffer = buf, desc = "Clear UI or Unfocus (CodeCompanion)" }
+          )
 
           vim.api.nvim_create_autocmd("BufLeave", {
             group = augroup,

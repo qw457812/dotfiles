@@ -142,15 +142,7 @@ return {
       -- },
       {
         "<Esc>",
-        function()
-          if not U.keymap.clear_ui_esc() then
-            local win = vim.api.nvim_get_current_win()
-            vim.cmd("wincmd p")
-            if vim.api.nvim_get_current_win() == win then
-              vim.cmd("wincmd w")
-            end
-          end
-        end,
+        U.keymap.clear_ui_or_unfocus_esc,
         desc = "Clear UI or Unfocus (Smart Translate)",
         ft = "translate-split",
       },
