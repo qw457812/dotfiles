@@ -332,21 +332,25 @@ return {
         "nt",
         -- "no", -- vim.hl.on_yank()
       }
-      -- opts.filetypes_denylist =
-      --   vim.list_extend(opts.filetypes_denylist or vim.deepcopy(require("illuminate.config").filetypes_denylist()), {
-      --     "lazy",
-      --     "mason",
-      --     "harpoon",
-      --     "qf",
-      --     "netrw",
-      --     "neo-tree",
-      --     "oil",
-      --     "minifiles",
-      --     "trouble",
-      --     "notify",
-      --     "TelescopePrompt",
-      --     "snacks_picker_input",
-      --   })
+      opts.filetypes_denylist =
+        vim.list_extend(opts.filetypes_denylist or vim.deepcopy(require("illuminate.config").filetypes_denylist()), {
+          "DiffviewFiles",
+          "DiffviewFileHistory",
+          "NeogitStatus",
+          "NeogitPopup",
+          -- "lazy",
+          -- "mason",
+          -- "harpoon",
+          -- "qf",
+          -- "netrw",
+          -- "neo-tree",
+          -- "oil",
+          -- "minifiles",
+          -- "trouble",
+          -- "notify",
+          -- "TelescopePrompt",
+          -- "snacks_picker_input",
+        })
     end,
   },
 
