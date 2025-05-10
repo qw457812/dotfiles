@@ -237,7 +237,7 @@ return {
       -- auto_suggestions_provider = "ollama", -- high-frequency, can be expensive if enabled
       ---@type AvanteSupportedProvider
       copilot = {
-        model = "gpt-4o",
+        model = "gpt-4.1",
       },
       ---@type AvanteSupportedProvider
       ollama = {
@@ -255,10 +255,8 @@ return {
       -- https://github.com/yetone/cosmos-nvim/blob/64ffc3f90f33eb4049f1495ba49f086280dc8a1c/lua/layers/completion/plugins.lua#L249
       ---@type table<string, AvanteSupportedProvider>
       vendors = {
-        -- be able to switch between copilot (gpt-4o) and copilot_claude
         copilot_claude = {
           __inherited_from = "copilot",
-          -- https://github.com/CopilotC-Nvim/CopilotChat.nvim#models
           model = "claude-3.7-sonnet",
         },
         copilot_claude_thought = {
@@ -270,10 +268,6 @@ return {
         copilot_gemini = {
           __inherited_from = "copilot",
           model = "gemini-2.5-pro",
-        },
-        copilot_gpt_4o_mini = {
-          __inherited_from = "copilot",
-          model = "gpt-4o-mini",
         },
         -- deepseek = {
         --   __inherited_from = "openai",
@@ -302,7 +296,7 @@ return {
           __inherited_from = "openai",
           endpoint = "https://openrouter.ai/api/v1",
           api_key_name = "OPENROUTER_API_KEY",
-          model = "google/gemini-2.5-pro-preview-03-25",
+          model = "google/gemini-2.5-pro-preview",
         },
         ["claude-haiku"] = { hide_in_model_selector = true },
         ["claude-opus"] = { hide_in_model_selector = true },

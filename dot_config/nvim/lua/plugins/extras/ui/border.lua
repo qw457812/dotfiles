@@ -205,4 +205,17 @@ return {
       },
     },
   },
+
+  {
+    "y3owk1n/time-machine.nvim",
+    optional = true,
+    opts = function()
+      -- HACK: add border for diff/help/log window
+      -- https://github.com/y3owk1n/time-machine.nvim/blob/08bda79dfc13b4b81d2fbb8295d0ad5a3a438d84/lua/time-machine/window.lua#L5-L8
+      local orig_winborder = vim.o.winborder
+      vim.o.winborder = "rounded"
+      require("time-machine.window")
+      vim.o.winborder = orig_winborder
+    end,
+  },
 }
