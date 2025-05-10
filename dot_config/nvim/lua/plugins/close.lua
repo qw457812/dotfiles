@@ -270,6 +270,34 @@ return {
           [close_key] = "close_window",
         },
       },
+      filesystem = {
+        window = {
+          mappings = {
+            [close_key] = "close_window",
+          },
+        },
+      },
+      buffers = {
+        window = {
+          mappings = {
+            [close_key] = "close_window",
+          },
+        },
+      },
+      git_status = {
+        window = {
+          mappings = {
+            [close_key] = "close_window",
+          },
+        },
+      },
+      document_symbols = {
+        window = {
+          mappings = {
+            [close_key] = "close_window",
+          },
+        },
+      },
     },
   },
   {
@@ -286,6 +314,16 @@ return {
               -- https://github.com/nvim-neo-tree/neo-tree.nvim/blob/d175a0ce24bcb022ec1c93635841c043d764418e/lua/neo-tree/sources/filesystem/lib/filter.lua#L203
               vim.cmd("wincmd p")
             end, { buffer = event.buf, desc = "Close (NeoTree Popup)" })
+          end, 100)
+        end,
+      })
+      vim.api.nvim_create_autocmd("FileType", {
+        group = augroup,
+        pattern = "neo-tree",
+        callback = function(event)
+          vim.defer_fn(function()
+            -- HACK: sometimes `<bs>` is mapped to `navigate_up` instead of `close_window`
+            vim.keymap.set("n", close_key, "q", { buffer = event.buf, remap = true, desc = "Close (NeoTree)" })
           end, 100)
         end,
       })
