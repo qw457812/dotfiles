@@ -93,6 +93,12 @@ map("n", "dd", function()
   return vim.api.nvim_get_current_line():match("^%s*$") and '"_dd' or "dd"
 end, { expr = true, desc = "Don't Yank Empty Line to Clipboard" })
 map("n", "i", U.keymap.indented_i, { desc = "Indented i on Empty Line" })
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "neo-tree-popup",
+  callback = function(event)
+    map("n", "i", "i", { buffer = event.buf })
+  end,
+})
 
 safe_map("n", "n", "nzv") -- nvim-hlslens
 safe_map("n", "N", "Nzv")
