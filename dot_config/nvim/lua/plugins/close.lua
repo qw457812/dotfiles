@@ -493,6 +493,7 @@ return {
     optional = true,
     opts = function()
       vim.api.nvim_create_autocmd("FileType", {
+        group = augroup,
         pattern = "copilot-chat",
         callback = function(ev)
           vim.keymap.set("n", close_key, function()

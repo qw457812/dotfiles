@@ -22,6 +22,10 @@ return {
         redo = "U",
         preview_sequence_diff = "d",
       },
+      split_opts = {
+        split = "right",
+        width = vim.g.user_explorer_width,
+      },
     },
   },
 

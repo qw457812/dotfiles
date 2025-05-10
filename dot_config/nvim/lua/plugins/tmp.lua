@@ -70,6 +70,6 @@ return {
     end,
   },
 
-  { "mason.nvim", pin = true },
-  { "mason-lspconfig.nvim", pin = true },
+  { "mason.nvim", version = "^1.0.0" },
+  { "mason-lspconfig.nvim", version = "^1.0.0" },
 }
