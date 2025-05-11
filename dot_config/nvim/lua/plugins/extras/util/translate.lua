@@ -138,6 +138,7 @@ return {
       --     return (":Translate --handle=%s<CR>"):format(U.is_floating_win() and "float" or "split")
       --   end,
       --   expr = true,
+      --   silent = true,
       --   desc = "Translate",
       -- },
       {

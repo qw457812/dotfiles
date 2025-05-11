@@ -5,8 +5,8 @@ function H.build_plugin(plugin)
 end
 
 return {
-  -- https://github.com/sxyazi/dotfiles/blob/18ce3eda7792df659cb248d9636b8d7802844831/nvim/lua/plugins/ui.lua#L646
-  -- https://github.com/mikavilpas/dotfiles/blob/main/.config/nvim/lua/plugins/my-file-manager.lua
+  -- https://github.com/sxyazi/dotfiles/blob/79828c4b3f33a9b0286f2c8f5e60dcc052ace632/nvim/lua/plugins/ui.lua#L557
+  -- https://github.com/mikavilpas/dotfiles/blob/4e99cc0c933abd614bd362e2555630b528ebb0fe/.config/nvim/lua/plugins/my-file-manager.lua
   {
     "mikavilpas/yazi.nvim",
     dependencies = "folke/snacks.nvim",
@@ -59,6 +59,7 @@ return {
 
       local picker = ({ snacks = "snacks.picker", fzf = "fzf-lua", telescope = "telescope" })[LazyVim.pick.picker.name]
 
+      ---@module "yazi"
       ---@type YaziConfig
       return {
         open_for_directories = vim.g.user_hijack_netrw == "yazi.nvim",
@@ -66,8 +67,14 @@ return {
         floating_window_scaling_factor = vim.g.user_is_termux and 1 or { height = 0.875, width = 0.9 },
         yazi_floating_window_border = vim.g.user_is_termux and "none" or nil,
         keymaps = {
-          cycle_open_buffers = false, -- see: https://github.com/mikavilpas/yazi.nvim/pull/894
-          show_help = "~", -- `~` for yazi.nvim and `g?` for yazi
+          -- do not map `<tab>` or `~`, otherwise they will not be available in `shell "$SHELL" --block`
+          -- see: https://github.com/mikavilpas/yazi.nvim/pull/894
+          cycle_open_buffers = "<c-space>",
+          open_file_in_horizontal_split = "<c-s>",
+          grep_in_directory = "<c-g>",
+          replace_in_directory = "<m-r>",
+          open_and_pick_window = "<m-o>",
+          copy_relative_path_to_selected_files = "<m-y>",
         },
         integrations = {
           grep_in_directory = picker,
@@ -109,4 +116,44 @@ return {
       { "dedukun/bookmarks.yazi", lazy = true, build = H.build_plugin },
     },
   },
+
+  LazyVim.pick.picker.name == "snacks"
+      and {
+        "mikavilpas/yazi.nvim",
+        ---@type YaziConfig
+        opts = {
+          integrations = {
+            picker_add_copy_relative_path_action = "snacks.picker",
+          },
+        },
+        specs = {
+          {
+            "folke/snacks.nvim",
+            ---@module "snacks"
+            ---@type snacks.Config
+            opts = {
+              picker = {
+                win = {
+                  input = {
+                    keys = {
+                      ["<M-y>"] = {
+                        "<M-y>",
+                        function(self)
+                          require("lazy").load({ plugins = { "yazi.nvim" } })
+                          self:execute("yazi_copy_relative_path")
+                          local paths = vim.fn.getreg(require("yazi").config.clipboard_register)
+                          LazyVim.info(paths, { title = "Copied Path" })
+                        end,
+                        mode = { "n", "i" },
+                        desc = "yazi_copy_relative_path",
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      }
+    or nil,
 }

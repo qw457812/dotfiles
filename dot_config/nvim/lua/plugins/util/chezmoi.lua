@@ -267,10 +267,30 @@ return {
         end,
       })
     end,
-    opts = function()
+    opts = function(_, opts)
       vim.api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
         group = vim.api.nvim_create_augroup("chezmoi_managed_cache", { clear = true }),
         callback = U.debounce_wrap(100, H.reset),
+      })
+
+      return U.extend_tbl(opts, {
+        events = {
+          on_open = {
+            notification = {
+              enable = true,
+            },
+          },
+          on_watch = {
+            notification = {
+              enable = false,
+            },
+          },
+          on_apply = {
+            notification = {
+              enable = true,
+            },
+          },
+        },
       })
     end,
   },
@@ -438,8 +458,8 @@ return {
             event = "notify",
             any = {
               { find = "^chezmoi: .*: not in source state$" },
-              { find = "^Edit: Opened a chezmoi%-managed file$" },
-              { find = "^Edit: Successfully applied$" },
+              { find = "^Opened a chezmoi%-managed file$" },
+              { find = "^Successfully applied$" },
             },
           },
           view = "mini",
