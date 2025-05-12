@@ -137,9 +137,14 @@ map("x", "A", blockwise_force("A"), { expr = true, desc = "Blockwise Append" })
 -- buffers
 -- ":e #" doesn't work if the alternate buffer doesn't have a file name, while CTRL-^ still works then
 map("n", { "<leader>`", "<leader>bb" }, "<C-^>", { desc = "Switch to Other Buffer" })
+-- stylua: ignore start
+map("n", "<leader>bo", function()
+  Snacks.bufdelete({ filter = function(b) return #vim.fn.win_findbuf(b) == 0 end })
+end, { desc = "Delete Hidden Buffers" })
+map("n", "<leader>bO", function() Snacks.bufdelete.other() end, { desc = "Delete Other Buffers" })
 safe_map("n", "<leader>ba", "<cmd>bufdo bd<cr>", { desc = "Delete All Buffers" }) -- bufferline.nvim
--- stylua: ignore
 map("n", "<leader>bA", function() Snacks.bufdelete.all() end, { desc = "Delete All Buffers" })
+-- stylua: ignore end
 
 -- windows
 map("n", "vv", "<C-w>v", { desc = "Split Window Right", remap = true }) -- "<C-w>v<cmd>e #<cr>"
