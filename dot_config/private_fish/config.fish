@@ -13,6 +13,7 @@ fish_add_path ~/.local/share/bob/nvim-bin
 fish_add_path ~/go/bin
 fish_add_path "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
 fish_add_path "$HOME/Library/Application Support/Coursier/bin" # scalafmt
+fish_add_path ~/.codeium/windsurf/bin
 
 # Fish
 set -g fish_greeting

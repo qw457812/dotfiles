@@ -30,6 +30,10 @@
   "files.trimTrailingWhitespace": true,
   "files.insertFinalNewline": true,
   "files.trimFinalNewlines": true,
+  "files.watcherExclude": {
+    "**/.bloop": true,
+    "**/.metals": true
+  },
   "diffEditor.renderSideBySide": true,
   "[python]": {
     "editor.formatOnSave": true,

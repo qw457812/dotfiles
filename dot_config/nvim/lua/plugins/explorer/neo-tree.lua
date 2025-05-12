@@ -87,6 +87,7 @@ return {
               or vim.list_contains({ "neo-tree", "gitcommit", "snacks_dashboard" }, vim.bo[buf or 0].filetype)
               or U.is_edgy_win(win)
               or vim.t.user_diffview
+              or vim.fn.getcmdwintype() ~= ""
           end
 
           -- If `vim.g.user_explorer_auto_close` is set to true,

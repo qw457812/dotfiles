@@ -288,9 +288,7 @@ return {
               number = false,
               winbar = "", -- disable dropbar.nvim for Snacks.picker.buffers()
             },
-            b = {
-              snacks_indent = false,
-            },
+            -- b = { snacks_indent = false },
             keys = {
               ["<Esc>"] = {
                 "<Esc>",
