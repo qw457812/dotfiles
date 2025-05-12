@@ -666,8 +666,8 @@ vnoremap <silent> W :togglepane<cr>gv
 " Quit vifm
 " nnoremap q :q<cr>
 nnoremap q :wqall<cr>
-" not work
-" nnoremap <bs> :wqall<cr>
+" sometimes not working
+nnoremap <bs> :wqall<cr>
 " Also sometimes neither of them might work and it's <del> key which corresponds to your backspace (don't mind the name). | https://vifm.info/manual.shtml
 " Note: <del> here actually means <bs>
 nnoremap <del> :wqall<cr>
@@ -894,7 +894,7 @@ autocmd DirEnter * !zoxide add %d %i
 
 " https://wiki.vifm.info/index.php/How_to_integrate_fzf_for_fuzzy_finding
 " https://github.com/vifm/vifm/issues/279#issuecomment-1001788619
-if $TMUX
+if $TMUX != ''
     " Use popup window. Requires tmux 3.2 and up
     command! FZFfind : set noquickview
                     \| let $FZF_PICK = system('fd -H | fzf-tmux -p 60%% --reverse --header="Find in path: %d" 2>/dev/tty')
