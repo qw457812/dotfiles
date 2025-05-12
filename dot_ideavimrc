@@ -171,19 +171,25 @@ xmap ig <Plug>textobj-entire-i
 " let g:NERDTreeMapCloseDir = "h"
 let g:NERDTreeMapJumpParent = "h"
 let g:NERDTreeMapActivateNode = "l"
+let g:NERDTreeMapJumpRoot = "gg"
+let g:NERDTreeMapJumpLastChild = "G"
 let g:NERDTreeMapQuit = "<BS>"
-let g:NERDTreeMapPreview = "<TAB>"
+" <TAB>
+let g:NERDTreeMapPreview = "<CR>"
 let g:NERDTreeMapPaste = "p"
 let g:NERDTreeMapNewFile = "a"
 let g:NERDTreeMapNewDir = "A"
 let g:NERDTreeMapRefresh = "<C-r>"
 let g:NERDTreeMapRename = "r"
 let g:NERDTreeMapToggleHidden = "g."
+let g:NERDTreeMapOpenSplit = "<C-s>"
+let g:NERDTreeMapOpenVSplit = "<C-v>"
+let g:NERDTreeMapOpenInTab = "<C-t>"
+let g:NERDTreeMapMenu = ","
 let g:NERDTreeMapOpenRecursively = "zO"
 let g:NERDTreeMapCloseDir = "zc"
 let g:NERDTreeMapCloseChildren = "zC"
 let g:NERDTreeMapToggleZoom = "Z"
-let g:NERDTreeMapMenu = ","
 
 nmap s <Plug>ReplaceWithRegisterOperator
 nmap ss <Plug>ReplaceWithRegisterLine
@@ -387,8 +393,9 @@ imap <C-k> <Action>(copilot.cyclePrevInlays)
 " nmap m <Action>(ToggleBookmarkWithMnemonic)
 
 " map gd <Action>(GotoDeclarationOnly)
+" map gr gd
 " map gr <Action>(FindUsages)
-map gr gd
+map gr <Action>(ShowUsages)
 map gI <Action>(GotoImplementation)
 " map gI <Action>(QuickImplementations)
 " execute hover on gh
@@ -622,7 +629,6 @@ map <leader>rr <Action>(Run)
 map <leader>rs <Action>(Stop)
 " map <leader>sd <Action>(SafeDelete)
 map <leader>si <Action>(SelectIn)
-map <leader>su <Action>(ShowUsages)
 " map <Leader>sw :action SurroundWith<CR>
 map <leader>th <Action>(TypeHierarchy)
 " add

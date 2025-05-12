@@ -69,7 +69,4 @@ return {
       end
     end,
   },
-
-  { "mason.nvim", version = "^1.0.0" },
-  { "mason-lspconfig.nvim", version = "^1.0.0" },
 }
