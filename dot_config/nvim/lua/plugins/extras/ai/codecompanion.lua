@@ -100,6 +100,8 @@ return {
         pattern = "codecompanion",
         callback = function(ev)
           local buf = ev.buf
+          vim.b[buf].user_blink_path = false
+
           vim.keymap.set(
             "n",
             "<Esc>",

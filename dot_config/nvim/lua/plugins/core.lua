@@ -56,6 +56,26 @@ return {
         -- top_down = false,
         -- filter = function(notif) return true end,
       },
+      indent = {
+        -- enable `only_current` to fix issues like: https://github.com/lukas-reineke/indent-blankline.nvim/issues/622#issuecomment-1707489777
+        indent = {
+          only_current = true,
+        },
+        scope = {
+          only_current = true,
+        },
+        chunk = {
+          only_current = true,
+        },
+        -- -- alternative to `only_current`, note that indent in floating windows like zen/zoom will be disabled in this case
+        -- filter = function(buf)
+        --   -- copied from: https://github.com/folke/snacks.nvim/blob/cddf714dd66a14b0cf556f9be82165b22517de1a/lua/snacks/indent.lua#L78-L80
+        --   return vim.g.snacks_indent ~= false
+        --     and vim.b[buf].snacks_indent ~= false
+        --     and vim.bo[buf].buftype == ""
+        --     and #vim.fn.win_findbuf(buf) == 1
+        -- end,
+      },
       scroll = {
         animate = {
           duration = { step = 10, total = 100 },

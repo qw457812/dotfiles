@@ -73,7 +73,14 @@ return {
           [".*/vscode/keybindings%.json"] = "jsonc",
         },
       })
+
       vim.treesitter.language.register("vim", "vifm")
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "vifm",
+        callback = function()
+          vim.opt_local.commentstring = '" %s'
+        end,
+      })
     end,
   },
 }
