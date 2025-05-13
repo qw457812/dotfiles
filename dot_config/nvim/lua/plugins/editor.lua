@@ -527,10 +527,10 @@ return {
             end
 
             local opts = require("undo-glow.utils").merge_command_opts("UgCursor", {
-              animation = {
+              animation = not U.has_user_extra("ui.nvchad-ui") and {
                 duration = 500,
                 animation_type = "slide",
-              },
+              } or nil,
             })
             local lnum = vim.api.nvim_win_get_cursor(0)[1]
             local line = vim.api.nvim_get_current_line()

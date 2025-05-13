@@ -84,7 +84,7 @@ return {
         callback = function(event)
           local function should_ignore(buf, win)
             return vim.api.nvim_win_get_config(win or 0).relative ~= ""
-              or vim.list_contains({ "neo-tree", "gitcommit", "snacks_dashboard" }, vim.bo[buf or 0].filetype)
+              or vim.list_contains({ "neo-tree", "gitcommit", "snacks_dashboard", "nvdash" }, vim.bo[buf or 0].filetype)
               or U.is_edgy_win(win)
               or vim.t.user_diffview
               or vim.fn.getcmdwintype() ~= ""
