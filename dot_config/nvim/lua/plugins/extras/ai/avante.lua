@@ -116,22 +116,7 @@ return {
     -- lazy = false, -- see: https://github.com/yetone/avante.nvim/issues/561#issuecomment-2342550208
     build = vim.g.user_is_termux and "make BUILD_FROM_SOURCE=true" or "make",
     dependencies = {
-      {
-        "nvim-treesitter/nvim-treesitter",
-        -- opts = {
-        --   -- copied from: https://github.com/yetone/avante.nvim/pull/1181
-        --   highlight = {
-        --     disable = function(_, buf)
-        --       if vim.bo[buf].filetype == "Avante" then
-        --         local sidebar = require("avante").get()
-        --         if sidebar and sidebar.is_generating then
-        --           return true
-        --         end
-        --       end
-        --     end,
-        --   },
-        -- },
-      },
+      "nvim-treesitter/nvim-treesitter",
       "stevearc/dressing.nvim",
       "MunifTanjim/nui.nvim",
       "zbirenbaum/copilot.lua", -- for `provider = "copilot"`

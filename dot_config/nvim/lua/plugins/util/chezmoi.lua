@@ -232,6 +232,29 @@ end
 
 return {
   {
+    "alker0/chezmoi.vim",
+    lazy = false,
+    init = function()
+      vim.g["chezmoi#use_tmp_buffer"] = 1
+      vim.g["chezmoi#source_dir_path"] = U.path.CHEZMOI
+    end,
+    specs = {
+      {
+        "nvim-treesitter/nvim-treesitter",
+        opts = {
+          highlight = {
+            disable = function(_, buf)
+              if vim.bo[buf].filetype:find("chezmoitmpl") then
+                return true
+              end
+            end,
+          },
+        },
+      },
+    },
+  },
+
+  {
     "xvzc/chezmoi.nvim",
     optional = true,
     cmd = "ChezmoiEdit",
