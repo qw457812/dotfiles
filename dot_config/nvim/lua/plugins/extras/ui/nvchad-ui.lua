@@ -4,13 +4,21 @@ return {
   lazy = false,
   keys = {
     -- stylua: ignore
-    { "<Leader>uC", function() require("nvchad.themes").open() end, desc = "NvChad Themes" },
+    { "<Leader>uC", function() require("nvchad.themes").open() end, desc = "Themes (NvChad)" },
   },
   opts = function()
     return {
       base46 = {
         theme = "onedark",
+        hl_override = {
+          -- https://github.com/NvChad/base46/blob/0e1824f7e4a3df36180e607e1adb3bdbd96db07f/lua/base46/integrations/defaults.lua#L19
+          FloatTitle = vim.g.user_transparent_background and { fg = "white", bg = "NONE" } or nil,
+        },
         transparency = vim.g.user_transparent_background,
+        -- penumbra_dark, github_dark, oceanic-next
+        theme_toggle = { "onedark", "bearded-arc" },
+        -- https://github.com/NvChad/base46/blob/3fa132de83788b34db0bb170c2a4e9138ccad3e7/lua/base46/init.lua#L6-L23
+        integrations = { "diffview" },
       },
       ui = {
         statusline = {
@@ -41,13 +49,24 @@ return {
     require("nvchad")
   end,
   specs = {
-    -- {
-    --   "LazyVim/LazyVim",
-    --   config = function(_, opts)
-    --     opts.colorscheme = function() end
-    --     require("lazyvim").setup(opts)
-    --   end,
-    -- },
+    {
+      "LazyVim/LazyVim",
+      opts = function()
+        vim.api.nvim_create_autocmd("User", {
+          pattern = "LazyVimKeymaps",
+          once = true,
+          callback = function()
+            vim.keymap.set("n", "<leader>ur", function()
+              require("base46").toggle_theme()
+            end, { desc = "Toggle Theme (NvChad)" })
+          end,
+        })
+      end,
+      -- config = function(_, opts)
+      --   opts.colorscheme = function() end
+      --   require("lazyvim").setup(opts)
+      -- end,
+    },
     {
       "hrsh7th/nvim-cmp",
       optional = true,
@@ -63,10 +82,11 @@ return {
         -- https://github.com/NvChad/ui/blob/9a60cd12635c7235200d810bf94019c0c931a656/lua/nvchad/blink/config.lua
         return vim.tbl_deep_extend("force", opts, {
           completion = {
-            documentation = {
-              window = { border = "single" },
+            menu = {
+              draw = {
+                components = require("nvchad.blink").components,
+              },
             },
-            menu = require("nvchad.blink").menu,
           },
         })
       end,
@@ -203,12 +223,13 @@ return {
             end)
           end,
         },
+        -- opts.base46.integrations
         {
-          "folke/trouble.nvim",
+          "sindrets/diffview.nvim",
           optional = true,
           opts = function()
             pcall(function()
-              dofile(vim.g.base46_cache .. "trouble")
+              dofile(vim.g.base46_cache .. "diffview")
             end)
           end,
         },
