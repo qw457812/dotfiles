@@ -233,6 +233,7 @@ end
 return {
   {
     "alker0/chezmoi.vim",
+    optional = true,
     lazy = false,
     init = function()
       vim.g["chezmoi#use_tmp_buffer"] = 1

@@ -621,23 +621,22 @@ return {
 
   {
     "LazyVim/LazyVim",
+    keys = {
+      {
+        "<leader>ur",
+        function()
+          local random = random_colorscheme()
+          if random then
+            vim.cmd.colorscheme(random)
+            LazyVim.info(random, { title = "Random ColorScheme" })
+          end
+        end,
+        desc = "Random ColorScheme",
+      },
+    },
     opts = function(_, opts)
       opts = opts or {}
       opts.colorscheme = random_colorscheme()
-
-      vim.api.nvim_create_autocmd("User", {
-        pattern = "LazyVimKeymaps",
-        once = true,
-        callback = function()
-          vim.keymap.set("n", "<leader>ur", function()
-            local random = random_colorscheme()
-            if random then
-              vim.cmd.colorscheme(random)
-              LazyVim.info(random, { title = "Random ColorScheme" })
-            end
-          end, { desc = "Random ColorScheme" })
-        end,
-      })
     end,
   },
 
