@@ -9,6 +9,7 @@ return {
   opts = function()
     return {
       base46 = {
+        theme = "onedark",
         transparency = vim.g.user_transparent_background,
       },
       ui = {
