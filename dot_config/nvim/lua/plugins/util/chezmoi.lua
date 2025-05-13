@@ -261,7 +261,7 @@ return {
     keys = {
       { "<leader>sz", false },
       { "<leader>f.", H.pick_chezmoi, desc = "Chezmoi Source Dotfiles" },
-      { "<leader>f>", H.pick_chezmoi_all, desc = "Chezmoi Files (All)" },
+      { "<leader>f`", H.pick_chezmoi_all, desc = "Chezmoi Files (All)" },
       { "<leader>fc", H.pick_config, desc = "Config File" },
     },
     init = function()

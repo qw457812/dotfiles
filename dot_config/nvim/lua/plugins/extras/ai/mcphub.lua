@@ -8,10 +8,10 @@ return {
     keys = {
       { "<leader>am", "<cmd>MCPHub<cr>", desc = "MCP Hub" },
     },
+    ---@module "mcphub"
+    ---@type MCPHub.Config
     opts = {
-      log = {
-        -- level = vim.log.levels.WARN,
-      },
+      -- log = { level = vim.log.levels.WARN },
     },
   },
 
