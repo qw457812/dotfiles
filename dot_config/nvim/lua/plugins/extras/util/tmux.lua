@@ -104,9 +104,42 @@ local function zen(snacks)
     end
   end
 
+  -- toggle kitty window layout (zoom)
+  local on_open_kitty = function() end
+  local on_close_kitty = function() end
+  if is_kitty then
+    local smart_splits_kitty = require("smart-splits.mux.kitty")
+
+    local is_zoomed
+    on_open_kitty = function()
+      is_zoomed = smart_splits_kitty.current_pane_is_zoomed()
+      if is_zoomed == false then
+        vim.system({ "kitten", "@", "goto-layout", "stack" })
+      end
+    end
+    on_close_kitty = function()
+      -- restore window layout
+      if is_zoomed == false then
+        vim.system({ "kitten", "@", "last-used-layout" })
+      end
+    end
+  end
+
+  local function on_open()
+    on_open_tmux()
+    on_open_wezterm()
+    on_open_kitty()
+  end
+
+  local function on_close()
+    on_close_tmux()
+    on_close_wezterm()
+    on_close_kitty()
+  end
+
   return {
     autocmds = function()
-      if not is_tmux and not is_wezterm then
+      if not (is_tmux or is_wezterm or is_kitty) then
         return
       end
 
@@ -116,22 +149,15 @@ local function zen(snacks)
         callback = function()
           if assert(Snacks.toggle.get("zen")):get() then
             -- `U.toggle.zen:set(false)` not working for snacks zen
-            on_close_tmux()
-            on_close_wezterm()
+            on_close()
           elseif U.toggle.zen:get() then
             U.toggle.zen:set(false)
           end
         end,
       })
     end,
-    on_open = function()
-      on_open_tmux()
-      on_open_wezterm()
-    end,
-    on_close = function()
-      on_close_tmux()
-      on_close_wezterm()
-    end,
+    on_open = on_open,
+    on_close = on_close,
   }
 end
 
