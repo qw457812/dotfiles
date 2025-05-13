@@ -10,9 +10,12 @@ return {
     return {
       base46 = {
         theme = "onedark",
+        hl_add = {
+          SnacksIndent = { fg = "line" },
+          SnacksIndentScope = { fg = "light_grey" },
+        },
         hl_override = {
-          -- https://github.com/NvChad/base46/blob/0e1824f7e4a3df36180e607e1adb3bdbd96db07f/lua/base46/integrations/defaults.lua#L19
-          FloatTitle = vim.g.user_transparent_background and { fg = "white", bg = "NONE" } or nil,
+          FloatTitle = { fg = "white", bg = "NONE" },
         },
         transparency = vim.g.user_transparent_background,
         -- penumbra_dark, github_dark, oceanic-next

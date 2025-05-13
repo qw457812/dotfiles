@@ -217,6 +217,7 @@ return {
         -- auto_apply_diff_after_generation = true,
         -- auto_focus_on_diff_view = true,
         -- enable_token_counting = false,
+        use_cwd_as_project_root = true,
       },
       provider = "copilot_claude", -- only recommend using claude
       -- auto_suggestions_provider = "ollama", -- high-frequency, can be expensive if enabled
