@@ -126,10 +126,10 @@ return {
         keymap = {
           -- TODO: better coop with mini.snippets and signature_help
           ["<Tab>"] = {
-            H.actions.copilot_nes,
             "select_next",
             "snippet_forward",
             H.actions.pum_next,
+            H.actions.copilot_nes,
             function(cmp)
               if has_words_before() then
                 return cmp.show()
