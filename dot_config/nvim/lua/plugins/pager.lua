@@ -134,6 +134,7 @@ return {
       if
         vim.g.terminal_scrollback_pager
         and LazyVim.has("tokyonight.nvim")
+        and vim.g.colors_name
         and vim.startswith(vim.g.colors_name, "tokyonight")
       then
         local tokyonight = require("lualine.themes.tokyonight")

@@ -102,6 +102,7 @@ return {
         load_on_startup = not Snacks.config.dashboard.enabled,
         -- TODO: buttons
       },
+      lsp = { signature = false },
     }
   end,
   init = function()
