@@ -13,6 +13,9 @@ return {
         hl_add = {
           SnacksIndent = { fg = "line" },
           SnacksIndentScope = { fg = "light_grey" },
+          BufferLineSeparator = { fg = "black2", bg = "black2" },
+          BufferLineSeparatorVisible = { fg = "black2", bg = "black2" },
+          BufferLineSeparatorSelected = { fg = "black2", bg = "black2" },
         },
         hl_override = {
           FloatTitle = { fg = "white", bg = "NONE" },
@@ -64,6 +67,11 @@ return {
             end, { desc = "Toggle Theme (NvChad)" })
           end,
         })
+
+        -- HACK: different vim.g.user_transparent_background between kitty and neovide
+        U.on_very_very_lazy(function()
+          require("base46").load_all_highlights()
+        end)
       end,
       -- config = function(_, opts)
       --   opts.colorscheme = function() end
