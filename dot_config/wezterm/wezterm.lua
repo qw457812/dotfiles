@@ -16,7 +16,7 @@ require("mouse").apply_to_config(config)
 require("links").apply_to_config(config)
 require("keys").apply_to_config(config)
 
-config.default_prog = { "/opt/homebrew/bin/fish", "-l" }
+-- config.default_prog = { "/opt/homebrew/bin/fish", "-l" }
 
 -- Window
 config.window_decorations = "RESIZE"
@@ -33,7 +33,9 @@ config.hide_tab_bar_if_only_one_tab = true
 -- end)
 
 -- Colorscheme
+config.color_scheme_dirs = { wezterm.home_dir .. "/.config/tokyonight.nvim/extras/wezterm" }
 config.color_scheme = "tokyonight_night"
+wezterm.add_to_config_reload_watch_list(config.color_scheme_dirs[1] .. config.color_scheme .. ".toml")
 config.colors = {
   indexed = { [241] = "#65bcff" },
   -- https://github.com/folke/tokyonight.nvim/blob/19f39b53ef5e148bf94ea3696df36175af7e31e6/extras/wezterm/tokyonight_night.toml#L3
@@ -45,12 +47,18 @@ config.window_background_image_hsb = {
 }
 
 -- Fonts
-config.font = wezterm.font_with_fallback({
-  "JetBrainsMono Nerd Font", -- "JetBrainsMonoNL Nerd Font", "FiraCode Nerd Font"
-  -- Chinese
-  "Maple Mono NF CN", -- "Sarasa Mono SC", "LXGW WenKai Mono"
-}) -- wezterm ls-fonts --list-system
-config.font_size = 13
+-- config.font = wezterm.font_with_fallback({
+--   "JetBrainsMono Nerd Font", -- "JetBrainsMonoNL Nerd Font", "FiraCode Nerd Font"
+--   -- Chinese
+--   "Maple Mono NF CN", -- "Sarasa Mono SC", "LXGW WenKai Mono"
+-- }) -- wezterm ls-fonts --list-system
+config.font = wezterm.font({
+  family = "Maple Mono NF CN",
+  weight = "Medium",
+  harfbuzz_features = { "cv35", "ss06", "cv61", "cv62" },
+})
+config.bold_brightens_ansi_colors = true
+config.font_size = 12.0
 config.command_palette_font_size = 15
 -- config.cell_width = 0.9 -- effectively like letter-spacing
 
@@ -62,5 +70,7 @@ config.cursor_thickness = "0.07cell"
 
 -- Scrollback
 config.scrollback_lines = 50000
+
+config.enable_kitty_graphics = true
 
 return config
