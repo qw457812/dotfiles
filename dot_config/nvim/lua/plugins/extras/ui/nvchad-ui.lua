@@ -3,36 +3,40 @@ return {
   "NvChad/ui",
   lazy = false,
   keys = function(_, keys)
-    -- stylua: ignore
-    local mappings = {
-      -- theme
+    -- theme
+    vim.list_extend(keys, {
+      -- stylua: ignore
       { "<Leader>uC", function() require("nvchad.themes").open() end, desc = "Themes (NvChad)" },
-      -- tabufline
-      { "[b", function() require("nvchad.tabufline").prev() end, desc = "Prev Buffer" },
-      { "]b", function() require("nvchad.tabufline").next() end, desc = "Next Buffer" },
-      { "[B", function() require("nvchad.tabufline").move_buf(-1) end, desc = "Move buffer prev" },
-      { "]B", function() require("nvchad.tabufline").move_buf(1) end, desc = "Move buffer next" },
-      { "<Down>", function() require("nvchad.tabufline").next() end, desc = "Next Buffer" },
-      { "<Up>", function() require("nvchad.tabufline").prev() end, desc = "Prev Buffer" },
-      { "J", function() require("nvchad.tabufline").next() end, desc = "Next Buffer" },
-      { "K", function() require("nvchad.tabufline").prev() end, desc = "Prev Buffer" },
-      { "<leader>bH", function() vim.api.nvim_set_current_buf(vim.t.bufs[1]) end, desc = "Goto First Buffer" }, -- <cmd>brewind<cr>
-      { "<leader>bL", function() vim.api.nvim_set_current_buf(vim.t.bufs[#vim.t.bufs]) end, desc = "Goto Last Buffer" }, -- <cmd>blast<cr>
-      { "<leader>bh", function() require("nvchad.tabufline").closeBufs_at_direction("left") end, desc = "Delete Buffers to the Left" },
-      { "<leader>bl", function() require("nvchad.tabufline").closeBufs_at_direction("right") end, desc = "Delete Buffers to the Right" },
-    }
-    -- unlike bufferline.nvim, this is not the visible position
-    for i = 1, 9 do
-      table.insert(mappings, {
-        "<leader>" .. i,
-        function()
-          local bufs = vim.t.bufs
-          vim.api.nvim_set_current_buf(bufs[i] or bufs[#bufs])
-        end,
-        desc = "which_key_ignore",
+    })
+    -- tabufline
+    if not LazyVim.has("bufferline.nvim") then
+      -- stylua: ignore
+      vim.list_extend(keys, {
+        { "[b", function() require("nvchad.tabufline").prev() end, desc = "Prev Buffer" },
+        { "]b", function() require("nvchad.tabufline").next() end, desc = "Next Buffer" },
+        { "[B", function() require("nvchad.tabufline").move_buf(-1) end, desc = "Move buffer prev" },
+        { "]B", function() require("nvchad.tabufline").move_buf(1) end, desc = "Move buffer next" },
+        { "<Down>", function() require("nvchad.tabufline").next() end, desc = "Next Buffer" },
+        { "<Up>", function() require("nvchad.tabufline").prev() end, desc = "Prev Buffer" },
+        { "J", function() require("nvchad.tabufline").next() end, desc = "Next Buffer" },
+        { "K", function() require("nvchad.tabufline").prev() end, desc = "Prev Buffer" },
+        { "<leader>bH", function() vim.api.nvim_set_current_buf(vim.t.bufs[1]) end, desc = "Goto First Buffer" }, -- <cmd>brewind<cr>
+        { "<leader>bL", function() vim.api.nvim_set_current_buf(vim.t.bufs[#vim.t.bufs]) end, desc = "Goto Last Buffer" }, -- <cmd>blast<cr>
+        { "<leader>bh", function() require("nvchad.tabufline").closeBufs_at_direction("left") end, desc = "Delete Buffers to the Left" },
+        { "<leader>bl", function() require("nvchad.tabufline").closeBufs_at_direction("right") end, desc = "Delete Buffers to the Right" },
       })
+      -- unlike bufferline.nvim, this is not the visible position
+      for i = 1, 9 do
+        table.insert(keys, {
+          "<leader>" .. i,
+          function()
+            local bufs = vim.t.bufs
+            vim.api.nvim_set_current_buf(bufs[i] or bufs[#bufs])
+          end,
+          desc = "which_key_ignore",
+        })
+      end
     end
-    vim.list_extend(keys, mappings)
   end,
   opts = function()
     return {
