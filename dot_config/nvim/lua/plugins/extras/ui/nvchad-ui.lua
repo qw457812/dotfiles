@@ -118,6 +118,10 @@ return {
       dofile(vim.g.base46_cache .. "statusline")
     end)
     require("nvchad")
+    -- TODO: override the ReloadNvChad autocmd
+    vim.schedule(function()
+      vim.api.nvim_del_augroup_by_name("ReloadNvChad")
+    end)
   end,
   specs = {
     {
