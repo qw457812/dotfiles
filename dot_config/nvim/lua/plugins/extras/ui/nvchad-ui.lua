@@ -58,6 +58,8 @@ return {
     {
       "LazyVim/LazyVim",
       opts = function()
+        local LazyUtil = require("lazy.util")
+
         vim.api.nvim_create_autocmd("User", {
           pattern = "LazyVimKeymaps",
           once = true,
@@ -68,20 +70,13 @@ return {
           end,
         })
 
-        -- reload base46 when vim.g.user_transparent_background changes
+        -- reload base46 on vim.g.user_transparent_background change (kitty/neovide)
         U.on_very_very_lazy(function()
-          local transparent_changed = true
           local cache_file = vim.fn.stdpath("cache") .. "/user_transparent_background.txt"
-          if vim.fn.filereadable(cache_file) == 1 then
-            local fd = assert(io.open(cache_file, "r"))
-            local data = fd:read("*a")
-            fd:close()
-            transparent_changed = data ~= tostring(vim.g.user_transparent_background)
-          end
-          local fd = assert(io.open(cache_file, "w"))
-          fd:write(tostring(vim.g.user_transparent_background))
-          fd:close()
-          if transparent_changed then
+          local prev_transparent = vim.fn.filereadable(cache_file) == 1 and LazyUtil.read_file(cache_file) or nil
+          local transparent = tostring(vim.g.user_transparent_background)
+          LazyUtil.write_file(cache_file, transparent)
+          if prev_transparent ~= transparent then
             require("base46").load_all_highlights()
           end
         end)
