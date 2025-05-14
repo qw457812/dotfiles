@@ -181,25 +181,6 @@ return {
   {
     "echasnovski/mini.diff",
     optional = true,
-    keys = function(_, keys)
-      -- HACK: redraw to update the signs
-      local function redraw()
-        vim.defer_fn(function()
-          Snacks.util.redraw(vim.api.nvim_get_current_win())
-        end, 200)
-      end
-
-      vim.list_extend(keys, {
-        {
-          "<leader>go",
-          function()
-            require("mini.diff").toggle_overlay(0)
-            redraw()
-          end,
-          desc = "Toggle mini.diff overlay",
-        },
-      })
-    end,
     opts = function()
       -- copied from: https://github.com/echasnovski/mini.nvim/issues/1319#issuecomment-2761528147
       Snacks.util.set_hl({
@@ -209,6 +190,14 @@ return {
         MiniDiffOverContext = { bg = "#401010" }, -- regular red
         MiniDiffOverContextBuf = "MiniDiffOverAdd",
         MiniDiffOverDelete = "MiniDiffOverContext",
+      })
+
+      -- HACK: redraw to update the signs for `gh`/`<leader>go`
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "MiniDiffUpdated",
+        callback = U.debounce_wrap(100, function()
+          Snacks.util.redraw(vim.api.nvim_get_current_win())
+        end),
       })
     end,
   },
