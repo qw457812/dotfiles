@@ -1,3 +1,13 @@
+local base46_did_reload = false
+---@param force? boolean default false
+local function reload_base46(force)
+  if base46_did_reload and force ~= true then
+    return
+  end
+  require("base46").load_all_highlights()
+  base46_did_reload = true
+end
+
 -- copied from: https://github.com/AstroNvim/astrocommunity/blob/e56d7b3c52cb496780a901123705d7824914642b/lua/astrocommunity/pack/nvchad-ui/init.lua
 return {
   "NvChad/ui",
@@ -5,8 +15,14 @@ return {
   keys = function(_, keys)
     -- theme
     vim.list_extend(keys, {
-      -- stylua: ignore
-      { "<Leader>uC", function() require("nvchad.themes").open() end, desc = "Themes (NvChad)" },
+      {
+        "<Leader>uC",
+        function()
+          require("nvchad.themes").open()
+          base46_did_reload = true
+        end,
+        desc = "Themes (NvChad)",
+      },
     })
     -- tabufline
     if not LazyVim.has("bufferline.nvim") then
@@ -114,6 +130,7 @@ return {
           callback = function()
             vim.keymap.set("n", "<leader>ur", function()
               require("base46").toggle_theme()
+              base46_did_reload = true
             end, { desc = "Toggle Theme (NvChad)" })
           end,
         })
@@ -125,7 +142,7 @@ return {
           local transparent = tostring(vim.g.user_transparent_background)
           LazyUtil.write_file(cache_file, transparent)
           if prev_transparent ~= transparent then
-            require("base46").load_all_highlights()
+            reload_base46()
           end
         end)
       end,
@@ -177,7 +194,7 @@ return {
       end,
       build = function()
         vim.g.base46_cache = vim.fn.stdpath("data") .. "/base46_cache/"
-        require("base46").load_all_highlights()
+        reload_base46(true)
       end,
       -- load base46 cache when necessary
       specs = {
@@ -308,6 +325,7 @@ return {
             pcall(function()
               dofile(vim.g.base46_cache .. "diffview")
             end)
+            LazyVim.on_load("diffview.nvim", reload_base46)
           end,
         },
       },
