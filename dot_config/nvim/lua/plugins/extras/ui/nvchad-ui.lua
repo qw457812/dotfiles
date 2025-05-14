@@ -68,9 +68,22 @@ return {
           end,
         })
 
-        -- HACK: different vim.g.user_transparent_background between kitty and neovide
+        -- reload base46 when vim.g.user_transparent_background changes
         U.on_very_very_lazy(function()
-          require("base46").load_all_highlights()
+          local transparent_changed = true
+          local cache_file = vim.fn.stdpath("cache") .. "/user_transparent_background.txt"
+          if vim.fn.filereadable(cache_file) == 1 then
+            local fd = assert(io.open(cache_file, "r"))
+            local data = fd:read("*a")
+            fd:close()
+            transparent_changed = data ~= tostring(vim.g.user_transparent_background)
+          end
+          local fd = assert(io.open(cache_file, "w"))
+          fd:write(tostring(vim.g.user_transparent_background))
+          fd:close()
+          if transparent_changed then
+            require("base46").load_all_highlights()
+          end
         end)
       end,
       -- config = function(_, opts)
