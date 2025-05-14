@@ -32,6 +32,22 @@ return {
         },
         tabufline = {
           enabled = not LazyVim.has("bufferline.nvim"),
+          modules = {
+            -- copied from: https://github.com/NvChad/ui/blob/4466c87073c811c22b14215ba8a0cfc7d1b8b688/lua/nvchad/tabufline/modules.lua#L59-L62
+            treeOffset = function()
+              local function getNeoTreeWidth()
+                for _, win in pairs(vim.api.nvim_tabpage_list_wins(0)) do
+                  if vim.bo[vim.api.nvim_win_get_buf(win)].ft == "neo-tree" then
+                    return vim.api.nvim_win_get_width(win)
+                  end
+                end
+                return 0
+              end
+              local w = getNeoTreeWidth()
+              return (w == 0 and "" or "%#NvimTreeNormal#" .. string.rep(" ", w) .. "%#NvimTreeWinSeparator#" .. "│")
+                .. " "
+            end,
+          },
         },
       },
       nvdash = {
@@ -239,6 +255,16 @@ return {
           opts = function()
             pcall(function()
               dofile(vim.g.base46_cache .. "blink")
+            end)
+          end,
+        },
+        -- for opts.ui.tabufline.modules.treeOffset
+        {
+          "nvim-neo-tree/neo-tree.nvim",
+          optional = true,
+          opts = function()
+            pcall(function()
+              dofile(vim.g.base46_cache .. "nvimtree")
             end)
           end,
         },
