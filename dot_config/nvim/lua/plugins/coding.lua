@@ -103,14 +103,6 @@ return {
         {
           "gx",
           function()
-            require("various-textobjs").url()
-            local found_url = vim.fn.mode() == "v"
-            if found_url then
-              local url = U.get_visual_selection()
-              U.open_in_browser(url)
-              return
-            end
-
             -- short url of lazy plugin
             if vim.bo.filetype == "lua" then
               local path = vim.fn.expand("%:p")
@@ -126,6 +118,14 @@ return {
                   return
                 end
               end
+            end
+
+            require("various-textobjs").url()
+            local found_url = vim.fn.mode() == "v"
+            if found_url then
+              local url = U.get_visual_selection()
+              U.open_in_browser(url)
+              return
             end
 
             if U.is_bigfile() then
