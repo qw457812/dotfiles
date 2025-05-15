@@ -46,7 +46,6 @@
     "plugins.extras.ui.border",
     "plugins.extras.ui.dropbar",
     "plugins.extras.ui.hide-hints-in-insert-mode",
-    "plugins.extras.ui.nvchad-ui",
     "plugins.extras.util.tmux",
     "plugins.extras.util.translate",
     "plugins.extras.util.zoxide"
@@ -54,7 +53,7 @@
   "install_version": 7,
   "news": {
     "NEWS.md": "10960",
-    "doc/news.txt": "5866"
+    "doc/news.txt": "6151"
   },
   "version": 8
 }

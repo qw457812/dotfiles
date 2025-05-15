@@ -102,11 +102,11 @@ return {
     ---@type snacks.Config
     opts = {
       lazygit = {
-        win = vim.g.user_is_termux and {
-          height = vim.o.lines,
-          width = vim.o.columns,
+        win = {
+          height = 0,
+          width = 0,
           border = "none",
-        } or nil,
+        },
       },
     },
   },
