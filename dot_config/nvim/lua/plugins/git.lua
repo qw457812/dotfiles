@@ -2,10 +2,12 @@ return {
   {
     "LazyVim/LazyVim",
     opts = function()
+      local commit_ft = { "gitcommit", "svn" }
+      local commit_filename = { "COMMIT_EDITMSG", "svn-commit.tmp" }
       vim.api.nvim_create_autocmd("FileType", {
-        pattern = "gitcommit",
+        pattern = commit_ft,
         callback = function(ev)
-          if not vim.fn.fnamemodify(ev.file, ":t") == "COMMIT_EDITMSG" then
+          if not vim.list_contains(commit_filename, vim.fn.fnamemodify(ev.file, ":t")) then
             return
           end
           local win = vim.fn.bufwinid(ev.buf)
@@ -18,9 +20,9 @@ return {
         end,
       })
       vim.api.nvim_create_autocmd("BufWritePost", {
-        pattern = "COMMIT_EDITMSG",
+        pattern = commit_filename,
         callback = function(ev)
-          if vim.bo[ev.buf].filetype ~= "gitcommit" then
+          if not vim.list_contains(commit_ft, vim.bo[ev.buf].filetype) then
             return
           end
           local win = vim.fn.bufwinid(ev.buf)
@@ -103,17 +105,31 @@ return {
         },
       })
     end,
-    ---@module "snacks"
-    ---@type snacks.Config
-    opts = {
-      lazygit = {
-        win = {
-          height = 0,
-          width = 0,
-          border = "none",
+    opts = function(_, opts)
+      ---@type snacks.Config
+      local o = {
+        lazygit = {
+          ---@type snacks.win.Config|{}
+          win = {
+            -- fullscreen
+            -- copied from: https://github.com/folke/snacks.nvim/blob/3ae98636aaaf8f1b2f55b264f5745ae268de532f/lua/snacks/layout.lua#L247-L258
+            height = function()
+              local bottom = (vim.o.cmdheight + (vim.o.laststatus == 3 and 1 or 0)) or 0
+              local top = (vim.o.showtabline == 2 or (vim.o.showtabline == 1 and #vim.api.nvim_list_tabpages() > 1))
+                  and 1
+                or 0
+              return vim.o.lines - top - bottom
+            end,
+            width = 0,
+            border = "none",
+          },
         },
-      },
-    },
+        gitbrowse = {
+          open = U.open_in_browser,
+        },
+      }
+      return U.extend_tbl(opts, o)
+    end,
   },
 
   {
@@ -170,15 +186,17 @@ return {
           gs.undo_stage_hunk()
           redraw()
         end, "Undo Stage Hunk")
-        map("n", "<leader>gD", function()
-          gs.diffthis("~")
-          if vim.g.user_close_key then
-            map("n", vim.g.user_close_key, function()
-              vim.keymap.del("n", vim.g.user_close_key, { buffer = buffer })
-              vim.cmd.only()
-            end, "Close Diff (Gitsigns)")
-          end
-        end, "Diff This ~")
+        if not LazyVim.has("diffview.nvim") then
+          map("n", "<leader>gD", function()
+            gs.diffthis("~")
+            if vim.g.user_close_key then
+              map("n", vim.g.user_close_key, function()
+                vim.keymap.del("n", vim.g.user_close_key, { buffer = buffer })
+                vim.cmd.only()
+              end, "Close Diff (Gitsigns)")
+            end
+          end, "Diff This ~")
+        end
         map("n", "<leader>g?", gs.toggle_current_line_blame, "Toggle Blame Line (GitSigns)")
       end
     end,
@@ -338,7 +356,7 @@ return {
             if not vim.api.nvim_buf_is_valid(buf) then
               return
             end
-            pcall(vim.keymap.del, "n", "<Tab>", { buffer = buf })
+            pcall(vim.keymap.del, "n", "<Tab>", { buffer = buf }) -- <Tab> is mapped to <C-w>w
           end, 100)
         end,
       })

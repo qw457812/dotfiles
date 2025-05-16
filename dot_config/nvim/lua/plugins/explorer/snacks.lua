@@ -11,6 +11,10 @@ return {
       picker = {
         sources = {
           explorer = {
+            layout = {
+              ---@diagnostic disable-next-line: assign-type-mismatch
+              preview = { main = true, enabled = false },
+            },
             actions = {
               unfocus = function(picker)
                 local _, win = picker:current_win()
