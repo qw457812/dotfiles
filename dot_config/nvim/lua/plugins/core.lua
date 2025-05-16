@@ -65,6 +65,7 @@ return {
           only_current = true,
         },
         chunk = {
+          enabled = true,
           only_current = true,
         },
         -- -- alternative to `only_current`, note that indent in floating windows like zen/zoom will be disabled in this case
@@ -91,6 +92,13 @@ return {
       },
       image = {
         enabled = vim.g.user_is_wezterm or vim.g.user_is_kitty,
+      },
+      profiler = {
+        presets = {
+          on_stop = function()
+            Snacks.profiler.scratch()
+          end,
+        },
       },
       zen = {
         toggles = {

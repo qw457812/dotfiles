@@ -73,7 +73,7 @@
 [alias]
     st = status --short --branch
     co = checkout
-    c = commit --verbose
+    c = commit
     p = push
     # https://github.com/folke/dot/blob/3d97483b2a900849bc2dcacc8d86460155d2abc3/config/.gitconfig#L20
     l = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --decorate --date=short --color --decorate

@@ -249,8 +249,8 @@ return {
               ["J"] = "preview_scroll_down", -- same as lazygit/yazi
               ["K"] = "preview_scroll_up",
               ["/"] = false, -- highlights text in preview
-              ["<leader><space>"] = "toggle_focus",
-              ["<leader>/"] = "cycle_win", -- toggle focus between input and preview
+              ["<C-Space>"] = { "cycle_win", mode = { "n", "i" } },
+              ["<C-/>"] = { "toggle_input", mode = { "n", "i" } },
               ["<Up>"] = "history_back",
               ["<Down>"] = "history_forward",
               i_up = { "<Up>", "list_up", mode = "i", expr = true },
@@ -275,7 +275,8 @@ return {
               ["J"] = "preview_scroll_down",
               ["K"] = "preview_scroll_up",
               ["/"] = false,
-              ["<leader><space>"] = "toggle_focus",
+              ["<C-Space>"] = { "cycle_win", mode = { "n", "i" } },
+              ["<C-/>"] = { "toggle_input", mode = { "n", "i" } },
               ["<Left>"] = "preview_scroll_left",
               ["<Right>"] = "preview_scroll_right",
               ["<C-Left>"] = "preview_scroll_left",
@@ -299,7 +300,7 @@ return {
                 end,
                 desc = "Clear UI or Focus Input",
               },
-              ["<leader>/"] = "toggle_focus",
+              ["<C-Space>"] = { "cycle_win", mode = { "n", "i" } },
             },
           },
         },

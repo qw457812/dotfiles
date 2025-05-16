@@ -173,8 +173,7 @@ return {
       -- https://github.com/JoseConseco/nvim_config/blob/23dbf5f8b9779d792643ab5274ebe8dabe79c0c0/lua/plugins.lua#L1049
       ---@param skip_first_match? boolean default false
       local function treesitter(skip_first_match)
-        ---@type Flash.State.Config
-        ---@diagnostic disable-next-line: missing-fields
+        ---@type Flash.State.Config|{}
         local opts = { label = { rainbow = { enabled = true } } }
         if skip_first_match then
           ---@param matches Flash.Match.TS[]
