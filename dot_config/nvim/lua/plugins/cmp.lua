@@ -223,8 +223,7 @@ return {
               enabled = function()
                 return vim.b.user_blink_path ~= false
               end,
-              ---@type blink.cmp.PathOpts
-              ---@diagnostic disable-next-line: missing-fields
+              ---@type blink.cmp.PathOpts|{}
               opts = {
                 show_hidden_files_by_default = true,
               },
@@ -244,14 +243,6 @@ return {
     ---@module 'blink.cmp'
     ---@param opts blink.cmp.Config
     opts = function(_, opts)
-      local cmdline = require("blink.cmp.sources.cmdline")
-      local enabled_orig = cmdline.enabled
-      if enabled_orig then
-        function cmdline:enabled()
-          return enabled_orig(self) or vim.fn.getcmdwintype() == ":"
-        end
-      end
-
       ---@type blink.cmp.Config
       local o = {
         sources = {
@@ -260,6 +251,11 @@ return {
           },
           providers = {
             cmdline = {
+              override = {
+                enabled = function(self)
+                  return self:enabled() or vim.fn.getcmdwintype() == ":"
+                end,
+              },
               transform_items = function(ctx, items)
                 if vim.fn.getcmdwintype() == ":" then
                   for _, item in ipairs(items) do
