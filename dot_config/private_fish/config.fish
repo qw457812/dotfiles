@@ -105,6 +105,9 @@ abbr gpp "git push"
 # abbr gdw "git diff --word-diff"
 abbr gdw "git diff --ignore-all-space"
 abbr gdsw "git diff --staged --ignore-all-space"
+abbr gdm 'git diff (git_main_branch)'
+abbr gdom 'git diff origin/(git_main_branch)'
+abbr gdum 'git diff upstream/(git_main_branch)'
 # copied from: https://github.com/ohmyzsh/ohmyzsh/blob/750d3ac4b493dca13ef0ced55fa6a2cd02dc7ee8/plugins/git/git.plugin.zsh
 abbr ga "git add"
 abbr gaa "git add --all"
@@ -126,6 +129,7 @@ abbr gcpa "git cherry-pick --abort"
 abbr gcpc "git cherry-pick --continue"
 abbr gd "git diff"
 abbr gds "git diff --staged"
+abbr gdup 'git diff @{upstream}'
 abbr gf "git fetch"
 abbr ghh "git help"
 abbr glg "git log --stat"
