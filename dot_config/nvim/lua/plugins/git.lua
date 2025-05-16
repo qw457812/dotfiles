@@ -23,11 +23,16 @@ return {
           if vim.bo[ev.buf].filetype ~= "gitcommit" then
             return
           end
-          if vim.g.user_close_key then
-            vim.api.nvim_feedkeys(vim.keycode(vim.g.user_close_key), "m", false)
-          else
-            vim.cmd([[quit]])
-          end
+          local win = vim.fn.bufwinid(ev.buf)
+          vim.schedule(function()
+            if vim.api.nvim_get_current_buf() == ev.buf and vim.api.nvim_get_current_win() == win then
+              if vim.g.user_close_key then
+                vim.api.nvim_feedkeys(vim.keycode(vim.g.user_close_key), "m", false)
+              else
+                vim.cmd([[quit]])
+              end
+            end
+          end)
         end,
       })
     end,
@@ -296,20 +301,48 @@ return {
         {
           "<Leader>gc",
           function()
-            open({ [1] = "commit" })
-            vim.api.nvim_create_autocmd("FileType", {
+            open({ "commit" })
+
+            -- skip NeogitPopup
+            local executed = false
+            local id = vim.api.nvim_create_autocmd("FileType", {
+              group = vim.api.nvim_create_augroup("neogit_quick_commit", { clear = true }),
               pattern = "NeogitPopup",
               once = true,
               callback = function()
+                executed = true
                 vim.api.nvim_feedkeys(vim.keycode("c"), "m", false)
               end,
             })
+            vim.defer_fn(function()
+              if not executed then -- see `:h autocmd-once`
+                vim.api.nvim_del_autocmd(id)
+              end
+            end, 500)
           end,
           desc = "Commit (Neogit)",
         },
       }
     end,
     opts = function(_, opts)
+      vim.api.nvim_create_autocmd("FileType", {
+        group = vim.api.nvim_create_augroup("neogit_commit_diff_keymaps", { clear = true }),
+        pattern = "NeogitDiffView", -- for `:Neogit commit`
+        callback = function(ev)
+          local buf = ev.buf
+          -- stylua: ignore
+          vim.keymap.set("n", "<Esc>", U.keymap.clear_ui_or_unfocus_esc, { buffer = buf, desc = "Clear UI or Unfocus (Neogit)" })
+          vim.keymap.set("n", "]h", "}", { buffer = buf, remap = true, desc = "Next Hunk (Neogit)" })
+          vim.keymap.set("n", "[h", "{", { buffer = buf, remap = true, desc = "Prev Hunk (Neogit)" })
+          vim.defer_fn(function()
+            if not vim.api.nvim_buf_is_valid(buf) then
+              return
+            end
+            pcall(vim.keymap.del, "n", "<Tab>", { buffer = buf })
+          end, 100)
+        end,
+      })
+
       return U.extend_tbl(opts, {
         disable_signs = true,
         telescope_sorter = function()
