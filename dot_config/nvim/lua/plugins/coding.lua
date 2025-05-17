@@ -2,16 +2,53 @@ return {
   {
     "echasnovski/mini.pairs",
     optional = true,
-    opts = {
-      mappings = {
-        ["`"] = { neigh_pattern = "[^\\`]." }, -- better deal with markdown code blocks in non-markdown files
-        -- TODO:
-        -- https://www.reddit.com/r/neovim/comments/1kbz9jf/comment/mpzjc7k/
-        -- https://github.com/echasnovski/mini.pairs/blob/69864a2efb36c030877421634487fd90db1e4298/lua/mini/pairs.lua#L57-L76
-        ["<"] = { action = "open", pair = "<>", neigh_pattern = "[^\\].", register = { cr = false } },
-        [">"] = { action = "close", pair = "<>", neigh_pattern = "[^\\].", register = { cr = false } },
-      },
-    },
+    opts = function(_, opts)
+      local pairs = require("mini.pairs")
+
+      -- `<>` pair
+      local lt_opts = { action = "open", pair = "<>", neigh_pattern = "[^\\].", register = { cr = false } }
+      local gt_opts = { action = "close", pair = "<>", neigh_pattern = "[^\\].", register = { cr = false } }
+      local angle_brackets_group = vim.api.nvim_create_augroup("mini_pairs_angle_brackets", { clear = true })
+      -- use case for cmdline: `:map <esc>`
+      local lt_opts_cmdline, gt_opts_cmdline = lt_opts, gt_opts
+      pairs.map("c", "<", lt_opts_cmdline)
+      pairs.map("c", ">", gt_opts_cmdline)
+      vim.api.nvim_create_autocmd("CmdWinEnter", {
+        group = angle_brackets_group,
+        callback = function(ev)
+          pairs.map_buf(ev.buf, "i", "<", lt_opts_cmdline)
+          pairs.map_buf(ev.buf, "i", ">", gt_opts_cmdline)
+        end,
+      })
+      -- use cases for lua:
+      -- - `---@type table<string, string>`
+      -- - `local z = x < y`
+      -- see: https://www.reddit.com/r/neovim/comments/1kbz9jf/comment/mpzjc7k/
+      vim.api.nvim_create_autocmd("FileType", {
+        group = angle_brackets_group,
+        pattern = { "lua", "java" },
+        callback = function(ev)
+          -- stylua: ignore
+          pairs.map_buf(ev.buf, "i", "<", { action = "open", pair = "<>", neigh_pattern = "%a.", register = { cr = false } })
+          pairs.map_buf(ev.buf, "i", ">", gt_opts)
+        end,
+      })
+      -- use case for xml: `<?xml version="1.0"?>`
+      vim.api.nvim_create_autocmd("FileType", {
+        group = angle_brackets_group,
+        pattern = "xml",
+        callback = function(ev)
+          pairs.map_buf(ev.buf, "i", "<", lt_opts)
+          pairs.map_buf(ev.buf, "i", ">", gt_opts)
+        end,
+      })
+
+      return U.extend_tbl(opts, {
+        mappings = {
+          ["`"] = { neigh_pattern = "[^\\`]." }, -- better deal with markdown code blocks in non-markdown files
+        },
+      })
+    end,
   },
 
   {
