@@ -33,7 +33,6 @@ return {
   {
     "saghen/blink.cmp",
     optional = true,
-    ---@module 'blink.cmp'
     ---@param opts blink.cmp.Config
     opts = function(_, opts)
       local menu_default = require("blink.cmp.config.completion.menu").default
@@ -240,8 +239,6 @@ return {
   {
     "saghen/blink.cmp",
     optional = true,
-    ---@module 'blink.cmp'
-    ---@param opts blink.cmp.Config
     opts = function(_, opts)
       ---@type blink.cmp.Config
       local o = {
@@ -295,7 +292,6 @@ return {
           },
         },
       }
-
       return U.extend_tbl(opts, o)
     end,
   },
@@ -369,13 +365,21 @@ return {
         },
       })
     end,
+    specs = {
+      {
+        "folke/lazydev.nvim",
+        opts = function(_, opts)
+          opts.library = opts.library or {}
+          table.insert(opts.library, { path = "mini.snippets", words = { "MiniSnippets" } })
+        end,
+      },
+    },
   },
 
   {
     "saghen/blink.cmp",
     optional = true,
     dependencies = { "mikavilpas/blink-ripgrep.nvim", shell_command_editor = true },
-    ---@module 'blink.cmp'
     ---@type blink.cmp.Config
     opts = {
       sources = {
