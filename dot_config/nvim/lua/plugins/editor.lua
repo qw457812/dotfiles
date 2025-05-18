@@ -131,10 +131,8 @@ return {
             vim.keymap.set("n", "<esc>", function()
               U.keymap.clear_ui_esc({
                 close = function()
-                  -- simulate `q` keypress to abort
                   vim.api.nvim_feedkeys(abort_key, "m", false)
                 end,
-                esc = false,
               })
             end, {
               buffer = event.buf,

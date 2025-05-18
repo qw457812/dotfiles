@@ -100,4 +100,11 @@ return {
       })
     end,
   },
+  {
+    "folke/lazydev.nvim",
+    opts = function(_, opts)
+      opts.library = opts.library or {}
+      table.insert(opts.library, { path = "mini.files", words = { "MiniFiles" } })
+    end,
+  },
 }
