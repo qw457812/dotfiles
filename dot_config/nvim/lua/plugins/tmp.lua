@@ -69,4 +69,6 @@ return {
       end
     end,
   },
+
+  { "zapling/mason-lock.nvim", optional = true, pin = true },
 }
