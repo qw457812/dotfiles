@@ -342,9 +342,7 @@ return {
               if #items == 0 then
                 return
               end
-              local files = vim.tbl_map(function(item)
-                return Snacks.picker.util.path(item)
-              end, items)
+              local files = vim.tbl_map(Snacks.picker.util.path, items)
               require("chezmoi.commands").edit({ targets = files })
             end,
           },
