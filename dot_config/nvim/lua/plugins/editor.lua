@@ -747,15 +747,11 @@ return {
     opts = function()
       local has_ufo = LazyVim.has("nvim-ufo")
       return {
-        keepFoldsAcrossSessions = false, -- has_ufo
-        foldtextWithLineCount = {
-          enabled = not has_ufo,
-          template = "  󰘖 %s",
-        },
         foldKeymaps = {
           setup = false,
           hOnlyOpensOnFirstColumn = true,
         },
+        useLspFoldsWithTreesitterFallback = false,
         autoFold = {
           enabled = not has_ufo,
           kinds = {
@@ -763,6 +759,11 @@ return {
             -- "comment",
           }, ---@type lsp.FoldingRangeKind[]
         },
+        foldtextWithLineCount = {
+          enabled = not has_ufo,
+          template = "  󰘖 %s",
+        },
+        keepFoldsAcrossSessions = false, -- has_ufo
       }
     end,
   },
