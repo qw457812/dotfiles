@@ -238,7 +238,7 @@ if set -q TERMUX_VERSION
 else
     alias vless "nvim -u $(brew --prefix)/share/nvim/runtime/macros/less.vim"
 
-    if status is-interactive
+    if status is-interactive; or set -q NEOVIDE_FRAME
         term_proxy_on
     end
 end
