@@ -105,6 +105,7 @@ abbr gpp "git push"
 # abbr gdw "git diff --word-diff"
 abbr gdw "git diff --ignore-all-space"
 abbr gdsw "git diff --staged --ignore-all-space"
+abbr glgpw "git log --stat --patch --ignore-all-space"
 abbr gdm 'git diff (git_main_branch)'
 abbr gdom 'git diff origin/(git_main_branch)'
 abbr gdum 'git diff upstream/(git_main_branch)'
@@ -118,6 +119,7 @@ abbr gbm "git branch --move"
 abbr gbnm "git branch --no-merged"
 abbr gbr 'git branch --remote'
 abbr gc "git commit --verbose"
+abbr gc! 'git commit --verbose --amend'
 abbr gcb "git checkout -b"
 abbr gcf "git config --list | vimpager"
 abbr gcl "git clone --recurse-submodules"
