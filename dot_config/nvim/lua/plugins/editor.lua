@@ -377,8 +377,7 @@ return {
           end,
           desc = "Undo (undo-glow)",
         },
-        { "<C-r>", function() require("undo-glow").redo() end, desc = "Redo (undo-glow)" },
-        { "U", "<C-r>", desc = "Redo (undo-glow)", remap = true },
+        { "U", function() require("undo-glow").redo() end, desc = "Redo (undo-glow)" },
         {
           "gc",
           function()

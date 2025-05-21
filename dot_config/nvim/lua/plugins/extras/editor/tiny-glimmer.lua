@@ -1,6 +1,4 @@
 return {
-  { "tzachar/highlight-undo.nvim", optional = true, enabled = false },
-
   { "y3owk1n/undo-glow.nvim", optional = true, enabled = false },
 
   {
@@ -17,7 +15,7 @@ return {
       "TextYankPost",
       -- "WinEnter", -- for pulsar
     },
-    keys = { { "p" }, { "P" }, { "u" }, { "U" }, { "<C-r>" } },
+    keys = { { "p" }, { "P" }, { "u" }, { "U" } },
     opts = function(_, opts)
       local function animations()
         local visual = Snacks.util.color("Visual", "bg")
@@ -33,7 +31,6 @@ return {
         }
       end
 
-      vim.keymap.set("n", "U", "<C-r>", { remap = true, silent = true, desc = "Redo" })
       if LazyVim.has("yanky.nvim") then
         -- for tiny-glimmer.nvim to hijack
         vim.keymap.set("n", "p", "<Plug>(YankyPutAfter)")
@@ -74,6 +71,7 @@ return {
                 from_color = "TinyGlimmerRedoFrom",
               },
             },
+            redo_mapping = "U",
           },
         },
         presets = {

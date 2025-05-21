@@ -364,9 +364,6 @@ return {
             -- for flash treesitter search, not necessary after using `{ label = { rainbow = { enabled = true } } }` opts
             FlashLabel = { fg = colors.base, bg = colors.green, style = { "bold" } },
 
-            -- highlight-undo.nvim
-            HighlightUndo = { link = "CurSearch" },
-            -- HighlightRedo = { link = "HighlightUndo" },
             -- undo-glow.nvim
             UgUndo = { link = "CurSearch" },
             -- UgRedo = { link = "UgUndo" },
