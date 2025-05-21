@@ -669,6 +669,7 @@ return {
           or vim.bo[buf].buftype == "terminal"
           or buf == vim.api.nvim_win_get_buf(0)
       end,
+      -- case_insensitive = true,
     },
   },
 
