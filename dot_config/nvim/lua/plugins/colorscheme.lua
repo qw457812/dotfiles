@@ -27,7 +27,7 @@ local ignored_colorschemes = vim.list_extend({
 }, has_tokyonight_custom_style and {} or { "tokyonight" })
 
 -- options
-local borderless_telescope = false -- vim.g.user_transparent_background
+local borderless_picker = false -- vim.g.user_transparent_background
 local no_italic = vim.g.user_is_termux
 
 local tokyonight_custom_style = "custom"
@@ -152,7 +152,7 @@ return {
           hl.TelescopeSelectionCaret =
             { fg = (hl.TelescopePromptPrefix or hl.Identifier).fg, bg = (hl.TelescopeSelection or hl.Visual).bg }
 
-          if borderless_telescope then
+          if borderless_picker then
             local bg = to_gray(c.bg_dark) -- c.bg_dark
             local prompt = bg -- "#2d3149"
             hl.TelescopeNormal = { bg = bg, fg = c.fg }
@@ -294,7 +294,7 @@ return {
           },
           -- telescope = {
           --   enabled = true,
-          --   style = borderless_telescope and "nvchad" or nil, -- not working when transparent
+          --   style = borderless_picker and "nvchad" or nil, -- not working when transparent
           -- },
           treesitter_context = false,
           gitsigns = {
@@ -382,7 +382,7 @@ return {
           end
 
           local borderless_telescope_bg = to_gray(colors.mantle)
-          return vim.tbl_deep_extend("force", custom_highlights, borderless_telescope and {
+          return vim.tbl_deep_extend("force", custom_highlights, borderless_picker and {
             -- copied from: https://github.com/catppuccin/nvim/blob/35d8057137af463c9f41f169539e9b190d57d269/lua/catppuccin/groups/integrations/telescope.lua#L6
             TelescopeBorder = { fg = borderless_telescope_bg, bg = borderless_telescope_bg },
             TelescopeNormal = { bg = borderless_telescope_bg },
@@ -529,18 +529,21 @@ return {
     enabled = false,
     cond = cond_colorscheme("^cyberdream$"),
     lazy = true,
-    dependencies = { "nvim-lualine/lualine.nvim", optional = true },
     init = function()
+      if not LazyVim.has("lualine.nvim") then
+        return
+      end
+
       local lualine_sep_orig
       local is_lualine_modified = false
       vim.api.nvim_create_autocmd("ColorScheme", {
         callback = function(event)
-          -- https://github.com/scottmckendry/cyberdream.nvim/blob/7e6feb49d2ec47a742215754ec0ecc51eebba55a/lua/cyberdream/util.lua#L257
-          local ok, lualine = pcall(require, "lualine")
-          if not ok then
+          if not package.loaded["cyberdream"] then
             return
           end
 
+          -- https://github.com/scottmckendry/cyberdream.nvim/blob/7e6feb49d2ec47a742215754ec0ecc51eebba55a/lua/cyberdream/util.lua#L257
+          local lualine = require("lualine")
           local lualine_opts = lualine.get_config()
           if event.match == "cyberdream" and vim.g.user_transparent_background then
             lualine_sep_orig = lualine_sep_orig or lualine_opts.options.section_separators
@@ -557,27 +560,25 @@ return {
     end,
     opts = function()
       local util = require("cyberdream.util")
+
+      ---@type cyberdream.Config
       return {
         transparent = vim.g.user_transparent_background,
         italic_comments = true,
-        borderless_telescope = {
-          border = not borderless_telescope,
-          style = "flat", -- nvchad
-        },
-        theme = {
-          -- ~/.local/share/nvim/lazy/cyberdream.nvim/lua/cyberdream/colors.lua
-          overrides = function(c)
-            local illuminate = util.blend(c.bgHighlight, c.fg, 0.875)
-            return {
-              IlluminatedWordRead = { bg = illuminate },
-              IlluminatedWordWrite = { bg = illuminate, underline = true },
-              LspReferenceRead = { link = "IlluminatedWordRead" },
-              LspReferenceWrite = { link = "IlluminatedWordWrite" },
-              -- CmpGhostText = { bg = c.bg, fg = util.blend(c.grey, c.fg, 0.85) },
-              DiagnosticUnnecessary = { fg = util.blend(c.grey, c.fg, 0.7) },
-            }
-          end,
-        },
+        borderless_pickers = not borderless_picker,
+        overrides = function(c)
+          local illuminate = util.blend(c.bg_highlight, c.fg, 0.875)
+          return {
+            IlluminatedWordRead = { bg = illuminate },
+            IlluminatedWordWrite = { bg = illuminate, underline = true },
+            LspReferenceRead = { link = "IlluminatedWordRead" },
+            LspReferenceWrite = { link = "IlluminatedWordWrite" },
+            -- CmpGhostText = { bg = c.bg, fg = util.blend(c.grey, c.fg, 0.85) },
+            DiagnosticUnnecessary = { fg = util.blend(c.grey, c.fg, 0.7) },
+
+            DropBarIconUISeparator = { fg = c.grey },
+          }
+        end,
       }
     end,
   },
