@@ -240,6 +240,15 @@ return {
               return ret
             end,
           },
+          highlights = {
+            confirm = function(picker, item)
+              picker:close()
+              if item then
+                vim.fn.setreg(vim.v.register, item.hl_group)
+                LazyVim.info(item.hl_group, { title = "Copied Highlight Group" })
+              end
+            end,
+          },
         },
         win = {
           input = {
