@@ -34,7 +34,7 @@ return {
       end
 
       -- custom highlight
-      Snacks.util.set_hl({
+      require("snacks.util").set_hl({
         DropBarFileName = { fg = Snacks.util.color("Normal"), bold = true },
         DropBarFileNameModified = { fg = Snacks.util.color("MatchParen"), bold = true },
         DropBarFolderName = { fg = Snacks.util.color("Conceal") },
