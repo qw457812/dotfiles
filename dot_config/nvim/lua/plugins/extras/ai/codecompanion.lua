@@ -113,13 +113,13 @@ return {
         end,
       })
 
-      -- HACK: stop insert mode on send via `i_CTRL-S`
-      -- https://github.com/olimorris/codecompanion.nvim/blob/90e82abf4d65b64b0986a5be0981ba13e84eee8b/lua/codecompanion/strategies/chat/keymaps.lua#L214-L218
-      local chat_keymaps = require("codecompanion.strategies.chat.keymaps")
-      chat_keymaps.send.callback = U.patch_func(chat_keymaps.send.callback, function(orig, ...)
-        orig(...)
-        vim.cmd("stopinsert")
-      end)
+      -- stop insert mode on send via `i_CTRL-S`
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "CodeCompanionRequestStarted",
+        callback = function()
+          vim.cmd("stopinsert")
+        end,
+      })
     end,
   },
 
