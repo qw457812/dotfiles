@@ -52,7 +52,7 @@ local function ask(question)
 
     local sidebar = require("avante").get()
     local input_orig ---@type string?
-    local is_visual = vim.list_contains({ "v", "V", vim.keycode("<C-v>") }, vim.fn.mode():sub(1, 1))
+    local is_visual = U.is_visual_mode()
     if sidebar and sidebar:is_open() then
       if is_visual then
         input_orig = sidebar:get_input_value()

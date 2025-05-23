@@ -328,11 +328,14 @@ map("n", "<leader>iC", function() LazyVim.info(vim.g.colors_name, { title = "Col
 map("n", "<leader>iN", news, { desc = "Neovim News" })
 
 local function web_search(query)
-  query = U.url_encode(query or vim.fn.expand("<cword>"))
-  vim.ui.open("https://www.google.com/search?q=" .. query)
+  query = query or U.get_visual_selection({ strict = true }) or vim.fn.expand("<cword>")
+  if not query then
+    LazyVim.warn("No contents to search", { title = "Web Search" })
+    return
+  end
+  vim.ui.open("https://www.google.com/search?q=" .. U.url_encode(query))
 end
--- stylua: ignore
-safe_map("x", "<leader>?", function() web_search(U.get_visual_selection()) end, { desc = "Web Search" }) -- csgithub.nvim
+safe_map("x", "<leader>?", web_search, { desc = "Web Search" }) -- csgithub.nvim
 
 local function paste()
   vim.api.nvim_paste(vim.fn.getreg("+"), true, -1)

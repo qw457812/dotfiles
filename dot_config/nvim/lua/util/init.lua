@@ -135,38 +135,71 @@ function M.is_edgy_win(win)
   return false
 end
 
+---@param mode? string
+---@return boolean
+function M.is_visual_mode(mode)
+  mode = (mode or vim.fn.mode()):sub(1, 1)
+  return vim.list_contains({ "v", "V", vim.keycode("<C-v>") }, mode)
+end
+
 function M.stop_visual_mode()
   local mode = vim.fn.mode():sub(1, 1) ---@type string
-  if vim.tbl_contains({ "v", "V", vim.keycode("<C-v>") }, mode) then
+  if M.is_visual_mode(mode) then
     vim.cmd("normal! " .. mode)
   end
 end
 
+---@alias GetVisualSelectionOpts {strict?: boolean, stop_visual_mode?: boolean}
+
 --- Get visually selected lines.
---- alternative:
 --- https://github.com/ibhagwan/fzf-lua/blob/f39de2d77755e90a7a80989b007f0bf2ca13b0dd/lua/fzf-lua/utils.lua#L770
 --- https://github.com/MagicDuck/grug-far.nvim/blob/308e357be687197605cf19222f843fbb331f50f5/lua/grug-far.lua#L448
----@param stop_visual_mode? boolean default true
-function M.get_visual_selection(stop_visual_mode)
-  local mode = vim.fn.mode(true)
-  -- eval `vim.api.nvim_replace_termcodes("<C-v>", true, false, true)` or `vim.fn.nr2char(22)`
-  local is_visual = mode == "v" or mode == "V" or mode == "\22"
-  assert(is_visual, "Not in Visual mode")
-
-  local cache_z_reg = vim.fn.getreginfo("z")
-  vim.cmd.normal('"zy')
-  if stop_visual_mode == false then
-    vim.cmd.normal("gv")
+--- https://github.com/olimorris/codecompanion.nvim/blob/84a8e8962e9ae20b8357d813dee1ea44a8079605/lua/codecompanion/utils/context.lua#L34-L93
+---@param opts? GetVisualSelectionOpts
+---@return string[]?
+function M.get_visual_selection_lines(opts)
+  opts = opts or {}
+  local mode = vim.fn.mode()
+  local lines
+  if M.is_visual_mode(mode) then
+    lines = vim.fn.getregion(vim.fn.getpos("v"), vim.fn.getpos("."), { type = mode })
+    if opts.stop_visual_mode ~= false then
+      M.stop_visual_mode()
+    end
+  elseif opts.strict ~= true then
+    lines = vim.fn.getregion(vim.fn.getpos("'<"), vim.fn.getpos("'>"), { type = vim.fn.visualmode() })
   end
-  local selection = vim.fn.getreg("z")
-  vim.fn.setreg("z", cache_z_reg)
+  return lines
+end
+
+--- Get visually selected contents.
+---@param opts? GetVisualSelectionOpts
+---@return string?
+function M.get_visual_selection(opts)
+  opts = opts or {}
+  local mode = vim.fn.mode()
+  local selection
+  -- prefer register workaround to trigger `vim.hl.on_yank()`
+  if M.is_visual_mode(mode) then
+    local cache_z_reg = vim.fn.getreginfo("z")
+    vim.cmd.normal('"zy')
+    if opts.stop_visual_mode == false then
+      vim.cmd.normal("gv")
+    end
+    selection = vim.fn.getreg("z")
+    vim.fn.setreg("z", cache_z_reg)
+  else
+    local lines = M.get_visual_selection_lines(opts)
+    selection = lines and table.concat(lines, "\n") or nil
+  end
   return selection
 end
 
 ---@param url string
 function M.open_in_browser(url)
+  -- do not open github url via GitHub app on termux
   -- https://www.reddit.com/r/termux/comments/gsafc0/comment/fs44i6b/
-  vim.ui.open(url, vim.g.user_is_termux and {
+  vim.ui.open(url, vim.g.user_is_termux and url:match("^https://github%.com/(.+)$") and {
     cmd = {
       "am",
       "start",
@@ -185,8 +218,7 @@ function M.url_encode(str)
   str = str:gsub("([^%w%-%.%_%~ ])", function(c)
     return string.format("%%%02X", c:byte())
   end)
-  str = str:gsub(" ", "+")
-  return str
+  return str:gsub(" ", "+")
 end
 
 --- Merge extended options with a default table of options

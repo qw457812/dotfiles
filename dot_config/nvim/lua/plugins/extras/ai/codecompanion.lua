@@ -2,14 +2,7 @@
 return {
   {
     "olimorris/codecompanion.nvim",
-    dependencies = {
-      {
-        "MeanderingProgrammer/render-markdown.nvim",
-        optional = true,
-        ft = U.markdown.render_markdown_ft("codecompanion"),
-      },
-    },
-    cmd = { "CodeCompanion" },
+    cmd = "CodeCompanion",
     keys = {
       {
         "<leader>al",

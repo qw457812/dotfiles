@@ -118,6 +118,7 @@ return {
           { "<leader>fF", function() Snacks.picker.files({ hidden = true, follow = true, ignored = true }) end, desc = "Find all files" },
           { "<leader>,", function() Snacks.picker.buffers({ current = false }) end, desc = "Buffers" },
           { "<leader>fC", function() Snacks.picker.buffers({ modified = true }) end, desc = "Buffers (changed)" },
+          { "<leader>fA", function() Snacks.picker() end, desc = "All Pickers" },
           unpack(H.mappings),
         })
       end
