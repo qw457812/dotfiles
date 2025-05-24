@@ -608,4 +608,20 @@ return {
       },
     },
   },
+
+  {
+    "MagicDuck/grug-far.nvim",
+    optional = true,
+    opts = function()
+      vim.api.nvim_create_autocmd("FileType", {
+        group = augroup,
+        pattern = "grug-far",
+        callback = function(ev)
+          vim.keymap.set("n", close_key, function()
+            require("grug-far").get_instance(0):close()
+          end, { buffer = ev.buf, desc = "Close (Grug Far)" })
+        end,
+      })
+    end,
+  },
 }
