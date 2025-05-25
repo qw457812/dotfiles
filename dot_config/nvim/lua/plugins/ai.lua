@@ -154,7 +154,7 @@ return {
       return U.extend_tbl(opts, {
         error_header = LazyVim.config.icons.diagnostics.Error .. " Error ",
         question_header = "  User ",
-        -- model = "claude-3.7-sonnet",
+        -- model = "claude-sonnet-4",
         -- show_help = false,
         window = {
           layout = function()

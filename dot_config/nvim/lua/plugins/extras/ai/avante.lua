@@ -243,7 +243,7 @@ return {
       vendors = {
         copilot_claude = {
           __inherited_from = "copilot",
-          model = "claude-3.7-sonnet",
+          model = "claude-sonnet-4",
         },
         copilot_claude_thought = {
           __inherited_from = "copilot",
@@ -276,7 +276,7 @@ return {
           __inherited_from = "openai",
           endpoint = "https://openrouter.ai/api/v1",
           api_key_name = "OPENROUTER_API_KEY",
-          model = "anthropic/claude-3.7-sonnet",
+          model = "anthropic/claude-sonnet-4",
         },
         openrouter_gemini = {
           __inherited_from = "openai",
