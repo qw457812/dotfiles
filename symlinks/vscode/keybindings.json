@@ -444,9 +444,19 @@
     },
     "when": "terminalFocus"
   },
+  // {
+  //   "key": "ctrl+space",
+  //   "command": "workbench.action.terminal.toggleTerminal"
+  // },
   {
     "key": "ctrl+space",
-    "command": "workbench.action.terminal.toggleTerminal"
+    "command": "workbench.action.createTerminalEditor",
+    "when": "!terminalEditorFocus"
+  },
+  {
+    "key": "ctrl+space",
+    "command": "workbench.action.closeActiveEditor",
+    "when": "terminalEditorFocus"
   },
   {
     "command": "workbench.action.compareEditor.nextChange",
