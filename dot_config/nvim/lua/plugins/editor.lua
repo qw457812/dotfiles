@@ -44,6 +44,7 @@ return {
           else
             -- not working for <C-v>
             require("grug-far").open({
+              transient = true,
               visualSelectionUsage = "operate-within-range",
               minSearchChars = 1,
             })

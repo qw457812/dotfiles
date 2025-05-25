@@ -284,6 +284,8 @@ return {
       -- https://github.com/Virgiel/my-config/blob/64c5c60c0be4a5f67fc7709017b3dd34ddc33376/config/nvim.lua#L25
       -- https://github.com/Matt-FTW/dotfiles/blob/7f14ad9d58fa5ee2aa971b77da4570c52f9aaa01/.config/nvim/lua/plugins/extras/util/vscode.lua
       -- https://github.com/jellydn/vscode-like-pro/blob/main/vscode.lua
+      --
+      -- https://github.com/corwinm/oil.code
     end,
   },
 }

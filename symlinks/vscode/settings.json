@@ -163,7 +163,7 @@
     }
   },
   "terminal.integrated.commandsToSkipShell": [
-    "workbench.action.closeActiveEditor" // ctrl+space to close `workbench.action.createTerminalEditor`
+    "workbench.action.terminal.killEditor" // ctrl+space to close `workbench.action.createTerminalEditor`
   ],
   "github.copilot.editor.enableAutoCompletions": true,
   "github.copilot.enable": {

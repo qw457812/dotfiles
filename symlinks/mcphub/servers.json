@@ -19,6 +19,10 @@
     "github.com/upstash/context7-mcp": {
       "command": "npx",
       "args": ["-y", "@upstash/context7-mcp@latest"]
+    },
+    "github.com/modelcontextprotocol/servers/tree/main/src/git": {
+      "command": "uvx",
+      "args": ["mcp-server-git"]
     }
   },
   "nativeMCPServers": []
