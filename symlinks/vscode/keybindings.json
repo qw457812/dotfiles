@@ -455,7 +455,7 @@
   },
   {
     "key": "ctrl+space",
-    "command": "workbench.action.closeActiveEditor",
+    "command": "workbench.action.terminal.killEditor",
     "when": "terminalEditorFocus"
   },
   {
