@@ -1,3 +1,10 @@
+# respect .gitignore
+if type -q fd
+    set -x FZF_DEFAULT_COMMAND "fd --type f --type l --hidden --follow"
+else if type -q rg
+    set -x FZF_DEFAULT_COMMAND "rg --files --hidden --follow"
+end
+
 # `--height 100%` is required, see https://github.com/wez/wezterm/discussions/4101
 # https://github.com/folke/tokyonight.nvim/blob/45d22cf0e1b93476d3b6d362d720412b3d34465c/extras/fzf/tokyonight_moon.sh
 set -x FZF_DEFAULT_OPTS "
