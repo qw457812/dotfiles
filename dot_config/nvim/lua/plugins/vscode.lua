@@ -81,6 +81,8 @@ return {
           vscode_map("n", { "<Up>", "K", "[b" }, "workbench.action.previousEditor", { desc = "Prev Editor" })
           vscode_map("n", { "<Down>", "J", "]b" }, "workbench.action.nextEditor", { desc = "Next Editor" })
           vscode_map({ "n", "v" }, "gk", "editor.action.showHover", { desc = "Hover" })
+          vscode_map("n", "gK", "editor.action.triggerParameterHints", { desc = "Signature Help" })
+          -- vscode_map("i", "<c-k>", "editor.action.triggerParameterHints", { desc = "Signature Help" }) -- not working
           vscode_map("n", "[B", "workbench.action.moveEditorLeftInGroup", { desc = "Move Editor Prev" })
           vscode_map("n", "]B", "workbench.action.moveEditorRightInGroup", { desc = "Move Editor Next" })
           vscode_map("n", "[d", "editor.action.marker.prevInFiles", { desc = "Prev Diagnostic" })
@@ -116,6 +118,14 @@ return {
           vscode_map("n", "<C-Up>", "workbench.action.decreaseViewHeight")
           vscode_map("n", "<C-Left>", "workbench.action.decreaseViewWidth")
           vscode_map("n", "<C-Right>", "workbench.action.increaseViewWidth")
+
+          vscode_map("n", "zM", "editor.foldAll")
+          vscode_map("n", "zR", "editor.unfoldAll")
+          vscode_map("n", "zc", "editor.fold")
+          vscode_map("n", "zC", "editor.foldRecursively")
+          vscode_map("n", "zo", "editor.unfold")
+          vscode_map("n", "zO", "editor.unfoldRecursively")
+          vscode_map("n", "za", "editor.toggleFold")
 
           vscode_map("n", "<leader>e", "workbench.view.explorer", { desc = "Explorer" })
           vscode_map("n", "<leader>n", "notifications.showList", { desc = "Notification History" })
