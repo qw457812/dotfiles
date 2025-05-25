@@ -169,7 +169,10 @@ safe_map("n", "<c-_>", function() U.terminal(nil, { cwd = LazyVim.root() }) end,
 -- stylua: ignore end
 map("n", "<c-space>", function()
   local filepath = vim.fn.expand("%:p:h")
-  U.terminal(nil, { cwd = vim.fn.isdirectory(filepath) == 1 and filepath or LazyVim.root() })
+  U.terminal(nil, {
+    win = { position = "float" },
+    cwd = vim.fn.isdirectory(filepath) == 1 and filepath or LazyVim.root(),
+  })
 end, { desc = "Terminal (Buffer Dir)" })
 map("t", "<c-space>", "<cmd>close<cr>", { desc = "Hide Terminal" })
 

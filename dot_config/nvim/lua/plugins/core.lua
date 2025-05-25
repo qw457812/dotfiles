@@ -85,11 +85,11 @@ return {
           duration = { step = 0, total = 0 }, -- holding down `<C-d>`
         },
       },
-      terminal = {
-        win = {
-          position = "float", -- alternative: style = "float"
-        },
-      },
+      -- terminal = {
+      --   win = {
+      --     position = "float", -- alternative: style = "float"
+      --   },
+      -- },
       image = {
         enabled = vim.g.user_is_wezterm or vim.g.user_is_kitty,
       },
