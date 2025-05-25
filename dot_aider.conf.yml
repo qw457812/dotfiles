@@ -5,14 +5,15 @@ read:
   - ~/.config/aider/CONVENTIONS_GLOBAL.md
 
 alias:
-  - "sonnet:openrouter/anthropic/claude-3.7-sonnet"
-  - "gemini:openrouter/google/gemini-2.5-pro-preview"
   - "r1:openrouter/deepseek/deepseek-r1"
+  - "gemini:openrouter/google/gemini-2.5-pro-preview"
+  - "claude:openrouter/anthropic/claude-sonnet-4"
+  - "copilot:openai/claude-sonnet-4"
 
-model: openrouter/google/gemini-2.5-pro-preview
-# architect: true
-# model: openrouter/deepseek/deepseek-r1
-editor-model: openrouter/anthropic/claude-3.7-sonnet
+# model: r1
+# model: gemini
+# model: claude
+model: copilot
 show-model-warnings: false
 
 gitignore: false
