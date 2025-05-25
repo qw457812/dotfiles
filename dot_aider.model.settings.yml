@@ -1,9 +1,64 @@
 # https://github.com/Aider-AI/aider/blob/028257480b2eeaeb0b6d5e27c2bcde08e4b8ba86/aider/website/docs/config/adv-model-settings.md?plain=1#L63
 # https://github.com/Aider-AI/aider/blob/3daf7d4df33bf590d4be04ae541216b67b6e3087/aider/resources/model-settings.yml#L1396-L1407
 # https://github.com/Aider-AI/aider/blob/028257480b2eeaeb0b6d5e27c2bcde08e4b8ba86/aider/website/docs/llms/openrouter.md?plain=1#L42
+
+- name: openrouter/deepseek/deepseek-r1
+  edit_format: architect
+  editor_model_name: openrouter/anthropic/claude-sonnet-4
+
 - name: openrouter/google/gemini-2.5-pro-preview
   overeager: true
   edit_format: diff-fenced
   use_repo_map: true
   weak_model_name: openrouter/google/gemini-2.5-flash-preview
-  editor_model_name: openrouter/google/gemini-2.5-flash-preview
+
+# https://github.com/Aider-AI/aider/blob/9ef32113650b00cbbf503a62659542742488e816/aider/resources/model-settings.yml#L1440-L1452
+- name: openrouter/anthropic/claude-sonnet-4
+  edit_format: diff
+  weak_model_name: openrouter/anthropic/claude-3.5-haiku
+  use_repo_map: true
+  examples_as_sys_msg: false
+  extra_params:
+    extra_headers:
+      anthropic-beta: prompt-caching-2024-07-31,pdfs-2024-09-25,output-128k-2025-02-19
+    max_tokens: 64000
+  cache_control: true
+  editor_model_name: openrouter/anthropic/claude-sonnet-4
+  editor_edit_format: editor-diff
+  accepts_settings: ["thinking_tokens"]
+
+# copilot
+# https://aider.chat/docs/llms/github.html
+# https://github.com/Aider-AI/aider/issues/2227#issuecomment-2906375723
+- name: openai/claude-sonnet-4
+  edit_format: diff
+  weak_model_name: openai/gpt-4.1
+  use_repo_map: true
+  examples_as_sys_msg: false
+  extra_params:
+    api_base: https://api.githubcopilot.com
+    extra_headers:
+      Editor-Version: Aider/0.83.1
+      Copilot-Integration-Id: vscode-chat
+      anthropic-beta: prompt-caching-2024-07-31,pdfs-2024-09-25,output-128k-2025-02-19
+    max_tokens: 64000
+  cache_control: true
+  editor_model_name: openai/claude-sonnet-4
+  editor_edit_format: editor-diff
+  accepts_settings: ["thinking_tokens"]
+
+- name: openai/gpt-4.1
+  extra_params:
+    api_base: https://api.githubcopilot.com
+    extra_headers:
+      Editor-Version: Aider/0.83.1
+      Copilot-Integration-Id: vscode-chat
+  weak_model_name: openai/gpt-4.1-mini
+  editor_model_name: openai/gpt-4.1-mini
+
+- name: openai/gpt-4.1-mini
+  extra_params:
+    api_base: https://api.githubcopilot.com
+    extra_headers:
+      Editor-Version: Aider/0.83.1
+      Copilot-Integration-Id: vscode-chat
