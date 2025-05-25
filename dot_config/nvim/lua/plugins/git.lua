@@ -51,7 +51,20 @@ return {
           -- { "<leader>gc", function() Snacks.picker.git_log({ cwd = LazyVim.root.git() }) end, desc = "Git Log" },
           { "<leader>gd", function() Snacks.picker.git_diff({ cwd = LazyVim.root.git() }) end, desc = "Git Diff (hunks)" },
           { "<leader>gs", function() Snacks.picker.git_status({ cwd = LazyVim.root.git() }) end, desc = "Git Status" },
-          { "<leader>gS", function() Snacks.picker.git_stash({ cwd = LazyVim.root.git() }) end, desc = "Git Stash" },
+          {
+            "<leader>gS",
+            function()
+              Snacks.picker.git_stash({
+                cwd = LazyVim.root.git(),
+                previewers = {
+                  git = {
+                    args = {}, -- overwrite `opts.picker.previewers.git.args`
+                  },
+                },
+              })
+            end,
+            desc = "Git Stash",
+          },
         })
       end
     end,
@@ -66,6 +79,7 @@ return {
           },
           git = {
             builtin = false,
+            args = { "-c", "delta.file-style=omit", "-c", "delta.hunk-header-style=omit" },
           },
         },
       },
