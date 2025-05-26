@@ -106,11 +106,22 @@ return {
             "diff.yazi",
             "smart-filter.yazi",
             "mount.yazi",
+            "types.yazi",
           }
           for _, sub_dir in ipairs(sub_dirs) do
             require("yazi.plugin").build_plugin(plugin, { sub_dir = sub_dir })
           end
         end,
+        specs = {
+          {
+            "folke/lazydev.nvim",
+            opts = {
+              library = {
+                { path = "yazi-plugins/types.yazi", words = { "ya%.mgr_emit", "ya%.sync" } },
+              },
+            },
+          },
+        },
       },
       { "Rolv-Apneseth/starship.yazi", lazy = true, build = H.build_plugin },
       { "dedukun/bookmarks.yazi", lazy = true, build = H.build_plugin },
