@@ -187,6 +187,29 @@ return {
     end,
   },
   {
+    "folke/snacks.nvim",
+    ---@module "snacks"
+    ---@type snacks.Config
+    opts = {
+      picker = {
+        sources = {
+          lsp_symbols = {
+            confirm = function(...)
+              -- HACK: fix the error occurring in the jdtls class buffer when neo-tree is open:
+              -- vim.schedule callback: https://github.com/folke/snacks.nvim/blob/3d695ab7d062d40c980ca5fd9fe6e593c8f35b12/lua/snacks/picker/actions.lua#L128: Cursor position outside buffer
+              -- see: https://github.com/folke/snacks.nvim/commit/4551f499c7945036761fd48927cc07b9720fce56
+              local main = require("snacks.picker.core.main").new({ float = false, file = false })
+              vim.api.nvim_set_current_win(main:get())
+
+              -- original confirm action
+              Snacks.picker.actions.jump(...)
+            end,
+          },
+        },
+      },
+    },
+  },
+  {
     "folke/which-key.nvim",
     opts = {
       spec = {

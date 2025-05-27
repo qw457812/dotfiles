@@ -255,7 +255,20 @@ return {
           input = {
             keys = {
               -- use the same `["<Esc>"]` key to ensure overwriting
-              ["<Esc>"] = { "<Esc>", U.keymap.clear_ui_esc, desc = "Clear UI or Close" },
+              ["<Esc>"] = {
+                "<Esc>",
+                function(self)
+                  U.keymap.clear_ui_esc({
+                    close = function()
+                      -- use `cancel` instead of `close` to go back to last window
+                      -- for example: prevent neo-tree from gaining focus when closing the snacks picker while in a jdtls class buffer
+                      self:execute("cancel")
+                    end,
+                  })
+                end,
+                desc = "Clear UI or Close",
+              },
+
               ["J"] = "preview_scroll_down", -- same as lazygit/yazi
               ["K"] = "preview_scroll_up",
               ["/"] = false, -- highlights text in preview
