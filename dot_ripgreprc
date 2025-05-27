@@ -1,5 +1,4 @@
 --hidden
---glob=!.git/*
---glob=!.svn/*
+--glob=!{.git,.svn}
 
 --smart-case

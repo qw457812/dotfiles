@@ -137,7 +137,7 @@ Using [Emacs Plus](https://github.com/d12frosted/homebrew-emacs-plus).
 
 [My rime config](private_Library/Rime) for Chinese input based on [rime-ice](https://github.com/iDvel/rime-ice) and [TigerCode](https://tiger-code.com/).
 
-Using [KeyboardHolder](https://keyboardholder.leavesc.com/zh-cn/) to keep [Squirrel](https://github.com/rime/squirrel) as the only input source on macOS, instead of ABC.
+Using [InputSourcePro](https://github.com/runjuu/InputSourcePro) to keep [Squirrel](https://github.com/rime/squirrel) as the only input source on macOS, instead of ABC.
 
 And using [ShowyEdge](https://github.com/pqrs-org/ShowyEdge) to notice when input source automatically changes to ABC.
 
