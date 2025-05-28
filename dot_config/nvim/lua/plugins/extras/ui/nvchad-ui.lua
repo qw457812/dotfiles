@@ -145,7 +145,7 @@ return {
           local cache_file = vim.fn.stdpath("cache") .. "/user_transparent_background.txt"
           local prev_transparent = vim.fn.filereadable(cache_file) == 1 and LazyUtil.read_file(cache_file) or nil
           local transparent = tostring(vim.g.user_transparent_background)
-          if prev_transparent ~= transparent then
+          if transparent ~= prev_transparent then
             LazyUtil.write_file(cache_file, transparent)
             reload_base46()
           end

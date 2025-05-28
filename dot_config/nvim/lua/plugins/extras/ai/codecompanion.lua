@@ -124,27 +124,6 @@ return {
     end,
   },
 
-  -- vim.fn.executable("vectorcode") == 1 and {
-  --   "olimorris/codecompanion.nvim",
-  --   dependencies = {
-  --     {
-  --       "Davidyz/VectorCode",
-  --       version = "*",
-  --       build = "pipx upgrade vectorcode",
-  --       cmd = "VectorCode",
-  --     },
-  --   },
-  --   opts = {
-  --     extensions = {
-  --       vectorcode = {
-  --         opts = {
-  --           add_tool = true,
-  --         },
-  --       },
-  --     },
-  --   },
-  -- } or nil,
-
   -- TODO: https://github.com/ravitemer/codecompanion-history.nvim
 
   -- status
@@ -226,4 +205,25 @@ return {
   --     })
   --   end,
   -- },
+
+  -- vim.fn.executable("vectorcode") == 1 and {
+  --   "olimorris/codecompanion.nvim",
+  --   dependencies = {
+  --     {
+  --       "Davidyz/VectorCode",
+  --       version = "*",
+  --       build = "pipx upgrade vectorcode",
+  --       cmd = "VectorCode",
+  --     },
+  --   },
+  --   opts = {
+  --     extensions = {
+  --       vectorcode = {
+  --         opts = {
+  --           add_tool = true,
+  --         },
+  --       },
+  --     },
+  --   },
+  -- } or nil,
 }
