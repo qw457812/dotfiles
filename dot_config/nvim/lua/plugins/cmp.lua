@@ -410,6 +410,28 @@ return {
   {
     "saghen/blink.cmp",
     optional = true,
+    dependencies = { "garyhurtz/blink_cmp_kitty", shell_command_editor = true },
+    ---@type blink.cmp.Config
+    opts = {
+      sources = {
+        default = { "blink_cmp_kitty" },
+        providers = {
+          blink_cmp_kitty = {
+            enabled = vim.g.user_is_kitty,
+            module = "blink_cmp_kitty",
+            name = "kitty",
+            min_keyword_length = 3,
+            max_items = 2,
+            score_offset = -10,
+          },
+        },
+      },
+    },
+  },
+
+  {
+    "saghen/blink.cmp",
+    optional = true,
     dependencies = { "ribru17/blink-cmp-spell", shell_command_editor = true },
     ---@type blink.cmp.Config
     opts = {
