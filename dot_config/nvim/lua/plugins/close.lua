@@ -230,7 +230,7 @@ return {
         win = {
           input = {
             keys = {
-              [close_key] = "close",
+              [close_key] = "close", -- cancel
             },
           },
           list = {

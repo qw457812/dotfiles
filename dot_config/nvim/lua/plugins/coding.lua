@@ -82,16 +82,25 @@ return {
   {
     "echasnovski/mini.ai",
     optional = true,
-    opts = {
-      mappings = {
-        around_next = "",
-        inside_next = "",
-        around_last = "",
-        inside_last = "",
-        goto_left = "",
-        goto_right = "",
-      },
-    },
+    opts = function(_, opts)
+      local ai = require("mini.ai")
+      return U.extend_tbl(opts, {
+        mappings = {
+          around_next = "",
+          inside_next = "",
+          around_last = "",
+          inside_last = "",
+          goto_left = "",
+          goto_right = "",
+        },
+        custom_textobjects = {
+          -- add `<>` brackets, copied from: https://github.com/echasnovski/mini.ai/blob/7f1fe86277f0e977642cf8fe15f004229f61e61a/lua/mini/ai.lua#L1155
+          ["b"] = { { "%b()", "%b[]", "%b{}", "%b<>" }, "^.().*().$" },
+          ["?"] = false,
+          ["/"] = ai.gen_spec.user_prompt(),
+        },
+      })
+    end,
   },
 
   {
