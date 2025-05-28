@@ -125,6 +125,28 @@ return {
       { "gp", mode = { "n", "x" }, false },
       { "gP", mode = { "n", "x" }, false },
     },
+    specs = {
+      {
+        "saghen/blink.cmp",
+        optional = true,
+        dependencies = { "marcoSven/blink-cmp-yanky", shell_command_editor = true },
+        ---@module 'blink.cmp'
+        ---@type blink.cmp.Config
+        opts = {
+          sources = {
+            default = { "yank" },
+            providers = {
+              yank = {
+                module = "blink-yanky",
+                min_keyword_length = 3,
+                max_items = 1,
+                score_offset = -10,
+              },
+            },
+          },
+        },
+      },
+    },
   },
 
   {
