@@ -10,6 +10,7 @@
   "blink-cmp-dictionary": { "branch": "master", "commit": "43e0fbe8d273f92a87c58aa958c51c95557d20c4" },
   "blink-cmp-env": { "branch": "main", "commit": "700b6d9542b9d5deea80121abbb46b1400ace302" },
   "blink-cmp-spell": { "branch": "master", "commit": "782bc76be09c0c5dd08e3edd04e4ec1054c3158e" },
+  "blink-cmp-yanky": { "branch": "main", "commit": "0c2ba4c05663ceb9d96611443567ea99d2a4d075" },
   "blink-copilot": { "branch": "main", "commit": "bdc45bbbed2ec252b3a29f4adecf031e157b5573" },
   "blink-ripgrep.nvim": { "branch": "main", "commit": "a910b62c896eee2d0e74eb48b3ff5eedd211db69" },
   "blink.cmp": { "branch": "main", "commit": "7c76cf55214f838845444637dfdafd2d5f227484" },
