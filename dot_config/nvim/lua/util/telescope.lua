@@ -74,6 +74,7 @@ M.previewers = {
               "--color-scale",
               "all",
               "--icons=always",
+              "--no-quotes",
               "--long",
               "--time-style=iso",
               "--git",
