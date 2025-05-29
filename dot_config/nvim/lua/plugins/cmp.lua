@@ -432,6 +432,32 @@ return {
   },
 
   {
+    "gbprod/yanky.nvim",
+    optional = true,
+    specs = {
+      {
+        "saghen/blink.cmp",
+        optional = true,
+        dependencies = { "marcoSven/blink-cmp-yanky", shell_command_editor = true },
+        ---@type blink.cmp.Config
+        opts = {
+          sources = {
+            default = { "yank" },
+            providers = {
+              yank = {
+                module = "blink-yanky",
+                min_keyword_length = 3,
+                max_items = 1,
+                score_offset = -10,
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+
+  {
     "saghen/blink.cmp",
     optional = true,
     dependencies = { "ribru17/blink-cmp-spell", shell_command_editor = true },

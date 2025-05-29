@@ -14,7 +14,9 @@ return {
           vim.schedule(function()
             if vim.api.nvim_get_current_buf() == ev.buf and vim.api.nvim_get_current_win() == win then
               vim.api.nvim_win_set_cursor(win, { 1, 0 })
-              vim.cmd("startinsert")
+              if vim.api.nvim_get_current_line():match("^%s*$") then
+                vim.cmd("startinsert")
+              end
             end
           end)
         end,

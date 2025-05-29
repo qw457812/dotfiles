@@ -1,6 +1,6 @@
 #!/usr/bin/env fish
 
-# added to crontab as this token expires in 30 minutes
+# add to crontab as this token expires in 30 minutes (not working, removed from crontab)
 # */25 * * * * ~/.config/fish/scripts/refresh_copilot_token.fish >/dev/null 2>&1
 
 if test -f ~/.config/github-copilot/apps.json

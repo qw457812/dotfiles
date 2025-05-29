@@ -117,7 +117,7 @@ return {
             "folke/lazydev.nvim",
             opts = {
               library = {
-                { path = "yazi-plugins/types.yazi", words = { "ya%.mgr_emit", "ya%.sync" } },
+                { path = "yazi-plugins/types.yazi", words = { "ya%.emit", "ya%.sync" } },
               },
             },
           },
