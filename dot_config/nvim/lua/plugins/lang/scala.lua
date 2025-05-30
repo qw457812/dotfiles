@@ -44,19 +44,65 @@ return {
 
       -- stylua: ignore
       vim.list_extend(opts.servers.metals.keys, {
+        { "gs", function() require("metals").goto_super_method() end, desc = "Goto Super (Metals)" },
+        { "gk", function() require("metals").type_of_range() end, desc = "Type of Range (Metals)", mode = "x" },
         { "<leader>co", function() require("metals").organize_imports() end, desc = "Organize Imports (Metals)" },
         { "<leader>im", function() require("metals").info() end, desc = "Metals" },
         { "<leader>m", "", desc = "+metals" },
         -- NOTE: need to run `:MetalsUpdate` to update (re-install) to the latest stable version or `opts.servers.metals.settings.serverVersion` of metals (~/.cache/nvim/nvim-metals/metals)
         { "<leader>mu", "<cmd>MetalsUpdate<cr>", desc = "Update Metals" },
+        { "<leader>mm", function() require("metals").commands() end, desc = "Commands" },
         { "<leader>me", false },
+        { "<leader>mh", false },
         { "<leader>mc", function() require("metals").compile_cascade() end, desc = "Compile Cascade" },
-        { "<leader>mh", function() require("metals").hover_worksheet() end, desc = "Hover Worksheet" },
+        { "<leader>mw", function() require("metals").hover_worksheet() end, desc = "Worksheet" },
         { "<leader>ml", function() require("metals").toggle_logs() end, desc = "Logs" },
         { "<leader>md", function() require("metals").run_doctor() end, desc = "Run Doctor" },
         { "<leader>mi", function() require("metals").import_build() end, desc = "Import Build" },
         { "<leader>mC", function() require("metals").compile_clean() end, desc = "Compile Clean" },
         { "<leader>mR", function() require("metals").reset_workspace() end, desc = "Reset Workspace" },
+        { "<leader>mt", function() require("metals.tvp").toggle_tree_view() end, desc = "Toggle Tree View Panel" },
+        { "<leader>mr", function() require("metals.tvp").reveal_in_tree() end, desc = "Reveal In Tree View Panel" },
+      })
+
+      -- https://github.com/ckipp01/dots/blob/c9e829c15a64ca1febe4ebc7544997974e0e5952/nvim/.config/nvim/lua/mesopotamia/lsp.lua#L42
+      opts.servers.metals = U.extend_tbl(opts.servers.metals, {
+        tvp = {
+          icons = {
+            enabled = true,
+          },
+        },
+        settings = {
+          -- serverVersion = "latest.snapshot", -- run `:MetalsUpdate` after changing this
+          autoImportBuild = "all", -- initial
+          defaultBspToBuildTool = true, -- see also: https://github.com/scalameta/metals/discussions/4505
+          showInferredType = true,
+          showImplicitConversionsAndClasses = true,
+          inlayHints = {
+            byNameParameters = { enable = true },
+            hintsInPatternMatch = { enable = true },
+            implicitArguments = { enable = true },
+            implicitConversions = { enable = true },
+            inferredTypes = { enable = true },
+            typeParameters = { enable = true },
+          },
+          -- https://scalameta.org/metals/docs/integrations/new-editor#starting-the-server
+          serverProperties = {
+            "-Xss4m",
+            "-Xms8g",
+            "-Xmx16g",
+          },
+          -- https://scalacenter.github.io/bloop/docs/server-reference#custom-java-options
+          bloopJvmProperties = {
+            "-Xss4m",
+            "-Xms8g",
+            "-Xmx16g",
+          },
+        },
+        -- https://scalameta.org/metals/docs/integrations/new-editor#initializationoptions
+        init_options = {
+          icons = "unicode",
+        },
       })
     end,
   },

@@ -245,16 +245,17 @@ function M.clear_ui_esc(opts)
   end
 
   local function is_lsp_progressing()
-    return vim.lsp.status() ~= ""
+    local ok, message = pcall(vim.lsp.status) -- metals
+    return ok and message ~= ""
   end
 
   local function dismiss_notif()
     if package.loaded["noice"] then
-      if is_lsp_progressing() then
-        -- dismiss lsp progress for seconds, otherwise esc becomes useless during lsp progress
-        vim.g.user_dismiss_lsp_progress = true
+      if vim.g.user_suppress_lsp_progress ~= true and is_lsp_progressing() then
+        -- suppress lsp progress for seconds, otherwise esc becomes useless during lsp progress
+        vim.g.user_suppress_lsp_progress = true
         vim.defer_fn(function()
-          vim.g.user_dismiss_lsp_progress = nil
+          vim.g.user_suppress_lsp_progress = nil
         end, 3000)
       end
       require("noice").cmd("dismiss") -- including mini view like lsp progress (floating windows)
