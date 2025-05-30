@@ -71,13 +71,16 @@ return {
             "n",
             "<C-S>",
             vim.tbl_get(opts, "keymaps", "syncLocations", "n") or "<localleader>s",
-            { buffer = ev.buf, remap = true, desc = "Sync All" }
+            { buffer = ev.buf, remap = true, desc = "Sync All (Grug Far)" }
           )
         end,
       })
 
-      opts.keymaps = vim.tbl_deep_extend("force", opts.keymaps or {}, {
-        refresh = { n = "<localleader>R" },
+      return U.extend_tbl(opts, {
+        showCompactInputs = true,
+        keymaps = {
+          refresh = { n = "<localleader>R" },
+        },
       })
     end,
   },
@@ -92,7 +95,7 @@ return {
         "<leader>sf",
         mode = { "n", "x" },
         function()
-          -- popup overlaps when `opts.popupWin.position == "top"`
+          -- popups overlap when `opts.popupWin.position == "top"`
           Snacks.notifier.hide()
           require("rip-substitute").sub()
           if vim.api.nvim_get_current_line() ~= "" then
@@ -664,13 +667,13 @@ return {
     shell_command_editor = true,
     event = "ModeChanged *:[vV]",
     opts = {
+      case_insensitive = true,
       chars_lower_limit = 2,
       buffers = function(buf)
         return vim.bo[buf].buflisted and vim.bo[buf].buftype == ""
           or vim.bo[buf].buftype == "terminal"
           or buf == vim.api.nvim_win_get_buf(0)
       end,
-      -- case_insensitive = true,
     },
   },
 

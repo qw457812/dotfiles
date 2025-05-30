@@ -23,6 +23,9 @@ return {
       vim.g.copilot_nes_debounce = 500
       vim.lsp.enable("copilot_ls")
     end,
+    ---@module "copilot-lsp"
+    ---@type copilotlsp.config|{}
+    opts = {},
     specs = {
       { "zbirenbaum/copilot.lua", optional = true, enabled = false, cond = false },
       {
@@ -69,8 +72,7 @@ return {
         opts.sections.lualine_x,
         2,
         LazyVim.lualine.status(LazyVim.config.icons.kinds.Copilot, function()
-          local clients = package.loaded["copilot-lsp.nes"]
-              and LazyVim.lsp.get_clients({ name = "copilot_ls", bufnr = 0 })
+          local clients = package.loaded["copilot-lsp"] and LazyVim.lsp.get_clients({ name = "copilot_ls", bufnr = 0 })
             or {}
           if #clients > 0 then
             return vim.b.nes_state and "pending" or "ok"

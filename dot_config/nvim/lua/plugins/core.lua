@@ -4,6 +4,7 @@ return {
   {
     "LazyVim/LazyVim",
     version = false,
+    ---@module "lazyvim"
     ---@type LazyVimOptions
     opts = {
       news = { lazyvim = true, neovim = true },

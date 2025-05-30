@@ -624,4 +624,33 @@ return {
       })
     end,
   },
+
+  {
+    "scalameta/nvim-metals",
+    optional = true,
+    opts = function()
+      -- see: https://github.com/scalameta/nvim-metals/blob/df146792d5a642e92dd649b9130999d74e686e88/lua/metals/config.lua#L170-L200
+      vim.api.nvim_create_autocmd("FileType", {
+        group = augroup,
+        pattern = "log",
+        callback = function(ev)
+          local buf = ev.buf
+          vim.schedule(function()
+            if
+              vim.api.nvim_buf_is_valid(buf)
+              and vim.bo[buf].buftype == "terminal"
+              and vim.b[buf].metals_buf_purpose == "logs"
+            then
+              vim.keymap.set("n", close_key, function()
+                if #vim.api.nvim_list_tabpages() > 1 then
+                  vim.cmd("tabclose")
+                end
+                Snacks.bufdelete({ buf = buf })
+              end, { buffer = buf, desc = "Close (Metals Logs)" })
+            end
+          end)
+        end,
+      })
+    end,
+  },
 }
