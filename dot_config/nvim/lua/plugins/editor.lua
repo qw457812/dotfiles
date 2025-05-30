@@ -701,6 +701,9 @@ return {
       vim.api.nvim_create_autocmd("LspAttach", {
         desc = "User: Prefer LSP folding if client supports it",
         callback = function(args)
+          if args.file:match("/%.metals/readonly/dependencies/") then
+            return
+          end
           local client = vim.lsp.get_client_by_id(args.data.client_id)
           if client and client:supports_method("textDocument/foldingRange") then
             local win = vim.api.nvim_get_current_win()

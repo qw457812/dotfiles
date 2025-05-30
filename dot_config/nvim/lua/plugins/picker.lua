@@ -157,7 +157,15 @@ return {
           },
         },
         on_show = function()
-          vim.cmd("noh") -- clear_ui_esc
+          -- in favor of clear_ui_esc
+          vim.cmd("noh")
+          vim.g.user_suppress_lsp_progress = true
+          if package.loaded["noice"] then
+            require("noice").cmd("dismiss")
+          end
+        end,
+        on_close = function()
+          vim.g.user_suppress_lsp_progress = nil
         end,
         sources = {
           files = {

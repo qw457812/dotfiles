@@ -229,7 +229,7 @@ return {
           kind = "progress",
           cond = function(message)
             -- dd(vim.tbl_get(message.opts, "progress"))
-            return vim.g.user_dismiss_lsp_progress == true
+            return vim.g.user_suppress_lsp_progress == true
           end,
         },
         opts = { skip = true },
