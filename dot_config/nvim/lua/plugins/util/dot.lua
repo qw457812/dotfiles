@@ -1,4 +1,9 @@
 return {
+  -- TODO: fish-lsp
+  -- - https://github.com/neovim/nvim-lspconfig/pull/3869
+  -- - https://github.com/mason-org/mason-registry/pull/8609
+  -- - https://github.com/ndonfris/fish-lsp
+
   -- zsh
   {
     "stevearc/conform.nvim",

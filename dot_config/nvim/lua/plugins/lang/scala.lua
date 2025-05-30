@@ -11,7 +11,7 @@ return {
         return
       end
 
-      -- HACK: add java to filetypes
+      -- HACK: add java to filetypes in favor of `gr` (lsp references) in java files
       -- see: https://github.com/LazyVim/LazyVim/blob/859646f628ff0d99e6afe835ba0a48faed2972af/lua/lazyvim/plugins/extras/lang/scala.lua#L55-L69
       local setup_metals_orig = opts.setup.metals
       opts.setup.metals = function(...)
@@ -41,6 +41,23 @@ return {
 
         return ret
       end
+
+      -- stylua: ignore
+      vim.list_extend(opts.servers.metals.keys, {
+        { "<leader>co", function() require("metals").organize_imports() end, desc = "Organize Imports (Metals)" },
+        { "<leader>im", function() require("metals").info() end, desc = "Metals" },
+        { "<leader>m", "", desc = "+metals" },
+        -- NOTE: need to run `:MetalsUpdate` to update (re-install) to the latest stable version or `opts.servers.metals.settings.serverVersion` of metals (~/.cache/nvim/nvim-metals/metals)
+        { "<leader>mu", "<cmd>MetalsUpdate<cr>", desc = "Update Metals" },
+        { "<leader>me", false },
+        { "<leader>mc", function() require("metals").compile_cascade() end, desc = "Compile Cascade" },
+        { "<leader>mh", function() require("metals").hover_worksheet() end, desc = "Hover Worksheet" },
+        { "<leader>ml", function() require("metals").toggle_logs() end, desc = "Logs" },
+        { "<leader>md", function() require("metals").run_doctor() end, desc = "Run Doctor" },
+        { "<leader>mi", function() require("metals").import_build() end, desc = "Import Build" },
+        { "<leader>mC", function() require("metals").compile_clean() end, desc = "Compile Clean" },
+        { "<leader>mR", function() require("metals").reset_workspace() end, desc = "Reset Workspace" },
+      })
     end,
   },
 }
