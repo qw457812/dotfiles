@@ -218,4 +218,21 @@ return {
       vim.o.winborder = orig_winborder
     end,
   },
+
+  {
+    "yetone/avante.nvim",
+    optional = true,
+    ---@module "avante"
+    ---@type avante.Config
+    opts = {
+      windows = {
+        edit = {
+          border = "rounded",
+        },
+        ask = {
+          border = "rounded",
+        },
+      },
+    },
+  },
 }
