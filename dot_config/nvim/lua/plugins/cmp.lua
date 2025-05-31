@@ -126,8 +126,8 @@ return {
           -- TODO: better coop with mini.snippets and signature_help
           ["<Tab>"] = {
             "select_next",
-            "snippet_forward",
             H.actions.pum_next,
+            "snippet_forward",
             H.actions.copilot_nes,
             function(cmp)
               if has_words_before() then
@@ -136,14 +136,15 @@ return {
             end,
             "fallback",
           },
-          ["<S-Tab>"] = { "select_prev", "snippet_backward", H.actions.pum_prev, "fallback" },
+          ["<S-Tab>"] = { "select_prev", H.actions.pum_prev, "snippet_backward", "fallback" },
           ["<CR>"] = { "accept", H.actions.pum_accept, "fallback" },
           ["<C-n>"] = { "select_next", "show" },
           ["<C-p>"] = { "select_prev", "show" },
+          -- TODO: better snippets/signature keymaps
           ["<C-j>"] = { "select_next", H.actions.pum_next, H.actions.mini_snippets_expand, "fallback" },
-          ["<C-k>"] = { "select_prev", H.actions.pum_prev, "fallback" }, -- TODO: conflicts with signatureHelp
+          ["<C-k>"] = { "select_prev", H.actions.pum_prev, "show_signature", "hide_signature", "fallback" },
           ["<C-l>"] = { "snippet_forward", H.actions.mini_snippets_expand, "fallback" },
-          ["<C-h>"] = { "snippet_backward", "fallback" },
+          ["<C-h>"] = { "snippet_backward", "show_signature", "hide_signature", "fallback" },
           -- ["<C-u>"] = { "scroll_documentation_up", "fallback" },
           -- ["<C-d>"] = { "scroll_documentation_down", "fallback" },
         },
@@ -372,6 +373,30 @@ return {
           opts.library = opts.library or {}
           table.insert(opts.library, { path = "mini.snippets", words = { "MiniSnippets" } })
         end,
+      },
+    },
+  },
+
+  -- signature help
+  {
+    "saghen/blink.cmp",
+    optional = true,
+    ---@type blink.cmp.Config
+    opts = {
+      signature = {
+        enabled = true,
+        window = {
+          show_documentation = true,
+        },
+      },
+    },
+    specs = {
+      {
+        "folke/noice.nvim",
+        optional = true,
+        ---@module "noice"
+        ---@type NoiceConfig|{}
+        opts = { lsp = { signature = { enabled = false } } },
       },
     },
   },

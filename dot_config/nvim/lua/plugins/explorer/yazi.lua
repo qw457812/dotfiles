@@ -82,7 +82,7 @@ return {
         },
       }
     end,
-    -- use lazy.nvim instead of `ya pack` as package manager
+    -- use lazy.nvim instead of `ya pkg` as package manager
     specs = {
       {
         "yazi-rs/flavors",
