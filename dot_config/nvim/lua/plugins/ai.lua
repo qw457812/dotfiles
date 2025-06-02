@@ -119,11 +119,7 @@ return {
     optional = true,
     cmd = { "CopilotChatModels", "CopilotChatPrompts", "CopilotChatAgents" },
     dependencies = {
-      {
-        "MeanderingProgrammer/render-markdown.nvim",
-        optional = true,
-        ft = U.markdown.render_markdown_ft("copilot-chat"),
-      },
+      { "MeanderingProgrammer/render-markdown.nvim", optional = true, ft = "copilot-chat" },
     },
     -- stylua: ignore
     keys = {
