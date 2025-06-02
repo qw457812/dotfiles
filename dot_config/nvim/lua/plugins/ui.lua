@@ -14,6 +14,23 @@ return {
         { "<leader>br", false },
         { "<leader>bl", "<Cmd>BufferLineCloseRight<CR>", desc = "Delete Buffers to the Right" },
         { "<leader>ba", "<Cmd>BufferLineGroupClose ungrouped<CR>", desc = "Delete Non-Pinned Buffers" },
+        {
+          "<leader><tab>r",
+          function()
+            vim.ui.input({
+              prompt = "New Tab Name: ",
+              default = vim.fs.basename(LazyVim.root()),
+            }, function(input)
+              if input and input ~= "" then
+                vim.cmd("BufferLineTabRename " .. input)
+              end
+            end)
+            if vim.api.nvim_get_current_line() ~= "" then
+              vim.cmd("stopinsert")
+            end
+          end,
+          desc = "Rename Tab",
+        },
       }
       for i = 1, 9 do
         table.insert(

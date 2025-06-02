@@ -34,6 +34,6 @@ function auto_pwd --on-variable PWD
 
         # local changes
         echo -e "## Status\n" | gum format
-        hub -c color.ui=always st | sed 's/^/  /'
+        hub -c color.ui=always status --short --branch | sed 's/^/  /'
     end
 end
