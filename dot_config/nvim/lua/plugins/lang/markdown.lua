@@ -48,7 +48,7 @@ return {
   {
     "MeanderingProgrammer/render-markdown.nvim",
     optional = true,
-    ft = U.markdown.render_markdown_ft("gitcommit"),
+    ft = "gitcommit",
     opts = {
       heading = {
         icons = function(ctx)

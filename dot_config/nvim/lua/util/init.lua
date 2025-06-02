@@ -4,7 +4,6 @@
 ---@field java util.java
 ---@field keymap util.keymap
 ---@field lualine util.lualine
----@field markdown util.markdown
 ---@field path util.path
 ---@field rime_ls util.rime_ls
 ---@field telescope util.telescope

@@ -144,11 +144,7 @@ return {
       --     },
       --   },
       -- },
-      {
-        "MeanderingProgrammer/render-markdown.nvim",
-        optional = true,
-        ft = U.markdown.render_markdown_ft("Avante"),
-      },
+      { "MeanderingProgrammer/render-markdown.nvim", optional = true, ft = "Avante" },
     },
     cmd = "AvanteModels",
     keys = function(_, keys)
