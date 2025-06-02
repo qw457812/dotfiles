@@ -221,6 +221,7 @@ time nvim -c exit
 - [ ] Replace `vim.endswith` and `vim.startswith` with `string.match` since I found [this commit of oil.nvim](https://github.com/stevearc/oil.nvim/commit/4de3025).
 - [ ] Try [nvim-focus/focus.nvim](https://github.com/nvim-focus/focus.nvim).
 - [ ] Try [jake-stewart/multicursor.nvim](https://github.com/jake-stewart/multicursor.nvim).
+- [ ] Try [quicker.nvim](https://github.com/stevearc/quicker.nvim).
   > Mentioned in this [issue](https://github.com/Saghen/blink.cmp/issues/182#issuecomment-2651686405) of `blink.cmp`.
 - [ ] [firenvim](https://github.com/glacambre/firenvim) like [megalithic](https://github.com/megalithic/dotfiles/blob/main/config/nvim/lua/plugins/extended/firenvim.lua).
 - [ ] Check this [chezmoi.lua.tmpl](https://github.com/Nitestack/dotfiles/blob/506b895c45b8ed012a2cb0c35fe62058d8b6dbc4/config/private_dot_config/exact_nvim/lua/exact_plugins/chezmoi.lua.tmpl).
