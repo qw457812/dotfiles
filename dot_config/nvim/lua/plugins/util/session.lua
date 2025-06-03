@@ -6,11 +6,25 @@ if lazyvim_docs then
   vim.g.user_auto_session = false
 end
 
+local LazyUtil = require("lazy.util")
+
+local restart_cache_file = vim.fn.stdpath("cache") .. "/user_is_restart.txt"
+
 return {
   -- copied from: https://github.com/rafi/vim-config/blob/0feb5daebc9f5297f01dc2304f81156318b8616b/lua/rafi/plugins/editor.lua#L27
   {
     "folke/persistence.nvim",
     optional = true,
+    keys = {
+      {
+        "<leader>qr",
+        function()
+          LazyUtil.write_file(restart_cache_file, "1")
+          vim.cmd("restart")
+        end,
+        desc = "Restart and Restore Session",
+      },
+    },
     opts = {
       -- branch = false,
     },
@@ -29,6 +43,14 @@ return {
         once = true,
         nested = true,
         callback = function()
+          -- for `<leader>qr`
+          if vim.fn.filereadable(restart_cache_file) == 1 and LazyUtil.read_file(restart_cache_file) == "1" then
+            LazyUtil.write_file(restart_cache_file, "0")
+            require("persistence").load({ last = vim.g.user_auto_root })
+            return
+          end
+
+          -- for `vim.g.user_auto_session`
           if not vim.g.user_auto_session then
             return
           end
