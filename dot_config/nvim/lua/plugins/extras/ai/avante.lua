@@ -101,12 +101,16 @@ local function edit_submit(question)
 end
 
 local function switch_provider()
-  -- https://github.com/yetone/avante.nvim/blob/931a364dad7b4ff9cc583646c3fd5ae69d3dcc61/plugin/avante.lua#L110-L118
-  vim.ui.select(require("avante.config").provider_names, { prompt = "Select Avante Provider:" }, function(choice)
-    if choice then
-      require("avante.api").switch_provider(choice)
+  -- https://github.com/yetone/avante.nvim/blob/e9ab2ca2fd7b8df4bed0963f490f59d8ed119ecb/plugin/avante.lua#L115-L123
+  vim.ui.select(
+    vim.tbl_keys(require("avante.config").providers),
+    { prompt = "Select Avante Provider:" },
+    function(choice)
+      if choice then
+        require("avante.api").switch_provider(choice)
+      end
     end
-  end)
+  )
 end
 
 -- https://github.com/AstroNvim/astrocommunity/blob/main/lua/astrocommunity/completion/avante-nvim/init.lua
@@ -217,26 +221,24 @@ return {
       },
       provider = "copilot_claude", -- only recommend using claude
       -- auto_suggestions_provider = "ollama", -- high-frequency, can be expensive if enabled
-      ---@type AvanteSupportedProvider
-      copilot = {
-        model = "gpt-4.1",
-      },
-      ---@type AvanteSupportedProvider
-      ollama = {
-        model = "llama3.2",
-        hide_in_model_selector = true,
-      },
-      openai = { hide_in_model_selector = true },
-      azure = { hide_in_model_selector = true },
-      claude = { hide_in_model_selector = true },
-      bedrock = { hide_in_model_selector = true },
-      gemini = { hide_in_model_selector = true },
-      vertex = { hide_in_model_selector = true },
-      cohere = { hide_in_model_selector = true },
-      vertex_claude = { hide_in_model_selector = true },
       -- https://github.com/yetone/cosmos-nvim/blob/64ffc3f90f33eb4049f1495ba49f086280dc8a1c/lua/layers/completion/plugins.lua#L249
       ---@type table<string, AvanteSupportedProvider>
-      vendors = {
+      providers = {
+        copilot = {
+          model = "gpt-4.1",
+        },
+        ollama = {
+          model = "llama3.2",
+          hide_in_model_selector = true,
+        },
+        -- openai = { hide_in_model_selector = true },
+        azure = { hide_in_model_selector = true },
+        claude = { hide_in_model_selector = true },
+        bedrock = { hide_in_model_selector = true },
+        gemini = { hide_in_model_selector = true },
+        vertex = { hide_in_model_selector = true },
+        cohere = { hide_in_model_selector = true },
+        vertex_claude = { hide_in_model_selector = true },
         copilot_claude = {
           __inherited_from = "copilot",
           model = "claude-sonnet-4",
@@ -244,8 +246,10 @@ return {
         copilot_claude_thought = {
           __inherited_from = "copilot",
           model = "claude-3.7-sonnet-thought",
-          temperature = 1,
-          max_tokens = 20000,
+          extra_request_body = {
+            temperature = 1,
+            max_tokens = 20000,
+          },
         },
         copilot_gemini = {
           __inherited_from = "copilot",
@@ -265,7 +269,9 @@ return {
           endpoint = "https://api.groq.com/openai/v1/",
           -- curl -X GET "https://api.groq.com/openai/v1/models" -H "Authorization: Bearer $GROQ_API_KEY" -H "Content-Type: application/json" | jq '.data | sort_by(.created)'
           model = "llama-3.3-70b-versatile",
-          max_tokens = 32768,
+          extra_request_body = {
+            max_tokens = 32768,
+          },
           disable_tools = true,
         },
         openrouter_claude = {
