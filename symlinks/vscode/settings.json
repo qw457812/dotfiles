@@ -160,6 +160,11 @@
       "path": "${userHome}/.local/bin/vscode-tmux",
       "args": ["${workspaceFolder}"],
       "icon": "terminal-tmux"
+    },
+    "aider": {
+      "path": "${userHome}/.local/bin/vscode-tmux-aider",
+      "args": ["${workspaceFolder}"],
+      "icon": "robot"
     }
   },
   "terminal.integrated.commandsToSkipShell": [
