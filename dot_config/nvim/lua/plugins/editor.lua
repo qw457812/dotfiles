@@ -1,3 +1,5 @@
+---@module "lazy"
+---@type LazySpec
 return {
   {
     "MagicDuck/grug-far.nvim",
@@ -826,6 +828,22 @@ return {
         keepFoldsAcrossSessions = false, -- has_ufo
       }
     end,
+    specs = {
+      {
+        "folke/noice.nvim",
+        optional = true,
+        opts = function(_, opts)
+          -- https://github.com/chrisgrieser/nvim-origami/blob/7e38cff819414471de8fbfbb48ccde06dcf966fb/lua/origami/features/autofold-comments-imports.lua#L27
+          table.insert(opts.routes, {
+            filter = {
+              event = "msg_show",
+              find = "vim%.schedule.*callback: .+/runtime/lua/vim/lsp/_folding_range%.lua:62: attempt to index a nil value",
+            },
+            opts = { skip = true },
+          })
+        end,
+      },
+    },
   },
 
   -- alternative: https://github.com/echasnovski/mini.keymap
