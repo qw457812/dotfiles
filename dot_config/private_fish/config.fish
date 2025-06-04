@@ -90,6 +90,7 @@ abbr tad 'tmux attach -d -t'
 abbr ts 'tmux new -s'
 abbr tl 'tmux ls'
 abbr tk 'tmux kill-session -t'
+abbr tksv 'tmux kill-server'
 
 # Git
 abbr g git
