@@ -178,7 +178,7 @@ end
 
 function M.indented_i()
   local count1 = vim.v.count1
-  if count1 > 1 or not vim.api.nvim_get_current_line():match("^%s*$") then
+  if count1 > 1 or vim.bo.buftype == "terminal" or not vim.api.nvim_get_current_line():match("^%s*$") then
     vim.api.nvim_feedkeys(vim.keycode(count1 .. "i"), "n", false)
     return
   end
