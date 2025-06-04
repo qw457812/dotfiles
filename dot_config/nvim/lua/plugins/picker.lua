@@ -106,6 +106,8 @@ H.mappings = {
   -- { "<leader>sB", function() LazyVim.pick("live_grep", { cwd = vim.fn.expand("%:p:h") })() end, desc = "Grep (Buffer Dir)" },
 }
 
+---@module "lazy"
+---@type LazySpec
 return {
   {
     "folke/snacks.nvim",
@@ -131,10 +133,11 @@ return {
           cycle = false,
           preset = function()
             -- return vim.o.columns > 2 * vim.o.lines and "default" or "narrow"
-            return vim.o.columns >= 120 and "default" or "narrow"
+            return vim.o.columns >= 120 and "based_telescope" or "narrow"
           end,
         },
         layouts = {
+          -- based on the dropdown preset, mainly for termux
           narrow = {
             layout = {
               backdrop = false,
@@ -152,6 +155,33 @@ return {
                 title_pos = "center",
                 { win = "input", height = 1, border = "bottom" },
                 { win = "list", border = "none" },
+              },
+            },
+          },
+          based_telescope = {
+            layout = {
+              box = "horizontal",
+              backdrop = false,
+              width = 0.8,
+              height = 0.8,
+              border = "none",
+              {
+                box = "vertical",
+                {
+                  win = "input",
+                  height = 1,
+                  border = "rounded",
+                  title = "{title} {live} {flags}",
+                  title_pos = "center",
+                },
+                { win = "list", title = " Results ", title_pos = "center", border = "rounded" },
+              },
+              {
+                win = "preview",
+                title = "{preview:Preview}",
+                width = 0.5,
+                border = "rounded",
+                title_pos = "center",
               },
             },
           },

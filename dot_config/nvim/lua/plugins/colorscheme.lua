@@ -27,6 +27,7 @@ local ignored_colorschemes = vim.list_extend({
 }, has_tokyonight_custom_style and {} or { "tokyonight" })
 
 -- options
+-- TODO: borderless snacks picker
 local borderless_picker = false -- vim.g.user_transparent_background
 local no_italic = vim.g.user_is_termux
 
@@ -85,6 +86,8 @@ local function to_gray(color)
   return vim.g.user_transparent_background and color or require("util.color").to_gray(color)
 end
 
+---@module "lazy"
+---@type LazySpec
 return {
   {
     "tokyonight.nvim",
@@ -352,6 +355,9 @@ return {
 
             Folded = vim.g.user_transparent_background and { fg = colors.blue, bg = colors.surface1 } or nil,
 
+            -- https://github.com/folke/tokyonight.nvim/blob/ea54d9e450ab2463028be94c6020544887f149a0/lua/tokyonight/groups/base.lua#L46-L47
+            FloatTitle = { link = "FloatBorder" }, -- SnacksPickerTitle = { link = "SnacksPickerBorder" }
+
             TreesitterContext = {
               bg = vim.g.user_transparent_background and util.darken(colors.surface0, 0.5, colors.base)
                 or util.darken(colors.surface1, 0.7, colors.base),
@@ -399,6 +405,8 @@ return {
             TelescopePromptBorder = { fg = colors.peach },
             TelescopePromptTitle = { fg = colors.peach },
             TelescopeBorder = { fg = colors.sapphire },
+            SnacksPickerInputBorder = { fg = colors.peach },
+            SnacksPickerInputTitle = { fg = colors.peach },
           })
         end,
       })
