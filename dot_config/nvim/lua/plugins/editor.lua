@@ -354,6 +354,59 @@ return {
         })
     end,
   },
+  {
+    "snacks.nvim",
+    ---@module "snacks"
+    ---@type snacks.Config
+    opts = {
+      words = {
+        modes = {
+          "n",
+          -- "o",
+        },
+      },
+    },
+  },
+
+  -- snacks words (lsp) -> vim-illuminate (treesitter/regex)
+  -- vim-illuminate highlights the incorrect position if an icon or Chinese character appears to the left of the word
+  {
+    "snacks.nvim",
+    opts = { words = { enabled = true } },
+    specs = {
+      {
+        "RRethy/vim-illuminate",
+        optional = true,
+        opts = function(_, opts)
+          opts.large_file_overrides = nil
+          opts.providers = { "treesitter", "regex" }
+          opts.should_enable = function(buf)
+            return not Snacks.words.is_enabled(buf)
+          end
+
+          LazyVim.on_load("vim-illuminate", function()
+            local st_words = Snacks.toggle.words()
+            vim.defer_fn(function()
+              -- see:
+              -- - https://github.com/LazyVim/LazyVim/blob/0b6d1c00506a6ea6af51646e6ec7212ac89f86e5/lua/lazyvim/plugins/extras/editor/illuminate.lua#L21-L34
+              -- - https://github.com/folke/snacks.nvim/blob/ee9e6179fe18a2bf36ebb5e81ddf1052e04577dc/lua/snacks/toggle.lua#L59-L61
+              local st_illuminate = assert(Snacks.toggle.get("illuminate"))
+              Snacks.toggle({
+                name = "Words (Snacks & Illuminate)",
+                get = function()
+                  return st_words:get() and st_illuminate:get()
+                end,
+                set = function(enabled)
+                  st_words:set(enabled)
+                  st_illuminate:set(enabled)
+                end,
+              }):map("<leader>ux")
+            end, 100)
+          end)
+        end,
+      },
+    },
+  },
 
   {
     "y3owk1n/undo-glow.nvim",
