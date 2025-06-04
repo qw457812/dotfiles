@@ -11,7 +11,7 @@ function _G.get_oil_winbar()
   end
 end
 
-local preview_enabled ---@type boolean?
+local preview_enabled = vim.o.columns >= 120
 
 local function toggle_preview()
   preview_enabled = not require("oil.util").get_preview_win()
@@ -21,7 +21,7 @@ end
 ---@param dir? string
 local function open(dir)
   -- respect preview toggle
-  require("oil").open(dir, { preview = preview_enabled ~= false and {} or nil })
+  require("oil").open(dir, { preview = preview_enabled and {} or nil })
 end
 
 return {

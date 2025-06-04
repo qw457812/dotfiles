@@ -1,4 +1,5 @@
 return {
+  -- alternative: https://github.com/TungstnBallon/conflict.nvim
   {
     "akinsho/git-conflict.nvim",
     event = { "LazyFile", "VeryLazy" },
