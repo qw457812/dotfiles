@@ -459,6 +459,10 @@
     "when": "terminalEditorFocus"
   },
   {
+    "key": "ctrl+enter",
+    "command": "roo-cline.focusInput"
+  },
+  {
     "command": "workbench.action.compareEditor.nextChange",
     "key": "] ]",
     "when": "textCompareEditorVisible"
