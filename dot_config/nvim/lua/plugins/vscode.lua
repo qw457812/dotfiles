@@ -189,6 +189,19 @@ return {
 
           vscode_map("n", "<leader>gg", "workbench.view.scm", { desc = "SCM" })
 
+          map("n", "<leader>wh", "<C-w>h", { desc = "Go to the left window", remap = true })
+          map("n", "<leader>wj", "<C-w>j", { desc = "Go to the down window", remap = true })
+          map("n", "<leader>wk", "<C-w>k", { desc = "Go to the up window", remap = true })
+          map("n", "<leader>wl", "<C-w>l", { desc = "Go to the right window", remap = true })
+          map("n", "<leader>wH", "<C-w>H", { desc = "Move window to far left", remap = true })
+          map("n", "<leader>wJ", "<C-w>J", { desc = "Move window to far bottom", remap = true })
+          map("n", "<leader>wK", "<C-w>K", { desc = "Move window to far top", remap = true })
+          map("n", "<leader>wL", "<C-w>L", { desc = "Move window to far right", remap = true })
+          map("n", "<leader>ww", "<C-w>w", { desc = "Switch Windows", remap = true })
+          map("n", "<leader>wv", "<C-w>v", { desc = "Split Window Right", remap = true })
+          map("n", "<leader>ws", "<C-w>s", { desc = "Split Window Below", remap = true })
+          map("n", "<leader>wo", "<C-w>o", { desc = "Delete Other Windows", remap = true })
+
           -- editor.action.codeAction = editor.action.quickFix + editor.action.refactor
           vscode_map({ "n", "v" }, "<leader>ca", "editor.action.codeAction", { desc = "Code Action" })
           vscode_map("n", "<leader>cA", "editor.action.sourceAction", { desc = "Source Action" })
