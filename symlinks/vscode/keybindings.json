@@ -460,6 +460,20 @@
   },
   {
     "key": "ctrl+enter",
+    "command": "workbench.action.terminal.newWithProfile",
+    "args": {
+      "profileName": "aider",
+      "location": "editor"
+    },
+    "when": "!terminalEditorFocus"
+  },
+  {
+    "key": "ctrl+enter",
+    "command": "workbench.action.terminal.killEditor",
+    "when": "terminalEditorFocus"
+  },
+  {
+    "key": "ctrl+.",
     "command": "roo-cline.focusInput"
   },
   {

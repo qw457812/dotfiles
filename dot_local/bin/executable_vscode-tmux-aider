@@ -1,0 +1,16 @@
+#!/bin/bash
+
+WORKSPACE_FOLDER="${1:-$PWD}"
+
+case "$WORKSPACE_FOLDER" in
+"\${workspaceFolder}" | "$HOME")
+  # non workspace
+  WORKSPACE_FOLDER="~"
+  ;;
+"${HOME%/}/"*)
+  # replace $HOME with ~ if start with $HOME/
+  WORKSPACE_FOLDER="${WORKSPACE_FOLDER/#$HOME/~}"
+  ;;
+esac
+
+exec tmux new-session -A -s "󰨞    $WORKSPACE_FOLDER" -- aider

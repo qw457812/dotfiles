@@ -6,24 +6,25 @@
 # https://gist.github.com/jaywhy13/4f3c05b15117ad9012a9ffade7789176
 
 # https://github.com/WaylonWalker/devtainer/blob/6afe46e6a3ec61ac3587466c87dd607a64a2200e/bin/.local/bin/ta
+# https://github.com/ohmyzsh/ohmyzsh/blob/95ef2516697aa764d1d4bb93ad3490584cc118ec/plugins/tmux/tmux.plugin.zsh#L177-L188
 
 # exec tmux new-session -A -s "󰨞  $PWD"
 
 WORKSPACE_FOLDER="${1:-$PWD}"
 
 case "$WORKSPACE_FOLDER" in
-  "\${workspaceFolder}" | "$HOME")
-    # non workspace
-    WORKSPACE_FOLDER="~"
-    ;;
-  "${HOME%/}/"*)
-    # replace $HOME with ~ if start with $HOME/
-    # https://stackoverflow.com/questions/13210880/replace-one-substring-for-another-string-in-shell-script
-    WORKSPACE_FOLDER="${WORKSPACE_FOLDER/#$HOME/~}"
-    # WORKSPACE_FOLDER=$(echo "$WORKSPACE_FOLDER" | sed "s#$HOME#~#")
-    # https://unix.stackexchange.com/questions/706227/how-can-i-use-the-sed-command-to-replace-home-user-with
-    # WORKSPACE_FOLDER=$(printf '~%s\n' "${WORKSPACE_FOLDER#"${HOME%/}"}")
-    ;;
+"\${workspaceFolder}" | "$HOME")
+  # non workspace
+  WORKSPACE_FOLDER="~"
+  ;;
+"${HOME%/}/"*)
+  # replace $HOME with ~ if start with $HOME/
+  # https://stackoverflow.com/questions/13210880/replace-one-substring-for-another-string-in-shell-script
+  WORKSPACE_FOLDER="${WORKSPACE_FOLDER/#$HOME/~}"
+  # WORKSPACE_FOLDER=$(echo "$WORKSPACE_FOLDER" | sed "s#$HOME#~#")
+  # https://unix.stackexchange.com/questions/706227/how-can-i-use-the-sed-command-to-replace-home-user-with
+  # WORKSPACE_FOLDER=$(printf '~%s\n' "${WORKSPACE_FOLDER#"${HOME%/}"}")
+  ;;
 esac
 
 # $(basename $WORKSPACE_FOLDER)
@@ -31,4 +32,3 @@ esac
 
 # nf-md-microsoft_visual_studio_code | https://www.nerdfonts.com/cheat-sheet
 exec tmux new-session -A -s "󰨞  $WORKSPACE_FOLDER"
-
