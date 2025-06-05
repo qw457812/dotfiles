@@ -1,3 +1,4 @@
+---@module "lazyvim"
 ---@class AutoToggle.Opts
 ---@field get fun(event:vim.api.create_autocmd.callback.args):boolean
 ---@field set fun(state:boolean,event:vim.api.create_autocmd.callback.args)

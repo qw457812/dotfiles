@@ -108,6 +108,7 @@ return {
           -- mute; having progress reports is enough
           config.handlers["language/status"] = function() end
         end,
+        ---@module "lazyvim"
         ---@param args vim.api.create_autocmd.callback.args
         on_attach = function(args)
           local wk = require("which-key")
