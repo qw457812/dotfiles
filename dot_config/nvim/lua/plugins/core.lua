@@ -94,6 +94,7 @@ return {
       image = {
         enabled = vim.g.user_is_wezterm or vim.g.user_is_kitty,
       },
+      -- alternative: https://github.com/stevearc/profile.nvim
       profiler = {
         presets = {
           on_stop = function()

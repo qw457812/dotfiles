@@ -27,6 +27,7 @@ return {
   {
     "milanglacier/minuet-ai.nvim",
     lazy = true,
+    shell_command_editor = true,
     opts = {
       provider = "openai_compatible",
       request_timeout = request_timeout,
