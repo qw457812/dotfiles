@@ -55,7 +55,7 @@ config.window_background_image_hsb = {
 config.font = wezterm.font({
   family = "Maple Mono NF CN",
   weight = "Medium",
-  harfbuzz_features = { "cv35", "ss06", "cv61", "cv62" },
+  harfbuzz_features = { "cv35", "cv61", "cv62", "ss06" },
 })
 config.bold_brightens_ansi_colors = true
 config.font_size = 12.0

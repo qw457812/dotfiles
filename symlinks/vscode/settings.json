@@ -21,7 +21,7 @@
   "editor.accessibilitySupport": "off",
   "editor.fontFamily": "Maple Mono NF CN",
   // https://github.com/subframe7536/maple-font/blob/variable/source/features/README.md
-  "editor.fontLigatures": "'calt', 'cv35', 'ss06', 'cv61', 'cv62'", // cv01
+  "editor.fontLigatures": "'calt', 'cv35', 'cv61', 'cv62', 'ss06'", // cv01
   "editor.fontWeight": "normal",
   "editor.wordWrap": "off",
   "editor.minimap.enabled": false,

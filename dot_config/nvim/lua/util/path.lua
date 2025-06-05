@@ -67,7 +67,7 @@ function M.shorten(path)
       { require("lazy.core.config").options.root, "󰒲 " },
     }
     if M.CHEZMOI then
-      table.insert(patterns, { M.CHEZMOI .. "/dot_config", "󱁿 " }) -- 󰒓
+      table.insert(patterns, { M.CHEZMOI .. "/dot_config", "󱁿 " }) -- 󰒓 
       table.insert(patterns, { M.CHEZMOI, "󰠦 " })
       table.insert(patterns, { vim.fn.stdpath("config"), " " }) -- 
     end
