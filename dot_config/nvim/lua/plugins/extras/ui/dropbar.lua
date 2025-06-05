@@ -24,6 +24,7 @@ return {
       local sources = require("dropbar.sources")
       local menu_utils = require("dropbar.utils.menu")
       local default_opts = require("dropbar.configs").opts
+      local snacks_util = require("snacks.util")
 
       -- https://github.com/MunifTanjim/nui.nvim/blob/HEAD/lua/nui/utils/init.lua#L206
       local function truncate_string(str, max_length)
@@ -34,18 +35,17 @@ return {
       end
 
       -- custom highlight
-      require("snacks.util").set_hl({
-        DropBarFileName = { fg = Snacks.util.color("Normal"), bold = true },
-        DropBarFileNameModified = { fg = Snacks.util.color("MatchParen"), bold = true },
-        DropBarFolderName = { fg = Snacks.util.color("Conceal") },
+      snacks_util.set_hl({
+        DropBarFileName = { fg = snacks_util.color("Normal"), bold = true },
+        DropBarFileNameModified = { fg = snacks_util.color("MatchParen"), bold = true },
+        DropBarFolderName = { fg = snacks_util.color("Conceal") },
         DropBarSymbolName = "DropBarFolderName",
       }, { default = true })
 
       -- local home_parts = vim.tbl_filter(function(part)
       --   return part ~= ""
       -- end, require("plenary.path"):new(home):_split())
-      ---@diagnostic disable-next-line: param-type-mismatch
-      local home_parts = vim.split(vim.uv.os_homedir(), "/", { trimempty = true })
+      local home_parts = vim.split(assert(vim.uv.os_homedir()), "/", { trimempty = true })
       local source_path = {
         get_symbols = function(buff, win, cursor)
           local mini_icons = require("mini.icons")
@@ -116,7 +116,7 @@ return {
           end
 
           -- truncate
-          -- TODO: win width based
+          -- TODO: win width based truncate
           local win_width = vim.api.nvim_win_get_width(win)
 
           -- same behavior as `length` of `LazyVim.lualine.pretty_path()`
@@ -143,12 +143,12 @@ return {
       }
 
       local source_markdown = {
-        get_symbols = function(buff, win, cursor)
-          if vim.b[buff].trouble_lualine == false then
+        get_symbols = function(buf, win, cursor)
+          if vim.b[buf].trouble_lualine == false then
             return {}
           end
 
-          local symbols = sources.markdown.get_symbols(buff, win, cursor)
+          local symbols = sources.markdown.get_symbols(buf, win, cursor)
           for _, symbol in ipairs(symbols) do
             symbol.name_hl = "DropBarSymbolName"
           end

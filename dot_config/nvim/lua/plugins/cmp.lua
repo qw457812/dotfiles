@@ -125,25 +125,25 @@ return {
         appearance = {
           nerd_font_variant = "normal",
         },
+        -- TODO: better snippets/signature keymaps with tab/ctrl-hjkl
         keymap = {
-          -- TODO: better coop with mini.snippets and signature_help
-          ["<Tab>"] = {
-            "select_next",
-            H.actions.pum_next,
-            "snippet_forward",
-            H.actions.copilot_nes,
-            function(cmp)
-              if has_words_before() then
-                return cmp.show()
-              end
-            end,
-            "fallback",
-          },
+          -- ["<Tab>"] = {
+          --   "select_next",
+          --   H.actions.pum_next,
+          --   "snippet_forward",
+          --   H.actions.copilot_nes,
+          --   function(cmp)
+          --     if has_words_before() then
+          --       return cmp.show()
+          --     end
+          --   end,
+          --   "fallback",
+          -- },
+          ["<Tab>"] = { "select_next", H.actions.pum_next, "snippet_forward", H.actions.copilot_nes, "show" },
           ["<S-Tab>"] = { "select_prev", H.actions.pum_prev, "snippet_backward", "fallback" },
           ["<CR>"] = { "accept", H.actions.pum_accept, "fallback" },
           ["<C-n>"] = { "select_next", "show" },
           ["<C-p>"] = { "select_prev", "show" },
-          -- TODO: better snippets/signature keymaps
           ["<C-j>"] = { "select_next", H.actions.pum_next, H.actions.mini_snippets_expand, "fallback" },
           ["<C-k>"] = { "select_prev", H.actions.pum_prev, "show_signature", "hide_signature", "fallback" },
           ["<C-l>"] = { "snippet_forward", H.actions.mini_snippets_expand, "fallback" },
@@ -192,10 +192,14 @@ return {
           },
         },
         completion = {
+          ghost_text = {
+            enabled = false,
+          },
           menu = {
             draw = {
               columns = vim.list_extend(
-                vim.tbl_get(opts, "completion", "menu", "draw", "columns") or vim.deepcopy(menu_default.draw.columns),
+                vim.tbl_get(opts, "completion", "menu", "draw", "columns")
+                  or vim.deepcopy(menu_default.draw.columns --[[@as blink.cmp.DrawColumnDefinition[] ]]),
                 {
                   { "source_name" },
                 }
