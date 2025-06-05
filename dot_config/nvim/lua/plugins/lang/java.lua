@@ -83,7 +83,26 @@ return {
               -- To disable format and organize imports on save for specific projects,
               -- create a `.lazy.lua` file in your project with following content:
               -- ```lua
+              --    if vim.g.autoformat == false then
+              --      return {}
+              --    end
+              --
+              --    -- disable autoformat for current project
               --    vim.g.autoformat = false
+              --
+              --    local local_spec = vim.fs.root(0, ".lazy.lua") -- current .lazy.lua file
+              --    vim.api.nvim_create_autocmd("BufReadPost", {
+              --      callback = function(ev)
+              --        if vim.fs.root(ev.buf, ".lazy.lua") == local_spec then
+              --          return -- current project
+              --        end
+              --
+              --        -- but do not disable autoformat for other projects, like dotfiles
+              --        if vim.b[ev.buf].autoformat == nil then
+              --          vim.b[ev.buf].autoformat = true
+              --        end
+              --      end,
+              --    })
               --
               --    return {}
               -- ```
