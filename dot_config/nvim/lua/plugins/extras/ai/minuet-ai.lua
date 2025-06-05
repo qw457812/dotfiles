@@ -1,3 +1,5 @@
+local request_timeout = 2
+
 ---@module "lazy"
 ---@type LazySpec
 return {
@@ -21,14 +23,15 @@ return {
     },
   },
 
+  -- https://github.com/milanglacier/nvim/blob/f19f427127b75eebf8f0f46e28f6e2c72d629de9/lua/plugins/completion.lua
   {
     "milanglacier/minuet-ai.nvim",
     lazy = true,
     opts = {
       provider = "openai_compatible",
-      request_timeout = 2.5,
-      throttle = 1500,
-      debounce = 600,
+      request_timeout = request_timeout,
+      throttle = 2000,
+      debounce = 800,
       add_single_line_entry = false,
       n_completions = 1,
       provider_options = {
@@ -50,8 +53,32 @@ return {
   },
 
   {
+    "milanglacier/minuet-ai.nvim",
+    opts = function()
+      local has_nvim_cmp = LazyVim.has_extra("coding.nvim-cmp")
+      local cmp_engine = has_nvim_cmp and "cmp" or "blink"
+
+      Snacks.util.set_hl({ [has_nvim_cmp and "CmpItemKindMinuet" or "BlinkCmpItemKindMinuet"] = "MiniIconsRed" })
+
+      -- see: https://github.com/milanglacier/minuet-ai.nvim/blob/ef001ddff241d5d4f27cb37a2c331c576965cce3/lua/minuet/init.lua#L158-L169
+      U.toggle.ai_cmps.minuet = Snacks.toggle({
+        name = "Minuet",
+        get = function()
+          return package.loaded["minuet"] ~= nil and require("minuet").config[cmp_engine].enable_auto_complete
+        end,
+        set = function(state)
+          require("minuet").config[cmp_engine].enable_auto_complete = state
+        end,
+      })
+    end,
+  },
+
+  {
     "saghen/blink.cmp",
     optional = true,
+    dependencies = "milanglacier/minuet-ai.nvim",
+    ---@module "blink.cmp"
+    ---@type blink.cmp.Config
     opts = {
       sources = {
         default = { "minuet" },
@@ -61,6 +88,7 @@ return {
             module = "minuet.blink",
             score_offset = 99,
             async = true,
+            timeout_ms = request_timeout * 1000 + 100,
           },
         },
       },
@@ -70,6 +98,7 @@ return {
   {
     "nvim-cmp",
     optional = true,
+    dependencies = "milanglacier/minuet-ai.nvim",
     opts = function(_, opts)
       table.insert(opts.sources, 1, {
         name = "minuet",
@@ -78,7 +107,8 @@ return {
       })
 
       opts.performance = opts.performance or {}
-      opts.performance.fetching_timeout = math.max(opts.performance.fetching_timeout or 500, 2000) -- increase the timeout
+      opts.performance.fetching_timeout =
+        math.max(opts.performance.fetching_timeout or 500, request_timeout * 1000 + 100)
     end,
   },
 
@@ -150,6 +180,9 @@ return {
       table.insert(opts.sections.lualine_x, 6, {
         minuet,
         cond = function()
+          if U.toggle.ai_cmps.minuet then
+            return U.toggle.ai_cmps.minuet:get()
+          end
           return package.loaded["minuet"] ~= nil
         end,
       })
