@@ -93,7 +93,7 @@ M.formatter = {
     return #lsp_clients > 0
   end,
   color = function()
-    return { fg = Snacks.util.color("MiniIconsCyan") } -- Identifier
+    return { fg = LazyVim.format.enabled() and Snacks.util.color("MiniIconsCyan") or "#FF007C" } -- Identifier FlashLabel
   end,
 }
 
