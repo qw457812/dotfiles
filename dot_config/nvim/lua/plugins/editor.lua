@@ -834,10 +834,18 @@ return {
         optional = true,
         opts = function(_, opts)
           -- https://github.com/chrisgrieser/nvim-origami/blob/7e38cff819414471de8fbfbb48ccde06dcf966fb/lua/origami/features/autofold-comments-imports.lua#L27
+          -- https://github.com/neovim/neovim/blob/1c417b565ec82839aee12918eb8b3e93b91cc253/runtime/lua/vim/lsp/_folding_range.lua
           table.insert(opts.routes, {
             filter = {
               event = "msg_show",
-              find = "vim%.schedule.*callback: .+/runtime/lua/vim/lsp/_folding_range%.lua:62: attempt to index a nil value",
+              any = {
+                {
+                  find = "vim%.schedule.*callback: .+/runtime/lua/vim/lsp/_folding_range%.lua:62: attempt to index a nil value",
+                },
+                {
+                  find = "vim%.schedule.*callback: .+/runtime/lua/vim/lsp/_folding_range%.lua:119: assertion failed!",
+                },
+              },
             },
             opts = { skip = true },
           })

@@ -122,6 +122,9 @@ return {
 
       ---@type blink.cmp.Config
       local o = {
+        appearance = {
+          nerd_font_variant = "normal",
+        },
         keymap = {
           -- TODO: better coop with mini.snippets and signature_help
           ["<Tab>"] = {
