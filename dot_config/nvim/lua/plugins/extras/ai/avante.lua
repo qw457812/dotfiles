@@ -121,7 +121,6 @@ return {
     build = vim.g.user_is_termux and "make BUILD_FROM_SOURCE=true" or "make",
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
-      "stevearc/dressing.nvim",
       "MunifTanjim/nui.nvim",
       "zbirenbaum/copilot.lua", -- for `provider = "copilot"`
       -- {
@@ -293,13 +292,6 @@ return {
         ["aihubmix-claude"] = { hide_in_model_selector = true },
         ["bedrock-claude-3.7-sonnet"] = { hide_in_model_selector = true },
       },
-      rag_service = {
-        -- enabled = vim.fn.executable("docker") == 1 and vim.fn.executable("ollama") == 1,
-        provider = "ollama",
-        llm_model = "llama3.2",
-        embed_model = "nomic-embed-text",
-        endpoint = "http://localhost:11434",
-      },
       windows = {
         ---@type AvantePosition
         position = "smart",
@@ -311,6 +303,9 @@ return {
       selector = {
         provider = ({ snacks = "snacks", fzf = "fzf_lua" })[LazyVim.pick.picker.name],
         exclude_auto_select = { "neo-tree" },
+      },
+      input = {
+        provider = "snacks",
       },
       hints = { enabled = false },
     },
