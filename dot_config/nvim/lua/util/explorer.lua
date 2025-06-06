@@ -39,6 +39,17 @@ function M.close()
   end
 end
 
+---@return boolean
+function M.has_dir_arg()
+  ---@diagnostic disable-next-line: param-type-mismatch
+  for _, arg in ipairs(vim.fn.argv()) do
+    if vim.fn.isdirectory(arg) == 1 then
+      return true
+    end
+  end
+  return false
+end
+
 --- Make hijack-netrw plugins handle `nvim .` and `:e .` correctly (bad alternative: `lazy = false`)
 --- https://github.com/AstroNvim/AstroNvim/blob/4fd4781ab0c2d9c876acef1fc5b3f01773c78be6/lua/astronvim/plugins/neo-tree.lua#L23
 --- https://github.com/stevearc/oil.nvim/issues/300#issuecomment-1950541064
@@ -50,16 +61,7 @@ function M.load_on_directory(hijack_netrw_plugin)
     require("lazy").load({ plugins = { hijack_netrw_plugin } })
   end
 
-  local has_dir_arg = false
-  ---@diagnostic disable-next-line: param-type-mismatch
-  for _, arg in ipairs(vim.fn.argv()) do
-    if vim.fn.isdirectory(arg) == 1 then
-      has_dir_arg = true
-      break
-    end
-  end
-
-  if has_dir_arg then
+  if M.has_dir_arg() then
     -- for `nvim .`
     load()
   else

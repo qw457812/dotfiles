@@ -1,3 +1,4 @@
+---@module "snacks"
 ---@class util.terminal
 ---@overload fun(cmd?: string|string[], opts?: snacks.terminal.Opts): snacks.terminal
 local M = setmetatable({}, {
@@ -8,13 +9,17 @@ local M = setmetatable({}, {
 
 ---@param cmd? string | string[]
 ---@param opts? snacks.terminal.Opts
+---@return snacks.win
 function M.toggle(cmd, opts)
   if vim.bo.filetype == "snacks_terminal" then
+    local win = vim.api.nvim_get_current_win()
+    local terminal = vim.tbl_filter(function(t)
+      return t.win == win
+    end, Snacks.terminal.list())[1]
     vim.cmd("close")
-    return
+    return terminal
   end
-
-  Snacks.terminal(cmd, opts)
+  return Snacks.terminal(cmd, opts)
 end
 
 --- pager

@@ -165,6 +165,7 @@ return {
       -- https://github.com/stevearc/oil.nvim/issues/300#issuecomment-1950541064
       -- https://github.com/stevearc/oil.nvim/issues/268#issuecomment-1880161152
       local has_ssh_arg = false
+      ---@diagnostic disable-next-line: param-type-mismatch
       for _, arg in ipairs(vim.fn.argv()) do
         if vim.startswith(arg, "oil-ssh://") then
           has_ssh_arg = true

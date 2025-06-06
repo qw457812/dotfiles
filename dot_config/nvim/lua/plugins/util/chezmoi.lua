@@ -11,8 +11,9 @@ H.cache = {}
 ---@return string[]
 function H.chezmoi_list_files(opts)
   opts = opts or {}
-  local hashed_cache_key = vim.fn.sha256(vim.json.encode(opts))
-  local ret = H.cache[hashed_cache_key]
+  -- local hashed_cache_key = vim.fn.sha256(vim.json.encode(opts))
+  local id = vim.inspect(opts)
+  local ret = H.cache[id]
   if not ret then
     -- exclude directories and externals
     local args = { "--include", "files" .. (opts.include_symlinks and ",symlinks" or ""), "--exclude", "externals" }
@@ -20,7 +21,7 @@ function H.chezmoi_list_files(opts)
       vim.list_extend(args, { "--path-style", "absolute" })
     end
     ret = require("chezmoi.commands").list({ targets = opts.targets or {}, args = args })
-    H.cache[hashed_cache_key] = ret
+    H.cache[id] = ret
   end
   return ret
 end
