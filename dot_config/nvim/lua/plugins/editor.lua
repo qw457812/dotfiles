@@ -840,10 +840,10 @@ return {
               event = "msg_show",
               any = {
                 {
-                  find = "vim%.schedule.*callback: .+/runtime/lua/vim/lsp/_folding_range%.lua:62: attempt to index a nil value",
+                  find = "vim%.schedule.*callback: .+/runtime/lua/vim/lsp/_folding_range%.lua:%d+: attempt to index a nil value",
                 },
                 {
-                  find = "vim%.schedule.*callback: .+/runtime/lua/vim/lsp/_folding_range%.lua:119: assertion failed!",
+                  find = "vim%.schedule.*callback: .+/runtime/lua/vim/lsp/_folding_range%.lua:%d+: assertion failed!",
                 },
               },
             },

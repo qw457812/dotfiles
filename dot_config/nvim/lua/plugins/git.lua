@@ -23,6 +23,7 @@ return {
           end)
         end,
       })
+      -- see also: https://github.com/willothy/nvim-config/blob/b5db7b8b7fe6258770c98f12337d6954a56b95e7/lua/configs/terminal/flatten.lua#L93-L105
       vim.api.nvim_create_autocmd("BufWritePost", {
         pattern = commit_filename,
         callback = function(ev)

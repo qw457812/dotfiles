@@ -120,8 +120,10 @@ abbr gbd "git branch --delete"
 abbr gbm "git branch --move"
 abbr gbnm "git branch --no-merged"
 abbr gbr 'git branch --remote'
-abbr gc "NVIM_FLATTEN_NEST=1 git commit --verbose"
-abbr gc! 'NVIM_FLATTEN_NEST=1 git commit --verbose --amend'
+# abbr gc "NVIM_FLATTEN_NEST=1 git commit --verbose"
+abbr gc "git commit --verbose"
+# abbr gc! 'NVIM_FLATTEN_NEST=1 git commit --verbose --amend'
+abbr gc! 'git commit --verbose --amend'
 abbr gcb "git checkout -b"
 abbr gcf "git config --list | vimpager"
 abbr gcl "git clone --recurse-submodules"
@@ -160,7 +162,8 @@ abbr gss "git status --short"
 
 # SVN
 abbr sva 'svn add'
-abbr svc 'NVIM_FLATTEN_NEST=1 svn commit'
+# abbr svc 'NVIM_FLATTEN_NEST=1 svn commit'
+abbr svc 'svn commit'
 abbr svs 'svn status'
 abbr svu 'svn update'
 abbr svl --set-cursor 'svn log -v % 2>&1 | vimpager'
