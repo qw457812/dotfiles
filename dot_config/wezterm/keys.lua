@@ -300,6 +300,19 @@ function M.apply_to_config(config)
     --     wezterm.open_with(wezterm.config_file)
     --   end),
     -- },
+    {
+      mods = "SUPER|SHIFT",
+      key = "u",
+      action = wezterm.action_callback(function(win, _)
+        -- must be set to "notification type > alerts" in macos
+        win:toast_notification("wezterm", "updating plugins...", nil, 1000)
+        -- run `print(wezterm.plugin.list())` in wezterm.action.ShowDebugOverlay
+        wezterm.plugin.update_all()
+        -- win:toast_notification("wezterm", "reloading config...", nil, 1000)
+        wezterm.reload_configuration()
+        win:toast_notification("wezterm", "config reloaded!", nil, 1000)
+      end),
+    },
   }
 
   config.key_tables = {}

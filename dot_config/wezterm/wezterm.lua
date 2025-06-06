@@ -6,6 +6,7 @@
 --
 -- TODO:
 -- https://github.com/MLFlexer/resurrect.wezterm
+-- https://github.com/adriankarlen/bar.wezterm
 
 local wezterm = require("wezterm") --[[@as Wezterm]]
 -- wezterm.plugin.update_all() -- bad performance

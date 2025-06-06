@@ -127,19 +127,18 @@ return {
         },
         -- TODO: better snippets/signature keymaps with tab/ctrl-hjkl
         keymap = {
-          -- ["<Tab>"] = {
-          --   "select_next",
-          --   H.actions.pum_next,
-          --   "snippet_forward",
-          --   H.actions.copilot_nes,
-          --   function(cmp)
-          --     if has_words_before() then
-          --       return cmp.show()
-          --     end
-          --   end,
-          --   "fallback",
-          -- },
-          ["<Tab>"] = { "select_next", H.actions.pum_next, "snippet_forward", H.actions.copilot_nes, "show" },
+          ["<Tab>"] = {
+            "select_next",
+            H.actions.pum_next,
+            "snippet_forward",
+            H.actions.copilot_nes,
+            function(cmp)
+              if has_words_before() then
+                return cmp.show()
+              end
+            end,
+            "fallback",
+          },
           ["<S-Tab>"] = { "select_prev", H.actions.pum_prev, "snippet_backward", "fallback" },
           ["<CR>"] = { "accept", H.actions.pum_accept, "fallback" },
           ["<C-n>"] = { "select_next", "show" },
