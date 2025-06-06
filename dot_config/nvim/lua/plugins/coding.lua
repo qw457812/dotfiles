@@ -177,7 +177,7 @@ return {
             require("various-textobjs").url()
             local found_url = vim.fn.mode() == "v"
             if found_url then
-              local url = U.get_visual_selection()
+              local url = assert(U.get_visual_selection())
               U.open_in_browser(url)
               return
             end

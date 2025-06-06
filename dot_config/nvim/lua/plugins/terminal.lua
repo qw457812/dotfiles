@@ -79,12 +79,14 @@ return {
         },
         nest_if_no_args = true,
         hooks = {
+          should_block = function(argv)
+            -- use `nvim -b file1` instead of `nvim --cmd 'let g:flatten_wait=1' file1` for shortcuts
+            return vim.tbl_contains(argv, "-b")
+          end,
           should_nest = function(host)
-            -- allow nesting for gitcommit via `NVIM_FLATTEN_NEST=1 git commit`, as flattening gitcommit results in an error
             if vim.env.NVIM_FLATTEN_NEST then
               return true
             end
-
             return require("flatten").hooks.should_nest(host)
           end,
           no_files = function(opts)
@@ -122,7 +124,6 @@ return {
 
             return true
           end,
-          -- TODO: reopen the terminal after blocking ends
           pre_open = function()
             if vim.bo.filetype == "snacks_terminal" then
               local win = vim.api.nvim_get_current_win()
@@ -131,11 +132,23 @@ return {
               end, Snacks.terminal.list())[1]
             end
           end,
-          post_open = function()
+          -- hide the terminal after flattening
+          post_open = function(opts)
             if current_terminal then
               current_terminal:hide()
-              current_terminal = nil
+              if not opts.is_blocking then
+                current_terminal = nil
+              end
             end
+          end,
+          -- reopen the terminal after blocking ends, like gitcommit
+          block_end = function()
+            vim.schedule(function()
+              if current_terminal then
+                current_terminal:show()
+                current_terminal = nil
+              end
+            end)
           end,
         },
       }
