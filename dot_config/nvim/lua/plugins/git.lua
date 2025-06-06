@@ -1,3 +1,5 @@
+---@module "lazy"
+---@type LazySpec
 return {
   {
     "LazyVim/LazyVim",
@@ -90,37 +92,35 @@ return {
 
   {
     "folke/snacks.nvim",
-    keys = function(_, keys)
-      vim.list_extend(keys, {
-        {
-          "<leader>gO",
-          function()
-            ---@diagnostic disable-next-line: missing-fields
-            Snacks.gitbrowse({ what = "permalink" })
-            U.stop_visual_mode()
-          end,
-          mode = { "n", "x" },
-          desc = "Git Browse (open)",
-        },
-        {
-          "<leader>gY",
-          function()
-            ---@diagnostic disable-next-line: missing-fields
-            Snacks.gitbrowse({
-              what = "permalink",
-              open = function(url)
-                vim.fn.setreg(vim.v.register, url)
-                U.stop_visual_mode()
-                LazyVim.info(url, { title = "Copied URL" })
-              end,
-              notify = false,
-            })
-          end,
-          mode = { "n", "x" },
-          desc = "Git Browse (copy)",
-        },
-      })
-    end,
+    keys = {
+      {
+        "<leader>gO",
+        function()
+          ---@diagnostic disable-next-line: missing-fields
+          Snacks.gitbrowse({ what = "permalink" })
+          U.stop_visual_mode()
+        end,
+        mode = { "n", "x" },
+        desc = "Git Browse (open)",
+      },
+      {
+        "<leader>gY",
+        function()
+          ---@diagnostic disable-next-line: missing-fields
+          Snacks.gitbrowse({
+            what = "permalink",
+            open = function(url)
+              vim.fn.setreg(vim.v.register, url)
+              U.stop_visual_mode()
+              LazyVim.info(url, { title = "Copied URL" })
+            end,
+            notify = false,
+          })
+        end,
+        mode = { "n", "x" },
+        desc = "Git Browse (copy)",
+      },
+    },
     opts = function(_, opts)
       ---@type snacks.Config
       local o = {
