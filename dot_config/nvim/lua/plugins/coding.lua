@@ -1,3 +1,5 @@
+---@module "lazy"
+---@type LazySpec
 return {
   {
     "echasnovski/mini.pairs",
@@ -105,6 +107,7 @@ return {
 
   {
     "gbprod/yanky.nvim",
+    dependencies = { "kkharji/sqlite.lua", pager = true, shell_command_editor = true },
     optional = true,
     keys = {
       {
@@ -124,6 +127,11 @@ return {
       },
       { "gp", mode = { "n", "x" }, false },
       { "gP", mode = { "n", "x" }, false },
+    },
+    opts = {
+      ring = {
+        storage = "sqlite",
+      },
     },
   },
 
