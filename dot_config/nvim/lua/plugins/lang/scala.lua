@@ -73,7 +73,7 @@ return {
           },
         },
         settings = {
-          -- serverVersion = "latest.snapshot", -- run `:MetalsUpdate` after changing this
+          serverVersion = "latest.snapshot", -- run `:MetalsUpdate` after changing this
           autoImportBuild = "all", -- initial
           defaultBspToBuildTool = true, -- see also: https://github.com/scalameta/metals/discussions/4505
           showInferredType = true,
