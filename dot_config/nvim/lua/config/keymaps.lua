@@ -163,9 +163,10 @@ map("n", "[<tab>", "<cmd>tabprevious<cr>", { desc = "Previous Tab" })
 
 -- terminal
 -- stylua: ignore start
-safe_map("n", "<leader>fT", function() U.terminal() end, { desc = "Terminal (cwd)" })
-safe_map("n", { "<leader>ft", "<c-/>" }, function() U.terminal(nil, { cwd = LazyVim.root() }) end, { desc = "Terminal (Root Dir)" })
-safe_map("n", "<c-_>", function() U.terminal(nil, { cwd = LazyVim.root() }) end, { desc = "which_key_ignore" })
+map("n",      "<leader>fT", function() U.terminal() end, { desc = "Terminal (cwd)" })
+safe_map("n", "<leader>ft", function() U.terminal(nil, { cwd = LazyVim.root() }) end, { desc = "Terminal (Root Dir)" })
+map("n",      "<c-/>",      function() U.terminal(nil, { cwd = LazyVim.root() }) end, { desc = "Terminal (Root Dir)" })
+map("n",      "<c-_>",      function() U.terminal(nil, { cwd = LazyVim.root() }) end, { desc = "which_key_ignore" })
 -- stylua: ignore end
 map("n", "<c-space>", function()
   local filepath = vim.fn.expand("%:p:h")
