@@ -3,6 +3,8 @@ local function has_words_before()
   return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
 end
 
+---@module "lazy"
+---@type LazySpec
 return {
   {
     "saghen/blink.cmp",
@@ -251,6 +253,10 @@ return {
       local o = {
         sources = {
           per_filetype = {
+            -- -- https://github.com/Saghen/blink.cmp/pull/1843
+            -- vim = function()
+            --   return vim.fn.win_gettype() == "command" and { "cmdline" } or {}
+            -- end,
             vim = { "cmdline" }, -- I don't need to write vimscript anyway
           },
           providers = {

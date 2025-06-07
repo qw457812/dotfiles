@@ -7,6 +7,13 @@ return {
     opts = function(_, opts)
       local pairs = require("mini.pairs")
 
+      -- fix `=vim.fn.winnr(<cr>)` by '(' with `register = { cr = true }`
+      vim.api.nvim_create_autocmd("CmdWinEnter", {
+        callback = function(ev)
+          vim.keymap.set("i", "<cr>", "<cr>", { buffer = ev.buf })
+        end,
+      })
+
       -- `<>` pair
       local lt_opts = { action = "open", pair = "<>", neigh_pattern = "[^\\].", register = { cr = false } }
       local gt_opts = { action = "close", pair = "<>", neigh_pattern = "[^\\].", register = { cr = false } }
