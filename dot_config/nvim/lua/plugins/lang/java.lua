@@ -92,9 +92,10 @@ return {
               --
               --    local local_spec = vim.fs.root(0, ".lazy.lua") -- current .lazy.lua file
               --    vim.api.nvim_create_autocmd("BufReadPost", {
+              --      group = vim.api.nvim_create_augroup("local_spec_autoformat", { clear = true }),
               --      callback = function(ev)
-              --        if vim.fs.root(ev.buf, ".lazy.lua") == local_spec then
-              --          return -- current project
+              --        if vim.fs.root(ev.buf, ".lazy.lua") == local_spec and vim.fn.fnamemodify(ev.file, ":t") ~= ".lazy.lua" then
+              --          return -- current project and not the .lazy.lua file
               --        end
               --
               --        -- but do not disable autoformat for other projects, like dotfiles
