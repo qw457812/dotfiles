@@ -579,6 +579,44 @@ return {
     },
   },
 
+  -- HACK: deduplicate items, see: https://github.com/Saghen/blink.cmp/issues/1222#issuecomment-2891921393
+  {
+    "saghen/blink.cmp",
+    optional = true,
+    opts = function()
+      -- sources that need deduplicating
+      -- :=LazyVim.opts("blink.cmp").sources.default
+      local source_dedup_priority = {
+        "lsp",
+        "lazydev",
+        "path",
+        "buffer",
+        "ripgrep",
+        "blink_cmp_kitty",
+        "dictionary",
+        "spell",
+        "yank",
+      }
+
+      local show_orig = require("blink.cmp.completion.list").show
+      ---@diagnostic disable-next-line: duplicate-set-field
+      require("blink.cmp.completion.list").show = function(ctx, items_by_source)
+        local seen = {}
+        for _, source in ipairs(source_dedup_priority) do
+          if items_by_source[source] then
+            ---@param item blink.cmp.CompletionItem
+            items_by_source[source] = vim.tbl_filter(function(item)
+              local did_seen = seen[item.label]
+              seen[item.label] = true
+              return not did_seen
+            end, items_by_source[source])
+          end
+        end
+        return show_orig(ctx, items_by_source)
+      end
+    end,
+  },
+
   -- nvim-cmp {{{
 
   -- use <tab> for completion and snippets (supertab)
