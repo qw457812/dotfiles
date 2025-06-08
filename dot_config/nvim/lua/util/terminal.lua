@@ -13,6 +13,7 @@ local M = setmetatable({}, {
 function M.toggle(cmd, opts)
   if vim.bo.filetype == "snacks_terminal" then
     local win = vim.api.nvim_get_current_win()
+    ---@param t snacks.win
     local terminal = vim.tbl_filter(function(t)
       return t.win == win
     end, Snacks.terminal.list())[1]

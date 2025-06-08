@@ -66,6 +66,23 @@ return {
     "willothy/flatten.nvim",
     lazy = false,
     priority = 1001,
+    -- keys = {
+    --   {
+    --     "<Leader>gc",
+    --     function()
+    --       local root = LazyVim.root.git() -- Snacks.git.get_root()
+    --       -- TODO:
+    --       -- - delete terminal buffer with `[Process exited 1]`
+    --       -- - notify when something is wrong (e.g., no changes to commit)
+    --       local terminal = Snacks.terminal.open(
+    --         { "git", "-C", root, "commit", "--verbose" },
+    --         { interactive = false, auto_close = true }
+    --       )
+    --       terminal:hide()
+    --     end,
+    --     desc = "Commit (Flatten)",
+    --   },
+    -- },
     opts = function()
       local current_terminal ---@type snacks.win?
 
@@ -127,6 +144,7 @@ return {
           pre_open = function()
             if vim.bo.filetype == "snacks_terminal" then
               local win = vim.api.nvim_get_current_win()
+              ---@param t snacks.win
               current_terminal = vim.tbl_filter(function(t)
                 return t.win == win
               end, Snacks.terminal.list())[1]
