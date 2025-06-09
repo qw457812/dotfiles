@@ -1462,11 +1462,10 @@
            [:!Qh :!Ograve_accent_and_tilde :WeWork] ; AltTab.app
            [:!Qj :open-default-browser :!default-browser]
            [:!Qj :same_wind_app :default-browser]
-           ; [:!Qk [:open "/Applications/kitty.app"] :!Kitty]
-           ; [:!Qk :same_wind_app :Kitty]
            [:!Qk :open-default-terminal :!default-terminal]
-           ; [:!Qk :same_wind_app :default-terminal]
-           [:!Qk [:open "/Applications/WezTerm.app"] :default-terminal]
+           ;; [:!Qk :same_wind_app :default-terminal] ; not working for kitty
+           [:!Qk "/opt/homebrew/bin/yabai -m window --focus $(/opt/homebrew/bin/yabai -m query --windows | /opt/homebrew/bin/jq -e \"map(select(.app==\\\"kitty\\\" and .\\\"has-focus\\\"==false)) | .[0] | .id\") > /dev/null 2>&1" :default-terminal]
+           ;; [:!Qk [:open "/Applications/WezTerm.app"] :default-terminal]
            [:!Ql [:open "/Applications/Visual Studio Code.app"] :!VSCode]
            [:!Ql :same_wind_app :VSCode]
            ;; [:!Qsemicolon [:open "/Library/Application Support/Citrix Receiver/Citrix Viewer.app"]] ; Citrix Workspace.app
@@ -1918,11 +1917,10 @@
            [:!Wh :same_wind_app :WeWork]
            [:!Wj [:left_command :open-default-browser] :!default-browser]
            [:!Wj :same_wind_app :default-browser]
-           ; [:!Wk [:left_command [:open "/Applications/kitty.app"]] :!Kitty]
-           ; [:!Wk :same_wind_app :Kitty]
            [:!Wk [:left_command :open-default-terminal] :!default-terminal]
-           ; [:!Wk :same_wind_app :default-terminal]
-           [:!Wk [:left_command [:open "/Applications/WezTerm.app"]] :default-terminal]
+           ;; [:!Wk :same_wind_app :default-terminal] ; not working for kitty
+           [:!Wk [:left_command "/opt/homebrew/bin/yabai -m window --focus $(/opt/homebrew/bin/yabai -m query --windows | /opt/homebrew/bin/jq -e \"map(select(.app==\\\"kitty\\\" and .\\\"has-focus\\\"==false)) | .[0] | .id\") > /dev/null 2>&1"] :default-terminal]
+           ;; [:!Wk [:left_command [:open "/Applications/WezTerm.app"]] :default-terminal]
            [:!Wl [:left_command [:open "/Applications/Visual Studio Code.app"]] :!VSCode]
            [:!Wl :same_wind_app :VSCode]
            ;; [:!Wsemicolon [:left_command [:open "/Library/Application Support/Citrix Receiver/Citrix Viewer.app"]]] ; Citrix Workspace.app
