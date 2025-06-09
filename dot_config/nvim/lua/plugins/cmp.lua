@@ -3,6 +3,7 @@ local function has_words_before()
   return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
 end
 
+-- https://github.com/Saghen/nvim/blob/06849f05f2057e4fa7774bdba0d9b70d785716f0/lua/core/blink.lua
 ---@module "lazy"
 ---@type LazySpec
 return {
@@ -280,7 +281,14 @@ return {
               "fallback",
             },
             ["<C-e>"] = { "cancel", "fallback" },
+            ["<C-u>"] = { H.actions.scroll_list_up, "fallback" },
+            ["<C-d>"] = { H.actions.scroll_list_down, "fallback" },
+            ["<C-space>"] = { "show", "hide" },
           },
+          -- completion = {
+          --   menu = { auto_show = true },
+          --   ghost_text = { enabled = false },
+          -- },
         },
         completion = {
           ghost_text = {
