@@ -114,7 +114,7 @@ return {
 
   {
     "gbprod/yanky.nvim",
-    dependencies = { "kkharji/sqlite.lua", pager = true, shell_command_editor = true },
+    dependencies = { "kkharji/sqlite.lua", vscode = true, pager = true, shell_command_editor = true },
     optional = true,
     keys = {
       {
