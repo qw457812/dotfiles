@@ -359,6 +359,7 @@ return {
         default_component_configs = {
           -- use mini.icons instead of nvim-web-devicons
           -- https://github.com/nvim-neo-tree/neo-tree.nvim/pull/1527#issuecomment-2233186777
+          ---@diagnostic disable-next-line: missing-fields
           icon = {
             provider = function(icon, node)
               if node.type == "file" or node.type == "directory" then

@@ -89,6 +89,94 @@ return {
           cmp.hide()
           return nes.apply_pending_nes() and nes.walk_cursor_end_edit()
         end,
+        -- see: https://github.com/Saghen/blink.cmp/issues/569#issuecomment-2833362734
+        scroll_list_up = function(cmp)
+          if not cmp.is_menu_visible() then
+            return
+          end
+          vim.schedule(function()
+            -- based on select_prev: https://github.com/saghen/blink.cmp/blob/8cab663a36d474634b1b1d3e72118a718a143fcd/lua/blink/cmp/completion/list.lua#L204-L229
+            local list = require("blink.cmp.completion.list")
+            local menu = require("blink.cmp.completion.windows.menu")
+
+            if #list.items == 0 or list.context == nil then
+              return
+            end
+
+            -- haven't selected anything yet, select the last item, if cycling enabled
+            if list.selected_item_idx == nil then
+              if not list.config.cycle.from_top then
+                return
+              end
+
+              return list.select(#list.items)
+            end
+
+            -- start of the list
+            if list.selected_item_idx == 1 then
+              -- auto_insert is enabled, we go back to no selection
+              local select_mode = list.get_selection_mode(list.context)
+              if not select_mode.preselect or select_mode.auto_insert then
+                return list.select()
+              end
+
+              -- cycling around has been disabled, ignore
+              if not list.config.cycle.from_top then
+                return
+              end
+
+              -- otherwise, we cycle around
+              return list.select(#list.items)
+            end
+
+            -- typical case, half page up
+            -- see: https://github.com/saghen/blink.cmp/blob/7856f05dd48ea7f2c68ad3cba40202f8a9369b9e/lua/blink/cmp/lib/window/init.lua#L237-L241
+            local page_size = vim.api.nvim_win_get_height(menu.win:get_win())
+            list.select(math.max(1, list.selected_item_idx - math.floor(page_size / 2)))
+          end)
+          return true
+        end,
+        scroll_list_down = function(cmp)
+          if not cmp.is_menu_visible() then
+            return
+          end
+          vim.schedule(function()
+            -- based on select_next: https://github.com/saghen/blink.cmp/blob/8cab663a36d474634b1b1d3e72118a718a143fcd/lua/blink/cmp/completion/list.lua#L181-L202
+            local list = require("blink.cmp.completion.list")
+            local menu = require("blink.cmp.completion.windows.menu")
+
+            if #list.items == 0 or list.context == nil then
+              return
+            end
+
+            -- haven't selected anything yet, select the first item, if cycling enabled
+            if list.selected_item_idx == nil then
+              return list.select(1)
+            end
+
+            -- end of the list
+            if list.selected_item_idx == #list.items then
+              -- preselect is not enabled, we go back to no selection
+              local select_mode = list.get_selection_mode(list.context)
+              if not select_mode.preselect or select_mode.auto_insert then
+                return list.select()
+              end
+
+              -- cycling around has been disabled, ignore
+              if not list.config.cycle.from_bottom then
+                return
+              end
+
+              -- otherwise, we cycle around
+              return list.select(1)
+            end
+
+            -- typical case, half page down
+            local page_size = vim.api.nvim_win_get_height(menu.win:get_win())
+            list.select(math.min(#list.items, list.selected_item_idx + math.floor(page_size / 2)))
+          end)
+          return true
+        end,
       }
 
       ---@type table<string, blink.cmp.KeymapCommand>
@@ -151,6 +239,8 @@ return {
           ["<C-h>"] = { "snippet_backward", "show_signature", "hide_signature", "fallback" },
           -- ["<C-u>"] = { "scroll_documentation_up", "fallback" },
           -- ["<C-d>"] = { "scroll_documentation_down", "fallback" },
+          ["<C-u>"] = { H.actions.scroll_list_up, "fallback" },
+          ["<C-d>"] = { H.actions.scroll_list_down, "fallback" },
         },
         cmdline = {
           enabled = true,
