@@ -75,4 +75,7 @@ return {
 
   -- https://github.com/Saghen/blink.cmp/issues/1876
   { "saghen/blink.cmp", optional = true, commit = vim.g.lazyvim_blink_main and "02d5e15" or nil },
+
+  -- TODO: breaking changes
+  { "chrisgrieser/nvim-various-textobjs", optional = true, commit = "bf2133a" },
 }

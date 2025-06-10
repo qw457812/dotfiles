@@ -495,9 +495,9 @@ return {
     opts = {
       signature = {
         enabled = true,
-        window = {
-          show_documentation = true,
-        },
+        -- window = {
+        --   show_documentation = true,
+        -- },
       },
     },
     specs = {
