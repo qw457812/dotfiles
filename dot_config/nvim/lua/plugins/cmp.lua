@@ -496,7 +496,7 @@ return {
       signature = {
         enabled = true,
         -- window = {
-        --   show_documentation = true,
+        --   show_documentation = not vim.g.user_is_termux,
         -- },
       },
     },
