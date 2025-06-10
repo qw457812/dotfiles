@@ -922,5 +922,13 @@
       "after": ["%"]
     }
   ],
-  "vim.commandLineModeKeyBindings": []
+  "vim.commandLineModeKeyBindings": [],
+  "roo-cline.allowedCommands": [
+    "npm test",
+    "npm install",
+    "tsc",
+    "git log",
+    "git diff",
+    "git show"
+  ]
 }
