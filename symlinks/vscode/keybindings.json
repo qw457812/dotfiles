@@ -98,8 +98,8 @@
       "commands": [
         "workbench.action.focusActiveEditorGroup",
         "workbench.action.closeSidebar",
-        "workbench.action.closePanel"
-        // "workbench.action.closeAuxiliaryBar"
+        "workbench.action.closePanel",
+        "workbench.action.closeAuxiliaryBar"
       ]
     }
     // "when": "terminalFocus"

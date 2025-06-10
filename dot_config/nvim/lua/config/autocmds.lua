@@ -186,7 +186,7 @@ vim.api.nvim_create_autocmd("BufDelete", {
 })
 
 -- auto open explorer if the window is too wide
-if vim.g.user_explorer_auto_open then
+if vim.g.user_explorer_auto_open and not vim.g.vscode then
   -- using `{ "BufReadPre", "BufNewFile", "BufWritePre" }` instead of LazyFile, see: https://github.com/LazyVim/LazyVim/pull/6053
   vim.api.nvim_create_autocmd(
     vim.fn.has("nvim-0.11") == 1 and { "BufReadPre", "BufNewFile", "BufWritePre" } or LazyVim.plugin.lazy_file_events,
