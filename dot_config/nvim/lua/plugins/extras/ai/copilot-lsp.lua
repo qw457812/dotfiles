@@ -42,6 +42,72 @@ return {
         "williamboman/mason.nvim",
         opts = { ensure_installed = { "copilot-language-server" } },
       },
+      -- update blink menu position when copilot NES is visible
+      -- see: https://github.com/Saghen/blink.cmp/issues/1801#issuecomment-2956456623
+      {
+        "saghen/blink.cmp",
+        optional = true,
+        opts = function(_, opts)
+          do
+            -- TODO: wait for https://github.com/Saghen/blink.cmp/issues/1876 to be resolved
+            return
+          end
+          if not vim.g.lazyvim_blink_main then
+            -- TODO: wait for https://github.com/Saghen/blink.cmp/commit/d59d55de59a0a13709b1dc0cbac23f80d4c2c459 to be released
+            return
+          end
+
+          vim.api.nvim_create_autocmd("User", {
+            pattern = "BlinkCmpMenuOpen",
+            callback = function()
+              local timer = assert(vim.uv.new_timer())
+              local last_nes_visible = vim.b.nes_state ~= nil
+
+              timer:start(
+                0,
+                80,
+                vim.schedule_wrap(function()
+                  local nes_visible = vim.b.nes_state ~= nil
+                  if nes_visible ~= last_nes_visible then
+                    last_nes_visible = nes_visible
+                    require("blink.cmp.completion.windows.menu").update_position()
+                    require("blink.cmp.completion.windows.documentation").update_position()
+                    -- see: https://github.com/saghen/blink.cmp/blob/a026b8db7f8ab0e98b9a2e0a7a8d7a7b73410a27/lua/blink/cmp/signature/window.lua#L123-L131
+                    -- require("blink.cmp.signature.window").update_position()
+                    if nes_visible then
+                      require("blink.cmp.signature.window").close()
+                    end
+                  end
+                end)
+              )
+
+              -- clean up timer when menu closes
+              vim.api.nvim_create_autocmd("User", {
+                pattern = "BlinkCmpMenuClose",
+                once = true,
+                callback = function()
+                  timer:stop()
+                  if not timer:is_closing() then
+                    timer:close()
+                  end
+                end,
+              })
+            end,
+          })
+
+          return U.extend_tbl(opts, {
+            ---@module "blink.cmp"
+            ---@type blink.cmp.CompletionConfigPartial
+            completion = {
+              menu = {
+                direction_priority = function()
+                  return vim.b.nes_state and { "n", "s" } or { "s", "n" }
+                end,
+              },
+            },
+          })
+        end,
+      },
     },
   },
 
