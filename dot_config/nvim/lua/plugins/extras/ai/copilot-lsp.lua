@@ -48,10 +48,6 @@ return {
         "saghen/blink.cmp",
         optional = true,
         opts = function(_, opts)
-          do
-            -- TODO: wait for https://github.com/Saghen/blink.cmp/issues/1876 to be resolved
-            return
-          end
           if not vim.g.lazyvim_blink_main then
             -- TODO: wait for https://github.com/Saghen/blink.cmp/commit/d59d55de59a0a13709b1dc0cbac23f80d4c2c459 to be released
             return
