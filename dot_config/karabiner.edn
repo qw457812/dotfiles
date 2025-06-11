@@ -2018,8 +2018,8 @@
            [:##right_control :!CTOleft_shift nil {:alone :!Cv}] ; right_ctrl, see "For Not HHKB" above
            ]}
 
-  {:des "Kitty: quick access"
-   :rules [[:!Ospacebar "/opt/homebrew/bin/kitten quick-access-terminal"]]}
+  ;; {:des "Kitty: quick access"
+  ;;  :rules [[:!Ospacebar "/opt/homebrew/bin/kitten quick-access-terminal"]]}
 
   ;; inspired by chrome extension: Copy on Select
   ;; https://apple.stackexchange.com/questions/21595/can-i-copy-by-highlighting-and-paste-by-middle-click-on-mac-os-x
