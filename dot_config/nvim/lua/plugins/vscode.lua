@@ -87,8 +87,8 @@ return {
           -- vscode_map("i", "<c-k>", "editor.action.triggerParameterHints", { desc = "Signature Help" }) -- not working
           vscode_map("n", "[B", "workbench.action.moveEditorLeftInGroup", { desc = "Move Editor Prev" })
           vscode_map("n", "]B", "workbench.action.moveEditorRightInGroup", { desc = "Move Editor Next" })
-          vscode_map("n", "[d", "editor.action.marker.prevInFiles", { desc = "Prev Diagnostic" })
-          vscode_map("n", "]d", "editor.action.marker.nextInFiles", { desc = "Next Diagnostic" })
+          vscode_map("n", { "[d", "[e" }, "editor.action.marker.prevInFiles", { desc = "Prev Diagnostic" })
+          vscode_map("n", { "]d", "]e" }, "editor.action.marker.nextInFiles", { desc = "Next Diagnostic" })
           vscode_map("n", "[h", "editor.action.dirtydiff.previous", { desc = "Prev Hunk" })
           vscode_map("n", "]h", "editor.action.dirtydiff.next", { desc = "Next Hunk" })
 
@@ -128,6 +128,11 @@ return {
           vscode_map("n", "zo", "editor.unfold")
           vscode_map("n", "zO", "editor.unfoldRecursively")
           vscode_map("n", "za", "editor.toggleFold")
+          vscode_map("n", "zA", "editor.toggleFoldRecursively")
+          vscode_map("n", "zj", "editor.gotoNextFold")
+          vscode_map("n", "zk", "editor.gotoPreviousFold")
+          vscode_map("v", "zf", "editor.createFoldingRangeFromSelection")
+          vscode_map("n", "zd", "editor.removeManualFoldingRanges")
 
           vscode_map("n", "<leader>e", "workbench.view.explorer", { desc = "Explorer" })
           vscode_map("n", "<leader>n", "notifications.showList", { desc = "Notification History" })
@@ -157,8 +162,23 @@ return {
           vscode_map("n", "<leader>bd", "workbench.action.closeActiveEditor", { desc = "Close Editor" })
           vscode_map("n", "<leader>bo", "workbench.action.closeOtherEditors", { desc = "Close Other Editors" })
           vscode_map("n", "<leader>bA", "workbench.action.closeAllEditors", { desc = "Close All Editors" })
-          vscode_map("n", "<leader>bp", "workbench.action.pinEditor", { desc = "Pin Editor" })
-          vscode_map("n", "<leader>bP", "workbench.action.unpinEditor", { desc = "Unpin Editor" })
+          -- copied from: https://github.com/Lxw0628/nvim/blob/e1c04bf500f5baae0b291836bedf64aaa186f51d/lua/plugins/vscode.lua#L75-L91
+          map("n", "<leader>bp", function()
+            if vscode.eval("return vscode.window.tabGroups.activeTabGroup.activeTab.isPinned") then
+              vscode.action("workbench.action.unpinEditor")
+            else
+              vscode.action("workbench.action.pinEditor")
+            end
+          end, { desc = "Toggle Pin Editor" })
+          map("n", "<leader>ba", function()
+            vscode.eval([[
+              vscode.window.tabGroups.all.forEach((tabGroup) => {
+                tabGroup.tabs.forEach((tab) => {
+                  if (!tab.isPinned) vscode.window.tabGroups.close(tab);
+                });
+              });
+            ]])
+          end, { desc = "Delete Non-Pinned Buffers" })
           -- stylua: ignore start
           vscode_map("n", "<leader>bh", "workbench.action.closeEditorsToTheLeft", { desc = "Close Editors to the Left" })
           vscode_map("n", "<leader>bl", "workbench.action.closeEditorsToTheRight", { desc = "Close Editors to the Right" })
@@ -188,6 +208,7 @@ return {
           vscode_map("n", "<leader>ss", "workbench.action.gotoSymbol", { desc = "Goto Symbol" })
           vscode_map("n", "<leader>sS", "workbench.action.showAllSymbols", { desc = "Goto Symbol (Workspace)" })
           vscode_map("n", "<leader>sna", "notifications.showList", { desc = "Noice All" })
+          vscode_map("n", "<leader>snd", "notifications.clearAll", { desc = "Dismiss All" })
 
           vscode_map("n", "<leader>gg", "workbench.view.scm", { desc = "SCM" })
 
@@ -208,10 +229,13 @@ return {
           vscode_map({ "n", "v" }, "<leader>ca", "editor.action.codeAction", { desc = "Code Action" })
           vscode_map("n", "<leader>cA", "editor.action.sourceAction", { desc = "Source Action" })
           vscode_map("n", "<leader>cr", "editor.action.rename", { desc = "Rename" })
-          vscode_map({ "n", "v" }, "<leader>cf", "editor.action.formatDocument", { desc = "Format" })
+          vscode_map("n", "<leader>cf", "editor.action.formatDocument", { desc = "Format" })
+          vscode_map("v", "<leader>cf", "editor.action.formatSelection", { desc = "Format" })
+          vscode_map("n", "<leader>cF", "editor.action.formatDocument.multiple", { desc = "Format With" })
+          vscode_map("v", "<leader>cF", "editor.action.formatSelection.multiple", { desc = "Format With" })
           vscode_map("n", "<leader>co", "editor.action.organizeImports", { desc = "Organize Imports" })
 
-          vscode_map("v", "<leader>rr", "editor.action.refactor", { desc = "Refactor" })
+          vscode_map({ "n", "v" }, "<leader>rr", "editor.action.refactor", { desc = "Refactor" })
           -- https://code.visualstudio.com/docs/editor/refactoring#_keyboard-shortcuts-for-code-actions
           map("v", "<leader>rx", function()
             vscode.action("editor.action.codeAction", { args = { kind = "refactor.extract.variable" } })
@@ -277,6 +301,9 @@ return {
           -- }}}
 
           vscode_map("n", "<leader>uC", "workbench.action.selectTheme", { desc = "Colorscheme with Preview" })
+          vscode_map("n", "<leader>un", "notifications.clearAll", { desc = "Dismiss All Notifications" })
+          vscode_map("n", "<leader>uz", "workbench.action.toggleCenteredLayout")
+          vscode_map("n", "<leader>uS", "workbench.action.toggleSidebarPosition")
 
           vscode_map("n", "<leader>xx", "workbench.actions.view.problems", { desc = "Diagnostics" })
 

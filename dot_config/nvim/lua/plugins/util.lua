@@ -29,6 +29,7 @@ return {
 
   {
     "thenbe/csgithub.nvim",
+    vscode = true,
     pager = true,
     keys = function()
       local function search(args)
