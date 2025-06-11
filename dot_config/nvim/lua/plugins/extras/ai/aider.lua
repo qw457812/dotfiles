@@ -2,7 +2,7 @@ if vim.fn.executable("aider") == 0 then
   return {}
 end
 
-local toggle_key = "<C-.>"
+local toggle_key = "<C-/>"
 
 return {
   {
@@ -14,11 +14,11 @@ return {
       { "<leader>a=", "<cmd>Aider add<cr>", desc = "Add File (Aider)" },
       { "<leader>a-", "<cmd>Aider drop<cr>", desc = "Drop File (Aider)" },
       { "<leader>a+", "<cmd>Aider add readonly<cr>", desc = "Add Read-Only File (Aider)" },
-      { "<leader>aii", "<cmd>Aider send<cr>", desc = "Send", mode = { "n", "v" } },
-      { "<leader>ai/", "<cmd>Aider command<cr>", desc = "Commands" },
-      { "<leader>aib", "<cmd>Aider buffer<cr>", desc = "Send Buffer" },
-      { "<leader>aid", "<cmd>Aider buffer diagnostics<cr>", desc = "Send Buffer Diagnostics" },
-      { "<leader>air", "<cmd>Aider reset<cr>", desc = "Reset" },
+      { "<leader>adi", "<cmd>Aider send<cr>", desc = "Send", mode = { "n", "v" } },
+      { "<leader>ad/", "<cmd>Aider command<cr>", desc = "Commands" },
+      { "<leader>adb", "<cmd>Aider buffer<cr>", desc = "Send Buffer" },
+      { "<leader>add", "<cmd>Aider buffer diagnostics<cr>", desc = "Send Buffer Diagnostics" },
+      { "<leader>adr", "<cmd>Aider reset<cr>", desc = "Reset" },
     },
     opts = function()
       -- local defaults = require("nvim_aider.config").defaults
@@ -80,7 +80,7 @@ return {
     "folke/which-key.nvim",
     opts = {
       spec = {
-        { "<leader>ai", group = "aider" },
+        { "<leader>ad", group = "aider" },
       },
     },
   },

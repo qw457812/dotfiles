@@ -459,7 +459,7 @@
     "when": "terminalEditorFocus"
   },
   {
-    "key": "ctrl+.",
+    "key": "ctrl+/",
     "command": "workbench.action.terminal.newWithProfile",
     "args": {
       "profileName": "aider",
@@ -468,7 +468,7 @@
     "when": "!terminalEditorFocus"
   },
   {
-    "key": "ctrl+.",
+    "key": "ctrl+/",
     "command": "workbench.action.terminal.killEditor",
     "when": "terminalEditorFocus"
   },
