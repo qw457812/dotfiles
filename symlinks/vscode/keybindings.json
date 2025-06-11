@@ -429,12 +429,12 @@
   // also see default key binding `cmd+j`
   // https://github.com/nikitavoloboev/config/blob/master/vscode/keybindings.json
   {
-    "key": "ctrl+/",
+    "key": "ctrl+enter",
     "command": "workbench.action.terminal.focus",
     "when": "!terminalFocus"
   },
   {
-    "key": "ctrl+/",
+    "key": "ctrl+enter",
     "command": "runCommands",
     "args": {
       "commands": [
@@ -459,7 +459,7 @@
     "when": "terminalEditorFocus"
   },
   {
-    "key": "ctrl+enter",
+    "key": "ctrl+.",
     "command": "workbench.action.terminal.newWithProfile",
     "args": {
       "profileName": "aider",
@@ -468,12 +468,12 @@
     "when": "!terminalEditorFocus"
   },
   {
-    "key": "ctrl+enter",
+    "key": "ctrl+.",
     "command": "workbench.action.terminal.killEditor",
     "when": "terminalEditorFocus"
   },
   {
-    "key": "ctrl+.",
+    "key": "ctrl+/",
     "command": "roo-cline.focusInput"
   },
   {

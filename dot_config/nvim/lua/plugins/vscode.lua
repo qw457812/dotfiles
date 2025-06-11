@@ -4,6 +4,7 @@ end
 
 local vscode = require("vscode")
 local map = U.keymap.map
+-- local is_cursor = vscode.eval('return vscode.env.appName.includes("Cursor")')
 
 vim.notify = vscode.notify
 -- vim.g.clipboard = vim.g.vscode_clipboard

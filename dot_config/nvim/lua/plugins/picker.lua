@@ -311,7 +311,7 @@ return {
               ["K"] = "preview_scroll_up",
               ["/"] = false, -- highlights text in preview
               ["<C-Space>"] = { "cycle_win", mode = { "n", "i" } },
-              ["<C-/>"] = { "toggle_input", mode = { "n", "i" } },
+              ["<C-cr>"] = { "toggle_input", mode = { "n", "i" } },
               ["<Up>"] = "history_back",
               ["<Down>"] = "history_forward",
               i_up = { "<Up>", "list_up", mode = "i", expr = true },
@@ -337,7 +337,7 @@ return {
               ["K"] = "preview_scroll_up",
               ["/"] = false,
               ["<C-Space>"] = { "cycle_win", mode = { "n", "i" } },
-              ["<C-/>"] = { "toggle_input", mode = { "n", "i" } },
+              ["<C-cr>"] = { "toggle_input", mode = { "n", "i" } },
               ["<Left>"] = "preview_scroll_left",
               ["<Right>"] = "preview_scroll_right",
               ["<C-Left>"] = "preview_scroll_left",

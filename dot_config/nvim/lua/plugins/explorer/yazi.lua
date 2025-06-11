@@ -106,6 +106,7 @@ return {
             "diff.yazi",
             "smart-filter.yazi",
             "mount.yazi",
+            "zoom.yazi",
             "types.yazi",
           }
           for _, sub_dir in ipairs(sub_dirs) do
