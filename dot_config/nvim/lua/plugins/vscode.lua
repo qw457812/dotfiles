@@ -3,8 +3,8 @@ if not vim.g.vscode then
 end
 
 local vscode = require("vscode")
+local is_cursor = vscode.eval('return vscode.env.appName.includes("Cursor")')
 local map = U.keymap.map
--- local is_cursor = vscode.eval('return vscode.env.appName.includes("Cursor")')
 
 vim.notify = vscode.notify
 -- vim.g.clipboard = vim.g.vscode_clipboard
@@ -153,9 +153,25 @@ return {
           vscode_map("n", { "<leader>:", "<leader>sc" }, "workbench.action.showCommands", { desc = "Commands" })
 
           -- github.copilot.chat.attachFile
-          -- github.copilot.chat.attachSelection
-          vscode_map({ "n", "v" }, "<leader>aa", "workbench.action.chat.openInSidebar", { desc = "Copilot Chat" })
-          vscode_map({ "n", "v" }, "<leader>ae", "inlineChat.start", { desc = "Inline Chat" })
+          vscode_map(
+            "n",
+            "<leader>aa",
+            is_cursor and "aichat.newchataction" or "workbench.action.chat.openInSidebar",
+            { desc = "Copilot Chat" }
+          )
+          vscode_map(
+            "v",
+            "<leader>aa",
+            is_cursor and "aichat.insertselectionintochat" or "github.copilot.chat.attachSelection",
+            { desc = "Copilot Chat" }
+          )
+          vscode_map(
+            { "n", "v" },
+            "<leader>ae",
+            is_cursor and "aipopup.action.modal.generate" or "inlineChat.start",
+            { desc = "Inline Chat" }
+          )
+          vscode_map("n", "<leader>ar", "roo-cline.focusInput", { desc = "Roo Code" })
 
           for i = 1, 9 do
             vscode_map("n", "<leader>" .. i, "workbench.action.openEditorAtIndex" .. i, { desc = "Goto Editor " .. i })

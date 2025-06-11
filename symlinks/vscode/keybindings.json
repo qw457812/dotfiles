@@ -473,8 +473,12 @@
     "when": "terminalEditorFocus"
   },
   {
-    "key": "ctrl+/",
+    "key": "alt+space",
     "command": "roo-cline.focusInput"
+  },
+  {
+    "key": "alt+enter",
+    "command": "roo-cline.acceptInput"
   },
   {
     "command": "workbench.action.compareEditor.nextChange",
