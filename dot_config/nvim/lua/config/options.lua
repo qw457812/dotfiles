@@ -102,6 +102,10 @@ if vim.g.neovide then
   vim.g.neovide_opacity = vim.g.user_transparent_background and 0.0 or vim.g.neovide_opacity
 end
 
+if vim.g.vscode then
+  opt.laststatus = 0
+end
+
 U.on_very_very_lazy(function()
   -- after VeryLazy
   vim.g.user_very_very_lazy = true
