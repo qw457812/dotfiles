@@ -205,6 +205,14 @@ abbr lzd lazydocker
 abbr zj zellij
 abbr py python3
 
+if type -q aider
+    abbr ad aider
+    abbr adr 'aider --model r1'
+    abbr adg 'aider --model gemini'
+    abbr adc 'aider --model claude'
+    abbr adp aider_copilot
+end
+
 if type -q atuin
     set -gx ATUIN_NOBIND true
     atuin init fish | source

@@ -71,7 +71,6 @@
   "mini.snippets": { "branch": "main", "commit": "6f0de3c3f97a8c015f99619f72edf9b2880b6886" },
   "mini.surround": { "branch": "main", "commit": "365f98d842face0876e95f05d6e48fbfcc08e351" },
   "mini.trailspace": { "branch": "main", "commit": "39a0460c025a605519fdd6bea1ce870642429996" },
-  "minuet-ai.nvim": { "branch": "main", "commit": "094a23ed3b0c679b73181087d0ad8a3451411e09" },
   "neo-tree.nvim": { "branch": "main", "commit": "e01ca7de8e6dbc6118bcb12c4cbe1f88162a337f" },
   "neogen": { "branch": "main", "commit": "d7f9461727751fb07f82011051338a9aba07581d" },
   "neogit": { "branch": "master", "commit": "3852b5991337fd5cf466e1d67dee4950fde140a2" },
@@ -134,6 +133,6 @@
   "which-key.nvim": { "branch": "main", "commit": "370ec46f710e058c9c1646273e6b225acf47cbed" },
   "yanky.nvim": { "branch": "main", "commit": "04775cc6e10ef038c397c407bc17f00a2f52b378" },
   "yazi-flavors": { "branch": "main", "commit": "d04a298a8d4ada755816cb1a8cfb74dd46ef7124" },
-  "yazi-plugins": { "branch": "main", "commit": "63f9650e522336e0010261dcd0ffb0bf114cf912" },
+  "yazi-plugins": { "branch": "main", "commit": "c648526665f6fb466150e9ee41aa0431b87cb041" },
   "yazi.nvim": { "branch": "main", "commit": "e2ddbaa88ec61d0b96e3d53ba851b0e7a0b36f14" }
 }

@@ -23,6 +23,7 @@ return {
     end,
   },
 
+  -- TODO: not sure what it's for
   {
     "nvim-treesitter/nvim-treesitter",
     opts = { ensure_installed = { "javadoc" } },

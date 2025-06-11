@@ -2,26 +2,45 @@
 ---@type LazySpec
 return {
   {
+    "LazyVim/LazyVim",
+    opts = function()
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "LazyVimKeymapsDefaults",
+        callback = function()
+          vim.keymap.del({ "n", "t" }, "<c-/>")
+          vim.keymap.del({ "n", "t" }, "<c-_>")
+        end,
+      })
+    end,
+  },
+
+  {
     "folke/snacks.nvim",
     keys = {
       -- stylua: ignore start
       { "<leader>fT", function() U.terminal() end, desc = "Terminal (cwd)" },
       -- { "<leader>ft", function() U.terminal(nil, { cwd = LazyVim.root() }) end, desc = "Terminal (Root Dir)" },
-      { "<c-/>", function() U.terminal(nil, { cwd = LazyVim.root() }) end, desc = "Terminal (Root Dir)" },
-      { "<c-_>", function() U.terminal(nil, { cwd = LazyVim.root() }) end, desc = "which_key_ignore" },
       -- stylua: ignore end
       {
         "<c-space>",
         function()
-          local filepath = vim.fn.expand("%:p:h")
           U.terminal(nil, {
             win = { position = "float" },
-            cwd = vim.fn.isdirectory(filepath) == 1 and filepath or LazyVim.root(),
+            cwd = LazyVim.root(),
           })
+        end,
+        desc = "Terminal (Root Dir)",
+      },
+      { "<c-space>", "<cmd>close<cr>", desc = "Hide Terminal", mode = "t" },
+      {
+        "<c-cr>",
+        function()
+          local filepath = vim.fn.expand("%:p:h")
+          U.terminal(nil, { cwd = vim.fn.isdirectory(filepath) == 1 and filepath or LazyVim.root() })
         end,
         desc = "Terminal (Buffer Dir)",
       },
-      { "<c-space>", "<cmd>close<cr>", desc = "Hide Terminal", mode = "t" },
+      { "<c-cr>", "<cmd>close<cr>", desc = "Hide Terminal", mode = "t" },
     },
     ---@module "snacks"
     ---@type snacks.Config

@@ -2,7 +2,7 @@ if vim.fn.executable("aider") == 0 then
   return {}
 end
 
-local toggle_key = "<C-cr>"
+local toggle_key = "<C-.>"
 
 return {
   {
@@ -21,16 +21,16 @@ return {
       { "<leader>air", "<cmd>Aider reset<cr>", desc = "Reset" },
     },
     opts = function()
-      local defaults = require("nvim_aider.config").defaults
+      -- local defaults = require("nvim_aider.config").defaults
 
       return {
-        -- see also:
-        -- - ~/.aider.conf.yml
-        -- - ~/.aider.model.settings.yml
-        args = vim.list_extend(vim.deepcopy(defaults.args), {
-          "--model",
-          "gemini",
-        }),
+        -- -- see also:
+        -- -- - ~/.aider.conf.yml
+        -- -- - ~/.aider.model.settings.yml
+        -- args = vim.list_extend(vim.deepcopy(defaults.args), {
+        --   "--model",
+        --   "gemini",
+        -- }),
         auto_reload = true,
         ---@module "snacks"
         ---@type snacks.win.Config

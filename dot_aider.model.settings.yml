@@ -16,14 +16,14 @@
     max_tokens: 8192
     include_reasoning: true
   caches_by_default: true
-  editor_model_name: openai/claude-sonnet-4
+  editor_model_name: openrouter/anthropic/claude-sonnet-4
   editor_edit_format: editor-diff
 
 - name: openrouter/google/gemini-2.5-pro-preview
   overeager: true
   edit_format: diff-fenced
   use_repo_map: true
-  weak_model_name: openrouter/google/gemini-2.5-flash-preview
+  weak_model_name: openrouter/google/gemini-2.5-flash-preview-05-20
 
 # https://github.com/Aider-AI/aider/blob/b259226770b7d9f5091567288b504652b04a74f6/aider/resources/model-settings.yml#L1440-L1452
 # https://github.com/Aider-AI/aider/blob/b259226770b7d9f5091567288b504652b04a74f6/aider/resources/model-settings.yml#L1548

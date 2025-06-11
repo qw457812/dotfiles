@@ -11,9 +11,9 @@ alias:
   - "copilot:openai/claude-sonnet-4"
 
 # model: r1
-# model: gemini
+model: gemini
 # model: claude
-model: copilot
+# model: copilot
 show-model-warnings: false
 
 gitignore: false
