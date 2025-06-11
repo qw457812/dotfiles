@@ -2,19 +2,6 @@
 ---@type LazySpec
 return {
   {
-    "LazyVim/LazyVim",
-    opts = function()
-      vim.api.nvim_create_autocmd("User", {
-        pattern = "LazyVimKeymapsDefaults",
-        callback = function()
-          vim.keymap.del({ "n", "t" }, "<c-/>")
-          vim.keymap.del({ "n", "t" }, "<c-_>")
-        end,
-      })
-    end,
-  },
-
-  {
     "folke/snacks.nvim",
     keys = {
       -- stylua: ignore start
