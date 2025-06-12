@@ -235,9 +235,8 @@ append_keymap = [
   { on = "<Backspace>", run = "close", desc = "Close the current tab, or quit if it is last tab" },
 
   # https://github.com/yazi-rs/plugins/tree/main/zoom.yazi
-  { on = "+", run = "plugin zoom 1", desc = "Zoom in hovered file" },
-  { on = "=", run = "plugin zoom 1", desc = "Zoom in hovered file" },
-  { on = "-", run = "plugin zoom -1", desc = "Zoom out hovered file" },
+  { on = "<A-=>", run = "plugin zoom 1", desc = "Zoom in hovered file" },
+  { on = "<A-->", run = "plugin zoom -1", desc = "Zoom out hovered file" },
 
   # TODO: cc A
   # https://github.com/hankertrix/augment-command.yazi

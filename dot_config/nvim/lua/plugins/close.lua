@@ -1,6 +1,6 @@
 local close_key, exit_key, term_close_key = vim.g.user_close_key, vim.g.user_exit_key, vim.g.user_term_close_key
 if not close_key then
-  vim.notify("`vim.g.user_close_key` is required", "warn", { title = "Close" })
+  vim.notify("`vim.g.user_close_key` is required", vim.log.levels.WARN, { title = "Close" })
   return {}
 end
 

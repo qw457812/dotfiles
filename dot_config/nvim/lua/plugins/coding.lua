@@ -324,10 +324,10 @@ return {
     },
     opts = {
       enter_callback = function()
-        vim.notify("Caps Word: On", "info", { title = "Caps Word" })
+        vim.notify("Caps Word: On", vim.log.levels.INFO, { title = "Caps Word" })
       end,
       exit_callback = function()
-        vim.notify("Caps Word: Off", "info", { title = "Caps Word" })
+        vim.notify("Caps Word: Off", vim.log.levels.INFO, { title = "Caps Word" })
       end,
     },
   },
