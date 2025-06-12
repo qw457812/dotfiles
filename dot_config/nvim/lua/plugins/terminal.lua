@@ -70,6 +70,9 @@ return {
   -- TODO: nested `nvim .` with oil not working
   {
     "willothy/flatten.nvim",
+    -- if the YAZI_ID environment variable is set, then we are in a yazi
+    -- session. To avoid issues with bulk renaming, we disable flatten.nvim
+    enabled = vim.env.YAZI_ID == nil,
     lazy = false,
     priority = 1001,
     -- keys = {

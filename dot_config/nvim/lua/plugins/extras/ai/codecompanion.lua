@@ -159,7 +159,7 @@ return {
             title = "CodeCompanion"
           end
 
-          vim.notify(msg, "info", {
+          vim.notify(msg, vim.log.levels.INFO, {
             id = "codecompanion_status",
             title = title,
             timeout = 500,
