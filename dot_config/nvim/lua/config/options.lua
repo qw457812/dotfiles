@@ -47,6 +47,9 @@ if vim.env.SHELL_COMMAND_EDITOR then
   -- set in fish_user_key_bindings.fish before calling `edit_command_buffer`
   vim.g.shell_command_editor = true
 end
+if vim.env.KITTY_SCROLLBACK_NVIM == "true" then
+  vim.g.terminal_scrollback_pager = true
+end
 if lazyvim_docs then
   -- set in config.fish via `alias vimpager 'nvim - --cmd "lua vim.g.pager = true" -c "lua require(\'util.terminal\').colorize()"'`
   vim.g.pager = false
