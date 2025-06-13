@@ -1,9 +1,10 @@
 ---@module "lazy"
 ---@type LazySpec
+-- TODO: https://github.com/mikesmithgh/kitty-scrollback.nvim#command-line-editing
 return {
   {
     "mikesmithgh/kitty-scrollback.nvim",
-    cond = vim.g.terminal_scrollback_pager == true, -- disable for pager/manpager
+    cond = vim.env.KITTY_SCROLLBACK_NVIM == "true",
     cmd = {
       "KittyScrollbackGenerateKittens",
       "KittyScrollbackCheckHealth",

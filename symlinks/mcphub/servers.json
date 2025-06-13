@@ -2,19 +2,11 @@
   "mcpServers": {
     "fetch": {
       "command": "uvx",
-      "args": ["mcp-server-fetch"],
-      "env": {
-        "API_KEY": "",
-        "SERVER_URL": null,
-        "DEBUG": "true"
-      }
+      "args": ["mcp-server-fetch"]
     },
     "github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-sequential-thinking"
-      ]
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
     },
     "github.com/upstash/context7-mcp": {
       "command": "npx",
@@ -27,3 +19,4 @@
   },
   "nativeMCPServers": []
 }
+
