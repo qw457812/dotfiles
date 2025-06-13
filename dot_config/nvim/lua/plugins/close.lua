@@ -656,5 +656,51 @@ return {
     end,
   },
 
-  -- TODO: kitty-scrollback.nvim
+  {
+    "mikesmithgh/kitty-scrollback.nvim",
+    optional = true,
+    opts = function()
+      local ksb_kitty_cmds = require("kitty-scrollback.kitty_commands")
+      local ksb_api = require("kitty-scrollback.api")
+      local plug = require("kitty-scrollback.util").plug_mapping_names
+
+      vim.api.nvim_create_autocmd("FileType", {
+        group = augroup,
+        pattern = "kitty-scrollback",
+        callback = function(ev)
+          -- -- do not ask for saving changes for paste_window
+          -- vim.keymap.set("n", close_key, plug.QUIT_ALL, { buffer = ev.buf, desc = "Force Quit" })
+          -- if exit_key then
+          --   vim.keymap.set("n", exit_key, plug.QUIT_ALL, { buffer = ev.buf, desc = "Force Quit All" })
+          -- end
+
+          vim.keymap.set("n", close_key, function()
+            -- see: https://github.com/mikesmithgh/kitty-scrollback.nvim/blob/f6b982e3cdc2c45b00e0266c7c2d5a69c8bb5429/lua/kitty-scrollback/api.lua#L50
+            if not pcall(ksb_kitty_cmds.send_paste_buffer_text_to_kitty_and_quit, false) then
+              -- https://github.com/mikesmithgh/kitty-scrollback.nvim/blob/fea315d016eec41e807d67dd8980fa119850694a/lua/kitty-scrollback/kitty_commands.lua#L214: Invalid 'buffer': Expected Lua number
+              ksb_api.quit_all()
+            end
+          end, { buffer = ev.buf, desc = "Quit and Paste" })
+          if exit_key then
+            vim.keymap.set("n", exit_key, close_key, { buffer = ev.buf, remap = true, desc = "Quit and Paste" })
+          end
+        end,
+      })
+
+      -- HACK: exit_key for pastebufs
+      if exit_key then
+        local mapped_pastebufs = {} ---@type table<integer, boolean>
+        vim.api.nvim_create_autocmd("BufWinEnter", {
+          group = augroup,
+          callback = vim.schedule_wrap(function()
+            local buf = vim.api.nvim_get_current_buf()
+            if vim.api.nvim_buf_get_name(buf):match("%.ksb_pastebuf$") and not mapped_pastebufs[buf] then
+              mapped_pastebufs[buf] = true
+              vim.keymap.set("n", exit_key, plug.PASTE_CMD, { buffer = buf, desc = "Quit and Paste" })
+            end
+          end),
+        })
+      end
+    end,
+  },
 }
