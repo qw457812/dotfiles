@@ -90,16 +90,19 @@ return {
                 "svn",
                 "snacks_dashboard",
                 "nvdash",
+                "kitty-scrollback",
               }, vim.bo[buf or 0].filetype)
               or U.is_edgy_win(win)
               or vim.t.user_diffview
               or vim.fn.getcmdwintype() ~= ""
           end
 
+          local win = tonumber(event.match) or vim.fn.bufwinid(event.buf)
+
           -- If `vim.g.user_explorer_auto_close` is set to true,
           -- then the resize-neotree-auto-close feature will not be needed,
           -- and the resize-neotree-auto-open feature will be ignored.
-          if vim.g.user_explorer_auto_close or should_ignore(event.buf, event.match + 0) then
+          if vim.g.user_explorer_auto_close or should_ignore(event.buf, win) then
             return
           end
 

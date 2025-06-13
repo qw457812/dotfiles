@@ -533,7 +533,12 @@ return {
       })
       vim.api.nvim_create_autocmd("TextYankPost", {
         group = vim.api.nvim_create_augroup("undo_glow_highlight_yank", { clear = true }),
-        callback = function()
+        callback = function(ev)
+          if vim.bo[ev.buf].filetype == "kitty-scrollback" then
+            -- TODO: report bugs
+            return vim.hl.on_yank()
+          end
+
           -- copied from: https://github.com/neovim/neovim/blob/c3337e357a838aadf0ac40dd5bbc4dd0d1909b32/runtime/lua/vim/hl.lua#L163-L175
           local event = vim.v.event
           local on_macro = false
