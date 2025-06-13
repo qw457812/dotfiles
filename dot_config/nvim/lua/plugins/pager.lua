@@ -65,9 +65,16 @@ return {
         once = true,
         callback = function()
           vim.keymap.set("n", "<Esc>", function()
-            -- TODO: has_kitty_scrollback_nvim
-            if not U.keymap.clear_ui_esc() then
-              vim.cmd([[quit]])
+            if
+              not U.keymap.clear_ui_esc({
+                popups = vim.bo.filetype ~= "kitty-scrollback", -- status_window of kitty-scrollback.nvim
+              })
+            then
+              if vim.g.user_close_key then
+                vim.api.nvim_feedkeys(vim.keycode(vim.g.user_close_key), "m", false)
+              else
+                vim.cmd([[quit]])
+              end
             end
           end, { desc = "Clear UI or Quit" })
           if vim.g.terminal_scrollback_pager and not has_kitty_scrollback_nvim then

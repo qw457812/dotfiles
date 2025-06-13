@@ -103,7 +103,11 @@ return {
         callback = function()
           vim.keymap.set("n", "<Esc>", function()
             if not U.keymap.clear_ui_esc() then
-              vim.cmd([[quit]])
+              if vim.g.user_close_key then
+                vim.api.nvim_feedkeys(vim.keycode(vim.g.user_close_key), "m", false)
+              else
+                vim.cmd([[quit]])
+              end
             end
           end, { desc = "Clear UI or Quit" })
         end,

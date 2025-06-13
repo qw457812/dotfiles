@@ -57,7 +57,7 @@ function M.colorize()
     vim.keymap.set("x", vim.g.user_close_key, function()
       vim.cmd.normal("y")
       vim.api.nvim_feedkeys(vim.keycode(vim.g.user_close_key), "m", false)
-    end, { silent = true, buffer = buf, desc = "Yank then Quit" })
+    end, { buffer = buf, desc = "Yank and Quit" })
   end
 end
 
