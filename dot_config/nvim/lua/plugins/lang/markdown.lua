@@ -77,6 +77,15 @@ return {
   },
 
   {
+    "L3MON4D3/LuaSnip",
+    optional = true,
+    opts = function()
+      -- https://github.com/MeanderingProgrammer/render-markdown.nvim/issues/141
+      require("luasnip").filetype_extend("gitcommit", { "markdown" })
+    end,
+  },
+
+  {
     "wurli/contextindent.nvim",
     enabled = false, -- wrong indent on `o` in nested list
     dependencies = {

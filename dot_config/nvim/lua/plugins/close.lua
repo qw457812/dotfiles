@@ -57,6 +57,8 @@ local function close_buffer_or_window_or_exit()
   end
 end
 
+---@module "lazy"
+---@type LazySpec
 return {
   {
     "LazyVim/LazyVim",
@@ -653,4 +655,6 @@ return {
       })
     end,
   },
+
+  -- TODO: kitty-scrollback.nvim
 }
