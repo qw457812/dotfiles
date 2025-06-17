@@ -204,12 +204,14 @@
     "git diff",
     "git show"
   ],
+  "svn.path": "/opt/homebrew/bin/svn",
   "extensions.experimental.affinity": {
     // VSCodeVim is too slow! To improve performance | https://github.com/microsoft/vscode/issues/75627#issuecomment-1078827311
     "vscodevim.vim": 1,
     "asvetliakov.vscode-neovim": 1
   },
   // "vscode-neovim.neovimExecutablePaths.darwin": "/opt/homebrew/bin/nvim",
+  "vscode-neovim.neovimExecutablePaths.darwin": "/Users/xingyuqiang/.local/share/bob/nvim-bin/nvim",
   // "vscode-neovim.compositeKeys": {
   //   "jj": {
   //     "command": "vscode-neovim.escape"
