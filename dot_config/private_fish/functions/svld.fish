@@ -7,7 +7,7 @@ function svld
 end
 
 function __complete_svld
-    svn log -q | grep '^r' | cut -d' ' -f1
+    svn log -q -l 15 | grep '^r' | cut -d' ' -f1
 end
 
 complete -c svld -f -k -a "(__complete_svld)"
