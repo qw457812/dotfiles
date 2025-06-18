@@ -31,10 +31,10 @@ local enabled = {
   "plenary.nvim", -- for blink.cmp
   "conform.nvim",
   "nvim-lint",
-  -- -- bash
-  -- "nvim-lspconfig",
-  -- "mason.nvim", -- for nvim-lspconfig
-  -- "mason-lspconfig.nvim",
+  -- bash/fish
+  "nvim-lspconfig",
+  "mason.nvim", -- for nvim-lspconfig
+  "mason-lspconfig.nvim",
 }
 
 local Config = require("lazy.core.config")

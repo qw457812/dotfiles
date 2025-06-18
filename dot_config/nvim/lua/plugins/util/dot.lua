@@ -1,8 +1,32 @@
 return {
-  -- TODO: fish-lsp
-  -- - https://github.com/neovim/nvim-lspconfig/pull/3869
-  -- - https://github.com/mason-org/mason-registry/pull/8609
-  -- - https://github.com/ndonfris/fish-lsp
+  -- fish
+  {
+    "LazyVim/LazyVim",
+    opts = function()
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "fish",
+        callback = function()
+          vim.lsp.start({
+            name = "fish-lsp",
+            cmd = { "fish-lsp", "start" },
+            cmd_env = { fish_lsp_show_client_popups = false },
+          })
+        end,
+      })
+    end,
+  },
+  {
+    "williamboman/mason.nvim",
+    opts = { ensure_installed = { "fish-lsp" } },
+  },
+  -- {
+  --   "stevearc/conform.nvim",
+  --   optional = true,
+  --   opts = function(_, opts)
+  --     opts.formatters_by_ft = opts.formatters_by_ft or {}
+  --     opts.formatters_by_ft.fish = nil -- using fish-lsp
+  --   end,
+  -- },
 
   -- zsh
   {
