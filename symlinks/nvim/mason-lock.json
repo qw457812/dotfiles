@@ -6,6 +6,7 @@
   "docker-compose-language-service": "0.4.0",
   "dockerfile-language-server": "0.14.0",
   "eslint-lsp": "4.10.0",
+  "fish-lsp": "1.0.9-1",
   "hadolint": "v2.12.0",
   "java-debug-adapter": "0.58.1",
   "java-test": "0.43.1",
