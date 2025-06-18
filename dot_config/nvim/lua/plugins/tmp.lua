@@ -71,7 +71,6 @@ return {
   },
 
   { "zapling/mason-lock.nvim", optional = true, commit = "86614f7" },
-  { "neovim/nvim-lspconfig", commit = LazyVim.has_extra("lang.vue") and "ac1dfbe" or nil },
 
   -- TODO: breaking changes
   { "chrisgrieser/nvim-various-textobjs", optional = true, commit = "bf2133a" },
