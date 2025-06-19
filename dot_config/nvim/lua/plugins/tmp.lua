@@ -63,9 +63,9 @@ return {
       -- for kitty.conf: scrollback_pager nvim --cmd "lua vim.g.terminal_scrollback_pager = true" -c "lua require('util.terminal').colorize()"
       -- in favor of pantran.nvim
       if vim.g.terminal_scrollback_pager then
-        vim.env.https_proxy = "http://127.0.0.1:7897"
-        vim.env.http_proxy = "http://127.0.0.1:7897"
-        vim.env.all_proxy = "socks5://127.0.0.1:7897"
+        vim.env.https_proxy = "http://127.0.0.1:10808"
+        vim.env.http_proxy = "http://127.0.0.1:10808"
+        vim.env.all_proxy = "socks5://127.0.0.1:10808"
       end
     end,
   },

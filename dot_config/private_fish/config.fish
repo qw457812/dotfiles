@@ -30,7 +30,7 @@ set -gx VISUAL $EDITOR
 set -gx SUDO_EDITOR $EDITOR
 
 set -g __proxy_ip "127.0.0.1"
-set -g __http_proxy_port 7897
+set -g __http_proxy_port 10808
 set -g __socks_proxy_port $__http_proxy_port
 
 # Exports
@@ -204,6 +204,9 @@ abbr lzd lazydocker
 abbr zj zellij
 abbr py python3
 
+if type -q claude
+    abbr cl claude
+end
 if type -q aider
     abbr ad aider
     abbr adr 'aider --model r1'
