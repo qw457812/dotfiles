@@ -1158,7 +1158,9 @@
            [:spacebar :!!f16] ; show hidden items for Bartender 4
            [:i :!!close_bracket nil {:delayed {:invoked [:!Ct]} :params {:delay 100}}] ; trigger Benchmark for ClashX
            [:h :!!open_bracket] ; Switch Hosts (Raycast extensions)
-           [:j :!!close_bracket] ; open Menu for ClashX
+           ;; [:j :!!close_bracket] ; open Menu for ClashX
+           [:j [:open "/Applications/v2rayN.app"] :!V2rayN]
+           [:j :prev_app :V2rayN]
            [:k [:hs ["toggleAClock"]]] ; show time
            [:l :!!f12] ; itsycal (calendar)
            [:semicolon :!!f2] ; control center by Bartender 4
@@ -2343,6 +2345,7 @@
   :CitrixViewer     ["^com\\.citrix\\.receiver\\.icaviewer\\.mac$"]
   :RuijieWorkSpace  ["^cn\\.com\\.ruijie\\.RuijieWorkSpace$"]
   :ChatGPT          ["^com\\.lencx\\.chatgpt$"]
+  :V2rayN           ["^2dust\\.v2rayN$"]
   :WPSOffice        ["^com\\.kingsoft\\.wpsoffice\\.mac$"]
   :LibreOffice      ["^org\\.libreoffice\\.script$"]
   :Chrome           ["^com\\.google\\.Chrome$"]
