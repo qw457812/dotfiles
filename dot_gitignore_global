@@ -2,5 +2,10 @@
 .DS_Store
 
 .svn
-.aider*
 .lazy.lua
+
+.aider*
+.claude
+CLAUDE.md
+CLAUDE.local.md
+.opencode

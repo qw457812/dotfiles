@@ -739,7 +739,6 @@ return {
 
   {
     "chrisgrieser/nvim-origami",
-    dependencies = "neovim/nvim-lspconfig", -- https://github.com/chrisgrieser/nvim-origami/blob/9c8984a224b813f5072fa994a5b1df2bad238d03/lua/origami/features/foldtext.lua#L14
     event = "VeryLazy",
     init = function()
       -- -- copied from: https://github.com/chrisgrieser/.config/blob/832fa40a0648b31780658b59138379851a5231ec/nvim/lua/config/options.lua#L161-L181
@@ -800,24 +799,29 @@ return {
         },
       }
     end,
-    opts = {
-      foldKeymaps = {
-        setup = false,
-        hOnlyOpensOnFirstColumn = true,
-      },
-      useLspFoldsWithTreesitterFallback = false,
-      autoFold = {
-        kinds = {
-          "imports",
-          -- "comment",
-        }, ---@type lsp.FoldingRangeKind[]
-      },
-      foldtext = {
-        lineCount = {
-          template = "  󰘖 %d",
+    opts = function()
+      local has_gitsigns = LazyVim.has("gitsigns.nvim")
+      return {
+        foldKeymaps = {
+          setup = false,
+          hOnlyOpensOnFirstColumn = true,
         },
-      },
-    },
+        useLspFoldsWithTreesitterFallback = false,
+        autoFold = {
+          kinds = {
+            "imports",
+            -- "comment",
+          }, ---@type lsp.FoldingRangeKind[]
+        },
+        foldtext = {
+          padding = 2,
+          lineCount = {
+            template = "󰘖 %d",
+          },
+          gitsignsCount = has_gitsigns,
+        },
+      }
+    end,
     specs = {
       {
         "folke/noice.nvim",
