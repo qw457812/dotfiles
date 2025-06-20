@@ -739,17 +739,9 @@ return {
 
   {
     "chrisgrieser/nvim-origami",
+    dependencies = "neovim/nvim-lspconfig", -- https://github.com/chrisgrieser/nvim-origami/blob/9c8984a224b813f5072fa994a5b1df2bad238d03/lua/origami/features/foldtext.lua#L14
     event = "VeryLazy",
-    dependencies = {
-      "kevinhwang91/nvim-ufo",
-      optional = true,
-      keys = { { "<leader>iF", false } },
-    },
     init = function()
-      if LazyVim.has("nvim-ufo") then
-        return
-      end
-
       -- -- copied from: https://github.com/chrisgrieser/.config/blob/832fa40a0648b31780658b59138379851a5231ec/nvim/lua/config/options.lua#L161-L181
       -- vim.o.foldlevel = 99 -- do not auto-fold
       vim.o.foldlevelstart = 99
@@ -802,37 +794,30 @@ return {
         {
           "<leader>iF",
           function()
-            if LazyVim.has("nvim-ufo") then
-              pcall(vim.cmd.UfoInspect)
-            end
             require("origami").inspectLspFolds("special")
           end,
           desc = "Fold",
         },
       }
     end,
-    opts = function()
-      local has_ufo = LazyVim.has("nvim-ufo")
-      return {
-        foldKeymaps = {
-          setup = false,
-          hOnlyOpensOnFirstColumn = true,
+    opts = {
+      foldKeymaps = {
+        setup = false,
+        hOnlyOpensOnFirstColumn = true,
+      },
+      useLspFoldsWithTreesitterFallback = false,
+      autoFold = {
+        kinds = {
+          "imports",
+          -- "comment",
+        }, ---@type lsp.FoldingRangeKind[]
+      },
+      foldtext = {
+        lineCount = {
+          template = "  󰘖 %d",
         },
-        useLspFoldsWithTreesitterFallback = false,
-        autoFold = {
-          enabled = not has_ufo,
-          kinds = {
-            "imports",
-            -- "comment",
-          }, ---@type lsp.FoldingRangeKind[]
-        },
-        foldtextWithLineCount = {
-          enabled = not has_ufo,
-          template = "  󰘖 %s",
-        },
-        keepFoldsAcrossSessions = false, -- has_ufo
-      }
-    end,
+      },
+    },
     specs = {
       {
         "folke/noice.nvim",

@@ -1,4 +1,6 @@
 return {
+  { "chrisgrieser/nvim-origami", optional = true, enabled = false },
+
   {
     "kevinhwang91/nvim-ufo",
     dependencies = {
