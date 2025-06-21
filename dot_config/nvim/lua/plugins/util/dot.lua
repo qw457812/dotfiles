@@ -3,6 +3,9 @@ return {
   {
     "LazyVim/LazyVim",
     opts = function()
+      if vim.g.user_is_termux then
+        return
+      end
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "fish",
         callback = function()
@@ -17,12 +20,15 @@ return {
   },
   {
     "williamboman/mason.nvim",
-    opts = { ensure_installed = { "fish-lsp" } },
+    opts = vim.g.user_is_termux and {} or { ensure_installed = { "fish-lsp" } },
   },
   -- {
   --   "stevearc/conform.nvim",
   --   optional = true,
   --   opts = function(_, opts)
+  --     if vim.g.user_is_termux then
+  --       return
+  --     end
   --     opts.formatters_by_ft = opts.formatters_by_ft or {}
   --     opts.formatters_by_ft.fish = nil -- using fish-lsp
   --   end,
