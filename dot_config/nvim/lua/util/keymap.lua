@@ -135,8 +135,12 @@ function M.smart_duplicate_line()
     line = line:gsub("^(%s*)if( .* then)$", "%1elseif%2")
   elseif ft == "zsh" or ft == "bash" then
     line = line:gsub("^(%s*)if( .* then)$", "%1elif%2")
+  elseif ft == "fish" then
+    line = line:gsub("^(%s*)if( .*)$", "%1else if%2")
   elseif ft == "python" then
     line = line:gsub("^(%s*)if( .*:)$", "%1elif%2")
+  elseif ft == "java" or ft == "scala" then
+    line = line:gsub("^(%s*)if( %(.+%) %{)$", "%1} else if%2")
   end
 
   -- insert duplicated line
