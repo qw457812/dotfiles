@@ -207,6 +207,7 @@ abbr py python3
 if type -q claude
     abbr cl claude
     abbr clc "claude --continue"
+    abbr clr "claude --resume"
 end
 if type -q aider
     abbr ad aider
