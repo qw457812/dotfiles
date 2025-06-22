@@ -82,18 +82,11 @@ function M.is_floating_win(win, opts)
     local is_tsc = package.loaded["treesitter-context"]
       and (vim.w[win].treesitter_context or vim.w[win].treesitter_context_line_number)
 
-    local is_snacks_explorer = (function()
-      local picker = Snacks.picker.get({ source = "explorer" })[1]
-      if not picker then
-        return false
-      end
-      for _, w in pairs(picker.layout.wins or {}) do
-        if w.win == win then
-          return true
-        end
-      end
-      return false
-    end)()
+    local is_snacks_explorer = vim.iter(Snacks.picker.get({ source = "explorer" })):any(function(picker)
+      return vim.iter(picker.layout.wins or {}):any(function(w)
+        return w.win == win
+      end)
+    end)
 
     if is_tsc or is_snacks_explorer or vim.list_contains({ "snacks_dashboard", "layers_help" }, ft) then
       return false
@@ -124,14 +117,11 @@ function M.is_edgy_win(win)
   end
   win = win or 0
   win = win == 0 and vim.api.nvim_get_current_win() or win
-  for _, edgebar in pairs(require("edgy.config").layout) do
-    for _, w in ipairs(edgebar.wins) do
-      if win == w.win then
-        return true
-      end
-    end
-  end
-  return false
+  return vim.iter(require("edgy.config").layout):any(function(edgebar)
+    return vim.iter(edgebar.wins):any(function(w)
+      return w.win == win
+    end)
+  end)
 end
 
 ---@param mode? string
