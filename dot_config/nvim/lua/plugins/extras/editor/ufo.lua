@@ -48,7 +48,7 @@ return {
       --   end),
       -- })
 
-      -- add number suffix of folded lines
+      -- add number suffix to folded lines
       local function virt_text_handler(virtText, lnum, endLnum, width, truncate)
         local newVirtText = {}
         local suffix = (" 󰘖 %d "):format(endLnum - lnum) -- ⋯ 
@@ -65,7 +65,7 @@ return {
             local hlGroup = chunk[2]
             table.insert(newVirtText, { chunkText, hlGroup })
             chunkWidth = vim.fn.strdisplaywidth(chunkText)
-            -- str width returned from truncate() may less than 2nd argument, need padding
+            -- string width returned from truncate() may be less than 2nd argument, need padding
             if curWidth + chunkWidth < targetWidth then
               suffix = suffix .. (" "):rep(targetWidth - curWidth - chunkWidth)
             end
@@ -131,7 +131,7 @@ return {
             "marker",
           },
           -- json = { "array" },
-          -- markdown = {}, -- avoid everything becoming folded
+          -- markdown = {}, -- prevent everything from being folded
           -- toml = {},
           gitcommit = {},
         },

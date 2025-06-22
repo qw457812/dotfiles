@@ -70,8 +70,8 @@ return {
       end
       -- do not delay `v_c`
       operators.make_mappings("exchange", { textobject = "cx", line = "cxx", selection = "X" }) -- https://github.com/tommcdo/vim-exchange#mappings
-      -- Do not set `multiply` mapping for line, since we use our own, as
-      -- multiply's transformation function only supports pre-duplication
+      -- Do not set `multiply` mapping for line since we use our own.
+      -- The multiply's transformation function only supports pre-duplication
       -- changes, which prevents us from doing post-duplication cursor
       -- movements.
       operators.make_mappings("multiply", { textobject = "sd", line = "", selection = "sd" })

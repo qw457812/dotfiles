@@ -95,7 +95,7 @@ time nvim -c exit
 ## TODO
 
 - [x] Check out the great [:h lua-guide](https://neovim.io/doc/user/lua-guide.html#lua-guide).
-- [ ] Map `gd` to both lsp_definition and lsp_references like vscode and idea, maybe give `gr` to ReplaceWithRegister.
+- [ ] Map `gd` to both lsp_definition and lsp_references like VSCode and IntelliJ IDEA, maybe give `gr` to ReplaceWithRegister.
 
   ```lua
   {
