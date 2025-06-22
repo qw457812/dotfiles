@@ -11,9 +11,9 @@ return {
     cmd = "Aider",
     keys = {
       { toggle_key, "<cmd>Aider toggle<cr>", desc = "Open (Aider)" },
-      { "<leader>a=", "<cmd>Aider add<cr>", desc = "Add File (Aider)" },
-      { "<leader>a-", "<cmd>Aider drop<cr>", desc = "Drop File (Aider)" },
-      { "<leader>a+", "<cmd>Aider add readonly<cr>", desc = "Add Read-Only File (Aider)" },
+      { "<leader>ad=", "<cmd>Aider add<cr>", desc = "Add File" },
+      { "<leader>ad-", "<cmd>Aider drop<cr>", desc = "Drop File" },
+      { "<leader>ad+", "<cmd>Aider add readonly<cr>", desc = "Add Read-Only File" },
       { "<leader>adi", "<cmd>Aider send<cr>", desc = "Send", mode = { "n", "v" } },
       { "<leader>ad/", "<cmd>Aider command<cr>", desc = "Commands" },
       { "<leader>adb", "<cmd>Aider buffer<cr>", desc = "Send Buffer" },
@@ -139,9 +139,9 @@ return {
         },
         window = {
           mappings = {
-            ["="] = { "nvim_aider_add", desc = "add to aider" },
-            ["-"] = { "nvim_aider_drop", desc = "drop from aider" },
-            ["+"] = { "nvim_aider_add_read_only", desc = "add as read-only to aider" },
+            ["<localleader>="] = { "nvim_aider_add", desc = "Add (Aider)" },
+            ["<localleader>-"] = { "nvim_aider_drop", desc = "Drop (Aider)" },
+            ["<localleader>+"] = { "nvim_aider_add_read_only", desc = "Add As Read-only (Aider)" },
           },
         },
       },
