@@ -68,12 +68,12 @@ return {
           -- use_custom_command = {
           --   "bash",
           --   "-c",
-          --   -- "echo '$DIFF' | delta --file-style omit --hunk-header-style omit --paging never", -- can't scroll, see hack below
+          --   -- "echo '$DIFF' | delta --file-style omit --hunk-header-style omit --paging never", -- can't scroll with this, see hack below
           --   "echo '$DIFF' | delta --file-style omit --hunk-header-style omit --side-by-side",
           -- },
           layout_strategy = "vertical",
           layout_config = {
-            preview_cutoff = 1, -- preview should always show
+            preview_cutoff = 1, -- preview should always be shown
             vertical = {
               width = function(_, max_columns, _)
                 return vim.g.user_is_termux and max_columns or math.floor(max_columns * 0.9)
@@ -142,7 +142,7 @@ return {
       -- NOTE:
       -- 1. The `setup` and `load_extension` below can be skipped, but tab completions `:Telescope |<tab>` will not be available right away.
       --    https://github.com/nvim-telescope/telescope.nvim/blob/10b8a82b042caf50b78e619d92caf0910211973d/README.md?plain=1#L598
-      -- 2. Seems to be that `load_extension` needs to be called after the `setup`.
+      -- 2. It seems that `load_extension` needs to be called after the `setup`.
       --    https://github.com/LazyVim/LazyVim/issues/283#issuecomment-1433352997
       -- 3. The reason of using `opts` function instead of `config` function:
       --    If you have multiple specs for the same plugin, then all `opts` will be evaluated, but only the last `config`.

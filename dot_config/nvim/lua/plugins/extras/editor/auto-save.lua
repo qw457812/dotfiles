@@ -1,5 +1,5 @@
 if lazyvim_docs then
-  -- condition of auto-save.nvim
+  -- condition for auto-save.nvim
   vim.g.user_auto_save = false
 end
 
