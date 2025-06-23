@@ -205,6 +205,7 @@ abbr zj zellij
 abbr py python3
 
 if type -q claude
+    alias claude "env -u https_proxy -u http_proxy -u all_proxy command claude"
     abbr cl claude
     abbr clc "claude --continue"
     abbr clr "claude --resume"
