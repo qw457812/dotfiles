@@ -2,6 +2,7 @@ symlinks/
 backup/
 README.md
 CLAUDE.md
+AGENTS.md
 {{ if ne .chezmoi.os "darwin" }}
 Library/
 .hammerspoon/
