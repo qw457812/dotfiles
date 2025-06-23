@@ -129,8 +129,8 @@ return {
     },
     cmd = "ClaudeCode",
     keys = {
-      -- stylua: ignore
-      { H.toggle_key, function() vim.cmd(H.is_cc() and "ClaudeCode" or "ClaudeCodeFocus") end, desc = "Claude Code" },
+      -- { H.toggle_key, function() vim.cmd(H.is_cc() and "ClaudeCode" or "ClaudeCodeFocus") end, desc = "Claude Code" }, -- same behavior as `:ClaudeCodeFocus`
+      { H.toggle_key, "<cmd>ClaudeCodeFocus<cr>", desc = "Claude Code", mode = { "n", "x" } },
       { "<leader>ar", "<cmd>ClaudeCode --resume<cr>", desc = "Resume (Claude)" },
       { "<leader>a.", "<cmd>ClaudeCode --continue<cr>", desc = "Continue (Claude)" },
       {
