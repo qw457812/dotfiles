@@ -205,7 +205,6 @@ abbr zj zellij
 abbr py python3
 
 if type -q claude
-    alias claude "env -u https_proxy -u http_proxy -u all_proxy command claude"
     abbr cl claude
     abbr clc "claude --continue"
     abbr clr "claude --resume"
@@ -256,6 +255,7 @@ if set -q TERMUX_VERSION
         tmux attach || tmux
     end
 else
+    alias claude "env -u https_proxy -u http_proxy -u all_proxy command claude"
     alias vless "nvim -u $(brew --prefix)/share/nvim/runtime/macros/less.vim"
 
     if status is-interactive; or set -q NEOVIDE_FRAME
