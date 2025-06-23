@@ -6,8 +6,24 @@ function svld
     end
 end
 
+# @fish-lsp-disable-next-line 4004
 function __complete_svld
-    svn log -q -l 15 | grep '^r' | cut -d' ' -f1
+    # svn log -q -l 9 | grep '^r' | cut -d' ' -f1
+    svn log -l 9 | awk '
+        /^r[0-9]+/ {
+            rev = $1;
+            sub(/^r/, "", rev);
+            msg = "";
+        }
+        /^[^-r]/ && NF > 0 && rev && !msg {
+            msg = $0;
+        }
+        /^------------------------------------------------------------------------$/ && rev {
+            if (msg == "") msg = "<empty message>";
+            print rev "\t" msg;
+            rev = "";
+            msg = "";
+        }'
 end
 
 complete -c svld -f -k -a "(__complete_svld)"
