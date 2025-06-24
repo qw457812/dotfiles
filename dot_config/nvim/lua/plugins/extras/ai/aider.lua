@@ -33,8 +33,7 @@ return {
         -- }),
         auto_reload = true,
         ---@module "snacks"
-        ---@type snacks.win.Config
-        ---@diagnostic disable-next-line: missing-fields
+        ---@type snacks.win.Config|{}
         win = {
           position = "float",
           wo = {

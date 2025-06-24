@@ -256,10 +256,11 @@ if set -q TERMUX_VERSION
         tmux attach || tmux
     end
 else
-    alias claude "env -u https_proxy -u http_proxy -u all_proxy command claude"
     alias vless "nvim -u $(brew --prefix)/share/nvim/runtime/macros/less.vim"
 
-    if status is-interactive; or set -q NEOVIDE_FRAME
-        term_proxy_on
-    end
+    # # using TUN for now
+    # if status is-interactive; or set -q NEOVIDE_FRAME
+    #     alias claude "env -u https_proxy -u http_proxy -u all_proxy command claude"
+    #     term_proxy_on
+    # end
 end
