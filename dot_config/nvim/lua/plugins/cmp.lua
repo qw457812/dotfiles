@@ -557,7 +557,15 @@ return {
       {
         "saghen/blink.cmp",
         optional = true,
-        dependencies = { "marcoSven/blink-cmp-yanky", shell_command_editor = true },
+        dependencies = {
+          "marcoSven/blink-cmp-yanky",
+          shell_command_editor = true,
+          init = function()
+            LazyVim.on_load("mini.icons", function()
+              require("snacks.util").set_hl({ BlinkCmpKindYank = "MiniIconsYellow" })
+            end)
+          end,
+        },
         ---@type blink.cmp.Config
         opts = {
           sources = {
@@ -568,6 +576,9 @@ return {
                 min_keyword_length = 3,
                 max_items = 1,
                 score_offset = -10,
+                opts = {
+                  kind_icon = "󰅍",
+                },
               },
             },
           },
@@ -600,6 +611,7 @@ return {
     },
   },
 
+  -- TODO: https://github.com/archie-judd/blink-cmp-words
   {
     "saghen/blink.cmp",
     optional = true,
