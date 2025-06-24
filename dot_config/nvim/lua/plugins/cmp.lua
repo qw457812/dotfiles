@@ -345,52 +345,6 @@ return {
     end,
   },
 
-  -- HACK: command-line window
-  {
-    "saghen/blink.cmp",
-    optional = true,
-    opts = function(_, opts)
-      ---@type blink.cmp.Config
-      local o = {
-        sources = {
-          per_filetype = {
-            -- -- https://github.com/Saghen/blink.cmp/pull/1843
-            -- vim = function()
-            --   return vim.fn.win_gettype() == "command" and { "cmdline" } or {}
-            -- end,
-            vim = { "cmdline" }, -- I don't need to write vimscript anyway
-          },
-          providers = {
-            cmdline = {
-              override = {
-                enabled = function(self)
-                  return self:enabled() or vim.fn.getcmdwintype() == ":"
-                end,
-              },
-              transform_items = function(ctx, items)
-                if vim.fn.getcmdwintype() == ":" then
-                  for _, item in ipairs(items) do
-                    local text_edit = item.textEdit
-                    if text_edit then
-                      -- see: https://github.com/Saghen/blink.cmp/blob/9c5d82370cf2e5f28c27437f4a88d315ace1844f/lua/blink/cmp/sources/cmdline/init.lua#L232-L245
-                      text_edit.insert.start.line = ctx.cursor[1] - 1
-                      text_edit.insert["end"].line = ctx.cursor[1] - 1
-                      text_edit.replace.start.line = ctx.cursor[1] - 1
-                      text_edit.replace["end"].line = ctx.cursor[1] - 1
-                      text_edit.insert["end"].character = text_edit.replace["end"].character
-                    end
-                  end
-                end
-                return items
-              end,
-            },
-          },
-        },
-      }
-      return U.extend_tbl(opts, o)
-    end,
-  },
-
   -- snippet
   {
     "LazyVim/LazyVim",
