@@ -288,10 +288,17 @@ return {
             ["<C-d>"] = { H.actions.scroll_list_down, "fallback" },
             ["<C-space>"] = { "show", "hide" },
           },
-          -- completion = {
-          --   menu = { auto_show = true },
-          --   ghost_text = { enabled = false },
-          -- },
+          completion = {
+            -- menu = { auto_show = true },
+            -- ghost_text = { enabled = false },
+            ghost_text = {
+              enabled = function()
+                -- 1. enable ghost_text in cmdwin
+                -- 2. enable ghost_text in cmdline when the cursor is at the end of cmdline, in favor of the `<>` pair of mini.pairs and the left arrow key
+                return vim.fn.win_gettype() == "command" or vim.fn.getcmdpos() == #vim.fn.getcmdline() + 1
+              end,
+            },
+          },
         },
         completion = {
           ghost_text = {
