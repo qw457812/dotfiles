@@ -31,6 +31,7 @@
     "lazyvim.plugins.extras.util.dot",
     "lazyvim.plugins.extras.util.mini-hipatterns",
     "plugins.extras.ai.avante",
+    "plugins.extras.ai.claude-code",
     "plugins.extras.ai.codecompanion",
     "plugins.extras.ai.copilot-lsp",
     "plugins.extras.editor.mini-operators",
