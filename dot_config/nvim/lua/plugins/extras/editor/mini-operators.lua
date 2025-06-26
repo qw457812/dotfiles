@@ -83,7 +83,7 @@ return {
     optional = true,
     keys = {
       { "s", mode = { "n", "x", "o" }, false },
-      { "S", mode = { "n", "o", "x" }, false },
+      { "S", mode = { "n", "x", "o" }, false },
     },
     specs = {
       {
