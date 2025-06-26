@@ -48,11 +48,6 @@ return {
         "saghen/blink.cmp",
         optional = true,
         opts = function(_, opts)
-          if not vim.g.lazyvim_blink_main then
-            -- TODO: wait for https://github.com/Saghen/blink.cmp/commit/d59d55de59a0a13709b1dc0cbac23f80d4c2c459 to be released
-            return
-          end
-
           vim.api.nvim_create_autocmd("User", {
             pattern = "BlinkCmpMenuOpen",
             callback = function()
