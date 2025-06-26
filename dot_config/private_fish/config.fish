@@ -159,6 +159,11 @@ abbr grbum 'git rebase upstream/(git_main_branch)'
 abbr grv "git remote --verbose"
 abbr gsb "git status --short --branch"
 abbr gss "git status --short"
+abbr gwt 'git worktree'
+abbr gwta 'git worktree add'
+abbr gwtls 'git worktree list'
+abbr gwtmv 'git worktree move'
+abbr gwtrm 'git worktree remove'
 
 # SVN
 abbr sva 'svn add'
