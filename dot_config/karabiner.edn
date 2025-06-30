@@ -1729,7 +1729,7 @@
            [:!Tj :!COdown_arrow] ; select next unread chat message
            ]}
 
-  {:des   "WPSOffice: paste without formatting"
+  #_{:des   "WPSOffice: paste without formatting"
    :rules [:WPSOffice
            [:!Cv :!COSv] ; 粘贴剪贴板内容并匹配周围文本的格式
            [:!Qv :!COSv]
@@ -1833,7 +1833,7 @@
            [:##left_shift :delete_or_backspace :!Preview] ; see lshift-cmd-mode simlayer above
            [:##left_shift :!Cw :Preview] ; see "Preview: doomemacs like keybindings" above
            [:##right_shift :right_command nil {:alone :escape}]
-           [:!Qv :!COSv :WPSOffice] ; see "WPSOffice: paste without formatting" above
+           ;; [:!Qv :!COSv :WPSOffice] ; see "WPSOffice: paste without formatting" above
            [:!Qv [:left_command :!Sinsert] :CitrixViewer] ; for MTPuTTY, add left_command to prevent switching IME with cmd+shift
            ;; TODO: better way to cmd -> ctrl for RuijieWorkSpace
            [:!Qc :!Tc :RuijieWorkSpace] ; copy
