@@ -26,7 +26,7 @@ function H.chezmoi_list_files(opts)
   return ret
 end
 
-function H.pick_chezmoi()
+function H.pick_find_chezmoi()
   if LazyVim.pick.picker.name == "telescope" then
     require("telescope").extensions.chezmoi.find_files()
   elseif LazyVim.pick.picker.name == "fzf" then
@@ -59,7 +59,7 @@ function H.pick_chezmoi()
   end
 end
 
-function H.pick_chezmoi_all()
+function H.pick_find_chezmoi_all()
   if LazyVim.pick.picker.name == "snacks" then
     Snacks.picker.files({
       cwd = U.path.CHEZMOI,
@@ -73,12 +73,26 @@ function H.pick_chezmoi_all()
   end
 end
 
+function H.pick_search_chezmoi_all()
+  if LazyVim.pick.picker.name == "snacks" then
+    Snacks.picker.grep({
+      dirs = { U.path.CHEZMOI },
+      hidden = true,
+      -- ignored = true,
+      follow = true,
+      title = "Chezmoi",
+    })
+  else
+    LazyVim.pick("live_grep", { cwd = U.path.CHEZMOI })()
+  end
+end
+
 function H.chezmoi_list_config_files()
   return H.chezmoi_list_files({ targets = vim.fn.stdpath("config"), path_style_absolute = true })
 end
 
 --- pick nvim config
-function H.pick_config()
+function H.pick_find_config()
   local managed_config_files = H.chezmoi_list_config_files()
   if vim.tbl_isempty(managed_config_files) then
     LazyVim.pick.config_files()()
@@ -262,9 +276,10 @@ return {
     cmd = "ChezmoiEdit",
     keys = {
       { "<leader>sz", false },
-      { "<leader>f.", H.pick_chezmoi, desc = "Chezmoi Source Dotfiles" },
-      { "<leader>f`", H.pick_chezmoi_all, desc = "Chezmoi Files (All)" },
-      { "<leader>fc", H.pick_config, desc = "Config File" },
+      { "<leader>f.", H.pick_find_chezmoi, desc = "Chezmoi Source Dotfiles" },
+      { "<leader>f`", H.pick_find_chezmoi_all, desc = "Chezmoi Files (All)" },
+      { "<leader>s`", H.pick_search_chezmoi_all, desc = "Chezmoi Files (All)" },
+      { "<leader>fc", H.pick_find_config, desc = "Config File" },
     },
     init = function()
       U.on_very_very_lazy(H.autocmd_chezmoi_add)
@@ -443,7 +458,7 @@ return {
       for i, key in ipairs(keys) do
         if key.key == "c" then
           config_idx = i
-          key.action = H.pick_config
+          key.action = H.pick_find_config
           break
         end
       end
@@ -452,7 +467,7 @@ return {
       table.insert(
         keys,
         (config_idx or #keys) + 1,
-        { action = H.pick_chezmoi, desc = "Chezmoi", icon = "󰠦 ", key = "." }
+        { action = H.pick_find_chezmoi, desc = "Chezmoi", icon = "󰠦 ", key = "." }
       )
     end,
   },

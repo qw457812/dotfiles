@@ -1,6 +1,5 @@
 {
   "selectedAuthType": "oauth-personal",
-  "theme": "Default",
   "usageStatisticsEnabled": false,
   "contextFileName": [
     "CLAUDE.md",

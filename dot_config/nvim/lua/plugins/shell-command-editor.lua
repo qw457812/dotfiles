@@ -58,7 +58,7 @@ return {
         dashboard = { enabled = false },
         scroll = { enabled = false },
         image = { enabled = false },
-        words = { enabled = false }, -- TODO: fish-lsp
+        -- words = { enabled = false }, -- fish-lsp
       }
       local notify = vim.notify
       require("snacks").setup(vim.tbl_deep_extend("force", opts, o))
