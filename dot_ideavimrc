@@ -287,8 +287,9 @@ nnoremap <C-l> <C-w>l
 " nmap <C-Left> <Action>(DecrementWindowWidth)
 " nmap <C-Right> <Action>(IncrementWindowWidth)
 
-map <C-/> <Action>(ActivateTerminalToolWindow)
+map <C-CR> <Action>(ActivateTerminalToolWindow)
 map <C-space> <Action>(ActivateTerminalToolWindow)
+map <C-,> <Action>(com.anthropic.code.plugin.actions.OpenClaudeInTerminalAction)
 
 " Have j and k navigate visual lines rather than logical ones
 " Notice: just for fix ideavim bug ---> when meet folded @SuppressWarnings("unchecked") like /unchecked/, jjj... will not walk through (but gj not work well when soft-wrap is on)
