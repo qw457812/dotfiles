@@ -1494,6 +1494,7 @@
            [:!Qgrave_accent_and_tilde [:open "/Applications/YesPlayMusic.app"]]
            [:!Qcomma [:open "/System/Applications/System Settings.app"]] ; cmd+, for setting
            [:!Qperiod [:open "/System/Applications/Launchpad.app"]] ; 启动台
+           [:!Qslash [:open "/Applications/qutebrowser.app"]]
            [:!Qopen_bracket [:open "/Applications/Hillstone Secure Connect.app"]]
            [:!Qclose_bracket [[:open "/Applications/企业微信.app/Contents/Frameworks/wwmapp.app"] :same_wind_app] :!WeWork-Meeting] ; 企业微信•会议
            [:!Qclose_bracket :same_wind_app :WeWork-Meeting]
@@ -1965,6 +1966,7 @@
            [:!Wcomma [:left_command [:open "/System/Applications/System Settings.app"]]] ; cmd+, for setting
            [:!Wperiod [:left_command [:open "/System/Applications/Launchpad.app"]]] ; 启动台
            ; [:!Wslash [:open "/Applications/WhatPulse/WhatPulse.app"]]
+           [:!Wslash [:left_command [:open "/Applications/qutebrowser.app"]]]
            [:!Wopen_bracket [:left_command [:open "/Applications/Hillstone Secure Connect.app"]]]
            [:!Wclose_bracket [:left_command [:open "/Applications/企业微信.app/Contents/Frameworks/wwmapp.app"] :same_wind_app] :!WeWork-Meeting] ; 企业微信•会议
            [:!Wclose_bracket :same_wind_app :WeWork-Meeting]

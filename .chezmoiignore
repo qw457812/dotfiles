@@ -17,6 +17,7 @@ Library/
 .termux/
 {{ else }}
 .ideavimrc
+.qutebrowser/
 .config/alacritty/
 .config/kitty/
 .config/wezterm/
