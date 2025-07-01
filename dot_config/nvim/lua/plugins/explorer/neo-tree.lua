@@ -680,9 +680,13 @@ return {
             fuzzy_finder_mappings = {
               ["<C-j>"] = "move_cursor_down",
               ["<C-k>"] = "move_cursor_up",
-              ["<esc>"] = function()
-                vim.cmd.stopinsert()
-              end,
+              ["<Esc>"] = "noop",
+              ["<CR>"] = "close_keep_filter",
+              {
+                n = {
+                  ["<CR>"] = "close_keep_filter",
+                },
+              },
             },
           },
         },
