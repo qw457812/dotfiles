@@ -83,7 +83,7 @@ function M.is_floating_win(win, opts)
       and (vim.w[win].treesitter_context or vim.w[win].treesitter_context_line_number)
 
     local is_snacks_explorer = vim.iter(Snacks.picker.get({ source = "explorer" })):any(function(picker)
-      return vim.iter(picker.layout.wins or {}):any(function(w)
+      return vim.iter(picker.layout.wins or {}):any(function(_, w)
         return w.win == win
       end)
     end)
@@ -117,7 +117,7 @@ function M.is_edgy_win(win)
   end
   win = win or 0
   win = win == 0 and vim.api.nvim_get_current_win() or win
-  return vim.iter(require("edgy.config").layout):any(function(edgebar)
+  return vim.iter(require("edgy.config").layout):any(function(_, edgebar)
     return vim.iter(edgebar.wins):any(function(w)
       return w.win == win
     end)
