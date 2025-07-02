@@ -27,6 +27,7 @@ c.downloads.location.prompt = False
 c.window.hide_decoration = True
 c.colors.webpage.darkmode.enabled = True
 
+c.content.javascript.clipboard = "access"
 c.auto_save.session = True
 c.keyhint.delay = 300  # which key
 # c.scrolling.smooth = True
@@ -42,3 +43,31 @@ c.editor.command = [
     "--cmd",
     "lua vim.g.shell_command_editor = true",
 ]
+
+config.bind("gt", "tab-focus")
+config.bind("gT", "tab-prev")
+
+config.bind("<Backspace>", "tab-close")
+config.bind("<Space><Backspace>", "quit")
+
+config.bind("<Space>,", "set-cmd-text -s :tab-select")
+config.bind("<Space>`", "tab-focus last")
+config.bind("<Space>bb", "tab-focus last")
+config.bind("<Space>bd", "tab-close")
+config.bind("<Space>bp", "tab-pin")
+config.bind("<Space>bo", "tab-only")
+config.bind("<Space>bH", "tab-focus 1")
+config.bind("<Space>bL", "tab-focus -1")
+
+config.bind("<Space>qq", "quit")
+config.bind("<Space>qr", "restart")
+
+config.bind("<Space>1", "tab-focus 1")
+config.bind("<Space>2", "tab-focus 2")
+config.bind("<Space>3", "tab-focus 3")
+config.bind("<Space>4", "tab-focus 4")
+config.bind("<Space>5", "tab-focus 5")
+config.bind("<Space>6", "tab-focus 6")
+config.bind("<Space>7", "tab-focus 7")
+config.bind("<Space>8", "tab-focus 8")
+config.bind("<Space>9", "tab-focus 9")
