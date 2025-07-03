@@ -72,6 +72,9 @@ yabai -m rule --add app="^Raycast$" manage=off
 yabai -m rule --add app="^IntelliJ IDEA$" title="^(Settings|Move|Preferences|Breakpoints|Select Methods to Implement|Harpoon|Evaluate)$" manage=off
 # yabai -m rule --add app="^KeePassXC$" title="^(Unlock Database - )" manage=off
 
+# for `c.window.hide_decoration = True` in `~/.qutebrowser/config.py`, see: https://github.com/qutebrowser/qutebrowser/issues/4067#issuecomment-1938747376
+yabai -m rule --add app="^qutebrowser$" title!="^$" role="AXWindow" subrole="AXDialog" manage=on
+
 # TODO not work if: open Filder (no visible window of Filder before) -> cmd+f -> cmd+w -> cmd+w
 # If no window is focused after a window is destroyed or minimized, focus the window under the cursor
 # useful when close Finder.app's last window
