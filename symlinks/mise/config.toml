@@ -1,0 +1,9 @@
+[tools]
+java = "latest"
+python = "latest"
+scala = "latest"
+
+[settings]
+idiomatic_version_file_enable_tools = ["python"]
+experimental = true
+python.uv_venv_auto = true
