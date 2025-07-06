@@ -44,6 +44,19 @@ c.editor.command = [
     "lua vim.g.shell_command_editor = true",
 ]
 
+config.bind("d", "scroll-page 0 0.5")
+config.bind("u", "scroll-page 0 -0.5")
+config.bind("x", "tab-close")
+config.bind("X", "undo")
+config.bind("h", "back")
+config.bind("l", "forward")
+config.bind("H", "cmd-run-with-count 2 scroll left")
+config.bind("L", "cmd-run-with-count 2 scroll right")
+config.bind("j", "cmd-run-with-count 2 scroll down")
+config.bind("k", "cmd-run-with-count 2 scroll up")
+config.bind("gn", "navigate next")
+config.bind("gp", "navigate prev")
+
 config.bind("gt", "tab-focus")
 config.bind("gT", "tab-prev")
 
