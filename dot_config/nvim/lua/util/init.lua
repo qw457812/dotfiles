@@ -125,16 +125,17 @@ function M.is_edgy_win(win)
 end
 
 ---@param mode? string
----@return boolean
+---@return boolean, string
 function M.is_visual_mode(mode)
-  mode = (mode or vim.fn.mode()):sub(1, 1)
-  return vim.list_contains({ "v", "V", vim.keycode("<C-v>") }, mode)
+  mode = mode or vim.fn.mode()
+  return vim.list_contains({ "v", "V", vim.keycode("<C-v>") }, mode:sub(1, 1)), mode
 end
 
-function M.stop_visual_mode()
-  local mode = vim.fn.mode():sub(1, 1) ---@type string
+---@param mode? string
+function M.stop_visual_mode(mode)
+  mode = mode or vim.fn.mode()
   if M.is_visual_mode(mode) then
-    vim.cmd("normal! " .. mode)
+    vim.cmd("normal! " .. mode:sub(1, 1))
   end
 end
 
@@ -153,7 +154,7 @@ function M.get_visual_selection_lines(opts)
   if M.is_visual_mode(mode) then
     lines = vim.fn.getregion(vim.fn.getpos("v"), vim.fn.getpos("."), { type = mode })
     if opts.stop_visual_mode ~= false then
-      M.stop_visual_mode()
+      M.stop_visual_mode(mode)
     end
   elseif opts.strict ~= true then
     lines = vim.fn.getregion(vim.fn.getpos("'<"), vim.fn.getpos("'>"), { type = vim.fn.visualmode() })
@@ -166,10 +167,9 @@ end
 ---@return string?
 function M.get_visual_selection(opts)
   opts = opts or {}
-  local mode = vim.fn.mode()
   local selection
   -- prefer register workaround to trigger `vim.hl.on_yank()`
-  if M.is_visual_mode(mode) then
+  if M.is_visual_mode() then
     local cache_z_reg = vim.fn.getreginfo("z")
     vim.cmd.normal('"zy')
     if opts.stop_visual_mode == false then
