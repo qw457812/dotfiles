@@ -60,20 +60,21 @@ return {
         ["<esc>"] = U.rime_ls.cmp.esc_clear(),
         ["<cr>"] = U.rime_ls.cmp.enter_commit_code(),
       },
-      sources = {
-        providers = {
-          lsp = {
-            -- copied from: https://github.com/saghen/blink.cmp/blob/035e1bae395b2b34c6cf0234f4270bf9481905b4/lua/blink/cmp/config/sources.lua#L56-L62
-            transform_items = function(_, items)
-              -- filter out text items, since we have the buffer source
-              ---@param item blink.cmp.CompletionItem
-              return vim.tbl_filter(function(item)
-                return item.kind ~= require("blink.cmp.types").CompletionItemKind.Text or U.rime_ls.cmp.is_rime(item)
-              end, items)
-            end,
-          },
-        },
-      },
+      -- sources = {
+      --   providers = {
+      --     lsp = {
+      --       -- copied from: https://github.com/saghen/blink.cmp/blob/035e1bae395b2b34c6cf0234f4270bf9481905b4/lua/blink/cmp/config/sources.lua#L56-L62
+      --       -- TODO: not needed since https://github.com/Saghen/blink.cmp/commit/2f2ebc5e007bb72d98dd13e1268af301533acca1
+      --       transform_items = function(_, items)
+      --         -- filter out text items, since we have the buffer source
+      --         ---@param item blink.cmp.CompletionItem
+      --         return vim.tbl_filter(function(item)
+      --           return item.kind ~= require("blink.cmp.types").CompletionItemKind.Text or U.rime_ls.cmp.is_rime(item)
+      --         end, items)
+      --       end,
+      --     },
+      --   },
+      -- },
     },
   },
 
