@@ -13,5 +13,7 @@
         "@upstash/context7-mcp"
       ]
     }
-  }
+  },
+  "theme": "GitHub",
+  "preferredEditor": "neovim"
 }

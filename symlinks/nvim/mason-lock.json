@@ -1,7 +1,7 @@
 {
   "basedpyright": "1.29.5",
   "bash-language-server": "5.6.0",
-  "copilot-language-server": "1.339.0",
+  "copilot-language-server": "1.341.0",
   "debugpy": "1.8.14",
   "docker-compose-language-service": "0.4.0",
   "dockerfile-language-server": "0.14.0",
@@ -24,7 +24,7 @@
   "ruff": "0.12.2",
   "selene": "0.28.0",
   "shellcheck": "v0.10.0",
-  "shfmt": "v3.11.0",
+  "shfmt": "v3.12.0",
   "sqlfluff": "3.4.1",
   "stylua": "v2.1.0",
   "taplo": "0.10.0",

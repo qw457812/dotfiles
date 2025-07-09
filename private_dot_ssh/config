@@ -1,0 +1,6 @@
+Host *
+  ForwardAgent yes
+  # AddKeysToAgent yes
+  UseKeychain yes
+
+Include config.local

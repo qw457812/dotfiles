@@ -271,7 +271,7 @@ function M.clear_ui_esc(opts)
   end
 
   local something_done = false
-  local is_cmdwin = vim.fn.getcmdwintype() ~= ""
+  local is_cmdwin = vim.fn.getcmdwintype() ~= "" -- alternate: vim.fn.win_gettype() == "command"
 
   if vim.v.hlsearch == 1 or LazyVim.cmp.actions.snippet_active() or has_notif() then
     dismiss_notif()
