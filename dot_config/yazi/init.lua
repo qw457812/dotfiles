@@ -31,6 +31,7 @@ require("bookmarks"):setup({
   persist = "all", -- none(default), all, vim
   desc_format = "full", -- full(default), parent
   file_pick_mode = "parent", -- hover(default), parent
+  show_keys = true,
   notify = { enable = true },
 })
 

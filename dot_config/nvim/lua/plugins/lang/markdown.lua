@@ -50,11 +50,11 @@ return {
     optional = true,
     ft = "gitcommit",
     opts = {
-      heading = {
-        icons = function(ctx)
-          return ("%s%s "):format(table.concat(ctx.sections, "."), #ctx.sections > 1 and "" or ".")
-        end,
-      },
+      -- heading = {
+      --   icons = function(ctx)
+      --     return ("%s%s "):format(table.concat(ctx.sections, "."), #ctx.sections > 1 and "" or ".")
+      --   end,
+      -- },
       code = vim.tbl_deep_extend(
         "force",
         {
