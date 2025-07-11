@@ -323,9 +323,19 @@ return {
         group = augroup,
         pattern = "neo-tree",
         callback = function(event)
+          -- HACK: sometimes <bs> is mapped to `navigate_up` instead of `close_window`
           vim.defer_fn(function()
-            -- HACK: sometimes `<bs>` is mapped to `navigate_up` instead of `close_window`
-            vim.keymap.set("n", close_key, "q", { buffer = event.buf, remap = true, desc = "Close (NeoTree)" })
+            vim.keymap.set("n", close_key, function()
+              -- HACK: make <bs> close neotree even if vim.g.user_explorer_auto_open is true
+              if vim.g.user_explorer_auto_open then
+                local ei = vim.o.eventignore
+                vim.o.eventignore = "WinResized" -- for augroup: resize_neotree_auto_open_or_close
+                vim.schedule(function()
+                  vim.o.eventignore = ei
+                end)
+              end
+              return "q"
+            end, { buffer = event.buf, remap = true, expr = true, desc = "Close (NeoTree)" })
           end, 100)
         end,
       })

@@ -126,10 +126,30 @@ return {
       -- * session restored with dead windows if nvim exited with neotree open (somehow related to `close_if_last_window = true`), see: https://github.com/yetone/avante.nvim/pull/1803
       -- * `ZZ`/`:wq` won't exit nvim when neotree is visible (maybe related to `vim.g.user_explorer_auto_open = true`)
       -- alternative to `close_if_last_window = true`
+      -- see also: https://github.com/nvim-tree/nvim-tree.lua/wiki/Auto-Close#marvinth01
       vim.api.nvim_create_autocmd("QuitPre", {
         group = vim.api.nvim_create_augroup("close_neotree_before_quit", { clear = true }),
-        callback = function()
-          if is_visible() then
+        callback = function(ev)
+          if
+            vim.bo[ev.buf].filetype == "neo-tree" -- in favor of vim.g.user_exit_key in neotree buffer
+            or U.is_floating_win(vim.fn.bufwinid(ev.buf))
+          then
+            return
+          end
+
+          local tree_wins, floating_wins = {}, {}
+          local wins = vim.api.nvim_tabpage_list_wins(0)
+          for _, w in ipairs(wins) do
+            if vim.bo[vim.api.nvim_win_get_buf(w)].filetype == "neo-tree" then
+              table.insert(tree_wins, w)
+            elseif U.is_floating_win(w) then
+              table.insert(floating_wins, w)
+            end
+          end
+          if
+            #wins - #floating_wins - #tree_wins == 1 -- should exit
+            and #tree_wins > 0 -- neotree is visible
+          then
             require("neo-tree.command").execute({ action = "close" })
           end
         end,
