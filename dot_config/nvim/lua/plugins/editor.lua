@@ -383,7 +383,7 @@ return {
           opts.large_file_overrides = nil
           opts.providers = { "treesitter", "regex" }
           opts.should_enable = function(buf)
-            return not Snacks.words.is_enabled(buf)
+            return not (U.is_bigfile(buf) or Snacks.words.is_enabled(buf))
           end
 
           LazyVim.on_load("vim-illuminate", function()
