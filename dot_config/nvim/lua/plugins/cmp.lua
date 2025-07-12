@@ -572,40 +572,75 @@ return {
     },
   },
 
-  -- TODO: https://github.com/archie-judd/blink-cmp-words
+  -- {
+  --   "saghen/blink.cmp",
+  --   optional = true,
+  --   dependencies = {
+  --     "Kaiser-Yang/blink-cmp-dictionary",
+  --     shell_command_editor = true,
+  --     -- TODO: add dict downloading to build
+  --     init = function()
+  --       LazyVim.on_load("mini.icons", function()
+  --         require("snacks.util").set_hl({ BlinkCmpKindDict = "MiniIconsRed" })
+  --       end)
+  --     end,
+  --   },
+  --   ---@type blink.cmp.Config
+  --   opts = {
+  --     sources = {
+  --       default = { "dictionary" },
+  --       providers = {
+  --         dictionary = {
+  --           module = "blink-cmp-dictionary",
+  --           name = "Dict",
+  --           min_keyword_length = 3,
+  --           max_items = 1,
+  --           score_offset = -20,
+  --           ---@module 'blink-cmp-dictionary'
+  --           ---@type blink-cmp-dictionary.Options
+  --           opts = {
+  --             dictionary_files = {
+  --               -- aspell -d en_US dump master | aspell -l en expand | sed 's/\s\+/\n/g' > aspell_en.dict
+  --               vim.fn.stdpath("data") .. "/cmp-dictionary/dict/aspell_en.dict",
+  --               -- -- https://github.com/dwyl/english-words/blob/8179fe68775df3f553ef19520db065228e65d1d3/words_alpha.txt
+  --               -- vim.fn.stdpath("data") .. "/cmp-dictionary/dict/words_alpha.txt",
+  --             },
+  --           },
+  --         },
+  --       },
+  --     },
+  --   },
+  -- },
   {
     "saghen/blink.cmp",
     optional = true,
     dependencies = {
-      "Kaiser-Yang/blink-cmp-dictionary",
+      "archie-judd/blink-cmp-words",
       shell_command_editor = true,
-      -- TODO: add dict downloading to build
-      init = function()
-        LazyVim.on_load("mini.icons", function()
-          require("snacks.util").set_hl({ BlinkCmpKindDict = "MiniIconsRed" })
-        end)
-      end,
     },
-    ---@type blink.cmp.Config
     opts = {
       sources = {
-        default = { "dictionary" },
+        default = { "dictionary", "thesaurus" },
         providers = {
           dictionary = {
-            module = "blink-cmp-dictionary",
+            module = "blink-cmp-words.dictionary",
             name = "Dict",
             min_keyword_length = 3,
             max_items = 1,
-            score_offset = -20,
-            ---@module 'blink-cmp-dictionary'
-            ---@type blink-cmp-dictionary.Options
+            ---@module 'blink-cmp-words'
+            ---@type BlinkCmpWordsOpts|{}
             opts = {
-              dictionary_files = {
-                -- aspell -d en_US dump master | aspell -l en expand | sed 's/\s\+/\n/g' > aspell_en.dict
-                vim.fn.stdpath("data") .. "/cmp-dictionary/dict/aspell_en.dict",
-                -- -- https://github.com/dwyl/english-words/blob/8179fe68775df3f553ef19520db065228e65d1d3/words_alpha.txt
-                -- vim.fn.stdpath("data") .. "/cmp-dictionary/dict/words_alpha.txt",
-              },
+              score_offset = -10, -- actually is -20, see: https://github.com/archie-judd/blink-cmp-words/blob/f6190f584075476ee9abd5aa736ef9085c9b2694/lua/blink-cmp-words/source.lua#L171
+            },
+          },
+          thesaurus = {
+            module = "blink-cmp-words.thesaurus",
+            name = "Words",
+            min_keyword_length = 3,
+            max_items = 1,
+            ---@type BlinkCmpWordsOpts|{}
+            opts = {
+              score_offset = -10,
             },
           },
         },
@@ -649,6 +684,7 @@ return {
         "ripgrep",
         "blink_cmp_kitty",
         "dictionary",
+        "thesaurus",
         "spell",
         "yank",
       }
