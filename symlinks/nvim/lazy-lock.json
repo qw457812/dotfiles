@@ -52,6 +52,7 @@
   "layers.nvim": { "branch": "main", "commit": "ebbb386d7aea84a04bf7eab0873975b2e9d695a5" },
   "lazy.nvim": { "branch": "main", "commit": "6c3bda4aca61a13a9c63f1c1d1b16b9d3be90d7a" },
   "lazydev.nvim": { "branch": "main", "commit": "2367a6c0a01eb9edb0464731cc0fb61ed9ab9d2c" },
+  "leetcode.nvim": { "branch": "master", "commit": "74f2987292efbe0ba198a35d0ea412c5ae19d31c" },
   "live-rename.nvim": { "branch": "main", "commit": "78fcdb4072c6b1a8e909872f9a971b2f2b642d1e" },
   "log-highlight.nvim": { "branch": "main", "commit": "ad14bf52ef93d83a625ab22a1ed94405bcacbcf7" },
   "lua-console.nvim": { "branch": "main", "commit": "bdf40fdc2147d190688d5bfb6aa50d2b73418a64" },

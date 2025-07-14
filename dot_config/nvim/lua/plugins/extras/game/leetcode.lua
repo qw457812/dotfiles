@@ -1,25 +1,16 @@
 return {
-  -- https://github.com/AstroNvim/astrocommunity/blob/90ff9f23f98c4265b37091c6077744b48c19e324/lua/astrocommunity/game/leetcode-nvim/init.lua
-  -- https://github.com/AstroNvim/AstroNvim/blob/8fe477244430f91292d0f1a9c3e44ad787091707/lua/astronvim/utils/init.lua#L54
-  -- https://github.com/kawre/nvim/blob/e39d243759b5a18cf8eb86c9d761e8fb3e13dcad/lua/plugins/extras/leetcode.lua
-  -- https://github.com/search?q=repo%3Akawre%2Fnvim%20leetcode&type=code
-  -- https://github.com/ofseed/nvim/blob/338f7742db9739eb6fadfebaafcc5e6c7d316e8d/lua/plugins/tool/leetcode.lua#L29
-  -- https://github.com/m1dsolo/dotfiles/blob/c99eef4184a1afe0ab1c01b060d027e34ad0ea7f/.config/nvim/lua/plugins/leetcode-nvim.lua#L84
+  -- https://github.com/kawre/nvim/blob/07b398aa24287a2859d6eae24c2dbbb755dfca12/lua/plugins/extras/leetcode.lua
   {
     "kawre/leetcode.nvim",
     build = ":TSUpdate html",
     cmd = "Leet",
     dependencies = {
       { "MunifTanjim/nui.nvim" },
-      { "3rd/image.nvim", optional = true },
-      { "nvim-tree/nvim-web-devicons", optional = true },
       {
         "nvim-treesitter/nvim-treesitter",
-        optional = true,
-        opts = function(_, opts)
-          table.insert(opts.ensure_installed, "html")
-        end,
+        opts = { ensure_installed = { "html" } },
       },
+      { "3rd/image.nvim", optional = true },
     },
     -- or localleader
     keys = {
@@ -54,14 +45,6 @@ return {
         plugins = {
           non_standalone = true,
         },
-        injector = {
-          ["java"] = {
-            before = true, -- access default imports via `require("leetcode.config.imports")`
-          },
-          ["python3"] = {
-            before = true,
-          },
-        },
         hooks = {
           ["enter"] = function()
             -- vim.g.user_is_leetcode = true
@@ -88,8 +71,8 @@ return {
           },
           confirm = { "<CR>" },
 
-          reset_testcases = "R",
-          use_testcase = "U",
+          reset_testcases = "<localleader>r",
+          use_testcase = "<localleader>u",
           focus_testcases = "<C-h>",
           focus_result = "<C-l>",
         },
