@@ -268,4 +268,8 @@ else
     #     alias claude "env -u https_proxy -u http_proxy -u all_proxy command claude"
     #     term_proxy_on
     # end
+
+    # https://github.com/LLM-Red-Team/kimi-cc
+    export ANTHROPIC_BASE_URL=https://api.moonshot.cn/anthropic/
+    export ANTHROPIC_API_KEY=$MOONSHOT_API_KEY
 end

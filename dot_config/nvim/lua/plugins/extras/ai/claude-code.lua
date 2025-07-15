@@ -176,10 +176,10 @@ return {
       { "<M-space>", "<cmd>ClaudeCodeDiffAccept<cr>", desc = "Accept Diff (Claude)" },
       { "<M-cr>", "<cmd>ClaudeCodeDiffDeny<cr>", desc = "Deny Diff (Claude)" },
     },
-    init = function()
-      -- see: https://github.com/coder/claudecode.nvim/issues/52#issuecomment-2993522840
-      vim.env.CLAUDE_CONFIG_DIR = vim.fn.expand("~/.config/claude")
-    end,
+    -- init = function()
+    --   -- see: https://github.com/coder/claudecode.nvim/issues/52#issuecomment-2993522840
+    --   vim.env.CLAUDE_CONFIG_DIR = vim.fn.expand("~/.config/claude")
+    -- end,
     opts = function()
       vim.api.nvim_create_autocmd("TermOpen", {
         pattern = "term://*:claude*",
