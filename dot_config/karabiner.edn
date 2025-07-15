@@ -1171,7 +1171,8 @@
            [:p [:!!f17 :!!f4]] ; Toggle System Proxy and Enhance Mode for ClashX Pro
            [:g "/opt/homebrew/bin/goku"]
            [:r :!TOgrave_accent_and_tilde] ; rime deploy
-           [:y "/opt/homebrew/bin/yabai --restart-service"] ; https://github.com/koekeishiya/yabai/wiki/Tips-and-tricks#quickly-restart-the-yabai-launch-agent
+           ;; [:y "/opt/homebrew/bin/yabai --restart-service"] ; https://github.com/koekeishiya/yabai/wiki/Tips-and-tricks#quickly-restart-the-yabai-launch-agent
+           [:y "/usr/bin/pgrep yabai > /dev/null && /opt/homebrew/bin/yabai --stop-service || /opt/homebrew/bin/yabai --start-service"]
 
            ;; information
            [:n :!!f1] ; clock by Bartender 4 (n for notifications)
