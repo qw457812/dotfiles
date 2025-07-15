@@ -5,9 +5,7 @@
   "autoupdate": true,
   "provider": {
     "openrouter": {
-      "npm": "@openrouter/ai-sdk-provider",
       "name": "OpenRouter",
-      "options": {},
       "models": {
         "anthropic/claude-sonnet-4": {
           "name": "Claude Sonnet 4"
@@ -21,7 +19,13 @@
   "mcp": {
     "context7": {
       "type": "local",
-      "command": ["npx", "-y", "@upstash/context7-mcp@latest"]
+      "command": ["npx", "-y", "@upstash/context7-mcp"],
+      "enabled": true
+    },
+    "playwright": {
+      "type": "local",
+      "command": ["npx", "@playwright/mcp@latest"],
+      "enabled": true
     }
   },
   "keybinds": {

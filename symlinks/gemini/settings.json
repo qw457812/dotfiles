@@ -7,13 +7,15 @@
   ],
   "mcpServers": {
     "context7": {
+      "httpUrl": "https://mcp.context7.com/mcp"
+    },
+    "playwright": {
       "command": "npx",
       "args": [
-        "-y",
-        "@upstash/context7-mcp"
+        "@playwright/mcp@latest"
       ]
     }
   },
-  "theme": "GitHub",
+  "theme": "Default",
   "preferredEditor": "neovim"
 }
