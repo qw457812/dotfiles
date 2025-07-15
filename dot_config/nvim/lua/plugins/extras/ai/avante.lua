@@ -215,7 +215,7 @@ return {
         -- auto_suggestions = true, -- experimental
         -- auto_apply_diff_after_generation = true,
         -- auto_focus_on_diff_view = true,
-        -- enable_token_counting = false,
+        enable_token_counting = false,
         -- use_cwd_as_project_root = true,
       },
       provider = "copilot_claude", -- only recommend using claude
@@ -293,11 +293,15 @@ return {
         ["bedrock-claude-3.7-sonnet"] = { hide_in_model_selector = true },
       },
       windows = {
-        ---@type AvantePosition
-        position = "smart",
+        ------@type AvantePosition
+        ---position = "smart",
+        width = 40,
         height = 50,
         sidebar_header = {
-          align = vim.g.user_is_termux and "right" or nil,
+          -- align = vim.g.user_is_termux and "right" or nil,
+        },
+        input = {
+          height = vim.g.user_is_termux and 8 or nil,
         },
       },
       selector = {
@@ -333,7 +337,8 @@ return {
 
           vim.keymap.set("n", "<Esc>", function()
             if not U.keymap.clear_ui_esc({ popups = not is_input }) then
-              vim.cmd.wincmd(vim.g.user_is_termux and "3k" or "h")
+              -- vim.cmd.wincmd(vim.g.user_is_termux and "3k" or "h")
+              vim.cmd.wincmd("h")
             end
           end, { buffer = buf, desc = "Clear UI or Unfocus (Avante)" })
 
