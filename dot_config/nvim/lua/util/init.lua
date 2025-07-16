@@ -29,11 +29,13 @@ function M.has_user_extra(extra)
 end
 
 ---@param fn fun()
-function M.on_very_very_lazy(fn)
+---@param timeout? integer
+function M.on_very_very_lazy(fn, timeout)
+  timeout = timeout or 200
   LazyVim.on_very_lazy(function()
     vim.defer_fn(function()
       fn()
-    end, 200)
+    end, timeout)
   end)
 end
 

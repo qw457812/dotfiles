@@ -79,20 +79,13 @@ return {
           end, { desc = "Clear UI or Quit" })
           if vim.g.terminal_scrollback_pager and not has_kitty_scrollback_nvim then
             vim.keymap.set("n", "i", "<cmd>qa<cr>", { desc = "Quit All" })
+            vim.keymap.set("n", "a", "<cmd>qa<cr>", { desc = "Quit All" })
             vim.keymap.set("n", "<C-c>", "<cmd>qa<cr>", { desc = "Quit All" })
           end
         end,
       })
 
-      if vim.g.terminal_scrollback_pager then
-        if not has_kitty_scrollback_nvim then
-          LazyVim.on_very_lazy(function()
-            vim.defer_fn(function()
-              vim.cmd("normal! G")
-            end, 100)
-          end)
-        end
-      elseif vim.g.manpager and vim.g.user_is_termux then
+      if vim.g.manpager and vim.g.user_is_termux then
         -- fix the `command man chezmoi | eval $MANPAGER` open a empty buffer
         LazyVim.on_very_lazy(function()
           if vim.api.nvim_buf_get_name(0) == "man://" then

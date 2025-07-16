@@ -61,4 +61,20 @@ function M.colorize()
   end
 end
 
+--- set in kitty.conf:
+---
+--- ```
+--- scrollback_pager nvim -c "lua require('util.terminal').kitty_scrollback_pager(INPUT_LINE_NUMBER, CURSOR_LINE, CURSOR_COLUMN)"
+--- ```
+---@param input_line_number integer
+---@param cursor_line integer
+---@param cursor_column integer
+function M.kitty_scrollback_pager(input_line_number, cursor_line, cursor_column)
+  M.colorize()
+
+  U.on_very_very_lazy(function()
+    vim.fn.winrestview({ topline = input_line_number, lnum = input_line_number + cursor_line - 1, col = cursor_column })
+  end, 100)
+end
+
 return M
