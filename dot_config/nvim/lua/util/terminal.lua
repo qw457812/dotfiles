@@ -73,7 +73,14 @@ function M.kitty_scrollback_pager(input_line_number, cursor_line, cursor_column)
   M.colorize()
 
   U.on_very_very_lazy(function()
-    vim.fn.winrestview({ topline = input_line_number, lnum = input_line_number + cursor_line - 1, col = cursor_column })
+    vim.fn.winrestview({
+      topline = input_line_number,
+      lnum = input_line_number + cursor_line - 1,
+      -- col = cursor_column, -- not working well
+      col = 0,
+    })
+    -- https://github.com/ray-x/nvim/blob/5b4905384bbb6b34c988ed3b115b6583972e2f09/lua/core/kitty_page.lua#L29-L30
+    vim.cmd("normal! " .. (cursor_column - 1) .. "l")
   end, 100)
 end
 
