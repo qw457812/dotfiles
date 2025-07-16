@@ -28,6 +28,7 @@
   "sqlfluff": "3.4.1",
   "stylua": "v2.1.0",
   "taplo": "0.10.0",
+  "vscode-spring-boot-tools": "1.59.0",
   "vtsls": "0.2.9",
   "vue-language-server": "2.2.10",
   "yaml-language-server": "1.18.0"

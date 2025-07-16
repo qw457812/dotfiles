@@ -128,6 +128,12 @@ return {
           config.handlers = config.handlers or {}
           -- mute; having progress reports is enough
           config.handlers["language/status"] = function() end
+
+          if LazyVim.has("spring-boot.nvim") then
+            config.init_options = config.init_options or {}
+            config.init_options.bundles =
+              vim.list_extend(vim.deepcopy(config.init_options.bundles or {}), require("spring_boot").java_extensions())
+          end
         end,
         ---@module "lazyvim"
         ---@param args vim.api.create_autocmd.callback.args
@@ -159,6 +165,18 @@ return {
         end,
       })
     end,
+  },
+
+  -- https://github.com/AstroNvim/astrocommunity/blob/5f74d5fb8d8dc9b8e2904846809121068d7afaca/lua/astrocommunity/pack/spring-boot/init.lua
+  {
+    "JavaHello/spring-boot.nvim",
+    ft = { "java", "yaml", "jproperties" },
+    ---@type bootls.Config|{}
+    opts = {},
+  },
+  {
+    "mason-org/mason.nvim",
+    opts = { ensure_installed = { "vscode-spring-boot-tools" } },
   },
 
   {
