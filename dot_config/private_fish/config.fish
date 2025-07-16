@@ -217,6 +217,10 @@ if type -q claude
     abbr clc "claude --continue"
     abbr clr "claude --resume"
 end
+# https://github.com/musistudio/claude-code-router
+if type -q ccr
+    abbr ccr "ccr code"
+end
 if type -q aider
     abbr ad aider
     abbr adr 'aider --model r1'
@@ -263,15 +267,11 @@ if set -q TERMUX_VERSION
         tmux attach || tmux
     end
 else
-    alias vless "nvim -u $(brew --prefix)/share/nvim/runtime/macros/less.vim"
+    # ~/.local/share/bob/nightly/share/nvim/runtime/scripts/less.vim
+    alias vless "nvim -u $(brew --prefix)/share/nvim/runtime/scripts/less.vim"
 
     # # using TUN for now
     # if status is-interactive; or set -q NEOVIDE_FRAME
-    #     alias claude "env -u https_proxy -u http_proxy -u all_proxy command claude"
     #     term_proxy_on
     # end
-
-    # https://github.com/LLM-Red-Team/kimi-cc
-    export ANTHROPIC_BASE_URL=https://api.moonshot.cn/anthropic/
-    export ANTHROPIC_API_KEY=$MOONSHOT_API_KEY
 end
