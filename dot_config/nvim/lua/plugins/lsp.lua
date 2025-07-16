@@ -105,8 +105,9 @@ function H.pick_definitions_or_references()
   end
 end
 
+---@module "lazy"
+---@type LazySpec
 return {
-  { "saecki/live-rename.nvim", lazy = true },
   {
     "neovim/nvim-lspconfig",
     opts = function(_, opts)
@@ -133,7 +134,6 @@ return {
             return not U.keymap.buffer_local_mapping_exists(0, "n", "<cr>")
           end,
         },
-        { "<leader>cr", function() require("live-rename").rename() end, desc = "Rename (live-rename.nvim)", has = "rename" },
         { "<leader>cl", false },
         -- { "<leader>il", "<cmd>LspInfo<cr>", desc = "Lsp" },
         { "<leader>il", function() Snacks.picker.lsp_config() end, desc = "Lsp" },
@@ -187,6 +187,50 @@ return {
     end,
   },
   {
+    "folke/which-key.nvim",
+    opts = {
+      spec = {
+        { "<leader>cl", group = "Lsp", icon = { icon = " ", color = "purple" } },
+      },
+    },
+  },
+
+  {
+    "saecki/live-rename.nvim",
+    lazy = true,
+    specs = {
+      {
+        "neovim/nvim-lspconfig",
+        opts = function()
+          local Keys = require("lazyvim.plugins.lsp.keymaps").get()
+          vim.list_extend(Keys, {
+            {
+              "<leader>cr",
+              function()
+                local live_rename = require("live-rename")
+                live_rename.rename()
+
+                local buf = vim.api.nvim_get_current_buf()
+                -- see: https://github.com/saecki/live-rename.nvim/blob/78fcdb4072c6b1a8e909872f9a971b2f2b642d1e/lua/live-rename.lua#L467
+                if vim.fn.fnamemodify(vim.api.nvim_buf_get_name(buf), ":t") == "lsp:rename" then
+                  vim.keymap.set({ "n", "i" }, "<C-s>", live_rename.submit, { buffer = buf, desc = "Submit rename" })
+                  vim.keymap.set("n", "<C-c>", live_rename.hide, { buffer = buf, desc = "Cancel rename" })
+                  vim.keymap.set("i", "<C-c>", function()
+                    vim.cmd("stopinsert")
+                    live_rename.hide()
+                  end, { buffer = buf, desc = "Cancel rename" })
+                end
+              end,
+              desc = "Rename (live-rename.nvim)",
+              has = "rename",
+            },
+          })
+        end,
+      },
+    },
+  },
+
+  {
     "folke/snacks.nvim",
     ---@module "snacks"
     ---@type snacks.Config
@@ -209,14 +253,7 @@ return {
       },
     },
   },
-  {
-    "folke/which-key.nvim",
-    opts = {
-      spec = {
-        { "<leader>cl", group = "Lsp", icon = { icon = " ", color = "purple" } },
-      },
-    },
-  },
+
   {
     "folke/noice.nvim",
     optional = true,
