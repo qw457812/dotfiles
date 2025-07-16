@@ -92,6 +92,19 @@ return {
           vim.opt_local.commentstring = "# %s"
         end,
       })
+      if vim.g.user_is_kitty then
+        vim.api.nvim_create_autocmd("BufWritePost", {
+          pattern = "kitty.conf",
+          callback = U.debounce_wrap(500, function()
+            local res = vim.system({ "kitten", "@", "load-config" }, { text = true }):wait()
+            if res.code == 0 then
+              LazyVim.info("kitty.conf reloaded", { title = "Kitty" })
+            else
+              LazyVim.error(("Failed to run `kitten @ load-config`:\n%s"):format(res.stderr), { title = "Kitty" })
+            end
+          end),
+        })
+      end
     end,
   },
 
