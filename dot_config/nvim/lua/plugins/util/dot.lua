@@ -3,8 +3,11 @@ return {
   {
     "LazyVim/LazyVim",
     opts = function()
-      if vim.g.user_is_termux then
-        return
+      if
+        vim.g.terminal_scrollback_pager -- ksb_pastebuf of kitty-scrollback.nvim
+        or vim.g.user_is_termux
+      then
+        return -- fish-lsp failed to start
       end
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "fish",
