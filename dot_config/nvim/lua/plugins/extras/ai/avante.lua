@@ -218,7 +218,7 @@ return {
         enable_token_counting = false,
         -- use_cwd_as_project_root = true,
       },
-      provider = "copilot_claude", -- only recommend using claude
+      provider = "copilot_claude",
       -- auto_suggestions_provider = "ollama", -- high-frequency, can be expensive if enabled
       -- https://github.com/yetone/cosmos-nvim/blob/64ffc3f90f33eb4049f1495ba49f086280dc8a1c/lua/layers/completion/plugins.lua#L249
       ---@type table<string, AvanteSupportedProvider>
@@ -283,7 +283,13 @@ return {
           __inherited_from = "openai",
           endpoint = "https://openrouter.ai/api/v1",
           api_key_name = "OPENROUTER_API_KEY",
-          model = "google/gemini-2.5-pro-preview",
+          model = "google/gemini-2.5-pro",
+        },
+        openrouter_kimi = {
+          __inherited_from = "openai",
+          endpoint = "https://openrouter.ai/api/v1",
+          api_key_name = "OPENROUTER_API_KEY",
+          model = "moonshotai/kimi-k2",
         },
         ["claude-haiku"] = { hide_in_model_selector = true },
         ["claude-opus"] = { hide_in_model_selector = true },

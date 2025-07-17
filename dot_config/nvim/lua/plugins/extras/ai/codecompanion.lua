@@ -51,6 +51,93 @@ return {
       strategies = {
         chat = {
           adapter = "copilot",
+          keymaps = {
+            options = {
+              modes = {
+                n = { "g?", "<localleader>?" },
+              },
+            },
+            regenerate = {
+              modes = {
+                n = "<localleader>r",
+              },
+            },
+            stop = {
+              modes = {
+                n = "<localleader>s",
+              },
+            },
+            clear = {
+              modes = {
+                n = "<localleader>c",
+              },
+            },
+            codeblock = {
+              modes = {
+                n = "<localleader>C",
+              },
+            },
+            yank_code = {
+              modes = {
+                n = "<localleader>y",
+              },
+            },
+            pin = {
+              modes = {
+                n = "<localleader>p",
+              },
+            },
+            watch = {
+              modes = {
+                n = "<localleader>w",
+              },
+            },
+            next_chat = {
+              modes = {
+                n = "<localleader>]",
+              },
+            },
+            previous_chat = {
+              modes = {
+                n = "<localleader>[",
+              },
+            },
+            change_adapter = {
+              modes = {
+                n = "<localleader>m",
+              },
+            },
+            fold_code = {
+              modes = {
+                n = "<localleader>f",
+              },
+            },
+            debug = {
+              modes = {
+                n = "<localleader>d",
+              },
+            },
+            system_prompt = {
+              modes = {
+                n = "<localleader>P",
+              },
+            },
+            auto_tool_mode = {
+              modes = {
+                n = "<localleader>a",
+              },
+            },
+            goto_file_under_cursor = {
+              modes = {
+                n = "<localleader>F",
+              },
+            },
+            copilot_stats = {
+              modes = {
+                n = "<localleader>S",
+              },
+            },
+          },
         },
         inline = {
           adapter = "copilot",
