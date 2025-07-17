@@ -1,4 +1,4 @@
--- https://github.com/olimorris/dotfiles/blob/8b81a8acdc8135355c15c3f6ca351c1524a55d17/.config/nvim/lua/plugins/coding.lua
+-- https://github.com/olimorris/dotfiles/blob/459dfcc8f2952f80c428353cc9c3fc2d90cbcf8d/.config/nvim/lua/plugins/coding.lua
 -- https://github.com/petobens/dotfiles/blob/08ae687d7c8b9669af1278ef44bfaaf1f6e6f957/nvim/lua/plugin-config/codecompanion_config.lua
 return {
   {
@@ -38,16 +38,15 @@ return {
     },
     opts = {
       adapters = {
-        copilot = function()
-          return require("codecompanion.adapters").extend("copilot", {
-            schema = {
-              model = {
-                -- default = "claude-sonnet-4",
-                default = "gemini-2.5-pro",
-              },
-            },
-          })
-        end,
+        -- copilot = function()
+        --   return require("codecompanion.adapters").extend("copilot", {
+        --     schema = {
+        --       model = {
+        --         default = "gemini-2.5-pro", -- claude-sonnet-4
+        --       },
+        --     },
+        --   })
+        -- end,
       },
       strategies = {
         chat = {
@@ -159,15 +158,18 @@ return {
             title = "CodeCompanion"
           end
 
+          local processing = ev.match ~= "CodeCompanionRequestFinished"
+          vim.g.user_esc_keep_notify = processing
+
           vim.notify(msg, vim.log.levels.INFO, {
             id = "codecompanion_status",
             title = title,
             timeout = 500,
             keep = function()
-              return ev.match ~= "CodeCompanionRequestFinished"
+              return processing
             end,
             opts = function(notif)
-              notif.icon = ev.match == "CodeCompanionRequestFinished" and " " or Snacks.util.spinner()
+              notif.icon = processing and Snacks.util.spinner() or " "
             end,
           })
         end,
