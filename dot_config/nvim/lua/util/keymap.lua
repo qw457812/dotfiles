@@ -245,7 +245,7 @@ function M.clear_ui_esc(opts)
   end
 
   local function has_notif()
-    return not vim.tbl_isempty(notif_bufs())
+    return not vim.g.user_esc_keep_notify and #notif_bufs() > 0
   end
 
   local function is_lsp_progressing()
@@ -254,6 +254,10 @@ function M.clear_ui_esc(opts)
   end
 
   local function dismiss_notif()
+    if vim.g.user_esc_keep_notify then
+      return
+    end
+
     if package.loaded["noice"] then
       if vim.g.user_suppress_lsp_progress ~= true and is_lsp_progressing() then
         -- suppress lsp progress for seconds, otherwise esc becomes useless during lsp progress
@@ -291,7 +295,10 @@ function M.clear_ui_esc(opts)
     elseif opts.popups and not is_cmdwin then
       -- close all floating windows (can't close other windows when the command-line window is open)
       for _, w in ipairs(vim.api.nvim_list_wins()) do
-        if vim.api.nvim_win_is_valid(w) and U.is_floating_win(w, { zen = false, misc = false }) then
+        if
+          vim.api.nvim_win_is_valid(w)
+          and U.is_floating_win(w, { zen = false, notify = vim.g.user_esc_keep_notify ~= true, misc = false })
+        then
           vim.api.nvim_win_close(w, false)
           something_done = true
         end

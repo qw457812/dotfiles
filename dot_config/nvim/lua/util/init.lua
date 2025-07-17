@@ -40,8 +40,9 @@ function M.on_very_very_lazy(fn, timeout)
 end
 
 ---@param win? integer default 0
----@param opts? {zen?: boolean, misc?: boolean} default true
+---@param opts? {zen?: boolean, notify?: boolean, misc?: boolean} default true
 ---      - zen: whether to treat zen-mode as floating window
+---      - notify: whether to treat snacks_notif, notify, noice as floating window
 ---      - misc: whether to treat nvim-treesitter-context, snacks_dashboard terminal sections, layers.nvim help as floating windows
 ---@return boolean
 function M.is_floating_win(win, opts)
@@ -54,7 +55,7 @@ function M.is_floating_win(win, opts)
   end
 
   win = win == 0 and vim.api.nvim_get_current_win() or win
-  opts = vim.tbl_deep_extend("keep", opts, { zen = true, misc = true })
+  opts = vim.tbl_deep_extend("keep", opts, { zen = true, notify = true, misc = true })
 
   local buf = vim.api.nvim_win_get_buf(win)
   local ft = vim.bo[buf].filetype
@@ -77,6 +78,10 @@ function M.is_floating_win(win, opts)
         return false
       end
     end
+  end
+
+  if not opts.notify and vim.list_contains({ "snacks_notif", "notify", "noice" }, ft) then
+    return false
   end
 
   if not opts.misc then
