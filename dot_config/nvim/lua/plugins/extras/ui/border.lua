@@ -235,4 +235,14 @@ return {
       },
     },
   },
+
+  {
+    "nvim-neotest/neotest",
+    optional = true,
+    opts = {
+      floating = {
+        border = "rounded",
+      },
+    },
+  },
 }

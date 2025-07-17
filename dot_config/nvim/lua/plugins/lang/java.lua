@@ -126,8 +126,8 @@ return {
             or nil
 
           config.handlers = config.handlers or {}
-          -- mute; having progress reports is enough
-          config.handlers["language/status"] = function() end
+          -- config.handlers["$/progress"] = function() end -- disable progress updates
+          config.handlers["language/status"] = function() end -- mute; having progress reports is enough
 
           if LazyVim.has("spring-boot.nvim") then
             config.init_options = config.init_options or {}
