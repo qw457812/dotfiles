@@ -1080,7 +1080,8 @@
            ;; [:f [:opena-file "/Applications/Google Chrome.app" "chrome://newtab/"]]
            [:f [:opena-file "/Applications/Brave Browser.app" "brave://newtab/"]]
            ;; [:e [:opena-file "/Applications/Google Chrome.app" "chrome://extensions/"]]
-           [:e [:opena-file "/Applications/Brave Browser.app" "brave://extensions/"]]
+           ;; [:e [:opena-file "/Applications/Brave Browser.app" "brave://extensions/"]]
+           [:e [:opena-file "/Applications/Dia.app" "dia://extensions/"]]
            [:d [:open "https://www.deepl.com/translator"]]
            ;; https://github.com/pqrs-org/Karabiner-Elements/issues/2535
            ;; [:s :!Cc nil {:delayed {:invoked [:open "https://translate.google.com/?sl=en&tl=zh-CN&text=$(pbpaste)&op=translate"]} :params {:delay 30}}]
@@ -1476,8 +1477,8 @@
            [:!Qsemicolon [:open "/Applications/RuijieWorkSpace.app"] :RuijieWorkSpace]
            ; [:!Qf [:open "/System/Library/CoreServices/Finder.app"] :!Finder]
            ; [:!Qf :same_wind_app :Finder]
-           [:!Qe [:open "/Applications/Emacs.app"] :!Emacs]
-           [:!Qe :same_wind_app :Emacs]
+           ;; [:!Qe [:open "/Applications/Emacs.app"] :!Emacs]
+           ;; [:!Qe :same_wind_app :Emacs]
            [:!Qy [:open "$HOME/Applications/PyCharm Community Edition.app"] :!PyCharm]
            [:!Qy :same_wind_app :PyCharm]
            [:!Qu [:open "/Applications/Neovide.app"]] ; pronounce
