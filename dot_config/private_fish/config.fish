@@ -82,6 +82,7 @@ abbr -a --position anywhere --set-cursor NUL '% > /dev/null 2>&1'
 abbr -a --position anywhere H '| head'
 abbr -a --position anywhere T '| tail'
 abbr -a --position anywhere G '| grep'
+abbr -a --position anywhere R '| rg'
 abbr -a --position anywhere J '| jq'
 abbr -a --position anywhere D '| delta'
 
@@ -191,6 +192,30 @@ abbr czu 'chezmoi update'
 abbr czm 'chezmoi managed --path-style=absolute .'
 abbr czum 'chezmoi unmanaged --path-style=absolute .'
 abbr czg 'chezmoi git --'
+
+# Docker
+abbr d docker
+abbr dcls "docker container ls"
+abbr dclsa "docker container ls -a"
+abbr dlg "docker container logs"
+abbr dpo "docker container port"
+abbr dr "docker container run"
+abbr drm "docker container rm"
+abbr dst "docker container start"
+abbr drs "docker container restart"
+abbr dstp "docker container stop"
+abbr dils "docker image ls"
+abbr dirm "docker image rm"
+abbr dps "docker ps"
+abbr dpsa "docker ps -a"
+# Docker Compose
+abbr dc "docker compose"
+abbr dcps "docker compose ps"
+abbr dcup "docker compose up"
+abbr dcupd "docker compose up -d"
+abbr dcdn "docker compose down"
+abbr dclg "docker compose logs"
+abbr dclgf "docker compose logs -f"
 
 # Homebrew
 abbr bo 'brew update && brew outdated'

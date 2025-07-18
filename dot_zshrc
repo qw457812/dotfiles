@@ -472,5 +472,5 @@ if [[ -v TERMUX_VERSION ]]; then
 else
   alias vless="nvim -u $(brew --prefix)/share/nvim/runtime/macros/less.vim"
 
-  term_proxy_on
+  # term_proxy_on
 fi
