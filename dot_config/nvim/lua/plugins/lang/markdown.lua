@@ -4,6 +4,7 @@ end
 
 local use_image_nvim = false -- use image.nvim instead of snacks image
 local image_cursor_only = false
+local code_conceal = false -- backticks
 
 return {
   {
@@ -68,7 +69,14 @@ return {
               language_border = " ",
               highlight_border = false,
             }
-          or {}
+          or {},
+        -- https://github.com/MeanderingProgrammer/render-markdown.nvim/discussions/475#discussioncomment-13799516
+        code_conceal and {}
+          or {
+            conceal_delimiters = false,
+            language = false,
+            border = "none",
+          }
       ),
       -- checkbox = {
       --   enabled = true,
