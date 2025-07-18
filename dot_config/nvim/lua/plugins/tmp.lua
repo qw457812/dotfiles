@@ -2,6 +2,31 @@ local java_home = vim.g.user_is_termux and "/data/data/com.termux/files/usr/lib/
   or vim.fn.expand("$HOME/.local/share/mise/installs/java/23")
 
 return {
+  -- {
+  --   "akinsho/bufferline.nvim",
+  --   optional = true,
+  --   dependencies = {
+  --     "tiagovla/scope.nvim", -- backdround/tabscope.nvim
+  --     opts = {},
+  --   },
+  -- },
+
+  {
+    "alex-popov-tech/store.nvim",
+    cmd = "Store",
+    keys = {
+      { "<leader>le", "<cmd>Store<cr>", desc = "Plugin Store" },
+    },
+    opts = {
+      width = 0.9,
+      height = 0.9,
+      proportions = {
+        list = 0.4,
+        preview = 0.6,
+      },
+    },
+  },
+
   -- for java projects using JDK version older than 21
   {
     "mfussenegger/nvim-jdtls",

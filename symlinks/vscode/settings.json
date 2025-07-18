@@ -176,6 +176,9 @@
     "markdown": true,
     "scminput": false
   },
+  // https://github.com/VSCodeVim/Vim/issues/9459#issuecomment-2646423390
+  // https://github.com/vscode-neovim/vscode-neovim#keybinding-passthroughs
+  "github.copilot.nextEditSuggestions.enabled": true,
   "markdown-preview-enhanced.previewTheme": "github-dark.css",
   "markdown-preview-enhanced.codeBlockTheme": "github-dark.css",
   "markdown-preview-enhanced.enablePreviewZenMode": true,
