@@ -310,6 +310,7 @@ return {
                 vim.tbl_get(opts, "completion", "menu", "draw", "columns")
                   or vim.deepcopy(menu_default.draw.columns --[[@as blink.cmp.DrawColumnDefinition[] ]]),
                 {
+                  -- { "score" }, -- helpful for setting score_offset
                   { "source_name" },
                 }
               ),
@@ -326,6 +327,12 @@ return {
                 source_name = {
                   text = function(ctx)
                     return "[" .. ctx.source_name .. "]"
+                  end,
+                  highlight = "NonText",
+                },
+                score = {
+                  text = function(ctx)
+                    return string.format("%d(%d)", ctx.item.score, ctx.item.score_offset)
                   end,
                   highlight = "NonText",
                 },
