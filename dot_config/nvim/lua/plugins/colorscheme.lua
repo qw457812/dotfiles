@@ -27,7 +27,7 @@ local ignored_colorschemes = vim.list_extend({
 }, has_tokyonight_custom_style and {} or { "tokyonight" })
 
 -- options
--- TODO: borderless snacks picker
+-- TODO: borderless snacks picker, see also `opts.picker.layouts.borderless` of snacks
 local borderless_picker = false -- vim.g.user_transparent_background
 local no_italic = vim.g.user_is_termux
 
