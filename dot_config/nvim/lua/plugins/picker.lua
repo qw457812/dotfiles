@@ -129,6 +129,7 @@ return {
     ---@type snacks.Config
     opts = {
       picker = {
+        prompt = "  ",
         layout = {
           cycle = false,
           preset = function()
@@ -182,6 +183,61 @@ return {
                 width = 0.5,
                 border = "rounded",
                 title_pos = "center",
+              },
+            },
+          },
+          borderless_based_default = {
+            layout = {
+              box = "horizontal",
+              width = 0.8,
+              min_width = 120,
+              height = 0.8,
+              border = "none",
+              {
+                box = "vertical",
+                border = "solid",
+                title = "{title} {live} {flags}",
+                {
+                  win = "input",
+                  height = 1,
+                  border = { "", "", "", "", "", " ", "", "" }, -- "bottom"
+                },
+                { win = "list", border = "none" },
+              },
+              {
+                win = "preview",
+                title = "{preview}",
+                border = "solid", -- { " ", " ", " ", " ", " ", " ", " ", "│" }
+                width = 0.5,
+              },
+            },
+          },
+          borderless_narrow = {
+            layout = {
+              backdrop = false,
+              width = 0.5,
+              min_width = 80,
+              height = 0.8,
+              min_height = math.min(35, vim.o.lines - 1),
+              border = "none",
+              box = "vertical",
+              {
+                win = "preview",
+                title = "{preview}",
+                height = 0.45,
+                border = "solid", -- { " ", " ", " ", " ", " ", "─", " ", " " }
+              },
+              {
+                box = "vertical",
+                border = "solid",
+                title = "{title} {live} {flags}",
+                title_pos = "center",
+                {
+                  win = "input",
+                  height = 1,
+                  border = { "", "", "", "", "", " ", "", "" }, -- "bottom"
+                },
+                { win = "list", border = "none" },
               },
             },
           },
