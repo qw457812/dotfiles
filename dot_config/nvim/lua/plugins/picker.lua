@@ -133,32 +133,14 @@ return {
         layout = {
           cycle = false,
           preset = function()
-            -- return vim.o.columns > 2 * vim.o.lines and "default" or "narrow"
-            return vim.o.columns >= 120 and "based_telescope" or "narrow"
+            -- vim.o.columns > 2 * vim.o.lines
+            local layouts = vim.o.columns >= 120 and { "default", "based_telescope", "borderless", "based_borderless" }
+              or { "narrow", "borderless_narrow", "based_borderless_narrow" }
+            return layouts[math.random(#layouts)]
           end,
         },
+        -- copied from: https://github.com/folke/snacks.nvim/blob/27cba535a6763cbca3f3162c5c4bb48c6f382005/lua/snacks/picker/config/layouts.lua
         layouts = {
-          -- based on the dropdown preset, mainly for termux
-          narrow = {
-            layout = {
-              backdrop = false,
-              width = 0.5,
-              min_width = 80,
-              height = 0.8,
-              min_height = math.min(35, vim.o.lines - 1), -- 1 for lualine.nvim
-              border = "none",
-              box = "vertical",
-              { win = "preview", title = "{preview}", height = 0.45, border = "rounded" },
-              {
-                box = "vertical",
-                border = "rounded",
-                title = "{title} {live} {flags}",
-                title_pos = "center",
-                { win = "input", height = 1, border = "bottom" },
-                { win = "list", border = "none" },
-              },
-            },
-          },
           based_telescope = {
             layout = {
               box = "horizontal",
@@ -186,7 +168,30 @@ return {
               },
             },
           },
-          borderless_based_default = {
+          -- based on the dropdown preset, mainly for termux
+          narrow = {
+            layout = {
+              backdrop = false,
+              width = 0.5,
+              min_width = 80,
+              height = 0.8,
+              min_height = math.min(35, vim.o.lines - 1), -- 1 for lualine.nvim
+              border = "none",
+              box = "vertical",
+              { win = "preview", title = "{preview}", height = 0.45, border = "rounded" },
+              {
+                box = "vertical",
+                border = "rounded",
+                title = "{title} {live} {flags}",
+                title_pos = "center",
+                { win = "input", height = 1, border = "bottom" },
+                { win = "list", border = "none" },
+              },
+            },
+          },
+          -- based on the default preset
+          -- see also: https://github.com/folke/snacks.nvim/blob/fa29c6c92631026a7ee41249c78bd91562e67a09/lua/snacks/win.lua#L186-L191
+          borderless = {
             layout = {
               box = "horizontal",
               width = 0.8,
@@ -197,21 +202,13 @@ return {
                 box = "vertical",
                 border = "solid",
                 title = "{title} {live} {flags}",
-                {
-                  win = "input",
-                  height = 1,
-                  border = { "", "", "", "", "", " ", "", "" }, -- "bottom"
-                },
+                { win = "input", height = 1, border = { "", "", "", "", "", " ", "", "" } },
                 { win = "list", border = "none" },
               },
-              {
-                win = "preview",
-                title = "{preview}",
-                border = "solid", -- { " ", " ", " ", " ", " ", " ", " ", "│" }
-                width = 0.5,
-              },
+              { win = "preview", title = "{preview}", border = "solid", width = 0.5 },
             },
           },
+          -- based on the narrow layout
           borderless_narrow = {
             layout = {
               backdrop = false,
@@ -221,22 +218,56 @@ return {
               min_height = math.min(35, vim.o.lines - 1),
               border = "none",
               box = "vertical",
-              {
-                win = "preview",
-                title = "{preview}",
-                height = 0.45,
-                border = "solid", -- { " ", " ", " ", " ", " ", "─", " ", " " }
-              },
+              { win = "preview", title = "{preview}", height = 0.45, border = "solid" },
               {
                 box = "vertical",
                 border = "solid",
                 title = "{title} {live} {flags}",
                 title_pos = "center",
-                {
-                  win = "input",
-                  height = 1,
-                  border = { "", "", "", "", "", " ", "", "" }, -- "bottom"
-                },
+                { win = "input", height = 1, border = { "", "", "", "", "", " ", "", "" } },
+                { win = "list", border = "none" },
+              },
+            },
+          },
+          -- add a few borders to split input, list and preview
+          based_borderless = {
+            layout = {
+              box = "horizontal",
+              width = 0.8,
+              min_width = 120,
+              height = 0.8,
+              border = "none",
+              {
+                box = "vertical",
+                border = "solid",
+                title = "{title} {live} {flags}",
+                { win = "input", height = 1, border = "bottom" },
+                { win = "list", border = "none" },
+              },
+              {
+                win = "preview",
+                title = "{preview}",
+                border = { " ", " ", " ", " ", " ", " ", " ", "│" },
+                width = 0.5,
+              },
+            },
+          },
+          based_borderless_narrow = {
+            layout = {
+              backdrop = false,
+              width = 0.5,
+              min_width = 80,
+              height = 0.8,
+              min_height = math.min(35, vim.o.lines - 1),
+              border = "none",
+              box = "vertical",
+              { win = "preview", title = "{preview}", height = 0.45, border = "solid" },
+              {
+                box = "vertical",
+                border = { " ", "─", " ", " ", " ", " ", " ", " " },
+                title = "{title} {live} {flags}",
+                title_pos = "center",
+                { win = "input", height = 1, border = "bottom" },
                 { win = "list", border = "none" },
               },
             },
