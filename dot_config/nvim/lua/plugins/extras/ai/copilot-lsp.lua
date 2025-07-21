@@ -62,15 +62,10 @@ return {
                   if nes_visible ~= last_nes_visible then
                     last_nes_visible = nes_visible
                     require("blink.cmp.completion.windows.menu").update_position()
-                    require("blink.cmp.completion.windows.documentation").update_position()
                     -- see: https://github.com/saghen/blink.cmp/blob/a026b8db7f8ab0e98b9a2e0a7a8d7a7b73410a27/lua/blink/cmp/signature/window.lua#L123-L131
-                    if nes_visible then
-                      -- copied from: https://github.com/saghen/blink.cmp/blob/a5be099b0519339bc0d9e2dc96744b55640e810e/lua/blink/cmp/init.lua#L279-L284
-                      if require("blink.cmp").is_signature_visible() then
-                        require("blink.cmp.signature.trigger").hide()
-                      end
-                    else
-                      require("blink.cmp.signature.window").update_position()
+                    -- copied from: https://github.com/saghen/blink.cmp/blob/a5be099b0519339bc0d9e2dc96744b55640e810e/lua/blink/cmp/init.lua#L279-L284
+                    if nes_visible and require("blink.cmp").is_signature_visible() then
+                      require("blinn.cmp.signature.trigger").hide()
                     end
                   end
                 end)
