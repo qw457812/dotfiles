@@ -57,6 +57,7 @@ def handle_result(
 
     direction = args[1]
     key = args[2]
+    is_ctrl_jk = key in ("ctrl+j", "ctrl+k")
 
     # # debugging: run `kitty` from another kitty instance
     # print(f"""neighboring_window_or_pass_key.py:
@@ -69,14 +70,13 @@ def handle_result(
     cmd = w.child.foreground_cmdline[0]
     # https://github.com/yurikhan/kitty-smart-scroll/blob/8aaa91b9f52527c3dbe395a79a90aea4a879857a/smart_scroll.py#L18
     # yazi: for cmp like `cd --interactive`
-    if w.screen.is_main_linebuf() or not (
-        is_nvim(cmd)
-        or is_tmux(cmd)
-        or ((key == "ctrl+j" or key == "ctrl+k") and (is_fzf(w) or is_yazi(cmd)))
-    ):
+    if (
+        not w.screen.is_main_linebuf()
+        and (is_nvim(cmd) or is_tmux(cmd) or (is_ctrl_jk and is_yazi(cmd)))
+    ) or (is_ctrl_jk and is_fzf(w)):
+        # pass the keys through to nvim/tmux/fzf/yazi
+        w.write_to_child(encode_key_mapping(w, key))
+    else:
         # # kitten @ focus-window --match=neighbor:bottom
         # boss.call_remote_control(w, ("focus-window", f"--match=neighbor:{direction}"))
         boss.active_tab.neighboring_window(direction)
-    else:
-        # pass the keys through to nvim/tmux/fzf
-        w.write_to_child(encode_key_mapping(w, key))

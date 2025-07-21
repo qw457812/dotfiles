@@ -5,11 +5,8 @@ else if type -q rg
     set -x FZF_DEFAULT_COMMAND "rg --files --hidden --follow"
 end
 
-# `--height 100%` is required, see https://github.com/wez/wezterm/discussions/4101
 # https://github.com/folke/tokyonight.nvim/blob/45d22cf0e1b93476d3b6d362d720412b3d34465c/extras/fzf/tokyonight_moon.sh
 set -x FZF_DEFAULT_OPTS "
-  --height=100%
-  --tmux=100%
   --cycle
   --layout=reverse
   --ansi
@@ -36,6 +33,12 @@ set -x FZF_DEFAULT_OPTS "
   --color=separator:#ff966c
   --color=spinner:#ff007c
 "
+if set -q WEZTERM_UNIX_SOCKET
+    # `--height 100%` is required, see https://github.com/wez/wezterm/discussions/4101
+    set -x FZF_DEFAULT_OPTS "$FZF_DEFAULT_OPTS --height=100% --tmux=100%"
+else
+    set -x FZF_DEFAULT_OPTS "$FZF_DEFAULT_OPTS --height=90%"
+end
 
 # https://github.com/PatrickF1/fzf.fish
 set fzf_diff_highlighter delta --paging=never --width=20
