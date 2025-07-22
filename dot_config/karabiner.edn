@@ -69,7 +69,7 @@
              ; :prev_app                {:shell "/opt/homebrew/bin/yabai -m window --focus recent || open -g hammerspoon://cmdTab"}
              :prev_app                {:shell "open -g hammerspoon://prevApp"}
              :open-default-terminal   {:shell "open /Applications/kitty.app"} ; kitty.app, WezTerm.app
-             :open-default-browser    {:shell "open \"/Applications/Dia.app\""} ; Brave Browser.app, Dia.app, Google Chrome.app
+             :open-default-browser    {:shell "open \"/Applications/Brave Browser.app\""} ; Brave Browser.app, Dia.app, Google Chrome.app
              :home_dir                [{:key  :grave_accent_and_tilde
                                         :modi [:left_shift]
                                         :lazy true} {:key :slash}]
@@ -1080,8 +1080,8 @@
            ;; [:f [:opena-file "/Applications/Google Chrome.app" "chrome://newtab/"]]
            [:f [:opena-file "/Applications/Brave Browser.app" "brave://newtab/"]]
            ;; [:e [:opena-file "/Applications/Google Chrome.app" "chrome://extensions/"]]
-           ;; [:e [:opena-file "/Applications/Brave Browser.app" "brave://extensions/"]]
-           [:e [:opena-file "/Applications/Dia.app" "dia://extensions/"]]
+           ;; [:e [:opena-file "/Applications/Dia.app" "dia://extensions/"]]
+           [:e [:opena-file "/Applications/Brave Browser.app" "brave://extensions/"]]
            [:d [:open "https://www.deepl.com/translator"]]
            ;; https://github.com/pqrs-org/Karabiner-Elements/issues/2535
            ;; [:s :!Cc nil {:delayed {:invoked [:open "https://translate.google.com/?sl=en&tl=zh-CN&text=$(pbpaste)&op=translate"]} :params {:delay 30}}]
@@ -2318,7 +2318,7 @@
   :tmux-autostart-terminals
   ["^org\\.alacritty$" "^com\\.github\\.wez\\.wezterm$" "^net\\.kovidgoyal\\.kitty$"]
   :default-terminal ["^net\\.kovidgoyal\\.kitty$"]
-  :default-browser  ["^company\\.thebrowser\\.dia$"]
+  :default-browser  ["^com\\.brave\\.Browser$"]
   :Terminals        ["^com\\.apple\\.Terminal$"
                      "^com\\.googlecode\\.iterm2$"
                      "^co\\.zeit\\.hyperterm$" "^co\\.zeit\\.hyper$"
