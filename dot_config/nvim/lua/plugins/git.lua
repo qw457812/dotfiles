@@ -391,12 +391,5 @@ return {
         },
       })
     end,
-    specs = {
-      {
-        "catppuccin",
-        optional = true,
-        opts = { integrations = { neogit = true } },
-      },
-    },
   },
 }

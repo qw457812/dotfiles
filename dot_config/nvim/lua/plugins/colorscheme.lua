@@ -286,15 +286,16 @@ return {
         },
         transparent_background = vim.g.user_transparent_background,
         no_italic = no_italic,
+        auto_integrations = true, -- check `:=require("catppuccin.lib.detect_integrations").create_integrations_table()`
         integrations = {
-          mini = {
-            enabled = true,
-            -- indentscope_color = "subtext0",
-          },
-          dropbar = {
-            enabled = true,
-            -- color_mode = true,
-          },
+          -- mini = {
+          --   enabled = true,
+          --   -- indentscope_color = "subtext0",
+          -- },
+          -- dropbar = {
+          --   enabled = true,
+          --   -- color_mode = true,
+          -- },
           -- telescope = {
           --   enabled = true,
           --   style = borderless_picker and "nvchad" or nil, -- not working when transparent
@@ -409,7 +410,7 @@ return {
             SnacksPickerInputTitle = { fg = colors.peach },
           })
         end,
-      })
+      } --[[@as CatppuccinOptions]])
     end,
   },
 

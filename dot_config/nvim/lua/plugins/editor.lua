@@ -316,13 +316,6 @@ return {
       local harpoon_extensions = require("harpoon.extensions")
       harpoon:extend(harpoon_extensions.builtins.highlight_current_file())
     end,
-    specs = {
-      {
-        "catppuccin",
-        optional = true,
-        opts = { integrations = { harpoon = true } },
-      },
-    },
   },
 
   {
