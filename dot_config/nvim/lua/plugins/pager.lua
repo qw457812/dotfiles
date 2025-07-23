@@ -33,8 +33,9 @@ return {
     ---@module "snacks"
     ---@param opts snacks.Config
     config = function(_, opts)
-      ---@type snacks.Config
-      local o = {
+      -- copied from: https://github.com/LazyVim/LazyVim/blob/ba632c500da56532c122539c45fe3511fd894a05/lua/lazyvim/plugins/init.lua#L22-L28
+      local notify = vim.notify
+      require("snacks").setup(vim.tbl_deep_extend("force", opts, {
         bigfile = { enabled = false },
         dashboard = { enabled = false },
         indent = { enabled = false },
@@ -46,10 +47,7 @@ return {
         words = { enabled = false },
         -- notifier = { enabled = false }, -- enabled for noice.nvim
         -- picker = { enabled = false }, -- enabled `vim.ui.select` for `gx` via nvim-various-textobjs
-      }
-      -- copied from: https://github.com/LazyVim/LazyVim/blob/ba632c500da56532c122539c45fe3511fd894a05/lua/lazyvim/plugins/init.lua#L22-L28
-      local notify = vim.notify
-      require("snacks").setup(vim.tbl_deep_extend("force", opts, o))
+      } --[[@as snacks.Config]]))
       if LazyVim.has("noice.nvim") then
         vim.notify = notify
       end

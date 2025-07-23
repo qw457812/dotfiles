@@ -123,8 +123,7 @@ return {
       },
     },
     opts = function(_, opts)
-      ---@type snacks.Config
-      local o = {
+      return U.extend_tbl(opts, {
         lazygit = {
           ---@type snacks.win.Config|{}
           win = {
@@ -144,8 +143,7 @@ return {
         gitbrowse = {
           open = U.open_in_browser,
         },
-      }
-      return U.extend_tbl(opts, o)
+      } --[[@as snacks.Config]])
     end,
   },
 

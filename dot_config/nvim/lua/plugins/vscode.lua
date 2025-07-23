@@ -33,8 +33,7 @@ return {
     ---@module "snacks"
     ---@param opts snacks.Config
     config = function(_, opts)
-      ---@type snacks.Config
-      local o = {
+      require("snacks").setup(vim.tbl_deep_extend("force", opts, {
         bigfile = { enabled = false },
         dashboard = { enabled = false },
         indent = { enabled = false },
@@ -47,8 +46,7 @@ return {
         image = { enabled = false },
         scope = { enabled = false },
         words = { enabled = false },
-      }
-      require("snacks").setup(vim.tbl_deep_extend("force", opts, o))
+      } --[[@as snacks.Config]]))
     end,
   },
   {

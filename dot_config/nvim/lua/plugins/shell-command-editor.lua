@@ -52,16 +52,14 @@ return {
     ---@module "snacks"
     ---@param opts snacks.Config
     config = function(_, opts)
-      ---@type snacks.Config
-      local o = {
+      local notify = vim.notify
+      require("snacks").setup(vim.tbl_deep_extend("force", opts, {
         bigfile = { enabled = false },
         dashboard = { enabled = false },
         scroll = { enabled = false },
         image = { enabled = false },
         -- words = { enabled = false }, -- fish-lsp
-      }
-      local notify = vim.notify
-      require("snacks").setup(vim.tbl_deep_extend("force", opts, o))
+      } --[[@as snacks.Config]]))
       if LazyVim.has("noice.nvim") then
         vim.notify = notify
       end

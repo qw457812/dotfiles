@@ -248,6 +248,7 @@ return {
           local processing = ev.match ~= "CodeCompanionRequestFinished"
           vim.g.user_esc_keep_notify = processing
 
+          ---@module "snacks"
           vim.notify(msg, vim.log.levels.INFO, {
             id = "codecompanion_status",
             title = title,
@@ -258,7 +259,7 @@ return {
             opts = function(notif)
               notif.icon = processing and Snacks.util.spinner() or " "
             end,
-          })
+          } --[[@as snacks.notifier.Notif.opts]])
         end,
       })
     end,

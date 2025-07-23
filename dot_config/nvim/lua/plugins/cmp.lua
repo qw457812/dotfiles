@@ -211,8 +211,7 @@ return {
         end,
       }
 
-      ---@type blink.cmp.Config
-      local o = {
+      return U.extend_tbl(opts, {
         appearance = {
           nerd_font_variant = "normal",
         },
@@ -353,9 +352,7 @@ return {
             },
           },
         },
-      }
-
-      return U.extend_tbl(opts, o)
+      } --[[@as blink.cmp.Config]])
     end,
   },
 
