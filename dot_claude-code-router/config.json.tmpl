@@ -1,0 +1,29 @@
+{
+  "Providers": [
+    {
+      "name": "openrouter",
+      "api_base_url": "https://openrouter.ai/api/v1/chat/completions",
+      "api_key": "{{ env `OPENROUTER_API_KEY_CCR` }}",
+      "models": [
+        "moonshotai/kimi-k2",
+        "google/gemini-2.5-pro",
+        "anthropic/claude-sonnet-4"
+      ],
+      "transformer": {
+        "use": ["openrouter"]
+      }
+    },
+    {
+      "name": "openrouter-kimi",
+      "api_base_url": "https://openrouter.ai/api/v1/chat/completions",
+      "api_key": "{{ env `OPENROUTER_API_KEY_CCR` }}",
+      "models": ["@preset/kimi"],
+      "transformer": {
+        "use": ["openrouter", ["maxtoken", { "max_tokens": 0 }]]
+      }
+    }
+  ],
+  "Router": {
+    "default": "openrouter-kimi,@preset/kimi"
+  }
+}

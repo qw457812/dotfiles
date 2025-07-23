@@ -253,6 +253,14 @@ return {
     init = function()
       vim.g["chezmoi#use_tmp_buffer"] = 1
       vim.g["chezmoi#source_dir_path"] = U.path.CHEZMOI
+
+      vim.api.nvim_create_autocmd("FileType", {
+        group = vim.api.nvim_create_augroup("chezmoi_json_conceal", {}),
+        pattern = "json.chezmoitmpl",
+        callback = function()
+          vim.opt_local.conceallevel = 0
+        end,
+      })
     end,
     specs = {
       {

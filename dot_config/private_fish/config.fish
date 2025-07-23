@@ -182,6 +182,9 @@ abbr cz chezmoi
 abbr czz 'cd (chezmoi source-path)' # chezmoi cd
 abbr czs 'chezmoi status'
 abbr cza 'chezmoi add'
+abbr czat 'chezmoi add --template'
+abbr czct 'chezmoi chattr +template'
+abbr czet --set-cursor "chezmoi execute-template '%'"
 abbr czd 'chezmoi diff'
 abbr czap 'chezmoi apply'
 abbr czapv 'chezmoi apply -v'

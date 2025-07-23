@@ -67,6 +67,7 @@ return {
   },
 
   -- https://github.com/willothy/nvim-config/blob/b5db7b8b7fe6258770c98f12337d6954a56b95e7/lua/configs/terminal/flatten.lua
+  -- alternative: https://github.com/hat0uma/dotfiles/blob/d01f24164f7dda71c2cab2cccd54cca8ba386e13/.config/nvim/lua/rc/terminal/editor.lua#L7-L9
   -- TODO: nested `nvim .` with oil not working
   {
     "willothy/flatten.nvim",
