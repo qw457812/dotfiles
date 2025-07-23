@@ -43,6 +43,7 @@
     "plugins.extras.editor.undotree",
     "plugins.extras.game.leetcode",
     "plugins.extras.git.gitlab",
+    "plugins.extras.lang.csv",
     "plugins.extras.lang.xml",
     "plugins.extras.lsp.mason-lock",
     "plugins.extras.lsp.tiny-inline-diagnostic",

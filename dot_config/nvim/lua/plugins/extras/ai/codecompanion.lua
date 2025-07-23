@@ -218,7 +218,7 @@ return {
     opts = function()
       -- see:
       -- - https://github.com/olimorris/codecompanion.nvim/discussions/813#discussioncomment-13081665
-      -- - https://github.com/olimorris/dotfiles/blob/16a503b14e75c9d5dfc973f2ee9e7aa2523e8a97/.config/nvim/lua/plugins/custom/spinner.lua
+      -- - https://github.com/olimorris/dotfiles/blob/450300040e03c389db76136565da9337018c0fb6/.config/nvim/lua/plugins/custom/spinner.lua
       vim.api.nvim_create_autocmd("User", {
         pattern = { "CodeCompanionRequestStarted", "CodeCompanionRequestStreaming", "CodeCompanionRequestFinished" },
         group = vim.api.nvim_create_augroup("codecompanion_snacks_notifier", {}),
@@ -239,7 +239,7 @@ return {
           local title
           local adapter = ev.data.adapter
           if adapter then
-            title = adapter.formatted_name
+            title = (adapter.formatted_name or adapter.name or "")
               .. (adapter.model and adapter.model ~= "" and " (" .. adapter.model .. ")" or "")
           else
             title = "CodeCompanion"

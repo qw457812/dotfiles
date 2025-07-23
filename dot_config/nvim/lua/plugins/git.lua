@@ -152,6 +152,7 @@ return {
     optional = true,
     opts = function(_, opts)
       opts.attach_to_untracked = true
+      opts.gh = vim.fn.executable("gh") == 1
 
       local on_attach = opts.on_attach or function(_) end
       opts.on_attach = function(buffer)

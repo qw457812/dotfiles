@@ -7,6 +7,8 @@ return {
     keys = {
       { "<leader>uc", "<cmd>CsvViewToggle<cr>", desc = "Csv View", ft = csv_ft },
     },
+    ---@module "csvview"
+    ---@type CsvView.Options
     opts = {
       -- view = { display_mode = "border" },
     },

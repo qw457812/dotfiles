@@ -1,6 +1,6 @@
 local mapping_disabled_prefix = "<leader>av<localleader>"
 
-local avante_ft = { "Avante", "AvanteInput", "AvanteSelectedFiles" }
+local avante_ft = { "Avante", "AvanteInput", "AvanteSelectedFiles", "AvanteSelectedCode" }
 
 -- https://github.com/yetone/avante.nvim/wiki/Recipe-and-Tricks
 ---@type table<string, string|fun():string>
@@ -391,6 +391,7 @@ return {
         compat = {
           "avante_commands",
           "avante_mentions",
+          "avante_shortcuts",
           -- "avante_files",
         },
         providers = {
@@ -398,6 +399,9 @@ return {
             score_offset = 90,
           },
           avante_mentions = {
+            score_offset = 100,
+          },
+          avante_shortcuts = {
             score_offset = 100,
           },
           -- avante_files = {

@@ -155,6 +155,7 @@ return {
             "avante",
             "avante_commands",
             "avante_mentions",
+            "avante_shortcuts",
             "avante_files",
           }, sources_default[i])
         then
