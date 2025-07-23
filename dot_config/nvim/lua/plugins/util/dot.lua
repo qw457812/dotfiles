@@ -9,14 +9,35 @@ return {
       then
         return -- fish-lsp failed to start
       end
+
+      -- HACK: prevent `bob update --all` from failing with: `Error: Neovim is currently running. Please close it before updating.`
+      -- see: https://github.com/ndonfris/fish-lsp/blob/1be77fcfa37d9d3877994f14163c7faacf7a533e/fish_files/get-documentation.fish
+      -- work with the following MANPAGER in config.fish:
+      -- ```fish
+      -- if status is-interactive
+      --     set -x MANPAGER 'nvim --cmd "lua vim.g.manpager = true" -c "nnoremap d <C-d>|lua vim.defer_fn(function() vim.api.nvim_command(\"silent! nunmap dd|nnoremap u <C-u>\") end, 500)" +Man!'
+      -- end
+      -- ```
+      local manpager = vim.env.MANPAGER
+      local fish_lsp_manpager = vim.fn.executable("col") == 1 and "col -bx" or "cat"
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "fish",
         callback = function()
           vim.lsp.start({
             name = "fish-lsp",
             cmd = { "fish-lsp", "start" },
-            cmd_env = { fish_lsp_show_client_popups = false },
+            cmd_env = {
+              MANPAGER = fish_lsp_manpager,
+              fish_lsp_show_client_popups = false,
+            },
           })
+        end,
+      })
+      vim.api.nvim_create_autocmd("BufEnter", {
+        group = vim.api.nvim_create_augroup("fix_fish_lsp_manpager", {}),
+        desc = "Fix hover and blink documentation for fish-lsp",
+        callback = function(ev)
+          vim.env.MANPAGER = vim.bo[ev.buf].filetype == "fish" and fish_lsp_manpager or manpager
         end,
       })
     end,
