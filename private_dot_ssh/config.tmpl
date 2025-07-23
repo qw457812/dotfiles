@@ -5,8 +5,8 @@ Host *
   UseKeychain yes
 {{- end }}
 
+Include config.local
+
 Host gh
   Hostname github.com
   User git
-
-Include config.local
