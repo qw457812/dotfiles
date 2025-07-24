@@ -540,20 +540,29 @@ return {
         group = augroup,
         pattern = "codecompanion",
         callback = function(event)
-          vim.schedule(function()
-            if not vim.api.nvim_buf_is_valid(event.buf) or U.is_floating_win(vim.fn.bufwinid(event.buf)) then
-              -- floating window for copilot stats
-              return
-            end
+          -- -- close (clears chat history)
+          -- vim.schedule(function()
+          --   if not vim.api.nvim_buf_is_valid(event.buf) or U.is_floating_win(vim.fn.bufwinid(event.buf)) then
+          --     -- floating window for copilot stats
+          --     return
+          --   end
+          --
+          --   local key = require("codecompanion.config").strategies.chat.keymaps.close.modes.n
+          --   vim.keymap.set(
+          --     "n",
+          --     close_key,
+          --     type(key) == "table" and key[1] or key,
+          --     { buffer = event.buf, remap = true, silent = true, desc = "Close (CodeCompanion)" }
+          --   )
+          -- end)
 
-            local key = require("codecompanion.config").strategies.chat.keymaps.close.modes.n
-            vim.keymap.set(
-              "n",
-              close_key,
-              type(key) == "table" and key[1] or key,
-              { buffer = event.buf, remap = true, silent = true, desc = "Close (CodeCompanion)" }
-            )
-          end)
+          -- hide (does not clear chat history)
+          vim.keymap.set(
+            "n",
+            close_key,
+            "<cmd>close<cr>",
+            { buffer = event.buf, silent = true, desc = "Close (CodeCompanion)" }
+          )
         end,
       })
     end,

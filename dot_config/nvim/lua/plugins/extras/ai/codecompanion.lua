@@ -214,56 +214,66 @@ return {
 
   -- status
   {
-    "folke/snacks.nvim",
-    opts = function()
-      -- see:
-      -- - https://github.com/olimorris/codecompanion.nvim/discussions/813#discussioncomment-13081665
-      -- - https://github.com/olimorris/dotfiles/blob/450300040e03c389db76136565da9337018c0fb6/.config/nvim/lua/plugins/custom/spinner.lua
-      vim.api.nvim_create_autocmd("User", {
-        pattern = { "CodeCompanionRequestStarted", "CodeCompanionRequestStreaming", "CodeCompanionRequestFinished" },
-        group = vim.api.nvim_create_augroup("codecompanion_snacks_notifier", {}),
-        callback = function(ev)
-          local msg
-          if ev.match == "CodeCompanionRequestStarted" then
-            msg = "  Sending..."
-          elseif ev.match == "CodeCompanionRequestStreaming" then
-            msg = "  Generating..."
-          elseif ev.data.status == "success" then
-            msg = "  Completed"
-          elseif ev.data.status == "error" then
-            msg = "  Failed"
-          else
-            msg = "󰜺  Cancelled"
-          end
-
-          local title
-          local adapter = ev.data.adapter
-          if adapter then
-            title = (adapter.formatted_name or adapter.name or "")
-              .. (adapter.model and adapter.model ~= "" and " (" .. adapter.model .. ")" or "")
-          else
-            title = "CodeCompanion"
-          end
-
-          local processing = ev.match ~= "CodeCompanionRequestFinished"
-          vim.g.user_esc_keep_notify = processing
-
-          ---@module "snacks"
-          vim.notify(msg, vim.log.levels.INFO, {
-            id = "codecompanion_status",
-            title = title,
-            timeout = 500,
-            keep = function()
-              return processing
-            end,
-            opts = function(notif)
-              notif.icon = processing and Snacks.util.spinner() or " "
-            end,
-          } --[[@as snacks.notifier.Notif.opts]])
-        end,
-      })
-    end,
+    "olimorris/codecompanion.nvim",
+    dependencies = "franco-ruggeri/codecompanion-spinner.nvim",
+    optional = true,
+    opts = {
+      extensions = {
+        spinner = {},
+      },
+    },
   },
+  -- {
+  --   "folke/snacks.nvim",
+  --   opts = function()
+  --     -- see:
+  --     -- - https://github.com/olimorris/codecompanion.nvim/discussions/813#discussioncomment-13081665
+  --     -- - https://github.com/olimorris/dotfiles/blob/450300040e03c389db76136565da9337018c0fb6/.config/nvim/lua/plugins/custom/spinner.lua
+  --     vim.api.nvim_create_autocmd("User", {
+  --       pattern = { "CodeCompanionRequestStarted", "CodeCompanionRequestStreaming", "CodeCompanionRequestFinished" },
+  --       group = vim.api.nvim_create_augroup("codecompanion_snacks_notifier", {}),
+  --       callback = function(ev)
+  --         local msg
+  --         if ev.match == "CodeCompanionRequestStarted" then
+  --           msg = "  Sending..."
+  --         elseif ev.match == "CodeCompanionRequestStreaming" then
+  --           msg = "  Generating..."
+  --         elseif ev.data.status == "success" then
+  --           msg = "  Completed"
+  --         elseif ev.data.status == "error" then
+  --           msg = "  Failed"
+  --         else
+  --           msg = "󰜺  Cancelled"
+  --         end
+  --
+  --         local title
+  --         local adapter = ev.data.adapter
+  --         if adapter then
+  --           title = (adapter.formatted_name or adapter.name or "")
+  --             .. (adapter.model and adapter.model ~= "" and " (" .. adapter.model .. ")" or "")
+  --         else
+  --           title = "CodeCompanion"
+  --         end
+  --
+  --         local processing = ev.match ~= "CodeCompanionRequestFinished"
+  --         vim.g.user_esc_keep_notify = processing
+  --
+  --         ---@module "snacks"
+  --         vim.notify(msg, vim.log.levels.INFO, {
+  --           id = "codecompanion_status",
+  --           title = title,
+  --           timeout = 500,
+  --           keep = function()
+  --             return processing
+  --           end,
+  --           opts = function(notif)
+  --             notif.icon = processing and Snacks.util.spinner() or " "
+  --           end,
+  --         } --[[@as snacks.notifier.Notif.opts]])
+  --       end,
+  --     })
+  --   end,
+  -- },
   -- {
   --   "nvim-lualine/lualine.nvim",
   --   optional = true,
