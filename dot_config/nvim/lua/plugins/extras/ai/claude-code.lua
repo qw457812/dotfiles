@@ -185,7 +185,7 @@ return {
         pattern = "term://*:claude*",
         callback = function(ev)
           if vim.bo[ev.buf].filetype == "snacks_terminal" then
-            vim.b[ev.buf].user_lualine_filename = "claude_code"
+            vim.b[ev.buf].user_lualine_filename = "claude-code"
           end
         end,
       })

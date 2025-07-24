@@ -129,12 +129,14 @@ return {
           win = {
             -- fullscreen
             -- copied from: https://github.com/folke/snacks.nvim/blob/3ae98636aaaf8f1b2f55b264f5745ae268de532f/lua/snacks/layout.lua#L247-L258
-            height = function()
+            -- see also: https://github.com/folke/snacks.nvim/blob/3ae98636aaaf8f1b2f55b264f5745ae268de532f/lua/snacks/layout.lua#L475-L478
+            height = function(self)
               local bottom = (vim.o.cmdheight + (vim.o.laststatus == 3 and 1 or 0)) or 0
               local top = (vim.o.showtabline == 2 or (vim.o.showtabline == 1 and #vim.api.nvim_list_tabpages() > 1))
                   and 1
                 or 0
-              return vim.o.lines - top - bottom
+              local border = self:border_size()
+              return vim.o.lines - top - bottom - border.top - border.bottom
             end,
             width = 0,
             border = "none",

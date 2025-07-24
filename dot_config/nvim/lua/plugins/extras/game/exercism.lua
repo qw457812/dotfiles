@@ -20,6 +20,7 @@ return {
       { "<leader>El", "<cmd>Exercism list<cr>", desc = "List" },
       { "<leader>Es", "<cmd>Exercism submit<cr>", desc = "Submit" },
       { "<leader>Et", "<cmd>Exercism test<cr>", desc = "Test" },
+      { "<leader>Er", "<cmd>Exercism recents<cr>", desc = "Recent" },
     },
     opts = {
       use_new_command = true,
