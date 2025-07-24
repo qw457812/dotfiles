@@ -24,13 +24,13 @@ return {
         mode = { "n", "x" },
       },
       {
-        "<leader>aop",
+        "<leader>anp",
         "<cmd>CodeCompanionActions<CR>",
         desc = "Actions (CodeCompanion)",
         mode = { "n", "x" },
       },
       {
-        "<leader>aoa",
+        "<leader>ana",
         "<cmd>CodeCompanionChat Add<CR>",
         desc = "Add (CodeCompanion)",
         mode = { "n", "x" },
@@ -52,91 +52,23 @@ return {
         chat = {
           adapter = "copilot",
           keymaps = {
-            options = {
-              modes = {
-                n = { "g?", "<localleader>?" },
-              },
-            },
-            regenerate = {
-              modes = {
-                n = "<localleader>r",
-              },
-            },
-            stop = {
-              modes = {
-                n = "<localleader>s",
-              },
-            },
-            clear = {
-              modes = {
-                n = "<localleader>c",
-              },
-            },
-            codeblock = {
-              modes = {
-                n = "<localleader>C",
-              },
-            },
-            yank_code = {
-              modes = {
-                n = "<localleader>y",
-              },
-            },
-            pin = {
-              modes = {
-                n = "<localleader>p",
-              },
-            },
-            watch = {
-              modes = {
-                n = "<localleader>w",
-              },
-            },
-            next_chat = {
-              modes = {
-                n = "<localleader>]",
-              },
-            },
-            previous_chat = {
-              modes = {
-                n = "<localleader>[",
-              },
-            },
-            change_adapter = {
-              modes = {
-                n = "<localleader>m",
-              },
-            },
-            fold_code = {
-              modes = {
-                n = "<localleader>f",
-              },
-            },
-            debug = {
-              modes = {
-                n = "<localleader>d",
-              },
-            },
-            system_prompt = {
-              modes = {
-                n = "<localleader>P",
-              },
-            },
-            auto_tool_mode = {
-              modes = {
-                n = "<localleader>a",
-              },
-            },
-            goto_file_under_cursor = {
-              modes = {
-                n = "<localleader>F",
-              },
-            },
-            copilot_stats = {
-              modes = {
-                n = "<localleader>S",
-              },
-            },
+            options = { modes = { n = { "g?", "<localleader>?" } } },
+            regenerate = { modes = { n = "<localleader>r" } },
+            stop = { modes = { n = "<localleader>s" } },
+            clear = { modes = { n = "<localleader>c" } },
+            codeblock = { modes = { n = "<localleader>C" } },
+            yank_code = { modes = { n = "<localleader>y" } },
+            pin = { modes = { n = "<localleader>p" } },
+            watch = { modes = { n = "<localleader>w" } },
+            next_chat = { modes = { n = "<localleader>]" } },
+            previous_chat = { modes = { n = "<localleader>[" } },
+            change_adapter = { modes = { n = "<localleader>m" } },
+            fold_code = { modes = { n = "<localleader>f" } },
+            debug = { modes = { n = "<localleader>d" } },
+            system_prompt = { modes = { n = "<localleader>P" } },
+            auto_tool_mode = { modes = { n = "<localleader>a" } },
+            goto_file_under_cursor = { modes = { n = "<localleader>F" } },
+            copilot_stats = { modes = { n = "<localleader>S" } },
           },
         },
         inline = {
@@ -166,7 +98,10 @@ return {
     "folke/which-key.nvim",
     opts = {
       spec = {
-        { "<leader>ao", group = "codecompanion" },
+        {
+          mode = { "n", "v" },
+          { "<leader>an", group = "codecompanion" },
+        },
       },
     },
   },

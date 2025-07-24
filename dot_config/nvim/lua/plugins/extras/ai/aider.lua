@@ -79,7 +79,10 @@ return {
     "folke/which-key.nvim",
     opts = {
       spec = {
-        { "<leader>ad", group = "aider" },
+        {
+          mode = { "n", "v" },
+          { "<leader>ad", group = "aider" },
+        },
       },
     },
   },

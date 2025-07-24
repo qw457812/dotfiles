@@ -177,7 +177,7 @@ return {
           ["<C-j>"] = { "select_next", H.actions.pum_next, H.actions.mini_snippets_expand, "fallback" },
           ["<C-k>"] = { "select_prev", H.actions.pum_prev, "show_signature", "hide_signature", "fallback" },
           ["<C-l>"] = { "snippet_forward", H.actions.mini_snippets_expand, "fallback" },
-          ["<C-h>"] = { "snippet_backward", "show_signature", "hide_signature", "fallback" },
+          ["<C-h>"] = { "snippet_backward", "show_signature", "hide_signature", "fallback" }, -- TODO: the fallback seems unreachable because show_signature returns true if the signature is not visible
           -- ["<C-u>"] = { "scroll_documentation_up", "fallback" },
           -- ["<C-d>"] = { "scroll_documentation_down", "fallback" },
           ["<C-u>"] = { H.actions.scroll_list_up, "fallback" },

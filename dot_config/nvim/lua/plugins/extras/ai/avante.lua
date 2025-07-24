@@ -218,7 +218,7 @@ return {
         enable_token_counting = false,
         -- use_cwd_as_project_root = true,
       },
-      provider = "copilot_claude",
+      provider = "copilot",
       -- auto_suggestions_provider = "ollama", -- high-frequency, can be expensive if enabled
       -- https://github.com/yetone/cosmos-nvim/blob/64ffc3f90f33eb4049f1495ba49f086280dc8a1c/lua/layers/completion/plugins.lua#L249
       ---@type table<string, AvanteSupportedProvider>
@@ -350,8 +350,10 @@ return {
 
           if is_input then
             vim.b[buf].user_blink_path = false
-            vim.keymap.set("i", "<C-h>", "<Esc><C-w>h", { buffer = buf, desc = "Go to Left Window", remap = true })
-            vim.keymap.set("i", "<C-k>", "<Esc><C-w>k", { buffer = buf, desc = "Go to Upper Window", remap = true })
+            vim.defer_fn(function()
+              vim.keymap.set("i", "<C-h>", "<Esc><C-w>h", { buffer = buf, desc = "Go to Left Window", remap = true })
+              -- vim.keymap.set("i", "<C-k>", "<Esc><C-w>k", { buffer = buf, desc = "Go to Upper Window", remap = true })
+            end, 100) -- prevent <C-h> from being remapped by blink.nvim, since the `fallback` command in `{ "show_signature", "hide_signature", "fallback" }` appears to be unreachable
           else
             vim.keymap.set("n", "i", focus_input, { buffer = buf, desc = "Focus Input (Avante)" })
             vim.api.nvim_create_autocmd("BufEnter", {
