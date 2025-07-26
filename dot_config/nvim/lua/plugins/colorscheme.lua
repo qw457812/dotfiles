@@ -377,6 +377,15 @@ return {
 
             TelescopeSelection = { fg = colors.text, bg = colors.surface0, style = { "bold" } },
             TelescopeSelectionCaret = { fg = colors.flamingo, bg = colors.surface0 },
+
+            SnacksPickerInput = {
+              fg = colors.text,
+              bg = not vim.g.user_transparent_background and colors.mantle or nil,
+            },
+            SnacksPickerSelected = {
+              fg = colors.green,
+              bg = not vim.g.user_transparent_background and colors.mantle or nil,
+            },
           }
 
           if vim.g.user_transparent_background then
@@ -406,8 +415,11 @@ return {
             TelescopePromptBorder = { fg = colors.peach },
             TelescopePromptTitle = { fg = colors.peach },
             TelescopeBorder = { fg = colors.sapphire },
-            SnacksPickerInputBorder = { fg = colors.peach },
-            SnacksPickerInputTitle = { fg = colors.peach },
+            SnacksPickerInputBorder = {
+              fg = colors.peach,
+              bg = not vim.g.user_transparent_background and colors.mantle or nil,
+            },
+            SnacksPickerInputTitle = { link = "SnacksPickerInputBorder" },
           })
         end,
       } --[[@as CatppuccinOptions]])
