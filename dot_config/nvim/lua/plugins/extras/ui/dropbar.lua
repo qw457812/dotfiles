@@ -301,6 +301,7 @@ return {
         "Avante", -- avante.nvim has its own winbar
         "AvanteInput",
         "AvanteSelectedFiles",
+        "AvanteSelectedCode",
       })
 
       opts.winbar = {

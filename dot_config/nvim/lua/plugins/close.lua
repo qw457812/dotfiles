@@ -522,7 +522,7 @@ return {
     opts = function()
       vim.api.nvim_create_autocmd("FileType", {
         group = augroup,
-        pattern = { "Avante", "AvanteInput", "AvanteSelectedFiles" },
+        pattern = { "Avante", "AvanteInput", "AvanteSelectedFiles", "AvanteSelectedCode" },
         callback = function(event)
           vim.keymap.set("n", close_key, function()
             require("avante").close_sidebar()
