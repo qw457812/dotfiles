@@ -1,3 +1,4 @@
+# @fish-lsp-disable 4004
 # https://github.com/LLM-Red-Team/kimi-cc
 function claude --wraps=claude
     set -lx ANTHROPIC_BASE_URL https://api.moonshot.cn/anthropic/

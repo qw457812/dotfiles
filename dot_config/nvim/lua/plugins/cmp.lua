@@ -417,11 +417,16 @@ return {
             ---@type blink-ripgrep.Options
             opts = {
               prefix_min_len = 3, -- same as `min_keyword_length`
-              ignore_paths = { vim.uv.os_homedir() }, -- CPU usage
               project_root_marker = function(_, path)
                 return path == LazyVim.root({ normalize = true })
               end,
-              project_root_fallback = false,
+              backend = {
+                use = "gitgrep-or-ripgrep",
+                ripgrep = {
+                  ignore_paths = { vim.uv.os_homedir() }, -- CPU usage
+                  project_root_fallback = false,
+                },
+              },
             },
           },
         },
