@@ -10,6 +10,7 @@ opt.relativenumber = false
 opt.spelllang:append("cjk") -- exclude East Asian characters from spell checking
 opt.timeoutlen = vim.g.vscode and 1000 or 500 -- increase timeoutlen for mini.operators `cX` since which-key v3
 -- opt.shell = vim.fn.executable("fish") == 1 and "fish" or opt.shell
+opt.exrc = true -- .nvim.lua
 opt.backup = true
 opt.backupdir = vim.fn.stdpath("state") .. "/backup"
 -- ignore builtin colorschemes for Snacks.picker.colorschemes(), see #969
