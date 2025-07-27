@@ -602,9 +602,14 @@ return {
         providers = {
           env = {
             module = "blink-cmp-env",
-            min_keyword_length = 3,
-            max_items = 3,
-            score_offset = -25,
+
+            -- -- without trigger character
+            -- min_keyword_length = 3,
+            -- max_items = 3,
+            -- score_offset = -25,
+
+            -- with "$" as trigger character
+            max_items = 20,
           },
         },
       },

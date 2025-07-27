@@ -5,7 +5,7 @@
   "Trans.nvim": { "branch": "v2", "commit": "3ebcd7b785dba7faec577b58606eb8a1c46b6260" },
   "avante.nvim": { "branch": "main", "commit": "d8ec4e4aa464b29c6ee276a701a691a042053c3f" },
   "better-escape.nvim": { "branch": "master", "commit": "19a38aab94961016430905ebec30d272a01e9742" },
-  "blink-cmp-env": { "branch": "main", "commit": "f008e0a4f1f0be9597d732000819cbd375e95bb6" },
+  "blink-cmp-env": { "branch": "main", "commit": "34c7817fa94f04719b4bab5e766974033f221f60" },
   "blink-cmp-spell": { "branch": "master", "commit": "2bd0e0d5e7735c047e72b6918a0458f3e8fadaba" },
   "blink-cmp-words": { "branch": "main", "commit": "81224ec2eb72115c84bb19ae566ef25083dbfed2" },
   "blink-cmp-yanky": { "branch": "main", "commit": "473b987c2a7d80cca116f6faf087dba4dbfbb3c5" },
