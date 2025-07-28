@@ -72,37 +72,40 @@ end
 function H.pick_definitions_or_references()
   local params = vim.lsp.util.make_position_params(0, "utf-16")
   local method = vim.lsp.protocol.Methods.textDocument_definition
-  local results_by_client, err = vim.lsp.buf_request_sync(0, method, params, 1000)
-  if err or not results_by_client then
-    LazyVim.error(string.format("Error executing '%s': %s", method, err), { title = "LSP" })
-    return
-  end
-  if vim.tbl_isempty(results_by_client) then
-    -- no definitions found, try references
-    H.pick_references()
-  else
-    for _, lsp_results in pairs(results_by_client) do
-      local result = lsp_results.result or {}
-      if result.range then -- Location
-        if H.is_same_position(result, params) then
-          -- already at one of the definitions, go to references
-          H.pick_references()
-          return
-        end
-      else
-        result = result --[[@as (lsp.Location[]|lsp.LocationLink[])]]
-        for _, item in pairs(result) do
-          if H.is_same_position(item, params) then
+
+  vim.lsp.buf_request_all(0, method, params, function(results)
+    if vim.tbl_isempty(results) then
+      -- no definitions found, try references
+      H.pick_references()
+      return
+    end
+
+    for _, resp in pairs(results) do
+      local err, result = resp.err, resp.result
+      if err then
+        LazyVim.error(string.format("Error executing '%s' (%d): %s", method, err.code, err.message), { title = "LSP" })
+      elseif result then
+        if result.range then -- Location
+          if H.is_same_position(result, params) then
             -- already at one of the definitions, go to references
             H.pick_references()
             return
+          end
+        else
+          result = result --[[@as (lsp.Location[]|lsp.LocationLink[])]]
+          for _, item in pairs(result) do
+            if H.is_same_position(item, params) then
+              -- already at one of the definitions, go to references
+              H.pick_references()
+              return
+            end
           end
         end
       end
     end
     -- not at any definition, go to definitions
     H.pick_definitions()
-  end
+  end)
 end
 
 ---@module "lazy"
