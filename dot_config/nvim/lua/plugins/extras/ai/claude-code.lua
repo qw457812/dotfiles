@@ -75,59 +75,7 @@ end
 return {
   {
     "coder/claudecode.nvim",
-    dependencies = {
-      "folke/snacks.nvim",
-      -- -- TODO: https://github.com/coder/claudecode.nvim/pull/65
-      -- ---@module "snacks"
-      -- ---@type snacks.Config
-      -- opts = {
-      --   terminal = {
-      --     win = {
-      --       keys = {
-      --         claude_close = {
-      --           H.toggle_key,
-      --           function(self)
-      --             self:hide()
-      --           end,
-      --           mode = "t",
-      --           desc = "Close",
-      --         },
-      --         -- copied from: https://github.com/folke/snacks.nvim/blob/bc0630e43be5699bb94dadc302c0d21615421d93/lua/snacks/terminal.lua#L49-L64
-      --         term_normal = {
-      --           "<esc>",
-      --           function(self)
-      --             local is_cc = H.is_cc(self.buf)
-      --             local is_cc_norm = H.is_cc_norm(self.buf)
-      --
-      --             ---@diagnostic disable-next-line: inject-field
-      --             self.esc_timer = self.esc_timer or (vim.uv or vim.loop).new_timer()
-      --             if self.esc_timer:is_active() then
-      --               self.esc_timer:stop()
-      --               if is_cc_norm then
-      --                 vim.api.nvim_feedkeys(vim.keycode("i"), "n", false)
-      --               end
-      --               vim.cmd("stopinsert")
-      --             else
-      --               self.esc_timer:start(
-      --                 200,
-      --                 0,
-      --                 (not is_cc or is_cc_norm) and function() end
-      --                   or vim.schedule_wrap(function()
-      --                     vim.api.nvim_feedkeys(vim.keycode("<esc>"), "n", false)
-      --                   end)
-      --               )
-      --               return (not is_cc or is_cc_norm) and "<esc>" or ""
-      --             end
-      --           end,
-      --           mode = "t",
-      --           expr = true,
-      --           desc = "Double escape to normal mode",
-      --         },
-      --       },
-      --     },
-      --   },
-      -- },
-    },
+    dependencies = "folke/snacks.nvim",
     cmd = "ClaudeCode",
     keys = {
       -- { H.toggle_key, function() vim.cmd(H.is_cc() and "ClaudeCode" or "ClaudeCodeFocus") end, desc = "Claude Code" }, -- same behavior as `:ClaudeCodeFocus`
@@ -176,10 +124,6 @@ return {
       -- { "<M-space>", "<cmd>ClaudeCodeDiffAccept<cr>", desc = "Accept Diff (Claude)" }, -- set `Diff tool` to `terminal`
       -- { "<M-cr>", "<cmd>ClaudeCodeDiffDeny<cr>", desc = "Deny Diff (Claude)" },
     },
-    -- init = function()
-    --   -- see: https://github.com/coder/claudecode.nvim/issues/52#issuecomment-2993522840
-    --   vim.env.CLAUDE_CONFIG_DIR = vim.fn.expand("~/.config/claude")
-    -- end,
     opts = function()
       vim.api.nvim_create_autocmd("TermOpen", {
         pattern = "term://*:claude*",
