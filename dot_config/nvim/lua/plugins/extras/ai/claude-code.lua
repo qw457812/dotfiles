@@ -204,61 +204,50 @@ return {
       return {
         terminal = {
           split_width_percentage = 0.4,
-        },
-      }
-    end,
-  },
+          ---@module "snacks"
+          ---@type snacks.win.Config|{}
+          snacks_win_opts = {
+            position = "float",
+            width = 0.9,
+            height = 0.9,
+            keys = {
+              claude_close = {
+                H.toggle_key,
+                function(self)
+                  self:hide()
+                end,
+                mode = "t",
+                desc = "Close",
+              },
+              -- copied from: https://github.com/folke/snacks.nvim/blob/bc0630e43be5699bb94dadc302c0d21615421d93/lua/snacks/terminal.lua#L49-L64
+              term_normal = {
+                "<esc>",
+                function(self)
+                  local is_cc_norm = H.is_cc_norm(self.buf)
 
-  -- TODO: https://github.com/coder/claudecode.nvim/pull/65
-  {
-    "qw457812/claudecode.nvim",
-    branch = "feat_snacks_win_opts",
-    optional = true,
-    opts = {
-      terminal = {
-        ---@module "snacks"
-        ---@type snacks.win.Config|{}
-        snacks_win_opts = {
-          position = "float",
-          width = 0.9,
-          height = 0.9,
-          keys = {
-            claude_close = {
-              H.toggle_key,
-              function(self)
-                self:hide()
-              end,
-              mode = "t",
-              desc = "Close",
-            },
-            -- copied from: https://github.com/folke/snacks.nvim/blob/bc0630e43be5699bb94dadc302c0d21615421d93/lua/snacks/terminal.lua#L49-L64
-            term_normal = {
-              "<esc>",
-              function(self)
-                local is_cc_norm = H.is_cc_norm(self.buf)
-
-                ---@diagnostic disable-next-line: inject-field
-                self.esc_timer = self.esc_timer or (vim.uv or vim.loop).new_timer()
-                if self.esc_timer:is_active() then
-                  self.esc_timer:stop()
-                  if is_cc_norm then
-                    vim.api.nvim_feedkeys(vim.keycode("i"), "n", false)
+                  ---@diagnostic disable-next-line: inject-field
+                  self.esc_timer = self.esc_timer or (vim.uv or vim.loop).new_timer()
+                  if self.esc_timer:is_active() then
+                    self.esc_timer:stop()
+                    if is_cc_norm then
+                      vim.api.nvim_feedkeys(vim.keycode("i"), "n", false)
+                    end
+                    vim.cmd("stopinsert")
+                  else
+                    self.esc_timer:start(200, 0, is_cc_norm and function() end or vim.schedule_wrap(function()
+                      vim.api.nvim_feedkeys(vim.keycode("<esc>"), "n", false)
+                    end))
+                    return is_cc_norm and "<esc>" or ""
                   end
-                  vim.cmd("stopinsert")
-                else
-                  self.esc_timer:start(200, 0, is_cc_norm and function() end or vim.schedule_wrap(function()
-                    vim.api.nvim_feedkeys(vim.keycode("<esc>"), "n", false)
-                  end))
-                  return is_cc_norm and "<esc>" or ""
-                end
-              end,
-              mode = "t",
-              expr = true,
-              desc = "Double escape to normal mode",
+                end,
+                mode = "t",
+                expr = true,
+                desc = "Double escape to normal mode",
+              },
             },
           },
         },
-      },
-    },
+      }
+    end,
   },
 }
