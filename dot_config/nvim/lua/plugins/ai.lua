@@ -117,7 +117,7 @@ return {
   {
     "CopilotC-Nvim/CopilotChat.nvim",
     optional = true,
-    cmd = { "CopilotChatModels", "CopilotChatPrompts", "CopilotChatAgents" },
+    cmd = { "CopilotChatModels", "CopilotChatPrompts" },
     dependencies = {
       { "MeanderingProgrammer/render-markdown.nvim", optional = true, ft = "copilot-chat" },
     },
@@ -148,10 +148,13 @@ return {
       })
 
       return U.extend_tbl(opts, {
-        error_header = LazyVim.config.icons.diagnostics.Error .. " Error ",
-        question_header = "  User ",
         -- model = "claude-sonnet-4",
         -- show_help = false,
+        headers = {
+          user = "##   User ",
+          assistant = "##   Copilot ",
+          tool = "## 󱁤  Tool ",
+        },
         window = {
           layout = function()
             return vim.o.columns >= 120 and "vertical" or "horizontal"

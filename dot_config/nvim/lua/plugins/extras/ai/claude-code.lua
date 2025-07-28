@@ -152,8 +152,20 @@ return {
           ---@type snacks.win.Config|{}
           snacks_win_opts = {
             position = "float",
-            width = 0.9,
-            height = 0.9,
+            -- TODO: duplicated code with `gemini-cli.lua`
+            -- fullscreen on termux
+            height = vim.g.user_is_termux
+                ---@param self snacks.win
+                and function(self)
+                  local bottom = (vim.o.cmdheight + (vim.o.laststatus == 3 and 1 or 0)) or 0
+                  local top = (vim.o.showtabline == 2 or (vim.o.showtabline == 1 and #vim.api.nvim_list_tabpages() > 1))
+                      and 1
+                    or 0
+                  local border = self:border_size()
+                  return vim.o.lines - top - bottom - border.top - border.bottom
+                end
+              or 0.9,
+            width = vim.g.user_is_termux and 0 or 0.9,
             keys = {
               claude_close = {
                 H.toggle_key,
