@@ -1,5 +1,19 @@
 local H = {}
 
+--- copied from: https://github.com/neovim/neovim/blob/cf9b36f3d97b6f9c66ffff008bc1b5a5dd14ca98/runtime/lua/vim/lsp/buf.lua#L13-L24
+--- @param params? table
+--- @return fun(client: vim.lsp.Client): lsp.TextDocumentPositionParams
+function H.client_positional_params(params)
+  local win = vim.api.nvim_get_current_win()
+  return function(client)
+    local ret = vim.lsp.util.make_position_params(win, client.offset_encoding)
+    if params then
+      ret = vim.tbl_extend("force", ret, params)
+    end
+    return ret
+  end
+end
+
 ---Check if cursor is in range
 ---copied from: https://github.com/Bekaboo/dropbar.nvim/blob/5439d2f02bb744cecb878aaa23c6c6f8b21a351c/lua/dropbar/sources/lsp.lua#L97-L115
 ---@module 'dropbar'
@@ -70,42 +84,47 @@ end
 --- Go to definition or references if already at definition, like `gd` in vscode and idea but slightly different.
 --- https://github.com/neovim/neovim/blob/fb6c059dc55c8d594102937be4dd70f5ff51614a/runtime/lua/vim/lsp/_tagfunc.lua#L25
 function H.pick_definitions_or_references()
-  local params = vim.lsp.util.make_position_params(0, "utf-16")
-  local method = vim.lsp.protocol.Methods.textDocument_definition
+  vim.lsp.buf_request_all(
+    0,
+    vim.lsp.protocol.Methods.textDocument_definition,
+    H.client_positional_params(),
+    function(results, ctx)
+      if vim.tbl_isempty(results) then
+        -- no definitions found, try references
+        H.pick_references()
+        return
+      end
 
-  vim.lsp.buf_request_all(0, method, params, function(results)
-    if vim.tbl_isempty(results) then
-      -- no definitions found, try references
-      H.pick_references()
-      return
-    end
-
-    for _, resp in pairs(results) do
-      local err, result = resp.err, resp.result
-      if err then
-        LazyVim.error(string.format("Error executing '%s' (%d): %s", method, err.code, err.message), { title = "LSP" })
-      elseif result then
-        if result.range then -- Location
-          if H.is_same_position(result, params) then
-            -- already at one of the definitions, go to references
-            H.pick_references()
-            return
-          end
-        else
-          result = result --[[@as (lsp.Location[]|lsp.LocationLink[])]]
-          for _, item in pairs(result) do
-            if H.is_same_position(item, params) then
+      for _, resp in pairs(results) do
+        local err, result = resp.err, resp.result
+        if err then
+          LazyVim.error(
+            string.format("Error executing '%s' (%d): %s", ctx.method, err.code, err.message),
+            { title = "LSP" }
+          )
+        elseif result then
+          if result.range then -- Location
+            if H.is_same_position(result, ctx.params) then
               -- already at one of the definitions, go to references
               H.pick_references()
               return
             end
+          else
+            result = result --[[@as (lsp.Location[]|lsp.LocationLink[])]]
+            for _, item in pairs(result) do
+              if H.is_same_position(item, ctx.params) then
+                -- already at one of the definitions, go to references
+                H.pick_references()
+                return
+              end
+            end
           end
         end
       end
+      -- not at any definition, go to definitions
+      H.pick_definitions()
     end
-    -- not at any definition, go to definitions
-    H.pick_definitions()
-  end)
+  )
 end
 
 ---@module "lazy"
