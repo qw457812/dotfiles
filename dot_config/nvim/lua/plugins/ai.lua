@@ -125,7 +125,21 @@ return {
     keys = {
       { "<leader>aa", mode = { "n", "v" }, false },
       { "<leader>ax", mode = { "n", "v" }, false },
-      { "<leader>ac", mode = { "n", "v" }, function() require("CopilotChat").open() end, desc = "CopilotChat" },
+      {
+        "<leader>ac",
+        mode = { "n", "v" },
+        function()
+          local copilot_chat = require("CopilotChat")
+          copilot_chat.open()
+
+          -- copied from: https://github.com/CopilotC-Nvim/CopilotChat.nvim/blob/9d9b2809e1240f9525752ae145799b88d22cd7af/lua/CopilotChat/ui/chat.lua#L360-L369
+          local chat = copilot_chat.chat
+          if chat:focused() and vim.bo[chat.bufnr].modifiable then
+            vim.cmd("startinsert!")
+          end
+        end,
+        desc = "CopilotChat",
+      },
       { "<localleader>c", mode = { "n", "v" }, function() require("CopilotChat").reset() end, desc = "Clear", ft = "copilot-chat" },
       { "<localleader>m", "<cmd>CopilotChatModels<cr>", desc = "Switch Model", ft = "copilot-chat" },
       { "<localleader>s", "<cmd>CopilotChatStop<cr>", desc = "Stop", ft = "copilot-chat" },
@@ -150,6 +164,7 @@ return {
       return U.extend_tbl(opts, {
         -- model = "claude-sonnet-4",
         -- show_help = false,
+        auto_insert_mode = false, -- wrong cursor position: https://github.com/CopilotC-Nvim/CopilotChat.nvim/blob/9d9b2809e1240f9525752ae145799b88d22cd7af/lua/CopilotChat/ui/chat.lua#L409
         headers = {
           user = "##   User ",
           assistant = "##   Copilot ",
