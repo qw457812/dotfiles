@@ -10,5 +10,18 @@
       "Bash(tail:*)",
       "Bash(mkdir:*)"
     ]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/xingyuqiang/.claude/count_tokens.js"
+          }
+        ]
+      }
+    ]
   }
 }

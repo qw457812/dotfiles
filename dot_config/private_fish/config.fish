@@ -244,10 +244,13 @@ if type -q claude
     abbr cl claude
     abbr clc "claude --continue"
     abbr clr "claude --resume"
-end
-# https://github.com/musistudio/claude-code-router
-if type -q ccr
-    abbr ccr "ccr code"
+    abbr ccexp "bunx ccexp@latest" # https://github.com/nyatinte/ccexp
+    abbr cctmpl "npx claude-code-templates@latest" # https://github.com/davila7/claude-code-templates
+    abbr ccleaderboard "open https://www.claudecount.com/" # need to run `npx claude-code-leaderboard` first, see https://github.com/grp06/claude-code-leaderboard
+    # https://github.com/musistudio/claude-code-router
+    if type -q ccr
+        abbr ccr "ccr code"
+    end
 end
 if type -q aider
     abbr ad aider
