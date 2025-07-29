@@ -136,16 +136,12 @@ return {
         end,
         -- insert current (selected) item
         insert = function(cmp)
-          if H.cmdline_actions.is_inserted(cmp) then
+          if cmp.get_selected_item_idx() == nil or H.cmdline_actions.is_inserted(cmp) then
             return
           end
-          -- work-around for insert current
-          if #cmp.get_items() > 1 and cmp.get_selected_item_idx() ~= nil then
-            cmp.select_next({ auto_insert = false })
-            return cmp.select_prev({ auto_insert = true })
-          else
-            return cmp.select_next({ auto_insert = true }) -- alternate to `cmp.insert_next()`
-          end
+          -- work-around for insert current (selected) item
+          cmp.select_next({ auto_insert = false })
+          return cmp.select_prev({ auto_insert = true })
         end,
       }
 
@@ -195,6 +191,7 @@ return {
               "fallback",
             },
             ["<Tab>"] = { "show_and_insert", H.cmdline_actions.insert, "select_next" },
+            ["<S-Tab>"] = { "show_and_insert", H.cmdline_actions.insert, "select_prev" },
             ["<Right>"] = {
               function(cmp)
                 if cmp.is_ghost_text_visible() and not H.cmdline_actions.is_inserted(cmp) then
