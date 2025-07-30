@@ -57,9 +57,10 @@ function M.relative_to_root(path)
 end
 
 ---@param path string
+---@param relative? boolean relative to root if possible, defaults to true
 ---@return string
-function M.shorten(path)
-  path = M.home_to_tilde(path)
+function M.shorten(path, relative)
+  -- special paths like dotfiles
   if not M._SHORTEN_PATTERNS then
     local patterns = {
       { M.CONFIG, " " },
@@ -73,12 +74,31 @@ function M.shorten(path)
     end
     table.insert(patterns, { vim.env.XDG_CONFIG_HOME or vim.env.HOME .. "/.config", "󱁿 " })
     patterns = vim.tbl_map(function(p)
-      return { "^" .. vim.pesc(M.home_to_tilde(p[1])) .. "/", p[2] }
+      return { "^" .. vim.pesc(p[1]) .. "/", p[2] }
     end, patterns)
     M._SHORTEN_PATTERNS = patterns
   end
+
+  local path_orig = path
   for _, p in ipairs(M._SHORTEN_PATTERNS) do
     path = path:gsub(p[1], p[2])
+  end
+  if relative ~= false and path == path_orig then
+    -- copied from: https://github.com/folke/snacks.nvim/blob/e039139291f85eebf3eeb41cc5ad9dc4265cafa4/lua/snacks/picker/util/init.lua#L25-L35
+    local root = LazyVim.root({ normalize = true })
+    if path:find(root .. "/", 1, true) == 1 and #path > #root then
+      path = path:sub(#root + 2)
+    else
+      root = Snacks.git.get_root(path)
+      if root and root ~= "" and path:find(root, 1, true) == 1 then
+        local tail = vim.fn.fnamemodify(root, ":t")
+        path = "⋮" .. tail .. "/" .. path:sub(#root + 2)
+      elseif path:find(M.HOME, 1, true) == 1 then
+        path = "~" .. path:sub(#M.HOME + 1)
+      end
+    end
+  else
+    path = M.home_to_tilde(path)
   end
   return U.java.path_shorten(path)
 end
