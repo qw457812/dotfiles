@@ -538,7 +538,7 @@ return {
               local item = picker and picker:current()
               -- local path = item and item.file -- better performance
               local path = item and Snacks.picker.util.path(item)
-              return path and U.path.shorten(path, false) or ""
+              return path and U.path.shorten(path, { relative = false }) or ""
             end,
           },
           lualine_z = {

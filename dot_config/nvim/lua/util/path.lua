@@ -56,41 +56,59 @@ function M.relative_to_root(path)
   return require("plenary.path"):new(path):make_relative(LazyVim.root({ normalize = true }))
 end
 
+-- * special: special paths like dotfiles, defaults to true
+-- * relative: relative to cwd/root or provided path if possible, defaults to true, same as vim.fn.getcwd()
+-- * java: java paths, defaults to true
+---@alias PathShortenOpts {special?: boolean, relative?: boolean|string, java?: boolean}
+
 ---@param path string
----@param relative? boolean relative to root if possible, defaults to true
+---@param opts? PathShortenOpts
 ---@return string
-function M.shorten(path, relative)
-  -- special paths like dotfiles
-  if not M._SHORTEN_PATTERNS then
-    local patterns = {
-      { M.CONFIG, " " },
-      { M.LAZYVIM, "󰒲 " },
-      { require("lazy.core.config").options.root, "󰒲 " },
-    }
-    if M.CHEZMOI then
-      table.insert(patterns, { M.CHEZMOI .. "/dot_config", "󱁿 " }) -- 󰒓 
-      table.insert(patterns, { M.CHEZMOI, "󰠦 " })
-      table.insert(patterns, { vim.fn.stdpath("config"), " " }) -- 
-    end
-    table.insert(patterns, { vim.env.XDG_CONFIG_HOME or vim.env.HOME .. "/.config", "󱁿 " })
-    patterns = vim.tbl_map(function(p)
-      return { "^" .. vim.pesc(p[1]) .. "/", p[2] }
-    end, patterns)
-    M._SHORTEN_PATTERNS = patterns
-  end
+function M.shorten(path, opts)
+  opts = vim.tbl_deep_extend("force", {
+    special = true,
+    relative = true,
+    java = true,
+  }, opts or {}) --[[@as PathShortenOpts]]
 
   local path_orig = path
-  for _, p in ipairs(M._SHORTEN_PATTERNS) do
-    path = path:gsub(p[1], p[2])
+  if opts.special then
+    if not M._SHORTEN_PATTERNS then
+      local patterns = {
+        { M.CONFIG, " " },
+        { M.LAZYVIM, "󰒲 " },
+        { require("lazy.core.config").options.root, "󰒲 " },
+      }
+      if M.CHEZMOI then
+        table.insert(patterns, { M.CHEZMOI .. "/dot_config", "󱁿 " }) -- 󰒓 
+        table.insert(patterns, { M.CHEZMOI, "󰠦 " })
+        table.insert(patterns, { vim.fn.stdpath("config"), " " }) -- 
+      end
+      table.insert(patterns, { vim.env.XDG_CONFIG_HOME or vim.env.HOME .. "/.config", "󱁿 " })
+      patterns = vim.tbl_map(function(p)
+        return { "^" .. vim.pesc(p[1]) .. "/", p[2] }
+      end, patterns)
+      M._SHORTEN_PATTERNS = patterns
+    end
+    for _, p in ipairs(M._SHORTEN_PATTERNS) do
+      path = path:gsub(p[1], p[2])
+    end
   end
-  if relative ~= false and path == path_orig then
-    -- copied from: https://github.com/folke/snacks.nvim/blob/e039139291f85eebf3eeb41cc5ad9dc4265cafa4/lua/snacks/picker/util/init.lua#L25-L35
-    local root = LazyVim.root({ normalize = true })
-    if path:find(root .. "/", 1, true) == 1 and #path > #root then
-      path = path:sub(#root + 2)
+
+  -- special paths take precedence over relative paths
+  if path == path_orig and opts.relative then
+    -- copied from: https://github.com/folke/snacks.nvim/blob/e039139291f85eebf3eeb41cc5ad9dc4265cafa4/lua/snacks/picker/util/init.lua#L21-L35
+    local cwd = type(opts.relative) == "string"
+        and vim.fs.normalize(opts.relative --[[@as string]], { _fast = true, expand_env = false })
+      or vim.fn.getcwd()
+    if path:find(cwd .. "/", 1, true) == 1 and #path > #cwd then
+      path = path:sub(#cwd + 2)
     else
-      root = Snacks.git.get_root(path)
-      if root and root ~= "" and path:find(root, 1, true) == 1 then
+      local root = LazyVim.root({ normalize = true })
+      if not (path:find(root .. "/", 1, true) == 1 and #path > #root) then
+        root = Snacks.git.get_root(path) or ""
+      end
+      if root ~= "" and path:find(root, 1, true) == 1 then
         local tail = vim.fn.fnamemodify(root, ":t")
         path = "⋮" .. tail .. "/" .. path:sub(#root + 2)
       elseif path:find(M.HOME, 1, true) == 1 then
@@ -100,7 +118,8 @@ function M.shorten(path, relative)
   else
     path = M.home_to_tilde(path)
   end
-  return U.java.path_shorten(path)
+
+  return opts.java and U.java.path_shorten(path) or path
 end
 
 return M
