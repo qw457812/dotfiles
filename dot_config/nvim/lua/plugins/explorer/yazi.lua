@@ -4,6 +4,8 @@ function H.build_plugin(plugin)
   require("yazi.plugin").build_plugin(plugin)
 end
 
+---@module "lazy"
+---@type LazySpec
 return {
   -- https://github.com/sxyazi/dotfiles/blob/79828c4b3f33a9b0286f2c8f5e60dcc052ace632/nvim/lua/plugins/ui.lua#L557
   -- https://github.com/mikavilpas/dotfiles/blob/4e99cc0c933abd614bd362e2555630b528ebb0fe/.config/nvim/lua/plugins/my-file-manager.lua

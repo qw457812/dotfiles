@@ -8,20 +8,8 @@
       "Bash(cat:*)",
       "Bash(head:*)",
       "Bash(tail:*)",
+      "Bash(touch:*)",
       "Bash(mkdir:*)"
-    ]
-  },
-  "hooks": {
-    "Stop": [
-      {
-        "matcher": ".*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/Users/xingyuqiang/.claude/count_tokens.js"
-          }
-        ]
-      }
     ]
   }
 }

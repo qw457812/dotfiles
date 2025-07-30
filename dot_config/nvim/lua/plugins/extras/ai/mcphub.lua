@@ -18,6 +18,9 @@ return {
   -- {
   --   "yetone/avante.nvim",
   --   optional = true,
+  --   dependencies = "ravitemer/mcphub.nvim",
+  --   ---@module "avante"
+  --   ---@type avante.Config
   --   opts = {
   --     system_prompt = function()
   --       local hub = require("mcphub").get_hub_instance()
@@ -38,11 +41,8 @@ return {
       extensions = {
         mcphub = {
           callback = "mcphub.extensions.codecompanion",
-          opts = {
-            show_result_in_chat = true,
-            make_vars = true,
-            make_slash_commands = true,
-          },
+          ---@type MCPHub.Extensions.CodeCompanionConfig|{}
+          opts = {},
         },
       },
     },

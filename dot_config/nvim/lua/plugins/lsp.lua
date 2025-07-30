@@ -277,6 +277,24 @@ return {
   },
 
   {
+    "williamboman/mason.nvim",
+    optional = true,
+    ---@module "mason"
+    ---@type MasonSettings
+    opts = {
+      ui = {
+        width = vim.g.user_is_termux and 1 or nil,
+        height = vim.g.user_is_termux and 1 or nil,
+        keymaps = {
+          uninstall_package = "x",
+          apply_language_filter = "f",
+          toggle_help = "?",
+        },
+      },
+    },
+  },
+
+  {
     "folke/noice.nvim",
     optional = true,
     opts = function(_, opts)
