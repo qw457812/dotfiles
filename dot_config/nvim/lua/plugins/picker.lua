@@ -461,6 +461,35 @@ return {
     "folke/snacks.nvim",
     optional = true,
     opts = function()
+      ---@param dir string
+      ---@param len number
+      ---@return string
+      local function trunc_dir(dir, len)
+        if len <= 1 then
+          return ""
+        end
+
+        dir = U.path.shorten(dir)
+        -- ref: https://github.com/folke/snacks.nvim/blob/e039139291f85eebf3eeb41cc5ad9dc4265cafa4/lua/snacks/picker/util/init.lua#L36-L61
+        if vim.api.nvim_strwidth(dir) <= len then
+          return dir
+        end
+
+        local parts = vim.split(dir:gsub("/$", ""), "/")
+        -- single part, e.g. "foobar/" ("foobar/baz") -> "foob…/" ("foob…/baz")
+        if #parts < 2 then
+          return H.truncate(dir, len - 1) .. "/"
+        end
+
+        -- -- TODO: https://github.com/folke/snacks.nvim/blob/e039139291f85eebf3eeb41cc5ad9dc4265cafa4/lua/snacks/picker/util/init.lua#L46-L61
+        -- local ret = table.remove(parts)
+        -- local first = table.remove(parts, 1)
+        -- if (first == "~" or first == "") and #parts > 0 then
+        --   first = first .. "/" .. table.remove(parts, 1)
+        -- end
+        return H.truncate(dir, len, -1)
+      end
+
       -- HACK: shorten & truncate dir | https://github.com/folke/snacks.nvim/blob/2568f18c4de0f43b15b0244cd734dcb5af93e53f/lua/snacks/picker/format.lua#L51
       Snacks.picker.util.truncpath = function(path)
         return path
@@ -499,8 +528,7 @@ return {
 
         for _, text in ipairs(ret) do
           if text[2] == "SnacksPickerDir" then
-            text[1] = U.path.shorten(text[1])
-            text[1] = dir_trunc_len <= 1 and "" or H.truncate(text[1], dir_trunc_len, -1)
+            text[1] = trunc_dir(text[1], dir_trunc_len)
             break
           end
         end
