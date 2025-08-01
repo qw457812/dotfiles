@@ -2,26 +2,15 @@
 -- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
 -- Add any additional keymaps here
 
+---@module "lazyvim"
+---@module "snacks"
+
 local Lazy = require("lazy")
 local LazyViewConfig = require("lazy.view.config")
 
 local map = U.keymap.map
 local safe_map = U.keymap.safe_map
 local del = U.keymap.del
-
-local function cmdwin(type)
-  local function open()
-    vim.api.nvim_feedkeys(vim.keycode("q" .. type .. "G"), "n", false)
-  end
-  return function()
-    if U.toggle.zen:get() then
-      U.toggle.zen:set(false)
-      vim.schedule(open) -- schedule for snacks zen
-    else
-      open()
-    end
-  end
-end
 
 -- -- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/keybindings.lua#L234
 -- map("n", "<cr>", function() return vim.fn.pumvisible() == 1 and "<cr>" or "gd" end, { expr = true, desc = "Goto local Declaration" })
@@ -75,6 +64,7 @@ map("n", "<Right>", "<C-i>", { desc = "Go Forward" })
 map("n", "<esc>", U.keymap.clear_ui_esc, { desc = "Escape and Clear hlsearch or notifications or Close floating window(s)" })
 map({ "i", "s" }, "<esc>", function()
   -- vim.cmd("noh")
+  ---@module "mini.snippets"
   if not _G.MiniSnippets then -- by design, <esc> should not stop the session!
     LazyVim.cmp.actions.snippet_stop()
   end
@@ -215,9 +205,9 @@ map("n", "gp", '"`[" . strpart(getregtype(), 0, 1) . "`]"', { expr = true, repla
 -- use `silent = false` for it to make effect immediately
 map("x", "g/", "<esc>/\\%V", { silent = false, desc = "Search inside visual selection" })
 
-map("n", "g/", cmdwin("/"), { desc = "command-line window (Search forward)" })
-map("n", "g?", cmdwin("?"), { desc = "command-line window (Search backward)" })
-map({ "n", "x" }, "g:", cmdwin(":"), { desc = "command-line window (Ex command)" })
+map("n", "g/", U.keymap.cmdwin("/"), { desc = "command-line window (Search forward)" })
+map("n", "g?", U.keymap.cmdwin("?"), { desc = "command-line window (Search backward)" })
+map({ "n", "x" }, "g:", U.keymap.cmdwin(":"), { desc = "command-line window (Ex command)" })
 
 map("n", "g.", "@:", { desc = "Repeat last command-line" })
 
@@ -225,6 +215,8 @@ map("n", "g.", "@:", { desc = "Repeat last command-line" })
 map("n", "z.", "1z=", { desc = "Fix Spelling" })
 
 map("s", "<bs>", "<C-o>s", { desc = "Inside a snippet (nvim-cmp), use backspace to remove the placeholder" })
+
+safe_map("x", "<leader>?", U.keymap.web_search, { desc = "Web Search" }) -- csgithub.nvim
 
 -- toggle options
 U.toggle.zen:map("<leader>z")
@@ -314,16 +306,6 @@ map("n", "<leader>iL", lint_info, { desc = "Lint" })
 map("n", "<leader>iC", function() LazyVim.info(vim.g.colors_name, { title = "ColorScheme" }) end, { desc = "ColorScheme" })
 -- alternative: `:h news` or `LazyVim.news.neovim()`
 map("n", "<leader>iN", news, { desc = "Neovim News" })
-
-local function web_search(query)
-  query = query or U.get_visual_selection({ strict = true }) or vim.fn.expand("<cword>")
-  if not query then
-    LazyVim.warn("No contents to search", { title = "Web Search" })
-    return
-  end
-  vim.ui.open("https://www.google.com/search?q=" .. U.url_encode(query))
-end
-safe_map("x", "<leader>?", web_search, { desc = "Web Search" }) -- csgithub.nvim
 
 local function paste()
   vim.api.nvim_paste(vim.fn.getreg("+"), true, -1)

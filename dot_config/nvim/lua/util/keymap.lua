@@ -1,3 +1,6 @@
+---@module "lazyvim"
+---@module "snacks"
+
 ---@class util.keymap
 ---@overload fun(mode: string|string[], lhs: string|string[], rhs: string|function, opts?: vim.keymap.set.Opts)
 local M = setmetatable({}, {
@@ -103,6 +106,7 @@ function M.put_empty_line(put_above)
     return "g@l"
   end
   local target_line = vim.fn.line(".") - (cache_empty_line.put_above and 1 or 0)
+  ---@diagnostic disable-next-line: missing-return
   vim.fn.append(target_line, vim.fn["repeat"]({ "" }, vim.v.count1))
 end
 
@@ -166,6 +170,32 @@ function M.save_without_format()
   if vim.fn.mode() ~= "n" then
     vim.api.nvim_feedkeys(vim.keycode("<esc>"), "n", false)
   end
+end
+
+---@param type ":"|"/"|"?"
+---@return function
+function M.cmdwin(type)
+  local function open()
+    vim.api.nvim_feedkeys(vim.keycode("q" .. type .. "G"), "n", false)
+  end
+  return function()
+    if U.toggle.zen:get() then
+      U.toggle.zen:set(false)
+      vim.schedule(open) -- schedule for snacks zen
+    else
+      open()
+    end
+  end
+end
+
+---@param query string?
+function M.web_search(query)
+  query = query or U.get_visual_selection({ strict = true }) or vim.fn.expand("<cword>")
+  if not query then
+    LazyVim.warn("No contents to search", { title = "Web Search" })
+    return
+  end
+  vim.ui.open("https://www.google.com/search?q=" .. U.url_encode(query))
 end
 
 -- https://github.com/folke/flash.nvim/blob/34c7be146a91fec3555c33fe89c7d643f6ef5cf1/lua/flash/jump.lua#L204
