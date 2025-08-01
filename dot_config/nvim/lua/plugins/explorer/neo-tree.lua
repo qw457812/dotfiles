@@ -122,38 +122,39 @@ return {
         end,
       })
 
-      -- fixes:
-      -- * session restored with dead windows if nvim exited with neotree open (somehow related to `close_if_last_window = true`), see: https://github.com/yetone/avante.nvim/pull/1803
-      -- * `ZZ`/`:wq` won't exit nvim when neotree is visible (maybe related to `vim.g.user_explorer_auto_open = true`)
-      -- alternative to `close_if_last_window = true`
-      -- see also: https://github.com/nvim-tree/nvim-tree.lua/wiki/Auto-Close/f9ee39e5c1849d21e7a2ec8138dcdd453e721508#marvinth01
-      vim.api.nvim_create_autocmd("QuitPre", {
-        group = vim.api.nvim_create_augroup("close_neotree_before_quit", { clear = true }),
-        callback = function(ev)
-          if
-            vim.bo[ev.buf].filetype == "neo-tree" -- in favor of vim.g.user_exit_key in neotree buffer
-            or U.is_floating_win(vim.fn.bufwinid(ev.buf))
-          then
-            return
-          end
-
-          local tree_wins, floating_wins = {}, {}
-          local wins = vim.api.nvim_tabpage_list_wins(0)
-          for _, w in ipairs(wins) do
-            if vim.bo[vim.api.nvim_win_get_buf(w)].filetype == "neo-tree" then
-              table.insert(tree_wins, w)
-            elseif U.is_floating_win(w) then
-              table.insert(floating_wins, w)
-            end
-          end
-          if
-            #wins - #floating_wins - #tree_wins == 1 -- should exit
-            and #tree_wins > 0 -- neotree is visible
-          then
-            require("neo-tree.command").execute({ action = "close" })
-          end
-        end,
-      })
+      -- -- fixes:
+      -- -- * session restored with dead windows if nvim exited with neotree open (somehow related to `close_if_last_window = true`), see: https://github.com/yetone/avante.nvim/pull/1803
+      -- -- * `ZZ`/`:wq` won't exit nvim when neotree is visible (maybe related to `vim.g.user_explorer_auto_open = true`)
+      -- -- alternative to `close_if_last_window = true`
+      -- -- see also: https://github.com/nvim-tree/nvim-tree.lua/wiki/Auto-Close/f9ee39e5c1849d21e7a2ec8138dcdd453e721508#marvinth01
+      -- -- TODO: not needed since https://github.com/nvim-neo-tree/neo-tree.nvim/commit/7eadf08 and https://github.com/nvim-neo-tree/neo-tree.nvim/commit/46fa0c2
+      -- vim.api.nvim_create_autocmd("QuitPre", {
+      --   group = vim.api.nvim_create_augroup("close_neotree_before_quit", { clear = true }),
+      --   callback = function(ev)
+      --     if
+      --       vim.bo[ev.buf].filetype == "neo-tree" -- in favor of vim.g.user_exit_key in neotree buffer
+      --       or U.is_floating_win(vim.fn.bufwinid(ev.buf))
+      --     then
+      --       return
+      --     end
+      --
+      --     local tree_wins, floating_wins = {}, {}
+      --     local wins = vim.api.nvim_tabpage_list_wins(0)
+      --     for _, w in ipairs(wins) do
+      --       if vim.bo[vim.api.nvim_win_get_buf(w)].filetype == "neo-tree" then
+      --         table.insert(tree_wins, w)
+      --       elseif U.is_floating_win(w) then
+      --         table.insert(floating_wins, w)
+      --       end
+      --     end
+      --     if
+      --       #wins - #floating_wins - #tree_wins == 1 -- should exit
+      --       and #tree_wins > 0 -- neotree is visible
+      --     then
+      --       require("neo-tree.command").execute({ action = "close" })
+      --     end
+      --   end,
+      -- })
 
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "neo-tree-popup",
@@ -384,7 +385,7 @@ return {
       ---@type neotree.Config
       local o = {
         sources = { "filesystem" },
-        -- close_if_last_window = true, -- disabled as it causes `:bd` to exit vim in java library buffer when neo-tree opened, see #241
+        close_if_last_window = true, -- note that this causes `:bd` to exit vim in a java library buffer when neo-tree is open, see #241
         default_component_configs = {
           -- use mini.icons instead of nvim-web-devicons
           -- https://github.com/nvim-neo-tree/neo-tree.nvim/pull/1527#issuecomment-2233186777
