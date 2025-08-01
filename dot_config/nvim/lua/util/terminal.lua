@@ -1,4 +1,5 @@
 ---@module "snacks"
+
 ---@class util.terminal
 ---@overload fun(cmd?: string|string[], opts?: snacks.terminal.Opts): snacks.terminal
 local M = setmetatable({}, {

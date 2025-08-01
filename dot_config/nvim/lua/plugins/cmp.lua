@@ -5,6 +5,8 @@ end
 
 -- https://github.com/Saghen/nvim/blob/06849f05f2057e4fa7774bdba0d9b70d785716f0/lua/core/blink.lua
 ---@module "lazy"
+---@module "lazyvim"
+---@module "mini.snippets"
 ---@type LazySpec
 return {
   {
@@ -174,10 +176,12 @@ return {
           ["<C-k>"] = { "select_prev", H.actions.pum_prev, "show_signature", "hide_signature", "fallback" },
           ["<C-l>"] = { "snippet_forward", H.actions.mini_snippets_expand, "fallback" },
           ["<C-h>"] = { "snippet_backward", "show_signature", "hide_signature", "fallback" }, -- TODO: the fallback seems unreachable because show_signature returns true if the signature is not visible
-          -- ["<C-u>"] = { "scroll_documentation_up", "fallback" },
-          -- ["<C-d>"] = { "scroll_documentation_down", "fallback" },
+          -- ["<C-u>"] = { "scroll_documentation_up", "scroll_signature_up", "fallback" },
+          -- ["<C-d>"] = { "scroll_documentation_down", "scroll_signature_down", "fallback" },
           ["<C-u>"] = { H.actions.scroll_list_up, "fallback" },
           ["<C-d>"] = { H.actions.scroll_list_down, "fallback" },
+          ["<C-b>"] = { "scroll_documentation_up", "scroll_signature_up", "fallback" },
+          ["<C-f>"] = { "scroll_documentation_down", "scroll_signature_down", "fallback" },
         },
         cmdline = {
           enabled = true,
@@ -663,6 +667,7 @@ return {
   {
     "nvim-cmp",
     optional = true,
+    ---@module "cmp"
     ---@param opts cmp.ConfigSchema
     opts = function(_, opts)
       local cmp = require("cmp")
