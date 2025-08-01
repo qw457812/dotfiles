@@ -198,8 +198,8 @@ abbr czg 'chezmoi git --'
 
 # Docker
 abbr d docker
-abbr dcls "docker container ls"
-abbr dclsa "docker container ls -a"
+abbr dls "docker container ls"
+abbr dlsa "docker container ls -a"
 abbr dlg "docker container logs"
 abbr dpo "docker container port"
 abbr dr "docker container run"
@@ -211,6 +211,9 @@ abbr dils "docker image ls"
 abbr dirm "docker image rm"
 abbr dps "docker ps"
 abbr dpsa "docker ps -a"
+abbr dvi "docker volume inspect"
+abbr dvls "docker volume ls"
+abbr dvprune "docker volume prune"
 # Docker Compose
 abbr dc "docker compose"
 abbr dcps "docker compose ps"
