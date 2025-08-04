@@ -115,6 +115,8 @@ return {
       if LazyVim.pick.picker.name == "snacks" then
         -- stylua: ignore
         vim.list_extend(keys, {
+          ---@diagnostic disable-next-line: undefined-field
+          { "<leader><space>", function() Snacks.picker.files_with_ignored({ cwd = LazyVim.root() }) end, desc = "Find Files (Root Dir)" },
           { "<leader>s.", function() Snacks.picker.resume() end, desc = "Resume" },
           { "<leader>ff", function() Snacks.picker.smart() end, desc = "Smart" },
           { "<leader>fF", function() Snacks.picker.files({ hidden = true, follow = true, ignored = true }) end, desc = "Find all files" },
@@ -289,6 +291,39 @@ return {
             hidden = true,
             follow = true,
           },
+          -- ignored by git, but we still want to edit them
+          gitignored = {
+            finder = function(opts, ctx)
+              local gitignored = {
+                ".nvim.lua",
+                ".lazy.lua",
+                ".env",
+                ".env.*",
+                "CLAUDE.md",
+                "CLAUDE.local.md",
+              }
+              local args = {}
+              for _, i in ipairs(gitignored) do
+                table.insert(args, "-g")
+                table.insert(args, i)
+              end
+              opts = vim.tbl_deep_extend("force", opts, { cmd = "rg", args = args })
+              return require("snacks.picker.source.files").files(opts, ctx)
+            end,
+            -- copied from: https://github.com/folke/snacks.nvim/blob/3d695ab7d062d40c980ca5fd9fe6e593c8f35b12/lua/snacks/picker/config/sources.lua#L200-L208
+            format = "file",
+            show_empty = true,
+            hidden = true,
+            ignored = false,
+            follow = true,
+            supports_live = true,
+          },
+          -- copied from: https://github.com/folke/snacks.nvim/blob/3d695ab7d062d40c980ca5fd9fe6e593c8f35b12/lua/snacks/picker/config/sources.lua#L788-L797
+          files_with_ignored = {
+            multi = { "files", "gitignored" },
+            format = "file",
+            transform = "unique_file",
+          },
           grep = {
             actions = {
               filter_extension = function(picker)
@@ -393,7 +428,6 @@ return {
                 end,
                 desc = "Clear UI or Close",
               },
-
               ["J"] = "preview_scroll_down", -- same as lazygit/yazi
               ["K"] = "preview_scroll_up",
               ["/"] = false, -- highlights text in preview
