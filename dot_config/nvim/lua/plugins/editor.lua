@@ -423,6 +423,8 @@ return {
           "u",
           function()
             require("undo-glow").undo()
+
+            ---@module "mini.snippets"
             if _G.MiniSnippets then
               MiniSnippets.session.stop()
             end

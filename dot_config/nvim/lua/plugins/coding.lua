@@ -1,4 +1,5 @@
 ---@module "lazy"
+---@module "lazyvim"
 ---@type LazySpec
 return {
   {

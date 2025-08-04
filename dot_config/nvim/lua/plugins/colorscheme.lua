@@ -87,6 +87,7 @@ local function to_gray(color)
 end
 
 ---@module "lazy"
+---@module "lazyvim"
 ---@type LazySpec
 return {
   {
@@ -285,6 +286,10 @@ return {
           dark = "macchiato", -- frappe, macchiato, mocha(default)
         },
         transparent_background = vim.g.user_transparent_background,
+        ---@diagnostic disable-next-line: missing-fields
+        float = {
+          transparent = vim.g.user_transparent_background,
+        },
         no_italic = no_italic,
         auto_integrations = true, -- check `:=require("catppuccin.lib.detect_integrations").create_integrations_table()`
         integrations = {
@@ -696,6 +701,7 @@ return {
           desc = "Colorscheme with Preview",
         })
       end
+      return keys
     end,
   },
 }

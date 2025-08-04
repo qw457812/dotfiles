@@ -48,7 +48,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 })
 
 vim.api.nvim_create_autocmd("BufReadPost", {
-  pattern = { "*.env", "*.env.*" },
+  pattern = { ".env", ".env.*" },
   desc = "Disable diagnostics on .env files",
   group = vim.api.nvim_create_augroup("disable_diagnostics_on_env", {}),
   callback = function(event)

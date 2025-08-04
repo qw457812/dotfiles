@@ -164,6 +164,22 @@ return {
       return U.extend_tbl(opts, {
         -- model = "claude-sonnet-4",
         -- show_help = false,
+        language = "Chinese",
+        -- stylua: ignore
+        mappings = {
+          complete         = { insert = "<Tab>"           },
+          reset            = { normal = "<localleader>c"  },
+          toggle_sticky    = { normal = "<localleader>p"  },
+          clear_stickies   = { normal = "<localleader>x"  },
+          accept_diff      = { normal = "<localleader>a"  },
+          jump_to_diff     = { normal = "<localleader>j"  },
+          quickfix_answers = { normal = "<localleader>qa" },
+          quickfix_diffs   = { normal = "<localleader>qd" },
+          yank_diff        = { normal = "<localleader>y"  },
+          show_diff        = { normal = "<localleader>d"  },
+          show_info        = { normal = "<localleader>i"  },
+          show_help        = { normal = "g?"              },
+        },
         headers = {
           user = "##   User ",
           assistant = "##   Copilot ",
@@ -174,7 +190,7 @@ return {
             return vim.o.columns >= 120 and "vertical" or "horizontal"
           end,
         },
-      })
+      } --[[@as CopilotChat.config.Config]])
     end,
   },
   {

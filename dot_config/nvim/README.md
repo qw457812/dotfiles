@@ -229,6 +229,7 @@ time nvim -c exit
 - [ ] Try [cronex.nvim](https://github.com/fabridamicelli/cronex.nvim).
 - [ ] Try [nvim-dbeer](https://github.com/javiorfo/nvim-dbeer).
 - [ ] Try [blink.pairs](https://github.com/Saghen/blink.pairs).
+- [ ] Try [emmylua_ls](https://github.com/CppCXY/emmylua-analyzer-rust/tree/main/crates/emmylua_ls).
   > Mentioned in this [issue](https://github.com/Saghen/blink.cmp/issues/182#issuecomment-2651686405) of `blink.cmp`.
 - [ ] [firenvim](https://github.com/glacambre/firenvim) like [megalithic](https://github.com/megalithic/dotfiles/blob/main/config/nvim/lua/plugins/extended/firenvim.lua).
 - [ ] Check this [chezmoi.lua.tmpl](https://github.com/Nitestack/dotfiles/blob/506b895c45b8ed012a2cb0c35fe62058d8b6dbc4/config/private_dot_config/exact_nvim/lua/exact_plugins/chezmoi.lua.tmpl).
