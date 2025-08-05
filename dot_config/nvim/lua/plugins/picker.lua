@@ -321,6 +321,9 @@ return {
                   transform = function(item)
                     item.cwd = cwd
                     item.file = item.text
+                    -- see: https://github.com/folke/snacks.nvim/blob/f32002607a5a81a1d25eda27b954fc6ba8e9fd1b/lua/snacks/picker/format.lua#L70-L87
+                    -- item.ignored = true -- SnacksPickerPathIgnored
+                    item.filename_hl = "SnacksPickerDimmed" -- SnacksPickerIconArray
                   end,
                 },
               }, ctx)
