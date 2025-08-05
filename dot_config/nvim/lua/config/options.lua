@@ -75,7 +75,7 @@ vim.g.root_spec = { { ".nvim.lua", ".lazy.lua" }, "lsp", { ".git", "lua", ".svn"
 vim.g.root_lsp_ignore = vim.list_extend(vim.g.root_lsp_ignore or {}, { "copilot_ls", "rime_ls", "harper_ls" })
 vim.g.deprecation_warnings = true
 vim.g.trouble_lualine = false
-vim.g.lazyvim_blink_main = not vim.g.user_is_termux
+vim.g.lazyvim_blink_main = true
 -- failed to install basedpyright on termux via mason
 vim.g.lazyvim_python_lsp = not vim.g.user_is_termux and "basedpyright" or vim.g.lazyvim_python_lsp
 -- vim.env.FZF_DEFAULT_OPTS = "" -- better coop with fzf-lua

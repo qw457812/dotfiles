@@ -306,9 +306,6 @@ return {
         sidebar_header = {
           -- align = vim.g.user_is_termux and "right" or nil,
         },
-        input = {
-          height = vim.g.user_is_termux and 8 or nil,
-        },
       },
       selector = {
         provider = ({ snacks = "snacks", fzf = "fzf_lua" })[LazyVim.pick.picker.name],
