@@ -292,25 +292,47 @@ return {
             hidden = true,
             follow = true,
           },
-          -- ignored by git, but we still want to edit them
-          gitignored = {
+          -- ignored by git, but we still want to search them
+          -- copied from: https://github.com/folke/snacks.nvim/blob/bc902f7032df305df7dc48104cfa4e37967b3bdf/lua/snacks/picker/source/files.lua#L153-L179
+          ---@class snacks.picker.ignored.Config: snacks.picker.files.Config
+          ---@field patterns? string[] ignored patterns to search
+          ignored = {
+            ---@param opts snacks.picker.ignored.Config
+            ---@type snacks.picker.finder
             finder = function(opts, ctx)
-              local gitignored = {
-                ".nvim.lua",
-                ".lazy.lua",
-                ".env",
-                ".env.*",
-                "CLAUDE.md",
-                "CLAUDE.local.md",
-              }
-              local args = {}
-              for _, i in ipairs(gitignored) do
-                table.insert(args, "-g")
-                table.insert(args, i)
+              local cwd = not (opts.rtp or (opts.dirs and #opts.dirs > 0))
+                  and vim.fs.normalize(opts and opts.cwd or vim.uv.cwd() or ".")
+                or nil
+              local cmd, args = require("snacks.picker.source.files").get_cmd("rg")
+              if not (cmd and args) then
+                return function() end
               end
-              opts = vim.tbl_deep_extend("force", opts, { cmd = "rg", args = args })
-              return require("snacks.picker.source.files").files(opts, ctx)
+              vim.list_extend(args, { "-g", "{" .. table.concat(opts.patterns or {}, ",") .. "}" })
+              if opts.debug.files then
+                Snacks.notify(cmd .. " " .. table.concat(args or {}, " "))
+              end
+              return require("snacks.picker.source.proc").proc({
+                opts,
+                {
+                  cmd = cmd,
+                  args = args,
+                  notify = false, -- if no match could be found, then the exit status is 1, see `man rg`
+                  ---@param item snacks.picker.finder.Item
+                  transform = function(item)
+                    item.cwd = cwd
+                    item.file = item.text
+                  end,
+                },
+              }, ctx)
             end,
+            patterns = {
+              ".nvim.lua",
+              ".lazy.lua",
+              ".env",
+              ".env.*",
+              "CLAUDE.md",
+              "CLAUDE.local.md",
+            },
             -- copied from: https://github.com/folke/snacks.nvim/blob/3d695ab7d062d40c980ca5fd9fe6e593c8f35b12/lua/snacks/picker/config/sources.lua#L200-L208
             format = "file",
             show_empty = true,
@@ -321,7 +343,7 @@ return {
           },
           -- copied from: https://github.com/folke/snacks.nvim/blob/3d695ab7d062d40c980ca5fd9fe6e593c8f35b12/lua/snacks/picker/config/sources.lua#L788-L797
           files_with_ignored = {
-            multi = { "files", "gitignored" },
+            multi = { "files", "ignored" },
             format = "file",
             transform = "unique_file",
           },
@@ -609,7 +631,8 @@ return {
           lualine_z = {
             function()
               local picker = Snacks.picker.get()[1]
-              return picker and picker.opts.source or "custom"
+              local source = picker and picker.opts.source or "custom"
+              return source == "files_with_ignored" and "files" or source
             end,
           },
         },
