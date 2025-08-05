@@ -6,6 +6,9 @@ local lsp = vim.g.lazyvim_python_lsp or "pyright"
 -- local ruff = vim.g.lazyvim_python_ruff or "ruff"
 local has_black = LazyVim.has_extra("formatting.black")
 
+---@module "lazy"
+---@module "lazyvim"
+---@type LazySpec
 return {
   -- https://github.com/LazyVim/LazyVim/issues/1819
   -- https://docs.astral.sh/ruff/editors/setup/#neovim
@@ -200,51 +203,107 @@ return {
     "linux-cultist/venv-selector.nvim",
     enabled = true,
     optional = true,
-    opts = {
-      settings = {
+    ---@module "venv-selector"
+    ---@param opts venv-selector.Settings
+    opts = function(_, opts)
+      -- legacy settings, see: https://github.com/linux-cultist/venv-selector.nvim/blob/789aafff17bf96b0e6e8c206ef825599d967f64b/lua/venv-selectorhttps://github.com/linux-cultist/venv-selector.nvim/blob/789aafff17bf96b0e6e8c206ef825599d967f64b/lua/venv-selector/config.lua#L206-L209config.lua#L206-L209
+      ---@diagnostic disable-next-line: undefined-field
+      opts = opts and opts.settings or opts or {}
+
+      local icon, hl = require("mini.icons").get("filetype", "python")
+      return U.extend_tbl(opts, {
+        ---@diagnostic disable-next-line: missing-fields
         options = {
+          -- picker = "native",
+          icon = icon,
+          -- works for other pickers too
+          telescope_active_venv_color = Snacks.util.color(hl),
           on_telescope_result_callback = function(filename)
-            return U.path.home_to_tilde(filename):gsub("/bin/python", "")
+            return (U.path.shorten(filename, { special = false, java = false }):gsub("/bin/python", ""))
           end,
         },
-      },
-    },
+      } --[[@as venv-selector.Settings|{}]])
+    end,
   },
 
-  -- https://github.com/MeanderingProgrammer/dotfiles/blob/3f48b647453dff09b9c9d39bead797082b445175/.config/nvim/lua/mp/plugins/lang/python.lua#L23
+  -- https://github.com/MeanderingProgrammer/dotfiles/blob/93b7df0ce5f809c867c98c11b17ed6aed3fa7c1c/.config/nvim/lua/mp/plugins/requirements.lua
   {
     "MeanderingProgrammer/py-requirements.nvim",
-    enabled = false, -- TODO: bad performance
-    event = "BufRead requirements.txt",
+    -- event = "BufRead requirements.txt", -- bad performance, manually load it with keys
     dependencies = {
       {
         "nvim-treesitter/nvim-treesitter",
-        opts = function(_, opts)
-          table.insert(opts.ensure_installed, "requirements")
-        end,
+        opts = { ensure_installed = { "requirements" } },
       },
+    },
+    keys = function()
+      local function attach()
+        -- see: https://github.com/MeanderingProgrammer/py-requirements.nvim/blob/22da9093a75a33a4e022b86e2d2cd2fb78cdd37d/lua/py-requirements/manager.lua#L16-L23
+        local manager = require("py-requirements.manager")
+        local buf = vim.api.nvim_get_current_buf()
+        if manager.active(buf) then
+          ---@diagnostic disable-next-line: invisible
+          manager.display(buf)
+        else
+          ---@diagnostic disable-next-line: invisible
+          manager.attach(buf)
+        end
+      end
+
+      return {
+        { "<localleader>c", attach, desc = "Check All Packages", ft = "requirements" },
+        {
+          "<localleader>u",
+          function()
+            attach()
+            require("py-requirements").upgrade()
+          end,
+          desc = "Update Package",
+          ft = "requirements",
+        },
+        {
+          "<localleader>U",
+          function()
+            attach()
+            require("py-requirements").upgrade_all()
+          end,
+          desc = "Update All Packages",
+          ft = "requirements",
+        },
+        {
+          "gk",
+          function()
+            attach()
+            require("py-requirements").show_description()
+          end,
+          desc = "Show Package Description",
+          ft = "requirements",
+        },
+      }
+    end,
+    opts = function()
+      vim.api.nvim_create_autocmd("BufRead", {
+        group = vim.api.nvim_create_augroup("fix_py_requirements_display", { clear = true }),
+        pattern = "requirements.txt",
+        callback = function(ev)
+          local manager = require("py-requirements.manager")
+          if manager.active(ev.buf) then
+            ---@diagnostic disable-next-line: invisible
+            manager.display(ev.buf)
+          end
+        end,
+      })
+
+      ---@type py.reqs.UserConfig
+      return {
+        -- filter = { final_release = true },
+      }
+    end,
+    specs = {
       {
-        "nvim-cmp",
+        "rachartier/tiny-inline-diagnostic.nvim",
         optional = true,
-        opts = function(_, opts)
-          table.insert(opts.sources, { name = "py-requirements" })
-        end,
-      },
-    },
-    opts = {},
-    -- stylua: ignore
-    keys = {
-      { "<leader>Ppu", function() require("py-requirements").upgrade() end, desc = "Update Package" },
-      { "<leader>PpU", function() require("py-requirements").upgrade_all() end, desc = "Update All Packages" },
-      { "<leader>PpK", function() require("py-requirements").show_description() end, desc = "Show Package Description" },
-    },
-  },
-  {
-    "folke/which-key.nvim",
-    opts = {
-      spec = {
-        { "<leader>P", group = "packages/dependencies", icon = " " },
-        { "<leader>Pp", group = "python", icon = " " },
+        opts = { disabled_ft = { "requirements" } },
       },
     },
   },

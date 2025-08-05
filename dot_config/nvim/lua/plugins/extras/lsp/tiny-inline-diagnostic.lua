@@ -1,3 +1,5 @@
+---@module "lazy"
+---@type LazySpec
 return {
   -- https://github.com/search?q=repo%3Aaimuzov%2FLazyVimx%20tiny-inline-diagnostic.nvim&type=code
   {
@@ -5,6 +7,7 @@ return {
     -- priority = 1000,
     -- lazy = false,
     event = "VeryLazy", -- LspAttach
+    opts_extend = { "disabled_ft" },
     opts = {
       signs = {
         left = " ",

@@ -24,7 +24,7 @@
   "prettier": "3.6.2",
   "ruff": "0.12.7",
   "selene": "0.29.0",
-  "shellcheck": "v0.10.0",
+  "shellcheck": "v0.11.0",
   "shfmt": "v3.12.0",
   "sqlfluff": "3.4.2",
   "stylua": "v2.1.0",
