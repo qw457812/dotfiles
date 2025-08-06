@@ -82,6 +82,7 @@ return {
           { term_close_key, close_key, desc = "Close buffer/window or Exit", remap = true },
         })
       end
+      return keys
     end,
     opts = function()
       if close_key:lower() == "<bs>" then

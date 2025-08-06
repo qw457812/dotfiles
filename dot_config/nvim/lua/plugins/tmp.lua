@@ -1,6 +1,9 @@
 local java_home = vim.g.user_is_termux and "/data/data/com.termux/files/usr/lib/jvm/java-21-openjdk"
   or vim.fn.expand("$HOME/.local/share/mise/installs/java/23")
 
+---@module "lazy"
+---@module "lazyvim"
+---@type LazySpec
 return {
   -- {
   --   "akinsho/bufferline.nvim",

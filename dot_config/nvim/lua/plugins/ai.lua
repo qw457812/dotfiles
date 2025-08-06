@@ -1,3 +1,6 @@
+---@module "lazy"
+---@module "lazyvim"
+---@type LazySpec
 return {
   {
     "zbirenbaum/copilot.lua",

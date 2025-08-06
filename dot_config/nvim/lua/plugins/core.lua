@@ -1,4 +1,5 @@
----@diagnostic disable: missing-fields
+---@module "lazy"
+---@type LazySpec
 return {
   { "folke/lazy.nvim", version = false },
   {

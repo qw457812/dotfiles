@@ -46,6 +46,7 @@ Config.options.defaults.cond = function(plugin)
 end
 vim.g.snacks_animate = false
 
+---@type LazySpec
 return {
   {
     "snacks.nvim",

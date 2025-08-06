@@ -1,3 +1,6 @@
+---@module "lazy"
+---@module "lazyvim"
+---@type LazySpec
 return {
   {
     "akinsho/bufferline.nvim",
@@ -39,6 +42,7 @@ return {
         )
       end
       vim.list_extend(keys, mappings)
+      return keys
     end,
     opts = function(_, opts)
       local get_element_icon = vim.tbl_get(opts, "options", "get_element_icon")
@@ -168,6 +172,8 @@ return {
   {
     "folke/noice.nvim",
     optional = true,
+    ---@module "noice"
+    ---@param opts NoiceConfig
     opts = function(_, opts)
       if vim.g.deprecation_warnings then
         table.insert(opts.routes, {
@@ -189,16 +195,16 @@ return {
               min_width = math.min(60, math.floor(2 * vim.o.columns / 3)),
             },
           },
-          split = {
-            enter = true,
-            size = "70%",
-            win_options = {
-              scrolloff = 4,
-              sidescrolloff = 8,
-            },
-          },
-        },
-      })
+          -- split = {
+          --   enter = true,
+          --   size = "70%",
+          --   win_options = {
+          --     scrolloff = 4,
+          --     sidescrolloff = 8,
+          --   },
+          -- },
+        } --[[@as NoiceConfigViews]],
+      } --[[@as NoiceConfig]])
     end,
   },
 

@@ -1,4 +1,5 @@
 ---@module "lazy"
+---@module "lazyvim"
 ---@type LazySpec
 return {
   {
@@ -72,6 +73,7 @@ return {
           },
         })
       end
+      return keys
     end,
     ---@module "snacks"
     ---@type snacks.Config
