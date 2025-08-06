@@ -194,8 +194,16 @@ return {
               end,
               "fallback",
             },
-            ["<Tab>"] = { "show_and_insert", H.cmdline_actions.insert, "select_next" },
-            ["<S-Tab>"] = { "show_and_insert", H.cmdline_actions.insert, "select_prev" },
+            ["<Tab>"] = {
+              "show_and_insert", -- show_and_insert_or_accept_single
+              H.cmdline_actions.insert,
+              "select_next",
+            },
+            ["<S-Tab>"] = {
+              "show_and_insert", -- show_and_insert_or_accept_single
+              H.cmdline_actions.insert,
+              "select_prev",
+            },
             ["<Right>"] = {
               function(cmp)
                 if cmp.is_ghost_text_visible() and not H.cmdline_actions.is_inserted(cmp) then
@@ -221,7 +229,6 @@ return {
               end,
               "fallback",
             },
-            ["<C-e>"] = { "cancel", "fallback" },
             ["<C-u>"] = { H.actions.scroll_list_up, "fallback" },
             ["<C-d>"] = { H.actions.scroll_list_down, "fallback" },
             ["<C-space>"] = { "show", "hide" },

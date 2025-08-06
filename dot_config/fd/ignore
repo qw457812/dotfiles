@@ -1,2 +1,4 @@
 .git/
 .svn/
+
+.DS_Store

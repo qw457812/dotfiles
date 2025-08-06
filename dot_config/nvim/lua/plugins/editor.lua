@@ -1,4 +1,5 @@
 ---@module "lazy"
+---@module "lazyvim"
 ---@type LazySpec
 return {
   {
@@ -310,6 +311,7 @@ return {
         { "<C-n>", function() require("harpoon"):list():next({ ui_nav_wrap = true }) end, desc = "Next Harpoon File" },
         { "<C-p>", function() require("harpoon"):list():prev({ ui_nav_wrap = true }) end, desc = "Prev Harpoon File" },
       })
+      return keys
     end,
     opts = function()
       local harpoon = require("harpoon")
@@ -495,6 +497,8 @@ return {
           { "P", function() require("undo-glow").paste_above() end, desc = "Put Text Before Cursor (undo-glow)" },
         })
       end
+
+      return keys
     end,
     opts = function()
       Snacks.util.set_hl({

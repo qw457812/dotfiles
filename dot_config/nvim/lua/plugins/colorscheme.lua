@@ -333,12 +333,18 @@ return {
         },
         custom_highlights = function(colors)
           local util = require("catppuccin.utils.colors")
+          local options = require("catppuccin").options
+
           -- highlight word/references under cursor
           -- require lazyvim.plugins.extras.editor.illuminate
           -- colors.surface1(#45475a) #494d64 #51576d colors.surface2(#585b70)
           local illuminate = util.darken(colors.surface2, 0.8, colors.base)
           local indent_scope = util.blend(colors.green, colors.sapphire, 0.75)
+
           local custom_highlights = {
+            -- copied from: https://github.com/catppuccin/nvim/pull/804#pullrequestreview-3080755868
+            ["@property"] = { fg = colors.lavender, style = options.styles.properties or {} },
+
             -- IlluminatedWordText = { bg = util.darken(colors.surface1, 0.7, colors.base) }, -- use default
             IlluminatedWordRead = { bg = illuminate },
             IlluminatedWordWrite = { bg = illuminate, style = { "underline" } },

@@ -1,14 +1,20 @@
+# vim: filetype=gitignore
+
 *~
 .DS_Store
 
 .svn
+
 .nvim.lua
 .lazy.lua
 
-.aider*
 .claude
+# .claude/settings.local.json
 CLAUDE.md
 CLAUDE.local.md
+.mcp.json
+
+.aider*
 .opencode
 AGENTS.md
 .crush/

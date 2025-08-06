@@ -247,8 +247,10 @@ if type -q claude
     abbr cl claude
     abbr clc "claude --continue"
     abbr clr "claude --resume"
-    abbr ccexp "bunx ccexp@latest" # https://github.com/nyatinte/ccexp
-    abbr cctmpl "npx claude-code-templates@latest" # https://github.com/davila7/claude-code-templates
+    # https://github.com/nyatinte/ccexp
+    abbr ccexp "bunx ccexp@latest"
+    # https://github.com/davila7/claude-code-templates
+    abbr cctmpl "ANTHROPIC_BASE_URL=https://hk.ctok.ai/api/ ANTHROPIC_AUTH_TOKEN=$CTOK_AUTH_TOKEN npx claude-code-templates@latest"
     # https://github.com/musistudio/claude-code-router
     if type -q ccr
         abbr ccr "ccr code"
