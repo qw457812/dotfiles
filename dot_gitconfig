@@ -15,8 +15,8 @@
     ; diffFilter = diff-so-fancy --patch
     diffFilter = delta --color-only
 
-; [include]
-;     path = ~/.local/share/nvim/lazy/tokyonight.nvim/extras/delta/tokyonight_moon.gitconfig
+[include]
+    path = ~/.local/share/nvim/lazy/tokyonight.nvim/extras/delta/tokyonight_moon.gitconfig
 
 [delta]
     # use n and N to move between diff sections
@@ -25,15 +25,25 @@
     ; side-by-side = true
     ; line-numbers = true
 
-    ; syntax-theme = Dracula
-    ; syntax-theme = tokyonight_moon
+    ; syntax-theme = Nord
+    syntax-theme = tokyonight_moon
+    # https://github.com/dandavison/delta/blob/d5e0565cbfa47acde98d41d8777ace5d1bc4d690/themes.gitconfig
+    ; minus-emph-style              = syntax auto
+    minus-emph-style              = syntax bold "#890000" # #600000 #780000 #8e0000
+    minus-style                   = syntax      "#590000" # #401010 #400000 #5e0000
+    plus-style                    = syntax      "#004000" # #104010 #004000 #004800
+    plus-emph-style               = syntax bold "#006800" # #006000 #007800 #007800
+    minus-non-emph-style          = minus-style
+    minus-empty-line-marker-style = minus-style
+    plus-non-emph-style           = plus-style
+    plus-empty-line-marker-style  = plus-style
 
-    diff-so-fancy = true
-    # delta --diff-highlight --show-config
-    minus-emph-style = reverse red
-    plus-emph-style = reverse green
-    hunk-header-style = line-number syntax
-    ; hunk-header-decoration-style = omit
+    ; diff-so-fancy = true
+    ; # delta --diff-highlight --show-config
+    ; minus-emph-style = reverse red
+    ; plus-emph-style = reverse green
+    ; hunk-header-style = line-number syntax
+    ; ; hunk-header-decoration-style = omit
 
     ; diff-highlight = true
     ; file-style = bold yellow
