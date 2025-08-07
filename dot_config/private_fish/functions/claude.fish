@@ -6,7 +6,7 @@ function claude --wraps=claude
     # https://claude.ctok.ai/api/
     # https://us.ctok.ai/api/
     # https://hk.ctok.ai/api/
-    set -lx ANTHROPIC_BASE_URL https://hk.ctok.ai/api/
+    set -lx ANTHROPIC_BASE_URL https://claude.ctok.ai/api/
     set -lx ANTHROPIC_AUTH_TOKEN $CTOK_AUTH_TOKEN
 
     # command claude --verbose $argv

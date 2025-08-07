@@ -1,7 +1,7 @@
 set style moon
 set theme tokyonight_{$style}
 
-set src ~/.config/tokyonight.nvim/extras/fish_themes/{$theme}.theme
+set src ~/.local/share/nvim/lazy/tokyonight.nvim/extras/fish_themes/{$theme}.theme
 set dst ~/.config/fish/themes/{$theme}.theme
 
 [ -L $dst ]

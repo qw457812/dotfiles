@@ -247,14 +247,10 @@ if type -q claude
     abbr cl claude
     abbr clc "claude --continue"
     abbr clr "claude --resume"
-    # https://github.com/nyatinte/ccexp
+    abbr ccu "bunx ccusage"
     abbr ccexp "bunx ccexp@latest"
-    # https://github.com/davila7/claude-code-templates
-    abbr cctmpl "ANTHROPIC_BASE_URL=https://hk.ctok.ai/api/ ANTHROPIC_AUTH_TOKEN=$CTOK_AUTH_TOKEN npx claude-code-templates@latest"
-    # https://github.com/musistudio/claude-code-router
-    if type -q ccr
-        abbr ccr "ccr code"
-    end
+    abbr cctmpl "ANTHROPIC_BASE_URL=https://claude.ctok.ai/api/ ANTHROPIC_AUTH_TOKEN=$CTOK_AUTH_TOKEN npx claude-code-templates@latest"
+    type -q ccr; and abbr ccr "ccr code" # https://github.com/musistudio/claude-code-router
 end
 if type -q aider
     abbr ad aider
@@ -270,9 +266,7 @@ if type -q atuin
 end
 
 # set -x LESSOPEN "|/opt/homebrew/bin/lesspipe.sh %s"
-if type -q batpipe
-    eval (batpipe)
-end
+type -q batpipe; and eval (batpipe)
 
 # if type -q pyenv
 #     set -Ux PYENV_ROOT $HOME/.pyenv
@@ -298,9 +292,7 @@ if set -q TERMUX_VERSION
     abbr dl 'cd ~/storage/downloads'
     abbr rime 'cd ~/storage/shared/Android/rime'
 
-    if not set -q TMUX
-        tmux attach || tmux
-    end
+    set -q TMUX; or tmux attach || tmux
 else
     # ~/.local/share/bob/nightly/share/nvim/runtime/scripts/less.vim
     alias vless "nvim -u $(brew --prefix)/share/nvim/runtime/scripts/less.vim"

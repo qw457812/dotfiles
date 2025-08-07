@@ -170,7 +170,6 @@ return {
         language = "Chinese",
         -- stylua: ignore
         mappings = {
-          complete         = { insert = "<Tab>"           },
           reset            = { normal = "<localleader>c"  },
           toggle_sticky    = { normal = "<localleader>p"  },
           clear_stickies   = { normal = "<localleader>x"  },

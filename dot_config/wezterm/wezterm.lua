@@ -34,7 +34,7 @@ config.hide_tab_bar_if_only_one_tab = true
 -- end)
 
 -- Colorscheme
-config.color_scheme_dirs = { wezterm.home_dir .. "/.config/tokyonight.nvim/extras/wezterm" }
+config.color_scheme_dirs = { wezterm.home_dir .. "/.local/share/nvim/lazy/tokyonight.nvim/extras/wezterm" }
 config.color_scheme = "tokyonight_night"
 wezterm.add_to_config_reload_watch_list(config.color_scheme_dirs[1] .. config.color_scheme .. ".toml")
 config.colors = {

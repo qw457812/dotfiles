@@ -1,7 +1,7 @@
 set style moon
 set theme tokyonight_{$style}
 
-set src ~/.config/tokyonight.nvim/extras/sublime/{$theme}.tmTheme
+set src ~/.local/share/nvim/lazy/tokyonight.nvim/extras/sublime/{$theme}.tmTheme
 set dst ~/.config/bat/themes/{$theme}.tmTheme
 
 if not test -L $dst

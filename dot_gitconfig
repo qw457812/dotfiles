@@ -16,7 +16,7 @@
     diffFilter = delta --color-only
 
 ; [include]
-;     path = ~/.config/tokyonight.nvim/extras/delta/tokyonight_moon.gitconfig
+;     path = ~/.local/share/nvim/lazy/tokyonight.nvim/extras/delta/tokyonight_moon.gitconfig
 
 [delta]
     # use n and N to move between diff sections
@@ -82,6 +82,7 @@
     unstage = reset HEAD --
     discard = checkout --
     amend = commit --amend
+    uncommit = reset --soft HEAD~1
 
 [credential "https://github.com"]
     helper = !gh auth git-credential

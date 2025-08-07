@@ -1,3 +1,5 @@
+---@module "lazy"
+---@type LazySpec
 return {
   {
     "oysandvik94/curl.nvim",
@@ -5,8 +7,11 @@ return {
     keys = {
       { "<leader>C", "<cmd>CurlOpen<cr>", desc = "Open Curl (cwd)" },
     },
+    ---@module "curl"
+    ---@type curl_config
     opts = {
-      -- open_with = "vsplit",
+      open_with = "buffer",
+      show_request_duration_limit = 1,
     },
   },
 }
