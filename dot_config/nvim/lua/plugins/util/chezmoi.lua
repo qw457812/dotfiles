@@ -245,7 +245,67 @@ function H.reset()
   H.autocmd_chezmoi_add()
 end
 
+---@module "lazy"
+---@module "lazyvim"
+---@type LazySpec
 return {
+  {
+    "LazyVim/LazyVim",
+    opts = function()
+      -- Allows using `gf` on `{{ .chezmoi.sourceDir }}/symlinks/vscode/settings.json`
+      -- https://github.com/twpayne/chezmoi/blob/9b1def1eff7c581272ffeb7f707e7af80ec434b1/assets/chezmoi.io/docs/user-guide/manage-different-types-of-file.md?plain=1#L146-L186
+      vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+        group = vim.api.nvim_create_augroup("chezmoi_tmpl_gf", {}),
+        pattern = U.path.CHEZMOI .. "/*/symlink_*.tmpl",
+        callback = function(ev)
+          -- chezmoi template variables
+          local var_patterns = {
+            ["{{ %.chezmoi%.sourceDir }}"] = U.path.CHEZMOI,
+            ["{{ %.chezmoi%.homeDir }}"] = U.path.HOME,
+          }
+
+          function _G.__chezmoi_expand_tmpl_var(fname)
+            for pattern, value in pairs(var_patterns) do
+              fname = fname:gsub(pattern, value)
+            end
+            return fname
+          end
+          -- for v_gf
+          vim.bo[ev.buf].includeexpr = "v:lua.__chezmoi_expand_tmpl_var(v:fname)"
+
+          -- for gf
+          vim.keymap.set("n", "gf", function()
+            local line = vim.api.nvim_get_current_line()
+            local col = vim.api.nvim_win_get_cursor(0)[2] + 1
+
+            for pattern, value in pairs(var_patterns) do
+              for match in line:gmatch(pattern .. "/[%w_%-%./]+") do
+                local s, e = line:find(vim.pesc(match))
+                -- check: cursor within match AND at word boundary
+                if s and s <= col and e >= col and (s == 1 or not line:sub(s - 1, s - 1):match("[%w_]")) then
+                  local file = vim.fn.fnamemodify(match:gsub(pattern, value), ":p")
+                  if vim.fn.filereadable(file) == 1 then
+                    vim.cmd.edit(vim.fn.fnameescape(file))
+                  else
+                    LazyVim.warn(
+                      ("Can't find file `%s`.\nFallback to `normal! gf`"):format(file),
+                      { title = "Chezmoi" }
+                    )
+                    vim.cmd("normal! gf")
+                  end
+                  return
+                end
+              end
+            end
+
+            -- fallback to built-in gf
+            vim.cmd("normal! gf")
+          end, { buffer = ev.buf, desc = "Goto File (Chezmoi)" })
+        end,
+      })
+    end,
+  },
+
   {
     "alker0/chezmoi.vim",
     optional = true,
