@@ -1,9 +1,22 @@
 {
   "selectedAuthType": "oauth-personal",
   "usageStatisticsEnabled": false,
+  "vimMode": true,
+  "hideBanner": true,
+  "contextFileName": [
+    "CLAUDE.md",
+    "CLAUDE.local.md"
+  ],
+  "checkpointing": {
+    "enabled": true
+  },
   "mcpServers": {
     "context7": {
-      "httpUrl": "https://mcp.context7.com/mcp"
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp"
+      ]
     },
     "playwright": {
       "command": "npx",

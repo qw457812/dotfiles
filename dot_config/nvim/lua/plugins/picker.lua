@@ -564,14 +564,18 @@ return {
             ---@param opts snacks.picker.ignored.Config
             ---@type snacks.picker.finder
             finder = function(opts, ctx)
+              local cmd, args = require("snacks.picker.source.files").get_cmd("rg")
+              local patterns = opts.patterns or {}
+              if not (cmd and args and #patterns > 0) then
+                return function() end
+              end
               local cwd = not (opts.rtp or (opts.dirs and #opts.dirs > 0))
                   and vim.fs.normalize(opts and opts.cwd or vim.uv.cwd() or ".")
                 or nil
-              local cmd, args = require("snacks.picker.source.files").get_cmd("rg")
-              if not (cmd and args) then
-                return function() end
+              table.insert(args, "--no-ignore-global") -- or `--no-ignore-vcs`, it depends on patterns like "**/.claude/**", `--no-ignore-global` has better performance
+              for _, p in ipairs(patterns) do
+                vim.list_extend(args, { "-g", p })
               end
-              vim.list_extend(args, { "-g", "{" .. table.concat(opts.patterns or {}, ",") .. "}" })
               if opts.debug.files then
                 Snacks.notify(cmd .. " " .. table.concat(args or {}, " "))
               end
@@ -599,6 +603,8 @@ return {
               ".env.*",
               "CLAUDE.md",
               "CLAUDE.local.md",
+              ".mcp.json",
+              "**/.claude/**",
             },
             -- copied from: https://github.com/folke/snacks.nvim/blob/3d695ab7d062d40c980ca5fd9fe6e593c8f35b12/lua/snacks/picker/config/sources.lua#L200-L208
             format = "file",

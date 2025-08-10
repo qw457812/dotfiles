@@ -41,8 +41,7 @@ return {
           { "<leader>" .. i, "<cmd>BufferLineGoToBuffer " .. i .. "<cr>", desc = "which_key_ignore" }
         )
       end
-      vim.list_extend(keys, mappings)
-      return keys
+      return vim.list_extend(keys, mappings)
     end,
     opts = function(_, opts)
       local get_element_icon = vim.tbl_get(opts, "options", "get_element_icon")

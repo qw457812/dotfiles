@@ -268,7 +268,7 @@ return {
               vim.api.nvim_set_current_win(main:get())
 
               -- original confirm action
-              Snacks.picker.actions.jump(...)
+              Snacks.picker.actions.confirm(...)
             end,
           },
         },

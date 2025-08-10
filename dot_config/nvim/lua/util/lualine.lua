@@ -80,12 +80,12 @@ M.formatter = {
     if not vim.g.user_very_very_lazy then
       return false
     end
-    local ok, conform = pcall(require, "conform")
-    if not ok then
+    local has_conform, conform = pcall(require, "conform")
+    if not has_conform then
       return false
     end
-    local formatters = conform.list_formatters(0)
-    if #formatters > 0 then
+    local ok, formatters = pcall(conform.list_formatters, 0)
+    if ok and #formatters > 0 then
       return true
     end
     local lsp_format = require("conform.lsp_format")

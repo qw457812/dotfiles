@@ -98,6 +98,13 @@ return {
           end,
         },
       },
+      scratch = {
+        win = {
+          b = {
+            user_lualine_filename = "snacks_scratch",
+          },
+        },
+      },
       zen = {
         toggles = {
           dim = false,

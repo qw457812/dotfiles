@@ -158,12 +158,12 @@ function H.pick_find_config()
       },
     })
   elseif LazyVim.pick.picker.name == "snacks" then
-    ---@diagnostic disable-next-line: missing-fields
     Snacks.picker.files({
       cwd = config_dir,
       hidden = true,
       ignored = true,
       follow = true,
+      -- TODO: multi-select
       confirm = function(picker, item)
         picker:close()
         if item then
@@ -472,7 +472,7 @@ return {
                     vim.cmd("norm! zzzv")
                   end
                 else
-                  Snacks.picker.actions.jump(picker, item, action)
+                  Snacks.picker.actions.confirm(picker, item, action)
                 end
               end
             end,

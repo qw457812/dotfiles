@@ -247,9 +247,11 @@ if type -q claude
     abbr cl claude
     abbr clc "claude --continue"
     abbr clr "claude --resume"
-    abbr ccu "bunx ccusage"
-    abbr ccexp "bunx ccexp@latest"
-    abbr cctmpl "ANTHROPIC_BASE_URL=https://claude.ctok.ai/api/ ANTHROPIC_AUTH_TOKEN=$CTOK_AUTH_TOKEN npx claude-code-templates@latest"
+    abbr cls "claude --model sonnet"
+    abbr clo "claude --model opus"
+    abbr ccu (type -q bunx; and echo "bunx ccusage"; or echo "npx ccusage@latest")
+    abbr ccexp (type -q bunx; and echo "bunx ccexp@latest"; or echo "npx ccexp@latest")
+    abbr cctmpl "ANTHROPIC_BASE_URL=https://us.ctok.ai/api/ ANTHROPIC_AUTH_TOKEN=$CTOK_AUTH_TOKEN npx claude-code-templates@latest"
     type -q ccr; and abbr ccr "ccr code" # https://github.com/musistudio/claude-code-router
 end
 if type -q aider

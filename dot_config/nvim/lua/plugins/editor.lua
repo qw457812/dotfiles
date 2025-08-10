@@ -307,11 +307,10 @@ return {
         table.insert(keys, { "<leader>" .. i, false })
       end
       -- stylua: ignore
-      vim.list_extend(keys, {
+      return vim.list_extend(keys, {
         { "<C-n>", function() require("harpoon"):list():next({ ui_nav_wrap = true }) end, desc = "Next Harpoon File" },
         { "<C-p>", function() require("harpoon"):list():prev({ ui_nav_wrap = true }) end, desc = "Prev Harpoon File" },
       })
-      return keys
     end,
     opts = function()
       local harpoon = require("harpoon")

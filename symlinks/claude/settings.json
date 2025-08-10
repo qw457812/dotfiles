@@ -1,5 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "includeCoAuthoredBy": false,
   "permissions": {
     "allow": [
       "Bash(ls:*)",
@@ -11,7 +12,12 @@
       "Bash(tail:*)",
       "Bash(touch:*)",
       "Bash(mkdir:*)"
-    ]
+    ],
+    "defaultMode": "plan"
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "if command -v bunx >/dev/null 2>&1; then bunx ccusage statusline; else npx -y ccusage statusline; fi"
   },
   "feedbackSurveyState": {
     "lastShownTime": 1754043197597

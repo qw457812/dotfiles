@@ -98,27 +98,8 @@ return {
       },
       { "<leader>ar", "<cmd>ClaudeCode --resume<cr>", desc = "Resume (Claude)" },
       { "<leader>a.", "<cmd>ClaudeCode --continue<cr>", desc = "Continue (Claude)" },
-      {
-        "<leader>ab",
-        function()
-          vim.cmd("ClaudeCodeAdd %")
-          vim.schedule(function()
-            vim.cmd("ClaudeCodeFocus")
-          end)
-        end,
-        desc = "Add Buffer (Claude)",
-      },
-      {
-        "<leader>as",
-        function()
-          vim.cmd("ClaudeCodeSend")
-          vim.schedule(function()
-            vim.cmd("ClaudeCodeFocus")
-          end)
-        end,
-        desc = "Send (Claude)",
-        mode = "x",
-      },
+      { "<leader>ab", "<cmd>ClaudeCodeAdd %<cr>", desc = "Add Buffer (Claude)" },
+      { "<leader>as", "<cmd>ClaudeCodeSend<cr>", desc = "Send (Claude)", mode = "x" },
       { "=", "<cmd>ClaudeCodeTreeAdd<cr>", desc = "Add File (Claude)", mode = { "n", "x" }, ft = "neo-tree" },
       { "<localleader>=", "<cmd>ClaudeCodeTreeAdd<cr>", desc = "Add File (Claude)", ft = { "oil", "minifiles" } },
       -- { "<M-space>", "<cmd>ClaudeCodeDiffAccept<cr>", desc = "Accept Diff (Claude)" }, -- set `Diff tool` to `terminal`
