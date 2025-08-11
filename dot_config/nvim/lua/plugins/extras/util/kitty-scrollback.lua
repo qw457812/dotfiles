@@ -43,5 +43,18 @@ return {
         end),
       })
     end,
+    config = function(_, opts)
+      require("kitty-scrollback").setup(opts)
+
+      if vim.g.user_kitty_scrollback_nvim_minimal then
+        vim.defer_fn(function()
+          -- https://github.com/mikesmithgh/kitty-scrollback.nvim/blob/e291b9e611a9c9ce25adad6bb1c4a9b850963de2/lua/kitty-scrollback/autocommands.lua#L138
+          vim.api.nvim_clear_autocmds({
+            group = vim.api.nvim_create_augroup("KittyScrollBackNvimTextYankPost", { clear = false }),
+            event = "TextYankPost",
+          })
+        end, 100)
+      end
+    end,
   },
 }

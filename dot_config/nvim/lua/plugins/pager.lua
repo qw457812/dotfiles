@@ -57,8 +57,6 @@ return {
   {
     "LazyVim/LazyVim",
     opts = function()
-      local has_kitty_scrollback_nvim = LazyVim.has("kitty-scrollback.nvim")
-
       vim.api.nvim_create_autocmd("User", {
         pattern = "LazyVimKeymaps",
         once = true,
@@ -76,7 +74,10 @@ return {
               end
             end
           end, { desc = "Clear UI or Quit" })
-          if vim.g.terminal_scrollback_pager and not has_kitty_scrollback_nvim then
+          if
+            vim.g.terminal_scrollback_pager
+            and (vim.env.KITTY_SCROLLBACK_NVIM ~= "true" or vim.g.user_kitty_scrollback_nvim_minimal)
+          then
             vim.keymap.set("n", "i", "<cmd>qa<cr>", { desc = "Quit All" })
             vim.keymap.set("n", "a", "<cmd>qa<cr>", { desc = "Quit All" })
             vim.keymap.set("n", "<C-c>", "<cmd>qa<cr>", { desc = "Quit All" })

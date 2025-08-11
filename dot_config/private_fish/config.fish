@@ -247,8 +247,9 @@ if type -q claude
     abbr cl claude
     abbr clc "claude --continue"
     abbr clr "claude --resume"
-    abbr cls "claude --model sonnet"
+    abbr cls "claude --model sonnet --permission-mode default"
     abbr clo "claude --model opus"
+    abbr clgc "claude --model sonnet --permission-mode default 'commit only the staged changes'"
     abbr ccu (type -q bunx; and echo "bunx ccusage"; or echo "npx ccusage@latest")
     abbr ccexp (type -q bunx; and echo "bunx ccexp@latest"; or echo "npx ccexp@latest")
     abbr cctmpl "ANTHROPIC_BASE_URL=https://us.ctok.ai/api/ ANTHROPIC_AUTH_TOKEN=$CTOK_AUTH_TOKEN npx claude-code-templates@latest"

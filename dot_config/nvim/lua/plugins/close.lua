@@ -687,6 +687,10 @@ return {
     "mikesmithgh/kitty-scrollback.nvim",
     optional = true,
     opts = function()
+      if vim.g.user_kitty_scrollback_nvim_minimal then
+        return
+      end
+
       local ksb_kitty_cmds = require("kitty-scrollback.kitty_commands")
       local ksb_api = require("kitty-scrollback.api")
       local plug = require("kitty-scrollback.util").plug_mapping_names

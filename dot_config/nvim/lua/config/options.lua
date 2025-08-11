@@ -50,6 +50,8 @@ if vim.env.SHELL_COMMAND_EDITOR then
 end
 if vim.env.KITTY_SCROLLBACK_NVIM == "true" then
   vim.g.terminal_scrollback_pager = true
+  -- Whether to disable pastebuf
+  vim.g.user_kitty_scrollback_nvim_minimal = true
 end
 if lazyvim_docs then
   -- set in config.fish via `alias vimpager 'nvim - --cmd "lua vim.g.pager = true" -c "lua require(\'util.terminal\').colorize()"'`
