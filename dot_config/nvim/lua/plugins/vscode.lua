@@ -27,7 +27,6 @@ local function vscode_map(mode, key, command, opts)
   end, opts)
 end
 
----@module "lazy"
 ---@type LazySpec
 return {
   {

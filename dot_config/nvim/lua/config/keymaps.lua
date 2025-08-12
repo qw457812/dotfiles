@@ -2,9 +2,6 @@
 -- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
 -- Add any additional keymaps here
 
----@module "lazyvim"
----@module "snacks"
-
 local Lazy = require("lazy")
 local LazyViewConfig = require("lazy.view.config")
 
@@ -64,7 +61,6 @@ map("n", "<Right>", "<C-i>", { desc = "Go Forward" })
 map("n", "<esc>", U.keymap.clear_ui_esc, { desc = "Escape and Clear hlsearch or notifications or Close floating window(s)" })
 map({ "i", "s" }, "<esc>", function()
   -- vim.cmd("noh")
-  ---@module "mini.snippets"
   if not _G.MiniSnippets then -- by design, <esc> should not stop the session!
     LazyVim.cmp.actions.snippet_stop()
   end

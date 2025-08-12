@@ -1,11 +1,9 @@
 local request_timeout = 2
 
----@module "lazy"
 ---@type LazySpec
 return {
   {
     "LazyVim/LazyVim",
-    ---@module "lazyvim"
     ---@type LazyVimOptions|{}
     opts = {
       icons = {

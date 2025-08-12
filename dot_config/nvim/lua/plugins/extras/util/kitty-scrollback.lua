@@ -1,6 +1,5 @@
----@module "lazy"
----@type LazySpec
 -- TODO: https://github.com/mikesmithgh/kitty-scrollback.nvim#command-line-editing
+---@type LazySpec
 return {
   {
     "mikesmithgh/kitty-scrollback.nvim",

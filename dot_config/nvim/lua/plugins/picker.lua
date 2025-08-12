@@ -106,8 +106,6 @@ H.mappings = {
   -- { "<leader>sB", function() LazyVim.pick("live_grep", { cwd = vim.fn.expand("%:p:h") })() end, desc = "Grep (Buffer Dir)" },
 }
 
----@module "lazy"
----@module "lazyvim"
 ---@type LazySpec
 return {
   {

@@ -245,8 +245,6 @@ function H.reset()
   H.autocmd_chezmoi_add()
 end
 
----@module "lazy"
----@module "lazyvim"
 ---@type LazySpec
 return {
   {

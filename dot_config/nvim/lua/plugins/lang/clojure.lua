@@ -3,6 +3,7 @@ if not LazyVim.has_extra("lang.clojure") then
 end
 
 -- https://github.com/AstroNvim/astrocommunity/blob/main/lua/astrocommunity/pack/clojure
+---@type LazySpec
 return {
   -- lazy loading
   {

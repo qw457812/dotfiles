@@ -2,6 +2,7 @@ if not LazyVim.has_extra("lang.java") and not U.has_user_extra("lang.nvim-java")
   return {}
 end
 
+---@type LazySpec
 return {
   {
     "LazyVim/LazyVim",

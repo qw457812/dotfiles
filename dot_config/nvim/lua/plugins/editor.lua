@@ -1,5 +1,3 @@
----@module "lazy"
----@module "lazyvim"
 ---@type LazySpec
 return {
   {
@@ -425,7 +423,6 @@ return {
           function()
             require("undo-glow").undo()
 
-            ---@module "mini.snippets"
             if _G.MiniSnippets then
               MiniSnippets.session.stop()
             end

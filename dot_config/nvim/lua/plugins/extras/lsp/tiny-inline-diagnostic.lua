@@ -1,4 +1,3 @@
----@module "lazy"
 ---@type LazySpec
 return {
   -- https://github.com/search?q=repo%3Aaimuzov%2FLazyVimx%20tiny-inline-diagnostic.nvim&type=code

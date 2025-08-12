@@ -4,7 +4,6 @@ function H.build_plugin(plugin)
   require("yazi.plugin").build_plugin(plugin)
 end
 
----@module "lazy"
 ---@type LazySpec
 return {
   -- https://github.com/sxyazi/dotfiles/blob/79828c4b3f33a9b0286f2c8f5e60dcc052ace632/nvim/lua/plugins/ui.lua#L557
@@ -118,11 +117,10 @@ return {
         specs = {
           {
             "folke/lazydev.nvim",
-            opts = {
-              library = {
-                { path = "yazi-plugins/types.yazi", words = { "ya%.emit", "ya%.sync" } },
-              },
-            },
+            opts = function(_, opts)
+              opts.library = opts.library or {}
+              table.insert(opts.library, { path = "yazi-plugins/types.yazi", words = { "ya%.emit", "ya%.sync" } })
+            end,
           },
         },
       },

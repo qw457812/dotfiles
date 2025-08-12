@@ -24,6 +24,7 @@ local function open(dir)
   require("oil").open(dir, { preview = preview_enabled and {} or nil })
 end
 
+---@type LazySpec
 return {
   -- https://github.com/stevearc/dotfiles/blob/eeb506f9afd32cd8cd9f2366110c76efaae5786c/.config/nvim/lua/plugins/oil.lua
   -- https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/editor/oil.lua

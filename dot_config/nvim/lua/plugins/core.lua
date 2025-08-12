@@ -1,11 +1,9 @@
----@module "lazy"
 ---@type LazySpec
 return {
   { "folke/lazy.nvim", version = false },
   {
     "LazyVim/LazyVim",
     version = false,
-    ---@module "lazyvim"
     ---@type LazyVimOptions
     opts = {
       news = { lazyvim = true, neovim = true },

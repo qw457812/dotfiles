@@ -70,7 +70,6 @@ function H.is_cc_norm(buf)
   end
 end
 
----@module "lazy"
 ---@type LazySpec
 return {
   {

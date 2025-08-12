@@ -6,6 +6,7 @@ local use_image_nvim = false -- use image.nvim instead of snacks image
 local image_cursor_only = false
 local code_conceal = false -- backticks
 
+---@type LazySpec
 return {
   {
     "LazyVim/LazyVim",

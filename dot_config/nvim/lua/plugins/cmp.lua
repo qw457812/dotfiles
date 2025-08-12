@@ -4,9 +4,6 @@ local function has_words_before()
 end
 
 -- https://github.com/Saghen/nvim/blob/06849f05f2057e4fa7774bdba0d9b70d785716f0/lua/core/blink.lua
----@module "lazy"
----@module "lazyvim"
----@module "mini.snippets"
 ---@type LazySpec
 return {
   {

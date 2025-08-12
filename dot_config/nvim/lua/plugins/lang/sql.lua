@@ -4,6 +4,7 @@ end
 
 local sql_ft = { "sql", "mysql", "plsql" }
 
+---@type LazySpec
 return {
   {
     "kristijanhusak/vim-dadbod-ui",

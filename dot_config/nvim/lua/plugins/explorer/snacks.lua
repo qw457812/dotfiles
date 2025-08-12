@@ -1,4 +1,4 @@
----@diagnostic disable: missing-fields
+---@type LazySpec
 return {
   {
     "folke/snacks.nvim",
@@ -121,7 +121,7 @@ return {
     keys = function(_, keys)
       -- use snacks explorer when vim.g.shell_command_editor is true without lazyvim.plugins.extras.editor.snacks_explorer
       if LazyVim.has("neo-tree.nvim") then
-        return
+        return keys
       end
 
       -- fixes: `ZZ`/`:wq` won't exit nvim when snacks explorer is visible
@@ -154,7 +154,7 @@ return {
         end
       end
 
-      vim.list_extend(keys, {
+      return vim.list_extend(keys, {
         {
           "<leader>fe",
           function()

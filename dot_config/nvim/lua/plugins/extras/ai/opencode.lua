@@ -4,7 +4,6 @@ end
 
 local toggle_key = "<M-,>"
 
----@module "lazy"
 ---@type LazySpec
 return {
   -- TODO: duplicated code with `gemini-cli.lua`

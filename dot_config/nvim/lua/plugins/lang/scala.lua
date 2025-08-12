@@ -2,6 +2,7 @@ if not LazyVim.has_extra("lang.scala") then
   return {}
 end
 
+---@type LazySpec
 return {
   { "scalameta/nvim-metals", optional = true, ft = "java" },
   {

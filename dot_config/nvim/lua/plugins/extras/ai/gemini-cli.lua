@@ -4,7 +4,6 @@ end
 
 local toggle_key = "<M-space>"
 
----@module "lazy"
 ---@type LazySpec
 return {
   {

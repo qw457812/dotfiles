@@ -127,7 +127,6 @@ function H.pick_definitions_or_references()
   )
 end
 
----@module "lazy"
 ---@type LazySpec
 return {
   {
@@ -254,7 +253,6 @@ return {
 
   {
     "folke/snacks.nvim",
-    ---@module "snacks"
     ---@type snacks.Config
     opts = {
       picker = {

@@ -10,6 +10,7 @@ local LazyUtil = require("lazy.util")
 
 local restart_cache_file = vim.fn.stdpath("cache") .. "/user_is_restart.txt"
 
+---@type LazySpec
 return {
   -- copied from: https://github.com/rafi/vim-config/blob/0feb5daebc9f5297f01dc2304f81156318b8616b/lua/rafi/plugins/editor.lua#L27
   {

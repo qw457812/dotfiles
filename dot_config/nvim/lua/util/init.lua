@@ -1,6 +1,3 @@
----@module "lazyvim"
----@module "snacks"
-
 ---@class util
 ---@field color util.color
 ---@field explorer util.explorer

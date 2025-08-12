@@ -86,8 +86,6 @@ local function to_gray(color)
   return vim.g.user_transparent_background and color or require("util.color").to_gray(color)
 end
 
----@module "lazy"
----@module "lazyvim"
 ---@type LazySpec
 return {
   {
