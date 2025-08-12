@@ -171,7 +171,11 @@ return {
   -- https://github.com/AstroNvim/astrocommunity/blob/5f74d5fb8d8dc9b8e2904846809121068d7afaca/lua/astrocommunity/pack/spring-boot/init.lua
   {
     "JavaHello/spring-boot.nvim",
-    ft = { "java", "yaml", "jproperties" },
+    ft = {
+      "java",
+      -- "yaml",
+      "jproperties",
+    },
     ---@type bootls.Config|{}
     opts = {},
   },

@@ -75,11 +75,15 @@ return {
           grep_in_directory = "<c-g>",
           replace_in_directory = "<m-r>",
           open_and_pick_window = "<m-o>",
-          copy_relative_path_to_selected_files = "<m-y>",
+          copy_relative_path_to_selected_files = "<M-y>", -- relative to nvim current file
         },
         integrations = {
           grep_in_directory = picker,
           grep_in_selected_files = picker,
+          -- -- for copy_relative_path_to_selected_files, relative to root instead of current file
+          -- resolve_relative_path_implementation = function(args, get_relative_path)
+          --   return get_relative_path({ selected_file = args.selected_file, source_dir = LazyVim.root() })
+          -- end,
         },
       }
     end,
@@ -148,11 +152,11 @@ return {
                 win = {
                   input = {
                     keys = {
-                      ["<M-y>"] = {
+                      yazi_copy_relative_path = {
                         "<M-y>",
                         function(self)
                           require("lazy").load({ plugins = { "yazi.nvim" } })
-                          self:execute("yazi_copy_relative_path")
+                          self:execute("yazi_copy_relative_path") -- relative to alternate-file, same behavior as copy_relative_path_to_selected_files
                           local paths = vim.fn.getreg(require("yazi").config.clipboard_register)
                           LazyVim.info(paths, { title = "Copied Path" })
                         end,
