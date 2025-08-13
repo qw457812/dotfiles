@@ -61,9 +61,17 @@ return {
             end
             return o.raise(0)
           end,
-          -- hide extension
+          --- see: https://github.com/akinsho/bufferline.nvim/blob/28e347dbc6d0e8367ea56fb045fb9d135579ff79/lua/bufferline/models.lua#L182-L184
+          ---@param buf {name: string, path: string, bufnr: integer}
+          ---@return string?
           name_formatter = function(buf)
-            return vim.b[buf.bufnr].user_bufferline_name or buf.name:match("(.+)%..+$")
+            local name = vim.b[buf.bufnr].user_bufferline_name
+            if name then
+              return name
+            end
+            -- hide extension unless it is a .env file
+            local tail = vim.fn.fnamemodify(buf.name, ":t")
+            return not (tail == ".env" or tail:match("^%.env%.")) and buf.name:match("(.+)%..+$") or nil
           end,
           ---@param o bufferline.IconFetcherOpts
           get_element_icon = function(o)
