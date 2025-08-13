@@ -2,10 +2,49 @@
   "lines": [
     [
       {
+        "id": "1755080107119",
+        "type": "custom-command",
+        "commandPath": "pwd | awk -v h=\"$HOME\" '{if($0==h || $0==\"/\"){print \"\"}else{gsub(/\\/[^\\/]*$/,\"\",$0); gsub(\"^\"h,\"~\",$0); if($0==\"\"){print \"/\"} else {print $0\"/\"}}}'",
+        "color": "white"
+      },
+      {
+        "id": "1755070172387",
+        "type": "custom-command",
+        "character": "|",
+        "commandPath": "pwd | awk -v h=\"$HOME\" '{if($0==h){print \"~\"}else if($0==\"/\"){print \"/\"}else{n=split($0,a,\"/\"); print a[n]}}'",
+        "color": "cyanBright",
+        "preserveColors": false
+      },
+      {
+        "id": "1755070271099",
+        "type": "separator",
+        "character": " "
+      },
+      {
+        "id": "1755070275188",
+        "type": "git-branch",
+        "rawValue": true
+      },
+      {
+        "id": "1755070306875",
+        "type": "separator",
+        "character": " "
+      },
+      {
+        "id": "1755070312077",
+        "type": "git-changes",
+        "rawValue": false
+      },
+      {
+        "id": "1755078219644",
+        "type": "flex-separator",
+        "character": "|"
+      },
+      {
         "id": "1755072402109",
         "type": "custom-text",
         "customText": "Tok",
-        "color": "magentaBright",
+        "color": "white",
         "bold": true
       },
       {
@@ -50,7 +89,8 @@
       {
         "id": "1755069943207",
         "type": "tokens-total",
-        "rawValue": true
+        "rawValue": true,
+        "color": "blue"
       },
       {
         "id": "1755069948951",
@@ -61,7 +101,7 @@
         "id": "1755072335759",
         "type": "custom-text",
         "customText": "Ctx",
-        "color": "magentaBright",
+        "color": "whiteBright",
         "bold": true
       },
       {
@@ -73,7 +113,7 @@
         "id": "1755070109693",
         "type": "context-length",
         "rawValue": true,
-        "color": "blue"
+        "color": "cyan"
       },
       {
         "id": "1755070122044",
@@ -84,7 +124,7 @@
         "id": "1755070126168",
         "type": "context-percentage",
         "rawValue": true,
-        "color": "red"
+        "color": "magentaBright"
       },
       {
         "id": "1755070811984",
@@ -102,39 +142,15 @@
         "character": " "
       },
       {
+        "id": "1755078371283",
+        "type": "custom-text",
+        "customText": "v"
+      },
+      {
         "id": "1755070863780",
         "type": "version",
         "rawValue": true,
         "color": "white"
-      }
-    ],
-    [
-      {
-        "id": "1755070172387",
-        "type": "custom-command",
-        "character": "|",
-        "commandPath": "pwd | sed \"s#$HOME#~#\"",
-        "color": "cyanBright"
-      },
-      {
-        "id": "1755070271099",
-        "type": "separator",
-        "character": " "
-      },
-      {
-        "id": "1755070275188",
-        "type": "git-branch",
-        "rawValue": true
-      },
-      {
-        "id": "1755070306875",
-        "type": "separator",
-        "character": " "
-      },
-      {
-        "id": "1755070312077",
-        "type": "git-changes",
-        "rawValue": false
       }
     ],
     [
@@ -145,7 +161,8 @@
         "timeout": 5000,
         "preserveColors": true
       }
-    ]
+    ],
+    []
   ],
   "flexMode": "full-minus-40",
   "compactThreshold": 60
