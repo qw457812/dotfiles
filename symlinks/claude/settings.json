@@ -14,12 +14,13 @@
       "Bash(mkdir:*)"
     ]
   },
+  "model": "opusplan",
   "statusLine": {
     "type": "command",
-    "command": "if command -v bunx >/dev/null 2>&1; then bunx ccusage statusline; else npx -y ccusage@latest statusline; fi"
+    "command": "npx -y ccstatusline@latest",
+    "padding": 0
   },
   "feedbackSurveyState": {
     "lastShownTime": 1754043197597
-  },
-  "model": "opus"
+  }
 }

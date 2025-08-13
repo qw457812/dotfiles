@@ -240,11 +240,12 @@ if type -q claude
     abbr cld "claude --debug"
     abbr cls "claude --model sonnet"
     abbr clo "claude --model opus"
-    abbr clp "claude --model opus --permission-mode plan"
+    abbr clp "claude --model opusplan --permission-mode plan"
     abbr clgc "claude --model sonnet 'commit only the staged changes'"
     abbr ccu (type -q bunx; and echo "bunx ccusage"; or echo "npx ccusage@latest")
     abbr ccexp (type -q bunx; and echo "bunx ccexp@latest"; or echo "npx ccexp@latest")
     abbr cctmpl "ANTHROPIC_BASE_URL=https://us.ctok.ai/api/ ANTHROPIC_AUTH_TOKEN=$CTOK_AUTH_TOKEN npx claude-code-templates@latest"
+    abbr ccstl "npx ccstatusline@latest"
     abbr cck claude_kimi
     abbr ccg claude_glm
     abbr ccq claude_qwen
@@ -252,7 +253,7 @@ if type -q claude
     abbr cckr "claude_kimi --resume"
     type -q ccr; and abbr ccr "ccr code" # https://github.com/musistudio/claude-code-router
 end
-type -q gemini; and abbr gm gemini
+# type -q gemini; and abbr gm gemini
 if type -q aider
     abbr ad aider
     abbr adr 'aider --model r1'

@@ -1,0 +1,152 @@
+{
+  "lines": [
+    [
+      {
+        "id": "1755072402109",
+        "type": "custom-text",
+        "customText": "Tok",
+        "color": "magentaBright",
+        "bold": true
+      },
+      {
+        "id": "1755072395924",
+        "type": "separator",
+        "character": " "
+      },
+      {
+        "id": "1755069420574",
+        "type": "tokens-input",
+        "rawValue": true,
+        "color": "red"
+      },
+      {
+        "id": "1755069435353",
+        "type": "separator",
+        "character": " "
+      },
+      {
+        "id": "1755069644395",
+        "type": "tokens-output",
+        "rawValue": true,
+        "color": "green"
+      },
+      {
+        "id": "1755069663216",
+        "type": "separator",
+        "character": " "
+      },
+      {
+        "id": "1755069651869",
+        "type": "tokens-cached",
+        "rawValue": true,
+        "bold": false,
+        "color": "yellow"
+      },
+      {
+        "id": "1755069938799",
+        "type": "separator",
+        "character": " "
+      },
+      {
+        "id": "1755069943207",
+        "type": "tokens-total",
+        "rawValue": true
+      },
+      {
+        "id": "1755069948951",
+        "type": "separator",
+        "character": "|"
+      },
+      {
+        "id": "1755072335759",
+        "type": "custom-text",
+        "customText": "Ctx",
+        "color": "magentaBright",
+        "bold": true
+      },
+      {
+        "id": "1755072329711",
+        "type": "separator",
+        "character": " "
+      },
+      {
+        "id": "1755070109693",
+        "type": "context-length",
+        "rawValue": true,
+        "color": "blue"
+      },
+      {
+        "id": "1755070122044",
+        "type": "separator",
+        "character": " "
+      },
+      {
+        "id": "1755070126168",
+        "type": "context-percentage",
+        "rawValue": true,
+        "color": "red"
+      },
+      {
+        "id": "1755070811984",
+        "type": "separator"
+      },
+      {
+        "id": "1755070815208",
+        "type": "session-clock",
+        "rawValue": true,
+        "color": "greenBright"
+      },
+      {
+        "id": "1755070851825",
+        "type": "separator",
+        "character": " "
+      },
+      {
+        "id": "1755070863780",
+        "type": "version",
+        "rawValue": true,
+        "color": "white"
+      }
+    ],
+    [
+      {
+        "id": "1755070172387",
+        "type": "custom-command",
+        "character": "|",
+        "commandPath": "pwd | sed \"s#$HOME#~#\"",
+        "color": "cyanBright"
+      },
+      {
+        "id": "1755070271099",
+        "type": "separator",
+        "character": " "
+      },
+      {
+        "id": "1755070275188",
+        "type": "git-branch",
+        "rawValue": true
+      },
+      {
+        "id": "1755070306875",
+        "type": "separator",
+        "character": " "
+      },
+      {
+        "id": "1755070312077",
+        "type": "git-changes",
+        "rawValue": false
+      }
+    ],
+    [
+      {
+        "id": "1755070338269",
+        "type": "custom-command",
+        "commandPath": "if command -v bunx >/dev/null 2>&1; then bunx ccusage statusline; else npx -y ccusage@latest statusline; fi",
+        "timeout": 5000,
+        "preserveColors": true
+      }
+    ]
+  ],
+  "flexMode": "full-minus-40",
+  "compactThreshold": 60
+}
