@@ -125,7 +125,10 @@ return {
         end),
       })
 
+      ---@module "claudecode"
+      ---@type ClaudeCodeConfig|{}
       return {
+        ---@type ClaudeCodeTerminalConfig|{}
         terminal = {
           split_width_percentage = 0.4,
           ---@module "snacks"

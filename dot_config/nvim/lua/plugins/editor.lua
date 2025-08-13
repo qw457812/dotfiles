@@ -293,6 +293,7 @@ return {
     },
   },
 
+  -- TODO: https://github.com/y3owk1n/warp.nvim
   {
     "ThePrimeagen/harpoon",
     optional = true,

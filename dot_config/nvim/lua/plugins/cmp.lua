@@ -563,37 +563,66 @@ return {
   --     },
   --   },
   -- },
+  -- {
+  --   "saghen/blink.cmp",
+  --   optional = true,
+  --   dependencies = {
+  --     "archie-judd/blink-cmp-words",
+  --     shell_command_editor = true,
+  --   },
+  --   opts = {
+  --     sources = {
+  --       default = { "dictionary", "thesaurus" },
+  --       providers = {
+  --         dictionary = {
+  --           module = "blink-cmp-words.dictionary",
+  --           name = "Dict",
+  --           min_keyword_length = 3,
+  --           max_items = 1,
+  --           ---@module 'blink-cmp-words'
+  --           ---@type BlinkCmpWordsOpts|{}
+  --           opts = {
+  --             score_offset = -10, -- actually is -20, see: https://github.com/archie-judd/blink-cmp-words/blob/f6190f584075476ee9abd5aa736ef9085c9b2694/lua/blink-cmp-words/source.lua#L171
+  --           },
+  --         },
+  --         thesaurus = {
+  --           module = "blink-cmp-words.thesaurus",
+  --           name = "Words",
+  --           min_keyword_length = 3,
+  --           max_items = 1,
+  --           ---@type BlinkCmpWordsOpts|{}
+  --           opts = {
+  --             score_offset = -10,
+  --           },
+  --         },
+  --       },
+  --     },
+  --   },
+  -- },
   {
     "saghen/blink.cmp",
-    optional = true,
     dependencies = {
-      "archie-judd/blink-cmp-words",
-      shell_command_editor = true,
+      { "xieyonn/blink-cmp-dat-word", shell_command_editor = true },
+      { "first20hours/google-10000-english" }, -- dict, not a nvim plugin
     },
     opts = {
       sources = {
-        default = { "dictionary", "thesaurus" },
+        default = { "datword" },
         providers = {
-          dictionary = {
-            module = "blink-cmp-words.dictionary",
-            name = "Dict",
-            min_keyword_length = 3,
-            max_items = 1,
-            ---@module 'blink-cmp-words'
-            ---@type BlinkCmpWordsOpts|{}
+          datword = {
+            name = "Word",
+            module = "blink-cmp-dat-word",
+            ---@module 'blink-cmp-dat-word'
+            ---@type blink.cmp.Source.DatWord.Opts|{}
             opts = {
-              score_offset = -10, -- actually is -20, see: https://github.com/archie-judd/blink-cmp-words/blob/f6190f584075476ee9abd5aa736ef9085c9b2694/lua/blink-cmp-words/source.lua#L171
+              paths = {
+                require("lazy.core.config").options.root .. "/google-10000-english/google-10000-english-usa.txt",
+                "/usr/share/dict/words", -- this file is included by default on Linux/macOS
+              },
             },
-          },
-          thesaurus = {
-            module = "blink-cmp-words.thesaurus",
-            name = "Words",
-            min_keyword_length = 3,
             max_items = 1,
-            ---@type BlinkCmpWordsOpts|{}
-            opts = {
-              score_offset = -10,
-            },
+            score_offset = -10,
+            min_keyword_length = 3,
           },
         },
       },
@@ -642,6 +671,7 @@ return {
         "blink_cmp_kitty",
         "dictionary",
         "thesaurus",
+        "datword",
         "spell",
         "yank",
       }

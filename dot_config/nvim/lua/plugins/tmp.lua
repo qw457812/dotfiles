@@ -12,24 +12,6 @@ return {
   --   },
   -- },
 
-  {
-    "alex-popov-tech/store.nvim",
-    cmd = "Store",
-    keys = {
-      { "<leader>le", "<cmd>Store<cr>", desc = "Plugin Store" },
-    },
-    ---@module "store"
-    ---@type UserConfig
-    opts = {
-      github_token = vim.env.GITHUB_TOKEN,
-      width = vim.g.user_is_termux and vim.o.columns or 0.95,
-      height = vim.g.user_is_termux and vim.o.lines or 0.9,
-      proportions = { list = 0.4, preview = 0.6 },
-      list_fields = { "stars", "full_name", "pushed_at", "forks", "issues", "tags" },
-      full_name_limit = vim.g.user_is_termux and 30 or nil,
-    },
-  },
-
   -- for java projects using JDK version older than 21
   {
     "mfussenegger/nvim-jdtls",

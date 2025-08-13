@@ -12,8 +12,7 @@
       "Bash(tail:*)",
       "Bash(touch:*)",
       "Bash(mkdir:*)"
-    ],
-    "defaultMode": "plan"
+    ]
   },
   "statusLine": {
     "type": "command",

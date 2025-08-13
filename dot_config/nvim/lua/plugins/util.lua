@@ -60,4 +60,19 @@ return {
       }
     end,
   },
+
+  {
+    "alex-popov-tech/store.nvim",
+    cmd = "Store",
+    keys = {
+      { "<leader>lh", "<cmd>Store<cr>", desc = "Plugin Hub" },
+    },
+    ---@module "store"
+    ---@type UserConfig
+    opts = {
+      width = vim.g.user_is_termux and vim.o.columns or 0.95,
+      height = vim.g.user_is_termux and vim.o.lines or 0.9,
+      list_fields = { "is_installed", "is_installable", "stars", "full_name", "pushed_at", "forks", "issues", "tags" },
+    },
+  },
 }

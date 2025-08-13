@@ -61,6 +61,7 @@ if lazyvim_docs then
   -- set in kitty.conf via `scrollback_pager nvim --cmd "lua vim.g.terminal_scrollback_pager = true" -c "lua require('util.terminal').colorize()"`
   vim.g.terminal_scrollback_pager = false
 end
+-- TODO: https://github.com/A7Lavinraj/fyler.nvim
 ---@type "neo-tree.nvim"|"snacks.nvim"|"oil.nvim"|"mini.files"|"yazi.nvim"|"telescope-file-browser.nvim"
 vim.g.user_hijack_netrw = (
   vim.g.shell_command_editor

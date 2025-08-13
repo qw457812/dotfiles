@@ -313,7 +313,9 @@ end
 ---@type table<string, uv.uv_timer_t>
 local debounce_timers = {}
 
---- alternative: https://github.com/CopilotC-Nvim/CopilotChat.nvim/blob/2ebe591cff06018e265263e71e1dbc4c5aa8281e/lua/CopilotChat/utils.lua#L157
+--- alternative:
+--- - https://github.com/CopilotC-Nvim/CopilotChat.nvim/blob/2ebe591cff06018e265263e71e1dbc4c5aa8281e/lua/CopilotChat/utils.lua#L157
+--- - https://github.com/yetone/avante.nvim/commit/76fe3f6
 ---@param id string
 ---@param ms integer
 ---@param fn function

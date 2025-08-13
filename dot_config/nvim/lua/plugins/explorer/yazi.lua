@@ -30,7 +30,6 @@ return {
             return
           end
 
-          vim.b[buf].user_lualine_filename = "yazi"
           -- vim.keymap.set("t", "<esc>", "<esc>", { buffer = buf, nowait = true })
           vim.keymap.set("t", "<c-h>", "<c-h>", { buffer = buf, nowait = true })
           vim.keymap.set("t", "<c-j>", "<c-j>", { buffer = buf, nowait = true })

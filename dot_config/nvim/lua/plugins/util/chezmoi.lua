@@ -286,7 +286,7 @@ return {
                     vim.cmd.edit(vim.fn.fnameescape(file))
                   else
                     LazyVim.warn(
-                      ("Can't find file `%s`.\nFallback to `normal! gf`"):format(file),
+                      ("Can't find file `%s`.\nFallback to `:normal! gf`"):format(file),
                       { title = "Chezmoi" }
                     )
                     vim.cmd("normal! gf")
