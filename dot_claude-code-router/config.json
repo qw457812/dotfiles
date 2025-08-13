@@ -3,7 +3,7 @@
     {
       "name": "openrouter",
       "api_base_url": "https://openrouter.ai/api/v1/chat/completions",
-      "api_key": "{{ env `CCR_OPENROUTER_API_KEY` }}",
+      "api_key": "${CCR_OPENROUTER_API_KEY}",
       "models": [
         "moonshotai/kimi-k2",
         "google/gemini-2.5-pro",
@@ -16,7 +16,7 @@
     {
       "name": "openrouter-kimi",
       "api_base_url": "https://openrouter.ai/api/v1/chat/completions",
-      "api_key": "{{ env `CCR_OPENROUTER_API_KEY` }}",
+      "api_key": "${CCR_OPENROUTER_API_KEY}",
       "models": ["@preset/kimi"],
       "transformer": {
         "use": ["openrouter", ["maxtoken", { "max_tokens": 0 }]]
