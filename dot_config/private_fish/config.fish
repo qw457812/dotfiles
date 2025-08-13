@@ -247,6 +247,7 @@ if type -q claude
     abbr cctmpl "ANTHROPIC_BASE_URL=https://us.ctok.ai/api/ ANTHROPIC_AUTH_TOKEN=$CTOK_AUTH_TOKEN npx claude-code-templates@latest"
     abbr cck claude_kimi
     abbr ccg claude_glm
+    abbr ccq claude_qwen
     abbr cckc "claude_kimi --continue"
     abbr cckr "claude_kimi --resume"
     type -q ccr; and abbr ccr "ccr code" # https://github.com/musistudio/claude-code-router

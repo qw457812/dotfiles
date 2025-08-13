@@ -1,4 +1,17 @@
 {
+  "LOG": true,
+  "OPENAI_API_KEY": "",
+  "OPENAI_BASE_URL": "",
+  "OPENAI_MODEL": "",
+  "transformers": [
+    {
+      "path": "$HOME/.claude-code-router/plugins/dashscope-transformer.js",
+      "options": {
+        "enable_thinking": false,
+        "stream": true
+      }
+    }
+  ],
   "Providers": [
     {
       "name": "openrouter",
@@ -21,9 +34,21 @@
       "transformer": {
         "use": ["openrouter", ["maxtoken", { "max_tokens": 0 }]]
       }
+    },
+    {
+      "name": "dashscope",
+      "api_base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "api_key": "${DASHSCOPE_API_KEY}",
+      "models": ["qwen3-coder-plus"],
+      "transformer": {
+        "use": ["dashscope"]
+      }
     }
   ],
   "Router": {
-    "default": "openrouter-kimi,@preset/kimi"
+    "default": "dashscope,qwen3-coder-plus",
+    "think": "dashscope,qwen3-coder-plus",
+    "background": "dashscope,qwen3-coder-plus",
+    "longContext": "dashscope,qwen3-coder-plus"
   }
 }
