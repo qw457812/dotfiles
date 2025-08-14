@@ -158,6 +158,7 @@ return {
       },
     },
   },
+  -- TODO: check https://github.com/olimorris/codecompanion.nvim/commit/f962b2e
   -- {
   --   "folke/snacks.nvim",
   --   opts = function()

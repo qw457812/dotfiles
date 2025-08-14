@@ -617,7 +617,7 @@ return {
             opts = {
               paths = {
                 require("lazy.core.config").options.root .. "/google-10000-english/google-10000-english-usa.txt",
-                "/usr/share/dict/words", -- this file is included by default on Linux/macOS
+                -- "/usr/share/dict/words", -- this file is included by default on Linux/macOS
               },
             },
             max_items = 1,

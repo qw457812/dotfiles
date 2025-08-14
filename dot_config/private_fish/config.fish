@@ -242,10 +242,13 @@ if type -q claude
     abbr clo "claude --model opus"
     abbr clp "claude --model opusplan --permission-mode plan"
     abbr clgc "claude --model sonnet 'commit only the staged changes'"
-    abbr ccu (type -q bunx; and echo "bunx ccusage"; or echo "npx ccusage@latest")
+    set -l ccusage (type -q bunx; and echo "bunx ccusage"; or echo "npx ccusage@latest")
+    abbr ccu "$ccusage"
+    abbr ccum "$ccusage daily --breakdown"
+    abbr ccub "$ccusage blocks"
+    abbr ccstl "npx ccstatusline@latest"
     abbr ccexp (type -q bunx; and echo "bunx ccexp@latest"; or echo "npx ccexp@latest")
     abbr cctmpl "ANTHROPIC_BASE_URL=https://us.ctok.ai/api/ ANTHROPIC_AUTH_TOKEN=$CTOK_AUTH_TOKEN npx claude-code-templates@latest"
-    abbr ccstl "npx ccstatusline@latest"
     abbr cck claude_kimi
     abbr ccg claude_glm
     abbr ccq claude_qwen

@@ -69,9 +69,11 @@ return {
             if name then
               return name
             end
-            -- hide extension unless it is a .env file
+            -- hide extension unless it is a .env or docker-compose*.yml file
             local tail = vim.fn.fnamemodify(buf.name, ":t")
-            return not (tail == ".env" or tail:match("^%.env%.")) and buf.name:match("(.+)%..+$") or nil
+            return not (tail == ".env" or tail:match("^%.env%.") or tail:match("^docker%-compose.*%.yml$"))
+                and buf.name:match("(.+)%..+$")
+              or nil
           end,
           ---@param o bufferline.IconFetcherOpts
           get_element_icon = function(o)

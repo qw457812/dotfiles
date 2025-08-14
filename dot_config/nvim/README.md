@@ -129,6 +129,7 @@ time nvim -c exit
   - [flash.nvim](https://github.com/folke/flash.nvim): clever-f style, get rid of `;`/`,`.
   - [demicolon.nvim](https://github.com/mawkler/demicolon.nvim): repeat diagnostic jumps (`]d`/`[d`) and nvim-treesitter-textobjects jumps (`]f`/`[f`) with `;`/`,`.
   - [eyeliner.nvim](https://github.com/jinh0/eyeliner.nvim): enhance `f`/`F`/`t`/`T`, like quick-scope.
+    - [ ] [fFtT-highlights.nvim](https://github.com/samiulsami/fFtT-highlights.nvim).
 - [ ] [Org Mode](https://github.com/topics/orgmode-nvim) in nvim, or neorg like [stevearc](https://github.com/stevearc/dotfiles/blob/eeb506f9afd32cd8cd9f2366110c76efaae5786c/.config/nvim/lua/plugins/neorg.lua).
 - [ ] [codecompanion.nvim](https://github.com/olimorris/codecompanion.nvim)
 - [ ] [ChatGPT.nvim](https://github.com/jackMort/ChatGPT.nvim), eg. [AstroCommunity](https://github.com/AstroNvim/astrocommunity/tree/1f3a6ec008b404c72f84093fe25c574ba63fc256/lua/astrocommunity/editing-support/chatgpt-nvim), [Matt-FTW](https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/coding/ai/gpt.lua)
@@ -230,6 +231,8 @@ time nvim -c exit
 - [ ] Try [nvim-dbeer](https://github.com/javiorfo/nvim-dbeer).
 - [ ] Try [blink.pairs](https://github.com/Saghen/blink.pairs).
 - [ ] Try [emmylua_ls](https://github.com/CppCXY/emmylua-analyzer-rust/tree/main/crates/emmylua_ls).
+- [ ] Try [videre.nvim](https://github.com/Owen-Dechow/videre.nvim).
+- [ ] Try [lensline.nvim](https://github.com/oribarilan/lensline.nvim).
   > Mentioned in this [issue](https://github.com/Saghen/blink.cmp/issues/182#issuecomment-2651686405) of `blink.cmp`.
 - [ ] [firenvim](https://github.com/glacambre/firenvim) like [megalithic](https://github.com/megalithic/dotfiles/blob/main/config/nvim/lua/plugins/extended/firenvim.lua).
 - [ ] Check this [chezmoi.lua.tmpl](https://github.com/Nitestack/dotfiles/blob/506b895c45b8ed012a2cb0c35fe62058d8b6dbc4/config/private_dot_config/exact_nvim/lua/exact_plugins/chezmoi.lua.tmpl).
