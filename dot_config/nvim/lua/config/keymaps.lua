@@ -191,8 +191,10 @@ end, { desc = "Yank file relative path" })
 -- https://github.com/echasnovski/mini.nvim/blob/af673d8523c5c2c5ff0a53b1e42a296ca358dcc7/lua/mini/basics.lua#L579
 -- map('n', 'gO', "<Cmd>call append(line('.') - 1, repeat([''], v:count1))<CR>") -- without dot-repeat
 -- map('n', 'go', "<Cmd>call append(line('.'),     repeat([''], v:count1))<CR>")
-map("n", "gO", "v:lua.require'util.keymap'.put_empty_line(v:true)", { expr = true, desc = "Put empty line above" })
-map("n", "go", "v:lua.require'util.keymap'.put_empty_line(v:false)", { expr = true, desc = "Put empty line below" })
+-- map("n", "gO", "v:lua.require'util.keymap'.put_empty_line(v:true)", { expr = true, desc = "Put empty line above" })
+-- map("n", "go", "v:lua.require'util.keymap'.put_empty_line(v:false)", { expr = true, desc = "Put empty line below" })
+map("n", "gO", "[<Space>", { remap = true, desc = "Put empty line above" })
+map("n", "go", "]<Space>", { remap = true, desc = "Put empty line below" })
 
 -- https://github.com/echasnovski/mini.nvim/blob/af673d8523c5c2c5ff0a53b1e42a296ca358dcc7/lua/mini/basics.lua#L589
 -- stylua: ignore

@@ -51,6 +51,8 @@ return {
     "MeanderingProgrammer/render-markdown.nvim",
     optional = true,
     ft = "gitcommit",
+    ---@module "render-markdown"
+    ---@type render.md.UserConfig
     opts = {
       -- heading = {
       --   icons = function(ctx)
@@ -61,7 +63,7 @@ return {
         "force",
         {
           inline_pad = 1,
-        },
+        } --[[@as render.md.code.UserConfig]],
         -- https://github.com/MeanderingProgrammer/render-markdown.nvim/issues/246#issuecomment-2510220411
         vim.g.user_transparent_background
             and {
@@ -69,7 +71,7 @@ return {
               border = "none",
               language_border = " ",
               highlight_border = false,
-            }
+            } --[[@as render.md.code.UserConfig]]
           or {},
         -- https://github.com/MeanderingProgrammer/render-markdown.nvim/discussions/475#discussioncomment-13799516
         code_conceal and {}
@@ -77,7 +79,7 @@ return {
             conceal_delimiters = false,
             language = false,
             border = "none",
-          }
+          } --[[@as render.md.code.UserConfig]]
       ),
       -- checkbox = {
       --   enabled = true,
