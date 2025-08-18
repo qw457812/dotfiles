@@ -314,7 +314,9 @@ return {
       input = {
         provider = "snacks",
       },
-      hints = { enabled = false },
+      selection = {
+        hint_display = "none",
+      },
     },
   },
   {

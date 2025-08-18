@@ -14,10 +14,10 @@
       "Bash(mkdir:*)"
     ]
   },
-  "model": "opusplan",
+  "model": "sonnet[1m]",
   "statusLine": {
     "type": "command",
-    "command": "npx -y ccstatusline@latest",
+    "command": "if command -v bunx >/dev/null 2>&1; then bunx -y ccstatusline@latest; else npx -y ccstatusline@latest; fi",
     "padding": 0
   },
   "feedbackSurveyState": {
