@@ -748,7 +748,7 @@ return {
       vim.api.nvim_create_autocmd("LspAttach", {
         desc = "User: Prefer LSP folding if client supports it",
         callback = function(args)
-          if args.file:match("/%.metals/readonly/dependencies/") then
+          if vim.o.diff or args.file:match("/%.metals/readonly/dependencies/") then
             return
           end
           local client = vim.lsp.get_client_by_id(args.data.client_id)

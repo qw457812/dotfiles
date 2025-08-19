@@ -69,10 +69,16 @@ return {
             auto_tool_mode = { modes = { n = "<localleader>a" } },
             goto_file_under_cursor = { modes = { n = "<localleader>F" } },
             copilot_stats = { modes = { n = "<localleader>S" } },
+            super_diff = { modes = { n = "<localleader>D" } },
           },
         },
         inline = {
           adapter = "copilot",
+          keymaps = {
+            accept_change = { modes = { n = "<localleader>da" } },
+            reject_change = { modes = { n = "<localleader>dr" } },
+            always_accept = { modes = { n = "<localleader>dt" } },
+          },
         },
       },
       display = {

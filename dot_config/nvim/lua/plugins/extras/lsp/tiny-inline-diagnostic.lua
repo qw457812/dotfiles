@@ -20,6 +20,7 @@ return {
         -- multilines = true, -- not just current line
         -- show_source = true,
       },
+      -- blend = { factor = vim.g.user_transparent_background and 0 or nil },
     },
   },
 }

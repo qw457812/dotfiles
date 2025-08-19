@@ -14,7 +14,7 @@
       "Bash(mkdir:*)"
     ]
   },
-  "model": "sonnet[1m]",
+  "model": "opusplan",
   "statusLine": {
     "type": "command",
     "command": "if command -v bunx >/dev/null 2>&1; then bunx -y ccstatusline@latest; else npx -y ccstatusline@latest; fi",
