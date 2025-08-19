@@ -104,7 +104,7 @@ require("lazy").setup({
       },
     },
   },
-  diff = { cmd = "terminal_git" },
+  diff = { cmd = "terminal_git_ignore_all_space" }, -- terminal_git
   checker = {
     enabled = true, -- check for plugin updates periodically
     notify = false, -- notify on update
@@ -126,3 +126,22 @@ require("lazy").setup({
     },
   },
 })
+
+-- HACK: add `--ignore-all-space`
+-- see: https://github.com/folke/lazy.nvim/blob/6ca90a21202808796418e46d3cebfbb5a44e54a2/lua/lazy/view/init.lua#L287
+-- copied from: https://github.com/folke/lazy.nvim/blob/a32e307981519a25dd3f05a33a6b7eea709f0fdc/lua/lazy/view/diff.lua#L49-L61
+---@type LazyDiffFun
+require("lazy.view.diff").handlers.terminal_git_ignore_all_space = function(plugin, diff)
+  local cmd = { "git" }
+  if diff.commit then
+    cmd[#cmd + 1] = "show"
+    cmd[#cmd + 1] = "--ignore-all-space"
+    cmd[#cmd + 1] = diff.commit
+  else
+    cmd[#cmd + 1] = "diff"
+    cmd[#cmd + 1] = "--ignore-all-space"
+    cmd[#cmd + 1] = diff.from
+    cmd[#cmd + 1] = diff.to
+  end
+  require("lazy.util").float_term(cmd, { cwd = plugin.dir, interactive = false, env = { PAGER = "cat" } })
+end
