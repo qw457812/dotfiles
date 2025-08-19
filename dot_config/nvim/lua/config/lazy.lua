@@ -90,9 +90,18 @@ require("lazy").setup({
         end,
         desc = "Open Issue / Commit",
       },
-      ["<localleader>d"] = function(plugin)
-        dd(plugin)
-      end,
+      ["<c-space>"] = {
+        function(plugin)
+          U.terminal(nil, { win = { position = "float" }, cwd = plugin.dir })
+        end,
+        desc = "Snacks Terminal (Plugin Dir)",
+      },
+      ["<localleader>d"] = {
+        function(plugin)
+          dd(plugin)
+        end,
+        desc = "Inspect Plugin (Snacks Debug)",
+      },
     },
   },
   diff = { cmd = "terminal_git" },
