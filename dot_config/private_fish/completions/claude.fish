@@ -17,7 +17,7 @@ complete -c claude -l append-system-prompt -d "Append a system prompt to the def
 complete -c claude -l permission-mode -xa "acceptEdits bypassPermissions default plan" -d "Permission mode to use for the session"
 complete -c claude -s c -l continue -d "Continue the most recent conversation"
 complete -c claude -s r -l resume -d "Resume a conversation - provide a session ID or interactively select"
-complete -c claude -l model -xa "sonnet opus haiku claude-sonnet-4-20250514" -d "Model for the current session"
+complete -c claude -l model -xa "sonnet opus haiku opusplan claude-sonnet-4-20250514" -d "Model for the current session"
 complete -c claude -l fallback-model -xa "sonnet opus haiku claude-sonnet-4-20250514" -d "Enable automatic fallback to specified model when default model is overloaded"
 complete -c claude -l settings -rF -d "Path to a settings JSON file to load additional settings from"
 complete -c claude -l add-dir -rF -d "Additional directories to allow tool access to"

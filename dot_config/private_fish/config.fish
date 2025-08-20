@@ -107,13 +107,11 @@ abbr gpp "git push"
 # abbr gcp "git commit -p"
 # abbr gpr "hub pr checkout"
 # abbr gcm "git branch -l main | rg main > /dev/null 2>&1 && git checkout main || git checkout master"
-# abbr gdw "git diff --word-diff"
-abbr gdw "git diff --ignore-all-space"
-abbr gdsw "git diff --staged --ignore-all-space"
-abbr glgpw "git log --stat --patch --ignore-all-space"
-abbr gdm 'git diff (git_main_branch)'
-abbr gdom 'git diff origin/(git_main_branch)'
-abbr gdum 'git diff upstream/(git_main_branch)'
+abbr gdw "git diff --word-diff"
+abbr gdsw "git diff --staged --word-diff"
+abbr gdi "git diff --ignore-all-space --ignore-blank-lines --ignore-cr-at-eol"
+abbr gdsi "git diff --staged --ignore-all-space --ignore-blank-lines --ignore-cr-at-eol"
+abbr glgpi "git log --stat --patch --ignore-all-space --ignore-blank-lines --ignore-cr-at-eol"
 # copied from: https://github.com/ohmyzsh/ohmyzsh/blob/750d3ac4b493dca13ef0ced55fa6a2cd02dc7ee8/plugins/git/git.plugin.zsh
 abbr ga "git add"
 abbr gaa "git add --all"
