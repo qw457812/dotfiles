@@ -24,8 +24,8 @@
       {
         "id": "43d417f8-d31b-482e-a60f-0ba21b4b5ff9",
         "type": "git-branch",
-        "rawValue": true,
-        "color": "brightMagenta"
+        "color": "brightMagenta",
+        "rawValue": true
       },
       {
         "id": "30f3044b-6d2d-4fee-9512-497666c35f19",
@@ -161,7 +161,7 @@
         "type": "custom-command",
         "commandPath": "if command -v bunx >/dev/null 2>&1; then bunx ccusage statusline; else npx -y ccusage@latest statusline; fi",
         "preserveColors": true,
-        "timeout": 5000
+        "timeout": 10000
       }
     ],
     []
