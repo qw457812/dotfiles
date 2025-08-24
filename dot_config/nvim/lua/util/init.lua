@@ -6,6 +6,7 @@
 ---@field lualine util.lualine
 ---@field path util.path
 ---@field rime_ls util.rime_ls
+---@field snacks util.snacks
 ---@field telescope util.telescope
 ---@field terminal util.terminal
 ---@field toggle util.toggle
@@ -229,8 +230,8 @@ end
 
 --- https://github.com/echasnovski/mini.files/commit/2756117
 --- vim.cmd.edit(path)
----@param path
----@param win_id?
+---@param path string
+---@param win_id? integer
 ---@return integer?
 function M.edit(path, win_id)
   if type(path) ~= "string" then
@@ -293,6 +294,21 @@ function M.patch_func(orig, override)
   return function(...)
     return override(orig, ...)
   end
+end
+
+---@param text string
+---@param width number
+---@param direction? -1 | 1
+function M.truncate(text, width, direction)
+  if width <= 1 then
+    return width == 1 and "…" or ""
+  end
+  local tw = vim.api.nvim_strwidth(text)
+  if tw > width then
+    return direction == -1 and "…" .. vim.fn.strcharpart(text, tw - width + 1, width - 1)
+      or vim.fn.strcharpart(text, 0, width - 1) .. "…"
+  end
+  return text
 end
 
 --- copied from: https://github.com/folke/noice.nvim/blob/eaed6cc9c06aa2013b5255349e4f26a6b17ab70f/lua/noice/util/init.lua#L104

@@ -1,20 +1,5 @@
 local H = {}
 
----@param text string
----@param width number
----@param direction? -1 | 1
-function H.truncate(text, width, direction)
-  if width <= 1 then
-    return width == 1 and "…" or ""
-  end
-  local tw = vim.api.nvim_strwidth(text)
-  if tw > width then
-    return direction == -1 and "…" .. vim.fn.strcharpart(text, tw - width + 1, width - 1)
-      or vim.fn.strcharpart(text, 0, width - 1) .. "…"
-  end
-  return text
-end
-
 function H.pick_search_lazy_specs()
   local dirs = { U.path.CONFIG .. "/lua/plugins", U.path.LAZYVIM .. "/lua/lazyvim/plugins" }
   if LazyVim.pick.picker.name == "telescope" then
@@ -352,7 +337,7 @@ return {
                 if text[2] == "SnacksPickerDir" then
                   text[1] = text[1]:gsub("^.*lua/plugins/", ""):gsub("^.*lua/lazyvim/plugins/", "")
                   local offset = Snacks.picker.highlight.offset(ret, { char_idx = true })
-                  text[1] = H.truncate(text[1], vim.api.nvim_strwidth(text[1]) - (offset - trunc_len) - 1, -1)
+                  text[1] = U.truncate(text[1], vim.api.nvim_strwidth(text[1]) - (offset - trunc_len) - 1, -1)
                   break
                 end
               end
@@ -477,7 +462,7 @@ return {
         local parts = vim.split(dir:gsub("/$", ""), "/")
         -- single part, e.g. "foobar/" ("foobar/baz") -> "foob…/" ("foob…/baz")
         if #parts < 2 then
-          return H.truncate(dir, len - 1) .. "/"
+          return U.truncate(dir, len - 1) .. "/"
         end
 
         -- -- TODO: https://github.com/folke/snacks.nvim/blob/e039139291f85eebf3eeb41cc5ad9dc4265cafa4/lua/snacks/picker/util/init.lua#L46-L61
@@ -486,7 +471,7 @@ return {
         -- if (first == "~" or first == "") and #parts > 0 then
         --   first = first .. "/" .. table.remove(parts, 1)
         -- end
-        return H.truncate(dir, len, -1)
+        return U.truncate(dir, len, -1)
       end
 
       -- HACK: shorten & truncate dir | https://github.com/folke/snacks.nvim/blob/2568f18c4de0f43b15b0244cd734dcb5af93e53f/lua/snacks/picker/format.lua#L51
