@@ -188,6 +188,7 @@ return {
     opts = {
       mappings = {
         new_ask = mapping_disabled_prefix .. "n",
+        full_view_ask = mapping_disabled_prefix .. "F",
         refresh = mapping_disabled_prefix .. "r",
         focus = mapping_disabled_prefix .. "f",
         select_model = mapping_disabled_prefix .. "m",

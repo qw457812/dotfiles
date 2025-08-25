@@ -232,6 +232,11 @@ abbr bs 'brew search'
 
 # AI
 if type -q claude
+    # claude mcp add -s user context7 -- npx -y @upstash/context7-mcp
+    # claude mcp add -s user playwright npx @playwright/mcp@latest
+    # claude mcp add -s user magic -- npx -y @21st-dev/magic@latest
+    # claude mcp add -s user sequential-thinking -- npx -y @modelcontextprotocol/server-sequential-thinking
+    # claude mcp add -s user --transport http grep https://mcp.grep.app
     abbr cl claude
     abbr clc "claude --continue"
     abbr clr "claude --resume"

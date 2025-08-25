@@ -177,4 +177,14 @@ return {
       }
     end,
   },
+
+  -- {
+  --   "yetone/avante.nvim",
+  --   optional = true,
+  --   ---@module "avante"
+  --   ---@type avante.Config
+  --   opts = {
+  --     instructions_file = "CLAUDE.md",
+  --   },
+  -- },
 }

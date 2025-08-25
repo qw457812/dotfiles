@@ -1,3 +1,4 @@
+-- TODO: https://github.com/neovim/nvim-lspconfig/pull/4029#issuecomment-3218682706
 return {
   {
     "copilotlsp-nvim/copilot-lsp",
