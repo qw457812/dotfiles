@@ -199,6 +199,7 @@ return {
 
   {
     "linux-cultist/venv-selector.nvim",
+    branch = "main",
     enabled = true,
     optional = true,
     ---@module "venv-selector"

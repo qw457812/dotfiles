@@ -237,6 +237,8 @@ if type -q claude
     # claude mcp add -s user magic -- npx -y @21st-dev/magic@latest
     # claude mcp add -s user sequential-thinking -- npx -y @modelcontextprotocol/server-sequential-thinking
     # claude mcp add -s user --transport http grep https://mcp.grep.app
+    # claude mcp add -s user firecrawl -e FIRECRAWL_API_KEY=$FIRECRAWL_API_KEY -- npx -y firecrawl-mcp
+    # claude mcp add -s user gemini-cli -- npx -y gemini-mcp-tool
     abbr cl claude
     abbr clc "claude --continue"
     abbr clr "claude --resume"
