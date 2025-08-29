@@ -422,13 +422,17 @@ return {
         {
           "u",
           function()
+            if vim.bo.modifiable == false then
+              return vim.cmd("normal! " .. vim.v.count1 .. "<C-u>")
+            end
+
             require("undo-glow").undo()
 
             if _G.MiniSnippets then
               MiniSnippets.session.stop()
             end
           end,
-          desc = "Undo (undo-glow)",
+          desc = "Undo or Scroll Up (undo-glow)",
         },
         { "U", function() require("undo-glow").redo() end, desc = "Redo (undo-glow)" },
         {
