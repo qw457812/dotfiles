@@ -25,14 +25,21 @@ shell = ["bash"]
 # format = "[ $output ]($style)"
 # shell = ["bash"]
 
+[git_branch]
+symbol = " "
+format = '[$branch(:$remote_branch)]($style) '
+
 [git_status]
-untracked = '[ $count](bold yellow) '
-staged = '[ $count](bold green) '
+untracked = '[?$count](bold blue) '
+staged = '[++$count](bold green) '
 stashed = "[ ](cyan) "
-deleted = '[ $count](bold red) '
-modified = '[ $count](bold blue) '
-behind = '[ ](bold purple) '
-ahead = '[ ](bold purple) '
+deleted = '[D$count](bold red) '
+modified = '[M$count](bold yellow) '
+renamed = '[R$count](bold 136) '
+conflicted = '[!$count](bold red)'
+behind = '[⇣${count}](bold purple) '
+ahead = '[⇡${count}](bold purple) '
+diverged = '[⇕⇡${ahead_count}⇣${behind_count}](bold purple) '
 format = '([$all_status$ahead_behind]($style))'
 
 [git_metrics]
@@ -80,9 +87,6 @@ symbol = " "
 symbol = " "
 
 [fossil_branch]
-symbol = " "
-
-[git_branch]
 symbol = " "
 
 [git_commit]
