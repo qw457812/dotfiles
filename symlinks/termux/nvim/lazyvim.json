@@ -39,6 +39,7 @@
     "plugins.extras.game.exercism",
     "plugins.extras.lsp.mason-lock",
     "plugins.extras.lsp.tiny-inline-diagnostic",
+    "plugins.extras.note.orgmode",
     "plugins.extras.ui.border",
     "plugins.extras.ui.dropbar",
     "plugins.extras.ui.hide-hints-in-insert-mode",
@@ -49,7 +50,7 @@
   "install_version": 7,
   "news": {
     "NEWS.md": "10960",
-    "doc/news.txt": "25127"
+    "doc/news.txt": "25358"
   },
   "version": 8
 }
