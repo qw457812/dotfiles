@@ -202,26 +202,19 @@ return {
     branch = "main",
     enabled = true,
     optional = true,
-    ---@module "venv-selector"
-    ---@param opts venv-selector.Settings
     opts = function(_, opts)
       -- legacy settings, see: https://github.com/linux-cultist/venv-selector.nvim/blob/789aafff17bf96b0e6e8c206ef825599d967f64b/lua/venv-selectorhttps://github.com/linux-cultist/venv-selector.nvim/blob/789aafff17bf96b0e6e8c206ef825599d967f64b/lua/venv-selector/config.lua#L206-L209config.lua#L206-L209
-      ---@diagnostic disable-next-line: undefined-field
       opts = opts and opts.settings or opts or {}
 
-      local icon, hl = require("mini.icons").get("filetype", "python")
       return U.extend_tbl(opts, {
-        ---@diagnostic disable-next-line: missing-fields
         options = {
           -- picker = "native",
-          icon = icon,
-          -- works for other pickers too
-          telescope_active_venv_color = Snacks.util.color(hl),
           on_telescope_result_callback = function(filename)
+            -- works for other pickers too
             return (U.path.shorten(filename, { special = false, java = false }):gsub("/bin/python", ""))
           end,
         },
-      } --[[@as venv-selector.Settings|{}]])
+      })
     end,
   },
 
