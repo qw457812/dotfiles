@@ -93,9 +93,9 @@ return {
           return nes.apply_pending_nes() and nes.walk_cursor_end_edit()
         end,
         -- see: https://github.com/Saghen/blink.cmp/issues/569#issuecomment-2833362734
-        scroll_list_up = function(cmp)
-          -- based on select_prev: https://github.com/saghen/blink.cmp/blob/6f3ed55a0b1a298ddf4d00cc50dc66b59865df40/lua/blink/cmp/init.lua#L178-L184
-          if not cmp.is_menu_visible() then
+        scroll_list_up = function()
+          -- based on select_prev: https://github.com/Saghen/blink.cmp/blob/6323a6ddb191323904557dc9b545f309ea2b0e12/lua/blink/cmp/init.lua#L200-L205
+          if not require("blink.cmp.completion.list").can_select() then
             return
           end
           vim.schedule(function()
@@ -106,9 +106,9 @@ return {
           end)
           return true
         end,
-        scroll_list_down = function(cmp)
-          -- based on select_next: https://github.com/saghen/blink.cmp/blob/6f3ed55a0b1a298ddf4d00cc50dc66b59865df40/lua/blink/cmp/init.lua#L187-L193
-          if not cmp.is_menu_visible() then
+        scroll_list_down = function()
+          -- based on select_next: https://github.com/Saghen/blink.cmp/blob/6323a6ddb191323904557dc9b545f309ea2b0e12/lua/blink/cmp/init.lua#L208-L213
+          if not require("blink.cmp.completion.list").can_select() then
             return
           end
           vim.schedule(function()
@@ -182,6 +182,18 @@ return {
           ["<C-d>"] = { H.actions.scroll_list_down, "fallback" },
           ["<C-b>"] = { "scroll_documentation_up", "scroll_signature_up", "fallback" },
           ["<C-f>"] = { "scroll_documentation_down", "scroll_signature_down", "fallback" },
+          ["<C-.>"] = {
+            function(cmp)
+              return cmp.select_next({ jump_by = "source_id" })
+            end,
+            "fallback",
+          },
+          ["<C-,>"] = {
+            function(cmp)
+              return cmp.select_prev({ jump_by = "source_id" })
+            end,
+            "fallback",
+          },
         },
         cmdline = {
           enabled = true,

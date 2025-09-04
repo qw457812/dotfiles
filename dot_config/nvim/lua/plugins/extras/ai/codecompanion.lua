@@ -1,5 +1,6 @@
 -- https://github.com/olimorris/dotfiles/blob/459dfcc8f2952f80c428353cc9c3fc2d90cbcf8d/.config/nvim/lua/plugins/coding.lua
 -- https://github.com/petobens/dotfiles/blob/08ae687d7c8b9669af1278ef44bfaaf1f6e6f957/nvim/lua/plugin-config/codecompanion_config.lua
+---@type LazySpec
 return {
   {
     "olimorris/codecompanion.nvim",
@@ -47,10 +48,21 @@ return {
         --     },
         --   })
         -- end,
+        acp = {
+          claude_code = function()
+            return require("codecompanion.adapters").extend("claude_code", {
+              env = {
+                ANTHROPIC_BASE_URL = "CTOK_BASE_URL",
+                ANTHROPIC_AUTH_TOKEN = "CTOK_AUTH_TOKEN",
+                ANTHROPIC_MODEL = "sonnet",
+              },
+            })
+          end,
+        },
       },
       strategies = {
         chat = {
-          adapter = "copilot",
+          adapter = vim.fn.executable("claude") == 1 and "claude_code" or "copilot",
           keymaps = {
             options = { modes = { n = { "g?", "<localleader>?" } } },
             regenerate = { modes = { n = "<localleader>r" } },
@@ -66,7 +78,7 @@ return {
             fold_code = { modes = { n = "<localleader>f" } },
             debug = { modes = { n = "<localleader>d" } },
             system_prompt = { modes = { n = "<localleader>P" } },
-            auto_tool_mode = { modes = { n = "<localleader>a" } },
+            yolo_mode = { modes = { n = "<localleader>Y" } },
             goto_file_under_cursor = { modes = { n = "<localleader>F" } },
             copilot_stats = { modes = { n = "<localleader>S" } },
             super_diff = { modes = { n = "<localleader>D" } },
