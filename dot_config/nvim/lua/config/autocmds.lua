@@ -221,7 +221,7 @@ if vim.g.user_explorer_auto_open and not vim.g.vscode then
 end
 
 -- copied from:
--- https://github.com/echasnovski/mini.nvim/blob/73bbcbfa7839c4b00a64965fb504f87461abefbd/lua/mini/misc.lua#L194
+-- https://github.com/nvim-mini/mini.nvim/blob/73bbcbfa7839c4b00a64965fb504f87461abefbd/lua/mini/misc.lua#L194
 -- https://github.com/mrbeardad/nvim/blob/916d17211cc67d082ece6476bdfffe1a9fc41d22/lua/user/configs/autocmds.lua#L61
 if vim.g.user_auto_root and not vim.o.autochdir then
   local function set_root(buf)

@@ -6,7 +6,7 @@ return {
     "Bekaboo/dropbar.nvim",
     event = "VeryLazy",
     dependencies = {
-      "echasnovski/mini.icons",
+      "nvim-mini/mini.icons",
       { "nvim-telescope/telescope-fzf-native.nvim", optional = true },
     },
     init = function()

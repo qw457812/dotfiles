@@ -52,8 +52,8 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [nvimdots](https://dotfyle.com/plugins/ayamir/nvimdots)
 - [AstroCommunity](https://github.com/AstroNvim/astrocommunity)
 - [echasnovski](https://github.com/echasnovski/nvim)
-  > Author of [mini.nvim](https://github.com/echasnovski/mini.nvim).
-  - [mini.basics](https://github.com/echasnovski/mini.nvim/blob/main/lua/mini/basics.lua): [Common configuration presets](https://github.com/echasnovski/mini.nvim#modules)
+  > Author of [mini.nvim](https://github.com/nvim-mini/mini.nvim).
+  - [mini.basics](https://github.com/nvim-mini/mini.nvim/blob/main/lua/mini/basics.lua): [Common configuration presets](https://github.com/nvim-mini/mini.nvim#modules)
 - [Lazyman](https://github.com/doctorfree/nvim-lazyman)
 - [pkazmier](https://github.com/pkazmier/nvim)
 - [v1nh1shungry](https://github.com/v1nh1shungry/.dotfiles/tree/main/nvim)
@@ -185,7 +185,7 @@ time nvim -c exit
 - [ ] Dashboard logo like [shxfee](https://github.com/shxfee/dotfiles/blob/067e65a3bb43c0646d117a6eac16f862b03a82d6/nvim/lua/shxfee/plugins/temp.lua#L166).
 - [x] [symbol-usage.nvim](https://github.com/Wansmer/symbol-usage.nvim) like [jellydn](https://github.com/jellydn/lazy-nvim-ide/blob/main/lua/plugins/lsp.lua)
 - [x] [telescope-undo.nvim](https://github.com/debugloop/telescope-undo.nvim) or [undotree](https://github.com/mbbill/undotree) like [jellydn](https://github.com/jellydn/lazy-nvim-ide/blob/main/lua/plugins/undotree.lua)
-- [ ] [mini.bracketed](https://github.com/echasnovski/mini.bracketed)
+- [ ] [mini.bracketed](https://github.com/nvim-mini/mini.bracketed)
 - [ ] [keymap-amend.nvim](https://github.com/anuvyklack/keymap-amend.nvim)
 - [ ] [flatten.nvim](https://github.com/willothy/flatten.nvim) like [amaanq](https://github.com/amaanq/nvim-config/blob/master/lua/plugins/editor.lua)
 - [ ] [benlubas/molten-nvim](https://github.com/benlubas/molten-nvim) for jupyter
@@ -267,7 +267,7 @@ time nvim -c exit
          opts = {
            triggers = {
              { "<auto>", mode = "nxsot" }, -- this line is necessary
-             -- https://github.com/echasnovski/mini.nvim/issues/1058
+             -- https://github.com/nvim-mini/mini.nvim/issues/1058
              -- https://github.com/folke/which-key.nvim/issues/672#issuecomment-2235978897
              -- 1. Get rid of the `vim.opt.timeoutlen` limit, since `cr` is a little hard to type.
              -- 2. Fix `cR` for `cr$`, or `cR`.

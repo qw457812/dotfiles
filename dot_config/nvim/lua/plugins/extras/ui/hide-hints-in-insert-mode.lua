@@ -65,7 +65,7 @@ return {
   },
 
   {
-    "echasnovski/mini.indentscope",
+    "nvim-mini/mini.indentscope",
     optional = true,
     opts = function()
       auto_toggle({

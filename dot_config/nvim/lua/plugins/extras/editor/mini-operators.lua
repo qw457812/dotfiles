@@ -1,6 +1,6 @@
 return {
   {
-    "echasnovski/mini.operators",
+    "nvim-mini/mini.operators",
     shell_command_editor = true,
     dependencies = {
       {

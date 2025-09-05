@@ -31,7 +31,7 @@ M.CONFIG = M.CHEZMOI and M.CHEZMOI .. "/dot_config/nvim" or vim.fn.stdpath("conf
 M.LAZYVIM = LazyVim.get_plugin_path("LazyVim")
 
 --- Replace home directory with '~'
---- https://github.com/echasnovski/mini.files/blob/10ed64157ec45f176decefbdb0e2ba10cccd187f/lua/mini/files.lua#L2365
+--- https://github.com/nvim-mini/mini.files/blob/10ed64157ec45f176decefbdb0e2ba10cccd187f/lua/mini/files.lua#L2365
 --- https://github.com/ibhagwan/fzf-lua/blob/769b6636af07ea4587e6c06067d8fe9fb0629390/lua/fzf-lua/path.lua#L253
 --- https://github.com/nvim-lualine/lualine.nvim/blob/b431d228b7bbcdaea818bdc3e25b8cdbe861f056/lua/lualine/extensions/nerdtree.lua#L4
 ---@param path string

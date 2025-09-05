@@ -13,7 +13,7 @@ return {
   -- },
 
   {
-    "echasnovski/mini.align",
+    "nvim-mini/mini.align",
     vscode = true,
     keys = {
       -- { "ga", mode = { "n", "x" }, desc = "Align" },
@@ -42,7 +42,7 @@ return {
   },
 
   {
-    "echasnovski/mini.trailspace",
+    "nvim-mini/mini.trailspace",
     event = { "BufReadPost", "BufNewFile" },
     keys = {
       { "<leader>cw", "<cmd>lua MiniTrailspace.trim()<CR>", desc = "Erase Whitespace" },

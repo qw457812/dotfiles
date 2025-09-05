@@ -335,7 +335,7 @@ return {
     end,
   },
   {
-    "echasnovski/mini.snippets",
+    "nvim-mini/mini.snippets",
     optional = true,
     opts = function(_, opts)
       LazyVim.cmp.actions.snippet_active = function()

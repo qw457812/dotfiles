@@ -99,7 +99,7 @@ return {
             vim.schedule_wrap(function()
               local pairs = require("mini.pairs")
               local c_pairs_bs = pairs.config.modes.command
-              -- see: https://github.com/echasnovski/mini.pairs/blob/7e834c5937d95364cc1740e20d673afe2d034cdb/lua/mini/pairs.lua#L574C5-L576C54
+              -- see: https://github.com/nvim-mini/mini.pairs/blob/7e834c5937d95364cc1740e20d673afe2d034cdb/lua/mini/pairs.lua#L574C5-L576C54
               vim.keymap.set("c", "<bs>", function()
                 if vim.fn.getcmdline() ~= "" then
                   return c_pairs_bs and pairs.bs() or "<bs>"
@@ -405,7 +405,7 @@ return {
   },
 
   {
-    "echasnovski/mini.files",
+    "nvim-mini/mini.files",
     optional = true,
     opts = function(_, opts)
       vim.api.nvim_create_autocmd("User", {

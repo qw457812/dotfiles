@@ -188,7 +188,7 @@ return {
     --   optional = true,
     --   opts = { dashboard = { enabled = false } },
     -- },
-    { "echasnovski/mini.hipatterns", optional = true, cond = false },
+    { "nvim-mini/mini.hipatterns", optional = true, cond = false },
     -- add lazy loaded dependencies
     { "NvChad/volt", lazy = true },
     {
@@ -286,7 +286,7 @@ return {
           end,
         },
         {
-          "echasnovski/mini.icons",
+          "nvim-mini/mini.icons",
           optional = true,
           opts = function()
             pcall(function()

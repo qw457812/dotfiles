@@ -86,7 +86,7 @@ function M.global_mapping_exists(mode, lhs)
   return false
 end
 
--- copied from: https://github.com/echasnovski/mini.nvim/blob/ad46fda7862153107124f95d4ea0e510eafc1dd8/lua/mini/basics.lua#L558
+-- copied from: https://github.com/nvim-mini/mini.nvim/blob/ad46fda7862153107124f95d4ea0e510eafc1dd8/lua/mini/basics.lua#L558
 local cache_empty_line
 ---Add empty lines before and after cursor line supporting dot-repeat
 ---@param put_above boolean

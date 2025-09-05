@@ -1043,7 +1043,7 @@ nnoremap <wait> <space>czz :execute 'cd' fnameescape(system('chezmoi source-path
 " https://github.com/yorukot/superfile
 " https://github.com/nvim-neo-tree/neo-tree.nvim?tab=readme-ov-file#longer-example-for-packer
 " https://github.com/nvim-telescope/telescope-file-browser.nvim?tab=readme-ov-file#mappings
-" https://github.com/echasnovski/mini.files
+" https://github.com/nvim-mini/mini.files
 
 " fileviewer
 " https://github.com/wofr06/lesspipe#4-supported-file-formats

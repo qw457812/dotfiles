@@ -101,7 +101,7 @@ return {
 
   {
     "nvim-lualine/lualine.nvim",
-    dependencies = { "echasnovski/mini.icons" },
+    dependencies = { "nvim-mini/mini.icons" },
     optional = true,
     opts = function(_, opts)
       local is_termux = vim.g.user_is_termux
@@ -216,7 +216,7 @@ return {
   },
 
   {
-    "echasnovski/mini.icons",
+    "nvim-mini/mini.icons",
     optional = true,
     opts = {
       -- file = {
@@ -370,7 +370,7 @@ return {
   },
 
   {
-    "echasnovski/mini.animate",
+    "nvim-mini/mini.animate",
     optional = true,
     opts = function(_, opts)
       local animate = require("mini.animate")
@@ -390,7 +390,7 @@ return {
   },
 
   {
-    "echasnovski/mini.indentscope",
+    "nvim-mini/mini.indentscope",
     optional = true,
     opts = function()
       vim.api.nvim_create_autocmd("FileType", {

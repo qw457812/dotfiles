@@ -3,7 +3,7 @@ return {
   -- https://github.com/linkarzu/dotfiles-latest/blob/66c7304d34c713e8c7d6066d924ac2c3a9c0c9e8/neovim/neobean/lua/plugins/mini-files.lua
   -- https://github.com/mrjones2014/dotfiles/blob/62cd7b9c034b04daff4a2b38ad9eac0c9dcb43e1/nvim/lua/my/configure/mini_files.lua
   {
-    "echasnovski/mini.files",
+    "nvim-mini/mini.files",
     optional = true,
     init = function(plugin)
       local opts = LazyVim.opts("mini.files")

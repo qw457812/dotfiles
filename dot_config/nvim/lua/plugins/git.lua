@@ -210,10 +210,10 @@ return {
     end,
   },
   {
-    "echasnovski/mini.diff",
+    "nvim-mini/mini.diff",
     optional = true,
     opts = function()
-      -- copied from: https://github.com/echasnovski/mini.nvim/issues/1319#issuecomment-2761528147
+      -- copied from: https://github.com/nvim-mini/mini.nvim/issues/1319#issuecomment-2761528147
       Snacks.util.set_hl({
         MiniDiffOverAdd = { bg = "#104010" }, -- regular green
         MiniDiffOverChange = { bg = "#600000" }, -- saturated red

@@ -6,7 +6,7 @@ return {
   {
     "nvim-neo-tree/neo-tree.nvim",
     optional = true,
-    dependencies = { "echasnovski/mini.icons" },
+    dependencies = { "nvim-mini/mini.icons" },
     keys = function(_, keys)
       local mappings = {
         {

@@ -228,7 +228,7 @@ function M.extend_tbl(default, opts)
   return default and vim.tbl_deep_extend("force", default, opts) or opts
 end
 
---- https://github.com/echasnovski/mini.files/commit/2756117
+--- https://github.com/nvim-mini/mini.files/commit/2756117
 --- vim.cmd.edit(path)
 ---@param path string
 ---@param win_id? integer

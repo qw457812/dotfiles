@@ -1,7 +1,7 @@
 ---@type LazySpec
 return {
   {
-    "echasnovski/mini.pairs",
+    "nvim-mini/mini.pairs",
     optional = true,
     opts = function(_, opts)
       local pairs = require("mini.pairs")
@@ -60,7 +60,7 @@ return {
   },
 
   {
-    "echasnovski/mini.surround",
+    "nvim-mini/mini.surround",
     optional = true,
     opts = {
       -- helix-style mappings
@@ -88,7 +88,7 @@ return {
   },
 
   {
-    "echasnovski/mini.ai",
+    "nvim-mini/mini.ai",
     optional = true,
     opts = function(_, opts)
       local ai = require("mini.ai")
@@ -102,7 +102,7 @@ return {
           goto_right = "",
         },
         custom_textobjects = {
-          -- add `<>` brackets, copied from: https://github.com/echasnovski/mini.ai/blob/7f1fe86277f0e977642cf8fe15f004229f61e61a/lua/mini/ai.lua#L1155
+          -- add `<>` brackets, copied from: https://github.com/nvim-mini/mini.ai/blob/7f1fe86277f0e977642cf8fe15f004229f61e61a/lua/mini/ai.lua#L1155
           ["b"] = { { "%b()", "%b[]", "%b{}", "%b<>" }, "^.().*().$" },
           ["?"] = false,
           ["/"] = ai.gen_spec.user_prompt(),

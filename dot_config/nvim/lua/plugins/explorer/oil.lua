@@ -32,7 +32,7 @@ return {
   -- https://github.com/jellydn/lazy-nvim-ide/blob/main/lua/plugins/extras/oil.lua
   {
     "stevearc/oil.nvim",
-    dependencies = { "echasnovski/mini.icons", optional = true },
+    dependencies = { "nvim-mini/mini.icons", optional = true },
     cmd = "Oil",
     ---@module 'oil'
     ---@type oil.SetupOpts

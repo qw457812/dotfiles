@@ -162,10 +162,10 @@ return {
   },
 
   {
-    "echasnovski/mini.files",
+    "nvim-mini/mini.files",
     optional = true,
     opts = function()
-      -- copied from: https://github.com/echasnovski/mini.files/blob/7a377fa4645a361ceaa0aee2f830112a9d046b5b/lua/mini/files.lua#L381-L397
+      -- copied from: https://github.com/nvim-mini/mini.files/blob/7a377fa4645a361ceaa0aee2f830112a9d046b5b/lua/mini/files.lua#L381-L397
       vim.api.nvim_create_autocmd("User", {
         pattern = "MiniFilesWindowOpen",
         callback = function(args)
