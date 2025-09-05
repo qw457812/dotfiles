@@ -1,5 +1,6 @@
 -- https://github.com/AstroNvim/astrocommunity/blob/438fdb8c648bc8870bab82e9149cad595ddc7a67/lua/astrocommunity/editing-support/mcphub-nvim/init.lua
 -- https://github.com/nzlov/LazyVim/blob/274dc6b4bb39184ee330633df3ca0cf47e2fa754/lua/plugins/avante.lua#L156
+---@type LazySpec
 return {
   {
     "ravitemer/mcphub.nvim",
