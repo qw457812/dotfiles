@@ -8,6 +8,7 @@ AGENTS.md
 Library/
 .hammerspoon/
 .macos
+.Brewfile
 .yabairc
 .config/yabai/
 .config/sketchybar/

@@ -254,7 +254,7 @@ return {
       -- https://github.com/twpayne/chezmoi/blob/9b1def1eff7c581272ffeb7f707e7af80ec434b1/assets/chezmoi.io/docs/user-guide/manage-different-types-of-file.md?plain=1#L146-L186
       vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
         group = vim.api.nvim_create_augroup("chezmoi_tmpl_gf", {}),
-        pattern = U.path.CHEZMOI .. "/*/symlink_*.tmpl",
+        pattern = { U.path.CHEZMOI .. "/symlink_*.tmpl", U.path.CHEZMOI .. "/*/symlink_*.tmpl" },
         callback = function(ev)
           -- chezmoi template variables
           local var_patterns = {
