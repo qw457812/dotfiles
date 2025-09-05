@@ -255,6 +255,7 @@ if type -q claude
     abbr ccum "$ccusage daily --breakdown"
     abbr ccub "$ccusage blocks"
     abbr ccstl (type -q bunx; and echo "bunx ccstatusline@latest"; or echo "npx ccstatusline@latest")
+    abbr cchistory "npx cchistory"
     abbr ccexp (type -q bunx; and echo "bunx ccexp@latest"; or echo "npx ccexp@latest")
     abbr cctmpl "ANTHROPIC_BASE_URL=$CTOK_BASE_URL ANTHROPIC_AUTH_TOKEN=$CTOK_AUTH_TOKEN npx claude-code-templates@latest"
     abbr cck claude_kimi
