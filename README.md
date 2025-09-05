@@ -85,24 +85,16 @@ TODO:
 Tips:
 
 1. Remap `esc`.
-
    - For all keyboard (mainly for Apple Internal Keyboard): remap `jk` to `esc` by karabiner.
    - For Glove80 specifically: remap one of the **thumb keys** to `esc` by karabiner.
    - In vim(s): `inoremap jj <esc>` or `inoremap jk <esc>`.
-
 2. Turn up `Key repeat rate` and turn down `Delay until repeat` in `System Settings` -> `Keyboard`.
-
    See [.macos](executable_dot_macos).
-
 3. When leaving insert mode, auto switch IME to English (if necessary).
-
    - By [Rime](https://rime.im/)'s [vim_mode](https://github.com/rime/home/blob/11bbdb85d2acbb6789433064711b03b4952aa7f5/blog/source/release/squirrel/index.md?plain=1#L256) app option, see [squirrel.custom.yaml](private_Library/Rime/squirrel.custom.yaml).
    - Use [vim.g.neovide_input_ime](https://neovide.dev/configuration.html#ime) with `autocmd` in [Neovide](https://neovide.dev/).
-
 4. Remap `shift` (optional).
-
    - For all keyboard: remap `space` to `shift` by karabiner.
-
      > The original tap and hold (repeat) functions of `space` are still available.
 
 ## [IdeaVim](https://github.com/JetBrains/ideavim)
@@ -162,3 +154,9 @@ TODO:
 Using [zathura-pdf-poppler](https://github.com/zegervdv/homebrew-zathura#install-and-link-one-of-the-two-plugins) plugin.
 
 Fix [zathura auto focus on open](https://github.com/zegervdv/homebrew-zathura/issues/62#issuecomment-1413968157) problem by using yabai.
+
+## TODO
+
+- [ ] Termux packages
+  - <https://www.chezmoi.io/user-guide/advanced/install-packages-declaratively/>
+  - <https://www.chezmoi.io/user-guide/use-scripts-to-perform-actions/#install-packages-with-scripts>
