@@ -160,3 +160,20 @@ Fix [zathura auto focus on open](https://github.com/zegervdv/homebrew-zathura/is
 - [ ] Termux packages
   - <https://www.chezmoi.io/user-guide/advanced/install-packages-declaratively/>
   - <https://www.chezmoi.io/user-guide/use-scripts-to-perform-actions/#install-packages-with-scripts>
+
+### Nix
+
+#### Install
+
+- [Determinate Nix Installer](https://github.com/DeterminateSystems/nix-installer)
+- [nix-darwin](https://github.com/nix-darwin/nix-darwin)
+- [home-manager](https://github.com/nix-community/home-manager)
+
+#### Docs
+
+- [Zero to Nix from Determinate Systems](https://zero-to-nix.com/start/install/)
+- [nix.dev](https://github.com/nixos/nix.dev)
+
+#### Dotfiles
+
+- [johnstegeman](https://github.com/johnstegeman/dotfiles/tree/nix): chezmoi + nix (nix-darwin and home-manager)

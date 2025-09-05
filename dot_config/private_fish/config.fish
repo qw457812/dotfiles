@@ -6,7 +6,6 @@ set -gx fish_cursor_visual block
 set -gx fish_cursor_replace_one underscore
 
 # Path
-set -x fish_user_paths
 fish_add_path ~/go/bin
 set -q TERMUX_VERSION; or fish_add_path ~/.cargo/bin # https://github.com/rust-lang/rustup/blob/5e59246c45756b860ffa2c0e471e9989f0d56ff8/doc/user-guide/src/installation/already-installed-rust.md?plain=1#L63-L66
 fish_add_path ~/.local/share/bob/nvim-bin
