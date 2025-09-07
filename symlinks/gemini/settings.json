@@ -1,15 +1,18 @@
 {
-  "selectedAuthType": "oauth-personal",
-  "usageStatisticsEnabled": false,
+  "preferredEditor": "neovim",
   "vimMode": true,
-  "hideBanner": true,
-  "contextFileName": [
-    "CLAUDE.md",
-    "CLAUDE.local.md"
-  ],
   "checkpointing": {
     "enabled": true
   },
+  "theme": "Default",
+  "hideBanner": true,
+  "usageStatisticsEnabled": false,
+  "contextFileName": [
+    "CLAUDE.md",
+    "CLAUDE.local.md",
+    "GEMINI.md"
+  ],
+  "selectedAuthType": "oauth-personal",
   "mcpServers": {
     "context7": {
       "command": "npx",
@@ -24,7 +27,5 @@
         "@playwright/mcp@latest"
       ]
     }
-  },
-  "preferredEditor": "neovim",
-  "theme": "Default"
+  }
 }

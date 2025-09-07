@@ -228,6 +228,7 @@ abbr bi 'brew info'
 abbr bI 'brew install'
 abbr bl 'brew list | fzf'
 abbr bs 'brew search'
+abbr bbd 'brew bundle dump --global --force'
 
 # AI
 if type -q claude

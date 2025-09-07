@@ -301,6 +301,14 @@ return {
           end, { buffer = ev.buf, desc = "Goto File (Chezmoi)" })
         end,
       })
+
+      vim.api.nvim_create_autocmd("BufRead", {
+        group = vim.api.nvim_create_augroup("chezmoi_symlinks_no_autoformat", {}),
+        pattern = U.path.CHEZMOI .. "/symlinks/*",
+        callback = function(ev)
+          vim.b[ev.buf].autoformat = false
+        end,
+      })
     end,
   },
 
