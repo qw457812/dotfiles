@@ -662,9 +662,9 @@ return {
         desc = "Random ColorScheme",
       },
     },
+    ---@param opts LazyVimOptions
     opts = function(_, opts)
-      opts = opts or {}
-      opts.colorscheme = random_colorscheme()
+      opts.colorscheme = random_colorscheme() or opts.colorscheme
     end,
   },
 

@@ -22,6 +22,7 @@ return {
       end
     end,
     opts = function()
+      -- alternative: `opts.hooks.yazi_opened`
       vim.api.nvim_create_autocmd("TermOpen", {
         pattern = "term://*yazi*",
         callback = function(event)
