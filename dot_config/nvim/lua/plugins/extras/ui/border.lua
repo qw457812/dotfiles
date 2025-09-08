@@ -247,4 +247,18 @@ return {
       },
     },
   },
+
+  {
+    "ravitemer/mcphub.nvim",
+    ---@module "mcphub"
+    ---@type MCPHub.Config
+    opts = {
+      ---@type MCPHub.UIConfig
+      ui = {
+        window = {
+          border = "rounded",
+        },
+      },
+    },
+  },
 }
