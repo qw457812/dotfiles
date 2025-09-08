@@ -250,6 +250,7 @@ return {
 
   {
     "ravitemer/mcphub.nvim",
+    optional = true,
     ---@module "mcphub"
     ---@type MCPHub.Config
     opts = {

@@ -1,8 +1,4 @@
 {
-  "LOG": true,
-  "OPENAI_API_KEY": "",
-  "OPENAI_BASE_URL": "",
-  "OPENAI_MODEL": "",
   "transformers": [
     {
       "path": "$HOME/.claude-code-router/plugins/dashscope-transformer.js",
@@ -46,9 +42,6 @@
     }
   ],
   "Router": {
-    "default": "dashscope,qwen3-coder-plus",
-    "think": "dashscope,qwen3-coder-plus",
-    "background": "dashscope,qwen3-coder-plus",
-    "longContext": "dashscope,qwen3-coder-plus"
+    "default": "openrouter-kimi,@preset/kimi"
   }
 }

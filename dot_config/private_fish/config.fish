@@ -44,6 +44,7 @@ set -x EZA_MIN_LUMINANCE 50
 set -x DYLD_LIBRARY_PATH /opt/homebrew/opt/librime/lib # https://github.com/wlh320/rime-ls#macos
 set -x RIPGREP_CONFIG_PATH $HOME/.ripgreprc
 set -x LG_CONFIG_FILE $HOME/.config/lazygit/config.yml,$HOME/.cache/nvim/lazygit-theme.yml
+set -x CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC 1
 
 # Files & Directories
 set -l ll_cmd 'eza --all --color=always --color-scale all --icons=always --long --group --time-style=iso --git'
