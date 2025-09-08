@@ -117,6 +117,10 @@ Using [Emacs Plus](https://github.com/d12frosted/homebrew-emacs-plus).
 
 [fish config](dot_config/private_fish)
 
+TODO:
+
+- [ ] Try [nushell](https://github.com/nushell/nushell).
+
 ## [Oh my tmux!](https://github.com/gpakosz/.tmux)
 
 [.tmux.conf.local](dot_tmux.conf.local)
@@ -174,6 +178,19 @@ Fix [zathura auto focus on open](https://github.com/zegervdv/homebrew-zathura/is
 - [Zero to Nix from Determinate Systems](https://zero-to-nix.com/start/install/)
 - [nix.dev](https://github.com/nixos/nix.dev)
 
-#### Dotfiles
+#### Awesome Nix Config
 
-- [johnstegeman](https://github.com/johnstegeman/dotfiles/tree/nix): chezmoi + nix (nix-darwin and home-manager)
+- [Misterio77/nix-starter-configs](https://github.com/Misterio77/nix-starter-configs)
+  - [Misterio77/nix-config](https://github.com/Misterio77/nix-config)
+- [ryan4yin/nix-config](https://github.com/ryan4yin/nix-config): with Fcitx5 + rime + 小鹤音形 flypy
+  - [ryan4yin/nix-darwin-kickstarter](https://github.com/ryan4yin/nix-darwin-kickstarter)
+- [dustinlyons/nixos-config](https://github.com/dustinlyons/nixos-config)
+- [mitchellh/nixos-config](https://github.com/mitchellh/nixos-config)
+- [srid/nixos-config](https://github.com/srid/nixos-config)
+  - [juspay/nixos-unified-template](https://github.com/juspay/nixos-unified-template)
+  - [srid/nixos-unified](https://github.com/srid/nixos-unified)
+
+- [nix-community/stylix](https://github.com/nix-community/stylix)
+
+- [johnstegeman](https://github.com/johnstegeman/dotfiles/tree/nix): with chezmoi
+- [bgub/nix-macos-starter](https://github.com/bgub/nix-macos-starter)

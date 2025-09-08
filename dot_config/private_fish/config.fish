@@ -57,6 +57,8 @@ abbr mv "mv -iv"
 abbr cp "cp -riv"
 abbr rm "rm -i"
 abbr mkdir "mkdir -vp"
+abbr zr "cd (git rev-parse --show-toplevel)"
+abbr cdt "cd (mktemp -d)"
 abbr ncdu "ncdu --color dark"
 abbr pwdc "pwd | tr -d '\n' | fish_clipboard_copy"
 abbr paths 'echo $PATH | tr " " "\n" | nl'
@@ -232,16 +234,16 @@ abbr bbd 'brew bundle dump --global --force'
 
 # AI
 if type -q claude
-    # claude mcp add -s user context7 -- npx -y @upstash/context7-mcp
+    # claude mcp add -s user context7 -- npx -y @upstash/context7-mcp --api-key $CONTEXT7_API_KEY
     # claude mcp add -s user playwright npx @playwright/mcp@latest
     # claude mcp add -s user magic -- npx -y @21st-dev/magic@latest
     # claude mcp add -s user sequential-thinking -- npx -y @modelcontextprotocol/server-sequential-thinking
     # claude mcp add -s user -t http deepwiki https://mcp.deepwiki.com/mcp
     # claude mcp add -s user --transport http grep https://mcp.grep.app
-    # claude mcp add -s user gemini-cli -- npx -y gemini-mcp-tool
     # claude mcp add -s user exa -e EXA_API_KEY=$EXA_API_KEY -- npx -y exa-mcp-server
     # claude mcp add -s user firecrawl -e FIRECRAWL_API_KEY=$FIRECRAWL_API_KEY -- npx -y firecrawl-mcp
     abbr cl claude
+    abbr clt claude_temp
     abbr clc "claude --continue"
     abbr clr "claude --resume"
     abbr clv "claude --verbose"
@@ -255,6 +257,7 @@ if type -q claude
     abbr ccum "$ccusage daily --breakdown"
     abbr ccub "$ccusage blocks"
     abbr ccstl (type -q bunx; and echo "bunx ccstatusline@latest"; or echo "npx ccstatusline@latest")
+    abbr ccspec --set-cursor "uvx --from git+https://github.com/github/spec-kit.git specify init --here% --ai claude"
     abbr cchistory "npx cchistory"
     abbr ccexp (type -q bunx; and echo "bunx ccexp@latest"; or echo "npx ccexp@latest")
     abbr cctmpl "ANTHROPIC_BASE_URL=$CTOK_BASE_URL ANTHROPIC_AUTH_TOKEN=$CTOK_AUTH_TOKEN npx claude-code-templates@latest"
