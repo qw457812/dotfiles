@@ -10,7 +10,10 @@
 -- onedark
 -- obscure
 -- cyberdream
-local colorschemes = vim.g.user_transparent_background and {
+local colorschemes = vim.g.user_is_termux and {
+  "tokyonight-moon",
+  "tokyonight-storm",
+} or vim.g.user_transparent_background and {
   "tokyonight-moon",
   "catppuccin-frappe",
 } or {
@@ -274,6 +277,7 @@ return {
   {
     "catppuccin",
     optional = true,
+    cond = cond_colorscheme("^catppuccin"),
     opts = function(_, opts)
       local palettes = require("catppuccin.palettes")
       local frappe = palettes.get_palette("frappe")
