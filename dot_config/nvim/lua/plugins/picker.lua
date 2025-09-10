@@ -584,6 +584,7 @@ return {
               ".lazy.lua",
               ".env",
               ".env.*",
+              "AGENTS.md",
               "CLAUDE.md",
               "CLAUDE.local.md",
               ".mcp.json",

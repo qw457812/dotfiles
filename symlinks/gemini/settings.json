@@ -1,18 +1,14 @@
 {
-  "preferredEditor": "neovim",
-  "vimMode": true,
   "checkpointing": {
     "enabled": true
   },
-  "theme": "Default",
-  "hideBanner": true,
-  "usageStatisticsEnabled": false,
   "contextFileName": [
     "CLAUDE.md",
     "CLAUDE.local.md",
     "GEMINI.md"
   ],
-  "selectedAuthType": "oauth-personal",
+  "disableAutoUpdate": true,
+  "hideBanner": true,
   "mcpServers": {
     "context7": {
       "command": "npx",
@@ -20,12 +16,11 @@
         "-y",
         "@upstash/context7-mcp"
       ]
-    },
-    "playwright": {
-      "command": "npx",
-      "args": [
-        "@playwright/mcp@latest"
-      ]
     }
-  }
+  },
+  "preferredEditor": "neovim",
+  "selectedAuthType": "oauth-personal",
+  "theme": "GitHub",
+  "usageStatisticsEnabled": false,
+  "vimMode": true
 }

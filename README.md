@@ -125,6 +125,10 @@ TODO:
 
 [.tmux.conf.local](dot_tmux.conf.local)
 
+TODO:
+
+- [ ] Try [zellij](https://github.com/zellij-org/zellij).
+
 ## [Yazi](https://github.com/sxyazi/yazi)
 
 [yazi config](dot_config/yazi)
@@ -190,6 +194,7 @@ Fix [zathura auto focus on open](https://github.com/zegervdv/homebrew-zathura/is
   - [juspay/nixos-unified-template](https://github.com/juspay/nixos-unified-template)
   - [srid/nixos-unified](https://github.com/srid/nixos-unified)
 
+- [nix-community/awesome-nix](https://github.com/nix-community/awesome-nix)
 - [nix-community/stylix](https://github.com/nix-community/stylix)
 
 - [johnstegeman](https://github.com/johnstegeman/dotfiles/tree/nix): with chezmoi
