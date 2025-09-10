@@ -62,18 +62,25 @@ return {
   {
     "nvim-mini/mini.surround",
     optional = true,
-    opts = {
-      -- helix-style mappings
-      mappings = {
-        add = "ms",
-        replace = "mr",
-        delete = "md",
-        find = "",
-        find_left = "",
-        highlight = "",
-        update_n_lines = "m<C-n>",
-      },
+    keys = {
+      { "m<C-n>", "<Cmd>lua MiniSurround.update_n_lines()<CR>", desc = "Update `MiniSurround.config.n_lines`" },
     },
+    opts = function(_, opts)
+      if vim.tbl_get(opts, "mappings", "update_n_lines") then
+        opts.mappings.update_n_lines = nil
+      end
+      return U.extend_tbl(opts, {
+        -- helix-style mappings
+        mappings = {
+          add = "ms",
+          replace = "mr",
+          delete = "md",
+          find = "",
+          find_left = "",
+          highlight = "",
+        },
+      })
+    end,
   },
   {
     "folke/which-key.nvim",
