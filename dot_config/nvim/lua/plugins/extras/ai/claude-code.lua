@@ -143,7 +143,7 @@ return {
         end),
       })
 
-      local floating_claude = false
+      local floating_claude = vim.g.user_is_termux
 
       ---@module "claudecode"
       ---@type PartialClaudeCodeConfig

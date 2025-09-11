@@ -311,7 +311,7 @@ if set -q TERMUX_VERSION
     # # https://github.com/nvim-lua/plenary.nvim/issues/536#issuecomment-1799807408
     # set -q XDG_RUNTIME_DIR; or set -gx XDG_RUNTIME_DIR "$PREFIX/tmp"
 
-    alias pkgbackup 'pkg list-installed >(chezmoi source-path)/backup/termux-packages'
+    alias pkgbackup 'pkg list-installed >(chezmoi source-path)/backup/termux-packages 2>/dev/null'
     abbr pkgu 'pkg update && pkg upgrade && pkgbackup'
     abbr pkgi --set-cursor 'pkg install % && pkgbackup'
     abbr pkgs 'pkg search'
