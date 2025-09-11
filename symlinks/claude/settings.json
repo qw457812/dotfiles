@@ -19,7 +19,7 @@
   "model": "opusplan",
   "statusLine": {
     "type": "command",
-    "command": "if command -v bunx >/dev/null 2>&1; then bunx -y ccstatusline@latest; else npx -y ccstatusline@latest; fi",
+    "command": "if [ \"$__IS_CLAUDECODE_NVIM\" = \"1\" ]; then echo ''; else if command -v bunx >/dev/null 2>&1; then bunx -y ccstatusline@latest; else npx -y ccstatusline@latest; fi; fi",
     "padding": 0
   },
   "feedbackSurveyState": {

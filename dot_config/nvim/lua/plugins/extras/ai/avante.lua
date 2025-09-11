@@ -4,7 +4,7 @@ local avante_ft = { "Avante", "AvanteInput", "AvanteSelectedFiles", "AvanteSelec
 
 -- https://github.com/yetone/avante.nvim/wiki/Recipe-and-Tricks
 ---@type table<string, string|fun():string>
-local prompt = {
+local prompts = {
   grammar_correction = "Correct the text to standard English, but keep any code blocks inside intact.",
   code_readability_analysis = [[
   You must identify any readability issues in the code snippet.
@@ -20,16 +20,6 @@ local prompt = {
   - Code repetition
   You may identify additional problems. The user submits a small section of code from a larger file.
 ]],
-  optimize_code = "Optimize the following code",
-  summarize = "Summarize the following text",
-  translate = "Translate this into Chinese, but keep any code blocks inside intact",
-  explain_code = "Explain the following code",
-  complete_code = function()
-    return "Complete the following codes written in " .. vim.bo.filetype
-  end,
-  add_docstring = "Add docstring to the following codes",
-  fix_bugs = "Fix the bugs inside the following codes if any",
-  add_tests = "Implement tests for the following code",
 }
 
 local function focus_input()
@@ -118,7 +108,6 @@ end
 return {
   {
     "yetone/avante.nvim",
-    -- lazy = false, -- see: https://github.com/yetone/avante.nvim/issues/561#issuecomment-2342550208
     build = vim.g.user_is_termux and "make BUILD_FROM_SOURCE=true" or "make",
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
@@ -157,33 +146,20 @@ return {
       local mappings = {
         { "<leader>av",                                 "",                                                            desc = "+avante",                         mode = { "n", "v" } },
         { mapping_disabled_prefix,                      "",                                                            desc = "+disabled" },
-        { opts_mappings.ask or "<leader>aa",            ask(),                                                         desc = "Chat (Avante)",                   mode = { "n", "v" } },
-        { opts_mappings.new_ask or "<leader>an",        function() require("avante.api").ask({ new_chat = true }) end, desc = "New Chat (Avante)",               mode = { "n", "v" } },
-        { opts_mappings.edit or "<leader>ae",           function() require("avante.api").edit() end,                   desc = "Edit (Avante)",                   mode = "v" },
-        { opts_mappings.select_history or "<leader>ah", function() require("avante.api").select_history() end,         desc = "Pick History (Avante)" },
-        { opts_mappings.zen_mode or "<leader>az",       function() require("avante.api").zen_mode() end,               desc = "Zen Mode (Avante)",               mode = { "n", "v" } },
-        { opts_mappings.toggle.repomap or "<leader>aR", function() require("avante.repo_map").show() end,              desc = "Display Repo Map (Avante)" },
+        { opts_mappings.ask or "<leader>aa",            ask(),                                                         desc = "Chat",                            mode = { "n", "v" } },
+        { opts_mappings.new_ask or "<leader>an",        function() require("avante.api").ask({ new_chat = true }) end, desc = "New Chat",                        mode = { "n", "v" } },
+        { opts_mappings.edit or "<leader>ae",           function() require("avante.api").edit() end,                   desc = "Edit",                            mode = "v" },
+        { opts_mappings.select_history or "<leader>ah", function() require("avante.api").select_history() end,         desc = "Pick History" },
+        { opts_mappings.zen_mode or "<leader>az",       function() require("avante.api").zen_mode() end,               desc = "Zen Mode",                        mode = { "n", "v" } },
+        { opts_mappings.toggle.repomap or "<leader>aR", function() require("avante.repo_map").show() end,              desc = "Display Repo Map" },
         { "<localleader>s",                             function() require("avante.api").stop() end,                   desc = "Stop",                            ft = avante_ft },
         { "<localleader>r",                             function() require("avante.api").refresh() end,                desc = "Refresh",                         ft = avante_ft },
         { "<localleader>m",                             function() require("avante.api").select_model() end,           desc = "Switch Model",                    ft = avante_ft },
         { "<localleader>c",                             "<cmd>AvanteClear<cr>",                                        desc = "Clear",                           ft = avante_ft },
         { "<localleader>p",                             switch_provider,                                               desc = "Switch Provider",                 ft = avante_ft },
-        { "<leader>avg",                                ask(prompt.grammar_correction),                                desc = "Grammar Correction (Ask)",        mode = { "n", "v" } },
-        { "<leader>avG",                                edit_submit(prompt.grammar_correction),                        desc = "Grammar Correction (Edit)",       mode = "v" },
-        { "<leader>avr",                                ask(prompt.code_readability_analysis),                         desc = "Code Readability Analysis (Ask)", mode = { "n", "v" } },
-        { "<leader>avo",                                ask(prompt.optimize_code),                                     desc = "Optimize Code (Ask)",             mode = { "n", "v" } },
-        { "<leader>avO",                                edit_submit(prompt.optimize_code),                             desc = "Optimize Code (Edit)",            mode = "v" },
-        { "<leader>avs",                                ask(prompt.summarize),                                         desc = "Summarize text (Ask)",            mode = { "n", "v" } },
-        { "<leader>avt",                                ask(prompt.translate),                                         desc = "Translate text (Ask)",            mode = { "n", "v" } },
-        { "<leader>ave",                                ask(prompt.explain_code),                                      desc = "Explain Code (Ask)",              mode = { "n", "v" } },
-        { "<leader>avc",                                ask(prompt.complete_code),                                     desc = "Complete Code (Ask)",             mode = { "n", "v" } },
-        { "<leader>avC",                                edit_submit(prompt.complete_code),                             desc = "Complete Code (Edit)",            mode = "v" },
-        { "<leader>avd",                                ask(prompt.add_docstring),                                     desc = "Docstring (Ask)",                 mode = { "n", "v" } },
-        { "<leader>avD",                                edit_submit(prompt.add_docstring),                             desc = "Docstring (Edit)",                mode = "v" },
-        { "<leader>avf",                                ask(prompt.fix_bugs),                                          desc = "Fix Bugs (Ask)",                  mode = { "n", "v" } },
-        { "<leader>avF",                                edit_submit(prompt.fix_bugs),                                  desc = "Fix Bugs (Edit)",                 mode = "v" },
-        { "<leader>avu",                                ask(prompt.add_tests),                                         desc = "Add Tests (Ask)",                 mode = { "n", "v" } },
-        { "<leader>avU",                                edit_submit(prompt.add_tests),                                 desc = "Add Tests (Edit)",                mode = "v" },
+        { "<leader>avg",                                ask(prompts.grammar_correction),                               desc = "Grammar Correction (Ask)",        mode = { "n", "v" } },
+        { "<leader>avG",                                edit_submit(prompts.grammar_correction),                       desc = "Grammar Correction (Edit)",       mode = "v" },
+        { "<leader>avr",                                ask(prompts.code_readability_analysis),                        desc = "Code Readability Analysis (Ask)", mode = { "n", "v" } },
       }
       return vim.list_extend(keys, mappings)
     end,
@@ -191,6 +167,7 @@ return {
     opts = {
       mappings = {
         ask = "<leader>avv",
+        edit = "<leader>ave",
         select_history = "<leader>avh",
         zen_mode = "<leader>avz",
         new_ask = mapping_disabled_prefix .. "n",

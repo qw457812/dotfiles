@@ -25,7 +25,7 @@ return {
             cwd = LazyVim.root(),
             -- make sure win.position is bottom, without this, type <c-space> first then <c-/> will make the terminal float
             -- see: https://github.com/folke/snacks.nvim/blob/544a2ae01c28056629a0c90f8d0ff40995c84e42/lua/snacks/terminal.lua#L174
-            env = { __nvim_snacks_terminal_id = "CTRL-/" },
+            env = { __NVIM_SNACKS_TERMINAL_ID = "CTRL-/" },
           })
         end,
         desc = "Terminal (Root Dir)",

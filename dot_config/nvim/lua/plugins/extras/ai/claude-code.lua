@@ -23,6 +23,7 @@ function H.is_cc_norm(buf)
 
   local has_input_prompt = false
   local lines = vim.api.nvim_buf_get_lines(buf, -50, -1, false)
+  local hr_re = vim.regex([[^─\+$]]) -- vim.regex([[^\%u2500\+$]])
   for i, line in ipairs(lines) do
     -- selecting, not inputting
     -- - `│ ❯ Auto-compact                              true           │` of `/config`
@@ -54,17 +55,17 @@ function H.is_cc_norm(buf)
     -- ──────────────────────────────────────────────────────────────
     --                                           ◯ IDE disconnected
 
-    if line:match("^──.+──$") and lines[i + 1]:match("^ > .*") then
+    if hr_re:match_str(line) and lines[i + 1]:match("^ > .*") then
       has_input_prompt = true
     elseif
       has_input_prompt
-      and line:match("^──.+──$")
+      and hr_re:match_str(line)
       and (
         lines[i + 1]:match("^%s+◯ IDE disconnected$")
         or lines[i + 1]:match("^%s+◯ IDE connected$")
         or lines[i + 1]:match("^%s+◯$")
         or lines[i + 1]:match("^%s+⧉ In .+")
-      )
+      ) -- not compatible with claude code statusline
     then
       -- empty mode means normal mode
       return true
@@ -102,7 +103,8 @@ return {
       { "<leader>acc", "<cmd>ClaudeCode --continue<cr>", desc = "Continue" },
       { "<leader>acr", "<cmd>ClaudeCode --resume<cr>", desc = "Resume" },
       { "<leader>acm", "<cmd>ClaudeCodeSelectModel<cr>", desc = "Select Model" },
-      { "<leader>ac=", "<cmd>ClaudeCodeAdd %<cr>", desc = "Add Current File" },
+      { "<leader>af", "<cmd>ClaudeCodeAdd %<cr>", desc = "Add File (Claude)" },
+      -- { "<leader>ac=", "<cmd>ClaudeCodeAdd %<cr>", desc = "Add File" },
       { "=", "<cmd>ClaudeCodeTreeAdd<cr>", desc = "Add File (Claude)", mode = { "n", "x" }, ft = "neo-tree" },
       { "<localleader>=", "<cmd>ClaudeCodeTreeAdd<cr>", desc = "Add File (Claude)", ft = { "oil", "minifiles" } },
     },
@@ -212,6 +214,37 @@ return {
           mode = { "n", "v" },
           { "<leader>ac", group = "claude" },
         },
+      },
+    },
+  },
+
+  {
+    "coder/claudecode.nvim",
+    ---@type PartialClaudeCodeConfig
+    opts = {
+      ---@type ClaudeCodeTerminalConfig|{}
+      terminal = {
+        ---@type snacks.win.Config|{}
+        snacks_win_opts = {
+          b = { __is_claudecode_nvim = true },
+        },
+      },
+    },
+    specs = {
+      {
+        "coder/claudecode.nvim",
+        opts = function()
+          -- HACK: disable claude code statusline inside nvim in favor of H.is_cc_norm
+          -- see: https://github.com/coder/claudecode.nvim/blob/3e2601f1ac0eb61231ee6c6a7f9e8be82420f371/lua/claudecode/terminal/snacks.lua#L131
+          -- __IS_CLAUDECODE_NVIM is used in ~/.claude/settings.json
+          local open_orig = Snacks.terminal.open
+          function Snacks.terminal.open(cmd, opts)
+            if vim.tbl_get(opts, "win", "b", "__is_claudecode_nvim") then
+              opts.env = U.extend_tbl(opts.env, { __IS_CLAUDECODE_NVIM = "1" })
+            end
+            return open_orig(cmd, opts)
+          end
+        end,
       },
     },
   },
