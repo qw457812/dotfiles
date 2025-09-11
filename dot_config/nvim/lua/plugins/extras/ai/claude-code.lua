@@ -95,14 +95,14 @@ return {
         desc = "Claude Code",
         mode = { "n", "x" },
       },
-      { "<leader>ar", "<cmd>ClaudeCode --resume<cr>", desc = "Resume (Claude)" },
-      { "<leader>a.", "<cmd>ClaudeCode --continue<cr>", desc = "Continue (Claude)" },
-      { "<leader>ab", "<cmd>ClaudeCodeAdd %<cr>", desc = "Add Buffer (Claude)" },
-      { "<leader>as", "<cmd>ClaudeCodeSend<cr>", desc = "Send (Claude)", mode = "x" },
+      { "<leader>aa", H.toggle_key, desc = "Claude", remap = true },
+      { "<leader>aa", "<cmd>ClaudeCodeSend<cr>", desc = "Claude", mode = "x" },
+      { "<leader>acc", "<cmd>ClaudeCode --continue<cr>", desc = "Continue" },
+      { "<leader>acr", "<cmd>ClaudeCode --resume<cr>", desc = "Resume" },
+      { "<leader>acm", "<cmd>ClaudeCodeSelectModel<cr>", desc = "Select Model" },
+      { "<leader>ac=", "<cmd>ClaudeCodeAdd %<cr>", desc = "Add Current File" },
       { "=", "<cmd>ClaudeCodeTreeAdd<cr>", desc = "Add File (Claude)", mode = { "n", "x" }, ft = "neo-tree" },
       { "<localleader>=", "<cmd>ClaudeCodeTreeAdd<cr>", desc = "Add File (Claude)", ft = { "oil", "minifiles" } },
-      -- { "<M-space>", "<cmd>ClaudeCodeDiffAccept<cr>", desc = "Accept Diff (Claude)" }, -- set `Diff tool` to `terminal`
-      -- { "<M-cr>", "<cmd>ClaudeCodeDiffDeny<cr>", desc = "Deny Diff (Claude)" },
     },
     opts = function()
       vim.api.nvim_create_autocmd("TermOpen", {
@@ -125,6 +125,22 @@ return {
         end),
       })
 
+      vim.api.nvim_create_autocmd("TabNewEntered", {
+        group = vim.api.nvim_create_augroup("claude_diff_keymaps", {}),
+        callback = vim.schedule_wrap(function()
+          local buf = vim.api.nvim_get_current_buf()
+          -- see: https://github.com/coder/claudecode.nvim/blob/3e2601f1ac0eb61231ee6c6a7f9e8be82420f371/lua/claudecode/diff.lua#L1401-L1428
+          -- stylua: ignore
+          if vim.b[buf].claudecode_diff_tab_name then
+            vim.keymap.set("n", "<C-s>", "<Cmd>ClaudeCodeDiffAccept<CR>", { buffer = buf, desc = "Accept Diff (Claude)" })
+            vim.keymap.set("n", "<localleader>a", "<Cmd>ClaudeCodeDiffAccept<CR>", { buffer = buf, desc = "Accept Diff (Claude)" })
+            vim.keymap.set("n", "<localleader>d", "<Cmd>ClaudeCodeDiffDeny<CR>", { buffer = buf, desc = "Deny Diff (Claude)" })
+          end
+        end),
+      })
+
+      local floating_claude = false
+
       ---@module "claudecode"
       ---@type PartialClaudeCodeConfig
       return {
@@ -138,16 +154,9 @@ return {
         ---@type ClaudeCodeTerminalConfig|{}
         terminal = {
           split_width_percentage = 0.4,
-          -- TODO: multiple snacks terminal instances per LazyVim.root(), custom terminal provider?
-          cwd_provider = function()
-            return LazyVim.root()
-          end,
+          cwd_provider = LazyVim.root.git, -- TODO: multiple snacks terminal instances per root, custom terminal provider?
           ---@module "snacks"
-          ---@type snacks.win.Config|{}
-          snacks_win_opts = {
-            position = "float",
-            height = vim.g.user_is_termux and U.snacks.win.fullscreen_height or 0.9,
-            width = vim.g.user_is_termux and 0 or 0.9,
+          snacks_win_opts = vim.tbl_deep_extend("force", {
             keys = {
               claude_close = {
                 H.toggle_key,
@@ -157,6 +166,7 @@ return {
                 mode = "t",
                 desc = "Close",
               },
+              claude_unfocus = { "<esc>", U.keymap.clear_ui_or_unfocus_esc, desc = "Clear UI or Unfocus (Claude)" },
               -- copied from: https://github.com/folke/snacks.nvim/blob/bc0630e43be5699bb94dadc302c0d21615421d93/lua/snacks/terminal.lua#L49-L64
               term_normal = {
                 "<esc>",
@@ -183,10 +193,25 @@ return {
                 desc = "Double escape to normal mode",
               },
             },
-          },
+          } --[[@as snacks.win.Config]], floating_claude and {
+            position = "float",
+            height = vim.g.user_is_termux and U.snacks.win.fullscreen_height or 0.9,
+            width = vim.g.user_is_termux and 0 or 0.9,
+          } --[[@as snacks.win.Config]] or {}),
         },
       }
     end,
+  },
+  {
+    "folke/which-key.nvim",
+    opts = {
+      spec = {
+        {
+          mode = { "n", "v" },
+          { "<leader>ac", group = "claude" },
+        },
+      },
+    },
   },
 
   -- {

@@ -7,7 +7,7 @@ return {
     cmd = "CodeCompanion",
     keys = {
       {
-        "<leader>al",
+        "<leader>ao",
         -- "<cmd>CodeCompanionChat Toggle<CR>",
         function()
           -- https://github.com/olimorris/codecompanion.nvim/blob/3f7fd6292b9d43d38e9760f43b581652210b0349/lua/codecompanion/init.lua#L178-L192

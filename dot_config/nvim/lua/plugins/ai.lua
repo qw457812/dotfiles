@@ -126,8 +126,10 @@ return {
     keys = {
       { "<leader>aa", mode = { "n", "v" }, false },
       { "<leader>ax", mode = { "n", "v" }, false },
+      { "<leader>ap", mode = { "n", "v" }, false },
+      { "<leader>aq", mode = { "n", "v" }, false },
       {
-        "<leader>ac",
+        "<leader>app",
         mode = { "n", "v" },
         function()
           local copilot_chat = require("CopilotChat")
@@ -141,7 +143,8 @@ return {
         end,
         desc = "CopilotChat",
       },
-      { "<localleader>c", mode = { "n", "v" }, function() require("CopilotChat").reset() end, desc = "Clear", ft = "copilot-chat" },
+      { "<leader>apa", function() require("CopilotChat").select_prompt() end, desc = "Prompt Actions", mode = { "n", "v" } },
+      { "<localleader>c", function() require("CopilotChat").reset() end, desc = "Clear", mode = { "n", "v" }, ft = "copilot-chat" },
       { "<localleader>m", "<cmd>CopilotChatModels<cr>", desc = "Switch Model", ft = "copilot-chat" },
       { "<localleader>s", "<cmd>CopilotChatStop<cr>", desc = "Stop", ft = "copilot-chat" },
     },
@@ -192,6 +195,17 @@ return {
         },
       } --[[@as CopilotChat.config.Config]])
     end,
+  },
+  {
+    "folke/which-key.nvim",
+    opts = {
+      spec = {
+        {
+          mode = { "n", "v" },
+          { "<leader>ap", group = "copilot" },
+        },
+      },
+    },
   },
   {
     "folke/edgy.nvim",

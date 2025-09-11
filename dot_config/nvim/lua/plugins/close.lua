@@ -733,4 +733,20 @@ return {
       end
     end,
   },
+
+  {
+    "coder/claudecode.nvim",
+    optional = true,
+    opts = function()
+      vim.api.nvim_create_autocmd("TabNewEntered", {
+        group = augroup,
+        callback = vim.schedule_wrap(function()
+          local buf = vim.api.nvim_get_current_buf()
+          if vim.b[buf].claudecode_diff_tab_name then
+            vim.keymap.set("n", close_key, "<Cmd>ClaudeCodeDiffDeny<CR>", { buffer = buf, desc = "Deny Diff (Claude)" })
+          end
+        end),
+      })
+    end,
+  },
 }

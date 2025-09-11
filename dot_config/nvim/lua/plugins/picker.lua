@@ -382,7 +382,18 @@ return {
               ["K"] = "preview_scroll_up",
               ["/"] = false, -- highlights text in preview
               ["<C-Space>"] = { "cycle_win", mode = { "n", "i" } },
-              ["<C-,>"] = { "toggle_input", mode = { "n", "i" } },
+              ["<C-,>"] = "toggle_input",
+              i_ctrl_comma = {
+                "<C-,>",
+                function(self)
+                  vim.cmd.stopinsert()
+                  vim.schedule(function()
+                    self:execute("toggle_input")
+                  end)
+                end,
+                mode = "i",
+                desc = "toggle_input",
+              },
               ["<Up>"] = "history_back",
               ["<Down>"] = "history_forward",
               i_up = { "<Up>", "list_up", mode = "i", expr = true },

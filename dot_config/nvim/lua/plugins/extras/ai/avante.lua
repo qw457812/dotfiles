@@ -157,8 +157,8 @@ return {
       local mappings = {
         { "<leader>av",                                 "",                                                            desc = "+avante",                         mode = { "n", "v" } },
         { mapping_disabled_prefix,                      "",                                                            desc = "+disabled" },
-        { opts_mappings.ask or "<leader>aa",            ask(),                                                         desc = "Avante",                          mode = { "n", "v" } },
-        { "<leader>aA",                                 function() require("avante.api").ask({ new_chat = true }) end, desc = "Avante New Chat",                 mode = { "n", "v" } },
+        { opts_mappings.ask or "<leader>aa",            ask(),                                                         desc = "Chat (Avante)",                   mode = { "n", "v" } },
+        { opts_mappings.new_ask or "<leader>an",        function() require("avante.api").ask({ new_chat = true }) end, desc = "New Chat (Avante)",               mode = { "n", "v" } },
         { opts_mappings.edit or "<leader>ae",           function() require("avante.api").edit() end,                   desc = "Edit (Avante)",                   mode = "v" },
         { opts_mappings.select_history or "<leader>ah", function() require("avante.api").select_history() end,         desc = "Pick History (Avante)" },
         { opts_mappings.zen_mode or "<leader>az",       function() require("avante.api").zen_mode() end,               desc = "Zen Mode (Avante)",               mode = { "n", "v" } },
@@ -190,6 +190,7 @@ return {
     ---@type avante.Config
     opts = {
       mappings = {
+        ask = "<leader>avv",
         select_history = "<leader>avh",
         zen_mode = "<leader>avz",
         new_ask = mapping_disabled_prefix .. "n",
@@ -215,7 +216,7 @@ return {
           },
         },
         files = {
-          add_current = "<leader>av.",
+          add_current = "<leader>av=",
           add_all_buffers = mapping_disabled_prefix .. "B",
         },
       },

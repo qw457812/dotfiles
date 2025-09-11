@@ -94,7 +94,7 @@
   "nvim-lspconfig": { "branch": "master", "commit": "bc09aa236d7d2af66f56a5a35d0577588eca7800" },
   "nvim-metals": { "branch": "main", "commit": "db6c9ffb32ec698b96d11cba1317dccc26f5c16d" },
   "nvim-nio": { "branch": "master", "commit": "21f5324bfac14e22ba26553caf69ec76ae8a7662" },
-  "nvim-origami": { "branch": "main", "commit": "457bd4756ba1034f2a8415f80e69effca933e38a" },
+  "nvim-origami": { "branch": "main", "commit": "d11a2f53760d27f5cc62c073bc386aee4b1f09e1" },
   "nvim-rip-substitute": { "branch": "main", "commit": "42c4494386ed33af84424c9a249ab7a20f8a2a51" },
   "nvim-treesitter": { "branch": "master", "commit": "42fc28ba918343ebfd5565147a42a26580579482" },
   "nvim-treesitter-context": { "branch": "master", "commit": "41847d3dafb5004464708a3db06b14f12bde548a" },
