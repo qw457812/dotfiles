@@ -25,8 +25,8 @@ function H.is_cc_norm(buf)
   local lines = vim.api.nvim_buf_get_lines(buf, -50, -1, false)
   for i, line in ipairs(lines) do
     -- selecting, not inputting
-    -- - `│ ❯ Editor mode                               vim                                 │` of `/config`
-    -- - `│ ❯ 1. Yes                                                                        │` of `Do you want to make this edit to <file>?`
+    -- - `│ ❯ Auto-compact                              true           │` of `/config`
+    -- - `│ ❯ 1. Yes                                                   │` of `Do you want to make this edit to <file>?`
     if line:match("^│ ❯ .+") then
       return false
     end
@@ -38,28 +38,30 @@ function H.is_cc_norm(buf)
       return true
     end
 
-    -- ╭──────────────────────────────────────────────────────────╮
-    -- │ >                                                        │
-    -- ╰──────────────────────────────────────────────────────────╯
-    --                                       ⧉ In claude-code.lua
-    --
-    -- ╭──────────────────────────────────────────────────────────╮
-    -- │ > 11111111111111111111111111111111111111111111111111111  │
-    -- │   111                                                    │
-    -- ╰──────────────────────────────────────────────────────────╯
-    --                                         ◯ IDE disconnected
-    --
-    -- ╭──────────────────────────────────────────────────────────╮
-    -- │ > 1                                                      │
-    -- ╰──────────────────────────────────────────────────────────╯
-    --                                                          ◯
-    if line:match("^╭─.+─╮$") and lines[i + 1]:match("^│ > .*  │$") then
+    -- ──────────────────────────────────────────────────────────────
+    --  > Try "refactor keymaps.lua"
+    -- ──────────────────────────────────────────────────────────────
+    --   -- INSERT --                                             ◯
+
+    -- ──────────────────────────────────────────────────────────────
+    --  > 1111111111111111111111111111111111111111111111111111111
+    --    111
+    -- ──────────────────────────────────────────────────────────────
+    --   ? for shortcuts                       ⧉ In claude-code.lua
+
+    -- ──────────────────────────────────────────────────────────────
+    --  > 1
+    -- ──────────────────────────────────────────────────────────────
+    --                                           ◯ IDE disconnected
+
+    if line:match("^──.+──$") and lines[i + 1]:match("^ > .*") then
       has_input_prompt = true
     elseif
       has_input_prompt
-      and line:match("^╰─.+─╯$")
+      and line:match("^──.+──$")
       and (
         lines[i + 1]:match("^%s+◯ IDE disconnected$")
+        or lines[i + 1]:match("^%s+◯ IDE connected$")
         or lines[i + 1]:match("^%s+◯$")
         or lines[i + 1]:match("^%s+⧉ In .+")
       )
