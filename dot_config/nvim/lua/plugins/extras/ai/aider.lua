@@ -2,7 +2,7 @@ if vim.fn.executable("aider") == 0 then
   return {}
 end
 
-local toggle_key = "<C-/>"
+local toggle_key = "<M-/>"
 
 return {
   {

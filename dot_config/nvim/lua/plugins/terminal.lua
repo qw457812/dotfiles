@@ -15,18 +15,31 @@ return {
             cwd = LazyVim.root(),
           })
         end,
-        desc = "Terminal (Root Dir)",
+        desc = "Float Terminal (Root Dir)",
       },
       { "<c-space>", "<cmd>close<cr>", desc = "Hide Terminal", mode = "t" },
       {
-        "<c-cr>",
+        "<c-/>",
+        function()
+          U.terminal(nil, {
+            cwd = LazyVim.root(),
+            -- make sure win.position is bottom, without this, type <c-space> first then <c-/> will make the terminal float
+            -- see: https://github.com/folke/snacks.nvim/blob/544a2ae01c28056629a0c90f8d0ff40995c84e42/lua/snacks/terminal.lua#L174
+            env = { __nvim_snacks_terminal_id = "CTRL-/" },
+          })
+        end,
+        desc = "Terminal (Root Dir)",
+      },
+      { "<c-_>", "<c-/>", desc = "Terminal (Root Dir)", remap = true }, -- is this necessary?
+      {
+        "<c-,>",
         function()
           local filepath = vim.fn.expand("%:p:h")
           U.terminal(nil, { cwd = vim.fn.isdirectory(filepath) == 1 and filepath or LazyVim.root() })
         end,
         desc = "Terminal (Buffer Dir)",
       },
-      { "<c-cr>", "<cmd>close<cr>", desc = "Hide Terminal", mode = "t" },
+      { "<c-,>", "<cmd>close<cr>", desc = "Hide Terminal", mode = "t" },
     },
     ---@module "snacks"
     ---@type snacks.Config

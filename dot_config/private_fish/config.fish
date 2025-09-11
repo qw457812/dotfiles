@@ -265,11 +265,11 @@ if type -q claude
     abbr cck claude_kimi
     abbr ccg claude_glm
     abbr ccq claude_qwen
-    abbr cckc "claude_kimi --continue"
-    abbr cckr "claude_kimi --resume"
     type -q ccr; and abbr ccr "ccr code" # https://github.com/musistudio/claude-code-router
 end
+type -q codex; and abbr cx codex # codex completion fish >~/.config/fish/completions/codex.fish
 # type -q gemini; and abbr gm gemini
+type -q opencode; and abbr oc opencode
 if type -q aider
     abbr ad aider
     abbr adr 'aider --model r1'
@@ -289,6 +289,7 @@ abbr hide-cursor "tput civis"
 abbr lzd lazydocker
 abbr zj zellij
 abbr py python3
+abbr mk make
 
 if type -q atuin
     set -gx ATUIN_NOBIND true

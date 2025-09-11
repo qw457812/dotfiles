@@ -4,7 +4,7 @@ end
 
 local H = {}
 
-H.toggle_key = "<C-,>"
+H.toggle_key = "<M-space>"
 
 ---@param buf? integer
 function H.is_cc(buf)
@@ -126,11 +126,22 @@ return {
       })
 
       ---@module "claudecode"
-      ---@type ClaudeCodeConfig|{}
+      ---@type PartialClaudeCodeConfig
       return {
+        focus_after_send = true,
+        ---@type ClaudeCodeDiffOptions|{}
+        diff_opts = {
+          open_in_new_tab = true,
+          hide_terminal_in_new_tab = true,
+          on_new_file_reject = "close_window",
+        },
         ---@type ClaudeCodeTerminalConfig|{}
         terminal = {
           split_width_percentage = 0.4,
+          -- TODO: multiple snacks terminal instances per LazyVim.root(), custom terminal provider?
+          cwd_provider = function()
+            return LazyVim.root()
+          end,
           ---@module "snacks"
           ---@type snacks.win.Config|{}
           snacks_win_opts = {

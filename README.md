@@ -196,6 +196,7 @@ Fix [zathura auto focus on open](https://github.com/zegervdv/homebrew-zathura/is
 
 - [nix-community/awesome-nix](https://github.com/nix-community/awesome-nix)
 - [nix-community/stylix](https://github.com/nix-community/stylix)
+- [nix-community/nh](https://github.com/nix-community/nh)
 
 - [johnstegeman](https://github.com/johnstegeman/dotfiles/tree/nix): with chezmoi
 - [bgub/nix-macos-starter](https://github.com/bgub/nix-macos-starter)

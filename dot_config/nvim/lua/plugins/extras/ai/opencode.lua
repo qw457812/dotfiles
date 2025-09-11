@@ -2,7 +2,7 @@ if vim.fn.executable("opencode") == 0 then
   return {}
 end
 
-local toggle_key = "<M-,>"
+local toggle_key = "<M-.>"
 
 ---@type LazySpec
 return {

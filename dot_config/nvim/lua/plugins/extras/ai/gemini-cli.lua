@@ -2,7 +2,7 @@ if vim.fn.executable("gemini") == 0 then
   return {}
 end
 
-local toggle_key = "<M-space>"
+local toggle_key = "<M-,>"
 
 ---@type LazySpec
 return {
