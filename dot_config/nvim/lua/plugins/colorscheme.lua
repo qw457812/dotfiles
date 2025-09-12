@@ -10,10 +10,7 @@
 -- onedark
 -- obscure
 -- cyberdream
-local colorschemes = vim.g.user_is_termux and {
-  "tokyonight-moon",
-  "tokyonight-storm",
-} or vim.g.user_transparent_background and {
+local colorschemes = vim.g.user_transparent_background and {
   "tokyonight-moon",
   "catppuccin-frappe",
 } or {
@@ -277,7 +274,6 @@ return {
   {
     "catppuccin",
     optional = true,
-    cond = cond_colorscheme("^catppuccin"),
     opts = function(_, opts)
       local palettes = require("catppuccin.palettes")
       local frappe = palettes.get_palette("frappe")
@@ -293,16 +289,17 @@ return {
           transparent = vim.g.user_transparent_background,
         },
         no_italic = no_italic,
-        auto_integrations = true, -- check `:=require("catppuccin.lib.detect_integrations").create_integrations_table()`
+        -- check `:=require("catppuccin.lib.detect_integrations").create_integrations_table()`
+        auto_integrations = _G.U == nil, -- disabled due to _G.U issues
         integrations = {
-          -- mini = {
-          --   enabled = true,
-          --   -- indentscope_color = "subtext0",
-          -- },
-          -- dropbar = {
-          --   enabled = true,
-          --   -- color_mode = true,
-          -- },
+          mini = {
+            enabled = true,
+            -- indentscope_color = "subtext0",
+          },
+          dropbar = {
+            enabled = true,
+            -- color_mode = true,
+          },
           -- telescope = {
           --   enabled = true,
           --   style = borderless_picker and "nvchad" or nil, -- not working when transparent
