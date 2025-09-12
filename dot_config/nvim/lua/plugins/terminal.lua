@@ -22,13 +22,13 @@ return {
         "<c-/>",
         function()
           U.terminal(nil, {
-            cwd = LazyVim.root(),
+            cwd = LazyVim.root.git(),
             -- make sure win.position is bottom, without this, type <c-space> first then <c-/> will make the terminal float
             -- see: https://github.com/folke/snacks.nvim/blob/544a2ae01c28056629a0c90f8d0ff40995c84e42/lua/snacks/terminal.lua#L174
             env = { __NVIM_SNACKS_TERMINAL_ID = "CTRL-/" },
           })
         end,
-        desc = "Terminal (Root Dir)",
+        desc = "Terminal (Git Root Dir)",
       },
       { "<c-_>", "<c-/>", desc = "Terminal (Root Dir)", remap = true }, -- is this necessary?
       {

@@ -269,7 +269,11 @@ if type -q claude
 end
 type -q codex; and abbr cx codex # codex completion fish >~/.config/fish/completions/codex.fish
 # type -q gemini; and abbr gm gemini
-type -q opencode; and abbr oc opencode
+if type -q opencode
+    abbr oc opencode
+    abbr occ 'opencode --continue'
+    abbr ocg 'opencode --model opencode/grok-code'
+end
 if type -q aider
     abbr ad aider
     abbr adr 'aider --model r1'

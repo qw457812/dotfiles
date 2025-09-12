@@ -112,4 +112,12 @@ function M.to_gray(hex)
   )
 end
 
+---@param name string
+---@return boolean
+function M.colorscheme_loaded(name)
+  -- vim.fn.globpath(vim.o.runtimepath, "colors/" .. name .. ".{vim,lua}") ~= ""
+  -- #vim.api.nvim_get_runtime_file("colors/" .. name .. ".{vim,lua}", true) > 0
+  return vim.list_contains(vim.fn.getcompletion("", "color"), name)
+end
+
 return M

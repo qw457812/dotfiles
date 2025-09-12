@@ -9,13 +9,6 @@ return {
       icons = {
         kinds = {
           Minuet = "󱗻 ",
-          Claude = "󰋦 ",
-          OpenAI = "󱢆 ",
-          Gemini = " ",
-          Groq = " ",
-          OpenRouter = "󱂇 ",
-          Ollama = "󰳆 ",
-          DeepSeek = " ",
         },
       },
     },

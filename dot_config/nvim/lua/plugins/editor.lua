@@ -233,6 +233,7 @@ return {
         desc = "Buffer Keymaps (which-key)",
       },
     },
+    ---@type wk.Opts
     opts = {
       keys = {
         scroll_down = "<c-f>",

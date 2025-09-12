@@ -167,10 +167,10 @@ return {
     opts = {
       mappings = {
         ask = "<leader>avv",
+        new_ask = "<leader>avn",
+        zen_mode = "<leader>avz",
         edit = "<leader>ave",
         select_history = "<leader>avh",
-        zen_mode = "<leader>avz",
-        new_ask = mapping_disabled_prefix .. "n",
         refresh = mapping_disabled_prefix .. "r",
         focus = mapping_disabled_prefix .. "f",
         select_model = mapping_disabled_prefix .. "m",
@@ -204,7 +204,7 @@ return {
         enable_token_counting = false,
         -- use_cwd_as_project_root = true,
       },
-      provider = vim.fn.executable("claude") == 1 and "claude-code" or "copilot",
+      provider = not vim.g.user_is_termux and vim.fn.executable("claude") == 1 and "claude-code" or "copilot",
       -- auto_suggestions_provider = "ollama", -- high-frequency, can be expensive if enabled
       -- https://github.com/yetone/cosmos-nvim/blob/64ffc3f90f33eb4049f1495ba49f086280dc8a1c/lua/layers/completion/plugins.lua#L249
       ---@type table<string, AvanteSupportedProvider>
@@ -282,7 +282,6 @@ return {
         ["openai-gpt-4o-mini"] = { hide_in_model_selector = true },
         aihubmix = { hide_in_model_selector = true },
         ["aihubmix-claude"] = { hide_in_model_selector = true },
-        ["bedrock-claude-3.7-sonnet"] = { hide_in_model_selector = true },
       },
       ---@type table<string, AvanteACPProvider|{}>
       acp_providers = {
@@ -312,6 +311,18 @@ return {
       },
       selection = {
         hint_display = "none",
+      },
+    },
+  },
+  {
+    "folke/which-key.nvim",
+    opts = {
+      spec = {
+        {
+          mode = { "n", "v" },
+          { "<leader>av", group = "avante", icon = { icon = " ", color = "grey" } },
+          { mapping_disabled_prefix, group = "disabled" },
+        },
       },
     },
   },

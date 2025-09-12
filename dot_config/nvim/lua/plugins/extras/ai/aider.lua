@@ -81,7 +81,7 @@ return {
       spec = {
         {
           mode = { "n", "v" },
-          { "<leader>ad", group = "aider" },
+          { "<leader>ad", group = "aider", icon = { icon = "󰧑 ", color = "green" } },
         },
       },
     },

@@ -209,6 +209,7 @@ return {
       return U.extend_tbl(opts, {
         options = {
           -- picker = "native",
+          notify_user_on_venv_activation = false,
           on_telescope_result_callback = function(filename)
             -- works for other pickers too
             return (U.path.shorten(filename, { special = false, java = false }):gsub("/bin/python", ""))

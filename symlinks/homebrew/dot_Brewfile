@@ -307,6 +307,7 @@ cask "syncthing-app"
 cask "topnotch"
 cask "v2rayn"
 cask "vlc"
+cask "warp"
 cask "wezterm@nightly"
 mas "Blackmagic Disk Speed Test", id: 425264550
 mas "GarageBand", id: 682658836

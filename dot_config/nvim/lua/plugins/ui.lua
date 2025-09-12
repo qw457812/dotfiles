@@ -216,6 +216,39 @@ return {
   },
 
   {
+    "LazyVim/LazyVim",
+    ---@type LazyVimOptions|{}
+    opts = {
+      icons = {
+        -- used in blink.cmp
+        kinds = {
+          Claude = "󰛄 ", --  
+          Gemini = " ", -- 󰫢
+          Google = " ",
+          Groq = " ",
+          OpenRouter = "󰑪 ",
+        },
+      },
+    },
+  },
+  {
+    "folke/which-key.nvim",
+    ---@module "which-key"
+    ---@param opts wk.Opts
+    opts = function(_, opts)
+      local icons = LazyVim.config.icons.kinds
+      return U.extend_tbl(opts, {
+        icons = {
+          rules = {
+            { plugin = "CopilotChat.nvim", pattern = "copilot", icon = icons.Copilot, color = "azure" },
+            { plugin = "claudecode.nvim", pattern = "claude", icon = icons.Claude, color = "orange" },
+            { plugin = "mcphub.nvim", icon = " ", color = "grey" },
+          } --[[@as wk.IconRule[] ]],
+        },
+      } --[[@as wk.Opts]])
+    end,
+  },
+  {
     "nvim-mini/mini.icons",
     optional = true,
     opts = {
