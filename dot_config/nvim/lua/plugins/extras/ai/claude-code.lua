@@ -26,36 +26,33 @@ function H.is_cc_norm(buf)
   local hr_re = vim.regex([[^─\+$]]) -- vim.regex([[^\%u2500\+$]])
   for i, line in ipairs(lines) do
     -- selecting, not inputting
-    -- - `│ ❯ Auto-compact                              true           │` of `/config`
-    -- - `│ ❯ 1. Yes                                                   │` of `Do you want to make this edit to <file>?`
+    -- - `│ ❯ Auto-compact                              true         │` of `/config`
+    -- - `│ ❯ 1. Yes                                                 │` of "Do you want to make this edit to claude-code.lua?"
     if line:match("^│ ❯ .+") then
       return false
     end
 
+    -- insert mode indicator
     if line:match("^  %-%- INSERT %-%- ") or line:match("^  %-%- INSERT MODE %-%- ") then
       return false
     end
+    -- normal mode indicator
     if line:match("^  %? for shortcuts ") or line:match("^  %-%- NORMAL MODE %-%- ") then
       return true
     end
 
-    -- ──────────────────────────────────────────────────────────────
-    --  > Try "refactor keymaps.lua"
-    -- ──────────────────────────────────────────────────────────────
-    --   -- INSERT --                                             ◯
+    -- ────────────────────────────────────────────────────────────
+    -- > 11111111111111111111111111111111111111111111111111111111
+    --   111
+    -- ────────────────────────────────────────────────────────────
+    --   -- INSERT --                        ⧉ In claude-code.lua
 
-    -- ──────────────────────────────────────────────────────────────
-    --  > 1111111111111111111111111111111111111111111111111111111
-    --    111
-    -- ──────────────────────────────────────────────────────────────
-    --   ? for shortcuts                       ⧉ In claude-code.lua
+    -- ────────────────────────────────────────────────────────────
+    -- > 1
+    -- ────────────────────────────────────────────────────────────
+    --                                         ◯ IDE disconnected
 
-    -- ──────────────────────────────────────────────────────────────
-    --  > 1
-    -- ──────────────────────────────────────────────────────────────
-    --                                           ◯ IDE disconnected
-
-    if hr_re:match_str(line) and lines[i + 1]:match("^ > .*") then
+    if hr_re:match_str(line) and lines[i + 1]:match("^> .*") then
       has_input_prompt = true
     elseif
       has_input_prompt
@@ -65,10 +62,10 @@ function H.is_cc_norm(buf)
         or lines[i + 1]:match("^%s+◯ IDE connected$")
         or lines[i + 1]:match("^%s+◯$")
         or lines[i + 1]:match("^%s+⧉ In .+")
+        or lines[i + 1]:match("^%s*$")
       ) -- not compatible with claude code statusline
     then
-      -- empty mode means normal mode
-      return true
+      return true -- no mode indicator -> normal mode
     end
   end
 end
