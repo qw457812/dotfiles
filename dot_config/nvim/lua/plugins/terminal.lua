@@ -11,7 +11,11 @@ return {
         "<c-space>",
         function()
           U.terminal(nil, {
-            win = { position = "float" },
+            win = {
+              position = "float",
+              height = vim.g.user_is_termux and U.snacks.win.fullscreen_height or nil,
+              width = vim.g.user_is_termux and 0 or nil,
+            },
             cwd = LazyVim.root(),
           })
         end,

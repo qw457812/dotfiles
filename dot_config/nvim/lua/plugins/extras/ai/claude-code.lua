@@ -136,9 +136,8 @@ return {
           -- see: https://github.com/coder/claudecode.nvim/blob/3e2601f1ac0eb61231ee6c6a7f9e8be82420f371/lua/claudecode/diff.lua#L1401-L1428
           -- stylua: ignore
           if vim.b[buf].claudecode_diff_tab_name then
-            vim.keymap.set("n", "<C-s>", "<Cmd>ClaudeCodeDiffAccept<CR>", { buffer = buf, desc = "Accept Diff (Claude)" })
-            vim.keymap.set("n", "<localleader>a", "<Cmd>ClaudeCodeDiffAccept<CR>", { buffer = buf, desc = "Accept Diff (Claude)" })
-            vim.keymap.set("n", "<localleader>d", "<Cmd>ClaudeCodeDiffDeny<CR>", { buffer = buf, desc = "Deny Diff (Claude)" })
+            U.keymap("n", { "<C-s>", "<localleader>a" }, "<Cmd>ClaudeCodeDiffAccept<CR>", { buffer = buf, desc = "Accept Diff (Claude)" })
+            U.keymap("n", { "<C-c>", "<localleader>d" }, "<Cmd>ClaudeCodeDiffDeny<CR>", { buffer = buf, desc = "Deny Diff (Claude)" })
           end
         end),
       })
