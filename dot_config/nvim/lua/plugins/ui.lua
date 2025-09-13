@@ -242,6 +242,7 @@ return {
           rules = {
             { plugin = "CopilotChat.nvim", pattern = "copilot", icon = icons.Copilot, color = "azure" },
             { plugin = "claudecode.nvim", pattern = "claude", icon = icons.Claude, color = "orange" },
+            { plugin = "codecompanion.nvim", pattern = "codecompanion", icon = " ", color = "purple" },
             { plugin = "mcphub.nvim", icon = " ", color = "grey" },
           } --[[@as wk.IconRule[] ]],
         },

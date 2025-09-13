@@ -44,7 +44,6 @@ set -x EZA_MIN_LUMINANCE 50
 set -x DYLD_LIBRARY_PATH /opt/homebrew/opt/librime/lib # https://github.com/wlh320/rime-ls#macos
 set -x RIPGREP_CONFIG_PATH $HOME/.ripgreprc
 set -x LG_CONFIG_FILE $HOME/.config/lazygit/config.yml,$HOME/.cache/nvim/lazygit-theme.yml
-set -x CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC 1
 
 # Files & Directories
 set -l ll_cmd 'eza --all --color=always --color-scale all --icons=always --long --group --time-style=iso --git'
@@ -252,6 +251,9 @@ if type -q claude
     abbr cls "claude --model sonnet"
     abbr clo "claude --model opus"
     abbr clp "claude --model opusplan --permission-mode plan"
+    abbr clk "MAX_THINKING_TOKENS=31999 claude"
+    abbr clko "MAX_THINKING_TOKENS=31999 claude --model opus"
+    abbr clkt "MAX_THINKING_TOKENS=31999 claude_temp"
     abbr clgc "claude --model sonnet 'commit only the staged changes'"
     set -l ccusage (type -q bunx; and echo "bunx ccusage"; or echo "npx ccusage@latest")
     abbr ccu "$ccusage"

@@ -7,7 +7,7 @@ return {
     cmd = "CodeCompanion",
     keys = {
       {
-        "<leader>ann",
+        "<leader>ao",
         -- "<cmd>CodeCompanionChat Toggle<CR>",
         function()
           -- https://github.com/olimorris/codecompanion.nvim/blob/3f7fd6292b9d43d38e9760f43b581652210b0349/lua/codecompanion/init.lua#L178-L192
@@ -119,7 +119,7 @@ return {
       spec = {
         {
           mode = { "n", "v" },
-          { "<leader>an", group = "codecompanion", icon = { icon = " ", color = "purple" } },
+          { "<leader>an", group = "codecompanion" },
         },
       },
     },

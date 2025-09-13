@@ -155,6 +155,10 @@ return {
             return not U.keymap.buffer_local_mapping_exists(0, "n", "<cr>")
           end,
         },
+        -- https://zed.dev/docs/vim#language-server
+        { "cd", "<leader>cr", desc = "Rename (change definition)", has = "rename", remap = true },
+        { "gs", "<leader>ss", desc = "LSP Symbols", has = "documentSymbol", remap = true },
+        { "gS", "<leader>sS", desc = "LSP Workspace Symbols", has = "workspace/symbols", remap = true },
         { "<leader>cl", false },
         -- { "<leader>il", "<cmd>LspInfo<cr>", desc = "Lsp" },
         { "<leader>il", function() Snacks.picker.lsp_config() end, desc = "Lsp" },

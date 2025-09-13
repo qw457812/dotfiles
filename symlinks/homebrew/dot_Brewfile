@@ -309,6 +309,7 @@ cask "v2rayn"
 cask "vlc"
 cask "warp"
 cask "wezterm@nightly"
+cask "zed"
 mas "Blackmagic Disk Speed Test", id: 425264550
 mas "GarageBand", id: 682658836
 mas "iMovie", id: 408981434
