@@ -39,22 +39,37 @@ return {
     },
     opts = {
       adapters = {
-        -- copilot = function()
-        --   return require("codecompanion.adapters").extend("copilot", {
-        --     schema = {
-        --       model = {
-        --         default = "gemini-2.5-pro", -- claude-sonnet-4
-        --       },
-        --     },
-        --   })
-        -- end,
+        http = {
+          copilot_claude = function()
+            return require("codecompanion.adapters").extend("copilot", {
+              name = "copilot_claude",
+              formatted_name = "Copilot Claude Sonnet 4",
+              schema = {
+                model = {
+                  -- https://docs.github.com/en/copilot/concepts/billing/copilot-requests#model-multipliers
+                  default = "claude-sonnet-4",
+                },
+              },
+            })
+          end,
+          copilot_gpt_5 = function()
+            return require("codecompanion.adapters").extend("copilot", {
+              name = "copilot_gpt_5",
+              formatted_name = "Copilot GPT-5",
+              schema = {
+                model = {
+                  default = "gpt-5",
+                },
+              },
+            })
+          end,
+        },
         acp = {
           claude_code = function()
             return require("codecompanion.adapters").extend("claude_code", {
               env = {
                 ANTHROPIC_BASE_URL = "CTOK_BASE_URL",
                 ANTHROPIC_AUTH_TOKEN = "CTOK_AUTH_TOKEN",
-                ANTHROPIC_MODEL = "sonnet",
               },
             })
           end,
@@ -79,6 +94,7 @@ return {
             fold_code              = { modes = { n = "<localleader>f" } },
             debug                  = { modes = { n = "<localleader>d" } },
             system_prompt          = { modes = { n = "<localleader>P" } },
+            memory                 = { modes = { n = "<localleader>M" } },
             yolo_mode              = { modes = { n = "<localleader>Y" } },
             goto_file_under_cursor = { modes = { n = "<localleader>F" } },
             copilot_stats          = { modes = { n = "<localleader>S" } },
@@ -91,6 +107,36 @@ return {
             accept_change = { modes = { n = "<localleader>a" } },
             reject_change = { modes = { n = "<localleader>d" } },
             always_accept = { modes = { n = "<localleader>A" } },
+          },
+        },
+      },
+      memory = {
+        agents_md = {
+          description = "One AGENTS.md works across many agents",
+          -- `enabled` not working
+          ------@return boolean
+          ---enabled = function()
+          ---  -- do not add AGENTS.md to memory if CLAUDE.md exists
+          ---  return vim.fn.filereadable("CLAUDE.md") == 0
+          ---end,
+          files = { "AGENTS.md" },
+        },
+        claude = {
+          description = "Claude Code memory files",
+          parser = "claude",
+          files = {
+            "~/.claude/CLAUDE.md",
+            "CLAUDE.md",
+            "CLAUDE.local.md",
+          },
+        },
+        opts = {
+          chat = {
+            enabled = true,
+            default_memory = {
+              -- "agents_md", -- `opts.memory.agents_md.enabled` not working
+              "claude",
+            },
           },
         },
       },
@@ -110,6 +156,9 @@ return {
         diff = {
           provider = "mini_diff",
         },
+      },
+      opts = {
+        language = "Chinese",
       },
     },
   },
