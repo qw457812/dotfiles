@@ -141,7 +141,7 @@ return {
             vim.cmd("startinsert!") -- add `!`
           end
         end,
-        desc = "CopilotChat",
+        desc = "Chat",
       },
       { "<leader>apa", function() require("CopilotChat").select_prompt() end, desc = "Prompt Actions", mode = { "n", "v" } },
       { "<localleader>c", function() require("CopilotChat").reset() end, desc = "Clear", mode = { "n", "v" }, ft = "copilot-chat" },

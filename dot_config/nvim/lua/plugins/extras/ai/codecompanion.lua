@@ -1,5 +1,4 @@
--- https://github.com/olimorris/dotfiles/blob/459dfcc8f2952f80c428353cc9c3fc2d90cbcf8d/.config/nvim/lua/plugins/coding.lua
--- https://github.com/petobens/dotfiles/blob/08ae687d7c8b9669af1278ef44bfaaf1f6e6f957/nvim/lua/plugin-config/codecompanion_config.lua
+-- https://github.com/olimorris/dotfiles/blob/main/.config/nvim/lua/plugins/coding.lua
 ---@type LazySpec
 return {
   {
@@ -24,16 +23,14 @@ return {
         desc = "CodeCompanion",
         mode = { "n", "x" },
       },
+      { "<leader>ann", "<cmd>CodeCompanionChat Add<CR>", desc = "Add", mode = { "n", "x" } },
+      { "<leader>ana", "<cmd>CodeCompanionActions<CR>", desc = "Actions", mode = { "n", "x" } },
+      { "<leader>anc", "<cmd>CodeCompanionChat claude_code<CR>", desc = "Claude Code ACP", mode = { "n", "x" } },
+      { "<leader>anp", "<cmd>CodeCompanionChat copilot_gpt_5<CR>", desc = "Copilot GPT-5", mode = { "n", "x" } },
       {
-        "<leader>anp",
-        "<cmd>CodeCompanionActions<CR>",
-        desc = "Actions (CodeCompanion)",
-        mode = { "n", "x" },
-      },
-      {
-        "<leader>ana",
-        "<cmd>CodeCompanionChat Add<CR>",
-        desc = "Add (CodeCompanion)",
+        "<leader>ans",
+        "<cmd>CodeCompanionChat copilot_claude<CR>",
+        desc = "Copilot Claude Sonnet 4",
         mode = { "n", "x" },
       },
     },
@@ -77,19 +74,32 @@ return {
       },
       strategies = {
         chat = {
-          adapter = vim.fn.executable("claude") == 1 and "claude_code" or "copilot",
+          adapter = "copilot",
+          roles = {
+            ---@param adapter CodeCompanion.HTTPAdapter|CodeCompanion.ACPAdapter
+            ---@return string
+            llm = function(adapter)
+              return adapter.formatted_name
+            end,
+            user = "User",
+          },
+          tools = {
+            opts = {
+              default_tools = { "files" },
+            },
+          },
           -- stylua: ignore
           keymaps = {
             options                = { modes = { n = { "g?", "<localleader>?" } } },
             regenerate             = { modes = { n = "<localleader>r" } },
             stop                   = { modes = { n = "<localleader>s" } },
             clear                  = { modes = { n = "<localleader>c" } },
-            codeblock              = { modes = { n = "<localleader>C" } },
+            codeblock              = { modes = { n = "<localleader>`" } },
             yank_code              = { modes = { n = "<localleader>y" } },
             pin                    = { modes = { n = "<localleader>p" } },
             watch                  = { modes = { n = "<localleader>w" } },
-            next_chat              = { modes = { n = "<localleader>]" } },
-            previous_chat          = { modes = { n = "<localleader>[" } },
+            next_chat              = { modes = { n = "<localleader>j" } },
+            previous_chat          = { modes = { n = "<localleader>k" } },
             change_adapter         = { modes = { n = "<localleader>m" } },
             fold_code              = { modes = { n = "<localleader>f" } },
             debug                  = { modes = { n = "<localleader>d" } },
@@ -184,6 +194,7 @@ return {
         callback = function(ev)
           local buf = ev.buf
           vim.b[buf].user_blink_path = false
+          vim.b[buf].user_lualine_filename = "codecompanion"
 
           vim.keymap.set(
             "n",
@@ -213,7 +224,46 @@ return {
     end,
   },
 
-  -- TODO: https://github.com/ravitemer/codecompanion-history.nvim
+  -- history
+  {
+    "olimorris/codecompanion.nvim",
+    dependencies = "ravitemer/codecompanion-history.nvim",
+    optional = true,
+    keys = {
+      { "<leader>anh", "<cmd>CodeCompanionHistory<CR>", desc = "History" },
+    },
+    opts = {
+      extensions = {
+        history = {
+          opts = {
+            keymap = "<localleader>h",
+            save_chat_keymap = { n = {}, i = {} }, -- disable since auto_save is enabled (by default), "<Nop>" works too
+            expiration_days = 30,
+            picker_keymaps = {
+              rename = { n = "<localleader>r" },
+              delete = { n = "<localleader>d" },
+              duplicate = { n = "<localleader>y", i = "<M-y>" },
+            },
+            title_generation_opts = {
+              adapter = "copilot",
+            },
+            -- disable summary
+            summary = {
+              create_summary_keymap = { n = {} },
+              browse_summaries_keymap = { n = {} },
+              generation_opts = {
+                adapter = "copilot",
+              },
+            },
+            -- disable memory
+            memory = {
+              auto_create_memories_on_summary_generation = false,
+            },
+          },
+        },
+      },
+    },
+  },
 
   -- status
   {
