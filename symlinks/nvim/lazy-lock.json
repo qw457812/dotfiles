@@ -24,7 +24,7 @@
   "claudecode.nvim": { "branch": "main", "commit": "3e2601f1ac0eb61231ee6c6a7f9e8be82420f371" },
   "codecompanion-history.nvim": { "branch": "main", "commit": "eb99d256352144cf3b6a1c45608ec25544a0813d" },
   "codecompanion-spinner.nvim": { "branch": "main", "commit": "c1fa2a84ea1aed687aaed60df65e347c280f4f22" },
-  "codecompanion.nvim": { "branch": "main", "commit": "9544c1feac7298d8ef6f3c92bc45da57b6acffb6" },
+  "codecompanion.nvim": { "branch": "main", "commit": "c13422e23b45bfd49906c22014929dc4be8d67c7" },
   "coerce.nvim": { "branch": "main", "commit": "de8ad1663ba467003b90c79eaf5b8105964dd6f5" },
   "colorful-menu.nvim": { "branch": "master", "commit": "bc3e82609f2fcf7dad7ca87c20e65e51d5d9d87c" },
   "conform.nvim": { "branch": "master", "commit": "b4aab989db276993ea5dcb78872be494ce546521" },

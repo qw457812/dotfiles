@@ -1,3 +1,15 @@
+---@return boolean True if focus changed, false otherwise
+local function focus_last_chat()
+  local chat = require("codecompanion").last_chat()
+  if not (chat and chat.ui:is_visible()) then
+    return false
+  end
+  vim.api.nvim_set_current_win(chat.ui.winnr)
+  U.stop_visual_mode()
+  vim.cmd("startinsert!")
+  return true
+end
+
 -- https://github.com/olimorris/dotfiles/blob/main/.config/nvim/lua/plugins/coding.lua
 ---@type LazySpec
 return {
@@ -10,22 +22,26 @@ return {
         -- "<cmd>CodeCompanionChat Toggle<CR>",
         function()
           -- https://github.com/olimorris/codecompanion.nvim/blob/3f7fd6292b9d43d38e9760f43b581652210b0349/lua/codecompanion/init.lua#L178-L192
-          local codecompanion = require("codecompanion")
-          local chat = codecompanion.last_chat()
-          if chat and chat.ui:is_visible() then
-            vim.api.nvim_set_current_win(chat.ui.winnr)
-            U.stop_visual_mode()
-            vim.cmd("startinsert!")
-          else
-            codecompanion.toggle()
+          if not focus_last_chat() then
+            require("codecompanion").toggle()
           end
         end,
         desc = "CodeCompanion",
-        mode = { "n", "x" },
+        -- mode = { "n", "x" }, -- not working in visual mode, using `:CodeCompanionChat Add` instead
       },
-      { "<leader>ann", "<cmd>CodeCompanionChat Add<CR>", desc = "Add", mode = { "n", "x" } },
+      {
+        "<leader>ao",
+        function()
+          vim.cmd("CodeCompanionChat Add")
+          focus_last_chat()
+        end,
+        desc = "Add to Chat",
+        mode = "x",
+      },
+      { "<leader>ani", "<cmd>CodeCompanion<CR>", desc = "Inline", mode = { "n", "x" } },
       { "<leader>ana", "<cmd>CodeCompanionActions<CR>", desc = "Actions", mode = { "n", "x" } },
-      { "<leader>anc", "<cmd>CodeCompanionChat claude_code<CR>", desc = "Claude Code ACP", mode = { "n", "x" } },
+      { "<leader>anN", "<cmd>CodeCompanionChat<CR>", desc = "New Chat", mode = { "n", "x" } },
+      { "<leader>ann", "<cmd>CodeCompanionChat claude_code<CR>", desc = "Claude Code ACP", mode = { "n", "x" } },
       { "<leader>anp", "<cmd>CodeCompanionChat copilot_gpt_5<CR>", desc = "Copilot GPT-5", mode = { "n", "x" } },
       {
         "<leader>ans",
@@ -109,6 +125,9 @@ return {
             goto_file_under_cursor = { modes = { n = "<localleader>F" } },
             copilot_stats          = { modes = { n = "<localleader>S" } },
             super_diff             = { modes = { n = "<localleader>D" } },
+            _acp_allow_always      = { modes = { n = "<S-Tab>" } },
+            _acp_allow_once        = { modes = { n = "<C-s>" } },
+            _acp_reject_once       = { modes = { n = "<C-c>" } },
           },
         },
         inline = {
@@ -359,25 +378,4 @@ return {
   --     })
   --   end,
   -- },
-
-  -- vim.fn.executable("vectorcode") == 1 and {
-  --   "olimorris/codecompanion.nvim",
-  --   dependencies = {
-  --     {
-  --       "Davidyz/VectorCode",
-  --       version = "*",
-  --       build = "pipx upgrade vectorcode",
-  --       cmd = "VectorCode",
-  --     },
-  --   },
-  --   opts = {
-  --     extensions = {
-  --       vectorcode = {
-  --         opts = {
-  --           add_tool = true,
-  --         },
-  --       },
-  --     },
-  --   },
-  -- } or nil,
 }
