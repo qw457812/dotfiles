@@ -155,7 +155,7 @@ return {
 
   -- (isort + black) or ruff
   {
-    "williamboman/mason.nvim",
+    "mason-org/mason.nvim",
     opts = function(_, opts)
       opts.ensure_installed = opts.ensure_installed or {}
       table.insert(opts.ensure_installed, "debugpy") -- required by nvim-dap-python
@@ -199,8 +199,6 @@ return {
 
   {
     "linux-cultist/venv-selector.nvim",
-    branch = "main",
-    enabled = true,
     optional = true,
     opts = function(_, opts)
       -- legacy settings, see: https://github.com/linux-cultist/venv-selector.nvim/blob/789aafff17bf96b0e6e8c206ef825599d967f64b/lua/venv-selectorhttps://github.com/linux-cultist/venv-selector.nvim/blob/789aafff17bf96b0e6e8c206ef825599d967f64b/lua/venv-selector/config.lua#L206-L209config.lua#L206-L209

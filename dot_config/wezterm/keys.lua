@@ -192,6 +192,7 @@ local function split_nav(resize_or_move, mods, key, direction)
   }
 end
 
+---@param config Config
 function M.apply_to_config(config)
   -- macOS right option key as alt modifier
   config.send_composed_key_when_right_alt_is_pressed = false

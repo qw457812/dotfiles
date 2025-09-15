@@ -44,7 +44,7 @@ return {
     end,
   },
   {
-    "williamboman/mason.nvim",
+    "mason-org/mason.nvim",
     opts = vim.g.user_is_termux and {} or { ensure_installed = { "fish-lsp" } },
   },
   -- {
@@ -69,7 +69,7 @@ return {
     end,
   },
   {
-    "williamboman/mason.nvim",
+    "mason-org/mason.nvim",
     opts = { ensure_installed = { "shfmt" } },
   },
 

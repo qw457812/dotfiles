@@ -82,7 +82,7 @@ return {
 
   -- -- sqlfluff -> sqruff
   -- {
-  --   "williamboman/mason.nvim",
+  --   "mason-org/mason.nvim",
   --   opts = function(_, opts)
   --     for i, pkg in ipairs(opts.ensure_installed) do
   --       if pkg == "sqlfluff" then

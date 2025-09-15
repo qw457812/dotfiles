@@ -303,7 +303,7 @@ return {
       if LazyVim.has("telescope.nvim") then
         table.insert(keys, { "<leader>fh", "<Cmd>Telescope harpoon marks<CR>", desc = "Harpoon Files" })
       end
-      for i = 1, 5 do
+      for i = 1, 9 do
         table.insert(keys, { "<leader>" .. i, false })
       end
       -- stylua: ignore

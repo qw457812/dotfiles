@@ -344,24 +344,24 @@ return {
     },
   },
 
-  -- -- Manage wezterm types for ~/.config/wezterm/*.lua with lazy. Plugin will never be loaded
-  -- { "justinsgithub/wezterm-types", cond = is_wezterm, lazy = true },
-  -- {
-  --   "folke/lazydev.nvim",
-  --   opts = function(_, opts)
-  --     if not is_wezterm then
-  --       return
-  --     end
-  --
-  --     -- opts.debug = true
-  --     opts.library = opts.library or {}
-  --     if LazyVim.has("wezterm.nvim") then
-  --       table.insert(opts.library, { path = "wezterm-types", words = { "%-%-%[%[@as Wezterm%]%]" } })
-  --     else
-  --       table.insert(opts.library, { path = "wezterm-types", mods = { "wezterm" } }) -- conflicts with willothy/wezterm.nvim
-  --     end
-  --   end,
-  -- },
+  -- Manage wezterm types for ~/.config/wezterm/*.lua with lazy. Plugin will never be loaded
+  { "DrKJeff16/wezterm-types", cond = is_wezterm, lazy = true },
+  {
+    "folke/lazydev.nvim",
+    opts = function(_, opts)
+      if not is_wezterm then
+        return
+      end
+
+      -- opts.debug = true
+      opts.library = opts.library or {}
+      if LazyVim.has("wezterm.nvim") then
+        table.insert(opts.library, { path = "wezterm-types", words = { "%-%-%[%[@as Wezterm%]%]" } })
+      else
+        table.insert(opts.library, { path = "wezterm-types", mods = { "wezterm" } }) -- conflicts with willothy/wezterm.nvim
+      end
+    end,
+  },
 
   {
     "folke/zen-mode.nvim",

@@ -6,16 +6,6 @@ return {
       servers = {
         lua_ls = {
           mason = not vim.g.user_is_termux and nil, -- run `pkg install lua-language-server` on termux
-          -- do not use home dir as root dir
-          root_dir = function(fname, buf)
-            -- see: https://github.com/neovim/nvim-lspconfig/blob/4ea9083b6d3dff4ddc6da17c51334c3255b7eba5/lua/lspconfig/configs/lua_ls.lua#L18
-            local root = LazyVim.lsp.get_raw_config("lua_ls").default_config.root_dir(fname, buf)
-            -- copied from: https://github.com/neovim/nvim-lspconfig/blob/7c284f44fe7b120cf1e5b63d2b0648c3831c4048/lua/lspconfig/configs/lua_ls.lua#L17-L28
-            if root and root ~= vim.env.HOME then
-              return root
-            end
-            return require("lspconfig.util").root_pattern("lua/")(fname)
-          end,
           -- https://luals.github.io/wiki/settings/
           -- https://github.com/LuaLS/lua-language-server/blob/12013babf4e386bdde1b21af57a2a06b6e127703/locale/zh-cn/setting.lua
           settings = {
@@ -86,7 +76,7 @@ return {
   },
 
   {
-    "williamboman/mason.nvim",
+    "mason-org/mason.nvim",
     opts = {
       ensure_installed = {
         "selene",

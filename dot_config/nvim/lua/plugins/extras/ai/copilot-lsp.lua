@@ -40,7 +40,7 @@ return {
     specs = {
       { "zbirenbaum/copilot.lua", optional = true, enabled = false, cond = false },
       {
-        "williamboman/mason.nvim",
+        "mason-org/mason.nvim",
         opts = { ensure_installed = { "copilot-language-server" } },
       },
       -- update blink menu position when copilot NES is visible

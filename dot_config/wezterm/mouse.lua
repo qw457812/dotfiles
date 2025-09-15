@@ -6,6 +6,7 @@ local act = wezterm.action
 
 local M = {}
 
+---@param config Config
 function M.apply_to_config(config)
   config.mouse_bindings = {
     -- Paste on right click

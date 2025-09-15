@@ -26,6 +26,7 @@
     "lazyvim.plugins.extras.lang.scala",
     "lazyvim.plugins.extras.lang.sql",
     "lazyvim.plugins.extras.lang.toml",
+    "lazyvim.plugins.extras.lang.typescript",
     "lazyvim.plugins.extras.lang.vue",
     "lazyvim.plugins.extras.lang.yaml",
     "lazyvim.plugins.extras.linting.eslint",
@@ -61,7 +62,7 @@
   ],
   "install_version": 7,
   "news": {
-    "NEWS.md": "10960",
+    "NEWS.md": "11341",
     "doc/news.txt": "15171"
   },
   "version": 8

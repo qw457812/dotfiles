@@ -4,6 +4,7 @@ local wezterm = require("wezterm") --[[@as Wezterm]]
 
 local M = {}
 
+---@param config Config
 function M.apply_to_config(config)
   -- use the defaults as a base
   config.hyperlink_rules = wezterm.default_hyperlink_rules()

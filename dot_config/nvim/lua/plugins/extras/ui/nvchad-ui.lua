@@ -259,7 +259,7 @@ return {
           end,
         },
         {
-          "williamboman/mason.nvim",
+          "mason-org/mason.nvim",
           optional = true,
           opts = function()
             pcall(function()
