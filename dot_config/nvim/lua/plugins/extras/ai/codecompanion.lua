@@ -295,58 +295,91 @@ return {
       },
     },
   },
-  -- TODO: check https://github.com/olimorris/codecompanion.nvim/commit/f962b2e
-  -- {
-  --   "folke/snacks.nvim",
-  --   opts = function()
-  --     -- see:
-  --     -- - https://github.com/olimorris/codecompanion.nvim/discussions/813#discussioncomment-13081665
-  --     -- - https://github.com/olimorris/dotfiles/blob/450300040e03c389db76136565da9337018c0fb6/.config/nvim/lua/plugins/custom/spinner.lua
-  --     vim.api.nvim_create_autocmd("User", {
-  --       pattern = { "CodeCompanionRequestStarted", "CodeCompanionRequestStreaming", "CodeCompanionRequestFinished" },
-  --       group = vim.api.nvim_create_augroup("codecompanion_snacks_notifier", {}),
-  --       callback = function(ev)
-  --         local msg
-  --         if ev.match == "CodeCompanionRequestStarted" then
-  --           msg = "  Sending..."
-  --         elseif ev.match == "CodeCompanionRequestStreaming" then
-  --           msg = "  Generating..."
-  --         elseif ev.data.status == "success" then
-  --           msg = "  Completed"
-  --         elseif ev.data.status == "error" then
-  --           msg = "  Failed"
-  --         else
-  --           msg = "󰜺  Cancelled"
-  --         end
-  --
-  --         local title
-  --         local adapter = ev.data.adapter
-  --         if adapter then
-  --           title = (adapter.formatted_name or adapter.name or "")
-  --             .. (adapter.model and adapter.model ~= "" and " (" .. adapter.model .. ")" or "")
-  --         else
-  --           title = "CodeCompanion"
-  --         end
-  --
-  --         local processing = ev.match ~= "CodeCompanionRequestFinished"
-  --         vim.g.user_esc_keep_notify = processing
-  --
-  --         ---@module "snacks"
-  --         vim.notify(msg, vim.log.levels.INFO, {
-  --           id = "codecompanion_status",
-  --           title = title,
-  --           timeout = 500,
-  --           keep = function()
-  --             return processing
-  --           end,
-  --           opts = function(notif)
-  --             notif.icon = processing and Snacks.util.spinner() or " "
-  --           end,
-  --         } --[[@as snacks.notifier.Notif.opts]])
-  --       end,
-  --     })
-  --   end,
-  -- },
+  -- TODO: check:
+  -- - https://github.com/olimorris/codecompanion.nvim/commit/f962b2e
+  -- - https://github.com/lalitmee/codecompanion-spinners.nvim
+  {
+    "folke/snacks.nvim",
+    opts = function()
+      -- see:
+      -- - https://github.com/olimorris/codecompanion.nvim/discussions/813#discussioncomment-13081665
+      -- - https://github.com/olimorris/dotfiles/blob/450300040e03c389db76136565da9337018c0fb6/.config/nvim/lua/plugins/custom/spinner.lua
+      vim.api.nvim_create_autocmd("User", {
+        pattern = { "CodeCompanionRequestStarted", "CodeCompanionRequestStreaming", "CodeCompanionRequestFinished" },
+        group = vim.api.nvim_create_augroup("codecompanion_snacks_notifier", {}),
+        callback = function(ev)
+          local msg
+          if ev.match == "CodeCompanionRequestStarted" then
+            msg = "  Sending..."
+          elseif ev.match == "CodeCompanionRequestStreaming" then
+            msg = "  Generating..."
+          elseif ev.data.status == "success" then
+            msg = "󰗡  Done!"
+          elseif ev.data.status == "error" then
+            msg = "  Failed"
+          else
+            msg = "󰜺  Cancelled"
+          end
+
+          local title
+          local adapter = ev.data.adapter
+          if adapter then
+            title = (adapter.formatted_name or adapter.name or "")
+              .. (adapter.model and adapter.model ~= "" and " (" .. adapter.model .. ")" or "")
+          else
+            title = "CodeCompanion"
+          end
+
+          local processing = ev.match ~= "CodeCompanionRequestFinished"
+          vim.g.user_esc_keep_notify = processing
+
+          vim.notify(msg, vim.log.levels.INFO, {
+            id = "codecompanion_status",
+            title = title,
+            timeout = 500,
+            keep = function(notif)
+              -- if notif.win and notif.win:valid() then
+              --   vim.w[notif.win.win].user_notify_keep = processing
+              --   vim.b[notif.win.buf].user_notify_keep = processing
+              -- end
+              return processing
+            end,
+            opts = function(notif)
+              notif.icon = processing and Snacks.util.spinner() or ""
+            end,
+            -- style = "history",
+            style = function(buf, notif, ctx)
+              ctx.opts.border = "none"
+              -- copied from: https://github.com/folke/snacks.nvim/blob/a13c891a59ec0e67a75824fe1505a9e57fbfca0f/lua/snacks/notifier.lua#L186-L212
+              local lines = vim.split(notif.msg, "\n", { plain = true })
+              local prefix = {
+                { notif.icon, ctx.hl.icon },
+                { notif.title, ctx.hl.title },
+              }
+              prefix = vim.tbl_filter(function(v)
+                return (v[1] or "") ~= ""
+              end, prefix)
+              local prefix_width = 0
+              for i = 1, #prefix do
+                prefix_width = prefix_width + vim.fn.strdisplaywidth(prefix[i * 2 - 1][1]) + 1
+                table.insert(prefix, i * 2, { " " })
+              end
+              local top = vim.api.nvim_buf_line_count(buf)
+              local empty = top == 1 and #vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1] == 0
+              top = empty and 0 or top
+              lines[1] = string.rep(" ", prefix_width) .. (lines[1] or "")
+              vim.api.nvim_buf_set_lines(buf, top, -1, false, lines)
+              vim.api.nvim_buf_set_extmark(buf, ctx.ns, top, 0, {
+                virt_text = prefix,
+                virt_text_pos = "overlay",
+                priority = 10,
+              })
+            end,
+          } --[[@as snacks.notifier.Notif.opts]])
+        end,
+      })
+    end,
+  },
   -- {
   --   "nvim-lualine/lualine.nvim",
   --   optional = true,
