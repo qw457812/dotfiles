@@ -32,6 +32,7 @@
     "lazyvim.plugins.extras.linting.eslint",
     "lazyvim.plugins.extras.test.core",
     "lazyvim.plugins.extras.ui.treesitter-context",
+    "lazyvim.plugins.extras.ui.treesitter-main",
     "lazyvim.plugins.extras.util.chezmoi",
     "lazyvim.plugins.extras.util.dot",
     "lazyvim.plugins.extras.util.mini-hipatterns",
@@ -62,7 +63,7 @@
   ],
   "install_version": 7,
   "news": {
-    "NEWS.md": "11341",
+    "NEWS.md": "11499",
     "doc/news.txt": "15171"
   },
   "version": 8
