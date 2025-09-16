@@ -23,8 +23,8 @@ return {
           for _, buf in ipairs(vim.api.nvim_list_bufs()) do
             if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].modified then
               LazyVim.warn("Please save or discard changes first", { title = "Restart Nvim" })
-              if not vim.bo.modified then
-                vim.cmd.edit(vim.api.nvim_buf_get_name(buf))
+              if not (vim.bo.modified or vim.wo.winfixbuf) then
+                vim.api.nvim_set_current_buf(buf)
               end
               return
             end
