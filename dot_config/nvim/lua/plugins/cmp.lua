@@ -196,7 +196,6 @@ return {
           },
         },
         cmdline = {
-          enabled = true,
           keymap = {
             ["<CR>"] = {
               function(cmp)
@@ -246,7 +245,7 @@ return {
             ["<C-space>"] = { "show", "hide" },
           },
           completion = {
-            -- menu = { auto_show = true },
+            menu = { auto_show = false },
             -- ghost_text = { enabled = false },
             ghost_text = {
               enabled = function()

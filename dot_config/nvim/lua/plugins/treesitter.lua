@@ -11,27 +11,21 @@ return {
       local TS = require("nvim-treesitter")
 
       -- Unset unused old treesitter config
-      opts.incremental_selection = nil
-      opts.textobjects = nil
+      ---@diagnostic disable-next-line: inject-field
+      opts.incremental_selection, opts.textobjects = nil, nil
 
-      -- Setup highlight and indent on our own
+      -- Setup highlight on our own in favor of chezmoi templates
+      ---@diagnostic disable-next-line: inject-field
       opts.highlight = nil
-      opts.indent = nil
       local installed =
         LazyVim.dedup(vim.list_extend(TS.get_installed("parsers"), opts.ensure_installed --[[@as string[] ]]))
       local has_chezmoi_vim = LazyVim.has("chezmoi.vim")
       vim.api.nvim_create_autocmd("FileType", {
         callback = function(ev)
           local lang = vim.treesitter.language.get_lang(ev.match)
-          if not vim.tbl_contains(installed, lang) then
-            return
-          end
-          -- highlight
-          if not (has_chezmoi_vim and ev.match:find("chezmoitmpl")) then
+          if vim.tbl_contains(installed, lang) and not (has_chezmoi_vim and ev.match:find("chezmoitmpl")) then
             pcall(vim.treesitter.start)
           end
-          -- indent
-          vim.bo[ev.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
         end,
       })
     end,

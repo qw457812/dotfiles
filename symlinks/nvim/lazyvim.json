@@ -48,7 +48,6 @@
     "plugins.extras.editor.mini-operators",
     "plugins.extras.editor.undotree",
     "plugins.extras.game.leetcode",
-    "plugins.extras.git.gitlab",
     "plugins.extras.lang.csv",
     "plugins.extras.lang.xml",
     "plugins.extras.lsp.mason-lock",

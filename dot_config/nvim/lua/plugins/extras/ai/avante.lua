@@ -112,7 +112,6 @@ return {
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
       "MunifTanjim/nui.nvim",
-      "zbirenbaum/copilot.lua", -- for `provider = "copilot"`
       -- {
       --   "HakonHarnes/img-clip.nvim", -- support for image pasting
       --   cmd = "PasteImage",
