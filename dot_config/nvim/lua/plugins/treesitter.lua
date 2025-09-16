@@ -5,33 +5,40 @@ return {
     keys = {
       { "<c-space>", false },
       { "<bs>", false, mode = "x" },
-      { "K", desc = "Increment Selection", mode = "x" },
-      { "J", desc = "Decrement Selection", mode = "x" },
     },
+    ---@param opts TSConfig
     opts = function(_, opts)
-      -- https://github.com/nvim-treesitter/nvim-treesitter#supported-languages
-      vim.list_extend(opts.ensure_installed, {
-        "mermaid",
-        "groovy",
-      })
+      local TS = require("nvim-treesitter")
 
-      opts.incremental_selection = vim.tbl_deep_extend("force", opts.incremental_selection or {}, {
-        keymaps = {
-          init_selection = false,
-          node_incremental = "K",
-          node_decremental = "J",
-        },
+      -- Unset unused old treesitter config
+      opts.incremental_selection = nil
+      opts.textobjects = nil
+
+      -- Setup highlight and indent on our own
+      opts.highlight = nil
+      opts.indent = nil
+      local installed =
+        LazyVim.dedup(vim.list_extend(TS.get_installed("parsers"), opts.ensure_installed --[[@as string[] ]]))
+      local has_chezmoi_vim = LazyVim.has("chezmoi.vim")
+      vim.api.nvim_create_autocmd("FileType", {
+        callback = function(ev)
+          local lang = vim.treesitter.language.get_lang(ev.match)
+          if not vim.tbl_contains(installed, lang) then
+            return
+          end
+          -- highlight
+          if not (has_chezmoi_vim and ev.match:find("chezmoitmpl")) then
+            pcall(vim.treesitter.start)
+          end
+          -- indent
+          vim.bo[ev.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+        end,
       })
     end,
   },
   {
-    "folke/which-key.nvim",
-    opts = {
-      spec = {
-        { "J", desc = "Decrement Selection", mode = "x" },
-        { "K", desc = "Increment Selection", mode = "x" },
-      },
-    },
+    "nvim-treesitter/nvim-treesitter",
+    opts = { ensure_installed = { "mermaid", "groovy" } },
   },
 
   {
@@ -39,9 +46,7 @@ return {
     ft = "help",
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
-      opts = function(_, opts)
-        table.insert(opts.ensure_installed, "vimdoc")
-      end,
+      opts = { ensure_installed = { "vimdoc" } },
     },
     keys = {
       { "<leader>uH", "<cmd>Helpview Toggle<cr>", desc = "Helpview" },

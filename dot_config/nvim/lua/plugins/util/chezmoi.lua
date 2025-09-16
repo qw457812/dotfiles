@@ -328,20 +328,6 @@ return {
         end,
       })
     end,
-    specs = {
-      {
-        "nvim-treesitter/nvim-treesitter",
-        opts = {
-          highlight = {
-            disable = function(_, buf)
-              if vim.bo[buf].filetype:find("chezmoitmpl") then
-                return true
-              end
-            end,
-          },
-        },
-      },
-    },
   },
 
   {
