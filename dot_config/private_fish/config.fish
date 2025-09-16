@@ -289,25 +289,12 @@ abbr q exit
 abbr reload "exec fish -l"
 abbr fda "fd -IH"
 abbr rga "rg -uu"
-# abbr show-cursor "tput cnorm"
-# abbr hide-cursor "tput civis"
 abbr lzd lazydocker
 abbr zj zellij
 abbr py python3
 abbr mk make
 
-# if type -q pyenv
-#     set -Ux PYENV_ROOT $HOME/.pyenv
-#     fish_add_path $PYENV_ROOT/bin
-#     pyenv init - | source
-#     set -gx PYENV_VIRTUALENV_DISABLE_PROMPT 1
-#     pyenv virtualenv-init - | source
-# end
-
 if set -q TERMUX_VERSION
-    # # https://github.com/nvim-lua/plenary.nvim/issues/536#issuecomment-1799807408
-    # set -q XDG_RUNTIME_DIR; or set -gx XDG_RUNTIME_DIR "$PREFIX/tmp"
-
     alias pkgbackup 'pkg list-installed >(chezmoi source-path)/backup/termux-packages 2>/dev/null'
     abbr pkgu 'pkg update && pkg upgrade && pkgbackup'
     abbr pkgi --set-cursor 'pkg install % && pkgbackup'
@@ -321,11 +308,9 @@ if set -q TERMUX_VERSION
     abbr dl 'cd ~/storage/downloads'
     abbr rime 'cd ~/storage/shared/Android/rime'
 
+    # Auto start tmux on Termux
     set -q TMUX; or tmux attach || tmux
 else
-    # ~/.local/share/bob/nightly/share/nvim/runtime/scripts/less.vim
-    alias vless "nvim -u $(brew --prefix)/share/nvim/runtime/scripts/less.vim"
-
     # # using TUN for now
     # if status is-interactive; or set -q NEOVIDE_FRAME
     #     term_proxy_on
