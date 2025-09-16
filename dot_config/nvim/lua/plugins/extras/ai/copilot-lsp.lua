@@ -5,6 +5,7 @@ return {
     shell_command_editor = true,
     event = "LazyFile",
     keys = function(_, keys)
+      ---@return boolean
       local function nes_jump_or_apply()
         local nes = require("copilot-lsp.nes")
         return nes.walk_cursor_start_edit() or (nes.apply_pending_nes() and nes.walk_cursor_end_edit())

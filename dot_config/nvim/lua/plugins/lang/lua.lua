@@ -15,7 +15,6 @@ return {
             -- see:
             -- - https://github.com/neovim/nvim-lspconfig/blob/d9879110d0422a566fa01d732556f4d5515e1738/lua/lspconfig/configs/lua_ls.lua#L18
             -- - https://github.com/neovim/nvim-lspconfig/blob/5a49a97f9d3de5c39a2b18d583035285b3640cb0/lsp/lua_ls.lua#L75-L84
-            -- local root = LazyVim.lsp.get_raw_config("lua_ls").default_config.root_dir(fname, bufnr)
             local root = util.root_pattern(vim.lsp.config.lua_ls.root_markers)(fname)
             -- ref: https://github.com/neovim/nvim-lspconfig/blob/7c284f44fe7b120cf1e5b63d2b0648c3831c4048/lua/lspconfig/configs/lua_ls.lua#L17-L28
             on_dir(root ~= vim.env.HOME and root or util.root_pattern("lua/")(fname))

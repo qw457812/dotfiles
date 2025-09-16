@@ -139,7 +139,9 @@ return {
         end),
       })
 
-      local floating_claude = vim.g.user_is_termux
+      -- TODO: status notifications for hidden floating terminal
+      -- check: https://github.com/GeorgesAlkhouri/nvim-aider/commit/aa5df1a
+      local floating_terminal = vim.g.user_is_termux
 
       ---@module "claudecode"
       ---@type PartialClaudeCodeConfig
@@ -193,7 +195,7 @@ return {
                 desc = "Double escape to normal mode",
               },
             },
-          } --[[@as snacks.win.Config]], floating_claude and {
+          } --[[@as snacks.win.Config]], floating_terminal and {
             position = "float",
             height = vim.g.user_is_termux and U.snacks.win.fullscreen_height or 0.9,
             width = vim.g.user_is_termux and 0 or 0.9,

@@ -188,6 +188,7 @@ Fix [zathura auto focus on open](https://github.com/zegervdv/homebrew-zathura/is
   - [Misterio77/nix-config](https://github.com/Misterio77/nix-config)
 - [ryan4yin/nix-config](https://github.com/ryan4yin/nix-config): with Fcitx5 + rime + 小鹤音形 flypy
   - [ryan4yin/nix-darwin-kickstarter](https://github.com/ryan4yin/nix-darwin-kickstarter)
+  - [NixOS & Flakes Book](https://nixos-and-flakes.thiscute.world/zh/)
 - [dustinlyons/nixos-config](https://github.com/dustinlyons/nixos-config)
 - [mitchellh/nixos-config](https://github.com/mitchellh/nixos-config)
 - [srid/nixos-config](https://github.com/srid/nixos-config)

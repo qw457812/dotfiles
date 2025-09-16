@@ -12,7 +12,6 @@ fish_add_path ~/.local/share/bob/nvim-bin
 fish_add_path ~/.local/bin
 fish_add_path "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
 fish_add_path "$HOME/Library/Application Support/Coursier/bin" # scalafmt
-fish_add_path ~/.codeium/windsurf/bin
 
 # Fish
 set -g fish_greeting
@@ -34,7 +33,6 @@ set -g __http_proxy_port 10808
 set -g __socks_proxy_port $__http_proxy_port
 
 # Exports
-set -x LESS '--RAW-CONTROL-CHARS --ignore-case --LONG-PROMPT --chop-long-lines --incsearch --use-color --tabs=4 --intr=c$ --save-marks --status-line'
 if status is-interactive # https://github.com/ndonfris/fish-lsp/blob/1be77fcfa37d9d3877994f14163c7faacf7a533e/fish_files/get-documentation.fish
     # set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
     set -x MANPAGER 'nvim --cmd "lua vim.g.manpager = true" -c "nnoremap d <C-d>|lua vim.defer_fn(function() vim.api.nvim_command(\"silent! nunmap dd|nnoremap u <C-u>\") end, 500)" +Man!'
@@ -242,6 +240,7 @@ if type -q claude
     # claude mcp add -s user --transport http grep https://mcp.grep.app
     # claude mcp add -s user exa -e EXA_API_KEY=$EXA_API_KEY -- npx -y exa-mcp-server
     # claude mcp add -s user firecrawl -e FIRECRAWL_API_KEY=$FIRECRAWL_API_KEY -- npx -y firecrawl-mcp
+    # claude mcp add -s user codex -- codex mcp serve
     abbr cl claude
     abbr clt claude_temp
     abbr clc "claude --continue"
@@ -290,20 +289,12 @@ abbr q exit
 abbr reload "exec fish -l"
 abbr fda "fd -IH"
 abbr rga "rg -uu"
-abbr show-cursor "tput cnorm"
-abbr hide-cursor "tput civis"
+# abbr show-cursor "tput cnorm"
+# abbr hide-cursor "tput civis"
 abbr lzd lazydocker
 abbr zj zellij
 abbr py python3
 abbr mk make
-
-if type -q atuin
-    set -gx ATUIN_NOBIND true
-    atuin init fish | source
-end
-
-# set -x LESSOPEN "|/opt/homebrew/bin/lesspipe.sh %s"
-type -q batpipe; and eval (batpipe)
 
 # if type -q pyenv
 #     set -Ux PYENV_ROOT $HOME/.pyenv
