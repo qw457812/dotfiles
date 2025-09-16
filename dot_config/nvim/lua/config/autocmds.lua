@@ -187,37 +187,34 @@ vim.api.nvim_create_autocmd("BufDelete", {
 
 -- auto open explorer if the window is too wide
 if vim.g.user_explorer_auto_open and not vim.g.vscode then
-  -- using `{ "BufReadPre", "BufNewFile", "BufWritePre" }` instead of LazyFile, see: https://github.com/LazyVim/LazyVim/pull/6053
-  vim.api.nvim_create_autocmd(
-    vim.fn.has("nvim-0.11") == 1 and { "BufReadPre", "BufNewFile", "BufWritePre" } or LazyVim.plugin.lazy_file_events,
-    {
-      group = vim.api.nvim_create_augroup("explorer_auto_open", { clear = true }),
-      callback = function(ev)
-        -- TODO: Snacks.explorer
-        if package.loaded["neo-tree"] then
-          return true -- let WinResized event to handle the rest
-        end
+  -- using `{ "BufReadPre", "BufNewFile", "BufWritePre" }` instead of `LazyVim.plugin.lazy_file_events`, see: https://github.com/LazyVim/LazyVim/pull/6053
+  vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile", "BufWritePre" }, {
+    group = vim.api.nvim_create_augroup("explorer_auto_open", { clear = true }),
+    callback = function(ev)
+      -- TODO: Snacks.explorer
+      if package.loaded["neo-tree"] then
+        return true -- let WinResized event to handle the rest
+      end
+      if
+        vim.g.user_explorer_auto_close
+        or vim.bo[ev.buf].buftype ~= ""
+        or vim.list_contains({ "gitcommit", "svn" }, vim.bo[ev.buf].filetype)
+        or vim.list_contains({ "COMMIT_EDITMSG", "svn-commit.tmp" }, vim.fn.fnamemodify(ev.file, ":t"))
+        or vim.t.user_diffview
+      then
+        return
+      end
+      vim.schedule(function()
         if
-          vim.g.user_explorer_auto_close
-          or vim.bo[ev.buf].buftype ~= ""
-          or vim.list_contains({ "gitcommit", "svn" }, vim.bo[ev.buf].filetype)
-          or vim.list_contains({ "COMMIT_EDITMSG", "svn-commit.tmp" }, vim.fn.fnamemodify(ev.file, ":t"))
-          or vim.t.user_diffview
+          not vim.g.user_explorer_visible
+          and not U.is_edgy_win()
+          and vim.api.nvim_win_get_width(0) - vim.g.user_explorer_width >= 120
         then
-          return
+          U.explorer.open({ focus = false })
         end
-        vim.schedule(function()
-          if
-            not vim.g.user_explorer_visible
-            and not U.is_edgy_win()
-            and vim.api.nvim_win_get_width(0) - vim.g.user_explorer_width >= 120
-          then
-            U.explorer.open({ focus = false })
-          end
-        end)
-      end,
-    }
-  )
+      end)
+    end,
+  })
 end
 
 -- copied from:

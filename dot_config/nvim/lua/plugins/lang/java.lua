@@ -121,11 +121,6 @@ return {
             })
           end
 
-          -- https://github.com/LazyVim/LazyVim/pull/5218
-          config.capabilities = config.capabilities
-            or LazyVim.has("blink.cmp") and require("blink.cmp").get_lsp_capabilities()
-            or nil
-
           config.handlers = config.handlers or {}
           -- config.handlers["$/progress"] = function() end -- disable progress updates
           config.handlers["language/status"] = function() end -- mute; having progress reports is enough
@@ -171,6 +166,7 @@ return {
   -- https://github.com/AstroNvim/astrocommunity/blob/5f74d5fb8d8dc9b8e2904846809121068d7afaca/lua/astrocommunity/pack/spring-boot/init.lua
   {
     "JavaHello/spring-boot.nvim",
+    enabled = not vim.g.user_is_termux,
     ft = {
       "java",
       -- "yaml",
@@ -178,10 +174,12 @@ return {
     },
     ---@type bootls.Config|{}
     opts = {},
-  },
-  {
-    "mason-org/mason.nvim",
-    opts = { ensure_installed = { "vscode-spring-boot-tools" } },
+    specs = {
+      {
+        "mason-org/mason.nvim",
+        opts = { ensure_installed = { "vscode-spring-boot-tools" } },
+      },
+    },
   },
 
   {

@@ -91,10 +91,21 @@ return {
   {
     "mason-org/mason.nvim",
     opts = {
-      ensure_installed = {
-        "selene",
-        "luacheck",
-      },
+      ensure_installed = vim.list_extend({ "luacheck" }, vim.g.user_is_termux and {} or { "selene" }),
     },
+  },
+  {
+    "mason-org/mason.nvim",
+    opts = function(_, opts)
+      -- run `pkg install stylua` on termux
+      if vim.g.user_is_termux then
+        for i, pkg in ipairs(opts.ensure_installed) do
+          if pkg == "stylua" then
+            table.remove(opts.ensure_installed, i)
+            break
+          end
+        end
+      end
+    end,
   },
 }

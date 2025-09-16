@@ -320,23 +320,6 @@ return {
         },
         view = "mini",
       })
-
-      if vim.fn.has("nvim-0.11") == 1 then
-        table.insert(opts.routes, {
-          filter = {
-            event = "notify",
-            any = {
-              {
-                find = "^position_encoding param is required in vim%.lsp%.util%.make_position_params%. Defaulting to position encoding of the first client%.$",
-              },
-              {
-                find = "^warning: multiple different client offset_encodings detected for buffer, vim%.lsp%.util%._get_offset_encoding%(%) uses the offset_encoding from the first client$",
-              },
-            },
-          },
-          view = "mini",
-        })
-      end
     end,
   },
 }

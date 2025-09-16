@@ -156,13 +156,10 @@ return {
   -- (isort + black) or ruff
   {
     "mason-org/mason.nvim",
-    opts = function(_, opts)
-      opts.ensure_installed = opts.ensure_installed or {}
-      table.insert(opts.ensure_installed, "debugpy") -- required by nvim-dap-python
-      if has_black then
-        table.insert(opts.ensure_installed, "isort")
-      end
-    end,
+    opts = {
+      -- nvim-dap-python requires debugpy
+      ensure_installed = vim.list_extend({ "debugpy" }, has_black and { "isort" } or {}),
+    },
   },
   {
     "nvimtools/none-ls.nvim",

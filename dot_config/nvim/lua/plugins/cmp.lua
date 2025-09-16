@@ -245,7 +245,7 @@ return {
             ["<C-space>"] = { "show", "hide" },
           },
           completion = {
-            menu = { auto_show = false },
+            -- menu = { auto_show = false },
             -- ghost_text = { enabled = false },
             ghost_text = {
               enabled = function()
