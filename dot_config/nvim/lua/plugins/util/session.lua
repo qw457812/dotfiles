@@ -20,6 +20,15 @@ return {
       {
         "<leader>qr",
         function()
+          for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+            if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].modified then
+              LazyVim.warn("Please save or discard changes first", { title = "Restart Nvim" })
+              if not vim.bo.modified then
+                vim.cmd.edit(vim.api.nvim_buf_get_name(buf))
+              end
+              return
+            end
+          end
           LazyUtil.write_file(restart_cache_file, "1")
           vim.cmd("restart")
         end,
