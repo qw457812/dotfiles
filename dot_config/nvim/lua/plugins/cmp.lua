@@ -677,8 +677,8 @@ return {
       -- sources that need deduplicating
       -- :=LazyVim.opts("blink.cmp").sources.default
       local source_dedup_priority = {
-        "lsp",
         "lazydev",
+        "lsp",
         "path",
         "buffer",
         "ripgrep",

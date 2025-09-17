@@ -5,16 +5,35 @@ end
 ---@type LazySpec
 return {
   {
-    "LazyVim/LazyVim",
-    opts = function()
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = "nix",
-        callback = function(ev)
-          if vim.fn.executable("nixfmt") == 0 then
-            vim.b[ev.buf].autoformat = false
-          end
-        end,
-      })
+    "neovim/nvim-lspconfig",
+    opts = {
+      servers = {
+        nil_ls = {
+          settings = {
+            ["nil"] = {
+              formatting = {
+                command = { "alejandra" },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  {
+    "mason-org/mason.nvim",
+    opts = {
+      ensure_installed = { "alejandra" },
+    },
+  },
+  {
+    "stevearc/conform.nvim",
+    optional = true,
+    ---@module "conform"
+    ---@param opts conform.setupOpts
+    opts = function(_, opts)
+      opts.formatters_by_ft = opts.formatters_by_ft or {}
+      opts.formatters_by_ft.nix = nil -- using nil_ls
     end,
   },
 }

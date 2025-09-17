@@ -176,11 +176,11 @@ return {
   {
     "stevearc/conform.nvim",
     optional = true,
-    opts = function(_, opts)
-      opts.formatters_by_ft = opts.formatters_by_ft or {}
-      opts.formatters_by_ft.python = has_black and { "isort", "black" }
-        or { "ruff_fix", "ruff_format", "ruff_organize_imports" }
-    end,
+    opts = {
+      formatters_by_ft = {
+        python = has_black and { "isort", "black" } or { "ruff_fix", "ruff_format", "ruff_organize_imports" },
+      },
+    },
   },
   -- TODO: mypy?
   -- https://github.com/akthe-at/.dotfiles/blob/49beab5ec32659fba8f3b0c5ca3a6f75cc7a7d8a/nvim/lua/plugins/lint.lua
