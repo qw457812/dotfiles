@@ -57,6 +57,13 @@ return {
           if vim.fn.filereadable(restart_cache_file) == 1 and LazyUtil.read_file(restart_cache_file) == "1" then
             LazyUtil.write_file(restart_cache_file, "0")
             require("persistence").load({ last = vim.g.user_auto_root })
+            -- HACK: fix filetype
+            if vim.bo.filetype == "" then
+              -- vim.cmd.edit()
+              vim.schedule(function()
+                vim.cmd("filetype detect")
+              end)
+            end
             return
           end
 
