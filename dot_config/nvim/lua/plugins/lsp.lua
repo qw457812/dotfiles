@@ -131,6 +131,7 @@ end
 return {
   {
     "neovim/nvim-lspconfig",
+    ---@param opts PluginLspOpts
     opts = function(_, opts)
       local Keys = require("lazyvim.plugins.lsp.keymaps").get()
       -- stylua: ignore
@@ -204,11 +205,23 @@ return {
         })
       end
 
+      -- opts.folds.enabled
+      LazyVim.lsp.on_supports_method("textDocument/foldingRange", function(client, buffer)
+        local fname = vim.api.nvim_buf_get_name(buffer)
+        if vim.o.diff or fname:match("/%.metals/readonly/dependencies/") then
+          return
+        end
+        local win = vim.api.nvim_get_current_win()
+        vim.wo[win][0].foldexpr = "v:lua.vim.lsp.foldexpr()"
+      end)
+
       return U.extend_tbl(opts, {
         -- setting `vim.diagnostic.config({ virtual_text = false })` for tiny-inline-diagnostic.nvim
         -- see: https://github.com/LazyVim/LazyVim/blob/1e83b4f843f88678189df81b1c88a400c53abdbc/lua/lazyvim/plugins/lsp/init.lua#L177
+        ---@type vim.diagnostic.Opts
         diagnostics = { virtual_text = not LazyVim.has("tiny-inline-diagnostic.nvim") and { prefix = "icons" } },
-      })
+        folds = { enabled = false }, -- set up on our own above
+      } --[[@as PluginLspOpts]])
     end,
   },
   {

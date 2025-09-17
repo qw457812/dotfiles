@@ -3,7 +3,6 @@ return {
   {
     "MagicDuck/grug-far.nvim",
     optional = true,
-    cmd = "GrugFarWithin",
     keys = {
       {
         "<leader>sr",
@@ -173,21 +172,23 @@ return {
     "folke/flash.nvim",
     optional = true,
     keys = function(_, keys)
+      ---@class user.Flash.State.Config: Flash.State.Config
+      ---@field skip_first_match? boolean
+
       -- https://github.com/JoseConseco/nvim_config/blob/23dbf5f8b9779d792643ab5274ebe8dabe79c0c0/lua/plugins.lua#L1049
-      ---@param skip_first_match? boolean default false
-      local function treesitter(skip_first_match)
-        ---@type Flash.State.Config|{}
-        local opts = { label = { rainbow = { enabled = true } } }
-        if skip_first_match then
-          ---@param matches Flash.Match.TS[]
-          opts.filter = function(matches)
+      ---@param opts? user.Flash.State.Config
+      local function treesitter(opts)
+        opts = U.extend_tbl({ label = { rainbow = { enabled = true } } } --[[@as Flash.State.Config]], opts) --[[@as user.Flash.State.Config]]
+        if opts.skip_first_match then
+          local filter = opts.filter
+          opts.filter = function(matches, state)
             -- before removing first match, match[n+1] should use previous match[n] label
             for i = #matches, 2, -1 do
               matches[i].label = matches[i - 1].label
             end
             -- remove first match, as it is same as word under cursor (not always) thus redundant with word motion
             table.remove(matches, 1)
-            return matches
+            return filter and filter(matches, state) or matches
           end
         end
         require("flash").treesitter(opts)
@@ -215,6 +216,20 @@ return {
             require("flash").treesitter_search({ label = { rainbow = { enabled = true } } })
           end,
           desc = "Treesitter Search",
+        },
+        { "<c-space>", false, mode = { "n", "o", "x" } },
+        {
+          "K",
+          mode = { "o", "x" },
+          function()
+            treesitter({
+              actions = {
+                ["K"] = "next",
+                ["J"] = "prev",
+              },
+            })
+          end,
+          desc = "Treesitter Incremental Selection",
         },
       })
     end,
@@ -743,29 +758,6 @@ return {
   {
     "chrisgrieser/nvim-origami",
     event = "VeryLazy",
-    init = function()
-      -- -- copied from: https://github.com/chrisgrieser/.config/blob/832fa40a0648b31780658b59138379851a5231ec/nvim/lua/config/options.lua#L161-L181
-      -- vim.o.foldlevel = 99 -- do not auto-fold
-      vim.o.foldlevelstart = 99
-      -- vim.o.foldtext = "" -- empty string keeps text (overwritten by nvim-origami)
-
-      -- -- LSP -> Treesitter
-      -- vim.o.foldmethod = "expr"
-      -- vim.o.foldexpr = "v:lua.vim.treesitter.foldexpr()"
-      vim.api.nvim_create_autocmd("LspAttach", {
-        desc = "User: Prefer LSP folding if client supports it",
-        callback = function(args)
-          if vim.o.diff or args.file:match("/%.metals/readonly/dependencies/") then
-            return
-          end
-          local client = vim.lsp.get_client_by_id(args.data.client_id)
-          if client and client:supports_method("textDocument/foldingRange") then
-            local win = vim.api.nvim_get_current_win()
-            vim.wo[win][0].foldexpr = "v:lua.vim.lsp.foldexpr()"
-          end
-        end,
-      })
-    end,
     keys = function()
       -- https://github.com/folke/snacks.nvim/blob/4c52b7f25da0ce6b2b830ce060dbd162706acf33/lua/snacks/scroll.lua#L275-L282
       local repeat_delay = 100

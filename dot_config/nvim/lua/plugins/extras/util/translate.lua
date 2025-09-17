@@ -28,7 +28,7 @@ return {
     opts = {
       theme = "tokyonight", -- default | tokyonight | dracula
       frontend = {
-        ---@class TransFrontendOpts
+        ---@type TransFrontendOpts
         default = {
           title = "", -- disable title
           ---@type {open: string | boolean, close: string | boolean, interval: integer} Hover Window Animation
@@ -39,7 +39,7 @@ return {
           },
           timeout = 5000,
         },
-        ---@class TransHoverOpts : TransFrontendOpts
+        ---@type TransHoverOpts : TransFrontendOpts
         hover = {
           -- -- Max Width of Hover Window
           -- width = 37,

@@ -1,3 +1,12 @@
+-- should be `---@field [1]? string|neotree.TreeCommand` on this line: https://github.com/nvim-neo-tree/neo-tree.nvim/blob/fba6d1f9b5ed031f983b2cb413d69838d88d76fa/lua/neo-tree/types/config.lua#L9
+---@class user.neotree.Config.Window.Command.Configured: neotree.Config.Window.Command.Configured
+---@field [1]? string|neotree.TreeCommand
+
+---@alias user.neotree.Config.TreeCommand string|neotree.TreeCommand|user.neotree.Config.Window.Command.Configured
+
+---@class (exact) user.neotree.Config.Window.Mappings
+---@field [string]? user.neotree.Config.TreeCommand
+
 ---@type LazySpec
 return {
   -- https://github.com/Matt-FTW/dotfiles/blob/main/.config/nvim/lua/plugins/extras/editor/neo-tree-extended.lua
@@ -50,6 +59,7 @@ return {
       return vim.list_extend(keys, mappings)
     end,
     ---@module "neo-tree"
+    ---@module "nui.tree"
     ---@param opts neotree.Config
     opts = function(_, opts)
       local hijack_netrw = vim.g.user_hijack_netrw == "neo-tree.nvim"
@@ -557,6 +567,7 @@ return {
         },
         window = {
           width = vim.g.user_explorer_width,
+          ---@type user.neotree.Config.Window.Mappings
           mappings = {
             -- ["-"] = "close_or_unfocus", -- toggle neo-tree, work with `-` defined in `keys` above
             ["-"] = hijack_netrw and "close_or_unfocus" or {
@@ -621,6 +632,7 @@ return {
           -- commands = {},
           window = {
             -- TODO: unify the keybindings of yazi and neo-tree.nvim
+            ---@type user.neotree.Config.Window.Mappings
             mappings = {
               -- ["<esc>"] = {
               --   function(state)

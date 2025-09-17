@@ -110,7 +110,6 @@ return {
     "yetone/avante.nvim",
     build = vim.g.user_is_termux and "make BUILD_FROM_SOURCE=true" or "make",
     dependencies = {
-      "nvim-treesitter/nvim-treesitter",
       "MunifTanjim/nui.nvim",
       -- {
       --   "HakonHarnes/img-clip.nvim", -- support for image pasting

@@ -38,6 +38,21 @@ return {
         desc = "Add to Chat",
         mode = "x",
       },
+      {
+        "<leader>anf",
+        function()
+          require("codecompanion").toggle({
+            window_opts = {
+              layout = "float",
+              height = 0.8,
+              width = 0.6,
+              border = "rounded",
+              title = "   CodeCompanion ",
+            },
+          })
+        end,
+        desc = "Floating",
+      },
       { "<leader>ani", "<cmd>CodeCompanion<CR>", desc = "Inline", mode = { "n", "x" } },
       { "<leader>ana", "<cmd>CodeCompanionActions<CR>", desc = "Actions", mode = { "n", "x" } },
       { "<leader>anN", "<cmd>CodeCompanionChat<CR>", desc = "New Chat", mode = { "n", "x" } },

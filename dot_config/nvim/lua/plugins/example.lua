@@ -66,9 +66,9 @@ return {
   -- add pyright to lspconfig
   {
     "neovim/nvim-lspconfig",
-    ---@class PluginLspOpts
+    ---@type PluginLspOpts
     opts = {
-      ---@type lspconfig.options
+      ---@type table<string, vim.lsp.Config|{mason?:boolean, enabled?:boolean}|boolean>
       servers = {
         -- pyright will be automatically installed with mason and loaded with lspconfig
         pyright = {},
@@ -89,16 +89,16 @@ return {
         end)
       end,
     },
-    ---@class PluginLspOpts
+    ---@type PluginLspOpts
     opts = {
-      ---@type lspconfig.options
+      ---@type table<string, vim.lsp.Config|{mason?:boolean, enabled?:boolean}|boolean>
       servers = {
         -- tsserver will be automatically installed with mason and loaded with lspconfig
         tsserver = {},
       },
       -- you can do any additional lsp server setup here
       -- return true if you don't want this server to be setup with lspconfig
-      ---@type table<string, fun(server:string, opts:_.lspconfig.options):boolean?>
+      ---@type table<string, fun(server:string, opts: vim.lsp.Config):boolean?>
       setup = {
         -- example to setup with typescript.nvim
         tsserver = function(_, opts)
