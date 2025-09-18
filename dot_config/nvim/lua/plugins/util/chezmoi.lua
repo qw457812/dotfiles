@@ -337,7 +337,7 @@ return {
           vim.api.nvim_create_autocmd("FileType", {
             pattern = { "chezmoitmpl", "*.chezmoitmpl" },
             callback = function(ev)
-              if LazyVim.ui.have(ev.match) then
+              if LazyVim.treesitter.have(ev.match) then
                 vim.defer_fn(function()
                   if vim.api.nvim_buf_is_valid(ev.buf) then
                     pcall(vim.treesitter.stop, ev.buf)

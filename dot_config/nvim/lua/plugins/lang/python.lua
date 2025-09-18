@@ -197,21 +197,16 @@ return {
   {
     "linux-cultist/venv-selector.nvim",
     optional = true,
-    opts = function(_, opts)
-      -- legacy settings, see: https://github.com/linux-cultist/venv-selector.nvim/blob/789aafff17bf96b0e6e8c206ef825599d967f64b/lua/venv-selectorhttps://github.com/linux-cultist/venv-selector.nvim/blob/789aafff17bf96b0e6e8c206ef825599d967f64b/lua/venv-selector/config.lua#L206-L209config.lua#L206-L209
-      opts = opts and opts.settings or opts or {}
-
-      return U.extend_tbl(opts, {
-        options = {
-          -- picker = "native",
-          notify_user_on_venv_activation = false,
-          on_telescope_result_callback = function(filename)
-            -- works for other pickers too
-            return (U.path.shorten(filename, { special = false, java = false }):gsub("/bin/python", ""))
-          end,
-        },
-      })
-    end,
+    opts = {
+      options = {
+        -- picker = "native",
+        notify_user_on_venv_activation = false,
+        on_telescope_result_callback = function(filename)
+          -- works for other pickers too
+          return (U.path.shorten(filename, { special = false, java = false }):gsub("/bin/python", ""))
+        end,
+      },
+    },
   },
 
   -- https://github.com/MeanderingProgrammer/dotfiles/blob/93b7df0ce5f809c867c98c11b17ed6aed3fa7c1c/.config/nvim/lua/mp/plugins/requirements.lua
