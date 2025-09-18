@@ -163,6 +163,14 @@ return {
     end,
   },
 
+  -- TODO: this should not be needed
+  -- https://github.com/LazyVim/LazyVim/blob/c05392186e9e540d4af169922c333b5baa583cbe/lua/lazyvim/plugins/extras/lang/java.lua#L65-L80
+  -- https://github.com/LazyVim/LazyVim/commit/773f28b4912d5505a21da9686d56ab7cf41a9be7
+  {
+    "mason-org/mason.nvim",
+    opts = { ensure_installed = { "jdtls" } },
+  },
+
   -- https://github.com/AstroNvim/astrocommunity/blob/5f74d5fb8d8dc9b8e2904846809121068d7afaca/lua/astrocommunity/pack/spring-boot/init.lua
   {
     "JavaHello/spring-boot.nvim",

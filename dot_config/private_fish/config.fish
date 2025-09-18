@@ -66,6 +66,7 @@ abbr dl "cd ~/Downloads"
 abbr vim nvim
 abbr vi nvim
 abbr v nvim
+abbr v! "nvim -u NONE"
 alias vimpager 'nvim - --cmd "lua vim.g.pager = true" -c "lua require(\'util.terminal\').colorize()"'
 alias cat 'bat --paging=never'
 abbr -a --position anywhere --set-cursor -- -h "% -h 2>&1 | bat --plain --language=help"

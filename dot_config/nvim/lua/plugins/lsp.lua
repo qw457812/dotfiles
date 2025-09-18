@@ -213,6 +213,7 @@ return {
         end
         local win = vim.api.nvim_get_current_win()
         vim.wo[win][0].foldexpr = "v:lua.vim.lsp.foldexpr()"
+        vim.wo[win][0].foldmethod = "expr"
       end)
 
       return U.extend_tbl(opts, {

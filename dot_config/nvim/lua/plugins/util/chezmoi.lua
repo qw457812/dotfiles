@@ -328,27 +328,6 @@ return {
         end,
       })
     end,
-    specs = {
-      {
-        "nvim-treesitter/nvim-treesitter",
-        opts = function()
-          -- stops treesitter highlighting for chezmoi templates
-          -- undo: https://github.com/LazyVim/LazyVim/blob/014b5bf6ac9ec24c955d481882b5e8cb39846d97/lua/lazyvim/plugins/treesitter.lua#L84-L90
-          vim.api.nvim_create_autocmd("FileType", {
-            pattern = { "chezmoitmpl", "*.chezmoitmpl" },
-            callback = function(ev)
-              if LazyVim.treesitter.have(ev.match) then
-                vim.defer_fn(function()
-                  if vim.api.nvim_buf_is_valid(ev.buf) then
-                    pcall(vim.treesitter.stop, ev.buf)
-                  end
-                end, 100)
-              end
-            end,
-          })
-        end,
-      },
-    },
   },
 
   {

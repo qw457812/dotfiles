@@ -4,10 +4,11 @@ return {
     pager = true,
     dependencies = "kkharji/sqlite.lua",
     build = function()
-      -- https://github.com/JuanZoran/Trans.nvim/issues/52#issuecomment-1869952281
-      -- Download https://github.com/skywind3000/ECDICT-ultimate/releases/download/1.0.0/ecdict-ultimate-sqlite.zip,
-      -- unzip, replace ~/.local/share/nvim/lazy/Trans.nvim/ultimate.db manually.
-      -- see: ~/.local/share/nvim/lazy/Trans.nvim/lua/Trans/core/install.lua
+      -- see: https://github.com/JuanZoran/Trans.nvim/issues/52#issuecomment-1869952281
+      -- set uri https://github.com/skywind3000/ECDICT-ultimate/releases/download/1.0.0/ecdict-ultimate-sqlite.zip
+      -- set dir ~/.local/share/nvim/lazy/Trans.nvim
+      -- set zip "$dir/ultimate.zip"
+      -- curl -L --progress-bar -o "$zip" "$uri" && unzip "$zip" -d "$dir" && rm "$zip"
       require("Trans").install()
     end,
     keys = {
