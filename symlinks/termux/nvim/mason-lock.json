@@ -21,6 +21,7 @@
   "shfmt": "v3.12.0",
   "sqlfluff": "3.4.2",
   "taplo": "0.10.0",
+  "tree-sitter-cli": "v0.25.9",
   "vscode-spring-boot-tools": "1.63.0",
   "vtsls": "0.2.9",
   "vue-language-server": "3.0.7",

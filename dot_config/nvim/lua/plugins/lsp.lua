@@ -211,9 +211,9 @@ return {
         if vim.o.diff or fname:match("/%.metals/readonly/dependencies/") then
           return
         end
-        local win = vim.api.nvim_get_current_win()
-        vim.wo[win][0].foldexpr = "v:lua.vim.lsp.foldexpr()"
-        vim.wo[win][0].foldmethod = "expr"
+        if LazyVim.set_default("foldmethod", "expr") then
+          LazyVim.set_default("foldexpr", "v:lua.vim.lsp.foldexpr()")
+        end
       end)
 
       return U.extend_tbl(opts, {
