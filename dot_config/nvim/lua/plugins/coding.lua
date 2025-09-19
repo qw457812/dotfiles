@@ -131,21 +131,6 @@ return {
     dependencies = { "kkharji/sqlite.lua", vscode = true, pager = true, shell_command_editor = true },
     optional = true,
     keys = {
-      {
-        "<leader>p",
-        function()
-          if LazyVim.pick.picker.name == "telescope" then
-            require("telescope").extensions.yank_history.yank_history({})
-          elseif LazyVim.pick.picker.name == "snacks" then
-            ---@diagnostic disable-next-line: undefined-field
-            Snacks.picker.yanky()
-          else
-            vim.cmd([[YankyRingHistory]])
-          end
-        end,
-        mode = { "n", "x" },
-        desc = "Open Yank History",
-      },
       { "gp", mode = { "n", "x" }, false },
       { "gP", mode = { "n", "x" }, false },
     },

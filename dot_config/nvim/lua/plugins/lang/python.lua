@@ -197,7 +197,10 @@ return {
   {
     "linux-cultist/venv-selector.nvim",
     optional = true,
+    ---@module "venv-selector"
+    ---@type venv-selector.Settings
     opts = {
+      ---@type venv-selector.Options
       options = {
         -- picker = "native",
         notify_user_on_venv_activation = false,

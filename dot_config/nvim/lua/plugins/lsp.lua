@@ -158,6 +158,7 @@ return {
         },
         -- https://zed.dev/docs/vim#language-server
         { "cd", "<leader>cr", desc = "Rename (change definition)", has = "rename", remap = true },
+        -- TODO: conflict with goto_super_method in java/scala files
         { "gs", "<leader>ss", desc = "LSP Symbols", has = "documentSymbol", remap = true },
         { "gS", "<leader>sS", desc = "LSP Workspace Symbols", has = "workspace/symbols", remap = true },
         { "<leader>cl", false },
@@ -232,6 +233,17 @@ return {
         { "<leader>cl", group = "Lsp", icon = { icon = " ", color = "purple" } },
       },
     },
+  },
+  {
+    "LazyVim/LazyVim",
+    opts = function()
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = { "help", "man", "checkhealth" },
+        callback = function(ev)
+          vim.keymap.set("n", "gs", "gO", { buffer = ev.buf, silent = true, remap = true, desc = "Show Outline" })
+        end,
+      })
+    end,
   },
 
   {

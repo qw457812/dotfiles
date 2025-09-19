@@ -11,10 +11,8 @@ return {
     optional = true,
     lazy = true,
   },
-  -- alternative: julienvincent/nvim-paredit
-  -- see: https://github.com/LazyVim/LazyVim/pull/5876
   {
-    "PaterJason/nvim-treesitter-sexp",
+    "julienvincent/nvim-paredit",
     optional = true,
     event = function()
       return {}
@@ -22,10 +20,10 @@ return {
     ft = {
       "clojure",
       -- "fennel",
+      -- "scheme",
+      -- "lisp",
       -- "janet",
-      -- "query",
     },
-    cmd = "TSSexp",
   },
   {
     "Olical/conjure",
