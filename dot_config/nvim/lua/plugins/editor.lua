@@ -444,7 +444,8 @@ return {
           "u",
           function()
             if vim.bo.modifiable == false then
-              return vim.cmd("normal! " .. vim.v.count1 .. "<C-u>")
+              local count = vim.v.count
+              return vim.cmd("normal! " .. vim.keycode((count > 0 and count or "") .. "<C-u>"))
             end
 
             require("undo-glow").undo()

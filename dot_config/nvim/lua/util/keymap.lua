@@ -337,7 +337,7 @@ function M.clear_ui_esc(opts)
     vim.cmd("diffupdate")
   end
   -- vim.cmd("syntax sync fromstart")
-  Snacks.util.redraw(vim.api.nvim_get_current_win()) -- vim.cmd("normal! <C-L>") -- vim.cmd.redraw({ bang = true })
+  Snacks.util.redraw(vim.api.nvim_get_current_win())
   if opts.esc then
     vim.api.nvim_feedkeys(vim.keycode("<esc>"), "n", false)
   end
