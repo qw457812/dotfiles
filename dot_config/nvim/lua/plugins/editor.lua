@@ -178,7 +178,14 @@ return {
       -- https://github.com/JoseConseco/nvim_config/blob/23dbf5f8b9779d792643ab5274ebe8dabe79c0c0/lua/plugins.lua#L1049
       ---@param opts? user.Flash.State.Config
       local function treesitter(opts)
-        opts = U.extend_tbl({ label = { rainbow = { enabled = true } } } --[[@as Flash.State.Config]], opts) --[[@as user.Flash.State.Config]]
+        opts = U.extend_tbl({
+          label = { rainbow = { enabled = true } },
+          -- not working well in operator-pending mode
+          actions = U.is_visual_mode() and {
+            ["K"] = "next",
+            ["J"] = "prev",
+          } or nil,
+        } --[[@as Flash.State.Config]], opts) --[[@as user.Flash.State.Config]]
         if opts.skip_first_match then
           local filter = opts.filter
           opts.filter = function(matches, state)
@@ -220,17 +227,13 @@ return {
         { "<c-space>", false, mode = { "n", "o", "x" } },
         {
           "K",
-          mode = { "o", "x" },
+          mode = "x",
           function()
-            treesitter({
-              actions = {
-                ["K"] = "next",
-                ["J"] = "prev",
-              },
-            })
+            treesitter({ labels = "" }) -- disable labels
           end,
           desc = "Treesitter Incremental Selection",
         },
+        -- { "K", mode = "o", treesitter, desc = "Treesitter Incremental Selection" },
       })
     end,
   },
