@@ -68,7 +68,7 @@ return {
     "neovim/nvim-lspconfig",
     ---@type PluginLspOpts
     opts = {
-      ---@type table<string, vim.lsp.Config|{mason?:boolean, enabled?:boolean}|boolean>
+      ---@type table<string, lazyvim.lsp.Config|boolean>
       servers = {
         -- pyright will be automatically installed with mason and loaded with lspconfig
         pyright = {},
@@ -91,7 +91,7 @@ return {
     },
     ---@type PluginLspOpts
     opts = {
-      ---@type table<string, vim.lsp.Config|{mason?:boolean, enabled?:boolean}|boolean>
+      ---@type table<string, lazyvim.lsp.Config|boolean>
       servers = {
         -- tsserver will be automatically installed with mason and loaded with lspconfig
         tsserver = {},

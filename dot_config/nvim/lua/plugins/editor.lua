@@ -487,33 +487,13 @@ return {
         },
       })
 
+      -- stylua: ignore
       if LazyVim.has("yanky.nvim") then
         vim.list_extend(keys, {
-          {
-            "p",
-            function()
-              -- copied from: https://github.com/y3owk1n/undo-glow.nvim/blob/7a224dead8cc94fee57d753b188413910dd5b98c/lua/undo-glow/init.lua#L138
-              local opts = require("undo-glow.utils").merge_command_opts("UgPaste")
-              require("undo-glow").highlight_changes(opts)
-              return "<Plug>(YankyPutAfter)"
-            end,
-            desc = "Put Text After Cursor (undo-glow)",
-            expr = true,
-          },
-          {
-            "P",
-            function()
-              -- copied from: https://github.com/y3owk1n/undo-glow.nvim/blob/7a224dead8cc94fee57d753b188413910dd5b98c/lua/undo-glow/init.lua#L145
-              local opts = require("undo-glow.utils").merge_command_opts("UgPaste")
-              require("undo-glow").highlight_changes(opts)
-              return "<Plug>(YankyPutBefore)"
-            end,
-            desc = "Put Text Before Cursor (undo-glow)",
-            expr = true,
-          },
+          { "p", function() return require("undo-glow").yanky_put("YankyPutAfter") end, desc = "Put Text After Cursor (undo-glow)", expr = true },
+          { "P", function() return require("undo-glow").yanky_put("YankyPutBefore") end, desc = "Put Text Before Cursor (undo-glow)", expr = true },
         })
       else
-        -- stylua: ignore
         vim.list_extend(keys, {
           { "p", function() require("undo-glow").paste_below() end, desc = "Put Text After Cursor (undo-glow)" },
           { "P", function() require("undo-glow").paste_above() end, desc = "Put Text Before Cursor (undo-glow)" },

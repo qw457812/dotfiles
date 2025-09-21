@@ -29,21 +29,6 @@ return {
       })
     end,
   },
-  { "giuxtaposition/blink-cmp-copilot", optional = true, enabled = false, cond = false },
-  {
-    "saghen/blink.cmp",
-    optional = true,
-    dependencies = { "fang2hou/blink-copilot", shell_command_editor = true },
-    opts = {
-      sources = {
-        providers = {
-          copilot = {
-            module = "blink-copilot",
-          },
-        },
-      },
-    },
-  },
 
   {
     "Exafunction/codeium.nvim",
