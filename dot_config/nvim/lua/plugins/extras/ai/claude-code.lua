@@ -87,7 +87,7 @@ return {
             -- HACK: not sure why claude code goes into its own normal mode
             vim.defer_fn(function()
               if H.is_cc_norm() then
-                vim.api.nvim_feedkeys(vim.keycode("i"), "n", false)
+                vim.api.nvim_feedkeys("i", "n", false)
               end
             end, 100)
           end
@@ -121,7 +121,7 @@ return {
         desc = "Enter insert mode of claude code",
         callback = vim.schedule_wrap(function()
           if H.is_cc_norm() then
-            vim.api.nvim_feedkeys(vim.keycode("i"), "n", false)
+            vim.api.nvim_feedkeys("i", "n", false)
           end
         end),
       })
@@ -180,7 +180,7 @@ return {
                   if self.esc_timer:is_active() then
                     self.esc_timer:stop()
                     if is_cc_norm then
-                      vim.api.nvim_feedkeys(vim.keycode("i"), "n", false)
+                      vim.api.nvim_feedkeys("i", "n", false)
                     end
                     vim.cmd("stopinsert")
                   else

@@ -158,7 +158,7 @@ return {
           elseif require("lazyvim.plugins.lsp.keymaps").has(0, "hover") then
             vim.lsp.buf.hover()
           else
-            vim.api.nvim_feedkeys(vim.keycode("K"), "n", false)
+            vim.cmd.normal({ "K", bang = true })
           end
         end,
         desc = "Peek Fold (UFO) / Hover / Keywordprg",

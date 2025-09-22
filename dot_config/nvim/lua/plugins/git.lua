@@ -33,7 +33,7 @@ return {
           vim.schedule(function()
             if vim.api.nvim_get_current_buf() == ev.buf and vim.api.nvim_get_current_win() == win then
               if vim.g.user_close_key then
-                vim.api.nvim_feedkeys(vim.keycode(vim.g.user_close_key), "m", false)
+                vim.cmd.normal(vim.keycode(vim.g.user_close_key))
               else
                 vim.cmd([[quit]])
               end
@@ -337,7 +337,7 @@ return {
               once = true,
               callback = function()
                 executed = true
-                vim.api.nvim_feedkeys(vim.keycode("c"), "m", false)
+                vim.api.nvim_feedkeys("c", "m", false)
               end,
             })
             vim.defer_fn(function()

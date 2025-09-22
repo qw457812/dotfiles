@@ -179,9 +179,9 @@ function M.get_visual_selection(opts)
   -- prefer register workaround to trigger `vim.hl.on_yank()`
   if M.is_visual_mode() then
     local cache_z_reg = vim.fn.getreginfo("z")
-    vim.cmd.normal('"zy')
+    vim.cmd.normal({ '"zy', bang = true })
     if opts.stop_visual_mode == false then
-      vim.cmd.normal("gv")
+      vim.cmd.normal({ "gv", bang = true })
     end
     selection = vim.fn.getreg("z")
     vim.fn.setreg("z", cache_z_reg)

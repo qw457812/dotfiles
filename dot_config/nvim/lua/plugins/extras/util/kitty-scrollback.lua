@@ -21,8 +21,8 @@ return {
         callback = function(ev)
           if vim.g.user_close_key then
             vim.keymap.set("x", vim.g.user_close_key, function()
-              vim.cmd.normal("y")
-              vim.api.nvim_feedkeys(vim.keycode(vim.g.user_close_key), "m", false)
+              vim.cmd.normal({ "y", bang = true })
+              vim.cmd.normal(vim.keycode(vim.g.user_close_key))
             end, { buffer = ev.buf, desc = "Yank and Quit" })
           end
         end,

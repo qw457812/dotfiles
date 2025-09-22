@@ -76,7 +76,7 @@ return {
           vim.keymap.set("n", "<Esc>", function()
             if not U.keymap.clear_ui_esc() then
               if vim.g.user_close_key then
-                vim.api.nvim_feedkeys(vim.keycode(vim.g.user_close_key), "m", false)
+                vim.cmd.normal(vim.keycode(vim.g.user_close_key))
               else
                 vim.cmd([[quit]])
               end

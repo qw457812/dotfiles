@@ -219,7 +219,7 @@ function M.indented_i()
   if not orig_modified then
     orig_lnum, orig_line = vim.fn.line("."), vim.fn.getline(".")
   end
-  vim.api.nvim_feedkeys(vim.keycode('"_cc'), "n", false)
+  vim.api.nvim_feedkeys('"_cc', "n", false)
   -- prevent `"_cc` from changing `vim.bo.modified`
   if not orig_modified then
     vim.api.nvim_create_autocmd("InsertLeave", {
@@ -246,7 +246,8 @@ function M.clear_ui_esc(opts)
   opts = vim.tbl_deep_extend("keep", opts or {}, {
     close = function()
       if vim.g.user_close_key then
-        vim.api.nvim_feedkeys(vim.keycode(vim.g.user_close_key), "m", false)
+        -- alternative: vim.api.nvim_feedkeys(vim.keycode(vim.g.user_close_key), "m", false)
+        vim.cmd.normal(vim.keycode(vim.g.user_close_key))
       else
         local ft = vim.bo.filetype
         if ft == "oil" then

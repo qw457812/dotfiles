@@ -73,7 +73,7 @@ return {
               -- powerlevel10k for zsh-vi-mode or starship for fish_vi_key_bindings
               if vim.api.nvim_get_current_line():match("^❮ .*") then
                 -- use `a` instead of `i` to restore cursor position
-                vim.api.nvim_feedkeys(vim.keycode("a"), "n", false)
+                vim.api.nvim_feedkeys("a", "n", false)
               end
             end)
           end,
