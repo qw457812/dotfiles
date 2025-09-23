@@ -260,7 +260,7 @@ if type -q claude
     abbr ccum "$ccusage daily --breakdown"
     abbr ccub "$ccusage blocks"
     abbr ccstl (type -q bunx; and echo "bunx ccstatusline@latest"; or echo "npx ccstatusline@latest")
-    abbr ccspec --set-cursor "uvx --from git+https://github.com/github/spec-kit.git specify init --here% --ai claude"
+    abbr spec "uvx --from git+https://github.com/github/spec-kit.git specify init --script sh --ai claude --here"
     abbr cchistory "npx cchistory"
     abbr ccexp (type -q bunx; and echo "bunx ccexp@latest"; or echo "npx ccexp@latest")
     abbr cctmpl "ANTHROPIC_BASE_URL=$CTOK_BASE_URL ANTHROPIC_AUTH_TOKEN=$CTOK_AUTH_TOKEN npx claude-code-templates@latest"
