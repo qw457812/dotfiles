@@ -24,17 +24,6 @@ return {
     end,
   },
 
-  {
-    "neovim/nvim-lspconfig",
-    opts = {
-      setup = {
-        jdtls = function()
-          return true
-        end,
-      },
-    },
-  },
-
   -- TODO: not sure what it's for
   {
     "nvim-treesitter/nvim-treesitter",
@@ -49,7 +38,13 @@ return {
     "mfussenegger/nvim-jdtls",
     optional = true,
     opts = function(_, opts)
+      -- for multi-module projects with maven
+      local root_markers = vim.list_extend({ ".nvim.lua", ".lazy.lua" }, vim.lsp.config.jdtls.root_markers)
+
       return U.extend_tbl(opts, {
+        root_dir = function(path)
+          return vim.fs.root(path, root_markers)
+        end,
         -- https://github.com/eclipse-jdtls/eclipse.jdt.ls/wiki/Running-the-JAVA-LS-server-from-the-command-line#initialize-request
         settings = {
           java = {
@@ -177,14 +172,6 @@ return {
         end,
       })
     end,
-  },
-
-  -- TODO: this should not be needed
-  -- https://github.com/LazyVim/LazyVim/blob/c05392186e9e540d4af169922c333b5baa583cbe/lua/lazyvim/plugins/extras/lang/java.lua#L65-L80
-  -- https://github.com/LazyVim/LazyVim/commit/773f28b4912d5505a21da9686d56ab7cf41a9be7
-  {
-    "mason-org/mason.nvim",
-    opts = { ensure_installed = { "jdtls" } },
   },
 
   -- https://github.com/AstroNvim/astrocommunity/blob/5f74d5fb8d8dc9b8e2904846809121068d7afaca/lua/astrocommunity/pack/spring-boot/init.lua
