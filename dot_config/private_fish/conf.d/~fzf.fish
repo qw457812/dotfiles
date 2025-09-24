@@ -1,3 +1,5 @@
+status is-interactive; or exit
+
 # respect .gitignore
 if type -q fd
     set -x FZF_DEFAULT_COMMAND "fd --type f --type l --hidden --follow"

@@ -1,8 +1,7 @@
--- if vim.fn.exists("+winborder") == 1 then
---   vim.o.winborder = "rounded"
--- end
+local winborder = "rounded"
+-- vim.o.winborder = winborder -- TODO: use vim.o.winborder
 
--- https://github.com/aimuzov/LazyVimx/blob/main/lua/lazyvimx/extras/ui/style/popups/rounded.lua
+-- https://github.com/aimuzov/LazyVimx/blob/3fc53024822628837b574c0d0456044e7c3cfe98/lua/lazyvimx/extras/ui/better-float.lua
 -- https://github.com/consoleaf/nvim-config/blob/ebcd80b5accbf7e2a5ae568c9c157a7a880411a8/lua/plugins/round.lua
 return {
   {
@@ -13,7 +12,7 @@ return {
     opts = {
       -- -- https://github.com/Nitestack/dotfiles/blob/506b895c45b8ed012a2cb0c35fe62058d8b6dbc4/config/private_dot_config/exact_nvim/lua/exact_plugins/snacks.lua#L9
       -- win = {
-      --   border = "rounded",
+      --   border = winborder,
       -- },
       -- zen = {
       --   win = {
@@ -22,7 +21,13 @@ return {
       -- },
       terminal = {
         win = {
-          border = "rounded",
+          border = winborder,
+        },
+      },
+      lazygit = {
+        ---@type snacks.win.Config|{}
+        win = {
+          border = "none",
         },
       },
     },
@@ -50,19 +55,19 @@ return {
     opts = {
       completion = {
         menu = {
-          border = "rounded",
+          border = winborder,
           winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder,CursorLine:PmenuSel,Search:None",
         },
         documentation = {
           window = {
-            border = "rounded",
+            border = winborder,
             winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder,CursorLine:PmenuSel,Search:None",
           },
         },
       },
       signature = {
         window = {
-          border = "rounded",
+          border = winborder,
           winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder",
         },
       },
@@ -74,7 +79,7 @@ return {
     optional = true,
     opts = {
       diagnostics = {
-        float = { border = "rounded" },
+        float = { border = winborder },
       },
     },
   },
@@ -98,7 +103,7 @@ return {
     ---@module "neo-tree"
     ---@type neotree.Config
     opts = {
-      popup_border_style = "rounded",
+      popup_border_style = winborder,
       default_component_configs = {
         indent = {
           last_indent_marker = "╰",
@@ -112,19 +117,19 @@ return {
     optional = true,
     ---@module "mason"
     ---@type MasonSettings
-    opts = { ui = { border = "rounded" } },
+    opts = { ui = { border = winborder } },
   },
 
   {
     "rcarriga/nvim-dap-ui",
     optional = true,
-    opts = { floating = { border = "rounded" } },
+    opts = { floating = { border = winborder } },
   },
 
   {
     "lewis6991/gitsigns.nvim",
     optional = true,
-    opts = { preview_config = { border = "rounded" } },
+    opts = { preview_config = { border = winborder } },
   },
 
   {
@@ -133,7 +138,7 @@ return {
     opts = {
       menu = {
         win_configs = {
-          border = "rounded",
+          border = winborder,
         },
       },
     },
@@ -145,7 +150,7 @@ return {
     opts = {
       window = {
         window_config = {
-          border = "rounded",
+          border = winborder,
         },
       },
     },
@@ -156,7 +161,7 @@ return {
     optional = true,
     opts = {
       float_opts = {
-        border = "rounded",
+        border = winborder,
       },
     },
   },
@@ -171,7 +176,7 @@ return {
         callback = function(args)
           local win_id = args.data.win_id
           local config = vim.api.nvim_win_get_config(win_id)
-          config.border = "rounded"
+          config.border = winborder
           vim.api.nvim_win_set_config(win_id, config)
         end,
       })
@@ -183,7 +188,7 @@ return {
     optional = true,
     opts = {
       winopts = {
-        border = "rounded",
+        border = winborder,
       },
     },
   },
@@ -193,7 +198,7 @@ return {
     optional = true,
     opts = {
       window = {
-        border = "rounded",
+        border = winborder,
       },
     },
   },
@@ -203,7 +208,7 @@ return {
     optional = true,
     opts = {
       popupWin = {
-        border = "rounded",
+        border = winborder,
       },
     },
   },
@@ -215,7 +220,7 @@ return {
       -- HACK: add border for diff/help/log window
       -- https://github.com/y3owk1n/time-machine.nvim/blob/08bda79dfc13b4b81d2fbb8295d0ad5a3a438d84/lua/time-machine/window.lua#L5-L8
       local orig_winborder = vim.o.winborder
-      vim.o.winborder = "rounded"
+      vim.o.winborder = winborder
       require("time-machine.window")
       vim.o.winborder = orig_winborder
     end,
@@ -229,10 +234,10 @@ return {
     opts = {
       windows = {
         edit = {
-          border = "rounded",
+          border = winborder,
         },
         ask = {
-          border = "rounded",
+          border = winborder,
         },
       },
     },
@@ -243,7 +248,7 @@ return {
     optional = true,
     opts = {
       floating = {
-        border = "rounded",
+        border = winborder,
       },
     },
   },
@@ -257,7 +262,7 @@ return {
       ---@type MCPHub.UIConfig
       ui = {
         window = {
-          border = "rounded",
+          border = winborder,
         },
       },
     },

@@ -129,7 +129,6 @@ return {
           win = {
             height = U.snacks.win.fullscreen_height,
             width = 0,
-            border = "none",
           },
         },
         gitbrowse = {
