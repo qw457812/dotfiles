@@ -152,13 +152,13 @@ return {
           nerd_font_variant = "normal",
         },
         -- `keymap` configuration for command-line window goes here
-        -- TODO: better snippets/signature keymaps with tab/ctrl-hjkl
         keymap = {
           ["<Tab>"] = {
+            "snippet_forward",
+            LazyVim.cmp.map({ "ai_accept" }),
+            H.actions.copilot_nes,
             "select_next",
             H.actions.pum_next,
-            "snippet_forward",
-            H.actions.copilot_nes,
             function(cmp)
               if
                 has_words_before()
@@ -169,14 +169,14 @@ return {
             end,
             "fallback",
           },
-          ["<S-Tab>"] = { "select_prev", H.actions.pum_prev, "snippet_backward", "fallback" },
+          ["<S-Tab>"] = { "snippet_backward", "select_prev", H.actions.pum_prev, "fallback" },
           ["<CR>"] = { "accept", H.actions.pum_accept, "fallback" },
           ["<C-n>"] = { "select_next", "show" },
           ["<C-p>"] = { "select_prev", "show" },
-          ["<C-j>"] = { "select_next", H.actions.pum_next, H.actions.mini_snippets_expand, "fallback" },
-          ["<C-k>"] = { "select_prev", H.actions.pum_prev, "show_signature", "hide_signature", "fallback" },
-          ["<C-l>"] = { "snippet_forward", H.actions.mini_snippets_expand, "fallback" },
-          ["<C-h>"] = { "snippet_backward", "show_signature", "hide_signature", "fallback" }, -- TODO: the fallback seems unreachable because show_signature returns true if the signature is not visible
+          ["<C-j>"] = { "select_next", H.actions.pum_next, "fallback" },
+          ["<C-k>"] = { "select_prev", H.actions.pum_prev, "fallback" },
+          ["<C-l>"] = { H.actions.mini_snippets_expand, "fallback" }, -- TODO: fallback is unreachable because H.actions.mini_snippets_expand always returns true
+          ["<C-h>"] = { "show_signature", "hide_signature", "fallback" }, -- TODO: fallback seems unreachable because show_signature returns true if the signature is not visible
           -- ["<C-u>"] = { "scroll_documentation_up", "scroll_signature_up", "fallback" },
           -- ["<C-d>"] = { "scroll_documentation_down", "scroll_signature_down", "fallback" },
           ["<C-u>"] = { H.actions.scroll_list_up, "fallback" },
