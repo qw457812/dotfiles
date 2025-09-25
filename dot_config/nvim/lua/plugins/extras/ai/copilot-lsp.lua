@@ -79,7 +79,7 @@ return {
                     -- see: https://github.com/saghen/blink.cmp/blob/a026b8db7f8ab0e98b9a2e0a7a8d7a7b73410a27/lua/blink/cmp/signature/window.lua#L123-L131
                     -- copied from: https://github.com/saghen/blink.cmp/blob/a5be099b0519339bc0d9e2dc96744b55640e810e/lua/blink/cmp/init.lua#L279-L284
                     if nes_visible and require("blink.cmp").is_signature_visible() then
-                      require("blinn.cmp.signature.trigger").hide()
+                      require("blink.cmp.signature.trigger").hide()
                     end
                   end
                 end)
