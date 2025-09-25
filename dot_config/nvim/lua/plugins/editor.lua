@@ -729,6 +729,7 @@ return {
     shell_command_editor = true,
     event = "ModeChanged *:[vV]",
     opts = {
+      hl_group = "Search",
       case_insensitive = true,
       chars_lower_limit = 2,
       buffers = function(buf)

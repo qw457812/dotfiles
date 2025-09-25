@@ -1,6 +1,6 @@
 {
   "alejandra": "4.0.0",
-  "basedpyright": "1.31.4",
+  "basedpyright": "1.31.5",
   "bash-language-server": "5.6.0",
   "codelldb": "v1.11.5",
   "copilot-language-server": "1.375.0",
@@ -36,5 +36,5 @@
   "vscode-spring-boot-tools": "1.63.0",
   "vtsls": "0.2.9",
   "vue-language-server": "3.0.8",
-  "yaml-language-server": "1.18.0"
+  "yaml-language-server": "1.19.1"
 }

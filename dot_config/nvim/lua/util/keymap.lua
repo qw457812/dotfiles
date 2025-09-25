@@ -314,8 +314,7 @@ function M.clear_ui_esc(opts)
     LazyVim.cmp.actions.snippet_stop()
     something_done = true
   elseif package.loaded["copilot-lsp.nes"] and vim.b.nes_state then
-    -- see: https://github.com/copilotlsp-nvim/copilot-lsp/blob/a45b3d9c0c00cd4271445224de95650090800182/lua/copilot-lsp/nes/ui.lua#L173-L183
-    require("copilot-lsp.nes").clear_suggestion()
+    require("copilot-lsp.nes").clear()
   elseif opts.close then
     if U.is_floating_win(0, { zen = false }) then
       opts.close()
