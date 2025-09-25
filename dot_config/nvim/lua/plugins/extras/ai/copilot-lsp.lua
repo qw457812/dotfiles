@@ -40,9 +40,21 @@ return {
     opts = {},
     specs = {
       { "zbirenbaum/copilot.lua", optional = true, enabled = false, cond = false },
+      -- with the way LazyVim sets up mason-lspconfig.nvim, using opts.ensure_installed of mason.nvim will automatically enable installed servers
+      -- see: https://github.com/LazyVim/LazyVim/blob/8a760984611cd9df0971a9f36a94838b9e32453f/lua/lazyvim/plugins/lsp/init.lua#L217-L220
       {
-        "mason-org/mason.nvim",
-        opts = { ensure_installed = { "copilot-language-server" } },
+        "neovim/nvim-lspconfig",
+        opts = {
+          -- ensure mason installs copilot-language-server
+          servers = {
+            copilot = {},
+          },
+          setup = {
+            copilot = function()
+              return true -- but don't automatically enable it since we already enabled copilot_ls
+            end,
+          },
+        },
       },
       -- update blink menu position when copilot NES is visible
       -- see: https://github.com/Saghen/blink.cmp/issues/1801#issuecomment-2956456623
