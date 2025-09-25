@@ -151,6 +151,7 @@ return {
         appearance = {
           nerd_font_variant = "normal",
         },
+        -- `keymap` configuration for command-line window goes here
         -- TODO: better snippets/signature keymaps with tab/ctrl-hjkl
         keymap = {
           ["<Tab>"] = {
@@ -244,15 +245,24 @@ return {
             ["<C-d>"] = { H.actions.scroll_list_down, "fallback" },
             ["<C-space>"] = { "show", "hide" },
           },
+          -- `completion` configuration for command-line window goes here
           completion = {
             -- menu = { auto_show = false },
             -- ghost_text = { enabled = false },
             ghost_text = {
               enabled = function()
-                -- 1. enable ghost_text in cmdwin
-                -- 2. enable ghost_text in cmdline when the cursor is at the end of cmdline, in favor of the `<>` pair of mini.pairs and the left arrow key
-                return vim.fn.win_gettype() == "command" or vim.fn.getcmdpos() == #vim.fn.getcmdline() + 1
+                -- disable ghost_text in cmdwin, because with `preselect` enabled, <cr> accepts the ghost text (preselected item) instead of executing the command-line
+                -- enable ghost_text in cmdline when the cursor is at the end of cmdline, in favor of the `<>` pair of mini.pairs and the left arrow key
+                return vim.fn.win_gettype() ~= "command" and vim.fn.getcmdpos() == #vim.fn.getcmdline() + 1
               end,
+            },
+            list = {
+              selection = {
+                preselect = function()
+                  -- enable preselect in cmdwin, same behavior as in normal buffer
+                  return vim.fn.win_gettype() == "command"
+                end,
+              },
             },
           },
         },
