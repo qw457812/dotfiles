@@ -204,7 +204,19 @@ return {
       -- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/keybindings.lua#L150
       vim.keymap.set("n", "guu", "guu") -- prevent `omap u` from overwriting `guu`
       return vim.list_extend(keys, {
-        { "u", mode = { "o", "x" }, treesitter, desc = "Flash Treesitter" }, -- unit textobject, conflict with `guu`
+        { "u", mode = "o", treesitter, desc = "Flash Treesitter" }, -- unit textobject, conflict with `guu`
+        {
+          "u",
+          mode = "x",
+          function()
+            if vim.bo.modifiable == false then
+              local count = vim.v.count
+              return vim.api.nvim_feedkeys(vim.keycode((count > 0 and count or "") .. "<C-u>"), "n", false)
+            end
+            treesitter()
+          end,
+          desc = "Flash Treesitter or Scroll Up",
+        },
         -- { "S", mode = { "n", "o", "x" }, treesitter, desc = "Flash Treesitter" }, -- conflict with mini.operators, use `vu` instead
         { "r", mode = "o", false },
         { "R", mode = { "o", "x" }, false },

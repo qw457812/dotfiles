@@ -39,14 +39,6 @@ return {
       return keys
     end,
     opts = function()
-      LazyVim.cmp.actions.ai_active = function()
-        return package.loaded["copilot-lsp.nes"] ~= nil and vim.b.nes_state ~= nil
-      end
-      ---@diagnostic disable-next-line: duplicate-set-field
-      LazyVim.cmp.actions.ai_stop = function()
-        require("copilot-lsp.nes").clear()
-      end
-
       U.toggle.ai_cmps.copilot_lsp = Snacks.toggle({
         name = "Copilot LSP",
         get = function()
@@ -101,11 +93,14 @@ return {
                 vim.lsp.inline_completion.enable()
               end
 
+              -- HACK: `vim.g.ai_cmp` changed to false after `:LazyExtras` even when `ai.copilot-native` is not enabled
+              -- caused by: https://github.com/LazyVim/LazyVim/blob/ed637bb0f7f418de069a4d5a7ed8a7b3b93eb425/lua/lazyvim/plugins/extras/ai/copilot-native.lua#L18
+              local ai_cmp = vim.g.ai_cmp
               -- Accept inline completion or next edit suggestion
               ---@diagnostic disable-next-line: duplicate-set-field
               LazyVim.cmp.actions.ai_accept = function()
-                -- perfer inline completion if available
-                if not vim.g.ai_cmp and vim.lsp.inline_completion.get() then
+                -- prefer inline completion if available
+                if not ai_cmp and vim.lsp.inline_completion.get() then
                   return true
                 end
 

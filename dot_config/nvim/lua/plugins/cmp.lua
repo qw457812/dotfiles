@@ -34,9 +34,11 @@ return {
   },
   {
     "saghen/blink.cmp",
+    -- https://github.com/Saghen/blink.cmp/issues/145#issuecomment-2483686337
     -- https://github.com/Saghen/blink.cmp/issues/145#issuecomment-2492759016
-    build = vim.g.lazyvim_blink_main
-      and ("%s cargo build --release"):format(vim.g.user_is_termux and "RUSTC_BOOTSTRAP=1" or ""),
+    build = vim.g.lazyvim_blink_main and ("%s cargo build --release"):format(
+      vim.g.user_is_termux and 'RUSTC_BOOTSTRAP=1 RUSTFLAGS="-C link-args=-lluajit"' or ""
+    ),
     optional = true,
     ---@param opts blink.cmp.Config
     opts = function(_, opts)
@@ -322,10 +324,6 @@ return {
         or function()
           return vim.snippet.active()
         end
-
-      LazyVim.cmp.actions.ai_active = LazyVim.cmp.actions.ai_active or function()
-        return false
-      end
     end,
   },
   {

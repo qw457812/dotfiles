@@ -99,6 +99,9 @@ return {
       { "<leader>aa", "<cmd>ClaudeCodeSend<cr>", desc = "Claude", mode = "x" },
       { "<leader>acc", "<cmd>ClaudeCode --continue<cr>", desc = "Continue" },
       { "<leader>acr", "<cmd>ClaudeCode --resume<cr>", desc = "Resume" },
+      { "<leader>acs", "<cmd>ClaudeCode --model sonnet<cr>", desc = "Sonnet" },
+      { "<leader>aco", "<cmd>ClaudeCode --model opus<cr>", desc = "Opus" },
+      { "<leader>acgc", "<cmd>ClaudeCode --model sonnet 'commit only the staged changes'<cr>", desc = "Git Commit" },
       { "<leader>acm", "<cmd>ClaudeCodeSelectModel<cr>", desc = "Select Model" },
       { "<leader>af", "<cmd>ClaudeCodeAdd %<cr>", desc = "Add File (Claude)" },
       -- { "<leader>ac=", "<cmd>ClaudeCodeAdd %<cr>", desc = "Add File" },
@@ -211,6 +214,7 @@ return {
         {
           mode = { "n", "v" },
           { "<leader>ac", group = "claude" },
+          { "<leader>acg", group = "git" },
         },
       },
     },

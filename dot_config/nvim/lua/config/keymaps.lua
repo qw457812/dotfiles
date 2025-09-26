@@ -64,7 +64,6 @@ map({ "i", "s" }, "<esc>", function()
   if not _G.MiniSnippets then -- by design, <esc> should not stop the session!
     LazyVim.cmp.actions.snippet_stop()
   end
-  -- LazyVim.cmp.actions.ai_stop()
   return "<esc>"
 end, { expr = true, desc = "Escape and Stop Snippet" })
 
@@ -74,12 +73,19 @@ safe_map("n", "U", "<C-r>", { desc = "Redo" }) -- undo-glow.nvim
 map("n", "<C-r>", "<cmd>edit<cr>", { desc = "Reload File" })
 map("n", "<leader>U", "U", { desc = "Undo all changes on one line" })
 
-map("c", "<C-j>", "<C-n>", { silent = false, desc = "Next Command / Completion" })
-map("c", "<C-k>", "<C-p>", { silent = false, desc = "Prev Command / Completion" })
-
+safe_map({ "n", "x" }, "u", function()
+  return vim.bo.modifiable == false and "<C-u>" or "u"
+end, { expr = true, desc = "Undo or Scroll Up" })
+map({ "n", "x" }, "d", function()
+  return vim.bo.modifiable == false and "<C-d>" or "d"
+end, { expr = true, desc = "Delete or Scroll Down" })
 map("n", "dd", function()
+  if vim.bo.modifiable == false then
+    return "<C-d>"
+  end
   return vim.api.nvim_get_current_line():match("^%s*$") and '"_dd' or "dd"
 end, { expr = true, desc = "Don't Yank Empty Line to Clipboard" })
+
 map("n", "i", U.keymap.indented_i, { desc = "Indented i on Empty Line" })
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "neo-tree-popup",
@@ -87,6 +93,9 @@ vim.api.nvim_create_autocmd("FileType", {
     map("n", "i", "i", { buffer = event.buf })
   end,
 })
+
+map("c", "<C-j>", "<C-n>", { silent = false, desc = "Next Command / Completion" })
+map("c", "<C-k>", "<C-p>", { silent = false, desc = "Prev Command / Completion" })
 
 safe_map("n", "n", "nzv") -- nvim-hlslens
 safe_map("n", "N", "Nzv")
