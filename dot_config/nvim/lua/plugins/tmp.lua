@@ -3,6 +3,15 @@ local java_home = vim.g.user_is_termux and "/data/data/com.termux/files/usr/lib/
 
 ---@type LazySpec
 return {
+  -- -- dummy import
+  -- {
+  --   import = "foobar",
+  --   enabled = function()
+  --     -- something can be done here
+  --     return false
+  --   end,
+  -- },
+
   -- {
   --   "akinsho/bufferline.nvim",
   --   optional = true,

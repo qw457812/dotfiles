@@ -84,14 +84,6 @@ return {
           end
           return true
         end,
-        copilot_nes = function(cmp)
-          if not (package.loaded["copilot-lsp.nes"] and vim.b.nes_state) then
-            return
-          end
-          local nes = require("copilot-lsp.nes")
-          cmp.hide()
-          return nes.apply_pending_nes() and nes.walk_cursor_end_edit()
-        end,
         -- see: https://github.com/Saghen/blink.cmp/issues/569#issuecomment-2833362734
         scroll_list_up = function()
           -- based on select_prev: https://github.com/Saghen/blink.cmp/blob/6323a6ddb191323904557dc9b545f309ea2b0e12/lua/blink/cmp/init.lua#L200-L205
@@ -156,9 +148,8 @@ return {
           ["<Tab>"] = {
             "snippet_forward",
             LazyVim.cmp.map({ "ai_accept" }),
-            H.actions.copilot_nes,
-            "select_next",
-            H.actions.pum_next,
+            -- "select_next",
+            -- H.actions.pum_next,
             function(cmp)
               if
                 has_words_before()
@@ -331,6 +322,10 @@ return {
         or function()
           return vim.snippet.active()
         end
+
+      LazyVim.cmp.actions.ai_active = LazyVim.cmp.actions.ai_active or function()
+        return false
+      end
     end,
   },
   {

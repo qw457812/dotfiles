@@ -1,16 +1,25 @@
--- vim.g.ai_cmp = false
+if LazyVim.has_extra("ai.copilot-lsp") then
+  if LazyVim.has_extra("ai.copilot") then
+    LazyVim.error("Please disable the `ai.copilot` extra if you want to use `ai.copilot-lsp`")
+    return {}
+  end
+  if LazyVim.has_extra("ai.copilot-native") then
+    LazyVim.error("Please disable the `ai.copilot-native` extra if you want to use `ai.copilot-lsp`")
+    return {}
+  end
 
-if not (vim.g.ai_cmp or vim.lsp.inline_completion) then
-  LazyVim.error("You need Neovim >= 0.12 or `vim.g.ai_cmp` enabled to use the `ai.copilot-lsp` user extra.")
-  return {}
-end
-if LazyVim.has_extra("ai.copilot") then
-  LazyVim.error("Please disable the `ai.copilot` extra if you want to use `ai.copilot-lsp`")
-  return {}
+  if not vim.lsp.inline_completion then
+    if not LazyVim.has_extra("coding.blink") then
+      LazyVim.error("You need Neovim >= 0.12 or `coding.blink` extra to use the `ai.copilot-lsp` extra.")
+      return {}
+    end
+    vim.g.ai_cmp = true
+  end
 end
 
 local status = {} ---@type table<number, "ok" | "error" | "pending">
 
+-- https://github.com/LazyVim/LazyVim/blob/c83df9e68dd41f5a3f7df5a7048169ee286a7da8/lua/lazyvim/plugins/extras/ai/copilot-native.lua
 ---@type LazySpec
 return {
   {
@@ -18,24 +27,26 @@ return {
     shell_command_editor = true,
     event = "LazyFile",
     keys = function(_, keys)
-      ---@return boolean
-      local function nes_jump_or_apply()
-        local nes = require("copilot-lsp.nes")
-        return nes.walk_cursor_start_edit() or (nes.apply_pending_nes() and nes.walk_cursor_end_edit())
-      end
-
       if vim.g.user_distinguish_ctrl_i_tab or vim.g.user_is_termux then
         table.insert(keys, {
           "<tab>",
-          function()
-            local _ = nes_jump_or_apply() or vim.cmd("wincmd w")
-          end,
-          desc = "Jump/Apply Suggestion or Next Window (Copilot LSP)",
+          LazyVim.cmp.map({ "ai_accept" }, function()
+            vim.cmd("wincmd w")
+          end),
+          desc = "Jump/Apply Next Edit Suggestion or Next Window (Copilot LSP)",
         })
       end
       return keys
     end,
-    init = function()
+    opts = function()
+      LazyVim.cmp.actions.ai_active = function()
+        return package.loaded["copilot-lsp.nes"] ~= nil and vim.b.nes_state ~= nil
+      end
+      ---@diagnostic disable-next-line: duplicate-set-field
+      LazyVim.cmp.actions.ai_stop = function()
+        require("copilot-lsp.nes").clear()
+      end
+
       U.toggle.ai_cmps.copilot_lsp = Snacks.toggle({
         name = "Copilot LSP",
         get = function()
@@ -46,9 +57,6 @@ return {
         end,
       })
     end,
-    ---@module "copilot-lsp"
-    ---@type copilotlsp.config|{}
-    opts = {},
     specs = {
       {
         "neovim/nvim-lspconfig",
@@ -89,13 +97,26 @@ return {
             copilot_ls = function()
               vim.g.copilot_nes_debounce = 500
 
-              if vim.g.ai_cmp then
-                return
+              if not vim.g.ai_cmp then
+                vim.lsp.inline_completion.enable()
               end
-              vim.lsp.inline_completion.enable()
+
+              -- Accept inline completion or next edit suggestion
               ---@diagnostic disable-next-line: duplicate-set-field
               LazyVim.cmp.actions.ai_accept = function()
-                return vim.lsp.inline_completion.get()
+                -- perfer inline completion if available
+                if not vim.g.ai_cmp and vim.lsp.inline_completion.get() then
+                  return true
+                end
+
+                -- otherwise, try to jump to or apply nes
+                if package.loaded["copilot-lsp.nes"] and vim.b.nes_state then
+                  local nes = require("copilot-lsp.nes")
+                  if nes.walk_cursor_start_edit() or (nes.apply_pending_nes() and nes.walk_cursor_end_edit()) then
+                    vim.cmd("stopinsert")
+                    return true
+                  end
+                end
               end
             end,
           },
@@ -122,7 +143,8 @@ return {
 
   -- update blink menu position when copilot NES is visible
   -- see: https://github.com/Saghen/blink.cmp/issues/1801#issuecomment-2956456623
-  -- TODO: update blink menu position when copilot inline_completion is visible (via `status`)
+  -- TODO: disable nes in insert mode
+  -- ref: https://github.com/LazyVim/LazyVim/blob/c83df9e68dd41f5a3f7df5a7048169ee286a7da8/lua/lazyvim/plugins/extras/ai/copilot-native.lua#L64-L75
   {
     "saghen/blink.cmp",
     optional = true,

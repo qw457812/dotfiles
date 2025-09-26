@@ -64,6 +64,7 @@ map({ "i", "s" }, "<esc>", function()
   if not _G.MiniSnippets then -- by design, <esc> should not stop the session!
     LazyVim.cmp.actions.snippet_stop()
   end
+  -- LazyVim.cmp.actions.ai_stop()
   return "<esc>"
 end, { expr = true, desc = "Escape and Stop Snippet" })
 
