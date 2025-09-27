@@ -32,7 +32,7 @@ local enabled = {
   "plenary.nvim", -- for blink.cmp
   "conform.nvim",
   "nvim-lint",
-  -- bash/fish
+  -- bash/fish/copilot
   "nvim-lspconfig",
   "mason.nvim", -- for nvim-lspconfig
   "mason-lspconfig.nvim",

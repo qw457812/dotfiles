@@ -37,7 +37,7 @@ return {
           LazyVim.cmp.map({ "ai_accept" }, function()
             vim.cmd("wincmd w")
           end),
-          desc = "Jump/Apply Next Edit Suggestion or Next Window (Copilot LSP)",
+          desc = "Jump/Apply Next Edit Suggestions or Next Window (Copilot LSP)",
         })
       end
       return keys
@@ -100,7 +100,7 @@ return {
               -- HACK: `vim.g.ai_cmp` changed to false after `:LazyExtras` even when `ai.copilot-native` is not enabled
               -- caused by: https://github.com/LazyVim/LazyVim/blob/ed637bb0f7f418de069a4d5a7ed8a7b3b93eb425/lua/lazyvim/plugins/extras/ai/copilot-native.lua#L18
               local ai_cmp = vim.g.ai_cmp
-              -- Accept inline completion or next edit suggestion
+              -- Accept inline completion or next edit suggestions
               ---@diagnostic disable-next-line: duplicate-set-field
               LazyVim.cmp.actions.ai_accept = function()
                 -- prefer inline completion if available
@@ -220,13 +220,12 @@ return {
   vim.g.ai_cmp and {
     "saghen/blink.cmp",
     optional = true,
-    dependencies = { "fang2hou/blink-copilot" },
+    dependencies = "fang2hou/blink-copilot",
     opts = {
       sources = {
         default = { "copilot" },
         providers = {
           copilot = {
-            name = "copilot",
             module = "blink-copilot",
             score_offset = 100,
             async = true,

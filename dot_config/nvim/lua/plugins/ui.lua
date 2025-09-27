@@ -362,7 +362,8 @@ return {
       -- stylua: ignore end
 
       local headers = {
-        nil, -- default header
+        nil, -- default header from snacks
+        opts.dashboard.preset.header, -- default header from lazyvim
         [[
                                                                    
       ████ ██████           █████      ██                    
@@ -409,7 +410,7 @@ return {
         end,
         { section = "keys", padding = 1 },
         {
-          icon = " ",
+          icon = " ", --  
           title = "Recent Files",
           section = "recent_files",
           indent = 2,

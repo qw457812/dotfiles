@@ -33,7 +33,7 @@ return {
           LazyVim.cmp.map({ "ai_nes" }, function()
             vim.cmd("wincmd w")
           end),
-          desc = "Jump/Apply Next Edit Suggestion or Next Window (sidekick)",
+          desc = "Jump/Apply Next Edit Suggestions or Next Window (sidekick)",
         })
       end
       return keys
@@ -46,6 +46,25 @@ return {
           esc = false, -- clear_ui_esc
         },
       },
+    },
+    specs = {
+      vim.g.ai_cmp and {
+        "saghen/blink.cmp",
+        optional = true,
+        dependencies = "fang2hou/blink-copilot",
+        opts = {
+          sources = {
+            default = { "copilot" },
+            providers = {
+              copilot = {
+                module = "blink-copilot",
+                score_offset = 100,
+                async = true,
+              },
+            },
+          },
+        },
+      } or { import = "foobar", enabled = false }, -- dummy import
     },
   },
 
