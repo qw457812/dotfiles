@@ -2,20 +2,15 @@
 return {
   {
     "neovim/nvim-lspconfig",
-    opts = {
-      servers = {
-        copilot = {
-          root_dir = function(bufnr, on_dir)
-            local root = LazyVim.root({ buf = bufnr })
-            on_dir(root ~= vim.uv.cwd() and root or vim.fs.root(bufnr, vim.lsp.config.copilot.root_markers))
-          end,
-        },
-      },
-    },
-  },
-  {
-    "neovim/nvim-lspconfig",
-    opts = function()
+    ---@param opts PluginLspOpts
+    opts = function(_, opts)
+      if opts.servers.copilot then
+        opts.servers.copilot.root_dir = function(bufnr, on_dir)
+          local root = LazyVim.root({ buf = bufnr })
+          on_dir(root ~= vim.uv.cwd() and root or vim.fs.root(bufnr, vim.lsp.config.copilot.root_markers))
+        end
+      end
+
       U.toggle.ai_cmps.copilot = Snacks.toggle({
         name = "copilot-language-server",
         get = function()
@@ -59,7 +54,7 @@ return {
     optional = true,
     opts = {
       root_dir = function()
-        return LazyVim.root({ normalize = true })
+        return LazyVim.root()
       end,
       filetypes = { ["*"] = true },
     },

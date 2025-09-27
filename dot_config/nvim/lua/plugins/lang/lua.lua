@@ -107,4 +107,14 @@ return {
       end
     end,
   },
+
+  -- {
+  --   "neovim/nvim-lspconfig",
+  --   opts = {
+  --     servers = {
+  --       lua_ls = { enabled = false },
+  --       emmylua_ls = {},
+  --     },
+  --   },
+  -- },
 }
