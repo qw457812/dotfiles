@@ -1,14 +1,23 @@
 {
-  "checkpointing": {
-    "enabled": true
+  "general": {
+    "checkpointing": {
+      "enabled": true
+    },
+    "disableAutoUpdate": true,
+    "preferredEditor": "neovim",
+    "vimMode": true
   },
-  "contextFileName": [
-    "CLAUDE.md",
-    "CLAUDE.local.md",
-    "GEMINI.md"
-  ],
-  "disableAutoUpdate": true,
-  "hideBanner": true,
+  "context": {
+    "fileName": [
+      "CLAUDE.md",
+      "CLAUDE.local.md",
+      "GEMINI.md"
+    ]
+  },
+  "ui": {
+    "hideBanner": true,
+    "theme": "GitHub"
+  },
   "mcpServers": {
     "context7": {
       "command": "npx",
@@ -18,9 +27,15 @@
       ]
     }
   },
-  "preferredEditor": "neovim",
-  "selectedAuthType": "oauth-personal",
-  "theme": "GitHub",
-  "usageStatisticsEnabled": false,
-  "vimMode": true
+  "security": {
+    "auth": {
+      "selectedType": "oauth-personal"
+    }
+  },
+  "privacy": {
+    "usageStatisticsEnabled": false
+  },
+  "tools": {
+    "useRipgrep": true
+  }
 }
