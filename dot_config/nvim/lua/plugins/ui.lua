@@ -361,7 +361,9 @@ return {
       table.insert(keys, 5, { icon = " ", key = "p", action = ":ene | normal p", desc = "New File (Paste)", hidden = true })
       -- stylua: ignore end
 
-      opts.dashboard.preset.header = [[
+      local headers = {
+        nil, -- default header
+        [[
                                                                    
       ████ ██████           █████      ██                    
      ███████████             █████                            
@@ -369,8 +371,8 @@ return {
     █████████  ███    █████████████ █████ ██████████████  
    █████████ ██████████ █████████ █████ █████ ████ █████  
  ███████████ ███    ███ █████████ █████ █████ ████ █████ 
-██████  █████████████████████ ████ █████ █████ ████ ██████]]
-      opts.dashboard.preset.header = [[
+██████  █████████████████████ ████ █████ █████ ████ ██████]],
+        [[
                                                            Z
       █████                      ████     ██         z  
      █████                        ████                   
@@ -378,14 +380,33 @@ return {
     ███    ████     ██  ███████████ ███ ████████ 
    ███    ████   ██    ████████████ ███ ███ ██ ███ 
  █████████     ██ ██         ██ █████ ███ ███ ██ ███ 
-███████████████████████████████  ███ ███ ███ ██ ███]]
+███████████████████████████████  ███ ███ ███ ██ ███]],
+      }
       local v = vim.version()
       opts.dashboard.preset.header = vim.g.user_is_termux and ("NVIM v%s.%s.%s"):format(v.major, v.minor, v.patch)
-        or nil
+        or headers[math.random(#headers)]
 
       opts.dashboard.sections = {
         {}, -- top padding for header
-        { section = "header" },
+        function() -- header
+          if
+            vim.g.user_is_termux
+            or vim.fn.executable("npx") == 0
+            or not (vim.uv.cwd() == U.path.HOME or Snacks.git.get_root()) -- frequently used dirs
+          then
+            return { section = "header" }
+          end
+          return {
+            section = "terminal",
+            -- npx -y oh-my-logo@latest "NEOVIM" --filled --letter-spacing 0 --gallery
+            cmd = ('npx -y oh-my-logo@latest "NEOVIM" %s --filled --letter-spacing 0'):format(
+              vim.startswith(vim.g.colors_name or "", "tokyonight") and "purple" or "nebula" -- random palettes?
+            ),
+            ttl = 3 * 24 * 60 * 60, -- cache for 3 days
+            height = 10,
+            indent = 5,
+          } --[[@as snacks.dashboard.Item]]
+        end,
         { section = "keys", padding = 1 },
         {
           icon = " ",
