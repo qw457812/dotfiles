@@ -149,7 +149,7 @@ return {
         keymap = {
           ["<Tab>"] = {
             "snippet_forward",
-            LazyVim.cmp.map({ "ai_accept" }),
+            LazyVim.cmp.map({ "ai_nes", "ai_accept" }),
             -- "select_next",
             -- H.actions.pum_next,
             function(cmp)

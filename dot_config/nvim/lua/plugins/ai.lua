@@ -1,6 +1,60 @@
 ---@type LazySpec
 return {
   {
+    "neovim/nvim-lspconfig",
+    opts = {
+      servers = {
+        copilot = {
+          root_dir = function(bufnr, on_dir)
+            local root = LazyVim.root({ buf = bufnr })
+            on_dir(root ~= vim.uv.cwd() and root or vim.fs.root(bufnr, vim.lsp.config.copilot.root_markers))
+          end,
+        },
+      },
+    },
+  },
+  {
+    "neovim/nvim-lspconfig",
+    opts = function()
+      U.toggle.ai_cmps.copilot = Snacks.toggle({
+        name = "copilot-language-server",
+        get = function()
+          return vim.lsp.is_enabled("copilot")
+        end,
+        set = function(state)
+          vim.lsp.enable("copilot", state)
+        end,
+      })
+    end,
+  },
+  {
+    "folke/sidekick.nvim",
+    optional = true,
+    event = "LazyFile",
+    keys = function(_, keys)
+      if vim.g.user_distinguish_ctrl_i_tab or vim.g.user_is_termux then
+        table.insert(keys, {
+          "<tab>",
+          LazyVim.cmp.map({ "ai_nes" }, function()
+            vim.cmd("wincmd w")
+          end),
+          desc = "Jump/Apply Next Edit Suggestion or Next Window (sidekick)",
+        })
+      end
+      return keys
+    end,
+    ---@module "sidekick"
+    ---@type sidekick.Config
+    opts = {
+      nes = {
+        clear = {
+          esc = false, -- clear_ui_esc
+        },
+      },
+    },
+  },
+
+  {
     "zbirenbaum/copilot.lua",
     optional = true,
     opts = {
@@ -14,8 +68,8 @@ return {
     "zbirenbaum/copilot.lua",
     optional = true,
     opts = function()
-      U.toggle.ai_cmps.copilot = Snacks.toggle({
-        name = "Copilot",
+      U.toggle.ai_cmps.copilot_lua = Snacks.toggle({
+        name = "copilot.lua",
         get = function()
           return not require("copilot.client").is_disabled()
         end,

@@ -7,6 +7,10 @@ if LazyVim.has_extra("ai.copilot-lsp") then
     LazyVim.error("Please disable the `ai.copilot-native` extra if you want to use `ai.copilot-lsp`")
     return {}
   end
+  if LazyVim.has_extra("ai.sidekick") then
+    LazyVim.error("Please disable the `ai.sidekick` extra if you want to use `ai.copilot-lsp`")
+    return {}
+  end
 
   if not vim.lsp.inline_completion then
     if not LazyVim.has_extra("coding.blink") then
@@ -40,7 +44,7 @@ return {
     end,
     opts = function()
       U.toggle.ai_cmps.copilot_lsp = Snacks.toggle({
-        name = "Copilot LSP",
+        name = "copilot-lsp",
         get = function()
           return vim.lsp.is_enabled("copilot_ls")
         end,
@@ -57,8 +61,8 @@ return {
           servers = {
             copilot_ls = {
               root_dir = function(bufnr, on_dir)
-                -- on_dir(vim.fs.root(bufnr, vim.lsp.config.copilot.root_markers))
-                on_dir(LazyVim.root.get({ normalize = true, buf = bufnr }))
+                local root = LazyVim.root({ buf = bufnr })
+                on_dir(root ~= vim.uv.cwd() and root or vim.fs.root(bufnr, vim.lsp.config.copilot.root_markers))
               end,
               handlers = {
                 didChangeStatus = function(err, res, ctx)

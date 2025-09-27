@@ -315,6 +315,10 @@ function M.clear_ui_esc(opts)
     something_done = true
   elseif package.loaded["copilot-lsp.nes"] and vim.b.nes_state then
     require("copilot-lsp.nes").clear()
+    something_done = true
+  elseif package.loaded["sidekick"] and require("sidekick.nes").have() then
+    require("sidekick").clear()
+    something_done = true
   elseif opts.close then
     if U.is_floating_win(0, { zen = false }) then
       opts.close()
