@@ -4,7 +4,7 @@ return {
     "neovim/nvim-lspconfig",
     ---@type PluginLspOpts
     opts = {
-      ---@type table<string, vim.lsp.Config>
+      ---@type table<string, lazyvim.lsp.Config|boolean>
       servers = {
         lua_ls = {
           mason = not vim.g.user_is_termux and nil, -- run `pkg install lua-language-server` on termux

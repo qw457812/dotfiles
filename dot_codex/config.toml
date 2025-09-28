@@ -1,6 +1,7 @@
 # https://github.com/openai/codex/blob/main/docs/config.md
 
-model = "openai/gpt-5"
+# model = "openai/gpt-5"
+model = "openai/gpt-5-codex"
 model_provider = "openrouter"
 model_reasoning_effort = "high"
 approval_policy = "on-request"

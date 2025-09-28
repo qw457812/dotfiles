@@ -1,5 +1,5 @@
 {
-  "CopilotChat.nvim": { "branch": "main", "commit": "acd1e6d38d216289cd0748808da25dfc66015612" },
+  "CopilotChat.nvim": { "branch": "main", "commit": "2f3e07398ba81ccc0cf3d1fca9805aaca126264e" },
   "LazyVim": { "branch": "main", "commit": "b8899781516da71ba0f63afa93fb4a6b25dff144" },
   "SchemaStore.nvim": { "branch": "main", "commit": "fea7b3eb30d6e7261529ae7e8e94bf717f9c428f" },
   "Trans.nvim": { "branch": "v2", "commit": "3ebcd7b785dba7faec577b58606eb8a1c46b6260" },
@@ -10,7 +10,7 @@
   "blink-cmp-env": { "branch": "main", "commit": "99af62c1f9aa46005e8f50ad4ccee581946546ca" },
   "blink-cmp-spell": { "branch": "master", "commit": "2bd0e0d5e7735c047e72b6918a0458f3e8fadaba" },
   "blink-cmp-yanky": { "branch": "main", "commit": "473b987c2a7d80cca116f6faf087dba4dbfbb3c5" },
-  "blink-ripgrep.nvim": { "branch": "main", "commit": "8a87f2735033ddffa2a247bf061ab396e684651a" },
+  "blink-ripgrep.nvim": { "branch": "main", "commit": "498c73553077b9f3b802eec0e90fdfdd33658f92" },
   "blink.cmp": { "branch": "main", "commit": "ec28f71b59ee5549bfac16c49008fea40b66b1c5" },
   "blink.compat": { "branch": "main", "commit": "1454f14a8d855a578ceeba77c62538fa1459a67c" },
   "blink_cmp_kitty": { "branch": "main", "commit": "baaa3f1cd4a75c30b13f08bd98a4ba6f8cbd4df9" },
@@ -27,7 +27,7 @@
   "coerce.nvim": { "branch": "main", "commit": "de8ad1663ba467003b90c79eaf5b8105964dd6f5" },
   "colorful-menu.nvim": { "branch": "master", "commit": "d5b97d247528be308b6b69d96b5950a30e470f3d" },
   "conform.nvim": { "branch": "master", "commit": "3bad87250ed85246fe8c5bc10005ab5a6289ae4c" },
-  "conjure": { "branch": "main", "commit": "5f9171a62ec5bf6786608a7fde57dad64d497d54" },
+  "conjure": { "branch": "main", "commit": "45abc74e49acdd671603cb798bf9f28bc055f37a" },
   "coop.nvim": { "branch": "main", "commit": "85986a6f7390d1362864708dcba097ba0e6b8d39" },
   "crates.nvim": { "branch": "main", "commit": "ac9fa498a9edb96dc3056724ff69d5f40b898453" },
   "csgithub.nvim": { "branch": "master", "commit": "695f7c30433c87fc45d0af116fd5bfdc65d1b7fe" },
@@ -59,7 +59,7 @@
   "mason-lspconfig.nvim": { "branch": "main", "commit": "f760507df8c49a4bf46a4d12e1fc616797508979" },
   "mason-nvim-dap.nvim": { "branch": "main", "commit": "86389a3dd687cfaa647b6f44731e492970034baa" },
   "mason.nvim": { "branch": "main", "commit": "b3689a41dd77e5294498dba9757fb22cc80cbebd" },
-  "mcphub.nvim": { "branch": "main", "commit": "5e39057c4405bc7b83ef9fd38a37d18c9330e403" },
+  "mcphub.nvim": { "branch": "main", "commit": "8ff40b5edc649959bb7e89d25ae18e055554859a" },
   "mini.ai": { "branch": "main", "commit": "e0d00c227112e942ed2789dd4c21d651002831c0" },
   "mini.align": { "branch": "main", "commit": "be20e745cfa549009d1867bf55381602810250da" },
   "mini.diff": { "branch": "main", "commit": "faecf54385bad761d8f3f3096c6c0ea2a6e73123" },
@@ -109,7 +109,7 @@
   "py-requirements.nvim": { "branch": "main", "commit": "f48846401504da04e195abcf5766ea1de4576fad" },
   "refactoring.nvim": { "branch": "master", "commit": "74b608dfee827c2372250519d433cc21cb083407" },
   "render-markdown.nvim": { "branch": "main", "commit": "9ab9dade85d8c7d411cc89b592028da3d1b7955a" },
-  "rustaceanvim": { "branch": "master", "commit": "8947b1f941f63cb3d618ebe04e07278bf00714df" },
+  "rustaceanvim": { "branch": "master", "commit": "7c9271934d926969e920f7da932da6ba234b1e5a" },
   "sidekick.nvim": { "branch": "main", "commit": "242b2bd216191c151d24f665cc8f596cb63288ea" },
   "smart-splits.nvim": { "branch": "master", "commit": "652fbde8a997b9c9d32030dfaf2e7e1319dda7a3" },
   "smart-translate.nvim": { "branch": "main", "commit": "493a6911b7ff71af4e0d13ac21c9a400a46f2095" },
@@ -140,5 +140,5 @@
   "yanky.nvim": { "branch": "main", "commit": "04775cc6e10ef038c397c407bc17f00a2f52b378" },
   "yazi-flavors": { "branch": "main", "commit": "2d73b79da7c1a04420c6c5ef0b0974697f947ef6" },
   "yazi-plugins": { "branch": "main", "commit": "d1c8baab86100afb708694d22b13901b9f9baf00" },
-  "yazi.nvim": { "branch": "main", "commit": "a584418372290e14fbc33f8f7d4e2fad064ac847" }
+  "yazi.nvim": { "branch": "main", "commit": "9811dbc61c81a76b3665f174f5f7a20dd5c5dccb" }
 }

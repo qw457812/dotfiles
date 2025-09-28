@@ -4,22 +4,27 @@ return {
     "neovim/nvim-lspconfig",
     ---@param opts PluginLspOpts
     opts = function(_, opts)
-      if opts.servers.copilot then
-        opts.servers.copilot.root_dir = function(bufnr, on_dir)
+      local servers = opts.servers
+      if servers.copilot then
+        servers.copilot = servers.copilot == true and {} or servers.copilot
+
+        servers.copilot.root_dir = function(bufnr, on_dir)
           local root = LazyVim.root({ buf = bufnr })
           on_dir(root ~= vim.uv.cwd() and root or vim.fs.root(bufnr, vim.lsp.config.copilot.root_markers))
         end
-      end
 
-      U.toggle.ai_cmps.copilot = Snacks.toggle({
-        name = "copilot-language-server",
-        get = function()
-          return vim.lsp.is_enabled("copilot")
-        end,
-        set = function(state)
-          vim.lsp.enable("copilot", state)
-        end,
-      })
+        if servers.copilot.enabled ~= false then
+          U.toggle.ai_cmps.copilot = Snacks.toggle({
+            name = "copilot-language-server",
+            get = function()
+              return vim.lsp.is_enabled("copilot")
+            end,
+            set = function(state)
+              vim.lsp.enable("copilot", state)
+            end,
+          })
+        end
+      end
     end,
   },
   {
@@ -48,7 +53,7 @@ return {
       },
     },
     specs = {
-      vim.g.ai_cmp and {
+      vim.g.ai_cmp and not LazyVim.has_extra("ai.copilot") and {
         "saghen/blink.cmp",
         optional = true,
         dependencies = "fang2hou/blink-copilot",

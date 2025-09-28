@@ -20,6 +20,11 @@ return {
       {
         "<leader>qr",
         function()
+          if vim.g.neovide then
+            LazyVim.warn("Neovide doesn't support `:restart` yet", { title = "Restart Nvim" })
+            return
+          end
+
           for _, buf in ipairs(vim.api.nvim_list_bufs()) do
             if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].modified then
               LazyVim.warn("Please save or discard changes first", { title = "Restart Nvim" })
