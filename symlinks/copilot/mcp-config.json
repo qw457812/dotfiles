@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "exa": {
+      "type": "http",
+      "url": "https://mcp.exa.ai/mcp",
+      "headers": {},
+      "tools": [
+        "get_code_context_exa"
+      ]
+    }
+  }
+}
