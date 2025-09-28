@@ -1,10 +1,3 @@
-# Cursor styles
-set -gx fish_vi_force_cursor 1
-set -gx fish_cursor_default block
-set -gx fish_cursor_insert line blink
-set -gx fish_cursor_visual block
-set -gx fish_cursor_replace_one underscore
-
 # Path
 fish_add_path ~/go/bin
 set -q TERMUX_VERSION; or fish_add_path ~/.cargo/bin # https://github.com/rust-lang/rustup/blob/5e59246c45756b860ffa2c0e471e9989f0d56ff8/doc/user-guide/src/installation/already-installed-rust.md?plain=1#L63-L66
@@ -13,13 +6,9 @@ fish_add_path ~/.local/bin
 fish_add_path "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
 fish_add_path "$HOME/Library/Application Support/Coursier/bin" # scalafmt
 
-# Fish
-set -g fish_greeting
-set fish_emoji_width 2
-alias ssh "TERM=xterm-256color command ssh"
-alias mosh "TERM=xterm-256color command mosh"
-
+# Exports
 # set -gx TERM xterm-256color # https://github.com/gpakosz/.tmux
+set -q NEOVIDE_FRAME; and set -gx TERM xterm-256color
 set -gx LANG en_US.UTF-8
 set -gx LC_ALL en_US.UTF-8
 set -gx LC_CTYPE en_US.UTF-8
@@ -28,11 +17,6 @@ set -gx EDITOR (which nvim)
 set -gx VISUAL $EDITOR
 set -gx SUDO_EDITOR $EDITOR
 
-set -g __proxy_ip "127.0.0.1"
-set -g __http_proxy_port 10808
-set -g __socks_proxy_port $__http_proxy_port
-
-# Exports
 if status is-interactive # https://github.com/ndonfris/fish-lsp/blob/1be77fcfa37d9d3877994f14163c7faacf7a533e/fish_files/get-documentation.fish
     # set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
     set -x MANPAGER 'nvim --cmd "lua vim.g.manpager = true" -c "nnoremap d <C-d>|lua vim.defer_fn(function() vim.api.nvim_command(\"silent! nunmap dd|nnoremap u <C-u>\") end, 500)" +Man!'
@@ -42,6 +26,28 @@ set -x EZA_MIN_LUMINANCE 50
 set -x DYLD_LIBRARY_PATH /opt/homebrew/opt/librime/lib # https://github.com/wlh320/rime-ls#macos
 set -x RIPGREP_CONFIG_PATH $HOME/.ripgreprc
 set -x LG_CONFIG_FILE $HOME/.config/lazygit/config.yml,$HOME/.cache/nvim/lazygit-theme.yml
+
+# ==============================================================================
+# EXIT IF NOT INTERACTIVE
+# ==============================================================================
+status is-interactive; or exit
+
+# Cursor styles
+set -gx fish_vi_force_cursor 1
+set -gx fish_cursor_default block
+set -gx fish_cursor_insert line blink
+set -gx fish_cursor_visual block
+set -gx fish_cursor_replace_one underscore
+
+# Fish
+set -g fish_greeting
+set fish_emoji_width 2
+alias ssh "TERM=xterm-256color command ssh"
+alias mosh "TERM=xterm-256color command mosh"
+
+set -g __proxy_ip "127.0.0.1"
+set -g __http_proxy_port 10808
+set -g __socks_proxy_port $__http_proxy_port
 
 # Files & Directories
 set -l ll_cmd 'eza --all --color=always --color-scale all --icons=always --long --group --time-style=iso --git'
@@ -239,7 +245,9 @@ if type -q claude
     # claude mcp add -s user sequential-thinking -- npx -y @modelcontextprotocol/server-sequential-thinking
     # claude mcp add -s user -t http deepwiki https://mcp.deepwiki.com/mcp
     # claude mcp add -s user --transport http grep https://mcp.grep.app
-    # claude mcp add -s user exa -e EXA_API_KEY=$EXA_API_KEY -- npx -y exa-mcp-server
+    # claude mcp add -s user exa -e EXA_API_KEY=$EXA_API_KEY -- npx -y exa-mcp-server --tools=get_code_context_exa
+    # claude mcp add -s user exa -e EXA_API_KEY=$EXA_API_KEY -- npx -y exa-mcp-server --tools=deep_researcher_start,deep_researcher_check
+    # claude mcp add -s user -t http exa https://mcp.exa.ai/mcp
     # claude mcp add -s user firecrawl -e FIRECRAWL_API_KEY=$FIRECRAWL_API_KEY -- npx -y firecrawl-mcp
     # claude mcp add -s user codex -- codex mcp serve
     abbr cl claude
@@ -311,9 +319,4 @@ if set -q TERMUX_VERSION
 
     # Auto start tmux on Termux
     set -q TMUX; or tmux attach || tmux
-else
-    # # using TUN for now
-    # if status is-interactive; or set -q NEOVIDE_FRAME
-    #     term_proxy_on
-    # end
 end
