@@ -69,7 +69,7 @@
              ; :prev_app                {:shell "/opt/homebrew/bin/yabai -m window --focus recent || open -g hammerspoon://cmdTab"}
              :prev_app                {:shell "open -g hammerspoon://prevApp"}
              :open-default-terminal   {:shell "open /Applications/kitty.app"} ; kitty.app, WezTerm.app
-             :open-default-browser    {:shell "open \"/Applications/Brave Browser.app\""} ; Brave Browser.app, Dia.app, Google Chrome.app
+             :open-default-browser    {:shell "open \"/Applications/Helium.app\""} ; Brave Browser.app, Helium.app, Google Chrome.app
              :home_dir                [{:key  :grave_accent_and_tilde
                                         :modi [:left_shift]
                                         :lazy true} {:key :slash}]
@@ -1078,10 +1078,11 @@
            ;; TODO spacebar
            [:j [:open "https://google.com/search?q=$(pbpaste)"]]
            ;; [:f [:opena-file "/Applications/Google Chrome.app" "chrome://newtab/"]]
-           [:f [:opena-file "/Applications/Brave Browser.app" "brave://newtab/"]]
+           ;; [:f [:opena-file "/Applications/Brave Browser.app" "brave://newtab/"]]
+           [:f [:opena-file "/Applications/Helium.app" "helium://newtab/"]]
            ;; [:e [:opena-file "/Applications/Google Chrome.app" "chrome://extensions/"]]
-           ;; [:e [:opena-file "/Applications/Dia.app" "dia://extensions/"]]
-           [:e [:opena-file "/Applications/Brave Browser.app" "brave://extensions/"]]
+           ;; [:e [:opena-file "/Applications/Brave Browser.app" "brave://extensions/"]]
+           [:e [:opena-file "/Applications/Helium.app" "helium://extensions/"]]
            [:d [:open "https://www.deepl.com/translator"]]
            ;; https://github.com/pqrs-org/Karabiner-Elements/issues/2535
            ;; [:s :!Cc nil {:delayed {:invoked [:open "https://translate.google.com/?sl=en&tl=zh-CN&text=$(pbpaste)&op=translate"]} :params {:delay 30}}]
@@ -1203,7 +1204,7 @@
            [:0 :!CS0]
            [:hyphen :!CShyphen]
            [:equal_sign :!CSequal_sign]
-           [:w :!CSw [:!Chrome :!Brave :!Dia :!Safari :!CitrixViewer]] ; accidentally close all tabs
+           [:w :!CSw [:!Chrome :!Brave :!Helium :!Dia :!Safari :!CitrixViewer]] ; accidentally close all tabs
            [:e :!CSe]
            [:r :!CSr]
            [:t :!CSt]
@@ -2311,16 +2312,16 @@
   :create-tab-by-cmd-n-app
   ["^com\\.microsoft\\.VSCode(Insiders)?$" "^com\\.todesktop\\.230313mzl4w4u92$"]
   :line-navigating-by-cmd-arrow-app
-  ["^com\\.google\\.Chrome$" "^com\\.brave\\.Browser$" "^company\\.thebrowser\\.dia$"
-   "^com\\.tencent\\.xinWeChat$"]
+  ["^com\\.google\\.Chrome$" "^com\\.brave\\.Browser$" "^net\\.imput\\.helium$"
+   "^company\\.thebrowser\\.dia$" "^com\\.tencent\\.xinWeChat$"]
   :translate-by-opt-shift-a-app
-  ["^com\\.google\\.Chrome$" "^com\\.brave\\.Browser$" "^company\\.thebrowser\\.dia$"
-   "^com\\.apple\\.Safari$"
+  ["^com\\.google\\.Chrome$" "^com\\.brave\\.Browser$" "^net\\.imput\\.helium$"
+   "^company\\.thebrowser\\.dia$" "^com\\.apple\\.Safari$"
    "^com\\.jetbrains\\.intellij\\.ce$" "^com\\.jetbrains\\.pycharm\\.ce(-EAP)?$"]
   :tmux-autostart-terminals
   ["^org\\.alacritty$" "^com\\.github\\.wez\\.wezterm$" "^net\\.kovidgoyal\\.kitty$"]
   :default-terminal ["^net\\.kovidgoyal\\.kitty$"]
-  :default-browser  ["^com\\.brave\\.Browser$"]
+  :default-browser  ["^net\\.imput\\.helium$"]
   :Terminals        ["^com\\.apple\\.Terminal$"
                      "^com\\.googlecode\\.iterm2$"
                      "^co\\.zeit\\.hyperterm$" "^co\\.zeit\\.hyper$"
@@ -2356,6 +2357,7 @@
   :LibreOffice      ["^org\\.libreoffice\\.script$"]
   :Chrome           ["^com\\.google\\.Chrome$"]
   :Brave            ["^com\\.brave\\.Browser$"]
+  :Helium           ["^net\\.imput\\.helium$"]
   :Dia              ["^company\\.thebrowser\\.dia$"]
   :Safari           ["^com\\.apple\\.Safari$"]
   :Firefoxes        ["^org\\.mozilla\\.firefox$"
