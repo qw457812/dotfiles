@@ -171,7 +171,6 @@ return {
                 mode = "t",
                 desc = "Close",
               },
-              claude_unfocus = { "<esc>", U.keymap.clear_ui_or_unfocus_esc, desc = "Clear UI or Unfocus (Claude)" },
               -- copied from: https://github.com/folke/snacks.nvim/blob/bc0630e43be5699bb94dadc302c0d21615421d93/lua/snacks/terminal.lua#L49-L64
               term_normal = {
                 "<esc>",

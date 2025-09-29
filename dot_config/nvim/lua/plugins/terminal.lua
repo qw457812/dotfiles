@@ -51,19 +51,26 @@ return {
       terminal = {
         win = {
           -- position = "float", -- alternative: style = "float"
+          actions = {
+            blur = function(self)
+              if self:is_floating() then
+                self:hide()
+              elseif self:valid() and vim.api.nvim_get_current_win() == self.win then
+                vim.cmd.wincmd("p")
+              end
+            end,
+          },
           keys = {
             t_c_q = { "<c-q>", "hide", mode = "t" },
-            t_c_o = {
-              "<c-o>",
+            t_c_o = { "<c-o>", "blur", mode = "t" },
+            n_esc = {
+              "<esc>",
               function(self)
-                if self:is_floating() then
-                  self:hide()
-                elseif self:valid() and vim.api.nvim_get_current_win() == self.win then
-                  vim.cmd.wincmd("p")
+                if not U.keymap.clear_ui_esc() then
+                  self:execute("blur")
                 end
               end,
-              mode = "t",
-              desc = "Blur",
+              desc = "Clear UI or Blur",
             },
           },
         },
