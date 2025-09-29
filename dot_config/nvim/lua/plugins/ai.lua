@@ -44,6 +44,7 @@ return {
       -- stylua: ignore
       vim.list_extend(keys, {
         { "<leader>ax", function() require("sidekick.cli").toggle({ name = "codex" }) end, desc = "Codex (Sidekick)" },
+        { "<leader>asc", function() require("sidekick.cli").toggle({ name = "claude" }) end, desc = "Claude" },
         { "<leader>ass", function() require("sidekick.cli").toggle() end, desc = "CLI" },
         { "<leader>asp", function() require("sidekick.cli").select_prompt() end, desc = "Prompt", mode = { "n", "v" } },
       })
@@ -55,6 +56,25 @@ return {
       nes = {
         clear = {
           esc = false, -- clear_ui_esc
+        },
+      },
+      cli = {
+        win = {
+          layout = vim.g.user_is_termux and "horizontal" or "vertical", ---@type "vertical" | "horizontal"
+          position = vim.g.user_is_termux and "bottom" or "right", ---@type "left"|"bottom"|"top"|"right"
+          ---@type table<string, sidekick.cli.Keymap|false>
+          keys = {
+            blur_n = {
+              "<esc>",
+              function(t)
+                if not U.keymap.clear_ui_esc() then
+                  t:blur()
+                end
+              end,
+              desc = "Clear UI or Blur",
+              mode = "n",
+            },
+          },
         },
       },
     },

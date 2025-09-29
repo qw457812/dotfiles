@@ -91,6 +91,13 @@ return {
       end
     end,
   },
+  {
+    "folke/sidekick.nvim",
+    opts = function()
+      vim.env.ANTHROPIC_BASE_URL = vim.env.CTOK_BASE_URL
+      vim.env.ANTHROPIC_AUTH_TOKEN = vim.env.CTOK_AUTH_TOKEN
+    end,
+  },
 
   -- TODO: breaking changes
   { "chrisgrieser/nvim-various-textobjs", optional = true, commit = "bf2133a" },

@@ -262,6 +262,24 @@ return {
   },
 
   {
+    "folke/sidekick.nvim",
+    optional = true,
+    ---@module "sidekick"
+    ---@type sidekick.Config
+    opts = {
+      cli = {
+        win = {
+          ---@type table<string, sidekick.cli.Keymap|false>
+          keys = {
+            [close_key] = { close_key, "hide", mode = "n" },
+            term_close = term_close_key and { term_close_key, "hide" } or nil,
+          },
+        },
+      },
+    },
+  },
+
+  {
     "nvim-neo-tree/neo-tree.nvim",
     optional = true,
     ---@module "neo-tree"

@@ -48,11 +48,26 @@ return {
     ---@module "snacks"
     ---@type snacks.Config
     opts = {
-      -- terminal = {
-      --   win = {
-      --     position = "float", -- alternative: style = "float"
-      --   },
-      -- },
+      terminal = {
+        win = {
+          -- position = "float", -- alternative: style = "float"
+          keys = {
+            t_c_q = { "<c-q>", "hide", mode = "t" },
+            t_c_o = {
+              "<c-o>",
+              function(self)
+                if self:is_floating() then
+                  self:hide()
+                elseif self:valid() and vim.api.nvim_get_current_win() == self.win then
+                  vim.cmd.wincmd("p")
+                end
+              end,
+              mode = "t",
+              desc = "Blur",
+            },
+          },
+        },
+      },
     },
   },
 
