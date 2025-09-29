@@ -67,6 +67,8 @@ Using this [commit](https://github.com/LazyVim/starter/commit/cb79b0e6a9d0ec8104
 - [willothy](https://github.com/willothy/nvim-config)
 - [nvim-zh/awesome-nvim-conf](https://github.com/nvim-zh/awesome-nvim-conf)
   > From Chinese nvim users.
+- [CRAG666](https://github.com/CRAG666/dotfiles/tree/a980b40d622d1821c11ac7d092523d438980c895/config/nvim)
+- [Bekaboo](https://github.com/Bekaboo/dot/tree/f6ac5bd33411b13c9be89331dea57c11f2553a08/.config/nvim)
 
 ## Lazy Tips
 

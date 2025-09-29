@@ -130,6 +130,11 @@ return {
 
   {
     "nvim-treesitter/nvim-treesitter",
+    ---@type lazyvim.TSConfig|{}
+    opts = { ensure_installed = { "kitty" } },
+  },
+  {
+    "nvim-treesitter/nvim-treesitter",
     opts = function()
       vim.filetype.add({
         filename = {
@@ -142,6 +147,7 @@ return {
         },
       })
 
+      vim.treesitter.language.register("kitty", "kitty")
       vim.treesitter.language.register("vim", "vifm")
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "vifm",
