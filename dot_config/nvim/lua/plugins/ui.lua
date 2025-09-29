@@ -223,6 +223,7 @@ return {
         -- used in blink.cmp
         kinds = {
           Claude = "󰛄 ", --  
+          OpenAI = " ", -- 󱥸 󰕖
           Gemini = " ", -- 󰫢
           Google = " ",
           Groq = " ",
@@ -243,7 +244,8 @@ return {
             { plugin = "CopilotChat.nvim", pattern = "copilot", icon = icons.Copilot, color = "azure" },
             { plugin = "claudecode.nvim", pattern = "claude", icon = icons.Claude, color = "orange" },
             { plugin = "codecompanion.nvim", pattern = "codecompanion", icon = " ", color = "purple" },
-            { plugin = "mcphub.nvim", icon = " ", color = "grey" },
+            { plugin = "mcphub.nvim", icon = " ", color = "grey" }, -- 
+            { pattern = "codex", icon = icons.OpenAI, color = "grey" },
           } --[[@as wk.IconRule[] ]],
         },
       } --[[@as wk.Opts]])

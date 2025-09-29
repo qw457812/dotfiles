@@ -84,7 +84,7 @@ return {
           else
             vim.schedule(expand)
           end
-          return true
+          return true -- no way to know whether expansion happened or not
         end,
         -- see: https://github.com/Saghen/blink.cmp/issues/569#issuecomment-2833362734
         scroll_list_up = function()
@@ -141,6 +141,11 @@ return {
         end,
       }
 
+      local ai_cmp = vim.g.ai_cmp
+      function H.is_inline_cmp_possible()
+        return not ai_cmp and vim.fn.win_gettype() ~= "command" and vim.bo.filetype ~= "copilot-chat"
+      end
+
       return U.extend_tbl(opts, {
         appearance = {
           nerd_font_variant = "normal",
@@ -150,19 +155,37 @@ return {
           ["<Tab>"] = {
             "snippet_forward",
             LazyVim.cmp.map({ "ai_nes", "ai_accept" }),
-            -- "select_next",
-            -- H.actions.pum_next,
             function(cmp)
-              if
-                has_words_before()
-                or vim.fn.getcmdwintype() == ":" -- do not fallback to popup menu in command-line window
-              then
+              if H.is_inline_cmp_possible() then
+                -- we don't know whether Tab will select the next item or accept the inline completion
+                return
+              end
+              return cmp.select_next() or H.actions.pum_next(cmp)
+            end,
+            function(cmp)
+              if has_words_before() then
                 return cmp.show()
+              end
+            end,
+            function()
+              -- the same behavior as normal buffer for command-line window
+              if vim.fn.getcmdwintype() == ":" then
+                vim.api.nvim_feedkeys(vim.keycode("<Tab>"), "n", false) -- insert a tab character
+                return true -- do not fallback, which would open the popup menu ("q:")
               end
             end,
             "fallback",
           },
-          ["<S-Tab>"] = { "snippet_backward", "select_prev", H.actions.pum_prev, "fallback" },
+          ["<S-Tab>"] = {
+            "snippet_backward",
+            function(cmp)
+              if H.is_inline_cmp_possible() then
+                return
+              end
+              return cmp.select_prev() or H.actions.pum_prev(cmp)
+            end,
+            "fallback",
+          },
           ["<CR>"] = { "accept", H.actions.pum_accept, "fallback" },
           ["<C-n>"] = { "select_next", "show" },
           ["<C-p>"] = { "select_prev", "show" },
@@ -252,7 +275,7 @@ return {
             list = {
               selection = {
                 preselect = function()
-                  -- enable preselect in cmdwin, same behavior as in normal buffer
+                  -- enable preselect in cmdwin, the same behavior as in normal buffer
                   return vim.fn.win_gettype() == "command"
                 end,
               },
@@ -445,7 +468,7 @@ return {
               backend = {
                 use = "gitgrep-or-ripgrep",
                 ripgrep = {
-                  ignore_paths = { vim.uv.os_homedir() }, -- CPU usage
+                  ignore_paths = { vim.uv.os_homedir() }, -- reduce CPU usage
                   project_root_fallback = false,
                 },
               },

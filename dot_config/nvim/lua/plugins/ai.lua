@@ -41,6 +41,12 @@ return {
           desc = "Jump/Apply Next Edit Suggestions or Next Window (sidekick)",
         })
       end
+      -- stylua: ignore
+      vim.list_extend(keys, {
+        { "<leader>ax", function() require("sidekick.cli").toggle({ name = "codex" }) end, desc = "Codex (Sidekick)" },
+        { "<leader>ass", function() require("sidekick.cli").toggle() end, desc = "CLI" },
+        { "<leader>asp", function() require("sidekick.cli").select_prompt() end, desc = "Prompt", mode = { "n", "v" } },
+      })
       return keys
     end,
     ---@module "sidekick"
@@ -70,6 +76,17 @@ return {
           },
         },
       } or { import = "foobar", enabled = false }, -- dummy import
+      {
+        "folke/which-key.nvim",
+        opts = {
+          spec = {
+            {
+              mode = { "n", "v" },
+              { "<leader>as", group = "sidekick" },
+            },
+          },
+        },
+      },
     },
   },
 
