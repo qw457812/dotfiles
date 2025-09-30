@@ -9,6 +9,7 @@
   "permissions": {
     "allow": [
       "Bash(ls:*)",
+      "Bash(tree:*)",
       "Bash(find:*)",
       "Bash(grep:*)",
       "Bash(rg:*)",

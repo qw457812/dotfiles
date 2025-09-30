@@ -1101,6 +1101,7 @@
            [:z [:open "https://www.chezmoi.io/quick-start/"]]
            [:x [:open "https://learnxinyminutes.com/"]]
            [:p [:open "https://tiger-code.com/practice/advanced"]]
+           [:i [:open "https://ossinsight.io/"]]
            [:grave_accent_and_tilde [:open "https://github.com/qw457812/dotfiles"] [:!hhkb-bt :!glove80]]
            [:escape [:open "https://github.com/qw457812/dotfiles"] :hhkb-bt] ; see "For HHKB" below
            [:escape [:open "https://github.com/qw457812/dotfiles"] :glove80] ; see "For Glove80" below

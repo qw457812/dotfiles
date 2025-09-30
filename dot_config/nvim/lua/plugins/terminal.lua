@@ -53,10 +53,16 @@ return {
           -- position = "float", -- alternative: style = "float"
           actions = {
             blur = function(self)
+              if not self:valid() then
+                return
+              end
               if self:is_floating() then
                 self:hide()
-              elseif self:valid() and vim.api.nvim_get_current_win() == self.win then
+              elseif vim.api.nvim_get_current_win() == self.win then
                 vim.cmd.wincmd("p")
+                if vim.api.nvim_get_current_win() == self.win then
+                  vim.cmd.wincmd("w")
+                end
               end
             end,
           },

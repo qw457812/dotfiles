@@ -12,8 +12,10 @@ return {
         ---@type table<string, lazyvim.lsp.Config|boolean>
         servers = {
           fish_lsp = {
+            -- failed to install on termux
             -- ksb_pastebuf of kitty-scrollback.nvim
             enabled = not (vim.g.user_is_termux or vim.g.terminal_scrollback_pager),
+            mason = vim.fn.executable("fish-lsp") == 0, -- failed to install via mason, use `brew install fish-lsp` for now
             cmd_env = {
               -- HACK: prevent `bob update --all` from failing with: `Error: Neovim is currently running. Please close it before updating.`
               -- see: https://github.com/ndonfris/fish-lsp/blob/1be77fcfa37d9d3877994f14163c7faacf7a533e/fish_files/get-documentation.fish

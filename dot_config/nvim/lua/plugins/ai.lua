@@ -27,6 +27,7 @@ return {
       end
     end,
   },
+
   {
     "folke/sidekick.nvim",
     optional = true,
@@ -43,9 +44,15 @@ return {
       end
       -- stylua: ignore
       vim.list_extend(keys, {
+        { "<leader>aa", false },
+        { "<leader>an", false },
+        { "<leader>ap", false, mode = { "n", "v" } },
+        { "<c-.>", false, mode = { "n", "x", "i", "t" } },
+        { "<M-,>", function() require("sidekick.cli").focus() end, mode = { "n", "x", "t" }, desc = "Sidekick Switch Focus" },
         { "<leader>ax", function() require("sidekick.cli").toggle({ name = "codex" }) end, desc = "Codex (Sidekick)" },
         { "<leader>asc", function() require("sidekick.cli").toggle({ name = "claude" }) end, desc = "Claude" },
         { "<leader>ass", function() require("sidekick.cli").toggle() end, desc = "CLI" },
+        { "<leader>asn", function() require("sidekick.cli").select_tool() end, desc = "New Tool" },
         { "<leader>asp", function() require("sidekick.cli").select_prompt() end, desc = "Prompt", mode = { "n", "v" } },
       })
       return keys
@@ -73,6 +80,17 @@ return {
               end,
               desc = "Clear UI or Blur",
               mode = "n",
+            },
+          },
+        },
+        ---@type table<string, sidekick.cli.Tool.spec>
+        tools = {
+          ---@diagnostic disable-next-line: missing-fields
+          claude = {
+            env = {
+              __IS_CLAUDECODE_NVIM = "1", -- flag to disable claude code statusline in ~/.claude/settings.json
+              ANTHROPIC_BASE_URL = vim.env.CTOK_BASE_URL,
+              ANTHROPIC_AUTH_TOKEN = vim.env.CTOK_AUTH_TOKEN,
             },
           },
         },

@@ -267,6 +267,11 @@ if type -q claude
     abbr ccu "$ccusage"
     abbr ccum "$ccusage daily --breakdown"
     abbr ccub "$ccusage blocks"
+    if type -q claude-monitor # https://github.com/Maciek-roboblog/Claude-Code-Usage-Monitor
+        abbr ccm "claude-monitor --view realtime"
+        abbr ccmd "claude-monitor --view daily"
+        abbr ccmm "claude-monitor --view monthly"
+    end
     abbr ccstl (type -q bunx; and echo "bunx ccstatusline@latest"; or echo "npx ccstatusline@latest")
     abbr spec "uvx --from git+https://github.com/github/spec-kit.git specify init --script sh --ai claude --here"
     abbr cchistory "npx cchistory"

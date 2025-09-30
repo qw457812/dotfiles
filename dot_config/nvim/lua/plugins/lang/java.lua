@@ -38,7 +38,6 @@ return {
     "mfussenegger/nvim-jdtls",
     optional = true,
     opts = function(_, opts)
-      -- for multi-module projects with maven
       local root_markers = vim.list_extend({ { ".nvim.lua", ".lazy.lua" } }, vim.lsp.config.jdtls.root_markers)
 
       return U.extend_tbl(opts, {

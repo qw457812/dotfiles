@@ -831,6 +831,9 @@ return {
                 {
                   find = "vim%.schedule.*callback: .+/runtime/lua/vim/lsp/_folding_range%.lua:%d+: assertion failed!",
                 },
+                {
+                  find = "vim%.schedule.*callback: .+/runtime/lua/vim/lsp/_folding_range%.lua:%d+: Invalid window id: %d+",
+                },
               },
             },
             opts = { skip = true },
