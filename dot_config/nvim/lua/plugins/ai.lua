@@ -45,15 +45,16 @@ return {
       -- stylua: ignore
       vim.list_extend(keys, {
         { "<leader>aa", false },
-        { "<leader>an", false },
+        { "<leader>as", false, mode = { "n", "v" } },
         { "<leader>ap", false, mode = { "n", "v" } },
         { "<c-.>", false, mode = { "n", "x", "i", "t" } },
         { "<M-,>", function() require("sidekick.cli").focus() end, mode = { "n", "x", "t" }, desc = "Sidekick Switch Focus" },
-        { "<leader>ax", function() require("sidekick.cli").toggle({ name = "codex" }) end, desc = "Codex (Sidekick)" },
+        { "<leader>ak", function() require("sidekick.cli").toggle() end, desc = "Sidekick Toggle CLI" },
+        { "<leader>ass", function() require("sidekick.cli").select() end, desc = "Select CLI" },
+        { "<leader>ass", function() require("sidekick.cli").send() end, mode = "v", desc = "Send Visual Selection" },
+        { "<leader>asp", function() require("sidekick.cli").prompt() end, mode = { "n", "v" }, desc = "Select Prompt" },
         { "<leader>asc", function() require("sidekick.cli").toggle({ name = "claude" }) end, desc = "Claude" },
-        { "<leader>ass", function() require("sidekick.cli").toggle() end, desc = "CLI" },
-        { "<leader>asn", function() require("sidekick.cli").select_tool() end, desc = "New Tool" },
-        { "<leader>asp", function() require("sidekick.cli").select_prompt() end, desc = "Prompt", mode = { "n", "v" } },
+        { "<leader>asx", function() require("sidekick.cli").toggle({ name = "codex" }) end, desc = "Codex" },
       })
       return keys
     end,
@@ -67,8 +68,7 @@ return {
       },
       cli = {
         win = {
-          layout = vim.g.user_is_termux and "horizontal" or "vertical", ---@type "vertical" | "horizontal"
-          position = vim.g.user_is_termux and "bottom" or "right", ---@type "left"|"bottom"|"top"|"right"
+          layout = vim.g.user_is_termux and "bottom" or "right", ---@type "float"|"left"|"bottom"|"top"|"right"
           ---@type table<string, sidekick.cli.Keymap|false>
           keys = {
             blur_n = {
@@ -82,6 +82,11 @@ return {
               mode = "n",
             },
           },
+        },
+        ---@type sidekick.cli.Mux
+        mux = {
+          backend = "tmux",
+          enabled = true,
         },
         ---@type table<string, sidekick.cli.Tool.spec>
         tools = {
@@ -114,15 +119,31 @@ return {
           },
         },
       } or { import = "foobar", enabled = false }, -- dummy import
-      {
-        "folke/which-key.nvim",
-        opts = {
-          spec = {
-            {
-              mode = { "n", "v" },
-              { "<leader>as", group = "sidekick" },
-            },
-          },
+    },
+  },
+  {
+    "folke/sidekick.nvim",
+    optional = true,
+    opts = function()
+      U.toggle.ai_cmps.sidekick_nes = Snacks.toggle({
+        name = "Sidekick NES",
+        get = function()
+          -- https://github.com/folke/sidekick.nvim/blob/302cec770ca0a4b7dfafd7879034d33320592b33/lua/sidekick/nes/init.lua#L53-L55
+          return require("sidekick.nes").enabled
+        end,
+        set = function(state)
+          require("sidekick.nes").enable(state)
+        end,
+      })
+    end,
+  },
+  {
+    "folke/which-key.nvim",
+    opts = {
+      spec = {
+        {
+          mode = { "n", "v" },
+          { "<leader>as", group = "sidekick" },
         },
       },
     },

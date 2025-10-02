@@ -63,6 +63,7 @@ return {
 
   {
     "alex-popov-tech/store.nvim",
+    enabled = not vim.g.user_is_termux, -- error on termux
     cmd = "Store",
     keys = {
       { "<leader>lh", "<cmd>Store<cr>", desc = "Plugin Hub" },
@@ -70,9 +71,11 @@ return {
     ---@module "store"
     ---@type UserConfig
     opts = {
-      width = vim.g.user_is_termux and vim.o.columns or 0.95,
-      height = vim.g.user_is_termux and vim.o.lines or 0.9,
-      list_fields = { "is_installed", "is_installable", "stars", "full_name", "pushed_at", "forks", "issues", "tags" },
+      width = 0.95,
+      height = 0.9,
+      keybindings = {
+        hover = { "gk" },
+      },
     },
   },
 }

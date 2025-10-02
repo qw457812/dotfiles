@@ -94,7 +94,9 @@ return {
               vim.g.copilot_nes_debounce = 500
 
               if not vim.g.ai_cmp then
-                vim.lsp.inline_completion.enable()
+                vim.schedule(function()
+                  vim.lsp.inline_completion.enable()
+                end)
               end
 
               -- HACK: `vim.g.ai_cmp` changed to false after `:LazyExtras` even when `ai.copilot-native` is not enabled

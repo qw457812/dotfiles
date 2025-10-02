@@ -289,6 +289,12 @@ return {
           transparent = vim.g.user_transparent_background,
         },
         no_italic = no_italic,
+        ---@diagnostic disable-next-line: missing-fields
+        lsp_styles = {
+          inlay_hints = {
+            background = not vim.g.user_transparent_background,
+          },
+        },
         -- check `:=require("catppuccin.lib.detect_integrations").create_integrations_table()`
         auto_integrations = _G.U == nil, -- disabled due to _G.U issues
         integrations = {

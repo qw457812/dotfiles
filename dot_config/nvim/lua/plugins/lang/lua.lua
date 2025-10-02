@@ -48,7 +48,6 @@ return {
             },
           },
         },
-        stylua = { enabled = false }, -- prevent mason-lspconfig.nvim from automatically enabling it since we use conform.nvim
       },
     },
   },

@@ -322,6 +322,8 @@ if set -q TERMUX_VERSION
     abbr dl 'cd ~/storage/downloads'
     abbr rime 'cd ~/storage/shared/Android/rime'
 
-    # Auto start tmux on Termux
+    # ==============================================================================
+    # AUTO START TMUX ON TERMUX
+    # ==============================================================================
     set -q TMUX; or tmux attach || tmux
 end

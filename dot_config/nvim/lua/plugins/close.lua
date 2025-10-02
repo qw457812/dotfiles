@@ -27,6 +27,7 @@ local function close_buffer_or_window_or_exit()
   end
 
   -- https://github.com/nvim-neo-tree/neo-tree.nvim/blob/42caaf5c3b7ca346ab278201151bb878006a6031/lua/neo-tree/utils/init.lua#L533
+  -- https://github.com/folke/sidekick.nvim/commit/d72c611aa37b24d8ad401c4029d8946e27f53475
   local function non_real_file()
     return vim.bo.buftype ~= ""
   end

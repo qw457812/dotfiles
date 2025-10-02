@@ -22,5 +22,37 @@ return {
       },
       -- blend = { factor = vim.g.user_transparent_background and 0 or nil },
     },
+    specs = {
+      {
+        "folke/sidekick.nvim",
+        optional = true,
+        opts = function()
+          vim.api.nvim_create_autocmd("User", {
+            pattern = "SidekickNesShow",
+            callback = function()
+              if U.toggle.is_diagnostic_virt_enabled == false then
+                return
+              end
+              -- see: https://github.com/rachartier/tiny-inline-diagnostic.nvim/blob/9d5b02aea0f53926db5967eb753b0a15defe99be/lua/tiny-inline-diagnostic/diagnostic.lua#L449-L462
+              if require("tiny-inline-diagnostic.diagnostic").user_toggle_state then
+                require("tiny-inline-diagnostic").disable()
+              end
+            end,
+          })
+
+          vim.api.nvim_create_autocmd("User", {
+            pattern = "SidekickNesHide",
+            callback = function()
+              if U.toggle.is_diagnostic_virt_enabled == false then
+                return
+              end
+              if not require("tiny-inline-diagnostic.diagnostic").user_toggle_state then
+                require("tiny-inline-diagnostic").enable()
+              end
+            end,
+          })
+        end,
+      },
+    },
   },
 }

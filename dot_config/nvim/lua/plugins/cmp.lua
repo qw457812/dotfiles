@@ -642,8 +642,8 @@ return {
   {
     "saghen/blink.cmp",
     dependencies = {
-      { "xieyonn/blink-cmp-dat-word", shell_command_editor = true },
-      { "first20hours/google-10000-english" }, -- dict, not a nvim plugin
+      "xieyonn/blink-cmp-dat-word",
+      shell_command_editor = true,
     },
     opts = {
       sources = {
@@ -666,6 +666,10 @@ return {
           },
         },
       },
+    },
+    specs = {
+      -- not a nvim plugin, just for downloading the dict file
+      { "first20hours/google-10000-english", lazy = true },
     },
   },
 
@@ -702,7 +706,7 @@ return {
     opts = function()
       -- sources that need deduplicating
       -- :=LazyVim.opts("blink.cmp").sources.default
-      local source_dedup_priority = {
+      local dedup_order = {
         "lazydev",
         "lsp",
         "path",
@@ -720,13 +724,13 @@ return {
       ---@diagnostic disable-next-line: duplicate-set-field
       require("blink.cmp.completion.list").show = function(ctx, items_by_source)
         local seen = {}
-        for _, source in ipairs(source_dedup_priority) do
+        for _, source in ipairs(dedup_order) do
           if items_by_source[source] then
             ---@param item blink.cmp.CompletionItem
             items_by_source[source] = vim.tbl_filter(function(item)
-              local did_seen = seen[item.label]
+              local did_see = seen[item.label]
               seen[item.label] = true
-              return not did_seen
+              return not did_see
             end, items_by_source[source])
           end
         end
