@@ -45,14 +45,18 @@ return {
       -- stylua: ignore
       vim.list_extend(keys, {
         { "<leader>aa", false },
-        { "<leader>as", false, mode = { "n", "v" } },
-        { "<leader>ap", false, mode = { "n", "v" } },
+        { "<leader>as", false },
+        { "<leader>ac", false },
+        { "<leader>av", false, mode = "x" },
+        { "<leader>at", false, mode = { "n", "x" } },
+        { "<leader>ap", false, mode = { "n", "x" } },
         { "<c-.>", false, mode = { "n", "x", "i", "t" } },
         { "<M-,>", function() require("sidekick.cli").focus() end, mode = { "n", "x", "t" }, desc = "Sidekick Switch Focus" },
         { "<leader>ak", function() require("sidekick.cli").toggle() end, desc = "Sidekick Toggle CLI" },
         { "<leader>ass", function() require("sidekick.cli").select() end, desc = "Select CLI" },
-        { "<leader>ass", function() require("sidekick.cli").send() end, mode = "v", desc = "Send Visual Selection" },
-        { "<leader>asp", function() require("sidekick.cli").prompt() end, mode = { "n", "v" }, desc = "Select Prompt" },
+        { "<leader>ass", function() require("sidekick.cli").send({ msg = "{selection}" }) end, mode = "x", desc = "Send Visual Selection" },
+        { "<leader>ast", function() require("sidekick.cli").send({ msg = "{this}" }) end, mode = { "n", "x" }, desc = "Send This" },
+        { "<leader>asp", function() require("sidekick.cli").prompt() end, mode = { "n", "x" }, desc = "Select Prompt" },
         { "<leader>asc", function() require("sidekick.cli").toggle({ name = "claude" }) end, desc = "Claude" },
         { "<leader>asx", function() require("sidekick.cli").toggle({ name = "codex" }) end, desc = "Codex" },
       })
@@ -71,6 +75,7 @@ return {
           layout = vim.g.user_is_termux and "bottom" or "right", ---@type "float"|"left"|"bottom"|"top"|"right"
           ---@type table<string, sidekick.cli.Keymap|false>
           keys = {
+            blur_t = { "<c-o>", "blur" },
             blur_n = {
               "<esc>",
               function(t)
@@ -142,7 +147,7 @@ return {
     opts = {
       spec = {
         {
-          mode = { "n", "v" },
+          mode = { "n", "x" },
           { "<leader>as", group = "sidekick" },
         },
       },

@@ -26,8 +26,8 @@ return {
       -- { "m<tab>", "<Cmd>TranslateInput<CR>", desc = "Translate From Input" },
     },
     -- baidu, youdao settings: ~/.local/share/nvim/lazy/Trans.nvim/Trans.json
+    ---@type TransConf
     opts = {
-      theme = "tokyonight", -- default | tokyonight | dracula
       frontend = {
         ---@type TransFrontendOpts
         default = {
@@ -87,11 +87,18 @@ return {
     },
     config = function(_, opts)
       local Trans = require("Trans")
+      opts.theme = (vim.g.colors_name or ""):find("catppuccin") and "catppuccin" or "tokyonight"
       Trans.setup(opts)
 
-      -- fix: on colorscheme change
-      local highlights = Trans.style.theme[opts.theme or "default"]
-      Snacks.util.set_hl(highlights)
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        group = vim.api.nvim_create_augroup("trans_hl", { clear = true }),
+        callback = function(ev)
+          local theme = ev.match:find("catppuccin") and "catppuccin" or "tokyonight"
+          for hl_group, hl in pairs(Trans.style.theme[theme]) do
+            vim.api.nvim_set_hl(0, hl_group, hl)
+          end
+        end,
+      })
 
       local node = Trans.util.node
       ---@diagnostic disable-next-line: undefined-field

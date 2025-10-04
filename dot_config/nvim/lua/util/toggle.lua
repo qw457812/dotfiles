@@ -23,14 +23,8 @@ M.diagnostic_virt = st({
         require("tiny-inline-diagnostic").disable()
       end
     else
-      -- https://github.com/LazyVim/LazyVim/blob/3dbace941ee935c89c73fd774267043d12f57fe2/lua/lazyvim/plugins/lsp/init.lua#L18
-      vim.diagnostic.config({
-        virtual_text = state and {
-          spacing = 4,
-          source = "if_many",
-          prefix = "●",
-        } or false,
-      })
+      M._diag_conf = M._diag_conf or vim.diagnostic.config()
+      vim.diagnostic.config({ virtual_text = state and M._diag_conf.virtual_text or false })
     end
     if state and not st_diag:get() then
       st_diag:set(state)

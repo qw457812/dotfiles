@@ -218,10 +218,13 @@ return {
       end)
 
       return U.extend_tbl(opts, {
-        -- setting `vim.diagnostic.config({ virtual_text = false })` for tiny-inline-diagnostic.nvim
-        -- see: https://github.com/LazyVim/LazyVim/blob/1e83b4f843f88678189df81b1c88a400c53abdbc/lua/lazyvim/plugins/lsp/init.lua#L177
         ---@type vim.diagnostic.Opts
-        diagnostics = { virtual_text = not LazyVim.has("tiny-inline-diagnostic.nvim") and { prefix = "icons" } },
+        diagnostics = {
+          virtual_text = not LazyVim.has("tiny-inline-diagnostic.nvim") and {
+            prefix = "icons",
+            current_line = true,
+          } --[[@as vim.diagnostic.Opts.VirtualText]],
+        },
         folds = { enabled = false }, -- set up on our own above
       } --[[@as PluginLspOpts]])
     end,
