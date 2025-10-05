@@ -253,7 +253,9 @@ if type -q claude
     abbr cl claude
     abbr clt claude_temp
     abbr clc "claude --continue"
+    abbr clcf "claude --continue --fork-session"
     abbr clr "claude --resume"
+    abbr clrf "claude --resume --fork-session"
     abbr clv "claude --verbose"
     abbr cld "claude --debug"
     abbr cls "claude --model sonnet"

@@ -1,6 +1,5 @@
 {
   "extras": [
-    "lazyvim.plugins.extras.ai.copilot-chat",
     "lazyvim.plugins.extras.ai.copilot-native",
     "lazyvim.plugins.extras.ai.sidekick",
     "lazyvim.plugins.extras.coding.mini-snippets",
@@ -37,12 +36,9 @@
     "lazyvim.plugins.extras.util.chezmoi",
     "lazyvim.plugins.extras.util.dot",
     "lazyvim.plugins.extras.util.mini-hipatterns",
-    "plugins.extras.ai.aider",
-    "plugins.extras.ai.avante",
     "plugins.extras.ai.claude-code",
     "plugins.extras.ai.codecompanion",
     "plugins.extras.ai.mcphub",
-    "plugins.extras.ai.opencode",
     "plugins.extras.editor.mini-operators",
     "plugins.extras.editor.undotree",
     "plugins.extras.game.leetcode",

@@ -11,9 +11,7 @@ return {
     },
     ---@module "mcphub"
     ---@type MCPHub.Config
-    opts = {
-      -- log = { level = vim.log.levels.WARN },
-    },
+    opts = {},
   },
 
   -- {

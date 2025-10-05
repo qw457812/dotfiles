@@ -7,7 +7,6 @@ return {
       local servers = opts.servers
       if servers.copilot then
         servers.copilot = servers.copilot == true and {} or servers.copilot
-
         servers.copilot.root_dir = function(bufnr, on_dir)
           local root = LazyVim.root({ buf = bufnr })
           on_dir(root ~= vim.uv.cwd() and root or vim.fs.root(bufnr, vim.lsp.config.copilot.root_markers))
@@ -124,6 +123,17 @@ return {
           },
         },
       } or { import = "foobar", enabled = false }, -- dummy import
+      {
+        "folke/which-key.nvim",
+        opts = {
+          spec = {
+            {
+              mode = { "n", "x" },
+              { "<leader>as", group = "sidekick" },
+            },
+          },
+        },
+      },
     },
   },
   {
@@ -141,17 +151,6 @@ return {
         end,
       })
     end,
-  },
-  {
-    "folke/which-key.nvim",
-    opts = {
-      spec = {
-        {
-          mode = { "n", "x" },
-          { "<leader>as", group = "sidekick" },
-        },
-      },
-    },
   },
 
   {
@@ -205,53 +204,51 @@ return {
         return not vim.g.user_codeium_disable and orig(self)
       end)
     end,
-  },
-  {
-    "nvim-cmp",
-    optional = true,
-    opts = function(_, opts)
-      for _, source in ipairs(opts.sources or {}) do
-        if source.name == "codeium" then
-          source.priority = 99 -- lower than copilot
-          break
-        end
-      end
-    end,
-  },
-  {
-    "saghen/blink.cmp",
-    optional = true,
-    opts = function(_, opts)
-      if vim.tbl_get(opts, "sources", "providers", "codeium", "score_offset") then
-        opts.sources.providers.codeium.score_offset = 99 -- lower than copilot
-      end
-    end,
-  },
-  {
-    "folke/noice.nvim",
-    optional = true,
-    opts = function(_, opts)
-      if not LazyVim.has_extra("ai.codeium") then
-        return
-      end
-
-      opts.routes = vim.list_extend(opts.routes or {}, {
-        {
-          filter = {
-            event = "msg_show",
-            find = "^%[codeium/codeium%] ",
-          },
-          opts = { skip = true },
-        },
-        {
-          filter = {
-            event = "notify",
-            find = "^completion request failed$",
-          },
-          opts = { skip = true },
-        },
-      })
-    end,
+    specs = {
+      {
+        "nvim-cmp",
+        optional = true,
+        opts = function(_, opts)
+          for _, source in ipairs(opts.sources or {}) do
+            if source.name == "codeium" then
+              source.priority = 99 -- lower than copilot
+              break
+            end
+          end
+        end,
+      },
+      {
+        "saghen/blink.cmp",
+        optional = true,
+        opts = function(_, opts)
+          if vim.tbl_get(opts, "sources", "providers", "codeium", "score_offset") then
+            opts.sources.providers.codeium.score_offset = 99 -- lower than copilot
+          end
+        end,
+      },
+      {
+        "folke/noice.nvim",
+        optional = true,
+        opts = function(_, opts)
+          opts.routes = vim.list_extend(opts.routes or {}, {
+            {
+              filter = {
+                event = "msg_show",
+                find = "^%[codeium/codeium%] ",
+              },
+              opts = { skip = true },
+            },
+            {
+              filter = {
+                event = "notify",
+                find = "^completion request failed$",
+              },
+              opts = { skip = true },
+            },
+          })
+        end,
+      },
+    },
   },
 
   {
@@ -334,38 +331,40 @@ return {
         },
       } --[[@as CopilotChat.config.Config]])
     end,
-  },
-  {
-    "folke/which-key.nvim",
-    opts = {
-      spec = {
-        {
-          mode = { "n", "v" },
-          { "<leader>ap", group = "copilot" },
+    specs = {
+      {
+        "folke/which-key.nvim",
+        opts = {
+          spec = {
+            {
+              mode = { "n", "v" },
+              { "<leader>ap", group = "copilot" },
+            },
+          },
         },
       },
+      {
+        "folke/edgy.nvim",
+        optional = true,
+        opts = function(_, opts)
+          if vim.o.columns >= 120 then
+            return
+          end
+          opts.right = opts.right or {}
+          local copilot_chat_view
+          for i, view in ipairs(opts.right) do
+            if view.ft == "copilot-chat" then
+              copilot_chat_view = table.remove(opts.right, i)
+              break
+            end
+          end
+          if copilot_chat_view then
+            opts.bottom = opts.bottom or {}
+            copilot_chat_view.size = { height = 0.4 }
+            table.insert(opts.bottom, copilot_chat_view)
+          end
+        end,
+      },
     },
-  },
-  {
-    "folke/edgy.nvim",
-    optional = true,
-    opts = function(_, opts)
-      if vim.o.columns >= 120 then
-        return
-      end
-      opts.right = opts.right or {}
-      local copilot_chat_view
-      for i, view in ipairs(opts.right) do
-        if view.ft == "copilot-chat" then
-          copilot_chat_view = table.remove(opts.right, i)
-          break
-        end
-      end
-      if copilot_chat_view then
-        opts.bottom = opts.bottom or {}
-        copilot_chat_view.size = { height = 0.4 }
-        table.insert(opts.bottom, copilot_chat_view)
-      end
-    end,
   },
 }

@@ -10,6 +10,7 @@
     "allow": [
       "Bash(ls:*)",
       "Bash(tree:*)",
+      "Bash(wc:*)",
       "Bash(find:*)",
       "Bash(grep:*)",
       "Bash(rg:*)",

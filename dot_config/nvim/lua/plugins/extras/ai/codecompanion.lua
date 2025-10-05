@@ -269,6 +269,8 @@ return {
     opts = {
       extensions = {
         history = {
+          ---@module "codecompanion._extensions.history"
+          ---@type CodeCompanion.History.Opts
           opts = {
             keymap = "<localleader>h",
             save_chat_keymap = { n = {}, i = {} }, -- disable since auto_save is enabled (by default), "<Nop>" works too
@@ -278,6 +280,7 @@ return {
               delete = { n = "<localleader>d" },
               duplicate = { n = "<localleader>y", i = "<M-y>" },
             },
+            -- auto_generate_title = false,
             title_generation_opts = {
               adapter = "copilot",
             },
@@ -290,6 +293,7 @@ return {
               },
             },
             -- disable memory
+            ---@diagnostic disable-next-line: missing-fields
             memory = {
               auto_create_memories_on_summary_generation = false,
             },
