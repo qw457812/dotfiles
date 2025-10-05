@@ -84,47 +84,42 @@ end
 --- Go to definition or references if already at definition, like `gd` in vscode and idea but slightly different.
 --- https://github.com/neovim/neovim/blob/fb6c059dc55c8d594102937be4dd70f5ff51614a/runtime/lua/vim/lsp/_tagfunc.lua#L25
 function H.pick_definitions_or_references()
-  vim.lsp.buf_request_all(
-    0,
-    vim.lsp.protocol.Methods.textDocument_definition,
-    H.client_positional_params(),
-    function(results, ctx)
-      if vim.tbl_isempty(results) then
-        -- no definitions found, try references
-        H.pick_references()
-        return
-      end
+  vim.lsp.buf_request_all(0, "textDocument/definition", H.client_positional_params(), function(results, ctx)
+    if vim.tbl_isempty(results) then
+      -- no definitions found, try references
+      H.pick_references()
+      return
+    end
 
-      for _, resp in pairs(results) do
-        local err, result = resp.err, resp.result
-        if err then
-          LazyVim.error(
-            string.format("Error executing '%s' (%d): %s", ctx.method, err.code, err.message),
-            { title = "LSP" }
-          )
-        elseif result then
-          if result.range then -- Location
-            if H.is_same_position(result, ctx.params) then
+    for _, resp in pairs(results) do
+      local err, result = resp.err, resp.result
+      if err then
+        LazyVim.error(
+          string.format("Error executing '%s' (%d): %s", ctx.method, err.code, err.message),
+          { title = "LSP" }
+        )
+      elseif result then
+        if result.range then -- Location
+          if H.is_same_position(result, ctx.params) then
+            -- already at one of the definitions, go to references
+            H.pick_references()
+            return
+          end
+        else
+          result = result --[[@as (lsp.Location[]|lsp.LocationLink[])]]
+          for _, item in pairs(result) do
+            if H.is_same_position(item, ctx.params) then
               -- already at one of the definitions, go to references
               H.pick_references()
               return
             end
-          else
-            result = result --[[@as (lsp.Location[]|lsp.LocationLink[])]]
-            for _, item in pairs(result) do
-              if H.is_same_position(item, ctx.params) then
-                -- already at one of the definitions, go to references
-                H.pick_references()
-                return
-              end
-            end
           end
         end
       end
-      -- not at any definition, go to definitions
-      H.pick_definitions()
     end
-  )
+    -- not at any definition, go to definitions
+    H.pick_definitions()
+  end)
 end
 
 ---@type LazySpec

@@ -94,6 +94,7 @@ return {
               vim.g.copilot_nes_debounce = 500
 
               if not vim.g.ai_cmp then
+                -- TODO: https://github.com/neovim/nvim-lspconfig/commit/5b1a75b
                 vim.schedule(function()
                   vim.lsp.inline_completion.enable()
                 end)
