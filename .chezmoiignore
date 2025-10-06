@@ -20,6 +20,7 @@ Library/
 {{ else }}
 .ideavimrc
 .qutebrowser/
+.config/glide/
 .config/alacritty/
 .config/kitty/
 .config/wezterm/
