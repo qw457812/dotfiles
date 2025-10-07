@@ -1088,14 +1088,15 @@
            ;; [:s :!Cc nil {:delayed {:invoked [:open "https://translate.google.com/?sl=en&tl=zh-CN&text=$(pbpaste)&op=translate"]} :params {:delay 30}}]
            ;; [:s [:open "https://translate.google.com/?sl=en&tl=zh-CN&text=$(pbpaste)&op=translate"]]
            ; [:s [:open "https://translate.google.com/?sl=en&tl=zh-CN&op=translate"]]
-           [:s [:open "https://github.com/search?type=code"]] ; https://github.com/features/code-search
+           [:s [:open "https://github.com/search"]]
            [:b :!!hyphen] ; raycast://extensions/Codely/google-chrome/search-bookmarks
            [:h :!!f9] ; raycast://extensions/Codely/google-chrome/search-history
            [:t :!!f8] ; raycast://extensions/Codely/google-chrome/search-tab
            [:a [:open "http://localhost:3000/log"]] ; https://github.com/songquanpeng/one-api
-           [:g [:open "https://github.com/search"]]
+           [:g [:open "https://github.com/"]]
            ;; [:c [:open "https://chatgpt.com/"]]
-           [:c [:open "https://docs.anthropic.com/en/docs/claude-code/overview"]]
+           ;; [:c [:open "https://docs.anthropic.com/en/docs/claude-code/overview"]]
+           [:c [:open "https://github.com/search?type=code"]] ; https://github.com/features/code-search
            [:u [:open "https://unifuncs.com/deepresearch"]]
            [:n [:open "https://wiki.nikiv.dev"]]
            [:z [:open "https://www.chezmoi.io/quick-start/"]]
