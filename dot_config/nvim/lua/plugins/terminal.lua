@@ -117,9 +117,9 @@ return {
   -- TODO: nested `nvim .` with oil not working
   {
     "willothy/flatten.nvim",
-    -- * If the YAZI_ID environment variable is set, then we are in a yazi session. To avoid issues with bulk renaming, we disable flatten.nvim
-    -- * "ctrl-g to edit prompt in nvim" in claude code
-    enabled = vim.env.YAZI_ID == nil and vim.env.__IS_CLAUDECODE_NVIM == nil,
+    -- if the YAZI_ID environment variable is set, then we are in a yazi
+    -- session. To avoid issues with bulk renaming, we disable flatten.nvim
+    enabled = vim.env.YAZI_ID == nil,
     lazy = false,
     priority = 1001,
     -- keys = {
