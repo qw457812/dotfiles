@@ -30,7 +30,8 @@ glide.keymaps.del("normal", "<leader>f");
 glide.keymaps.del("normal", "<leader>d");
 // vimium-like keymaps
 // https://github.com/glide-browser/glide/blob/107e240a8fd274cafef403d089dc2b646319e8f8/src/glide/browser/base/content/plugins/keymaps.mts
-// TODO: p o b ge
+// TODO: o b
+glide.keymaps.set("normal", "/", "keys <D-f>");
 glide.keymaps.set("normal", "r", async () => {
   if (await glide.ctx.is_editing()) {
     await glide.excmds.execute("r");
@@ -46,6 +47,30 @@ glide.keymaps.set("normal", "t", async () => {
 glide.keymaps.set("normal", "T", async () => {
   if (!(await glide.ctx.is_editing())) {
     await glide.excmds.execute("commandline_show tab ");
+  }
+});
+glide.keymaps.set("normal", "yt", async ({ tab_id }) => {
+  if (!(await glide.ctx.is_editing())) {
+    await browser.tabs.duplicate(tab_id);
+  }
+});
+glide.keymaps.set("normal", "p", async ({ tab_id }) => {
+  if (!(await glide.ctx.is_editing())) {
+    const url = await navigator.clipboard.readText();
+    await browser.tabs.update(tab_id, { url });
+  }
+});
+glide.keymaps.set("normal", "P", async () => {
+  if (!(await glide.ctx.is_editing())) {
+    const url = await navigator.clipboard.readText();
+    await browser.tabs.create({ url });
+  }
+});
+glide.keymaps.set("normal", "e", async () => {
+  if (await glide.ctx.is_editing()) {
+    await glide.excmds.execute("motion e");
+  } else {
+    await glide.keys.send("<D-l>");
   }
 });
 glide.keymaps.set(
@@ -118,10 +143,13 @@ glide.keymaps.set("normal", "<BS>", "tab_close");
 glide.keymaps.set("normal", "<S-BS>", async () => {
   await browser.sessions.restore();
 });
-glide.keymaps.set("normal", "<C-r>", "reload");
+glide.keymaps.set("normal", "<C-r>", "config_reload");
 glide.keymaps.set("normal", "<C-f>", "hint --location=browser-ui");
+glide.keymaps.set("normal", "<C-p>", async ({ tab_id }) => {
+  const tab = await browser.tabs.get(tab_id);
+  await browser.tabs.update(tab_id, { pinned: !tab.pinned });
+});
 glide.keymaps.set("normal", "<leader><BS>", "quit");
-glide.keymaps.set("normal", "<leader>r", "config_reload");
 glide.keymaps.set("normal", "<leader>fc", async () => {
   await glide.process.spawn("neovide", [
     `${glide.path.home_dir}/.config/glide/glide.ts`,
@@ -170,6 +198,8 @@ glide.keymaps.set("command", "<c-k>", "commandline_focus_back");
 
 // Autocmds
 glide.autocmds.create("UrlEnter", { hostname: "github.com" }, async () => {
+  await glide.excmds.execute("mode_change normal");
+
   function go_to(page: string) {
     return async () => {
       const url = new URL(glide.ctx.url);
