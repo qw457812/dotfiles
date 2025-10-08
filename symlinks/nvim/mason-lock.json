@@ -2,7 +2,7 @@
   "alejandra": "4.0.0",
   "basedpyright": "1.31.6",
   "bash-language-server": "5.6.0",
-  "codelldb": "v1.11.5",
+  "codelldb": "v1.11.6",
   "copilot-language-server": "1.378.0",
   "debugpy": "1.8.17",
   "docker-compose-language-service": "0.4.0",
@@ -24,7 +24,7 @@
   "marksman": "2024-12-18",
   "nil": "2025-06-13",
   "prettier": "3.6.2",
-  "ruff": "0.13.3",
+  "ruff": "0.14.0",
   "selene": "0.29.0",
   "shellcheck": "v0.11.0",
   "shfmt": "v3.12.0",
@@ -35,6 +35,6 @@
   "tree-sitter-cli": "v0.25.10",
   "vscode-spring-boot-tools": "1.63.0",
   "vtsls": "0.2.9",
-  "vue-language-server": "3.1.0",
+  "vue-language-server": "3.1.1",
   "yaml-language-server": "1.19.1"
 }

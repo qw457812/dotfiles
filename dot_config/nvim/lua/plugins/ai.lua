@@ -70,6 +70,7 @@ return {
         },
       },
       cli = {
+        ---@type sidekick.win.Opts
         win = {
           layout = vim.g.user_is_termux and "bottom" or "right", ---@type "float"|"left"|"bottom"|"top"|"right"
           ---@type table<string, sidekick.cli.Keymap|false>
@@ -89,17 +90,18 @@ return {
         },
         ---@type sidekick.cli.Mux
         mux = {
-          backend = "tmux",
           enabled = true,
         },
-        ---@type table<string, sidekick.cli.Tool.spec>
+        ---@type table<string, sidekick.cli.Config|{}>
         tools = {
-          ---@diagnostic disable-next-line: missing-fields
           claude = {
             env = {
               __IS_CLAUDECODE_NVIM = "1", -- flag to disable claude code statusline in ~/.claude/settings.json
               ANTHROPIC_BASE_URL = vim.env.CTOK_BASE_URL,
               ANTHROPIC_AUTH_TOKEN = vim.env.CTOK_AUTH_TOKEN,
+            },
+            keys = {
+              blur_t = false, -- claude code uses <c-o> for its own functionality
             },
           },
         },
