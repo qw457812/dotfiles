@@ -28,10 +28,91 @@ glide.o.hint_size = "12px";
 // Keymaps
 glide.keymaps.del("normal", "<leader>f");
 glide.keymaps.del("normal", "<leader>d");
+// vimium-like keymaps
+// https://github.com/glide-browser/glide/blob/107e240a8fd274cafef403d089dc2b646319e8f8/src/glide/browser/base/content/plugins/keymaps.mts
+// TODO: p o b ge
+glide.keymaps.set("normal", "r", async () => {
+  if (await glide.ctx.is_editing()) {
+    await glide.excmds.execute("r");
+  } else {
+    await glide.excmds.execute("reload");
+  }
+});
+glide.keymaps.set("normal", "t", async () => {
+  if (!(await glide.ctx.is_editing())) {
+    await glide.excmds.execute("tab_new");
+  }
+});
+glide.keymaps.set("normal", "T", async () => {
+  if (!(await glide.ctx.is_editing())) {
+    await glide.excmds.execute("commandline_show tab ");
+  }
+});
+glide.keymaps.set(
+  "normal",
+  "d",
+  async () => {
+    if (await glide.ctx.is_editing()) {
+      await glide.excmds.execute("mode_change op-pending --operator=d");
+    } else {
+      await glide.excmds.execute("scroll_page_down");
+    }
+  },
+  {
+    retain_key_display: true,
+  },
+);
+glide.keymaps.set("normal", "u", async () => {
+  if (await glide.ctx.is_editing()) {
+    await glide.excmds.execute("undo");
+  } else {
+    await glide.excmds.execute("scroll_page_up");
+  }
+});
+glide.keymaps.set("normal", "x", async () => {
+  if (await glide.ctx.is_editing()) {
+    await glide.excmds.execute("motion x");
+  } else {
+    await glide.excmds.execute("tab_close");
+  }
+});
+glide.keymaps.set("normal", "X", async () => {
+  if (await glide.ctx.is_editing()) {
+    await glide.excmds.execute("motion X");
+  } else {
+    await browser.sessions.restore();
+  }
+});
+glide.keymaps.set("normal", "h", async () => {
+  if (await glide.ctx.is_editing()) {
+    await glide.excmds.execute("caret_move left");
+  } else {
+    await glide.excmds.execute("back");
+  }
+});
+glide.keymaps.set("normal", "l", async () => {
+  if (await glide.ctx.is_editing()) {
+    await glide.excmds.execute("caret_move right");
+  } else {
+    await glide.excmds.execute("forward");
+  }
+});
+glide.keymaps.set("normal", "H", async () => {
+  if (await glide.ctx.is_editing()) {
+    await glide.excmds.execute("motion 0");
+  } else {
+    await glide.excmds.execute("caret_move left"); // scroll left?
+  }
+});
+glide.keymaps.set("normal", "L", async () => {
+  if (await glide.ctx.is_editing()) {
+    await glide.excmds.execute("motion $");
+  } else {
+    await glide.excmds.execute("caret_move right"); // scroll right?
+  }
+});
 glide.keymaps.set("normal", "J", "tab_next");
 glide.keymaps.set("normal", "K", "tab_prev");
-glide.keymaps.set("normal", "H", "back");
-glide.keymaps.set("normal", "L", "forward");
 glide.keymaps.set("normal", "U", "redo");
 glide.keymaps.set("normal", "<BS>", "tab_close");
 glide.keymaps.set("normal", "<S-BS>", async () => {
