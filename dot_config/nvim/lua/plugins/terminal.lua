@@ -114,7 +114,7 @@ return {
   -- alternative:
   -- - https://github.com/hat0uma/dotfiles/blob/d01f24164f7dda71c2cab2cccd54cca8ba386e13/.config/nvim/lua/rc/terminal/editor.lua#L7-L9
   -- - https://github.com/brianhuster/unnest.nvim
-  -- TODO: nested `nvim .` with oil not working
+  -- TODO: `nvim .` with oil not working
   {
     "willothy/flatten.nvim",
     -- if the YAZI_ID environment variable is set, then we are in a yazi

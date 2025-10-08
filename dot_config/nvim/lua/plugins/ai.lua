@@ -97,6 +97,7 @@ return {
           claude = {
             env = {
               __IS_CLAUDECODE_NVIM = "1", -- flag to disable claude code statusline in ~/.claude/settings.json
+              NVIM_FLATTEN_NEST = "1", -- allow "ctrl-g to edit prompt in nvim" to be nested for flatten.nvim
               ANTHROPIC_BASE_URL = vim.env.CTOK_BASE_URL,
               ANTHROPIC_AUTH_TOKEN = vim.env.CTOK_AUTH_TOKEN,
             },

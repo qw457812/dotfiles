@@ -270,7 +270,10 @@ return {
           local open_orig = Snacks.terminal.open
           function Snacks.terminal.open(cmd, opts)
             if vim.tbl_get(opts, "win", "b", "__is_claudecode_nvim") then
-              opts.env = U.extend_tbl(opts.env, { __IS_CLAUDECODE_NVIM = "1" })
+              opts.env = U.extend_tbl(opts.env, {
+                __IS_CLAUDECODE_NVIM = "1",
+                NVIM_FLATTEN_NEST = "1", -- allow "ctrl-g to edit prompt in nvim" to be nested for flatten.nvim
+              })
             end
             return open_orig(cmd, opts)
           end
