@@ -54,6 +54,7 @@
 
 [diff]
     colorMoved = default
+    tool = nvimdiff
 
 [merge]
     tool = nvimdiff

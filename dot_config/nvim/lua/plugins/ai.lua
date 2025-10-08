@@ -45,16 +45,17 @@ return {
       vim.list_extend(keys, {
         { "<leader>aa", false },
         { "<leader>as", false },
-        { "<leader>ac", false },
+        { "<leader>af", false },
         { "<leader>av", false, mode = "x" },
         { "<leader>at", false, mode = { "n", "x" } },
         { "<leader>ap", false, mode = { "n", "x" } },
         { "<c-.>", false, mode = { "n", "x", "i", "t" } },
-        { "<M-,>", function() require("sidekick.cli").focus() end, mode = { "n", "x", "t" }, desc = "Sidekick Switch Focus" },
+        { "<M-,>", function() require("sidekick.cli").toggle() end, mode = { "n", "x", "t" }, desc = "Sidekick Toggle" },
         { "<leader>ak", function() require("sidekick.cli").toggle() end, desc = "Sidekick Toggle CLI" },
         { "<leader>ass", function() require("sidekick.cli").select() end, desc = "Select CLI" },
         { "<leader>ass", function() require("sidekick.cli").send({ msg = "{selection}" }) end, mode = "x", desc = "Send Visual Selection" },
         { "<leader>ast", function() require("sidekick.cli").send({ msg = "{this}" }) end, mode = { "n", "x" }, desc = "Send This" },
+        { "<leader>asf", function() require("sidekick.cli").send({ msg = "{file}" }) end, desc = "Send File" },
         { "<leader>asp", function() require("sidekick.cli").prompt() end, mode = { "n", "x" }, desc = "Select Prompt" },
         { "<leader>asc", function() require("sidekick.cli").toggle({ name = "claude" }) end, desc = "Claude" },
         { "<leader>asx", function() require("sidekick.cli").toggle({ name = "codex" }) end, desc = "Codex" },
@@ -66,7 +67,7 @@ return {
     opts = {
       nes = {
         clear = {
-          esc = false, -- clear_ui_esc
+          esc = false, -- handled by U.keymap.clear_ui_esc()
         },
       },
       cli = {
