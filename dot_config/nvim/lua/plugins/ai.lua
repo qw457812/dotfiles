@@ -43,14 +43,14 @@ return {
       end
       -- stylua: ignore
       vim.list_extend(keys, {
+        { "<c-.>", false, mode = { "n", "x", "i", "t" } },
+        { "<M-,>", function() require("sidekick.cli").toggle() end, mode = { "n", "x", "t" }, desc = "Sidekick Toggle" },
         { "<leader>aa", false },
         { "<leader>as", false },
         { "<leader>af", false },
         { "<leader>av", false, mode = "x" },
         { "<leader>at", false, mode = { "n", "x" } },
         { "<leader>ap", false, mode = { "n", "x" } },
-        { "<c-.>", false, mode = { "n", "x", "i", "t" } },
-        { "<M-,>", function() require("sidekick.cli").toggle() end, mode = { "n", "x", "t" }, desc = "Sidekick Toggle" },
         { "<leader>ak", function() require("sidekick.cli").toggle() end, desc = "Sidekick Toggle CLI" },
         { "<leader>ass", function() require("sidekick.cli").select() end, desc = "Select CLI" },
         { "<leader>ass", function() require("sidekick.cli").send({ msg = "{selection}" }) end, mode = "x", desc = "Send Visual Selection" },
@@ -76,6 +76,8 @@ return {
           layout = vim.g.user_is_termux and "bottom" or "right", ---@type "float"|"left"|"bottom"|"top"|"right"
           ---@type table<string, sidekick.cli.Keymap|false>
           keys = {
+            hide_ctrl_dot = false,
+            hide_alt_comma = { "<M-,>", "hide", mode = "nt" },
             blur_t = { "<c-o>", "blur" },
             blur_n = {
               "<esc>",
@@ -306,7 +308,7 @@ return {
       })
 
       return U.extend_tbl(opts, {
-        -- model = "claude-sonnet-4",
+        -- model = "claude-sonnet-4.5",
         -- show_help = false,
         language = "Chinese",
         -- stylua: ignore

@@ -12,6 +12,31 @@ return {
   --   },
   -- },
 
+  -- biome
+  {
+    "stevearc/conform.nvim",
+    optional = true,
+    ---@module "conform"
+    ---@param opts conform.setupOpts
+    opts = function(_, opts)
+      if not (LazyVim.has_extra("formatting.biome") and LazyVim.has_extra("formatting.prettier")) then
+        return
+      end
+
+      -- remove "prettier" if "biome" is present
+      for ft in pairs(opts.formatters_by_ft or {}) do
+        if
+          vim.islist(opts.formatters_by_ft[ft])
+          and vim.list_contains(opts.formatters_by_ft[ft] --[[@as string[] ]], "biome")
+        then
+          opts.formatters_by_ft[ft] = vim.tbl_filter(function(formatter)
+            return formatter ~= "prettier"
+          end, opts.formatters_by_ft[ft] --[[@as string[] ]])
+        end
+      end
+    end,
+  },
+
   {
     "nvim-mini/mini.align",
     vscode = true,

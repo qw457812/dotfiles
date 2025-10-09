@@ -10,22 +10,32 @@ return {
       {
         "<c-space>",
         function()
-          U.terminal(nil, {
+          -- TODO: focus if terminal is already open but not focused
+          Snacks.terminal(nil, {
             win = {
               position = "float",
               height = vim.g.user_is_termux and U.snacks.win.fullscreen_height or nil,
               width = vim.g.user_is_termux and 0 or nil,
+              keys = {
+                hide_ctrl_space = { "<c-space>", "hide", mode = { "n", "t" } },
+              },
             },
-            cwd = LazyVim.root(),
+            cwd = LazyVim.root(), -- TODO: fallback to last real file buffer's root if current buffer is not a file
           })
         end,
         desc = "Float Terminal (Root Dir)",
+        mode = { "n", "t" },
       },
-      { "<c-space>", "<cmd>close<cr>", desc = "Hide Terminal", mode = "t" },
       {
         "<c-/>",
         function()
-          U.terminal(nil, {
+          Snacks.terminal(nil, {
+            win = {
+              keys = {
+                hide_ctrl_slash = { "<c-/>", "hide", mode = { "n", "t" } },
+                hide_ctrl_underscore = { "<c-_>", "hide", mode = { "n", "t" } },
+              },
+            },
             cwd = LazyVim.root.git(),
             -- make sure win.position is bottom, without this, type <c-space> first then <c-/> will make the terminal float
             -- see: https://github.com/folke/snacks.nvim/blob/544a2ae01c28056629a0c90f8d0ff40995c84e42/lua/snacks/terminal.lua#L174
@@ -33,17 +43,25 @@ return {
           })
         end,
         desc = "Terminal (Git Root Dir)",
+        mode = { "n", "t" },
       },
-      { "<c-_>", "<c-/>", desc = "Terminal (Root Dir)", remap = true }, -- is this necessary?
+      { "<c-_>", "<c-/>", desc = "which_key_ignore", mode = { "n", "t" }, remap = true }, -- is remap right?
       {
         "<c-,>",
         function()
           local filepath = vim.fn.expand("%:p:h")
-          U.terminal(nil, { cwd = vim.fn.isdirectory(filepath) == 1 and filepath or LazyVim.root() })
+          Snacks.terminal(nil, {
+            win = {
+              keys = {
+                hide_ctrl_comma = { "<c-,>", "hide", mode = { "n", "t" } },
+              },
+            },
+            cwd = vim.fn.isdirectory(filepath) == 1 and filepath or LazyVim.root(),
+          })
         end,
         desc = "Terminal (Buffer Dir)",
+        mode = { "n", "t" },
       },
-      { "<c-,>", "<cmd>close<cr>", desc = "Hide Terminal", mode = "t" },
     },
     ---@module "snacks"
     ---@type snacks.Config
@@ -67,8 +85,15 @@ return {
             end,
           },
           keys = {
-            t_c_q = { "<c-q>", "hide", mode = "t" },
             t_c_o = { "<c-o>", "blur", mode = "t" },
+            t_c_q = {
+              "<c-q>",
+              function()
+                vim.cmd("stopinsert")
+              end,
+              mode = "t",
+            },
+            hide_ctrl_z = { "<c-z>", "hide", mode = { "n", "t" } },
             n_esc = {
               "<esc>",
               function(self)

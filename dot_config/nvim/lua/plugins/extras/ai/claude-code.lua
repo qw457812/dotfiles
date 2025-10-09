@@ -87,6 +87,10 @@ return {
             end
           end, { buffer = ev.buf, desc = "Clear UI or Exit" })
 
+          vim.keymap.set({ "n", "i" }, "<C-s>", function()
+            vim.cmd([[wqa]])
+          end, { buffer = ev.buf, desc = "Save and Exit" })
+
           vim.api.nvim_create_autocmd({ "InsertLeave", "TextChanged" }, {
             group = vim.api.nvim_create_augroup("claude_prompt_autowrite", { clear = true }),
             buffer = ev.buf,

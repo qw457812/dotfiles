@@ -102,6 +102,12 @@ return {
             end
           end, { buffer = ev.buf, desc = "Clear UI or Exit" })
 
+          vim.keymap.set({ "n", "i" }, "<C-s>", function()
+            -- use :write and :quitall instead of :wqa to avoid issues with fish_indent
+            vim.cmd([[write]])
+            vim.cmd([[quitall]])
+          end, { buffer = ev.buf, desc = "Save and Exit" })
+
           -- https://github.com/chrisgrieser/.config/blob/052cf97e9e38a37b8d8ca921c3b6626851f98043/nvim/lua/config/autocmds.lua#L51-L74
           vim.api.nvim_create_autocmd({ "InsertLeave", "TextChanged" }, {
             group = vim.api.nvim_create_augroup("shell_command_buffer_autowrite", { clear = true }),

@@ -61,7 +61,7 @@ return {
       {
         "<leader>ans",
         "<cmd>CodeCompanionChat copilot_claude<CR>",
-        desc = "Copilot Claude Sonnet 4",
+        desc = "Copilot Claude Sonnet 4.5",
         mode = { "n", "x" },
       },
     },
@@ -71,11 +71,11 @@ return {
           copilot_claude = function()
             return require("codecompanion.adapters").extend("copilot", {
               name = "copilot_claude",
-              formatted_name = "Copilot Claude Sonnet 4",
+              formatted_name = "Copilot Claude Sonnet 4.5",
               schema = {
                 model = {
                   -- https://docs.github.com/en/copilot/concepts/billing/copilot-requests#model-multipliers
-                  default = "claude-sonnet-4",
+                  default = "claude-sonnet-4.5",
                 },
               },
             })
