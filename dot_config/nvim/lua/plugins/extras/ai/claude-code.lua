@@ -196,6 +196,7 @@ return {
           ---@module "snacks"
           snacks_win_opts = vim.tbl_deep_extend("force", {
             keys = {
+              t_c_o = false, -- claude code uses <c-o> for its own functionality
               claude_close = {
                 H.toggle_key,
                 function(self)

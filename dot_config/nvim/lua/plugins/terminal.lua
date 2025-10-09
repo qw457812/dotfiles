@@ -93,6 +93,7 @@ return {
               end,
               mode = "t",
             },
+            n_c_q = { "<c-q>", "hide" }, -- with t_c_q, double `<c-q>` will hide
             hide_ctrl_z = { "<c-z>", "hide", mode = { "n", "t" } },
             n_esc = {
               "<esc>",
