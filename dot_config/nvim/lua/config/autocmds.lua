@@ -221,33 +221,32 @@ end
 -- https://github.com/nvim-mini/mini.nvim/blob/73bbcbfa7839c4b00a64965fb504f87461abefbd/lua/mini/misc.lua#L194
 -- https://github.com/mrbeardad/nvim/blob/916d17211cc67d082ece6476bdfffe1a9fc41d22/lua/user/configs/autocmds.lua#L61
 if vim.g.user_auto_root and not vim.o.autochdir then
-  local function set_root(buf)
+  ---debounced to wait for lazyvim_root_cache augroup to clear cache
+  ---@type fun(buf:integer)
+  local cd_root = U.debounce_wrap(100, function(buf)
+    if buf ~= vim.api.nvim_get_current_buf() or vim.bo[buf].buftype ~= "" then
+      return
+    end
     local root = LazyVim.root.get({ normalize = true, buf = buf })
     if root ~= vim.uv.cwd() then
       vim.fn.chdir(root)
     end
-  end
+  end)
 
   local current_buf = 0
+  local group = vim.api.nvim_create_augroup("auto_root", {})
   vim.api.nvim_create_autocmd("BufEnter", {
-    group = vim.api.nvim_create_augroup("auto_root", {}),
-    desc = "Find root and change current directory",
-    callback = function(event)
-      current_buf = event.buf
-      if vim.bo[current_buf].buftype == "" then
-        vim.defer_fn(function()
-          set_root(current_buf)
-        end, 100) -- wait till lazyvim_root_cache augroup clear cache
-      end
+    group = group,
+    callback = function(ev)
+      current_buf = ev.buf
+      cd_root(ev.buf)
     end,
   })
   vim.api.nvim_create_autocmd({ "LspAttach", "BufWritePost" }, {
-    group = vim.api.nvim_create_augroup("auto_root", { clear = false }),
-    callback = function(event)
-      if event.buf == current_buf then
-        vim.defer_fn(function()
-          set_root(current_buf)
-        end, 100)
+    group = group,
+    callback = function(ev)
+      if ev.buf == current_buf then
+        cd_root(ev.buf)
       end
     end,
   })
