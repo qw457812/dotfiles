@@ -43,9 +43,8 @@ return {
           })
         end,
         desc = "Terminal (Git Root Dir)",
-        mode = { "n", "t" },
       },
-      { "<c-_>", "<c-/>", desc = "which_key_ignore", mode = { "n", "t" }, remap = true }, -- is remap right?
+      { "<c-_>", "<c-/>", desc = "which_key_ignore", remap = true }, -- is remap right?
       {
         "<c-,>",
         function()
@@ -94,7 +93,7 @@ return {
               mode = "t",
             },
             n_c_q = { "<c-q>", "hide" }, -- with t_c_q, double `<c-q>` will hide
-            hide_ctrl_z = { "<c-z>", "hide", mode = { "n", "t" } },
+            hide_ctrl_z = { "<c-z>", "hide", mode = { "n", "t" } }, -- fish undo
             n_esc = {
               "<esc>",
               function(self)
