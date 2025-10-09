@@ -251,3 +251,51 @@ if vim.g.user_auto_root and not vim.o.autochdir then
     end,
   })
 end
+
+-- set up vim.g.user_last_file
+do
+  ---@param opts { buf: integer, cond?: fun():boolean }
+  local function track_last_file(opts)
+    local buf = opts.buf
+    -- debounced to wait for lazyvim_root_cache augroup to clear cache
+    U.debounce("track-last-file", 30, function()
+      if opts.cond and not opts.cond() then
+        return
+      end
+      local _, file = U.is_file(buf)
+      if not file then
+        return
+      end
+
+      vim.g.user_last_file = {
+        buf = buf,
+        path = file,
+        root = LazyVim.root.get({ normalize = true, buf = buf }),
+      }
+    end)
+  end
+
+  local current_buf = 0
+  local group = vim.api.nvim_create_augroup("track_last_file", {})
+  vim.api.nvim_create_autocmd("BufEnter", {
+    group = group,
+    callback = function(ev)
+      current_buf = ev.buf
+      track_last_file({ buf = ev.buf })
+    end,
+  })
+  vim.api.nvim_create_autocmd({ "LspAttach", "BufWritePost" }, {
+    group = group,
+    callback = function(ev)
+      if ev.buf == current_buf then
+        track_last_file({
+          buf = ev.buf,
+          -- only update root/path for already-tracked buffer
+          cond = function()
+            return ev.buf == (vim.g.user_last_file or {}).buf
+          end,
+        })
+      end
+    end,
+  })
+end

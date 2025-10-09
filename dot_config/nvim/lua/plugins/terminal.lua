@@ -10,6 +10,9 @@ return {
       {
         "<c-space>",
         function()
+          -- fallback to last file buffer's root if current buffer is not a file
+          local root = (U.is_file() or not vim.g.user_last_file) and LazyVim.root() or vim.g.user_last_file.root
+
           -- TODO: focus if terminal is already open but not focused
           Snacks.terminal(nil, {
             win = {
@@ -20,7 +23,7 @@ return {
                 hide_ctrl_space = { "<c-space>", "hide", mode = { "n", "t" } },
               },
             },
-            cwd = LazyVim.root(), -- TODO: fallback to last real file buffer's root if current buffer is not a file
+            cwd = root,
           })
         end,
         desc = "Float Terminal (Root Dir)",
@@ -29,6 +32,9 @@ return {
       {
         "<c-/>",
         function()
+          local git_root = (U.is_file() or not vim.g.user_last_file) and Snacks.git.get_root()
+            or Snacks.git.get_root(vim.g.user_last_file.path)
+
           Snacks.terminal(nil, {
             win = {
               keys = {
@@ -36,7 +42,7 @@ return {
                 hide_ctrl_underscore = { "<c-_>", "hide", mode = { "n", "t" } },
               },
             },
-            cwd = LazyVim.root.git(),
+            cwd = git_root,
             -- make sure win.position is bottom, without this, type <c-space> first then <c-/> will make the terminal float
             -- see: https://github.com/folke/snacks.nvim/blob/544a2ae01c28056629a0c90f8d0ff40995c84e42/lua/snacks/terminal.lua#L174
             env = { __NVIM_SNACKS_TERMINAL_ID = "CTRL-/" },
@@ -49,13 +55,17 @@ return {
         "<c-,>",
         function()
           local filepath = vim.fn.expand("%:p:h")
+          filepath = vim.fn.isdirectory(filepath) == 1 and filepath
+            or (vim.g.user_last_file and vim.fn.fnamemodify(vim.g.user_last_file.path, ":h"))
+            or LazyVim.root()
+
           Snacks.terminal(nil, {
             win = {
               keys = {
                 hide_ctrl_comma = { "<c-,>", "hide", mode = { "n", "t" } },
               },
             },
-            cwd = vim.fn.isdirectory(filepath) == 1 and filepath or LazyVim.root(),
+            cwd = filepath,
           })
         end,
         desc = "Terminal (Buffer Dir)",

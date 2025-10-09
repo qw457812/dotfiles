@@ -102,9 +102,20 @@ function M.is_floating_win(win, opts)
   return true
 end
 
----@param win? integer
-function M.too_narrow(win)
-  return vim.o.columns < 120 or vim.api.nvim_win_get_width(win or 0) < 120
+---copied from: https://github.com/folke/snacks.nvim/blob/ce67fa9e31467590c750e203e27d3e6df293f2ad/lua/snacks/picker/core/frecency.lua#L162-L168
+---@param buf? integer
+---@return boolean
+---@return string?
+function M.is_file(buf)
+  buf = buf or 0
+  if not vim.api.nvim_buf_is_valid(buf) or vim.bo[buf].buftype ~= "" or not vim.bo[buf].buflisted then
+    return false
+  end
+  local file = vim.api.nvim_buf_get_name(buf)
+  if file == "" or not vim.uv.fs_stat(file) then
+    return false
+  end
+  return true, file
 end
 
 -- snacks bigfile
@@ -112,6 +123,11 @@ end
 function M.is_bigfile(buf)
   buf = buf or 0
   return vim.bo[buf].filetype == "bigfile" or vim.b[buf].bigfile
+end
+
+---@param win? integer
+function M.too_narrow(win)
+  return vim.o.columns < 120 or vim.api.nvim_win_get_width(win or 0) < 120
 end
 
 -- see: https://github.com/folke/edgy.nvim/blob/e94e851f9dc296c2949d4c524b1be7de2340306e/lua/edgy/editor.lua#L80-L109
