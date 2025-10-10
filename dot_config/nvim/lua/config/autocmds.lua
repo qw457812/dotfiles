@@ -262,7 +262,7 @@ do
       if opts.cond and not opts.cond() then
         return
       end
-      local _, file = U.is_file(buf)
+      local _, file = U.is_file({ buf = buf })
       if not file then
         return
       end

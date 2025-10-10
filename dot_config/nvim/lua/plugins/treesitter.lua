@@ -10,7 +10,10 @@ return {
       local has_chezmoi_vim = LazyVim.has("chezmoi.vim")
       vim.api.nvim_create_autocmd("FileType", {
         callback = function(ev)
-          if LazyVim.treesitter.have(ev.match) and not (has_chezmoi_vim and ev.match:find("chezmoitmpl")) then
+          if
+            LazyVim.treesitter.have(ev.match, "highlights")
+            and not (has_chezmoi_vim and ev.match:find("chezmoitmpl"))
+          then
             pcall(vim.treesitter.start)
           end
         end,

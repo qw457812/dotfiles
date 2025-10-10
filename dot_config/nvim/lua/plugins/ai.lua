@@ -146,7 +146,7 @@ return {
   {
     "folke/sidekick.nvim",
     optional = true,
-    opts = function()
+    opts = function(_, opts)
       U.toggle.ai_cmps.sidekick_nes = Snacks.toggle({
         name = "Sidekick NES",
         get = function()
@@ -157,6 +157,29 @@ return {
           require("sidekick.nes").enable(state)
         end,
       })
+
+      if vim.g.neovide then
+        local function term_nav(dir)
+          return function()
+            vim.cmd.wincmd(dir)
+          end
+        end
+
+        return U.extend_tbl(opts, {
+          cli = {
+            ---@type sidekick.win.Opts
+            win = {
+              ---@type table<string, sidekick.cli.Keymap|false>
+              keys = {
+                nav_h = { "<C-h>", term_nav("h"), desc = "Go to Left Window" },
+                nav_j = { "<C-j>", term_nav("j"), desc = "Go to Lower Window" },
+                nav_k = { "<C-k>", term_nav("k"), desc = "Go to Upper Window" },
+                nav_l = { "<C-l>", term_nav("l"), desc = "Go to Right Window" },
+              },
+            },
+          },
+        } --[[@as sidekick.Config]])
+      end
     end,
   },
 

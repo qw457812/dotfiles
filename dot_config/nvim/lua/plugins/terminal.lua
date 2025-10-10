@@ -4,8 +4,16 @@ return {
     "folke/snacks.nvim",
     keys = function(_, keys)
       local function ctrl_slash()
-        local git_root = (U.is_file() or not vim.g.user_last_file) and Snacks.git.get_root()
-          or Snacks.git.get_root(vim.g.user_last_file.path)
+        local git_root ---@type string?
+        if U.is_file({ buflisted = false }) then
+          git_root = Snacks.git.get_root()
+        elseif vim.g.user_last_file then
+          git_root = Snacks.git.get_root(vim.g.user_last_file.path)
+        end
+        if not git_root then
+          LazyVim.warn("Not a git repo", { title = "Terminal" })
+          git_root = LazyVim.root()
+        end
 
         Snacks.terminal(nil, {
           win = {
@@ -29,7 +37,8 @@ return {
           "<c-space>",
           function()
             -- fallback to last file buffer's root if current buffer is not a file
-            local root = (U.is_file() or not vim.g.user_last_file) and LazyVim.root() or vim.g.user_last_file.root
+            local root = (U.is_file({ buflisted = false }) or not vim.g.user_last_file) and LazyVim.root()
+              or vim.g.user_last_file.root
 
             -- TODO: focus if terminal is already open but not focused
             Snacks.terminal(nil, {
@@ -52,10 +61,13 @@ return {
         {
           "<c-,>",
           function()
-            local filepath = vim.fn.expand("%:p:h")
-            filepath = vim.fn.isdirectory(filepath) == 1 and filepath
-              or (vim.g.user_last_file and vim.fn.fnamemodify(vim.g.user_last_file.path, ":h"))
-              or LazyVim.root()
+            local _, file = U.is_file({ buflisted = false })
+            local filepath = file and vim.fn.fnamemodify(file, ":h")
+              or vim.g.user_last_file and vim.fn.fnamemodify(vim.g.user_last_file.path, ":h")
+            if not filepath then
+              LazyVim.warn("Not a file", { title = "Terminal" })
+              return
+            end
 
             Snacks.terminal(nil, {
               win = {
@@ -164,7 +176,11 @@ return {
     --   {
     --     "<Leader>gc",
     --     function()
-    --       local root = LazyVim.root.git() -- Snacks.git.get_root()
+    --       local root = Snacks.git.get_root()
+    --       if not root then
+    --         LazyVim.warn("Not a git repo", { title = "Flatten" })
+    --         return
+    --       end
     --       -- TODO:
     --       -- - delete terminal buffer with `[Process exited 1]`
     --       -- - notify when something is wrong (e.g., no changes to commit)
