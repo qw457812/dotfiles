@@ -3,8 +3,7 @@
   "theme": "system",
   "share": "manual",
   "autoupdate": false,
-  "model": "openrouter/openai/gpt-5",
-  "small_model": "openrouter/moonshotai/kimi-k2-0905",
+  "model": "opencode/grok-code",
   "provider": {
     "openrouter": {
       "options": {
@@ -12,14 +11,6 @@
       },
       "models": {
         "moonshotai/kimi-k2-0905": {
-          "options": {
-            "provider": {
-              "order": ["moonshotai", "baseten", "together", "groq"],
-              "allow_fallbacks": false
-            }
-          }
-        },
-        "moonshotai/kimi-k2": {
           "options": {
             "provider": {
               "order": ["moonshotai", "baseten", "together", "groq"],
@@ -34,8 +25,16 @@
     "context7": {
       "type": "local",
       "command": ["npx", "-y", "@upstash/context7-mcp"],
+      "enabled": false
+    },
+    "exa": {
+      "type": "remote",
+      "url": "https://mcp.exa.ai/mcp",
       "enabled": true
     }
+  },
+  "tools": {
+    "exa_web_search_exa": false
   },
   "keybinds": {
     "leader": "ctrl+x",

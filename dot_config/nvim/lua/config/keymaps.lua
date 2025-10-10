@@ -158,7 +158,7 @@ map("n", "]<tab>", "<cmd>tabnext<cr>", { desc = "Next Tab" })
 map("n", "[<tab>", "<cmd>tabprevious<cr>", { desc = "Previous Tab" })
 
 -- terminal
-del("t", { "<c-/>", "<c-_>" }) -- undo for fish and claude code
+del("t", { "<c-/>", "<c-_>" }) -- undo for fish/claude
 
 -- files
 map("n", "<leader>fs", "<cmd>w<cr><esc>", { desc = "Save File" })

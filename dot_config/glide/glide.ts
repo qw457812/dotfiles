@@ -138,6 +138,16 @@ glide.keymaps.set("normal", "L", async () => {
 });
 glide.keymaps.set("normal", "J", "tab_next");
 glide.keymaps.set("normal", "K", "tab_prev");
+// track previously active tab
+let previousTabId: number | undefined;
+browser.tabs.onActivated.addListener((activeInfo) => {
+  previousTabId = activeInfo.previousTabId;
+});
+glide.keymaps.set("normal", "`", async () => {
+  if (previousTabId) {
+    await browser.tabs.update(previousTabId, { active: true });
+  }
+});
 glide.keymaps.set("normal", "U", "redo");
 glide.keymaps.set("normal", "<BS>", "tab_close");
 glide.keymaps.set("normal", "<S-BS>", async () => {

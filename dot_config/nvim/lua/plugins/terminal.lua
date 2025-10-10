@@ -2,76 +2,75 @@
 return {
   {
     "folke/snacks.nvim",
-    keys = {
-      -- stylua: ignore start
-      { "<leader>fT", function() U.terminal() end, desc = "Terminal (cwd)" },
-      -- { "<leader>ft", function() U.terminal(nil, { cwd = LazyVim.root() }) end, desc = "Terminal (Root Dir)" },
-      -- stylua: ignore end
-      {
-        "<c-space>",
-        function()
-          -- fallback to last file buffer's root if current buffer is not a file
-          local root = (U.is_file() or not vim.g.user_last_file) and LazyVim.root() or vim.g.user_last_file.root
+    keys = function(_, keys)
+      local function ctrl_slash()
+        local git_root = (U.is_file() or not vim.g.user_last_file) and Snacks.git.get_root()
+          or Snacks.git.get_root(vim.g.user_last_file.path)
 
-          -- TODO: focus if terminal is already open but not focused
-          Snacks.terminal(nil, {
-            win = {
-              position = "float",
-              height = vim.g.user_is_termux and U.snacks.win.fullscreen_height or nil,
-              width = vim.g.user_is_termux and 0 or nil,
-              keys = {
-                hide_ctrl_space = { "<c-space>", "hide", mode = { "n", "t" } },
-              },
+        Snacks.terminal(nil, {
+          win = {
+            keys = {
+              hide_ctrl_slash = { "<c-/>", "hide", desc = "Hide Terminal", mode = { "n", "t" } },
+              hide_ctrl_underscore = { "<c-_>", "hide", desc = "which_key_ignore", mode = { "n", "t" } },
             },
-            cwd = root,
-          })
-        end,
-        desc = "Float Terminal (Root Dir)",
-        mode = { "n", "t" },
-      },
-      {
-        "<c-/>",
-        function()
-          local git_root = (U.is_file() or not vim.g.user_last_file) and Snacks.git.get_root()
-            or Snacks.git.get_root(vim.g.user_last_file.path)
+          },
+          cwd = git_root,
+          -- make sure win.position is bottom, without this, type <c-space> first then <c-/> will make the terminal float
+          -- see: https://github.com/folke/snacks.nvim/blob/544a2ae01c28056629a0c90f8d0ff40995c84e42/lua/snacks/terminal.lua#L174
+          env = { __NVIM_SNACKS_TERMINAL_ID = "CTRL-/" },
+        })
+      end
 
-          Snacks.terminal(nil, {
-            win = {
-              keys = {
-                hide_ctrl_slash = { "<c-/>", "hide", mode = { "n", "t" } },
-                hide_ctrl_underscore = { "<c-_>", "hide", mode = { "n", "t" } },
-              },
-            },
-            cwd = git_root,
-            -- make sure win.position is bottom, without this, type <c-space> first then <c-/> will make the terminal float
-            -- see: https://github.com/folke/snacks.nvim/blob/544a2ae01c28056629a0c90f8d0ff40995c84e42/lua/snacks/terminal.lua#L174
-            env = { __NVIM_SNACKS_TERMINAL_ID = "CTRL-/" },
-          })
-        end,
-        desc = "Terminal (Git Root Dir)",
-      },
-      { "<c-_>", "<c-/>", desc = "which_key_ignore", remap = true }, -- is remap right?
-      {
-        "<c-,>",
-        function()
-          local filepath = vim.fn.expand("%:p:h")
-          filepath = vim.fn.isdirectory(filepath) == 1 and filepath
-            or (vim.g.user_last_file and vim.fn.fnamemodify(vim.g.user_last_file.path, ":h"))
-            or LazyVim.root()
+      return vim.list_extend(keys, {
+        -- stylua: ignore
+        { "<leader>fT", function() U.terminal() end, desc = "Terminal (cwd)" },
+        -- { "<leader>ft", function() U.terminal(nil, { cwd = LazyVim.root() }) end, desc = "Terminal (Root Dir)" },
+        {
+          "<c-space>",
+          function()
+            -- fallback to last file buffer's root if current buffer is not a file
+            local root = (U.is_file() or not vim.g.user_last_file) and LazyVim.root() or vim.g.user_last_file.root
 
-          Snacks.terminal(nil, {
-            win = {
-              keys = {
-                hide_ctrl_comma = { "<c-,>", "hide", mode = { "n", "t" } },
+            -- TODO: focus if terminal is already open but not focused
+            Snacks.terminal(nil, {
+              win = {
+                position = "float",
+                height = vim.g.user_is_termux and U.snacks.win.fullscreen_height or nil,
+                width = vim.g.user_is_termux and 0 or nil,
+                keys = {
+                  hide_ctrl_space = { "<c-space>", "hide", mode = { "n", "t" } },
+                },
               },
-            },
-            cwd = filepath,
-          })
-        end,
-        desc = "Terminal (Buffer Dir)",
-        mode = { "n", "t" },
-      },
-    },
+              cwd = root,
+            })
+          end,
+          desc = "Float Terminal (Root Dir)",
+          mode = { "n", "t" },
+        },
+        { "<c-/>", ctrl_slash, desc = "Terminal (Git Root Dir)" },
+        { "<c-_>", ctrl_slash, desc = "which_key_ignore" }, -- NOTE: type `<C-v><C-/>` in insert mode to see what your terminal sends, `<C-/>` or `<C-_>`
+        {
+          "<c-,>",
+          function()
+            local filepath = vim.fn.expand("%:p:h")
+            filepath = vim.fn.isdirectory(filepath) == 1 and filepath
+              or (vim.g.user_last_file and vim.fn.fnamemodify(vim.g.user_last_file.path, ":h"))
+              or LazyVim.root()
+
+            Snacks.terminal(nil, {
+              win = {
+                keys = {
+                  hide_ctrl_comma = { "<c-,>", "hide", mode = { "n", "t" } },
+                },
+              },
+              cwd = filepath,
+            })
+          end,
+          desc = "Terminal (Buffer Dir)",
+          mode = { "n", "t" },
+        },
+      })
+    end,
     ---@module "snacks"
     ---@type snacks.Config
     opts = {
@@ -94,6 +93,10 @@ return {
             end,
           },
           keys = {
+            -- Disable `<c-/>` to avoid conflicts with fish/claude undo.
+            -- Instead, `<c-/>` only hides the terminal opened by `<c-/>` (see `hide_ctrl_slash` above)
+            hide_slash = false,
+            hide_underscore = false,
             t_c_o = { "<c-o>", "blur", mode = "t" },
             t_c_q = {
               "<c-q>",
@@ -103,7 +106,7 @@ return {
               mode = "t",
             },
             n_c_q = { "<c-q>", "hide" }, -- with t_c_q, double `<c-q>` will hide
-            hide_ctrl_z = { "<c-z>", "hide", mode = { "n", "t" } }, -- fish undo
+            hide_ctrl_z = { "<c-z>", "hide", mode = { "n", "t" } }, -- conflicts with fish undo
             n_esc = {
               "<esc>",
               function(self)

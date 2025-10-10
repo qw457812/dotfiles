@@ -240,16 +240,16 @@ abbr bbd 'brew bundle dump --global --force'
 # AI
 if type -q claude
     # claude mcp add -s user context7 -- npx -y @upstash/context7-mcp --api-key $CONTEXT7_API_KEY
+    # claude mcp add -s user --transport http context7 https://mcp.context7.com/mcp --header "CONTEXT7_API_KEY: $CONTEXT7_API_KEY"
+    # # https://github.com/exa-labs/exa-mcp-server/issues/48
+    # claude mcp add -s user exa -e EXA_API_KEY=$EXA_API_KEY -- npx -y exa-mcp-server --tools=get_code_context_exa
+    # claude mcp add -s user -t http exa https://mcp.exa.ai/mcp
+    # claude mcp add -s user --transport http grep https://mcp.grep.app
     # claude mcp add -s user playwright npx @playwright/mcp@latest
     # claude mcp add -s user magic -- npx -y @21st-dev/magic@latest
     # claude mcp add -s user sequential-thinking -- npx -y @modelcontextprotocol/server-sequential-thinking
     # claude mcp add -s user -t http deepwiki https://mcp.deepwiki.com/mcp
-    # claude mcp add -s user --transport http grep https://mcp.grep.app
-    # claude mcp add -s user exa -e EXA_API_KEY=$EXA_API_KEY -- npx -y exa-mcp-server --tools=get_code_context_exa
-    # claude mcp add -s user exa -e EXA_API_KEY=$EXA_API_KEY -- npx -y exa-mcp-server --tools=deep_researcher_start,deep_researcher_check
-    # claude mcp add -s user -t http exa https://mcp.exa.ai/mcp
     # claude mcp add -s user firecrawl -e FIRECRAWL_API_KEY=$FIRECRAWL_API_KEY -- npx -y firecrawl-mcp
-    # claude mcp add -s user codex -- codex mcp serve
     abbr cl claude
     abbr clt claude_temp
     abbr clc "claude --continue"
@@ -275,6 +275,7 @@ if type -q claude
         abbr ccmm "claude-monitor --view monthly"
     end
     abbr ccstl (type -q bunx; and echo "bunx ccstatusline@latest"; or echo "npx ccstatusline@latest")
+    # alternative: https://github.com/Fission-AI/OpenSpec
     abbr spec "uvx --from git+https://github.com/github/spec-kit.git specify init --script sh --ai claude --here"
     abbr cchistory "npx cchistory"
     abbr ccexp (type -q bunx; and echo "bunx ccexp@latest"; or echo "npx ccexp@latest")
@@ -289,7 +290,7 @@ type -q codex; and abbr cx codex # codex completion fish >~/.config/fish/complet
 if type -q opencode
     abbr oc opencode
     abbr occ 'opencode --continue'
-    abbr ocg 'opencode --model opencode/grok-code'
+    abbr ocz 'opencode --model opencode/code-supernova' # https://opencode.ai/docs/zen/
 end
 if type -q aider
     abbr ad aider

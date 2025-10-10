@@ -246,6 +246,7 @@ return {
             { plugin = "codecompanion.nvim", pattern = "codecompanion", icon = " ", color = "purple" },
             { plugin = "mcphub.nvim", icon = " ", color = "grey" }, -- 
             { pattern = "codex", icon = icons.OpenAI, color = "grey" },
+            { pattern = "opencode", icon = " ", color = "grey" },
           } --[[@as wk.IconRule[] ]],
         },
       } --[[@as wk.Opts]])

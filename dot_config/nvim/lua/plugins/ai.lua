@@ -59,6 +59,7 @@ return {
         { "<leader>asp", function() require("sidekick.cli").prompt() end, mode = { "n", "x" }, desc = "Select Prompt" },
         { "<leader>asc", function() require("sidekick.cli").toggle({ name = "claude" }) end, desc = "Claude" },
         { "<leader>asx", function() require("sidekick.cli").toggle({ name = "codex" }) end, desc = "Codex" },
+        { "<leader>aso", function() require("sidekick.cli").toggle({ name = "opencode" }) end, desc = "OpenCode" },
       })
       return keys
     end,
