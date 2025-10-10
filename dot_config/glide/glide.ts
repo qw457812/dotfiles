@@ -161,9 +161,12 @@ glide.keymaps.set("normal", "<C-p>", async ({ tab_id }) => {
 });
 glide.keymaps.set("normal", "<leader><BS>", "quit");
 glide.keymaps.set("normal", "<leader>fc", async () => {
-  await glide.process.spawn("neovide", [
-    `${glide.path.home_dir}/.config/glide/glide.ts`,
-  ]);
+  const config = `${glide.path.home_dir}/.config/glide/glide.ts`;
+  if (glide.ctx.os === "macosx") {
+    await glide.process.spawn("open", ["-b", "com.neovide.neovide", config]);
+  } else {
+    await glide.process.spawn("neovide", [config]);
+  }
 });
 glide.keymaps.set("normal", "<leader>fk", "map");
 glide.keymaps.set("normal", "<leader>un", "clear");
@@ -213,13 +216,11 @@ glide.autocmds.create("UrlEnter", { hostname: "github.com" }, async () => {
   function go_to(page: string) {
     return async () => {
       const url = new URL(glide.ctx.url);
-      const parts = url.pathname.split("/").filter(Boolean);
-      assert(
-        parts.length >= 2,
-        `Path does not look like github.com/$org/$repo`,
-      );
-      url.pathname = "/" + [parts[0], parts[1], page].filter(Boolean).join("/");
-      await browser.tabs.update({ url: url.toString() });
+      const [org, repo] = url.pathname.split("/").filter(Boolean);
+      assert(org && repo, `Path does not look like github.com/$org/$repo`);
+      await browser.tabs.update({
+        url: [url.origin, org, repo, page].filter(Boolean).join("/"),
+      });
     };
   }
   glide.buf.keymaps.set("normal", ",<space>", go_to(""));
