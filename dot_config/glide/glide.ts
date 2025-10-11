@@ -32,50 +32,43 @@ glide.keymaps.del("normal", "<leader>d");
 // https://github.com/glide-browser/glide/blob/107e240a8fd274cafef403d089dc2b646319e8f8/src/glide/browser/base/content/plugins/keymaps.mts
 // TODO: o b
 glide.keymaps.set("normal", "/", "keys <D-f>");
-glide.keymaps.set("normal", "r", async () => {
-  if (await glide.ctx.is_editing()) {
-    await glide.excmds.execute("r");
-  } else {
-    await glide.excmds.execute("reload");
-  }
-});
-glide.keymaps.set("normal", "t", async () => {
-  if (!(await glide.ctx.is_editing())) {
-    await glide.excmds.execute("tab_new");
-  }
-});
-glide.keymaps.set("normal", "T", async () => {
-  if (!(await glide.ctx.is_editing())) {
-    await glide.excmds.execute("commandline_show tab ");
-  }
-});
-glide.keymaps.set("normal", "yt", async ({ tab_id }) => {
-  if (!(await glide.ctx.is_editing())) {
-    await browser.tabs.duplicate(tab_id);
-  }
-});
-glide.keymaps.set("normal", "p", async () => {
-  if (!(await glide.ctx.is_editing())) {
+glide.keymaps.set("normal", "r", when_editing("r", "reload"));
+glide.keymaps.set("normal", "t", when_editing(null, "tab_new"));
+glide.keymaps.set("normal", "T", when_editing(null, "commandline_show tab "));
+glide.keymaps.set(
+  "normal",
+  "yt",
+  when_editing(
+    null,
+    async ({ tab_id }) => await browser.tabs.duplicate(tab_id),
+  ),
+);
+glide.keymaps.set(
+  "normal",
+  "p",
+  when_editing(null, async () => {
     const url = await navigator.clipboard.readText();
     await browser.tabs.update({ url });
-  }
-});
-glide.keymaps.set("normal", "P", async () => {
-  if (!(await glide.ctx.is_editing())) {
+  }),
+);
+glide.keymaps.set(
+  "normal",
+  "P",
+  when_editing(null, async () => {
     const url = await navigator.clipboard.readText();
     await browser.tabs.create({ url });
-  }
-});
-glide.keymaps.set("normal", "e", async () => {
-  if (await glide.ctx.is_editing()) {
-    await glide.excmds.execute("motion e");
-  } else {
+  }),
+);
+glide.keymaps.set(
+  "normal",
+  "e",
+  when_editing("motion e", async () => {
     await glide.keys.send("<D-l>");
     await sleep(50);
     await glide.excmds.execute("mode_change normal");
     await glide.excmds.execute("caret_move right");
-  }
-});
+  }),
+);
 glide.keymaps.set("normal", "gu", async () => {
   const url = new URL(glide.ctx.url);
   const parts = url.pathname.split("/").filter(Boolean);
@@ -92,66 +85,20 @@ glide.keymaps.set("normal", "gU", async () => {
 glide.keymaps.set(
   "normal",
   "d",
-  async () => {
-    if (await glide.ctx.is_editing()) {
-      await glide.excmds.execute("mode_change op-pending --operator=d");
-    } else {
-      await glide.excmds.execute("scroll_page_down");
-    }
-  },
-  {
-    retain_key_display: true,
-  },
+  when_editing("mode_change op-pending --operator=d", "scroll_page_down"),
+  { retain_key_display: true },
 );
-glide.keymaps.set("normal", "u", async () => {
-  if (await glide.ctx.is_editing()) {
-    await glide.excmds.execute("undo");
-  } else {
-    await glide.excmds.execute("scroll_page_up");
-  }
-});
-glide.keymaps.set("normal", "x", async () => {
-  if (await glide.ctx.is_editing()) {
-    await glide.excmds.execute("motion x");
-  } else {
-    await glide.excmds.execute("tab_close");
-  }
-});
-glide.keymaps.set("normal", "X", async () => {
-  if (await glide.ctx.is_editing()) {
-    await glide.excmds.execute("motion X");
-  } else {
-    await browser.sessions.restore();
-  }
-});
-glide.keymaps.set("normal", "h", async () => {
-  if (await glide.ctx.is_editing()) {
-    await glide.excmds.execute("caret_move left");
-  } else {
-    await glide.excmds.execute("back");
-  }
-});
-glide.keymaps.set("normal", "l", async () => {
-  if (await glide.ctx.is_editing()) {
-    await glide.excmds.execute("caret_move right");
-  } else {
-    await glide.excmds.execute("forward");
-  }
-});
-glide.keymaps.set("normal", "H", async () => {
-  if (await glide.ctx.is_editing()) {
-    await glide.excmds.execute("motion 0");
-  } else {
-    await glide.excmds.execute("caret_move left"); // scroll left?
-  }
-});
-glide.keymaps.set("normal", "L", async () => {
-  if (await glide.ctx.is_editing()) {
-    await glide.excmds.execute("motion $");
-  } else {
-    await glide.excmds.execute("caret_move right"); // scroll right?
-  }
-});
+glide.keymaps.set("normal", "u", when_editing("undo", "scroll_page_up"));
+glide.keymaps.set("normal", "x", when_editing("motion x", "tab_close"));
+glide.keymaps.set(
+  "normal",
+  "X",
+  when_editing("motion X", async () => await browser.sessions.restore()),
+);
+glide.keymaps.set("normal", "h", when_editing("caret_move left", "back"));
+glide.keymaps.set("normal", "l", when_editing("caret_move right", "forward"));
+glide.keymaps.set("normal", "H", when_editing("motion 0", "caret_move left")); // scroll left?
+glide.keymaps.set("normal", "L", when_editing("motion $", "caret_move right")); // scroll right?
 glide.keymaps.set("normal", "J", "tab_next");
 glide.keymaps.set("normal", "K", "tab_prev");
 // track previously active tab
@@ -253,6 +200,25 @@ glide.autocmds.create("UrlEnter", { hostname: "github.com" }, async () => {
 // Utils
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function when_editing(
+  editing_action: glide.ExcmdString | glide.KeymapCallback | null,
+  non_editing_action: glide.ExcmdString | glide.KeymapCallback | null,
+): glide.KeymapCallback {
+  return async (props) => {
+    const action = (await glide.ctx.is_editing())
+      ? editing_action
+      : non_editing_action;
+
+    if (!action) return;
+
+    if (typeof action === "string") {
+      await glide.excmds.execute(action);
+    } else {
+      await action(props);
+    }
+  };
 }
 
 function go_to_tab(url: string) {
