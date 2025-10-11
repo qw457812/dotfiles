@@ -47,6 +47,7 @@ return {
         { "<M-,>", function() require("sidekick.cli").toggle() end, mode = { "n", "x", "t" }, desc = "Sidekick Toggle" },
         { "<leader>aa", false },
         { "<leader>as", false },
+        { "<leader>ad", false },
         { "<leader>af", false },
         { "<leader>av", false, mode = "x" },
         { "<leader>at", false, mode = { "n", "x" } },
@@ -54,6 +55,7 @@ return {
         { "<leader>ak", function() require("sidekick.cli").toggle() end, desc = "Sidekick Toggle CLI" },
         { "<leader>ass", function() require("sidekick.cli").select() end, desc = "Select CLI" },
         { "<leader>ass", function() require("sidekick.cli").send({ msg = "{selection}" }) end, mode = "x", desc = "Send Visual Selection" },
+        { "<leader>asd", function() require("sidekick.cli").close() end, desc = "Detach a CLI Session" },
         { "<leader>ast", function() require("sidekick.cli").send({ msg = "{this}" }) end, mode = { "n", "x" }, desc = "Send This" },
         { "<leader>asf", function() require("sidekick.cli").send({ msg = "{file}" }) end, desc = "Send File" },
         { "<leader>asp", function() require("sidekick.cli").prompt() end, mode = { "n", "x" }, desc = "Select Prompt" },
@@ -146,7 +148,7 @@ return {
   {
     "folke/sidekick.nvim",
     optional = true,
-    opts = function(_, opts)
+    opts = function()
       U.toggle.ai_cmps.sidekick_nes = Snacks.toggle({
         name = "Sidekick NES",
         get = function()
@@ -157,29 +159,6 @@ return {
           require("sidekick.nes").enable(state)
         end,
       })
-
-      if vim.g.neovide then
-        local function term_nav(dir)
-          return function()
-            vim.cmd.wincmd(dir)
-          end
-        end
-
-        return U.extend_tbl(opts, {
-          cli = {
-            ---@type sidekick.win.Opts
-            win = {
-              ---@type table<string, sidekick.cli.Keymap|false>
-              keys = {
-                nav_h = { "<C-h>", term_nav("h"), desc = "Go to Left Window" },
-                nav_j = { "<C-j>", term_nav("j"), desc = "Go to Lower Window" },
-                nav_k = { "<C-k>", term_nav("k"), desc = "Go to Upper Window" },
-                nav_l = { "<C-l>", term_nav("l"), desc = "Go to Right Window" },
-              },
-            },
-          },
-        } --[[@as sidekick.Config]])
-      end
     end,
   },
 

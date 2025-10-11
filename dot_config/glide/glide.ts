@@ -54,10 +54,10 @@ glide.keymaps.set("normal", "yt", async ({ tab_id }) => {
     await browser.tabs.duplicate(tab_id);
   }
 });
-glide.keymaps.set("normal", "p", async ({ tab_id }) => {
+glide.keymaps.set("normal", "p", async () => {
   if (!(await glide.ctx.is_editing())) {
     const url = await navigator.clipboard.readText();
-    await browser.tabs.update(tab_id, { url });
+    await browser.tabs.update({ url });
   }
 });
 glide.keymaps.set("normal", "P", async () => {
@@ -71,7 +71,23 @@ glide.keymaps.set("normal", "e", async () => {
     await glide.excmds.execute("motion e");
   } else {
     await glide.keys.send("<D-l>");
+    await sleep(50);
+    await glide.excmds.execute("mode_change normal");
+    await glide.excmds.execute("caret_move right");
   }
+});
+glide.keymaps.set("normal", "gu", async () => {
+  const url = new URL(glide.ctx.url);
+  const parts = url.pathname.split("/").filter(Boolean);
+  assert(parts.length > 0, "Cannot go up: already at root of URL hierarchy");
+  parts.pop();
+  await browser.tabs.update({
+    url: [url.origin, ...parts].filter(Boolean).join("/"),
+  });
+});
+glide.keymaps.set("normal", "gU", async () => {
+  const url = new URL(glide.ctx.url);
+  await browser.tabs.update({ url: url.origin });
 });
 glide.keymaps.set(
   "normal",
@@ -170,16 +186,6 @@ glide.keymaps.set("normal", "<leader>fc", async () => {
 });
 glide.keymaps.set("normal", "<leader>fk", "map");
 glide.keymaps.set("normal", "<leader>un", "clear");
-function go_to_tab(url: string) {
-  return async () => {
-    const tab = await glide.tabs.get_first({ url });
-    if (tab && tab.id) {
-      await browser.tabs.update(tab.id, { active: true });
-    } else {
-      await browser.tabs.create({ url });
-    }
-  };
-}
 glide.keymaps.set("normal", "<leader>gg", go_to_tab("https://github.com/"));
 glide.keymaps.set(
   "normal",
@@ -188,7 +194,7 @@ glide.keymaps.set(
 );
 glide.keymaps.set(
   "normal",
-  "<leader>gc",
+  "<leader>g/",
   go_to_tab("https://github.com/search?type=code"),
 );
 glide.keymaps.set(
@@ -199,8 +205,20 @@ glide.keymaps.set(
 glide.keymaps.set("normal", "<leader>gi", go_to_tab("https://ossinsight.io/"));
 glide.keymaps.set(
   "normal",
-  "<leader>g`",
+  "<leader>g.",
   go_to_tab("https://github.com/qw457812/dotfiles"),
+);
+glide.keymaps.set(
+  "normal",
+  "<leader>gG",
+  go_to_tab("https://github.com/glide-browser/glide"),
+);
+glide.keymaps.set(
+  "normal",
+  "<leader>gK",
+  go_to_tab(
+    "https://github.com/glide-browser/glide/blob/main/src/glide/browser/base/content/plugins/keymaps.mts",
+  ),
 );
 
 glide.keymaps.set("insert", "jj", "mode_change normal");
@@ -213,17 +231,17 @@ glide.keymaps.set("command", "<c-k>", "commandline_focus_back");
 glide.autocmds.create("UrlEnter", { hostname: "github.com" }, async () => {
   await glide.excmds.execute("mode_change normal");
 
-  function go_to(page: string) {
+  function go_to(what: string) {
     return async () => {
       const url = new URL(glide.ctx.url);
       const [org, repo] = url.pathname.split("/").filter(Boolean);
       assert(org && repo, `Path does not look like github.com/$org/$repo`);
       await browser.tabs.update({
-        url: [url.origin, org, repo, page].filter(Boolean).join("/"),
+        url: [url.origin, org, repo, what].filter(Boolean).join("/"),
       });
     };
   }
-  glide.buf.keymaps.set("normal", ",<space>", go_to(""));
+  glide.buf.keymaps.set("normal", ",,", go_to(""));
   glide.buf.keymaps.set("normal", ",c", go_to("commits"));
   glide.buf.keymaps.set("normal", ",i", go_to("issues"));
   glide.buf.keymaps.set("normal", ",p", go_to("pulls"));
@@ -231,3 +249,25 @@ glide.autocmds.create("UrlEnter", { hostname: "github.com" }, async () => {
   glide.buf.keymaps.set("normal", ",d", go_to("discussions"));
   glide.buf.keymaps.set("normal", ",w", go_to("wiki"));
 });
+
+// Utils
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function go_to_tab(url: string) {
+  return async () => {
+    const tab = await glide.tabs.get_first({ url });
+    if (tab && tab.id) {
+      await browser.tabs.update(tab.id, { active: true });
+    } else {
+      await browser.tabs.create({ url });
+    }
+  };
+}
+
+// TODO: test for next release: https://github.com/glide-browser/glide/commit/740d1f3e9f22f1470ac4f91ca529e62965745659
+// glide.keymaps.set("insert", "<c-j>", "keys <Down>");
+// glide.keymaps.set("insert", "<c-k>", "keys <Up>");
+// glide.keymaps.set("insert", "<c-n>", "keys <Down>");
+// glide.keymaps.set("insert", "<c-p>", "keys <Up>");
