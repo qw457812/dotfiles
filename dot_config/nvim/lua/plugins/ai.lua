@@ -148,7 +148,7 @@ return {
   {
     "folke/sidekick.nvim",
     optional = true,
-    opts = function(_, opts)
+    opts = function()
       U.toggle.ai_cmps.sidekick_nes = Snacks.toggle({
         name = "Sidekick NES",
         get = function()
@@ -159,32 +159,6 @@ return {
           require("sidekick.nes").enable(state)
         end,
       })
-
-      -- HACK: prevent nvim crashing when pressing `i` in scrollback (with tmux)
-      ---@param key "i"|"a"|"I"|"A"
-      local function exit_scrollback(key)
-        ---@type sidekick.cli.Action
-        return function(t)
-          if vim.fn.winbufnr(t.win) == t.buf then
-            return key
-          end
-          local buf = vim.fn.bufnr()
-          vim.schedule(function()
-            -- ref: https://github.com/folke/sidekick.nvim/blob/69eb7b736798af9d382f1fc67df88e0450cf1529/lua/sidekick/cli/terminal.lua#L482-L491
-            vim.api.nvim_win_set_buf(t.win, t.buf)
-            t:wo()
-            if vim.api.nvim_buf_is_valid(buf) then
-              pcall(vim.api.nvim_buf_delete, buf, { force = true })
-            end
-          end)
-        end
-      end
-      local keys = {}
-      for _, key in ipairs({ "i", "a", "I", "A" }) do
-        keys["exit_scrollback_" .. key] =
-          { key, exit_scrollback(key), expr = true, desc = "exit scrollback", mode = "n" }
-      end
-      return U.extend_tbl(opts, { cli = { win = { keys = keys } } } --[[@as sidekick.Config]])
     end,
   },
 
