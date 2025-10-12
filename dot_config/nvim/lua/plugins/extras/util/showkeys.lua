@@ -1,7 +1,8 @@
+---@type LazySpec
 return {
   {
     "nvchad/showkeys",
-    cmd = "ShowkeysToggle",
+    event = "VeryLazy",
     keys = {
       { "<leader>uk", "<cmd>ShowkeysToggle<cr>", desc = "Show keys" },
     },
@@ -11,5 +12,10 @@ return {
       show_count = true,
       position = "top-right",
     },
+    config = function(_, opts)
+      local showkeys = require("showkeys")
+      showkeys.setup(opts)
+      showkeys.open()
+    end,
   },
 }

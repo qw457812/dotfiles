@@ -12,31 +12,67 @@ return {
   --   },
   -- },
 
-  -- -- biome
-  -- -- TODO: not working with extras.formatting.prettier + extras.formatting.biome
-  -- {
-  --   "stevearc/conform.nvim",
-  --   optional = true,
-  --   ---@module "conform"
-  --   ---@param opts conform.setupOpts
-  --   opts = function(_, opts)
-  --     if not (LazyVim.has_extra("formatting.biome") and LazyVim.has_extra("formatting.prettier")) then
-  --       return
-  --     end
-  --
-  --     -- remove "prettier" if "biome" is present
-  --     for ft in pairs(opts.formatters_by_ft or {}) do
-  --       if
-  --         vim.islist(opts.formatters_by_ft[ft])
-  --         and vim.list_contains(opts.formatters_by_ft[ft] --[[@as string[] ]], "biome")
-  --       then
-  --         opts.formatters_by_ft[ft] = vim.tbl_filter(function(formatter)
-  --           return formatter ~= "prettier"
-  --         end, opts.formatters_by_ft[ft] --[[@as string[] ]])
-  --       end
-  --     end
-  --   end,
-  -- },
+  -- biome
+  {
+    "stevearc/conform.nvim",
+    optional = true,
+    ---@module "conform"
+    ---@param opts conform.setupOpts
+    opts = function(_, opts)
+      if not LazyVim.has_extra("formatting.biome") then
+        return
+      end
+
+      opts.formatters = opts.formatters or {}
+      -- opts.formatters.biome = opts.formatters.biome or {}
+      -- opts.formatters.biome.require_cwd = nil -- make biome config file optional
+
+      opts.formatters["biome-check"] = {
+        args = function(self, ctx)
+          local args = require("conform.formatters.biome-check").args
+          if not args then
+            return {}
+          end
+          if type(args) == "function" then
+            return args(self, ctx)
+          end
+
+          -- ref: https://github.com/stevearc/conform.nvim/blob/016bc8174a675e1dbf884b06a165cd0c6c03f9af/lua/conform/formatters/biome.lua#L10-L24
+          if self:cwd(ctx) then
+            return args
+          end
+          -- only when biome.json{,c} don't exist
+          return vim.list_extend(type(args) == "table" and vim.deepcopy(args) or { args }, {
+            "--indent-style",
+            vim.bo[ctx.buf].expandtab and "space" or "tab",
+            "--indent-width",
+            ctx.shiftwidth,
+          })
+        end,
+      }
+
+      -- (except vue) remove prettier if biome is present, and use biome-check instead of biome
+      local by_ft = opts.formatters_by_ft or {}
+      for ft in pairs(by_ft) do
+        if
+          not (type(by_ft[ft]) == "function")
+          ---@cast by_ft table<string, conform.FiletypeFormatterInternal>
+          and vim.list_contains(by_ft[ft], "biome")
+        then
+          for i = #by_ft[ft], 1, -1 do
+            if (by_ft[ft][i] == "prettier" and ft ~= "vue") or by_ft[ft][i] == "biome" then
+              table.remove(by_ft[ft], i)
+            end
+          end
+          if ft == "vue" then
+            table.insert(by_ft[ft], 1, "biome-organize-imports")
+          else
+            table.insert(by_ft[ft], "biome-check")
+          end
+        end
+      end
+    end,
+  },
 
   {
     "nvim-mini/mini.align",
