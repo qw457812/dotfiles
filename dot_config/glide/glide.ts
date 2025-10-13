@@ -28,6 +28,25 @@ glide.o.hint_size = "12px";
 // Keymaps
 glide.keymaps.del("normal", "<leader>f");
 glide.keymaps.del("normal", "<leader>d");
+glide.keymaps.set(
+  "normal",
+  "<Esc>",
+  when_editing(
+    async () => {
+      // for <D-f> find in this page
+      await glide.keys.send("<Esc>", { skip_mappings: true });
+
+      // defocus the editable element
+      await focus_page();
+    },
+    async () => {
+      await glide.keys.send("<Esc>", { skip_mappings: true });
+
+      // additional actions we want to perform on esc
+      await glide.excmds.execute("clear");
+    },
+  ),
+);
 // vimium-like keymaps
 // https://github.com/glide-browser/glide/blob/107e240a8fd274cafef403d089dc2b646319e8f8/src/glide/browser/base/content/plugins/keymaps.mts
 // TODO: o b
@@ -65,7 +84,7 @@ glide.keymaps.set(
   when_editing("motion e", async () => {
     await glide.keys.send("<D-l>");
     await sleep(50);
-    await glide.excmds.execute("mode_change normal");
+    // await glide.excmds.execute("mode_change normal");
     await glide.excmds.execute("caret_move right");
   }),
 );
@@ -133,6 +152,7 @@ glide.keymaps.set("normal", "<leader>fc", async () => {
 });
 glide.keymaps.set("normal", "<leader>fk", "map");
 glide.keymaps.set("normal", "<leader>un", "clear");
+glide.keymaps.set("normal", "<leader>g,", "tab_new about:settings");
 glide.keymaps.set("normal", "<leader>gg", go_to_tab("https://github.com/"));
 glide.keymaps.set(
   "normal",
@@ -168,8 +188,14 @@ glide.keymaps.set(
   ),
 );
 
+glide.keymaps.set(["normal", "insert"], "<C-q>", focus_page);
+
 glide.keymaps.set("insert", "jj", "mode_change normal");
 glide.keymaps.set("insert", "kk", "mode_change normal");
+glide.keymaps.set("insert", "<C-j>", "keys <Down>");
+glide.keymaps.set("insert", "<C-k>", "keys <Up>");
+glide.keymaps.set("insert", "<C-n>", "keys <Down>");
+glide.keymaps.set("insert", "<C-p>", "keys <Up>");
 
 glide.keymaps.set("command", "<c-j>", "commandline_focus_next");
 glide.keymaps.set("command", "<c-k>", "commandline_focus_back");
@@ -198,10 +224,6 @@ glide.autocmds.create("UrlEnter", { hostname: "github.com" }, async () => {
 });
 
 // Utils
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 function when_editing(
   editing_action: glide.ExcmdString | glide.KeymapCallback | null,
   non_editing_action: glide.ExcmdString | glide.KeymapCallback | null,
@@ -221,6 +243,16 @@ function when_editing(
   };
 }
 
+async function focus_page() {
+  // HACK: defocus the editable element by focusing the address bar and then refocusing the page
+  await glide.keys.send("<F6>", { skip_mappings: true });
+  await sleep(100);
+  // check insert mode for address bar
+  if (glide.ctx.mode === "insert") {
+    await glide.keys.send("<F6>", { skip_mappings: true });
+  }
+}
+
 function go_to_tab(url: string) {
   return async () => {
     const tab = await glide.tabs.get_first({ url });
@@ -232,8 +264,6 @@ function go_to_tab(url: string) {
   };
 }
 
-// TODO: test for next release: https://github.com/glide-browser/glide/commit/740d1f3e9f22f1470ac4f91ca529e62965745659
-// glide.keymaps.set("insert", "<c-j>", "keys <Down>");
-// glide.keymaps.set("insert", "<c-k>", "keys <Up>");
-// glide.keymaps.set("insert", "<c-n>", "keys <Down>");
-// glide.keymaps.set("insert", "<c-p>", "keys <Up>");
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
