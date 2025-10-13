@@ -144,6 +144,7 @@ glide.keymaps.set("normal", "<C-p>", async ({ tab_id }) => {
 glide.keymaps.set("normal", "<leader><BS>", "quit");
 glide.keymaps.set("normal", "<leader>fc", async () => {
   const config = `${glide.path.home_dir}/.config/glide/glide.ts`;
+  // await glide.process.spawn("kitty", ["-e", "nvim", config]);
   if (glide.ctx.os === "macosx") {
     await glide.process.spawn("open", ["-b", "com.neovide.neovide", config]);
   } else {
@@ -201,6 +202,8 @@ glide.keymaps.set("command", "<c-j>", "commandline_focus_next");
 glide.keymaps.set("command", "<c-k>", "commandline_focus_back");
 
 // Autocmds
+glide.autocmds.create("ModeChanged", "command:*", focus_page);
+
 glide.autocmds.create("UrlEnter", { hostname: "github.com" }, async () => {
   await glide.excmds.execute("mode_change normal");
 
