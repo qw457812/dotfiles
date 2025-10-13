@@ -64,6 +64,14 @@ glide.keymaps.set(
 );
 glide.keymaps.set(
   "normal",
+  "ym",
+  when_editing(null, async ({ tab_id }) => {
+    const tab = await browser.tabs.get(tab_id);
+    await navigator.clipboard.writeText(`[${tab.title}](${tab.url})`);
+  }),
+);
+glide.keymaps.set(
+  "normal",
   "p",
   when_editing(null, async () => {
     const url = await navigator.clipboard.readText();
@@ -84,7 +92,7 @@ glide.keymaps.set(
   when_editing("motion e", async () => {
     await glide.keys.send("<D-l>");
     await sleep(50);
-    // await glide.excmds.execute("mode_change normal");
+    await glide.excmds.execute("mode_change normal");
     await glide.excmds.execute("caret_move right");
   }),
 );
@@ -154,6 +162,20 @@ glide.keymaps.set("normal", "`", async () => {
     await browser.tabs.update(previousTabId, { active: true });
   }
 });
+glide.keymaps.set("normal", "q", async ({ tab_id }) => {
+  const tab = await browser.tabs.get(tab_id);
+  if (tab.index > 0) {
+    await browser.tabs.move(tab_id, { index: tab.index - 1 });
+  }
+});
+glide.keymaps.set(
+  "normal",
+  "w",
+  when_editing("motion w", async ({ tab_id }) => {
+    const tab = await browser.tabs.get(tab_id);
+    await browser.tabs.move(tab_id, { index: tab.index + 1 });
+  }),
+);
 glide.keymaps.set("normal", "U", "redo");
 glide.keymaps.set("normal", "<BS>", "tab_close");
 glide.keymaps.set("normal", "<S-BS>", async () => {
@@ -169,6 +191,51 @@ glide.keymaps.set("normal", "<leader><BS>", "quit");
 for (let i = 1; i <= 9; i++) {
   glide.keymaps.set("normal", `<leader>${i}`, `keys <D-${i}>`);
 }
+glide.keymaps.set("normal", "gh", "keys <D-1>");
+glide.keymaps.set("normal", "gl", "keys <D-9>");
+glide.keymaps.set("normal", "<leader>bH", "keys <D-1>");
+glide.keymaps.set("normal", "<leader>bL", "keys <D-9>");
+glide.keymaps.set("normal", "<leader>bh", async ({ tab_id }) => {
+  const tab = await browser.tabs.get(tab_id);
+  const tabs = await browser.tabs.query({ windowId: tab.windowId });
+  const tabs_to_close = tabs
+    .filter((t) => t.index < tab.index && t.id !== undefined)
+    .map((t) => t.id!);
+  if (tabs_to_close.length > 0) {
+    await browser.tabs.remove(tabs_to_close);
+  }
+});
+glide.keymaps.set("normal", "<leader>bl", async ({ tab_id }) => {
+  const tab = await browser.tabs.get(tab_id);
+  const tabs = await browser.tabs.query({ windowId: tab.windowId });
+  const tabs_to_close = tabs
+    .filter((t) => t.index > tab.index && t.id !== undefined)
+    .map((t) => t.id!);
+  if (tabs_to_close.length > 0) {
+    await browser.tabs.remove(tabs_to_close);
+  }
+});
+glide.keymaps.set("normal", "<leader>bo", async ({ tab_id }) => {
+  const tab = await browser.tabs.get(tab_id);
+  const tabs = await browser.tabs.query({ windowId: tab.windowId });
+  const tabs_to_close = tabs
+    .filter((t) => t.id !== tab_id && t.id !== undefined)
+    .map((t) => t.id!);
+  if (tabs_to_close.length > 0) {
+    await browser.tabs.remove(tabs_to_close);
+  }
+});
+glide.keymaps.set("normal", "<leader>ba", async ({ tab_id }) => {
+  const tab = await browser.tabs.get(tab_id);
+  const tabs = await browser.tabs.query({ windowId: tab.windowId });
+  const tabs_to_close = tabs
+    .filter((t) => !t.pinned && t.id !== undefined)
+    .map((t) => t.id!);
+  if (tabs_to_close.length > 0) {
+    await browser.tabs.remove(tabs_to_close);
+  }
+});
+glide.keymaps.set("normal", "<leader>bp", "keys <C-p>");
 glide.keymaps.set("normal", "<leader>fc", async () => {
   const config = `${glide.path.home_dir}/.config/glide/glide.ts`;
   // await glide.process.spawn("kitty", ["-e", "nvim", config]);
@@ -216,14 +283,14 @@ glide.keymaps.set(
   ),
 );
 
+glide.keymaps.set(["normal", "insert"], "<C-j>", "keys <Down>");
+glide.keymaps.set(["normal", "insert"], "<C-k>", "keys <Up>");
+// glide.keymaps.set(["normal", "insert"], "<C-n>", "keys <Down>");
+// glide.keymaps.set(["normal", "insert"], "<C-p>", "keys <Up>");
 glide.keymaps.set(["normal", "insert"], "<C-q>", focus_page);
 
 glide.keymaps.set("insert", "jj", "mode_change normal");
 glide.keymaps.set("insert", "kk", "mode_change normal");
-glide.keymaps.set("insert", "<C-j>", "keys <Down>");
-glide.keymaps.set("insert", "<C-k>", "keys <Up>");
-glide.keymaps.set("insert", "<C-n>", "keys <Down>");
-glide.keymaps.set("insert", "<C-p>", "keys <Up>");
 
 glide.keymaps.set("command", "<c-j>", "commandline_focus_next");
 glide.keymaps.set("command", "<c-k>", "commandline_focus_back");
@@ -232,12 +299,20 @@ glide.keymaps.set("command", "<c-k>", "commandline_focus_back");
 glide.autocmds.create("ModeChanged", "command:*", focus_page);
 
 glide.autocmds.create("UrlEnter", { hostname: "github.com" }, async () => {
+  const url = new URL(glide.ctx.url);
+  const [org, repo] = url.pathname.split("/").filter(Boolean);
+
+  // it's annoying to be in insert mode when switching tabs
+  // maybe do this for all URLs?
   await glide.excmds.execute("mode_change normal");
+
+  glide.buf.keymaps.set("normal", "yr", async () => {
+    assert(org && repo, `Path does not look like github.com/$org/$repo`);
+    await navigator.clipboard.writeText(`${org}/${repo}`);
+  });
 
   function go_to(what: string) {
     return async () => {
-      const url = new URL(glide.ctx.url);
-      const [org, repo] = url.pathname.split("/").filter(Boolean);
       assert(org && repo, `Path does not look like github.com/$org/$repo`);
       await browser.tabs.update({
         url: [url.origin, org, repo, what].filter(Boolean).join("/"),
@@ -252,6 +327,20 @@ glide.autocmds.create("UrlEnter", { hostname: "github.com" }, async () => {
   glide.buf.keymaps.set("normal", ",d", go_to("discussions"));
   glide.buf.keymaps.set("normal", ",w", go_to("wiki"));
 });
+
+// glide.autocmds.create(
+//   "KeyStateChanged",
+//   async ({ mode, sequence, partial }) => {
+//     if (
+//       mode === "normal" &&
+//       sequence.length === 1 &&
+//       sequence[0]?.toLowerCase() === "<esc>" &&
+//       partial === false
+//     ) {
+//       await glide.excmds.execute("clear");
+//     }
+//   },
+// );
 
 // Utils
 function when_editing(

@@ -163,6 +163,43 @@ return {
     end,
   },
 
+  -- TODO: duplicate code with shell-command-editor.lua
+  {
+    "LazyVim/LazyVim",
+    opts = function()
+      local tmpdir = (vim.env.TMPDIR or "/tmp"):gsub("/$", "")
+      vim.api.nvim_create_autocmd("BufRead", {
+        group = vim.api.nvim_create_augroup("ai_cli_prompt", { clear = true }),
+        pattern = {
+          tmpdir .. "/claude-prompt-*.md", -- claude code
+          tmpdir .. "/msg_*.md", -- https://github.com/sst/opencode/blob/5885b691b9a9ccee08a798fdbbfb7edd7a2d7ee7/packages/tui/internal/tui/tui.go#L1165
+        },
+        once = true,
+        callback = function(ev)
+          vim.keymap.set("n", "<Esc>", function()
+            if not U.keymap.clear_ui_esc() then
+              vim.cmd([[quitall]])
+            end
+          end, { buffer = ev.buf, desc = "Clear UI or Exit" })
+
+          vim.keymap.set({ "n", "i" }, "<C-s>", function()
+            vim.cmd([[wqa]])
+          end, { buffer = ev.buf, desc = "Save and Exit" })
+
+          vim.api.nvim_create_autocmd({ "InsertLeave", "TextChanged" }, {
+            group = vim.api.nvim_create_augroup("ai_cli_prompt_autowrite", { clear = true }),
+            buffer = ev.buf,
+            callback = function()
+              vim.api.nvim_buf_call(ev.buf, function()
+                vim.cmd("silent! noautocmd lockmarks write")
+              end)
+            end,
+          })
+        end,
+      })
+    end,
+  },
+
   {
     "zbirenbaum/copilot.lua",
     optional = true,

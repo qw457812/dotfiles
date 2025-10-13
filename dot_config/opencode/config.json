@@ -5,6 +5,11 @@
   "autoupdate": false,
   "model": "anthropic/claude-sonnet-4-5-20250929",
   "small_model": "anthropic/claude-3-5-haiku-20241022",
+  "agent": {
+    "plan": {
+      "model": "anthropic/claude-sonnet-4-5-20250929"
+    }
+  },
   "provider": {
     "anthropic": {
       "options": {

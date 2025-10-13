@@ -19,3 +19,4 @@ keybinding:
   universal:
     # not working, but <c-h> works
     quitWithoutChangingDirectory: <backspace>
+    focusMainView: <tab>
