@@ -200,6 +200,9 @@ end, { desc = "Yank file relative path" })
 --   LazyVim.info(("Copied file name: `%s`"):format(name))
 -- end, { desc = "Yank file name" })
 
+map("n", "gco", 'o<esc>V"_cx<esc><cmd>normal gcc<cr>fxa<bs>', { desc = "Add Comment Below" })
+map("n", "gcO", 'O<esc>V"_cx<esc><cmd>normal gcc<cr>fxa<bs>', { desc = "Add Comment Above" })
+
 -- Add empty lines before and after cursor line supporting dot-repeat
 -- https://github.com/nvim-mini/mini.nvim/blob/af673d8523c5c2c5ff0a53b1e42a296ca358dcc7/lua/mini/basics.lua#L579
 -- map('n', 'gO', "<Cmd>call append(line('.') - 1, repeat([''], v:count1))<CR>") -- without dot-repeat
@@ -297,13 +300,7 @@ local function news()
     file = vim.api.nvim_get_runtime_file("doc/news.txt", false)[1],
     width = 0.6,
     height = 0.6,
-    wo = {
-      spell = false,
-      wrap = false,
-      signcolumn = "yes",
-      statuscolumn = " ",
-      conceallevel = 3,
-    },
+    wo = { spell = false, wrap = false, signcolumn = "yes", statuscolumn = " ", conceallevel = 3 },
   })
 end
 
