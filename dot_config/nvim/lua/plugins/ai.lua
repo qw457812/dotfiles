@@ -53,6 +53,7 @@ return {
         { "<leader>at", false, mode = { "n", "x" } },
         { "<leader>ap", false, mode = { "n", "x" } },
         { "<leader>ak", function() require("sidekick.cli").toggle() end, desc = "Sidekick Toggle CLI" },
+        { "<leader>ak", function() require("sidekick.cli").send({ msg = "{this}" }) end, mode = "x", desc = "Send (Sidekick)" },
         { "<leader>ass", function() require("sidekick.cli").select() end, desc = "Select CLI" },
         { "<leader>ass", function() require("sidekick.cli").send({ msg = "{selection}" }) end, mode = "x", desc = "Send Visual Selection" },
         { "<leader>asd", function() require("sidekick.cli").close() end, desc = "Detach a CLI Session" },

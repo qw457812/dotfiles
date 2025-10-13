@@ -88,6 +88,12 @@ glide.keymaps.set(
     await glide.excmds.execute("caret_move right");
   }),
 );
+glide.keymaps.set("normal", "gi", async () => {
+  await glide.excmds.execute("focusinput last");
+  if (!(await glide.ctx.is_editing())) {
+    await glide.keys.send("gI");
+  }
+});
 glide.keymaps.set("normal", "gu", async () => {
   const url = new URL(glide.ctx.url);
   const parts = url.pathname.split("/").filter(Boolean);
@@ -104,10 +110,28 @@ glide.keymaps.set("normal", "gU", async () => {
 glide.keymaps.set(
   "normal",
   "d",
-  when_editing("mode_change op-pending --operator=d", "scroll_page_down"),
-  { retain_key_display: true },
+  when_editing("mode_change op-pending --operator=d", async () => {
+    // await glide.excmds.execute("scroll_page_down"); // buggy
+
+    for (let i = 0; i < 4; i++) {
+      await glide.excmds.execute("caret_move down");
+      await sleep(20);
+    }
+  }),
+  // { retain_key_display: true }, // no way to display key sequence only for editing
 );
-glide.keymaps.set("normal", "u", when_editing("undo", "scroll_page_up"));
+glide.keymaps.set(
+  "normal",
+  "u",
+  when_editing("undo", async () => {
+    // await glide.excmds.execute("scroll_page_up"); // buggy
+
+    for (let i = 0; i < 4; i++) {
+      await glide.excmds.execute("caret_move up");
+      await sleep(20);
+    }
+  }),
+);
 glide.keymaps.set("normal", "x", when_editing("motion x", "tab_close"));
 glide.keymaps.set(
   "normal",
@@ -142,6 +166,9 @@ glide.keymaps.set("normal", "<C-p>", async ({ tab_id }) => {
   await browser.tabs.update(tab_id, { pinned: !tab.pinned });
 });
 glide.keymaps.set("normal", "<leader><BS>", "quit");
+for (let i = 1; i <= 9; i++) {
+  glide.keymaps.set("normal", `<leader>${i}`, `keys <D-${i}>`);
+}
 glide.keymaps.set("normal", "<leader>fc", async () => {
   const config = `${glide.path.home_dir}/.config/glide/glide.ts`;
   // await glide.process.spawn("kitty", ["-e", "nvim", config]);
