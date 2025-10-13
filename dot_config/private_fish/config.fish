@@ -290,7 +290,7 @@ type -q codex; and abbr cx codex # codex completion fish >~/.config/fish/complet
 if type -q opencode
     abbr oc opencode
     abbr occ 'opencode --continue'
-    abbr ocz 'opencode --model opencode/code-supernova' # https://opencode.ai/docs/zen/
+    abbr ocg 'opencode --model opencode/grok-code' # https://opencode.ai/docs/zen/
 end
 if type -q aider
     abbr ad aider
