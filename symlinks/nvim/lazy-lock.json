@@ -1,5 +1,5 @@
 {
-  "LazyVim": { "branch": "main", "commit": "cfc0ae0184a96d1e69b0742c3db3075f7e0ecf2c" },
+  "LazyVim": { "branch": "main", "commit": "f8e8ea4b5e7f6d8db55f5c8dc223e0836beeeee6" },
   "SchemaStore.nvim": { "branch": "main", "commit": "caad5439cc80809be7475b625a5e36d1bb06cc7e" },
   "Trans.nvim": { "branch": "v2", "commit": "e58d63a8f6621845776da4657a06ca29ca75ef1a" },
   "baleia.nvim": { "branch": "main", "commit": "1b25eac3ac03659c3d3af75c7455e179e5f197f7" },
@@ -8,7 +8,7 @@
   "blink-cmp-env": { "branch": "main", "commit": "99af62c1f9aa46005e8f50ad4ccee581946546ca" },
   "blink-cmp-spell": { "branch": "master", "commit": "2bd0e0d5e7735c047e72b6918a0458f3e8fadaba" },
   "blink-cmp-yanky": { "branch": "main", "commit": "473b987c2a7d80cca116f6faf087dba4dbfbb3c5" },
-  "blink-ripgrep.nvim": { "branch": "main", "commit": "9433e4e27441ce1ea9d77d62dadff356e848f6c8" },
+  "blink-ripgrep.nvim": { "branch": "main", "commit": "0c0d9db740ca70aa739e40f50589b01e537ade6d" },
   "blink.cmp": { "branch": "main", "commit": "5037cfa645a9c4f5d6e2a3f6a44e096df86c8093" },
   "blink_cmp_kitty": { "branch": "main", "commit": "baaa3f1cd4a75c30b13f08bd98a4ba6f8cbd4df9" },
   "bookmarks.yazi": { "branch": "main", "commit": "9ef1254d8afe88aba21cd56a186f4485dd532ab8" },
@@ -137,5 +137,5 @@
   "yanky.nvim": { "branch": "main", "commit": "04775cc6e10ef038c397c407bc17f00a2f52b378" },
   "yazi-flavors": { "branch": "main", "commit": "2d73b79da7c1a04420c6c5ef0b0974697f947ef6" },
   "yazi-plugins": { "branch": "main", "commit": "9a52857eac61ede58d11c06ca813c3fa63fe3609" },
-  "yazi.nvim": { "branch": "main", "commit": "c2634b95a93cdb4dccc116412f64290186b99b37" }
+  "yazi.nvim": { "branch": "main", "commit": "84fa726ca820925daae855ba1d45e6214808f2a9" }
 }

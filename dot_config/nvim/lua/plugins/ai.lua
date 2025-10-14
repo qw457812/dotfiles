@@ -98,6 +98,7 @@ return {
           },
           -- HACK: disable some installed tools
           aider = { cmd = { "hack_to_disable_aider" } },
+          copilot = { cmd = { "hack_to_disable_copilot" } },
           gemini = { cmd = { "hack_to_disable_gemini" } },
         },
       },

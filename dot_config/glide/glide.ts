@@ -16,6 +16,8 @@
 //
 // Try typing `glide.` and see what you can do!
 
+// https://support.mozilla.org/en-US/kb/keyboard-shortcuts-perform-firefox-tasks-quickly
+
 // https://github.com/RobertCraigie/dotfiles/blob/ecfd6f66e8a775c80849f7889f297ef99cea7997/glide/glide.ts
 
 if (glide.ctx.os === "macosx") {
@@ -35,7 +37,7 @@ glide.keymaps.set(
   "<Esc>",
   when_editing(
     async () => {
-      // for <D-f> find in this page
+      // for case: `<D-f>` -> `<Esc>` -> `<Esc>` (close find bar)
       await glide.keys.send("<Esc>", { skip_mappings: true });
 
       // defocus the editable element
@@ -43,6 +45,11 @@ glide.keymaps.set(
     },
     async () => {
       await glide.keys.send("<Esc>", { skip_mappings: true });
+
+      // // for case: `<D-f>` -> `<C-w>` -> `<Esc>` at https://github.com/glide-browser/glide/blob/e6a590d53c7d6101792fedfd9894491cda46dbde/src/glide/browser/actors/GlideHandlerChild.sys.mts
+      // if (await glide.ctx.is_editing()) {
+      //   await focus_page();
+      // }
 
       // additional actions we want to perform on esc
       await glide.excmds.execute("clear");
@@ -86,7 +93,7 @@ glide.keymaps.set(
   "normal",
   "p",
   when_editing(null, async () => {
-    const url = await navigator.clipboard.readText();
+    const url = text_to_url(await navigator.clipboard.readText());
     await browser.tabs.update({ url });
   }),
 );
@@ -94,7 +101,7 @@ glide.keymaps.set(
   "normal",
   "P",
   when_editing(null, async () => {
-    const url = await navigator.clipboard.readText();
+    const url = text_to_url(await navigator.clipboard.readText());
     await browser.tabs.create({ url });
   }),
 );
@@ -102,7 +109,7 @@ glide.keymaps.set(
   "normal",
   "e",
   when_editing("motion e", async () => {
-    await glide.keys.send("<D-l>");
+    await glide.keys.send("<D-l>", { skip_mappings: true });
     await sleep(50);
     await glide.excmds.execute("mode_change normal");
     await glide.excmds.execute("caret_move right");
@@ -127,16 +134,19 @@ glide.keymaps.set("normal", "gU", async () => {
   const url = new URL(glide.ctx.url);
   await browser.tabs.update({ url: url.origin });
 });
+glide.keymaps.set("normal", "gs", "keys <D-u>");
 glide.keymaps.set(
   "normal",
   "d",
   when_editing("mode_change op-pending --operator=d", async () => {
     // await glide.excmds.execute("scroll_page_down"); // buggy
 
-    for (let i = 0; i < 4; i++) {
-      await glide.excmds.execute("caret_move down");
-      await sleep(20);
-    }
+    // for (let i = 0; i < 4; i++) {
+    //   await glide.excmds.execute("caret_move down");
+    //   await sleep(20);
+    // }
+
+    await glide.keys.send("<PageDown>", { skip_mappings: true });
   }),
   // { retain_key_display: true }, // no way to display key sequence only for editing
 );
@@ -146,10 +156,12 @@ glide.keymaps.set(
   when_editing("undo", async () => {
     // await glide.excmds.execute("scroll_page_up"); // buggy
 
-    for (let i = 0; i < 4; i++) {
-      await glide.excmds.execute("caret_move up");
-      await sleep(20);
-    }
+    // for (let i = 0; i < 4; i++) {
+    //   await glide.excmds.execute("caret_move up");
+    //   await sleep(20);
+    // }
+
+    await glide.keys.send("<PageUp>", { skip_mappings: true });
   }),
 );
 glide.keymaps.set("normal", "x", when_editing("motion x", "tab_close"));
@@ -195,9 +207,27 @@ glide.keymaps.set("normal", "<S-BS>", async () => {
 });
 glide.keymaps.set("normal", "<C-r>", "config_reload");
 glide.keymaps.set("normal", "<C-f>", "hint --location=browser-ui");
+// store tab indices before pinning to restore position when unpinning
+const tab_indices_before_pin = new Map<number, number>();
+browser.tabs.onRemoved.addListener((tabId) => {
+  tab_indices_before_pin.delete(tabId);
+});
+browser.tabs.onDetached.addListener((tabId) => {
+  tab_indices_before_pin.delete(tabId);
+});
 glide.keymaps.set("normal", "<C-p>", async ({ tab_id }) => {
   const tab = await browser.tabs.get(tab_id);
-  await browser.tabs.update(tab_id, { pinned: !tab.pinned });
+  if (tab.pinned) {
+    const orig_idx = tab_indices_before_pin.get(tab_id);
+    await browser.tabs.update(tab_id, { pinned: false });
+    if (orig_idx !== undefined) {
+      await browser.tabs.move(tab_id, { index: orig_idx });
+    }
+    tab_indices_before_pin.delete(tab_id);
+  } else {
+    tab_indices_before_pin.set(tab_id, tab.index);
+    await browser.tabs.update(tab_id, { pinned: true });
+  }
 });
 glide.keymaps.set("normal", "<leader><BS>", "quit");
 glide.keymaps.set("normal", "<leader>,", "commandline_show tab ");
@@ -248,6 +278,7 @@ glide.keymaps.set("normal", "<leader>ba", async ({ tab_id }) => {
     await browser.tabs.remove(tabs_to_close);
   }
 });
+glide.keymaps.set("normal", "<leader>bb", "keys `");
 glide.keymaps.set("normal", "<leader>bp", "keys <C-p>");
 glide.keymaps.set("normal", "<leader>fc", async () => {
   const config = `${glide.path.home_dir}/.config/glide/glide.ts`;
@@ -303,7 +334,7 @@ glide.keymaps.set(["normal", "insert"], "<C-k>", "keys <Up>");
 glide.keymaps.set(["normal", "insert"], "<C-q>", focus_page);
 
 glide.keymaps.set("insert", "jj", "mode_change normal");
-glide.keymaps.set("insert", "kk", "mode_change normal");
+// glide.keymaps.set("insert", "kk", "mode_change normal");
 
 glide.keymaps.set("command", "<c-j>", "commandline_focus_next");
 glide.keymaps.set("command", "<c-k>", "commandline_focus_back");
@@ -313,16 +344,32 @@ glide.autocmds.create("ModeChanged", "command:*", focus_page);
 
 glide.autocmds.create("UrlEnter", { hostname: "github.com" }, async () => {
   const url = new URL(glide.ctx.url);
-  const [org, repo] = url.pathname.split("/").filter(Boolean);
+  const [org, repo, ...rest_segments] = url.pathname.split("/").filter(Boolean);
 
   // it's annoying to be in insert mode when switching tabs
   // maybe do this for all URLs?
   await glide.excmds.execute("mode_change normal");
 
-  glide.buf.keymaps.set("normal", "yr", async () => {
-    assert(org && repo, `Path does not look like github.com/$org/$repo`);
-    await navigator.clipboard.writeText(`${org}/${repo}`);
-  });
+  glide.buf.keymaps.set(
+    "normal",
+    "ym",
+    when_editing(null, async ({ tab_id }) => {
+      const tab = await browser.tabs.get(tab_id);
+      if (org && repo && rest_segments.length === 0) {
+        await navigator.clipboard.writeText(`[${org}/${repo}](${tab.url})`);
+      } else {
+        await navigator.clipboard.writeText(`[${tab.title}](${tab.url})`);
+      }
+    }),
+  );
+  glide.buf.keymaps.set(
+    "normal",
+    "yr",
+    when_editing(null, async () => {
+      assert(org && repo, `Path does not look like github.com/$org/$repo`);
+      await navigator.clipboard.writeText(`${org}/${repo}`);
+    }),
+  );
 
   function go_to(what: string) {
     return async () => {
@@ -394,6 +441,15 @@ function go_to_tab(url: string) {
       await browser.tabs.create({ url });
     }
   };
+}
+
+function text_to_url(text: string): string {
+  try {
+    new URL(text);
+    return text;
+  } catch {
+    return `https://www.google.com/search?q=${encodeURIComponent(text)}`;
+  }
 }
 
 function sleep(ms: number) {
