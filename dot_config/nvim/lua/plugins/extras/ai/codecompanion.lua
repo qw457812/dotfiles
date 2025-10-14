@@ -35,7 +35,7 @@ return {
           vim.cmd("CodeCompanionChat Add")
           focus_last_chat()
         end,
-        desc = "Add to Chat",
+        desc = "CodeCompanion",
         mode = "x",
       },
       {

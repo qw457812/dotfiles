@@ -269,6 +269,7 @@ function M.clear_ui_esc(opts)
         and vim.list_contains({ "snacks_notif", "notify", "noice" }, vim.bo[b].filetype)
         and vim.bo[b].buftype == "nofile"
         and not vim.bo[b].buflisted
+        and not vim.bo[b].modified
     end, vim.api.nvim_list_bufs())
   end
 

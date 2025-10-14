@@ -4,7 +4,7 @@ end
 
 local H = {}
 
-H.toggle_key = "<M-space>"
+H.toggle_key = "<M-,>"
 
 ---@param buf? integer
 function H.is_cc(buf)
@@ -95,16 +95,15 @@ return {
         desc = "Claude Code",
         mode = { "n", "x" },
       },
-      { "<leader>aa", H.toggle_key, desc = "Claude", remap = true },
-      { "<leader>aa", "<cmd>ClaudeCodeSend<cr>", desc = "Claude", mode = "x" },
+      { "<leader>al", H.toggle_key, desc = "claudecode.nvim", remap = true },
+      { "<leader>al", "<cmd>ClaudeCodeSend<cr>", desc = "claudecode.nvim", mode = "x" },
+      { "<leader>acf", "<cmd>ClaudeCodeAdd %<cr>", desc = "Add File" },
       { "<leader>acc", "<cmd>ClaudeCode --continue<cr>", desc = "Continue" },
       { "<leader>acr", "<cmd>ClaudeCode --resume<cr>", desc = "Resume" },
       { "<leader>acs", "<cmd>ClaudeCode --model sonnet<cr>", desc = "Sonnet" },
       { "<leader>aco", "<cmd>ClaudeCode --model opus<cr>", desc = "Opus" },
       { "<leader>acgc", "<cmd>ClaudeCode --model sonnet 'commit only the staged changes'<cr>", desc = "Git Commit" },
       { "<leader>acm", "<cmd>ClaudeCodeSelectModel<cr>", desc = "Select Model" },
-      { "<leader>af", "<cmd>ClaudeCodeAdd %<cr>", desc = "Add File (Claude)" },
-      -- { "<leader>ac=", "<cmd>ClaudeCodeAdd %<cr>", desc = "Add File" },
       { "=", "<cmd>ClaudeCodeTreeAdd<cr>", desc = "Add File (Claude)", mode = { "n", "x" }, ft = "neo-tree" },
       { "<localleader>=", "<cmd>ClaudeCodeTreeAdd<cr>", desc = "Add File (Claude)", ft = { "oil", "minifiles" } },
     },
@@ -213,7 +212,7 @@ return {
       spec = {
         {
           mode = { "n", "v" },
-          { "<leader>ac", group = "claude" },
+          { "<leader>ac", group = "claudecode.nvim" },
           { "<leader>acg", group = "git" },
         },
       },

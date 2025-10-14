@@ -28,6 +28,8 @@ glide.o.hint_size = "12px";
 // Keymaps
 glide.keymaps.del("normal", "<leader>f");
 glide.keymaps.del("normal", "<leader>d");
+glide.keymaps.del("normal", "<leader>r");
+glide.keymaps.del("normal", "<leader>R");
 glide.keymaps.set(
   "normal",
   "<Esc>",
@@ -52,6 +54,7 @@ glide.keymaps.set(
 // TODO: o b
 glide.keymaps.set("normal", "/", "keys <D-f>");
 glide.keymaps.set("normal", "r", when_editing("r", "reload"));
+glide.keymaps.set("normal", "R", when_editing(null, "reload_hard"));
 glide.keymaps.set("normal", "t", when_editing(null, "tab_new"));
 glide.keymaps.set("normal", "T", when_editing(null, "commandline_show tab "));
 glide.keymaps.set(
@@ -62,6 +65,15 @@ glide.keymaps.set(
     async ({ tab_id }) => await browser.tabs.duplicate(tab_id),
   ),
 );
+glide.keymaps.set("normal", "yf", () => {
+  glide.hints.show({
+    action: async (target) => {
+      if ("href" in target && typeof target.href === "string") {
+        navigator.clipboard.writeText(target.href);
+      }
+    },
+  });
+});
 glide.keymaps.set(
   "normal",
   "ym",
@@ -188,6 +200,7 @@ glide.keymaps.set("normal", "<C-p>", async ({ tab_id }) => {
   await browser.tabs.update(tab_id, { pinned: !tab.pinned });
 });
 glide.keymaps.set("normal", "<leader><BS>", "quit");
+glide.keymaps.set("normal", "<leader>,", "commandline_show tab ");
 for (let i = 1; i <= 9; i++) {
   glide.keymaps.set("normal", `<leader>${i}`, `keys <D-${i}>`);
 }

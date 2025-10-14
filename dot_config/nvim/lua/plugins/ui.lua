@@ -245,6 +245,7 @@ return {
             { plugin = "claudecode.nvim", pattern = "claude", icon = icons.Claude, color = "orange" },
             { plugin = "codecompanion.nvim", pattern = "codecompanion", icon = " ", color = "purple" },
             { plugin = "mcphub.nvim", icon = " ", color = "grey" }, -- 
+            { pattern = "sidekick", icon = " ", color = "green" },
             { pattern = "codex", icon = icons.OpenAI, color = "grey" },
             { pattern = "opencode", icon = " ", color = "grey" },
           } --[[@as wk.IconRule[] ]],

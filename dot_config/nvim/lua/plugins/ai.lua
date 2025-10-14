@@ -1,32 +1,7 @@
+local sidekick_toggle_key = "<M-space>"
+
 ---@type LazySpec
 return {
-  {
-    "neovim/nvim-lspconfig",
-    ---@param opts PluginLspOpts
-    opts = function(_, opts)
-      local servers = opts.servers
-      if servers.copilot then
-        servers.copilot = servers.copilot == true and {} or servers.copilot
-        servers.copilot.root_dir = function(bufnr, on_dir)
-          local root = LazyVim.root({ buf = bufnr })
-          on_dir(root ~= vim.uv.cwd() and root or vim.fs.root(bufnr, vim.lsp.config.copilot.root_markers))
-        end
-
-        if servers.copilot.enabled ~= false then
-          U.toggle.ai_cmps.copilot = Snacks.toggle({
-            name = "copilot-language-server",
-            get = function()
-              return vim.lsp.is_enabled("copilot")
-            end,
-            set = function(state)
-              vim.lsp.enable("copilot", state)
-            end,
-          })
-        end
-      end
-    end,
-  },
-
   {
     "folke/sidekick.nvim",
     optional = true,
@@ -38,31 +13,40 @@ return {
           LazyVim.cmp.map({ "ai_nes" }, function()
             vim.cmd("wincmd w")
           end),
-          desc = "Jump/Apply Next Edit Suggestions or Next Window (sidekick)",
+          desc = "Jump/Apply Next Edit Suggestions or Next Window (Sidekick)",
         })
       end
+
+      local filter = { installed = true } ---@type sidekick.cli.Filter
       -- stylua: ignore
       vim.list_extend(keys, {
         { "<c-.>", false, mode = { "n", "x", "i", "t" } },
-        { "<M-,>", function() require("sidekick.cli").toggle() end, mode = { "n", "x", "t" }, desc = "Sidekick Toggle" },
-        { "<leader>aa", false },
-        { "<leader>as", false },
-        { "<leader>ad", false },
-        { "<leader>af", false },
+        { sidekick_toggle_key, function() require("sidekick.cli").toggle({ filter = filter }) end, mode = { "n", "x", "t" }, desc = "Sidekick" },
         { "<leader>av", false, mode = "x" },
         { "<leader>at", false, mode = { "n", "x" } },
-        { "<leader>ap", false, mode = { "n", "x" } },
-        { "<leader>ak", function() require("sidekick.cli").toggle() end, desc = "Sidekick Toggle CLI" },
-        { "<leader>ak", function() require("sidekick.cli").send({ msg = "{this}" }) end, mode = "x", desc = "Send (Sidekick)" },
-        { "<leader>ass", function() require("sidekick.cli").select() end, desc = "Select CLI" },
-        { "<leader>ass", function() require("sidekick.cli").send({ msg = "{selection}" }) end, mode = "x", desc = "Send Visual Selection" },
-        { "<leader>asd", function() require("sidekick.cli").close() end, desc = "Detach a CLI Session" },
-        { "<leader>ast", function() require("sidekick.cli").send({ msg = "{this}" }) end, mode = { "n", "x" }, desc = "Send This" },
-        { "<leader>asf", function() require("sidekick.cli").send({ msg = "{file}" }) end, desc = "Send File" },
-        { "<leader>asp", function() require("sidekick.cli").prompt() end, mode = { "n", "x" }, desc = "Select Prompt" },
-        { "<leader>asc", function() require("sidekick.cli").toggle({ name = "claude" }) end, desc = "Claude" },
-        { "<leader>asx", function() require("sidekick.cli").toggle({ name = "codex" }) end, desc = "Codex" },
-        { "<leader>aso", function() require("sidekick.cli").toggle({ name = "opencode" }) end, desc = "OpenCode" },
+        { "<leader>aa", sidekick_toggle_key, desc = "Sidekick", remap = true },
+        { "<leader>aa", function() require("sidekick.cli").send({ msg = "{this}", filter = filter }) end, mode = "x", desc = "Sidekick" },
+        { "<leader>as", function() require("sidekick.cli").select({ filter = filter }) end, desc = "Select (Sidekick)" },
+        { "<leader>as", function() require("sidekick.cli").send({ msg = "{selection}", filter = filter }) end, mode = "x", desc = "Send (Sidekick)" },
+        { "<leader>ad", function() require("sidekick.cli").close() end, desc = "Detach (Sidekick)" },
+        {
+          "<leader>ap",
+          function()
+            require("sidekick.cli").prompt({
+              cb = function(msg)
+                if msg then
+                  require("sidekick.cli").send({ msg = msg, render = false, filter = filter })
+                end
+              end,
+            })
+          end,
+          mode = { "n", "x" },
+          desc = "Prompt (Sidekick)",
+        },
+        { "<leader>af", function() require("sidekick.cli").send({ msg = "{file}", filter = filter }) end, desc = "File (Sidekick)" },
+        { "<leader>akc", function() require("sidekick.cli").toggle({ name = "claude" }) end, desc = "Claude" },
+        { "<leader>akx", function() require("sidekick.cli").toggle({ name = "codex" }) end, desc = "Codex" },
+        { "<leader>ako", function() require("sidekick.cli").toggle({ name = "opencode" }) end, desc = "OpenCode" },
       })
       return keys
     end,
@@ -81,7 +65,7 @@ return {
           ---@type table<string, sidekick.cli.Keymap|false>
           keys = {
             hide_ctrl_dot = false,
-            hide_alt_comma = { "<M-,>", "hide", mode = "nt" },
+            hide_toggle_key = { sidekick_toggle_key, "hide", mode = "nt" },
             blur_t = { "<c-o>", "blur" },
             blur_n = {
               "<esc>",
@@ -112,10 +96,36 @@ return {
               blur_t = false, -- claude code uses <c-o> for its own functionality
             },
           },
+          -- HACK: disable some installed tools
+          aider = { cmd = { "hack_to_disable_aider" } },
+          gemini = { cmd = { "hack_to_disable_gemini" } },
         },
       },
     },
     specs = {
+      {
+        "folke/snacks.nvim",
+        optional = true,
+        ---@module "snacks"
+        ---@type snacks.Config
+        opts = {
+          picker = {
+            sources = {
+              select = {
+                win = {
+                  input = {
+                    keys = {
+                      -- https://github.com/folke/sidekick.nvim/blob/e5bcf171b13a99e53a8ac6b584baebf7c435584a/lua/sidekick/cli/ui/select.lua#L46
+                      -- https://github.com/folke/sidekick.nvim/blob/30b7b9ef72a1d78fbabf5484f4dc33adc3abb7d1/lua/sidekick/cli/ui/prompt.lua#L106
+                      [sidekick_toggle_key] = { "close", mode = { "i", "n" }, desc = "Close (Sidekick)" },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
       vim.g.ai_cmp and not LazyVim.has_extra("ai.copilot") and {
         "saghen/blink.cmp",
         optional = true,
@@ -139,7 +149,7 @@ return {
           spec = {
             {
               mode = { "n", "x" },
-              { "<leader>as", group = "sidekick" },
+              { "<leader>ak", group = "sidekick" },
             },
           },
         },
@@ -199,6 +209,37 @@ return {
       })
     end,
   },
+
+  {
+    "neovim/nvim-lspconfig",
+    ---@param opts PluginLspOpts
+    opts = function(_, opts)
+      local servers = opts.servers
+      if servers.copilot then
+        servers.copilot = servers.copilot == true and {} or servers.copilot
+        servers.copilot.root_dir = function(bufnr, on_dir)
+          local root = LazyVim.root({ buf = bufnr })
+          on_dir(root ~= vim.uv.cwd() and root or vim.fs.root(bufnr, vim.lsp.config.copilot.root_markers))
+        end
+
+        if servers.copilot.enabled ~= false then
+          U.toggle.ai_cmps.copilot = Snacks.toggle({
+            name = "copilot-language-server",
+            get = function()
+              return vim.lsp.is_enabled("copilot")
+            end,
+            set = function(state)
+              vim.lsp.enable("copilot", state)
+            end,
+          })
+        end
+      end
+    end,
+  },
+
+  -- ===========================================================================
+  -- ALL LAZY SPECS BELOW ARE UNUSED
+  -- ===========================================================================
 
   {
     "zbirenbaum/copilot.lua",
