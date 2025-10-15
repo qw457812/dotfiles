@@ -1,6 +1,6 @@
 {
-  "darkMode": false,
-  "uiLang": "en",
+  "darkMode": true,
+  "uiLang": "zh",
   "minLength": 2,
   "maxLength": 100000,
   "newlineLength": 20,
@@ -711,8 +711,8 @@
     ]
   },
   "inputRule": {
-    "transOpen": true,
-    "apiSlug": "Microsoft",
+    "transOpen": false,
+    "apiSlug": "Google2",
     "fromLang": "auto",
     "toLang": "en",
     "triggerShortcut": [
@@ -724,9 +724,9 @@
     "transSign": "/"
   },
   "tranboxSetting": {
-    "transOpen": true,
+    "transOpen": false,
     "apiSlugs": [
-      "Microsoft"
+      "Google2"
     ],
     "fromLang": "auto",
     "toLang": "zh-CN",
@@ -740,10 +740,10 @@
     "boxOffsetX": 0,
     "boxOffsetY": 10,
     "hideTranBtn": false,
-    "hideClickAway": false,
-    "simpleStyle": false,
-    "followSelection": false,
-    "triggerMode": "click",
+    "hideClickAway": true,
+    "simpleStyle": true,
+    "followSelection": true,
+    "triggerMode": "select",
     "enDict": "Bing",
     "enSug": "Youdao"
   },
@@ -755,7 +755,7 @@
   "transInterval": 100,
   "langDetector": "-",
   "mouseHoverSetting": {
-    "useMouseHover": true,
+    "useMouseHover": false,
     "mouseHoverKey": [
       "KeyQ"
     ]
@@ -764,7 +764,7 @@
   "transAllnow": false,
   "subtitleSetting": {
     "enabled": true,
-    "apiSlug": "Microsoft",
+    "apiSlug": "Google2",
     "segSlug": "-",
     "chunkLength": 1000,
     "toLang": "zh-CN",
