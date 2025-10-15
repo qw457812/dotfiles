@@ -7,7 +7,7 @@ return {
     cmd = "MCPHub",
     build = "npm install -g mcp-hub@latest",
     keys = {
-      { "<leader>am", "<cmd>MCPHub<cr>", desc = "MCP Hub" },
+      { "<leader>aM", "<cmd>MCPHub<cr>", desc = "MCP Hub" },
     },
     ---@module "mcphub"
     ---@type MCPHub.Config

@@ -70,7 +70,15 @@ return {
         ["<C-space>"] = {
           desc = "Terminal (Oil Dir)",
           callback = function()
-            Snacks.terminal(nil, { cwd = require("oil").get_current_dir() })
+            Snacks.terminal(nil, {
+              win = {
+                position = "float",
+                keys = {
+                  hide_ctrl_space = { "<c-space>", "hide", mode = { "n", "t" } },
+                },
+              },
+              cwd = require("oil").get_current_dir(),
+            })
           end,
         },
         ["<C-y>"] = "actions.copy_to_system_clipboard",

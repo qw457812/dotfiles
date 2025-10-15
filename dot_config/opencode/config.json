@@ -51,6 +51,9 @@
   "keybinds": {
     "leader": "ctrl+x",
     "messages_half_page_up": "ctrl+u",
-    "messages_half_page_down": "ctrl+d"
+    "messages_half_page_down": "ctrl+d",
+    "messages_first": "<leader>g",
+    "messages_last": "<leader>G",
+    "editor_open": "ctrl+g"
   }
 }

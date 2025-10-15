@@ -267,4 +267,17 @@ return {
       },
     },
   },
+
+  {
+    "stevearc/oil.nvim",
+    ---@module 'oil'
+    ---@type oil.SetupOpts
+    opts = {
+      float = { border = winborder },
+      confirmation = { border = winborder },
+      progress = { border = winborder },
+      ssh = { border = winborder },
+      keymaps_help = { border = winborder },
+    },
+  },
 }

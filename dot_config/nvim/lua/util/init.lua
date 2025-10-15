@@ -102,7 +102,8 @@ function M.is_floating_win(win, opts)
   return true
 end
 
----copied from: https://github.com/folke/snacks.nvim/blob/ce67fa9e31467590c750e203e27d3e6df293f2ad/lua/snacks/picker/core/frecency.lua#L162-L168
+---https://github.com/folke/snacks.nvim/blob/ce67fa9e31467590c750e203e27d3e6df293f2ad/lua/snacks/picker/core/frecency.lua#L162-L168
+---https://github.com/folke/sidekick.nvim/blob/d570e1f83bf2a19e6c1fad5de9b1b07beb54b67d/lua/sidekick/cli/context/location.lua#L71-L76
 ---@param opts? {buf?: integer, buflisted?: boolean}
 ---@return boolean
 ---@return string?
@@ -110,9 +111,11 @@ function M.is_file(opts)
   opts = opts or {}
   local buf = opts.buf or 0
   if
-    not vim.api.nvim_buf_is_valid(buf)
-    or vim.bo[buf].buftype ~= ""
-    or (opts.buflisted ~= false and not vim.bo[buf].buflisted)
+    not (
+      vim.api.nvim_buf_is_valid(buf)
+      and (opts.buflisted == false or vim.bo[buf].buflisted)
+      and vim.list_contains({ "", "help" }, vim.bo[buf].buftype)
+    )
   then
     return false
   end

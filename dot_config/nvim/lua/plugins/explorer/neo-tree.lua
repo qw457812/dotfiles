@@ -600,7 +600,15 @@ return {
               function(state)
                 local node = state.tree:get_node()
                 local path = node.type == "file" and node:get_parent_id() or node:get_id()
-                Snacks.terminal(nil, { cwd = path })
+                Snacks.terminal(nil, {
+                  win = {
+                    position = "float",
+                    keys = {
+                      hide_ctrl_space = { "<c-space>", "hide", mode = { "n", "t" } },
+                    },
+                  },
+                  cwd = path,
+                })
               end,
               desc = "Terminal (NeoTree Dir)",
             },

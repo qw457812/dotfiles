@@ -93,7 +93,15 @@ require("lazy").setup({
       },
       ["<c-space>"] = {
         function(plugin)
-          U.terminal(nil, { win = { position = "float" }, cwd = plugin.dir })
+          Snacks.terminal(nil, {
+            win = {
+              position = "float",
+              keys = {
+                hide_ctrl_space = { "<c-space>", "hide", mode = { "n", "t" } },
+              },
+            },
+            cwd = plugin.dir,
+          })
         end,
         desc = "Snacks Terminal (Plugin Dir)",
       },

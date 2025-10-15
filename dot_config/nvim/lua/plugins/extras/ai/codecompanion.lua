@@ -18,7 +18,7 @@ return {
     cmd = "CodeCompanion",
     keys = {
       {
-        "<leader>ao",
+        "<leader>am",
         -- "<cmd>CodeCompanionChat Toggle<CR>",
         function()
           -- https://github.com/olimorris/codecompanion.nvim/blob/3f7fd6292b9d43d38e9760f43b581652210b0349/lua/codecompanion/init.lua#L178-L192
@@ -30,7 +30,7 @@ return {
         -- mode = { "n", "x" }, -- not working in visual mode, using `:CodeCompanionChat Add` instead
       },
       {
-        "<leader>ao",
+        "<leader>am",
         function()
           vim.cmd("CodeCompanionChat Add")
           focus_last_chat()

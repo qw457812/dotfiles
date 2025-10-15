@@ -8,6 +8,7 @@ local M = setmetatable({}, {
   end,
 })
 
+-- TODO: refactor
 ---@param cmd? string | string[]
 ---@param opts? snacks.terminal.Opts
 ---@return snacks.win

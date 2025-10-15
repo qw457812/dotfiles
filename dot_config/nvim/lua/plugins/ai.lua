@@ -33,6 +33,7 @@ return {
           "<leader>ap",
           function()
             require("sidekick.cli").prompt({
+              -- add filter
               cb = function(msg)
                 if msg then
                   require("sidekick.cli").send({ msg = msg, render = false, filter = filter })
@@ -44,9 +45,12 @@ return {
           desc = "Prompt (Sidekick)",
         },
         { "<leader>af", function() require("sidekick.cli").send({ msg = "{file}", filter = filter }) end, desc = "File (Sidekick)" },
-        { "<leader>akc", function() require("sidekick.cli").toggle({ name = "claude" }) end, desc = "Claude" },
-        { "<leader>akx", function() require("sidekick.cli").toggle({ name = "codex" }) end, desc = "Codex" },
-        { "<leader>ako", function() require("sidekick.cli").toggle({ name = "opencode" }) end, desc = "OpenCode" },
+        { "<leader>ac", function() require("sidekick.cli").toggle({ name = "claude" }) end, desc = "Claude" },
+        { "<leader>ac", function() require("sidekick.cli").send({ msg = "{this}", filter = { name = "claude" } }) end, mode = "x", desc = "Claude" },
+        { "<leader>ax", function() require("sidekick.cli").toggle({ name = "codex" }) end, desc = "Codex" },
+        { "<leader>ax", function() require("sidekick.cli").send({ msg = "{this}", filter = { name = "codex" } }) end, mode = "x", desc = "Codex" },
+        { "<leader>ao", function() require("sidekick.cli").toggle({ name = "opencode" }) end, desc = "OpenCode" },
+        { "<leader>ao", function() require("sidekick.cli").send({ msg = "{this}", filter = { name = "opencode" } }) end, mode = "x", desc = "OpenCode" },
       })
       return keys
     end,
@@ -76,6 +80,12 @@ return {
               end,
               desc = "Clear UI or Blur",
               mode = "n",
+            },
+            newline = {
+              "<S-CR>",
+              function(t)
+                t:send("\n")
+              end,
             },
           },
         },
@@ -144,17 +154,6 @@ return {
           },
         },
       } or { import = "foobar", enabled = false }, -- dummy import
-      {
-        "folke/which-key.nvim",
-        opts = {
-          spec = {
-            {
-              mode = { "n", "x" },
-              { "<leader>ak", group = "sidekick" },
-            },
-          },
-        },
-      },
     },
   },
   {
