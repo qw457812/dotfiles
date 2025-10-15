@@ -1,0 +1,31 @@
+[
+  {
+    "pattern": "*",
+    "selector": "h1, h2, h3, h4, h5, h6, li, p, dd, blockquote, figcaption, label, legend",
+    "keepSelector": "a:has(code)",
+    "terms": "",
+    "aiTerms": "",
+    "apiSlug": "Microsoft",
+    "fromLang": "auto",
+    "toLang": "zh-CN",
+    "textStyle": "style_none",
+    "transOpen": "false",
+    "bgColor": "",
+    "textDiyStyle": "color: #333;\nbackground: linear-gradient(\n  45deg,\n  LightGreen 20%,\n  LightPink 20% 40%,\n  LightSalmon 40% 60%,\n  LightSeaGreen 60% 80%,\n  LightSkyBlue 80%\n);\n&:hover {\n  color: #111;\n};",
+    "selectStyle": "-webkit-line-clamp: unset; max-height: none; height: auto;",
+    "parentStyle": "-webkit-line-clamp: unset; max-height: none; height: auto;",
+    "grandStyle": "-webkit-line-clamp: unset; max-height: none; height: auto;",
+    "injectJs": "",
+    "injectCss": "",
+    "transOnly": "false",
+    "transTag": "font",
+    "transTitle": "false",
+    "transStartHook": "",
+    "transEndHook": "",
+    "autoScan": "true",
+    "hasRichText": "true",
+    "hasShadowroot": "false",
+    "rootsSelector": "body",
+    "ignoreSelector": "aside, button, footer, form, pre, mark, nav"
+  }
+]
