@@ -3,11 +3,11 @@
   "theme": "system",
   "share": "manual",
   "autoupdate": false,
-  "model": "anthropic/claude-sonnet-4-5-20250929",
-  "small_model": "anthropic/claude-3-5-haiku-20241022",
+  "model": "anthropic/claude-sonnet-4-5",
+  "small_model": "anthropic/claude-haiku-4-5",
   "agent": {
     "plan": {
-      "model": "anthropic/claude-sonnet-4-5-20250929"
+      "model": "anthropic/claude-sonnet-4-5"
     }
   },
   "provider": {

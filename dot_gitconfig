@@ -52,9 +52,14 @@
     ; hunk-header-decoration-style = blue box
     ; hunk-header-style = line-number syntax
 
+    commit-decoration-style = bold yellow ul
+
 [diff]
+    algorithm = histogram
     colorMoved = default
     tool = nvimdiff
+    # Better submodule diffs
+    submodule = log
 
 [merge]
     tool = nvimdiff
@@ -63,14 +68,15 @@
 [pull]
     rebase = true
 
-; [push]
-;     default = upstream
+[push]
+    autoSetupRemote = true
 
 [rebase]
     autoStash = true
 
 [commit]
-    template = ~/.stCommitMsg
+    verbose = true
+    ; template = ~/.stCommitMsg
 
 [init]
     defaultBranch = main
@@ -84,16 +90,25 @@
 [alias]
     st = status
     co = checkout
+    sw = switch
+    br = branch
     c = commit
     ci = commit
     br = branch
     p = push
-    # https://github.com/folke/dot/blob/3d97483b2a900849bc2dcacc8d86460155d2abc3/config/.gitconfig#L20
-    l = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --decorate --date=short --color --decorate
+    pf = push --force-with-lease --force-if-includes
+    l = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=short
+    ll = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative --all
     unstage = reset HEAD --
     discard = checkout --
     amend = commit --amend --no-edit
     uncommit = reset --soft HEAD~1
+
+[help]
+    autocorrect = prompt
+
+[log]
+    date = auto:human
 
 [credential "https://github.com"]
     helper = !gh auth git-credential

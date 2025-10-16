@@ -166,6 +166,13 @@ return {
     "folke/sidekick.nvim",
     optional = true,
     opts = function()
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "sidekick_terminal",
+        callback = function(ev)
+          vim.bo[ev.buf].modifiable = false
+        end,
+      })
+
       U.toggle.ai_cmps.sidekick_nes = Snacks.toggle({
         name = "Sidekick NES",
         get = function()
