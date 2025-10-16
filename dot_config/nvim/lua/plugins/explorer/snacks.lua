@@ -11,6 +11,7 @@ return {
       picker = {
         sources = {
           explorer = {
+            hidden = true,
             layout = {
               ---@diagnostic disable-next-line: assign-type-mismatch
               preview = { main = true, enabled = false },

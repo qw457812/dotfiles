@@ -280,4 +280,22 @@ return {
       keymaps_help = { border = winborder },
     },
   },
+
+  {
+    "folke/sidekick.nvim",
+    optional = true,
+    ---@module "sidekick"
+    ---@type sidekick.Config
+    opts = {
+      cli = {
+        ---@type sidekick.win.Opts
+        win = {
+          ---@type vim.api.keyset.win_config
+          float = {
+            border = winborder,
+          },
+        },
+      },
+    },
+  },
 }

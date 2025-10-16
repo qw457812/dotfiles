@@ -269,46 +269,54 @@ return {
         on_close = function()
           vim.g.user_suppress_lsp_progress = nil
         end,
+        actions = {
+          toggle_lua = function(p)
+            local opts = p.opts --[[@as snacks.picker.grep.Config]]
+            opts.ft = not opts.ft and "lua" or nil
+            p:find()
+          end,
+          -- for sources: grep, files
+          filter_extension = function(picker)
+            local mode = vim.fn.mode()
+            local is_grep = vim.list_contains({ "grep", "grep_word" }, picker.opts.source)
+            local default = is_grep and "*." or ""
+            Snacks.input.input({
+              prompt = "Filter By Extension",
+              default = default,
+            }, function(ext)
+              ext = not vim.list_contains({ default, "" }, vim.trim(ext or "")) and ext or nil
+              local opts = picker.opts
+              if is_grep then
+                ---@cast opts snacks.picker.grep.Config
+                -- see: https://github.com/folke/snacks.nvim/blob/bc902f7032df305df7dc48104cfa4e37967b3bdf/lua/snacks/picker/source/grep.lua#L57-L62
+                if opts.glob ~= ext then
+                  opts.glob = ext
+                  picker:find()
+                end
+              else
+                ---@cast opts snacks.picker.files.Config
+                -- see: https://github.com/folke/snacks.nvim/blob/bc902f7032df305df7dc48104cfa4e37967b3bdf/lua/snacks/picker/source/files.lua#L75-L90
+                if opts.ft ~= ext then
+                  opts.ft = ext
+                  picker:find()
+                end
+              end
+              if mode == "n" then
+                vim.cmd.stopinsert()
+              end
+            end)
+          end,
+        },
         sources = {
           files = {
             hidden = true,
             follow = true,
           },
           grep = {
-            actions = {
-              filter_extension = function(picker)
-                local mode = vim.fn.mode()
-                local default = "*."
-                Snacks.input.input({
-                  prompt = "Filter By Extension",
-                  default = default,
-                }, function(glob)
-                  glob = not vim.list_contains({ default, "" }, vim.trim(glob or "")) and glob or nil
-                  local opts = picker.opts
-                  ---@cast opts snacks.picker.grep.Config
-                  -- see: https://github.com/folke/snacks.nvim/blob/bc902f7032df305df7dc48104cfa4e37967b3bdf/lua/snacks/picker/source/grep.lua#L57-L62
-                  if opts.glob ~= glob then
-                    opts.glob = glob
-                    picker:find()
-                  end
-                  if mode == "n" then
-                    vim.cmd.stopinsert()
-                  end
-                end)
-              end,
-            },
-            win = {
-              input = {
-                keys = {
-                  ["<C-e>"] = { "filter_extension", mode = { "i", "n" } },
-                },
-              },
-              list = {
-                keys = {
-                  ["<C-e>"] = { "filter_extension", mode = { "i", "n" } },
-                },
-              },
-            },
+            hidden = true,
+          },
+          grep_word = {
+            hidden = true,
           },
           lazy = {
             ---@diagnostic disable-next-line: missing-fields
@@ -381,6 +389,8 @@ return {
               ["J"] = "preview_scroll_down", -- same as lazygit/yazi
               ["K"] = "preview_scroll_up",
               ["/"] = false, -- highlights text in preview
+              ["<C-e>"] = { "filter_extension", mode = { "i", "n" } },
+              ["<M-l>"] = { "toggle_lua", mode = { "n", "i" } },
               ["<C-Space>"] = { "cycle_win", mode = { "n", "i" } },
               ["<C-,>"] = "toggle_input",
               i_ctrl_comma = {
@@ -420,6 +430,8 @@ return {
               ["J"] = "preview_scroll_down",
               ["K"] = "preview_scroll_up",
               ["/"] = false,
+              ["<C-e>"] = { "filter_extension", mode = { "i", "n" } },
+              ["<M-l>"] = { "toggle_lua", mode = { "n", "i" } },
               ["<C-Space>"] = { "cycle_win", mode = { "n", "i" } },
               ["<C-,>"] = { "toggle_input", mode = { "n", "i" } },
               ["<Left>"] = "preview_scroll_left",
@@ -580,12 +592,20 @@ return {
                   args = args,
                   notify = false, -- if no match could be found, then the exit status is 1, see `man rg`
                   ---@param item snacks.picker.finder.Item
-                  transform = function(item)
+                  ---@param _ctx snacks.picker.finder.ctx
+                  transform = function(item, _ctx)
                     item.cwd = cwd
                     item.file = item.text
                     -- see: https://github.com/folke/snacks.nvim/blob/f32002607a5a81a1d25eda27b954fc6ba8e9fd1b/lua/snacks/picker/format.lua#L70-L87
                     -- item.ignored = true -- SnacksPickerPathIgnored
                     item.filename_hl = "SnacksPickerDimmed" -- SnacksPickerIconArray
+
+                    -- respect `picker.opts.ft` in favor of `filter_extension` action
+                    -- https://github.com/folke/snacks.nvim/blob/bc902f7032df305df7dc48104cfa4e37967b3bdf/lua/snacks/picker/source/files.lua#L75-L90
+                    local _opts = _ctx.picker.opts --[[@as snacks.picker.files.Config]]
+                    if _opts.ft and vim.fn.fnamemodify(item.file, ":e") ~= _opts.ft then
+                      return false
+                    end
                   end,
                 },
               }, ctx)
