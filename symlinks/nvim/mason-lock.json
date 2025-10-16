@@ -4,7 +4,7 @@
   "bash-language-server": "5.6.0",
   "biome": "2.2.6",
   "codelldb": "v1.11.6",
-  "copilot-language-server": "1.381.0",
+  "copilot-language-server": "1.382.0",
   "debugpy": "1.8.17",
   "docker-compose-language-service": "0.4.0",
   "dockerfile-language-server": "0.15.0",
