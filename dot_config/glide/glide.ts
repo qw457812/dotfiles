@@ -20,6 +20,18 @@
 
 // https://github.com/RobertCraigie/dotfiles/blob/ecfd6f66e8a775c80849f7889f297ef99cea7997/glide/glide.ts
 
+// https://github.com/mozilla-firefox/firefox/blob/e2e91539047e030b956e01fd5e8c28c074ae3f88/services/settings/dumps/main/search-config-v2.json
+const search_engines = {
+  g: "https://www.google.com/search?q={}",
+  b: "https://www.bing.com/search?q={}",
+  d: "https://duckduckgo.com/?q={}",
+  p: "https://www.perplexity.ai/search?q={}",
+  bd: "https://www.baidu.com/baidu?wd={}",
+  gh: "https://github.com/search?q={}&type=repositories",
+  wiki: "https://en.wikipedia.org/wiki/Special:Search?search={}",
+} as const;
+const default_search_engine = search_engines.g;
+
 if (glide.ctx.os === "macosx") {
   glide.env.set("PATH", `/opt/homebrew/bin:${glide.env.get("PATH")}`);
 }
@@ -58,7 +70,7 @@ glide.keymaps.set(
 );
 // vimium-like keymaps
 // https://github.com/glide-browser/glide/blob/107e240a8fd274cafef403d089dc2b646319e8f8/src/glide/browser/base/content/plugins/keymaps.mts
-// TODO: o b
+// TODO: b
 glide.keymaps.set("normal", "/", "keys <D-f>");
 glide.keymaps.set("normal", "r", when_editing("r", "reload"));
 glide.keymaps.set("normal", "R", when_editing(null, "reload_hard"));
@@ -402,6 +414,36 @@ glide.autocmds.create("UrlEnter", { hostname: "github.com" }, async () => {
 //   },
 // );
 
+// Excmds
+const open = glide.excmds.create(
+  { name: "open", description: "Open URL" },
+  opener(),
+);
+declare global {
+  interface ExcmdRegistry {
+    open: typeof open;
+  }
+}
+const open_in_new_tab = glide.excmds.create(
+  { name: "open_in_new_tab", description: "Open URL in new tab" },
+  opener(true),
+);
+declare global {
+  interface ExcmdRegistry {
+    open_in_new_tab: typeof open_in_new_tab;
+  }
+}
+glide.keymaps.set(
+  "normal",
+  "o",
+  when_editing("motion o", "commandline_show open "),
+);
+glide.keymaps.set(
+  "normal",
+  "O",
+  when_editing(null, "commandline_show open_in_new_tab "),
+);
+
 // Utils
 function when_editing(
   editing_action: glide.ExcmdString | glide.KeymapCallback | null,
@@ -448,8 +490,47 @@ function text_to_url(text: string): string {
     new URL(text);
     return text;
   } catch {
-    return `https://www.google.com/search?q=${encodeURIComponent(text)}`;
+    return default_search_engine.replace("{}", encodeURIComponent(text));
   }
+}
+
+function opener(
+  newtab: boolean = false,
+): (props: glide.ExcmdCallbackProps) => void | Promise<void> {
+  // ref: https://github.com/glide-browser/glide/discussions/61#discussioncomment-14672404
+  function args_to_url(args: string[]): string | undefined {
+    if (!args.length) return;
+
+    // A single argument with dots is a host or URL on its own.
+    // But take care to complete it with a scheme if it doesn't have one.
+    if (args.length == 1 && args[0]!.indexOf(".") >= 0) {
+      return /^[a-z]+:/.test(args[0]!) ? args[0]! : "https://" + args[0]!;
+    }
+
+    // Otherwise, consider the first argument as a search shorthand.
+    for (const [shorthand, url] of Object.entries(search_engines)) {
+      if (args[0]! == shorthand) {
+        args.shift(); // drop shorthand
+        const query = args.map(encodeURIComponent).join("+");
+        return url.replace("{}", query);
+      }
+    }
+
+    // No shorthand match. Feed all args to the default search engine.
+    const query = args.map(encodeURIComponent).join("+");
+    return default_search_engine.replace("{}", query);
+  }
+
+  return (props) => {
+    const url = args_to_url(props.args_arr);
+    if (url) {
+      if (newtab) {
+        browser.tabs.create({ url });
+      } else {
+        browser.tabs.update({ url });
+      }
+    }
+  };
 }
 
 function sleep(ms: number) {
