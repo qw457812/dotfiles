@@ -1,5 +1,21 @@
 ---@type LazySpec
 return {
+  -- learn
+  {
+    "folke/dot",
+    name = "folke_dot",
+    lazy = true,
+    config = function() end,
+    specs = {
+      {
+        "LazyVim/LazyVim",
+        keys = {
+          { "<leader>lf", "<cmd>Lazy log folke_dot<cr>", desc = "Folke Dot" },
+        },
+      },
+    },
+  },
+
   -- fish
   {
     "neovim/nvim-lspconfig",
