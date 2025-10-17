@@ -49,6 +49,9 @@ return {
     "MeanderingProgrammer/render-markdown.nvim",
     optional = true,
     ft = "gitcommit",
+    keys = {
+      { "<leader>cp", "<cmd>RenderMarkdown preview<cr>", desc = "Preview Split", ft = "markdown" },
+    },
     ---@module "render-markdown"
     ---@type render.md.UserConfig
     opts = {
@@ -82,6 +85,23 @@ return {
       -- checkbox = {
       --   enabled = true,
       -- },
+      overrides = {
+        -- `:RenderMarkdown preview`
+        preview = {
+          heading = {
+            sign = true,
+            icons = { "󰲡 ", "󰲣 ", "󰲥 ", "󰲧 ", "󰲩 ", "󰲫 " },
+          },
+          code = {
+            sign = true,
+            conceal_delimiters = true,
+            language = true,
+          },
+          checkbox = {
+            enabled = true,
+          },
+        },
+      },
       completions = {
         -- blink = { enabled = true },
         lsp = { enabled = true },
@@ -91,6 +111,15 @@ return {
           end,
         },
       },
+    },
+  },
+
+  {
+    "iamcco/markdown-preview.nvim",
+    optional = true,
+    keys = {
+      { "<leader>cp", false, ft = "markdown" },
+      { "<leader>cP", "<cmd>MarkdownPreviewToggle<cr>", desc = "Markdown Preview", ft = "markdown" },
     },
   },
 
@@ -153,6 +182,7 @@ return {
       if use_image_nvim then
         vim.list_extend(ft, { "markdown" })
       end
+      return ft
     end,
     opts = {
       integrations = {
