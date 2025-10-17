@@ -359,6 +359,9 @@ glide.keymaps.set("insert", "jj", "mode_change normal");
 
 glide.keymaps.set("command", "<c-j>", "commandline_focus_next");
 glide.keymaps.set("command", "<c-k>", "commandline_focus_back");
+glide.keymaps.set("command", "<c-w>", "keys <A-BS>");
+glide.keymaps.set("command", "<c-u>", "keys <D-BS>");
+glide.keymaps.set("command", "<c-d>", "keys <Del>");
 
 // Autocmds
 glide.autocmds.create("ModeChanged", "command:*", focus_page);

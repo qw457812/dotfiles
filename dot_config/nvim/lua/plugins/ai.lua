@@ -103,6 +103,8 @@ return {
 
               ANTHROPIC_BASE_URL = vim.env.CTOK_BASE_URL,
               ANTHROPIC_AUTH_TOKEN = vim.env.CTOK_AUTH_TOKEN,
+              ANTHROPIC_MODEL = "",
+              ANTHROPIC_SMALL_FAST_MODEL = "",
 
               -- ANTHROPIC_BASE_URL = "https://api.moonshot.cn/anthropic",
               -- ANTHROPIC_AUTH_TOKEN = vim.env.MOONSHOT_API_KEY,
