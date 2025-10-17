@@ -96,11 +96,18 @@ return {
         ---@type table<string, sidekick.cli.Config|{}>
         tools = {
           claude = {
+            cmd = { "command", "claude" },
             env = {
               __IS_CLAUDECODE_NVIM = "1", -- flag to disable claude code statusline in ~/.claude/settings.json
               NVIM_FLATTEN_NEST = "1", -- allow ctrl-g to edit prompt in nvim" to be nested for flatten.nvim
+
               ANTHROPIC_BASE_URL = vim.env.CTOK_BASE_URL,
               ANTHROPIC_AUTH_TOKEN = vim.env.CTOK_AUTH_TOKEN,
+
+              -- ANTHROPIC_BASE_URL = "https://api.moonshot.cn/anthropic",
+              -- ANTHROPIC_AUTH_TOKEN = vim.env.MOONSHOT_API_KEY,
+              -- ANTHROPIC_MODEL = "kimi-k2-0905-preview",
+              -- ANTHROPIC_SMALL_FAST_MODEL = "kimi-k2-turbo-preview",
             },
             keys = {
               blur_t = false, -- claude code uses <c-o> for its own functionality

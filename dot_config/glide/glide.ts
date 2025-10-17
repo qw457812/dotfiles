@@ -320,7 +320,6 @@ glide.keymaps.set(
   "<leader>gt",
   go_to_tab("https://github.com/trending"),
 );
-glide.keymaps.set("normal", "<leader>gi", go_to_tab("https://ossinsight.io/"));
 glide.keymaps.set(
   "normal",
   "<leader>g.",
@@ -337,6 +336,16 @@ glide.keymaps.set(
   go_to_tab(
     "https://github.com/glide-browser/glide/blob/main/src/glide/browser/base/content/plugins/keymaps.mts",
   ),
+);
+glide.keymaps.set(
+  "normal",
+  "<leader>gi",
+  go_to_tab_by_hostname("ossinsight.io", "https://ossinsight.io/"),
+);
+glide.keymaps.set(
+  "normal",
+  "<leader>gr",
+  go_to_tab_by_hostname("openrouter.ai", "https://openrouter.ai/settings/keys"),
 );
 
 glide.keymaps.set(["normal", "insert"], "<C-j>", "keys <Down>");
@@ -398,6 +407,43 @@ glide.autocmds.create("UrlEnter", { hostname: "github.com" }, async () => {
   glide.buf.keymaps.set("normal", ",r", go_to("releases"));
   glide.buf.keymaps.set("normal", ",d", go_to("discussions"));
   glide.buf.keymaps.set("normal", ",w", go_to("wiki"));
+  // ref: https://github.com/refined-github/refined-github/pull/8430
+  glide.buf.keymaps.set(
+    "normal",
+    ",b",
+    go_to(
+      `issues?q=${encodeURIComponent("sort:updated-desc is:issue is:open (label:bug OR type:Bug)")}`,
+    ),
+  );
+});
+
+glide.autocmds.create("UrlEnter", { hostname: "openrouter.ai" }, async () => {
+  function go_to(url: string) {
+    return async () => {
+      await browser.tabs.update({ url });
+    };
+  }
+  glide.buf.keymaps.set(
+    "normal",
+    ",,",
+    go_to("https://openrouter.ai/settings/keys"),
+  );
+  glide.buf.keymaps.set(
+    "normal",
+    ",c",
+    go_to("https://openrouter.ai/settings/credits"),
+  );
+  glide.buf.keymaps.set(
+    "normal",
+    ",a",
+    go_to("https://openrouter.ai/activity"),
+  );
+  glide.buf.keymaps.set("normal", ",m", go_to("https://openrouter.ai/models"));
+  glide.buf.keymaps.set(
+    "normal",
+    ",r",
+    go_to("https://openrouter.ai/rankings"),
+  );
 });
 
 // glide.autocmds.create(
@@ -481,6 +527,24 @@ function go_to_tab(url: string) {
       await browser.tabs.update(tab.id, { active: true });
     } else {
       await browser.tabs.create({ url });
+    }
+  };
+}
+
+function go_to_tab_by_hostname(hostname: string, default_url: string) {
+  return async () => {
+    const tabs = await browser.tabs.query({});
+    const matching_tab = tabs.find((tab) => {
+      try {
+        return new URL(tab.url || "").hostname === hostname;
+      } catch {
+        return false;
+      }
+    });
+    if (matching_tab && matching_tab.id) {
+      await browser.tabs.update(matching_tab.id, { active: true });
+    } else {
+      await browser.tabs.create({ url: default_url });
     }
   };
 }
