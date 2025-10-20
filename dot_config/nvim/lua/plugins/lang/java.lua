@@ -130,11 +130,6 @@ return {
           -- config.handlers["$/progress"] = function() end -- disable progress updates
           config.handlers["language/status"] = function() end -- mute; having progress reports is enough
 
-          -- https://github.com/LazyVim/LazyVim/pull/5218
-          config.capabilities = config.capabilities
-            or LazyVim.has("blink.cmp") and require("blink.cmp").get_lsp_capabilities()
-            or nil
-
           if LazyVim.has("spring-boot.nvim") then
             config.init_options = config.init_options or {}
             config.init_options.bundles =

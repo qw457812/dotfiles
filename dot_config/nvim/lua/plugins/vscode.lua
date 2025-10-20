@@ -74,8 +74,6 @@ return {
         callback = function()
           -- vscode_map("n", "u", "undo", { desc = "VSCode Undo" })
           -- vscode_map("n", "U", "redo", { desc = "VSCode Redo" })
-          map("n", "u", "u", { desc = "Undo" })
-          map("n", "U", "<C-r>", { desc = "Redo" })
 
           vscode_map("n", "<Left>", "workbench.action.navigateBack", { desc = "Go Back" })
           vscode_map("n", "<Right>", "workbench.action.navigateForward", { desc = "Go Forward" })

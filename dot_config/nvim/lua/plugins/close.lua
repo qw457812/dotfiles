@@ -11,6 +11,7 @@ local augroup = vim.api.nvim_create_augroup("close_with_" .. close_key, { clear 
 
 -- copied from: https://github.com/psjay/buffer-closer.nvim/blob/74fec63c4c238b2cf6f61c40b47f869d442a8988/lua/buffer-closer/init.lua#L10
 -- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/funcs/alt-alt.lua#L42
+-- see also: https://github.com/folke/sidekick.nvim/commit/99824c2b63d547a1fd90e24fa9e8fb648382645d
 local function close_buffer_or_window_or_exit()
   if vim.g.vscode then
     local vscode = require("vscode")
