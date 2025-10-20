@@ -10,7 +10,7 @@ return {
       {
         "LazyVim/LazyVim",
         keys = {
-          { "<leader>lf", "<cmd>Lazy log folke_dot<cr>", desc = "Folke Dot" },
+          { "<leader>lf", "<cmd>Lazy log folke_dot<cr>", desc = "Folke Dot Logs" },
         },
       },
     },

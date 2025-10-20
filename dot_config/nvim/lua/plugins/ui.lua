@@ -115,13 +115,14 @@ return {
         end
       end
 
-      local mode = { "mode" }
-      if is_termux then
-        mode.fmt = function(str)
-          return str:sub(1, 1)
-        end
-      end
-      opts.sections.lualine_a = { mode }
+      opts.sections.lualine_a = {
+        {
+          "mode",
+          fmt = is_termux and function(str)
+            return str:sub(1, 1)
+          end or nil,
+        },
+      }
       opts.sections.lualine_b = { { "branch", icons_enabled = not is_termux } }
 
       local lualine_c = opts.sections.lualine_c
@@ -137,14 +138,17 @@ return {
         end
       end
 
-      -- move copilot to the right of command
-      table.insert(opts.sections.lualine_x, 4, table.remove(opts.sections.lualine_x, 2))
+      -- move copilot and sidekick to the right of command
+      local lualine_x = opts.sections.lualine_x
+      local copilot, sidekick = table.remove(lualine_x, 3), table.remove(lualine_x, 2)
+      table.insert(lualine_x, 4, copilot)
+      table.insert(lualine_x, 4, sidekick)
       if is_termux then
-        remove_component(opts.sections.lualine_x, "diff")
+        remove_component(lualine_x, "diff")
       else
-        vim.list_extend(opts.sections.lualine_x, { U.lualine.formatter, U.lualine.linter, U.lualine.lsp })
-        table.insert(opts.sections.lualine_x, 2, U.lualine.wrap)
-        table.insert(opts.sections.lualine_x, 2, U.lualine.hlsearch)
+        vim.list_extend(lualine_x, { U.lualine.formatter, U.lualine.linter, U.lualine.lsp })
+        table.insert(lualine_x, 2, U.lualine.wrap)
+        table.insert(lualine_x, 2, U.lualine.hlsearch)
       end
 
       opts.sections.lualine_y = {
@@ -156,8 +160,7 @@ return {
         },
         { "progress" },
       }
-      local location = { "location" }
-      opts.sections.lualine_z = { location }
+      opts.sections.lualine_z = { { "location" } }
 
       -- "" ┊ |          
       -- nerdfont-powerline icons prefix: `ple-`
@@ -166,8 +169,8 @@ return {
       local bubbles = false
       if bubbles then
         opts.options.section_separators = { left = "", right = "" }
-        mode.separator = { left = "" }
-        location.separator = { right = "" }
+        opts.sections.lualine_a[1].separator = { left = "" }
+        opts.sections.lualine_z[#opts.sections.lualine_z].separator = { right = "" }
       else
         opts.options.section_separators = { left = "", right = "" }
       end

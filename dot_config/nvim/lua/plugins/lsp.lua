@@ -215,9 +215,26 @@ return {
       return U.extend_tbl(opts, {
         ---@type vim.diagnostic.Opts
         diagnostics = {
+          -- signs = {
+          --   priority = 9999,
+          --   severity = {
+          --     min = vim.diagnostic.severity.WARN,
+          --     max = vim.diagnostic.severity.ERROR,
+          --   },
+          -- },
+          -- underline = {
+          --   severity = {
+          --     min = vim.diagnostic.severity.HINT,
+          --     max = vim.diagnostic.severity.ERROR,
+          --   },
+          -- },
           virtual_text = not LazyVim.has("tiny-inline-diagnostic.nvim") and {
             prefix = "icons",
             current_line = true,
+            -- severity = {
+            --   min = vim.diagnostic.severity.ERROR,
+            --   max = vim.diagnostic.severity.ERROR,
+            -- },
           } --[[@as vim.diagnostic.Opts.VirtualText]],
         },
         folds = { enabled = false }, -- set up on our own above

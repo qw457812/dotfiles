@@ -3,6 +3,21 @@ local java_home = vim.g.user_is_termux and "/data/data/com.termux/files/usr/lib/
 
 ---@type LazySpec
 return {
+  {
+    "neovim/neovim",
+    enabled = not vim.g.user_is_termux,
+    lazy = true,
+    config = function() end,
+    specs = {
+      {
+        "LazyVim/LazyVim",
+        keys = {
+          { "<leader>ln", "<cmd>Lazy log neovim<cr>", desc = "Neovim Logs" },
+        },
+      },
+    },
+  },
+
   -- -- dummy import
   -- {
   --   import = "foobar",

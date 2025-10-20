@@ -29,7 +29,7 @@
   "selene": "0.29.0",
   "shellcheck": "v0.11.0",
   "shfmt": "v3.12.0",
-  "sqlfluff": "3.4.2",
+  "sqlfluff": "3.5.0",
   "stylua": "v2.3.0",
   "tailwindcss-language-server": "0.14.28",
   "taplo": "0.10.0",
