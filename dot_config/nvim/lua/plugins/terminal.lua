@@ -172,27 +172,6 @@ return {
     enabled = vim.env.YAZI_ID == nil,
     lazy = false,
     priority = 1001,
-    -- keys = {
-    --   {
-    --     "<Leader>gc",
-    --     function()
-    --       local root = Snacks.git.get_root()
-    --       if not root then
-    --         LazyVim.warn("Not a git repo", { title = "Flatten" })
-    --         return
-    --       end
-    --       -- TODO:
-    --       -- - delete terminal buffer with `[Process exited 1]`
-    --       -- - notify when something is wrong (e.g., no changes to commit)
-    --       local terminal = Snacks.terminal.open(
-    --         { "git", "-C", root, "commit", "--verbose" },
-    --         { interactive = false, auto_close = true }
-    --       )
-    --       terminal:hide()
-    --     end,
-    --     desc = "Commit (Flatten)",
-    --   },
-    -- },
     opts = function()
       local current_terminal ---@type snacks.win?
 
