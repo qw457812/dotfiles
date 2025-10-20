@@ -211,7 +211,7 @@ return {
     opts = {
       spec = {
         {
-          mode = { "n", "v" },
+          mode = { "n", "x" },
           { "<leader>an", group = "codecompanion" },
         },
       },

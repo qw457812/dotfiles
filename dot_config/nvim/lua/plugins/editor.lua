@@ -16,12 +16,12 @@ return {
             },
           })
         end,
-        mode = { "n", "v" },
+        mode = { "n", "x" },
         desc = "Search and Replace",
       },
       {
         "<leader>sF",
-        mode = { "n", "v" },
+        mode = { "n", "x" },
         function()
           require("grug-far").open({
             transient = true,

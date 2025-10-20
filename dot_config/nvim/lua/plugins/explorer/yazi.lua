@@ -13,7 +13,7 @@ return {
     dependencies = "folke/snacks.nvim",
     cmd = "Yazi",
     keys = {
-      { "<leader><cr>", mode = { "n", "v" }, "<cmd>Yazi<cr>", desc = "Yazi (Buffer Dir)" },
+      { "<leader><cr>", mode = { "n", "x" }, "<cmd>Yazi<cr>", desc = "Yazi (Buffer Dir)" },
     },
     init = function(plugin)
       local opts = LazyVim.opts("yazi.nvim")

@@ -370,13 +370,13 @@ return {
     },
     -- stylua: ignore
     keys = {
-      { "<leader>aa", mode = { "n", "v" }, false },
-      { "<leader>ax", mode = { "n", "v" }, false },
-      { "<leader>ap", mode = { "n", "v" }, false },
-      { "<leader>aq", mode = { "n", "v" }, false },
+      { "<leader>aa", mode = { "n", "x" }, false },
+      { "<leader>ax", mode = { "n", "x" }, false },
+      { "<leader>ap", mode = { "n", "x" }, false },
+      { "<leader>aq", mode = { "n", "x" }, false },
       {
         "<leader>app",
-        mode = { "n", "v" },
+        mode = { "n", "x" },
         function()
           local copilot_chat = require("CopilotChat")
           copilot_chat.open()
@@ -389,8 +389,8 @@ return {
         end,
         desc = "Chat",
       },
-      { "<leader>apa", function() require("CopilotChat").select_prompt() end, desc = "Prompt Actions", mode = { "n", "v" } },
-      { "<localleader>c", function() require("CopilotChat").reset() end, desc = "Clear", mode = { "n", "v" }, ft = "copilot-chat" },
+      { "<leader>apa", function() require("CopilotChat").select_prompt() end, desc = "Prompt Actions", mode = { "n", "x" } },
+      { "<localleader>c", function() require("CopilotChat").reset() end, desc = "Clear", mode = { "n", "x" }, ft = "copilot-chat" },
       { "<localleader>m", "<cmd>CopilotChatModels<cr>", desc = "Switch Model", ft = "copilot-chat" },
       { "<localleader>s", "<cmd>CopilotChatStop<cr>", desc = "Stop", ft = "copilot-chat" },
     },
@@ -447,7 +447,7 @@ return {
         opts = {
           spec = {
             {
-              mode = { "n", "v" },
+              mode = { "n", "x" },
               { "<leader>ap", group = "copilot" },
             },
           },

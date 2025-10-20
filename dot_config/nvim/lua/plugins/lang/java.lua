@@ -156,7 +156,7 @@ return {
           -- stylua: ignore
           wk.add({
             {
-              mode = "v",
+              mode = "x",
               buffer = args.buf,
               { "<leader>rf", [[<ESC><CMD>lua require('jdtls').extract_method(true)<CR>]], desc = "Extract Method" },
               { "<leader>rx", [[<ESC><CMD>lua require('jdtls').extract_variable_all(true)<CR>]], desc = "Extract Variable" },

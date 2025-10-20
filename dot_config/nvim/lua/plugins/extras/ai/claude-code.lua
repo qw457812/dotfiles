@@ -211,7 +211,7 @@ return {
     opts = {
       spec = {
         {
-          mode = { "n", "v" },
+          mode = { "n", "x" },
           { "<leader>ae", group = "claudecode.nvim" },
           { "<leader>aeg", group = "git" },
         },

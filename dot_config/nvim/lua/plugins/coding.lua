@@ -87,7 +87,7 @@ return {
     opts = {
       spec = {
         {
-          mode = { "n", "v" },
+          mode = { "n", "x" },
           { "m", group = "match/surround" },
         },
       },
