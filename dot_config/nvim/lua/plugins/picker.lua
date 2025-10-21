@@ -469,10 +469,10 @@ return {
     "folke/snacks.nvim",
     optional = true,
     opts = function(_, opts)
-      -- HACK: add right padding (1)
+      -- HACK: add right padding
       local orig_truncpath = Snacks.picker.util.truncpath
       Snacks.picker.util.truncpath = function(path, len, _opts)
-        return orig_truncpath(path, len - 2, _opts)
+        return orig_truncpath(path, len - 1, _opts)
       end
 
       return U.extend_tbl(opts, {
@@ -492,6 +492,7 @@ return {
     opts = function()
       do
         -- using `opts.picker.formatters.file.truncate`
+        -- NOTE: not working after https://github.com/folke/snacks.nvim/commit/d5b6d30
         return
       end
 
