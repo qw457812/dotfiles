@@ -191,6 +191,10 @@ if vim.g.user_explorer_auto_open and not vim.g.vscode then
   vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile", "BufWritePre" }, {
     group = vim.api.nvim_create_augroup("explorer_auto_open", { clear = true }),
     callback = function(ev)
+      -- ref: https://github.com/folke/snacks.nvim/commit/756a791131304a9063ff8e3af52811efbcaef688
+      if vim.v.vim_did_enter == 0 then
+        return
+      end
       -- TODO: Snacks.explorer
       if package.loaded["neo-tree"] then
         return true -- let WinResized event to handle the rest

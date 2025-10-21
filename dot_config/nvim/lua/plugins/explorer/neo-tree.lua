@@ -397,6 +397,9 @@ return {
       local o = {
         sources = { "filesystem" },
         close_if_last_window = true, -- note that this causes `:bd` to exit vim in a java library buffer when neo-tree is open, see #241
+        clipboard = {
+          sync = "universal",
+        },
         default_component_configs = {
           -- use mini.icons instead of nvim-web-devicons
           -- https://github.com/nvim-neo-tree/neo-tree.nvim/pull/1527#issuecomment-2233186777
@@ -847,21 +850,25 @@ return {
   {
     "akinsho/bufferline.nvim",
     optional = true,
-    opts = {
-      options = {
-        offsets = {
-          {
-            filetype = "neo-tree",
-            text = function()
-              local cwd = LazyVim.root.cwd()
-              local root = LazyVim.root.get({ normalize = true })
-              return cwd == root and " Explorer" or " 󱞊 " .. U.path.home_to_tilde(cwd)
-            end,
-            highlight = "NeoTreeRootName", -- Directory
-            text_align = "left",
-          },
-        },
-      },
-    },
+    ---@module "bufferline"
+    ---@param opts bufferline.UserConfig
+    opts = function(_, opts)
+      for _, offset in ipairs((opts.options or {}).offsets or {}) do
+        if offset.filetype == "neo-tree" then
+          offset.text = function()
+            local cwd = LazyVim.root.cwd()
+            local root = LazyVim.root.get({ normalize = true })
+            return cwd == root and "Explorer" or "󱞊 " .. U.path.home_to_tilde(cwd)
+          end
+
+          Snacks.util.set_hl(
+            { NeoTreeRootName = { fg = Snacks.util.color("Directory"), bold = true } },
+            { default = true }
+          )
+          offset.highlight = "NeoTreeRootName"
+          break
+        end
+      end
+    end,
   },
 }

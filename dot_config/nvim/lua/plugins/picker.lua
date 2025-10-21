@@ -339,6 +339,9 @@ return {
               ret[#ret + 1] = { icon, hl, virtual = true }
 
               -- copied from: https://github.com/folke/snacks.nvim/blob/b773368f8aa6e84a68e979f0e335d23de71f405a/lua/snacks/picker/format.lua#L118-L133
+              -- TODO: adapt to latest changes in snacks.nvim
+              -- - check `Snacks.picker.highlight.resolve`
+              -- - https://github.com/folke/snacks.nvim/blob/5173e96f3359121233e817c12307d531a8622e4f/lua/snacks/picker/format.lua#L162-L177
               vim.list_extend(ret, Snacks.picker.format.filename(item, picker))
               local trunc_len = 30
               for _, text in ipairs(ret) do
@@ -465,6 +468,7 @@ return {
     },
   },
 
+  -- TODO: find a way to use `U.path.shorten` before truncation
   {
     "folke/snacks.nvim",
     optional = true,

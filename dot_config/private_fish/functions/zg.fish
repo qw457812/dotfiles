@@ -1,10 +1,10 @@
 function zg --description 'Jumps to parent git repo'
     set -l d (pwd)
-    if test -d $d/.git
+    if test -e $d/.git
         return
     end
     while test $d != /
-        if test -d $d/.git
+        if test -e $d/.git
             cd $d
             return
         else

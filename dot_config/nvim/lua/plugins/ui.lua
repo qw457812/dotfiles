@@ -41,12 +41,12 @@ return {
       end
       return vim.list_extend(keys, mappings)
     end,
+    ---@param opts bufferline.UserConfig
     opts = function(_, opts)
       local get_element_icon = vim.tbl_get(opts, "options", "get_element_icon")
       get_element_icon = vim.is_callable(get_element_icon) and get_element_icon or function(_) end
 
       return U.extend_tbl(opts, {
-        ---@type bufferline.Options
         options = {
           -- indicator = { style = "underline" },
           separator_style = vim.g.user_transparent_background and { "", "" } or "slant", -- slope
@@ -95,7 +95,7 @@ return {
             },
           },
         },
-      })
+      } --[[@as bufferline.UserConfig]])
     end,
   },
 

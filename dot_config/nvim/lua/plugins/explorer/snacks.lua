@@ -15,6 +15,7 @@ return {
             layout = {
               ---@diagnostic disable-next-line: assign-type-mismatch
               preview = { main = true, enabled = false },
+              auto_hide = { "input" },
             },
             actions = {
               unfocus = function(picker)

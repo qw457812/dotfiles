@@ -239,6 +239,7 @@ return {
       { "<leader>gC", "<Cmd>Git commit --amend<CR>", desc = "Commit Amend" },
       { "<leader>ga", "<Cmd>Git diff --cached<CR>", desc = "Diff Cached" },
       { "<leader>gA", "<Cmd>Git diff --cached -- %<CR>", desc = "Diff Cached Buffer" },
+      { "<leader>gP", "<Cmd>Git push<CR>", desc = "Push" },
     },
     opts = function()
       vim.api.nvim_create_autocmd("User", {
