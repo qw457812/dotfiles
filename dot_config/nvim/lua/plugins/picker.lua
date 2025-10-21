@@ -464,10 +464,37 @@ return {
       },
     },
   },
+
+  {
+    "folke/snacks.nvim",
+    optional = true,
+    opts = function(_, opts)
+      -- HACK: add right padding (1)
+      local orig_truncpath = Snacks.picker.util.truncpath
+      Snacks.picker.util.truncpath = function(path, len, _opts)
+        return orig_truncpath(path, len - 2, _opts)
+      end
+
+      return U.extend_tbl(opts, {
+        picker = {
+          formatters = {
+            file = {
+              truncate = "left",
+            },
+          },
+        },
+      } --[[@as snacks.Config]])
+    end,
+  },
   {
     "folke/snacks.nvim",
     optional = true,
     opts = function()
+      do
+        -- using `opts.picker.formatters.file.truncate`
+        return
+      end
+
       ---@param dir string
       ---@param len number
       ---@return string
@@ -501,9 +528,10 @@ return {
       Snacks.picker.util.truncpath = function(path)
         return path
       end
-      local filename_orig = Snacks.picker.format.filename
-      Snacks.picker.format.filename = function(item, picker)
-        local ret = filename_orig(item, picker)
+      local orig_filename = Snacks.picker.format._filename
+      Snacks.picker.format._filename = function(ctx)
+        local ret = orig_filename(ctx)
+        local picker = ctx.picker
         if picker.opts.formatters.file.filename_only then
           return ret
         end
@@ -543,6 +571,7 @@ return {
       end
     end,
   },
+
   {
     "folke/snacks.nvim",
     keys = function(_, keys)

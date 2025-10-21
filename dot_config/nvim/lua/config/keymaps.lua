@@ -315,6 +315,7 @@ map("n", "<leader>iC", function() LazyVim.info(vim.g.colors_name, { title = "Col
 -- alternative: `:h news` or `LazyVim.news.neovim()`
 map("n", "<leader>iN", news, { desc = "Neovim News" })
 
+-- https://github.com/folke/sidekick.nvim/commit/bed1d65
 local function paste()
   vim.api.nvim_paste(vim.fn.getreg("+"), true, -1)
 end

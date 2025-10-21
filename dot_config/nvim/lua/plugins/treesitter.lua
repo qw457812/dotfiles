@@ -14,7 +14,7 @@ return {
             LazyVim.treesitter.have(ev.match, "highlights")
             and not (has_chezmoi_vim and ev.match:find("chezmoitmpl"))
           then
-            pcall(vim.treesitter.start)
+            pcall(vim.treesitter.start, ev.buf)
           end
         end,
       })

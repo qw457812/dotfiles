@@ -66,6 +66,24 @@ return {
       { "m<C-n>", "<Cmd>lua MiniSurround.update_n_lines()<CR>", desc = "Update `MiniSurround.config.n_lines`" },
     },
     opts = function(_, opts)
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "markdown",
+        callback = function(ev)
+          -- copied from: https://github.com/nvim-mini/MiniMax/blob/515c6ea7361ab11d8f6024e35b4068b06e528aed/configs/nvim-0.11/after/ftplugin/markdown.lua#L27-L42
+          vim.b[ev.buf].minisurround_config = {
+            custom_surroundings = {
+              L = {
+                input = { "%[().-()%]%(.-%)" },
+                output = function()
+                  local link = require("mini.surround").user_input("Link: ")
+                  return { left = "[", right = "](" .. link .. ")" }
+                end,
+              },
+            },
+          }
+        end,
+      })
+
       if vim.tbl_get(opts, "mappings", "update_n_lines") then
         opts.mappings.update_n_lines = nil
       end
