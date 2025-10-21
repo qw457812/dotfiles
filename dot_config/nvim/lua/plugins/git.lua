@@ -52,8 +52,22 @@ return {
         vim.list_extend(keys, {
           { "<leader>gb", function() Snacks.picker.git_branches({ cwd = LazyVim.root.git() }) end, desc = "Git Branches" },
           { "<leader>gB", function() Snacks.picker.git_log_line() end, desc = "Git Blame Line" },
-          -- { "<leader>gc", function() Snacks.picker.git_log({ cwd = LazyVim.root.git() }) end, desc = "Git Log" },
           { "<leader>gd", function() Snacks.picker.git_diff({ cwd = LazyVim.root.git() }) end, desc = "Git Diff (hunks)" },
+          {
+            "<leader>gD",
+            function() Snacks.picker.git_diff({ cwd = LazyVim.root.git(), cmd_args = { "--", vim.api.nvim_buf_get_name(0) } }) end,
+            desc = "Git Diff Buffer (hunks)",
+          },
+          {
+            "<leader>ga",
+            function() Snacks.picker.git_diff({ cwd = LazyVim.root.git(), cmd_args = { "--cached" } }) end,
+            desc = "Git Diff Cached (hunks)",
+          },
+          {
+            "<leader>gA",
+            function() Snacks.picker.git_diff({ cwd = LazyVim.root.git(), cmd_args = { "--cached", "--", vim.api.nvim_buf_get_name(0) } }) end,
+            desc = "Git Diff Cached Buffer (hunks)",
+          },
           { "<leader>gs", function() Snacks.picker.git_status({ cwd = LazyVim.root.git() }) end, desc = "Git Status" },
           {
             "<leader>gS",
@@ -193,17 +207,15 @@ return {
           gs.undo_stage_hunk()
           redraw()
         end, "Undo Stage Hunk")
-        if not LazyVim.has("diffview.nvim") then
-          map("n", "<leader>gD", function()
-            gs.diffthis("~")
-            if vim.g.user_close_key then
-              map("n", vim.g.user_close_key, function()
-                vim.keymap.del("n", vim.g.user_close_key, { buffer = buffer })
-                vim.cmd.only()
-              end, "Close Diff (Gitsigns)")
-            end
-          end, "Diff This ~")
-        end
+        -- map("n", "<leader>gD", function()
+        --   gs.diffthis("~")
+        --   if vim.g.user_close_key then
+        --     map("n", vim.g.user_close_key, function()
+        --       vim.keymap.del("n", vim.g.user_close_key, { buffer = buffer })
+        --       vim.cmd.only()
+        --     end, "Close Diff (Gitsigns)")
+        --   end
+        -- end, "Diff This ~")
         map("n", "<leader>g?", gs.toggle_current_line_blame, "Toggle Blame Line (GitSigns)")
       end
     end,
@@ -237,8 +249,8 @@ return {
     keys = {
       { "<leader>gc", "<Cmd>Git commit<CR>", desc = "Commit" },
       { "<leader>gC", "<Cmd>Git commit --amend<CR>", desc = "Commit Amend" },
-      { "<leader>ga", "<Cmd>Git diff --cached<CR>", desc = "Diff Cached" },
-      { "<leader>gA", "<Cmd>Git diff --cached -- %<CR>", desc = "Diff Cached Buffer" },
+      -- { "<leader>ga", "<Cmd>Git diff --cached<CR>", desc = "Diff Cached" },
+      -- { "<leader>gA", "<Cmd>Git diff --cached -- %<CR>", desc = "Diff Cached Buffer" },
       { "<leader>gP", "<Cmd>Git push<CR>", desc = "Push" },
     },
     opts = function()
@@ -276,7 +288,7 @@ return {
     cmd = { "DiffviewOpen", "DiffviewFileHistory" },
     keys = {
       { "<leader>gv", "<cmd>DiffviewOpen<CR>", desc = "Diff View" },
-      { "<leader>gD", "<cmd>DiffviewFileHistory<CR>", desc = "Diff Repo (Diff View)" },
+      -- { "<leader>gD", "<cmd>DiffviewFileHistory<CR>", desc = "Diff Repo (Diff View)" },
       { "<leader>gF", "<cmd>DiffviewFileHistory %<CR>", desc = "File History (Diff View)" },
     },
     ---@param opts DiffviewConfig
