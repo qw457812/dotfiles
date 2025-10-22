@@ -597,8 +597,10 @@ return {
       picker = {
         sources = {
           -- ignored by git, but we still want to search them
-          -- copied from: https://github.com/folke/snacks.nvim/blob/bc902f7032df305df7dc48104cfa4e37967b3bdf/lua/snacks/picker/source/files.lua#L153-L179
-          ---@class snacks.picker.ignored.Config: snacks.picker.files.Config
+          -- ref: https://github.com/folke/snacks.nvim/blob/bc902f7032df305df7dc48104cfa4e37967b3bdf/lua/snacks/picker/source/files.lua#L153-L179
+          ---@class snacks.picker.ignored.Config: snacks.picker.proc.Config
+          ---@field follow? boolean follow symlinks
+          ---@field ft? string|string[] file extension(s)
           ---@field patterns? string[] ignored patterns to search
           ignored = {
             ---@param opts snacks.picker.ignored.Config
@@ -609,12 +611,14 @@ return {
               if not (cmd and args and #patterns > 0) then
                 return function() end
               end
-              local cwd = not (opts.rtp or (opts.dirs and #opts.dirs > 0))
-                  and vim.fs.normalize(opts and opts.cwd or vim.uv.cwd() or ".")
-                or nil
+              local cwd = vim.fs.normalize(opts and opts.cwd or vim.uv.cwd() or ".")
               table.insert(args, "--no-ignore-global") -- or `--no-ignore-vcs`, it depends on patterns like "**/.claude/**", `--no-ignore-global` has better performance
               for _, p in ipairs(patterns) do
                 vim.list_extend(args, { "-g", p })
+              end
+              -- follow
+              if opts.follow then
+                args[#args + 1] = "-L"
               end
               if opts.debug.files then
                 Snacks.notify(cmd .. " " .. table.concat(args or {}, " "))
@@ -634,10 +638,25 @@ return {
                     -- item.ignored = true -- SnacksPickerPathIgnored
                     item.filename_hl = "SnacksPickerDimmed" -- SnacksPickerIconArray
 
+                    -- extensions
                     -- respect `picker.opts.ft` in favor of `filter_extension` action
                     -- https://github.com/folke/snacks.nvim/blob/bc902f7032df305df7dc48104cfa4e37967b3bdf/lua/snacks/picker/source/files.lua#L75-L90
                     local _opts = _ctx.picker.opts --[[@as snacks.picker.files.Config]]
                     if _opts.ft and vim.fn.fnamemodify(item.file, ":e") ~= _opts.ft then
+                      return false
+                    end
+
+                    -- file glob
+                    -- for `supports_live = true`
+                    -- https://github.com/folke/snacks.nvim/blob/bc902f7032df305df7dc48104cfa4e37967b3bdf/lua/snacks/picker/source/files.lua#L112-L128
+                    if
+                      _ctx.filter.search ~= ""
+                      -- alternatives:
+                      -- - https://github.com/folke/snacks.nvim/blob/080320bb820ffdb6103f993da076b100ea68333c/lua/snacks/picker/core/preview.lua#L337-L353
+                      -- - vim.regex(_ctx.filter.search):match_str(item.file)
+                      -- - vim.glob.to_lpeg(_ctx.filter.search):match(item.file)
+                      and not item.file:find(_ctx.filter.search)
+                    then
                       return false
                     end
                   end,
@@ -655,19 +674,18 @@ return {
               ".mcp.json",
               "**/.claude/**",
             },
-            -- copied from: https://github.com/folke/snacks.nvim/blob/3d695ab7d062d40c980ca5fd9fe6e593c8f35b12/lua/snacks/picker/config/sources.lua#L200-L208
+            -- ref: https://github.com/folke/snacks.nvim/blob/3d695ab7d062d40c980ca5fd9fe6e593c8f35b12/lua/snacks/picker/config/sources.lua#L200-L208
             format = "file",
             show_empty = true,
-            hidden = true,
-            ignored = false,
             follow = true,
             supports_live = true,
           },
-          -- copied from: https://github.com/folke/snacks.nvim/blob/3d695ab7d062d40c980ca5fd9fe6e593c8f35b12/lua/snacks/picker/config/sources.lua#L788-L797
+          -- ref: https://github.com/folke/snacks.nvim/blob/3d695ab7d062d40c980ca5fd9fe6e593c8f35b12/lua/snacks/picker/config/sources.lua#L788-L797
           files_with_ignored = {
             multi = { "files", "ignored" },
             format = "file",
             transform = "unique_file",
+            supports_live = true,
           },
         },
       },
