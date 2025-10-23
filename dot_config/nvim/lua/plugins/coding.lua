@@ -320,13 +320,15 @@ return {
   {
     "gregorias/coerce.nvim",
     dependencies = "gregorias/coop.nvim",
-    keys = { { "ga", mode = { "n", "v" } } },
+    keys = {
+      { "gaa", mode = { "n", "v" } },
+    },
     ---@module 'coerce'
     ---@type CoerceConfigUser
     opts = {
       default_mode_keymap_prefixes = {
-        normal_mode = "ga",
-        visual_mode = "ga",
+        normal_mode = "gaa", -- TODO: better keymap
+        visual_mode = "gaa",
       },
       default_mode_mask = {
         motion_mode = false,

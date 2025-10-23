@@ -47,45 +47,64 @@ return {
   {
     "folke/snacks.nvim",
     keys = function(_, keys)
-      if LazyVim.pick.picker.name == "snacks" then
-        -- stylua: ignore
-        vim.list_extend(keys, {
-          { "<leader>gb", function() Snacks.picker.git_branches({ cwd = LazyVim.root.git() }) end, desc = "Git Branches" },
-          { "<leader>gB", function() Snacks.picker.git_log_line() end, desc = "Git Blame Line" },
-          { "<leader>gd", function() Snacks.picker.git_diff({ cwd = LazyVim.root.git() }) end, desc = "Git Diff (hunks)" },
-          {
-            "<leader>gD",
-            function() Snacks.picker.git_diff({ cwd = LazyVim.root.git(), cmd_args = { "--", vim.api.nvim_buf_get_name(0) } }) end,
-            desc = "Git Diff Buffer (hunks)",
-          },
-          {
-            "<leader>ga",
-            function() Snacks.picker.git_diff({ cwd = LazyVim.root.git(), cmd_args = { "--cached" } }) end,
-            desc = "Git Diff Cached (hunks)",
-          },
-          {
-            "<leader>gA",
-            function() Snacks.picker.git_diff({ cwd = LazyVim.root.git(), cmd_args = { "--cached", "--", vim.api.nvim_buf_get_name(0) } }) end,
-            desc = "Git Diff Cached Buffer (hunks)",
-          },
-          { "<leader>gs", function() Snacks.picker.git_status({ cwd = LazyVim.root.git() }) end, desc = "Git Status" },
-          {
-            "<leader>gS",
-            function()
-              Snacks.picker.git_stash({
-                cwd = LazyVim.root.git(),
-                previewers = {
-                  git = {
-                    args = {}, -- overwrite `opts.picker.previewers.git.args`
-                  },
-                },
-              })
-            end,
-            desc = "Git Stash",
-          },
-        })
+      if LazyVim.pick.picker.name ~= "snacks" then
+        return keys
       end
-      return keys
+
+      ---@type fun(opts?: snacks.picker.git.Config|{}): snacks.Picker
+      local function git_diff(opts)
+        opts = vim.tbl_deep_extend("force", { cwd = LazyVim.root.git() }, opts or {})
+        local path = vim.api.nvim_buf_get_name(0)
+        local picker = Snacks.picker.git_diff(opts)
+        -- focus the hunk at the cursor file
+        picker.matcher.task:on(
+          "done",
+          vim.schedule_wrap(function()
+            -- ref: https://github.com/folke/snacks.nvim/blob/ca0f8b2c09a6b437479e7d12bdb209731d9eb621/lua/snacks/picker/config/sources.lua#L236-L242
+            for i, item in ipairs(picker:items()) do
+              if Snacks.picker.util.path(item) == path then
+                picker.list:view(i)
+                Snacks.picker.actions.list_scroll_center(picker)
+                break
+              end
+            end
+          end)
+        )
+        return picker
+      end
+
+      -- stylua: ignore
+      return vim.list_extend(keys, {
+        { "<leader>gb", function() Snacks.picker.git_branches({ cwd = LazyVim.root.git() }) end, desc = "Git Branches" },
+        { "<leader>gB", function() Snacks.picker.git_log_line() end, desc = "Git Blame Line" },
+        { "<leader>gd", function() git_diff() end, desc = "Git Diff (hunks)" },
+        -- {
+        --   "<leader>gD",
+        --   function() Snacks.picker.git_diff({ cwd = LazyVim.root.git(), cmd_args = { "--", vim.api.nvim_buf_get_name(0) } }) end,
+        --   desc = "Git Diff Buffer (hunks)",
+        -- },
+        -- { "<leader>ga", function() git_diff({ cmd_args = { "--cached" } }) end, desc = "Git Diff Cached (hunks)" },
+        -- {
+        --   "<leader>gA",
+        --   function() Snacks.picker.git_diff({ cwd = LazyVim.root.git(), cmd_args = { "--cached", "--", vim.api.nvim_buf_get_name(0) } }) end,
+        --   desc = "Git Diff Cached Buffer (hunks)",
+        -- },
+        { "<leader>gs", function() Snacks.picker.git_status({ cwd = LazyVim.root.git() }) end, desc = "Git Status" },
+        {
+          "<leader>gS",
+          function()
+            Snacks.picker.git_stash({
+              cwd = LazyVim.root.git(),
+              previewers = {
+                git = {
+                  args = {}, -- overwrite `opts.picker.previewers.git.args`
+                },
+              },
+            })
+          end,
+          desc = "Git Stash",
+        },
+      })
     end,
     ---@module "snacks"
     ---@type snacks.Config
@@ -249,8 +268,9 @@ return {
     keys = {
       { "<leader>gc", "<Cmd>Git commit<CR>", desc = "Commit" },
       { "<leader>gC", "<Cmd>Git commit --amend<CR>", desc = "Commit Amend" },
-      -- { "<leader>ga", "<Cmd>Git diff --cached<CR>", desc = "Diff Cached" },
-      -- { "<leader>gA", "<Cmd>Git diff --cached -- %<CR>", desc = "Diff Cached Buffer" },
+      -- TODO: use delta via Snacks.terminal for <leader>ga
+      { "<leader>ga", "<Cmd>Git diff --cached<CR>", desc = "Diff Cached" },
+      { "<leader>gA", "<Cmd>Git diff --cached -- %<CR>", desc = "Diff Cached Buffer" },
       { "<leader>gP", "<Cmd>Git push<CR>", desc = "Push" },
     },
     opts = function()

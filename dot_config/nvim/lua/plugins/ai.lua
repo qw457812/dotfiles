@@ -105,11 +105,19 @@ return {
               ANTHROPIC_AUTH_TOKEN = vim.env.CTOK_AUTH_TOKEN,
               ANTHROPIC_MODEL = "",
               ANTHROPIC_SMALL_FAST_MODEL = "",
+              API_TIMEOUT_MS = "",
 
               -- ANTHROPIC_BASE_URL = "https://api.moonshot.cn/anthropic",
               -- ANTHROPIC_AUTH_TOKEN = vim.env.MOONSHOT_API_KEY,
               -- ANTHROPIC_MODEL = "kimi-k2-0905-preview",
               -- ANTHROPIC_SMALL_FAST_MODEL = "kimi-k2-turbo-preview",
+              -- API_TIMEOUT_MS = "",
+
+              -- ANTHROPIC_BASE_URL = "https://open.bigmodel.cn/api/anthropic",
+              -- ANTHROPIC_AUTH_TOKEN = vim.env.ZHIPU_API_KEY,
+              -- ANTHROPIC_MODEL = "",
+              -- ANTHROPIC_SMALL_FAST_MODEL = "",
+              -- API_TIMEOUT_MS = "3000000",
             },
             keys = {
               blur_t = false, -- claude code uses <c-o> for its own functionality

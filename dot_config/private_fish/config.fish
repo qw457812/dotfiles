@@ -137,6 +137,7 @@ abbr gc "git commit --verbose"
 # abbr gc! 'NVIM_FLATTEN_NEST=1 git commit --verbose --amend'
 abbr gc! 'git commit --verbose --amend'
 abbr gcb "git checkout -b"
+abbr gcd 'git checkout (git_develop_branch)'
 abbr gcf "git config --list | vimpager"
 abbr gcl "git clone --recurse-submodules"
 abbr gcl1 "git clone --depth 1"
@@ -163,6 +164,7 @@ abbr gprav "git pull --rebase --autostash -v"
 abbr grb 'git rebase'
 abbr grba 'git rebase --abort'
 abbr grbc 'git rebase --continue'
+abbr grbd 'git rebase (git_develop_branch)'
 abbr grbm 'git rebase (git_main_branch)'
 abbr grbo 'git rebase --onto'
 abbr grbom 'git rebase origin/(git_main_branch)'
@@ -171,6 +173,10 @@ abbr grbum 'git rebase upstream/(git_main_branch)'
 abbr grv "git remote --verbose"
 abbr gsb "git status --short --branch"
 abbr gss "git status --short"
+abbr gsw "git switch"
+abbr gswc 'git switch --create'
+abbr gswd 'git switch (git_develop_branch)'
+abbr gswm 'git switch (git_main_branch)'
 abbr gwt 'git worktree'
 abbr gwta 'git worktree add'
 abbr gwtls 'git worktree list'
