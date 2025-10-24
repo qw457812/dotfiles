@@ -530,6 +530,7 @@ return {
       ---@type UndoGlow.Config
       return {
         priority = 2048 * 3,
+        fallback_for_transparency = { bg = "#000000" },
         animation = {
           enabled = true,
           duration = 150,

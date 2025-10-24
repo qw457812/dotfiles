@@ -13,7 +13,7 @@ function M.is_file(path)
   return (vim.uv.fs_stat(path) or {}).type == "file"
 end
 
--- os.getenv("HOME")
+-- vim.env.HOME -- https://github.com/LazyVim/LazyVim/commit/231e476
 -- vim.fs.normalize("~")
 M.HOME = assert(vim.uv.os_homedir())
 

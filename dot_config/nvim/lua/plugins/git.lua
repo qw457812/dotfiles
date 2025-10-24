@@ -52,7 +52,7 @@ return {
       end
 
       ---@type fun(opts?: snacks.picker.git.Config|{}): snacks.Picker
-      local function git_diff(opts)
+      local function git_diff_pick(opts)
         opts = vim.tbl_deep_extend("force", { cwd = LazyVim.root.git() }, opts or {})
         local path = vim.api.nvim_buf_get_name(0)
         local picker = Snacks.picker.git_diff(opts)
@@ -73,22 +73,52 @@ return {
         return picker
       end
 
+      ---@param opts? { args?: string[], cmd_args?: string[] }
+      ---@return snacks.terminal
+      local function git_diff_term(opts)
+        opts = vim.tbl_deep_extend("force", { args = {}, cmd_args = {} }, opts or {})
+        local cmd = vim.list_extend({ "git", "-c", "delta.paging=never" }, opts.args)
+        table.insert(cmd, "diff")
+        vim.list_extend(cmd, opts.cmd_args)
+        return Snacks.terminal(cmd, {
+          cwd = LazyVim.root.git(),
+          interactive = false, -- normal mode in favor of copying
+          win = {
+            -- fully close on hide to make it one-time
+            on_close = function(self)
+              self:close()
+            end,
+          },
+        })
+      end
+
       -- stylua: ignore
       return vim.list_extend(keys, {
         { "<leader>gb", function() Snacks.picker.git_branches({ cwd = LazyVim.root.git() }) end, desc = "Git Branches" },
         { "<leader>gB", function() Snacks.picker.git_log_line() end, desc = "Git Blame Line" },
-        { "<leader>gd", function() git_diff() end, desc = "Git Diff (hunks)" },
+        { "<leader>gd", function() git_diff_pick() end, desc = "Git Diff (hunks)" },
         -- {
         --   "<leader>gD",
         --   function() Snacks.picker.git_diff({ cwd = LazyVim.root.git(), cmd_args = { "--", vim.api.nvim_buf_get_name(0) } }) end,
         --   desc = "Git Diff Buffer (hunks)",
         -- },
-        -- { "<leader>ga", function() git_diff({ cmd_args = { "--cached" } }) end, desc = "Git Diff Cached (hunks)" },
+        -- { "<leader>ga", function() git_diff_pick({ cmd_args = { "--staged" } }) end, desc = "Git Diff Staged (hunks)" },
         -- {
         --   "<leader>gA",
-        --   function() Snacks.picker.git_diff({ cwd = LazyVim.root.git(), cmd_args = { "--cached", "--", vim.api.nvim_buf_get_name(0) } }) end,
-        --   desc = "Git Diff Cached Buffer (hunks)",
+        --   function() Snacks.picker.git_diff({ cwd = LazyVim.root.git(), cmd_args = { "--staged", "--", vim.api.nvim_buf_get_name(0) } }) end,
+        --   desc = "Git Diff Staged Buffer (hunks)",
         -- },
+        { "<leader>ga", function() git_diff_term({ cmd_args = { "--staged" } }) end, desc = "Git Diff Staged" },
+        {
+          "<leader>gA",
+          function()
+            git_diff_term({
+              args = { "-c", "delta.file-style=omit" },
+              cmd_args = { "--staged", "--", vim.api.nvim_buf_get_name(0) },
+            })
+          end,
+          desc = "Git Diff Staged Buffer",
+        },
         { "<leader>gs", function() Snacks.picker.git_status({ cwd = LazyVim.root.git() }) end, desc = "Git Status" },
         {
           "<leader>gS",
@@ -268,9 +298,8 @@ return {
     keys = {
       { "<leader>gc", "<Cmd>Git commit<CR>", desc = "Commit" },
       { "<leader>gC", "<Cmd>Git commit --amend<CR>", desc = "Commit Amend" },
-      -- TODO: use delta via Snacks.terminal for <leader>ga
-      { "<leader>ga", "<Cmd>Git diff --cached<CR>", desc = "Diff Cached" },
-      { "<leader>gA", "<Cmd>Git diff --cached -- %<CR>", desc = "Diff Cached Buffer" },
+      -- { "<leader>ga", "<Cmd>Git diff --cached<CR>", desc = "Diff Staged" },
+      -- { "<leader>gA", "<Cmd>Git diff --cached -- %<CR>", desc = "Diff Staged Buffer" },
       { "<leader>gP", "<Cmd>Git push<CR>", desc = "Push" },
     },
     opts = function()
