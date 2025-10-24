@@ -146,12 +146,34 @@ return {
           picker = {
             sources = {
               select = {
-                win = {
-                  input = {
-                    keys = {
-                      -- https://github.com/folke/sidekick.nvim/blob/e5bcf171b13a99e53a8ac6b584baebf7c435584a/lua/sidekick/cli/ui/select.lua#L46
-                      -- https://github.com/folke/sidekick.nvim/blob/30b7b9ef72a1d78fbabf5484f4dc33adc3abb7d1/lua/sidekick/cli/ui/prompt.lua#L106
-                      [sidekick_toggle_key] = { "close", mode = { "i", "n" }, desc = "Close (Sidekick)" },
+                ---@type table<string, snacks.picker.Config|{}>
+                kinds = {
+                  -- https://github.com/folke/sidekick.nvim/blob/756882545e4fcb50185e3089ee77a67706951139/lua/sidekick/cli/ui/select.lua#L46
+                  sidekick_cli = {
+                    win = {
+                      input = {
+                        keys = {
+                          [sidekick_toggle_key] = { "close", mode = { "i", "n" }, desc = "Close (Sidekick)" },
+                        },
+                      },
+                    },
+                  },
+                  -- https://github.com/folke/sidekick.nvim/blob/756882545e4fcb50185e3089ee77a67706951139/lua/sidekick/cli/ui/prompt.lua#L108
+                  sidekick_prompt = {
+                    layout = {
+                      preset = function()
+                        local layouts = { "vscode", "narrow", "borderless_narrow", "based_borderless_narrow" }
+                        return layouts[math.random(#layouts)]
+                      end,
+                    },
+                    win = {
+                      input = {
+                        keys = {
+                          ["<c-y>"] = false,
+                          ["y"] = false,
+                          ["<localleader>y"] = { "yank" },
+                        },
+                      },
                     },
                   },
                 },

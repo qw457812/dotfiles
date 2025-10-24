@@ -8,7 +8,11 @@
   "includeCoAuthoredBy": false,
   "permissions": {
     "allow": [
+      "WebFetch(domain:*)",
+      "Read(**)",
+      "Glob(**)",
       "Bash(ls:*)",
+      "Bash(pwd:*)",
       "Bash(tree:*)",
       "Bash(wc:*)",
       "Bash(find:*)",
@@ -19,7 +23,26 @@
       "Bash(tail:*)",
       "Bash(touch:*)",
       "Bash(mkdir:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(which:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr diff:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh issue view:*)",
+      "Bash(gh issue list:*)",
+      "Bash(gh repo view:*)",
+      "Bash(gh status:*)",
+      "Bash(gh api:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)",
+      "Bash(git branch -v:*)",
+      "Bash(git remote -v:*)",
+      "Bash(nvim --version:*)",
+      "Bash(node --version:*)",
+      "Bash(npm list:*)"
     ]
   },
   "statusLine": {

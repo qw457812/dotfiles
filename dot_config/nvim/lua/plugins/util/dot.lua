@@ -3,14 +3,14 @@ return {
   -- learn
   {
     "folke/dot",
-    name = "folke_dot",
+    name = "folke-dot",
     lazy = true,
     config = function() end,
     specs = {
       {
         "LazyVim/LazyVim",
         keys = {
-          { "<leader>lf", "<cmd>Lazy log folke_dot<cr>", desc = "Folke Dot Logs" },
+          { "<leader>lf", "<cmd>Lazy log folke-dot<cr>", desc = "Folke Dot Logs" },
         },
       },
     },
