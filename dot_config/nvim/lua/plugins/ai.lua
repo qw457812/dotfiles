@@ -19,7 +19,7 @@ return {
 
       local filter = { installed = true } ---@type sidekick.cli.Filter
       -- stylua: ignore
-      vim.list_extend(keys, {
+      return vim.list_extend(keys, {
         { "<c-.>", false, mode = { "n", "x", "i", "t" } },
         { sidekick_toggle_key, function() require("sidekick.cli").toggle({ filter = filter }) end, mode = { "n", "x", "t" }, desc = "Sidekick" },
         { "<leader>av", false, mode = "x" },
@@ -52,7 +52,6 @@ return {
         { "<leader>ao", function() require("sidekick.cli").toggle({ name = "opencode" }) end, desc = "OpenCode" },
         { "<leader>ao", function() require("sidekick.cli").send({ msg = "{this}", filter = { name = "opencode" } }) end, mode = "x", desc = "OpenCode" },
       })
-      return keys
     end,
     ---@module "sidekick"
     ---@type sidekick.Config
@@ -65,6 +64,12 @@ return {
       cli = {
         ---@type sidekick.win.Opts
         win = {
+          ------@param terminal sidekick.cli.Terminal
+          ---config = function(terminal)
+          ---  vim.schedule(function()
+          ---    vim.b[terminal.buf].user_lualine_filename = terminal.tool.name
+          ---  end)
+          ---end,
           layout = vim.g.user_is_termux and "bottom" or "right", ---@type "float"|"left"|"bottom"|"top"|"right"
           ---@type table<string, sidekick.cli.Keymap|false>
           keys = {
@@ -134,6 +139,16 @@ return {
           copilot = { cmd = { "hack_to_disable_copilot" } },
           gemini = { cmd = { "hack_to_disable_gemini" } },
         },
+        ---@type table<string, sidekick.Prompt|string|fun(ctx:sidekick.context.ctx):(string?)>
+        prompts = {
+          refactor = "Please refactor {this} to be more maintainable",
+          security = "Review {file} for security vulnerabilities",
+        },
+      },
+      ui = {
+        icons = {
+          installed = "󰒲 ", -- 󰞃 󰯡
+        },
       },
     },
     specs = {
@@ -162,7 +177,7 @@ return {
                   sidekick_prompt = {
                     layout = {
                       preset = function()
-                        local layouts = { "vscode", "narrow", "borderless_narrow", "based_borderless_narrow" }
+                        local layouts = { "vscode", "narrow" }
                         return layouts[math.random(#layouts)]
                       end,
                     },
@@ -204,18 +219,38 @@ return {
   {
     "folke/sidekick.nvim",
     optional = true,
-    opts = function()
+    ---@param opts sidekick.Config
+    opts = function(_, opts)
+      Snacks.util.set_hl({ SidekickCliInstalled = "Comment" })
+
+      vim.api.nvim_create_autocmd("TermOpen", {
+        pattern = vim.tbl_get(opts, "cli", "mux", "enabled") and { "term://*:*tmux", "term://*:*zellij" } or nil,
+        callback = function(ev)
+          local buf = ev.buf
+          if vim.bo[buf].filetype ~= "sidekick_terminal" then
+            return
+          end
+          local tool = vim.b[buf].sidekick_cli ---@type sidekick.cli.Tool?
+          vim.b[buf].user_lualine_filename = tool and tool.name
+          vim.w.user_lualine_filename = vim.b[buf].user_lualine_filename
+        end,
+      })
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "sidekick_terminal",
         callback = function(ev)
-          vim.bo[ev.buf].modifiable = false
+          local buf = ev.buf
+          vim.schedule(function()
+            if vim.api.nvim_buf_is_valid(buf) then
+              -- for scrollback
+              vim.b[buf].user_lualine_filename = vim.b[buf].user_lualine_filename or vim.w.user_lualine_filename
+            end
+          end)
         end,
       })
 
       U.toggle.ai_cmps.sidekick_nes = Snacks.toggle({
         name = "Sidekick NES",
         get = function()
-          -- https://github.com/folke/sidekick.nvim/blob/302cec770ca0a4b7dfafd7879034d33320592b33/lua/sidekick/nes/init.lua#L53-L55
           return require("sidekick.nes").enabled
         end,
         set = function(state)

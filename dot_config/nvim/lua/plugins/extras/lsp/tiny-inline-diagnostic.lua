@@ -1,11 +1,9 @@
 ---@type LazySpec
 return {
-  -- https://github.com/search?q=repo%3Aaimuzov%2FLazyVimx%20tiny-inline-diagnostic.nvim&type=code
   {
     "rachartier/tiny-inline-diagnostic.nvim",
     -- priority = 1000,
-    -- lazy = false,
-    event = "VeryLazy", -- LspAttach
+    event = "VeryLazy",
     opts_extend = { "disabled_ft" },
     opts = function()
       local orig_open_float = vim.diagnostic.open_float
@@ -26,13 +24,18 @@ return {
           arrow = "  ",
           up_arrow = "  ",
         },
+        -- blend = { factor = vim.g.user_transparent_background and 0 or nil }, -- same as `transparent_bg = vim.g.user_transparent_background`
+        -- transparent_bg = vim.g.user_transparent_background,
         options = {
           virt_texts = { priority = 5000 }, -- set higher than symbol-usage.nvim
           use_icons_from_diagnostic = true,
           -- multilines = true, -- not just current line
           -- show_source = true,
+          add_messages = {
+            display_count = true, -- when `multilines = true`
+            -- show_multiple_glyphs = false, -- when `multilines = true`
+          },
         },
-        -- blend = { factor = vim.g.user_transparent_background and 0 or nil },
       }
     end,
     specs = {
@@ -46,8 +49,8 @@ return {
               if U.toggle.is_diagnostic_virt_enabled == false then
                 return
               end
-              -- see: https://github.com/rachartier/tiny-inline-diagnostic.nvim/blob/9d5b02aea0f53926db5967eb753b0a15defe99be/lua/tiny-inline-diagnostic/diagnostic.lua#L449-L462
-              if require("tiny-inline-diagnostic.diagnostic").user_toggle_state then
+              -- see: https://github.com/rachartier/tiny-inline-diagnostic.nvim/blob/e04c597bb11bad98413e8482fb46d21af66b7db7/lua/tiny-inline-diagnostic/state.lua#L44-L57
+              if require("tiny-inline-diagnostic.state").user_toggle_state then
                 require("tiny-inline-diagnostic").disable()
               end
             end,
@@ -59,7 +62,7 @@ return {
               if U.toggle.is_diagnostic_virt_enabled == false then
                 return
               end
-              if not require("tiny-inline-diagnostic.diagnostic").user_toggle_state then
+              if not require("tiny-inline-diagnostic.state").user_toggle_state then
                 require("tiny-inline-diagnostic").enable()
               end
             end,

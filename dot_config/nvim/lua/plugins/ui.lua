@@ -1,5 +1,69 @@
 ---@type LazySpec
 return {
+  -- icons
+  {
+    "LazyVim/LazyVim",
+    ---@type LazyVimOptions|{}
+    opts = {
+      icons = {
+        -- used in blink.cmp
+        kinds = {
+          Claude = "󰛄 ", --  
+          OpenAI = " ", -- 󱥸 󰕖
+          Gemini = " ", -- 󰫢
+          Google = " ",
+          Groq = " ",
+          OpenRouter = "󰑪 ",
+        },
+      },
+    },
+  },
+  {
+    "folke/which-key.nvim",
+    ---@module "which-key"
+    ---@param opts wk.Opts
+    opts = function(_, opts)
+      local icons = LazyVim.config.icons.kinds
+      return U.extend_tbl(opts, {
+        icons = {
+          rules = {
+            { plugin = "CopilotChat.nvim", pattern = "copilot", icon = icons.Copilot, color = "azure" },
+            { plugin = "claudecode.nvim", pattern = "claude", icon = icons.Claude, color = "orange" },
+            { plugin = "codecompanion.nvim", pattern = "codecompanion", icon = " ", color = "purple" },
+            { plugin = "mcphub.nvim", icon = " ", color = "grey" }, -- 
+            { pattern = "sidekick", icon = " ", color = "green" },
+            { pattern = "codex", icon = icons.OpenAI, color = "grey" },
+            { pattern = "opencode", icon = "󰰕 ", color = "grey" }, -- 󰫼󰫰 
+          } --[[@as wk.IconRule[] ]],
+        },
+      } --[[@as wk.Opts]])
+    end,
+  },
+  {
+    "nvim-mini/mini.icons",
+    optional = true,
+    opts = {
+      -- file = {
+      --   -- ["init.lua"] = { glyph = "󰢱" }, -- see: #1384
+      --   README = { glyph = "" },
+      --   ["README.md"] = { glyph = "" },
+      --   ["README.txt"] = { glyph = "" },
+      -- },
+      filetype = {
+        -- plugin filetypes
+        ["snacks_terminal"] = { glyph = "", hl = "MiniIconsCyan" },
+        ["snacks_input"] = { glyph = "󰏫", hl = "MiniIconsAzure" },
+        ["snacks_picker_input"] = { glyph = "󰏫", hl = "MiniIconsAzure" },
+        ["snacks_picker_list"] = { glyph = "󰷐", hl = "MiniIconsAzure" },
+        ["snacks_picker_preview"] = { glyph = "", hl = "MiniIconsAzure" },
+        ["snacks_notif"] = { glyph = "󰎟", hl = "MiniIconsYellow" },
+        ["noice"] = { glyph = "󰎟", hl = "MiniIconsYellow" },
+        ["rip-substitute"] = { glyph = "", hl = "MiniIconsGreen" },
+        ["sidekick_terminal"] = { glyph = "", hl = "MiniIconsGreen" },
+      },
+    },
+  },
+
   {
     "akinsho/bufferline.nvim",
     optional = true,
@@ -216,68 +280,6 @@ return {
         } --[[@as NoiceConfigViews]],
       } --[[@as NoiceConfig]])
     end,
-  },
-
-  {
-    "LazyVim/LazyVim",
-    ---@type LazyVimOptions|{}
-    opts = {
-      icons = {
-        -- used in blink.cmp
-        kinds = {
-          Claude = "󰛄 ", --  
-          OpenAI = " ", -- 󱥸 󰕖
-          Gemini = " ", -- 󰫢
-          Google = " ",
-          Groq = " ",
-          OpenRouter = "󰑪 ",
-        },
-      },
-    },
-  },
-  {
-    "folke/which-key.nvim",
-    ---@module "which-key"
-    ---@param opts wk.Opts
-    opts = function(_, opts)
-      local icons = LazyVim.config.icons.kinds
-      return U.extend_tbl(opts, {
-        icons = {
-          rules = {
-            { plugin = "CopilotChat.nvim", pattern = "copilot", icon = icons.Copilot, color = "azure" },
-            { plugin = "claudecode.nvim", pattern = "claude", icon = icons.Claude, color = "orange" },
-            { plugin = "codecompanion.nvim", pattern = "codecompanion", icon = " ", color = "purple" },
-            { plugin = "mcphub.nvim", icon = " ", color = "grey" }, -- 
-            { pattern = "sidekick", icon = " ", color = "green" },
-            { pattern = "codex", icon = icons.OpenAI, color = "grey" },
-            { pattern = "opencode", icon = " ", color = "grey" },
-          } --[[@as wk.IconRule[] ]],
-        },
-      } --[[@as wk.Opts]])
-    end,
-  },
-  {
-    "nvim-mini/mini.icons",
-    optional = true,
-    opts = {
-      -- file = {
-      --   -- ["init.lua"] = { glyph = "󰢱" }, -- see: #1384
-      --   README = { glyph = "" },
-      --   ["README.md"] = { glyph = "" },
-      --   ["README.txt"] = { glyph = "" },
-      -- },
-      filetype = {
-        -- plugin filetypes
-        ["snacks_terminal"] = { glyph = "", hl = "MiniIconsCyan" },
-        ["snacks_input"] = { glyph = "󰏫", hl = "MiniIconsAzure" },
-        ["snacks_picker_input"] = { glyph = "󰏫", hl = "MiniIconsAzure" },
-        ["snacks_picker_list"] = { glyph = "󰷐", hl = "MiniIconsAzure" },
-        ["snacks_picker_preview"] = { glyph = "", hl = "MiniIconsAzure" },
-        ["snacks_notif"] = { glyph = "󰎟", hl = "MiniIconsYellow" },
-        ["noice"] = { glyph = "󰎟", hl = "MiniIconsYellow" },
-        ["rip-substitute"] = { glyph = "", hl = "MiniIconsGreen" },
-      },
-    },
   },
 
   {

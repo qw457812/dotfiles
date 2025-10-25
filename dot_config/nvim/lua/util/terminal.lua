@@ -1,8 +1,7 @@
----@module "snacks"
-
 ---@class util.terminal
 ---@overload fun(cmd?: string|string[], opts?: snacks.terminal.Opts): snacks.terminal
 local M = setmetatable({}, {
+  ---@param t util.terminal
   __call = function(t, ...)
     return t.toggle(...)
   end,

@@ -13,6 +13,7 @@
 local M = {}
 
 setmetatable(M, {
+  ---@param t util
   __index = function(t, k)
     t[k] = require("util." .. k)
     -- return t[k] -- https://github.com/folke/snacks.nvim/commit/d0794dc

@@ -1,6 +1,7 @@
 ---@class util.keymap
 ---@overload fun(mode: string|string[], lhs: string|string[], rhs: string|function, opts?: vim.keymap.set.Opts)
 local M = setmetatable({}, {
+  ---@param t util.keymap
   __call = function(t, ...)
     return t.map(...)
   end,

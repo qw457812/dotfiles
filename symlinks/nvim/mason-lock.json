@@ -2,9 +2,9 @@
   "alejandra": "4.0.0",
   "basedpyright": "1.32.1",
   "bash-language-server": "5.6.0",
-  "biome": "2.2.7",
-  "codelldb": "v1.11.7",
-  "copilot-language-server": "1.387.0",
+  "biome": "2.3.0",
+  "codelldb": "v1.11.8",
+  "copilot-language-server": "1.388.0",
   "debugpy": "1.8.17",
   "docker-compose-language-service": "0.4.0",
   "dockerfile-language-server": "0.15.0",
@@ -36,6 +36,6 @@
   "tree-sitter-cli": "v0.25.10",
   "vscode-spring-boot-tools": "1.63.0",
   "vtsls": "0.2.9",
-  "vue-language-server": "3.1.1",
+  "vue-language-server": "3.1.2",
   "yaml-language-server": "1.19.2"
 }
