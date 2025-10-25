@@ -176,34 +176,38 @@ return {
               -- https://github.com/nvim-mini/mini.diff/blob/98fc732d5835eb7b6539f43534399b07b17f4e28/lua/mini/diff.lua#L1818-L1831
               apply_hunk = function(picker)
                 local items = picker:selected({ fallback = true })
-                local done = 0
-                for _, item in ipairs(items) do
-                  local cmd = {
-                    "git",
-                    "apply",
-                    "--whitespace=nowarn",
-                    "--cached",
-                    -- "--unidiff-zero",
-                    "--verbose", -- more helpful error messages
-                    "-",
-                  }
-                  -- https://github.com/folke/snacks.nvim/commit/d6a38acbf5765eeb5ca2558bcb0d1ae1428dd2ca
-                  -- https://github.com/folke/snacks.nvim/blob/b30121bfce84fdcbe53cb724c97388cbe4e18980/lua/snacks/picker/actions.lua#L342-L349
-                  local jid = Snacks.picker.util.cmd(cmd, function(data, code)
-                    done = done + 1
-                    if done == #items then
-                      picker.list:set_selected()
-                      picker.list:set_target()
-                      picker:find()
-                    end
-                  end, {
-                    cwd = item.cwd,
-                    -- sync = true, -- TODO: not sure what it's for
-                  })
-                  if jid then
-                    vim.fn.chansend(jid, item.diff .. "\n")
-                    vim.fn.chanclose(jid, "stdin")
-                  end
+                if #items == 0 then
+                  return
+                end
+
+                local cmd = {
+                  "git",
+                  "apply",
+                  "--whitespace=nowarn",
+                  "--cached",
+                  -- "--unidiff-zero",
+                  "--verbose", -- more helpful error messages
+                  "-",
+                }
+                local cwd = items[1].cwd
+                local diffs = vim.tbl_map(function(item)
+                  assert(item.cwd == cwd) -- https://github.com/folke/snacks.nvim/blob/7964f040bf605b2a3e8d66d02c453469352e005e/lua/snacks/picker/source/git.lua#L283
+                  return item.diff
+                end, items)
+                local patch = table.concat(diffs, "\n")
+                -- https://github.com/folke/snacks.nvim/commit/d6a38acbf5765eeb5ca2558bcb0d1ae1428dd2ca
+                -- https://github.com/folke/snacks.nvim/blob/b30121bfce84fdcbe53cb724c97388cbe4e18980/lua/snacks/picker/actions.lua#L342-L349
+                local jid = Snacks.picker.util.cmd(cmd, function(data, code)
+                  picker.list:set_selected()
+                  picker.list:set_target()
+                  picker:find()
+                end, {
+                  cwd = cwd,
+                  -- sync = true, -- TODO: not sure what it's for
+                })
+                if jid then
+                  vim.fn.chansend(jid, patch .. "\n")
+                  vim.fn.chanclose(jid, "stdin")
                 end
               end,
             },
