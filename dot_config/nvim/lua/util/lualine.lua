@@ -49,7 +49,11 @@ M.filename = {
   },
   color = function()
     local fg
-    if vim.bo.modified then
+    if vim.bo.buftype == "terminal" then
+      -- local modes = { t = "terminal", n = "normal", v = "visual", c = "command" }
+      -- fg = Snacks.util.color("lualine_a_" .. (modes[vim.fn.mode():sub(1, 1)] or "terminal"), "bg")
+      fg = vim.fn.mode():sub(1, 1) == "t" and Snacks.util.color("lualine_a_terminal", "bg") or "#FF007C" -- FlashLabel
+    elseif vim.bo.modified then
       fg = Snacks.util.color("MatchParen")
     elseif vim.bo.modifiable == false then
       fg = Snacks.util.color("DiagnosticError")

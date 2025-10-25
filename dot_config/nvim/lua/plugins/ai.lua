@@ -64,12 +64,22 @@ return {
       cli = {
         ---@type sidekick.win.Opts
         win = {
-          ------@param terminal sidekick.cli.Terminal
-          ---config = function(terminal)
-          ---  vim.schedule(function()
-          ---    vim.b[terminal.buf].user_lualine_filename = terminal.tool.name
-          ---  end)
-          ---end,
+          ---@param terminal sidekick.cli.Terminal
+          config = vim.schedule_wrap(function(terminal)
+            if terminal:buf_valid() then
+              vim.b[terminal.buf].user_lualine_filename = terminal.tool.name
+            end
+            vim.api.nvim_create_autocmd("FileType", {
+              group = vim.api.nvim_create_augroup("sidekick_scrollback_lualine_filename", { clear = false }),
+              pattern = "sidekick_terminal",
+              callback = function(ev)
+                local sb = terminal.scrollback
+                if sb and sb.buf == ev.buf then
+                  vim.b[sb.buf].user_lualine_filename = vim.b[sb.buf].user_lualine_filename or terminal.tool.name
+                end
+              end,
+            })
+          end),
           layout = vim.g.user_is_termux and "bottom" or "right", ---@type "float"|"left"|"bottom"|"top"|"right"
           ---@type table<string, sidekick.cli.Keymap|false>
           keys = {
@@ -219,34 +229,8 @@ return {
   {
     "folke/sidekick.nvim",
     optional = true,
-    ---@param opts sidekick.Config
-    opts = function(_, opts)
+    opts = function()
       Snacks.util.set_hl({ SidekickCliInstalled = "Comment" })
-
-      vim.api.nvim_create_autocmd("TermOpen", {
-        pattern = vim.tbl_get(opts, "cli", "mux", "enabled") and { "term://*:*tmux", "term://*:*zellij" } or nil,
-        callback = function(ev)
-          local buf = ev.buf
-          if vim.bo[buf].filetype ~= "sidekick_terminal" then
-            return
-          end
-          local tool = vim.b[buf].sidekick_cli ---@type sidekick.cli.Tool?
-          vim.b[buf].user_lualine_filename = tool and tool.name
-          vim.w.user_lualine_filename = vim.b[buf].user_lualine_filename
-        end,
-      })
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = "sidekick_terminal",
-        callback = function(ev)
-          local buf = ev.buf
-          vim.schedule(function()
-            if vim.api.nvim_buf_is_valid(buf) then
-              -- for scrollback
-              vim.b[buf].user_lualine_filename = vim.b[buf].user_lualine_filename or vim.w.user_lualine_filename
-            end
-          end)
-        end,
-      })
 
       U.toggle.ai_cmps.sidekick_nes = Snacks.toggle({
         name = "Sidekick NES",
