@@ -53,7 +53,15 @@ return {
 
       ---@type fun(opts?: snacks.picker.git.Config|{}): snacks.Picker
       local function git_diff_pick(opts)
-        opts = vim.tbl_deep_extend("force", { cwd = LazyVim.root.git() }, opts or {})
+        opts = vim.tbl_deep_extend("force", { cwd = LazyVim.root.git(), cmd_args = {} }, opts or {})
+        if vim.list_contains(opts.cmd_args, "--staged") or vim.list_contains(opts.cmd_args, "--cached") then
+          opts = vim.tbl_deep_extend("force", {
+            win = {
+              input = { keys = { ["gh"] = false } },
+              list = { keys = { ["gh"] = false } },
+            },
+          }, opts)
+        end
         local path = vim.api.nvim_buf_get_name(0)
         local picker = Snacks.picker.git_diff(opts)
         -- focus the hunk at the cursor file
@@ -84,6 +92,8 @@ return {
           cwd = LazyVim.root.git(),
           interactive = false, -- normal mode in favor of copying
           win = {
+            height = vim.g.user_is_termux and U.snacks.win.fullscreen_height or nil,
+            width = vim.g.user_is_termux and 0 or nil,
             -- fully close on hide to make it one-time
             on_close = function(self)
               self:close()
@@ -197,6 +207,7 @@ return {
                 local patch = table.concat(diffs, "\n")
                 -- https://github.com/folke/snacks.nvim/commit/d6a38acbf5765eeb5ca2558bcb0d1ae1428dd2ca
                 -- https://github.com/folke/snacks.nvim/blob/b30121bfce84fdcbe53cb724c97388cbe4e18980/lua/snacks/picker/actions.lua#L342-L349
+                -- TODO: use `vim.system()` instead
                 local jid = Snacks.picker.util.cmd(cmd, function(data, code)
                   picker.list:set_selected()
                   picker.list:set_target()

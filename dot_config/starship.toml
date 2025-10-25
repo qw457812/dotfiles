@@ -29,6 +29,7 @@ shell = ["bash"]
 symbol = " "
 format = '[$branch(:$remote_branch)]($style) '
 
+# https://github.com/folke/snacks.nvim/blob/7964f040bf605b2a3e8d66d02c453469352e005e/lua/snacks/picker/source/git.lua#L412-L468
 [git_status]
 untracked = '[?$count](bold blue) '
 staged = '[++$count](bold green) '

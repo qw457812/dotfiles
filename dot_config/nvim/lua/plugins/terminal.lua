@@ -29,6 +29,8 @@ return {
         })
       end
 
+      -- TODO: terminals picker
+      -- https://github.com/folke/snacks.nvim/pull/2276
       return vim.list_extend(keys, {
         -- stylua: ignore
         { "<leader>fT", function() U.terminal() end, desc = "Terminal (cwd)" },
