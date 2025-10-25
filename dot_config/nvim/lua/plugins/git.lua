@@ -102,6 +102,7 @@ return {
         --   function() Snacks.picker.git_diff({ cwd = LazyVim.root.git(), cmd_args = { "--", vim.api.nvim_buf_get_name(0) } }) end,
         --   desc = "Git Diff Buffer (hunks)",
         -- },
+        { "<leader>gD", function() Snacks.picker.git_diff({ base = "origin", cwd = LazyVim.root.git() }) end, desc = "Git Diff (origin)" },
         -- { "<leader>ga", function() git_diff_pick({ cmd_args = { "--staged" } }) end, desc = "Git Diff Staged (hunks)" },
         -- {
         --   "<leader>gA",
@@ -148,6 +149,76 @@ return {
           git = {
             builtin = false,
             args = { "-c", "delta.file-style=omit", "-c", "delta.hunk-header-style=omit" },
+          },
+        },
+        sources = {
+          git_branches = {
+            all = true,
+          },
+          git_status = {
+            win = {
+              input = {
+                keys = {
+                  ["<Tab>"] = { "select_and_next", mode = { "i", "n" } },
+                  ["gh"] = "git_stage",
+                },
+              },
+              list = {
+                keys = {
+                  ["gh"] = "git_stage",
+                },
+              },
+            },
+          },
+          git_diff = {
+            actions = {
+              -- https://github.com/chrisgrieser/.config/blob/fd27c6f94b748f436fa6251006fcd5641f9eeac6/nvim/lua/plugin-specs/snacks/snacks-picker.lua#L200-L215
+              -- https://github.com/nvim-mini/mini.diff/blob/98fc732d5835eb7b6539f43534399b07b17f4e28/lua/mini/diff.lua#L1818-L1831
+              apply_hunk = function(picker)
+                local items = picker:selected({ fallback = true })
+                local done = 0
+                for _, item in ipairs(items) do
+                  local cmd = {
+                    "git",
+                    "apply",
+                    "--whitespace=nowarn",
+                    "--cached",
+                    -- "--unidiff-zero",
+                    "--verbose", -- more helpful error messages
+                    "-",
+                  }
+                  -- https://github.com/folke/snacks.nvim/commit/d6a38acbf5765eeb5ca2558bcb0d1ae1428dd2ca
+                  -- https://github.com/folke/snacks.nvim/blob/b30121bfce84fdcbe53cb724c97388cbe4e18980/lua/snacks/picker/actions.lua#L342-L349
+                  local jid = Snacks.picker.util.cmd(cmd, function(data, code)
+                    done = done + 1
+                    if done == #items then
+                      picker.list:set_selected()
+                      picker.list:set_target()
+                      picker:find()
+                    end
+                  end, {
+                    cwd = item.cwd,
+                    -- sync = true, -- TODO: not sure what it's for
+                  })
+                  if jid then
+                    vim.fn.chansend(jid, item.diff .. "\n")
+                    vim.fn.chanclose(jid, "stdin")
+                  end
+                end
+              end,
+            },
+            win = {
+              input = {
+                keys = {
+                  ["gh"] = "apply_hunk",
+                },
+              },
+              list = {
+                keys = {
+                  ["gh"] = "apply_hunk",
+                },
+              },
+            },
           },
         },
       },

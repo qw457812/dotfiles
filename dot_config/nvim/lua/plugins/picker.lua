@@ -319,7 +319,6 @@ return {
             hidden = true,
           },
           lazy = {
-            ---@diagnostic disable-next-line: missing-fields
             icons = {
               files = {
                 enabled = false,
