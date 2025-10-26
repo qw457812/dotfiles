@@ -49,6 +49,7 @@ return {
     "neovim/nvim-lspconfig",
     ---@type PluginLspOpts
     opts = {
+      ---@type table<string, lazyvim.lsp.Config|boolean>
       servers = {
         ["*"] = {
           -- stylua: ignore
@@ -59,7 +60,7 @@ return {
               function() return vim.lsp.buf.hover() end,
               desc = "Hover",
               has = "hover", -- add `has = "hover"` to prevent rime_ls from overwriting `gk` in help pages
-              cond = function() return not LazyVim.has("nvim-ufo") end,
+              enabled = function() return not LazyVim.has("nvim-ufo") end,
             },
             { "<c-k>", mode = "i", false }, -- <c-k> for cmp navigation
             { "<c-h>", function() return vim.lsp.buf.signature_help() end, mode = "i", desc = "Signature Help", has = "signatureHelp" }, -- can conflict with mini.snippets
@@ -68,7 +69,7 @@ return {
               U.lsp.pick_definitions_or_references,
               desc = "Goto Definition/References",
               has = "definition",
-              cond = function()
+              enabled = function()
                 if vim.bo.filetype == "markdown" then
                   -- for gaoDean/autolist.nvim
                   return false
@@ -107,6 +108,7 @@ return {
       and {
         "neovim/nvim-lspconfig",
         opts = {
+          ---@type table<string, lazyvim.lsp.Config|boolean>
           servers = {
             ["*"] = {
               keys = {
@@ -166,6 +168,7 @@ return {
       {
         "neovim/nvim-lspconfig",
         opts = {
+          ---@type table<string, lazyvim.lsp.Config|boolean>
           servers = {
             ["*"] = {
               keys = {

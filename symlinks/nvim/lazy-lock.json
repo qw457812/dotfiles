@@ -1,5 +1,5 @@
 {
-  "LazyVim": { "branch": "main", "commit": "b5ea1e9d25202e38a47f0b03ac35cc587c80e6d7" },
+  "LazyVim": { "branch": "main", "commit": "d72127eb936f7f05d88d4fc316bc7e89080d69d8" },
   "SchemaStore.nvim": { "branch": "main", "commit": "4341619da06779ae310ee9c3d6d70edfefed7152" },
   "Trans.nvim": { "branch": "v2", "commit": "e58d63a8f6621845776da4657a06ca29ca75ef1a" },
   "baleia.nvim": { "branch": "main", "commit": "1b25eac3ac03659c3d3af75c7455e179e5f197f7" },
@@ -111,7 +111,7 @@
   "sidekick.nvim": { "branch": "main", "commit": "bd1f79a506b7447d44873f78ffc0de7ea232bc88" },
   "smart-splits.nvim": { "branch": "master", "commit": "6c7c64b6e1be6eb95fd9583c0969e0df625c6cd6" },
   "smart-translate.nvim": { "branch": "main", "commit": "493a6911b7ff71af4e0d13ac21c9a400a46f2095" },
-  "snacks.nvim": { "branch": "main", "commit": "f33aa2017a2671fb4a0e71316f385c8010c8b81b" },
+  "snacks.nvim": { "branch": "main", "commit": "4d0d855dbb458760744d189ac453cdf0236e2ba8" },
   "spring-boot.nvim": { "branch": "main", "commit": "dff5fc9ff38dc60514caf95d57b0dbcd4da9028a" },
   "sqlite.lua": { "branch": "master", "commit": "50092d60feb242602d7578398c6eb53b4a8ffe7b" },
   "starship.yazi": { "branch": "main", "commit": "a63550b2f91f0553cc545fd8081a03810bc41bc0" },
