@@ -127,30 +127,14 @@ return {
       },
       -- setup = {
       --   [ruff] = function()
-      --     LazyVim.lsp.on_attach(function(client, _)
+      --     Snacks.util.lsp.on({ name = ruff }, function(_, client)
       --       client.server_capabilities.hoverProvider = false
       --       -- Added this line so basedpyright is the only diagnoistics provider
       --       client.server_capabilities.diagnosticProvider = false
-      --     end, ruff)
+      --     end)
       --   end,
       -- },
     },
-  },
-
-  -- fix: diagnostic for python is not enabled on startup
-  {
-    "neovim/nvim-lspconfig",
-    opts = function()
-      if lsp == "basedpyright" then
-        LazyVim.lsp.on_attach(function()
-          vim.schedule(function()
-            Snacks.toggle.diagnostics():set(true)
-          end)
-          ---@diagnostic disable-next-line: redundant-return-value
-          return true -- don't mess up toggle
-        end, lsp)
-      end
-    end,
   },
 
   -- (isort + black) or ruff

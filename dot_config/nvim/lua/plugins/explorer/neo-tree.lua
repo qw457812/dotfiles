@@ -397,6 +397,7 @@ return {
       local o = {
         sources = { "filesystem" },
         close_if_last_window = true, -- note that this causes `:bd` to exit vim in a java library buffer when neo-tree is open, see #241
+        keep_altfile = true,
         clipboard = {
           sync = "universal",
         },

@@ -62,11 +62,9 @@ return {
     end,
     config = function(_, metals_config)
       local metals_did_attach = false
-      LazyVim.lsp.on_attach(function()
+      Snacks.util.lsp.on({ name = "metals" }, function()
         metals_did_attach = true
-        ---@diagnostic disable-next-line: redundant-return-value
-        return true
-      end, "metals")
+      end)
 
       vim.api.nvim_create_autocmd("FileType", {
         group = vim.api.nvim_create_augroup("nvim-metals", { clear = true }),

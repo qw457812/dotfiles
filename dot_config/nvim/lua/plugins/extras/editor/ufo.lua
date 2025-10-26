@@ -8,11 +8,16 @@ return {
       {
         "neovim/nvim-lspconfig",
         opts = {
-          capabilities = {
-            textDocument = {
-              foldingRange = {
-                dynamicRegistration = false,
-                lineFoldingOnly = true,
+          ---@type table<string, lazyvim.lsp.Config|boolean>
+          servers = {
+            ["*"] = {
+              capabilities = {
+                textDocument = {
+                  foldingRange = {
+                    dynamicRegistration = false,
+                    lineFoldingOnly = true,
+                  },
+                },
               },
             },
           },
@@ -155,7 +160,7 @@ return {
           local ufo_preview_win = require("ufo").peekFoldedLinesUnderCursor()
           if ufo_preview_win then
             vim.bo[vim.api.nvim_win_get_buf(ufo_preview_win)].filetype = "ufo_preview" -- for augroup: pager_nomodifiable
-          elseif require("lazyvim.plugins.lsp.keymaps").has(0, "hover") then
+          elseif U.lsp.has(0, "hover") then
             vim.lsp.buf.hover()
           else
             vim.cmd.normal({ "K", bang = true })
@@ -164,15 +169,13 @@ return {
         desc = "Peek Fold (UFO) / Hover / Keywordprg",
       },
     },
-    opts = function(_, opts)
-      table.insert(require("lazyvim.plugins.lsp.keymaps").get(), { "gk", false })
-      return U.extend_tbl(opts, {
-        preview = {
-          mappings = {
-            switch = "gk",
-          },
+    ---@type UfoConfig
+    opts = {
+      preview = {
+        mappings = {
+          switch = "gk",
         },
-      })
-    end,
+      },
+    },
   },
 }

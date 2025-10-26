@@ -1,5 +1,5 @@
 ---@class util.keymap
----@overload fun(mode: string|string[], lhs: string|string[], rhs: string|function, opts?: vim.keymap.set.Opts)
+---@overload fun(mode: string|string[], lhs: string|string[], rhs: string|function, opts?: snacks.keymap.set.Opts)
 local M = setmetatable({}, {
   ---@param t util.keymap
   __call = function(t, ...)
@@ -7,15 +7,12 @@ local M = setmetatable({}, {
   end,
 })
 
---- Wrapper around vim.keymap.set that will set `silent` to true by default.
---- https://github.com/folke/dot/blob/5df77fa64728a333f4d58e35d3ca5d8590c4f928/nvim/lua/config/options.lua#L22
 ---@param mode string|string[]
 ---@param lhs string|string[]
 ---@param rhs string|function
----@param opts? vim.keymap.set.Opts
+---@param opts? snacks.keymap.set.Opts
 function M.map(mode, lhs, rhs, opts)
   opts = opts or {}
-  opts.silent = opts.silent ~= false
   -- -- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/utils.lua#L17
   -- opts.unique = opts.unique ~= false
 
@@ -23,17 +20,14 @@ function M.map(mode, lhs, rhs, opts)
   ---@cast lhs string[]
 
   for _, l in ipairs(lhs) do
-    vim.keymap.set(mode, l, rhs, opts)
+    Snacks.keymap.set(mode, l, rhs, opts)
   end
 end
 
--- Wrapper around vim.keymap.set that will
--- not create a keymap if a lazy key handler exists.
--- It will also set `silent` to true by default.
 ---@param mode string|string[]
 ---@param lhs string|string[]
 ---@param rhs string|function
----@param opts? vim.keymap.set.Opts
+---@param opts? snacks.keymap.set.Opts
 function M.safe_map(mode, lhs, rhs, opts)
   lhs = type(lhs) == "string" and { lhs } or lhs
   ---@cast lhs string[]
@@ -45,13 +39,14 @@ end
 
 ---@param modes string|string[]
 ---@param lhs string|string[]
----@param opts? vim.keymap.del.Opts
+---@param opts? snacks.keymap.del.Opts
 function M.del(modes, lhs, opts)
+  opts = opts or {}
   lhs = type(lhs) == "string" and { lhs } or lhs
   ---@cast lhs string[]
 
   for _, l in ipairs(lhs) do
-    vim.keymap.del(modes, l, opts)
+    Snacks.keymap.del(modes, l, opts)
   end
 end
 

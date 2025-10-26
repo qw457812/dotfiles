@@ -98,6 +98,11 @@ return {
             on_close = function(self)
               self:close()
             end,
+            b = {
+              user_lualine_filename = table
+                .concat(vim.list_extend({ "git", "diff" }, opts.cmd_args), " ")
+                :gsub(" %-%- .*$", ""),
+            },
           },
         })
       end

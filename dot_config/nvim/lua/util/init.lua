@@ -3,6 +3,7 @@
 ---@field explorer util.explorer
 ---@field java util.java
 ---@field keymap util.keymap
+---@field lsp util.lsp
 ---@field lualine util.lualine
 ---@field path util.path
 ---@field rime_ls util.rime_ls

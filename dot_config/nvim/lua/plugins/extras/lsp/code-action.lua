@@ -37,18 +37,23 @@ return {
     specs = {
       {
         "neovim/nvim-lspconfig",
-        opts = function()
-          local Keys = require("lazyvim.plugins.lsp.keymaps").get()
-          table.insert(Keys, {
-            "<leader>ca",
-            function()
-              require("tiny-code-action").code_action({})
-            end,
-            desc = "Code Action Preview",
-            mode = { "n", "v" },
-            has = "codeAction",
-          })
-        end,
+        opts = {
+          servers = {
+            ["*"] = {
+              keys = {
+                {
+                  "<leader>ca",
+                  function()
+                    require("tiny-code-action").code_action({})
+                  end,
+                  desc = "Code Action Preview",
+                  mode = { "n", "v" },
+                  has = "codeAction",
+                },
+              },
+            },
+          },
+        },
       },
     },
   },
@@ -71,19 +76,24 @@ return {
     specs = {
       {
         "neovim/nvim-lspconfig",
-        opts = function()
-          local Keys = require("lazyvim.plugins.lsp.keymaps").get()
-          table.insert(Keys, {
-            "<leader>ca",
-            function()
-              require("actions-preview").code_actions()
-            end,
-            desc = "Code Action Preview",
-            mode = { "n", "v" },
-            has = "codeAction",
-            ft = "java", -- tiny-code-action.nvim failed to run "Generate toString()..." from jdtls
-          })
-        end,
+        opts = {
+          servers = {
+            ["*"] = {
+              keys = {
+                {
+                  "<leader>ca",
+                  function()
+                    require("actions-preview").code_actions()
+                  end,
+                  desc = "Code Action Preview",
+                  mode = { "n", "v" },
+                  has = "codeAction",
+                  ft = "java", -- tiny-code-action.nvim failed to run "Generate toString()..." from jdtls
+                },
+              },
+            },
+          },
+        },
       },
     },
   },
@@ -94,16 +104,21 @@ return {
     specs = {
       {
         "neovim/nvim-lspconfig",
-        opts = function()
-          local Keys = require("lazyvim.plugins.lsp.keymaps").get()
-          table.insert(Keys, {
-            "<leader>ca",
-            "<cmd>FzfLua lsp_code_actions<cr>",
-            desc = "Code Action Preview",
-            mode = { "n", "v" },
-            has = "codeAction",
-          })
-        end,
+        opts = {
+          servers = {
+            ["*"] = {
+              keys = {
+                {
+                  "<leader>ca",
+                  "<cmd>FzfLua lsp_code_actions<cr>",
+                  desc = "Code Action Preview",
+                  mode = { "n", "v" },
+                  has = "codeAction",
+                },
+              },
+            },
+          },
+        },
       },
     },
   },
