@@ -29,13 +29,10 @@ return {
                 end
               end,
               close_or_unfocus = function(picker)
-                if vim.g.user_explorer_auto_close then
+                if vim.g.user_explorer_auto_close or U.too_narrow() then
                   picker:close()
                 else
                   picker:action("unfocus")
-                  if U.too_narrow() then
-                    picker:close()
-                  end
                 end
               end,
               reset_input = function(picker)

@@ -33,9 +33,8 @@ end
 
 ---Check if cursor is in range
 ---copied from: https://github.com/Bekaboo/dropbar.nvim/blob/5439d2f02bb744cecb878aaa23c6c6f8b21a351c/lua/dropbar/sources/lsp.lua#L97-L115
----@module 'dropbar'
 ---@param cursor integer[] cursor position (line, character); (1, 0)-based
----@param range lsp_range_t 0-based range
+---@param range lsp.Range 0-based range
 ---@return boolean
 function M.cursor_in_range(cursor, range)
   local cursor0 = { cursor[1] - 1, cursor[2] }

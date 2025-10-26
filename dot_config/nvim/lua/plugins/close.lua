@@ -331,6 +331,9 @@ return {
         pattern = "neo-tree-popup",
         callback = function(event)
           vim.defer_fn(function()
+            if not vim.api.nvim_buf_is_valid(event.buf) then
+              return
+            end
             vim.keymap.set("n", close_key, function()
               -- HACK: trigger `BufLeave` of nui to close
               -- https://github.com/nvim-neo-tree/neo-tree.nvim/blob/d175a0ce24bcb022ec1c93635841c043d764418e/lua/neo-tree/sources/filesystem/lib/filter.lua#L203
@@ -345,6 +348,9 @@ return {
         callback = function(event)
           -- HACK: sometimes <bs> is mapped to `navigate_up` instead of `close_window`
           vim.defer_fn(function()
+            if not vim.api.nvim_buf_is_valid(event.buf) then
+              return
+            end
             vim.keymap.set("n", close_key, function()
               -- HACK: make <bs> close neotree even if vim.g.user_explorer_auto_open is true
               if vim.g.user_explorer_auto_open then

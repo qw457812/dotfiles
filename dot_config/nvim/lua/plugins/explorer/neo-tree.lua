@@ -97,6 +97,7 @@ return {
             return vim.api.nvim_win_get_config(win or 0).relative ~= ""
               or vim.list_contains({
                 "neo-tree",
+                "snacks_layout_box", -- snacks explorer
                 "gitcommit",
                 "svn",
                 "snacks_dashboard",
@@ -440,14 +441,8 @@ return {
             end
           end,
           close_or_unfocus = function(state)
-            if vim.g.user_explorer_auto_close then
-              state.commands["close_window"](state)
-            else
-              state.commands["unfocus_window"](state)
-              if U.too_narrow() then
-                state.commands["close_window"](state)
-              end
-            end
+            local command = (vim.g.user_explorer_auto_close or U.too_narrow()) and "close_window" or "unfocus_window"
+            state.commands[command](state)
           end,
           cancel_or_close_or_unfocus = function(state)
             local preview = require("neo-tree.sources.common.preview")

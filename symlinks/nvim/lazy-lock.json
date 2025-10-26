@@ -118,7 +118,7 @@
   "store.nvim": { "branch": "main", "commit": "df430716b095719f7221f2fb50be696879ca7c34" },
   "text-case.nvim": { "branch": "main", "commit": "e898cfd46fa6cde0e83abb624a16e67d2ffc6457" },
   "time-machine.nvim": { "branch": "main", "commit": "6657a7db8a07ecfa8a266be34bebfb6827bb2eab" },
-  "tiny-inline-diagnostic.nvim": { "branch": "main", "commit": "47a50525c251fe1195fc59443504f11fba2d5d3c" },
+  "tiny-inline-diagnostic.nvim": { "branch": "main", "commit": "8e633ccbff87c87ecfad8fe2e10d0869acb67033" },
   "todo-comments.nvim": { "branch": "main", "commit": "19d461ddd543e938eb22505fb03fa878800270b6" },
   "tokyonight.nvim": { "branch": "main", "commit": "4fe1b0c44f5d6ee769cdfbdffc7ccb703f53feda" },
   "treesj": { "branch": "main", "commit": "4770492244ccecdc9b01e0e81fa8f2f6b4a23841" },
@@ -136,5 +136,5 @@
   "yanky.nvim": { "branch": "main", "commit": "04775cc6e10ef038c397c407bc17f00a2f52b378" },
   "yazi-flavors": { "branch": "main", "commit": "f6b425a6d57af39c10ddfd94790759f4d7612332" },
   "yazi-plugins": { "branch": "main", "commit": "8f1d9711bcd0e48af1fcb4153c16d24da76e732d" },
-  "yazi.nvim": { "branch": "main", "commit": "e9503c9b334f9dae2bb0b12eee84e1908f13d557" }
+  "yazi.nvim": { "branch": "main", "commit": "e0917303cd48ced872c32eea4c36938142611797" }
 }

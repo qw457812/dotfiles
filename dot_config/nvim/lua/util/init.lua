@@ -135,9 +135,16 @@ function M.is_bigfile(buf)
   return vim.bo[buf].filetype == "bigfile" or vim.b[buf].bigfile
 end
 
----@param win? integer
-function M.too_narrow(win)
-  return vim.o.columns < 120 or vim.api.nvim_win_get_width(win or 0) < 120
+---@return boolean
+function M.too_narrow()
+  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+    local buf = vim.api.nvim_win_get_buf(win)
+    local is_explorer = vim.list_contains({ "neo-tree", "snacks_layout_box" }, vim.bo[buf].filetype)
+    if not M.is_floating_win(win) and not is_explorer and vim.api.nvim_win_get_width(win) < 120 then
+      return true
+    end
+  end
+  return false
 end
 
 -- see: https://github.com/folke/edgy.nvim/blob/e94e851f9dc296c2949d4c524b1be7de2340306e/lua/edgy/editor.lua#L80-L109
