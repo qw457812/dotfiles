@@ -213,13 +213,13 @@ return {
                 -- https://github.com/folke/snacks.nvim/commit/d6a38acbf5765eeb5ca2558bcb0d1ae1428dd2ca
                 -- https://github.com/folke/snacks.nvim/blob/b30121bfce84fdcbe53cb724c97388cbe4e18980/lua/snacks/picker/actions.lua#L342-L349
                 -- TODO: use `vim.system()` instead
-                local jid = Snacks.picker.util.cmd(cmd, function(data, code)
+                local jid = Snacks.picker.util.cmd(cmd, function()
                   picker.list:set_selected()
                   picker.list:set_target()
                   picker:find()
                 end, {
                   cwd = cwd,
-                  -- sync = true, -- TODO: not sure what it's for
+                  sync = true, -- TODO: not sure what it's for: https://github.com/folke/snacks.nvim/blob/d7caea32ab22afb20a1a23836437b0b728603b51/lua/snacks/util/job.lua#L98
                 })
                 if jid then
                   vim.fn.chansend(jid, patch .. "\n")

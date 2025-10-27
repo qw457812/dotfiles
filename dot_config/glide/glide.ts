@@ -364,15 +364,47 @@ glide.keymaps.set("command", "<c-u>", "keys <D-BS>");
 glide.keymaps.set("command", "<c-d>", "keys <Del>");
 
 // Autocmds
-glide.autocmds.create("ModeChanged", "command:*", focus_page);
+// glide.autocmds.create("ModeChanged", "*", ({ new_mode }) => {
+//   let color = null;
+//   switch (new_mode) {
+//     case "normal":
+//       color = "#000000";
+//       break;
+//     case "insert":
+//       color = "#C3E88D";
+//       break;
+//     case "visual":
+//       color = "#C099FF";
+//       break;
+//     case "ignore":
+//       color = "#FF757F";
+//       break;
+//     case "command":
+//       // color = "#FFC777";
+//       color = "#000000";
+//       break;
+//     case "op-pending":
+//       color = "#82AAFF";
+//       break;
+//     case "hint":
+//       color = "#000000";
+//       break;
+//   }
+//   if (color) {
+//     browser.theme.update({ colors: { frame: color } });
+//   }
+// });
+
+glide.autocmds.create("UrlEnter", {}, async ({ url }) => {
+  if (url !== "about:newtab") {
+    // it's annoying to be in insert mode when switching tabs
+    await glide.excmds.execute("mode_change normal");
+  }
+});
 
 glide.autocmds.create("UrlEnter", { hostname: "github.com" }, async () => {
   const url = new URL(glide.ctx.url);
   const [org, repo, ...rest_segments] = url.pathname.split("/").filter(Boolean);
-
-  // it's annoying to be in insert mode when switching tabs
-  // maybe do this for all URLs?
-  await glide.excmds.execute("mode_change normal");
 
   glide.buf.keymaps.set(
     "normal",

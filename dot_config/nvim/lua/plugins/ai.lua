@@ -138,7 +138,6 @@ return {
               blur_t = false, -- claude code uses <c-o> for its own functionality
             },
           },
-          codex = { cmd = { "codex" } },
           opencode = {
             env = {
               NVIM_FLATTEN_NEST = "1",

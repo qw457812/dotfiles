@@ -86,6 +86,13 @@ return {
           end
           return true -- no way to know whether expansion happened or not
         end,
+        mini_snippets_stop = function()
+          if not (_G.MiniSnippets and MiniSnippets.session.get()) then
+            return
+          end
+          vim.schedule(MiniSnippets.session.stop)
+          return true
+        end,
         -- see: https://github.com/Saghen/blink.cmp/issues/569#issuecomment-2833362734
         scroll_list_up = function()
           -- based on select_prev: https://github.com/Saghen/blink.cmp/blob/6323a6ddb191323904557dc9b545f309ea2b0e12/lua/blink/cmp/init.lua#L200-L205
@@ -187,6 +194,7 @@ return {
             "fallback",
           },
           ["<CR>"] = { "accept", H.actions.pum_accept, "fallback" },
+          ["<C-e>"] = { "cancel", H.actions.mini_snippets_stop, "fallback" },
           ["<C-n>"] = { "select_next", "show" },
           ["<C-p>"] = { "select_prev", "show" },
           ["<C-j>"] = { "select_next", H.actions.pum_next, "fallback" },
@@ -364,7 +372,7 @@ return {
     optional = true,
     opts = function(_, opts)
       LazyVim.cmp.actions.snippet_active = function()
-        return MiniSnippets.session.get(false) ~= nil
+        return MiniSnippets.session.get() ~= nil
       end
       ---@diagnostic disable-next-line: duplicate-set-field
       LazyVim.cmp.actions.snippet_stop = function()
@@ -479,90 +487,90 @@ return {
     },
   },
 
-  {
-    "saghen/blink.cmp",
-    optional = true,
-    dependencies = {
-      "garyhurtz/blink_cmp_kitty",
-      enabled = vim.g.user_is_kitty,
-      shell_command_editor = true,
-    },
-    opts = vim.g.user_is_kitty and {
-      sources = {
-        default = { "blink_cmp_kitty" },
-        providers = {
-          blink_cmp_kitty = {
-            module = "blink_cmp_kitty",
-            name = "kitty",
-            min_keyword_length = 3,
-            max_items = 2,
-            score_offset = -10,
-          },
-        },
-      },
-    } or nil,
-  },
+  -- {
+  --   "saghen/blink.cmp",
+  --   optional = true,
+  --   dependencies = {
+  --     "garyhurtz/blink_cmp_kitty",
+  --     enabled = vim.g.user_is_kitty,
+  --     shell_command_editor = true,
+  --   },
+  --   opts = vim.g.user_is_kitty and {
+  --     sources = {
+  --       default = { "blink_cmp_kitty" },
+  --       providers = {
+  --         blink_cmp_kitty = {
+  --           module = "blink_cmp_kitty",
+  --           name = "kitty",
+  --           min_keyword_length = 3,
+  --           max_items = 2,
+  --           score_offset = -10,
+  --         },
+  --       },
+  --     },
+  --   } or nil,
+  -- },
 
-  {
-    "gbprod/yanky.nvim",
-    optional = true,
-    specs = {
-      {
-        "saghen/blink.cmp",
-        optional = true,
-        dependencies = {
-          "marcoSven/blink-cmp-yanky",
-          shell_command_editor = true,
-          init = function()
-            LazyVim.on_load("mini.icons", function()
-              require("snacks.util").set_hl({ BlinkCmpKindYank = "MiniIconsYellow" })
-            end)
-          end,
-        },
-        ---@type blink.cmp.Config
-        opts = {
-          sources = {
-            default = { "yank" },
-            providers = {
-              yank = {
-                module = "blink-yanky",
-                min_keyword_length = 3,
-                max_items = 1,
-                score_offset = -10,
-                opts = {
-                  kind_icon = "󰅍",
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  },
+  -- {
+  --   "gbprod/yanky.nvim",
+  --   optional = true,
+  --   specs = {
+  --     {
+  --       "saghen/blink.cmp",
+  --       optional = true,
+  --       dependencies = {
+  --         "marcoSven/blink-cmp-yanky",
+  --         shell_command_editor = true,
+  --         init = function()
+  --           LazyVim.on_load("mini.icons", function()
+  --             require("snacks.util").set_hl({ BlinkCmpKindYank = "MiniIconsYellow" })
+  --           end)
+  --         end,
+  --       },
+  --       ---@type blink.cmp.Config
+  --       opts = {
+  --         sources = {
+  --           default = { "yank" },
+  --           providers = {
+  --             yank = {
+  --               module = "blink-yanky",
+  --               min_keyword_length = 3,
+  --               max_items = 1,
+  --               score_offset = -10,
+  --               opts = {
+  --                 kind_icon = "󰅍",
+  --               },
+  --             },
+  --           },
+  --         },
+  --       },
+  --     },
+  --   },
+  -- },
 
-  {
-    "saghen/blink.cmp",
-    optional = true,
-    dependencies = { "ribru17/blink-cmp-spell", shell_command_editor = true },
-    ---@type blink.cmp.Config
-    opts = {
-      sources = {
-        default = { "spell" },
-        providers = {
-          spell = {
-            module = "blink-cmp-spell",
-            min_keyword_length = 2,
-            max_items = 1,
-            score_offset = -10,
-            opts = {
-              preselect_current_word = false,
-              use_cmp_spell_sorting = true,
-            },
-          },
-        },
-      },
-    },
-  },
+  -- {
+  --   "saghen/blink.cmp",
+  --   optional = true,
+  --   dependencies = { "ribru17/blink-cmp-spell", shell_command_editor = true },
+  --   ---@type blink.cmp.Config
+  --   opts = {
+  --     sources = {
+  --       default = { "spell" },
+  --       providers = {
+  --         spell = {
+  --           module = "blink-cmp-spell",
+  --           min_keyword_length = 2,
+  --           max_items = 1,
+  --           score_offset = -10,
+  --           opts = {
+  --             preselect_current_word = false,
+  --             use_cmp_spell_sorting = true,
+  --           },
+  --         },
+  --       },
+  --     },
+  --   },
+  -- },
 
   -- {
   --   "saghen/blink.cmp",
