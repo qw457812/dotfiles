@@ -10,7 +10,7 @@
       "login": "qw457812"
     }
   ],
-  "theme": "auto",
+  "render_markdown": true,
   "screen_reader": false,
-  "render_markdown": true
+  "theme": "auto"
 }

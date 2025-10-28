@@ -179,10 +179,7 @@ return {
             pattern = "BlinkCmpMenuClose",
             once = true,
             callback = function()
-              timer:stop()
-              if not timer:is_closing() then
-                timer:close()
-              end
+              Snacks.util.stop(timer)
             end,
           })
         end,

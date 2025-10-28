@@ -144,8 +144,8 @@ return {
             },
           },
           -- HACK: disable some installed tools
+          copilot = tonumber(os.date("%d")) < 20 and { cmd = { "hack_to_disable_copilot" } } or {},
           aider = { cmd = { "hack_to_disable_aider" } },
-          copilot = { cmd = { "hack_to_disable_copilot" } },
           gemini = { cmd = { "hack_to_disable_gemini" } },
         },
         ---@type table<string, sidekick.Prompt|string|fun(ctx:sidekick.context.ctx):(string?)>

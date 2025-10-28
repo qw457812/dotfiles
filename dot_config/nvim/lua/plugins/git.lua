@@ -98,6 +98,18 @@ return {
             on_close = function(self)
               self:close()
             end,
+            on_win = function(self)
+              if not self:win_valid() then
+                return
+              end
+              vim.wo[self.win].scrolloff = math.floor((vim.api.nvim_win_get_height(self.win) - 1) / 2)
+              vim.api.nvim_win_call(
+                self.win,
+                vim.schedule_wrap(function()
+                  vim.cmd.normal({ "M", bang = true })
+                end)
+              )
+            end,
             b = {
               user_lualine_filename = table
                 .concat(vim.list_extend({ "git", "diff" }, opts.cmd_args), " ")
