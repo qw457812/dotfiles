@@ -24,17 +24,27 @@ return {
           arrow = "  ",
           up_arrow = "  ",
         },
-        -- blend = { factor = vim.g.user_transparent_background and 0 or nil }, -- same as `transparent_bg = vim.g.user_transparent_background`
+        blend = {
+          factor = vim.g.user_transparent_background and 0 or nil, -- same as `transparent_bg = vim.g.user_transparent_background`
+        },
         -- transparent_bg = vim.g.user_transparent_background,
         options = {
-          virt_texts = { priority = 5000 }, -- set higher than symbol-usage.nvim
-          use_icons_from_diagnostic = true,
-          -- multilines = true, -- not just current line
-          -- show_source = true,
-          add_messages = {
-            display_count = true, -- when `multilines = true`
-            -- show_multiple_glyphs = false, -- when `multilines = true`
+          virt_texts = {
+            priority = 5000, -- set higher than symbol-usage.nvim
           },
+          use_icons_from_diagnostic = true,
+          -- show_source = true,
+          multilines = {
+            enabled = true, -- not just current line
+            -- always_show = true, -- show diagnostics on other lines even if cursor is on a diagnostic line
+            severity = {
+              vim.diagnostic.severity.ERROR,
+            },
+          },
+          -- add_messages = {
+          --   display_count = true, -- when `opts.options.multilines.enabled = true`
+          --   -- show_multiple_glyphs = false, -- when `opts.options.multilines.enabled = true`
+          -- },
         },
       }
     end,
@@ -62,6 +72,7 @@ return {
               if U.toggle.is_diagnostic_virt_enabled == false then
                 return
               end
+              -- only re-enable if it was previously enabled
               if not require("tiny-inline-diagnostic.state").user_toggle_state then
                 require("tiny-inline-diagnostic").enable()
               end
