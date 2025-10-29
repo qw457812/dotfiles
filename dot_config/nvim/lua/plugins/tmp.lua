@@ -5,6 +5,7 @@ local java_home = vim.g.user_is_termux and "/data/data/com.termux/files/usr/lib/
 return {
   {
     "neovim/neovim",
+    pin = true,
     enabled = function()
       local v = vim.version()
       return v and v.prerelease ~= nil -- nightly

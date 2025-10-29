@@ -38,16 +38,16 @@ end
 
 function gwl
     set -l current (pwd)
-    set -l worktrees (git worktree list | awk '{print $1}')
+    set -l worktrees (git worktree list)
     set -l filtered
     for wt in $worktrees
-        if test "$wt" != "$current"
+        if test (echo $wt | awk '{print $1}') != "$current"
             set -a filtered $wt
         end
     end
     set -l selected (printf '%s\n' $filtered | fzf)
     if test -n "$selected"
-        cd $selected
+        cd (echo $selected | awk '{print $1}')
     end
 end
 

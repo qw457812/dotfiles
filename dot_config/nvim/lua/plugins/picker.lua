@@ -622,9 +622,8 @@ return {
               if opts.debug.files then
                 Snacks.notify(cmd .. " " .. table.concat(args or {}, " "))
               end
-              return require("snacks.picker.source.proc").proc({
-                opts,
-                {
+              return require("snacks.picker.source.proc").proc(
+                ctx:opts({
                   cmd = cmd,
                   args = args,
                   notify = false, -- if no match could be found, then the exit status is 1, see `man rg`
@@ -659,8 +658,9 @@ return {
                       return false
                     end
                   end,
-                },
-              }, ctx)
+                }),
+                ctx
+              )
             end,
             patterns = {
               ".nvim.lua",

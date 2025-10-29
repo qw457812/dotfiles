@@ -221,6 +221,10 @@ return {
           cond = function()
             return not is_termux
           end,
+          color = function()
+            -- align with https://github.com/qw457812/dotfiles/blob/424e2fa63c3f268cbf84453ba47d48f6f31e8293/dot_config/nvim/lua/util/lualine.lua#L55
+            return vim.bo.buftype == "terminal" and vim.fn.mode():sub(1, 1) ~= "t" and { fg = "#FF007C" } or nil
+          end,
         },
         { "progress" },
       }
