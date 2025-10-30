@@ -51,6 +51,8 @@ return {
         return keys
       end
 
+      ---use `opts.staged` instead of `opts.cmd_args = { "--staged" }` or `opts.cmd_args = { "--cached" }`
+      ---see: https://github.com/folke/snacks.nvim/blob/1fb3f4de49962a80cb88a9b143bc165042c72165/lua/snacks/picker/source/git.lua#L277-L292
       ---@param opts? snacks.picker.git.diff.Config
       ---@return snacks.Picker
       local function git_diff_pick(opts)
@@ -59,12 +61,7 @@ return {
           cwd = LazyVim.root.git(),
           cmd_args = {},
         } --[[@as snacks.picker.git.diff.Config]], opts or {})
-        if
-          opts.staged
-          or vim.list_contains(opts.cmd_args, "--cached")
-          or vim.list_contains(opts.cmd_args, "--staged")
-          or opts.base
-        then
+        if opts.staged or opts.base then
           opts = vim.tbl_deep_extend("force", {
             win = {
               input = { keys = { ["gh"] = false } },
@@ -80,6 +77,7 @@ return {
           "done",
           vim.schedule_wrap(function()
             -- ref: https://github.com/folke/snacks.nvim/blob/ca0f8b2c09a6b437479e7d12bdb209731d9eb621/lua/snacks/picker/config/sources.lua#L236-L242
+            -- TODO: prefer unstaged hunks if `opts.staged` is not true
             for i, item in ipairs(picker:items()) do
               if Snacks.picker.util.path(item) == path then
                 picker.list:view(i)
@@ -167,12 +165,12 @@ return {
         --   desc = "Git Diff Buffer (hunks)",
         -- },
         { "<leader>gD", function() git_diff_pick({ base = "origin" }) end, desc = "Git Diff (origin)" },
-        { "<leader>ga", function() git_diff_pick({ cmd_args = { "--staged" } }) end, desc = "Git Diff Staged (hunks)" },
-        {
-          "<leader>gA",
-          function() git_diff_pick({ cmd_args = { "--staged", "--", vim.api.nvim_buf_get_name(0) } }) end,
-          desc = "Git Diff Staged Buffer (hunks)",
-        },
+        { "<leader>ga", function() git_diff_pick({ staged = true }) end, desc = "Git Diff Staged (hunks)" },
+        -- {
+        --   "<leader>gA",
+        --   function() git_diff_pick({ staged = true, cmd_args = { "--", vim.api.nvim_buf_get_name(0) } }) end,
+        --   desc = "Git Diff Staged Buffer (hunks)",
+        -- },
         -- { "<leader>ga", function() git_diff_term({ cmd_args = { "--staged" } }) end, desc = "Git Diff Staged" },
         -- {
         --   "<leader>gA",
@@ -223,44 +221,29 @@ return {
             },
             on_show = U.explorer.close, -- in favor of ivy_split layout
             actions = {
+              -- https://github.com/folke/snacks.nvim/blob/1fb3f4de49962a80cb88a9b143bc165042c72165/lua/snacks/picker/actions.lua#L343-L363
               -- https://github.com/chrisgrieser/.config/blob/fd27c6f94b748f436fa6251006fcd5641f9eeac6/nvim/lua/plugin-specs/snacks/snacks-picker.lua#L200-L215
               -- https://github.com/nvim-mini/mini.diff/blob/98fc732d5835eb7b6539f43534399b07b17f4e28/lua/mini/diff.lua#L1818-L1831
+              -- TODO:
+              -- - unstage (multi) hunks with `git apply --cached --reverse`
+              -- - multi hunks mixed staged/unstaged
+              -- - <tab> for multi, what for unstaged?
               apply_hunk = function(picker)
                 local items = picker:selected({ fallback = true })
                 if #items == 0 then
                   return
                 end
 
-                local cmd = {
-                  "git",
-                  "apply",
-                  "--whitespace=nowarn",
-                  "--cached",
-                  -- "--unidiff-zero",
-                  "--verbose", -- more helpful error messages
-                  "-",
-                }
-                local cwd = items[1].cwd
+                local cmd = { "git", "apply", "--cached" }
                 local diffs = vim.tbl_map(function(item)
-                  assert(item.cwd == cwd) -- https://github.com/folke/snacks.nvim/blob/7964f040bf605b2a3e8d66d02c453469352e005e/lua/snacks/picker/source/git.lua#L283
                   return item.diff
                 end, items)
-                local patch = table.concat(diffs, "\n")
-                -- https://github.com/folke/snacks.nvim/commit/d6a38acbf5765eeb5ca2558bcb0d1ae1428dd2ca
-                -- https://github.com/folke/snacks.nvim/blob/b30121bfce84fdcbe53cb724c97388cbe4e18980/lua/snacks/picker/actions.lua#L342-L349
-                -- TODO: use `vim.system()` instead
-                local jid = Snacks.picker.util.cmd(cmd, function()
+                -- alternative: vim.system()
+                Snacks.picker.util.cmd(cmd, function()
                   picker.list:set_selected()
                   picker.list:set_target()
                   picker:find()
-                end, {
-                  cwd = cwd,
-                  sync = true, -- TODO: not sure what it's for: https://github.com/folke/snacks.nvim/blob/d7caea32ab22afb20a1a23836437b0b728603b51/lua/snacks/util/job.lua#L98
-                })
-                if jid then
-                  vim.fn.chansend(jid, patch .. "\n")
-                  vim.fn.chanclose(jid, "stdin")
-                end
+                end, { cwd = items[1].cwd, input = table.concat(diffs, "\n") })
               end,
             },
             win = {

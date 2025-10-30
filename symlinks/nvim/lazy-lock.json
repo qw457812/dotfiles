@@ -107,7 +107,7 @@
   "sidekick.nvim": { "branch": "main", "commit": "6c53e5fb5430821634062e034e3004a9cbea24e6" },
   "smart-splits.nvim": { "branch": "master", "commit": "6c7c64b6e1be6eb95fd9583c0969e0df625c6cd6" },
   "smart-translate.nvim": { "branch": "main", "commit": "493a6911b7ff71af4e0d13ac21c9a400a46f2095" },
-  "snacks.nvim": { "branch": "main", "commit": "aa8a318779ca6b5f0bba2cf383ddf596db199c09" },
+  "snacks.nvim": { "branch": "main", "commit": "6ca541747c09962f87fc42b858249e4f9d2bbf2d" },
   "spring-boot.nvim": { "branch": "main", "commit": "dff5fc9ff38dc60514caf95d57b0dbcd4da9028a" },
   "sqlite.lua": { "branch": "master", "commit": "50092d60feb242602d7578398c6eb53b4a8ffe7b" },
   "starship.yazi": { "branch": "main", "commit": "a63550b2f91f0553cc545fd8081a03810bc41bc0" },
