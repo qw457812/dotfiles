@@ -93,9 +93,15 @@ return {
       end
 
       ---@param opts? { args?: string[], cmd_args?: string[] }
-      ---@return snacks.terminal
+      ---@return snacks.terminal?
       local function git_diff_term(opts)
         opts = vim.tbl_deep_extend("force", { args = {}, cmd_args = {} }, opts or {})
+
+        local git_root = Snacks.git.get_root()
+        if not git_root then
+          Snacks.notify.error("Not a git repo")
+          return
+        end
 
         local cmd = { "git", "-c", "delta.paging=never" }
         vim.list_extend(cmd, vim.g.user_is_termux and {} or { "-c", "delta.line-numbers=true" })
@@ -103,8 +109,8 @@ return {
         table.insert(cmd, "diff")
         vim.list_extend(cmd, opts.cmd_args)
 
-        return Snacks.terminal(cmd, {
-          cwd = LazyVim.root.git(),
+        local terminal = Snacks.terminal(cmd, {
+          cwd = git_root,
           interactive = false, -- normal mode in favor of copying
           win = {
             height = U.snacks.win.fullscreen_height,
@@ -132,6 +138,22 @@ return {
             },
           },
         })
+
+        terminal:on("TermClose", function()
+          if type(vim.v.event) == "table" and vim.v.event.status ~= 0 then
+            Snacks.notify.error(("Command failed:\n- cmd: `%s`"):format(table.concat(cmd, " ")))
+            terminal:close()
+          else
+            vim.defer_fn(function()
+              if terminal:line(2) == "[Process exited 0]" then
+                Snacks.notify.warn(("No changes found:\n- cmd: `%s`"):format(table.concat(cmd, " ")))
+                terminal:close()
+              end
+            end, 20)
+          end
+        end, { buf = true })
+
+        return terminal
       end
 
       -- stylua: ignore
