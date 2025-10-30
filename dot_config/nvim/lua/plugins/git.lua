@@ -51,7 +51,7 @@ return {
         return keys
       end
 
-      ---use `opts.staged` instead of `opts.cmd_args = { "--staged" }` or `opts.cmd_args = { "--cached" }`
+      ---use `opts.staged = true` instead of `opts.cmd_args = { "--staged" }` or `opts.cmd_args = { "--cached" }`
       ---see: https://github.com/folke/snacks.nvim/blob/1fb3f4de49962a80cb88a9b143bc165042c72165/lua/snacks/picker/source/git.lua#L277-L292
       ---@param opts? snacks.picker.git.diff.Config
       ---@return snacks.Picker
@@ -61,14 +61,15 @@ return {
           cwd = LazyVim.root.git(),
           cmd_args = {},
         } --[[@as snacks.picker.git.diff.Config]], opts or {})
-        if opts.staged or opts.base then
-          opts = vim.tbl_deep_extend("force", {
-            win = {
-              input = { keys = { ["gh"] = false } },
-              list = { keys = { ["gh"] = false } },
-            },
-          }, opts)
-        end
+
+        -- if opts.staged ~= false or opts.base then
+        --   opts = vim.tbl_deep_extend("force", {
+        --     win = {
+        --       input = { keys = { ["gh"] = false } },
+        --       list = { keys = { ["gh"] = false } },
+        --     },
+        --   }, opts)
+        -- end
 
         local path = vim.api.nvim_buf_get_name(0)
         local picker = Snacks.picker.git_diff(opts)
@@ -77,7 +78,6 @@ return {
           "done",
           vim.schedule_wrap(function()
             -- ref: https://github.com/folke/snacks.nvim/blob/ca0f8b2c09a6b437479e7d12bdb209731d9eb621/lua/snacks/picker/config/sources.lua#L236-L242
-            -- TODO: prefer unstaged hunks if `opts.staged` is not true
             for i, item in ipairs(picker:items()) do
               if Snacks.picker.util.path(item) == path then
                 picker.list:view(i)
@@ -92,39 +92,33 @@ return {
 
       -- stylua: ignore
       return vim.list_extend(keys, {
-        { "<leader>gb", function() Snacks.picker.git_branches({ cwd = LazyVim.root.git() }) end, desc = "Git Branches" },
-        { "<leader>gB", function() Snacks.picker.git_log_line() end, desc = "Git Blame Line" },
-        { "<leader>gd", function() git_diff_pick() end, desc = "Git Diff (hunks)" },
-        -- {
-        --   "<leader>gD",
-        --   function() git_diff_pick({ cwd = LazyVim.root.git(), cmd_args = { "--", vim.api.nvim_buf_get_name(0) } }) end,
-        --   desc = "Git Diff Buffer (hunks)",
-        -- },
+        -- { "<leader>gd", function() git_diff_pick({ staged = false }) end, desc = "Git Diff (hunks)" },
+        { "<leader>gd", function() git_diff_pick() end, desc = "Git Diff HEAD (hunks)" },
+        -- { "<leader>gD", function() git_diff_pick({ staged = false, cmd_args = { "--", vim.api.nvim_buf_get_name(0) } }) end, desc = "Git Diff Buffer (hunks)" },
         { "<leader>gD", function() git_diff_pick({ base = "origin" }) end, desc = "Git Diff (origin)" },
-        { "<leader>ga", function() git_diff_pick({ staged = true }) end, desc = "Git Diff Staged (hunks)" },
+        -- { "<leader>ga", function() git_diff_pick({ staged = true }) end, desc = "Git Diff Staged (hunks)" },
         -- {
         --   "<leader>gA",
         --   function() git_diff_pick({ staged = true, cmd_args = { "--", vim.api.nvim_buf_get_name(0) } }) end,
         --   desc = "Git Diff Staged Buffer (hunks)",
         -- },
-        -- { "<leader>ga", function() U.git.diff_term({ cmd_args = { "--staged" } }) end, desc = "Git Diff Staged" },
+        { "<leader>ga", function() U.git.diff_term({ staged = true }) end, desc = "Git Diff Staged" },
         -- {
         --   "<leader>gA",
         --   function()
         --     U.git.diff_term({
+        --       staged = true,
         --       args = { "-c", "delta.file-style=omit" },
-        --       cmd_args = { "--staged", "--", vim.api.nvim_buf_get_name(0) },
+        --       cmd_args = { "--", vim.api.nvim_buf_get_name(0) },
         --     })
         --   end,
         --   desc = "Git Diff Staged Buffer",
         -- },
-        {
-          "<leader>gA",
-          function() U.git.diff_term({ cmd_args = { "--staged", "--ignore-all-space", "--ignore-blank-lines", "--ignore-cr-at-eol" } }) end,
-          desc = "Git Diff Staged (ignore space)",
-        },
+        { "<leader>gA", function() U.git.diff_term({ staged = true, ignore_space = true }) end, desc = "Git Diff Staged (ignore space)" },
         { "<leader>gs", function() Snacks.picker.git_status({ cwd = LazyVim.root.git() }) end, desc = "Git Status" },
         { "<leader>gS", function() Snacks.picker.git_stash({ cwd = LazyVim.root.git() }) end, desc = "Git Stash" },
+        { "<leader>gb", function() Snacks.picker.git_branches({ cwd = LazyVim.root.git() }) end, desc = "Git Branches" },
+        { "<leader>gB", function() Snacks.picker.git_log_line() end, desc = "Git Blame Line" },
       })
     end,
     ---@module "snacks"
@@ -163,8 +157,8 @@ return {
               -- TODO:
               -- - unstage (multi) hunks with `git apply --cached --reverse`
               -- - multi hunks mixed staged/unstaged
-              -- - <tab> for multi, what for unstaged?
-              apply_hunk = function(picker)
+              -- - <tab> for multi, what for unstaged? <space>?
+              git_apply = function(picker)
                 local items = picker:selected({ fallback = true })
                 if #items == 0 then
                   return
@@ -182,37 +176,37 @@ return {
                 end, { cwd = items[1].cwd, input = table.concat(diffs, "\n") })
               end,
             },
-            win = {
-              input = {
-                keys = {
-                  ["gh"] = "apply_hunk",
-                },
-              },
-              list = {
-                keys = {
-                  ["gh"] = "apply_hunk",
-                },
-              },
-            },
+            -- win = {
+            --   input = {
+            --     keys = {
+            --       ["gh"] = "git_apply",
+            --     },
+            --   },
+            --   list = {
+            --     keys = {
+            --       ["gh"] = "git_apply",
+            --     },
+            --   },
+            -- },
           },
           git_status = {
             layout = {
               preset = "ivy_split",
             },
             on_show = U.explorer.close,
-            win = {
-              input = {
-                keys = {
-                  ["<Tab>"] = { "select_and_next", mode = { "i", "n" } },
-                  ["gh"] = "git_stage",
-                },
-              },
-              list = {
-                keys = {
-                  ["gh"] = "git_stage",
-                },
-              },
-            },
+            -- win = {
+            --   input = {
+            --     keys = {
+            --       -- ["<Tab>"] = { "select_and_next", mode = { "i", "n" } },
+            --       ["gh"] = "git_stage",
+            --     },
+            --   },
+            --   list = {
+            --     keys = {
+            --       ["gh"] = "git_stage",
+            --     },
+            --   },
+            -- },
           },
           git_log = { layout = { preset = "ivy_split" }, on_show = U.explorer.close },
           git_log_file = { layout = { preset = "ivy_split" }, on_show = U.explorer.close },
@@ -380,7 +374,8 @@ return {
       local function commit(args)
         return function()
           U.git.diff_term({
-            cmd_args = { "--staged", "--ignore-all-space", "--ignore-blank-lines", "--ignore-cr-at-eol" },
+            staged = true,
+            -- ignore_space = true,
             win = {
               on_close = vim.schedule_wrap(function()
                 vim.cmd("Git commit" .. (args and " " .. table.concat(args, " ") or ""))
