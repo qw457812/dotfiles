@@ -270,6 +270,10 @@ return {
           vim.g.user_suppress_lsp_progress = nil
         end,
         actions = {
+          -- ref: https://github.com/folke/snacks.nvim/blob/df018edfdbc5df832b46b9bdc9eafb1d69ea460b/lua/snacks/picker/core/list.lua#L428-L430
+          unselect_all = function(picker)
+            picker.list:set_selected({})
+          end,
           toggle_lua = function(p)
             local opts = p.opts --[[@as snacks.picker.grep.Config]]
             opts.ft = not opts.ft and "lua" or nil
@@ -380,9 +384,10 @@ return {
                 function(self)
                   U.keymap.clear_ui_esc({
                     close = function()
+                      local picker = assert(Snacks.picker.get()[1])
                       -- use `cancel` instead of `close` to go back to last window
                       -- for example: prevent neo-tree from gaining focus when closing the snacks picker while in a jdtls class buffer
-                      self:execute("cancel")
+                      self:execute(#picker.list.selected > 0 and "unselect_all" or "cancel")
                     end,
                   })
                 end,

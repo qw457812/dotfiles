@@ -55,10 +55,20 @@ return {
       ---@return snacks.Picker
       local function git_diff_pick(opts)
         ---@type snacks.picker.git.diff.Config
-        opts = vim.tbl_deep_extend("force", { cwd = LazyVim.root.git(), cmd_args = {} }, opts or {})
+        opts = vim.tbl_deep_extend("force", {
+          cwd = LazyVim.root.git(),
+          cmd_args = {},
+          previewers = {
+            diff = {
+              -- overwrite `opts.picker.previewers.diff.cmd` to add `--line-numbers`
+              cmd = { "delta", "--file-style", "omit", "--hunk-header-style", "omit", "--line-numbers" },
+            },
+          },
+        } --[[@as snacks.picker.git.diff.Config]], opts or {})
         if
-          vim.list_contains(opts.cmd_args, "--staged")
+          opts.staged
           or vim.list_contains(opts.cmd_args, "--cached")
+          or vim.list_contains(opts.cmd_args, "--staged")
           or opts.base
         then
           opts = vim.tbl_deep_extend("force", {
@@ -91,7 +101,7 @@ return {
       ---@return snacks.terminal
       local function git_diff_term(opts)
         opts = vim.tbl_deep_extend("force", { args = {}, cmd_args = {} }, opts or {})
-        local cmd = vim.list_extend({ "git", "-c", "delta.paging=never" }, opts.args)
+        local cmd = vim.list_extend({ "git", "-c", "delta.paging=never", "-c", "delta.line-numbers=true" }, opts.args)
         table.insert(cmd, "diff")
         vim.list_extend(cmd, opts.cmd_args)
         return Snacks.terminal(cmd, {
@@ -132,7 +142,7 @@ return {
         { "<leader>gd", function() git_diff_pick() end, desc = "Git Diff (hunks)" },
         -- {
         --   "<leader>gD",
-        --   function() Snacks.picker.git_diff({ cwd = LazyVim.root.git(), cmd_args = { "--", vim.api.nvim_buf_get_name(0) } }) end,
+        --   function() git_diff_pick({ cwd = LazyVim.root.git(), cmd_args = { "--", vim.api.nvim_buf_get_name(0) } }) end,
         --   desc = "Git Diff Buffer (hunks)",
         -- },
         { "<leader>gD", function() git_diff_pick({ base = "origin" }) end, desc = "Git Diff (origin)" },
@@ -209,6 +219,13 @@ return {
             },
           },
           git_diff = {
+            layout = {
+              preset = "ivy_split",
+            },
+            on_show = function()
+              -- in favor of ivy_split layout
+              U.explorer.close()
+            end,
             actions = {
               -- https://github.com/chrisgrieser/.config/blob/fd27c6f94b748f436fa6251006fcd5641f9eeac6/nvim/lua/plugin-specs/snacks/snacks-picker.lua#L200-L215
               -- https://github.com/nvim-mini/mini.diff/blob/98fc732d5835eb7b6539f43534399b07b17f4e28/lua/mini/diff.lua#L1818-L1831

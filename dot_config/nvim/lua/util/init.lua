@@ -184,6 +184,7 @@ end
 --- https://github.com/ibhagwan/fzf-lua/blob/f39de2d77755e90a7a80989b007f0bf2ca13b0dd/lua/fzf-lua/utils.lua#L770
 --- https://github.com/MagicDuck/grug-far.nvim/blob/308e357be687197605cf19222f843fbb331f50f5/lua/grug-far.lua#L448
 --- https://github.com/olimorris/codecompanion.nvim/blob/84a8e8962e9ae20b8357d813dee1ea44a8079605/lua/codecompanion/utils/context.lua#L34-L93
+--- https://github.com/folke/snacks.nvim/blob/df018edfdbc5df832b46b9bdc9eafb1d69ea460b/lua/snacks/picker/core/list.lua#L383-L384
 ---@param opts? GetVisualSelectionOpts
 ---@return string[]?
 function M.get_visual_selection_lines(opts)

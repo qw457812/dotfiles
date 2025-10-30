@@ -256,6 +256,20 @@ return {
         },
         once = true,
         callback = function(ev)
+          vim.diagnostic.enable(false, { bufnr = ev.buf })
+
+          -- HACK: remove annoying "[O" and "[I" for claude code prompts, not sure why they are there
+          if ev.match:match("claude%-prompt") then
+            vim.api.nvim_buf_call(
+              ev.buf,
+              vim.schedule_wrap(function()
+                vim.cmd([[%s/\[O//ge]])
+                vim.cmd([[%s/\[I//ge]])
+                vim.cmd("silent! noautocmd lockmarks write")
+              end)
+            )
+          end
+
           vim.keymap.set("n", "<Esc>", function()
             if not U.keymap.clear_ui_esc() then
               vim.cmd([[quitall]])
