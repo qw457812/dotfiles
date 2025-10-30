@@ -12,7 +12,7 @@ local M = setmetatable({}, {
 ---@param rhs string|function
 ---@param opts? snacks.keymap.set.Opts
 function M.map(mode, lhs, rhs, opts)
-  opts = opts or {}
+  -- opts = opts or {}
   -- -- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/utils.lua#L17
   -- opts.unique = opts.unique ~= false
 
@@ -41,7 +41,6 @@ end
 ---@param lhs string|string[]
 ---@param opts? snacks.keymap.del.Opts
 function M.del(modes, lhs, opts)
-  opts = opts or {}
   lhs = type(lhs) == "string" and { lhs } or lhs
   ---@cast lhs string[]
 

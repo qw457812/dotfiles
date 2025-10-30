@@ -88,9 +88,11 @@ return {
                   ["<Esc>"] = {
                     "<Esc>",
                     function(self)
-                      if not U.keymap.clear_ui_esc({ close = false }) then
-                        self:execute("close_or_unfocus")
+                      if U.keymap.clear_ui_esc({ close = false }) then
+                        return
                       end
+                      local picker = assert(Snacks.picker.get({ source = "explorer" })[1])
+                      self:execute(#picker.list.selected > 0 and "unselect_all" or "close_or_unfocus")
                     end,
                     desc = "Clear UI or Close or Unfocus",
                   },
@@ -104,9 +106,15 @@ return {
                   ["<Esc>"] = {
                     "<Esc>",
                     function(self)
-                      if not U.keymap.clear_ui_esc({ close = false }) then
-                        self:execute(self:line() ~= "" and "reset_input" or "focus_list")
+                      if U.keymap.clear_ui_esc({ close = false }) then
+                        return
                       end
+                      local picker = assert(Snacks.picker.get({ source = "explorer" })[1])
+                      self:execute(
+                        #picker.list.selected > 0 and "unselect_all"
+                          or self:line() ~= "" and "reset_input"
+                          or "focus_list"
+                      )
                     end,
                     desc = "Clear UI or Reset Input or Focus List",
                   },

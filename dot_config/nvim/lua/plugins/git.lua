@@ -58,12 +58,6 @@ return {
         opts = vim.tbl_deep_extend("force", {
           cwd = LazyVim.root.git(),
           cmd_args = {},
-          previewers = {
-            diff = {
-              -- overwrite `opts.picker.previewers.diff.cmd` to add `--line-numbers`
-              cmd = { "delta", "--file-style", "omit", "--hunk-header-style", "omit", "--line-numbers" },
-            },
-          },
         } --[[@as snacks.picker.git.diff.Config]], opts or {})
         if
           opts.staged
@@ -78,6 +72,7 @@ return {
             },
           }, opts)
         end
+
         local path = vim.api.nvim_buf_get_name(0)
         local picker = Snacks.picker.git_diff(opts)
         -- focus the hunk at the cursor file
@@ -101,15 +96,19 @@ return {
       ---@return snacks.terminal
       local function git_diff_term(opts)
         opts = vim.tbl_deep_extend("force", { args = {}, cmd_args = {} }, opts or {})
-        local cmd = vim.list_extend({ "git", "-c", "delta.paging=never", "-c", "delta.line-numbers=true" }, opts.args)
+
+        local cmd = { "git", "-c", "delta.paging=never" }
+        vim.list_extend(cmd, vim.g.user_is_termux and {} or { "-c", "delta.line-numbers=true" })
+        vim.list_extend(cmd, opts.args)
         table.insert(cmd, "diff")
         vim.list_extend(cmd, opts.cmd_args)
+
         return Snacks.terminal(cmd, {
           cwd = LazyVim.root.git(),
           interactive = false, -- normal mode in favor of copying
           win = {
-            height = vim.g.user_is_termux and U.snacks.win.fullscreen_height or nil,
-            width = vim.g.user_is_termux and 0 or nil,
+            height = U.snacks.win.fullscreen_height,
+            width = 0,
             -- fully close on hide to make it one-time
             on_close = function(self)
               self:close()
@@ -169,20 +168,7 @@ return {
           desc = "Git Diff Staged (ignore space)",
         },
         { "<leader>gs", function() Snacks.picker.git_status({ cwd = LazyVim.root.git() }) end, desc = "Git Status" },
-        {
-          "<leader>gS",
-          function()
-            Snacks.picker.git_stash({
-              cwd = LazyVim.root.git(),
-              previewers = {
-                git = {
-                  args = {}, -- overwrite `opts.picker.previewers.git.args`
-                },
-              },
-            })
-          end,
-          desc = "Git Stash",
-        },
+        { "<leader>gS", function() Snacks.picker.git_stash({ cwd = LazyVim.root.git() }) end, desc = "Git Stash" },
       })
     end,
     ---@module "snacks"
@@ -192,40 +178,28 @@ return {
         previewers = {
           diff = {
             builtin = false,
-            cmd = { "delta", "--file-style", "omit", "--hunk-header-style", "omit" },
+            cmd = vim.list_extend(
+              { "delta", "--file-style", "omit", "--hunk-header-style", "omit" },
+              vim.g.user_is_termux and {} or { "--line-numbers" }
+            ),
           },
           git = {
             builtin = false,
-            args = { "-c", "delta.file-style=omit", "-c", "delta.hunk-header-style=omit" },
+            args = vim.list_extend(
+              { "-c", "delta.file-style=omit", "-c", "delta.hunk-header-style=omit" },
+              vim.g.user_is_termux and {} or { "-c", "delta.line-numbers=true" }
+            ),
           },
         },
         sources = {
           git_branches = {
             all = true,
           },
-          git_status = {
-            win = {
-              input = {
-                keys = {
-                  ["<Tab>"] = { "select_and_next", mode = { "i", "n" } },
-                  ["gh"] = "git_stage",
-                },
-              },
-              list = {
-                keys = {
-                  ["gh"] = "git_stage",
-                },
-              },
-            },
-          },
           git_diff = {
             layout = {
               preset = "ivy_split",
             },
-            on_show = function()
-              -- in favor of ivy_split layout
-              U.explorer.close()
-            end,
+            on_show = U.explorer.close, -- in favor of ivy_split layout
             actions = {
               -- https://github.com/chrisgrieser/.config/blob/fd27c6f94b748f436fa6251006fcd5641f9eeac6/nvim/lua/plugin-specs/snacks/snacks-picker.lua#L200-L215
               -- https://github.com/nvim-mini/mini.diff/blob/98fc732d5835eb7b6539f43534399b07b17f4e28/lua/mini/diff.lua#L1818-L1831
@@ -280,6 +254,40 @@ return {
               },
             },
           },
+          git_status = {
+            layout = {
+              preset = "ivy_split",
+            },
+            on_show = U.explorer.close,
+            win = {
+              input = {
+                keys = {
+                  ["<Tab>"] = { "select_and_next", mode = { "i", "n" } },
+                  ["gh"] = "git_stage",
+                },
+              },
+              list = {
+                keys = {
+                  ["gh"] = "git_stage",
+                },
+              },
+            },
+          },
+          git_log = { layout = { preset = "ivy_split" }, on_show = U.explorer.close },
+          git_log_file = { layout = { preset = "ivy_split" }, on_show = U.explorer.close },
+          git_log_line = { layout = { preset = "ivy_split" }, on_show = U.explorer.close },
+          git_stash = {
+            layout = {
+              preset = "ivy_split",
+            },
+            on_show = U.explorer.close,
+            previewers = {
+              git = {
+                args = {}, -- overwrite `opts.picker.previewers.git.args`
+              },
+            },
+          },
+          undo = { layout = { preset = "ivy_split" }, on_show = U.explorer.close },
         },
       },
     },

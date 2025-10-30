@@ -382,14 +382,13 @@ return {
               ["<Esc>"] = {
                 "<Esc>",
                 function(self)
-                  U.keymap.clear_ui_esc({
-                    close = function()
-                      local picker = assert(Snacks.picker.get()[1])
-                      -- use `cancel` instead of `close` to go back to last window
-                      -- for example: prevent neo-tree from gaining focus when closing the snacks picker while in a jdtls class buffer
-                      self:execute(#picker.list.selected > 0 and "unselect_all" or "cancel")
-                    end,
-                  })
+                  if U.keymap.clear_ui_esc({ close = false }) then
+                    return
+                  end
+                  local picker = assert(Snacks.picker.get()[1])
+                  -- use `cancel` instead of `close` to go back to last window
+                  -- for example: prevent neo-tree from gaining focus when closing the snacks picker while in a jdtls class buffer
+                  self:execute(#picker.list.selected > 0 and "unselect_all" or "cancel")
                 end,
                 desc = "Clear UI or Close",
               },
