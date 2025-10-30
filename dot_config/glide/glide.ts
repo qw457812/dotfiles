@@ -20,6 +20,7 @@
 
 // https://github.com/RobertCraigie/dotfiles/blob/ecfd6f66e8a775c80849f7889f297ef99cea7997/glide/glide.ts
 
+// Search engines
 // https://github.com/mozilla-firefox/firefox/blob/e2e91539047e030b956e01fd5e8c28c074ae3f88/services/settings/dumps/main/search-config-v2.json
 const search_engines = {
   g: "https://www.google.com/search?q={}",
@@ -32,9 +33,28 @@ const search_engines = {
 } as const;
 const default_search_engine = search_engines.g;
 
+// Env
 if (glide.ctx.os === "macosx") {
   glide.env.set("PATH", `/opt/homebrew/bin:${glide.env.get("PATH")}`);
 }
+
+// // TODO: Styles
+// glide.styles.add(css`
+//   #TabsToolbar {
+//     visibility: collapse !important;
+//   }
+// `);
+
+// // TODO: Preferences
+// glide.prefs.set("toolkit.legacyUserProfileCustomizations.stylesheets", true);
+// glide.prefs.set("devtools.debugger.prompt-connection", false);
+// glide.prefs.set(
+//   "media.videocontrols.picture-in-picture.audio-toggle.enabled",
+//   true,
+// );
+// // https://github.com/glide-browser/glide/discussions/95#discussioncomment-14814317
+// glide.prefs.set("privacy.trackingprotection.enabled", true);
+// glide.prefs.set("privacy.bounceTrackingProtection.mode", 1);
 
 // Options
 glide.o.hint_size = "12px";
@@ -48,19 +68,19 @@ glide.keymaps.set(
   "normal",
   "<Esc>",
   when_editing(
-    async () => {
+    async (props) => {
       // for case: `<D-f>` -> `<Esc>` -> `<Esc>` (close find bar)
       await glide.keys.send("<Esc>", { skip_mappings: true });
 
       // defocus the editable element
-      await focus_page();
+      await focus_page(props);
     },
-    async () => {
+    async (props) => {
       await glide.keys.send("<Esc>", { skip_mappings: true });
 
       // // for case: `<D-f>` -> `<C-w>` -> `<Esc>` at https://github.com/glide-browser/glide/blob/e6a590d53c7d6101792fedfd9894491cda46dbde/src/glide/browser/actors/GlideHandlerChild.sys.mts
       // if (await glide.ctx.is_editing()) {
-      //   await focus_page();
+      //   await focus_page(props);
       // }
 
       // additional actions we want to perform on esc
@@ -396,7 +416,10 @@ glide.keymaps.set("command", "<c-d>", "keys <Del>");
 // });
 
 glide.autocmds.create("UrlEnter", {}, async ({ url }) => {
-  if (url !== "about:newtab") {
+  if (
+    url !== "about:newtab" &&
+    !url.startsWith("https://grafana.com/grafana/dashboards/")
+  ) {
     // it's annoying to be in insert mode when switching tabs
     await glide.excmds.execute("mode_change normal");
   }
@@ -545,13 +568,28 @@ function when_editing(
   };
 }
 
-async function focus_page() {
-  // HACK: defocus the editable element by focusing the address bar and then refocusing the page
-  await glide.keys.send("<F6>", { skip_mappings: true });
-  await sleep(100);
-  // check insert mode for address bar
-  if (glide.ctx.mode === "insert") {
+/**
+ * defocus the editable element
+ */
+async function focus_page(props: glide.KeymapCallbackProps) {
+  // ref: https://github.com/glide-browser/glide/discussions/93#discussioncomment-14805495
+  await glide.content.execute(
+    async () => {
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+    },
+    { tab_id: props.tab_id },
+  );
+
+  // HACK: fall back to focus the address bar and then refocusing the page
+  if (await glide.ctx.is_editing()) {
     await glide.keys.send("<F6>", { skip_mappings: true });
+    await sleep(100);
+    // check insert mode for address bar
+    if (glide.ctx.mode === "insert") {
+      await glide.keys.send("<F6>", { skip_mappings: true });
+    }
   }
 }
 
