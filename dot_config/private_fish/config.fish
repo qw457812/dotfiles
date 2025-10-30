@@ -139,6 +139,7 @@ abbr gc! 'git commit --verbose --amend'
 abbr gcb "git checkout -b"
 abbr gcd 'git checkout (git_develop_branch)'
 abbr gcf "git config --list | vimpager"
+abbr gcfu "git commit --fixup"
 abbr gcl "git clone --recurse-submodules"
 abbr gcl1 "git clone --depth 1"
 abbr gcm 'git checkout (git_main_branch)'
@@ -165,6 +166,7 @@ abbr grb 'git rebase'
 abbr grba 'git rebase --abort'
 abbr grbc 'git rebase --continue'
 abbr grbd 'git rebase (git_develop_branch)'
+abbr grbi 'git rebase --interactive'
 abbr grbm 'git rebase (git_main_branch)'
 abbr grbo 'git rebase --onto'
 abbr grbom 'git rebase origin/(git_main_branch)'

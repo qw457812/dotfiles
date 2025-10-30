@@ -3,8 +3,8 @@ return {
   {
     "LazyVim/LazyVim",
     opts = function()
-      local commit_ft = { "gitcommit", "svn" }
-      local commit_filename = { "COMMIT_EDITMSG", "svn-commit.tmp" }
+      local commit_ft = { "gitcommit", "gitrebase", "svn" }
+      local commit_filename = { "COMMIT_EDITMSG", "git-rebase-todo", "svn-commit.tmp" }
       vim.api.nvim_create_autocmd("FileType", {
         pattern = commit_ft,
         callback = function(ev)
