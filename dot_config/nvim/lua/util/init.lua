@@ -1,6 +1,7 @@
 ---@class util
 ---@field color util.color
 ---@field explorer util.explorer
+---@field git util.git
 ---@field java util.java
 ---@field keymap util.keymap
 ---@field lsp util.lsp

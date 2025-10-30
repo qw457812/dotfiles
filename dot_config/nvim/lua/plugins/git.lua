@@ -90,70 +90,6 @@ return {
         return picker
       end
 
-      ---@param opts? { args?: string[], cmd_args?: string[] }
-      ---@return snacks.terminal?
-      local function git_diff_term(opts)
-        opts = vim.tbl_deep_extend("force", { args = {}, cmd_args = {} }, opts or {})
-
-        local git_root = Snacks.git.get_root()
-        if not git_root then
-          Snacks.notify.error("Not a git repo")
-          return
-        end
-
-        local cmd = { "git", "-c", "delta.paging=never" }
-        vim.list_extend(cmd, vim.g.user_is_termux and {} or { "-c", "delta.line-numbers=true" })
-        vim.list_extend(cmd, opts.args)
-        table.insert(cmd, "diff")
-        vim.list_extend(cmd, opts.cmd_args)
-
-        local terminal = Snacks.terminal(cmd, {
-          cwd = git_root,
-          interactive = false, -- normal mode in favor of copying
-          win = {
-            height = U.snacks.win.fullscreen_height,
-            width = 0,
-            -- fully close on hide to make it one-time
-            on_close = function(self)
-              self:close()
-            end,
-            on_win = function(self)
-              if not self:win_valid() then
-                return
-              end
-              vim.wo[self.win].scrolloff = math.floor((vim.api.nvim_win_get_height(self.win) - 1) / 2)
-              vim.api.nvim_win_call(
-                self.win,
-                vim.schedule_wrap(function()
-                  vim.cmd.normal({ "M", bang = true })
-                end)
-              )
-            end,
-            b = {
-              user_lualine_filename = table
-                .concat(vim.list_extend({ "git", "diff" }, opts.cmd_args), " ")
-                :gsub(" %-%- .*$", ""),
-            },
-          },
-        })
-
-        terminal:on("TermClose", function()
-          if type(vim.v.event) == "table" and vim.v.event.status ~= 0 then
-            Snacks.notify.error(("Command failed:\n- cmd: `%s`"):format(table.concat(cmd, " ")))
-            terminal:close()
-          else
-            vim.defer_fn(function()
-              if terminal:line(2) == "[Process exited 0]" then
-                Snacks.notify.warn(("No changes found:\n- cmd: `%s`"):format(table.concat(cmd, " ")))
-                terminal:close()
-              end
-            end, 20)
-          end
-        end, { buf = true })
-
-        return terminal
-      end
-
       -- stylua: ignore
       return vim.list_extend(keys, {
         { "<leader>gb", function() Snacks.picker.git_branches({ cwd = LazyVim.root.git() }) end, desc = "Git Branches" },
@@ -171,11 +107,11 @@ return {
         --   function() git_diff_pick({ staged = true, cmd_args = { "--", vim.api.nvim_buf_get_name(0) } }) end,
         --   desc = "Git Diff Staged Buffer (hunks)",
         -- },
-        -- { "<leader>ga", function() git_diff_term({ cmd_args = { "--staged" } }) end, desc = "Git Diff Staged" },
+        -- { "<leader>ga", function() U.git.diff_term({ cmd_args = { "--staged" } }) end, desc = "Git Diff Staged" },
         -- {
         --   "<leader>gA",
         --   function()
-        --     git_diff_term({
+        --     U.git.diff_term({
         --       args = { "-c", "delta.file-style=omit" },
         --       cmd_args = { "--staged", "--", vim.api.nvim_buf_get_name(0) },
         --     })
@@ -184,7 +120,7 @@ return {
         -- },
         {
           "<leader>gA",
-          function() git_diff_term({ cmd_args = { "--staged", "--ignore-all-space", "--ignore-blank-lines", "--ignore-cr-at-eol" } }) end,
+          function() U.git.diff_term({ cmd_args = { "--staged", "--ignore-all-space", "--ignore-blank-lines", "--ignore-cr-at-eol" } }) end,
           desc = "Git Diff Staged (ignore space)",
         },
         { "<leader>gs", function() Snacks.picker.git_status({ cwd = LazyVim.root.git() }) end, desc = "Git Status" },
@@ -439,13 +375,29 @@ return {
 
   {
     "nvim-mini/mini-git",
-    keys = {
-      { "<leader>gc", "<Cmd>Git commit<CR>", desc = "Commit" },
-      { "<leader>gC", "<Cmd>Git commit --amend<CR>", desc = "Commit Amend" },
-      -- { "<leader>ga", "<Cmd>Git diff --cached<CR>", desc = "Diff Staged" },
-      -- { "<leader>gA", "<Cmd>Git diff --cached -- %<CR>", desc = "Diff Staged Buffer" },
-      { "<leader>gP", "<Cmd>Git push<CR>", desc = "Push" },
-    },
+    keys = function()
+      ---@param args? string[]
+      local function commit(args)
+        return function()
+          U.git.diff_term({
+            cmd_args = { "--staged", "--ignore-all-space", "--ignore-blank-lines", "--ignore-cr-at-eol" },
+            win = {
+              on_close = vim.schedule_wrap(function()
+                vim.cmd("Git commit" .. (args and " " .. table.concat(args, " ") or ""))
+              end),
+            },
+          })
+        end
+      end
+
+      return {
+        { "<leader>gc", commit(), desc = "Commit" },
+        { "<leader>gC", commit({ "--amend" }), desc = "Commit Amend" },
+        -- { "<leader>ga", "<Cmd>Git diff --cached<CR>", desc = "Diff Staged" },
+        -- { "<leader>gA", "<Cmd>Git diff --cached -- %<CR>", desc = "Diff Staged Buffer" },
+        { "<leader>gP", "<Cmd>Git push<CR>", desc = "Push" },
+      }
+    end,
     opts = function()
       vim.api.nvim_create_autocmd("User", {
         pattern = "MiniGitCommandSplit",
