@@ -62,14 +62,14 @@ return {
           cmd_args = {},
         } --[[@as snacks.picker.git.diff.Config]], opts or {})
 
-        -- if opts.staged ~= false or opts.base then
-        --   opts = vim.tbl_deep_extend("force", {
-        --     win = {
-        --       input = { keys = { ["gh"] = false } },
-        --       list = { keys = { ["gh"] = false } },
-        --     },
-        --   }, opts)
-        -- end
+        if opts.staged == nil or opts.base then
+          opts = vim.tbl_deep_extend("force", {
+            win = {
+              input = { keys = { ["<Space>"] = false } },
+              list = { keys = { ["<Space>"] = false } },
+            },
+          }, opts)
+        end
 
         local path = vim.api.nvim_buf_get_name(0)
         local picker = Snacks.picker.git_diff(opts)
@@ -92,17 +92,17 @@ return {
 
       -- stylua: ignore
       return vim.list_extend(keys, {
-        -- { "<leader>gd", function() git_diff_pick({ staged = false }) end, desc = "Git Diff (hunks)" },
-        { "<leader>gd", function() git_diff_pick() end, desc = "Git Diff HEAD (hunks)" },
+        -- { "<leader>gd", function() git_diff_pick() end, desc = "Git Diff HEAD (hunks)" },
+        { "<leader>gd", function() git_diff_pick({ staged = false }) end, desc = "Git Diff (hunks)" },
         -- { "<leader>gD", function() git_diff_pick({ staged = false, cmd_args = { "--", vim.api.nvim_buf_get_name(0) } }) end, desc = "Git Diff Buffer (hunks)" },
         { "<leader>gD", function() git_diff_pick({ base = "origin" }) end, desc = "Git Diff (origin)" },
-        -- { "<leader>ga", function() git_diff_pick({ staged = true }) end, desc = "Git Diff Staged (hunks)" },
+        { "<leader>ga", function() git_diff_pick({ staged = true }) end, desc = "Git Diff Staged (hunks)" },
         -- {
         --   "<leader>gA",
         --   function() git_diff_pick({ staged = true, cmd_args = { "--", vim.api.nvim_buf_get_name(0) } }) end,
         --   desc = "Git Diff Staged Buffer (hunks)",
         -- },
-        { "<leader>ga", function() U.git.diff_term({ staged = true }) end, desc = "Git Diff Staged" },
+        -- { "<leader>ga", function() U.git.diff_term({ staged = true }) end, desc = "Git Diff Staged" },
         -- {
         --   "<leader>gA",
         --   function()
@@ -154,18 +154,17 @@ return {
               -- https://github.com/folke/snacks.nvim/blob/1fb3f4de49962a80cb88a9b143bc165042c72165/lua/snacks/picker/actions.lua#L343-L363
               -- https://github.com/chrisgrieser/.config/blob/fd27c6f94b748f436fa6251006fcd5641f9eeac6/nvim/lua/plugin-specs/snacks/snacks-picker.lua#L200-L215
               -- https://github.com/nvim-mini/mini.diff/blob/98fc732d5835eb7b6539f43534399b07b17f4e28/lua/mini/diff.lua#L1818-L1831
-              -- TODO:
-              -- - unstage (multi) hunks with `git apply --cached --reverse`
-              -- - multi hunks mixed staged/unstaged
-              -- - <tab> for multi, what for unstaged? <space>?
               git_apply = function(picker)
                 local items = picker:selected({ fallback = true })
                 if #items == 0 then
                   return
                 end
 
-                local cmd = { "git", "apply", "--cached" }
+                local is_staged = items[1].staged
+                local cmd = { "git", "apply", "--cached", is_staged and "--reverse" or nil }
                 local diffs = vim.tbl_map(function(item)
+                  -- TODO: mixed staged/unstaged hunks
+                  assert(item.staged == is_staged, "Cannot apply mixed staged/unstaged hunks")
                   return item.diff
                 end, items)
                 -- alternative: vim.system()
@@ -176,37 +175,38 @@ return {
                 end, { cwd = items[1].cwd, input = table.concat(diffs, "\n") })
               end,
             },
-            -- win = {
-            --   input = {
-            --     keys = {
-            --       ["gh"] = "git_apply",
-            --     },
-            --   },
-            --   list = {
-            --     keys = {
-            --       ["gh"] = "git_apply",
-            --     },
-            --   },
-            -- },
+            win = {
+              input = {
+                keys = {
+                  ["<Tab>"] = { "select_and_next", mode = { "i", "n" } },
+                  ["<Space>"] = "git_apply", -- gh
+                },
+              },
+              list = {
+                keys = {
+                  ["<Space>"] = "git_apply",
+                },
+              },
+            },
           },
           git_status = {
             layout = {
               preset = "ivy_split",
             },
             on_show = U.explorer.close,
-            -- win = {
-            --   input = {
-            --     keys = {
-            --       -- ["<Tab>"] = { "select_and_next", mode = { "i", "n" } },
-            --       ["gh"] = "git_stage",
-            --     },
-            --   },
-            --   list = {
-            --     keys = {
-            --       ["gh"] = "git_stage",
-            --     },
-            --   },
-            -- },
+            win = {
+              input = {
+                keys = {
+                  ["<Tab>"] = { "select_and_next", mode = { "i", "n" } },
+                  ["<Space>"] = "git_apply",
+                },
+              },
+              list = {
+                keys = {
+                  ["<Space>"] = "git_apply",
+                },
+              },
+            },
           },
           git_log = { layout = { preset = "ivy_split" }, on_show = U.explorer.close },
           git_log_file = { layout = { preset = "ivy_split" }, on_show = U.explorer.close },

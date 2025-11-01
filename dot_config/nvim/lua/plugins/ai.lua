@@ -138,15 +138,16 @@ return {
               blur_t = false, -- claude code uses <c-o> for its own functionality
             },
           },
+          codex = { cmd = { "codex" } },
           opencode = {
             env = {
               NVIM_FLATTEN_NEST = "1",
             },
           },
           -- HACK: disable some installed tools
-          copilot = tonumber(os.date("%d")) < 20 and { cmd = { "hack_to_disable_copilot" } } or {},
-          aider = { cmd = { "hack_to_disable_aider" } },
+          copilot = { cmd = tonumber(os.date("%d")) < 20 and { "hack_to_disable_copilot" } or { "copilot" } },
           gemini = { cmd = { "hack_to_disable_gemini" } },
+          aider = { cmd = { "hack_to_disable_aider" } },
         },
         ---@type table<string, sidekick.Prompt|string|fun(ctx:sidekick.context.ctx):(string?)>
         prompts = {
@@ -258,7 +259,7 @@ return {
         group = vim.api.nvim_create_augroup("ai_cli_prompt", { clear = true }),
         pattern = {
           tmpdir .. "/claude-prompt-*.md", -- claude code
-          tmpdir .. "/msg_*.md", -- https://github.com/sst/opencode/blob/5885b691b9a9ccee08a798fdbbfb7edd7a2d7ee7/packages/tui/internal/tui/tui.go#L1165
+          tmpdir .. "/[0-9]*.md", -- https://github.com/sst/opencode/blob/041353f4ff992e7be4455eaf6e71f492a97a123f/packages/opencode/src/cli/cmd/tui/util/editor.ts#L12
         },
         once = true,
         callback = function(ev)

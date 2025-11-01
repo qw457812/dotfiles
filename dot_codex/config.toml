@@ -12,8 +12,8 @@ base_url = "https://openrouter.ai/api/v1"
 # wire_api = "responses"
 env_key = "CODEX_OPENROUTER_API_KEY"
 
-[tools]
-web_search = true
+[features]
+web_search_request = true
 
 [mcp_servers.context7]
 args = ["-y", "@upstash/context7-mcp"]

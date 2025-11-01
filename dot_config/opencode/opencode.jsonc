@@ -1,12 +1,16 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "theme": "system",
+  "theme": "nord",
   "share": "manual",
   "autoupdate": false,
+  // https://opencode.ai/docs/zen/#pricing
+  // "model": "opencode/grok-code",
   "model": "anthropic/claude-sonnet-4-5",
+  // "small_model": "opencode/grok-code",
   "small_model": "anthropic/claude-haiku-4-5",
   "agent": {
     "plan": {
+      // "model": "opencode/grok-code"
       "model": "anthropic/claude-sonnet-4-5"
     }
   },

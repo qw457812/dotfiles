@@ -31,14 +31,23 @@ return {
   --   end,
   -- },
 
-  -- {
-  --   "akinsho/bufferline.nvim",
-  --   optional = true,
-  --   dependencies = {
-  --     "tiagovla/scope.nvim", -- backdround/tabscope.nvim
-  --     opts = {},
-  --   },
-  -- },
+  {
+    "alex-popov-tech/store.nvim",
+    enabled = not vim.g.user_is_termux, -- error on termux
+    cmd = "Store",
+    keys = {
+      { "<leader>lh", "<cmd>Store<cr>", desc = "Plugin Hub" },
+    },
+    ---@module "store"
+    ---@type UserConfig
+    opts = {
+      width = 0.95,
+      height = 0.9,
+      keybindings = {
+        hover = { "gk" },
+      },
+    },
+  },
 
   -- for java projects using JDK version older than 21
   {
