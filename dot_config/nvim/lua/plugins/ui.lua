@@ -239,6 +239,8 @@ return {
         opts.options.section_separators = { left = "", right = "" }
         opts.sections.lualine_a[1].separator = { left = "" }
         opts.sections.lualine_z[#opts.sections.lualine_z].separator = { right = "" }
+      elseif vim.g.user_is_termux then
+        opts.options.section_separators = { left = "", right = "" }
       else
         opts.options.section_separators = { left = "", right = "" }
       end

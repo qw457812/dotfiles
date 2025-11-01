@@ -153,5 +153,15 @@ require("lazy.view.diff").handlers.terminal_git_ignore_space = function(plugin, 
     cmd[#cmd + 1] = diff.from
     cmd[#cmd + 1] = diff.to
   end
-  require("lazy.util").float_term(cmd, { cwd = plugin.dir, interactive = false, env = { PAGER = "cat" } })
+  local float = require("lazy.util").float_term(cmd, { cwd = plugin.dir, interactive = false, env = { PAGER = "cat" } })
+
+  vim.wo[float.win].sidescrolloff = 0
+  vim.wo[float.win].scrolloff = math.floor((vim.api.nvim_win_get_height(float.win) - 1) / 2)
+  vim.api.nvim_win_call(
+    float.win,
+    vim.schedule_wrap(function()
+      vim.cmd.normal({ "M", bang = true })
+    end)
+  )
+  vim.api.nvim_create_autocmd("TermEnter", { buffer = float.buf, command = "stopinsert" })
 end

@@ -213,15 +213,17 @@ return {
       picker = {
         sources = {
           lsp_symbols = {
-            confirm = function(...)
+            confirm = function(picker, item, action)
               -- HACK: fix the error occurring in the jdtls class buffer when neo-tree is open:
               -- vim.schedule callback: https://github.com/folke/snacks.nvim/blob/3d695ab7d062d40c980ca5fd9fe6e593c8f35b12/lua/snacks/picker/actions.lua#L128: Cursor position outside buffer
               -- see: https://github.com/folke/snacks.nvim/commit/4551f499c7945036761fd48927cc07b9720fce56
-              local main = require("snacks.picker.core.main").new({ float = false, file = false })
-              vim.api.nvim_set_current_win(main:get())
+              -- local main = require("snacks.picker.core.main").new({ float = false, file = false })
+              -- vim.api.nvim_set_current_win(main:get())
+              -- see: https://github.com/folke/snacks.nvim/commit/85b8ec210975aa137af4b7bef1fb7b7098be331a
+              picker.main = picker:filter().current_win
 
               -- original confirm action
-              Snacks.picker.actions.confirm(...)
+              Snacks.picker.actions.confirm(picker, item, action)
             end,
           },
         },

@@ -95,7 +95,7 @@ return {
         -- { "<leader>gd", function() git_diff_pick() end, desc = "Git Diff HEAD (hunks)" },
         { "<leader>gd", function() git_diff_pick({ staged = false }) end, desc = "Git Diff (hunks)" },
         -- { "<leader>gD", function() git_diff_pick({ staged = false, cmd_args = { "--", vim.api.nvim_buf_get_name(0) } }) end, desc = "Git Diff Buffer (hunks)" },
-        { "<leader>gD", function() git_diff_pick({ base = "origin" }) end, desc = "Git Diff (origin)" },
+        { "<leader>gD", function() git_diff_pick({ base = "origin", group = true }) end, desc = "Git Diff (origin)" },
         { "<leader>ga", function() git_diff_pick({ staged = true }) end, desc = "Git Diff Staged (hunks)" },
         -- {
         --   "<leader>gA",
@@ -169,9 +169,7 @@ return {
                 end, items)
                 -- alternative: vim.system()
                 Snacks.picker.util.cmd(cmd, function()
-                  picker.list:set_selected()
-                  picker.list:set_target()
-                  picker:find()
+                  picker:refresh()
                 end, { cwd = items[1].cwd, input = table.concat(diffs, "\n") })
               end,
             },
@@ -390,7 +388,7 @@ return {
         { "<leader>gC", commit({ "--amend" }), desc = "Commit Amend" },
         -- { "<leader>ga", "<Cmd>Git diff --cached<CR>", desc = "Diff Staged" },
         -- { "<leader>gA", "<Cmd>Git diff --cached -- %<CR>", desc = "Diff Staged Buffer" },
-        { "<leader>gP", "<Cmd>Git push<CR>", desc = "Push" },
+        -- { "<leader>gP", "<Cmd>Git push<CR>", desc = "Push" },
       }
     end,
     opts = function()
