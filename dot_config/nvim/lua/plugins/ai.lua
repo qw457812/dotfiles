@@ -228,7 +228,13 @@ return {
   {
     "folke/sidekick.nvim",
     optional = true,
-    opts = function()
+    ---@param opts sidekick.Config
+    opts = function(_, opts)
+      if vim.g.user_is_termux then
+        opts.nes = opts.nes or {}
+        opts.nes.enabled = false -- copilot-language-server failed to start
+      end
+
       Snacks.util.set_hl({ SidekickCliInstalled = "Comment" })
 
       U.toggle.ai_cmps.sidekick_nes = Snacks.toggle({

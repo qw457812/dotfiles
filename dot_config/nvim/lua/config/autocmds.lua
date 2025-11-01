@@ -257,6 +257,7 @@ if vim.g.user_auto_root and not vim.o.autochdir then
 end
 
 -- set up vim.g.user_last_file
+-- see also: https://github.com/folke/snacks.nvim/issues/2378#issuecomment-3474790578
 do
   ---@param opts { buf: integer, cond?: fun():boolean }
   local function track_last_file(opts)

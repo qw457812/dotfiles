@@ -8,6 +8,7 @@ local M = {}
 ---@field ignore_space? boolean
 
 ---use `opts.staged = true` instead of `opts.cmd_args = { "--staged" }` or `opts.cmd_args = { "--cached" }`
+---ref: https://github.com/folke/lazy.nvim/blob/a32e307981519a25dd3f05a33a6b7eea709f0fdc/lua/lazy/view/diff.lua#L49-L61
 ---@param opts? user.util.git.diff.term.Opts
 ---@return snacks.terminal?
 function M.diff_term(opts)
@@ -24,6 +25,7 @@ function M.diff_term(opts)
     cmd_args = {},
     cwd = git_root,
     interactive = false, -- normal mode in favor of copying
+    -- env = { PAGER = "cat" }, -- alternative to `-c delta.paging=never`
     win = {
       height = U.snacks.win.fullscreen_height,
       width = 0,
@@ -37,13 +39,13 @@ function M.diff_term(opts)
   vim.list_extend(cmd, vim.g.user_is_termux and {} or { "-c", "delta.line-numbers=true" })
   vim.list_extend(cmd, opts.args)
   table.insert(cmd, "diff")
+  if opts.ignore_space then
+    vim.list_extend(cmd, { "--ignore-all-space", "--ignore-blank-lines", "--ignore-cr-at-eol" })
+  end
   if opts.staged then
     table.insert(cmd, "--cached")
   elseif opts.staged == nil then
     table.insert(cmd, "HEAD") -- staged + unstaged
-  end
-  if opts.ignore_space then
-    vim.list_extend(cmd, { "--ignore-all-space", "--ignore-blank-lines", "--ignore-cr-at-eol" })
   end
   vim.list_extend(cmd, opts.cmd_args)
 
@@ -73,6 +75,10 @@ function M.diff_term(opts)
   end
 
   local terminal = Snacks.terminal(cmd, opts)
+
+  terminal:on("TermEnter", function()
+    vim.cmd.stopinsert()
+  end, { buf = true })
 
   terminal:on("TermClose", function()
     if type(vim.v.event) == "table" and vim.v.event.status ~= 0 then
