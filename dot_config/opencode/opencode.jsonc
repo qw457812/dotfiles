@@ -4,6 +4,7 @@
   "share": "manual",
   "autoupdate": false,
   // https://opencode.ai/docs/zen/#pricing
+  // curl https://opencode.ai/zen/v1/models | jq '.data | sort_by(.created)'
   // "model": "opencode/grok-code",
   "model": "anthropic/claude-sonnet-4-5",
   // "small_model": "opencode/grok-code",
@@ -21,6 +22,7 @@
         "apiKey": "{env:CTOK_AUTH_TOKEN}"
       }
     },
+    // curl https://openrouter.ai/api/v1/models | jq '.data | sort_by(.created)' | less
     "openrouter": {
       "options": {
         "apiKey": "{env:OPENCODE_OPENROUTER_API_KEY}"
@@ -56,8 +58,8 @@
     "leader": "ctrl+x",
     "messages_half_page_up": "ctrl+u",
     "messages_half_page_down": "ctrl+d",
-    "messages_first": "<leader>g",
-    "messages_last": "<leader>G",
     "editor_open": "ctrl+g"
+    // "history_previous": "up,ctrl+k",
+    // "history_next": "down,ctrl+j,ctrl+n"
   }
 }

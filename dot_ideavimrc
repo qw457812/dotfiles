@@ -55,8 +55,7 @@ set commentary
 " https://github.com/vim-scripts/ReplaceWithRegister/blob/master/doc/ReplaceWithRegister.txt
 " [count]["x]gr{motion}, [count]["x]grr, {Visual}["x]gr
 set ReplaceWithRegister
-" argument text objects: aa, ia
-set argtextobj
+
 " https://github.com/tommcdo/vim-exchange/blob/master/doc/exchange.txt
 " cx{motion} to select, again to exchange
 " cx, cxx, v_X, cxc (eg. exchanging two words using `cxiw` and `.`)
@@ -69,9 +68,6 @@ set highlightedyank
 " https://github.com/dbakker/vim-paragraph-motion#vim-paragraph-motion
 " { }
 set vim-paragraph-motion
-" https://github.com/michaeljsmith/vim-indent-object/blob/master/doc/indent-object.txt
-" ai ii aI iI
-set textobj-indent
 " https://github.com/adelarsq/vim-matchit/blob/master/doc/matchit.txt
 " % g%
 set matchit
@@ -81,14 +77,33 @@ set notimeout
 " https://github.com/junegunn/vim-peekaboo
 " peek registers: " <C-r>
 set peekaboo
-" af if
-set functiontextobj
+
+" " argument text objects: aa, ia
+" set argtextobj
+" let g:argtextobj_pairs="[:],(:),<:>"
+" " af if
+" set functiontextobj
 " aq iq ab ib
 set mini-ai
+" https://github.com/michaeljsmith/vim-indent-object/blob/master/doc/indent-object.txt
+" ai ii aI iI
+set textobj-indent
+" https://github.com/magidc/ideavim-anyobject
+set anyobject
+" ,anyQuote,anyBracket
+let g:anyobject_included = "anyArgument,anyFunction,anyClass,anySubword"
+" let g:anyobject_map_anybracket = "b"
+let g:anyobject_map_anysubword = "e"
+
+set dial
+nnoremap <C-a> :DialIncrement<cr>
+nnoremap <C-x> :DialDecrement<cr>
+
+" https://github.com/yelog/ideavim-cmdfloat
+let g:cmdfloat_completion_prev_keys = ['Up', '<C-p>', '<S-Tab>', '<C-k>']
+let g:cmdfloat_completion_next_keys = ['Down', '<C-n>', '<Tab>', '<C-j>']
 
 """ Plugin settings -------------------------
-let g:argtextobj_pairs="[:],(:),<:>"
-
 let g:highlightedyank_highlight_duration = "150"
 " let g:highlightedyank_highlight_color = "rgba(57, 197, 187, 155)"
 let g:highlightedyank_highlight_color = "rgba(163, 190, 140, 155)"
@@ -428,6 +443,7 @@ imap <C-k> <C-o><Action>(ParameterInfo)
 " https://github.com/phisco/configs/blob/ceab3ac5a0761b91b631d85f96de085b232c2faf/.ideavimrc
 " https://github.com/helmerdavila/dotfiles/blob/main/dot_ideavimrc
 " https://github.com/dengzhizhi/dotfiles/blob/fbb6e4179abe82b1307b74a723cb77f3e66afa19/.ideavimrc
+" https://github.com/magidc/dotfiles/blob/998c4623eeb002f3dc4633b520cd474a7df58bbc/jetbrains/ideavimrc
 
 " -----------------------------------------------------常用--------------------------------------------------------
 " keys: https://ideavim.sourceforge.net/vim/intro.html
