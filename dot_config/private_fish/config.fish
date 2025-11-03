@@ -282,7 +282,7 @@ if type -q claude
     abbr ccum "$ccusage daily --breakdown"
     abbr ccub "$ccusage blocks"
     if type -q claude-monitor # https://github.com/Maciek-roboblog/Claude-Code-Usage-Monitor
-        abbr ccm "claude-monitor --view realtime"
+        abbr ccmr "claude-monitor --view realtime"
         abbr ccmd "claude-monitor --view daily"
         abbr ccmm "claude-monitor --view monthly"
     end
@@ -295,6 +295,7 @@ if type -q claude
     abbr cck claude_kimi
     abbr ccg claude_glm
     abbr ccq claude_qwen
+    abbr ccm claude_minimax
     type -q ccr; and abbr ccr "ccr code" # https://github.com/musistudio/claude-code-router
 end
 type -q codex; and abbr cx codex # codex completion fish >~/.config/fish/completions/codex.fish
@@ -302,7 +303,8 @@ type -q codex; and abbr cx codex # codex completion fish >~/.config/fish/complet
 if type -q opencode
     abbr oc opencode
     abbr occ 'opencode --continue'
-    abbr ocg 'opencode --model opencode/grok-code' # https://opencode.ai/docs/zen/
+    abbr ocg 'opencode --model opencode/grok-code'
+    abbr ocm 'opencode --model minimax/MiniMax-M2'
 end
 if type -q aider
     abbr ad aider
