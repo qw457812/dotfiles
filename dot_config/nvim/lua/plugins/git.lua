@@ -146,9 +146,7 @@ return {
             all = true,
           },
           git_diff = {
-            layout = {
-              preset = "ivy_split",
-            },
+            layout = { preset = "ivy_split" },
             on_show = U.explorer.close, -- in favor of ivy_split layout
             actions = {
               -- https://github.com/folke/snacks.nvim/blob/1fb3f4de49962a80cb88a9b143bc165042c72165/lua/snacks/picker/actions.lua#L343-L363
@@ -188,9 +186,7 @@ return {
             },
           },
           git_status = {
-            layout = {
-              preset = "ivy_split",
-            },
+            layout = { preset = "ivy_split" },
             on_show = U.explorer.close,
             win = {
               input = {
@@ -206,24 +202,90 @@ return {
               },
             },
           },
-          git_log = { layout = { preset = "ivy_split" }, on_show = U.explorer.close },
+          git_log = {
+            layout = { preset = "ivy_split" },
+            on_show = U.explorer.close,
+            previewers = { git = { args = vim.g.user_is_termux and {} or { "-c", "delta.line-numbers=true" } } }, -- overwrite `opts.picker.previewers.git.args`
+          },
           git_log_file = { layout = { preset = "ivy_split" }, on_show = U.explorer.close },
           git_log_line = { layout = { preset = "ivy_split" }, on_show = U.explorer.close },
           git_stash = {
-            layout = {
-              preset = "ivy_split",
-            },
+            layout = { preset = "ivy_split" },
             on_show = U.explorer.close,
-            previewers = {
-              git = {
-                args = {}, -- overwrite `opts.picker.previewers.git.args`
-              },
-            },
+            previewers = { git = { args = vim.g.user_is_termux and {} or { "-c", "delta.line-numbers=true" } } }, -- overwrite `opts.picker.previewers.git.args`
           },
           undo = { layout = { preset = "ivy_split" }, on_show = U.explorer.close },
         },
       },
     },
+  },
+
+  {
+    "folke/snacks.nvim",
+    keys = function(_, keys)
+      if LazyVim.pick.picker.name ~= "snacks" then
+        return keys
+      end
+
+      -- ref: https://github.com/folke/snacks.nvim/blob/50436373c277906cf40e47380f3dc1bd7769a885/lua/snacks/gh/api.lua#L464-L495
+      local function repo(cwd)
+        local git_config = vim.fn
+          .system({ "git", "-C", cwd or vim.uv.cwd(), "config", "--get-regexp", "^remote\\.(upstream|origin)\\.url" })
+          :gsub("\n$", "")
+
+        local cfg = {} ---@type table<string, string>
+        for _, line in ipairs(vim.split(git_config, "\n")) do
+          local key, value = line:match("^([^%s]+)%s+(.+)$")
+          if key then
+            cfg[key] = value
+          end
+        end
+
+        ---@param u? string
+        ---@return string?
+        local function parse(u)
+          return u and (u:match("github%.com[:/](.+/.+)%.git") or u:match("github%.com[:/](.+/.+)$")) or nil
+        end
+
+        return parse(cfg["remote.upstream.url"]) or parse(cfg["remote.origin.url"])
+      end
+
+      ---@param opts? snacks.picker.gh.issue.Config
+      local function gh_issue(opts)
+        opts = opts or {}
+        if not opts.repo then
+          local git_root = Snacks.git.get_root(opts.cwd)
+          if not git_root then
+            Snacks.notify.error("Not a git repo")
+            return
+          end
+          opts.repo = repo(git_root)
+        end
+        return Snacks.picker.gh_issue(opts)
+      end
+
+      ---@param opts? snacks.picker.gh.pr.Config
+      local function gh_pr(opts)
+        opts = opts or {}
+        if not opts.repo then
+          local git_root = Snacks.git.get_root(opts.cwd)
+          if not git_root then
+            Snacks.notify.error("Not a git repo")
+            return
+          end
+          opts.repo = repo(git_root)
+        end
+        return Snacks.picker.gh_pr(opts)
+      end
+
+      -- stylua: ignore
+      return vim.list_extend(keys, {
+        { "<leader>gi", function() gh_issue() end, desc = "GitHub Issues (open)" },
+        { "<leader>gI", function() gh_issue({ state = "all" }) end, desc = "GitHub Issues (all)" },
+        { "<leader>gp", function() gh_pr() end, desc = "GitHub Pull Requests (open)" },
+        { "<leader>gP", function() gh_pr({ state = "all" }) end, desc = "GitHub Pull Requests (all)" },
+      })
+    end,
   },
 
   {
@@ -265,6 +327,14 @@ return {
             height = U.snacks.win.fullscreen_height,
             width = 0,
           },
+          -- config = {
+          --   os = {
+          --     -- ref: https://github.com/jesseduffield/lazygit/blob/e6bd9d0ae6dd30d04dfe77d2cac15ac54fa18ff6/pkg/config/editor_presets.go#L60
+          --     edit = vim.o.shell:find("fish")
+          --         and 'begin; if test -z "$NVIM"; nvim -- {{filename}}; else; nvim --server "$NVIM" --remote-send "q"; and nvim --server "$NVIM" --remote {{filename}}; end; end'
+          --       or nil,
+          --   },
+          -- },
         },
         gitbrowse = {
           open = U.open_in_browser,

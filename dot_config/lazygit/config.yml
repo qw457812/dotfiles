@@ -4,9 +4,11 @@
 gui:
   nerdFontsVersion: "3"
 git:
-  paging:
-    colorArg: always
-    pager: delta --dark --paging=never
+  pagers:
+    - pager: delta --dark --paging=never
+    - pager: delta --dark --paging=never --line-numbers
+    - pager: delta --dark --paging=never --side-by-side
+    - pager: diff-so-fancy
 # exit Lazygit when the user presses escape in a context where there is nothing to cancel/close
 quitOnTopLevelReturn: true
 notARepository: skip
@@ -14,7 +16,7 @@ promptToReturnFromSubprocess: false
 os:
   # use `--remote` instead of `--remote-tab`
   # copied from: https://github.com/jesseduffield/lazygit/blob/e6bd9d0ae6dd30d04dfe77d2cac15ac54fa18ff6/pkg/config/editor_presets.go#L60
-  edit: 'begin; if test -z "$NVIM"; nvim -- {{filename}}; else; nvim --server "$NVIM" --remote-send "q"; nvim --server "$NVIM" --remote {{filename}}; end; end'
+  edit: 'begin; if test -z "$NVIM"; nvim -- {{filename}}; else; nvim --server "$NVIM" --remote-send "q"; and nvim --server "$NVIM" --remote {{filename}}; end; end'
 keybinding:
   universal:
     # not working, but <c-h> works
