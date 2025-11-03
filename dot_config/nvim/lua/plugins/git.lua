@@ -161,8 +161,8 @@ return {
                 local is_staged = items[1].staged
                 local cmd = { "git", "apply", "--cached", is_staged and "--reverse" or nil }
                 local diffs = vim.tbl_map(function(item)
-                  -- TODO: mixed staged/unstaged hunks
-                  assert(item.staged == is_staged, "Cannot apply mixed staged/unstaged hunks")
+                  assert(item.diff and item.staged ~= nil, "Can't stage/unstage this change") -- see: https://github.com/folke/snacks.nvim/commit/9cde35b7b16244fee5c6f73749523e95e4a2b432
+                  assert(item.staged == is_staged, "Cannot apply mixed staged/unstaged hunks") -- TODO: mixed staged/unstaged
                   return item.diff
                 end, items)
                 -- alternative: vim.system()
