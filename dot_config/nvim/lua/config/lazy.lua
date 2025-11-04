@@ -59,15 +59,49 @@ require("lazy").setup({
     custom_keys = {
       ["<leader><space>"] = {
         function(plugin)
-          vim.cmd.close()
-          LazyVim.pick("files", { cwd = plugin.dir, title = plugin.name })() -- `title` for snacks picker
+          if LazyVim.pick.picker.name == "snacks" then
+            local win = vim.api.nvim_get_current_win()
+            Snacks.picker.files({
+              cwd = plugin.dir,
+              title = plugin.name,
+              layout = {
+                preset = vim.o.columns >= 120 and "based_borderless" or "based_borderless_narrow",
+              },
+              actions = {
+                confirm = function(...)
+                  vim.api.nvim_win_close(win, false)
+                  Snacks.picker.actions.confirm(...)
+                end,
+              },
+            })
+          else
+            vim.cmd.close()
+            LazyVim.pick("files", { cwd = plugin.dir })()
+          end
         end,
         desc = "Find Plugin File",
       },
       ["<leader>/"] = {
         function(plugin)
-          vim.cmd.close()
-          LazyVim.pick("live_grep", { cwd = plugin.dir, title = plugin.name })()
+          if LazyVim.pick.picker.name == "snacks" then
+            local win = vim.api.nvim_get_current_win()
+            Snacks.picker.grep({
+              cwd = plugin.dir,
+              title = plugin.name,
+              layout = {
+                preset = vim.o.columns >= 120 and "based_borderless" or "based_borderless_narrow",
+              },
+              actions = {
+                confirm = function(...)
+                  vim.api.nvim_win_close(win, false)
+                  Snacks.picker.actions.confirm(...)
+                end,
+              },
+            })
+          else
+            vim.cmd.close()
+            LazyVim.pick("live_grep", { cwd = plugin.dir })()
+          end
         end,
         desc = "Search Plugin Code",
       },

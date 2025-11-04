@@ -98,21 +98,40 @@ return {
         ["<leader><space>"] = {
           desc = "Find Files (Oil Dir)",
           function()
-            local dir = require("oil").get_current_dir()
-            if vim.api.nvim_win_get_config(0).relative ~= "" then
-              vim.api.nvim_win_close(0, true)
-            end
-            Snacks.picker.files({ cwd = dir, hidden = true, ignored = true, follow = true })
+            local oil = require("oil")
+            local win = vim.api.nvim_get_current_win()
+            Snacks.picker.files({
+              cwd = oil.get_current_dir(),
+              hidden = true,
+              ignored = true,
+              follow = true,
+              actions = {
+                confirm = function(picker, item, action)
+                  vim.api.nvim_win_call(win, function()
+                    oil.close()
+                    Snacks.picker.actions.confirm(picker, item, action)
+                  end)
+                end,
+              },
+            })
           end,
         },
         ["<leader>/"] = {
           desc = "Grep (Oil Dir)",
           function()
-            local dir = require("oil").get_current_dir()
-            if vim.api.nvim_win_get_config(0).relative ~= "" then
-              vim.api.nvim_win_close(0, true)
-            end
-            LazyVim.pick("live_grep", { cwd = dir })()
+            local oil = require("oil")
+            local win = vim.api.nvim_get_current_win()
+            Snacks.picker.grep({
+              cwd = oil.get_current_dir(),
+              actions = {
+                confirm = function(picker, item, action)
+                  vim.api.nvim_win_call(win, function()
+                    oil.close()
+                    Snacks.picker.actions.confirm(picker, item, action)
+                  end)
+                end,
+              },
+            })
           end,
         },
         ["<leader>sr"] = {

@@ -123,6 +123,7 @@ abbr gdi "git diff --ignore-all-space --ignore-blank-lines --ignore-cr-at-eol"
 abbr gdsi "git diff --staged --ignore-all-space --ignore-blank-lines --ignore-cr-at-eol"
 abbr glgpi "git log --stat --patch --ignore-all-space --ignore-blank-lines --ignore-cr-at-eol"
 abbr gwtab 'git worktree add -b'
+abbr glor 'git log --oneline --decorate --reverse | vimpager'
 # copied from: https://github.com/ohmyzsh/ohmyzsh/blob/750d3ac4b493dca13ef0ced55fa6a2cd02dc7ee8/plugins/git/git.plugin.zsh
 abbr ga "git add"
 abbr gaa "git add --all"
@@ -154,6 +155,7 @@ abbr gf "git fetch"
 abbr ghh "git help"
 abbr glg "git log --stat"
 abbr glgp "git log --stat --patch"
+abbr glo 'git log --oneline --decorate'
 abbr gm 'git merge'
 abbr gma 'git merge --abort'
 abbr gmc 'git merge --continue'
