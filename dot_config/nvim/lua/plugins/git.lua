@@ -127,14 +127,13 @@ return {
       picker = {
         previewers = {
           diff = {
-            builtin = false,
+            style = "terminal",
             cmd = vim.list_extend(
               { "delta", "--file-style", "omit", "--hunk-header-style", "omit" },
               vim.g.user_is_termux and {} or { "--line-numbers" }
             ),
           },
           git = {
-            builtin = false,
             args = vim.list_extend(
               { "-c", "delta.file-style=omit", "-c", "delta.hunk-header-style=omit" },
               vim.g.user_is_termux and {} or { "-c", "delta.line-numbers=true" }
