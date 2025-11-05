@@ -205,8 +205,71 @@ return {
         return vim.list_extend(vim.g.user_is_termux and {} or { "-c", "delta.line-numbers=true" }, args or {})
       end
 
+      ---@return string
+      local function layout_preset()
+        local layouts = { "diff", "borderless_diff", "based_borderless_diff" }
+        return layouts[math.random(#layouts)]
+      end
+
       return U.extend_tbl(opts, {
         picker = {
+          layouts = {
+            -- based on the narrow preset, with fullscreen and bigger preview
+            diff = {
+              layout = {
+                backdrop = false,
+                width = 0,
+                height = U.snacks.win.fullscreen_height,
+                border = "none",
+                box = "vertical",
+                { win = "preview", title = "{preview}", height = 0.75, border = "rounded" },
+                {
+                  box = "vertical",
+                  border = "rounded",
+                  title = "{title} {live} {flags}",
+                  title_pos = "center",
+                  { win = "input", height = 1, border = "bottom" },
+                  { win = "list", border = "none" },
+                },
+              },
+            },
+            borderless_diff = {
+              layout = {
+                backdrop = false,
+                width = 0,
+                height = U.snacks.win.fullscreen_height,
+                border = "none",
+                box = "vertical",
+                { win = "preview", title = "{preview}", height = 0.75, border = "solid" },
+                {
+                  box = "vertical",
+                  border = "solid",
+                  title = "{title} {live} {flags}",
+                  title_pos = "center",
+                  { win = "input", height = 1, border = { "", "", "", "", "", " ", "", "" } },
+                  { win = "list", border = "none" },
+                },
+              },
+            },
+            based_borderless_diff = {
+              layout = {
+                backdrop = false,
+                width = 0,
+                height = U.snacks.win.fullscreen_height,
+                border = "none",
+                box = "vertical",
+                { win = "preview", title = "{preview}", height = 0.75, border = "solid" },
+                {
+                  box = "vertical",
+                  border = { " ", "─", " ", " ", " ", " ", " ", " " },
+                  title = "{title} {live} {flags}",
+                  title_pos = "center",
+                  { win = "input", height = 1, border = "bottom" },
+                  { win = "list", border = "none" },
+                },
+              },
+            },
+          },
           previewers = {
             diff = {
               style = "terminal",
@@ -218,14 +281,12 @@ return {
           },
           sources = {
             undo = {
-              layout = { preset = "ivy_split" },
-              on_show = U.explorer.close, -- in favor of ivy_split layout
+              layout = { preset = layout_preset },
               -- overwrite `opts.picker.previewers.diff.cmd`
               previewers = { diff = { cmd = diff_cmd({ "--file-style", "omit" }) } },
             },
             git_diff = {
-              layout = { preset = "ivy_split" },
-              on_show = U.explorer.close,
+              layout = { preset = layout_preset },
               previewers = {
                 diff = {
                   cmd = vim.g.user_is_termux and diff_cmd({ "--hunk-header-style", "omit" }) or nil,
@@ -233,26 +294,21 @@ return {
               },
             },
             git_status = {
-              layout = { preset = "ivy_split" },
-              on_show = U.explorer.close,
+              layout = { preset = layout_preset },
             },
             git_stash = {
-              layout = { preset = "ivy_split" },
-              on_show = U.explorer.close,
+              layout = { preset = layout_preset },
             },
             git_log = {
-              layout = { preset = "ivy_split" },
-              on_show = U.explorer.close,
+              layout = { preset = layout_preset },
             },
             git_log_file = {
-              layout = { preset = "ivy_split" },
-              on_show = U.explorer.close,
+              layout = { preset = layout_preset },
               -- overwrite `opts.picker.previewers.git.args`
               previewers = { git = { args = git_args({ "-c", "delta.file-style=omit" }) } },
             },
             git_log_line = {
-              layout = { preset = "ivy_split" },
-              on_show = U.explorer.close,
+              layout = { preset = layout_preset },
               previewers = { git = { args = git_args({ "-c", "delta.file-style=omit" }) } },
             },
           },
