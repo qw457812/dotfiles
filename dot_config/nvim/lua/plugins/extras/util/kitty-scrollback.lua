@@ -47,13 +47,48 @@ return {
       require("kitty-scrollback").setup(opts)
 
       if vim.g.user_kitty_scrollback_nvim_minimal then
-        vim.defer_fn(function()
+        local function autocmds_opts()
           -- https://github.com/mikesmithgh/kitty-scrollback.nvim/blob/e291b9e611a9c9ce25adad6bb1c4a9b850963de2/lua/kitty-scrollback/autocommands.lua#L138
-          vim.api.nvim_clear_autocmds({
+          return {
             group = vim.api.nvim_create_augroup("KittyScrollBackNvimTextYankPost", { clear = false }),
             event = "TextYankPost",
-          })
-        end, 100)
+          }
+        end
+        local function has_autocmds()
+          return #vim.api.nvim_get_autocmds(autocmds_opts()) > 0
+        end
+        local function clear_autocmds()
+          vim.api.nvim_clear_autocmds(autocmds_opts())
+        end
+
+        -- schedule: align with https://github.com/mikesmithgh/kitty-scrollback.nvim/blob/78fdd7a598ef095d34980a0b23b793bdaf47992e/lua/kitty-scrollback/launch.lua#L377-L390
+        vim.schedule(function()
+          -- schedule: make sure kitty-scrollback.nvim has set up its autocmds
+          vim.schedule(function()
+            if has_autocmds() then
+              clear_autocmds()
+            else
+              LazyVim.warn(
+                "This should not happen, check the setup of autocmds in kitty-scrollback.nvim.",
+                { title = "vim.g.user_kitty_scrollback_nvim_minimal" }
+              )
+
+              -- local polls = 0
+              -- local start = vim.uv.hrtime()
+              -- local done = vim.wait(50, function()
+              --   polls = polls + 1
+              --   return has_autocmds()
+              -- end, 10)
+              -- local elapsed = (vim.uv.hrtime() - start) / 1e6
+              -- Snacks.debug.inspect({ done = done, polls = polls, elapsed = string.format("%.2fms", elapsed) })
+              -- if done then
+              --   clear_autocmds()
+              -- end
+
+              vim.defer_fn(clear_autocmds, 1)
+            end
+          end)
+        end)
       end
     end,
   },
