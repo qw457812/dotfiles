@@ -125,28 +125,11 @@ return {
     ---@type snacks.Config
     opts = {
       picker = {
-        previewers = {
-          diff = {
-            style = "terminal",
-            cmd = vim.list_extend(
-              { "delta", "--file-style", "omit", "--hunk-header-style", "omit" },
-              vim.g.user_is_termux and {} or { "--line-numbers" }
-            ),
-          },
-          git = {
-            args = vim.list_extend(
-              { "-c", "delta.file-style=omit", "-c", "delta.hunk-header-style=omit" },
-              vim.g.user_is_termux and {} or { "-c", "delta.line-numbers=true" }
-            ),
-          },
-        },
         sources = {
           git_branches = {
             all = true,
           },
           git_diff = {
-            layout = { preset = "ivy_split" },
-            on_show = U.explorer.close, -- in favor of ivy_split layout
             actions = {
               -- https://github.com/folke/snacks.nvim/blob/1fb3f4de49962a80cb88a9b143bc165042c72165/lua/snacks/picker/actions.lua#L343-L363
               -- https://github.com/chrisgrieser/.config/blob/fd27c6f94b748f436fa6251006fcd5641f9eeac6/nvim/lua/plugin-specs/snacks/snacks-picker.lua#L200-L215
@@ -185,8 +168,6 @@ return {
             },
           },
           git_status = {
-            layout = { preset = "ivy_split" },
-            on_show = U.explorer.close,
             win = {
               input = {
                 keys = {
@@ -201,24 +182,86 @@ return {
               },
             },
           },
-          git_log = {
-            layout = { preset = "ivy_split" },
-            on_show = U.explorer.close,
-            previewers = { git = { args = vim.g.user_is_termux and {} or { "-c", "delta.line-numbers=true" } } }, -- overwrite `opts.picker.previewers.git.args`
-          },
-          git_log_file = { layout = { preset = "ivy_split" }, on_show = U.explorer.close },
-          git_log_line = { layout = { preset = "ivy_split" }, on_show = U.explorer.close },
-          git_stash = {
-            layout = { preset = "ivy_split" },
-            on_show = U.explorer.close,
-            previewers = { git = { args = vim.g.user_is_termux and {} or { "-c", "delta.line-numbers=true" } } }, -- overwrite `opts.picker.previewers.git.args`
-          },
-          undo = { layout = { preset = "ivy_split" }, on_show = U.explorer.close },
         },
       },
     },
   },
 
+  -- diff previewer
+  {
+    "folke/snacks.nvim",
+    ---@param opts snacks.Config
+    opts = function(_, opts)
+      ---@param args? string[] { "--file-style", "omit", "--hunk-header-style", "omit" }
+      ---@return string[]
+      local function diff_cmd(args)
+        local cmd = vim.list_extend({ "delta" }, vim.g.user_is_termux and {} or { "--line-numbers" })
+        return vim.list_extend(cmd, args or {})
+      end
+
+      ---@param args? string[] { "-c", "delta.file-style=omit", "-c", "delta.hunk-header-style=omit" }
+      ---@return string[]
+      local function git_args(args)
+        return vim.list_extend(vim.g.user_is_termux and {} or { "-c", "delta.line-numbers=true" }, args or {})
+      end
+
+      return U.extend_tbl(opts, {
+        picker = {
+          previewers = {
+            diff = {
+              style = "terminal",
+              cmd = diff_cmd(),
+            },
+            git = {
+              args = git_args(),
+            },
+          },
+          sources = {
+            undo = {
+              layout = { preset = "ivy_split" },
+              on_show = U.explorer.close, -- in favor of ivy_split layout
+              -- overwrite `opts.picker.previewers.diff.cmd`
+              previewers = { diff = { cmd = diff_cmd({ "--file-style", "omit" }) } },
+            },
+            git_diff = {
+              layout = { preset = "ivy_split" },
+              on_show = U.explorer.close,
+              previewers = {
+                diff = {
+                  cmd = vim.g.user_is_termux and diff_cmd({ "--hunk-header-style", "omit" }) or nil,
+                },
+              },
+            },
+            git_status = {
+              layout = { preset = "ivy_split" },
+              on_show = U.explorer.close,
+            },
+            git_stash = {
+              layout = { preset = "ivy_split" },
+              on_show = U.explorer.close,
+            },
+            git_log = {
+              layout = { preset = "ivy_split" },
+              on_show = U.explorer.close,
+            },
+            git_log_file = {
+              layout = { preset = "ivy_split" },
+              on_show = U.explorer.close,
+              -- overwrite `opts.picker.previewers.git.args`
+              previewers = { git = { args = git_args({ "-c", "delta.file-style=omit" }) } },
+            },
+            git_log_line = {
+              layout = { preset = "ivy_split" },
+              on_show = U.explorer.close,
+              previewers = { git = { args = git_args({ "-c", "delta.file-style=omit" }) } },
+            },
+          },
+        },
+      } --[[@as snacks.Config]])
+    end,
+  },
+
+  -- gh
   {
     "folke/snacks.nvim",
     keys = function(_, keys)
