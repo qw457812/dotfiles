@@ -154,10 +154,7 @@ return {
             {
               mode = "n",
               buffer = args.buf,
-              { "<leader>cgs", desc = "which_key_ignore" },
-              { "<leader>cgS", desc = "which_key_ignore" },
-              { "gs", require("jdtls").super_implementation, desc = "Goto Super" },
-              { "gS", require("jdtls.tests").goto_subjects, desc = "Goto Subjects" },
+              { "<leader>cg", group = "goto" },
               { "<leader>rx", require("jdtls").extract_variable_all, desc = "Extract Variable" },
               { "<leader>rC", require("jdtls").extract_constant, desc = "Extract Constant" },
               { "<localleader>r", require("jdtls").set_runtime, desc = "Pick Java Runtime" },

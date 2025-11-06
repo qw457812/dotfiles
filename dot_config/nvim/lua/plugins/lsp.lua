@@ -81,7 +81,6 @@ return {
             },
             -- https://zed.dev/docs/vim#language-server
             { "cd", "<leader>cr", desc = "Rename (change definition)", has = "rename", remap = true },
-            -- TODO: conflict with goto_super_method in java/scala files
             { "gs", "<leader>ss", desc = "LSP Symbols", has = "documentSymbol", remap = true },
             { "gS", "<leader>sS", desc = "LSP Workspace Symbols", has = "workspace/symbols", remap = true },
             { "<leader>cl", false },

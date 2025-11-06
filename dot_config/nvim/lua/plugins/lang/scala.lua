@@ -88,8 +88,9 @@ return {
 
       -- stylua: ignore
       local keys = vim.list_extend(metals_keys or {}, {
-        { "gs", function() require("metals").goto_super_method() end, desc = "Goto Super (Metals)" },
         { "gk", function() require("metals").type_of_range() end, desc = "Type of Range (Metals)", mode = "x" },
+        { "<leader>cg", "", desc = "goto" },
+        { "<leader>cgs", function() require("metals").goto_super_method() end, desc = "Goto Super (Metals)" },
         { "<leader>co", function() require("metals").organize_imports() end, desc = "Organize Imports (Metals)" },
         { "<leader>im", function() require("metals").info() end, desc = "Metals" },
         { "<leader>m", "", desc = "+metals" },
