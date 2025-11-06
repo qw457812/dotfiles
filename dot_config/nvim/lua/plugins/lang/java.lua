@@ -30,6 +30,16 @@ return {
     opts = { ensure_installed = { "javadoc" } },
   },
 
+  {
+    "neovim/nvim-lspconfig",
+    ---@param opts PluginLspOpts
+    opts = function(_, opts)
+      opts.inlay_hints = opts.inlay_hints or {}
+      -- Disable inlay hints for Java (jdtls) as it causes "Invalid 'col': out of range" errors
+      opts.inlay_hints.exclude = vim.list_extend(opts.inlay_hints.exclude or {}, { "java" })
+    end,
+  },
+
   -- https://github.com/AstroNvim/astrocommunity/tree/main/lua/astrocommunity/pack/java
   -- https://github.com/mfussenegger/dotfiles/blob/fa827b77f354b0f31a8352a27cfc1d9a4973a31c/vim/dot-config/nvim/ftplugin/java.lua
   -- https://github.com/MeanderingProgrammer/dotfiles/blob/d29d911a30eb5371c620f543e336bcbc628d45b0/.config/nvim/lua/mp/plugins/lang/java.lua
