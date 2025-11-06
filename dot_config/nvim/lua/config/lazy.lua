@@ -120,10 +120,19 @@ require("lazy").setup({
           if issue then
             local gh_repo = url:match("github%.com[:/](.+/.+)%.git") or url:match("github%.com[:/](.+/.+)$")
             if gh_repo then
-              -- snacks gh, see: https://www.reddit.com/r/neovim/s/hVCpOdakDs
-              local float = require("lazy.util").float({ file = string.format("gh://%s/issue/%d", gh_repo, issue) })
+              local float = require("lazy.util").float({
+                file = string.format("gh://%s/issue/%d", gh_repo, issue), -- snacks gh, see: https://www.reddit.com/r/neovim/s/hVCpOdakDs
+                title = string.format("  Issue #%d (%s)", issue, gh_repo),
+                title_pos = "center",
+              })
               vim.bo[float.buf].readonly = false
               vim.bo[float.buf].modifiable = true
+              vim.keymap.set({ "n", "x" }, "d", "<C-d>", {
+                buffer = float.buf,
+                silent = true,
+                desc = "Scroll Down",
+                nowait = true,
+              })
             else
               U.open_in_browser(url .. "/issues/" .. issue)
             end
