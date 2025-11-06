@@ -72,6 +72,11 @@ return {
 
   -- zsh
   {
+    "nvim-treesitter/nvim-treesitter",
+    ---@type lazyvim.TSConfig|{}
+    opts = { ensure_installed = { "zsh" } },
+  },
+  {
     "stevearc/conform.nvim",
     optional = true,
     opts = {

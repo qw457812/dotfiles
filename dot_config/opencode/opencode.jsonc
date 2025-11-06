@@ -5,14 +5,14 @@
   "autoupdate": false,
   // https://opencode.ai/docs/zen/#pricing
   // curl https://opencode.ai/zen/v1/models | jq '.data | sort_by(.created)'
-  // "model": "opencode/grok-code",
-  "model": "anthropic/claude-sonnet-4-5",
-  // "small_model": "opencode/grok-code",
-  "small_model": "anthropic/claude-haiku-4-5",
+  "model": "opencode/grok-code",
+  // "model": "anthropic/claude-sonnet-4-5",
+  "small_model": "opencode/grok-code",
+  // "small_model": "anthropic/claude-haiku-4-5",
   "agent": {
     "plan": {
-      // "model": "opencode/grok-code"
-      "model": "anthropic/claude-sonnet-4-5"
+      "model": "opencode/grok-code"
+      // "model": "anthropic/claude-sonnet-4-5"
     }
   },
   "provider": {

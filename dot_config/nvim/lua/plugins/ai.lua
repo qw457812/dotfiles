@@ -111,28 +111,46 @@ return {
         ---@type table<string, sidekick.cli.Config|{}>
         tools = {
           claude = {
-            -- cmd = { "command", "claude" },
+            cmd = vim.fn.executable("command") == 1 and { "command", "claude" } or { "claude" },
             env = {
               __IS_CLAUDECODE_NVIM = "1", -- flag to disable claude code statusline in ~/.claude/settings.json
               NVIM_FLATTEN_NEST = "1", -- allow ctrl-g to edit prompt in nvim" to be nested for flatten.nvim
 
               ANTHROPIC_BASE_URL = vim.env.CTOK_BASE_URL,
               ANTHROPIC_AUTH_TOKEN = vim.env.CTOK_AUTH_TOKEN,
+              API_TIMEOUT_MS = "",
               ANTHROPIC_MODEL = "",
               ANTHROPIC_SMALL_FAST_MODEL = "",
-              API_TIMEOUT_MS = "",
+              ANTHROPIC_DEFAULT_SONNET_MODEL = "",
+              ANTHROPIC_DEFAULT_OPUS_MODEL = "",
+              ANTHROPIC_DEFAULT_HAIKU_MODEL = "",
 
               -- ANTHROPIC_BASE_URL = "https://api.moonshot.cn/anthropic",
               -- ANTHROPIC_AUTH_TOKEN = vim.env.MOONSHOT_API_KEY,
+              -- API_TIMEOUT_MS = "",
               -- ANTHROPIC_MODEL = "kimi-k2-0905-preview",
               -- ANTHROPIC_SMALL_FAST_MODEL = "kimi-k2-turbo-preview",
-              -- API_TIMEOUT_MS = "",
+              -- ANTHROPIC_DEFAULT_SONNET_MODEL = "",
+              -- ANTHROPIC_DEFAULT_OPUS_MODEL = "",
+              -- ANTHROPIC_DEFAULT_HAIKU_MODEL = "",
 
               -- ANTHROPIC_BASE_URL = "https://open.bigmodel.cn/api/anthropic",
               -- ANTHROPIC_AUTH_TOKEN = vim.env.ZHIPU_API_KEY,
+              -- API_TIMEOUT_MS = "3000000",
               -- ANTHROPIC_MODEL = "",
               -- ANTHROPIC_SMALL_FAST_MODEL = "",
+              -- ANTHROPIC_DEFAULT_SONNET_MODEL = "",
+              -- ANTHROPIC_DEFAULT_OPUS_MODEL = "",
+              -- ANTHROPIC_DEFAULT_HAIKU_MODEL = "",
+
+              -- ANTHROPIC_BASE_URL = "https://api.minimax.io/anthropic",
+              -- ANTHROPIC_AUTH_TOKEN = vim.env.MINIMAX_API_KEY,
               -- API_TIMEOUT_MS = "3000000",
+              -- ANTHROPIC_MODEL = "MiniMax-M2",
+              -- ANTHROPIC_SMALL_FAST_MODEL = "MiniMax-M2",
+              -- ANTHROPIC_DEFAULT_SONNET_MODEL = "MiniMax-M2",
+              -- ANTHROPIC_DEFAULT_OPUS_MODEL = "MiniMax-M2",
+              -- ANTHROPIC_DEFAULT_HAIKU_MODEL = "MiniMax-M2",
             },
             keys = {
               blur_t = false, -- claude code uses <c-o> for its own functionality
@@ -148,6 +166,10 @@ return {
           copilot = { cmd = tonumber(os.date("%d")) < 20 and { "hack_to_disable_copilot" } or { "copilot" } },
           gemini = { cmd = { "hack_to_disable_gemini" } },
           aider = { cmd = { "hack_to_disable_aider" } },
+          -- debug = {
+          --   -- print env and read -p "any key to continue"
+          --   cmd = { "bash", "-c", "env | sort | bat -l env" },
+          -- },
         },
         ---@type table<string, sidekick.Prompt|string|fun(ctx:sidekick.context.ctx):(string?)>
         prompts = {
@@ -265,13 +287,14 @@ return {
         callback = function(ev)
           vim.diagnostic.enable(false, { bufnr = ev.buf })
 
-          -- HACK: remove annoying "[O" and "[I" for claude code prompts, not sure why they are there
+          -- HACK: Remove annoying "[O" and "[I" for claude code prompts, not sure why they are there.
+          -- Don't match "[Image ..." patterns like "[Image #1]"
           if ev.match:match("claude%-prompt") then
             vim.api.nvim_buf_call(
               ev.buf,
               vim.schedule_wrap(function()
                 vim.cmd([[%s/\[O//ge]])
-                vim.cmd([[%s/\[I//ge]])
+                vim.cmd([[%s/\[I\ze\(mage\)\@!//ge]]) -- match `[I` only when it's NOT followed by 'mage'
                 vim.cmd("silent! noautocmd lockmarks write")
               end)
             )

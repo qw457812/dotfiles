@@ -187,6 +187,12 @@ abbr gwtls 'git worktree list'
 abbr gwtmv 'git worktree move'
 abbr gwtrm 'git worktree remove'
 
+# Git SVN
+abbr gsv 'git svn'
+abbr gsvd 'git svn dcommit'
+abbr gsvr 'git svn rebase'
+abbr gsvcl 'git svn clone'
+
 # SVN
 abbr sva 'svn add'
 # abbr svc 'NVIM_FLATTEN_NEST=1 svn commit'
