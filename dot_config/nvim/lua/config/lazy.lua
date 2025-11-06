@@ -118,7 +118,15 @@ require("lazy").setup({
           local issue = line:match("#(%d+)")
           local commit = line:match("%f[%w](" .. string.rep("[a-f0-9]", 7) .. ")%f[%W]")
           if issue then
-            U.open_in_browser(url .. "/issues/" .. issue)
+            local gh_repo = url:match("github%.com[:/](.+/.+)%.git") or url:match("github%.com[:/](.+/.+)$")
+            if gh_repo then
+              -- snacks gh, see: https://www.reddit.com/r/neovim/s/hVCpOdakDs
+              local float = require("lazy.util").float({ file = string.format("gh://%s/issue/%d", gh_repo, issue) })
+              vim.bo[float.buf].readonly = false
+              vim.bo[float.buf].modifiable = true
+            else
+              U.open_in_browser(url .. "/issues/" .. issue)
+            end
           elseif commit then
             U.open_in_browser(url .. "/commit/" .. commit)
           end
