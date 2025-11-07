@@ -262,6 +262,25 @@ return {
       },
     },
   },
+  {
+    "folke/snacks.nvim",
+    opts = function()
+      vim.api.nvim_create_autocmd("FileType", {
+        group = augroup,
+        pattern = "markdown.gh",
+        callback = function(ev)
+          -- HACK: `:bd` (from `close_buffer_or_window_or_exit`) will exit nvim unexpectedly
+          vim.keymap.set("n", close_key, function()
+            if U.is_floating_win() then
+              vim.cmd("close")
+            else
+              Snacks.bufdelete()
+            end
+          end, { buffer = ev.buf, desc = "Close (Snacks gh buffer)" })
+        end,
+      })
+    end,
+  },
 
   {
     "folke/sidekick.nvim",

@@ -394,6 +394,9 @@ return {
               },
               ["J"] = "preview_scroll_down", -- same as lazygit/yazi
               ["K"] = "preview_scroll_up",
+              ["<PageDown>"] = { "preview_scroll_down", mode = { "i", "n" } },
+              ["<PageUp>"] = { "preview_scroll_up", mode = { "i", "n" } },
+              ["o"] = "confirm",
               ["/"] = false, -- highlights text in preview
               ["<C-e>"] = { "filter_extension", mode = { "i", "n" } },
               ["<M-l>"] = { "toggle_lua", mode = { "n", "i" } },
@@ -435,6 +438,9 @@ return {
               },
               ["J"] = "preview_scroll_down",
               ["K"] = "preview_scroll_up",
+              ["<PageDown>"] = { "preview_scroll_down", mode = { "i", "n" } },
+              ["<PageUp>"] = { "preview_scroll_up", mode = { "i", "n" } },
+              ["o"] = "confirm",
               ["/"] = false,
               ["<C-e>"] = { "filter_extension", mode = { "i", "n" } },
               ["<M-l>"] = { "toggle_lua", mode = { "n", "i" } },

@@ -311,6 +311,9 @@ return {
               layout = { preset = layout_preset },
               previewers = { git = { args = git_args({ "-c", "delta.file-style=omit" }) } },
             },
+            gh_diff = {
+              layout = { preset = layout_preset },
+            },
           },
         },
       } --[[@as snacks.Config]])
@@ -384,6 +387,49 @@ return {
         { "<leader>gP", function() gh_pr({ state = "all" }) end, desc = "GitHub Pull Requests (all)" },
       })
     end,
+    ---@module "snacks"
+    ---@type snacks.Config
+    opts = {
+      picker = {
+        sources = {
+          gh_issue = {
+            win = {
+              input = {
+                keys = {
+                  ["o"] = "gh_open",
+                  ["<localleader>y"] = "gh_yank",
+                  ["<localleader>b"] = "gh_browse",
+                },
+              },
+              list = {
+                keys = {
+                  ["y"] = false,
+                  ["<localleader>y"] = { "gh_yank", mode = { "n", "x" } },
+                },
+              },
+            },
+          },
+          gh_pr = {
+            win = {
+              input = {
+                keys = {
+                  ["o"] = "gh_open",
+                  ["<localleader>y"] = "gh_yank",
+                  ["<localleader>b"] = "gh_browse",
+                  ["<localleader>d"] = "gh_diff",
+                },
+              },
+              list = {
+                keys = {
+                  ["y"] = false,
+                  ["<localleader>y"] = { "gh_yank", mode = { "n", "x" } },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   },
 
   {

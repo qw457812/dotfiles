@@ -105,6 +105,50 @@ require("lazy").setup({
         end,
         desc = "Search Plugin Code",
       },
+      ["<leader>gi"] = {
+        function(plugin)
+          local gh_repo = plugin.url:match("github%.com[:/](.+/.+)%.git") or plugin.url:match("github%.com[:/](.+/.+)$")
+          if gh_repo and LazyVim.pick.picker.name == "snacks" then
+            local win = vim.api.nvim_get_current_win()
+            Snacks.picker.gh_issue({
+              repo = gh_repo,
+              state = "all",
+              layout = {
+                preset = vim.o.columns >= 120 and "based_borderless" or "based_borderless_narrow",
+              },
+              actions = {
+                confirm = function(picker)
+                  vim.api.nvim_win_close(win, false)
+                  picker:action("gh_open")
+                end,
+              },
+            })
+          end
+        end,
+        desc = "Plugin GitHub Issues",
+      },
+      ["<leader>gp"] = {
+        function(plugin)
+          local gh_repo = plugin.url:match("github%.com[:/](.+/.+)%.git") or plugin.url:match("github%.com[:/](.+/.+)$")
+          if gh_repo and LazyVim.pick.picker.name == "snacks" then
+            local win = vim.api.nvim_get_current_win()
+            Snacks.picker.gh_pr({
+              repo = gh_repo,
+              state = "all",
+              layout = {
+                preset = vim.o.columns >= 120 and "based_borderless" or "based_borderless_narrow",
+              },
+              actions = {
+                confirm = function(picker)
+                  vim.api.nvim_win_close(win, false)
+                  picker:action("gh_open")
+                end,
+              },
+            })
+          end
+        end,
+        desc = "Plugin GitHub Pull Requests",
+      },
       ["gx"] = {
         function(plugin)
           U.open_in_browser(plugin.url:gsub("%.git$", ""))
@@ -118,7 +162,7 @@ require("lazy").setup({
           local issue = line:match("#(%d+)")
           local commit = line:match("%f[%w](" .. string.rep("[a-f0-9]", 7) .. ")%f[%W]")
           if issue then
-            local gh_repo = url:match("github%.com[:/](.+/.+)%.git") or url:match("github%.com[:/](.+/.+)$")
+            local gh_repo = url:match("github%.com[:/](.+/.+)$")
             if gh_repo then
               local float = require("lazy.util").float({
                 file = string.format("gh://%s/issue/%d", gh_repo, issue), -- snacks gh, see: https://www.reddit.com/r/neovim/s/hVCpOdakDs
