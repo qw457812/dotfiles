@@ -20,6 +20,15 @@ return {
               end
             end
           end)
+
+          -- Abort commit for `git commit --amend`
+          vim.keymap.set("n", "<C-c>", function()
+            Snacks.picker.util.confirm("Abort Commit?", function()
+              -- aborting commit due to empty commit message
+              vim.api.nvim_buf_set_lines(ev.buf, 0, -1, false, {})
+              vim.cmd.write()
+            end)
+          end, { buffer = ev.buf, desc = "Abort Commit" })
         end,
       })
       -- see also: https://github.com/willothy/nvim-config/blob/b5db7b8b7fe6258770c98f12337d6954a56b95e7/lua/configs/terminal/flatten.lua#L93-L105

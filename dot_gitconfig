@@ -101,10 +101,11 @@
     pf = push --force-with-lease --force-if-includes
     l = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=short
     ll = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative --all
-    unstage = reset HEAD --
     discard = checkout --
+    unstage = reset HEAD --
+    uncommit = reset --soft HEAD^
     amend = commit --amend --no-edit
-    uncommit = reset --soft HEAD~1
+    unamend = reset --soft HEAD@{1}
     fixup = commit --fixup
 
 [help]

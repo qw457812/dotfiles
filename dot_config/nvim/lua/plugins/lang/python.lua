@@ -2,7 +2,6 @@ if not LazyVim.has_extra("lang.python") then
   return {}
 end
 
-local lsp = vim.g.lazyvim_python_lsp or "pyright"
 -- local ruff = vim.g.lazyvim_python_ruff or "ruff"
 local has_black = LazyVim.has_extra("formatting.black")
 
@@ -196,14 +195,14 @@ return {
     },
   },
 
-  -- https://github.com/MeanderingProgrammer/dotfiles/blob/93b7df0ce5f809c867c98c11b17ed6aed3fa7c1c/.config/nvim/lua/mp/plugins/requirements.lua
+  -- https://github.com/MeanderingProgrammer/dotfiles/blob/b5a446700f6b46564ac7e241e5f6e61b659b132c/.config/nvim/lua/mp/plugins/requirements.lua
   {
     "MeanderingProgrammer/py-requirements.nvim",
-    -- event = "BufRead requirements.txt", -- bad performance, manually load it with keys
+    -- event = { "BufRead requirements.txt", "BufRead pyproject.toml" }, -- bad performance, manually load it with keys
     dependencies = {
       {
         "nvim-treesitter/nvim-treesitter",
-        opts = { ensure_installed = { "requirements" } },
+        opts = { ensure_installed = { "requirements", "toml" } },
       },
     },
     keys = function()
@@ -213,15 +212,16 @@ return {
         local buf = vim.api.nvim_get_current_buf()
         if manager.active(buf) then
           ---@diagnostic disable-next-line: invisible
-          manager.display(buf)
+          manager.update(buf)
         else
           ---@diagnostic disable-next-line: invisible
           manager.attach(buf)
         end
       end
 
+      local ft = { "requirements", "toml" }
       return {
-        { "<localleader>c", attach, desc = "Check All Packages", ft = "requirements" },
+        { "<localleader>c", attach, desc = "Check All Packages", ft = ft },
         {
           "<localleader>u",
           function()
@@ -229,7 +229,7 @@ return {
             require("py-requirements").upgrade()
           end,
           desc = "Update Package",
-          ft = "requirements",
+          ft = ft,
         },
         {
           "<localleader>U",
@@ -238,28 +238,28 @@ return {
             require("py-requirements").upgrade_all()
           end,
           desc = "Update All Packages",
-          ft = "requirements",
+          ft = ft,
         },
         {
-          "gk",
+          "<localleader>k",
           function()
             attach()
             require("py-requirements").show_description()
           end,
           desc = "Show Package Description",
-          ft = "requirements",
+          ft = ft,
         },
       }
     end,
     opts = function()
       vim.api.nvim_create_autocmd("BufRead", {
-        group = vim.api.nvim_create_augroup("fix_py_requirements_display", { clear = true }),
-        pattern = "requirements.txt",
+        group = vim.api.nvim_create_augroup("fix_py_requirements_render", { clear = true }),
+        pattern = { "requirements.txt", "pyproject.toml" },
         callback = function(ev)
           local manager = require("py-requirements.manager")
           if manager.active(ev.buf) then
             ---@diagnostic disable-next-line: invisible
-            manager.display(ev.buf)
+            manager.update(ev.buf)
           end
         end,
       })
