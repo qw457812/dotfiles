@@ -109,6 +109,8 @@ require("lazy").setup({
         function(plugin)
           local gh_repo = plugin.url:match("github%.com[:/](.+/.+)%.git") or plugin.url:match("github%.com[:/](.+/.+)$")
           if gh_repo and LazyVim.pick.picker.name == "snacks" then
+            -- normalize mini.* and mini-* repos to mini.nvim
+            gh_repo = gh_repo:gsub("^(nvim%-mini/mini)[%.%-].+$", "%1.nvim")
             local win = vim.api.nvim_get_current_win()
             Snacks.picker.gh_issue({
               repo = gh_repo,
@@ -131,6 +133,7 @@ require("lazy").setup({
         function(plugin)
           local gh_repo = plugin.url:match("github%.com[:/](.+/.+)%.git") or plugin.url:match("github%.com[:/](.+/.+)$")
           if gh_repo and LazyVim.pick.picker.name == "snacks" then
+            gh_repo = gh_repo:gsub("^(nvim%-mini/mini)[%.%-].+$", "%1.nvim")
             local win = vim.api.nvim_get_current_win()
             Snacks.picker.gh_pr({
               repo = gh_repo,
@@ -149,12 +152,6 @@ require("lazy").setup({
         end,
         desc = "Plugin GitHub Pull Requests",
       },
-      ["gx"] = {
-        function(plugin)
-          U.open_in_browser(plugin.url:gsub("%.git$", ""))
-        end,
-        desc = "Plugin Repo",
-      },
       ["gi"] = {
         function(plugin)
           local url = plugin.url:gsub("%.git$", "")
@@ -162,6 +159,7 @@ require("lazy").setup({
           local issue = line:match("#(%d+)")
           local commit = line:match("%f[%w](" .. string.rep("[a-f0-9]", 7) .. ")%f[%W]")
           if issue then
+            url = url:gsub("(github%.com[:/]nvim%-mini/mini)[%.%-].+$", "%1.nvim")
             local gh_repo = url:match("github%.com[:/](.+/.+)$")
             if gh_repo then
               local float = require("lazy.util").float({
@@ -185,6 +183,12 @@ require("lazy").setup({
           end
         end,
         desc = "Open Issue / Commit",
+      },
+      ["gx"] = {
+        function(plugin)
+          U.open_in_browser(plugin.url:gsub("%.git$", ""))
+        end,
+        desc = "Plugin Repo",
       },
       ["<c-space>"] = {
         function(plugin)
