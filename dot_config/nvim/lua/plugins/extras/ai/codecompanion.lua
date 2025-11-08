@@ -6,7 +6,7 @@ local function focus_last_chat()
   end
   vim.api.nvim_set_current_win(chat.ui.winnr)
   U.stop_visual_mode()
-  vim.cmd("startinsert!")
+  -- vim.cmd("startinsert!")
   return true
 end
 
@@ -55,9 +55,10 @@ return {
       },
       { "<leader>ani", "<cmd>CodeCompanion<CR>", desc = "Inline", mode = { "n", "x" } },
       { "<leader>ana", "<cmd>CodeCompanionActions<CR>", desc = "Actions", mode = { "n", "x" } },
-      { "<leader>anN", "<cmd>CodeCompanionChat<CR>", desc = "New Chat", mode = { "n", "x" } },
-      { "<leader>ann", "<cmd>CodeCompanionChat claude_code<CR>", desc = "Claude Code ACP", mode = { "n", "x" } },
-      { "<leader>anp", "<cmd>CodeCompanionChat copilot_gpt_5<CR>", desc = "Copilot GPT-5", mode = { "n", "x" } },
+      { "<leader>ann", "<cmd>CodeCompanionChat<CR>", desc = "New Chat", mode = { "n", "x" } },
+      { "<leader>anc", "<cmd>CodeCompanionChat claude_code<CR>", desc = "Claude Code ACP", mode = { "n", "x" } },
+      { "<leader>anp", "<cmd>CodeCompanionChat copilot<CR>", desc = "Copilot", mode = { "n", "x" } },
+      { "<leader>an5", "<cmd>CodeCompanionChat copilot_gpt_5<CR>", desc = "Copilot GPT-5", mode = { "n", "x" } },
       {
         "<leader>ans",
         "<cmd>CodeCompanionChat copilot_claude<CR>",
@@ -106,7 +107,7 @@ return {
       },
       strategies = {
         chat = {
-          adapter = "copilot",
+          adapter = vim.fn.executable("claude-code-acp") == 1 and "claude_code" or "copilot",
           roles = {
             ---@param adapter CodeCompanion.HTTPAdapter|CodeCompanion.ACPAdapter
             ---@return string
@@ -117,7 +118,7 @@ return {
           },
           tools = {
             opts = {
-              default_tools = { "files" },
+              -- default_tools = { "files" }, -- ACP does not need it
             },
           },
           -- stylua: ignore
@@ -142,7 +143,7 @@ return {
             copilot_stats          = { modes = { n = "<localleader>S" } },
             super_diff             = { modes = { n = "<localleader>D" } },
             _acp_allow_always      = { modes = { n = "<S-Tab>" } },
-            _acp_allow_once        = { modes = { n = "<C-s>" } },
+            _acp_allow_once        = { modes = { n = "<CR>" } },
             _acp_reject_once       = { modes = { n = "<C-c>" } },
           },
         },
@@ -191,7 +192,7 @@ return {
         },
         chat = {
           -- show_settings = true,
-          start_in_insert_mode = true,
+          -- start_in_insert_mode = true,
           window = {
             layout = vim.o.columns >= 120 and "vertical" or "horizontal",
             height = 0.5,
@@ -254,6 +255,23 @@ return {
         pattern = "CodeCompanionRequestStarted",
         callback = function()
           vim.cmd("stopinsert")
+        end,
+      })
+
+      -- see: https://github.com/olimorris/codecompanion.nvim/blob/a4f850591970d5ab4e51951b08ddb0c5c239b210/lua/codecompanion/providers/diff/inline.lua#L46
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "CodeCompanionDiffAttached",
+        callback = function(ev)
+          if not (ev.data and ev.data.bufnr and ev.data.diff == "inline") then
+            return
+          end
+          local accept_key = require("codecompanion.config").config.strategies.chat.keymaps._acp_allow_once.modes.n
+          vim.keymap.set(
+            "n",
+            "<C-s>",
+            type(accept_key) == "table" and accept_key[1] or accept_key,
+            { buffer = ev.data.bufnr, remap = true, desc = "Accept Diff (CodeCompanion ACP)" }
+          )
         end,
       })
     end,

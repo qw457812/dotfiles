@@ -592,7 +592,7 @@ return {
           --     return
           --   end
           --
-          --   local key = require("codecompanion.config").strategies.chat.keymaps.close.modes.n
+          --   local key = require("codecompanion.config").config.strategies.chat.keymaps.close.modes.n
           --   vim.keymap.set(
           --     "n",
           --     close_key,
@@ -607,6 +607,22 @@ return {
             close_key,
             "<cmd>close<cr>",
             { buffer = event.buf, silent = true, desc = "Close (CodeCompanion)" }
+          )
+        end,
+      })
+
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "CodeCompanionDiffAttached",
+        callback = function(ev)
+          if not (ev.data and ev.data.bufnr and ev.data.diff == "inline") then
+            return
+          end
+          local reject_key = require("codecompanion.config").config.strategies.chat.keymaps._acp_reject_once.modes.n
+          vim.keymap.set(
+            "n",
+            close_key,
+            type(reject_key) == "table" and reject_key[1] or reject_key,
+            { buffer = ev.data.bufnr, remap = true, desc = "Reject Diff (CodeCompanion ACP)" }
           )
         end,
       })

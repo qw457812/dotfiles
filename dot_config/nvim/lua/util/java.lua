@@ -15,22 +15,18 @@ function M.jdt_java_runtimes()
   end
 
   local runtimes = {}
-  for i = 8, 23 do
-    local version = tostring(i)
-    local home = java_home(version)
-    if not home and version == "8" then
-      home = java_home("1.8")
-    end
+  for v = 8, 23 do
+    local home = java_home(tostring(v)) or (v == 8 and java_home("1.8"))
     if home then
       -- note that the field `name` must be a valid `ExecutionEnvironment`
       -- https://github.com/eclipse-jdtls/eclipse.jdt.ls/wiki/Running-the-JAVA-LS-server-from-the-command-line#initialize-request
       table.insert(runtimes, {
-        name = "JavaSE-" .. (version == "8" and "1.8" or version),
+        name = "JavaSE-" .. (v == 8 and "1.8" or tostring(v)),
         path = home,
       })
     end
   end
-  return not vim.tbl_isempty(runtimes) and runtimes or nil
+  return #runtimes > 0 and runtimes or nil
 end
 
 -- https://github.com/mfussenegger/nvim-jdtls/issues/423#issuecomment-1429184022
@@ -47,7 +43,7 @@ function M.parse_jdt_uri(uri)
 end
 
 --- jar path from maven local repository
----@param uri
+---@param uri string
 ---@return string?
 function M.jdt_uri_to_jar_path(uri)
   local jar = uri:match("jdt://.-(%%5C/.-%.jar)")
