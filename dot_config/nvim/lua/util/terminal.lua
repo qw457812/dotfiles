@@ -24,6 +24,45 @@ function M.toggle(cmd, opts)
   return Snacks.terminal(cmd, opts)
 end
 
+---Hide `[Process exited 0]`
+---Copied from: https://github.com/folke/snacks.nvim/blob/5faed2f7abed7fb97aed0425b2b1b03fb6048fa9/lua/snacks/util/job.lua#L229-L254
+---@param buf integer
+---@param cb? fun(lnum: integer)
+function M.hide_process_exited(buf, cb)
+  local function set_lines(from, to, lines)
+    if vim.api.nvim_buf_is_valid(buf) then
+      vim.bo[buf].modifiable = true
+      vim.api.nvim_buf_set_lines(buf, from, to, true, lines)
+      vim.bo[buf].modifiable = false
+    end
+  end
+
+  local timer = assert(vim.uv.new_timer())
+  local stop = function()
+    return timer:is_active() and timer:stop() == 0 and timer:close()
+  end
+  -- local start = vim.uv.hrtime()
+  -- local fires = 0
+  local check = function()
+    -- fires = fires + 1
+    if vim.api.nvim_buf_is_valid(buf) then
+      for i, line in ipairs(vim.api.nvim_buf_get_lines(buf, 0, -1, true)) do
+        if line:find("^%[Process exited 0%]") then
+          -- local elapsed = (vim.uv.hrtime() - start) / 1e6
+          -- Snacks.debug.inspect({ fires = fires, elapsed = string.format("%.2fms", elapsed) })
+          set_lines(i - 1, i, {})
+          if cb then
+            cb(i)
+          end
+          return stop()
+        end
+      end
+    end
+  end
+  timer:start(30, 30, vim.schedule_wrap(check))
+  vim.defer_fn(stop, 1000)
+end
+
 --- pager
 --- see `:h terminal-scrollback-pager`
 function M.colorize()

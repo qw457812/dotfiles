@@ -80,45 +80,6 @@ function M.diff_term(opts)
     vim.cmd.stopinsert()
   end, { buf = true })
 
-  local function set_lines(from, to, lines)
-    if terminal:buf_valid() then
-      vim.bo[terminal.buf].modifiable = true
-      vim.api.nvim_buf_set_lines(terminal.buf, from, to, true, lines)
-      vim.bo[terminal.buf].modifiable = false
-    end
-  end
-
-  -- copied from: https://github.com/folke/snacks.nvim/blob/5faed2f7abed7fb97aed0425b2b1b03fb6048fa9/lua/snacks/util/job.lua#L229-L254
-  local function hide_process_exited()
-    local timer = assert(vim.uv.new_timer())
-    local stop = function()
-      return timer:is_active() and timer:stop() == 0 and timer:close()
-    end
-    -- local start = vim.uv.hrtime()
-    -- local fires = 0
-    local check = function()
-      -- fires = fires + 1
-      if terminal:buf_valid() then
-        for i, line in ipairs(vim.api.nvim_buf_get_lines(terminal.buf, 0, -1, true)) do
-          if line:find("^%[Process exited 0%]") then
-            if i == 2 then
-              -- close terminal if no changes found
-              Snacks.notify.warn(("No changes found:\n- cmd: `%s`"):format(table.concat(cmd, " ")))
-              terminal:close()
-            else
-              set_lines(i - 1, i, {})
-            end
-            -- local elapsed = (vim.uv.hrtime() - start) / 1e6
-            -- Snacks.debug.inspect({ fires = fires, elapsed = string.format("%.2fms", elapsed) })
-            return stop()
-          end
-        end
-      end
-    end
-    timer:start(30, 30, vim.schedule_wrap(check))
-    vim.defer_fn(stop, 1000)
-  end
-
   terminal:on("TermClose", function()
     if type(vim.v.event) == "table" and vim.v.event.status ~= 0 then
       Snacks.notify.error(("Command failed:\n- cmd: `%s`"):format(table.concat(cmd, " ")))
@@ -140,7 +101,15 @@ function M.diff_term(opts)
       --   terminal:close()
       -- end
 
-      hide_process_exited()
+      if terminal.buf then
+        U.terminal.hide_process_exited(terminal.buf, function(lnum)
+          -- close terminal if no changes found
+          if lnum == 2 then
+            Snacks.notify.warn(("No changes found:\n- cmd: `%s`"):format(table.concat(cmd, " ")))
+            terminal:close()
+          end
+        end)
+      end
     end
   end, { buf = true })
 

@@ -50,9 +50,14 @@ require("lazy").setup({
   rocks = { hererocks = true },
   install = { colorscheme = { "tokyonight", "habamax" } },
   ui = {
-    size = vim.env.TERMUX_VERSION and { width = 1, height = 1 } or nil,
-    wrap = false,
     border = "rounded",
+    size = vim.env.TERMUX_VERSION
+        and {
+          width = 1,
+          height = vim.o.lines - 4, -- see: U.snacks.win.fullscreen_height
+        }
+      or nil,
+    wrap = false,
     icons = {
       keys = "󰥻 ",
     },
@@ -104,6 +109,20 @@ require("lazy").setup({
           end
         end,
         desc = "Search Plugin Code",
+      },
+      ["<leader>gg"] = {
+        function(plugin)
+          Snacks.lazygit({ cwd = plugin.dir })
+        end,
+        desc = "Lazygit (Plugin Dir)",
+      },
+      ["<leader>gl"] = {
+        function(plugin)
+          if LazyVim.pick.picker.name == "snacks" then
+            Snacks.picker.git_log({ cwd = plugin.dir, title = ("Git Log (%s)"):format(plugin.name) })
+          end
+        end,
+        desc = "Plugin Git Log",
       },
       ["<leader>gi"] = {
         function(plugin)
@@ -184,6 +203,35 @@ require("lazy").setup({
         end,
         desc = "Open Issue / Commit",
       },
+      ["gp"] = {
+        function(plugin)
+          local pr = vim.api.nvim_get_current_line():match("#(%d+)")
+          if not pr then
+            return
+          end
+          local url = plugin.url:gsub("%.git$", "")
+          url = url:gsub("(github%.com[:/]nvim%-mini/mini)[%.%-].+$", "%1.nvim")
+          local gh_repo = url:match("github%.com[:/](.+/.+)$")
+          if gh_repo then
+            local float = require("lazy.util").float({
+              file = string.format("gh://%s/pr/%d", gh_repo, pr),
+              title = string.format("  PR #%d (%s)", pr, gh_repo),
+              title_pos = "center",
+            })
+            vim.bo[float.buf].readonly = false
+            vim.bo[float.buf].modifiable = true
+            vim.keymap.set({ "n", "x" }, "d", "<C-d>", {
+              buffer = float.buf,
+              silent = true,
+              desc = "Scroll Down",
+              nowait = true,
+            })
+          else
+            U.open_in_browser(url .. "/pull/" .. pr)
+          end
+        end,
+        desc = "Open Pull request",
+      },
       ["gx"] = {
         function(plugin)
           U.open_in_browser(plugin.url:gsub("%.git$", ""))
@@ -263,4 +311,10 @@ require("lazy.view.diff").handlers.terminal_git_ignore_space = function(plugin, 
     end)
   )
   vim.api.nvim_create_autocmd("TermEnter", { buffer = float.buf, command = "stopinsert" })
+  vim.api.nvim_create_autocmd("TermClose", {
+    buffer = float.buf,
+    callback = function()
+      U.terminal.hide_process_exited(float.buf)
+    end,
+  })
 end
