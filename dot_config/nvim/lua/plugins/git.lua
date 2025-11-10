@@ -597,11 +597,9 @@ return {
           U.git.diff_term({
             staged = true,
             -- ignore_space = true,
-            win = {
-              on_close = vim.schedule_wrap(function()
-                vim.cmd("Git commit" .. (args and " " .. table.concat(args, " ") or ""))
-              end),
-            },
+            on_data = vim.schedule_wrap(function()
+              vim.cmd("Git commit" .. (args and " " .. table.concat(args, " ") or ""))
+            end),
           })
         end
       end

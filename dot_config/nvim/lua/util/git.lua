@@ -6,6 +6,7 @@ local M = {}
 ---@field cmd_args? string[] additional arguments to pass to the `git <cmd>``
 ---@field staged? boolean
 ---@field ignore_space? boolean
+---@field on_data? function Callback for when changes are found, after closing the window
 
 ---use `opts.staged = true` instead of `opts.cmd_args = { "--staged" }` or `opts.cmd_args = { "--cached" }`
 ---ref: https://github.com/folke/lazy.nvim/blob/a32e307981519a25dd3f05a33a6b7eea709f0fdc/lua/lazy/view/diff.lua#L49-L61
@@ -50,10 +51,14 @@ function M.diff_term(opts)
   vim.list_extend(cmd, opts.cmd_args)
 
   local on_close = opts.win.on_close
+  local on_data = opts.on_data
   opts.win.on_close = function(win)
     win:close() -- fully close on hide to make it one-time
     if on_close then
       on_close(win)
+    end
+    if on_data then
+      on_data()
     end
   end
 
@@ -80,10 +85,15 @@ function M.diff_term(opts)
     vim.cmd.stopinsert()
   end, { buf = true })
 
+  local function on_error()
+    on_data = nil
+    terminal:close()
+  end
+
   terminal:on("TermClose", function()
     if type(vim.v.event) == "table" and vim.v.event.status ~= 0 then
       Snacks.notify.error(("Command failed:\n- cmd: `%s`"):format(table.concat(cmd, " ")))
-      terminal:close()
+      on_error()
     else
       -- -- close terminal if no changes found (alternative: vim.defer_fn)
       -- local line2 ---@type string?
@@ -98,7 +108,7 @@ function M.diff_term(opts)
       -- -- Snacks.debug.inspect({ line2 = line2, polls = polls, elapsed = string.format("%.2fms", elapsed) })
       -- if line2 == "[Process exited 0]" then
       --   Snacks.notify.warn(("No changes found:\n- cmd: `%s`"):format(table.concat(cmd, " ")))
-      --   terminal:close()
+      --   on_error()
       -- end
 
       if terminal.buf then
@@ -106,7 +116,7 @@ function M.diff_term(opts)
           -- close terminal if no changes found
           if lnum == 2 then
             Snacks.notify.warn(("No changes found:\n- cmd: `%s`"):format(table.concat(cmd, " ")))
-            terminal:close()
+            on_error()
           end
         end)
       end
