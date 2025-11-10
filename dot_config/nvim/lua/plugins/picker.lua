@@ -1,5 +1,7 @@
 local H = {}
 
+local SCROLL_UP, SCROLL_DOWN = vim.keycode("<c-u>"), vim.keycode("<c-d>")
+
 function H.pick_search_lazy_specs()
   local dirs = { U.path.CONFIG .. "/lua/plugins", U.path.LAZYVIM .. "/lua/lazyvim/plugins" }
   if LazyVim.pick.picker.name == "telescope" then
@@ -270,6 +272,23 @@ return {
           vim.g.user_suppress_lsp_progress = nil
         end,
         actions = {
+          -- do not allow scrolling beyond eob, see:
+          -- - https://github.com/folke/snacks.nvim/commit/8b5f76292becf9ad76ef1507cbdcec64a49ff3f4
+          -- - https://github.com/folke/snacks.nvim/commit/a2716102c8bd7d25693201af0942552f10e9a0c3
+          preview_down = function(picker)
+            if picker.preview.win:valid() then
+              vim.api.nvim_win_call(picker.preview.win.win, function()
+                vim.cmd(("normal! %s"):format(SCROLL_DOWN))
+              end)
+            end
+          end,
+          preview_up = function(picker)
+            if picker.preview.win:valid() then
+              vim.api.nvim_win_call(picker.preview.win.win, function()
+                vim.cmd(("normal! %s"):format(SCROLL_UP))
+              end)
+            end
+          end,
           -- ref: https://github.com/folke/snacks.nvim/blob/df018edfdbc5df832b46b9bdc9eafb1d69ea460b/lua/snacks/picker/core/list.lua#L428-L430
           unselect_all = function(picker)
             picker.list:set_selected({})
@@ -392,8 +411,8 @@ return {
                 end,
                 desc = "Clear UI or Close",
               },
-              ["J"] = "preview_scroll_down", -- same as lazygit/yazi
-              ["K"] = "preview_scroll_up",
+              ["J"] = "preview_down", -- same as lazygit/yazi
+              ["K"] = "preview_up",
               ["<PageDown>"] = { "preview_scroll_down", mode = { "i", "n" } },
               ["<PageUp>"] = { "preview_scroll_up", mode = { "i", "n" } },
               ["o"] = "confirm",
@@ -436,8 +455,8 @@ return {
                 end,
                 desc = "Clear UI or Focus Input",
               },
-              ["J"] = "preview_scroll_down",
-              ["K"] = "preview_scroll_up",
+              ["J"] = "preview_down",
+              ["K"] = "preview_up",
               ["<PageDown>"] = { "preview_scroll_down", mode = { "i", "n" } },
               ["<PageUp>"] = { "preview_scroll_up", mode = { "i", "n" } },
               ["o"] = "confirm",
