@@ -12,14 +12,14 @@ return {
             return
           end
           local win = vim.fn.bufwinid(ev.buf)
-          vim.schedule(function()
+          vim.defer_fn(function()
             if vim.api.nvim_get_current_buf() == ev.buf and vim.api.nvim_get_current_win() == win then
               vim.api.nvim_win_set_cursor(win, { 1, 0 })
               if vim.api.nvim_get_current_line():match("^%s*$") then
                 vim.cmd("startinsert")
               end
             end
-          end)
+          end, 50)
 
           -- Abort commit for `git commit --amend`
           vim.keymap.set("n", "<C-c>", function()
