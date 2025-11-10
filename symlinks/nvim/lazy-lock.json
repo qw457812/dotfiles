@@ -115,7 +115,7 @@
   "text-case.nvim": { "branch": "main", "commit": "e898cfd46fa6cde0e83abb624a16e67d2ffc6457" },
   "time-machine.nvim": { "branch": "main", "commit": "6657a7db8a07ecfa8a266be34bebfb6827bb2eab" },
   "tiny-inline-diagnostic.nvim": { "branch": "main", "commit": "08e65d82d48416ab140b3dea26eea4fb9739bc47" },
-  "todo-comments.nvim": { "branch": "main", "commit": "411503d3bedeff88484de572f2509c248e499b38" },
+  "todo-comments.nvim": { "branch": "main", "commit": "31e3c38ce9b29781e4422fc0322eb0a21f4e8668" },
   "tokyonight.nvim": { "branch": "main", "commit": "5da1b76e64daf4c5d410f06bcb6b9cb640da7dfd" },
   "treesj": { "branch": "main", "commit": "4770492244ccecdc9b01e0e81fa8f2f6b4a23841" },
   "trouble.nvim": { "branch": "main", "commit": "bd67efe408d4816e25e8491cc5ad4088e708a69a" },

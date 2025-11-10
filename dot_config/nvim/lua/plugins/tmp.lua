@@ -85,11 +85,9 @@ return {
       -- The OceanBase I am using does not work with MySQL >9.0
       vim.env.PATH = "/opt/homebrew/opt/mysql@8.4/bin:" .. vim.env.PATH
 
-      -- https://github.com/kristijanhusak/vim-dadbod-ui#via-gdbs-global-variable
-      vim.g.dbs = vim.list_extend(vim.g.dbs or {}, {
-        {
-          name = "mysql_local",
-          url = U.sql.url.mysql("root", "root", "localhost", "3306", ""),
+      U.sql.add_dbs_to_dadbod_ui({
+        mysql = {
+          { name = "mysql_local", user = "root", password = "root" },
         },
       })
     end,

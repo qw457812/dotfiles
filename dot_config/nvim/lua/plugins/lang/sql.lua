@@ -7,6 +7,20 @@ local sql_ft = { "sql", "mysql", "plsql" }
 ---@type LazySpec
 return {
   {
+    "LazyVim/LazyVim",
+    opts = function()
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = sql_ft,
+        callback = function(ev)
+          if vim.bo[ev.buf].commentstring == "" then
+            vim.bo[ev.buf].commentstring = "-- %s"
+          end
+        end,
+      })
+    end,
+  },
+
+  {
     "tpope/vim-dadbod",
     optional = true,
     init = function()
