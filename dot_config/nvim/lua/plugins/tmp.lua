@@ -16,7 +16,16 @@ return {
       {
         "LazyVim/LazyVim",
         keys = {
-          { "<leader>ln", "<cmd>Lazy log neovim<cr>", desc = "Neovim Logs" },
+          {
+            "<leader>ln",
+            function()
+              vim.cmd("Lazy log neovim")
+              vim.defer_fn(function()
+                vim.cmd("silent! /neovim")
+              end, 200)
+            end,
+            desc = "Neovim Logs",
+          },
         },
       },
     },
@@ -69,36 +78,18 @@ return {
     end,
   },
 
-  -- :echo db#url#encode('my_password')
-  -- :=vim.fn['db#url#encode']('my_password')
-  -- :echo db#url#parse('my_url')
-  -- :echo db#adapter#dispatch("my_url", "interactive")
+  -- vim-dadbod
   {
-    "tpope/vim-dadbod",
-    optional = true,
-    init = function()
-      -- -- The OceanBase I am using does not work with MySQL >9.0
-      -- vim.env.PATH = "/opt/homebrew/opt/mysql@8.4/bin:" .. vim.env.PATH
-
-      local url = {
-        mysql = function(user, password, host, port, database)
-          -- mysql://[<user>[:<password>]@][<host>[:<port>]]/[database]
-          return string.format(
-            "mysql://%s:%s@%s:%s/%s",
-            U.url_encode(user),
-            U.url_encode(password),
-            host,
-            port,
-            database
-          )
-        end,
-      }
+    "LazyVim/LazyVim",
+    opts = function()
+      -- The OceanBase I am using does not work with MySQL >9.0
+      vim.env.PATH = "/opt/homebrew/opt/mysql@8.4/bin:" .. vim.env.PATH
 
       -- https://github.com/kristijanhusak/vim-dadbod-ui#via-gdbs-global-variable
       vim.g.dbs = vim.list_extend(vim.g.dbs or {}, {
         {
           name = "mysql_local",
-          url = url.mysql("root", "root", "localhost", "3306", ""),
+          url = U.sql.url.mysql("root", "root", "localhost", "3306", ""),
         },
       })
     end,

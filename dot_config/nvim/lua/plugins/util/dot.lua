@@ -10,7 +10,16 @@ return {
       {
         "LazyVim/LazyVim",
         keys = {
-          { "<leader>lf", "<cmd>Lazy log folke-dot<cr>", desc = "Folke Dot Logs" },
+          {
+            "<leader>lf",
+            function()
+              vim.cmd("Lazy log folke-dot")
+              vim.defer_fn(function()
+                vim.cmd("silent! /folke-dot")
+              end, 200)
+            end,
+            desc = "Folke Dot Logs",
+          },
         },
       },
     },

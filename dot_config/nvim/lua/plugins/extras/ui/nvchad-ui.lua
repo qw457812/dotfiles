@@ -32,10 +32,10 @@ return {
         { "]b", function() require("nvchad.tabufline").next() end, desc = "Next Buffer" },
         { "[B", function() require("nvchad.tabufline").move_buf(-1) end, desc = "Move buffer prev" },
         { "]B", function() require("nvchad.tabufline").move_buf(1) end, desc = "Move buffer next" },
-        { "<Down>", function() require("nvchad.tabufline").next() end, desc = "Next Buffer" },
-        { "<Up>", function() require("nvchad.tabufline").prev() end, desc = "Prev Buffer" },
-        { "J", function() require("nvchad.tabufline").next() end, desc = "Next Buffer" },
-        { "K", function() require("nvchad.tabufline").prev() end, desc = "Prev Buffer" },
+        { "<Down>", "]b", desc = "Next Buffer", remap = true },
+        { "<Up>", "[b", desc = "Prev Buffer", remap = true },
+        { "J", "]b", desc = "Next Buffer", remap = true },
+        { "K", "[b", desc = "Prev Buffer", remap = true },
         { "<leader>bH", function() vim.api.nvim_set_current_buf(vim.t.bufs[1]) end, desc = "Goto First Buffer" }, -- <cmd>brewind<cr>
         { "<leader>bL", function() vim.api.nvim_set_current_buf(vim.t.bufs[#vim.t.bufs]) end, desc = "Goto Last Buffer" }, -- <cmd>blast<cr>
         { "<leader>bh", function() require("nvchad.tabufline").closeBufs_at_direction("left") end, desc = "Delete Buffers to the Left" },

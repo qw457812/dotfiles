@@ -113,6 +113,7 @@ return {
       vim.api.nvim_create_autocmd("FileType", {
         pattern = {
           "gitcommit", -- git commit --verbose
+          "dbout",
         },
         callback = function(event)
           vim.b[event.buf].minitrailspace_disable = true

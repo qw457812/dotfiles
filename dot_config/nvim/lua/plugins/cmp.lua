@@ -454,7 +454,11 @@ return {
   {
     "saghen/blink.cmp",
     optional = true,
-    dependencies = { "mikavilpas/blink-ripgrep.nvim", shell_command_editor = true },
+    dependencies = {
+      "mikavilpas/blink-ripgrep.nvim",
+      version = "*",
+      shell_command_editor = true,
+    },
     ---@type blink.cmp.Config
     opts = {
       sources = {

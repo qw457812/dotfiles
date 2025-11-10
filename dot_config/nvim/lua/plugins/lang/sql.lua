@@ -7,11 +7,21 @@ local sql_ft = { "sql", "mysql", "plsql" }
 ---@type LazySpec
 return {
   {
+    "tpope/vim-dadbod",
+    optional = true,
+    init = function()
+      -- use oracle sqlcl instead of sqlplus, requires `brew install sqlcl`
+      vim.g.dbext_default_ORA_bin = vim.fn.executable("sql") == 1 and "sql" or nil
+    end,
+  },
+
+  {
     "kristijanhusak/vim-dadbod-ui",
     optional = true,
     keys = function(_, keys)
       vim.g.db_ui_disable_info_notifications = 1
       vim.g.db_ui_disable_mappings_sql = 1
+      vim.g.db_ui_win_position = "right"
 
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "dbui",

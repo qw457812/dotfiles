@@ -261,9 +261,8 @@ abbr bbd 'brew bundle dump --global --force'
 if type -q claude
     # claude mcp add -s user context7 -- npx -y @upstash/context7-mcp --api-key $CONTEXT7_API_KEY
     # claude mcp add -s user --transport http context7 https://mcp.context7.com/mcp --header "CONTEXT7_API_KEY: $CONTEXT7_API_KEY"
-    # # https://github.com/exa-labs/exa-mcp-server/issues/48
-    # claude mcp add -s user exa -e EXA_API_KEY=$EXA_API_KEY -- npx -y exa-mcp-server --tools=get_code_context_exa
-    # claude mcp add -s user -t http exa https://mcp.exa.ai/mcp
+    # claude mcp add -s user exa -e EXA_API_KEY=$EXA_API_KEY -- npx -y exa-mcp-server tools=get_code_context_exa
+    # claude mcp add -s user -t http exa https://mcp.exa.ai/mcp?tools=get_code_context_exa
     # claude mcp add -s user --transport http grep https://mcp.grep.app
     # claude mcp add -s user playwright npx @playwright/mcp@latest
     # claude mcp add -s user magic -- npx -y @21st-dev/magic@latest

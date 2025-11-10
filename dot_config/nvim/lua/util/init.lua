@@ -9,6 +9,7 @@
 ---@field path util.path
 ---@field rime_ls util.rime_ls
 ---@field snacks util.snacks
+---@field sql util.sql
 ---@field telescope util.telescope
 ---@field terminal util.terminal
 ---@field toggle util.toggle

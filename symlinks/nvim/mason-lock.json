@@ -1,6 +1,6 @@
 {
   "alejandra": "4.0.0",
-  "basedpyright": "1.32.1",
+  "basedpyright": "1.33.0",
   "bash-language-server": "5.6.0",
   "biome": "2.3.4",
   "codelldb": "v1.11.8",
@@ -12,7 +12,7 @@
   "fish-lsp": "1.1.0",
   "hadolint": "v2.14.0",
   "java-debug-adapter": "0.58.2",
-  "java-test": "0.43.1",
+  "java-test": "0.43.2",
   "jdtls": "v1.52.0",
   "joker": "v1.5.6",
   "js-debug-adapter": "v1.105.0",

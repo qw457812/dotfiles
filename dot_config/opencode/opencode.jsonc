@@ -60,13 +60,13 @@
     },
     "exa": {
       "type": "remote",
-      "url": "https://mcp.exa.ai/mcp",
+      "url": "https://mcp.exa.ai/mcp?tools=get_code_context_exa",
       "enabled": true
     }
   },
-  "tools": {
-    "exa_web_search_exa": false
-  },
+  // "tools": {
+  //   "exa_web_search_exa": false
+  // },
   "keybinds": {
     "leader": "ctrl+x",
     "messages_half_page_up": "ctrl+u",

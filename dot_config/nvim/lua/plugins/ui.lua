@@ -68,11 +68,14 @@ return {
     "akinsho/bufferline.nvim",
     optional = true,
     keys = function(_, keys)
+      -- stylua: ignore
       local mappings = {
-        { "<Down>", "<cmd>BufferLineCycleNext<cr>", desc = "Next Buffer" },
-        { "<Up>", "<cmd>BufferLineCyclePrev<cr>", desc = "Prev Buffer" },
-        { "J", "<cmd>BufferLineCycleNext<cr>", desc = "Next Buffer" },
-        { "K", "<cmd>BufferLineCyclePrev<cr>", desc = "Prev Buffer" },
+        { "]b", function() vim.cmd(vim.bo.buflisted and "BufferLineCycleNext" or "bnext") end, desc = "Next Buffer" },
+        { "[b", function() vim.cmd(vim.bo.buflisted and "BufferLineCyclePrev" or "bprevious") end, desc = "Prev Buffer" },
+        { "<Down>", "]b", desc = "Next Buffer", remap = true },
+        { "<Up>", "[b", desc = "Prev Buffer", remap = true },
+        { "J", "]b", desc = "Next Buffer", remap = true },
+        { "K", "[b", desc = "Prev Buffer", remap = true },
         { "<leader>bH", "<cmd>lua require('bufferline').go_to(1, true)<cr>", desc = "Goto First Buffer" },
         { "<leader>bL", "<cmd>lua require('bufferline').go_to(-1, true)<cr>", desc = "Goto Last Buffer" },
         { "<leader>bh", "<Cmd>BufferLineCloseLeft<CR>", desc = "Delete Buffers to the Left" },

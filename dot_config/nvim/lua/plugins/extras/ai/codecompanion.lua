@@ -45,7 +45,7 @@ return {
             window_opts = {
               layout = "float",
               height = 0.8,
-              width = 0.6,
+              width = 0.8,
               border = "rounded",
               title = "   CodeCompanion ",
             },
@@ -204,7 +204,7 @@ return {
         },
       },
       opts = {
-        language = "Chinese",
+        -- language = "Chinese",
       },
     },
   },
@@ -299,7 +299,8 @@ return {
               delete = { n = "<localleader>d" },
               duplicate = { n = "<localleader>y", i = "<M-y>" },
             },
-            -- auto_generate_title = false,
+            -- disable title generation since there are errors with claude_code adapter
+            auto_generate_title = false,
             title_generation_opts = {
               adapter = "copilot",
             },
