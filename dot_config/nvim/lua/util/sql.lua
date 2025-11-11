@@ -8,19 +8,16 @@ local M = {}
 ---@field port? string
 ---@field database? string
 
----@class user.util.sql.Db: user.util.sql.url.Opts
----@field name string
+---@alias user.util.sql.db.Type "postgresql"|"mysql"|"oracle"
 
----@alias user.util.sql.Db.type "postgresql"|"mysql"|"oracle"
-
----@type table<user.util.sql.Db.type, string>
+---@type table<user.util.sql.db.Type, string>
 local default_ports = {
   postgresql = "5432",
   mysql = "3306",
   oracle = "1521",
 }
 
----@param type user.util.sql.Db.type
+---@param type user.util.sql.db.Type
 ---@param opts user.util.sql.url.Opts
 ---@return string?
 local function build_url(type, opts)
@@ -44,14 +41,14 @@ local function build_url(type, opts)
   )
 end
 
----@param dbs_by_type table<user.util.sql.Db.type, user.util.sql.Db[]>
+---@param dbs_by_type table<user.util.sql.db.Type, table<string, user.util.sql.url.Opts>>
 function M.add_dbs_to_dadbod_ui(dbs_by_type)
   local all_dbs = {}
   for type, dbs in pairs(dbs_by_type) do
-    for _, db in ipairs(dbs) do
+    for name, db in pairs(dbs) do
       local url = build_url(type, db)
       if url then
-        table.insert(all_dbs, { name = db.name, url = url })
+        table.insert(all_dbs, { name = name, url = url })
       end
     end
   end

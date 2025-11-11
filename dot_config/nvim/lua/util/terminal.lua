@@ -27,8 +27,8 @@ end
 ---Hide `[Process exited 0]`
 ---Copied from: https://github.com/folke/snacks.nvim/blob/5faed2f7abed7fb97aed0425b2b1b03fb6048fa9/lua/snacks/util/job.lua#L229-L254
 ---@param buf integer
----@param cb? fun(lnum: integer)
-function M.hide_process_exited(buf, cb)
+---@param on_line? fun(lnum: integer)
+function M.hide_process_exited(buf, on_line)
   local function set_lines(from, to, lines)
     if vim.api.nvim_buf_is_valid(buf) then
       vim.bo[buf].modifiable = true
@@ -51,8 +51,8 @@ function M.hide_process_exited(buf, cb)
           -- local elapsed = (vim.uv.hrtime() - start) / 1e6
           -- Snacks.debug.inspect({ fires = fires, elapsed = string.format("%.2fms", elapsed) })
           set_lines(i - 1, i, {})
-          if cb then
-            cb(i)
+          if on_line then
+            on_line(i)
           end
           return stop()
         end

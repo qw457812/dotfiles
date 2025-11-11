@@ -630,7 +630,7 @@ return {
             return
           end
           vim.schedule(function()
-            if vim.api.nvim_get_current_buf() == ev.buf then
+            if vim.api.nvim_buf_is_valid(ev.buf) then
               vim.bo[ev.buf].buflisted = true
             end
           end)

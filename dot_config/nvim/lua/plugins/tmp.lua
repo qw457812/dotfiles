@@ -87,7 +87,7 @@ return {
 
       U.sql.add_dbs_to_dadbod_ui({
         mysql = {
-          { name = "mysql_local", user = "root", password = "root" },
+          mysql_local = { user = "root", password = "root" },
         },
       })
     end,
