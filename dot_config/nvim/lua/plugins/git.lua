@@ -591,14 +591,16 @@ return {
   {
     "nvim-mini/mini-git",
     keys = function()
-      ---@param args? string[]
-      local function commit(args)
+      ---@param amend? boolean
+      local function commit(amend)
         return function()
           U.git.diff_term({
             staged = true,
             -- ignore_space = true,
-            on_data = vim.schedule_wrap(function()
-              vim.cmd("Git commit" .. (args and " " .. table.concat(args, " ") or ""))
+            on_diff = vim.schedule_wrap(function(has_diff)
+              if has_diff or amend then
+                vim.cmd("Git commit" .. (amend and " --amend" or ""))
+              end
             end),
           })
         end
@@ -606,7 +608,7 @@ return {
 
       return {
         { "<leader>gc", commit(), desc = "Commit" },
-        { "<leader>gC", commit({ "--amend" }), desc = "Commit Amend" },
+        { "<leader>gC", commit(true), desc = "Commit Amend" },
         -- { "<leader>ga", "<Cmd>Git diff --cached<CR>", desc = "Diff Staged" },
         -- { "<leader>gA", "<Cmd>Git diff --cached -- %<CR>", desc = "Diff Staged Buffer" },
         -- { "<leader>gP", "<Cmd>Git push<CR>", desc = "Push" },

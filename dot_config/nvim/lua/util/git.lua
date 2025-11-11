@@ -6,7 +6,7 @@ local M = {}
 ---@field cmd_args? string[] additional arguments to pass to the `git <cmd>``
 ---@field staged? boolean
 ---@field ignore_space? boolean
----@field on_data? function Callback for when changes are found, after closing the window
+---@field on_diff? fun(has_diff:boolean) Callback for when changes are found, after closing the window
 
 ---use `opts.staged = true` instead of `opts.cmd_args = { "--staged" }` or `opts.cmd_args = { "--cached" }`
 ---ref: https://github.com/folke/lazy.nvim/blob/a32e307981519a25dd3f05a33a6b7eea709f0fdc/lua/lazy/view/diff.lua#L49-L61
@@ -51,14 +51,14 @@ function M.diff_term(opts)
   vim.list_extend(cmd, opts.cmd_args)
 
   local on_close = opts.win.on_close
-  local on_data = opts.on_data
+  local has_diff = true
   opts.win.on_close = function(win)
     win:close() -- fully close on hide to make it one-time
     if on_close then
       on_close(win)
     end
-    if on_data then
-      on_data()
+    if opts.on_diff then
+      opts.on_diff(has_diff)
     end
   end
 
@@ -86,7 +86,7 @@ function M.diff_term(opts)
   end, { buf = true })
 
   local function on_error()
-    on_data = nil
+    has_diff = false
     terminal:close()
   end
 

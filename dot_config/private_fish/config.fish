@@ -5,6 +5,7 @@ fish_add_path ~/.local/share/bob/nvim-bin
 fish_add_path ~/.local/bin
 fish_add_path "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
 fish_add_path "$HOME/Library/Application Support/Coursier/bin" # scalafmt
+fish_add_path (brew --prefix)/Caskroom/sqlcl/(command ls -t (brew --prefix)/Caskroom/sqlcl | head -1)/sqlcl/bin
 
 # Exports
 # set -gx TERM xterm-256color # https://github.com/gpakosz/.tmux
@@ -23,7 +24,7 @@ if status is-interactive # https://github.com/ndonfris/fish-lsp/blob/1be77fcfa37
 end
 # set -x MANROFFOPT -c
 set -x EZA_MIN_LUMINANCE 50
-set -x DYLD_LIBRARY_PATH /opt/homebrew/opt/librime/lib # https://github.com/wlh320/rime-ls#macos
+set -x DYLD_LIBRARY_PATH (brew --prefix)/opt/librime/lib # https://github.com/wlh320/rime-ls#macos
 set -x RIPGREP_CONFIG_PATH $HOME/.ripgreprc
 set -x LG_CONFIG_FILE $HOME/.config/lazygit/config.yml,$HOME/.cache/nvim/lazygit-theme.yml
 
