@@ -91,7 +91,7 @@ return {
         group = vim.api.nvim_create_augroup("shell_command_buffer", { clear = true }),
         pattern = {
           tmpdir .. "//fish.*/command-line.fish", -- https://github.com/fish-shell/fish-shell/blob/97ae05b69dbd01d3e5954dbd11a01dad6f5e0cdc/share/functions/edit_command_buffer.fish#L2-L4
-          tmpdir .. "/tmp.*.fish", -- https://github.com/fish-shell/fish-shell/blob/85ea9eefc62aced087a5f694dfcc76154fc1171b/share/functions/edit_command_buffer.fish#L2-L16
+          tmpdir .. "/fish.*/command-line.fish", -- fish 4.1.2
           tmpdir .. "/qutebrowser-editor-*", -- https://github.com/qutebrowser/qutebrowser/blob/7315c34957fd3b7c08d3314ba645eafd0eb6a815/qutebrowser/misc/editor.py#L118
         },
         once = true,

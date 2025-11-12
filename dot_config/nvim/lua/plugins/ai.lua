@@ -135,6 +135,15 @@ return {
               -- ANTHROPIC_DEFAULT_OPUS_MODEL = "",
               -- ANTHROPIC_DEFAULT_HAIKU_MODEL = "",
 
+              -- ANTHROPIC_BASE_URL = "https://api.kimi.com/coding/",
+              -- ANTHROPIC_AUTH_TOKEN = vim.env.KIMI_API_KEY,
+              -- API_TIMEOUT_MS = "",
+              -- ANTHROPIC_MODEL = "kimi-for-coding",
+              -- ANTHROPIC_SMALL_FAST_MODEL = "kimi-for-coding",
+              -- ANTHROPIC_DEFAULT_SONNET_MODEL = "",
+              -- ANTHROPIC_DEFAULT_OPUS_MODEL = "",
+              -- ANTHROPIC_DEFAULT_HAIKU_MODEL = "",
+
               -- ANTHROPIC_BASE_URL = "https://open.bigmodel.cn/api/anthropic",
               -- ANTHROPIC_AUTH_TOKEN = vim.env.ZHIPU_API_KEY,
               -- API_TIMEOUT_MS = "3000000",

@@ -338,9 +338,20 @@ return {
       end
 
       -- ref: https://github.com/folke/snacks.nvim/blob/50436373c277906cf40e47380f3dc1bd7769a885/lua/snacks/gh/api.lua#L464-L495
+      ---@param cwd? string
+      ---@return string?
       local function repo(cwd)
+        if vim.b.snacks_gh and not cwd then
+          return vim.b.snacks_gh.repo
+        end
+
+        local git_root = Snacks.git.get_root(cwd)
+        if not git_root then
+          return
+        end
+
         local git_config = vim.fn
-          .system({ "git", "-C", cwd or vim.uv.cwd(), "config", "--get-regexp", "^remote\\.(upstream|origin)\\.url" })
+          .system({ "git", "-C", git_root, "config", "--get-regexp", "^remote\\.(upstream|origin)\\.url" })
           :gsub("\n$", "")
 
         local cfg = {} ---@type table<string, string>
@@ -360,40 +371,12 @@ return {
         return parse(cfg["remote.upstream.url"]) or parse(cfg["remote.origin.url"])
       end
 
-      ---@param opts? snacks.picker.gh.issue.Config
-      local function gh_issue(opts)
-        opts = opts or {}
-        if not opts.repo then
-          local git_root = Snacks.git.get_root(opts.cwd)
-          if not git_root then
-            Snacks.notify.error("Not a git repo")
-            return
-          end
-          opts.repo = repo(git_root)
-        end
-        return Snacks.picker.gh_issue(opts)
-      end
-
-      ---@param opts? snacks.picker.gh.pr.Config
-      local function gh_pr(opts)
-        opts = opts or {}
-        if not opts.repo then
-          local git_root = Snacks.git.get_root(opts.cwd)
-          if not git_root then
-            Snacks.notify.error("Not a git repo")
-            return
-          end
-          opts.repo = repo(git_root)
-        end
-        return Snacks.picker.gh_pr(opts)
-      end
-
       -- stylua: ignore
       return vim.list_extend(keys, {
-        { "<leader>gi", function() gh_issue() end, desc = "GitHub Issues (open)" },
-        { "<leader>gI", function() gh_issue({ state = "all" }) end, desc = "GitHub Issues (all)" },
-        { "<leader>gp", function() gh_pr() end, desc = "GitHub Pull Requests (open)" },
-        { "<leader>gP", function() gh_pr({ state = "all" }) end, desc = "GitHub Pull Requests (all)" },
+        { "<leader>gi", function() Snacks.picker.gh_issue({ repo = repo() }) end, desc = "GitHub Issues (open)" },
+        { "<leader>gI", function() Snacks.picker.gh_issue({ repo = repo(), state = "all" }) end, desc = "GitHub Issues (all)" },
+        { "<leader>gp", function() Snacks.picker.gh_pr({ repo = repo() }) end, desc = "GitHub Pull Requests (open)" },
+        { "<leader>gP", function() Snacks.picker.gh_pr({ repo = repo(), state = "all" }) end, desc = "GitHub Pull Requests (all)" },
       })
     end,
     ---@module "snacks"

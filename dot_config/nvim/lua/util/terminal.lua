@@ -29,14 +29,6 @@ end
 ---@param buf integer
 ---@param on_line? fun(lnum: integer)
 function M.hide_process_exited(buf, on_line)
-  local function set_lines(from, to, lines)
-    if vim.api.nvim_buf_is_valid(buf) then
-      vim.bo[buf].modifiable = true
-      vim.api.nvim_buf_set_lines(buf, from, to, true, lines)
-      vim.bo[buf].modifiable = false
-    end
-  end
-
   local timer = assert(vim.uv.new_timer())
   local stop = function()
     return timer:is_active() and timer:stop() == 0 and timer:close()
@@ -50,7 +42,9 @@ function M.hide_process_exited(buf, on_line)
         if line:find("^%[Process exited 0%]") then
           -- local elapsed = (vim.uv.hrtime() - start) / 1e6
           -- Snacks.debug.inspect({ fires = fires, elapsed = string.format("%.2fms", elapsed) })
-          set_lines(i - 1, i, {})
+          vim.bo[buf].modifiable = true
+          vim.api.nvim_buf_set_lines(buf, i - 1, i, true, {})
+          vim.bo[buf].modifiable = false
           if on_line then
             on_line(i)
           end

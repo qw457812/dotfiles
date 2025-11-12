@@ -107,10 +107,6 @@ return {
             end,
           },
           keys = {
-            -- Disable `<c-/>` to avoid conflicts with fish/claude undo.
-            -- Instead, `<c-/>` only hides the terminal opened by `<c-/>` (see `hide_ctrl_slash` above)
-            hide_slash = false,
-            hide_underscore = false,
             t_c_o = { "<c-o>", "blur", mode = "t" },
             t_c_q = {
               "<c-q>",
@@ -120,7 +116,7 @@ return {
               mode = "t",
             },
             n_c_q = { "<c-q>", "hide" }, -- with t_c_q, double `<c-q>` will hide
-            hide_ctrl_z = { "<c-z>", "hide", mode = { "n", "t" } }, -- conflicts with fish undo
+            hide_ctrl_z = { "<c-z>", "hide", mode = { "n", "t" } }, -- overrides fish undo; use <c-/> as alternative undo keybinding in fish/claude
             n_esc = {
               "<esc>",
               function(self)

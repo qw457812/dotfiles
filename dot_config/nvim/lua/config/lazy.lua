@@ -304,17 +304,14 @@ require("lazy.view.diff").handlers.terminal_git_ignore_space = function(plugin, 
 
   vim.wo[float.win].sidescrolloff = 0
   vim.wo[float.win].scrolloff = math.floor((vim.api.nvim_win_get_height(float.win) - 1) / 2)
-  vim.api.nvim_win_call(
-    float.win,
-    vim.schedule_wrap(function()
-      vim.cmd.normal({ "M", bang = true })
-    end)
-  )
   vim.api.nvim_create_autocmd("TermEnter", { buffer = float.buf, command = "stopinsert" })
   vim.api.nvim_create_autocmd("TermClose", {
     buffer = float.buf,
     callback = function()
       U.terminal.hide_process_exited(float.buf)
+      vim.api.nvim_win_call(float.win, function()
+        vim.cmd.normal({ "M", bang = true })
+      end)
     end,
   })
 end

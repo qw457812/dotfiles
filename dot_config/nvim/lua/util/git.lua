@@ -6,7 +6,7 @@ local M = {}
 ---@field cmd_args? string[] additional arguments to pass to the `git <cmd>``
 ---@field staged? boolean
 ---@field ignore_space? boolean
----@field on_diff? fun(has_diff:boolean) Callback for when changes are found, after closing the window
+---@field on_diff? fun(has_diff:boolean) Callback after closing the window; has_diff indicates whether changes were found
 
 ---use `opts.staged = true` instead of `opts.cmd_args = { "--staged" }` or `opts.cmd_args = { "--cached" }`
 ---ref: https://github.com/folke/lazy.nvim/blob/a32e307981519a25dd3f05a33a6b7eea709f0fdc/lua/lazy/view/diff.lua#L49-L61
@@ -68,12 +68,6 @@ function M.diff_term(opts)
       return
     end
     vim.wo[win.win].scrolloff = math.floor((vim.api.nvim_win_get_height(win.win) - 1) / 2)
-    vim.api.nvim_win_call(
-      win.win,
-      vim.schedule_wrap(function()
-        vim.cmd.normal({ "M", bang = true })
-      end)
-    )
     if on_win then
       on_win(win)
     end
@@ -111,15 +105,17 @@ function M.diff_term(opts)
       --   on_error()
       -- end
 
-      if terminal.buf then
-        U.terminal.hide_process_exited(terminal.buf, function(lnum)
-          -- close terminal if no changes found
-          if lnum == 2 then
-            Snacks.notify.warn(("No changes found:\n- cmd: `%s`"):format(table.concat(cmd, " ")))
-            on_error()
-          end
-        end)
-      end
+      U.terminal.hide_process_exited(assert(terminal.buf), function(lnum)
+        -- close terminal if no changes found
+        if lnum == 2 then
+          Snacks.notify.warn(("No changes found:\n- cmd: `%s`"):format(table.concat(cmd, " ")))
+          on_error()
+        else
+          vim.api.nvim_win_call(assert(terminal.win), function()
+            vim.cmd.normal({ "M", bang = true })
+          end)
+        end
+      end)
     end
   end, { buf = true })
 
