@@ -1,5 +1,5 @@
 ---@class util.terminal
----@overload fun(cmd?: string|string[], opts?: snacks.terminal.Opts): snacks.terminal
+---@overload fun(cmd?: string|string[], opts?: snacks.terminal.Opts, hide_key?: string): snacks.terminal
 local M = setmetatable({}, {
   ---@param t util.terminal
   __call = function(t, ...)
@@ -7,12 +7,46 @@ local M = setmetatable({}, {
   end,
 })
 
--- TODO: refactor
+---@class vim.var_accessor
+---https://github.com/folke/snacks.nvim/blob/8c501965beff9a741b29eea53c7f876b039bddea/lua/snacks/terminal.lua#L111
+---@field snacks_terminal? { cmd?: string | string[], id: integer, cwd?: string, env?: table<string, string> }
+
 ---@param cmd? string | string[]
 ---@param opts? snacks.terminal.Opts
+---@param hide_key? string
 ---@return snacks.win
-function M.toggle(cmd, opts)
-  if vim.bo.filetype == "snacks_terminal" then
+function M.toggle(cmd, opts, hide_key)
+  opts = opts or {}
+
+  if hide_key then
+    opts = vim.tbl_deep_extend("force", {
+      win = { keys = { ["hide_" .. hide_key] = { hide_key, "hide", desc = "Hide Terminal", mode = "t" } } },
+    }, opts)
+  end
+
+  if vim.tbl_get(opts, "win", "position") == "float" then
+    opts = vim.tbl_deep_extend("force", {
+      win = {
+        height = vim.g.user_is_termux and U.snacks.win.fullscreen_height or nil,
+        width = vim.g.user_is_termux and 0 or nil,
+      },
+      -- try `<c-/>` -> `<c-/>` -> `<c-space>` in home dir (root and cwd are the same), without this, then <c-space> will open a bottom terminal
+      -- see: https://github.com/folke/snacks.nvim/blob/8c501965beff9a741b29eea53c7f876b039bddea/lua/snacks/terminal.lua#L173-L184
+      env = { __NVIM_SNACKS_TERMINAL_POSITION = "float" },
+    }, opts)
+  end
+
+  local st = vim.b.snacks_terminal or {}
+  if
+    vim.fn.mode() == "n" -- terminal mode handled by `hide_key`
+    and vim.bo.filetype == "snacks_terminal"
+    -- Instead of toggling the [1](https://github.com/folke/snacks.nvim/blob/8c501965beff9a741b29eea53c7f876b039bddea/lua/snacks/terminal.lua#L182), we want to close the current terminal.
+    -- Try `<c-/>` -> `<esc><esc>` -> `2<c-/>` -> `<esc><esc>` -> `<c-/>`, without this, the last `<c-/>` will close the first opened terminal instead of closing the current one.
+    -- See: https://github.com/LazyVim/LazyVim/pull/6774#issuecomment-3519559573
+    and vim.v.count == 0
+    -- Try `<c-/>` -> `<esc><esc>` -> `<c-space>`, without this, the `<c-space>` will close the bottom terminal instead of opening a float one.
+    and (vim.deep_equal(st.cmd, cmd) and st.cwd == opts.cwd and vim.deep_equal(st.env, opts.env))
+  then
     local win = vim.api.nvim_get_current_win()
     ---@param t snacks.win
     local terminal = vim.tbl_filter(function(t)
@@ -20,8 +54,10 @@ function M.toggle(cmd, opts)
     end, Snacks.terminal.list())[1]
     vim.cmd("close")
     return terminal
+  else
+    -- TODO: focus if terminal is already open but not focused
+    return Snacks.terminal(cmd, opts)
   end
-  return Snacks.terminal(cmd, opts)
 end
 
 ---Hide `[Process exited 0]`
