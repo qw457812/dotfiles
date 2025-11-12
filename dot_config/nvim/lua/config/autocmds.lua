@@ -258,6 +258,9 @@ if vim.g.user_auto_root and not vim.o.autochdir then
   })
 end
 
+---@class vim.var_accessor
+---@field user_last_file? { buf: number, path: string, root: string }
+
 -- set up vim.g.user_last_file
 -- see also: https://github.com/folke/snacks.nvim/issues/2378#issuecomment-3474790578
 do

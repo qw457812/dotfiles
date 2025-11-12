@@ -290,12 +290,22 @@ return {
   {
     "folke/todo-comments.nvim",
     optional = true,
-    -- stylua: ignore
-    keys = {
-      -- add `focus=true`
-      { "<leader>xt", "<cmd>Trouble todo toggle focus=true<cr>", desc = "Todo (Trouble)" },
-      { "<leader>xT", "<cmd>Trouble todo toggle focus=true filter = {tag = {TODO,FIX,FIXME}}<cr>", desc = "Todo/Fix/Fixme (Trouble)" },
-    },
+    keys = function(_, keys)
+      if LazyVim.pick.picker.name == "snacks" then
+        -- stylua: ignore
+        vim.list_extend(keys, {
+          { "<leader>st", function() Snacks.picker.todo_comments({ cwd = LazyVim.root() }) end, desc = "Todo" },
+          { "<leader>sT", function() Snacks.picker.todo_comments({ keywords = { "TODO", "FIX", "FIXME" }, cwd = LazyVim.root() }) end, desc = "Todo/Fix/Fixme" },
+        })
+      end
+
+      -- stylua: ignore
+      return vim.list_extend(keys, {
+        -- add `focus=true`
+        { "<leader>xt", "<cmd>Trouble todo toggle focus=true<cr>", desc = "Todo (Trouble)" },
+        { "<leader>xT", "<cmd>Trouble todo toggle focus=true filter = {tag = {TODO,FIX,FIXME}}<cr>", desc = "Todo/Fix/Fixme (Trouble)" },
+      })
+    end,
   },
 
   {

@@ -40,6 +40,7 @@
       "Bash(git branch:*)",
       "Bash(git branch -v:*)",
       "Bash(git remote -v:*)",
+      "Bash(git fetch:*)",
       "Bash(nvim --version:*)",
       "Bash(node --version:*)",
       "Bash(npm list:*)"

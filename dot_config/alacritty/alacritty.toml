@@ -23,7 +23,7 @@ option_as_alt = "Both"
 [font]
 # family: "JetBrainsMono Nerd Font", "Hack Nerd Font", "MesloLGM Nerd Font", "FiraCode Nerd Font"
 # style: "Light", "Regular"
-normal = { family = "JetBrainsMono Nerd Font", style = "Light" }
+normal = { family = "Maple Mono NF CN", style = "Light" }
 size = 13.0
 
 # Make mutable colors immutable
@@ -73,8 +73,8 @@ regex = "(ipfs:|ipns:|magnet:|mailto:|gemini://|gopher://|https://|http://|news:
 [keyboard]
 bindings = [
   # Launch Alacritty's Vi Mode
-  { key = "Space", mods = "Control", mode = "~Search", action = "ToggleViMode" },
-  { key = "Space", mods = "Control", mode = "Vi|~Search", action = "ScrollToBottom" },
+  { key = "Space", mods = "Command", mode = "~Search", action = "ToggleViMode" },
+  { key = "Space", mods = "Command", mode = "Vi|~Search", action = "ScrollToBottom" },
   { key = "J", mods = "Command", mode = "~Search", action = "ToggleViMode" },
   { key = "J", mods = "Command", mode = "Vi|~Search", action = "ScrollToBottom" },
   # Same behavior as "esc" in https://github.com/gpakosz/.tmux

@@ -583,6 +583,17 @@ return {
             on_diff = vim.schedule_wrap(function(has_diff)
               if has_diff or amend then
                 vim.cmd("Git commit" .. (amend and " --amend" or ""))
+
+                -- HACK: sometimes the gitcommit buffer is opened but not focused
+                if vim.bo.filetype ~= "gitcommit" then
+                  LazyVim.warn("Focusing gitcommit buffer", { title = "Git Commit" })
+                  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+                    if vim.bo[buf].filetype == "gitcommit" then
+                      vim.api.nvim_set_current_buf(buf)
+                      break
+                    end
+                  end
+                end
               end
             end),
           })
