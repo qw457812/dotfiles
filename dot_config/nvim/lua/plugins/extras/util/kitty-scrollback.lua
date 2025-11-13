@@ -5,6 +5,7 @@ return {
     "mikesmithgh/kitty-scrollback.nvim",
     pager = true,
     -- cond = vim.env.KITTY_SCROLLBACK_NVIM == "true", -- needs pre-installation
+    cond = vim.g.user_is_kitty,
     cmd = {
       "KittyScrollbackGenerateKittens",
       "KittyScrollbackCheckHealth",

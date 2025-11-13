@@ -32,6 +32,7 @@ return {
   {
     "kristijanhusak/vim-dadbod-ui",
     optional = true,
+    -- NOTE: `keys` function is called earlier than `init` function, so the `vim.g` variables can be overwritten by LazyVim.
     keys = function(_, keys)
       vim.g.db_ui_disable_info_notifications = 1
       vim.g.db_ui_disable_mappings_sql = 1
@@ -39,16 +40,59 @@ return {
 
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "dbui",
-        callback = function(event)
+        callback = function(ev)
           for _, key in ipairs({ "H", "<c-j>", "<c-k>" }) do
-            pcall(vim.keymap.del, "n", key, { buffer = event.buf })
+            pcall(vim.keymap.del, "n", key, { buffer = ev.buf })
+          end
+        end,
+      })
+
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = sql_ft,
+        callback = function(ev)
+          ---@param path string
+          ---@return boolean
+          local function is_tmp(path)
+            if not vim.g.db_ui_tmp_query_location then
+              return false
+            end
+            return vim.startswith(path, vim.fn.fnamemodify(vim.g.db_ui_tmp_query_location, ":p"))
+          end
+
+          local buf = ev.buf
+          if is_tmp(ev.file) then
+            local tmp_buf = buf
+            U.keymap("n", { "<C-s>", "<leader>fs", "<localleader>s" }, function()
+              -- alternative: vim.cmd.normal({ vim.keycode("<Plug>(DBUI_SaveQuery)"), bang = true })
+              vim.api.nvim_feedkeys(vim.keycode("<Plug>(DBUI_SaveQuery)"), "n", false)
+
+              if vim.g.db_ui_save_location then
+                vim.api.nvim_create_autocmd("BufWritePost", {
+                  group = vim.api.nvim_create_augroup("dadbod_ui_save_query_" .. tmp_buf, { clear = true }),
+                  pattern = vim.g.db_ui_save_location:gsub("/$", "") .. "/*",
+                  once = true,
+                  callback = function(_ev)
+                    if is_tmp(_ev.match) then
+                      return
+                    end
+
+                    local saved_buf = vim.fn.bufnr(_ev.match)
+                    if saved_buf ~= -1 then
+                      vim.bo[saved_buf].buflisted = true
+                      if vim.api.nvim_buf_is_valid(tmp_buf) then
+                        Snacks.bufdelete({ buf = tmp_buf, force = true })
+                      end
+                    end
+                  end,
+                })
+              end
+            end, { buffer = tmp_buf, desc = "Save Query (dadbod)" })
           end
         end,
       })
 
       return vim.list_extend(keys, {
         { "<cr>", mode = { "n", "x" }, "<Plug>(DBUI_ExecuteQuery)", desc = "Execute Query (dadbod)", ft = sql_ft },
-        { "<leader>fs", "<Plug>(DBUI_SaveQuery)", desc = "Save Query (dadbod)", ft = sql_ft },
         { "<localleader>e", "<Plug>(DBUI_EditBindParameters)", desc = "Edit Bind Parameters (dadbod)", ft = sql_ft },
         { "a", "<Plug>(DBUI_AddConnection)", desc = "Add Connection (dadbod)", ft = "dbui" },
         { "gd", "<Plug>(DBUI_ToggleDetails)", desc = "Toggle Details (dadbod)", ft = "dbui" },
