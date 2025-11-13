@@ -12,6 +12,7 @@
 # end
 
 # https://www.kimi.com/coding/docs/third-party-agents.html
+# https://www.kimi.com/membership/subscription
 function claude_kimi --wraps=claude
     set -lx ANTHROPIC_BASE_URL https://api.kimi.com/coding/
     set -lx ANTHROPIC_AUTH_TOKEN $KIMI_API_KEY

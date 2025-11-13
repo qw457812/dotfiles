@@ -59,9 +59,8 @@ return {
             return vim.startswith(path, vim.fn.fnamemodify(vim.g.db_ui_tmp_query_location, ":p"))
           end
 
-          local buf = ev.buf
           if is_tmp(ev.file) then
-            local tmp_buf = buf
+            local tmp_buf = ev.buf
             U.keymap("n", { "<C-s>", "<leader>fs", "<localleader>s" }, function()
               -- alternative: vim.cmd.normal({ vim.keycode("<Plug>(DBUI_SaveQuery)"), bang = true })
               vim.api.nvim_feedkeys(vim.keycode("<Plug>(DBUI_SaveQuery)"), "n", false)

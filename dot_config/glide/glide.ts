@@ -19,6 +19,7 @@
 // https://support.mozilla.org/en-US/kb/keyboard-shortcuts-perform-firefox-tasks-quickly
 
 // https://github.com/RobertCraigie/dotfiles/blob/ecfd6f66e8a775c80849f7889f297ef99cea7997/glide/glide.ts
+// https://github.com/y3owk1n/nix-system-config-v2/blob/6d6e20540ae533cea4828abdf655238e8d4f2498/config/glide/glide.ts
 
 // Search engines
 // https://github.com/mozilla-firefox/firefox/blob/e2e91539047e030b956e01fd5e8c28c074ae3f88/services/settings/dumps/main/search-config-v2.json
@@ -570,6 +571,7 @@ function when_editing(
 
 /**
  * defocus the editable element
+ * TODO: https://github.com/glide-browser/glide/discussions/93#discussioncomment-14918102
  */
 async function focus_page(props: glide.KeymapCallbackProps) {
   // ref: https://github.com/glide-browser/glide/discussions/93#discussioncomment-14805495

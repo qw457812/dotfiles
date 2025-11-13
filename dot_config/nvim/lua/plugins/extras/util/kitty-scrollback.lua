@@ -26,6 +26,11 @@ return {
               vim.cmd.normal(vim.keycode(vim.g.user_close_key))
             end, { buffer = ev.buf, desc = "Yank and Quit" })
           end
+
+          local win = vim.fn.bufwinid(ev.buf)
+          if win ~= -1 then
+            vim.wo[win].sidescrolloff = 0
+          end
         end,
       })
 

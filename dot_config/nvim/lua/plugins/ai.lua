@@ -81,6 +81,16 @@ return {
             })
           end),
           layout = vim.g.user_is_termux and "bottom" or "right", ---@type "float"|"left"|"bottom"|"top"|"right"
+          ---@type vim.api.keyset.win_config
+          float = {
+            width = 1,
+            height = vim.o.lines - 4, -- see: U.snacks.win.fullscreen_height
+          },
+          ---@type vim.api.keyset.win_config
+          split = {
+            width = math.max(80, math.floor(vim.o.columns * 0.4)),
+            height = math.max(20, math.floor(vim.o.lines * 0.5)),
+          },
           ---@type table<string, sidekick.cli.Keymap|false>
           keys = {
             hide_ctrl_dot = false,
@@ -310,6 +320,18 @@ return {
                 end
               end,
             })
+
+            -- Remove "[O" and "[I" for claude code prompts, but keep the "[Image #1]"
+            vim.api.nvim_buf_call(
+              ev.buf,
+              vim.schedule_wrap(function()
+                vim.cmd([[%s/\[O//ge]])
+                vim.cmd([[%s/\[I\ze\(mage\)\@!//ge]]) -- match `[I` only when it's NOT followed by 'mage'
+                if vim.bo[ev.buf].modified then
+                  vim.cmd("silent! noautocmd lockmarks write")
+                end
+              end)
+            )
           end
 
           vim.keymap.set("n", "<Esc>", function()

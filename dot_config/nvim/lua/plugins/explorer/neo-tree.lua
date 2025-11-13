@@ -114,7 +114,7 @@ return {
           -- If `vim.g.user_explorer_auto_close` is set to true,
           -- then the resize-neotree-auto-close feature will not be needed,
           -- and the resize-neotree-auto-open feature will be ignored.
-          if vim.g.user_explorer_auto_close or should_ignore(event.buf, win) then
+          if win == -1 or vim.g.user_explorer_auto_close or should_ignore(event.buf, win) then
             return
           end
 

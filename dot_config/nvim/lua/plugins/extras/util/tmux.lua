@@ -226,6 +226,7 @@ return {
       { "<leader><C-k>", function() require("smart-splits").swap_buf_up() end, desc = "Swap Buffer Up" },
       { "<leader><C-l>", function() require("smart-splits").swap_buf_right() end, desc = "Swap Buffer Right" },
     },
+    ---@type SmartSplitsConfig|{}
     opts = {
       ignored_filetypes = { "NvimTree", "neo-tree" },
       --- for tmux in wezterm: navigate from tmux panes to wezterm panes
