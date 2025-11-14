@@ -17,30 +17,49 @@
         "preserveColors": false
       },
       {
-        "id": "ac77a6a5-7bc0-491a-be2f-6d40a4e8d9ab",
-        "type": "separator",
-        "character": " "
-      },
-      {
-        "id": "43d417f8-d31b-482e-a60f-0ba21b4b5ff9",
-        "type": "git-branch",
-        "color": "brightMagenta",
-        "rawValue": true
-      },
-      {
         "id": "30f3044b-6d2d-4fee-9512-497666c35f19",
         "type": "separator",
         "character": " "
       },
       {
-        "id": "70ffcb49-359b-431d-807c-fa6c5e7b7bce",
-        "type": "git-changes",
-        "rawValue": false
+        "id": "a789591a-bd42-4578-bf5d-c0392f58c92a",
+        "type": "git-branch"
+      },
+      {
+        "id": "93bad283-ff94-4abd-91a1-4197f3557fe4",
+        "type": "separator",
+        "character": " "
+      },
+      {
+        "id": "d47acbe0-8e72-428f-93c9-6de094b0a993",
+        "type": "custom-command",
+        "color": "green",
+        "commandPath": "echo \"+$({ git diff --shortstat; git diff --cached --shortstat; } | grep -oE '[0-9]+ insertion' | grep -oE '[0-9]+' | awk '{s+=$1} END {print s}')\""
+      },
+      {
+        "id": "a290c94c-4998-4f21-99a1-5d6ac8b01e18",
+        "type": "separator",
+        "character": " "
+      },
+      {
+        "id": "44ac743a-3931-4e3d-a5ef-560f4f5d2fad",
+        "type": "custom-command",
+        "color": "red",
+        "commandPath": "echo \"-$({ git diff --shortstat; git diff --cached --shortstat; } | grep -oE '[0-9]+ deletion' | grep -oE '[0-9]+' | awk '{s+=$1} END {print s}')\""
       },
       {
         "id": "bec4f782-810f-4d76-9dd5-7c359dcd6227",
         "type": "flex-separator",
         "character": "|"
+      },
+      {
+        "id": "0db908a2-9ff8-41a4-8c2a-8ae831ced2df",
+        "type": "model",
+        "rawValue": true
+      },
+      {
+        "id": "8a21893d-80d4-49dc-afe7-58b15e581860",
+        "type": "separator"
       },
       {
         "id": "3eaf112c-d639-44a8-974f-abc0b89f4516",
@@ -129,8 +148,20 @@
         "rawValue": true
       },
       {
-        "id": "a8790a07-cc3a-48f2-9858-6b9fc25d8387",
-        "type": "separator"
+        "id": "3ea513af-4a04-4b45-a0cb-a826df2b50dc",
+        "type": "separator",
+        "character": "|"
+      },
+      {
+        "id": "66a015e1-9fff-40be-bb04-48c66d83d5f7",
+        "type": "session-cost",
+        "color": "yellow",
+        "rawValue": true
+      },
+      {
+        "id": "21b79659-4160-4386-b2dc-3b5d7b1a4a3d",
+        "type": "separator",
+        "character": " "
       },
       {
         "id": "9457c6c6-2b46-49f5-8e3e-33f541c3b4dd",
