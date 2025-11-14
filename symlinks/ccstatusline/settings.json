@@ -6,7 +6,7 @@
         "id": "986838e5-630a-4fc8-b1e3-21a9b6c5688a",
         "type": "custom-command",
         "color": "white",
-        "commandPath": "pwd | awk -v h=\"$HOME\" '{if($0==h || $0==\"/\"){print \"\"}else{gsub(/\\/[^\\/]*$/,\"\",$0); gsub(\"^\"h,\"~\",$0); if($0==\"\"){print \"/\"} else {path=$0\"/\"; if(length(path)>19){path=\"…\" substr(path,length(path)-18)} print path}}}'"
+        "commandPath": "pwd | awk -v h=\"$HOME\" '{if($0==h || $0==\"/\"){print \"\"}else{gsub(/\\/[^\\/]*$/,\"\",$0); gsub(\"^\"h,\"~\",$0); if($0==\"\"){print \"/\"} else {path=$0\"/\"; if(length(path)>15){path=\"…\" substr(path,length(path)-14)} print path}}}'"
       },
       {
         "id": "bd1bda17-2248-4785-893c-5b7b549eb8ed",
@@ -34,7 +34,7 @@
         "id": "d47acbe0-8e72-428f-93c9-6de094b0a993",
         "type": "custom-command",
         "color": "green",
-        "commandPath": "echo \"+$({ git diff --shortstat; git diff --cached --shortstat; } | grep -oE '[0-9]+ insertion' | grep -oE '[0-9]+' | awk '{s+=$1} END {print s}')\""
+        "commandPath": "(git diff --shortstat; git diff --cached --shortstat) | grep -oE '[0-9]+ insertion' | grep -oE '[0-9]+' | awk '{s+=$1} END {if(s>0) print \"+\"s; else print \"\"}'"
       },
       {
         "id": "a290c94c-4998-4f21-99a1-5d6ac8b01e18",
@@ -45,7 +45,7 @@
         "id": "44ac743a-3931-4e3d-a5ef-560f4f5d2fad",
         "type": "custom-command",
         "color": "red",
-        "commandPath": "echo \"-$({ git diff --shortstat; git diff --cached --shortstat; } | grep -oE '[0-9]+ deletion' | grep -oE '[0-9]+' | awk '{s+=$1} END {print s}')\""
+        "commandPath": "(git diff --shortstat; git diff --cached --shortstat) | grep -oE '[0-9]+ deletion' | grep -oE '[0-9]+' | awk '{s+=$1} END {if(s>0) print \"-\"s; else print \"\"}'"
       },
       {
         "id": "bec4f782-810f-4d76-9dd5-7c359dcd6227",
