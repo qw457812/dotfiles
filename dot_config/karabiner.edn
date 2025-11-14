@@ -1497,7 +1497,8 @@
            [:!Qn [:open "http://127.0.0.1:8080/"] nil {:delayed {:invoked [:escape]} :params {:delay 800}}] ; note
            [:!Qm [:open "/Applications/Thunderbird.app"] :!Thunderbird] ; email
            [:!Qm :same_wind_app :Thunderbird]
-           [:!Qspacebar [:open "/Applications/KeePassXC.app"]]
+           ;; [:!Qspacebar [:open "/Applications/KeePassXC.app"]]
+           [:!Qspacebar [:open "/Applications/Bitwarden.app"]]
            [:!Qgrave_accent_and_tilde [:open "/Applications/YesPlayMusic.app"]]
            [:!Qcomma [:open "/System/Applications/System Settings.app"]] ; cmd+, for setting
            [:!Qperiod [:open "/System/Applications/Launchpad.app"]] ; 启动台
@@ -1829,7 +1830,8 @@
   {:des   "For Glove80\n- backspace to space"
    :rules [:glove80
            ;; launch-mode before remap
-           [:!Wdelete_or_backspace [:left_command [:open "/Applications/KeePassXC.app"]]] ; space
+           ;; [:!Wdelete_or_backspace [:left_command [:open "/Applications/KeePassXC.app"]]] ; space
+           [:!Wdelete_or_backspace [:left_command [:open "/Applications/Bitwarden.app"]]] ; space
            [:!Wescape [:left_command [:open "/Applications/YesPlayMusic.app"]]] ; `
 
            ;; TODO delete cmd-c cmd-v rime ` = \ [ ]
