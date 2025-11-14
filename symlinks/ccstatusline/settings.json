@@ -186,15 +186,7 @@
         "rawValue": true
       }
     ],
-    [
-      {
-        "id": "1bb65e90-bcf8-44d0-a363-a49612702991",
-        "type": "custom-command",
-        "commandPath": "if command -v bunx >/dev/null 2>&1; then bunx ccusage statusline; else npx -y ccusage@latest statusline; fi",
-        "preserveColors": true,
-        "timeout": 10000
-      }
-    ],
+    [],
     []
   ],
   "flexMode": "full-minus-40",
