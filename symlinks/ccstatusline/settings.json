@@ -54,49 +54,9 @@
         "character": "|"
       },
       {
-        "id": "96b7390d-64eb-40f9-b62c-cf7854074c57",
-        "type": "tokens-input",
-        "color": "red",
-        "rawValue": true
-      },
-      {
-        "id": "ddf594fc-3719-4744-85ea-e5697d8702c0",
+        "id": "7306585e-6a5b-45aa-994f-7f90ba28cd0d",
         "type": "separator",
         "character": " "
-      },
-      {
-        "id": "f922cf05-5ed3-4c21-9996-4129f40bb9fd",
-        "type": "tokens-output",
-        "color": "green",
-        "rawValue": true
-      },
-      {
-        "id": "069f7fa7-5d6e-45b8-a39d-82d4fdee9f02",
-        "type": "separator",
-        "character": " "
-      },
-      {
-        "id": "4bf36114-c2c3-4bae-9fdb-2410e752f6c4",
-        "type": "tokens-cached",
-        "color": "yellow",
-        "bold": false,
-        "rawValue": true
-      },
-      {
-        "id": "faf8ed12-7fb0-42ac-a799-06e9081c0e2c",
-        "type": "separator",
-        "character": " "
-      },
-      {
-        "id": "103a540c-4d62-4542-833c-bffe6fefdead",
-        "type": "tokens-total",
-        "color": "cyan",
-        "rawValue": true
-      },
-      {
-        "id": "1817dd5f-998b-4768-acb4-8770280b5653",
-        "type": "separator",
-        "character": "|"
       },
       {
         "id": "a6110a91-ee50-4f7f-b6e8-7908bb93ccf9",
@@ -143,9 +103,55 @@
         "character": "|"
       },
       {
+        "id": "96b7390d-64eb-40f9-b62c-cf7854074c57",
+        "type": "tokens-input",
+        "color": "red",
+        "rawValue": true
+      },
+      {
+        "id": "ddf594fc-3719-4744-85ea-e5697d8702c0",
+        "type": "separator",
+        "character": " "
+      },
+      {
+        "id": "f922cf05-5ed3-4c21-9996-4129f40bb9fd",
+        "type": "tokens-output",
+        "color": "green",
+        "rawValue": true
+      },
+      {
+        "id": "069f7fa7-5d6e-45b8-a39d-82d4fdee9f02",
+        "type": "separator",
+        "character": " "
+      },
+      {
+        "id": "4bf36114-c2c3-4bae-9fdb-2410e752f6c4",
+        "type": "tokens-cached",
+        "color": "yellow",
+        "bold": false,
+        "rawValue": true
+      },
+      {
+        "id": "faf8ed12-7fb0-42ac-a799-06e9081c0e2c",
+        "type": "separator",
+        "character": " "
+      },
+      {
+        "id": "103a540c-4d62-4542-833c-bffe6fefdead",
+        "type": "tokens-total",
+        "color": "cyan",
+        "rawValue": true
+      },
+      {
+        "id": "1817dd5f-998b-4768-acb4-8770280b5653",
+        "type": "separator",
+        "character": "|"
+      },
+      {
         "id": "bae1b3d4-bf68-4e43-8e3e-1ca56ef066f1",
         "type": "model",
-        "rawValue": true
+        "rawValue": true,
+        "color": "blue"
       },
       {
         "id": "f387fd01-d436-4495-a957-9a374b334c48",
