@@ -22,6 +22,7 @@ return {
   },
   {
     "nvim-treesitter/nvim-treesitter",
+    -- `:=require('nvim-treesitter').get_available()`
     ---@type lazyvim.TSConfig|{}
     opts = { ensure_installed = { "mermaid", "groovy", "promql" } },
   },
