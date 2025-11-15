@@ -1,5 +1,5 @@
 {
-  "darkMode": true,
+  "darkMode": "dark",
   "uiLang": "zh",
   "minLength": 2,
   "maxLength": 100000,
@@ -773,5 +773,12 @@
     "originStyle": "font-size: clamp(1.5rem, 3cqw, 3rem);",
     "translationStyle": "font-size: clamp(1.5rem, 3cqw, 3rem);"
   },
-  "logLevel": 1
+  "logLevel": 1,
+  "customStyles": [
+    {
+      "styleSlug": "custom_6138f540-fcc1-44dc-9167-b119c8efa9fd",
+      "styleName": "Style_custom_blockquote",
+      "styleCode": "opacity: 0.92;\n-webkit-opacity: 0.92;\ndisplay: block;\npadding: 0.3em 0.75em;\nborder-left: 0.25em solid #cc3355;\nbackground: #302e34;\nborder-radius: 0 0.25em 0.25em 0;\nbox-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);\ntransition: opacity 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;\n&:hover {\n  opacity: 1;\n  -webkit-opacity: 1;\n  background: #3a3840;\n  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);\n}"
+    }
+  ]
 }
