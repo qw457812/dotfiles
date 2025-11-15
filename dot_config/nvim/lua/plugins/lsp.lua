@@ -76,7 +76,7 @@ return {
                 end
                 -- check to see if `<cr>` is already mapped to the buffer (avoids overwriting)
                 -- for yarospace/lua-console.nvim
-                return not U.keymap.buffer_local_mapping_exists(0, "n", "<cr>")
+                return not U.keymap.exists("n", "<cr>", { buf = true })
               end,
             },
             -- https://zed.dev/docs/vim#language-server

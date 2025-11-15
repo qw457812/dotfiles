@@ -83,7 +83,7 @@ vim.api.nvim_create_autocmd("FileType", {
       if
         vim.api.nvim_buf_is_valid(buf)
         and vim.bo[buf].modifiable == false
-        and not U.keymap.buffer_local_mapping_exists(buf, "n", { "u", "d", "dd" }) -- `dd` mapped for quickfix
+        and not U.keymap.exists("n", { "u", "d", "dd" }, { buf = buf }) -- `dd` mapped for quickfix
       then
         vim.b[buf].minianimate_disable = true
         -- vim.b[buf].snacks_scroll = false
@@ -163,7 +163,7 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     -- Mark the buffer as checked
     vim.g.q_close_windows[args.buf] = true
     -- Check to see if `q` is already mapped to the buffer (avoids overwriting)
-    if U.keymap.buffer_local_mapping_exists(args.buf, "n", "q") then
+    if U.keymap.exists("n", "q", { buf = args.buf }) then
       return
     end
     -- If there is no q mapping already and the buftype is a non-real file, create one

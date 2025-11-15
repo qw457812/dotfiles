@@ -49,31 +49,20 @@ function M.del(modes, lhs, opts)
   end
 end
 
+--- Check if a keymap exists (global or buffer-local)
 --- copied from: https://github.com/chipsenkbeil/org-roam.nvim/blob/6458d3cc3389716a9c69a81ab78658454738427a/spec/utils.lua#L386
----@param buf integer
 ---@param mode string
 ---@param lhs string|string[]
+---@param opts? {buf?: integer|boolean} If buf is provided, checks buffer-local mappings; otherwise checks global mappings. Use `buf = 0` or `buf = true` for current buffer
 ---@return boolean exists, vim.api.keyset.get_keymap|nil mapping
-function M.buffer_local_mapping_exists(buf, mode, lhs)
+function M.exists(mode, lhs, opts)
+  opts = opts or {}
   lhs = type(lhs) == "string" and { lhs } or lhs
   ---@cast lhs string[]
   local lhs_norm = vim.tbl_map(Snacks.util.normkey, lhs)
-  for _, map in ipairs(vim.api.nvim_buf_get_keymap(buf, mode)) do
-    if map.lhs and vim.list_contains(lhs_norm, Snacks.util.normkey(map.lhs)) then
-      return true, map
-    end
-  end
-  return false
-end
-
----@param mode string
----@param lhs string|string[]
----@return boolean exists, vim.api.keyset.get_keymap|nil mapping
-function M.global_mapping_exists(mode, lhs)
-  lhs = type(lhs) == "string" and { lhs } or lhs
-  ---@cast lhs string[]
-  local lhs_norm = vim.tbl_map(Snacks.util.normkey, lhs)
-  for _, map in ipairs(vim.api.nvim_get_keymap(mode)) do
+  local maps = opts.buf and vim.api.nvim_buf_get_keymap(opts.buf == true and 0 or opts.buf --[[@as integer]], mode)
+    or vim.api.nvim_get_keymap(mode)
+  for _, map in ipairs(maps) do
     if map.lhs and vim.list_contains(lhs_norm, Snacks.util.normkey(map.lhs)) then
       return true, map
     end
