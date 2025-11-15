@@ -410,6 +410,7 @@ return {
   -- vim-illuminate highlights the incorrect position if an icon or Chinese character appears to the left of the word
   {
     "snacks.nvim",
+    ---@type snacks.Config
     opts = { words = { enabled = true } },
     specs = {
       {

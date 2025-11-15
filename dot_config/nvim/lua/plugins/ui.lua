@@ -401,8 +401,7 @@ return {
  █████████     ██ ██         ██ █████ ███ ███ ██ ███ 
 ███████████████████████████████  ███ ███ ███ ██ ███]],
       }
-      local v = vim.version()
-      opts.dashboard.preset.header = vim.g.user_is_termux and v and ("NVIM v%s.%s.%s"):format(v.major, v.minor, v.patch)
+      opts.dashboard.preset.header = vim.g.user_is_termux and ("NVIM v%s"):format(tostring(vim.version()))
         or headers[math.random(#headers)]
 
       opts.dashboard.sections = {

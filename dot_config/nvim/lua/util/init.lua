@@ -350,6 +350,23 @@ function M.truncate(text, width, direction)
   return text
 end
 
+---@param buflisted? boolean
+---@return number? buf
+---@return string? path
+---@return string? root
+function M.last_file(buflisted)
+  local buf = vim.api.nvim_get_current_buf()
+  local _, file = U.is_file({ buf = buf, buflisted = buflisted })
+  if file then
+    return buf, file, LazyVim.root.get({ normalize = true, buf = buf })
+  end
+
+  local last_file = vim.g.user_last_file
+  if last_file then
+    return last_file.buf, last_file.path, last_file.root
+  end
+end
+
 --- copied from: https://github.com/folke/noice.nvim/blob/eaed6cc9c06aa2013b5255349e4f26a6b17ab70f/lua/noice/util/init.lua#L104
 ---@param ms integer
 ---@param fn function

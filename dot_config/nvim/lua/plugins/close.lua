@@ -614,16 +614,21 @@ return {
       vim.api.nvim_create_autocmd("User", {
         pattern = "CodeCompanionDiffAttached",
         callback = function(ev)
-          if not (ev.data and ev.data.bufnr and ev.data.diff == "inline") then
+          if not (ev.data and ev.data.bufnr) then
             return
           end
-          local reject_key = require("codecompanion.config").config.strategies.chat.keymaps._acp_reject_once.modes.n
-          vim.keymap.set(
-            "n",
-            close_key,
-            type(reject_key) == "table" and reject_key[1] or reject_key,
-            { buffer = ev.data.bufnr, remap = true, desc = "Reject Diff (CodeCompanion ACP)" }
-          )
+
+          local buf = ev.data.bufnr
+          local is_acp = ev.data.id and vim.api.nvim_buf_get_name(buf):match("_diff_" .. ev.data.id .. "$")
+          if is_acp and not U.is_file({ buf = buf }) then
+            local reject_key = require("codecompanion.config").config.strategies.chat.keymaps._acp_reject_once.modes.n
+            vim.keymap.set(
+              "n",
+              close_key,
+              type(reject_key) == "table" and reject_key[1] or reject_key,
+              { buffer = buf, remap = true, desc = "Reject Diff (CodeCompanion ACP)" }
+            )
+          end
         end,
       })
     end,

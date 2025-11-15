@@ -265,7 +265,6 @@ cask "alacritty"
 cask "alt-tab"
 cask "android-platform-tools"
 cask "betterdisplay"
-cask "bitwarden"
 cask "brave-browser"
 cask "bruno"
 cask "clash-verge-rev"
@@ -318,6 +317,7 @@ cask "vlc"
 cask "warp"
 cask "wezterm@nightly"
 cask "zed"
+mas "Bitwarden", id: 1352778147
 mas "Blackmagic Disk Speed Test", id: 425264550
 mas "GarageBand", id: 682658836
 mas "iMovie", id: 408981434

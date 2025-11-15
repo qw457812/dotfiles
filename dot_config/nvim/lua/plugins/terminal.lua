@@ -4,12 +4,8 @@ return {
     "folke/snacks.nvim",
     keys = function(_, keys)
       local function ctrl_slash()
-        local git_root ---@type string?
-        if U.is_file({ buflisted = false }) then
-          git_root = Snacks.git.get_root()
-        elseif vim.g.user_last_file then
-          git_root = Snacks.git.get_root(vim.g.user_last_file.path)
-        end
+        local _, file = U.last_file(false)
+        local git_root = file and Snacks.git.get_root(file)
         if not git_root then
           LazyVim.warn("Not a git repo", { title = "Terminal" })
           git_root = LazyVim.root()
@@ -34,8 +30,8 @@ return {
           "<c-space>",
           function()
             -- fallback to last file buffer's root if current buffer is not a file
-            local root = (U.is_file({ buflisted = false }) or not vim.g.user_last_file) and LazyVim.root()
-              or vim.g.user_last_file.root
+            local _, _, root = U.last_file(false)
+            root = root or LazyVim.root()
             U.terminal(nil, { win = { position = "float" }, cwd = root }, "<c-space>")
           end,
           desc = "Float Terminal (Root Dir)",
@@ -46,9 +42,8 @@ return {
         {
           "<c-,>",
           function()
-            local _, file = U.is_file({ buflisted = false })
+            local _, file = U.last_file(false)
             local filepath = file and vim.fn.fnamemodify(file, ":h")
-              or vim.g.user_last_file and vim.fn.fnamemodify(vim.g.user_last_file.path, ":h")
             if not filepath then
               LazyVim.warn("Not a file", { title = "Terminal" })
               return

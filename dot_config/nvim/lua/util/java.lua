@@ -2,16 +2,18 @@
 local M = {}
 
 --- https://github.com/sykesm/dotfiles/blob/92169d9a6ca596fddc58ce1771d708e92d779dec/.config/nvim/lua/sykesm/plugins/nvim-jdtls.lua#L39
----@return { name: string, path: string }|nil
+---@return { name: string, path: string }[]|nil
 function M.jdt_java_runtimes()
   local java_home_macos = "/usr/libexec/java_home"
   if vim.fn.has("macunix") == 0 or vim.fn.executable(java_home_macos) == 0 then
     return
   end
 
+  ---@param version string
+  ---@return string?
   local function java_home(version)
     local res = vim.system({ java_home_macos, "-F", "-v", version }, { text = true }):wait()
-    return res.code == 0 and res.stdout:gsub("\n+$", "")
+    return res.code == 0 and res.stdout:gsub("\n+$", "") or nil
   end
 
   local runtimes = {}

@@ -107,6 +107,7 @@ return {
     end,
   },
 
+  -- -- https://github.com/neovim/nvim-lspconfig/pull/4185
   -- {
   --   "neovim/nvim-lspconfig",
   --   opts = {

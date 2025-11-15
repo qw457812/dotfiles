@@ -258,20 +258,33 @@ return {
         end,
       })
 
-      -- see: https://github.com/olimorris/codecompanion.nvim/blob/a4f850591970d5ab4e51951b08ddb0c5c239b210/lua/codecompanion/providers/diff/inline.lua#L46
       vim.api.nvim_create_autocmd("User", {
         pattern = "CodeCompanionDiffAttached",
         callback = function(ev)
-          if not (ev.data and ev.data.bufnr and ev.data.diff == "inline") then
+          if not (ev.data and ev.data.bufnr) then
             return
           end
-          local accept_key = require("codecompanion.config").config.strategies.chat.keymaps._acp_allow_once.modes.n
-          vim.keymap.set(
-            "n",
-            "<C-s>",
-            type(accept_key) == "table" and accept_key[1] or accept_key,
-            { buffer = ev.data.bufnr, remap = true, desc = "Accept Diff (CodeCompanion ACP)" }
-          )
+
+          local buf = ev.data.bufnr
+          -- https://github.com/olimorris/codecompanion.nvim/blob/a8c696d1fc4268085e4306d54af39b07be884b17/lua/codecompanion/strategies/chat/acp/request_permission.lua#L360
+          local is_acp = ev.data.id and vim.api.nvim_buf_get_name(buf):match("_diff_" .. ev.data.id .. "$")
+          if is_acp then
+            local accept_key = require("codecompanion.config").config.strategies.chat.keymaps._acp_allow_once.modes.n
+            vim.keymap.set(
+              "n",
+              "<C-s>",
+              type(accept_key) == "table" and accept_key[1] or accept_key,
+              { buffer = buf, remap = true, desc = "Accept Diff (CodeCompanion ACP)" }
+            )
+
+            if ev.data.diff == "mini_diff" then
+              local win = vim.fn.bufwinid(buf)
+              if win ~= -1 and vim.wo[win].winhighlight:find("WinBar:CodeCompanionChatInfoBanner") then
+                -- vim.wo[win].winbar = "" -- will overwritten by dropbar
+                vim.wo[win].winhighlight = "" -- winhighlight looks bad
+              end
+            end
+          end
         end,
       })
     end,

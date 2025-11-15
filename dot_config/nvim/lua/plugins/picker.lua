@@ -393,6 +393,11 @@ return {
               end
             end,
           },
+          ---@type snacks.picker.icons.Config
+          icons = {
+            icon_sources = { "nerd_fonts" }, -- disable emoji
+            confirm = { "copy", "close" },
+          },
         },
         win = {
           input = {
