@@ -232,6 +232,7 @@ end
 --   vim.ui.open = U.patch_func(vim.ui.open, function(orig, path, opt)
 --     opt = opt or {}
 --     if not opt.cmd and path:match("^https://github%.com/.+") then
+--       -- https://www.reddit.com/r/termux/comments/gsafc0/comment/fs44i6b/
 --       opt.cmd = { "am", "start", "-n", "com.kiwibrowser.browser/com.google.android.apps.chrome.Main", "-d" }
 --     end
 --     return orig(path, opt)
@@ -239,11 +240,27 @@ end
 -- end
 ---@param url string
 function M.open_in_browser(url)
-  -- do not open github url via GitHub app on termux
-  -- https://www.reddit.com/r/termux/comments/gsafc0/comment/fs44i6b/
-  vim.ui.open(url, vim.g.user_is_termux and url:match("^https://github%.com/.+") and {
-    cmd = { "am", "start", "-n", "com.kiwibrowser.browser/com.google.android.apps.chrome.Main", "-d" },
-  } or nil)
+  -- do not open github/reddit url via GitHub/Reddit app on termux
+  if
+    vim.g.user_is_termux
+    and vim.fn.executable("am") == 1
+    and (url:match("^https://github%.com/.+") or url:match("^https://www%.reddit%.com"))
+  then
+    -- "org.mozilla.firefox"
+    -- "io.github.forkmaintainers.iceraven"
+    local browser = "com.kiwibrowser.browser"
+    vim.system({
+      "am",
+      "start",
+      "-a",
+      "android.intent.action.VIEW",
+      "-d",
+      url,
+      browser,
+    }, { text = true, detach = true })
+  else
+    vim.ui.open(url)
+  end
 end
 
 --- copied from: https://github.com/nvim-lua/plenary.nvim/blob/f031bef84630f556c2fb81215826ea419d81f4e9/lua/plenary/curl.lua#L44-L55
