@@ -1,6 +1,6 @@
 {
   "darkMode": "dark",
-  "uiLang": "zh",
+  "uiLang": "en",
   "minLength": 2,
   "maxLength": 100000,
   "newlineLength": 20,

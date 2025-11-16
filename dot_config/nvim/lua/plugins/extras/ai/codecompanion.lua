@@ -283,6 +283,24 @@ return {
                 -- vim.wo[win].winbar = "" -- will overwritten by dropbar
                 vim.wo[win].winhighlight = "" -- winhighlight looks bad
               end
+
+              -- go to first hunk
+              local executed = false
+              local id = vim.api.nvim_create_autocmd("User", {
+                group = vim.api.nvim_create_augroup("codecompanion_acp_mini_diff", { clear = true }),
+                pattern = "MiniDiffUpdated",
+                once = true,
+                callback = function()
+                  executed = true
+                  require("mini.diff").goto_hunk("first")
+                  vim.cmd("normal! zz")
+                end,
+              })
+              vim.defer_fn(function()
+                if not executed then -- see `:h autocmd-once`
+                  vim.api.nvim_del_autocmd(id)
+                end
+              end, 500)
             end
           end
         end,

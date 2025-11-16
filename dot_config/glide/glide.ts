@@ -21,6 +21,8 @@
 // https://github.com/RobertCraigie/dotfiles/blob/ecfd6f66e8a775c80849f7889f297ef99cea7997/glide/glide.ts
 // https://github.com/y3owk1n/nix-system-config-v2/blob/6d6e20540ae533cea4828abdf655238e8d4f2498/config/glide/glide.ts
 
+// TODO: https://github.com/yuuqilin/FlexFox
+
 // Search engines
 // https://github.com/mozilla-firefox/firefox/blob/e2e91539047e030b956e01fd5e8c28c074ae3f88/services/settings/dumps/main/search-config-v2.json
 const search_engines = {
@@ -322,7 +324,7 @@ glide.keymaps.set("normal", "<leader>fc", async () => {
     await glide.process.spawn("neovide", [config]);
   }
 });
-glide.keymaps.set("normal", "<leader>fk", "map");
+glide.keymaps.set("normal", "<leader>sk", "map");
 glide.keymaps.set("normal", "<leader>un", "clear");
 glide.keymaps.set("normal", "<leader>g,", "tab_new about:settings");
 glide.keymaps.set("normal", "<leader>gg", go_to_tab("https://github.com/"));
