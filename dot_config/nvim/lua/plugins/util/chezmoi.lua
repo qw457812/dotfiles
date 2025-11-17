@@ -163,16 +163,27 @@ function H.pick_find_config()
       hidden = true,
       ignored = true,
       follow = true,
-      -- TODO: multi-select
-      confirm = function(picker, item)
+      confirm = function(picker)
+        local items = picker:selected({ fallback = true })
         picker:close()
-        if item then
-          local file = assert(Snacks.picker.util.path(item))
-          if vim.list_contains(managed_config_files, file) then
-            require("chezmoi.commands").edit({ targets = file })
+        if #items == 0 then
+          return
+        end
+        local managed = {}
+        local files = vim.tbl_map(Snacks.picker.util.path, items)
+        for _, f in ipairs(files) do
+          if vim.list_contains(managed_config_files, f) then
+            table.insert(managed, f)
           else
-            vim.cmd.edit(file)
+            -- load the buffer, ref: https://github.com/folke/snacks.nvim/blob/d902c0a415ffbf66321f40ecb07e73fea283d0ab/lua/snacks/picker/actions.lua#L92-L102
+            local buf = vim.fn.bufadd(f)
+            vim.bo[buf].buflisted = true
           end
+        end
+        if #managed > 0 then
+          require("chezmoi.commands").edit({ targets = managed })
+        else
+          vim.cmd.edit(files[1])
         end
       end,
     })
