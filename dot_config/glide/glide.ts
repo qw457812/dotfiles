@@ -173,32 +173,10 @@ glide.keymaps.set("normal", "gs", "keys <D-u>");
 glide.keymaps.set(
   "normal",
   "d",
-  when_editing("mode_change op-pending --operator=d", async () => {
-    // await glide.excmds.execute("scroll_page_down"); // buggy
-
-    // for (let i = 0; i < 4; i++) {
-    //   await glide.excmds.execute("caret_move down");
-    //   await sleep(20);
-    // }
-
-    await glide.keys.send("<PageDown>", { skip_mappings: true });
-  }),
+  when_editing("mode_change op-pending --operator=d", "scroll_page_down"),
   // { retain_key_display: true }, // no way to display key sequence only for editing
 );
-glide.keymaps.set(
-  "normal",
-  "u",
-  when_editing("undo", async () => {
-    // await glide.excmds.execute("scroll_page_up"); // buggy
-
-    // for (let i = 0; i < 4; i++) {
-    //   await glide.excmds.execute("caret_move up");
-    //   await sleep(20);
-    // }
-
-    await glide.keys.send("<PageUp>", { skip_mappings: true });
-  }),
-);
+glide.keymaps.set("normal", "u", when_editing("undo", "scroll_page_up"));
 glide.keymaps.set("normal", "x", when_editing("motion x", "tab_close"));
 glide.keymaps.set(
   "normal",
@@ -207,8 +185,8 @@ glide.keymaps.set(
 );
 glide.keymaps.set("normal", "h", when_editing("caret_move left", "back"));
 glide.keymaps.set("normal", "l", when_editing("caret_move right", "forward"));
-glide.keymaps.set("normal", "H", when_editing("motion 0", "caret_move left")); // scroll left?
-glide.keymaps.set("normal", "L", when_editing("motion $", "caret_move right")); // scroll right?
+glide.keymaps.set("normal", "H", when_editing("motion 0", "caret_move left"));
+glide.keymaps.set("normal", "L", when_editing("motion $", "caret_move right"));
 glide.keymaps.set("normal", "J", "tab_next");
 glide.keymaps.set("normal", "K", "tab_prev");
 // track previously active tab
@@ -221,6 +199,7 @@ glide.keymaps.set("normal", "`", async () => {
     await browser.tabs.update(previousTabId, { active: true });
   }
 });
+// TODO: `>>` and `<<`
 glide.keymaps.set("normal", "q", async ({ tab_id }) => {
   const tab = await browser.tabs.get(tab_id);
   if (tab.index > 0) {
@@ -573,18 +552,18 @@ function when_editing(
 
 /**
  * defocus the editable element
- * TODO: https://github.com/glide-browser/glide/discussions/93#discussioncomment-14918102
  */
 async function focus_page(props: glide.KeymapCallbackProps) {
-  // ref: https://github.com/glide-browser/glide/discussions/93#discussioncomment-14805495
-  await glide.content.execute(
-    async () => {
-      if (document.activeElement instanceof HTMLElement) {
-        document.activeElement.blur();
-      }
-    },
-    { tab_id: props.tab_id },
-  );
+  // // ref: https://github.com/glide-browser/glide/discussions/93#discussioncomment-14805495
+  // await glide.content.execute(
+  //   async () => {
+  //     if (document.activeElement instanceof HTMLElement) {
+  //       document.activeElement.blur();
+  //     }
+  //   },
+  //   { tab_id: props.tab_id },
+  // );
+  await glide.excmds.execute("blur");
 
   // HACK: fall back to focus the address bar and then refocusing the page
   if (await glide.ctx.is_editing()) {
