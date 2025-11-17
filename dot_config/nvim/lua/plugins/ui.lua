@@ -68,10 +68,29 @@ return {
     "akinsho/bufferline.nvim",
     optional = true,
     keys = function(_, keys)
-      -- stylua: ignore
       local mappings = {
-        { "]b", function() vim.cmd(vim.bo.buflisted and "BufferLineCycleNext" or "bnext") end, desc = "Next Buffer" },
-        { "[b", function() vim.cmd(vim.bo.buflisted and "BufferLineCyclePrev" or "bprevious") end, desc = "Prev Buffer" },
+        {
+          "]b",
+          function()
+            if vim.wo.winfixbuf then
+              LazyVim.error("E1513: Cannot switch buffer. 'winfixbuf' is enabled", { title = "BufferLine" })
+              return
+            end
+            vim.cmd(vim.bo.buflisted and "BufferLineCycleNext" or "bnext")
+          end,
+          desc = "Next Buffer",
+        },
+        {
+          "[b",
+          function()
+            if vim.wo.winfixbuf then
+              LazyVim.error("E1513: Cannot switch buffer. 'winfixbuf' is enabled", { title = "BufferLine" })
+              return
+            end
+            vim.cmd(vim.bo.buflisted and "BufferLineCyclePrev" or "bprevious")
+          end,
+          desc = "Prev Buffer",
+        },
         { "<Down>", "]b", desc = "Next Buffer", remap = true },
         { "<Up>", "[b", desc = "Prev Buffer", remap = true },
         { "J", "]b", desc = "Next Buffer", remap = true },

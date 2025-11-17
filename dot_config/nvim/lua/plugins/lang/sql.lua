@@ -32,17 +32,43 @@ return {
   {
     "kristijanhusak/vim-dadbod-ui",
     optional = true,
-    -- NOTE: `keys` function is called earlier than `init` function, so the `vim.g` variables can be overwritten by LazyVim.
     keys = function(_, keys)
-      vim.g.db_ui_disable_info_notifications = 1
-      vim.g.db_ui_disable_mappings_sql = 1
-      vim.g.db_ui_win_position = "right"
+      -- `keys` function is called earlier than `init` function, so we use
+      -- `vim.schedule` to make sure these `vim.g` variables can overwrite
+      -- those set by LazyVim in `init`.
+      vim.schedule(function()
+        vim.g.db_ui_disable_info_notifications = 1
+        vim.g.db_ui_disable_mappings_sql = 1
+        vim.g.db_ui_win_position = "right"
+      end)
 
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "dbui",
-        callback = function(ev)
+        callback = vim.schedule_wrap(function(ev)
           for _, key in ipairs({ "H", "<c-j>", "<c-k>" }) do
             pcall(vim.keymap.del, "n", key, { buffer = ev.buf })
+          end
+        end),
+      })
+
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = { "dbui", "dbout" },
+        callback = function(ev)
+          local win = vim.fn.bufwinid(ev.buf)
+          if win ~= -1 then
+            vim.wo[win].winfixbuf = true
+          end
+        end,
+      })
+
+      -- prevent dbout empty windows from showing up after restoring a session
+      vim.api.nvim_create_autocmd("ExitPre", {
+        callback = function()
+          for _, win in ipairs(vim.api.nvim_list_wins()) do
+            local buf = vim.api.nvim_win_get_buf(win)
+            if vim.bo[buf].filetype == "dbout" then
+              vim.bo[buf].buftype = "nofile" -- set buftype to nofile to exclude from session saving
+            end
           end
         end,
       })
@@ -50,6 +76,8 @@ return {
       vim.api.nvim_create_autocmd("FileType", {
         pattern = sql_ft,
         callback = function(ev)
+          vim.bo[ev.buf].buflisted = true
+
           ---@param path string
           ---@return boolean
           local function is_tmp(path)
