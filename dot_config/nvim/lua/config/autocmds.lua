@@ -211,11 +211,7 @@ if vim.g.user_explorer_auto_open and not vim.g.vscode then
         return
       end
       vim.schedule(function()
-        if
-          not vim.g.user_explorer_visible
-          and not U.is_edgy_win()
-          and vim.api.nvim_win_get_width(0) - vim.g.user_explorer_width >= 120
-        then
+        if not vim.g.user_explorer_visible and not U.is_edgy_win() and U.too_wide() then
           U.explorer.open({ focus = false })
         end
       end)

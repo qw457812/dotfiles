@@ -78,7 +78,7 @@ M.explorer_auto_open = st({
       return
     end
     if state then
-      if vim.api.nvim_win_get_width(0) - vim.g.user_explorer_width >= 120 then
+      if U.too_wide() then
         U.explorer.open({ focus = false })
       end
     else

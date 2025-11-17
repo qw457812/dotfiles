@@ -85,11 +85,6 @@ return {
         return false
       end
 
-      ---@param win? integer
-      local function too_wide(win)
-        return vim.api.nvim_win_get_width(win or 0) - vim.g.user_explorer_width >= 120
-      end
-
       vim.api.nvim_create_autocmd("WinResized", {
         group = vim.api.nvim_create_augroup("resize_neotree_auto_open_or_close", {}),
         callback = function(event)
@@ -126,7 +121,7 @@ return {
               if U.too_narrow() then
                 require("neo-tree.command").execute({ action = "close" })
               end
-            elseif vim.g.user_explorer_auto_open and too_wide() then
+            elseif vim.g.user_explorer_auto_open and U.too_wide() then
               -- see also: explorer_auto_open augroup
               U.explorer.open({ focus = false })
             end
