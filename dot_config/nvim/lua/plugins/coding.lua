@@ -177,6 +177,20 @@ return {
     shell_command_editor = true,
     vscode = true,
     keys = function()
+      -- taken from: https://github.com/nvim-mini/mini.operators/blob/59f5fdbaaed7cce160076e70926cb16faadea78c/lua/mini/operators.lua#L705-L711
+      local remap_builtin_gx = function(mode)
+        if vim.fn.maparg("gX", mode) ~= "" then
+          return
+        end
+        local keymap = vim.fn.maparg("gx", mode, false, true)
+        local rhs = keymap.callback or keymap.rhs
+        if rhs == nil or (keymap.desc or ""):find("URI under cursor") == nil then
+          return
+        end
+        vim.keymap.set(mode, "gX", rhs, { desc = keymap.desc })
+      end
+      remap_builtin_gx("n")
+
       local keys = {
         {
           "gx",
@@ -191,7 +205,8 @@ return {
                 or path:match("^" .. vim.pesc(U.path.LAZYVIM) .. "/lua/lazyvim/plugins/")
               then
                 local lazy_plugin = vim.api.nvim_get_current_line():match("['\"]([%w%-%.]+/[%w%-%.]+)['\"]")
-                if lazy_plugin then
+                local url = require("vim.ui")._get_urls()[1] -- ref: https://github.com/neovim/neovim/blob/520568f40f22d77e623ddda77cf751031774384b/runtime/lua/vim/_defaults.lua#L487-L492
+                if lazy_plugin and not (url and vim.startswith(url, "http")) then
                   U.open_in_browser(("https://github.com/%s.git"):format(lazy_plugin))
                   return
                 end
