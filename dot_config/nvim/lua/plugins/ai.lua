@@ -69,13 +69,35 @@ return {
             if terminal:buf_valid() then
               vim.b[terminal.buf].user_lualine_filename = terminal.tool.name
             end
+
             vim.api.nvim_create_autocmd("FileType", {
-              group = vim.api.nvim_create_augroup("sidekick_scrollback_lualine_filename", { clear = false }),
+              group = vim.api.nvim_create_augroup("sidekick_scrollback", { clear = false }),
               pattern = "sidekick_terminal",
               callback = function(ev)
+                local buf = ev.buf
                 local sb = terminal.scrollback
-                if sb and sb.buf == ev.buf then
-                  vim.b[sb.buf].user_lualine_filename = vim.b[sb.buf].user_lualine_filename or terminal.tool.name
+                if not (sb and sb.buf == buf) then
+                  return
+                end
+
+                vim.b[buf].user_lualine_filename = vim.b[buf].user_lualine_filename or terminal.tool.name
+
+                if terminal.tool.name == "claude" then
+                  -- schedule to overwrite https://github.com/neovim/neovim/blob/520568f40f22d77e623ddda77cf751031774384b/runtime/lua/vim/_defaults.lua#L651-L656
+                  vim.schedule(function()
+                    vim.keymap.set("n", "]]", function()
+                      local lnum = vim.fn.search("^> ", "W")
+                      if lnum == 0 then
+                        LazyVim.warn("No more user messages", { title = "Sidekick" })
+                      end
+                    end, { buffer = buf, desc = "Jump to next user message (Sidekick)" })
+                    vim.keymap.set("n", "[[", function()
+                      local lnum = vim.fn.search("^> ", "Wb")
+                      if lnum == 0 then
+                        LazyVim.warn("No more user messages", { title = "Sidekick" })
+                      end
+                    end, { buffer = buf, desc = "Jump to previous user message (Sidekick)" })
+                  end)
                 end
               end,
             })
