@@ -67,30 +67,22 @@ glide.keymaps.del("normal", "<leader>f");
 glide.keymaps.del("normal", "<leader>d");
 glide.keymaps.del("normal", "<leader>r");
 glide.keymaps.del("normal", "<leader>R");
-glide.keymaps.set(
-  "normal",
-  "<Esc>",
-  when_editing(
-    async (props) => {
-      // for case: `<D-f>` -> `<Esc>` -> `<Esc>` (close find bar)
-      await glide.keys.send("<Esc>", { skip_mappings: true });
+glide.keymaps.set("normal", "<Esc>", async (props) => {
+  // Test cases:
+  // - `<D-f>` -> `<Esc>` (enter normal mode) -> `<Esc>` (close find bar) -> `j` (scroll page down)
+  // - On https://github.com/glide-browser/glide/blob/e6a590d53c7d6101792fedfd9894491cda46dbde/src/glide/browser/actors/GlideHandlerChild.sys.mts, `<D-f>` -> `<C-w>` (enter normal mode) -> `<Esc>` (close find bar)
+  // - `<D-l>` -> `<Esc>` (enter normal mode) -> `<Esc>` (defocus address bar)
+  // - On https://github.com/glide-browser/glide/issues, `f` -> `hq` (type hints of "Newest") -> `<Esc>` (defocus button) -> `j` (scroll page down)
+  // - On resource://glide-docs/dynamic/mappings.html, `<Esc>` without the "An error occurred executing () - Error: Missing host permission for the tab `:clear`" error
+  const is_editing = await glide.ctx.is_editing();
+  await glide.keys.send("<Esc>", { skip_mappings: true });
+  await focus_page(props);
+  if (!is_editing) {
+    await glide.excmds.execute("clear");
+    // TODO: close find bar if open
+  }
+});
 
-      // defocus the editable element
-      await focus_page(props);
-    },
-    async (props) => {
-      await glide.keys.send("<Esc>", { skip_mappings: true });
-
-      // // for case: `<D-f>` -> `<C-w>` -> `<Esc>` at https://github.com/glide-browser/glide/blob/e6a590d53c7d6101792fedfd9894491cda46dbde/src/glide/browser/actors/GlideHandlerChild.sys.mts
-      // if (await glide.ctx.is_editing()) {
-      //   await focus_page(props);
-      // }
-
-      // additional actions we want to perform on esc
-      await glide.excmds.execute("clear");
-    },
-  ),
-);
 // vimium-like keymaps
 // https://github.com/glide-browser/glide/blob/107e240a8fd274cafef403d089dc2b646319e8f8/src/glide/browser/base/content/plugins/keymaps.mts
 // TODO: b
@@ -356,7 +348,7 @@ glide.keymaps.set(["normal", "insert"], "<C-k>", "keys <Up>");
 // glide.keymaps.set(["normal", "insert"], "<C-p>", "keys <Up>");
 glide.keymaps.set(["normal", "insert"], "<C-q>", focus_page);
 
-glide.keymaps.set("insert", "jj", "mode_change normal");
+// glide.keymaps.set("insert", "jj", "mode_change normal");
 // glide.keymaps.set("insert", "kk", "mode_change normal");
 
 glide.keymaps.set("command", "<c-j>", "commandline_focus_next");
@@ -554,16 +546,20 @@ function when_editing(
  * defocus the editable element
  */
 async function focus_page(props: glide.KeymapCallbackProps) {
-  // // ref: https://github.com/glide-browser/glide/discussions/93#discussioncomment-14805495
-  // await glide.content.execute(
-  //   async () => {
-  //     if (document.activeElement instanceof HTMLElement) {
-  //       document.activeElement.blur();
-  //     }
-  //   },
-  //   { tab_id: props.tab_id },
-  // );
-  await glide.excmds.execute("blur");
+  try {
+    // ref: https://github.com/glide-browser/glide/discussions/93#discussioncomment-14805495
+    await glide.content.execute(
+      async () => {
+        if (document.activeElement instanceof HTMLElement) {
+          document.activeElement.blur();
+        }
+      },
+      { tab_id: props.tab_id },
+    );
+  } catch (error) {
+    // fall back to blur excmd if content.execute fails (e.g., missing host permissions on resource://glide-docs/dynamic/mappings.html)
+    await glide.excmds.execute("blur");
+  }
 
   // HACK: fall back to focus the address bar and then refocusing the page
   if (await glide.ctx.is_editing()) {
