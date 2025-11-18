@@ -262,9 +262,8 @@ function M.open_in_browser(url)
     and vim.fn.executable("am") == 1
     and (url:match("^https://github%.com/.+") or url:match("^https://www%.reddit%.com"))
   then
-    -- "org.mozilla.firefox"
-    -- "io.github.forkmaintainers.iceraven"
-    local browser = "com.kiwibrowser.browser"
+    -- "com.kiwibrowser.browser"
+    local browser = "com.microsoft.emmx.canary"
     vim.system({
       "am",
       "start",
