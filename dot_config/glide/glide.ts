@@ -389,30 +389,69 @@ glide.keymaps.set("command", "<c-d>", "keys <Del>");
 //   }
 // });
 
-glide.autocmds.create("UrlEnter", {}, async ({ url }) => {
-  if (
-    url !== "about:newtab" &&
-    !url.startsWith("https://grafana.com/grafana/dashboards/")
-  ) {
-    // it's annoying to be in insert mode when switching tabs
+function on_tab_enter(
+  pattern: glide.AutocmdPatterns["UrlEnter"],
+  callback: (args: glide.AutocmdArgs["UrlEnter"]) => void | Promise<void>,
+): void {
+  let last_tab_id: number | undefined;
+  glide.autocmds.create("UrlEnter", pattern, async (props) => {
+    const is_tab_enter = last_tab_id !== props.tab_id;
+    last_tab_id = props.tab_id;
+    // only trigger on tab enter, not URL change within same tab
+    if (is_tab_enter) {
+      await callback(props);
+    }
+  });
+}
+
+// It's annoying to be in insert mode when switching tabs.
+//
+// Use `on_tab_enter` instead of UrlEnter to prevent changing to normal mode when editing search box on the following pages:
+// - https://openrouter.ai/models?q=gemini
+// - https://grafana.com/grafana/dashboards/?search=node
+on_tab_enter({}, async ({ url }) => {
+  if (url !== "about:newtab") {
+    // HACK: sleep is needed when switching tabs quickly, otherwise `mode_change normal` may not take effect
+    // e.g. editing search box on https://openrouter.ai/models?q=gemini (insert mode) -> `<esc>` -> `J` -> `K`, without sleep, ends up in insert mode
+    await sleep(50);
     await glide.excmds.execute("mode_change normal");
   }
 });
 
 glide.autocmds.create("UrlEnter", { hostname: "github.com" }, async () => {
   const url = new URL(glide.ctx.url);
-  const [org, repo, ...rest_segments] = url.pathname.split("/").filter(Boolean);
+  const path_segments = url.pathname.split("/").filter(Boolean);
+  const is_searching =
+    path_segments.length === 1 &&
+    path_segments[0] === "search" &&
+    url.searchParams.has("q");
+
+  let org: string | undefined;
+  let repo: string | undefined;
+  if (is_searching) {
+    const query = url.searchParams.get("q")!;
+    const repo_match = query.match(/repo:(?<org>[^/\s]+)\/(?<repo>[^\s]+)/);
+    if (repo_match?.groups) {
+      ({ org, repo } = repo_match.groups);
+    }
+  } else if (path_segments.length >= 2) {
+    [org, repo] = path_segments;
+  }
 
   glide.buf.keymaps.set(
     "normal",
     "ym",
     when_editing(null, async ({ tab_id }) => {
       const tab = await browser.tabs.get(tab_id);
-      if (org && repo && rest_segments.length === 0) {
-        await navigator.clipboard.writeText(`[${org}/${repo}](${tab.url})`);
+      let md_link: string;
+      if (org && repo && (path_segments.length === 2 || is_searching)) {
+        md_link = is_searching
+          ? `[${tab.title} - ${org}/${repo}](${tab.url})`
+          : `[${org}/${repo}](${tab.url})`;
       } else {
-        await navigator.clipboard.writeText(`[${tab.title}](${tab.url})`);
+        md_link = `[${tab.title}](${tab.url})`;
       }
+      await navigator.clipboard.writeText(md_link);
     }),
   );
   glide.buf.keymaps.set(
