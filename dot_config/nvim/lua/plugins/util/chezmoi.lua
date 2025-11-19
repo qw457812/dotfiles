@@ -229,22 +229,19 @@ function H.autocmd_chezmoi_add()
 
       U.debounce("chezmoi-add-xdg-config", 100, function()
         local file = U.path.home_to_tilde(event.match)
-        -- alternative to `vim.fn.confirm`: `vim.ui.select` | https://github.com/olimorris/codecompanion.nvim/pull/1354
-        local ok, choice = pcall(vim.fn.confirm, ("Add %q to chezmoi?"):format(file), "&Yes\n&No")
-        if not ok then
-          return
-        end
-        if choice == 1 then -- Yes
-          local res = vim.system({ "chezmoi", "add", event.match }, { text = true }):wait()
-          if res.code == 0 then
-            H.reset()
-            LazyVim.info("Successfully added", { title = "Chezmoi" })
+        U.confirm(("Add %q to chezmoi?"):format(file), function(yes)
+          if yes then
+            local res = vim.system({ "chezmoi", "add", event.match }, { text = true }):wait()
+            if res.code == 0 then
+              H.reset()
+              LazyVim.info("Successfully added", { title = "Chezmoi" })
+            else
+              LazyVim.error(("Failed to add `%s`:\n%s"):format(file, res.stderr), { title = "Chezmoi" })
+            end
           else
-            LazyVim.error(("Failed to add `%s`:\n%s"):format(file, res.stderr), { title = "Chezmoi" })
+            table.insert(H.xdg_config_ignore, event.match)
           end
-        elseif choice == 0 or choice == 2 then -- 0 for <Esc> and 2 for No
-          table.insert(H.xdg_config_ignore, event.match)
-        end
+        end)
       end)
     end,
   })

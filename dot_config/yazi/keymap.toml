@@ -75,12 +75,12 @@ prepend_keymap = [
   # https://github.com/dedukun/bookmarks.yazi
   # h: ~
   # d: ~/Downloads
-  # c: ~/.local/share/chezmoi/dot_config
-  # C: ~/.config
-  # n: ~/.local/share/chezmoi/dot_config/nvim
-  # N: ~/.config/nvim
-  # l: ~/.local/share/nvim/lazy/LazyVim
+  # c: ~/.config
+  # n: ~/.config/nvim
+  # l: ~/.local/share/nvim/lazy
   # z: ~/.local/share/chezmoi
+  # p: ~/projects
+  # w: ~/projects/git-worktrees
   { on = "m", run = "plugin bookmarks save", desc = "Save current position as a bookmark" },
   { on = "'", run = "plugin bookmarks jump", desc = "Jump to a bookmark" },
   { on = [

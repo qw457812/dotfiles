@@ -297,6 +297,16 @@ return {
       end
       return keys
     end,
+    ---@type VariousTextobjs.Config
+    opts = {
+      textobjs = {
+        url = {
+          patterns = {
+            [[%l%l%l+://[^%s)%]}"'`>,]+]], -- exclude the trailing comma, https://github.com/chrisgrieser/nvim-various-textobjs/blob/0758831d4d5768df7a6cc22ce652680a435141ae/lua/various-textobjs/config/config.lua#L45
+          },
+        },
+      },
+    },
   },
   {
     "folke/which-key.nvim",

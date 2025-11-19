@@ -399,6 +399,37 @@ function M.last_file(buflisted)
   end
 end
 
+------@param prompt string
+------@param fn fun(yes: boolean)
+---function M.confirm(prompt, fn)
+---  local ok, choice = pcall(vim.fn.confirm, prompt, "&Yes\n&No")
+---  if not ok then
+---    return
+---  end
+---  if choice == 1 then -- Yes
+---    fn(true)
+---  elseif choice == 0 or choice == 2 then -- 0 for <Esc> and 2 for No
+---    fn(false)
+---  end
+---end
+---ref: https://github.com/folke/snacks.nvim/blob/907679381ba5ed36a24b0176930e3ceb97ca4755/lua/snacks/picker/util/init.lua#L76-L93
+---@param prompt string
+---@param fn fun(yes: boolean)
+function M.confirm(prompt, fn)
+  Snacks.picker.select({ "No", "Yes" }, {
+    prompt = prompt,
+    snacks = {
+      layout = {
+        layout = {
+          max_width = 60,
+        },
+      },
+    },
+  }, function(_, idx)
+    fn(idx == 2)
+  end)
+end
+
 --- copied from: https://github.com/folke/noice.nvim/blob/eaed6cc9c06aa2013b5255349e4f26a6b17ab70f/lua/noice/util/init.lua#L104
 ---@param ms integer
 ---@param fn function
