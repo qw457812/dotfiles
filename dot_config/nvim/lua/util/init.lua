@@ -263,7 +263,8 @@ function M.open_in_browser(url)
     and (url:match("^https://github%.com/.+") or url:match("^https://www%.reddit%.com"))
   then
     -- "com.kiwibrowser.browser"
-    local browser = "com.microsoft.emmx.canary"
+    -- "com.microsoft.emmx.canary"
+    local browser = "org.cromite.cromite"
     vim.system({
       "am",
       "start",
