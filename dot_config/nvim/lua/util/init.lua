@@ -279,6 +279,21 @@ function M.open_in_browser(url)
   end
 end
 
+---Open in finder
+---@param path? number|string buffer or path
+function M.reveal_file(path)
+  path = path or 0
+  path = type(path) == "number" and vim.api.nvim_buf_get_name(path) or path --[[@as string]]
+  if path == "" or not vim.uv.fs_stat(path) then
+    LazyVim.warn("Not a file: " .. path, { title = "Reveal" })
+    return
+  end
+  vim.ui.open(path, {
+    -- https://github.com/sxyazi/yazi/blob/9d92cdbf79de530de11e66a2fabd0537e8249eb9/yazi-config/preset/yazi-default.toml#L44-L50
+    cmd = vim.fn.has("mac") == 1 and { "open", "-R" } or nil,
+  })
+end
+
 --- copied from: https://github.com/nvim-lua/plenary.nvim/blob/f031bef84630f556c2fb81215826ea419d81f4e9/lua/plenary/curl.lua#L44-L55
 --- https://github.com/mistweaverco/kulala.nvim/blob/1c4156b8204137ff683d7c61b94218ca1cfbf801/lua/kulala/utils/string.lua#L22-L30
 ---@param str string

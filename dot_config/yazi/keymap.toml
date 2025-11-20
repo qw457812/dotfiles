@@ -172,6 +172,11 @@ prepend_keymap = [
     "f",
     "Y",
   ], run = "copy filename", desc = "Copy the filename" },
+  { on = [
+    "<Space>",
+    "f",
+    "O",
+  ], run = "shell -- open -R %s1", desc = "Macos Reveal" },
   # https://github.com/yazi-rs/plugins/tree/main/mount.yazi
   { on = [
     "<Space>",

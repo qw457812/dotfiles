@@ -293,6 +293,14 @@ return {
           unselect_all = function(picker)
             picker.list:set_selected({})
           end,
+          reveal_file = function(_, item)
+            local path = item and Snacks.picker.util.path(item)
+            if path then
+              U.reveal_file(path)
+            else
+              LazyVim.warn("Not a file", { title = "Reveal" })
+            end
+          end,
           toggle_lua = function(p)
             local opts = p.opts --[[@as snacks.picker.grep.Config]]
             opts.ft = not opts.ft and "lua" or nil
@@ -447,6 +455,8 @@ return {
               ["<Right>"] = "preview_scroll_right",
               ["<C-Left>"] = { "preview_scroll_left", mode = { "i", "n" } },
               ["<C-Right>"] = { "preview_scroll_right", mode = { "i", "n" } },
+              ["<localleader>o"] = "reveal_file",
+              ["<leader>fO"] = "reveal_file",
             },
           },
           list = {
@@ -462,18 +472,20 @@ return {
               },
               ["J"] = "preview_down",
               ["K"] = "preview_up",
-              ["<PageDown>"] = { "preview_scroll_down", mode = { "i", "n" } },
-              ["<PageUp>"] = { "preview_scroll_up", mode = { "i", "n" } },
+              ["<PageDown>"] = "preview_scroll_down",
+              ["<PageUp>"] = "preview_scroll_up",
               ["o"] = "confirm",
               ["/"] = false,
-              ["<C-e>"] = { "filter_extension", mode = { "i", "n" } },
-              ["<M-l>"] = { "toggle_lua", mode = { "n", "i" } },
-              ["<C-Space>"] = { "cycle_win", mode = { "n", "i" } },
-              ["<C-,>"] = { "toggle_input", mode = { "n", "i" } },
+              ["<C-e>"] = "filter_extension",
+              ["<M-l>"] = "toggle_lua",
+              ["<C-Space>"] = "cycle_win",
+              ["<C-,>"] = "toggle_input",
               ["<Left>"] = "preview_scroll_left",
               ["<Right>"] = "preview_scroll_right",
               ["<C-Left>"] = "preview_scroll_left",
               ["<C-Right>"] = "preview_scroll_right",
+              ["<localleader>o"] = "reveal_file",
+              ["<leader>fO"] = "reveal_file",
             },
           },
           preview = {

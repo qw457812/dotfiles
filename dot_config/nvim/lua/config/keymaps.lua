@@ -201,6 +201,8 @@ end, { desc = "Yank file relative path" })
 --   LazyVim.info(("Copied file name: `%s`"):format(name))
 -- end, { desc = "Yank file name" })
 
+map("n", "<leader>fO", U.reveal_file, { desc = "Reveal File" })
+
 map("n", "gco", 'o<esc>V"_cx<esc><cmd>normal gcc<cr>fxa<bs>', { desc = "Add Comment Below" })
 map("n", "gcO", 'O<esc>V"_cx<esc><cmd>normal gcc<cr>fxa<bs>', { desc = "Add Comment Above" })
 

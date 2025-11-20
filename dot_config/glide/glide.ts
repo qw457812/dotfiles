@@ -32,9 +32,10 @@ const search_engines = {
   p: "https://www.perplexity.ai/search?q={}",
   bd: "https://www.baidu.com/baidu?wd={}",
   gh: "https://github.com/search?q={}&type=repositories",
-  wiki: "https://en.wikipedia.org/wiki/Special:Search?search={}",
+  w: "https://en.wikipedia.org/wiki/Special:Search?search={}",
+  k: "https://kagi.com/search?q={}",
 } as const;
-const default_search_engine = search_engines.g;
+const default_search_engine = search_engines.k;
 
 // Env
 if (glide.ctx.os === "macosx") {
