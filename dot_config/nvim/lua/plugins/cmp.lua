@@ -272,13 +272,25 @@ return {
           },
           -- `completion` configuration for command-line window goes here
           completion = {
-            -- menu = { auto_show = false },
-            -- ghost_text = { enabled = false },
+            menu = {
+              auto_show = function()
+                -- the same behavior as normal buffer for command-line window
+                return vim.fn.getcmdtype() == ":" or vim.fn.getcmdwintype() == ":"
+              end,
+            },
             ghost_text = {
               enabled = function()
-                -- disable ghost_text in cmdwin, because with `preselect` enabled, <cr> accepts the ghost text (preselected item) instead of executing the command-line
-                -- enable ghost_text in cmdline when the cursor is at the end of cmdline, in favor of the `<>` pair of mini.pairs and the left arrow key
-                return vim.fn.win_gettype() ~= "command" and vim.fn.getcmdpos() == #vim.fn.getcmdline() + 1
+                local cmdwintype = vim.fn.getcmdwintype()
+                if cmdwintype ~= "" then
+                  -- For command-line window,
+                  -- align `ghost_text` with the result of `:=LazyVim.opts("blink.cmp").cmdline.completion.menu.auto_show()` in command-line window,
+                  -- because with `ghost_text` and `preselect` enabled in cmdwin, <cr> accepts the ghost text (preselected item) instead of executing the command-line.
+                  return cmdwintype == ":"
+                else
+                  -- For command-line mode,
+                  -- enable ghost_text when the cursor is at the end of cmdline, in favor of the `<>` pair of mini.pairs and the left arrow key
+                  return vim.fn.getcmdpos() == #vim.fn.getcmdline() + 1
+                end
               end,
             },
             list = {
