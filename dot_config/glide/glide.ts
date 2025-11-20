@@ -126,7 +126,7 @@ glide.keymaps.set(
 glide.keymaps.set(
   "normal",
   "p",
-  when_editing(null, async () => {
+  when_editing("keys <D-v>", async () => {
     const url = text_to_url(await navigator.clipboard.readText());
     await browser.tabs.update({ url });
   }),
@@ -134,10 +134,17 @@ glide.keymaps.set(
 glide.keymaps.set(
   "normal",
   "P",
-  when_editing(null, async () => {
-    const url = text_to_url(await navigator.clipboard.readText());
-    await browser.tabs.create({ url });
-  }),
+  when_editing(
+    async () => {
+      await glide.keys.send("<Left>", { skip_mappings: true });
+      await glide.keys.send("<D-v>", { skip_mappings: true });
+      await glide.keys.send("<Right>", { skip_mappings: true });
+    },
+    async () => {
+      const url = text_to_url(await navigator.clipboard.readText());
+      await browser.tabs.create({ url });
+    },
+  ),
 );
 glide.keymaps.set(
   "normal",
