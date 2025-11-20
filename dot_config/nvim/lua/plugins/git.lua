@@ -590,6 +590,10 @@ return {
                   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
                     if vim.bo[buf].filetype == "gitcommit" then
                       vim.api.nvim_set_current_buf(buf)
+                      vim.api.nvim_win_set_cursor(0, { 1, 0 })
+                      if vim.api.nvim_get_current_line():match("^%s*$") then
+                        vim.cmd("startinsert")
+                      end
                       break
                     end
                   end

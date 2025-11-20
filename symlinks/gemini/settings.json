@@ -5,7 +5,8 @@
     },
     "disableAutoUpdate": true,
     "preferredEditor": "neovim",
-    "vimMode": true
+    "vimMode": true,
+    "previewFeatures": true
   },
   "context": {
     "fileName": [

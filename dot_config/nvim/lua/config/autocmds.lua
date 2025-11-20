@@ -207,6 +207,7 @@ if vim.g.user_explorer_auto_open and not vim.g.vscode then
         or vim.list_contains({ "gitcommit", "svn" }, vim.bo[ev.buf].filetype)
         or vim.list_contains({ "COMMIT_EDITMSG", "svn-commit.tmp" }, vim.fn.fnamemodify(ev.file, ":t"))
         or vim.t.user_diffview
+        or U.is_floating_win()
       then
         return
       end

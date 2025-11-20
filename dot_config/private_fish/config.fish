@@ -276,15 +276,8 @@ if type -q claude
     abbr clcf "claude --continue --fork-session"
     abbr clr "claude --resume"
     abbr clrf "claude --resume --fork-session"
-    abbr clv "claude --verbose"
-    abbr cld "claude --debug"
-    abbr cls "claude --model sonnet"
-    abbr clo "claude --model opus"
-    abbr clp "claude --model opusplan --permission-mode plan"
-    abbr clk "MAX_THINKING_TOKENS=31999 claude"
-    abbr clko "MAX_THINKING_TOKENS=31999 claude --model opus"
-    abbr clkt "MAX_THINKING_TOKENS=31999 claude_temp"
-    abbr clgc "claude --model sonnet 'commit only the staged changes'"
+    abbr clgc "claude 'commit only the staged changes'"
+    abbr ccstl (type -q bunx; and echo "bunx ccstatusline@latest"; or echo "npx ccstatusline@latest")
     set -l ccusage (type -q bunx; and echo "bunx ccusage"; or echo "npx ccusage@latest")
     abbr ccu "$ccusage"
     abbr ccum "$ccusage daily --breakdown"
@@ -294,7 +287,6 @@ if type -q claude
         abbr ccmd "claude-monitor --view daily"
         abbr ccmm "claude-monitor --view monthly"
     end
-    abbr ccstl (type -q bunx; and echo "bunx ccstatusline@latest"; or echo "npx ccstatusline@latest")
     # alternative: https://github.com/Fission-AI/OpenSpec
     abbr spec "uvx --from git+https://github.com/github/spec-kit.git specify init --script sh --ai claude --here"
     abbr cchistory "npx cchistory"
@@ -306,13 +298,16 @@ if type -q claude
     abbr ccm claude_minimax
     type -q ccr; and abbr ccr "ccr code" # https://github.com/musistudio/claude-code-router
 end
-type -q codex; and abbr cx codex # codex completion fish >~/.config/fish/completions/codex.fish
+if type -q codex
+    # codex completion fish >~/.config/fish/completions/codex.fish
+    abbr cx codex
+    abbr cxr 'codex resume'
+end
 # type -q gemini; and abbr gm gemini
 if type -q opencode
     abbr oc opencode
     abbr occ 'opencode --continue'
     abbr ocg 'opencode --model opencode/grok-code'
-    abbr ocm 'opencode --model minimax/MiniMax-M2'
 end
 if type -q aider
     abbr ad aider

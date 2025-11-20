@@ -86,6 +86,12 @@ glide.keymaps.set("normal", "<Esc>", async (props) => {
 // vimium-like keymaps
 // https://github.com/glide-browser/glide/blob/107e240a8fd274cafef403d089dc2b646319e8f8/src/glide/browser/base/content/plugins/keymaps.mts
 // TODO: b
+// glide.keymaps.set("normal", "f", () =>
+//   glide.hints.show({ include_click_listeners: true }),
+// );
+// glide.keymaps.set("normal", "F", () =>
+//   glide.hints.show({ include_click_listeners: true, action: "newtab-click" }),
+// );
 glide.keymaps.set("normal", "/", "keys <D-f>");
 glide.keymaps.set("normal", "r", when_editing("r", "reload"));
 glide.keymaps.set("normal", "R", when_editing(null, "reload_hard"));
