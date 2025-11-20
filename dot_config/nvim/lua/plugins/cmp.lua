@@ -242,8 +242,9 @@ return {
             },
             ["<Right>"] = {
               function(cmp)
+                -- TODO: fix H.cmdline_actions.is_inserted for cmdwin
                 if cmp.is_ghost_text_visible() and not H.cmdline_actions.is_inserted(cmp) then
-                  return cmp.accept()
+                  return cmp.select_and_accept()
                 end
               end,
               function(cmp)
