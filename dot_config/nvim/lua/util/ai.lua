@@ -43,4 +43,38 @@ M.claude = {
   },
 }
 
+M.sidekick = {
+  cli = {
+    -- ref:
+    -- * https://github.com/Muizzyranking/dot-files/blob/538633c31067affd906cae0f88df8204ccd86980/config/nvim/lua/utils/plugins/sidekick.lua
+    -- * https://github.com/folke/sidekick.nvim/blob/d9e1fa2124340d3337d1a3a22b2f20de0701affe/lua/sidekick/cli/init.lua#L140-L160
+    ---@param opts? { filter?: sidekick.cli.Filter }
+    kill = function(opts)
+      local Cli = require("sidekick.cli")
+      local State = require("sidekick.cli.state")
+      local Util = require("sidekick.util")
+
+      ---@param state sidekick.cli.State
+      local function kill(state)
+        if not state then
+          return
+        end
+        State.detach(state)
+        if state.session and state.session.mux_session then
+          if state.session.backend == "tmux" or state.session.mux_backend == "tmux" then
+            Util.exec({ "tmux", "kill-session", "-t", state.session.mux_session })
+          end
+        end
+      end
+
+      opts = opts or {}
+      Cli.select({
+        auto = true,
+        filter = Util.merge(opts.filter, { started = true }),
+        cb = kill,
+      })
+    end,
+  },
+}
+
 return M

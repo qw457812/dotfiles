@@ -20,6 +20,7 @@ return {
         { "<leader>as", function() require("sidekick.cli").select({ filter = filter }) end, desc = "Select (Sidekick)" },
         { "<leader>as", function() require("sidekick.cli").send({ msg = "{selection}", filter = filter }) end, mode = "x", desc = "Send (Sidekick)" },
         { "<leader>ad", function() require("sidekick.cli").close() end, desc = "Detach (Sidekick)" },
+        { "<leader>ak", U.ai.sidekick.cli.kill, desc = "Kill (Sidekick)" },
         {
           "<leader>ap",
           function()
