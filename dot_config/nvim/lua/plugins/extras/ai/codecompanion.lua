@@ -97,10 +97,7 @@ return {
           -- requires `npm i -g @zed-industries/claude-code-acp`
           claude_code = function()
             return require("codecompanion.adapters").extend("claude_code", {
-              env = {
-                ANTHROPIC_BASE_URL = "CTOK_BASE_URL",
-                ANTHROPIC_AUTH_TOKEN = "CTOK_AUTH_TOKEN",
-              },
+              env = U.ai.claude.provider.plan.anthropic,
             })
           end,
         },

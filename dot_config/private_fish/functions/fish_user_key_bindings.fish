@@ -1,5 +1,4 @@
 function __edit_command_buffer
-    # @fish-lsp-disable-next-line 4004
     set -lx SHELL_COMMAND_EDITOR 1
     edit_command_buffer
 end

@@ -284,11 +284,7 @@ return {
       ---@type table<string, AvanteACPProvider|{}>
       acp_providers = {
         ["claude-code"] = {
-          env = {
-            ANTHROPIC_BASE_URL = vim.env.CTOK_BASE_URL,
-            ANTHROPIC_AUTH_TOKEN = vim.env.CTOK_AUTH_TOKEN,
-            ANTHROPIC_MODEL = "sonnet",
-          },
+          env = U.ai.claude.provider.plan.anthropic,
         },
       },
       windows = {

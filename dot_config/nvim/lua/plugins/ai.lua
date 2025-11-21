@@ -1,30 +1,21 @@
-local sidekick_toggle_key = "<M-space>"
+local sidekick_cli_toggle_key = "<M-space>"
+local copilot_available = not vim.g.user_is_termux -- copilot-language-server failed to start on termux
 
 ---@type LazySpec
 return {
+  -- sidekick cli
   {
     "folke/sidekick.nvim",
     optional = true,
-    event = "LazyFile",
     keys = function(_, keys)
-      if vim.g.user_distinguish_ctrl_i_tab or vim.g.user_is_termux then
-        table.insert(keys, {
-          "<tab>",
-          LazyVim.cmp.map({ "ai_nes" }, function()
-            vim.cmd("wincmd w")
-          end),
-          desc = "Jump/Apply Next Edit Suggestions or Next Window (Sidekick)",
-        })
-      end
-
       local filter = { installed = true } ---@type sidekick.cli.Filter
       -- stylua: ignore
       return vim.list_extend(keys, {
         { "<c-.>", false, mode = { "n", "x", "i", "t" } },
-        { sidekick_toggle_key, function() require("sidekick.cli").toggle({ filter = filter }) end, mode = { "n", "x", "t" }, desc = "Sidekick" },
+        { sidekick_cli_toggle_key, function() require("sidekick.cli").toggle({ filter = filter }) end, mode = { "n", "x", "t" }, desc = "Sidekick" },
         { "<leader>av", false, mode = "x" },
         { "<leader>at", false, mode = { "n", "x" } },
-        { "<leader>aa", sidekick_toggle_key, desc = "Sidekick", remap = true },
+        { "<leader>aa", sidekick_cli_toggle_key, desc = "Sidekick", remap = true },
         { "<leader>aa", function() require("sidekick.cli").send({ msg = "{this}", filter = filter }) end, mode = "x", desc = "Sidekick" },
         { "<leader>as", function() require("sidekick.cli").select({ filter = filter }) end, desc = "Select (Sidekick)" },
         { "<leader>as", function() require("sidekick.cli").send({ msg = "{selection}", filter = filter }) end, mode = "x", desc = "Send (Sidekick)" },
@@ -56,11 +47,6 @@ return {
     ---@module "sidekick"
     ---@type sidekick.Config
     opts = {
-      nes = {
-        clear = {
-          esc = false, -- handled by U.keymap.clear_ui_esc()
-        },
-      },
       cli = {
         ---@type sidekick.win.Opts
         win = {
@@ -116,7 +102,7 @@ return {
           ---@type table<string, sidekick.cli.Keymap|false>
           keys = {
             hide_ctrl_dot = false,
-            hide_toggle_key = { sidekick_toggle_key, "hide", mode = "nt" },
+            hide_toggle_key = { sidekick_cli_toggle_key, "hide", mode = "nt" },
             blur_t = { "<c-o>", "blur" },
             blur_n = {
               "<esc>",
@@ -147,52 +133,6 @@ return {
             env = {
               __IS_CLAUDECODE_NVIM = "1", -- flag to disable claude code statusline in ~/.claude/settings.json
               NVIM_FLATTEN_NEST = "1", -- allow ctrl-g to edit prompt in nvim" to be nested for flatten.nvim
-
-              ANTHROPIC_BASE_URL = vim.env.CTOK_BASE_URL,
-              ANTHROPIC_AUTH_TOKEN = vim.env.CTOK_AUTH_TOKEN,
-              API_TIMEOUT_MS = "",
-              ANTHROPIC_MODEL = "",
-              ANTHROPIC_SMALL_FAST_MODEL = "",
-              ANTHROPIC_DEFAULT_SONNET_MODEL = "",
-              ANTHROPIC_DEFAULT_OPUS_MODEL = "",
-              ANTHROPIC_DEFAULT_HAIKU_MODEL = "",
-
-              -- ANTHROPIC_BASE_URL = "https://api.moonshot.cn/anthropic",
-              -- ANTHROPIC_AUTH_TOKEN = vim.env.MOONSHOT_API_KEY,
-              -- API_TIMEOUT_MS = "",
-              -- -- ANTHROPIC_MODEL = "kimi-k2-0905-preview",
-              -- ANTHROPIC_MODEL = "kimi-k2-turbo-preview",
-              -- ANTHROPIC_SMALL_FAST_MODEL = "kimi-k2-turbo-preview",
-              -- ANTHROPIC_DEFAULT_SONNET_MODEL = "",
-              -- ANTHROPIC_DEFAULT_OPUS_MODEL = "",
-              -- ANTHROPIC_DEFAULT_HAIKU_MODEL = "",
-
-              -- ANTHROPIC_BASE_URL = "https://api.kimi.com/coding/",
-              -- ANTHROPIC_AUTH_TOKEN = vim.env.KIMI_API_KEY,
-              -- API_TIMEOUT_MS = "",
-              -- ANTHROPIC_MODEL = "kimi-for-coding",
-              -- ANTHROPIC_SMALL_FAST_MODEL = "kimi-for-coding",
-              -- ANTHROPIC_DEFAULT_SONNET_MODEL = "",
-              -- ANTHROPIC_DEFAULT_OPUS_MODEL = "",
-              -- ANTHROPIC_DEFAULT_HAIKU_MODEL = "",
-
-              -- ANTHROPIC_BASE_URL = "https://open.bigmodel.cn/api/anthropic",
-              -- ANTHROPIC_AUTH_TOKEN = vim.env.ZHIPU_API_KEY,
-              -- API_TIMEOUT_MS = "3000000",
-              -- ANTHROPIC_MODEL = "",
-              -- ANTHROPIC_SMALL_FAST_MODEL = "",
-              -- ANTHROPIC_DEFAULT_SONNET_MODEL = "",
-              -- ANTHROPIC_DEFAULT_OPUS_MODEL = "",
-              -- ANTHROPIC_DEFAULT_HAIKU_MODEL = "",
-
-              -- ANTHROPIC_BASE_URL = "https://api.minimax.io/anthropic",
-              -- ANTHROPIC_AUTH_TOKEN = vim.env.MINIMAX_API_KEY,
-              -- API_TIMEOUT_MS = "3000000",
-              -- ANTHROPIC_MODEL = "MiniMax-M2",
-              -- ANTHROPIC_SMALL_FAST_MODEL = "MiniMax-M2",
-              -- ANTHROPIC_DEFAULT_SONNET_MODEL = "MiniMax-M2",
-              -- ANTHROPIC_DEFAULT_OPUS_MODEL = "MiniMax-M2",
-              -- ANTHROPIC_DEFAULT_HAIKU_MODEL = "MiniMax-M2",
             },
             keys = {
               blur_t = false, -- claude code uses <c-o> for its own functionality
@@ -209,7 +149,6 @@ return {
           gemini = { cmd = { "hack_to_disable_gemini" } },
           aider = { cmd = { "hack_to_disable_aider" } },
           -- debug = {
-          --   -- print env and read -p "any key to continue"
           --   cmd = { "bash", "-c", "env | sort | bat -l env" },
           -- },
         },
@@ -242,7 +181,7 @@ return {
                     win = {
                       input = {
                         keys = {
-                          [sidekick_toggle_key] = { "close", mode = { "i", "n" }, desc = "Close (Sidekick)" },
+                          [sidekick_cli_toggle_key] = { "close", mode = { "i", "n" }, desc = "Close (Sidekick)" },
                         },
                       },
                     },
@@ -271,23 +210,6 @@ return {
           },
         },
       },
-      vim.g.ai_cmp and not LazyVim.has_extra("ai.copilot") and {
-        "saghen/blink.cmp",
-        optional = true,
-        dependencies = "fang2hou/blink-copilot",
-        opts = {
-          sources = {
-            default = { "copilot" },
-            providers = {
-              copilot = {
-                module = "blink-copilot",
-                score_offset = 100,
-                async = true,
-              },
-            },
-          },
-        },
-      } or { import = "foobar", enabled = false }, -- dummy import
     },
   },
   {
@@ -295,22 +217,18 @@ return {
     optional = true,
     ---@param opts sidekick.Config
     opts = function(_, opts)
-      if vim.g.user_is_termux then
-        opts.nes = opts.nes or {}
-        opts.nes.enabled = false -- copilot-language-server failed to start
-      end
-
       Snacks.util.set_hl({ SidekickCliInstalled = "Comment" })
 
-      U.toggle.ai_cmps.sidekick_nes = Snacks.toggle({
-        name = "Sidekick NES",
-        get = function()
-          return require("sidekick.nes").enabled
-        end,
-        set = function(state)
-          require("sidekick.nes").enable(state)
-        end,
-      })
+      return U.extend_tbl(opts, {
+        cli = {
+          ---@type table<string, sidekick.cli.Config|{}>
+          tools = {
+            claude = {
+              env = U.ai.claude.provider.plan.anthropic,
+            },
+          },
+        },
+      } --[[@as sidekick.Config]])
     end,
   },
 
@@ -378,6 +296,69 @@ return {
         end,
       })
     end,
+  },
+
+  -- sidekick nes
+  {
+    "folke/sidekick.nvim",
+    optional = true,
+    event = "LazyFile",
+    keys = function(_, keys)
+      if vim.g.user_distinguish_ctrl_i_tab or vim.g.user_is_termux then
+        table.insert(keys, {
+          "<tab>",
+          LazyVim.cmp.map({ "ai_nes" }, function()
+            vim.cmd("wincmd w")
+          end),
+          desc = "Jump/Apply Next Edit Suggestions or Next Window (Sidekick)",
+        })
+      end
+      return keys
+    end,
+    ---@param opts sidekick.Config
+    opts = function(_, opts)
+      if copilot_available then
+        U.toggle.ai_cmps.sidekick_nes = Snacks.toggle({
+          name = "Sidekick NES",
+          get = function()
+            return require("sidekick.nes").enabled
+          end,
+          set = function(state)
+            require("sidekick.nes").enable(state)
+          end,
+        })
+      else
+        opts.nes = opts.nes or {}
+        opts.nes.enabled = false
+      end
+
+      return U.extend_tbl(opts, {
+        nes = {
+          clear = {
+            esc = false, -- handled by U.keymap.clear_ui_esc()
+          },
+        },
+      } --[[@as sidekick.Config]])
+    end,
+    specs = {
+      copilot_available and vim.g.ai_cmp and not LazyVim.has_extra("ai.copilot") and {
+        "saghen/blink.cmp",
+        optional = true,
+        dependencies = "fang2hou/blink-copilot",
+        opts = {
+          sources = {
+            default = { "copilot" },
+            providers = {
+              copilot = {
+                module = "blink-copilot",
+                score_offset = 100,
+                async = true,
+              },
+            },
+          },
+        },
+      } or { import = "foobar", enabled = false }, -- dummy import
+    },
   },
 
   {

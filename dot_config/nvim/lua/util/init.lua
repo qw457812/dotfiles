@@ -1,4 +1,5 @@
 ---@class util
+---@field ai util.ai
 ---@field color util.color
 ---@field explorer util.explorer
 ---@field git util.git

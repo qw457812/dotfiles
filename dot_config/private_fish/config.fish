@@ -5,6 +5,7 @@ fish_add_path ~/.local/share/bob/nvim-bin
 fish_add_path ~/.local/bin
 fish_add_path "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
 fish_add_path "$HOME/Library/Application Support/Coursier/bin" # scalafmt
+fish_add_path ~/.antigravity/antigravity/bin
 type -q brew; and fish_add_path (brew --prefix)/Caskroom/sqlcl/(command ls -t (brew --prefix)/Caskroom/sqlcl 2>/dev/null | head -1)/sqlcl/bin
 
 # Exports
@@ -293,6 +294,10 @@ if type -q claude
     abbr ccexp (type -q bunx; and echo "bunx ccexp@latest"; or echo "npx ccexp@latest")
     abbr cctmpl "ANTHROPIC_BASE_URL=$CTOK_BASE_URL ANTHROPIC_AUTH_TOKEN=$CTOK_AUTH_TOKEN npx claude-code-templates@latest"
     abbr cck claude_kimi
+    abbr cckc "claude_kimi --continue"
+    abbr cckcf "claude_kimi --continue --fork-session"
+    abbr cckr "claude_kimi --resume"
+    abbr cckrf "claude_kimi --resume --fork-session"
     abbr ccg claude_glm
     abbr ccq claude_qwen
     abbr ccm claude_minimax

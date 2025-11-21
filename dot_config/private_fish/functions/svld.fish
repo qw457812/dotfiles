@@ -6,7 +6,6 @@ function svld
     end
 end
 
-# @fish-lsp-disable-next-line 4004
 function __complete_svld
     # svn log -q -l 9 | grep '^r' | cut -d' ' -f1
     svn log -l 9 | awk '

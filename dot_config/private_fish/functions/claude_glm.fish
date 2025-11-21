@@ -1,5 +1,3 @@
-# @fish-lsp-disable 4004
-
 # https://docs.bigmodel.cn/cn/guide/develop/claude
 # https://docs.bigmodel.cn/cn/coding-plan/tool/claude
 # https://docs.z.ai/scenario-example/develop-tools/claude

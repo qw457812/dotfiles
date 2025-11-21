@@ -1,4 +1,3 @@
-# @fish-lsp-disable 4004
 # https://api-docs.deepseek.com/guides/anthropic_api
 function claude_deepseek --wraps=claude
     set -lx ANTHROPIC_BASE_URL https://api.deepseek.com/anthropic
