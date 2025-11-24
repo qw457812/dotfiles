@@ -8,16 +8,14 @@
 .nvim.lua
 .lazy.lua
 
-.claude
-# .claude/settings.local.json
-CLAUDE.md
 CLAUDE.local.md
+# **/.claude/settings.local.json
+CLAUDE.md
+.claude
 .mcp.json
 
 .aider*
 .opencode
 AGENTS.md
-.crush/
-CRUSH.md
 
 .playwright-mcp

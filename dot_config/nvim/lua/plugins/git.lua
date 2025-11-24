@@ -181,12 +181,12 @@ return {
               input = {
                 keys = {
                   ["<Tab>"] = { "select_and_next", mode = { "i", "n" } },
-                  ["<Space>"] = "git_apply",
+                  ["<Space>"] = "git_stage",
                 },
               },
               list = {
                 keys = {
-                  ["<Space>"] = "git_apply",
+                  ["<Space>"] = "git_stage",
                 },
               },
             },

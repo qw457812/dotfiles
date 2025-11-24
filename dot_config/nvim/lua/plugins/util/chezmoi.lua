@@ -317,6 +317,16 @@ return {
           vim.b[ev.buf].autoformat = false
         end,
       })
+
+      LazyVim.on_very_lazy(function()
+        vim.system({ "chezmoi", "status" }, { text = true }, function(res)
+          if res.code ~= 0 or not res.stdout then
+            LazyVim.error(("Command failed: `chezmoi status`\n%s"):format(res.stderr or ""), { title = "Chezmoi" })
+          elseif res.stdout ~= "" then
+            LazyVim.warn(vim.trim(res.stdout), { title = "Chezmoi Status" })
+          end
+        end)
+      end)
     end,
   },
 

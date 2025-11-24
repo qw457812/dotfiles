@@ -121,6 +121,11 @@ return {
                 t:send("\n")
               end,
             },
+            -- we already have global mappings for window navigation
+            nav_down = false, -- HACK: fix "'kitty @ kitten neighboring_window.py right' returned 1", same for nav_up and nav_right
+            nav_up = false,
+            nav_right = false,
+            nav_left = false, -- not necessary, but for consistency
           },
         },
         ---@type sidekick.cli.Mux
@@ -130,7 +135,7 @@ return {
         ---@type table<string, sidekick.cli.Config|{}>
         tools = {
           claude = {
-            cmd = vim.fn.executable("command") == 1 and { "command", "claude" } or { "claude" },
+            cmd = vim.fn.executable("command") == 1 and { "command", "claude" } or { "claude" }, -- ~/.config/fish/functions/claude.fish
             env = {
               __IS_CLAUDECODE_NVIM = "1", -- flag to disable claude code statusline in ~/.claude/settings.json
               NVIM_FLATTEN_NEST = "1", -- allow ctrl-g to edit prompt in nvim" to be nested for flatten.nvim
@@ -144,6 +149,7 @@ return {
             env = {
               NVIM_FLATTEN_NEST = "1",
             },
+            keys = { prompt = { "<a-p>", "prompt" } },
           },
           -- HACK: disable some installed tools
           copilot = { cmd = tonumber(os.date("%d")) < 20 and { "hack_to_disable_copilot" } or { "copilot" } },

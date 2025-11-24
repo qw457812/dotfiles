@@ -107,6 +107,7 @@
     amend = commit --amend --no-edit
     unamend = reset --soft HEAD@{1}
     fixup = commit --fixup
+    fixup-rebase = "!f() { git commit --fixup \"$1\" && git rebase -i --autosquash \"$1~1\"; }; f"
 
 [help]
     autocorrect = prompt
