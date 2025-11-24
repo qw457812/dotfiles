@@ -424,18 +424,44 @@ return {
                 end,
                 desc = "Clear UI or Close",
               },
+              f_or_preview_down = {
+                "f",
+                function(self)
+                  if self:line() ~= "" then
+                    return "f"
+                  end
+                  vim.schedule(function()
+                    self:execute("preview_down")
+                  end)
+                end,
+                expr = true,
+                desc = "f or preview_down",
+              },
+              b_or_preview_up = {
+                "b",
+                function(self)
+                  if self:line() ~= "" then
+                    return "b"
+                  end
+                  vim.schedule(function()
+                    self:execute("preview_up")
+                  end)
+                end,
+                expr = true,
+                desc = "b or preview_up",
+              },
               ["J"] = "preview_down", -- same as lazygit/yazi
               ["K"] = "preview_up",
               ["<PageDown>"] = { "preview_scroll_down", mode = { "i", "n" } },
               ["<PageUp>"] = { "preview_scroll_up", mode = { "i", "n" } },
-              ["o"] = "confirm",
               ["/"] = false, -- highlights text in preview
               ["<C-e>"] = { "filter_extension", mode = { "i", "n" } },
               ["<M-l>"] = { "toggle_lua", mode = { "n", "i" } },
-              ["<C-Space>"] = { "cycle_win", mode = { "n", "i" } },
-              ["<C-,>"] = "toggle_input",
-              i_ctrl_comma = {
-                "<C-,>",
+              ["o"] = "cycle_win",
+              ["<C-o>"] = { "cycle_win", mode = { "n", "i" } },
+              ["<C-Space>"] = "toggle_input",
+              i_ctrl_space = {
+                "<C-Space>",
                 function(self)
                   vim.cmd.stopinsert()
                   vim.schedule(function()
@@ -474,12 +500,19 @@ return {
               ["K"] = "preview_up",
               ["<PageDown>"] = "preview_scroll_down",
               ["<PageUp>"] = "preview_scroll_up",
-              ["o"] = "confirm",
               ["/"] = false,
               ["<C-e>"] = "filter_extension",
               ["<M-l>"] = "toggle_lua",
-              ["<C-Space>"] = "cycle_win",
-              ["<C-,>"] = "toggle_input",
+              o_cycle_win = {
+                "o",
+                function(self)
+                  self:execute("cycle_win")
+                  vim.cmd.stopinsert()
+                end,
+                desc = "cycle_win",
+              },
+              ["<C-o>"] = "cycle_win",
+              ["<C-Space>"] = "toggle_input",
               ["<Left>"] = "preview_scroll_left",
               ["<Right>"] = "preview_scroll_right",
               ["<C-Left>"] = "preview_scroll_left",
@@ -505,7 +538,8 @@ return {
                 end,
                 desc = "Clear UI or Focus Input",
               },
-              ["<C-Space>"] = { "cycle_win", mode = { "n", "i" } },
+              ["o"] = "cycle_win",
+              ["<C-o>"] = "cycle_win",
             },
           },
         },

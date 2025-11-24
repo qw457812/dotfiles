@@ -252,6 +252,7 @@ return {
         },
         once = true,
         callback = function(ev)
+          vim.opt_local.wrap = true
           vim.diagnostic.enable(false, { bufnr = ev.buf })
 
           -- HACK: Fix for https://github.com/anthropics/claude-code/issues/10375

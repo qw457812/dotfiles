@@ -388,7 +388,7 @@ return {
             win = {
               input = {
                 keys = {
-                  ["o"] = "gh_open",
+                  ["<localleader>o"] = "gh_open",
                   ["<localleader>y"] = "gh_yank",
                   ["<localleader>b"] = "gh_browse",
                 },
@@ -405,7 +405,7 @@ return {
             win = {
               input = {
                 keys = {
-                  ["o"] = "gh_open",
+                  ["<localleader>o"] = "gh_open",
                   ["<localleader>y"] = "gh_yank",
                   ["<localleader>b"] = "gh_browse",
                   ["<localleader>d"] = "gh_diff",
