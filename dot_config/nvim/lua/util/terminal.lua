@@ -17,6 +17,7 @@ local M = setmetatable({}, {
 ---@return snacks.win
 function M.toggle(cmd, opts, hide_key)
   opts = opts or {}
+  local win = vim.api.nvim_get_current_win()
 
   if hide_key then
     opts = vim.tbl_deep_extend("force", {
@@ -36,6 +37,26 @@ function M.toggle(cmd, opts, hide_key)
     }, opts)
   end
 
+  -- HACK: re-open the explorer to do something like `opts.options.offsets` of bufferline.nvim
+  local on_win = opts.win and opts.win.on_win
+  ---@param self snacks.terminal
+  opts.win.on_win = function(self)
+    if not self:is_floating() and U.explorer.is_visible() then
+      U.explorer.close()
+      vim.schedule(function()
+        U.explorer.open({ focus = false })
+        -- prevent the explorer from becoming the "previous window", otherwise `<c-/>` -> `<c-/>` ends up focusing the explorer
+        if vim.api.nvim_win_is_valid(win) and self:win_valid() then
+          vim.api.nvim_set_current_win(win)
+          vim.api.nvim_set_current_win(self.win)
+        end
+      end)
+    end
+    if on_win then
+      on_win(self)
+    end
+  end
+
   local st = vim.b.snacks_terminal or {}
   if
     vim.fn.mode() == "n" -- terminal mode handled by `hide_key`
@@ -47,7 +68,6 @@ function M.toggle(cmd, opts, hide_key)
     -- Try `<c-/>` -> `<esc><esc>` -> `<c-space>`, without this, the `<c-space>` will close the bottom terminal instead of opening a float one.
     and (vim.deep_equal(st.cmd, cmd) and st.cwd == opts.cwd and vim.deep_equal(st.env, opts.env))
   then
-    local win = vim.api.nvim_get_current_win()
     ---@param t snacks.win
     local terminal = vim.tbl_filter(function(t)
       return t.win == win

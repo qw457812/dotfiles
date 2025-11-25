@@ -1,6 +1,19 @@
 ---@class util.explorer
 local M = {}
 
+-- TODO: vim.g.user_explorer_visible and is_visible() in neo-tree.lua
+---@return boolean, integer?, integer?
+function M.is_visible()
+  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+    local buf = vim.api.nvim_win_get_buf(win)
+    if vim.list_contains({ "neo-tree", "snacks_layout_box" }, vim.bo[buf].filetype) then
+      return true, buf, win
+    end
+  end
+  return false
+end
+
+-- TODO: current file -> U.last_file(false)
 -- reveal the current file in root directory
 ---@param opts? {focus?: boolean}
 function M.open(opts)
