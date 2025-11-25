@@ -1,0 +1,34 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+add_newline = false
+
+format = """
+$directory\
+$git_branch\
+$git_commit\
+$git_state\
+$git_metrics\
+$git_status"""
+
+[git_branch]
+symbol = " "
+format = '[$branch(:$remote_branch)]($style) '
+
+[git_status]
+untracked = '[?$count](bold blue) '
+staged = '[++$count](bold green) '
+stashed = ""
+deleted = '[D$count](bold red) '
+modified = '[M$count](bold yellow) '
+renamed = '[R$count](bold 136) '
+conflicted = '[!$count](bold red) '
+behind = '[⇣${count}](bold purple) '
+ahead = '[⇡${count}](bold purple) '
+diverged = '[⇕⇡${ahead_count}⇣${behind_count}](bold purple) '
+format = '([$all_status$ahead_behind]($style))'
+
+[git_metrics]
+disabled = false
+
+[directory]
+read_only = " 󰌾"
