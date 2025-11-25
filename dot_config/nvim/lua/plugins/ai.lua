@@ -97,13 +97,20 @@ return {
           },
           ---@type vim.api.keyset.win_config
           split = {
-            width = math.max(80, math.floor(vim.o.columns * 0.4)),
+            width = math.max(80, math.floor(vim.o.columns * 0.5)),
             height = math.max(20, math.floor(vim.o.lines * 0.5)),
           },
           ---@type table<string, sidekick.cli.Keymap|false>
           keys = {
             hide_ctrl_dot = false,
             hide_toggle_key = { sidekick_cli_toggle_key, "hide", mode = "nt" },
+            down_ctrl_j = { "<c-j>", "<Down>" }, -- this overrides the window navigation
+            up_ctrl_k = { "<c-k>", "<Up>" }, -- this overrides the window navigation
+            down_ctrl_n = { "<c-n>", "<Down>" },
+            up_ctrl_p = { "<c-p>", "<Up>" },
+            prompt = { "<a-p>", "prompt" },
+            buffers = { "<a-b>", "buffers", mode = "nt" },
+            files = { "<a-f>", "files", mode = "nt" },
             blur_t = { "<c-o>", "blur" },
             blur_n = {
               "<esc>",
@@ -121,7 +128,7 @@ return {
                 t:send("\n")
               end,
             },
-            -- we already have global mappings for window navigation
+            -- we already have global mappings for window navigation (plugins.extras.util.tmux)
             nav_down = false, -- HACK: fix "'kitty @ kitten neighboring_window.py right' returned 1", same for nav_up and nav_right
             nav_up = false,
             nav_right = false,
@@ -135,7 +142,13 @@ return {
         ---@type table<string, sidekick.cli.Config|{}>
         tools = {
           claude = {
-            cmd = vim.fn.executable("command") == 1 and { "command", "claude" } or { "claude" }, -- ~/.config/fish/functions/claude.fish
+            cmd = vim.list_extend(vim.fn.executable("command") == 1 and {
+              "command", -- skip ~/.config/fish/functions/claude.fish
+              "claude",
+            } or { "claude" }, {
+              -- "--continue",
+              -- "--resume",
+            }),
             env = {
               __IS_CLAUDECODE_NVIM = "1", -- flag to disable claude code statusline in ~/.claude/settings.json
               NVIM_FLATTEN_NEST = "1", -- allow ctrl-g to edit prompt in nvim" to be nested for flatten.nvim
@@ -149,15 +162,15 @@ return {
             env = {
               NVIM_FLATTEN_NEST = "1",
             },
-            keys = { prompt = { "<a-p>", "prompt" } },
+            keys = {
+              up_ctrl_p = false, -- opencode uses <c-p> for its own functionality
+            },
           },
           -- HACK: disable some installed tools
           copilot = { cmd = tonumber(os.date("%d")) < 20 and { "hack_to_disable_copilot" } or { "copilot" } },
           gemini = { cmd = { "hack_to_disable_gemini" } },
           aider = { cmd = { "hack_to_disable_aider" } },
-          -- debug = {
-          --   cmd = { "bash", "-c", "env | sort | bat -l env" },
-          -- },
+          -- debug = { cmd = { "bash", "-c", "env | sort | bat -l env" } },
         },
         ---@type table<string, sidekick.Prompt|string|fun(ctx:sidekick.context.ctx):(string?)>
         prompts = {

@@ -307,6 +307,7 @@ end
 if type -q codex
     # codex completion fish >~/.config/fish/completions/codex.fish
     abbr cx codex
+    abbr cxc 'codex resume --last'
     abbr cxr 'codex resume'
 end
 # type -q gemini; and abbr gm gemini
