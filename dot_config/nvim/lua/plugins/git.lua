@@ -23,7 +23,7 @@ return {
 
           -- Abort commit for `git commit --amend`
           vim.keymap.set("n", "<C-c>", function()
-            Snacks.picker.util.confirm("Abort Commit?", function()
+            U.confirm("Abort Commit?", function()
               -- aborting commit due to empty commit message
               vim.api.nvim_buf_set_lines(ev.buf, 0, -1, false, {})
               vim.cmd.write()

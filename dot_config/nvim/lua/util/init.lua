@@ -431,8 +431,13 @@ end
 ---end
 ---ref: https://github.com/folke/snacks.nvim/blob/907679381ba5ed36a24b0176930e3ceb97ca4755/lua/snacks/picker/util/init.lua#L76-L93
 ---@param prompt string
----@param fn fun(yes: boolean)
+---@param fn fun(yes?: boolean)
 function M.confirm(prompt, fn)
+  -- Check if fn accepts parameters to support two callback patterns:
+  -- 1. fn(yes) - always called with boolean (true/false)
+  -- 2. fn() - only called when user selects "Yes"
+  local fn_has_params = ((debug.getinfo(fn, "u") or {}).nparams or 0) > 0
+
   Snacks.picker.select({ "No", "Yes" }, {
     prompt = prompt,
     snacks = {
@@ -441,9 +446,17 @@ function M.confirm(prompt, fn)
           max_width = 60,
         },
       },
+      on_show = function()
+        vim.cmd.stopinsert()
+      end,
     },
   }, function(_, idx)
-    fn(idx == 2)
+    local yes = idx == 2
+    if fn_has_params then
+      fn(yes)
+    elseif yes then
+      fn()
+    end
   end)
 end
 

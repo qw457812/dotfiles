@@ -672,6 +672,16 @@ return {
   },
 
   {
+    "folke/snacks.nvim",
+    optional = true,
+    opts = function()
+      -- HACK: stopinsert on show
+      -- https://github.com/folke/snacks.nvim/blob/907679381ba5ed36a24b0176930e3ceb97ca4755/lua/snacks/picker/util/init.lua#L76-L93
+      Snacks.picker.util.confirm = U.confirm
+    end,
+  },
+
+  {
     "nvim-lualine/lualine.nvim",
     optional = true,
     opts = function(_, opts)
