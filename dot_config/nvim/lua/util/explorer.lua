@@ -1,7 +1,7 @@
 ---@class util.explorer
 local M = {}
 
--- TODO: vim.g.user_explorer_visible and is_visible() in neo-tree.lua
+-- TODO: refactor: vim.g.user_explorer_visible and is_visible() in neo-tree.lua
 ---@return boolean, integer?, integer?
 function M.is_visible()
   for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do

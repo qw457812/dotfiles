@@ -99,6 +99,8 @@ return {
                   ["h"] = "parent_or_close",
                   ["l"] = "child_or_open",
                   ["f"] = "focus_input", -- filter
+                  ["o"] = "reveal_file",
+                  ["O"] = "explorer_open",
                 },
               },
               input = {

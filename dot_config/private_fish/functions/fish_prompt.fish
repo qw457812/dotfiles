@@ -1,3 +1,4 @@
+# @fish-lsp-disable 4001
 starship init fish | source
 enable_transience
 # TODO: try https://github.com/IlanCosman/tide

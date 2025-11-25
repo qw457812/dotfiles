@@ -289,10 +289,13 @@ function M.reveal_file(path)
     LazyVim.warn("Not a file: " .. path, { title = "Reveal" })
     return
   end
-  vim.ui.open(path, {
+  local _, err = vim.ui.open(path, {
     -- https://github.com/sxyazi/yazi/blob/9d92cdbf79de530de11e66a2fabd0537e8249eb9/yazi-config/preset/yazi-default.toml#L44-L50
     cmd = vim.fn.has("mac") == 1 and { "open", "-R" } or nil,
   })
+  if err then
+    Snacks.notify.error("Failed to open `" .. path .. "`:\n- " .. err)
+  end
 end
 
 --- copied from: https://github.com/nvim-lua/plenary.nvim/blob/f031bef84630f556c2fb81215826ea419d81f4e9/lua/plenary/curl.lua#L44-L55
