@@ -5,10 +5,12 @@ input=$(cat)
 # cwd=$(echo "$input" | jq -r '.workspace.current_dir // .cwd')
 
 # fixes https://github.com/anthropics/claude-code/issues/10375
-if [ -n "$TMUX" ]; then
-  printf '\ePtmux;\e\e[?1004l\e\\'
-else
-  printf '\e[?1004l'
+if [ -z "$TERMUX_VERSION" ]; then
+  if [ -n "$TMUX" ]; then
+    printf '\ePtmux;\e\e[?1004l\e\\'
+  else
+    printf '\e[?1004l'
+  fi
 fi
 
 if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then

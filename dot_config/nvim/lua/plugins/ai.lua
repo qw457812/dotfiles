@@ -268,32 +268,32 @@ return {
           vim.opt_local.wrap = true
           vim.diagnostic.enable(false, { bufnr = ev.buf })
 
-          -- -- HACK: Fix for https://github.com/anthropics/claude-code/issues/10375
-          -- if ev.match:match("claude%-prompt") then
-          --   -- Disable focus reporting mode when leaving Neovim to prevent [I and [O escape sequences
-          --   -- from leaking into Claude Code
-          --   vim.api.nvim_create_autocmd("VimLeavePre", {
-          --     callback = function()
-          --       if vim.g.user_is_tmux then
-          --         io.stdout:write("\x1bPtmux;\x1b\x1b[?1004l\x1b\\")
-          --       else
-          --         -- io.stdout:write("\x1b[?1004l") -- FIXME: not working
-          --       end
-          --     end,
-          --   })
-          --
-          --   -- Remove "[O" and "[I" for claude code prompts, but keep the "[Image #1]"
-          --   vim.api.nvim_buf_call(
-          --     ev.buf,
-          --     vim.schedule_wrap(function()
-          --       vim.cmd([[%s/\[O//ge]])
-          --       vim.cmd([[%s/\[I\ze\(mage\)\@!//ge]]) -- match `[I` only when it's NOT followed by 'mage'
-          --       if vim.bo[ev.buf].modified then
-          --         vim.cmd("silent! noautocmd lockmarks write")
-          --       end
-          --     end)
-          --   )
-          -- end
+          -- HACK: Fix for https://github.com/anthropics/claude-code/issues/10375
+          if ev.match:match("claude%-prompt") then
+            -- Disable focus reporting mode when leaving Neovim to prevent [I and [O escape sequences
+            -- from leaking into Claude Code
+            vim.api.nvim_create_autocmd("VimLeavePre", {
+              callback = function()
+                if vim.g.user_is_tmux then
+                  io.stdout:write("\x1bPtmux;\x1b\x1b[?1004l\x1b\\")
+                else
+                  -- io.stdout:write("\x1b[?1004l") -- FIXME: not working
+                end
+              end,
+            })
+
+            -- -- Remove "[O" and "[I" for claude code prompts, but keep the "[Image #1]"
+            -- vim.api.nvim_buf_call(
+            --   ev.buf,
+            --   vim.schedule_wrap(function()
+            --     vim.cmd([[%s/\[O//ge]])
+            --     vim.cmd([[%s/\[I\ze\(mage\)\@!//ge]]) -- match `[I` only when it's NOT followed by 'mage'
+            --     if vim.bo[ev.buf].modified then
+            --       vim.cmd("silent! noautocmd lockmarks write")
+            --     end
+            --   end)
+            -- )
+          end
 
           vim.keymap.set("n", "<Esc>", function()
             if not U.keymap.clear_ui_esc() then
