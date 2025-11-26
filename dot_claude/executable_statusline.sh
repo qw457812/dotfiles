@@ -36,14 +36,7 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   session_cost_display=$(printf "\033[33m\$%.2f\033[0m" "$session_cost") # yellow
 
   # today cost
-  # TODO: cache result for 1 minute to avoid excessive ccusage calls
-  today=$(date +%Y%m%d)
-  if command -v bunx >/dev/null 2>&1; then
-    # alternative: `bunx ccusage daily --json --offline --order desc 2>/dev/null | jq -r '.daily[0].totalCost // 0' 2>/dev/null | xargs printf "%.2f"`
-    today_cost=$(bunx ccusage daily --json --offline --since "$today" --until "$today" 2>/dev/null | jq -r '.daily[0].totalCost // 0' 2>/dev/null || echo "0")
-  else
-    today_cost=$(npx -y ccusage daily --json --offline --since "$today" --until "$today" 2>/dev/null | jq -r '.daily[0].totalCost // 0' 2>/dev/null || echo "0")
-  fi
+  today_cost=$("$HOME/.claude/statusline/get-today-cost.sh")
   today_cost_display=$(printf "\033[35m\$%.2f\033[0m" "$today_cost") # purple
 
   # starship, only git status for now

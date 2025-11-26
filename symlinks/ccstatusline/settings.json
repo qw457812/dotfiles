@@ -24,8 +24,8 @@
       {
         "id": "a789591a-bd42-4578-bf5d-c0392f58c92a",
         "type": "git-branch",
-        "rawValue": true,
-        "color": "hex:C099FF"
+        "color": "hex:C099FF",
+        "rawValue": true
       },
       {
         "id": "93bad283-ff94-4abd-91a1-4197f3557fe4",
@@ -95,7 +95,7 @@
       {
         "id": "d8247c9a-9ae2-48ae-a5fa-ad6c48b81b48",
         "type": "custom-command",
-        "commandPath": "printf \"\\033[35m\\$%.2f\\033[0m\" \"$($(command -v bunx &>/dev/null && echo bunx || echo \"npx -y\") ccusage daily --json --offline --since \"$(date +%Y%m%d)\" --until \"$(date +%Y%m%d)\" 2>/dev/null | jq -r '.daily[0].totalCost // 0' || echo 0)\"",
+        "commandPath": "printf \"\\033[35m\\$%.2f\\033[0m\" \"$(\"$HOME/.claude/statusline/get-today-cost.sh\")\"",
         "preserveColors": true,
         "timeout": 5000
       },

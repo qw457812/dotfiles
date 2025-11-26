@@ -1,0 +1,33 @@
+#!/bin/sh
+
+# cache results to avoid frequent calls since ccusage can be slow
+
+today=$(date +%Y%m%d)
+cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/claude-statusline"
+cache_file="$cache_dir/today_cost_${today}.cache"
+cache_max_age=60 # seconds
+
+mkdir -p "$cache_dir"
+
+cache_valid=0
+if [ -f "$cache_file" ]; then
+  cache_time=$(stat -f %m "$cache_file" 2>/dev/null || stat -c %Y "$cache_file" 2>/dev/null || echo 0)
+  current_time=$(date +%s)
+  cache_age=$((current_time - cache_time))
+  if [ "$cache_age" -lt "$cache_max_age" ]; then
+    cache_valid=1
+  fi
+fi
+
+if [ "$cache_valid" -eq 1 ]; then
+  cat "$cache_file"
+else
+  if command -v bunx >/dev/null 2>&1; then
+    # alternative: `bunx ccusage daily --json --offline --order desc 2>/dev/null | jq -r '.daily[0].totalCost // 0' 2>/dev/null | xargs printf "%.2f"`
+    today_cost=$(bunx ccusage daily --json --offline --since "$today" --until "$today" 2>/dev/null | jq -r '.daily[0].totalCost // 0' 2>/dev/null || echo "0")
+  else
+    today_cost=$(npx -y ccusage daily --json --offline --since "$today" --until "$today" 2>/dev/null | jq -r '.daily[0].totalCost // 0' 2>/dev/null || echo "0")
+  fi
+  echo "$today_cost" >"$cache_file"
+  echo "$today_cost"
+fi
