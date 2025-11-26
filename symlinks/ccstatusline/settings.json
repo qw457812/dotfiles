@@ -24,7 +24,8 @@
       {
         "id": "a789591a-bd42-4578-bf5d-c0392f58c92a",
         "type": "git-branch",
-        "rawValue": true
+        "rawValue": true,
+        "color": "hex:C099FF"
       },
       {
         "id": "93bad283-ff94-4abd-91a1-4197f3557fe4",
@@ -32,21 +33,10 @@
         "character": " "
       },
       {
-        "id": "d47acbe0-8e72-428f-93c9-6de094b0a993",
+        "id": "0b7f57cd-d845-46e7-afa5-4468e9d1ede1",
         "type": "custom-command",
-        "color": "green",
-        "commandPath": "(git diff --shortstat; git diff --cached --shortstat) | grep -oE '[0-9]+ insertion' | grep -oE '[0-9]+' | awk '{s+=$1} END {if(s>0) print \"+\"s; else print \"\"}'"
-      },
-      {
-        "id": "a290c94c-4998-4f21-99a1-5d6ac8b01e18",
-        "type": "separator",
-        "character": " "
-      },
-      {
-        "id": "44ac743a-3931-4e3d-a5ef-560f4f5d2fad",
-        "type": "custom-command",
-        "color": "red",
-        "commandPath": "(git diff --shortstat; git diff --cached --shortstat) | grep -oE '[0-9]+ deletion' | grep -oE '[0-9]+' | awk '{s+=$1} END {if(s>0) print \"-\"s; else print \"\"}'"
+        "commandPath": "STARSHIP_CONFIG=\"$HOME/.config/starship-statusline.toml\" STARSHIP_SHELL=\"\" starship prompt | tr -d '\\n'",
+        "preserveColors": true
       },
       {
         "id": "bec4f782-810f-4d76-9dd5-7c359dcd6227",

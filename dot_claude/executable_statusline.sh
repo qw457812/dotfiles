@@ -23,20 +23,20 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
     [.[] | select(.type == "assistant") | .message.usage] | last |
     (.input_tokens // 0) + (.cache_creation_input_tokens // 0) + (.cache_read_input_tokens // 0) + (.output_tokens // 0)
   ' || echo 0)
-  total_tokens_display=$(awk -v t="$total_tokens" 'BEGIN {printf "\033[1;34m%.1fk\033[0m", t/1000}') # bold blue
+  total_tokens_display=$(awk -v t="$total_tokens" 'BEGIN {printf "\033[34m%.1fk\033[0m", t/1000}') # blue
 
   # context usage
   context_percentage=$(awk -v t="$total_tokens" 'BEGIN {printf "%.1f", t*100/200000}')
-  context_percentage_display=$(printf "\033[1;36m%s%%\033[0m" "$context_percentage") # bold cyan
+  context_percentage_display=$(printf "\033[36m%s%%\033[0m" "$context_percentage") # cyan
 
   # TODO: add session-clock
 
   # session cost
   session_cost=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
-  session_cost_display=$(printf "\033[1;33m\$%.2f\033[0m" "$session_cost") # bold yellow
+  session_cost_display=$(printf "\033[33m\$%.2f\033[0m" "$session_cost") # yellow
 
   # today cost
-  # TODO: cache result for 1 minute to avoid excessive calls
+  # TODO: cache result for 1 minute to avoid excessive ccusage calls
   today=$(date +%Y%m%d)
   if command -v bunx >/dev/null 2>&1; then
     # alternative: `bunx ccusage daily --json --offline --order desc 2>/dev/null | jq -r '.daily[0].totalCost // 0' 2>/dev/null | xargs printf "%.2f"`
@@ -44,11 +44,10 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   else
     today_cost=$(npx -y ccusage daily --json --offline --since "$today" --until "$today" 2>/dev/null | jq -r '.daily[0].totalCost // 0' 2>/dev/null || echo "0")
   fi
-  today_cost_display=$(printf "\033[1;35m\$%.2f\033[0m" "$today_cost") # bold purple
+  today_cost_display=$(printf "\033[35m\$%.2f\033[0m" "$today_cost") # purple
 
   # starship, only git status for now
   # https://github.com/Rolv-Apneseth/starship.yazi/blob/a63550b2f91f0553cc545fd8081a03810bc41bc0/main.lua#L111-L126
-  # TODO: add to ccstatusline
   starship_prompt=$(STARSHIP_CONFIG="$HOME/.config/starship-statusline.toml" STARSHIP_SHELL="" starship prompt | tr -d '\n')
 
   printf '%s %s %s %s %s\n' "$total_tokens_display" "$context_percentage_display" "$session_cost_display" "$today_cost_display" "$starship_prompt"
