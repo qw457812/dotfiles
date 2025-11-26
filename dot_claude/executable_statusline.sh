@@ -29,12 +29,13 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   context_percentage=$(awk -v t="$total_tokens" 'BEGIN {printf "%.1f", t*100/200000}')
   context_percentage_display=$(printf "\033[1;36m%s%%\033[0m" "$context_percentage") # bold cyan
 
+  # TODO: add session-clock
+
   # session cost
   session_cost=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
   session_cost_display=$(printf "\033[1;33m\$%.2f\033[0m" "$session_cost") # bold yellow
 
   # today cost
-  # TODO: add to ccstatusline
   # TODO: cache result for 1 minute to avoid excessive calls
   today=$(date +%Y%m%d)
   if command -v bunx >/dev/null 2>&1; then

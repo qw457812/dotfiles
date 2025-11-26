@@ -81,9 +81,9 @@
         "character": "|"
       },
       {
-        "id": "66a015e1-9fff-40be-bb04-48c66d83d5f7",
-        "type": "session-cost",
-        "color": "yellow",
+        "id": "9457c6c6-2b46-49f5-8e3e-33f541c3b4dd",
+        "type": "session-clock",
+        "color": "brightMagenta",
         "rawValue": true
       },
       {
@@ -92,15 +92,26 @@
         "character": " "
       },
       {
-        "id": "9457c6c6-2b46-49f5-8e3e-33f541c3b4dd",
-        "type": "session-clock",
-        "color": "brightMagenta",
+        "id": "66a015e1-9fff-40be-bb04-48c66d83d5f7",
+        "type": "session-cost",
+        "color": "yellow",
         "rawValue": true
       },
       {
-        "id": "ec02b1b7-8f5a-4c44-8d54-09bee289d42c",
+        "id": "69da3383-c7d6-4708-88e9-fa03bcb0a1ee",
         "type": "separator",
-        "character": "|"
+        "character": " "
+      },
+      {
+        "id": "d8247c9a-9ae2-48ae-a5fa-ad6c48b81b48",
+        "type": "custom-command",
+        "commandPath": "printf \"\\033[35m\\$%.2f\\033[0m\" \"$($(command -v bunx &>/dev/null && echo bunx || echo \"npx -y\") ccusage daily --json --offline --since \"$(date +%Y%m%d)\" --until \"$(date +%Y%m%d)\" 2>/dev/null | jq -r '.daily[0].totalCost // 0' || echo 0)\"",
+        "preserveColors": true,
+        "timeout": 5000
+      },
+      {
+        "id": "7e09b952-08d2-49ee-be95-a32ec8ac5040",
+        "type": "separator"
       },
       {
         "id": "96b7390d-64eb-40f9-b62c-cf7854074c57",
@@ -150,8 +161,8 @@
       {
         "id": "bae1b3d4-bf68-4e43-8e3e-1ca56ef066f1",
         "type": "model",
-        "rawValue": true,
-        "color": "blue"
+        "color": "blue",
+        "rawValue": true
       },
       {
         "id": "f387fd01-d436-4495-a957-9a374b334c48",
