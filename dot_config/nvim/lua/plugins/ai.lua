@@ -35,6 +35,32 @@ return {
       return vim.list_extend(keys, {
         { "<c-.>", false, mode = { "n", "x", "i", "t" } },
         { sidekick_cli_toggle_key, function() require("sidekick.cli").toggle({ filter = filter }) end, mode = { "n", "x", "t" }, desc = "Sidekick" },
+        {
+          "<c-q>",
+          function()
+            require("sidekick.cli").focus({ filter = filter })
+            local executed = false
+            local id = vim.api.nvim_create_autocmd("TermEnter", {
+              group = vim.api.nvim_create_augroup("sidekick_scrollback_onetime", { clear = true }),
+              once = true,
+              callback = function(ev)
+                if vim.bo[ev.buf].filetype ~= "sidekick_terminal" then
+                  return
+                end
+                executed = true
+                vim.cmd.stopinsert()
+              end,
+            })
+            -- TODO: to support sidekick_cli picker
+            -- autocmd-once -> append `vim.cmd.stopinsert()` to `cb` of `State.with` in `require("sidekick.cli").focus` here:
+            -- https://github.com/folke/sidekick.nvim/blob/d9e1fa2124340d3337d1a3a22b2f20de0701affe/lua/sidekick/cli/init.lua#L124-L131
+            vim.defer_fn(function()
+              if not executed then -- see `:h autocmd-once`
+                vim.api.nvim_del_autocmd(id)
+              end
+            end, 500)
+          end,
+        },
         { "<leader>av", false, mode = "x" },
         { "<leader>at", false, mode = { "n", "x" } },
         { "<leader>aa", sidekick_cli_toggle_key, desc = "Sidekick", remap = true },
@@ -188,6 +214,12 @@ return {
             },
             keys = {
               blur_t = false, -- claude code uses <c-o> for its own functionality
+              ultrathink = {
+                "<a-u>",
+                function(t)
+                  t:send(" ultrathink ")
+                end,
+              },
             },
           },
           codex = { cmd = { "codex" } },
