@@ -2,6 +2,7 @@
 
 input=$(cat)
 # echo "$input" >/tmp/statusline_debug.json
+
 # cwd=$(echo "$input" | jq -r '.workspace.current_dir // .cwd')
 
 # fixes https://github.com/anthropics/claude-code/issues/10375
@@ -13,28 +14,48 @@ if [ -z "$TERMUX_VERSION" ]; then
   fi
 fi
 
+# shorter statusline within nvim or termux
 if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   transcript_path=$(echo "$input" | jq -r '.transcript_path // ""')
 
+  # tokens
   total_tokens=$(cat "$transcript_path" 2>/dev/null | jq -s '
     [.[] | select(.type == "assistant") | .message.usage] | last |
     (.input_tokens // 0) + (.cache_creation_input_tokens // 0) + (.cache_read_input_tokens // 0) + (.output_tokens // 0)
   ' || echo 0)
+  total_tokens_display=$(awk -v t="$total_tokens" 'BEGIN {printf "\033[1;34m%.1fk\033[0m", t/1000}') # bold blue
 
-  # context
-  awk -v t="$total_tokens" 'BEGIN {printf "%.1fk %.1f%%\n", t/1000, t*100/200000}'
+  # context usage
+  context_percentage=$(awk -v t="$total_tokens" 'BEGIN {printf "%.1f", t*100/200000}')
+  context_percentage_display=$(printf "\033[1;36m%s%%\033[0m" "$context_percentage") # bold cyan
+
+  # session cost
+  session_cost=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
+  session_cost_display=$(printf "\033[1;33m\$%.2f\033[0m" "$session_cost") # bold yellow
+
+  # today cost
+  # TODO: add to ccstatusline
+  # TODO: cache result for 1 minute to avoid excessive calls
+  today=$(date +%Y%m%d)
+  if command -v bunx >/dev/null 2>&1; then
+    # alternative: `bunx ccusage daily --json --offline --order desc 2>/dev/null | jq -r '.daily[0].totalCost // 0' 2>/dev/null | xargs printf "%.2f"`
+    today_cost=$(bunx ccusage daily --json --offline --since "$today" --until "$today" 2>/dev/null | jq -r '.daily[0].totalCost // 0' 2>/dev/null || echo "0")
+  else
+    today_cost=$(npx -y ccusage daily --json --offline --since "$today" --until "$today" 2>/dev/null | jq -r '.daily[0].totalCost // 0' 2>/dev/null || echo "0")
+  fi
+  today_cost_display=$(printf "\033[1;35m\$%.2f\033[0m" "$today_cost") # bold purple
+
+  # starship, only git status for now
+  # https://github.com/Rolv-Apneseth/starship.yazi/blob/a63550b2f91f0553cc545fd8081a03810bc41bc0/main.lua#L111-L126
+  # TODO: add to ccstatusline
+  starship_prompt=$(STARSHIP_CONFIG="$HOME/.config/starship-statusline.toml" STARSHIP_SHELL="" starship prompt | tr -d '\n')
+
+  printf '%s %s %s %s %s\n' "$total_tokens_display" "$context_percentage_display" "$session_cost_display" "$today_cost_display" "$starship_prompt"
   exit 0
 fi
 
-# # TODO: add to ccstatusline
-# if command -v starship >/dev/null 2>&1; then
-#   # https://github.com/Rolv-Apneseth/starship.yazi/blob/a63550b2f91f0553cc545fd8081a03810bc41bc0/main.lua#L111-L126
-#   # STARSHIP_SHELL="" starship prompt | grep -m1 .
-#   STARSHIP_CONFIG="$HOME/.config/starship-statusline.toml" STARSHIP_SHELL="" starship prompt
-# fi
-
 if command -v bunx >/dev/null 2>&1; then
-  echo "$input" | bunx -y ccstatusline@latest
+  echo "$input" | bunx ccstatusline
 else
-  echo "$input" | npx -y ccstatusline@latest
+  echo "$input" | npx -y ccstatusline
 fi
