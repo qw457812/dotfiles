@@ -11,7 +11,11 @@ mkdir -p "$cache_dir"
 
 cache_valid=0
 if [ -f "$cache_file" ]; then
-  cache_time=$(stat -f %m "$cache_file" 2>/dev/null || stat -c %Y "$cache_file" 2>/dev/null || echo 0)
+  if [ "$(uname)" = "Darwin" ]; then
+    cache_time=$(stat -f %m "$cache_file" 2>/dev/null || echo 0)
+  else
+    cache_time=$(stat -c %Y "$cache_file" 2>/dev/null || echo 0)
+  fi
   current_time=$(date +%s)
   cache_age=$((current_time - cache_time))
   if [ "$cache_age" -lt "$cache_max_age" ]; then
