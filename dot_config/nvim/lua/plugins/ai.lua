@@ -7,6 +7,28 @@ return {
   {
     "folke/sidekick.nvim",
     optional = true,
+    ---@type sidekick.Config
+    opts = {
+      cli = {
+        ---@type table<string, sidekick.cli.Config|{}>
+        tools = {
+          claude = {
+            cmd = vim.list_extend(vim.fn.executable("command") == 1 and {
+              "command", -- ignore ~/.config/fish/functions/claude.fish
+              "claude",
+            } or { "claude" }, {
+              -- "--continue",
+              -- "--resume",
+            }),
+            env = U.ai.claude.provider.plan.anthropic,
+          },
+        },
+      },
+    },
+  },
+  {
+    "folke/sidekick.nvim",
+    optional = true,
     keys = function(_, keys)
       local filter = { installed = true } ---@type sidekick.cli.Filter
       -- stylua: ignore
@@ -70,8 +92,15 @@ return {
                 vim.b[buf].user_lualine_filename = vim.b[buf].user_lualine_filename or terminal.tool.name
 
                 if terminal.tool.name == "claude" then
-                  -- schedule to overwrite https://github.com/neovim/neovim/blob/520568f40f22d77e623ddda77cf751031774384b/runtime/lua/vim/_defaults.lua#L651-L656
+                  local function goto_input_prompt()
+                    local lnum = vim.fn.search("^> ", "Wb") -- inputting
+                    lnum = lnum == 0 and vim.fn.search(" ❯ ", "Wb") or lnum -- selecting like `/config`
+                  end
+
+                  -- schedule to overwrite `]]` and `[[` defined in https://github.com/neovim/neovim/blob/520568f40f22d77e623ddda77cf751031774384b/runtime/lua/vim/_defaults.lua#L651-L656
                   vim.schedule(function()
+                    goto_input_prompt() -- save some `k` presses
+
                     vim.keymap.set("n", "]]", function()
                       local lnum = vim.fn.search("^> ", "W")
                       if lnum == 0 then
@@ -112,14 +141,25 @@ return {
             buffers = { "<a-b>", "buffers", mode = "nt" },
             files = { "<a-f>", "files", mode = "nt" },
             blur_t = { "<c-o>", "blur" },
-            blur_n = {
+            blur_n = { "<c-o>", "blur", mode = "n" },
+            -- blur_esc = {
+            --   "<esc>",
+            --   function(t)
+            --     if not U.keymap.clear_ui_esc() then
+            --       t:blur()
+            --     end
+            --   end,
+            --   desc = "Clear UI or Blur",
+            --   mode = "n",
+            -- },
+            term_enter = {
               "<esc>",
-              function(t)
+              function()
                 if not U.keymap.clear_ui_esc() then
-                  t:blur()
+                  vim.cmd.startinsert()
                 end
               end,
-              desc = "Clear UI or Blur",
+              desc = "Clear UI or Enter Terminal Mode",
               mode = "n",
             },
             newline = {
@@ -142,13 +182,6 @@ return {
         ---@type table<string, sidekick.cli.Config|{}>
         tools = {
           claude = {
-            cmd = vim.list_extend(vim.fn.executable("command") == 1 and {
-              "command", -- skip ~/.config/fish/functions/claude.fish
-              "claude",
-            } or { "claude" }, {
-              -- "--continue",
-              -- "--resume",
-            }),
             env = {
               __IS_CLAUDECODE_NVIM = "1", -- flag to disable claude code statusline in ~/.claude/settings.json
               NVIM_FLATTEN_NEST = "1", -- allow ctrl-g to edit prompt in nvim" to be nested for flatten.nvim
@@ -235,20 +268,8 @@ return {
   {
     "folke/sidekick.nvim",
     optional = true,
-    ---@param opts sidekick.Config
-    opts = function(_, opts)
+    opts = function()
       Snacks.util.set_hl({ SidekickCliInstalled = "Comment" })
-
-      return U.extend_tbl(opts, {
-        cli = {
-          ---@type table<string, sidekick.cli.Config|{}>
-          tools = {
-            claude = {
-              env = U.ai.claude.provider.plan.anthropic,
-            },
-          },
-        },
-      } --[[@as sidekick.Config]])
     end,
   },
 

@@ -279,8 +279,8 @@ if type -q claude
     abbr clr "claude --resume"
     abbr clrf "claude --resume --fork-session"
     abbr clgc "claude 'commit only the staged changes'"
-    abbr ccstl (type -q bunx; and echo "bunx ccstatusline@latest"; or echo "npx ccstatusline@latest")
-    set -l ccusage (type -q bunx; and echo "bunx ccusage"; or echo "npx ccusage@latest")
+    abbr ccstl (type -q bunx; and echo "bunx ccstatusline@latest"; or echo "npx -y ccstatusline@latest")
+    set -l ccusage (type -q bunx; and echo "bunx ccusage@latest"; or echo "npx -y ccusage@latest")
     abbr ccu "$ccusage"
     abbr ccum "$ccusage daily --breakdown"
     abbr ccub "$ccusage blocks"
@@ -291,9 +291,9 @@ if type -q claude
     end
     # alternative: https://github.com/Fission-AI/OpenSpec
     abbr spec "uvx --from git+https://github.com/github/spec-kit.git specify init --script sh --ai claude --here"
-    abbr cchistory "npx cchistory"
-    abbr ccexp (type -q bunx; and echo "bunx ccexp@latest"; or echo "npx ccexp@latest")
-    abbr cctmpl "ANTHROPIC_BASE_URL=$CTOK_BASE_URL ANTHROPIC_AUTH_TOKEN=$CTOK_AUTH_TOKEN npx claude-code-templates@latest"
+    abbr cchistory "npx -y cchistory"
+    abbr ccexp (type -q bunx; and echo "bunx ccexp@latest"; or echo "npx -y ccexp@latest")
+    abbr cctmpl "ANTHROPIC_BASE_URL=$CTOK_BASE_URL ANTHROPIC_AUTH_TOKEN=$CTOK_AUTH_TOKEN npx -y claude-code-templates@latest"
     abbr cck claude_kimi
     abbr cckc "claude_kimi --continue"
     abbr cckcf "claude_kimi --continue --fork-session"

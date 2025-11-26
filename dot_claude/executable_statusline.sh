@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# https://github.com/ryanwclark1/nixos-config/blob/92f5401a93a645792d7d6ba46ef746b5f0128abc/home/features/ai/claude/statusline.sh
+
 input=$(cat)
 # echo "$input" >/tmp/statusline_debug.json
 

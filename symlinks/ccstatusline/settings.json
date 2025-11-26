@@ -101,7 +101,8 @@
       },
       {
         "id": "7e09b952-08d2-49ee-be95-a32ec8ac5040",
-        "type": "separator"
+        "type": "separator",
+        "character": "|"
       },
       {
         "id": "96b7390d-64eb-40f9-b62c-cf7854074c57",
