@@ -15,6 +15,19 @@ M.win = {
 }
 
 M.picker = {
+  ---In favor of U.keymap.clear_ui_esc().
+  ---@type fun(picker:snacks.Picker)
+  on_show = function()
+    vim.cmd("noh")
+    vim.g.user_suppress_lsp_progress = true
+    if package.loaded["noice"] then
+      require("noice").cmd("dismiss")
+    end
+  end,
+  ---@type fun(picker:snacks.Picker)
+  on_close = function()
+    vim.g.user_suppress_lsp_progress = nil
+  end,
   -- copied from: https://github.com/folke/snacks.nvim/blob/27cba535a6763cbca3f3162c5c4bb48c6f382005/lua/snacks/picker/config/layouts.lua
   ---@type table<string, snacks.picker.layout.Config>
   layouts = {

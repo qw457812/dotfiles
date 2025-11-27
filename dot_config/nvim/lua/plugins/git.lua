@@ -220,6 +220,12 @@ return {
         return layouts[math.random(#layouts)]
       end
 
+      ---@param picker snacks.Picker
+      local function on_show(picker)
+        U.snacks.picker.on_show(picker)
+        vim.cmd.stopinsert() -- in favor of <Space> for git_diff/git_status to git_apply/git_stage
+      end
+
       return U.extend_tbl(opts, {
         picker = {
           previewers = {
@@ -234,11 +240,15 @@ return {
           sources = {
             undo = {
               layout = { preset = layout_preset },
+              on_show = on_show,
+              on_close = U.snacks.picker.on_close,
               -- overwrite `opts.picker.previewers.diff.cmd`
               previewers = { diff = { cmd = diff_cmd({ "--file-style", "omit" }) } },
             },
             git_diff = {
               layout = { preset = layout_preset },
+              on_show = on_show,
+              on_close = U.snacks.picker.on_close,
               previewers = {
                 diff = {
                   cmd = vim.g.user_is_termux and diff_cmd({ "--hunk-header-style", "omit" }) or nil,
@@ -247,24 +257,36 @@ return {
             },
             git_status = {
               layout = { preset = layout_preset },
+              on_show = on_show,
+              on_close = U.snacks.picker.on_close,
             },
             git_stash = {
               layout = { preset = layout_preset },
+              on_show = on_show,
+              on_close = U.snacks.picker.on_close,
             },
             git_log = {
               layout = { preset = layout_preset },
+              on_show = on_show,
+              on_close = U.snacks.picker.on_close,
             },
             git_log_file = {
               layout = { preset = layout_preset },
+              on_show = on_show,
+              on_close = U.snacks.picker.on_close,
               -- overwrite `opts.picker.previewers.git.args`
               previewers = { git = { args = git_args({ "-c", "delta.file-style=omit" }) } },
             },
             git_log_line = {
               layout = { preset = layout_preset },
+              on_show = on_show,
+              on_close = U.snacks.picker.on_close,
               previewers = { git = { args = git_args({ "-c", "delta.file-style=omit" }) } },
             },
             gh_diff = {
               layout = { preset = layout_preset },
+              on_show = on_show,
+              on_close = U.snacks.picker.on_close,
             },
           },
         },
@@ -524,21 +546,23 @@ return {
             staged = true,
             -- ignore_space = true,
             on_diff = vim.schedule_wrap(function(has_diff)
-              if has_diff or amend then
-                vim.cmd("Git commit" .. (amend and " --amend" or ""))
+              if not (has_diff or amend) then
+                return
+              end
 
-                -- HACK: sometimes the gitcommit buffer is opened but not focused
-                if vim.bo.filetype ~= "gitcommit" then
-                  LazyVim.warn("Focusing gitcommit buffer", { title = "Git Commit" })
-                  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-                    if vim.bo[buf].filetype == "gitcommit" then
-                      vim.api.nvim_set_current_buf(buf)
-                      vim.api.nvim_win_set_cursor(0, { 1, 0 })
-                      if vim.api.nvim_get_current_line():match("^%s*$") then
-                        vim.cmd("startinsert")
-                      end
-                      break
+              vim.cmd("Git commit" .. (amend and " --amend" or ""))
+
+              -- HACK: sometimes the gitcommit buffer is opened but not focused
+              if vim.bo.filetype ~= "gitcommit" then
+                LazyVim.info("Focusing gitcommit buffer", { title = "Git Commit" })
+                for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+                  if vim.bo[buf].filetype == "gitcommit" then
+                    vim.api.nvim_set_current_buf(buf)
+                    vim.api.nvim_win_set_cursor(0, { 1, 0 })
+                    if vim.api.nvim_get_current_line():match("^%s*$") then
+                      vim.cmd("startinsert")
                     end
+                    break
                   end
                 end
               end

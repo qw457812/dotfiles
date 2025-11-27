@@ -127,17 +127,8 @@ return {
             return layouts[math.random(#layouts)]
           end,
         },
-        on_show = function()
-          -- in favor of clear_ui_esc
-          vim.cmd("noh")
-          vim.g.user_suppress_lsp_progress = true
-          if package.loaded["noice"] then
-            require("noice").cmd("dismiss")
-          end
-        end,
-        on_close = function()
-          vim.g.user_suppress_lsp_progress = nil
-        end,
+        on_show = U.snacks.picker.on_show,
+        on_close = U.snacks.picker.on_close,
         actions = {
           -- do not allow scrolling beyond eob, see:
           -- - https://github.com/folke/snacks.nvim/commit/8b5f76292becf9ad76ef1507cbdcec64a49ff3f4

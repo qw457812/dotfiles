@@ -238,7 +238,7 @@ return {
     opts = {
       ui = {
         width = vim.g.user_is_termux and 1 or nil,
-        height = vim.g.user_is_termux and 1 or nil,
+        height = vim.g.user_is_termux and vim.o.lines - 4 or nil, -- see: U.snacks.win.fullscreen_height
         keymaps = {
           uninstall_package = "x",
           apply_language_filter = "f",
