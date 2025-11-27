@@ -19,6 +19,7 @@ return {
             } or { "claude" }, {
               -- "--continue",
               -- "--resume",
+              -- "--fork-session",
             }),
             env = U.ai.claude.provider.plan.anthropic,
           },
@@ -35,38 +36,7 @@ return {
       return vim.list_extend(keys, {
         { "<c-.>", false, mode = { "n", "x", "i", "t" } },
         { sidekick_cli_toggle_key, function() require("sidekick.cli").toggle({ filter = filter }) end, mode = { "n", "x", "t" }, desc = "Sidekick" },
-        {
-          "<c-q>",
-          function()
-            require("sidekick.cli").focus({ filter = filter })
-
-            -- auto enter scrollback
-            local executed = false
-            local mux_enabled = vim.tbl_get(LazyVim.opts("sidekick.nvim"), "cli", "mux", "enabled")
-            local id = vim.api.nvim_create_autocmd("TermEnter", {
-              group = vim.api.nvim_create_augroup("sidekick_scrollback_oneshot", { clear = true }),
-              pattern = mux_enabled and { "term://*:*tmux", "term://*:*zellij" } or nil,
-              callback = function(ev)
-                if vim.bo[ev.buf].filetype ~= "sidekick_terminal" then
-                  return
-                end
-                vim.schedule(function()
-                  vim.cmd.stopinsert()
-                end)
-                executed = true
-                return true
-              end,
-            })
-            -- to auto enter scrollback after sidekick_cli picker confirm
-            -- autocmd -> append `vim.cmd.stopinsert()` to `cb` of `State.with` in `require("sidekick.cli").focus` here:
-            -- https://github.com/folke/sidekick.nvim/blob/d9e1fa2124340d3337d1a3a22b2f20de0701affe/lua/sidekick/cli/init.lua#L124-L131
-            vim.defer_fn(function()
-              if not executed then
-                vim.api.nvim_del_autocmd(id)
-              end
-            end, 500)
-          end,
-        },
+        { "<c-q>", function() U.ai.sidekick.cli.scrollback({ filter = filter }) end, desc = "Scrollback (Sidekick)" },
         { "<leader>av", false, mode = "x" },
         { "<leader>at", false, mode = { "n", "x" } },
         { "<leader>aa", sidekick_cli_toggle_key, desc = "Sidekick", remap = true },
@@ -165,8 +135,8 @@ return {
           keys = {
             hide_ctrl_dot = false,
             hide_toggle_key = { sidekick_cli_toggle_key, "hide", mode = "nt" },
-            down_ctrl_j = { "<c-j>", "<Down>" }, -- this overrides the window navigation
-            up_ctrl_k = { "<c-k>", "<Up>" }, -- this overrides the window navigation
+            down_ctrl_j = not vim.g.user_is_termux and { "<c-j>", "<Down>" } or false, -- this overrides the window navigation
+            up_ctrl_k = not vim.g.user_is_termux and { "<c-k>", "<Up>" } or false, -- this overrides the window navigation
             down_ctrl_n = { "<c-n>", "<Down>" },
             up_ctrl_p = { "<c-p>", "<Up>" },
             prompt = { "<a-p>", "prompt" },
@@ -307,6 +277,19 @@ return {
     "folke/sidekick.nvim",
     optional = true,
     opts = function()
+      local Terminal = require("sidekick.cli.terminal")
+
+      -- HACK: resize window after opening sidekick terminal (split)
+      -- see: https://github.com/folke/sidekick.nvim/pull/203
+      -- https://github.com/folke/sidekick.nvim/blob/83b6815c0ed738576f101aad31c79b885c892e0f/lua/sidekick/cli/terminal.lua#L340-L378
+      Terminal.open_win = U.patch_func(Terminal.open_win, function(orig, self)
+        local ret = orig(self)
+        if self.opts.layout ~= "float" then
+          vim.cmd("wincmd =")
+        end
+        return ret
+      end)
+
       Snacks.util.set_hl({ SidekickCliInstalled = "Comment" })
     end,
   },

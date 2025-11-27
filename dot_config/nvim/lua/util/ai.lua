@@ -74,6 +74,37 @@ M.sidekick = {
         cb = kill,
       })
     end,
+    ---@param opts? { filter?: sidekick.cli.Filter }
+    scrollback = function(opts)
+      opts = opts or {}
+      require("sidekick.cli").focus({ filter = opts.filter })
+
+      -- auto enter scrollback
+      local executed = false
+      local mux_enabled = vim.tbl_get(LazyVim.opts("sidekick.nvim"), "cli", "mux", "enabled")
+      local id = vim.api.nvim_create_autocmd("TermEnter", {
+        group = vim.api.nvim_create_augroup("sidekick_scrollback_oneshot", { clear = true }),
+        pattern = mux_enabled and { "term://*:*tmux", "term://*:*zellij" } or nil,
+        callback = function(ev)
+          if vim.bo[ev.buf].filetype ~= "sidekick_terminal" then
+            return
+          end
+          vim.schedule(function()
+            vim.cmd.stopinsert()
+          end)
+          executed = true
+          return true
+        end,
+      })
+      -- to auto enter scrollback after sidekick_cli picker confirm
+      -- autocmd -> append `vim.cmd.stopinsert()` to `cb` of `State.with` in `require("sidekick.cli").focus` here:
+      -- https://github.com/folke/sidekick.nvim/blob/d9e1fa2124340d3337d1a3a22b2f20de0701affe/lua/sidekick/cli/init.lua#L124-L131
+      vim.defer_fn(function()
+        if not executed then
+          vim.api.nvim_del_autocmd(id)
+        end
+      end, 500)
+    end,
   },
 }
 
