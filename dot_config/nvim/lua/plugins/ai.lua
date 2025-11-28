@@ -37,6 +37,7 @@ return {
         { "<c-.>", false, mode = { "n", "x", "i", "t" } },
         { sidekick_cli_toggle_key, function() require("sidekick.cli").toggle({ filter = filter }) end, mode = { "n", "x", "t" }, desc = "Sidekick" },
         { "<c-q>", function() U.ai.sidekick.cli.scrollback({ filter = filter }) end, desc = "Scrollback (Sidekick)" },
+        { "<cr>", function() U.ai.sidekick.cli.accept({ filter = filter }) end, desc = "Accept (Sidekick)" }, -- accept diff
         { "<leader>av", false, mode = "x" },
         { "<leader>at", false, mode = { "n", "x" } },
         { "<leader>aa", sidekick_cli_toggle_key, desc = "Sidekick", remap = true },

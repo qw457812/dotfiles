@@ -109,6 +109,42 @@ M.sidekick = {
         end
       end, 500)
     end,
+    ---@param opts? { filter?: sidekick.cli.Filter, focus?: boolean }
+    accept = function(opts)
+      local State = require("sidekick.cli.state")
+      local Util = require("sidekick.util")
+
+      opts = opts or {}
+
+      local is_visible = false
+      for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+        local buf = vim.api.nvim_win_get_buf(win)
+        if vim.bo[buf].filetype == "sidekick_terminal" then
+          is_visible = true
+          break
+        end
+      end
+
+      -- https://github.com/folke/sidekick.nvim/blob/d9e1fa2124340d3337d1a3a22b2f20de0701affe/lua/sidekick/cli/init.lua#L191-L205
+      State.with(function(state)
+        if not is_visible then
+          return
+        end
+        if state.session and state.session.mux_session then
+          if state.session.backend == "tmux" or state.session.mux_backend == "tmux" then
+            vim.schedule(function()
+              -- https://github.com/folke/sidekick.nvim/blob/41dec4dcdf0c8fe17f5f2e9eeced4645a88afb0d/lua/sidekick/cli/session/tmux.lua#L185-L187
+              Util.exec({ "tmux", "send-keys", "-t", state.session.mux_session, "Enter" })
+            end)
+          end
+        end
+      end, {
+        attach = true,
+        filter = opts.filter,
+        focus = opts.focus == true,
+        show = true,
+      })
+    end,
   },
 }
 

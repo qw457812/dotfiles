@@ -70,6 +70,9 @@ return {
               desc = "Goto Definition/References",
               has = "definition",
               enabled = function()
+                if LazyVim.has("sidekick.nvim") then
+                  return false
+                end
                 if vim.bo.filetype == "markdown" then
                   -- for gaoDean/autolist.nvim
                   return false

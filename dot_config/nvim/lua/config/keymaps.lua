@@ -9,21 +9,23 @@ local map = U.keymap.map
 local safe_map = U.keymap.safe_map
 local del = U.keymap.del
 
--- -- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/keybindings.lua#L234
--- map("n", "<cr>", function() return vim.fn.pumvisible() == 1 and "<cr>" or "gd" end, { expr = true, desc = "Goto local Declaration" })
--- -- restore default behavior of `<cr>`, which is overridden by my mapping above
--- -- https://github.com/nvim-mini/mini.jump2d/blob/5ff749990336e67195724d1dcddfea4e50057a19/lua/mini/jump2d.lua#L781-L786
--- vim.api.nvim_create_autocmd("FileType", {
---   pattern = { "qf", "neo-tree-popup" },
---   callback = function(event)
---     map("n", "<cr>", "<cr>", { buffer = event.buf })
---   end,
--- })
--- vim.api.nvim_create_autocmd("CmdWinEnter", {
---   callback = function(event)
---     map("n", "<cr>", "<cr>", { buffer = event.buf })
---   end,
--- })
+-- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/keybindings.lua#L234
+safe_map("n", "<cr>", function()
+  return vim.fn.pumvisible() == 1 and "<cr>" or "gd"
+end, { expr = true, desc = "Goto local Declaration" })
+-- restore default behavior of `<cr>`, which is overridden by my mapping above
+-- https://github.com/nvim-mini/mini.jump2d/blob/5ff749990336e67195724d1dcddfea4e50057a19/lua/mini/jump2d.lua#L781-L786
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "qf", "neo-tree-popup" },
+  callback = function(event)
+    map("n", "<cr>", "<cr>", { buffer = event.buf })
+  end,
+})
+vim.api.nvim_create_autocmd("CmdWinEnter", {
+  callback = function(event)
+    map("n", "<cr>", "<cr>", { buffer = event.buf })
+  end,
+})
 
 -- basics
 -- map({ "n", "x" }, "h", "col('.') == 1 && foldlevel(line('.')) > 0 ? 'za' : 'h'", { expr = true })
