@@ -101,6 +101,10 @@ return {
 
                   -- schedule to overwrite `]]` and `[[` defined in https://github.com/neovim/neovim/blob/520568f40f22d77e623ddda77cf751031774384b/runtime/lua/vim/_defaults.lua#L651-L656
                   vim.schedule(function()
+                    if not vim.api.nvim_buf_is_valid(buf) then
+                      return
+                    end
+
                     goto_input_prompt() -- save some `k` presses
 
                     vim.keymap.set("n", "]]", function()
@@ -217,6 +221,7 @@ return {
         prompts = {
           refactor = "Please refactor {this} to be more maintainable",
           security = "Review {file} for security vulnerabilities",
+          commit = "Commit only the staged changes",
         },
       },
       ui = {

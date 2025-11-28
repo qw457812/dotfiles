@@ -260,6 +260,11 @@ abbr bl 'brew list | fzf'
 abbr bs 'brew search'
 abbr bbd 'brew bundle dump --global --force'
 
+# npm
+abbr npmig 'npm i -g'
+abbr npmog 'npm outdated -g'
+abbr npmlg 'npm list --global --depth 0'
+
 # AI
 if type -q claude
     # claude mcp add -s user context7 -- npx -y @upstash/context7-mcp --api-key $CONTEXT7_API_KEY
@@ -289,7 +294,9 @@ if type -q claude
         abbr ccmd "claude-monitor --view daily"
         abbr ccmm "claude-monitor --view monthly"
     end
-    # alternative: https://github.com/Fission-AI/OpenSpec
+    # alternative:
+    # - https://github.com/Fission-AI/OpenSpec
+    # - https://github.com/UfoMiao/zcf
     abbr spec "uvx --from git+https://github.com/github/spec-kit.git specify init --script sh --ai claude --here"
     abbr cchistory "npx -y cchistory"
     abbr ccexp (type -q bunx; and echo "bunx ccexp@latest"; or echo "npx -y ccexp@latest")

@@ -66,6 +66,21 @@ return {
       table.insert(opts.cmd, "--java-executable=" .. java_home .. "/bin/java")
     end,
   },
+  {
+    "JavaHello/spring-boot.nvim",
+    optional = true,
+    opts = function()
+      if LazyVim.has("sidekick.nvim") then
+        ---HACK: https://github.com/JavaHello/spring-boot.nvim/blob/2bc14e114f748ebba365641b38403c9819cd42cd/lua/spring_boot/util.lua#L22-L28
+        ---@diagnostic disable-next-line: duplicate-set-field
+        require("spring_boot.util").java_bin = function()
+          return java_home .. "/bin/java"
+        end
+      else
+        vim.env.JAVA_HOME = java_home
+      end
+    end,
+  },
   -- for scala projects using JDK version older than 21
   {
     "neovim/nvim-lspconfig",

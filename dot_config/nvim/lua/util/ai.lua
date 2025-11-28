@@ -9,12 +9,16 @@ M.claude = {
         ANTHROPIC_BASE_URL = vim.env.CTOK_BASE_URL,
         ANTHROPIC_AUTH_TOKEN = vim.env.CTOK_AUTH_TOKEN,
       },
+      -- https://www.kimi.com/coding/docs/third-party-agents.html
+      -- https://www.kimi.com/membership/subscription
       kimi = {
         ANTHROPIC_BASE_URL = "https://api.kimi.com/coding/",
         ANTHROPIC_AUTH_TOKEN = vim.env.KIMI_API_KEY,
       },
     },
     payg = {
+      -- https://platform.moonshot.cn/docs/guide/agent-support
+      -- https://platform.moonshot.ai/docs/guide/agent-support
       kimi = {
         ANTHROPIC_BASE_URL = "https://api.moonshot.cn/anthropic",
         ANTHROPIC_AUTH_TOKEN = vim.env.MOONSHOT_API_KEY,

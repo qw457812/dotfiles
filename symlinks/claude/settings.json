@@ -3,6 +3,7 @@
   "cleanupPeriodDays": 90,
   "env": {
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR": "1",
     "MANPAGER": "col -bx"
   },
   "includeCoAuthoredBy": false,
