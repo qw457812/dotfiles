@@ -284,21 +284,84 @@ return {
     ---@param opts sidekick.Config
     opts = function(_, opts)
       local Terminal = require("sidekick.cli.terminal")
+      local mux_enabled = vim.tbl_get(opts, "cli", "mux", "enabled")
 
       -- HACK: with tmux as backend, JAVA_HOME differs in sidekick cli for unknown reasons, check `! mvn -v`
-      if vim.tbl_get(opts, "cli", "mux", "enabled") then
+      if mux_enabled then
         for _, tool in pairs(opts.cli.tools or {}) do
           tool.env = U.extend_tbl({ JAVA_HOME = vim.env.JAVA_HOME }, tool.env)
         end
       end
 
+      -- shown indicator when the sidekick window is focused
+      -- https://github.com/folke/snacks.nvim/blob/3c2d79162f8174d5e1c33539a72025a25f4af590/lua/snacks/zen.lua#L69-L80
+      Snacks.config.style("sidekick_indicator", {
+        text = "▍ sidekick    ",
+        minimal = true,
+        enter = false,
+        focusable = false,
+        height = 1,
+        row = 0,
+        col = -1,
+        backdrop = false,
+        bo = { filetype = "sidekick_indicator" },
+      })
+
+      -- https://github.com/folke/snacks.nvim/blob/3c2d79162f8174d5e1c33539a72025a25f4af590/lua/snacks/zen.lua#L160-L204
+      local indicator ---@type snacks.win?
+      vim.api.nvim_create_autocmd("WinEnter", {
+        pattern = mux_enabled and { "term://*:*tmux", "term://*:*zellij" } or "term://*",
+        callback = function(ev)
+          if not (vim.api.nvim_buf_is_valid(ev.buf) and vim.bo[ev.buf].filetype == "sidekick_terminal") then
+            return
+          end
+          if not indicator then
+            indicator = Snacks.win({
+              show = false,
+              style = "sidekick_indicator",
+              wo = { winhighlight = "NormalFloat:DiagnosticWarn" },
+            })
+            ---@diagnostic disable-next-line: invisible
+            indicator:open_buf()
+            local lines = vim.api.nvim_buf_get_lines(indicator.buf, 0, -1, false)
+            indicator.opts.width = vim.api.nvim_strwidth(lines[1] or "")
+            indicator:show()
+          end
+        end,
+      })
+      vim.api.nvim_create_autocmd("WinLeave", {
+        pattern = mux_enabled and { "term://*:*tmux", "term://*:*zellij" } or "term://*",
+        callback = function(ev)
+          if not (vim.api.nvim_buf_is_valid(ev.buf) and vim.bo[ev.buf].filetype == "sidekick_terminal") then
+            return
+          end
+          if indicator then
+            indicator:close()
+            indicator = nil
+          end
+        end,
+      })
+
       -- HACK: resize window after opening sidekick terminal (split)
       -- see: https://github.com/folke/sidekick.nvim/pull/203
       -- https://github.com/folke/sidekick.nvim/blob/83b6815c0ed738576f101aad31c79b885c892e0f/lua/sidekick/cli/terminal.lua#L340-L378
+      ---@param self sidekick.cli.Terminal
       Terminal.open_win = U.patch_func(Terminal.open_win, function(orig, self)
         local ret = orig(self)
         if self.opts.layout ~= "float" then
           vim.cmd("wincmd =")
+
+          if self:win_valid() then
+            vim.api.nvim_create_autocmd("WinClosed", {
+              pattern = self.win .. "",
+              callback = function()
+                if indicator then
+                  indicator:close()
+                  indicator = nil
+                end
+              end,
+            })
+          end
         end
         return ret
       end)

@@ -99,7 +99,11 @@ function M.is_floating_win(win, opts)
       end)
     end)
 
-    if is_tsc or is_snacks_explorer or vim.list_contains({ "snacks_dashboard", "layers_help" }, ft) then
+    if
+      is_tsc
+      or is_snacks_explorer
+      or vim.list_contains({ "snacks_dashboard", "layers_help", "sidekick_indicator" }, ft)
+    then
       return false
     end
   end
