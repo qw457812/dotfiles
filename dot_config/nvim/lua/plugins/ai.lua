@@ -276,8 +276,16 @@ return {
   {
     "folke/sidekick.nvim",
     optional = true,
-    opts = function()
+    ---@param opts sidekick.Config
+    opts = function(_, opts)
       local Terminal = require("sidekick.cli.terminal")
+
+      -- HACK: with tmux as backend, JAVA_HOME differs in sidekick cli for unknown reasons, check `! mvn -v`
+      if vim.tbl_get(opts, "cli", "mux", "enabled") then
+        for _, tool in pairs(opts.cli.tools or {}) do
+          tool.env = U.extend_tbl({ JAVA_HOME = vim.env.JAVA_HOME }, tool.env)
+        end
+      end
 
       -- HACK: resize window after opening sidekick terminal (split)
       -- see: https://github.com/folke/sidekick.nvim/pull/203

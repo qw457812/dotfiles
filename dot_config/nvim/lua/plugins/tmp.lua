@@ -70,6 +70,11 @@ return {
   {
     "neovim/nvim-lspconfig",
     opts = function()
+      if LazyVim.has("sidekick.nvim") then
+        -- Do not override JAVA_HOME set by Mise. Otherwise, `mvn clean compile` in Claude Code's Bash tool for some Java 1.8 projects will fail.
+        -- https://github.com/folke/sidekick.nvim/blob/83b6815c0ed738576f101aad31c79b885c892e0f/lua/sidekick/cli/terminal.lua#L272C45-L272C64
+        return
+      end
       if not LazyVim.has_extra("lang.scala") then
         return
       end
