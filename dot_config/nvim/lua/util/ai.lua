@@ -65,9 +65,11 @@ M.sidekick = {
         end
         State.detach(state)
         if state.session and state.session.mux_session then
-          if state.session.backend == "tmux" or state.session.mux_backend == "tmux" then
-            Util.exec({ "tmux", "kill-session", "-t", state.session.mux_session })
-          end
+          U.confirm(("Kill session %q?"):format(state.session.mux_session), function()
+            if state.session.backend == "tmux" or state.session.mux_backend == "tmux" then
+              Util.exec({ "tmux", "kill-session", "-t", state.session.mux_session })
+            end
+          end)
         end
       end
 
@@ -117,9 +119,8 @@ M.sidekick = {
       opts = opts or {}
 
       local is_visible = false
-      for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-        local buf = vim.api.nvim_win_get_buf(win)
-        if vim.bo[buf].filetype == "sidekick_terminal" then
+      for _, w in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+        if vim.bo[vim.api.nvim_win_get_buf(w)].filetype == "sidekick_terminal" then
           is_visible = true
           break
         end
