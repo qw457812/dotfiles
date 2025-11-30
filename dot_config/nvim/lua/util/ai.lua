@@ -82,34 +82,30 @@ M.sidekick = {
     end,
     ---@param opts? { filter?: sidekick.cli.Filter }
     scrollback = function(opts)
-      opts = opts or {}
-      require("sidekick.cli").focus({ filter = opts.filter })
+      local State = require("sidekick.cli.state")
 
-      -- auto enter scrollback
-      local executed = false
-      local mux_enabled = vim.tbl_get(LazyVim.opts("sidekick.nvim"), "cli", "mux", "enabled")
-      local id = vim.api.nvim_create_autocmd("TermEnter", {
-        group = vim.api.nvim_create_augroup("sidekick_scrollback_oneshot", { clear = true }),
-        pattern = mux_enabled and { "term://*:*tmux", "term://*:*zellij" } or nil,
-        callback = function(ev)
-          if vim.bo[ev.buf].filetype ~= "sidekick_terminal" then
-            return
-          end
-          vim.schedule(function()
-            vim.cmd.stopinsert()
-          end)
-          executed = true
-          return true
-        end,
-      })
-      -- to auto enter scrollback after sidekick_cli picker confirm
-      -- autocmd -> append `vim.cmd.stopinsert()` to `cb` of `State.with` in `require("sidekick.cli").focus` here:
-      -- https://github.com/folke/sidekick.nvim/blob/d9e1fa2124340d3337d1a3a22b2f20de0701affe/lua/sidekick/cli/init.lua#L124-L131
-      vim.defer_fn(function()
-        if not executed then
-          vim.api.nvim_del_autocmd(id)
+      opts = opts or {}
+      -- https://github.com/folke/sidekick.nvim/blob/d9e1fa2124340d3337d1a3a22b2f20de0701affe/lua/sidekick/cli/init.lua#L123-L137
+      State.with(function(state)
+        if not (state.terminal and state.terminal:is_running()) then
+          return
         end
-      end, 500)
+        -- focus: https://github.com/folke/sidekick.nvim/blob/83b6815c0ed738576f101aad31c79b885c892e0f/lua/sidekick/cli/terminal.lua#L380-L389
+        if not state.terminal:is_focused() then
+          vim.api.nvim_set_current_win(assert(state.terminal.win))
+        end
+        -- scrollback
+        vim.defer_fn(function()
+          if vim.fn.mode() ~= "n" then
+            vim.cmd.stopinsert()
+          end
+        end, 80)
+      end, {
+        attach = true,
+        filter = opts.filter,
+        focus = false,
+        show = true,
+      })
     end,
     ---@param opts? { filter?: sidekick.cli.Filter, focus?: boolean }
     accept = function(opts)
