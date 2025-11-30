@@ -60,14 +60,17 @@ M.sidekick = {
 
       ---@param state sidekick.cli.State
       local function kill(state)
-        if not state then
+        local session = state.session
+        if not session then
           return
         end
         State.detach(state)
-        if state.session and state.session.mux_session then
-          U.confirm(("Kill session %q?"):format(state.session.mux_session), function()
-            if state.session.backend == "tmux" or state.session.mux_backend == "tmux" then
-              Util.exec({ "tmux", "kill-session", "-t", state.session.mux_session })
+        if session.mux_session then
+          U.confirm(("Kill session %q?"):format(session.mux_session), function()
+            if session.backend == "tmux" or session.mux_backend == "tmux" then
+              Util.exec({ "tmux", "kill-session", "-t", session.mux_session })
+            else
+              -- TODO: zellij
             end
           end)
         end
@@ -87,19 +90,34 @@ M.sidekick = {
       opts = opts or {}
       -- https://github.com/folke/sidekick.nvim/blob/d9e1fa2124340d3337d1a3a22b2f20de0701affe/lua/sidekick/cli/init.lua#L123-L137
       State.with(function(state)
-        if not (state.terminal and state.terminal:is_running()) then
+        local terminal = state.terminal
+        if not (terminal and terminal:is_running() and terminal:buf_valid() and terminal:win_valid()) then
           return
         end
+
         -- focus: https://github.com/folke/sidekick.nvim/blob/83b6815c0ed738576f101aad31c79b885c892e0f/lua/sidekick/cli/terminal.lua#L380-L389
-        if not state.terminal:is_focused() then
-          vim.api.nvim_set_current_win(assert(state.terminal.win))
+        if not terminal:is_focused() then
+          vim.api.nvim_set_current_win(terminal.win)
         end
-        -- scrollback
+
         vim.defer_fn(function()
-          if vim.fn.mode() ~= "n" then
-            vim.cmd.stopinsert()
+          if vim.fn.mode() ~= "t" then
+            return
           end
-        end, 80)
+
+          -- https://github.com/folke/sidekick.nvim/blob/83b6815c0ed738576f101aad31c79b885c892e0f/lua/sidekick/cli/terminal.lua#L249-L254
+          local lines = vim.api.nvim_buf_get_lines(terminal.buf, 0, -1, false)
+          while #lines > 0 and lines[#lines] == "" do
+            table.remove(lines)
+          end
+          local cursor = vim.api.nvim_win_get_cursor(terminal.win)
+          local is_ready = #lines > 5 and cursor[1] > 3
+          if not is_ready then
+            return -- new terminal, nothing to scroll
+          end
+
+          vim.cmd.stopinsert()
+        end, 100)
       end, {
         attach = true,
         filter = opts.filter,
@@ -107,38 +125,79 @@ M.sidekick = {
         show = true,
       })
     end,
-    ---@param opts? { filter?: sidekick.cli.Filter, focus?: boolean }
-    accept = function(opts)
+    ---Submit (accept diff) or focus
+    ---@param opts? { filter?: sidekick.cli.Filter }
+    submit_or_focus = function(opts)
       local State = require("sidekick.cli.state")
       local Util = require("sidekick.util")
 
       opts = opts or {}
 
-      local is_visible = false
+      if vim.bo.filetype == "sidekick_terminal" and vim.fn.mode() ~= "t" then
+        vim.cmd.startinsert()
+        return
+      end
+
+      local is_open = false
       for _, w in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
         if vim.bo[vim.api.nvim_win_get_buf(w)].filetype == "sidekick_terminal" then
-          is_visible = true
+          is_open = true
           break
         end
       end
 
       -- https://github.com/folke/sidekick.nvim/blob/d9e1fa2124340d3337d1a3a22b2f20de0701affe/lua/sidekick/cli/init.lua#L191-L205
       State.with(function(state)
-        if not is_visible then
+        local terminal, session = state.terminal, state.session
+        if not (session and terminal and terminal:is_running() and terminal:buf_valid() and terminal:win_valid()) then
           return
         end
-        if state.session and state.session.mux_session then
-          if state.session.backend == "tmux" or state.session.mux_backend == "tmux" then
-            vim.schedule(function()
-              -- https://github.com/folke/sidekick.nvim/blob/41dec4dcdf0c8fe17f5f2e9eeced4645a88afb0d/lua/sidekick/cli/session/tmux.lua#L185-L187
-              Util.exec({ "tmux", "send-keys", "-t", state.session.mux_session, "Enter" })
-            end)
-          end
+
+        if not is_open then
+          terminal:focus()
+          return -- do not submit if terminal was not open
         end
+
+        vim.schedule(function()
+          local changedtick = vim.b[terminal.buf].changedtick
+
+          if session.mux_session then
+            if session.backend == "tmux" or session.mux_backend == "tmux" then
+              -- submit: https://github.com/folke/sidekick.nvim/blob/41dec4dcdf0c8fe17f5f2e9eeced4645a88afb0d/lua/sidekick/cli/session/tmux.lua#L185-L187
+              Util.exec({ "tmux", "send-keys", "-t", session.mux_session, "Enter" })
+
+              vim.defer_fn(function()
+                if vim.b[terminal.buf].changedtick == changedtick then
+                  -- focus if <cr> had no effect
+                  terminal:focus()
+                elseif terminal.scrollback and terminal.scrollback:is_open() then
+                  -- switch from scrollback to terminal if <cr> had effect
+                  terminal.scrollback:close()
+                end
+              end, 50)
+            else
+              -- TODO: zellij
+            end
+          else
+            local win = vim.api.nvim_get_current_win()
+            terminal:focus()
+            vim.defer_fn(function()
+              -- submit, need to call `terminal:focus()` first
+              vim.api.nvim_feedkeys(vim.keycode("<CR>"), "n", false)
+
+              vim.defer_fn(function()
+                if vim.b[terminal.buf].changedtick ~= changedtick and vim.api.nvim_win_is_valid(win) then
+                  -- back to original window if <cr> had effect, align with tmux backend behavior
+                  vim.api.nvim_set_current_win(win)
+                end
+              end, 50)
+            end, 20)
+          end
+        end)
       end, {
         attach = true,
         filter = opts.filter,
-        focus = opts.focus == true,
+        focus = false,
         show = true,
       })
     end,
