@@ -66,8 +66,8 @@ return {
       return {
         open_for_directories = vim.g.user_hijack_netrw == "yazi.nvim",
         open_multiple_tabs = true,
-        floating_window_scaling_factor = vim.g.user_is_termux and 1 or { height = 0.9, width = 0.9 },
-        yazi_floating_window_border = vim.g.user_is_termux and "none" or nil,
+        -- floating_window_scaling_factor = vim.g.user_is_termux and 1 or { height = 0.9, width = 0.9 }, -- see `opts.hooks.before_opening_window`
+        -- yazi_floating_window_border = vim.g.user_is_termux and "none" or nil, -- see `opts.hooks.before_opening_window`
         keymaps = {
           -- do not map `<tab>` or `~`, otherwise they will not be available in `shell "$SHELL" --block`
           -- see: https://github.com/mikavilpas/yazi.nvim/pull/894
@@ -85,6 +85,20 @@ return {
           -- resolve_relative_path_implementation = function(args, get_relative_path)
           --   return get_relative_path({ selected_file = args.selected_file, source_dir = LazyVim.root() })
           -- end,
+        },
+        ---@diagnostic disable-next-line: missing-fields
+        hooks = {
+          -- fullscreen
+          before_opening_window = function(win_opts)
+            local bottom = (vim.o.cmdheight + (vim.o.laststatus == 3 and 1 or 0)) or 0
+            local top = (vim.o.showtabline == 2 or (vim.o.showtabline == 1 and #vim.api.nvim_list_tabpages() > 1)) and 1
+              or 0
+            local border = 2 -- top + bottom of border (rounded)
+            win_opts.row = top
+            win_opts.col = 0
+            win_opts.height = vim.o.lines - top - bottom - border
+            win_opts.width = vim.o.columns
+          end,
         },
       }
     end,
