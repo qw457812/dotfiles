@@ -37,8 +37,8 @@ return {
         { "<c-.>", false, mode = { "n", "x", "i", "t" } },
         { sidekick_cli_toggle_key, function() require("sidekick.cli").toggle({ filter = filter }) end, mode = { "n", "x", "t" }, desc = "Sidekick" },
         { "<c-q>", function() U.ai.sidekick.cli.scrollback({ filter = filter }) end, desc = "Scrollback (Sidekick)" },
-        { "<cr>", function() U.ai.sidekick.cli.submit_or_focus({ filter = filter }) end, desc = "Submit or Focus (Sidekick)" },
-        { "<cr>", function() require("sidekick.cli").send({ msg = "{this}", filter = filter }) end, mode = "x", desc = "Sidekick" },
+        { "<cr>", function() U.ai.sidekick.cli.submit_or_focus({ filter = filter }, "claude") end, desc = "Submit or Focus (Sidekick)" },
+        { "<cr>", function() U.ai.sidekick.cli.quick.send("claude", { msg = "{this}" }) end, mode = "x", desc = "Sidekick" },
         { "<leader>av", false, mode = "x" },
         { "<leader>at", false, mode = { "n", "x" } },
         { "<leader>aa", sidekick_cli_toggle_key, desc = "Sidekick", remap = true },
@@ -63,12 +63,12 @@ return {
           desc = "Prompt (Sidekick)",
         },
         { "<leader>af", function() require("sidekick.cli").send({ msg = "{file}", filter = filter }) end, desc = "File (Sidekick)" },
-        { "<leader>ac", function() require("sidekick.cli").toggle({ name = "claude" }) end, desc = "Claude" },
-        { "<leader>ac", function() require("sidekick.cli").send({ msg = "{this}", filter = { name = "claude" } }) end, mode = "x", desc = "Claude" },
-        { "<leader>ax", function() require("sidekick.cli").toggle({ name = "codex" }) end, desc = "Codex" },
-        { "<leader>ax", function() require("sidekick.cli").send({ msg = "{this}", filter = { name = "codex" } }) end, mode = "x", desc = "Codex" },
-        { "<leader>ao", function() require("sidekick.cli").toggle({ name = "opencode" }) end, desc = "OpenCode" },
-        { "<leader>ao", function() require("sidekick.cli").send({ msg = "{this}", filter = { name = "opencode" } }) end, mode = "x", desc = "OpenCode" },
+        { "<leader>ac", function() U.ai.sidekick.cli.quick.show("claude") end, desc = "Claude" },
+        { "<leader>ac", function() U.ai.sidekick.cli.quick.send("claude", { msg = "{this}" }) end, mode = "x", desc = "Claude" },
+        { "<leader>ax", function() U.ai.sidekick.cli.quick.show("codex") end, desc = "Codex" },
+        { "<leader>ax", function() U.ai.sidekick.cli.quick.send("codex", { msg = "{this}" }) end, mode = "x", desc = "Codex" },
+        { "<leader>ao", function() U.ai.sidekick.cli.quick.show("opencode") end, desc = "OpenCode" },
+        { "<leader>ao", function() U.ai.sidekick.cli.quick.send("opencode", { msg = "{this}" }) end, mode = "x", desc = "OpenCode" },
       })
     end,
     ---@module "sidekick"
@@ -368,8 +368,8 @@ return {
     optional = true,
     -- stylua: ignore
     keys = {
-      { "<leader>at", function() require("sidekick.cli").toggle({ name = "claude_tmp" }) end, desc = "Claude Temp" },
-      { "<leader>at", function() require("sidekick.cli").send({ msg = "{this}", filter = { name = "claude_tmp" } }) end, mode = "x", desc = "Claude Temp" },
+      { "<leader>at", function() U.ai.sidekick.cli.quick.show("claude_tmp") end, desc = "Claude Temp" },
+      { "<leader>at", function() U.ai.sidekick.cli.quick.send("claude_tmp", { msg = "{this}" }) end, mode = "x", desc = "Claude Temp" },
     },
     ---@param opts sidekick.Config
     opts = function(_, opts)
