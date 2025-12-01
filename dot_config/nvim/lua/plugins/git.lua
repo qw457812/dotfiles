@@ -3,7 +3,6 @@ return {
   {
     "LazyVim/LazyVim",
     opts = function()
-      -- FIXME: `GIT_SEQUENCE_EDITOR="nvim -u NONE" git rebase --interactive HEAD~3`, caused by BufWritePost?
       local commit_ft = { "gitcommit", "gitrebase", "svn" }
       local commit_filename = { "COMMIT_EDITMSG", "git-rebase-todo", "svn-commit.tmp" }
       vim.api.nvim_create_autocmd("FileType", {

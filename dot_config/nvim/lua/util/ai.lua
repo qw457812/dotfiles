@@ -117,29 +117,6 @@ M.sidekick = {
       ---@param name string
       ---@param opts? { focus?: boolean }
       show = function(name, opts)
-        -- -- Copied from: https://github.com/folke/sidekick.nvim/pull/206
-        -- local Config = require("sidekick.config")
-        -- local Select = require("sidekick.cli.ui.select")
-        -- local Session = require("sidekick.cli.session")
-        -- local State = require("sidekick.cli.state")
-        -- local Util = require("sidekick.util")
-        --
-        -- opts = type(opts) == "string" and { name = opts } or opts or {}
-        -- local tool = Config.get_tool(name)
-        -- if not tool then
-        --   Util.error(("Unknown tool: %s"):format(name))
-        --   return
-        -- end
-        -- if vim.fn.executable(tool.cmd[1]) ~= 1 then
-        --   Select.on_missing(tool)
-        --   return
-        -- end
-        -- Session.setup() -- ensure backends are registered
-        -- local session = Session.new({ tool = name })
-        -- session = Session.attach(session)
-        -- local state = State.get_state(session)
-        -- State.attach(state, { show = true, focus = opts.focus })
-
         opts = opts or {}
         H.sidekick.cli.state.with_quick(function() end, name, {
           focus = opts.focus,

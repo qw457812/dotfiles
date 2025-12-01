@@ -37,8 +37,8 @@ return {
         { "<c-.>", false, mode = { "n", "x", "i", "t" } },
         { sidekick_cli_toggle_key, function() require("sidekick.cli").toggle({ filter = filter }) end, mode = { "n", "x", "t" }, desc = "Sidekick" },
         { "<c-q>", function() U.ai.sidekick.cli.scrollback({ filter = filter }) end, desc = "Scrollback (Sidekick)" },
-        { "<cr>", function() U.ai.sidekick.cli.submit_or_focus({ filter = filter }, "claude") end, desc = "Submit or Focus (Sidekick)" },
-        { "<cr>", function() U.ai.sidekick.cli.quick.send("claude", { msg = "{this}" }) end, mode = "x", desc = "Sidekick" },
+        { "<cr>", function() U.ai.sidekick.cli.submit_or_focus({ filter = filter }) end, desc = "Submit or Focus (Sidekick)" },
+        { "<cr>", function() require("sidekick.cli").send({ msg = "{this}", filter = filter }) end, mode = "x", desc = "Sidekick" },
         { "<leader>av", false, mode = "x" },
         { "<leader>at", false, mode = { "n", "x" } },
         { "<leader>aa", sidekick_cli_toggle_key, desc = "Sidekick", remap = true },
@@ -95,7 +95,7 @@ return {
 
                 vim.b[buf].user_lualine_filename = vim.b[buf].user_lualine_filename or terminal.tool.name
 
-                if terminal.tool.name == "claude" then
+                if terminal.tool.name:find("claude") then -- claude_tmp
                   local function goto_input_prompt()
                     local lnum = vim.fn.search("^> ", "Wb") -- inputting
                     lnum = lnum == 0 and vim.fn.search(" ❯ ", "Wb") or lnum -- selecting like `/config`

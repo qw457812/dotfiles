@@ -293,6 +293,7 @@ glide.keymaps.set("normal", "<leader>ba", async ({ tab_id }) => {
     await browser.tabs.remove(tabs_to_close);
   }
 });
+glide.keymaps.set("normal", "<leader>bd", "tab_close");
 glide.keymaps.set("normal", "<leader>bb", "keys `");
 glide.keymaps.set("normal", "<leader>bp", "keys <C-p>");
 glide.keymaps.set("normal", "<leader>fc", async () => {
