@@ -362,6 +362,23 @@ return {
     end,
   },
 
+  -- HACK: allow multiple sessions of claude code per cwd
+  {
+    "folke/sidekick.nvim",
+    optional = true,
+    -- stylua: ignore
+    keys = {
+      { "<leader>at", function() require("sidekick.cli").toggle({ name = "claude_tmp" }) end, desc = "Claude Temp" },
+      { "<leader>at", function() require("sidekick.cli").send({ msg = "{this}", filter = { name = "claude_tmp" } }) end, mode = "x", desc = "Claude Temp" },
+    },
+    ---@param opts sidekick.Config
+    opts = function(_, opts)
+      opts.cli = opts.cli or {}
+      opts.cli.tools = opts.cli.tools or {}
+      opts.cli.tools.claude_tmp = vim.deepcopy(opts.cli.tools.claude) or { cmd = { "claude" } }
+    end,
+  },
+
   -- TODO: duplicate code with shell-command-editor.lua
   {
     "LazyVim/LazyVim",
