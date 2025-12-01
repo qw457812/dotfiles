@@ -625,7 +625,7 @@ async function focus_page(props: glide.KeymapCallbackProps) {
       },
       { tab_id: props.tab_id },
     );
-  } catch (error) {
+  } catch {
     // fall back to blur excmd if content.execute fails (e.g., missing host permissions on resource://glide-docs/dynamic/mappings.html)
     await glide.excmds.execute("blur");
   }
@@ -684,39 +684,79 @@ function bookmarks_picker(newtab: boolean = false) {
     const bookmarks = await browser.bookmarks.getRecent(10000);
 
     glide.commandline.show({
-      title: ` Bookmarks (${bookmarks.length})`,
-      options: bookmarks.map((bookmark) => ({
-        label: bookmark.title,
-        // description: bookmark.url,
-        render() {
-          return DOM.create_element("div", {
-            style: {
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              paddingLeft: "5px",
-            },
-            children: [
-              DOM.create_element("span", [bookmark.title]),
-              DOM.create_element("span", [bookmark.url ?? ""], {
-                style: { color: "#777", fontSize: "0.9em" },
-              }),
-            ],
-          });
-        },
-        async execute() {
-          const tab = await glide.tabs.get_first({ url: bookmark.url });
-          if (tab) {
-            await browser.tabs.update(tab.id, { active: true });
-          } else {
-            if (newtab) {
+      title: `Bookmarks (${bookmarks.length})`,
+      options: bookmarks.map(
+        (bookmark): glide.CommandLineCustomOption => ({
+          label: bookmark.title,
+          // description: bookmark.url,
+          render() {
+            const url = bookmark.url ?? "";
+            let display_url = url;
+            try {
+              const u = new URL(url);
+              display_url = u.hostname + decodeURIComponent(u.pathname);
+            } catch {}
+
+            return DOM.create_element("div", {
+              style: {
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "4px 12px",
+                borderBottom: "1px solid #333",
+              },
+              children: [
+                DOM.create_element("div", [" "], {
+                  style: {
+                    fontSize: "1.2em",
+                    opacity: "0.6",
+                    flexShrink: "0",
+                    marginRight: "8px",
+                  },
+                }),
+                DOM.create_element("div", {
+                  style: {
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "1px",
+                    minWidth: "0",
+                    flex: "1",
+                  },
+                  children: [
+                    DOM.create_element("div", [bookmark.title], {
+                      style: {
+                        fontWeight: "500",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      },
+                    }),
+                    DOM.create_element("div", [display_url], {
+                      style: {
+                        color: "#888",
+                        fontSize: "0.8em",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      },
+                    }),
+                  ],
+                }),
+              ],
+            });
+          },
+          async execute() {
+            const tab = await glide.tabs.get_first({ url: bookmark.url });
+            if (tab) {
+              await browser.tabs.update(tab.id, { active: true });
+            } else if (newtab) {
               await browser.tabs.create({ url: bookmark.url });
             } else {
               await browser.tabs.update({ url: bookmark.url });
             }
-          }
-        },
-      })),
+          },
+        }),
+      ),
     });
   };
 }
