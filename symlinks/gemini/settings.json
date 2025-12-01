@@ -17,7 +17,10 @@
   },
   "ui": {
     "hideBanner": true,
-    "theme": "GitHub"
+    "theme": "GitHub",
+    "footer": {
+      "hideContextPercentage": false
+    }
   },
   "mcpServers": {
     "context7": {

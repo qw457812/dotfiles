@@ -137,7 +137,7 @@ return {
             width = math.max(80, math.floor(vim.o.columns * 0.5)),
             height = math.max(20, math.floor(vim.o.lines * 0.5)),
           },
-          ---@type table<string, sidekick.cli.Keymap|false>
+          ---@type table<string, sidekick.cli.Keymap|false|nil>
           keys = {
             hide_ctrl_dot = false,
             hide_toggle_key = { sidekick_cli_toggle_key, "hide", mode = "nt" },
@@ -177,10 +177,10 @@ return {
               end,
             },
             -- we already have global mappings for window navigation (plugins.extras.util.tmux)
-            nav_down = false, -- HACK: fix "'kitty @ kitten neighboring_window.py right' returned 1", same for nav_up and nav_right
-            nav_up = false,
-            nav_right = false,
-            nav_left = false, -- not necessary, but for consistency
+            nav_down = vim.F.if_nil(vim.g.neovide, false) and nil, -- HACK: fix "'kitty @ kitten neighboring_window.py right' returned 1", same for nav_up and nav_right
+            nav_up = vim.F.if_nil(vim.g.neovide, false) and nil,
+            nav_right = vim.F.if_nil(vim.g.neovide, false) and nil,
+            nav_left = vim.F.if_nil(vim.g.neovide, false) and nil, -- not necessary, but for consistency
           },
         },
         ---@type sidekick.cli.Mux

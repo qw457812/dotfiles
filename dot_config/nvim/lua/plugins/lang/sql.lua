@@ -21,6 +21,17 @@ return {
   },
 
   {
+    "nvim-treesitter/nvim-treesitter",
+    opts = function()
+      for _, ft in ipairs(sql_ft) do
+        if ft ~= "sql" then
+          vim.treesitter.language.register("sql", ft)
+        end
+      end
+    end,
+  },
+
+  {
     "tpope/vim-dadbod",
     optional = true,
     init = function()

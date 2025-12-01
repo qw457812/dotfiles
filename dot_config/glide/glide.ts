@@ -86,7 +86,6 @@ glide.keymaps.set("normal", "<Esc>", async (props) => {
 
 // vimium-like keymaps
 // https://github.com/glide-browser/glide/blob/107e240a8fd274cafef403d089dc2b646319e8f8/src/glide/browser/base/content/plugins/keymaps.mts
-// TODO: b
 // glide.keymaps.set("normal", "f", () =>
 //   glide.hints.show({ include_click_listeners: true }),
 // );
@@ -98,6 +97,15 @@ glide.keymaps.set("normal", "r", when_editing("r", "reload"));
 glide.keymaps.set("normal", "R", when_editing(null, "reload_hard"));
 glide.keymaps.set("normal", "t", when_editing(null, "tab_new"));
 glide.keymaps.set("normal", "T", when_editing(null, "commandline_show tab "));
+glide.keymaps.set("normal", "b", when_editing("motion b", bookmarks_picker()), {
+  description: "Open bookmark",
+});
+glide.keymaps.set(
+  "normal",
+  "B",
+  when_editing("motion B", bookmarks_picker(true)),
+  { description: "Open bookmark in a new tab" },
+);
 glide.keymaps.set(
   "normal",
   "yt",
@@ -161,19 +169,6 @@ glide.keymaps.set("normal", "gi", async () => {
   if (!(await glide.ctx.is_editing())) {
     await glide.keys.send("gI");
   }
-});
-glide.keymaps.set("normal", "gu", async () => {
-  const url = new URL(glide.ctx.url);
-  const parts = url.pathname.split("/").filter(Boolean);
-  assert(parts.length > 0, "Cannot go up: already at root of URL hierarchy");
-  parts.pop();
-  await browser.tabs.update({
-    url: [url.origin, ...parts].filter(Boolean).join("/"),
-  });
-});
-glide.keymaps.set("normal", "gU", async () => {
-  const url = new URL(glide.ctx.url);
-  await browser.tabs.update({ url: url.origin });
 });
 glide.keymaps.set("normal", "gs", "keys <D-u>");
 glide.keymaps.set(
@@ -309,6 +304,27 @@ glide.keymaps.set("normal", "<leader>fc", async () => {
     await glide.process.spawn("neovide", [config]);
   }
 });
+glide.keymaps.set(
+  "normal",
+  "<C-w>v",
+  async ({ tab_id }) => {
+    const alt_tab = previousTabId
+      ? await browser.tabs.get(previousTabId)
+      : await browser.tabs.duplicate(tab_id);
+    glide.unstable.split_views.create([tab_id, alt_tab.id!]);
+  },
+  {
+    description: "Create split view with previous tab",
+  },
+);
+glide.keymaps.set(
+  "normal",
+  "<C-w>d",
+  async ({ tab_id }) => glide.unstable.split_views.separate(tab_id),
+  { description: "Close split view" },
+);
+glide.keymaps.set("normal", "<leader>wv", "keys <C-w>v");
+glide.keymaps.set("normal", "<leader>wd", "keys <C-w>d");
 glide.keymaps.set("normal", "<leader>sk", "map");
 glide.keymaps.set("normal", "<leader>un", "clear");
 glide.keymaps.set("normal", "<leader>g,", "tab_new about:settings");
@@ -661,6 +677,48 @@ function text_to_url(text: string): string {
   } catch {
     return default_search_engine.replace("{}", encodeURIComponent(text));
   }
+}
+
+function bookmarks_picker(newtab: boolean = false) {
+  return async () => {
+    const bookmarks = await browser.bookmarks.getRecent(10000);
+
+    glide.commandline.show({
+      title: ` Bookmarks (${bookmarks.length})`,
+      options: bookmarks.map((bookmark) => ({
+        label: bookmark.title,
+        // description: bookmark.url,
+        render() {
+          return DOM.create_element("div", {
+            style: {
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              paddingLeft: "5px",
+            },
+            children: [
+              DOM.create_element("span", [bookmark.title]),
+              DOM.create_element("span", [bookmark.url ?? ""], {
+                style: { color: "#777", fontSize: "0.9em" },
+              }),
+            ],
+          });
+        },
+        async execute() {
+          const tab = await glide.tabs.get_first({ url: bookmark.url });
+          if (tab) {
+            await browser.tabs.update(tab.id, { active: true });
+          } else {
+            if (newtab) {
+              await browser.tabs.create({ url: bookmark.url });
+            } else {
+              await browser.tabs.update({ url: bookmark.url });
+            }
+          }
+        },
+      })),
+    });
+  };
 }
 
 function opener(
