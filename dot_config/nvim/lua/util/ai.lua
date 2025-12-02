@@ -50,24 +50,13 @@ M.claude = {
 
 H.sidekick = {
   cli = {
-    ---Copied from: https://github.com/folke/sidekick.nvim/blob/d9e1fa2124340d3337d1a3a22b2f20de0701affe/lua/sidekick/cli/init.lua#L45-L54
-    ---@generic T: {name?:string, filter?:sidekick.cli.Filter}
-    ---@param opts? T|string
-    ---@return T
-    filter_opts = function(opts)
-      opts = type(opts) == "string" and { name = opts } or opts or {}
-      ---@cast opts {name?:string, filter?:sidekick.cli.Filter}
-      opts.filter = opts.filter or {}
-      opts.filter.name = opts.name or opts.filter.name or nil
-      return opts
-    end,
-    state = {
-      ---Without select
+    quick = {
+      ---Without select.
       ---Copied from: https://github.com/folke/sidekick.nvim/blob/d2e6c6447e750a5f565ae1a832f1ca7fd8e6e8dd/lua/sidekick/cli/state.lua#L140-L174
       ---@param cb fun(state: sidekick.cli.State, attached?: boolean):any?
       ---@param name string
-      ---@param opts? sidekick.cli.With
-      with_quick = function(cb, name, opts)
+      ---@param opts? sidekick.cli.With [attach, all, filter.name] are ignored
+      with_state = function(cb, name, opts)
         local State = require("sidekick.cli.state")
         local Util = require("sidekick.util")
         local Select = require("sidekick.cli.ui.select")
@@ -114,24 +103,24 @@ M.sidekick = {
   cli = {
     -- Quick commands without select
     quick = {
+      ---Copied from: https://github.com/folke/sidekick.nvim/blob/d9e1fa2124340d3337d1a3a22b2f20de0701affe/lua/sidekick/cli/init.lua#L85-L96
       ---@param name string
       ---@param opts? { focus?: boolean }
       show = function(name, opts)
         opts = opts or {}
-        H.sidekick.cli.state.with_quick(function() end, name, {
+        H.sidekick.cli.quick.with_state(function() end, name, {
           focus = opts.focus,
           show = true,
         })
       end,
       ---Copied from: https://github.com/folke/sidekick.nvim/blob/d9e1fa2124340d3337d1a3a22b2f20de0701affe/lua/sidekick/cli/init.lua#L168-L173
       ---@param name string
-      ---@param opts? sidekick.cli.Send
+      ---@param opts? sidekick.cli.Send both [name] and [opts ignored by H.sidekick.cli.quick.with_state] are ignored
       send = function(name, opts)
         local Cli = require("sidekick.cli")
         local Util = require("sidekick.util")
 
-        opts = type(opts) == "string" and { msg = opts } or opts
-        opts = H.sidekick.cli.filter_opts(opts)
+        opts = type(opts) == "string" and { msg = opts } or opts or {}
 
         if not opts.msg and not opts.prompt and Util.visual_mode() then
           opts.msg = "{selection}"
@@ -149,7 +138,7 @@ M.sidekick = {
           end
         end
 
-        H.sidekick.cli.state.with_quick(
+        H.sidekick.cli.quick.with_state(
           function(state)
             Util.exit_visual_mode()
             vim.schedule(function()
@@ -198,7 +187,7 @@ M.sidekick = {
 
       opts = opts or {}
       if quick then
-        H.sidekick.cli.state.with_quick(kill, quick)
+        H.sidekick.cli.quick.with_state(kill, quick)
       else
         Cli.select({
           auto = true,
@@ -207,7 +196,7 @@ M.sidekick = {
         })
       end
     end,
-    ---@param opts? { quick?: boolean, filter?: sidekick.cli.Filter }
+    ---@param opts? { filter?: sidekick.cli.Filter }
     ---@param quick? string
     scrollback = function(opts, quick)
       local State = require("sidekick.cli.state")
@@ -246,7 +235,7 @@ M.sidekick = {
 
       opts = opts or {}
       if quick then
-        H.sidekick.cli.state.with_quick(scrollback, quick, {
+        H.sidekick.cli.quick.with_state(scrollback, quick, {
           focus = false,
           show = true,
         })
@@ -261,7 +250,7 @@ M.sidekick = {
       end
     end,
     ---Submit (accept diff) or focus
-    ---@param opts? { quick?: boolean, filter?: sidekick.cli.Filter }
+    ---@param opts? { filter?: sidekick.cli.Filter }
     ---@param quick? string
     submit_or_focus = function(opts, quick)
       local State = require("sidekick.cli.state")
@@ -333,7 +322,7 @@ M.sidekick = {
       end
 
       if quick then
-        H.sidekick.cli.state.with_quick(submit_or_focus, quick, {
+        H.sidekick.cli.quick.with_state(submit_or_focus, quick, {
           focus = false,
           show = true,
         })
