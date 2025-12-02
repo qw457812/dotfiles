@@ -7,7 +7,7 @@ return {
       -- opts.folds.enabled
       Snacks.util.lsp.on({ method = "textDocument/foldingRange" }, function(buf)
         local fname = vim.api.nvim_buf_get_name(buf)
-        if vim.o.diff or fname:match("/%.metals/readonly/dependencies/") then
+        if vim.o.diff or fname:match("/%.metals/readonly/dependencies/") then -- TODO: check if https://github.com/neovim/neovim/pull/36708 fixes metals
           return
         end
         if LazyVim.set_default("foldmethod", "expr") then
@@ -274,6 +274,33 @@ return {
           find = "^No information available$", -- hover by `K`
         },
         view = "mini",
+      })
+    end,
+  },
+
+  {
+    "folke/noice.nvim",
+    optional = true,
+    opts = function(_, opts)
+      -- https://github.com/chrisgrieser/nvim-origami/blob/7e38cff819414471de8fbfbb48ccde06dcf966fb/lua/origami/features/autofold-comments-imports.lua#L27
+      -- https://github.com/neovim/neovim/blob/1c417b565ec82839aee12918eb8b3e93b91cc253/runtime/lua/vim/lsp/_folding_range.lua
+      -- TODO: check if https://github.com/neovim/neovim/pull/36708 fixes these errors
+      table.insert(opts.routes, {
+        filter = {
+          event = "msg_show",
+          any = {
+            {
+              find = "vim%.schedule.*callback: .+/runtime/lua/vim/lsp/_folding_range%.lua:%d+: attempt to index a nil value",
+            },
+            {
+              find = "vim%.schedule.*callback: .+/runtime/lua/vim/lsp/_folding_range%.lua:%d+: assertion failed!",
+            },
+            {
+              find = "vim%.schedule.*callback: .+/runtime/lua/vim/lsp/_folding_range%.lua:%d+: Invalid window id: %d+",
+            },
+          },
+        },
+        opts = { skip = true },
       })
     end,
   },

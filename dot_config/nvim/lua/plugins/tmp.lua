@@ -6,6 +6,7 @@ return {
   {
     "neovim/neovim",
     pin = true,
+    -- commit = "",
     enabled = function()
       local v = vim.version()
       return v and v.prerelease ~= nil -- nightly

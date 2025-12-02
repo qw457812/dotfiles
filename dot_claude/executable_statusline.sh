@@ -50,7 +50,7 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
 fi
 
 if command -v bunx >/dev/null 2>&1; then
-  echo "$input" | bunx ccstatusline
+  echo "$input" | bunx ccstatusline@latest
 else
-  echo "$input" | npx -y ccstatusline
+  echo "$input" | npx -y ccstatusline@latest
 fi

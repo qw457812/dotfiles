@@ -27,6 +27,24 @@ return {
       },
     },
   },
+
+  -- HACK: allow multiple sessions of claude code per cwd
+  {
+    "folke/sidekick.nvim",
+    optional = true,
+    -- stylua: ignore
+    keys = {
+      { "<leader>at", function() U.ai.sidekick.cli.quick.show("claude_tmp") end, desc = "Claude Temp" },
+      { "<leader>at", function() U.ai.sidekick.cli.quick.send("claude_tmp", { msg = "{this}" }) end, mode = "x", desc = "Claude Temp" },
+    },
+    ---@param opts sidekick.Config
+    opts = function(_, opts)
+      opts.cli = opts.cli or {}
+      opts.cli.tools = opts.cli.tools or {}
+      opts.cli.tools.claude_tmp = vim.deepcopy(opts.cli.tools.claude) or { cmd = { "claude" } }
+    end,
+  },
+
   {
     "folke/sidekick.nvim",
     optional = true,
@@ -40,7 +58,7 @@ return {
         { "<cr>", function() U.ai.sidekick.cli.submit_or_focus({ filter = filter }) end, desc = "Submit or Focus (Sidekick)" },
         { "<cr>", function() require("sidekick.cli").send({ msg = "{this}", filter = filter }) end, mode = "x", desc = "Sidekick" },
         { "<leader>av", false, mode = "x" },
-        { "<leader>at", false, mode = { "n", "x" } },
+        -- { "<leader>at", false, mode = { "n", "x" } },
         { "<leader>aa", sidekick_cli_toggle_key, desc = "Sidekick", remap = true },
         { "<leader>aa", function() require("sidekick.cli").send({ msg = "{this}", filter = filter }) end, mode = "x", desc = "Sidekick" },
         { "<leader>as", function() require("sidekick.cli").select({ filter = filter }) end, desc = "Select (Sidekick)" },
@@ -280,6 +298,7 @@ return {
       },
     },
   },
+
   {
     "folke/sidekick.nvim",
     optional = true,
@@ -307,9 +326,9 @@ return {
       end)
 
       Snacks.util.set_hl({
+        SidekickCliInstalled = "Comment",
         SidekickCliIndicatorTerminal = "lualine_c_filename_terminal",
         SidekickCliIndicatorScrollback = { fg = "#FF007C", bold = true },
-        SidekickCliInstalled = "Comment",
       })
 
       -- shown indicator when the sidekick window is focused
@@ -359,23 +378,6 @@ return {
           })
         end,
       })
-    end,
-  },
-
-  -- HACK: allow multiple sessions of claude code per cwd
-  {
-    "folke/sidekick.nvim",
-    optional = true,
-    -- stylua: ignore
-    keys = {
-      { "<leader>at", function() U.ai.sidekick.cli.quick.show("claude_tmp") end, desc = "Claude Temp" },
-      { "<leader>at", function() U.ai.sidekick.cli.quick.send("claude_tmp", { msg = "{this}" }) end, mode = "x", desc = "Claude Temp" },
-    },
-    ---@param opts sidekick.Config
-    opts = function(_, opts)
-      opts.cli = opts.cli or {}
-      opts.cli.tools = opts.cli.tools or {}
-      opts.cli.tools.claude_tmp = vim.deepcopy(opts.cli.tools.claude) or { cmd = { "claude" } }
     end,
   },
 

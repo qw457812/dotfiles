@@ -423,6 +423,7 @@ return {
           -- annoying when `toggle_auto_expand_width`
           file_size = { enabled = false },
           type = { enabled = false },
+          ---@diagnostic disable-next-line: missing-fields
           last_modified = { enabled = false },
         },
         commands = {

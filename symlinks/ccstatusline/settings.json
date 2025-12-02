@@ -97,7 +97,7 @@
         "type": "custom-command",
         "commandPath": "printf \"\\033[35m\\$%.2f\\033[0m\" \"$(\"$HOME/.claude/statusline/get-today-cost.sh\")\"",
         "preserveColors": true,
-        "timeout": 5000
+        "timeout": 10000
       },
       {
         "id": "7e09b952-08d2-49ee-be95-a32ec8ac5040",

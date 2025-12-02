@@ -1,8 +1,6 @@
----@module "lazyvim"
-
 ---@class AutoToggle.Opts
----@field get fun(event:vim.api.create_autocmd.callback.args):boolean
----@field set fun(state:boolean,event:vim.api.create_autocmd.callback.args)
+---@field get fun(event:vim.api.keyset.create_autocmd.callback_args):boolean
+---@field set fun(state:boolean,event:vim.api.keyset.create_autocmd.callback_args)
 
 ---@param opts AutoToggle.Opts
 local function auto_toggle(opts)

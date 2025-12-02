@@ -26,12 +26,16 @@ fi
 if [ "$cache_valid" -eq 1 ]; then
   cat "$cache_file"
 else
-  if command -v bunx >/dev/null 2>&1; then
-    # alternative: `bunx ccusage daily --json --offline --order desc 2>/dev/null | jq -r '.daily[0].totalCost // 0' 2>/dev/null | xargs printf "%.2f"`
-    today_cost=$(bunx ccusage daily --json --offline --since "$today" --until "$today" 2>/dev/null | jq -r '.daily[0].totalCost // 0' 2>/dev/null || echo "0")
+  if command -v ccusage >/dev/null 2>&1; then
+    ccusage_cmd="ccusage"
+  elif command -v bunx >/dev/null 2>&1; then
+    ccusage_cmd="bunx ccusage@latest"
   else
-    today_cost=$(npx -y ccusage daily --json --offline --since "$today" --until "$today" 2>/dev/null | jq -r '.daily[0].totalCost // 0' 2>/dev/null || echo "0")
+    ccusage_cmd="npx -y ccusage@latest"
   fi
+  # --offline
+  # alternative: `ccusage daily --json --order desc 2>/dev/null | jq -r '.daily[0].totalCost // 0' 2>/dev/null`
+  today_cost=$($ccusage_cmd daily --json --since "$today" --until "$today" 2>/dev/null | jq -r '.daily[0].totalCost // 0' 2>/dev/null || echo "0")
   echo "$today_cost" >"$cache_file"
   echo "$today_cost"
 fi

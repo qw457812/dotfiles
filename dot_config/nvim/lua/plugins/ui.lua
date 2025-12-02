@@ -311,6 +311,21 @@ return {
   },
 
   {
+    "nvim-treesitter/nvim-treesitter-context",
+    optional = true,
+    ---@module "treesitter-context"
+    ---@type TSContext.Config|{}
+    opts = {
+      on_attach = function(buf)
+        vim.keymap.set("n", "gC", function()
+          require("treesitter-context").go_to_context(vim.v.count1)
+        end, { silent = true, buffer = buf, desc = "Go to Context" })
+        return true
+      end,
+    },
+  },
+
+  {
     "nvimdev/dashboard-nvim",
     optional = true,
     opts = function(_, opts)

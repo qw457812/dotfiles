@@ -67,6 +67,7 @@ return {
       },
     },
     opts = {
+      ignore_warnings = true,
       adapters = {
         http = {
           copilot_claude = function()
