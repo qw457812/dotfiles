@@ -1,3 +1,4 @@
+local orig_java_home = vim.env.JAVA_HOME -- may be set by Mise
 local java_home = vim.g.user_is_termux and "/data/data/com.termux/files/usr/lib/jvm/java-21-openjdk"
   or vim.fn.expand("$HOME/.local/share/mise/installs/java/23")
 
@@ -59,7 +60,7 @@ return {
     },
   },
 
-  -- for java projects using JDK version older than 21
+  -- for java projects using JDK version older than 21, 1.8 in my case
   {
     "mfussenegger/nvim-jdtls",
     optional = true,
@@ -71,31 +72,38 @@ return {
     "JavaHello/spring-boot.nvim",
     optional = true,
     opts = function()
-      if LazyVim.has("sidekick.nvim") then
-        ---HACK: https://github.com/JavaHello/spring-boot.nvim/blob/2bc14e114f748ebba365641b38403c9819cd42cd/lua/spring_boot/util.lua#L22-L28
-        ---@diagnostic disable-next-line: duplicate-set-field
-        require("spring_boot.util").java_bin = function()
-          return java_home .. "/bin/java"
-        end
-      else
-        vim.env.JAVA_HOME = java_home
+      -- HACK: better alternative to `vim.env.JAVA_HOME = java_home`
+      -- https://github.com/JavaHello/spring-boot.nvim/blob/2bc14e114f748ebba365641b38403c9819cd42cd/lua/spring_boot/util.lua#L22-L28
+      ---@diagnostic disable-next-line: duplicate-set-field
+      require("spring_boot.util").java_bin = function()
+        return java_home .. "/bin/java"
       end
     end,
   },
-  -- for scala projects using JDK version older than 21
+  {
+    "folke/sidekick.nvim",
+    optional = true,
+    ---@module "sidekick"
+    ---@param opts sidekick.Config
+    opts = function(_, opts)
+      opts.cli = opts.cli or {}
+      for _, tool in pairs(opts.cli.tools or {}) do
+        -- Use the JAVA_HOME set by Mise. Otherwise, `mvn clean compile` in Claude Code's Bash tool will fail for some Java 1.8 projects.
+        -- Run `! mvn -v` in Claude Code to confirm.
+        -- https://github.com/folke/sidekick.nvim/blob/83b6815c0ed738576f101aad31c79b885c892e0f/lua/sidekick/cli/terminal.lua#L272C45-L272C64
+        tool.env = U.extend_tbl({ JAVA_HOME = orig_java_home }, tool.env)
+      end
+    end,
+  },
+  -- for scala projects using JDK version older than 21, 1.8 in my case
+  -- (Oracle SQLcl requires Java 11 and above to run, see vim.g.dbext_default_ORA_bin of vim-dadbod)
   {
     "neovim/nvim-lspconfig",
     opts = function()
-      if LazyVim.has("sidekick.nvim") then
-        -- Do not override JAVA_HOME set by Mise. Otherwise, `mvn clean compile` in Claude Code's Bash tool for some Java 1.8 projects will fail.
-        -- https://github.com/folke/sidekick.nvim/blob/83b6815c0ed738576f101aad31c79b885c892e0f/lua/sidekick/cli/terminal.lua#L272C45-L272C64
-        return
+      if LazyVim.has_extra("lang.scala") then
+        -- see: https://github.com/scalameta/nvim-metals/issues/380
+        vim.env.JAVA_HOME = java_home
       end
-      if not LazyVim.has_extra("lang.scala") then
-        return
-      end
-      -- see: https://github.com/scalameta/nvim-metals/issues/380
-      vim.env.JAVA_HOME = java_home
     end,
   },
 
