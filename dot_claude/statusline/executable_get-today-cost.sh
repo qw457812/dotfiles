@@ -26,16 +26,22 @@ fi
 if [ "$cache_valid" -eq 1 ]; then
   cat "$cache_file"
 else
-  if command -v ccusage >/dev/null 2>&1; then
-    ccusage_cmd="ccusage"
-  elif command -v bunx >/dev/null 2>&1; then
-    ccusage_cmd="bunx ccusage@latest"
+  if command -v cc-statusbar >/dev/null 2>&1; then
+    # https://github.com/paceyw/cc-statusbar-for-Claude-Relay-Service
+    # /opt/homebrew/lib/node_modules/claude-code-statusbar/statusline.js
+    today_cost=$(cc-statusbar 2>/dev/null | grep -oE '[0-9]+\.[0-9]+' || echo "0")
   else
-    ccusage_cmd="npx -y ccusage@latest"
+    if command -v ccusage >/dev/null 2>&1; then
+      ccusage_cmd="ccusage"
+    elif command -v bunx >/dev/null 2>&1; then
+      ccusage_cmd="bunx ccusage@latest"
+    else
+      ccusage_cmd="npx -y ccusage@latest"
+    fi
+    # --offline
+    # alternative: `ccusage daily --json --order desc 2>/dev/null | jq -r '.daily[0].totalCost // 0' 2>/dev/null`
+    today_cost=$($ccusage_cmd daily --json --since "$today" --until "$today" 2>/dev/null | jq -r '.daily[0].totalCost // 0' 2>/dev/null || echo "0")
   fi
-  # --offline
-  # alternative: `ccusage daily --json --order desc 2>/dev/null | jq -r '.daily[0].totalCost // 0' 2>/dev/null`
-  today_cost=$($ccusage_cmd daily --json --since "$today" --until "$today" 2>/dev/null | jq -r '.daily[0].totalCost // 0' 2>/dev/null || echo "0")
   echo "$today_cost" >"$cache_file"
   echo "$today_cost"
 fi

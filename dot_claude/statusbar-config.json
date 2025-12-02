@@ -1,0 +1,10 @@
+{
+  "display": {
+    "showRequests": false,
+    "showTokens": false,
+    "showCost": true,
+    "showPercentage": false,
+    "showExpiry": false,
+    "showLastUpdate": false
+  }
+}
