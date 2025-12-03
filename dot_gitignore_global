@@ -9,13 +9,13 @@
 .lazy.lua
 
 CLAUDE.local.md
-# **/.claude/settings.local.json
-CLAUDE.md
-.claude
-.mcp.json
+**/.claude/settings.local.json
+# CLAUDE.md
+# .claude
+# .mcp.json
 
 .aider*
 .opencode
-AGENTS.md
+# AGENTS.md
 
 .playwright-mcp

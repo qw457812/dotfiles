@@ -116,7 +116,7 @@ return {
                 if terminal.tool.name:find("claude") then -- claude_tmp
                   local function goto_input_prompt()
                     local lnum = vim.fn.search("^> ", "Wb") -- inputting
-                    lnum = lnum == 0 and vim.fn.search(" ❯ ", "Wb") or lnum -- selecting like `/config`
+                    lnum = lnum == 0 and vim.fn.search("❯ ", "Wb") or lnum -- selecting like `/config`
                   end
 
                   -- schedule to overwrite `]]` and `[[` defined in https://github.com/neovim/neovim/blob/520568f40f22d77e623ddda77cf751031774384b/runtime/lua/vim/_defaults.lua#L651-L656
