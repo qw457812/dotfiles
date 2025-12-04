@@ -50,6 +50,29 @@ M.claude = {
 
 H.sidekick = {
   cli = {
+    ---Is visible.
+    ---@return boolean, integer?, integer?
+    is_open = function()
+      for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+        local buf = vim.api.nvim_win_get_buf(win)
+        if vim.bo[buf].filetype == "sidekick_terminal" then
+          return true, buf, win
+        end
+      end
+      return false
+    end,
+    ---https://github.com/folke/sidekick.nvim/blob/83b6815c0ed738576f101aad31c79b885c892e0f/lua/sidekick/cli/terminal.lua#L249-L254
+    ---@param buf integer
+    ---@param win integer
+    ---@return boolean
+    is_ready = function(buf, win)
+      local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+      while #lines > 0 and lines[#lines] == "" do
+        table.remove(lines)
+      end
+      local cursor = vim.api.nvim_win_get_cursor(win)
+      return #lines > 5 and cursor[1] > 3
+    end,
     quick = {
       ---Without select.
       ---Copied from: https://github.com/folke/sidekick.nvim/blob/d2e6c6447e750a5f565ae1a832f1ca7fd8e6e8dd/lua/sidekick/cli/state.lua#L140-L174
@@ -217,15 +240,7 @@ M.sidekick = {
           if vim.fn.mode() ~= "t" then
             return
           end
-
-          -- https://github.com/folke/sidekick.nvim/blob/83b6815c0ed738576f101aad31c79b885c892e0f/lua/sidekick/cli/terminal.lua#L249-L254
-          local lines = vim.api.nvim_buf_get_lines(terminal.buf, 0, -1, false)
-          while #lines > 0 and lines[#lines] == "" do
-            table.remove(lines)
-          end
-          local cursor = vim.api.nvim_win_get_cursor(terminal.win)
-          local is_ready = #lines > 5 and cursor[1] > 3
-          if not is_ready then
+          if not H.sidekick.cli.is_ready(terminal.buf, terminal.win) then
             return -- new terminal, nothing to scroll
           end
 
@@ -263,13 +278,7 @@ M.sidekick = {
         return
       end
 
-      local is_open = false
-      for _, w in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-        if vim.bo[vim.api.nvim_win_get_buf(w)].filetype == "sidekick_terminal" then
-          is_open = true
-          break
-        end
-      end
+      local is_open = H.sidekick.cli.is_open()
 
       ---@param state sidekick.cli.State
       local function submit_or_focus(state)

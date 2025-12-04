@@ -38,8 +38,6 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   # context usage
   context_percentage_display="${COLOR_CYAN}$(awk -v t="$total_tokens" 'BEGIN {printf "%.1f%%", t*100/200000}')${COLOR_RESET}"
 
-  # TODO: session clock: https://github.com/sirmalloc/ccstatusline/blob/03d19692ab15fd87ef0f4796dc0f46b447a222cc/src/utils/jsonl.ts#L19
-
   # session duration (hidden if < 1 min)
   session_duration=$(echo "$input" | jq -r '.cost.total_duration_ms // 0' | awk '{
     s = int($1/1000); if (s < 60) exit
@@ -60,7 +58,7 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   # https://github.com/Rolv-Apneseth/starship.yazi/blob/a63550b2f91f0553cc545fd8081a03810bc41bc0/main.lua#L111-L126
   starship_prompt=$(STARSHIP_CONFIG="$HOME/.config/starship-statusline.toml" STARSHIP_SHELL="" starship prompt | tr -d '\n')
 
-  # xargs skips empty, joins with spaces
+  # empty segments are skipped by xargs
   printf '%s\n' "$model_display" "$total_tokens_display" "$context_percentage_display" "$session_duration_display" "$session_cost_display" "$today_cost_display" "$starship_prompt" | xargs
   exit 0
 fi

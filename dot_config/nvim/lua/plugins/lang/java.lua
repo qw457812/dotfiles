@@ -148,16 +148,13 @@ return {
         end,
         ---@param args vim.api.keyset.create_autocmd.callback_args
         on_attach = function(args)
-          local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
-
-          -- fixes "vim.schedule callback: ...ghtly/share/nvim/runtime/lua/vim/lsp/semantic_tokens.lua:322: ...ghtly/share/nvim/runtime/lua/vim/lsp/semantic_tokens.lua:111: attempt to index local 'request' (a nil value)"
-          -- on neovim commit: 5299967551f26c1b6e192a71ca6fba17f055d869
-          if client.server_capabilities and client.server_capabilities.semanticTokensProvider then
-            client.server_capabilities.semanticTokensProvider = nil
-            if vim.lsp.semantic_tokens.enable then
-              vim.lsp.semantic_tokens.enable(false, { bufnr = args.buf })
-            end
-          end
+          -- local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
+          -- if client.server_capabilities and client.server_capabilities.semanticTokensProvider then
+          --   client.server_capabilities.semanticTokensProvider = nil
+          --   if vim.lsp.semantic_tokens.enable then
+          --     vim.lsp.semantic_tokens.enable(false, { bufnr = args.buf })
+          --   end
+          -- end
 
           local wk = require("which-key")
           wk.add({
@@ -168,6 +165,7 @@ return {
               { "<leader>rx", require("jdtls").extract_variable_all, desc = "Extract Variable" },
               { "<leader>rC", require("jdtls").extract_constant, desc = "Extract Constant" },
               { "<localleader>r", require("jdtls").set_runtime, desc = "Pick Java Runtime" },
+              { "<localleader>s", require("jdtls").extended_symbols, desc = "Symbols (Hierarchy)" }, -- TODO: integrate with `Snacks.picker.lsp_symbols()`, see: https://github.com/mfussenegger/nvim-jdtls/issues/827
             },
           })
           -- stylua: ignore

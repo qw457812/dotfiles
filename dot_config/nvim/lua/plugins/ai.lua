@@ -38,10 +38,12 @@ return {
       { "<leader>at", function() U.ai.sidekick.cli.quick.send("claude_tmp", { msg = "{this}" }) end, mode = "x", desc = "Claude Temp" },
     },
     ---@param opts sidekick.Config
-    opts = function(_, opts)
+    config = function(_, opts)
       opts.cli = opts.cli or {}
       opts.cli.tools = opts.cli.tools or {}
       opts.cli.tools.claude_tmp = vim.deepcopy(opts.cli.tools.claude) or { cmd = { "claude" } }
+
+      require("sidekick").setup(opts)
     end,
   },
 
@@ -111,6 +113,8 @@ return {
                   return
                 end
 
+                -- vim.b[buf].sidekick_scrollback = true
+                vim.b[buf].sidekick_cli = vim.b[buf].sidekick_cli or terminal.tool
                 vim.b[buf].user_lualine_filename = vim.b[buf].user_lualine_filename or terminal.tool.name
 
                 if terminal.tool.name:find("claude") then -- claude_tmp
@@ -326,7 +330,9 @@ return {
       -- shown indicator when the sidekick window is focused
       -- https://github.com/folke/snacks.nvim/blob/3c2d79162f8174d5e1c33539a72025a25f4af590/lua/snacks/zen.lua#L69-L80
       Snacks.config.style("sidekick_indicator", {
-        text = "▍ sidekick    ",
+        text = function()
+          return ("▍ %s    "):format((vim.b.sidekick_cli or {}).name or "sidekick")
+        end,
         minimal = true,
         enter = false,
         focusable = false,

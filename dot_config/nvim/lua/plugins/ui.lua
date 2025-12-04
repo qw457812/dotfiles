@@ -135,6 +135,8 @@ return {
       return U.extend_tbl(opts, {
         options = {
           -- indicator = { style = "underline" },
+          left_trunc_marker = "",
+          right_trunc_marker = "",
           separator_style = vim.g.user_transparent_background and { "", "" } or "slant", -- slope
           -- in favor of `BufferLineGoToBuffer`
           numbers = vim.g.user_is_termux and "none" or function(o)

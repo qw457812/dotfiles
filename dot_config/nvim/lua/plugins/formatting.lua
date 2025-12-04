@@ -114,6 +114,7 @@ return {
         pattern = {
           "gitcommit", -- git commit --verbose
           "dbout", -- vim-dadbod
+          "log",
         },
         callback = function(ev)
           vim.b[ev.buf].minitrailspace_disable = true
