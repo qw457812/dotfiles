@@ -337,7 +337,8 @@ return {
         enter = false,
         focusable = false,
         height = 1,
-        row = 0,
+        relative = "win",
+        row = 0, -- 1
         col = -1,
         backdrop = false,
         bo = { filetype = "sidekick_indicator" },
