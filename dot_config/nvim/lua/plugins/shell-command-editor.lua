@@ -92,6 +92,7 @@ return {
         pattern = {
           tmpdir .. (vim.g.user_is_termux and "" or "/") .. "/fish.*/command-line.fish", -- https://github.com/fish-shell/fish-shell/blob/97ae05b69dbd01d3e5954dbd11a01dad6f5e0cdc/share/functions/edit_command_buffer.fish#L2-L4
           tmpdir .. "/qutebrowser-editor-*", -- https://github.com/qutebrowser/qutebrowser/blob/7315c34957fd3b7c08d3314ba645eafd0eb6a815/qutebrowser/misc/editor.py#L118
+          tmpdir .. "/glide-editor-*", -- see bulk_tab_close in ~/.config/glide/glide.ts
         },
         once = true,
         callback = function(ev)

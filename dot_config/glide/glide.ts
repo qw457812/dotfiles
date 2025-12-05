@@ -164,12 +164,7 @@ glide.keymaps.set(
     await glide.excmds.execute("caret_move right");
   }),
 );
-glide.keymaps.set("normal", "gi", async () => {
-  await glide.excmds.execute("focusinput last");
-  if (!(await glide.ctx.is_editing())) {
-    await glide.keys.send("gI");
-  }
-});
+glide.keymaps.set("normal", "gi", focusinput);
 glide.keymaps.set("normal", "gs", "keys <D-u>");
 glide.keymaps.set(
   "normal",
@@ -298,12 +293,7 @@ glide.keymaps.set("normal", "<leader>bb", "keys `");
 glide.keymaps.set("normal", "<leader>bp", "keys <C-p>");
 glide.keymaps.set("normal", "<leader>fc", async () => {
   const config = `${glide.path.home_dir}/.config/glide/glide.ts`;
-  // await glide.process.spawn("kitty", ["-e", "nvim", config]);
-  if (glide.ctx.os === "macosx") {
-    await glide.process.spawn("open", ["-b", "com.neovide.neovide", config]);
-  } else {
-    await glide.process.spawn("neovide", [config]);
-  }
+  await open_in_editor(config);
 });
 glide.keymaps.set(
   "normal",
@@ -469,6 +459,15 @@ glide.autocmds.create("UrlEnter", { hostname: "github.com" }, async () => {
     [org, repo] = path_segments;
   }
 
+  glide.buf.keymaps.set("normal", "gi", async () => {
+    await focusinput();
+    await sleep(50);
+    if (!(await glide.ctx.is_editing())) {
+      await glide.excmds.execute("clear"); // clear "No hints found"
+      await glide.keys.send("/", { skip_mappings: true }); // GitHub keyboard shortcut: Open search bar
+    }
+  });
+
   glide.buf.keymaps.set(
     "normal",
     "ym",
@@ -592,6 +591,60 @@ glide.keymaps.set(
   when_editing(null, "commandline_show open_in_new_tab "),
 );
 
+const bulk_tab_close = glide.excmds.create(
+  { name: "bulk_tab_close", description: "Close tabs with editor" },
+  async () => {
+    const tabs = await browser.tabs.query({ pinned: false });
+    const lines = tabs.map(
+      (t) =>
+        `${t.id}: ${t.title?.replace(/\n/g, " ") || "No Title"} (${t.url || "about:blank"})`,
+    );
+
+    const mktemp = await glide.process.execute("mktemp", [
+      "-t",
+      "glide-editor-tabs.XXXXXX",
+    ]);
+    let tmp = "";
+    for await (const chunk of mktemp.stdout) tmp += chunk;
+    tmp = tmp.trim();
+    await glide.fs.write(tmp, lines.join("\n"));
+
+    try {
+      const { exit_code } = await (
+        await glide.process.execute("open", [
+          "-Wna",
+          "Ghostty",
+          "--args",
+          `--command=${glide.env.get("SHELL")!} -c 'nvim --cmd "lua vim.g.shell_command_editor = true" "${tmp}"'`,
+          "--quit-after-last-window-closed=true",
+        ])
+      ).wait();
+      if (exit_code !== 0)
+        throw new Error(`Editor failed with exit code ${exit_code}`);
+
+      const edited = await glide.fs.read(tmp, "utf8");
+      const keep = new Set(
+        edited
+          .split("\n")
+          .filter(Boolean)
+          .map((l) => Number(l.split(":")[0])),
+      );
+      const to_close = tabs
+        .map((t) => t.id)
+        .filter((id): id is number => id !== undefined && !keep.has(id));
+      await browser.tabs.remove(to_close);
+    } finally {
+      glide.process.spawn("rm", [tmp]);
+    }
+  },
+);
+declare global {
+  interface ExcmdRegistry {
+    bulk_tab_close: typeof bulk_tab_close;
+  }
+}
+glide.keymaps.set("normal", "<leader>bD", "bulk_tab_close");
+
 // Utils
 function when_editing(
   editing_action: glide.ExcmdString | glide.KeymapCallback | null,
@@ -639,6 +692,22 @@ async function focus_page(props: glide.KeymapCallbackProps) {
     if (glide.ctx.mode === "insert") {
       await glide.keys.send("<F6>", { skip_mappings: true });
     }
+  }
+}
+
+async function focusinput() {
+  await glide.excmds.execute("focusinput last");
+  if (!(await glide.ctx.is_editing())) {
+    await glide.keys.send("gI");
+  }
+}
+
+async function open_in_editor(file: string) {
+  // await glide.process.spawn("kitty", ["-e", "nvim", file]);
+  if (glide.ctx.os === "macosx") {
+    await glide.process.spawn("open", ["-b", "com.neovide.neovide", file]); // single neovide instance
+  } else {
+    await glide.process.spawn("neovide", [file]);
   }
 }
 

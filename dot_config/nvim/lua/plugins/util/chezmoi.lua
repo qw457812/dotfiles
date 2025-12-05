@@ -222,8 +222,11 @@ function H.autocmd_chezmoi_add()
     pattern = (vim.env.XDG_CONFIG_HOME or vim.env.HOME .. "/.config") .. "/*",
     desc = "chezmoi add for XDG_CONFIG_HOME",
     callback = function(event)
-      -- let chezmoi_re_add augroup handle the re-add
-      if vim.list_contains(managed_files, event.match) or vim.list_contains(H.xdg_config_ignore, event.match) then
+      if
+        vim.list_contains(managed_files, event.match) -- let chezmoi_re_add augroup handle the re-add
+        or vim.list_contains(H.xdg_config_ignore, event.match)
+        or vim.list_contains({ "gitcommit", "gitrebase" }, vim.bo[event.buf].filetype)
+      then
         return
       end
 
