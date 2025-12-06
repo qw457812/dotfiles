@@ -4,7 +4,7 @@ return {
     "neovim/nvim-lspconfig",
     opts = {
       servers = {
-        ts_query_ls = {},
+        ts_query_ls = not vim.g.user_is_termux and {} or nil,
       },
     },
   },

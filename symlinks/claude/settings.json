@@ -55,5 +55,6 @@
   "alwaysThinkingEnabled": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754043197597
-  }
+  },
+  "model": "opus"
 }

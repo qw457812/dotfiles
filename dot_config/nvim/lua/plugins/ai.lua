@@ -1,5 +1,5 @@
 local sidekick_cli_toggle_key = "<M-space>"
-local copilot_available = not vim.g.user_is_termux -- copilot-language-server failed to start on termux
+local copilot_available = not vim.g.user_is_termux or vim.fn.executable("copilot-language-server") == 1
 
 ---@type LazySpec
 return {
@@ -28,24 +28,26 @@ return {
     },
   },
 
-  -- HACK: allow multiple sessions of claude code per cwd
-  {
-    "folke/sidekick.nvim",
-    optional = true,
-    -- stylua: ignore
-    keys = {
-      { "<leader>at", function() U.ai.sidekick.cli.quick.show("claude_tmp") end, desc = "Claude Temp" },
-      { "<leader>at", function() U.ai.sidekick.cli.quick.send("claude_tmp", { msg = "{this}" }) end, mode = "x", desc = "Claude Temp" },
-    },
-    ---@param opts sidekick.Config
-    config = function(_, opts)
-      opts.cli = opts.cli or {}
-      opts.cli.tools = opts.cli.tools or {}
-      opts.cli.tools.claude_tmp = vim.deepcopy(opts.cli.tools.claude) or { cmd = { "claude" } }
+  not vim.g.user_is_termux
+      -- HACK: allow multiple sessions of claude code per cwd
+      and {
+        "folke/sidekick.nvim",
+        optional = true,
+        -- stylua: ignore
+        keys = {
+          { "<leader>at", function() U.ai.sidekick.cli.quick.show("claude_tmp") end, desc = "Claude Temp" },
+          { "<leader>at", function() U.ai.sidekick.cli.quick.send("claude_tmp", { msg = "{this}" }) end, mode = "x", desc = "Claude Temp" },
+        },
+        ---@param opts sidekick.Config
+        config = function(_, opts)
+          opts.cli = opts.cli or {}
+          opts.cli.tools = opts.cli.tools or {}
+          opts.cli.tools.claude_tmp = vim.deepcopy(opts.cli.tools.claude) or { cmd = { "claude" } }
 
-      require("sidekick").setup(opts)
-    end,
-  },
+          require("sidekick").setup(opts)
+        end,
+      }
+    or { import = "foobar", enabled = false },
 
   {
     "folke/sidekick.nvim",
@@ -517,6 +519,12 @@ return {
       local servers = opts.servers
       if servers.copilot then
         servers.copilot = servers.copilot == true and {} or servers.copilot
+        if vim.g.user_is_termux then
+          -- latest version of copilot-language-server failed to start on termux
+          -- using `npm install -g @github/copilot-language-server@1.380.0`
+          -- tested `copilot-language-server --version` without errors
+          servers.copilot.mason = false
+        end
         servers.copilot.root_dir = function(bufnr, on_dir)
           local root = LazyVim.root({ buf = bufnr })
           on_dir(root ~= vim.uv.cwd() and root or vim.fs.root(bufnr, vim.lsp.config.copilot.root_markers))
