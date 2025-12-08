@@ -808,7 +808,7 @@ return {
       return {
         foldKeymaps = {
           setup = false,
-          hOnlyOpensOnFirstColumn = true,
+          closeOnlyOnFirstColumn = true,
         },
         useLspFoldsWithTreesitterFallback = false,
         autoFold = {

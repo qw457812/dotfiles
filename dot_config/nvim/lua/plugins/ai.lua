@@ -28,26 +28,23 @@ return {
     },
   },
 
-  not vim.g.user_is_termux
-      -- HACK: allow multiple sessions of claude code per cwd
-      and {
-        "folke/sidekick.nvim",
-        optional = true,
-        -- stylua: ignore
-        keys = {
-          { "<leader>at", function() U.ai.sidekick.cli.quick.show("claude_tmp") end, desc = "Claude Temp" },
-          { "<leader>at", function() U.ai.sidekick.cli.quick.send("claude_tmp", { msg = "{this}" }) end, mode = "x", desc = "Claude Temp" },
-        },
-        ---@param opts sidekick.Config
-        config = function(_, opts)
-          opts.cli = opts.cli or {}
-          opts.cli.tools = opts.cli.tools or {}
-          opts.cli.tools.claude_tmp = vim.deepcopy(opts.cli.tools.claude) or { cmd = { "claude" } }
-
-          require("sidekick").setup(opts)
-        end,
-      }
-    or { import = "foobar", enabled = false },
+  -- HACK: allow multiple sessions of claude code per cwd
+  {
+    "folke/sidekick.nvim",
+    optional = true,
+    -- stylua: ignore
+    keys = not vim.g.user_is_termux and {
+      { "<leader>at", function() U.ai.sidekick.cli.quick.show("claude_tmp") end, desc = "Claude Temp" },
+      { "<leader>at", function() U.ai.sidekick.cli.quick.send("claude_tmp", { msg = "{this}" }) end, mode = "x", desc = "Claude Temp" },
+    } or { { "<leader>at", false, mode = { "n", "x" } } },
+    ---@param opts sidekick.Config
+    config = not vim.g.user_is_termux and function(_, opts)
+      opts.cli = opts.cli or {}
+      opts.cli.tools = opts.cli.tools or {}
+      opts.cli.tools.claude_tmp = vim.deepcopy(opts.cli.tools.claude) or { cmd = { "claude" } }
+      require("sidekick").setup(opts)
+    end or nil,
+  },
 
   {
     "folke/sidekick.nvim",
@@ -62,7 +59,6 @@ return {
         { "<cr>", function() U.ai.sidekick.cli.submit_or_focus({ filter = filter }) end, desc = "Submit or Focus (Sidekick)" },
         { "<cr>", function() require("sidekick.cli").send({ msg = "{this}", filter = filter }) end, mode = "x", desc = "Sidekick" },
         { "<leader>av", false, mode = "x" },
-        -- { "<leader>at", false, mode = { "n", "x" } },
         { "<leader>aa", sidekick_cli_toggle_key, desc = "Sidekick", remap = true },
         { "<leader>aa", function() require("sidekick.cli").send({ msg = "{this}", filter = filter }) end, mode = "x", desc = "Sidekick" },
         { "<leader>as", function() require("sidekick.cli").select({ filter = filter }) end, desc = "Select (Sidekick)" },

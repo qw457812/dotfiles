@@ -594,10 +594,10 @@ glide.keymaps.set(
 const bulk_tab_close = glide.excmds.create(
   { name: "bulk_tab_close", description: "Close tabs with editor" },
   async () => {
-    const tabs = await browser.tabs.query({ pinned: false });
+    const tabs = await browser.tabs.query({});
     const lines = tabs.map(
       (t) =>
-        `${t.id}: ${t.title?.replace(/\n/g, " ") || "No Title"} (${t.url || "about:blank"})`,
+        `${t.id}${t.pinned ? "  " : ""} [${t.title?.replace(/\n/g, " ") || "No Title"}](${t.url || "about:blank"})`,
     );
 
     const mktemp = await glide.process.execute("mktemp", [
@@ -612,10 +612,12 @@ const bulk_tab_close = glide.excmds.create(
     try {
       const { exit_code } = await (
         await glide.process.execute("open", [
-          "-Wna",
-          "Ghostty",
+          "-W",
+          "-n",
+          "-b",
+          "com.mitchellh.ghostty",
           "--args",
-          `--command=${glide.env.get("SHELL")!} -c 'nvim --cmd "lua vim.g.shell_command_editor = true" "${tmp}"'`,
+          `--command=${glide.env.get("SHELL")!} -c 'nvim --cmd "lua vim.g.shell_command_editor = true" -c "setl ft=markdown" -c "setl cole=0" -c "lua vim.diagnostic.enable(false, { bufnr = 0 })" "${tmp}"'`,
           "--quit-after-last-window-closed=true",
         ])
       ).wait();
@@ -627,7 +629,7 @@ const bulk_tab_close = glide.excmds.create(
         edited
           .split("\n")
           .filter(Boolean)
-          .map((l) => Number(l.split(":")[0])),
+          .map((l) => Number(l.split(" ")[0])),
       );
       const to_close = tabs
         .map((t) => t.id)

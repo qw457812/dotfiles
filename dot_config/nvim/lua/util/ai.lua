@@ -5,11 +5,12 @@ local H = {}
 -- https://github.com/farion1231/cc-switch/blob/7fa0a7b16648e99ef956d18c01f686dd50e843ed/src/config/claudeProviderPresets.ts
 M.claude = {
   provider = {
+    ---@type table<string, table<string, string>>
     plan = {
-      anthropic = {
-        ANTHROPIC_BASE_URL = vim.env.CTOK_BASE_URL,
-        ANTHROPIC_AUTH_TOKEN = vim.env.CTOK_AUTH_TOKEN,
-      },
+      anthropic = vim.env.CLAUDE_RELAY_SERVICE_URL and {
+        ANTHROPIC_BASE_URL = vim.env.CLAUDE_RELAY_SERVICE_URL .. "/api",
+        ANTHROPIC_AUTH_TOKEN = vim.env.CLAUDE_RELAY_SERVICE_API_KEY,
+      } or {},
       -- https://www.kimi.com/coding/docs/third-party-agents.html
       -- https://www.kimi.com/membership/subscription
       kimi = {
@@ -17,6 +18,7 @@ M.claude = {
         ANTHROPIC_AUTH_TOKEN = vim.env.KIMI_API_KEY,
       },
     },
+    ---@type table<string, table<string, string>>
     payg = {
       -- https://platform.moonshot.cn/docs/guide/agent-support
       -- https://platform.moonshot.ai/docs/guide/agent-support

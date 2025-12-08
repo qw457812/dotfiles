@@ -291,19 +291,11 @@ if type -q claude
     set -l ccusage (type -q bunx; and echo "bunx ccusage@latest"; or echo "npx -y ccusage@latest")
     abbr ccu "$ccusage"
     abbr ccum "$ccusage daily --breakdown"
-    abbr ccub "$ccusage blocks"
-    if type -q claude-monitor # https://github.com/Maciek-roboblog/Claude-Code-Usage-Monitor
-        abbr ccmr "claude-monitor --view realtime"
-        abbr ccmd "claude-monitor --view daily"
-        abbr ccmm "claude-monitor --view monthly"
-    end
     # alternative:
     # - https://github.com/Fission-AI/OpenSpec
     # - https://github.com/UfoMiao/zcf
     abbr spec "uvx --from git+https://github.com/github/spec-kit.git specify init --script sh --ai claude --here"
     abbr cchistory "npx -y cchistory"
-    abbr ccexp (type -q bunx; and echo "bunx ccexp@latest"; or echo "npx -y ccexp@latest")
-    abbr cctmpl "ANTHROPIC_BASE_URL=$CTOK_BASE_URL ANTHROPIC_AUTH_TOKEN=$CTOK_AUTH_TOKEN npx -y claude-code-templates@latest"
     abbr cck claude_kimi
     abbr cckc "claude_kimi --continue"
     abbr cckcf "claude_kimi --continue --fork-session"
@@ -312,7 +304,7 @@ if type -q claude
     abbr ccg claude_glm
     abbr ccq claude_qwen
     abbr ccm claude_minimax
-    type -q ccr; and abbr ccr "ccr code" # https://github.com/musistudio/claude-code-router
+    # type -q ccr; and abbr ccr "ccr code" # https://github.com/musistudio/claude-code-router
 end
 if type -q codex
     # codex completion fish >~/.config/fish/completions/codex.fish
@@ -324,15 +316,14 @@ end
 if type -q opencode
     abbr oc opencode
     abbr occ 'opencode --continue'
-    abbr ocg 'opencode --model opencode/grok-code'
 end
-if type -q aider
-    abbr ad aider
-    abbr adr 'aider --model r1'
-    abbr adg 'aider --model gemini'
-    abbr adc 'aider --model claude'
-    abbr adp aider_copilot
-end
+# if type -q aider
+#     abbr ad aider
+#     abbr adr 'aider --model r1'
+#     abbr adg 'aider --model gemini'
+#     abbr adc 'aider --model claude'
+#     abbr adp aider_copilot
+# end
 
 # Other
 abbr b "cd -"

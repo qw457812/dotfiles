@@ -7,21 +7,21 @@
   "autoupdate": false,
   // https://opencode.ai/docs/zen/#pricing
   // curl https://opencode.ai/zen/v1/models | jq '.data | sort_by(.created)'
-  "model": "opencode/grok-code",
+  "model": "opencode/big-pickle",
   // "model": "anthropic/claude-sonnet-4-5",
   "small_model": "opencode/grok-code",
   // "small_model": "anthropic/claude-haiku-4-5",
   "agent": {
     "plan": {
-      "model": "opencode/grok-code"
+      "model": "opencode/big-pickle"
       // "model": "anthropic/claude-sonnet-4-5"
     }
   },
   "provider": {
     "anthropic": {
       "options": {
-        "baseURL": "{env:CTOK_BASE_URL_V1}",
-        "apiKey": "{env:CTOK_AUTH_TOKEN}"
+        "baseURL": "{env:CLAUDE_RELAY_SERVICE_URL}/api/v1",
+        "apiKey": "{env:CLAUDE_RELAY_SERVICE_API_KEY}"
       }
     },
     // https://platform.minimax.io/docs/guides/text-ai-coding-tools#use-minimax-m2-in-opencode
@@ -63,7 +63,7 @@
     "exa": {
       "type": "remote",
       "url": "https://mcp.exa.ai/mcp?tools=get_code_context_exa",
-      "enabled": true
+      "enabled": false
     }
   },
   // "tools": {
@@ -74,7 +74,5 @@
     "messages_half_page_up": "ctrl+u",
     "messages_half_page_down": "ctrl+d",
     "editor_open": "ctrl+g"
-    // "history_previous": "up,ctrl+k",
-    // "history_next": "down,ctrl+j,ctrl+n"
   }
 }
