@@ -42,23 +42,21 @@ if (glide.ctx.os === "macosx") {
   glide.env.set("PATH", `/opt/homebrew/bin:${glide.env.get("PATH")}`);
 }
 
-// // TODO: Styles
+// // Styles
 // glide.styles.add(css`
 //   #TabsToolbar {
 //     visibility: collapse !important;
 //   }
 // `);
 
-// // TODO: Preferences
+// Preferences
+glide.prefs.set("browser.uidensity", 1); // compact mode
 // glide.prefs.set("toolkit.legacyUserProfileCustomizations.stylesheets", true);
 // glide.prefs.set("devtools.debugger.prompt-connection", false);
 // glide.prefs.set(
 //   "media.videocontrols.picture-in-picture.audio-toggle.enabled",
 //   true,
 // );
-// // https://github.com/glide-browser/glide/discussions/95#discussioncomment-14814317
-// glide.prefs.set("privacy.trackingprotection.enabled", true);
-// glide.prefs.set("privacy.bounceTrackingProtection.mode", 1);
 
 // Options
 glide.o.hint_size = "12px";

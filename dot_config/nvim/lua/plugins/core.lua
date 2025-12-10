@@ -97,10 +97,18 @@ return {
         },
       },
       scratch = {
+        ft = function()
+          return vim.bo.buftype == "" and vim.bo.filetype == "lua" and "lua" or "markdown"
+        end,
         win = {
           b = {
             user_lualine_filename = "snacks_scratch",
           },
+          on_buf = function(win)
+            if vim.bo[win.buf].filetype == "markdown" then
+              vim.diagnostic.enable(false, { bufnr = win.buf })
+            end
+          end,
         },
       },
       zen = {

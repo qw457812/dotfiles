@@ -154,6 +154,7 @@ Using [emacs-rime](https://github.com/DogLooksGood/emacs-rime) in Doom Emacs and
 TODO:
 
 - [ ] Try [AeroSpace](https://github.com/nikitabobko/AeroSpace).
+- [ ] Try [acsandmann/rift](https://github.com/acsandmann/rift).
 
 ## [zathura](https://github.com/zegervdv/homebrew-zathura)
 
