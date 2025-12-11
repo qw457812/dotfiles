@@ -1,6 +1,65 @@
 ---@class util.git
 local M = {}
 
+---@class user.util.git.repo.Opts
+---@field path? number|string buffer or path
+---@field patterns? string[] host patterns to match
+---@field fallback_local? boolean fallback to local git root directory name if no remote matches
+
+-- ref: https://github.com/folke/snacks.nvim/blob/50436373c277906cf40e47380f3dc1bd7769a885/lua/snacks/gh/api.lua#L464-L495
+---@param opts? user.util.git.repo.Opts
+---@return string?
+function M.repo(opts)
+  opts = vim.tbl_deep_extend("force", {
+    path = 0,
+    -- https://github.com/folke/snacks.nvim/blob/a4664298ba6669ec14f704b9602339f448bd45c9/lua/snacks/gitbrowse.lua#L51-L76
+    patterns = { "github%.com", "gitlab[^/]*", "codeberg%.org" },
+    fallback_local = false,
+  }, opts or {}) --[[@as user.util.git.repo.Opts]]
+
+  local buf = vim.fn.bufnr(opts.path)
+  if buf ~= -1 and vim.b[buf].snacks_gh then
+    return vim.b[buf].snacks_gh.repo
+  end
+
+  local git_root = Snacks.git.get_root(opts.path)
+  if not git_root then
+    return
+  end
+
+  local git_config = vim.fn
+    .system({ "git", "-C", git_root, "config", "--get-regexp", "^remote\\.(upstream|origin)\\.url" })
+    :gsub("\n$", "")
+
+  local cfg = {} ---@type table<string, string>
+  for _, line in ipairs(vim.split(git_config, "\n")) do
+    local key, value = line:match("^([^%s]+)%s+(.+)$")
+    if key then
+      cfg[key] = value
+    end
+  end
+
+  ---@param url? string
+  ---@return string?
+  local function parse(url)
+    if not url then
+      return
+    end
+    for _, p in ipairs(opts.patterns) do
+      local repo = url:match(p .. "[:/](.+/.+)%.git") or url:match(p .. "[:/](.+/.+)$")
+      if repo then
+        return repo
+      end
+    end
+  end
+
+  local repo = parse(cfg["remote.upstream.url"]) or parse(cfg["remote.origin.url"])
+  if not repo and opts.fallback_local then
+    repo = vim.fn.fnamemodify(git_root, ":t")
+  end
+  return repo
+end
+
 ---@class user.util.git.diff.term.Opts: snacks.terminal.Opts
 ---@field args? string[] additional arguments to pass to `git`
 ---@field cmd_args? string[] additional arguments to pass to the `git <cmd>``

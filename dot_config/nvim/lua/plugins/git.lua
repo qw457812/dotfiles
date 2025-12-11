@@ -302,38 +302,9 @@ return {
         return keys
       end
 
-      -- ref: https://github.com/folke/snacks.nvim/blob/50436373c277906cf40e47380f3dc1bd7769a885/lua/snacks/gh/api.lua#L464-L495
-      ---@param cwd? string
       ---@return string?
-      local function repo(cwd)
-        if vim.b.snacks_gh and not cwd then
-          return vim.b.snacks_gh.repo
-        end
-
-        local git_root = Snacks.git.get_root(cwd)
-        if not git_root then
-          return
-        end
-
-        local git_config = vim.fn
-          .system({ "git", "-C", git_root, "config", "--get-regexp", "^remote\\.(upstream|origin)\\.url" })
-          :gsub("\n$", "")
-
-        local cfg = {} ---@type table<string, string>
-        for _, line in ipairs(vim.split(git_config, "\n")) do
-          local key, value = line:match("^([^%s]+)%s+(.+)$")
-          if key then
-            cfg[key] = value
-          end
-        end
-
-        ---@param u? string
-        ---@return string?
-        local function parse(u)
-          return u and (u:match("github%.com[:/](.+/.+)%.git") or u:match("github%.com[:/](.+/.+)$")) or nil
-        end
-
-        return parse(cfg["remote.upstream.url"]) or parse(cfg["remote.origin.url"])
+      local function repo()
+        return U.git.repo({ patterns = { "github%.com" } })
       end
 
       -- stylua: ignore
