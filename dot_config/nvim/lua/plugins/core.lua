@@ -31,6 +31,27 @@ return {
       {
         "<leader>ft",
         function()
+          local buf, file = U.last_file(false)
+          local repo = U.git.repo({ path = file, fallback_local = true })
+            or U.path.home_to_tilde(LazyVim.root({ buf = buf }))
+          -- https://github.com/folke/snacks.nvim/blob/a2716102c8bd7d25693201af0942552f10e9a0c3/lua/snacks/gh/actions.lua#L933-L945
+          Snacks.scratch({
+            ft = "markdown",
+            icon = " ",
+            name = ("Todo (%s)"):format(repo),
+            filekey = {
+              cwd = false,
+              branch = false,
+              count = false,
+              id = repo,
+            },
+          })
+        end,
+        desc = "Todo List",
+      },
+      {
+        "<leader>fT",
+        function()
           Snacks.scratch({ icon = " ", name = "Todo", ft = "markdown", file = "~/TODO.md" })
         end,
         desc = "Todo List",

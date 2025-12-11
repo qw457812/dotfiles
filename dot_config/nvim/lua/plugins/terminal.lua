@@ -23,9 +23,8 @@ return {
 
       -- TODO: terminals picker, see: https://github.com/folke/snacks.nvim/pull/2276
       return vim.list_extend(keys, {
-        -- stylua: ignore
-        { "<leader>fT", function() U.terminal() end, desc = "Terminal (cwd)" },
         -- { "<leader>ft", function() U.terminal(nil, { cwd = LazyVim.root() }) end, desc = "Terminal (Root Dir)" },
+        -- { "<leader>fT", function() U.terminal() end, desc = "Terminal (cwd)" },
         {
           "<c-space>",
           function()
