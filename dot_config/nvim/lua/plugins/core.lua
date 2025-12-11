@@ -121,15 +121,32 @@ return {
         ft = function()
           return vim.bo.buftype == "" and vim.bo.filetype == "lua" and "lua" or "markdown"
         end,
+        autowrite = false, -- setup autowrite on our own to avoid writing empty files
         win = {
+          on_buf = function(win)
+            local buf = assert(win.buf)
+            -- copied from: https://github.com/folke/snacks.nvim/blob/3c5c23ba91e608bd89bb36d76cb005aa63d20dbf/lua/snacks/scratch.lua#L218-L229
+            vim.api.nvim_create_autocmd("BufHidden", {
+              group = vim.api.nvim_create_augroup("snacks_scratch_autowrite_" .. buf, { clear = true }),
+              buffer = buf,
+              callback = function(ev)
+                if not vim.bo[ev.buf].modified then
+                  return -- avoid writing empty files
+                end
+                vim.api.nvim_buf_call(ev.buf, function()
+                  vim.cmd("silent! write")
+                  vim.bo[ev.buf].buflisted = false
+                end)
+              end,
+            })
+
+            if vim.bo[buf].filetype == "markdown" then
+              vim.diagnostic.enable(false, { bufnr = buf })
+            end
+          end,
           b = {
             user_lualine_filename = "snacks_scratch",
           },
-          on_buf = function(win)
-            if vim.bo[win.buf].filetype == "markdown" then
-              vim.diagnostic.enable(false, { bufnr = win.buf })
-            end
-          end,
         },
       },
       zen = {
