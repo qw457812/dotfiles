@@ -94,7 +94,7 @@ return {
         { "<leader>co", function() require("metals").organize_imports() end, desc = "Organize Imports (Metals)" },
         { "<leader>im", function() require("metals").info() end, desc = "Metals" },
         { "<leader>m", "", desc = "+metals" },
-        -- NOTE: need to run `:MetalsUpdate` to update (re-install) to the latest stable version or `opts.servers.metals.settings.serverVersion` of metals (~/.cache/nvim/nvim-metals/metals)
+        -- NOTE: need to run `:MetalsUpdate` to update (re-install) to the latest stable version or `opts.servers.metals.settings.serverVersion` of metals (~/.cache/nvim/nvim-metals/metals --version)
         { "<leader>mu", "<cmd>MetalsUpdate<cr>", desc = "Update Metals" },
         { "<leader>mm", function() require("metals").commands() end, desc = "Commands" },
         { "<leader>me", false },
