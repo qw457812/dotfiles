@@ -163,11 +163,11 @@ return {
             hide_toggle_key = { sidekick_cli_toggle_key, "hide", mode = "nt" },
             down_ctrl_j = not vim.g.user_is_termux and { "<c-j>", "<Down>" } or false, -- this overrides the window navigation
             up_ctrl_k = not vim.g.user_is_termux and { "<c-k>", "<Up>" } or false, -- this overrides the window navigation
-            down_ctrl_n = { "<c-n>", "<Down>" },
-            up_ctrl_p = { "<c-p>", "<Up>" },
-            prompt = { "<a-p>", "prompt" },
-            buffers = { "<a-b>", "buffers", mode = "nt" },
-            files = { "<a-f>", "files", mode = "nt" },
+            -- down_ctrl_n = { "<c-n>", "<Down>" },
+            -- up_ctrl_p = { "<c-p>", "<Up>" },
+            -- prompt = { "<a-p>", "prompt" }, -- claude code uses <a-p> for its own functionality
+            -- buffers = { "<a-b>", "buffers", mode = "nt" },
+            -- files = { "<a-f>", "files", mode = "nt" },
             blur_t = { "<c-o>", "blur" },
             blur_n = { "<c-o>", "blur", mode = "n" },
             -- blur_esc = {
@@ -230,7 +230,8 @@ return {
               NVIM_FLATTEN_NEST = "1",
             },
             keys = {
-              up_ctrl_p = false, -- opencode uses <c-p> for its own functionality
+              prompt = false, -- opencode uses <c-p> for its own functionality
+              -- up_ctrl_p = false, -- opencode uses <c-p> for its own functionality
             },
           },
           -- HACK: disable some installed tools

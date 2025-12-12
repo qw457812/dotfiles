@@ -20,23 +20,28 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   COLOR_GREEN=$(printf '\033[32m')
   COLOR_RESET=$(printf '\033[0m')
 
+  context_window_size=$(echo "$input" | jq -r '.context_window.context_window_size // 200000')
   transcript_path=$(echo "$input" | jq -r '.transcript_path // ""')
-
   # cwd=$(echo "$input" | jq -r '.workspace.current_dir // .cwd')
 
   # model (hidden if Sonnet)
   model=$(echo "$input" | jq -r '(.model.display_name // "") | .[0:1] | ascii_upcase')
   model_display=$([ "$model" != "S" ] && echo "${COLOR_RED}${model}${COLOR_RESET}")
 
-  # tokens
+  # tokens (from transcript)
   total_tokens=$(cat "$transcript_path" 2>/dev/null | jq -s '
     [.[] | select(.type == "assistant") | .message.usage] | last |
     (.input_tokens // 0) + (.cache_creation_input_tokens // 0) + (.cache_read_input_tokens // 0) + (.output_tokens // 0)
   ' || echo 0)
   total_tokens_display="${COLOR_BLUE}$(awk -v t="$total_tokens" 'BEGIN {printf "%.1fk", t/1000}')${COLOR_RESET}"
+  # context usage (from transcript)
+  context_percentage_display="${COLOR_CYAN}$(awk -v t="$total_tokens" -v s="$context_window_size" 'BEGIN {printf "%.1f%%", t*100/s}')${COLOR_RESET}"
 
-  # context usage
-  context_percentage_display="${COLOR_CYAN}$(awk -v t="$total_tokens" 'BEGIN {printf "%.1f%%", t*100/200000}')${COLOR_RESET}"
+  # tokens (from context_window)
+  cw_total_tokens=$(echo "$input" | jq -r '(.context_window.total_input_tokens // 0) + (.context_window.total_output_tokens // 0)')
+  cw_total_tokens_display="${COLOR_BLUE}$(awk -v t="$cw_total_tokens" 'BEGIN {printf "%.1fk", t/1000}')${COLOR_RESET}"
+  # context usage (from context_window)
+  cw_context_percentage_display="${COLOR_CYAN}$(awk -v t="$cw_total_tokens" -v s="$context_window_size" 'BEGIN {printf "%.1f%%", t*100/s}')${COLOR_RESET}"
 
   # session duration (hidden if < 1 min)
   session_duration=$(echo "$input" | jq -r '.cost.total_duration_ms // 0' | awk '{
@@ -59,7 +64,7 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   starship_prompt=$(STARSHIP_CONFIG="$HOME/.config/starship-statusline.toml" STARSHIP_SHELL="" starship prompt | tr -d '\n')
 
   # empty segments are skipped by xargs
-  printf '%s\n' "$model_display" "$total_tokens_display" "$context_percentage_display" "$session_duration_display" "$session_cost_display" "$today_cost_display" "$starship_prompt" | xargs
+  printf '%s\n' "$model_display" "$total_tokens_display" "$context_percentage_display" "$cw_total_tokens_display" "$cw_context_percentage_display" "$session_duration_display" "$session_cost_display" "$today_cost_display" "$starship_prompt" | xargs
   exit 0
 fi
 
