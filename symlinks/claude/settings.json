@@ -47,6 +47,7 @@
       "Bash(npm list:*)"
     ]
   },
+  "model": "opus",
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh",
@@ -55,6 +56,5 @@
   "alwaysThinkingEnabled": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754043197597
-  },
-  "model": "opus"
+  }
 }
