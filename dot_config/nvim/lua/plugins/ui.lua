@@ -69,6 +69,8 @@ return {
     optional = true,
     keys = function(_, keys)
       local mappings = {
+        { "<S-h>", false },
+        { "<S-l>", false },
         {
           "]b",
           function()

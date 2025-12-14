@@ -36,10 +36,10 @@ vim.api.nvim_create_autocmd("CmdWinEnter", {
 safe_map({ "n", "x" }, "l", U.keymap.foldopen_l, { desc = "Right" }) -- nvim-origami
 
 -- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/keybindings.lua#L19
-map({ "n", "x" }, "H", "&wrap ? 'g^' : '0^'", { desc = "Goto line start", expr = true }) -- use 0^ to scroll fully to the left
+safe_map({ "n", "x" }, "H", "&wrap ? 'g^' : '0^'", { desc = "Goto line start", expr = true }) -- nvim-origami, use 0^ to scroll fully to the left
 map("o", "H", "&wrap ? 'g^' : '^'", { desc = "Goto line start", expr = true })
 -- map("n", "L", "foldclosed('.') != -1 ? 'zO' : v:count ? '$' : &wrap ? 'g$' : '$'", { desc = "Goto line end", expr = true })
-map("n", "L", "(v:count ? '$' : &wrap ? 'g$' : '$').'zv'", { desc = "Goto line end", expr = true })
+safe_map("n", "L", "(v:count ? '$' : &wrap ? 'g$' : '$').'zv'", { desc = "Goto line end", expr = true }) -- nvim-origami
 map("o", "L", "v:count ? '$' : &wrap ? 'g$' : '$'", { desc = "Goto line end", expr = true })
 -- TODO: to the last non-blank character of the line when wrapped
 -- stylua: ignore

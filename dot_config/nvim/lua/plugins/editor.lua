@@ -794,6 +794,35 @@ return {
           end,
           desc = "Right (Origami)",
         },
+        -- https://github.com/chrisgrieser/nvim-origami/blob/d79851b880ebe44543bc4e247b6fc2a8ef95b624/lua/origami/features/fold-keymaps.lua#L30-L39
+        {
+          "H",
+          function()
+            ---Whether the cursor is at the first non-blank character of the line
+            ---@return boolean
+            local function at_caret()
+              return vim.api.nvim_win_get_cursor(0)[2] == #(vim.api.nvim_get_current_line():match("^%s*") or "")
+            end
+            if at_caret() and vim.fn.foldlevel(".") > 0 then
+              return "zC"
+            end
+            return vim.wo.wrap and "g^" or "0^"
+          end,
+          expr = true,
+          desc = "Goto line start (Origami)",
+        },
+        -- https://github.com/chrisgrieser/nvim-origami/blob/d79851b880ebe44543bc4e247b6fc2a8ef95b624/lua/origami/features/fold-keymaps.lua#L52-L56
+        {
+          "L",
+          function()
+            if vim.fn.foldclosed(".") ~= -1 then
+              return "zO"
+            end
+            return vim.v.count > 0 and "$" or vim.wo.wrap and "g$" or "$"
+          end,
+          expr = true,
+          desc = "Goto line end (Origami)",
+        },
         {
           "<leader>iF",
           function()
