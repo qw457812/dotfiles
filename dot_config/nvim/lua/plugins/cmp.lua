@@ -193,6 +193,15 @@ return {
             end,
             "fallback",
           },
+          ["<Right>"] = {
+            LazyVim.cmp.map({ "ai_accept" }), -- when there's an active snippet, we use <right> to accept the AI inline suggestion since <tab> is used for snippet jumping
+            function(cmp)
+              if cmp.is_ghost_text_visible() then
+                return cmp.select_and_accept()
+              end
+            end,
+            "fallback",
+          },
           ["<CR>"] = { "accept", H.actions.pum_accept, "fallback" },
           ["<C-e>"] = { "cancel", H.actions.mini_snippets_stop, "fallback" },
           ["<C-n>"] = { "select_next", "show" },
@@ -242,7 +251,6 @@ return {
             },
             ["<Right>"] = {
               function(cmp)
-                -- TODO: fix H.cmdline_actions.is_inserted for cmdwin
                 if cmp.is_ghost_text_visible() and not H.cmdline_actions.is_inserted(cmp) then
                   return cmp.select_and_accept()
                 end
