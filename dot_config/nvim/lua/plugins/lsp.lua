@@ -51,7 +51,7 @@ return {
               enabled = function() return not LazyVim.has("nvim-ufo") end,
             },
             { "<c-k>", mode = "i", false }, -- <c-k> for cmp navigation
-            { "<c-h>", function() return vim.lsp.buf.signature_help() end, mode = "i", desc = "Signature Help", has = "signatureHelp" }, -- can conflict with mini.snippets
+            { "<M-space>", function() return vim.lsp.buf.signature_help() end, mode = "i", desc = "Signature Help", has = "signatureHelp" },
             {
               "<cr>",
               U.lsp.pick_definitions_or_references,
