@@ -114,9 +114,12 @@ glide.keymaps.set(
 );
 glide.keymaps.set("normal", "yf", () => {
   glide.hints.show({
-    action: async (target) => {
-      if ("href" in target && typeof target.href === "string") {
-        navigator.clipboard.writeText(target.href);
+    action: async ({ content }) => {
+      const href = await content.execute((el) =>
+        "href" in el && typeof el.href === "string" ? el.href : null,
+      );
+      if (href) {
+        navigator.clipboard.writeText(href);
       }
     },
   });
@@ -193,21 +196,18 @@ glide.keymaps.set("normal", "`", async () => {
     await browser.tabs.update(previousTabId, { active: true });
   }
 });
-// TODO: `>>` and `<<`
-glide.keymaps.set("normal", "q", async ({ tab_id }) => {
+glide.keymaps.set("normal", "<<", async ({ tab_id }) => {
   const tab = await browser.tabs.get(tab_id);
   if (tab.index > 0) {
     await browser.tabs.move(tab_id, { index: tab.index - 1 });
   }
 });
-glide.keymaps.set(
-  "normal",
-  "w",
-  when_editing("motion w", async ({ tab_id }) => {
-    const tab = await browser.tabs.get(tab_id);
-    await browser.tabs.move(tab_id, { index: tab.index + 1 });
-  }),
-);
+glide.keymaps.set("normal", ">>", async ({ tab_id }) => {
+  const tab = await browser.tabs.get(tab_id);
+  await browser.tabs.move(tab_id, { index: tab.index + 1 });
+});
+glide.keymaps.set("normal", "q", "keys <<");
+glide.keymaps.set("normal", "w", when_editing("motion w", "keys >>"));
 glide.keymaps.set("normal", "U", "redo");
 glide.keymaps.set("normal", "<BS>", "tab_close");
 glide.keymaps.set("normal", "<S-BS>", async () => {
@@ -312,8 +312,29 @@ glide.keymaps.set(
   async ({ tab_id }) => glide.unstable.split_views.separate(tab_id),
   { description: "Close split view" },
 );
+glide.keymaps.set(
+  "normal",
+  "<C-w>f",
+  async ({ tab_id }) => {
+    glide.hints.show({
+      action: async ({ content }) => {
+        const href = await content.execute((el) =>
+          "href" in el && typeof el.href === "string" ? el.href : null,
+        );
+        if (href) {
+          const new_tab = await browser.tabs.create({ url: href });
+          if (new_tab.id) {
+            glide.unstable.split_views.create([tab_id, new_tab.id]);
+          }
+        }
+      },
+    });
+  },
+  { description: "Open link in split view" },
+);
 glide.keymaps.set("normal", "<leader>wv", "keys <C-w>v");
 glide.keymaps.set("normal", "<leader>wd", "keys <C-w>d");
+glide.keymaps.set("normal", "<leader>wf", "keys <C-w>f");
 glide.keymaps.set("normal", "<leader>sk", "map");
 glide.keymaps.set("normal", "<leader>un", "clear");
 glide.keymaps.set("normal", "<leader>g,", "tab_new about:settings");
