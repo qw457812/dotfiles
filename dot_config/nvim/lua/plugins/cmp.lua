@@ -86,11 +86,11 @@ return {
           end
           return true -- no way to know whether expansion happened or not
         end,
-        mini_snippets_stop = function()
-          if not (_G.MiniSnippets and MiniSnippets.session.get()) then
+        snippet_stop = function()
+          if not LazyVim.cmp.actions.snippet_active() then
             return
           end
-          vim.schedule(MiniSnippets.session.stop)
+          vim.schedule(LazyVim.cmp.actions.snippet_stop)
           return true
         end,
         -- see: https://github.com/Saghen/blink.cmp/issues/569#issuecomment-2833362734
@@ -203,7 +203,15 @@ return {
             "fallback",
           },
           ["<CR>"] = { "accept", H.actions.pum_accept, "fallback" },
-          ["<C-e>"] = { "cancel", H.actions.mini_snippets_stop, "fallback" },
+          ["<C-e>"] = {
+            "cancel",
+            function(cmp)
+              if _G.MiniSnippets and MiniSnippets.session.get() then
+                return H.actions.snippet_stop(cmp)
+              end
+            end,
+            "fallback",
+          },
           ["<C-n>"] = { "select_next", "show" },
           ["<C-p>"] = { "select_prev", "show" },
           ["<C-j>"] = { "select_next", H.actions.pum_next, "fallback" },

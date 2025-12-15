@@ -139,5 +139,13 @@ return {
   },
 
   -- TODO: breaking changes
+  --
+  -- migrate to v18:
+  -- * https://github.com/olimorris/codecompanion.nvim/pull/2439
+  -- * https://github.com/olimorris/codecompanion.nvim/discussions/2465
+  { "olimorris/codecompanion.nvim", optional = true, commit = "8ad65ee" },
+  { "ravitemer/codecompanion-history.nvim", lazy = true, optional = true, commit = "eb99d25" },
+  --
+  -- `textobjects.scm` query files with `nvim-treesitter/nvim-treesitter-textobjects`
   { "chrisgrieser/nvim-various-textobjs", optional = true, commit = "bf2133a" },
 }

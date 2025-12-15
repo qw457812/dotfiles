@@ -286,7 +286,7 @@ if type -q claude
     abbr clh "claude --model haiku"
     abbr cls "claude --model sonnet"
     abbr clo "claude --model opus"
-    abbr clgc "claude --model sonnet 'commit only the staged changes'"
+    abbr clgc "claude --model haiku 'commit only the staged changes'"
     abbr ccstl (type -q bunx; and echo "bunx ccstatusline@latest"; or echo "npx -y ccstatusline@latest")
     set -l ccusage (type -q bunx; and echo "bunx ccusage@latest"; or echo "npx -y ccusage@latest")
     abbr ccu "$ccusage"

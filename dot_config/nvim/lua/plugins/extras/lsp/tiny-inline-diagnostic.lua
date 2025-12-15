@@ -45,6 +45,9 @@ return {
           --   display_count = true, -- when `opts.options.multilines.enabled = true`
           --   -- show_multiple_glyphs = false, -- when `opts.options.multilines.enabled = true`
           -- },
+          experimental = {
+            use_window_local_extmarks = true,
+          },
         },
       }
     end,

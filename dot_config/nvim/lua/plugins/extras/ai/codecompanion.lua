@@ -58,7 +58,6 @@ return {
       { "<leader>ann", "<cmd>CodeCompanionChat<CR>", desc = "New Chat", mode = { "n", "x" } },
       { "<leader>anc", "<cmd>CodeCompanionChat claude_code<CR>", desc = "Claude Code ACP", mode = { "n", "x" } },
       { "<leader>anp", "<cmd>CodeCompanionChat copilot<CR>", desc = "Copilot", mode = { "n", "x" } },
-      { "<leader>an5", "<cmd>CodeCompanionChat copilot_gpt_5<CR>", desc = "Copilot GPT-5", mode = { "n", "x" } },
       {
         "<leader>ans",
         "<cmd>CodeCompanionChat copilot_claude<CR>",
@@ -78,17 +77,6 @@ return {
                 model = {
                   -- https://docs.github.com/en/copilot/concepts/billing/copilot-requests#model-multipliers
                   default = "claude-sonnet-4.5",
-                },
-              },
-            })
-          end,
-          copilot_gpt_5 = function()
-            return require("codecompanion.adapters").extend("copilot", {
-              name = "copilot_gpt_5",
-              formatted_name = "Copilot GPT-5",
-              schema = {
-                model = {
-                  default = "gpt-5",
                 },
               },
             })

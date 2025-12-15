@@ -10,20 +10,20 @@ local safe_map = U.keymap.safe_map
 local del = U.keymap.del
 
 -- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/keybindings.lua#L234
-safe_map("n", "<cr>", function()
+safe_map("n", "<cr>", function() -- sidekick.nvim
   return vim.fn.pumvisible() == 1 and "<cr>" or "gd"
 end, { expr = true, desc = "Goto local Declaration" })
 -- restore default behavior of `<cr>`, which is overridden by my mapping above
 -- https://github.com/nvim-mini/mini.jump2d/blob/5ff749990336e67195724d1dcddfea4e50057a19/lua/mini/jump2d.lua#L781-L786
 vim.api.nvim_create_autocmd("FileType", {
   pattern = { "qf", "neo-tree-popup" },
-  callback = function(event)
-    map("n", "<cr>", "<cr>", { buffer = event.buf })
+  callback = function(ev)
+    map("n", "<cr>", "<cr>", { buffer = ev.buf })
   end,
 })
 vim.api.nvim_create_autocmd("CmdWinEnter", {
-  callback = function(event)
-    map("n", "<cr>", "<cr>", { buffer = event.buf })
+  callback = function(ev)
+    map("n", "<cr>", "<cr>", { buffer = ev.buf })
   end,
 })
 
@@ -76,7 +76,10 @@ safe_map("n", "U", "<C-r>", { desc = "Redo" }) -- undo-glow.nvim
 map("n", "<C-r>", "<cmd>edit<cr>", { desc = "Reload File" })
 map("n", "<leader>U", "U", { desc = "Undo all changes on one line" })
 
-safe_map({ "n", "x" }, "u", function()
+safe_map({ "n", "x" }, "u", function() -- undo-glow.nvim
+  if _G.MiniSnippets then
+    vim.schedule(MiniSnippets.session.stop) -- stop mini.snippets on undo
+  end
   return vim.bo.modifiable == false and "<C-u>" or "u"
 end, { expr = true, desc = "Undo or Scroll Up" })
 map({ "n", "x" }, "d", function()
@@ -92,8 +95,8 @@ end, { expr = true, desc = "Don't Yank Empty Line to Clipboard" })
 map("n", "i", U.keymap.indented_i, { desc = "Indented i on Empty Line" })
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "neo-tree-popup",
-  callback = function(event)
-    map("n", "i", "i", { buffer = event.buf })
+  callback = function(ev)
+    map("n", "i", "i", { buffer = ev.buf })
   end,
 })
 
@@ -113,7 +116,7 @@ if vim.g.user_distinguish_ctrl_i_tab then
   -- See `:h tui-input`
   map({ "n", "i", "c", "v", "o", "t" }, "<M-i>", "<C-i>", { desc = "<C-i>" })
   -- candidates: "<C-w>w", "za", ">>"
-  safe_map("n", "<tab>", "<C-w>w", { desc = "Next Window", remap = true }) -- copilotlsp-nvim/copilot-lsp
+  safe_map("n", "<tab>", "<C-w>w", { desc = "Next Window", remap = true }) -- copilot-lsp, sidekick.nvim
   map("n", "<S-tab>", "<C-w>W", { desc = "Prev Window", remap = true })
 end
 
