@@ -128,8 +128,8 @@ require("lazy").setup({
         function(plugin)
           local gh_repo = plugin.url:match("github%.com[:/](.+/.+)%.git") or plugin.url:match("github%.com[:/](.+/.+)$")
           if gh_repo and LazyVim.pick.picker.name == "snacks" then
-            -- normalize mini.* and mini-* repos to mini.nvim
-            gh_repo = gh_repo:gsub("^(nvim%-mini/mini)[%.%-].+$", "%1.nvim")
+            -- normalize mini.* and mini-git repos to mini.nvim
+            gh_repo = gh_repo:match("^nvim%-mini/mini[%.%-]") and "nvim-mini/mini.nvim" or gh_repo
             local win = vim.api.nvim_get_current_win()
             Snacks.picker.gh_issue({
               repo = gh_repo,
@@ -152,7 +152,7 @@ require("lazy").setup({
         function(plugin)
           local gh_repo = plugin.url:match("github%.com[:/](.+/.+)%.git") or plugin.url:match("github%.com[:/](.+/.+)$")
           if gh_repo and LazyVim.pick.picker.name == "snacks" then
-            gh_repo = gh_repo:gsub("^(nvim%-mini/mini)[%.%-].+$", "%1.nvim")
+            gh_repo = gh_repo:match("^nvim%-mini/mini[%.%-]") and "nvim-mini/mini.nvim" or gh_repo
             local win = vim.api.nvim_get_current_win()
             Snacks.picker.gh_pr({
               repo = gh_repo,

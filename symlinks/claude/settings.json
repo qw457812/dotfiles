@@ -47,14 +47,17 @@
       "Bash(npm list:*)"
     ]
   },
+  "model": "opus",
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh",
     "padding": 0
   },
-  "alwaysThinkingEnabled": true,
+  "enabledPlugins": {
+    "feature-dev@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true
+  },
   "feedbackSurveyState": {
     "lastShownTime": 1754043197597
-  },
-  "model": "opus"
+  }
 }

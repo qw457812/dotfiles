@@ -60,6 +60,25 @@ return {
     },
   },
 
+  -- {
+  --   "esmuellert/vscode-diff.nvim",
+  --   dependencies = "MunifTanjim/nui.nvim",
+  --   cmd = "CodeDiff",
+  --   opts = {
+  --     keymaps = {
+  --       view = {
+  --         next_hunk = "]h",
+  --         prev_hunk = "[h",
+  --         next_file = "J",
+  --         prev_file = "K",
+  --       },
+  --       explorer = {
+  --         hover = "gk",
+  --       },
+  --     },
+  --   },
+  -- },
+
   -- for java projects using JDK version older than 21, 1.8 in my case
   {
     "mfussenegger/nvim-jdtls",

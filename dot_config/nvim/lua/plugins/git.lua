@@ -123,6 +123,7 @@ return {
         --   end,
         --   desc = "Git Diff Staged Buffer",
         -- },
+        -- TODO: buffer-local mapping for U.git.diff_term({ staged = true }): commit, amend, fixup_rebase
         { "<leader>gA", function() U.git.diff_term({ staged = true, ignore_space = true }) end, desc = "Git Diff Staged (ignore space)" },
         { "<leader>gs", function() Snacks.picker.git_status({ cwd = LazyVim.root.git() }) end, desc = "Git Status" },
         { "<leader>gS", function() Snacks.picker.git_stash({ cwd = LazyVim.root.git() }) end, desc = "Git Stash" },
@@ -294,84 +295,65 @@ return {
     end,
   },
 
-  -- fixup
+  -- fixup + rebase
   {
     "folke/snacks.nvim",
     -- TODO: map leader-gF to check U.git.diff_term first then open git_log picker
     ---@param opts snacks.Config
     opts = function(_, opts)
-      ---@type snacks.picker.Action.fn
-      local function fixup_rebase(picker, item)
-        if not item then
-          return
-        end
-
-        local commit, cwd = item.commit, item.cwd
-        U.git.diff_term({
-          staged = true,
-          on_diff = vim.schedule_wrap(function(has_diff)
-            if not has_diff then
+      ---@type snacks.picker.Config
+      local git_log = {
+        actions = {
+          fixup_rebase = function(picker, item)
+            if not item then
               return
             end
 
-            Snacks.picker.util.cmd({ "git", "commit", "--fixup", commit }, function()
-              Snacks.picker.util.cmd({ "git", "rebase", "-i", "--autosquash", commit .. "~1" }, function()
-                if picker then
-                  picker:refresh()
+            local commit, cwd = item.commit, item.cwd
+
+            U.git.diff_term({
+              cwd = cwd,
+              staged = true,
+              on_diff = vim.schedule_wrap(function(has_diff)
+                if not has_diff then
+                  return
                 end
-              end, { cwd = cwd, env = { GIT_SEQUENCE_EDITOR = ":" } })
-            end, { cwd = cwd })
-          end),
-          win = {
-            width = 100,
-            height = 30,
-          },
-        })
-      end
+
+                local function refresh()
+                  if picker then
+                    picker:refresh()
+                  end
+                end
+
+                Snacks.picker.util.cmd({ "git", "commit", "--fixup", commit }, function()
+                  refresh() -- show fixup commit if rebase fails below
+
+                  Snacks.picker.util.cmd(
+                    { "git", "rebase", "--autostash", "-i", "--autosquash", commit .. "~1" },
+                    refresh,
+                    { cwd = cwd, env = { GIT_SEQUENCE_EDITOR = ":" } }
+                  )
+                end, { cwd = cwd })
+              end),
+              win = {
+                width = 0.5,
+                height = 0.4,
+              },
+            })
+          end,
+        },
+        win = {
+          input = { keys = { ["<localleader>f"] = "fixup_rebase" } },
+          list = { keys = { ["<localleader>f"] = "fixup_rebase" } },
+        },
+      }
 
       return U.extend_tbl(opts, {
         picker = {
           sources = {
-            -- TODO: refactor to avoid duplication
-            git_log = {
-              actions = {
-                fixup_rebase = fixup_rebase,
-              },
-              win = {
-                input = {
-                  keys = { ["<localleader>f"] = "fixup_rebase" },
-                },
-                list = {
-                  keys = { ["<localleader>f"] = "fixup_rebase" },
-                },
-              },
-            },
-            git_log_file = {
-              actions = {
-                fixup_rebase = fixup_rebase,
-              },
-              win = {
-                input = {
-                  keys = { ["<localleader>f"] = "fixup_rebase" },
-                },
-                list = {
-                  keys = { ["<localleader>f"] = "fixup_rebase" },
-                },
-              },
-            },
-            git_log_line = {
-              actions = {
-                fixup_rebase = fixup_rebase,
-              },
-              win = {
-                input = {
-                  keys = { ["<localleader>f"] = "fixup_rebase" },
-                },
-                list = {
-                  keys = { ["<localleader>f"] = "fixup_rebase" },
-                },
-              },
-            },
+            git_log = git_log,
+            git_log_file = git_log,
+            git_log_line = git_log,
           },
         },
       } --[[@as snacks.Config]])
@@ -594,6 +576,7 @@ return {
 
   {
     "nvim-mini/mini-git",
+    cmd = "Git",
     keys = function()
       ---@param amend? boolean
       local function commit(amend)
@@ -610,7 +593,7 @@ return {
 
               -- HACK: sometimes the gitcommit buffer is opened but not focused
               if vim.bo.filetype ~= "gitcommit" then
-                LazyVim.info("Focusing gitcommit buffer", { title = "Git Commit" })
+                -- LazyVim.info("Focusing gitcommit buffer", { title = "Git Commit" })
                 for _, buf in ipairs(vim.api.nvim_list_bufs()) do
                   if vim.bo[buf].filetype == "gitcommit" then
                     vim.api.nvim_set_current_buf(buf)
