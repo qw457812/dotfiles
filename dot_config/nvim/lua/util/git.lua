@@ -89,11 +89,33 @@ function M.diff_term(opts)
     win = {
       height = U.snacks.win.fullscreen_height,
       width = 0,
+      zindex = (vim.api.nvim_win_get_config(0).zindex or 50) + 1,
       b = {
         user_lualine_filename = "diff",
       },
     },
   } --[[@as user.util.git.diff.term.Opts]], opts)
+
+  -- for `opts.on_diff`
+  local on_diff, has_diff, aborted = opts.on_diff, true, false
+  if on_diff then
+    ---@type user.util.git.diff.term.Opts
+    opts = vim.tbl_deep_extend("force", {
+      win = {
+        keys = {
+          abort_on_diff = {
+            "<C-c>",
+            function(self)
+              aborted = true
+              self:close()
+            end,
+            desc = "Abort on_diff",
+          },
+        },
+        footer_keys = { "<C-c>" },
+      },
+    } --[[@as user.util.git.diff.term.Opts]], opts)
+  end
 
   local cmd = { "git", "-c", "delta.paging=never" }
   vim.list_extend(cmd, vim.g.user_is_termux and {} or { "-c", "delta.line-numbers=true" })
@@ -110,14 +132,13 @@ function M.diff_term(opts)
   vim.list_extend(cmd, opts.cmd_args)
 
   local on_close = opts.win.on_close
-  local has_diff = true
   opts.win.on_close = function(win)
     win:close() -- fully close on hide to make it one-time
     if on_close then
       on_close(win)
     end
-    if opts.on_diff then
-      opts.on_diff(has_diff)
+    if on_diff and not aborted then
+      on_diff(has_diff)
     end
   end
 

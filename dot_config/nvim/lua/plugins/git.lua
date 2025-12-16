@@ -294,6 +294,90 @@ return {
     end,
   },
 
+  -- fixup
+  {
+    "folke/snacks.nvim",
+    -- TODO: map leader-gF to check U.git.diff_term first then open git_log picker
+    ---@param opts snacks.Config
+    opts = function(_, opts)
+      ---@type snacks.picker.Action.fn
+      local function fixup_rebase(picker, item)
+        if not item then
+          return
+        end
+
+        local commit, cwd = item.commit, item.cwd
+        U.git.diff_term({
+          staged = true,
+          on_diff = vim.schedule_wrap(function(has_diff)
+            if not has_diff then
+              return
+            end
+
+            Snacks.picker.util.cmd({ "git", "commit", "--fixup", commit }, function()
+              Snacks.picker.util.cmd({ "git", "rebase", "-i", "--autosquash", commit .. "~1" }, function()
+                if picker then
+                  picker:refresh()
+                end
+              end, { cwd = cwd, env = { GIT_SEQUENCE_EDITOR = ":" } })
+            end, { cwd = cwd })
+          end),
+          win = {
+            width = 100,
+            height = 30,
+          },
+        })
+      end
+
+      return U.extend_tbl(opts, {
+        picker = {
+          sources = {
+            -- TODO: refactor to avoid duplication
+            git_log = {
+              actions = {
+                fixup_rebase = fixup_rebase,
+              },
+              win = {
+                input = {
+                  keys = { ["<localleader>f"] = "fixup_rebase" },
+                },
+                list = {
+                  keys = { ["<localleader>f"] = "fixup_rebase" },
+                },
+              },
+            },
+            git_log_file = {
+              actions = {
+                fixup_rebase = fixup_rebase,
+              },
+              win = {
+                input = {
+                  keys = { ["<localleader>f"] = "fixup_rebase" },
+                },
+                list = {
+                  keys = { ["<localleader>f"] = "fixup_rebase" },
+                },
+              },
+            },
+            git_log_line = {
+              actions = {
+                fixup_rebase = fixup_rebase,
+              },
+              win = {
+                input = {
+                  keys = { ["<localleader>f"] = "fixup_rebase" },
+                },
+                list = {
+                  keys = { ["<localleader>f"] = "fixup_rebase" },
+                },
+              },
+            },
+          },
+        },
+      } --[[@as snacks.Config]])
+    end,
+  },
+
   -- gh
   {
     "folke/snacks.nvim",
@@ -360,6 +444,7 @@ return {
     },
   },
 
+  -- lazygit, gitbrowse
   {
     "folke/snacks.nvim",
     keys = {

@@ -7,5 +7,6 @@ function git_fixup_rebase --wraps='git commit --fixup'
     end
 
     # add `GIT_SEQUENCE_EDITOR=:` to skip the interactive editing step
+    # @fish-lsp-disable-next-line 7001
     git commit --fixup "$commit" && GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash "$commit~1"
 end
