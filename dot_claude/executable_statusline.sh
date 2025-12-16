@@ -21,27 +21,23 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   COLOR_RESET=$(printf '\033[0m')
 
   context_window_size=$(echo "$input" | jq -r '.context_window.context_window_size // 200000')
-  transcript_path=$(echo "$input" | jq -r '.transcript_path // ""')
+  # transcript_path=$(echo "$input" | jq -r '.transcript_path // ""')
   # cwd=$(echo "$input" | jq -r '.workspace.current_dir // .cwd')
 
   # model (hidden if Sonnet)
   model=$(echo "$input" | jq -r '(.model.display_name // "") | .[0:1] | ascii_upcase')
   model_display=$([ "$model" != "S" ] && echo "${COLOR_RED}${model}${COLOR_RESET}")
 
-  # NOTE: `context_window.total_input_tokens + context_window.total_output_tokens` is not accurate for now
-  # # tokens (from context_window)
-  # total_tokens=$(echo "$input" | jq -r '(.context_window.total_input_tokens // 0) + (.context_window.total_output_tokens // 0)')
-  # total_tokens_display="${COLOR_BLUE}$(awk -v t="$total_tokens" 'BEGIN {printf "%.1fk", t/1000}')${COLOR_RESET}"
-  # # context usage (from context_window)
-  # context_percentage_display="${COLOR_CYAN}$(awk -v t="$total_tokens" -v s="$context_window_size" 'BEGIN {printf "%.1f%%", t*100/s}')${COLOR_RESET}"
-
-  # tokens (from transcript)
-  total_tokens=$(cat "$transcript_path" 2>/dev/null | jq -s '
-    [.[] | select(.type == "assistant") | .message.usage] | last |
-    (.input_tokens // 0) + (.cache_creation_input_tokens // 0) + (.cache_read_input_tokens // 0) + (.output_tokens // 0)
-  ' || echo 0)
+  # # tokens (from transcript)
+  # total_tokens=$(cat "$transcript_path" 2>/dev/null | jq -s '
+  #   [.[] | select(.type == "assistant") | .message.usage] | last |
+  #   (.input_tokens // 0) + (.output_tokens // 0) + (.cache_creation_input_tokens // 0) + (.cache_read_input_tokens // 0)
+  # ' || echo 0)
+  # tokens (from context_window)
+  total_tokens=$(echo "$input" | jq -r '.context_window.current_usage | (.input_tokens // 0) + (.output_tokens // 0) + (.cache_creation_input_tokens // 0) + (.cache_read_input_tokens // 0)')
   total_tokens_display="${COLOR_BLUE}$(awk -v t="$total_tokens" 'BEGIN {printf "%.1fk", t/1000}')${COLOR_RESET}"
-  # context usage (from transcript)
+
+  # context usage
   context_percentage_display="${COLOR_CYAN}$(awk -v t="$total_tokens" -v s="$context_window_size" 'BEGIN {printf "%.1f%%", t*100/s}')${COLOR_RESET}"
 
   # session duration (hidden if < 1 min)
