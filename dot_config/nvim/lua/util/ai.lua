@@ -2,6 +2,15 @@
 local M = {}
 local H = {}
 
+---@class vim.var_accessor
+---https://github.com/folke/sidekick.nvim/blob/83b6815c0ed738576f101aad31c79b885c892e0f/lua/sidekick/cli/terminal.lua#L375
+---https://github.com/folke/sidekick.nvim/blob/83b6815c0ed738576f101aad31c79b885c892e0f/lua/sidekick/cli/terminal.lua#L154
+---@field sidekick_cli? sidekick.cli.Tool
+
+---@class vim.var_accessor
+---https://github.com/folke/sidekick.nvim/blob/83b6815c0ed738576f101aad31c79b885c892e0f/lua/sidekick/cli/terminal.lua#L376
+---@field sidekick_session_id? string
+
 -- https://github.com/farion1231/cc-switch/blob/7fa0a7b16648e99ef956d18c01f686dd50e843ed/src/config/claudeProviderPresets.ts
 M.claude = {
   provider = {
@@ -53,16 +62,26 @@ M.claude = {
 
 H.sidekick = {
   cli = {
-    ---Is visible.
-    ---@return boolean, integer?, integer?
-    is_open = function()
-      for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-        local buf = vim.api.nvim_win_get_buf(win)
-        if vim.bo[buf].filetype == "sidekick_terminal" then
-          return true, buf, win
+    ---@return { win: integer, buf: integer, tool: sidekick.cli.Tool, terminal: sidekick.cli.Terminal, session: sidekick.cli.Session }[]
+    list_visible = function()
+      local Session = require("sidekick.cli.session")
+      local Terminal = require("sidekick.cli.terminal")
+
+      local ret = {}
+      for _, w in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+        local b = vim.api.nvim_win_get_buf(w)
+        if vim.bo[b].filetype == "sidekick_terminal" then
+          local session_id = assert(vim.w[w].sidekick_session_id)
+          table.insert(ret, {
+            win = w,
+            buf = b,
+            tool = assert(vim.w[w].sidekick_cli),
+            terminal = assert(Terminal.get(session_id)),
+            session = assert(Session.attached()[session_id]),
+          })
         end
       end
-      return false
+      return ret
     end,
     ---https://github.com/folke/sidekick.nvim/blob/83b6815c0ed738576f101aad31c79b885c892e0f/lua/sidekick/cli/terminal.lua#L249-L254
     ---@param buf integer
@@ -77,7 +96,7 @@ H.sidekick = {
       return #lines > 5 and cursor[1] > 3
     end,
     quick = {
-      ---Without select.
+      ---Skip the select step.
       ---Copied from: https://github.com/folke/sidekick.nvim/blob/d2e6c6447e750a5f565ae1a832f1ca7fd8e6e8dd/lua/sidekick/cli/state.lua#L140-L174
       ---@param cb fun(state: sidekick.cli.State, attached?: boolean):any?
       ---@param name string
@@ -127,7 +146,7 @@ H.sidekick = {
 
 M.sidekick = {
   cli = {
-    -- Quick commands without select
+    -- quick commands that skip the select step
     quick = {
       ---Copied from: https://github.com/folke/sidekick.nvim/blob/d9e1fa2124340d3337d1a3a22b2f20de0701affe/lua/sidekick/cli/init.lua#L85-L96
       ---@param name string
@@ -227,13 +246,8 @@ M.sidekick = {
     scrollback = function(opts, quick)
       local State = require("sidekick.cli.state")
 
-      ---@param state sidekick.cli.State
-      local function scrollback(state)
-        local terminal = state.terminal
-        if not (terminal and terminal:is_running() and terminal:buf_valid() and terminal:win_valid()) then
-          return
-        end
-
+      ---@param terminal sidekick.cli.Terminal
+      local function norm(terminal)
         -- focus: https://github.com/folke/sidekick.nvim/blob/83b6815c0ed738576f101aad31c79b885c892e0f/lua/sidekick/cli/terminal.lua#L380-L389
         if not terminal:is_focused() then
           vim.api.nvim_set_current_win(terminal.win)
@@ -251,7 +265,27 @@ M.sidekick = {
         end, 100)
       end
 
+      ---@param state sidekick.cli.State
+      local function scrollback(state)
+        local terminal = state.terminal
+        if not (terminal and terminal:is_running() and terminal:buf_valid() and terminal:win_valid()) then
+          return
+        end
+
+        norm(terminal)
+      end
+
       opts = opts or {}
+
+      -- skip the select step if only one terminal visible, regardless of multiple attached sessions
+      local visible = H.sidekick.cli.list_visible()
+      if #visible == 1 then
+        if not (quick and quick ~= visible[1].tool.name) then
+          norm(visible[1].terminal)
+          return
+        end
+      end
+
       if quick then
         H.sidekick.cli.quick.with_state(scrollback, quick, {
           focus = false,
@@ -274,27 +308,9 @@ M.sidekick = {
       local State = require("sidekick.cli.state")
       local Util = require("sidekick.util")
 
-      opts = opts or {}
-
-      if vim.bo.filetype == "sidekick_terminal" and vim.fn.mode() ~= "t" then
-        vim.cmd.startinsert()
-        return
-      end
-
-      local is_open = H.sidekick.cli.is_open()
-
-      ---@param state sidekick.cli.State
-      local function submit_or_focus(state)
-        local terminal, session = state.terminal, state.session
-        if not (session and terminal and terminal:is_running() and terminal:buf_valid() and terminal:win_valid()) then
-          return
-        end
-
-        if not is_open then
-          terminal:focus()
-          return -- do not submit if terminal was not open
-        end
-
+      ---@param terminal sidekick.cli.Terminal
+      ---@param session sidekick.cli.Session
+      local function submit(terminal, session)
         vim.schedule(function()
           local changedtick = vim.b[terminal.buf].changedtick
 
@@ -304,6 +320,7 @@ M.sidekick = {
               Util.exec({ "tmux", "send-keys", "-t", session.mux_session, "Enter" })
 
               vim.defer_fn(function()
+                -- NOTE: for codex, changedtick may change without content change
                 if vim.b[terminal.buf].changedtick == changedtick then
                   -- focus if <cr> had no effect
                   terminal:focus()
@@ -331,6 +348,40 @@ M.sidekick = {
             end, 20)
           end
         end)
+      end
+
+      opts = opts or {}
+
+      if vim.bo.filetype == "sidekick_terminal" and vim.fn.mode() ~= "t" then
+        vim.cmd.startinsert()
+        return
+      end
+
+      -- skip the select step if only one terminal visible, regardless of multiple attached sessions
+      local visible = H.sidekick.cli.list_visible()
+      if #visible == 1 then
+        if not (quick and quick ~= visible[1].tool.name) then
+          submit(visible[1].terminal, visible[1].session)
+          return
+        end
+      end
+
+      ---@param state sidekick.cli.State
+      local function submit_or_focus(state)
+        local terminal, session = state.terminal, state.session
+        if not (session and terminal and terminal:is_running() and terminal:buf_valid() and terminal:win_valid()) then
+          return
+        end
+
+        local is_visible = vim.iter(visible):any(function(v)
+          return v.win == terminal.win
+        end)
+        if not is_visible then
+          terminal:focus()
+          return -- do not submit if terminal was not visible
+        end
+
+        submit(terminal, session)
       end
 
       if quick then
