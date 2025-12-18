@@ -15,9 +15,11 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   COLOR_BLUE=$(printf '\033[34m')
   COLOR_CYAN=$(printf '\033[36m')
   COLOR_YELLOW=$(printf '\033[33m')
-  COLOR_PINK=$(printf '\033[95m')
+  COLOR_ORANGE=$(printf '\033[38;5;209m')
   COLOR_RED=$(printf '\033[31m')
   COLOR_GREEN=$(printf '\033[32m')
+  COLOR_TEAL=$(printf '\033[38;5;73m')
+  COLOR_GRAY=$(printf '\033[38;5;248m')
   COLOR_RESET=$(printf '\033[0m')
 
   context_window_size=$(echo "$input" | jq -r '.context_window.context_window_size // 200000')
@@ -40,28 +42,49 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   # context usage
   context_percentage_display="${COLOR_CYAN}$(awk -v t="$total_tokens" -v s="$context_window_size" 'BEGIN {printf "%.1f%%", t*100/s}')${COLOR_RESET}"
 
-  # session duration (hidden if < 1 min)
-  session_duration=$(echo "$input" | jq -r '.cost.total_duration_ms // 0' | awk '{
-    s = int($1/1000); if (s < 60) exit
-    h = int(s/3600); m = int((s%3600)/60)
-    printf "%s", (h > 0 ? h"h"m"m" : m"m")
-  }')
-  session_duration_display=$([ -n "$session_duration" ] && echo "${COLOR_GREEN}${session_duration}${COLOR_RESET}")
-
   # session cost
   session_cost=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
   session_cost_display="${COLOR_YELLOW}$(printf "\$%.2f" "$session_cost")${COLOR_RESET}"
 
   # today cost
   today_cost=$("$HOME/.claude/statusline/get-today-cost.sh")
-  today_cost_display="${COLOR_PINK}$(printf "\$%.2f" "$today_cost")${COLOR_RESET}"
+  today_cost_display="${COLOR_ORANGE}$(printf "\$%.2f" "$today_cost")${COLOR_RESET}"
 
-  # starship (only git status for now)
-  # https://github.com/Rolv-Apneseth/starship.yazi/blob/a63550b2f91f0553cc545fd8081a03810bc41bc0/main.lua#L111-L126
-  starship_prompt=$(STARSHIP_CONFIG="$HOME/.config/starship-statusline.toml" STARSHIP_SHELL="" starship prompt | tr -d '\n')
+  # session duration (hidden if < 1 min)
+  session_duration=$(echo "$input" | jq -r '.cost.total_duration_ms // 0' | awk '{
+    s = int($1/1000); if (s < 60) exit
+    h = int(s/3600); m = int((s%3600)/60)
+    printf "%s", (h > 0 ? h"h"m"m" : m"m")
+  }')
+  session_duration_display=$([ -n "$session_duration" ] && echo "${COLOR_TEAL}${session_duration}${COLOR_RESET}")
+
+  # version
+  version=$(echo "$input" | jq -r '.version // ""')
+  version_display=$([ -n "$version" ] && echo "${COLOR_GRAY}v${version}${COLOR_RESET}")
+
+  # changes: lines changed (for nvim) or starship git status (for termux)
+  if [ "$__IS_CLAUDECODE_NVIM" = "1" ]; then
+    lines_added=$(echo "$input" | jq -r '.cost.total_lines_added // 0')
+    lines_removed=$(echo "$input" | jq -r '.cost.total_lines_removed // 0')
+    # hide if no changes
+    changes_display=""
+    [ "$lines_added" -gt 0 ] && changes_display="${COLOR_GREEN}+${lines_added}${COLOR_RESET}"
+    [ "$lines_removed" -gt 0 ] && changes_display="${changes_display}${changes_display:+ }${COLOR_RED}-${lines_removed}${COLOR_RESET}"
+  else
+    # https://github.com/Rolv-Apneseth/starship.yazi/blob/a63550b2f91f0553cc545fd8081a03810bc41bc0/main.lua#L111-L126
+    changes_display=$(STARSHIP_CONFIG="$HOME/.config/starship-statusline.toml" STARSHIP_SHELL="" starship prompt | tr -d '\n')
+  fi
 
   # empty segments are skipped by xargs
-  printf '%s\n' "$model_display" "$total_tokens_display" "$context_percentage_display" "$session_duration_display" "$session_cost_display" "$today_cost_display" "$starship_prompt" | xargs
+  printf '%s\n' \
+    "$model_display" \
+    "$total_tokens_display" \
+    "$context_percentage_display" \
+    "$session_cost_display" \
+    "$today_cost_display" \
+    "$session_duration_display" \
+    "$version_display" \
+    "$changes_display" | xargs
   exit 0
 fi
 
