@@ -10,7 +10,7 @@ approval_policy = "on-request"
 [model_providers.openrouter]
 name = "OpenRouter"
 base_url = "https://openrouter.ai/api/v1"
-# wire_api = "responses"
+wire_api = "responses"
 env_key = "CODEX_OPENROUTER_API_KEY"
 
 [features]

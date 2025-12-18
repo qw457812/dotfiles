@@ -83,19 +83,7 @@ return {
         local path = vim.api.nvim_buf_get_name(0)
         local picker = Snacks.picker.git_diff(opts)
         -- focus the hunk at the cursor file
-        picker.matcher.task:on(
-          "done",
-          vim.schedule_wrap(function()
-            -- ref: https://github.com/folke/snacks.nvim/blob/ca0f8b2c09a6b437479e7d12bdb209731d9eb621/lua/snacks/picker/config/sources.lua#L236-L242
-            for i, item in ipairs(picker:items()) do
-              if Snacks.picker.util.path(item) == path then
-                picker.list:view(i)
-                Snacks.picker.actions.list_scroll_center(picker)
-                break
-              end
-            end
-          end)
-        )
+        U.snacks.picker.follow_file(picker, path)
         return picker
       end
 
@@ -125,7 +113,15 @@ return {
         -- },
         -- TODO: buffer-local mapping for U.git.diff_term({ staged = true }): commit, amend, fixup_rebase
         { "<leader>gA", function() U.git.diff_term({ staged = true, ignore_space = true }) end, desc = "Git Diff Staged (ignore space)" },
-        { "<leader>gs", function() Snacks.picker.git_status({ cwd = LazyVim.root.git() }) end, desc = "Git Status" },
+        {
+          "<leader>gs",
+          function()
+            local path = vim.api.nvim_buf_get_name(0)
+            local picker = Snacks.picker.git_status({ cwd = LazyVim.root.git() })
+            U.snacks.picker.follow_file(picker, path)
+          end,
+          desc = "Git Status",
+        },
         { "<leader>gS", function() Snacks.picker.git_stash({ cwd = LazyVim.root.git() }) end, desc = "Git Stash" },
         { "<leader>gb", function() Snacks.picker.git_branches({ cwd = LazyVim.root.git() }) end, desc = "Git Branches" },
         { "<leader>gB", function() Snacks.picker.git_log_line() end, desc = "Git Blame Line" },

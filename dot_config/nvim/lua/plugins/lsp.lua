@@ -75,11 +75,9 @@ return {
             { "gs", "<leader>ss", desc = "LSP Symbols", has = "documentSymbol", remap = true },
             { "gS", "<leader>sS", desc = "LSP Workspace Symbols", has = "workspace/symbols", remap = true },
             { "<leader>cl", false },
-            -- { "<leader>il", "<cmd>LspInfo<cr>", desc = "Lsp" },
+            -- { "<leader>il", "<cmd>checkhealth vim.lsp<cr>", desc = "Lsp" },
+            -- TODO: add keys to Snacks.picker.lsp_config(): `:lsp enable [<config_name>]`, `:lsp disable [<config_name>]`, `:lsp restart [<client_name>]`
             { "<leader>il", function() Snacks.picker.lsp_config() end, desc = "Lsp" },
-            { "<leader>clr", "<cmd>LspRestart<cr>", desc = "Restart Lsp" },
-            { "<leader>cls", "<cmd>LspStart<cr>", desc = "Start Lsp" },
-            { "<leader>clS", "<cmd>LspStop<cr>", desc = "Stop Lsp" },
             { "<leader>clW", function() vim.lsp.buf.remove_workspace_folder() end, desc = "Remove Workspace" },
             { "<leader>clw", function() vim.lsp.buf.add_workspace_folder() end, desc = "Add Workspace" },
             {

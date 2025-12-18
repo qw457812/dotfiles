@@ -28,6 +28,24 @@ M.picker = {
   on_close = function()
     vim.g.user_suppress_lsp_progress = nil
   end,
+  ---Focus the item with the given path when the picker is ready.
+  ---@param picker snacks.Picker
+  ---@param path string
+  follow_file = function(picker, path)
+    picker.matcher.task:on(
+      "done",
+      vim.schedule_wrap(function()
+        -- ref: https://github.com/folke/snacks.nvim/blob/ca0f8b2c09a6b437479e7d12bdb209731d9eb621/lua/snacks/picker/config/sources.lua#L236-L242
+        for i, item in ipairs(picker:items()) do
+          if Snacks.picker.util.path(item) == path then
+            picker.list:view(i)
+            Snacks.picker.actions.list_scroll_center(picker)
+            break
+          end
+        end
+      end)
+    )
+  end,
   -- copied from: https://github.com/folke/snacks.nvim/blob/27cba535a6763cbca3f3162c5c4bb48c6f382005/lua/snacks/picker/config/layouts.lua
   ---@type table<string, snacks.picker.layout.Config>
   layouts = {

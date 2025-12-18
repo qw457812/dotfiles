@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r --arg src \"$(chezmoi source-path)\" '.tool_input.file_path | select(startswith($src))' | xargs -r chezmoi target-path 2>/dev/null | xargs -r chezmoi apply 2>/dev/null || true"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -130,17 +130,26 @@ return {
                     goto_input_prompt() -- save some `k` presses
 
                     vim.keymap.set("n", "]]", function()
-                      local lnum = vim.fn.search("^> ", "W")
-                      if lnum == 0 then
+                      if vim.fn.search("^> ", "W") == 0 then
                         LazyVim.warn("No more user messages", { title = "Sidekick" })
                       end
                     end, { buffer = buf, desc = "Jump to next user message (Sidekick)" })
                     vim.keymap.set("n", "[[", function()
-                      local lnum = vim.fn.search("^> ", "Wb")
-                      if lnum == 0 then
+                      if vim.fn.search("^> ", "Wb") == 0 then
                         LazyVim.warn("No more user messages", { title = "Sidekick" })
                       end
                     end, { buffer = buf, desc = "Jump to previous user message (Sidekick)" })
+
+                    vim.keymap.set("n", "J", function()
+                      if vim.fn.search("^⏺ ", "W") == 0 then
+                        LazyVim.warn("No more assistant messages", { title = "Sidekick" })
+                      end
+                    end, { buffer = buf, desc = "Jump to next assistant message (Sidekick)" })
+                    vim.keymap.set("n", "K", function()
+                      if vim.fn.search("^⏺ ", "Wb") == 0 then
+                        LazyVim.warn("No more assistant messages", { title = "Sidekick" })
+                      end
+                    end, { buffer = buf, desc = "Jump to previous assistant message (Sidekick)" })
                   end)
                 end
               end,
@@ -441,6 +450,21 @@ return {
               end)
             end,
           })
+        end,
+      })
+
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "markdown",
+        callback = function(ev)
+          local path = vim.api.nvim_buf_get_name(ev.buf)
+          if
+            path:match("/CLAUDE%.md$")
+            or path:match("/CLAUDE%.local%.md$")
+            or path:match("/AGENTS%.md$")
+            or path:find("/%.claude/rules/")
+          then
+            vim.diagnostic.enable(false, { bufnr = ev.buf })
+          end
         end,
       })
     end,

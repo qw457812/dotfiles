@@ -12,13 +12,13 @@ fi
 
 # shorter statusline within nvim or termux
 if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
-  COLOR_BLUE=$(printf '\033[34m')
-  COLOR_CYAN=$(printf '\033[36m')
-  COLOR_YELLOW=$(printf '\033[33m')
-  COLOR_ORANGE=$(printf '\033[38;5;209m')
   COLOR_RED=$(printf '\033[31m')
   COLOR_GREEN=$(printf '\033[32m')
+  COLOR_YELLOW=$(printf '\033[33m')
+  COLOR_BLUE=$(printf '\033[34m')
+  COLOR_CYAN=$(printf '\033[36m')
   COLOR_TEAL=$(printf '\033[38;5;73m')
+  COLOR_ORANGE=$(printf '\033[38;5;209m')
   COLOR_GRAY=$(printf '\033[38;5;248m')
   COLOR_RESET=$(printf '\033[0m')
 
@@ -26,9 +26,9 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   # transcript_path=$(echo "$input" | jq -r '.transcript_path // ""')
   # cwd=$(echo "$input" | jq -r '.workspace.current_dir // .cwd')
 
-  # model (hidden if Sonnet)
-  model=$(echo "$input" | jq -r '(.model.display_name // "") | .[0:1] | ascii_upcase')
-  model_display=$([ "$model" != "S" ] && echo "${COLOR_RED}${model}${COLOR_RESET}")
+  # model
+  model=$(echo "$input" | jq -r '(.model.display_name // "") | split(" ")[0]')
+  model_display=$([ -n "$model" ] && echo "${COLOR_RED}${model}${COLOR_RESET}")
 
   # # tokens (from transcript)
   # total_tokens=$(cat "$transcript_path" 2>/dev/null | jq -s '

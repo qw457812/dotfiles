@@ -95,15 +95,21 @@ glide.keymaps.set("normal", "r", when_editing("r", "reload"));
 glide.keymaps.set("normal", "R", when_editing(null, "reload_hard"));
 glide.keymaps.set("normal", "t", when_editing(null, "tab_new"));
 glide.keymaps.set("normal", "T", when_editing(null, "commandline_show tab "));
-glide.keymaps.set("normal", "b", when_editing("motion b", bookmarks_picker()), {
+glide.keymaps.set("normal", "b", when_editing("motion b", bookmark_picker()), {
   description: "Open bookmark",
 });
 glide.keymaps.set(
   "normal",
   "B",
-  when_editing("motion B", bookmarks_picker(true)),
+  when_editing("motion B", bookmark_picker(true)),
   { description: "Open bookmark in a new tab" },
 );
+glide.keymaps.set("normal", "s", history_picker(), {
+  description: "Open history",
+});
+glide.keymaps.set("normal", "S", history_picker(), {
+  description: "Open history in a new tab",
+});
 glide.keymaps.set(
   "normal",
   "yt",
@@ -610,6 +616,7 @@ glide.keymaps.set(
   when_editing(null, "commandline_show open_in_new_tab "),
 );
 
+// ref: https://github.com/seruman/rc.d/blob/2b56450a8316680dfcecbdae0729f592e7ac42f4/private_dot_config/glide/glide.ts#L394-L458
 const bulk_tab_close = glide.excmds.create(
   { name: "bulk_tab_close", description: "Close tabs with editor" },
   async () => {
@@ -770,7 +777,7 @@ function text_to_url(text: string): string {
   }
 }
 
-function bookmarks_picker(newtab: boolean = false) {
+function bookmark_picker(newtab: boolean = false) {
   return async () => {
     const bookmarks = await browser.bookmarks.getRecent(10000);
 
@@ -848,6 +855,70 @@ function bookmarks_picker(newtab: boolean = false) {
           },
         }),
       ),
+    });
+  };
+}
+
+// ref: https://github.com/glide-browser/glide/discussions/147#discussioncomment-15270940
+function history_picker(newtab: boolean = false) {
+  return async () => {
+    const all_history = await browser.history.search({
+      text: "",
+      startTime: 0,
+      maxResults: 1000,
+    });
+
+    const seen = new Set<string>();
+    const unique_history = all_history.filter(
+      (item) => item.url && !seen.has(item.url) && seen.add(item.url),
+    );
+
+    glide.commandline.show({
+      title: "history",
+      options: unique_history.map((item) => ({
+        label: item.title || item.url!,
+        render() {
+          const url = item.url ?? "";
+          let display_url = url;
+          try {
+            const u = new URL(url);
+            display_url = u.hostname + decodeURIComponent(u.pathname);
+          } catch {}
+
+          return DOM.create_element("div", {
+            style: {
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              marginLeft: "1em",
+            },
+            children: [
+              DOM.create_element("img", {
+                src: `page-icon:${item.url}`,
+                style: { width: "16px", height: "16px" },
+              }),
+              DOM.create_element("div", {
+                children: [
+                  ...(item.title
+                    ? [DOM.create_element("div", { children: item.title })]
+                    : []),
+                  DOM.create_element("div", { children: display_url }),
+                ],
+              }),
+            ],
+          });
+        },
+        async execute() {
+          const tab = await glide.tabs.get_first({ url: item.url });
+          if (tab) {
+            await browser.tabs.update(tab.id, { active: true });
+          } else if (newtab) {
+            await browser.tabs.create({ active: true, url: item.url });
+          } else {
+            await browser.tabs.update({ url: item.url });
+          }
+        },
+      })),
     });
   };
 }
