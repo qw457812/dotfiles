@@ -19,6 +19,7 @@ return {
             } or { "claude" }, {
               -- "--continue",
               -- "--resume",
+              -- "255b938c-0cb9-4858-83a0-6929fa42b927", -- specific session ID
               -- "--fork-session",
             }),
             env = U.ai.claude.provider.plan.anthropic,

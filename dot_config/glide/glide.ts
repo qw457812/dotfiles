@@ -50,13 +50,20 @@ if (glide.ctx.os === "macosx") {
 // `);
 
 // Preferences
+// about:config
+// https://support.mozilla.org/en-US/kb/about-config-editor-firefox
+// https://kb.mozillazine.org/About:config_entries
+// https://searchfox.org/firefox-release/source/browser/app/profile/firefox.js
+glide.prefs.set("browser.startup.page", 3); // Open previous windows and tabs
 glide.prefs.set("browser.uidensity", 1); // compact mode
-// glide.prefs.set("toolkit.legacyUserProfileCustomizations.stylesheets", true);
-// glide.prefs.set("devtools.debugger.prompt-connection", false);
-// glide.prefs.set(
-//   "media.videocontrols.picture-in-picture.audio-toggle.enabled",
-//   true,
-// );
+// make <PageDown>/<PageUp> scroll half page
+glide.prefs.set("toolkit.scrollbox.pagescroll.maxOverlapLines", 10000);
+glide.prefs.set("toolkit.scrollbox.pagescroll.maxOverlapPercent", 50);
+// disable the password manager since I use Bitwarden
+glide.prefs.set("signon.rememberSignons", false);
+// disable the credit card and address autofill
+glide.prefs.set("extensions.formautofill.creditCards.enabled", false);
+glide.prefs.set("extensions.formautofill.addresses.enabled", false);
 
 // Options
 glide.o.hint_size = "12px";
@@ -107,7 +114,7 @@ glide.keymaps.set(
 glide.keymaps.set("normal", "s", history_picker(), {
   description: "Open history",
 });
-glide.keymaps.set("normal", "S", history_picker(), {
+glide.keymaps.set("normal", "S", history_picker(true), {
   description: "Open history in a new tab",
 });
 glide.keymaps.set(
@@ -375,6 +382,13 @@ glide.keymaps.set(
   "<leader>gK",
   go_to_tab(
     "https://github.com/glide-browser/glide/blob/main/src/glide/browser/base/content/plugins/keymaps.mts",
+  ),
+);
+glide.keymaps.set(
+  "normal",
+  "<leader>gP",
+  go_to_tab(
+    "https://searchfox.org/firefox-release/source/browser/app/profile/firefox.js",
   ),
 );
 glide.keymaps.set(
@@ -950,13 +964,13 @@ function opener(
     return default_search_engine.replace("{}", query);
   }
 
-  return (props) => {
+  return async (props) => {
     const url = args_to_url(props.args_arr);
     if (url) {
       if (newtab) {
-        browser.tabs.create({ url });
+        await browser.tabs.create({ url });
       } else {
-        browser.tabs.update({ url });
+        await browser.tabs.update({ url });
       }
     }
   };

@@ -12,7 +12,16 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     ---@type lazyvim.TSConfig|{}
-    opts = { ensure_installed = { "jq", "awk", "mermaid", "groovy", "promql" } },
+    opts = {
+      ensure_installed = {
+        "awk",
+        "groovy",
+        "jq",
+        "mermaid",
+        "promql",
+        "scss", -- vue
+      },
+    },
   },
   {
     "nvim-treesitter/nvim-treesitter",
@@ -45,17 +54,12 @@ return {
           return not vim.list_contains(installed, p)
         end, available)
 
-        local function format_parsers(parsers)
-          return table.concat(
-            vim.tbl_map(function(p)
-              return "`" .. p .. "`"
-            end, parsers),
-            ", "
-          )
+        local function fmt(parsers)
+          return #parsers == 0 and "" or "`" .. table.concat(parsers, "`, `") .. "`"
         end
 
         LazyVim.info(
-          ("- Installed: %s\n- Not installed: %s"):format(format_parsers(installed), format_parsers(not_installed)),
+          ("- Installed: %s\n- Not installed: %s"):format(fmt(installed), fmt(not_installed)),
           { title = ("Treesitter Installed (%d/%d)"):format(#installed, #available) }
         )
       end, { desc = "Show treesitter parsers info" })

@@ -156,6 +156,16 @@ return {
           --   end
           -- end
 
+          -- ignore the `saveActions.organizeImports`
+          vim.keymap.set({ "i", "x", "n", "s" }, "<a-s>", "<cmd>noautocmd w<cr><esc>", {
+            buffer = args.buf,
+            desc = "Save File Without Formatting",
+          })
+          vim.keymap.set("n", "<leader>fS", "<cmd>noautocmd w<cr>", {
+            buffer = args.buf,
+            desc = "Save File Without Formatting",
+          })
+
           local wk = require("which-key")
           wk.add({
             {

@@ -7,6 +7,7 @@ local wezterm = require("wezterm") --[[@as Wezterm]]
 local helpers = require("helpers")
 local act = wezterm.action
 
+-- commit: d53fb08b8212d82c34abacfce167bfa79919bb41
 local wez_tmux = wezterm.plugin.require("https://github.com/sei40kr/wez-tmux")
 
 local M = {}

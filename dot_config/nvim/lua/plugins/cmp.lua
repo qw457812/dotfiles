@@ -252,6 +252,7 @@ return {
               H.cmdline_actions.insert,
               "select_next",
             },
+            -- TODO: check https://github.com/saghen/blink.cmp/commit/37ce860
             ["<S-Tab>"] = {
               "show_and_insert", -- show_and_insert_or_accept_single
               H.cmdline_actions.insert,

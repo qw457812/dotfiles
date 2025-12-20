@@ -15,10 +15,10 @@ return {
     end,
   },
 
-  -- {
-  --   "nvim-treesitter/nvim-treesitter",
-  --   opts = { ensure_installed = { "xml", "html" } },
-  -- },
+  {
+    "nvim-treesitter/nvim-treesitter",
+    opts = { ensure_installed = { "xml", "html" } },
+  },
 
   {
     "neovim/nvim-lspconfig",

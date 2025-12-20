@@ -1,6 +1,8 @@
+// TODO: https://github.com/code-yeongyu/oh-my-opencode
 {
   "$schema": "https://opencode.ai/config.json",
   // // https://github.com/sst/opencode/issues/3688#issuecomment-3513966167
+  // // https://github.com/sst/opencode/issues/445#issuecomment-3508873123
   // "theme": "system",
   "theme": "github",
   "share": "manual",
@@ -62,7 +64,8 @@
     },
     "exa": {
       "type": "remote",
-      "url": "https://mcp.exa.ai/mcp?tools=get_code_context_exa",
+      // "url": "https://mcp.exa.ai/mcp?tools=get_code_context_exa",
+      "url": "https://mcp.exa.ai/mcp?tools=web_search_exa",
       "enabled": false
     }
   },

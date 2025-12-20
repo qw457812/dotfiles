@@ -2,11 +2,9 @@
   "mcpServers": {
     "exa": {
       "type": "http",
-      "url": "https://mcp.exa.ai/mcp",
+      "url": "https://mcp.exa.ai/mcp?tools=web_search_exa",
       "headers": {},
-      "tools": [
-        "get_code_context_exa"
-      ]
+      "tools": []
     }
   }
 }
