@@ -1,22 +1,25 @@
-// TODO: https://github.com/code-yeongyu/oh-my-opencode
+// https://opencode.ai/docs/zen/#pricing
+// curl https://opencode.ai/zen/v1/models | jq '.data | sort_by(.created)'
 {
   "$schema": "https://opencode.ai/config.json",
-  // // https://github.com/sst/opencode/issues/3688#issuecomment-3513966167
-  // // https://github.com/sst/opencode/issues/445#issuecomment-3508873123
-  // "theme": "system",
+  "plugin": [
+    "oh-my-opencode", // https://github.com/code-yeongyu/oh-my-opencode
+    "opencode-antigravity-auth" // https://github.com/NoeFabris/opencode-antigravity-auth
+  ],
+  // "theme": "system", // https://github.com/sst/opencode/issues/445#issuecomment-3508873123
   "theme": "github",
   "share": "manual",
   "autoupdate": false,
-  // https://opencode.ai/docs/zen/#pricing
-  // curl https://opencode.ai/zen/v1/models | jq '.data | sort_by(.created)'
-  "model": "opencode/big-pickle",
+  // "model": "opencode/big-pickle", // Sisyphus
   // "model": "anthropic/claude-sonnet-4-5",
+  // "model": "anthropic/claude-opus-4-5",
   "small_model": "opencode/grok-code",
   // "small_model": "anthropic/claude-haiku-4-5",
   "agent": {
     "plan": {
-      "model": "opencode/big-pickle"
+      "model": "opencode/big-pickle" // Planner-Sisyphus
       // "model": "anthropic/claude-sonnet-4-5"
+      // "model": "anthropic/claude-opus-4-5"
     }
   },
   "provider": {
@@ -24,6 +27,53 @@
       "options": {
         "baseURL": "{env:CLAUDE_RELAY_SERVICE_URL}/api/v1",
         "apiKey": "{env:CLAUDE_RELAY_SERVICE_API_KEY}"
+      }
+    },
+    "google": {
+      "models": {
+        "gemini-3-pro-high": {
+          "name": "Gemini 3 Pro High (Antigravity)",
+          "limit": { "context": 1048576, "output": 65535 },
+          "modalities": {
+            "input": ["text", "image", "pdf"],
+            "output": ["text"]
+          }
+        },
+        "gemini-3-pro-low": {
+          "name": "Gemini 3 Pro Low (Antigravity)",
+          "limit": { "context": 1048576, "output": 65535 },
+          "modalities": {
+            "input": ["text", "image", "pdf"],
+            "output": ["text"]
+          }
+        },
+        "claude-sonnet-4-5": {
+          "name": "Claude Sonnet 4.5 (Antigravity)",
+          "limit": { "context": 200000, "output": 64000 },
+          "modalities": {
+            "input": ["text", "image", "pdf"],
+            "output": ["text"]
+          }
+        },
+        "claude-sonnet-4-5-thinking": {
+          "name": "Claude Sonnet 4.5 Thinking (Antigravity)",
+          "limit": {
+            "context": 200000,
+            "output": 64000
+          },
+          "modalities": {
+            "input": ["text", "image", "pdf"],
+            "output": ["text"]
+          }
+        },
+        "claude-opus-4-5-thinking": {
+          "name": "Claude Opus 4.5 Thinking (Antigravity)",
+          "limit": { "context": 200000, "output": 64000 },
+          "modalities": {
+            "input": ["text", "image", "pdf"],
+            "output": ["text"]
+          }
+        }
       }
     },
     // https://platform.minimax.io/docs/guides/text-ai-coding-tools#use-minimax-m2-in-opencode
@@ -45,29 +95,29 @@
         "apiKey": "{env:OPENCODE_OPENROUTER_API_KEY}"
       },
       "models": {
-        "moonshotai/kimi-k2-0905": {
-          "options": {
-            "provider": {
-              "order": ["moonshotai", "baseten", "together", "groq"],
-              "allow_fallbacks": false
-            }
-          }
-        }
+        // "moonshotai/kimi-k2-0905": {
+        //   "options": {
+        //     "provider": {
+        //       "order": ["moonshotai", "baseten", "together", "groq"],
+        //       "allow_fallbacks": false
+        //     }
+        //   }
+        // }
       }
     }
   },
   "mcp": {
-    "context7": {
-      "type": "local",
-      "command": ["npx", "-y", "@upstash/context7-mcp"],
-      "enabled": false
-    },
-    "exa": {
-      "type": "remote",
-      // "url": "https://mcp.exa.ai/mcp?tools=get_code_context_exa",
-      "url": "https://mcp.exa.ai/mcp?tools=web_search_exa",
-      "enabled": false
-    }
+    // "context7": {
+    //   "type": "local",
+    //   "command": ["npx", "-y", "@upstash/context7-mcp"],
+    //   "enabled": false
+    // },
+    // "exa": {
+    //   "type": "remote",
+    //   // "url": "https://mcp.exa.ai/mcp?tools=get_code_context_exa",
+    //   "url": "https://mcp.exa.ai/mcp?tools=web_search_exa",
+    //   "enabled": false
+    // }
   },
   // "tools": {
   //   "exa_web_search_exa": false
