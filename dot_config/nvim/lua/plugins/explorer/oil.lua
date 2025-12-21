@@ -48,7 +48,6 @@ return {
       },
       keymaps = {
         ["`"] = false,
-        ["~"] = false,
         ["<C-h>"] = false,
         ["<C-l>"] = false,
         ["<C-s>"] = false,
