@@ -142,12 +142,12 @@ return {
                     end, { buffer = buf, desc = "Jump to previous user message (Sidekick)" })
 
                     vim.keymap.set("n", "J", function()
-                      if vim.fn.search("^⏺ ", "W") == 0 then
+                      if vim.fn.search(vim.g.user_is_termux and "^● " or "^⏺ ", "W") == 0 then
                         LazyVim.warn("No more assistant messages", { title = "Sidekick" })
                       end
                     end, { buffer = buf, desc = "Jump to next assistant message (Sidekick)" })
                     vim.keymap.set("n", "K", function()
-                      if vim.fn.search("^⏺ ", "Wb") == 0 then
+                      if vim.fn.search(vim.g.user_is_termux and "^● " or "^⏺ ", "Wb") == 0 then
                         LazyVim.warn("No more assistant messages", { title = "Sidekick" })
                       end
                     end, { buffer = buf, desc = "Jump to previous assistant message (Sidekick)" })
@@ -156,11 +156,13 @@ return {
               end,
             })
           end),
-          layout = vim.g.user_is_termux and "bottom" or "right", ---@type "float"|"left"|"bottom"|"top"|"right"
+          layout = vim.g.user_is_termux and "float" or "right", ---@type "float"|"left"|"bottom"|"top"|"right"
           ---@type vim.api.keyset.win_config
           float = {
-            width = 1,
-            height = vim.o.lines - 4, -- see: U.snacks.win.fullscreen_height
+            row = 0,
+            col = 0,
+            width = vim.o.columns,
+            height = vim.o.lines - 3, -- see: U.snacks.win.fullscreen_height
           },
           ---@type vim.api.keyset.win_config
           split = {
@@ -255,6 +257,8 @@ return {
           refactor = "Please refactor {this} to be more maintainable",
           security = "Review {file} for security vulnerabilities",
           commit = "Commit only the staged changes",
+          review_staged = "Review only the staged changes",
+          review_unstaged = "Review only the unstaged changes",
         },
       },
       ui = {
@@ -347,6 +351,7 @@ return {
         focusable = false,
         height = 1,
         relative = "win",
+        zindex = 51, -- sidekick_terminal + 1
         row = 0, -- 1
         col = -1,
         backdrop = false,

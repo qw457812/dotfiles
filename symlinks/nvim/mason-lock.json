@@ -37,6 +37,6 @@
   "ts_query_ls": "v3.14.0",
   "vscode-spring-boot-tools": "1.63.0",
   "vtsls": "0.2.9",
-  "vue-language-server": "3.1.8",
+  "vue-language-server": "3.2.0",
   "yaml-language-server": "1.19.2"
 }

@@ -791,31 +791,50 @@ function text_to_url(text: string): string {
   }
 }
 
+const bookmark_cache = {
+  data: null as Awaited<ReturnType<typeof browser.bookmarks.getRecent>> | null,
+  timestamp: 0,
+  ttl: 60_000, // 1 minute cache
+};
+
+async function cached_bookmarks() {
+  const now = Date.now();
+  if (
+    bookmark_cache.data &&
+    now - bookmark_cache.timestamp < bookmark_cache.ttl
+  ) {
+    return bookmark_cache.data;
+  }
+  bookmark_cache.data = await browser.bookmarks.getRecent(10000);
+  bookmark_cache.timestamp = now;
+  return bookmark_cache.data;
+}
+
 function bookmark_picker(newtab: boolean = false) {
   return async () => {
-    const bookmarks = await browser.bookmarks.getRecent(10000);
+    const bookmarks = await cached_bookmarks();
 
     glide.commandline.show({
       title: `Bookmarks (${bookmarks.length})`,
-      options: bookmarks.map(
-        (bookmark): glide.CommandLineCustomOption => ({
+      options: bookmarks.map((bookmark): glide.CommandLineCustomOption => {
+        const url = bookmark.url ?? "";
+        let display_url = url;
+        try {
+          const u = new URL(url);
+          display_url = u.hostname + decodeURIComponent(u.pathname);
+        } catch {}
+
+        return {
           label: bookmark.title,
           // description: bookmark.url,
           render() {
-            const url = bookmark.url ?? "";
-            let display_url = url;
-            try {
-              const u = new URL(url);
-              display_url = u.hostname + decodeURIComponent(u.pathname);
-            } catch {}
-
             return DOM.create_element("div", {
               style: {
                 display: "flex",
                 alignItems: "center",
                 gap: "8px",
                 padding: "4px 12px",
-                borderBottom: "1px solid #333",
+                borderBottom: "1px solid #2a2a2a",
               },
               children: [
                 DOM.create_element("div", [" "], {
@@ -830,8 +849,8 @@ function bookmark_picker(newtab: boolean = false) {
                   style: {
                     display: "flex",
                     flexDirection: "column",
-                    gap: "1px",
-                    minWidth: "0",
+                    gap: "2px",
+                    overflow: "hidden",
                     flex: "1",
                   },
                   children: [
@@ -845,7 +864,7 @@ function bookmark_picker(newtab: boolean = false) {
                     }),
                     DOM.create_element("div", [display_url], {
                       style: {
-                        color: "#888",
+                        color: "#888888",
                         fontSize: "0.8em",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
@@ -867,8 +886,8 @@ function bookmark_picker(newtab: boolean = false) {
               await browser.tabs.update({ url: bookmark.url });
             }
           },
-        }),
-      ),
+        };
+      }),
     });
   };
 }
