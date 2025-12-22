@@ -71,8 +71,8 @@ abbr paths 'echo $PATH | tr " " "\n" | nl'
 abbr dl "cd ~/Downloads"
 
 # Editor & Pager
-abbr vim nvim
-abbr vi nvim
+# abbr vim nvim
+# abbr vi nvim
 abbr v nvim
 abbr v! "nvim -u NONE"
 abbr minimax "NVIM_APPNAME=nvim-minimax nvim"
