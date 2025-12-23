@@ -247,7 +247,7 @@ return {
             },
           },
           -- HACK: disable some installed tools
-          copilot = { cmd = tonumber(os.date("%d")) < 20 and { "hack_to_disable_copilot" } or { "copilot" } },
+          copilot = { cmd = { "hack_to_disable_copilot" } },
           gemini = { cmd = { "hack_to_disable_gemini" } },
           aider = { cmd = { "hack_to_disable_aider" } },
           -- debug = { cmd = { "bash", "-c", "env | sort | bat -l env" } },

@@ -1,4 +1,4 @@
-if not LazyVim.has_extra("lang.nix") then
+if not (LazyVim.has_extra("lang.nix") and vim.fn.executable("nix") == 1) then
   return {}
 end
 

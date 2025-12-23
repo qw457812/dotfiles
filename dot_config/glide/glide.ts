@@ -965,13 +965,13 @@ function opener(
 
     // A single argument with dots is a host or URL on its own.
     // But take care to complete it with a scheme if it doesn't have one.
-    if (args.length == 1 && args[0]!.indexOf(".") >= 0) {
+    if (args.length === 1 && args[0]!.indexOf(".") >= 0) {
       return /^[a-z]+:/.test(args[0]!) ? args[0]! : "https://" + args[0]!;
     }
 
     // Otherwise, consider the first argument as a search shorthand.
     for (const [shorthand, url] of Object.entries(search_engines)) {
-      if (args[0]! == shorthand) {
+      if (args[0]! === shorthand) {
         args.shift(); // drop shorthand
         const query = args.map(encodeURIComponent).join("+");
         return url.replace("{}", query);
