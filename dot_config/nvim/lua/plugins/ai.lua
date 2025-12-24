@@ -33,16 +33,31 @@ return {
   {
     "folke/sidekick.nvim",
     optional = true,
-    -- stylua: ignore
     keys = not vim.g.user_is_termux and {
-      { "<leader>at", function() U.ai.sidekick.cli.quick.show("claude_tmp") end, desc = "Claude Temp" },
-      { "<leader>at", function() U.ai.sidekick.cli.quick.send("claude_tmp", { msg = "{this}" }) end, mode = "x", desc = "Claude Temp" },
+      {
+        "<leader>at",
+        function()
+          U.ai.sidekick.cli.quick.show("claude_tmp" .. (vim.v.count == 0 and "" or vim.v.count))
+        end,
+        desc = "Claude Temp",
+      },
+      {
+        "<leader>at",
+        function()
+          U.ai.sidekick.cli.quick.send("claude_tmp" .. (vim.v.count == 0 and "" or vim.v.count), { msg = "{this}" })
+        end,
+        mode = "x",
+        desc = "Claude Temp",
+      },
     } or { { "<leader>at", false, mode = { "n", "x" } } },
     ---@param opts sidekick.Config
     config = not vim.g.user_is_termux and function(_, opts)
       opts.cli = opts.cli or {}
       opts.cli.tools = opts.cli.tools or {}
       opts.cli.tools.claude_tmp = vim.deepcopy(opts.cli.tools.claude) or { cmd = { "claude" } }
+      for i = 1, 9 do
+        opts.cli.tools["claude_tmp" .. i] = vim.deepcopy(opts.cli.tools.claude_tmp)
+      end
       require("sidekick").setup(opts)
     end or nil,
   },

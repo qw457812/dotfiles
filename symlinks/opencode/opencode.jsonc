@@ -3,23 +3,22 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "plugin": [
-    "oh-my-opencode@2.4.7", // https://github.com/code-yeongyu/oh-my-opencode
-    "opencode-antigravity-auth@1.2.2" // https://github.com/NoeFabris/opencode-antigravity-auth
+    "oh-my-opencode@2.5.1", // https://github.com/code-yeongyu/oh-my-opencode
+    "opencode-antigravity-auth@1.2.4" // https://github.com/NoeFabris/opencode-antigravity-auth
   ],
   // "theme": "system", // https://github.com/sst/opencode/issues/445#issuecomment-3508873123
   "theme": "github",
   "share": "manual",
   "autoupdate": false,
-  // "model": "opencode/big-pickle", // Sisyphus
-  // "model": "anthropic/claude-sonnet-4-5",
+  // "model": "opencode/glm-4.7-free", // Sisyphus
   // "model": "anthropic/claude-opus-4-5",
+  "model": "google/claude-opus-4-5-thinking",
   "small_model": "opencode/grok-code",
-  // "small_model": "anthropic/claude-haiku-4-5",
   "agent": {
     "plan": {
-      "model": "opencode/big-pickle" // Planner-Sisyphus
-      // "model": "anthropic/claude-sonnet-4-5"
+      // "model": "opencode/glm-4.7-free" // Planner-Sisyphus
       // "model": "anthropic/claude-opus-4-5"
+      "model": "google/claude-opus-4-5-thinking"
     }
   },
   "provider": {
@@ -31,9 +30,9 @@
     },
     "google": {
       "models": {
-        "gemini-3-pro-high": {
-          "name": "Gemini 3 Pro High (Antigravity)",
-          "limit": { "context": 1048576, "output": 65535 },
+        "gemini-3-flash": {
+          "name": "Gemini 3 Flash (Antigravity)",
+          "limit": { "context": 1048576, "output": 65536 },
           "modalities": {
             "input": ["text", "image", "pdf"],
             "output": ["text"]
@@ -41,6 +40,14 @@
         },
         "gemini-3-pro-low": {
           "name": "Gemini 3 Pro Low (Antigravity)",
+          "limit": { "context": 1048576, "output": 65535 },
+          "modalities": {
+            "input": ["text", "image", "pdf"],
+            "output": ["text"]
+          }
+        },
+        "gemini-3-pro-high": {
+          "name": "Gemini 3 Pro High (Antigravity)",
           "limit": { "context": 1048576, "output": 65535 },
           "modalities": {
             "input": ["text", "image", "pdf"],
@@ -57,10 +64,7 @@
         },
         "claude-sonnet-4-5-thinking": {
           "name": "Claude Sonnet 4.5 Thinking (Antigravity)",
-          "limit": {
-            "context": 200000,
-            "output": 64000
-          },
+          "limit": { "context": 200000, "output": 64000 },
           "modalities": {
             "input": ["text", "image", "pdf"],
             "output": ["text"]
@@ -69,6 +73,14 @@
         "claude-opus-4-5-thinking": {
           "name": "Claude Opus 4.5 Thinking (Antigravity)",
           "limit": { "context": 200000, "output": 64000 },
+          "modalities": {
+            "input": ["text", "image", "pdf"],
+            "output": ["text"]
+          }
+        },
+        "gpt-oss-120b-medium": {
+          "name": "GPT-OSS 120B Medium (Antigravity)",
+          "limit": { "context": 131072, "output": 32768 },
           "modalities": {
             "input": ["text", "image", "pdf"],
             "output": ["text"]
