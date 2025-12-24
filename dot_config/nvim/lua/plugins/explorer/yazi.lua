@@ -138,7 +138,14 @@ return {
             "folke/lazydev.nvim",
             opts = function(_, opts)
               opts.library = opts.library or {}
-              table.insert(opts.library, { path = "yazi-plugins/types.yazi", words = { "ya%.emit", "ya%.sync" } })
+              table.insert(opts.library, {
+                path = "yazi-plugins/types.yazi",
+                words = {
+                  "yazi%-rs/", -- for ~/.config/yazi/init.lua
+                  "ya%.emit", -- for ~/.config/yazi/plugins/folder-rules.yazi/main.lua
+                  "ya%.sync",
+                },
+              })
             end,
           },
         },

@@ -13,7 +13,15 @@ require("session"):setup({
 require("folder-rules"):setup()
 -- https://github.com/yazi-rs/plugins/tree/main/full-border.yazi
 require("full-border"):setup()
--- https://github.com/yazi-rs/plugins/tree/main/git.yazi
+-- https://github.com/yazi-rs/plugins/blob/05234ed15876ea80e1f4f05695e8e90c1fd5ab60/git.yazi/main.lua#L183-L188
+---@diagnostic disable-next-line: inject-field
+th.git = th.git or {}
+-- th.git.ignored = ui.Style():fg("gray")
+th.git.ignored_sign = "I"
+th.git.modified_sign = "M"
+th.git.added_sign = "A"
+th.git.deleted_sign = "D"
+th.git.updated_sign = "U"
 require("git"):setup()
 -- -- https://github.com/llanosrocas/githead.yazi
 -- require("githead"):setup({

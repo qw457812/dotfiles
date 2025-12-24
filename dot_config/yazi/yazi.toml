@@ -22,6 +22,7 @@ prepend_rules = [
 [plugin]
 prepend_fetchers = [
   # https://github.com/yazi-rs/plugins/tree/main/git.yazi
-  { id = "git", name = "*", run = "git" },
-  { id = "git", name = "*/", run = "git" },
+  # `name` for yazi stable and `url` for yazi nightly
+  { id = "git", name = "*", url = "*", run = "git" },
+  { id = "git", name = "*/", url = "*/", run = "git" },
 ]
