@@ -3,13 +3,13 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "plugin": [
-    "oh-my-opencode@2.5.1", // https://github.com/code-yeongyu/oh-my-opencode
+    "oh-my-opencode@2.5.3", // https://github.com/code-yeongyu/oh-my-opencode
     "opencode-antigravity-auth@1.2.4" // https://github.com/NoeFabris/opencode-antigravity-auth
   ],
   // "theme": "system", // https://github.com/sst/opencode/issues/445#issuecomment-3508873123
   "theme": "github",
   "share": "manual",
-  "autoupdate": false,
+  "autoupdate": "notify",
   // "model": "opencode/glm-4.7-free", // Sisyphus
   // "model": "anthropic/claude-opus-4-5",
   "model": "google/claude-opus-4-5-thinking",
@@ -19,6 +19,21 @@
       // "model": "opencode/glm-4.7-free" // Planner-Sisyphus
       // "model": "anthropic/claude-opus-4-5"
       "model": "google/claude-opus-4-5-thinking"
+    }
+  },
+  "permission": {
+    "bash": {
+      "git add *": "ask",
+      "git commit *": "ask",
+      "git push *": "ask",
+      "git pull *": "ask",
+      "git merge *": "ask",
+      "git rebase *": "ask",
+      "git reset *": "ask",
+      "git checkout *": "ask",
+      "git stash *": "ask",
+      "git cherry-pick *": "ask",
+      "git revert *": "ask"
     }
   },
   "provider": {
