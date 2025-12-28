@@ -61,9 +61,11 @@
       "Bash(git rebase:*)",
       "Bash(git reset:*)",
       "Bash(git checkout:*)",
+      "Bash(git switch:*)",
       "Bash(git stash:*)",
       "Bash(git cherry-pick:*)",
-      "Bash(git revert:*)"
+      "Bash(git revert:*)",
+      "Bash(git restore:*)"
     ],
     "defaultMode": "acceptEdits"
   },

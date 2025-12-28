@@ -100,3 +100,7 @@ defaults write com.apple.LaunchServices/com.apple.launchservices.secure LSHandle
     LSHandlerContentType = "public.plain-text";
     LSHandlerRoleAll = "com.neovide.neovide";
 }'
+
+# Trackpad: enable three finger drag
+defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerDrag -bool true
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerDrag -bool true

@@ -767,13 +767,12 @@ function go_to_tab(url: string) {
 function go_to_tab_by_hostname(hostname: string, default_url: string) {
   return async () => {
     const tabs = await browser.tabs.query({});
-    const matching_tab = tabs.find((tab) => {
-      try {
-        return new URL(tab.url || "").hostname === hostname;
-      } catch {
-        return false;
-      }
-    });
+    const matching_tab = tabs.find(
+      (tab) =>
+        tab.url &&
+        URL.canParse(tab.url) &&
+        new URL(tab.url).hostname === hostname,
+    );
     if (matching_tab && matching_tab.id) {
       await browser.tabs.update(matching_tab.id, { active: true });
     } else {
@@ -783,12 +782,9 @@ function go_to_tab_by_hostname(hostname: string, default_url: string) {
 }
 
 function text_to_url(text: string): string {
-  try {
-    new URL(text);
-    return text;
-  } catch {
-    return default_search_engine.replace("{}", encodeURIComponent(text));
-  }
+  return URL.canParse(text)
+    ? text
+    : default_search_engine.replace("{}", encodeURIComponent(text));
 }
 
 const bookmark_cache = {

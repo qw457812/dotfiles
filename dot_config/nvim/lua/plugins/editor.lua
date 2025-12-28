@@ -839,7 +839,9 @@ return {
           setup = false,
           closeOnlyOnFirstColumn = true,
         },
-        useLspFoldsWithTreesitterFallback = false,
+        useLspFoldsWithTreesitterFallback = {
+          enabled = false,
+        },
         autoFold = {
           kinds = {
             "imports",

@@ -18,7 +18,7 @@
   "js-debug-adapter": "v1.105.0",
   "json-lsp": "4.10.0",
   "lemminx": "0.29.0",
-  "lua-language-server": "3.16.3",
+  "lua-language-server": "3.16.4",
   "luacheck": "1.1.0",
   "markdown-toc": "1.2.0",
   "markdownlint-cli2": "0.20.0",
@@ -34,9 +34,9 @@
   "tailwindcss-language-server": "0.14.29",
   "taplo": "0.10.0",
   "tree-sitter-cli": "v0.26.3",
-  "ts_query_ls": "v3.14.0",
+  "ts_query_ls": "v3.15.1",
   "vscode-spring-boot-tools": "1.63.0",
-  "vtsls": "0.2.9",
+  "vtsls": "0.3.0",
   "vue-language-server": "3.2.1",
   "yaml-language-server": "1.19.2"
 }
