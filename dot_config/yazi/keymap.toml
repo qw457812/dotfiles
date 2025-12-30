@@ -474,6 +474,9 @@ prepend_keymap = [
   # # https://yazi-rs.github.io/docs/tips/#close-input-by-esc
   # # Close input by once `Esc` press (without entering Vi mode)
   # { on = "<Esc>", run = "close", desc = "Cancel input" },
+
+  { on = "u", run = "undo", desc = "Undo" },
+  { on = "U", run = "redo", desc = "Redo the last operation" },
 ]
 
 append_keymap = [
@@ -486,7 +489,14 @@ append_keymap = [
   { on = "H", run = "move first-char", desc = "Move to the first non-whitespace character" },
   { on = "L", run = "move eol", desc = "Move to the EOL" },
 
-  { on = "U", run = "redo", desc = "Redo the last operation" },
+  { on = [
+    "g",
+    "u",
+  ], run = "casefy lower", desc = "Lowercase if in visual mode" },
+  { on = [
+    "g",
+    "U",
+  ], run = "casefy upper", desc = "Uppercase if in visual mode" },
 ]
 
 [confirm]

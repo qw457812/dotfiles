@@ -3,7 +3,9 @@
   "google_auth": false,
   "agents": {
     "librarian": { "model": "opencode/glm-4.7-free" },
+    // "librarian": { "model": "anthropic/claude-sonnet-4-5" },
     "oracle": { "model": "google/claude-opus-4-5-thinking" },
+    // "oracle": { "model": "anthropic/claude-opus-4-5" },
     "frontend-ui-ux-engineer": { "model": "google/gemini-3-pro-high" },
     "document-writer": { "model": "google/gemini-3-flash" },
     "multimodal-looker": { "model": "google/gemini-3-flash" }
