@@ -5,7 +5,8 @@ return {
     "hat0uma/csvview.nvim",
     ft = csv_ft,
     keys = {
-      { "<leader>uc", "<cmd>CsvViewToggle<cr>", desc = "Csv View", ft = csv_ft },
+      { "<localleader>c", "<cmd>CsvViewToggle<cr>", desc = "Csv View", ft = csv_ft },
+      { "<localleader>i", "<cmd>CsvViewInfo<cr>", desc = "Csv View Info", ft = csv_ft },
     },
     ---@module "csvview"
     ---@type CsvView.Options

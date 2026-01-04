@@ -18,6 +18,7 @@ require("full-border"):setup()
 th.git = th.git or {}
 -- th.git.ignored = ui.Style():fg("gray")
 th.git.ignored_sign = "I"
+th.git.untracked_sign = "?"
 th.git.modified_sign = "M"
 th.git.added_sign = "A"
 th.git.deleted_sign = "D"

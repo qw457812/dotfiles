@@ -3,6 +3,7 @@ fish_add_path ~/go/bin
 set -q TERMUX_VERSION; or fish_add_path ~/.cargo/bin # https://github.com/rust-lang/rustup/blob/5e59246c45756b860ffa2c0e471e9989f0d56ff8/doc/user-guide/src/installation/already-installed-rust.md?plain=1#L63-L66
 fish_add_path ~/.local/share/bob/nvim-bin
 fish_add_path ~/.local/bin
+fish_add_path ~/.opencode/bin
 fish_add_path "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
 fish_add_path "$HOME/Library/Application Support/Coursier/bin" # scalafmt
 fish_add_path ~/.antigravity/antigravity/bin

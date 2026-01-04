@@ -2,12 +2,27 @@
   "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json",
   "google_auth": false,
   "agents": {
-    "librarian": { "model": "opencode/glm-4.7-free" },
-    // "librarian": { "model": "anthropic/claude-sonnet-4-5" },
-    "oracle": { "model": "google/claude-opus-4-5-thinking" },
-    // "oracle": { "model": "anthropic/claude-opus-4-5" },
-    "frontend-ui-ux-engineer": { "model": "google/gemini-3-pro-high" },
-    "document-writer": { "model": "google/gemini-3-flash" },
-    "multimodal-looker": { "model": "google/gemini-3-flash" }
+    "oracle": {
+      "model": "google/antigravity-claude-opus-4-5-thinking-high"
+      // "model": "anthropic/claude-opus-4-5"
+    },
+    "librarian": {
+      // "model": "opencode/glm-4.7-free"
+      "model": "google/antigravity-claude-sonnet-4-5-thinking-low"
+      // "model": "anthropic/claude-sonnet-4-5"
+    },
+    "explore": {
+      // "model": "opencode/grok-code"
+      "model": "google/antigravity-gemini-3-flash"
+    },
+    "frontend-ui-ux-engineer": {
+      "model": "google/antigravity-gemini-3-pro-high"
+    },
+    "document-writer": {
+      "model": "google/antigravity-gemini-3-flash"
+    },
+    "multimodal-looker": {
+      "model": "google/antigravity-gemini-3-flash"
+    }
   }
 }
