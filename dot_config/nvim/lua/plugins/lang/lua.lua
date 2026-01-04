@@ -89,7 +89,10 @@ return {
   {
     "mason-org/mason.nvim",
     opts = {
-      ensure_installed = vim.list_extend({ "luacheck" }, vim.g.user_is_termux and {} or { "selene" }),
+      ensure_installed = vim.list_extend(
+        { "luacheck" },
+        (vim.g.user_is_termux or vim.g.user_is_asahi) and {} or { "selene" }
+      ),
     },
   },
   {

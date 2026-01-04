@@ -61,10 +61,7 @@ return {
   {
     "mason-org/mason.nvim",
     opts = {
-      ensure_installed = {
-        "joker",
-        -- "clj-kondo",
-      },
+      ensure_installed = not vim.g.user_is_asahi and { "joker" } or nil,
     },
   },
 
@@ -73,16 +70,6 @@ return {
   --   opts = {
   --     servers = {
   --       clojure_lsp = {},
-  --     },
-  --   },
-  -- },
-
-  -- {
-  --   "mfussenegger/nvim-lint",
-  --   optional = true,
-  --   opts = {
-  --     linters_by_ft = {
-  --       clojure = { "clj-kondo" },
   --     },
   --   },
   -- },

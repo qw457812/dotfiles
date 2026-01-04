@@ -24,7 +24,8 @@ return {
     "neovim/nvim-lspconfig",
     opts = {
       servers = {
-        lemminx = {},
+        -- failed to install lemminx via mason on Fedora Asahi Remix
+        lemminx = not vim.g.user_is_asahi and {} or nil,
       },
     },
   },

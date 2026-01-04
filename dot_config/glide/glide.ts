@@ -56,6 +56,11 @@ if (glide.ctx.os === "macosx") {
 // https://searchfox.org/firefox-release/source/browser/app/profile/firefox.js
 glide.prefs.set("browser.startup.page", 3); // Open previous windows and tabs
 glide.prefs.set("browser.uidensity", 1); // compact mode
+// vertical tabs
+glide.prefs.set("sidebar.revamp", true);
+glide.prefs.set("sidebar.verticalTabs", true);
+glide.prefs.set("sidebar.visibility", "expand-on-hover");
+glide.prefs.set("sidebar.animation.expand-on-hover.duration-ms", "0");
 // make <PageDown>/<PageUp> scroll half page
 glide.prefs.set("toolkit.scrollbox.pagescroll.maxOverlapLines", 10000);
 glide.prefs.set("toolkit.scrollbox.pagescroll.maxOverlapPercent", 50);
@@ -97,7 +102,11 @@ glide.keymaps.set("normal", "<Esc>", async (props) => {
 // glide.keymaps.set("normal", "F", () =>
 //   glide.hints.show({ include_click_listeners: true, action: "newtab-click" }),
 // );
-glide.keymaps.set("normal", "/", "keys <D-f>");
+glide.keymaps.set("normal", "/", async () => {
+  await glide.keys.send(glide.ctx.os === "macosx" ? "<D-f>" : "<C-f>", {
+    skip_mappings: true,
+  });
+});
 glide.keymaps.set("normal", "r", when_editing("r", "reload"));
 glide.keymaps.set("normal", "R", when_editing(null, "reload_hard"));
 glide.keymaps.set("normal", "t", when_editing(null, "tab_new"));
@@ -148,10 +157,13 @@ glide.keymaps.set(
 glide.keymaps.set(
   "normal",
   "p",
-  when_editing("keys <D-v>", async () => {
-    const url = text_to_url(await navigator.clipboard.readText());
-    await browser.tabs.update({ url });
-  }),
+  when_editing(
+    `keys ${glide.ctx.os === "macosx" ? "<D-v>" : "<C-v>"}`,
+    async () => {
+      const url = text_to_url(await navigator.clipboard.readText());
+      await browser.tabs.update({ url });
+    },
+  ),
 );
 glide.keymaps.set(
   "normal",
@@ -159,7 +171,9 @@ glide.keymaps.set(
   when_editing(
     async () => {
       await glide.keys.send("<Left>", { skip_mappings: true });
-      await glide.keys.send("<D-v>", { skip_mappings: true });
+      await glide.keys.send(glide.ctx.os === "macosx" ? "<D-v>" : "<C-v>", {
+        skip_mappings: true,
+      });
       await glide.keys.send("<Right>", { skip_mappings: true });
     },
     async () => {
@@ -172,14 +186,20 @@ glide.keymaps.set(
   "normal",
   "e",
   when_editing("motion e", async () => {
-    await glide.keys.send("<D-l>", { skip_mappings: true });
+    await glide.keys.send(glide.ctx.os === "macosx" ? "<D-l>" : "<C-l>", {
+      skip_mappings: true,
+    });
     await sleep(50);
     await glide.excmds.execute("mode_change normal");
     await glide.excmds.execute("caret_move right");
   }),
 );
 glide.keymaps.set("normal", "gi", focusinput);
-glide.keymaps.set("normal", "gs", "keys <D-u>");
+glide.keymaps.set("normal", "gs", async () => {
+  await glide.keys.send(glide.ctx.os === "macosx" ? "<D-u>" : "<C-u>", {
+    skip_mappings: true,
+  });
+});
 glide.keymaps.set(
   "normal",
   "d",

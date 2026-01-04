@@ -1,14 +1,19 @@
-if not (LazyVim.has_extra("lang.nix") and vim.fn.executable("nix") == 1) then
+if not LazyVim.has_extra("lang.nix") then
   return {}
 end
+
+local has_nix = vim.fn.executable("nix") == 1
 
 ---@type LazySpec
 return {
   {
     "neovim/nvim-lspconfig",
+    ---@type PluginLspOpts
     opts = {
+      ---@type table<string, lazyvim.lsp.Config|boolean>
       servers = {
         nil_ls = {
+          enabled = has_nix,
           settings = {
             ["nil"] = {
               formatting = {
@@ -23,7 +28,7 @@ return {
   {
     "mason-org/mason.nvim",
     opts = {
-      ensure_installed = { "alejandra" },
+      ensure_installed = has_nix and { "alejandra" } or nil,
     },
   },
   {
