@@ -1,5 +1,9 @@
 {{ if eq .chezmoi.os "android" }}
-{{ .chezmoi.sourceDir }}/symlinks/termux/nvim/lazy-lock.json
+{{ .chezmoi.sourceDir }}/symlinks/nvim/termux/lazy-lock.json
+{{ else if and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "fedora-asahi-remix") }}
+{{ .chezmoi.sourceDir }}/symlinks/nvim/fedora-asahi/lazy-lock.json
+{{ else if eq .chezmoi.os "darwin" }}
+{{ .chezmoi.sourceDir }}/symlinks/nvim/macos/lazy-lock.json
 {{ else }}
 {{ .chezmoi.sourceDir }}/symlinks/nvim/lazy-lock.json
 {{ end }}

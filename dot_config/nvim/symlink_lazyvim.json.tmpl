@@ -1,5 +1,9 @@
 {{ if eq .chezmoi.os "android" }}
-{{ .chezmoi.sourceDir }}/symlinks/termux/nvim/lazyvim.json
+{{ .chezmoi.sourceDir }}/symlinks/nvim/termux/lazyvim.json
+{{ else if and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "fedora-asahi-remix") }}
+{{ .chezmoi.sourceDir }}/symlinks/nvim/fedora-asahi/lazyvim.json
+{{ else if eq .chezmoi.os "darwin" }}
+{{ .chezmoi.sourceDir }}/symlinks/nvim/macos/lazyvim.json
 {{ else }}
 {{ .chezmoi.sourceDir }}/symlinks/nvim/lazyvim.json
 {{ end }}
