@@ -35,6 +35,7 @@ return {
       })
 
       -- HACK: keymaps for pastebufs
+      -- alternative: try `opts.paste_window.filetype`
       local mapped_pastebufs = {} ---@type table<integer, boolean>
       vim.api.nvim_create_autocmd("BufWinEnter", {
         group = augroup,
