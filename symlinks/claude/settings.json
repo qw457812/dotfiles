@@ -69,7 +69,6 @@
     ],
     "defaultMode": "acceptEdits"
   },
-  "model": "opus",
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh",
@@ -90,5 +89,6 @@
   },
   "feedbackSurveyState": {
     "lastShownTime": 1754043197597
-  }
+  },
+  "model": "opus"
 }

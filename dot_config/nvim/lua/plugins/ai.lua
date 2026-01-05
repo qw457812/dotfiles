@@ -29,37 +29,53 @@ return {
     },
   },
 
-  -- HACK: allow multiple sessions of claude code per cwd
+  -- HACK: multiple claude/opencode sessions per cwd
   {
     "folke/sidekick.nvim",
     optional = true,
-    keys = not vim.g.user_is_termux and {
+    keys = {
       {
-        "<leader>at",
+        "<leader>ac",
         function()
-          U.ai.sidekick.cli.quick.show("claude_tmp" .. (vim.v.count == 0 and "" or vim.v.count))
+          U.ai.sidekick.cli.quick.show("claude" .. (vim.v.count == 0 and "" or vim.v.count))
         end,
-        desc = "Claude Temp",
+        desc = "Claude",
       },
       {
-        "<leader>at",
+        "<leader>ac",
         function()
-          U.ai.sidekick.cli.quick.send("claude_tmp" .. (vim.v.count == 0 and "" or vim.v.count), { msg = "{this}" })
+          U.ai.sidekick.cli.quick.send("claude" .. (vim.v.count == 0 and "" or vim.v.count), { msg = "{this}" })
         end,
         mode = "x",
-        desc = "Claude Temp",
+        desc = "Claude",
       },
-    } or { { "<leader>at", false, mode = { "n", "x" } } },
+      {
+        "<leader>ao",
+        function()
+          U.ai.sidekick.cli.quick.show("opencode" .. (vim.v.count == 0 and "" or vim.v.count))
+        end,
+        desc = "OpenCode",
+      },
+      {
+        "<leader>ao",
+        function()
+          U.ai.sidekick.cli.quick.send("opencode" .. (vim.v.count == 0 and "" or vim.v.count), { msg = "{this}" })
+        end,
+        mode = "x",
+        desc = "OpenCode",
+      },
+    },
     ---@param opts sidekick.Config
-    config = not vim.g.user_is_termux and function(_, opts)
+    config = function(_, opts)
       opts.cli = opts.cli or {}
       opts.cli.tools = opts.cli.tools or {}
-      opts.cli.tools.claude_tmp = vim.deepcopy(opts.cli.tools.claude) or { cmd = { "claude" } }
-      for i = 1, 9 do
-        opts.cli.tools["claude_tmp" .. i] = vim.deepcopy(opts.cli.tools.claude_tmp)
+      for i = 1, 5 do
+        opts.cli.tools["claude" .. i] = U.extend_tbl({ cmd = { "claude" } }, opts.cli.tools.claude)
+        opts.cli.tools["opencode" .. i] = U.extend_tbl({ cmd = { "opencode" } }, opts.cli.tools.opencode)
       end
+
       require("sidekick").setup(opts)
-    end or nil,
+    end,
   },
 
   {
@@ -75,6 +91,7 @@ return {
         { "<cr>", function() U.ai.sidekick.cli.submit_or_focus({ filter = filter }) end, desc = "Submit or Focus (Sidekick)" },
         { "<cr>", function() require("sidekick.cli").send({ msg = "{this}", filter = filter }) end, mode = "x", desc = "Sidekick" },
         { "<leader>av", false, mode = "x" },
+        { "<leader>at", false, mode = { "n", "x" } },
         { "<leader>aa", sidekick_cli_toggle_key, desc = "Sidekick", remap = true },
         { "<leader>aa", function() require("sidekick.cli").send({ msg = "{this}", filter = filter }) end, mode = "x", desc = "Sidekick" },
         { "<leader>as", function() require("sidekick.cli").select({ filter = filter }) end, desc = "Select (Sidekick)" },
@@ -97,12 +114,8 @@ return {
           desc = "Prompt (Sidekick)",
         },
         { "<leader>af", function() require("sidekick.cli").send({ msg = "{file}", filter = filter }) end, desc = "File (Sidekick)" },
-        { "<leader>ac", function() U.ai.sidekick.cli.quick.show("claude") end, desc = "Claude" },
-        { "<leader>ac", function() U.ai.sidekick.cli.quick.send("claude", { msg = "{this}" }) end, mode = "x", desc = "Claude" },
         { "<leader>ax", function() U.ai.sidekick.cli.quick.show("codex") end, desc = "Codex" },
         { "<leader>ax", function() U.ai.sidekick.cli.quick.send("codex", { msg = "{this}" }) end, mode = "x", desc = "Codex" },
-        { "<leader>ao", function() U.ai.sidekick.cli.quick.show("opencode") end, desc = "OpenCode" },
-        { "<leader>ao", function() U.ai.sidekick.cli.quick.send("opencode", { msg = "{this}" }) end, mode = "x", desc = "OpenCode" },
       })
     end,
     ---@module "sidekick"
@@ -131,7 +144,7 @@ return {
                 -- vim.b[buf].sidekick_cli = vim.b[buf].sidekick_cli or terminal.tool -- `vim.w.sidekick_cli` does not need this kind of fix, use that instead
                 vim.b[buf].user_lualine_filename = vim.b[buf].user_lualine_filename or terminal.tool.name
 
-                if terminal.tool.name:find("claude") then -- claude_tmp
+                if terminal.tool.name:find("claude") then
                   local function goto_input_prompt()
                     local lnum = vim.fn.search("^> ", "Wb") -- inputting
                     lnum = lnum == 0 and vim.fn.search("❯ ", "Wb") or lnum -- selecting like `/config`

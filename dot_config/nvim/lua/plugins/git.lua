@@ -315,18 +315,14 @@ return {
                   return
                 end
 
-                local function refresh()
-                  if picker then
-                    picker:refresh()
-                  end
-                end
-
                 Snacks.picker.util.cmd({ "git", "commit", "--fixup", commit }, function()
-                  refresh() -- show fixup commit if rebase fails below
+                  picker:refresh() -- show fixup commit if rebase fails below
 
                   Snacks.picker.util.cmd(
                     { "git", "rebase", "--autostash", "-i", "--autosquash", commit .. "~1" },
-                    refresh,
+                    function()
+                      picker:refresh()
+                    end,
                     { cwd = cwd, env = { GIT_SEQUENCE_EDITOR = ":" } }
                   )
                 end, { cwd = cwd })

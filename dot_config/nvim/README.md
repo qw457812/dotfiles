@@ -227,6 +227,7 @@ time nvim -c exit
 - [ ] Replace `vim.endswith` and `vim.startswith` with `string.match` since I found [this commit of oil.nvim](https://github.com/stevearc/oil.nvim/commit/4de3025).
 - [ ] Try [nvim-focus/focus.nvim](https://github.com/nvim-focus/focus.nvim).
 - [ ] Try [jake-stewart/multicursor.nvim](https://github.com/jake-stewart/multicursor.nvim).
+  - <https://github.com/stevearc/oil.nvim/commit/756dec8>
 - [ ] Try [quicker.nvim](https://github.com/stevearc/quicker.nvim).
 - [ ] Try [term-edit.nvim](https://github.com/chomosuke/term-edit.nvim).
 - [ ] Try [cronex.nvim](https://github.com/fabridamicelli/cronex.nvim).

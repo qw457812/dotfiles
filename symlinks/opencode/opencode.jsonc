@@ -6,36 +6,18 @@
     "oh-my-opencode@2.12.4", // https://github.com/code-yeongyu/oh-my-opencode
     "opencode-antigravity-auth@1.2.7" // https://github.com/NoeFabris/opencode-antigravity-auth
   ],
-  // "theme": "system", // https://github.com/sst/opencode/issues/445#issuecomment-3508873123
-  "theme": "github",
+  "theme": "lucent-orng", // system (https://github.com/sst/opencode/issues/445#issuecomment-3508873123), github
   "share": "manual",
   // "autoupdate": "notify",
-  // "model": "opencode/glm-4.7-free", // Sisyphus
-  // "model": "google/antigravity-claude-opus-4-5-thinking-medium",
-  "model": "anthropic/claude-opus-4-5",
+  "model": "opencode/minimax-m2.1-free", // Sisyphus
+  // "model": "google/antigravity-claude-opus-4-5-thinking-low",
+  // "model": "anthropic/claude-opus-4-5",
   "small_model": "opencode/grok-code",
   "agent": {
     "plan": {
-      // "model": "opencode/glm-4.7-free" // Planner-Sisyphus
-      // "model": "google/antigravity-claude-opus-4-5-thinking-medium"
-      "model": "anthropic/claude-opus-4-5"
-    }
-  },
-  "permission": {
-    "bash": {
-      "git add *": "ask",
-      "git commit *": "ask",
-      "git push *": "ask",
-      "git pull *": "ask",
-      "git merge *": "ask",
-      "git rebase *": "ask",
-      "git reset *": "ask",
-      "git checkout *": "ask",
-      "git switch *": "ask",
-      "git stash *": "ask",
-      "git cherry-pick *": "ask",
-      "git revert *": "ask",
-      "git restore *": "ask"
+      "model": "opencode/minimax-m2.1-free" // Planner-Sisyphus
+      // "model": "google/antigravity-claude-opus-4-5-thinking-low"
+      // "model": "anthropic/claude-opus-4-5"
     }
   },
   "provider": {
@@ -196,13 +178,35 @@
       "timeout": 10000
     }
   },
-  // "tools": {
-  //   "exa_web_search_exa": false
-  // },
+  "permission": {
+    "websearch": "deny", // exa, not sure why this tool exists
+    "codesearch": "deny", // exa, not sure why this tool exists
+    "bash": {
+      "git add *": "ask",
+      "git commit *": "ask",
+      "git push *": "ask",
+      "git pull *": "ask",
+      "git merge *": "ask",
+      "git rebase *": "ask",
+      "git reset *": "ask",
+      "git checkout *": "ask",
+      "git switch *": "ask",
+      "git stash *": "ask",
+      "git cherry-pick *": "ask",
+      "git revert *": "ask",
+      "git restore *": "ask"
+    }
+  },
   "keybinds": {
     "leader": "ctrl+x",
     "messages_half_page_up": "ctrl+u",
     "messages_half_page_down": "ctrl+d",
-    "editor_open": "ctrl+g"
+    "app_exit": "ctrl+c,<leader>q", // ctrl+d (messages_half_page_down) in subagent session exits app
+    "input_delete_to_line_start": "ctrl+u,alt+u",
+    "messages_next": "alt+j",
+    "messages_previous": "alt+k",
+    "editor_open": "ctrl+g", // align with claude code since we can't change claude code keybinds
+    "agent_cycle": "none", // avoid accidental agent cycle
+    "session_child_cycle": "<leader>right,tab"
   }
 }

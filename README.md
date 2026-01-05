@@ -170,6 +170,11 @@ Fix [zathura auto focus on open](https://github.com/zegervdv/homebrew-zathura/is
   - <https://www.chezmoi.io/user-guide/advanced/install-packages-declaratively/>
   - <https://www.chezmoi.io/user-guide/use-scripts-to-perform-actions/#install-packages-with-scripts>
 
+### Linux on Apple Silicon
+
+- [Asahi Linux](https://asahilinux.org/)
+- [nix-community/nixos-apple-silicon](https://github.com/nix-community/nixos-apple-silicon)
+
 ### Nix
 
 #### Install
