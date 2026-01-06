@@ -72,6 +72,10 @@ background_image_layout scaled
 
 # Advanced
 # shell /opt/homebrew/bin/fish --login --interactive
+{{- if and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "fedora-asahi-remix") }}
+# for neovim `vim.g.clipboard = "osc52"`
+clipboard_control write-clipboard write-primary read-clipboard read-primary
+{{- end }}
 
 # OS specific tweaks
 macos_option_as_alt both
