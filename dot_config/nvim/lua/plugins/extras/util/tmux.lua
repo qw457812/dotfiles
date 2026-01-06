@@ -164,7 +164,7 @@ end
 return {
   {
     "gpakosz/.tmux",
-    commit = "6e22cc296528bab6681d72e3324a91905c37d37c",
+    commit = "87dcd13",
     name = "oh-my-tmux",
     lazy = true,
     config = function() end,

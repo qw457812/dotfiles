@@ -79,7 +79,7 @@
   "nvim-treesitter-textobjects": { "branch": "main", "commit": "28a3494c075ef0f353314f627546537e43c09592" },
   "nvim-ts-autotag": { "branch": "main", "commit": "c4ca798ab95b316a768d51eaaaee48f64a4a46bc" },
   "nvim-various-textobjs": { "branch": "main", "commit": "bf2133af67b31bdd3c30248b76b5f058bb9b762e" },
-  "oh-my-tmux": { "branch": "master", "commit": "6e22cc296528bab6681d72e3324a91905c37d37c" },
+  "oh-my-tmux": { "branch": "master", "commit": "87dcd13a28aeb5f18baee630e24b3f5765ae3a4f" },
   "oil.nvim": { "branch": "master", "commit": "81b8a91735ad5cd24a6b3137f14a89f19176364f" },
   "pantran.nvim": { "branch": "main", "commit": "b87c3ae48cba4659587fb75abd847e5b7a7c9ca0" },
   "persistence.nvim": { "branch": "main", "commit": "b20b2a7887bd39c1a356980b45e03250f3dce49c" },
