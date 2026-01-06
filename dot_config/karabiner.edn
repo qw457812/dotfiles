@@ -64,10 +64,10 @@
              ;; https://github.com/koekeishiya/dotfiles/blob/master/yabai/yabairc
              ;; problem1: can't switch after press cmd+2 in ActivityMonitor.app
              ;; problem2: can't switch to another space's app
-             ; :prev_app                {:shell "/opt/homebrew/bin/yabai -m window --focus recent || (id=$(/opt/homebrew/bin/yabai -m query --windows --space | /opt/homebrew/bin/jq '.[1].id') && /opt/homebrew/bin/yabai -m window --focus \"$id\") || open -g hammerspoon://cmdTab"}
+             ; :prev_app                {:shell "/opt/homebrew/bin/yabai -m window --focus recent || (id=$(/opt/homebrew/bin/yabai -m query --windows --space | /opt/homebrew/bin/jq '.[1].id') && /opt/homebrew/bin/yabai -m window --focus \"$id\") || open -g hammerspoon://cmd_tab"}
              ;; problem: can switch to Finder.app's closed window
-             ; :prev_app                {:shell "/opt/homebrew/bin/yabai -m window --focus recent || open -g hammerspoon://cmdTab"}
-             :prev_app                {:shell "open -g hammerspoon://prevApp"}
+             ; :prev_app                {:shell "/opt/homebrew/bin/yabai -m window --focus recent || open -g hammerspoon://cmd_tab"}
+             :prev_app                {:shell "open -g hammerspoon://prev_app"}
              :open-default-terminal   {:shell "open /Applications/kitty.app"} ; kitty.app, WezTerm.app
              :open-default-browser    {:shell "open \"/Applications/Glide.app\""} ; Brave Browser.app, Helium.app, Glide.app, Google Chrome.app
              :home_dir                [{:key  :grave_accent_and_tilde
@@ -797,8 +797,8 @@
 
            [:i :!Ckeypad_plus] ; Zoom in
            [:o :!Ckeypad_hyphen] ; Zoom out
-           [:m [:hs ["mouseHighlight"]]] ; show mouse
-           ;; [:spacebar [:hs ["mouseCenterClick"]]] ; centre mouse to active app
+           [:m [:hs ["mouse_highlight"]]] ; show mouse
+           ;; [:spacebar [:hs ["mouse_center_click"]]] ; centre mouse to active app
            [:##spacebar {:pkey :button1}] ; Left click
            ]}
 
@@ -1167,7 +1167,7 @@
            ;; [:j :!!close_bracket] ; open Menu for ClashX
            [:j [:open "/Applications/v2rayN.app"] :!V2rayN]
            [:j :prev_app :V2rayN]
-           [:k [:hs ["toggleAClock"]]] ; show time
+           [:k [:hs ["toggle_aclock"]]] ; show time
            [:l :!!f12] ; itsycal (calendar)
            [:semicolon :!!f2] ; control center by Bartender 4
            ;; Toggle dark mode (https://github.com/sindresorhus/dark-mode/blob/main/Sources/DarkMode.swift)
@@ -1525,7 +1525,7 @@
   ;; right cmd -> cmd+`/rime/raycast/mouseCenter/return
   {:des   "right cmd alone -> toggle rime chinese/english"
    :rules [[:condi :!niz-x87-bt :!glove80]
-           ;; [:#Pright_command :right_command nil {:alone [:hs ["mouseCenterClick"]]}]
+           ;; [:#Pright_command :right_command nil {:alone [:hs ["mouse_center_click"]]}]
            ;; `:##` or `:#P` ---> only `:#P` work for "For Apple-Internal-Keyboard\n- left cmd + right cmd -> raycast" below
            ;; [:##right_command :right_command :!Emacs {:alone :left_shift}] ; rime
            [:#Pright_command :right_command [:!Emacs :!Neovide] {:alone :right_control}] ; rime
@@ -1557,8 +1557,8 @@
              ;; 2. call hammerspoon URL event "mouseCenterClick"
              ;; 3. set variable "right-command" to 0
              ;; FIXME vscode 切换中英文经常不灵
-             :alone   [:!TSclose_bracket [:hs ["mouseCenterClick"]] ["right-command" 0]] ; or move `["right-command" 0]` into `:afterup`
-             ;; :alone   [:!TSclose_bracket [:hs ["mouseCenterClick"]]]
+             :alone   [:!TSclose_bracket [:hs ["mouse_center_click"]] ["right-command" 0]] ; or move `["right-command" 0]` into `:afterup`
+             ;; :alone   [:!TSclose_bracket [:hs ["mouse_center_click"]]]
 
              ;; [to_after_key_up](https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/to-after-key-up/)
              ;; set variable "right-command" to 0 when the <from> key is released
@@ -1609,7 +1609,7 @@
    :rules [[:condi :!glove80 :!niz-x87-bt :!niz-x87-wired]
            ;; [:#Pright_option :right_option :translate-by-opt-shift-a-app {:alone [:!OSa]}]
            ;; [:#Pright_option :right_option :!translate-by-opt-shift-a-app {:alone [:!!backslash]}] ; raycast://extensions/isfeng/easydict/easydict
-           [:#Pright_option :right_option nil {:alone [:hs ["mouseCenterClick"]]}]
+           [:#Pright_option :right_option nil {:alone [:hs ["mouse_center_click"]]}]
            ]}
 
   ;; TODO 影响 double shift
@@ -1860,7 +1860,7 @@
            [:##left_option :left_option :VSCode {:alone [:!Tb]}] ; tmux prefix
            [:##left_option :left_option :Cursor {:alone [:!Tb]}] ; tmux prefix
            [:##left_option :left_option :RuijieWorkSpace {:alone [:!Tb]}] ; tmux prefix
-           [:##right_option :right_option nil {:alone [:hs ["mouseCenterClick"]]}]
+           [:##right_option :right_option nil {:alone [:hs ["mouse_center_click"]]}]
            [:##up_arrow :down_arrow]
            [:##down_arrow :up_arrow]
            [:##home :equal_sign :!Preview]
@@ -2014,7 +2014,7 @@
 
   {:des   "For NIZ: fix the wrong position of modifier keys"
    :rules [:niz-x87-bt
-           [:##right_control :right_command nil {:alone [:hs ["mouseCenterClick"]]}] ; right_command, see "right cmd alone" above
+           [:##right_control :right_command nil {:alone [:hs ["mouse_center_click"]]}] ; right_command, see "right cmd alone" above
            [:##right_command :right_option :translate-by-opt-shift-a-app {:alone [:!OSa]}] ; right_option, see "right option alone" above
            [:##right_command :right_option :!translate-by-opt-shift-a-app {:alone [:!!backslash]}] ; right_option, see "right option alone" above
            [:##right_option :!CTOleft_shift nil {:alone :!Cv}] ; right_ctrl see "For Not HHKB" above
@@ -2025,7 +2025,7 @@
            [:##left_command :left_option :tmux-autostart-terminals {:alone [:!Tb]}] ; left_option, see "left option alone" above
            [:##left_command :left_option :VSCode {:alone [:!Tb]}] ; left_option, see "left option alone" above
            [:##left_command :left_option :Cursor {:alone [:!Tb]}] ; left_option, see "left option alone" above
-           [:##right_option :right_command nil {:alone [:hs ["mouseCenterClick"]]}] ; right_command, see "right cmd alone" above
+           [:##right_option :right_command nil {:alone [:hs ["mouse_center_click"]]}] ; right_command, see "right cmd alone" above
            [:##application :right_option :translate-by-opt-shift-a-app {:alone [:!OSa]}] ; right_option, see "right option alone" above
            [:##application :right_option :!translate-by-opt-shift-a-app {:alone [:!!backslash]}] ; right_option, see "right option alone" above
            [:##right_control :!CTOleft_shift nil {:alone :!Cv}] ; right_ctrl, see "For Not HHKB" above

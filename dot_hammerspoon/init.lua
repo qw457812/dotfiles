@@ -10,7 +10,7 @@ spoon.AClock:init()
 spoon.AClock.format = "%H:%M:%S"
 spoon.AClock.width = 512
 spoon.AClock.showDuration = 1
-hs.urlevent.bind("toggleAClock", function(eventName, params)
+hs.urlevent.bind("toggle_aclock", function(eventName, params)
   spoon.AClock:toggleShow()
 end)
 
@@ -24,7 +24,7 @@ function mouseCenterClick()
   -- https://www.hammerspoon.org/docs/hs.eventtap.html#leftClick
   hs.eventtap.leftClick(center)
 end
-hs.urlevent.bind("mouseCenterClick", function(eventName, params)
+hs.urlevent.bind("mouse_center_click", function(eventName, params)
   mouseCenterClick()
 end)
 
@@ -44,7 +44,7 @@ end)
 --   -- https://www.hammerspoon.org/docs/hs.keycodes.html#map
 --   hs.eventtap.keyStroke({ "ctrl", "alt", "shift" }, "space")
 -- end
--- hs.urlevent.bind("mouseCenterClickThenMaximizeWindow", function(eventName, params)
+-- hs.urlevent.bind("mouse_center_click_then_maximize_window", function(eventName, params)
 --   mouseCenterClick()
 --   maximizeWindow()
 -- end)
@@ -68,7 +68,7 @@ function cmdTab(repeatTimes)
 
   hs.eventtap.event.newKeyEvent(hs.keycodes.map.cmd, false):post()
 end
-hs.urlevent.bind("cmdTab", function(eventName, params)
+hs.urlevent.bind("cmd_tab", function(eventName, params)
   cmdTab(1)
 end)
 
@@ -100,7 +100,7 @@ function prevApp()
   end)
 end
 
-hs.urlevent.bind("prevApp", function(eventName, params)
+hs.urlevent.bind("prev_app", function(eventName, params)
   local _, status = hs.execute("/opt/homebrew/bin/yabai -m window --focus recent")
 
   -- fallback to cmd+tab on yabai failed
@@ -160,7 +160,7 @@ function mouseHighlight()
   end)
 end
 -- hs.hotkey.bind({"cmd", "alt", "ctrl", "shift"}, "D", mouseHighlight)
-hs.urlevent.bind("mouseHighlight", function(eventName, params)
+hs.urlevent.bind("mouse_highlight", function(eventName, params)
   mouseHighlight()
 end)
 
