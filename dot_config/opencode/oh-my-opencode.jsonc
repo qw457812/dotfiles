@@ -1,16 +1,15 @@
 {
   "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json",
   "google_auth": false,
-  // re-add websearch_exa in opencode.jsonc to fix the timed out issue
-  "disabled_mcps": ["websearch_exa"],
+  "disabled_hooks": ["startup-toast"],
   "agents": {
     "oracle": {
-      "model": "google/antigravity-claude-opus-4-5-thinking-high"
+      "model": "google/antigravity-claude-opus-4-5-thinking-medium"
       // "model": "anthropic/claude-opus-4-5"
     },
     "librarian": {
-      "model": "opencode/minimax-m2.1-free"
-      // "model": "google/antigravity-claude-sonnet-4-5-thinking-low"
+      "model": "opencode/glm-4.7-free"
+      // "model": "google/antigravity-claude-sonnet-4-5"
       // "model": "anthropic/claude-sonnet-4-5"
     },
     // "explore": {

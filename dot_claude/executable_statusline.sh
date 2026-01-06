@@ -27,7 +27,7 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   # cwd=$(echo "$input" | jq -r '.workspace.current_dir // .cwd')
 
   # model
-  model=$(echo "$input" | jq -r '(.model.display_name // "") | split(" ")[0]')
+  model=$(echo "$input" | jq -r '(.model.display_name // "") | split(" ")[0] | split("-")[0] | (.[:1] | ascii_upcase) + .[1:]')
   model_display=$([ -n "$model" ] && echo "${COLOR_RED}${model}${COLOR_RESET}")
 
   # # tokens (from transcript)

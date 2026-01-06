@@ -62,7 +62,7 @@
   "mini.snippets": { "branch": "main", "commit": "b4065ca6b33e4df2897672d3bb760cfc93f4390a" },
   "mini.surround": { "branch": "main", "commit": "cc7b9d0a056b5fa6915ffac1cb91f29bf7c96f69" },
   "mini.trailspace": { "branch": "main", "commit": "f8083ca969e1b2098480c10f3c3c4d2ce3586680" },
-  "neo-tree.nvim": { "branch": "main", "commit": "38c8e49bf6731a27eb612834ec88c606532b7fea" },
+  "neo-tree.nvim": { "branch": "main", "commit": "6ba0ef540a8dc92f9533433a3f10d414014676aa" },
   "neogen": { "branch": "main", "commit": "d7f9461727751fb07f82011051338a9aba07581d" },
   "neon.nvim": { "branch": "main", "commit": "50537d23b2ca3b482b95e572b86b26a699ab2ce4" },
   "neotest": { "branch": "master", "commit": "deadfb1af5ce458742671ad3a013acb9a6b41178" },
@@ -90,7 +90,7 @@
   "nvim-ts-autotag": { "branch": "main", "commit": "c4ca798ab95b316a768d51eaaaee48f64a4a46bc" },
   "nvim-various-textobjs": { "branch": "main", "commit": "bf2133af67b31bdd3c30248b76b5f058bb9b762e" },
   "obscure.nvim": { "branch": "main", "commit": "5b35a4e1b1df49c3f66747355c75bee871c6a60f" },
-  "oh-my-tmux": { "branch": "master", "commit": "6e22cc296528bab6681d72e3324a91905c37d37c" },
+  "oh-my-tmux": { "branch": "master", "commit": "87dcd13a28aeb5f18baee630e24b3f5765ae3a4f" },
   "oil.nvim": { "branch": "master", "commit": "81b8a91735ad5cd24a6b3137f14a89f19176364f" },
   "onedark.nvim": { "branch": "master", "commit": "fae34f7c635797f4bf62fb00e7d0516efa8abe37" },
   "pantran.nvim": { "branch": "main", "commit": "b87c3ae48cba4659587fb75abd847e5b7a7c9ca0" },
@@ -127,6 +127,6 @@
   "which-key.nvim": { "branch": "main", "commit": "3aab2147e74890957785941f0c1ad87d0a44c15a" },
   "yanky.nvim": { "branch": "main", "commit": "04fc42b94305d94948c9c197f679336668af3292" },
   "yazi-flavors": { "branch": "main", "commit": "4a1802a5add0f867b08d5890780c10dd1f051c36" },
-  "yazi-plugins": { "branch": "main", "commit": "03cdd4b5b15341b3c0d0f4c850d633fadd05a45f" },
-  "yazi.nvim": { "branch": "main", "commit": "d666962582840f889161109cf970d311c7a447d0" }
+  "yazi-plugins": { "branch": "main", "commit": "4e5590280db0de5f130bf377e9c32a202110f575" },
+  "yazi.nvim": { "branch": "main", "commit": "ba8aa934dcb932efb5c9b3f869470baaedaad068" }
 }
