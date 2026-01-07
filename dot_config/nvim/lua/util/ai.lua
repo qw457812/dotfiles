@@ -399,6 +399,41 @@ M.sidekick = {
         })
       end
     end,
+    tools = {
+      opencode = {
+        actions = {
+          ---@param dir "u"|"d"
+          scrollback_messages_scroll = function(dir)
+            ---@type sidekick.cli.Action
+            return function(t)
+              if not t.tool.name:find("opencode") then
+                local count = vim.v.count
+                return vim.cmd("normal! " .. vim.keycode((count > 0 and count or "") .. "<C-" .. dir .. ">"))
+              end
+
+              if t.mux_session then
+                if t.backend == "tmux" or t.mux_backend == "tmux" then
+                  require("sidekick.util").exec({ "tmux", "send-keys", "-t", t.mux_session, "C-" .. dir })
+                else
+                  -- TODO: zellij
+                end
+              else
+                local win = vim.api.nvim_get_current_win()
+                local cursor = vim.api.nvim_win_get_cursor(win)
+                vim.cmd.startinsert()
+                vim.api.nvim_feedkeys(vim.keycode("<C-" .. dir .. ">"), "n", false)
+                vim.schedule(function()
+                  vim.cmd.stopinsert()
+                  vim.defer_fn(function()
+                    vim.api.nvim_win_set_cursor(win, cursor)
+                  end, 10)
+                end)
+              end
+            end
+          end,
+        },
+      },
+    },
   },
 }
 

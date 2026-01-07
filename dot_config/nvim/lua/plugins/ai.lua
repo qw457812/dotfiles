@@ -241,6 +241,17 @@ return {
             nav_up = vim.F.if_nil(vim.g.neovide, false) and nil,
             nav_right = vim.F.if_nil(vim.g.neovide, false) and nil,
             nav_left = vim.F.if_nil(vim.g.neovide, false) and nil, -- not necessary, but for consistency
+            -- putting opencode_messages_scroll_up in `opts.cli.tools.opencode.keys` causes errors, related to `mode = "n"`
+            opencode_messages_scroll_up = {
+              "<C-u>",
+              U.ai.sidekick.cli.tools.opencode.actions.scrollback_messages_scroll("u"),
+              mode = "n",
+            },
+            opencode_messages_scroll_down = {
+              "<C-d>",
+              U.ai.sidekick.cli.tools.opencode.actions.scrollback_messages_scroll("d"),
+              mode = "n",
+            },
           },
         },
         ---@type sidekick.cli.Mux
