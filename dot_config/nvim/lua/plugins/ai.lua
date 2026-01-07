@@ -1,3 +1,6 @@
+---@class vim.var_accessor
+---@field user_sidekick_indicator? { win: number }
+
 local sidekick_cli_toggle_key = "<M-space>"
 local copilot_available = not vim.g.user_is_termux or vim.fn.executable("copilot-language-server") == 1
 
@@ -398,36 +401,61 @@ return {
       })
 
       -- https://github.com/folke/snacks.nvim/blob/3c2d79162f8174d5e1c33539a72025a25f4af590/lua/snacks/zen.lua#L160-L204
-      local indicator ---@type snacks.win?
-      vim.api.nvim_create_autocmd("BufEnter", {
-        group = vim.api.nvim_create_augroup("sidekick_indicator", { clear = true }),
+      local indicator_group = vim.api.nvim_create_augroup("sidekick_indicator", { clear = true })
+      vim.api.nvim_create_autocmd("WinEnter", {
+        group = indicator_group,
         callback = function(ev)
+          local win = vim.api.nvim_get_current_win()
           if vim.bo[ev.buf].filetype ~= "sidekick_terminal" then
             return
           end
-          if not indicator then
-            local hl = ev.match == "" and "SidekickCliIndicatorScrollback" or "SidekickCliIndicatorTerminal"
-            indicator = Snacks.win({
-              show = false,
-              style = "sidekick_indicator",
-              wo = { winhighlight = "NormalFloat:" .. hl },
-            })
-            ---@diagnostic disable-next-line: invisible
-            indicator:open_buf()
-            local lines = vim.api.nvim_buf_get_lines(indicator.buf, 0, -1, false)
-            indicator.opts.width = vim.api.nvim_strwidth(lines[1] or "")
-            indicator:show()
+
+          local indicator = Snacks.win({ show = false, style = "sidekick_indicator" })
+          ---@diagnostic disable-next-line: invisible
+          indicator:open_buf()
+          local lines = vim.api.nvim_buf_get_lines(indicator.buf, 0, -1, false)
+          indicator.opts.width = vim.api.nvim_strwidth(lines[1] or "")
+          indicator:show()
+
+          vim.w[win].user_sidekick_indicator = { win = indicator.win }
+
+          ---@param w number
+          ---@param is_sb boolean
+          local function winhl(w, is_sb)
+            local hl = is_sb and "SidekickCliIndicatorScrollback" or "SidekickCliIndicatorTerminal"
+            vim.wo[w][0].winhighlight = "NormalFloat:" .. hl
           end
-          vim.api.nvim_create_autocmd("BufLeave", {
-            group = vim.api.nvim_create_augroup("sidekick_indicator_" .. ev.buf, { clear = true }),
-            buffer = ev.buf,
-            callback = function()
-              if indicator then
-                indicator:close()
-                indicator = nil
-              end
-            end,
-          })
+
+          -- schedule for vim.fn.mode()
+          vim.schedule(function()
+            if indicator:win_valid() then
+              winhl(indicator.win, vim.fn.mode() ~= "t")
+            end
+          end)
+          indicator:on("TermEnter", function(self, _ev)
+            if vim.bo[_ev.buf].filetype == "sidekick_terminal" and self:win_valid() then
+              winhl(self.win, false)
+            end
+          end)
+          indicator:on("TermLeave", function(self, _ev)
+            if vim.bo[_ev.buf].filetype == "sidekick_terminal" and self:win_valid() then
+              winhl(self.win, true)
+            end
+          end)
+        end,
+      })
+
+      vim.api.nvim_create_autocmd("WinLeave", {
+        group = indicator_group,
+        callback = function(ev)
+          local win = vim.api.nvim_get_current_win()
+          if vim.bo[ev.buf].filetype ~= "sidekick_terminal" then
+            return
+          end
+          local indicator = vim.w[win].user_sidekick_indicator
+          if indicator then
+            vim.api.nvim_win_close(indicator.win, false)
+          end
         end,
       })
     end,
