@@ -3,24 +3,25 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "plugin": [
-    "oh-my-opencode@2.13.2", // https://github.com/code-yeongyu/oh-my-opencode
+    "oh-my-opencode@2.14.0", // https://github.com/code-yeongyu/oh-my-opencode
     "opencode-antigravity-auth@1.2.7" // https://github.com/NoeFabris/opencode-antigravity-auth
   ],
   "theme": "lucent-orng", // system (https://github.com/sst/opencode/issues/445#issuecomment-3508873123), github
   "share": "manual",
   // "autoupdate": "notify",
-  "model": "opencode/glm-4.7-free", // Sisyphus
+  // "model": "opencode/glm-4.7-free", // Sisyphus
   // "model": "google/antigravity-claude-opus-4-5-thinking-low",
-  // "model": "anthropic/claude-opus-4-5",
+  "model": "anthropic/claude-opus-4-5-20251101",
   "small_model": "opencode/grok-code",
   "agent": {
     "plan": {
-      "model": "opencode/glm-4.7-free" // Planner-Sisyphus
+      // "model": "opencode/glm-4.7-free" // Planner-Sisyphus
       // "model": "google/antigravity-claude-opus-4-5-thinking-low"
-      // "model": "anthropic/claude-opus-4-5"
+      "model": "anthropic/claude-opus-4-5-20251101"
     }
   },
   "provider": {
+    // check `opencode models anthropic`
     "anthropic": {
       "options": {
         "baseURL": "{env:CLAUDE_RELAY_SERVICE_URL}/api/v1",
@@ -157,25 +158,41 @@
       }
     }
   },
+  "disabled_providers": [
+    "alibaba",
+    "alibaba-cn",
+    "deepseek",
+    "groq",
+    "kimi-for-coding",
+    "minimax",
+    "minimax-cn",
+    "modelscope",
+    "moonshotai",
+    "moonshotai-cn",
+    "openrouter",
+    "togetherai",
+    "zai",
+    "zai-coding-plan",
+    "zhipuai",
+    "zhipuai-coding-plan"
+  ],
   "mcp": {
     // "context7": {
     //   "type": "local",
     //   "command": ["npx", "-y", "@upstash/context7-mcp"],
     //   "enabled": false
     // },
-    // oh-my-opencode removed websearch_exa since the Exa Remote MCP is broken
-    // see: https://github.com/code-yeongyu/oh-my-opencode/issues/493
-    // re-adding here since we need a working web search tool
-    "websearch_exa": {
-      "type": "local",
-      "command": ["npx", "-y", "exa-mcp-server", "tools=web_search_exa"],
-      "enabled": true,
-      "timeout": 60000
-    }
+    // https://github.com/code-yeongyu/oh-my-opencode/issues/493
+    // "exa": {
+    //   "type": "local",
+    //   "command": ["npx", "-y", "exa-mcp-server", "tools=web_search_exa"],
+    //   "enabled": true,
+    //   "timeout": 60000
+    // }
   },
   "permission": {
-    "websearch": "deny", // exa, not sure why this tool exists
-    "codesearch": "deny", // exa, not sure why this tool exists
+    "websearch": "deny", // provided by exa, not sure why this tool exists (for opencode/glm-4.7-free), we already have websearch_web_search_exa (from `websearch` MCP which was added by oh-my-opencode)
+    "codesearch": "deny", // provided by exa, not sure why this tool exists (for opencode/glm-4.7-free)
     "bash": {
       "git add *": "ask",
       "git commit *": "ask",
