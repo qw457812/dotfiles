@@ -404,10 +404,13 @@ return {
       local indicator_group = vim.api.nvim_create_augroup("sidekick_indicator", { clear = true })
       vim.api.nvim_create_autocmd("WinEnter", {
         group = indicator_group,
-        callback = function(ev)
+        callback = function()
           local win = vim.api.nvim_get_current_win()
-          if vim.bo[ev.buf].filetype ~= "sidekick_terminal" then
+          if not vim.w[win].sidekick_cli then
             return
+          end
+          if vim.w[win].user_sidekick_indicator then
+            return -- already shown (likely not needed, but kept as a safeguard)
           end
 
           local indicator = Snacks.win({ show = false, style = "sidekick_indicator" })
@@ -416,7 +419,6 @@ return {
           local lines = vim.api.nvim_buf_get_lines(indicator.buf, 0, -1, false)
           indicator.opts.width = vim.api.nvim_strwidth(lines[1] or "")
           indicator:show()
-
           vim.w[win].user_sidekick_indicator = { win = indicator.win }
 
           ---@param w number
@@ -432,13 +434,13 @@ return {
               winhl(indicator.win, vim.fn.mode() ~= "t")
             end
           end)
-          indicator:on("TermEnter", function(self, _ev)
-            if vim.bo[_ev.buf].filetype == "sidekick_terminal" and self:win_valid() then
+          indicator:on("TermEnter", function(self)
+            if vim.w.sidekick_cli and self:win_valid() then
               winhl(self.win, false)
             end
           end)
-          indicator:on("TermLeave", function(self, _ev)
-            if vim.bo[_ev.buf].filetype == "sidekick_terminal" and self:win_valid() then
+          indicator:on("TermLeave", function(self)
+            if vim.w.sidekick_cli and self:win_valid() then
               winhl(self.win, true)
             end
           end)
@@ -447,13 +449,13 @@ return {
 
       vim.api.nvim_create_autocmd("WinLeave", {
         group = indicator_group,
-        callback = function(ev)
-          local win = vim.api.nvim_get_current_win()
-          if vim.bo[ev.buf].filetype ~= "sidekick_terminal" then
+        callback = function()
+          if not vim.w.sidekick_cli then
             return
           end
-          local indicator = vim.w[win].user_sidekick_indicator
+          local indicator = vim.w.user_sidekick_indicator
           if indicator then
+            vim.w.user_sidekick_indicator = nil
             vim.api.nvim_win_close(indicator.win, false)
           end
         end,
