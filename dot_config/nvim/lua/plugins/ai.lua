@@ -149,9 +149,20 @@ return {
 
                 if terminal.tool.name:find("claude") then
                   local function goto_input_prompt()
-                    local lnum = vim.fn.search("^> ", "Wb") -- inputting
+                    local lnum = vim.fn.search("^❯", "Wb") -- inputting
                     lnum = lnum == 0 and vim.fn.search("❯ ", "Wb") or lnum -- selecting like `/config`
                   end
+
+                  vim.keymap.set("n", "J", function()
+                    if vim.fn.search(vim.g.user_is_termux and "^● " or "^⏺ ", "W") == 0 then
+                      LazyVim.warn("No more assistant messages", { title = "Sidekick" })
+                    end
+                  end, { buffer = buf, desc = "Jump to next assistant message (Sidekick)" })
+                  vim.keymap.set("n", "K", function()
+                    if vim.fn.search(vim.g.user_is_termux and "^● " or "^⏺ ", "Wb") == 0 then
+                      LazyVim.warn("No more assistant messages", { title = "Sidekick" })
+                    end
+                  end, { buffer = buf, desc = "Jump to previous assistant message (Sidekick)" })
 
                   -- schedule to overwrite `]]` and `[[` defined in https://github.com/neovim/neovim/blob/520568f40f22d77e623ddda77cf751031774384b/runtime/lua/vim/_defaults.lua#L651-L656
                   vim.schedule(function()
@@ -162,26 +173,15 @@ return {
                     goto_input_prompt() -- save some `k` presses
 
                     vim.keymap.set("n", "]]", function()
-                      if vim.fn.search("^> ", "W") == 0 then
+                      if vim.fn.search("^❯ ", "W") == 0 then
                         LazyVim.warn("No more user messages", { title = "Sidekick" })
                       end
                     end, { buffer = buf, desc = "Jump to next user message (Sidekick)" })
                     vim.keymap.set("n", "[[", function()
-                      if vim.fn.search("^> ", "Wb") == 0 then
+                      if vim.fn.search("^❯ ", "Wb") == 0 then
                         LazyVim.warn("No more user messages", { title = "Sidekick" })
                       end
                     end, { buffer = buf, desc = "Jump to previous user message (Sidekick)" })
-
-                    vim.keymap.set("n", "J", function()
-                      if vim.fn.search(vim.g.user_is_termux and "^● " or "^⏺ ", "W") == 0 then
-                        LazyVim.warn("No more assistant messages", { title = "Sidekick" })
-                      end
-                    end, { buffer = buf, desc = "Jump to next assistant message (Sidekick)" })
-                    vim.keymap.set("n", "K", function()
-                      if vim.fn.search(vim.g.user_is_termux and "^● " or "^⏺ ", "Wb") == 0 then
-                        LazyVim.warn("No more assistant messages", { title = "Sidekick" })
-                      end
-                    end, { buffer = buf, desc = "Jump to previous assistant message (Sidekick)" })
                   end)
                 end
               end,
@@ -244,15 +244,17 @@ return {
             nav_up = vim.F.if_nil(vim.g.neovide, false) and nil,
             nav_right = vim.F.if_nil(vim.g.neovide, false) and nil,
             nav_left = vim.F.if_nil(vim.g.neovide, false) and nil, -- not necessary, but for consistency
-            -- putting opencode_messages_scroll_up in `opts.cli.tools.opencode.keys` causes errors, related to `mode = "n"`
-            opencode_messages_scroll_up = {
-              "<C-u>",
-              U.ai.sidekick.cli.tools.opencode.actions.scrollback_messages_scroll("u"),
-              mode = "n",
-            },
-            opencode_messages_scroll_down = {
-              "<C-d>",
-              U.ai.sidekick.cli.tools.opencode.actions.scrollback_messages_scroll("d"),
+            editor_open = {
+              "<C-g>",
+              function(t)
+                local name = t.tool.name
+                if name:find("claude") or name:find("opencode") or name:find("codex") then
+                  U.ai.sidekick.cli.tools.actions.send_keys({ "<C-g>" })(t)
+                  vim.cmd.startinsert()
+                else
+                  vim.api.nvim_feedkeys(vim.keycode("<C-g>"), "n", false)
+                end
+              end,
               mode = "n",
             },
           },
@@ -376,6 +378,58 @@ return {
         return ret
       end)
 
+      -- opencode does not have scrollback since its `native_scroll` is `true`
+      vim.api.nvim_create_autocmd("FileType", {
+        group = vim.api.nvim_create_augroup("sidekick_opencode_norm", { clear = false }),
+        pattern = "sidekick_terminal",
+        -- schedule_wrap since `vim.w.sidekick_cli` and `vim.w.sidekick_session_id` is set after `vim.bo.filetype`
+        -- see: https://github.com/folke/sidekick.nvim/blob/83b6815c0ed738576f101aad31c79b885c892e0f/lua/sidekick/cli/terminal.lua#L153-L157
+        ---@param ev vim.api.keyset.create_autocmd.callback_args
+        callback = vim.schedule_wrap(function(ev)
+          local buf = ev.buf
+          if not vim.api.nvim_buf_is_valid(buf) then
+            return
+          end
+          local win = vim.fn.bufwinid(buf)
+          if win == -1 then
+            return
+          end
+          local tool = assert(vim.w[win].sidekick_cli)
+          local session_id = assert(vim.w[win].sidekick_session_id)
+          local terminal = assert(Terminal.get(session_id))
+          -- TODO: claude code without mux enabled also needs keymaps created here
+          if not tool.name:find("opencode") then
+            return
+          end
+
+          -- putting opencode keymaps in `opts.cli.tools.opencode.keys` causes errors, related to `mode = "n"`
+          -- putting opencode keymaps in `opts.cli.win.keys` needs fallbacks for other tools
+          U.keymap("n", { "<C-u>", "u" }, function()
+            U.ai.sidekick.cli.tools.opencode.actions.norm_messages_scroll("u")(terminal)
+          end, { buffer = buf, desc = "Messages Scroll Up (Sidekick)" })
+          U.keymap("n", { "<C-d>", "d" }, function()
+            U.ai.sidekick.cli.tools.opencode.actions.norm_messages_scroll("d")(terminal)
+          end, { buffer = buf, desc = "Messages Scroll Down (Sidekick)" })
+
+          vim.keymap.set("n", "gg", function()
+            U.ai.sidekick.cli.tools.opencode.actions.norm_messages_edge("top")(terminal)
+          end, { buffer = buf, desc = "Go to top, or first message (Sidekick)" })
+          vim.keymap.set("n", "G", function()
+            U.ai.sidekick.cli.tools.opencode.actions.norm_messages_edge("bottom")(terminal)
+          end, { buffer = buf, desc = "Go to bottom, or last message (Sidekick)" })
+
+          -- schedule is needed to overwrite `]]` and `[[` defined in https://github.com/neovim/neovim/blob/520568f40f22d77e623ddda77cf751031774384b/runtime/lua/vim/_defaults.lua#L651-L656
+          vim.keymap.set("n", "]]", function()
+            U.ai.sidekick.cli.tools.actions.send_keys({ "<A-j>" })(terminal)
+          end, { buffer = buf, desc = "Jump to next user message (Sidekick)" })
+          vim.keymap.set("n", "[[", function()
+            U.ai.sidekick.cli.tools.actions.send_keys({ "<A-k>" })(terminal)
+          end, { buffer = buf, desc = "Jump to previous user message (Sidekick)" })
+
+          -- TODO: more useful keymaps: https://opencode.ai/docs/keybinds/
+        end),
+      })
+
       Snacks.util.set_hl({
         SidekickCliInstalled = "Comment",
         SidekickCliIndicatorTerminal = "lualine_c_filename_terminal",
@@ -473,6 +527,7 @@ return {
         pattern = {
           tmpdir .. "/claude-prompt-*.md", -- claude code
           tmpdir .. "/[0-9]*.md", -- https://github.com/sst/opencode/blob/041353f4ff992e7be4455eaf6e71f492a97a123f/packages/opencode/src/cli/cmd/tui/util/editor.ts#L12
+          tmpdir .. "/.*.md", -- https://github.com/openai/codex/blob/f6b563ec6403392aadbc31f449226aaabd881c01/codex-rs/tui/src/external_editor.rs#L60
         },
         once = true,
         callback = function(ev)

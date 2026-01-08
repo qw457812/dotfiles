@@ -540,7 +540,7 @@ return {
       ---@module 'undo-glow'
       ---@type UndoGlow.Config
       return {
-        priority = 2048 * 3,
+        priority = 2048 * 3, -- see `:h vim.hl.priorities`
         fallback_for_transparency = { bg = "#000000" },
         animation = {
           enabled = true,

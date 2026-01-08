@@ -344,4 +344,32 @@ function M.clear_ui_or_unfocus_esc(opts)
   end
 end
 
+---Delete a global mapping when entering a buffer, and restore it when leaving the buffer
+---@param mode string
+---@param lhs string
+---@param buf integer
+function M.del_on_buf(mode, lhs, buf)
+  local orig_keymap = vim.fn.maparg(lhs, mode, false, true) --[[@as table<string,any>]]
+  if not vim.tbl_isempty(orig_keymap) then
+    if vim.api.nvim_get_current_buf() == buf then
+      vim.keymap.del(mode, lhs)
+    end
+    local group = vim.api.nvim_create_augroup(("del_on_buf_%s_%s_%d)"):format(mode, lhs, buf), { clear = true })
+    vim.api.nvim_create_autocmd("BufEnter", {
+      group = group,
+      buffer = buf,
+      callback = function()
+        pcall(vim.keymap.del, mode, lhs)
+      end,
+    })
+    vim.api.nvim_create_autocmd("BufLeave", {
+      group = group,
+      buffer = buf,
+      callback = function()
+        vim.fn.mapset(mode, false, orig_keymap)
+      end,
+    })
+  end
+end
+
 return M

@@ -91,6 +91,16 @@ map("n", "dd", function()
   end
   return vim.api.nvim_get_current_line():match("^%s*$") and '"_dd' or "dd"
 end, { expr = true, desc = "Don't Yank Empty Line to Clipboard" })
+vim.api.nvim_create_autocmd("FileType", {
+  desc = "Prevent global `dd` from delaying buffer-local `d`",
+  callback = function(ev)
+    vim.defer_fn(function()
+      if vim.api.nvim_buf_is_valid(ev.buf) and U.keymap.exists("n", "d", { buf = ev.buf }) then
+        U.keymap.del_on_buf("n", "dd", ev.buf)
+      end
+    end, 500)
+  end,
+})
 
 map("n", "i", U.keymap.indented_i, { desc = "Indented i on Empty Line" })
 vim.api.nvim_create_autocmd("FileType", {

@@ -300,6 +300,7 @@ if type -q claude
     # alternative:
     # - https://github.com/Fission-AI/OpenSpec
     # - https://github.com/UfoMiao/zcf
+    # - https://github.com/glittercowboy/get-shit-done
     abbr spec "uvx --from git+https://github.com/github/spec-kit.git specify init --script sh --ai claude --here"
     abbr cchistory "npx -y cchistory"
     abbr cck claude_kimi

@@ -60,6 +60,40 @@ M.claude = {
   },
 }
 
+---@param buf integer
+---@param win integer
+---@return string[]
+function H.visible_lines(buf, win)
+  return vim.api.nvim_buf_get_lines(buf, vim.fn.line("w0", win) - 1, vim.fn.line("w$", win), false)
+end
+
+---@param key string
+---@return string
+function H.nvim_key_to_tmux(key)
+  return (
+    key
+      :gsub("<[Cc]%-(%w)>", "C-%1")
+      :gsub("<[MmAa]%-(%w)>", "M-%1")
+      :gsub("<[Ss]%-(%a)>", string.upper)
+      :gsub("<[Ss]%-(%w+)>", "S-%1")
+      :gsub("<[Cc][Rr]>", "Enter")
+      :gsub("<[Ee][Ss][Cc]>", "Escape")
+      :gsub("<[Ss]%-[Tt][Aa][Bb]>", "BTab")
+      :gsub("<[Tt][Aa][Bb]>", "Tab")
+      :gsub("<[Bb][Ss]>", "BSpace")
+      :gsub("<[Ss][Pp][Aa][Cc][Ee]>", "Space")
+      :gsub("<[Uu][Pp]>", "Up")
+      :gsub("<[Dd][Oo][Ww][Nn]>", "Down")
+      :gsub("<[Ll][Ee][Ff][Tt]>", "Left")
+      :gsub("<[Rr][Ii][Gg][Hh][Tt]>", "Right")
+      :gsub("<[Hh][Oo][Mm][Ee]>", "Home")
+      :gsub("<[Ee][Nn][Dd]>", "End")
+      :gsub("<[Pp][Aa][Gg][Ee][Uu][Pp]>", "PageUp")
+      :gsub("<[Pp][Aa][Gg][Ee][Dd][Oo][Ww][Nn]>", "PageDown")
+      :gsub("<[Ff](%d+)>", "F%1")
+  )
+end
+
 H.sidekick = {
   cli = {
     ---@return { win: integer, buf: integer, tool: sidekick.cli.Tool, terminal: sidekick.cli.Terminal, session: sidekick.cli.Session }[]
@@ -312,7 +346,7 @@ M.sidekick = {
       ---@param session sidekick.cli.Session
       local function submit(terminal, session)
         vim.schedule(function()
-          local changedtick = vim.b[terminal.buf].changedtick
+          local lines_before = H.visible_lines(terminal.buf, terminal.win)
 
           if session.mux_session then
             if session.backend == "tmux" or session.mux_backend == "tmux" then
@@ -320,8 +354,8 @@ M.sidekick = {
               Util.exec({ "tmux", "send-keys", "-t", session.mux_session, "Enter" })
 
               vim.defer_fn(function()
-                -- NOTE: for codex, changedtick may change without content change
-                if vim.b[terminal.buf].changedtick == changedtick then
+                local lines_after = H.visible_lines(terminal.buf, terminal.win)
+                if vim.deep_equal(lines_before, lines_after) then
                   -- focus if <cr> had no effect
                   terminal:focus()
                 elseif terminal.scrollback and terminal.scrollback:is_open() then
@@ -340,7 +374,8 @@ M.sidekick = {
               vim.api.nvim_feedkeys(vim.keycode("<CR>"), "n", false)
 
               vim.defer_fn(function()
-                if vim.b[terminal.buf].changedtick ~= changedtick and vim.api.nvim_win_is_valid(win) then
+                local lines_after = H.visible_lines(terminal.buf, terminal.win)
+                if not vim.deep_equal(lines_before, lines_after) and vim.api.nvim_win_is_valid(win) then
                   -- back to original window if <cr> had effect, align with tmux backend behavior
                   vim.api.nvim_set_current_win(win)
                 end
@@ -400,34 +435,96 @@ M.sidekick = {
       end
     end,
     tools = {
+      actions = {
+        ---@param keys string[] Keys in neovim format like `<C-u>`
+        ---@param fallback? fun(t:sidekick.cli.Terminal) Callback to call if keys have no effect
+        ---@return sidekick.cli.Action
+        send_keys = function(keys, fallback)
+          ---@type sidekick.cli.Action
+          return function(t)
+            -- for codex/opencode, `vim.b.changedtick` may change without content change
+            local lines_before = H.visible_lines(t.buf, t.win)
+
+            local function fb(defer_ms)
+              if fallback then
+                vim.defer_fn(function()
+                  local lines_after = H.visible_lines(t.buf, t.win)
+                  if vim.deep_equal(lines_before, lines_after) then
+                    fallback(t)
+                  end
+                end, defer_ms or 50)
+              end
+            end
+
+            if t.mux_session then
+              if t.backend == "tmux" or t.mux_backend == "tmux" then
+                local tmux_keys = vim.tbl_map(H.nvim_key_to_tmux, keys)
+                require("sidekick.util").exec({ "tmux", "send-keys", "-t", t.mux_session, unpack(tmux_keys) })
+                fb()
+              else
+                -- TODO: zellij
+              end
+            else
+              local win = vim.api.nvim_get_current_win()
+              local cursor = vim.api.nvim_win_get_cursor(win)
+              local is_norm = vim.fn.mode() ~= "t"
+              if is_norm then
+                vim.cmd.startinsert()
+              end
+              vim.api.nvim_feedkeys(vim.keycode(table.concat(keys)), "n", false)
+              vim.schedule(function()
+                if is_norm then
+                  vim.cmd.stopinsert()
+                end
+                vim.defer_fn(function()
+                  vim.api.nvim_win_set_cursor(win, cursor)
+                  fb(20)
+                end, 10)
+              end)
+            end
+          end
+        end,
+      },
       opencode = {
         actions = {
           ---@param dir "u"|"d"
-          scrollback_messages_scroll = function(dir)
+          norm_messages_scroll = function(dir)
             ---@type sidekick.cli.Action
             return function(t)
-              if not t.tool.name:find("opencode") then
-                local count = vim.v.count
-                return vim.cmd("normal! " .. vim.keycode((count > 0 and count or "") .. "<C-" .. dir .. ">"))
+              local count = vim.v.count
+
+              local function vim_scroll()
+                vim.cmd("normal! " .. (count > 0 and count or "") .. vim.keycode("<C-" .. dir .. ">"))
               end
 
-              if t.mux_session then
-                if t.backend == "tmux" or t.mux_backend == "tmux" then
-                  require("sidekick.util").exec({ "tmux", "send-keys", "-t", t.mux_session, "C-" .. dir })
-                else
-                  -- TODO: zellij
-                end
+              if count > 0 or not t.tool.name:find("opencode") then
+                return vim_scroll()
+              end
+
+              M.sidekick.cli.tools.actions.send_keys({ "<C-" .. dir .. ">" }, vim_scroll)(t)
+            end
+          end,
+          ---@param edge "top"|"bottom"
+          norm_messages_edge = function(edge)
+            ---@type sidekick.cli.Action
+            return function(t)
+              local count = vim.v.count
+
+              local function vim_edge()
+                vim.cmd("normal! " .. (count > 0 and count or "") .. (edge == "top" and "gg" or "G"))
+              end
+
+              if count > 0 or not t.tool.name:find("opencode") then
+                return vim_edge()
+              end
+
+              local cursor_lnum = vim.api.nvim_win_get_cursor(t.win)[1]
+              local line_count = vim.api.nvim_buf_line_count(t.buf)
+              local at_edge = (edge == "top" and cursor_lnum == 1) or (edge == "bottom" and cursor_lnum == line_count)
+              if at_edge then
+                M.sidekick.cli.tools.actions.send_keys({ edge == "top" and "<Home>" or "<End>" })(t)
               else
-                local win = vim.api.nvim_get_current_win()
-                local cursor = vim.api.nvim_win_get_cursor(win)
-                vim.cmd.startinsert()
-                vim.api.nvim_feedkeys(vim.keycode("<C-" .. dir .. ">"), "n", false)
-                vim.schedule(function()
-                  vim.cmd.stopinsert()
-                  vim.defer_fn(function()
-                    vim.api.nvim_win_set_cursor(win, cursor)
-                  end, 10)
-                end)
+                vim_edge()
               end
             end
           end,
