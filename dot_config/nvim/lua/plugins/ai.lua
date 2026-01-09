@@ -397,6 +397,29 @@ return {
         return ret
       end)
 
+      vim.api.nvim_create_autocmd("BufWinEnter", {
+        group = vim.api.nvim_create_augroup("fix_opencode_render", { clear = false }),
+        callback = function(ev)
+          if vim.bo[ev.buf].filetype ~= "sidekick_terminal" then
+            return
+          end
+          local win = vim.fn.bufwinid(ev.buf)
+          if win == -1 then
+            return
+          end
+          vim.schedule(function() -- schedule to make sure `vim.w.sidekick_cli` is set
+            if not vim.api.nvim_win_is_valid(win) then
+              return
+            end
+            local tool = vim.w[win].sidekick_cli
+            if tool and tool.name:find("opencode") then
+              -- HACK: fix opencode render issue by showing then hiding line numbers
+              vim.wo[win][0].number = true
+            end
+          end)
+        end,
+      })
+
       -- opencode does not have scrollback since its `native_scroll` is `true`
       vim.api.nvim_create_autocmd("FileType", {
         group = vim.api.nvim_create_augroup("sidekick_opencode_norm", { clear = false }),
