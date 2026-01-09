@@ -72,9 +72,30 @@ return {
     config = function(_, opts)
       opts.cli = opts.cli or {}
       opts.cli.tools = opts.cli.tools or {}
+
+      local function symlink(target, source)
+        if source == "" then
+          return
+        end
+        local to = vim.fs.joinpath(vim.fn.expand("~/.local/bin"), target)
+        if not vim.uv.fs_stat(to) then
+          vim.uv.fs_symlink(source, to)
+        end
+      end
+
       for i = 1, 5 do
-        opts.cli.tools["claude" .. i] = U.extend_tbl({ cmd = { "claude" } }, opts.cli.tools.claude)
-        opts.cli.tools["opencode" .. i] = U.extend_tbl({ cmd = { "opencode" } }, opts.cli.tools.opencode)
+        symlink("claude" .. i, vim.fn.exepath("claude")) -- symlink, in favor of `is_proc`
+        opts.cli.tools["claude" .. i] = U.extend_tbl(opts.cli.tools.claude, {
+          cmd = { "claude" .. i },
+          is_proc = "\\<claude" .. i .. "\\>",
+        } --[[@as sidekick.cli.Config]])
+
+        symlink("opencode" .. i, vim.fn.exepath("opencode"))
+        opts.cli.tools["opencode" .. i] = U.extend_tbl(opts.cli.tools.opencode, {
+          cmd = { "opencode" .. i },
+          is_proc = "\\<opencode" .. i .. "\\>",
+          native_scroll = true,
+        } --[[@as sidekick.cli.Config]])
       end
 
       require("sidekick").setup(opts)

@@ -104,6 +104,7 @@ H.sidekick = {
       local ret = {}
       for _, w in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
         local b = vim.api.nvim_win_get_buf(w)
+        -- vim.api.nvim_get_chan_info(vim.bo.channel)
         if vim.bo[b].filetype == "sidekick_terminal" then
           local session_id = assert(vim.w[w].sidekick_session_id)
           table.insert(ret, {
