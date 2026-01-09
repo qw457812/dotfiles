@@ -73,30 +73,27 @@ return {
       opts.cli = opts.cli or {}
       opts.cli.tools = opts.cli.tools or {}
 
-      local function symlink(target, source)
-        if source == "" then
+      local function numbered_tools(name, tool_opts, count)
+        local exe = vim.fn.exepath(name)
+        if exe == "" then
           return
         end
-        local to = vim.fs.joinpath(vim.fn.expand("~/.local/bin"), target)
-        if not vim.uv.fs_stat(to) then
-          vim.uv.fs_symlink(source, to)
+        for i = 1, count or 5 do
+          local numbered_name = name .. i
+          -- use symlink to make `is_proc` behave
+          local symlink = vim.fs.joinpath(vim.fn.expand("~/.local/bin"), numbered_name)
+          if not vim.uv.fs_stat(symlink) then
+            vim.uv.fs_symlink(exe, symlink)
+          end
+          opts.cli.tools[numbered_name] = vim.tbl_extend("force", opts.cli.tools[name], {
+            cmd = { numbered_name },
+            is_proc = "\\<" .. numbered_name .. "\\>",
+          } --[[@as sidekick.cli.Config]], tool_opts or {})
         end
       end
 
-      for i = 1, 5 do
-        symlink("claude" .. i, vim.fn.exepath("claude")) -- symlink, in favor of `is_proc`
-        opts.cli.tools["claude" .. i] = U.extend_tbl(opts.cli.tools.claude, {
-          cmd = { "claude" .. i },
-          is_proc = "\\<claude" .. i .. "\\>",
-        } --[[@as sidekick.cli.Config]])
-
-        symlink("opencode" .. i, vim.fn.exepath("opencode"))
-        opts.cli.tools["opencode" .. i] = U.extend_tbl(opts.cli.tools.opencode, {
-          cmd = { "opencode" .. i },
-          is_proc = "\\<opencode" .. i .. "\\>",
-          native_scroll = true,
-        } --[[@as sidekick.cli.Config]])
-      end
+      numbered_tools("claude")
+      numbered_tools("opencode", { native_scroll = true })
 
       require("sidekick").setup(opts)
     end,
