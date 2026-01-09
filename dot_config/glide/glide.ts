@@ -134,18 +134,31 @@ glide.keymaps.set(
     async ({ tab_id }) => await browser.tabs.duplicate(tab_id),
   ),
 );
-glide.keymaps.set("normal", "yf", () => {
-  glide.hints.show({
-    action: async ({ content }) => {
-      const href = await content.execute((el) =>
-        "href" in el && typeof el.href === "string" ? el.href : null,
-      );
-      if (href) {
-        navigator.clipboard.writeText(href);
-      }
-    },
-  });
-});
+// https://github.com/glide-browser/glide/blob/afd0b0c9d1dd55b5f4a67804576307650333cd80/src/glide/browser/base/content/plugins/keymaps.mts#L130-L142
+glide.keymaps.set(
+  "normal",
+  "yf",
+  () =>
+    glide.hints.show({
+      selector: "[href]",
+      async action({ content }) {
+        let href = await content.execute((el) =>
+          "href" in el && typeof el.href === "string" ? el.href : null,
+        );
+        if (!href) return;
+
+        if (href.startsWith("mailto:")) {
+          href = href.slice(7);
+        } else if (href.startsWith("tel:") || href.startsWith("sms:")) {
+          href = href.slice(4);
+        }
+        await navigator.clipboard.writeText(href);
+      },
+    }),
+  {
+    description: "Yank the URL of the selected hintable link to the clipboard",
+  },
+);
 glide.keymaps.set(
   "normal",
   "ym",
@@ -207,7 +220,7 @@ glide.keymaps.set(
   // { retain_key_display: true }, // no way to display key sequence only for editing
 );
 glide.keymaps.set("normal", "u", when_editing("undo", "scroll_page_up"));
-glide.keymaps.set("normal", "x", when_editing("motion x", "tab_close"));
+glide.keymaps.set("normal", "x", when_editing("motion x", tab_close));
 glide.keymaps.set(
   "normal",
   "X",
@@ -242,7 +255,7 @@ glide.keymaps.set("normal", ">>", async ({ tab_id }) => {
 glide.keymaps.set("normal", "q", "keys <<");
 glide.keymaps.set("normal", "w", when_editing("motion w", "keys >>"));
 glide.keymaps.set("normal", "U", "redo");
-glide.keymaps.set("normal", "<BS>", "tab_close");
+glide.keymaps.set("normal", "<BS>", tab_close);
 glide.keymaps.set("normal", "<S-BS>", async () => {
   await browser.sessions.restore();
 });
@@ -319,7 +332,7 @@ glide.keymaps.set("normal", "<leader>ba", async ({ tab_id }) => {
     await browser.tabs.remove(tabs_to_close);
   }
 });
-glide.keymaps.set("normal", "<leader>bd", "tab_close");
+glide.keymaps.set("normal", "<leader>bd", tab_close);
 glide.keymaps.set("normal", "<leader>bb", "keys `");
 glide.keymaps.set("normal", "<leader>bp", "keys <C-p>");
 glide.keymaps.set("normal", "<leader>fc", async () => {
@@ -754,6 +767,14 @@ async function focus_page(props: glide.KeymapCallbackProps) {
     if (glide.ctx.mode === "insert") {
       await glide.keys.send("<F6>", { skip_mappings: true });
     }
+  }
+}
+
+async function tab_close() {
+  const alt_tab_id = previousTabId;
+  await glide.excmds.execute("tab_close");
+  if (alt_tab_id) {
+    await browser.tabs.update(alt_tab_id, { active: true });
   }
 }
 

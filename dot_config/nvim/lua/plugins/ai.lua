@@ -148,11 +148,6 @@ return {
                 vim.b[buf].user_lualine_filename = vim.b[buf].user_lualine_filename or terminal.tool.name
 
                 if terminal.tool.name:find("claude") then
-                  local function goto_input_prompt()
-                    local lnum = vim.fn.search("^❯", "Wb") -- inputting
-                    lnum = lnum == 0 and vim.fn.search("❯ ", "Wb") or lnum -- selecting like `/config`
-                  end
-
                   vim.keymap.set("n", "J", function()
                     if vim.fn.search(vim.g.user_is_termux and "^● " or "^⏺ ", "W") == 0 then
                       LazyVim.warn("No more assistant messages", { title = "Sidekick" })
@@ -170,7 +165,10 @@ return {
                       return
                     end
 
-                    goto_input_prompt() -- save some `k` presses
+                    -- jump to input/select prompt, save some `k` presses
+                    if vim.api.nvim_get_current_buf() == buf then
+                      vim.fn.search("❯", "Wb")
+                    end
 
                     vim.keymap.set("n", "]]", function()
                       if vim.fn.search("^❯ ", "W") == 0 then

@@ -73,6 +73,7 @@ end
 ---@return snacks.terminal?
 function M.diff_term(opts)
   opts = opts or {}
+  local _opts = vim.deepcopy(opts) -- original opts, for toggling `opts.ignore_space`
   local git_root = Snacks.git.get_root(opts.cwd)
   if not git_root then
     Snacks.notify.error("Not a git repo")
@@ -85,14 +86,36 @@ function M.diff_term(opts)
     cmd_args = {},
     cwd = git_root,
     interactive = false, -- normal mode in favor of copying
-    -- env = { PAGER = "cat" }, -- alternative to `-c delta.paging=never`
+    -- env = { PAGER = "cat", DELTA_PAGER = "cat" }, -- alternative to `-c delta.paging=never`
     win = {
       height = U.snacks.win.fullscreen_height,
       width = 0,
+      title = opts.ignore_space and "(ignoring whitespace)" or nil,
       zindex = (vim.api.nvim_win_get_config(0).zindex or 50) + 1,
       b = {
         user_lualine_filename = "diff",
       },
+      -- TODO: add actions: commit, amend, fixup_rebase
+      actions = {
+        toggle_whitespace = function(self)
+          if not self:valid() then
+            return
+          end
+
+          -- close current diff_term
+          -- need to discard `opts.win.on_close` and `opts.on_diff` before closing, otherwise they would be triggered multiple times
+          self.opts.on_close = nil -- https://github.com/folke/snacks.nvim/blob/8b5f76292becf9ad76ef1507cbdcec64a49ff3f4/lua/snacks/win.lua#L1015-L1017
+          self:close()
+
+          -- reopen a new diff_term with toggled `opts.ignore_space`
+          _opts.ignore_space = not _opts.ignore_space
+          M.diff_term(_opts)
+        end,
+      },
+      keys = {
+        toggle_whitespace = { "<C-w>", "toggle_whitespace", desc = "Toggle Whitespace" }, -- align with lazygit
+      },
+      footer_keys = { "<C-w>" },
     },
   } --[[@as user.util.git.diff.term.Opts]], opts)
 
@@ -112,9 +135,9 @@ function M.diff_term(opts)
             desc = "Abort on_diff",
           },
         },
-        footer_keys = { "<C-c>" },
       },
     } --[[@as user.util.git.diff.term.Opts]], opts)
+    table.insert(opts.win.footer_keys --[[@as string[] ]], "<C-c>")
   end
 
   local cmd = { "git", "-c", "delta.paging=never" }
@@ -133,7 +156,7 @@ function M.diff_term(opts)
 
   local on_close = opts.win.on_close
   opts.win.on_close = function(win)
-    win:close() -- fully close on hide to make it one-time
+    win:close() -- fully close on `hide` to make it one-time
     if on_close then
       on_close(win)
     end
