@@ -12,7 +12,5 @@
       }
     ]
   },
-  "enabledPlugins": {
-    "lua-lsp@claude-plugins-official": true
-  }
+  "enabledPlugins": {}
 }
