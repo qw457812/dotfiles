@@ -1,26 +1,33 @@
 {
   "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json",
   "google_auth": false,
-  "disabled_hooks": ["startup-toast"],
+  "disabled_hooks": [
+    // "todo-continuation-enforcer",
+    "startup-toast"
+  ],
   "disabled_skills": ["playwright"],
   "background_task": {
     "modelConcurrency": {
-      "anthropic/claude-opus-4-5-20251101": 3
+      "anthropic/claude-opus-4-5-20251101": 3,
+      "google/antigravity-claude-opus-4-5-thinking": 3,
+      "github-copilot/claude-opus-4.5": 3
     }
   },
   "agents": {
     "oracle": {
+      // "model": "anthropic/claude-opus-4-5-20251101"
       // "model": "google/antigravity-claude-opus-4-5-thinking"
-      "model": "anthropic/claude-opus-4-5-20251101"
+      "model": "github-copilot/gpt-5.2"
     },
     "librarian": {
+      // "model": "opencode/minimax-m2.1-free"
       "model": "opencode/glm-4.7-free"
       // "model": "google/antigravity-claude-sonnet-4-5"
       // "model": "anthropic/claude-sonnet-4-5-20250929"
     },
-    // "explore": {
-    //   "model": "google/antigravity-gemini-3-flash"
-    // },
+    "explore": {
+      "model": "google/antigravity-gemini-3-flash"
+    },
     "frontend-ui-ux-engineer": {
       "model": "google/antigravity-gemini-3-pro"
     },

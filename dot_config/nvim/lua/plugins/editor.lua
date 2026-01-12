@@ -116,7 +116,7 @@ return {
         toggleIgnoreCase = "<localleader>c",
       },
       regexOptions = {
-        startWithFixedStringsOn = true,
+        startWithFixedStrings = true,
         -- startWithIgnoreCase = true,
       },
       prefill = {
@@ -868,11 +868,11 @@ return {
       mappings = {
         i = {
           j = { j = "<Esc>", k = "<Esc>" },
-          k = { j = "<Esc>" },
+          -- k = { j = "<Esc>" },
         },
         c = {
           j = { j = "<Esc>", k = "<Esc>" },
-          k = { j = "<Esc>" },
+          -- k = { j = "<Esc>" },
         },
       },
     },

@@ -11,14 +11,22 @@
   "share": "manual",
   // "autoupdate": "notify",
   // "model": "opencode/glm-4.7-free", // Sisyphus
+  // "model": "anthropic/claude-sonnet-4-5-20250929",
+  // "model": "anthropic/claude-opus-4-5-20251101",
+  // "model": "google/antigravity-claude-sonnet-4-5-thinking",
   // "model": "google/antigravity-claude-opus-4-5-thinking",
-  "model": "anthropic/claude-opus-4-5-20251101",
+  // "model": "github-copilot/claude-sonnet-4.5",
+  "model": "github-copilot/claude-opus-4.5",
   "small_model": "opencode/grok-code",
   "agent": {
     "plan": {
       // "model": "opencode/glm-4.7-free" // Planner-Sisyphus
+      // "model": "anthropic/claude-sonnet-4-5-20250929"
+      // "model": "anthropic/claude-opus-4-5-20251101"
+      // "model": "google/antigravity-claude-sonnet-4-5-thinking"
       // "model": "google/antigravity-claude-opus-4-5-thinking"
-      "model": "anthropic/claude-opus-4-5-20251101"
+      // "model": "github-copilot/claude-sonnet-4.5"
+      "model": "github-copilot/claude-opus-4.5"
     }
   },
   "provider": {
