@@ -80,7 +80,12 @@ return {
             local oil = require("oil")
             local config = require("oil.config")
             if #config.columns == 1 then
-              oil.set_columns({ "icon", "permissions", "size", "mtime" })
+              oil.set_columns({
+                { "permissions", highlight = "MiniIconsYellow" },
+                { "size", highlight = "MiniIconsGreen", align = "right" },
+                { "mtime", highlight = "MiniIconsCyan" },
+                "icon",
+              })
             else
               oil.set_columns({ "icon" })
             end

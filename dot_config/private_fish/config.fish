@@ -301,7 +301,9 @@ if type -q claude
     # - https://github.com/Fission-AI/OpenSpec
     # - https://github.com/UfoMiao/zcf
     # - https://github.com/glittercowboy/get-shit-done
+    # - https://github.com/OthmanAdi/planning-with-files
     abbr spec "uvx --from git+https://github.com/github/spec-kit.git specify init --script sh --ai claude --here"
+    abbr ccgsd "npx get-shit-done-cc@latest"
     abbr cchistory "npx -y cchistory"
     abbr cck claude_kimi
     abbr cckc "claude_kimi --continue"
