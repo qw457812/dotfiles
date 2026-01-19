@@ -288,12 +288,6 @@ return {
             },
             keys = {
               blur_t = false, -- claude code uses <c-o> for its own functionality
-              ultrathink = {
-                "<a-u>",
-                function(t)
-                  t:send(" ultrathink ")
-                end,
-              },
             },
           },
           codex = { cmd = { "codex" } },
