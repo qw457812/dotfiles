@@ -21,6 +21,12 @@ M.claude = {
         ANTHROPIC_BASE_URL = vim.env.CLAUDE_RELAY_SERVICE_URL .. "/api",
         ANTHROPIC_AUTH_TOKEN = vim.env.CLAUDE_RELAY_SERVICE_API_KEY,
       } or {},
+      -- https://z.ai/manage-apikey/subscription
+      glm = {
+        ANTHROPIC_BASE_URL = "https://api.z.ai/api/anthropic",
+        ANTHROPIC_AUTH_TOKEN = vim.env.ZAI_API_KEY,
+        API_TIMEOUT_MS = "3000000",
+      },
       -- https://www.kimi.com/coding/docs/third-party-agents.html
       -- https://www.kimi.com/membership/subscription
       kimi = {
@@ -41,11 +47,6 @@ M.claude = {
         ANTHROPIC_DEFAULT_HAIKU_MODEL = "kimi-k2-thinking-turbo",
         CLAUDE_CODE_SUBAGENT_MODEL = "kimi-k2-thinking-turbo",
       },
-      glm = {
-        ANTHROPIC_BASE_URL = "https://api.z.ai/api/anthropic",
-        ANTHROPIC_AUTH_TOKEN = vim.env.ZAI_API_KEY,
-        API_TIMEOUT_MS = "3000000",
-      },
       minimax = {
         ANTHROPIC_BASE_URL = "https://api.minimax.io/anthropic",
         ANTHROPIC_AUTH_TOKEN = vim.env.MINIMAX_API_KEY,
@@ -59,6 +60,7 @@ M.claude = {
     },
   },
 }
+M.claude.provider.payg.glm = M.claude.provider.plan.glm
 
 ---@param buf integer
 ---@param win integer

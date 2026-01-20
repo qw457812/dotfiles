@@ -1,3 +1,5 @@
+# TODO: https://github.com/max-sixty/worktrunk
+
 # copied from: https://github.com/folke/dot/commit/3fe0fd9
 set -g git_worktrees_root ~/projects/git-worktrees
 mkdir -p $git_worktrees_root

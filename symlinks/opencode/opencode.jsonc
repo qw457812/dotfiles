@@ -10,7 +10,8 @@
   "theme": "lucent-github", // based on [lucent-orng](https://github.com/anomalyco/opencode/blob/e6e7eaf6e0ce50a0d5ff31f330972f749bec819c/packages/opencode/src/cli/cmd/tui/context/theme/lucent-orng.json), but with [github](https://github.com/anomalyco/opencode/blob/eaa0826e7fa3aa5a52d670dad0dce92108843700/packages/opencode/src/cli/cmd/tui/context/theme/github.json) diff colors
   "share": "manual",
   // "autoupdate": "notify",
-  "model": "opencode/glm-4.7-free", // Sisyphus
+  // "model": "opencode/glm-4.7-free", // Sisyphus
+  "model": "zai-coding-plan/glm-4.7",
   // "model": "anthropic/claude-sonnet-4-5-20250929",
   // "model": "anthropic/claude-opus-4-5-20251101",
   // "model": "google/antigravity-claude-sonnet-4-5-thinking",
@@ -20,7 +21,8 @@
   "small_model": "opencode/grok-code",
   "agent": {
     "plan": {
-      "model": "opencode/glm-4.7-free" // Prometheus (Planner)
+      // "model": "opencode/glm-4.7-free" // Prometheus (Planner)
+      "model": "zai-coding-plan/glm-4.7"
       // "model": "anthropic/claude-sonnet-4-5-20250929"
       // "model": "anthropic/claude-opus-4-5-20251101"
       // "model": "google/antigravity-claude-sonnet-4-5-thinking"
@@ -175,7 +177,7 @@
     "openrouter",
     "togetherai",
     "zai",
-    "zai-coding-plan",
+    // "zai-coding-plan",
     "zhipuai",
     "zhipuai-coding-plan"
   ],

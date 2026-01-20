@@ -24,7 +24,8 @@
       "model": "github-copilot/gpt-5.2"
     },
     "librarian": {
-      "model": "opencode/glm-4.7-free"
+      // "model": "opencode/glm-4.7-free"
+      "model": "zai-coding-plan/glm-4.7"
     },
     "explore": {
       "model": "google/antigravity-gemini-3-flash"
@@ -40,18 +41,18 @@
     },
     "orchestrator-sisyphus": {
       // "model": "anthropic/claude-sonnet-4-5-20250929"
-      "model": "opencode/glm-4.7-free"
+      "model": "zai-coding-plan/glm-4.7"
     },
     "Metis (Plan Consultant)": {
       // "model": "anthropic/claude-opus-4-5-20251101"
-      "model": "opencode/glm-4.7-free"
+      "model": "github-copilot/claude-opus-4.5"
     },
     "Momus (Plan Reviewer)": {
       "model": "github-copilot/gpt-5.2"
     },
     "Sisyphus-Junior": {
       // "model": "anthropic/claude-sonnet-4-5-20250929"
-      "model": "opencode/glm-4.7-free"
+      "model": "zai-coding-plan/glm-4.7"
     }
   },
   // https://github.com/code-yeongyu/oh-my-opencode/blob/f2dc61f1a3b5c3a0ea55589f6270413f7313c239/src/tools/sisyphus-task/constants.ts#L186-L215
@@ -74,11 +75,11 @@
     },
     "most-capable": {
       // "model": "anthropic/claude-opus-4-5-20251101"
-      "model": "opencode/glm-4.7-free"
+      "model": "github-copilot/claude-opus-4.5"
     },
     "general": {
       // "model": "anthropic/claude-sonnet-4-5-20250929"
-      "model": "opencode/glm-4.7-free"
+      "model": "zai-coding-plan/glm-4.7"
     }
   }
 }

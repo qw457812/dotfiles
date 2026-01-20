@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # https://github.com/ryanwclark1/nixos-config/blob/92f5401a93a645792d7d6ba46ef746b5f0128abc/home/features/ai/claude/statusline.sh
+# https://github.com/jarrodwatts/claude-hud
 
 input=$(cat)
 # echo "$input" >/tmp/statusline_debug.json
@@ -23,11 +24,23 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   COLOR_RESET=$(printf '\033[0m')
 
   context_window_size=$(echo "$input" | jq -r '.context_window.context_window_size // 200000')
-  # transcript_path=$(echo "$input" | jq -r '.transcript_path // ""')
+  transcript_path=$(echo "$input" | jq -r '.transcript_path // ""')
   # cwd=$(echo "$input" | jq -r '.workspace.current_dir // .cwd')
 
+  # vim mode
+  vim_mode=$(echo "$input" | jq -r '.vim.mode // ""')
+  case "$vim_mode" in
+  INSERT) vim_mode_display="${COLOR_GREEN}I${COLOR_RESET}" ;;
+  NORMAL) vim_mode_display="${COLOR_BLUE}N${COLOR_RESET}" ;;
+  *) vim_mode_display=$([ -n "$vim_mode" ] && echo "${vim_mode}") ;;
+  esac
+
   # model
-  model=$(echo "$input" | jq -r '(.model.display_name // "") | split(" ")[0] | split("-")[0] | (.[:1] | ascii_upcase) + .[1:]')
+  case "$ANTHROPIC_BASE_URL" in
+  "" | "$CLAUDE_RELAY_SERVICE_URL"*) ;;
+  *) model=$(cat "$transcript_path" 2>/dev/null | jq -r 'select(.type == "assistant") | .message.model // empty' | tail -1) ;; # z.ai
+  esac
+  model=${model:-$(echo "$input" | jq -r '(.model.display_name // "") | split(" ")[0] | split("-")[0] | (.[:1] | ascii_upcase) + .[1:]')}
   model_display=$([ -n "$model" ] && echo "${COLOR_RED}${model}${COLOR_RESET}")
 
   # # tokens (from transcript)
@@ -77,6 +90,7 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
 
   # empty segments are skipped by xargs
   printf '%s\n' \
+    "$vim_mode_display" \
     "$model_display" \
     "$total_tokens_display" \
     "$context_percentage_display" \

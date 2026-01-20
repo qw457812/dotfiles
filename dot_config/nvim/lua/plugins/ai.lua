@@ -26,6 +26,7 @@ return {
               -- "--fork-session",
             }),
             env = U.ai.claude.provider.plan.anthropic,
+            -- env = U.ai.claude.provider.plan.glm,
           },
         },
       },
@@ -301,9 +302,7 @@ return {
             },
           },
           -- HACK: disable some installed tools
-          copilot = { cmd = { "hack_to_disable_copilot" } },
           gemini = { cmd = { "hack_to_disable_gemini" } },
-          aider = { cmd = { "hack_to_disable_aider" } },
           -- debug = { cmd = { "bash", "-c", "env | sort | bat -l env" } },
         },
         ---@type table<string, sidekick.Prompt|string|fun(ctx:sidekick.context.ctx):(string?)>
