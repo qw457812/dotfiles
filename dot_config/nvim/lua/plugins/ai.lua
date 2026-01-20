@@ -79,6 +79,7 @@ return {
         if exe == "" then
           return
         end
+        local tool = opts.cli.tools[name]
         for i = 1, count or 5 do
           local numbered_name = name .. i
           -- use symlink to make `is_proc` behave
@@ -86,8 +87,13 @@ return {
           if not vim.uv.fs_stat(symlink) then
             vim.uv.fs_symlink(exe, symlink)
           end
-          opts.cli.tools[numbered_name] = vim.tbl_extend("force", opts.cli.tools[name], {
-            cmd = { numbered_name },
+          opts.cli.tools[numbered_name] = vim.tbl_extend("force", tool, {
+            cmd = tool.cmd and vim
+              .iter(tool.cmd)
+              :map(function(v)
+                return v == name and numbered_name or v
+              end)
+              :totable() or { numbered_name },
             is_proc = "\\<" .. numbered_name .. "\\>",
           } --[[@as sidekick.cli.Config]], tool_opts or {})
         end
