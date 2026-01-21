@@ -26,7 +26,6 @@ return {
               -- "--fork-session",
             }),
             env = U.ai.claude.provider.plan.anthropic,
-            -- env = U.ai.claude.provider.plan.glm,
           },
         },
       },
@@ -68,26 +67,54 @@ return {
         mode = "x",
         desc = "OpenCode",
       },
+      {
+        "<leader>ag",
+        function()
+          U.ai.sidekick.cli.quick.show("claude_glm" .. (vim.v.count == 0 and "" or vim.v.count))
+        end,
+        desc = "Claude GLM",
+      },
+      {
+        "<leader>ag",
+        function()
+          U.ai.sidekick.cli.quick.send("claude_glm" .. (vim.v.count == 0 and "" or vim.v.count), { msg = "{this}" })
+        end,
+        mode = "x",
+        desc = "Claude GLM",
+      },
     },
     ---@param opts sidekick.Config
     config = function(_, opts)
       opts.cli = opts.cli or {}
       opts.cli.tools = opts.cli.tools or {}
 
-      local function numbered_tools(name, tool_opts, count)
-        local exe = vim.fn.exepath(name)
-        if exe == "" then
+      ---@param _opts { name: string, exe?: string, tool_opts?: sidekick.cli.Config|{}, count?: number }
+      local function numbered_tools(_opts)
+        local function symlink(src, dest)
+          if not vim.startswith(dest, "/") then
+            dest = vim.fs.joinpath(vim.fn.expand("~/.local/bin"), dest)
+          end
+          if not vim.uv.fs_stat(dest) then
+            vim.uv.fs_symlink(src, dest)
+          end
+        end
+
+        local name = _opts.name
+        local exe = _opts.exe or name
+        local exepath = vim.fn.exepath(exe)
+        if exepath == "" then
           return
         end
-        local tool = opts.cli.tools[name]
-        for i = 1, count or 5 do
+
+        if name ~= exe then
+          symlink(exepath, name) -- for `claude_glm`, without number suffix
+        end
+
+        local tool = opts.cli.tools[name] or {}
+        for i = 1, _opts.count or 5 do
           local numbered_name = name .. i
-          -- use symlink to make `is_proc` behave
-          local symlink = vim.fs.joinpath(vim.fn.expand("~/.local/bin"), numbered_name)
-          if not vim.uv.fs_stat(symlink) then
-            vim.uv.fs_symlink(exe, symlink)
-          end
-          opts.cli.tools[numbered_name] = vim.tbl_extend("force", tool, {
+          symlink(exepath, numbered_name) -- use symlink to make `is_proc` behave
+          opts.cli.tools[numbered_name] = vim.tbl_deep_extend("force", tool, {
             cmd = tool.cmd and vim
               .iter(tool.cmd)
               :map(function(v)
@@ -95,12 +122,18 @@ return {
               end)
               :totable() or { numbered_name },
             is_proc = "\\<" .. numbered_name .. "\\>",
-          } --[[@as sidekick.cli.Config]], tool_opts or {})
+          } --[[@as sidekick.cli.Config]], _opts.tool_opts or {})
         end
       end
 
-      numbered_tools("claude")
-      numbered_tools("opencode", { native_scroll = true })
+      numbered_tools({ name = "claude" })
+      numbered_tools({ name = "opencode", tool_opts = { native_scroll = true } })
+
+      opts.cli.tools.claude_glm = vim.tbl_deep_extend("force", opts.cli.tools.claude or {}, {
+        cmd = { "claude_glm" }, -- symlinked to `claude` executable by `numbered_tools`
+        env = U.ai.claude.provider.plan.glm,
+      } --[[@as sidekick.cli.Config]])
+      numbered_tools({ name = "claude_glm", exe = "claude" })
 
       require("sidekick").setup(opts)
     end,
