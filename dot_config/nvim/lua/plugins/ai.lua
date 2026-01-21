@@ -85,11 +85,29 @@ return {
     },
     ---@param opts sidekick.Config
     config = function(_, opts)
+      local Config = require("sidekick.config")
+
       opts.cli = opts.cli or {}
       opts.cli.tools = opts.cli.tools or {}
 
-      ---@param _opts { name: string, exe?: string, tool_opts?: sidekick.cli.Config|{}, count?: number }
+      ---@param _opts { name: string, base_tool?: string, tool_opts?: sidekick.cli.Config|{}, count?: number }
       local function numbered_tools(_opts)
+        ---@param name string
+        ---@return sidekick.cli.Config|{}, string|nil
+        local function get_tool(name)
+          local tool = vim.tbl_deep_extend("force", Config.get_tool(name).config or {}, opts.cli.tools[name] or {})
+          tool = vim.deepcopy(tool)
+
+          local exe = tool.cmd and tool.cmd[1]
+          if exe == "command" then
+            table.remove(tool.cmd, 1)
+            exe = tool.cmd[1]
+          end
+          return tool, exe
+        end
+
+        ---@param src string
+        ---@param dest string
         local function symlink(src, dest)
           if not vim.startswith(dest, "/") then
             dest = vim.fs.joinpath(vim.fn.expand("~/.local/bin"), dest)
@@ -100,40 +118,41 @@ return {
         end
 
         local name = _opts.name
-        local exe = _opts.exe or name
-        local exepath = vim.fn.exepath(exe)
-        if exepath == "" then
+        local base, base_exe = get_tool(_opts.base_tool or name)
+        if not base_exe then
+          return
+        end
+        local base_exepath = vim.fn.exepath(base_exe)
+        if base_exepath == "" then
           return
         end
 
-        if name ~= exe then
-          symlink(exepath, name) -- for `claude_glm`, without number suffix
+        local tool = get_tool(name)
+        if not tool.cmd then -- for `claude_glm`, without number suffix
+          symlink(base_exepath, name)
+
+          tool = vim.tbl_deep_extend("force", vim.deepcopy(base), _opts.tool_opts or {})
+          tool.cmd[1], tool.is_proc = name, "\\<" .. name .. "\\>"
+          opts.cli.tools[name] = tool
         end
 
-        local tool = opts.cli.tools[name] or {}
         for i = 1, _opts.count or 5 do
           local numbered_name = name .. i
-          symlink(exepath, numbered_name) -- use symlink to make `is_proc` behave
-          opts.cli.tools[numbered_name] = vim.tbl_deep_extend("force", tool, {
-            cmd = tool.cmd and vim
-              .iter(tool.cmd)
-              :map(function(v)
-                return v == name and numbered_name or v
-              end)
-              :totable() or { numbered_name },
-            is_proc = "\\<" .. numbered_name .. "\\>",
-          } --[[@as sidekick.cli.Config]], _opts.tool_opts or {})
+          symlink(base_exepath, numbered_name) -- use symlink to make `is_proc` behave
+
+          local numbered = vim.tbl_deep_extend("force", vim.deepcopy(tool), _opts.tool_opts or {})
+          numbered.cmd[1], numbered.is_proc = numbered_name, "\\<" .. numbered_name .. "\\>"
+          opts.cli.tools[numbered_name] = numbered
         end
       end
 
       numbered_tools({ name = "claude" })
-      numbered_tools({ name = "opencode", tool_opts = { native_scroll = true } })
-
-      opts.cli.tools.claude_glm = vim.tbl_deep_extend("force", opts.cli.tools.claude or {}, {
-        cmd = { "claude_glm" }, -- symlinked to `claude` executable by `numbered_tools`
-        env = U.ai.claude.provider.plan.glm,
-      } --[[@as sidekick.cli.Config]])
-      numbered_tools({ name = "claude_glm", exe = "claude" })
+      numbered_tools({ name = "opencode" })
+      numbered_tools({
+        name = "claude_glm",
+        base_tool = "claude",
+        tool_opts = { env = U.ai.claude.provider.plan.glm },
+      })
 
       require("sidekick").setup(opts)
     end,
