@@ -14,7 +14,7 @@ esac
 
 cache_file=$(get_cache_file "glm_quota")
 
-cache_get "$cache_file" 120 && exit 0
+cache_get "$cache_file" 180 && exit 0
 
 # https://github.com/zai-org/zai-coding-plugins/blob/64cebffd62b9ade133a473e5d169e0e8c895441c/plugins/glm-plan-usage/skills/usage-query-skill/scripts/query-usage.mjs
 glm_quota=$(curl -s "https://$(echo "$base_url" | cut -d'/' -f3)/api/monitor/usage/quota/limit" \

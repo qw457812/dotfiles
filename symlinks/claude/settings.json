@@ -69,12 +69,15 @@
     ],
     "defaultMode": "acceptEdits"
   },
+  "model": "opus",
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh",
     "padding": 0
   },
-  "enabledPlugins": {},
+  "enabledPlugins": {
+    "context7@claude-plugins-official": true
+  },
   "sandbox": {
     "enabled": true,
     "autoAllowBashIfSandboxed": true,
@@ -86,6 +89,5 @@
   },
   "feedbackSurveyState": {
     "lastShownTime": 1754043197597
-  },
-  "model": "opus"
+  }
 }
