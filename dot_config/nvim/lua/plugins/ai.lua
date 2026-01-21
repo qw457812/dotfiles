@@ -36,53 +36,23 @@ return {
   {
     "folke/sidekick.nvim",
     optional = true,
-    keys = {
-      {
-        "<leader>ac",
-        function()
-          U.ai.sidekick.cli.quick.show("claude" .. (vim.v.count == 0 and "" or vim.v.count))
-        end,
-        desc = "Claude",
-      },
-      {
-        "<leader>ac",
-        function()
-          U.ai.sidekick.cli.quick.send("claude" .. (vim.v.count == 0 and "" or vim.v.count), { msg = "{this}" })
-        end,
-        mode = "x",
-        desc = "Claude",
-      },
-      {
-        "<leader>ao",
-        function()
-          U.ai.sidekick.cli.quick.show("opencode" .. (vim.v.count == 0 and "" or vim.v.count))
-        end,
-        desc = "OpenCode",
-      },
-      {
-        "<leader>ao",
-        function()
-          U.ai.sidekick.cli.quick.send("opencode" .. (vim.v.count == 0 and "" or vim.v.count), { msg = "{this}" })
-        end,
-        mode = "x",
-        desc = "OpenCode",
-      },
-      {
-        "<leader>ag",
-        function()
-          U.ai.sidekick.cli.quick.show("claude_glm" .. (vim.v.count == 0 and "" or vim.v.count))
-        end,
-        desc = "Claude GLM",
-      },
-      {
-        "<leader>ag",
-        function()
-          U.ai.sidekick.cli.quick.send("claude_glm" .. (vim.v.count == 0 and "" or vim.v.count), { msg = "{this}" })
-        end,
-        mode = "x",
-        desc = "Claude GLM",
-      },
-    },
+    keys = function(_, keys)
+      local mappings = {}
+      local tools = {
+        ["<leader>ac"] = "claude",
+        ["<leader>ao"] = "opencode",
+        ["<leader>ag"] = "claude_glm",
+      }
+      for key, tool in pairs(tools) do
+        local desc = tool:gsub("_", " "):gsub("^%l", string.upper)
+        -- stylua: ignore
+        vim.list_extend(mappings, {
+          { key, function() U.ai.sidekick.cli.quick.show(tool .. (vim.v.count == 0 and "" or vim.v.count)) end, desc = desc },
+          { key, function() U.ai.sidekick.cli.quick.send(tool .. (vim.v.count == 0 and "" or vim.v.count), { msg = "{this}" }) end, mode = "x", desc = desc },
+        })
+      end
+      return vim.list_extend(keys, mappings)
+    end,
     ---@param opts sidekick.Config
     config = function(_, opts)
       local Config = require("sidekick.config")
@@ -97,52 +67,33 @@ return {
         local function get_tool(name)
           local tool = vim.tbl_deep_extend("force", Config.get_tool(name).config or {}, opts.cli.tools[name] or {})
           tool = vim.deepcopy(tool)
-
-          local exe = tool.cmd and tool.cmd[1]
-          if exe == "command" then
+          if tool.cmd and tool.cmd[1] == "command" then
             table.remove(tool.cmd, 1)
-            exe = tool.cmd[1]
           end
-          return tool, exe
+          return tool, tool.cmd and tool.cmd[1]
         end
 
-        ---@param src string
-        ---@param dest string
-        local function symlink(src, dest)
-          if not vim.startswith(dest, "/") then
-            dest = vim.fs.joinpath(vim.fn.expand("~/.local/bin"), dest)
-          end
-          if not vim.uv.fs_stat(dest) then
-            vim.uv.fs_symlink(src, dest)
-          end
-        end
-
-        local name = _opts.name
-        local base, base_exe = get_tool(_opts.base_tool or name)
-        if not base_exe then
-          return
-        end
-        local base_exepath = vim.fn.exepath(base_exe)
+        local name, base_name = _opts.name, _opts.base_tool or _opts.name
+        local base, base_exe = get_tool(base_name)
+        local base_exepath = base_exe and vim.fn.exepath(base_exe) or ""
         if base_exepath == "" then
           return
         end
 
-        local tool = get_tool(name)
-        if not tool.cmd then -- for `claude_glm`, without number suffix
-          symlink(base_exepath, name)
-
-          tool = vim.tbl_deep_extend("force", vim.deepcopy(base), _opts.tool_opts or {})
-          tool.cmd[1], tool.is_proc = name, "\\<" .. name .. "\\>"
-          opts.cli.tools[name] = tool
+        local function register(tool)
+          local dest = vim.fs.joinpath(vim.fn.expand("~/.local/bin"), tool)
+          if not vim.uv.fs_stat(dest) then
+            vim.uv.fs_symlink(base_exepath, dest) -- use symlink to make `is_proc` behave
+          end
+          opts.cli.tools[tool] = vim.tbl_deep_extend("force", vim.deepcopy(base), _opts.tool_opts or {})
+          opts.cli.tools[tool].cmd[1], opts.cli.tools[tool].is_proc = tool, "\\<" .. tool .. "\\>"
         end
 
+        if name ~= base_name and not get_tool(name).cmd then
+          register(name) -- for `claude_glm` (without number suffix)
+        end
         for i = 1, _opts.count or 5 do
-          local numbered_name = name .. i
-          symlink(base_exepath, numbered_name) -- use symlink to make `is_proc` behave
-
-          local numbered = vim.tbl_deep_extend("force", vim.deepcopy(tool), _opts.tool_opts or {})
-          numbered.cmd[1], numbered.is_proc = numbered_name, "\\<" .. numbered_name .. "\\>"
-          opts.cli.tools[numbered_name] = numbered
+          register(name .. i)
         end
       end
 
