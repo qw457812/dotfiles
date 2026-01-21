@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # https://github.com/ryanwclark1/nixos-config/blob/92f5401a93a645792d7d6ba46ef746b5f0128abc/home/features/ai/claude/statusline.sh
+# https://github.com/gqy20/cc_plugins/blob/d5fbcd844847b320dc4207ad841ae7a3c18dd222/.claude/statusline.sh
 # https://github.com/jarrodwatts/claude-hud
 
 input=$(cat)
@@ -63,6 +64,10 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   today_cost=$("$HOME/.claude/statusline/get-today-cost.sh")
   today_cost_display="${COLOR_ORANGE}$(printf "\$%.2f" "$today_cost")${COLOR_RESET}"
 
+  # glm quota (only for ZAI/ZHIPU platforms)
+  glm_quota=$("$HOME/.claude/statusline/get-glm-quota.sh")
+  glm_quota_display=$([ -n "$glm_quota" ] && echo "${COLOR_RED}${glm_quota}%${COLOR_RESET}")
+
   # session duration (hidden if < 1 min)
   session_duration=$(echo "$input" | jq -r '.cost.total_duration_ms // 0' | awk '{
     s = int($1/1000); if (s < 60) exit
@@ -96,6 +101,7 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
     "$context_percentage_display" \
     "$session_cost_display" \
     "$today_cost_display" \
+    "$glm_quota_display" \
     "$session_duration_display" \
     "$version_display" \
     "$changes_display" | xargs
