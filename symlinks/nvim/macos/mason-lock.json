@@ -18,7 +18,7 @@
   "js-debug-adapter": "v1.105.0",
   "json-lsp": "4.10.0",
   "lemminx": "0.29.0",
-  "lua-language-server": "3.17.1",
+  "lua-language-server": "3.16.4",
   "luacheck": "1.1.0",
   "markdown-toc": "1.2.0",
   "markdownlint-cli2": "0.20.0",
