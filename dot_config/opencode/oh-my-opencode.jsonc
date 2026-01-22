@@ -1,8 +1,6 @@
 // https://github.com/code-yeongyu/oh-my-opencode/blob/dev/src/config/schema.ts
-// https://github.com/code-yeongyu/oh-my-opencode/blob/0c21c72e05a95a02baa127c8565ea2f95102588a/src/cli/config-manager.ts#L265
 {
   "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json",
-  "google_auth": false,
   "disabled_hooks": [
     // "todo-continuation-enforcer",
     "startup-toast"
@@ -21,7 +19,8 @@
   },
   "agents": {
     "oracle": {
-      "model": "github-copilot/gpt-5.2"
+      "model": "github-copilot/gpt-5.2",
+      "variant": "high"
     },
     "librarian": {
       // "model": "opencode/glm-4.7-free"
@@ -30,56 +29,47 @@
     "explore": {
       "model": "google/antigravity-gemini-3-flash"
     },
-    "frontend-ui-ux-engineer": {
-      "model": "google/antigravity-gemini-3-pro"
-    },
-    "document-writer": {
-      "model": "google/antigravity-gemini-3-flash"
-    },
     "multimodal-looker": {
       "model": "google/antigravity-gemini-3-flash"
     },
-    "orchestrator-sisyphus": {
-      // "model": "anthropic/claude-sonnet-4-5-20250929"
-      "model": "zai-coding-plan/glm-4.7"
-    },
-    "Metis (Plan Consultant)": {
-      // "model": "anthropic/claude-opus-4-5-20251101"
-      "model": "github-copilot/claude-opus-4.5"
-    },
     "Momus (Plan Reviewer)": {
-      "model": "github-copilot/gpt-5.2"
+      "model": "github-copilot/gpt-5.2",
+      "variant": "medium"
     },
     "Sisyphus-Junior": {
       // "model": "anthropic/claude-sonnet-4-5-20250929"
       "model": "zai-coding-plan/glm-4.7"
     }
   },
-  // https://github.com/code-yeongyu/oh-my-opencode/blob/f2dc61f1a3b5c3a0ea55589f6270413f7313c239/src/tools/sisyphus-task/constants.ts#L186-L215
+  // https://github.com/code-yeongyu/oh-my-opencode/blob/8cc995891e0a6a08c8d5fedc6ab42d2faad022bb/src/tools/delegate-task/constants.ts#L158-L166
+  // https://github.com/code-yeongyu/oh-my-opencode/blob/ffe82c1dbdeb4496ed8e13631ba74fbf1782a6bb/src/cli/model-fallback.ts#L49-L86
   "categories": {
     "visual-engineering": {
       "model": "google/antigravity-gemini-3-pro"
     },
-    "artistry": {
-      "model": "google/antigravity-gemini-3-pro"
-    },
-    "writing": {
-      "model": "google/antigravity-gemini-3-flash"
-    },
     "ultrabrain": {
-      "model": "github-copilot/gpt-5.2"
+      "model": "github-copilot/gpt-5.2-codex",
+      "variant": "high"
+    },
+    "artistry": {
+      "model": "google/antigravity-gemini-3-pro",
+      "variant": "high"
     },
     "quick": {
       // "model": "anthropic/claude-haiku-4-5-20251001"
       "model": "google/antigravity-gemini-3-flash"
     },
-    "most-capable": {
-      // "model": "anthropic/claude-opus-4-5-20251101"
-      "model": "github-copilot/claude-opus-4.5"
-    },
-    "general": {
+    "unspecified-low": {
       // "model": "anthropic/claude-sonnet-4-5-20250929"
       "model": "zai-coding-plan/glm-4.7"
+    },
+    "unspecified-high": {
+      // "model": "github-copilot/claude-opus-4.5",
+      // "variant": "high"
+      "model": "zai-coding-plan/glm-4.7"
+    },
+    "writing": {
+      "model": "google/antigravity-gemini-3-flash"
     }
   }
 }

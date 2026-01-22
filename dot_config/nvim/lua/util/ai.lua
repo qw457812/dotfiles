@@ -14,7 +14,6 @@ local H = {}
 -- https://github.com/farion1231/cc-switch/blob/7fa0a7b16648e99ef956d18c01f686dd50e843ed/src/config/claudeProviderPresets.ts
 M.claude = {
   provider = {
-    ---@type table<string, table<string, string>>
     plan = {
       -- curl -s -X POST "$CLAUDE_RELAY_SERVICE_URL/apiStats/api-key/test" -H "Content-Type: application/json" -d "{\"apiKey\":\"$CLAUDE_RELAY_SERVICE_API_KEY\"}"
       anthropic = vim.env.CLAUDE_RELAY_SERVICE_URL and {
@@ -34,8 +33,13 @@ M.claude = {
         ANTHROPIC_AUTH_TOKEN = vim.env.KIMI_API_KEY,
       },
     },
-    ---@type table<string, table<string, string>>
     payg = {
+      -- https://openrouter.ai/docs/guides/guides/claude-code-integration
+      openrouter = {
+        ANTHROPIC_BASE_URL = "https://openrouter.ai/api",
+        ANTHROPIC_AUTH_TOKEN = vim.env.CC_OPENROUTER_API_KEY,
+        ANTHROPIC_API_KEY = "",
+      },
       -- https://platform.moonshot.cn/docs/guide/agent-support
       -- https://platform.moonshot.ai/docs/guide/agent-support
       kimi = {
