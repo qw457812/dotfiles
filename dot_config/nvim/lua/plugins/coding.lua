@@ -14,8 +14,8 @@ return {
       })
 
       -- `<>` pair
-      local lt_opts = { action = "open", pair = "<>", neigh_pattern = "[^\\].", register = { cr = false } }
-      local gt_opts = { action = "close", pair = "<>", neigh_pattern = "[^\\].", register = { cr = false } }
+      local lt_opts = { action = "open", pair = "<>", neigh_pattern = "^[^\\]", register = { cr = false } }
+      local gt_opts = { action = "close", pair = "<>", neigh_pattern = "^[^\\]", register = { cr = false } }
       local angle_brackets_group = vim.api.nvim_create_augroup("mini_pairs_angle_brackets", { clear = true })
       -- use case for cmdline: `:map <esc>`
       local lt_opts_cmdline, gt_opts_cmdline = lt_opts, gt_opts
@@ -37,7 +37,7 @@ return {
         pattern = { "lua", "java" },
         callback = function(ev)
           -- stylua: ignore
-          pairs.map_buf(ev.buf, "i", "<", { action = "open", pair = "<>", neigh_pattern = "%a.", register = { cr = false } })
+          pairs.map_buf(ev.buf, "i", "<", { action = "open", pair = "<>", neigh_pattern = "^%a", register = { cr = false } })
           pairs.map_buf(ev.buf, "i", ">", gt_opts)
         end,
       })
@@ -53,7 +53,7 @@ return {
 
       return U.extend_tbl(opts, {
         mappings = {
-          ["`"] = { neigh_pattern = "[^\\`]." }, -- better deal with markdown code blocks in non-markdown files
+          ["`"] = { neigh_pattern = "^[^\\`]" }, -- better deal with markdown code blocks in non-markdown files
         },
       })
     end,
