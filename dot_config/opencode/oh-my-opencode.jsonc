@@ -17,7 +17,32 @@
       "github-copilot/claude-opus-4.5": 3
     }
   },
+  // https://github.com/code-yeongyu/oh-my-opencode/blob/f4a0d5ec403a834ba9eee550e36258872e261e5c/src/shared/model-requirements.ts
   "agents": {
+    "Sisyphus": {
+      // "model": "anthropic/claude-opus-4-5-20251101"
+      "model": "zai-coding-plan/glm-4.7"
+    },
+    "Atlas": {
+      // "model": "anthropic/claude-sonnet-4-5-20250929"
+      "model": "zai-coding-plan/glm-4.7"
+    },
+    "Prometheus (Planner)": {
+      // "model": "anthropic/claude-opus-4-5-20251101"
+      "model": "zai-coding-plan/glm-4.7"
+    },
+    "Metis (Plan Consultant)": {
+      // "model": "anthropic/claude-opus-4-5-20251101"
+      "model": "zai-coding-plan/glm-4.7"
+    },
+    "Momus (Plan Reviewer)": {
+      "model": "github-copilot/gpt-5.2",
+      "variant": "medium"
+    },
+    "Sisyphus-Junior": {
+      // "model": "anthropic/claude-sonnet-4-5-20250929"
+      "model": "zai-coding-plan/glm-4.7"
+    },
     "oracle": {
       "model": "github-copilot/gpt-5.2",
       "variant": "high"
@@ -31,14 +56,6 @@
     },
     "multimodal-looker": {
       "model": "google/antigravity-gemini-3-flash"
-    },
-    "Momus (Plan Reviewer)": {
-      "model": "github-copilot/gpt-5.2",
-      "variant": "medium"
-    },
-    "Sisyphus-Junior": {
-      // "model": "anthropic/claude-sonnet-4-5-20250929"
-      "model": "zai-coding-plan/glm-4.7"
     }
   },
   // https://github.com/code-yeongyu/oh-my-opencode/blob/8cc995891e0a6a08c8d5fedc6ab42d2faad022bb/src/tools/delegate-task/constants.ts#L158-L166

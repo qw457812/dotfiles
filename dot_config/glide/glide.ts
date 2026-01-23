@@ -482,6 +482,29 @@ glide.keymaps.set("command", "<c-d>", "keys <Del>");
 //   }
 // });
 
+// ref: https://github.com/glide-browser/glide/discussions/147#discussioncomment-15564858
+glide.autocmds.create("ModeChanged", "*", ({ new_mode }) => {
+  const fallback = "--glide-fallback-mode";
+  // https://github.com/glide-browser/glide/issues/237
+  const mode_colors: Record<keyof GlideModes, string> = {
+    command: "--glide-mode-command",
+    hint: "--glide-mode-hint",
+    ignore: "--glide-mode-ignore",
+    insert: "--glide-mode-insert",
+    normal: "--glide-mode-normal",
+    "op-pending": "--glide-mode-op-pending",
+    visual: "--glide-mode-visual",
+  };
+  glide.styles.add(
+    `
+      #browser {
+        border-bottom: 3px solid var(${mode_colors[new_mode] ?? fallback})
+      }
+    `,
+    { id: "glide-custom-mode-indicator", overwrite: true },
+  );
+});
+
 function on_tab_enter(
   pattern: glide.AutocmdPatterns["UrlEnter"],
   callback: (args: glide.AutocmdArgs["UrlEnter"]) => void | Promise<void>,

@@ -3,6 +3,11 @@
 # https://github.com/jesseduffield/lazygit/blob/master/docs/keybindings/Custom_Keybindings.md
 gui:
   nerdFontsVersion: "3"
+  scrollHeight: 20
+  scrollPastBottom: false
+  # sidePanelWidth: 0.25
+  showDivergenceFromBaseBranch: arrowAndNumber
+  statusPanelView: allBranchesLog
 git:
   pagers:
     - pager: delta --dark --paging=never
