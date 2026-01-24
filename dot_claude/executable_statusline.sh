@@ -21,6 +21,11 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   COLOR_CYAN=$(printf '\033[36m')
   COLOR_TEAL=$(printf '\033[38;5;73m')
   COLOR_ORANGE=$(printf '\033[38;5;209m')
+  COLOR_MAGENTA=$(printf '\033[38;5;213m')
+  COLOR_SKY=$(printf '\033[38;5;81m')
+  COLOR_AQUAMARINE=$(printf '\033[38;5;122m')
+  COLOR_BRONZE=$(printf '\033[38;5;130m')
+  COLOR_LAVENDER=$(printf '\033[38;5;147m')
   COLOR_GRAY=$(printf '\033[38;5;248m')
   COLOR_RESET=$(printf '\033[0m')
 
@@ -31,8 +36,8 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   # vim mode
   vim_mode=$(echo "$input" | jq -r '.vim.mode // ""')
   case "$vim_mode" in
-  INSERT) vim_mode_display="${COLOR_GREEN}I${COLOR_RESET}" ;;
-  NORMAL) vim_mode_display="${COLOR_BLUE}N${COLOR_RESET}" ;;
+  INSERT) vim_mode_display="${COLOR_AQUAMARINE}I${COLOR_RESET}" ;;
+  NORMAL) vim_mode_display="${COLOR_SKY}N${COLOR_RESET}" ;;
   *) vim_mode_display=$([ -n "$vim_mode" ] && echo "${vim_mode}") ;;
   esac
 
@@ -42,7 +47,7 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   *) model=$(cat "$transcript_path" 2>/dev/null | jq -r 'select(.type == "assistant") | .message.model // empty' | tail -1) ;; # z.ai
   esac
   model=${model:-$(echo "$input" | jq -r '(.model.display_name // "") | split(" ")[0] | split("-")[0] | (.[:1] | ascii_upcase) + .[1:]')}
-  model_display=$([ -n "$model" ] && echo "${COLOR_RED}${model}${COLOR_RESET}")
+  model_display=$([ -n "$model" ] && echo "${COLOR_LAVENDER}${model}${COLOR_RESET}")
 
   # # tokens (from transcript)
   # total_tokens=$(cat "$transcript_path" 2>/dev/null | jq -s '
@@ -60,13 +65,17 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   session_cost=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
   session_cost_display="${COLOR_YELLOW}$(printf "\$%.2f" "$session_cost")${COLOR_RESET}"
 
-  # today cost
-  today_cost=$("$HOME/.claude/statusline/get-today-cost.sh")
-  today_cost_display="${COLOR_ORANGE}$(printf "\$%.2f" "$today_cost")${COLOR_RESET}"
+  # daily cost
+  daily_cost=$("$HOME/.claude/statusline/get-daily-cost.sh")
+  daily_cost_display="${COLOR_ORANGE}$(printf "\$%.2f" "$daily_cost")${COLOR_RESET}"
+
+  # weekly cost (only for CRS)
+  weekly_cost=$("$HOME/.claude/statusline/get-weekly-cost.sh")
+  weekly_cost_display=$([ -n "$weekly_cost" ] && echo "${COLOR_BRONZE}$(printf "\$%.0f" "$weekly_cost")${COLOR_RESET}")
 
   # glm quota (only for ZAI/ZHIPU platforms)
   glm_quota=$("$HOME/.claude/statusline/get-glm-quota.sh")
-  glm_quota_display=$([ -n "$glm_quota" ] && echo "${COLOR_RED}${glm_quota}%${COLOR_RESET}")
+  glm_quota_display=$([ -n "$glm_quota" ] && echo "${COLOR_MAGENTA}${glm_quota}%${COLOR_RESET}")
 
   # session duration (hidden if < 1 min)
   session_duration=$(echo "$input" | jq -r '.cost.total_duration_ms // 0' | awk '{
@@ -100,7 +109,8 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
     "$total_tokens_display" \
     "$context_percentage_display" \
     "$session_cost_display" \
-    "$today_cost_display" \
+    "$daily_cost_display" \
+    "$weekly_cost_display" \
     "$glm_quota_display" \
     "$session_duration_display" \
     "$version_display" \
