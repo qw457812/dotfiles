@@ -57,12 +57,7 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   # ' || echo 0)
   # tokens (from context_window)
   total_tokens=$(echo "$input" | jq -r '.context_window.current_usage | (.input_tokens // 0) + (.output_tokens // 0) + (.cache_creation_input_tokens // 0) + (.cache_read_input_tokens // 0)')
-  if [ "$total_tokens" -ne 0 ]; then
-    total_tokens_display="${COLOR_BLUE}$(awk -v t="$total_tokens" 'BEGIN {printf "%.1fk", t/1000}')${COLOR_RESET}"
-
-    # context usage
-    context_percentage_display="${COLOR_CYAN}$(awk -v t="$total_tokens" -v s="$context_window_size" 'BEGIN {printf "%.1f%%", t*100/s}')${COLOR_RESET}"
-  else
+  if [ "$total_tokens" -eq 0 ] && [ -f "$transcript_path" ]; then # transcript exists → user submitted prompt
     # HACK: current_usage is 0 with z.ai in v2.1.8+
     # https://github.com/anthropics/claude-code/issues/19724
     total_input_tokens=$(echo "$input" | jq -r '.context_window.total_input_tokens // 0')
@@ -70,6 +65,11 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
     total_tokens_display="${COLOR_BLUE}$(awk -v t="$total_input_tokens" 'BEGIN {printf "%.1fk", t/1000}')${COLOR_RESET} ${COLOR_CYAN}$(awk -v t="$total_output_tokens" 'BEGIN {printf "%.1fk", t/1000}')${COLOR_RESET}"
 
     context_percentage_display=""
+  else
+    total_tokens_display="${COLOR_BLUE}$(awk -v t="$total_tokens" 'BEGIN {printf "%.1fk", t/1000}')${COLOR_RESET}"
+
+    # context usage
+    context_percentage_display="${COLOR_CYAN}$(awk -v t="$total_tokens" -v s="$context_window_size" 'BEGIN {printf "%.1f%%", t*100/s}')${COLOR_RESET}"
   fi
 
   # session cost
@@ -78,7 +78,7 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
 
   # daily cost
   daily_cost=$("$HOME/.claude/statusline/get-daily-cost.sh")
-  daily_cost_display="${COLOR_ORANGE}$(printf "\$%.2f" "$daily_cost")${COLOR_RESET}"
+  daily_cost_display=$([ "$daily_cost" != "0" ] && echo "${COLOR_ORANGE}$(printf "\$%.2f" "$daily_cost")${COLOR_RESET}")
 
   # weekly cost (only for CRS)
   weekly_cost=$("$HOME/.claude/statusline/get-weekly-cost.sh")

@@ -300,6 +300,7 @@ if type -q claude
     # alternative:
     # - https://github.com/Fission-AI/OpenSpec
     # - https://github.com/OthmanAdi/planning-with-files
+    # - https://github.com/obra/superpowers
     abbr ccspec "uvx --from git+https://github.com/github/spec-kit.git specify init --script sh --ai claude --here"
     abbr ccgsd "npx get-shit-done-cc@latest" # https://github.com/glittercowboy/get-shit-done
     abbr cchistory "npx -y cchistory"

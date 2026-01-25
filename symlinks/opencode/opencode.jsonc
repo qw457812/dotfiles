@@ -11,7 +11,7 @@
   "share": "manual",
   // "autoupdate": "notify",
   "model": "zai-coding-plan/glm-4.7",
-  "small_model": "opencode/grok-code",
+  "small_model": "opencode/gpt-5-nano",
   "agent": {
     "plan": {
       "model": "zai-coding-plan/glm-4.7"
