@@ -1,3 +1,4 @@
+// bunx oh-my-opencode doctor --verbose
 // https://github.com/code-yeongyu/oh-my-opencode/blob/dev/src/config/schema.ts
 {
   "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json",
@@ -17,30 +18,26 @@
       "github-copilot/claude-opus-4.5": 3
     }
   },
-  // https://github.com/code-yeongyu/oh-my-opencode/blob/f4a0d5ec403a834ba9eee550e36258872e261e5c/src/shared/model-requirements.ts
+  // https://github.com/code-yeongyu/oh-my-opencode/blob/b55fd8d76f8ce857f00b79a50855af987bee254e/src/shared/model-requirements.ts
+  // https://github.com/code-yeongyu/oh-my-opencode/blob/b55fd8d76f8ce857f00b79a50855af987bee254e/src/cli/model-fallback.ts
   "agents": {
-    "Sisyphus": {
-      // "model": "anthropic/claude-opus-4-5-20251101"
+    "sisyphus": {
       "model": "zai-coding-plan/glm-4.7"
     },
-    "Atlas": {
-      // "model": "anthropic/claude-sonnet-4-5-20250929"
+    "atlas": {
       "model": "zai-coding-plan/glm-4.7"
     },
-    "Prometheus (Planner)": {
-      // "model": "anthropic/claude-opus-4-5-20251101"
+    "prometheus": {
       "model": "zai-coding-plan/glm-4.7"
     },
-    "Metis (Plan Consultant)": {
-      // "model": "anthropic/claude-opus-4-5-20251101"
+    "metis": {
       "model": "zai-coding-plan/glm-4.7"
     },
-    "Momus (Plan Reviewer)": {
+    "momus": {
       "model": "github-copilot/gpt-5.2",
       "variant": "medium"
     },
-    "Sisyphus-Junior": {
-      // "model": "anthropic/claude-sonnet-4-5-20250929"
+    "sisyphus-junior": {
       "model": "zai-coding-plan/glm-4.7"
     },
     "oracle": {
@@ -48,18 +45,16 @@
       "variant": "high"
     },
     "librarian": {
-      // "model": "opencode/glm-4.7-free"
       "model": "zai-coding-plan/glm-4.7"
     },
     "explore": {
-      "model": "google/antigravity-gemini-3-flash"
+      "model": "github-copilot/gpt-5-mini"
     },
     "multimodal-looker": {
       "model": "google/antigravity-gemini-3-flash"
     }
   },
-  // https://github.com/code-yeongyu/oh-my-opencode/blob/8cc995891e0a6a08c8d5fedc6ab42d2faad022bb/src/tools/delegate-task/constants.ts#L158-L166
-  // https://github.com/code-yeongyu/oh-my-opencode/blob/ffe82c1dbdeb4496ed8e13631ba74fbf1782a6bb/src/cli/model-fallback.ts#L49-L86
+  // https://github.com/code-yeongyu/oh-my-opencode/blob/04633ba208cab78728ce6250b99d6e82bc5d2271/src/tools/delegate-task/constants.ts#L158-L166
   "categories": {
     "visual-engineering": {
       "model": "google/antigravity-gemini-3-pro"
@@ -73,17 +68,14 @@
       "variant": "high"
     },
     "quick": {
-      // "model": "anthropic/claude-haiku-4-5-20251001"
       "model": "google/antigravity-gemini-3-flash"
     },
     "unspecified-low": {
-      // "model": "anthropic/claude-sonnet-4-5-20250929"
       "model": "zai-coding-plan/glm-4.7"
     },
     "unspecified-high": {
-      // "model": "github-copilot/claude-opus-4.5",
-      // "variant": "high"
-      "model": "zai-coding-plan/glm-4.7"
+      "model": "github-copilot/gpt-5.2",
+      "variant": "high"
     },
     "writing": {
       "model": "google/antigravity-gemini-3-flash"
