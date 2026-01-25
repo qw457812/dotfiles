@@ -14,8 +14,10 @@ CLAUDE.local.md
 # .claude
 # .mcp.json
 
-.aider*
-.opencode
+# .opencode
+# .opencode.json
 # AGENTS.md
+
+.aider*
 
 .playwright-mcp

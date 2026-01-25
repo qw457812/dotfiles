@@ -300,16 +300,11 @@ if type -q claude
     # alternative:
     # - https://github.com/Fission-AI/OpenSpec
     # - https://github.com/OthmanAdi/planning-with-files
-    abbr spec "uvx --from git+https://github.com/github/spec-kit.git specify init --script sh --ai claude --here"
+    abbr ccspec "uvx --from git+https://github.com/github/spec-kit.git specify init --script sh --ai claude --here"
     abbr ccgsd "npx get-shit-done-cc@latest" # https://github.com/glittercowboy/get-shit-done
     abbr cchistory "npx -y cchistory"
     abbr cck claude_kimi
-    abbr cckc "claude_kimi --continue"
-    abbr cckcf "claude_kimi --continue --fork-session"
-    abbr cckr "claude_kimi --resume"
-    abbr cckrf "claude_kimi --resume --fork-session"
     abbr ccg claude_glm
-    abbr ccq claude_qwen
     abbr ccm claude_minimax
     # type -q ccr; and abbr ccr "ccr code" # https://github.com/musistudio/claude-code-router
 end
@@ -319,7 +314,6 @@ if type -q codex
     abbr cxc 'codex resume --last'
     abbr cxr 'codex resume'
 end
-# type -q gemini; and abbr gm gemini
 if type -q opencode
     abbr oc opencode
     abbr occ 'opencode --continue'

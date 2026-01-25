@@ -22,6 +22,7 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   COLOR_TEAL=$(printf '\033[38;5;73m')
   COLOR_ORANGE=$(printf '\033[38;5;209m')
   COLOR_MAGENTA=$(printf '\033[38;5;213m')
+  COLOR_SEAFOAM=$(printf '\033[38;5;107m')
   COLOR_SKY=$(printf '\033[38;5;81m')
   COLOR_AQUAMARINE=$(printf '\033[38;5;122m')
   COLOR_BRONZE=$(printf '\033[38;5;130m')
@@ -56,10 +57,20 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   # ' || echo 0)
   # tokens (from context_window)
   total_tokens=$(echo "$input" | jq -r '.context_window.current_usage | (.input_tokens // 0) + (.output_tokens // 0) + (.cache_creation_input_tokens // 0) + (.cache_read_input_tokens // 0)')
-  total_tokens_display="${COLOR_BLUE}$(awk -v t="$total_tokens" 'BEGIN {printf "%.1fk", t/1000}')${COLOR_RESET}"
+  if [ "$total_tokens" -ne 0 ]; then
+    total_tokens_display="${COLOR_BLUE}$(awk -v t="$total_tokens" 'BEGIN {printf "%.1fk", t/1000}')${COLOR_RESET}"
 
-  # context usage
-  context_percentage_display="${COLOR_CYAN}$(awk -v t="$total_tokens" -v s="$context_window_size" 'BEGIN {printf "%.1f%%", t*100/s}')${COLOR_RESET}"
+    # context usage
+    context_percentage_display="${COLOR_CYAN}$(awk -v t="$total_tokens" -v s="$context_window_size" 'BEGIN {printf "%.1f%%", t*100/s}')${COLOR_RESET}"
+  else
+    # HACK: current_usage is 0 with z.ai in v2.1.8+
+    # https://github.com/anthropics/claude-code/issues/19724
+    total_input_tokens=$(echo "$input" | jq -r '.context_window.total_input_tokens // 0')
+    total_output_tokens=$(echo "$input" | jq -r '.context_window.total_output_tokens // 0')
+    total_tokens_display="${COLOR_BLUE}$(awk -v t="$total_input_tokens" 'BEGIN {printf "%.1fk", t/1000}')${COLOR_RESET} ${COLOR_CYAN}$(awk -v t="$total_output_tokens" 'BEGIN {printf "%.1fk", t/1000}')${COLOR_RESET}"
+
+    context_percentage_display=""
+  fi
 
   # session cost
   session_cost=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
@@ -75,7 +86,9 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
 
   # glm quota (only for ZAI/ZHIPU platforms)
   glm_quota=$("$HOME/.claude/statusline/get-glm-quota.sh")
-  glm_quota_display=$([ -n "$glm_quota" ] && echo "${COLOR_MAGENTA}${glm_quota}%${COLOR_RESET}")
+  glm_quota_token=$(echo "$glm_quota" | jq -r '.token // 0')
+  glm_quota_mcp=$(echo "$glm_quota" | jq -r '.mcp // 0')
+  glm_quota_display=$([ -n "$glm_quota" ] && echo "${COLOR_MAGENTA}${glm_quota_token}%${COLOR_RESET} ${COLOR_SEAFOAM}${glm_quota_mcp}%${COLOR_RESET}")
 
   # session duration (hidden if < 1 min)
   session_duration=$(echo "$input" | jq -r '.cost.total_duration_ms // 0' | awk '{
