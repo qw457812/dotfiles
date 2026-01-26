@@ -35,7 +35,7 @@ const search_engines = {
   w: "https://en.wikipedia.org/wiki/Special:Search?search={}",
   k: "https://kagi.com/search?q={}",
 } as const;
-const default_search_engine = search_engines.k;
+const default_search_engine = search_engines.g;
 
 // Env
 if (glide.ctx.os === "macosx") {

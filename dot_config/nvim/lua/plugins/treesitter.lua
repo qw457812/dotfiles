@@ -9,6 +9,11 @@ return {
     },
   },
 
+  -- HACK: Steps to fix Neovim segfaults after nvim-treesitter upgrades:
+  -- 1. Uninstall nvim-treesitter plugin via lazy.nvim UI
+  -- 2. Exit Neovim
+  -- 3. Run `rm -rf ~/.local/share/nvim/site/` (see: https://github.com/nvim-treesitter/nvim-treesitter/blob/1927c76aec829d40dcad24b6469cb639f1334096/lua/nvim-treesitter/config.lua#L10)
+  -- 4. Open Neovim (lazy.nvim will reinstall nvim-treesitter and LazyVim will reinstall parsers)
   {
     "nvim-treesitter/nvim-treesitter",
     ---@type lazyvim.TSConfig|{}
