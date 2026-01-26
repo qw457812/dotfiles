@@ -9,5 +9,6 @@ function claude_glm --wraps=claude
     # set -lx ANTHROPIC_AUTH_TOKEN $ZHIPU_API_KEY
 
     set -lx API_TIMEOUT_MS 3000000
+    set -lx ANTHROPIC_DEFAULT_HAIKU_MODEL glm-4.7 # glm-4.5-air is not good enough
     command claude $argv
 end

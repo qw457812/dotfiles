@@ -30,6 +30,7 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   COLOR_GRAY=$(printf '\033[38;5;248m')
   COLOR_RESET=$(printf '\033[0m')
 
+  base_url="$ANTHROPIC_BASE_URL"
   context_window_size=$(echo "$input" | jq -r '.context_window.context_window_size // 200000')
   transcript_path=$(echo "$input" | jq -r '.transcript_path // ""')
   # cwd=$(echo "$input" | jq -r '.workspace.current_dir // .cwd')
@@ -43,10 +44,10 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   esac
 
   # model
-  case "$ANTHROPIC_BASE_URL" in
-  "" | "$CLAUDE_RELAY_SERVICE_URL"*) ;;
-  *) model=$(cat "$transcript_path" 2>/dev/null | jq -r 'select(.type == "assistant") | .message.model // empty' | tail -1) ;; # z.ai
-  esac
+  model=""
+  if [ -n "$base_url" ] && [ "${base_url#"$CLAUDE_RELAY_SERVICE_URL"}" = "$base_url" ]; then
+    model=$(cat "$transcript_path" 2>/dev/null | jq -r 'select(.type == "assistant") | .message.model // empty' | tail -1) # z.ai
+  fi
   model=${model:-$(echo "$input" | jq -r '(.model.display_name // "") | split(" ")[0] | split("-")[0] | (.[:1] | ascii_upcase) + .[1:]')}
   model_display=$([ -n "$model" ] && echo "${COLOR_LAVENDER}${model}${COLOR_RESET}")
 
@@ -80,9 +81,9 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   daily_cost=$("$HOME/.claude/statusline/get-daily-cost.sh")
   daily_cost_display=$([ "$daily_cost" != "0" ] && echo "${COLOR_ORANGE}$(printf "\$%.2f" "$daily_cost")${COLOR_RESET}")
 
-  # weekly cost (only for CRS)
+  # weekly cost (only for CRS; hidden on Monday)
   weekly_cost=$("$HOME/.claude/statusline/get-weekly-cost.sh")
-  weekly_cost_display=$([ -n "$weekly_cost" ] && echo "${COLOR_BRONZE}$(printf "\$%.0f" "$weekly_cost")${COLOR_RESET}")
+  weekly_cost_display=$([ -n "$weekly_cost" ] && echo "${COLOR_BRONZE}$(printf "\$%.2f" "$weekly_cost")${COLOR_RESET}")
 
   # glm quota (only for ZAI/ZHIPU platforms)
   glm_quota=$("$HOME/.claude/statusline/get-glm-quota.sh")
@@ -106,7 +107,7 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   if [ "$__IS_CLAUDECODE_NVIM" = "1" ]; then
     lines_added=$(echo "$input" | jq -r '.cost.total_lines_added // 0')
     lines_removed=$(echo "$input" | jq -r '.cost.total_lines_removed // 0')
-    # hide if no changes
+    # hidden if no changes
     changes_display=""
     [ "$lines_added" -gt 0 ] && changes_display="${COLOR_GREEN}+${lines_added}${COLOR_RESET}"
     [ "$lines_removed" -gt 0 ] && changes_display="${changes_display}${changes_display:+ }${COLOR_RED}-${lines_removed}${COLOR_RESET}"

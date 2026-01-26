@@ -18,6 +18,10 @@
       "github-copilot/claude-opus-4.5": 3
     }
   },
+  "tmux": {
+    // https://github.com/code-yeongyu/oh-my-opencode/blob/6a2f43858aef84e13af25730dcac32b3e3dac3c9/docs/configurations.md?plain=1#L315-L316
+    "enabled": true
+  },
   // https://github.com/code-yeongyu/oh-my-opencode/blob/b55fd8d76f8ce857f00b79a50855af987bee254e/src/shared/model-requirements.ts
   // https://github.com/code-yeongyu/oh-my-opencode/blob/b55fd8d76f8ce857f00b79a50855af987bee254e/src/cli/model-fallback.ts
   "agents": {
