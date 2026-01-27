@@ -26,8 +26,6 @@
 #   i=$((i - 1))
 # done | awk '{s+=$1} END {print s+0}'
 
-# NOTE: `natural_weekly` is not officially supported by https://github.com/Wei-Shaw/claude-relay-service/tree/03dfedc3d97b5c00a4c710e214ef89619fa6d6b1
-
 . "$(dirname "$0")/cache-utils.sh"
 
 crs_url="$CLAUDE_RELAY_SERVICE_URL"
@@ -47,9 +45,10 @@ cache_file=$(get_cache_file "weekly_cost_$(date +%Y%V)_crs")
 
 cache_get "$cache_file" 60 && exit 0
 
-weekly_cost=$(curl -s -X POST "${crs_url}/apiStats/api/user-model-stats" \
+# https://github.com/Wei-Shaw/claude-relay-service/blob/029bdf3719e19de09975f5862274fddb290b99d6/web/admin-spa/src/utils/http_apis.js#L10
+weekly_cost=$(curl -s -X POST "${crs_url}/apiStats/api/user-stats" \
   -H "Content-Type: application/json" \
-  -d "{\"apiId\":\"${crs_api_id}\",\"period\":\"natural_weekly\"}" |
-  jq -r '[.data[].costs.total] | add // 0')
+  -d "{\"apiId\":\"${crs_api_id}\"}" |
+  jq -r '.data.limits.weeklyOpusCost // 0')
 
 cache_set "$cache_file" "${weekly_cost:-0}"
