@@ -3,8 +3,8 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "plugin": [
-    "oh-my-opencode@3.1.2", // https://github.com/code-yeongyu/oh-my-opencode
-    "opencode-antigravity-auth@1.3.1" // https://github.com/NoeFabris/opencode-antigravity-auth
+    "oh-my-opencode@3.1.4", // https://github.com/code-yeongyu/oh-my-opencode
+    "opencode-antigravity-auth@1.3.2" // https://github.com/NoeFabris/opencode-antigravity-auth
   ],
   "theme": "system",
   "share": "manual",
@@ -15,6 +15,51 @@
     "plan": {
       "model": "zai-coding-plan/glm-4.7"
     }
+  },
+  "mcp": {
+    // "context7": {
+    //   "type": "local",
+    //   "command": ["npx", "-y", "@upstash/context7-mcp"],
+    //   "enabled": false
+    // },
+    // https://github.com/code-yeongyu/oh-my-opencode/issues/493
+    "websearch": {
+      "type": "local",
+      "command": ["npx", "-y", "exa-mcp-server", "tools=web_search_exa"],
+      "enabled": true,
+      "timeout": 60000
+    }
+  },
+  "permission": {
+    "websearch": "deny", // provided by exa, not sure why this tool exists (for opencode/big-pickle), we already have websearch_web_search_exa (from `websearch` MCP which was added by oh-my-opencode)
+    "codesearch": "deny", // provided by exa, not sure why this tool exists (for opencode/big-pickle)
+    "bash": {
+      "git add *": "ask",
+      "git commit *": "ask",
+      "git push *": "ask",
+      "git pull *": "ask",
+      "git merge *": "ask",
+      "git rebase *": "ask",
+      "git reset *": "ask",
+      "git checkout *": "ask",
+      "git switch *": "ask",
+      "git stash *": "ask",
+      "git cherry-pick *": "ask",
+      "git revert *": "ask",
+      "git restore *": "ask"
+    }
+  },
+  "keybinds": {
+    "leader": "ctrl+x",
+    "messages_half_page_up": "ctrl+u",
+    "messages_half_page_down": "ctrl+d",
+    "app_exit": "ctrl+c,<leader>q", // ctrl+d (messages_half_page_down) in subagent session exits app
+    "input_delete_to_line_start": "ctrl+u,alt+u",
+    "messages_next": "alt+j",
+    "messages_previous": "alt+k",
+    "editor_open": "ctrl+g", // align with claude code since we can't change claude code keybinds
+    "agent_cycle": "none", // avoid accidental agent cycle
+    "session_child_cycle": "<leader>right,tab"
   },
   "provider": {
     // check `opencode models anthropic`
@@ -154,50 +199,5 @@
     // "zai-coding-plan",
     "zhipuai",
     "zhipuai-coding-plan"
-  ],
-  "mcp": {
-    // "context7": {
-    //   "type": "local",
-    //   "command": ["npx", "-y", "@upstash/context7-mcp"],
-    //   "enabled": false
-    // },
-    // https://github.com/code-yeongyu/oh-my-opencode/issues/493
-    "websearch": {
-      "type": "local",
-      "command": ["npx", "-y", "exa-mcp-server", "tools=web_search_exa"],
-      "enabled": true,
-      "timeout": 60000
-    }
-  },
-  "permission": {
-    "websearch": "deny", // provided by exa, not sure why this tool exists (for opencode/big-pickle), we already have websearch_web_search_exa (from `websearch` MCP which was added by oh-my-opencode)
-    "codesearch": "deny", // provided by exa, not sure why this tool exists (for opencode/big-pickle)
-    "bash": {
-      "git add *": "ask",
-      "git commit *": "ask",
-      "git push *": "ask",
-      "git pull *": "ask",
-      "git merge *": "ask",
-      "git rebase *": "ask",
-      "git reset *": "ask",
-      "git checkout *": "ask",
-      "git switch *": "ask",
-      "git stash *": "ask",
-      "git cherry-pick *": "ask",
-      "git revert *": "ask",
-      "git restore *": "ask"
-    }
-  },
-  "keybinds": {
-    "leader": "ctrl+x",
-    "messages_half_page_up": "ctrl+u",
-    "messages_half_page_down": "ctrl+d",
-    "app_exit": "ctrl+c,<leader>q", // ctrl+d (messages_half_page_down) in subagent session exits app
-    "input_delete_to_line_start": "ctrl+u,alt+u",
-    "messages_next": "alt+j",
-    "messages_previous": "alt+k",
-    "editor_open": "ctrl+g", // align with claude code since we can't change claude code keybinds
-    "agent_cycle": "none", // avoid accidental agent cycle
-    "session_child_cycle": "<leader>right,tab"
-  }
+  ]
 }

@@ -46,9 +46,10 @@ cache_file=$(get_cache_file "weekly_cost_$(date +%Y%V)_crs")
 cache_get "$cache_file" 60 && exit 0
 
 # https://github.com/Wei-Shaw/claude-relay-service/blob/029bdf3719e19de09975f5862274fddb290b99d6/web/admin-spa/src/utils/http_apis.js#L10
+# NOTE: `currentWeeklyCost` is not officially supported by claude-relay-service
 weekly_cost=$(curl -s -X POST "${crs_url}/apiStats/api/user-stats" \
   -H "Content-Type: application/json" \
   -d "{\"apiId\":\"${crs_api_id}\"}" |
-  jq -r '.data.limits.weeklyOpusCost // 0')
+  jq -r '.data.limits.currentWeeklyCost // 0')
 
 cache_set "$cache_file" "${weekly_cost:-0}"
