@@ -61,10 +61,12 @@ return {
   },
 
   -- {
-  --   "esmuellert/vscode-diff.nvim",
+  --   "esmuellert/codediff.nvim",
+  --   enabled = not vim.g.user_is_termux,
   --   dependencies = "MunifTanjim/nui.nvim",
   --   cmd = "CodeDiff",
   --   opts = {
+  --     -- wait for: https://github.com/esmuellert/codediff.nvim/issues/211
   --     keymaps = {
   --       view = {
   --         next_hunk = "]h",

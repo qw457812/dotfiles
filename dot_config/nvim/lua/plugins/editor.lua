@@ -105,47 +105,52 @@ return {
         desc = "Rip Substitute",
       },
     },
-    opts = {
-      popupWin = {
-        position = "top",
-        disableCompletions = false,
-      },
-      keymaps = {
-        insertModeConfirm = "<C-s>",
-        toggleFixedStrings = "<localleader>f",
-        toggleIgnoreCase = "<localleader>c",
-      },
-      regexOptions = {
-        startWithFixedStrings = true,
-        -- startWithIgnoreCase = true,
-      },
-      prefill = {
-        startInReplaceLineIfPrefill = true,
-        alsoPrefillReplaceLine = true,
-      },
-    },
-    config = function(_, opts)
-      require("rip-substitute").setup(opts)
+    opts = function()
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "rip-substitute",
+        callback = function(ev)
+          local keymaps = require("rip-substitute.config").config.keymaps
 
-      local abort_key = vim.keycode(vim.tbl_get(opts, "keymaps", "abort") or "q")
-      if abort_key ~= vim.keycode("<esc>") then
-        vim.api.nvim_create_autocmd("FileType", {
-          pattern = "rip-substitute",
-          callback = function(event)
+          local abort_key = vim.keycode(keymaps.abort)
+          if abort_key ~= vim.keycode("<esc>") then
             vim.keymap.set("n", "<esc>", function()
               U.keymap.clear_ui_esc({
                 close = function()
                   vim.api.nvim_feedkeys(abort_key, "m", false)
                 end,
               })
-            end, {
-              buffer = event.buf,
-              silent = true,
-              desc = "Clear UI or Abort (Rip Substitute)",
-            })
-          end,
-        })
-      end
+            end, { buffer = ev.buf, silent = true, desc = "Clear UI or Abort (Rip Substitute)" })
+          end
+
+          -- disable cwd substitution since we have grug-far.nvim
+          vim.schedule(function()
+            pcall(vim.keymap.del, "n", keymaps.confirmAndSubstituteInCwd, { buffer = ev.buf })
+          end)
+        end,
+      })
+
+      ---@type RipSubstitute.Config
+      return {
+        popupWin = {
+          position = "top",
+          disableCompletions = false,
+        },
+        keymaps = {
+          insertModeConfirmAndSubstituteInBuffer = "<C-s>",
+          confirmAndSubstituteInCwd = "<localleader><S-CR>",
+          toggleFixedStrings = "<localleader>f",
+          toggleIgnoreCase = "<localleader>c",
+          openAtRegex101 = "<localleader>r",
+        },
+        regexOptions = {
+          startWithFixedStrings = true,
+          -- startWithIgnoreCase = true,
+        },
+        prefill = {
+          startInReplaceLineIfPrefill = true,
+          alsoPrefillReplaceLine = true,
+        },
+      }
     end,
     specs = {
       {

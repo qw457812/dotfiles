@@ -744,6 +744,28 @@ return {
     end,
   },
 
+  {
+    "anomalyco/opencode",
+    enabled = not vim.g.user_is_termux,
+    version = "*",
+    lazy = true,
+    config = function() end,
+  },
+  {
+    "code-yeongyu/oh-my-opencode",
+    enabled = not vim.g.user_is_termux,
+    version = "*",
+    lazy = true,
+    config = function() end,
+  },
+  {
+    "NoeFabris/opencode-antigravity-auth",
+    enabled = not vim.g.user_is_termux,
+    version = "*",
+    lazy = true,
+    config = function() end,
+  },
+
   -- ===========================================================================
   -- ALL LAZY SPECS BELOW ARE UNUSED
   -- ===========================================================================
