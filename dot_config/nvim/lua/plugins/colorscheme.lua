@@ -62,7 +62,7 @@ local function random_colorscheme()
     return v ~= last_random and v ~= vim.g.colors_name
   end, colorschemes)
   if #themes == 0 then
-    return nil
+    return
   end
   -- return themes[tonumber(os.date("%S")) % #themes + 1]
   -- generate random config with initialized random seed (otherwise it won't be random during startup)

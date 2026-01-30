@@ -27,7 +27,7 @@ M.claude = {
         API_TIMEOUT_MS = "3000000",
         ANTHROPIC_DEFAULT_HAIKU_MODEL = "glm-4.7", -- glm-4.5-air is not good enough
       },
-      -- https://www.kimi.com/coding/docs/third-party-agents.html
+      -- https://www.kimi.com/code/docs/more/third-party-agents.html
       -- https://www.kimi.com/membership/subscription
       kimi = {
         ANTHROPIC_BASE_URL = "https://api.kimi.com/coding/",

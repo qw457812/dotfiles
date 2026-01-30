@@ -32,9 +32,10 @@
       // "model": "github-copilot/claude-opus-4.5",
       // "model": "github-copilot/claude-sonnet-4.5",
       // "variant": "high"
-      "model": "zai-coding-plan/glm-4.7"
+      // "model": "zai-coding-plan/glm-4.7"
       // "model": "github-copilot/gpt-5.2-codex",
       // "variant": "medium"
+      "model": "opencode/kimi-k2.5-free"
     },
     "atlas": {
       // "model": "github-copilot/claude-sonnet-4.5"
