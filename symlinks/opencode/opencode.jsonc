@@ -3,8 +3,8 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "plugin": [
-    "oh-my-opencode@3.1.8", // https://github.com/code-yeongyu/oh-my-opencode
-    "opencode-antigravity-auth@1.4.2" // https://github.com/NoeFabris/opencode-antigravity-auth
+    "oh-my-opencode@3.2.1", // https://github.com/code-yeongyu/oh-my-opencode
+    "opencode-antigravity-auth@1.4.3" // https://github.com/NoeFabris/opencode-antigravity-auth
   ],
   "theme": "system",
   "share": "manual",
@@ -17,11 +17,16 @@
     }
   },
   "mcp": {
-    // "context7": {
-    //   "type": "local",
-    //   "command": ["npx", "-y", "@upstash/context7-mcp"],
-    //   "enabled": false
-    // },
+    // https://github.com/code-yeongyu/oh-my-opencode/blob/af67bc8592485ca25fcdf6752839754304f6bfb6/src/mcp/context7.ts
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
+      },
+      "enabled": true,
+      "oauth": false
+    },
     // https://github.com/code-yeongyu/oh-my-opencode/issues/493
     "websearch": {
       "type": "local",
