@@ -284,7 +284,7 @@ return {
       ---@type table<string, AvanteACPProvider|{}>
       acp_providers = {
         ["claude-code"] = {
-          env = U.ai.claude.provider.plan.anthropic,
+          env = U.ai.claude.provider.plan.glm,
         },
       },
       windows = {

@@ -86,7 +86,7 @@ return {
           -- requires `npm i -g @zed-industries/claude-code-acp`
           claude_code = function()
             return require("codecompanion.adapters").extend("claude_code", {
-              env = U.ai.claude.provider.plan.anthropic,
+              env = U.ai.claude.provider.plan.glm,
             })
           end,
         },

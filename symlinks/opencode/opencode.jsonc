@@ -67,13 +67,13 @@
     "session_child_cycle": "<leader>right,tab"
   },
   "provider": {
-    // check `opencode models anthropic`
-    "anthropic": {
-      "options": {
-        "baseURL": "{env:CLAUDE_RELAY_SERVICE_URL}/api/v1",
-        "apiKey": "{env:CLAUDE_RELAY_SERVICE_API_KEY}"
-      }
-    },
+    // // check `opencode models anthropic`
+    // "anthropic": {
+    //   "options": {
+    //     "baseURL": "{env:CLAUDE_RELAY_SERVICE_URL}/api/v1",
+    //     "apiKey": "{env:CLAUDE_RELAY_SERVICE_API_KEY}"
+    //   }
+    // },
     "google": {
       "models": {
         "antigravity-gemini-3-pro": {

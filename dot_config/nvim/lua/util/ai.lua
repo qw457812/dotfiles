@@ -16,7 +16,7 @@ M.claude = {
   provider = {
     plan = {
       -- curl -s -X POST "$CLAUDE_RELAY_SERVICE_URL/apiStats/api-key/test" -H "Content-Type: application/json" -d "{\"apiKey\":\"$CLAUDE_RELAY_SERVICE_API_KEY\"}"
-      anthropic = vim.env.CLAUDE_RELAY_SERVICE_URL and {
+      crs = vim.env.CLAUDE_RELAY_SERVICE_URL and {
         ANTHROPIC_BASE_URL = vim.env.CLAUDE_RELAY_SERVICE_URL .. "/api",
         ANTHROPIC_AUTH_TOKEN = vim.env.CLAUDE_RELAY_SERVICE_API_KEY,
       } or {},

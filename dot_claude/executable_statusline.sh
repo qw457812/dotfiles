@@ -20,12 +20,12 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   COLOR_BLUE=$(printf '\033[34m')
   COLOR_CYAN=$(printf '\033[36m')
   COLOR_TEAL=$(printf '\033[38;5;73m')
-  COLOR_ORANGE=$(printf '\033[38;5;209m')
+  # COLOR_ORANGE=$(printf '\033[38;5;209m')
   COLOR_MAGENTA=$(printf '\033[38;5;213m')
   COLOR_SEAFOAM=$(printf '\033[38;5;107m')
   COLOR_SKY=$(printf '\033[38;5;81m')
   COLOR_AQUAMARINE=$(printf '\033[38;5;122m')
-  COLOR_BRONZE=$(printf '\033[38;5;130m')
+  # COLOR_BRONZE=$(printf '\033[38;5;130m')
   COLOR_LAVENDER=$(printf '\033[38;5;147m')
   COLOR_GRAY=$(printf '\033[38;5;248m')
   COLOR_RESET=$(printf '\033[0m')
@@ -77,13 +77,13 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   session_cost=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
   session_cost_display="${COLOR_YELLOW}$(printf "\$%.2f" "$session_cost")${COLOR_RESET}"
 
-  # daily cost
-  daily_cost=$("$HOME/.claude/statusline/get-daily-cost.sh")
-  daily_cost_display=$([ "$daily_cost" != "0" ] && echo "${COLOR_ORANGE}$(printf "\$%.2f" "$daily_cost")${COLOR_RESET}")
+  # # daily cost
+  # daily_cost=$("$HOME/.claude/statusline/get-daily-cost.sh")
+  # daily_cost_display=$([ "$daily_cost" != "0" ] && echo "${COLOR_ORANGE}$(printf "\$%.2f" "$daily_cost")${COLOR_RESET}")
 
-  # weekly cost (only for CRS; hidden on Monday)
-  weekly_cost=$("$HOME/.claude/statusline/get-weekly-cost.sh")
-  weekly_cost_display=$([ -n "$weekly_cost" ] && echo "${COLOR_BRONZE}$(printf "\$%.2f" "$weekly_cost")${COLOR_RESET}")
+  # # weekly cost (only for CRS; hidden on Monday)
+  # weekly_cost=$("$HOME/.claude/statusline/get-weekly-cost.sh")
+  # weekly_cost_display=$([ -n "$weekly_cost" ] && echo "${COLOR_BRONZE}$(printf "\$%.2f" "$weekly_cost")${COLOR_RESET}")
 
   # glm quota (only for ZAI/ZHIPU platforms)
   glm_quota=$("$HOME/.claude/statusline/get-glm-quota.sh")
@@ -123,8 +123,6 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
     "$total_tokens_display" \
     "$context_percentage_display" \
     "$session_cost_display" \
-    "$daily_cost_display" \
-    "$weekly_cost_display" \
     "$glm_quota_display" \
     "$session_duration_display" \
     "$version_display" \
