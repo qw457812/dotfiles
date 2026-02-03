@@ -1,0 +1,22 @@
+{
+  "default_mcp_settings": {
+    "use_idea_mcp": true,
+    "use_custom_mcp": true
+  },
+  "agent_servers": {
+    "Claude": {
+      "command": "{{ lookPath `claude-code-acp` }}",
+      "env": {
+        "ANTHROPIC_BASE_URL": "https://api.z.ai/api/anthropic",
+        "ANTHROPIC_AUTH_TOKEN": "{{ env `ZAI_API_KEY` }}",
+        "API_TIMEOUT_MS": "3000000",
+        "ANTHROPIC_DEFAULT_HAIKU_MODEL": "glm-4.7"
+      }
+    },
+    "OpenCode": {
+      "command": "{{ lookPath `opencode` }}",
+      "args": ["acp"]
+    }
+  }
+}
+
