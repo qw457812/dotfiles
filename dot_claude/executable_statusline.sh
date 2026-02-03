@@ -30,6 +30,18 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   COLOR_GRAY=$(printf '\033[38;5;248m')
   COLOR_RESET=$(printf '\033[0m')
 
+  format_ms() {
+    echo "$1" | awk '{
+      s = int($1/1000)
+      if (s < 60) {
+        printf "<1m"
+      } else {
+        h = int(s/3600); m = int((s%3600)/60)
+        printf "%s", (h > 0 ? h"h"m"m" : m"m")
+      }
+    }'
+  }
+
   base_url="$ANTHROPIC_BASE_URL"
   context_window_size=$(echo "$input" | jq -r '.context_window.context_window_size // 200000')
   transcript_path=$(echo "$input" | jq -r '.transcript_path // ""')
@@ -48,7 +60,8 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   if [ -n "$base_url" ] && [ "${base_url#"$CLAUDE_RELAY_SERVICE_URL"}" = "$base_url" ]; then
     model=$(cat "$transcript_path" 2>/dev/null | jq -r 'select(.type == "assistant") | .message.model // empty' | tail -1) # z.ai
   fi
-  model=${model:-$(echo "$input" | jq -r '(.model.display_name // "") | split(" ")[0] | split("-")[0] | (.[:1] | ascii_upcase) + .[1:]')}
+  model=${model:-$(echo "$input" | jq -r '.model.display_name // .model.id // empty')}
+  case "$base_url" in *api.synthetic.new*) model=${model##*/} ;; esac
   model_display=$([ -n "$model" ] && echo "${COLOR_LAVENDER}${model}${COLOR_RESET}")
 
   # # tokens (from transcript)
@@ -77,7 +90,7 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   session_cost=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
   session_cost_display="${COLOR_YELLOW}$(printf "\$%.2f" "$session_cost")${COLOR_RESET}"
 
-  # # daily cost
+  # # daily cost (mainly for CRS)
   # daily_cost=$("$HOME/.claude/statusline/get-daily-cost.sh")
   # daily_cost_display=$([ "$daily_cost" != "0" ] && echo "${COLOR_ORANGE}$(printf "\$%.2f" "$daily_cost")${COLOR_RESET}")
 
@@ -85,18 +98,27 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   # weekly_cost=$("$HOME/.claude/statusline/get-weekly-cost.sh")
   # weekly_cost_display=$([ -n "$weekly_cost" ] && echo "${COLOR_BRONZE}$(printf "\$%.2f" "$weekly_cost")${COLOR_RESET}")
 
+  # synthetic quota (only for synthetic platform)
+  synthetic_quota=$("$HOME/.claude/statusline/get-synthetic-quota.sh")
+  synthetic_quota_display=""
+  if echo "$synthetic_quota" | jq -e . >/dev/null 2>&1; then
+    synthetic_requests=$(echo "$synthetic_quota" | jq -r '.requests // 0')
+    synthetic_limit=$(echo "$synthetic_quota" | jq -r '.limit // 0')
+    synthetic_renews_ms=$(echo "$synthetic_quota" | jq -r '.renews_remaining_ms // 0')
+    synthetic_quota_display="${COLOR_MAGENTA}${synthetic_requests}/${synthetic_limit}${COLOR_RESET} ${COLOR_SEAFOAM}$(format_ms "$synthetic_renews_ms")${COLOR_RESET}"
+  fi
+
   # glm quota (only for ZAI/ZHIPU platforms)
   glm_quota=$("$HOME/.claude/statusline/get-glm-quota.sh")
-  glm_quota_token=$(echo "$glm_quota" | jq -r '.token // 0')
-  glm_quota_mcp=$(echo "$glm_quota" | jq -r '.mcp // 0')
-  glm_quota_display=$([ -n "$glm_quota" ] && echo "${COLOR_MAGENTA}${glm_quota_token}%${COLOR_RESET} ${COLOR_SEAFOAM}${glm_quota_mcp}%${COLOR_RESET}")
+  glm_quota_display=""
+  if echo "$glm_quota" | jq -e . >/dev/null 2>&1; then
+    glm_quota_token=$(echo "$glm_quota" | jq -r '.token // 0')
+    glm_quota_mcp=$(echo "$glm_quota" | jq -r '.mcp // 0')
+    glm_quota_display="${COLOR_MAGENTA}${glm_quota_token}%${COLOR_RESET} ${COLOR_SEAFOAM}${glm_quota_mcp}%${COLOR_RESET}"
+  fi
 
-  # session duration (hidden if < 1 min)
-  session_duration=$(echo "$input" | jq -r '.cost.total_duration_ms // 0' | awk '{
-    s = int($1/1000); if (s < 60) exit
-    h = int(s/3600); m = int((s%3600)/60)
-    printf "%s", (h > 0 ? h"h"m"m" : m"m")
-  }')
+  # session duration
+  session_duration=$(format_ms "$(echo "$input" | jq -r '.cost.total_duration_ms // 0')")
   session_duration_display=$([ -n "$session_duration" ] && echo "${COLOR_TEAL}${session_duration}${COLOR_RESET}")
 
   # version
@@ -123,6 +145,7 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
     "$total_tokens_display" \
     "$context_percentage_display" \
     "$session_cost_display" \
+    "$synthetic_quota_display" \
     "$glm_quota_display" \
     "$session_duration_display" \
     "$version_display" \

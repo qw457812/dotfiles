@@ -9,11 +9,13 @@
   "theme": "system",
   "share": "manual",
   // "autoupdate": "notify",
-  "model": "zai-coding-plan/glm-4.7",
+  // "model": "zai-coding-plan/glm-4.7",
+  "model": "synthetic/hf:moonshotai/Kimi-K2.5",
   "small_model": "github-copilot/gpt-5-mini",
   "agent": {
     "plan": {
-      "model": "zai-coding-plan/glm-4.7"
+      // "model": "zai-coding-plan/glm-4.7"
+      "model": "synthetic/hf:moonshotai/Kimi-K2.5"
     }
   },
   "mcp": {

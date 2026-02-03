@@ -7,6 +7,17 @@
     "Claude": {
       "command": "{{ lookPath `claude-code-acp` }}",
       "env": {
+        "ANTHROPIC_BASE_URL": "https://api.synthetic.new/anthropic",
+        "ANTHROPIC_AUTH_TOKEN": "{{ env `SYNTHETIC_API_KEY` }}",
+        "ANTHROPIC_DEFAULT_OPUS_MODEL": "hf:moonshotai/Kimi-K2.5",
+        "ANTHROPIC_DEFAULT_SONNET_MODEL": "hf:moonshotai/Kimi-K2.5",
+        "ANTHROPIC_DEFAULT_HAIKU_MODEL": "hf:moonshotai/Kimi-K2.5",
+        "CLAUDE_CODE_SUBAGENT_MODEL": "hf:moonshotai/Kimi-K2.5"
+      }
+    },
+    "Claude Glm": {
+      "command": "{{ lookPath `claude-code-acp` }}",
+      "env": {
         "ANTHROPIC_BASE_URL": "https://api.z.ai/api/anthropic",
         "ANTHROPIC_AUTH_TOKEN": "{{ env `ZAI_API_KEY` }}",
         "API_TIMEOUT_MS": "3000000",

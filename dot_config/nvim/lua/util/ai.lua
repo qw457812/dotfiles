@@ -20,6 +20,16 @@ M.claude = {
         ANTHROPIC_BASE_URL = vim.env.CLAUDE_RELAY_SERVICE_URL .. "/api",
         ANTHROPIC_AUTH_TOKEN = vim.env.CLAUDE_RELAY_SERVICE_API_KEY,
       } or {},
+      -- https://synthetic.new/billing
+      synthetic = {
+        ANTHROPIC_BASE_URL = "https://api.synthetic.new/anthropic",
+        ANTHROPIC_AUTH_TOKEN = vim.env.SYNTHETIC_API_KEY,
+        ANTHROPIC_DEFAULT_OPUS_MODEL = "hf:moonshotai/Kimi-K2.5",
+        ANTHROPIC_DEFAULT_SONNET_MODEL = "hf:moonshotai/Kimi-K2.5",
+        -- ANTHROPIC_DEFAULT_HAIKU_MODEL = "hf:MiniMaxAI/MiniMax-M2.1",
+        ANTHROPIC_DEFAULT_HAIKU_MODEL = "hf:moonshotai/Kimi-K2.5",
+        CLAUDE_CODE_SUBAGENT_MODEL = "hf:moonshotai/Kimi-K2.5",
+      },
       -- https://z.ai/manage-apikey/subscription
       glm = {
         ANTHROPIC_BASE_URL = "https://api.z.ai/api/anthropic",
@@ -66,6 +76,21 @@ M.claude = {
   },
 }
 M.claude.provider.payg.glm = M.claude.provider.plan.glm
+-- Fix envs for `LazyVim.opts("sidekick.nvim").cli.mux.enabled` (tmux)
+for _, tier in pairs(M.claude.provider) do
+  for _, p in pairs(tier) do
+    for _, k in ipairs({
+      "ANTHROPIC_DEFAULT_OPUS_MODEL",
+      "ANTHROPIC_DEFAULT_SONNET_MODEL",
+      "ANTHROPIC_DEFAULT_HAIKU_MODEL",
+      "CLAUDE_CODE_SUBAGENT_MODEL",
+      "ANTHROPIC_MODEL",
+      "ANTHROPIC_SMALL_FAST_MODEL",
+    }) do
+      p[k] = p[k] or ""
+    end
+  end
+end
 
 ---@param buf integer
 ---@param win integer

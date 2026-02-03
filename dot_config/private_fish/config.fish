@@ -327,6 +327,7 @@ end
 #     abbr adp aider_copilot
 # end
 abbr tokscale "bunx tokscale@latest --light --today"
+alias synthetic_quota 'curl -s https://api.synthetic.new/v2/quotas -H "Authorization: Bearer $SYNTHETIC_API_KEY" | jq .'
 
 # Other
 abbr b "cd -"

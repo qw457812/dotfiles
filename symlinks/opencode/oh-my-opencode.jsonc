@@ -33,7 +33,7 @@
     "sisyphus": {
       // "model": "github-copilot/claude-opus-4.5",
       // "variant": "thinking"
-      "model": "opencode/kimi-k2.5-free"
+      "model": "synthetic/hf:moonshotai/Kimi-K2.5"
       // "model": "zai-coding-plan/glm-4.7"
     },
     "hephaestus": {
@@ -41,19 +41,19 @@
       "variant": "medium"
     },
     "atlas": {
-      "model": "opencode/kimi-k2.5-free"
+      "model": "synthetic/hf:moonshotai/Kimi-K2.5"
       // "model": "github-copilot/claude-sonnet-4.5"
     },
     "prometheus": {
       // "model": "github-copilot/claude-opus-4.5",
       // "variant": "thinking"
-      "model": "opencode/kimi-k2.5-free"
+      "model": "synthetic/hf:moonshotai/Kimi-K2.5"
       // "model": "github-copilot/gpt-5.2"
     },
     "metis": {
       // "model": "github-copilot/claude-opus-4.5",
       // "variant": "thinking"
-      "model": "opencode/kimi-k2.5-free"
+      "model": "synthetic/hf:moonshotai/Kimi-K2.5"
       // "model": "github-copilot/gpt-5.2"
     },
     "momus": {
@@ -71,6 +71,7 @@
       "model": "zai-coding-plan/glm-4.7"
     },
     "explore": {
+      // "model": "github-copilot/grok-code-fast-1"
       // "model": "github-copilot/gpt-5-mini"
       "model": "google/antigravity-gemini-3-flash"
     },
