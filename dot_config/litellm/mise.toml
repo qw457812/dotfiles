@@ -1,0 +1,17 @@
+[env]
+_.python.venv = { path = ".venv", create = true }
+
+[tasks.install]
+description = "Install LiteLLM"
+alias = "i"
+run = "uv pip install 'litellm[proxy]'"
+
+[tasks.upgrade]
+description = "Upgrade LiteLLM"
+run = "uv pip install --upgrade 'litellm[proxy]'"
+
+[tasks.run]
+description = "Start LiteLLM proxy"
+# run = "uv run litellm --config config.yaml --detailed_debug"
+# run = "uv run litellm --config config.yaml --debug"
+run = "uv run litellm --config config.yaml"

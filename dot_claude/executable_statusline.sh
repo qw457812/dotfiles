@@ -3,6 +3,7 @@
 # https://github.com/ryanwclark1/nixos-config/blob/92f5401a93a645792d7d6ba46ef746b5f0128abc/home/features/ai/claude/statusline.sh
 # https://github.com/gqy20/cc_plugins/blob/d5fbcd844847b320dc4207ad841ae7a3c18dd222/.claude/statusline.sh
 # https://github.com/jarrodwatts/claude-hud
+# https://github.com/OpenRouterTeam/openrouter-examples/blob/main/claude-code/statusline.ts
 
 input=$(cat)
 # echo "$input" >/tmp/statusline_debug.json
@@ -61,7 +62,7 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
     model=$(cat "$transcript_path" 2>/dev/null | jq -r 'select(.type == "assistant") | .message.model // empty' | tail -1) # z.ai
   fi
   model=${model:-$(echo "$input" | jq -r '.model.display_name // .model.id // empty')}
-  case "$base_url" in *api.synthetic.new*) model=${model##*/} ;; esac
+  case "$base_url" in *api.synthetic.new* | *localhost*) model=${model##*/} ;; esac
   model_display=$([ -n "$model" ] && echo "${COLOR_LAVENDER}${model}${COLOR_RESET}")
 
   # # tokens (from transcript)

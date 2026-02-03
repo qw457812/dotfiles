@@ -14,6 +14,24 @@ local H = {}
 -- https://github.com/farion1231/cc-switch/blob/7fa0a7b16648e99ef956d18c01f686dd50e843ed/src/config/claudeProviderPresets.ts
 M.claude = {
   provider = {
+    proxy = {
+      -- alternatives:
+      -- - https://github.com/looplj/axonhub
+      -- - https://developers.cloudflare.com/ai-gateway/get-started/
+      -- - https://github.com/router-for-me/CLIProxyAPI
+      litellm = {
+        ANTHROPIC_BASE_URL = "http://localhost:4000",
+        ANTHROPIC_AUTH_TOKEN = vim.env.LITELLM_MASTER_KEY,
+        -- ANTHROPIC_MODEL = "synthetic/hf:moonshotai/Kimi-K2.5",
+        -- ANTHROPIC_DEFAULT_OPUS_MODEL = "synthetic/hf:moonshotai/Kimi-K2.5",
+        -- ANTHROPIC_DEFAULT_SONNET_MODEL = "synthetic/hf:moonshotai/Kimi-K2.5",
+        -- ANTHROPIC_DEFAULT_HAIKU_MODEL = "zai/glm-4.7",
+        -- CLAUDE_CODE_SUBAGENT_MODEL = "synthetic/hf:moonshotai/Kimi-K2.5",
+
+        SYNTHETIC_API_KEY = vim.env.SYNTHETIC_API_KEY, -- for executable_get-synthetic-quota.sh
+        ZAI_API_KEY = vim.env.ZAI_API_KEY, -- for executable_get-glm-quota.sh
+      },
+    },
     plan = {
       -- curl -s -X POST "$CLAUDE_RELAY_SERVICE_URL/apiStats/api-key/test" -H "Content-Type: application/json" -d "{\"apiKey\":\"$CLAUDE_RELAY_SERVICE_API_KEY\"}"
       crs = vim.env.CLAUDE_RELAY_SERVICE_URL and {
@@ -37,7 +55,6 @@ M.claude = {
         API_TIMEOUT_MS = "3000000",
         ANTHROPIC_DEFAULT_HAIKU_MODEL = "glm-4.7", -- glm-4.5-air is not good enough
       },
-      -- https://www.kimi.com/code/docs/more/third-party-agents.html
       -- https://www.kimi.com/membership/subscription
       kimi = {
         ANTHROPIC_BASE_URL = "https://api.kimi.com/coding/",
@@ -51,8 +68,6 @@ M.claude = {
         ANTHROPIC_AUTH_TOKEN = vim.env.CC_OPENROUTER_API_KEY,
         ANTHROPIC_API_KEY = "",
       },
-      -- https://platform.moonshot.cn/docs/guide/agent-support
-      -- https://platform.moonshot.ai/docs/guide/agent-support
       kimi = {
         ANTHROPIC_BASE_URL = "https://api.moonshot.cn/anthropic",
         ANTHROPIC_AUTH_TOKEN = vim.env.MOONSHOT_API_KEY,

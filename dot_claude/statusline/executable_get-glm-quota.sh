@@ -7,6 +7,10 @@ auth_token="$ANTHROPIC_AUTH_TOKEN"
 
 case "$base_url" in
 *api.z.ai* | *open.bigmodel.cn* | *dev.bigmodel.cn*) ;;
+*localhost*) # for LiteLLM
+  base_url="https://api.z.ai/api/anthropic"
+  auth_token="$ZAI_API_KEY"
+  ;;
 *) exit 0 ;;
 esac
 

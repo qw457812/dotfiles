@@ -297,16 +297,19 @@ if type -q claude
     set -l ccusage (type -q bunx; and echo "bunx ccusage@latest"; or echo "npx -y ccusage@latest")
     abbr ccu "$ccusage"
     abbr ccum "$ccusage daily --breakdown"
-    # alternative:
+    # alternatives:
     # - https://github.com/Fission-AI/OpenSpec
     # - https://github.com/OthmanAdi/planning-with-files
     # - https://github.com/obra/superpowers
     abbr ccspec "uvx --from git+https://github.com/github/spec-kit.git specify init --script sh --ai claude --here"
     abbr ccgsd "npx get-shit-done-cc@latest" # https://github.com/glittercowboy/get-shit-done
     abbr cchistory "npx -y cchistory"
-    abbr cck claude_kimi
+    abbr ccl claude_litellm
+    abbr ccs claude_synthetic
     abbr ccg claude_glm
+    abbr cck claude_kimi
     abbr ccm claude_minimax
+    abbr cco claude_openrouter
     # type -q ccr; and abbr ccr "ccr code" # https://github.com/musistudio/claude-code-router
 end
 if type -q codex

@@ -7,6 +7,7 @@ auth_token="$ANTHROPIC_AUTH_TOKEN"
 
 case "$base_url" in
 *api.synthetic.new*) ;;
+*localhost*) auth_token="$SYNTHETIC_API_KEY" ;; # for LiteLLM
 *) exit 0 ;;
 esac
 

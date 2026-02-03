@@ -37,6 +37,16 @@ const search_engines = {
 } as const;
 const default_search_engine = search_engines.g;
 
+Object.entries(search_engines).forEach(([keyword, url]) => {
+  glide.search_engines.add({
+    name: keyword.toUpperCase(),
+    keyword,
+    search_url: url.replace("{}", "{searchTerms}"),
+    favicon_url: new URL(url).origin + "/favicon.ico",
+    is_default: url === default_search_engine,
+  });
+});
+
 // Env
 if (glide.ctx.os === "macosx") {
   glide.env.set("PATH", `/opt/homebrew/bin:${glide.env.get("PATH")}`);
@@ -700,9 +710,7 @@ const bulk_tab_close = glide.excmds.create(
       "-t",
       "glide-editor-tabs.XXXXXX",
     ]);
-    let tmp = "";
-    for await (const chunk of mktemp.stdout) tmp += chunk;
-    tmp = tmp.trim();
+    const tmp = (await mktemp.stdout.text()).trim();
     await glide.fs.write(tmp, lines.join("\n"));
 
     try {
