@@ -276,13 +276,6 @@ if type -q claude
     # claude mcp add -s user websearch -e EXA_API_KEY=$EXA_API_KEY -- npx -y exa-mcp-server tools=web_search_exa
     # claude mcp add -s user -t http websearch "https://mcp.exa.ai/mcp?exaApiKey=$EXA_API_KEY&tools=web_search_exa"
     # claude mcp add -s user --transport http grep_app https://mcp.grep.app
-    # claude mcp add -s user playwright npx @playwright/mcp@latest
-    # claude mcp add -s user magic -- npx -y @21st-dev/magic@latest
-    # claude mcp add -s user sequential-thinking -- npx -y @modelcontextprotocol/server-sequential-thinking
-    # claude mcp add -s user -t http deepwiki https://mcp.deepwiki.com/mcp
-    # claude mcp add -s user firecrawl -e FIRECRAWL_API_KEY=$FIRECRAWL_API_KEY -- npx -y firecrawl-mcp
-    # claude mcp add -s user synthetic-web-search -e SYNTHETIC_API_KEY=$SYNTHETIC_API_KEY -- npx -y synthetic-web-search-mcp@latest
-    # claude mcp add -s user -t http web-search-prime https://api.z.ai/api/mcp/web_search_prime/mcp --header "Authorization: Bearer $ZAI_API_KEY"
     # claude mcp add -s user -t http web-reader https://api.z.ai/api/mcp/web_reader/mcp --header "Authorization: Bearer $ZAI_API_KEY"
     abbr cl claude
     abbr clt claude_temp
