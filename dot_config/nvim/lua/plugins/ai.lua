@@ -27,7 +27,7 @@ return {
               -- "255b938c-0cb9-4858-83a0-6929fa42b927", -- specific session ID
               -- "--fork-session",
             }),
-            env = U.ai.claude.provider.proxy.litellm,
+            env = vim.g.user_is_termux and U.ai.claude.provider.plan.synthetic or U.ai.claude.provider.proxy.litellm,
           },
         },
       },

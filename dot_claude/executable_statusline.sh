@@ -17,18 +17,20 @@ fi
 if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   COLOR_RED=$(printf '\033[31m')
   COLOR_GREEN=$(printf '\033[32m')
-  COLOR_YELLOW=$(printf '\033[33m')
+  # COLOR_YELLOW=$(printf '\033[33m')
   COLOR_BLUE=$(printf '\033[34m')
   COLOR_CYAN=$(printf '\033[36m')
   COLOR_TEAL=$(printf '\033[38;5;73m')
-  # COLOR_ORANGE=$(printf '\033[38;5;209m')
+  COLOR_GOLD=$(printf '\033[38;5;136m')
+  COLOR_ORANGE=$(printf '\033[38;5;209m')
   COLOR_MAGENTA=$(printf '\033[38;5;213m')
-  COLOR_SEAFOAM=$(printf '\033[38;5;107m')
+  # COLOR_SEAFOAM=$(printf '\033[38;5;107m')
   COLOR_SKY=$(printf '\033[38;5;81m')
   COLOR_AQUAMARINE=$(printf '\033[38;5;122m')
-  # COLOR_BRONZE=$(printf '\033[38;5;130m')
+  COLOR_BRONZE=$(printf '\033[38;5;130m')
   COLOR_LAVENDER=$(printf '\033[38;5;147m')
   COLOR_GRAY=$(printf '\033[38;5;248m')
+  COLOR_MAUVE=$(printf '\033[38;5;96m')
   COLOR_RESET=$(printf '\033[0m')
 
   format_ms() {
@@ -89,7 +91,7 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
 
   # session cost
   session_cost=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
-  session_cost_display="${COLOR_YELLOW}$(printf "\$%.2f" "$session_cost")${COLOR_RESET}"
+  session_cost_display="${COLOR_GOLD}$(printf "\$%.2f" "$session_cost")${COLOR_RESET}"
 
   # # daily cost (mainly for CRS)
   # daily_cost=$("$HOME/.claude/statusline/get-daily-cost.sh")
@@ -106,25 +108,26 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
     synthetic_requests=$(echo "$synthetic_quota" | jq -r '.requests // 0')
     synthetic_limit=$(echo "$synthetic_quota" | jq -r '.limit // 0')
     synthetic_renews_ms=$(echo "$synthetic_quota" | jq -r '.renews_remaining_ms // 0')
-    synthetic_quota_display="${COLOR_MAGENTA}${synthetic_requests}/${synthetic_limit}${COLOR_RESET} ${COLOR_SEAFOAM}$(format_ms "$synthetic_renews_ms")${COLOR_RESET}"
+    synthetic_quota_display="${COLOR_MAGENTA}${synthetic_requests}${COLOR_RESET}${COLOR_MAUVE}/${synthetic_limit} $(format_ms "$synthetic_renews_ms")${COLOR_RESET}"
   fi
 
   # glm quota (only for ZAI/ZHIPU platforms)
   glm_quota=$("$HOME/.claude/statusline/get-glm-quota.sh")
   glm_quota_display=""
   if echo "$glm_quota" | jq -e . >/dev/null 2>&1; then
-    glm_quota_token=$(echo "$glm_quota" | jq -r '.token // 0')
-    glm_quota_mcp=$(echo "$glm_quota" | jq -r '.mcp // 0')
-    glm_quota_display="${COLOR_MAGENTA}${glm_quota_token}%${COLOR_RESET} ${COLOR_SEAFOAM}${glm_quota_mcp}%${COLOR_RESET}"
+    glm_token=$(echo "$glm_quota" | jq -r '.token.percentage // 0')
+    glm_renews_ms=$(echo "$glm_quota" | jq -r '.token.renews_remaining_ms // 0')
+    glm_mcp=$(echo "$glm_quota" | jq -r '.mcp.percentage // 0')
+    glm_quota_display="${COLOR_ORANGE}${glm_token}%${COLOR_RESET} ${COLOR_BRONZE}$(format_ms "$glm_renews_ms") ${glm_mcp}%${COLOR_RESET}"
   fi
-
-  # session duration
-  session_duration=$(format_ms "$(echo "$input" | jq -r '.cost.total_duration_ms // 0')")
-  session_duration_display=$([ -n "$session_duration" ] && echo "${COLOR_TEAL}${session_duration}${COLOR_RESET}")
 
   # version
   version=$(echo "$input" | jq -r '.version // ""')
   version_display=$([ -n "$version" ] && echo "${COLOR_GRAY}v${version}${COLOR_RESET}")
+
+  # session duration
+  session_duration=$(format_ms "$(echo "$input" | jq -r '.cost.total_duration_ms // 0')")
+  session_duration_display=$([ -n "$session_duration" ] && echo "${COLOR_TEAL}${session_duration}${COLOR_RESET}")
 
   # changes: lines changed (for nvim) or starship git status (for termux)
   if [ "$__IS_CLAUDECODE_NVIM" = "1" ]; then
@@ -148,8 +151,8 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
     "$session_cost_display" \
     "$synthetic_quota_display" \
     "$glm_quota_display" \
-    "$session_duration_display" \
     "$version_display" \
+    "$session_duration_display" \
     "$changes_display" | xargs
   exit 0
 fi

@@ -24,7 +24,20 @@ cache_get "$cache_file" 180 && exit 0
 glm_quota=$(curl -s "https://$(echo "$base_url" | cut -d'/' -f3)/api/monitor/usage/quota/limit" \
   -H "Authorization: $auth_token" \
   -H "Content-Type: application/json" 2>/dev/null |
-  jq -r '[.data.limits[] | {(.type): .percentage}] | add | {token: (.TOKENS_LIMIT // 0), mcp: (.TIME_LIMIT // 0)}' 2>/dev/null)
+  jq -r '
+  def to_ms: . * 1000;
+  (.data.limits[] | select(.type == "TOKENS_LIMIT")) as $token |
+  (.data.limits[] | select(.type == "TIME_LIMIT")) as $mcp |
+  {
+    token: {
+      percentage: ($token.percentage // 0),
+      renews_remaining_ms: (($token.nextResetTime // 0) - (now | to_ms) | if . > 0 then . else 0 end | floor)
+    },
+    mcp: {
+      percentage: ($mcp.percentage // 0)
+    }
+  }
+' 2>/dev/null)
 
 echo "$glm_quota" | jq -e '.token' >/dev/null 2>&1 || exit 0
 

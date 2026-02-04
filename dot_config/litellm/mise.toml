@@ -1,17 +1,47 @@
 [env]
 _.python.venv = { path = ".venv", create = true }
+PORT = "4000" # https://github.com/BerriAI/litellm/blob/be89b38ea8a75f8b5b156d28c25eb3183862d02c/litellm/proxy/proxy_cli.py#L317
 
 [tasks.install]
 description = "Install LiteLLM"
-alias = "i"
 run = "uv pip install 'litellm[proxy]'"
 
 [tasks.upgrade]
 description = "Upgrade LiteLLM"
 run = "uv pip install --upgrade 'litellm[proxy]'"
 
+[tasks.dev]
+description = "Start LiteLLM Proxy with debug (foreground)"
+run = 'lsof -i:${PORT} >/dev/null 2>&1 && echo "Already running on port ${PORT}" || uv run litellm --config config.yaml --detailed_debug'
+
 [tasks.run]
-description = "Start LiteLLM proxy"
-# run = "uv run litellm --config config.yaml --detailed_debug"
-# run = "uv run litellm --config config.yaml --debug"
-run = "uv run litellm --config config.yaml"
+description = "Start LiteLLM Proxy (background)"
+alias = "r"
+run = 'lsof -i:${PORT} >/dev/null 2>&1 && echo "Already running on port ${PORT}" || (nohup uv run litellm --config config.yaml > litellm.log 2>&1 & echo "Started on port ${PORT}")'
+
+[tasks.stop]
+description = "Stop LiteLLM Proxy"
+alias = "s"
+run = '''
+stopped=false
+for pid in $(lsof -ti:${PORT}); do
+    if ps -p "$pid" -o args= 2>/dev/null | grep -q "litellm --config"; then
+        kill "$pid" 2>/dev/null
+        stopped=true
+    fi
+done
+if $stopped; then
+    echo "Stopped port ${PORT}"
+else
+    echo "Not running on port ${PORT}"
+fi
+'''
+
+[tasks.status]
+description = "Check LiteLLM status"
+alias = "st"
+run = 'lsof -i:${PORT} >/dev/null 2>&1 && echo "Running on port ${PORT}" || echo "Not running"'
+
+[tasks.logs]
+description = "Tail LiteLLM logs"
+run = "tail -f litellm.log"

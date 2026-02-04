@@ -19,6 +19,7 @@ Library/
 .termux/
 {{ else }}
 .ideavimrc
+.jetbrains/
 .qutebrowser/
 .config/glide/
 .config/alacritty/
