@@ -15,7 +15,6 @@
   },
   "permissions": {
     "allow": [
-      "WebFetch(domain:*)",
       "Read",
       "Glob",
       "Bash(ls:*)",
@@ -50,9 +49,14 @@
       "Bash(git fetch:*)",
       "Bash(nvim --version:*)",
       "Bash(node --version:*)",
-      "Bash(npm list:*)"
+      "Bash(npm list:*)",
+      "mcp__websearch__web_search_exa",
+      "mcp__web-reader__webReader"
     ],
-    "deny": [],
+    "deny": [
+      "WebSearch",
+      "WebFetch"
+    ],
     "ask": [
       "Bash(git add:*)",
       "Bash(git commit:*)",
