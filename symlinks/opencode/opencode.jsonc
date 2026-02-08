@@ -3,8 +3,8 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "plugin": [
-    "oh-my-opencode@3.2.3", // https://github.com/code-yeongyu/oh-my-opencode
-    "opencode-antigravity-auth@1.4.3" // https://github.com/NoeFabris/opencode-antigravity-auth
+    "oh-my-opencode@3.3.2", // https://github.com/code-yeongyu/oh-my-opencode
+    "opencode-antigravity-auth@1.4.6" // https://github.com/NoeFabris/opencode-antigravity-auth
   ],
   "theme": "system",
   "share": "manual",

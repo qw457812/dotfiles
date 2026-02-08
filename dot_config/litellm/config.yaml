@@ -4,29 +4,32 @@ general_settings:
   master_key: os.environ/LITELLM_MASTER_KEY
 
 model_list:
-  - model_name: claude-opus-4-5-20251101
+  - model_name: claude-opus-*
     litellm_params:
       model: anthropic/hf:moonshotai/Kimi-K2.5
       api_base: https://api.synthetic.new/anthropic
       api_key: os.environ/SYNTHETIC_API_KEY
-  - model_name: claude-sonnet-4-5-20250929
+
+  - model_name: claude-sonnet-*
     litellm_params:
       model: anthropic/hf:moonshotai/Kimi-K2.5
       api_base: https://api.synthetic.new/anthropic
       api_key: os.environ/SYNTHETIC_API_KEY
-  - model_name: claude-haiku-4-5-20251001
+
+  - model_name: claude-haiku-*
     litellm_params:
       model: anthropic/glm-4.7
       api_base: https://api.z.ai/api/anthropic
       api_key: os.environ/ZAI_API_KEY
 
-  # - model_name: "synthetic/*"
-  #   litellm_params:
-  #     model: "anthropic/*"
-  #     api_base: https://api.synthetic.new/anthropic
-  #     api_key: os.environ/SYNTHETIC_API_KEY
-  # - model_name: "zai/*"
-  #   litellm_params:
-  #     model: "anthropic/*"
-  #     api_base: https://api.z.ai/api/anthropic
-  #     api_key: os.environ/ZAI_API_KEY
+  - model_name: "synthetic/*"
+    litellm_params:
+      model: "anthropic/*"
+      api_base: https://api.synthetic.new/anthropic
+      api_key: os.environ/SYNTHETIC_API_KEY
+
+  - model_name: "zai/*"
+    litellm_params:
+      model: "anthropic/*"
+      api_base: https://api.z.ai/api/anthropic
+      api_key: os.environ/ZAI_API_KEY

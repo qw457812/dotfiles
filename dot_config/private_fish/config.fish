@@ -6,7 +6,6 @@ fish_add_path ~/.local/bin
 fish_add_path ~/.opencode/bin
 fish_add_path "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
 fish_add_path "$HOME/Library/Application Support/Coursier/bin" # scalafmt
-fish_add_path ~/.antigravity/antigravity/bin
 type -q brew; and fish_add_path (brew --prefix)/Caskroom/sqlcl/(command ls -t (brew --prefix)/Caskroom/sqlcl 2>/dev/null | head -1)/sqlcl/bin
 
 # Exports

@@ -425,23 +425,23 @@ return {
               -- HACK: fix opencode render issue by showing then hiding line numbers
               vim.wo[win][0].number = true
             elseif tool.name:find("claude") then
-              local session_id = assert(vim.w[win].sidekick_session_id)
-              local terminal = assert(Terminal.get(session_id))
-              -- HACK: fix claude render issue by ctrl-o twice
-              if not vim.w[win].user_sidekick_claude_render_fixing then
-                vim.w[win].user_sidekick_claude_render_fixing = true
-                vim.defer_fn(function()
-                  if vim.fn.mode() ~= "t" then -- do not ctrl-o twice when <c-q> U.ai.sidekick.cli.scrollback
-                    vim.w[win].user_sidekick_claude_render_fixing = nil
-                    return
-                  end
-                  U.ai.sidekick.cli.tools.actions.send_keys({ "<C-o>" })(terminal)
-                  U.ai.sidekick.cli.tools.actions.send_keys({ "<C-o>" })(terminal)
-                  vim.schedule(function()
-                    vim.w[win].user_sidekick_claude_render_fixing = nil
-                  end)
-                end, 10)
-              end
+              -- local session_id = assert(vim.w[win].sidekick_session_id)
+              -- local terminal = assert(Terminal.get(session_id))
+              -- -- HACK: fix claude render issue by ctrl-o twice
+              -- if not vim.w[win].user_sidekick_claude_render_fixing then
+              --   vim.w[win].user_sidekick_claude_render_fixing = true
+              --   vim.defer_fn(function()
+              --     if vim.fn.mode() ~= "t" then -- do not ctrl-o twice when <c-q> U.ai.sidekick.cli.scrollback
+              --       vim.w[win].user_sidekick_claude_render_fixing = nil
+              --       return
+              --     end
+              --     U.ai.sidekick.cli.tools.actions.send_keys({ "<C-o>" })(terminal)
+              --     U.ai.sidekick.cli.tools.actions.send_keys({ "<C-o>" })(terminal)
+              --     vim.schedule(function()
+              --       vim.w[win].user_sidekick_claude_render_fixing = nil
+              --     end)
+              --   end, 10)
+              -- end
             end
           end)
         end,
