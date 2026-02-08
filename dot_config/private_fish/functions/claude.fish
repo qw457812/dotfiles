@@ -1,3 +1,7 @@
 function claude --wraps=claude
-    claude_litellm $argv
+    if test -n "$TERMUX_VERSION"
+        claude_synthetic $argv
+    else
+        claude_litellm $argv
+    end
 end
