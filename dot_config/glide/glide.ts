@@ -801,12 +801,15 @@ async function focus_page(props: glide.KeymapCallbackProps) {
   }
 }
 
-async function tab_close() {
+async function tab_close(props: glide.KeymapCallbackProps) {
   const alt_tab_id = previousTabId;
-  await glide.excmds.execute("tab_close");
+  // await glide.excmds.execute("tab_close");
   if (alt_tab_id) {
-    await browser.tabs.update(alt_tab_id, { active: true });
+    try {
+      await browser.tabs.update(alt_tab_id, { active: true });
+    } catch {}
   }
+  await browser.tabs.remove(props.tab_id);
 }
 
 async function focusinput() {

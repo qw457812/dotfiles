@@ -1,9 +1,10 @@
 // bunx oh-my-opencode doctor --verbose
 // https://github.com/code-yeongyu/oh-my-opencode/blob/dev/src/config/schema.ts
+// https://docs.github.com/en/copilot/concepts/billing/copilot-requests#model-multipliers
 {
   "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json",
   "disabled_hooks": [
-    // "todo-continuation-enforcer",
+    "todo-continuation-enforcer",
     "directory-readme-injector",
     "startup-toast"
   ],
@@ -20,9 +21,9 @@
   },
   "background_task": {
     "modelConcurrency": {
-      "anthropic/claude-opus-4-5-20251101": 3,
       "google/antigravity-claude-opus-4-5-thinking": 3,
-      "github-copilot/claude-opus-4.5": 3
+      "google/antigravity-claude-opus-4-6-thinking": 3,
+      "github-copilot/claude-opus-4.6": 3
     }
   },
   // "tmux": {
@@ -31,7 +32,7 @@
   // https://github.com/code-yeongyu/oh-my-opencode/blob/64825158a732467fc7310bfc976c6733b227931b/src/shared/model-requirements.ts
   "agents": {
     "sisyphus": {
-      // "model": "github-copilot/claude-opus-4.5",
+      // "model": "github-copilot/claude-opus-4.6",
       // "variant": "thinking"
       "model": "synthetic/hf:moonshotai/Kimi-K2.5"
       // "model": "zai-coding-plan/glm-4.7"
@@ -45,13 +46,13 @@
       // "model": "github-copilot/claude-sonnet-4.5"
     },
     "prometheus": {
-      // "model": "github-copilot/claude-opus-4.5",
+      // "model": "github-copilot/claude-opus-4.6",
       // "variant": "thinking"
       "model": "synthetic/hf:moonshotai/Kimi-K2.5"
       // "model": "github-copilot/gpt-5.2"
     },
     "metis": {
-      // "model": "github-copilot/claude-opus-4.5",
+      // "model": "github-copilot/claude-opus-4.6",
       // "variant": "thinking"
       "model": "synthetic/hf:moonshotai/Kimi-K2.5"
       // "model": "github-copilot/gpt-5.2"

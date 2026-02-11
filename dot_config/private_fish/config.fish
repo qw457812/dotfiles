@@ -273,7 +273,7 @@ if type -q claude
     # claude mcp add -s user context7 -- npx -y @upstash/context7-mcp --api-key $CONTEXT7_API_KEY
     # claude mcp add -s user --transport http context7 https://mcp.context7.com/mcp --header "CONTEXT7_API_KEY: $CONTEXT7_API_KEY"
     # claude mcp add -s user websearch -e EXA_API_KEY=$EXA_API_KEY -- npx -y exa-mcp-server tools=web_search_exa
-    # claude mcp add -s user -t http websearch "https://mcp.exa.ai/mcp?exaApiKey=$EXA_API_KEY&tools=web_search_exa"
+    # claude mcp add -s user -t http websearch "https://mcp.exa.ai/mcp?tools=web_search_exa&exaApiKey=$EXA_API_KEY"
     # claude mcp add -s user --transport http grep_app https://mcp.grep.app
     # claude mcp add -s user -t http web-reader https://api.z.ai/api/mcp/web_reader/mcp --header "Authorization: Bearer $ZAI_API_KEY"
     abbr cl claude

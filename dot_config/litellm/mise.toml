@@ -41,7 +41,3 @@ fi
 description = "Check LiteLLM status"
 alias = "st"
 run = 'lsof -i:${PORT} >/dev/null 2>&1 && echo "Running on port ${PORT}" || echo "Not running"'
-
-[tasks.logs]
-description = "Tail LiteLLM logs"
-run = "tail -f litellm.log"
