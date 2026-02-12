@@ -39,8 +39,14 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
       if (s < 60) {
         printf "<1m"
       } else {
-        h = int(s/3600); m = int((s%3600)/60)
-        printf "%s", (h > 0 ? h"h"m"m" : m"m")
+        d = int(s/86400); h = int((s%86400)/3600); m = int((s%3600)/60)
+        if (d > 0) {
+          printf "%dd%dh%dm", d, h, m
+        } else if (h > 0) {
+          printf "%dh%dm", h, m
+        } else {
+          printf "%dm", m
+        }
       }
     }'
   }
@@ -115,10 +121,24 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   glm_quota=$("$HOME/.claude/statusline/get-glm-quota.sh")
   glm_quota_display=""
   if echo "$glm_quota" | jq -e . >/dev/null 2>&1; then
-    glm_token=$(echo "$glm_quota" | jq -r '.token.percentage // 0')
-    glm_renews_ms=$(echo "$glm_quota" | jq -r '.token.renews_remaining_ms // 0')
     glm_mcp=$(echo "$glm_quota" | jq -r '.mcp.percentage // 0')
-    glm_quota_display="${COLOR_ORANGE}${glm_token}%${COLOR_RESET} ${COLOR_BRONZE}$(format_ms "$glm_renews_ms") ${glm_mcp}%${COLOR_RESET}"
+    glm_tokens_display=""
+    token_count=$(echo "$glm_quota" | jq -r '.tokens | length // 0')
+    i=0
+    while [ "$i" -lt "$token_count" ]; do
+      token_percent=$(echo "$glm_quota" | jq -r ".tokens[$i].percentage // 0")
+      token_renews_ms=$(echo "$glm_quota" | jq -r ".tokens[$i].renews_remaining_ms // 0")
+      token_time=$(format_ms "$token_renews_ms")
+      if [ -n "$glm_tokens_display" ]; then
+        glm_tokens_display="${glm_tokens_display} "
+      fi
+      glm_tokens_display="${glm_tokens_display}${COLOR_ORANGE}${token_percent}%${COLOR_RESET}${COLOR_BRONZE}/${token_time}${COLOR_RESET}"
+      i=$((i + 1))
+    done
+    if [ -n "$glm_tokens_display" ]; then
+      glm_quota_display="${glm_tokens_display}"
+      [ "$glm_mcp" -gt 0 ] && glm_quota_display="${glm_quota_display} ${COLOR_MAGENTA}${glm_mcp}%${COLOR_RESET}"
+    fi
   fi
 
   # version
