@@ -1,7 +1,7 @@
 {
   "alejandra": "4.0.0",
   "bash-language-server": "5.6.0",
-  "biome": "2.3.14",
+  "biome": "2.3.15",
   "debugpy": "1.8.20",
   "dockerfile-language-server": "0.15.0",
   "eslint-lsp": "4.10.0",
@@ -19,7 +19,7 @@
   "pyright": "1.1.408",
   "shellcheck": "v0.11.0",
   "shfmt": "v3.12.0",
-  "sqlfluff": "4.0.0",
+  "sqlfluff": "4.0.4",
   "taplo": "0.10.0",
   "tree-sitter-cli": "v0.26.5",
   "vscode-spring-boot-tools": "1.63.0",

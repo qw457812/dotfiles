@@ -24,7 +24,7 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   COLOR_GOLD=$(printf '\033[38;5;136m')
   COLOR_ORANGE=$(printf '\033[38;5;209m')
   COLOR_MAGENTA=$(printf '\033[38;5;213m')
-  # COLOR_SEAFOAM=$(printf '\033[38;5;107m')
+  COLOR_SEAFOAM=$(printf '\033[38;5;107m')
   COLOR_SKY=$(printf '\033[38;5;81m')
   COLOR_AQUAMARINE=$(printf '\033[38;5;122m')
   COLOR_BRONZE=$(printf '\033[38;5;130m')
@@ -107,7 +107,7 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   # weekly_cost=$("$HOME/.claude/statusline/get-weekly-cost.sh")
   # weekly_cost_display=$([ -n "$weekly_cost" ] && echo "${COLOR_BRONZE}$(printf "\$%.2f" "$weekly_cost")${COLOR_RESET}")
 
-  # synthetic quota (only for synthetic platform)
+  # synthetic quota (only for synthetic)
   synthetic_quota=$("$HOME/.claude/statusline/get-synthetic-quota.sh")
   synthetic_quota_display=""
   if echo "$synthetic_quota" | jq -e . >/dev/null 2>&1; then
@@ -117,20 +117,20 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
     synthetic_quota_display="${COLOR_MAGENTA}${synthetic_requests}${COLOR_RESET}${COLOR_MAUVE}/${synthetic_limit} $(format_ms "$synthetic_renews_ms")${COLOR_RESET}"
   fi
 
-  # glm quota (only for ZAI/ZHIPU platforms)
+  # glm quota (only for ZAI/ZHIPU)
   glm_quota=$("$HOME/.claude/statusline/get-glm-quota.sh")
   glm_quota_display=""
   if echo "$glm_quota" | jq -e . >/dev/null 2>&1; then
     glm_tokens_display=$(
-      echo "$glm_quota" | jq -r '.tokens[] | "\(.percentage)%/\(.renews_remaining_ms)"' |
-        while IFS=/ read -r pct ms; do
-          printf '%s%s%s%s/%s%s ' \
+      echo "$glm_quota" | jq -r '.tokens[] | "\(.percentage) \(.renews_remaining_ms)"' |
+        while read -r pct ms; do
+          printf '%s%s%%%s%s/%s%s ' \
             "$COLOR_ORANGE" "$pct" "$COLOR_RESET" \
             "$COLOR_BRONZE" "$(format_ms "$ms")" "$COLOR_RESET"
         done | xargs
     )
     glm_mcp=$(echo "$glm_quota" | jq -r '.mcp.percentage // 0')
-    glm_quota_display=$([ -n "$glm_tokens_display" ] && echo "$glm_tokens_display${glm_mcp:+ ${COLOR_MAGENTA}${glm_mcp}%${COLOR_RESET}}")
+    glm_quota_display=$([ -n "$glm_tokens_display" ] && echo "$glm_tokens_display${glm_mcp:+ ${COLOR_SEAFOAM}${glm_mcp}%${COLOR_RESET}}")
   fi
 
   # version
