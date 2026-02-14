@@ -8,10 +8,10 @@
 input=$(cat)
 # echo "$input" >/tmp/statusline_debug.json
 
-if [ -z "$TERMUX_VERSION" ]; then
-  # fixes https://github.com/anthropics/claude-code/issues/10375
-  [ -n "$TMUX" ] && printf '\ePtmux;\e\e[?1004l\e\\' || printf '\e[?1004l'
-fi
+# if [ -z "$TERMUX_VERSION" ]; then
+#   # fixes https://github.com/anthropics/claude-code/issues/10375
+#   [ -n "$TMUX" ] && printf '\ePtmux;\e\e[?1004l\e\\' || printf '\e[?1004l'
+# fi
 
 # shorter statusline within nvim or termux
 if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
