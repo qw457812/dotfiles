@@ -25,7 +25,7 @@ if status is-interactive # https://github.com/ndonfris/fish-lsp/blob/1be77fcfa37
 end
 # set -x MANROFFOPT -c
 set -x EZA_MIN_LUMINANCE 50
-type -q brew; and set -x DYLD_LIBRARY_PATH (brew --prefix)/opt/librime/lib # https://github.com/wlh320/rime-ls#macos
+# type -q brew; and set -x DYLD_LIBRARY_PATH (brew --prefix)/opt/librime/lib # https://github.com/wlh320/rime-ls#macos
 set -x RIPGREP_CONFIG_PATH $HOME/.ripgreprc
 test -f $HOME/.cache/nvim/lazygit-theme.yml; and set -x LG_CONFIG_FILE $HOME/.config/lazygit/config.yml,$HOME/.cache/nvim/lazygit-theme.yml
 
