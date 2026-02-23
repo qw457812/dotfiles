@@ -17,14 +17,14 @@ input=$(cat)
 if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   COLOR_RED=$(printf '\033[31m')
   COLOR_GREEN=$(printf '\033[32m')
-  # COLOR_YELLOW=$(printf '\033[33m')
+  COLOR_YELLOW=$(printf '\033[33m')
   COLOR_BLUE=$(printf '\033[34m')
   COLOR_CYAN=$(printf '\033[36m')
   COLOR_TEAL=$(printf '\033[38;5;73m')
   COLOR_GOLD=$(printf '\033[38;5;136m')
   COLOR_ORANGE=$(printf '\033[38;5;209m')
   COLOR_MAGENTA=$(printf '\033[38;5;213m')
-  COLOR_SEAFOAM=$(printf '\033[38;5;107m')
+  # COLOR_SEAFOAM=$(printf '\033[38;5;107m')
   COLOR_SKY=$(printf '\033[38;5;81m')
   COLOR_AQUAMARINE=$(printf '\033[38;5;122m')
   COLOR_BRONZE=$(printf '\033[38;5;130m')
@@ -39,7 +39,9 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
       if (s < 60) {
         printf "<1m"
       } else {
-        d = int(s/86400); h = int((s%86400)/3600); m = int((s%3600)/60)
+        d = int(s/86400)
+        h = int((s%86400)/3600)
+        m = int((s%3600)/60)
         if (d > 0) {
           printf "%dd%dh%dm", d, h, m
         } else if (h > 0) {
@@ -93,13 +95,20 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   # weekly_cost_display=$([ -n "$weekly_cost" ] && echo "${COLOR_BRONZE}$(printf "\$%.2f" "$weekly_cost")${COLOR_RESET}")
 
   # synthetic quota (only for synthetic)
-  synthetic_quota=$("$HOME/.claude/statusline/get-synthetic-quota.sh")
-  synthetic_quota_display=""
-  if echo "$synthetic_quota" | jq -e . >/dev/null 2>&1; then
-    synthetic_requests=$(echo "$synthetic_quota" | jq -r '.requests // 0')
-    synthetic_limit=$(echo "$synthetic_quota" | jq -r '.limit // 0')
-    synthetic_renews_ms=$(echo "$synthetic_quota" | jq -r '.renews_remaining_ms // 0')
-    synthetic_quota_display="${COLOR_MAGENTA}${synthetic_requests}${COLOR_RESET}${COLOR_MAUVE}/${synthetic_limit} $(format_ms "$synthetic_renews_ms")${COLOR_RESET}"
+  syn_quota=$("$HOME/.claude/statusline/get-synthetic-quota.sh")
+  syn_quota_display=""
+  if echo "$syn_quota" | jq -e . >/dev/null 2>&1; then
+    syn_sub_requests=$(echo "$syn_quota" | jq -r '.subscription.requests // 0')
+    syn_sub_limit=$(echo "$syn_quota" | jq -r '.subscription.limit // 0')
+    syn_sub_renews_ms=$(echo "$syn_quota" | jq -r '.subscription.renews_remaining_ms // 0')
+    syn_sub_display="${COLOR_MAGENTA}${syn_sub_requests}${COLOR_RESET}${COLOR_MAUVE}/${syn_sub_limit} $(format_ms "$syn_sub_renews_ms")${COLOR_RESET}"
+
+    syn_free_requests=$(echo "$syn_quota" | jq -r '.freeToolCalls.requests // 0')
+    syn_free_limit=$(echo "$syn_quota" | jq -r '.freeToolCalls.limit // 0')
+    syn_free_renews_ms=$(echo "$syn_quota" | jq -r '.freeToolCalls.renews_remaining_ms // 0')
+    syn_free_display="${COLOR_MAGENTA}${syn_free_requests}${COLOR_RESET}${COLOR_MAUVE}/${syn_free_limit} $(format_ms "$syn_free_renews_ms")${COLOR_RESET}"
+
+    syn_quota_display="${syn_sub_display} ${syn_free_display}"
   fi
 
   # glm quota (only for ZAI/ZHIPU)
@@ -115,7 +124,7 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
         done | xargs
     )
     glm_mcp=$(echo "$glm_quota" | jq -r '.mcp.percentage // 0')
-    glm_quota_display=$([ -n "$glm_tokens_display" ] && echo "$glm_tokens_display${glm_mcp:+ ${COLOR_SEAFOAM}${glm_mcp}%${COLOR_RESET}}")
+    glm_quota_display=$([ -n "$glm_tokens_display" ] && echo "$glm_tokens_display${glm_mcp:+ ${COLOR_YELLOW}${glm_mcp}%${COLOR_RESET}}")
   fi
 
   # version
@@ -146,7 +155,7 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
     "$total_tokens_display" \
     "$context_percentage_display" \
     "$session_cost_display" \
-    "$synthetic_quota_display" \
+    "$syn_quota_display" \
     "$glm_quota_display" \
     "$version_display" \
     "$session_duration_display" \

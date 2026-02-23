@@ -22,7 +22,8 @@ cache_get "$cache_file" 60 && exit 0
 synthetic_quota=$(curl -s "https://api.synthetic.new/v2/quotas" \
   -H "Authorization: Bearer $auth_token" \
   -H "Content-Type: application/json" 2>/dev/null |
-  jq '.subscription | {
+  jq '
+  def format_quota: {
     requests: (.requests // 0),
     limit: (.limit // 0),
     renews_remaining_ms: (
@@ -35,8 +36,13 @@ synthetic_quota=$(curl -s "https://api.synthetic.new/v2/quotas" \
       . * 1000 |
       if . > 0 then floor else 0 end
     )
+  };
+
+  {
+    subscription: (.subscription | format_quota),
+    freeToolCalls: (.freeToolCalls | format_quota)
   }' 2>/dev/null)
 
-echo "$synthetic_quota" | jq -e '.requests' >/dev/null 2>&1 || exit 0
+echo "$synthetic_quota" | jq -e '.subscription.requests' >/dev/null 2>&1 || exit 0
 
 cache_set "$cache_file" "$synthetic_quota"
