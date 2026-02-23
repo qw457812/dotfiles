@@ -1,4 +1,3 @@
-// bunx oh-my-opencode doctor --verbose
 // https://github.com/code-yeongyu/oh-my-opencode/blob/dev/src/config/schema.ts
 // https://docs.github.com/en/copilot/concepts/billing/copilot-requests#model-multipliers
 {
@@ -8,8 +7,6 @@
     "directory-readme-injector",
     "startup-toast"
   ],
-  // re-add websearch in opencode.jsonc to fix the timed out issue
-  "disabled_mcps": ["websearch"],
   "disabled_skills": ["agent-browser"],
   "browser_automation_engine": {
     // `npm install -g agent-browser` -> `agent-browser install`
@@ -21,7 +18,6 @@
   },
   "background_task": {
     "modelConcurrency": {
-      "google/antigravity-claude-opus-4-5-thinking": 3,
       "google/antigravity-claude-opus-4-6-thinking": 3,
       "github-copilot/claude-opus-4.6": 3
     }
@@ -35,7 +31,7 @@
       // "model": "github-copilot/claude-opus-4.6",
       // "variant": "thinking"
       "model": "synthetic/hf:moonshotai/Kimi-K2.5"
-      // "model": "zai-coding-plan/glm-4.7"
+      // "model": "zai-coding-plan/glm-5"
     },
     "hephaestus": {
       "model": "github-copilot/gpt-5.2-codex",
@@ -43,7 +39,7 @@
     },
     "atlas": {
       "model": "synthetic/hf:moonshotai/Kimi-K2.5"
-      // "model": "github-copilot/claude-sonnet-4.5"
+      // "model": "github-copilot/claude-sonnet-4.6"
     },
     "prometheus": {
       // "model": "github-copilot/claude-opus-4.6",
@@ -62,7 +58,7 @@
       "variant": "medium"
     },
     "sisyphus-junior": {
-      "model": "zai-coding-plan/glm-4.7"
+      "model": "zai-coding-plan/glm-5"
     },
     "oracle": {
       "model": "github-copilot/gpt-5.2",
@@ -82,7 +78,7 @@
   },
   "categories": {
     "visual-engineering": {
-      "model": "google/antigravity-gemini-3-pro"
+      "model": "google/antigravity-gemini-3.1-pro"
     },
     "ultrabrain": {
       "model": "github-copilot/gpt-5.2-codex",
@@ -93,21 +89,22 @@
       "variant": "medium"
     },
     "artistry": {
-      "model": "google/antigravity-gemini-3-pro",
+      "model": "google/antigravity-gemini-3.1-pro",
       "variant": "high"
     },
     "quick": {
       "model": "google/antigravity-gemini-3-flash"
     },
     "unspecified-low": {
-      "model": "zai-coding-plan/glm-4.7"
+      "model": "zai-coding-plan/glm-5"
     },
     "unspecified-high": {
       "model": "github-copilot/gpt-5.2",
       "variant": "high"
     },
     "writing": {
-      "model": "google/antigravity-gemini-3-flash"
+      "model": "synthetic/hf:nvidia/Kimi-K2.5-NVFP4"
+      // "model": "google/antigravity-gemini-3-flash"
     }
   }
 }

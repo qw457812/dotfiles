@@ -5,8 +5,8 @@
     "DISABLE_BUG_COMMAND": "1",
     "DISABLE_ERROR_REPORTING": "1",
     "DISABLE_TELEMETRY": "1",
-    "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR": "1",
     "CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD": "1",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
     "MCP_TIMEOUT": "60000",
     "MANPAGER": "col -bx"
   },
@@ -52,7 +52,7 @@
       "Bash(node --version:*)",
       "Bash(npm list:*)",
       "mcp__websearch__web_search_exa",
-      "mcp__web-reader__webReader"
+      "mcp__webfetch__fetch"
     ],
     "deny": [
       "WebSearch",
@@ -75,7 +75,7 @@
     ],
     "defaultMode": "acceptEdits"
   },
-  "model": "opus",
+  "model": "sonnet",
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh",

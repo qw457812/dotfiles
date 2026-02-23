@@ -83,7 +83,7 @@ return {
           end,
         },
         acp = {
-          -- requires `npm i -g @zed-industries/claude-code-acp`
+          -- requires `npm i -g @zed-industries/claude-agent-acp`
           claude_code = function()
             return require("codecompanion.adapters").extend("claude_code", {
               env = U.ai.claude.provider.plan.synthetic,
@@ -93,7 +93,7 @@ return {
       },
       strategies = {
         chat = {
-          adapter = vim.fn.executable("claude-code-acp") == 1 and "claude_code" or "copilot",
+          adapter = vim.fn.executable("claude-agent-acp") == 1 and "claude_code" or "copilot",
           roles = {
             ---@param adapter CodeCompanion.HTTPAdapter|CodeCompanion.ACPAdapter
             ---@return string

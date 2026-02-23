@@ -20,6 +20,8 @@ return {
               "command", -- ignore ~/.config/fish/functions/claude.fish
               "claude",
             } or { "claude" }, {
+              "--teammate-mode",
+              "in-process",
               -- "--model",
               -- "haiku",
               -- "--continue",

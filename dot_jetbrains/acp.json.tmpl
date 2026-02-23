@@ -5,14 +5,14 @@
   },
   "agent_servers": {
     "Claude": {
-      "command": "{{ lookPath `claude-code-acp` }}",
+      "command": "{{ lookPath `claude-agent-acp` }}",
       "env": {
         "ANTHROPIC_BASE_URL": "http://localhost:4000",
         "ANTHROPIC_AUTH_TOKEN": "{{ env `LITELLM_MASTER_KEY` }}"
       }
     },
     "Claude Synthetic": {
-      "command": "{{ lookPath `claude-code-acp` }}",
+      "command": "{{ lookPath `claude-agent-acp` }}",
       "env": {
         "ANTHROPIC_BASE_URL": "https://api.synthetic.new/anthropic",
         "ANTHROPIC_AUTH_TOKEN": "{{ env `SYNTHETIC_API_KEY` }}",
@@ -23,7 +23,7 @@
       }
     },
     "Claude Glm": {
-      "command": "{{ lookPath `claude-code-acp` }}",
+      "command": "{{ lookPath `claude-agent-acp` }}",
       "env": {
         "ANTHROPIC_BASE_URL": "https://api.z.ai/api/anthropic",
         "ANTHROPIC_AUTH_TOKEN": "{{ env `ZAI_API_KEY` }}",

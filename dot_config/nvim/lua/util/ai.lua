@@ -24,7 +24,7 @@ M.claude = {
         ANTHROPIC_AUTH_TOKEN = vim.env.LITELLM_MASTER_KEY,
         -- ANTHROPIC_MODEL = "synthetic/hf:moonshotai/Kimi-K2.5",
         ANTHROPIC_DEFAULT_OPUS_MODEL = "synthetic/hf:moonshotai/Kimi-K2.5",
-        -- ANTHROPIC_DEFAULT_SONNET_MODEL = "synthetic/hf:moonshotai/Kimi-K2.5",
+        ANTHROPIC_DEFAULT_SONNET_MODEL = "synthetic/hf:nvidia/Kimi-K2.5-NVFP4",
         -- ANTHROPIC_DEFAULT_HAIKU_MODEL = "zai/glm-4.7",
         -- CLAUDE_CODE_SUBAGENT_MODEL = "synthetic/hf:moonshotai/Kimi-K2.5",
 
@@ -43,10 +43,9 @@ M.claude = {
         ANTHROPIC_BASE_URL = "https://api.synthetic.new/anthropic",
         ANTHROPIC_AUTH_TOKEN = vim.env.SYNTHETIC_API_KEY,
         ANTHROPIC_DEFAULT_OPUS_MODEL = "hf:moonshotai/Kimi-K2.5",
-        ANTHROPIC_DEFAULT_SONNET_MODEL = "hf:moonshotai/Kimi-K2.5",
-        -- ANTHROPIC_DEFAULT_HAIKU_MODEL = "hf:MiniMaxAI/MiniMax-M2.1",
-        ANTHROPIC_DEFAULT_HAIKU_MODEL = "hf:moonshotai/Kimi-K2.5",
-        CLAUDE_CODE_SUBAGENT_MODEL = "hf:moonshotai/Kimi-K2.5",
+        ANTHROPIC_DEFAULT_SONNET_MODEL = "hf:nvidia/Kimi-K2.5-NVFP4",
+        ANTHROPIC_DEFAULT_HAIKU_MODEL = "hf:nvidia/Kimi-K2.5-NVFP4",
+        CLAUDE_CODE_SUBAGENT_MODEL = "hf:nvidia/Kimi-K2.5-NVFP4",
       },
       -- https://z.ai/manage-apikey/subscription
       glm = {

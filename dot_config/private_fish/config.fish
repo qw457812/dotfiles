@@ -275,6 +275,7 @@ if type -q claude
     # claude mcp add -s user websearch -e EXA_API_KEY=$EXA_API_KEY -- npx -y exa-mcp-server tools=web_search_exa
     # claude mcp add -s user -t http websearch "https://mcp.exa.ai/mcp?tools=web_search_exa&exaApiKey=$EXA_API_KEY"
     # claude mcp add -s user --transport http grep_app https://mcp.grep.app
+    # claude mcp add -s user webfetch -- uvx mcp-server-fetch
     # claude mcp add -s user -t http web-reader https://api.z.ai/api/mcp/web_reader/mcp --header "Authorization: Bearer $ZAI_API_KEY"
     abbr cl claude
     abbr clt claude_temp
