@@ -1,0 +1,53 @@
+{
+  "providers": {
+    "synthetic": {
+      "baseUrl": "https://api.synthetic.new/anthropic",
+      "apiKey": "SYNTHETIC_API_KEY",
+      "api": "anthropic-messages",
+      "models": [
+        {
+          "id": "hf:moonshotai/Kimi-K2.5",
+          "name": "moonshotai/Kimi-K2.5",
+          "reasoning": true,
+          "input": ["text", "image"],
+          "contextWindow": 262144,
+          "maxTokens": 65536,
+          "cost": {
+            "input": 0.0000006,
+            "output": 0.000003,
+            "cacheRead": 0.0000006,
+            "cacheWrite": 0
+          }
+        },
+        {
+          "id": "hf:nvidia/Kimi-K2.5-NVFP4",
+          "name": "nvidia/Kimi-K2.5-NVFP4",
+          "reasoning": true,
+          "input": ["text", "image"],
+          "contextWindow": 262144,
+          "maxTokens": 65536,
+          "cost": {
+            "input": 0.0000006,
+            "output": 0.000003,
+            "cacheRead": 0.0000006,
+            "cacheWrite": 0
+          }
+        },
+        {
+          "id": "hf:MiniMaxAI/MiniMax-M2.5",
+          "name": "MiniMaxAI/MiniMax-M2.5",
+          "reasoning": true,
+          "input": ["text"],
+          "contextWindow": 191488,
+          "maxTokens": 65536,
+          "cost": {
+            "input": 0.0000006,
+            "output": 0.000003,
+            "cacheRead": 0.0000006,
+            "cacheWrite": 0
+          }
+        }
+      ]
+    }
+  }
+}
