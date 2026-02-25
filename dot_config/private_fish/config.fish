@@ -340,6 +340,9 @@ abbr py python3
 abbr mk make
 
 if set -q TERMUX_VERSION
+    # for uv
+    set -gx ANDROID_API_LEVEL (getprop ro.build.version.sdk)
+
     alias pkgbackup 'pkg list-installed >(chezmoi source-path)/backup/termux-packages 2>/dev/null'
     abbr pkgu 'pkg update && pkg upgrade && pkgbackup'
     abbr pkgi --set-cursor 'pkg install % && pkgbackup'
