@@ -7,7 +7,8 @@
     "directory-readme-injector",
     "startup-toast"
   ],
-  "disabled_skills": ["agent-browser"],
+  "disabled_mcps": ["webfetch"], // for `claude mcp add -s user webfetch -- uvx mcp-server-fetch`
+  "disabled_skills": ["agent-browser", "dev-browser"],
   "browser_automation_engine": {
     // `npm install -g agent-browser` -> `agent-browser install`
     "provider": "agent-browser"
@@ -78,7 +79,8 @@
   },
   "categories": {
     "visual-engineering": {
-      "model": "google/antigravity-gemini-3.1-pro"
+      // "model": "google/antigravity-gemini-3.1-pro"
+      "model": "zai-coding-plan/glm-5"
     },
     "ultrabrain": {
       "model": "github-copilot/gpt-5.2-codex",
@@ -89,8 +91,9 @@
       "variant": "medium"
     },
     "artistry": {
-      "model": "google/antigravity-gemini-3.1-pro",
-      "variant": "high"
+      // "model": "google/antigravity-gemini-3.1-pro",
+      // "variant": "high"
+      "model": "synthetic/hf:moonshotai/Kimi-K2.5"
     },
     "quick": {
       "model": "google/antigravity-gemini-3-flash"

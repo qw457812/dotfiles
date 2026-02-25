@@ -22,14 +22,12 @@ M.claude = {
       litellm = {
         ANTHROPIC_BASE_URL = "http://localhost:4000",
         ANTHROPIC_AUTH_TOKEN = vim.env.LITELLM_MASTER_KEY,
-        -- ANTHROPIC_MODEL = "synthetic/hf:moonshotai/Kimi-K2.5",
         ANTHROPIC_DEFAULT_OPUS_MODEL = "synthetic/hf:moonshotai/Kimi-K2.5",
-        ANTHROPIC_DEFAULT_SONNET_MODEL = "synthetic/hf:nvidia/Kimi-K2.5-NVFP4",
+        ANTHROPIC_DEFAULT_SONNET_MODEL = "synthetic/hf:moonshotai/Kimi-K2.5",
         -- ANTHROPIC_DEFAULT_HAIKU_MODEL = "zai/glm-4.7",
-        -- CLAUDE_CODE_SUBAGENT_MODEL = "synthetic/hf:moonshotai/Kimi-K2.5",
 
-        SYNTHETIC_API_KEY = vim.env.SYNTHETIC_API_KEY, -- for executable_get-synthetic-quota.sh
-        ZAI_API_KEY = vim.env.ZAI_API_KEY, -- for executable_get-glm-quota.sh
+        SYNTHETIC_API_KEY = vim.env.SYNTHETIC_API_KEY, -- for ~/.claude/statusline/get-synthetic-quota.sh
+        ZAI_API_KEY = vim.env.ZAI_API_KEY, -- for ~/.claude/statusline/get-glm-quota.sh
       },
     },
     plan = {
@@ -43,9 +41,9 @@ M.claude = {
         ANTHROPIC_BASE_URL = "https://api.synthetic.new/anthropic",
         ANTHROPIC_AUTH_TOKEN = vim.env.SYNTHETIC_API_KEY,
         ANTHROPIC_DEFAULT_OPUS_MODEL = "hf:moonshotai/Kimi-K2.5",
-        ANTHROPIC_DEFAULT_SONNET_MODEL = "hf:nvidia/Kimi-K2.5-NVFP4",
+        ANTHROPIC_DEFAULT_SONNET_MODEL = "hf:moonshotai/Kimi-K2.5",
         ANTHROPIC_DEFAULT_HAIKU_MODEL = "hf:nvidia/Kimi-K2.5-NVFP4",
-        CLAUDE_CODE_SUBAGENT_MODEL = "hf:nvidia/Kimi-K2.5-NVFP4",
+        CLAUDE_CODE_SUBAGENT_MODEL = "hf:moonshotai/Kimi-K2.5",
       },
       -- https://z.ai/manage-apikey/subscription
       glm = {

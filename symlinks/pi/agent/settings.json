@@ -2,6 +2,7 @@
   "lastChangelogVersion": "0.55.0",
   "defaultProvider": "synthetic",
   "defaultModel": "hf:moonshotai/Kimi-K2.5",
-  "defaultThinkingLevel": "off",
-  "hideThinkingBlock": false
+  "defaultThinkingLevel": "medium",
+  "hideThinkingBlock": false,
+  "quietStartup": true
 }
