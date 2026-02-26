@@ -12,6 +12,7 @@ local H = {}
 ---@field sidekick_session_id? string
 
 -- https://github.com/farion1231/cc-switch/blob/7fa0a7b16648e99ef956d18c01f686dd50e843ed/src/config/claudeProviderPresets.ts
+-- NOTE: the `CLAUDE_CODE_SUBAGENT_MODEL` overrides the default model for agents, e.g. Explore: haiku -> CLAUDE_CODE_SUBAGENT_MODEL
 M.claude = {
   provider = {
     proxy = {
@@ -23,7 +24,7 @@ M.claude = {
         ANTHROPIC_BASE_URL = "http://localhost:4000",
         ANTHROPIC_AUTH_TOKEN = vim.env.LITELLM_MASTER_KEY,
         ANTHROPIC_DEFAULT_OPUS_MODEL = "synthetic/hf:moonshotai/Kimi-K2.5",
-        ANTHROPIC_DEFAULT_SONNET_MODEL = "synthetic/hf:moonshotai/Kimi-K2.5",
+        ANTHROPIC_DEFAULT_SONNET_MODEL = "synthetic/hf:nvidia/Kimi-K2.5-NVFP4",
         -- ANTHROPIC_DEFAULT_HAIKU_MODEL = "zai/glm-4.7",
 
         SYNTHETIC_API_KEY = vim.env.SYNTHETIC_API_KEY, -- for ~/.claude/statusline/get-synthetic-quota.sh
@@ -41,9 +42,9 @@ M.claude = {
         ANTHROPIC_BASE_URL = "https://api.synthetic.new/anthropic",
         ANTHROPIC_AUTH_TOKEN = vim.env.SYNTHETIC_API_KEY,
         ANTHROPIC_DEFAULT_OPUS_MODEL = "hf:moonshotai/Kimi-K2.5",
-        ANTHROPIC_DEFAULT_SONNET_MODEL = "hf:moonshotai/Kimi-K2.5",
-        ANTHROPIC_DEFAULT_HAIKU_MODEL = "hf:nvidia/Kimi-K2.5-NVFP4",
-        CLAUDE_CODE_SUBAGENT_MODEL = "hf:moonshotai/Kimi-K2.5",
+        ANTHROPIC_DEFAULT_SONNET_MODEL = "hf:nvidia/Kimi-K2.5-NVFP4",
+        ANTHROPIC_DEFAULT_HAIKU_MODEL = "hf:MiniMaxAI/MiniMax-M2.5",
+        -- CLAUDE_CODE_SUBAGENT_MODEL = "hf:moonshotai/Kimi-K2.5",
       },
       -- https://z.ai/manage-apikey/subscription
       glm = {
@@ -51,8 +52,8 @@ M.claude = {
         ANTHROPIC_AUTH_TOKEN = vim.env.ZAI_API_KEY,
         API_TIMEOUT_MS = "3000000",
         ANTHROPIC_DEFAULT_OPUS_MODEL = "glm-5",
-        ANTHROPIC_DEFAULT_SONNET_MODEL = "glm-5",
-        ANTHROPIC_DEFAULT_HAIKU_MODEL = "glm-4.7", -- glm-4.5-air is not good enough
+        ANTHROPIC_DEFAULT_SONNET_MODEL = "glm-4.7",
+        -- ANTHROPIC_DEFAULT_HAIKU_MODEL = "glm-4.7", -- glm-4.5-air is not good enough
       },
       -- https://www.kimi.com/membership/subscription
       kimi = {
@@ -70,17 +71,17 @@ M.claude = {
       kimi = {
         ANTHROPIC_BASE_URL = "https://api.moonshot.cn/anthropic",
         ANTHROPIC_AUTH_TOKEN = vim.env.MOONSHOT_API_KEY,
-        ANTHROPIC_MODEL = "kimi-k2-thinking-turbo",
+        -- ANTHROPIC_MODEL = "kimi-k2-thinking-turbo",
         ANTHROPIC_DEFAULT_OPUS_MODEL = "kimi-k2-thinking-turbo",
         ANTHROPIC_DEFAULT_SONNET_MODEL = "kimi-k2-thinking-turbo",
         ANTHROPIC_DEFAULT_HAIKU_MODEL = "kimi-k2-thinking-turbo",
-        CLAUDE_CODE_SUBAGENT_MODEL = "kimi-k2-thinking-turbo",
+        -- CLAUDE_CODE_SUBAGENT_MODEL = "kimi-k2-thinking-turbo",
       },
       minimax = {
         ANTHROPIC_BASE_URL = "https://api.minimax.io/anthropic",
         ANTHROPIC_AUTH_TOKEN = vim.env.MINIMAX_API_KEY,
         API_TIMEOUT_MS = "3000000",
-        ANTHROPIC_MODEL = "MiniMax-M2.1",
+        -- ANTHROPIC_MODEL = "MiniMax-M2.1",
         ANTHROPIC_SMALL_FAST_MODEL = "MiniMax-M2.1",
         ANTHROPIC_DEFAULT_SONNET_MODEL = "MiniMax-M2.1",
         ANTHROPIC_DEFAULT_OPUS_MODEL = "MiniMax-M2.1",

@@ -8,7 +8,9 @@
       "command": "{{ lookPath `claude-agent-acp` }}",
       "env": {
         "ANTHROPIC_BASE_URL": "http://localhost:4000",
-        "ANTHROPIC_AUTH_TOKEN": "{{ env `LITELLM_MASTER_KEY` }}"
+        "ANTHROPIC_AUTH_TOKEN": "{{ env `LITELLM_MASTER_KEY` }}",
+        "ANTHROPIC_DEFAULT_OPUS_MODEL": "synthetic/hf:moonshotai/Kimi-K2.5",
+        "ANTHROPIC_DEFAULT_SONNET_MODEL": "synthetic/hf:nvidia/Kimi-K2.5-NVFP4"
       }
     },
     "Claude Synthetic": {
@@ -17,9 +19,8 @@
         "ANTHROPIC_BASE_URL": "https://api.synthetic.new/anthropic",
         "ANTHROPIC_AUTH_TOKEN": "{{ env `SYNTHETIC_API_KEY` }}",
         "ANTHROPIC_DEFAULT_OPUS_MODEL": "hf:moonshotai/Kimi-K2.5",
-        "ANTHROPIC_DEFAULT_SONNET_MODEL": "hf:moonshotai/Kimi-K2.5",
-        "ANTHROPIC_DEFAULT_HAIKU_MODEL": "hf:moonshotai/Kimi-K2.5",
-        "CLAUDE_CODE_SUBAGENT_MODEL": "hf:moonshotai/Kimi-K2.5"
+        "ANTHROPIC_DEFAULT_SONNET_MODEL": "hf:nvidia/Kimi-K2.5-NVFP4",
+        "ANTHROPIC_DEFAULT_HAIKU_MODEL": "hf:MiniMaxAI/MiniMax-M2.5"
       }
     },
     "Claude Glm": {
@@ -27,8 +28,7 @@
       "env": {
         "ANTHROPIC_BASE_URL": "https://api.z.ai/api/anthropic",
         "ANTHROPIC_AUTH_TOKEN": "{{ env `ZAI_API_KEY` }}",
-        "API_TIMEOUT_MS": "3000000",
-        "ANTHROPIC_DEFAULT_HAIKU_MODEL": "glm-4.7"
+        "API_TIMEOUT_MS": "3000000"
       }
     },
     "OpenCode": {

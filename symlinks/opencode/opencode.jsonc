@@ -6,7 +6,6 @@
     "oh-my-opencode", // https://github.com/code-yeongyu/oh-my-opencode
     "opencode-antigravity-auth@latest" // https://github.com/NoeFabris/opencode-antigravity-auth
   ],
-  "theme": "system",
   "share": "manual",
   // "autoupdate": "notify",
   // "model": "zai-coding-plan/glm-5",
@@ -55,18 +54,6 @@
       "git revert *": "ask",
       "git restore *": "ask"
     }
-  },
-  "keybinds": {
-    "leader": "ctrl+x",
-    "messages_half_page_up": "ctrl+u",
-    "messages_half_page_down": "ctrl+d",
-    "app_exit": "ctrl+c,<leader>q", // ctrl+d (messages_half_page_down) in subagent session exits app
-    "input_delete_to_line_start": "ctrl+u,alt+u",
-    "messages_next": "alt+j",
-    "messages_previous": "alt+k",
-    "editor_open": "ctrl+g", // align with claude code since we can't change claude code keybinds
-    "agent_cycle": "none", // avoid accidental agent cycle
-    "session_child_cycle": "<leader>right,tab"
   },
   "provider": {
     // // check `opencode models anthropic`

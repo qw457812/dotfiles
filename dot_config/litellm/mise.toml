@@ -1,6 +1,7 @@
 [env]
 _.python.venv = { path = ".venv", create = true }
-PORT = "4000" # https://github.com/BerriAI/litellm/blob/be89b38ea8a75f8b5b156d28c25eb3183862d02c/litellm/proxy/proxy_cli.py#L317
+# https://github.com/BerriAI/litellm/blob/be89b38ea8a75f8b5b156d28c25eb3183862d02c/litellm/proxy/proxy_cli.py#L317
+PORT = "4000"
 
 [tasks.install]
 description = "Install LiteLLM"
@@ -12,6 +13,7 @@ run = "uv pip install --upgrade 'litellm[proxy]'"
 
 [tasks.dev]
 description = "Start LiteLLM Proxy with debug (foreground)"
+# --debug
 run = 'lsof -i:${PORT} >/dev/null 2>&1 && echo "Already running on port ${PORT}" || uv run litellm --config config.yaml --detailed_debug'
 
 [tasks.run]

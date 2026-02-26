@@ -12,7 +12,7 @@ model_list:
 
   - model_name: claude-sonnet-*
     litellm_params:
-      model: anthropic/hf:moonshotai/Kimi-K2.5
+      model: anthropic/hf:nvidia/Kimi-K2.5-NVFP4
       api_base: https://api.synthetic.new/anthropic
       api_key: os.environ/SYNTHETIC_API_KEY
 
