@@ -3,4 +3,4 @@ if test (uname) = Darwin
 else
     set -gx PNPM_HOME "$HOME/.local/share/pnpm"
 end
-fish_add_path $PNPM_HOME
+fish_add_path -g $PNPM_HOME

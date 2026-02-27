@@ -1,12 +1,12 @@
 # Path
-fish_add_path ~/go/bin
-set -q TERMUX_VERSION; or fish_add_path ~/.cargo/bin # https://github.com/rust-lang/rustup/blob/5e59246c45756b860ffa2c0e471e9989f0d56ff8/doc/user-guide/src/installation/already-installed-rust.md?plain=1#L63-L66
-fish_add_path ~/.local/share/bob/nvim-bin
-fish_add_path ~/.local/bin
-fish_add_path ~/.opencode/bin
-fish_add_path "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
-fish_add_path "$HOME/Library/Application Support/Coursier/bin" # scalafmt
-type -q brew; and fish_add_path (brew --prefix)/Caskroom/sqlcl/(command ls -t (brew --prefix)/Caskroom/sqlcl 2>/dev/null | head -1)/sqlcl/bin
+fish_add_path -g ~/go/bin
+set -q TERMUX_VERSION; or fish_add_path -g ~/.cargo/bin # https://github.com/rust-lang/rustup/blob/5e59246c45756b860ffa2c0e471e9989f0d56ff8/doc/user-guide/src/installation/already-installed-rust.md?plain=1#L63-L66
+fish_add_path -g ~/.local/share/bob/nvim-bin
+fish_add_path -g ~/.local/bin
+fish_add_path -g ~/.opencode/bin
+fish_add_path -g "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
+fish_add_path -g "$HOME/Library/Application Support/Coursier/bin" # scalafmt
+type -q brew; and fish_add_path -g (brew --prefix)/Caskroom/sqlcl/(command ls -t (brew --prefix)/Caskroom/sqlcl 2>/dev/null | head -1)/sqlcl/bin
 
 # Exports
 # set -gx TERM xterm-256color # https://github.com/gpakosz/.tmux
