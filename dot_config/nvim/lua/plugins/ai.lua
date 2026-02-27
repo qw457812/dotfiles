@@ -319,8 +319,16 @@ return {
               -- up_ctrl_p = false, -- opencode uses <c-p> for its own functionality
             },
           },
-          -- HACK: disable some installed tools
-          gemini = { cmd = { "hack_to_disable_gemini" } },
+          gemini = { cmd = { "hack_to_disable_gemini" } }, -- HACK: disable gemini
+          pi = {
+            cmd = { "pi" },
+            is_proc = "\\<pi\\>",
+            url = "https://github.com/badlogic/pi-mono/tree/main/packages/coding-agent",
+            keys = {
+              blur_t = false, -- pi uses <c-o> for its own functionality
+              prompt = false, -- pi uses <c-p> for its own functionality
+            },
+          },
           -- debug = { cmd = { "bash", "-c", "env | sort | bat -l env" } },
         },
         ---@type table<string, sidekick.Prompt|string|fun(ctx:sidekick.context.ctx):(string?)>

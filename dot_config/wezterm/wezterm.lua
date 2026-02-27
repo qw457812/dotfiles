@@ -73,5 +73,6 @@ config.cursor_thickness = "0.07cell"
 config.scrollback_lines = 50000
 
 config.enable_kitty_graphics = true
+config.enable_kitty_keyboard = true
 
 return config
