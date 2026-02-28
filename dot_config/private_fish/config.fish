@@ -298,7 +298,7 @@ if type -q claude
     # - https://github.com/OthmanAdi/planning-with-files
     # - https://github.com/obra/superpowers
     abbr ccspec "uvx --from git+https://github.com/github/spec-kit.git specify init --script sh --ai claude --here"
-    abbr ccgsd "npx get-shit-done-cc@latest" # https://github.com/glittercowboy/get-shit-done
+    abbr ccgsd "npx -y get-shit-done-cc@latest --local" # https://github.com/glittercowboy/get-shit-done
     abbr cchistory "npx -y cchistory"
     abbr ccl claude_litellm
     abbr ccs claude_synthetic

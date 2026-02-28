@@ -1,0 +1,42 @@
+{
+  configVersion: 1,
+  yourName: 'qw',
+  models: [
+    {
+      nickname: 'Kimi K2.5 (Synthetic)',
+      baseUrl: 'https://api.synthetic.new/v1',
+      model: 'hf:moonshotai/Kimi-K2.5',
+      context: 262144,
+      modalities: {
+        image: {
+          enabled: true,
+          maxSizeMB: 10,
+          acceptedMimeTypes: [
+            'image/jpeg',
+            'image/png',
+            'image/webp',
+            'image/gif',
+          ],
+        },
+      },
+    },
+    {
+      nickname: 'MiniMax M2.5 (Synthetic)',
+      baseUrl: 'https://api.synthetic.new/v1',
+      model: 'hf:MiniMaxAI/MiniMax-M2.5',
+      context: 196608,
+    },
+  ],
+  diffApply: {
+    baseUrl: 'https://api.synthetic.new/v1',
+    model: 'hf:syntheticlab/diff-apply',
+  },
+  fixJson: {
+    baseUrl: 'https://api.synthetic.new/v1',
+    model: 'hf:syntheticlab/fix-json',
+  },
+  defaultApiKeyOverrides: {},
+  vimEmulation: {
+    enabled: true,
+  },
+}

@@ -81,6 +81,9 @@ return {
         keymaps = {
           refresh = { n = "<localleader>R" },
         },
+        folding = {
+          enabled = false,
+        },
       })
     end,
   },
@@ -133,7 +136,7 @@ return {
       return {
         popupWin = {
           position = "top",
-          disableCompletions = false,
+          -- disableCompletions = false,
         },
         keymaps = {
           insertModeConfirmAndSubstituteInBuffer = "<C-s>",

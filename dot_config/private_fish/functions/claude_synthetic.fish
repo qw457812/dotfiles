@@ -6,5 +6,10 @@ function claude_synthetic --wraps=claude
     set -lx ANTHROPIC_DEFAULT_OPUS_MODEL hf:moonshotai/Kimi-K2.5
     set -lx ANTHROPIC_DEFAULT_SONNET_MODEL hf:nvidia/Kimi-K2.5-NVFP4
     set -lx ANTHROPIC_DEFAULT_HAIKU_MODEL hf:MiniMaxAI/MiniMax-M2.5
+
+    # Fix Synthetic API Error for Claude Code 2.1.63
+    set -lx CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING 1
+    set -lx MAX_THINKING_TOKENS 31999
+
     command claude $argv
 end

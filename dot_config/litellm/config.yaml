@@ -4,6 +4,7 @@ general_settings:
   master_key: os.environ/LITELLM_MASTER_KEY
 
 model_list:
+  # claude-opus-4-6 -> anthropic/hf:moonshotai/Kimi-K2.5
   - model_name: claude-opus-*
     litellm_params:
       model: anthropic/hf:moonshotai/Kimi-K2.5
@@ -22,12 +23,14 @@ model_list:
       api_base: https://api.z.ai/api/anthropic
       api_key: os.environ/ZAI_API_KEY
 
+  # synthetic/hf:moonshotai/Kimi-K2.5 -> anthropic/hf:moonshotai/Kimi-K2.5
   - model_name: "synthetic/*"
     litellm_params:
       model: "anthropic/*"
       api_base: https://api.synthetic.new/anthropic
       api_key: os.environ/SYNTHETIC_API_KEY
 
+  # zai/glm-4.7 -> anthropic/glm-4.7
   - model_name: "zai/*"
     litellm_params:
       model: "anthropic/*"

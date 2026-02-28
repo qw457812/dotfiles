@@ -217,12 +217,13 @@ return {
               end,
             })
           end),
-          layout = vim.g.user_is_termux and "float" or "right", ---@type "float"|"left"|"bottom"|"top"|"right"
+          -- layout = vim.g.user_is_termux and "float" or "right",
+          layout = "float", ---@type "float"|"left"|"bottom"|"top"|"right"
           ---@type vim.api.keyset.win_config
           float = {
             row = 0,
-            col = 0,
-            width = vim.o.columns,
+            col = vim.g.user_is_termux and 0 or vim.g.user_explorer_width,
+            width = vim.o.columns - (vim.g.user_is_termux and 0 or (vim.g.user_explorer_width + 2)), -- 2 for border width (left + right)
             height = vim.o.lines - 3, -- see: U.snacks.win.fullscreen_height
           },
           ---@type vim.api.keyset.win_config
