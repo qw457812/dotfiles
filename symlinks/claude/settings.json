@@ -74,6 +74,19 @@
     "defaultMode": "acceptEdits"
   },
   "model": "opus",
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ \"$(uname -s)\" = \"Darwin\" ] && osascript -e 'display notification \"Claude Code needs your attention\" with title \"Claude Code\"'"
+          }
+        ]
+      }
+    ]
+  },
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh",
@@ -90,5 +103,6 @@
       "gh",
       "docker"
     ]
-  }
+  },
+  "promptSuggestionEnabled": false
 }
