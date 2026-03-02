@@ -298,6 +298,7 @@ return {
         tools = {
           claude = {
             env = {
+              __AI_AGENT = "claude",
               __IS_CLAUDECODE_NVIM = "1", -- flag to disable claude code statusline in ~/.claude/settings.json
               NVIM_FLATTEN_NEST = "1", -- allow ctrl-g to edit prompt in nvim" to be nested for flatten.nvim
             },
@@ -305,9 +306,15 @@ return {
               blur_t = false, -- claude code uses <c-o> for its own functionality
             },
           },
-          codex = { cmd = { "codex" } },
+          codex = {
+            cmd = { "codex" },
+            env = {
+              __AI_AGENT = "codex",
+            },
+          },
           opencode = {
             env = {
+              __AI_AGENT = "opencode",
               NVIM_FLATTEN_NEST = "1",
               OPENCODE_CONFIG_CONTENT = vim.json.encode({
                 -- `system` theme not available when using neovim terminal, see: https://github.com/sst/opencode/issues/445#issuecomment-3508873123
@@ -325,6 +332,9 @@ return {
             cmd = { "pi" },
             is_proc = "\\<pi\\>",
             url = "https://github.com/badlogic/pi-mono/tree/main/packages/coding-agent",
+            env = {
+              __AI_AGENT = "pi",
+            },
             keys = {
               blur_t = false, -- pi uses <c-o> for its own functionality
               prompt = false, -- pi uses <c-p> for its own functionality

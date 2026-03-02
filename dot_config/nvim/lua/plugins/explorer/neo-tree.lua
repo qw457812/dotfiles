@@ -101,6 +101,7 @@ return {
               }, vim.bo[buf or 0].filetype)
               or U.is_edgy_win(win)
               or vim.t.user_diffview
+              or vim.env.__AI_AGENT
               or vim.fn.getcmdwintype() ~= ""
           end
 
