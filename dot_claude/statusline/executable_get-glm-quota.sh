@@ -31,12 +31,12 @@ glm_quota=$(curl -s "https://$(echo "$base_url" | cut -d'/' -f3)/api/monitor/usa
       .data.limits[] |
       select(.type == "TOKENS_LIMIT") |
       {
-        percentage: (.percentage // 0),
-        renews_remaining_ms: ((.nextResetTime // 0) - (now | to_ms) | if . > 0 then . else 0 end | floor)
+        used_pct: (.percentage // 0),
+        reset_remaining_ms: ((.nextResetTime // 0) - (now | to_ms) | if . > 0 then . else 0 end | floor)
       }
     ],
     mcp: {
-      percentage: (.data.limits[] | select(.type == "TIME_LIMIT") | .percentage // 0)
+      used_pct: (.data.limits[] | select(.type == "TIME_LIMIT") | .percentage // 0)
     }
   }
 ' 2>/dev/null)

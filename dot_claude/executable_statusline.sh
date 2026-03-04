@@ -16,7 +16,7 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   COLOR_BLUE=$(printf '\033[34m')
   COLOR_CYAN=$(printf '\033[36m')
   COLOR_TEAL=$(printf '\033[38;5;73m')
-  COLOR_GOLD=$(printf '\033[38;5;136m')
+  # COLOR_GOLD=$(printf '\033[38;5;136m')
   COLOR_ORANGE=$(printf '\033[38;5;209m')
   COLOR_MAGENTA=$(printf '\033[38;5;213m')
   # COLOR_SEAFOAM=$(printf '\033[38;5;107m')
@@ -26,6 +26,8 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   COLOR_LAVENDER=$(printf '\033[38;5;147m')
   COLOR_GRAY=$(printf '\033[38;5;248m')
   COLOR_MAUVE=$(printf '\033[38;5;96m')
+  COLOR_STEEL=$(printf '\033[38;5;67m')
+  COLOR_CERULEAN=$(printf '\033[38;5;74m')
   COLOR_RESET=$(printf '\033[0m')
 
   format_ms() {
@@ -77,9 +79,9 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   # context usage
   context_percentage_display="${COLOR_CYAN}$(awk -v t="$total_tokens" -v s="$context_window_size" 'BEGIN {printf "%.1f%%", t*100/s}')${COLOR_RESET}"
 
-  # session cost
-  session_cost=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
-  session_cost_display="${COLOR_GOLD}$(printf "\$%.2f" "$session_cost")${COLOR_RESET}"
+  # # session cost
+  # session_cost=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
+  # session_cost_display="${COLOR_GOLD}$(printf "\$%.2f" "$session_cost")${COLOR_RESET}"
 
   # # daily cost (mainly for CRS)
   # daily_cost=$("$HOME/.claude/statusline/get-daily-cost.sh")
@@ -93,17 +95,17 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   syn_quota=$("$HOME/.claude/statusline/get-synthetic-quota.sh")
   syn_quota_display=""
   if echo "$syn_quota" | jq -e . >/dev/null 2>&1; then
-    syn_sub_requests=$(echo "$syn_quota" | jq -r '.subscription.requests // 0')
-    syn_sub_limit=$(echo "$syn_quota" | jq -r '.subscription.limit // 0')
-    syn_sub_renews_ms=$(echo "$syn_quota" | jq -r '.subscription.renews_remaining_ms // 0')
-    syn_sub_display="${COLOR_MAGENTA}${syn_sub_requests}${COLOR_RESET}${COLOR_MAUVE}/${syn_sub_limit} $(format_ms "$syn_sub_renews_ms")${COLOR_RESET}"
+    syn_sub_used=$(echo "$syn_quota" | jq -r '.sub.used // 0')
+    syn_sub_limit=$(echo "$syn_quota" | jq -r '.sub.limit // 0')
+    syn_sub_reset_ms=$(echo "$syn_quota" | jq -r '.sub.reset_remaining_ms // 0')
+    syn_sub_display="${COLOR_MAGENTA}${syn_sub_used}${COLOR_RESET}${COLOR_MAUVE}/${syn_sub_limit} $(format_ms "$syn_sub_reset_ms")${COLOR_RESET}"
 
-    syn_free_requests=$(echo "$syn_quota" | jq -r '.freeToolCalls.requests // 0')
-    syn_free_limit=$(echo "$syn_quota" | jq -r '.freeToolCalls.limit // 0')
-    syn_free_renews_ms=$(echo "$syn_quota" | jq -r '.freeToolCalls.renews_remaining_ms // 0')
-    syn_free_display="${COLOR_MAGENTA}${syn_free_requests}${COLOR_RESET}${COLOR_MAUVE}/${syn_free_limit} $(format_ms "$syn_free_renews_ms")${COLOR_RESET}"
+    syn_tc_used=$(echo "$syn_quota" | jq -r '.tool_calls.used // 0')
+    syn_tc_limit=$(echo "$syn_quota" | jq -r '.tool_calls.limit // 0')
+    syn_tc_reset_ms=$(echo "$syn_quota" | jq -r '.tool_calls.reset_remaining_ms // 0')
+    syn_tc_display="${COLOR_MAGENTA}${syn_tc_used}${COLOR_RESET}${COLOR_MAUVE}/${syn_tc_limit} $(format_ms "$syn_tc_reset_ms")${COLOR_RESET}"
 
-    syn_quota_display="${syn_sub_display} ${syn_free_display}"
+    syn_quota_display="${syn_sub_display} ${syn_tc_display}"
   fi
 
   # glm quota (only for ZAI/ZHIPU)
@@ -111,15 +113,25 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   glm_quota_display=""
   if echo "$glm_quota" | jq -e . >/dev/null 2>&1; then
     glm_tokens_display=$(
-      echo "$glm_quota" | jq -r '.tokens[] | "\(.percentage) \(.renews_remaining_ms)"' |
+      echo "$glm_quota" | jq -r '.tokens[] | "\(.used_pct) \(.reset_remaining_ms)"' |
         while read -r pct ms; do
           printf '%s%s%%%s%s/%s%s ' \
             "$COLOR_ORANGE" "$pct" "$COLOR_RESET" \
             "$COLOR_BRONZE" "$(format_ms "$ms")" "$COLOR_RESET"
         done | xargs
     )
-    glm_mcp=$(echo "$glm_quota" | jq -r '.mcp.percentage // 0')
+    glm_mcp=$(echo "$glm_quota" | jq -r '.mcp.used_pct // 0')
     glm_quota_display=$([ -n "$glm_tokens_display" ] && echo "$glm_tokens_display${glm_mcp:+ ${COLOR_YELLOW}${glm_mcp}%${COLOR_RESET}}")
+  fi
+
+  # copilot premium quota
+  copilot_quota=$("$HOME/.claude/statusline/get-copilot-quota.sh")
+  copilot_quota_display=""
+  if echo "$copilot_quota" | jq -e . >/dev/null 2>&1; then
+    copilot_used=$(echo "$copilot_quota" | jq -r '.used // 0')
+    copilot_limit=$(echo "$copilot_quota" | jq -r '.limit // 0')
+    copilot_reset_ms=$(echo "$copilot_quota" | jq -r '.reset_remaining_ms // 0')
+    copilot_quota_display="${COLOR_CERULEAN}${copilot_used}${COLOR_RESET}${COLOR_STEEL}/${copilot_limit} $(format_ms "$copilot_reset_ms")${COLOR_RESET}"
   fi
 
   # version
@@ -143,15 +155,23 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
     changes_display=$(STARSHIP_CONFIG="$HOME/.config/starship-statusline.toml" STARSHIP_SHELL="" starship prompt | tr -d '\n')
   fi
 
+  # GSD update available?
+  # https://github.com/gsd-build/get-shit-done/blob/2eaed7a8475839958f9ec76ca4c26d9a0bbfc33f/hooks/gsd-statusline.js#L107-L111
+  gsd_update_display=""
+  if [ -f ".claude/hooks/gsd-statusline.js" ] && echo "$input" | node .claude/hooks/gsd-statusline.js 2>/dev/null | grep -q "/gsd:update"; then
+    gsd_update_display="${COLOR_YELLOW}/gsd:update${COLOR_RESET}"
+  fi
+
   # empty segments are skipped by xargs
   printf '%s\n' \
+    "$gsd_update_display" \
     "$vim_mode_display" \
     "$model_display" \
     "$total_tokens_display" \
     "$context_percentage_display" \
-    "$session_cost_display" \
     "$syn_quota_display" \
     "$glm_quota_display" \
+    "$copilot_quota_display" \
     "$version_display" \
     "$session_duration_display" \
     "$changes_display" | xargs

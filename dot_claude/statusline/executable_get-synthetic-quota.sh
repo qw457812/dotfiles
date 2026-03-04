@@ -24,9 +24,9 @@ synthetic_quota=$(curl -s "https://api.synthetic.new/v2/quotas" \
   -H "Content-Type: application/json" 2>/dev/null |
   jq '
   def format_quota: {
-    requests: (.requests // 0),
+    used: (.requests // 0),
     limit: (.limit // 0),
-    renews_remaining_ms: (
+    reset_remaining_ms: (
       (.renewsAt // "") |
       sub("\\.[0-9]+"; "") |
       sub("\\+00:00$"; "Z") |
@@ -39,10 +39,10 @@ synthetic_quota=$(curl -s "https://api.synthetic.new/v2/quotas" \
   };
 
   {
-    subscription: (.subscription | format_quota),
-    freeToolCalls: (.freeToolCalls | format_quota)
+    sub: (.subscription | format_quota),
+    tool_calls: (.freeToolCalls | format_quota)
   }' 2>/dev/null)
 
-echo "$synthetic_quota" | jq -e '.subscription.requests' >/dev/null 2>&1 || exit 0
+echo "$synthetic_quota" | jq -e '.sub.used' >/dev/null 2>&1 || exit 0
 
 cache_set "$cache_file" "$synthetic_quota"
