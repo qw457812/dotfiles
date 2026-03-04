@@ -3,5 +3,6 @@ function claude_openrouter --wraps=claude
     set -lx ANTHROPIC_BASE_URL https://openrouter.ai/api
     set -lx ANTHROPIC_AUTH_TOKEN $CC_OPENROUTER_API_KEY
     set -lx ANTHROPIC_API_KEY ""
+    set -lx CLAUDE_CODE_TMPDIR (test -n "$TERMUX_VERSION" && printf %s "$TMPDIR")
     command claude $argv
 end

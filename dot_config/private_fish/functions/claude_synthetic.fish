@@ -11,5 +11,7 @@ function claude_synthetic --wraps=claude
     set -lx CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING 1
     set -lx MAX_THINKING_TOKENS 31999
 
+    # https://github.com/anthropics/claude-code/issues/18342#issuecomment-3936122160
+    set -lx CLAUDE_CODE_TMPDIR (test -n "$TERMUX_VERSION" && printf %s "$TMPDIR")
     command claude $argv
 end

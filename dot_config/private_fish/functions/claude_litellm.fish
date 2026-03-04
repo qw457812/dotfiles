@@ -7,5 +7,6 @@ function claude_litellm --wraps=claude
     set -lx CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING 1
     set -lx MAX_THINKING_TOKENS 31999
 
+    set -lx CLAUDE_CODE_TMPDIR (test -n "$TERMUX_VERSION" && printf %s "$TMPDIR")
     command claude $argv
 end

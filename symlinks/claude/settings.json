@@ -81,7 +81,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "[ \"$(uname -s)\" = \"Darwin\" ] && osascript -e 'display notification \"Claude Code needs your attention\" with title \"Claude Code\"'"
+            "command": "if [ \"$(uname -s)\" = \"Darwin\" ]; then osascript -e 'display notification \"Claude Code needs your attention\" with title \"Claude Code\"'; elif command -v termux-toast >/dev/null 2>&1; then termux-toast \"Claude Code needs your attention\"; fi"
           }
         ]
       }

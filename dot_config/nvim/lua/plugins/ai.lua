@@ -301,6 +301,7 @@ return {
               __AI_AGENT = "claude",
               __IS_CLAUDECODE_NVIM = "1", -- flag to disable claude code statusline in ~/.claude/settings.json
               NVIM_FLATTEN_NEST = "1", -- allow ctrl-g to edit prompt in nvim" to be nested for flatten.nvim
+              CLAUDE_CODE_TMPDIR = vim.g.user_is_termux and vim.env.TMPDIR or "", -- https://github.com/anthropics/claude-code/issues/18342#issuecomment-3936122160
             },
             keys = {
               blur_t = false, -- claude code uses <c-o> for its own functionality

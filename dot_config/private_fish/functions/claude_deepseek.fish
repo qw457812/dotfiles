@@ -5,5 +5,6 @@ function claude_deepseek --wraps=claude
     set -lx API_TIMEOUT_MS 600000
     set -lx ANTHROPIC_MODEL deepseek-chat
     set -lx ANTHROPIC_SMALL_FAST_MODEL deepseek-chat
+    set -lx CLAUDE_CODE_TMPDIR (test -n "$TERMUX_VERSION" && printf %s "$TMPDIR")
     command claude $argv
 end

@@ -8,6 +8,7 @@ function claude_kimi --wraps=claude
     set -lx ANTHROPIC_DEFAULT_SONNET_MODEL kimi-k2-thinking-turbo
     set -lx ANTHROPIC_DEFAULT_HAIKU_MODEL kimi-k2-thinking-turbo
     set -lx CLAUDE_CODE_SUBAGENT_MODEL kimi-k2-thinking-turbo
+    set -lx CLAUDE_CODE_TMPDIR (test -n "$TERMUX_VERSION" && printf %s "$TMPDIR")
     command claude $argv
 end
 
@@ -15,5 +16,6 @@ end
 # function claude_kimi --wraps=claude
 #     set -lx ANTHROPIC_BASE_URL https://api.kimi.com/coding/
 #     set -lx ANTHROPIC_AUTH_TOKEN $KIMI_API_KEY
+#     set -lx CLAUDE_CODE_TMPDIR (test -n "$TERMUX_VERSION" && printf %s "$TMPDIR")
 #     command claude $argv
 # end
