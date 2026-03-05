@@ -327,6 +327,7 @@ end
 # end
 abbr tokscale "bunx tokscale@latest --light --today"
 alias synthetic_quota 'curl -s https://api.synthetic.new/v2/quotas -H "Authorization: Bearer $SYNTHETIC_API_KEY" | jq .'
+alias synthetic_models 'curl -s https://api.synthetic.new/openai/v1/models -H "Authorization: Bearer $SYNTHETIC_API_KEY" | jq \'.data[] | select(.provider == "synthetic")\''
 
 # Other
 abbr b "cd -"

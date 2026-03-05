@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.55.3",
+  "lastChangelogVersion": "0.56.1",
   "defaultProvider": "synthetic",
   "defaultModel": "hf:moonshotai/Kimi-K2.5",
   "defaultThinkingLevel": "medium",
@@ -7,7 +7,6 @@
   "quietStartup": true,
   "enabledModels": [
     "synthetic/hf:moonshotai/Kimi-K2.5",
-    "synthetic/hf:nvidia/Kimi-K2.5-NVFP4",
     "synthetic/hf:MiniMaxAI/MiniMax-M2.5",
     "zai/glm-5",
     "zai/glm-4.7"

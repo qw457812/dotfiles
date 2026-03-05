@@ -106,7 +106,7 @@
       "variant": "high"
     },
     "writing": {
-      "model": "synthetic/hf:nvidia/Kimi-K2.5-NVFP4"
+      "model": "synthetic/hf:moonshotai/Kimi-K2.5"
       // "model": "google/antigravity-gemini-3-flash"
     }
   }
