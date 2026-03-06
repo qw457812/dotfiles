@@ -644,6 +644,7 @@ glide.autocmds.create("UrlEnter", { hostname: "openrouter.ai" }, async () => {
     ",a",
     go_to("https://openrouter.ai/activity"),
   );
+  glide.buf.keymaps.set("normal", ",l", go_to("https://openrouter.ai/logs"));
   glide.buf.keymaps.set("normal", ",m", go_to("https://openrouter.ai/models"));
   glide.buf.keymaps.set(
     "normal",

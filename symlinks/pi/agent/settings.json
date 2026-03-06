@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.56.1",
+  "lastChangelogVersion": "0.56.2",
   "defaultProvider": "synthetic",
   "defaultModel": "hf:moonshotai/Kimi-K2.5",
   "defaultThinkingLevel": "medium",
@@ -10,5 +10,8 @@
     "synthetic/hf:MiniMaxAI/MiniMax-M2.5",
     "zai/glm-5",
     "zai/glm-4.7"
+  ],
+  "packages": [
+    "npm:pi-vim"
   ]
 }

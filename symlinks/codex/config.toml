@@ -1,15 +1,18 @@
 # https://github.com/openai/codex/blob/main/docs/config.md
 
-model_provider = "openrouter"
-model = "openai/gpt-5.3-codex"
-# model_reasoning_effort = "high"
+# # https://openrouter.ai/docs/guides/guides/codex-cli
+# model_provider = "openrouter"
+# model = "openai/gpt-5.4"
+
+model = "gpt-5.4"
+
+model_reasoning_effort = "high"
 approval_policy = "on-request"
 personality = "pragmatic"
 
 [model_providers.openrouter]
 name = "OpenRouter"
 base_url = "https://openrouter.ai/api/v1"
-wire_api = "responses"
 env_key = "CODEX_OPENROUTER_API_KEY"
 
 [mcp_servers.context7]
@@ -18,4 +21,4 @@ command = "npx"
 enabled = false
 
 [tui]
-status_line = ["model-with-reasoning", "context-used"]
+status_line = ["model-with-reasoning", "total-input-tokens", "total-output-tokens", "used-tokens", "context-used", "five-hour-limit", "weekly-limit", "codex-version"]
