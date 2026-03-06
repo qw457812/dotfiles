@@ -45,6 +45,7 @@ return {
       local tools = {
         ["<leader>ac"] = "claude",
         ["<leader>ao"] = "opencode",
+        ["<leader>ax"] = "codex",
         ["<leader>ag"] = "claude_glm",
       }
       for key, tool in pairs(tools) do
@@ -103,6 +104,7 @@ return {
 
       numbered_tools({ name = "claude" })
       numbered_tools({ name = "opencode" })
+      numbered_tools({ name = "codex" })
       numbered_tools({
         name = "claude_glm",
         base_tool = "claude",
@@ -149,8 +151,8 @@ return {
           desc = "Prompt (Sidekick)",
         },
         { "<leader>af", function() require("sidekick.cli").send({ msg = "{file}", filter = filter }) end, desc = "File (Sidekick)" },
-        { "<leader>ax", function() U.ai.sidekick.cli.quick.show("codex") end, desc = "Codex" },
-        { "<leader>ax", function() U.ai.sidekick.cli.quick.send("codex", { msg = "{this}" }) end, mode = "x", desc = "Codex" },
+        { "<leader>ai", function() U.ai.sidekick.cli.quick.show("pi") end, desc = "Pi" },
+        { "<leader>ai", function() U.ai.sidekick.cli.quick.send("pi", { msg = "{this}" }) end, mode = "x", desc = "Pi" },
       })
     end,
     ---@module "sidekick"
@@ -761,6 +763,13 @@ return {
     end,
   },
 
+  {
+    "badlogic/pi-mono",
+    enabled = not vim.g.user_is_termux,
+    version = "*",
+    lazy = true,
+    config = function() end,
+  },
   {
     "anomalyco/opencode",
     enabled = not vim.g.user_is_termux,
