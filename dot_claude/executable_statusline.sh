@@ -124,15 +124,15 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
     glm_quota_display=$([ -n "$glm_tokens_display" ] && echo "$glm_tokens_display${glm_mcp:+ ${COLOR_YELLOW}${glm_mcp}%${COLOR_RESET}}")
   fi
 
-  # copilot premium quota
-  copilot_quota=$("$HOME/.claude/statusline/get-copilot-quota.sh")
-  copilot_quota_display=""
-  if echo "$copilot_quota" | jq -e . >/dev/null 2>&1; then
-    copilot_used=$(echo "$copilot_quota" | jq -r '.used // 0')
-    copilot_limit=$(echo "$copilot_quota" | jq -r '.limit // 0')
-    copilot_reset_ms=$(echo "$copilot_quota" | jq -r '.reset_remaining_ms // 0')
-    copilot_quota_display="${COLOR_CERULEAN}${copilot_used}${COLOR_RESET}${COLOR_STEEL}/${copilot_limit} $(format_ms "$copilot_reset_ms")${COLOR_RESET}"
-  fi
+  # # copilot premium quota
+  # copilot_quota=$("$HOME/.claude/statusline/get-copilot-quota.sh")
+  # copilot_quota_display=""
+  # if echo "$copilot_quota" | jq -e . >/dev/null 2>&1; then
+  #   copilot_used=$(echo "$copilot_quota" | jq -r '.used // 0')
+  #   copilot_limit=$(echo "$copilot_quota" | jq -r '.limit // 0')
+  #   copilot_reset_ms=$(echo "$copilot_quota" | jq -r '.reset_remaining_ms // 0')
+  #   copilot_quota_display="${COLOR_CERULEAN}${copilot_used}${COLOR_RESET}${COLOR_STEEL}/${copilot_limit} $(format_ms "$copilot_reset_ms")${COLOR_RESET}"
+  # fi
 
   # version
   version=$(echo "$input" | jq -r '.version // ""')
@@ -171,7 +171,6 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
     "$context_percentage_display" \
     "$syn_quota_display" \
     "$glm_quota_display" \
-    "$copilot_quota_display" \
     "$version_display" \
     "$session_duration_display" \
     "$changes_display" | xargs
