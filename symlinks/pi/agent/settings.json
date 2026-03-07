@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.56.3",
+  "lastChangelogVersion": "0.57.0",
   "defaultProvider": "synthetic",
   "defaultModel": "hf:moonshotai/Kimi-K2.5",
   "defaultThinkingLevel": "medium",

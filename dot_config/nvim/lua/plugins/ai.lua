@@ -765,7 +765,6 @@ return {
 
   {
     "badlogic/pi-mono",
-    enabled = not vim.g.user_is_termux,
     version = "*",
     lazy = true,
     config = function() end,

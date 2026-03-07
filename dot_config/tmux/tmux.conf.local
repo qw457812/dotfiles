@@ -433,6 +433,10 @@ unbind C-a
 set -g default-shell fish
 set -g default-command fish
 
+# https://github.com/badlogic/pi-mono/commit/bdf482cefce24c534a13d7bf647dc69b67b6fbfc
+set -g extended-keys on
+set -g extended-keys-format csi-u
+
 # -- my bindings ---------------------------------------------------------------
 # window navigation
 bind -r p previous-window # select previous window
