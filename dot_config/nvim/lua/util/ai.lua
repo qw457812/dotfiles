@@ -24,10 +24,6 @@ M.claude = {
         ANTHROPIC_BASE_URL = "http://localhost:4000",
         ANTHROPIC_AUTH_TOKEN = vim.env.LITELLM_MASTER_KEY,
 
-        -- Fix Synthetic API Error for Claude Code 2.1.63
-        CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING = "1",
-        MAX_THINKING_TOKENS = "31999",
-
         SYNTHETIC_API_KEY = vim.env.SYNTHETIC_API_KEY, -- for ~/.claude/statusline/get-synthetic-quota.sh
         ZAI_API_KEY = vim.env.ZAI_API_KEY, -- for ~/.claude/statusline/get-glm-quota.sh
       },
@@ -45,10 +41,6 @@ M.claude = {
         ANTHROPIC_DEFAULT_OPUS_MODEL = "hf:moonshotai/Kimi-K2.5",
         ANTHROPIC_DEFAULT_SONNET_MODEL = "hf:moonshotai/Kimi-K2.5",
         ANTHROPIC_DEFAULT_HAIKU_MODEL = "hf:MiniMaxAI/MiniMax-M2.5",
-
-        -- Fix Synthetic API Error for Claude Code 2.1.63
-        CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING = "1",
-        MAX_THINKING_TOKENS = "31999",
       },
       -- https://z.ai/manage-apikey/subscription
       glm = {
@@ -104,8 +96,6 @@ for _, tier in pairs(M.claude.provider) do
       "CLAUDE_CODE_SUBAGENT_MODEL",
       "ANTHROPIC_MODEL",
       "ANTHROPIC_SMALL_FAST_MODEL",
-      "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING",
-      "MAX_THINKING_TOKENS",
     }) do
       p[k] = p[k] or ""
     end
