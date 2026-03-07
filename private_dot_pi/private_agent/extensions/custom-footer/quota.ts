@@ -3,7 +3,6 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import type { TUI } from "@mariozechner/pi-tui";
 
-// Cache directory for provider quota snapshots.
 const CACHE_DIR = join(homedir(), ".cache", "pi-agent-footer");
 const COPILOT_APPS_PATH = join(
   homedir(),
@@ -11,9 +10,11 @@ const COPILOT_APPS_PATH = join(
   "github-copilot",
   "apps.json",
 );
+
 const MINUTE_MS = 60 * 1000;
 const HOUR_MS = 60 * MINUTE_MS;
 const DAY_MS = 24 * HOUR_MS;
+const RETRY_COOLDOWN_MS = 30 * 1000;
 
 interface SyntheticQuota {
   subscription: {
@@ -52,12 +53,6 @@ interface QuotaProviderSpec<T> {
   formatQuota: (quota: T) => string;
 }
 
-interface QuotaProviderState<T> {
-  cache: CachedValue<T> | null;
-  fetching: boolean;
-  nextRetryAt: number;
-}
-
 interface QuotaProviderRuntime {
   getText(): string | null;
   refresh(tui: TUI): Promise<void>;
@@ -76,16 +71,37 @@ function isCacheFresh<T>(
   cache: CachedValue<T> | null,
   ttlMs: number,
 ): cache is CachedValue<T> {
-  if (!cache) return false;
-  return Date.now() - cache.updatedAt < ttlMs;
+  return cache !== null && Date.now() - cache.updatedAt < ttlMs;
+}
+
+async function readJsonFile<T>(filePath: string): Promise<T | null> {
+  try {
+    const content = await readFile(filePath, "utf-8");
+    return JSON.parse(content) as T;
+  } catch {
+    return null;
+  }
+}
+
+async function fetchJson<T>(url: string, authToken: string): Promise<T | null> {
+  try {
+    const response = await fetch(url, {
+      headers: { Authorization: `Bearer ${authToken}` },
+    });
+    if (!response.ok) {
+      return null;
+    }
+    return (await response.json()) as T;
+  } catch {
+    return null;
+  }
 }
 
 function formatTimeRemaining(targetDate: string): string {
-  const now = Date.now();
-  const target = new Date(targetDate).getTime();
-  const diff = target - now;
-
-  if (diff <= 0) return "0m";
+  const diff = new Date(targetDate).getTime() - Date.now();
+  if (diff <= 0) {
+    return "0m";
+  }
 
   const days = Math.floor(diff / DAY_MS);
   const hours = Math.floor((diff % DAY_MS) / HOUR_MS);
@@ -100,93 +116,13 @@ function formatTimeRemaining(targetDate: string): string {
   return `${minutes}m`;
 }
 
-async function getSyntheticApiKey(): Promise<string | null> {
-  return process.env.SYNTHETIC_API_KEY || null;
-}
-
-async function getCopilotToken(): Promise<string | null> {
-  try {
-    const content = await readFile(COPILOT_APPS_PATH, "utf-8");
-    const apps = JSON.parse(content) as Record<
-      string,
-      { oauth_token?: string }
-    >;
-    // apps.json is an object with host:app keys, values contain oauth_token
-    const app = Object.values(apps).find((a) => a.oauth_token);
-    return app?.oauth_token || null;
-  } catch {
-    return null;
-  }
-}
-
-async function fetchSyntheticQuota(
-  apiKey: string,
-): Promise<SyntheticQuota | null> {
-  try {
-    const response = await fetch("https://api.synthetic.new/v2/quotas", {
-      headers: { Authorization: `Bearer ${apiKey}` },
-    });
-    if (!response.ok) return null;
-    return (await response.json()) as SyntheticQuota;
-  } catch {
-    return null;
-  }
-}
-
-async function fetchCopilotQuota(token: string): Promise<CopilotQuota | null> {
-  try {
-    const response = await fetch(
-      "https://api.github.com/copilot_internal/user",
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      },
-    );
-    if (!response.ok) return null;
-    return (await response.json()) as CopilotQuota;
-  } catch {
-    return null;
-  }
-}
-
-function formatQuotaUsage(
-  used: number,
-  limit: number,
-  renewsAt: string,
-): string {
-  return `${used}/${limit} ${formatTimeRemaining(renewsAt)}`;
-}
-
-function formatSyntheticQuota(quota: SyntheticQuota): string {
-  const sub = quota.subscription;
-  const tool = quota.freeToolCalls;
-  return [
-    formatQuotaUsage(sub.requests, sub.limit, sub.renewsAt),
-    formatQuotaUsage(tool.requests, tool.limit, tool.renewsAt),
-  ].join(" ");
-}
-
-function formatCopilotQuota(quota: CopilotQuota): string {
-  const premium = quota.quota_snapshots.premium_interactions;
-  const used = premium.entitlement - premium.remaining;
-  return formatQuotaUsage(
-    used,
-    premium.entitlement,
-    quota.quota_reset_date_utc,
-  );
-}
-
 function createCacheStore<T>(cacheKey: string): CacheStore<T> {
   const filePath = join(CACHE_DIR, `${cacheKey}.json`);
 
   return {
     async readFresh(ttlMs: number): Promise<CachedValue<T> | null> {
-      try {
-        const content = await readFile(filePath, "utf-8");
-        const cache = JSON.parse(content) as CachedValue<T>;
-        return isCacheFresh(cache, ttlMs) ? cache : null;
-      } catch {
-        return null;
-      }
+      const cached = await readJsonFile<CachedValue<T>>(filePath);
+      return isCacheFresh(cached, ttlMs) ? cached : null;
     },
     async write(value: T): Promise<void> {
       await mkdir(CACHE_DIR, { recursive: true });
@@ -199,107 +135,143 @@ function createCacheStore<T>(cacheKey: string): CacheStore<T> {
   };
 }
 
-function createQuotaProvider<T>(
-  spec: QuotaProviderSpec<T>,
-): QuotaProviderRuntime {
-  const cacheStore = createCacheStore<T>(spec.cacheKey);
-  const state: QuotaProviderState<T> = {
-    cache: null,
-    fetching: false,
-    nextRetryAt: 0,
-  };
+class QuotaProvider<T> implements QuotaProviderRuntime {
+  private readonly cacheStore: CacheStore<T>;
+  private cache: CachedValue<T> | null = null;
+  private fetching = false;
+  private nextRetryAt = 0;
 
-  function scheduleRetry(): void {
-    state.nextRetryAt = Date.now() + spec.retryCooldownMs;
+  constructor(private readonly spec: QuotaProviderSpec<T>) {
+    this.cacheStore = createCacheStore<T>(spec.cacheKey);
   }
 
-  function updateCache(cache: CachedValue<T>): void {
-    state.cache = cache;
-    state.nextRetryAt = 0;
-  }
-
-  async function loadCachedQuota(): Promise<boolean> {
-    const cached = await cacheStore.readFresh(spec.cacheTtlMs);
-    if (!cached) {
-      return false;
+  getText(): string | null {
+    if (!isCacheFresh(this.cache, this.spec.cacheTtlMs)) {
+      return null;
     }
 
-    updateCache(cached);
-    return true;
+    return this.spec.formatQuota(this.cache.value);
   }
 
-  async function fetchAndCacheQuota(): Promise<boolean> {
-    const auth = await spec.readAuth();
+  async refresh(tui: TUI): Promise<void> {
+    if (!this.shouldRefresh()) {
+      return;
+    }
+
+    this.fetching = true;
+    try {
+      const cache = await this.resolveQuota();
+      if (!cache) {
+        return;
+      }
+
+      this.updateCache(cache);
+      tui.requestRender();
+    } finally {
+      this.fetching = false;
+    }
+  }
+
+  private shouldRefresh(): boolean {
+    return (
+      !isCacheFresh(this.cache, this.spec.cacheTtlMs) &&
+      !this.fetching &&
+      Date.now() >= this.nextRetryAt
+    );
+  }
+
+  private updateCache(cache: CachedValue<T>): void {
+    this.cache = cache;
+    this.nextRetryAt = 0;
+  }
+
+  private scheduleRetry(): void {
+    this.nextRetryAt = Date.now() + this.spec.retryCooldownMs;
+  }
+
+  private failRefresh(): null {
+    this.scheduleRetry();
+    return null;
+  }
+
+  private async resolveQuota(): Promise<CachedValue<T> | null> {
+    return (
+      (await this.cacheStore.readFresh(this.spec.cacheTtlMs)) ??
+      (await this.fetchQuota())
+    );
+  }
+
+  private async fetchQuota(): Promise<CachedValue<T> | null> {
+    const auth = await this.spec.readAuth();
     if (!auth) {
-      scheduleRetry();
-      return false;
+      return this.failRefresh();
     }
 
-    const quota = await spec.fetchQuota(auth);
+    const quota = await this.spec.fetchQuota(auth);
     if (!quota) {
-      scheduleRetry();
-      return false;
+      return this.failRefresh();
     }
 
-    updateCache(createCachedValue(quota));
+    const cached = createCachedValue(quota);
 
     try {
-      await cacheStore.write(quota);
+      await this.cacheStore.write(quota);
     } catch {
       // Keep the in-memory value even if the disk cache cannot be updated.
     }
 
-    return true;
+    return cached;
   }
-
-  return {
-    getText() {
-      const cachedQuota = state.cache;
-      if (!isCacheFresh(cachedQuota, spec.cacheTtlMs)) {
-        return null;
-      }
-
-      return spec.formatQuota(cachedQuota.value);
-    },
-    async refresh(tui: TUI): Promise<void> {
-      if (
-        isCacheFresh(state.cache, spec.cacheTtlMs) ||
-        state.fetching ||
-        Date.now() < state.nextRetryAt
-      ) {
-        return;
-      }
-
-      state.fetching = true;
-      try {
-        const didUpdate =
-          (await loadCachedQuota()) || (await fetchAndCacheQuota());
-        if (didUpdate) {
-          tui.requestRender();
-        }
-      } finally {
-        state.fetching = false;
-      }
-    },
-  };
 }
 
 const QUOTA_PROVIDERS: Record<string, QuotaProviderRuntime> = {
-  synthetic: createQuotaProvider({
+  synthetic: new QuotaProvider({
     cacheKey: "synthetic-quota",
     cacheTtlMs: MINUTE_MS,
-    retryCooldownMs: 30 * 1000,
-    readAuth: getSyntheticApiKey,
-    fetchQuota: fetchSyntheticQuota,
-    formatQuota: formatSyntheticQuota,
+    retryCooldownMs: RETRY_COOLDOWN_MS,
+    async readAuth(): Promise<string | null> {
+      return process.env.SYNTHETIC_API_KEY || null;
+    },
+    async fetchQuota(apiKey: string): Promise<SyntheticQuota | null> {
+      return fetchJson<SyntheticQuota>(
+        "https://api.synthetic.new/v2/quotas",
+        apiKey,
+      );
+    },
+    formatQuota(quota: SyntheticQuota): string {
+      return [
+        `${quota.subscription.requests}/${quota.subscription.limit} ${formatTimeRemaining(quota.subscription.renewsAt)}`,
+        `${quota.freeToolCalls.requests}/${quota.freeToolCalls.limit} ${formatTimeRemaining(quota.freeToolCalls.renewsAt)}`,
+      ].join(" ");
+    },
   }),
-  "github-copilot": createQuotaProvider({
+  "github-copilot": new QuotaProvider({
     cacheKey: "github-copilot-quota",
     cacheTtlMs: 3 * MINUTE_MS,
-    retryCooldownMs: 30 * 1000,
-    readAuth: getCopilotToken,
-    fetchQuota: fetchCopilotQuota,
-    formatQuota: formatCopilotQuota,
+    retryCooldownMs: RETRY_COOLDOWN_MS,
+    async readAuth(): Promise<string | null> {
+      const apps =
+        await readJsonFile<Record<string, { oauth_token?: string }>>(
+          COPILOT_APPS_PATH,
+        );
+
+      if (!apps) {
+        return null;
+      }
+
+      const app = Object.values(apps).find(({ oauth_token }) => oauth_token);
+      return app?.oauth_token || null;
+    },
+    async fetchQuota(token: string): Promise<CopilotQuota | null> {
+      return fetchJson<CopilotQuota>(
+        "https://api.github.com/copilot_internal/user",
+        token,
+      );
+    },
+    formatQuota(quota: CopilotQuota): string {
+      const premium = quota.quota_snapshots.premium_interactions;
+      return `${premium.entitlement - premium.remaining}/${premium.entitlement} ${formatTimeRemaining(quota.quota_reset_date_utc)}`;
+    },
   }),
 };
 
@@ -307,11 +279,7 @@ export function getQuotaText(
   provider: string | undefined,
   tui: TUI,
 ): string | null {
-  if (!provider) {
-    return null;
-  }
-
-  const quotaProvider = QUOTA_PROVIDERS[provider];
+  const quotaProvider = provider ? QUOTA_PROVIDERS[provider] : null;
   if (!quotaProvider) {
     return null;
   }

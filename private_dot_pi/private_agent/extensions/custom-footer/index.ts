@@ -11,10 +11,10 @@
  * - Context usage: N% (colored: green/yellow/red based on usage)
  * - Model name, provider (when multi-provider), thinking level
  * - Extension status messages (if any)
- * - Quota info for Synthetic/Copilot providers (when active)
+ * - Quota info for certain providers (when active)
  *
  * Ref:
- * - Original example: https://github.com/badlogic/pi-mono/blob/7b902612e96a8bf49cf6f34345f09a44e5ca6926/packages/coding-agent/examples/extensions/custom-footer.ts
+ * - Example extension: https://github.com/badlogic/pi-mono/blob/7b902612e96a8bf49cf6f34345f09a44e5ca6926/packages/coding-agent/examples/extensions/custom-footer.ts
  * - Default footer: https://github.com/badlogic/pi-mono/blob/3de8c48692ba2fd9f23d9cd0b99299edbe46af80/packages/coding-agent/src/modes/interactive/components/footer.ts
  */
 
