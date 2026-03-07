@@ -10,6 +10,7 @@ const COPILOT_APPS_PATH = join(
   "github-copilot",
   "apps.json",
 );
+const PI_AGENT_AUTH_PATH = join(homedir(), ".pi", "agent", "auth.json");
 
 const MINUTE_MS = 60 * 1000;
 const HOUR_MS = 60 * MINUTE_MS;
@@ -39,6 +40,19 @@ interface CopilotQuota {
   quota_reset_date_utc: string;
 }
 
+interface CodexQuota {
+  rate_limit?: {
+    primary_window?: {
+      used_percent: number;
+      reset_at: number;
+    } | null;
+    secondary_window?: {
+      used_percent: number;
+      reset_at: number;
+    } | null;
+  } | null;
+}
+
 interface CachedValue<T> {
   value: T;
   updatedAt: number;
@@ -50,7 +64,7 @@ interface QuotaProviderSpec<T> {
   retryCooldownMs: number;
   readAuth: () => Promise<string | null>;
   fetchQuota: (auth: string) => Promise<T | null>;
-  formatQuota: (quota: T) => string;
+  formatQuota: (quota: T) => string | null;
 }
 
 interface QuotaProviderRuntime {
@@ -97,8 +111,13 @@ async function fetchJson<T>(url: string, authToken: string): Promise<T | null> {
   }
 }
 
-function formatTimeRemaining(targetDate: string): string {
-  const diff = new Date(targetDate).getTime() - Date.now();
+function formatTimeRemaining(targetDate: string | number): string {
+  const targetTime =
+    typeof targetDate === "number"
+      ? targetDate
+      : new Date(targetDate).getTime();
+  const diff = targetTime - Date.now();
+
   if (diff <= 0) {
     return "0m";
   }
@@ -250,11 +269,11 @@ const QUOTA_PROVIDERS: Record<string, QuotaProviderRuntime> = {
     cacheTtlMs: 3 * MINUTE_MS,
     retryCooldownMs: RETRY_COOLDOWN_MS,
     async readAuth(): Promise<string | null> {
+      // curl -s "https://api.github.com/copilot_internal/user" -H "Authorization: Bearer $(jq -r '.[] | select(.oauth_token) | .oauth_token' ~/.config/github-copilot/apps.json | head -1)"
       const apps =
         await readJsonFile<Record<string, { oauth_token?: string }>>(
           COPILOT_APPS_PATH,
         );
-
       if (!apps) {
         return null;
       }
@@ -271,6 +290,46 @@ const QUOTA_PROVIDERS: Record<string, QuotaProviderRuntime> = {
     formatQuota(quota: CopilotQuota): string {
       const premium = quota.quota_snapshots.premium_interactions;
       return `${premium.entitlement - premium.remaining}/${premium.entitlement} ${formatTimeRemaining(quota.quota_reset_date_utc)}`;
+    },
+  }),
+  "openai-codex": new QuotaProvider({
+    cacheKey: "openai-codex-quota",
+    cacheTtlMs: MINUTE_MS,
+    retryCooldownMs: RETRY_COOLDOWN_MS,
+    async readAuth(): Promise<string | null> {
+      // curl -s -H "Authorization: Bearer $(cat ~/.codex/auth.json | jq -r '.tokens.access_token')" "https://chatgpt.com/backend-api/wham/usage" | jq .
+      const auth =
+        await readJsonFile<Record<string, { access?: string }>>(
+          PI_AGENT_AUTH_PATH,
+        );
+      return auth?.["openai-codex"]?.access || null;
+    },
+    async fetchQuota(token: string): Promise<CodexQuota | null> {
+      return fetchJson<CodexQuota>(
+        "https://chatgpt.com/backend-api/wham/usage",
+        token,
+      );
+    },
+    formatQuota(quota: CodexQuota): string | null {
+      const rateLimit = quota.rate_limit;
+      if (!rateLimit) {
+        return null;
+      }
+
+      const primary = rateLimit.primary_window;
+      const secondary = rateLimit.secondary_window;
+      const parts: string[] = [];
+      if (primary) {
+        parts.push(
+          `${primary.used_percent}% ${formatTimeRemaining(primary.reset_at * 1000)}`,
+        );
+      }
+      if (secondary) {
+        parts.push(
+          `${secondary.used_percent}% ${formatTimeRemaining(secondary.reset_at * 1000)}`,
+        );
+      }
+      return parts.length > 0 ? parts.join(" ") : null;
     },
   }),
 };
