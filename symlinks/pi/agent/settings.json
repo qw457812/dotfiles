@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.56.2",
+  "lastChangelogVersion": "0.56.3",
   "defaultProvider": "synthetic",
   "defaultModel": "hf:moonshotai/Kimi-K2.5",
   "defaultThinkingLevel": "medium",
@@ -7,9 +7,9 @@
   "quietStartup": true,
   "enabledModels": [
     "synthetic/hf:moonshotai/Kimi-K2.5",
-    "synthetic/hf:MiniMaxAI/MiniMax-M2.5",
     "zai/glm-5",
-    "zai/glm-4.7"
+    "openai-codex/gpt-5.4",
+    "github-copilot/claude-opus-4.6"
   ],
   "packages": [
     "npm:pi-vim"

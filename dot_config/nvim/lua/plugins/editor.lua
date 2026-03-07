@@ -857,7 +857,9 @@ return {
           }, ---@type lsp.FoldingRangeKind[]
         },
         foldtext = {
-          padding = 2,
+          padding = {
+            width = 2,
+          },
           lineCount = {
             template = "󰘖 %d",
           },

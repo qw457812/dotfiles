@@ -22,4 +22,7 @@ command = "npx"
 enabled = false
 
 [tui]
-status_line = ["model-with-reasoning", "total-input-tokens", "total-output-tokens", "used-tokens", "context-used", "five-hour-limit", "weekly-limit", "codex-version"]
+status_line = ["model-with-reasoning", "total-input-tokens", "total-output-tokens", "context-used", "five-hour-limit", "weekly-limit", "codex-version"]
+
+[features]
+prevent_idle_sleep = true

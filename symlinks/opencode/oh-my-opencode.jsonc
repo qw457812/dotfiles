@@ -19,81 +19,71 @@
   },
   "background_task": {
     "modelConcurrency": {
-      "google/antigravity-claude-opus-4-6-thinking": 3,
       "github-copilot/claude-opus-4.6": 3
     }
   },
   // "tmux": {
   //   "enabled": true
   // },
-  // https://github.com/code-yeongyu/oh-my-opencode/blob/64825158a732467fc7310bfc976c6733b227931b/src/shared/model-requirements.ts
+  // https://github.com/code-yeongyu/oh-my-opencode/blob/7718969317e89e1c390d057d5a35b53b28079bae/src/shared/model-requirements.ts
   "agents": {
     "sisyphus": {
-      // "model": "github-copilot/claude-opus-4.6",
-      // "variant": "thinking"
-      "model": "synthetic/hf:moonshotai/Kimi-K2.5"
       // "model": "zai-coding-plan/glm-5"
+      "model": "synthetic/hf:moonshotai/Kimi-K2.5"
     },
     "hephaestus": {
-      "model": "github-copilot/gpt-5.2-codex",
+      "model": "openai/gpt-5.3-codex",
       "variant": "medium"
     },
     "atlas": {
+      // "model": "openai/gpt-5.4"
       "model": "synthetic/hf:moonshotai/Kimi-K2.5"
-      // "model": "github-copilot/claude-sonnet-4.6"
     },
     "prometheus": {
-      // "model": "github-copilot/claude-opus-4.6",
-      // "variant": "thinking"
-      "model": "synthetic/hf:moonshotai/Kimi-K2.5"
-      // "model": "github-copilot/gpt-5.2"
+      "model": "openai/gpt-5.4",
+      "variant": "high"
     },
     "metis": {
-      // "model": "github-copilot/claude-opus-4.6",
-      // "variant": "thinking"
-      "model": "synthetic/hf:moonshotai/Kimi-K2.5"
-      // "model": "github-copilot/gpt-5.2"
+      "model": "openai/gpt-5.4",
+      "variant": "high"
     },
     "momus": {
-      "model": "github-copilot/gpt-5.2",
-      "variant": "medium"
-    },
-    "sisyphus-junior": {
-      "model": "zai-coding-plan/glm-5"
+      "model": "openai/gpt-5.4",
+      "variant": "xhigh"
     },
     "oracle": {
-      "model": "github-copilot/gpt-5.2",
+      "model": "openai/gpt-5.4",
       "variant": "high"
     },
     "librarian": {
       "model": "zai-coding-plan/glm-4.7"
     },
     "explore": {
-      // "model": "github-copilot/grok-code-fast-1"
       // "model": "github-copilot/gpt-5-mini"
       "model": "google/antigravity-gemini-3-flash"
     },
     "multimodal-looker": {
-      "model": "google/antigravity-gemini-3-flash"
+      "model": "openai/gpt-5.3-codex"
     }
   },
   "categories": {
     "visual-engineering": {
-      // "model": "google/antigravity-gemini-3.1-pro"
-      "model": "zai-coding-plan/glm-5"
+      "model": "google/antigravity-gemini-3.1-pro",
+      "variant": "high"
+      // "model": "zai-coding-plan/glm-5"
     },
     "ultrabrain": {
-      "model": "github-copilot/gpt-5.2-codex",
+      "model": "openai/gpt-5.3-codex",
       "variant": "xhigh"
     },
     "deep": {
-      "model": "github-copilot/gpt-5.2-codex",
+      "model": "openai/gpt-5.3-codex",
       "variant": "medium"
     },
     "artistry": {
-      // "model": "google/antigravity-gemini-3.1-pro",
-      // "variant": "high"
-      "model": "synthetic/hf:moonshotai/Kimi-K2.5"
+      "model": "google/antigravity-gemini-3.1-pro",
+      "variant": "high"
+      // "model": "openai/gpt-5.4"
     },
     "quick": {
       "model": "google/antigravity-gemini-3-flash"
@@ -102,12 +92,12 @@
       "model": "zai-coding-plan/glm-5"
     },
     "unspecified-high": {
-      "model": "github-copilot/gpt-5.2",
+      "model": "openai/gpt-5.4",
       "variant": "high"
     },
     "writing": {
-      "model": "synthetic/hf:moonshotai/Kimi-K2.5"
       // "model": "google/antigravity-gemini-3-flash"
+      "model": "synthetic/hf:moonshotai/Kimi-K2.5"
     }
   }
 }
