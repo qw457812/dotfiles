@@ -53,6 +53,16 @@ interface CodexQuota {
   } | null;
 }
 
+interface ZaiQuota {
+  data: {
+    limits: Array<{
+      type: "TOKENS_LIMIT" | "TIME_LIMIT";
+      percentage: number;
+      nextResetTime: number;
+    }>;
+  };
+}
+
 interface CachedValue<T> {
   value: T;
   updatedAt: number;
@@ -330,6 +340,32 @@ const QUOTA_PROVIDERS: Record<string, QuotaProviderRuntime> = {
         );
       }
       return parts.length > 0 ? parts.join(" ") : null;
+    },
+  }),
+  zai: new QuotaProvider({
+    cacheKey: "zai-quota",
+    cacheTtlMs: 3 * MINUTE_MS,
+    retryCooldownMs: RETRY_COOLDOWN_MS,
+    async readAuth(): Promise<string | null> {
+      return process.env.ZAI_API_KEY || null;
+    },
+    async fetchQuota(apiKey: string): Promise<ZaiQuota | null> {
+      return fetchJson<ZaiQuota>(
+        "https://api.z.ai/api/monitor/usage/quota/limit",
+        apiKey,
+      );
+    },
+    formatQuota(quota: ZaiQuota): string {
+      const tokens: string[] = [];
+      const mcp: string[] = [];
+      for (const limit of quota.data.limits) {
+        if (limit.type === "TOKENS_LIMIT") {
+          tokens.push(`${limit.percentage}%/${formatTimeRemaining(limit.nextResetTime)}`);
+        } else if (limit.type === "TIME_LIMIT") {
+          mcp.push(`${limit.percentage}%`);
+        }
+      }
+      return [...tokens, ...mcp].join(" ");
     },
   }),
 };
