@@ -8,12 +8,10 @@
   ],
   "share": "manual",
   // "autoupdate": "notify",
-  // "model": "zai-coding-plan/glm-5",
   "model": "synthetic/hf:moonshotai/Kimi-K2.5",
   "small_model": "github-copilot/gpt-5-mini",
   "agent": {
     "plan": {
-      // "model": "zai-coding-plan/glm-5"
       "model": "synthetic/hf:moonshotai/Kimi-K2.5"
     }
   },

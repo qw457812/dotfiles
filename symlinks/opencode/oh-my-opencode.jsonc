@@ -28,11 +28,10 @@
   // https://github.com/code-yeongyu/oh-my-opencode/blob/7718969317e89e1c390d057d5a35b53b28079bae/src/shared/model-requirements.ts
   "agents": {
     "sisyphus": {
-      // "model": "zai-coding-plan/glm-5"
       "model": "synthetic/hf:moonshotai/Kimi-K2.5"
     },
     "hephaestus": {
-      "model": "openai/gpt-5.3-codex",
+      "model": "openai/gpt-5.4",
       "variant": "medium"
     },
     "atlas": {
@@ -63,7 +62,7 @@
       "model": "google/antigravity-gemini-3-flash"
     },
     "multimodal-looker": {
-      "model": "openai/gpt-5.3-codex"
+      "model": "openai/gpt-5.4"
     }
   },
   "categories": {
@@ -73,17 +72,16 @@
       // "model": "zai-coding-plan/glm-5"
     },
     "ultrabrain": {
-      "model": "openai/gpt-5.3-codex",
+      "model": "openai/gpt-5.4",
       "variant": "xhigh"
     },
     "deep": {
-      "model": "openai/gpt-5.3-codex",
+      "model": "openai/gpt-5.4",
       "variant": "medium"
     },
     "artistry": {
       "model": "google/antigravity-gemini-3.1-pro",
       "variant": "high"
-      // "model": "openai/gpt-5.4"
     },
     "quick": {
       "model": "google/antigravity-gemini-3-flash"
@@ -96,8 +94,7 @@
       "variant": "high"
     },
     "writing": {
-      // "model": "google/antigravity-gemini-3-flash"
-      "model": "synthetic/hf:moonshotai/Kimi-K2.5"
+      "model": "google/antigravity-gemini-3-flash"
     }
   }
 }

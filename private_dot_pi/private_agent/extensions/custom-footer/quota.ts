@@ -4,12 +4,6 @@ import { join } from "node:path";
 import type { TUI } from "@mariozechner/pi-tui";
 
 const CACHE_DIR = join(homedir(), ".cache", "pi-agent-footer");
-const COPILOT_APPS_PATH = join(
-  homedir(),
-  ".config",
-  "github-copilot",
-  "apps.json",
-);
 const PI_AGENT_AUTH_PATH = join(homedir(), ".pi", "agent", "auth.json");
 
 const MINUTE_MS = 60 * 1000;
@@ -58,7 +52,7 @@ interface ZaiQuota {
     limits: Array<{
       type: "TOKENS_LIMIT" | "TIME_LIMIT";
       percentage: number;
-      nextResetTime: number;
+      nextResetTime?: number;
     }>;
   };
 }
@@ -280,16 +274,11 @@ const QUOTA_PROVIDERS: Record<string, QuotaProviderRuntime> = {
     retryCooldownMs: RETRY_COOLDOWN_MS,
     async readAuth(): Promise<string | null> {
       // curl -s "https://api.github.com/copilot_internal/user" -H "Authorization: Bearer $(jq -r '.[] | select(.oauth_token) | .oauth_token' ~/.config/github-copilot/apps.json | head -1)"
-      const apps =
-        await readJsonFile<Record<string, { oauth_token?: string }>>(
-          COPILOT_APPS_PATH,
+      const auth =
+        await readJsonFile<Record<string, { refresh?: string }>>(
+          PI_AGENT_AUTH_PATH,
         );
-      if (!apps) {
-        return null;
-      }
-
-      const app = Object.values(apps).find(({ oauth_token }) => oauth_token);
-      return app?.oauth_token || null;
+      return auth?.["github-copilot"]?.refresh || null;
     },
     async fetchQuota(token: string): Promise<CopilotQuota | null> {
       return fetchJson<CopilotQuota>(
@@ -360,7 +349,11 @@ const QUOTA_PROVIDERS: Record<string, QuotaProviderRuntime> = {
       const mcp: string[] = [];
       for (const limit of quota.data.limits) {
         if (limit.type === "TOKENS_LIMIT") {
-          tokens.push(`${limit.percentage}%/${formatTimeRemaining(limit.nextResetTime)}`);
+          tokens.push(
+            limit.nextResetTime
+              ? `${limit.percentage}%/${formatTimeRemaining(limit.nextResetTime)}`
+              : `${limit.percentage}%`,
+          );
         } else if (limit.type === "TIME_LIMIT") {
           mcp.push(`${limit.percentage}%`);
         }
