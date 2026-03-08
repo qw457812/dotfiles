@@ -637,12 +637,12 @@ const showActionSelector = async (
 	options: { canQuickLook: boolean; canEdit: boolean; canDiff: boolean },
 ): Promise<"reveal" | "quicklook" | "open" | "edit" | "addToPrompt" | "diff" | null> => {
 	const actions: SelectItem[] = [
-		...(options.canDiff ? [{ value: "diff", label: "Diff in VS Code" }] : []),
+		{ value: "addToPrompt", label: "Add to prompt" },
 		{ value: "reveal", label: "Reveal in Finder" },
 		{ value: "open", label: "Open" },
-		{ value: "addToPrompt", label: "Add to prompt" },
 		...(options.canQuickLook ? [{ value: "quicklook", label: "Open in Quick Look" }] : []),
 		...(options.canEdit ? [{ value: "edit", label: "Edit" }] : []),
+		...(options.canDiff ? [{ value: "diff", label: "Diff in VS Code" }] : []),
 	];
 
 	return ctx.ui.custom<"reveal" | "quicklook" | "open" | "edit" | "addToPrompt" | "diff" | null>((tui, theme, _kb, done) => {

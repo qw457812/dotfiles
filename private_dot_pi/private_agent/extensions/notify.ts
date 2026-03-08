@@ -12,13 +12,29 @@
 
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { Markdown, type MarkdownTheme } from "@mariozechner/pi-tui";
+import { spawn } from "node:child_process";
 
 /**
  * Send a desktop notification via OSC 777 escape sequence.
  */
 const notify = (title: string, body: string): void => {
-	// OSC 777 format: ESC ] 777 ; notify ; title ; body BEL
-	process.stdout.write(`\x1b]777;notify;${title};${body}\x07`);
+	if (process.platform === "darwin") {
+		const script = `on run argv
+set notifTitle to item 1 of argv
+set notifBody to item 2 of argv
+display notification notifBody with title notifTitle
+end run`;
+		const proc = spawn("osascript", ["-e", script, "--", title, body], { stdio: "ignore" });
+		proc.once("error", () => {});
+		proc.unref();
+	} else if (process.env.TERMUX_VERSION) {
+		const proc = spawn("termux-notification", ["-t", title, "-c", body], { stdio: "ignore" });
+		proc.once("error", () => {});
+		proc.unref();
+	} else {
+		// OSC 777 format: ESC ] 777 ; notify ; title ; body BEL
+		process.stdout.write(`\x1b]777;notify;${title};${body}\x07`);
+	}
 };
 
 const isTextPart = (part: unknown): part is { type: "text"; text: string } =>
