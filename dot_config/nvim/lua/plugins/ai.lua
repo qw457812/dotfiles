@@ -768,6 +768,10 @@ return {
     version = "*",
     lazy = true,
     config = function() end,
+    specs = {
+      { "lajarre/pi-vim", lazy = true, config = function() end },
+      { "mitsuhiko/agent-stuff", version = "*", lazy = true, config = function() end },
+    },
   },
   {
     "anomalyco/opencode",
@@ -775,20 +779,22 @@ return {
     version = "*",
     lazy = true,
     config = function() end,
-  },
-  {
-    "code-yeongyu/oh-my-opencode",
-    enabled = not vim.g.user_is_termux,
-    version = "*",
-    lazy = true,
-    config = function() end,
-  },
-  {
-    "NoeFabris/opencode-antigravity-auth",
-    enabled = not vim.g.user_is_termux,
-    version = "*",
-    lazy = true,
-    config = function() end,
+    specs = {
+      {
+        "code-yeongyu/oh-my-opencode",
+        enabled = not vim.g.user_is_termux,
+        version = "*",
+        lazy = true,
+        config = function() end,
+      },
+      {
+        "NoeFabris/opencode-antigravity-auth",
+        enabled = not vim.g.user_is_termux,
+        version = "*",
+        lazy = true,
+        config = function() end,
+      },
+    },
   },
 
   -- ===========================================================================
