@@ -18,7 +18,7 @@
   "prettier": "3.8.1",
   "pyright": "1.1.408",
   "shellcheck": "v0.11.0",
-  "shfmt": "v3.12.0",
+  "shfmt": "v3.13.0",
   "sqlfluff": "4.0.4",
   "taplo": "0.10.0",
   "tree-sitter-cli": "v0.26.6",

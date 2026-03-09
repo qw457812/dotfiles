@@ -4,7 +4,7 @@ function claude_temp --wraps=claude
     cd $tmpdir
     # echo "" >CLAUDE.md
     set -lx CLAUDE_CODE_TMPDIR (test -n "$TERMUX_VERSION" && printf %s "$TMPDIR")
-    set -lx CLAUDE_CODE_SIMPLE 1
+    # set -lx CLAUDE_CODE_SIMPLE 1
     claude $argv
     cd $orig_pwd
     rm -r $tmpdir

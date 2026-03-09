@@ -34,6 +34,7 @@ return {
             { pattern = "sidekick", icon = " ", color = "green" },
             { pattern = "codex", icon = icons.OpenAI, color = "grey" },
             { pattern = "opencode", icon = "󰰕 ", color = "grey" }, -- 󰫼󰫰 
+            { pattern = "pi", icon = "󰏿 ", color = "grey" },
           } --[[@as wk.IconRule[] ]],
         },
       } --[[@as wk.Opts]])
