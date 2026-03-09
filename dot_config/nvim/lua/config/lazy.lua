@@ -171,6 +171,14 @@ require("lazy").setup({
         end,
         desc = "Plugin GitHub Pull Requests",
       },
+      ["<leader>fy"] = {
+        function(plugin)
+          local path = vim.fn.fnamemodify(plugin.dir, ":p:~")
+          vim.fn.setreg(vim.v.register, path)
+          LazyVim.info(path, { title = "Copied Plugin Path" })
+        end,
+        desc = "Yank Plugin Path",
+      },
       ["gi"] = {
         function(plugin)
           local url = plugin.url:gsub("%.git$", "")

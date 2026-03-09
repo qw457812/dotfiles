@@ -215,6 +215,39 @@ return {
                       end
                     end, { buffer = buf, desc = "Jump to previous user message (Sidekick)" })
                   end)
+                elseif terminal.tool.name:find("codex") then
+                  -- TODO: duplicate code with claude
+                  vim.keymap.set("n", "J", function()
+                    if vim.fn.search("^• ", "W") == 0 then
+                      LazyVim.warn("No more assistant messages", { title = "Sidekick" })
+                    end
+                  end, { buffer = buf, desc = "Jump to next assistant message (Sidekick)" })
+                  vim.keymap.set("n", "K", function()
+                    if vim.fn.search("^• ", "Wb") == 0 then
+                      LazyVim.warn("No more assistant messages", { title = "Sidekick" })
+                    end
+                  end, { buffer = buf, desc = "Jump to previous assistant message (Sidekick)" })
+
+                  vim.schedule(function()
+                    if not vim.api.nvim_buf_is_valid(buf) then
+                      return
+                    end
+
+                    if vim.api.nvim_get_current_buf() == buf then
+                      vim.fn.search("› ", "Wb")
+                    end
+
+                    vim.keymap.set("n", "]]", function()
+                      if vim.fn.search("^› ", "W") == 0 then
+                        LazyVim.warn("No more user messages", { title = "Sidekick" })
+                      end
+                    end, { buffer = buf, desc = "Jump to next user message (Sidekick)" })
+                    vim.keymap.set("n", "[[", function()
+                      if vim.fn.search("^› ", "Wb") == 0 then
+                        LazyVim.warn("No more user messages", { title = "Sidekick" })
+                      end
+                    end, { buffer = buf, desc = "Jump to previous user message (Sidekick)" })
+                  end)
                 end
               end,
             })
@@ -772,6 +805,13 @@ return {
       { "lajarre/pi-vim", lazy = true, config = function() end },
       { "mitsuhiko/agent-stuff", version = "*", lazy = true, config = function() end },
     },
+  },
+  {
+    "openai/codex",
+    enabled = not vim.g.user_is_termux,
+    version = "*",
+    lazy = true,
+    config = function() end,
   },
   {
     "anomalyco/opencode",

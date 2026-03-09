@@ -7,7 +7,7 @@ local LazyViewConfig = require("lazy.view.config")
 
 local map = U.keymap.map
 local safe_map = U.keymap.safe_map
-local del = U.keymap.del
+local unmap = U.keymap.del
 
 -- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/keybindings.lua#L234
 safe_map("n", "<cr>", function() -- sidekick.nvim
@@ -115,7 +115,7 @@ map("c", "<C-k>", "<C-p>", { silent = false, desc = "Prev Command / Completion" 
 
 safe_map("n", "n", "nzv") -- nvim-hlslens
 safe_map("n", "N", "Nzv")
-del({ "x", "o" }, { "n", "N" })
+unmap({ "x", "o" }, { "n", "N" })
 safe_map("n", "gw", "*``", { desc = "Search word under cursor" }) -- nvim-hlslens
 map("n", "cn", "*``cgn", { desc = "Change cword (Search forward)" })
 map("n", "cN", "*``cgN", { desc = "Change cword (Search backward)" })
@@ -167,14 +167,14 @@ map("n", "vo", "<C-w>o", { desc = "Delete Other Windows", remap = true })
 map("n", "<leader>_", "<C-w>v", { desc = "Split Window Right", remap = true })
 
 -- tabs
-del("n", { "<leader><tab>f", "<leader><tab>l", "<leader><tab>]", "<leader><tab>[" })
+unmap("n", { "<leader><tab>f", "<leader><tab>l", "<leader><tab>]", "<leader><tab>[" })
 map("n", "<leader><tab>H", "<cmd>tabfirst<cr>", { desc = "First Tab" })
 map("n", "<leader><tab>L", "<cmd>tablast<cr>", { desc = "Last Tab" })
 map("n", "]<tab>", "<cmd>tabnext<cr>", { desc = "Next Tab" })
 map("n", "[<tab>", "<cmd>tabprevious<cr>", { desc = "Previous Tab" })
 
 -- terminal
-del("t", { "<c-/>", "<c-_>" }) -- undo for fish/claude
+unmap("t", { "<c-/>", "<c-_>" }) -- undo for fish/claude
 
 -- files
 map("n", "<leader>fs", "<cmd>w<cr><esc>", { desc = "Save File" })
@@ -273,7 +273,7 @@ map("n", "<leader>lx", "<cmd>LazyExtras<cr>", { desc = "Extras" })
 map("n", "<leader>lu", Lazy.update, { desc = "Lazy Update" })
 map("n", "<leader>ls", Lazy.sync, { desc = "Lazy Sync" })
 map("n", "<leader>lc", Lazy.check, { desc = "Lazy Check" })
-del("n", "<leader>L")
+unmap("n", "<leader>L")
 -- stylua: ignore start
 map("n", "<leader>lL", function() LazyVim.news.changelog() end, { desc = "LazyVim Changelog" })
 map("n", "<leader>lN", function() LazyVim.news.lazyvim() end, { desc = "LazyVim News" })

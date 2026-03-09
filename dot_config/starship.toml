@@ -50,15 +50,25 @@ disabled = false
 # disabled = false
 # healthy_symbol = ""
 
+[gcloud]
+symbol = " "
+disabled = true
+
 # starship preset nerd-font-symbols -o ~/.config/starship.toml
 [aws]
-symbol = "  "
+symbol = " "
 
 [buf]
 symbol = " "
 
+[bun]
+symbol = " "
+
 [c]
 symbol = " "
+
+[cpp]
+symbol = " "
 
 [cmake]
 symbol = " "
@@ -71,6 +81,9 @@ symbol = " "
 
 [dart]
 symbol = " "
+
+[deno]
+symbol = " "
 
 [directory]
 read_only = " 󰌾"
@@ -87,6 +100,9 @@ symbol = " "
 [fennel]
 symbol = " "
 
+[fortran]
+symbol = " "
+
 [fossil_branch]
 symbol = " "
 
@@ -95,6 +111,9 @@ tag_symbol = '  '
 
 [golang]
 symbol = " "
+
+[gradle]
+symbol = " "
 
 [guix_shell]
 symbol = " "
@@ -147,12 +166,14 @@ Alpine = " "
 AlmaLinux = " "
 Amazon = " "
 Android = " "
+AOSC = " "
 Arch = " "
 Artix = " "
 CachyOS = " "
 CentOS = " "
 Debian = " "
 DragonFly = " "
+Elementary = " "
 Emscripten = " "
 EndeavourOS = " "
 Fedora = " "
@@ -161,6 +182,7 @@ Garuda = "󰛓 "
 Gentoo = " "
 HardenedBSD = "󰞌 "
 Illumos = "󰈸 "
+Ios = "󰀷 "
 Kali = " "
 Linux = " "
 Mabox = " "
@@ -187,6 +209,7 @@ Ubuntu = " "
 Unknown = " "
 Void = " "
 Windows = "󰍲 "
+Zorin = " "
 
 [package]
 symbol = "󰏗 "
@@ -199,6 +222,9 @@ symbol = " "
 
 [pijul_channel]
 symbol = " "
+
+[pixi]
+symbol = "󰏗 "
 
 [python]
 symbol = " "
@@ -215,11 +241,14 @@ symbol = "󱘗 "
 [scala]
 symbol = " "
 
+[status]
+symbol = " "
+
 [swift]
 symbol = " "
 
+[xmake]
+symbol = " "
+
 [zig]
 symbol = " "
-
-[gradle]
-symbol = " "
