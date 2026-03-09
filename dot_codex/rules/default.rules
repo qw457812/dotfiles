@@ -1,0 +1,22 @@
+prefix_rule(
+    pattern = [
+        "git",
+        [
+            "add",
+            "commit",
+            "push",
+            "pull",
+            "merge",
+            "rebase",
+            "reset",
+            "checkout",
+            "switch",
+            "stash",
+            "cherry-pick",
+            "revert",
+            "restore",
+        ],
+    ],
+    decision = "prompt",
+    justification = "Ask before state-changing git operations",
+)
