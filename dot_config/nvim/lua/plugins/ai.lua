@@ -343,7 +343,7 @@ return {
             },
           },
           codex = {
-            cmd = { "codex" },
+            cmd = { "codex", "-c", string.format('notify=["python3", "%s/.codex/notify.py"]', vim.fn.expand("~")) },
             env = {
               __AI_AGENT = "codex",
             },

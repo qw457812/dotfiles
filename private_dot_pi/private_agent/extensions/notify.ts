@@ -1,4 +1,6 @@
-// Copied from: https://github.com/mitsuhiko/agent-stuff/blob/e2d2df778fedf9989975ce50c71e434a5ea15359/pi-extensions/notify.ts
+// Ref:
+// https://github.com/mitsuhiko/agent-stuff/blob/e2d2df778fedf9989975ce50c71e434a5ea15359/pi-extensions/notify.ts
+// https://github.com/badlogic/pi-mono/blob/4351dd7cdc5806fd4c4e61aa534e7790b9a54947/packages/coding-agent/examples/extensions/notify.ts
 
 /**
  * Desktop Notification Extension
@@ -31,6 +33,10 @@ end run`;
 		const proc = spawn("termux-notification", ["-t", title, "-c", body], { stdio: "ignore" });
 		proc.once("error", () => {});
 		proc.unref();
+	} else if (process.env.KITTY_WINDOW_ID) {
+		// Kitty OSC 99: i=notification id, d=0 means not done yet, p=body for second part
+		process.stdout.write(`\x1b]99;i=1:d=0;${title}\x1b\\`);
+		process.stdout.write(`\x1b]99;i=1:p=body;${body}\x1b\\`);
 	} else {
 		// OSC 777 format: ESC ] 777 ; notify ; title ; body BEL
 		process.stdout.write(`\x1b]777;notify;${title};${body}\x07`);

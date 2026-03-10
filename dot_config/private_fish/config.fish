@@ -315,9 +315,10 @@ if type -q claude
 end
 if type -q codex
     # codex completion fish >~/.config/fish/completions/codex.fish
-    abbr cx codex
-    abbr cxc 'codex resume --last'
-    abbr cxr 'codex resume'
+    set -l codex_cmd "codex -c 'notify=[\"python3\", \"$HOME/.codex/notify.py\"]'"
+    abbr cx "$codex_cmd"
+    abbr cxc "$codex_cmd resume --last"
+    abbr cxr "$codex_cmd resume"
 end
 if type -q opencode
     abbr oc opencode
