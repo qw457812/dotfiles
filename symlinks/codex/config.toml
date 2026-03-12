@@ -28,3 +28,7 @@ status_line = ["model-with-reasoning", "total-input-tokens", "total-output-token
 
 [features]
 prevent_idle_sleep = true
+multi_agent = true
+
+[notice]
+hide_rate_limit_model_nudge = true

@@ -40,7 +40,7 @@ M.claude = {
         ANTHROPIC_AUTH_TOKEN = vim.env.SYNTHETIC_API_KEY,
         ANTHROPIC_DEFAULT_OPUS_MODEL = "hf:moonshotai/Kimi-K2.5",
         ANTHROPIC_DEFAULT_SONNET_MODEL = "hf:moonshotai/Kimi-K2.5",
-        ANTHROPIC_DEFAULT_HAIKU_MODEL = "hf:MiniMaxAI/MiniMax-M2.5",
+        ANTHROPIC_DEFAULT_HAIKU_MODEL = "hf:zai-org/GLM-4.7-Flash",
       },
       -- https://z.ai/manage-apikey/subscription
       glm = {

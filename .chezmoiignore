@@ -18,6 +18,8 @@ Library/
 {{ if ne .chezmoi.os "android" }}
 .termux/
 {{ else }}
+.vrapperrc
+.obsidian.vimrc
 .ideavimrc
 .jetbrains/
 .qutebrowser/
@@ -27,6 +29,8 @@ Library/
 .config/wezterm/
 .config/ghostty/
 .config/neovide/
+.config/zathura/
 .local/bin/vscode-tmux
+.local/bin/vscode-tmux-aider
 {{ end }}
 
