@@ -1,0 +1,61 @@
+" https://github.com/amix/vimrc/blob/master/vimrcs/basic.vim
+
+let mapleader = " "
+
+set undofile
+
+set number
+set hlsearch
+set incsearch
+set ignorecase
+set smartcase
+set background=dark
+
+set laststatus=2
+set statusline=\ %F%m%r%h\ %w\ \ CWD:\ %r%{getcwd()}%h\ \ \ Line:\ %l\ \ Column:\ %c
+
+syntax enable
+
+try
+    colorscheme desert
+catch
+endtry
+
+map j gj
+map k gk
+map H ^
+map L $
+nnoremap Y y$
+
+nmap <leader>qq :qa<cr>
+nmap <C-s> :w<cr>
+
+" buffers
+nmap <leader>` :e #<cr>
+nmap <leader>bb :e #<cr>
+nmap <leader>bd :bd<cr>
+nmap [b :bprevious<cr>
+nmap ]b :bnext<cr>
+
+" windows
+map <C-j> <C-W>j
+map <C-k> <C-W>k
+map <C-h> <C-W>h
+map <C-l> <C-W>l
+nmap <leader>ww <c-w>w
+nmap <leader>wh <c-w>h
+nmap <leader>wj <c-w>j
+nmap <leader>wk <c-w>k
+nmap <leader>wl <c-w>l
+nmap <leader>wo <c-w>o
+nmap <leader>ws <c-w>s
+nmap <leader>wv <c-w>v
+nmap <leader>wd <c-w>c
+
+" files
+nmap <leader>fn :enew<cr>
+nmap <leader>fs :w<cr>
+nmap <leader>fc :e ~/.vimrc<cr>
+nmap <leader>f. :e ~/.bashrc<cr>
+
+nmap <leader>un :set nu!<cr>
