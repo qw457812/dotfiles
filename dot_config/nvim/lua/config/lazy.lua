@@ -44,19 +44,17 @@ require("lazy").setup({
   concurrency = (jit.os:find("Windows") or vim.env.TERMUX_VERSION) and (vim.uv.available_parallelism() * 2) or nil,
   git = {
     log = { "--since=7 days ago" }, -- show commits from the last x days
-    -- building some plugins on termux can take a long time
-    timeout = vim.env.TERMUX_VERSION and 600 or nil, -- kill processes that take more than x seconds
+    -- building some plugins (like blink.cmp) can take a long time
+    timeout = vim.env.TERMUX_VERSION and 600 or 300, -- kill processes that take more than x seconds
   },
   rocks = { hererocks = true },
   install = { colorscheme = { "tokyonight", "habamax" } },
   ui = {
     border = "rounded",
-    size = vim.env.TERMUX_VERSION
-        and {
-          width = 1,
-          height = vim.o.lines - 4, -- see: U.snacks.win.fullscreen_height
-        }
-      or nil,
+    size = vim.env.TERMUX_VERSION and {
+      width = 1,
+      height = vim.o.lines - 4, -- see: U.snacks.win.fullscreen_height
+    } or nil,
     wrap = false,
     icons = {
       keys = "󰥻 ",
@@ -109,6 +107,62 @@ require("lazy").setup({
           end
         end,
         desc = "Search Plugin Code",
+      },
+      ["<leader>fy"] = {
+        function(plugin)
+          local path = vim.fn.fnamemodify(plugin.dir, ":p:~")
+          vim.fn.setreg(vim.v.register, path)
+          LazyVim.info(path, { title = "Copied Plugin Path" })
+        end,
+        desc = "Yank Plugin Path",
+      },
+      ["<leader>ac"] = {
+        function(plugin)
+          local orig_cwd = vim.fn.chdir(plugin.dir)
+          U.ai.sidekick.cli.quick.show("claude" .. (vim.v.count == 0 and "" or vim.v.count))
+          if orig_cwd ~= "" then
+            vim.schedule(function()
+              vim.fn.chdir(orig_cwd)
+            end)
+          end
+        end,
+        desc = "Claude",
+      },
+      ["<leader>ax"] = {
+        function(plugin)
+          local orig_cwd = vim.fn.chdir(plugin.dir)
+          U.ai.sidekick.cli.quick.show("codex" .. (vim.v.count == 0 and "" or vim.v.count))
+          if orig_cwd ~= "" then
+            vim.schedule(function()
+              vim.fn.chdir(orig_cwd)
+            end)
+          end
+        end,
+        desc = "Codex",
+      },
+      ["<leader>ao"] = {
+        function(plugin)
+          local orig_cwd = vim.fn.chdir(plugin.dir)
+          U.ai.sidekick.cli.quick.show("opencode" .. (vim.v.count == 0 and "" or vim.v.count))
+          if orig_cwd ~= "" then
+            vim.schedule(function()
+              vim.fn.chdir(orig_cwd)
+            end)
+          end
+        end,
+        desc = "OpenCode",
+      },
+      ["<leader>ai"] = {
+        function(plugin)
+          local orig_cwd = vim.fn.chdir(plugin.dir)
+          U.ai.sidekick.cli.quick.show("pi" .. (vim.v.count == 0 and "" or vim.v.count))
+          if orig_cwd ~= "" then
+            vim.schedule(function()
+              vim.fn.chdir(orig_cwd)
+            end)
+          end
+        end,
+        desc = "Pi",
       },
       ["<leader>gg"] = {
         function(plugin)
@@ -170,14 +224,6 @@ require("lazy").setup({
           end
         end,
         desc = "Plugin GitHub Pull Requests",
-      },
-      ["<leader>fy"] = {
-        function(plugin)
-          local path = vim.fn.fnamemodify(plugin.dir, ":p:~")
-          vim.fn.setreg(vim.v.register, path)
-          LazyVim.info(path, { title = "Copied Plugin Path" })
-        end,
-        desc = "Yank Plugin Path",
       },
       ["gi"] = {
         function(plugin)

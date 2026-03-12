@@ -44,8 +44,8 @@ return {
       local mappings = {}
       local tools = {
         ["<leader>ac"] = "claude",
-        ["<leader>ao"] = "opencode",
         ["<leader>ax"] = "codex",
+        ["<leader>ao"] = "opencode",
         ["<leader>ai"] = "pi",
         ["<leader>ag"] = "claude_glm",
       }
@@ -54,7 +54,27 @@ return {
         -- stylua: ignore
         vim.list_extend(mappings, {
           { key, function() U.ai.sidekick.cli.quick.show(tool .. (vim.v.count == 0 and "" or vim.v.count)) end, desc = desc },
-          { key, function() U.ai.sidekick.cli.quick.send(tool .. (vim.v.count == 0 and "" or vim.v.count), { msg = "{this}" }) end, mode = "x", desc = desc },
+          { key, function() U.ai.sidekick.cli.quick.send(tool, { msg = "{this}" }) end, mode = "x", desc = desc },
+          -- HACK: use current buffer's git root as cwd for the cli
+          {
+            key:sub(1, -2) .. key:sub(-1):upper(), -- <leader>aC
+            function()
+              local git_root = Snacks.git.get_root()
+              if not git_root then
+                LazyVim.warn("Not a git repo", { title = "Terminal" })
+                return
+              end
+              local orig_cwd = vim.fn.chdir(git_root)
+              -- TODO: need to detach `tool` first if it's already attached
+              U.ai.sidekick.cli.quick.show(tool .. (vim.v.count == 0 and "" or vim.v.count))
+              if orig_cwd ~= "" then
+                vim.schedule(function()
+                  vim.fn.chdir(orig_cwd)
+                end)
+              end
+            end,
+            desc = desc .. " (Git Root Dir)",
+          },
         })
       end
       return vim.list_extend(keys, mappings)
@@ -104,8 +124,8 @@ return {
       end
 
       numbered_tools({ name = "claude" })
-      numbered_tools({ name = "opencode" })
       numbered_tools({ name = "codex" })
+      numbered_tools({ name = "opencode" })
       numbered_tools({ name = "pi" })
       numbered_tools({
         name = "claude_glm",
@@ -314,7 +334,7 @@ return {
               "<C-g>",
               function(t)
                 local name = t.tool.name
-                if name:find("claude") or name:find("opencode") or name:find("codex") then
+                if name:find("claude") or name:find("codex") or name:find("opencode") then
                   U.ai.sidekick.cli.tools.actions.send_keys({ "<C-g>" })(t)
                   vim.cmd.startinsert()
                 else
