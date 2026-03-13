@@ -10,7 +10,7 @@ function gw -a name
         return 0
     end
 
-    set -l repo (basename (git rev-parse --show-toplevel))
+    set -l repo (basename (git worktree list | head -n 1 | awk '{print $1}'))
     set -l path $git_worktrees_root/$repo-$name
 
     if not test -d $path
@@ -27,7 +27,7 @@ function gpr -a pr
     end
 
     set -l branch (gh pr view "$pr" --json headRefName -q .headRefName)
-    set -l repo (basename (git rev-parse --show-toplevel))
+    set -l repo (basename (git worktree list | head -n 1 | awk '{print $1}'))
     set -l path $git_worktrees_root/$repo-$pr-$branch
 
     if not test -d $path
