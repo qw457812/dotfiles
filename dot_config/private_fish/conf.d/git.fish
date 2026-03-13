@@ -49,11 +49,11 @@ function gpr -a pr
 end
 
 function gwl
-    set -l current (git rev-parse --show-toplevel 2>/dev/null; or pwd)
+    set -l current (realpath (git rev-parse --show-toplevel 2>/dev/null; or pwd))
     set -l worktrees (git worktree list)
     set -l filtered
     for wt in $worktrees
-        if test (echo $wt | awk '{print $1}') != "$current"
+        if test (realpath (echo $wt | awk '{print $1}')) != "$current"
             set -a filtered $wt
         end
     end
