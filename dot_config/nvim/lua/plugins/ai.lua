@@ -373,6 +373,7 @@ return {
               __AI_AGENT = "opencode",
               NVIM_FLATTEN_NEST = "1",
               OPENCODE_THEME = "", -- undo https://github.com/folke/sidekick.nvim/blob/c302dbaf0fcbde909838b296719bbf84e3db6e20/lua/sidekick/config.lua#L119-L119
+              OPENCODE_ENABLE_EXA = "1",
             },
             keys = {
               prompt = false, -- opencode uses <c-p> for its own functionality

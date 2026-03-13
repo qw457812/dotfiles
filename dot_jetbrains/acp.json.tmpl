@@ -31,7 +31,10 @@
     },
     "OpenCode": {
       "command": "{{ lookPath `opencode` }}",
-      "args": ["acp"]
+      "args": ["acp"],
+      "env": {
+        "OPENCODE_ENABLE_EXA": "1"
+      }
     }
   }
 }

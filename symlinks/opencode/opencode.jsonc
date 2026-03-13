@@ -23,20 +23,21 @@
       "headers": {
         "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
       },
-      "enabled": true,
-      "oauth": false
+      "oauth": false,
+      "enabled": false // we already have `codesearch` via `OPENCODE_ENABLE_EXA=1`
     },
-    // https://github.com/code-yeongyu/oh-my-opencode/issues/493
     "websearch": {
       "type": "local",
       "command": ["npx", "-y", "exa-mcp-server", "tools=web_search_exa"],
-      "enabled": true,
-      "timeout": 60000
+      "timeout": 60000, // https://github.com/code-yeongyu/oh-my-opencode/issues/493
+      "enabled": false // we already have `websearch` via `OPENCODE_ENABLE_EXA=1`
     }
   },
   "permission": {
-    "websearch": "deny", // provided by exa, not sure why this tool exists (for opencode/big-pickle), we already have websearch_web_search_exa (from `websearch` MCP which was added by oh-my-opencode)
-    "codesearch": "deny", // provided by exa, not sure why this tool exists (for opencode/big-pickle)
+    // // https://github.com/anomalyco/opencode/blob/28c8182bd543582c20d67d8faaeb91177fb28cc7/packages/web/src/content/docs/tools.mdx#L289-L315
+    // "websearch": "deny", // for OpenCode provider, we already have `websearch_web_search_exa` via `websearch` MCP
+    // "codesearch": "deny", // for OpenCode provider, we already have context7 MCP
+
     // "google_search": "deny", // provided by opencode-antigravity-auth
     "bash": {
       "git add *": "ask",
