@@ -372,11 +372,7 @@ return {
             env = {
               __AI_AGENT = "opencode",
               NVIM_FLATTEN_NEST = "1",
-              OPENCODE_CONFIG_CONTENT = vim.json.encode({
-                -- `system` theme not available when using neovim terminal, see: https://github.com/sst/opencode/issues/445#issuecomment-3508873123
-                -- lucent-github: based on [lucent-orng](https://github.com/anomalyco/opencode/blob/e6e7eaf6e0ce50a0d5ff31f330972f749bec819c/packages/opencode/src/cli/cmd/tui/context/theme/lucent-orng.json), but with [github](https://github.com/anomalyco/opencode/blob/eaa0826e7fa3aa5a52d670dad0dce92108843700/packages/opencode/src/cli/cmd/tui/context/theme/github.json) diff colors
-                theme = vim.g.user_transparent_background and "lucent-github" or "github",
-              }),
+              OPENCODE_THEME = "", -- undo https://github.com/folke/sidekick.nvim/blob/c302dbaf0fcbde909838b296719bbf84e3db6e20/lua/sidekick/config.lua#L119-L119
             },
             keys = {
               prompt = false, -- opencode uses <c-p> for its own functionality
