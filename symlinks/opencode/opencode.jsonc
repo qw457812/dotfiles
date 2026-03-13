@@ -3,8 +3,8 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "plugin": [
-    "oh-my-opencode@latest", // https://github.com/code-yeongyu/oh-my-opencode
-    "opencode-antigravity-auth@latest" // https://github.com/NoeFabris/opencode-antigravity-auth
+    // "oh-my-opencode@latest", // https://github.com/code-yeongyu/oh-my-opencode
+    // "opencode-antigravity-auth@latest" // https://github.com/NoeFabris/opencode-antigravity-auth
   ],
   "share": "manual",
   // "autoupdate": "notify",
@@ -37,7 +37,7 @@
   "permission": {
     "websearch": "deny", // provided by exa, not sure why this tool exists (for opencode/big-pickle), we already have websearch_web_search_exa (from `websearch` MCP which was added by oh-my-opencode)
     "codesearch": "deny", // provided by exa, not sure why this tool exists (for opencode/big-pickle)
-    "google_search": "deny", // provided by opencode-antigravity-auth
+    // "google_search": "deny", // provided by opencode-antigravity-auth
     "bash": {
       "git add *": "ask",
       "git commit *": "ask",
@@ -62,36 +62,36 @@
     //     "apiKey": "{env:CLAUDE_RELAY_SERVICE_API_KEY}"
     //   }
     // },
-    "google": {
-      "models": {
-        "antigravity-gemini-3.1-pro": {
-          "name": "Gemini 3.1 Pro (Antigravity)",
-          "limit": { "context": 1048576, "output": 65535 },
-          "modalities": {
-            "input": ["text", "image", "pdf"],
-            "output": ["text"]
-          },
-          "variants": {
-            "low": { "thinkingLevel": "low" },
-            "high": { "thinkingLevel": "high" }
-          }
-        },
-        "antigravity-gemini-3-flash": {
-          "name": "Gemini 3 Flash (Antigravity)",
-          "limit": { "context": 1048576, "output": 65536 },
-          "modalities": {
-            "input": ["text", "image", "pdf"],
-            "output": ["text"]
-          },
-          "variants": {
-            "minimal": { "thinkingLevel": "minimal" },
-            "low": { "thinkingLevel": "low" },
-            "medium": { "thinkingLevel": "medium" },
-            "high": { "thinkingLevel": "high" }
-          }
-        }
-      }
-    },
+    // "google": {
+    //   "models": {
+    //     "antigravity-gemini-3.1-pro": {
+    //       "name": "Gemini 3.1 Pro (Antigravity)",
+    //       "limit": { "context": 1048576, "output": 65535 },
+    //       "modalities": {
+    //         "input": ["text", "image", "pdf"],
+    //         "output": ["text"]
+    //       },
+    //       "variants": {
+    //         "low": { "thinkingLevel": "low" },
+    //         "high": { "thinkingLevel": "high" }
+    //       }
+    //     },
+    //     "antigravity-gemini-3-flash": {
+    //       "name": "Gemini 3 Flash (Antigravity)",
+    //       "limit": { "context": 1048576, "output": 65536 },
+    //       "modalities": {
+    //         "input": ["text", "image", "pdf"],
+    //         "output": ["text"]
+    //       },
+    //       "variants": {
+    //         "minimal": { "thinkingLevel": "minimal" },
+    //         "low": { "thinkingLevel": "low" },
+    //         "medium": { "thinkingLevel": "medium" },
+    //         "high": { "thinkingLevel": "high" }
+    //       }
+    //     }
+    //   }
+    // },
     // curl https://openrouter.ai/api/v1/models | jq '.data | sort_by(.created)' | less
     "openrouter": {
       "options": {
