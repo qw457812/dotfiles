@@ -363,7 +363,12 @@ return {
             },
           },
           codex = {
-            cmd = { "codex", "-c", string.format('notify=["python3", "%s/.codex/notify.py"]', vim.fn.expand("~")) },
+            cmd = {
+              "codex",
+              "-c",
+              string.format('notify=["python3", "%s/.codex/notify.py"]', vim.fn.expand("~")),
+              "--no-alt-screen", -- for https://github.com/folke/sidekick.nvim/blob/41dec4dcdf0c8fe17f5f2e9eeced4645a88afb0d/lua/sidekick/cli/session/tmux.lua#L194 (not sure if `--no-alt-screen` makes any difference)
+            },
             env = {
               __AI_AGENT = "codex",
             },

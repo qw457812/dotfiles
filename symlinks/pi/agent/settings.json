@@ -1,7 +1,7 @@
 {
-  "lastChangelogVersion": "0.57.1",
-  "defaultProvider": "synthetic",
-  "defaultModel": "hf:moonshotai/Kimi-K2.5",
+  "lastChangelogVersion": "0.58.3",
+  "defaultProvider": "zai",
+  "defaultModel": "glm-5",
   "defaultThinkingLevel": "medium",
   "hideThinkingBlock": true,
   "quietStartup": true,

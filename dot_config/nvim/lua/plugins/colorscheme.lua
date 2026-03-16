@@ -23,6 +23,7 @@ local has_tokyonight_custom_style = vim.list_contains(colorschemes, "tokyonight"
 local ignored_colorschemes = vim.list_extend({
   "tokyonight-day",
   "catppuccin", -- redundant with catppuccin-macchiato
+  "catppuccin-nvim",
   "catppuccin-latte",
 }, has_tokyonight_custom_style and {} or { "tokyonight" })
 
