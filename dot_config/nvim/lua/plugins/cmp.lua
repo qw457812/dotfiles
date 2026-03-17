@@ -82,7 +82,7 @@ return {
           if cmp.is_visible() then
             cmp.cancel({ callback = expand })
           else
-            vim.schedule(expand)
+            expand()
           end
           return true -- no way to know whether expansion happened or not
         end,
@@ -90,34 +90,28 @@ return {
           if not LazyVim.cmp.actions.snippet_active() then
             return
           end
-          vim.schedule(LazyVim.cmp.actions.snippet_stop)
+          LazyVim.cmp.actions.snippet_stop()
           return true
         end,
         -- see: https://github.com/Saghen/blink.cmp/issues/569#issuecomment-2833362734
-        scroll_list_up = function()
-          -- based on select_prev: https://github.com/Saghen/blink.cmp/blob/6323a6ddb191323904557dc9b545f309ea2b0e12/lua/blink/cmp/init.lua#L200-L205
-          if not require("blink.cmp.completion.list").can_select() then
+        scroll_list_up = function(cmp)
+          -- see: https://github.com/saghen/blink.cmp/blob/7856f05dd48ea7f2c68ad3cba40202f8a9369b9e/lua/blink/cmp/lib/window/init.lua#L237-L241
+          local menu_win = require("blink.cmp.completion.windows.menu").win:get_win()
+          if not menu_win then
             return
           end
-          vim.schedule(function()
-            -- see: https://github.com/saghen/blink.cmp/blob/7856f05dd48ea7f2c68ad3cba40202f8a9369b9e/lua/blink/cmp/lib/window/init.lua#L237-L241
-            local page_size = vim.api.nvim_win_get_height(require("blink.cmp.completion.windows.menu").win:get_win())
-            -- half page up
-            require("blink.cmp.completion.list").select_prev({ count = math.floor(page_size / 2) })
-          end)
-          return true
+          local page_size = vim.api.nvim_win_get_height(menu_win)
+          -- half page up
+          return cmp.select_prev({ count = math.floor(page_size / 2) })
         end,
-        scroll_list_down = function()
-          -- based on select_next: https://github.com/Saghen/blink.cmp/blob/6323a6ddb191323904557dc9b545f309ea2b0e12/lua/blink/cmp/init.lua#L208-L213
-          if not require("blink.cmp.completion.list").can_select() then
+        scroll_list_down = function(cmp)
+          local menu_win = require("blink.cmp.completion.windows.menu").win:get_win()
+          if not menu_win then
             return
           end
-          vim.schedule(function()
-            local page_size = vim.api.nvim_win_get_height(require("blink.cmp.completion.windows.menu").win:get_win())
-            -- half page down
-            require("blink.cmp.completion.list").select_next({ count = math.floor(page_size / 2) })
-          end)
-          return true
+          local page_size = vim.api.nvim_win_get_height(menu_win)
+          -- half page down
+          return cmp.select_next({ count = math.floor(page_size / 2) })
         end,
       }
 
