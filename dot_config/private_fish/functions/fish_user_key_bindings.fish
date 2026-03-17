@@ -56,4 +56,6 @@ function fish_user_key_bindings
     bind alt-l c repaint-mode
     bind -M insert alt-l c repaint-mode
     bind -M visual alt-l c repaint-mode
+
+    bind -M insert alt-h show_help
 end

@@ -162,7 +162,8 @@ return {
           toggle_lua = function(p)
             local opts = p.opts --[[@as snacks.picker.grep.Config]]
             opts.ft = not opts.ft and "lua" or nil
-            p:find()
+            -- opts.dirs = opts.ft == "lua" and { "lua" } or nil
+            p:refresh()
           end,
           -- for sources: grep, files
           filter_extension = function(picker)
@@ -687,15 +688,13 @@ return {
               return "snacks"
             end,
           } or nil,
-          lualine_b = not vim.g.user_is_termux
-              and {
-                function()
-                  local picker = Snacks.picker.get()[1]
-                  -- return picker and picker.list.cursor .. "/" .. picker.input.totals or ""
-                  return picker and picker.list.cursor .. "/" .. picker.list:count() or ""
-                end,
-              }
-            or nil,
+          lualine_b = not vim.g.user_is_termux and {
+            function()
+              local picker = Snacks.picker.get()[1]
+              -- return picker and picker.list.cursor .. "/" .. picker.input.totals or ""
+              return picker and picker.list.cursor .. "/" .. picker.list:count() or ""
+            end,
+          } or nil,
           lualine_x = { U.lualine.hlsearch }, -- clear_ui_esc
           lualine_y = {
             function()

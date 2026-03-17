@@ -52,24 +52,24 @@ return {
             },
             { "<c-k>", mode = "i", false }, -- <c-k> for cmp navigation
             { "<M-space>", function() return vim.lsp.buf.signature_help() end, mode = "i", desc = "Signature Help", has = "signatureHelp" },
-            {
-              "<cr>",
-              U.lsp.pick_definitions_or_references,
-              desc = "Goto Definition/References",
-              has = "definition",
-              enabled = function()
-                if LazyVim.has("sidekick.nvim") then
-                  return false
-                end
-                if vim.bo.filetype == "markdown" then
-                  -- for gaoDean/autolist.nvim
-                  return false
-                end
-                -- check to see if `<cr>` is already mapped to the buffer (avoids overwriting)
-                -- for yarospace/lua-console.nvim
-                return not U.keymap.exists("n", "<cr>", { buf = true })
-              end,
-            },
+            -- {
+            --   "<cr>",
+            --   U.lsp.pick_definitions_or_references,
+            --   desc = "Goto Definition/References",
+            --   has = "definition",
+            --   enabled = function()
+            --     if LazyVim.has("sidekick.nvim") then
+            --       return false
+            --     end
+            --     if vim.bo.filetype == "markdown" then
+            --       -- for gaoDean/autolist.nvim
+            --       return false
+            --     end
+            --     -- check to see if `<cr>` is already mapped to the buffer (avoids overwriting)
+            --     -- for yarospace/lua-console.nvim
+            --     return not U.keymap.exists("n", "<cr>", { buf = true })
+            --   end,
+            -- },
             -- https://zed.dev/docs/vim#language-server
             { "cd", "<leader>cr", desc = "Rename (change definition)", has = "rename", remap = true },
             { "gs", "<leader>ss", desc = "LSP Symbols", has = "documentSymbol", remap = true },
@@ -92,43 +92,41 @@ return {
       },
     },
   },
-  LazyVim.pick.picker.name == "snacks"
-      and {
-        "neovim/nvim-lspconfig",
-        opts = {
-          ---@type table<string, lazyvim.lsp.Config|boolean>
-          servers = {
-            ["*"] = {
-              keys = {
-                {
-                  "<leader>ss",
-                  function()
-                    -- see: https://github.com/folke/snacks.nvim/issues/1057#issuecomment-2652052218
-                    -- copied from: https://github.com/disrupted/dotfiles/blob/60e5eff02e2f4aff30dae259cdebdfe172b8e6fe/.config/nvim/lua/plugins/plugins.lua#L181-L253
-                    local cursor = vim.api.nvim_win_get_cursor(0)
-                    local picker = Snacks.picker.lsp_symbols({ filter = LazyVim.config.kind_filter })
-                    -- focus the symbol at the cursor position
-                    picker.matcher.task:on(
-                      "done",
-                      vim.schedule_wrap(function()
-                        for symbol in vim.iter(picker:items()):rev() do
-                          if U.lsp.cursor_in_range(cursor, symbol.range) then
-                            picker.list:move(symbol.idx, true)
-                            return
-                          end
-                        end
-                      end)
-                    )
-                  end,
-                  desc = "LSP Symbols",
-                  has = "documentSymbol",
-                },
-              },
+  LazyVim.pick.picker.name == "snacks" and {
+    "neovim/nvim-lspconfig",
+    opts = {
+      ---@type table<string, lazyvim.lsp.Config|boolean>
+      servers = {
+        ["*"] = {
+          keys = {
+            {
+              "<leader>ss",
+              function()
+                -- see: https://github.com/folke/snacks.nvim/issues/1057#issuecomment-2652052218
+                -- copied from: https://github.com/disrupted/dotfiles/blob/60e5eff02e2f4aff30dae259cdebdfe172b8e6fe/.config/nvim/lua/plugins/plugins.lua#L181-L253
+                local cursor = vim.api.nvim_win_get_cursor(0)
+                local picker = Snacks.picker.lsp_symbols({ filter = LazyVim.config.kind_filter })
+                -- focus the symbol at the cursor position
+                picker.matcher.task:on(
+                  "done",
+                  vim.schedule_wrap(function()
+                    for symbol in vim.iter(picker:items()):rev() do
+                      if U.lsp.cursor_in_range(cursor, symbol.range) then
+                        picker.list:move(symbol.idx, true)
+                        return
+                      end
+                    end
+                  end)
+                )
+              end,
+              desc = "LSP Symbols",
+              has = "documentSymbol",
             },
           },
         },
-      }
-    or { import = "foobar", enabled = false },
+      },
+    },
+  } or { import = "foobar", enabled = false },
   {
     "folke/which-key.nvim",
     opts = {

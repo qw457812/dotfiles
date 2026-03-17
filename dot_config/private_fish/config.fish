@@ -160,6 +160,7 @@ abbr gcpa "git cherry-pick --abort"
 abbr gcpc "git cherry-pick --continue"
 abbr gd "git diff"
 abbr gds "git diff --staged"
+abbr gdt "git difftool -d"
 abbr gdup 'git diff @{upstream}'
 abbr gf "git fetch"
 abbr ghh "git help"

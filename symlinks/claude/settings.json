@@ -42,6 +42,7 @@
       "Bash(git diff:*)",
       "Bash(git log:*)",
       "Bash(git show:*)",
+      "Bash(git show-ref:*)",
       "Bash(git branch:*)",
       "Bash(git branch -v:*)",
       "Bash(git remote -v:*)",

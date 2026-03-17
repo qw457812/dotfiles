@@ -91,7 +91,7 @@ return {
           vscode_map("n", "]h", "editor.action.dirtydiff.next", { desc = "Next Hunk" })
 
           -- vscode_map("n", "gd", "editor.action.revealDefinition", { desc = "Goto Definition" })
-          map("n", "<cr>", "gd", { desc = "Goto Definition/References", remap = true })
+          -- map("n", "<cr>", "gd", { desc = "Goto Definition/References", remap = true })
           -- map("n", "gr", function()
           --   vscode.action("editor.action.goToReferences", {
           --     callback = function()

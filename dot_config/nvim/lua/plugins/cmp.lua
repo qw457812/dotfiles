@@ -216,6 +216,12 @@ return {
             end,
             "fallback",
           },
+          ["<Left>"] = {
+            function(cmp)
+              cmp.hide() -- in favor of `fallback`
+            end,
+            "fallback",
+          },
           ["<CR>"] = { "accept", H.actions.pum_accept, "fallback" },
           ["<C-e>"] = {
             "cancel",

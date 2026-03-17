@@ -24,50 +24,55 @@ return {
       end
 
       opts.formatters = opts.formatters or {}
-      -- opts.formatters.biome = opts.formatters.biome or {}
-      -- opts.formatters.biome.require_cwd = nil -- make biome config file optional
+      opts.formatters["biome-check"] = opts.formatters["biome-check"] or {}
+      opts.formatters["biome-check"].require_cwd = nil -- make biome config file optional
 
-      opts.formatters["biome-check"] = {
-        args = function(self, ctx)
-          local args = require("conform.formatters.biome-check").args
-          if not args then
-            return {}
-          end
-          if type(args) == "function" then
-            return args(self, ctx)
-          end
+      ---@param self conform.JobFormatterConfig
+      ---@param ctx conform.Context
+      ---@return string|string[]
+      opts.formatters["biome-check"].args = function(self, ctx)
+        local args = require("conform.formatters.biome-check").args
+        if not args then
+          return {}
+        end
+        if type(args) == "function" then
+          return args(self, ctx)
+        end
 
-          -- ref: https://github.com/stevearc/conform.nvim/blob/016bc8174a675e1dbf884b06a165cd0c6c03f9af/lua/conform/formatters/biome.lua#L10-L24
-          if self:cwd(ctx) then
-            return args
-          end
-          -- only when biome.json{,c} don't exist
-          return vim.list_extend(type(args) == "table" and vim.deepcopy(args) or { args }, {
-            "--indent-style",
-            vim.bo[ctx.buf].expandtab and "space" or "tab",
-            "--indent-width",
-            ctx.shiftwidth,
-          })
-        end,
-      }
+        -- ref: https://github.com/stevearc/conform.nvim/blob/016bc8174a675e1dbf884b06a165cd0c6c03f9af/lua/conform/formatters/biome.lua#L10-L24
+        if self:cwd(ctx) then
+          return args
+        end
+        -- only when biome.json{,c} don't exist
+        return vim.list_extend(type(args) == "table" and vim.deepcopy(args) or { args }, {
+          "--indent-style",
+          vim.bo[ctx.buf].expandtab and "space" or "tab",
+          "--indent-width",
+          ctx.shiftwidth,
+        })
+      end
 
-      -- (except vue) remove prettier if biome is present, and use biome-check instead of biome
-      local by_ft = opts.formatters_by_ft or {}
-      for ft in pairs(by_ft) do
+      -- remove prettier if biome-check is present (except vue)
+      for ft, formatters in pairs(opts.formatters_by_ft or {}) do
         if
-          not (type(by_ft[ft]) == "function")
-          ---@cast by_ft table<string, conform.FiletypeFormatterInternal>
-          and vim.list_contains(by_ft[ft], "biome")
+          not (type(formatters) == "function")
+          ---@cast formatters conform.FiletypeFormatterInternal
+          and vim.list_contains(formatters, "biome-check")
+          and vim.list_contains(formatters, "prettier")
         then
-          for i = #by_ft[ft], 1, -1 do
-            if (by_ft[ft][i] == "prettier" and ft ~= "vue") or by_ft[ft][i] == "biome" then
-              table.remove(by_ft[ft], i)
-            end
-          end
           if ft == "vue" then
-            table.insert(by_ft[ft], 1, "biome-organize-imports")
+            for i = #formatters, 1, -1 do
+              if formatters[i] == "biome-check" then
+                table.remove(formatters, i)
+              end
+            end
+            table.insert(formatters, 1, "biome-organize-imports")
           else
-            table.insert(by_ft[ft], "biome-check")
+            for i = #formatters, 1, -1 do
+              if formatters[i] == "prettier" then
+                table.remove(formatters, i)
+              end
+            end
           end
         end
       end
