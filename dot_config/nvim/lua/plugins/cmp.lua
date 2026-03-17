@@ -95,23 +95,43 @@ return {
         end,
         -- see: https://github.com/Saghen/blink.cmp/issues/569#issuecomment-2833362734
         scroll_list_up = function(cmp)
-          -- see: https://github.com/saghen/blink.cmp/blob/7856f05dd48ea7f2c68ad3cba40202f8a9369b9e/lua/blink/cmp/lib/window/init.lua#L237-L241
-          local menu_win = require("blink.cmp.completion.windows.menu").win:get_win()
-          if not menu_win then
+          if not cmp.is_menu_visible() then
             return
           end
-          local page_size = vim.api.nvim_win_get_height(menu_win)
+          -- see: https://github.com/saghen/blink.cmp/blob/7856f05dd48ea7f2c68ad3cba40202f8a9369b9e/lua/blink/cmp/lib/window/init.lua#L237-L241
+          local page_size = vim.api.nvim_win_get_height(require("blink.cmp.completion.windows.menu").win:get_win())
           -- half page up
-          return cmp.select_prev({ count = math.floor(page_size / 2) })
+          cmp.select_prev({ count = math.floor(page_size / 2) })
+          return true -- consume the key whenever the menu window is open, even if already at top/bottom
         end,
         scroll_list_down = function(cmp)
-          local menu_win = require("blink.cmp.completion.windows.menu").win:get_win()
-          if not menu_win then
+          if not cmp.is_menu_visible() then
             return
           end
-          local page_size = vim.api.nvim_win_get_height(menu_win)
+          local page_size = vim.api.nvim_win_get_height(require("blink.cmp.completion.windows.menu").win:get_win())
           -- half page down
-          return cmp.select_next({ count = math.floor(page_size / 2) })
+          cmp.select_next({ count = math.floor(page_size / 2) })
+          return true
+        end,
+        scroll_doc_or_signature_up = function(cmp)
+          if cmp.is_documentation_visible() then
+            cmp.scroll_documentation_up()
+            return true -- consume the key whenever the documentation window is open, even if already at top/bottom
+          end
+          if cmp.is_signature_visible() then
+            cmp.scroll_signature_up()
+            return true -- consume the key whenever the signature window is open, even if already at top/bottom
+          end
+        end,
+        scroll_doc_or_signature_down = function(cmp)
+          if cmp.is_documentation_visible() then
+            cmp.scroll_documentation_down()
+            return true
+          end
+          if cmp.is_signature_visible() then
+            cmp.scroll_signature_down()
+            return true
+          end
         end,
       }
 
@@ -211,12 +231,12 @@ return {
           ["<C-j>"] = { "select_next", H.actions.pum_next, "fallback" },
           ["<C-k>"] = { "select_prev", H.actions.pum_prev, "fallback" },
           ["<C-l>"] = { H.actions.mini_snippets_expand, "fallback" }, -- TODO: fallback is unreachable because H.actions.mini_snippets_expand always returns true
-          -- ["<C-u>"] = { "scroll_documentation_up", "scroll_signature_up", "fallback" },
-          -- ["<C-d>"] = { "scroll_documentation_down", "scroll_signature_down", "fallback" },
+          -- ["<C-u>"] = { H.actions.scroll_doc_or_signature_up, "fallback" },
+          -- ["<C-d>"] = { H.actions.scroll_doc_or_signature_down, "fallback" },
           ["<C-u>"] = { H.actions.scroll_list_up, "fallback" },
           ["<C-d>"] = { H.actions.scroll_list_down, "fallback" },
-          ["<C-b>"] = { "scroll_documentation_up", "scroll_signature_up", "fallback" },
-          ["<C-f>"] = { "scroll_documentation_down", "scroll_signature_down", "fallback" },
+          ["<C-b>"] = { H.actions.scroll_doc_or_signature_up, "fallback" },
+          ["<C-f>"] = { H.actions.scroll_doc_or_signature_down, "fallback" },
           ["<M-space>"] = { "show_signature", "hide_signature", "fallback" }, -- fallback seems unreachable because show_signature returns true if the signature is not visible
           ["<M-.>"] = {
             function(cmp)
