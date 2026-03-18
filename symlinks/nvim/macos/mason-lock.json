@@ -1,10 +1,10 @@
 {
   "alejandra": "4.0.0",
-  "basedpyright": "1.38.2",
+  "basedpyright": "1.38.3",
   "bash-language-server": "5.6.0",
   "biome": "2.4.7",
   "codelldb": "v1.12.1",
-  "copilot-language-server": "1.454.0",
+  "copilot-language-server": "1.456.0",
   "debugpy": "1.8.20",
   "docker-compose-language-service": "0.5.0",
   "dockerfile-language-server": "0.15.0",
@@ -37,6 +37,6 @@
   "ts_query_ls": "v3.16.0",
   "vscode-spring-boot-tools": "1.63.0",
   "vtsls": "0.3.0",
-  "vue-language-server": "3.2.5",
+  "vue-language-server": "3.2.6",
   "yaml-language-server": "1.21.0"
 }

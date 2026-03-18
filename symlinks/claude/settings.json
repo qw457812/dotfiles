@@ -76,7 +76,7 @@
     ],
     "defaultMode": "acceptEdits"
   },
-  "model": "opus",
+  "model": "opus[1m]",
   "hooks": {
     "Notification": [
       {
@@ -98,6 +98,7 @@
   "enabledPlugins": {
     "context7@claude-plugins-official": true
   },
+  "language": "Chinese",
   "sandbox": {
     "enabled": true,
     "autoAllowBashIfSandboxed": true,

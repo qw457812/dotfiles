@@ -845,6 +845,7 @@ return {
       {
         "code-yeongyu/oh-my-opencode",
         enabled = not vim.g.user_is_termux,
+        pin = true,
         version = "*",
         lazy = true,
         config = function() end,

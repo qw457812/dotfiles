@@ -4,13 +4,6 @@
     "use_custom_mcp": true
   },
   "agent_servers": {
-    "Claude LiteLLM": {
-      "command": "{{ lookPath `claude-agent-acp` }}",
-      "env": {
-        "ANTHROPIC_BASE_URL": "http://localhost:4000",
-        "ANTHROPIC_AUTH_TOKEN": "{{ env `LITELLM_MASTER_KEY` }}"
-      }
-    },
     "Claude Synthetic": {
       "command": "{{ lookPath `claude-agent-acp` }}",
       "env": {
@@ -18,7 +11,8 @@
         "ANTHROPIC_AUTH_TOKEN": "{{ env `SYNTHETIC_API_KEY` }}",
         "ANTHROPIC_DEFAULT_OPUS_MODEL": "hf:moonshotai/Kimi-K2.5",
         "ANTHROPIC_DEFAULT_SONNET_MODEL": "hf:moonshotai/Kimi-K2.5",
-        "ANTHROPIC_DEFAULT_HAIKU_MODEL": "hf:zai-org/GLM-4.7-Flash"
+        "ANTHROPIC_DEFAULT_HAIKU_MODEL": "hf:nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4",
+        "ANTHROPIC_MODEL": "hf:moonshotai/Kimi-K2.5"
       }
     },
     "Claude GLM": {
@@ -27,7 +21,17 @@
         "ANTHROPIC_BASE_URL": "https://api.z.ai/api/anthropic",
         "ANTHROPIC_AUTH_TOKEN": "{{ env `ZAI_API_KEY` }}",
         "API_TIMEOUT_MS": "3000000",
-        "ANTHROPIC_DEFAULT_OPUS_MODEL": "glm-5"
+        "ANTHROPIC_DEFAULT_OPUS_MODEL": "glm-5",
+        "ANTHROPIC_DEFAULT_SONNET_MODEL": "glm-5",
+        "ANTHROPIC_DEFAULT_HAIKU_MODEL": "glm-4.7",
+        "ANTHROPIC_MODEL": "glm-5"
+      }
+    },
+    "Claude LiteLLM": {
+      "command": "{{ lookPath `claude-agent-acp` }}",
+      "env": {
+        "ANTHROPIC_BASE_URL": "http://localhost:4000",
+        "ANTHROPIC_AUTH_TOKEN": "{{ env `LITELLM_MASTER_KEY` }}"
       }
     },
     "OpenCode": {
