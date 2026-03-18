@@ -23,24 +23,33 @@ synthetic_quota=$(curl -s "https://api.synthetic.new/v2/quotas" \
   -H "Authorization: Bearer $auth_token" \
   -H "Content-Type: application/json" 2>/dev/null |
   jq '
-  def format_quota: {
-    used: (.requests // 0),
-    limit: (.limit // 0),
-    reset_remaining_ms: (
-      (.renewsAt // "") |
-      sub("\\.[0-9]+"; "") |
-      sub("\\+00:00$"; "Z") |
-      sub("Z$"; "") + "Z" |
-      fromdateiso8601 // 0 |
-      . - now |
-      . * 1000 |
-      if . > 0 then floor else 0 end
-    )
-  };
+  def format_remaining_ms:
+    sub("\\.[0-9]+"; "")
+    | sub("\\+00:00$"; "Z")
+    | sub("Z$"; "") + "Z"
+    | fromdateiso8601 // 0
+    | . - now
+    | . * 1000
+    | if . > 0 then floor else 0 end;
 
   {
-    sub: (.subscription | format_quota),
-    tool_calls: (.freeToolCalls | format_quota)
+    sub: (.subscription | {
+      used: (.requests // 0),
+      limit: (.limit // 0),
+      reset_remaining_ms: (.renewsAt // "" | format_remaining_ms)
+    }),
+    tool_calls: (.freeToolCalls | {
+      used: (.requests // 0),
+      limit: (.limit // 0),
+      reset_remaining_ms: (.renewsAt // "" | format_remaining_ms)
+    }),
+    weekly_tokens: (.weeklyTokenLimit | {
+      input_used: (.input.current // 0),
+      input_limit: (.input.limit // 0),
+      output_used: (.output.current // 0),
+      output_limit: (.output.limit // 0),
+      reset_remaining_ms: (.renewsAt // "" | format_remaining_ms)
+    })
   }' 2>/dev/null)
 
 echo "$synthetic_quota" | jq -e '.sub.used' >/dev/null 2>&1 || exit 0

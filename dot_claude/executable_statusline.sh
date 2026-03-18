@@ -103,9 +103,21 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
     syn_tc_used=$(echo "$syn_quota" | jq -r '.tool_calls.used // 0')
     syn_tc_limit=$(echo "$syn_quota" | jq -r '.tool_calls.limit // 0')
     syn_tc_reset_ms=$(echo "$syn_quota" | jq -r '.tool_calls.reset_remaining_ms // 0')
-    syn_tc_display="${COLOR_MAGENTA}${syn_tc_used}${COLOR_RESET}${COLOR_MAUVE}/${syn_tc_limit} $(format_ms "$syn_tc_reset_ms")${COLOR_RESET}"
+    [ "$syn_tc_used" != "0" ] && syn_tc_display="${COLOR_MAGENTA}${syn_tc_used}${COLOR_RESET}${COLOR_MAUVE}/${syn_tc_limit} $(format_ms "$syn_tc_reset_ms")${COLOR_RESET}"
 
-    syn_quota_display="${syn_sub_display} ${syn_tc_display}"
+    syn_weekly_input_used=$(echo "$syn_quota" | jq -r '.weekly_tokens.input_used // 0')
+    syn_weekly_input_limit=$(echo "$syn_quota" | jq -r '.weekly_tokens.input_limit // 0')
+    syn_weekly_output_used=$(echo "$syn_quota" | jq -r '.weekly_tokens.output_used // 0')
+    syn_weekly_output_limit=$(echo "$syn_quota" | jq -r '.weekly_tokens.output_limit // 0')
+    syn_weekly_reset_ms=$(echo "$syn_quota" | jq -r '.weekly_tokens.reset_remaining_ms // 0')
+    syn_weekly_display=$(printf '%s%0.2fM%s%s/%0.0fM%s %s%0.1fK%s%s/%0.0fK%s %s%s%s' \
+      "$COLOR_MAGENTA" "$(echo "$syn_weekly_input_used" | awk '{print $1/1000000}')" "$COLOR_RESET" \
+      "$COLOR_MAUVE" "$(echo "$syn_weekly_input_limit" | awk '{print $1/1000000}')" "$COLOR_RESET" \
+      "$COLOR_MAGENTA" "$(echo "$syn_weekly_output_used" | awk '{print $1/1000}')" "$COLOR_RESET" \
+      "$COLOR_MAUVE" "$(echo "$syn_weekly_output_limit" | awk '{print $1/1000}')" "$COLOR_RESET" \
+      "$COLOR_MAUVE" "$(format_ms "$syn_weekly_reset_ms")" "$COLOR_RESET")
+
+    syn_quota_display=$(printf '%s\n' "$syn_sub_display" "$syn_tc_display" "$syn_weekly_display" | xargs)
   fi
 
   # glm quota (only for ZAI/ZHIPU)

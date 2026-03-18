@@ -22,6 +22,11 @@ interface SyntheticQuota {
     requests: number;
     renewsAt: string;
   };
+  weeklyTokenLimit?: {
+    input: { current: number; limit: number };
+    output: { current: number; limit: number };
+    renewsAt: string;
+  };
 }
 
 interface CopilotQuota {
@@ -262,10 +267,32 @@ const QUOTA_PROVIDERS: Record<string, QuotaProviderRuntime> = {
       );
     },
     formatQuota(quota: SyntheticQuota): string {
-      return [
+      const parts: string[] = [
         `${quota.subscription.requests}/${quota.subscription.limit} ${formatTimeRemaining(quota.subscription.renewsAt)}`,
-        `${quota.freeToolCalls.requests}/${quota.freeToolCalls.limit} ${formatTimeRemaining(quota.freeToolCalls.renewsAt)}`,
-      ].join(" ");
+      ];
+      if (quota.freeToolCalls.requests > 0) {
+        parts.push(
+          `${quota.freeToolCalls.requests}/${quota.freeToolCalls.limit} ${formatTimeRemaining(quota.freeToolCalls.renewsAt)}`,
+        );
+      }
+      if (quota.weeklyTokenLimit) {
+        const inputUsed = (
+          quota.weeklyTokenLimit.input.current / 1_000_000
+        ).toFixed(2);
+        const inputLimit = (
+          quota.weeklyTokenLimit.input.limit / 1_000_000
+        ).toFixed(0);
+        const outputUsed = (
+          quota.weeklyTokenLimit.output.current / 1_000
+        ).toFixed(1);
+        const outputLimit = (
+          quota.weeklyTokenLimit.output.limit / 1_000
+        ).toFixed(0);
+        parts.push(
+          `${inputUsed}M/${inputLimit}M ${outputUsed}K/${outputLimit}K ${formatTimeRemaining(quota.weeklyTokenLimit.renewsAt)}`,
+        );
+      }
+      return parts.join(" ");
     },
   }),
   "github-copilot": new QuotaProvider({
