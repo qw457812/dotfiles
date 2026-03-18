@@ -26,8 +26,8 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   COLOR_LAVENDER=$(printf '\033[38;5;147m')
   COLOR_GRAY=$(printf '\033[38;5;248m')
   COLOR_MAUVE=$(printf '\033[38;5;96m')
-  COLOR_STEEL=$(printf '\033[38;5;67m')
-  COLOR_CERULEAN=$(printf '\033[38;5;74m')
+  # COLOR_STEEL=$(printf '\033[38;5;67m')
+  # COLOR_CERULEAN=$(printf '\033[38;5;74m')
   COLOR_RESET=$(printf '\033[0m')
 
   format_ms() {
@@ -98,24 +98,25 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
     syn_sub_used=$(echo "$syn_quota" | jq -r '.sub.used // 0')
     syn_sub_limit=$(echo "$syn_quota" | jq -r '.sub.limit // 0')
     syn_sub_reset_ms=$(echo "$syn_quota" | jq -r '.sub.reset_remaining_ms // 0')
-    syn_sub_display="${COLOR_MAGENTA}${syn_sub_used}${COLOR_RESET}${COLOR_MAUVE}/${syn_sub_limit} $(format_ms "$syn_sub_reset_ms")${COLOR_RESET}"
+    syn_sub_display="${COLOR_MAGENTA}${syn_sub_used}${COLOR_MAUVE}/${syn_sub_limit} $(format_ms "$syn_sub_reset_ms")${COLOR_RESET}"
 
     syn_tc_used=$(echo "$syn_quota" | jq -r '.tool_calls.used // 0')
     syn_tc_limit=$(echo "$syn_quota" | jq -r '.tool_calls.limit // 0')
     syn_tc_reset_ms=$(echo "$syn_quota" | jq -r '.tool_calls.reset_remaining_ms // 0')
-    [ "$syn_tc_used" != "0" ] && syn_tc_display="${COLOR_MAGENTA}${syn_tc_used}${COLOR_RESET}${COLOR_MAUVE}/${syn_tc_limit} $(format_ms "$syn_tc_reset_ms")${COLOR_RESET}"
+    syn_tc_display=""
+    [ "$syn_tc_used" != "0" ] && syn_tc_display="${COLOR_MAGENTA}${syn_tc_used}${COLOR_MAUVE}/${syn_tc_limit} $(format_ms "$syn_tc_reset_ms")${COLOR_RESET}"
 
     syn_weekly_input_used=$(echo "$syn_quota" | jq -r '.weekly_tokens.input_used // 0')
     syn_weekly_input_limit=$(echo "$syn_quota" | jq -r '.weekly_tokens.input_limit // 0')
     syn_weekly_output_used=$(echo "$syn_quota" | jq -r '.weekly_tokens.output_used // 0')
     syn_weekly_output_limit=$(echo "$syn_quota" | jq -r '.weekly_tokens.output_limit // 0')
     syn_weekly_reset_ms=$(echo "$syn_quota" | jq -r '.weekly_tokens.reset_remaining_ms // 0')
-    syn_weekly_display=$(printf '%s%0.2fM%s%s/%0.0fM%s %s%0.1fK%s%s/%0.0fK%s %s%s%s' \
-      "$COLOR_MAGENTA" "$(echo "$syn_weekly_input_used" | awk '{print $1/1000000}')" "$COLOR_RESET" \
-      "$COLOR_MAUVE" "$(echo "$syn_weekly_input_limit" | awk '{print $1/1000000}')" "$COLOR_RESET" \
-      "$COLOR_MAGENTA" "$(echo "$syn_weekly_output_used" | awk '{print $1/1000}')" "$COLOR_RESET" \
-      "$COLOR_MAUVE" "$(echo "$syn_weekly_output_limit" | awk '{print $1/1000}')" "$COLOR_RESET" \
-      "$COLOR_MAUVE" "$(format_ms "$syn_weekly_reset_ms")" "$COLOR_RESET")
+    syn_weekly_display=$(printf '%s%0.2fM%s/%0.0fM %s%0.1fK%s/%0.0fK %s%s' \
+      "$COLOR_MAGENTA" "$(echo "$syn_weekly_input_used" | awk '{print $1/1000000}')" \
+      "$COLOR_MAUVE" "$(echo "$syn_weekly_input_limit" | awk '{print $1/1000000}')" \
+      "$COLOR_MAGENTA" "$(echo "$syn_weekly_output_used" | awk '{print $1/1000}')" \
+      "$COLOR_MAUVE" "$(echo "$syn_weekly_output_limit" | awk '{print $1/1000}')" \
+      "$(format_ms "$syn_weekly_reset_ms")" "$COLOR_RESET")
 
     syn_quota_display=$(printf '%s\n' "$syn_sub_display" "$syn_tc_display" "$syn_weekly_display" | xargs)
   fi
@@ -133,7 +134,11 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
         done | xargs
     )
     glm_mcp=$(echo "$glm_quota" | jq -r '.mcp.used_pct // 0')
-    glm_quota_display=$([ -n "$glm_tokens_display" ] && echo "$glm_tokens_display${glm_mcp:+ ${COLOR_YELLOW}${glm_mcp}%${COLOR_RESET}}")
+    if [ "$glm_mcp" != "0" ]; then
+      glm_quota_display="$glm_tokens_display ${COLOR_YELLOW}${glm_mcp}%${COLOR_RESET}"
+    else
+      glm_quota_display="$glm_tokens_display"
+    fi
   fi
 
   # # copilot premium quota
@@ -143,7 +148,7 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   #   copilot_used=$(echo "$copilot_quota" | jq -r '.used // 0')
   #   copilot_limit=$(echo "$copilot_quota" | jq -r '.limit // 0')
   #   copilot_reset_ms=$(echo "$copilot_quota" | jq -r '.reset_remaining_ms // 0')
-  #   copilot_quota_display="${COLOR_CERULEAN}${copilot_used}${COLOR_RESET}${COLOR_STEEL}/${copilot_limit} $(format_ms "$copilot_reset_ms")${COLOR_RESET}"
+  #   copilot_quota_display="${COLOR_CERULEAN}${copilot_used}${COLOR_STEEL}/${copilot_limit} $(format_ms "$copilot_reset_ms")${COLOR_RESET}"
   # fi
 
   # version

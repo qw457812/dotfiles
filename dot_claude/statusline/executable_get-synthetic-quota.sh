@@ -19,6 +19,7 @@ cache_get "$cache_file" 60 && exit 0
 
 # https://dev.synthetic.new/docs/synthetic/quotas
 # "renewsAt": "2026-02-03T13:19:50.957Z"
+# TODO: remove freeToolCalls
 synthetic_quota=$(curl -s "https://api.synthetic.new/v2/quotas" \
   -H "Authorization: Bearer $auth_token" \
   -H "Content-Type: application/json" 2>/dev/null |
