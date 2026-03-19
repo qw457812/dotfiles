@@ -344,10 +344,7 @@ const quotaSources: Record<string, QuotaSource> = {
               ? `${limit.percentage}%/${formatTimeRemaining(limit.nextResetTime)}`
               : `${limit.percentage}%`,
           );
-          continue;
-        }
-
-        if (limit.type === "TIME_LIMIT") {
+        } else if (limit.type === "TIME_LIMIT" && limit.percentage > 0) {
           mcp.push(`${limit.percentage}%`);
         }
       }
