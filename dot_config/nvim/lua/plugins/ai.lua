@@ -387,9 +387,6 @@ return {
           },
           gemini = { cmd = { "hack_to_disable_gemini" } }, -- HACK: disable gemini
           pi = {
-            cmd = { "pi" },
-            is_proc = "\\<pi\\>",
-            url = "https://github.com/badlogic/pi-mono/tree/main/packages/coding-agent",
             env = {
               __AI_AGENT = "pi",
             },
