@@ -2,5 +2,6 @@
   "selectUp": ["up", "ctrl+p", "ctrl+k"],
   "selectDown": ["down", "ctrl+n", "ctrl+j"],
   "undo": ["ctrl+-", "ctrl+/"],
-  "selectModel": ["alt+p"]
+  "selectModel": ["alt+p"],
+  "cycleModelForward": []
 }

@@ -1,6 +1,20 @@
 {
-  "selectUp": ["up", "ctrl+p", "ctrl+k"],
-  "selectDown": ["down", "ctrl+n", "ctrl+j"],
-  "undo": ["ctrl+-", "ctrl+/"],
-  "selectModel": ["alt+p"]
+  "tui.editor.undo": [
+    "ctrl+-",
+    "ctrl+/"
+  ],
+  "tui.select.up": [
+    "up",
+    "ctrl+p",
+    "ctrl+k"
+  ],
+  "tui.select.down": [
+    "down",
+    "ctrl+n",
+    "ctrl+j"
+  ],
+  "app.model.select": [
+    "alt+p"
+  ],
+  "app.model.cycleForward": []
 }
