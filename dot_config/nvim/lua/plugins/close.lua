@@ -592,7 +592,7 @@ return {
           --     return
           --   end
           --
-          --   local key = require("codecompanion.config").config.strategies.chat.keymaps.close.modes.n
+          --   local key = require("codecompanion.config").config.interactions.chat.keymaps.close.modes.n
           --   vim.keymap.set(
           --     "n",
           --     close_key,
@@ -611,25 +611,25 @@ return {
         end,
       })
 
-      vim.api.nvim_create_autocmd("User", {
-        pattern = "CodeCompanionDiffAttached",
-        callback = function(ev)
-          if not (ev.data and ev.data.bufnr) then
+      vim.api.nvim_create_autocmd("BufWinEnter", {
+        group = augroup,
+        callback = vim.schedule_wrap(function(ev)
+          local buf = ev.buf
+          if not (vim.api.nvim_buf_is_valid(buf) and U.ai.codecompanion.is_diff(buf)) then
             return
           end
 
-          local buf = ev.data.bufnr
-          local is_acp = ev.data.id and vim.api.nvim_buf_get_name(buf):match("_diff_" .. ev.data.id .. "$")
-          if is_acp and not U.is_file({ buf = buf }) then
-            local reject_key = require("codecompanion.config").config.strategies.chat.keymaps._acp_reject_once.modes.n
-            vim.keymap.set(
-              "n",
-              close_key,
-              type(reject_key) == "table" and reject_key[1] or reject_key,
-              { buffer = buf, remap = true, desc = "Reject Diff (CodeCompanion ACP)" }
-            )
-          end
-        end,
+          local config = require("codecompanion.config").config
+
+          local reject_key = U.ai.codecompanion.is_acp() and config.interactions.chat.keymaps._acp_reject_once.modes.n
+            or config.interactions.shared.keymaps.reject_change.modes.n
+          vim.keymap.set(
+            "n",
+            close_key,
+            type(reject_key) == "table" and reject_key[1] or reject_key,
+            { buffer = buf, remap = true, desc = "Reject Diff (CodeCompanion)" }
+          )
+        end),
       })
     end,
   },

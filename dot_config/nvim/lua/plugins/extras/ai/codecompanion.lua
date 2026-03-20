@@ -10,7 +10,6 @@ local function focus_last_chat()
   return true
 end
 
--- https://github.com/olimorris/dotfiles/blob/main/.config/nvim/lua/plugins/coding.lua
 ---@type LazySpec
 return {
   {
@@ -56,27 +55,23 @@ return {
       { "<leader>ani", "<cmd>CodeCompanion<CR>", desc = "Inline", mode = { "n", "x" } },
       { "<leader>ana", "<cmd>CodeCompanionActions<CR>", desc = "Actions", mode = { "n", "x" } },
       { "<leader>ann", "<cmd>CodeCompanionChat<CR>", desc = "New Chat", mode = { "n", "x" } },
-      { "<leader>anc", "<cmd>CodeCompanionChat claude_code<CR>", desc = "Claude Code ACP", mode = { "n", "x" } },
-      { "<leader>anp", "<cmd>CodeCompanionChat copilot<CR>", desc = "Copilot", mode = { "n", "x" } },
       {
-        "<leader>ans",
-        "<cmd>CodeCompanionChat copilot_claude<CR>",
-        desc = "Copilot Claude Sonnet 4.5",
+        "<leader>anc",
+        "<cmd>CodeCompanionChat adapter=claude_code<CR>",
+        desc = "Claude Code ACP",
         mode = { "n", "x" },
       },
+      { "<leader>anp", "<cmd>CodeCompanionChat adapter=copilot<CR>", desc = "Copilot", mode = { "n", "x" } },
     },
     opts = {
-      ignore_warnings = true,
       adapters = {
         http = {
-          copilot_claude = function()
+          copilot = function()
             return require("codecompanion.adapters").extend("copilot", {
-              name = "copilot_claude",
-              formatted_name = "Copilot Claude Sonnet 4.5",
               schema = {
                 model = {
                   -- https://docs.github.com/en/copilot/concepts/billing/copilot-requests#model-multipliers
-                  default = "claude-sonnet-4.5",
+                  default = "gpt-5-mini",
                 },
               },
             })
@@ -91,7 +86,7 @@ return {
           end,
         },
       },
-      strategies = {
+      interactions = {
         chat = {
           adapter = vim.fn.executable("claude-agent-acp") == 1 and "claude_code" or "copilot",
           roles = {
@@ -115,60 +110,32 @@ return {
             clear                  = { modes = { n = "<localleader>c" } },
             codeblock              = { modes = { n = "<localleader>`" } },
             yank_code              = { modes = { n = "<localleader>y" } },
-            pin                    = { modes = { n = "<localleader>p" } },
-            watch                  = { modes = { n = "<localleader>w" } },
+            buffer_sync_all        = { modes = { n = "<localleader>A" } },
+            buffer_sync_diff       = { modes = { n = "<localleader>D" } },
             next_chat              = { modes = { n = "<localleader>j" } },
             previous_chat          = { modes = { n = "<localleader>k" } },
             change_adapter         = { modes = { n = "<localleader>m" } },
             fold_code              = { modes = { n = "<localleader>f" } },
             debug                  = { modes = { n = "<localleader>d" } },
             system_prompt          = { modes = { n = "<localleader>P" } },
-            memory                 = { modes = { n = "<localleader>M" } },
+            rules                  = { modes = { n = "<localleader>M" } },
+            clear_approvals        = { modes = { n = "<localleader>X" } },
             yolo_mode              = { modes = { n = "<localleader>Y" } },
             goto_file_under_cursor = { modes = { n = "<localleader>F" } },
             copilot_stats          = { modes = { n = "<localleader>S" } },
-            super_diff             = { modes = { n = "<localleader>D" } },
             _acp_allow_always      = { modes = { n = "<S-Tab>" } },
             _acp_allow_once        = { modes = { n = "<CR>" } },
             _acp_reject_once       = { modes = { n = "<C-c>" } },
+            _acp_reject_always     = { modes = { n = "<localleader><C-c>" } },
           },
         },
-        inline = {
-          adapter = "copilot",
+        shared = {
           keymaps = {
+            always_accept = { modes = { n = "<localleader>A" } },
             accept_change = { modes = { n = "<localleader>a" } },
             reject_change = { modes = { n = "<localleader>d" } },
-            always_accept = { modes = { n = "<localleader>A" } },
-          },
-        },
-      },
-      memory = {
-        agents_md = {
-          description = "One AGENTS.md works across many agents",
-          -- `enabled` not working
-          ------@return boolean
-          ---enabled = function()
-          ---  -- do not add AGENTS.md to memory if CLAUDE.md exists
-          ---  return vim.fn.filereadable("CLAUDE.md") == 0
-          ---end,
-          files = { "AGENTS.md" },
-        },
-        claude = {
-          description = "Claude Code memory files",
-          parser = "claude",
-          files = {
-            "~/.claude/CLAUDE.md",
-            "CLAUDE.md",
-            "CLAUDE.local.md",
-          },
-        },
-        opts = {
-          chat = {
-            enabled = true,
-            default_memory = {
-              -- "agents_md", -- `opts.memory.agents_md.enabled` not working
-              "claude",
-            },
+            next_hunk = { modes = { n = "]h" } },
+            previous_hunk = { modes = { n = "[h" } },
           },
         },
       },
@@ -184,9 +151,6 @@ return {
             height = 0.5,
             width = 0.4,
           },
-        },
-        diff = {
-          provider = "mini_diff",
         },
       },
       opts = {
@@ -209,9 +173,8 @@ return {
     "olimorris/codecompanion.nvim",
     optional = true,
     opts = function()
-      local augroup = vim.api.nvim_create_augroup("codecompanion_keymaps", { clear = true })
       vim.api.nvim_create_autocmd("FileType", {
-        group = augroup,
+        group = vim.api.nvim_create_augroup("codecompanion_keymaps", { clear = true }),
         pattern = "codecompanion",
         callback = function(ev)
           local buf = ev.buf
@@ -226,7 +189,7 @@ return {
           )
 
           vim.api.nvim_create_autocmd("BufLeave", {
-            group = augroup,
+            group = vim.api.nvim_create_augroup("codecompanion_keymaps_" .. buf, { clear = true }),
             buffer = buf,
             callback = function()
               -- for i_<C-c>
@@ -244,52 +207,25 @@ return {
         end,
       })
 
-      vim.api.nvim_create_autocmd("User", {
-        pattern = "CodeCompanionDiffAttached",
-        callback = function(ev)
-          if not (ev.data and ev.data.bufnr) then
+      vim.api.nvim_create_autocmd("BufWinEnter", {
+        group = vim.api.nvim_create_augroup("codecompanion_diff_keymaps", { clear = true }),
+        callback = vim.schedule_wrap(function(ev)
+          local buf = ev.buf
+          if not (vim.api.nvim_buf_is_valid(buf) and U.ai.codecompanion.is_diff(buf)) then
             return
           end
 
-          local buf = ev.data.bufnr
-          -- https://github.com/olimorris/codecompanion.nvim/blob/a8c696d1fc4268085e4306d54af39b07be884b17/lua/codecompanion/strategies/chat/acp/request_permission.lua#L360
-          local is_acp = ev.data.id and vim.api.nvim_buf_get_name(buf):match("_diff_" .. ev.data.id .. "$")
-          if is_acp then
-            local accept_key = require("codecompanion.config").config.strategies.chat.keymaps._acp_allow_once.modes.n
-            vim.keymap.set(
-              "n",
-              "<C-s>",
-              type(accept_key) == "table" and accept_key[1] or accept_key,
-              { buffer = buf, remap = true, desc = "Accept Diff (CodeCompanion ACP)" }
-            )
+          local config = require("codecompanion.config").config
 
-            if ev.data.diff == "mini_diff" then
-              local win = vim.fn.bufwinid(buf)
-              if win ~= -1 and vim.wo[win].winhighlight:find("WinBar:CodeCompanionChatInfoBanner") then
-                -- vim.wo[win].winbar = "" -- will overwritten by dropbar
-                vim.wo[win].winhighlight = "" -- winhighlight looks bad
-              end
-
-              -- go to first hunk
-              local executed = false
-              local id = vim.api.nvim_create_autocmd("User", {
-                group = vim.api.nvim_create_augroup("codecompanion_acp_mini_diff", { clear = true }),
-                pattern = "MiniDiffUpdated",
-                once = true,
-                callback = function()
-                  executed = true
-                  require("mini.diff").goto_hunk("first")
-                  vim.cmd("normal! zz")
-                end,
-              })
-              vim.defer_fn(function()
-                if not executed then -- see `:h autocmd-once`
-                  vim.api.nvim_del_autocmd(id)
-                end
-              end, 500)
-            end
-          end
-        end,
+          local accept_key = U.ai.codecompanion.is_acp() and config.interactions.chat.keymaps._acp_allow_once.modes.n
+            or config.interactions.shared.keymaps.accept_change.modes.n
+          vim.keymap.set(
+            "n",
+            "<C-s>",
+            type(accept_key) == "table" and accept_key[1] or accept_key,
+            { buffer = buf, remap = true, desc = "Accept Diff (CodeCompanion)" }
+          )
+        end),
       })
     end,
   },
@@ -316,8 +252,7 @@ return {
               delete = { n = "<localleader>d" },
               duplicate = { n = "<localleader>y", i = "<M-y>" },
             },
-            -- disable title generation since there are errors with claude_code adapter
-            auto_generate_title = false,
+            auto_generate_title = false, -- buggy
             title_generation_opts = {
               adapter = "copilot",
             },

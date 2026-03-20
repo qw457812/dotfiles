@@ -580,4 +580,26 @@ M.sidekick = {
   },
 }
 
+M.codecompanion = {
+  ---@param buf integer
+  ---@return boolean
+  is_diff = function(buf)
+    for name, ns in pairs(vim.api.nvim_get_namespaces()) do
+      -- https://github.com/olimorris/codecompanion.nvim/blob/f9291106861c3325b257138acccef7ccabfcac5d/lua/codecompanion/diff/ui.lua#L588
+      if name:find("^codecompanion_diff_extmarks_") then
+        local marks = vim.api.nvim_buf_get_extmarks(buf, ns, 0, -1, { limit = 1 })
+        if #marks > 0 then
+          return true
+        end
+      end
+    end
+    return false
+  end,
+  ---@return boolean
+  is_acp = function()
+    local chat = require("codecompanion").last_chat()
+    return chat and chat.adapter and chat.adapter.type == "acp" or false
+  end,
+}
+
 return M
