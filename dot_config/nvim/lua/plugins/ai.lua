@@ -147,7 +147,7 @@ return {
       -- stylua: ignore
       return vim.list_extend(keys, {
         { "<c-.>", false, mode = { "n", "x", "i", "t" } },
-        { sidekick_cli_toggle_key, function() require("sidekick.cli").toggle({ filter = filter }) end, mode = { "n", "x", "t" }, desc = "Sidekick" },
+        { sidekick_cli_toggle_key, function() require("sidekick.cli").focus({ filter = filter }) end, mode = { "n", "x", "t" }, desc = "Sidekick" },
         { "<c-q>", function() U.ai.sidekick.cli.scrollback({ filter = filter }) end, desc = "Scrollback (Sidekick)" },
         -- { "<cr>", function() U.ai.sidekick.cli.submit_or_focus({ filter = filter }) end, desc = "Submit or Focus (Sidekick)" },
         -- { "<cr>", function() require("sidekick.cli").send({ msg = "{this}", filter = filter }) end, mode = "x", desc = "Sidekick" },
@@ -291,6 +291,7 @@ return {
           ---@type table<string, sidekick.cli.Keymap|false|nil>
           keys = {
             hide_ctrl_dot = false,
+            hide_ctrl_z = { "<c-z>", "hide", mode = "nt" },
             hide_toggle_key = { sidekick_cli_toggle_key, "hide", mode = "nt" },
             down_ctrl_j = not vim.g.user_is_termux and { "<c-j>", "<Down>" } or false, -- this overrides the window navigation
             up_ctrl_k = not vim.g.user_is_termux and { "<c-k>", "<Up>" } or false, -- this overrides the window navigation
@@ -336,7 +337,13 @@ return {
               "<C-g>",
               function(t)
                 local name = t.tool.name
-                if name:find("claude") or name:find("codex") or name:find("opencode") then
+                if
+                  name:find("^claude")
+                  or name:find("^codex")
+                  or name:find("^opencode")
+                  or name:find("^pi")
+                  or name:find("^gsd")
+                then
                   U.ai.sidekick.cli.tools.actions.send_keys({ "<C-g>" })(t)
                   vim.cmd.startinsert()
                 else
