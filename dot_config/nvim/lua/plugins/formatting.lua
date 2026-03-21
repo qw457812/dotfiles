@@ -19,7 +19,7 @@ return {
     ---@module "conform"
     ---@param opts conform.setupOpts
     opts = function(_, opts)
-      if not LazyVim.has_extra("formatting.biome") then
+      if not LazyVim.has_extra("lang.typescript.biome") then
         return
       end
 

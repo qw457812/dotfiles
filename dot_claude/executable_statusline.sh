@@ -40,7 +40,8 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
         h = int((s%86400)/3600)
         m = int((s%3600)/60)
         if (d > 0) {
-          printf "%dd%dh%dm", d, h, m
+          # printf "%dd%dh%dm", d, h, m
+          printf "%dd%dh", d, h
         } else if (h > 0) {
           printf "%dh%dm", h, m
         } else {
@@ -74,10 +75,10 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
 
   # tokens
   total_tokens=$(echo "$input" | jq -r '.context_window.current_usage | (.input_tokens // 0) + (.output_tokens // 0) + (.cache_creation_input_tokens // 0) + (.cache_read_input_tokens // 0)')
-  total_tokens_display="${COLOR_BLUE}$(awk -v t="$total_tokens" 'BEGIN {printf "%.1fk", t/1000}')${COLOR_RESET}"
+  total_tokens_display="${COLOR_BLUE}$(awk -v t="$total_tokens" 'BEGIN {v=t/1000; if (v==int(v)) printf "%dk", v; else printf "%.1fk", v}')${COLOR_RESET}"
 
   # context usage
-  context_percentage_display="${COLOR_CYAN}$(awk -v t="$total_tokens" -v s="$context_window_size" 'BEGIN {printf "%.1f%%", t*100/s}')${COLOR_RESET}"
+  context_percentage_display="${COLOR_CYAN}$(awk -v t="$total_tokens" -v s="$context_window_size" 'BEGIN {v=t*100/s; if (v==int(v)) printf "%d%%", v; else printf "%.1f%%", v}')${COLOR_RESET}"
 
   # # session cost
   # session_cost=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
@@ -95,7 +96,7 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   syn_quota=$("$HOME/.claude/statusline/get-synthetic-quota.sh")
   syn_quota_display=""
   if echo "$syn_quota" | jq -e . >/dev/null 2>&1; then
-    syn_sub_used=$(echo "$syn_quota" | jq -r '.sub.used // 0')
+    syn_sub_used=$(echo "$syn_quota" | jq -r '.sub.used // 0' | awk '{if ($1 == int($1)) printf "%d", $1; else printf "%.1f", $1}')
     syn_sub_limit=$(echo "$syn_quota" | jq -r '.sub.limit // 0')
     syn_sub_reset_ms=$(echo "$syn_quota" | jq -r '.sub.reset_remaining_ms // 0')
     syn_sub_display="${COLOR_MAGENTA}${syn_sub_used}${COLOR_MAUVE}/${syn_sub_limit} $(format_ms "$syn_sub_reset_ms")${COLOR_RESET}"
