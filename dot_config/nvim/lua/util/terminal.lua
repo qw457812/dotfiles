@@ -69,14 +69,18 @@ function M.toggle(cmd, opts, hide_key)
     and (vim.deep_equal(st.cmd, cmd) and st.cwd == opts.cwd and vim.deep_equal(st.env, opts.env))
   then
     ---@param t snacks.win
-    local terminal = vim.tbl_filter(function(t)
+    local term = vim.tbl_filter(function(t)
       return t.win == win
     end, Snacks.terminal.list())[1]
     vim.cmd("close")
-    return terminal
+    return term
   else
-    -- TODO: focus if terminal is already open but not focused
-    return Snacks.terminal(cmd, opts)
+    -- focus if terminal is already open but not focused
+    local term = Snacks.terminal.focus(cmd, opts)
+    local term_win = vim.api.nvim_get_current_win()
+    return term or vim.tbl_filter(function(t)
+      return t.win == term_win
+    end, Snacks.terminal.list())[1]
   end
 end
 

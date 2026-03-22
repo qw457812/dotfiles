@@ -76,6 +76,9 @@ return {
             end,
           },
           keys = {
+            -- Disable `<c-/>` to avoid conflicts with fish/claude undo. Instead, `<c-/>` only hides the terminal opened by `<c-/>`
+            hide_slash = false,
+            hide_underscore = false,
             t_c_o = { "<c-o>", "blur", mode = "t" },
             t_c_q = {
               "<c-q>",

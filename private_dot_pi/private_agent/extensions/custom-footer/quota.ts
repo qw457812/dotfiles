@@ -161,7 +161,8 @@ function formatTimeRemaining(targetDate: string | number): string {
   const minutes = Math.floor((diff % HOUR_MS) / MINUTE_MS);
 
   if (days > 0) {
-    return `${days}d${hours}h${minutes}m`;
+    // return `${days}d${hours}h${minutes}m`;
+    return `${days}d${hours}h`;
   }
   if (hours > 0) {
     return `${hours}h${minutes}m`;
