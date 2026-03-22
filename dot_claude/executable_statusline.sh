@@ -51,6 +51,15 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
     }'
   }
 
+  # Format number: show as integer if whole number, otherwise show decimals
+  # Usage: format_num <value> [fraction_digits=1]
+  format_num() {
+    awk -v v="$1" -v d="${2:-1}" 'BEGIN {
+      if (v == int(v)) printf "%d", v
+      else printf "%.*f", d, v
+    }'
+  }
+
   base_url="$ANTHROPIC_BASE_URL"
   context_window_size=$(echo "$input" | jq -r '.context_window.context_window_size // 200000')
   transcript_path=$(echo "$input" | jq -r '.transcript_path // ""')
@@ -75,10 +84,10 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
 
   # tokens
   total_tokens=$(echo "$input" | jq -r '.context_window.current_usage | (.input_tokens // 0) + (.output_tokens // 0) + (.cache_creation_input_tokens // 0) + (.cache_read_input_tokens // 0)')
-  total_tokens_display="${COLOR_BLUE}$(awk -v t="$total_tokens" 'BEGIN {v=t/1000; if (v==int(v)) printf "%dk", v; else printf "%.1fk", v}')${COLOR_RESET}"
+  total_tokens_display="${COLOR_BLUE}$(format_num "$(echo "$total_tokens" | awk '{print $1/1000}')")k${COLOR_RESET}"
 
   # context usage
-  context_percentage_display="${COLOR_CYAN}$(awk -v t="$total_tokens" -v s="$context_window_size" 'BEGIN {v=t*100/s; if (v==int(v)) printf "%d%%", v; else printf "%.1f%%", v}')${COLOR_RESET}"
+  context_percentage_display="${COLOR_CYAN}$(format_num "$(echo "$total_tokens" | awk -v s="$context_window_size" '{print $1*100/s}')")%${COLOR_RESET}"
 
   # # session cost
   # session_cost=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
@@ -96,7 +105,7 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   syn_quota=$("$HOME/.claude/statusline/get-synthetic-quota.sh")
   syn_quota_display=""
   if echo "$syn_quota" | jq -e . >/dev/null 2>&1; then
-    syn_sub_used=$(echo "$syn_quota" | jq -r '.sub.used // 0' | awk '{if ($1 == int($1)) printf "%d", $1; else printf "%.1f", $1}')
+    syn_sub_used=$(format_num "$(echo "$syn_quota" | jq -r '.sub.used // 0')")
     syn_sub_limit=$(echo "$syn_quota" | jq -r '.sub.limit // 0')
     syn_sub_reset_ms=$(echo "$syn_quota" | jq -r '.sub.reset_remaining_ms // 0')
     syn_sub_display="${COLOR_MAGENTA}${syn_sub_used}${COLOR_MAUVE}/${syn_sub_limit} $(format_ms "$syn_sub_reset_ms")${COLOR_RESET}"
