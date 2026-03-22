@@ -843,7 +843,7 @@ return {
     config = function() end,
     specs = {
       { "lajarre/pi-vim", version = "*", lazy = true, config = function() end },
-      { "mitsuhiko/agent-stuff", version = "*", lazy = true, config = function() end },
+      { "mitsuhiko/agent-stuff", lazy = true, config = function() end },
     },
   },
   {

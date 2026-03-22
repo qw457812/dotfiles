@@ -108,6 +108,12 @@ require("lazy").setup({
         end,
         desc = "Search Plugin Code",
       },
+      ["<leader><cr>"] = {
+        function(plugin)
+          require("yazi").yazi({ open_multiple_tabs = false }, plugin.dir)
+        end,
+        desc = "Yazi (Plugin Dir)",
+      },
       ["<leader>fy"] = {
         function(plugin)
           local path = vim.fn.fnamemodify(plugin.dir, ":p:~")
