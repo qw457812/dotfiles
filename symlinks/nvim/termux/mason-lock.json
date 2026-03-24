@@ -14,7 +14,7 @@
   "luacheck": "1.1.0",
   "markdown-toc": "1.2.0",
   "markdownlint": "0.48.0",
-  "markdownlint-cli2": "0.21.0",
+  "markdownlint-cli2": "0.22.0",
   "prettier": "3.8.1",
   "pyright": "1.1.408",
   "shellcheck": "v0.11.0",
