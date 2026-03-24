@@ -45,11 +45,8 @@ synthetic_quota=$(curl -s "https://api.synthetic.new/v2/quotas" \
       reset_remaining_ms: (.renewsAt // "" | format_remaining_ms)
     }),
     weekly_tokens: (.weeklyTokenLimit | {
-      input_used: (.input.current // 0),
-      input_limit: (.input.limit // 0),
-      output_used: (.output.current // 0),
-      output_limit: (.output.limit // 0),
-      reset_remaining_ms: (.renewsAt // "" | format_remaining_ms)
+      used_pct: (100 - (.percentRemaining // 0)),
+      regen_remaining_ms: (.nextRegenAt // "" | format_remaining_ms)
     })
   }' 2>/dev/null)
 

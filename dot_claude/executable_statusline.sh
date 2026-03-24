@@ -116,17 +116,9 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
     syn_tc_display=""
     [ "$syn_tc_used" != "0" ] && syn_tc_display="${COLOR_MAGENTA}${syn_tc_used}${COLOR_MAUVE}/${syn_tc_limit} $(format_ms "$syn_tc_reset_ms")${COLOR_RESET}"
 
-    syn_weekly_input_used=$(echo "$syn_quota" | jq -r '.weekly_tokens.input_used // 0')
-    syn_weekly_input_limit=$(echo "$syn_quota" | jq -r '.weekly_tokens.input_limit // 0')
-    syn_weekly_output_used=$(echo "$syn_quota" | jq -r '.weekly_tokens.output_used // 0')
-    syn_weekly_output_limit=$(echo "$syn_quota" | jq -r '.weekly_tokens.output_limit // 0')
-    syn_weekly_reset_ms=$(echo "$syn_quota" | jq -r '.weekly_tokens.reset_remaining_ms // 0')
-    syn_weekly_display=$(printf '%s%0.2fM%s/%0.0fM %s%0.1fK%s/%0.0fK %s%s' \
-      "$COLOR_MAGENTA" "$(echo "$syn_weekly_input_used" | awk '{print $1/1000000}')" \
-      "$COLOR_MAUVE" "$(echo "$syn_weekly_input_limit" | awk '{print $1/1000000}')" \
-      "$COLOR_MAGENTA" "$(echo "$syn_weekly_output_used" | awk '{print $1/1000}')" \
-      "$COLOR_MAUVE" "$(echo "$syn_weekly_output_limit" | awk '{print $1/1000}')" \
-      "$(format_ms "$syn_weekly_reset_ms")" "$COLOR_RESET")
+    syn_weekly_used_pct=$(echo "$syn_quota" | jq -r '.weekly_tokens.used_pct // 0')
+    syn_weekly_regen_ms=$(echo "$syn_quota" | jq -r '.weekly_tokens.regen_remaining_ms // 0')
+    syn_weekly_display="${COLOR_MAGENTA}$(format_num "$syn_weekly_used_pct")%${COLOR_MAUVE} $(format_ms "$syn_weekly_regen_ms")${COLOR_RESET}"
 
     syn_quota_display=$(printf '%s\n' "$syn_sub_display" "$syn_tc_display" "$syn_weekly_display" | xargs)
   fi
