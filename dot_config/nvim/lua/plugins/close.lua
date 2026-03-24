@@ -619,10 +619,7 @@ return {
             return
           end
 
-          local config = require("codecompanion.config").config
-
-          local reject_key = U.ai.codecompanion.is_acp() and config.interactions.chat.keymaps._acp_reject_once.modes.n
-            or config.interactions.shared.keymaps.reject_change.modes.n
+          local reject_key = require("codecompanion.config").config.interactions.shared.keymaps.reject_change.modes.n
           vim.keymap.set(
             "n",
             close_key,

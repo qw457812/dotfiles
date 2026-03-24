@@ -106,34 +106,33 @@ return {
           keymaps = {
             options                = { modes = { n = { "g?", "<localleader>?" } } },
             regenerate             = { modes = { n = "<localleader>r" } },
+            close                  = { modes = { n = "<localleader>C", i = {} } },
             stop                   = { modes = { n = "<localleader>s" } },
             clear                  = { modes = { n = "<localleader>c" } },
             codeblock              = { modes = { n = "<localleader>`" } },
             yank_code              = { modes = { n = "<localleader>y" } },
-            buffer_sync_all        = { modes = { n = "<localleader>A" } },
-            buffer_sync_diff       = { modes = { n = "<localleader>D" } },
+            buffer_sync_all        = { modes = { n = "<localleader>ba" } },
+            buffer_sync_diff       = { modes = { n = "<localleader>bd" } },
             next_chat              = { modes = { n = "<localleader>j" } },
             previous_chat          = { modes = { n = "<localleader>k" } },
             change_adapter         = { modes = { n = "<localleader>m" } },
             fold_code              = { modes = { n = "<localleader>f" } },
-            debug                  = { modes = { n = "<localleader>d" } },
+            debug                  = { modes = { n = "<localleader>D" } },
             system_prompt          = { modes = { n = "<localleader>P" } },
             rules                  = { modes = { n = "<localleader>M" } },
             clear_approvals        = { modes = { n = "<localleader>X" } },
             yolo_mode              = { modes = { n = "<localleader>Y" } },
             goto_file_under_cursor = { modes = { n = "<localleader>F" } },
             copilot_stats          = { modes = { n = "<localleader>S" } },
-            _acp_allow_always      = { modes = { n = "<S-Tab>" } },
-            _acp_allow_once        = { modes = { n = "<CR>" } },
-            _acp_reject_once       = { modes = { n = "<C-c>" } },
-            _acp_reject_always     = { modes = { n = "<localleader><C-c>" } },
           },
         },
         shared = {
           keymaps = {
+            view_diff = { modes = { n = "<localleader>d" } },
             always_accept = { modes = { n = "<localleader>A" } },
             accept_change = { modes = { n = "<localleader>a" } },
-            reject_change = { modes = { n = "<localleader>d" } },
+            reject_change = { modes = { n = "<localleader>x" } },
+            cancel = { modes = { n = "<C-c>" } },
             next_hunk = { modes = { n = "]h" } },
             previous_hunk = { modes = { n = "[h" } },
           },
@@ -215,15 +214,20 @@ return {
             return
           end
 
-          local config = require("codecompanion.config").config
-
-          local accept_key = U.ai.codecompanion.is_acp() and config.interactions.chat.keymaps._acp_allow_once.modes.n
-            or config.interactions.shared.keymaps.accept_change.modes.n
+          local shared_keymaps = require("codecompanion.config").config.interactions.shared.keymaps
+          local accept_key = shared_keymaps.accept_change.modes.n
+          local reject_key = shared_keymaps.reject_change.modes.n
           vim.keymap.set(
             "n",
-            "<C-s>",
+            "<CR>",
             type(accept_key) == "table" and accept_key[1] or accept_key,
             { buffer = buf, remap = true, desc = "Accept Diff (CodeCompanion)" }
+          )
+          vim.keymap.set(
+            "n",
+            "<C-c>",
+            type(reject_key) == "table" and reject_key[1] or reject_key,
+            { buffer = buf, remap = true, desc = "Reject Diff (CodeCompanion)" }
           )
         end),
       })
