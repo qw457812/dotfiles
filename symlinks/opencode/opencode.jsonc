@@ -1,4 +1,5 @@
 // https://opencode.ai/docs/zen/#pricing
+// https://github.com/settings/billing/premium_requests_usage
 // curl https://opencode.ai/zen/v1/models | jq '.data | sort_by(.created)'
 {
   "$schema": "https://opencode.ai/config.json",

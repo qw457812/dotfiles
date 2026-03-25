@@ -170,6 +170,30 @@ require("lazy").setup({
         end,
         desc = "Pi",
       },
+      ["<leader>ag"] = {
+        function(plugin)
+          local orig_cwd = vim.fn.chdir(plugin.dir)
+          U.ai.sidekick.cli.quick.show("claude_glm" .. (vim.v.count == 0 and "" or vim.v.count))
+          if orig_cwd ~= "" then
+            vim.schedule(function()
+              vim.fn.chdir(orig_cwd)
+            end)
+          end
+        end,
+        desc = "Claude GLM",
+      },
+      ["<leader>as"] = {
+        function(plugin)
+          local orig_cwd = vim.fn.chdir(plugin.dir)
+          U.ai.sidekick.cli.quick.show("gsd" .. (vim.v.count == 0 and "" or vim.v.count))
+          if orig_cwd ~= "" then
+            vim.schedule(function()
+              vim.fn.chdir(orig_cwd)
+            end)
+          end
+        end,
+        desc = "GSD",
+      },
       ["<leader>gg"] = {
         function(plugin)
           Snacks.lazygit({ cwd = plugin.dir })

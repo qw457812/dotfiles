@@ -3,11 +3,11 @@
     "checkpointing": {
       "enabled": true
     },
-    "disableAutoUpdate": true,
     "preferredEditor": "neovim",
     "vimMode": true,
     "previewFeatures": true,
-    "enableAutoUpdate": false
+    "enableAutoUpdate": false,
+    "enableNotifications": true
   },
   "context": {
     "fileName": [
@@ -20,7 +20,13 @@
     "hideBanner": true,
     "theme": "GitHub",
     "footer": {
-      "hideContextPercentage": false
+      "hideContextPercentage": false,
+      "items": [
+        "sandbox",
+        "model-name",
+        "context-used",
+        "quota"
+      ]
     }
   },
   "mcpServers": {

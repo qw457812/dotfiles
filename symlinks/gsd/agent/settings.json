@@ -1,8 +1,8 @@
 {
   "lastChangelogVersion": "2.33.0",
-  "defaultProvider": "zai",
-  "defaultModel": "glm-5",
-  "defaultThinkingLevel": "medium",
+  "defaultProvider": "github-copilot",
+  "defaultModel": "gpt-5.4",
+  "defaultThinkingLevel": "high",
   "hideThinkingBlock": true,
   "quietStartup": true,
   "collapseChangelog": true,
@@ -10,7 +10,8 @@
     "synthetic/hf:moonshotai/Kimi-K2.5",
     "zai/glm-5",
     "openai-codex/gpt-5.4",
-    "github-copilot/claude-opus-4.6"
+    "github-copilot/claude-opus-4.6",
+    "github-copilot/gpt-5.4"
   ],
   "packages": [
     "npm:pi-vim"
