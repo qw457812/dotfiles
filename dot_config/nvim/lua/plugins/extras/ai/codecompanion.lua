@@ -78,7 +78,7 @@ return {
           end,
         },
         acp = {
-          -- requires `npm i -g @zed-industries/claude-agent-acp`
+          -- requires `npm i -g @agentclientprotocol/claude-agent-acp`
           claude_code = function()
             return require("codecompanion.adapters").extend("claude_code", {
               env = U.ai.claude.provider.plan.synthetic,

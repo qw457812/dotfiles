@@ -6,7 +6,7 @@ return {
     "3rd/image.nvim",
     lazy = true,
     cond = not vim.g.shell_command_editor
-      and (vim.g.user_is_wezterm or vim.g.user_is_kitty)
+      and (vim.g.user_is_wezterm or vim.g.user_is_kitty or vim.g.user_is_ghostty)
       and not (use_magick_cli and vim.fn.executable("magick") == 0),
     build = not use_magick_cli,
     opts = {

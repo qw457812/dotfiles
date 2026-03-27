@@ -107,7 +107,7 @@ return {
         },
       },
       image = {
-        enabled = vim.g.user_is_wezterm or vim.g.user_is_kitty,
+        enabled = vim.g.user_is_wezterm or vim.g.user_is_kitty or vim.g.user_is_ghostty,
       },
       -- alternative: https://github.com/stevearc/profile.nvim
       profiler = {

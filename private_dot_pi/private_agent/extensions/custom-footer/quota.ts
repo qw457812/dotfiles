@@ -259,7 +259,7 @@ const quotaSources: Record<string, QuotaSource> = {
     formatQuota(quota: SyntheticQuota): string | null {
       const weekly = quota.weeklyTokenLimit;
       return joinParts([
-        `${quota.subscription.requests}/${quota.subscription.limit}/${formatTimeRemaining(quota.subscription.renewsAt)}`,
+        `${quota.subscription.requests.toFixed(1)}/${quota.subscription.limit}/${formatTimeRemaining(quota.subscription.renewsAt)}`,
         quota.freeToolCalls.requests > 0
           ? `${quota.freeToolCalls.requests}/${quota.freeToolCalls.limit}/${formatTimeRemaining(quota.freeToolCalls.renewsAt)}`
           : null,

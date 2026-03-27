@@ -31,6 +31,9 @@ return {
             }),
             env = U.ai.claude.provider.plan.synthetic,
           },
+          gsd = {
+            env = U.ai.claude.provider.plan.glm,
+          },
         },
       },
     },

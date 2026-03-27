@@ -1475,8 +1475,10 @@
            ;; [:!Qk :same_wind_app :default-terminal] ; not working for kitty
            [:!Qk "/opt/homebrew/bin/yabai -m window --focus $(/opt/homebrew/bin/yabai -m query --windows | /opt/homebrew/bin/jq -e \"map(select(.app==\\\"kitty\\\" and .\\\"has-focus\\\"==false)) | .[0] | .id\") > /dev/null 2>&1" :default-terminal]
            ;; [:!Qk [:open "/Applications/WezTerm.app"] :default-terminal]
-           [:!Ql [:open "/Applications/Visual Studio Code.app"] :!VSCode]
-           [:!Ql :same_wind_app :VSCode]
+           ;; [:!Ql [:open "/Applications/Visual Studio Code.app"] :!VSCode]
+           ;; [:!Ql :same_wind_app :VSCode]
+           [:!Ql [:open "/Applications/Ghostty.app"] :!Ghostty]
+           [:!Ql :same_wind_app :Ghostty]
            ;; [:!Qsemicolon [:open "/Library/Application Support/Citrix Receiver/Citrix Viewer.app"]] ; Citrix Workspace.app
            [:!Qsemicolon "/opt/homebrew/bin/yabai -m window --focus $(/opt/homebrew/bin/yabai -m query --windows | /opt/homebrew/bin/jq -e \"map(select(.app==\\\"RemoteDesktopClient\\\")) | .[0] | .id\") > /dev/null 2>&1 || open /Applications/RuijieWorkSpace.app" :!RuijieWorkSpace]
            [:!Qsemicolon [:open "/Applications/RuijieWorkSpace.app"] :RuijieWorkSpace]
@@ -1933,8 +1935,10 @@
            ;; [:!Wk :same_wind_app :default-terminal] ; not working for kitty
            [:!Wk [:left_command "/opt/homebrew/bin/yabai -m window --focus $(/opt/homebrew/bin/yabai -m query --windows | /opt/homebrew/bin/jq -e \"map(select(.app==\\\"kitty\\\" and .\\\"has-focus\\\"==false)) | .[0] | .id\") > /dev/null 2>&1"] :default-terminal]
            ;; [:!Wk [:left_command [:open "/Applications/WezTerm.app"]] :default-terminal]
-           [:!Wl [:left_command [:open "/Applications/Visual Studio Code.app"]] :!VSCode]
-           [:!Wl :same_wind_app :VSCode]
+           ;; [:!Wl [:left_command [:open "/Applications/Visual Studio Code.app"]] :!VSCode]
+           ;; [:!Wl :same_wind_app :VSCode]
+           [:!Wl [:left_command [:open "/Applications/Ghostty.app"]] :!Ghostty]
+           [:!Wl :same_wind_app :Ghostty]
            ;; [:!Wsemicolon [:left_command [:open "/Library/Application Support/Citrix Receiver/Citrix Viewer.app"]]] ; Citrix Workspace.app
            [:!Wsemicolon [:left_command "/opt/homebrew/bin/yabai -m window --focus $(/opt/homebrew/bin/yabai -m query --windows | /opt/homebrew/bin/jq -e \"map(select(.app==\\\"RemoteDesktopClient\\\")) | .[0] | .id\") > /dev/null 2>&1 || open /Applications/RuijieWorkSpace.app"] :!RuijieWorkSpace]
            [:!Wsemicolon [:left_command [:open "/Applications/RuijieWorkSpace.app"]] :RuijieWorkSpace]
@@ -2339,6 +2343,7 @@
   :Kitty            ["^net\\.kovidgoyal\\.kitty$"]
   :WezTerm          ["^com\\.github\\.wez\\.wezterm$"]
   :iTerm            ["^com\\.googlecode\\.iterm2$"]
+  :Ghostty          ["^com\\.mitchellh\\.ghostty$"]
   :Neovide          ["^com\\.neovide\\.neovide$"]
   :Emacs            ["^org\\.gnu\\.Emacs$" "^org\\.gnu\\.AquamacsEmacs$"
                      "^org\\.gnu\\.Aquamacs$"]

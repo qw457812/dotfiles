@@ -22,12 +22,16 @@ patch:
       vim_mode: true
     net.kovidgoyal.kitty:
       vim_mode: true
+    com.mitchellh.ghostty:
+      vim_mode: true
     org.gnu.Emacs:
       vim_mode: true # evil
     # com.google.Chrome:
     #   # 規避 https://github.com/rime/squirrel/issues/435
     #   # [鼠须管输入法配置 - 哈呜.王](https://www.hawu.me/others/2666)
     #   inline: true
+    app.glide-browser.glide:
+      vim_mode: true
     com.qvacua.VimR:
       vim_mode: true
     com.neovide.neovide:
