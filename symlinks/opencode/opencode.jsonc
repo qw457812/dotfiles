@@ -10,12 +10,12 @@
   "share": "manual",
   // "autoupdate": "notify",
   // "model": "synthetic/hf:moonshotai/Kimi-K2.5",
-  "model": "zai-coding-plan/glm-5",
+  "model": "zai-coding-plan/glm-5.1",
   "small_model": "github-copilot/gpt-5-mini",
   "agent": {
     "plan": {
       // "model": "synthetic/hf:moonshotai/Kimi-K2.5"
-      "model": "zai-coding-plan/glm-5"
+      "model": "zai-coding-plan/glm-5.1"
     }
   },
   "mcp": {

@@ -23,6 +23,7 @@ M.claude = {
       litellm = {
         ANTHROPIC_BASE_URL = "http://localhost:4000",
         ANTHROPIC_AUTH_TOKEN = vim.env.LITELLM_MASTER_KEY,
+        API_TIMEOUT_MS = "3000000", -- for glm
 
         SYNTHETIC_API_KEY = vim.env.SYNTHETIC_API_KEY, -- for ~/.claude/statusline/get-synthetic-quota.sh
         ZAI_API_KEY = vim.env.ZAI_API_KEY, -- for ~/.claude/statusline/get-glm-quota.sh
@@ -48,10 +49,10 @@ M.claude = {
         ANTHROPIC_BASE_URL = "https://api.z.ai/api/anthropic",
         ANTHROPIC_AUTH_TOKEN = vim.env.ZAI_API_KEY,
         API_TIMEOUT_MS = "3000000",
-        ANTHROPIC_DEFAULT_OPUS_MODEL = "glm-5",
-        ANTHROPIC_DEFAULT_SONNET_MODEL = "glm-5", -- glm-5-turbo
+        ANTHROPIC_DEFAULT_OPUS_MODEL = "glm-5.1",
+        ANTHROPIC_DEFAULT_SONNET_MODEL = "glm-5.1", -- glm-5-turbo
         ANTHROPIC_DEFAULT_HAIKU_MODEL = "glm-4.7", -- glm-4.5-air is not good enough
-        ANTHROPIC_MODEL = "glm-5", -- to disable 1M `context_window_size`
+        ANTHROPIC_MODEL = "glm-5.1", -- to disable 1M `context_window_size`
       },
       -- https://www.kimi.com/membership/subscription
       kimi = {

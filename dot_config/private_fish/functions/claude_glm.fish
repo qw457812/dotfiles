@@ -8,10 +8,10 @@ function claude_glm --wraps=claude
     # set -lx ANTHROPIC_AUTH_TOKEN $ZHIPU_API_KEY
 
     set -lx API_TIMEOUT_MS 3000000
-    set -lx ANTHROPIC_DEFAULT_OPUS_MODEL glm-5
-    set -lx ANTHROPIC_DEFAULT_SONNET_MODEL glm-5
+    set -lx ANTHROPIC_DEFAULT_OPUS_MODEL glm-5.1
+    set -lx ANTHROPIC_DEFAULT_SONNET_MODEL glm-5.1
     set -lx ANTHROPIC_DEFAULT_HAIKU_MODEL glm-4.7 # glm-4.5-air is not good enough
-    set -lx ANTHROPIC_MODEL glm-5 # to disable 1M `context_window_size`
+    set -lx ANTHROPIC_MODEL glm-5.1 # to disable 1M `context_window_size`
     set -lx CLAUDE_CODE_TMPDIR (test -n "$TERMUX_VERSION" && printf %s "$TMPDIR")
     command claude $argv
 end

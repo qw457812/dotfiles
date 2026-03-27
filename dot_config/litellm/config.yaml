@@ -4,12 +4,12 @@ general_settings:
   master_key: os.environ/LITELLM_MASTER_KEY
 
 model_list:
-  # claude-opus-4-6 -> anthropic/hf:moonshotai/Kimi-K2.5
+  # claude-opus-4-6 -> anthropic/glm-5.1
   - model_name: claude-opus-*
     litellm_params:
-      model: anthropic/hf:moonshotai/Kimi-K2.5
-      api_base: https://api.synthetic.new/anthropic
-      api_key: os.environ/SYNTHETIC_API_KEY
+      model: anthropic/glm-5.1
+      api_base: https://api.z.ai/api/anthropic
+      api_key: os.environ/ZAI_API_KEY
 
   - model_name: claude-sonnet-*
     litellm_params:
