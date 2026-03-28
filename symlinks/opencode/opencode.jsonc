@@ -10,12 +10,14 @@
   "share": "manual",
   // "autoupdate": "notify",
   // "model": "synthetic/hf:moonshotai/Kimi-K2.5",
-  "model": "zai-coding-plan/glm-5.1",
+  // "model": "zai-coding-plan/glm-5.1",
+  "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
   "small_model": "github-copilot/gpt-5-mini",
   "agent": {
     "plan": {
       // "model": "synthetic/hf:moonshotai/Kimi-K2.5"
-      "model": "zai-coding-plan/glm-5.1"
+      // "model": "zai-coding-plan/glm-5.1"
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo"
     }
   },
   "mcp": {

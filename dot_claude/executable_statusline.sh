@@ -79,7 +79,7 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
     model=$(cat "$transcript_path" 2>/dev/null | jq -r 'select(.type == "assistant") | .message.model // empty' | tail -1) # z.ai
   fi
   model=${model:-$(echo "$input" | jq -r '.model.display_name // .model.id // empty')}
-  case "$base_url" in *api.synthetic.new* | *localhost*) model=${model##*/} ;; esac
+  case "$base_url" in *api.synthetic.new* | *api.fireworks.ai* | *localhost*) model=${model##*/} ;; esac
   model_display=$([ -n "$model" ] && echo "${COLOR_LAVENDER}${model}${COLOR_RESET}")
 
   # tokens

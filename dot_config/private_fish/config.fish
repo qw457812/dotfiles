@@ -310,6 +310,7 @@ if type -q claude
     abbr ccl claude_litellm
     abbr ccs claude_synthetic
     abbr ccg claude_glm
+    abbr ccf claude_fireworks
     abbr cck claude_kimi
     abbr ccm claude_minimax
     abbr cco claude_openrouter

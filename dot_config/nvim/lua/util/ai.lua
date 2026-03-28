@@ -54,6 +54,16 @@ M.claude = {
         ANTHROPIC_DEFAULT_HAIKU_MODEL = "glm-4.7", -- glm-4.5-air is not good enough
         ANTHROPIC_MODEL = "glm-5.1", -- to disable 1M `context_window_size`
       },
+      -- https://app.fireworks.ai/fire-pass
+      fireworks = {
+        ANTHROPIC_BASE_URL = "https://api.fireworks.ai/inference",
+        ANTHROPIC_AUTH_TOKEN = vim.env.FIREWORKS_API_KEY,
+        ANTHROPIC_DEFAULT_OPUS_MODEL = "accounts/fireworks/routers/kimi-k2p5-turbo",
+        ANTHROPIC_DEFAULT_SONNET_MODEL = "accounts/fireworks/routers/kimi-k2p5-turbo",
+        ANTHROPIC_DEFAULT_HAIKU_MODEL = "accounts/fireworks/routers/kimi-k2p5-turbo",
+        ANTHROPIC_MODEL = "accounts/fireworks/routers/kimi-k2p5-turbo",
+        CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS = "1",
+      },
       -- https://www.kimi.com/membership/subscription
       kimi = {
         ANTHROPIC_BASE_URL = "https://api.kimi.com/coding/",
