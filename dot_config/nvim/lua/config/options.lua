@@ -36,6 +36,7 @@ vim.g.user_is_kitty = not vim.g.neovide and vim.env.KITTY_PID ~= nil
 vim.g.user_is_ghostty = not vim.g.neovide and vim.env.GHOSTTY_RESOURCES_DIR ~= nil
 vim.g.user_is_tmux = not vim.g.neovide and vim.env.TMUX ~= nil
 vim.g.user_is_termux = vim.env.TERMUX_VERSION ~= nil
+vim.g.user_is_macos = vim.fn.has("mac") == 1
 vim.g.user_is_asahi = jit.os == "Linux" and vim.uv.os_uname().machine == "aarch64"
 if vim.g.user_is_asahi and vim.g.user_is_kitty and not vim.g.user_is_tmux and not vim.g.neovide then
   vim.g.clipboard = "osc52" -- to avoid nvim freezing

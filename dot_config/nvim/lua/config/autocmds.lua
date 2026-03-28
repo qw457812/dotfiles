@@ -47,6 +47,16 @@ vim.api.nvim_create_autocmd("BufReadPost", {
   end,
 })
 
+vim.api.nvim_create_autocmd("BufRead", {
+  group = vim.api.nvim_create_augroup("ghostty_screen_file_nomodifiable", { clear = true }),
+  -- https://github.com/ghostty-org/ghostty/blob/2ea6029c7adc08f245ef243a77915ec40c7566b4/src/Surface.zig#L5832-L5847
+  pattern = vim.fn.resolve(vim.env.TMPDIR or "/tmp"):gsub("/$", "") .. "/*/screen.txt",
+  callback = function(ev)
+    vim.bo[ev.buf].readonly = true
+    vim.bo[ev.buf].modifiable = false
+  end,
+})
+
 vim.api.nvim_create_autocmd("BufReadPost", {
   pattern = { ".env", ".env.*" },
   desc = "Disable diagnostics on .env files",

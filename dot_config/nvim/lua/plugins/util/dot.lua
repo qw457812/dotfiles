@@ -156,6 +156,24 @@ return {
           end),
         })
       end
+
+      if vim.g.user_is_ghostty and vim.g.user_is_macos then
+        vim.api.nvim_create_autocmd("BufWritePost", {
+          pattern = "*/ghostty/config",
+          callback = U.debounce_wrap(500, function()
+            local script = [[tell application "Ghostty"
+    set term to focused terminal of selected tab of front window
+    perform action "reload_config" on term
+end tell]]
+            local res = vim.system({ "osascript", "-e", script }, { text = true }):wait()
+            if res.code == 0 then
+              LazyVim.info("Ghostty config reloaded", { title = "Ghostty" })
+            else
+              LazyVim.error(("Failed to reload Ghostty config:\n%s"):format(res.stderr), { title = "Ghostty" })
+            end
+          end),
+        })
+      end
     end,
   },
 

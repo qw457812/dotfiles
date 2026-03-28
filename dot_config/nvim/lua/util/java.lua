@@ -5,7 +5,7 @@ local M = {}
 ---@return { name: string, path: string }[]|nil
 function M.jdt_java_runtimes()
   local java_home_macos = "/usr/libexec/java_home"
-  if vim.fn.has("macunix") == 0 or vim.fn.executable(java_home_macos) == 0 then
+  if not (vim.g.user_is_macos and vim.fn.executable(java_home_macos) == 1) then
     return
   end
 

@@ -20,7 +20,7 @@ keybind = super+enter=new_split:auto
 keybind = super+space=write_screen_file:open
 keybind = super+k=previous_tab
 keybind = super+j=next_tab
-keybind = super+r=reload_config
+# keybind = super+r=reload_config
 keybind = super+u=scroll_page_fractional:-0.5
 keybind = super+d=scroll_page_fractional:0.5
 
