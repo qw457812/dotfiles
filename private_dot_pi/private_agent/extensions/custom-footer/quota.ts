@@ -12,17 +12,17 @@ const DAY_MS = 24 * HOUR_MS;
 const RETRY_COOLDOWN_MS = 30 * 1000;
 
 interface SyntheticQuota {
-  subscription: {
-    limit: number;
-    requests: number;
-    renewsAt: string;
+  rollingFiveHourLimit: {
+    max: number;
+    remaining: number;
+    nextTickAt: string;
   };
   freeToolCalls: {
     limit: number;
     requests: number;
     renewsAt: string;
   };
-  weeklyTokenLimit?: {
+  weeklyTokenLimit: {
     nextRegenAt: string;
     percentRemaining: number;
   };
@@ -257,15 +257,14 @@ const quotaSources: Record<string, QuotaSource> = {
       );
     },
     formatQuota(quota: SyntheticQuota): string | null {
+      const fiveHour = quota.rollingFiveHourLimit;
       const weekly = quota.weeklyTokenLimit;
       return joinParts([
-        `${quota.subscription.requests.toFixed(1)}/${quota.subscription.limit}/${formatTimeRemaining(quota.subscription.renewsAt)}`,
+        `${(fiveHour.max - fiveHour.remaining).toFixed(1)}/${fiveHour.max}/${formatTimeRemaining(fiveHour.nextTickAt)}`,
         quota.freeToolCalls.requests > 0
           ? `${quota.freeToolCalls.requests}/${quota.freeToolCalls.limit}/${formatTimeRemaining(quota.freeToolCalls.renewsAt)}`
           : null,
-        weekly
-          ? `${(100 - weekly.percentRemaining).toFixed(1)}%/${formatTimeRemaining(weekly.nextRegenAt)}`
-          : null,
+        `${(100 - weekly.percentRemaining).toFixed(1)}%/${formatTimeRemaining(weekly.nextRegenAt)}`,
       ]);
     },
   }),

@@ -34,22 +34,22 @@ synthetic_quota=$(curl -s "https://api.synthetic.new/v2/quotas" \
     | if . > 0 then floor else 0 end;
 
   {
-    sub: (.subscription | {
-      used: (.requests // 0),
-      limit: (.limit // 0),
-      reset_remaining_ms: (.renewsAt // "" | format_remaining_ms)
+    five_hour: (.rollingFiveHourLimit | {
+      used: ((.max // 0) - (.remaining // 0)),
+      limit: (.max // 0),
+      regen_remaining_ms: (.nextTickAt // "" | format_remaining_ms)
     }),
     tool_calls: (.freeToolCalls | {
       used: (.requests // 0),
       limit: (.limit // 0),
       reset_remaining_ms: (.renewsAt // "" | format_remaining_ms)
     }),
-    weekly_tokens: (.weeklyTokenLimit | {
+    weekly: (.weeklyTokenLimit | {
       used_pct: (100 - (.percentRemaining // 0)),
       regen_remaining_ms: (.nextRegenAt // "" | format_remaining_ms)
     })
   }' 2>/dev/null)
 
-echo "$synthetic_quota" | jq -e '.sub.used' >/dev/null 2>&1 || exit 0
+echo "$synthetic_quota" | jq -e '.five_hour.used' >/dev/null 2>&1 || exit 0
 
 cache_set "$cache_file" "$synthetic_quota"
