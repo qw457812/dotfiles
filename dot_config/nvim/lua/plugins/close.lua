@@ -50,7 +50,7 @@ local function close_buffer_or_window_or_exit()
       or is_winfixbuf()
       or (#vim.api.nvim_list_tabpages() > 1 and #vim.api.nvim_tabpage_list_wins(0) == 1)
     then
-      vim.cmd("bd") -- Delete Buffer and Window
+      vim.cmd.bdelete({ bang = vim.bo.buftype == "terminal" }) -- Delete Buffer and Window
     else
       Snacks.bufdelete() -- Delete Buffer
     end

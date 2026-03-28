@@ -17,7 +17,7 @@ keybind = performable:ctrl+k=goto_split:top
 keybind = performable:ctrl+l=goto_split:right
 keybind = super+m=toggle_split_zoom
 keybind = super+enter=new_split:auto
-keybind = super+space=write_screen_file:open
+keybind = super+space=write_screen_file:open,vt
 keybind = super+k=previous_tab
 keybind = super+j=next_tab
 # keybind = super+r=reload_config

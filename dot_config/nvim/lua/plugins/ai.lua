@@ -523,7 +523,7 @@ return {
             end
             if tool.name:find("opencode") then
               -- HACK: fix opencode render issue by showing then hiding line numbers
-              vim.wo[win][0].number = true
+              vim.wo[win][0].number = true -- vim.wo.number will be restored to the original value for some unknown reason
             elseif tool.name:find("claude") then
               -- local session_id = assert(vim.w[win].sidekick_session_id)
               -- local terminal = assert(Terminal.get(session_id))
