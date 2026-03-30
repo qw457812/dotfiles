@@ -59,6 +59,8 @@ vim.api.nvim_create_autocmd("BufRead", {
   -- https://github.com/ghostty-org/ghostty/blob/2ea6029c7adc08f245ef243a77915ec40c7566b4/src/Surface.zig#L5832-L5847
   pattern = vim.fn.resolve(vim.env.TMPDIR or "/tmp"):gsub("/$", "") .. "/*/screen.txt",
   callback = function(ev)
+    vim.b[ev.buf].user_ghostty_screen = true
+
     -- HACK: try to avoid hard-wrapping, see: https://github.com/mikesmithgh/kitty-scrollback.nvim/blob/b001090a4230bf3861bf8f9f91316c18ca497473/lua/kitty-scrollback/kitty_commands.lua#L68-L73
     vim.o.columns = 300 -- vim.o.columns will be restored to the original value for some unknown reason
     vim.api.nvim_buf_call(ev.buf, U.terminal.colorize) -- for `vt` in `write_screen_file:open,vt`
@@ -231,7 +233,12 @@ if vim.g.user_explorer_auto_open and not vim.g.vscode then
         return
       end
       vim.schedule(function()
-        if not vim.g.user_explorer_visible and not U.is_edgy_win() and U.too_wide() then
+        if
+          not vim.g.user_explorer_visible
+          and not U.is_edgy_win()
+          and U.too_wide()
+          and not vim.b.user_ghostty_screen
+        then
           U.explorer.open({ focus = false })
         end
       end)

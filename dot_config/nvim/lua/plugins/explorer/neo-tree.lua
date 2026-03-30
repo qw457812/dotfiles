@@ -103,6 +103,7 @@ return {
               or vim.t.user_diffview
               or vim.env.__AI_AGENT
               or vim.fn.getcmdwintype() ~= ""
+              or vim.b.user_ghostty_screen
           end
 
           local win = tonumber(event.match) or vim.fn.bufwinid(event.buf)
