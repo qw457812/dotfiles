@@ -19,21 +19,27 @@ function auto_pwd --on-variable PWD
 
     # check if .git/ exists and is a git repo and if onefetch is installed
     if test -d .git && git rev-parse --git-dir >/dev/null 2>&1
+        # buffer output to prevent slow commands from clobbering user input
+        set -l tmp (mktemp)
+
         # readme file
         if test -f README.md
             awk '/^##/{exit} 1' README.md | string trim \
-                | gum format | grep -v 'Image: image' 2>&1 | head -20
+                | gum format | grep -v 'Image: image' 2>&1 | head -20 >$tmp
         end
 
         # recent commits
-        echo -e "## Recent Activity\n" | gum format
+        echo -e "## Recent Activity\n" | gum format >>$tmp
         hub l -10 \
             --since='1 week ago' \
             | devmoji --log --color \
-            | sed 's/^/  /'
+            | sed 's/^/  /' >>$tmp
 
         # local changes
-        echo -e "## Status\n" | gum format
-        hub -c color.ui=always status --short --branch | sed 's/^/  /'
+        echo -e "## Status\n" | gum format >>$tmp
+        hub -c color.ui=always status --short --branch | sed 's/^/  /' >>$tmp
+
+        cat $tmp
+        rm -f $tmp
     end
 end
