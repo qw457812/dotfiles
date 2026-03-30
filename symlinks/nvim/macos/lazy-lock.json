@@ -3,7 +3,7 @@
   "LazyVim-starter": { "branch": "main", "commit": "803bc181d7c0d6d5eeba9274d9be49b287294d99" },
   "SchemaStore.nvim": { "branch": "main", "commit": "66e53f3316515ac8548b47826f8d273955aa7af1" },
   "Trans.nvim": { "branch": "v2", "commit": "e58d63a8f6621845776da4657a06ca29ca75ef1a" },
-  "agent-stuff": { "branch": "main", "commit": "3bf6bd34e516af81d9c2b313b568031a785a15e2" },
+  "agent-stuff": { "branch": "main", "commit": "d8d6a20edabc5f151ace1342dcd384aa5169b6fd" },
   "baleia.nvim": { "branch": "main", "commit": "32617940adb2eea56e85a64883a19961ceac9641" },
   "better-escape.nvim": { "branch": "master", "commit": "19a38aab94961016430905ebec30d272a01e9742" },
   "blink-cmp-dat-word": { "branch": "main", "commit": "0c58fe92bd94710c52a5cb3a89c63a47bc851733" },
