@@ -110,6 +110,7 @@ for _, tier in pairs(M.claude.provider) do
       "CLAUDE_CODE_SUBAGENT_MODEL",
       "ANTHROPIC_MODEL",
       "ANTHROPIC_SMALL_FAST_MODEL",
+      "CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS",
     }) do
       p[k] = p[k] or ""
     end
