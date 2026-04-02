@@ -4,7 +4,7 @@ frame = "none"
 
 [font]
 normal = ["Maple Mono NF CN", "Symbols Nerd Font Mono"]
-size = 12.0
+size = 11.5
 
 [font.features]
 # +cv01
