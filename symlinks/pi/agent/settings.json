@@ -2,7 +2,7 @@
   "lastChangelogVersion": "0.64.0",
   "defaultProvider": "fireworks",
   "defaultModel": "accounts/fireworks/routers/kimi-k2p5-turbo",
-  "defaultThinkingLevel": "medium",
+  "defaultThinkingLevel": "high",
   "hideThinkingBlock": true,
   "quietStartup": true,
   "enabledModels": [

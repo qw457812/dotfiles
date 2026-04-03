@@ -136,14 +136,6 @@ glide.keymaps.set("normal", "s", history_picker(), {
 glide.keymaps.set("normal", "S", history_picker(true), {
   description: "Open history in a new tab",
 });
-glide.keymaps.set(
-  "normal",
-  "yt",
-  when_editing(
-    null,
-    async ({ tab_id }) => await browser.tabs.duplicate(tab_id),
-  ),
-);
 // https://github.com/glide-browser/glide/blob/afd0b0c9d1dd55b5f4a67804576307650333cd80/src/glide/browser/base/content/plugins/keymaps.mts#L130-L142
 glide.keymaps.set(
   "normal",

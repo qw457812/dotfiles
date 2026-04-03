@@ -2328,7 +2328,7 @@
    "^app\\.glide-browser\\.glide$" "^company\\.thebrowser\\.dia$" "^com\\.apple\\.Safari$"
    "^com\\.jetbrains\\.intellij\\.ce$" "^com\\.jetbrains\\.pycharm\\.ce(-EAP)?$"]
   :tmux-autostart-terminals
-  ["^org\\.alacritty$" "^com\\.github\\.wez\\.wezterm$" "^net\\.kovidgoyal\\.kitty$"]
+  ["^org\\.alacritty$" "^com\\.github\\.wez\\.wezterm$" "^net\\.kovidgoyal\\.kitty$" "^com\\.mitchellh\\.ghostty$"]
   :default-terminal ["^net\\.kovidgoyal\\.kitty$"]
   :default-browser  ["^app\\.glide-browser\\.glide$"]
   :Terminals        ["^com\\.apple\\.Terminal$"
@@ -2337,7 +2337,7 @@
                      "^io\\.alacritty$" "^org\\.alacritty$"
                      "^com\\.github\\.wez\\.wezterm$"
                      "^net\\.kovidgoyal\\.kitty$"
-                     ;; "^dev\\.warp\\.Warp.*"
+                     "^com\\.mitchellh\\.ghostty$"
                      ]
   :Alacritty        ["^org\\.alacritty$"]
   :Kitty            ["^net\\.kovidgoyal\\.kitty$"]

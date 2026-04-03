@@ -41,7 +41,9 @@ require("lazy").setup({
     version = false, -- always use the latest git commit
     -- version = "*", -- try installing the latest stable version for plugins that support semver
   },
-  concurrency = (jit.os:find("Windows") or vim.env.TERMUX_VERSION) and (vim.uv.available_parallelism() * 2) or nil,
+  concurrency = (jit.os:find("Windows") or vim.env.TERMUX_VERSION or vim.env.GHOSTTY_RESOURCES_DIR)
+      and (vim.uv.available_parallelism() * 2)
+    or nil,
   git = {
     log = { "--since=7 days ago" }, -- show commits from the last x days
     -- building some plugins (like blink.cmp) can take a long time
