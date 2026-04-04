@@ -1,7 +1,7 @@
 {
-  "lastChangelogVersion": "0.64.0",
-  "defaultProvider": "fireworks",
-  "defaultModel": "accounts/fireworks/routers/kimi-k2p5-turbo",
+  "lastChangelogVersion": "0.65.0",
+  "defaultProvider": "zai",
+  "defaultModel": "glm-5.1",
   "defaultThinkingLevel": "high",
   "hideThinkingBlock": true,
   "quietStartup": true,
