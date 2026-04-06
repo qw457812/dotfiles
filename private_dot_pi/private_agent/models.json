@@ -58,31 +58,6 @@
           }
         }
       ]
-    },
-    "zai": {
-      "baseUrl": "https://api.z.ai/api/coding/paas/v4",
-      "apiKey": "ZAI_API_KEY",
-      "models": [
-        {
-          "id": "glm-5.1",
-          "name": "GLM-5.1",
-          "api": "openai-completions",
-          "compat": {
-            "supportsDeveloperRole": false,
-            "thinkingFormat": "zai"
-          },
-          "reasoning": true,
-          "input": ["text"],
-          "cost": {
-            "input": 1,
-            "output": 3.2,
-            "cacheRead": 0.2,
-            "cacheWrite": 0
-          },
-          "contextWindow": 204800,
-          "maxTokens": 131072
-        }
-      ]
     }
   }
 }
