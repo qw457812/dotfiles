@@ -47,30 +47,6 @@ vim.api.nvim_create_autocmd("BufReadPost", {
   end,
 })
 
--- for `keybind = super+space=write_screen_file:open,vt` in ~/.config/ghostty/config
---
--- # https://github.com/ghostty-org/ghostty/issues/189#issuecomment-2565845911
--- defaults write com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers -array-add '{
---     LSHandlerContentType = "public.plain-text";
---     LSHandlerRoleAll = "com.neovide.neovide";
--- }'
-if vim.g.neovide then
-  -- add VimEnter since BufRead won't be triggered if the Ghostty screen file is the first file opened in Neovide 0.16.0
-  vim.api.nvim_create_autocmd({ "BufRead", "VimEnter" }, {
-    group = vim.api.nvim_create_augroup("ghostty_scrollback", { clear = true }),
-    -- https://github.com/ghostty-org/ghostty/blob/2ea6029c7adc08f245ef243a77915ec40c7566b4/src/Surface.zig#L5832-L5847
-    pattern = vim.fn.resolve(vim.env.TMPDIR or "/tmp"):gsub("/$", "") .. "/*/screen.txt",
-    callback = function(ev)
-      vim.b[ev.buf].user_ghostty_screen = true
-
-      -- -- HACK: try to avoid hard-wrapping, see: https://github.com/mikesmithgh/kitty-scrollback.nvim/blob/b001090a4230bf3861bf8f9f91316c18ca497473/lua/kitty-scrollback/kitty_commands.lua#L68-L73
-      -- -- not necessary if the `font.size` of neovide is small enough (compared to the `font-size` of ghostty)
-      -- vim.o.columns = 300 -- vim.o.columns will be restored to the original value for some unknown reason
-      vim.api.nvim_buf_call(ev.buf, U.terminal.colorize) -- for `vt` in `write_screen_file:open,vt`
-    end,
-  })
-end
-
 vim.api.nvim_create_autocmd("BufReadPost", {
   pattern = { ".env", ".env.*" },
   desc = "Disable diagnostics on .env files",

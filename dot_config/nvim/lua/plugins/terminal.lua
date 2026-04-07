@@ -130,6 +130,54 @@ return {
     end,
   },
 
+  -- ghostty scrollback
+  --
+  -- for `keybind = super+space=write_screen_file:open,vt` in ~/.config/ghostty/config
+  --
+  -- # https://github.com/ghostty-org/ghostty/issues/189#issuecomment-2565845911
+  -- defaults write com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers -array-add '{
+  --     LSHandlerContentType = "public.plain-text";
+  --     LSHandlerRoleAll = "com.neovide.neovide";
+  -- }'
+  {
+    "LazyVim/LazyVim",
+    opts = function()
+      if not vim.g.neovide then
+        return
+      end
+
+      ---@param buf integer
+      local function ghostty_scrollback_pager(buf)
+        if not vim.b[buf].user_ghostty_screen then
+          vim.b[buf].user_ghostty_screen = true
+
+          -- -- HACK: try to avoid hard-wrapping, see: https://github.com/mikesmithgh/kitty-scrollback.nvim/blob/b001090a4230bf3861bf8f9f91316c18ca497473/lua/kitty-scrollback/kitty_commands.lua#L68-L73
+          -- -- not necessary if the `font.size` of neovide is small enough (compared to the `font-size` of ghostty)
+          -- vim.o.columns = 300 -- vim.o.columns will be restored to the original value for some unknown reason
+          vim.api.nvim_buf_call(buf, U.terminal.colorize) -- for `vt` in `write_screen_file:open,vt`
+        end
+      end
+
+      local tmpdir = vim.fn.resolve(vim.env.TMPDIR or "/tmp"):gsub("/$", "")
+      vim.api.nvim_create_autocmd("BufRead", {
+        group = vim.api.nvim_create_augroup("ghostty_scrollback", { clear = true }),
+        -- https://github.com/ghostty-org/ghostty/blob/2ea6029c7adc08f245ef243a77915ec40c7566b4/src/Surface.zig#L5832-L5847
+        pattern = tmpdir .. "/*/screen.txt",
+        callback = function(ev)
+          ghostty_scrollback_pager(ev.buf)
+        end,
+      })
+
+      -- HACK: `BufRead` won't be triggered if the Ghostty screen file is the first file opened in Neovide 0.16.*
+      vim.schedule(function()
+        local buf = vim.api.nvim_get_current_buf()
+        if vim.api.nvim_buf_get_name(buf):match("^" .. vim.pesc(tmpdir) .. "/[^/]+/screen.txt$") then
+          ghostty_scrollback_pager(buf)
+        end
+      end)
+    end,
+  },
+
   -- https://github.com/willothy/nvim-config/blob/b5db7b8b7fe6258770c98f12337d6954a56b95e7/lua/configs/terminal/flatten.lua
   -- alternative:
   -- - https://github.com/hat0uma/dotfiles/blob/d01f24164f7dda71c2cab2cccd54cca8ba386e13/.config/nvim/lua/rc/terminal/editor.lua#L7-L9
