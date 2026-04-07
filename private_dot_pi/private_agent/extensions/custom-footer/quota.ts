@@ -17,11 +17,6 @@ interface SyntheticQuota {
     remaining: number;
     nextTickAt: string;
   };
-  freeToolCalls: {
-    limit: number;
-    requests: number;
-    renewsAt: string;
-  };
   weeklyTokenLimit: {
     nextRegenAt: string;
     percentRemaining: number;
@@ -261,9 +256,6 @@ const quotaSources: Record<string, QuotaSource> = {
       const weekly = quota.weeklyTokenLimit;
       return joinParts([
         `${(fiveHour.max - fiveHour.remaining).toFixed(1)}/${fiveHour.max}/${formatTimeRemaining(fiveHour.nextTickAt)}`,
-        quota.freeToolCalls.requests > 0
-          ? `${quota.freeToolCalls.requests}/${quota.freeToolCalls.limit}/${formatTimeRemaining(quota.freeToolCalls.renewsAt)}`
-          : null,
         `${(100 - weekly.percentRemaining).toFixed(1)}%/${formatTimeRemaining(weekly.nextRegenAt)}`,
       ]);
     },
