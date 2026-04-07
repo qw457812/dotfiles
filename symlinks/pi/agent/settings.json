@@ -1,12 +1,13 @@
 {
   "lastChangelogVersion": "0.65.2",
-  "defaultProvider": "zai",
-  "defaultModel": "glm-5.1",
+  "defaultProvider": "synthetic",
+  "defaultModel": "hf:moonshotai/Kimi-K2.5",
   "defaultThinkingLevel": "high",
   "hideThinkingBlock": true,
   "quietStartup": true,
   "enabledModels": [
     "zai/glm-5.1",
+    "synthetic/hf:zai-org/GLM-5",
     "synthetic/hf:moonshotai/Kimi-K2.5",
     "fireworks/accounts/fireworks/routers/kimi-k2p5-turbo",
     "openai-codex/gpt-5.4",

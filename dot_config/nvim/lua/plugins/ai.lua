@@ -31,9 +31,6 @@ return {
             }),
             env = U.ai.claude.provider.plan.synthetic,
           },
-          gsd = {
-            env = U.ai.claude.provider.plan.glm,
-          },
         },
       },
     },
@@ -51,7 +48,6 @@ return {
         ["<leader>ao"] = "opencode",
         ["<leader>ai"] = "pi",
         ["<leader>ag"] = "claude_glm",
-        ["<leader>as"] = "gsd",
       }
       for key, tool in pairs(tools) do
         local desc = tool:gsub("_", " "):gsub("^%l", string.upper)
@@ -131,7 +127,6 @@ return {
       numbered_tools({ name = "codex" })
       numbered_tools({ name = "opencode" })
       numbered_tools({ name = "pi" })
-      numbered_tools({ name = "gsd" })
       numbered_tools({
         name = "claude_glm",
         base_tool = "claude",
@@ -158,8 +153,8 @@ return {
         { "<leader>at", false, mode = { "n", "x" } },
         { "<leader>aa", sidekick_cli_toggle_key, desc = "Sidekick", remap = true },
         { "<leader>aa", function() require("sidekick.cli").send({ msg = "{this}", filter = filter }) end, mode = "x", desc = "Sidekick" },
-        -- { "<leader>as", function() require("sidekick.cli").select({ filter = filter }) end, desc = "Select (Sidekick)" },
-        -- { "<leader>as", function() require("sidekick.cli").send({ msg = "{selection}", filter = filter }) end, mode = "x", desc = "Send (Sidekick)" },
+        { "<leader>as", function() require("sidekick.cli").select({ filter = filter }) end, desc = "Select (Sidekick)" },
+        { "<leader>as", function() require("sidekick.cli").send({ msg = "{selection}", filter = filter }) end, mode = "x", desc = "Send (Sidekick)" },
         { "<leader>ad", function() require("sidekick.cli").close() end, desc = "Detach (Sidekick)" },
         { "<leader>ak", U.ai.sidekick.cli.kill, desc = "Kill (Sidekick)" },
         {
@@ -340,13 +335,7 @@ return {
               "<C-g>",
               function(t)
                 local name = t.tool.name
-                if
-                  name:find("^claude")
-                  or name:find("^codex")
-                  or name:find("^opencode")
-                  or name:find("^pi")
-                  or name:find("^gsd")
-                then
+                if name:find("^claude") or name:find("^codex") or name:find("^opencode") or name:find("^pi") then
                   U.ai.sidekick.cli.tools.actions.send_keys({ "<C-g>" })(t)
                   vim.cmd.startinsert()
                 else
@@ -405,18 +394,6 @@ return {
             keys = {
               blur_t = false, -- pi uses <c-o> for its own functionality
               prompt = false, -- pi uses <c-p> for its own functionality
-            },
-          },
-          gsd = {
-            cmd = { "gsd" },
-            is_proc = "\\<gsd\\>",
-            url = "https://github.com/gsd-build/gsd-2",
-            env = {
-              __AI_AGENT = "gsd",
-            },
-            keys = {
-              blur_t = false,
-              prompt = false,
             },
           },
           -- debug = { cmd = { "bash", "-c", "env | sort | bat -l env" } },
@@ -850,13 +827,6 @@ return {
     },
   },
   {
-    "gsd-build/gsd-2",
-    enabled = not vim.g.user_is_termux,
-    version = "*",
-    lazy = true,
-    config = function() end,
-  },
-  {
     "openai/codex",
     enabled = not vim.g.user_is_termux,
     version = "*",
@@ -869,23 +839,6 @@ return {
     version = "*",
     lazy = true,
     config = function() end,
-    specs = {
-      {
-        "code-yeongyu/oh-my-opencode",
-        enabled = not vim.g.user_is_termux,
-        pin = true,
-        version = "*",
-        lazy = true,
-        config = function() end,
-      },
-      {
-        "NoeFabris/opencode-antigravity-auth",
-        enabled = not vim.g.user_is_termux,
-        version = "*",
-        lazy = true,
-        config = function() end,
-      },
-    },
   },
 
   -- ===========================================================================
