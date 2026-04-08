@@ -4,6 +4,7 @@
     "DISABLE_BUG_COMMAND": "1",
     "DISABLE_ERROR_REPORTING": "1",
     "DISABLE_TELEMETRY": "1",
+    "CLAUDE_CODE_DISABLE_1M_CONTEXT": "1",
     "CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD": "1",
     "MCP_TIMEOUT": "60000",
     "MANPAGER": "col -bx"
@@ -76,7 +77,7 @@
     ],
     "defaultMode": "acceptEdits"
   },
-  "model": "opus[1m]",
+  "model": "opus",
   "hooks": {
     "Notification": [
       {

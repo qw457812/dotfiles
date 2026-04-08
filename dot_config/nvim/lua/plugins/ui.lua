@@ -404,19 +404,21 @@ return {
           key.section, key.action = nil, ":lua require('persistence').load({ last = true })"
         elseif key.key == "q" then
           key.hidden = true
+        elseif key.key == "g" then
+          -- key.enabled = false
+          key.key = "t"
         elseif key.key == "l" then
           lazy_idx = i
         elseif key.key == "c" then
           config_idx = i
         end
       end
-      -- stylua: ignore start
       table.insert(keys, (lazy_idx or #keys) + 1, { icon = "󱌢 ", key = "m", action = ":Mason", desc = "Mason" })
+      -- stylua: ignore
       table.insert(keys, (config_idx or #keys) + 1, { icon = "󰒲 ", key = ",", action = "<leader>f,", desc = "LazyVim Config" })
-      table.insert(keys, 3, { icon = " ", key = "i", action = ":ene | startinsert", desc = "New File (Insert)", hidden = true })
-      table.insert(keys, 4, { icon = " ", key = "a", action = ":ene | startinsert", desc = "New File (Append)", hidden = true })
-      table.insert(keys, 5, { icon = " ", key = "p", action = ":ene | normal p", desc = "New File (Paste)", hidden = true })
-      -- stylua: ignore end
+      table.insert(keys, { icon = " ", key = "i", action = ":ene | startinsert", desc = "Insert", hidden = true })
+      table.insert(keys, { icon = "󰆒 ", key = "p", action = ":ene | normal p", desc = "Paste", hidden = true })
+      table.insert(keys, 1, { icon = " ", key = "a", action = "<leader>aa", desc = "Sidekick" })
 
       local headers = {
         nil, -- default header from snacks
