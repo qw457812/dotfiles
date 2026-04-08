@@ -39,10 +39,10 @@ M.claude = {
       synthetic = {
         ANTHROPIC_BASE_URL = "https://api.synthetic.new/anthropic",
         ANTHROPIC_AUTH_TOKEN = vim.env.SYNTHETIC_API_KEY,
-        ANTHROPIC_DEFAULT_OPUS_MODEL = "hf:moonshotai/Kimi-K2.5", -- hf:zai-org/GLM-5
+        ANTHROPIC_DEFAULT_OPUS_MODEL = "hf:zai-org/GLM-5",
         ANTHROPIC_DEFAULT_SONNET_MODEL = "hf:moonshotai/Kimi-K2.5",
-        ANTHROPIC_DEFAULT_HAIKU_MODEL = "hf:nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4",
-        ANTHROPIC_MODEL = "hf:moonshotai/Kimi-K2.5",
+        ANTHROPIC_DEFAULT_HAIKU_MODEL = "hf:zai-org/GLM-4.7", -- hf:nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4
+        ANTHROPIC_MODEL = "hf:zai-org/GLM-5",
       },
       -- https://z.ai/manage-apikey/subscription
       glm = {
@@ -58,10 +58,10 @@ M.claude = {
       fireworks = {
         ANTHROPIC_BASE_URL = "https://api.fireworks.ai/inference",
         ANTHROPIC_AUTH_TOKEN = vim.env.FIREWORKS_API_KEY,
-        ANTHROPIC_DEFAULT_OPUS_MODEL = "accounts/fireworks/routers/kimi-k2p5-turbo",
+        ANTHROPIC_DEFAULT_OPUS_MODEL = "accounts/fireworks/routers/glm-5-fast",
         ANTHROPIC_DEFAULT_SONNET_MODEL = "accounts/fireworks/routers/kimi-k2p5-turbo",
         ANTHROPIC_DEFAULT_HAIKU_MODEL = "accounts/fireworks/routers/kimi-k2p5-turbo",
-        ANTHROPIC_MODEL = "accounts/fireworks/routers/kimi-k2p5-turbo",
+        ANTHROPIC_MODEL = "accounts/fireworks/routers/glm-5-fast",
         CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS = "1",
       },
       -- https://www.kimi.com/membership/subscription

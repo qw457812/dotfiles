@@ -19,7 +19,7 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   # COLOR_GOLD=$(printf '\033[38;5;136m')
   COLOR_ORANGE=$(printf '\033[38;5;209m')
   COLOR_MAGENTA=$(printf '\033[38;5;213m')
-  # COLOR_SEAFOAM=$(printf '\033[38;5;107m')
+  COLOR_SEAFOAM=$(printf '\033[38;5;107m')
   COLOR_SKY=$(printf '\033[38;5;81m')
   COLOR_AQUAMARINE=$(printf '\033[38;5;122m')
   COLOR_BRONZE=$(printf '\033[38;5;130m')
@@ -33,17 +33,26 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   format_ms() {
     echo "$1" | awk '{
       s = int($1/1000)
-      if (s < 60) {
-        printf "<1m"
+      if (s < 1) {
+        printf "<1s"
+      } else if (s < 60) {
+        printf "%ds", s
       } else {
         d = int(s/86400)
         h = int((s%86400)/3600)
         m = int((s%3600)/60)
         if (d > 0) {
-          # printf "%dd%dh%dm", d, h, m
-          printf "%dd%dh", d, h
+          if (h > 0) {
+            printf "%dd%dh", d, h
+          } else {
+            printf "%dd", d
+          }
         } else if (h > 0) {
-          printf "%dh%dm", h, m
+          if (m > 0) {
+            printf "%dh%dm", h, m
+          } else {
+            printf "%dh", h
+          }
         } else {
           printf "%dm", m
         }
@@ -88,6 +97,15 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
 
   # context usage
   context_percentage_display="${COLOR_CYAN}$(format_num "$(echo "$total_tokens" | awk -v s="$context_window_size" '{print $1*100/s}')")%${COLOR_RESET}"
+
+  # TPS
+  output_tokens=$(echo "$input" | jq -r '.context_window.total_output_tokens // 0')
+  api_duration_ms=$(echo "$input" | jq -r '.cost.total_api_duration_ms // 0')
+  tps_display=""
+  if [ "$api_duration_ms" -gt 0 ] 2>/dev/null; then
+    tps=$(echo "$output_tokens $api_duration_ms" | awk '{printf "%.1f", $1 / ($2 / 1000)}')
+    tps_display="${COLOR_SEAFOAM} ${tps}${COLOR_RESET}"
+  fi
 
   # # session cost
   # session_cost=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
@@ -182,6 +200,7 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
     "$model_display" \
     "$total_tokens_display" \
     "$context_percentage_display" \
+    "$tps_display" \
     "$syn_quota_display" \
     "$glm_quota_display" \
     "$version_display" \

@@ -672,6 +672,7 @@ return {
         group = vim.api.nvim_create_augroup("ai_cli_prompt", { clear = true }),
         pattern = {
           tmpdir .. "/claude-prompt-*.md", -- claude code
+          vim.fn.resolve("/tmp/claude-prompt-*.md"), -- claude code
           tmpdir .. "/[0-9]*.md", -- https://github.com/sst/opencode/blob/041353f4ff992e7be4455eaf6e71f492a97a123f/packages/opencode/src/cli/cmd/tui/util/editor.ts#L12
           tmpdir .. "/.*.md", -- https://github.com/openai/codex/blob/f6b563ec6403392aadbc31f449226aaabd881c01/codex-rs/tui/src/external_editor.rs#L60
           tmpdir .. "/pi-editor-*.pi.md", -- https://github.com/badlogic/pi-mono/blob/5c0ec26c28c918c5301f218e8c13fcc540d8e3a4/packages/coding-agent/src/modes/interactive/interactive-mode.ts#L2746
