@@ -24,7 +24,7 @@ import type {
   ReadonlyFooterDataProvider,
 } from "@mariozechner/pi-coding-agent";
 import { type TUI, truncateToWidth, visibleWidth } from "@mariozechner/pi-tui";
-import { readQuotaText } from "./quota.js";
+import { getQuota } from "./quota.js";
 
 export default function (pi: ExtensionAPI) {
   let enabled = true;
@@ -124,9 +124,9 @@ export default function (pi: ExtensionAPI) {
           statsParts.push(contextPercentStr);
 
           // Fetch quota info for certain providers
-          const quotaText = readQuotaText(ctx.model?.provider, tui);
-          if (quotaText) {
-            statsParts.push(quotaText);
+          const quota = getQuota(ctx.model?.provider, tui);
+          if (quota) {
+            statsParts.push(quota);
           }
 
           let statsLeft = statsParts.join(" ");

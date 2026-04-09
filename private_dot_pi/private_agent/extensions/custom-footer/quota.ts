@@ -61,15 +61,15 @@ interface CachedValue<T> {
   updatedAt: number;
 }
 
-interface QuotaSourceConfig<T> {
+interface SourceConfig<T> {
   cacheTtlMs: number;
-  readAuth: () => Promise<string | null>;
-  fetchQuota: (auth: string) => Promise<T | null>;
-  formatQuota: (quota: T) => string | null;
+  getAuth: () => Promise<string | null>;
+  fetch: (auth: string) => Promise<T | null>;
+  format: (quota: T) => string | null;
 }
 
-interface QuotaSource {
-  readText(): string | null;
+interface Source {
+  get(): string | null;
   refresh(tui: TUI): Promise<void>;
 }
 
@@ -84,24 +84,24 @@ function fresh<T>(
   return cache;
 }
 
-async function readJsonFile<T>(filePath: string): Promise<T | null> {
+async function readJson<T>(path: string): Promise<T | null> {
   try {
-    const content = await readFile(filePath, "utf-8");
+    const content = await readFile(path, "utf-8");
     return JSON.parse(content) as T;
   } catch {
     return null;
   }
 }
 
-async function fetchJson<T>(url: string, authToken: string): Promise<T | null> {
+async function fetchJson<T>(url: string, token: string): Promise<T | null> {
   try {
-    const response = await fetch(url, {
-      headers: { Authorization: `Bearer ${authToken}` },
+    const resp = await fetch(url, {
+      headers: { Authorization: `Bearer ${token}` },
     });
-    if (!response.ok) {
+    if (!resp.ok) {
       return null;
     }
-    return (await response.json()) as T;
+    return (await resp.json()) as T;
   } catch {
     return null;
   }
@@ -115,31 +115,31 @@ async function readCache<T>(
   provider: string,
   ttlMs: number,
 ): Promise<CachedValue<T> | null> {
-  return fresh(await readJsonFile<CachedValue<T>>(cachePath(provider)), ttlMs);
+  return fresh(await readJson<CachedValue<T>>(cachePath(provider)), ttlMs);
 }
 
 async function writeCache<T>(provider: string, value: T): Promise<void> {
-  const filePath = cachePath(provider);
+  const path = cachePath(provider);
   await mkdir(CACHE_DIR, { recursive: true });
   await writeFile(
-    filePath,
+    path,
     JSON.stringify({ value, updatedAt: Date.now() } satisfies CachedValue<T>),
     "utf-8",
   );
 }
 
-async function readToken(
+async function readAuth(
   provider: string,
   key: "access" | "refresh",
 ): Promise<string | null> {
   const auth =
-    await readJsonFile<
+    await readJson<
       Record<string, Partial<Record<"access" | "refresh", string>>>
     >(PI_AGENT_AUTH_PATH);
   return auth?.[provider]?.[key] || null;
 }
 
-function formatTimeRemaining(targetDate: string | number): string {
+function formatTime(targetDate: string | number): string {
   const targetTime =
     typeof targetDate === "number"
       ? targetDate
@@ -155,16 +155,10 @@ function formatTimeRemaining(targetDate: string | number): string {
   const minutes = Math.floor((diff % HOUR_MS) / MINUTE_MS);
 
   if (days > 0) {
-    if (hours > 0) {
-      return `${days}d${hours}h`;
-    }
-    return `${days}d`;
+    return hours > 0 ? `${days}d${hours}h` : `${days}d`;
   }
   if (hours > 0) {
-    if (minutes > 0) {
-      return `${hours}h${minutes}m`;
-    }
-    return `${hours}h`;
+    return minutes > 0 ? `${hours}h${minutes}m` : `${hours}h`;
   }
   return `${minutes}m`;
 }
@@ -176,15 +170,12 @@ function joinParts(
   return filtered.length > 0 ? filtered.join(" ") : null;
 }
 
-function createQuotaSource<T>(
-  provider: string,
-  config: QuotaSourceConfig<T>,
-): QuotaSource {
+function createSource<T>(provider: string, config: SourceConfig<T>): Source {
   let cache: CachedValue<T> | null = null;
   let fetching = false;
   let nextRetryAt = 0;
 
-  async function loadQuota(): Promise<CachedValue<T> | null> {
+  async function load(): Promise<CachedValue<T> | null> {
     const cached =
       fresh(cache, config.cacheTtlMs) ??
       (await readCache<T>(provider, config.cacheTtlMs));
@@ -192,13 +183,13 @@ function createQuotaSource<T>(
       return cached;
     }
 
-    const auth = await config.readAuth();
+    const auth = await config.getAuth();
     if (!auth) {
       nextRetryAt = Date.now() + RETRY_COOLDOWN_MS;
       return null;
     }
 
-    const quota = await config.fetchQuota(auth);
+    const quota = await config.fetch(auth);
     if (!quota) {
       nextRetryAt = Date.now() + RETRY_COOLDOWN_MS;
       return null;
@@ -215,9 +206,9 @@ function createQuotaSource<T>(
   }
 
   return {
-    readText(): string | null {
+    get(): string | null {
       const cached = fresh(cache, config.cacheTtlMs);
-      return cached ? config.formatQuota(cached.value) : null;
+      return cached ? config.format(cached.value) : null;
     },
     async refresh(tui: TUI): Promise<void> {
       if (fetching || fresh(cache, config.cacheTtlMs)) {
@@ -229,7 +220,7 @@ function createQuotaSource<T>(
 
       fetching = true;
       try {
-        const next = await loadQuota();
+        const next = await load();
         if (!next) {
           return;
         }
@@ -244,57 +235,57 @@ function createQuotaSource<T>(
   };
 }
 
-const quotaSources: Record<string, QuotaSource> = {
-  synthetic: createQuotaSource("synthetic", {
+const sources: Record<string, Source> = {
+  synthetic: createSource("synthetic", {
     cacheTtlMs: MINUTE_MS,
-    async readAuth(): Promise<string | null> {
+    async getAuth(): Promise<string | null> {
       return process.env.SYNTHETIC_API_KEY || null;
     },
-    async fetchQuota(apiKey: string): Promise<SyntheticQuota | null> {
+    async fetch(apiKey: string): Promise<SyntheticQuota | null> {
       return fetchJson<SyntheticQuota>(
         "https://api.synthetic.new/v2/quotas",
         apiKey,
       );
     },
-    formatQuota(quota: SyntheticQuota): string | null {
+    format(quota: SyntheticQuota): string | null {
       const fiveHour = quota.rollingFiveHourLimit;
       const weekly = quota.weeklyTokenLimit;
       return joinParts([
-        `${(fiveHour.max - fiveHour.remaining).toFixed(1)}/${fiveHour.max}/${formatTimeRemaining(fiveHour.nextTickAt)}`,
-        `${(100 - weekly.percentRemaining).toFixed(1)}%/${formatTimeRemaining(weekly.nextRegenAt)}`,
+        `${(fiveHour.max - fiveHour.remaining).toFixed(1)}/${fiveHour.max}/${formatTime(fiveHour.nextTickAt)}`,
+        `${(100 - weekly.percentRemaining).toFixed(1)}%/${formatTime(weekly.nextRegenAt)}`,
       ]);
     },
   }),
-  "github-copilot": createQuotaSource("github-copilot", {
+  "github-copilot": createSource("github-copilot", {
     cacheTtlMs: 3 * MINUTE_MS,
-    async readAuth(): Promise<string | null> {
+    async getAuth(): Promise<string | null> {
       // curl -s "https://api.github.com/copilot_internal/user" -H "Authorization: Bearer $(jq -r '.[] | select(.oauth_token) | .oauth_token' ~/.config/github-copilot/apps.json | head -1)"
-      return readToken("github-copilot", "refresh");
+      return readAuth("github-copilot", "refresh");
     },
-    async fetchQuota(token: string): Promise<CopilotQuota | null> {
+    async fetch(token: string): Promise<CopilotQuota | null> {
       return fetchJson<CopilotQuota>(
         "https://api.github.com/copilot_internal/user",
         token,
       );
     },
-    formatQuota(quota: CopilotQuota): string | null {
+    format(quota: CopilotQuota): string | null {
       const premium = quota.quota_snapshots.premium_interactions;
-      return `${premium.entitlement - premium.remaining}/${premium.entitlement} ${formatTimeRemaining(quota.quota_reset_date_utc)}`;
+      return `${premium.entitlement - premium.remaining}/${premium.entitlement} ${formatTime(quota.quota_reset_date_utc)}`;
     },
   }),
-  "openai-codex": createQuotaSource("openai-codex", {
+  "openai-codex": createSource("openai-codex", {
     cacheTtlMs: MINUTE_MS,
-    async readAuth(): Promise<string | null> {
+    async getAuth(): Promise<string | null> {
       // curl -s -H "Authorization: Bearer $(cat ~/.codex/auth.json | jq -r '.tokens.access_token')" "https://chatgpt.com/backend-api/wham/usage" | jq .
-      return readToken("openai-codex", "access");
+      return readAuth("openai-codex", "access");
     },
-    async fetchQuota(token: string): Promise<CodexQuota | null> {
+    async fetch(token: string): Promise<CodexQuota | null> {
       return fetchJson<CodexQuota>(
         "https://chatgpt.com/backend-api/wham/usage",
         token,
       );
     },
-    formatQuota(quota: CodexQuota): string | null {
+    format(quota: CodexQuota): string | null {
       const rateLimit = quota.rate_limit;
       if (!rateLimit) {
         return null;
@@ -310,7 +301,7 @@ const quotaSources: Record<string, QuotaSource> = {
           | undefined,
       ): string | null =>
         window
-          ? `${window.used_percent}% ${formatTimeRemaining(window.reset_at * 1000)}`
+          ? `${window.used_percent}% ${formatTime(window.reset_at * 1000)}`
           : null;
 
       return joinParts([
@@ -319,25 +310,25 @@ const quotaSources: Record<string, QuotaSource> = {
       ]);
     },
   }),
-  zai: createQuotaSource("zai", {
+  zai: createSource("zai", {
     cacheTtlMs: 3 * MINUTE_MS,
-    async readAuth(): Promise<string | null> {
+    async getAuth(): Promise<string | null> {
       return process.env.ZAI_API_KEY || null;
     },
-    async fetchQuota(apiKey: string): Promise<ZaiQuota | null> {
+    async fetch(apiKey: string): Promise<ZaiQuota | null> {
       return fetchJson<ZaiQuota>(
         "https://api.z.ai/api/monitor/usage/quota/limit",
         apiKey,
       );
     },
-    formatQuota(quota: ZaiQuota): string | null {
+    format(quota: ZaiQuota): string | null {
       const tokens: string[] = [];
       const mcp: string[] = [];
       for (const limit of quota.data.limits) {
         if (limit.type === "TOKENS_LIMIT") {
           tokens.push(
             limit.nextResetTime
-              ? `${limit.percentage}%/${formatTimeRemaining(limit.nextResetTime)}`
+              ? `${limit.percentage}%/${formatTime(limit.nextResetTime)}`
               : `${limit.percentage}%`,
           );
         } else if (limit.type === "TIME_LIMIT" && limit.percentage > 0) {
@@ -349,16 +340,16 @@ const quotaSources: Record<string, QuotaSource> = {
   }),
 };
 
-export function readQuotaText(
+export function getQuota(
   provider: string | undefined,
   tui: TUI,
 ): string | null {
-  const quotaSource = provider ? quotaSources[provider] : null;
-  if (!quotaSource) {
+  const source = provider ? sources[provider] : null;
+  if (!source) {
     return null;
   }
 
-  const quotaText = quotaSource.readText();
-  void quotaSource.refresh(tui);
-  return quotaText;
+  const quota = source.get();
+  void source.refresh(tui);
+  return quota;
 }
