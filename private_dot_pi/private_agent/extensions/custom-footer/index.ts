@@ -8,10 +8,11 @@
  * Shows:
  * - Token usage: ↑input ↓output Rcache_read Wcache_write
  * - Cost: $N.NNN
+ * - TPS: session-average tokens per second
  * - Context usage: N% (colored: green/yellow/red based on usage)
+ * - Quota info for certain providers (when active)
  * - Model name, provider (when multi-provider), thinking level
  * - Extension status messages (if any)
- * - Quota info for certain providers (when active)
  *
  * Ref:
  * - Example extension: https://github.com/badlogic/pi-mono/blob/7b902612e96a8bf49cf6f34345f09a44e5ca6926/packages/coding-agent/examples/extensions/custom-footer.ts
@@ -25,9 +26,11 @@ import type {
 } from "@mariozechner/pi-coding-agent";
 import { type TUI, truncateToWidth, visibleWidth } from "@mariozechner/pi-tui";
 import { getQuota } from "./quota.js";
+import { createTpsTracker } from "./tps.js";
 
 export default function (pi: ExtensionAPI) {
   let enabled = true;
+  const tpsTracker = createTpsTracker();
 
   /**
    * Sanitize text for display in a single-line status.
@@ -108,6 +111,12 @@ export default function (pi: ExtensionAPI) {
             statsParts.push(`$${totalCost.toFixed(3)}`);
           }
 
+          // Tokens per second
+          const tps = tpsTracker.getTps();
+          if (tps) {
+            statsParts.push(tps);
+          }
+
           // Colorize context percentage based on usage
           let contextPercentStr: string;
           const contextPercentDisplay =
@@ -123,7 +132,7 @@ export default function (pi: ExtensionAPI) {
           }
           statsParts.push(contextPercentStr);
 
-          // Fetch quota info for certain providers
+          // Quota for certain providers
           const quota = getQuota(ctx.model?.provider, tui);
           if (quota) {
             statsParts.push(quota);
@@ -224,6 +233,16 @@ export default function (pi: ExtensionAPI) {
   // Set custom footer on startup
   pi.on("session_start", (_event, ctx) => {
     ctx.ui.setFooter(createFooterFactory(ctx));
+
+    tpsTracker.onSessionStart();
+  });
+
+  pi.on("agent_start", () => {
+    tpsTracker.onAgentStart();
+  });
+
+  pi.on("agent_end", (event, ctx) => {
+    tpsTracker.onAgentEnd(event, ctx);
   });
 
   pi.registerCommand("footer", {
