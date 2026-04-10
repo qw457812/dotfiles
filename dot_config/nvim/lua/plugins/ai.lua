@@ -29,7 +29,7 @@ return {
               -- "255b938c-0cb9-4858-83a0-6929fa42b927", -- specific session ID
               -- "--fork-session",
             }),
-            env = U.ai.claude.provider.plan.synthetic,
+            env = vim.deepcopy(U.ai.claude.provider.plan.synthetic),
           },
         },
       },
@@ -130,7 +130,7 @@ return {
       numbered_tools({
         name = "claude_glm",
         base_tool = "claude",
-        tool_opts = { env = U.ai.claude.provider.plan.glm },
+        tool_opts = { env = vim.deepcopy(U.ai.claude.provider.plan.glm) },
       })
 
       require("sidekick").setup(opts)

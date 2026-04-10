@@ -81,7 +81,15 @@ return {
           -- requires `npm i -g @agentclientprotocol/claude-agent-acp`
           claude_code = function()
             return require("codecompanion.adapters").extend("claude_code", {
-              env = U.ai.claude.provider.plan.synthetic,
+              env = (function()
+                local env = vim.deepcopy(U.ai.claude.provider.plan.synthetic)
+                for k, v in pairs(env) do
+                  if v == "" then
+                    env[k] = nil
+                  end
+                end
+                return env
+              end)(),
             })
           end,
         },
