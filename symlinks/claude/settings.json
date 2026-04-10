@@ -94,7 +94,8 @@
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh",
-    "padding": 0
+    "padding": 0,
+    "refreshInterval": 30
   },
   "enabledPlugins": {
     "context7@claude-plugins-official": true

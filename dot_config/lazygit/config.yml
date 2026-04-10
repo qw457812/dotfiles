@@ -3,7 +3,7 @@
 # https://github.com/jesseduffield/lazygit/blob/master/docs/keybindings/Custom_Keybindings.md
 gui:
   nerdFontsVersion: "3"
-  scrollHeight: 20
+  scrollHeight: 10
   scrollPastBottom: false
   # sidePanelWidth: 0.25
   showDivergenceFromBaseBranch: arrowAndNumber

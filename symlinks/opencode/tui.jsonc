@@ -15,5 +15,21 @@
     "editor_open": "ctrl+g", // align with claude code since we can't change claude code keybinds
     "agent_cycle": "none", // avoid accidental agent cycle
     "session_child_cycle": "<leader>right,tab"
-  }
+  },
+  "plugin": [
+    [
+      "oc-plugin-rainbow",
+      {
+        "enabled": true,
+        "fg": true,
+        "bg": true,
+        "speed": 0.008,
+        "turns": 3,
+        "glow": 0.05,
+        "keybinds": {
+          "logo_splash": "ctrl+shift+r"
+        }
+      }
+    ]
+  ]
 }

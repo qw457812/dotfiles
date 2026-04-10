@@ -821,10 +821,11 @@ return {
     "badlogic/pi-mono",
     version = "*",
     lazy = true,
+    build = "npm install -g @mariozechner/pi-coding-agent",
     config = function() end,
     specs = {
-      { "lajarre/pi-vim", version = "*", lazy = true, config = function() end },
       { "mitsuhiko/agent-stuff", lazy = true, config = function() end },
+      { "lajarre/pi-vim", version = "*", lazy = true, config = function() end },
     },
   },
   {
