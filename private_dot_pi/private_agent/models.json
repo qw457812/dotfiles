@@ -23,8 +23,8 @@
           }
         },
         {
-          "id": "hf:zai-org/GLM-5",
-          "name": "GLM-5",
+          "id": "hf:zai-org/GLM-5.1",
+          "name": "GLM-5.1",
           "reasoning": true,
           "input": ["text"],
           "contextWindow": 196608,

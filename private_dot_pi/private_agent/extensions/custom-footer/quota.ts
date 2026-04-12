@@ -139,12 +139,9 @@ async function readAuth(
   return auth?.[provider]?.[key] || null;
 }
 
-function formatTime(targetDate: string | number): string {
-  const targetTime =
-    typeof targetDate === "number"
-      ? targetDate
-      : new Date(targetDate).getTime();
-  const diff = targetTime - Date.now();
+function formatTime(date: string | number): string {
+  const time = typeof date === "number" ? date : new Date(date).getTime();
+  const diff = time - Date.now();
 
   if (diff <= 0) {
     return "0m";
