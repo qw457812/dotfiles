@@ -56,6 +56,8 @@ export default async function (pi: ExtensionAPI) {
 
   const { ModalEditor } = await import("./pi-vim.generated.ts");
 
+  type Mode = "insert" | "normal";
+
   type ThinkingTheme = {
     getThinkingBorderColor?: (
       level: string,
@@ -66,10 +68,6 @@ export default async function (pi: ExtensionAPI) {
   type ModalEditorInstance = InstanceType<typeof ModalEditor> & {
     getModeLabel?: () => string;
     labelColorizers?: {
-      insert: (s: string) => string;
-      normal: (s: string) => string;
-    } | null;
-    prefixColorizers?: {
       insert: (s: string) => string;
       normal: (s: string) => string;
     } | null;
@@ -106,13 +104,17 @@ export default async function (pi: ExtensionAPI) {
   }
 
   function getRenderedPrefix(
-    editor: ModalEditorInstance,
+    colorizers: {
+      insert: (s: string) => string;
+      normal: (s: string) => string;
+    } | null,
+    mode: Mode,
     prefix: string,
   ): string {
-    const colorize = editor.prefixColorizers
-      ? editor.getMode() === "insert"
-        ? editor.prefixColorizers.insert
-        : editor.prefixColorizers.normal
+    const colorize = colorizers
+      ? mode === "insert"
+        ? colorizers.insert
+        : colorizers.normal
       : null;
 
     return colorize ? colorize(prefix) : prefix;
@@ -129,6 +131,28 @@ export default async function (pi: ExtensionAPI) {
   }
 
   class PromptPrefixEditor extends ModalEditor {
+    private readonly prefixColorizers: {
+      insert: (s: string) => string;
+      normal: (s: string) => string;
+    } | null;
+
+    constructor(
+      tui: any,
+      theme: any,
+      kb: any,
+      labelColorizers: {
+        insert: (s: string) => string;
+        normal: (s: string) => string;
+      } | null,
+      prefixColorizers: {
+        insert: (s: string) => string;
+        normal: (s: string) => string;
+      } | null,
+    ) {
+      super(tui, theme, kb, labelColorizers);
+      this.prefixColorizers = prefixColorizers;
+    }
+
     override render(width: number): string[] {
       if (width <= PREFIX_WIDTH) return super.render(width);
 
@@ -151,10 +175,11 @@ export default async function (pi: ExtensionAPI) {
 
       const borderColor = this.borderColor ?? ((s: string) => s);
       const extraBorder = borderColor("─".repeat(PREFIX_WIDTH));
-      const prefix =
-        this.getMode() === "insert" ? INSERT_PREFIX : NORMAL_PREFIX;
+      const mode = this.getMode();
+      const prefix = mode === "insert" ? INSERT_PREFIX : NORMAL_PREFIX;
       const renderedPrefix = getRenderedPrefix(
-        this as ModalEditorInstance,
+        this.prefixColorizers,
+        mode,
         prefix,
       );
       const { raw: rawLabel, rendered: renderedLabel } = getRenderedModeLabel(
@@ -222,8 +247,8 @@ export default async function (pi: ExtensionAPI) {
           editorTheme,
           kb,
           colorizers,
+          prefixColorizers,
         ) as ModalEditorInstance;
-        editor.prefixColorizers = prefixColorizers;
         return editor;
       });
 
