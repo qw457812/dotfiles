@@ -130,6 +130,12 @@ export default async function (pi: ExtensionAPI) {
     }
   }
 
+  const VIM_REMAPS: Record<string, string> = {
+    H: "0",
+    L: "$",
+    U: "\x12", // Ctrl+r
+  };
+
   class PromptPrefixEditor extends ModalEditor {
     private readonly prefixColorizers: {
       insert: (s: string) => string;
@@ -151,6 +157,36 @@ export default async function (pi: ExtensionAPI) {
     ) {
       super(tui, theme, kb, labelColorizers);
       this.prefixColorizers = prefixColorizers;
+    }
+
+    override handleInput(data: string): void {
+      if (this.getMode() === "normal") {
+        // Single-key remaps (H -> 0, L -> $, U -> Ctrl+r)
+        if (data in VIM_REMAPS) {
+          super.handleInput(VIM_REMAPS[data]!);
+          return;
+        }
+        // Y -> y$
+        if (data === "Y") {
+          super.handleInput("y");
+          super.handleInput("$");
+          return;
+        }
+        // cl -> s: pi-vim doesn't accept l as a motion for c, so we clear
+        // the pending operator directly and delegate to the native s command.
+        if (
+          (this as unknown as { pendingOperator: string | null })
+            .pendingOperator === "c" &&
+          data === "l"
+        ) {
+          (
+            this as unknown as { pendingOperator: string | null }
+          ).pendingOperator = null;
+          super.handleInput("s"); // cut char + insert
+          return;
+        }
+      }
+      super.handleInput(data);
     }
 
     override render(width: number): string[] {
@@ -207,6 +243,16 @@ export default async function (pi: ExtensionAPI) {
       for (let i = 1; i < bottomIdx; i++) {
         lines[i] = (i === 1 ? renderedPrefix : CONTINUATION_PREFIX) + lines[i]!;
       }
+
+      // // Related upstream logic:
+      // // - https://github.com/badlogic/pi-mono/blob/a1e107897d56292d987cecb5816979acae6fc6aa/packages/tui/src/components/editor.ts#L514-L522
+      // //
+      // // Editor.render() appends autocomplete rows after the bottom border. They
+      // // were rendered at the narrower body width above, so shift them into the
+      // // same gutter-aligned column as wrapped continuation lines.
+      // for (let i = bottomIdx + 1; i < lines.length; i++) {
+      //   lines[i] = CONTINUATION_PREFIX + lines[i]!;
+      // }
 
       return lines;
     }
