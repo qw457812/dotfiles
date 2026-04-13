@@ -1,5 +1,5 @@
 function claude_fireworks --wraps=claude
-    # https://docs.fireworks.ai/firepass
+    # https://docs.fireworks.ai/firepass#claude-code
     # https://docs.fireworks.ai/ecosystem/integrations/claude-code
     set -lx ANTHROPIC_BASE_URL https://api.fireworks.ai/inference
     set -lx ANTHROPIC_AUTH_TOKEN $FIREWORKS_API_KEY
