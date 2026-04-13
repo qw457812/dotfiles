@@ -9,6 +9,7 @@
     "zai/glm-5.1",
     "synthetic/hf:zai-org/GLM-5.1",
     "synthetic/hf:moonshotai/Kimi-K2.5",
+    "fireworks/accounts/fireworks/routers/glm-5-fast",
     "fireworks/accounts/fireworks/routers/kimi-k2p5-turbo",
     "openai-codex/gpt-5.4",
     "github-copilot/gpt-5.4",

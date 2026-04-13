@@ -17,6 +17,7 @@ M.claude = {
   provider = {
     proxy = {
       -- alternatives:
+      -- - https://github.com/mcowger/plexus
       -- - https://github.com/looplj/axonhub
       -- - https://developers.cloudflare.com/ai-gateway/get-started/
       -- - https://github.com/router-for-me/CLIProxyAPI
@@ -62,7 +63,7 @@ M.claude = {
         ANTHROPIC_DEFAULT_SONNET_MODEL = "accounts/fireworks/routers/kimi-k2p5-turbo",
         ANTHROPIC_DEFAULT_HAIKU_MODEL = "accounts/fireworks/routers/kimi-k2p5-turbo",
         ANTHROPIC_MODEL = "accounts/fireworks/routers/glm-5-fast",
-        CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS = "1",
+        -- CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS = "1",
       },
       -- https://www.kimi.com/membership/subscription
       kimi = {
@@ -110,7 +111,7 @@ for _, tier in pairs(M.claude.provider) do
       "CLAUDE_CODE_SUBAGENT_MODEL",
       "ANTHROPIC_MODEL",
       "ANTHROPIC_SMALL_FAST_MODEL",
-      "CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS",
+      -- "CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS",
     }) do
       p[k] = p[k] or ""
     end

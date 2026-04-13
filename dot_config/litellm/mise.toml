@@ -13,8 +13,8 @@ run = "uv pip install --upgrade 'litellm[proxy]'"
 
 [tasks.dev]
 description = "Start LiteLLM Proxy with debug (foreground)"
-# --debug
-run = 'lsof -i:${PORT} >/dev/null 2>&1 && echo "Already running on port ${PORT}" || uv run litellm --config config.yaml --detailed_debug'
+# --detailed_debug
+run = 'lsof -i:${PORT} >/dev/null 2>&1 && echo "Already running on port ${PORT}" || uv run litellm --config config.yaml --debug'
 
 [tasks.run]
 description = "Start LiteLLM Proxy (background)"

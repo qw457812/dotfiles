@@ -56,6 +56,20 @@
             "cacheRead": 0,
             "cacheWrite": 0
           }
+        },
+        {
+          "id": "accounts/fireworks/routers/glm-5-fast",
+          "name": "GLM-5 Fast",
+          "reasoning": true,
+          "input": ["text"],
+          "contextWindow": 202752,
+          "maxTokens": 131072,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0
+          }
         }
       ]
     }

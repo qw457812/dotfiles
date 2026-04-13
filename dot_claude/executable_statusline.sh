@@ -186,16 +186,15 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
     changes_display=$(STARSHIP_CONFIG="$HOME/.config/starship-statusline.toml" STARSHIP_SHELL="" starship prompt | tr -d '\n')
   fi
 
-  # GSD update available?
-  # https://github.com/gsd-build/get-shit-done/blob/2eaed7a8475839958f9ec76ca4c26d9a0bbfc33f/hooks/gsd-statusline.js#L107-L111
-  gsd_update_display=""
-  if [ -f ".claude/hooks/gsd-statusline.js" ] && echo "$input" | node .claude/hooks/gsd-statusline.js 2>/dev/null | grep -q "/gsd:update"; then
-    gsd_update_display="${COLOR_YELLOW}/gsd:update${COLOR_RESET}"
-  fi
+  # # GSD update available?
+  # # https://github.com/gsd-build/get-shit-done/blob/2eaed7a8475839958f9ec76ca4c26d9a0bbfc33f/hooks/gsd-statusline.js#L107-L111
+  # gsd_update_display=""
+  # if [ -f ".claude/hooks/gsd-statusline.js" ] && echo "$input" | node .claude/hooks/gsd-statusline.js 2>/dev/null | grep -q "/gsd:update"; then
+  #   gsd_update_display="${COLOR_YELLOW}/gsd:update${COLOR_RESET}"
+  # fi
 
   # empty segments are skipped by xargs
   printf '%s\n' \
-    "$gsd_update_display" \
     "$vim_mode_display" \
     "$model_display" \
     "$total_tokens_display" \

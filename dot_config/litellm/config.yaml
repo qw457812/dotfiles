@@ -2,6 +2,7 @@
 # https://docs.anthropic.com/en/docs/claude-code/llm-gateway
 general_settings:
   master_key: os.environ/LITELLM_MASTER_KEY
+  # database_url: os.environ/DATABASE_URL
 
 model_list:
   # claude-opus-4-6 -> anthropic/glm-5.1
@@ -10,18 +11,38 @@ model_list:
       model: anthropic/glm-5.1
       api_base: https://api.z.ai/api/anthropic
       api_key: os.environ/ZAI_API_KEY
+  - model_name: claude-opus-*
+    litellm_params:
+      model: anthropic/hf:zai-org/GLM-5.1
+      api_base: https://api.synthetic.new/anthropic
+      api_key: os.environ/SYNTHETIC_API_KEY
 
   - model_name: claude-sonnet-*
     litellm_params:
       model: anthropic/hf:moonshotai/Kimi-K2.5
       api_base: https://api.synthetic.new/anthropic
       api_key: os.environ/SYNTHETIC_API_KEY
+  - model_name: claude-sonnet-*
+    litellm_params:
+      model: anthropic/accounts/fireworks/routers/kimi-k2p5-turbo
+      api_base: https://api.fireworks.ai/inference
+      api_key: os.environ/FIREWORKS_API_KEY
+  # - model_name: claude-sonnet-*
+  #   litellm_params:
+  #     model: anthropic/accounts/fireworks/routers/glm-5-fast
+  #     api_base: https://api.fireworks.ai/inference
+  #     api_key: os.environ/FIREWORKS_API_KEY
 
   - model_name: claude-haiku-*
     litellm_params:
       model: anthropic/glm-4.7
       api_base: https://api.z.ai/api/anthropic
       api_key: os.environ/ZAI_API_KEY
+  - model_name: claude-haiku-*
+    litellm_params:
+      model: anthropic/hf:MiniMaxAI/MiniMax-M2.5
+      api_base: https://api.synthetic.new/anthropic
+      api_key: os.environ/SYNTHETIC_API_KEY
 
   # synthetic/hf:moonshotai/Kimi-K2.5 -> anthropic/hf:moonshotai/Kimi-K2.5
   - model_name: "synthetic/*"
@@ -36,3 +57,29 @@ model_list:
       model: "anthropic/*"
       api_base: https://api.z.ai/api/anthropic
       api_key: os.environ/ZAI_API_KEY
+
+  - model_name: glm-5.1
+    litellm_params:
+      model: openai/hf:zai-org/GLM-5.1
+      api_base: https://api.synthetic.new/v1
+      api_key: os.environ/SYNTHETIC_API_KEY
+      drop_params: true
+  - model_name: glm-5.1
+    litellm_params:
+      model: openai/glm-5.1
+      api_base: https://api.z.ai/api/coding/paas/v4
+      api_key: os.environ/ZAI_API_KEY
+      drop_params: true
+
+  - model_name: kimi-k2.5
+    litellm_params:
+      model: openai/hf:moonshotai/Kimi-K2.5
+      api_base: https://api.synthetic.new/v1
+      api_key: os.environ/SYNTHETIC_API_KEY
+      drop_params: true
+  - model_name: kimi-k2.5
+    litellm_params:
+      model: openai/accounts/fireworks/routers/kimi-k2p5-turbo
+      api_base: https://api.fireworks.ai/inference/v1
+      api_key: os.environ/FIREWORKS_API_KEY
+      drop_params: true

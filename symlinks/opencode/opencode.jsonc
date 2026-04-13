@@ -9,15 +9,15 @@
   ],
   "share": "manual",
   // "autoupdate": "notify",
-  // "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+  // "model": "zai-coding-plan/glm-5.1",
   // "model": "synthetic/hf:moonshotai/Kimi-K2.5",
-  "model": "zai-coding-plan/glm-5.1",
+  "model": "synthetic/hf:zai-org/GLM-5.1",
+  // "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+  // "model": "fireworks-ai/accounts/fireworks/routers/glm-5-fast",
   "small_model": "github-copilot/gpt-5-mini",
   "agent": {
     "plan": {
-      // "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo"
-      // "model": "synthetic/hf:moonshotai/Kimi-K2.5"
-      "model": "zai-coding-plan/glm-5.1"
+      "model": "synthetic/hf:zai-org/GLM-5.1"
     }
   },
   "mcp": {
@@ -61,6 +61,54 @@
     }
   },
   "provider": {
+    "synthetic": {
+      "models": {
+        "hf:zai-org/GLM-5.1": {
+          "name": "GLM 5.1",
+          "family": "glm",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 1,
+            "output": 3
+          },
+          "limit": {
+            "context": 196608,
+            "output": 65536
+          },
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          }
+        }
+      }
+    },
+    "fireworks-ai": {
+      "models": {
+        "accounts/fireworks/routers/glm-5-fast": {
+          "name": "GLM 5 Fast",
+          "family": "glm",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0,
+            "output": 0
+          },
+          "limit": {
+            "context": 202752,
+            "output": 131072
+          },
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          }
+        }
+      }
+    },
     // // check `opencode models anthropic`
     // "anthropic": {
     //   "options": {
