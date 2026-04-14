@@ -4,7 +4,7 @@
  * Files Extension
  *
  * /files command lists all files the model has read/written/edited in the active session branch,
- * coalesced by path and sorted newest first. Selecting a file opens it in VS Code.
+ * coalesced by path and sorted newest first. Selecting a file opens it in Neovide.
  */
 
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
@@ -94,7 +94,7 @@ export default function (pi: ExtensionAPI) {
 			const WINDOWS_UNSAFE_CMD_CHARS_RE = /[&|<>^%\r\n]/;
 			const quoteCmdArg = (value: string) => `"${value.replace(/"/g, '""')}"`;
 
-			const openWithCode = async (path: string) => {
+			const openWithNeovide = async (path: string) => {
 				if (process.platform === "win32") {
 					if (WINDOWS_UNSAFE_CMD_CHARS_RE.test(path)) {
 						ctx.ui.notify(
@@ -103,15 +103,19 @@ export default function (pi: ExtensionAPI) {
 						);
 						return null;
 					}
-					const commandLine = `code -g ${quoteCmdArg(path)}`;
+					const commandLine = `neovide ${quoteCmdArg(path)}`;
 					return pi.exec("cmd", ["/d", "/s", "/c", commandLine], { cwd: ctx.cwd });
+				} else if (process.platform === "darwin") {
+					// Use `open -b` to reuse an existing Neovide instance instead of spawning a new one
+					return pi.exec("open", ["-b", "com.neovide.neovide", path], { cwd: ctx.cwd });
+				} else {
+					return pi.exec("neovide", [path], { cwd: ctx.cwd });
 				}
-				return pi.exec("code", ["-g", path], { cwd: ctx.cwd });
 			};
 
 			const openSelected = async (file: FileEntry): Promise<void> => {
 				try {
-					const openResult = await openWithCode(file.path);
+					const openResult = await openWithNeovide(file.path);
 					if (!openResult) return;
 					if (openResult.code !== 0) {
 						const openStderr = openResult.stderr.trim();
