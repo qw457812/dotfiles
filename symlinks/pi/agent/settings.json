@@ -16,6 +16,25 @@
     "github-copilot/claude-opus-4.6"
   ],
   "packages": [
+    {
+      "source": "npm:mitsupi",
+      "extensions": [
+        "pi-extensions/answer.ts",
+        "pi-extensions/btw.ts",
+        "pi-extensions/context.ts",
+        "pi-extensions/loop.ts",
+        "pi-extensions/review.ts",
+        "pi-extensions/session-breakdown.ts",
+        "pi-extensions/split-fork.ts"
+      ],
+      "skills": [
+        "skills/commit",
+        "skills/frontend-design",
+        "skills/librarian"
+      ],
+      "prompts": [],
+      "themes": []
+    },
     "npm:pi-vim"
   ]
 }
