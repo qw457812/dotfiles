@@ -3,7 +3,7 @@
 /**
  * pi-caffeinate — Keep the machine awake while the agent is working.
  *
- * Works on macOS, Linux, and Windows:
+ * Works on macOS, Linux, Termux, and Windows:
  *
  * macOS:   Spawns `caffeinate -i` which creates a keep-awake
  *          assertion via IOKit.
@@ -12,6 +12,9 @@
  *          which takes an idle inhibitor lock via logind.
  *          Falls back silently if systemd-inhibit is not available
  *          (e.g. non-systemd distros).
+ *
+ * Termux:  Runs `termux-wake-lock` on start and
+ *          `termux-wake-unlock` on shutdown.
  *
  * Windows: Spawns a PowerShell process that calls
  *          SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED)
@@ -24,25 +27,114 @@
  * while waiting for user input).
  *
  * A process.on('exit') handler acts as a safety net so that the
- * child is always cleaned up, even if pi exits without firing
+ * inhibitor is always cleaned up, even if pi exits without firing
  * session_shutdown (e.g. uncaught exception).
  */
 
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
-import { spawn, type ChildProcess } from "node:child_process";
+import { spawn, spawnSync, type ChildProcess } from "node:child_process";
 import { platform } from "node:os";
 
-/**
- * Build the command + args to keep the machine awake on the current platform.
- * Returns null if the platform is unsupported.
- */
-function inhibitCommand(): { cmd: string; args: string[] } | null {
+type CommandSpec = { cmd: string; args: string[] };
+type Inhibitor = { start(): void; stop(): void };
+
+function runCommandOrThrow(command: CommandSpec): void {
+	const result = spawnSync(command.cmd, command.args, {
+		stdio: "ignore",
+	});
+
+	if (result.error) {
+		throw new Error(`Command failed: ${command.cmd}: ${result.error.message}`);
+	}
+	if (result.signal || result.status !== 0) {
+		throw new Error(`Command failed: ${command.cmd}: exit=${result.status} signal=${result.signal}`);
+	}
+}
+
+function createProcessInhibitor(command: CommandSpec): Inhibitor {
+	let proc: ChildProcess | null = null;
+
+	return {
+		start() {
+			if (proc) return;
+
+			const child = spawn(command.cmd, command.args, {
+				stdio: "ignore",
+				detached: false,
+			});
+
+			proc = child;
+
+			// If the command isn't found (e.g. no systemd-inhibit on a
+			// non-systemd Linux), silently disable the inhibitor.
+			child.on("error", () => {
+				if (proc === child) proc = null;
+			});
+
+			child.on("exit", () => {
+				if (proc === child) proc = null;
+			});
+		},
+
+		stop() {
+			if (!proc) return;
+
+			const child = proc;
+			proc = null;
+
+			// On Windows, SIGTERM is not supported — ChildProcess.kill()
+			// terminates the process tree. On Unix, SIGTERM is clean.
+			child.kill();
+		},
+	};
+}
+
+function createCommandInhibitor(
+	engage: CommandSpec,
+	disengage: CommandSpec,
+): Inhibitor {
+	let active = false;
+
+	return {
+		start() {
+			if (active) return;
+			try {
+				runCommandOrThrow(engage);
+				active = true;
+			} catch {
+				// Gracefully degrade if command unavailable (e.g. missing termux-wake-lock)
+			}
+		},
+
+		stop() {
+			if (!active) return;
+			try {
+				runCommandOrThrow(disengage);
+			} catch {
+				// Best-effort cleanup
+			}
+			active = false;
+		},
+	};
+}
+
+function createInhibitor(): Inhibitor | null {
+	if (process.env.TERMUX_VERSION) {
+		return createCommandInhibitor(
+			{ cmd: "termux-wake-lock", args: [] },
+			{ cmd: "termux-wake-unlock", args: [] },
+		);
+	}
+
 	switch (platform()) {
 		case "darwin":
-			return { cmd: "caffeinate", args: ["-i"] };
+			return createProcessInhibitor({
+				cmd: "caffeinate",
+				args: ["-i"],
+			});
 
 		case "linux":
-			return {
+			return createProcessInhibitor({
 				cmd: "systemd-inhibit",
 				args: [
 					"--what=idle",
@@ -52,15 +144,10 @@ function inhibitCommand(): { cmd: string; args: string[] } | null {
 					"sleep",
 					"infinity",
 				],
-			};
+			});
 
 		case "win32":
-			// PowerShell one-liner that:
-			// 1. Adds a P/Invoke signature for SetThreadExecutionState
-			// 2. Calls it with ES_CONTINUOUS | ES_SYSTEM_REQUIRED (0x80000001)
-			// 3. Sleeps forever (the execution state is thread-scoped and
-			//    released automatically when the process exits)
-			return {
+			return createProcessInhibitor({
 				cmd: "powershell.exe",
 				args: [
 					"-NoProfile",
@@ -76,7 +163,7 @@ function inhibitCommand(): { cmd: string; args: string[] } | null {
 						"[Threading.Thread]::Sleep([Threading.Timeout]::Infinite)",
 					].join(" "),
 				],
-			};
+			});
 
 		default:
 			return null;
@@ -84,53 +171,22 @@ function inhibitCommand(): { cmd: string; args: string[] } | null {
 }
 
 export default function (pi: ExtensionAPI) {
-	const command = inhibitCommand();
-	if (!command) return; // unsupported platform — no-op
+	const inhibitor = createInhibitor();
+	if (!inhibitor) return;
 
-	let proc: ChildProcess | null = null;
-
-	function engage() {
-		if (proc) return; // already running
-		proc = spawn(command.cmd, command.args, {
-			stdio: "ignore",
-			detached: false,
-		});
-
-		// If the command isn't found (e.g. no systemd-inhibit on a
-		// non-systemd Linux), silently ignore and null out.
-		proc.on("error", () => {
-			proc = null;
-		});
-
-		proc.on("exit", () => {
-			proc = null;
-		});
-	}
-
-	function disengage() {
-		if (!proc) return;
-		// On Windows, SIGTERM is not supported — ChildProcess.kill()
-		// terminates the process tree. On Unix, SIGTERM is clean.
-		proc.kill();
-		proc = null;
-	}
-
-	// Safety net: kill the inhibitor when our process exits for any
-	// reason. This fires on normal exit, SIGTERM, SIGINT, and even
-	// uncaught exceptions — but NOT SIGKILL (nothing can catch that).
 	process.on("exit", () => {
-		disengage();
+		inhibitor.stop();
 	});
 
-	pi.on("agent_start", async () => {
-		engage();
+	pi.on("agent_start", () => {
+		inhibitor.start();
 	});
 
-	pi.on("agent_end", async () => {
-		disengage();
+	pi.on("agent_end", () => {
+		inhibitor.stop();
 	});
 
-	pi.on("session_shutdown", async () => {
-		disengage();
+	pi.on("session_shutdown", () => {
+		inhibitor.stop();
 	});
 }
