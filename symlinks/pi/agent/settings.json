@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.66.1",
+  "lastChangelogVersion": "0.67.2",
   "defaultProvider": "synthetic",
   "defaultModel": "hf:zai-org/GLM-5.1",
   "defaultThinkingLevel": "high",
@@ -16,6 +16,7 @@
     "github-copilot/claude-opus-4.6"
   ],
   "packages": [
-    "npm:pi-vim"
+    "npm:pi-vim",
+    "npm:pi-caffeinate"
   ]
 }
