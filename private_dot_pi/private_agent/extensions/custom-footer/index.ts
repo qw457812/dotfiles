@@ -7,7 +7,8 @@
  *
  * Shows:
  * - Token usage: ↑input ↓output Rcache_read Wcache_write
- * - Cost: $N.NNN
+ * - Cost: $N.NN
+ * - Elapsed: session duration
  * - TPS: session-average tokens per second
  * - Context usage: N% (colored: green/yellow/red based on usage)
  * - Quota info for certain providers (when active)
@@ -17,6 +18,7 @@
  * Ref:
  * - Example extension: https://github.com/badlogic/pi-mono/blob/7b902612e96a8bf49cf6f34345f09a44e5ca6926/packages/coding-agent/examples/extensions/custom-footer.ts
  * - Default footer: https://github.com/badlogic/pi-mono/blob/3de8c48692ba2fd9f23d9cd0b99299edbe46af80/packages/coding-agent/src/modes/interactive/components/footer.ts
+ * - oh-pi footer: https://github.com/telagod/oh-pi/blob/21c06f2d577eb6129582d1f9bb1e0f3bb98ed5c4/pi-package/extensions/custom-footer.ts
  */
 
 import type {
@@ -30,7 +32,19 @@ import { createTpsTracker } from "./tps.js";
 
 export default function (pi: ExtensionAPI) {
   let enabled = true;
+  let sessionStart = Date.now();
   const tpsTracker = createTpsTracker();
+
+  function formatElapsed(ms: number): string {
+    const s = Math.floor(ms / 1000);
+    if (s < 60) return `${s}s`;
+    const m = Math.floor(s / 60);
+    const rs = s % 60;
+    if (m < 60) return `${m}m${rs > 0 ? rs + "s" : ""}`;
+    const h = Math.floor(m / 60);
+    const rm = m % 60;
+    return `${h}h${rm > 0 ? rm + "m" : ""}`;
+  }
 
   /**
    * Sanitize text for display in a single-line status.
@@ -62,9 +76,13 @@ export default function (pi: ExtensionAPI) {
       footerData: ReadonlyFooterDataProvider,
     ) => {
       const unsub = footerData.onBranchChange(() => tui.requestRender());
+      const timer = setInterval(() => tui.requestRender(), 30000);
 
       return {
-        dispose: unsub,
+        dispose() {
+          unsub();
+          clearInterval(timer);
+        },
         invalidate() {},
         render(width: number): string[] {
           // Calculate cumulative usage from ALL session entries (not just post-compaction messages)
@@ -108,32 +126,34 @@ export default function (pi: ExtensionAPI) {
 
           // Cost (without "(sub)" indicator - not accessible from extension)
           if (totalCost) {
-            statsParts.push(`$${totalCost.toFixed(3)}`);
+            statsParts.push(`$${totalCost.toFixed(2)}`);
           }
 
+          // Elapsed
+          statsParts.push(`⏱ ${formatElapsed(Date.now() - sessionStart)}`);
+
           // Tokens per second
-          const tps = tpsTracker.getTps();
+          const tps = tpsTracker.getTps(theme);
           if (tps) {
             statsParts.push(tps);
           }
 
           // Colorize context percentage based on usage
-          let contextPercentStr: string;
-          const contextPercentDisplay =
-            contextPercent === "?"
-              ? `?/${formatTokens(contextWindow)}`
-              : `${contextPercent}%/${formatTokens(contextWindow)}`;
-          if (contextPercentValue > 90) {
-            contextPercentStr = theme.fg("error", contextPercentDisplay);
-          } else if (contextPercentValue > 70) {
-            contextPercentStr = theme.fg("warning", contextPercentDisplay);
-          } else {
-            contextPercentStr = contextPercentDisplay;
-          }
+          const contextPercentColor =
+            contextPercentValue > 75
+              ? "error"
+              : contextPercentValue > 50
+                ? "warning"
+                : "success";
+          const contextPercentStr =
+            theme.fg(
+              contextPercentColor,
+              contextPercent === "?" ? "?" : `${contextPercent}%`,
+            ) + theme.fg("dim", `/${formatTokens(contextWindow)}`);
           statsParts.push(contextPercentStr);
 
-          // Quota for certain providers
-          const quota = getQuota(ctx.model?.provider, tui);
+          // Quota
+          const quota = getQuota(ctx.model?.provider, tui, theme);
           if (quota) {
             statsParts.push(quota);
           }
@@ -147,7 +167,7 @@ export default function (pi: ExtensionAPI) {
 
           // If statsLeft is too wide, truncate it
           if (statsLeftWidth > width) {
-            statsLeft = truncateToWidth(statsLeft, width, "...");
+            statsLeft = truncateToWidth(statsLeft, width, "…");
             statsLeftWidth = visibleWidth(statsLeft);
           }
 
@@ -160,14 +180,14 @@ export default function (pi: ExtensionAPI) {
             const thinkingLevel = pi.getThinkingLevel() || "off";
             rightSideWithoutProvider =
               thinkingLevel === "off"
-                ? `${modelName} • thinking off`
-                : `${modelName} • ${thinkingLevel}`;
+                ? `${modelName} thinking off`
+                : `${modelName} ${thinkingLevel}`;
           }
 
           // Prepend the provider in parentheses if there are multiple providers and there's enough room
           let rightSide = rightSideWithoutProvider;
           if (footerData.getAvailableProviderCount() > 1 && ctx.model) {
-            rightSide = `(${ctx.model.provider}) ${rightSideWithoutProvider}`;
+            rightSide = `${ctx.model.provider} ${rightSideWithoutProvider}`;
             if (statsLeftWidth + minPadding + visibleWidth(rightSide) > width) {
               // Too wide, fall back
               rightSide = rightSideWithoutProvider;
@@ -220,7 +240,7 @@ export default function (pi: ExtensionAPI) {
             const statusLine = sortedStatuses.join(" ");
             // Truncate to terminal width with dim ellipsis for consistency with footer style
             lines.push(
-              truncateToWidth(statusLine, width, theme.fg("dim", "...")),
+              truncateToWidth(statusLine, width, theme.fg("dim", "…")),
             );
           }
 
@@ -232,6 +252,8 @@ export default function (pi: ExtensionAPI) {
 
   // Set custom footer on startup
   pi.on("session_start", (_event, ctx) => {
+    sessionStart = Date.now();
+
     ctx.ui.setFooter(createFooterFactory(ctx));
 
     tpsTracker.onSessionStart();

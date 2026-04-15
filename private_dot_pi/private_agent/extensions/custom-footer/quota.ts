@@ -6,10 +6,15 @@ import type { TUI } from "@mariozechner/pi-tui";
 const CACHE_DIR = join(homedir(), ".cache", "pi-agent-footer");
 const PI_AGENT_AUTH_PATH = join(homedir(), ".pi", "agent", "auth.json");
 
-const MINUTE_MS = 60 * 1000;
+const SECOND_MS = 1000;
+const MINUTE_MS = 60 * SECOND_MS;
 const HOUR_MS = 60 * MINUTE_MS;
 const DAY_MS = 24 * HOUR_MS;
 const RETRY_COOLDOWN_MS = 30 * 1000;
+
+interface Theme {
+  fg(color: string, text: string): string;
+}
 
 interface SyntheticQuota {
   rollingFiveHourLimit: {
@@ -65,11 +70,11 @@ interface SourceConfig<T> {
   cacheTtlMs: number;
   getAuth: () => Promise<string | null>;
   fetch: (auth: string) => Promise<T | null>;
-  format: (quota: T) => string | null;
+  format: (quota: T, theme: Theme) => string | null;
 }
 
 interface Source {
-  get(): string | null;
+  get(theme: Theme): string | null;
   refresh(tui: TUI): Promise<void>;
 }
 
@@ -139,17 +144,18 @@ async function readAuth(
   return auth?.[provider]?.[key] || null;
 }
 
-function formatTime(date: string | number): string {
+function formatRemaining(date: string | number): string {
   const time = typeof date === "number" ? date : new Date(date).getTime();
   const diff = time - Date.now();
 
-  if (diff <= 0) {
-    return "0m";
+  if (diff < SECOND_MS) {
+    return diff <= 0 ? "0s" : "<1s";
   }
 
   const days = Math.floor(diff / DAY_MS);
   const hours = Math.floor((diff % DAY_MS) / HOUR_MS);
   const minutes = Math.floor((diff % HOUR_MS) / MINUTE_MS);
+  const seconds = Math.floor((diff % MINUTE_MS) / SECOND_MS);
 
   if (days > 0) {
     return hours > 0 ? `${days}d${hours}h` : `${days}d`;
@@ -157,7 +163,10 @@ function formatTime(date: string | number): string {
   if (hours > 0) {
     return minutes > 0 ? `${hours}h${minutes}m` : `${hours}h`;
   }
-  return `${minutes}m`;
+  if (minutes > 0) {
+    return `${minutes}m`;
+  }
+  return `${seconds}s`;
 }
 
 function joinParts(
@@ -203,9 +212,9 @@ function createSource<T>(provider: string, config: SourceConfig<T>): Source {
   }
 
   return {
-    get(): string | null {
+    get(theme: Theme): string | null {
       const cached = fresh(cache, config.cacheTtlMs);
-      return cached ? config.format(cached.value) : null;
+      return cached ? config.format(cached.value, theme) : null;
     },
     async refresh(tui: TUI): Promise<void> {
       if (fetching || fresh(cache, config.cacheTtlMs)) {
@@ -244,17 +253,17 @@ const sources: Record<string, Source> = {
         apiKey,
       );
     },
-    format(quota: SyntheticQuota): string | null {
+    format(quota: SyntheticQuota, theme: Theme): string | null {
       const fiveHour = quota.rollingFiveHourLimit;
       const weekly = quota.weeklyTokenLimit;
       return joinParts([
-        `${(fiveHour.max - fiveHour.remaining).toFixed(1)}/${fiveHour.max}/${formatTime(fiveHour.nextTickAt)}`,
-        `${(100 - weekly.percentRemaining).toFixed(1)}%/${formatTime(weekly.nextRegenAt)}`,
+        `${theme.fg("accent", `${Math.round(fiveHour.max - fiveHour.remaining)}`)}${theme.fg("dim", `/${fiveHour.max}/${formatRemaining(fiveHour.nextTickAt)}`)}`,
+        `${theme.fg("accent", `${(100 - weekly.percentRemaining).toFixed(1)}%`)}${theme.fg("dim", `/${formatRemaining(weekly.nextRegenAt)}`)}`,
       ]);
     },
   }),
   "github-copilot": createSource("github-copilot", {
-    cacheTtlMs: 3 * MINUTE_MS,
+    cacheTtlMs: MINUTE_MS,
     async getAuth(): Promise<string | null> {
       // curl -s "https://api.github.com/copilot_internal/user" -H "Authorization: Bearer $(jq -r '.[] | select(.oauth_token) | .oauth_token' ~/.config/github-copilot/apps.json | head -1)"
       return readAuth("github-copilot", "refresh");
@@ -265,9 +274,9 @@ const sources: Record<string, Source> = {
         token,
       );
     },
-    format(quota: CopilotQuota): string | null {
+    format(quota: CopilotQuota, theme: Theme): string | null {
       const premium = quota.quota_snapshots.premium_interactions;
-      return `${premium.entitlement - premium.remaining}/${premium.entitlement} ${formatTime(quota.quota_reset_date_utc)}`;
+      return `${theme.fg("accent", `${premium.entitlement - premium.remaining}`)}${theme.fg("dim", `/${premium.entitlement} ${formatRemaining(quota.quota_reset_date_utc)}`)}`;
     },
   }),
   "openai-codex": createSource("openai-codex", {
@@ -282,7 +291,7 @@ const sources: Record<string, Source> = {
         token,
       );
     },
-    format(quota: CodexQuota): string | null {
+    format(quota: CodexQuota, theme: Theme): string | null {
       const rateLimit = quota.rate_limit;
       if (!rateLimit) {
         return null;
@@ -298,7 +307,7 @@ const sources: Record<string, Source> = {
           | undefined,
       ): string | null =>
         window
-          ? `${window.used_percent}% ${formatTime(window.reset_at * 1000)}`
+          ? `${theme.fg("accent", `${window.used_percent}%`)}${theme.fg("dim", `/${formatRemaining(window.reset_at * 1000)}`)}`
           : null;
 
       return joinParts([
@@ -308,7 +317,7 @@ const sources: Record<string, Source> = {
     },
   }),
   zai: createSource("zai", {
-    cacheTtlMs: 3 * MINUTE_MS,
+    cacheTtlMs: MINUTE_MS,
     async getAuth(): Promise<string | null> {
       return process.env.ZAI_API_KEY || null;
     },
@@ -318,18 +327,18 @@ const sources: Record<string, Source> = {
         apiKey,
       );
     },
-    format(quota: ZaiQuota): string | null {
+    format(quota: ZaiQuota, theme: Theme): string | null {
       const tokens: string[] = [];
       const mcp: string[] = [];
       for (const limit of quota.data.limits) {
         if (limit.type === "TOKENS_LIMIT") {
           tokens.push(
             limit.nextResetTime
-              ? `${limit.percentage}%/${formatTime(limit.nextResetTime)}`
-              : `${limit.percentage}%`,
+              ? `${theme.fg("accent", `${limit.percentage}%`)}${theme.fg("dim", `/${formatRemaining(limit.nextResetTime)}`)}`
+              : theme.fg("accent", `${limit.percentage}%`),
           );
         } else if (limit.type === "TIME_LIMIT" && limit.percentage > 0) {
-          mcp.push(`${limit.percentage}%`);
+          mcp.push(theme.fg("muted", `${limit.percentage}%`));
         }
       }
       return joinParts([...tokens, ...mcp]);
@@ -340,13 +349,14 @@ const sources: Record<string, Source> = {
 export function getQuota(
   provider: string | undefined,
   tui: TUI,
+  theme: Theme,
 ): string | null {
   const source = provider ? sources[provider] : null;
   if (!source) {
     return null;
   }
 
-  const quota = source.get();
+  const quota = source.get(theme);
   void source.refresh(tui);
   return quota;
 }

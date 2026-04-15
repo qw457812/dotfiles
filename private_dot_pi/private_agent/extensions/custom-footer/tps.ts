@@ -4,6 +4,10 @@ import type {
   ExtensionContext,
 } from "@mariozechner/pi-coding-agent";
 
+interface Theme {
+  fg(color: string, text: string): string;
+}
+
 function isAssistantMessage(message: unknown): message is AssistantMessage {
   if (!message || typeof message !== "object") return false;
   const role = (message as { role?: unknown }).role;
@@ -14,7 +18,7 @@ export interface TpsTracker {
   onSessionStart(): void;
   onAgentStart(): void;
   onAgentEnd(event: AgentEndEvent, ctx: ExtensionContext): boolean;
-  getTps(): string | null;
+  getTps(theme: Theme): string | null;
 }
 
 export function createTpsTracker(): TpsTracker {
@@ -54,13 +58,13 @@ export function createTpsTracker(): TpsTracker {
       return true;
     },
 
-    getTps(): string | null {
+    getTps(theme: Theme): string | null {
       if (totalElapsedMs <= 0) {
         return null;
       }
 
       const averageTokensPerSecond = totalOutput / (totalElapsedMs / 1000);
-      return ` ${averageTokensPerSecond.toFixed(1)}`;
+      return theme.fg("muted", ` ${averageTokensPerSecond.toFixed(1)}`);
     },
   };
 }
