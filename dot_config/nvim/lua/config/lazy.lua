@@ -126,6 +126,7 @@ require("lazy").setup({
       },
       ["<leader>ac"] = {
         function(plugin)
+          vim.cmd.close()
           local orig_cwd = vim.fn.chdir(plugin.dir)
           U.ai.sidekick.cli.quick.show("claude" .. (vim.v.count == 0 and "" or vim.v.count))
           if orig_cwd ~= "" then
@@ -138,6 +139,7 @@ require("lazy").setup({
       },
       ["<leader>ax"] = {
         function(plugin)
+          vim.cmd.close()
           local orig_cwd = vim.fn.chdir(plugin.dir)
           U.ai.sidekick.cli.quick.show("codex" .. (vim.v.count == 0 and "" or vim.v.count))
           if orig_cwd ~= "" then
@@ -150,6 +152,7 @@ require("lazy").setup({
       },
       ["<leader>ao"] = {
         function(plugin)
+          vim.cmd.close()
           local orig_cwd = vim.fn.chdir(plugin.dir)
           U.ai.sidekick.cli.quick.show("opencode" .. (vim.v.count == 0 and "" or vim.v.count))
           if orig_cwd ~= "" then
@@ -162,6 +165,7 @@ require("lazy").setup({
       },
       ["<leader>ai"] = {
         function(plugin)
+          vim.cmd.close()
           local orig_cwd = vim.fn.chdir(plugin.dir)
           U.ai.sidekick.cli.quick.show("pi" .. (vim.v.count == 0 and "" or vim.v.count))
           if orig_cwd ~= "" then
@@ -174,6 +178,7 @@ require("lazy").setup({
       },
       ["<leader>ag"] = {
         function(plugin)
+          vim.cmd.close()
           local orig_cwd = vim.fn.chdir(plugin.dir)
           U.ai.sidekick.cli.quick.show("claude_glm" .. (vim.v.count == 0 and "" or vim.v.count))
           if orig_cwd ~= "" then
@@ -183,18 +188,6 @@ require("lazy").setup({
           end
         end,
         desc = "Claude GLM",
-      },
-      ["<leader>as"] = {
-        function(plugin)
-          local orig_cwd = vim.fn.chdir(plugin.dir)
-          U.ai.sidekick.cli.quick.show("gsd" .. (vim.v.count == 0 and "" or vim.v.count))
-          if orig_cwd ~= "" then
-            vim.schedule(function()
-              vim.fn.chdir(orig_cwd)
-            end)
-          end
-        end,
-        desc = "GSD",
       },
       ["<leader>gg"] = {
         function(plugin)

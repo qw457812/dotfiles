@@ -119,7 +119,6 @@ brew "helix"
 brew "hf"
 brew "highlight"
 brew "himalaya"
-brew "howdoi"
 brew "http-prompt"
 brew "httpie"
 brew "hub"
@@ -162,7 +161,6 @@ brew "ninja"
 brew "micro"
 brew "midnight-commander"
 brew "mise"
-brew "models"
 brew "mole"
 brew "monolith"
 brew "protobuf"
@@ -292,7 +290,6 @@ cask "brave-browser"
 cask "codex"
 cask "codex-app"
 cask "steipete/tap/codexbar"
-cask "discord"
 cask "easydict"
 cask "firefox"
 cask "font-fira-code"
@@ -342,7 +339,6 @@ mas "iMovie", id: 408981434
 mas "Keynote", id: 409183694
 mas "Numbers", id: 409203825
 mas "Pages", id: 409201541
-mas "WeChat", id: 836500024
 mas "WeCom", id: 1189898970
 mas "WPS Office", id: 1443749478
 mas "Xcode", id: 497799835
@@ -426,5 +422,6 @@ vscode "xabikos.javascriptsnippets"
 vscode "zhuangtongfa.material-theme"
 go "github.com/Done-0/fuck-u-code/cmd/fuck-u-code"
 uv "claude-monitor"
+uv "kimi-cli"
 uv "nano-pdf"
 uv "posting"

@@ -272,8 +272,8 @@ return {
               end,
             })
           end),
-          -- layout = vim.g.user_is_termux and "float" or "right",
-          layout = "float", ---@type "float"|"left"|"bottom"|"top"|"right"
+          -- layout = "float",
+          layout = vim.g.user_is_termux and "float" or "right", ---@type "float"|"left"|"bottom"|"top"|"right"
           ---@type vim.api.keyset.win_config
           float = {
             row = 0,
@@ -826,6 +826,8 @@ return {
     specs = {
       { "mitsuhiko/agent-stuff", lazy = true, config = function() end },
       { "lajarre/pi-vim", version = "*", lazy = true, config = function() end },
+      { "georgebashi/pi-caffeinate", lazy = true, config = function() end },
+      { "telagod/oh-pi", lazy = true, config = function() end },
     },
   },
   {
