@@ -164,7 +164,7 @@ return {
 
       local ai_cmp = vim.g.ai_cmp
       function H.is_inline_cmp_possible()
-        return not ai_cmp and vim.fn.win_gettype() ~= "command" and vim.bo.filetype ~= "copilot-chat"
+        return not ai_cmp and vim.fn.getcmdwintype() == "" and vim.bo.filetype ~= "copilot-chat"
       end
 
       return U.extend_tbl(opts, {
@@ -334,7 +334,7 @@ return {
               selection = {
                 preselect = function()
                   -- enable preselect in cmdwin, the same behavior as in normal buffer
-                  return vim.fn.win_gettype() == "command"
+                  return vim.fn.getcmdwintype() ~= ""
                 end,
               },
             },
