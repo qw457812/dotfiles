@@ -17,6 +17,24 @@
   ],
   "packages": [
     "npm:pi-vim",
-    "npm:pi-caffeinate"
+    "npm:pi-caffeinate",
+    {
+      "source": "npm:oh-pi",
+      "extensions": [
+        "pi-package/extensions/safe-guard.ts"
+      ],
+      "skills": [
+        "pi-package/skills/context7",
+        "pi-package/skills/web-fetch",
+        "pi-package/skills/web-search"
+      ],
+      "prompts": [
+        "pi-package/prompts/commit.md",
+        "pi-package/prompts/explain.md",
+        "pi-package/prompts/fix.md",
+        "pi-package/prompts/test.md"
+      ],
+      "themes": []
+    }
   ]
 }
