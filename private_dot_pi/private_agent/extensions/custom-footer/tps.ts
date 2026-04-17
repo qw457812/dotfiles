@@ -64,7 +64,7 @@ export function createTpsTracker(): TpsTracker {
       }
 
       const averageTokensPerSecond = totalOutput / (totalElapsedMs / 1000);
-      return theme.fg("muted", ` ${averageTokensPerSecond.toFixed(1)}`);
+      return theme.fg("syntaxComment", `${averageTokensPerSecond.toFixed(1)}`);
     },
   };
 }

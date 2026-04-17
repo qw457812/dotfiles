@@ -8,10 +8,11 @@
  * Shows:
  * - Token usage: ↑input ↓output Rcache_read Wcache_write
  * - Cost: $N.NN
- * - Elapsed: session duration
  * - TPS: session-average tokens per second
  * - Context usage: N% (colored: green/yellow/red based on usage)
  * - Quota info for certain providers (when active)
+ * - Elapsed: session duration
+ * - Version
  * - Model name, provider (when multi-provider), thinking level
  * - Extension status messages (if any)
  *
@@ -26,6 +27,7 @@ import type {
   ExtensionContext,
   ReadonlyFooterDataProvider,
 } from "@mariozechner/pi-coding-agent";
+import { VERSION } from "@mariozechner/pi-coding-agent";
 import { type TUI, truncateToWidth, visibleWidth } from "@mariozechner/pi-tui";
 import { getQuota } from "./quota.js";
 import { createTpsTracker } from "./tps.js";
@@ -130,9 +132,6 @@ export default function (pi: ExtensionAPI) {
             statsParts.push(`$${totalCost.toFixed(2)}`);
           }
 
-          // Elapsed
-          statsParts.push(`${formatElapsed(Date.now() - sessionStart)}`);
-
           // Tokens per second
           const tps = tpsTracker.getTps(theme);
           if (tps) {
@@ -158,6 +157,14 @@ export default function (pi: ExtensionAPI) {
           if (quota) {
             statsParts.push(quota);
           }
+
+          // Version
+          statsParts.push(theme.fg("dim", `v${VERSION}`));
+
+          // Elapsed
+          statsParts.push(
+            theme.fg("dim", formatElapsed(Date.now() - sessionStart)),
+          );
 
           let statsLeft = statsParts.join(" ");
 
