@@ -155,6 +155,7 @@ TODO:
 
 - [ ] Try [AeroSpace](https://github.com/nikitabobko/AeroSpace).
 - [ ] Try [acsandmann/rift](https://github.com/acsandmann/rift).
+- [ ] Try [karinushka/paneru](https://github.com/karinushka/paneru).
 
 ## [zathura](https://github.com/zegervdv/homebrew-zathura)
 

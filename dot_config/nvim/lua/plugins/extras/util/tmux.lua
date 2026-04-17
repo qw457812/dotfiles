@@ -1,6 +1,8 @@
 local is_tmux = vim.g.user_is_tmux
 local is_wezterm = vim.g.user_is_wezterm
 local is_kitty = vim.g.user_is_kitty
+-- TODO: tmux in ghostty
+local is_ghostty = vim.g.user_is_ghostty
 
 -- https://github.com/folke/zen-mode.nvim/blob/a31cf7113db34646ca320f8c2df22cf1fbfc6f2a/lua/zen-mode/plugins.lua#L96
 local function get_tmux_opt(option)
@@ -233,7 +235,7 @@ return {
   {
     "mrjones2014/smart-splits.nvim",
     pager = true,
-    cond = is_wezterm or is_kitty,
+    cond = is_wezterm or is_kitty or is_ghostty,
     -- build = "./kitty/install-kittens.bash", -- ~/.config/kitty/neighboring_window.py has been modified to adapt to tmux in kitty
     lazy = false, -- required
     -- stylua: ignore

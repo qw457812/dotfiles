@@ -125,6 +125,7 @@ function H.visible_lines(buf, win)
   return vim.api.nvim_buf_get_lines(buf, vim.fn.line("w0", win) - 1, vim.fn.line("w$", win), false)
 end
 
+-- TODO: check https://github.com/saghen/blink.cmp/blob/c573a15a62bd0bfd4006ee0849b24f5404395500/lua/blink/cmp/keymap/utils.lua#L27-L63
 ---@param key string
 ---@return string
 function H.nvim_key_to_tmux(key)

@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.67.2",
+  "lastChangelogVersion": "0.67.6",
   "defaultProvider": "synthetic",
   "defaultModel": "hf:zai-org/GLM-5.1",
   "defaultThinkingLevel": "high",

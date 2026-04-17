@@ -682,6 +682,13 @@ return {
           vim.opt_local.wrap = true
           vim.diagnostic.enable(false, { bufnr = ev.buf })
 
+          -- for "Show last response in external editor"
+          if ev.match:match("/claude%-prompt%-.+%.md$") then
+            vim.schedule(function()
+              vim.cmd("normal! G")
+            end)
+          end
+
           vim.keymap.set("n", "<Esc>", function()
             if not U.keymap.clear_ui_esc() then
               vim.cmd([[quitall]])
