@@ -832,9 +832,10 @@ return {
     config = function() end,
     specs = {
       { "mitsuhiko/agent-stuff", lazy = true, config = function() end },
-      { "lajarre/pi-vim", version = "*", lazy = true, config = function() end },
-      { "georgebashi/pi-caffeinate", lazy = true, config = function() end },
       { "telagod/oh-pi", lazy = true, config = function() end },
+      { "lajarre/pi-vim", version = "*", lazy = true, config = function() end },
+      { "georgebashi/pi-caffeinate", version = "*", lazy = true, config = function() end },
+      { "nicobailon/pi-mcp-adapter", version = "*", lazy = true, config = function() end },
     },
   },
   {
