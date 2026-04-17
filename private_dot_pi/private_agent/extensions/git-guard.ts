@@ -1,19 +1,12 @@
+// Ref: https://github.com/telagod/oh-pi/blob/7e59d1bcbfe1af837494a65d759d047a6474b103/pi-package/extensions/git-guard.ts
+
 /**
  * oh-pi Git Checkpoint Extension
  *
- * Auto-stash before each turn, notify on agent completion.
- * Combines git-checkpoint + notify + dirty-repo-guard.
+ * Auto-stash before each turn.
+ * Combines git-checkpoint + dirty-repo-guard.
  */
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
-
-function terminalNotify(title: string, body: string): void {
-  if (process.env.KITTY_WINDOW_ID) {
-    process.stdout.write(`\x1b]99;i=1:d=0;${title}\x1b\\`);
-    process.stdout.write(`\x1b]99;i=1:p=body;${body}\x1b\\`);
-  } else {
-    process.stdout.write(`\x1b]777;notify;${title};${body}\x07`);
-  }
-}
 
 export default function (pi: ExtensionAPI) {
   let turnCount = 0;
@@ -37,9 +30,7 @@ export default function (pi: ExtensionAPI) {
     } catch { /* not a git repo */ }
   });
 
-  // Notify when agent is done
   pi.on("agent_end", async () => {
-    terminalNotify("oh-pi", `Done after ${turnCount} turn(s). Ready for input.`);
     turnCount = 0;
   });
 }
