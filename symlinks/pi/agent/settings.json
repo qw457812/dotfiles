@@ -1,19 +1,17 @@
 {
-  "lastChangelogVersion": "0.67.6",
-  "defaultProvider": "synthetic",
-  "defaultModel": "hf:zai-org/GLM-5.1",
+  "lastChangelogVersion": "0.67.68",
+  "defaultProvider": "neuralwatt",
+  "defaultModel": "zai-org/GLM-5.1-FP8",
   "defaultThinkingLevel": "high",
   "hideThinkingBlock": true,
   "quietStartup": true,
   "enabledModels": [
     "zai/glm-5.1",
     "synthetic/hf:zai-org/GLM-5.1",
-    "synthetic/hf:moonshotai/Kimi-K2.5",
-    "fireworks/accounts/fireworks/routers/glm-5-fast",
-    "fireworks/accounts/fireworks/routers/kimi-k2p5-turbo",
+    "neuralwatt/zai-org/GLM-5.1-FP8",
     "openai-codex/gpt-5.4",
     "github-copilot/gpt-5.4",
-    "github-copilot/claude-opus-4.6"
+    "synthetic/hf:moonshotai/Kimi-K2.5"
   ],
   "packages": [
     "npm:pi-vim",
@@ -36,6 +34,7 @@
       ],
       "themes": []
     },
-    "npm:pi-mcp-adapter"
+    "npm:pi-mcp-adapter",
+    "git:github.com/monotykamary/pi-neuralwatt-provider"
   ]
 }

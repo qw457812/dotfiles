@@ -29,6 +29,7 @@ import type {
 } from "@mariozechner/pi-coding-agent";
 import { VERSION } from "@mariozechner/pi-coding-agent";
 import { type TUI, truncateToWidth, visibleWidth } from "@mariozechner/pi-tui";
+import { formatDecimal } from "./utils.js";
 import { getQuota } from "./quota.js";
 import { createTpsTracker } from "./tps.js";
 
@@ -66,9 +67,9 @@ export default function (pi: ExtensionAPI) {
    */
   function formatTokens(count: number): string {
     if (count < 1000) return count.toString();
-    if (count < 10000) return `${(count / 1000).toFixed(1)}k`;
+    if (count < 10000) return `${formatDecimal(count / 1000, 1)}k`;
     if (count < 1000000) return `${Math.round(count / 1000)}k`;
-    if (count < 10000000) return `${(count / 1000000).toFixed(1)}M`;
+    if (count < 10000000) return `${formatDecimal(count / 1000000, 1)}M`;
     return `${Math.round(count / 1000000)}M`;
   }
 
@@ -115,7 +116,7 @@ export default function (pi: ExtensionAPI) {
           const contextPercentValue = contextUsage?.percent ?? 0;
           const contextPercent =
             contextUsage?.percent !== null
-              ? contextPercentValue.toFixed(1)
+              ? formatDecimal(contextPercentValue, 1)
               : "?";
 
           // Build stats line
@@ -129,7 +130,7 @@ export default function (pi: ExtensionAPI) {
 
           // Cost (without "(sub)" indicator - not accessible from extension)
           if (totalCost) {
-            statsParts.push(`$${totalCost.toFixed(2)}`);
+            statsParts.push(`$${formatDecimal(totalCost, 2)}`);
           }
 
           // Tokens per second

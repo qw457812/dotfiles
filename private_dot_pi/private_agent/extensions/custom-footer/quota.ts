@@ -2,6 +2,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import type { TUI } from "@mariozechner/pi-tui";
+import { formatDecimal } from "./utils.js";
 
 const CACHE_DIR = join(homedir(), ".cache", "pi-agent-footer");
 const PI_AGENT_AUTH_PATH = join(homedir(), ".pi", "agent", "auth.json");
@@ -49,6 +50,15 @@ interface CodexQuota {
       reset_at: number;
     } | null;
   } | null;
+}
+
+// https://portal.neuralwatt.com/docs/api/quota
+interface NeuralwattQuota {
+  balance: {
+    credits_remaining_usd: number;
+    total_credits_usd: number;
+    credits_used_usd: number;
+  };
 }
 
 interface ZaiQuota {
@@ -258,7 +268,7 @@ const sources: Record<string, Source> = {
       const weekly = quota.weeklyTokenLimit;
       return joinParts([
         `${theme.fg("accent", `${Math.round(fiveHour.max - fiveHour.remaining)}`)}${theme.fg("dim", `/${fiveHour.max}/${formatRemaining(fiveHour.nextTickAt)}`)}`,
-        `${theme.fg("accent", `${(100 - weekly.percentRemaining).toFixed(1)}%`)}${theme.fg("dim", `/${formatRemaining(weekly.nextRegenAt)}`)}`,
+        `${theme.fg("accent", `${formatDecimal(100 - weekly.percentRemaining, 1)}%`)}${theme.fg("dim", `/${formatRemaining(weekly.nextRegenAt)}`)}`,
       ]);
     },
   }),
@@ -314,6 +324,22 @@ const sources: Record<string, Source> = {
         formatWindow(rateLimit.primary_window),
         formatWindow(rateLimit.secondary_window),
       ]);
+    },
+  }),
+  neuralwatt: createSource("neuralwatt", {
+    cacheTtlMs: MINUTE_MS,
+    async getAuth(): Promise<string | null> {
+      return process.env.NEURALWATT_API_KEY || null;
+    },
+    async fetch(apiKey: string): Promise<NeuralwattQuota | null> {
+      return fetchJson<NeuralwattQuota>(
+        "https://api.neuralwatt.com/v1/quota",
+        apiKey,
+      );
+    },
+    format(quota: NeuralwattQuota, theme: Theme): string | null {
+      const bal = quota.balance;
+      return `${theme.fg("accent", `$${formatDecimal(bal.credits_used_usd, 2)}`)}${theme.fg("dim", `/$${formatDecimal(bal.total_credits_usd, 2)}`)}`;
     },
   }),
   zai: createSource("zai", {
