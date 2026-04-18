@@ -1,7 +1,12 @@
-import type { AssistantMessage } from "@mariozechner/pi-ai";
+import { formatDecimal } from "./utils";
+import type {
+  AssistantMessage,
+  AssistantMessageEvent,
+} from "@mariozechner/pi-ai";
 import type {
   AgentEndEvent,
   ExtensionContext,
+  MessageUpdateEvent,
 } from "@mariozechner/pi-coding-agent";
 
 interface Theme {
@@ -14,27 +19,50 @@ function isAssistantMessage(message: unknown): message is AssistantMessage {
   return role === "assistant";
 }
 
+function isFirstTokenEvent({ type }: AssistantMessageEvent) {
+  return type === "thinking_delta" || type === "text_delta";
+}
+
 export interface TpsTracker {
   onSessionStart(): void;
   onAgentStart(): void;
+  onMessageUpdate(event: MessageUpdateEvent): void;
   onAgentEnd(event: AgentEndEvent, ctx: ExtensionContext): boolean;
   getTps(theme: Theme): string | null;
+  getTtft(theme: Theme): string | null;
 }
 
 export function createTpsTracker(): TpsTracker {
   let agentStartMs: number | null = null;
+  let agentTtftMs: number | null = null;
+  let totalTtftMs = 0;
+  let ttftCount = 0;
   let totalOutput = 0;
   let totalElapsedMs = 0;
 
   return {
     onSessionStart() {
       agentStartMs = null;
+      agentTtftMs = null;
+      totalTtftMs = 0;
+      ttftCount = 0;
       totalOutput = 0;
       totalElapsedMs = 0;
     },
 
     onAgentStart() {
       agentStartMs = Date.now();
+      agentTtftMs = null;
+    },
+
+    onMessageUpdate(event: MessageUpdateEvent) {
+      if (agentStartMs === null || agentTtftMs !== null) return;
+      if (!isAssistantMessage(event.message)) return;
+      if (!isFirstTokenEvent(event.assistantMessageEvent)) return;
+
+      agentTtftMs = Date.now() - agentStartMs;
+      totalTtftMs += agentTtftMs;
+      ttftCount++;
     },
 
     onAgentEnd(event: AgentEndEvent, ctx: ExtensionContext): boolean {
@@ -43,6 +71,7 @@ export function createTpsTracker(): TpsTracker {
 
       const elapsedMs = Date.now() - agentStartMs;
       agentStartMs = null;
+      agentTtftMs = null;
       if (elapsedMs <= 0) return false;
 
       let output = 0;
@@ -63,8 +92,17 @@ export function createTpsTracker(): TpsTracker {
         return null;
       }
 
-      const averageTokensPerSecond = totalOutput / (totalElapsedMs / 1000);
-      return theme.fg("syntaxComment", `${averageTokensPerSecond.toFixed(1)}`);
+      const avgTps = totalOutput / (totalElapsedMs / 1000);
+      return theme.fg("syntaxComment", formatDecimal(avgTps, 1));
+    },
+
+    getTtft(theme: Theme): string | null {
+      if (ttftCount <= 0) {
+        return null;
+      }
+
+      const avgTtft = totalTtftMs / ttftCount / 1000;
+      return theme.fg("syntaxComment", `${formatDecimal(avgTtft, 1)}s`);
     },
   };
 }
