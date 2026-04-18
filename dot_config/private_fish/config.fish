@@ -338,6 +338,7 @@ abbr tokscale "bunx tokscale@latest --light --today"
 alias synthetic_quota 'curl -s https://api.synthetic.new/v2/quotas -H "Authorization: Bearer $SYNTHETIC_API_KEY" | jq .'
 alias synthetic_models 'curl -s https://api.synthetic.new/openai/v1/models -H "Authorization: Bearer $SYNTHETIC_API_KEY" | jq \'.data[] | select(.provider == "synthetic")\''
 alias neuralwatt_quota 'curl https://api.neuralwatt.com/v1/quota -H "Authorization: Bearer $NEURALWATT_API_KEY" | jq .'
+alias neuralwatt_usage 'curl https://api.neuralwatt.com/v1/usage/energy -H "Authorization: Bearer $NEURALWATT_API_KEY" | jq .'
 alias neuralwatt_models 'curl https://api.neuralwatt.com/v1/models -H "Authorization: Bearer $NEURALWATT_API_KEY" | jq .'
 
 # Other

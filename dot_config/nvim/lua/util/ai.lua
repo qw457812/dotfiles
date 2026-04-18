@@ -30,6 +30,7 @@ M.claude = {
         ZAI_API_KEY = vim.env.ZAI_API_KEY, -- for ~/.claude/statusline/get-glm-quota.sh
       },
     },
+    -- https://www.wafer.ai/pass
     plan = {
       -- curl -s -X POST "$CLAUDE_RELAY_SERVICE_URL/apiStats/api-key/test" -H "Content-Type: application/json" -d "{\"apiKey\":\"$CLAUDE_RELAY_SERVICE_API_KEY\"}"
       crs = vim.env.CLAUDE_RELAY_SERVICE_URL and {
