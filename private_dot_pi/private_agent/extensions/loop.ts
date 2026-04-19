@@ -33,6 +33,7 @@ const LOOP_PRESETS = [
 ] as const;
 
 const LOOP_STATE_ENTRY = "loop-state";
+const LOOP_SUCCESS_TOOL = "signal_loop_success";
 
 const HAIKU_MODEL_ID = "claude-haiku-4-5";
 
@@ -182,9 +183,23 @@ export default function loopExtension(pi: ExtensionAPI): void {
 		pi.appendEntry(LOOP_STATE_ENTRY, state);
 	}
 
+	function updateLoopSuccessTool(state: LoopStateData): void {
+		const activeTools = pi.getActiveTools();
+		const hasLoopSuccessTool = activeTools.includes(LOOP_SUCCESS_TOOL);
+
+		if (state.active) {
+			if (!hasLoopSuccessTool) {
+				pi.setActiveTools([...activeTools, LOOP_SUCCESS_TOOL]);
+			}
+		} else if (hasLoopSuccessTool) {
+			pi.setActiveTools(activeTools.filter((t) => t !== LOOP_SUCCESS_TOOL));
+		}
+	}
+
 	function setLoopState(state: LoopStateData, ctx: ExtensionContext): void {
 		loopState = state;
 		persistState(state);
+		updateLoopSuccessTool(state);
 		updateStatus(ctx, state);
 	}
 
@@ -192,6 +207,7 @@ export default function loopExtension(pi: ExtensionAPI): void {
 		const cleared: LoopStateData = { active: false };
 		loopState = cleared;
 		persistState(cleared);
+		updateLoopSuccessTool(cleared);
 		updateStatus(ctx, cleared);
 	}
 
@@ -318,7 +334,7 @@ export default function loopExtension(pi: ExtensionAPI): void {
 	}
 
 	pi.registerTool({
-		name: "signal_loop_success",
+		name: LOOP_SUCCESS_TOOL,
 		label: "Signal Loop Success",
 		description: "Stop the active loop when the breakout condition is satisfied. Only call this tool when explicitly instructed to do so by the user, tool or system prompt.",
 		parameters: Type.Object({}),
@@ -430,6 +446,7 @@ export default function loopExtension(pi: ExtensionAPI): void {
 
 	async function restoreLoopState(ctx: ExtensionContext): Promise<void> {
 		loopState = await loadState(ctx);
+		updateLoopSuccessTool(loopState);
 		updateStatus(ctx, loopState);
 
 		if (loopState.active && loopState.mode && !loopState.summary) {
