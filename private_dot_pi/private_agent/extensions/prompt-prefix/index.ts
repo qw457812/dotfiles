@@ -6,7 +6,11 @@ import { fileURLToPath } from "node:url";
 import { CustomEditor, type ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { truncateToWidth, visibleWidth } from "@mariozechner/pi-tui";
 
-import { applyPromptHistory, hydratePromptHistory } from "./prompt-history.ts";
+import {
+  applyPromptHistory,
+  hydratePromptHistory,
+  replacePromptHistory,
+} from "./prompt-history.ts";
 
 const INSERT_PREFIX = "❯ ";
 const NORMAL_PREFIX = "❮ ";
@@ -287,27 +291,34 @@ export default async function (pi: ExtensionAPI) {
       // editor, then replace it with our prefixed subclass. interactive-mode
       // also copies borderColor from defaultEditor during the swap, so we
       // re-apply the thinking-level border color below.
-      applyPromptHistory(ctx, (history) => {
-        let editor: ModalEditorInstance | undefined;
+      let editor: ModalEditorInstance | undefined;
 
-        ctx.ui.setEditorComponent((tui, editorTheme, kb) => {
-          editor = new PromptPrefixEditor(
-            tui,
-            editorTheme,
-            kb,
-            colorizers,
-            prefixColorizers,
-          ) as ModalEditorInstance;
-          hydratePromptHistory(editor, history);
-          return editor;
-        });
+      applyPromptHistory(
+        ctx,
+        (history) => {
+          ctx.ui.setEditorComponent((tui, editorTheme, kb) => {
+            editor = new PromptPrefixEditor(
+              tui,
+              editorTheme,
+              kb,
+              colorizers,
+              prefixColorizers,
+            ) as ModalEditorInstance;
+            hydratePromptHistory(editor, history);
+            return editor;
+          });
 
-        if (editor) {
-          // Must run after setEditorComponent() returns: interactive-mode
-          // overwrites newEditor.borderColor during the swap.
-          applyThinkingBorderColor(editor, theme);
-        }
-      });
+          if (editor) {
+            // Must run after setEditorComponent() returns: interactive-mode
+            // overwrites newEditor.borderColor during the swap.
+            applyThinkingBorderColor(editor, theme);
+          }
+        },
+        (history) => {
+          if (!editor) return;
+          replacePromptHistory(editor, history);
+        },
+      );
     }, 0);
   });
 }

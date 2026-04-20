@@ -189,6 +189,22 @@ function historiesMatch(a: PromptEntry[], b: PromptEntry[]): boolean {
   return true;
 }
 
+function buildEditorHistory(history: PromptEntry[]): string[] {
+  const entries: string[] = [];
+
+  for (const prompt of history) {
+    const text = prompt.text.trim();
+    if (!text) continue;
+    if (entries[0] === text) continue;
+    entries.unshift(text);
+    if (entries.length > MAX_HISTORY_ENTRIES) {
+      entries.pop();
+    }
+  }
+
+  return entries;
+}
+
 export function hydratePromptHistory(
   editor: { addToHistory?: (text: string) => void },
   history: PromptEntry[],
@@ -198,9 +214,18 @@ export function hydratePromptHistory(
   }
 }
 
+export function replacePromptHistory(
+  editor: { history?: string[]; historyIndex?: number },
+  history: PromptEntry[],
+): void {
+  editor.history = buildEditorHistory(history);
+  editor.historyIndex = -1;
+}
+
 export function applyPromptHistory(
   ctx: ExtensionContext,
   setEditor: (history: PromptEntry[]) => void,
+  updateHistory?: (history: PromptEntry[]) => void,
 ): void {
   const sessionFile = ctx.sessionManager.getSessionFile();
   const currentEntries = ctx.sessionManager.getBranch();
@@ -220,6 +245,10 @@ export function applyPromptHistory(
     if (ctx.ui.getEditorText() !== initialText) return;
     const history = buildHistoryList(currentPrompts, previousPrompts);
     if (historiesMatch(history, immediateHistory)) return;
+    if (updateHistory) {
+      updateHistory(history);
+      return;
+    }
     setEditor(history);
   })();
 }
