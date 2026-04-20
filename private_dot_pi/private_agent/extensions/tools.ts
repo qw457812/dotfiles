@@ -20,26 +20,24 @@ interface ToolsState {
 	enabledTools: string[];
 }
 
-export default function toolsExtension(pi: ExtensionAPI) {
-	// Track enabled tools
-	let enabledTools: Set<string> = new Set();
-	let allTools: ToolInfo[] = [];
+const TOOLS_CONFIG_ENTRY = "tools-config";
 
+export default function toolsExtension(pi: ExtensionAPI) {
 	// Persist current state
-	function persistState() {
-		pi.appendEntry<ToolsState>("tools-config", {
+	function persistState(enabledTools: Set<string>) {
+		pi.appendEntry<ToolsState>(TOOLS_CONFIG_ENTRY, {
 			enabledTools: Array.from(enabledTools),
 		});
 	}
 
 	// Apply current tool selection
-	function applyTools() {
+	function applyTools(enabledTools: Set<string>) {
 		pi.setActiveTools(Array.from(enabledTools));
 	}
 
 	// Find the last tools-config entry in the current branch
 	function restoreFromBranch(ctx: ExtensionContext) {
-		allTools = pi.getAllTools();
+		const allTools = pi.getAllTools();
 
 		// Get entries in current branch only
 		const branchEntries = ctx.sessionManager.getBranch();
@@ -57,11 +55,8 @@ export default function toolsExtension(pi: ExtensionAPI) {
 		if (savedTools) {
 			// Restore saved tool selection (filter to only tools that still exist)
 			const allToolNames = allTools.map((t) => t.name);
-			enabledTools = new Set(savedTools.filter((t: string) => allToolNames.includes(t)));
-			applyTools();
-		} else {
-			// No saved state - sync with currently active tools
-			enabledTools = new Set(pi.getActiveTools());
+			const enabledTools = new Set(savedTools.filter((t: string) => allToolNames.includes(t)));
+			applyTools(enabledTools);
 		}
 	}
 
@@ -70,7 +65,9 @@ export default function toolsExtension(pi: ExtensionAPI) {
 		description: "Enable/disable tools",
 		handler: async (_args, ctx) => {
 			// Refresh tool list
-			allTools = pi.getAllTools();
+			const allTools = pi.getAllTools();
+			const allToolNames = allTools.map((t) => t.name);
+			const enabledTools = new Set(pi.getActiveTools().filter((t: string) => allToolNames.includes(t)));
 
 			await ctx.ui.custom((tui, theme, _kb, done) => {
 				// Build settings items for each tool
@@ -102,8 +99,8 @@ export default function toolsExtension(pi: ExtensionAPI) {
 						} else {
 							enabledTools.delete(id);
 						}
-						applyTools();
-						persistState();
+						applyTools(enabledTools);
+						persistState(enabledTools);
 					},
 					() => {
 						// Close dialog

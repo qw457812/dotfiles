@@ -26,6 +26,8 @@ type LoopStateData = {
 	loopCount?: number;
 };
 
+const LOOP_SUCCESS_TOOL = "signal_loop_success";
+
 const LOOP_PRESETS = [
 	{ value: "tests", label: "Until tests pass", description: "" },
 	{ value: "custom", label: "Until custom condition", description: "" },
@@ -48,18 +50,18 @@ function buildPrompt(mode: LoopMode, condition?: string): string {
 	switch (mode) {
 		case "tests":
 			return (
-				"Run all tests. If they are passing, call the signal_loop_success tool. " +
+				`Run all tests. If they are passing, call the ${LOOP_SUCCESS_TOOL} tool. ` +
 				"Otherwise continue until the tests pass."
 			);
 		case "custom": {
 			const customCondition = condition?.trim() || "the custom condition is satisfied";
 			return (
 				`Continue until the following condition is satisfied: ${customCondition}. ` +
-				"When it is satisfied, call the signal_loop_success tool."
+				`When it is satisfied, call the ${LOOP_SUCCESS_TOOL} tool.`
 			);
 		}
 		case "self":
-			return "Continue until you are done. When finished, call the signal_loop_success tool.";
+			return `Continue until you are done. When finished, call the ${LOOP_SUCCESS_TOOL} tool.`;
 	}
 }
 
@@ -164,15 +166,15 @@ function updateStatus(ctx: ExtensionContext, state: LoopStateData): void {
 	ctx.ui.setWidget("loop", [ctx.ui.theme.fg("accent", text)]);
 }
 
-async function loadState(ctx: ExtensionContext): Promise<LoopStateData> {
+async function loadState(ctx: ExtensionContext): Promise<{ state: LoopStateData; hasState: boolean }> {
 	const entries = ctx.sessionManager.getEntries();
 	for (let i = entries.length - 1; i >= 0; i--) {
 		const entry = entries[i] as { type: string; customType?: string; data?: LoopStateData };
 		if (entry.type === "custom" && entry.customType === LOOP_STATE_ENTRY && entry.data) {
-			return entry.data;
+			return { state: entry.data, hasState: true };
 		}
 	}
-	return { active: false };
+	return { state: { active: false }, hasState: false };
 }
 
 export default function loopExtension(pi: ExtensionAPI): void {
@@ -180,6 +182,21 @@ export default function loopExtension(pi: ExtensionAPI): void {
 
 	function persistState(state: LoopStateData): void {
 		pi.appendEntry(LOOP_STATE_ENTRY, state);
+	}
+
+	function setLoopToolEnabled(enabled: boolean): void {
+		const activeTools = new Set(pi.getActiveTools());
+		const hasLoopTool = activeTools.has(LOOP_SUCCESS_TOOL);
+
+		if (enabled) {
+			if (hasLoopTool) return;
+			activeTools.add(LOOP_SUCCESS_TOOL);
+		} else {
+			if (!hasLoopTool) return;
+			activeTools.delete(LOOP_SUCCESS_TOOL);
+		}
+
+		pi.setActiveTools(Array.from(activeTools));
 	}
 
 	function setLoopState(state: LoopStateData, ctx: ExtensionContext): void {
@@ -318,7 +335,7 @@ export default function loopExtension(pi: ExtensionAPI): void {
 	}
 
 	pi.registerTool({
-		name: "signal_loop_success",
+		name: LOOP_SUCCESS_TOOL,
 		label: "Signal Loop Success",
 		description: "Stop the active loop when the breakout condition is satisfied. Only call this tool when explicitly instructed to do so by the user, tool or system prompt.",
 		parameters: Type.Object({}),
@@ -366,6 +383,7 @@ export default function loopExtension(pi: ExtensionAPI): void {
 				}
 			}
 
+			setLoopToolEnabled(true);
 			const summarizedState: LoopStateData = { ...nextState, summary: undefined, loopCount: 0 };
 			setLoopState(summarizedState, ctx);
 			ctx.ui.notify("Loop active", "info");
@@ -429,7 +447,9 @@ export default function loopExtension(pi: ExtensionAPI): void {
 	});
 
 	async function restoreLoopState(ctx: ExtensionContext): Promise<void> {
-		loopState = await loadState(ctx);
+		const { state, hasState } = await loadState(ctx);
+		loopState = state;
+		setLoopToolEnabled(hasState);
 		updateStatus(ctx, loopState);
 
 		if (loopState.active && loopState.mode && !loopState.summary) {
