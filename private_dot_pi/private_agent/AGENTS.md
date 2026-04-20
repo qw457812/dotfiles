@@ -20,3 +20,6 @@
 - Read before write — understand context first
 - Minimal changes — don't refactor unrelated code
 - Verify after changes — run tests or check output
+
+## Language
+Always respond in Chinese. Use Chinese for all explanations, comments, and communications with the user. Technical terms and code identifiers should remain in their original form.

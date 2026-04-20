@@ -58,8 +58,8 @@
           }
         },
         {
-          "id": "accounts/fireworks/routers/glm-5-fast",
-          "name": "GLM-5 Fast",
+          "id": "accounts/fireworks/routers/glm-5p1-fast",
+          "name": "GLM-5.1 Fast",
           "reasoning": true,
           "input": ["text"],
           "contextWindow": 202752,

@@ -1,7 +1,7 @@
 {
   "lastChangelogVersion": "0.67.68",
-  "defaultProvider": "neuralwatt",
-  "defaultModel": "zai-org/GLM-5.1-FP8",
+  "defaultProvider": "synthetic",
+  "defaultModel": "hf:zai-org/GLM-5.1",
   "defaultThinkingLevel": "high",
   "hideThinkingBlock": true,
   "quietStartup": true,
@@ -22,9 +22,7 @@
         "pi-package/extensions/safe-guard.ts"
       ],
       "skills": [
-        "pi-package/skills/context7",
-        "pi-package/skills/web-fetch",
-        "pi-package/skills/web-search"
+        "pi-package/skills/context7"
       ],
       "prompts": [
         "pi-package/prompts/commit.md",

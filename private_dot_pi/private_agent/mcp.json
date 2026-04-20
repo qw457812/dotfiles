@@ -1,5 +1,12 @@
 {
   "settings": {
+    "directTools": true,
     "disableProxyTool": true
+  },
+  "mcpServers": {
+    "exa": {
+      "url": "https://mcp.exa.ai/mcp",
+      "exposeResources": false
+    }
   }
 }

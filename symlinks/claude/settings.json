@@ -52,9 +52,7 @@
       "Bash(node --version:*)",
       "Bash(npm list:*)",
       "mcp__plugin_context7_context7__*",
-      "mcp__grep_app__searchGitHub",
-      "mcp__websearch__web_search_exa",
-      "mcp__webfetch__fetch"
+      "mcp__exa__*"
     ],
     "deny": [
       "WebSearch",

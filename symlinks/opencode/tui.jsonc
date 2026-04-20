@@ -20,7 +20,7 @@
     [
       "oc-plugin-rainbow",
       {
-        "enabled": true,
+        "enabled": false,
         "fg": true,
         "bg": true,
         "speed": 0.008,
