@@ -15,7 +15,24 @@
   ],
   "packages": [
     "npm:pi-vim",
-    "npm:pi-caffeinate",
+    {
+      "source": "git:github.com/mitsuhiko/agent-stuff",
+      "extensions": [
+        "extensions/answer.ts",
+        "extensions/btw.ts",
+        "extensions/context.ts",
+        "extensions/review.ts",
+        "extensions/session-breakdown.ts",
+        "extensions/split-fork.ts"
+      ],
+      "skills": [
+        "skills/commit",
+        "skills/frontend-design",
+        "skills/librarian"
+      ],
+      "prompts": [],
+      "themes": []
+    },
     {
       "source": "npm:oh-pi",
       "extensions": [
@@ -32,6 +49,7 @@
       ],
       "themes": []
     },
+    "npm:pi-caffeinate",
     "npm:pi-mcp-adapter",
     "git:github.com/monotykamary/pi-neuralwatt-provider"
   ]
