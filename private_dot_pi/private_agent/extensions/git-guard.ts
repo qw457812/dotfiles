@@ -7,33 +7,29 @@
  * Combines git-checkpoint + dirty-repo-guard.
  */
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import { spawn } from "node:child_process";
 
-const GUARDED_GIT_SUBCOMMANDS = [
-  "add",
-  "commit",
-  "push",
-  "pull",
-  "merge",
-  "rebase",
-  "reset",
-  "checkout",
-  "switch",
-  "stash",
-  "cherry-pick",
-  "revert",
-  "restore",
-];
+const GUARDED_GIT_PATTERN = /\bgit\s+(?<subcommand>add|commit|push|pull|merge|rebase|reset|checkout|switch|stash|cherry-pick|revert|restore)\b/;
 
-function getGuardedGitCommand(command: string): string | null {
-  const trimmed = command.trim();
-  if (!trimmed.startsWith("git ")) return null;
-
-  const match = trimmed.match(/^git\s+([\w-]+)/);
-  if (!match) return null;
-
-  const subcommand = match[1];
-  return GUARDED_GIT_SUBCOMMANDS.includes(subcommand) ? subcommand : null;
-}
+const notify = (title: string, body: string): void => {
+  if (process.platform === "darwin") {
+    const script = `on run argv
+display notification (item 2 of argv) with title (item 1 of argv)
+end run`;
+    const proc = spawn("osascript", ["-e", script, "--", title, body], { stdio: "ignore" });
+    proc.once("error", () => {});
+    proc.unref();
+  } else if (process.env.TERMUX_VERSION) {
+    const proc = spawn("termux-notification", ["-t", title, "-c", body], { stdio: "ignore" });
+    proc.once("error", () => {});
+    proc.unref();
+  } else if (process.env.KITTY_WINDOW_ID) {
+    process.stdout.write(`\x1b]99;i=1:d=0;${title}\x1b\\`);
+    process.stdout.write(`\x1b]99;i=1:p=body;${body}\x1b\\`);
+  } else {
+    process.stdout.write(`\x1b]777;notify;${title};${body}\x07`);
+  }
+};
 
 export default function (pi: ExtensionAPI) {
   let turnCount = 0;
@@ -42,16 +38,23 @@ export default function (pi: ExtensionAPI) {
     if (event.toolName !== "bash") return;
 
     const command = (event.input as { command?: string }).command ?? "";
-    const subcommand = getGuardedGitCommand(command);
+    const subcommand = command.match(GUARDED_GIT_PATTERN)?.groups?.subcommand;
     if (!subcommand) return;
 
     if (!ctx.hasUI) {
       return { block: true, reason: `Git ${subcommand} requires user confirmation` };
     }
 
-    const ok = await ctx.ui.confirm("🔐 Confirm Git Command", `Run: ${command}?`);
+    notify("Pi Git Approval Needed", command);
+    const ok = await ctx.ui.confirm(`🔐 Allow git ${subcommand}?`, command);
     if (!ok) {
-      return { block: true, reason: `Git ${subcommand} cancelled by user` };
+      const reason = (await ctx.ui.input("Why block this Git command?", "optional reason"))?.trim();
+      return {
+        block: true,
+        reason: reason
+          ? `Git ${subcommand} blocked by user: ${reason}`
+          : `Git ${subcommand} blocked by user`,
+      };
     }
   });
 

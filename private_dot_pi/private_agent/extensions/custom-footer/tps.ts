@@ -1,4 +1,3 @@
-import { formatDecimal } from "./utils";
 import type {
   AssistantMessage,
   AssistantMessageEvent,
@@ -8,6 +7,7 @@ import type {
   ExtensionContext,
   MessageUpdateEvent,
 } from "@mariozechner/pi-coding-agent";
+import { formatDecimal } from "./utils";
 
 interface Theme {
   fg(color: string, text: string): string;
@@ -102,7 +102,7 @@ export function createTpsTracker(): TpsTracker {
       }
 
       const avgTtft = totalTtftMs / ttftCount / 1000;
-      return theme.fg("syntaxComment", `${formatDecimal(avgTtft, 1)}s`);
+      return theme.fg("muted", `${formatDecimal(avgTtft, 1)}s`);
     },
   };
 }

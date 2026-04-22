@@ -1,10 +1,10 @@
 {
   "alejandra": "4.0.0",
-  "basedpyright": "1.39.1",
+  "basedpyright": "1.39.3",
   "bash-language-server": "5.6.0",
   "biome": "2.4.12",
-  "codelldb": "v1.12.1",
-  "copilot-language-server": "1.470.0",
+  "codelldb": "v1.12.2",
+  "copilot-language-server": "1.473.0",
   "debugpy": "1.8.20",
   "docker-compose-language-service": "0.5.0",
   "dockerfile-language-server": "0.15.0",
@@ -15,7 +15,7 @@
   "java-test": "0.44.0",
   "jdtls": "v1.58.0",
   "joker": "v1.7.1",
-  "js-debug-adapter": "v1.112.0",
+  "js-debug-adapter": "v1.117.0",
   "json-lsp": "4.10.0",
   "lemminx": "0.29.0",
   "lua-language-server": "3.18.2",
@@ -38,6 +38,6 @@
   "ts_query_ls": "v3.16.0",
   "vscode-spring-boot-tools": "1.63.0",
   "vtsls": "0.3.0",
-  "vue-language-server": "3.2.6",
+  "vue-language-server": "3.2.7",
   "yaml-language-server": "1.22.0"
 }

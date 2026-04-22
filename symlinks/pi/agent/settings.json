@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.67.68",
+  "lastChangelogVersion": "0.68.1",
   "defaultProvider": "synthetic",
   "defaultModel": "hf:zai-org/GLM-5.1",
   "defaultThinkingLevel": "high",
@@ -11,7 +11,8 @@
     "neuralwatt/zai-org/GLM-5.1-FP8",
     "openai-codex/gpt-5.4",
     "github-copilot/gpt-5.4",
-    "synthetic/hf:moonshotai/Kimi-K2.5"
+    "synthetic/hf:moonshotai/Kimi-K2.5",
+    "fireworks/accounts/fireworks/routers/kimi-k2p5-turbo"
   ],
   "packages": [
     "npm:pi-vim",
@@ -35,9 +36,7 @@
     },
     {
       "source": "npm:oh-pi",
-      "extensions": [
-        "pi-package/extensions/safe-guard.ts"
-      ],
+      "extensions": [],
       "skills": [
         "pi-package/skills/context7"
       ],
