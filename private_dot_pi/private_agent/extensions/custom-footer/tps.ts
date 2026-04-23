@@ -1,7 +1,4 @@
-import type {
-  AssistantMessage,
-  AssistantMessageEvent,
-} from "@mariozechner/pi-ai";
+import type { AssistantMessage, AssistantMessageEvent } from "@mariozechner/pi-ai";
 import type {
   AgentEndEvent,
   ExtensionContext,

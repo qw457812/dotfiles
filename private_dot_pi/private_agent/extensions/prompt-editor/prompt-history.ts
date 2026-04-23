@@ -90,9 +90,7 @@ async function loadPromptHistoryForCwd(
   excludeSessionFile?: string,
 ): Promise<PromptEntry[]> {
   const sessionDir = getSessionDirForCwd(path.resolve(cwd));
-  const resolvedExclude = excludeSessionFile
-    ? path.resolve(excludeSessionFile)
-    : undefined;
+  const resolvedExclude = excludeSessionFile ? path.resolve(excludeSessionFile) : undefined;
   const prompts: PromptEntry[] = [];
 
   let entries: Dirent[] = [];
@@ -117,9 +115,7 @@ async function loadPromptHistoryForCwd(
   );
 
   const sortedFiles = files
-    .filter((file): file is { filePath: string; mtimeMs: number } =>
-      Boolean(file),
-    )
+    .filter((file): file is { filePath: string; mtimeMs: number } => Boolean(file))
     .sort((a, b) => b.mtimeMs - a.mtimeMs);
 
   for (const file of sortedFiles) {
@@ -139,11 +135,7 @@ async function loadPromptHistoryForCwd(
       }
       if (entry?.type !== "message") continue;
       const message = entry?.message;
-      if (
-        !message ||
-        message.role !== "user" ||
-        !Array.isArray(message.content)
-      ) {
+      if (!message || message.role !== "user" || !Array.isArray(message.content)) {
         continue;
       }
       const text = extractText(message.content);
@@ -237,10 +229,7 @@ export function applyPromptHistory(
   setEditor(immediateHistory);
 
   void (async () => {
-    const previousPrompts = await loadPromptHistoryForCwd(
-      ctx.cwd,
-      sessionFile ?? undefined,
-    );
+    const previousPrompts = await loadPromptHistoryForCwd(ctx.cwd, sessionFile ?? undefined);
     if (currentLoad !== loadCounter) return;
     if (ctx.ui.getEditorText() !== initialText) return;
     const history = buildHistoryList(currentPrompts, previousPrompts);

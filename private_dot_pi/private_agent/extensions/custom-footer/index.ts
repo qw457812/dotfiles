@@ -98,10 +98,7 @@ export default function (pi: ExtensionAPI) {
           let totalCost = 0;
 
           for (const entry of ctx.sessionManager.getEntries()) {
-            if (
-              entry.type === "message" &&
-              entry.message.role === "assistant"
-            ) {
+            if (entry.type === "message" && entry.message.role === "assistant") {
               totalInput += entry.message.usage.input;
               totalOutput += entry.message.usage.output;
               totalCacheRead += entry.message.usage.cacheRead;
@@ -112,22 +109,17 @@ export default function (pi: ExtensionAPI) {
 
           // Calculate context usage from session
           const contextUsage = ctx.getContextUsage();
-          const contextWindow =
-            contextUsage?.contextWindow ?? ctx.model?.contextWindow ?? 0;
+          const contextWindow = contextUsage?.contextWindow ?? ctx.model?.contextWindow ?? 0;
           const contextPercentValue = contextUsage?.percent ?? 0;
           const contextPercent =
-            contextUsage?.percent !== null
-              ? formatDecimal(contextPercentValue, 1)
-              : "?";
+            contextUsage?.percent !== null ? formatDecimal(contextPercentValue, 1) : "?";
 
           // Build stats line
           const statsParts = [];
           if (totalInput) statsParts.push(`↑${formatTokens(totalInput)}`);
           if (totalOutput) statsParts.push(`↓${formatTokens(totalOutput)}`);
-          if (totalCacheRead && !isTermux)
-            statsParts.push(`R${formatTokens(totalCacheRead)}`);
-          if (totalCacheWrite && !isTermux)
-            statsParts.push(`W${formatTokens(totalCacheWrite)}`);
+          if (totalCacheRead && !isTermux) statsParts.push(`R${formatTokens(totalCacheRead)}`);
+          if (totalCacheWrite && !isTermux) statsParts.push(`W${formatTokens(totalCacheWrite)}`);
 
           // Cost (without "(sub)" indicator - not accessible from extension)
           if (totalCost) {
@@ -146,16 +138,10 @@ export default function (pi: ExtensionAPI) {
 
           // Colorize context percentage based on usage
           const contextPercentColor =
-            contextPercentValue > 75
-              ? "error"
-              : contextPercentValue > 50
-                ? "warning"
-                : "success";
+            contextPercentValue > 75 ? "error" : contextPercentValue > 50 ? "warning" : "success";
           const contextPercentStr =
-            theme.fg(
-              contextPercentColor,
-              contextPercent === "?" ? "?" : `${contextPercent}%`,
-            ) + theme.fg("dim", `/${formatTokens(contextWindow)}`);
+            theme.fg(contextPercentColor, contextPercent === "?" ? "?" : `${contextPercent}%`) +
+            theme.fg("dim", `/${formatTokens(contextWindow)}`);
           statsParts.push(contextPercentStr);
 
           // Quota
@@ -168,9 +154,7 @@ export default function (pi: ExtensionAPI) {
           statsParts.push(theme.fg("dim", `v${VERSION}`));
 
           // Elapsed
-          statsParts.push(
-            theme.fg("dim", formatElapsed(Date.now() - sessionStart)),
-          );
+          statsParts.push(theme.fg("dim", formatElapsed(Date.now() - sessionStart)));
 
           let statsLeft = statsParts.join(" ");
 
@@ -220,15 +204,9 @@ export default function (pi: ExtensionAPI) {
             // Need to truncate right side
             const availableForRight = width - statsLeftWidth - minPadding;
             if (availableForRight > 0) {
-              const truncatedRight = truncateToWidth(
-                rightSide,
-                availableForRight,
-                "",
-              );
+              const truncatedRight = truncateToWidth(rightSide, availableForRight, "");
               const truncatedRightWidth = visibleWidth(truncatedRight);
-              const padding = " ".repeat(
-                Math.max(0, width - statsLeftWidth - truncatedRightWidth),
-              );
+              const padding = " ".repeat(Math.max(0, width - statsLeftWidth - truncatedRightWidth));
               statsLine = statsLeft + padding + truncatedRight;
             } else {
               // Not enough space for right side at all
@@ -253,9 +231,7 @@ export default function (pi: ExtensionAPI) {
               .map(([, text]) => sanitizeStatusText(text));
             const statusLine = sortedStatuses.join(" ");
             // Truncate to terminal width with dim ellipsis for consistency with footer style
-            lines.push(
-              truncateToWidth(statusLine, width, theme.fg("dim", "…")),
-            );
+            lines.push(truncateToWidth(statusLine, width, theme.fg("dim", "…")));
           }
 
           return lines;

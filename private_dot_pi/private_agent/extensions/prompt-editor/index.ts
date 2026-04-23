@@ -17,9 +17,7 @@ const NORMAL_PREFIX = "❮ ";
 const CONTINUATION_PREFIX = "  ";
 const PREFIX_WIDTH = visibleWidth(INSERT_PREFIX);
 const EXTENSION_DIR =
-  typeof __dirname === "string"
-    ? __dirname
-    : dirname(fileURLToPath(import.meta.url));
+  typeof __dirname === "string" ? __dirname : dirname(fileURLToPath(import.meta.url));
 // pi's extension loader can evaluate TS via jiti, but importing pi-vim directly
 // is not reliable in this extension context. We generate a tiny local wrapper
 // that re-exports the globally installed pi-vim entry and import that instead.
@@ -32,9 +30,7 @@ function findPiVimEntry(): string {
     if (existsSync(entry)) return entry;
   } catch {}
 
-  throw new Error(
-    "prompt-editor: pi-vim not found. Install with: pi install npm:pi-vim",
-  );
+  throw new Error("prompt-editor: pi-vim not found. Install with: pi install npm:pi-vim");
 }
 
 function ensurePiVimWrapper(): void {
@@ -49,9 +45,7 @@ function ensurePiVimWrapper(): void {
 export * from ${JSON.stringify(piVimEntry)};
 `;
 
-  const current = existsSync(PI_VIM_WRAPPER)
-    ? readFileSync(PI_VIM_WRAPPER, "utf8")
-    : null;
+  const current = existsSync(PI_VIM_WRAPPER) ? readFileSync(PI_VIM_WRAPPER, "utf8") : null;
   if (current !== content) {
     writeFileSync(PI_VIM_WRAPPER, content);
   }
@@ -65,9 +59,7 @@ export default async function (pi: ExtensionAPI) {
   type Mode = "insert" | "normal";
 
   type ThinkingTheme = {
-    getThinkingBorderColor?: (
-      level: string,
-    ) => ((s: string) => string) | undefined;
+    getThinkingBorderColor?: (level: string) => ((s: string) => string) | undefined;
     fg: (color: string, text: string) => string;
   };
 
@@ -95,8 +87,7 @@ export default async function (pi: ExtensionAPI) {
     rendered: string;
   } {
     const raw =
-      editor.getModeLabel?.() ??
-      (editor.getMode() === "insert" ? " INSERT " : " NORMAL ");
+      editor.getModeLabel?.() ?? (editor.getMode() === "insert" ? " INSERT " : " NORMAL ");
     const colorize = editor.labelColorizers
       ? editor.getMode() === "insert"
         ? editor.labelColorizers.insert
@@ -181,13 +172,10 @@ export default async function (pi: ExtensionAPI) {
         // cl -> s: pi-vim doesn't accept l as a motion for c, so we clear
         // the pending operator directly and delegate to the native s command.
         if (
-          (this as unknown as { pendingOperator: string | null })
-            .pendingOperator === "c" &&
+          (this as unknown as { pendingOperator: string | null }).pendingOperator === "c" &&
           data === "l"
         ) {
-          (
-            this as unknown as { pendingOperator: string | null }
-          ).pendingOperator = null;
+          (this as unknown as { pendingOperator: string | null }).pendingOperator = null;
           super.handleInput("s"); // cut char + insert
           return;
         }
@@ -206,10 +194,7 @@ export default async function (pi: ExtensionAPI) {
       // label to the last rendered line (which becomes the autocomplete list
       // during slash-command completion). We re-attach the label to the actual
       // bottom border below.
-      const lines = CustomEditor.prototype.render.call(
-        this,
-        width - PREFIX_WIDTH,
-      ) as string[];
+      const lines = CustomEditor.prototype.render.call(this, width - PREFIX_WIDTH) as string[];
       if (lines.length < 3) return lines;
 
       const bottomIdx = findBottomBorderIndex(lines);
@@ -219,11 +204,7 @@ export default async function (pi: ExtensionAPI) {
       const extraBorder = borderColor("─".repeat(PREFIX_WIDTH));
       const mode = this.getMode();
       const prefix = mode === "insert" ? INSERT_PREFIX : NORMAL_PREFIX;
-      const renderedPrefix = getRenderedPrefix(
-        this.prefixColorizers,
-        mode,
-        prefix,
-      );
+      const renderedPrefix = getRenderedPrefix(this.prefixColorizers, mode, prefix);
       const { raw: rawLabel, rendered: renderedLabel } = getRenderedModeLabel(
         this as ModalEditorInstance,
       );
@@ -235,11 +216,7 @@ export default async function (pi: ExtensionAPI) {
       lines[0] = lines[0]! + extraBorder;
       if (visibleWidth(lines[bottomIdx]!) >= labelWidth) {
         lines[bottomIdx] =
-          truncateToWidth(
-            lines[bottomIdx]!,
-            width - PREFIX_WIDTH - labelWidth,
-            "",
-          ) +
+          truncateToWidth(lines[bottomIdx]!, width - PREFIX_WIDTH - labelWidth, "") +
           extraBorder +
           renderedLabel;
       } else {
@@ -269,8 +246,7 @@ export default async function (pi: ExtensionAPI) {
     const colorizers = theme
       ? {
           insert: (s: string) => theme.fg("borderMuted", `\x1b[7m${s}\x1b[27m`),
-          normal: (s: string) =>
-            theme.fg("borderAccent", `\x1b[7m${s}\x1b[27m`),
+          normal: (s: string) => theme.fg("borderAccent", `\x1b[7m${s}\x1b[27m`),
         }
       : null;
     // Prefix styling is intentionally lighter than the bottom mode label:

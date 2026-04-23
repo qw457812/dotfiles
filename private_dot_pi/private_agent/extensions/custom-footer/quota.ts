@@ -88,10 +88,7 @@ interface Source {
   refresh(tui: TUI): Promise<void>;
 }
 
-function fresh<T>(
-  cache: CachedValue<T> | null,
-  ttlMs: number,
-): CachedValue<T> | null {
+function fresh<T>(cache: CachedValue<T> | null, ttlMs: number): CachedValue<T> | null {
   if (!cache || Date.now() - cache.updatedAt >= ttlMs) {
     return null;
   }
@@ -126,10 +123,7 @@ function cachePath(provider: string): string {
   return join(CACHE_DIR, `${provider}-quota.json`);
 }
 
-async function readCache<T>(
-  provider: string,
-  ttlMs: number,
-): Promise<CachedValue<T> | null> {
+async function readCache<T>(provider: string, ttlMs: number): Promise<CachedValue<T> | null> {
   return fresh(await readJson<CachedValue<T>>(cachePath(provider)), ttlMs);
 }
 
@@ -143,14 +137,11 @@ async function writeCache<T>(provider: string, value: T): Promise<void> {
   );
 }
 
-async function readAuth(
-  provider: string,
-  key: "access" | "refresh",
-): Promise<string | null> {
+async function readAuth(provider: string, key: "access" | "refresh"): Promise<string | null> {
   const auth =
-    await readJson<
-      Record<string, Partial<Record<"access" | "refresh", string>>>
-    >(PI_AGENT_AUTH_PATH);
+    await readJson<Record<string, Partial<Record<"access" | "refresh", string>>>>(
+      PI_AGENT_AUTH_PATH,
+    );
   return auth?.[provider]?.[key] || null;
 }
 
@@ -179,9 +170,7 @@ function formatRemaining(date: string | number): string {
   return `${seconds}s`;
 }
 
-function joinParts(
-  parts: Array<string | null | undefined | false>,
-): string | null {
+function joinParts(parts: Array<string | null | undefined | false>): string | null {
   const filtered = parts.filter((part): part is string => Boolean(part));
   return filtered.length > 0 ? filtered.join(" ") : null;
 }
@@ -193,8 +182,7 @@ function createSource<T>(provider: string, config: SourceConfig<T>): Source {
 
   async function load(): Promise<CachedValue<T> | null> {
     const cached =
-      fresh(cache, config.cacheTtlMs) ??
-      (await readCache<T>(provider, config.cacheTtlMs));
+      fresh(cache, config.cacheTtlMs) ?? (await readCache<T>(provider, config.cacheTtlMs));
     if (cached) {
       return cached;
     }
@@ -258,10 +246,7 @@ const sources: Record<string, Source> = {
       return process.env.SYNTHETIC_API_KEY || null;
     },
     async fetch(apiKey: string): Promise<SyntheticQuota | null> {
-      return fetchJson<SyntheticQuota>(
-        "https://api.synthetic.new/v2/quotas",
-        apiKey,
-      );
+      return fetchJson<SyntheticQuota>("https://api.synthetic.new/v2/quotas", apiKey);
     },
     format(quota: SyntheticQuota, theme: Theme): string | null {
       const fiveHour = quota.rollingFiveHourLimit;
@@ -279,10 +264,7 @@ const sources: Record<string, Source> = {
       return readAuth("github-copilot", "refresh");
     },
     async fetch(token: string): Promise<CopilotQuota | null> {
-      return fetchJson<CopilotQuota>(
-        "https://api.github.com/copilot_internal/user",
-        token,
-      );
+      return fetchJson<CopilotQuota>("https://api.github.com/copilot_internal/user", token);
     },
     format(quota: CopilotQuota, theme: Theme): string | null {
       const premium = quota.quota_snapshots.premium_interactions;
@@ -296,10 +278,7 @@ const sources: Record<string, Source> = {
       return readAuth("openai-codex", "access");
     },
     async fetch(token: string): Promise<CodexQuota | null> {
-      return fetchJson<CodexQuota>(
-        "https://chatgpt.com/backend-api/wham/usage",
-        token,
-      );
+      return fetchJson<CodexQuota>("https://chatgpt.com/backend-api/wham/usage", token);
     },
     format(quota: CodexQuota, theme: Theme): string | null {
       const rateLimit = quota.rate_limit;
@@ -332,10 +311,7 @@ const sources: Record<string, Source> = {
       return process.env.NEURALWATT_API_KEY || null;
     },
     async fetch(apiKey: string): Promise<NeuralwattQuota | null> {
-      return fetchJson<NeuralwattQuota>(
-        "https://api.neuralwatt.com/v1/quota",
-        apiKey,
-      );
+      return fetchJson<NeuralwattQuota>("https://api.neuralwatt.com/v1/quota", apiKey);
     },
     format(quota: NeuralwattQuota, theme: Theme): string | null {
       const bal = quota.balance;
@@ -348,10 +324,7 @@ const sources: Record<string, Source> = {
       return process.env.ZAI_API_KEY || null;
     },
     async fetch(apiKey: string): Promise<ZaiQuota | null> {
-      return fetchJson<ZaiQuota>(
-        "https://api.z.ai/api/monitor/usage/quota/limit",
-        apiKey,
-      );
+      return fetchJson<ZaiQuota>("https://api.z.ai/api/monitor/usage/quota/limit", apiKey);
     },
     format(quota: ZaiQuota, theme: Theme): string | null {
       const tokens: string[] = [];
@@ -372,11 +345,7 @@ const sources: Record<string, Source> = {
   }),
 };
 
-export function getQuota(
-  provider: string | undefined,
-  tui: TUI,
-  theme: Theme,
-): string | null {
+export function getQuota(provider: string | undefined, tui: TUI, theme: Theme): string | null {
   const source = provider ? sources[provider] : null;
   if (!source) {
     return null;
