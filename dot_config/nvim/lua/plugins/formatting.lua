@@ -19,10 +19,6 @@ return {
     ---@module "conform"
     ---@param opts conform.setupOpts
     opts = function(_, opts)
-      if not LazyVim.has_extra("lang.typescript.biome") then
-        return
-      end
-
       opts.formatters = opts.formatters or {}
       opts.formatters["biome-check"] = opts.formatters["biome-check"] or {}
       opts.formatters["biome-check"].require_cwd = nil -- make biome config file optional
@@ -52,25 +48,55 @@ return {
         })
       end
 
-      -- remove prettier if biome-check is present (except vue)
-      for ft, formatters in pairs(opts.formatters_by_ft or {}) do
-        if
-          not (type(formatters) == "function")
-          ---@cast formatters conform.FiletypeFormatterInternal
-          and vim.list_contains(formatters, "biome-check")
-          and vim.list_contains(formatters, "prettier")
-        then
-          if ft == "vue" then
-            for i = #formatters, 1, -1 do
-              if formatters[i] == "biome-check" then
-                table.remove(formatters, i)
+      if LazyVim.has_extra("lang.typescript.biome") then
+        -- https://biomejs.dev/internals/language-support/
+        -- remove prettier if biome-check is present (except vue)
+        for ft, formatters in pairs(opts.formatters_by_ft or {}) do
+          if
+            not (type(formatters) == "function")
+            ---@cast formatters conform.FiletypeFormatterInternal
+            and vim.list_contains(formatters, "biome-check")
+            and vim.list_contains(formatters, "prettier")
+          then
+            if ft == "vue" then
+              for i = #formatters, 1, -1 do
+                if formatters[i] == "biome-check" then
+                  table.remove(formatters, i)
+                end
+              end
+              table.insert(formatters, 1, "biome-organize-imports")
+            else
+              for i = #formatters, 1, -1 do
+                if formatters[i] == "prettier" then
+                  table.remove(formatters, i)
+                end
               end
             end
-            table.insert(formatters, 1, "biome-organize-imports")
-          else
-            for i = #formatters, 1, -1 do
-              if formatters[i] == "prettier" then
-                table.remove(formatters, i)
+          end
+        end
+      end
+
+      if LazyVim.has_extra("lang.typescript.oxc") then
+        -- https://oxc.rs/compatibility.html
+        -- remove prettier/biome-check if oxfmt is present (except astro/svelte)
+        for ft, formatters in pairs(opts.formatters_by_ft or {}) do
+          if
+            not (type(formatters) == "function")
+            ---@cast formatters conform.FiletypeFormatterInternal
+            and vim.list_contains(formatters, "oxfmt")
+            and (vim.list_contains(formatters, "prettier") or vim.list_contains(formatters, "biome-check"))
+          then
+            if ft == "astro" or ft == "svelte" then
+              for i = #formatters, 1, -1 do
+                if formatters[i] == "oxfmt" then
+                  table.remove(formatters, i)
+                end
+              end
+            else
+              for i = #formatters, 1, -1 do
+                if formatters[i] == "prettier" or formatters[i] == "biome-check" then
+                  table.remove(formatters, i)
+                end
               end
             end
           end
