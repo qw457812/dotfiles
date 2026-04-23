@@ -50,8 +50,8 @@ export default function (pi: ExtensionAPI) {
         notify("Pi Danger Approval Needed", cmd);
         const ok = await ctx.ui.confirm("⚠️ Dangerous Command", `Execute: ${cmd}?`);
         if (!ok) {
-          const reason = (await ctx.ui.input("Why block this command?", "optional reason"))?.trim();
-          return { block: true, reason: reason ? `Blocked by user: ${reason}` : "Blocked by user" };
+          ctx.abort();
+          return { block: true, reason: "Blocked by user" };
         }
       }
     }
@@ -65,8 +65,8 @@ export default function (pi: ExtensionAPI) {
           notify("Pi Path Approval Needed", path);
           const ok = await ctx.ui.confirm("🛡️ Protected Path", `Allow write to ${path}?`);
           if (!ok) {
-            const reason = (await ctx.ui.input("Why block this write?", "optional reason"))?.trim();
-            return { block: true, reason: reason ? `Protected path ${hit} blocked by user: ${reason}` : `Protected path: ${hit}` };
+            ctx.abort();
+            return { block: true, reason: `Protected path: ${hit}` };
           }
         } else {
           return { block: true, reason: `Protected path: ${hit}` };

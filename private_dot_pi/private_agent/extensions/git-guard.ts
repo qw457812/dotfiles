@@ -48,13 +48,8 @@ export default function (pi: ExtensionAPI) {
     notify("Pi Git Approval Needed", command);
     const ok = await ctx.ui.confirm(`🔐 Allow git ${subcommand}?`, command);
     if (!ok) {
-      const reason = (await ctx.ui.input("Why block this Git command?", "optional reason"))?.trim();
-      return {
-        block: true,
-        reason: reason
-          ? `Git ${subcommand} blocked by user: ${reason}`
-          : `Git ${subcommand} blocked by user`,
-      };
+      ctx.abort();
+      return { block: true, reason: "Blocked by user" };
     }
   });
 
