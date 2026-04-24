@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.68.1",
+  "lastChangelogVersion": "0.70.0",
   "defaultProvider": "synthetic",
   "defaultModel": "hf:zai-org/GLM-5.1",
   "defaultThinkingLevel": "high",
@@ -9,10 +9,10 @@
     "zai/glm-5.1",
     "synthetic/hf:zai-org/GLM-5.1",
     "neuralwatt/zai-org/GLM-5.1-FP8",
-    "openai-codex/gpt-5.4",
     "github-copilot/gpt-5.4",
     "synthetic/hf:moonshotai/Kimi-K2.5",
-    "fireworks/accounts/fireworks/routers/kimi-k2p5-turbo"
+    "neuralwatt/moonshotai/Kimi-K2.6",
+    "openai-codex/gpt-5.5"
   ],
   "packages": [
     "npm:pi-vim",

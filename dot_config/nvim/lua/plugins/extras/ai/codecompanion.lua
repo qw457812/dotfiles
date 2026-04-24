@@ -132,6 +132,7 @@ return {
             yolo_mode              = { modes = { n = "<localleader>Y" } },
             goto_file_under_cursor = { modes = { n = "<localleader>F" } },
             copilot_stats          = { modes = { n = "<localleader>S" } },
+            _btw                   = { modes = { n = "<localleader>B" } },
           },
         },
         shared = {

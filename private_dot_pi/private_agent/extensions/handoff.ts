@@ -1,4 +1,4 @@
-// Copied from: https://github.com/badlogic/pi-mono/blob/7a786d88aa3a683d22f8abd5184ec317ca62f5eb/packages/coding-agent/examples/extensions/handoff.ts
+// Copied from: https://github.com/badlogic/pi-mono/blob/f0cf8a59d29e5d8da02cf608924523f0710576c9/packages/coding-agent/examples/extensions/handoff.ts
 
 /**
  * Handoff extension - transfer context to a new focused session
@@ -137,19 +137,20 @@ export default function (pi: ExtensionAPI) {
 				return;
 			}
 
-			// Create new session with parent tracking
+			// Create new session with parent tracking. Use the replacement-session
+			// context for post-switch UI work; the original ctx is stale after a
+			// successful session replacement.
 			const newSessionResult = await ctx.newSession({
 				parentSession: currentSessionFile,
+				withSession: async (replacementCtx) => {
+					replacementCtx.ui.setEditorText(editedPrompt);
+					replacementCtx.ui.notify("Handoff ready. Submit when ready.", "info");
+				},
 			});
 
 			if (newSessionResult.cancelled) {
 				ctx.ui.notify("New session cancelled", "info");
-				return;
 			}
-
-			// Set the edited prompt in the main editor for submission
-			ctx.ui.setEditorText(editedPrompt);
-			ctx.ui.notify("Handoff ready. Submit when ready.", "info");
 		},
 	});
 }

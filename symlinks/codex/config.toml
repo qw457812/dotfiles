@@ -6,7 +6,7 @@
 # model_provider = "openrouter"
 # model = "openai/gpt-5.4"
 
-model = "gpt-5.4"
+model = "gpt-5.5"
 
 model_reasoning_effort = "medium"
 approval_policy = "on-request"
@@ -26,10 +26,11 @@ command = "npx"
 enabled = false
 
 [tui]
-status_line = ["model-with-reasoning", "fast-mode", "total-input-tokens", "total-output-tokens", "context-used", "five-hour-limit", "weekly-limit", "codex-version"]
+status_line = ["model-with-reasoning", "fast-mode", "total-input-tokens", "total-output-tokens", "context-used", "five-hour-limit", "weekly-limit", "task-progress", "codex-version"]
 
 [features]
 prevent_idle_sleep = true
+external_migration = true
 
 [notice]
 hide_rate_limit_model_nudge = true
