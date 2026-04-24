@@ -349,6 +349,7 @@ return {
         ---@type sidekick.cli.Mux
         mux = {
           enabled = true,
+          dump = 10000,
         },
         ---@type table<string, sidekick.cli.Config|{}>
         tools = {
@@ -675,6 +676,7 @@ return {
           tmpdir .. "/[0-9]*.md", -- https://github.com/sst/opencode/blob/041353f4ff992e7be4455eaf6e71f492a97a123f/packages/opencode/src/cli/cmd/tui/util/editor.ts#L12
           tmpdir .. "/.*.md", -- https://github.com/openai/codex/blob/f6b563ec6403392aadbc31f449226aaabd881c01/codex-rs/tui/src/external_editor.rs#L60
           tmpdir .. "/pi-editor-*.pi.md", -- https://github.com/badlogic/pi-mono/blob/5c0ec26c28c918c5301f218e8c13fcc540d8e3a4/packages/coding-agent/src/modes/interactive/interactive-mode.ts#L2746
+          tmpdir .. "/pi-extension-editor-*.md", -- https://github.com/badlogic/pi-mono/blob/e3fee7a511503ebe170223cd89e7631751539f25/packages/coding-agent/src/modes/interactive/components/extension-editor.ts#L120
         },
         once = true,
         callback = function(ev)
