@@ -2,7 +2,7 @@
 description: Fast codebase exploration agent (read-only)
 display_name: Explore
 tools: read, bash, grep, find, ls
-model: anthropic/claude-haiku-4-5-20251001
+model: synthetic/hf:moonshotai/Kimi-K2.5
 prompt_mode: replace
 ---
 
