@@ -50,6 +50,7 @@
     },
     "npm:pi-caffeinate",
     "npm:pi-mcp-adapter",
+    "npm:@tintinweb/pi-subagents",
     "git:github.com/monotykamary/pi-neuralwatt-provider"
   ]
 }

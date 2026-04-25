@@ -865,6 +865,13 @@ return {
         config = function() end,
       },
       {
+        "tintinweb/pi-subagents",
+        version = "*",
+        build = "pi update npm:@tintinweb/pi-subagents",
+        lazy = true,
+        config = function() end,
+      },
+      {
         "monotykamary/pi-neuralwatt-provider",
         build = "pi update git:github.com/monotykamary/pi-neuralwatt-provider",
         lazy = true,
