@@ -34,11 +34,15 @@ return {
   },
   {
     "saghen/blink.cmp",
-    -- https://github.com/Saghen/blink.cmp/issues/145#issuecomment-2483686337
-    -- https://github.com/Saghen/blink.cmp/issues/145#issuecomment-2492759016
-    build = vim.g.lazyvim_blink_main and ("%s cargo build --release"):format(
-      vim.g.user_is_termux and 'RUSTC_BOOTSTRAP=1 RUSTFLAGS="-C link-args=-lluajit"' or ""
-    ),
+    dependencies = { "saghen/blink.lib", shell_command_editor = true },
+    -- -- https://github.com/Saghen/blink.cmp/issues/145#issuecomment-2483686337
+    -- -- https://github.com/Saghen/blink.cmp/issues/145#issuecomment-2492759016
+    -- build = vim.g.lazyvim_blink_main and ("%s cargo build --release"):format(
+    --   vim.g.user_is_termux and 'RUSTC_BOOTSTRAP=1 RUSTFLAGS="-C link-args=-lluajit"' or ""
+    -- ),
+    build = function()
+      require("blink.cmp").build():wait(60000) -- wait up to 60 seconds
+    end,
     optional = true,
     ---@param opts blink.cmp.Config
     opts = function(_, opts)
@@ -735,31 +739,31 @@ return {
     },
   },
 
-  -- TODO: https://github.com/philosofonusus/ecolog.nvim
-  {
-    "saghen/blink.cmp",
-    optional = true,
-    dependencies = { "bydlw98/blink-cmp-env", shell_command_editor = true },
-    ---@type blink.cmp.Config
-    opts = {
-      sources = {
-        default = { "env" },
-        providers = {
-          env = {
-            module = "blink-cmp-env",
-
-            -- -- without trigger character
-            -- min_keyword_length = 3,
-            -- max_items = 3,
-            -- score_offset = -25,
-
-            -- with "$" as trigger character
-            max_items = 20,
-          },
-        },
-      },
-    },
-  },
+  -- -- TODO: https://github.com/philosofonusus/ecolog.nvim
+  -- {
+  --   "saghen/blink.cmp",
+  --   optional = true,
+  --   dependencies = { "bydlw98/blink-cmp-env", shell_command_editor = true },
+  --   ---@type blink.cmp.Config
+  --   opts = {
+  --     sources = {
+  --       default = { "env" },
+  --       providers = {
+  --         env = {
+  --           module = "blink-cmp-env",
+  --
+  --           -- -- without trigger character
+  --           -- min_keyword_length = 3,
+  --           -- max_items = 3,
+  --           -- score_offset = -25,
+  --
+  --           -- with "$" as trigger character
+  --           max_items = 20,
+  --         },
+  --       },
+  --     },
+  --   },
+  -- },
 
   -- HACK: deduplicate items, see: https://github.com/Saghen/blink.cmp/issues/1222#issuecomment-2891921393
   {

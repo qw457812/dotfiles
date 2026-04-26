@@ -73,14 +73,15 @@ return {
         end,
       })
 
-      -- https://github.com/alexpasmantier/pymple.nvim/blob/eff337420a294e68180c5ee87f03994c0b176dd4/lua/pymple/hooks.lua#L69
-      vim.api.nvim_create_autocmd("User", {
-        pattern = "MiniFilesActionMove",
-        ---@param event {data: {action: string, from: string, to: string}}
-        callback = function(event)
-          Snacks.rename.on_rename_file(event.data.from, event.data.to)
-        end,
-      })
+      -- https://github.com/nvim-mini/mini.files/commit/34299f5
+      -- -- https://github.com/alexpasmantier/pymple.nvim/blob/eff337420a294e68180c5ee87f03994c0b176dd4/lua/pymple/hooks.lua#L69
+      -- vim.api.nvim_create_autocmd("User", {
+      --   pattern = "MiniFilesActionMove",
+      --   ---@param event {data: {action: string, from: string, to: string}}
+      --   callback = function(event)
+      --     Snacks.rename.on_rename_file(event.data.from, event.data.to)
+      --   end,
+      -- })
 
       return vim.tbl_deep_extend("force", opts, {
         options = {

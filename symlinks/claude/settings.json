@@ -44,8 +44,8 @@
       "Bash(git log:*)",
       "Bash(git show:*)",
       "Bash(git show-ref:*)",
+      "Bash(git rev-parse:*)",
       "Bash(git branch:*)",
-      "Bash(git branch -v:*)",
       "Bash(git remote -v:*)",
       "Bash(git fetch:*)",
       "Bash(nvim --version:*)",
@@ -119,5 +119,6 @@
     ]
   },
   "effortLevel": "high",
-  "promptSuggestionEnabled": true
+  "promptSuggestionEnabled": true,
+  "editorMode": "vim"
 }
