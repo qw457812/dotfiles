@@ -12,7 +12,7 @@
  * Not supported: Kitty (uses OSC 99), Terminal.app, Windows Terminal, Alacritty
  */
 
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI, ExtensionUIContext } from "@mariozechner/pi-coding-agent";
 import { Markdown, type MarkdownTheme } from "@mariozechner/pi-tui";
 import { spawn } from "node:child_process";
 
@@ -41,6 +41,71 @@ end run`;
 		// OSC 777 format: ESC ] 777 ; notify ; title ; body BEL
 		process.stdout.write(`\x1b]777;notify;${title};${body}\x07`);
 	}
+};
+
+type FocusTracker = {
+	// true = focused, false = unfocused, undefined = unknown
+	isFocused: () => boolean | undefined;
+	dispose: () => void;
+};
+
+const createTerminalFocusTracker = (ui: Pick<ExtensionUIContext, "onTerminalInput">): FocusTracker | undefined => {
+	if (!process.stdin.isTTY || !process.stdout.isTTY) {
+		return undefined;
+	}
+
+	const FOCUS_REPORTING_ENABLE = "\x1b[?1004h";
+	const FOCUS_REPORTING_DISABLE = "\x1b[?1004l";
+	const FOCUS_IN = "\x1b[I";
+	const FOCUS_OUT = "\x1b[O";
+
+	let focused: boolean | undefined;
+
+	process.stdout.write(FOCUS_REPORTING_ENABLE);
+	const unsubTermInput = ui.onTerminalInput((data) => {
+		if (data === FOCUS_IN) {
+			focused = true;
+		} else if (data === FOCUS_OUT) {
+			focused = false;
+		}
+	});
+
+	return {
+		isFocused: () => focused,
+		dispose: () => {
+			unsubTermInput();
+			process.stdout.write(FOCUS_REPORTING_DISABLE);
+		},
+	};
+};
+
+type FocusAwareNotifier = {
+	notify: (title: string, body: string) => void;
+};
+
+const createFocusAwareNotifier = (pi: ExtensionAPI): FocusAwareNotifier => {
+	let focusTracker: FocusTracker | undefined;
+
+	pi.on("session_start", async (_event, ctx) => {
+		if (!ctx.hasUI) {
+			return;
+		}
+
+		focusTracker = createTerminalFocusTracker(ctx.ui);
+	});
+
+	pi.on("session_shutdown", async () => {
+		focusTracker?.dispose();
+		focusTracker = undefined;
+	});
+
+	return {
+		notify: (title: string, body: string) => {
+			if (!focusTracker?.isFocused()) {
+				notify(title, body);
+			}
+		},
+	};
 };
 
 const isTextPart = (part: unknown): part is { type: "text"; text: string } =>
@@ -104,9 +169,11 @@ const formatNotification = (text: string | null): { title: string; body: string 
 };
 
 export default function (pi: ExtensionAPI) {
+	const notifier = createFocusAwareNotifier(pi);
+
 	pi.on("agent_end", async (event) => {
 		const lastText = extractLastAssistantText(event.messages ?? []);
 		const { title, body } = formatNotification(lastText);
-		notify(title, body);
+		notifier.notify(title, body);
 	});
 }

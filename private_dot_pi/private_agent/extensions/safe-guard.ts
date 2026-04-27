@@ -5,7 +5,7 @@
  *
  * Combines destructive command confirmation + protected paths in one extension.
  */
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI, ExtensionUIContext } from "@mariozechner/pi-coding-agent";
 import { spawn } from "node:child_process";
 
 export const DANGEROUS_PATTERNS = [
@@ -40,14 +40,81 @@ end run`;
   }
 };
 
+type FocusTracker = {
+  // true = focused, false = unfocused, undefined = unknown
+  isFocused: () => boolean | undefined;
+  dispose: () => void;
+};
+
+const createTerminalFocusTracker = (ui: Pick<ExtensionUIContext, "onTerminalInput">): FocusTracker | undefined => {
+  if (!process.stdin.isTTY || !process.stdout.isTTY) {
+    return undefined;
+  }
+
+  const FOCUS_REPORTING_ENABLE = "\x1b[?1004h";
+  const FOCUS_REPORTING_DISABLE = "\x1b[?1004l";
+  const FOCUS_IN = "\x1b[I";
+  const FOCUS_OUT = "\x1b[O";
+
+  let focused: boolean | undefined;
+
+  process.stdout.write(FOCUS_REPORTING_ENABLE);
+  const unsubTermInput = ui.onTerminalInput((data) => {
+    if (data === FOCUS_IN) {
+      focused = true;
+    } else if (data === FOCUS_OUT) {
+      focused = false;
+    }
+  });
+
+  return {
+    isFocused: () => focused,
+    dispose: () => {
+      unsubTermInput();
+      process.stdout.write(FOCUS_REPORTING_DISABLE);
+    },
+  };
+};
+
+type FocusAwareNotifier = {
+  notify: (title: string, body: string) => void;
+};
+
+const createFocusAwareNotifier = (pi: ExtensionAPI): FocusAwareNotifier => {
+  let focusTracker: FocusTracker | undefined;
+
+  pi.on("session_start", async (_event, ctx) => {
+    if (!ctx.hasUI) {
+      return;
+    }
+
+    focusTracker = createTerminalFocusTracker(ctx.ui);
+  });
+
+  pi.on("session_shutdown", async () => {
+    focusTracker?.dispose();
+    focusTracker = undefined;
+  });
+
+  return {
+    notify: (title: string, body: string) => {
+      if (!focusTracker?.isFocused()) {
+        notify(title, body);
+      }
+    },
+  };
+};
+
 export default function (pi: ExtensionAPI) {
+  const notifier = createFocusAwareNotifier(pi);
+
   pi.on("tool_call", async (event, ctx) => {
     // Check bash commands for dangerous patterns
     if (event.toolName === "bash") {
       const cmd = (event.input as { command?: string }).command ?? "";
       const match = DANGEROUS_PATTERNS.find((p) => p.test(cmd));
       if (match && ctx.hasUI) {
-        notify("Pi Danger Approval Needed", cmd);
+        notifier.notify("Pi Danger Approval Needed", cmd);
         const ok = await ctx.ui.confirm("⚠️ Dangerous Command", `Execute: ${cmd}?`);
         if (!ok) {
           ctx.abort();
@@ -62,7 +129,7 @@ export default function (pi: ExtensionAPI) {
       const hit = PROTECTED_PATHS.find((p) => path.includes(p));
       if (hit) {
         if (ctx.hasUI) {
-          notify("Pi Path Approval Needed", path);
+          notifier.notify("Pi Path Approval Needed", path);
           const ok = await ctx.ui.confirm("🛡️ Protected Path", `Allow write to ${path}?`);
           if (!ok) {
             ctx.abort();
