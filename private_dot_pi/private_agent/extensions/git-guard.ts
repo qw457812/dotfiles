@@ -1,10 +1,9 @@
 // Ref: https://github.com/telagod/oh-pi/blob/7e59d1bcbfe1af837494a65d759d047a6474b103/pi-package/extensions/git-guard.ts
 
 /**
- * oh-pi Git Checkpoint Extension
+ * Git Guard Extension
  *
- * Auto-stash before each turn.
- * Combines git-checkpoint + dirty-repo-guard.
+ * Combines mutating git command confirmation + dirty-repo-guard.
  */
 import type { ExtensionAPI, ExtensionUIContext } from "@mariozechner/pi-coding-agent";
 import { spawn } from "node:child_process";
@@ -97,7 +96,6 @@ const createFocusAwareNotifier = (pi: ExtensionAPI): FocusAwareNotifier => {
 };
 
 export default function (pi: ExtensionAPI) {
-  let turnCount = 0;
   const notifier = createFocusAwareNotifier(pi);
 
   pi.on("tool_call", async (event, ctx) => {
@@ -128,17 +126,5 @@ export default function (pi: ExtensionAPI) {
         ctx.ui.notify(`⚠️ Dirty repo: ${lines} uncommitted change(s)`, "warning");
       }
     } catch { /* not a git repo, ignore */ }
-  });
-
-  // Stash checkpoint before each turn
-  pi.on("turn_start", async () => {
-    turnCount++;
-    try {
-      await pi.exec("git", ["stash", "create", "-m", `oh-pi-turn-${turnCount}`]);
-    } catch { /* not a git repo */ }
-  });
-
-  pi.on("agent_end", async () => {
-    turnCount = 0;
   });
 }

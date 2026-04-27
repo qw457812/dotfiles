@@ -51,6 +51,7 @@
     "npm:pi-caffeinate",
     "npm:pi-mcp-adapter",
     "npm:@tintinweb/pi-subagents",
+    "npm:pi-rewind",
     "git:github.com/monotykamary/pi-neuralwatt-provider"
   ]
 }

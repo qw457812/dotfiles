@@ -872,6 +872,13 @@ return {
         config = function() end,
       },
       {
+        "arpagon/pi-rewind",
+        version = "*",
+        build = "pi update npm:pi-rewind",
+        lazy = true,
+        config = function() end,
+      },
+      {
         "monotykamary/pi-neuralwatt-provider",
         build = "pi update git:github.com/monotykamary/pi-neuralwatt-provider",
         lazy = true,
