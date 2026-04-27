@@ -55,7 +55,8 @@
       "git stash *": "ask",
       "git cherry-pick *": "ask",
       "git revert *": "ask",
-      "git restore *": "ask"
+      "git restore *": "ask",
+      "git clean *": "ask"
     }
   },
   "provider": {

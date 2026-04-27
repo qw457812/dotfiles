@@ -15,6 +15,7 @@ prefix_rule(
             "cherry-pick",
             "revert",
             "restore",
+            "clean",
         ],
     ],
     decision = "prompt",

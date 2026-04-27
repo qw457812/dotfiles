@@ -9,7 +9,7 @@
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { spawn } from "node:child_process";
 
-const GUARDED_GIT_PATTERN = /\bgit\s+(?<subcommand>add|commit|push|pull|merge|rebase|reset|checkout|switch|stash|cherry-pick|revert|restore)\b/;
+const GUARDED_GIT_PATTERN = /\bgit\s+(?<subcommand>add|commit|push|pull|merge|rebase|reset|checkout|switch|stash|cherry-pick|revert|restore|clean)\b/;
 
 const notify = (title: string, body: string): void => {
   if (process.platform === "darwin") {
