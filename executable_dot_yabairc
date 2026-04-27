@@ -1,5 +1,8 @@
 #!/usr/bin/env sh
 
+# Fixes "yabai: command not found" at /tmp/yabai_$USER.err.log
+export PATH="$PATH:/opt/homebrew/bin"
+
 #
 # for this to work you must configure sudo such that
 # it will be able to run the command without password
