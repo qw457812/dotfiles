@@ -176,4 +176,9 @@ export default function (pi: ExtensionAPI) {
 		const { title, body } = formatNotification(lastText);
 		notifier.notify(title, body);
 	});
+
+	pi.events.on("my:notification", (data: unknown) => {
+		const { title, body } = data as { title: string; body: string };
+		notifier.notify(title, body);
+	});
 }
