@@ -160,12 +160,14 @@ function validateSqlQuery(sql: string): { valid: boolean; error?: string } {
 }
 
 async function confirmOrBlock(
+  pi: ExtensionAPI,
   ctx: ExtensionContext,
   title: string,
   message: string,
   reason: string,
 ) {
   if (!ctx.hasUI) return { block: true, reason };
+  pi.events.emit("my:notification", { title, body: message });
   const ok = await ctx.ui.confirm(title, message);
   if (!ok) return { block: true, reason };
 }
@@ -182,6 +184,7 @@ export default function (pi: ExtensionAPI) {
 
     if (extracted.kind === "confirm") {
       return confirmOrBlock(
+        pi,
         ctx,
         "⚠️ SQL Guard",
         `${extracted.error}\n\nTool: ${event.toolName}\n\nInput:\n${JSON.stringify(event.input, null, 2)}`,
@@ -193,6 +196,7 @@ export default function (pi: ExtensionAPI) {
     if (result.valid) return;
 
     return confirmOrBlock(
+      pi,
       ctx,
       "⚠️ SQL Guard",
       `${result.error}\n\nTool: ${event.toolName}\n\nInput:\n${JSON.stringify(event.input, null, 2)}`,

@@ -829,7 +829,7 @@ return {
     "badlogic/pi-mono",
     version = "*",
     lazy = true,
-    build = "npm install -g @mariozechner/pi-coding-agent",
+    build = "npm install -g @mariozechner/pi-coding-agent", -- `pi update --self`
     config = function() end,
     specs = {
       {
@@ -854,6 +854,12 @@ return {
       {
         "georgebashi/pi-caffeinate",
         build = "pi update npm:pi-caffeinate",
+        lazy = true,
+        config = function() end,
+      },
+      {
+        "aliou/pi-guardrails",
+        build = "pi update npm:@aliou/pi-guardrails",
         lazy = true,
         config = function() end,
       },

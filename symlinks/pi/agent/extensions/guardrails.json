@@ -1,0 +1,93 @@
+{
+  "applyBuiltinDefaults": true,
+  "version": "0.9.0-20260327",
+  "onboarding": {
+    "completed": true,
+    "completedAt": "2026-04-28T09:43:12.932Z",
+    "version": "0.9.0-20260327"
+  },
+  "features": {
+    "pathAccess": false,
+    "policies": false
+  },
+  "pathAccess": {
+    "mode": "ask"
+  },
+  "permissionGate": {
+    "patterns": [
+      {
+        "pattern": "brew",
+        "description": "Homebrew package manager"
+      },
+      {
+        "pattern": "docker inspect",
+        "description": "Docker inspect (may expose env vars)"
+      },
+      {
+        "pattern": "docker system prune",
+        "description": "Docker system cleanup"
+      },
+      {
+        "pattern": "git push --force",
+        "description": "Git force push"
+      },
+      {
+        "pattern": "npm publish",
+        "description": "NPM package publishing"
+      },
+      {
+        "pattern": "yarn publish",
+        "description": "Yarn package publishing"
+      },
+      {
+        "pattern": "pnpm publish",
+        "description": "PNPM package publishing"
+      },
+      {
+        "pattern": "DROP DATABASE",
+        "description": "SQL database drop"
+      },
+      {
+        "pattern": "DROP TABLE",
+        "description": "SQL table drop"
+      },
+      {
+        "pattern": "docker rm",
+        "description": "Docker container removal"
+      },
+      {
+        "pattern": "docker rmi",
+        "description": "Docker image removal"
+      },
+      {
+        "pattern": "docker compose down",
+        "description": "Docker Compose service teardown"
+      },
+      {
+        "pattern": "\\b(?:[Dd][Rr][Oo][Pp]|[Tt][Rr][Uu][Nn][Cc][Aa][Tt][Ee]|[Dd][Ee][Ll][Ee][Tt][Ee]\\s+[Ff][Rr][Oo][Mm])\\b",
+        "description": "SQL destructive statement",
+        "regex": true
+      },
+      {
+        "pattern": "\\brm\\s+(-[a-zA-Z]*f[a-zA-Z]*\\s+|.*-rf\\b|.*--force\\b)",
+        "description": "Force delete",
+        "regex": true
+      },
+      {
+        "pattern": "\\bchmod\\s+777\\b",
+        "description": "World-writable permissions",
+        "regex": true
+      },
+      {
+        "pattern": ">\\s*\\/dev\\/sd[a-z]\\b",
+        "description": "Redirect to block device",
+        "regex": true
+      },
+      {
+        "pattern": "\\bgit(?:\\s+-C\\s+(?:\"[^\"]*\"|'[^']*'|\\S+))*\\s+(?:add|commit|push|pull|merge|rebase|reset|checkout|switch|stash|cherry-pick|revert|restore|clean)\\b",
+        "description": "Mutating git command",
+        "regex": true
+      }
+    ]
+  }
+}

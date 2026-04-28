@@ -49,6 +49,7 @@
       "themes": []
     },
     "npm:pi-caffeinate",
+    "npm:@aliou/pi-guardrails",
     "npm:pi-mcp-adapter",
     "npm:@tintinweb/pi-subagents",
     "npm:pi-rewind",
