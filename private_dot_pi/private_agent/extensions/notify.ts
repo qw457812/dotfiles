@@ -44,40 +44,54 @@ end run`;
 };
 
 type FocusTracker = {
+	attach: (ui?: Pick<ExtensionUIContext, "onTerminalInput">) => void;
+	detach: () => void;
 	// true = focused, false = unfocused, undefined = unknown
 	isFocused: () => boolean | undefined;
-	dispose: () => void;
 };
 
 // See also: https://github.com/tmustier/pi-extensions/blob/8da9865e5beb625050406c0e9281e4393d076b22/session-recap/index.ts
-const createTerminalFocusTracker = (ui: Pick<ExtensionUIContext, "onTerminalInput">): FocusTracker | undefined => {
-	if (!process.stdin.isTTY || !process.stdout.isTTY) {
-		return undefined;
-	}
-
+const createFocusTracker = (): FocusTracker => {
 	// https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
-	const FOCUS_REPORTING_ENABLE = "\x1b[?1004h";
-	const FOCUS_REPORTING_DISABLE = "\x1b[?1004l";
+	const FOCUS_ENABLE = "\x1b[?1004h";
+	const FOCUS_DISABLE = "\x1b[?1004l";
 	const FOCUS_IN = "\x1b[I";
 	const FOCUS_OUT = "\x1b[O";
 
 	let focused: boolean | undefined;
+	let offTerminalInput: (() => void) | undefined;
 
-	process.stdout.write(FOCUS_REPORTING_ENABLE);
-	const unsubTermInput = ui.onTerminalInput((data) => {
-		if (data === FOCUS_IN) {
-			focused = true;
-		} else if (data === FOCUS_OUT) {
-			focused = false;
+	const detach = () => {
+		focused = undefined;
+		if (!offTerminalInput) {
+			return;
 		}
-	});
+
+		offTerminalInput();
+		offTerminalInput = undefined;
+		process.stdout.write(FOCUS_DISABLE);
+	};
+
+	const attach = (ui?: Pick<ExtensionUIContext, "onTerminalInput">) => {
+		detach();
+		if (!ui || !process.stdin.isTTY || !process.stdout.isTTY) {
+			return;
+		}
+
+		process.stdout.write(FOCUS_ENABLE);
+		offTerminalInput = ui.onTerminalInput((data) => {
+			if (data === FOCUS_IN) {
+				focused = true;
+			} else if (data === FOCUS_OUT) {
+				focused = false;
+			}
+		});
+	};
 
 	return {
+		attach,
+		detach,
 		isFocused: () => focused,
-		dispose: () => {
-			unsubTermInput();
-			process.stdout.write(FOCUS_REPORTING_DISABLE);
-		},
 	};
 };
 
@@ -86,24 +100,19 @@ type FocusAwareNotifier = {
 };
 
 const createFocusAwareNotifier = (pi: ExtensionAPI): FocusAwareNotifier => {
-	let focusTracker: FocusTracker | undefined;
+	const focusTracker = createFocusTracker();
 
 	pi.on("session_start", async (_event, ctx) => {
-		if (!ctx.hasUI) {
-			return;
-		}
-
-		focusTracker = createTerminalFocusTracker(ctx.ui);
+		focusTracker.attach(ctx.hasUI ? ctx.ui : undefined);
 	});
 
 	pi.on("session_shutdown", async () => {
-		focusTracker?.dispose();
-		focusTracker = undefined;
+		focusTracker.detach();
 	});
 
 	return {
 		notify: (title: string, body: string) => {
-			if (!focusTracker?.isFocused()) {
+			if (focusTracker.isFocused() !== true) {
 				notify(title, body);
 			}
 		},
