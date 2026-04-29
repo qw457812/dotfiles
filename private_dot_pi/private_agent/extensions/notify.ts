@@ -49,11 +49,13 @@ type FocusTracker = {
 	dispose: () => void;
 };
 
+// See also: https://github.com/tmustier/pi-extensions/blob/8da9865e5beb625050406c0e9281e4393d076b22/session-recap/index.ts
 const createTerminalFocusTracker = (ui: Pick<ExtensionUIContext, "onTerminalInput">): FocusTracker | undefined => {
 	if (!process.stdin.isTTY || !process.stdout.isTTY) {
 		return undefined;
 	}
 
+	// https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
 	const FOCUS_REPORTING_ENABLE = "\x1b[?1004h";
 	const FOCUS_REPORTING_DISABLE = "\x1b[?1004l";
 	const FOCUS_IN = "\x1b[I";

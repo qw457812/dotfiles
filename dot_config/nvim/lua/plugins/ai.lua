@@ -825,6 +825,15 @@ return {
     end,
   },
 
+  -- https://github.com/w-winter/dot314
+  -- https://github.com/default-anton/dotfiles/tree/master/pi
+  -- https://github.com/dannote/dot-pi
+  -- https://github.com/richardgill/nix/tree/main/out-of-store-config/ai-agents/pi/extensions
+  -- https://github.com/kaofelix/dotfiles/tree/main/pi/.pi/agent
+  -- https://github.com/aliou/pi-harness
+  --
+  -- https://github.com/tmustier/pi-extensions
+  -- https://github.com/knoopx/pi
   {
     "badlogic/pi-mono",
     version = "*",
@@ -834,78 +843,78 @@ return {
     specs = {
       {
         "mitsuhiko/agent-stuff",
-        build = "pi update git:github.com/mitsuhiko/agent-stuff",
+        build = "pi update --extension git:github.com/mitsuhiko/agent-stuff",
         lazy = true,
         config = function() end,
       },
       {
         "telagod/oh-pi",
-        build = "pi update npm:oh-pi",
+        build = "pi update --extension npm:oh-pi",
         lazy = true,
         config = function() end,
       },
       {
         "lajarre/pi-vim",
         version = "*",
-        build = "pi update npm:pi-vim",
+        build = "pi update --extension npm:pi-vim",
         lazy = true,
         config = function() end,
       },
       {
         "georgebashi/pi-caffeinate",
-        build = "pi update npm:pi-caffeinate",
+        build = "pi update --extension npm:pi-caffeinate",
         lazy = true,
         config = function() end,
       },
       {
         "aliou/pi-guardrails",
-        build = "pi update npm:@aliou/pi-guardrails",
+        build = "pi update --extension npm:@aliou/pi-guardrails",
         lazy = true,
         config = function() end,
       },
       {
         "nicobailon/pi-mcp-adapter",
         version = "*",
-        build = "pi update npm:pi-mcp-adapter",
+        build = "pi update --extension npm:pi-mcp-adapter",
         lazy = true,
         config = function() end,
       },
       {
         "tintinweb/pi-subagents",
         version = "*",
-        build = "pi update npm:@tintinweb/pi-subagents",
+        build = "pi update --extension npm:@tintinweb/pi-subagents",
         lazy = true,
         config = function() end,
       },
       {
         "arpagon/pi-rewind",
         version = "*",
-        build = "pi update npm:pi-rewind",
+        build = "pi update --extension npm:pi-rewind",
         lazy = true,
         config = function() end,
       },
       {
         "monotykamary/pi-neuralwatt-provider",
-        build = "pi update git:github.com/monotykamary/pi-neuralwatt-provider",
+        build = "pi update --extension git:github.com/monotykamary/pi-neuralwatt-provider",
         lazy = true,
         config = function() end,
       },
     },
   },
-  {
-    "openai/codex",
-    enabled = not vim.g.user_is_termux,
-    version = "*",
-    lazy = true,
-    config = function() end,
-  },
-  {
-    "anomalyco/opencode",
-    enabled = not vim.g.user_is_termux,
-    version = "*",
-    lazy = true,
-    config = function() end,
-  },
+  -- {
+  --   "openai/codex",
+  --   enabled = not vim.g.user_is_termux,
+  --   version = "*",
+  --   lazy = true,
+  --   config = function() end,
+  -- },
+  -- {
+  --   "anomalyco/opencode",
+  --   enabled = not vim.g.user_is_termux,
+  --   version = "*",
+  --   lazy = true,
+  --   config = function() end,
+  -- },
 
   -- ===========================================================================
   -- ALL LAZY SPECS BELOW ARE UNUSED

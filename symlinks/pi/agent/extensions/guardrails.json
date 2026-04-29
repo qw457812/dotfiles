@@ -16,10 +16,6 @@
   "permissionGate": {
     "patterns": [
       {
-        "pattern": "brew",
-        "description": "Homebrew package manager"
-      },
-      {
         "pattern": "docker inspect",
         "description": "Docker inspect (may expose env vars)"
       },
@@ -44,14 +40,6 @@
         "description": "PNPM package publishing"
       },
       {
-        "pattern": "DROP DATABASE",
-        "description": "SQL database drop"
-      },
-      {
-        "pattern": "DROP TABLE",
-        "description": "SQL table drop"
-      },
-      {
         "pattern": "docker rm",
         "description": "Docker container removal"
       },
@@ -64,7 +52,7 @@
         "description": "Docker Compose service teardown"
       },
       {
-        "pattern": "\\b(?:[Dd][Rr][Oo][Pp]|[Tt][Rr][Uu][Nn][Cc][Aa][Tt][Ee]|[Dd][Ee][Ll][Ee][Tt][Ee]\\s+[Ff][Rr][Oo][Mm])\\b",
+        "pattern": "\\b(?i:drop|truncate|delete\\s+from)\\b",
         "description": "SQL destructive statement",
         "regex": true
       },

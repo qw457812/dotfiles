@@ -55,6 +55,7 @@ Using [WhatPulse](https://whatpulse.org/) to track keyboard input.
 
 TODO:
 
+- [ ] Try [kanata](https://github.com/jtroo/kanata).
 - [ ] Try [Glove80 Layout Editor](https://my.glove80.com/).
 - [ ] Try [ZMK](https://zmk.dev/) or [QMK](https://docs.qmk.fm/).
   - [qmk.nvim](https://github.com/codethread/qmk.nvim)

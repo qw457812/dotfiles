@@ -28,6 +28,9 @@ enabled = false
 [tui]
 status_line = ["model-with-reasoning", "fast-mode", "total-input-tokens", "total-output-tokens", "context-used", "five-hour-limit", "weekly-limit", "task-progress", "codex-version"]
 
+[tui.model_availability_nux]
+"gpt-5.5" = 4
+
 [features]
 prevent_idle_sleep = true
 external_migration = true
