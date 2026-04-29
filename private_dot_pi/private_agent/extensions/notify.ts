@@ -171,20 +171,25 @@ const formatNotification = (text: string | null): { title: string; body: string 
 export default function (pi: ExtensionAPI) {
 	const notifier = createFocusAwareNotifier(pi);
 
+	const offMyNotification = pi.events.on("my:notification", (data: unknown) => {
+		const { title, body } = data as { title: string; body: string };
+		notifier.notify(title, body);
+	});
+
+	// https://github.com/aliou/pi-guardrails/blob/ba06d720196c68825274f652dadd1032260f64ad/src/utils/events.ts#L31
+	const offGuardrailsDangerous = pi.events.on("guardrails:dangerous", (data: unknown) => {
+		const { command, description, pattern } = data as { command: string; description: string; pattern: string; };
+		notifier.notify("pi-guardrails:dangerous", `${command}\n${description}\n${pattern}`);
+	});
+
 	pi.on("agent_end", async (event) => {
 		const lastText = extractLastAssistantText(event.messages ?? []);
 		const { title, body } = formatNotification(lastText);
 		notifier.notify(title, body);
 	});
 
-	pi.events.on("my:notification", (data: unknown) => {
-		const { title, body } = data as { title: string; body: string };
-		notifier.notify(title, body);
-	});
-
-	// https://github.com/aliou/pi-guardrails/blob/ba06d720196c68825274f652dadd1032260f64ad/src/utils/events.ts#L31
-	pi.events.on("guardrails:dangerous", (data: unknown) => {
-		const { command, description, pattern } = data as { command: string; description: string; pattern: string; };
-		notifier.notify("pi-guardrails:dangerous", `${command}\n${description}\n${pattern}`);
+	pi.on("session_shutdown", async () => {
+		offMyNotification();
+		offGuardrailsDangerous();
 	});
 }

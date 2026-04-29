@@ -17,10 +17,15 @@ export default function (pi: ExtensionAPI) {
   });
 
   // https://github.com/aliou/pi-guardrails/blob/ba06d720196c68825274f652dadd1032260f64ad/src/utils/events.ts#L24
-  pi.events.on("guardrails:blocked", (data: unknown) => {
+  const offGuardrailsBlocked = pi.events.on("guardrails:blocked", (data: unknown) => {
     const { feature, userDenied } = data as GuardrailsBlockedEvent;
     if (userDenied && feature === "permissionGate") {
       currentCtx?.abort();
     }
+  });
+
+  pi.on("session_shutdown", async () => {
+    currentCtx = undefined;
+    offGuardrailsBlocked();
   });
 }
