@@ -248,8 +248,24 @@ export default function (pi: ExtensionAPI) {
     tpsTracker.onAgentStart();
   });
 
+  pi.on("turn_start", () => {
+    tpsTracker.onTurnStart();
+  });
+
+  pi.on("message_start", (event) => {
+    tpsTracker.onMessageStart(event);
+  });
+
   pi.on("message_update", (event) => {
     tpsTracker.onMessageUpdate(event);
+  });
+
+  pi.on("message_end", (event) => {
+    tpsTracker.onMessageEnd(event);
+  });
+
+  pi.on("turn_end", () => {
+    tpsTracker.onTurnEnd();
   });
 
   pi.on("agent_end", (event, ctx) => {
