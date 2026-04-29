@@ -11,11 +11,6 @@ import type {
 	TurnStartEvent,
 } from "@mariozechner/pi-coding-agent";
 
-interface MessageStartEvent {
-	type: "message_start";
-	message: unknown;
-}
-
 interface MessageUpdateEvent {
 	type: "message_update";
 	message: unknown;
@@ -30,7 +25,7 @@ interface MessageEndEvent {
 interface TurnTiming {
 	turnStartMs: number;
 	firstTokenMs: number | null;
-	currentMessageStartMs: number | null;
+	currentGenerationStartMs: number | null;
 	assistantMessages: AssistantMessage[];
 	generationMs: number;
 }
@@ -105,26 +100,24 @@ export default function (pi: ExtensionAPI) {
 		currentTurn = {
 			turnStartMs: performance.now(),
 			firstTokenMs: null,
-			currentMessageStartMs: null,
+			currentGenerationStartMs: null,
 			assistantMessages: [],
 			generationMs: 0,
 		};
 	});
 
-	pi.on("message_start", (event: MessageStartEvent) => {
-		if (!currentTurn) return;
-		if (!isAssistantMessage(event.message)) return;
-
-		currentTurn.currentMessageStartMs = performance.now();
-	});
-
 	pi.on("message_update", (event: MessageUpdateEvent) => {
 		if (!currentTurn) return;
-		if (currentTurn.firstTokenMs !== null) return;
 		if (!isAssistantMessage(event.message)) return;
 		if (!isFirstTokenEvent(event.assistantMessageEvent)) return;
 
-		currentTurn.firstTokenMs = performance.now();
+		const now = performance.now();
+		if (currentTurn.firstTokenMs === null) {
+			currentTurn.firstTokenMs = now;
+		}
+		if (currentTurn.currentGenerationStartMs === null) {
+			currentTurn.currentGenerationStartMs = now;
+		}
 	});
 
 	pi.on("message_end", (event: MessageEndEvent) => {
@@ -132,9 +125,9 @@ export default function (pi: ExtensionAPI) {
 		if (!isAssistantMessage(event.message)) return;
 
 		const now = performance.now();
-		if (currentTurn.currentMessageStartMs !== null) {
-			currentTurn.generationMs += now - currentTurn.currentMessageStartMs;
-			currentTurn.currentMessageStartMs = null;
+		if (currentTurn.currentGenerationStartMs !== null) {
+			currentTurn.generationMs += now - currentTurn.currentGenerationStartMs;
+			currentTurn.currentGenerationStartMs = null;
 		}
 		currentTurn.assistantMessages.push(event.message);
 	});

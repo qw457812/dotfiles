@@ -16,11 +16,6 @@ function isFirstTokenEvent({ type }: AssistantMessageEvent) {
   return type === "thinking_delta" || type === "text_delta" || type === "toolcall_delta";
 }
 
-interface MessageStartEvent {
-  type: "message_start";
-  message: unknown;
-}
-
 interface MessageUpdateEvent {
   type: "message_update";
   message: unknown;
@@ -35,7 +30,7 @@ interface MessageEndEvent {
 interface TurnTiming {
   turnStartMs: number;
   firstTokenMs: number | null;
-  currentMessageStartMs: number | null;
+  currentGenerationStartMs: number | null;
   assistantMessages: AssistantMessage[];
   generationMs: number;
 }
@@ -66,7 +61,6 @@ export interface TpsTracker {
   onSessionStart(): void;
   onAgentStart(): void;
   onTurnStart(): void;
-  onMessageStart(event: MessageStartEvent): void;
   onMessageUpdate(event: MessageUpdateEvent): void;
   onMessageEnd(event: MessageEndEvent): void;
   onTurnEnd(): boolean;
@@ -98,26 +92,24 @@ export function createTpsTracker(): TpsTracker {
       currentTurn = {
         turnStartMs: performance.now(),
         firstTokenMs: null,
-        currentMessageStartMs: null,
+        currentGenerationStartMs: null,
         assistantMessages: [],
         generationMs: 0,
       };
     },
 
-    onMessageStart(event: MessageStartEvent) {
-      if (!currentTurn) return;
-      if (!isAssistantMessage(event.message)) return;
-
-      currentTurn.currentMessageStartMs = performance.now();
-    },
-
     onMessageUpdate(event: MessageUpdateEvent) {
       if (!currentTurn) return;
-      if (currentTurn.firstTokenMs !== null) return;
       if (!isAssistantMessage(event.message)) return;
       if (!isFirstTokenEvent(event.assistantMessageEvent)) return;
 
-      currentTurn.firstTokenMs = performance.now();
+      const now = performance.now();
+      if (currentTurn.firstTokenMs === null) {
+        currentTurn.firstTokenMs = now;
+      }
+      if (currentTurn.currentGenerationStartMs === null) {
+        currentTurn.currentGenerationStartMs = now;
+      }
     },
 
     onMessageEnd(event: MessageEndEvent) {
@@ -125,9 +117,9 @@ export function createTpsTracker(): TpsTracker {
       if (!isAssistantMessage(event.message)) return;
 
       const now = performance.now();
-      if (currentTurn.currentMessageStartMs !== null) {
-        currentTurn.generationMs += now - currentTurn.currentMessageStartMs;
-        currentTurn.currentMessageStartMs = null;
+      if (currentTurn.currentGenerationStartMs !== null) {
+        currentTurn.generationMs += now - currentTurn.currentGenerationStartMs;
+        currentTurn.currentGenerationStartMs = null;
       }
       currentTurn.assistantMessages.push(event.message);
     },

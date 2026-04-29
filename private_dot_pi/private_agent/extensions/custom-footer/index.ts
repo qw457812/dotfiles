@@ -252,10 +252,6 @@ export default function (pi: ExtensionAPI) {
     tpsTracker.onTurnStart();
   });
 
-  pi.on("message_start", (event) => {
-    tpsTracker.onMessageStart(event);
-  });
-
   pi.on("message_update", (event) => {
     tpsTracker.onMessageUpdate(event);
   });
