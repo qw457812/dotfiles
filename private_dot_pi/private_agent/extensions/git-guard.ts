@@ -10,6 +10,7 @@ import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 // const GUARDED_GIT_PATTERN = /\bgit(?:\s+-C\s+(?:"[^"]*"|'[^']*'|\S+))*\s+(?<subcommand>add|commit|push|pull|merge|rebase|reset|checkout|switch|stash|cherry-pick|revert|restore|clean)\b/;
 
 export default function (pi: ExtensionAPI) {
+  // Using the `permissionGate` feature from `npm:@aliou/pi-guardrails` instead
   // pi.on("tool_call", async (event, ctx) => {
   //   if (event.toolName !== "bash") return;
   //

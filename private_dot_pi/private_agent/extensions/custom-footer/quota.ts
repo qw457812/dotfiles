@@ -1,7 +1,7 @@
+import type { TUI } from "@mariozechner/pi-tui";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import type { TUI } from "@mariozechner/pi-tui";
 import { formatDecimal } from "./utils.js";
 
 const CACHE_DIR = join(homedir(), ".cache", "pi-agent-footer");

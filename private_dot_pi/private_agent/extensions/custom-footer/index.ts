@@ -8,8 +8,7 @@
  * Shows:
  * - Token usage: ↑input ↓output Rcache_read Wcache_write
  * - Cost: $N.NN
- * - TPS: session-average tokens per second
- * - TTFT: session-average time to first token
+ * - TPS/TTFT: session-average tokens per second / time to first token
  * - Context usage: N% (colored: green/yellow/red based on usage)
  * - Quota info for certain providers (when active)
  * - Elapsed: session duration
@@ -30,9 +29,9 @@ import type {
 } from "@mariozechner/pi-coding-agent";
 import { VERSION } from "@mariozechner/pi-coding-agent";
 import { type TUI, truncateToWidth, visibleWidth } from "@mariozechner/pi-tui";
-import { formatDecimal } from "./utils.js";
 import { getQuota } from "./quota.js";
 import { createTpsTracker } from "./tps.js";
+import { formatDecimal } from "./utils.js";
 
 export default function (pi: ExtensionAPI) {
   let enabled = true;
@@ -126,14 +125,10 @@ export default function (pi: ExtensionAPI) {
             statsParts.push(`$${formatDecimal(totalCost, 2)}`);
           }
 
-          // Session-average TPS and TTFT
+          // Session-average TPS/TTFT
           const tps = tpsTracker.getTps(theme);
           if (tps) {
             statsParts.push(tps);
-          }
-          const ttft = tpsTracker.getTtft(theme);
-          if (ttft) {
-            statsParts.push(ttft);
           }
 
           // Colorize context percentage based on usage

@@ -26,7 +26,6 @@ export interface TpsTracker {
   onMessageUpdate(event: MessageUpdateEvent): void;
   onAgentEnd(event: AgentEndEvent, ctx: ExtensionContext): boolean;
   getTps(theme: Theme): string | null;
-  getTtft(theme: Theme): string | null;
 }
 
 export function createTpsTracker(): TpsTracker {
@@ -85,21 +84,16 @@ export function createTpsTracker(): TpsTracker {
     },
 
     getTps(theme: Theme): string | null {
-      if (totalElapsedMs <= 0) {
-        return null;
+      const parts: string[] = [];
+      if (totalElapsedMs > 0) {
+        const avgTps = totalOutput / (totalElapsedMs / 1000);
+        parts.push(theme.fg("syntaxComment", formatDecimal(avgTps, 1)));
       }
-
-      const avgTps = totalOutput / (totalElapsedMs / 1000);
-      return theme.fg("syntaxComment", formatDecimal(avgTps, 1));
-    },
-
-    getTtft(theme: Theme): string | null {
-      if (ttftCount <= 0) {
-        return null;
+      if (ttftCount > 0) {
+        const avgTtft = totalTtftMs / ttftCount / 1000;
+        parts.push(theme.fg("muted", `${formatDecimal(avgTtft, 1)}s`));
       }
-
-      const avgTtft = totalTtftMs / ttftCount / 1000;
-      return theme.fg("muted", `${formatDecimal(avgTtft, 1)}s`);
+      return parts.length ? parts.join(theme.fg("muted", "/")) : null;
     },
   };
 }
