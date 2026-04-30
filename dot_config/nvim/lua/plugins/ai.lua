@@ -880,13 +880,6 @@ return {
         config = function() end,
       },
       {
-        "tintinweb/pi-subagents",
-        version = "*",
-        build = "pi update --extension npm:@tintinweb/pi-subagents",
-        lazy = true,
-        config = function() end,
-      },
-      {
         "arpagon/pi-rewind",
         version = "*",
         build = "pi update --extension npm:pi-rewind",

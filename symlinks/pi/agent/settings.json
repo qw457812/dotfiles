@@ -50,7 +50,6 @@
     "npm:pi-caffeinate",
     "npm:@aliou/pi-guardrails",
     "npm:pi-mcp-adapter",
-    "npm:@tintinweb/pi-subagents",
     "npm:pi-rewind",
     "git:github.com/monotykamary/pi-tps",
     "git:github.com/monotykamary/pi-neuralwatt-provider"
