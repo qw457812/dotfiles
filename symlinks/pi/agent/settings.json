@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.70.2",
+  "lastChangelogVersion": "0.70.6",
   "defaultProvider": "synthetic",
   "defaultModel": "hf:zai-org/GLM-5.1",
   "defaultThinkingLevel": "high",
@@ -21,7 +21,6 @@
       "extensions": [
         "extensions/answer.ts",
         "extensions/btw.ts",
-        "extensions/context.ts",
         "extensions/review.ts",
         "extensions/session-breakdown.ts",
         "extensions/split-fork.ts"
@@ -53,6 +52,7 @@
     "npm:pi-mcp-adapter",
     "npm:@tintinweb/pi-subagents",
     "npm:pi-rewind",
+    "git:github.com/monotykamary/pi-tps",
     "git:github.com/monotykamary/pi-neuralwatt-provider"
   ]
 }

@@ -894,6 +894,12 @@ return {
         config = function() end,
       },
       {
+        "monotykamary/pi-tps",
+        build = "pi update --extension git:github.com/monotykamary/pi-tps",
+        lazy = true,
+        config = function() end,
+      },
+      {
         "monotykamary/pi-neuralwatt-provider",
         build = "pi update --extension git:github.com/monotykamary/pi-neuralwatt-provider",
         lazy = true,
