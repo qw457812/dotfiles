@@ -834,6 +834,9 @@ return {
   --
   -- https://github.com/tmustier/pi-extensions
   -- https://github.com/knoopx/pi
+  --
+  -- https://github.com/carderne/pi-sandbox
+  -- https://github.com/tuansondinh/pi-claude-sandbox
   {
     "badlogic/pi-mono",
     version = "*",

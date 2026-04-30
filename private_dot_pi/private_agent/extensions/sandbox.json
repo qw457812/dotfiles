@@ -1,0 +1,5 @@
+{
+  "filesystem": {
+    "allowWrite": [".", "/tmp", "/private/tmp", "~/.cache"]
+  }
+}

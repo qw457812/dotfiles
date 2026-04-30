@@ -169,7 +169,10 @@ async function confirmOrBlock(
   if (!ctx.hasUI) return { block: true, reason };
   pi.events.emit("my:notification", { title, body: message });
   const ok = await ctx.ui.confirm(title, message);
-  if (!ok) return { block: true, reason };
+  if (!ok) {
+    ctx.abort();
+    return { block: true, reason };
+  }
 }
 
 export default function (pi: ExtensionAPI) {

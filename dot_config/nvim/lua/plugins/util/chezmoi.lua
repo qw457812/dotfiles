@@ -219,8 +219,11 @@ function H.autocmd_chezmoi_add()
 
   vim.api.nvim_create_autocmd("BufWritePost", {
     group = vim.api.nvim_create_augroup("chezmoi_add_xdg_config", { clear = true }),
-    pattern = (vim.env.XDG_CONFIG_HOME or vim.env.HOME .. "/.config") .. "/*",
-    desc = "chezmoi add for XDG_CONFIG_HOME",
+    pattern = {
+      (vim.env.XDG_CONFIG_HOME or vim.env.HOME .. "/.config") .. "/*",
+      (vim.env.PI_CODING_AGENT_DIR or vim.env.HOME .. "/.pi/agent") .. "/*",
+    },
+    desc = "chezmoi add for XDG_CONFIG_HOME and PI_CODING_AGENT_DIR",
     callback = function(event)
       if
         vim.list_contains(managed_files, event.match) -- let chezmoi_re_add augroup handle the re-add
