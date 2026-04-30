@@ -169,6 +169,16 @@ return {
       return vim.tbl_deep_extend("force", opts, {
         bar = {
           enable = false, -- using lualine.nvim
+          update_events = {
+            buf = {
+              -- https://github.com/Bekaboo/dropbar.nvim/blob/f0a42bd92aa647e44221397723453403f5e20f16/lua/dropbar/configs.lua#L323
+              -- https://github.com/neovim/neovim/commit/4431713
+              vim.fn.exists("##BufModifiedSet") == 1 and "BufModifiedSet" or "OptionSet",
+              "FileChangedShellPost",
+              "TextChanged",
+              "ModeChanged",
+            },
+          },
           sources = function(buf, _)
             if vim.bo[buf].ft == "markdown" then
               return vim.g.user_trouble_lualine_old and { source_path, source_markdown } or { source_path }

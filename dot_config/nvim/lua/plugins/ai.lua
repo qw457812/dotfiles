@@ -848,8 +848,8 @@ return {
         config = function() end,
       },
       {
-        "telagod/oh-pi",
-        build = "pi update --extension npm:oh-pi",
+        "telagod/pi-agent-colony",
+        build = "pi update --extension git:github.com/telagod/pi-agent-colony",
         lazy = true,
         config = function() end,
       },

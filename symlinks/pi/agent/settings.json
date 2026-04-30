@@ -34,7 +34,7 @@
       "themes": []
     },
     {
-      "source": "npm:oh-pi",
+      "source": "git:github.com/telagod/pi-agent-colony",
       "extensions": [],
       "skills": [
         "pi-package/skills/context7"
