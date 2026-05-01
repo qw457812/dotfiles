@@ -1,4 +1,4 @@
-// Copied from: https://github.com/badlogic/pi-mono/blob/82ecc1300f1649388c346568c7a1b7978ec610d3/packages/coding-agent/examples/extensions/sandbox/index.ts#L278
+// Copied from: https://github.com/badlogic/pi-mono/blob/82ecc1300f1649388c346568c7a1b7978ec610d3/packages/coding-agent/examples/extensions/sandbox/index.ts
 
 /**
  * Sandbox Extension - OS-level sandboxing for bash commands
