@@ -1,16 +1,14 @@
 {
   "providers": {
     "synthetic": {
-      "baseUrl": "https://api.synthetic.new/v1",
+      "baseUrl": "https://api.synthetic.new/openai/v1",
       "apiKey": "SYNTHETIC_API_KEY",
-      "api": "openai-completions",
-      "compat": {
-        "supportsDeveloperRole": false
-      },
       "models": [
         {
           "id": "hf:moonshotai/Kimi-K2.6",
           "name": "Kimi K2.6",
+          "api": "anthropic-messages",
+          "baseUrl": "https://api.synthetic.new/anthropic",
           "reasoning": true,
           "input": ["text", "image"],
           "contextWindow": 262144,
@@ -25,6 +23,11 @@
         {
           "id": "hf:zai-org/GLM-5.1",
           "name": "GLM-5.1",
+          "api": "openai-completions",
+          "baseUrl": "https://api.synthetic.new/openai/v1",
+          "compat": {
+            "supportsDeveloperRole": false
+          },
           "reasoning": true,
           "input": ["text"],
           "contextWindow": 196608,
@@ -33,41 +36,6 @@
             "input": 1,
             "output": 3,
             "cacheRead": 1,
-            "cacheWrite": 0
-          }
-        }
-      ]
-    },
-    "fireworks": {
-      "baseUrl": "https://api.fireworks.ai/inference/v1",
-      "apiKey": "FIREWORKS_API_KEY",
-      "api": "openai-completions",
-      "models": [
-        {
-          "id": "accounts/fireworks/routers/kimi-k2p5-turbo",
-          "name": "Kimi K2.5 Turbo",
-          "reasoning": true,
-          "input": ["text", "image"],
-          "contextWindow": 256000,
-          "maxTokens": 256000,
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cacheRead": 0,
-            "cacheWrite": 0
-          }
-        },
-        {
-          "id": "accounts/fireworks/routers/glm-5p1-fast",
-          "name": "GLM-5.1 Fast",
-          "reasoning": true,
-          "input": ["text"],
-          "contextWindow": 202752,
-          "maxTokens": 131072,
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cacheRead": 0,
             "cacheWrite": 0
           }
         }
