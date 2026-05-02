@@ -19,7 +19,7 @@ model_list:
 
   - model_name: claude-sonnet-*
     litellm_params:
-      model: anthropic/hf:moonshotai/Kimi-K2.5
+      model: anthropic/hf:moonshotai/Kimi-K2.6
       api_base: https://api.synthetic.new/anthropic
       api_key: os.environ/SYNTHETIC_API_KEY
   - model_name: claude-sonnet-*
@@ -44,7 +44,7 @@ model_list:
       api_base: https://api.synthetic.new/anthropic
       api_key: os.environ/SYNTHETIC_API_KEY
 
-  # synthetic/hf:moonshotai/Kimi-K2.5 -> anthropic/hf:moonshotai/Kimi-K2.5
+  # synthetic/hf:moonshotai/Kimi-K2.6 -> anthropic/hf:moonshotai/Kimi-K2.6
   - model_name: "synthetic/*"
     litellm_params:
       model: "anthropic/*"
@@ -69,17 +69,4 @@ model_list:
       model: openai/glm-5.1
       api_base: https://api.z.ai/api/coding/paas/v4
       api_key: os.environ/ZAI_API_KEY
-      drop_params: true
-
-  - model_name: kimi-k2.5
-    litellm_params:
-      model: openai/hf:moonshotai/Kimi-K2.5
-      api_base: https://api.synthetic.new/v1
-      api_key: os.environ/SYNTHETIC_API_KEY
-      drop_params: true
-  - model_name: kimi-k2.5
-    litellm_params:
-      model: openai/accounts/fireworks/routers/kimi-k2p5-turbo
-      api_base: https://api.fireworks.ai/inference/v1
-      api_key: os.environ/FIREWORKS_API_KEY
       drop_params: true

@@ -7,12 +7,12 @@
   "quietStartup": true,
   "enabledModels": [
     "synthetic/hf:zai-org/GLM-5.1",
+    "synthetic/hf:moonshotai/Kimi-K2.6",
     "openai-codex/gpt-5.5",
-    "neuralwatt/moonshotai/Kimi-K2.6",
     "github-copilot/gpt-5.4",
-    "neuralwatt/zai-org/GLM-5.1-FP8",
     "zai/glm-5.1",
-    "synthetic/hf:moonshotai/Kimi-K2.5"
+    "neuralwatt/zai-org/GLM-5.1-FP8",
+    "neuralwatt/moonshotai/Kimi-K2.6"
   ],
   "packages": [
     "npm:pi-vim",
