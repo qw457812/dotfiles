@@ -79,12 +79,13 @@ const createFocusTracker = (): FocusTracker => {
 		}
 
 		process.stdout.write(FOCUS_ENABLE);
-		offTerminalInput = ui.onTerminalInput((data) => {
+		offTerminalInput = ui.onTerminalInput((data: string) => {
 			if (data === FOCUS_IN) {
 				focused = true;
 			} else if (data === FOCUS_OUT) {
 				focused = false;
 			}
+			return {};
 		});
 	};
 

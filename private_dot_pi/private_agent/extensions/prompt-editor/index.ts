@@ -58,18 +58,24 @@ export default async function (pi: ExtensionAPI) {
 
   type Mode = "insert" | "normal";
 
+  type ModeColorizers = {
+    insert: (s: string) => string;
+    normal: (s: string) => string;
+  };
+
   type ThinkingTheme = {
     getThinkingBorderColor?: (level: string) => ((s: string) => string) | undefined;
     fg: (color: string, text: string) => string;
   };
 
-  type ModalEditorInstance = InstanceType<typeof ModalEditor> & {
+  type ModalEditorRuntime = {
+    getMode: () => Mode;
     getModeLabel?: () => string;
-    labelColorizers?: {
-      insert: (s: string) => string;
-      normal: (s: string) => string;
-    } | null;
+    labelColorizers?: ModeColorizers | null;
     borderColor?: (s: string) => string;
+    addToHistory?: (text: string) => void;
+    history?: string[];
+    historyIndex?: number;
   };
 
   function findBottomBorderIndex(lines: string[]): number {
@@ -82,7 +88,7 @@ export default async function (pi: ExtensionAPI) {
 
   // Related upstream logic:
   // - https://github.com/lajarre/pi-vim/blob/3eaa60ab3ca1dfca4c3ce3661d24d8327b747842/index.ts#L2218-L2259 (ModalEditor.render + getModeLabel)
-  function getRenderedModeLabel(editor: ModalEditorInstance): {
+  function getRenderedModeLabel(editor: ModalEditorRuntime): {
     raw: string;
     rendered: string;
   } {
@@ -101,10 +107,7 @@ export default async function (pi: ExtensionAPI) {
   }
 
   function getRenderedPrefix(
-    colorizers: {
-      insert: (s: string) => string;
-      normal: (s: string) => string;
-    } | null,
+    colorizers: ModeColorizers | null,
     mode: Mode,
     prefix: string,
   ): string {
@@ -118,7 +121,7 @@ export default async function (pi: ExtensionAPI) {
   }
 
   function applyThinkingBorderColor(
-    editor: ModalEditorInstance,
+    editor: ModalEditorRuntime,
     theme: ThinkingTheme | undefined,
   ): void {
     const borderColor = theme?.getThinkingBorderColor?.(pi.getThinkingLevel());
@@ -134,23 +137,14 @@ export default async function (pi: ExtensionAPI) {
   };
 
   class PromptEditor extends ModalEditor {
-    private readonly prefixColorizers: {
-      insert: (s: string) => string;
-      normal: (s: string) => string;
-    } | null;
+    private readonly prefixColorizers: ModeColorizers | null;
 
     constructor(
       tui: any,
       theme: any,
       kb: any,
-      labelColorizers: {
-        insert: (s: string) => string;
-        normal: (s: string) => string;
-      } | null,
-      prefixColorizers: {
-        insert: (s: string) => string;
-        normal: (s: string) => string;
-      } | null,
+      labelColorizers: ModeColorizers | null,
+      prefixColorizers: ModeColorizers | null,
     ) {
       super(tui, theme, kb, labelColorizers);
       this.prefixColorizers = prefixColorizers;
@@ -206,7 +200,7 @@ export default async function (pi: ExtensionAPI) {
       const prefix = mode === "insert" ? INSERT_PREFIX : NORMAL_PREFIX;
       const renderedPrefix = getRenderedPrefix(this.prefixColorizers, mode, prefix);
       const { raw: rawLabel, rendered: renderedLabel } = getRenderedModeLabel(
-        this as ModalEditorInstance,
+        this as unknown as ModalEditorRuntime,
       );
       const labelWidth = visibleWidth(rawLabel);
 
@@ -267,21 +261,16 @@ export default async function (pi: ExtensionAPI) {
       // editor, then replace it with our prompt-editor subclass. interactive-mode
       // also copies borderColor from defaultEditor during the swap, so we
       // re-apply the thinking-level border color below.
-      let editor: ModalEditorInstance | undefined;
+      let editor: ModalEditorRuntime | undefined;
 
       applyPromptHistory(
         ctx,
         (history) => {
           ctx.ui.setEditorComponent((tui, editorTheme, kb) => {
-            editor = new PromptEditor(
-              tui,
-              editorTheme,
-              kb,
-              colorizers,
-              prefixColorizers,
-            ) as ModalEditorInstance;
+            const newEditor = new PromptEditor(tui, editorTheme, kb, colorizers, prefixColorizers);
+            editor = newEditor as unknown as ModalEditorRuntime;
             hydratePromptHistory(editor, history);
-            return editor;
+            return newEditor;
           });
 
           if (editor) {
