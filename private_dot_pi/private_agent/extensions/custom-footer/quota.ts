@@ -71,6 +71,13 @@ interface ZaiQuota {
   };
 }
 
+interface DeepSeekQuota {
+  balance_infos: Array<{
+    currency: "CNY" | "USD";
+    total_balance: string;
+  }>;
+}
+
 interface CachedValue<T> {
   value: T;
   updatedAt: number;
@@ -341,6 +348,25 @@ const sources: Record<string, Source> = {
         }
       }
       return joinParts([...tokens, ...mcp]);
+    },
+  }),
+  deepseek: createSource("deepseek", {
+    cacheTtlMs: MINUTE_MS,
+    async getAuth(): Promise<string | null> {
+      return process.env.DEEPSEEK_API_KEY || null;
+    },
+    async fetch(apiKey: string): Promise<DeepSeekQuota | null> {
+      return fetchJson<DeepSeekQuota>("https://api.deepseek.com/user/balance", apiKey);
+    },
+    format(quota: DeepSeekQuota, theme: Theme): string | null {
+      return joinParts(
+        quota.balance_infos
+          .filter((b) => parseFloat(b.total_balance) > 0)
+          .map((b) => {
+            const symbol = b.currency === "CNY" ? "¥" : "$";
+            return `${theme.fg("accent", `${symbol}${parseFloat(b.total_balance).toFixed(2)}`)}`;
+          }),
+      );
     },
   }),
 };

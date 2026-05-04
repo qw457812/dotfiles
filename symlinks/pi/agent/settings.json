@@ -11,6 +11,7 @@
     "openai-codex/gpt-5.5",
     "github-copilot/gpt-5.4",
     "zai/glm-5.1",
+    "deepseek/deepseek-v4-pro",
     "neuralwatt/zai-org/GLM-5.1-FP8",
     "neuralwatt/moonshotai/Kimi-K2.6"
   ],
