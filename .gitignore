@@ -1,0 +1,3 @@
+private_dot_pi/private_agent/node_modules
+private_dot_pi/private_agent/extensions/*/node_modules
+private_dot_pi/private_agent/extensions/prompt-editor/pi-vim.generated.ts
