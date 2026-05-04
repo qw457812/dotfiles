@@ -16,6 +16,7 @@ const INSERT_PREFIX = "❯ ";
 const NORMAL_PREFIX = "❮ ";
 const CONTINUATION_PREFIX = "  ";
 const PREFIX_WIDTH = visibleWidth(INSERT_PREFIX);
+const ANSI_COLOR_RE = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, "g");
 const EXTENSION_DIR =
   typeof __dirname === "string" ? __dirname : dirname(fileURLToPath(import.meta.url));
 // pi's extension loader can evaluate TS via jiti, but importing pi-vim directly
@@ -80,7 +81,7 @@ export default async function (pi: ExtensionAPI) {
 
   function findBottomBorderIndex(lines: string[]): number {
     for (let i = lines.length - 1; i >= 0; i--) {
-      const stripped = lines[i]!.replace(/\x1b\[[0-9;]*m/g, "");
+      const stripped = lines[i]!.replace(ANSI_COLOR_RE, "");
       if (stripped.startsWith("─")) return i;
     }
     return -1;
