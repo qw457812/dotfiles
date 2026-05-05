@@ -37,7 +37,7 @@ export default function (pi: ExtensionAPI) {
   let enabled = true;
   let sessionStart = Date.now();
   const tpsTracker = createTpsTracker();
-  const isTermux = Boolean(process.env.TERMUX_VERSION);
+  // const isTermux = Boolean(process.env.TERMUX_VERSION);
 
   function formatElapsed(ms: number): string {
     const s = Math.floor(ms / 1000);
@@ -117,8 +117,8 @@ export default function (pi: ExtensionAPI) {
           const statsParts = [];
           if (totalInput) statsParts.push(`↑${formatTokens(totalInput)}`);
           if (totalOutput) statsParts.push(`↓${formatTokens(totalOutput)}`);
-          if (totalCacheRead && !isTermux) statsParts.push(`R${formatTokens(totalCacheRead)}`);
-          if (totalCacheWrite && !isTermux) statsParts.push(`W${formatTokens(totalCacheWrite)}`);
+          if (totalCacheRead) statsParts.push(`R${formatTokens(totalCacheRead)}`);
+          if (totalCacheWrite) statsParts.push(`W${formatTokens(totalCacheWrite)}`);
 
           // Cost (without "(sub)" indicator - not accessible from extension)
           if (totalCost) {

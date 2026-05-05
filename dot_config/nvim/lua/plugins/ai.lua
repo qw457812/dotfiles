@@ -49,6 +49,16 @@ return {
         ["<leader>ai"] = "pi",
         ["<leader>ag"] = "claude_glm",
       }
+      local favourite_tool = "pi"
+      for i = 1, 5 do
+        local key, tool = "<leader>a" .. i, favourite_tool .. i
+        local desc = tool:gsub("_", " "):gsub("^%l", string.upper)
+        -- stylua: ignore
+        vim.list_extend(mappings, {
+          { key, function() U.ai.sidekick.cli.quick.show(tool) end, desc = desc },
+          { key, function() U.ai.sidekick.cli.quick.send(tool, { msg = "{this}" }) end, mode = "x", desc = desc },
+        })
+      end
       for key, tool in pairs(tools) do
         local desc = tool:gsub("_", " "):gsub("^%l", string.upper)
         -- stylua: ignore
@@ -123,14 +133,15 @@ return {
         end
       end
 
-      numbered_tools({ name = "claude" })
-      numbered_tools({ name = "codex" })
-      numbered_tools({ name = "opencode" })
+      numbered_tools({ name = "claude", count = 2 })
+      numbered_tools({ name = "codex", count = 2 })
+      numbered_tools({ name = "opencode", count = 2 })
       numbered_tools({ name = "pi" })
       numbered_tools({
         name = "claude_glm",
         base_tool = "claude",
         tool_opts = { env = vim.deepcopy(U.ai.claude.provider.plan.glm) },
+        count = 2,
       })
 
       require("sidekick").setup(opts)
@@ -201,7 +212,7 @@ return {
                 -- vim.b[buf].sidekick_cli = vim.b[buf].sidekick_cli or terminal.tool -- `vim.w.sidekick_cli` does not need this kind of fix, use that instead
                 vim.b[buf].user_lualine_filename = vim.b[buf].user_lualine_filename or terminal.tool.name
 
-                if terminal.tool.name:find("claude") then
+                if terminal.tool.name:find("^claude") then
                   vim.keymap.set("n", "J", function()
                     if vim.fn.search(vim.g.user_is_termux and "^● " or "^⏺ ", "W") == 0 then
                       LazyVim.warn("No more assistant messages", { title = "Sidekick" })
@@ -235,7 +246,7 @@ return {
                       end
                     end, { buffer = buf, desc = "Jump to previous user message (Sidekick)" })
                   end)
-                elseif terminal.tool.name:find("codex") then
+                elseif terminal.tool.name:find("^codex") then
                   -- TODO: duplicate code with claude
                   vim.keymap.set("n", "J", function()
                     if vim.fn.search("^• ", "W") == 0 then
@@ -267,6 +278,16 @@ return {
                         LazyVim.warn("No more user messages", { title = "Sidekick" })
                       end
                     end, { buffer = buf, desc = "Jump to previous user message (Sidekick)" })
+                  end)
+                elseif terminal.tool.name:find("^pi") then
+                  vim.schedule(function()
+                    if not vim.api.nvim_buf_is_valid(buf) then
+                      return
+                    end
+
+                    if vim.api.nvim_get_current_buf() == buf then
+                      vim.fn.search("❯ ", "Wb")
+                    end
                   end)
                 end
               end,
@@ -498,10 +519,10 @@ return {
             if not tool then
               return
             end
-            if tool.name:find("opencode") then
+            if tool.name:find("^opencode") then
               -- HACK: fix opencode render issue by showing then hiding line numbers
               vim.wo[win][0].number = true -- vim.wo.number will be restored to the original value for some unknown reason
-            elseif tool.name:find("claude") then
+            elseif tool.name:find("^claude") then
               -- local session_id = assert(vim.w[win].sidekick_session_id)
               -- local terminal = assert(Terminal.get(session_id))
               -- -- HACK: fix claude render issue by ctrl-o twice
@@ -544,7 +565,7 @@ return {
           local session_id = assert(vim.w[win].sidekick_session_id)
           local terminal = assert(Terminal.get(session_id))
           -- TODO: claude code without mux enabled also needs keymaps created here
-          if not tool.name:find("opencode") then
+          if not tool.name:find("^opencode") then
             return
           end
 
@@ -898,6 +919,12 @@ return {
       {
         "monotykamary/pi-neuralwatt-provider",
         build = "pi update --extension git:github.com/monotykamary/pi-neuralwatt-provider",
+        lazy = true,
+        config = function() end,
+      },
+      {
+        "monotykamary/pi-wafer-provider",
+        build = "pi update --extension git:github.com/monotykamary/pi-wafer-provider",
         lazy = true,
         config = function() end,
       },

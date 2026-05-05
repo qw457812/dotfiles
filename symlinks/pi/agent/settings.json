@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.72.1",
+  "lastChangelogVersion": "0.73.0",
   "defaultProvider": "synthetic",
   "defaultModel": "hf:zai-org/GLM-5.1",
   "defaultThinkingLevel": "high",
@@ -53,6 +53,7 @@
     "npm:pi-mcp-adapter",
     "npm:pi-rewind",
     "git:github.com/monotykamary/pi-tps",
-    "git:github.com/monotykamary/pi-neuralwatt-provider"
+    "git:github.com/monotykamary/pi-neuralwatt-provider",
+    "git:github.com/monotykamary/pi-wafer-provider"
   ]
 }
