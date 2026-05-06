@@ -133,7 +133,7 @@ function deepMerge(base: SandboxConfig, overrides: Partial<SandboxConfig>): Sand
 
 function createSandboxedBashOps(): BashOperations {
 	return {
-		async exec(command, cwd, { onData, signal, timeout }) {
+		async exec(command, cwd, { onData, signal, timeout, env }) {
 			if (!existsSync(cwd)) {
 				throw new Error(`Working directory does not exist: ${cwd}`);
 			}
@@ -144,6 +144,7 @@ function createSandboxedBashOps(): BashOperations {
 				const child = spawn("bash", ["-c", wrappedCommand], {
 					cwd,
 					detached: true,
+					env,
 					stdio: ["ignore", "pipe", "pipe"],
 				});
 
