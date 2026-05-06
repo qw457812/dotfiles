@@ -78,8 +78,24 @@ function buildTurnMetrics(turn: TurnTiming): TurnMetrics | null {
 	};
 }
 
+function formatDecimal(n: number, digits: number): string {
+	return n.toFixed(digits).replace(/\.?0+$/, "");
+}
+
 function formatDuration(ms: number): string {
-	return `${(ms / 1000).toFixed(1)}s`;
+	const s = ms / 1000;
+	if (s < 60) return `${formatDecimal(s, 1)}s`;
+	const m = Math.floor(s / 60);
+	const rs = Math.floor(s % 60);
+	return `${m}m${rs}s`;
+}
+
+function formatTokens(count: number): string {
+	if (count < 1000) return count.toString();
+	if (count < 10000) return `${formatDecimal(count / 1000, 1)}k`;
+	if (count < 1000000) return `${Math.round(count / 1000)}k`;
+	if (count < 10000000) return `${formatDecimal(count / 1000000, 1)}M`;
+	return `${Math.round(count / 1000000)}M`;
 }
 
 export default function (pi: ExtensionAPI) {
@@ -177,19 +193,22 @@ export default function (pi: ExtensionAPI) {
 		turnMetrics = [];
 		if (output <= 0 || totalGenerationMs <= 0) return;
 
-		const tokensPerSecond = output / (totalGenerationMs / 1000);
 		const parts = [
-			`TPS ${tokensPerSecond.toFixed(1)} tok/s`,
+			`${turnCount} ${turnCount === 1 ? "turn" : "turns"}`,
+			`TPS ${formatDecimal(output / (totalGenerationMs / 1000), 1)}`,
 			...(ttftCount > 0 ? [`TTFT ${formatDuration(totalTtftMs / ttftCount)}`] : []),
-			`out ${output.toLocaleString()}`,
-			`in ${input.toLocaleString()}`,
-			`cache r/w ${cacheRead.toLocaleString()}/${cacheWrite.toLocaleString()}`,
-			`total ${totalTokens.toLocaleString()}`,
-			`${turnCount} turn(s)`,
-			`gen ${formatDuration(totalGenerationMs)}`,
-			`wall ${formatDuration(agentElapsedMs)}`,
+			`Gen ${formatDuration(totalGenerationMs)}/${formatDuration(agentElapsedMs)}`,
+			[
+				`↑${formatTokens(input)}`,
+				`↓${formatTokens(output)}`,
+				cacheRead > 0 ? `R${formatTokens(cacheRead)}` : "",
+				cacheWrite > 0 ? `W${formatTokens(cacheWrite)}` : "",
+				`Σ${formatTokens(totalTokens)}`,
+			]
+				.filter(Boolean)
+				.join(" "),
 		];
-		ctx.ui.notify(parts.join(", "), "info");
+		ctx.ui.notify(parts.join(" · "), "info");
 		turnCount = 0;
 	});
 }
