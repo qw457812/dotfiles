@@ -1,2 +1,12 @@
 node_modules
 extensions/*/node_modules
+
+/sessions
+/auth.json
+/pi-crash.log
+
+# https://github.com/nicobailon/pi-mcp-adapter
+/mcp-cache.json
+
+# https://github.com/monotykamary/pi-neuralwatt-provider
+/cache

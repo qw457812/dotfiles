@@ -81,10 +81,10 @@ abbr dl "cd ~/Downloads"
 # abbr vi nvim
 abbr v nvim
 abbr v! "nvim -u NONE"
-abbr minimax "NVIM_APPNAME=nvim-minimax nvim"
+# abbr minimax "NVIM_APPNAME=nvim-minimax nvim"
 alias vimpager 'nvim - --cmd "lua vim.g.pager = true" -c "lua require(\'util.terminal\').colorize()"'
 alias cat 'bat --paging=never'
-abbr -a --position anywhere --set-cursor -- -h "% -h 2>&1 | bat --plain --language=help"
+# abbr -a --position anywhere --set-cursor -- -h "% -h 2>&1 | bat --plain --language=help"
 abbr -a --position anywhere --set-cursor L "% | bat --style=plain --paging=always"
 abbr -a --position anywhere --set-cursor LL "% 2>&1 | bat --style=plain --paging=always"
 abbr -a --position anywhere --set-cursor V '% | vimpager'
@@ -276,6 +276,11 @@ abbr npmog 'npm outdated -g'
 abbr npmlg 'npm list --global --depth 0'
 
 # AI
+if type -q pi
+    abbr pic "pi --continue"
+    abbr pir "pi --resume"
+    abbr pit "pi --no-context-files --no-session"
+end
 if type -q claude
     # claude mcp add -s user context7 -- npx -y @upstash/context7-mcp --api-key $CONTEXT7_API_KEY
     # claude mcp add -s user --transport http context7 https://mcp.context7.com/mcp --header "CONTEXT7_API_KEY: $CONTEXT7_API_KEY"
@@ -288,9 +293,7 @@ if type -q claude
     abbr cl claude
     abbr clt claude_temp
     abbr clc "claude --continue"
-    abbr clcf "claude --continue --fork-session"
     abbr clr "claude --resume"
-    abbr clrf "claude --resume --fork-session"
     abbr clh "claude --model haiku"
     abbr cls "claude --model sonnet"
     abbr clo "claude --model opus"
@@ -353,7 +356,7 @@ abbr mk make
 
 if set -q TERMUX_VERSION
     # for uv
-    set -gx ANDROID_API_LEVEL (getprop ro.build.version.sdk)
+    set -gx ANDROID_API_LEVEL (command getprop ro.build.version.sdk)
 
     alias pkgbackup 'pkg list-installed >(chezmoi source-path)/backup/termux-packages 2>/dev/null'
     abbr pkgu 'pkg update && pkg upgrade && pkgbackup'
