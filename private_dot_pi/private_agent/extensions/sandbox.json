@@ -1,5 +1,36 @@
 {
+  "network": {
+    "allowedDomains": [
+      "npmjs.org",
+      "*.npmjs.org",
+      "registry.npmjs.org",
+      "registry.yarnpkg.com",
+      "pypi.org",
+      "*.pypi.org",
+      "rubygems.org",
+      "*.rubygems.org",
+      "github.com",
+      "*.github.com",
+      "api.github.com",
+      "raw.githubusercontent.com",
+      "bun.sh",
+      "*.bun.sh",
+      "*.googleapis.com",
+      "*.google.com",
+      "*.anthropic.com",
+      "*.openai.com"
+    ]
+  },
   "filesystem": {
-    "allowWrite": [".", "/tmp", "/private/tmp", "~/.cache"]
+    "denyRead": ["~/.ssh", "~/.aws", "~/.gnupg", "~/.config/gh"],
+    "allowWrite": [
+      ".",
+      "/tmp",
+      "/private/tmp",
+      "/var/folders",
+      "/private/var/folders",
+      "~/.bun",
+      "~/.cache"
+    ]
   }
 }

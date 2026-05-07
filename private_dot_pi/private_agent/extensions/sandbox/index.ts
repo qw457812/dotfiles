@@ -1,4 +1,6 @@
-// Copied from: https://github.com/badlogic/pi-mono/blob/82ecc1300f1649388c346568c7a1b7978ec610d3/packages/coding-agent/examples/extensions/sandbox/index.ts
+// Ref:
+// - https://github.com/badlogic/pi-mono/blob/82ecc1300f1649388c346568c7a1b7978ec610d3/packages/coding-agent/examples/extensions/sandbox/index.ts
+// - https://github.com/dannote/dot-pi/blob/a8f7711ddcf7ca8f2addfe1cf84c77b56a62987a/extensions/sandbox/index.ts
 
 /**
  * Sandbox Extension - OS-level sandboxing for bash commands
@@ -46,8 +48,12 @@
 import { spawn } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { SandboxManager, type SandboxRuntimeConfig } from "@anthropic-ai/sandbox-runtime";
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import {
+	SandboxManager,
+	type SandboxAskCallback,
+	type SandboxRuntimeConfig,
+} from "@anthropic-ai/sandbox-runtime";
+import type { ExtensionAPI, ExtensionContext } from "@mariozechner/pi-coding-agent";
 import { type BashOperations, createBashTool, getAgentDir } from "@mariozechner/pi-coding-agent";
 
 interface SandboxConfig extends SandboxRuntimeConfig {
@@ -201,6 +207,45 @@ function createSandboxedBashOps(): BashOperations {
 	};
 }
 
+// Track allowed domains for this session (user approved)
+const sessionAllowedDomains = new Set<string>();
+
+// Create the ask callback that prompts user for network permission
+function createAskCallback(ctx: ExtensionContext): SandboxAskCallback {
+	return async ({ host, port }) => {
+		const target = port ? `${host}:${port}` : host;
+
+		// Check if already approved this session
+		if (sessionAllowedDomains.has(host) || sessionAllowedDomains.has(target)) {
+			return true;
+		}
+
+		if (!ctx.hasUI) {
+			return false;
+		}
+
+		// Known issues:
+		// 1. Pending approvals still consume wall-clock timeouts, including bash tool
+		//    timeout and `curl --connect-timeout`.
+		// 2. Without a request-scoped signal, the dialog can outlive the originating
+		//    command.
+		try {
+			const allowed = await ctx.ui.confirm("Network Access", `Allow connection to ${target}?`);
+
+			if (allowed) {
+				sessionAllowedDomains.add(host);
+				ctx.ui.notify(`Allowed: ${target}`, "info");
+			} else {
+				ctx.ui.notify(`Blocked: ${target}`, "warning");
+			}
+
+			return allowed;
+		} catch {
+			return false;
+		}
+	};
+}
+
 export default function (pi: ExtensionAPI) {
 	pi.registerFlag("no-sandbox", {
 		description: "Disable OS-level sandboxing for bash commands",
@@ -264,12 +309,18 @@ export default function (pi: ExtensionAPI) {
 				enableWeakerNestedSandbox?: boolean;
 			};
 
-			await SandboxManager.initialize({
-				network: config.network,
-				filesystem: config.filesystem,
-				ignoreViolations: configExt.ignoreViolations,
-				enableWeakerNestedSandbox: configExt.enableWeakerNestedSandbox,
-			});
+			// Create ask callback for network permission prompts
+			const askCallback = createAskCallback(ctx);
+
+			await SandboxManager.initialize(
+				{
+					network: config.network,
+					filesystem: config.filesystem,
+					ignoreViolations: configExt.ignoreViolations,
+					enableWeakerNestedSandbox: configExt.enableWeakerNestedSandbox,
+				},
+				askCallback,
+			);
 
 			sandboxEnabled = true;
 			sandboxInitialized = true;
@@ -295,6 +346,9 @@ export default function (pi: ExtensionAPI) {
 				// Ignore cleanup errors
 			}
 		}
+
+		// Clear session state
+		sessionAllowedDomains.clear();
 	});
 
 	pi.registerCommand("sandbox", {
@@ -312,6 +366,7 @@ export default function (pi: ExtensionAPI) {
 				"Network:",
 				`  Allowed: ${config.network?.allowedDomains?.join(", ") || "(none)"}`,
 				`  Denied: ${config.network?.deniedDomains?.join(", ") || "(none)"}`,
+				`  Session approved: ${Array.from(sessionAllowedDomains).join(", ") || "(none)"}`,
 				"",
 				"Filesystem:",
 				`  Deny Read: ${config.filesystem?.denyRead?.join(", ") || "(none)"}`,
