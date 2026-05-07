@@ -22,7 +22,7 @@ export default function (pi: ExtensionAPI) {
   //     return { block: true, reason: `Git ${subcommand} requires user confirmation` };
   //   }
   //
-  //   pi.events.emit("my:notification", { title: "Pi Git Approval Needed", body: command });
+  //   pi.events.emit("my:notification", { title: "Pi Git Approval", body: command });
   //   const ok = await ctx.ui.confirm(`🔐 Allow git ${subcommand}?`, command);
   //   if (!ok) {
   //     ctx.abort();

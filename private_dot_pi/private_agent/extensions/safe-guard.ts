@@ -27,7 +27,7 @@ export default function (pi: ExtensionAPI) {
     //   const cmd = (event.input as { command?: string }).command ?? "";
     //   const match = DANGEROUS_PATTERNS.find((p) => p.test(cmd));
     //   if (match && ctx.hasUI) {
-    //     pi.events.emit("my:notification", { title: "Pi Danger Approval Needed", body: cmd });
+    //     pi.events.emit("my:notification", { title: "Pi Danger Approval", body: cmd });
     //     const ok = await ctx.ui.confirm("⚠️ Dangerous Command", `Execute: ${cmd}?`);
     //     if (!ok) {
     //       ctx.abort();
@@ -42,7 +42,7 @@ export default function (pi: ExtensionAPI) {
       const hit = PROTECTED_PATHS.find((p) => path.includes(p));
       if (hit) {
         if (ctx.hasUI) {
-          pi.events.emit("my:notification", { title: "Pi Path Approval Needed", body: path });
+          pi.events.emit("my:notification", { title: "Pi Path Approval", body: path });
           const ok = await ctx.ui.confirm("🛡️ Protected Path", `Allow write to ${path}?`);
           if (!ok) {
             ctx.abort();

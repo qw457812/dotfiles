@@ -10,11 +10,35 @@
  *
  * Supported terminals: Ghostty, iTerm2, WezTerm, rxvt-unicode
  * Not supported: Kitty (uses OSC 99), Terminal.app, Windows Terminal, Alacritty
+ *
+ * Note: inside Neovim's `:terminal`, OSC 99/777 are intercepted by Nvim and won't
+ * reach the host terminal unless they are forwarded via `TermRequest` + `nvim_ui_send()`.
  */
 
 import type { ExtensionAPI, ExtensionUIContext } from "@mariozechner/pi-coding-agent";
 import { Markdown, type MarkdownTheme } from "@mariozechner/pi-tui";
 import { spawn } from "node:child_process";
+
+// requires `set -g allow-passthrough on` in tmux config
+const wrapForTmux = (seq: string): string => {
+	return process.env.TMUX ? `\x1bPtmux;${seq.replace(/\x1b/g, "\x1b\x1b")}\x1b\\` : seq;
+};
+
+const notifyOSC99 = (title: string, body: string): void => {
+	const encode = (value: string): string => Buffer.from(value, "utf8").toString("base64");
+
+	// Kitty OSC 99: i=notification id, d=0 means not done yet, p=body for second part, e=1 means base64 payload
+	process.stdout.write(wrapForTmux(`\x1b]99;i=1:d=0:e=1;${encode(title)}\x1b\\`));
+	process.stdout.write(wrapForTmux(`\x1b]99;i=1:p=body:e=1;${encode(body)}\x1b\\`));
+};
+
+const notifyOSC777 = (title: string, body: string): void => {
+	const sanitize = (value: string): string => value.replace(/[\x00-\x1f\x7f\u0080-\u009f;]/g, " ").trim();
+
+	// OSC 777 format: ESC ] 777 ; notify ; title ; body BEL
+	// https://terminfo.dev/extensions/osc-777-notify
+	process.stdout.write(wrapForTmux(`\x1b]777;notify;${sanitize(title)};${sanitize(body)}\x07`));
+};
 
 /**
  * Send a desktop notification via OSC 777 escape sequence.
@@ -34,12 +58,9 @@ end run`;
 		proc.once("error", () => {});
 		proc.unref();
 	} else if (process.env.KITTY_WINDOW_ID) {
-		// Kitty OSC 99: i=notification id, d=0 means not done yet, p=body for second part
-		process.stdout.write(`\x1b]99;i=1:d=0;${title}\x1b\\`);
-		process.stdout.write(`\x1b]99;i=1:p=body;${body}\x1b\\`);
+		notifyOSC99(title, body);
 	} else {
-		// OSC 777 format: ESC ] 777 ; notify ; title ; body BEL
-		process.stdout.write(`\x1b]777;notify;${title};${body}\x07`);
+		notifyOSC777(title, body);
 	}
 };
 

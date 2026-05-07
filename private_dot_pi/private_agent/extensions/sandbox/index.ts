@@ -211,7 +211,7 @@ function createSandboxedBashOps(): BashOperations {
 const sessionAllowedDomains = new Set<string>();
 
 // Create the ask callback that prompts user for network permission
-function createAskCallback(ctx: ExtensionContext): SandboxAskCallback {
+function createAskCallback(pi: ExtensionAPI, ctx: ExtensionContext): SandboxAskCallback {
 	return async ({ host, port }) => {
 		const target = port ? `${host}:${port}` : host;
 
@@ -230,6 +230,7 @@ function createAskCallback(ctx: ExtensionContext): SandboxAskCallback {
 		// 2. Without a request-scoped signal, the dialog can outlive the originating
 		//    command.
 		try {
+			pi.events.emit("my:notification", { title: "Pi Sandbox Network Approval", body: `Allow connection to ${target}?` });
 			const allowed = await ctx.ui.confirm("Network Access", `Allow connection to ${target}?`);
 
 			if (allowed) {
@@ -310,7 +311,7 @@ export default function (pi: ExtensionAPI) {
 			};
 
 			// Create ask callback for network permission prompts
-			const askCallback = createAskCallback(ctx);
+			const askCallback = createAskCallback(pi, ctx);
 
 			await SandboxManager.initialize(
 				{

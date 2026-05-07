@@ -336,7 +336,6 @@ end
 #     abbr adc 'aider --model claude'
 #     abbr adp aider_copilot
 # end
-abbr tokscale "bunx tokscale@latest --light --today"
 alias synthetic_quota 'curl -s https://api.synthetic.new/v2/quotas -H "Authorization: Bearer $SYNTHETIC_API_KEY" | jq .'
 alias synthetic_models 'curl -s https://api.synthetic.new/openai/v1/models -H "Authorization: Bearer $SYNTHETIC_API_KEY" | jq \'.data[] | select(.provider == "synthetic")\''
 alias neuralwatt_quota 'curl https://api.neuralwatt.com/v1/quota -H "Authorization: Bearer $NEURALWATT_API_KEY" | jq .'
