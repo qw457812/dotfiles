@@ -1,5 +1,5 @@
-import type { AssistantMessage, AssistantMessageEvent } from "@mariozechner/pi-ai";
-import type { AgentEndEvent, ExtensionContext } from "@mariozechner/pi-coding-agent";
+import type { AssistantMessage, AssistantMessageEvent } from "@earendil-works/pi-ai";
+import type { AgentEndEvent, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { formatDecimal } from "./utils";
 
 interface Theme {

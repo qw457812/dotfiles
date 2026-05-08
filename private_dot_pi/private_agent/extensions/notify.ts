@@ -15,8 +15,8 @@
  * reach the host terminal unless they are forwarded via `TermRequest` + `nvim_ui_send()`.
  */
 
-import type { ExtensionAPI, ExtensionUIContext } from "@mariozechner/pi-coding-agent";
-import { Markdown, type MarkdownTheme } from "@mariozechner/pi-tui";
+import type { ExtensionAPI, ExtensionUIContext } from "@earendil-works/pi-coding-agent";
+import { Markdown, type MarkdownTheme } from "@earendil-works/pi-tui";
 import { spawn } from "node:child_process";
 
 // requires `set -g allow-passthrough on` in tmux config

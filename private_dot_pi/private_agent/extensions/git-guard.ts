@@ -5,7 +5,7 @@
  *
  * Combines mutating git command confirmation + dirty-repo-guard.
  */
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
 // const GUARDED_GIT_PATTERN = /\bgit(?:\s+-C\s+(?:"[^"]*"|'[^']*'|\S+))*\s+(?<subcommand>add|commit|push|pull|merge|rebase|reset|checkout|switch|stash|cherry-pick|revert|restore|clean)\b/;
 

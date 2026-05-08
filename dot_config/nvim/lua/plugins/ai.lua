@@ -860,10 +860,10 @@ return {
   -- https://github.com/carderne/pi-sandbox
   -- https://github.com/tuansondinh/pi-claude-sandbox
   {
-    "badlogic/pi-mono",
+    "earendil-works/pi",
     version = "*",
     lazy = true,
-    build = "npm install -g @mariozechner/pi-coding-agent", -- `pi update --self`
+    build = "pi update --self",
     config = function() end,
     specs = {
       {

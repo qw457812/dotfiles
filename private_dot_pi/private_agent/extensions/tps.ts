@@ -2,14 +2,14 @@
 // https://github.com/badlogic/pi-mono/blob/a26a9cfabd05ccf774045b3685e50d3605516cdb/.pi/extensions/tps.ts
 // https://github.com/monotykamary/pi-tps/blob/64472f2ccddc327e33ed604d69e94e152a659ac9/extensions/pi-tps/index.ts
 
-import type { AssistantMessage, AssistantMessageEvent } from "@mariozechner/pi-ai";
+import type { AssistantMessage, AssistantMessageEvent } from "@earendil-works/pi-ai";
 import type {
 	AgentEndEvent,
 	ExtensionAPI,
 	ExtensionContext,
 	TurnEndEvent,
 	TurnStartEvent,
-} from "@mariozechner/pi-coding-agent";
+} from "@earendil-works/pi-coding-agent";
 
 interface MessageUpdateEvent {
 	type: "message_update";

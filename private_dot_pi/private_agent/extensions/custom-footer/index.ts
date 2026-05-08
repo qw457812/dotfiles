@@ -26,9 +26,9 @@ import type {
   ExtensionAPI,
   ExtensionContext,
   ReadonlyFooterDataProvider,
-} from "@mariozechner/pi-coding-agent";
-import { VERSION } from "@mariozechner/pi-coding-agent";
-import { type TUI, truncateToWidth, visibleWidth } from "@mariozechner/pi-tui";
+} from "@earendil-works/pi-coding-agent";
+import { VERSION } from "@earendil-works/pi-coding-agent";
+import { type TUI, truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
 import { getQuota } from "./quota.js";
 import { createTpsTracker } from "./tps.js";
 import { formatDecimal } from "./utils.js";

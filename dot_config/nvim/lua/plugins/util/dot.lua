@@ -193,6 +193,8 @@ end tell]]
         pattern = {
           [".*/vscode/settings%.json"] = "jsonc",
           [".*/vscode/keybindings%.json"] = "jsonc",
+          [".*%.pi/agent/models%.json"] = "jsonc",
+          [".*private_dot_pi/private_agent/models%.json"] = "jsonc",
         },
       })
 

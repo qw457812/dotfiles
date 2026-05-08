@@ -1,6 +1,6 @@
 // Ref: https://github.com/mitsuhiko/agent-stuff/blob/2b70e8d53647c1e0277bd54dbbb2519cb5bea92b/extensions/prompt-editor.ts
 
-import type { ExtensionContext } from "@mariozechner/pi-coding-agent";
+import type { ExtensionContext } from "@earendil-works/pi-coding-agent";
 import type { Dirent } from "node:fs";
 import fs from "node:fs/promises";
 import os from "node:os";
