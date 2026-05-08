@@ -7,6 +7,7 @@
       "registry.yarnpkg.com",
       "pypi.org",
       "*.pypi.org",
+      "files.pythonhosted.org",
       "rubygems.org",
       "*.rubygems.org",
       "github.com",
@@ -22,7 +23,6 @@
     ]
   },
   "filesystem": {
-    "denyRead": ["~/.ssh", "~/.aws", "~/.gnupg", "~/.config/gh"],
     "allowWrite": [
       ".",
       "/tmp",

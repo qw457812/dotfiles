@@ -6,6 +6,100 @@ local copilot_available = not vim.g.user_is_termux or vim.fn.executable("copilot
 
 ---@type LazySpec
 return {
+  -- https://github.com/w-winter/dot314
+  -- https://github.com/default-anton/dotfiles/tree/master/pi
+  -- https://github.com/dannote/dot-pi
+  -- https://github.com/richardgill/nix/tree/main/out-of-store-config/ai-agents/pi/extensions
+  -- https://github.com/kaofelix/dotfiles/tree/main/pi/.pi/agent
+  -- https://github.com/aliou/pi-harness
+  --
+  -- https://github.com/tmustier/pi-extensions
+  -- https://github.com/knoopx/pi
+  -- https://github.com/rytswd/pi-agent-extensions
+  --
+  -- https://github.com/carderne/pi-sandbox
+  -- https://github.com/tuansondinh/pi-claude-sandbox
+  {
+    "earendil-works/pi",
+    version = "*",
+    lazy = true,
+    build = "pi update --self",
+    config = function() end,
+    specs = {
+      {
+        "mitsuhiko/agent-stuff",
+        name = "mitsuhiko-agent-stuff",
+        build = "pi update --extension git:github.com/mitsuhiko/agent-stuff",
+        lazy = true,
+        config = function() end,
+      },
+      {
+        "addyosmani/agent-skills",
+        name = "addyosmani-agent-skills",
+        build = "pi update --extension git:github.com/addyosmani/agent-skills",
+        lazy = true,
+        config = function() end,
+      },
+      {
+        "telagod/pi-agent-colony",
+        build = "pi update --extension git:github.com/telagod/pi-agent-colony",
+        lazy = true,
+        config = function() end,
+      },
+      {
+        "lajarre/pi-vim",
+        version = "*",
+        build = "pi update --extension npm:pi-vim",
+        lazy = true,
+        config = function() end,
+      },
+      {
+        "georgebashi/pi-caffeinate",
+        build = "pi update --extension npm:pi-caffeinate",
+        lazy = true,
+        config = function() end,
+      },
+      {
+        "aliou/pi-guardrails",
+        build = "pi update --extension npm:@aliou/pi-guardrails",
+        lazy = true,
+        config = function() end,
+      },
+      {
+        "nicobailon/pi-mcp-adapter",
+        version = "*",
+        build = "pi update --extension npm:pi-mcp-adapter",
+        lazy = true,
+        config = function() end,
+      },
+      {
+        "arpagon/pi-rewind",
+        version = "*",
+        build = "pi update --extension npm:pi-rewind",
+        lazy = true,
+        config = function() end,
+      },
+      {
+        "monotykamary/pi-tps",
+        build = "pi update --extension git:github.com/monotykamary/pi-tps",
+        lazy = true,
+        config = function() end,
+      },
+      {
+        "monotykamary/pi-neuralwatt-provider",
+        build = "pi update --extension git:github.com/monotykamary/pi-neuralwatt-provider",
+        lazy = true,
+        config = function() end,
+      },
+      {
+        "monotykamary/pi-wafer-provider",
+        build = "pi update --extension git:github.com/monotykamary/pi-wafer-provider",
+        lazy = true,
+        config = function() end,
+      },
+    },
+  },
+
   -- sidekick cli
   {
     "folke/sidekick.nvim",
@@ -411,6 +505,7 @@ return {
           pi = {
             env = {
               __AI_AGENT = "pi",
+              NVIM_FLATTEN_NEST = "1",
             },
             keys = {
               blur_t = false, -- pi uses <c-o> for its own functionality
@@ -684,7 +779,6 @@ return {
     end,
   },
 
-  -- TODO: duplicate code with shell-command-editor.lua
   {
     "LazyVim/LazyVim",
     opts = function()
@@ -845,106 +939,6 @@ return {
       end
     end,
   },
-
-  -- https://github.com/w-winter/dot314
-  -- https://github.com/default-anton/dotfiles/tree/master/pi
-  -- https://github.com/dannote/dot-pi
-  -- https://github.com/richardgill/nix/tree/main/out-of-store-config/ai-agents/pi/extensions
-  -- https://github.com/kaofelix/dotfiles/tree/main/pi/.pi/agent
-  -- https://github.com/aliou/pi-harness
-  --
-  -- https://github.com/tmustier/pi-extensions
-  -- https://github.com/knoopx/pi
-  -- https://github.com/rytswd/pi-agent-extensions
-  --
-  -- https://github.com/carderne/pi-sandbox
-  -- https://github.com/tuansondinh/pi-claude-sandbox
-  {
-    "earendil-works/pi",
-    version = "*",
-    lazy = true,
-    build = "pi update --self",
-    config = function() end,
-    specs = {
-      {
-        "mitsuhiko/agent-stuff",
-        build = "pi update --extension git:github.com/mitsuhiko/agent-stuff",
-        lazy = true,
-        config = function() end,
-      },
-      {
-        "telagod/pi-agent-colony",
-        build = "pi update --extension git:github.com/telagod/pi-agent-colony",
-        lazy = true,
-        config = function() end,
-      },
-      {
-        "lajarre/pi-vim",
-        version = "*",
-        build = "pi update --extension npm:pi-vim",
-        lazy = true,
-        config = function() end,
-      },
-      {
-        "georgebashi/pi-caffeinate",
-        build = "pi update --extension npm:pi-caffeinate",
-        lazy = true,
-        config = function() end,
-      },
-      {
-        "aliou/pi-guardrails",
-        build = "pi update --extension npm:@aliou/pi-guardrails",
-        lazy = true,
-        config = function() end,
-      },
-      {
-        "nicobailon/pi-mcp-adapter",
-        version = "*",
-        build = "pi update --extension npm:pi-mcp-adapter",
-        lazy = true,
-        config = function() end,
-      },
-      {
-        "arpagon/pi-rewind",
-        version = "*",
-        build = "pi update --extension npm:pi-rewind",
-        lazy = true,
-        config = function() end,
-      },
-      {
-        "monotykamary/pi-tps",
-        build = "pi update --extension git:github.com/monotykamary/pi-tps",
-        lazy = true,
-        config = function() end,
-      },
-      {
-        "monotykamary/pi-neuralwatt-provider",
-        build = "pi update --extension git:github.com/monotykamary/pi-neuralwatt-provider",
-        lazy = true,
-        config = function() end,
-      },
-      {
-        "monotykamary/pi-wafer-provider",
-        build = "pi update --extension git:github.com/monotykamary/pi-wafer-provider",
-        lazy = true,
-        config = function() end,
-      },
-    },
-  },
-  -- {
-  --   "openai/codex",
-  --   enabled = not vim.g.user_is_termux,
-  --   version = "*",
-  --   lazy = true,
-  --   config = function() end,
-  -- },
-  -- {
-  --   "anomalyco/opencode",
-  --   enabled = not vim.g.user_is_termux,
-  --   version = "*",
-  --   lazy = true,
-  --   config = function() end,
-  -- },
 
   -- ===========================================================================
   -- ALL LAZY SPECS BELOW ARE UNUSED

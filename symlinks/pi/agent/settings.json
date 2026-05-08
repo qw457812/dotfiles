@@ -35,6 +35,15 @@
       "themes": []
     },
     {
+      "source": "git:github.com/addyosmani/agent-skills",
+      "extensions": [],
+      "skills": [
+        "skills/code-simplification"
+      ],
+      "prompts": [],
+      "themes": []
+    },
+    {
       "source": "git:github.com/telagod/pi-agent-colony",
       "extensions": [],
       "skills": [
