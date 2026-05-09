@@ -73,13 +73,6 @@ return {
         config = function() end,
       },
       {
-        "arpagon/pi-rewind",
-        version = "*",
-        build = "pi update --extension npm:pi-rewind",
-        lazy = true,
-        config = function() end,
-      },
-      {
         "monotykamary/pi-tps",
         build = "pi update --extension git:github.com/monotykamary/pi-tps",
         lazy = true,

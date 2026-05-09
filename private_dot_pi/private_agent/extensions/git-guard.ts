@@ -1,15 +1,18 @@
 // Ref: https://github.com/telagod/oh-pi/blob/7e59d1bcbfe1af837494a65d759d047a6474b103/pi-package/extensions/git-guard.ts
 
 /**
- * Git Guard Extension
+ * Git Checkpoint Extension
  *
- * Combines mutating git command confirmation + dirty-repo-guard.
+ * Auto-stash before each turn.
+ * Combines git-checkpoint + dirty-repo-guard.
  */
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
 // const GUARDED_GIT_PATTERN = /\bgit(?:\s+-C\s+(?:"[^"]*"|'[^']*'|\S+))*\s+(?<subcommand>add|commit|push|pull|merge|rebase|reset|checkout|switch|stash|cherry-pick|revert|restore|clean)\b/;
 
 export default function (pi: ExtensionAPI) {
+  let turnCount = 0;
+
   // Using the `permissionGate` feature from `npm:@aliou/pi-guardrails` instead
   // pi.on("tool_call", async (event, ctx) => {
   //   if (event.toolName !== "bash") return;
@@ -39,5 +42,17 @@ export default function (pi: ExtensionAPI) {
         ctx.ui.notify(`⚠️ Dirty repo: ${lines} uncommitted change(s)`, "warning");
       }
     } catch { /* not a git repo, ignore */ }
+  });
+
+  // Stash checkpoint before each turn
+  pi.on("turn_start", async () => {
+    turnCount++;
+    try {
+      await pi.exec("git", ["stash", "create", "-m", `pi-turn-${turnCount}`]);
+    } catch { /* not a git repo */ }
+  });
+
+  pi.on("agent_end", async () => {
+    turnCount = 0;
   });
 }
