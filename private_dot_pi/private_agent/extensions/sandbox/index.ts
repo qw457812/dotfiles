@@ -47,7 +47,7 @@
 
 import { spawn } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve, sep } from "node:path";
 import {
 	SandboxManager,
 	type SandboxAskCallback,
@@ -135,6 +135,71 @@ function deepMerge(base: SandboxConfig, overrides: Partial<SandboxConfig>): Sand
 	}
 
 	return result;
+}
+
+/**
+ * Ref: https://github.com/qw457812/claude-code-sourcemap/blob/a8a678cb6244e6770e1e421767ff0987a1d95549/restored-src/src/utils/sandbox/sandbox-adapter.ts#L416-L445
+ *
+ * Detect if cwd is a git worktree and resolve the main repo path.
+ * In a worktree, .git is a file (not a directory) containing "gitdir: ...".
+ * If .git is a directory, readFileSync throws and we return null.
+ */
+function detectWorktreeMainRepoPath(cwd: string): string | null {
+	const gitPath = join(cwd, ".git");
+	if (!existsSync(gitPath)) {
+		return null;
+	}
+
+	try {
+		const gitContent = readFileSync(gitPath, "utf-8");
+		const gitdirMatch = gitContent.match(/^gitdir:\s*(.+)$/m);
+		if (!gitdirMatch?.[1]) {
+			return null;
+		}
+
+		// gitdir may be relative (rare, but git accepts it) — resolve against cwd
+		const gitdir = resolve(cwd, gitdirMatch[1].trim());
+		// gitdir format: /path/to/main/repo/.git/worktrees/worktree-name
+		// Match the /.git/worktrees/ segment specifically — indexOf('.git') alone
+		// would false-match paths like /home/user/.github-projects/...
+		const marker = `${sep}.git${sep}worktrees${sep}`;
+		const markerIndex = gitdir.lastIndexOf(marker);
+		if (markerIndex <= 0) {
+			return null;
+		}
+
+		return gitdir.slice(0, markerIndex);
+	} catch {
+		// Not in a worktree, .git is a directory, or can't read .git file
+		return null;
+	}
+}
+
+function addAllowWritePath(config: SandboxConfig, path: string): SandboxConfig {
+	const allowWrite = new Set(config.filesystem?.allowWrite ?? []);
+	if (allowWrite.has(path)) {
+		return config;
+	}
+
+	allowWrite.add(path);
+	return {
+		...config,
+		filesystem: {
+			...config.filesystem,
+			allowWrite: Array.from(allowWrite),
+		},
+	};
+}
+
+function withWorktreeMainRepoGitWriteAccess(config: SandboxConfig, cwd: string): SandboxConfig {
+	const worktreeMainRepoPath = detectWorktreeMainRepoPath(cwd);
+	if (!worktreeMainRepoPath || worktreeMainRepoPath === cwd) {
+		return config;
+	}
+
+	// Git operations in a worktree need write access to the main repo's .git
+	// directory for index.lock etc.
+	return addAllowWritePath(config, join(worktreeMainRepoPath, ".git"));
 }
 
 function createSandboxedBashOps(): BashOperations {
@@ -289,7 +354,7 @@ export default function (pi: ExtensionAPI) {
 			return;
 		}
 
-		const config = loadConfig(ctx.cwd);
+		const config = withWorktreeMainRepoGitWriteAccess(loadConfig(ctx.cwd), ctx.cwd);
 
 		if (!config.enabled) {
 			sandboxEnabled = false;

@@ -92,6 +92,7 @@ return {
       },
     },
   },
+  { "qw457812/claude-code-sourcemap", lazy = true, config = function() end },
 
   -- sidekick cli
   {
