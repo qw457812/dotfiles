@@ -5,7 +5,7 @@
   },
   "mcpServers": {
     "exa": {
-      "url": "https://mcp.exa.ai/mcp",
+      "url": "https://mcp.exa.ai/mcp?tools=web_fetch_exa",
       "exposeResources": false
     }
   }
