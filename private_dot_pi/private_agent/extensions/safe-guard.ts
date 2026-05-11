@@ -6,8 +6,10 @@
  * Combines destructive command confirmation + protected paths in one extension.
  */
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import { homedir } from "node:os";
+import { join } from "node:path";
 
-// export const DANGEROUS_PATTERNS = [
+// const DANGEROUS_PATTERNS = [
 //   /\brm\s+(-[a-zA-Z]*f[a-zA-Z]*\s+|.*-rf\b|.*--force\b)/,
 //   /\bsudo\s+rm\b/,
 //   /\b(DROP|TRUNCATE|DELETE\s+FROM)\b/i,
@@ -17,7 +19,19 @@ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 //   />\s*\/dev\/sd[a-z]/,
 // ];
 
-export const PROTECTED_PATHS = [".env", ".git/", "node_modules/", ".pi/", "id_rsa", ".ssh/"];
+const HOME = homedir();
+
+function expandHome(p: string): string {
+  if (p === "~") return HOME;
+  if (p.startsWith("~/")) return join(HOME, p.slice(2));
+  return p;
+}
+
+const AGENT_DIR = process.env.PI_CODING_AGENT_DIR
+  ? expandHome(process.env.PI_CODING_AGENT_DIR)
+  : join(HOME, ".pi", "agent");
+
+const PROTECTED_PATHS = [".env", ".git/", "node_modules/", ".pi/", "id_rsa", ".ssh/"];
 
 export default function (pi: ExtensionAPI) {
   pi.on("tool_call", async (event, ctx) => {
@@ -39,7 +53,9 @@ export default function (pi: ExtensionAPI) {
     // Check write/edit for protected paths
     if (event.toolName === "write" || event.toolName === "edit") {
       const path = (event.input as { path?: string }).path ?? "";
-      const hit = PROTECTED_PATHS.find((p) => path.includes(p));
+      const guardedPaths =
+        ctx.cwd === AGENT_DIR ? PROTECTED_PATHS.filter((p) => p !== ".pi/") : PROTECTED_PATHS;
+      const hit = guardedPaths.find((p) => path.includes(p));
       if (hit) {
         if (ctx.hasUI) {
           pi.events.emit("my:notification", { title: "Pi Path Approval", body: path });

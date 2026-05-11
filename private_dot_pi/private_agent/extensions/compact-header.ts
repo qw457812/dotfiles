@@ -15,6 +15,8 @@ export default function (pi: ExtensionAPI) {
         const d = (s: string) => theme.fg("dim", s);
         const a = (s: string) => theme.fg("accent", s);
 
+        const home = process.env.HOME || process.env.USERPROFILE;
+        const cwd = home && ctx.cwd.startsWith(home) ? `~${ctx.cwd.slice(home.length)}` : ctx.cwd;
         const cmds = pi.getCommands();
         const prompts = cmds.filter(c => c.source === "prompt").map(c => `/${c.name}`).join("  ");
         const skills = cmds.filter(c => c.source === "skill").map(c => c.name).join("  ");
@@ -25,6 +27,7 @@ export default function (pi: ExtensionAPI) {
 
         const lines: string[] = [""];
 
+        lines.push(t(`${pad(d("cwd"), lk)}${a(cwd)}`));
         if (prompts) lines.push(t(`${pad(d("prompts"), lk)}${a(prompts)}`));
         if (skills) lines.push(t(`${pad(d("skills"), lk)}${a(skills)}`));
         lines.push(d("─".repeat(width)));

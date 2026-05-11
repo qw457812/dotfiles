@@ -221,7 +221,8 @@ function H.autocmd_chezmoi_add()
     group = vim.api.nvim_create_augroup("chezmoi_add_xdg_config", { clear = true }),
     pattern = {
       (vim.env.XDG_CONFIG_HOME or vim.env.HOME .. "/.config") .. "/*",
-      (vim.env.PI_CODING_AGENT_DIR or vim.env.HOME .. "/.pi/agent") .. "/*",
+      (vim.env.PI_CODING_AGENT_DIR and vim.fs.normalize(vim.env.PI_CODING_AGENT_DIR) or vim.env.HOME .. "/.pi/agent")
+        .. "/*",
     },
     desc = "chezmoi add for XDG_CONFIG_HOME and PI_CODING_AGENT_DIR",
     callback = function(event)
