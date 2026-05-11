@@ -1,6 +1,7 @@
 # https://github.com/sxyazi/yazi/blob/shipped/yazi-config/preset/theme-dark.toml
 # https://yazi-rs.github.io/docs/configuration/theme
-"$schema" = "https://yazi-rs.github.io/schemas/theme.json"
+
+#:schema https://yazi-rs.github.io/schemas/theme.json
 
 # # https://yazi-rs.github.io/docs/faq#dont-like-nerd-fonts
 # [status]
@@ -17,3 +18,14 @@
 # https://github.com/yazi-rs/flavors/tree/main/catppuccin-frappe.yazi
 [flavor]
 dark = "catppuccin-frappe"
+
+# https://github.com/yazi-rs/plugins/tree/main/git.yazi
+# https://github.com/yazi-rs/plugins/blob/1db18bb5a1c962f95873654a7af1202abb98da60/git.yazi/main.lua#L176-L183
+[git]
+# ignored = { fg = "gray" }
+ignored_sign = "I"
+untracked_sign = "?"
+modified_sign = "M"
+added_sign = "A"
+deleted_sign = "D"
+updated_sign = "U"

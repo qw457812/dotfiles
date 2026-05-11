@@ -13,16 +13,23 @@ require("session"):setup({
 require("folder-rules"):setup()
 -- https://github.com/yazi-rs/plugins/tree/main/full-border.yazi
 require("full-border"):setup()
--- https://github.com/yazi-rs/plugins/blob/05234ed15876ea80e1f4f05695e8e90c1fd5ab60/git.yazi/main.lua#L183-L188
+-- https://github.com/yazi-rs/plugins/tree/main/git.yazi
+-- TODO: remove th.git fallback once Termux ships yazi >= 26.5.6
+--  https://repology.org/project/yazi/versions (Termux: 26.1.22)
+--  git signs are now configured in theme.toml [git] section (yazi-rs/plugins@1db18bb)
 ---@diagnostic disable-next-line: inject-field
 th.git = th.git or {}
--- th.git.ignored = ui.Style():fg("gray")
-th.git.ignored_sign = "I"
-th.git.untracked_sign = "?"
-th.git.modified_sign = "M"
-th.git.added_sign = "A"
-th.git.deleted_sign = "D"
-th.git.updated_sign = "U"
+if not th.git.ignored_sign then
+  -- ya.notify({ title = "git", content = "using init.lua fallback", timeout = 3 })
+  th.git.ignored_sign = "I"
+  th.git.untracked_sign = "?"
+  th.git.modified_sign = "M"
+  th.git.added_sign = "A"
+  th.git.deleted_sign = "D"
+  th.git.updated_sign = "U"
+else
+  -- ya.notify({ title = "git", content = "using theme.toml [git] section", timeout = 3 })
+end
 require("git"):setup()
 -- -- https://github.com/llanosrocas/githead.yazi
 -- require("githead"):setup({
