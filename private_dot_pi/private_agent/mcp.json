@@ -3,10 +3,5 @@
     "directTools": true,
     "disableProxyTool": true
   },
-  "mcpServers": {
-    "exa": {
-      "url": "https://mcp.exa.ai/mcp?tools=web_fetch_exa",
-      "exposeResources": false
-    }
-  }
+  "mcpServers": {}
 }
