@@ -21,6 +21,7 @@ import { spawn } from "node:child_process";
 
 // requires `set -g allow-passthrough on` in tmux config
 const wrapForTmux = (seq: string): string => {
+	// oxlint-disable-next-line no-control-regex
 	return process.env.TMUX ? `\x1bPtmux;${seq.replace(/\x1b/g, "\x1b\x1b")}\x1b\\` : seq;
 };
 
@@ -33,6 +34,7 @@ const notifyOSC99 = (title: string, body: string): void => {
 };
 
 const notifyOSC777 = (title: string, body: string): void => {
+	// oxlint-disable-next-line no-control-regex
 	const sanitize = (value: string): string => value.replace(/[\x00-\x1f\x7f\u0080-\u009f;]/g, " ").trim();
 
 	// OSC 777 format: ESC ] 777 ; notify ; title ; body BEL

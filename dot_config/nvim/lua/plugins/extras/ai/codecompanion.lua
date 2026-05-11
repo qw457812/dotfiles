@@ -52,7 +52,7 @@ return {
         end,
         desc = "Floating",
       },
-      { "<leader>ani", "<cmd>CodeCompanion<CR>", desc = "Inline", mode = { "n", "x" } },
+      { "<leader>anI", "<cmd>CodeCompanion<CR>", desc = "Inline", mode = { "n", "x" } },
       { "<leader>ana", "<cmd>CodeCompanionActions<CR>", desc = "Actions", mode = { "n", "x" } },
       { "<leader>ann", "<cmd>CodeCompanionChat<CR>", desc = "New Chat", mode = { "n", "x" } },
       {
@@ -61,6 +61,7 @@ return {
         desc = "Claude Code ACP",
         mode = { "n", "x" },
       },
+      { "<leader>ani", "<cmd>CodeCompanionChat adapter=pi<CR>", desc = "Pi ACP", mode = { "n", "x" } },
       { "<leader>anp", "<cmd>CodeCompanionChat adapter=copilot<CR>", desc = "Copilot", mode = { "n", "x" } },
     },
     opts = {
@@ -91,6 +92,46 @@ return {
                 return env
               end)(),
             })
+          end,
+          -- requires `npm i -g pi-acp`
+          pi = function()
+            local helpers = require("codecompanion.adapters.acp.helpers")
+            return {
+              name = "pi",
+              formatted_name = "Pi",
+              type = "acp",
+              roles = { llm = "assistant", user = "user" },
+              opts = { vision = true },
+              commands = {
+                default = { "pi-acp" },
+              },
+              defaults = {
+                mcpServers = {},
+                timeout = 20000,
+              },
+              parameters = {
+                protocolVersion = 1,
+                clientCapabilities = {
+                  fs = { readTextFile = true, writeTextFile = true },
+                },
+                clientInfo = {
+                  name = "CodeCompanion.nvim",
+                  version = "1.0.0",
+                },
+              },
+              handlers = {
+                setup = function()
+                  return true
+                end,
+                auth = function()
+                  return true
+                end,
+                form_messages = function(self, messages, capabilities)
+                  return helpers.form_messages(self, messages, capabilities)
+                end,
+                on_exit = function() end,
+              },
+            }
           end,
         },
       },

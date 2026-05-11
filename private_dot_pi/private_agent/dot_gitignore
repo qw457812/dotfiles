@@ -7,6 +7,7 @@ extensions/*/node_modules
 
 # https://github.com/nicobailon/pi-mcp-adapter
 /mcp-cache.json
+/mcp-onboarding.json
 
 # https://github.com/monotykamary/pi-neuralwatt-provider
 /cache
