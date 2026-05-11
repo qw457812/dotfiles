@@ -12,7 +12,7 @@ function isSubpath(parent: string, child: string): boolean {
 
 export default function (pi: ExtensionAPI) {
   let sourceDir: string | null = null;
-  let applyQueue: Promise<void> = Promise.resolve();
+  let reAddQueue: Promise<void> = Promise.resolve();
 
   pi.on("session_start", async (_event, ctx) => {
     const { code, stdout } = await pi.exec("chezmoi", ["source-path"], {
@@ -26,40 +26,41 @@ export default function (pi: ExtensionAPI) {
     if (!(isEditToolResult(event) || isWriteToolResult(event)) || event.isError) return;
     if (typeof event.input.path !== "string") return;
 
-    const sourcePath = resolve(ctx.cwd, event.input.path);
-    if (!isSubpath(sourceDir, sourcePath)) return;
+    const targetPath = resolve(ctx.cwd, event.input.path);
+    // Skip edits to source directory files
+    if (isSubpath(sourceDir, targetPath)) return;
 
     const run = async () => {
-      const targetPathResult = await pi.exec("chezmoi", ["target-path", sourcePath], {
+      // Check if this target file is managed by chezmoi
+      const sourcePathResult = await pi.exec("chezmoi", ["source-path", targetPath], {
         cwd: ctx.cwd,
         signal: ctx.signal,
       });
 
-      if (targetPathResult.killed || targetPathResult.code !== 0) {
-        // Ignore files not managed by chezmoi and aborted runs.
+      if (sourcePathResult.killed || sourcePathResult.code !== 0) {
+        // Not managed by chezmoi or aborted — ignore silently
         return;
       }
 
-      const targetPath = targetPathResult.stdout.trim();
-      if (!targetPath) return;
+      const sourcePath = sourcePathResult.stdout.trim();
+      if (!sourcePath) return;
 
-      const applyResult = await pi.exec("chezmoi", ["apply", "--no-tty", targetPath], {
+      // Re-add the target file to sync changes back to source state
+      const reAddResult = await pi.exec("chezmoi", ["re-add", "--no-tty", targetPath], {
         cwd: ctx.cwd,
         signal: ctx.signal,
       });
 
-      if (applyResult.killed || applyResult.code === 0) {
-        return;
-      }
+      if (reAddResult.killed || reAddResult.code === 0) return;
 
       if (ctx.hasUI) {
-        const message = applyResult.stderr.trim() || `chezmoi exited with code ${applyResult.code}`;
-        ctx.ui.notify(`chezmoi apply failed for ${targetPath}: ${message}`, "warning");
+        const message = reAddResult.stderr.trim() || `chezmoi exited with code ${reAddResult.code}`;
+        ctx.ui.notify(`chezmoi re-add failed for ${targetPath}: ${message}`, "warning");
       }
     };
 
-    const next = applyQueue.then(run, run);
-    applyQueue = next.catch(() => {});
+    const next = reAddQueue.then(run, run);
+    reAddQueue = next.catch(() => {});
     await next;
   });
 }
