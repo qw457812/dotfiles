@@ -1,3 +1,4 @@
+import { getAgentDir } from "@earendil-works/pi-coding-agent";
 import type { TUI } from "@earendil-works/pi-tui";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
@@ -5,7 +6,7 @@ import { join } from "node:path";
 import { formatDecimal } from "./utils.js";
 
 const CACHE_DIR = join(homedir(), ".cache", "pi-agent-footer");
-const PI_AGENT_AUTH_PATH = join(homedir(), ".pi", "agent", "auth.json");
+const PI_AGENT_AUTH_PATH = join(getAgentDir(), "auth.json");
 
 const SECOND_MS = 1000;
 const MINUTE_MS = 60 * SECOND_MS;

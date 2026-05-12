@@ -6,8 +6,7 @@
  * Combines destructive command confirmation + protected paths in one extension.
  */
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-import { homedir } from "node:os";
-import { join } from "node:path";
+import { getAgentDir } from "@earendil-works/pi-coding-agent";
 
 // const DANGEROUS_PATTERNS = [
 //   /\brm\s+(-[a-zA-Z]*f[a-zA-Z]*\s+|.*-rf\b|.*--force\b)/,
@@ -19,17 +18,7 @@ import { join } from "node:path";
 //   />\s*\/dev\/sd[a-z]/,
 // ];
 
-const HOME = homedir();
-
-function expandHome(p: string): string {
-  if (p === "~") return HOME;
-  if (p.startsWith("~/")) return join(HOME, p.slice(2));
-  return p;
-}
-
-const AGENT_DIR = process.env.PI_CODING_AGENT_DIR
-  ? expandHome(process.env.PI_CODING_AGENT_DIR)
-  : join(HOME, ".pi", "agent");
+const AGENT_DIR = getAgentDir();
 
 const PROTECTED_PATHS = [".env", ".git/", "node_modules/", ".pi/", "id_rsa", ".ssh/"];
 
