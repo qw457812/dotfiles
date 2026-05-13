@@ -22,7 +22,6 @@
       "extensions": [
         "extensions/answer.ts",
         "extensions/btw.ts",
-        "extensions/review.ts",
         "extensions/session-breakdown.ts",
         "extensions/split-fork.ts"
       ],
