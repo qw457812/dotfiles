@@ -1,3 +1,5 @@
+local lua_lsp = "lua_ls" ---@type "lua_ls" | "emmylua_ls"
+
 ---@type LazySpec
 return {
   {
@@ -110,14 +112,36 @@ return {
     end,
   },
 
-  -- -- https://github.com/neovim/nvim-lspconfig/pull/4185
-  -- {
-  --   "neovim/nvim-lspconfig",
-  --   opts = {
-  --     servers = {
-  --       lua_ls = { enabled = false },
-  --       emmylua_ls = {},
-  --     },
-  --   },
-  -- },
+  -- https://github.com/neovim/nvim-lspconfig/pull/4185
+  -- https://github.com/neovim/nvim-lspconfig/commit/cab9d27
+  {
+    "neovim/nvim-lspconfig",
+    ---@type PluginLspOpts
+    opts = {
+      ---@type table<string, lazyvim.lsp.Config|boolean>
+      servers = {
+        lua_ls = {
+          enabled = lua_lsp == "lua_ls",
+        },
+        emmylua_ls = {
+          enabled = lua_lsp == "emmylua_ls",
+          mason = not vim.g.user_is_termux and nil, -- run `pkg install emmylua-ls` on termux
+          -- root_dir = function(bufnr, on_dir)
+          --   local root = vim.fs.root(bufnr, vim.lsp.config.emmylua_ls.root_markers)
+          --   on_dir(root ~= vim.env.HOME and root or vim.fs.root(bufnr, "lua"))
+          -- end,
+          -- -- lazydev#136: custom root_dir triggers emmylua_ls before library loaded → stale diagnostics.
+          -- -- Go-to-definition works but pull-diagnostic state won't refresh. Re-pull after delay.
+          -- on_attach = function(client, bufnr)
+          --   vim.defer_fn(function()
+          --     if client:is_stopped() then
+          --       return
+          --     end
+          --     vim.lsp.diagnostic._refresh(bufnr, client.id)
+          --   end, 1000)
+          -- end,
+        },
+      },
+    },
+  },
 }
