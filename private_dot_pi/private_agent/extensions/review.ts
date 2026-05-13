@@ -912,7 +912,7 @@ export default function reviewExtension(pi: ExtensionAPI) {
 
 		while (true) {
 			const customInstructionsLabel = reviewCustomInstructions
-				? "Remove custom review instructions"
+				? "Change custom review instructions"
 				: "Add custom review instructions";
 			const customInstructionsDescription = reviewCustomInstructions
 				? "(currently set)"
@@ -978,18 +978,18 @@ export default function reviewExtension(pi: ExtensionAPI) {
 			}
 
 			if (result === TOGGLE_CUSTOM_INSTRUCTIONS_VALUE) {
-				if (reviewCustomInstructions) {
+				const customInstructions = await ctx.ui.editor(
+					"Enter custom review instructions (applies to all review modes):",
+					reviewCustomInstructions || "",
+				);
+
+				if (reviewCustomInstructions && customInstructions?.trim() === "") {
 					setReviewCustomInstructions(undefined);
 					ctx.ui.notify("Custom review instructions removed", "info");
 					continue;
 				}
 
-				const customInstructions = await ctx.ui.editor(
-					"Enter custom review instructions (applies to all review modes):",
-					"",
-				);
-
-				if (!customInstructions?.trim()) {
+				if (!customInstructions?.trim() || customInstructions.trim() === reviewCustomInstructions) {
 					ctx.ui.notify("Custom review instructions not changed", "info");
 					continue;
 				}
