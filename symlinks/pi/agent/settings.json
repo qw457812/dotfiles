@@ -15,9 +15,6 @@
     "neuralwatt/zai-org/GLM-5.1-FP8",
     "neuralwatt/moonshotai/Kimi-K2.6"
   ],
-  "extensions": [
-    "~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/extensions/goal.ts"
-  ],
   "packages": [
     "npm:pi-vim",
     {
@@ -65,7 +62,6 @@
     "npm:@aliou/pi-guardrails",
     "npm:pi-mcp-adapter",
     "git:github.com/monotykamary/pi-tps",
-    "git:github.com/monotykamary/pi-neuralwatt-provider",
-    "git:github.com/monotykamary/pi-wafer-provider"
+    "git:github.com/monotykamary/pi-neuralwatt-provider"
   ]
 }

@@ -101,6 +101,7 @@ return {
     ---@type sidekick.Config
     opts = {
       cli = {
+        watch = not vim.g.user_is_termux and nil, -- disable fs watch on termux to prevent ENOSPC
         ---@type table<string, sidekick.cli.Config|{}>
         tools = {
           claude = {

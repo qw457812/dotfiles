@@ -52,11 +52,6 @@
         "description": "Docker Compose service teardown"
       },
       {
-        "pattern": "\\b(?i:drop|truncate|delete\\s+from)\\b",
-        "description": "SQL destructive statement",
-        "regex": true
-      },
-      {
         "pattern": "\\brm\\s+(-[a-zA-Z]*f[a-zA-Z]*\\s+|.*-rf\\b|.*--force\\b)",
         "description": "Force delete",
         "regex": true
