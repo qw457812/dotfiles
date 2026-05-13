@@ -1435,7 +1435,11 @@ export default function reviewExtension(pi: ExtensionAPI) {
 		ctx.ui.notify(`Starting review: ${hint}${modeHint}`, "info");
 
 		// Send as a user message that triggers a turn
-		pi.sendUserMessage(fullPrompt);
+		if (ctx.isIdle()) {
+			pi.sendUserMessage(fullPrompt);
+		} else {
+			pi.sendUserMessage(fullPrompt, { deliverAs: "followUp" });
+		}
 		return true;
 	}
 
