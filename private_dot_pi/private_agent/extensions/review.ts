@@ -962,6 +962,15 @@ export default function reviewExtension(pi: ExtensionAPI) {
 						container.invalidate();
 					},
 					handleInput(data: string) {
+						if (data === "j" || data === "k") {
+							const selected = selectList.getSelectedItem();
+							const current = selected ? items.findIndex((item) => item.value === selected.value) : 0;
+							const direction = data === "j" ? 1 : -1;
+							selectList.setSelectedIndex((current + direction + items.length) % items.length);
+							tui.requestRender();
+							return;
+						}
+
 						selectList.handleInput(data);
 						tui.requestRender();
 					},
