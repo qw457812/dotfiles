@@ -112,23 +112,4 @@ return {
       })
     end,
   },
-
-  {
-    "Wansmer/symbol-usage.nvim",
-    optional = true,
-    opts = function()
-      auto_toggle({
-        get = function(event)
-          return next(require("symbol-usage.state").get_buf_workers(event.buf)) ~= nil
-        end,
-        set = function(state, event)
-          if state then
-            require("symbol-usage.buf").attach_buffer(event.buf)
-          else
-            require("symbol-usage.buf").clear_buffer(event.buf)
-          end
-        end,
-      })
-    end,
-  },
 }

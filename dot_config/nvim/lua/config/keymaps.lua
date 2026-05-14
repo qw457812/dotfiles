@@ -259,12 +259,10 @@ U.toggle.diagnostic_virt:map("<leader>ud")
 U.toggle.diagnostics:map("<leader>uD")
 U.toggle.ai_cmp:map("<leader>uA")
 Snacks.toggle.option("number", { name = "Line Number" }):map("<leader>ul")
--- stylua: ignore
+-- stylua: ignore start
 Snacks.toggle.option("showtabline", { off = 0, on = vim.o.showtabline > 0 and vim.o.showtabline or 2, name = "Tabline" }):map("<leader>u<tab>")
-if not LazyVim.has("nvim-scrollbar") then
-  -- stylua: ignore
-  Snacks.toggle.option("laststatus", { off = 0, on = vim.o.laststatus > 0 and vim.o.laststatus or 3, name = "Status Line" }):map("<leader>uS")
-end
+Snacks.toggle.option("laststatus", { off = 0, on = vim.o.laststatus > 0 and vim.o.laststatus or 3, name = "Status Line" }):map("<leader>uS")
+-- stylua: ignore end
 
 -- lazy.nvim/LazyVim
 map("n", "<leader>l", "", { desc = "+lazy/lazyvim" })

@@ -30,7 +30,7 @@ return {
         -- transparent_bg = vim.g.user_transparent_background,
         options = {
           virt_texts = {
-            priority = 5000, -- set higher than symbol-usage.nvim
+            priority = 5000,
           },
           use_icons_from_diagnostic = true,
           -- show_source = true,

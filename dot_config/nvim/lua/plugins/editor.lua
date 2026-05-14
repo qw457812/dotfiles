@@ -654,7 +654,6 @@ return {
       -- https://github.com/kevinhwang91/nvim-hlslens/issues/64#issuecomment-1606196924
       -- alternative: https://github.com/rapan931/lasterisk.nvim
       { "haya14busa/vim-asterisk", pager = true, shell_command_editor = true, vscode = true },
-      { "petertriho/nvim-scrollbar", optional = true },
     },
     event = "CmdlineEnter",
     -- stylua: ignore
@@ -708,11 +707,7 @@ return {
       end,
     },
     config = function(_, opts)
-      if LazyVim.has("nvim-scrollbar") then
-        require("scrollbar.handlers.search").setup(opts)
-      else
-        require("hlslens").setup(opts)
-      end
+      require("hlslens").setup(opts)
 
       local Render = require("hlslens.render")
 

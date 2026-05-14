@@ -293,9 +293,6 @@ function M.clear_ui_esc(opts)
   if vim.v.hlsearch == 1 or LazyVim.cmp.actions.snippet_active() or has_notif() then
     dismiss_notif()
     vim.cmd("nohlsearch")
-    if package.loaded["scrollbar"] then
-      require("scrollbar.handlers.search").nohlsearch() -- nvim-scrollbar & nvim-hlslens
-    end
     LazyVim.cmp.actions.snippet_stop()
     something_done = true
   elseif package.loaded["copilot-lsp.nes"] and vim.b.nes_state then

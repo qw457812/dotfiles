@@ -122,18 +122,4 @@ return {
       },
     },
   },
-
-  {
-    "kosayoda/nvim-lightbulb",
-    event = "LspAttach",
-    opts = {
-      autocmd = { enabled = true },
-      sign = { text = "" },
-      action_kinds = { "quickfix", "refactor" },
-      ignore = {
-        clients = { "null-ls", "lua_ls" },
-        actions_without_kind = true,
-      },
-    },
-  },
 }

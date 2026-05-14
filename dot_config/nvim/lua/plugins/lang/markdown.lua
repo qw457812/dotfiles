@@ -214,12 +214,4 @@ return {
       },
     },
   },
-
-  {
-    "kosayoda/nvim-lightbulb",
-    optional = true,
-    opts = function(_, opts)
-      LazyVim.extend(opts, "ignore.clients", { "marksman" })
-    end,
-  },
 }

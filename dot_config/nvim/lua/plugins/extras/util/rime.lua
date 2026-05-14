@@ -95,20 +95,4 @@ return {
       })
     end,
   },
-
-  {
-    "Wansmer/symbol-usage.nvim",
-    optional = true,
-    opts = function(_, opts)
-      LazyVim.extend(opts, "disable.lsp", { "rime_ls" })
-    end,
-  },
-
-  {
-    "kosayoda/nvim-lightbulb",
-    optional = true,
-    opts = function(_, opts)
-      LazyVim.extend(opts, "ignore.clients", { "rime_ls" })
-    end,
-  },
 }

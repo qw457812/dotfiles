@@ -211,20 +211,4 @@ return {
       },
     },
   },
-
-  {
-    "Wansmer/symbol-usage.nvim",
-    optional = true,
-    opts = function(_, opts)
-      LazyVim.extend(opts, "disable.lsp", { "jdtls" })
-    end,
-  },
-
-  {
-    "kosayoda/nvim-lightbulb",
-    optional = true,
-    opts = function(_, opts)
-      LazyVim.extend(opts, "ignore.clients", { "jdtls" })
-    end,
-  },
 }
