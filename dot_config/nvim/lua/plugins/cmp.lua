@@ -265,6 +265,13 @@ return {
           keymap = {
             ["<CR>"] = {
               function(cmp)
+                -- HACK: not sure why this is needed, but without this,
+                -- pressing <CR> while searching would accept the first
+                -- completion item instead of executing the search
+                if vim.list_contains({ "/", "?" }, vim.fn.getcmdtype()) then
+                  return
+                end
+
                 if cmp.is_menu_visible() and not H.cmdline_actions.is_inserted(cmp) then
                   return cmp.accept()
                 end
