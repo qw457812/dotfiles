@@ -3,10 +3,10 @@ import type { Model } from "@earendil-works/pi-ai";
 import { getSupportedThinkingLevels } from "@earendil-works/pi-ai";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
-const ALL_LEVELS: ThinkingLevel[] = ["off", "minimal", "low", "medium", "high", "xhigh"];
+const ALL_LEVELS: ThinkingLevel[] = ["xhigh", "high", "medium", "low", "minimal", "off"];
 
 function getSupportedLevels(model: Model<any> | undefined): ThinkingLevel[] {
-  return model ? (getSupportedThinkingLevels(model) as ThinkingLevel[]) : ALL_LEVELS;
+  return model ? [...(getSupportedThinkingLevels(model) as ThinkingLevel[])].reverse() : ALL_LEVELS;
 }
 
 export default function (pi: ExtensionAPI) {
@@ -15,8 +15,9 @@ export default function (pi: ExtensionAPI) {
     handler: async (_args, ctx) => {
       const supported = getSupportedLevels(ctx.model);
       const current = pi.getThinkingLevel();
-      const selected = await ctx.ui.select(`Thinking level (current: ${current})`, supported);
-      const target = supported.find((level) => level === selected);
+      const available = supported.filter((level) => level !== current);
+      const selected = await ctx.ui.select(`Thinking level (current: ${current})`, available);
+      const target = available.find((level) => level === selected);
       if (!target) return;
 
       pi.setThinkingLevel(target);
