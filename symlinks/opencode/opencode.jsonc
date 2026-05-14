@@ -11,12 +11,12 @@
   // "autoupdate": "notify",
   // "model": "zai-coding-plan/glm-5.1",
   // "model": "synthetic/hf:moonshotai/Kimi-K2.6",
-  "model": "synthetic/hf:zai-org/GLM-5.1",
-  // "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
+  // "model": "synthetic/hf:zai-org/GLM-5.1",
+  "model": "firepass/accounts/fireworks/routers/kimi-k2p6-turbo",
   "small_model": "github-copilot/gpt-5-mini",
   "agent": {
     "plan": {
-      "model": "synthetic/hf:zai-org/GLM-5.1"
+      "model": "firepass/accounts/fireworks/routers/kimi-k2p6-turbo"
     }
   },
   "mcp": {
@@ -76,30 +76,6 @@
           "limit": {
             "context": 196608,
             "output": 65536
-          },
-          "modalities": {
-            "input": ["text"],
-            "output": ["text"]
-          }
-        }
-      }
-    },
-    "fireworks-ai": {
-      "models": {
-        "accounts/fireworks/routers/glm-5p1-fast": {
-          "name": "GLM 5.1 Fast",
-          "family": "glm",
-          "attachment": false,
-          "reasoning": true,
-          "temperature": true,
-          "tool_call": true,
-          "cost": {
-            "input": 0,
-            "output": 0
-          },
-          "limit": {
-            "context": 202752,
-            "output": 131072
           },
           "modalities": {
             "input": ["text"],

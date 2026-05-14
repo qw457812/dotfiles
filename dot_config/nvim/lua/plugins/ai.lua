@@ -118,7 +118,7 @@ return {
               -- "255b938c-0cb9-4858-83a0-6929fa42b927", -- specific session ID
               -- "--fork-session",
             }),
-            env = vim.deepcopy(U.ai.claude.provider.plan.synthetic),
+            env = vim.deepcopy(U.ai.claude.provider.plan.firepass),
           },
         },
       },
@@ -137,6 +137,7 @@ return {
         ["<leader>ao"] = "opencode",
         ["<leader>ai"] = "pi",
         ["<leader>ag"] = "claude_glm",
+        ["<leader>at"] = "pi_tmp",
       }
       local favourite_tool = "pi"
       for i = 1, 5 do
@@ -222,15 +223,21 @@ return {
         end
       end
 
-      numbered_tools({ name = "claude", count = 2 })
-      numbered_tools({ name = "codex", count = 2 })
-      numbered_tools({ name = "opencode", count = 2 })
+      numbered_tools({ name = "claude", count = 1 })
+      numbered_tools({ name = "codex", count = 1 })
+      numbered_tools({ name = "opencode", count = 1 })
       numbered_tools({ name = "pi" })
       numbered_tools({
         name = "claude_glm",
         base_tool = "claude",
         tool_opts = { env = vim.deepcopy(U.ai.claude.provider.plan.glm) },
-        count = 2,
+        count = 0,
+      })
+      numbered_tools({
+        name = "pi_tmp",
+        base_tool = "pi",
+        tool_opts = { cmd = { "pi", "--no-context-files", "--no-session" } },
+        count = 0,
       })
 
       require("sidekick").setup(opts)
@@ -250,7 +257,7 @@ return {
         -- { "<cr>", function() U.ai.sidekick.cli.submit_or_focus({ filter = filter }) end, desc = "Submit or Focus (Sidekick)" },
         -- { "<cr>", function() require("sidekick.cli").send({ msg = "{this}", filter = filter }) end, mode = "x", desc = "Sidekick" },
         { "<leader>av", false, mode = "x" },
-        { "<leader>at", false, mode = { "n", "x" } },
+        -- { "<leader>at", false, mode = { "n", "x" } },
         { "<leader>aa", sidekick_cli_toggle_key, desc = "Sidekick", remap = true },
         { "<leader>aa", function() require("sidekick.cli").send({ msg = "{this}", filter = filter }) end, mode = "x", desc = "Sidekick" },
         { "<leader>as", function() require("sidekick.cli").select({ filter = filter }) end, desc = "Select (Sidekick)" },

@@ -40,6 +40,30 @@
           }
         }
       ]
+    },
+    "firepass": {
+      "baseUrl": "https://api.fireworks.ai/inference/v1",
+      "apiKey": "FIREPASS_API_KEY",
+      "models": [
+        {
+          "id": "accounts/fireworks/routers/kimi-k2p6-turbo",
+          "name": "Kimi K2.6 Turbo",
+          // "api": "openai-completions",
+          // "baseUrl": "https://api.fireworks.ai/inference/v1",
+          "api": "anthropic-messages",
+          "baseUrl": "https://api.fireworks.ai/inference",
+          "reasoning": true,
+          "input": ["text", "image"],
+          "contextWindow": 256000,
+          "maxTokens": 256000,
+          "cost": {
+            "input": 0.95,
+            "output": 4,
+            "cacheRead": 0.16,
+            "cacheWrite": 0
+          }
+        }
+      ]
     }
   }
 }

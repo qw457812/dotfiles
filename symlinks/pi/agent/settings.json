@@ -1,11 +1,12 @@
 {
   "lastChangelogVersion": "0.74.0",
-  "defaultProvider": "synthetic",
-  "defaultModel": "hf:zai-org/GLM-5.1",
+  "defaultProvider": "firepass",
+  "defaultModel": "accounts/fireworks/routers/kimi-k2p6-turbo",
   "defaultThinkingLevel": "high",
   "hideThinkingBlock": true,
   "quietStartup": true,
   "enabledModels": [
+    "firepass/accounts/fireworks/routers/kimi-k2p6-turbo",
     "synthetic/hf:zai-org/GLM-5.1",
     "synthetic/hf:moonshotai/Kimi-K2.6",
     "openai-codex/gpt-5.5",

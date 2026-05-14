@@ -28,9 +28,9 @@ set -x EZA_MIN_LUMINANCE 50
 set -x RIPGREP_CONFIG_PATH $HOME/.ripgreprc
 test -f $HOME/.cache/nvim/lazygit-theme.yml; and set -x LG_CONFIG_FILE $HOME/.config/lazygit/config.yml,$HOME/.cache/nvim/lazygit-theme.yml
 
-# `brew install gcloud-cli`
-# @fish-lsp-disable-next-line 1004
-type -q brew; and test -f (brew --prefix)/share/google-cloud-sdk/path.fish.inc; and source (brew --prefix)/share/google-cloud-sdk/path.fish.inc
+# # `brew install gcloud-cli`
+# # @fish-lsp-disable-next-line 1004
+# type -q brew; and test -f (brew --prefix)/share/google-cloud-sdk/path.fish.inc; and source (brew --prefix)/share/google-cloud-sdk/path.fish.inc
 
 # ==============================================================================
 # EXIT IF NOT INTERACTIVE
@@ -50,7 +50,7 @@ set fish_emoji_width 2
 alias ssh "TERM=xterm-256color command ssh"
 alias mosh "TERM=xterm-256color command mosh"
 
-test -f "$HOME/.openclaw/completions/openclaw.fish" && source "$HOME/.openclaw/completions/openclaw.fish"
+# test -f "$HOME/.openclaw/completions/openclaw.fish" && source "$HOME/.openclaw/completions/openclaw.fish"
 
 set -g __proxy_ip "127.0.0.1"
 set -g __http_proxy_port 10808
@@ -221,14 +221,14 @@ abbr czct 'chezmoi chattr +template'
 abbr czet --set-cursor "chezmoi execute-template '%'"
 abbr czd 'chezmoi diff'
 abbr czap 'chezmoi apply'
-abbr czapv 'chezmoi apply -v'
-abbr cze 'chezmoi edit'
-abbr czeap 'chezmoi edit --apply'
-abbr czeapv 'chezmoi edit --apply --verbose'
+# abbr czapv 'chezmoi apply -v'
+# abbr cze 'chezmoi edit'
+# abbr czeap 'chezmoi edit --apply'
+# abbr czeapv 'chezmoi edit --apply --verbose'
 abbr czu 'chezmoi update'
 abbr czm 'chezmoi managed --path-style=absolute .'
 abbr czum 'chezmoi unmanaged --path-style=absolute .'
-abbr czg 'chezmoi git --'
+# abbr czg 'chezmoi git --'
 
 # Docker
 abbr d docker
@@ -311,7 +311,7 @@ if type -q claude
     abbr ccl claude_litellm
     abbr ccs claude_synthetic
     abbr ccg claude_glm
-    abbr ccf claude_fireworks
+    abbr ccf claude_firepass
     abbr cck claude_kimi
     abbr ccm claude_minimax
     abbr cco claude_openrouter

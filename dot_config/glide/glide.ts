@@ -294,46 +294,26 @@ glide.keymaps.set("normal", "gh", "keys <D-1>");
 glide.keymaps.set("normal", "gl", "keys <D-9>");
 glide.keymaps.set("normal", "<leader>bH", "keys <D-1>");
 glide.keymaps.set("normal", "<leader>bL", "keys <D-9>");
-glide.keymaps.set("normal", "<leader>bh", async ({ tab_id }) => {
-  const tab = await browser.tabs.get(tab_id);
-  const tabs = await browser.tabs.query({ windowId: tab.windowId });
-  const tabs_to_close = tabs
-    .filter((t) => t.index < tab.index && t.id !== undefined)
-    .map((t) => t.id!);
-  if (tabs_to_close.length > 0) {
-    await browser.tabs.remove(tabs_to_close);
-  }
-});
-glide.keymaps.set("normal", "<leader>bl", async ({ tab_id }) => {
-  const tab = await browser.tabs.get(tab_id);
-  const tabs = await browser.tabs.query({ windowId: tab.windowId });
-  const tabs_to_close = tabs
-    .filter((t) => t.index > tab.index && t.id !== undefined)
-    .map((t) => t.id!);
-  if (tabs_to_close.length > 0) {
-    await browser.tabs.remove(tabs_to_close);
-  }
-});
-glide.keymaps.set("normal", "<leader>bo", async ({ tab_id }) => {
-  const tab = await browser.tabs.get(tab_id);
-  const tabs = await browser.tabs.query({ windowId: tab.windowId });
-  const tabs_to_close = tabs
-    .filter((t) => t.id !== tab_id && t.id !== undefined)
-    .map((t) => t.id!);
-  if (tabs_to_close.length > 0) {
-    await browser.tabs.remove(tabs_to_close);
-  }
-});
-glide.keymaps.set("normal", "<leader>ba", async ({ tab_id }) => {
-  const tab = await browser.tabs.get(tab_id);
-  const tabs = await browser.tabs.query({ windowId: tab.windowId });
-  const tabs_to_close = tabs
-    .filter((t) => !t.pinned && t.id !== undefined)
-    .map((t) => t.id!);
-  if (tabs_to_close.length > 0) {
-    await browser.tabs.remove(tabs_to_close);
-  }
-});
+glide.keymaps.set(
+  "normal",
+  "<leader>bh",
+  close_tabs_if((t, cur) => t.index < cur.index),
+);
+glide.keymaps.set(
+  "normal",
+  "<leader>bl",
+  close_tabs_if((t, cur) => t.index > cur.index),
+);
+glide.keymaps.set(
+  "normal",
+  "<leader>bo",
+  close_tabs_if((t, cur) => t.id !== cur.id),
+);
+glide.keymaps.set(
+  "normal",
+  "<leader>ba",
+  close_tabs_if((t) => !t.pinned),
+);
 glide.keymaps.set("normal", "<leader>bd", tab_close);
 glide.keymaps.set("normal", "<leader>bb", "keys `");
 glide.keymaps.set("normal", "<leader>bp", "keys <C-p>");
@@ -794,6 +774,18 @@ async function focus_page(props: glide.KeymapCallbackProps) {
   }
 }
 
+function close_tabs_if(
+  should_close: (tab: Browser.Tabs.Tab, cur_tab: Browser.Tabs.Tab) => boolean,
+): glide.KeymapCallback {
+  return async ({ tab_id }) => {
+    const tab = await browser.tabs.get(tab_id);
+    const to_close = (await browser.tabs.query({ windowId: tab.windowId }))
+      .filter((t) => t.id !== undefined && should_close(t, tab))
+      .map((t) => t.id!);
+    if (to_close.length > 0) await browser.tabs.remove(to_close);
+  };
+}
+
 async function tab_close(props: glide.KeymapCallbackProps) {
   const alt_tab_id = previousTabId;
   // await glide.excmds.execute("tab_close");
@@ -855,6 +847,14 @@ function text_to_url(text: string): string {
     : default_search_engine.replace("{}", encodeURIComponent(text));
 }
 
+function display_url(url: string): string {
+  try {
+    const u = new URL(url);
+    return u.hostname + decodeURIComponent(u.pathname);
+  } catch {}
+  return url;
+}
+
 const bookmark_cache = {
   data: null as Awaited<ReturnType<typeof browser.bookmarks.getRecent>> | null,
   timestamp: 0,
@@ -882,11 +882,6 @@ function bookmark_picker(newtab: boolean = false) {
       title: `Bookmarks (${bookmarks.length})`,
       options: bookmarks.map((bookmark): glide.CommandLineCustomOption => {
         const url = bookmark.url ?? "";
-        let display_url = url;
-        try {
-          const u = new URL(url);
-          display_url = u.hostname + decodeURIComponent(u.pathname);
-        } catch {}
 
         return {
           label: bookmark.title,
@@ -926,7 +921,7 @@ function bookmark_picker(newtab: boolean = false) {
                         whiteSpace: "nowrap",
                       },
                     }),
-                    DOM.create_element("div", [display_url], {
+                    DOM.create_element("div", [display_url(url)], {
                       style: {
                         color: "#888888",
                         fontSize: "0.8em",
@@ -976,11 +971,6 @@ function history_picker(newtab: boolean = false) {
         label: item.title || item.url!,
         render() {
           const url = item.url ?? "";
-          let display_url = url;
-          try {
-            const u = new URL(url);
-            display_url = u.hostname + decodeURIComponent(u.pathname);
-          } catch {}
 
           return DOM.create_element("div", {
             style: {
@@ -999,7 +989,7 @@ function history_picker(newtab: boolean = false) {
                   ...(item.title
                     ? [DOM.create_element("div", { children: item.title })]
                     : []),
-                  DOM.create_element("div", { children: display_url }),
+                  DOM.create_element("div", { children: display_url(url) }),
                 ],
               }),
             ],

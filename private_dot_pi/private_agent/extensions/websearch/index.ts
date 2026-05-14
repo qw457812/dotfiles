@@ -211,7 +211,7 @@ export default function (pi: ExtensionAPI) {
         content: [
           { type: "text" as const, text: `Searching via ${providerShortLabel(provider)}...` },
         ],
-        details: {} as WebsearchDetails,
+        details: { provider },
       });
 
       const callCtx: ProviderCallContext = {

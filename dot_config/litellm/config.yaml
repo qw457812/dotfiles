@@ -24,14 +24,9 @@ model_list:
       api_key: os.environ/SYNTHETIC_API_KEY
   - model_name: claude-sonnet-*
     litellm_params:
-      model: anthropic/accounts/fireworks/routers/kimi-k2p5-turbo
+      model: anthropic/accounts/fireworks/routers/kimi-k2p6-turbo
       api_base: https://api.fireworks.ai/inference
-      api_key: os.environ/FIREWORKS_API_KEY
-  # - model_name: claude-sonnet-*
-  #   litellm_params:
-  #     model: anthropic/accounts/fireworks/routers/glm-5-fast
-  #     api_base: https://api.fireworks.ai/inference
-  #     api_key: os.environ/FIREWORKS_API_KEY
+      api_key: os.environ/FIREPASS_API_KEY
 
   - model_name: claude-haiku-*
     litellm_params:
