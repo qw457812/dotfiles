@@ -9,8 +9,7 @@ fish_add_path -g "$HOME/Library/Application Support/Coursier/bin" # scalafmt
 type -q brew; and fish_add_path -g (brew --prefix)/Caskroom/sqlcl/(command ls -t (brew --prefix)/Caskroom/sqlcl 2>/dev/null | head -1)/sqlcl/bin
 
 # Exports
-# set -gx TERM xterm-256color # https://github.com/gpakosz/.tmux
-set -q NEOVIDE_FRAME; and set -gx TERM xterm-256color
+# set -q NEOVIDE_FRAME; and set -gx TERM xterm-256color # https://github.com/gpakosz/.tmux
 set -gx LANG en_US.UTF-8
 set -gx LC_ALL en_US.UTF-8
 set -gx LC_CTYPE en_US.UTF-8

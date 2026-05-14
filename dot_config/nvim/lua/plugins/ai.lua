@@ -92,7 +92,7 @@ return {
       },
     },
   },
-  { "qw457812/claude-code-sourcemap", lazy = true, config = function() end },
+  { "qw457812/claude-code-sourcemap", pin = true, lazy = true, config = function() end },
 
   -- sidekick cli
   {
