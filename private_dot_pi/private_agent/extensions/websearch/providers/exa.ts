@@ -7,7 +7,7 @@
  * Tool name: web_search_exa
  */
 
-import { mcpCall } from "../mcp-client";
+import { mcpCall, type McpCallResult } from "../mcp-client";
 import type { ProviderCallContext, WebSearchParams } from "./types";
 
 const EXA_BASE_URL = "https://mcp.exa.ai/mcp";
@@ -23,7 +23,7 @@ function getExaUrl(): string {
 export function callExa(
   params: WebSearchParams,
   ctx: ProviderCallContext,
-): Promise<string | undefined> {
+): Promise<McpCallResult | undefined> {
   return mcpCall({
     url: getExaUrl(),
     tool: "web_search_exa",

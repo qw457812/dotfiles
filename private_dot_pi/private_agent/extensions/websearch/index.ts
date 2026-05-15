@@ -38,6 +38,7 @@ import { Type } from "typebox";
 import { callExa } from "./providers/exa";
 import { callParallel } from "./providers/parallel";
 import type { ProviderCallContext, WebSearchParams, WebSearchProvider } from "./providers/types";
+import type { McpCallResult } from "./mcp-client";
 import {
   formatWebsearchCall,
   providerLabel,
@@ -228,20 +229,27 @@ export default function (pi: ExtensionAPI) {
         contextMaxCharacters: params.contextMaxCharacters,
       };
 
-      let rawResult: string | undefined;
+      let mcpResult: McpCallResult | undefined;
       try {
         if (provider === "exa") {
-          rawResult = await callExa(searchParams, callCtx);
+          mcpResult = await callExa(searchParams, callCtx);
         } else {
-          rawResult = await callParallel(searchParams, callCtx);
+          mcpResult = await callParallel(searchParams, callCtx);
         }
       } catch (err: any) {
         throw new Error(`WebSearch (${title}) failed: ${err.message}`, { cause: err });
       }
 
-      // Mirrors OpenCode: result ?? "No search results found..."
-      if (!rawResult) {
+      // MCP spec: isError results are returned (not thrown) so the LLM can
+      // see the error content and self-correct. Prefix with a clear marker
+      // so the LLM knows this is an error, not search results.
+      let rawResult: string;
+      if (!mcpResult) {
         rawResult = "No search results found. Please try a different query.";
+      } else if (mcpResult.isError) {
+        rawResult = `[Search provider returned an error]\n${mcpResult.text}`;
+      } else {
+        rawResult = mcpResult.text;
       }
 
       const truncation = truncateHead(rawResult, {
@@ -251,6 +259,7 @@ export default function (pi: ExtensionAPI) {
 
       const details: WebsearchDetails = {
         provider,
+        isError: mcpResult?.isError ?? false,
       };
 
       let resultText = truncation.content;

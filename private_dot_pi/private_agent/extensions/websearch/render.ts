@@ -24,6 +24,7 @@ import type { WebSearchProvider } from "./providers/types";
 
 export interface WebsearchDetails {
   provider: WebSearchProvider;
+  isError?: boolean;
   truncation?: TruncationResult;
   fullOutputPath?: string;
 }
@@ -175,7 +176,14 @@ export function rebuildWebsearchResultRenderComponent(
     return;
   }
 
-  let statusText = theme.fg("success", `✓ ${label}`);
+  let statusText = "";
+  if (details.isError) {
+    // Tool execution error (MCP isError: true) — distinct from protocol error
+    statusText = theme.fg("warning", `⚠ ${label}`);
+    statusText += theme.fg("dim", " (provider error)");
+  } else {
+    statusText = theme.fg("success", `✓ ${label}`);
+  }
   if (details.truncation?.truncated) {
     statusText += theme.fg("warning", " (truncated)");
   }

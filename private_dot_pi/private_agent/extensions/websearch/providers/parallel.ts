@@ -11,7 +11,7 @@
  */
 
 import { VERSION } from "@earendil-works/pi-coding-agent";
-import { mcpCall } from "../mcp-client";
+import { mcpCall, type McpCallResult } from "../mcp-client";
 import type { ProviderCallContext, WebSearchParams } from "./types";
 
 const PARALLEL_URL = "https://search.parallel.ai/mcp";
@@ -32,7 +32,7 @@ function getParallelHeaders(): Record<string, string> {
 export function callParallel(
   params: WebSearchParams,
   ctx: ProviderCallContext,
-): Promise<string | undefined> {
+): Promise<McpCallResult | undefined> {
   return mcpCall({
     url: PARALLEL_URL,
     tool: "web_search",
