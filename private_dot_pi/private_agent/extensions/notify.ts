@@ -217,6 +217,32 @@ export default function (pi: ExtensionAPI) {
 		notifier.notify("pi-guardrails:dangerous", `${command}\n${description}\n${pattern}`);
 	});
 
+	// TODO: switch to this when upstream @aliou/pi-guardrails 0.12.0+ ships
+	// ref: https://github.com/aliou/pi-guardrails/blob/a57fe81595d8b787bd7e9ad0ef054a101392f6c8/src/shared/events.ts#L5
+	/*
+	interface GuardrailsRiskDetectedPayload {
+		source: "guardrails";
+		feature: "policies" | "permissionGate" | "pathAccess";
+		timestamp: string;
+		risk: {
+			kind: "dangerous";
+			action: { kind: "command"; command: string; origin?: string };
+			key: string;
+			reason: string;
+			metadata?: unknown;
+		};
+		context?: { toolName?: string; input?: Record<string, unknown> };
+	}
+
+	const offGuardrailsRiskDetected = pi.events.on("guardrails:risk:detected", (data: unknown) => {
+		const { risk } = data as GuardrailsRiskDetectedPayload;
+		notifier.notify(
+			"pi-guardrails:risk:detected",
+			`${risk.action.command}\n${risk.reason}\n${risk.key}`,
+		);
+	});
+	*/
+
 	pi.on("agent_end", async (event) => {
 		const lastText = extractLastAssistantText(event.messages ?? []);
 		const { title, body } = formatNotification(lastText);
@@ -226,5 +252,6 @@ export default function (pi: ExtensionAPI) {
 	pi.on("session_shutdown", async () => {
 		offMyNotification();
 		offGuardrailsDangerous();
+		// offGuardrailsRiskDetected(); // TODO: enable when upstream 0.12.0+ ships
 	});
 }
