@@ -35,6 +35,13 @@
       "themes": []
     },
     {
+      "source": "git:github.com/mattpocock/skills",
+      "skills": [
+        "skills/productivity/grill-me",
+        "skills/productivity/write-a-skill"
+      ]
+    },
+    {
       "source": "git:github.com/addyosmani/agent-skills",
       "extensions": [],
       "skills": [

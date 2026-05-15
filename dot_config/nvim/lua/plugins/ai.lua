@@ -34,6 +34,13 @@ return {
         config = function() end,
       },
       {
+        "mattpocock/skills",
+        name = "mattpocock-skills",
+        build = "pi update --extension git:github.com/mattpocock/skills",
+        lazy = true,
+        config = function() end,
+      },
+      {
         "addyosmani/agent-skills",
         name = "addyosmani-agent-skills",
         build = "pi update --extension git:github.com/addyosmani/agent-skills",
@@ -81,12 +88,6 @@ return {
       {
         "monotykamary/pi-neuralwatt-provider",
         build = "pi update --extension git:github.com/monotykamary/pi-neuralwatt-provider",
-        lazy = true,
-        config = function() end,
-      },
-      {
-        "monotykamary/pi-wafer-provider",
-        build = "pi update --extension git:github.com/monotykamary/pi-wafer-provider",
         lazy = true,
         config = function() end,
       },
@@ -223,7 +224,7 @@ return {
         end
       end
 
-      numbered_tools({ name = "claude", count = 1 })
+      numbered_tools({ name = "claude", count = 2 })
       numbered_tools({ name = "codex", count = 1 })
       numbered_tools({ name = "opencode", count = 1 })
       numbered_tools({ name = "pi" })
