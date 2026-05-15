@@ -34,13 +34,10 @@ API keys are for authentication only — they do **not** affect which provider i
 
 ## Tool Parameters
 
-| Parameter              | Type                             | Default      | Description                              |
-| ---------------------- | -------------------------------- | ------------ | ---------------------------------------- |
-| `query`                | string (required)                | —            | Search query                             |
-| `numResults`           | integer (≥1)                     | 8            | Number of results                        |
-| `livecrawl`            | `"fallback"` \| `"preferred"`    | `"fallback"` | Live crawl mode                          |
-| `type`                 | `"auto"` \| `"fast"` \| `"deep"` | `"auto"`     | Search depth                             |
-| `contextMaxCharacters` | number                           | —            | Max characters for LLM-optimized context |
+| Parameter    | Type              | Default | Description       |
+| ------------ | ----------------- | ------- | ----------------- |
+| `query`      | string (required) | —       | Search query      |
+| `numResults` | integer (≥1)      | 8       | Number of results |
 
 ## Output Truncation
 

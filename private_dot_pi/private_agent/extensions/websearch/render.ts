@@ -39,8 +39,6 @@ export interface WebsearchRenderState {
 interface WebsearchCallArgs {
   query: string;
   numResults?: number;
-  type?: string;
-  livecrawl?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -87,12 +85,7 @@ export function formatWebsearchCall(
   if (args?.numResults !== undefined && args.numResults !== 8) {
     extras.push(`${args.numResults} results`);
   }
-  if (args?.type && args.type !== "auto") {
-    extras.push(args.type);
-  }
-  if (args?.livecrawl && args.livecrawl !== "fallback") {
-    extras.push(`livecrawl=${args.livecrawl}`);
-  }
+
   if (extras.length > 0) {
     text += theme.fg("dim", ` (${extras.join(", ")})`);
   }

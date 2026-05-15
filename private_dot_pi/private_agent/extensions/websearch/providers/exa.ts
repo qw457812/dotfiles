@@ -29,12 +29,7 @@ export function callExa(
     tool: "web_search_exa",
     args: {
       query: params.query,
-      type: params.type || "auto",
       numResults: params.numResults || 8,
-      livecrawl: params.livecrawl || "fallback",
-      ...(params.contextMaxCharacters != null
-        ? { contextMaxCharacters: params.contextMaxCharacters }
-        : {}),
     },
     timeout: 25_000,
     signal: ctx.signal,

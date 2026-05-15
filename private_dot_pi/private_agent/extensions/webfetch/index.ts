@@ -221,7 +221,7 @@ const WebFetchParamsSchema = Type.Object({
 });
 
 // ---------------------------------------------------------------------------
-// Tool description (mirrors OpenCode's webfetch.txt verbatim)
+// Tool description (adapted from OpenCode's webfetch.txt)
 // ---------------------------------------------------------------------------
 
 const DESCRIPTION = `- Fetches content from a specified URL
@@ -234,8 +234,7 @@ Usage notes:
   - IMPORTANT: if another tool is present that offers better web fetching capabilities, is more targeted to the task, or has fewer restrictions, prefer using that tool instead of this one.
   - The URL must be a fully-formed valid URL
   - Format options: "markdown" (default), "text", or "html"
-  - This tool is read-only and does not modify any files
-  - Results may be summarized if the content is very large`;
+  - This tool is read-only and does not modify any files`;
 
 // ---------------------------------------------------------------------------
 // Temp file tracking for cleanup on session shutdown

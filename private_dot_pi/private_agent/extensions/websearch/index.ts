@@ -89,42 +89,19 @@ const WebSearchParamsSchema = Type.Object({
       minimum: 1,
     }),
   ),
-  livecrawl: Type.Optional(
-    StringEnum(["fallback", "preferred"] as const, {
-      description:
-        "Live crawl mode - 'fallback': use live crawling as backup if cached content unavailable, 'preferred': prioritize live crawling (default: 'fallback')",
-    }),
-  ),
-  type: Type.Optional(
-    StringEnum(["auto", "fast", "deep"] as const, {
-      description:
-        "Search type - 'auto': balanced search (default), 'fast': quick results, 'deep': comprehensive search",
-    }),
-  ),
-  contextMaxCharacters: Type.Optional(
-    Type.Number({
-      description: "Maximum characters for context string optimized for LLMs (default: 10000)",
-    }),
-  ),
 });
 
 // ---------------------------------------------------------------------------
-// Description builder (lazy year evaluation, mirrors OpenCode's websearch.txt)
+// Description builder (lazy year evaluation, adapted from OpenCode's websearch.txt)
 // ---------------------------------------------------------------------------
 
 function buildDescription(): string {
   const year = new Date().getFullYear();
-  return `- Search the web using the session's web search provider - performs real-time web searches and can scrape content from specific URLs
+  return `- Search the web
 - Provides up-to-date information for current events and recent data
 - Supports configurable result counts and returns the content from the most relevant websites
 - Use this tool for accessing information beyond knowledge cutoff
 - Searches are performed automatically within a single API call
-
-Usage notes:
-  - Supports live crawling modes when available: 'fallback' (backup if cached unavailable) or 'preferred' (prioritize live crawling)
-  - Search types when available: 'auto' (balanced), 'fast' (quick results), 'deep' (comprehensive search)
-  - Configurable context length for optimal LLM integration
-  - Domain filtering and advanced search options available
 
 The current year is ${year}. You MUST use this year when searching for recent information or current events
 - Example: If the current year is ${year} and the user asks for "latest AI news", search for "AI news ${year}", NOT "AI news ${year - 1}"`;
@@ -224,9 +201,6 @@ export default function (pi: ExtensionAPI) {
       const searchParams: WebSearchParams = {
         query: params.query,
         numResults: params.numResults,
-        livecrawl: params.livecrawl,
-        type: params.type,
-        contextMaxCharacters: params.contextMaxCharacters,
       };
 
       let mcpResult: McpCallResult | undefined;
@@ -305,8 +279,6 @@ export default function (pi: ExtensionAPI) {
           {
             query: args?.query,
             numResults: args?.numResults,
-            type: args?.type,
-            livecrawl: args?.livecrawl,
           },
           provider,
           theme,
