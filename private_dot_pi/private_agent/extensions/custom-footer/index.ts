@@ -31,7 +31,7 @@ import { VERSION } from "@earendil-works/pi-coding-agent";
 import { type TUI, truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
 import { getQuota } from "./quota.js";
 import { createTpsTracker } from "./tps.js";
-import { formatDecimal } from "./utils.js";
+import { formatDecimal, formatTokens } from "./utils.js";
 
 export default function (pi: ExtensionAPI) {
   let enabled = true;
@@ -60,17 +60,6 @@ export default function (pi: ExtensionAPI) {
       .replace(/[\r\n\t]/g, " ")
       .replace(/ +/g, " ")
       .trim();
-  }
-
-  /**
-   * Format token counts (similar to web-ui)
-   */
-  function formatTokens(count: number): string {
-    if (count < 1000) return count.toString();
-    if (count < 10000) return `${formatDecimal(count / 1000, 1)}k`;
-    if (count < 1000000) return `${Math.round(count / 1000)}k`;
-    if (count < 10000000) return `${formatDecimal(count / 1000000, 1)}M`;
-    return `${Math.round(count / 1000000)}M`;
   }
 
   function createFooterFactory(ctx: ExtensionContext) {

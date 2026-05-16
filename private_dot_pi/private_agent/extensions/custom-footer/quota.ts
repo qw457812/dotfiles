@@ -1,12 +1,15 @@
 import { getAgentDir } from "@earendil-works/pi-coding-agent";
 import type { TUI } from "@earendil-works/pi-tui";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { createReadStream, type Dirent } from "node:fs";
+import { mkdir, readdir, readFile, stat, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { formatDecimal } from "./utils.js";
+import readline from "node:readline";
+import { formatDecimal, formatTokens } from "./utils.js";
 
 const CACHE_DIR = join(homedir(), ".cache", "pi-agent-footer");
 const PI_AGENT_AUTH_PATH = join(getAgentDir(), "auth.json");
+const PI_AGENT_SESSIONS_DIR = join(getAgentDir(), "sessions");
 
 const SECOND_MS = 1000;
 const MINUTE_MS = 60 * SECOND_MS;
@@ -77,6 +80,11 @@ interface DeepSeekQuota {
     currency: "CNY" | "USD";
     total_balance: string;
   }>;
+}
+
+interface FirepassUsage {
+  tokens: number;
+  cost: number;
 }
 
 interface CachedValue<T> {
@@ -181,6 +189,113 @@ function formatRemaining(date: string | number): string {
 function joinParts(parts: Array<string | null | undefined | false>): string | null {
   const filtered = parts.filter((part): part is string => Boolean(part));
   return filtered.length > 0 ? filtered.join(" ") : null;
+}
+
+function toLocalDayKey(d: Date): string {
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function readNum(v: unknown): number | null {
+  if (typeof v === "number") return Number.isFinite(v) ? v : null;
+  if (typeof v === "string") {
+    const trimmed = v.trim();
+    if (!trimmed) return null;
+    const n = Number(trimmed);
+    return Number.isFinite(n) ? n : null;
+  }
+  return null;
+}
+
+async function getDailyFirepassUsage(): Promise<FirepassUsage> {
+  const today = toLocalDayKey(new Date());
+  let tokens = 0;
+  let cost = 0;
+
+  async function walk(dir: string) {
+    let entries: Dirent[] = [];
+    try {
+      entries = await readdir(dir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+
+    for (const ent of entries) {
+      const p = join(dir, ent.name);
+      if (ent.isDirectory()) {
+        await walk(p);
+        continue;
+      }
+      if (!ent.isFile() || !ent.name.endsWith(".jsonl")) continue;
+
+      try {
+        const st = await stat(p);
+        const mtimeDate = toLocalDayKey(new Date(st.mtime));
+        if (mtimeDate !== today) continue;
+      } catch {
+        continue;
+      }
+
+      try {
+        const stream = createReadStream(p, { encoding: "utf8" });
+        const rl = readline.createInterface({ input: stream, crlfDelay: Infinity });
+        try {
+          for await (const line of rl) {
+            if (!line.trim()) continue;
+            let entry: any;
+            try {
+              entry = JSON.parse(line);
+            } catch {
+              continue;
+            }
+
+            if (entry.type !== "message") continue;
+            const msg = entry.message;
+            if (!msg || msg.role !== "assistant") continue;
+            if (msg.provider !== "firepass") continue;
+            const usage = msg.usage;
+            if (!usage) continue;
+
+            // Tokens: prefer direct total, fall back to sum of parts
+            const total = readNum(usage.totalTokens);
+            let t = 0;
+            if (total !== null) {
+              t = total;
+            } else {
+              const input = readNum(usage.input) ?? 0;
+              const output = readNum(usage.output) ?? 0;
+              const cacheRead = readNum(usage.cacheRead) ?? 0;
+              const cacheWrite = readNum(usage.cacheWrite) ?? 0;
+              t = input + output + cacheRead + cacheWrite;
+            }
+            t = Number.isFinite(t) ? t : 0;
+
+            // Cost
+            const c = readNum(usage.cost?.total) ?? 0;
+
+            const entryTs = entry.timestamp || msg.timestamp;
+            if (!entryTs) continue;
+            const entryDate = toLocalDayKey(new Date(entryTs));
+            if (entryDate === today) {
+              tokens += t;
+              cost += c;
+            }
+          }
+        } finally {
+          rl.close();
+          stream.destroy();
+        }
+      } catch {
+        // Skip unreadable files
+        continue;
+      }
+    }
+  }
+
+  await walk(PI_AGENT_SESSIONS_DIR);
+  return { tokens, cost };
 }
 
 function createSource<T>(provider: string, config: SourceConfig<T>): Source {
@@ -368,6 +483,24 @@ const sources: Record<string, Source> = {
             return `${theme.fg("accent", `${symbol}${parseFloat(b.total_balance).toFixed(2)}`)}`;
           }),
       );
+    },
+  }),
+  firepass: createSource("firepass", {
+    cacheTtlMs: MINUTE_MS,
+    async getAuth(): Promise<string | null> {
+      return "-";
+    },
+    async fetch(_auth: string): Promise<FirepassUsage | null> {
+      return await getDailyFirepassUsage();
+    },
+    format(data: FirepassUsage, theme: Theme): string | null {
+      const tok = formatTokens(data.tokens);
+      if (data.cost <= 0) return theme.fg("accent", tok);
+
+      let digits = 2;
+      if (data.cost < 1) digits = 3;
+      if (data.cost < 0.01) digits = 4;
+      return `${theme.fg("accent", tok)}${theme.fg("dim", `/$${formatDecimal(data.cost, digits)}`)}`;
     },
   }),
 };
