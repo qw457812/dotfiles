@@ -10,6 +10,7 @@ import { formatDecimal, formatTokens } from "./utils.js";
 const CACHE_DIR = join(homedir(), ".cache", "pi-agent-footer");
 const PI_AGENT_AUTH_PATH = join(getAgentDir(), "auth.json");
 const PI_AGENT_SESSIONS_DIR = join(getAgentDir(), "sessions");
+const IS_TERMUX = Boolean(process.env.TERMUX_VERSION);
 
 const SECOND_MS = 1000;
 const MINUTE_MS = 60 * SECOND_MS;
@@ -82,6 +83,7 @@ interface DeepSeekQuota {
   }>;
 }
 
+// Fire Pass V2 is unlimited
 interface FirepassUsage {
   tokens: number;
   cost: number;
@@ -209,6 +211,7 @@ function readNum(v: unknown): number | null {
   return null;
 }
 
+// alternative: `firectl --api-key $FIREWORKS_API_KEY billing export-metrics --start-time "2026-05-16" --end-time "2026-05-17"`
 async function getDailyFirepassUsage(): Promise<FirepassUsage> {
   const today = toLocalDayKey(new Date());
   let tokens = 0;
@@ -486,7 +489,7 @@ const sources: Record<string, Source> = {
     },
   }),
   firepass: createSource("firepass", {
-    cacheTtlMs: MINUTE_MS,
+    cacheTtlMs: IS_TERMUX ? 5 * MINUTE_MS : MINUTE_MS,
     async getAuth(): Promise<string | null> {
       return "-";
     },

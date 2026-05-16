@@ -22,7 +22,6 @@
  *   API keys are only for authentication, they do NOT affect provider selection.
  */
 
-import { StringEnum } from "@earendil-works/pi-ai";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import {
   DEFAULT_MAX_BYTES,

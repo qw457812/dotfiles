@@ -16,6 +16,7 @@ return {
   -- https://github.com/tmustier/pi-extensions
   -- https://github.com/knoopx/pi
   -- https://github.com/rytswd/pi-agent-extensions
+  -- https://github.com/audibleblink/pi-harness
   --
   -- https://github.com/carderne/pi-sandbox
   -- https://github.com/tuansondinh/pi-claude-sandbox
