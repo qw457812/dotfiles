@@ -67,13 +67,15 @@ end run`;
 };
 
 type FocusTracker = {
-	attach: (ui?: Pick<ExtensionUIContext, "onTerminalInput">) => void;
+	attach: (ui?: Pick<ExtensionUIContext, "onTerminalInput">, onChange?: (focused: boolean) => void) => void;
 	detach: () => void;
 	// true = focused, false = unfocused, undefined = unknown
 	isFocused: () => boolean | undefined;
 };
 
-// See also: https://github.com/tmustier/pi-extensions/blob/8da9865e5beb625050406c0e9281e4393d076b22/session-recap/index.ts
+// See also:
+// - https://github.com/tmustier/pi-extensions/blob/8da9865e5beb625050406c0e9281e4393d076b22/session-recap/index.ts
+// - https://github.com/audibleblink/pi-harness/blob/b0e30a95aad74b80c8006097f80f710f0061c9fc/extensions/blur.ts
 const createFocusTracker = (): FocusTracker => {
 	// https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
 	const FOCUS_ENABLE = "\x1b[?1004h";
@@ -95,7 +97,7 @@ const createFocusTracker = (): FocusTracker => {
 		process.stdout.write(FOCUS_DISABLE);
 	};
 
-	const attach = (ui?: Pick<ExtensionUIContext, "onTerminalInput">) => {
+	const attach = (ui?: Pick<ExtensionUIContext, "onTerminalInput">, onChange?: (focused: boolean) => void) => {
 		detach();
 		if (!ui || !process.stdin.isTTY || !process.stdout.isTTY) {
 			return;
@@ -104,9 +106,15 @@ const createFocusTracker = (): FocusTracker => {
 		process.stdout.write(FOCUS_ENABLE);
 		offTerminalInput = ui.onTerminalInput((data: string) => {
 			if (data === FOCUS_IN) {
-				focused = true;
+				if (focused !== true) {
+					focused = true;
+					onChange?.(true);
+				}
 			} else if (data === FOCUS_OUT) {
-				focused = false;
+				if (focused !== false) {
+					focused = false;
+					onChange?.(false);
+				}
 			}
 			return {};
 		});
@@ -127,10 +135,12 @@ const createFocusAwareNotifier = (pi: ExtensionAPI): FocusAwareNotifier => {
 	const focusTracker = createFocusTracker();
 
 	pi.on("session_start", async (_event, ctx) => {
-		focusTracker.attach(ctx.hasUI ? ctx.ui : undefined);
+		focusTracker.attach(ctx.hasUI ? ctx.ui : undefined, (focused) => {
+			pi.events.emit("my:focus", { focused });
+		});
 	});
 
-	pi.on("session_shutdown", async () => {
+	pi.on("session_shutdown", () => {
 		focusTracker.detach();
 	});
 
@@ -249,7 +259,7 @@ export default function (pi: ExtensionAPI) {
 		notifier.notify(title, body);
 	});
 
-	pi.on("session_shutdown", async () => {
+	pi.on("session_shutdown", () => {
 		offMyNotification();
 		offGuardrailsDangerous();
 		// offGuardrailsRiskDetected(); // TODO: enable when upstream 0.12.0+ ships

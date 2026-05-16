@@ -137,6 +137,10 @@ export default async function (pi: ExtensionAPI) {
     U: "\x12", // Ctrl+r
   };
 
+  let blurred = false;
+  let requestRender: (() => void) | undefined;
+  let offMyFocus: (() => void) | undefined;
+
   class PromptEditor extends ModalEditor {
     private readonly prefixColorizers: ModeColorizers | null;
 
@@ -232,11 +236,36 @@ export default async function (pi: ExtensionAPI) {
       //   lines[i] = CONTINUATION_PREFIX + lines[i]!;
       // }
 
+      // Hide cursor on blur
+      if (blurred) {
+        // Only strip inverse-video from editor body lines (1..bottomIdx-1).
+        // Lines[0] is the top border, lines[bottomIdx] contains the mode label —
+        // those should keep their styling so the mode remains visible when blurred.
+        for (let i = 1; i < bottomIdx; i++) {
+          // See: https://github.com/earendil-works/pi/blob/e3fee7a511503ebe170223cd89e7631751539f25/packages/tui/src/components/input.ts#L492-L493
+          // oxlint-disable-next-line no-control-regex
+          lines[i] = lines[i]!.replace(/\x1b\[7m/g, "").replace(/\x1b\[27m/g, "");
+        }
+      }
+
       return lines;
     }
   }
 
   pi.on("session_start", (_event, ctx) => {
+    offMyFocus = pi.events.on("my:focus", (data: unknown) => {
+      if (
+        typeof data === "object" &&
+        data !== null &&
+        "focused" in data &&
+        typeof (data as Record<string, unknown>).focused === "boolean"
+      ) {
+        const { focused } = data as { focused: boolean };
+        blurred = !focused;
+        requestRender?.();
+      }
+    });
+
     const theme = ctx.ui.theme as ThinkingTheme | undefined;
     const colorizers = theme
       ? {
@@ -268,6 +297,7 @@ export default async function (pi: ExtensionAPI) {
         ctx,
         (history) => {
           ctx.ui.setEditorComponent((tui, editorTheme, kb) => {
+            requestRender = () => tui.requestRender();
             const newEditor = new PromptEditor(tui, editorTheme, kb, colorizers, prefixColorizers);
             editor = newEditor as unknown as ModalEditorRuntime;
             hydratePromptHistory(editor, history);
@@ -286,5 +316,12 @@ export default async function (pi: ExtensionAPI) {
         },
       );
     }, 0);
+  });
+
+  pi.on("session_shutdown", () => {
+    offMyFocus?.();
+    offMyFocus = undefined;
+    blurred = false;
+    requestRender = undefined;
   });
 }
