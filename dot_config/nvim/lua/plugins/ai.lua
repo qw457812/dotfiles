@@ -699,6 +699,42 @@ return {
         end),
       })
 
+      -- work-around for pi-vim auto insert
+      vim.api.nvim_create_autocmd("TermEnter", {
+        group = vim.api.nvim_create_augroup("sidekick_pi_vi_mode", { clear = true }),
+        callback = function(ev)
+          local buf = ev.buf
+          if vim.bo[buf].filetype ~= "sidekick_terminal" then
+            return
+          end
+          local win = vim.fn.bufwinid(buf)
+          if win == -1 then
+            return
+          end
+          local tool = vim.w[win].sidekick_cli
+          if not tool or not tool.name:find("^pi") then
+            return
+          end
+          vim.defer_fn(function()
+            if not (vim.api.nvim_get_current_buf() == buf and vim.api.nvim_get_current_win() == win) then
+              return
+            end
+            -- pi prompt-editor uses ❮ for normal mode prefix and ❯ for insert mode prefix
+            -- https://github.com/qw457812/dotfiles/blob/4e28970c14da2e0f9aab8b18014ef5d7c309235d/private_dot_pi/private_agent/extensions/prompt-editor/index.ts
+            local cursor_row = vim.api.nvim_win_get_cursor(win)[1]
+            for row = cursor_row, math.max(1, cursor_row - 20), -1 do
+              local line = vim.api.nvim_buf_get_lines(buf, row - 1, row, false)[1] or ""
+              if line:match("^❮ ") then
+                vim.api.nvim_feedkeys("i", "n", false)
+                return
+              elseif line:match("^❯ ") then
+                return
+              end
+            end
+          end, 10)
+        end,
+      })
+
       Snacks.util.set_hl({
         SidekickCliInstalled = "Comment",
         SidekickCliIndicatorTerminal = "lualine_c_filename_terminal",
