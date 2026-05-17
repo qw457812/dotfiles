@@ -13,9 +13,12 @@
  *
  * Note: inside Neovim's `:terminal`, OSC 99/777 are intercepted by Nvim and won't
  * reach the host terminal unless they are forwarded via `TermRequest` + `nvim_ui_send()`.
+ *
+ * Focus awareness is provided by the separate `focus.ts` extension via `my:focus_change`
+ * events on the shared event bus. If `focus.ts` is not loaded, notifications always fire.
  */
 
-import type { ExtensionAPI, ExtensionUIContext } from "@earendil-works/pi-coding-agent";
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { Markdown, type MarkdownTheme } from "@earendil-works/pi-tui";
 import { spawn } from "node:child_process";
 
@@ -45,7 +48,7 @@ const notifyOSC777 = (title: string, body: string): void => {
 /**
  * Send a desktop notification via OSC 777 escape sequence.
  */
-const notify = (title: string, body: string): void => {
+const doNotify = (title: string, body: string): void => {
 	if (process.platform === "darwin") {
 		const script = `on run argv
 set notifTitle to item 1 of argv
@@ -64,93 +67,6 @@ end run`;
 	} else {
 		notifyOSC777(title, body);
 	}
-};
-
-type FocusTracker = {
-	attach: (ui?: Pick<ExtensionUIContext, "onTerminalInput">, onChange?: (focused: boolean) => void) => void;
-	detach: () => void;
-	// true = focused, false = unfocused, undefined = unknown
-	isFocused: () => boolean | undefined;
-};
-
-// See also:
-// - https://github.com/tmustier/pi-extensions/blob/8da9865e5beb625050406c0e9281e4393d076b22/session-recap/index.ts
-// - https://github.com/audibleblink/pi-harness/blob/b0e30a95aad74b80c8006097f80f710f0061c9fc/extensions/blur.ts
-const createFocusTracker = (): FocusTracker => {
-	// https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
-	const FOCUS_ENABLE = "\x1b[?1004h";
-	const FOCUS_DISABLE = "\x1b[?1004l";
-	const FOCUS_IN = "\x1b[I";
-	const FOCUS_OUT = "\x1b[O";
-
-	let focused: boolean | undefined;
-	let offTerminalInput: (() => void) | undefined;
-
-	const detach = () => {
-		focused = undefined;
-		if (!offTerminalInput) {
-			return;
-		}
-
-		offTerminalInput();
-		offTerminalInput = undefined;
-		process.stdout.write(FOCUS_DISABLE);
-	};
-
-	const attach = (ui?: Pick<ExtensionUIContext, "onTerminalInput">, onChange?: (focused: boolean) => void) => {
-		detach();
-		if (!ui || !process.stdin.isTTY || !process.stdout.isTTY) {
-			return;
-		}
-
-		process.stdout.write(FOCUS_ENABLE);
-		offTerminalInput = ui.onTerminalInput((data: string) => {
-			if (data === FOCUS_IN) {
-				if (focused !== true) {
-					focused = true;
-					onChange?.(true);
-				}
-			} else if (data === FOCUS_OUT) {
-				if (focused !== false) {
-					focused = false;
-					onChange?.(false);
-				}
-			}
-			return {};
-		});
-	};
-
-	return {
-		attach,
-		detach,
-		isFocused: () => focused,
-	};
-};
-
-type FocusAwareNotifier = {
-	notify: (title: string, body: string) => void;
-};
-
-const createFocusAwareNotifier = (pi: ExtensionAPI): FocusAwareNotifier => {
-	const focusTracker = createFocusTracker();
-
-	pi.on("session_start", async (_event, ctx) => {
-		focusTracker.attach(ctx.hasUI ? ctx.ui : undefined, (focused) => {
-			pi.events.emit("my:focus", { focused });
-		});
-	});
-
-	pi.on("session_shutdown", () => {
-		focusTracker.detach();
-	});
-
-	return {
-		notify: (title: string, body: string) => {
-			if (focusTracker.isFocused() !== true) {
-				notify(title, body);
-			}
-		},
-	};
 };
 
 const isTextPart = (part: unknown): part is { type: "text"; text: string } =>
@@ -214,17 +130,28 @@ const formatNotification = (text: string | null): { title: string; body: string 
 };
 
 export default function (pi: ExtensionAPI) {
-	const notifier = createFocusAwareNotifier(pi);
+	let isFocused: boolean | undefined;
+
+	const notify = (title: string, body: string): void => {
+		if (isFocused !== true) {
+			doNotify(title, body);
+		}
+	};
+
+	const offMyFocusChange = pi.events.on("my:focus_change", (data: unknown) => {
+		const { focused } = data as { focused: boolean };
+		isFocused = focused;
+	});
 
 	const offMyNotification = pi.events.on("my:notification", (data: unknown) => {
 		const { title, body } = data as { title: string; body: string };
-		notifier.notify(title, body);
+		notify(title, body);
 	});
 
 	// https://github.com/aliou/pi-guardrails/blob/ba06d720196c68825274f652dadd1032260f64ad/src/utils/events.ts#L31
 	const offGuardrailsDangerous = pi.events.on("guardrails:dangerous", (data: unknown) => {
 		const { command, description, pattern } = data as { command: string; description: string; pattern: string; };
-		notifier.notify("pi-guardrails:dangerous", `${command}\n${description}\n${pattern}`);
+		notify("pi-guardrails:dangerous", `${command}\n${description}\n${pattern}`);
 	});
 
 	// TODO: switch to this when upstream @aliou/pi-guardrails 0.12.0+ ships
@@ -246,7 +173,7 @@ export default function (pi: ExtensionAPI) {
 
 	const offGuardrailsRiskDetected = pi.events.on("guardrails:risk:detected", (data: unknown) => {
 		const { risk } = data as GuardrailsRiskDetectedPayload;
-		notifier.notify(
+		notify(
 			"pi-guardrails:risk:detected",
 			`${risk.action.command}\n${risk.reason}\n${risk.key}`,
 		);
@@ -256,10 +183,12 @@ export default function (pi: ExtensionAPI) {
 	pi.on("agent_end", async (event) => {
 		const lastText = extractLastAssistantText(event.messages ?? []);
 		const { title, body } = formatNotification(lastText);
-		notifier.notify(title, body);
+		notify(title, body);
 	});
 
 	pi.on("session_shutdown", () => {
+		isFocused = undefined;
+		offMyFocusChange();
 		offMyNotification();
 		offGuardrailsDangerous();
 		// offGuardrailsRiskDetected(); // TODO: enable when upstream 0.12.0+ ships

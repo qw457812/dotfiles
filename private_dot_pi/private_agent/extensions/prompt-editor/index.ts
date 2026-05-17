@@ -152,14 +152,13 @@ export default async function (pi: ExtensionAPI) {
   let blurred = false;
   let activeTui: CursorTUI | undefined;
   let activeEditor: ModalEditorRuntime | undefined;
-  let offMyFocus: (() => void) | undefined;
 
   // ANSI DECSCUSR cursor style sequences (CSI Ps SP q).
   // Pi's Editor always paints a fake inverse-video cursor in render()
   // (https://github.com/earendil-works/pi/blob/d06db09a53958e485131527db25c1293f29b9367/packages/tui/src/components/editor.ts#L466-L495). To make blur handling
   // reliable, we keep only the zero-width CURSOR_MARKER and render the
   // hardware cursor in both modes. That way the visible normal-mode block no
-  // longer depends on the best-effort `my:focus` event; focus tracking is only
+  // longer depends on the best-effort `my:focus_change` event; focus tracking is only
   // used to hide/show the hardware cursor when the terminal reports it.
   const CURSOR_STYLE_INSERT = "\x1b[6 q"; // steady bar
   const CURSOR_STYLE_NORMAL = "\x1b[2 q"; // steady block
@@ -333,25 +332,18 @@ export default async function (pi: ExtensionAPI) {
     }
   }
 
-  pi.on("session_start", (_event, ctx) => {
-    offMyFocus = pi.events.on("my:focus", (data: unknown) => {
-      if (
-        typeof data === "object" &&
-        data !== null &&
-        "focused" in data &&
-        typeof (data as Record<string, unknown>).focused === "boolean"
-      ) {
-        const { focused } = data as { focused: boolean };
-        blurred = !focused;
-        if (activeTui) {
-          syncHardwareCursorVisibility(activeTui);
-          if (focused && activeEditor) {
-            activeTui.terminal.write(getCursorStyle(activeEditor.getMode()));
-          }
-        }
+  const offMyFocusChange = pi.events.on("my:focus_change", (data: unknown) => {
+    const { focused } = data as { focused: boolean };
+    blurred = !focused;
+    if (activeTui) {
+      syncHardwareCursorVisibility(activeTui);
+      if (focused && activeEditor) {
+        activeTui.terminal.write(getCursorStyle(activeEditor.getMode()));
       }
-    });
+    }
+  });
 
+  pi.on("session_start", (_event, ctx) => {
     const theme = ctx.ui.theme as ThinkingTheme | undefined;
     const colorizers = theme
       ? {
@@ -429,8 +421,7 @@ export default async function (pi: ExtensionAPI) {
   });
 
   pi.on("session_shutdown", () => {
-    offMyFocus?.();
-    offMyFocus = undefined;
+    offMyFocusChange();
     blurred = false;
     activeTui = undefined;
     activeEditor = undefined;

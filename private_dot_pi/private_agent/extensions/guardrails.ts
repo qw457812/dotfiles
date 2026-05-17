@@ -50,7 +50,7 @@ export default function (pi: ExtensionAPI) {
   });
   */
 
-  pi.on("session_shutdown", async () => {
+  pi.on("session_shutdown", () => {
     currentCtx = undefined;
     offGuardrailsBlocked();
     // offGuardrailsActionBlocked(); // TODO: enable when upstream 0.12.0+ ships
