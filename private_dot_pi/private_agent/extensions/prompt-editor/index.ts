@@ -4,7 +4,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { CustomEditor, type ExtensionAPI } from "@earendil-works/pi-coding-agent";
-import { truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
+import { CURSOR_MARKER, truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
 
 import {
   applyPromptHistory,
@@ -141,6 +141,17 @@ export default async function (pi: ExtensionAPI) {
   let requestRender: (() => void) | undefined;
   let offMyFocus: (() => void) | undefined;
 
+  // ANSI DECSCUSR cursor style sequences (CSI Ps SP q).
+  // Pi renders a "fake cursor" using inverse-video (see input.ts:492-494 /
+  // editor.ts:490-492) and hides the hardware cursor by default. We show the
+  // hardware cursor in insert mode and strip the fake inverse-video highlight
+  // so only the bar-shaped hardware cursor is visible. In normal mode we
+  // switch to a block hardware cursor; the fake inverse-video cursor and the
+  // hardware block overlap naturally.
+  const CURSOR_STYLE_INSERT = "\x1b[6 q"; // steady bar
+  const CURSOR_STYLE_NORMAL = "\x1b[2 q"; // steady block
+  const CURSOR_STYLE_RESET = "\x1b[0 q"; // reset to default
+
   class PromptEditor extends ModalEditor {
     private readonly prefixColorizers: ModeColorizers | null;
 
@@ -183,7 +194,19 @@ export default async function (pi: ExtensionAPI) {
     }
 
     override render(width: number): string[] {
-      if (width <= PREFIX_WIDTH) return super.render(width);
+      const isInsert = this.getMode() === "insert";
+      const shouldStripFakeCursor = blurred || isInsert;
+
+      if (width <= PREFIX_WIDTH) {
+        const lines = super.render(width);
+        if (!blurred) {
+          this.ensureCursorMarker(lines, lines.length);
+        }
+        if (shouldStripFakeCursor) {
+          this.stripFakeCursor(lines);
+        }
+        return lines;
+      }
 
       // Related upstream logic:
       // - https://github.com/lajarre/pi-vim/blob/3eaa60ab3ca1dfca4c3ce3661d24d8327b747842/index.ts#L2218-L2232 (ModalEditor.render)
@@ -236,19 +259,54 @@ export default async function (pi: ExtensionAPI) {
       //   lines[i] = CONTINUATION_PREFIX + lines[i]!;
       // }
 
-      // Hide cursor on blur
       if (blurred) {
-        // Only strip inverse-video from editor body lines (1..bottomIdx-1).
-        // Lines[0] is the top border, lines[bottomIdx] contains the mode label —
-        // those should keep their styling so the mode remains visible when blurred.
-        for (let i = 1; i < bottomIdx; i++) {
-          // See: https://github.com/earendil-works/pi/blob/e3fee7a511503ebe170223cd89e7631751539f25/packages/tui/src/components/input.ts#L492-L493
-          // oxlint-disable-next-line no-control-regex
-          lines[i] = lines[i]!.replace(/\x1b\[7m/g, "").replace(/\x1b\[27m/g, "");
-        }
+        (this as any).tui.setShowHardwareCursor(false);
+      } else {
+        (this as any).tui.setShowHardwareCursor(true);
+        // Re-inject CURSOR_MARKER suppressed by autocomplete
+        this.ensureCursorMarker(lines, bottomIdx);
+      }
+      if (shouldStripFakeCursor) {
+        this.stripFakeCursor(lines, bottomIdx);
       }
 
       return lines;
+    }
+
+    /**
+     * Re-inject CURSOR_MARKER before the fake cursor if Editor suppressed it.
+     * Editor omits the marker during autocomplete to prevent the IME candidate
+     * window from obscuring the autocomplete list; we add it back so the
+     * hardware cursor stays visible — safe because slash-command input and
+     * IME input never coincide.
+     */
+    private ensureCursorMarker(lines: string[], bottomIdx: number): void {
+      for (let i = 1; i < bottomIdx; i++) {
+        if (lines[i]!.includes(CURSOR_MARKER)) return; // already present
+      }
+      // No marker found — inject before the first inverse-video sequence
+      for (let i = 1; i < bottomIdx; i++) {
+        // oxlint-disable-next-line no-control-regex
+        const idx = lines[i]!.indexOf("\x1b[7m");
+        if (idx !== -1) {
+          lines[i] = lines[i]!.slice(0, idx) + CURSOR_MARKER + lines[i]!.slice(idx);
+          return;
+        }
+      }
+    }
+
+    /** Strip the inverse-video fake cursor (\x1b[7m...\x1b[0m) from body lines.
+     *  \x1b[0m (SGR reset) is the actual close tag used by Editor; \x1b[27m
+     *  (explicit reverse off) is stripped defensively in case other code uses it. */
+    private stripFakeCursor(lines: string[], end?: number): void {
+      const last = end ?? lines.length;
+      for (let i = 1; i < last; i++) {
+        // See: https://github.com/earendil-works/pi/blob/e3fee7a511503ebe170223cd89e7631751539f25/packages/tui/src/components/input.ts#L492-L493
+        // oxlint-disable-next-line no-control-regex
+        lines[i] = lines[i]!.replace(/\x1b\[7m/g, "")
+          .replace(/\x1b\[0m/g, "")
+          .replace(/\x1b\[27m/g, "");
+      }
     }
   }
 
@@ -298,7 +356,30 @@ export default async function (pi: ExtensionAPI) {
         (history) => {
           ctx.ui.setEditorComponent((tui, editorTheme, kb) => {
             requestRender = () => tui.requestRender();
+
             const newEditor = new PromptEditor(tui, editorTheme, kb, colorizers, prefixColorizers);
+
+            // Enable hardware cursor and set initial shape (steady bar for insert mode).
+            // blur/focus toggles showHardwareCursor in render() — see the blur block.
+            tui.setShowHardwareCursor(true);
+            tui.terminal.write(CURSOR_STYLE_INSERT);
+
+            // Track mode changes to update cursor style. We hook into
+            // requestRender (called by pi-vim after every handleInput that
+            // mutates state) and write the appropriate shape sequence directly
+            // to the terminal.
+            const origRequestRender = tui.requestRender.bind(tui);
+            let lastShapeMode: Mode | undefined = "insert";
+            tui.requestRender = () => {
+              origRequestRender();
+              const curMode = newEditor.getMode();
+              if (curMode !== lastShapeMode) {
+                lastShapeMode = curMode;
+                const shape = curMode === "insert" ? CURSOR_STYLE_INSERT : CURSOR_STYLE_NORMAL;
+                tui.terminal.write(shape);
+              }
+            };
+
             editor = newEditor as unknown as ModalEditorRuntime;
             hydratePromptHistory(editor, history);
             return newEditor;
@@ -323,5 +404,7 @@ export default async function (pi: ExtensionAPI) {
     offMyFocus = undefined;
     blurred = false;
     requestRender = undefined;
+    // Restore default terminal cursor style on exit
+    process.stdout.write(CURSOR_STYLE_RESET);
   });
 }

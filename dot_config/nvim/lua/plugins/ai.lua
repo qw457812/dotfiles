@@ -384,7 +384,10 @@ return {
                     end
 
                     if vim.api.nvim_get_current_buf() == buf then
-                      vim.fn.search("❯ ", "Wb")
+                      -- https://github.com/qw457812/dotfiles/blob/4e28970c14da2e0f9aab8b18014ef5d7c309235d/private_dot_pi/private_agent/extensions/prompt-editor/index.ts
+                      if vim.fn.search("❯", "Wb") == 0 then
+                        vim.fn.search("❮", "Wb")
+                      end
                     end
                   end)
                 end
