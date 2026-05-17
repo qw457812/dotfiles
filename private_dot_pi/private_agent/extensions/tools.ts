@@ -118,7 +118,13 @@ export default function toolsExtension(pi: ExtensionAPI) {
 						container.invalidate();
 					},
 					handleInput(data: string) {
-						settingsList.handleInput?.(data);
+						if (data === "j") {
+							settingsList.handleInput?.("\x1b[B"); // down
+						} else if (data === "k") {
+							settingsList.handleInput?.("\x1b[A"); // up
+						} else {
+							settingsList.handleInput?.(data);
+						}
 						tui.requestRender();
 					},
 				};

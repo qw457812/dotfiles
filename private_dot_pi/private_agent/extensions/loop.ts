@@ -282,7 +282,13 @@ export default function loopExtension(pi: ExtensionAPI): void {
 					container.invalidate();
 				},
 				handleInput(data: string) {
-					selectList.handleInput(data);
+					if (data === "j") {
+						selectList.handleInput("\x1b[B"); // down
+					} else if (data === "k") {
+						selectList.handleInput("\x1b[A"); // up
+					} else {
+						selectList.handleInput(data);
+					}
 					tui.requestRender();
 				},
 			};

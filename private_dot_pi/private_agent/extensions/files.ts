@@ -186,12 +186,15 @@ export default function (pi: ExtensionAPI) {
 					render: (w) => container.render(w),
 					invalidate: () => container.invalidate(),
 					handleInput: (data) => {
-						// Add paging with left/right
-						if (matchesKey(data, Key.left)) {
+						if (data === "j") {
+							selectList.handleInput("\x1b[B"); // down
+						} else if (data === "k") {
+							selectList.handleInput("\x1b[A"); // up
+						} else if (data === "h" || matchesKey(data, Key.left)) {
 							// Page up - clamp to 0
 							currentIndex = Math.max(0, currentIndex - visibleRows);
 							selectList.setSelectedIndex(currentIndex);
-						} else if (matchesKey(data, Key.right)) {
+						} else if (data === "l" || matchesKey(data, Key.right)) {
 							// Page down - clamp to last
 							currentIndex = Math.min(items.length - 1, currentIndex + visibleRows);
 							selectList.setSelectedIndex(currentIndex);
