@@ -18,8 +18,8 @@ const CONTINUATION_PREFIX = "  ";
 const PREFIX_WIDTH = visibleWidth(INSERT_PREFIX);
 const ESC = String.fromCharCode(27);
 const ANSI_COLOR_RE = new RegExp(`${ESC}\\[[0-9;]*m`, "g");
-const FAKE_CURSOR_SGR_RESET_RE = new RegExp(`${ESC}\\[7m([\\s\\S]*?)${ESC}\\[0m`, "g");
-const FAKE_CURSOR_REVERSE_OFF_RE = new RegExp(`${ESC}\\[7m([\\s\\S]*?)${ESC}\\[27m`, "g");
+const FAKE_CURSOR_SGR_RESET_RE = new RegExp(`${ESC}\\[7m(.*?)${ESC}\\[0m`, "g");
+const FAKE_CURSOR_REVERSE_OFF_RE = new RegExp(`${ESC}\\[7m(.*?)${ESC}\\[27m`, "g");
 const EXTENSION_DIR =
   typeof __dirname === "string" ? __dirname : dirname(fileURLToPath(import.meta.url));
 // pi's extension loader can evaluate TS via jiti, but importing pi-vim directly
@@ -221,7 +221,10 @@ export default async function (pi: ExtensionAPI) {
     override render(width: number): string[] {
       if (width <= PREFIX_WIDTH) {
         const lines = super.render(width);
-        this.renderHardwareCursor(lines, lines.length);
+        const bottomIdx = findBottomBorderIndex(lines);
+        // In narrow mode ModalEditor puts the mode label on the last line when
+        // there's no border; don't strip its inverse-video formatting.
+        this.renderHardwareCursor(lines, bottomIdx > 0 ? bottomIdx : lines.length - 1);
         return lines;
       }
 
