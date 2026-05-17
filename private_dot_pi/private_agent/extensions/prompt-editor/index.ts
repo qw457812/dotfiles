@@ -222,9 +222,8 @@ export default async function (pi: ExtensionAPI) {
       if (width <= PREFIX_WIDTH) {
         const lines = super.render(width);
         const bottomIdx = findBottomBorderIndex(lines);
-        // In narrow mode ModalEditor puts the mode label on the last line when
-        // there's no border; don't strip its inverse-video formatting.
-        this.renderHardwareCursor(lines, bottomIdx > 0 ? bottomIdx : lines.length - 1);
+        // Last line has ModalEditor's mode label; don't strip its inverse-video.
+        this.renderHardwareCursor(lines, bottomIdx >= 1 ? bottomIdx : lines.length - 1);
         return lines;
       }
 
