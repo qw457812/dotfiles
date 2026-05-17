@@ -50,8 +50,18 @@
           "name": "Kimi K2.6 Turbo",
           // "api": "openai-completions",
           // "baseUrl": "https://api.fireworks.ai/inference/v1",
+          // "compat": {
+          //   "sendSessionAffinityHeaders": true,
+          //   "supportsLongCacheRetention": false
+          // },
           "api": "anthropic-messages",
           "baseUrl": "https://api.fireworks.ai/inference",
+          "compat": {
+            "sendSessionAffinityHeaders": true,
+            "supportsEagerToolInputStreaming": false,
+            "supportsCacheControlOnTools": false,
+            "supportsLongCacheRetention": false
+          },
           "reasoning": true,
           "input": ["text", "image"],
           "contextWindow": 256000,
