@@ -153,13 +153,31 @@ export default async function (pi: ExtensionAPI) {
   let activeTui: CursorTUI | undefined;
   let activeEditor: ModalEditorRuntime | undefined;
 
+  // User preference from /setting "Show hardware cursor". Mirrors the value
+  // that interactive-mode writes via tui.setShowHardwareCursor(). When false,
+  // we leave the upstream fake inverse-video cursor intact (stripping it on
+  // blur, restoring on focus) and skip all cursor-shape sequences.
+  let userPrefersShowHardwareCursor = true;
+
+  // Saved before we wrap setShowHardwareCursor / requestRender so our
+  // internal blur/focus logic can toggle the effective visibility without
+  // accidentally updating userPrefersShowHardwareCursor, and so session_shutdown
+  // can restore the originals.
+  let originalSetShowHardwareCursor: CursorTUI["setShowHardwareCursor"] | undefined;
+  let originalRequestRender: CursorTUI["requestRender"] | undefined;
+
   // ANSI DECSCUSR cursor style sequences (CSI Ps SP q).
   // Pi's Editor always paints a fake inverse-video cursor in render()
-  // (https://github.com/earendil-works/pi/blob/d06db09a53958e485131527db25c1293f29b9367/packages/tui/src/components/editor.ts#L466-L495). To make blur handling
-  // reliable, we keep only the zero-width CURSOR_MARKER and render the
-  // hardware cursor in both modes. That way the visible normal-mode block no
-  // longer depends on the best-effort `my:focus_change` event; focus tracking is only
-  // used to hide/show the hardware cursor when the terminal reports it.
+  // (https://github.com/earendil-works/pi/blob/d06db09a53958e485131527db25c1293f29b9367/packages/tui/src/components/editor.ts#L466-L495).
+  //
+  // When the user enables hardware cursor, we keep only the zero-width
+  // CURSOR_MARKER and drive the visible cursor with DECSCUSR shapes. Focus
+  // tracking hides/shows the hardware cursor so the visible block no longer
+  // depends on best-effort focus events.
+  //
+  // When the user disables hardware cursor, we leave the fake inverse-video
+  // cursor intact (stripping it on blur, restoring on focus) and only emit
+  // CURSOR_STYLE_RESET to clear any lingering cursor shape.
   const CURSOR_STYLE_INSERT = "\x1b[6 q"; // steady bar
   const CURSOR_STYLE_NORMAL = "\x1b[2 q"; // steady block
   const CURSOR_STYLE_RESET = "\x1b[0 q"; // reset to default
@@ -168,12 +186,22 @@ export default async function (pi: ExtensionAPI) {
     return mode === "insert" ? CURSOR_STYLE_INSERT : CURSOR_STYLE_NORMAL;
   }
 
-  function syncHardwareCursorVisibility(tui: CursorTUI): void {
-    const shouldShow = !blurred;
-    if (tui.getShowHardwareCursor?.() === shouldShow) {
-      return;
-    }
-    tui.setShowHardwareCursor(shouldShow);
+  /** Apply hardware cursor visibility based on user preference and current
+   *  focus state. Uses the original setter to bypass the wrapper installed
+   *  on tui.setShowHardwareCursor. */
+  function applyHardwareCursorVisibility(tui: CursorTUI): void {
+    if (!originalSetShowHardwareCursor) return;
+    const effective = userPrefersShowHardwareCursor && !blurred;
+    if (tui.getShowHardwareCursor?.() === effective) return;
+    originalSetShowHardwareCursor.call(tui, effective);
+  }
+
+  /** Write the DECSCUSR shape if hardware cursor is active; otherwise emit
+   *  CURSOR_STYLE_RESET so the terminal reverts to its default shape. */
+  function writeCursorStyle(tui: CursorTUI, mode: Mode): void {
+    tui.terminal.write(
+      userPrefersShowHardwareCursor && !blurred ? getCursorStyle(mode) : CURSOR_STYLE_RESET,
+    );
   }
 
   class PromptEditor extends ModalEditor {
@@ -222,7 +250,7 @@ export default async function (pi: ExtensionAPI) {
         const lines = super.render(width);
         const bottomIdx = findBottomBorderIndex(lines);
         // Last line has ModalEditor's mode label; don't strip its inverse-video.
-        this.renderHardwareCursor(lines, bottomIdx >= 1 ? bottomIdx : lines.length - 1);
+        this.renderCursor(lines, bottomIdx >= 1 ? bottomIdx : lines.length - 1);
         return lines;
       }
 
@@ -236,13 +264,13 @@ export default async function (pi: ExtensionAPI) {
       // bottom border below.
       const lines = CustomEditor.prototype.render.call(this, width - PREFIX_WIDTH) as string[];
       if (lines.length < 3) {
-        this.renderHardwareCursor(lines, lines.length);
+        this.renderCursor(lines, lines.length);
         return lines;
       }
 
       const bottomIdx = findBottomBorderIndex(lines);
       if (bottomIdx <= 0) {
-        this.renderHardwareCursor(lines, lines.length);
+        this.renderCursor(lines, lines.length);
         return lines;
       }
 
@@ -283,16 +311,24 @@ export default async function (pi: ExtensionAPI) {
       //   lines[i] = CONTINUATION_PREFIX + lines[i]!;
       // }
 
-      this.renderHardwareCursor(lines, bottomIdx);
+      this.renderCursor(lines, bottomIdx);
       return lines;
     }
 
-    private renderHardwareCursor(lines: string[], bottomIdx: number): void {
-      // Keep the cursor fully hardware-driven in both modes. This removes the
-      // normal-mode dependency on the fake inverse-video cursor, which is what
-      // could remain visible when blur events were missed.
-      this.ensureCursorMarker(lines, bottomIdx);
-      this.stripFakeCursor(lines, bottomIdx);
+    private renderCursor(lines: string[], bottomIdx: number): void {
+      if (userPrefersShowHardwareCursor) {
+        // Hardware cursor mode: ensure CURSOR_MARKER is present for the
+        // terminal to position its hardware cursor, and strip the fake
+        // inverse-video cursor rendered by Editor.
+        this.ensureCursorMarker(lines, bottomIdx);
+        this.stripFakeCursor(lines, bottomIdx);
+      } else if (blurred) {
+        // Fake cursor mode + blurred: strip the fake inverse-video cursor
+        // so no cursor is visible when the terminal loses focus.
+        this.stripFakeCursor(lines, bottomIdx);
+      }
+      // Fake cursor mode + focused: leave the upstream inverse-video cursor
+      // untouched — it serves as the visible cursor.
     }
 
     /**
@@ -335,11 +371,18 @@ export default async function (pi: ExtensionAPI) {
   const offMyFocusChange = pi.events.on("my:focus_change", (data: unknown) => {
     const { focused } = data as { focused: boolean };
     blurred = !focused;
-    if (activeTui) {
-      syncHardwareCursorVisibility(activeTui);
-      if (focused && activeEditor) {
-        activeTui.terminal.write(getCursorStyle(activeEditor.getMode()));
-      }
+    if (!activeTui || !activeEditor) return;
+
+    if (userPrefersShowHardwareCursor) {
+      applyHardwareCursorVisibility(activeTui);
+      // Update cursor style on every focus change: writeCursorStyle
+      // emits the DECSCUSR shape when focused and CURSOR_STYLE_RESET
+      // when blurred, matching the setting-toggle path.
+      writeCursorStyle(activeTui, activeEditor.getMode());
+    } else {
+      // Fake cursor mode: request a re-render so renderCursor() can
+      // strip or restore the inverse-video cursor.
+      activeTui.requestRender();
     }
   });
 
@@ -381,24 +424,67 @@ export default async function (pi: ExtensionAPI) {
             activeEditor = newEditor as unknown as ModalEditorRuntime;
             editor = activeEditor;
 
-            // Keep visibility outside render() so setShowHardwareCursor() cannot
-            // re-enter the render path. Focus reporting is only a fallback here:
-            // the rendered cursor itself is now always hardware-driven.
-            syncHardwareCursorVisibility(activeTui);
-            activeTui.terminal.write(getCursorStyle(newEditor.getMode()));
+            // Capture initial user preference from the TUI. interactive-mode
+            // passes settingsManager.getShowHardwareCursor() to the TUI
+            // constructor, so this reflects the /setting value.
+            userPrefersShowHardwareCursor = tui.getShowHardwareCursor?.() ?? true;
+
+            // Capture the original setter once (unbound so .call(tui, …)
+            // supplies the correct this). Guard against re-capture: if
+            // session_shutdown didn't fire, the TUI still holds the
+            // previous wrapper — skip to avoid nesting.
+            if (!originalSetShowHardwareCursor) {
+              originalSetShowHardwareCursor = tui.setShowHardwareCursor;
+            }
+
+            // Wrap setShowHardwareCursor to catch live /setting changes.
+            // interactive-mode calls this when the user toggles
+            // "Show hardware cursor".
+            tui.setShowHardwareCursor = (enabled: boolean) => {
+              const changed = enabled !== userPrefersShowHardwareCursor;
+              userPrefersShowHardwareCursor = enabled;
+              applyHardwareCursorVisibility(tui);
+              // When switching away from hardware cursor, reset the
+              // terminal cursor shape so it doesn't linger.
+              if (!enabled) {
+                tui.terminal.write(CURSOR_STYLE_RESET);
+              } else if (!blurred) {
+                writeCursorStyle(tui, newEditor.getMode());
+              }
+              if (changed) {
+                tui.requestRender();
+              }
+            };
+
+            // Apply initial effective visibility outside render() so
+            // setShowHardwareCursor() cannot re-enter the render path.
+            applyHardwareCursorVisibility(activeTui);
+            // writeCursorStyle handles both modes (shape on enable, reset
+            // on disable), but skip if user has hardware cursor off — no
+            // DECSCUSR sequences needed at all.
+            if (userPrefersShowHardwareCursor) {
+              writeCursorStyle(activeTui, newEditor.getMode());
+            }
 
             // Track mode changes to update cursor style. We hook into
             // requestRender (called by pi-vim after every handleInput that
             // mutates state) and write the appropriate shape sequence directly
             // to the terminal.
-            const origRequestRender = tui.requestRender.bind(tui);
+            // Guard against re-capture (same rationale as
+            // originalSetShowHardwareCursor above).
+            if (!originalRequestRender) {
+              originalRequestRender = tui.requestRender;
+            }
+            const origRequestRender = originalRequestRender!;
             let lastShapeMode: Mode | undefined = newEditor.getMode();
             tui.requestRender = () => {
-              origRequestRender();
+              origRequestRender.call(tui);
               const curMode = newEditor.getMode();
               if (curMode !== lastShapeMode) {
                 lastShapeMode = curMode;
-                tui.terminal.write(getCursorStyle(curMode));
+                if (userPrefersShowHardwareCursor && !blurred) {
+                  tui.terminal.write(getCursorStyle(curMode));
+                }
               }
             };
 
@@ -421,10 +507,24 @@ export default async function (pi: ExtensionAPI) {
   });
 
   pi.on("session_shutdown", () => {
+    // Restore TUI methods that were wrapped in setEditorComponent so
+    // subsequent calls from interactive-mode (applyRuntimeSettings,
+    // resetExtensionUI) hit the originals instead of our stale closures.
+    if (activeTui) {
+      if (originalSetShowHardwareCursor) {
+        activeTui.setShowHardwareCursor = originalSetShowHardwareCursor;
+      }
+      if (originalRequestRender) {
+        activeTui.requestRender = originalRequestRender;
+      }
+    }
     offMyFocusChange();
     blurred = false;
     activeTui = undefined;
     activeEditor = undefined;
+    userPrefersShowHardwareCursor = true;
+    originalSetShowHardwareCursor = undefined;
+    originalRequestRender = undefined;
     // Restore default terminal cursor style on exit
     process.stdout.write(CURSOR_STYLE_RESET);
   });
