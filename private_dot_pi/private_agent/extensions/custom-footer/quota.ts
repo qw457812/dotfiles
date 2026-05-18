@@ -515,6 +515,8 @@ const sources: Record<string, Source> = {
       return fetchJson<CrofQuota>("https://crof.ai/usage_api/", apiKey);
     },
     format(quota: CrofQuota, theme: Theme): string | null {
+      const { usable_requests: remaining, requests_plan: limit, credits } = quota;
+
       // CrofAI daily requests reset at 05:00 UTC (13:00 CST)
       const now = new Date();
       const nextReset = new Date(
@@ -526,17 +528,17 @@ const sources: Record<string, Source> = {
 
       return joinParts(
         [
-          quota.usable_requests !== null
+          remaining !== null
             ? joinParts(
                 [
-                  theme.fg("accent", `${quota.usable_requests}`),
-                  quota.requests_plan !== null ? theme.fg("dim", `${quota.requests_plan}`) : null,
+                  theme.fg("accent", `${limit !== null ? limit - remaining : remaining}`),
+                  limit !== null ? theme.fg("dim", `${limit}`) : null,
                   theme.fg("dim", `${formatRemaining(nextReset.getTime())}`),
                 ],
                 theme.fg("dim", "/"),
               )
             : null,
-          quota.credits > 0 ? theme.fg("accent", `$${formatDecimal(quota.credits, 2)}`) : null,
+          credits > 0 ? theme.fg("accent", `$${formatDecimal(credits, 2)}`) : null,
         ],
         " ",
       );
