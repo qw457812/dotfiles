@@ -148,38 +148,6 @@ export default function (pi: ExtensionAPI) {
 		notify(title, body);
 	});
 
-	// https://github.com/aliou/pi-guardrails/blob/ba06d720196c68825274f652dadd1032260f64ad/src/utils/events.ts#L31
-	const offGuardrailsDangerous = pi.events.on("guardrails:dangerous", (data: unknown) => {
-		const { command, description, pattern } = data as { command: string; description: string; pattern: string; };
-		notify("pi-guardrails:dangerous", `${command}\n${description}\n${pattern}`);
-	});
-
-	// TODO: switch to this when upstream @aliou/pi-guardrails 0.12.0+ ships
-	// ref: https://github.com/aliou/pi-guardrails/blob/a57fe81595d8b787bd7e9ad0ef054a101392f6c8/src/shared/events.ts#L5
-	/*
-	interface GuardrailsRiskDetectedPayload {
-		source: "guardrails";
-		feature: "policies" | "permissionGate" | "pathAccess";
-		timestamp: string;
-		risk: {
-			kind: "dangerous";
-			action: { kind: "command"; command: string; origin?: string };
-			key: string;
-			reason: string;
-			metadata?: unknown;
-		};
-		context?: { toolName?: string; input?: Record<string, unknown> };
-	}
-
-	const offGuardrailsRiskDetected = pi.events.on("guardrails:risk:detected", (data: unknown) => {
-		const { risk } = data as GuardrailsRiskDetectedPayload;
-		notify(
-			"pi-guardrails:risk:detected",
-			`${risk.action.command}\n${risk.reason}\n${risk.key}`,
-		);
-	});
-	*/
-
 	pi.on("agent_end", async (event) => {
 		const lastText = extractLastAssistantText(event.messages ?? []);
 		const { title, body } = formatNotification(lastText);
@@ -190,7 +158,5 @@ export default function (pi: ExtensionAPI) {
 		isFocused = undefined;
 		offMyFocusChange();
 		offMyNotification();
-		offGuardrailsDangerous();
-		// offGuardrailsRiskDetected(); // TODO: enable when upstream 0.12.0+ ships
 	});
 }
