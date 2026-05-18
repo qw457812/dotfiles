@@ -92,6 +92,18 @@ return {
         lazy = true,
         config = function() end,
       },
+      {
+        "monotykamary/pi-crofai-provider",
+        build = "pi update --extension git:github.com/monotykamary/pi-crofai-provider",
+        lazy = true,
+        config = function() end,
+      },
+      {
+        "monotykamary/pi-invisible-continue",
+        build = "pi update --extension git:github.com/monotykamary/pi-invisible-continue",
+        lazy = true,
+        config = function() end,
+      },
     },
   },
   { "qw457812/claude-code-sourcemap", pin = true, lazy = true, config = function() end },

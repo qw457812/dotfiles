@@ -6,15 +6,19 @@
   "hideThinkingBlock": true,
   "quietStartup": true,
   "enabledModels": [
-    "firepass/accounts/fireworks/routers/kimi-k2p6-turbo",
     "synthetic/hf:zai-org/GLM-5.1",
     "synthetic/hf:moonshotai/Kimi-K2.6",
-    "openai-codex/gpt-5.5",
-    "github-copilot/gpt-5.4",
     "zai/glm-5.1",
+    "firepass/accounts/fireworks/routers/kimi-k2p6-turbo",
+    "crofai/glm-5.1-precision",
+    "crofai/kimi-k2.6-precision",
+    "crofai/mimo-v2.5-pro-precision",
+    "crofai/deepseek-v4-pro-precision",
     "deepseek/deepseek-v4-pro",
     "neuralwatt/zai-org/GLM-5.1-FP8",
-    "neuralwatt/moonshotai/Kimi-K2.6"
+    "neuralwatt/moonshotai/Kimi-K2.6",
+    "openai-codex/gpt-5.5",
+    "github-copilot/gpt-5.4"
   ],
   "packages": [
     "npm:pi-vim",
@@ -69,6 +73,8 @@
     "npm:@aliou/pi-guardrails",
     "npm:pi-mcp-adapter",
     "git:github.com/monotykamary/pi-tps",
-    "git:github.com/monotykamary/pi-neuralwatt-provider"
+    "git:github.com/monotykamary/pi-neuralwatt-provider",
+    "git:github.com/monotykamary/pi-crofai-provider",
+    "git:github.com/monotykamary/pi-invisible-continue"
   ]
 }

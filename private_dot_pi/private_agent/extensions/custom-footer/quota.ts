@@ -84,6 +84,12 @@ interface DeepSeekQuota {
   }>;
 }
 
+// https://crof.ai/docs
+interface CrofQuota {
+  usable_requests: number | null;
+  credits: number;
+}
+
 // Fire Pass V2 is unlimited
 interface FirepassUsage {
   tokens: number;
@@ -189,9 +195,12 @@ function formatRemaining(date: string | number): string {
   return `${seconds}s`;
 }
 
-function joinParts(parts: Array<string | null | undefined | false>): string | null {
+function joinParts(
+  parts: Array<string | null | undefined | false>,
+  separator = " ",
+): string | null {
   const filtered = parts.filter((part): part is string => Boolean(part));
-  return filtered.length > 0 ? filtered.join(" ") : null;
+  return filtered.length > 0 ? filtered.join(separator) : null;
 }
 
 function toLocalDayKey(d: Date): string {
@@ -496,6 +505,24 @@ const sources: Record<string, Source> = {
       );
     },
   }),
+  crofai: createSource("crofai", {
+    cacheTtlMs: MINUTE_MS,
+    async getAuth(): Promise<string | null> {
+      return process.env.CROFAI_API_KEY || null;
+    },
+    async fetch(apiKey: string): Promise<CrofQuota | null> {
+      return fetchJson<CrofQuota>("https://crof.ai/usage_api/", apiKey);
+    },
+    format(quota: CrofQuota, theme: Theme): string | null {
+      return joinParts(
+        [
+          quota.usable_requests !== null ? theme.fg("accent", `${quota.usable_requests}`) : null,
+          quota.credits > 0 ? theme.fg("dim", `$${formatDecimal(quota.credits, 2)}`) : null,
+        ],
+        theme.fg("dim", "/"),
+      );
+    },
+  }),
   firepass: createSource("firepass", {
     cacheTtlMs: IS_TERMUX ? 5 * MINUTE_MS : MINUTE_MS,
     async getAuth(): Promise<string | null> {
@@ -505,13 +532,18 @@ const sources: Record<string, Source> = {
       return await getDailyFirepassUsage();
     },
     format(data: FirepassUsage, theme: Theme): string | null {
-      const tok = formatTokens(data.tokens);
-      if (data.cost <= 0) return theme.fg("accent", tok);
-
-      let digits = 2;
-      if (data.cost < 1) digits = 3;
-      if (data.cost < 0.01) digits = 4;
-      return `${theme.fg("accent", tok)}${theme.fg("dim", `/$${formatDecimal(data.cost, digits)}`)}`;
+      return joinParts(
+        [
+          theme.fg("accent", formatTokens(data.tokens)),
+          data.cost > 0
+            ? theme.fg(
+                "dim",
+                `$${formatDecimal(data.cost, data.cost < 0.01 ? 4 : data.cost < 1 ? 3 : 2)}`,
+              )
+            : null,
+        ],
+        theme.fg("dim", "/"),
+      );
     },
   }),
 };
