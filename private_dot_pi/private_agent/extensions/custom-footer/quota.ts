@@ -87,6 +87,7 @@ interface DeepSeekQuota {
 // https://crof.ai/docs
 interface CrofQuota {
   usable_requests: number | null;
+  requests_plan: number | null;
   credits: number;
 }
 
@@ -514,12 +515,30 @@ const sources: Record<string, Source> = {
       return fetchJson<CrofQuota>("https://crof.ai/usage_api/", apiKey);
     },
     format(quota: CrofQuota, theme: Theme): string | null {
+      // CrofAI daily requests reset at 05:00 UTC (13:00 CST)
+      const now = new Date();
+      const nextReset = new Date(
+        Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 5, 0, 0, 0),
+      );
+      if (nextReset.getTime() <= now.getTime()) {
+        nextReset.setUTCDate(nextReset.getUTCDate() + 1);
+      }
+
       return joinParts(
         [
-          quota.usable_requests !== null ? theme.fg("accent", `${quota.usable_requests}`) : null,
-          quota.credits > 0 ? theme.fg("dim", `$${formatDecimal(quota.credits, 2)}`) : null,
+          quota.usable_requests !== null
+            ? joinParts(
+                [
+                  theme.fg("accent", `${quota.usable_requests}`),
+                  quota.requests_plan !== null ? theme.fg("dim", `${quota.requests_plan}`) : null,
+                  theme.fg("dim", `${formatRemaining(nextReset.getTime())}`),
+                ],
+                theme.fg("dim", "/"),
+              )
+            : null,
+          quota.credits > 0 ? theme.fg("accent", `$${formatDecimal(quota.credits, 2)}`) : null,
         ],
-        theme.fg("dim", "/"),
+        " ",
       );
     },
   }),
