@@ -1,3 +1,4 @@
+import type { OAuthCredentials } from "@earendil-works/pi-ai";
 import { getAgentDir } from "@earendil-works/pi-coding-agent";
 import type { TUI } from "@earendil-works/pi-tui";
 import { createReadStream, type Dirent } from "node:fs";
@@ -91,6 +92,19 @@ interface CrofQuota {
   credits: number;
 }
 
+interface CodebuddyQuota {
+  code: number;
+  data: {
+    credit: number;
+    limitNum: number;
+    cycleResetTime: string;
+  };
+}
+
+type CodebuddyOAuthCredentials = {
+  enterpriseId?: string;
+} & OAuthCredentials;
+
 // Fire Pass V2 is unlimited
 interface FirepassUsage {
   tokens: number;
@@ -102,10 +116,10 @@ interface CachedValue<T> {
   updatedAt: number;
 }
 
-interface SourceConfig<T> {
+interface SourceConfig<T, A = string> {
   cacheTtlMs: number;
-  getAuth: () => Promise<string | null>;
-  fetch: (auth: string) => Promise<T | null>;
+  getAuth: () => Promise<A | null>;
+  fetch: (auth: A) => Promise<T | null>;
   format: (quota: T, theme: Theme) => string | null;
 }
 
@@ -136,9 +150,7 @@ async function fetchJson<T>(url: string, token: string): Promise<T | null> {
     const resp = await fetch(url, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    if (!resp.ok) {
-      return null;
-    }
+    if (!resp.ok) return null;
     return (await resp.json()) as T;
   } catch {
     return null;
@@ -163,12 +175,9 @@ async function writeCache<T>(provider: string, value: T): Promise<void> {
   );
 }
 
-async function readAuth(provider: string, key: "access" | "refresh"): Promise<string | null> {
-  const auth =
-    await readJson<Record<string, Partial<Record<"access" | "refresh", string>>>>(
-      PI_AGENT_AUTH_PATH,
-    );
-  return auth?.[provider]?.[key] || null;
+async function readAuth<T = Record<string, unknown>>(provider: string): Promise<T | null> {
+  const auth = await readJson<Record<string, T>>(PI_AGENT_AUTH_PATH);
+  return auth?.[provider] ?? null;
 }
 
 function formatRemaining(date: string | number): string {
@@ -312,7 +321,7 @@ async function getDailyFirepassUsage(): Promise<FirepassUsage> {
   return { tokens, cost };
 }
 
-function createSource<T>(provider: string, config: SourceConfig<T>): Source {
+function createSource<T, A = string>(provider: string, config: SourceConfig<T, A>): Source {
   let cache: CachedValue<T> | null = null;
   let fetching = false;
   let nextRetryAt = 0;
@@ -405,7 +414,7 @@ const sources: Record<string, Source> = {
     cacheTtlMs: MINUTE_MS,
     async getAuth(): Promise<string | null> {
       // curl -s "https://api.github.com/copilot_internal/user" -H "Authorization: Bearer $(jq -r '.[] | select(.oauth_token) | .oauth_token' ~/.config/github-copilot/apps.json | head -1)"
-      return readAuth("github-copilot", "refresh");
+      return (await readAuth<{ refresh?: string }>("github-copilot"))?.refresh ?? null;
     },
     async fetch(token: string): Promise<CopilotQuota | null> {
       return fetchJson<CopilotQuota>("https://api.github.com/copilot_internal/user", token);
@@ -419,7 +428,7 @@ const sources: Record<string, Source> = {
     cacheTtlMs: MINUTE_MS,
     async getAuth(): Promise<string | null> {
       // curl -s -H "Authorization: Bearer $(cat ~/.codex/auth.json | jq -r '.tokens.access_token')" "https://chatgpt.com/backend-api/wham/usage" | jq .
-      return readAuth("openai-codex", "access");
+      return (await readAuth<{ access?: string }>("openai-codex"))?.access ?? null;
     },
     async fetch(token: string): Promise<CodexQuota | null> {
       return fetchJson<CodexQuota>("https://chatgpt.com/backend-api/wham/usage", token);
@@ -565,6 +574,43 @@ const sources: Record<string, Source> = {
         ],
         theme.fg("dim", "/"),
       );
+    },
+  }),
+  codebuddy: createSource<CodebuddyQuota, CodebuddyOAuthCredentials>("codebuddy", {
+    cacheTtlMs: MINUTE_MS,
+    async getAuth(): Promise<CodebuddyOAuthCredentials | null> {
+      return await readAuth<CodebuddyOAuthCredentials>("codebuddy");
+    },
+    async fetch(auth): Promise<CodebuddyQuota | null> {
+      if (!auth.enterpriseId) return null;
+
+      try {
+        // https://www.codebuddy.cn/profile/usage
+        const resp = await fetch(
+          "https://www.codebuddy.cn/billing/meter/get-enterprise-user-usage",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${auth.access}`,
+              "X-Enterprise-Id": auth.enterpriseId,
+            },
+            body: "{}",
+          },
+        );
+        if (!resp.ok) return null;
+        const quota = (await resp.json()) as CodebuddyQuota;
+        if (!quota?.data || quota.code !== 0) return null;
+        return quota;
+      } catch {
+        return null;
+      }
+    },
+    format(quota: CodebuddyQuota, theme: Theme): string | null {
+      const { credit, limitNum, cycleResetTime } = quota.data;
+      return joinParts([
+        `${theme.fg("accent", formatDecimal(credit, 2))}${theme.fg("dim", `/${formatDecimal(limitNum, 2)}`)}`,
+        theme.fg("dim", formatRemaining(Date.parse(cycleResetTime.replace(" ", "T")))),
+      ]);
     },
   }),
 };
