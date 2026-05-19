@@ -143,7 +143,7 @@ export default async function (pi: ExtensionAPI) {
   type CursorTUI = {
     getShowHardwareCursor?: () => boolean;
     setShowHardwareCursor: (enabled: boolean) => void;
-    requestRender: () => void;
+    requestRender: (force?: boolean) => void;
     terminal: {
       write: (data: string) => void;
     };
@@ -477,8 +477,8 @@ export default async function (pi: ExtensionAPI) {
             }
             const origRequestRender = originalRequestRender!;
             let lastShapeMode: Mode | undefined = newEditor.getMode();
-            tui.requestRender = () => {
-              origRequestRender.call(tui);
+            tui.requestRender = (force?: boolean) => {
+              origRequestRender.call(tui, force);
               const curMode = newEditor.getMode();
               if (curMode !== lastShapeMode) {
                 lastShapeMode = curMode;
