@@ -20,13 +20,13 @@ import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-a
  *  - OceanBase MCP Server: https://github.com/oceanbase/awesome-oceanbase-mcp
  */
 const GUARDED_TOOL_PATTERNS = [
-  /_run-sqlcl$/, // SQLcl MCP Server: tools like sqlcl_run-sqlcl
-  /_run-sql$/, // SQLcl MCP Server: tools like sqlcl_run-sql
+  /_sqlcl_run$/, // SQLcl MCP Server: tools like sqlcl_sqlcl_run
+  /_sql_run$/, // SQLcl MCP Server: tools like sqlcl_sql_run
   /_execute_sql$/, // OceanBase MCP Server: tools like oceanbase_execute_sql
 ];
 const SQL_PARAM_KEYS = [
-  "sql", // Used by tools like sqlcl_run-sql and oceanbase_execute_sql
-  "sqlcl", // Used by tools like sqlcl_run-sqlcl
+  "sql", // Used by tools like sqlcl_sql_run and oceanbase_execute_sql
+  "sqlcl", // Used by tools like sqlcl_sqlcl_run
 ] as const;
 const DANGEROUS_KEYWORDS = [
   "INSERT",
