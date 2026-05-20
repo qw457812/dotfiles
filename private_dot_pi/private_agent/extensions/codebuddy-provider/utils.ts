@@ -1,10 +1,10 @@
 import { Buffer } from "node:buffer";
 import { randomUUID } from "node:crypto";
-import { CODEBUDDY_DEFAULT_DOMAIN, EXPIRY_BUFFER_MS, SUCCESS_CODES } from "./constants.js";
+import { DEFAULT_DOMAIN, EXPIRY_BUFFER_MS, SUCCESS_CODES } from "./constants.js";
 
 // ── JWT ──────────────────────────────────────────────────────────────────────
 
-export function decodeCodebuddyJwtClaims(
+export function decodeJwtClaims(
   accessToken: string | undefined,
 ): Record<string, string | undefined> {
   if (!accessToken) return {};
@@ -26,14 +26,14 @@ export function decodeCodebuddyJwtClaims(
   }
 }
 
-export function decodeCodebuddyUserId(accessToken: string | undefined): string | undefined {
-  return normalizeNonEmpty(decodeCodebuddyJwtClaims(accessToken).sub);
+export function decodeUserId(accessToken: string | undefined): string | undefined {
+  return normalizeNonEmpty(decodeJwtClaims(accessToken).sub);
 }
 
 // ── Domain ───────────────────────────────────────────────────────────────────
 
 export function normalizeDomain(domain: unknown): string {
-  return normalizeNonEmpty(domain) || CODEBUDDY_DEFAULT_DOMAIN;
+  return normalizeNonEmpty(domain) || DEFAULT_DOMAIN;
 }
 
 // ── Value normalization ──────────────────────────────────────────────────────
@@ -55,25 +55,25 @@ export function firstNonEmpty(...values: unknown[]): string | undefined {
 
 // ── Response parsing ─────────────────────────────────────────────────────────
 
-export function readCode(payload: unknown): number | null {
+export function readResponseCode(payload: unknown): number | null {
   if (typeof payload !== "object" || payload == null) return null;
   return parseNumeric((payload as Record<string, unknown>).code);
 }
 
-export function readMessage(payload: unknown): string {
+export function readResponseMessage(payload: unknown): string {
   if (typeof payload === "string") return payload.trim();
   if (typeof payload !== "object" || payload == null) return "";
   const record = payload as Record<string, unknown>;
   return normalizeNonEmpty(record.message) || normalizeNonEmpty(record.msg) || "";
 }
 
-export function readString(
-  value: Record<string, unknown> | null | undefined,
+export function readField(
+  record: Record<string, unknown> | null | undefined,
   keys: string[],
 ): string {
   for (const key of keys) {
-    const current = normalizeNonEmpty(value?.[key]);
-    if (current) return current;
+    const value = normalizeNonEmpty(record?.[key]);
+    if (value) return value;
   }
   return "";
 }
@@ -91,19 +91,19 @@ export function readHeader(
 }
 
 export function readBoolean(
-  value: Record<string, unknown> | null | undefined,
+  record: Record<string, unknown> | null | undefined,
   keys: string[],
 ): boolean {
-  return keys.some((key) => value?.[key] === true);
+  return keys.some((key) => record?.[key] === true);
 }
 
 export function readArray(
-  value: Record<string, unknown> | null | undefined,
+  record: Record<string, unknown> | null | undefined,
   keys: string[],
 ): unknown[] | null {
   for (const key of keys) {
-    const current = value?.[key];
-    if (Array.isArray(current)) return current;
+    const value = record?.[key];
+    if (Array.isArray(value)) return value;
   }
   return null;
 }
@@ -158,19 +158,6 @@ export function uniqueStrings(values: Array<string | undefined>): string[] {
   return [...new Set(values.filter((v): v is string => Boolean(v)))];
 }
 
-// ── Environment ──────────────────────────────────────────────────────────────
-
-export function stainlessOs(): string {
-  switch (process.platform) {
-    case "darwin":
-      return "MacOS";
-    case "win32":
-      return "Windows";
-    default:
-      return "Linux";
-  }
-}
-
 // ── Async helpers ────────────────────────────────────────────────────────────
 
 export async function sleep(ms: number, signal?: AbortSignal): Promise<void> {
@@ -206,7 +193,7 @@ export async function requestJson<T>(url: string, init?: RequestInit): Promise<T
   }
 
   if (!response.ok) {
-    const message = readMessage(payload) || text || response.statusText;
+    const message = readResponseMessage(payload) || text || response.statusText;
     throw new Error(`HTTP ${response.status}: ${message}`);
   }
 
@@ -246,7 +233,7 @@ export function asError(value: unknown): Error {
 // ── Guard ────────────────────────────────────────────────────────────────────
 
 export function ensureSuccess(payload: unknown, fallbackMessage: string): void {
-  const code = readCode(payload);
+  const code = readResponseCode(payload);
   if (code == null || SUCCESS_CODES.has(code)) return;
-  throw new Error(readMessage(payload) || `${fallbackMessage} (code=${code})`);
+  throw new Error(readResponseMessage(payload) || `${fallbackMessage} (code=${code})`);
 }

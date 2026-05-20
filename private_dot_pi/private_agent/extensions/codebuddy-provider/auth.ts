@@ -1,37 +1,42 @@
 import type { OAuthCredentials, OAuthLoginCallbacks } from "@earendil-works/pi-ai";
 import {
-  CODEBUDDY_ACCOUNT_BASE_URL,
-  CODEBUDDY_CLI_BASE_URL,
-  CODEBUDDY_DEFAULT_DOMAIN,
-  CODEBUDDY_PRODUCT,
-  CODEBUDDY_USER_AGENT,
+  ACCOUNTS_PATH,
+  ACCOUNT_BASE_URL,
+  AUTH_REFRESH_PATH,
+  AUTH_STATE_PATH,
+  AUTH_TOKEN_PATH,
+  CLI_BASE_URL,
+  DEFAULT_DOMAIN,
+  PRODUCT,
+  USER_AGENT,
   PENDING_CODES,
   POLL_INTERVAL_MS,
   POLL_TIMEOUT_MS,
   SUCCESS_CODES,
 } from "./constants.js";
 import type {
-  CodebuddyAuthPlatform,
-  CodebuddyAuthState,
+  AuthPlatform,
+  AuthState,
+  AccountsData,
+  AccountEntry,
+  ApiResponse,
+  AuthStateData,
   CodebuddyOAuthCredentials,
-  CodebuddyTokenPayload,
-  CodebuddyProfile,
+  TokenData,
+  TokenPayload,
+  Profile,
 } from "./types.js";
 import {
   asError,
-  asRecord,
   requestJson,
-  decodeCodebuddyJwtClaims,
+  decodeJwtClaims,
   ensureSuccess,
   firstNonEmpty,
   normalizeDomain,
   normalizeNonEmpty,
   parseExpiry,
-  readArray,
-  readBoolean,
-  readCode,
-  readMessage,
-  readString,
+  readResponseCode,
+  readResponseMessage,
   requestId,
   sleep,
   toAbsoluteUrl,
@@ -50,9 +55,9 @@ const NO_AUTH_HEADERS: Record<string, string> = {
 
 const COMMON_HEADERS: Record<string, string> = {
   Accept: "application/json, text/plain, */*",
-  "User-Agent": CODEBUDDY_USER_AGENT,
+  "User-Agent": USER_AGENT,
   "X-Requested-With": "XMLHttpRequest",
-  "X-Product": CODEBUDDY_PRODUCT,
+  "X-Product": PRODUCT,
 };
 
 // ── Public API ───────────────────────────────────────────────────────────────
@@ -60,15 +65,15 @@ const COMMON_HEADERS: Record<string, string> = {
 export async function loginCodebuddy(
   callbacks: OAuthLoginCallbacks,
 ): Promise<CodebuddyOAuthCredentials> {
-  const authState = await fetchCodebuddyAuthState(callbacks.signal);
+  const authState = await fetchAuthState(callbacks.signal);
   callbacks.onAuth({
     url: authState.authUrl,
     instructions: "Complete authorization in the browser. Pi will continue automatically.",
   });
   callbacks.onProgress?.("Waiting for CodeBuddy authorization...");
 
-  const token = await pollCodebuddyToken(authState, callbacks.signal);
-  const credentials = await enrichCodebuddyCredentials(
+  const token = await pollToken(authState, callbacks.signal);
+  return enrichCredentials(
     {
       access: token.accessToken,
       refresh: token.refreshToken,
@@ -76,12 +81,10 @@ export async function loginCodebuddy(
       domain: token.domain,
       authBaseUrl: authState.baseUrl,
       authPlatform: authState.platform,
-      accountBaseUrl: CODEBUDDY_ACCOUNT_BASE_URL,
+      accountBaseUrl: ACCOUNT_BASE_URL,
     },
     callbacks.signal,
   );
-
-  return credentials;
 }
 
 export async function refreshCodebuddyCredentials(
@@ -93,15 +96,10 @@ export async function refreshCodebuddyCredentials(
     throw new Error("CodeBuddy refresh token missing. Please run /login codebuddy again");
   }
 
-  const baseUrls = uniqueStrings([
-    current.authBaseUrl,
-    CODEBUDDY_CLI_BASE_URL,
-    CODEBUDDY_ACCOUNT_BASE_URL,
-  ]);
+  const baseUrls = uniqueStrings([current.authBaseUrl, CLI_BASE_URL, ACCOUNT_BASE_URL]);
 
   return tryEach(baseUrls, async (baseUrl) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const payload = await requestJson<any>(`${baseUrl}/v2/plugin/auth/token/refresh`, {
+    const payload = await requestJson<ApiResponse<TokenData>>(`${baseUrl}${AUTH_REFRESH_PATH}`, {
       method: "POST",
       headers: {
         ...COMMON_HEADERS,
@@ -117,58 +115,56 @@ export async function refreshCodebuddyCredentials(
       signal,
     });
     ensureSuccess(payload, "Token refresh failed");
-    const data = asRecord(payload?.data);
-    const accessToken = readString(data, ["accessToken", "access_token"]);
+    const data = payload.data;
+    const accessToken = data?.accessToken || data?.access_token;
     if (!accessToken) {
       throw new Error("Token refresh response missing accessToken");
     }
 
-    return enrichCodebuddyCredentials(
+    return enrichCredentials(
       {
         ...current,
         access: accessToken,
-        refresh: readString(data, ["refreshToken", "refresh_token"]) || current.refresh,
-        expires:
-          parseExpiry(data?.expiresAt, data?.expires_in ?? data?.expiresIn) ?? current.expires,
-        domain: readString(data, ["domain"]) || current.domain,
+        refresh: data?.refreshToken || data?.refresh_token || current.refresh,
+        expires: parseExpiry(data?.expiresAt, data?.expiresIn) ?? current.expires,
+        domain: data?.domain || current.domain,
         authBaseUrl: baseUrl,
-        accountBaseUrl: current.accountBaseUrl || CODEBUDDY_ACCOUNT_BASE_URL,
+        accountBaseUrl: current.accountBaseUrl || ACCOUNT_BASE_URL,
       },
       signal,
     );
   });
 }
 
-async function enrichCodebuddyCredentials(
+// ── Private: credentials ─────────────────────────────────────────────────────
+
+async function enrichCredentials(
   credentials: CodebuddyOAuthCredentials,
   signal?: AbortSignal,
 ): Promise<CodebuddyOAuthCredentials> {
-  const next = normalizeCredentials(credentials);
-  if (!needsProfileEnrichment(next)) return next;
+  if (!needsProfileEnrichment(credentials)) return normalizeCredentials(credentials);
 
   try {
-    const profile = await fetchCodebuddyProfile(next, signal);
-    const mergeFields: Partial<CodebuddyOAuthCredentials> = {};
-    for (const key of [
-      "userId",
-      "uid",
-      "email",
-      "nickname",
-      "enterpriseId",
-      "enterpriseName",
-    ] as const) {
-      const profileValue = profile[key];
-      if (profileValue) mergeFields[key] = profileValue;
-    }
-    return normalizeCredentials({ ...next, ...mergeFields });
+    const profile = await fetchProfile(credentials, signal);
+    const merged: CodebuddyOAuthCredentials = {
+      ...credentials,
+      userId: credentials.userId || profile.userId,
+      uid: credentials.uid || profile.uid,
+      email: credentials.email || profile.email,
+      nickname: credentials.nickname || profile.nickname,
+      enterpriseId: credentials.enterpriseId || profile.enterpriseId,
+      enterpriseName: credentials.enterpriseName || profile.enterpriseName,
+      departmentFullName: credentials.departmentFullName || profile.departmentFullName,
+    };
+    return normalizeCredentials(merged);
   } catch {
-    return next;
+    return normalizeCredentials(credentials);
   }
 }
 
 function normalizeCredentials(credentials: CodebuddyOAuthCredentials): CodebuddyOAuthCredentials {
   const domain = normalizeDomain(credentials.domain);
-  const decoded = decodeCodebuddyJwtClaims(credentials.access);
+  const decoded = decodeJwtClaims(credentials.access);
   const userId = firstNonEmpty(credentials.userId, credentials.uid, decoded.sub);
   const email = firstNonEmpty(credentials.email, decoded.email, decoded.preferred_username);
   const nickname = firstNonEmpty(credentials.nickname, decoded.name);
@@ -182,8 +178,8 @@ function normalizeCredentials(credentials: CodebuddyOAuthCredentials): Codebuddy
     enterpriseId: normalizeNonEmpty(credentials.enterpriseId),
     enterpriseName: normalizeNonEmpty(credentials.enterpriseName),
     domain,
-    authBaseUrl: credentials.authBaseUrl || CODEBUDDY_CLI_BASE_URL,
-    accountBaseUrl: credentials.accountBaseUrl || CODEBUDDY_ACCOUNT_BASE_URL,
+    authBaseUrl: credentials.authBaseUrl || CLI_BASE_URL,
+    accountBaseUrl: credentials.accountBaseUrl || ACCOUNT_BASE_URL,
   };
 }
 
@@ -198,26 +194,24 @@ function needsProfileEnrichment(credentials: CodebuddyOAuthCredentials): boolean
 
 // ── Private: auth state ──────────────────────────────────────────────────────
 
-async function fetchCodebuddyAuthState(signal?: AbortSignal): Promise<CodebuddyAuthState> {
+async function fetchAuthState(signal?: AbortSignal): Promise<AuthState> {
   const attempts: Array<{
     baseUrl: string;
-    platform: CodebuddyAuthPlatform;
+    platform: AuthPlatform;
   }> = [
-    { baseUrl: CODEBUDDY_CLI_BASE_URL, platform: "CLI" },
-    { baseUrl: CODEBUDDY_ACCOUNT_BASE_URL, platform: "ide" },
+    { baseUrl: CLI_BASE_URL, platform: "cli" },
+    { baseUrl: ACCOUNT_BASE_URL, platform: "ide" },
   ];
 
   return tryEach(attempts, async (attempt) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const payload = await requestJson<any>(
-      `${attempt.baseUrl}/v2/plugin/auth/state?platform=${attempt.platform}`,
+    const payload = await requestJson<ApiResponse<AuthStateData>>(
+      `${attempt.baseUrl}${AUTH_STATE_PATH}?platform=${attempt.platform}`,
       {
         method: "POST",
         headers: {
           ...COMMON_HEADERS,
           ...NO_AUTH_HEADERS,
           "Content-Type": "application/json",
-          "X-Domain": attempt.baseUrl,
           "X-Request-ID": requestId(),
         },
         body: "{}",
@@ -225,10 +219,12 @@ async function fetchCodebuddyAuthState(signal?: AbortSignal): Promise<CodebuddyA
       },
     );
     ensureSuccess(payload, "Failed to get CodeBuddy authorization URL");
-    const data = asRecord(payload?.data);
-    const state = readString(data, ["state"]);
+    const data = payload.data;
+    const state = data?.state || "";
     const authUrl =
-      readString(data, ["authUrl", "auth_url", "url"]) ||
+      data?.authUrl ||
+      data?.auth_url ||
+      data?.url ||
       `${attempt.baseUrl}/login?state=${encodeURIComponent(state)}`;
     if (!state || !authUrl) {
       throw new Error("CodeBuddy authorization response missing state or authUrl");
@@ -244,11 +240,8 @@ async function fetchCodebuddyAuthState(signal?: AbortSignal): Promise<CodebuddyA
 
 // ── Private: token polling ───────────────────────────────────────────────────
 
-async function pollCodebuddyToken(
-  authState: CodebuddyAuthState,
-  signal?: AbortSignal,
-): Promise<CodebuddyTokenPayload> {
-  const url = `${authState.baseUrl}/v2/plugin/auth/token?state=${encodeURIComponent(authState.state)}`;
+async function pollToken(authState: AuthState, signal?: AbortSignal): Promise<TokenPayload> {
+  const url = `${authState.baseUrl}${AUTH_TOKEN_PATH}?state=${encodeURIComponent(authState.state)}`;
   const deadline = Date.now() + POLL_TIMEOUT_MS;
 
   while (Date.now() < deadline) {
@@ -257,32 +250,32 @@ async function pollCodebuddyToken(
     }
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const payload = await requestJson<any>(url, {
+      const payload = await requestJson<ApiResponse<TokenData>>(url, {
         headers: {
           ...COMMON_HEADERS,
           ...NO_AUTH_HEADERS,
         },
         signal,
       });
-      const code = readCode(payload);
+      const code = readResponseCode(payload);
       if (code !== null && SUCCESS_CODES.has(code)) {
-        const data = asRecord(payload?.data);
-        const accessToken = readString(data, ["accessToken", "access_token"]);
+        const data = payload.data;
+        const accessToken = data?.accessToken || data?.access_token;
         if (!accessToken) {
           throw new Error("CodeBuddy authorization response missing accessToken");
         }
         return {
           accessToken,
-          refreshToken: readString(data, ["refreshToken", "refresh_token"]),
+          refreshToken: data?.refreshToken || data?.refresh_token || "",
           expires:
-            parseExpiry(data?.expiresAt, data?.expires_in ?? data?.expiresIn) ||
-            Date.now() + 24 * 60 * 60 * 1000,
-          domain: readString(data, ["domain"]) || CODEBUDDY_DEFAULT_DOMAIN,
+            parseExpiry(data?.expiresAt, data?.expiresIn) || Date.now() + 24 * 60 * 60 * 1000,
+          domain: data?.domain || DEFAULT_DOMAIN,
         };
       }
-      if (code !== null && !PENDING_CODES.has(code)) {
-        throw new Error(readMessage(payload) || `CodeBuddy authorization failed (code=${code})`);
+      if (code !== null && !SUCCESS_CODES.has(code) && !PENDING_CODES.has(code)) {
+        throw new Error(
+          readResponseMessage(payload) || `CodeBuddy authorization failed (code=${code})`,
+        );
       }
     } catch (error) {
       if (signal?.aborted) {
@@ -301,19 +294,18 @@ async function pollCodebuddyToken(
 
 // ── Private: profile ─────────────────────────────────────────────────────────
 
-async function fetchCodebuddyProfile(
+async function fetchProfile(
   credentials: CodebuddyOAuthCredentials,
   signal?: AbortSignal,
-): Promise<CodebuddyProfile> {
+): Promise<Profile> {
   const urls = uniqueStrings([
     credentials.accountBaseUrl,
     credentials.authBaseUrl,
-    CODEBUDDY_ACCOUNT_BASE_URL,
+    ACCOUNT_BASE_URL,
   ]);
 
   return tryEach(urls, async (baseUrl) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const payload = await requestJson<any>(`${baseUrl}/v2/plugin/accounts`, {
+    const payload = await requestJson<ApiResponse<AccountsData>>(`${baseUrl}${ACCOUNTS_PATH}`, {
       headers: {
         ...COMMON_HEADERS,
         Authorization: `Bearer ${credentials.access}`,
@@ -321,23 +313,22 @@ async function fetchCodebuddyProfile(
       },
       signal,
     });
-    if (readCode(payload) !== null) {
+    if (readResponseCode(payload) !== null) {
       ensureSuccess(payload, "Failed to fetch CodeBuddy account info");
     }
-    const data = asRecord(payload?.data);
-    const accounts =
-      readArray(data, ["accounts", "Accounts"]) || readArray(payload, ["accounts", "Accounts"]);
-    const selected =
-      accounts?.find((item) => readBoolean(asRecord(item), ["lastLogin"])) || accounts?.[0];
-    const account = asRecord(selected);
-    if (!account) {
+    const data = payload.data;
+    const accounts = data?.accounts || data?.Accounts;
+    const selected = accounts?.find((a) => a.lastLogin === true) || accounts?.[0];
+    if (!selected) {
       throw new Error("CodeBuddy account info is empty");
     }
-    const uid = readString(account, ["uid", "id"]);
-    const nickname = readString(account, ["nickname", "label", "name"]);
-    const email = readString(account, ["email"]);
-    const enterpriseId = readString(account, ["enterpriseId", "enterprise_id"]);
-    const enterpriseName = readString(account, ["enterpriseName", "enterprise_name"]);
+    const uid = selected.uid || selected.id || "";
+    const nickname = selected.nickname || selected.label || selected.name || "";
+    const email = selected.email || "";
+    const enterpriseId = selected.enterpriseId || selected.enterprise_id || "";
+    const enterpriseName = selected.enterpriseName || selected.enterprise_name || "";
+    const departmentFullName =
+      selected.departmentFullName || selected.department_full_name || selected.deptFullName || "";
     return {
       userId: uid,
       uid,
@@ -345,6 +336,7 @@ async function fetchCodebuddyProfile(
       nickname: nickname || email || uid,
       enterpriseId,
       enterpriseName,
+      departmentFullName,
     };
   });
 }
