@@ -1,3 +1,3 @@
 function claude --wraps=claude
-    claude_firepass $argv
+    claude_glm $argv
 end

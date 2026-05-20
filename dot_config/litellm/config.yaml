@@ -22,11 +22,6 @@ model_list:
       model: anthropic/hf:moonshotai/Kimi-K2.6
       api_base: https://api.synthetic.new/anthropic
       api_key: os.environ/SYNTHETIC_API_KEY
-  - model_name: claude-sonnet-*
-    litellm_params:
-      model: anthropic/accounts/fireworks/routers/kimi-k2p6-turbo
-      api_base: https://api.fireworks.ai/inference
-      api_key: os.environ/FIREPASS_API_KEY
 
   - model_name: claude-haiku-*
     litellm_params:
