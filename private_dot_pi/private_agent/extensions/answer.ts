@@ -69,35 +69,31 @@ Example output:
   ]
 }`;
 
-const CODEX_MODEL_ID = "gpt-5.3";
-const HAIKU_MODEL_ID = "claude-haiku-4-5";
+const EXTRACTION_FALLBACK_MODELS: Array<{ provider: string; modelId: string }> = [
+	{ provider: "openai-codex", modelId: "gpt-5.3" },
+	{ provider: "anthropic", modelId: "claude-haiku-4-5" },
+	{ provider: "zai", modelId: "glm-4.7" },
+	{ provider: "deepseek", modelId: "deepseek-v4-flash" },
+];
 
 /**
- * Prefer GPT-5.3 for extraction when available, otherwise fallback to haiku or the current model.
+ * Select the first available model from the fallback list for extraction, or current model.
  */
 async function selectExtractionModel(
 	currentModel: Model<Api>,
 	modelRegistry: ModelRegistry,
 ): Promise<Model<Api>> {
-	const codexModel = modelRegistry.find("openai-codex", CODEX_MODEL_ID);
-	if (codexModel) {
-		const auth = await modelRegistry.getApiKeyAndHeaders(codexModel);
-		if (auth.ok) {
-			return codexModel;
-		}
+	for (const { provider, modelId } of EXTRACTION_FALLBACK_MODELS) {
+		const model = modelRegistry.find(provider, modelId);
+		if (!model) continue;
+
+		const auth = await modelRegistry.getApiKeyAndHeaders(model);
+		if (!auth.ok || !auth.apiKey) continue;
+
+		return model;
 	}
 
-	const haikuModel = modelRegistry.find("anthropic", HAIKU_MODEL_ID);
-	if (!haikuModel) {
-		return currentModel;
-	}
-
-	const auth = await modelRegistry.getApiKeyAndHeaders(haikuModel);
-	if (auth.ok === false || !auth.apiKey) {
-		return currentModel;
-	}
-
-	return haikuModel;
+	return currentModel;
 }
 
 /**
@@ -454,7 +450,7 @@ export default function (pi: ExtensionAPI) {
 
 			// Run extraction with loader UI
 			const extractionResult = await ctx.ui.custom<ExtractionResult | null>((tui, theme, _kb, done) => {
-				const loader = new BorderedLoader(tui, theme, `Extracting questions using ${extractionModel.id}...`);
+				const loader = new BorderedLoader(tui, theme, `Extracting questions using ${extractionModel.provider}/${extractionModel.id}...`);
 				loader.onAbort = () => done(null);
 
 				const doExtract = async () => {
@@ -529,7 +525,7 @@ export default function (pi: ExtensionAPI) {
 		handler: (_args, ctx) => answerHandler(ctx),
 	});
 
-	pi.registerShortcut("ctrl+.", {
+	pi.registerShortcut("alt+.", {
 		description: "Extract and answer questions",
 		handler: answerHandler,
 	});
