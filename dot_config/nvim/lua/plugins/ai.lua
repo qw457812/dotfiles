@@ -492,7 +492,7 @@ return {
           claude = {
             env = {
               __AI_AGENT = "claude",
-              __IS_CLAUDECODE_NVIM = "1", -- flag to disable claude code statusline in ~/.claude/settings.json
+              __IS_CLAUDECODE_NVIM = "1", -- flag to make statusline shorter, see ~/.claude/statusline.sh
               NVIM_FLATTEN_NEST = "1", -- allow ctrl-g to edit prompt in nvim" to be nested for flatten.nvim
               CLAUDE_CODE_TMPDIR = vim.g.user_is_termux and vim.env.TMPDIR or "", -- https://github.com/anthropics/claude-code/issues/18342#issuecomment-3936122160
             },
@@ -539,6 +539,11 @@ return {
             url = "https://www.codebuddy.ai/cli",
             env = {
               __AI_AGENT = "codebuddy",
+              __IS_CLAUDECODE_NVIM = "1", -- flag to make statusline shorter, see ~/.claude/statusline.sh
+              NVIM_FLATTEN_NEST = "1",
+            },
+            keys = {
+              blur_t = false, -- codebuddy uses <c-o> for its own functionality
             },
           },
           -- debug = { cmd = { "bash", "-c", "env | sort | bat -l env" } },

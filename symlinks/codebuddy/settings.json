@@ -3,6 +3,13 @@
   "vim": {
     "enabled": true
   },
-  "trustAll": true
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh",
+    "padding": 0
+  },
+  "trustAll": true,
+  "language": "简体中文",
+  "showTokensCounter": true
 }
 

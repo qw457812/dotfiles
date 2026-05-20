@@ -165,6 +165,16 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   #   copilot_quota_display="${COLOR_CERULEAN}${copilot_used}${COLOR_STEEL}/${copilot_limit} $(format_ms "$copilot_reset_ms")${COLOR_RESET}"
   # fi
 
+  # codebuddy quota (only when running inside CodeBuddy Code, which re-uses this statusline)
+  codebuddy_quota_display=""
+  codebuddy_quota=$("$HOME/.claude/statusline/get-codebuddy-quota.sh")
+  if echo "$codebuddy_quota" | jq -e . >/dev/null 2>&1; then
+    cb_used=$(echo "$codebuddy_quota" | jq -r '.used // 0')
+    cb_limit=$(echo "$codebuddy_quota" | jq -r '.limit // 0')
+    cb_reset_ms=$(echo "$codebuddy_quota" | jq -r '.reset_remaining_ms // 0')
+    codebuddy_quota_display="${COLOR_MAGENTA}$(format_num "$cb_used")${COLOR_MAUVE}/$(format_num "$cb_limit")/$(format_ms "$cb_reset_ms")${COLOR_RESET}"
+  fi
+
   # version
   version=$(echo "$input" | jq -r '.version // ""')
   version_display=$([ -n "$version" ] && echo "${COLOR_GRAY}v${version}${COLOR_RESET}")
@@ -202,6 +212,7 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
     "$tps_display" \
     "$syn_quota_display" \
     "$glm_quota_display" \
+    "$codebuddy_quota_display" \
     "$version_display" \
     "$session_duration_display" \
     "$changes_display" | xargs
