@@ -105,7 +105,6 @@
   "pi": { "branch": "main", "commit": "a7d8dd3d5db7d66aa5cc6886e32768b1196ce91f" },
   "pi-agent-colony": { "branch": "main", "commit": "e609f5d5c935079e36c88944252b168ff0907a27" },
   "pi-caffeinate": { "branch": "main", "commit": "203939f73588f9f04f70738b7d911e72e3207945" },
-  "pi-crofai-provider": { "branch": "main", "commit": "9eb90b728236a4bf04e94c455b3f287d05ccdd05" },
   "pi-guardrails": { "branch": "main", "commit": "ecf096382ba8d58b2ae869735777c1500d58658f" },
   "pi-invisible-continue": { "branch": "main", "commit": "4cd9e5679b2e3390431aac92d5f8a4a77a176a0e" },
   "pi-mcp-adapter": { "branch": "main", "commit": "8c1a28e7ebb837d5fa03de3a67f217ce994782cc" },

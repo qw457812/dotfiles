@@ -73,7 +73,6 @@
     "npm:pi-mcp-adapter",
     "git:github.com/monotykamary/pi-tps",
     "git:github.com/monotykamary/pi-neuralwatt-provider",
-    "git:github.com/monotykamary/pi-crofai-provider",
     "git:github.com/monotykamary/pi-invisible-continue"
   ]
 }

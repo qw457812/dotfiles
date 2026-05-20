@@ -341,6 +341,8 @@ alias synthetic_models 'curl -s https://api.synthetic.new/openai/v1/models -H "A
 alias neuralwatt_quota 'curl https://api.neuralwatt.com/v1/quota -H "Authorization: Bearer $NEURALWATT_API_KEY" | jq .'
 alias neuralwatt_usage 'curl https://api.neuralwatt.com/v1/usage/energy -H "Authorization: Bearer $NEURALWATT_API_KEY" | jq .'
 alias neuralwatt_models 'curl https://api.neuralwatt.com/v1/models -H "Authorization: Bearer $NEURALWATT_API_KEY" | jq .'
+alias crofai_quota 'curl -s https://crof.ai/usage_api/ -H "Authorization: Bearer $CROFAI_API_KEY" | jq .'
+alias crofai_models 'curl https://crof.ai/v1/models -H "Authorization: Bearer $CROFAI_API_KEY" | jq .'
 
 # Other
 abbr b "cd -"
