@@ -294,6 +294,8 @@ return {
           desc = "Prompt (Sidekick)",
         },
         { "<leader>af", function() require("sidekick.cli").send({ msg = "{file}", filter = filter }) end, desc = "File (Sidekick)" },
+        { "<leader>ab", function() U.ai.sidekick.cli.quick.show("codebuddy") end, desc = "CodeBuddy" },
+        { "<leader>ab", function() U.ai.sidekick.cli.quick.send("codebuddy", { msg = "{this}" }) end, mode = "x", desc = "CodeBuddy" },
       })
     end,
     ---@module "sidekick"
@@ -529,6 +531,14 @@ return {
             keys = {
               blur_t = false, -- pi uses <c-o> for its own functionality
               prompt = false, -- pi uses <c-p> for its own functionality
+            },
+          },
+          codebuddy = {
+            cmd = { "codebuddy" },
+            is_proc = "\\<codebuddy\\>",
+            url = "https://www.codebuddy.ai/cli",
+            env = {
+              __AI_AGENT = "codebuddy",
             },
           },
           -- debug = { cmd = { "bash", "-c", "env | sort | bat -l env" } },
@@ -847,6 +857,7 @@ return {
           tmpdir .. "/.*.md", -- https://github.com/openai/codex/blob/f6b563ec6403392aadbc31f449226aaabd881c01/codex-rs/tui/src/external_editor.rs#L60
           tmpdir .. "/pi-editor-*.pi.md", -- https://github.com/badlogic/pi-mono/blob/5c0ec26c28c918c5301f218e8c13fcc540d8e3a4/packages/coding-agent/src/modes/interactive/interactive-mode.ts#L2746
           tmpdir .. "/pi-extension-editor-*.md", -- https://github.com/badlogic/pi-mono/blob/e3fee7a511503ebe170223cd89e7631751539f25/packages/coding-agent/src/modes/interactive/components/extension-editor.ts#L120
+          tmpdir .. "/codebuddy_edit_*.md",
         },
         once = true,
         callback = function(ev)

@@ -15,10 +15,10 @@
     "deepseek/deepseek-v4-pro",
     "neuralwatt/zai-org/GLM-5.1-FP8",
     "neuralwatt/moonshotai/Kimi-K2.6",
-    "openai-codex/gpt-5.5",
     "github-copilot/gpt-5.4",
     "codebuddy/glm-5.1",
-    "codebuddy/kimi-k2.6"
+    "codebuddy/kimi-k2.6",
+    "codebuddy/deepseek-v4-pro"
   ],
   "packages": [
     "npm:pi-vim",

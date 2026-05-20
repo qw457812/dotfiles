@@ -20,16 +20,6 @@
     "compat": { "supportsDeveloperRole": false, "maxTokensField": "max_tokens" }
   },
   {
-    "id": "minimax-m2.7",
-    "name": "MiniMax M2.7",
-    "reasoning": true,
-    "input": ["text", "image"],
-    "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
-    "contextWindow": 200000,
-    "maxTokens": 48000,
-    "compat": { "supportsDeveloperRole": false, "maxTokensField": "max_tokens" }
-  },
-  {
     "id": "kimi-k2.6",
     "name": "Kimi K2.6",
     "reasoning": true,
@@ -37,6 +27,36 @@
     "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
     "contextWindow": 256000,
     "maxTokens": 32000,
+    "compat": { "supportsDeveloperRole": false, "maxTokensField": "max_tokens" }
+  },
+  {
+    "id": "deepseek-v4-pro",
+    "name": "DeepSeek V4 Pro",
+    "reasoning": true,
+    "input": ["text"],
+    "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+    "contextWindow": 1000000,
+    "maxTokens": 384000,
+    "compat": { "supportsDeveloperRole": false, "maxTokensField": "max_tokens" }
+  },
+  {
+    "id": "deepseek-v4-flash",
+    "name": "DeepSeek V4 Flash",
+    "reasoning": true,
+    "input": ["text"],
+    "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+    "contextWindow": 1000000,
+    "maxTokens": 384000,
+    "compat": { "supportsDeveloperRole": false, "maxTokensField": "max_tokens" }
+  },
+  {
+    "id": "minimax-m2.7",
+    "name": "MiniMax M2.7",
+    "reasoning": true,
+    "input": ["text", "image"],
+    "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+    "contextWindow": 200000,
+    "maxTokens": 48000,
     "compat": { "supportsDeveloperRole": false, "maxTokensField": "max_tokens" }
   }
 ]
