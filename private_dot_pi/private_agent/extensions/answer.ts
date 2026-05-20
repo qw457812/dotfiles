@@ -93,7 +93,7 @@ async function selectExtractionModel(
 	}
 
 	const auth = await modelRegistry.getApiKeyAndHeaders(haikuModel);
-	if (auth.ok === false) {
+	if (auth.ok === false || !auth.apiKey) {
 		return currentModel;
 	}
 
