@@ -9,9 +9,9 @@ import {
 import type { ExtensionAPI, ProviderModelConfig } from "@earendil-works/pi-coding-agent";
 import { loginCodebuddy, refreshCodebuddyCredentials } from "./auth.js";
 import { CHAT_BASE_URL, DEFAULT_DOMAIN, PROVIDER, USER_AGENT, VERSION } from "./constants.js";
-import type { CodebuddyOAuthCredentials } from "./types.js";
-import { decodeUserId, normalizeDomain, readHeader, requestId, firstNonEmpty } from "./utils.js";
 import modelsData from "./models.json" with { type: "json" };
+import type { CodebuddyOAuthCredentials } from "./types.js";
+import { decodeUserId, firstNonEmpty, normalizeDomain, readHeader, requestId } from "./utils.js";
 
 const MODELS: ProviderModelConfig[] = modelsData as ProviderModelConfig[];
 

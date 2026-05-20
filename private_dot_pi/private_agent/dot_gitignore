@@ -4,6 +4,7 @@ extensions/*/node_modules
 /sessions
 /auth.json
 /pi-crash.log
+/pi-debug.log
 
 # https://github.com/nicobailon/pi-mcp-adapter
 /mcp-cache.json

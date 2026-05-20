@@ -1,18 +1,16 @@
 {
-  "lastChangelogVersion": "0.74.0",
-  "defaultProvider": "firepass",
-  "defaultModel": "accounts/fireworks/routers/kimi-k2p6-turbo",
+  "lastChangelogVersion": "0.75.3",
+  "defaultProvider": "zai",
+  "defaultModel": "glm-5.1",
   "defaultThinkingLevel": "high",
   "hideThinkingBlock": true,
   "quietStartup": true,
   "showHardwareCursor": true,
   "enabledModels": [
-    "synthetic/hf:zai-org/GLM-5.1",
-    "synthetic/hf:moonshotai/Kimi-K2.6",
     "zai/glm-5.1",
     "firepass/accounts/fireworks/routers/kimi-k2p6-turbo",
-    "crofai/glm-5.1-precision",
-    "crofai/kimi-k2.6-precision",
+    "synthetic/hf:zai-org/GLM-5.1",
+    "synthetic/hf:moonshotai/Kimi-K2.6",
     "crofai/mimo-v2.5-pro-precision",
     "crofai/deepseek-v4-pro-precision",
     "deepseek/deepseek-v4-pro",
@@ -21,8 +19,7 @@
     "openai-codex/gpt-5.5",
     "github-copilot/gpt-5.4",
     "codebuddy/glm-5.1",
-    "codebuddy/kimi-k2.6",
-    "codebuddy/minimax-m2.7"
+    "codebuddy/kimi-k2.6"
   ],
   "packages": [
     "npm:pi-vim",
