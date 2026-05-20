@@ -1,0 +1,8 @@
+{
+  "model": "glm-5.1",
+  "vim": {
+    "enabled": true
+  },
+  "trustAll": true
+}
+
