@@ -7,11 +7,11 @@ export const ACCOUNT_BASE_URL = "https://www.codebuddy.cn";
 export const CHAT_BASE_URL = "https://copilot.tencent.com/v2";
 export const DEFAULT_DOMAIN = "www.codebuddy.cn";
 
-// ── Auth API paths (CLI mode — no /plugin/ prefix) ──────────────────────────
-export const AUTH_STATE_PATH = "/v2/auth/state";
-export const AUTH_TOKEN_PATH = "/v2/auth/token";
-export const AUTH_REFRESH_PATH = "/v2/auth/token/refresh";
-export const ACCOUNTS_PATH = "/v2/accounts";
+// ── Auth API paths (CLI mode, prefixPath="/plugin") ─────────────────────
+export const AUTH_STATE_PATH = "/v2/plugin/auth/state";
+export const AUTH_TOKEN_PATH = "/v2/plugin/auth/token";
+export const AUTH_REFRESH_PATH = "/v2/plugin/auth/token/refresh";
+export const ACCOUNTS_PATH = "/v2/plugin/accounts";
 
 // ── Expiry buffer ───────────────────────────────────────────────────────────
 export const EXPIRY_BUFFER_MS = 5 * 60 * 1000; // 5-minute buffer before token expiry
