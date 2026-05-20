@@ -7,7 +7,7 @@ export const ACCOUNT_BASE_URL = "https://www.codebuddy.cn";
 export const CHAT_BASE_URL = "https://copilot.tencent.com/v2";
 export const DEFAULT_DOMAIN = "www.codebuddy.cn";
 
-// ── Auth API paths (CLI mode, prefixPath="/plugin") ─────────────────────
+// ── Auth API paths ---------------------------------─────────────────────────
 export const AUTH_STATE_PATH = "/v2/plugin/auth/state";
 export const AUTH_TOKEN_PATH = "/v2/plugin/auth/token";
 export const AUTH_REFRESH_PATH = "/v2/plugin/auth/token/refresh";

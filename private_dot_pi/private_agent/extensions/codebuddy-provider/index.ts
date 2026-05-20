@@ -15,7 +15,7 @@ import { decodeUserId, firstNonEmpty, normalizeDomain, readHeader, requestId } f
 
 const MODELS: ProviderModelConfig[] = modelsData as ProviderModelConfig[];
 
-export function streamCodebuddy(
+function streamCodebuddy(
   model: Model<Api>,
   context: Context,
   options?: SimpleStreamOptions,

@@ -67,17 +67,6 @@ export function readResponseMessage(payload: unknown): string {
   return normalizeNonEmpty(record.message) || normalizeNonEmpty(record.msg) || "";
 }
 
-export function readField(
-  record: Record<string, unknown> | null | undefined,
-  keys: string[],
-): string {
-  for (const key of keys) {
-    const value = normalizeNonEmpty(record?.[key]);
-    if (value) return value;
-  }
-  return "";
-}
-
 export function readHeader(
   headers: Record<string, string> | undefined,
   key: string,
@@ -88,30 +77,6 @@ export function readHeader(
     if (headerKey.toLowerCase() === target && value.trim()) return value.trim();
   }
   return undefined;
-}
-
-export function readBoolean(
-  record: Record<string, unknown> | null | undefined,
-  keys: string[],
-): boolean {
-  return keys.some((key) => record?.[key] === true);
-}
-
-export function readArray(
-  record: Record<string, unknown> | null | undefined,
-  keys: string[],
-): unknown[] | null {
-  for (const key of keys) {
-    const value = record?.[key];
-    if (Array.isArray(value)) return value;
-  }
-  return null;
-}
-
-export function asRecord(value: unknown): Record<string, unknown> | null {
-  return value && typeof value === "object" && !Array.isArray(value)
-    ? (value as Record<string, unknown>)
-    : null;
 }
 
 // ── Numeric parsing ──────────────────────────────────────────────────────────
