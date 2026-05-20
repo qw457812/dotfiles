@@ -26,7 +26,6 @@
     {
       "source": "git:github.com/mitsuhiko/agent-stuff",
       "extensions": [
-        "extensions/answer.ts",
         "extensions/btw.ts",
         "extensions/session-breakdown.ts",
         "extensions/split-fork.ts"
