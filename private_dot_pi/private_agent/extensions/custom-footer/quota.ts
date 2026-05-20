@@ -526,13 +526,14 @@ const sources: Record<string, Source> = {
     format(quota: CrofQuota, theme: Theme): string | null {
       const { usable_requests: remaining, requests_plan: limit, credits } = quota;
 
-      // CrofAI daily requests reset at 05:00 UTC (13:00 CST)
+      // CrofAI daily requests reset at midnight Central time (America/Chicago)
+      // Ref: https://github.com/steipete/CodexBar/blob/3ee87432532ec917c78d6c7dd534b9eea045fa71/docs/crof.md?plain=1#L28
       const now = new Date();
-      const nextReset = new Date(
-        Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 5, 0, 0, 0),
-      );
+      const chi = new Date(now.toLocaleString("en-US", { timeZone: "America/Chicago" }));
+      const nextReset = new Date(chi.getFullYear(), chi.getMonth(), chi.getDate() + 1);
+      nextReset.setTime(nextReset.getTime() + now.getTime() - chi.getTime());
       if (nextReset.getTime() <= now.getTime()) {
-        nextReset.setUTCDate(nextReset.getUTCDate() + 1);
+        nextReset.setDate(nextReset.getDate() + 1);
       }
 
       return joinParts(
