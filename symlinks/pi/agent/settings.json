@@ -5,6 +5,7 @@
   "defaultThinkingLevel": "high",
   "hideThinkingBlock": true,
   "quietStartup": true,
+  "showHardwareCursor": true,
   "enabledModels": [
     "synthetic/hf:zai-org/GLM-5.1",
     "synthetic/hf:moonshotai/Kimi-K2.6",
