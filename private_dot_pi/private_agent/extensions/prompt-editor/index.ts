@@ -220,6 +220,12 @@ export default async function (pi: ExtensionAPI) {
         return;
       }
       if (this.getMode() === "normal") {
+        // Backspace in normal mode: swallow it. pi-vim passes backspace to
+        // the base Editor which deletes a character — wrong for vim where
+        // backspace is a no-op in normal mode.
+        if (data === "\x7f" || data === "\x08") {
+          return;
+        }
         // Single-key remaps (H -> 0, L -> $, U -> Ctrl+r)
         if (data in VIM_REMAPS) {
           super.handleInput(VIM_REMAPS[data]!);
