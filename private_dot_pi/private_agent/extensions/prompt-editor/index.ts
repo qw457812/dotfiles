@@ -3,7 +3,13 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { CustomEditor, getAgentDir, type ExtensionAPI } from "@earendil-works/pi-coding-agent";
-import { CURSOR_MARKER, truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
+import {
+  CURSOR_MARKER,
+  Key,
+  matchesKey,
+  truncateToWidth,
+  visibleWidth,
+} from "@earendil-works/pi-tui";
 
 import {
   applyPromptHistory,
@@ -230,10 +236,19 @@ export default async function (pi: ExtensionAPI) {
           (this as any).cancelAutocomplete?.();
         }
 
-        // Backspace in normal mode: swallow it. pi-vim passes backspace to
-        // the base Editor which deletes a character — wrong for vim where
-        // backspace is a no-op in normal mode.
-        if (data === "\x7f" || data === "\x08") {
+        // Backspace in normal mode: map to h (move left) instead of
+        // passing through to the base Editor which deletes a character.
+        if (matchesKey(data, Key.backspace)) {
+          super.handleInput("h");
+          return;
+        }
+        // React when Ctrl+C clears the input: auto-enter insert mode so
+        // the user can start typing immediately.
+        if (matchesKey(data, Key.ctrl("c"))) {
+          super.handleInput(data);
+          if (this.getText() === "") {
+            (this as any).mode = "insert";
+          }
           return;
         }
         // Single-key remaps (H -> 0, L -> $, U -> Ctrl+r)
