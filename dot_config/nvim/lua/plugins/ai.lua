@@ -56,8 +56,8 @@ return {
       },
       {
         "lajarre/pi-vim",
-        version = "*",
-        build = "pi update --extension npm:pi-vim",
+        -- version = "*",
+        -- build = "pi update --extension npm:pi-vim",
         lazy = true,
         config = function() end,
       },

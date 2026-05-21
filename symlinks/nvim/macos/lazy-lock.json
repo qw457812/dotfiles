@@ -110,7 +110,7 @@
   "pi-mcp-adapter": { "branch": "main", "commit": "8c1a28e7ebb837d5fa03de3a67f217ce994782cc" },
   "pi-neuralwatt-provider": { "branch": "main", "commit": "2faec6d7a5dc9bd3b35704aa105a22e3a2b61db8" },
   "pi-tps": { "branch": "main", "commit": "a487097ac117f6f966d89ecb155658e04dcc3075" },
-  "pi-vim": { "branch": "main", "commit": "3eaa60ab3ca1dfca4c3ce3661d24d8327b747842" },
+  "pi-vim": { "branch": "main", "commit": "6bb999b204516ccd9e32469431102eccf0613962" },
   "plenary.nvim": { "branch": "master", "commit": "74b06c6c75e4eeb3108ec01852001636d85a932b" },
   "py-requirements.nvim": { "branch": "main", "commit": "025ba677503d2332b722ebefb10e82871ac8ef96" },
   "refactoring.nvim": { "branch": "master", "commit": "f5b54f3605d9ed709521db1827b8686dea283622" },
