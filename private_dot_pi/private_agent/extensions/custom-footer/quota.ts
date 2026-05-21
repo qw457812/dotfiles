@@ -90,6 +90,8 @@ interface CrofQuota {
   usable_requests: number | null;
   requests_plan: number | null;
   credits: number;
+  /** Reset time (epoch ms) computed at fetch time, cached alongside the quota for consistency. */
+  reset_at: number;
 }
 
 interface CodebuddyQuota {
@@ -571,14 +573,22 @@ const sources: Record<string, Source> = {
       return process.env.CROFAI_API_KEY || null;
     },
     async fetch(apiKey: string): Promise<CrofQuota | null> {
-      return fetchJson<CrofQuota>("https://crof.ai/usage_api/", apiKey);
-    },
-    format(quota: CrofQuota, theme: Theme): string | null {
-      const { usable_requests: remaining, requests_plan: limit, credits } = quota;
+      const data = await fetchJson<
+        Pick<CrofQuota, "usable_requests" | "requests_plan" | "credits">
+      >("https://crof.ai/usage_api/", apiKey);
+      if (!data) return null;
 
       // CrofAI daily requests reset at midnight Central time (America/Chicago)
       // Ref: https://github.com/steipete/CodexBar/blob/3ee87432532ec917c78d6c7dd534b9eea045fa71/docs/crof.md?plain=1#L28
-      const resetAt = nextChicagoMidnight();
+      return { ...data, reset_at: nextChicagoMidnight().getTime() };
+    },
+    format(quota: CrofQuota, theme: Theme): string | null {
+      const {
+        usable_requests: remaining,
+        requests_plan: limit,
+        credits,
+        reset_at: resetAt,
+      } = quota;
 
       return joinParts(
         [
@@ -587,7 +597,7 @@ const sources: Record<string, Source> = {
                 [
                   theme.fg("accent", `${limit !== null ? limit - remaining : remaining}`),
                   limit !== null ? theme.fg("dim", `${limit}`) : null,
-                  theme.fg("dim", `${formatRemaining(resetAt.getTime())}`),
+                  theme.fg("dim", `${formatRemaining(resetAt)}`),
                 ],
                 theme.fg("dim", "/"),
               )
