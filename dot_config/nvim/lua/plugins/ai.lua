@@ -98,6 +98,14 @@ return {
         lazy = true,
         config = function() end,
       },
+      -- track models' updates only
+      {
+        "monotykamary/pi-crofai-provider",
+        -- build = "pi update --extension git:github.com/monotykamary/pi-crofai-provider",
+        lazy = true,
+        config = function() end,
+      },
+      { "disler/pi-vs-claude-code", lazy = true, config = function() end },
     },
   },
   { "qw457812/claude-code-sourcemap", pin = true, lazy = true, config = function() end },

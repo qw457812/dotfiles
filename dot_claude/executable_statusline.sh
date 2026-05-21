@@ -91,12 +91,16 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   case "$base_url" in *api.synthetic.new* | *api.fireworks.ai* | *localhost*) model=${model##*/} ;; esac
   model_display=$([ -n "$model" ] && echo "${COLOR_LAVENDER}${model}${COLOR_RESET}")
 
-  # tokens
-  total_tokens=$(echo "$input" | jq -r '.context_window.current_usage | (.input_tokens // 0) + (.output_tokens // 0) + (.cache_creation_input_tokens // 0) + (.cache_read_input_tokens // 0)')
+  # tokens and context usage
+  if [ -n "$CODEBUDDY_INTERNET_ENVIRONMENT" ]; then
+    total_tokens=$(echo "$input" | jq -r '.context_window.current_usage | (.input_tokens // 0) + (.output_tokens // 0)')
+    context_used_pct=$(echo "$input" | jq -r '.context_window.used_percentage // 0')
+  else
+    total_tokens=$(echo "$input" | jq -r '.context_window.current_usage | (.input_tokens // 0) + (.output_tokens // 0) + (.cache_creation_input_tokens // 0) + (.cache_read_input_tokens // 0)')
+    context_used_pct=$(echo "$total_tokens" | awk -v s="$context_window_size" '{print $1*100/s}')
+  fi
   total_tokens_display="${COLOR_BLUE}$(format_num "$(echo "$total_tokens" | awk '{print $1/1000}')")k${COLOR_RESET}"
-
-  # context usage
-  context_percentage_display="${COLOR_CYAN}$(format_num "$(echo "$total_tokens" | awk -v s="$context_window_size" '{print $1*100/s}')")%${COLOR_RESET}"
+  context_percentage_display="${COLOR_CYAN}$(format_num "$context_used_pct")%${COLOR_RESET}"
 
   # TPS
   output_tokens=$(echo "$input" | jq -r '.context_window.total_output_tokens // 0')
