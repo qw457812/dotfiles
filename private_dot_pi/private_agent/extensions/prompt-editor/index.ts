@@ -220,6 +220,16 @@ export default async function (pi: ExtensionAPI) {
         return;
       }
       if (this.getMode() === "normal") {
+        // pi-vim's cutCurrentLineContent (used by `cc`) relies on CTRL_A +
+        // CTRL_K which doesn't work when autocomplete is active. Dismiss it
+        // before executing a pending operator so `cc` clears correctly.
+        if (
+          (this as unknown as ModalEditorRuntime).pendingOperator !== null &&
+          (this as any).isShowingAutocomplete?.()
+        ) {
+          (this as any).cancelAutocomplete?.();
+        }
+
         // Backspace in normal mode: swallow it. pi-vim passes backspace to
         // the base Editor which deletes a character — wrong for vim where
         // backspace is a no-op in normal mode.
