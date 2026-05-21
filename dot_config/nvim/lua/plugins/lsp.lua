@@ -149,6 +149,7 @@ return {
 
   {
     "saecki/live-rename.nvim",
+    cond = false, -- E5108: Lua: ...cal/share/nvim/lazy/live-rename.nvim/lua/live-rename.lua:184: attempt to call field '_get_line_byte_from_position' (a nil value)
     lazy = true,
     specs = {
       {
