@@ -213,6 +213,56 @@ function joinParts(
   return filtered.length > 0 ? filtered.join(separator) : null;
 }
 
+let _chicagoFormatter: Intl.DateTimeFormat | undefined;
+
+/**
+ * Return the next midnight in America/Chicago.
+ * CDT (summer) → 05:00 UTC; CST (winter) → 06:00 UTC.
+ */
+function nextChicagoMidnight(after = new Date()): Date {
+  _chicagoFormatter ??= new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Chicago",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+    hourCycle: "h23",
+  });
+  const fmt = _chicagoFormatter;
+
+  function getPart(parts: Intl.DateTimeFormatPart[], type: string): number {
+    const part = parts.find((p) => p.type === type);
+    if (!part) throw new Error(`Missing ${type} part from DateTimeFormat`);
+    return parseInt(part.value, 10);
+  }
+
+  const parts = fmt.formatToParts(after);
+  const year = getPart(parts, "year");
+  const month = getPart(parts, "month");
+  const day = getPart(parts, "day");
+
+  // Always target the upcoming midnight; if we're exactly at 00:00:00 the
+  // "next" reset is still 24h away.
+  const nextDay = day + 1;
+
+  // America/Chicago alternates between CST (UTC-6) and CDT (UTC-5);
+  // one of [6, 5] always maps to Chicago midnight.
+  const utcHour = ([6, 5] as const).find((h) => {
+    const candidate = new Date(Date.UTC(year, month - 1, nextDay, h, 0, 0));
+    return getPart(fmt.formatToParts(candidate), "hour") === 0;
+  });
+  if (utcHour == null) {
+    throw new Error(
+      `Failed to compute Chicago midnight: no UTC-5/UTC-6 match for ${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`,
+    );
+  }
+
+  return new Date(Date.UTC(year, month - 1, nextDay, utcHour, 0, 0));
+}
+
 function toLocalDayKey(d: Date): string {
   const yyyy = d.getFullYear();
   const mm = String(d.getMonth() + 1).padStart(2, "0");
@@ -528,13 +578,7 @@ const sources: Record<string, Source> = {
 
       // CrofAI daily requests reset at midnight Central time (America/Chicago)
       // Ref: https://github.com/steipete/CodexBar/blob/3ee87432532ec917c78d6c7dd534b9eea045fa71/docs/crof.md?plain=1#L28
-      const now = new Date();
-      const chi = new Date(now.toLocaleString("en-US", { timeZone: "America/Chicago" }));
-      const nextReset = new Date(chi.getFullYear(), chi.getMonth(), chi.getDate() + 1);
-      nextReset.setTime(nextReset.getTime() + now.getTime() - chi.getTime());
-      if (nextReset.getTime() <= now.getTime()) {
-        nextReset.setDate(nextReset.getDate() + 1);
-      }
+      const resetAt = nextChicagoMidnight();
 
       return joinParts(
         [
@@ -543,7 +587,7 @@ const sources: Record<string, Source> = {
                 [
                   theme.fg("accent", `${limit !== null ? limit - remaining : remaining}`),
                   limit !== null ? theme.fg("dim", `${limit}`) : null,
-                  theme.fg("dim", `${formatRemaining(nextReset.getTime())}`),
+                  theme.fg("dim", `${formatRemaining(resetAt.getTime())}`),
                 ],
                 theme.fg("dim", "/"),
               )
