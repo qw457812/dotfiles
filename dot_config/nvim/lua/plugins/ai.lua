@@ -878,11 +878,11 @@ return {
             end)
           end
 
-          vim.keymap.set("n", "<Esc>", function()
-            if not U.keymap.clear_ui_esc() then
-              vim.cmd([[quitall]])
-            end
-          end, { buffer = ev.buf, desc = "Clear UI or Exit" })
+          -- vim.keymap.set("n", "<Esc>", function()
+          --   if not U.keymap.clear_ui_esc() then
+          --     vim.cmd([[quitall]])
+          --   end
+          -- end, { buffer = ev.buf, desc = "Clear UI or Exit" })
 
           vim.keymap.set({ "n", "i" }, "<C-s>", function()
             vim.cmd([[wqa]])
