@@ -21,10 +21,9 @@ const INSERT_PREFIX = "❯ ";
 const NORMAL_PREFIX = "❮ ";
 const CONTINUATION_PREFIX = "  ";
 const PREFIX_WIDTH = visibleWidth(INSERT_PREFIX);
-const ESC = String.fromCharCode(27);
-const ANSI_COLOR_RE = new RegExp(`${ESC}\\[[0-9;]*m`, "g");
-const FAKE_CURSOR_SGR_RESET_RE = new RegExp(`${ESC}\\[7m(.*?)${ESC}\\[0m`, "g");
-const FAKE_CURSOR_REVERSE_OFF_RE = new RegExp(`${ESC}\\[7m(.*?)${ESC}\\[27m`, "g");
+const ANSI_COLOR_RE = /\x1b\[[0-9;]*m/g;
+const SOFTWARE_CURSOR_START = "\x1b[7m";
+const SOFTWARE_CURSOR_RESETS = ["\x1b[0m", "\x1b[27m"] as const;
 const EXTENSION_DIR =
   typeof __dirname === "string" ? __dirname : dirname(fileURLToPath(import.meta.url));
 // pi's extension loader can evaluate TS via jiti, but importing pi-vim directly
@@ -58,6 +57,48 @@ export * from ${JSON.stringify(piVimEntry)};
   if (current !== content) {
     writeFileSync(PI_VIM_WRAPPER, content);
   }
+}
+
+// Copied from pi-vim v0.9.0 — findSoftwareCursorReset.
+// https://github.com/lajarre/pi-vim/blob/6bb999b204516ccd9e32469431102eccf0613962/index.ts#L177-L192
+function findSoftwareCursorReset(
+  line: string,
+  startIndex: number,
+): { index: number; sequence: (typeof SOFTWARE_CURSOR_RESETS)[number] } | null {
+  let firstReset: { index: number; sequence: (typeof SOFTWARE_CURSOR_RESETS)[number] } | null =
+    null;
+
+  for (const sequence of SOFTWARE_CURSOR_RESETS) {
+    const index = line.indexOf(sequence, startIndex);
+    if (index === -1) continue;
+    if (!firstReset || index < firstReset.index) {
+      firstReset = { index, sequence };
+    }
+  }
+
+  return firstReset;
+}
+
+// Copied from pi-vim v0.9.0 — stripSoftwareCursorAfterMarker.
+// https://github.com/lajarre/pi-vim/blob/6bb999b204516ccd9e32469431102eccf0613962/index.ts#L194-L209
+// See also: https://github.com/earendil-works/pi/blob/d06db09a53958e485131527db25c1293f29b9367/packages/tui/src/components/editor.ts#L480-L493
+function stripSoftwareCursorAfterMarker(line: string): string {
+  const markerIndex = line.indexOf(CURSOR_MARKER);
+  if (markerIndex === -1) return line;
+
+  const searchStart = markerIndex + CURSOR_MARKER.length;
+  const cursorStart = line.indexOf(SOFTWARE_CURSOR_START, searchStart);
+  if (cursorStart === -1) return line;
+
+  const cursorContentStart = cursorStart + SOFTWARE_CURSOR_START.length;
+  const reset = findSoftwareCursorReset(line, cursorContentStart);
+  if (!reset) return line;
+
+  return (
+    line.slice(0, cursorStart) +
+    line.slice(cursorContentStart, reset.index) +
+    line.slice(reset.index + reset.sequence.length)
+  );
 }
 
 export default async function (pi: ExtensionAPI) {
@@ -346,14 +387,16 @@ export default async function (pi: ExtensionAPI) {
 
     private renderCursor(lines: string[], bottomIdx: number): void {
       if (userPrefersShowHardwareCursor) {
-        // Hardware cursor mode: ensure CURSOR_MARKER is present for the
-        // terminal to position its hardware cursor, and strip the fake
-        // inverse-video cursor rendered by Editor.
+        // Optional: re-inject CURSOR_MARKER when Editor suppressed it
+        // during autocomplete. Without it the cursor shape may revert to
+        // steady block despite the correct DECSCUSR sequence being written.
         this.ensureCursorMarker(lines, bottomIdx);
+        // Hardware cursor mode: strip the fake inverse-video cursor rendered
+        // by Editor immediately after CURSOR_MARKER.
         this.stripFakeCursor(lines, bottomIdx);
       } else if (blurred) {
-        // Fake cursor mode + blurred: strip the fake inverse-video cursor
-        // so no cursor is visible when the terminal loses focus.
+        // Fake cursor mode + blurred: same as hardware path — only the
+        // software cursor adjacent to CURSOR_MARKER is stripped.
         this.stripFakeCursor(lines, bottomIdx);
       }
       // Fake cursor mode + focused: leave the upstream inverse-video cursor
@@ -361,20 +404,17 @@ export default async function (pi: ExtensionAPI) {
     }
 
     /**
-     * Re-inject CURSOR_MARKER before the fake cursor if Editor suppressed it.
-     * Editor omits the marker during autocomplete to prevent the IME candidate
-     * window from obscuring the autocomplete list; we add it back so the
-     * hardware cursor stays visible — safe because slash-command input and
-     * IME input never coincide.
+     * Re-inject CURSOR_MARKER when Editor suppressed it during autocomplete.
+     * Without it the cursor shape falls back to steady block even though
+     * the correct DECSCUSR sequence was written.
      */
     private ensureCursorMarker(lines: string[], bottomIdx: number): void {
-      for (let i = 1; i < bottomIdx; i++) {
+      for (let i = bottomIdx - 1; i >= 1; i--) {
         if (lines[i]!.includes(CURSOR_MARKER)) return; // already present
       }
       // No marker found — inject before the first inverse-video sequence
-      for (let i = 1; i < bottomIdx; i++) {
-        // oxlint-disable-next-line no-control-regex
-        const idx = lines[i]!.indexOf("\x1b[7m");
+      for (let i = bottomIdx - 1; i >= 1; i--) {
+        const idx = lines[i]!.indexOf(SOFTWARE_CURSOR_START);
         if (idx !== -1) {
           lines[i] = lines[i]!.slice(0, idx) + CURSOR_MARKER + lines[i]!.slice(idx);
           return;
@@ -382,17 +422,19 @@ export default async function (pi: ExtensionAPI) {
       }
     }
 
-    /** Strip Editor's inverse-video fake cursor while preserving the grapheme
-     *  underneath it. Editor closes the cursor with \x1b[0m; \x1b[27m is kept
-     *  as a defensive fallback in case upstream switches to explicit reverse-off. */
-    private stripFakeCursor(lines: string[], end?: number): void {
-      const last = end ?? lines.length;
-      for (let i = 1; i < last; i++) {
-        // See: https://github.com/earendil-works/pi/blob/d06db09a53958e485131527db25c1293f29b9367/packages/tui/src/components/editor.ts#L480-L493
-        lines[i] = lines[i]!.replace(FAKE_CURSOR_SGR_RESET_RE, "$1").replace(
-          FAKE_CURSOR_REVERSE_OFF_RE,
-          "$1",
-        );
+    /**
+     * Strip the fake inverse-video cursor rendered by Editor immediately
+     * after CURSOR_MARKER, preserving the grapheme underneath. Delegates to
+     * pi-vim's stripSoftwareCursorAfterMarker for exact alignment.
+     * ensureCursorMarker guarantees MARKER is present before this runs.
+     */
+    private stripFakeCursor(lines: string[], bottomIdx: number): void {
+      for (let i = bottomIdx - 1; i >= 1; i--) {
+        const stripped = stripSoftwareCursorAfterMarker(lines[i]!);
+        if (stripped !== lines[i]!) {
+          lines[i] = stripped;
+          return;
+        }
       }
     }
   }
