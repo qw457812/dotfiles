@@ -59,8 +59,8 @@ export * from ${JSON.stringify(piVimEntry)};
   }
 }
 
-// Copied from pi-vim v0.9.0 — findSoftwareCursorReset.
-// https://github.com/lajarre/pi-vim/blob/6bb999b204516ccd9e32469431102eccf0613962/index.ts#L177-L192
+// Copied from pi-vim v0.10.0 — findSoftwareCursorReset.
+// https://github.com/lajarre/pi-vim/blob/fa62bb2/index.ts
 function findSoftwareCursorReset(
   line: string,
   startIndex: number,
@@ -79,8 +79,8 @@ function findSoftwareCursorReset(
   return firstReset;
 }
 
-// Copied from pi-vim v0.9.0 — stripSoftwareCursorAfterMarker.
-// https://github.com/lajarre/pi-vim/blob/6bb999b204516ccd9e32469431102eccf0613962/index.ts#L194-L209
+// Copied from pi-vim v0.10.0 — stripSoftwareCursorAfterMarker.
+// https://github.com/lajarre/pi-vim/blob/fa62bb2/index.ts
 // See also: https://github.com/earendil-works/pi/blob/d06db09a53958e485131527db25c1293f29b9367/packages/tui/src/components/editor.ts#L480-L493
 function stripSoftwareCursorAfterMarker(line: string): string {
   const markerIndex = line.indexOf(CURSOR_MARKER);
@@ -108,11 +108,7 @@ export default async function (pi: ExtensionAPI) {
 
   type Mode = "insert" | "normal";
 
-  type ModeColorizers = {
-    insert: (s: string) => string;
-    normal: (s: string) => string;
-    ex: (s: string) => string;
-  };
+  type ModeColorizers = Record<"insert" | "normal" | "ex", (s: string) => string>;
 
   type ModalEditorRuntime = {
     getMode: () => Mode;
@@ -135,20 +131,20 @@ export default async function (pi: ExtensionAPI) {
   }
 
   // Related upstream logic:
-  // - https://github.com/lajarre/pi-vim/blob/3eaa60ab3ca1dfca4c3ce3661d24d8327b747842/index.ts#L2218-L2259 (ModalEditor.render + getModeLabel)
+  // - https://github.com/lajarre/pi-vim/blob/fa62bb2/index.ts (ModalEditor.render + getModeLabel + getModeLabelColorizer)
+  function getActiveMode(editor: ModalEditorRuntime): "insert" | "normal" | "ex" {
+    if (editor.pendingExCommand !== null) return "ex";
+    return editor.getMode();
+  }
+
   function getRenderedModeLabel(editor: ModalEditorRuntime): {
     raw: string;
     rendered: string;
   } {
     const raw =
       editor.getModeLabel?.() ?? (editor.getMode() === "insert" ? " INSERT " : " NORMAL ");
-    const colorize = editor.labelColorizers
-      ? editor.pendingExCommand !== null
-        ? editor.labelColorizers.ex
-        : editor.getMode() === "insert"
-          ? editor.labelColorizers.insert
-          : editor.labelColorizers.normal
-      : null;
+    const active = getActiveMode(editor);
+    const colorize = editor.labelColorizers?.[active] ?? null;
 
     return {
       raw,
@@ -159,12 +155,8 @@ export default async function (pi: ExtensionAPI) {
   function getRenderedPrefix(editor: ModalEditorRuntime, colorizers: ModeColorizers): string {
     const mode = editor.getMode();
     const prefix = mode === "insert" ? INSERT_PREFIX : NORMAL_PREFIX;
-    const colorize =
-      editor.pendingExCommand !== null
-        ? colorizers.ex
-        : mode === "insert"
-          ? colorizers.insert
-          : colorizers.normal;
+    const active = getActiveMode(editor);
+    const colorize = colorizers[active];
 
     return colorize ? colorize(prefix) : prefix;
   }
@@ -249,18 +241,17 @@ export default async function (pi: ExtensionAPI) {
       labelColorizers: ModeColorizers | null,
       prefixColorizers: ModeColorizers,
     ) {
-      super(tui, theme, kb, labelColorizers);
+      super(tui, theme, kb, { labelColorizers, borderColorizers: null });
       this.prefixColorizers = prefixColorizers;
-      // pi-vim v0.9.0+ has built-in cursor shape management
-      // (https://github.com/lajarre/pi-vim/blob/6bb999b204516ccd9e32469431102eccf0613962/index.ts#L571)
+      // pi-vim v0.10.0+ has built-in cursor shape management
+      // (https://github.com/lajarre/pi-vim/blob/fa62bb2/index.ts)
       // that conflicts with our DECSCUSR logic. Disable it so
       // our renderCursor() is the sole cursor authority.
       (this as any).cursorShapeRuntime = null;
     }
 
     override handleInput(data: string): void {
-      // pi-vim v0.9.0+ has an ex command mode
-      // (https://github.com/lajarre/pi-vim/blob/6bb999b204516ccd9e32469431102eccf0613962/index.ts#L916-L919).
+      // pi-vim has an ex command mode.
       // If active, let pi-vim handle input directly so remaps don't interfere.
       if ((this as unknown as ModalEditorRuntime).pendingExCommand !== null) {
         super.handleInput(data);
@@ -324,7 +315,7 @@ export default async function (pi: ExtensionAPI) {
       }
 
       // Related upstream logic:
-      // - https://github.com/lajarre/pi-vim/blob/3eaa60ab3ca1dfca4c3ce3661d24d8327b747842/index.ts#L2218-L2232 (ModalEditor.render)
+      // - https://github.com/lajarre/pi-vim/blob/fa62bb2/index.ts (ModalEditor.render)
       // - https://github.com/badlogic/pi-mono/blob/e3fee7a511503ebe170223cd89e7631751539f25/packages/coding-agent/src/modes/interactive/components/custom-editor.ts
       //
       // Bypass ModalEditor.render() here so pi-vim does not append the mode
@@ -458,17 +449,17 @@ export default async function (pi: ExtensionAPI) {
   });
 
   pi.on("session_start", (_event, ctx) => {
-    // https://github.com/lajarre/pi-vim/blob/6bb999b204516ccd9e32469431102eccf0613962/index.ts#L3081-L3087
+    // https://github.com/lajarre/pi-vim/blob/fa62bb2/index.ts (default export session_start handler)
     const theme = ctx.ui.theme;
     const reverseVideo = (s: string) => `\x1b[7m${s}\x1b[27m`;
-    const colorizers = {
+    const colorizers: ModeColorizers = {
       insert: (s: string) => theme.fg("borderMuted", reverseVideo(s)),
       normal: (s: string) => theme.fg("borderAccent", reverseVideo(s)),
       ex: (s: string) => theme.fg("warning", reverseVideo(s)),
     };
     // Prefix styling is intentionally lighter than the bottom mode label:
     // insert stays plain/default text, while normal gets only the accent fg.
-    const prefixColorizers = {
+    const prefixColorizers: ModeColorizers = {
       insert: (s: string) => s,
       normal: (s: string) => theme.fg("borderAccent", s),
       ex: (s: string) => theme.fg("warning", s),
@@ -476,7 +467,7 @@ export default async function (pi: ExtensionAPI) {
 
     setTimeout(() => {
       // Related upstream logic:
-      // - https://github.com/lajarre/pi-vim/blob/3eaa60ab3ca1dfca4c3ce3661d24d8327b747842/index.ts#L2262-L2271 (default export session_start handler)
+      // - https://github.com/lajarre/pi-vim/blob/fa62bb2/index.ts (default export session_start handler)
       // - https://github.com/badlogic/pi-mono/blob/cca5a3a1a4c6db90e4c5e2e95772845c1d5a251d/packages/coding-agent/src/modes/interactive/interactive-mode.ts#L1841-L1909 (setCustomEditorComponent)
       //
       // Defer until after pi-vim's own session_start handler has installed its
@@ -491,8 +482,8 @@ export default async function (pi: ExtensionAPI) {
           ctx.ui.setEditorComponent((tui, editorTheme, kb) => {
             const newEditor = new PromptEditor(tui, editorTheme, kb, colorizers, prefixColorizers);
 
-            // pi-vim v0.9.0+ configures quitFn and notifyFn on the editor
-            // (https://github.com/lajarre/pi-vim/blob/6bb999b204516ccd9e32469431102eccf0613962/index.ts#L3085-L3087).
+            // pi-vim v0.10.0+ configures quitFn and notifyFn on the editor
+            // (https://github.com/lajarre/pi-vim/blob/fa62bb2/index.ts).
             // Apply them to our subclass so :q/:wq etc work correctly.
             (newEditor as any).setQuitFn(() => ctx.shutdown());
             (newEditor as any).setNotifyFn((message: string) => ctx.ui.notify(message, "warning"));
