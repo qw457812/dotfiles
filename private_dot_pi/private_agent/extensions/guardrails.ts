@@ -1,6 +1,6 @@
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 
-// ref: https://github.com/aliou/pi-guardrails/blob/v0.12.1/src/shared/events.ts
+// ref: https://github.com/aliou/pi-guardrails/blob/v0.13.0/src/shared/events.ts
 type GuardrailsBlockSource = "policy" | "permission" | "user" | "nonInteractive";
 
 type Action =
@@ -17,15 +17,16 @@ interface GuardrailsActionBlockedPayload {
   context?: { toolName?: string; input?: Record<string, unknown> };
 }
 
-interface GuardrailsRiskDetectedPayload {
+interface GuardrailsActionPromptedPayload {
   source: "guardrails";
   feature: "policies" | "permissionGate" | "pathAccess";
   timestamp: string;
-  risk: {
-    kind: "dangerous";
-    action: Action;
-    key: string;
-    reason: string;
+  action: Action;
+  reason: string;
+  prompt: {
+    /** What kind of prompt was shown */
+    kind: "confirmation" | "permission";
+    /** The feature-specific metadata about the risk */
     metadata?: unknown;
   };
   context?: { toolName?: string; input?: Record<string, unknown> };
@@ -46,17 +47,20 @@ export default function (pi: ExtensionAPI) {
     }
   });
 
-  const offGuardrailsRiskDetected = pi.events.on("guardrails:risk:detected", (data: unknown) => {
-    const { risk } = data as GuardrailsRiskDetectedPayload;
-    pi.events.emit("my:notification", {
-      title: "pi-guardrails:risk:detected",
-      body: `${risk.action.kind === "command" ? risk.action.command : risk.action.path}\n${risk.reason}\n${risk.key}`,
-    });
-  });
+  const offGuardrailsActionPrompted = pi.events.on(
+    "guardrails:action:prompted",
+    (data: unknown) => {
+      const { action, prompt, reason } = data as GuardrailsActionPromptedPayload;
+      pi.events.emit("my:notification", {
+        title: `pi-guardrails:action:prompted (${prompt.kind})`,
+        body: `${action.kind === "command" ? action.command : action.path}\n${reason}`,
+      });
+    },
+  );
 
   pi.on("session_shutdown", () => {
     currentCtx = undefined;
     offGuardrailsActionBlocked();
-    offGuardrailsRiskDetected();
+    offGuardrailsActionPrompted();
   });
 }
