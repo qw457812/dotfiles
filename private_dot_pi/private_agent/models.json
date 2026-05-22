@@ -62,7 +62,7 @@
           "id": "glm-5.1-precision",
           "name": "GLM 5.1 (Precision)",
           "reasoning": true,
-          "input": ["text", "image"],
+          "input": ["text"],
           "contextWindow": 202752,
           "maxTokens": 202752,
           "cost": { "input": 0.75, "output": 2.9, "cacheRead": 0.15, "cacheWrite": 0 }
