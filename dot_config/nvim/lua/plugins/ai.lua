@@ -413,6 +413,18 @@ return {
                         vim.fn.search("^❮", "Wb", stopline)
                       end
                     end
+
+                    -- ~/.pi/agent/extensions/chat-divider.ts
+                    vim.keymap.set("n", "]]", function()
+                      if vim.fn.search([[^ ─\{10,}]], "W") == 0 then
+                        LazyVim.warn("No more user messages", { title = "Sidekick" })
+                      end
+                    end, { buffer = buf, desc = "Jump to next user message (Sidekick)" })
+                    vim.keymap.set("n", "[[", function()
+                      if vim.fn.search([[^ ─\{10,}]], "Wb") == 0 then
+                        LazyVim.warn("No more user messages", { title = "Sidekick" })
+                      end
+                    end, { buffer = buf, desc = "Jump to previous user message (Sidekick)" })
                   end)
                 end
               end,
