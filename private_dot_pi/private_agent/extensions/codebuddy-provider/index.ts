@@ -27,6 +27,7 @@ function streamCodebuddy(
 
   const userId = readHeader(model.headers, "X-User-Id") || decodeUserId(accessToken);
   const domain = readHeader(model.headers, "X-Domain") || DEFAULT_DOMAIN;
+  const enterpriseId = readHeader(model.headers, "X-Enterprise-Id");
   const department = readHeader(model.headers, "X-Department-Info") || "";
   const agentPurpose = readHeader(model.headers, "X-Agent-Purpose");
   const conversationId = requestId();
@@ -36,6 +37,7 @@ function streamCodebuddy(
   const headers: Record<string, string> = {
     ...(userId ? { "X-User-Id": userId } : {}),
     "X-Domain": domain,
+    ...(enterpriseId ? { "X-Enterprise-Id": enterpriseId } : {}),
     "X-Department-Info": department,
     "X-IDE-Type": "CLI",
     "X-IDE-Name": "CLI",
@@ -85,6 +87,7 @@ export default function (pi: ExtensionAPI) {
         const headers: Record<string, string> = {
           ...(userId ? { "X-User-Id": userId } : {}),
           "X-Domain": domain,
+          ...(c.enterpriseId ? { "X-Enterprise-Id": c.enterpriseId } : {}),
         };
         if (c.departmentFullName) {
           headers["X-Department-Info"] = c.departmentFullName;
