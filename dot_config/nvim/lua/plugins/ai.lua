@@ -252,7 +252,14 @@ return {
       numbered_tools({
         name = "pi_tmp",
         base_tool = "pi",
-        tool_opts = { cmd = { "pi", "--no-context-files", "--no-session" } },
+        tool_opts = {
+          cmd = {
+            "pi",
+            "--no-context-files",
+            "--no-session",
+            -- "--no-extensions",
+          },
+        },
         count = 0,
       })
 
@@ -401,8 +408,9 @@ return {
 
                     if vim.api.nvim_get_current_buf() == buf then
                       -- https://github.com/qw457812/dotfiles/blob/4e28970c14da2e0f9aab8b18014ef5d7c309235d/private_dot_pi/private_agent/extensions/prompt-editor/index.ts
-                      if vim.fn.search("❯", "Wb") == 0 then
-                        vim.fn.search("❮", "Wb")
+                      local stopline = vim.fn.line(".") - 20
+                      if vim.fn.search("^❯", "Wb", stopline) == 0 then
+                        vim.fn.search("^❮", "Wb", stopline)
                       end
                     end
                   end)

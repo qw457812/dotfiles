@@ -184,6 +184,8 @@ async function readAuth<T = Record<string, unknown>>(provider: string): Promise<
 
 function formatRemaining(date: string | number): string {
   const time = typeof date === "number" ? date : new Date(date).getTime();
+  if (!Number.isFinite(time)) return "?";
+
   const diff = time - Date.now();
 
   if (diff < SECOND_MS) {
