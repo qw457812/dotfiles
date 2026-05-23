@@ -130,6 +130,6 @@
   "which-key.nvim": { "branch": "main", "commit": "3aab2147e74890957785941f0c1ad87d0a44c15a" },
   "yanky.nvim": { "branch": "main", "commit": "784188e0a7363e762e53140f39124d786aec0832" },
   "yazi-flavors": { "branch": "main", "commit": "06708015bfb53b169d99bb3907829f9175105d57" },
-  "yazi-plugins": { "branch": "main", "commit": "16e8ed382db5fc5ea9d179a2803d86859803fae0" },
+  "yazi-plugins": { "branch": "main", "commit": "5d5c4803dd12bab4e4f19d606f8db0c871e6bec5" },
   "yazi.nvim": { "branch": "main", "commit": "172bd64a4c2d3adbe2e0ef56289f47ffe139ca55" }
 }

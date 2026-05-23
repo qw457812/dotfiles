@@ -23,9 +23,6 @@ prepend_rules = [
 [plugin]
 prepend_fetchers = [
   # https://github.com/yazi-rs/plugins/tree/main/git.yazi
-  # TODO: remove `id` once Termux ships yazi >= 26.5.6
-  #  `id` was renamed to `group` in 26.5.6 (sxyazi/yazi#3943)
-  #  yazi < 26.5.6 ignores unknown `group`, yazi >= 26.5.6 ignores unknown `id`
-  { id = "git", url = "*", run = "git", group = "git" },
-  { id = "git", url = "*/", run = "git", group = "git" },
+  { url = "*", run = "git", group = "git" },
+  { url = "*/", run = "git", group = "git" },
 ]
