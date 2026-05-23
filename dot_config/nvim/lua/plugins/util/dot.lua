@@ -143,9 +143,10 @@ return {
           vim.opt_local.commentstring = "# %s"
         end,
       })
+      -- alternative: remove `auto_reload_config -1` from kitty.conf
       if vim.g.user_is_kitty then
         vim.api.nvim_create_autocmd("BufWritePost", {
-          pattern = "kitty.conf",
+          pattern = { "kitty.conf", "kitty.conf.tmpl" },
           callback = U.debounce_wrap(500, function()
             local res = vim.system({ "kitten", "@", "load-config" }, { text = true }):wait()
             if res.code == 0 then
