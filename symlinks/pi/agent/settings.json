@@ -39,10 +39,13 @@
     },
     {
       "source": "git:github.com/mattpocock/skills",
+      "extensions": [],
       "skills": [
         "skills/productivity/grill-me",
         "skills/productivity/write-a-skill"
-      ]
+      ],
+      "prompts": [],
+      "themes": []
     },
     {
       "source": "git:github.com/addyosmani/agent-skills",
@@ -66,6 +69,15 @@
         "pi-package/prompts/fix.md",
         "pi-package/prompts/test.md"
       ],
+      "themes": []
+    },
+    {
+      "source": "npm:amp-themes",
+      "extensions": [
+        "extensions/amp-user-message.ts"
+      ],
+      "skills": [],
+      "prompts": [],
       "themes": []
     },
     "npm:pi-caffeinate",

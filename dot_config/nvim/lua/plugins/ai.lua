@@ -414,15 +414,37 @@ return {
                       end
                     end
 
-                    -- ~/.pi/agent/extensions/chat-divider.ts
+                    -- https://www.npmjs.com/package/amp-themes?activeTab=code (extensions/amp-user-message.ts)
                     vim.keymap.set("n", "]]", function()
-                      if vim.fn.search([[^ ─\{10,}]], "W") == 0 then
+                      local pos = vim.fn.getpos(".")
+                      -- Skip past the current user message block before searching for the next one
+                      if vim.fn.getline("."):find("^▌") then
+                        vim.fn.search("^[^▌]", "W")
+                      end
+                      if vim.fn.search("^▌", "W") == 0 then
+                        vim.fn.setpos(".", pos)
                         LazyVim.warn("No more user messages", { title = "Sidekick" })
                       end
                     end, { buffer = buf, desc = "Jump to next user message (Sidekick)" })
                     vim.keymap.set("n", "[[", function()
-                      if vim.fn.search([[^ ─\{10,}]], "Wb") == 0 then
+                      local pos = vim.fn.getpos(".")
+                      if vim.fn.getline("."):find("^▌") then
+                        -- If no gap above, we are already at the first user message block
+                        if vim.fn.search("^[^▌]", "Wb") == 0 then
+                          LazyVim.warn("No more user messages", { title = "Sidekick" })
+                          return
+                        end
+                      end
+                      if vim.fn.search("^▌", "Wb") == 0 then
+                        vim.fn.setpos(".", pos)
                         LazyVim.warn("No more user messages", { title = "Sidekick" })
+                      else
+                        -- Jump to the first line of the user message block
+                        if vim.fn.search("^[^▌]", "Wb") == 0 then
+                          vim.fn.cursor(1, 1)
+                        else
+                          vim.fn.search("^▌", "W")
+                        end
                       end
                     end, { buffer = buf, desc = "Jump to previous user message (Sidekick)" })
                   end)
