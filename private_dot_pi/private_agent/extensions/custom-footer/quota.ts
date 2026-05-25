@@ -94,6 +94,11 @@ interface CrofQuota {
   reset_at: number;
 }
 
+interface SmartaipiQuota {
+  credits: number;
+  free_credits: number;
+}
+
 interface CodebuddyQuota {
   code: number;
   data: {
@@ -608,6 +613,19 @@ const sources: Record<string, Source> = {
         ],
         " ",
       );
+    },
+  }),
+  smartaipi: createSource("smartaipi", {
+    cacheTtlMs: MINUTE_MS,
+    async getAuth(): Promise<string | null> {
+      return process.env.SMART_AIPI_TOKEN || null;
+    },
+    async fetch(token: string): Promise<SmartaipiQuota | null> {
+      // https://www.npmjs.com/package/@smart-aipi/mcp
+      return fetchJson<SmartaipiQuota>("https://smartaipi.com/api/usage", token);
+    },
+    format(quota: SmartaipiQuota, theme: Theme): string | null {
+      return theme.fg("accent", `$${formatDecimal((quota.credits + quota.free_credits) / 100, 2)}`);
     },
   }),
   firepass: createSource("firepass", {
