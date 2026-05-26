@@ -70,7 +70,7 @@ Example output:
 }`;
 
 const EXTRACTION_FALLBACK_MODELS: Array<{ provider: string; modelId: string }> = [
-	{ provider: "openai-codex", modelId: "gpt-5.3" },
+	{ provider: "openai-codex", modelId: "gpt-5.3-codex" },
 	{ provider: "anthropic", modelId: "claude-haiku-4-5" },
 	{ provider: "zai", modelId: "glm-4.7" },
 	{ provider: "deepseek", modelId: "deepseek-v4-flash" },

@@ -29,6 +29,7 @@
       "/private/tmp",
       "/var/folders",
       "/private/var/folders",
+      "~/.npm",
       "~/.bun",
       "~/.cache"
     ]
