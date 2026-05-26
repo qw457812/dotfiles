@@ -13,10 +13,13 @@
 import type { ExtensionAPI, ExtensionUIContext } from "@earendil-works/pi-coding-agent";
 
 type FocusTracker = {
-	attach: (ui?: Pick<ExtensionUIContext, "onTerminalInput">, onChange?: (focused: boolean) => void) => void;
-	detach: () => void;
-	// true = focused, false = unfocused, undefined = unknown
-	isFocused: () => boolean | undefined;
+  attach: (
+    ui?: Pick<ExtensionUIContext, "onTerminalInput">,
+    onChange?: (focused: boolean) => void,
+  ) => void;
+  detach: () => void;
+  // true = focused, false = unfocused, undefined = unknown
+  isFocused: () => boolean | undefined;
 };
 
 // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
@@ -26,60 +29,63 @@ const FOCUS_IN = "\x1b[I";
 const FOCUS_OUT = "\x1b[O";
 
 const createFocusTracker = (): FocusTracker => {
-	let focused: boolean | undefined;
-	let offTerminalInput: (() => void) | undefined;
+  let focused: boolean | undefined;
+  let offTerminalInput: (() => void) | undefined;
 
-	const detach = () => {
-		focused = undefined;
-		if (!offTerminalInput) {
-			return;
-		}
+  const detach = () => {
+    focused = undefined;
+    if (!offTerminalInput) {
+      return;
+    }
 
-		offTerminalInput();
-		offTerminalInput = undefined;
-		process.stdout.write(FOCUS_DISABLE);
-	};
+    offTerminalInput();
+    offTerminalInput = undefined;
+    process.stdout.write(FOCUS_DISABLE);
+  };
 
-	const attach = (ui?: Pick<ExtensionUIContext, "onTerminalInput">, onChange?: (focused: boolean) => void) => {
-		detach();
-		if (!ui || !process.stdin.isTTY || !process.stdout.isTTY) {
-			return;
-		}
+  const attach = (
+    ui?: Pick<ExtensionUIContext, "onTerminalInput">,
+    onChange?: (focused: boolean) => void,
+  ) => {
+    detach();
+    if (!ui || !process.stdin.isTTY || !process.stdout.isTTY) {
+      return;
+    }
 
-		process.stdout.write(FOCUS_ENABLE);
-		offTerminalInput = ui.onTerminalInput((data: string) => {
-			if (data === FOCUS_IN) {
-				if (focused !== true) {
-					focused = true;
-					onChange?.(true);
-				}
-			} else if (data === FOCUS_OUT) {
-				if (focused !== false) {
-					focused = false;
-					onChange?.(false);
-				}
-			}
-			return {};
-		});
-	};
+    process.stdout.write(FOCUS_ENABLE);
+    offTerminalInput = ui.onTerminalInput((data: string) => {
+      if (data === FOCUS_IN) {
+        if (focused !== true) {
+          focused = true;
+          onChange?.(true);
+        }
+      } else if (data === FOCUS_OUT) {
+        if (focused !== false) {
+          focused = false;
+          onChange?.(false);
+        }
+      }
+      return {};
+    });
+  };
 
-	return {
-		attach,
-		detach,
-		isFocused: () => focused,
-	};
+  return {
+    attach,
+    detach,
+    isFocused: () => focused,
+  };
 };
 
 export default function (pi: ExtensionAPI) {
-	const focusTracker = createFocusTracker();
+  const focusTracker = createFocusTracker();
 
-	pi.on("session_start", (_event, ctx) => {
-		focusTracker.attach(ctx.hasUI ? ctx.ui : undefined, (focused) => {
-			pi.events.emit("my:focus_change", { focused });
-		});
-	});
+  pi.on("session_start", (_event, ctx) => {
+    focusTracker.attach(ctx.hasUI ? ctx.ui : undefined, (focused) => {
+      pi.events.emit("my:focus_change", { focused });
+    });
+  });
 
-	pi.on("session_shutdown", () => {
-		focusTracker.detach();
-	});
+  pi.on("session_shutdown", () => {
+    focusTracker.detach();
+  });
 }
