@@ -8,17 +8,23 @@
   "showHardwareCursor": true,
   "enabledModels": [
     "zai/glm-5.1",
+    "openai-codex/gpt-5.5",
+    "openai-codex/gpt-5.4",
+    "openai-codex/gpt-5.4-mini",
     "synthetic/hf:zai-org/GLM-5.1",
     "synthetic/hf:moonshotai/Kimi-K2.6",
+    "crofai/glm-5.1-precision",
+    "crofai/kimi-k2.6-precision",
     "crofai/mimo-v2.5-pro-precision",
     "crofai/deepseek-v4-pro-precision",
+    "crofai/deepseek-v4-pro-lightning",
     "deepseek/deepseek-v4-pro",
     "neuralwatt/zai-org/GLM-5.1-FP8",
     "neuralwatt/moonshotai/Kimi-K2.6",
+    "neuralwatt/glm-5.1-flex",
+    "neuralwatt/kimi-k2.6-flex",
     "github-copilot/gpt-5.4",
-    "codebuddy/glm-5.1",
-    "codebuddy/kimi-k2.6",
-    "codebuddy/deepseek-v4-pro"
+    "codebuddy/glm-5.1"
   ],
   "packages": [
     "npm:pi-vim",

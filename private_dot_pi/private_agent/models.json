@@ -31,27 +31,64 @@
         }
       ]
     },
+    // https://github.com/monotykamary/pi-crofai-provider/blob/8b0c3ae5ce18af4d80ef0cc43c9c500d2f95d2db
     "crofai": {
       "baseUrl": "https://crof.ai/v1",
       "apiKey": "CROFAI_API_KEY",
-      "api": "openai-completions",
-      "compat": {
-        "maxTokensField": "max_tokens",
-        "supportsStore": false
-      },
       "models": [
         {
           "id": "deepseek-v4-pro-precision",
           "name": "DeepSeek V4 Pro (Precision)",
+          "api": "openai-completions",
+          "baseUrl": "https://crof.ai/v1",
+          "compat": {
+            "maxTokensField": "max_tokens",
+            "supportsStore": false
+          },
           "reasoning": true,
           "input": ["text"],
           "contextWindow": 1000000,
           "maxTokens": 131072,
-          "cost": { "input": 1.25, "output": 2.5, "cacheRead": 0.1, "cacheWrite": 0 }
+          "thinkingLevelMap": {
+            "minimal": null,
+            "low": null,
+            "medium": null,
+            "high": "high",
+            "xhigh": "max"
+          },
+          "cost": { "input": 0.7, "output": 1.4, "cacheRead": 0.006, "cacheWrite": 0 }
+        },
+        {
+          "id": "deepseek-v4-pro-lightning",
+          "name": "DeepSeek V4 Pro (Lightning)",
+          "api": "openai-completions",
+          "baseUrl": "https://crof.ai/v1",
+          "compat": {
+            "maxTokensField": "max_tokens",
+            "supportsStore": false
+          },
+          "reasoning": true,
+          "input": ["text"],
+          "contextWindow": 1000000,
+          "maxTokens": 131072,
+          "thinkingLevelMap": {
+            "minimal": null,
+            "low": null,
+            "medium": null,
+            "high": "high",
+            "xhigh": "max"
+          },
+          "cost": { "input": 1.7, "output": 3.4, "cacheRead": 0.1, "cacheWrite": 0 }
         },
         {
           "id": "mimo-v2.5-pro-precision",
           "name": "MiMo-V2.5-Pro (Precision)",
+          "api": "openai-completions",
+          "baseUrl": "https://crof.ai/v1",
+          "compat": {
+            "maxTokensField": "max_tokens",
+            "supportsStore": false
+          },
           "reasoning": true,
           "input": ["text"],
           "contextWindow": 1000000,
@@ -61,6 +98,12 @@
         {
           "id": "glm-5.1-precision",
           "name": "GLM 5.1 (Precision)",
+          "api": "openai-completions",
+          "baseUrl": "https://crof.ai/v1",
+          "compat": {
+            "maxTokensField": "max_tokens",
+            "supportsStore": false
+          },
           "reasoning": true,
           "input": ["text"],
           "contextWindow": 202752,
@@ -70,6 +113,12 @@
         {
           "id": "kimi-k2.6-precision",
           "name": "Kimi K2.6 (Precision)",
+          "api": "openai-completions",
+          "baseUrl": "https://crof.ai/v1",
+          "compat": {
+            "maxTokensField": "max_tokens",
+            "supportsStore": false
+          },
           "reasoning": true,
           "input": ["text", "image"],
           "contextWindow": 262144,
