@@ -160,6 +160,26 @@ return {
     end,
   },
 
+  {
+    "folke/sidekick.nvim",
+    optional = true,
+    opts = {
+      cli = {
+        tools = {
+          pi = {
+            env = {
+              -- needed for openai-codex to login/refreshToken even with TUN on
+              -- https://github.com/earendil-works/pi/issues/1132
+              https_proxy = not vim.g.user_is_termux and "http://127.0.0.1:10808" or nil,
+              http_proxy = not vim.g.user_is_termux and "http://127.0.0.1:10808" or nil,
+              all_proxy = not vim.g.user_is_termux and "socks5://127.0.0.1:10808" or nil,
+            },
+          },
+        },
+      },
+    },
+  },
+
   -- TODO: breaking changes
   -- `textobjects.scm` query files with `nvim-treesitter/nvim-treesitter-textobjects`
   { "chrisgrieser/nvim-various-textobjs", optional = true, commit = "bf2133a" },
