@@ -2,6 +2,10 @@ local orig_java_home = vim.env.JAVA_HOME -- may be set by Mise
 local java_home = vim.g.user_is_termux and "/data/data/com.termux/files/usr/lib/jvm/java-21-openjdk"
   or vim.fn.expand("$HOME/.local/share/mise/installs/java/23")
 
+local https_proxy = "http://127.0.0.1:10808"
+local http_proxy = "http://127.0.0.1:10808"
+local all_proxy = "socks5://127.0.0.1:10808"
+
 ---@type LazySpec
 return {
   {
@@ -147,15 +151,15 @@ return {
   {
     "LazyVim/LazyVim",
     opts = function()
-      -- for kitty.conf: scrollback_pager nvim --cmd "lua vim.g.terminal_scrollback_pager = true" -c "lua require('util.terminal').colorize()"
-      -- in favor of pantran.nvim
-      if vim.g.terminal_scrollback_pager then
-        do
-          return -- using TUN for now
-        end
-        vim.env.https_proxy = "http://127.0.0.1:10808"
-        vim.env.http_proxy = "http://127.0.0.1:10808"
-        vim.env.all_proxy = "socks5://127.0.0.1:10808"
+      -- For (in favor of pantran.nvim, etc.):
+      -- 1. kitty.conf
+      --    - scrollback_pager nvim --cmd "lua vim.g.terminal_scrollback_pager = true" -c "lua require('util.terminal').kitty_scrollback_pager(INPUT_LINE_NUMBER, CURSOR_LINE, CURSOR_COLUMN)"
+      --    - mikesmithgh/kitty-scrollback.nvim
+      -- 2. neovide
+      if vim.g.terminal_scrollback_pager or vim.g.neovide then
+        vim.env.https_proxy = vim.env.https_proxy or https_proxy
+        vim.env.http_proxy = vim.env.http_proxy or http_proxy
+        vim.env.all_proxy = vim.env.all_proxy or all_proxy
       end
     end,
   },
@@ -170,9 +174,9 @@ return {
             env = {
               -- needed for openai-codex to login/refreshToken even with TUN on
               -- https://github.com/earendil-works/pi/issues/1132
-              https_proxy = not vim.g.user_is_termux and "http://127.0.0.1:10808" or nil,
-              http_proxy = not vim.g.user_is_termux and "http://127.0.0.1:10808" or nil,
-              all_proxy = not vim.g.user_is_termux and "socks5://127.0.0.1:10808" or nil,
+              https_proxy = vim.env.https_proxy or (not vim.g.user_is_termux and https_proxy or nil),
+              http_proxy = vim.env.http_proxy or (not vim.g.user_is_termux and http_proxy or nil),
+              all_proxy = vim.env.all_proxy or (not vim.g.user_is_termux and all_proxy or nil),
             },
           },
         },

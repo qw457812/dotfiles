@@ -376,4 +376,6 @@ if set -q TERMUX_VERSION
     # AUTO START TMUX ON TERMUX
     # ==============================================================================
     set -q TMUX; or tmux attach || tmux
+else
+    term_proxy_on
 end
