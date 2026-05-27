@@ -14,6 +14,7 @@
  * - Elapsed: session duration
  * - Version
  * - Model name, provider (when multi-provider), thinking level
+ * - Tool tally (if any)
  * - Extension status messages (if any)
  *
  * Ref:
@@ -30,6 +31,7 @@ import type {
 import { VERSION } from "@earendil-works/pi-coding-agent";
 import { type TUI, truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
 import { getQuota } from "./quota.js";
+import { createToolCounter } from "./tool-counter.js";
 import { createTpsTracker } from "./tps.js";
 import { formatDecimal, formatTokens } from "./utils.js";
 
@@ -37,7 +39,7 @@ export default function (pi: ExtensionAPI) {
   let enabled = true;
   let sessionStart = Date.now();
   const tpsTracker = createTpsTracker();
-  // const isTermux = Boolean(process.env.TERMUX_VERSION);
+  const toolCounter = createToolCounter();
 
   function formatElapsed(ms: number): string {
     const s = Math.floor(ms / 1000);
@@ -207,6 +209,12 @@ export default function (pi: ExtensionAPI) {
 
           const lines = [dimStatsLeft + dimRemainder];
 
+          // Tool tally line
+          const toolTally = toolCounter.getToolTally(theme);
+          if (toolTally) {
+            lines.push(truncateToWidth(toolTally, width, theme.fg("dim", "…")));
+          }
+
           // Add extension statuses on a single line, sorted by key alphabetically
           const extensionStatuses = footerData.getExtensionStatuses();
           if (extensionStatuses.size > 0) {
@@ -231,6 +239,7 @@ export default function (pi: ExtensionAPI) {
     ctx.ui.setFooter(createFooterFactory(ctx));
 
     tpsTracker.onSessionStart();
+    toolCounter.onSessionStart();
   });
 
   pi.on("agent_start", () => {
@@ -255,6 +264,10 @@ export default function (pi: ExtensionAPI) {
 
   pi.on("agent_end", (event, ctx) => {
     tpsTracker.onAgentEnd(event, ctx);
+  });
+
+  pi.on("tool_execution_end", (event) => {
+    toolCounter.onToolExecutionEnd(event);
   });
 
   pi.registerCommand("footer", {
