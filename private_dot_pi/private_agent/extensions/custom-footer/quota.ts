@@ -17,6 +17,7 @@ const SECOND_MS = 1000;
 const MINUTE_MS = 60 * SECOND_MS;
 const HOUR_MS = 60 * MINUTE_MS;
 const DAY_MS = 24 * HOUR_MS;
+const FETCH_TIMEOUT_MS = 15 * SECOND_MS;
 const RETRY_BASE_MS = 30 * SECOND_MS;
 const RETRY_MAX_MS = 4 * MINUTE_MS;
 
@@ -83,6 +84,16 @@ interface DeepSeekQuota {
     currency: "CNY" | "USD";
     total_balance: string;
   }>;
+}
+
+// Xiaomi MiMo pay-as-you-go
+// Ref: https://github.com/steipete/CodexBar/blob/ad33b32773bd6087cbb932ff60ae493008063cc4/Sources/CodexBarCore/Providers/MiMo/MiMoUsageFetcher.swift
+interface XiaomiQuota {
+  code: number;
+  data?: {
+    balance: string;
+    currency: string;
+  };
 }
 
 // https://crof.ai/docs
@@ -155,6 +166,7 @@ async function readJson<T>(path: string): Promise<T | null> {
 async function fetchJson<T>(url: string, token: string): Promise<T | null> {
   try {
     const resp = await fetch(url, {
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!resp.ok) return null;
@@ -574,6 +586,43 @@ const sources: Record<string, Source> = {
       );
     },
   }),
+  xiaomi: createSource<XiaomiQuota, string>("xiaomi", {
+    cacheTtlMs: MINUTE_MS,
+    async getAuth(): Promise<string | null> {
+      // Manual cookie import
+      // 1. Open `https://platform.xiaomimimo.com/#/console/balance`
+      // 2. Copy a `Cookie:` header from your browser’s Network tab
+      return process.env.XIAOMI_MIMO_COOKIE || null;
+    },
+    async fetch(cookie: string): Promise<XiaomiQuota | null> {
+      try {
+        const resp = await fetch("https://platform.xiaomimimo.com/api/v1/balance", {
+          signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+          headers: {
+            Accept: "application/json, text/plain, */*",
+            "Accept-Language": "en-US,en;q=0.9",
+            Cookie: cookie,
+            Origin: "https://platform.xiaomimimo.com",
+            Referer: "https://platform.xiaomimimo.com/#/console/balance",
+            "User-Agent":
+              "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+            "x-timeZone": "UTC+01:00",
+          },
+        });
+        if (!resp.ok) return null;
+        const json = (await resp.json()) as XiaomiQuota;
+        if (!json?.data || json.code !== 0) return null;
+        return json;
+      } catch {
+        return null;
+      }
+    },
+    format(quota: XiaomiQuota, theme: Theme): string | null {
+      const { currency, balance } = quota.data!;
+      const symbol = currency === "CNY" ? "¥" : "$";
+      return theme.fg("accent", `${symbol}${formatDecimal(parseFloat(balance), 2)}`);
+    },
+  }),
   crofai: createSource("crofai", {
     cacheTtlMs: MINUTE_MS,
     async getAuth(): Promise<string | null> {
@@ -665,6 +714,7 @@ const sources: Record<string, Source> = {
           "https://www.codebuddy.cn/billing/meter/get-enterprise-user-usage",
           {
             method: "POST",
+            signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
             headers: {
               Authorization: `Bearer ${auth.access}`,
               "X-Enterprise-Id": auth.enterpriseId,
@@ -673,9 +723,9 @@ const sources: Record<string, Source> = {
           },
         );
         if (!resp.ok) return null;
-        const quota = (await resp.json()) as CodebuddyQuota;
-        if (!quota?.data || quota.code !== 0) return null;
-        return quota;
+        const json = (await resp.json()) as CodebuddyQuota;
+        if (!json?.data || json.code !== 0) return null;
+        return json;
       } catch {
         return null;
       }

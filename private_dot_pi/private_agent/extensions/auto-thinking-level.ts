@@ -57,6 +57,7 @@ export default function (pi: ExtensionAPI) {
         "zai",
         "synthetic",
         "deepseek",
+        "xiaomi",
         "neuralwatt",
         "codebuddy",
       ].includes(provider)
