@@ -312,3 +312,5 @@ do
     end,
   })
 end
+
+-- TODO: track main win for <esc> and <bs>

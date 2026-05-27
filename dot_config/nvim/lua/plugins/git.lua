@@ -92,6 +92,7 @@ return {
         -- { "<leader>gd", function() git_diff_pick() end, desc = "Git Diff HEAD (hunks)" },
         { "<leader>gd", function() git_diff_pick({ staged = false }) end, desc = "Git Diff (hunks)" },
         -- { "<leader>gD", function() git_diff_pick({ staged = false, cmd_args = { "--", vim.api.nvim_buf_get_name(0) } }) end, desc = "Git Diff Buffer (hunks)" },
+        -- TODO: `Snacks.picker.git_branches({ cwd = LazyVim.root.git() })` -> pick a branch as `base` to diff against
         { "<leader>gD", function() git_diff_pick({ base = "origin", group = true }) end, desc = "Git Diff (origin)" },
         { "<leader>ga", function() git_diff_pick({ staged = true }) end, desc = "Git Diff Staged (hunks)" },
         -- {

@@ -2,6 +2,18 @@
 // - https://github.com/badlogic/pi-mono/blob/82ecc1300f1649388c346568c7a1b7978ec610d3/packages/coding-agent/examples/extensions/sandbox/index.ts
 // - https://github.com/dannote/dot-pi/blob/a8f7711ddcf7ca8f2addfe1cf84c77b56a62987a/extensions/sandbox/index.ts
 
+// TODO:
+// 1. Ask the user after a sandbox violation (with an option to remember for the session)
+//    - Re-run unsandboxed commands
+//    - Re-run sandboxed commands with updated SandboxConfig
+// 2. Toggle sandbox via `/sandbox [on|off]`
+// 3. Show the count of sandbox violations via `ctx.ui.setStatus`
+//
+// Ref:
+// - https://github.com/carderne/pi-sandbox
+// - https://github.com/tuansondinh/pi-claude-sandbox
+// - https://github.com/aldoborrero/pi-agent-kit/blob/c990b5c4b3927c5d0886911f0c22981eb5e54db6/extensions/sandbox/index.ts
+
 /**
  * Sandbox Extension - OS-level sandboxing for bash commands
  *

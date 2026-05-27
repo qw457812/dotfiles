@@ -2,6 +2,8 @@ if not LazyVim.has_extra("lang.python") then
   return {}
 end
 
+-- TODO: https://github.com/astral-sh/ty
+
 -- local ruff = vim.g.lazyvim_python_ruff or "ruff"
 local has_black = LazyVim.has_extra("formatting.black")
 

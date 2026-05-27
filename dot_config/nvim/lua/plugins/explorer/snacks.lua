@@ -99,7 +99,7 @@ return {
                   ["h"] = "parent_or_close",
                   ["l"] = "child_or_open",
                   ["f"] = "focus_input", -- filter
-                  ["o"] = "reveal_file",
+                  ["o"] = "reveal_file", -- TODO: neo-tree
                   ["O"] = "explorer_open",
                 },
               },
