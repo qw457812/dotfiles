@@ -65,13 +65,13 @@
     {
       "source": "git:github.com/telagod/pi-agent-colony",
       "extensions": [],
-      "skills": [
-        "pi-package/skills/context7"
-      ],
+      "skills": [],
       "prompts": [
         "pi-package/prompts/commit.md",
         "pi-package/prompts/explain.md",
         "pi-package/prompts/fix.md",
+        "pi-package/prompts/optimize.md",
+        "pi-package/prompts/refactor.md",
         "pi-package/prompts/test.md"
       ],
       "themes": []
