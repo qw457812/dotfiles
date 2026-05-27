@@ -1,5 +1,4 @@
 import type { AssistantMessage, AssistantMessageEvent } from "@earendil-works/pi-ai";
-import type { AgentEndEvent, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { formatDecimal } from "./utils";
 
 interface Theme {
@@ -59,12 +58,10 @@ function buildTurnMetrics(turn: TurnTiming): TurnMetrics | null {
 
 export interface TpsTracker {
   onSessionStart(): void;
-  onAgentStart(): void;
   onTurnStart(): void;
   onMessageUpdate(event: MessageUpdateEvent): void;
   onMessageEnd(event: MessageEndEvent): void;
-  onTurnEnd(): boolean;
-  onAgentEnd(event: AgentEndEvent, ctx: ExtensionContext): boolean;
+  onTurnEnd(): void;
   getTps(theme: Theme): string | null;
 }
 
@@ -82,10 +79,6 @@ export function createTpsTracker(): TpsTracker {
       ttftCount = 0;
       totalOutput = 0;
       totalGenerationMs = 0;
-    },
-
-    onAgentStart() {
-      currentTurn = null;
     },
 
     onTurnStart() {
@@ -124,12 +117,12 @@ export function createTpsTracker(): TpsTracker {
       currentTurn.assistantMessages.push(event.message);
     },
 
-    onTurnEnd(): boolean {
-      if (!currentTurn) return false;
+    onTurnEnd(): void {
+      if (!currentTurn) return;
 
       const metrics = buildTurnMetrics(currentTurn);
       currentTurn = null;
-      if (!metrics) return false;
+      if (!metrics) return;
 
       totalOutput += metrics.output;
       totalGenerationMs += metrics.generationMs;
@@ -137,12 +130,6 @@ export function createTpsTracker(): TpsTracker {
         totalTtftMs += metrics.ttftMs;
         ttftCount++;
       }
-      return true;
-    },
-
-    onAgentEnd(_event: AgentEndEvent, ctx: ExtensionContext): boolean {
-      currentTurn = null;
-      return ctx.hasUI;
     },
 
     getTps(theme: Theme): string | null {

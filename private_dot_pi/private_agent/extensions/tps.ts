@@ -163,9 +163,6 @@ export default function (pi: ExtensionAPI) {
 		if (agentStartMs === null) return;
 
 		const agentElapsedMs = performance.now() - agentStartMs;
-		agentStartMs = null;
-		currentTurn = null;
-
 		if (agentElapsedMs <= 0 || turnMetrics.length === 0) return;
 
 		let input = 0;
@@ -190,7 +187,6 @@ export default function (pi: ExtensionAPI) {
 			}
 		}
 
-		turnMetrics = [];
 		if (output <= 0 || totalGenerationMs <= 0) return;
 
 		const parts = [
@@ -209,6 +205,5 @@ export default function (pi: ExtensionAPI) {
 				.join(" "),
 		];
 		ctx.ui.notify(parts.join(" · "), "info");
-		turnCount = 0;
 	});
 }

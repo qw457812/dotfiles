@@ -236,14 +236,10 @@ export default function (pi: ExtensionAPI) {
   pi.on("session_start", (_event, ctx) => {
     sessionStart = Date.now();
 
-    ctx.ui.setFooter(createFooterFactory(ctx));
-
     tpsTracker.onSessionStart();
     toolCounter.onSessionStart();
-  });
 
-  pi.on("agent_start", () => {
-    tpsTracker.onAgentStart();
+    ctx.ui.setFooter(createFooterFactory(ctx));
   });
 
   pi.on("turn_start", () => {
@@ -260,10 +256,6 @@ export default function (pi: ExtensionAPI) {
 
   pi.on("turn_end", () => {
     tpsTracker.onTurnEnd();
-  });
-
-  pi.on("agent_end", (event, ctx) => {
-    tpsTracker.onAgentEnd(event, ctx);
   });
 
   pi.on("tool_execution_end", (event) => {
