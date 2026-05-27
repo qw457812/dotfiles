@@ -31,8 +31,8 @@ export function createToolCounter(): ToolCounterTracker {
       entries.sort(([a], [b]) => a.localeCompare(b));
       return entries
         .map(([name, { success, error }]) => {
-          const parts = [theme.fg("accent", name)];
-          if (success > 0) parts.push(theme.fg("success", `${success}`));
+          const parts = [theme.fg("dim", name)];
+          if (success > 0) parts.push(theme.fg("dim", `${success}`));
           if (error > 0) parts.push(theme.fg("error", `${error}`));
           return parts.join(" ");
         })
