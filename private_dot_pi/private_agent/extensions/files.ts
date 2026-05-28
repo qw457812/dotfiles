@@ -10,6 +10,8 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { DynamicBorder } from "@earendil-works/pi-coding-agent";
 import { Container, Key, matchesKey, type SelectItem, SelectList, Text } from "@earendil-works/pi-tui";
+import { homedir } from "node:os";
+import { isAbsolute, relative, resolve, sep } from "node:path";
 
 interface FileEntry {
 	path: string;
@@ -18,6 +20,27 @@ interface FileEntry {
 }
 
 type FileToolName = "read" | "write" | "edit";
+
+function formatPath(filePath: string, cwd: string): string {
+	const resolvedCwd = resolve(cwd);
+	const resolvedPath = isAbsolute(filePath) ? resolve(filePath) : resolve(resolvedCwd, filePath);
+
+	// cwd-relative
+	const rel = relative(resolvedCwd, resolvedPath);
+	const isInsideCwd =
+		rel === "" || (rel !== ".." && !rel.startsWith(`..${sep}`) && !isAbsolute(rel));
+	if (isInsideCwd) {
+		return rel || ".";
+	}
+
+	// Replace home directory with ~
+	const home = homedir();
+	if (home && (resolvedPath === home || resolvedPath.startsWith(home + sep))) {
+		return "~" + resolvedPath.slice(home.length);
+	}
+
+	return resolvedPath;
+}
 
 export default function (pi: ExtensionAPI) {
 	pi.registerCommand("files", {
@@ -148,9 +171,10 @@ export default function (pi: ExtensionAPI) {
 					if (f.operations.has("write")) ops.push(theme.fg("success", "W"));
 					if (f.operations.has("edit")) ops.push(theme.fg("warning", "E"));
 					const opsLabel = ops.join("");
+					const formattedPath = formatPath(f.path, ctx.cwd);
 					return {
 						value: f.path,
-						label: `${opsLabel} ${f.path}`,
+						label: `${opsLabel} ${formattedPath}`,
 					};
 				});
 
