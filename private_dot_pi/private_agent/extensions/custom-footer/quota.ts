@@ -18,8 +18,8 @@ const MINUTE_MS = 60 * SECOND_MS;
 const HOUR_MS = 60 * MINUTE_MS;
 const DAY_MS = 24 * HOUR_MS;
 const FETCH_TIMEOUT_MS = 15 * SECOND_MS;
-const RETRY_BASE_MS = 30 * SECOND_MS;
-const RETRY_MAX_MS = 4 * MINUTE_MS;
+const BASE_RETRY_DELAY_MS = 30 * SECOND_MS;
+const MAX_RETRY_DELAY_MS = 4 * MINUTE_MS;
 
 interface Theme {
   fg(color: string, text: string): string;
@@ -396,32 +396,32 @@ function createSource<T, A = string>(provider: string, config: SourceConfig<T, A
   let cache: CachedValue<T> | null = null;
   let fetching = false;
   let nextRetryAt = 0;
-  let retryBackoffMs = RETRY_BASE_MS;
+  let retryDelayMs = BASE_RETRY_DELAY_MS;
 
   async function load(): Promise<CachedValue<T> | null> {
     const cached =
       fresh(cache, config.cacheTtlMs) ?? (await readCache<T>(provider, config.cacheTtlMs));
     if (cached) {
       nextRetryAt = 0;
-      retryBackoffMs = RETRY_BASE_MS;
+      retryDelayMs = BASE_RETRY_DELAY_MS;
       return cached;
     }
 
     const auth = await config.getAuth();
     if (!auth) {
-      nextRetryAt = Date.now() + RETRY_BASE_MS;
-      retryBackoffMs = RETRY_BASE_MS;
+      nextRetryAt = Date.now() + BASE_RETRY_DELAY_MS;
+      retryDelayMs = BASE_RETRY_DELAY_MS;
       return null;
     }
 
     const quota = await config.fetch(auth);
     if (!quota) {
-      nextRetryAt = Date.now() + retryBackoffMs;
-      retryBackoffMs = Math.min(retryBackoffMs * 2, RETRY_MAX_MS);
+      nextRetryAt = Date.now() + retryDelayMs;
+      retryDelayMs = Math.min(retryDelayMs * 2, MAX_RETRY_DELAY_MS);
       return null;
     }
 
-    retryBackoffMs = RETRY_BASE_MS;
+    retryDelayMs = BASE_RETRY_DELAY_MS;
 
     const next = { value: quota, updatedAt: Date.now() };
     try {
