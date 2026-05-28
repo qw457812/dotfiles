@@ -6,6 +6,7 @@ local copilot_available = not vim.g.user_is_termux or vim.fn.executable("copilot
 
 ---@type LazySpec
 return {
+  -- https://github.com/disler/pi-vs-claude-code
   -- https://github.com/w-winter/dot314
   -- https://github.com/default-anton/dotfiles/tree/master/pi
   -- https://github.com/dannote/dot-pi
@@ -102,7 +103,6 @@ return {
         lazy = true,
         config = function() end,
       },
-      { "disler/pi-vs-claude-code", lazy = true, config = function() end },
     },
   },
   { "qw457812/claude-code-sourcemap", pin = true, lazy = true, config = function() end },
@@ -520,6 +520,54 @@ return {
                 end
               end,
               mode = "n",
+            },
+            pageup_t = {
+              "<PageUp>",
+              function(t)
+                local name = t.tool.name
+                if name:find("^pi") or name:find("^claude") or name:find("^codex") then
+                  vim.cmd.stopinsert()
+                  vim.schedule(function()
+                    vim.api.nvim_feedkeys(vim.keycode("<C-u>"), "n", false)
+                  end)
+                else
+                  vim.api.nvim_feedkeys(vim.keycode("<PageUp>"), "n", false)
+                end
+              end,
+              desc = "Scrollback and Scroll Up",
+            },
+            pagedown_t = {
+              "<PageDown>",
+              function(t)
+                local name = t.tool.name
+                if name:find("^pi") or name:find("^claude") or name:find("^codex") then
+                  vim.cmd.stopinsert()
+                  vim.schedule(function()
+                    vim.api.nvim_feedkeys(vim.keycode("<C-d>"), "n", false)
+                  end)
+                else
+                  vim.api.nvim_feedkeys(vim.keycode("<PageDown>"), "n", false)
+                end
+              end,
+              desc = "Scrollback and Scroll Down",
+            },
+            pageup_n = {
+              "<PageUp>",
+              function()
+                return "<C-u>"
+              end,
+              expr = true,
+              mode = "n",
+              desc = "Scroll Up",
+            },
+            pagedown_n = {
+              "<PageDown>",
+              function()
+                return "<C-d>"
+              end,
+              expr = true,
+              mode = "n",
+              desc = "Scroll Down",
             },
           },
         },

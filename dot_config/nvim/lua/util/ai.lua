@@ -568,7 +568,7 @@ M.sidekick = {
                 vim.cmd("normal! " .. (count > 0 and count or "") .. vim.keycode("<C-" .. dir .. ">"))
               end
 
-              if count > 0 or not t.tool.name:find("opencode") then
+              if count > 0 or not t.tool.name:find("^opencode") then
                 return vim_scroll()
               end
 
@@ -585,7 +585,7 @@ M.sidekick = {
                 vim.cmd("normal! " .. (count > 0 and count or "") .. (edge == "top" and "gg" or "G"))
               end
 
-              if count > 0 or not t.tool.name:find("opencode") then
+              if count > 0 or not t.tool.name:find("^opencode") then
                 return vim_edge()
               end
 
