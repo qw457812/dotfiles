@@ -12,3 +12,4 @@ extensions/*/node_modules
 
 # https://github.com/monotykamary/pi-neuralwatt-provider
 /cache
+/extensions/neuralwatt-mcr.log

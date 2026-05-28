@@ -253,8 +253,9 @@ return {
           cmd = {
             "pi",
             "--no-context-files",
-            "--no-session",
+            -- "--no-session",
             -- "--no-extensions",
+            -- "--no-sandbox", -- https://github.com/qw457812/dotfiles/blob/f47596acf973a7e416dbd1bd820a435657c57b7c/private_dot_pi/private_agent/extensions/sandbox/index.ts
           },
         },
         count = 0,
