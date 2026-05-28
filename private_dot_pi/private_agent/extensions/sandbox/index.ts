@@ -1,6 +1,11 @@
 // Ref:
 // - https://github.com/badlogic/pi-mono/blob/82ecc1300f1649388c346568c7a1b7978ec610d3/packages/coding-agent/examples/extensions/sandbox/index.ts
 // - https://github.com/dannote/dot-pi/blob/a8f7711ddcf7ca8f2addfe1cf84c77b56a62987a/extensions/sandbox/index.ts
+// - https://github.com/anthropic-experimental/sandbox-runtime
+
+// NOTE: @anthropic-ai/sandbox-runtime is pinned at >=0.0.52 (migrated from 0.0.26).
+// Versions <0.0.43 lack resolveParentProxy() — the sandbox proxy cannot chain through
+// the user's upstream HTTP_PROXY/HTTPS_PROXY, breaking network access behind firewalls/proxies.
 
 // TODO:
 // 1. Ask the user after a sandbox violation (with an option to remember for the session)
@@ -8,6 +13,7 @@
 //    - Re-run sandboxed commands with updated SandboxConfig
 // 2. Toggle sandbox via `/sandbox [on|off]`
 // 3. Show the count of sandbox violations via `ctx.ui.setStatus`
+// 4. Use `filesystem.allowRead` to selectively re-allow reads within denyRead regions
 //
 // Ref:
 // - https://github.com/carderne/pi-sandbox
