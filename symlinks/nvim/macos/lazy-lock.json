@@ -42,6 +42,7 @@
   "grug-far.nvim": { "branch": "main", "commit": "5506c2f59dc9ab2ed6c233585412b24d31d51521" },
   "helpview.nvim": { "branch": "main", "commit": "0057599e169ea6ffd53fef77f279cb13b61e174a" },
   "http.nvim": { "branch": "main", "commit": "f3e56c6ca6c34a110b0caacac5b8da0180c0c610" },
+  "kitty": { "branch": "master", "commit": "fb5255b1ae4f0249ba832d6a773348fd103449ce" },
   "kitty-scrollback.nvim": { "branch": "main", "commit": "53fd294658941719d7622471f28e70179d6737a6" },
   "layers.nvim": { "branch": "main", "commit": "ebbb386d7aea84a04bf7eab0873975b2e9d695a5" },
   "lazy.nvim": { "branch": "main", "commit": "306a05526ada86a7b30af95c5cc81ffba93fef97" },
