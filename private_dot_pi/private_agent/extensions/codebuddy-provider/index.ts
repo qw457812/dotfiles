@@ -70,7 +70,7 @@ export default function (pi: ExtensionAPI) {
   pi.registerProvider(PROVIDER, {
     name: "CodeBuddy CN",
     baseUrl: CHAT_BASE_URL,
-    apiKey: "CODEBUDDY_AUTH_TOKEN",
+    apiKey: "$CODEBUDDY_AUTH_TOKEN",
     api: "openai-completions",
     models: MODELS,
     oauth: {

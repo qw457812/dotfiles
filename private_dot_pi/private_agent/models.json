@@ -2,7 +2,7 @@
   "providers": {
     "synthetic": {
       "baseUrl": "https://api.synthetic.new/openai/v1",
-      "apiKey": "SYNTHETIC_API_KEY",
+      "apiKey": "$SYNTHETIC_API_KEY",
       "models": [
         {
           "id": "hf:moonshotai/Kimi-K2.6",
@@ -34,7 +34,7 @@
     // https://github.com/monotykamary/pi-crofai-provider/blob/8b0c3ae5ce18af4d80ef0cc43c9c500d2f95d2db
     "crofai": {
       "baseUrl": "https://crof.ai/v1",
-      "apiKey": "CROFAI_API_KEY",
+      "apiKey": "$CROFAI_API_KEY",
       "models": [
         {
           "id": "deepseek-v4-pro-precision",
@@ -129,7 +129,7 @@
     },
     "smartaipi": {
       "baseUrl": "https://api.smartaipi.com/v1",
-      "apiKey": "SMARTAIPI_API_KEY",
+      "apiKey": "$SMARTAIPI_API_KEY",
       "models": [
         {
           "id": "gpt-5.5",
@@ -165,7 +165,7 @@
     },
     "firepass": {
       "baseUrl": "https://api.fireworks.ai/inference/v1",
-      "apiKey": "FIREPASS_API_KEY",
+      "apiKey": "$FIREPASS_API_KEY",
       "models": [
         {
           "id": "accounts/fireworks/routers/kimi-k2p6-turbo",
