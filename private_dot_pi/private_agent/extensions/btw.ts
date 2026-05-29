@@ -1,4 +1,5 @@
 // Copied from: https://github.com/mitsuhiko/agent-stuff/blob/a3f8ab1108a48fec9e175f6cd5d9aaa4694ce29d/extensions/btw.ts
+// Ref: https://github.com/juicesharp/rpiv-mono/blob/3d045bf1e7433d73c23a80fcfdb94aba7493e49b/packages/rpiv-btw/btw-ui.ts
 
 import {
 	buildSessionContext,
@@ -204,6 +205,7 @@ class BtwOverlay extends Container implements Focusable {
 	private readonly onSubmitCallback: (value: string) => void;
 	private readonly onDismissCallback: () => void;
 	private _focused = false;
+	private scrollOffset = 0;
 
 	get focused(): boolean {
 		return this._focused;
@@ -247,6 +249,17 @@ class BtwOverlay extends Container implements Focusable {
 			return;
 		}
 
+		if (this.keybindings.matches(data, "tui.select.up")) {
+			this.scrollOffset++;
+			this.tui.requestRender();
+			return;
+		}
+		if (this.keybindings.matches(data, "tui.select.down")) {
+			this.scrollOffset = Math.max(0, this.scrollOffset - 1);
+			this.tui.requestRender();
+			return;
+		}
+
 		this.input.handleInput(data);
 	}
 
@@ -281,7 +294,10 @@ class BtwOverlay extends Container implements Focusable {
 
 		// Markdown renders to innerWidth already — no manual wrapping needed
 		const transcript = this.getTranscript(innerWidth, this.theme);
-		const visibleTranscript = transcript.slice(-transcriptHeight);
+		const excess = Math.max(0, transcript.length - transcriptHeight);
+		if (this.scrollOffset > excess) this.scrollOffset = excess;
+		const start = excess - this.scrollOffset;
+		const visibleTranscript = transcript.slice(start, start + transcriptHeight);
 		const transcriptPadding = Math.max(0, transcriptHeight - visibleTranscript.length);
 
 		const status = this.getStatus();
@@ -310,7 +326,7 @@ class BtwOverlay extends Container implements Focusable {
 		lines.push(
 			`${this.theme.fg("borderMuted", "│")}${inputLine}${this.theme.fg("borderMuted", "│")}`,
 		);
-		lines.push(this.frameLine(this.theme.fg("dim", "Enter submit · Esc close"), innerWidth));
+		lines.push(this.frameLine(this.theme.fg("dim", "Enter submit · Esc close · ↑/↓ scroll"), innerWidth));
 		lines.push(this.borderLine(innerWidth, "bottom"));
 
 		return lines;
