@@ -114,6 +114,7 @@ return {
         build = function(plugin)
           require("yazi.plugin").build_flavor(plugin, { sub_dir = "catppuccin-frappe.yazi" })
         end,
+        config = function() end,
       },
       {
         "yazi-rs/plugins",
@@ -136,6 +137,7 @@ return {
             require("yazi.plugin").build_plugin(plugin, { sub_dir = sub_dir })
           end
         end,
+        config = function() end,
         specs = {
           {
             "folke/lazydev.nvim",
@@ -153,8 +155,8 @@ return {
           },
         },
       },
-      { "Rolv-Apneseth/starship.yazi", lazy = true, build = H.build_plugin },
-      { "dedukun/bookmarks.yazi", lazy = true, build = H.build_plugin },
+      { "Rolv-Apneseth/starship.yazi", lazy = true, build = H.build_plugin, config = function() end },
+      { "dedukun/bookmarks.yazi", lazy = true, build = H.build_plugin, config = function() end },
     },
   },
 

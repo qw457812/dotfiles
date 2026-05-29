@@ -4,4 +4,4 @@
 Always respond in Chinese. Use Chinese for all communications with the user. Technical terms and code identifiers should remain in their original form.
 
 ## Tool Usage
-- Prefer `rg` over `grep`, `fd` over `find` — faster, respects `.gitignore`.
+- Prefer `rg` over `grep` and `fd` over `find` for `bash` tool (faster, respects `.gitignore`).

@@ -742,7 +742,7 @@ return {
     },
     specs = {
       -- not a nvim plugin, just for downloading the dict file
-      { "first20hours/google-10000-english", lazy = true },
+      { "first20hours/google-10000-english", lazy = true, config = function() end },
     },
   },
 

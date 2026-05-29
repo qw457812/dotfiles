@@ -373,7 +373,7 @@ return {
   },
 
   -- Manage wezterm types for ~/.config/wezterm/*.lua with lazy. Plugin will never be loaded
-  { "DrKJeff16/wezterm-types", cond = is_wezterm, lazy = true },
+  { "DrKJeff16/wezterm-types", cond = is_wezterm, lazy = true, config = function() end },
   {
     "folke/lazydev.nvim",
     opts = function(_, opts)
@@ -388,6 +388,7 @@ return {
       else
         table.insert(opts.library, { path = "wezterm-types", mods = { "wezterm" } }) -- conflicts with willothy/wezterm.nvim
       end
+      table.insert(opts.library, { path = "wez-tmux", mods = { "wez-tmux" } })
     end,
   },
 
