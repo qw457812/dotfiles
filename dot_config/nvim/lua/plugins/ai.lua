@@ -103,6 +103,12 @@ return {
         lazy = true,
         config = function() end,
       },
+      {
+        "qw457812/pi-listen",
+        build = "pi update --extension git:github.com/qw457812/pi-listen",
+        lazy = true,
+        config = function() end,
+      },
     },
   },
   { "qw457812/claude-code-sourcemap", pin = true, lazy = true, config = function() end },

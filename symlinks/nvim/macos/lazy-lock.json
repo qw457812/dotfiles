@@ -108,6 +108,7 @@
   "pi-crofai-provider": { "branch": "main", "commit": "210c79351be9eb4a5e5572db5da98ad42eda6ca5" },
   "pi-guardrails": { "branch": "main", "commit": "a9ac037b729f50d32bb8b151139a5f2d926416ab" },
   "pi-invisible-continue": { "branch": "main", "commit": "d26226c591517beb77109dee23a86f7ce0369a6d" },
+  "pi-listen": { "branch": "main", "commit": "7d7c54c59be3c7127565eb8498254a888e16831e" },
   "pi-mcp-adapter": { "branch": "main", "commit": "1091b34da83d58bd2d9fcaff2dc31f449a94bf1f" },
   "pi-neuralwatt-provider": { "branch": "main", "commit": "8df9b9b00dc8f5c1cf6b559526e761590d425664" },
   "pi-tps": { "branch": "main", "commit": "5680b9245b2d93f9bcb26b422d46a8b299c968b4" },

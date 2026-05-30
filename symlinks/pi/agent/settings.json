@@ -90,13 +90,14 @@
     "git:github.com/monotykamary/pi-tps",
     "git:github.com/monotykamary/pi-neuralwatt-provider",
     "git:github.com/monotykamary/pi-invisible-continue",
-    "npm:@codexstar/pi-listen"
+    "git:github.com/qw457812/pi-listen"
   ],
   "voice": {
     "language": "zh",
     "toggleShortcut": "alt+v",
     "onboarding": {
       "completed": true
-    }
+    },
+    "doubleEscClear": false
   }
 }

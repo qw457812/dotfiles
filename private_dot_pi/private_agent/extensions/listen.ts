@@ -1,5 +1,6 @@
 /**
  * https://github.com/codexstar69/pi-listen
+ * https://github.com/qw457812/pi-listen
  *
  * Ensures PulseAudio microphone module is running for pi-listen on Termux.
  *
@@ -10,8 +11,8 @@
  * Only activates on Termux (Android). No-op on other platforms.
  *
  * Prerequisites:
- * - `pi install npm:@codexstar/pi-listen`
- * - `pkg install pulseaudio sox` (Termux)
+ * - `pi install npm:@codexstar/pi-listen` or `pi install git:github.com/qw457812/pi-listen`
+ * - `pkg install pulseaudio sox` (Termux) or `brew install sox` (macOS)
  */
 
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
