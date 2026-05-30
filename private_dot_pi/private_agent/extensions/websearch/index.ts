@@ -94,6 +94,9 @@ const WebSearchParamsSchema = Type.Object({
 // Description builder (lazy year evaluation, adapted from OpenCode's websearch.txt)
 // ---------------------------------------------------------------------------
 
+// TODO: shorten tool description, add promptSnippet/promptGuidelines if needed
+// - https://www.npmjs.com/package/@ollama/pi-web-search?activeTab=code
+// - https://github.com/juicesharp/rpiv-mono/blob/b4a2b7543b95d8d1e5a4d2e842bd9a09b555e225/packages/rpiv-web-tools/web-tools.ts
 function buildDescription(): string {
   const year = new Date().getFullYear();
   return `- Search the web

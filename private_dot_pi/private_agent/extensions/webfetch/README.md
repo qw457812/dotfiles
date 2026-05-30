@@ -1,6 +1,6 @@
 # Pi WebFetch Extension
 
-Adds a `webfetch` tool to [pi](https://pi.dev) that fetches content from URLs and converts it to markdown, text, or HTML format. Mirrors [OpenCode](https://github.com/anomalyco/opencode)'s webfetch implementation.
+Adds a `webfetch` tool to [pi](https://pi.dev) that fetches content from URLs and converts it to markdown, text, or HTML format. Mirrors [OpenCode](https://github.com/anomalyco/opencode/tree/5fb85a6aa3a3)'s webfetch implementation.
 
 ## How It Works
 
@@ -56,7 +56,7 @@ webfetch/
 - **No permission gate** — OpenCode requires `webfetch` permission; this extension does not
 - **No Effect framework** — Uses plain async/await instead of Effect.ts
 - **Image delivery** — Uses pi's `{ type: "image", data, mimeType }` content format instead of OpenCode's `attachments` array
-- **cheerio instead of HTMLRewriter** — Uses cheerio for HTML-to-text extraction (mirrors HTMLRewriter's skip behavior), since HTMLRewriter is Cloudflare Workers-specific
+- **cheerio instead of htmlparser2** — Uses cheerio (DOM-based) for HTML-to-text extraction; OpenCode uses htmlparser2 (SAX-based) with a `skipDepth` counter. Both skip the same tags (`script, style, noscript, iframe, object, embed`) and produce equivalent output
 - **Per-attempt timeout controllers** — OpenCode wraps retry in `Effect.timeoutOrElse`; here each attempt gets its own `AbortController` with the remaining budget
 - **Response body draining** — Drains non-2xx and 403 response bodies to release TCP connections; OpenCode relies on Effect's resource management
 

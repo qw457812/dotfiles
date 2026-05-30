@@ -14,11 +14,19 @@
 // 2. Toggle sandbox via `/sandbox [on|off]`
 // 3. Show the count of sandbox violations via `ctx.ui.setStatus`
 // 4. Use `filesystem.allowRead` to selectively re-allow reads within denyRead regions
+// 5. Use [vercel-labs/just-bash](https://github.com/vercel-labs/just-bash) on Termux (Android)
+//    where @anthropic-ai/sandbox-runtime is not supported
 //
 // Ref:
 // - https://github.com/carderne/pi-sandbox
 // - https://github.com/tuansondinh/pi-claude-sandbox
 // - https://github.com/aldoborrero/pi-agent-kit/blob/c990b5c4b3927c5d0886911f0c22981eb5e54db6/extensions/sandbox/index.ts
+// - https://github.com/sionic-ai/pi-justbash-sandbox
+
+// Alternative sandbox runtimes:
+// - https://github.com/afshinm/zerobox
+// - https://github.com/always-further/nono
+//   see nono's pre-built profiles for reference sandbox configurations
 
 /**
  * Sandbox Extension - OS-level sandboxing for bash commands

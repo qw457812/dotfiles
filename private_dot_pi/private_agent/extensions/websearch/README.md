@@ -22,7 +22,7 @@ Then start pi — the `websearch` tool is automatically available.
 
 Both Exa and Parallel have **free tiers** that work without API keys. Keys unlock higher rate limits.
 
-Provider selection mirrors OpenCode exactly:
+Provider selection mirrors [OpenCode](https://github.com/anomalyco/opencode/tree/5fb85a6aa3a3)'s exactly:
 
 | Scenario                         | Provider                                              |
 | -------------------------------- | ----------------------------------------------------- |
@@ -58,3 +58,14 @@ websearch/
 ```
 
 No local MCP server processes are started. All calls go to remote MCP endpoints via HTTPS.
+
+## Differences from OpenCode's WebSearch
+
+- **No permission gate** — OpenCode requires `websearch` permission; this extension does not
+- **No Effect framework** — Uses plain async/await + TypeBox instead of Effect.ts + Effect Schema
+- **Stale OpenCode parameters** — OpenCode still passes `type`, `livecrawl`, and `contextMaxCharacters` to Exa, but Exa's `web_search_exa` schema no longer accepts them (`additionalProperties: false`); they are silently ignored. This extension only sends the two supported parameters: `query` and `numResults`
+- **Fewer tool parameters** — Exposes only `query` and `numResults` to the LLM; OpenCode exposes `livecrawl`, `type`, and `contextMaxCharacters` in its schema but they have no effect on Exa
+- **No RuntimeFlags** — OpenCode uses feature flags (`enableExa`, `enableParallel`) to influence provider selection; this extension relies solely on `PI_WEBSEARCH_PROVIDER` env var and hash-based routing
+- **User-Agent for Parallel** — Sends `pi/${VERSION}` instead of `opencode/${InstallationVersion}`
+- **Env var prefix** — Uses `PI_WEBSEARCH_PROVIDER` instead of `OPENCODE_WEBSEARCH_PROVIDER`
+- **MCP client** — TypeBox schema validation + AbortController timeout instead of Effect Schema + `Effect.timeoutOrElse`
