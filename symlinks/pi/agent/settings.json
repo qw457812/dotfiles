@@ -89,6 +89,14 @@
     "npm:pi-mcp-adapter",
     "git:github.com/monotykamary/pi-tps",
     "git:github.com/monotykamary/pi-neuralwatt-provider",
-    "git:github.com/monotykamary/pi-invisible-continue"
-  ]
+    "git:github.com/monotykamary/pi-invisible-continue",
+    "npm:@codexstar/pi-listen"
+  ],
+  "voice": {
+    "language": "zh",
+    "toggleShortcut": "alt+v",
+    "onboarding": {
+      "completed": true
+    }
+  }
 }
