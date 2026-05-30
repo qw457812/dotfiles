@@ -158,6 +158,20 @@ return {
         })
       end
 
+      if vim.g.user_is_termux then
+        vim.api.nvim_create_autocmd("BufWritePost", {
+          pattern = { "termux.properties", "private_termux.properties" },
+          callback = U.debounce_wrap(500, function()
+            local res = vim.system({ "termux-reload-settings" }, { text = true }):wait()
+            if res.code == 0 then
+              LazyVim.info("Termux settings reloaded", { title = "Termux" })
+            else
+              LazyVim.error(("Failed to run `termux-reload-settings`:\n%s"):format(res.stderr), { title = "Termux" })
+            end
+          end),
+        })
+      end
+
       if vim.g.user_is_ghostty and vim.g.user_is_macos then
         vim.api.nvim_create_autocmd("BufWritePost", {
           pattern = "*/ghostty/config",
