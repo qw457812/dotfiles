@@ -2,6 +2,8 @@ if not LazyVim.has_extra("lang.java") then
   return {}
 end
 
+-- TODO: try jls, see: https://github.com/neovim/nvim-lspconfig/commit/175ea67
+
 ---@type LazySpec
 return {
   {
