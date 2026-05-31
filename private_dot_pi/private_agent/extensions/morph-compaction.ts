@@ -1,5 +1,8 @@
 // Copied from: https://github.com/earendil-works/pi/pull/2836
-// TODO: https://github.com/rickicode/pi-morphllm-plugin
+
+// TODO:
+// - https://github.com/rickicode/pi-morphllm-plugin
+// - https://docs.morphllm.com/sdk/components/compact
 
 /**
  * Morph Compaction Extension
