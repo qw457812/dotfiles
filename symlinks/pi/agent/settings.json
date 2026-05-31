@@ -23,7 +23,11 @@
     "neuralwatt/moonshotai/Kimi-K2.6",
     "neuralwatt/glm-5.1-flex",
     "neuralwatt/kimi-k2.6-flex",
-    "codebuddy/glm-5.1"
+    "codebuddy/glm-5.1",
+    "makora/zai-org/GLM-5.1-FP8",
+    "makora/nvidia/Kimi-K2.6-NVFP4",
+    "makora/deepseek-ai/DeepSeek-V4-Pro",
+    "makora/deepseek-ai/DeepSeek-V4-Flash"
   ],
   "packages": [
     "npm:pi-vim",
@@ -85,10 +89,11 @@
       "themes": []
     },
     "npm:pi-caffeinate",
-    "npm:@aliou/pi-guardrails",
     "npm:pi-mcp-adapter",
-    "git:github.com/monotykamary/pi-tps",
+    "npm:@aliou/pi-guardrails",
     "git:github.com/monotykamary/pi-neuralwatt-provider",
+    "git:github.com/monotykamary/pi-makora-provider",
+    "git:github.com/monotykamary/pi-tps",
     "git:github.com/monotykamary/pi-invisible-continue",
     "git:github.com/qw457812/pi-listen"
   ],

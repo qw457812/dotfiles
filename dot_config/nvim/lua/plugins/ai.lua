@@ -104,6 +104,12 @@ return {
         config = function() end,
       },
       {
+        "monotykamary/pi-makora-provider",
+        build = "pi update --extension git:github.com/monotykamary/pi-makora-provider",
+        lazy = true,
+        config = function() end,
+      },
+      {
         "qw457812/pi-listen",
         build = "pi update --extension git:github.com/qw457812/pi-listen",
         lazy = true,

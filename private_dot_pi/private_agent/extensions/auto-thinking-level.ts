@@ -60,6 +60,7 @@ export default function (pi: ExtensionAPI) {
         "xiaomi",
         "neuralwatt",
         "codebuddy",
+        "makora",
       ].includes(provider)
     ) {
       setThinkingLevelIfSupported(pi, model, getMaxThinkingLevel(model));
