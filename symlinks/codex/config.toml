@@ -34,6 +34,7 @@ status_line = ["model-with-reasoning", "fast-mode", "total-input-tokens", "total
 [features]
 prevent_idle_sleep = true
 external_migration = true
+terminal_resize_reflow = true
 
 [notice]
 hide_rate_limit_model_nudge = true
