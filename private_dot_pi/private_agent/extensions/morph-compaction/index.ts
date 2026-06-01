@@ -15,7 +15,8 @@
  *   MORPH_API_KEY environment variable
  */
 
-import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import type { AgentMessage } from "@earendil-works/pi-agent-core";
+import type { ExtensionAPI, FileOperations, SessionEntry } from "@earendil-works/pi-coding-agent";
 import { convertToLlm, serializeConversation } from "@earendil-works/pi-coding-agent";
 import { MorphClient, type CompactInput, type CompactResult } from "@morphllm/morphsdk";
 
@@ -46,15 +47,88 @@ function escapeMorphKeepContextTags(text: string): string {
   );
 }
 
-function buildInput(conversationText: string, previousSummary: string | undefined): string {
-  const escapedConversationText = escapeMorphKeepContextTags(conversationText);
-  const escapedPreviousSummary = previousSummary?.trim()
-    ? escapeMorphKeepContextTags(previousSummary.trim())
-    : undefined;
+function collectRawMessagesBeforeFirstKept(
+  branchEntries: SessionEntry[],
+  firstKeptEntryId: string,
+): AgentMessage[] {
+  const firstKeptIndex = branchEntries.findIndex((entry) => entry.id === firstKeptEntryId);
+  if (firstKeptIndex < 0) return [];
 
-  if (!escapedPreviousSummary) return escapedConversationText;
+  return branchEntries
+    .slice(0, firstKeptIndex)
+    .filter((entry): entry is SessionEntry & { type: "message" } => entry.type === "message")
+    .map((entry) => entry.message);
+}
 
-  return [escapedPreviousSummary, escapedConversationText].join("\n\n");
+function toCompactMessages(messages: AgentMessage[]): NonNullable<CompactInput["messages"]> {
+  return convertToLlm(messages)
+    .map((message) => ({
+      role: message.role,
+      content: escapeMorphKeepContextTags(serializeConversation([message])),
+    }))
+    .filter((message) => message.content.trim().length > 0);
+}
+
+function createEmptyFileOps(): FileOperations {
+  return {
+    read: new Set(),
+    written: new Set(),
+    edited: new Set(),
+  };
+}
+
+function extractFileOps(message: AgentMessage, fileOps: FileOperations): void {
+  if (message.role !== "assistant") return;
+
+  for (const block of message.content) {
+    if (block.type !== "toolCall") continue;
+
+    const args = block.arguments as { path?: unknown } | undefined;
+    const path = typeof args?.path === "string" ? args.path : undefined;
+    if (!path) continue;
+
+    if (block.name === "read") fileOps.read.add(path);
+    if (block.name === "write") fileOps.written.add(path);
+    if (block.name === "edit") fileOps.edited.add(path);
+  }
+}
+
+function mergeFileOps(target: FileOperations, source: FileOperations): void {
+  for (const path of source.read) target.read.add(path);
+  for (const path of source.written) target.written.add(path);
+  for (const path of source.edited) target.edited.add(path);
+}
+
+function computeFileLists(fileOps: FileOperations): {
+  readFiles: string[];
+  modifiedFiles: string[];
+} {
+  const modified = new Set([...fileOps.edited, ...fileOps.written]);
+  const readFiles = [...fileOps.read].filter((path) => !modified.has(path)).sort();
+  const modifiedFiles = [...modified].sort();
+  return { readFiles, modifiedFiles };
+}
+
+function formatFileOperations(readFiles: string[], modifiedFiles: string[]): string {
+  const sections: string[] = [];
+  if (readFiles.length > 0) {
+    sections.push(`<read-files>\n${readFiles.join("\n")}\n</read-files>`);
+  }
+  if (modifiedFiles.length > 0) {
+    sections.push(`<modified-files>\n${modifiedFiles.join("\n")}\n</modified-files>`);
+  }
+  return sections.length > 0 ? `\n\n${sections.join("\n\n")}` : "";
+}
+
+function collectFileLists(messages: AgentMessage[], fallbackFileOps: FileOperations) {
+  const fileOps = createEmptyFileOps();
+  mergeFileOps(fileOps, fallbackFileOps);
+
+  for (const message of messages) {
+    extractFileOps(message, fileOps);
+  }
+
+  return computeFileLists(fileOps);
 }
 
 async function compactWithAbort(
@@ -88,27 +162,30 @@ export default function (pi: ExtensionAPI) {
       return;
     }
 
-    const { preparation, customInstructions, signal } = event;
-    const {
-      messagesToSummarize,
-      turnPrefixMessages,
-      tokensBefore,
-      firstKeptEntryId,
-      previousSummary,
-    } = preparation;
+    const { preparation, customInstructions, signal, branchEntries } = event;
+    const { messagesToSummarize, turnPrefixMessages, tokensBefore, firstKeptEntryId, fileOps } =
+      preparation;
 
-    const allMessages = [...messagesToSummarize, ...turnPrefixMessages];
-    if (allMessages.length === 0) return;
+    // Highest-fidelity mode: replay raw branch messages before Pi's kept boundary
+    // instead of iteratively compacting previous summaries. Fall back to Pi's
+    // prepared span if the kept entry cannot be found (e.g. older session data).
+    const rawMessages = collectRawMessagesBeforeFirstKept(branchEntries, firstKeptEntryId);
+    const messagesForMorph =
+      rawMessages.length > 0 ? rawMessages : [...messagesToSummarize, ...turnPrefixMessages];
+    if (messagesForMorph.length === 0) return;
 
-    const conversationText = serializeConversation(convertToLlm(allMessages));
-    if (!conversationText.trim()) return;
+    const compactMessages = toCompactMessages(messagesForMorph);
+    if (compactMessages.length === 0) return;
 
-    const input = buildInput(conversationText, previousSummary);
     const query = buildQuery(customInstructions);
-    const inputChars = input.length;
+    const inputChars = compactMessages.reduce(
+      (total, message) => total + message.content.length,
+      0,
+    );
+    const { readFiles, modifiedFiles } = collectFileLists(messagesForMorph, fileOps);
 
     ctx.ui.notify(
-      `Morph compact: compressing ${allMessages.length} messages (${tokensBefore.toLocaleString()} tokens, ${inputChars.toLocaleString()} chars)...`,
+      `Morph compact: compressing ${messagesForMorph.length} messages (${tokensBefore.toLocaleString()} tokens, ${inputChars.toLocaleString()} chars)...`,
       "info",
     );
 
@@ -120,7 +197,7 @@ export default function (pi: ExtensionAPI) {
         morph,
         {
           model: MORPH_MODEL,
-          input,
+          messages: compactMessages,
           query,
           compressionRatio: COMPRESSION_RATIO,
           preserveRecent: PRESERVE_RECENT_MESSAGES,
@@ -129,8 +206,8 @@ export default function (pi: ExtensionAPI) {
         },
         signal,
       );
-      const summary = data.output;
-      if (!summary?.trim()) {
+      const summary = `${data.output.trimEnd()}${formatFileOperations(readFiles, modifiedFiles)}`;
+      if (!summary.trim()) {
         if (!signal.aborted) {
           ctx.ui.notify(
             "Morph returned empty output, falling back to default compaction",
@@ -157,6 +234,9 @@ export default function (pi: ExtensionAPI) {
             provider: "morph",
             endpoint: "/v1/compact",
             compressionRatio: COMPRESSION_RATIO,
+            messageCount: compactMessages.length,
+            readFiles,
+            modifiedFiles,
             usage: data.usage,
           },
         },
