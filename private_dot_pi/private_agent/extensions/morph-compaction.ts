@@ -1,51 +1,70 @@
-// Copied from: https://github.com/earendil-works/pi/pull/2836
-
-// TODO:
-// - https://github.com/rickicode/pi-morphllm-plugin
-// - https://docs.morphllm.com/sdk/components/compact
+// References:
+// - Morph Compact API: https://docs.morphllm.com/sdk/components/compact
+// - Pi compaction extensions: https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/compaction.md#session_before_compact
+// - Pi Morph compaction PR: https://github.com/earendil-works/pi/pull/2836
+// - Rickicode Morph plugin: https://github.com/rickicode/pi-morphllm-plugin
 
 /**
  * Morph Compaction Extension
  *
- * Replaces the default compaction with Morph's compaction service.
- * Uses the OpenAI-compatible endpoint at api.morphllm.com with the
- * "morph-compactor" model for fast, high-quality context compression.
+ * Uses Morph Compact to delete low-relevance lines from pi's compacted span.
+ * This intentionally produces compressed transcript/context, not a rewritten
+ * pi-style structured summary.
  *
- * API key resolution (in order):
- *   1. MORPH_API_KEY environment variable
- *   2. ~/.claude/morph/.env file
- *
- * Usage:
- *   pi --extension examples/extensions/morph-compaction.ts
+ * API key resolution:
+ *   MORPH_API_KEY environment variable
  */
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { convertToLlm, serializeConversation } from "@earendil-works/pi-coding-agent";
-import { readFileSync } from "fs";
-import { homedir } from "os";
-import { join } from "path";
 
-const MORPH_API_URL = "https://api.morphllm.com/v1/chat/completions";
+const MORPH_API_URL = "https://api.morphllm.com/v1/compact";
 const MORPH_MODEL = "morph-compactor";
 
+// Morph docs: default 0.5 is a good start; long agent loops can use 0.3.
+const COMPRESSION_RATIO = 0.3;
+
+// Pi keeps recent context itself via firstKeptEntryId, so only compact the old span.
+const PRESERVE_RECENT_MESSAGES = 0;
+
+const DEFAULT_QUERY =
+  "Keep the current user task, accepted constraints, current plan, recent decisions, file/code context, exact file paths, code symbols, commands, errors, files read or modified, and next actionable steps. Remove greetings, repetition, stale logs, obsolete alternatives, and irrelevant detours.";
+
+interface MorphCompactResponse {
+  output?: string;
+  usage?: {
+    input_tokens?: number;
+    output_tokens?: number;
+    compression_ratio?: number;
+    processing_time_ms?: number;
+  };
+}
+
 function loadApiKey(): string | undefined {
-  // 1. Environment variable
-  const envKey = process.env.MORPH_API_KEY;
-  if (envKey) return envKey;
+  return process.env.MORPH_API_KEY?.trim() || undefined;
+}
 
-  // 2. ~/.claude/morph/.env file
-  try {
-    const envFile = join(homedir(), ".claude", "morph", ".env");
-    const text = readFileSync(envFile, "utf-8");
-    for (const line of text.split("\n")) {
-      const match = line.match(/^MORPH_API_KEY=(.+)$/);
-      if (match) return match[1].trim();
-    }
-  } catch {
-    // File doesn't exist or isn't readable
-  }
+function buildQuery(customInstructions: string | undefined): string {
+  const focus = customInstructions?.trim();
+  return focus ? `${DEFAULT_QUERY}\n\nAdditional focus: ${focus}` : DEFAULT_QUERY;
+}
 
-  return undefined;
+function escapeMorphKeepContextTags(text: string): string {
+  return text.replace(
+    /(^|\n)([ \t]*)<(\/?)keepContext>[ \t]*(?=\n|$)/g,
+    "$1$2&lt;$3keepContext&gt;",
+  );
+}
+
+function buildInput(conversationText: string, previousSummary: string | undefined): string {
+  const escapedConversationText = escapeMorphKeepContextTags(conversationText);
+  const escapedPreviousSummary = previousSummary?.trim()
+    ? escapeMorphKeepContextTags(previousSummary.trim())
+    : undefined;
+
+  if (!escapedPreviousSummary) return escapedConversationText;
+
+  return [escapedPreviousSummary, escapedConversationText].join("\n\n");
 }
 
 export default function (pi: ExtensionAPI) {
@@ -53,13 +72,13 @@ export default function (pi: ExtensionAPI) {
     const apiKey = loadApiKey();
     if (!apiKey) {
       ctx.ui.notify(
-        "MORPH_API_KEY not found. Set it as an environment variable or in ~/.claude/morph/.env. Falling back to default compaction.",
+        "MORPH_API_KEY not found. Set it as an environment variable. Falling back to default compaction.",
         "warning",
       );
       return;
     }
 
-    const { preparation, signal } = event;
+    const { preparation, customInstructions, signal } = event;
     const {
       messagesToSummarize,
       turnPrefixMessages,
@@ -69,30 +88,19 @@ export default function (pi: ExtensionAPI) {
     } = preparation;
 
     const allMessages = [...messagesToSummarize, ...turnPrefixMessages];
-    if (allMessages.length === 0) {
-      return;
-    }
+    if (allMessages.length === 0) return;
 
-    const inputChars = allMessages.reduce((n, m) => {
-      if ("content" in m && typeof m.content === "string") return n + m.content.length;
-      if ("content" in m && Array.isArray(m.content)) {
-        return n + m.content.reduce((acc: number, c: any) => acc + (c.text?.length || 0), 0);
-      }
-      return n;
-    }, 0);
+    const conversationText = serializeConversation(convertToLlm(allMessages));
+    if (!conversationText.trim()) return;
+
+    const input = buildInput(conversationText, previousSummary);
+    const query = buildQuery(customInstructions);
+    const inputChars = input.length;
 
     ctx.ui.notify(
-      `Morph compaction: compressing ${allMessages.length} messages (${tokensBefore.toLocaleString()} tokens, ${inputChars.toLocaleString()} chars)...`,
+      `Morph compact: compressing ${allMessages.length} messages (${tokensBefore.toLocaleString()} tokens, ${inputChars.toLocaleString()} chars)...`,
       "info",
     );
-
-    // Serialize conversation to text
-    const conversationText = serializeConversation(convertToLlm(allMessages));
-
-    // Include previous summary if available (for iterative compaction)
-    const content = previousSummary
-      ? `Previous summary:\n${previousSummary}\n\nNew conversation to compress:\n${conversationText}`
-      : conversationText;
 
     const startTime = performance.now();
 
@@ -105,7 +113,12 @@ export default function (pi: ExtensionAPI) {
         },
         body: JSON.stringify({
           model: MORPH_MODEL,
-          messages: [{ role: "user", content }],
+          input,
+          query,
+          compression_ratio: COMPRESSION_RATIO,
+          preserve_recent: PRESERVE_RECENT_MESSAGES,
+          include_markers: true,
+          include_line_ranges: false,
         }),
         signal,
       });
@@ -115,15 +128,12 @@ export default function (pi: ExtensionAPI) {
         throw new Error(`Morph API returned ${response.status}: ${errorText}`);
       }
 
-      const data = (await response.json()) as {
-        choices: Array<{ message: { content: string } }>;
-      };
-
-      const summary = data.choices?.[0]?.message?.content;
+      const data = (await response.json()) as MorphCompactResponse;
+      const summary = data.output;
       if (!summary?.trim()) {
         if (!signal.aborted) {
           ctx.ui.notify(
-            "Morph returned empty summary, falling back to default compaction",
+            "Morph returned empty output, falling back to default compaction",
             "warning",
           );
         }
@@ -134,7 +144,7 @@ export default function (pi: ExtensionAPI) {
       const ratio = inputChars > 0 ? ((summary.length / inputChars) * 100).toFixed(1) : "N/A";
 
       ctx.ui.notify(
-        `Morph compaction complete: ${inputChars.toLocaleString()} → ${summary.length.toLocaleString()} chars (${ratio}%) in ${durationMs}ms`,
+        `Morph compact complete: ${inputChars.toLocaleString()} → ${summary.length.toLocaleString()} chars (${ratio}%) in ${durationMs}ms`,
         "info",
       );
 
@@ -143,12 +153,18 @@ export default function (pi: ExtensionAPI) {
           summary,
           firstKeptEntryId,
           tokensBefore,
+          details: {
+            provider: "morph",
+            endpoint: "/v1/compact",
+            compressionRatio: COMPRESSION_RATIO,
+            usage: data.usage,
+          },
         },
       };
     } catch (error) {
       if (signal.aborted) return;
       const message = error instanceof Error ? error.message : String(error);
-      ctx.ui.notify(`Morph compaction failed: ${message}. Falling back to default.`, "error");
+      ctx.ui.notify(`Morph compact failed: ${message}. Falling back to default.`, "error");
       return;
     }
   });
