@@ -103,6 +103,7 @@
     "onboarding": {
       "completed": true
     },
-    "doubleEscClear": false
+    "doubleEscClear": false,
+    "backend": "volcengine"
   }
 }
