@@ -47,7 +47,36 @@ function escapeMorphKeepContextTags(text: string): string {
   );
 }
 
-function collectRawMessagesBeforeFirstKept(
+function messageFromEntryForRawCompaction(entry: SessionEntry): AgentMessage | undefined {
+  if (entry.type === "message") return entry.message;
+
+  if (entry.type === "custom_message") {
+    return {
+      role: "custom",
+      customType: entry.customType,
+      content: entry.content,
+      display: entry.display,
+      details: entry.details,
+      timestamp: new Date(entry.timestamp).getTime(),
+    };
+  }
+
+  if (entry.type === "branch_summary") {
+    return {
+      role: "branchSummary",
+      summary: entry.summary,
+      fromId: entry.fromId,
+      timestamp: new Date(entry.timestamp).getTime(),
+    };
+  }
+
+  // Deliberately skip old compaction entries to avoid summary-of-summary drift.
+  // Session metadata entries (labels, model/thinking changes, custom state, etc.)
+  // do not participate in Pi's LLM context and should not pollute Morph input.
+  return undefined;
+}
+
+function collectContextMessagesBeforeFirstKept(
   branchEntries: SessionEntry[],
   firstKeptEntryId: string,
 ): AgentMessage[] {
@@ -56,8 +85,8 @@ function collectRawMessagesBeforeFirstKept(
 
   return branchEntries
     .slice(0, firstKeptIndex)
-    .filter((entry): entry is SessionEntry & { type: "message" } => entry.type === "message")
-    .map((entry) => entry.message);
+    .map(messageFromEntryForRawCompaction)
+    .filter((message): message is AgentMessage => message !== undefined);
 }
 
 function toCompactMessages(messages: AgentMessage[]): NonNullable<CompactInput["messages"]> {
@@ -169,7 +198,7 @@ export default function (pi: ExtensionAPI) {
     // Highest-fidelity mode: replay raw branch messages before Pi's kept boundary
     // instead of iteratively compacting previous summaries. Fall back to Pi's
     // prepared span if the kept entry cannot be found (e.g. older session data).
-    const rawMessages = collectRawMessagesBeforeFirstKept(branchEntries, firstKeptEntryId);
+    const rawMessages = collectContextMessagesBeforeFirstKept(branchEntries, firstKeptEntryId);
     const messagesForMorph =
       rawMessages.length > 0 ? rawMessages : [...messagesToSummarize, ...turnPrefixMessages];
     if (messagesForMorph.length === 0) return;
