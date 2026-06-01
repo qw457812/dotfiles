@@ -18,7 +18,34 @@
 import type { AgentMessage } from "@earendil-works/pi-agent-core";
 import type { ExtensionAPI, FileOperations, SessionEntry } from "@earendil-works/pi-coding-agent";
 import { convertToLlm, serializeConversation } from "@earendil-works/pi-coding-agent";
-import { MorphClient, type CompactInput, type CompactResult } from "@morphllm/morphsdk";
+
+const MORPH_COMPACT_URL = "https://api.morphllm.com/v1/compact";
+const MORPH_COMPACT_TIMEOUT_MS = 120_000;
+
+type CompactMessageInput = {
+  role: string;
+  content: string;
+};
+
+type CompactInput = {
+  model: string;
+  messages: CompactMessageInput[];
+  query: string;
+  compressionRatio: number;
+  preserveRecent: number;
+  includeMarkers: boolean;
+  includeLineRanges: boolean;
+};
+
+type CompactResult = {
+  output: string;
+  usage?: {
+    input_tokens?: number;
+    output_tokens?: number;
+    compression_ratio?: number;
+    processing_time_ms?: number;
+  };
+};
 
 const MORPH_MODEL = "morph-compactor";
 
@@ -89,7 +116,7 @@ function collectContextMessagesBeforeFirstKept(
     .filter((message): message is AgentMessage => message !== undefined);
 }
 
-function toCompactMessages(messages: AgentMessage[]): NonNullable<CompactInput["messages"]> {
+function toCompactMessages(messages: AgentMessage[]): CompactMessageInput[] {
   return convertToLlm(messages)
     .map((message) => ({
       role: message.role,
@@ -161,22 +188,61 @@ function collectFileLists(messages: AgentMessage[], fallbackFileOps: FileOperati
 }
 
 async function compactWithAbort(
-  morph: MorphClient,
+  apiKey: string,
   input: CompactInput,
   signal: AbortSignal,
 ): Promise<CompactResult> {
   if (signal.aborted) throw new Error("Morph compact aborted");
 
-  let abortHandler: (() => void) | undefined;
-  const abortPromise = new Promise<never>((_, reject) => {
-    abortHandler = () => reject(new Error("Morph compact aborted"));
-    signal.addEventListener("abort", abortHandler, { once: true });
-  });
+  const controller = new AbortController();
+  const abortFromCaller = () => controller.abort(signal.reason);
+  const timeoutId = setTimeout(() => {
+    controller.abort(new Error(`Morph compact timed out after ${MORPH_COMPACT_TIMEOUT_MS}ms`));
+  }, MORPH_COMPACT_TIMEOUT_MS);
+
+  signal.addEventListener("abort", abortFromCaller, { once: true });
 
   try {
-    return await Promise.race([morph.compact(input), abortPromise]);
+    const response = await fetch(MORPH_COMPACT_URL, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: input.model,
+        messages: input.messages,
+        query: input.query,
+        compression_ratio: input.compressionRatio,
+        preserve_recent: input.preserveRecent,
+        include_markers: input.includeMarkers,
+        include_line_ranges: input.includeLineRanges,
+      }),
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Morph compact returned ${response.status}: ${errorText}`);
+    }
+
+    const data = (await response.json()) as { output?: unknown; usage?: CompactResult["usage"] };
+    if (typeof data.output !== "string") {
+      throw new Error("Morph compact returned an unexpected response shape");
+    }
+
+    return {
+      output: data.output,
+      usage: data.usage,
+    };
+  } catch (error) {
+    if (!signal.aborted && controller.signal.reason instanceof Error) {
+      throw controller.signal.reason;
+    }
+    throw error;
   } finally {
-    if (abortHandler) signal.removeEventListener("abort", abortHandler);
+    clearTimeout(timeoutId);
+    signal.removeEventListener("abort", abortFromCaller);
   }
 }
 
@@ -221,9 +287,8 @@ export default function (pi: ExtensionAPI) {
     const startTime = performance.now();
 
     try {
-      const morph = new MorphClient({ apiKey });
       const data = await compactWithAbort(
-        morph,
+        apiKey,
         {
           model: MORPH_MODEL,
           messages: compactMessages,
