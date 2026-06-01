@@ -756,6 +756,7 @@ return {
             event = "neo_tree_window_after_open",
             handler = function(args)
               if args.position == "left" then
+                vim.wo[args.winid].winfixwidth = true -- workaround: bb46bc6 skips NuiSplit win_options (including winfixwidth) when enter=false
                 vim.cmd("wincmd =")
               end
             end,
