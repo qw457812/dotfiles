@@ -1,0 +1,14 @@
+{
+  "name": "pi-extension-morph-compaction",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@morphllm/morphsdk": "^0.2.173"
+  },
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

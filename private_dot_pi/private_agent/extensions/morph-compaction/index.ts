@@ -17,8 +17,8 @@
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { convertToLlm, serializeConversation } from "@earendil-works/pi-coding-agent";
+import { MorphClient, type CompactInput, type CompactResult } from "@morphllm/morphsdk";
 
-const MORPH_API_URL = "https://api.morphllm.com/v1/compact";
 const MORPH_MODEL = "morph-compactor";
 
 // Morph docs: default 0.5 is a good start; long agent loops can use 0.3.
@@ -29,16 +29,6 @@ const PRESERVE_RECENT_MESSAGES = 0;
 
 const DEFAULT_QUERY =
   "Keep the current user task, accepted constraints, current plan, recent decisions, file/code context, exact file paths, code symbols, commands, errors, files read or modified, and next actionable steps. Remove greetings, repetition, stale logs, obsolete alternatives, and irrelevant detours.";
-
-interface MorphCompactResponse {
-  output?: string;
-  usage?: {
-    input_tokens?: number;
-    output_tokens?: number;
-    compression_ratio?: number;
-    processing_time_ms?: number;
-  };
-}
 
 function loadApiKey(): string | undefined {
   return process.env.MORPH_API_KEY?.trim() || undefined;
@@ -65,6 +55,26 @@ function buildInput(conversationText: string, previousSummary: string | undefine
   if (!escapedPreviousSummary) return escapedConversationText;
 
   return [escapedPreviousSummary, escapedConversationText].join("\n\n");
+}
+
+async function compactWithAbort(
+  morph: MorphClient,
+  input: CompactInput,
+  signal: AbortSignal,
+): Promise<CompactResult> {
+  if (signal.aborted) throw new Error("Morph compact aborted");
+
+  let abortHandler: (() => void) | undefined;
+  const abortPromise = new Promise<never>((_, reject) => {
+    abortHandler = () => reject(new Error("Morph compact aborted"));
+    signal.addEventListener("abort", abortHandler, { once: true });
+  });
+
+  try {
+    return await Promise.race([morph.compact(input), abortPromise]);
+  } finally {
+    if (abortHandler) signal.removeEventListener("abort", abortHandler);
+  }
 }
 
 export default function (pi: ExtensionAPI) {
@@ -105,30 +115,20 @@ export default function (pi: ExtensionAPI) {
     const startTime = performance.now();
 
     try {
-      const response = await fetch(MORPH_API_URL, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+      const morph = new MorphClient({ apiKey });
+      const data = await compactWithAbort(
+        morph,
+        {
           model: MORPH_MODEL,
           input,
           query,
-          compression_ratio: COMPRESSION_RATIO,
-          preserve_recent: PRESERVE_RECENT_MESSAGES,
-          include_markers: true,
-          include_line_ranges: false,
-        }),
+          compressionRatio: COMPRESSION_RATIO,
+          preserveRecent: PRESERVE_RECENT_MESSAGES,
+          includeMarkers: true,
+          includeLineRanges: false,
+        },
         signal,
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Morph API returned ${response.status}: ${errorText}`);
-      }
-
-      const data = (await response.json()) as MorphCompactResponse;
+      );
       const summary = data.output;
       if (!summary?.trim()) {
         if (!signal.aborted) {
