@@ -51,9 +51,9 @@ const RETRY_DEFAULTS = {
   initialDelay: 1000,
   maxDelay: 30000,
   backoffMultiplier: 2,
-  retryableStatuses: new Set([429, 503]),
-  retryableErrorCodes: ["ECONNREFUSED", "ETIMEDOUT", "ENOTFOUND"],
-} as const;
+  retryableStatuses: new Set<number>([429, 503]),
+  retryableErrorCodes: ["ECONNREFUSED", "ETIMEDOUT", "ENOTFOUND"] as readonly string[],
+};
 
 function sleep(ms: number, signal: AbortSignal): Promise<void> {
   const rejectWithReason = () => {
@@ -82,7 +82,7 @@ function isRetryableNetworkError(error: unknown): boolean {
   const code =
     (error.cause as { code?: string } | undefined)?.code ?? (error as { code?: string }).code;
   if (typeof code === "string") {
-    return (RETRY_DEFAULTS.retryableErrorCodes as readonly string[]).includes(code);
+    return RETRY_DEFAULTS.retryableErrorCodes.includes(code);
   }
   // Fallback: check message for non-fetch errors that don't use .code
   return RETRY_DEFAULTS.retryableErrorCodes.some((c) => error.message?.includes(c));
@@ -160,8 +160,6 @@ export async function compact(
   input: CompactInput,
   signal: AbortSignal,
 ): Promise<CompactResult> {
-  if (signal.aborted) throw new Error("Morph compact aborted");
-
   const response = await fetchWithRetry(
     MORPH_COMPACT_URL,
     {

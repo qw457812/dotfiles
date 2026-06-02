@@ -13,6 +13,10 @@
  * This intentionally produces compressed transcript/context, not a rewritten
  * pi-style structured summary.
  *
+ * Enable switch:
+ *   Disabled by default. Enable with `--morph-compact`, MORPH_COMPACT=1,
+ *   or toggle at runtime with `/morph-compact on|off|status`.
+ *
  * API key resolution:
  *   MORPH_API_KEY environment variable
  */
@@ -23,6 +27,8 @@ import { convertToLlm, serializeConversation } from "@earendil-works/pi-coding-a
 import { compact } from "./morph-client.ts";
 
 const MORPH_MODEL = "morph-compactor";
+const MORPH_COMPACT_FLAG = "morph-compact";
+const MORPH_COMPACT_ENV = "MORPH_COMPACT";
 
 // Morph docs: default 0.5 is a good start; long agent loops can use 0.3.
 const COMPRESSION_RATIO = 0.3;
@@ -35,6 +41,48 @@ const DEFAULT_QUERY =
 
 function loadApiKey(): string | undefined {
   return process.env.MORPH_API_KEY?.trim() || undefined;
+}
+
+function loadMorphCompactDefault(): boolean {
+  const value = process.env[MORPH_COMPACT_ENV]?.trim().toLowerCase();
+  return value === "1" || value === "true" || value === "yes" || value === "on";
+}
+
+const MORPH_COMPACT_COMPLETIONS = [
+  { value: "on", label: "on", description: "Enable Morph Compact" },
+  { value: "off", label: "off", description: "Disable Morph Compact" },
+  { value: "status", label: "status", description: "Show current Morph Compact state" },
+];
+
+function getMorphCompactCompletions(argumentPrefix: string) {
+  const prefix = argumentPrefix.trimStart().toLowerCase();
+  if (prefix.includes(" ")) return null;
+
+  return MORPH_COMPACT_COMPLETIONS.filter((item) => item.value.startsWith(prefix));
+}
+
+function parseEnabledArg(args: string | undefined): boolean | "status" | undefined {
+  const arg = args?.trim().split(/\s+/)[0]?.toLowerCase();
+  switch (arg) {
+    case "on":
+    case "enable":
+    case "enabled":
+    case "true":
+    case "1":
+      return true;
+    case "off":
+    case "disable":
+    case "disabled":
+    case "false":
+    case "0":
+      return false;
+    case "":
+    case undefined:
+    case "status":
+      return "status";
+    default:
+      return undefined;
+  }
 }
 
 function buildQuery(customInstructions: string | undefined): string {
@@ -163,7 +211,39 @@ function collectFileLists(messages: AgentMessage[], fallbackFileOps: FileOperati
 }
 
 export default function (pi: ExtensionAPI) {
+  pi.registerFlag(MORPH_COMPACT_FLAG, {
+    description: "Enable Morph Compact during session compaction",
+    type: "boolean",
+    default: loadMorphCompactDefault(),
+  });
+
+  let morphCompactEnabled: boolean | undefined;
+
+  function isMorphCompactEnabled(): boolean {
+    return morphCompactEnabled ?? (pi.getFlag(MORPH_COMPACT_FLAG) as boolean) === true;
+  }
+
+  pi.registerCommand("morph-compact", {
+    description: "Enable/disable Morph Compact (/morph-compact on|off|status)",
+    getArgumentCompletions: getMorphCompactCompletions,
+    handler: async (args, ctx) => {
+      const enabled = parseEnabledArg(args);
+      if (enabled === undefined) {
+        ctx.ui.notify("Usage: /morph-compact on | off | status", "warning");
+        return;
+      }
+
+      if (enabled !== "status") {
+        morphCompactEnabled = enabled;
+      }
+
+      ctx.ui.notify(`Morph Compact is ${isMorphCompactEnabled() ? "enabled" : "disabled"}`, "info");
+    },
+  });
+
   pi.on("session_before_compact", async (event, ctx) => {
+    if (!isMorphCompactEnabled()) return;
+
     const apiKey = loadApiKey();
     if (!apiKey) {
       ctx.ui.notify(
