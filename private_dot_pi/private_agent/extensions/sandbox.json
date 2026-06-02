@@ -1,4 +1,5 @@
 {
+  "enableWeakerNetworkIsolation": true,
   "network": {
     "allowedDomains": [
       "npmjs.org",

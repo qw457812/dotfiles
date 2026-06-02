@@ -150,14 +150,18 @@ function deepMerge(base: SandboxConfig, overrides: Partial<SandboxConfig>): Sand
 	const extOverrides = overrides as {
 		ignoreViolations?: Record<string, string[]>;
 		enableWeakerNestedSandbox?: boolean;
+		enableWeakerNetworkIsolation?: boolean;
 	};
-	const extResult = result as { ignoreViolations?: Record<string, string[]>; enableWeakerNestedSandbox?: boolean };
+	const extResult = result as { ignoreViolations?: Record<string, string[]>; enableWeakerNestedSandbox?: boolean; enableWeakerNetworkIsolation?: boolean };
 
 	if (extOverrides.ignoreViolations) {
 		extResult.ignoreViolations = extOverrides.ignoreViolations;
 	}
 	if (extOverrides.enableWeakerNestedSandbox !== undefined) {
 		extResult.enableWeakerNestedSandbox = extOverrides.enableWeakerNestedSandbox;
+	}
+	if (extOverrides.enableWeakerNetworkIsolation !== undefined) {
+		extResult.enableWeakerNetworkIsolation = extOverrides.enableWeakerNetworkIsolation;
 	}
 
 	return result;
@@ -399,6 +403,7 @@ export default function (pi: ExtensionAPI) {
 			const configExt = config as unknown as {
 				ignoreViolations?: Record<string, string[]>;
 				enableWeakerNestedSandbox?: boolean;
+				enableWeakerNetworkIsolation?: boolean;
 			};
 
 			// Create ask callback for network permission prompts
@@ -410,6 +415,7 @@ export default function (pi: ExtensionAPI) {
 					filesystem: config.filesystem,
 					ignoreViolations: configExt.ignoreViolations,
 					enableWeakerNestedSandbox: configExt.enableWeakerNestedSandbox,
+					enableWeakerNetworkIsolation: configExt.enableWeakerNetworkIsolation,
 				},
 				askCallback,
 			);
