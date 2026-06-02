@@ -13,12 +13,6 @@
     "github-copilot/gpt-5.4",
     "deepseek/deepseek-v4-pro",
     "xiaomi/mimo-v2.5-pro",
-    "synthetic/hf:zai-org/GLM-5.1",
-    "synthetic/hf:moonshotai/Kimi-K2.6",
-    "crofai/glm-5.1-precision",
-    "crofai/kimi-k2.6-precision",
-    "crofai/mimo-v2.5-pro-precision",
-    "crofai/deepseek-v4-pro-precision",
     "neuralwatt/zai-org/GLM-5.1-FP8",
     "neuralwatt/moonshotai/Kimi-K2.6",
     "neuralwatt/glm-5.1-flex",
@@ -27,7 +21,13 @@
     "makora/zai-org/GLM-5.1-FP8",
     "makora/nvidia/Kimi-K2.6-NVFP4",
     "makora/deepseek-ai/DeepSeek-V4-Pro",
-    "makora/deepseek-ai/DeepSeek-V4-Flash"
+    "makora/deepseek-ai/DeepSeek-V4-Flash",
+    "crofai/glm-5.1",
+    "crofai/kimi-k2.6",
+    "crofai/mimo-v2.5-pro",
+    "crofai/deepseek-v4-pro",
+    "synthetic/hf:zai-org/GLM-5.1",
+    "synthetic/hf:moonshotai/Kimi-K2.6"
   ],
   "packages": [
     "npm:pi-vim",
