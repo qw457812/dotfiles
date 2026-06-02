@@ -208,22 +208,22 @@ const RETRY_DEFAULTS = {
   retryableErrorCodes: ["ECONNREFUSED", "ETIMEDOUT", "ENOTFOUND"],
 } as const;
 
-function sleep(ms: number, signal?: AbortSignal): Promise<void> {
+function sleep(ms: number, signal: AbortSignal): Promise<void> {
   const rejectWithReason = () => {
-    const reason = signal?.reason;
+    const reason = signal.reason;
     return reason instanceof Error ? reason : new Error("Morph compact aborted");
   };
-  if (signal?.aborted) return Promise.reject(rejectWithReason());
+  if (signal.aborted) return Promise.reject(rejectWithReason());
   return new Promise((resolve, reject) => {
     const onAbort = () => {
       clearTimeout(timer);
       reject(rejectWithReason());
     };
     const timer = setTimeout(() => {
-      signal?.removeEventListener("abort", onAbort);
+      signal.removeEventListener("abort", onAbort);
       resolve();
     }, ms);
-    signal?.addEventListener("abort", onAbort, { once: true });
+    signal.addEventListener("abort", onAbort, { once: true });
   });
 }
 
@@ -242,14 +242,30 @@ function isRetryableNetworkError(error: unknown): boolean {
   return RETRY_DEFAULTS.retryableErrorCodes.some((c) => error.message?.includes(c));
 }
 
+function capRetryDelay(ms: number): number {
+  return Math.min(ms, RETRY_DEFAULTS.maxDelay);
+}
+
+function increaseRetryDelay(delay: number): number {
+  return delay * RETRY_DEFAULTS.backoffMultiplier;
+}
+
+function retryDelayFromHeader(response: Response, fallbackDelay: number): number {
+  const retryAfter = response.headers.get("Retry-After");
+  const parsed = retryAfter ? parseInt(retryAfter, 10) * 1000 : NaN;
+  // Retry-After can be seconds (integer) or HTTP-date; parseInt on a date
+  // returns NaN. Fall back to computed delay when unparseable.
+  return Number.isFinite(parsed) ? capRetryDelay(parsed) : capRetryDelay(fallbackDelay);
+}
+
 async function fetchWithRetry(
   url: string,
   init: RequestInit,
   signal: AbortSignal,
-  delay: number,
 ): Promise<Response> {
   // Overall timeout wraps the entire retry loop (aligned with SDK's
   // withTimeout(fetchWithRetry(...), timeout) pattern).
+  let delay: number = RETRY_DEFAULTS.initialDelay;
   const controller = new AbortController();
   const abortFromCaller = () => controller.abort(signal.reason);
   signal.addEventListener("abort", abortFromCaller, { once: true });
@@ -261,34 +277,28 @@ async function fetchWithRetry(
   try {
     for (let attempt = 0; attempt <= RETRY_DEFAULTS.maxRetries; attempt++) {
       if (signal.aborted) throw new Error("Morph compact aborted");
+      const hasRetryRemaining = attempt < RETRY_DEFAULTS.maxRetries;
 
       let response: Response;
       try {
         response = await fetch(url, { ...init, signal: controller.signal });
       } catch (error) {
         // Network error: retry if retryable
-        if (isRetryableNetworkError(error) && attempt < RETRY_DEFAULTS.maxRetries) {
-          await sleep(Math.min(delay, RETRY_DEFAULTS.maxDelay), controller.signal);
-          delay *= RETRY_DEFAULTS.backoffMultiplier;
+        if (isRetryableNetworkError(error) && hasRetryRemaining) {
+          await sleep(capRetryDelay(delay), controller.signal);
+          delay = increaseRetryDelay(delay);
           continue;
         }
         throw error;
       }
 
       // HTTP-level retry on 429 / 503 (aligned with SDK fetchWithRetry)
-      if (RETRY_DEFAULTS.retryableStatuses.has(response.status) && attempt < RETRY_DEFAULTS.maxRetries) {
+      if (RETRY_DEFAULTS.retryableStatuses.has(response.status) && hasRetryRemaining) {
         // Release response body so undici can reclaim the connection.
         await response.body?.cancel().catch(() => {});
 
-        const retryAfter = response.headers.get("Retry-After");
-        const parsed = retryAfter ? parseInt(retryAfter, 10) * 1000 : NaN;
-        // Retry-After can be seconds (integer) or HTTP-date; parseInt on a date
-        // returns NaN. Fall back to computed delay when unparseable.
-        const waitTime = Number.isFinite(parsed)
-          ? Math.min(parsed, RETRY_DEFAULTS.maxDelay)
-          : Math.min(delay, RETRY_DEFAULTS.maxDelay);
-        await sleep(waitTime, controller.signal);
-        delay *= RETRY_DEFAULTS.backoffMultiplier;
+        await sleep(retryDelayFromHeader(response, delay), controller.signal);
+        delay = increaseRetryDelay(delay);
         continue;
       }
 
@@ -328,7 +338,6 @@ async function compactWithRetry(
       }),
     },
     signal,
-    RETRY_DEFAULTS.initialDelay,
   );
 
   if (!response.ok) {
