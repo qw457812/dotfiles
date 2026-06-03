@@ -1,54 +1,109 @@
-/* eslint-disable no-unreachable */
-
-// Copied from: https://github.com/earendil-works/pi/blob/3e5ad67e0f325d4888f82f9b82966218eb4407f5/packages/coding-agent/examples/extensions/git-checkpoint.ts
-
-// TODO:
-// - https://github.com/audibleblink/pi-harness/blob/4cba24c7a84a9054d7ca773ed67cac51a17977f5/extensions/git-checkpoint.ts
-// - https://github.com/arpagon/pi-rewind
-
 /**
  * Git Checkpoint Extension
  *
- * Creates git stash checkpoints at each turn so /fork can restore code state.
- * When forking, offers to restore code to that point in history.
+ * Snapshots the working tree (including untracked files) at each turn_end
+ * via `git write-tree`, keyed by the leaf session entryId (the just-finished
+ * assistant message). On /fork, prompts the user to restore the working tree
+ * and staged state to that snapshot.
  */
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
+interface Checkpoint {
+	branch: string;
+	indexTree: string;
+	worktreeTree: string;
+}
+
 export default function (pi: ExtensionAPI) {
-	return; // TODO: disabled for now — see BUG(1-3)
+	const checkpoints = new Map<string, Checkpoint>();
+	let gitDisabled = false;
+	let gitChecked = false;
 
-	const checkpoints = new Map<string, string>();
-	let currentEntryId: string | undefined;
+	async function ensureGit(ctx: {
+		hasUI: boolean;
+		ui: { notify: (m: string, l: "info" | "warning" | "error") => void };
+	}) {
+		if (gitChecked) return;
+		gitChecked = true;
+		try {
+			const result = await pi.exec("git", ["rev-parse", "--git-dir"]);
+			if (result.code === 0) return;
+		} catch {
+			// handled below
+		}
 
-	// Track the current entry ID when user messages are saved
+		gitDisabled = true;
+		if (ctx.hasUI)
+			ctx.ui.notify("git-checkpoint disabled: not a git repository", "warning");
+	}
 
-	// TODO: BUG(1): turn_start fires before tool_result on first turn, so
-	// currentEntryId is undefined. Also tool_result fires via afterToolCall
-	// before the message is persisted; getLeafEntry() returns the wrong leaf.
-	pi.on("tool_result", async (_event, ctx) => {
+	async function currentBranch(): Promise<string> {
+		const { stdout, code } = await pi.exec("git", ["rev-parse", "--abbrev-ref", "HEAD"]);
+		return code === 0 ? stdout.trim() || "unknown" : "unknown";
+	}
+
+	async function createSnapshot(): Promise<Checkpoint | undefined> {
+		const [{ stdout: indexTreeOut, code: indexCode }, branch] = await Promise.all([
+			pi.exec("git", ["write-tree"]),
+			currentBranch(),
+		]);
+		if (indexCode !== 0) return undefined;
+
+		// Use a temporary index so snapshotting never touches the user's staged state.
+		// `pi.exec` does not support env overrides, so use a small shell wrapper for
+		// GIT_INDEX_FILE + cleanup.
+		const script = [
+			"set -e",
+			'idx="${TMPDIR:-/tmp}/pi-git-checkpoint-index.$$"',
+			'rm -f "$idx"',
+			'trap \'rm -f "$idx"\' EXIT',
+			'if git rev-parse --verify HEAD >/dev/null 2>&1; then',
+			'  GIT_INDEX_FILE="$idx" git read-tree HEAD',
+			"fi",
+			'GIT_INDEX_FILE="$idx" git add -A',
+			'GIT_INDEX_FILE="$idx" git write-tree',
+		].join("\n");
+		const { stdout: worktreeTreeOut, code: worktreeCode } = await pi.exec("bash", [
+			"-c",
+			script,
+		]);
+		if (worktreeCode !== 0) return undefined;
+
+		const indexTree = indexTreeOut.trim();
+		const worktreeTree = worktreeTreeOut.trim();
+		if (!indexTree || !worktreeTree) return undefined;
+
+		return { branch, indexTree, worktreeTree };
+	}
+
+	pi.on("turn_end", async (_event, ctx) => {
+		await ensureGit(ctx);
+		if (gitDisabled) return;
+
 		const leaf = ctx.sessionManager.getLeafEntry();
-		if (leaf) currentEntryId = leaf.id;
-	});
+		if (!leaf) return;
 
-	pi.on("turn_start", async () => {
-		// Create a git stash entry before LLM makes changes
-
-		// TODO: BUG(2): git stash create produces dangling loose objects.
-		// git write-tree + read-tree is cleaner.
-		const { stdout } = await pi.exec("git", ["stash", "create"]);
-		const ref = stdout.trim();
-		if (ref && currentEntryId) {
-			checkpoints.set(currentEntryId, ref);
+		try {
+			const checkpoint = await createSnapshot();
+			if (checkpoint) checkpoints.set(leaf.id, checkpoint);
+		} catch {
+			// snapshot failure is non-fatal; skip this turn
 		}
 	});
 
 	pi.on("session_before_fork", async (event, ctx) => {
-		const ref = checkpoints.get(event.entryId);
-		if (!ref) return;
+		if (!ctx.hasUI) return;
 
-		if (!ctx.hasUI) {
-			// In non-interactive mode, don't restore automatically
+		const checkpoint = checkpoints.get(event.entryId);
+		if (!checkpoint) return;
+
+		const branch = await currentBranch();
+		if (branch !== checkpoint.branch) {
+			ctx.ui.notify(
+				`Checkpoint was created on ${checkpoint.branch}, but current branch is ${branch}; not restoring code state.`,
+				"warning",
+			);
 			return;
 		}
 
@@ -58,16 +113,11 @@ export default function (pi: ExtensionAPI) {
 		]);
 
 		if (choice?.startsWith("Yes")) {
-			await pi.exec("git", ["stash", "apply", ref]);
+			// First restore files to the full worktree snapshot, then restore the staged
+			// state without touching files. This preserves partial-staging boundaries.
+			await pi.exec("git", ["read-tree", "-u", "--reset", checkpoint.worktreeTree]);
+			await pi.exec("git", ["read-tree", "--reset", checkpoint.indexTree]);
 			ctx.ui.notify("Code restored to checkpoint", "info");
 		}
-	});
-
-	pi.on("agent_end", async () => {
-		// Clear checkpoints after agent completes
-
-		// TODO: BUG(3): User typically runs /fork after agent ends. Clearing
-		// checkpoints here empties the Map before session_before_fork fires.
-		checkpoints.clear();
 	});
 }
