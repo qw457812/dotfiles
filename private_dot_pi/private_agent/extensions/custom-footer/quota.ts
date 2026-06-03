@@ -470,7 +470,8 @@ const sources: Record<string, Source> = {
       return process.env.SYNTHETIC_API_KEY || null;
     },
     async fetch(apiKey: string): Promise<SyntheticQuota | null> {
-      return fetchJson<SyntheticQuota>("https://api.synthetic.new/v2/quotas", apiKey);
+      const data = await fetchJson<SyntheticQuota>("https://api.synthetic.new/v2/quotas", apiKey);
+      return data?.rollingFiveHourLimit ? data : null;
     },
     format(quota: SyntheticQuota, theme: Theme): string | null {
       const fiveHour = quota.rollingFiveHourLimit;

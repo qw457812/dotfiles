@@ -83,7 +83,7 @@ return {
           claude_code = function()
             return require("codecompanion.adapters").extend("claude_code", {
               env = (function()
-                local env = vim.deepcopy(U.ai.claude.provider.plan.synthetic)
+                local env = vim.deepcopy(U.ai.claude.provider.plan.glm)
                 for k, v in pairs(env) do
                   if v == "" then
                     env[k] = nil

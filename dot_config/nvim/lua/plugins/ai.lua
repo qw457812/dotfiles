@@ -143,7 +143,7 @@ return {
               -- "255b938c-0cb9-4858-83a0-6929fa42b927", -- specific session ID
               -- "--fork-session",
             }),
-            env = vim.deepcopy(U.ai.claude.provider.plan.synthetic),
+            env = vim.deepcopy(U.ai.claude.provider.plan.glm),
           },
         },
       },
@@ -161,7 +161,7 @@ return {
         ["<leader>ax"] = "codex",
         ["<leader>ao"] = "opencode",
         ["<leader>ai"] = "pi",
-        ["<leader>ag"] = "claude_glm",
+        -- ["<leader>ag"] = "claude_glm",
         ["<leader>at"] = "pi_tmp",
       }
       local favourite_tool = "pi"
@@ -252,12 +252,12 @@ return {
       numbered_tools({ name = "codex", count = 1 })
       numbered_tools({ name = "opencode", count = 1 })
       numbered_tools({ name = "pi" })
-      numbered_tools({
-        name = "claude_glm",
-        base_tool = "claude",
-        tool_opts = { env = vim.deepcopy(U.ai.claude.provider.plan.glm) },
-        count = 0,
-      })
+      -- numbered_tools({
+      --   name = "claude_glm",
+      --   base_tool = "claude",
+      --   tool_opts = { env = vim.deepcopy(U.ai.claude.provider.plan.glm) },
+      --   count = 0,
+      -- })
       numbered_tools({
         name = "pi_tmp",
         base_tool = "pi",
