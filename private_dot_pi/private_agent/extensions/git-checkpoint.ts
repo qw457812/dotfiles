@@ -7,39 +7,13 @@
  * and staged state to that snapshot.
  */
 
-import { stat, unlink } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-
-const MAX_UNTRACKED_FILE_SIZE = 10 * 1024 * 1024;
-const MAX_UNTRACKED_DIR_FILES = 200;
-const IGNORED_DIR_NAMES = new Set([
-	"node_modules",
-	".venv",
-	"venv",
-	"env",
-	".env",
-	"dist",
-	"build",
-	".pytest_cache",
-	".mypy_cache",
-	".cache",
-	".tox",
-	"__pycache__",
-]);
 
 interface Checkpoint {
 	branch: string;
 	indexTree: string;
 	worktreeTree: string;
 	preexistingUntrackedFiles: string[];
-	skippedLargeDirs: string[];
-}
-
-interface FilteredUntrackedFiles {
-	files: string[];
-	skippedLargeDirs: string[];
 }
 
 export default function (pi: ExtensionAPI) {
@@ -65,11 +39,6 @@ export default function (pi: ExtensionAPI) {
 			ctx.ui.notify("git-checkpoint disabled: not a git repository", "warning");
 	}
 
-	async function repoRoot(): Promise<string | undefined> {
-		const { stdout, code } = await pi.exec("git", ["rev-parse", "--show-toplevel"]);
-		return code === 0 ? stdout.trim() || undefined : undefined;
-	}
-
 	async function currentBranch(): Promise<string> {
 		const { stdout, code } = await pi.exec("git", ["rev-parse", "--abbrev-ref", "HEAD"]);
 		return code === 0 ? stdout.trim() || "unknown" : "unknown";
@@ -86,164 +55,49 @@ export default function (pi: ExtensionAPI) {
 		return stdout.split("\0").filter(Boolean);
 	}
 
-	async function listUntrackedDirs(): Promise<string[]> {
-		const { stdout, code } = await pi.exec("git", [
-			"status",
-			"--porcelain",
-			"-z",
-			"--untracked-files=normal",
-		]);
-		if (code !== 0 || !stdout) return [];
-		return stdout
-			.split("\0")
-			.filter((entry) => entry.startsWith("?? ") && entry.endsWith("/"))
-			.map((entry) => entry.slice(3, -1));
-	}
-
-	function shouldIgnoreForSnapshot(path: string): boolean {
-		return path.split(/[/\\]/).some((part) => IGNORED_DIR_NAMES.has(part));
-	}
-
-	function isPathWithin(path: string, dir: string): boolean {
-		if (!dir || dir === ".") return true;
-		return path === dir || path.startsWith(`${dir}/`);
-	}
-
-	function isPathWithinAny(path: string, dirs: Set<string>): boolean {
-		for (const dir of dirs) {
-			if (isPathWithin(path, dir)) return true;
-		}
-		return false;
-	}
-
-	function detectLargeDirs(files: string[], dirs: string[]): string[] {
-		const counts = new Map<string, number>();
-		for (const dir of dirs) counts.set(dir, 0);
-
-		for (const file of files) {
-			for (const dir of dirs) {
-				if (isPathWithin(file, dir)) counts.set(dir, (counts.get(dir) || 0) + 1);
-			}
-		}
-
-		return [...counts.entries()]
-			.filter(([, count]) => count >= MAX_UNTRACKED_DIR_FILES)
-			.map(([dir]) => dir);
-	}
-
-	async function filterUntrackedFiles(
-		root: string,
-		files: string[],
-		dirs: string[],
-	): Promise<FilteredUntrackedFiles> {
-		const skippedLargeDirs = detectLargeDirs(files, dirs);
-		const skippedLargeDirSet = new Set(skippedLargeDirs);
-		const filtered: string[] = [];
-
-		for (const file of files) {
-			if (shouldIgnoreForSnapshot(file)) continue;
-			if (isPathWithinAny(file, skippedLargeDirSet)) continue;
-
-			try {
-				const s = await stat(join(root, file));
-				if (s.isFile() && s.size > MAX_UNTRACKED_FILE_SIZE) continue;
-			} catch {
-				continue;
-			}
-
-			filtered.push(file);
-		}
-
-		return { files: filtered, skippedLargeDirs };
-	}
-
-	async function gitWithIndex(indexPath: string, args: string[]) {
-		return pi.exec("bash", [
-			"-c",
-			'idx="$1"; shift; GIT_INDEX_FILE="$idx" git "$@"',
-			"bash",
-			indexPath,
-			...args,
-		]);
-	}
-
 	async function createSnapshot(): Promise<Checkpoint | undefined> {
 		const [
 			{ stdout: indexTreeOut, code: indexCode },
 			branch,
-			root,
 			preexistingUntrackedFiles,
-			untrackedDirs,
 		] = await Promise.all([
 			pi.exec("git", ["write-tree"]),
 			currentBranch(),
-			repoRoot(),
 			listUntrackedFiles(),
-			listUntrackedDirs(),
 		]);
-		if (indexCode !== 0 || !root) return undefined;
-
-		const indexTree = indexTreeOut.trim();
-		if (!indexTree) return undefined;
-
-		const { files: untrackedFilesForSnapshot, skippedLargeDirs } =
-			await filterUntrackedFiles(root, preexistingUntrackedFiles, untrackedDirs);
+		if (indexCode !== 0) return undefined;
 
 		// Use a temporary index so snapshotting never touches the user's staged state.
-		// Start from the real index tree so staged additions are preserved, then add
-		// tracked worktree changes and filtered untracked files into the temp index.
-		const tmpIndex = join(
-			tmpdir(),
-			`pi-git-checkpoint-index-${process.pid}-${Date.now()}-${Math.random()
-				.toString(36)
-				.slice(2)}`,
-		);
+		// `pi.exec` does not support env overrides, so use a small shell wrapper for
+		// GIT_INDEX_FILE + cleanup.
+		const script = [
+			"set -e",
+			'idx="${TMPDIR:-/tmp}/pi-git-checkpoint-index.$$"',
+			'rm -f "$idx"',
+			'trap \'rm -f "$idx"\' EXIT',
+			'if git rev-parse --verify HEAD >/dev/null 2>&1; then',
+			'  GIT_INDEX_FILE="$idx" git read-tree HEAD',
+			"fi",
+			'GIT_INDEX_FILE="$idx" git add -A',
+			'GIT_INDEX_FILE="$idx" git write-tree',
+		].join("\n");
+		const { stdout: worktreeTreeOut, code: worktreeCode } = await pi.exec("bash", [
+			"-c",
+			script,
+		]);
+		if (worktreeCode !== 0) return undefined;
 
-		try {
-			let result = await gitWithIndex(tmpIndex, ["read-tree", indexTree]);
-			if (result.code !== 0) return undefined;
+		const indexTree = indexTreeOut.trim();
+		const worktreeTree = worktreeTreeOut.trim();
+		if (!indexTree || !worktreeTree) return undefined;
 
-			result = await gitWithIndex(tmpIndex, ["add", "-u"]);
-			if (result.code !== 0) return undefined;
-
-			const batchSize = 100;
-			for (let i = 0; i < untrackedFilesForSnapshot.length; i += batchSize) {
-				const batch = untrackedFilesForSnapshot.slice(i, i + batchSize);
-				result = await gitWithIndex(tmpIndex, ["add", "--", ...batch]);
-				if (result.code !== 0) return undefined;
-			}
-
-			const { stdout: worktreeTreeOut, code: worktreeCode } = await gitWithIndex(
-				tmpIndex,
-				["write-tree"],
-			);
-			if (worktreeCode !== 0) return undefined;
-
-			const worktreeTree = worktreeTreeOut.trim();
-			if (!worktreeTree) return undefined;
-
-			return {
-				branch,
-				indexTree,
-				worktreeTree,
-				preexistingUntrackedFiles,
-				skippedLargeDirs,
-			};
-		} finally {
-			await unlink(tmpIndex).catch(() => {});
-		}
+		return { branch, indexTree, worktreeTree, preexistingUntrackedFiles };
 	}
 
 	async function cleanNewUntrackedFiles(checkpoint: Checkpoint): Promise<void> {
 		const preexisting = new Set(checkpoint.preexistingUntrackedFiles);
-		const skippedLargeDirs = new Set(checkpoint.skippedLargeDirs);
 		const current = await listUntrackedFiles();
-		const toRemove = current.filter(
-			(path) =>
-				!preexisting.has(path) &&
-				!shouldIgnoreForSnapshot(path) &&
-				!isPathWithinAny(path, skippedLargeDirs),
-		);
+		const toRemove = current.filter((path) => !preexisting.has(path));
 		if (toRemove.length === 0) return;
 
 		const batchSize = 100;
