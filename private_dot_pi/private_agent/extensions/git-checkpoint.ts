@@ -13,6 +13,7 @@ interface Checkpoint {
 	branch: string;
 	indexTree: string;
 	worktreeTree: string;
+	preexistingUntrackedFiles: string[];
 }
 
 export default function (pi: ExtensionAPI) {
@@ -43,10 +44,26 @@ export default function (pi: ExtensionAPI) {
 		return code === 0 ? stdout.trim() || "unknown" : "unknown";
 	}
 
+	async function listUntrackedFiles(): Promise<string[]> {
+		const { stdout, code } = await pi.exec("git", [
+			"ls-files",
+			"--others",
+			"--exclude-standard",
+			"-z",
+		]);
+		if (code !== 0 || !stdout) return [];
+		return stdout.split("\0").filter(Boolean);
+	}
+
 	async function createSnapshot(): Promise<Checkpoint | undefined> {
-		const [{ stdout: indexTreeOut, code: indexCode }, branch] = await Promise.all([
+		const [
+			{ stdout: indexTreeOut, code: indexCode },
+			branch,
+			preexistingUntrackedFiles,
+		] = await Promise.all([
 			pi.exec("git", ["write-tree"]),
 			currentBranch(),
+			listUntrackedFiles(),
 		]);
 		if (indexCode !== 0) return undefined;
 
@@ -74,7 +91,20 @@ export default function (pi: ExtensionAPI) {
 		const worktreeTree = worktreeTreeOut.trim();
 		if (!indexTree || !worktreeTree) return undefined;
 
-		return { branch, indexTree, worktreeTree };
+		return { branch, indexTree, worktreeTree, preexistingUntrackedFiles };
+	}
+
+	async function cleanNewUntrackedFiles(checkpoint: Checkpoint): Promise<void> {
+		const preexisting = new Set(checkpoint.preexistingUntrackedFiles);
+		const current = await listUntrackedFiles();
+		const toRemove = current.filter((path) => !preexisting.has(path));
+		if (toRemove.length === 0) return;
+
+		const batchSize = 100;
+		for (let i = 0; i < toRemove.length; i += batchSize) {
+			const batch = toRemove.slice(i, i + batchSize);
+			await pi.exec("git", ["clean", "-f", "--", ...batch]);
+		}
 	}
 
 	pi.on("turn_end", async (_event, ctx) => {
@@ -113,9 +143,11 @@ export default function (pi: ExtensionAPI) {
 		]);
 
 		if (choice?.startsWith("Yes")) {
-			// First restore files to the full worktree snapshot, then restore the staged
-			// state without touching files. This preserves partial-staging boundaries.
+			// First restore files to the full worktree snapshot, clean untracked files
+			// created after the checkpoint, then restore the staged state without
+			// touching files. This preserves partial-staging boundaries.
 			await pi.exec("git", ["read-tree", "-u", "--reset", checkpoint.worktreeTree]);
+			await cleanNewUntrackedFiles(checkpoint);
 			await pi.exec("git", ["read-tree", "--reset", checkpoint.indexTree]);
 			ctx.ui.notify("Code restored to checkpoint", "info");
 		}
