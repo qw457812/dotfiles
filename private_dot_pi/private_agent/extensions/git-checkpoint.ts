@@ -9,6 +9,8 @@
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
+// Inspired by pi-rewind's temp-index snapshot + staged-state restore approach:
+// https://github.com/arpagon/pi-rewind/blob/91611ad87992fb7b635a41ba68f67916ff6e6ae3/src/core.ts
 interface Checkpoint {
   branch: string;
   indexTree: string;
@@ -21,6 +23,20 @@ export default function (pi: ExtensionAPI) {
   let gitDisabled = false;
   let gitChecked = false;
 
+  function errorMessage(error: unknown): string {
+    return error instanceof Error ? error.message : String(error);
+  }
+
+  async function execOrThrow(command: string, args: string[], action: string): Promise<string> {
+    const result = await pi.exec(command, args);
+    if (result.code !== 0) {
+      const details =
+        result.stderr.trim() || result.stdout.trim() || `${command} ${args.join(" ")}`;
+      throw new Error(`${action} failed: ${details}`);
+    }
+    return result.stdout;
+  }
+
   async function ensureGit(ctx: {
     hasUI: boolean;
     ui: { notify: (m: string, l: "info" | "warning" | "error") => void };
@@ -31,7 +47,7 @@ export default function (pi: ExtensionAPI) {
       const result = await pi.exec("git", ["rev-parse", "--git-dir"]);
       if (result.code === 0) return;
     } catch {
-      // handled below
+      // Boundary-safe probe: failed git detection disables this extension.
     }
 
     gitDisabled = true;
@@ -39,25 +55,43 @@ export default function (pi: ExtensionAPI) {
   }
 
   async function currentBranch(): Promise<string> {
-    const { stdout, code } = await pi.exec("git", ["rev-parse", "--abbrev-ref", "HEAD"]);
-    return code === 0 ? stdout.trim() || "unknown" : "unknown";
+    const symbolic = await pi.exec("git", ["symbolic-ref", "--quiet", "--short", "HEAD"]);
+    if (symbolic.code === 0) {
+      const branch = symbolic.stdout.trim();
+      if (!branch) throw new Error("read current branch failed: empty branch name");
+      return branch;
+    }
+
+    // `git symbolic-ref --quiet` uses exit code 1 for detached HEAD.
+    // Other non-zero codes are real command failures and should fail fast.
+    if (symbolic.code !== 1) {
+      const details =
+        symbolic.stderr.trim() || symbolic.stdout.trim() || "git symbolic-ref --quiet --short HEAD";
+      throw new Error(`read current branch failed: ${details}`);
+    }
+
+    const sha = (
+      await execOrThrow("git", ["rev-parse", "--verify", "HEAD"], "read detached HEAD")
+    ).trim();
+    if (!sha) throw new Error("read detached HEAD failed: empty commit id");
+    return `detached:${sha}`;
   }
 
   async function listUntrackedFiles(): Promise<string[]> {
-    const { stdout, code } = await pi.exec("git", [
-      "ls-files",
-      "--others",
-      "--exclude-standard",
-      "-z",
-    ]);
-    if (code !== 0 || !stdout) return [];
+    const stdout = await execOrThrow(
+      "git",
+      ["ls-files", "--others", "--exclude-standard", "-z"],
+      "list untracked files",
+    );
     return stdout.split("\0").filter(Boolean);
   }
 
-  async function createSnapshot(): Promise<Checkpoint | undefined> {
-    const [{ stdout: indexTreeOut, code: indexCode }, branch, preexistingUntrackedFiles] =
-      await Promise.all([pi.exec("git", ["write-tree"]), currentBranch(), listUntrackedFiles()]);
-    if (indexCode !== 0) return undefined;
+  async function createSnapshot(): Promise<Checkpoint> {
+    const [indexTreeOut, branch, preexistingUntrackedFiles] = await Promise.all([
+      execOrThrow("git", ["write-tree"], "create index snapshot"),
+      currentBranch(),
+      listUntrackedFiles(),
+    ]);
 
     // Use a temporary index so snapshotting never touches the user's staged state.
     // `pi.exec` does not support env overrides, so use a small shell wrapper for
@@ -73,26 +107,38 @@ export default function (pi: ExtensionAPI) {
       'GIT_INDEX_FILE="$idx" git add -A',
       'GIT_INDEX_FILE="$idx" git write-tree',
     ].join("\n");
-    const { stdout: worktreeTreeOut, code: worktreeCode } = await pi.exec("bash", ["-c", script]);
-    if (worktreeCode !== 0) return undefined;
+    const worktreeTreeOut = await execOrThrow("bash", ["-c", script], "create worktree snapshot");
 
     const indexTree = indexTreeOut.trim();
     const worktreeTree = worktreeTreeOut.trim();
-    if (!indexTree || !worktreeTree) return undefined;
+    if (!indexTree) throw new Error("create index snapshot failed: empty tree id");
+    if (!worktreeTree) throw new Error("create worktree snapshot failed: empty tree id");
 
     return { branch, indexTree, worktreeTree, preexistingUntrackedFiles };
   }
 
+  function literalPathspec(path: string): string {
+    return `:(literal)${path}`;
+  }
+
   async function cleanNewUntrackedFiles(checkpoint: Checkpoint): Promise<void> {
     const preexisting = new Set(checkpoint.preexistingUntrackedFiles);
-    const current = await listUntrackedFiles();
-    const toRemove = current.filter((path) => !preexisting.has(path));
+    const toRemove = (await listUntrackedFiles()).filter((path) => !preexisting.has(path));
     if (toRemove.length === 0) return;
 
     const batchSize = 100;
     for (let i = 0; i < toRemove.length; i += batchSize) {
-      const batch = toRemove.slice(i, i + batchSize);
-      await pi.exec("git", ["clean", "-f", "--", ...batch]);
+      await execOrThrow(
+        "git",
+        ["clean", "-ff", "--", ...toRemove.slice(i, i + batchSize).map(literalPathspec)],
+        "clean new untracked files",
+      );
+    }
+
+    const remaining = new Set(await listUntrackedFiles());
+    const failed = toRemove.filter((path) => remaining.has(path));
+    if (failed.length > 0) {
+      throw new Error(`clean new untracked files failed: still present: ${failed.join(", ")}`);
     }
   }
 
@@ -104,20 +150,34 @@ export default function (pi: ExtensionAPI) {
     if (!leaf) return;
 
     try {
-      const checkpoint = await createSnapshot();
-      if (checkpoint) checkpoints.set(leaf.id, checkpoint);
-    } catch {
-      // snapshot failure is non-fatal; skip this turn
+      checkpoints.set(leaf.id, await createSnapshot());
+    } catch (error) {
+      // Event boundary: checkpoint failure is non-fatal, but should be visible.
+      if (ctx.hasUI)
+        ctx.ui.notify(`git-checkpoint snapshot failed: ${errorMessage(error)}`, "warning");
     }
   });
 
   pi.on("session_before_fork", async (event, ctx) => {
     if (!ctx.hasUI) return;
 
-    const checkpoint = checkpoints.get(event.entryId);
+    const targetEntryId =
+      event.position === "before"
+        ? ctx.sessionManager.getEntry(event.entryId)?.parentId
+        : event.entryId;
+    if (!targetEntryId) return;
+
+    const checkpoint = checkpoints.get(targetEntryId);
     if (!checkpoint) return;
 
-    const branch = await currentBranch();
+    let branch: string;
+    try {
+      branch = await currentBranch();
+    } catch (error) {
+      ctx.ui.notify(`git-checkpoint restore unavailable: ${errorMessage(error)}`, "error");
+      return;
+    }
+
     if (branch !== checkpoint.branch) {
       ctx.ui.notify(
         `Checkpoint was created on ${checkpoint.branch}, but current branch is ${branch}; not restoring code state.`,
@@ -132,13 +192,23 @@ export default function (pi: ExtensionAPI) {
     ]);
 
     if (choice?.startsWith("Yes")) {
-      // First restore files to the full worktree snapshot, clean untracked files
-      // created after the checkpoint, then restore the staged state without
-      // touching files. This preserves partial-staging boundaries.
-      await pi.exec("git", ["read-tree", "-u", "--reset", checkpoint.worktreeTree]);
-      await cleanNewUntrackedFiles(checkpoint);
-      await pi.exec("git", ["read-tree", "--reset", checkpoint.indexTree]);
-      ctx.ui.notify("Code restored to checkpoint", "info");
+      try {
+        // Fail fast: clean before changing the index, then only restore the
+        // checkpoint index after the worktree restore succeeds.
+        await cleanNewUntrackedFiles(checkpoint);
+        await execOrThrow(
+          "git",
+          ["read-tree", "-u", "--reset", checkpoint.worktreeTree],
+          "restore worktree",
+        );
+        await execOrThrow("git", ["read-tree", "--reset", checkpoint.indexTree], "restore index");
+        ctx.ui.notify("Code restored to checkpoint", "info");
+      } catch (error) {
+        // Event boundary: translate restore failure into a visible error and
+        // cancel the fork so conversation and code state do not diverge.
+        ctx.ui.notify(`git-checkpoint restore failed: ${errorMessage(error)}`, "error");
+        return { cancel: true };
+      }
     }
   });
 }
