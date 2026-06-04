@@ -1,10 +1,10 @@
 /**
  * Git Checkpoint Extension
  *
- * Snapshots the working tree (including untracked files) at each turn_end
- * via `git write-tree`, keyed by the leaf session entryId (the just-finished
- * assistant message). On /fork, prompts the user to restore the working tree
- * and staged state to that snapshot.
+ * Snapshots the working tree (including untracked files) at each agent_end
+ * via `git write-tree`, keyed by the leaf session entryId for the completed
+ * user prompt. On /fork, prompts the user to restore the working tree and
+ * staged state to that snapshot.
  */
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
@@ -154,7 +154,7 @@ export default function (pi: ExtensionAPI) {
     await execOrThrow("git", ["read-tree", "--reset", checkpoint.indexTree], "restore index");
   }
 
-  pi.on("turn_end", async (_event, ctx) => {
+  pi.on("agent_end", async (_event, ctx) => {
     await ensureGit(ctx);
     if (gitDisabled) return;
 
