@@ -7,7 +7,7 @@
  * staged state to that snapshot.
  */
 
-import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 
 // Inspired by pi-rewind's temp-index snapshot + staged-state restore approach:
 // https://github.com/arpagon/pi-rewind/blob/91611ad87992fb7b635a41ba68f67916ff6e6ae3/src/core.ts
@@ -19,9 +19,8 @@ interface Checkpoint {
 }
 
 export default function (pi: ExtensionAPI) {
+  let isGitRepo = false;
   const checkpoints = new Map<string, Checkpoint>();
-  let gitDisabled = false;
-  let gitChecked = false;
 
   function errorMessage(error: unknown): string {
     return error instanceof Error ? error.message : String(error);
@@ -37,21 +36,17 @@ export default function (pi: ExtensionAPI) {
     return result.stdout;
   }
 
-  async function ensureGit(ctx: {
-    hasUI: boolean;
-    ui: { notify: (m: string, l: "info" | "warning" | "error") => void };
-  }) {
-    if (gitChecked) return;
-    gitChecked = true;
+  async function checkGitRepo(ctx: ExtensionContext) {
     try {
       const result = await pi.exec("git", ["rev-parse", "--git-dir"]);
-      if (result.code === 0) return;
+      isGitRepo = result.code === 0;
     } catch {
-      // Boundary-safe probe: failed git detection disables this extension.
+      isGitRepo = false;
     }
 
-    gitDisabled = true;
-    if (ctx.hasUI) ctx.ui.notify("git-checkpoint disabled: not a git repository", "warning");
+    if (!isGitRepo && ctx.hasUI) {
+      ctx.ui.notify("git-checkpoint disabled: not a git repository", "warning");
+    }
   }
 
   async function currentBranch(): Promise<string> {
@@ -154,9 +149,12 @@ export default function (pi: ExtensionAPI) {
     await execOrThrow("git", ["read-tree", "--reset", checkpoint.indexTree], "restore index");
   }
 
+  pi.on("session_start", async (_event, ctx) => {
+    await checkGitRepo(ctx);
+  });
+
   pi.on("agent_end", async (_event, ctx) => {
-    await ensureGit(ctx);
-    if (gitDisabled) return;
+    if (!isGitRepo) return;
 
     const leaf = ctx.sessionManager.getLeafEntry();
     if (!leaf) return;
