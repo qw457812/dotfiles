@@ -142,6 +142,18 @@ export default function (pi: ExtensionAPI) {
     }
   }
 
+  async function restoreCheckpoint(checkpoint: Checkpoint): Promise<void> {
+    // Fail fast: clean before changing the index, then only restore the
+    // checkpoint index after the worktree restore succeeds.
+    await cleanNewUntrackedFiles(checkpoint);
+    await execOrThrow(
+      "git",
+      ["read-tree", "-u", "--reset", checkpoint.worktreeTree],
+      "restore worktree",
+    );
+    await execOrThrow("git", ["read-tree", "--reset", checkpoint.indexTree], "restore index");
+  }
+
   pi.on("turn_end", async (_event, ctx) => {
     await ensureGit(ctx);
     if (gitDisabled) return;
@@ -207,24 +219,16 @@ export default function (pi: ExtensionAPI) {
       "No, keep current code",
     ]);
 
-    if (choice?.startsWith("Yes")) {
-      try {
-        // Fail fast: clean before changing the index, then only restore the
-        // checkpoint index after the worktree restore succeeds.
-        await cleanNewUntrackedFiles(checkpoint);
-        await execOrThrow(
-          "git",
-          ["read-tree", "-u", "--reset", checkpoint.worktreeTree],
-          "restore worktree",
-        );
-        await execOrThrow("git", ["read-tree", "--reset", checkpoint.indexTree], "restore index");
-        ctx.ui.notify("Code restored to checkpoint", "info");
-      } catch (error) {
-        // Event boundary: translate restore failure into a visible error and
-        // cancel the fork so conversation and code state do not diverge.
-        ctx.ui.notify(`git-checkpoint restore failed: ${errorMessage(error)}`, "error");
-        return { cancel: true };
-      }
+    if (!choice?.startsWith("Yes")) return;
+
+    try {
+      await restoreCheckpoint(checkpoint);
+      ctx.ui.notify("Code restored to checkpoint", "info");
+    } catch (error) {
+      // Event boundary: translate restore failure into a visible error and
+      // cancel the fork so conversation and code state do not diverge.
+      ctx.ui.notify(`git-checkpoint restore failed: ${errorMessage(error)}`, "error");
+      return { cancel: true };
     }
   });
 }
