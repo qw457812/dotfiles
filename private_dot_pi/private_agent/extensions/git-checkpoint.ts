@@ -161,14 +161,30 @@ export default function (pi: ExtensionAPI) {
   pi.on("session_before_fork", async (event, ctx) => {
     if (!ctx.hasUI) return;
 
-    const targetEntryId =
-      event.position === "before"
-        ? ctx.sessionManager.getEntry(event.entryId)?.parentId
-        : event.entryId;
+    const entry = ctx.sessionManager.getEntry(event.entryId);
+    const startId = event.position === "before" ? (entry?.parentId ?? undefined) : event.entryId;
+
+    // Walk up from startId only across non-message metadata/custom entries.
+    // /fork selects user messages, and their parent may be a custom/stat entry
+    // after the previous assistant message where the checkpoint was saved.
+    // Do not cross real context entries without a checkpoint: that would
+    // restore an older code state than the conversation fork point.
+    let targetEntryId: string | undefined;
+    let walkId: string | undefined = startId;
+    while (walkId) {
+      if (checkpoints.has(walkId)) {
+        targetEntryId = walkId;
+        break;
+      }
+
+      const e = ctx.sessionManager.getEntry(walkId);
+      if (!e || e.type === "message" || e.type === "custom_message") break;
+      walkId = e.parentId ?? undefined;
+    }
+
     if (!targetEntryId) return;
 
-    const checkpoint = checkpoints.get(targetEntryId);
-    if (!checkpoint) return;
+    const checkpoint = checkpoints.get(targetEntryId)!;
 
     let branch: string;
     try {
