@@ -87,7 +87,6 @@ interface DeepSeekQuota {
 }
 
 // Xiaomi MiMo pay-as-you-go
-// Ref: https://github.com/steipete/CodexBar/blob/ad33b32773bd6087cbb932ff60ae493008063cc4/Sources/CodexBarCore/Providers/MiMo/MiMoUsageFetcher.swift
 interface XiaomiQuota {
   code: number;
   data?: {
@@ -96,13 +95,8 @@ interface XiaomiQuota {
   };
 }
 
-// https://crof.ai/docs
 interface CrofQuota {
-  usable_requests: number | null;
-  requests_plan: number | null;
   credits: number;
-  /** Reset time (epoch ms) computed at fetch time, cached alongside the quota for consistency. */
-  reset_at: number;
 }
 
 interface SmartaipiQuota {
@@ -232,56 +226,6 @@ function joinParts(
 ): string | null {
   const filtered = parts.filter((part): part is string => Boolean(part));
   return filtered.length > 0 ? filtered.join(separator) : null;
-}
-
-let _chicagoFormatter: Intl.DateTimeFormat | undefined;
-
-/**
- * Return the next midnight in America/Chicago.
- * CDT (summer) → 05:00 UTC; CST (winter) → 06:00 UTC.
- */
-function nextChicagoMidnight(after = new Date()): Date {
-  _chicagoFormatter ??= new Intl.DateTimeFormat("en-US", {
-    timeZone: "America/Chicago",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-    hourCycle: "h23",
-  });
-  const fmt = _chicagoFormatter;
-
-  function getPart(parts: Intl.DateTimeFormatPart[], type: string): number {
-    const part = parts.find((p) => p.type === type);
-    if (!part) throw new Error(`Missing ${type} part from DateTimeFormat`);
-    return parseInt(part.value, 10);
-  }
-
-  const parts = fmt.formatToParts(after);
-  const year = getPart(parts, "year");
-  const month = getPart(parts, "month");
-  const day = getPart(parts, "day");
-
-  // Always target the upcoming midnight; if we're exactly at 00:00:00 the
-  // "next" reset is still 24h away.
-  const nextDay = day + 1;
-
-  // America/Chicago alternates between CST (UTC-6) and CDT (UTC-5);
-  // one of [6, 5] always maps to Chicago midnight.
-  const utcHour = ([6, 5] as const).find((h) => {
-    const candidate = new Date(Date.UTC(year, month - 1, nextDay, h, 0, 0));
-    return getPart(fmt.formatToParts(candidate), "hour") === 0;
-  });
-  if (utcHour == null) {
-    throw new Error(
-      `Failed to compute Chicago midnight: no UTC-5/UTC-6 match for ${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`,
-    );
-  }
-
-  return new Date(Date.UTC(year, month - 1, nextDay, utcHour, 0, 0));
 }
 
 function toLocalDayKey(d: Date): string {
@@ -596,6 +540,7 @@ const sources: Record<string, Source> = {
       return process.env.XIAOMI_MIMO_COOKIE || null;
     },
     async fetch(cookie: string): Promise<XiaomiQuota | null> {
+      // Ref: https://github.com/steipete/CodexBar/blob/ad33b32773bd6087cbb932ff60ae493008063cc4/Sources/CodexBarCore/Providers/MiMo/MiMoUsageFetcher.swift
       try {
         const resp = await fetch("https://platform.xiaomimimo.com/api/v1/balance", {
           signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
@@ -630,39 +575,10 @@ const sources: Record<string, Source> = {
       return process.env.CROFAI_API_KEY || null;
     },
     async fetch(apiKey: string): Promise<CrofQuota | null> {
-      const data = await fetchJson<
-        Pick<CrofQuota, "usable_requests" | "requests_plan" | "credits">
-      >("https://crof.ai/usage_api/", apiKey);
-      if (!data) return null;
-
-      // CrofAI daily requests reset at midnight Central time (America/Chicago)
-      // Ref: https://github.com/steipete/CodexBar/blob/3ee87432532ec917c78d6c7dd534b9eea045fa71/docs/crof.md?plain=1#L28
-      return { ...data, reset_at: nextChicagoMidnight().getTime() };
+      return fetchJson<CrofQuota>("https://crof.ai/usage_api/", apiKey);
     },
     format(quota: CrofQuota, theme: Theme): string | null {
-      const {
-        usable_requests: remaining,
-        requests_plan: limit,
-        credits,
-        reset_at: resetAt,
-      } = quota;
-
-      return joinParts(
-        [
-          remaining !== null
-            ? joinParts(
-                [
-                  theme.fg("accent", `${limit !== null ? limit - remaining : remaining}`),
-                  limit !== null ? theme.fg("dim", `${limit}`) : null,
-                  theme.fg("dim", `${formatRemaining(resetAt)}`),
-                ],
-                theme.fg("dim", "/"),
-              )
-            : null,
-          credits > 0 ? theme.fg("accent", `$${formatDecimal(credits, 2)}`) : null,
-        ],
-        " ",
-      );
+      return theme.fg("accent", `$${formatDecimal(quota.credits, 2)}`);
     },
   }),
   smartaipi: createSource("smartaipi", {

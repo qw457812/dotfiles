@@ -6,13 +6,13 @@ const ORDERED_LEVELS: ModelThinkingLevel[] = ["off", "minimal", "low", "medium",
 
 const MAX_LEVEL_PROVIDERS = new Set([
   "github-copilot",
-  "crofai",
   "zai",
-  "synthetic",
   "deepseek",
   "xiaomi",
   "neuralwatt",
+  "synthetic",
   "codebuddy",
+  "crofai",
   "makora",
 ]);
 

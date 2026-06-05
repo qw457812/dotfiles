@@ -16,11 +16,7 @@
     "neuralwatt/zai-org/GLM-5.1-FP8",
     "neuralwatt/moonshotai/Kimi-K2.6",
     "neuralwatt/glm-5.1-flex",
-    "neuralwatt/kimi-k2.6-flex",
-    "crofai/glm-5.1",
-    "crofai/kimi-k2.6",
-    "crofai/mimo-v2.5-pro",
-    "crofai/deepseek-v4-pro"
+    "neuralwatt/kimi-k2.6-flex"
   ],
   "packages": [
     "npm:pi-vim",
