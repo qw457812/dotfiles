@@ -152,7 +152,7 @@ function getCompactionInstructions(mode: LoopMode, condition?: string): string {
 }
 
 function updateStatus(ctx: ExtensionContext, state: LoopStateData): void {
-	if (!ctx.hasUI) return;
+	if (ctx.mode !== "tui") return;
 	if (!state.active || !state.mode) {
 		ctx.ui.setWidget("loop", undefined);
 		return;
@@ -368,7 +368,7 @@ export default function loopExtension(pi: ExtensionAPI): void {
 		handler: async (args, ctx) => {
 			let nextState = parseArgs(args);
 			if (!nextState) {
-				if (!ctx.hasUI) {
+				if (ctx.mode !== "tui") {
 					ctx.ui.notify("Usage: /loop tests | /loop custom <condition> | /loop self", "warning");
 					return;
 				}

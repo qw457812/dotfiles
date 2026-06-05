@@ -46,7 +46,7 @@ export default function (pi: ExtensionAPI) {
 	pi.registerCommand("files", {
 		description: "Show files read/written/edited in this session",
 		handler: async (_args, ctx) => {
-			if (!ctx.hasUI) {
+			if (ctx.mode !== "tui") {
 				ctx.ui.notify("No UI available", "error");
 				return;
 			}

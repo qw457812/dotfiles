@@ -661,7 +661,7 @@ export default function (pi: ExtensionAPI) {
 	}
 
 	async function ensureOverlay(ctx: ExtensionCommandContext | ExtensionContext): Promise<void> {
-		if (!ctx.hasUI) {
+		if (ctx.mode !== "tui") {
 			return;
 		}
 
