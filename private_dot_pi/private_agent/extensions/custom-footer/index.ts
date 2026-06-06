@@ -108,7 +108,12 @@ export default function (pi: ExtensionAPI) {
           const statsParts = [];
           if (totalInput) statsParts.push(`↑${formatTokens(totalInput)}`);
           if (totalOutput) statsParts.push(`↓${formatTokens(totalOutput)}`);
-          if (totalCacheRead) statsParts.push(`R${formatTokens(totalCacheRead)}`);
+          if (totalCacheRead) {
+            const cacheHitRate = totalCacheRead / (totalCacheRead + totalInput + totalCacheWrite);
+            statsParts.push(
+              `R${formatTokens(totalCacheRead)}(${formatDecimal(cacheHitRate * 100, 0)}%)`,
+            );
+          }
           if (totalCacheWrite) statsParts.push(`W${formatTokens(totalCacheWrite)}`);
 
           // Cost (without "(sub)" indicator - not accessible from extension)
