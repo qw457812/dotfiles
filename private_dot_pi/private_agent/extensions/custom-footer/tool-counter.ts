@@ -36,7 +36,7 @@ export function createToolCounter(): ToolCounterTracker {
           if (error > 0) parts.push(theme.fg("error", `${error}`));
           return parts.join(" ");
         })
-        .join(theme.fg("dim", " | "));
+        .join(" ");
     },
   };
 }

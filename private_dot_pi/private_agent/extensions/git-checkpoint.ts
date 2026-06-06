@@ -5,6 +5,8 @@
  * via `git write-tree`, keyed by the leaf session entryId for the completed
  * user prompt. On /fork, prompts the user to restore the working tree and
  * staged state to that snapshot.
+ *
+ * TODO: See also: https://github.com/nicobailon/pi-rewind-hook
  */
 
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
@@ -112,10 +114,6 @@ export default function (pi: ExtensionAPI) {
     return { branch, indexTree, worktreeTree, preexistingUntrackedFiles };
   }
 
-  function literalPathspec(path: string): string {
-    return `:(literal)${path}`;
-  }
-
   async function cleanNewUntrackedFiles(checkpoint: Checkpoint): Promise<void> {
     const preexisting = new Set(checkpoint.preexistingUntrackedFiles);
     const toRemove = (await listUntrackedFiles()).filter((path) => !preexisting.has(path));
@@ -125,7 +123,7 @@ export default function (pi: ExtensionAPI) {
     for (let i = 0; i < toRemove.length; i += batchSize) {
       await execOrThrow(
         "git",
-        ["clean", "-ff", "--", ...toRemove.slice(i, i + batchSize).map(literalPathspec)],
+        ["clean", "-ff", "--", ...toRemove.slice(i, i + batchSize).map((p) => `:(literal)${p}`)],
         "clean new untracked files",
       );
     }

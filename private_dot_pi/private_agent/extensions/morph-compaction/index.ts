@@ -44,8 +44,7 @@ function loadApiKey(): string | undefined {
 }
 
 function loadMorphCompactDefault(): boolean {
-  const value = process.env[MORPH_COMPACT_ENV]?.trim().toLowerCase();
-  return value === "1" || value === "true" || value === "yes" || value === "on";
+  return process.env[MORPH_COMPACT_ENV]?.trim() === "1";
 }
 
 const MORPH_COMPACT_COMPLETIONS = [
@@ -65,16 +64,8 @@ function parseEnabledArg(args: string | undefined): boolean | "status" | undefin
   const arg = args?.trim().split(/\s+/)[0]?.toLowerCase();
   switch (arg) {
     case "on":
-    case "enable":
-    case "enabled":
-    case "true":
-    case "1":
       return true;
     case "off":
-    case "disable":
-    case "disabled":
-    case "false":
-    case "0":
       return false;
     case "":
     case undefined:

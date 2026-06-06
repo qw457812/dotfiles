@@ -362,16 +362,6 @@ export default async function (pi: ExtensionAPI) {
         lines[i] = (i === 1 ? renderedPrefix : CONTINUATION_PREFIX) + lines[i]!;
       }
 
-      // // Related upstream logic:
-      // // - https://github.com/badlogic/pi-mono/blob/a1e107897d56292d987cecb5816979acae6fc6aa/packages/tui/src/components/editor.ts#L514-L522
-      // //
-      // // Editor.render() appends autocomplete rows after the bottom border. They
-      // // were rendered at the narrower body width above, so shift them into the
-      // // same gutter-aligned column as wrapped continuation lines.
-      // for (let i = bottomIdx + 1; i < lines.length; i++) {
-      //   lines[i] = CONTINUATION_PREFIX + lines[i]!;
-      // }
-
       this.renderCursor(lines, bottomIdx);
       return lines;
     }

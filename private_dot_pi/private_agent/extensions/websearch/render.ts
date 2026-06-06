@@ -46,12 +46,6 @@ interface WebsearchCallArgs {
 // ---------------------------------------------------------------------------
 
 export function providerLabel(provider: WebSearchProvider): string {
-  if (provider === "parallel") return "Parallel Web Search";
-  if (provider === "exa") return "Exa Web Search";
-  return "Web Search";
-}
-
-export function providerShortLabel(provider: WebSearchProvider): string {
   if (provider === "parallel") return "Parallel";
   if (provider === "exa") return "Exa";
   return "Web";
@@ -78,7 +72,7 @@ export function formatWebsearchCall(
   let text = theme.fg("toolTitle", theme.bold("websearch "));
   text += args?.query ? theme.fg("accent", `"${args.query}"`) : invalidArg;
   if (provider) {
-    text += theme.fg("muted", ` [${providerShortLabel(provider)}]`);
+    text += theme.fg("muted", ` [${providerLabel(provider)}]`);
   }
   // Show non-default parameters (mirrors read's offset/limit, grep's glob/limit)
   const extras: string[] = [];
@@ -152,7 +146,7 @@ export function rebuildWebsearchResultRenderComponent(
     return;
   }
 
-  const label = providerShortLabel(details.provider);
+  const label = providerLabel(details.provider);
 
   if (isError) {
     let text = theme.fg("error", `✗ ${label}`);

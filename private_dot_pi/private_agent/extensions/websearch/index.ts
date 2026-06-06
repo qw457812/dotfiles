@@ -41,7 +41,6 @@ import type { McpCallResult } from "./mcp-client";
 import {
   formatWebsearchCall,
   providerLabel,
-  providerShortLabel,
   rebuildWebsearchResultRenderComponent,
   WebsearchResultRenderComponent,
   type WebsearchDetails,
@@ -185,12 +184,10 @@ export default function (pi: ExtensionAPI) {
       const modelName = model?.id ? model.id.slice(0, 100) : undefined;
 
       const provider = selectProvider(sessionID);
-      const title = providerLabel(provider);
+      const label = providerLabel(provider);
 
       onUpdate?.({
-        content: [
-          { type: "text" as const, text: `Searching via ${providerShortLabel(provider)}...` },
-        ],
+        content: [{ type: "text" as const, text: `Searching via ${label}...` }],
         details: { provider },
       });
 
@@ -213,7 +210,7 @@ export default function (pi: ExtensionAPI) {
           mcpResult = await callParallel(searchParams, callCtx);
         }
       } catch (err: any) {
-        throw new Error(`WebSearch (${title}) failed: ${err.message}`, { cause: err });
+        throw new Error(`WebSearch (${label}) failed: ${err.message}`, { cause: err });
       }
 
       // MCP spec: isError results are returned (not thrown) so the LLM can
