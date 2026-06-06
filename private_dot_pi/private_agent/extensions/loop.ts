@@ -36,7 +36,10 @@ const LOOP_PRESETS = [
 
 const LOOP_STATE_ENTRY = "loop-state";
 
-const HAIKU_MODEL_ID = "claude-haiku-4-5";
+const SUMMARY_FALLBACK_MODELS: Array<{ provider: string; modelId: string }> = [
+	{ provider: "anthropic", modelId: "claude-haiku-4-5" },
+	{ provider: "deepseek", modelId: "deepseek-v4-flash" },
+];
 
 const SUMMARY_SYSTEM_PROMPT = `You summarize loop breakout conditions for a status widget.
 Return a concise phrase (max 6 words) that says when the loop should stop.
@@ -94,14 +97,14 @@ async function selectSummaryModel(
 ): Promise<{ model: Model<Api>; apiKey?: string; headers?: Record<string, string> } | null> {
 	if (!ctx.model) return null;
 
-	if (ctx.model.provider === "anthropic") {
-		const haikuModel = ctx.modelRegistry.find("anthropic", HAIKU_MODEL_ID);
-		if (haikuModel) {
-			const auth = await ctx.modelRegistry.getApiKeyAndHeaders(haikuModel);
-			if (auth.ok) {
-				return { model: haikuModel, apiKey: auth.apiKey, headers: auth.headers };
-			}
-		}
+	for (const { provider, modelId } of SUMMARY_FALLBACK_MODELS) {
+		const model = ctx.modelRegistry.find(provider, modelId);
+		if (!model) continue;
+
+		const auth = await ctx.modelRegistry.getApiKeyAndHeaders(model);
+		if (!auth.ok || !auth.apiKey) continue;
+
+		return { model, apiKey: auth.apiKey, headers: auth.headers };
 	}
 
 	const auth = await ctx.modelRegistry.getApiKeyAndHeaders(ctx.model);
