@@ -367,6 +367,64 @@ export default function (pi: ExtensionAPI) {
 		ctx.ui.setStatus("sandbox", ctx.ui.theme.fg("dim", `󰌾 ${networkCount}/${writeCount}`));
 	}
 
+	async function initializeSandbox(
+		ctx: ExtensionContext,
+		{
+			respectConfigEnabled = true,
+		}: {
+			respectConfigEnabled?: boolean;
+		} = {},
+	): Promise<boolean> {
+		if (platform !== "darwin" && platform !== "linux") {
+			sandboxEnabled = false;
+			sandboxInitialized = false;
+			updateSandboxStatus(ctx);
+			ctx.ui.notify(`Sandbox not supported on ${platform}`, "warning");
+			return false;
+		}
+
+		const config = withWorktreeMainRepoGitWriteAccess(loadConfig(ctx.cwd), ctx.cwd);
+		if (respectConfigEnabled && !config.enabled) {
+			sandboxEnabled = false;
+			sandboxInitialized = false;
+			updateSandboxStatus(ctx);
+			ctx.ui.notify("Sandbox disabled via config", "info");
+			return false;
+		}
+
+		try {
+			const configExt = config as unknown as {
+				ignoreViolations?: Record<string, string[]>;
+				enableWeakerNestedSandbox?: boolean;
+				enableWeakerNetworkIsolation?: boolean;
+			};
+
+			const askCallback = createAskCallback(pi, ctx);
+
+			await SandboxManager.initialize(
+				{
+					network: config.network,
+					filesystem: config.filesystem,
+					ignoreViolations: configExt.ignoreViolations,
+					enableWeakerNestedSandbox: configExt.enableWeakerNestedSandbox,
+					enableWeakerNetworkIsolation: configExt.enableWeakerNetworkIsolation,
+				},
+				askCallback,
+			);
+
+			sandboxEnabled = true;
+			sandboxInitialized = true;
+			updateSandboxStatus(ctx);
+			return true;
+		} catch (err) {
+			sandboxEnabled = false;
+			sandboxInitialized = false;
+			updateSandboxStatus(ctx);
+			ctx.ui.notify(`Sandbox initialization failed: ${err instanceof Error ? err.message : err}`, "error");
+			return false;
+		}
+	}
+
 	pi.registerTool({
 		...localBash,
 		label: "bash (sandboxed)",
@@ -392,53 +450,14 @@ export default function (pi: ExtensionAPI) {
 
 		if (noSandbox) {
 			sandboxEnabled = false;
+			sandboxInitialized = false;
+			updateSandboxStatus(ctx);
 			ctx.ui.notify("Sandbox disabled via --no-sandbox", "warning");
 			return;
 		}
 
-		const config = withWorktreeMainRepoGitWriteAccess(loadConfig(ctx.cwd), ctx.cwd);
-
-		if (!config.enabled) {
-			sandboxEnabled = false;
-			ctx.ui.notify("Sandbox disabled via config", "info");
-			return;
-		}
-
-		if (platform !== "darwin" && platform !== "linux") {
-			sandboxEnabled = false;
-			ctx.ui.notify(`Sandbox not supported on ${platform}`, "warning");
-			return;
-		}
-
-		try {
-			const configExt = config as unknown as {
-				ignoreViolations?: Record<string, string[]>;
-				enableWeakerNestedSandbox?: boolean;
-				enableWeakerNetworkIsolation?: boolean;
-			};
-
-			// Create ask callback for network permission prompts
-			const askCallback = createAskCallback(pi, ctx);
-
-			await SandboxManager.initialize(
-				{
-					network: config.network,
-					filesystem: config.filesystem,
-					ignoreViolations: configExt.ignoreViolations,
-					enableWeakerNestedSandbox: configExt.enableWeakerNestedSandbox,
-					enableWeakerNetworkIsolation: configExt.enableWeakerNetworkIsolation,
-				},
-				askCallback,
-			);
-
-			sandboxEnabled = true;
-			sandboxInitialized = true;
-
-			updateSandboxStatus(ctx);
+		if (await initializeSandbox(ctx)) {
 			ctx.ui.notify("Sandbox initialized", "info");
-		} catch (err) {
-			sandboxEnabled = false;
-			ctx.ui.notify(`Sandbox initialization failed: ${err instanceof Error ? err.message : err}`, "error");
 		}
 	});
 
@@ -450,6 +469,9 @@ export default function (pi: ExtensionAPI) {
 				// Ignore cleanup errors
 			}
 		}
+
+		sandboxEnabled = false;
+		sandboxInitialized = false;
 
 		// Clear session state
 		sessionAllowedDomains.clear();
@@ -467,21 +489,19 @@ export default function (pi: ExtensionAPI) {
 			const arg = args.trim().toLowerCase();
 
 			if (arg === "on") {
-				if (platform !== "darwin" && platform !== "linux") {
-					ctx.ui.notify(`Sandbox not supported on ${platform}`, "warning");
-					return;
-				}
-				if (!sandboxInitialized) {
-					ctx.ui.notify("Sandbox was not initialized — cannot enable", "error");
-					return;
-				}
 				if (sandboxEnabled) {
 					ctx.ui.notify("Sandbox is already enabled", "info");
 					return;
 				}
-				sandboxEnabled = true;
-				updateSandboxStatus(ctx);
-				ctx.ui.notify("Sandbox enabled", "info");
+				if (sandboxInitialized) {
+					sandboxEnabled = true;
+					updateSandboxStatus(ctx);
+					ctx.ui.notify("Sandbox enabled", "info");
+					return;
+				}
+				if (await initializeSandbox(ctx, { respectConfigEnabled: false })) {
+					ctx.ui.notify("Sandbox enabled", "info");
+				}
 				return;
 			}
 
