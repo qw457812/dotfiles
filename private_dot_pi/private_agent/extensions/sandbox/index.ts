@@ -11,10 +11,9 @@
 // 1. Ask the user after a sandbox violation (with an option to remember for the session)
 //    - Re-run unsandboxed commands
 //    - Re-run sandboxed commands with updated SandboxConfig
-// 2. Toggle sandbox via `/sandbox [on|off]`
-// 3. Show the count of sandbox violations via `ctx.ui.setStatus`
-// 4. Use `filesystem.allowRead` to selectively re-allow reads within denyRead regions
-// 5. Use [vercel-labs/just-bash](https://github.com/vercel-labs/just-bash) on Termux (Android)
+// 2. Show the count of sandbox violations via `ctx.ui.setStatus`
+// 3. Use `filesystem.allowRead` to selectively re-allow reads within denyRead regions
+// 4. Use [vercel-labs/just-bash](https://github.com/vercel-labs/just-bash) on Termux (Android)
 //    where @anthropic-ai/sandbox-runtime is not supported
 //
 // Ref:
@@ -349,11 +348,24 @@ export default function (pi: ExtensionAPI) {
 		default: false,
 	});
 
+	const platform = process.platform;
 	const localCwd = process.cwd();
 	const localBash = createBashTool(localCwd);
 
 	let sandboxEnabled = false;
 	let sandboxInitialized = false;
+
+	function updateSandboxStatus(ctx: ExtensionContext) {
+		if (!ctx.hasUI) return;
+		if (!sandboxEnabled) {
+			ctx.ui.setStatus("sandbox", undefined);
+			return;
+		}
+		const config = SandboxManager.getConfig();
+		const networkCount = config?.network?.allowedDomains?.length ?? 0;
+		const writeCount = config?.filesystem?.allowWrite?.length ?? 0;
+		ctx.ui.setStatus("sandbox", ctx.ui.theme.fg("dim", `󰌾 ${networkCount}/${writeCount}`));
+	}
 
 	pi.registerTool({
 		...localBash,
@@ -392,7 +404,6 @@ export default function (pi: ExtensionAPI) {
 			return;
 		}
 
-		const platform = process.platform;
 		if (platform !== "darwin" && platform !== "linux") {
 			sandboxEnabled = false;
 			ctx.ui.notify(`Sandbox not supported on ${platform}`, "warning");
@@ -423,9 +434,7 @@ export default function (pi: ExtensionAPI) {
 			sandboxEnabled = true;
 			sandboxInitialized = true;
 
-			const networkCount = config.network?.allowedDomains?.length ?? 0;
-			const writeCount = config.filesystem?.allowWrite?.length ?? 0;
-			ctx.ui.setStatus("sandbox", ctx.ui.theme.fg("dim", `󰌾 ${networkCount}/${writeCount}`));
+			updateSandboxStatus(ctx);
 			ctx.ui.notify("Sandbox initialized", "info");
 		} catch (err) {
 			sandboxEnabled = false;
@@ -447,28 +456,72 @@ export default function (pi: ExtensionAPI) {
 	});
 
 	pi.registerCommand("sandbox", {
-		description: "Show sandbox configuration",
-		handler: async (_args, ctx) => {
-			if (!sandboxEnabled) {
-				ctx.ui.notify("Sandbox is disabled", "info");
+		description: "Show sandbox configuration or toggle (/sandbox [on|off])",
+		getArgumentCompletions(prefix: string) {
+			const items = ["on", "off"]
+				.filter((item) => item.startsWith(prefix.trimStart().toLowerCase()))
+				.map((item) => ({ value: item, label: item }));
+			return items.length > 0 ? items : null;
+		},
+		handler: async (args, ctx) => {
+			const arg = args.trim().toLowerCase();
+
+			if (arg === "on") {
+				if (platform !== "darwin" && platform !== "linux") {
+					ctx.ui.notify(`Sandbox not supported on ${platform}`, "warning");
+					return;
+				}
+				if (!sandboxInitialized) {
+					ctx.ui.notify("Sandbox was not initialized — cannot enable", "error");
+					return;
+				}
+				if (sandboxEnabled) {
+					ctx.ui.notify("Sandbox is already enabled", "info");
+					return;
+				}
+				sandboxEnabled = true;
+				updateSandboxStatus(ctx);
+				ctx.ui.notify("Sandbox enabled", "info");
 				return;
 			}
 
-			const config = loadConfig(ctx.cwd);
-			const lines = [
-				"Sandbox Configuration:",
-				"",
-				"Network:",
-				`  Allowed: ${config.network?.allowedDomains?.join(", ") || "(none)"}`,
-				`  Denied: ${config.network?.deniedDomains?.join(", ") || "(none)"}`,
-				`  Session approved: ${Array.from(sessionAllowedDomains).join(", ") || "(none)"}`,
-				"",
-				"Filesystem:",
-				`  Deny Read: ${config.filesystem?.denyRead?.join(", ") || "(none)"}`,
-				`  Allow Write: ${config.filesystem?.allowWrite?.join(", ") || "(none)"}`,
-				`  Deny Write: ${config.filesystem?.denyWrite?.join(", ") || "(none)"}`,
-			];
-			ctx.ui.notify(lines.join("\n"), "info");
+			if (arg === "off") {
+				if (!sandboxEnabled) {
+					ctx.ui.notify("Sandbox is already disabled", "info");
+					return;
+				}
+				sandboxEnabled = false;
+				updateSandboxStatus(ctx);
+				ctx.ui.notify("Sandbox disabled", "warning");
+				return;
+			}
+
+			// No args — show status
+			if (!arg) {
+				if (!sandboxEnabled) {
+					ctx.ui.notify("Sandbox is disabled. Use `/sandbox on` to enable.", "info");
+					return;
+				}
+
+				const config = loadConfig(ctx.cwd);
+				const lines = [
+					"Sandbox: ENABLED",
+					"",
+					"Network:",
+					`  Allowed: ${config.network?.allowedDomains?.join(", ") || "(none)"}`,
+					`  Denied: ${config.network?.deniedDomains?.join(", ") || "(none)"}`,
+					`  Session approved: ${Array.from(sessionAllowedDomains).join(", ") || "(none)"}`,
+					"",
+					"Filesystem:",
+					`  Deny Read: ${config.filesystem?.denyRead?.join(", ") || "(none)"}`,
+					`  Allow Write: ${config.filesystem?.allowWrite?.join(", ") || "(none)"}`,
+					`  Deny Write: ${config.filesystem?.denyWrite?.join(", ") || "(none)"}`,
+				];
+				ctx.ui.notify(lines.join("\n"), "info");
+				return;
+			}
+
+			ctx.ui.notify("Usage: /sandbox [on|off]", "error");
 		},
 	});
 }
