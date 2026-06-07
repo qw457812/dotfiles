@@ -140,7 +140,7 @@
             "supportsStore": false
           },
           "reasoning": true,
-          "thinkingLevelMap": { "off": "none", "xhigh": "xhigh" },
+          "thinkingLevelMap": { "off": "none", "xhigh": "xhigh", "minimal": null },
           "input": ["text", "image"],
           "contextWindow": 272000,
           "maxTokens": 128000,
@@ -160,6 +160,42 @@
           "contextWindow": 272000,
           "maxTokens": 128000,
           "cost": { "input": 0.625, "output": 3.75, "cacheRead": 0.0625, "cacheWrite": 0 }
+        }
+      ]
+    },
+    "freemodel": {
+      "baseUrl": "https://api.freemodel.dev",
+      "apiKey": "$FREEMODEL_API_KEY",
+      "models": [
+        {
+          "id": "gpt-5.5",
+          "name": "GPT-5.5",
+          "api": "openai-responses",
+          "baseUrl": "https://api.freemodel.dev",
+          "compat": {
+            "supportsStore": false
+          },
+          "reasoning": true,
+          "thinkingLevelMap": { "off": "none", "xhigh": "xhigh", "minimal": null },
+          "input": ["text", "image"],
+          "contextWindow": 272000,
+          "maxTokens": 128000,
+          "cost": { "input": 5, "output": 30, "cacheRead": 0.5, "cacheWrite": 0 }
+        },
+        {
+          "id": "gpt-5.4",
+          "name": "GPT-5.4",
+          "api": "openai-responses",
+          "baseUrl": "https://api.freemodel.dev",
+          "compat": {
+            "supportsStore": false
+          },
+          "reasoning": true,
+          "thinkingLevelMap": { "off": "none", "xhigh": "xhigh" },
+          "input": ["text", "image"],
+          "contextWindow": 272000,
+          "maxTokens": 128000,
+          "cost": { "input": 2.5, "output": 15, "cacheRead": 0.25, "cacheWrite": 0 }
         }
       ]
     },
