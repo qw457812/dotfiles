@@ -96,6 +96,12 @@ return {
         lazy = true,
         config = function() end,
       },
+      -- {
+      --   "monotykamary/pi-retry",
+      --   build = "pi update --extension git:github.com/monotykamary/pi-retry",
+      --   lazy = true,
+      --   config = function() end,
+      -- },
       {
         "qw457812/pi-listen",
         build = "pi update --extension git:github.com/qw457812/pi-listen",
@@ -152,7 +158,7 @@ return {
         ["<leader>at"] = "pi_tmp",
       }
       local favourite_tool = "pi"
-      for i = 1, 5 do
+      for i = 1, 9 do
         local key, tool = "<leader>a" .. i, favourite_tool .. i
         local desc = tool:gsub("_", " "):gsub("^%l", string.upper)
         -- stylua: ignore
@@ -235,10 +241,10 @@ return {
         end
       end
 
-      numbered_tools({ name = "claude", count = 2 })
+      numbered_tools({ name = "claude", count = 1 })
       numbered_tools({ name = "codex", count = 1 })
       numbered_tools({ name = "opencode", count = 1 })
-      numbered_tools({ name = "pi" })
+      numbered_tools({ name = "pi", count = 9 })
       -- numbered_tools({
       --   name = "claude_glm",
       --   base_tool = "claude",
@@ -412,6 +418,7 @@ return {
                     end
 
                     -- https://www.npmjs.com/package/amp-themes?activeTab=code (extensions/amp-user-message.ts)
+                    -- https://unpkg.com/amp-themes@0.4.0/extensions/amp-user-message.ts
                     vim.keymap.set("n", "]]", function()
                       local pos = vim.fn.getpos(".")
                       -- Skip past the current user message block before searching for the next one
