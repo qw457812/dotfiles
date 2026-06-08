@@ -39,43 +39,6 @@ const PRESERVE_RECENT_MESSAGES = 0;
 const DEFAULT_QUERY =
   "Keep the current user task, accepted constraints, current plan, recent decisions, file/code context, exact file paths, code symbols, commands, errors, files read or modified, and next actionable steps. Remove greetings, repetition, stale logs, obsolete alternatives, and irrelevant detours.";
 
-function loadApiKey(): string | undefined {
-  return process.env.MORPH_API_KEY?.trim() || undefined;
-}
-
-function loadMorphCompactDefault(): boolean {
-  return process.env[MORPH_COMPACT_ENV]?.trim() === "1";
-}
-
-const MORPH_COMPACT_COMPLETIONS = [
-  { value: "on", label: "on", description: "Enable Morph Compact" },
-  { value: "off", label: "off", description: "Disable Morph Compact" },
-  { value: "status", label: "status", description: "Show current Morph Compact state" },
-];
-
-function getMorphCompactCompletions(argumentPrefix: string) {
-  const prefix = argumentPrefix.trimStart().toLowerCase();
-  if (prefix.includes(" ")) return null;
-
-  return MORPH_COMPACT_COMPLETIONS.filter((item) => item.value.startsWith(prefix));
-}
-
-function parseEnabledArg(args: string | undefined): boolean | "status" | undefined {
-  const arg = args?.trim().split(/\s+/)[0]?.toLowerCase();
-  switch (arg) {
-    case "on":
-      return true;
-    case "off":
-      return false;
-    case "":
-    case undefined:
-    case "status":
-      return "status";
-    default:
-      return undefined;
-  }
-}
-
 function buildQuery(customInstructions: string | undefined): string {
   const focus = customInstructions?.trim();
   return focus ? `${DEFAULT_QUERY}\n\nAdditional focus: ${focus}` : DEFAULT_QUERY;
@@ -205,7 +168,7 @@ export default function (pi: ExtensionAPI) {
   pi.registerFlag(MORPH_COMPACT_FLAG, {
     description: "Enable Morph Compact during session compaction",
     type: "boolean",
-    default: loadMorphCompactDefault(),
+    default: process.env[MORPH_COMPACT_ENV]?.trim() === "1",
   });
 
   let morphCompactEnabled: boolean | undefined;
@@ -216,16 +179,22 @@ export default function (pi: ExtensionAPI) {
 
   pi.registerCommand("morph-compact", {
     description: "Enable/disable Morph Compact (/morph-compact on|off|status)",
-    getArgumentCompletions: getMorphCompactCompletions,
+    getArgumentCompletions: (prefix) => {
+      return [
+        { value: "on", label: "on", description: "Enable Morph Compact" },
+        { value: "off", label: "off", description: "Disable Morph Compact" },
+        { value: "status", label: "status", description: "Show current Morph Compact state" },
+      ].filter((item) => item.value.startsWith(prefix.trimStart().toLowerCase()));
+    },
     handler: async (args, ctx) => {
-      const enabled = parseEnabledArg(args);
-      if (enabled === undefined) {
-        ctx.ui.notify("Usage: /morph-compact on | off | status", "warning");
+      const arg = args?.trim().toLowerCase();
+      if (arg === "on") {
+        morphCompactEnabled = true;
+      } else if (arg === "off") {
+        morphCompactEnabled = false;
+      } else if (arg !== undefined && arg !== "" && arg !== "status") {
+        ctx.ui.notify("Usage: /morph-compact [on|off|status]", "warning");
         return;
-      }
-
-      if (enabled !== "status") {
-        morphCompactEnabled = enabled;
       }
 
       ctx.ui.notify(`Morph Compact is ${isMorphCompactEnabled() ? "enabled" : "disabled"}`, "info");
@@ -235,7 +204,7 @@ export default function (pi: ExtensionAPI) {
   pi.on("session_before_compact", async (event, ctx) => {
     if (!isMorphCompactEnabled()) return;
 
-    const apiKey = loadApiKey();
+    const apiKey = process.env.MORPH_API_KEY?.trim() || undefined;
     if (!apiKey) {
       ctx.ui.notify(
         "MORPH_API_KEY not found. Set it as an environment variable. Falling back to default compaction.",
