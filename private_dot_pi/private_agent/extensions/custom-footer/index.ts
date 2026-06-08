@@ -86,6 +86,7 @@ export default function (pi: ExtensionAPI) {
           let totalCacheRead = 0;
           let totalCacheWrite = 0;
           let totalCost = 0;
+          let latestCacheHitRate: number | undefined;
 
           for (const entry of ctx.sessionManager.getEntries()) {
             if (entry.type === "message" && entry.message.role === "assistant") {
@@ -94,6 +95,15 @@ export default function (pi: ExtensionAPI) {
               totalCacheRead += entry.message.usage.cacheRead;
               totalCacheWrite += entry.message.usage.cacheWrite;
               totalCost += entry.message.usage.cost.total;
+
+              const latestPromptTokens =
+                entry.message.usage.input +
+                entry.message.usage.cacheRead +
+                entry.message.usage.cacheWrite;
+              latestCacheHitRate =
+                latestPromptTokens > 0
+                  ? (entry.message.usage.cacheRead / latestPromptTokens) * 100
+                  : undefined;
             }
           }
 
@@ -108,13 +118,11 @@ export default function (pi: ExtensionAPI) {
           const statsParts = [];
           if (totalInput) statsParts.push(`↑${formatTokens(totalInput)}`);
           if (totalOutput) statsParts.push(`↓${formatTokens(totalOutput)}`);
-          if (totalCacheRead) {
-            const cacheHitRate = totalCacheRead / (totalCacheRead + totalInput + totalCacheWrite);
-            statsParts.push(
-              `R${formatTokens(totalCacheRead)}(${formatDecimal(cacheHitRate * 100, 0)}%)`,
-            );
-          }
+          if (totalCacheRead) statsParts.push(`R${formatTokens(totalCacheRead)}`);
           if (totalCacheWrite) statsParts.push(`W${formatTokens(totalCacheWrite)}`);
+          if ((totalCacheRead > 0 || totalCacheWrite > 0) && latestCacheHitRate !== undefined) {
+            statsParts.push(`CH${formatDecimal(latestCacheHitRate, 1)}%`);
+          }
 
           // Cost (without "(sub)" indicator - not accessible from extension)
           if (totalCost) {
