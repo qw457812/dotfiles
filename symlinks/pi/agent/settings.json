@@ -11,6 +11,8 @@
     "openai-codex/gpt-5.5",
     "openai-codex/gpt-5.4",
     "github-copilot/gpt-5.4",
+    "freemodel/gpt-5.5",
+    "freemodel/gpt-5.4",
     "deepseek/deepseek-v4-pro",
     "xiaomi/mimo-v2.5-pro",
     "neuralwatt/zai-org/GLM-5.1-FP8",

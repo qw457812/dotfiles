@@ -41,7 +41,10 @@ export default function (pi: ExtensionAPI) {
     const { provider, id } = model;
     if (source !== "set" && source !== "cycle") return;
 
-    if (provider === "openai-codex" && (id === "gpt-5.5" || id === "gpt-5.4")) {
+    if (
+      (provider === "openai-codex" || provider === "freemodel") &&
+      (id === "gpt-5.5" || id === "gpt-5.4")
+    ) {
       setLevelIfSupported(pi, model, "high");
       return;
     }

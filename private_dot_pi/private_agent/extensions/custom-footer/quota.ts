@@ -47,16 +47,15 @@ interface CopilotQuota {
   quota_reset_date_utc: string;
 }
 
+interface CodexQuotaWindow {
+  used_percent: number;
+  reset_at: number;
+}
+
 interface CodexQuota {
   rate_limit?: {
-    primary_window?: {
-      used_percent: number;
-      reset_at: number;
-    } | null;
-    secondary_window?: {
-      used_percent: number;
-      reset_at: number;
-    } | null;
+    primary_window?: CodexQuotaWindow | null;
+    secondary_window?: CodexQuotaWindow | null;
   } | null;
 }
 
@@ -102,6 +101,21 @@ interface CrofQuota {
 interface SmartaipiQuota {
   credits: number;
   free_credits: number;
+}
+
+interface FreemodelQuotaWindow {
+  usedCents: number;
+  limitCents: number;
+  resetsAt?: number;
+}
+
+interface FreemodelQuota {
+  totalRequests?: number;
+  totalTokens?: number;
+  todayCacheReadTokens?: number;
+  todayCacheWriteTokens?: number;
+  window5h?: FreemodelQuotaWindow;
+  windowWeek?: FreemodelQuotaWindow;
 }
 
 interface CodebuddyQuota {
@@ -455,15 +469,7 @@ const sources: Record<string, Source> = {
         return null;
       }
 
-      const formatWindow = (
-        window:
-          | {
-              used_percent: number;
-              reset_at: number;
-            }
-          | null
-          | undefined,
-      ): string | null =>
+      const formatWindow = (window: CodexQuotaWindow | null | undefined): string | null =>
         window
           ? `${theme.fg("accent", `${window.used_percent}%`)}${theme.fg("dim", `/${formatRemaining(window.reset_at * 1000)}`)}`
           : null;
@@ -592,6 +598,47 @@ const sources: Record<string, Source> = {
     },
     format(quota: SmartaipiQuota, theme: Theme): string | null {
       return theme.fg("accent", `$${formatDecimal((quota.credits + quota.free_credits) / 100, 2)}`);
+    },
+  }),
+  freemodel: createSource<FreemodelQuota, string>("freemodel", {
+    cacheTtlMs: MINUTE_MS,
+    async getAuth(): Promise<string | null> {
+      return process.env.FREEMODEL_COOKIE || null;
+    },
+    async fetch(cookie: string): Promise<FreemodelQuota | null> {
+      // Ref: https://github.com/zhezzma/freemodel-proxy/blob/30e40671127b6fd8538fac220246f7a309a8e0cc/src/usage.js#L64-L73
+      try {
+        const resp = await fetch("https://freemodel.dev/api/usage", {
+          method: "GET",
+          signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+          headers: {
+            accept: "*/*",
+            "cache-control": "no-cache",
+            pragma: "no-cache",
+            cookie,
+            referer: "https://freemodel.dev/dashboard/usage",
+          },
+        });
+        if (!resp.ok) return null;
+
+        const json = (await resp.json()) as FreemodelQuota;
+        return json?.window5h || json?.windowWeek ? json : null;
+      } catch {
+        return null;
+      }
+    },
+    format(quota: FreemodelQuota, theme: Theme): string | null {
+      const formatWindow = (w: FreemodelQuotaWindow | undefined): string | null => {
+        if (!w) return null;
+
+        const resetAt =
+          typeof w.resetsAt === "number" && Number.isFinite(w.resetsAt)
+            ? `/${formatRemaining(w.resetsAt * 1000)}`
+            : "?";
+        return `${theme.fg("accent", `$${formatDecimal(w.usedCents / 100, 2)}`)}${theme.fg("dim", `/$${formatDecimal(w.limitCents / 100, 2)}${resetAt}`)}`;
+      };
+
+      return joinParts([formatWindow(quota.window5h), formatWindow(quota.windowWeek)]);
     },
   }),
   firepass: createSource("firepass", {
