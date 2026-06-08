@@ -1,6 +1,7 @@
 // Ref:
 // - https://github.com/badlogic/pi-mono/blob/82ecc1300f1649388c346568c7a1b7978ec610d3/packages/coding-agent/examples/extensions/sandbox/index.ts
 // - https://github.com/dannote/dot-pi/blob/a8f7711ddcf7ca8f2addfe1cf84c77b56a62987a/extensions/sandbox/index.ts
+// - https://github.com/aldoborrero/pi-agent-kit/blob/c990b5c4b3927c5d0886911f0c22981eb5e54db6/extensions/sandbox/index.ts
 // - https://github.com/anthropic-experimental/sandbox-runtime
 
 // NOTE: @anthropic-ai/sandbox-runtime is pinned at >=0.0.52 (migrated from 0.0.26).
@@ -12,14 +13,12 @@
 //    - Re-run unsandboxed commands
 //    - Re-run sandboxed commands with updated SandboxConfig
 // 2. Show the count of sandbox violations via `ctx.ui.setStatus`
-// 3. Use `filesystem.allowRead` to selectively re-allow reads within denyRead regions
-// 4. Use [vercel-labs/just-bash](https://github.com/vercel-labs/just-bash) on Termux (Android)
+// 3. Use [vercel-labs/just-bash](https://github.com/vercel-labs/just-bash) on Termux (Android)
 //    where @anthropic-ai/sandbox-runtime is not supported
 //
 // Ref:
 // - https://github.com/carderne/pi-sandbox
 // - https://github.com/tuansondinh/pi-claude-sandbox
-// - https://github.com/aldoborrero/pi-agent-kit/blob/c990b5c4b3927c5d0886911f0c22981eb5e54db6/extensions/sandbox/index.ts
 // - https://github.com/sionic-ai/pi-justbash-sandbox
 
 // Alternative sandbox runtimes:
@@ -109,6 +108,14 @@ const DEFAULT_CONFIG: SandboxConfig = {
 	},
 };
 
+// Copied from: https://github.com/earendil-works/pi/blob/3e9f7174456b5789a1c16398782c683d48321741/packages/coding-agent/src/utils/json.ts
+/** Strip `//` line comments and trailing commas from JSON, leaving string literals untouched. */
+function stripJsonComments(input: string): string {
+	return input
+		.replace(/"(?:\\.|[^"\\])*"|\/\/[^\n]*/g, (m) => (m[0] === '"' ? m : ""))
+		.replace(/"(?:\\.|[^"\\])*"|,(\s*[}\]])/g, (m, tail) => tail ?? (m[0] === '"' ? m : ""));
+}
+
 function loadConfig(cwd: string): SandboxConfig {
 	const projectConfigPath = join(cwd, ".pi", "sandbox.json");
 	const globalConfigPath = join(getAgentDir(), "extensions", "sandbox.json");
@@ -118,7 +125,7 @@ function loadConfig(cwd: string): SandboxConfig {
 
 	if (existsSync(globalConfigPath)) {
 		try {
-			globalConfig = JSON.parse(readFileSync(globalConfigPath, "utf-8"));
+			globalConfig = JSON.parse(stripJsonComments(readFileSync(globalConfigPath, "utf-8")));
 		} catch (e) {
 			console.error(`Warning: Could not parse ${globalConfigPath}: ${e}`);
 		}
@@ -126,7 +133,7 @@ function loadConfig(cwd: string): SandboxConfig {
 
 	if (existsSync(projectConfigPath)) {
 		try {
-			projectConfig = JSON.parse(readFileSync(projectConfigPath, "utf-8"));
+			projectConfig = JSON.parse(stripJsonComments(readFileSync(projectConfigPath, "utf-8")));
 		} catch (e) {
 			console.error(`Warning: Could not parse ${projectConfigPath}: ${e}`);
 		}
@@ -533,6 +540,7 @@ export default function (pi: ExtensionAPI) {
 					`  Session approved: ${Array.from(sessionAllowedDomains).join(", ") || "(none)"}`,
 					"",
 					"Filesystem:",
+					`  Allow Read: ${config.filesystem?.allowRead?.join(", ") || "(none)"}`,
 					`  Deny Read: ${config.filesystem?.denyRead?.join(", ") || "(none)"}`,
 					`  Allow Write: ${config.filesystem?.allowWrite?.join(", ") || "(none)"}`,
 					`  Deny Write: ${config.filesystem?.denyWrite?.join(", ") || "(none)"}`,

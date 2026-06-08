@@ -1,7 +1,8 @@
 {
-  "enableWeakerNetworkIsolation": true,
+  "enableWeakerNetworkIsolation": true, // in favor of `gh`
   "network": {
     "allowedDomains": [
+      // Package registries
       "npmjs.org",
       "*.npmjs.org",
       "registry.npmjs.org",
@@ -11,12 +12,15 @@
       "files.pythonhosted.org",
       "rubygems.org",
       "*.rubygems.org",
+      // GitHub
       "github.com",
       "*.github.com",
       "api.github.com",
       "raw.githubusercontent.com",
+      // Bun
       "bun.sh",
       "*.bun.sh",
+      // LLM APIs
       "*.googleapis.com",
       "*.google.com",
       "*.anthropic.com",
@@ -32,7 +36,7 @@
       "/private/var/folders",
       "~/.npm",
       "~/.bun",
-      "~/.cache"
+      "~/.cache" // in favor of `/skill:librarian`
     ]
   }
 }

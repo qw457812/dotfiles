@@ -210,6 +210,8 @@ end tell]]
           [".*/vscode/keybindings%.json"] = "jsonc",
           [".*%.pi/agent/models%.json"] = "jsonc",
           [".*private_dot_pi/private_agent/models%.json"] = "jsonc",
+          [".*%.pi/agent/extensions/sandbox%.json"] = "jsonc",
+          [".*private_dot_pi/private_agent/extensions/sandbox%.json"] = "jsonc",
         },
       })
 
