@@ -59,12 +59,13 @@ return {
         lazy = true,
         config = function() end,
       },
-      {
-        "georgebashi/pi-caffeinate",
-        build = "pi update --extension npm:pi-caffeinate",
-        lazy = true,
-        config = function() end,
-      },
+      -- -- alternative: https://github.com/mitsuhiko/agent-stuff/blob/ab0a07b6d3b0e3a2846c4ee3753dee4c683e7ec2/extensions/no-sleep.ts
+      -- {
+      --   "georgebashi/pi-caffeinate",
+      --   build = "pi update --extension npm:pi-caffeinate",
+      --   lazy = true,
+      --   config = function() end,
+      -- },
       {
         "aliou/pi-guardrails",
         build = "pi update --extension npm:@aliou/pi-guardrails",

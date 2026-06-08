@@ -25,6 +25,7 @@
     {
       "source": "git:github.com/mitsuhiko/agent-stuff",
       "extensions": [
+        "extensions/no-sleep.ts",
         "extensions/session-breakdown.ts",
         "extensions/split-fork.ts"
       ],
@@ -79,7 +80,6 @@
       "prompts": [],
       "themes": []
     },
-    "npm:pi-caffeinate",
     "npm:pi-mcp-adapter",
     "npm:@aliou/pi-guardrails",
     "git:github.com/monotykamary/pi-neuralwatt-provider",
