@@ -3,6 +3,7 @@ extensions/*/node_modules
 
 /sessions
 /auth.json
+/trust.json
 /pi-crash.log
 /pi-debug.log
 

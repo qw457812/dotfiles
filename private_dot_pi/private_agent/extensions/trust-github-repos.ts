@@ -11,7 +11,7 @@
 
 import type { ExtensionAPI, ProjectTrustEventResult } from "@earendil-works/pi-coding-agent";
 
-const TRUSTED_GITHUB_OWNERS = new Set(["earendil-works", "mitsuhiko"]);
+const TRUSTED_GITHUB_OWNERS = new Set(["earendil-works", "mitsuhiko", "qw457812"]);
 const GIT_TIMEOUT_MS = 5_000;
 
 type GitHubRepo = {
