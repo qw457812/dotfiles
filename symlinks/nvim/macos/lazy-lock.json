@@ -102,7 +102,7 @@
   "onedark.nvim": { "branch": "master", "commit": "fae34f7c635797f4bf62fb00e7d0516efa8abe37" },
   "pantran.nvim": { "branch": "main", "commit": "b87c3ae48cba4659587fb75abd847e5b7a7c9ca0" },
   "persistence.nvim": { "branch": "main", "commit": "b20b2a7887bd39c1a356980b45e03250f3dce49c" },
-  "pi": { "branch": "main", "commit": "592c34c05643d115d6eed08a6f615999651cfaa3" },
+  "pi": { "branch": "main", "commit": "c10fb95fd993a1f6a92d5f770258fada1a20b55a" },
   "pi-agent-colony": { "branch": "main", "commit": "e609f5d5c935079e36c88944252b168ff0907a27" },
   "pi-guardrails": { "branch": "main", "commit": "6ebd7297498082af96c30fe69d4add25392d3a5a" },
   "pi-invisible-continue": { "branch": "main", "commit": "51c18e3dee02135a9682501af69bda685c0d17f5" },
