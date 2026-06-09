@@ -1,8 +1,8 @@
 ---
-description: Generate a Conventional Commit message for staged changes
+description: Commit staged changes
 source: https://github.com/telagod/pi-agent-colony/blob/65825ec2ada22b8d1a1a8d03aae3a3394b75d8fd/pi-package/prompts/commit.md
 ---
-Generate a commit message for the current staged changes (`git diff --cached`).
+Commit the current staged changes (`git diff --cached`).
 
 Follow Conventional Commits format:
 ```
