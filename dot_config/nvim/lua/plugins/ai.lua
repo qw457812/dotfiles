@@ -109,6 +109,12 @@ return {
         lazy = true,
         config = function() end,
       },
+      {
+        "https://gitlab.com/tom81094/pi-copilot-advanced",
+        build = "pi update --extension git:gitlab.com/tom81094/pi-copilot-advanced",
+        lazy = true,
+        config = function() end,
+      },
     },
   },
   { "qw457812/claude-code-sourcemap", pin = true, lazy = true, config = function() end },
