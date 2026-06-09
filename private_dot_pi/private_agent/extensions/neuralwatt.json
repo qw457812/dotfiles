@@ -1,4 +1,5 @@
 {
   "energy": "statusbar",
-  "quota": "off"
+  "quota": "off",
+  "mcr": "statusbar"
 }
