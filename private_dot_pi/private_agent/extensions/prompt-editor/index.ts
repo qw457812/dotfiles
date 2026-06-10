@@ -2,7 +2,12 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { CustomEditor, getAgentDir, type ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import {
+  CustomEditor,
+  getAgentDir,
+  type ExtensionAPI,
+  type ExtensionUIContext,
+} from "@earendil-works/pi-coding-agent";
 import {
   CURSOR_MARKER,
   Key,
@@ -107,6 +112,9 @@ export default async function (pi: ExtensionAPI) {
   const { ModalEditor } = await import("./pi-vim.generated.ts");
 
   type Mode = "insert" | "normal";
+  type ModalEditorConstructorArgs = ConstructorParameters<typeof ModalEditor>;
+  type EditorFactory = NonNullable<Parameters<ExtensionUIContext["setEditorComponent"]>[0]>;
+  type EditorFactoryArgs = Parameters<EditorFactory>;
 
   type ModeColorizers = Record<"insert" | "normal" | "ex", (s: string) => string>;
 
@@ -177,7 +185,7 @@ export default async function (pi: ExtensionAPI) {
   };
 
   type EditorUI = {
-    setEditorComponent: (...args: any[]) => void;
+    setEditorComponent: ExtensionUIContext["setEditorComponent"];
   };
 
   type PromptHistory = Parameters<typeof hydratePromptHistory>[1];
@@ -245,13 +253,18 @@ export default async function (pi: ExtensionAPI) {
     private readonly prefixColorizers: ModeColorizers;
 
     constructor(
-      tui: any,
-      theme: any,
-      kb: any,
+      tui: EditorFactoryArgs[0],
+      theme: EditorFactoryArgs[1],
+      kb: EditorFactoryArgs[2],
       labelColorizers: ModeColorizers | null,
       prefixColorizers: ModeColorizers,
     ) {
-      super(tui, theme, kb, { labelColorizers, borderColorizers: null });
+      super(
+        tui as unknown as ModalEditorConstructorArgs[0],
+        theme as unknown as ModalEditorConstructorArgs[1],
+        kb as unknown as ModalEditorConstructorArgs[2],
+        { labelColorizers, borderColorizers: null },
+      );
       this.prefixColorizers = prefixColorizers;
       // pi-vim v0.10.0+ has built-in cursor shape management
       // (https://github.com/lajarre/pi-vim/blob/fa62bb2/index.ts)
@@ -494,7 +507,7 @@ export default async function (pi: ExtensionAPI) {
 
     const installPromptEditor = (history: PromptHistory) => {
       if (!isCurrentSession()) return;
-      originalSetEditorComponent?.((tui: any, editorTheme: any, kb: any) => {
+      originalSetEditorComponent?.((tui, editorTheme, kb) => {
         const newEditor = new PromptEditor(tui, editorTheme, kb, colorizers, prefixColorizers);
 
         // pi-vim v0.10.0+ configures quitFn and notifyFn on the editor
@@ -590,12 +603,12 @@ export default async function (pi: ExtensionAPI) {
       }, 0);
     };
 
-    ui.setEditorComponent = ((...args: any[]) => {
-      originalSetEditorComponent?.(...args);
+    ui.setEditorComponent = ((factory: EditorFactory | undefined) => {
+      originalSetEditorComponent?.(factory);
       if (!installingPromptEditor) {
         scheduleReinstall();
       }
-    }) as EditorUI["setEditorComponent"];
+    }) satisfies EditorUI["setEditorComponent"];
 
     applyPromptHistory(
       ctx,
