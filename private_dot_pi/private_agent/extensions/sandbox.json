@@ -17,6 +17,7 @@
       "*.github.com",
       "api.github.com",
       "raw.githubusercontent.com",
+      "gitlab.com",
       // Bun
       "bun.sh",
       "*.bun.sh",

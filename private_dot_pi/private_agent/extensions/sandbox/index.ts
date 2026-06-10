@@ -15,11 +15,15 @@
 // 2. Show the count of sandbox violations via `ctx.ui.setStatus`
 // 3. Use [vercel-labs/just-bash](https://github.com/vercel-labs/just-bash) on Termux (Android)
 //    where @anthropic-ai/sandbox-runtime is not supported
+// 4. Add `excludedCommands` to bypass sandbox for trusted command patterns
+//    - Consider adding `allowUnsandboxedCommands`: Allow commands to run outside the sandbox via the `dangerouslyDisableSandbox` parameter
 //
 // Ref:
 // - https://github.com/carderne/pi-sandbox
 // - https://github.com/tuansondinh/pi-claude-sandbox
 // - https://github.com/sionic-ai/pi-justbash-sandbox
+// - https://github.com/code-yeongyu/pi-sandbox (just-bash)
+// - https://github.com/qw457812/claude-code-sourcemap (`excludedCommands`)
 
 // Alternative sandbox runtimes:
 // - https://github.com/afshinm/zerobox
@@ -50,6 +54,7 @@
  *     "deniedDomains": []
  *   },
  *   "filesystem": {
+ *     "allowRead": ["~/.ssh/known_hosts"],
  *     "denyRead": ["~/.ssh", "~/.aws"],
  *     "allowWrite": [".", "/tmp"],
  *     "denyWrite": [".env"]
