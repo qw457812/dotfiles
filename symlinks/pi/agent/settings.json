@@ -32,7 +32,8 @@
       "skills": [
         "skills/commit",
         "skills/frontend-design",
-        "skills/librarian"
+        "skills/librarian",
+        "skills/web-browser"
       ],
       "prompts": [],
       "themes": []

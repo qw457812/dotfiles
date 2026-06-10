@@ -1,5 +1,17 @@
 {
   "enableWeakerNetworkIsolation": true, // in favor of `gh`
+  "excludedCommands": [
+    "~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/web-browser/scripts/start.js:*",
+    "~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/web-browser/scripts/nav.js:*",
+    "~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/web-browser/scripts/eval.js:*",
+    "~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/web-browser/scripts/screenshot.js:*",
+    "~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/web-browser/scripts/emulate.js:*",
+    "~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/web-browser/scripts/pick.js:*",
+    "~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/web-browser/scripts/dismiss-cookies.js:*",
+    "~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/web-browser/scripts/watch.js:*",
+    "~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/web-browser/scripts/logs-tail.js:*",
+    "~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/web-browser/scripts/net-summary.js:*"
+  ],
   "network": {
     "allowedDomains": [
       // Package registries

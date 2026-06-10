@@ -15,8 +15,7 @@
 // 2. Show the count of sandbox violations via `ctx.ui.setStatus`
 // 3. Use [vercel-labs/just-bash](https://github.com/vercel-labs/just-bash) on Termux (Android)
 //    where @anthropic-ai/sandbox-runtime is not supported
-// 4. Add `excludedCommands` to bypass sandbox for trusted command patterns
-//    - Consider adding `allowUnsandboxedCommands`: Allow commands to run outside the sandbox via the `dangerouslyDisableSandbox` parameter
+// 4. Consider adding `allowUnsandboxedCommands`: Allow commands to run outside the sandbox via the `dangerouslyDisableSandbox` parameter
 //
 // Ref:
 // - https://github.com/carderne/pi-sandbox
@@ -49,6 +48,7 @@
  * ```json
  * {
  *   "enabled": true,
+ *   "excludedCommands": ["gh:*", "docker:*"],
  *   "network": {
  *     "allowedDomains": ["github.com", "*.github.com"],
  *     "deniedDomains": []
@@ -77,20 +77,23 @@
 import { spawn } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve, sep } from "node:path";
+import { initializeExcludedCommandMatcher, matchExcludedCommand } from "./excluded-commands.ts";
 import {
 	SandboxManager,
 	type SandboxAskCallback,
 	type SandboxRuntimeConfig,
 } from "@anthropic-ai/sandbox-runtime";
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
-import { type BashOperations, createBashTool, getAgentDir } from "@earendil-works/pi-coding-agent";
+import { type BashOperations, createBashTool, createLocalBashOperations, getAgentDir } from "@earendil-works/pi-coding-agent";
 
 interface SandboxConfig extends SandboxRuntimeConfig {
 	enabled?: boolean;
+	excludedCommands?: string[];
 }
 
 const DEFAULT_CONFIG: SandboxConfig = {
 	enabled: true,
+	excludedCommands: [],
 	network: {
 		allowedDomains: [
 			"npmjs.org",
@@ -147,10 +150,15 @@ function loadConfig(cwd: string): SandboxConfig {
 	return deepMerge(deepMerge(DEFAULT_CONFIG, globalConfig), projectConfig);
 }
 
+function hasExcludedCommands(config: SandboxConfig): boolean {
+	return Array.isArray(config.excludedCommands) && config.excludedCommands.length > 0;
+}
+
 function deepMerge(base: SandboxConfig, overrides: Partial<SandboxConfig>): SandboxConfig {
 	const result: SandboxConfig = { ...base };
 
 	if (overrides.enabled !== undefined) result.enabled = overrides.enabled;
+	if (overrides.excludedCommands !== undefined) result.excludedCommands = overrides.excludedCommands;
 	if (overrides.network) {
 		result.network = { ...base.network, ...overrides.network };
 	}
@@ -367,6 +375,12 @@ export default function (pi: ExtensionAPI) {
 	let sandboxEnabled = false;
 	let sandboxInitialized = false;
 
+	async function getExcludedCommandMatch(command: string, cwd: string) {
+		const config = withWorktreeMainRepoGitWriteAccess(loadConfig(cwd), cwd);
+		if (!hasExcludedCommands(config)) return null;
+		return matchExcludedCommand(command, cwd, config.excludedCommands ?? []);
+	}
+
 	function updateSandboxStatus(ctx: ExtensionContext) {
 		if (!ctx.hasUI) return;
 		if (!sandboxEnabled) {
@@ -405,6 +419,10 @@ export default function (pi: ExtensionAPI) {
 		}
 
 		try {
+			if (hasExcludedCommands(config)) {
+				await initializeExcludedCommandMatcher();
+			}
+
 			const configExt = config as unknown as {
 				ignoreViolations?: Record<string, string[]>;
 				enableWeakerNestedSandbox?: boolean;
@@ -440,8 +458,17 @@ export default function (pi: ExtensionAPI) {
 	pi.registerTool({
 		...localBash,
 		label: "bash (sandboxed)",
-		async execute(id, params, signal, onUpdate, _ctx) {
+		async execute(id, params, signal, onUpdate, ctx) {
 			if (!sandboxEnabled || !sandboxInitialized) {
+				return localBash.execute(id, params, signal, onUpdate);
+			}
+
+			const command = typeof params?.command === "string" ? params.command : "";
+			const excludedMatch = await getExcludedCommandMatch(command, ctx.cwd);
+			if (excludedMatch) {
+				if (ctx.hasUI) {
+					ctx.ui.notify(`Bypassing sandbox: matched excluded command "${excludedMatch.pattern}"`, "info");
+				}
 				return localBash.execute(id, params, signal, onUpdate);
 			}
 
@@ -452,8 +479,17 @@ export default function (pi: ExtensionAPI) {
 		},
 	});
 
-	pi.on("user_bash", () => {
+	pi.on("user_bash", async (event, ctx) => {
 		if (!sandboxEnabled || !sandboxInitialized) return;
+
+		const excludedMatch = await getExcludedCommandMatch(event.command, event.cwd);
+		if (excludedMatch) {
+			if (ctx.hasUI) {
+				ctx.ui.notify(`Bypassing sandbox: matched excluded command "${excludedMatch.pattern}"`, "info");
+			}
+			return { operations: createLocalBashOperations() };
+		}
+
 		return { operations: createSandboxedBashOps() };
 	});
 
@@ -538,6 +574,9 @@ export default function (pi: ExtensionAPI) {
 				const config = loadConfig(ctx.cwd);
 				const lines = [
 					"Sandbox: ENABLED",
+					"",
+					"Excluded Commands:",
+					`  ${config.excludedCommands?.join(", ") || "(none)"}`,
 					"",
 					"Network:",
 					`  Allowed: ${config.network?.allowedDomains?.join(", ") || "(none)"}`,
