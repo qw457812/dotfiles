@@ -176,9 +176,16 @@ export default async function (pi: ExtensionAPI) {
     };
   };
 
+  type EditorUI = {
+    setEditorComponent: (...args: any[]) => void;
+  };
+
+  type PromptHistory = Parameters<typeof hydratePromptHistory>[1];
+
   let blurred = false;
   let activeTui: CursorTUI | undefined;
   let activeEditor: ModalEditorRuntime | undefined;
+  let activeUi: EditorUI | undefined;
 
   // User preference from /setting "Show hardware cursor". Mirrors the value
   // that interactive-mode writes via tui.setShowHardwareCursor(). When false,
@@ -192,6 +199,9 @@ export default async function (pi: ExtensionAPI) {
   // can restore the originals.
   let originalSetShowHardwareCursor: CursorTUI["setShowHardwareCursor"] | undefined;
   let originalRequestRender: CursorTUI["requestRender"] | undefined;
+  let originalSetEditorComponent: EditorUI["setEditorComponent"] | undefined;
+  let reinstallTimer: NodeJS.Timeout | undefined;
+  let sessionGeneration = 0;
 
   // ANSI DECSCUSR cursor style sequences (CSI Ps SP q).
   // Pi's Editor always paints a fake inverse-video cursor in render()
@@ -455,116 +465,167 @@ export default async function (pi: ExtensionAPI) {
       ex: (s: string) => theme.fg("warning", s),
     };
 
-    setTimeout(() => {
-      // Related upstream logic:
-      // - https://github.com/lajarre/pi-vim/blob/fa62bb2/index.ts (default export session_start handler)
-      // - https://github.com/badlogic/pi-mono/blob/cca5a3a1a4c6db90e4c5e2e95772845c1d5a251d/packages/coding-agent/src/modes/interactive/interactive-mode.ts#L1841-L1909 (setCustomEditorComponent)
-      //
-      // Defer until after pi-vim's own session_start handler has installed its
-      // editor, then replace it with our prompt-editor subclass. interactive-mode
-      // also copies borderColor from defaultEditor during the swap, so we
-      // re-apply the thinking-level border color below.
-      let editor: ModalEditorRuntime | undefined;
+    // Related upstream logic:
+    // - https://github.com/lajarre/pi-vim/blob/fa62bb2/index.ts (default export session_start handler)
+    // - https://github.com/badlogic/pi-mono/blob/cca5a3a1a4c6db90e4c5e2e95772845c1d5a251d/packages/coding-agent/src/modes/interactive/interactive-mode.ts#L1841-L1909 (setCustomEditorComponent)
+    //
+    // prompt-editor loads from the user extension directory, while pi-vim is a
+    // package extension and can run later in session_start. Do not rely only on
+    // setTimeout(0): any earlier async session_start handler can yield to timers
+    // before pi-vim installs its editor. Wrap setEditorComponent for this session
+    // so any later editor install is followed by re-installing our PromptEditor
+    // subclass.
+    const generation = ++sessionGeneration;
+    if (reinstallTimer) {
+      clearTimeout(reinstallTimer);
+      reinstallTimer = undefined;
+    }
 
-      applyPromptHistory(
-        ctx,
-        (history) => {
-          ctx.ui.setEditorComponent((tui, editorTheme, kb) => {
-            const newEditor = new PromptEditor(tui, editorTheme, kb, colorizers, prefixColorizers);
+    const ui = ctx.ui as unknown as EditorUI;
+    if (!originalSetEditorComponent || activeUi !== ui) {
+      originalSetEditorComponent = ui.setEditorComponent.bind(ctx.ui);
+      activeUi = ui;
+    }
 
-            // pi-vim v0.10.0+ configures quitFn and notifyFn on the editor
-            // (https://github.com/lajarre/pi-vim/blob/fa62bb2/index.ts).
-            // Apply them to our subclass so :q/:wq etc work correctly.
-            (newEditor as any).setQuitFn(() => ctx.shutdown());
-            (newEditor as any).setNotifyFn((message: string) => ctx.ui.notify(message, "warning"));
+    let editor: ModalEditorRuntime | undefined;
+    let reinstallPromptEditor: (() => void) | undefined;
+    let installingPromptEditor = false;
+    const isCurrentSession = () => generation === sessionGeneration;
 
-            activeTui = tui as CursorTUI;
-            activeEditor = newEditor as unknown as ModalEditorRuntime;
-            editor = activeEditor;
+    const installPromptEditor = (history: PromptHistory) => {
+      if (!isCurrentSession()) return;
+      originalSetEditorComponent?.((tui: any, editorTheme: any, kb: any) => {
+        const newEditor = new PromptEditor(tui, editorTheme, kb, colorizers, prefixColorizers);
 
-            // Capture initial user preference from the TUI. interactive-mode
-            // passes settingsManager.getShowHardwareCursor() to the TUI
-            // constructor, so this reflects the /setting value.
-            userPrefersShowHardwareCursor = tui.getShowHardwareCursor?.() ?? true;
+        // pi-vim v0.10.0+ configures quitFn and notifyFn on the editor
+        // (https://github.com/lajarre/pi-vim/blob/fa62bb2/index.ts).
+        // Apply them to our subclass so :q/:wq etc work correctly.
+        (newEditor as any).setQuitFn(() => ctx.shutdown());
+        (newEditor as any).setNotifyFn((message: string) => ctx.ui.notify(message, "warning"));
 
-            // Capture the original setter once (unbound so .call(tui, …)
-            // supplies the correct this). Guard against re-capture: if
-            // session_shutdown didn't fire, the TUI still holds the
-            // previous wrapper — skip to avoid nesting.
-            if (!originalSetShowHardwareCursor) {
-              originalSetShowHardwareCursor = tui.setShowHardwareCursor;
-            }
+        activeTui = tui as CursorTUI;
+        activeEditor = newEditor as unknown as ModalEditorRuntime;
+        editor = activeEditor;
 
-            // Wrap setShowHardwareCursor to catch live /setting changes.
-            // interactive-mode calls this when the user toggles
-            // "Show hardware cursor".
-            tui.setShowHardwareCursor = (enabled: boolean) => {
-              const changed = enabled !== userPrefersShowHardwareCursor;
-              userPrefersShowHardwareCursor = enabled;
-              applyHardwareCursorVisibility(tui);
-              // When switching away from hardware cursor, reset the
-              // terminal cursor shape so it doesn't linger.
-              if (!enabled) {
-                tui.terminal.write(CURSOR_STYLE_RESET);
-              } else if (!blurred) {
-                writeCursorStyle(tui, newEditor.getMode());
-              }
-              if (changed) {
-                tui.requestRender();
-              }
-            };
+        // Capture initial user preference from the TUI. interactive-mode
+        // passes settingsManager.getShowHardwareCursor() to the TUI
+        // constructor, so this reflects the /setting value.
+        userPrefersShowHardwareCursor = tui.getShowHardwareCursor?.() ?? true;
 
-            // Apply initial effective visibility outside render() so
-            // setShowHardwareCursor() cannot re-enter the render path.
-            applyHardwareCursorVisibility(activeTui);
-            // writeCursorStyle handles both modes (shape on enable, reset
-            // on disable), but skip if user has hardware cursor off — no
-            // DECSCUSR sequences needed at all.
-            if (userPrefersShowHardwareCursor) {
-              writeCursorStyle(activeTui, newEditor.getMode());
-            }
+        // Capture the original setter once (unbound so .call(tui, …)
+        // supplies the correct this). Guard against re-capture: if
+        // session_shutdown didn't fire, the TUI still holds the
+        // previous wrapper — skip to avoid nesting.
+        if (!originalSetShowHardwareCursor) {
+          originalSetShowHardwareCursor = tui.setShowHardwareCursor;
+        }
 
-            // Track mode changes to update cursor style. We hook into
-            // requestRender (called by pi-vim after every handleInput that
-            // mutates state) and write the appropriate shape sequence directly
-            // to the terminal.
-            // Guard against re-capture (same rationale as
-            // originalSetShowHardwareCursor above).
-            if (!originalRequestRender) {
-              originalRequestRender = tui.requestRender;
-            }
-            const origRequestRender = originalRequestRender!;
-            let lastShapeMode: Mode | undefined = newEditor.getMode();
-            tui.requestRender = (force?: boolean) => {
-              origRequestRender.call(tui, force);
-              const curMode = newEditor.getMode();
-              if (curMode !== lastShapeMode) {
-                lastShapeMode = curMode;
-                if (userPrefersShowHardwareCursor && !blurred) {
-                  tui.terminal.write(getCursorStyle(curMode));
-                }
-              }
-            };
-
-            hydratePromptHistory(editor, history);
-            return newEditor;
-          });
-
-          if (editor) {
-            // Must run after setEditorComponent() returns: interactive-mode
-            // overwrites newEditor.borderColor during the swap.
-            editor.borderColor = ctx.ui.theme.getThinkingBorderColor(pi.getThinkingLevel());
+        // Wrap setShowHardwareCursor to catch live /setting changes.
+        // interactive-mode calls this when the user toggles
+        // "Show hardware cursor".
+        tui.setShowHardwareCursor = (enabled: boolean) => {
+          const changed = enabled !== userPrefersShowHardwareCursor;
+          userPrefersShowHardwareCursor = enabled;
+          applyHardwareCursorVisibility(tui);
+          // When switching away from hardware cursor, reset the
+          // terminal cursor shape so it doesn't linger.
+          if (!enabled) {
+            tui.terminal.write(CURSOR_STYLE_RESET);
+          } else if (!blurred) {
+            writeCursorStyle(tui, newEditor.getMode());
           }
-        },
-        (history) => {
-          if (!editor) return;
-          replacePromptHistory(editor, history);
-        },
-      );
-    }, 0);
+          if (changed) {
+            tui.requestRender();
+          }
+        };
+
+        // Apply initial effective visibility outside render() so
+        // setShowHardwareCursor() cannot re-enter the render path.
+        applyHardwareCursorVisibility(activeTui);
+        // writeCursorStyle handles both modes (shape on enable, reset
+        // on disable), but skip if user has hardware cursor off — no
+        // DECSCUSR sequences needed at all.
+        if (userPrefersShowHardwareCursor) {
+          writeCursorStyle(activeTui, newEditor.getMode());
+        }
+
+        // Track mode changes to update cursor style. We hook into
+        // requestRender (called by pi-vim after every handleInput that
+        // mutates state) and write the appropriate shape sequence directly
+        // to the terminal.
+        // Guard against re-capture (same rationale as
+        // originalSetShowHardwareCursor above).
+        if (!originalRequestRender) {
+          originalRequestRender = tui.requestRender;
+        }
+        const origRequestRender = originalRequestRender!;
+        let lastShapeMode: Mode | undefined = newEditor.getMode();
+        tui.requestRender = (force?: boolean) => {
+          origRequestRender.call(tui, force);
+          const curMode = newEditor.getMode();
+          if (curMode !== lastShapeMode) {
+            lastShapeMode = curMode;
+            if (userPrefersShowHardwareCursor && !blurred) {
+              tui.terminal.write(getCursorStyle(curMode));
+            }
+          }
+        };
+
+        hydratePromptHistory(editor, history);
+        return newEditor;
+      });
+
+      if (editor) {
+        // Must run after setEditorComponent() returns: interactive-mode
+        // overwrites newEditor.borderColor during the swap.
+        editor.borderColor = ctx.ui.theme.getThinkingBorderColor(pi.getThinkingLevel());
+      }
+    };
+
+    const scheduleReinstall = () => {
+      if (!reinstallPromptEditor || reinstallTimer || !isCurrentSession()) return;
+      reinstallTimer = setTimeout(() => {
+        reinstallTimer = undefined;
+        if (isCurrentSession()) reinstallPromptEditor?.();
+      }, 0);
+    };
+
+    ui.setEditorComponent = ((...args: any[]) => {
+      originalSetEditorComponent?.(...args);
+      if (!installingPromptEditor) {
+        scheduleReinstall();
+      }
+    }) as EditorUI["setEditorComponent"];
+
+    applyPromptHistory(
+      ctx,
+      (history) => {
+        reinstallPromptEditor = () => {
+          if (!isCurrentSession()) return;
+          installingPromptEditor = true;
+          try {
+            installPromptEditor(history);
+          } finally {
+            installingPromptEditor = false;
+          }
+        };
+
+        reinstallPromptEditor();
+      },
+      (history) => {
+        if (!editor) return;
+        replacePromptHistory(editor, history);
+      },
+    );
   });
 
   pi.on("session_shutdown", () => {
+    sessionGeneration++;
+    if (reinstallTimer) {
+      clearTimeout(reinstallTimer);
+      reinstallTimer = undefined;
+    }
+
     // Restore TUI methods that were wrapped in setEditorComponent so
     // subsequent calls from interactive-mode (applyRuntimeSettings,
     // resetExtensionUI) hit the originals instead of our stale closures.
@@ -576,13 +637,18 @@ export default async function (pi: ExtensionAPI) {
         activeTui.requestRender = originalRequestRender;
       }
     }
+    if (activeUi && originalSetEditorComponent) {
+      activeUi.setEditorComponent = originalSetEditorComponent;
+    }
     offMyFocusChange();
     blurred = false;
     activeTui = undefined;
     activeEditor = undefined;
+    activeUi = undefined;
     userPrefersShowHardwareCursor = true;
     originalSetShowHardwareCursor = undefined;
     originalRequestRender = undefined;
+    originalSetEditorComponent = undefined;
     // Restore default terminal cursor style on exit
     process.stdout.write(CURSOR_STYLE_RESET);
   });
