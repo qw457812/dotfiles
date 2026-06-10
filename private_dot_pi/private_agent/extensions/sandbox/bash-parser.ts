@@ -5,10 +5,16 @@ import type { Node as SyntaxNode, Parser as WebTreeSitterParser } from "web-tree
 
 const require = createRequire(import.meta.url);
 
+export type StaticEnvAssignment = {
+  name: string;
+  value: string;
+};
+
 export type StaticSimpleCommand = {
   executable: string;
   args: string[];
   cwd: string;
+  envAssignments: StaticEnvAssignment[];
 };
 
 let bashParserPromise: Promise<WebTreeSitterParser> | undefined;
@@ -122,7 +128,14 @@ function flattenAndList(node: SyntaxNode): SyntaxNode[] | null {
 
 function extractSimpleCommand(commandNode: SyntaxNode, cwd: string): StaticSimpleCommand | null {
   const children = namedAndOperatorChildren(commandNode);
-  if (children.some((child) => child.type === "variable_assignment")) return null;
+  const envAssignments: StaticEnvAssignment[] = [];
+
+  for (const child of children) {
+    if (child.type !== "variable_assignment") continue;
+    const assignment = parseStaticEnvAssignment(child.text);
+    if (!assignment) return null;
+    envAssignments.push(assignment);
+  }
 
   const commandNameNode = children.find((child) => child.type === "command_name");
   if (!commandNameNode) return null;
@@ -132,14 +145,22 @@ function extractSimpleCommand(commandNode: SyntaxNode, cwd: string): StaticSimpl
 
   const args: string[] = [];
   for (const child of children) {
-    if (child === commandNameNode) continue;
+    if (child === commandNameNode || child.type === "variable_assignment") continue;
     if (!isStaticArgumentNode(child)) return null;
     const arg = unquote(child.text);
     if (!isStaticText(arg)) return null;
     args.push(arg);
   }
 
-  return { executable, args, cwd };
+  return { executable, args, cwd, envAssignments };
+}
+
+function parseStaticEnvAssignment(text: string): StaticEnvAssignment | null {
+  const match = text.match(/^([A-Za-z_][A-Za-z0-9_]*)=(.*)$/);
+  if (!match) return null;
+  const value = unquote(match[2] ?? "");
+  if (!isStaticText(value)) return null;
+  return { name: match[1]!, value };
 }
 
 function namedAndOperatorChildren(node: SyntaxNode): SyntaxNode[] {
@@ -169,7 +190,6 @@ function containsDynamicShellSyntax(root: SyntaxNode): boolean {
       "process_substitution",
       "simple_expansion",
       "expansion",
-      "variable_assignment",
     ]).length,
   );
 }

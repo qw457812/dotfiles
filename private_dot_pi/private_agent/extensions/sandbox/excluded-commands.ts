@@ -32,7 +32,7 @@ export async function matchExcludedCommand(
     if (isAllowedChainUtility(simple)) continue;
 
     const match = matchSimpleCommand(simple, patterns);
-    if (!match) return null;
+    if (!match || !hasOnlyAllowedEnvAssignments(simple, match)) return null;
     firstMatch ??= match;
   }
 
@@ -40,6 +40,7 @@ export async function matchExcludedCommand(
 }
 
 function isAllowedChainUtility(simple: StaticSimpleCommand): boolean {
+  if (simple.envAssignments.length > 0) return false;
   if (simple.executable !== "sleep" || simple.args.length !== 1) return false;
   const seconds = Number(simple.args[0]);
   return (
@@ -48,6 +49,22 @@ function isAllowedChainUtility(simple: StaticSimpleCommand): boolean {
     seconds >= 0 &&
     seconds <= MAX_ALLOWED_SLEEP_SECONDS
   );
+}
+
+function hasOnlyAllowedEnvAssignments(
+  simple: StaticSimpleCommand,
+  match: ExcludedCommandMatch,
+): boolean {
+  if (simple.envAssignments.length === 0) return true;
+
+  // https://github.com/mitsuhiko/agent-stuff/blob/29bcb2db8afb4ab68850e169471a6912c14d9df6/skills/web-browser/scripts/start.js
+  if (!match.pattern.includes("/web-browser/scripts/start.js:")) return false;
+
+  return simple.envAssignments.every((assignment) => {
+    if (assignment.name !== "BROWSER_DEBUG_PORT") return false;
+    const port = Number(assignment.value);
+    return /^\d+$/.test(assignment.value) && Number.isInteger(port) && port >= 1 && port <= 65535;
+  });
 }
 
 function matchSimpleCommand(
