@@ -79,111 +79,121 @@ import { existsSync, readFileSync } from "node:fs";
 import { join, resolve, sep } from "node:path";
 import { initializeExcludedCommandMatcher, matchExcludedCommand } from "./excluded-commands.ts";
 import {
-	SandboxManager,
-	type SandboxAskCallback,
-	type SandboxRuntimeConfig,
+  SandboxManager,
+  type SandboxAskCallback,
+  type SandboxRuntimeConfig,
 } from "@anthropic-ai/sandbox-runtime";
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
-import { type BashOperations, createBashTool, createLocalBashOperations, getAgentDir } from "@earendil-works/pi-coding-agent";
+import {
+  type BashOperations,
+  createBashTool,
+  createLocalBashOperations,
+  getAgentDir,
+} from "@earendil-works/pi-coding-agent";
 
 interface SandboxConfig extends SandboxRuntimeConfig {
-	enabled?: boolean;
-	excludedCommands?: string[];
+  enabled?: boolean;
+  excludedCommands?: string[];
 }
 
 const DEFAULT_CONFIG: SandboxConfig = {
-	enabled: true,
-	excludedCommands: [],
-	network: {
-		allowedDomains: [
-			"npmjs.org",
-			"*.npmjs.org",
-			"registry.npmjs.org",
-			"registry.yarnpkg.com",
-			"pypi.org",
-			"*.pypi.org",
-			"github.com",
-			"*.github.com",
-			"api.github.com",
-			"raw.githubusercontent.com",
-		],
-		deniedDomains: [],
-	},
-	filesystem: {
-		denyRead: ["~/.ssh", "~/.aws", "~/.gnupg"],
-		allowWrite: [".", "/tmp"],
-		denyWrite: [".env", ".env.*", "*.pem", "*.key"],
-	},
+  enabled: true,
+  excludedCommands: [],
+  network: {
+    allowedDomains: [
+      "npmjs.org",
+      "*.npmjs.org",
+      "registry.npmjs.org",
+      "registry.yarnpkg.com",
+      "pypi.org",
+      "*.pypi.org",
+      "github.com",
+      "*.github.com",
+      "api.github.com",
+      "raw.githubusercontent.com",
+    ],
+    deniedDomains: [],
+  },
+  filesystem: {
+    denyRead: ["~/.ssh", "~/.aws", "~/.gnupg"],
+    allowWrite: [".", "/tmp"],
+    denyWrite: [".env", ".env.*", "*.pem", "*.key"],
+  },
 };
 
 // Copied from: https://github.com/earendil-works/pi/blob/3e9f7174456b5789a1c16398782c683d48321741/packages/coding-agent/src/utils/json.ts
 /** Strip `//` line comments and trailing commas from JSON, leaving string literals untouched. */
 function stripJsonComments(input: string): string {
-	return input
-		.replace(/"(?:\\.|[^"\\])*"|\/\/[^\n]*/g, (m) => (m[0] === '"' ? m : ""))
-		.replace(/"(?:\\.|[^"\\])*"|,(\s*[}\]])/g, (m, tail) => tail ?? (m[0] === '"' ? m : ""));
+  return input
+    .replace(/"(?:\\.|[^"\\])*"|\/\/[^\n]*/g, (m) => (m[0] === '"' ? m : ""))
+    .replace(/"(?:\\.|[^"\\])*"|,(\s*[}\]])/g, (m, tail) => tail ?? (m[0] === '"' ? m : ""));
 }
 
 function loadConfig(cwd: string): SandboxConfig {
-	const projectConfigPath = join(cwd, ".pi", "sandbox.json");
-	const globalConfigPath = join(getAgentDir(), "extensions", "sandbox.json");
+  const projectConfigPath = join(cwd, ".pi", "sandbox.json");
+  const globalConfigPath = join(getAgentDir(), "extensions", "sandbox.json");
 
-	let globalConfig: Partial<SandboxConfig> = {};
-	let projectConfig: Partial<SandboxConfig> = {};
+  let globalConfig: Partial<SandboxConfig> = {};
+  let projectConfig: Partial<SandboxConfig> = {};
 
-	if (existsSync(globalConfigPath)) {
-		try {
-			globalConfig = JSON.parse(stripJsonComments(readFileSync(globalConfigPath, "utf-8")));
-		} catch (e) {
-			console.error(`Warning: Could not parse ${globalConfigPath}: ${e}`);
-		}
-	}
+  if (existsSync(globalConfigPath)) {
+    try {
+      globalConfig = JSON.parse(stripJsonComments(readFileSync(globalConfigPath, "utf-8")));
+    } catch (e) {
+      console.error(`Warning: Could not parse ${globalConfigPath}: ${e}`);
+    }
+  }
 
-	if (existsSync(projectConfigPath)) {
-		try {
-			projectConfig = JSON.parse(stripJsonComments(readFileSync(projectConfigPath, "utf-8")));
-		} catch (e) {
-			console.error(`Warning: Could not parse ${projectConfigPath}: ${e}`);
-		}
-	}
+  if (existsSync(projectConfigPath)) {
+    try {
+      projectConfig = JSON.parse(stripJsonComments(readFileSync(projectConfigPath, "utf-8")));
+    } catch (e) {
+      console.error(`Warning: Could not parse ${projectConfigPath}: ${e}`);
+    }
+  }
 
-	return deepMerge(deepMerge(DEFAULT_CONFIG, globalConfig), projectConfig);
+  return deepMerge(deepMerge(DEFAULT_CONFIG, globalConfig), projectConfig);
 }
 
 function hasExcludedCommands(config: SandboxConfig): boolean {
-	return Array.isArray(config.excludedCommands) && config.excludedCommands.length > 0;
+  return Array.isArray(config.excludedCommands) && config.excludedCommands.length > 0;
 }
 
 function deepMerge(base: SandboxConfig, overrides: Partial<SandboxConfig>): SandboxConfig {
-	const result: SandboxConfig = { ...base };
+  const result: SandboxConfig = { ...base };
 
-	if (overrides.enabled !== undefined) result.enabled = overrides.enabled;
-	if (overrides.excludedCommands !== undefined) result.excludedCommands = overrides.excludedCommands;
-	if (overrides.network) {
-		result.network = { ...base.network, ...overrides.network };
-	}
-	if (overrides.filesystem) {
-		result.filesystem = { ...base.filesystem, ...overrides.filesystem };
-	}
+  if (overrides.enabled !== undefined) result.enabled = overrides.enabled;
+  if (overrides.excludedCommands !== undefined)
+    result.excludedCommands = overrides.excludedCommands;
+  if (overrides.network) {
+    result.network = { ...base.network, ...overrides.network };
+  }
+  if (overrides.filesystem) {
+    result.filesystem = { ...base.filesystem, ...overrides.filesystem };
+  }
 
-	const extOverrides = overrides as {
-		ignoreViolations?: Record<string, string[]>;
-		enableWeakerNestedSandbox?: boolean;
-		enableWeakerNetworkIsolation?: boolean;
-	};
-	const extResult = result as { ignoreViolations?: Record<string, string[]>; enableWeakerNestedSandbox?: boolean; enableWeakerNetworkIsolation?: boolean };
+  const extOverrides = overrides as {
+    ignoreViolations?: Record<string, string[]>;
+    enableWeakerNestedSandbox?: boolean;
+    enableWeakerNetworkIsolation?: boolean;
+  };
+  const extResult = result as {
+    ignoreViolations?: Record<string, string[]>;
+    enableWeakerNestedSandbox?: boolean;
+    enableWeakerNetworkIsolation?: boolean;
+  };
 
-	if (extOverrides.ignoreViolations) {
-		extResult.ignoreViolations = extOverrides.ignoreViolations;
-	}
-	if (extOverrides.enableWeakerNestedSandbox !== undefined) {
-		extResult.enableWeakerNestedSandbox = extOverrides.enableWeakerNestedSandbox;
-	}
-	if (extOverrides.enableWeakerNetworkIsolation !== undefined) {
-		extResult.enableWeakerNetworkIsolation = extOverrides.enableWeakerNetworkIsolation;
-	}
+  if (extOverrides.ignoreViolations) {
+    extResult.ignoreViolations = extOverrides.ignoreViolations;
+  }
+  if (extOverrides.enableWeakerNestedSandbox !== undefined) {
+    extResult.enableWeakerNestedSandbox = extOverrides.enableWeakerNestedSandbox;
+  }
+  if (extOverrides.enableWeakerNetworkIsolation !== undefined) {
+    extResult.enableWeakerNetworkIsolation = extOverrides.enableWeakerNetworkIsolation;
+  }
 
-	return result;
+  return result;
 }
 
 /**
@@ -194,131 +204,131 @@ function deepMerge(base: SandboxConfig, overrides: Partial<SandboxConfig>): Sand
  * If .git is a directory, readFileSync throws and we return null.
  */
 function detectWorktreeMainRepoPath(cwd: string): string | null {
-	const gitPath = join(cwd, ".git");
-	if (!existsSync(gitPath)) {
-		return null;
-	}
+  const gitPath = join(cwd, ".git");
+  if (!existsSync(gitPath)) {
+    return null;
+  }
 
-	try {
-		const gitContent = readFileSync(gitPath, "utf-8");
-		const gitdirMatch = gitContent.match(/^gitdir:\s*(.+)$/m);
-		if (!gitdirMatch?.[1]) {
-			return null;
-		}
+  try {
+    const gitContent = readFileSync(gitPath, "utf-8");
+    const gitdirMatch = gitContent.match(/^gitdir:\s*(.+)$/m);
+    if (!gitdirMatch?.[1]) {
+      return null;
+    }
 
-		// gitdir may be relative (rare, but git accepts it) — resolve against cwd
-		const gitdir = resolve(cwd, gitdirMatch[1].trim());
-		// gitdir format: /path/to/main/repo/.git/worktrees/worktree-name
-		// Match the /.git/worktrees/ segment specifically — indexOf('.git') alone
-		// would false-match paths like /home/user/.github-projects/...
-		const marker = `${sep}.git${sep}worktrees${sep}`;
-		const markerIndex = gitdir.lastIndexOf(marker);
-		if (markerIndex <= 0) {
-			return null;
-		}
+    // gitdir may be relative (rare, but git accepts it) — resolve against cwd
+    const gitdir = resolve(cwd, gitdirMatch[1].trim());
+    // gitdir format: /path/to/main/repo/.git/worktrees/worktree-name
+    // Match the /.git/worktrees/ segment specifically — indexOf('.git') alone
+    // would false-match paths like /home/user/.github-projects/...
+    const marker = `${sep}.git${sep}worktrees${sep}`;
+    const markerIndex = gitdir.lastIndexOf(marker);
+    if (markerIndex <= 0) {
+      return null;
+    }
 
-		return gitdir.slice(0, markerIndex);
-	} catch {
-		// Not in a worktree, .git is a directory, or can't read .git file
-		return null;
-	}
+    return gitdir.slice(0, markerIndex);
+  } catch {
+    // Not in a worktree, .git is a directory, or can't read .git file
+    return null;
+  }
 }
 
 function addAllowWritePath(config: SandboxConfig, path: string): SandboxConfig {
-	const allowWrite = new Set(config.filesystem?.allowWrite ?? []);
-	if (allowWrite.has(path)) {
-		return config;
-	}
+  const allowWrite = new Set(config.filesystem?.allowWrite ?? []);
+  if (allowWrite.has(path)) {
+    return config;
+  }
 
-	allowWrite.add(path);
-	return {
-		...config,
-		filesystem: {
-			...config.filesystem,
-			allowWrite: Array.from(allowWrite),
-		},
-	};
+  allowWrite.add(path);
+  return {
+    ...config,
+    filesystem: {
+      ...config.filesystem,
+      allowWrite: Array.from(allowWrite),
+    },
+  };
 }
 
 function withWorktreeMainRepoGitWriteAccess(config: SandboxConfig, cwd: string): SandboxConfig {
-	const worktreeMainRepoPath = detectWorktreeMainRepoPath(cwd);
-	if (!worktreeMainRepoPath || worktreeMainRepoPath === cwd) {
-		return config;
-	}
+  const worktreeMainRepoPath = detectWorktreeMainRepoPath(cwd);
+  if (!worktreeMainRepoPath || worktreeMainRepoPath === cwd) {
+    return config;
+  }
 
-	// Git operations in a worktree need write access to the main repo's .git
-	// directory for index.lock etc.
-	return addAllowWritePath(config, join(worktreeMainRepoPath, ".git"));
+  // Git operations in a worktree need write access to the main repo's .git
+  // directory for index.lock etc.
+  return addAllowWritePath(config, join(worktreeMainRepoPath, ".git"));
 }
 
 function createSandboxedBashOps(): BashOperations {
-	return {
-		async exec(command, cwd, { onData, signal, timeout, env }) {
-			if (!existsSync(cwd)) {
-				throw new Error(`Working directory does not exist: ${cwd}`);
-			}
+  return {
+    async exec(command, cwd, { onData, signal, timeout, env }) {
+      if (!existsSync(cwd)) {
+        throw new Error(`Working directory does not exist: ${cwd}`);
+      }
 
-			const wrappedCommand = await SandboxManager.wrapWithSandbox(command);
+      const wrappedCommand = await SandboxManager.wrapWithSandbox(command);
 
-			return new Promise((resolve, reject) => {
-				const child = spawn("bash", ["-c", wrappedCommand], {
-					cwd,
-					detached: true,
-					env,
-					stdio: ["ignore", "pipe", "pipe"],
-				});
+      return new Promise((resolve, reject) => {
+        const child = spawn("bash", ["-c", wrappedCommand], {
+          cwd,
+          detached: true,
+          env,
+          stdio: ["ignore", "pipe", "pipe"],
+        });
 
-				let timedOut = false;
-				let timeoutHandle: NodeJS.Timeout | undefined;
+        let timedOut = false;
+        let timeoutHandle: NodeJS.Timeout | undefined;
 
-				if (timeout !== undefined && timeout > 0) {
-					timeoutHandle = setTimeout(() => {
-						timedOut = true;
-						if (child.pid) {
-							try {
-								process.kill(-child.pid, "SIGKILL");
-							} catch {
-								child.kill("SIGKILL");
-							}
-						}
-					}, timeout * 1000);
-				}
+        if (timeout !== undefined && timeout > 0) {
+          timeoutHandle = setTimeout(() => {
+            timedOut = true;
+            if (child.pid) {
+              try {
+                process.kill(-child.pid, "SIGKILL");
+              } catch {
+                child.kill("SIGKILL");
+              }
+            }
+          }, timeout * 1000);
+        }
 
-				child.stdout?.on("data", onData);
-				child.stderr?.on("data", onData);
+        child.stdout?.on("data", onData);
+        child.stderr?.on("data", onData);
 
-				child.on("error", (err) => {
-					if (timeoutHandle) clearTimeout(timeoutHandle);
-					reject(err);
-				});
+        child.on("error", (err) => {
+          if (timeoutHandle) clearTimeout(timeoutHandle);
+          reject(err);
+        });
 
-				const onAbort = () => {
-					if (child.pid) {
-						try {
-							process.kill(-child.pid, "SIGKILL");
-						} catch {
-							child.kill("SIGKILL");
-						}
-					}
-				};
+        const onAbort = () => {
+          if (child.pid) {
+            try {
+              process.kill(-child.pid, "SIGKILL");
+            } catch {
+              child.kill("SIGKILL");
+            }
+          }
+        };
 
-				signal?.addEventListener("abort", onAbort, { once: true });
+        signal?.addEventListener("abort", onAbort, { once: true });
 
-				child.on("close", (code) => {
-					if (timeoutHandle) clearTimeout(timeoutHandle);
-					signal?.removeEventListener("abort", onAbort);
+        child.on("close", (code) => {
+          if (timeoutHandle) clearTimeout(timeoutHandle);
+          signal?.removeEventListener("abort", onAbort);
 
-					if (signal?.aborted) {
-						reject(new Error("aborted"));
-					} else if (timedOut) {
-						reject(new Error(`timeout:${timeout}`));
-					} else {
-						resolve({ exitCode: code });
-					}
-				});
-			});
-		},
-	};
+          if (signal?.aborted) {
+            reject(new Error("aborted"));
+          } else if (timedOut) {
+            reject(new Error(`timeout:${timeout}`));
+          } else {
+            resolve({ exitCode: code });
+          }
+        });
+      });
+    },
+  };
 }
 
 // Track allowed domains for this session (user approved)
@@ -326,274 +336,286 @@ const sessionAllowedDomains = new Set<string>();
 
 // Create the ask callback that prompts user for network permission
 function createAskCallback(pi: ExtensionAPI, ctx: ExtensionContext): SandboxAskCallback {
-	return async ({ host, port }) => {
-		const target = port ? `${host}:${port}` : host;
+  return async ({ host, port }) => {
+    const target = port ? `${host}:${port}` : host;
 
-		// Check if already approved this session
-		if (sessionAllowedDomains.has(host) || sessionAllowedDomains.has(target)) {
-			return true;
-		}
+    // Check if already approved this session
+    if (sessionAllowedDomains.has(host) || sessionAllowedDomains.has(target)) {
+      return true;
+    }
 
-		if (!ctx.hasUI) {
-			return false;
-		}
+    if (!ctx.hasUI) {
+      return false;
+    }
 
-		// Known issues:
-		// 1. Pending approvals still consume wall-clock timeouts, including bash tool
-		//    timeout and `curl --connect-timeout`.
-		// 2. Without a request-scoped signal, the dialog can outlive the originating
-		//    command.
-		try {
-			pi.events.emit("my:notification", { title: "Pi Sandbox Network Approval", body: `Allow connection to ${target}?` });
-			const allowed = await ctx.ui.confirm("Network Access", `Allow connection to ${target}?`);
+    // Known issues:
+    // 1. Pending approvals still consume wall-clock timeouts, including bash tool
+    //    timeout and `curl --connect-timeout`.
+    // 2. Without a request-scoped signal, the dialog can outlive the originating
+    //    command.
+    try {
+      pi.events.emit("my:notification", {
+        title: "Pi Sandbox Network Approval",
+        body: `Allow connection to ${target}?`,
+      });
+      const allowed = await ctx.ui.confirm("Network Access", `Allow connection to ${target}?`);
 
-			if (allowed) {
-				sessionAllowedDomains.add(host);
-				ctx.ui.notify(`Allowed: ${target}`, "info");
-			} else {
-				ctx.ui.notify(`Blocked: ${target}`, "warning");
-			}
+      if (allowed) {
+        sessionAllowedDomains.add(host);
+        ctx.ui.notify(`Allowed: ${target}`, "info");
+      } else {
+        ctx.ui.notify(`Blocked: ${target}`, "warning");
+      }
 
-			return allowed;
-		} catch {
-			return false;
-		}
-	};
+      return allowed;
+    } catch {
+      return false;
+    }
+  };
 }
 
 export default function (pi: ExtensionAPI) {
-	pi.registerFlag("no-sandbox", {
-		description: "Disable OS-level sandboxing for bash commands",
-		type: "boolean",
-		default: false,
-	});
+  pi.registerFlag("no-sandbox", {
+    description: "Disable OS-level sandboxing for bash commands",
+    type: "boolean",
+    default: false,
+  });
 
-	const platform = process.platform;
-	const localCwd = process.cwd();
-	const localBash = createBashTool(localCwd);
+  const platform = process.platform;
+  const localCwd = process.cwd();
+  const localBash = createBashTool(localCwd);
 
-	let sandboxEnabled = false;
-	let sandboxInitialized = false;
+  let sandboxEnabled = false;
+  let sandboxInitialized = false;
 
-	async function getExcludedCommandMatch(command: string, cwd: string) {
-		const config = withWorktreeMainRepoGitWriteAccess(loadConfig(cwd), cwd);
-		if (!hasExcludedCommands(config)) return null;
-		return matchExcludedCommand(command, cwd, config.excludedCommands ?? []);
-	}
+  async function getExcludedCommandMatch(command: string, cwd: string) {
+    const config = withWorktreeMainRepoGitWriteAccess(loadConfig(cwd), cwd);
+    if (!hasExcludedCommands(config)) return null;
+    return matchExcludedCommand(command, cwd, config.excludedCommands ?? []);
+  }
 
-	function updateSandboxStatus(ctx: ExtensionContext) {
-		if (!ctx.hasUI) return;
-		if (!sandboxEnabled) {
-			ctx.ui.setStatus("sandbox", undefined);
-			return;
-		}
-		const config = SandboxManager.getConfig();
-		const networkCount = config?.network?.allowedDomains?.length ?? 0;
-		const writeCount = config?.filesystem?.allowWrite?.length ?? 0;
-		ctx.ui.setStatus("sandbox", ctx.ui.theme.fg("dim", `󰌾 ${networkCount}/${writeCount}`));
-	}
+  function updateSandboxStatus(ctx: ExtensionContext) {
+    if (!ctx.hasUI) return;
+    if (!sandboxEnabled) {
+      ctx.ui.setStatus("sandbox", undefined);
+      return;
+    }
+    const config = SandboxManager.getConfig();
+    const networkCount = config?.network?.allowedDomains?.length ?? 0;
+    const writeCount = config?.filesystem?.allowWrite?.length ?? 0;
+    ctx.ui.setStatus("sandbox", ctx.ui.theme.fg("dim", `󰌾 ${networkCount}/${writeCount}`));
+  }
 
-	async function initializeSandbox(
-		ctx: ExtensionContext,
-		{
-			respectConfigEnabled = true,
-		}: {
-			respectConfigEnabled?: boolean;
-		} = {},
-	): Promise<boolean> {
-		if (platform !== "darwin" && platform !== "linux") {
-			sandboxEnabled = false;
-			sandboxInitialized = false;
-			updateSandboxStatus(ctx);
-			ctx.ui.notify(`Sandbox not supported on ${platform}`, "warning");
-			return false;
-		}
+  async function initializeSandbox(
+    ctx: ExtensionContext,
+    {
+      respectConfigEnabled = true,
+    }: {
+      respectConfigEnabled?: boolean;
+    } = {},
+  ): Promise<boolean> {
+    if (platform !== "darwin" && platform !== "linux") {
+      sandboxEnabled = false;
+      sandboxInitialized = false;
+      updateSandboxStatus(ctx);
+      ctx.ui.notify(`Sandbox not supported on ${platform}`, "warning");
+      return false;
+    }
 
-		const config = withWorktreeMainRepoGitWriteAccess(loadConfig(ctx.cwd), ctx.cwd);
-		if (respectConfigEnabled && !config.enabled) {
-			sandboxEnabled = false;
-			sandboxInitialized = false;
-			updateSandboxStatus(ctx);
-			ctx.ui.notify("Sandbox disabled via config", "info");
-			return false;
-		}
+    const config = withWorktreeMainRepoGitWriteAccess(loadConfig(ctx.cwd), ctx.cwd);
+    if (respectConfigEnabled && !config.enabled) {
+      sandboxEnabled = false;
+      sandboxInitialized = false;
+      updateSandboxStatus(ctx);
+      ctx.ui.notify("Sandbox disabled via config", "info");
+      return false;
+    }
 
-		try {
-			if (hasExcludedCommands(config)) {
-				await initializeExcludedCommandMatcher();
-			}
+    try {
+      if (hasExcludedCommands(config)) {
+        await initializeExcludedCommandMatcher();
+      }
 
-			const configExt = config as unknown as {
-				ignoreViolations?: Record<string, string[]>;
-				enableWeakerNestedSandbox?: boolean;
-				enableWeakerNetworkIsolation?: boolean;
-			};
+      const configExt = config as unknown as {
+        ignoreViolations?: Record<string, string[]>;
+        enableWeakerNestedSandbox?: boolean;
+        enableWeakerNetworkIsolation?: boolean;
+      };
 
-			const askCallback = createAskCallback(pi, ctx);
+      const askCallback = createAskCallback(pi, ctx);
 
-			await SandboxManager.initialize(
-				{
-					network: config.network,
-					filesystem: config.filesystem,
-					ignoreViolations: configExt.ignoreViolations,
-					enableWeakerNestedSandbox: configExt.enableWeakerNestedSandbox,
-					enableWeakerNetworkIsolation: configExt.enableWeakerNetworkIsolation,
-				},
-				askCallback,
-			);
+      await SandboxManager.initialize(
+        {
+          network: config.network,
+          filesystem: config.filesystem,
+          ignoreViolations: configExt.ignoreViolations,
+          enableWeakerNestedSandbox: configExt.enableWeakerNestedSandbox,
+          enableWeakerNetworkIsolation: configExt.enableWeakerNetworkIsolation,
+        },
+        askCallback,
+      );
 
-			sandboxEnabled = true;
-			sandboxInitialized = true;
-			updateSandboxStatus(ctx);
-			return true;
-		} catch (err) {
-			sandboxEnabled = false;
-			sandboxInitialized = false;
-			updateSandboxStatus(ctx);
-			ctx.ui.notify(`Sandbox initialization failed: ${err instanceof Error ? err.message : err}`, "error");
-			return false;
-		}
-	}
+      sandboxEnabled = true;
+      sandboxInitialized = true;
+      updateSandboxStatus(ctx);
+      return true;
+    } catch (err) {
+      sandboxEnabled = false;
+      sandboxInitialized = false;
+      updateSandboxStatus(ctx);
+      ctx.ui.notify(
+        `Sandbox initialization failed: ${err instanceof Error ? err.message : err}`,
+        "error",
+      );
+      return false;
+    }
+  }
 
-	pi.registerTool({
-		...localBash,
-		label: "bash (sandboxed)",
-		async execute(id, params, signal, onUpdate, ctx) {
-			if (!sandboxEnabled || !sandboxInitialized) {
-				return localBash.execute(id, params, signal, onUpdate);
-			}
+  pi.registerTool({
+    ...localBash,
+    label: "bash (sandboxed)",
+    async execute(id, params, signal, onUpdate, ctx) {
+      if (!sandboxEnabled || !sandboxInitialized) {
+        return localBash.execute(id, params, signal, onUpdate);
+      }
 
-			const command = typeof params?.command === "string" ? params.command : "";
-			const excludedMatch = await getExcludedCommandMatch(command, ctx.cwd);
-			if (excludedMatch) {
-				if (ctx.hasUI) {
-					ctx.ui.notify(`Bypassing sandbox: matched excluded command "${excludedMatch.pattern}"`, "info");
-				}
-				return localBash.execute(id, params, signal, onUpdate);
-			}
+      const command = typeof params?.command === "string" ? params.command : "";
+      const excludedMatch = await getExcludedCommandMatch(command, ctx.cwd);
+      if (excludedMatch) {
+        if (ctx.hasUI) {
+          ctx.ui.notify(
+            `Bypassing sandbox: matched excluded command "${excludedMatch.pattern}"`,
+            "info",
+          );
+        }
+        return localBash.execute(id, params, signal, onUpdate);
+      }
 
-			const sandboxedBash = createBashTool(localCwd, {
-				operations: createSandboxedBashOps(),
-			});
-			return sandboxedBash.execute(id, params, signal, onUpdate);
-		},
-	});
+      const sandboxedBash = createBashTool(localCwd, {
+        operations: createSandboxedBashOps(),
+      });
+      return sandboxedBash.execute(id, params, signal, onUpdate);
+    },
+  });
 
-	pi.on("user_bash", async (event, ctx) => {
-		if (!sandboxEnabled || !sandboxInitialized) return;
+  pi.on("user_bash", async (event, ctx) => {
+    if (!sandboxEnabled || !sandboxInitialized) return;
 
-		const excludedMatch = await getExcludedCommandMatch(event.command, event.cwd);
-		if (excludedMatch) {
-			if (ctx.hasUI) {
-				ctx.ui.notify(`Bypassing sandbox: matched excluded command "${excludedMatch.pattern}"`, "info");
-			}
-			return { operations: createLocalBashOperations() };
-		}
+    const excludedMatch = await getExcludedCommandMatch(event.command, event.cwd);
+    if (excludedMatch) {
+      if (ctx.hasUI) {
+        ctx.ui.notify(
+          `Bypassing sandbox: matched excluded command "${excludedMatch.pattern}"`,
+          "info",
+        );
+      }
+      return { operations: createLocalBashOperations() };
+    }
 
-		return { operations: createSandboxedBashOps() };
-	});
+    return { operations: createSandboxedBashOps() };
+  });
 
-	pi.on("session_start", async (_event, ctx) => {
-		const noSandbox = pi.getFlag("no-sandbox") as boolean;
+  pi.on("session_start", async (_event, ctx) => {
+    const noSandbox = pi.getFlag("no-sandbox") as boolean;
 
-		if (noSandbox) {
-			sandboxEnabled = false;
-			sandboxInitialized = false;
-			updateSandboxStatus(ctx);
-			ctx.ui.notify("Sandbox disabled via --no-sandbox", "warning");
-			return;
-		}
+    if (noSandbox) {
+      sandboxEnabled = false;
+      sandboxInitialized = false;
+      updateSandboxStatus(ctx);
+      ctx.ui.notify("Sandbox disabled via --no-sandbox", "warning");
+      return;
+    }
 
-		if (await initializeSandbox(ctx)) {
-			ctx.ui.notify("Sandbox initialized", "info");
-		}
-	});
+    if (await initializeSandbox(ctx)) {
+      ctx.ui.notify("Sandbox initialized", "info");
+    }
+  });
 
-	pi.on("session_shutdown", async () => {
-		if (sandboxInitialized) {
-			try {
-				await SandboxManager.reset();
-			} catch {
-				// Ignore cleanup errors
-			}
-		}
+  pi.on("session_shutdown", async () => {
+    if (sandboxInitialized) {
+      try {
+        await SandboxManager.reset();
+      } catch {
+        // Ignore cleanup errors
+      }
+    }
 
-		sandboxEnabled = false;
-		sandboxInitialized = false;
+    sandboxEnabled = false;
+    sandboxInitialized = false;
 
-		// Clear session state
-		sessionAllowedDomains.clear();
-	});
+    // Clear session state
+    sessionAllowedDomains.clear();
+  });
 
-	pi.registerCommand("sandbox", {
-		description: "Show sandbox configuration or toggle (/sandbox [on|off])",
-		getArgumentCompletions(prefix: string) {
-			const items = ["on", "off"]
-				.filter((item) => item.startsWith(prefix.trimStart().toLowerCase()))
-				.map((item) => ({ value: item, label: item }));
-			return items.length > 0 ? items : null;
-		},
-		handler: async (args, ctx) => {
-			const arg = args.trim().toLowerCase();
+  pi.registerCommand("sandbox", {
+    description: "Show sandbox configuration or toggle (/sandbox [on|off])",
+    getArgumentCompletions(prefix: string) {
+      const items = ["on", "off"]
+        .filter((item) => item.startsWith(prefix.trimStart().toLowerCase()))
+        .map((item) => ({ value: item, label: item }));
+      return items.length > 0 ? items : null;
+    },
+    handler: async (args, ctx) => {
+      const arg = args.trim().toLowerCase();
 
-			if (arg === "on") {
-				if (sandboxEnabled) {
-					ctx.ui.notify("Sandbox is already enabled", "info");
-					return;
-				}
-				if (sandboxInitialized) {
-					sandboxEnabled = true;
-					updateSandboxStatus(ctx);
-					ctx.ui.notify("Sandbox enabled", "info");
-					return;
-				}
-				if (await initializeSandbox(ctx, { respectConfigEnabled: false })) {
-					ctx.ui.notify("Sandbox enabled", "info");
-				}
-				return;
-			}
+      if (arg === "on") {
+        if (sandboxEnabled) {
+          ctx.ui.notify("Sandbox is already enabled", "info");
+          return;
+        }
+        if (sandboxInitialized) {
+          sandboxEnabled = true;
+          updateSandboxStatus(ctx);
+          ctx.ui.notify("Sandbox enabled", "info");
+          return;
+        }
+        if (await initializeSandbox(ctx, { respectConfigEnabled: false })) {
+          ctx.ui.notify("Sandbox enabled", "info");
+        }
+        return;
+      }
 
-			if (arg === "off") {
-				if (!sandboxEnabled) {
-					ctx.ui.notify("Sandbox is already disabled", "info");
-					return;
-				}
-				sandboxEnabled = false;
-				updateSandboxStatus(ctx);
-				ctx.ui.notify("Sandbox disabled", "warning");
-				return;
-			}
+      if (arg === "off") {
+        if (!sandboxEnabled) {
+          ctx.ui.notify("Sandbox is already disabled", "info");
+          return;
+        }
+        sandboxEnabled = false;
+        updateSandboxStatus(ctx);
+        ctx.ui.notify("Sandbox disabled", "warning");
+        return;
+      }
 
-			// No args — show status
-			if (!arg) {
-				if (!sandboxEnabled) {
-					ctx.ui.notify("Sandbox is disabled. Use `/sandbox on` to enable.", "info");
-					return;
-				}
+      // No args — show status
+      if (!arg) {
+        if (!sandboxEnabled) {
+          ctx.ui.notify("Sandbox is disabled. Use `/sandbox on` to enable.", "info");
+          return;
+        }
 
-				const config = loadConfig(ctx.cwd);
-				const lines = [
-					"Sandbox: ENABLED",
-					"",
-					"Excluded Commands:",
-					`  ${config.excludedCommands?.join(", ") || "(none)"}`,
-					"",
-					"Network:",
-					`  Allowed: ${config.network?.allowedDomains?.join(", ") || "(none)"}`,
-					`  Denied: ${config.network?.deniedDomains?.join(", ") || "(none)"}`,
-					`  Session approved: ${Array.from(sessionAllowedDomains).join(", ") || "(none)"}`,
-					"",
-					"Filesystem:",
-					`  Allow Read: ${config.filesystem?.allowRead?.join(", ") || "(none)"}`,
-					`  Deny Read: ${config.filesystem?.denyRead?.join(", ") || "(none)"}`,
-					`  Allow Write: ${config.filesystem?.allowWrite?.join(", ") || "(none)"}`,
-					`  Deny Write: ${config.filesystem?.denyWrite?.join(", ") || "(none)"}`,
-				];
-				ctx.ui.notify(lines.join("\n"), "info");
-				return;
-			}
+        const config = loadConfig(ctx.cwd);
+        const lines = [
+          "Sandbox: ENABLED",
+          "",
+          "Excluded Commands:",
+          `  ${config.excludedCommands?.join(", ") || "(none)"}`,
+          "",
+          "Network:",
+          `  Allowed: ${config.network?.allowedDomains?.join(", ") || "(none)"}`,
+          `  Denied: ${config.network?.deniedDomains?.join(", ") || "(none)"}`,
+          `  Session approved: ${Array.from(sessionAllowedDomains).join(", ") || "(none)"}`,
+          "",
+          "Filesystem:",
+          `  Allow Read: ${config.filesystem?.allowRead?.join(", ") || "(none)"}`,
+          `  Deny Read: ${config.filesystem?.denyRead?.join(", ") || "(none)"}`,
+          `  Allow Write: ${config.filesystem?.allowWrite?.join(", ") || "(none)"}`,
+          `  Deny Write: ${config.filesystem?.denyWrite?.join(", ") || "(none)"}`,
+        ];
+        ctx.ui.notify(lines.join("\n"), "info");
+        return;
+      }
 
-			ctx.ui.notify("Usage: /sandbox [on|off]", "error");
-		},
-	});
+      ctx.ui.notify("Usage: /sandbox [on|off]", "error");
+    },
+  });
 }
