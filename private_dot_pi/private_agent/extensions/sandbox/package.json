@@ -6,7 +6,7 @@
 	"scripts": {
 		"clean": "echo 'nothing to clean'",
 		"build": "echo 'nothing to build'",
-		"check": "node ./test-excluded-commands.mjs"
+		"check": "node ./test-excluded-commands.mjs && node ./test-just-bash-ops.mjs"
 	},
 	"pi": {
 		"extensions": [
@@ -15,6 +15,7 @@
 	},
 	"dependencies": {
 		"@anthropic-ai/sandbox-runtime": "^0.0.52",
+		"just-bash": "^3.0.1",
 		"tree-sitter-bash": "0.25.0",
 		"web-tree-sitter": "0.25.10"
 	},

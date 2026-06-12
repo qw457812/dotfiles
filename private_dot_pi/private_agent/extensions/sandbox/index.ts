@@ -74,10 +74,6 @@
  * Linux also requires: bubblewrap, socat, ripgrep
  */
 
-import { spawn } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
-import { join, resolve, sep } from "node:path";
-import { initializeExcludedCommandMatcher, matchExcludedCommand } from "./excluded-commands.ts";
 import {
   SandboxManager,
   type SandboxAskCallback,
@@ -85,15 +81,25 @@ import {
 } from "@anthropic-ai/sandbox-runtime";
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import {
-  type BashOperations,
   createBashTool,
   createLocalBashOperations,
   getAgentDir,
+  type BashOperations,
 } from "@earendil-works/pi-coding-agent";
+import { spawn } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
+import { join, resolve, sep } from "node:path";
+import { initializeExcludedCommandMatcher, matchExcludedCommand } from "./excluded-commands.ts";
+import {
+  createJustBashOps,
+  formatAllowedUrlPrefixes,
+  type JustBashConfig,
+} from "./just-bash-ops.ts";
 
 interface SandboxConfig extends SandboxRuntimeConfig {
   enabled?: boolean;
   excludedCommands?: string[];
+  justBash?: JustBashConfig;
 }
 
 const DEFAULT_CONFIG: SandboxConfig = {
@@ -165,6 +171,15 @@ function deepMerge(base: SandboxConfig, overrides: Partial<SandboxConfig>): Sand
   if (overrides.enabled !== undefined) result.enabled = overrides.enabled;
   if (overrides.excludedCommands !== undefined)
     result.excludedCommands = overrides.excludedCommands;
+  if (overrides.justBash) {
+    result.justBash = {
+      ...base.justBash,
+      ...overrides.justBash,
+      ...(overrides.justBash.network
+        ? { network: { ...base.justBash?.network, ...overrides.justBash.network } }
+        : {}),
+    };
+  }
   if (overrides.network) {
     result.network = { ...base.network, ...overrides.network };
   }
@@ -259,6 +274,13 @@ function withWorktreeMainRepoGitWriteAccess(config: SandboxConfig, cwd: string):
   // Git operations in a worktree need write access to the main repo's .git
   // directory for index.lock etc.
   return addAllowWritePath(config, join(worktreeMainRepoPath, ".git"));
+}
+
+function isTermux(): boolean {
+  return (
+    (process.platform as string) === "android" ||
+    process.env.PREFIX?.includes("/com.termux/") === true
+  );
 }
 
 function createSandboxedBashOps(): BashOperations {
@@ -400,6 +422,16 @@ export default function (pi: ExtensionAPI) {
       ctx.ui.setStatus("sandbox", undefined);
       return;
     }
+    if (isTermux()) {
+      const network = loadConfig(ctx.cwd).justBash?.network;
+      const networkCount = network?.dangerouslyAllowFullInternetAccess
+        ? "∞"
+        : String(
+            Array.isArray(network?.allowedUrlPrefixes) ? network.allowedUrlPrefixes.length : 0,
+          );
+      ctx.ui.setStatus("sandbox", ctx.ui.theme.fg("dim", `󰌾 ${networkCount}`));
+      return;
+    }
     const config = SandboxManager.getConfig();
     const networkCount = config?.network?.allowedDomains?.length ?? 0;
     const writeCount = config?.filesystem?.allowWrite?.length ?? 0;
@@ -414,14 +446,6 @@ export default function (pi: ExtensionAPI) {
       respectConfigEnabled?: boolean;
     } = {},
   ): Promise<boolean> {
-    if (platform !== "darwin" && platform !== "linux") {
-      sandboxEnabled = false;
-      sandboxInitialized = false;
-      updateSandboxStatus(ctx);
-      ctx.ui.notify(`Sandbox not supported on ${platform}`, "warning");
-      return false;
-    }
-
     const config = withWorktreeMainRepoGitWriteAccess(loadConfig(ctx.cwd), ctx.cwd);
     if (respectConfigEnabled && !config.enabled) {
       sandboxEnabled = false;
@@ -434,6 +458,21 @@ export default function (pi: ExtensionAPI) {
     try {
       if (hasExcludedCommands(config)) {
         await initializeExcludedCommandMatcher();
+      }
+
+      if (isTermux()) {
+        sandboxEnabled = true;
+        sandboxInitialized = true;
+        updateSandboxStatus(ctx);
+        return true;
+      }
+
+      if (platform !== "darwin" && platform !== "linux") {
+        sandboxEnabled = false;
+        sandboxInitialized = false;
+        updateSandboxStatus(ctx);
+        ctx.ui.notify(`Sandbox not supported on ${platform}`, "warning");
+        return false;
       }
 
       const configExt = config as unknown as {
@@ -491,6 +530,14 @@ export default function (pi: ExtensionAPI) {
         return localBash.execute(id, params, signal, onUpdate);
       }
 
+      if (isTermux()) {
+        const config = withWorktreeMainRepoGitWriteAccess(loadConfig(ctx.cwd), ctx.cwd);
+        const justBash = createBashTool(ctx.cwd, {
+          operations: createJustBashOps(ctx.cwd, config.justBash?.network, config.filesystem),
+        });
+        return justBash.execute(id, params, signal, onUpdate);
+      }
+
       const sandboxedBash = createBashTool(localCwd, {
         operations: createSandboxedBashOps(),
       });
@@ -510,6 +557,13 @@ export default function (pi: ExtensionAPI) {
         );
       }
       return { operations: createLocalBashOperations() };
+    }
+
+    if (isTermux()) {
+      const config = withWorktreeMainRepoGitWriteAccess(loadConfig(event.cwd), event.cwd);
+      return {
+        operations: createJustBashOps(event.cwd, config.justBash?.network, config.filesystem),
+      };
     }
 
     return { operations: createSandboxedBashOps() };
@@ -532,7 +586,7 @@ export default function (pi: ExtensionAPI) {
   });
 
   pi.on("session_shutdown", async () => {
-    if (sandboxInitialized) {
+    if (sandboxInitialized && !isTermux()) {
       try {
         await SandboxManager.reset();
       } catch {
@@ -594,16 +648,27 @@ export default function (pi: ExtensionAPI) {
         }
 
         const config = loadConfig(ctx.cwd);
+        const network = config.justBash?.network;
         const lines = [
           "Sandbox: ENABLED",
           "",
           "Excluded Commands:",
           `  ${config.excludedCommands?.join(", ") || "(none)"}`,
           "",
-          "Network:",
-          `  Allowed: ${config.network?.allowedDomains?.join(", ") || "(none)"}`,
-          `  Denied: ${config.network?.deniedDomains?.join(", ") || "(none)"}`,
-          `  Session approved: ${Array.from(sessionAllowedDomains).join(", ") || "(none)"}`,
+          ...(isTermux()
+            ? [
+                "Just Bash Network:",
+                `  Allowed URL Prefixes: ${formatAllowedUrlPrefixes(network?.allowedUrlPrefixes)}`,
+                `  Allowed Methods: ${network?.allowedMethods?.join(", ") || "(default GET, HEAD)"}`,
+                `  Full Internet: ${network?.dangerouslyAllowFullInternetAccess === true ? "true" : "false"}`,
+                `  Deny Private Ranges: ${network?.denyPrivateRanges === undefined ? "(just-bash default)" : String(network.denyPrivateRanges)}`,
+              ]
+            : [
+                "Network:",
+                `  Allowed: ${config.network?.allowedDomains?.join(", ") || "(none)"}`,
+                `  Denied: ${config.network?.deniedDomains?.join(", ") || "(none)"}`,
+                `  Session approved: ${Array.from(sessionAllowedDomains).join(", ") || "(none)"}`,
+              ]),
           "",
           "Filesystem:",
           `  Allow Read: ${config.filesystem?.allowRead?.join(", ") || "(none)"}`,
