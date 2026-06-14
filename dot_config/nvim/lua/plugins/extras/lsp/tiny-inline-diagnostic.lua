@@ -1,3 +1,5 @@
+-- TODO: try https://github.com/neovim/neovim/pull/40178
+
 ---@type LazySpec
 return {
   {
