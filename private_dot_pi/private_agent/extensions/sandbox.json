@@ -51,5 +51,8 @@
       "~/.bun",
       "~/.cache" // in favor of `/skill:librarian`
     ]
+  },
+  "justBash": {
+    "dangerouslyPassthroughCommands": ["git", "gh"]
   }
 }

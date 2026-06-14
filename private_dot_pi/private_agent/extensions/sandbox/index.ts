@@ -58,6 +58,9 @@
  *     "denyRead": ["~/.ssh", "~/.aws"],
  *     "allowWrite": [".", "/tmp"],
  *     "denyWrite": [".env"]
+ *   },
+ *   "justBash": {
+ *     "dangerouslyPassthroughCommands": ["git"]
  *   }
  * }
  * ```
@@ -533,7 +536,7 @@ export default function (pi: ExtensionAPI) {
       if (isTermux()) {
         const config = withWorktreeMainRepoGitWriteAccess(loadConfig(ctx.cwd), ctx.cwd);
         const justBash = createBashTool(ctx.cwd, {
-          operations: createJustBashOps(ctx.cwd, config.justBash?.network, config.filesystem),
+          operations: createJustBashOps(ctx.cwd, config.justBash, config.filesystem),
         });
         return justBash.execute(id, params, signal, onUpdate);
       }
@@ -562,7 +565,7 @@ export default function (pi: ExtensionAPI) {
     if (isTermux()) {
       const config = withWorktreeMainRepoGitWriteAccess(loadConfig(event.cwd), event.cwd);
       return {
-        operations: createJustBashOps(event.cwd, config.justBash?.network, config.filesystem),
+        operations: createJustBashOps(event.cwd, config.justBash, config.filesystem),
       };
     }
 
@@ -648,7 +651,8 @@ export default function (pi: ExtensionAPI) {
         }
 
         const config = loadConfig(ctx.cwd);
-        const network = config.justBash?.network;
+        const justBash = config.justBash;
+        const network = justBash?.network;
         const lines = [
           "Sandbox: ENABLED",
           "",
@@ -662,6 +666,7 @@ export default function (pi: ExtensionAPI) {
                 `  Allowed Methods: ${network?.allowedMethods?.join(", ") || "(default GET, HEAD)"}`,
                 `  Full Internet: ${network?.dangerouslyAllowFullInternetAccess === true ? "true" : "false"}`,
                 `  Deny Private Ranges: ${network?.denyPrivateRanges === undefined ? "(just-bash default)" : String(network.denyPrivateRanges)}`,
+                `  Host Commands (unsandboxed; disables just-bash defense; env scrubbed): ${justBash?.dangerouslyPassthroughCommands?.join(", ") || "(none)"}`,
               ]
             : [
                 "Network:",
