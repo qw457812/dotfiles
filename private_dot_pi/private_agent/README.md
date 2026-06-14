@@ -1,0 +1,9 @@
+- <https://github.com/qw457812/claude-code-sourcemap>
+- <https://github.com/openai/codex>
+- <https://github.com/anomalyco/opencode>
+- <https://github.com/openclaw/openclaw>
+- <https://github.com/charmbracelet/crush>
+- <https://github.com/cline/cline>
+- <https://github.com/XiaomiMiMo/MiMo-Code>
+- <https://github.com/1jehuang/jcode>
+- <https://github.com/withastro/flue>
