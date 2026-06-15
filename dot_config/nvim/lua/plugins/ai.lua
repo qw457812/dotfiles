@@ -611,11 +611,13 @@ return {
               "--no-alt-screen", -- for https://github.com/folke/sidekick.nvim/blob/41dec4dcdf0c8fe17f5f2e9eeced4645a88afb0d/lua/sidekick/cli/session/tmux.lua#L194 (not sure if `--no-alt-screen` makes any difference)
             },
             env = {
+              MANPAGER = "col -bx",
               __AI_AGENT = "codex",
             },
           },
           opencode = {
             env = {
+              MANPAGER = "col -bx",
               __AI_AGENT = "opencode",
               NVIM_FLATTEN_NEST = "1",
               OPENCODE_THEME = "", -- undo https://github.com/folke/sidekick.nvim/blob/c302dbaf0fcbde909838b296719bbf84e3db6e20/lua/sidekick/config.lua#L119-L119
@@ -625,9 +627,9 @@ return {
               -- up_ctrl_p = false, -- opencode uses <c-p> for its own functionality
             },
           },
-          gemini = { cmd = { "hack_to_disable_gemini" } }, -- HACK: disable gemini
           pi = {
             env = {
+              MANPAGER = "col -bx",
               __AI_AGENT = "pi",
               NVIM_FLATTEN_NEST = "1",
             },
@@ -649,6 +651,7 @@ return {
               blur_t = false, -- codebuddy uses <c-o> for its own functionality
             },
           },
+          gemini = { cmd = { "hack_to_disable_gemini" } }, -- HACK: disable gemini
           -- debug = { cmd = { "bash", "-c", "env | sort | bat -l env" } },
         },
         ---@type table<string, sidekick.Prompt|string|fun(ctx:sidekick.context.ctx):(string?)>

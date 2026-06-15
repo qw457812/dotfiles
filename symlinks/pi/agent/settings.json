@@ -11,14 +11,11 @@
     "openai-codex/gpt-5.5",
     "openai-codex/gpt-5.4",
     "github-copilot/gpt-5.4",
-    "freemodel/gpt-5.5",
-    "freemodel/gpt-5.4",
     "deepseek/deepseek-v4-pro",
     "xiaomi/mimo-v2.5-pro",
     "neuralwatt/glm-5.1",
     "neuralwatt/kimi-k2.6",
-    "neuralwatt/glm-5.1-flex",
-    "neuralwatt/kimi-k2.6-flex"
+    "codebuddy/glm-5.1"
   ],
   "packages": [
     "npm:pi-vim",
