@@ -31,8 +31,12 @@ def handle_result(
     if w is None:
         return
 
-    # make <bs> close the lazygit
-    # mapped <c-h> to quit in lazygit/config.yml via `quitWithoutChangingDirectory: <backspace>`
-    # when typing a commit message in lazygit, <c-h> and <bs> do the same thing
-    key = "ctrl+h" if w.child.foreground_cmdline[0] == "lazygit" else "backspace"
-    w.write_to_child(encode_key_mapping(w, key))
+    if w.child.foreground_cmdline[0] == "lazygit":
+        # make <bs> close the lazygit
+        # mapped <c-h> to quit in lazygit/config.yml via `quitWithoutChangingDirectory: <backspace>`
+        # when typing a commit message in lazygit, <c-h> and <bs> do the same thing
+        # tcell doesn't handle kitty keyboard protocol's CSI-u backspace correctly
+        # with <backspace> keybinding, so send raw \x08 (ASCII BS) instead
+        w.write_to_child(b"\x08")
+    else:
+        w.write_to_child(encode_key_mapping(w, "backspace"))
