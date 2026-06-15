@@ -81,9 +81,8 @@
     "npm:pi-mcp-adapter",
     "npm:@aliou/pi-guardrails",
     "git:github.com/monotykamary/pi-neuralwatt-provider",
-    "git:github.com/monotykamary/pi-tps",
-    "git:github.com/monotykamary/pi-invisible-continue",
     "git:gitlab.com/tom81094/pi-copilot-advanced",
+    "git:github.com/monotykamary/pi-retry",
     "git:github.com/qw457812/pi-listen"
   ],
   "voice": {
