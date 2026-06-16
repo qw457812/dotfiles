@@ -2,7 +2,7 @@
 
 import { createJiti } from "jiti";
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -15,6 +15,7 @@ const thisDirPath = dirname(thisFilePath);
 const workdir = mkdtempSync(join(thisDirPath, ".tmp-workdir-"));
 const extraWriteDir = mkdtempSync(join(thisDirPath, ".tmp-extra-write-"));
 const blockedWritePath = join(thisDirPath, `.tmp-blocked-write-${process.pid}.txt`);
+const hostBinSymlinkPath = join(thisDirPath, `.tmp-host-bin-link-${process.pid}`);
 const defaultTmpWritePath = join(tmpdir(), `pi-sandbox-default-tmp-${process.pid}.txt`);
 const ops = createJustBashOps(workdir, { filesystem: { allowWrite: [".", extraWriteDir] } });
 const passthroughOps = createJustBashOps(
@@ -211,10 +212,41 @@ try {
   assert.equal(awkStdoutFile.exitCode, 2);
   assert.match(awkStdoutFile.output, /EROFS: read-only file system, write '\/dev\/stdout'/);
 
+  // Regression (macOS/Linux): exposing the real host /usr/bin makes just-bash
+  // see ELF/Mach-O binaries instead of command-registry stubs; hiding /usr/bin
+  // entirely makes `command -v git` return a path that cannot be executed. The
+  // sandbox mounts virtual /usr/bin and /bin stub directories instead, so
+  // registered commands resolve through stable system paths while host binaries
+  // remain unreadable.
+  const usrBinVisible = await run(`test -d /usr/bin && echo VISIBLE || echo HIDDEN`);
+  assert.equal(usrBinVisible.output, "VISIBLE\n");
+
+  const gitOps = createJustBashOps(
+    workdir,
+    { dangerouslyPassthroughCommands: ["git"], filesystem: { allowWrite: [".", extraWriteDir] } },
+  );
+  const gitVersion = await runWithOps(gitOps, "git --version");
+  assert.equal(gitVersion.exitCode, 0);
+  assert.match(gitVersion.output, /git version/);
+
+  const gitCommandPath = await runWithOps(gitOps, `command -v git`);
+  assert.equal(gitCommandPath.output, "/usr/bin/git\n");
+  const gitAbsolutePath = await runWithOps(gitOps, `$(command -v git) --version`);
+  assert.equal(gitAbsolutePath.exitCode, 0);
+  assert.match(gitAbsolutePath.output, /git version/);
+
+  if (existsSync("/bin/sh")) {
+    symlinkSync("/bin/sh", hostBinSymlinkPath);
+    const hostBinSymlinkRead = await run(`cat ${hostBinSymlinkPath}`);
+    assert.equal(hostBinSymlinkRead.exitCode, 1);
+    assert.match(hostBinSymlinkRead.output, /No such file or directory/);
+  }
+
   console.log("✓ just-bash operations tests passed");
 } finally {
   rmSync(workdir, { recursive: true, force: true });
   rmSync(extraWriteDir, { recursive: true, force: true });
   rmSync(blockedWritePath, { force: true });
+  rmSync(hostBinSymlinkPath, { force: true });
   rmSync(defaultTmpWritePath, { force: true });
 }
