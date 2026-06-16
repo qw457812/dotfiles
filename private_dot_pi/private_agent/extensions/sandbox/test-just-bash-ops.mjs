@@ -79,6 +79,12 @@ try {
   assert.equal(outsideRead.exitCode, 0);
   assert.equal(outsideRead.output, "#!/usr/bin/env node\n");
 
+  const hostsRead = await run("head -n 1 /etc/hosts");
+  assert.equal(hostsRead.exitCode, 0);
+  assert.ok(hostsRead.output.length > 0);
+
+  assert.deepEqual(await run("which ls"), { exitCode: 0, output: "/usr/bin/ls\n" });
+
   const extraWritePath = join(extraWriteDir, "extra-write.txt");
   assert.deepEqual(await run(`printf extra > ${extraWritePath} && cat ${extraWritePath}`), {
     exitCode: 0,
