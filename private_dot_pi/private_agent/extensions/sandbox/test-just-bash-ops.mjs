@@ -18,10 +18,10 @@ const blockedWritePath = join(thisDirPath, `.tmp-blocked-write-${process.pid}.tx
 const hostBinSymlinkPath = join(thisDirPath, `.tmp-host-bin-link-${process.pid}`);
 const defaultTmpWritePath = join(tmpdir(), `pi-sandbox-default-tmp-${process.pid}.txt`);
 const ops = createJustBashOps(workdir, { filesystem: { allowWrite: [".", extraWriteDir] } });
-const passthroughOps = createJustBashOps(
-  workdir,
-  { dangerouslyPassthroughCommands: ["node"], filesystem: { allowWrite: [".", extraWriteDir] } },
-);
+const passthroughOps = createJustBashOps(workdir, {
+  dangerouslyPassthroughCommands: ["node"],
+  filesystem: { allowWrite: [".", extraWriteDir] },
+});
 
 async function runWithOps(selectedOps, command) {
   let output = "";

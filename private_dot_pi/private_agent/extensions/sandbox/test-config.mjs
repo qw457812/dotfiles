@@ -4,12 +4,8 @@ import assert from "node:assert/strict";
 import { createJiti } from "jiti";
 
 const jiti = createJiti(import.meta.url);
-const {
-  DEFAULT_CONFIG,
-  deepMerge,
-  resolveBackend,
-  effectiveExcludedCommands,
-} = await jiti.import("./index.ts");
+const { DEFAULT_CONFIG, deepMerge, resolveBackend, effectiveExcludedCommands } =
+  await jiti.import("./index.ts");
 
 // --- DEFAULT_CONFIG ----------------------------------------------------------
 
