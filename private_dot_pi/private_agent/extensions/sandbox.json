@@ -1,5 +1,4 @@
 {
-  "enableWeakerNetworkIsolation": true, // in favor of `gh`
   "excludedCommands": [
     "~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/web-browser/scripts/start.js:*",
     "~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/web-browser/scripts/nav.js:*",
@@ -12,47 +11,54 @@
     "~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/web-browser/scripts/logs-tail.js:*",
     "~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/web-browser/scripts/net-summary.js:*"
   ],
-  "network": {
-    "allowedDomains": [
-      // Package registries
-      "npmjs.org",
-      "*.npmjs.org",
-      "registry.npmjs.org",
-      "registry.yarnpkg.com",
-      "pypi.org",
-      "*.pypi.org",
-      "files.pythonhosted.org",
-      "rubygems.org",
-      "*.rubygems.org",
-      // GitHub
-      "github.com",
-      "*.github.com",
-      "api.github.com",
-      "raw.githubusercontent.com",
-      "gitlab.com",
-      // Bun
-      "bun.sh",
-      "*.bun.sh",
-      // LLM APIs
-      "*.googleapis.com",
-      "*.google.com",
-      "*.anthropic.com",
-      "*.openai.com"
-    ]
-  },
-  "filesystem": {
-    "allowWrite": [
-      ".",
-      "/tmp",
-      "/private/tmp",
-      "/var/folders",
-      "/private/var/folders",
-      "~/.npm",
-      "~/.bun",
-      "~/.cache" // in favor of `/skill:librarian`
-    ]
+  "sandboxRuntime": {
+    "enableWeakerNetworkIsolation": true, // in favor of `gh`
+    "network": {
+      "allowedDomains": [
+        // Package registries
+        "npmjs.org",
+        "*.npmjs.org",
+        "registry.npmjs.org",
+        "registry.yarnpkg.com",
+        "pypi.org",
+        "*.pypi.org",
+        "files.pythonhosted.org",
+        "rubygems.org",
+        "*.rubygems.org",
+        // GitHub
+        "github.com",
+        "*.github.com",
+        "api.github.com",
+        "raw.githubusercontent.com",
+        "gitlab.com",
+        // Bun
+        "bun.sh",
+        "*.bun.sh",
+        // LLM APIs
+        "*.googleapis.com",
+        "*.google.com",
+        "*.anthropic.com",
+        "*.openai.com"
+      ]
+    },
+    "filesystem": {
+      "allowWrite": [
+        ".",
+        "/tmp",
+        "/private/tmp",
+        "/var/folders",
+        "/private/var/folders",
+        "~/.npm",
+        "~/.bun",
+        "~/.cache" // in favor of `/skill:librarian`
+      ]
+    }
   },
   "justBash": {
+    "excludedCommands": [
+      "bash checkout.sh:*",
+      "~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/librarian/checkout.sh*"
+    ],
     "dangerouslyPassthroughCommands": ["git", "gh"]
   }
 }

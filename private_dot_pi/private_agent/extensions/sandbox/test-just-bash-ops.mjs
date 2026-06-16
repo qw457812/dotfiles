@@ -16,11 +16,10 @@ const workdir = mkdtempSync(join(thisDirPath, ".tmp-workdir-"));
 const extraWriteDir = mkdtempSync(join(thisDirPath, ".tmp-extra-write-"));
 const blockedWritePath = join(thisDirPath, `.tmp-blocked-write-${process.pid}.txt`);
 const defaultTmpWritePath = join(tmpdir(), `pi-sandbox-default-tmp-${process.pid}.txt`);
-const ops = createJustBashOps(workdir, undefined, { allowWrite: [".", extraWriteDir] });
+const ops = createJustBashOps(workdir, { filesystem: { allowWrite: [".", extraWriteDir] } });
 const passthroughOps = createJustBashOps(
   workdir,
-  { dangerouslyPassthroughCommands: ["node"] },
-  { allowWrite: [".", extraWriteDir] },
+  { dangerouslyPassthroughCommands: ["node"], filesystem: { allowWrite: [".", extraWriteDir] } },
 );
 
 async function runWithOps(selectedOps, command) {

@@ -6,7 +6,7 @@
 	"scripts": {
 		"clean": "echo 'nothing to clean'",
 		"build": "echo 'nothing to build'",
-		"check": "node ./test-excluded-commands.mjs && node ./test-just-bash-ops.mjs"
+		"check": "node ./test-excluded-commands.mjs && node ./test-just-bash-ops.mjs && node ./test-config.mjs"
 	},
 	"pi": {
 		"extensions": [

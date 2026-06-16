@@ -48,18 +48,29 @@
  * ```json
  * {
  *   "enabled": true,
+ *   "backend": "sandboxRuntime",
  *   "excludedCommands": ["gh:*", "docker:*"],
- *   "network": {
- *     "allowedDomains": ["github.com", "*.github.com"],
- *     "deniedDomains": []
- *   },
- *   "filesystem": {
- *     "allowRead": ["~/.ssh/known_hosts"],
- *     "denyRead": ["~/.ssh", "~/.aws"],
- *     "allowWrite": [".", "/tmp"],
- *     "denyWrite": [".env"]
+ *   "sandboxRuntime": {
+ *     "excludedCommands": [],
+ *     "network": {
+ *       "allowedDomains": ["github.com", "*.github.com"],
+ *       "deniedDomains": []
+ *     },
+ *     "filesystem": {
+ *       "allowRead": ["~/.ssh/known_hosts"],
+ *       "denyRead": ["~/.ssh", "~/.aws"],
+ *       "allowWrite": [".", "/tmp"],
+ *       "denyWrite": [".env"]
+ *     }
  *   },
  *   "justBash": {
+ *     "excludedCommands": ["bash checkout.sh:*"],
+ *     "network": {
+ *       "allowedUrlPrefixes": ["https://github.com"]
+ *     },
+ *     "filesystem": {
+ *       "allowWrite": [".", "/tmp"]
+ *     },
  *     "dangerouslyPassthroughCommands": ["git"]
  *   }
  * }
@@ -81,6 +92,8 @@ import {
   SandboxManager,
   type SandboxAskCallback,
   type SandboxRuntimeConfig,
+  type FilesystemConfig as RuntimeFilesystemConfig,
+  type NetworkConfig as RuntimeNetworkConfig,
 } from "@anthropic-ai/sandbox-runtime";
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import {
@@ -99,34 +112,57 @@ import {
   type JustBashConfig,
 } from "./just-bash-ops.ts";
 
-interface SandboxConfig extends SandboxRuntimeConfig {
-  enabled?: boolean;
+type Backend = "sandboxRuntime" | "justBash";
+
+interface SandboxRuntimeBackendConfig extends Omit<SandboxRuntimeConfig, "network" | "filesystem"> {
   excludedCommands?: string[];
-  justBash?: JustBashConfig;
+  network?: RuntimeNetworkConfig;
+  filesystem?: RuntimeFilesystemConfig;
 }
 
-const DEFAULT_CONFIG: SandboxConfig = {
+interface JustBashBackendConfig extends JustBashConfig {
+  excludedCommands?: string[];
+}
+
+interface SandboxConfig {
+  enabled?: boolean;
+  /** Explicit backend override. Omit for auto (justBash on Termux/Android, sandboxRuntime otherwise). */
+  backend?: Backend;
+  /** Shared exclusion list applied to BOTH backends. */
+  excludedCommands?: string[];
+  sandboxRuntime?: SandboxRuntimeBackendConfig;
+  justBash?: JustBashBackendConfig;
+}
+
+export const DEFAULT_CONFIG: SandboxConfig = {
   enabled: true,
   excludedCommands: [],
-  network: {
-    allowedDomains: [
-      "npmjs.org",
-      "*.npmjs.org",
-      "registry.npmjs.org",
-      "registry.yarnpkg.com",
-      "pypi.org",
-      "*.pypi.org",
-      "github.com",
-      "*.github.com",
-      "api.github.com",
-      "raw.githubusercontent.com",
-    ],
-    deniedDomains: [],
+  sandboxRuntime: {
+    network: {
+      allowedDomains: [
+        "npmjs.org",
+        "*.npmjs.org",
+        "registry.npmjs.org",
+        "registry.yarnpkg.com",
+        "pypi.org",
+        "*.pypi.org",
+        "github.com",
+        "*.github.com",
+        "api.github.com",
+        "raw.githubusercontent.com",
+      ],
+      deniedDomains: [],
+    },
+    filesystem: {
+      denyRead: ["~/.ssh", "~/.aws", "~/.gnupg"],
+      allowWrite: [".", "/tmp"],
+      denyWrite: [".env", ".env.*", "*.pem", "*.key"],
+    },
   },
-  filesystem: {
-    denyRead: ["~/.ssh", "~/.aws", "~/.gnupg"],
-    allowWrite: [".", "/tmp"],
-    denyWrite: [".env", ".env.*", "*.pem", "*.key"],
+  justBash: {
+    filesystem: {
+      allowWrite: [".", "/tmp"],
+    },
   },
 };
 
@@ -138,7 +174,7 @@ function stripJsonComments(input: string): string {
     .replace(/"(?:\\.|[^"\\])*"|,(\s*[}\]])/g, (m, tail) => tail ?? (m[0] === '"' ? m : ""));
 }
 
-function loadConfig(cwd: string): SandboxConfig {
+export function loadConfig(cwd: string): SandboxConfig {
   const projectConfigPath = join(cwd, ".pi", "sandbox.json");
   const globalConfigPath = join(getAgentDir(), "extensions", "sandbox.json");
 
@@ -164,51 +200,61 @@ function loadConfig(cwd: string): SandboxConfig {
   return deepMerge(deepMerge(DEFAULT_CONFIG, globalConfig), projectConfig);
 }
 
-function hasExcludedCommands(config: SandboxConfig): boolean {
-  return Array.isArray(config.excludedCommands) && config.excludedCommands.length > 0;
+export function resolveBackend(config: SandboxConfig): Backend {
+  if (config.backend === "sandboxRuntime" || config.backend === "justBash") {
+    return config.backend;
+  }
+  return isTermux() ? "justBash" : "sandboxRuntime";
 }
 
-function deepMerge(base: SandboxConfig, overrides: Partial<SandboxConfig>): SandboxConfig {
+/** Shared (top-level) excludedCommands ∪ the active backend's excludedCommands. */
+export function effectiveExcludedCommands(config: SandboxConfig, backend: Backend): string[] {
+  const shared = config.excludedCommands ?? [];
+  const specific = config[backend]?.excludedCommands ?? [];
+  return Array.from(new Set([...shared, ...specific]));
+}
+
+function hasExcludedCommands(config: SandboxConfig, backend: Backend): boolean {
+  return effectiveExcludedCommands(config, backend).length > 0;
+}
+
+function mergeOptional<T extends object>(
+  base: T | undefined,
+  overrides: T | undefined,
+): T | undefined {
+  if (!base) return overrides;
+  if (!overrides) return base;
+  return { ...base, ...overrides };
+}
+
+export function deepMerge(base: SandboxConfig, overrides: Partial<SandboxConfig>): SandboxConfig {
   const result: SandboxConfig = { ...base };
 
   if (overrides.enabled !== undefined) result.enabled = overrides.enabled;
+  if (overrides.backend !== undefined) result.backend = overrides.backend;
   if (overrides.excludedCommands !== undefined)
     result.excludedCommands = overrides.excludedCommands;
-  if (overrides.justBash) {
-    result.justBash = {
-      ...base.justBash,
-      ...overrides.justBash,
-      ...(overrides.justBash.network
-        ? { network: { ...base.justBash?.network, ...overrides.justBash.network } }
-        : {}),
+
+  if (overrides.sandboxRuntime) {
+    const b = base.sandboxRuntime;
+    const o = overrides.sandboxRuntime;
+    result.sandboxRuntime = {
+      ...b,
+      ...o,
+      network: mergeOptional(b?.network, o.network),
+      filesystem: mergeOptional(b?.filesystem, o.filesystem),
     };
   }
-  if (overrides.network) {
-    result.network = { ...base.network, ...overrides.network };
-  }
-  if (overrides.filesystem) {
-    result.filesystem = { ...base.filesystem, ...overrides.filesystem };
-  }
 
-  const extOverrides = overrides as {
-    ignoreViolations?: Record<string, string[]>;
-    enableWeakerNestedSandbox?: boolean;
-    enableWeakerNetworkIsolation?: boolean;
-  };
-  const extResult = result as {
-    ignoreViolations?: Record<string, string[]>;
-    enableWeakerNestedSandbox?: boolean;
-    enableWeakerNetworkIsolation?: boolean;
-  };
-
-  if (extOverrides.ignoreViolations) {
-    extResult.ignoreViolations = extOverrides.ignoreViolations;
-  }
-  if (extOverrides.enableWeakerNestedSandbox !== undefined) {
-    extResult.enableWeakerNestedSandbox = extOverrides.enableWeakerNestedSandbox;
-  }
-  if (extOverrides.enableWeakerNetworkIsolation !== undefined) {
-    extResult.enableWeakerNetworkIsolation = extOverrides.enableWeakerNetworkIsolation;
+  if (overrides.justBash) {
+    const b = base.justBash;
+    const o = overrides.justBash;
+    result.justBash = {
+      ...b,
+      ...o,
+      network: mergeOptional(b?.network, o.network),
+      filesystem: mergeOptional(b?.filesystem, o.filesystem),
+    };
   }
 
   return result;
@@ -252,20 +298,14 @@ function detectWorktreeMainRepoPath(cwd: string): string | null {
   }
 }
 
-function addAllowWritePath(config: SandboxConfig, path: string): SandboxConfig {
-  const allowWrite = new Set(config.filesystem?.allowWrite ?? []);
-  if (allowWrite.has(path)) {
-    return config;
-  }
-
-  allowWrite.add(path);
-  return {
-    ...config,
-    filesystem: {
-      ...config.filesystem,
-      allowWrite: Array.from(allowWrite),
-    },
-  };
+function addBackendWritePath<T extends { filesystem?: { allowWrite?: string[] } }>(
+  block: T | undefined,
+  path: string,
+): T | undefined {
+  if (!block) return block;
+  const allowWrite = block.filesystem?.allowWrite ?? [];
+  if (allowWrite.includes(path)) return block;
+  return { ...block, filesystem: { ...block.filesystem, allowWrite: [...allowWrite, path] } };
 }
 
 function withWorktreeMainRepoGitWriteAccess(config: SandboxConfig, cwd: string): SandboxConfig {
@@ -275,8 +315,15 @@ function withWorktreeMainRepoGitWriteAccess(config: SandboxConfig, cwd: string):
   }
 
   // Git operations in a worktree need write access to the main repo's .git
-  // directory for index.lock etc.
-  return addAllowWritePath(config, join(worktreeMainRepoPath, ".git"));
+  // directory for index.lock etc. Inject into both backends' allowWrite so that
+  // whichever is active (and even if git runs sandboxed rather than as a just-bash
+  // passthrough host process) keeps working.
+  const gitPath = join(worktreeMainRepoPath, ".git");
+  return {
+    ...config,
+    sandboxRuntime: addBackendWritePath(config.sandboxRuntime, gitPath),
+    justBash: addBackendWritePath(config.justBash, gitPath),
+  };
 }
 
 function isTermux(): boolean {
@@ -399,6 +446,39 @@ function createAskCallback(pi: ExtensionAPI, ctx: ExtensionContext): SandboxAskC
   };
 }
 
+function justBashDisplayLines(justBash: JustBashBackendConfig | undefined): string[] {
+  const network = justBash?.network;
+  return [
+    "Just Bash Network:",
+    `  Allowed URL Prefixes: ${formatAllowedUrlPrefixes(network?.allowedUrlPrefixes)}`,
+    `  Allowed Methods: ${network?.allowedMethods?.join(", ") || "(default GET, HEAD)"}`,
+    `  Full Internet: ${network?.dangerouslyAllowFullInternetAccess === true ? "true" : "false"}`,
+    `  Deny Private Ranges: ${network?.denyPrivateRanges === undefined ? "(just-bash default)" : String(network.denyPrivateRanges)}`,
+    "",
+    "Just Bash Filesystem:",
+    `  Allow Write: ${justBash?.filesystem?.allowWrite?.join(", ") || "(just-bash defaults)"}`,
+    "",
+    `  Host Commands (unsandboxed; disables just-bash defense; env scrubbed): ${justBash?.dangerouslyPassthroughCommands?.join(", ") || "(none)"}`,
+  ];
+}
+
+function sandboxRuntimeDisplayLines(runtime: SandboxRuntimeBackendConfig | undefined): string[] {
+  const network = runtime?.network;
+  const filesystem = runtime?.filesystem;
+  return [
+    "Network:",
+    `  Allowed: ${network?.allowedDomains?.join(", ") || "(none)"}`,
+    `  Denied: ${network?.deniedDomains?.join(", ") || "(none)"}`,
+    `  Session approved: ${Array.from(sessionAllowedDomains).join(", ") || "(none)"}`,
+    "",
+    "Filesystem:",
+    `  Allow Read: ${filesystem?.allowRead?.join(", ") || "(none)"}`,
+    `  Deny Read: ${filesystem?.denyRead?.join(", ") || "(none)"}`,
+    `  Allow Write: ${filesystem?.allowWrite?.join(", ") || "(none)"}`,
+    `  Deny Write: ${filesystem?.denyWrite?.join(", ") || "(none)"}`,
+  ];
+}
+
 export default function (pi: ExtensionAPI) {
   pi.registerFlag("no-sandbox", {
     description: "Disable OS-level sandboxing for bash commands",
@@ -412,11 +492,14 @@ export default function (pi: ExtensionAPI) {
 
   let sandboxEnabled = false;
   let sandboxInitialized = false;
+  let activeBackend: Backend | null = null;
 
   async function getExcludedCommandMatch(command: string, cwd: string) {
     const config = withWorktreeMainRepoGitWriteAccess(loadConfig(cwd), cwd);
-    if (!hasExcludedCommands(config)) return null;
-    return matchExcludedCommand(command, cwd, config.excludedCommands ?? []);
+    const backend = resolveBackend(config);
+    const patterns = effectiveExcludedCommands(config, backend);
+    if (patterns.length === 0) return null;
+    return matchExcludedCommand(command, cwd, patterns);
   }
 
   function updateSandboxStatus(ctx: ExtensionContext) {
@@ -425,14 +508,18 @@ export default function (pi: ExtensionAPI) {
       ctx.ui.setStatus("sandbox", undefined);
       return;
     }
-    if (isTermux()) {
-      const network = loadConfig(ctx.cwd).justBash?.network;
+    const backend = activeBackend ?? resolveBackend(loadConfig(ctx.cwd));
+
+    if (backend === "justBash") {
+      const config = loadConfig(ctx.cwd).justBash;
+      const network = config?.network;
       const networkCount = network?.dangerouslyAllowFullInternetAccess
         ? "∞"
         : String(
             Array.isArray(network?.allowedUrlPrefixes) ? network.allowedUrlPrefixes.length : 0,
           );
-      ctx.ui.setStatus("sandbox", ctx.ui.theme.fg("dim", `󰌾 ${networkCount}`));
+      const writeCount = String(config?.filesystem?.allowWrite?.length ?? 0);
+      ctx.ui.setStatus("sandbox", ctx.ui.theme.fg("dim", `󰌾 ${networkCount}/${writeCount}`));
       return;
     }
     const config = SandboxManager.getConfig();
@@ -453,19 +540,23 @@ export default function (pi: ExtensionAPI) {
     if (respectConfigEnabled && !config.enabled) {
       sandboxEnabled = false;
       sandboxInitialized = false;
+      activeBackend = null;
       updateSandboxStatus(ctx);
       ctx.ui.notify("Sandbox disabled via config", "info");
       return false;
     }
 
+    const backend = resolveBackend(config);
+
     try {
-      if (hasExcludedCommands(config)) {
+      if (hasExcludedCommands(config, backend)) {
         await initializeExcludedCommandMatcher();
       }
 
-      if (isTermux()) {
+      if (backend === "justBash") {
         sandboxEnabled = true;
         sandboxInitialized = true;
+        activeBackend = backend;
         updateSandboxStatus(ctx);
         return true;
       }
@@ -473,37 +564,38 @@ export default function (pi: ExtensionAPI) {
       if (platform !== "darwin" && platform !== "linux") {
         sandboxEnabled = false;
         sandboxInitialized = false;
+        activeBackend = null;
         updateSandboxStatus(ctx);
         ctx.ui.notify(`Sandbox not supported on ${platform}`, "warning");
         return false;
       }
 
-      const configExt = config as unknown as {
-        ignoreViolations?: Record<string, string[]>;
-        enableWeakerNestedSandbox?: boolean;
-        enableWeakerNetworkIsolation?: boolean;
-      };
+      // DEFAULT_CONFIG always provides sandboxRuntime.network/filesystem and deepMerge
+      // preserves them, so both are present whenever the sandboxRuntime backend runs.
+      const runtimeConfig = config.sandboxRuntime!;
 
       const askCallback = createAskCallback(pi, ctx);
 
       await SandboxManager.initialize(
         {
-          network: config.network,
-          filesystem: config.filesystem,
-          ignoreViolations: configExt.ignoreViolations,
-          enableWeakerNestedSandbox: configExt.enableWeakerNestedSandbox,
-          enableWeakerNetworkIsolation: configExt.enableWeakerNetworkIsolation,
+          network: runtimeConfig.network!,
+          filesystem: runtimeConfig.filesystem!,
+          ignoreViolations: runtimeConfig.ignoreViolations,
+          enableWeakerNestedSandbox: runtimeConfig.enableWeakerNestedSandbox,
+          enableWeakerNetworkIsolation: runtimeConfig.enableWeakerNetworkIsolation,
         },
         askCallback,
       );
 
       sandboxEnabled = true;
       sandboxInitialized = true;
+      activeBackend = backend;
       updateSandboxStatus(ctx);
       return true;
     } catch (err) {
       sandboxEnabled = false;
       sandboxInitialized = false;
+      activeBackend = null;
       updateSandboxStatus(ctx);
       ctx.ui.notify(
         `Sandbox initialization failed: ${err instanceof Error ? err.message : err}`,
@@ -533,10 +625,12 @@ export default function (pi: ExtensionAPI) {
         return localBash.execute(id, params, signal, onUpdate);
       }
 
-      if (isTermux()) {
-        const config = withWorktreeMainRepoGitWriteAccess(loadConfig(ctx.cwd), ctx.cwd);
+      const config = withWorktreeMainRepoGitWriteAccess(loadConfig(ctx.cwd), ctx.cwd);
+      const backend = resolveBackend(config);
+
+      if (backend === "justBash") {
         const justBash = createBashTool(ctx.cwd, {
-          operations: createJustBashOps(ctx.cwd, config.justBash, config.filesystem),
+          operations: createJustBashOps(ctx.cwd, config.justBash),
         });
         return justBash.execute(id, params, signal, onUpdate);
       }
@@ -562,10 +656,12 @@ export default function (pi: ExtensionAPI) {
       return { operations: createLocalBashOperations() };
     }
 
-    if (isTermux()) {
-      const config = withWorktreeMainRepoGitWriteAccess(loadConfig(event.cwd), event.cwd);
+    const config = withWorktreeMainRepoGitWriteAccess(loadConfig(event.cwd), event.cwd);
+    const backend = resolveBackend(config);
+
+    if (backend === "justBash") {
       return {
-        operations: createJustBashOps(event.cwd, config.justBash, config.filesystem),
+        operations: createJustBashOps(event.cwd, config.justBash),
       };
     }
 
@@ -578,6 +674,7 @@ export default function (pi: ExtensionAPI) {
     if (noSandbox) {
       sandboxEnabled = false;
       sandboxInitialized = false;
+      activeBackend = null;
       updateSandboxStatus(ctx);
       ctx.ui.notify("Sandbox disabled via --no-sandbox", "warning");
       return;
@@ -589,7 +686,7 @@ export default function (pi: ExtensionAPI) {
   });
 
   pi.on("session_shutdown", async () => {
-    if (sandboxInitialized && !isTermux()) {
+    if (sandboxInitialized && activeBackend === "sandboxRuntime") {
       try {
         await SandboxManager.reset();
       } catch {
@@ -599,6 +696,7 @@ export default function (pi: ExtensionAPI) {
 
     sandboxEnabled = false;
     sandboxInitialized = false;
+    activeBackend = null;
 
     // Clear session state
     sessionAllowedDomains.clear();
@@ -651,35 +749,19 @@ export default function (pi: ExtensionAPI) {
         }
 
         const config = loadConfig(ctx.cwd);
-        const justBash = config.justBash;
-        const network = justBash?.network;
+        const backend = activeBackend ?? resolveBackend(config);
+        const effectivePatterns = effectiveExcludedCommands(config, backend);
         const lines = [
           "Sandbox: ENABLED",
           "",
+          `Backend: ${backend}`,
+          "",
           "Excluded Commands:",
-          `  ${config.excludedCommands?.join(", ") || "(none)"}`,
+          `  ${effectivePatterns.join(", ") || "(none)"}`,
           "",
-          ...(isTermux()
-            ? [
-                "Just Bash Network:",
-                `  Allowed URL Prefixes: ${formatAllowedUrlPrefixes(network?.allowedUrlPrefixes)}`,
-                `  Allowed Methods: ${network?.allowedMethods?.join(", ") || "(default GET, HEAD)"}`,
-                `  Full Internet: ${network?.dangerouslyAllowFullInternetAccess === true ? "true" : "false"}`,
-                `  Deny Private Ranges: ${network?.denyPrivateRanges === undefined ? "(just-bash default)" : String(network.denyPrivateRanges)}`,
-                `  Host Commands (unsandboxed; disables just-bash defense; env scrubbed): ${justBash?.dangerouslyPassthroughCommands?.join(", ") || "(none)"}`,
-              ]
-            : [
-                "Network:",
-                `  Allowed: ${config.network?.allowedDomains?.join(", ") || "(none)"}`,
-                `  Denied: ${config.network?.deniedDomains?.join(", ") || "(none)"}`,
-                `  Session approved: ${Array.from(sessionAllowedDomains).join(", ") || "(none)"}`,
-              ]),
-          "",
-          "Filesystem:",
-          `  Allow Read: ${config.filesystem?.allowRead?.join(", ") || "(none)"}`,
-          `  Deny Read: ${config.filesystem?.denyRead?.join(", ") || "(none)"}`,
-          `  Allow Write: ${config.filesystem?.allowWrite?.join(", ") || "(none)"}`,
-          `  Deny Write: ${config.filesystem?.denyWrite?.join(", ") || "(none)"}`,
+          ...(backend === "justBash"
+            ? justBashDisplayLines(config.justBash)
+            : sandboxRuntimeDisplayLines(config.sandboxRuntime)),
         ];
         ctx.ui.notify(lines.join("\n"), "info");
         return;

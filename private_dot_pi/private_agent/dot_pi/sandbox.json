@@ -1,0 +1,7 @@
+{
+  // Project-local passthrough commands for Node/TypeScript development.
+  // Note: arrays in `justBash` override global values, so keep `git`/`gh` here too.
+  "justBash": {
+    "dangerouslyPassthroughCommands": ["git", "gh", "node", "npm", "npx"]
+  }
+}

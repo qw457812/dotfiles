@@ -24,9 +24,21 @@ import { isAbsolute, join, relative, resolve } from "node:path";
 const require = createRequire(import.meta.url);
 const { spawn } = require("node:child_process") as typeof import("node:child_process");
 
+export interface JustBashFilesystemConfig {
+  /** Write roots plumbed into just-bash's virtual filesystem (MountableFs mounts). */
+  allowWrite?: string[];
+}
+
 export interface JustBashConfig {
   /** Passed through verbatim to just-bash as trusted local NetworkConfig. */
   network?: NetworkConfig;
+  /**
+   * Write roots plumbed into just-bash's virtual filesystem. just-bash only
+   * consumes `allowWrite` here (it does not implement `denyRead`); the rest of
+   * the writable defaults — /dev devices, TMPDIR, ~/.npm/_logs, etc. — are
+   * supplied by defaultAndConfiguredWriteRoots() inside this module.
+   */
+  filesystem?: JustBashFilesystemConfig;
   /**
    * Escape hatch for commands that just-bash does not implement (for example `git`).
    * These run as REAL HOST PROCESSES via spawn(): they bypass just-bash's
@@ -42,8 +54,6 @@ export interface JustBashConfig {
    */
   dangerouslyPassthroughCommands?: string[];
 }
-
-type JustBashFilesystemConfig = { allowWrite?: string[] } | undefined;
 
 const JUST_BASH_NO_HOST_BINS_PATH = "/__just_bash_no_host_bins__";
 
@@ -75,7 +85,7 @@ const HOST_ENV_SECRET_PATTERN =
 
 function createJustBashFs(
   policyRoot: string,
-  filesystem: JustBashFilesystemConfig,
+  filesystem: JustBashFilesystemConfig | undefined,
 ): ReadWriteFs | MountableFs {
   const writeRoots = coalesceWriteRoots(defaultAndConfiguredWriteRoots(policyRoot, filesystem));
   if (writeRoots.includes("/")) return new ReadWriteFs({ root: "/", allowSymlinks: false });
@@ -360,7 +370,7 @@ function isDiscardDevice(root: string): boolean {
 
 function defaultAndConfiguredWriteRoots(
   policyRoot: string,
-  filesystem: JustBashFilesystemConfig,
+  filesystem: JustBashFilesystemConfig | undefined,
 ): string[] {
   return [
     // Keep Termux just-bash write defaults aligned with sandbox-runtime's recommended paths.
@@ -600,9 +610,9 @@ async function executeHostCommand(
 export function createJustBashOps(
   root: string,
   config: JustBashConfig | undefined,
-  filesystem: JustBashFilesystemConfig,
 ): BashOperations {
   const policyRoot = resolve(root);
+  const filesystem = config?.filesystem;
   const passthroughCommands = createHostPassthroughCommands(
     normalizePassthroughCommands(config?.dangerouslyPassthroughCommands),
   );
