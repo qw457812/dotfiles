@@ -18,7 +18,7 @@ import {
   type NetworkConfig,
   type RmOptions,
 } from "just-bash";
-import { existsSync, promises as fsPromises, mkdirSync, statSync } from "node:fs";
+import { existsSync, promises as fsPromises, mkdirSync, realpathSync, statSync } from "node:fs";
 import { createRequire } from "node:module";
 import { homedir, tmpdir } from "node:os";
 import { isAbsolute, join, relative, resolve } from "node:path";
@@ -57,8 +57,7 @@ export interface JustBashConfig {
   dangerouslyPassthroughCommands?: string[];
 }
 
-const JUST_BASH_SAFE_PATH = "/usr/bin:/bin";
-const JUST_BASH_SYSTEM_DIRS = new Set(["/bin", "/usr/bin"]);
+const JUST_BASH_VIRTUAL_SYSTEM_PATH = "/usr/bin:/bin";
 
 // Env vars that just-bash/shell manage and that must never be forwarded as-is
 // to a host child: they describe the *virtual* shell, not the real host cwd/dir.
@@ -89,12 +88,15 @@ const HOST_ENV_SECRET_PATTERN =
 function createJustBashFs(
   policyRoot: string,
   filesystem: JustBashFilesystemConfig | undefined,
-  virtualCommandNames: ReadonlySet<string>,
+  virtualBinCommands: string[],
 ): ReadWriteFs | MountableFs {
   const writeRoots = coalesceWriteRoots(defaultAndConfiguredWriteRoots(policyRoot, filesystem));
   if (writeRoots.includes("/")) return new ReadWriteFs({ root: "/", allowSymlinks: false });
 
-  const fs = new MountableFs({ base: new ReadOnlyHostFs(virtualCommandNames) });
+  const fs = new MountableFs({ base: new ReadOnlyHostFs() });
+  const virtualBinFs = new VirtualBinFs(virtualBinCommands);
+  fs.mount("/usr/bin", virtualBinFs);
+  fs.mount("/bin", virtualBinFs);
   for (const root of writeRoots) {
     if (isDiscardDevice(root)) {
       fs.mount(root, new DiscardDeviceFs());
@@ -207,25 +209,36 @@ class DiscardDeviceFs {
   }
 }
 
-class ReadOnlyHostFs {
-  constructor(private readonly virtualCommandNames: ReadonlySet<string>) {}
+class VirtualBinFs {
+  private readonly commands: Set<string>;
+  private readonly sortedCommands: string[];
+
+  constructor(commandNames: string[]) {
+    this.sortedCommands = Array.from(new Set(commandNames)).sort();
+    this.commands = new Set(this.sortedCommands);
+  }
 
   async readFile(
     path: string,
     options?: BufferEncoding | { encoding?: BufferEncoding | null },
   ): Promise<string> {
-    const buffer = await this.readHostOrVirtualCommandFile(path);
+    const buffer = await this.readFileBuffer(path);
     const encoding = typeof options === "string" ? options : (options?.encoding ?? "utf8");
     return Buffer.from(buffer).toString(encoding ?? "utf8");
   }
 
   async readFileBytes(path: string): Promise<ByteString> {
-    const buffer = await this.readHostOrVirtualCommandFile(path);
+    const buffer = await this.readFileBuffer(path);
     return unsafeBytesFromLatin1(Buffer.from(buffer).toString("latin1"));
   }
 
   async readFileBuffer(path: string): Promise<Uint8Array> {
-    return this.readHostOrVirtualCommandFile(path);
+    const commandName = this.commandNameForPath(path);
+    if (!commandName) {
+      if (isDeviceRoot(path)) throw isDirectoryError("read", path);
+      throw noSuchFileError("open", path);
+    }
+    return Buffer.from(`# just-bash virtual command stub: ${commandName}\n`, "utf8");
   }
 
   async writeFile(path: string, _content: FileContent): Promise<void> {
@@ -237,7 +250,160 @@ class ReadOnlyHostFs {
   }
 
   async exists(path: string): Promise<boolean> {
-    if (this.isVirtualSystemDir(path) || this.isVirtualCommandPath(path)) return true;
+    return isDeviceRoot(path) || this.commandNameForPath(path) !== null;
+  }
+
+  async stat(path: string): Promise<FsStat> {
+    if (isDeviceRoot(path)) return directoryStat();
+    const commandName = this.commandNameForPath(path);
+    if (commandName) return virtualCommandStat(commandName);
+    throw noSuchFileError("stat", path);
+  }
+
+  async lstat(path: string): Promise<FsStat> {
+    return this.stat(path);
+  }
+
+  async mkdir(path: string, options?: MkdirOptions): Promise<void> {
+    if (isDeviceRoot(path) && options?.recursive) return;
+    throw readOnlyFsError("mkdir", path);
+  }
+
+  async readdir(path: string): Promise<string[]> {
+    if (!isDeviceRoot(path)) throw notDirectoryError("scandir", path);
+    return this.sortedCommands;
+  }
+
+  async rm(path: string, _options?: RmOptions): Promise<void> {
+    throw readOnlyFsError("rm", path);
+  }
+
+  async cp(src: string, _dest: string, _options?: CpOptions): Promise<void> {
+    throw readOnlyFsError("cp", src);
+  }
+
+  async mv(src: string, _dest: string): Promise<void> {
+    throw readOnlyFsError("mv", src);
+  }
+
+  resolvePath(base: string, path: string): string {
+    return resolve(base, path);
+  }
+
+  getAllPaths(): string[] {
+    return ["/", ...this.sortedCommands.map((command) => `/${command}`)];
+  }
+
+  async chmod(path: string, _mode: number): Promise<void> {
+    throw readOnlyFsError("chmod", path);
+  }
+
+  async symlink(_target: string, linkPath: string): Promise<void> {
+    throw readOnlyFsError("symlink", linkPath);
+  }
+
+  async link(existingPath: string, _newPath: string): Promise<void> {
+    throw readOnlyFsError("link", existingPath);
+  }
+
+  async readlink(path: string): Promise<string> {
+    if (!isDeviceRoot(path) && !this.commandNameForPath(path)) {
+      throw noSuchFileError("readlink", path);
+    }
+    throw invalidArgumentError("readlink", path);
+  }
+
+  async realpath(path: string): Promise<string> {
+    if (isDeviceRoot(path) || this.commandNameForPath(path)) return resolve("/", path);
+    throw noSuchFileError("realpath", path);
+  }
+
+  async utimes(path: string, _atime: Date, _mtime: Date): Promise<void> {
+    throw readOnlyFsError("utimes", path);
+  }
+
+  private commandNameForPath(path: string): string | null {
+    const normalized = resolve("/", path);
+    if (normalized === "/") return null;
+    const commandName = normalized.slice(1);
+    if (commandName.includes("/")) return null;
+    return this.commands.has(commandName) ? commandName : null;
+  }
+}
+
+// just-bash treats /usr/bin and /bin specially during command resolution:
+// commands found in those system PATH dirs dispatch to the registered command
+// implementation, while commands found elsewhere are interpreted as user
+// scripts. Exposing the real host /usr/bin would make PATH resolution see host
+// ELF/Mach-O binaries; hiding it entirely makes `command -v git` return a path
+// that cannot be executed. Mount virtual stub directories instead: registered
+// commands are discoverable at stable system paths, but host binaries are never
+// read from /usr/bin or /bin.
+//
+// Ref (permalink, v3.0.x @ 9481331):
+// https://github.com/vercel-labs/just-bash/blob/9481331f54fdcbfa1b81b313d756cd7f541d7018/packages/just-bash/src/interpreter/command-resolution.ts#L154-L163
+const HIDDEN_HOST_BIN_DIRS = hiddenHostBinDirs(["/usr/bin", "/bin"]);
+
+function hiddenHostBinDirs(dirs: string[]): string[] {
+  const hidden = new Set<string>();
+  for (const dir of dirs) {
+    const resolved = resolve(dir);
+    hidden.add(resolved);
+    try {
+      hidden.add(realpathSync(resolved));
+    } catch {
+      // Directory may not exist on every platform (for example /usr on Termux).
+    }
+  }
+  return Array.from(hidden);
+}
+
+function isHostBinPath(path: string): boolean {
+  const p = resolve(path);
+  return HIDDEN_HOST_BIN_DIRS.some((dir) => p === dir || p.startsWith(`${dir}/`));
+}
+
+async function resolvesToHostBinPath(path: string): Promise<boolean> {
+  if (isHostBinPath(path)) return true;
+  try {
+    return isHostBinPath(await fsPromises.realpath(resolve(path)));
+  } catch {
+    return false;
+  }
+}
+
+class ReadOnlyHostFs {
+  async readFile(
+    path: string,
+    options?: BufferEncoding | { encoding?: BufferEncoding | null },
+  ): Promise<string> {
+    if (await resolvesToHostBinPath(path)) throw noSuchFileError("open", path);
+    const buffer = await fsPromises.readFile(resolve(path));
+    const encoding = typeof options === "string" ? options : (options?.encoding ?? "utf8");
+    return Buffer.from(buffer).toString(encoding ?? "utf8");
+  }
+
+  async readFileBytes(path: string): Promise<ByteString> {
+    if (await resolvesToHostBinPath(path)) throw noSuchFileError("open", path);
+    const buffer = await fsPromises.readFile(resolve(path));
+    return unsafeBytesFromLatin1(Buffer.from(buffer).toString("latin1"));
+  }
+
+  async readFileBuffer(path: string): Promise<Uint8Array> {
+    if (await resolvesToHostBinPath(path)) throw noSuchFileError("open", path);
+    return fsPromises.readFile(resolve(path));
+  }
+
+  async writeFile(path: string, _content: FileContent): Promise<void> {
+    throw readOnlyFsError("write", path);
+  }
+
+  async appendFile(path: string, _content: FileContent): Promise<void> {
+    throw readOnlyFsError("write", path);
+  }
+
+  async exists(path: string): Promise<boolean> {
+    if (await resolvesToHostBinPath(path)) return false;
     try {
       await fsPromises.access(resolve(path));
       return true;
@@ -247,11 +413,13 @@ class ReadOnlyHostFs {
   }
 
   async stat(path: string): Promise<FsStat> {
-    return this.statHostOrVirtualCommandPath(path, false);
+    if (await resolvesToHostBinPath(path)) throw noSuchFileError("stat", path);
+    return toFsStat(await fsPromises.stat(resolve(path)));
   }
 
   async lstat(path: string): Promise<FsStat> {
-    return this.statHostOrVirtualCommandPath(path, true);
+    if (isHostBinPath(path)) throw noSuchFileError("lstat", path);
+    return toFsStat(await fsPromises.lstat(resolve(path)));
   }
 
   async mkdir(path: string, _options?: MkdirOptions): Promise<void> {
@@ -259,17 +427,8 @@ class ReadOnlyHostFs {
   }
 
   async readdir(path: string): Promise<string[]> {
-    const resolved = resolve("/", path);
-    const entries = new Set<string>();
-    try {
-      for (const entry of await fsPromises.readdir(resolve(path))) entries.add(entry);
-    } catch (error) {
-      if (!this.isVirtualSystemDir(path)) throw error;
-    }
-    if (JUST_BASH_SYSTEM_DIRS.has(resolved)) {
-      for (const commandName of this.virtualCommandNames) entries.add(commandName);
-    }
-    return Array.from(entries).sort();
+    if (await resolvesToHostBinPath(path)) throw noSuchFileError("scandir", path);
+    return fsPromises.readdir(resolve(path));
   }
 
   async rm(path: string, _options?: RmOptions): Promise<void> {
@@ -305,95 +464,18 @@ class ReadOnlyHostFs {
   }
 
   async readlink(path: string): Promise<string> {
+    if (isHostBinPath(path)) throw noSuchFileError("readlink", path);
     return fsPromises.readlink(resolve(path));
   }
 
   async realpath(path: string): Promise<string> {
+    if (await resolvesToHostBinPath(path)) throw noSuchFileError("realpath", path);
     return fsPromises.realpath(resolve(path));
   }
 
   async utimes(path: string, _atime: Date, _mtime: Date): Promise<void> {
     throw readOnlyFsError("utimes", path);
   }
-
-  private async readHostOrVirtualCommandFile(path: string): Promise<Uint8Array> {
-    try {
-      return await fsPromises.readFile(resolve(path));
-    } catch (error) {
-      if (!this.isVirtualCommandPath(path)) throw error;
-      return Buffer.from(
-        `#!/bin/bash\n# just-bash virtual command stub: ${getSystemCommandName(path)}\n`,
-      );
-    }
-  }
-
-  private async statHostOrVirtualCommandPath(path: string, lstat: boolean): Promise<FsStat> {
-    if (this.isVirtualSystemDir(path)) return virtualDirectoryStat();
-
-    const isVirtualCommand = this.isVirtualCommandPath(path);
-    try {
-      const stat = lstat
-        ? await fsPromises.lstat(resolve(path))
-        : await fsPromises.stat(resolve(path));
-      const fsStat = toFsStat(stat);
-      if (isSystemCommandPath(path) && !isVirtualCommand && fsStat.isFile) {
-        // PATH must not auto-run arbitrary host binaries as just-bash scripts.
-        // Contents remain readable (`cat /usr/bin/git` still reads the host file),
-        // but non-registered commands under system PATH dirs lose executable bits
-        // inside just-bash command resolution.
-        return { ...fsStat, mode: fsStat.mode & ~0o111 };
-      }
-      return fsStat;
-    } catch (error) {
-      if (!isVirtualCommand) throw error;
-      return virtualFileStat();
-    }
-  }
-
-  private isVirtualSystemDir(path: string): boolean {
-    return this.virtualCommandNames.size > 0 && JUST_BASH_SYSTEM_DIRS.has(resolve("/", path));
-  }
-
-  private isVirtualCommandPath(path: string): boolean {
-    const commandName = getSystemCommandName(path);
-    return commandName !== null && this.virtualCommandNames.has(commandName);
-  }
-}
-
-function getSystemCommandName(path: string): string | null {
-  const resolved = resolve("/", path);
-  const slash = resolved.lastIndexOf("/");
-  if (slash <= 0) return null;
-  const dir = resolved.slice(0, slash);
-  if (!JUST_BASH_SYSTEM_DIRS.has(dir)) return null;
-  const name = resolved.slice(slash + 1);
-  return name.length > 0 ? name : null;
-}
-
-function isSystemCommandPath(path: string): boolean {
-  return getSystemCommandName(path) !== null;
-}
-
-function virtualDirectoryStat(): FsStat {
-  return {
-    isFile: false,
-    isDirectory: true,
-    isSymbolicLink: false,
-    mode: 0o755,
-    size: 0,
-    mtime: new Date(),
-  };
-}
-
-function virtualFileStat(): FsStat {
-  return {
-    isFile: true,
-    isDirectory: false,
-    isSymbolicLink: false,
-    mode: 0o755,
-    size: 0,
-    mtime: new Date(),
-  };
 }
 
 function toFsStat(stat: Awaited<ReturnType<typeof fsPromises.stat>>): FsStat {
@@ -420,6 +502,14 @@ function notDirectoryError(operation: string, target: string): Error {
     `ENOTDIR: not a directory, ${operation} '${target}'`,
   ) as NodeJS.ErrnoException;
   error.code = "ENOTDIR";
+  return error;
+}
+
+function isDirectoryError(operation: string, target: string): Error {
+  const error = new Error(
+    `EISDIR: illegal operation on a directory, ${operation} '${target}'`,
+  ) as NodeJS.ErrnoException;
+  error.code = "EISDIR";
   return error;
 }
 
@@ -456,6 +546,28 @@ function deviceStat(): FsStat {
     isSymbolicLink: false,
     mode: 0o666,
     size: 0,
+    mtime: new Date(),
+  };
+}
+
+function directoryStat(): FsStat {
+  return {
+    isFile: false,
+    isDirectory: true,
+    isSymbolicLink: false,
+    mode: 0o555,
+    size: 0,
+    mtime: new Date(),
+  };
+}
+
+function virtualCommandStat(commandName: string): FsStat {
+  return {
+    isFile: true,
+    isDirectory: false,
+    isSymbolicLink: false,
+    mode: 0o555,
+    size: Buffer.byteLength(`# just-bash virtual command stub: ${commandName}\n`, "utf8"),
     mtime: new Date(),
   };
 }
@@ -713,11 +825,13 @@ export function createJustBashOps(
     config?.dangerouslyPassthroughCommands,
   );
   const passthroughCommands = createHostPassthroughCommands(passthroughCommandNames);
-  const virtualCommandNames = new Set([
-    ...getCommandNames(),
-    ...(config?.network !== undefined ? getNetworkCommandNames() : []),
-    ...passthroughCommandNames,
-  ]);
+  const virtualBinCommands = Array.from(
+    new Set([
+      ...getCommandNames(),
+      ...(config?.network !== undefined ? getNetworkCommandNames() : []),
+      ...passthroughCommandNames,
+    ]),
+  );
 
   return {
     async exec(command, cwd, { onData, signal, timeout, env }) {
@@ -752,7 +866,7 @@ export function createJustBashOps(
           : undefined;
 
       try {
-        const fs = createJustBashFs(policyRoot, filesystem, virtualCommandNames);
+        const fs = createJustBashFs(policyRoot, filesystem, virtualBinCommands);
         const bash = new Bash({
           fs,
           cwd: virtualCwd,
@@ -782,7 +896,7 @@ export function createJustBashOps(
                 // just-bash's FS does NOT enforce `denyRead` (only `allowWrite`
                 // is plumbed into createJustBashFs), so any sandboxed command —
                 // builtin `cat` just as much as a shadowed imposter — can read
-                // any host file. PATH shadowing adds no new read capability;
+                // host files outside hidden /bin and /usr/bin. PATH shadowing adds no new read capability;
                 // the only effect is that the passthrough command silently runs
                 // a sandboxed same-named script instead of the host binary.
                 // buildHostCommandEnv ignores the shell PATH for the real spawn
@@ -831,11 +945,10 @@ function toStringEnv(env: NodeJS.ProcessEnv): Record<string, string> {
     if (typeof value === "string") out[key] = value;
   }
   // With host-wide read access, forwarding the real host PATH makes just-bash
-  // discover native binaries and try to interpret them as shell scripts. Keep
-  // command lookup on just-bash's hard-coded system dirs; ReadOnlyHostFs exposes
-  // virtual command stubs there and masks executable bits for non-registered
-  // host binaries while keeping their contents readable.
-  out.PATH = JUST_BASH_SAFE_PATH;
+  // discover host ELF/Mach-O binaries and try to parse them as shell scripts.
+  // Keep command lookup through the virtual /usr/bin and /bin mounts created by
+  // createJustBashFs().
+  out.PATH = JUST_BASH_VIRTUAL_SYSTEM_PATH;
   return out;
 }
 

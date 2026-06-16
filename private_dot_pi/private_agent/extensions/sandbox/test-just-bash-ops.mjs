@@ -2,7 +2,7 @@
 
 import { createJiti } from "jiti";
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -15,6 +15,7 @@ const thisDirPath = dirname(thisFilePath);
 const workdir = mkdtempSync(join(thisDirPath, ".tmp-workdir-"));
 const extraWriteDir = mkdtempSync(join(thisDirPath, ".tmp-extra-write-"));
 const blockedWritePath = join(thisDirPath, `.tmp-blocked-write-${process.pid}.txt`);
+const hostBinSymlinkPath = join(thisDirPath, `.tmp-host-bin-link-${process.pid}`);
 const defaultTmpWritePath = join(tmpdir(), `pi-sandbox-default-tmp-${process.pid}.txt`);
 const ops = createJustBashOps(workdir, { filesystem: { allowWrite: [".", extraWriteDir] } });
 const passthroughOps = createJustBashOps(
@@ -111,6 +112,14 @@ try {
     `NODE_PASSTHROUGH_TEST=ok node -e "process.stdout.write((process.env.NODE_PASSTHROUGH_TEST || '') + ':' + process.cwd())"`,
   );
   assert.deepEqual(passthroughNode, { exitCode: 0, output: `ok:${workdir}` });
+
+  const nodeCommandPath = await runWithOps(passthroughOps, "command -v node");
+  assert.equal(nodeCommandPath.output, "/usr/bin/node\n");
+  const nodeAbsolutePath = await runWithOps(
+    passthroughOps,
+    `$(command -v node) -e "process.stdout.write('absolute')"`,
+  );
+  assert.deepEqual(nodeAbsolutePath, { exitCode: 0, output: "absolute" });
 
   // KNOWN LIMITATION (just-bash): with DiD OFF (forced when passthrough
   // commands are enabled), a command-prefix PATH override like
@@ -217,10 +226,24 @@ try {
   assert.equal(awkStdoutFile.exitCode, 2);
   assert.match(awkStdoutFile.output, /EROFS: read-only file system, write '\/dev\/stdout'/);
 
+  // Host files are generally readable, but host binaries under /bin and /usr/bin
+  // are intentionally hidden behind virtual command-stub mounts. Symlinks that
+  // resolve into those host bin dirs are hidden too.
+  const virtualSh = await run("cat /bin/sh");
+  assert.equal(virtualSh.exitCode, 0);
+  assert.match(virtualSh.output, /just-bash virtual command stub: sh/);
+  if (existsSync("/bin/sh")) {
+    symlinkSync("/bin/sh", hostBinSymlinkPath);
+    const hostBinSymlinkRead = await run(`cat ${hostBinSymlinkPath}`);
+    assert.equal(hostBinSymlinkRead.exitCode, 1);
+    assert.match(hostBinSymlinkRead.output, /No such file or directory/);
+  }
+
   console.log("✓ just-bash operations tests passed");
 } finally {
   rmSync(workdir, { recursive: true, force: true });
   rmSync(extraWriteDir, { recursive: true, force: true });
   rmSync(blockedWritePath, { force: true });
+  rmSync(hostBinSymlinkPath, { force: true });
   rmSync(defaultTmpWritePath, { force: true });
 }
