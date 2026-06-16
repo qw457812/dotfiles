@@ -91,6 +91,13 @@ return {
         lazy = true,
         config = function() end,
       },
+      -- https://github.com/simonsmh/pi-provider-kiro
+      {
+        "mikeyobrien/pi-provider-kiro",
+        build = "pi update --extension git:github.com/mikeyobrien/pi-provider-kiro",
+        lazy = true,
+        config = function() end,
+      },
       -- {
       --   "monotykamary/pi-invisible-continue",
       --   build = "pi update --extension git:github.com/monotykamary/pi-invisible-continue",

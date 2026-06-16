@@ -131,6 +131,21 @@ type CodebuddyOAuthCredentials = {
   enterpriseId?: string;
 } & OAuthCredentials;
 
+// https://github.com/mikeyobrien/pi-provider-kiro/blob/77366aa27d76cdaa2a6d712a61120657788c4b06/src/usage.ts
+interface KiroQuota {
+  usageBreakdownList?: Array<{
+    currentUsage: number;
+    currentUsageWithPrecision?: number;
+    usageLimit: number;
+    usageLimitWithPrecision?: number;
+    nextDateReset?: number | string;
+  }>;
+}
+
+type KiroOAuthCredentials = {
+  region?: string;
+} & OAuthCredentials;
+
 // Fire Pass V2 is unlimited
 interface FirepassUsage {
   tokens: number;
@@ -700,6 +715,49 @@ const sources: Record<string, Source> = {
         `${theme.fg("accent", formatDecimal(credit, 2))}${theme.fg("dim", `/${formatDecimal(limitNum, 2)}`)}`,
         theme.fg("dim", formatRemaining(Date.parse(cycleResetTime.replace(" ", "T")))),
       ]);
+    },
+  }),
+  kiro: createSource<KiroQuota, KiroOAuthCredentials>("kiro", {
+    cacheTtlMs: MINUTE_MS,
+    async getAuth(): Promise<KiroOAuthCredentials | null> {
+      return await readAuth<KiroOAuthCredentials>("kiro");
+    },
+    async fetch(auth): Promise<KiroQuota | null> {
+      try {
+        const region = auth.region || "us-east-1";
+        const resp = await fetch(`https://q.${region}.amazonaws.com/`, {
+          method: "POST",
+          signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+          headers: {
+            "Content-Type": "application/x-amz-json-1.0",
+            Authorization: `Bearer ${auth.access}`,
+            "X-Amz-Target": "AmazonCodeWhispererService.GetUsageLimits",
+          },
+          body: JSON.stringify({ origin: "CLI", resourceType: "CREDIT" }),
+        });
+        if (!resp.ok) return null;
+        return (await resp.json()) as KiroQuota;
+      } catch {
+        return null;
+      }
+    },
+    format(quota: KiroQuota, theme: Theme): string | null {
+      return joinParts(
+        (quota.usageBreakdownList ?? []).map((b) => {
+          const used = b.currentUsageWithPrecision ?? b.currentUsage;
+          const limit = b.usageLimitWithPrecision ?? b.usageLimit;
+          const resetAt = b.nextDateReset;
+          return joinParts([
+            `${theme.fg("accent", formatDecimal(used, 2))}${theme.fg("dim", `/${formatDecimal(limit, 2)}`)}`,
+            resetAt
+              ? theme.fg(
+                  "dim",
+                  formatRemaining(typeof resetAt === "number" ? resetAt * 1000 : resetAt),
+                )
+              : null,
+          ]);
+        }),
+      );
     },
   }),
 };
