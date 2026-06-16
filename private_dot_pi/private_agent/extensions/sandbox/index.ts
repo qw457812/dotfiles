@@ -71,7 +71,7 @@
  *     "filesystem": {
  *       "allowWrite": [".", "/tmp"]
  *     },
- *     "dangerouslyPassthroughCommands": ["git"]
+ *     "hostCommands": ["git"]
  *   }
  * }
  * ```
@@ -317,7 +317,7 @@ function withWorktreeMainRepoGitWriteAccess(config: SandboxConfig, cwd: string):
   // Git operations in a worktree need write access to the main repo's .git
   // directory for index.lock etc. Inject into both backends' allowWrite so that
   // whichever is active (and even if git runs sandboxed rather than as a just-bash
-  // passthrough host process) keeps working.
+  // host process) keeps working.
   const gitPath = join(worktreeMainRepoPath, ".git");
   return {
     ...config,
@@ -458,7 +458,7 @@ function justBashDisplayLines(justBash: JustBashBackendConfig | undefined): stri
     "Just Bash Filesystem:",
     `  Allow Write: ${justBash?.filesystem?.allowWrite?.join(", ") || "(just-bash defaults)"}`,
     "",
-    `  Host Commands (unsandboxed; disables just-bash defense; env scrubbed): ${justBash?.dangerouslyPassthroughCommands?.join(", ") || "(none)"}`,
+    `  Host Commands (unsandboxed; disables just-bash defense; env scrubbed): ${justBash?.hostCommands?.join(", ") || "(none)"}`,
   ];
 }
 

@@ -53,10 +53,10 @@ assert.ok(
 // justBash block merges independently of sandboxRuntime.
 {
   const merged = deepMerge(
-    { justBash: { dangerouslyPassthroughCommands: ["git"] } },
+    { justBash: { hostCommands: ["git"] } },
     { justBash: { excludedCommands: ["bash checkout.sh:*"] } },
   );
-  assert.deepEqual(merged.justBash.dangerouslyPassthroughCommands, ["git"]);
+  assert.deepEqual(merged.justBash.hostCommands, ["git"]);
   assert.deepEqual(merged.justBash.excludedCommands, ["bash checkout.sh:*"]);
 }
 

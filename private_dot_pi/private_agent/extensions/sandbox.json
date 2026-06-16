@@ -59,6 +59,6 @@
       "bash checkout.sh:*",
       "~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/librarian/checkout.sh*"
     ],
-    "dangerouslyPassthroughCommands": ["git", "gh"]
+    "hostCommands": ["git", "gh"]
   }
 }

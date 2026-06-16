@@ -18,8 +18,8 @@ const blockedWritePath = join(thisDirPath, `.tmp-blocked-write-${process.pid}.tx
 const hostBinSymlinkPath = join(thisDirPath, `.tmp-host-bin-link-${process.pid}`);
 const defaultTmpWritePath = join(tmpdir(), `pi-sandbox-default-tmp-${process.pid}.txt`);
 const ops = createJustBashOps(workdir, { filesystem: { allowWrite: [".", extraWriteDir] } });
-const passthroughOps = createJustBashOps(workdir, {
-  dangerouslyPassthroughCommands: ["node"],
+const hostOps = createJustBashOps(workdir, {
+  hostCommands: ["node"],
   filesystem: { allowWrite: [".", extraWriteDir] },
 });
 
@@ -49,7 +49,7 @@ async function runError(command) {
 
 async function runBinary(command) {
   const chunks = [];
-  const result = await passthroughOps.exec(command, workdir, {
+  const result = await hostOps.exec(command, workdir, {
     onData: (chunk) => {
       chunks.push(Buffer.from(chunk));
     },
@@ -107,23 +107,23 @@ try {
   assert.equal(missingNode.exitCode, 127);
   assert.match(missingNode.output, /command not found/);
 
-  const passthroughNode = await runWithOps(
-    passthroughOps,
-    `NODE_PASSTHROUGH_TEST=ok node -e "process.stdout.write((process.env.NODE_PASSTHROUGH_TEST || '') + ':' + process.cwd())"`,
+  const hostNode = await runWithOps(
+    hostOps,
+    `NODE_HOST_TEST=ok node -e "process.stdout.write((process.env.NODE_HOST_TEST || '') + ':' + process.cwd())"`,
   );
-  assert.deepEqual(passthroughNode, { exitCode: 0, output: `ok:${workdir}` });
+  assert.deepEqual(hostNode, { exitCode: 0, output: `ok:${workdir}` });
 
-  const nodeCommandPath = await runWithOps(passthroughOps, "command -v node");
+  const nodeCommandPath = await runWithOps(hostOps, "command -v node");
   assert.equal(nodeCommandPath.output, "/usr/bin/node\n");
   const nodeAbsolutePath = await runWithOps(
-    passthroughOps,
+    hostOps,
     `$(command -v node) -e "process.stdout.write('absolute')"`,
   );
   assert.deepEqual(nodeAbsolutePath, { exitCode: 0, output: "absolute" });
 
-  // KNOWN LIMITATION (just-bash): with DiD OFF (forced when passthrough
+  // KNOWN LIMITATION (just-bash): with DiD OFF (forced when host
   // commands are enabled), a command-prefix PATH override like
-  // `PATH=<writable-dir> <passthrough-cmd>` makes just-bash resolve the command
+  // `PATH=<writable-dir> <host-cmd>` makes just-bash resolve the command
   // from that dir instead of dispatching to the registered custom command. The
   // resolved file is NOT spawned on the host: just-bash reads it, strips the
   // shebang, and interprets it as bash *inside the sandbox* (executeUserScript),
@@ -143,11 +143,11 @@ try {
     probePath,
     'process.stdout.write(process.env.SECRET_API_KEY || process.env.HTTPS_PROXY || "CLEAN");',
   );
-  const leakedSecret = await runWithOps(passthroughOps, `SECRET_API_KEY=leaked node ${probePath}`);
+  const leakedSecret = await runWithOps(hostOps, `SECRET_API_KEY=leaked node ${probePath}`);
   assert.deepEqual(leakedSecret, { exitCode: 0, output: "CLEAN" });
 
   const leakedProxy = await runWithOps(
-    passthroughOps,
+    hostOps,
     `HTTPS_PROXY=http://evil.invalid node ${probePath}`,
   );
   assert.deepEqual(leakedProxy, { exitCode: 0, output: "CLEAN" });
@@ -159,17 +159,17 @@ try {
   // ctx.env table.
   const fooProbe = join(workdir, "env-foo.js");
   writeFileSync(fooProbe, 'process.stdout.write("FOO=" + (process.env.FOO || "UNSET"));');
-  const leakedLocal = await runWithOps(passthroughOps, `FOO=leaked; node ${fooProbe}`);
+  const leakedLocal = await runWithOps(hostOps, `FOO=leaked; node ${fooProbe}`);
   assert.deepEqual(leakedLocal, { exitCode: 0, output: "FOO=UNSET" });
-  const prefixVar = await runWithOps(passthroughOps, `FOO=prefix node ${fooProbe}`);
+  const prefixVar = await runWithOps(hostOps, `FOO=prefix node ${fooProbe}`);
   assert.deepEqual(prefixVar, { exitCode: 0, output: "FOO=prefix" });
-  const exportedVar = await runWithOps(passthroughOps, `export FOO=x; node ${fooProbe}`);
+  const exportedVar = await runWithOps(hostOps, `export FOO=x; node ${fooProbe}`);
   assert.deepEqual(exportedVar, { exitCode: 0, output: "FOO=x" });
 
   // KNOWN LIMITATION (pre-existing, just-bash path): createJustBashFs only
   // consumes `allowWrite`; config `denyRead` is NOT plumbed through, so the
   // read-only host FS lets ANY sandboxed command read arbitrary host files
-  // (including ~/.ssh keys). This is independent of passthrough/PATH shadowing
+  // (including ~/.ssh keys). This is independent of host/PATH shadowing
   // — a plain builtin `cat` reads the same. Pin the gap here so a future fix
   // that enforces denyRead flips this assertion intentionally rather than by
   // accident.
@@ -184,7 +184,7 @@ try {
   }
 
   // KNOWN LIMITATION (just-bash pipeline): non-UTF-8 binary stdout from a
-  // host passthrough command is utf8-EXPANDED, not preserved byte-for-byte.
+  // host command is utf8-EXPANDED, not preserved byte-for-byte.
   // just-bash carries output as a JS string, so raw bytes 0x80-0xFF pass
   // through logResult's decode (which falls back to the latin1 string when the
   // strict UTF-8 decode fails) and then Buffer.from(..., "utf8") re-encodes
@@ -205,7 +205,7 @@ try {
   // emitted 0xe9 (mojibake). Letting logResult's decode run (it throws on lone
   // 0xe9 and returns the original Unicode string) and UTF-8 encoding at the
   // boundary keeps it correct. Guards the Termux-wide regression that affected
-  // every builtin once passthrough was enabled.
+  // every builtin once host commands were enabled.
   const builtinTextOut = await runBinary(`printf 'café'`);
   assert.equal(builtinTextOut.exitCode, 0);
   assert.deepEqual(Array.from(builtinTextOut.buffer), [0x63, 0x61, 0x66, 0xc3, 0xa9]);

@@ -49,12 +49,12 @@ export interface JustBashConfig {
    * hooks/config/`ext::` transports), so treat the list as a deliberate escape
    * hatch, not a convenience. The child env is scrubbed (proxy and
    * secret-shaped vars removed) and PATH is forced to the host PATH.
-   * NOTE: enabling any passthrough command also disables just-bash
+   * NOTE: enabling any host command also disables just-bash
    * `defenseInDepth` for that Bash instance (currently required to work
    * around a just-bash bug where command-prefix assignments trigger a DiD
    * violation). Prefer a short explicit allow-list.
    */
-  dangerouslyPassthroughCommands?: string[];
+  hostCommands?: string[];
 }
 
 const JUST_BASH_VIRTUAL_SYSTEM_PATH = "/usr/bin:/bin";
@@ -64,7 +64,7 @@ const JUST_BASH_VIRTUAL_SYSTEM_PATH = "/usr/bin:/bin";
 const HOST_ENV_BLOCKLIST = new Set(["OLDPWD", "PWD", "SHLVL", "_"]);
 
 // Proxy env vars that can redirect host child network traffic. Strip them so a
-// passthrough command cannot be pointed at an attacker-controlled proxy by the
+// host command cannot be pointed at an attacker-controlled proxy by the
 // host environment. (Mirrors pi-sandbox's PROXY_KEYS set.)
 const HOST_ENV_PROXY_BLOCKLIST = new Set([
   "HTTP_PROXY",
@@ -80,7 +80,7 @@ const HOST_ENV_PROXY_BLOCKLIST = new Set([
 ]);
 
 // Host env var names that commonly hold secrets (API keys, tokens, cloud creds).
-// Passthrough commands run fully unsandboxed, so leaking these lets an injected
+// Host commands run fully unsandboxed, so leaking these lets an injected
 // command exfiltrate them over the network. (Pattern adapted from pi-sandbox.)
 const HOST_ENV_SECRET_PATTERN =
   /(_KEY|_TOKEN|_SECRET|_PASSWORD|_PASSWD|^SSH_AUTH_SOCK$|^AWS_.+|^GCP_.+|^GOOGLE_APPLICATION_CREDENTIALS$)/i;
@@ -271,7 +271,8 @@ class VirtualBinFs {
 
   async readdir(path: string): Promise<string[]> {
     if (!isDeviceRoot(path)) throw notDirectoryError("scandir", path);
-    return this.sortedCommands;
+    // Copy: shared across /usr/bin and /bin mounts — don't let consumers mutate it.
+    return [...this.sortedCommands];
   }
 
   async rm(path: string, _options?: RmOptions): Promise<void> {
@@ -641,8 +642,8 @@ function ensureWritableDirectory(root: string): boolean {
   }
 }
 
-function normalizePassthroughCommands(
-  entries: JustBashConfig["dangerouslyPassthroughCommands"],
+function normalizeHostCommands(
+  entries: JustBashConfig["hostCommands"],
 ): string[] {
   if (!Array.isArray(entries)) return [];
   return Array.from(
@@ -665,7 +666,7 @@ function isBareCommandName(value: string): boolean {
   return /^[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?$/.test(value);
 }
 
-function createHostPassthroughCommands(commandNames: string[]): Command[] {
+function createHostCommands(commandNames: string[]): Command[] {
   return commandNames.map((commandName) => ({
     name: commandName,
     trusted: true,
@@ -694,7 +695,7 @@ function buildHostCommandEnv(
   exportedEnv: Readonly<Record<string, string>> | undefined,
   cwd: string,
 ): NodeJS.ProcessEnv {
-  // Start from the host environment but drop proxy/secret keys: passthrough
+  // Start from the host environment but drop proxy/secret keys: host
   // commands run fully unsandboxed, so forwarding secrets would let an injected
   // command exfiltrate them, and forwarding a proxy var would let it reroute
   // traffic to an attacker-controlled host.
@@ -821,15 +822,15 @@ export function createJustBashOps(
 ): BashOperations {
   const policyRoot = resolve(root);
   const filesystem = config?.filesystem;
-  const passthroughCommandNames = normalizePassthroughCommands(
-    config?.dangerouslyPassthroughCommands,
+  const hostCommandNames = normalizeHostCommands(
+    config?.hostCommands,
   );
-  const passthroughCommands = createHostPassthroughCommands(passthroughCommandNames);
+  const hostCommands = createHostCommands(hostCommandNames);
   const virtualBinCommands = Array.from(
     new Set([
       ...getCommandNames(),
       ...(config?.network !== undefined ? getNetworkCommandNames() : []),
-      ...passthroughCommandNames,
+      ...hostCommandNames,
     ]),
   );
 
@@ -872,21 +873,21 @@ export function createJustBashOps(
           cwd: virtualCwd,
           ...(env !== undefined ? { env: toStringEnv(env) } : {}),
           ...(config?.network !== undefined ? { network: config.network } : {}),
-          ...(passthroughCommands.length > 0
+          ...(hostCommands.length > 0
             ? {
-                customCommands: passthroughCommands,
+                customCommands: hostCommands,
                 // defenseInDepth is disabled for this Bash instance because of
                 // a just-bash 3.x bug: with DiD ON, *any* command-prefix
                 // assignment (`VAR=value cmd ...`, including builtins) trips a
                 // `dynamic import of Node.js builtin 'node:module'` violation.
                 // That breaks the common `GIT_AUTHOR_NAME=... git commit`
-                // idiom, so DiD must be off whenever passthrough commands are
+                // idiom, so DiD must be off whenever host commands are
                 // registered. (The import is just-bash's own ESM-loader hook
                 // used to enforce DiD; see its defense-in-depth-box.ts.)
                 //
                 // NOTE on PATH shadowing: with DiD OFF, just-bash resolves
                 // commands via PATH *before* dispatching to custom commands.
-                // `PATH=<writable-dir> <passthrough-cmd>` can therefore resolve
+                // `PATH=<writable-dir> <host-cmd>` can therefore resolve
                 // to a same-named file in that dir instead of the registered
                 // command. That file is NOT executed on the host — just-bash
                 // reads it, strips the shebang, and interprets it as bash
@@ -897,7 +898,7 @@ export function createJustBashOps(
                 // is plumbed into createJustBashFs), so any sandboxed command —
                 // builtin `cat` just as much as a shadowed imposter — can read
                 // host files outside hidden /bin and /usr/bin. PATH shadowing adds no new read capability;
-                // the only effect is that the passthrough command silently runs
+                // the only effect is that the host command silently runs
                 // a sandboxed same-named script instead of the host binary.
                 // buildHostCommandEnv ignores the shell PATH for the real spawn
                 // (always process.env.PATH).
@@ -920,7 +921,7 @@ export function createJustBashOps(
         // is utf8-expanded (an inherent limitation of just-bash's string-based
         // pipeline, since byte 0xE9 and codepoint U+00E9 are indistinguishable
         // once collapsed into a JS string); that only affects raw binary from a
-        // passthrough command, never the text output of git/gh/node.
+        // host command, never the text output of git/gh/node.
         const result = await bash.exec(command, { signal: controller.signal });
         if (result.stdout.length > 0) onData(Buffer.from(result.stdout, "utf8"));
         if (result.stderr.length > 0) onData(Buffer.from(result.stderr, "utf8"));
