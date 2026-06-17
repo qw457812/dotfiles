@@ -91,18 +91,18 @@ return {
         lazy = true,
         config = function() end,
       },
-      -- Providers that offer Opus models with a coding plan:
-      -- 1. https://kilo.ai/pricing
-      --    - https://github.com/Kilo-Org/kilo-pi-provider
-      --
-      -- 2. https://kiro.dev/docs/models/
-      --    - see also the fork of mikeyobrien/pi-provider-kiro: https://github.com/simonsmh/pi-provider-kiro
-      {
-        "mikeyobrien/pi-provider-kiro",
-        build = "pi update --extension git:github.com/mikeyobrien/pi-provider-kiro",
-        lazy = true,
-        config = function() end,
-      },
+      -- -- Providers that offer Opus models with a coding plan:
+      -- -- 1. https://kilo.ai/pricing
+      -- --    - https://github.com/Kilo-Org/kilo-pi-provider
+      -- --
+      -- -- 2. https://kiro.dev/docs/models/
+      -- --    - see also the fork of mikeyobrien/pi-provider-kiro: https://github.com/simonsmh/pi-provider-kiro
+      -- {
+      --   "mikeyobrien/pi-provider-kiro",
+      --   build = "pi update --extension git:github.com/mikeyobrien/pi-provider-kiro",
+      --   lazy = true,
+      --   config = function() end,
+      -- },
       -- {
       --   "monotykamary/pi-invisible-continue",
       --   build = "pi update --extension git:github.com/monotykamary/pi-invisible-continue",

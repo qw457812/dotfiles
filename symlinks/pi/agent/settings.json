@@ -15,8 +15,7 @@
     "deepseek/deepseek-v4-pro",
     "xiaomi/mimo-v2.5-pro",
     "neuralwatt/glm-5.2",
-    "neuralwatt/moonshotai/Kimi-K2.7-Code",
-    "kiro/claude-sonnet-4-5"
+    "neuralwatt/moonshotai/Kimi-K2.7-Code"
   ],
   "packages": [
     "npm:pi-vim",
@@ -82,7 +81,6 @@
     "npm:pi-mcp-adapter",
     "npm:@aliou/pi-guardrails",
     "git:github.com/monotykamary/pi-neuralwatt-provider",
-    "npm:pi-provider-kiro",
     "git:github.com/monotykamary/pi-retry",
     "git:gitlab.com/tom81094/pi-copilot-advanced",
     "git:github.com/qw457812/pi-listen"
