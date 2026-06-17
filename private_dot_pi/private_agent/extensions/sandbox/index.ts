@@ -71,6 +71,8 @@
  *     "filesystem": {
  *       "allowWrite": [".", "/tmp"]
  *     },
+ *     "python": true,
+ *     "javascript": true,
  *     "hostCommands": ["git"]
  *   }
  * }
@@ -457,6 +459,16 @@ function justBashDisplayLines(justBash: JustBashBackendConfig | undefined): stri
     "",
     "Just Bash Filesystem:",
     `  Allow Write: ${justBash?.filesystem?.allowWrite?.join(", ") || "(just-bash defaults)"}`,
+    "",
+    "Just Bash WASM Runtimes (sandboxed in-process):",
+    `  Python: ${justBash?.python === true ? "on (python3/python; CPython Emscripten WASM)" : "off"}`,
+    `  JavaScript: ${
+      justBash?.javascript
+        ? typeof justBash.javascript === "object"
+          ? "on (js-exec; QuickJS WASM + bootstrap)"
+          : "on (js-exec; QuickJS WASM)"
+        : "off"
+    }`,
     "",
     `  Host Commands (unsandboxed; disables just-bash defense; env scrubbed): ${justBash?.hostCommands?.join(", ") || "(none)"}`,
   ];

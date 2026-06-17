@@ -59,6 +59,10 @@
       "bash checkout.sh:*",
       "~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/librarian/checkout.sh*"
     ],
+    // Sandboxed WASM runtimes (in-process, same FS/network policy):
+    // `python3`/`python` (CPython Emscripten), `js-exec` + `node` stub (QuickJS).
+    "python": true,
+    "javascript": true,
     "hostCommands": ["git", "gh"]
   }
 }

@@ -22,14 +22,28 @@ const hostOps = createJustBashOps(workdir, {
   hostCommands: ["node"],
   filesystem: { allowWrite: [".", extraWriteDir] },
 });
+const pythonOps = createJustBashOps(workdir, {
+  python: true,
+  filesystem: { allowWrite: [".", extraWriteDir] },
+});
+const javascriptOps = createJustBashOps(workdir, {
+  javascript: true,
+  filesystem: { allowWrite: [".", extraWriteDir] },
+});
+const javascriptHostOps = createJustBashOps(workdir, {
+  // `node` in hostCommands must win over the js-exec `node` stub.
+  javascript: true,
+  hostCommands: ["node"],
+  filesystem: { allowWrite: [".", extraWriteDir] },
+});
 
-async function runWithOps(selectedOps, command) {
+async function runWithOps(selectedOps, command, timeout = 5) {
   let output = "";
   const result = await selectedOps.exec(command, workdir, {
     onData: (chunk) => {
       output += chunk.toString("utf8");
     },
-    timeout: 5,
+    timeout,
   });
   return { ...result, output };
 }
@@ -238,6 +252,49 @@ try {
     assert.equal(hostBinSymlinkRead.exitCode, 1);
     assert.match(hostBinSymlinkRead.output, /No such file or directory/);
   }
+
+  // --- WASM runtime opt-in: python / javascript ---------------------------------
+  // Discovery is the right test level here, NOT execution. The WASM runtimes
+  // (CPython Emscripten for python3, QuickJS for js-exec) are lazily loaded by
+  // just-bash only on first *execution* — and cold-starting CPython WASM can
+  // hang for minutes on constrained runtimes (e.g. Termux), so asserting on
+  // real execution would make `npm run check` environment-flaky. Discovery
+  // (`command -v`) exercises BOTH halves of the wiring without loading WASM:
+  //   (1) the `python:true`/`javascript:true` option registers the command in
+  //       just-bash's internal registry (via the `new Bash({...})` options),
+  //   (2) the SAME option mirrors the command name into `virtualBinCommands`,
+  //       which populates the VirtualBinFs stub under /usr/bin that PATH
+  //       resolution requires (the registry-only fallback is skipped because
+  //       this extension always mounts /usr/bin).
+  // Missing either half -> `command -v` returns nothing. Upstream just-bash
+  // already covers that a registered command actually executes.
+
+  // Default-off: neither command is discoverable when its option is omitted.
+  const pythonMissingByDefault = await run("command -v python3");
+  assert.deepEqual(pythonMissingByDefault, { exitCode: 1, output: "" });
+  const jsExecMissingByDefault = await run("command -v js-exec");
+  assert.deepEqual(jsExecMissingByDefault, { exitCode: 1, output: "" });
+
+  // Opt-in discovery: virtual command stubs appear under /usr/bin (and /bin).
+  const python3Path = await runWithOps(pythonOps, "command -v python3");
+  assert.deepEqual(python3Path, { exitCode: 0, output: "/usr/bin/python3\n" });
+  const pythonAliasPath = await runWithOps(pythonOps, "command -v python");
+  assert.deepEqual(pythonAliasPath, { exitCode: 0, output: "/usr/bin/python\n" });
+  const jsExecPath = await runWithOps(javascriptOps, "command -v js-exec");
+  assert.deepEqual(jsExecPath, { exitCode: 0, output: "/usr/bin/js-exec\n" });
+  // `javascript: true` also registers a `node` stub that points to js-exec.
+  const jsNodeStubPath = await runWithOps(javascriptOps, "command -v node");
+  assert.deepEqual(jsNodeStubPath, { exitCode: 0, output: "/usr/bin/node\n" });
+
+  // Precedence: when `node` is BOTH a js-exec stub AND a hostCommand, the host
+  // process wins (customCommands registered last in just-bash's Bash ctor).
+  // This dispatches to a real host spawn, never loading the QuickJS WASM, so it
+  // stays fast and proves the stub is dormant rather than shadowing host node.
+  const hostNodeWinsOverStub = await runWithOps(
+    javascriptHostOps,
+    `node -e "process.stdout.write('HOST')"`,
+  );
+  assert.deepEqual(hostNodeWinsOverStub, { exitCode: 0, output: "HOST" });
 
   console.log("✓ just-bash operations tests passed");
 } finally {

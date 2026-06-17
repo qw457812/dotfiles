@@ -1,6 +1,4 @@
 {
-  // Project-local host commands for Node/TypeScript development.
-  // Note: arrays in `justBash` override global values, so keep `git`/`gh` here too.
   "justBash": {
     "hostCommands": ["git", "gh", "node", "npm", "npx"]
   }

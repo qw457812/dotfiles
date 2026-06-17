@@ -4,7 +4,9 @@ import {
   MountableFs,
   ReadWriteFs,
   getCommandNames,
+  getJavaScriptCommandNames,
   getNetworkCommandNames,
+  getPythonCommandNames,
   latin1FromBytes,
   unsafeBytesFromLatin1,
   type BufferEncoding,
@@ -14,6 +16,7 @@ import {
   type CpOptions,
   type FileContent,
   type FsStat,
+  type JavaScriptConfig,
   type MkdirOptions,
   type NetworkConfig,
   type RmOptions,
@@ -41,6 +44,32 @@ export interface JustBashConfig {
    * supplied by defaultAndConfiguredWriteRoots() inside this module.
    */
   filesystem?: JustBashFilesystemConfig;
+  /**
+   * Enable the sandboxed `python3`/`python` commands (CPython 3.13 compiled to
+   * WASM via Emscripten). Runs ENTIRELY inside just-bash's WASM sandbox: file
+   * access goes through the same MountableFs (host read-only outside the
+   * configured write roots) and network through the configured NetworkConfig.
+   * No host process is spawned. Introduces a CPython WASM runtime security
+   * surface, hence opt-in; see just-bash's THREAT_MODEL.md §4.7.
+   *
+   * Precedence: if a python command name is ALSO in `hostCommands`, the host
+   * process wins (customCommands are registered last in just-bash's Bash
+   * constructor), so the WASM runtime only takes effect for names NOT claimed
+   * by hostCommands.
+   */
+  python?: boolean;
+  /**
+   * Enable the sandboxed `js-exec` command (QuickJS WASM) for JavaScript /
+   * TypeScript. Runs inside just-bash's WASM sandbox under the same FS/network
+   * policy as `python`. A `node` *stub* is registered alongside it that prints
+   * a pointer to `js-exec`; if `node` is ALSO in `hostCommands`, the host
+   * process wins (customCommands registered last), so the stub is dormant.
+   *
+   * Note: QuickJS js-exec is NOT a Node.js toolchain — no `node_modules`
+   * resolution, no native addons, no `npm install`. For project build tools
+   * (tsc/vitest/npm scripts) keep the host command in `hostCommands`.
+   */
+  javascript?: boolean | JavaScriptConfig;
   /**
    * Escape hatch for commands that just-bash does not implement (for example `git`).
    * These run as REAL HOST PROCESSES via spawn(): they bypass just-bash's
@@ -826,10 +855,22 @@ export function createJustBashOps(
     config?.hostCommands,
   );
   const hostCommands = createHostCommands(hostCommandNames);
+  // Command discovery is two-layered: (1) just-bash's Bash constructor only
+  // registers a command in its internal registry when its option is set
+  // (python/javascript/network/custom), and (2) THIS extension overrides
+  // /usr/bin and /bin with a VirtualBinFs whose readdir/exists/stat are driven
+  // solely by this list. Because VirtualBinFs always mounts /usr/bin, just-bash's
+  // registry-only fallback (command-resolution.ts, taken when /usr/bin is
+  // absent) NEVER runs here — so a command missing from virtualBinCommands is
+  // invisible even if it is registered. Therefore every opt-in command set must
+  // be mirrored into virtualBinCommands with the SAME condition as the
+  // `new Bash({...})` call below.
   const virtualBinCommands = Array.from(
     new Set([
       ...getCommandNames(),
       ...(config?.network !== undefined ? getNetworkCommandNames() : []),
+      ...(config?.python === true ? getPythonCommandNames() : []),
+      ...(config?.javascript ? getJavaScriptCommandNames() : []),
       ...hostCommandNames,
     ]),
   );
@@ -873,6 +914,8 @@ export function createJustBashOps(
           cwd: virtualCwd,
           ...(env !== undefined ? { env: toStringEnv(env) } : {}),
           ...(config?.network !== undefined ? { network: config.network } : {}),
+          ...(config?.python === true ? { python: true } : {}),
+          ...(config?.javascript ? { javascript: config.javascript } : {}),
           ...(hostCommands.length > 0
             ? {
                 customCommands: hostCommands,
