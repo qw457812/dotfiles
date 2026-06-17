@@ -5,6 +5,7 @@
 // - Rickicode Morph plugin: https://github.com/rickicode/pi-morphllm-plugin
 // - Morph Claude Code plugin: https://github.com/morphllm/morph-claude-code-plugin
 // - Morph OpenCode plugin: https://github.com/morphllm/opencode-morph-plugin
+// - Monotykamary pi-morph: https://github.com/monotykamary/pi-morph
 
 /**
  * Morph Compaction Extension

@@ -25,15 +25,16 @@
         "files.pythonhosted.org",
         "rubygems.org",
         "*.rubygems.org",
+        // Bun
+        "bun.sh",
+        "*.bun.sh",
         // GitHub
         "github.com",
         "*.github.com",
         "api.github.com",
         "raw.githubusercontent.com",
+        // GitLab
         "gitlab.com",
-        // Bun
-        "bun.sh",
-        "*.bun.sh",
         // LLM APIs
         "*.googleapis.com",
         "*.google.com",
@@ -59,10 +60,49 @@
       "bash checkout.sh:*",
       "~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/librarian/checkout.sh*"
     ],
+    "hostCommands": ["git", "gh"],
+    "filesystem": {
+      "allowWrite": [
+        ".",
+        "/tmp",
+        "/private/tmp",
+        "/var/folders",
+        "/private/var/folders",
+        "~/.npm",
+        "~/.bun",
+        "~/.cache" // in favor of `/skill:librarian`
+      ]
+    },
+    "network": {
+      "allowedMethods": ["GET", "HEAD", "POST"],
+      "allowedUrlPrefixes": [
+        // Package registries
+        "https://npmjs.org",
+        "https://registry.npmjs.org",
+        "https://registry.yarnpkg.com",
+        "https://pypi.org",
+        "https://files.pythonhosted.org",
+        "https://rubygems.org",
+        "https://index.rubygems.org",
+        // Bun
+        "https://bun.sh",
+        // GitHub
+        "https://github.com",
+        "https://api.github.com",
+        "https://codeload.github.com",
+        "https://raw.githubusercontent.com",
+        // GitLab
+        "https://gitlab.com",
+        // LLM APIs
+        "https://generativelanguage.googleapis.com",
+        "https://oauth2.googleapis.com",
+        "https://api.anthropic.com",
+        "https://api.openai.com"
+      ]
+    },
     // Sandboxed WASM runtimes (in-process, same FS/network policy):
     // `python3`/`python` (CPython Emscripten), `js-exec` + `node` stub (QuickJS).
     "python": true,
-    "javascript": true,
-    "hostCommands": ["git", "gh"]
+    "javascript": true
   }
 }

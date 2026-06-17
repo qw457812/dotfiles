@@ -91,6 +91,13 @@ return {
         lazy = true,
         config = function() end,
       },
+      -- -- https://github.com/umans-ai/pi-provider-umans
+      -- {
+      --   "monotykamary/pi-umans-provider",
+      --   build = "pi update --extension git:github.com/monotykamary/pi-umans-provider",
+      --   lazy = true,
+      --   config = function() end,
+      -- },
       -- -- Providers that offer Opus models with a coding plan:
       -- -- 1. https://kilo.ai/pricing
       -- --    - https://github.com/Kilo-Org/kilo-pi-provider

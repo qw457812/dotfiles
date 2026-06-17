@@ -94,7 +94,7 @@ const HOST_ENV_BLOCKLIST = new Set(["OLDPWD", "PWD", "SHLVL", "_"]);
 
 // Proxy env vars that can redirect host child network traffic. Strip them so a
 // host command cannot be pointed at an attacker-controlled proxy by the
-// host environment. (Mirrors pi-sandbox's PROXY_KEYS set.)
+// host environment. (Mirrors code-yeongyu/pi-sandbox's PROXY_KEYS set.)
 const HOST_ENV_PROXY_BLOCKLIST = new Set([
   "HTTP_PROXY",
   "HTTPS_PROXY",
@@ -110,7 +110,7 @@ const HOST_ENV_PROXY_BLOCKLIST = new Set([
 
 // Host env var names that commonly hold secrets (API keys, tokens, cloud creds).
 // Host commands run fully unsandboxed, so leaking these lets an injected
-// command exfiltrate them over the network. (Pattern adapted from pi-sandbox.)
+// command exfiltrate them over the network. (Pattern adapted from code-yeongyu/pi-sandbox.)
 const HOST_ENV_SECRET_PATTERN =
   /(_KEY|_TOKEN|_SECRET|_PASSWORD|_PASSWD|^SSH_AUTH_SOCK$|^AWS_.+|^GCP_.+|^GOOGLE_APPLICATION_CREDENTIALS$)/i;
 
@@ -611,7 +611,7 @@ function defaultAndConfiguredWriteRoots(
   filesystem: JustBashFilesystemConfig | undefined,
 ): string[] {
   return [
-    // Keep Termux just-bash write defaults aligned with sandbox-runtime's recommended paths.
+    // Keep just-bash write defaults aligned with sandbox-runtime's recommended paths.
     // Source: https://github.com/anthropic-experimental/sandbox-runtime/blob/d455fb453e41d32323fbf13d73bfe017bfa52d8a/src/sandbox/sandbox-utils.ts#L278
     "/dev/stdout",
     "/dev/stderr",
@@ -671,9 +671,7 @@ function ensureWritableDirectory(root: string): boolean {
   }
 }
 
-function normalizeHostCommands(
-  entries: JustBashConfig["hostCommands"],
-): string[] {
+function normalizeHostCommands(entries: JustBashConfig["hostCommands"]): string[] {
   if (!Array.isArray(entries)) return [];
   return Array.from(
     new Set(
@@ -851,9 +849,7 @@ export function createJustBashOps(
 ): BashOperations {
   const policyRoot = resolve(root);
   const filesystem = config?.filesystem;
-  const hostCommandNames = normalizeHostCommands(
-    config?.hostCommands,
-  );
+  const hostCommandNames = normalizeHostCommands(config?.hostCommands);
   const hostCommands = createHostCommands(hostCommandNames);
   // Command discovery is two-layered: (1) just-bash's Bash constructor only
   // registers a command in its internal registry when its option is set
