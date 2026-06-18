@@ -171,6 +171,31 @@ return {
         return not ai_cmp and vim.fn.getcmdwintype() == "" and vim.bo.filetype ~= "copilot-chat"
       end
 
+      local function cmdwin_cmp_menu_auto_show()
+        return vim.fn.getcmdwintype() == ":"
+      end
+
+      -- HACK: cmdwin completion is a per-mode config, not `opts.cmdwin.completion`.
+      -- upstream `cmdwin` only accepts `enabled`: https://github.com/saghen/blink.cmp/blob/26ec6f0a1a8101eb134f8b8568d6099be015fe70/lua/blink/cmp/config/init.lua#L37-L39
+      require("blink.cmp.config")({
+        completion = {
+          menu = {
+            -- matching `cmdline.completion.menu.auto_show`: true for `q:`, false for `q/` and `q?`
+            auto_show = cmdwin_cmp_menu_auto_show,
+          },
+          ghost_text = {
+            -- align with `completion.menu.auto_show`, because with `ghost_text` and `preselect` enabled
+            -- in cmdwin, <CR> accepts the ghost text (preselected item) instead of executing the command-line.
+            enabled = cmdwin_cmp_menu_auto_show,
+          },
+          list = {
+            selection = {
+              preselect = true, -- the same behavior as normal buffer
+            },
+          },
+        },
+      }, { mode = "cmdwin", validate = false })
+
       return U.extend_tbl(opts, {
         appearance = {
           nerd_font_variant = "normal",
@@ -318,35 +343,21 @@ return {
             ["<C-d>"] = { H.actions.scroll_list_down, "fallback" },
             ["<C-space>"] = { "show", "hide" },
           },
-          -- `completion` configuration for command-line window goes here
           completion = {
             menu = {
               auto_show = function()
-                -- the same behavior as normal buffer for command-line window
-                return vim.fn.getcmdtype() == ":" or vim.fn.getcmdwintype() == ":"
+                return vim.fn.getcmdtype() == ":"
               end,
             },
             ghost_text = {
               enabled = function()
-                local cmdwintype = vim.fn.getcmdwintype()
-                if cmdwintype ~= "" then
-                  -- For command-line window,
-                  -- align `ghost_text` with the result of `:=LazyVim.opts("blink.cmp").cmdline.completion.menu.auto_show()` in command-line window,
-                  -- because with `ghost_text` and `preselect` enabled in cmdwin, <cr> accepts the ghost text (preselected item) instead of executing the command-line.
-                  return cmdwintype == ":"
-                else
-                  -- For command-line mode,
-                  -- enable ghost_text when the cursor is at the end of cmdline, in favor of the `<>` pair of mini.pairs and the left arrow key
-                  return vim.fn.getcmdpos() == #vim.fn.getcmdline() + 1
-                end
+                -- enable ghost_text when the cursor is at the end of cmdline, in favor of the `<>` pair of mini.pairs and the left arrow key
+                return vim.fn.getcmdpos() == #vim.fn.getcmdline() + 1
               end,
             },
             list = {
               selection = {
-                preselect = function()
-                  -- enable preselect in cmdwin, the same behavior as in normal buffer
-                  return vim.fn.getcmdwintype() ~= ""
-                end,
+                preselect = false,
               },
             },
           },
