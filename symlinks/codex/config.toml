@@ -32,7 +32,6 @@ status_line_use_colors = true
 
 [features]
 prevent_idle_sleep = true
-external_migration = true
 terminal_resize_reflow = true
 
 [notice]

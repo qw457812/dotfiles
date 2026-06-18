@@ -39,9 +39,9 @@
       "source": "git:github.com/mattpocock/skills",
       "extensions": [],
       "skills": [
-        "skills/productivity/grill-me",
+        "skills/productivity/grilling",
         "skills/productivity/teach",
-        "skills/productivity/write-a-skill"
+        "skills/productivity/writing-great-skills"
       ],
       "prompts": [],
       "themes": []

@@ -39,7 +39,7 @@
   "taplo": "0.10.0",
   "tree-sitter-cli": "v0.26.9",
   "ts_query_ls": "v3.16.0",
-  "tsgo": "7.0.0-dev.20260611.2",
+  "tsgo": "7.0.0-dev.20260613.1",
   "vscode-spring-boot-tools": "2.2.0",
   "vtsls": "0.3.0",
   "vue-language-server": "3.3.4",

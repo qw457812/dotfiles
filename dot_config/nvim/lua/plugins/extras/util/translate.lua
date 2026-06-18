@@ -153,7 +153,7 @@ return {
         "<Esc>",
         U.keymap.clear_ui_or_unfocus_esc,
         desc = "Clear UI or Unfocus (Smart Translate)",
-        ft = "translate-split",
+        ft = { "translate-split", "translate-vsplit" },
       },
     },
     opts = {},

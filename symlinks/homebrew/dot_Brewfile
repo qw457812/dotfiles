@@ -30,12 +30,6 @@ brew "gettext"
 brew "readline"
 # Address book with mutt support
 brew "abook"
-# Easily download, build, install, upgrade, and uninstall Python packages
-brew "python-setuptools"
-# General-purpose data compression with high compression ratio
-brew "xz"
-# OpenType text shaping engine
-brew "harfbuzz"
 # Utility to read Word (.doc) files
 brew "antiword"
 # Cryptography and SSL/TLS Toolkit
@@ -52,6 +46,8 @@ brew "atuin"
 brew "autoconf"
 # Tool for generating GNU Standards-compliant Makefiles
 brew "automake"
+# General-purpose data compression with high compression ratio
+brew "xz"
 # Bourne-Again SHell, a UNIX command interpreter
 brew "bash"
 # Clone of cat(1) with syntax highlighting and Git integration
@@ -70,10 +66,14 @@ brew "bottom"
 brew "broot"
 # Resource monitor. C++ version and continuation of bashtop and bpytop
 brew "btop"
+# Easily download, build, install, upgrade, and uninstall Python packages
+brew "python-setuptools"
 # CLI tool for analyzing Claude Code usage from local JSONL files
 brew "ccusage"
 # Tool to obtain certs from Let's Encrypt and autoenable HTTPS
 brew "certbot"
+# OpenType text shaping engine
+brew "harfbuzz"
 # Versatile and fast Unicode/ASCII/ANSI graphics renderer
 brew "chafa"
 # Create and view interactive cheat sheets for *nix commands
@@ -248,6 +248,8 @@ brew "jenv"
 brew "jq"
 # Interactive environments for writing and running code
 brew "jupyterlab"
+# Open-source distributed event streaming platform
+brew "kafka"
 # Generic command-line non-JVM Apache Kafka producer and consumer
 brew "kcat"
 # Command-line music player
@@ -296,8 +298,6 @@ brew "maven"
 brew "mcat"
 # Unified display of technical and tag data for audio/video
 brew "media-info"
-# Small build system for use with gyp or CMake
-brew "ninja"
 # Modern and intuitive terminal-based text editor
 brew "micro"
 # Terminal-based visual file manager
@@ -336,6 +336,8 @@ brew "neovim"
 brew "neovim-remote"
 # HTTP(S) server and reverse proxy, and IMAP/POP3 proxy server
 brew "nginx"
+# Small build system for use with gyp or CMake
+brew "ninja"
 # Tiny, lightning fast, feature-packed file manager
 brew "nnn"
 # Open-source, cross-platform JavaScript runtime environment
@@ -368,6 +370,8 @@ brew "pmd"
 brew "pngpaste"
 # Fast, disk space efficient package manager
 brew "pnpm"
+# Python package management tool
+brew "poetry"
 # PDF rendering library (based on the xpdf-3.0 code base)
 brew "poppler"
 # Object-relational database system
@@ -384,6 +388,8 @@ brew "pyenv"
 brew "pyenv-virtualenv"
 # Generic syntax highlighter
 brew "pygments"
+# Static type checker for Python
+brew "pyright"
 # Python Language Server for the Language Server Protocol
 brew "python-lsp-server"
 # Interpreted, interactive, object-oriented programming language
@@ -404,6 +410,8 @@ brew "rich-cli"
 brew "ripgrep"
 # Readline wrapper: adds readline support to tools that lack it
 brew "rlwrap"
+# Utility that provides fast incremental file transfer
+brew "rsync"
 # Web search from the terminal
 brew "s-search"
 # JVM-based programming language
@@ -690,6 +698,7 @@ npm "@google/gemini-cli"
 npm "@googleworkspace/cli"
 npm "@gsd-build/sdk"
 npm "@mermaid-js/mermaid-cli"
+npm "@mimo-ai/cli"
 npm "@tencent-ai/codebuddy-code"
 npm "agent-browser"
 npm "cowsay"
