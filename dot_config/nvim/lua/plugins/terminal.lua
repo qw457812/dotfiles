@@ -218,30 +218,7 @@ return {
               return false
             end
 
-            ---copied from: https://github.com/willothy/flatten.nvim/blob/ea99c8c7e9ee4fd66d749a102462d5610126b988/lua/flatten/core.lua#L53-L72
-            ---@param argv string[]
-            ---@return string[] pre_cmds, string[] post_cmds
-            local function parse_argv(argv)
-              local pre_cmds, post_cmds = {}, {}
-              local is_cmd = false
-              for _, arg in ipairs(argv) do
-                if is_cmd then
-                  is_cmd = false
-                  -- execute --cmd <cmd> commands
-                  table.insert(pre_cmds, arg)
-                elseif arg:sub(1, 1) == "+" then
-                  local cmd = string.sub(arg, 2, -1)
-                  table.insert(post_cmds, cmd)
-                elseif arg == "--cmd" then
-                  -- next arg is the actual command
-                  is_cmd = true
-                end
-              end
-              return pre_cmds, post_cmds
-            end
-
-            -- HACK: fix `nest_if_no_args = true`, see: https://github.com/willothy/flatten.nvim/issues/108
-            local pre_cmds, post_cmds = (require("flatten.core").parse_argv or parse_argv)(opts.argv)
+            local pre_cmds, post_cmds = require("flatten.core").parse_argv(opts.argv)
             if #pre_cmds > 0 or #post_cmds > 0 then
               return false
             end

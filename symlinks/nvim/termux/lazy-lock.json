@@ -30,7 +30,7 @@
   "dropbar.nvim": { "branch": "master", "commit": "808ba31cde89aec8833e9789f5e04557cd31c9e1" },
   "exercism.nvim": { "branch": "main", "commit": "dee4f1844555a15d0d343e0e88b65dbf20be337e" },
   "flash.nvim": { "branch": "main", "commit": "fcea7ff883235d9024dc41e638f164a450c14ca2" },
-  "flatten.nvim": { "branch": "main", "commit": "72527798e75b5e34757491947c2cb853ce21dc0e" },
+  "flatten.nvim": { "branch": "main", "commit": "d92ca41e9c330f45c1b854a80c89c8488a9d730c" },
   "folke-dot": { "branch": "master", "commit": "10526a848771bab9e9fbb98b5995c997f7ef92b6" },
   "friendly-snippets": { "branch": "main", "commit": "6cd7280adead7f586db6fccbd15d2cac7e2188b9" },
   "google-10000-english": { "branch": "master", "commit": "d0736d492489198e4f9d650c7ab4143bc14c1e9e" },
