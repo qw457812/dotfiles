@@ -30,7 +30,7 @@
  */
 
 import type { ExtensionAPI, ExtensionContext, ExtensionCommandContext } from "@earendil-works/pi-coding-agent";
-import { DynamicBorder, BorderedLoader } from "@earendil-works/pi-coding-agent";
+import { CONFIG_DIR_NAME, DynamicBorder, BorderedLoader } from "@earendil-works/pi-coding-agent";
 import {
 	Container,
 	fuzzyFilter,
@@ -495,7 +495,7 @@ async function loadProjectReviewGuidelines(cwd: string): Promise<string | null> 
 	let currentDir = path.resolve(cwd);
 
 	while (true) {
-		const piDir = path.join(currentDir, ".pi");
+		const piDir = path.join(currentDir, CONFIG_DIR_NAME);
 		const guidelinesPath = path.join(currentDir, "REVIEW_GUIDELINES.md");
 
 		const piStats = await fs.stat(piDir).catch(() => null);

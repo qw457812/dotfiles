@@ -92,13 +92,14 @@
 
 import {
   SandboxManager,
-  type SandboxAskCallback,
-  type SandboxRuntimeConfig,
   type FilesystemConfig as RuntimeFilesystemConfig,
   type NetworkConfig as RuntimeNetworkConfig,
+  type SandboxAskCallback,
+  type SandboxRuntimeConfig,
 } from "@anthropic-ai/sandbox-runtime";
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import {
+  CONFIG_DIR_NAME,
   createBashTool,
   createLocalBashOperations,
   getAgentDir,
@@ -177,7 +178,7 @@ function stripJsonComments(input: string): string {
 }
 
 export function loadConfig(cwd: string): SandboxConfig {
-  const projectConfigPath = join(cwd, ".pi", "sandbox.json");
+  const projectConfigPath = join(cwd, CONFIG_DIR_NAME, "sandbox.json");
   const globalConfigPath = join(getAgentDir(), "extensions", "sandbox.json");
 
   let globalConfig: Partial<SandboxConfig> = {};

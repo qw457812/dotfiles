@@ -6,7 +6,7 @@
  * Combines destructive command confirmation + protected paths in one extension.
  */
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-import { getAgentDir } from "@earendil-works/pi-coding-agent";
+import { CONFIG_DIR_NAME, getAgentDir } from "@earendil-works/pi-coding-agent";
 
 // const DANGEROUS_PATTERNS = [
 //   /\brm\s+(-[a-zA-Z]*f[a-zA-Z]*\s+|.*-rf\b|.*--force\b)/,
@@ -20,7 +20,14 @@ import { getAgentDir } from "@earendil-works/pi-coding-agent";
 
 const AGENT_DIR = getAgentDir();
 
-const PROTECTED_PATHS = [".env", ".git/", "node_modules/", ".pi/", "id_rsa", ".ssh/"];
+const PROTECTED_PATHS = [
+  ".env",
+  ".git/",
+  "node_modules/",
+  `${CONFIG_DIR_NAME}/`,
+  "id_rsa",
+  ".ssh/",
+];
 
 export default function (pi: ExtensionAPI) {
   pi.on("tool_call", async (event, ctx) => {
@@ -43,7 +50,9 @@ export default function (pi: ExtensionAPI) {
     if (event.toolName === "write" || event.toolName === "edit") {
       const path = (event.input as { path?: string }).path ?? "";
       const guardedPaths =
-        ctx.cwd === AGENT_DIR ? PROTECTED_PATHS.filter((p) => p !== ".pi/") : PROTECTED_PATHS;
+        ctx.cwd === AGENT_DIR
+          ? PROTECTED_PATHS.filter((p) => p !== `${CONFIG_DIR_NAME}/`)
+          : PROTECTED_PATHS;
       const hit = guardedPaths.find((p) => path.includes(p));
       if (hit) {
         if (ctx.hasUI) {

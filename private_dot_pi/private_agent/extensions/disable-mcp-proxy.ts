@@ -16,7 +16,7 @@
  */
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-import { getAgentDir } from "@earendil-works/pi-coding-agent";
+import { CONFIG_DIR_NAME, getAgentDir } from "@earendil-works/pi-coding-agent";
 import { existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join, resolve } from "node:path";
@@ -36,7 +36,11 @@ interface McpConfig {
   };
 }
 
-const CONFIG_PATHS = [join(homedir(), ".config", "mcp", "mcp.json"), ".mcp.json", ".pi/mcp.json"];
+const CONFIG_PATHS = [
+  join(homedir(), ".config", "mcp", "mcp.json"),
+  ".mcp.json",
+  join(CONFIG_DIR_NAME, "mcp.json"),
+];
 
 function readJsonConfig(path: string): McpConfig | null {
   try {

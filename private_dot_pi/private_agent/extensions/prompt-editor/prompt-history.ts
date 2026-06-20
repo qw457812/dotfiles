@@ -1,5 +1,6 @@
 // Ref: https://github.com/mitsuhiko/agent-stuff/blob/2b70e8d53647c1e0277bd54dbbb2519cb5bea92b/extensions/prompt-editor.ts
 
+import { CONFIG_DIR_NAME } from "@earendil-works/pi-coding-agent";
 import type { ExtensionContext } from "@earendil-works/pi-coding-agent";
 import type { Dirent } from "node:fs";
 import fs from "node:fs/promises";
@@ -23,7 +24,7 @@ function expandUserPath(p: string): string {
 function getGlobalAgentDir(): string {
   const env = process.env.PI_CODING_AGENT_DIR;
   if (env) return expandUserPath(env);
-  return path.join(os.homedir(), ".pi", "agent");
+  return path.join(os.homedir(), CONFIG_DIR_NAME, "agent");
 }
 
 function extractText(content: Array<{ type: string; text?: string }>): string {
