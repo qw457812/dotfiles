@@ -1,6 +1,7 @@
 ---
 name: adapt-pi-vim
 description: Adapt a pi extension that extends pi-vim's ModalEditor to newer pi-vim versions. Covers type changes, cursor shape conflict resolution, ex-command support, and pi-managed path resolution. Use when pi-vim has a breaking API change and an extension subclassing ModalEditor (e.g., prompt-editor) needs updating.
+disable-model-invocation: true
 ---
 
 # Adapt pi-vim changes
