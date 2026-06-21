@@ -11,10 +11,10 @@
 # (exactly lazy's log task range). Everything else is skipped the same way
 # lazy's fast_check skips it.
 #
-# By default this is OFFLINE: it reuses the origin refs your last `:Lazy check`
-# fetched. So: run `:Lazy check` first, generate the specs cache
-# (dump-specs.lua), then run this script. Pass --fetch only if you want it to
-# git-fetch per plugin itself; that refreshes the specs again after fetching.
+# It always re-dumps specs first (headless nvim, ~1s) so installed/target
+# reflect lazy's latest resolution and the refs your last `:Lazy check` wrote.
+# Run `:Lazy check` in Neovim before this for fresh upstream status; pass
+# --fetch to make this script git-fetch each plugin itself instead.
 #
 # NOTE: written for Termux's restricted `bash` — no process substitution, no
 # trap. jq is NOT required (specs cache is already TSV).
@@ -26,23 +26,20 @@ SPEC_FILE="${SPEC_FILE:-$HOME/.cache/lazy-changelog/specs.tsv}"
 full=0
 limit=0
 do_fetch=0
-do_refresh=0
-no_refresh=0
 list_mode=0
 filter=""
 
 usage() {
   cat <<'EOF'
-Usage: lazy-changelog.sh [--refresh] [--fetch] [--full] [--limit N] [plugin ...]
+Usage: lazy-changelog.sh [--fetch] [--full] [--limit N] [--list] [plugin ...]
 
 Prints the changelog (git log) of commits an update would pull for lazy.nvim
 plugins behind their update target. Output matches :Lazy check's "Updates".
+Always re-dumps specs first via headless nvim (~1s); run :Lazy check in nvim
+beforehand for fresh upstream refs, or pass --fetch to fetch here.
 
 Options:
-  --refresh      regenerate the specs cache via nvim first (run after :Lazy check)
-  --no-refresh   trust the existing specs cache, never auto-refresh even if stale
   --fetch        git fetch per plugin, then refresh specs before comparing
-                 (redundant if you already ran :Lazy check)
   --full         show date + author + subject instead of oneline
   --limit N      cap changelog commits per plugin (0 = all)
   --list         only list outdated plugins + range + commit count (no log body)
@@ -50,17 +47,12 @@ Options:
 
 Env:
   SPEC_FILE  resolved-specs cache (default: ~/.cache/lazy-changelog/specs.tsv)
-             generate with:
-               nvim --headless +"lua require('lazy')" \
-                       +"luafile <skill>/scripts/dump-specs.lua" +qa
 EOF
 }
 
 while [ $# -gt 0 ]; do
   case "$1" in
     --fetch) do_fetch=1; shift ;;
-    --refresh) do_refresh=1; shift ;;
-    --no-refresh) no_refresh=1; shift ;;
     --full)  full=1; shift ;;
     --list)  list_mode=1; shift ;;
     -h|--help) usage; exit 0 ;;
@@ -89,51 +81,15 @@ fetch_from_specs() {
   done
 }
 
-[ -f "$SPEC_FILE" ] || { [ "$no_refresh" = "0" ] && do_refresh=1; }
-
-# Auto-refresh on stale cache (only when not already refreshing/fetching and
-# the user did not ask for offline --no-refresh). refresh-specs.sh re-reads
-# the refs that :Lazy check/update just wrote, so a refresh here makes the
-# offline comparison accurate instead of reporting drift that no longer exists.
-if [ "$do_refresh" = "0" ] && [ "$do_fetch" = "0" ] && [ "$no_refresh" = "0" ]; then
-  # Portable epoch-seconds mtime: `find -printf '%T@'` works on toybox and GNU
-  # (toybox `stat -c %Y` prints "%Y" literally). cut drops the fractional secs.
-  mtime() { find "$1" -printf '%T@' 2>/dev/null | cut -d. -f1; }
-  specs_mtime=$(mtime "$SPEC_FILE")
-
-  # :Lazy check refreshes origin refs and bumps lazy/state.json's last_check.
-  state_file="$HOME/.local/state/nvim/lazy/state.json"
-  last_check=""
-  [ -f "$state_file" ] && last_check=$(grep -o '"last_check":[0-9]*' "$state_file" 2>/dev/null | head -1 | cut -d: -f2)
-
-  # :Lazy update/sync/restore rewrites lazy-lock.json, so a newer lockfile means
-  # the recorded installed commits are stale even with no :Lazy check since.
-  lock_file="${XDG_CONFIG_HOME:-$HOME/.config}/nvim/lazy-lock.json"
-  lock_mtime=$(mtime "$lock_file")
-
-  if { [ -n "$specs_mtime" ] && [ -n "$last_check" ] && [ "$specs_mtime" -lt "$last_check" ] 2>/dev/null; } \
-     || { [ -n "$specs_mtime" ] && [ -n "$lock_mtime" ] && [ "$specs_mtime" -lt "$lock_mtime" ] 2>/dev/null; }; then
-    do_refresh=1
-  fi
-fi
-
-# A fetch changes the refs that Git.get_target reads, so refresh the dump after
-# fetching. If no dump exists yet, create one first only to discover plugin dirs.
-if [ "$do_fetch" = "1" ]; then
-  [ -f "$SPEC_FILE" ] || refresh_specs || exit $?
-  fetch_from_specs || exit $?
-  do_refresh=1
-fi
-
-if [ "$do_refresh" = "1" ]; then
+# --fetch needs a specs file to discover plugin dirs; create one first.
+if [ "$do_fetch" = "1" ] && [ ! -f "$SPEC_FILE" ]; then
   refresh_specs || exit $?
+  fetch_from_specs || exit $?
 fi
 
-[ -f "$SPEC_FILE" ] || {
-  echo "error: specs cache not found: $SPEC_FILE" >&2
-  echo "       generate it with dump-specs.lua inside nvim (see --help)" >&2
-  exit 1
-}
+# Always re-dump specs (via headless nvim) so installed/target reflect the
+# latest lazy resolution and on-disk refs. ~1s; this skill is called rarely.
+refresh_specs || exit $?
 
 log_fmt="--pretty=format:%h %s (%cr)"
 [ "$full" = "1" ] && log_fmt="--pretty=format:%h %ad %an %s"
@@ -194,8 +150,8 @@ else
   printf 'outdated=%s scanned=%s  (all up to date)\n' "$n_out" "$n_total" >&2
 fi
 if [ "$do_fetch" = "1" ]; then
-  echo "(fetched plugin refs, refreshed specs, then compared)" >&2
+  echo "(fetched refs, re-dumped specs, then compared)" >&2
 else
-  echo "(offline; reuses origin refs from your last :Lazy check)" >&2
+  echo "(re-dumped specs against refs from your last :Lazy check)" >&2
 fi
 rm -rf "$cnt_dir"
