@@ -2,10 +2,13 @@
 # refresh-specs.sh — regenerate the lazy-changelog specs cache by running
 # dump-specs.lua inside Neovim (with your config, so lazy resolves all specs).
 #
-# Run this (or pass --refresh to lazy-changelog.sh) right after `:Lazy check`,
-# so the specs cache matches the freshly-fetched origin refs.
+# Run this (or rely on lazy-changelog.sh's always-refresh) right after
+# `:Lazy check`, so the specs cache matches the freshly-fetched origin refs.
 #
 # Output: $SPEC_FILE (default ~/.cache/lazy-changelog/specs.tsv)
+#
+# Needs a real Neovim binary; this repo's .pi/sandbox.json allows `nvim` via
+# justBash.hostCommands, so it runs inside the agent sandbox too.
 #
 # NOTE: written for Termux's restricted `bash` — no trap, no process subst.
 

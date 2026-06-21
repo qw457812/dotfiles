@@ -18,8 +18,7 @@
 -- installed/target are computed with lazy's OWN Git.info / Git.get_target, so
 -- the comparison is identical to what :Lazy check / checker.fast_check do.
 --
--- Usage (headless; works in this repo's agent sandbox because .pi/sandbox.json
--- allows `nvim` as a justBash.hostCommand):
+-- Usage (headless, via refresh-specs.sh):
 --   nvim --headless +"lua require('lazy')" +"luafile /path/dump-specs.lua" +qa
 -- If lazy is lazy-loaded, just open your config first then :luafile it.
 
@@ -41,6 +40,7 @@ for _, p in ipairs(lazy.plugins()) do
   local is_local = (p._ and p._.is_local) == true
   local installed_flag = (p._ and p._.installed) == true
   local dir = p.dir or ""
+  local url = ""
 
   local skip, installed, target = "", "", ""
 
@@ -63,7 +63,14 @@ for _, p in ipairs(lazy.plugins()) do
     end
   end
 
-  io.stdout:write(string.format("%s|%s|%s|%s|%s|%s|%s|%s\n",
+  -- origin URL for building github issue/PR links; works even for custom spec
+  -- URLs since it reads the actual .git/config remote.
+  if dir ~= "" then
+    local ok, origin = pcall(Git.get_origin, dir)
+    if ok and origin then url = origin end
+  end
+
+  io.stdout:write(string.format("%s|%s|%s|%s|%s|%s|%s|%s|%s\n",
     name, tostring(not disabled), tostring(pin), tostring(is_local),
-    dir, skip, installed, target))
+    dir, url, skip, installed, target))
 end

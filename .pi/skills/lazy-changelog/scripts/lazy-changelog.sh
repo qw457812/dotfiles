@@ -23,15 +23,13 @@ set -u
 
 SPEC_FILE="${SPEC_FILE:-$HOME/.cache/lazy-changelog/specs.tsv}"
 
-full=0
 limit=0
 do_fetch=0
 list_mode=0
 filter=""
-
 usage() {
   cat <<'EOF'
-Usage: lazy-changelog.sh [--fetch] [--full] [--limit N] [--list] [plugin ...]
+Usage: lazy-changelog.sh [--fetch] [--limit N] [--list] [plugin ...]
 
 Prints the changelog (git log) of commits an update would pull for lazy.nvim
 plugins behind their update target. Output matches :Lazy check's "Updates".
@@ -40,7 +38,6 @@ beforehand for fresh upstream refs, or pass --fetch to fetch here.
 
 Options:
   --fetch        git fetch per plugin, then refresh specs before comparing
-  --full         show date + author + subject instead of oneline
   --limit N      cap changelog commits per plugin (0 = all)
   --list         only list outdated plugins + range + commit count (no log body)
   plugin ...     only scan these plugin names (default: all non-skipped)
@@ -53,7 +50,6 @@ EOF
 while [ $# -gt 0 ]; do
   case "$1" in
     --fetch) do_fetch=1; shift ;;
-    --full)  full=1; shift ;;
     --list)  list_mode=1; shift ;;
     -h|--help) usage; exit 0 ;;
     --limit) [ $# -ge 2 ] || { echo "--limit needs a value" >&2; exit 2; }; limit="$2"; shift 2 ;;
@@ -71,7 +67,7 @@ refresh_specs() {
 
 fetch_from_specs() {
   [ -f "$SPEC_FILE" ] || return 0
-  printf '%s\n' "$(cat "$SPEC_FILE")" | while IFS='|' read -r name enabled pin is_local dir skip installed target; do
+  printf '%s\n' "$(cat "$SPEC_FILE")" | while IFS='|' read -r name enabled pin is_local dir url skip installed target; do
     [ -n "$name" ] || continue
     [ -z "$skip" ] || continue
     [ "$enabled" = "false" ] && continue
@@ -91,8 +87,10 @@ fi
 # latest lazy resolution and on-disk refs. ~1s; this skill is called rarely.
 refresh_specs || exit $?
 
+# Shorten $HOME to ~ for display (the restricted shell skips ${x/#$HOME/~}).
+short() { case "$1" in "$HOME"*) printf '~%s' "${1#$HOME}";; *) printf '%s' "$1";; esac; }
+
 log_fmt="--pretty=format:%h %s (%cr)"
-[ "$full" = "1" ] && log_fmt="--pretty=format:%h %ad %an %s"
 
 # Counters: the scan loop runs in a subshell (pipe), so in-memory counters
 # won't escape it. Append one byte per event and wc -c later.
@@ -101,7 +99,7 @@ mkdir -p "$cnt_dir"
 c_total="$cnt_dir/total"; c_out="$cnt_dir/outdated"; c_out_names="$cnt_dir/outdated_names"
 : > "$c_total"; : > "$c_out"; : > "$c_out_names"
 
-printf '%s\n' "$(cat "$SPEC_FILE")" | while IFS='|' read -r name enabled pin is_local dir skip installed target; do
+printf '%s\n' "$(cat "$SPEC_FILE")" | while IFS='|' read -r name enabled pin is_local dir url skip installed target; do
   [ -n "$name" ] || continue
   [ -z "$skip" ] || continue                # disabled/pin/local/not-installed
   [ "$enabled" = "false" ] && continue
@@ -127,13 +125,13 @@ printf '%s\n' "$(cat "$SPEC_FILE")" | while IFS='|' read -r name enabled pin is_
     full_tgt="$(git -C "$dir" rev-parse -q --verify "${target}^{commit}" 2>/dev/null)"; [ -n "$full_tgt" ] || full_tgt="$target"
     if [ "$list_mode" = "1" ]; then
       n="$(git -C "$dir" rev-list --count "$full_inst..$full_tgt" 2>/dev/null)"
-      printf '%-28s %s..%s  %s commits\n' "$name" "${full_inst:0:8}" "${full_tgt:0:8}" "${n:-?}"
+      printf '%-28s %s..%s  %s commits  @ %s\n' "$name" "${full_inst:0:8}" "${full_tgt:0:8}" "${n:-?}" "$(short "$dir")"
     else
-      printf '## %s  %s..%s\n' "$name" "${full_inst:0:8}" "${full_tgt:0:8}"
+      printf '## %s  %s..%s  @ %s\n' "$name" "${full_inst:0:8}" "${full_tgt:0:8}" "$(short "$dir")"
       if [ "$limit" -gt 0 ] 2>/dev/null; then
-        git -C "$dir" log -n "$limit" --no-color --date=short "$log_fmt" "$full_inst..$full_tgt" 2>/dev/null
+        git -C "$dir" log -n "$limit" --no-color "$log_fmt" "$full_inst..$full_tgt" 2>/dev/null
       else
-        git -C "$dir" log --no-color --date=short "$log_fmt" "$full_inst..$full_tgt" 2>/dev/null
+        git -C "$dir" log --no-color "$log_fmt" "$full_inst..$full_tgt" 2>/dev/null
       fi
       echo
     fi
