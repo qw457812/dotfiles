@@ -1145,7 +1145,7 @@ export function createJustBashOps(
         const bash = new Bash({
           fs,
           cwd: virtualCwd,
-          ...(env !== undefined ? { env: toStringEnv(env) } : {}),
+          env: toStringEnv(env),
           ...(config?.network !== undefined ? { network: config.network } : {}),
           ...(config?.python === true ? { python: true } : {}),
           ...(config?.javascript ? { javascript: config.javascript } : {}),
@@ -1214,11 +1214,18 @@ export function createJustBashOps(
   };
 }
 
-function toStringEnv(env: NodeJS.ProcessEnv): Record<string, string> {
+function toStringEnv(env: NodeJS.ProcessEnv | undefined): Record<string, string> {
   const out: Record<string, string> = {};
-  for (const [key, value] of Object.entries(env)) {
+  for (const [key, value] of Object.entries(env ?? {})) {
     if (typeof value === "string") out[key] = value;
   }
+  // just-bash defaults HOME to "/", but this backend exposes the host path
+  // namespace. Keep shell $HOME aligned with config "~" expansion so commands
+  // like `$HOME/.ssh/known_hosts` work with allowRead overrides.
+  if (out.HOME === undefined || out.HOME.length === 0) out.HOME = homedir();
+  // Keep shell $TMPDIR aligned with the default writable temp root so commands
+  // like `mktemp` and `$TMPDIR/file` have a discoverable writable directory.
+  if (out.TMPDIR === undefined || out.TMPDIR.length === 0) out.TMPDIR = tmpdir();
   // With host-wide read access, forwarding the real host PATH makes just-bash
   // discover host ELF/Mach-O binaries and try to parse them as shell scripts.
   // Keep command lookup through the virtual /usr/bin and /bin mounts created by

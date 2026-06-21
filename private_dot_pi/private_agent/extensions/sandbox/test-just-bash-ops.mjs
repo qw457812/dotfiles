@@ -11,7 +11,7 @@ import {
   symlinkSync,
   writeFileSync,
 } from "node:fs";
-import { tmpdir } from "node:os";
+import { homedir, tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -20,6 +20,7 @@ const { createJustBashOps } = await jiti.import("./just-bash-ops.ts");
 
 const thisFilePath = fileURLToPath(import.meta.url);
 const thisDirPath = dirname(thisFilePath);
+const isTermux = process.platform === "android" || process.env.PREFIX?.includes("/com.termux/") === true;
 const workdir = mkdtempSync(join(thisDirPath, ".tmp-workdir-"));
 const extraWriteDir = mkdtempSync(join(thisDirPath, ".tmp-extra-write-"));
 const blockedWritePath = join(thisDirPath, `.tmp-blocked-write-${process.pid}.txt`);
@@ -106,6 +107,16 @@ try {
   assert.equal(hostsRead.exitCode, 0);
   assert.ok(hostsRead.output.length > 0);
 
+  assert.deepEqual(await run(`printf '%s\n' "$HOME"`), {
+    exitCode: 0,
+    output: `${homedir()}\n`,
+  });
+
+  assert.deepEqual(await run(`printf '%s\n' "$TMPDIR"`), {
+    exitCode: 0,
+    output: `${tmpdir()}\n`,
+  });
+
   assert.deepEqual(await run("which ls"), { exitCode: 0, output: "/usr/bin/ls\n" });
 
   const extraWritePath = join(extraWriteDir, "extra-write.txt");
@@ -149,12 +160,11 @@ try {
   // from that dir instead of dispatching to the registered custom command. The
   // resolved file is NOT spawned on the host: just-bash reads it, strips the
   // shebang, and interprets it as bash *inside the sandbox* (executeUserScript),
-  // so writes still hit the read-only host FS (EROFS). NOTE: just-bash's FS
-  // does NOT enforce `denyRead`, so reads of host files are wide open for ANY
-  // sandboxed command (builtin `cat` included) — PATH shadowing adds no new
-  // read capability, only command confusion. buildHostCommandEnv also ignores
-  // the shell PATH for the real spawn. Mitigation: don't allow adversaries to
-  // write same-named executables into PATH dirs.
+  // so writes still hit the read-only host FS (EROFS) and denyRead is enforced.
+  // PATH shadowing adds no new read capability, only command confusion.
+  // buildHostCommandEnv also ignores the shell PATH for the real spawn.
+  // Mitigation: don't allow adversaries to write same-named executables into
+  // PATH dirs.
 
   // Secret-shaped and proxy env vars must be stripped before reaching the
   // unsandboxed host child, otherwise an injected command could exfiltrate
@@ -402,7 +412,13 @@ try {
     assert.equal(cycleSafeCp.exitCode, 0);
     assert.equal(existsSync(join(cycleCpDest, "file.txt")), true);
 
-    if (process.platform !== "win32" && process.getuid?.() !== 0) {
+    // Android/Termux reports chmod(000) directories inconsistently enough that
+    // this host-permission edge-case test can leave undeletable temp dirs.
+    if (
+      process.platform !== "win32" &&
+      !isTermux &&
+      process.getuid?.() !== 0
+    ) {
       chmodSync(unreadableSourceDir, 0o000);
       const unreadableDirMv = await runWithOps(
         createJustBashOps(workdir, { filesystem: { allowWrite: [".", extraWriteDir] } }),
@@ -439,11 +455,13 @@ try {
     rmSync(deniedMoveDest, { force: true });
     rmSync(deniedCpDest, { force: true });
     rmSync(deniedLinkDest, { force: true });
-    try {
-      chmodSync(unreadableSourceDir, 0o700);
-    } catch {
-      // Best-effort cleanup: the directory may already be gone on platforms
-      // where chmod/readdir semantics differ, and rmSync below is the boundary.
+    for (const path of [unreadableSourceDir, unreadableMvDest]) {
+      try {
+        chmodSync(path, 0o700);
+      } catch {
+        // Best-effort cleanup: the directory may already be gone on platforms
+        // where chmod/readdir semantics differ, and rmSync below is the boundary.
+      }
     }
     rmSync(nestedSourceDir, { recursive: true, force: true });
     rmSync(nestedCpDest, { recursive: true, force: true });
