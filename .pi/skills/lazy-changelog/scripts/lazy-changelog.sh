@@ -27,6 +27,7 @@ full=0
 limit=0
 do_fetch=0
 do_refresh=0
+list_mode=0
 filter=""
 
 usage() {
@@ -42,6 +43,7 @@ Options:
                  (redundant if you already ran :Lazy check)
   --full         show date + author + subject instead of oneline
   --limit N      cap changelog commits per plugin (0 = all)
+  --list         only list outdated plugins + range + commit count (no log body)
   plugin ...     only scan these plugin names (default: all non-skipped)
 
 Env:
@@ -57,6 +59,7 @@ while [ $# -gt 0 ]; do
     --fetch) do_fetch=1; shift ;;
     --refresh) do_refresh=1; shift ;;
     --full)  full=1; shift ;;
+    --list)  list_mode=1; shift ;;
     -h|--help) usage; exit 0 ;;
     --limit) [ $# -ge 2 ] || { echo "--limit needs a value" >&2; exit 2; }; limit="$2"; shift 2 ;;
     --limit=*) limit="${1#--limit=}"; shift ;;
@@ -103,6 +106,20 @@ fi
   exit 1
 }
 
+# Warn if the specs cache predates lazy's last :Lazy check: the refs Lazy
+# fetched are then newer than what the dump saw, so installed/target may be
+# off. Only when we did NOT just refresh/fetch ourselves.
+if [ "$do_refresh" = "0" ] && [ "$do_fetch" = "0" ]; then
+  state_file="$HOME/.local/state/nvim/lazy/state.json"
+  if [ -f "$state_file" ]; then
+    last_check=$(grep -o '"last_check":[0-9]*' "$state_file" 2>/dev/null | head -1 | cut -d: -f2)
+    specs_mtime=$(stat -f %m "$SPEC_FILE" 2>/dev/null || stat -c %Y "$SPEC_FILE" 2>/dev/null)
+    if [ -n "$last_check" ] && [ -n "$specs_mtime" ] && [ "$specs_mtime" -lt "$last_check" ] 2>/dev/null; then
+      echo "warn: specs cache predates the last :Lazy check; re-run with --refresh (after :Lazy check)." >&2
+    fi
+  fi
+fi
+
 log_fmt="--pretty=format:%h %s (%cr)"
 [ "$full" = "1" ] && log_fmt="--pretty=format:%h %ad %an %s"
 
@@ -110,8 +127,8 @@ log_fmt="--pretty=format:%h %s (%cr)"
 # won't escape it. Append one byte per event and wc -c later.
 cnt_dir="${TMPDIR:-$HOME/.cache}/lazy-changelog.$$"
 mkdir -p "$cnt_dir"
-c_total="$cnt_dir/total"; c_out="$cnt_dir/outdated"
-: > "$c_total"; : > "$c_out"
+c_total="$cnt_dir/total"; c_out="$cnt_dir/outdated"; c_out_names="$cnt_dir/outdated_names"
+: > "$c_total"; : > "$c_out"; : > "$c_out_names"
 
 printf '%s\n' "$(cat "$SPEC_FILE")" | while IFS='|' read -r name enabled pin is_local dir skip installed target; do
   [ -n "$name" ] || continue
@@ -134,21 +151,32 @@ printf '%s\n' "$(cat "$SPEC_FILE")" | while IFS='|' read -r name enabled pin is_
   # full hashes for an accurate `git log installed..target` range.
   if [ "${installed:0:7}" != "${target:0:7}" ]; then
     printf x >> "$c_out"
+    printf '%s ' "$name" >> "$c_out_names"
     full_inst="$(git -C "$dir" rev-parse -q --verify "${installed}^{commit}" 2>/dev/null)"; [ -n "$full_inst" ] || full_inst="$installed"
     full_tgt="$(git -C "$dir" rev-parse -q --verify "${target}^{commit}" 2>/dev/null)"; [ -n "$full_tgt" ] || full_tgt="$target"
-    printf '## %s  %s..%s\n' "$name" "${full_inst:0:8}" "${full_tgt:0:8}"
-    if [ "$limit" -gt 0 ] 2>/dev/null; then
-      git -C "$dir" log -n "$limit" --no-color --date=short "$log_fmt" "$full_inst..$full_tgt" 2>/dev/null
+    if [ "$list_mode" = "1" ]; then
+      n="$(git -C "$dir" rev-list --count "$full_inst..$full_tgt" 2>/dev/null)"
+      printf '%-28s %s..%s  %s commits\n' "$name" "${full_inst:0:8}" "${full_tgt:0:8}" "${n:-?}"
     else
-      git -C "$dir" log --no-color --date=short "$log_fmt" "$full_inst..$full_tgt" 2>/dev/null
+      printf '## %s  %s..%s\n' "$name" "${full_inst:0:8}" "${full_tgt:0:8}"
+      if [ "$limit" -gt 0 ] 2>/dev/null; then
+        git -C "$dir" log -n "$limit" --no-color --date=short "$log_fmt" "$full_inst..$full_tgt" 2>/dev/null
+      else
+        git -C "$dir" log --no-color --date=short "$log_fmt" "$full_inst..$full_tgt" 2>/dev/null
+      fi
+      echo
     fi
-    echo
   fi
 done
 
 echo "----" >&2
-n_total="$(wc -c < "$c_total")"; n_out="$(wc -c < "$c_out")"
-printf 'scanned=%s outdated=%s\n' "$n_total" "$n_out" >&2
+n_total="$(wc -c < "$c_total" | tr -d '[:space:]')"; n_out="$(wc -c < "$c_out" | tr -d '[:space:]')"
+names="$(cat "$c_out_names" 2>/dev/null)"
+if [ -n "$names" ]; then
+  printf 'outdated=%s scanned=%s : %s\n' "$n_out" "$n_total" "$names" >&2
+else
+  printf 'outdated=%s scanned=%s  (all up to date)\n' "$n_out" "$n_total" >&2
+fi
 if [ "$do_fetch" = "1" ]; then
   echo "(fetched plugin refs, refreshed specs, then compared)" >&2
 else

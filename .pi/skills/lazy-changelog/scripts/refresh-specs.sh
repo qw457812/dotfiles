@@ -15,10 +15,11 @@ SPEC_FILE="${SPEC_FILE:-$HOME/.cache/lazy-changelog/specs.tsv}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 DUMP_LUA="$SCRIPT_DIR/dump-specs.lua"
 
-# locate nvim: explicit $NVIM, else PATH, else common Termux path
+# locate nvim: explicit $NVIM, else PATH, else common install paths (Termux,
+# bob, Homebrew, system)
 nvim="${NVIM:-$(command -v nvim 2>/dev/null)}"
 if [ -z "$nvim" ] || [ ! -x "$nvim" ]; then
-  for cand in "/data/data/com.termux/files/usr/bin/nvim" "/usr/bin/nvim" "$HOME/.local/bin/nvim"; do
+  for cand in "/data/data/com.termux/files/usr/bin/nvim" "$HOME/.local/share/bob/nvim-bin/nvim" "/opt/homebrew/bin/nvim" "/usr/bin/nvim" "$HOME/.local/bin/nvim"; do
     [ -x "$cand" ] && nvim="$cand" && break
   done
 fi
@@ -34,8 +35,10 @@ tmp="${SPEC_FILE}.$$"
 : > "$tmp"
 
 # headless: load config (lazy resolves specs), run the dump, quit.
+# No side-effect guards needed — nothing edits a buffer, so treesitter's
+# parser auto-install, Mason, and LSP never trigger here (verified: dump
+# completes in ~0.4s with no network).
 "$nvim" --headless \
-  +"lua vim.g.skip_ts_auto_install = true" \
   +"luafile $DUMP_LUA" \
   +qa 2>/dev/null > "$tmp"
 
