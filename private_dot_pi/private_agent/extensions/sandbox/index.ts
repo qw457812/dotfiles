@@ -69,6 +69,8 @@
  *       "allowedUrlPrefixes": ["https://github.com"]
  *     },
  *     "filesystem": {
+ *       "allowRead": ["~/.ssh/known_hosts"],
+ *       "denyRead": ["~/.ssh", "~/.aws"],
  *       "allowWrite": [".", "/tmp"]
  *     },
  *     "python": true,
@@ -165,6 +167,7 @@ export const DEFAULT_CONFIG: SandboxConfig = {
   justBash: {
     filesystem: {
       allowWrite: [".", "/tmp"],
+      denyRead: ["~/.ssh", "~/.aws", "~/.gnupg"],
     },
   },
 };
@@ -459,6 +462,8 @@ function justBashDisplayLines(justBash: JustBashBackendConfig | undefined): stri
     `  Deny Private Ranges: ${network?.denyPrivateRanges === undefined ? "(just-bash default)" : String(network.denyPrivateRanges)}`,
     "",
     "Just Bash Filesystem:",
+    `  Allow Read: ${justBash?.filesystem?.allowRead?.join(", ") || "(none)"}`,
+    `  Deny Read: ${justBash?.filesystem?.denyRead?.join(", ") || "(none)"}`,
     `  Allow Write: ${justBash?.filesystem?.allowWrite?.join(", ") || "(just-bash defaults)"}`,
     "",
     "Just Bash WASM Runtimes (sandboxed in-process):",

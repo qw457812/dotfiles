@@ -20,6 +20,18 @@ assert.ok(
   DEFAULT_CONFIG.justBash?.filesystem?.allowWrite?.includes("/tmp"),
   "DEFAULT_CONFIG.justBash.filesystem.allowWrite includes '/tmp'",
 );
+assert.ok(
+  DEFAULT_CONFIG.justBash?.filesystem?.denyRead?.includes("~/.ssh"),
+  "DEFAULT_CONFIG.justBash.filesystem.denyRead includes '~/.ssh'",
+);
+assert.ok(
+  DEFAULT_CONFIG.justBash?.filesystem?.denyRead?.includes("~/.aws"),
+  "DEFAULT_CONFIG.justBash.filesystem.denyRead includes '~/.aws'",
+);
+assert.ok(
+  DEFAULT_CONFIG.justBash?.filesystem?.denyRead?.includes("~/.gnupg"),
+  "DEFAULT_CONFIG.justBash.filesystem.denyRead includes '~/.gnupg'",
+);
 assert.equal(DEFAULT_CONFIG.enabled, true);
 // backend is intentionally unset — auto-resolved via isTermux().
 assert.equal(DEFAULT_CONFIG.backend, undefined);
@@ -80,6 +92,17 @@ assert.ok(
   // is wholesale. Callers who customize allowWrite must re-include "." if they
   // still want cwd writes.
   assert.deepEqual(merged.justBash.filesystem.allowWrite, ["~/projects"]);
+  assert.deepEqual(merged.justBash.filesystem.denyRead, ["~/.ssh", "~/.aws", "~/.gnupg"]);
+}
+
+// justBash.filesystem denyRead / allowRead merge field-by-field.
+{
+  const merged = deepMerge(DEFAULT_CONFIG, {
+    justBash: { filesystem: { allowRead: ["~/.ssh/known_hosts"] } },
+  });
+  assert.deepEqual(merged.justBash.filesystem.allowWrite, [".", "/tmp"]);
+  assert.deepEqual(merged.justBash.filesystem.denyRead, ["~/.ssh", "~/.aws", "~/.gnupg"]);
+  assert.deepEqual(merged.justBash.filesystem.allowRead, ["~/.ssh/known_hosts"]);
 }
 
 // --- resolveBackend --------------------------------------------------------

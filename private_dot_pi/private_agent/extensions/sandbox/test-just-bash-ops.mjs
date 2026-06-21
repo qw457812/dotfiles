@@ -2,7 +2,15 @@
 
 import { createJiti } from "jiti";
 import assert from "node:assert/strict";
-import { existsSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import {
+  chmodSync,
+  existsSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -180,21 +188,270 @@ try {
   const exportedVar = await runWithOps(hostOps, `export FOO=x; node ${fooProbe}`);
   assert.deepEqual(exportedVar, { exitCode: 0, output: "FOO=x" });
 
-  // KNOWN LIMITATION (pre-existing, just-bash path): createJustBashFs only
-  // consumes `allowWrite`; config `denyRead` is NOT plumbed through, so the
-  // read-only host FS lets ANY sandboxed command read arbitrary host files
-  // (including ~/.ssh keys). This is independent of host/PATH shadowing
-  // — a plain builtin `cat` reads the same. Pin the gap here so a future fix
-  // that enforces denyRead flips this assertion intentionally rather than by
-  // accident.
+  // The just-bash sandbox policy enforces denyRead / allowRead for sandboxed
+  // virtual filesystem reads. Host commands remain an explicit escape hatch;
+  // they are covered by a separate preflight seam, not by this virtual FS policy.
   const hostSecretPath = join(thisDirPath, `.tmp-host-secret-${process.pid}.txt`);
+  const hostSecretDir = mkdtempSync(join(thisDirPath, ".tmp-host-secret-dir-"));
+  const hostSecretDirFile = join(hostSecretDir, "secret.txt");
+  const symlinkToHostSecretPath = join(workdir, "host-secret-link.txt");
+  const deniedRootFileSymlinkPath = join(workdir, "deny-root-file-link.txt");
+  const deniedRootDirSymlinkPath = join(workdir, "deny-root-dir-link");
+  const allowRootFileSymlinkPath = join(workdir, "allow-root-file-link.txt");
+  const allowedSymlinkDir = mkdtempSync(join(thisDirPath, ".tmp-allowed-link-dir-"));
+  const allowedSymlinkToHostSecretPath = join(allowedSymlinkDir, "host-secret-link.txt");
+  const deniedMoveSource = join(workdir, "denied-move-source.txt");
+  const deniedMoveDest = join(workdir, "denied-move-dest.txt");
+  const deniedCpDest = join(workdir, "denied-cp-dest.txt");
+  const deniedLinkDest = join(workdir, "denied-link-dest.txt");
+  const nestedSourceDir = mkdtempSync(join(workdir, "nested-source-"));
+  const nestedDeniedChild = join(nestedSourceDir, "secret.txt");
+  const nestedCpDest = join(workdir, "nested-cp-dest");
+  const nestedMvDest = join(workdir, "nested-mv-dest");
+  const cycleSourceDir = mkdtempSync(join(workdir, "cycle-source-"));
+  const cycleSourceFile = join(cycleSourceDir, "file.txt");
+  const cycleLinkPath = join(cycleSourceDir, "loop");
+  const cycleCpDest = join(workdir, "cycle-cp-dest");
+  const unreadableSourceDir = mkdtempSync(join(workdir, "unreadable-source-"));
+  const unreadableChild = join(unreadableSourceDir, "secret.txt");
+  const unreadableMvDest = join(workdir, "unreadable-mv-dest");
   writeFileSync(hostSecretPath, "HOST_ONLY_SECRET\n");
+  writeFileSync(hostSecretDirFile, "DIR_SECRET\n");
+  writeFileSync(deniedMoveSource, "MOVE_SECRET\n");
+  writeFileSync(nestedDeniedChild, "NESTED_SECRET\n");
+  writeFileSync(cycleSourceFile, "CYCLE_OK\n");
+  writeFileSync(unreadableChild, "UNREADABLE_SECRET\n");
+  symlinkSync(cycleSourceDir, cycleLinkPath);
+  symlinkSync(hostSecretPath, deniedRootFileSymlinkPath);
+  symlinkSync(hostSecretDir, deniedRootDirSymlinkPath);
+  symlinkSync(hostSecretPath, allowRootFileSymlinkPath);
   try {
-    const hostRead = await run(`cat ${hostSecretPath}`);
-    assert.equal(hostRead.exitCode, 0);
-    assert.equal(hostRead.output, "HOST_ONLY_SECRET\n");
+    const deniedReadOps = createJustBashOps(workdir, {
+      filesystem: { allowWrite: [".", extraWriteDir], denyRead: [hostSecretPath] },
+    });
+    const deniedContentRead = await runWithOps(deniedReadOps, `cat ${hostSecretPath}`);
+    assert.notEqual(deniedContentRead.exitCode, 0);
+    assert.match(
+      deniedContentRead.output,
+      /EACCES: permission denied|Permission denied|No such file or directory/i,
+    );
+
+    // sandbox-runtime-compatible semantics: denyRead blocks direct reads and
+    // metadata, but does not promise complete existence hiding.
+    const deniedPathExists = await runWithOps(deniedReadOps, `test -e ${hostSecretPath}; echo $?`);
+    assert.deepEqual(deniedPathExists, { exitCode: 0, output: "0\n" });
+
+    const deniedStatRead = await runWithOps(deniedReadOps, `ls ${hostSecretPath}`);
+    assert.notEqual(deniedStatRead.exitCode, 0);
+    assert.match(
+      deniedStatRead.output,
+      /EACCES: permission denied|Permission denied|No such file or directory/i,
+    );
+
+    const deniedDirOps = createJustBashOps(workdir, {
+      filesystem: { allowWrite: [".", extraWriteDir], denyRead: [hostSecretDir] },
+    });
+    const deniedDirRead = await runWithOps(deniedDirOps, `ls ${hostSecretDir}`);
+    assert.notEqual(deniedDirRead.exitCode, 0);
+    assert.match(
+      deniedDirRead.output,
+      /EACCES: permission denied|Permission denied|No such file or directory/i,
+    );
+
+    const deniedChildOps = createJustBashOps(workdir, {
+      filesystem: { allowWrite: [".", extraWriteDir], denyRead: [hostSecretDirFile] },
+    });
+    const parentListingShowsDeniedChild = await runWithOps(deniedChildOps, `ls ${hostSecretDir}`);
+    assert.equal(parentListingShowsDeniedChild.exitCode, 0);
+    assert.match(parentListingShowsDeniedChild.output, /secret\.txt/);
+    const directDeniedChildRead = await runWithOps(deniedChildOps, `cat ${hostSecretDirFile}`);
+    assert.notEqual(directDeniedChildRead.exitCode, 0);
+
+    const allowReadOps = createJustBashOps(workdir, {
+      filesystem: {
+        allowWrite: [".", extraWriteDir],
+        denyRead: [thisDirPath],
+        allowRead: [hostSecretPath],
+      },
+    });
+    const allowedHostRead = await runWithOps(allowReadOps, `cat ${hostSecretPath}`);
+    assert.deepEqual(allowedHostRead, { exitCode: 0, output: "HOST_ONLY_SECRET\n" });
+
+    symlinkSync(hostSecretPath, symlinkToHostSecretPath);
+    const deniedSymlinkRead = await runWithOps(deniedReadOps, `cat ${symlinkToHostSecretPath}`);
+    assert.notEqual(deniedSymlinkRead.exitCode, 0);
+    assert.match(
+      deniedSymlinkRead.output,
+      /EACCES: permission denied|Permission denied|No such file or directory/i,
+    );
+
+    const deniedSymlinkRootFileOps = createJustBashOps(workdir, {
+      filesystem: { allowWrite: [".", extraWriteDir], denyRead: [deniedRootFileSymlinkPath] },
+    });
+    const deniedRealTargetViaSymlinkFileRoot = await runWithOps(
+      deniedSymlinkRootFileOps,
+      `cat ${hostSecretPath}`,
+    );
+    assert.notEqual(deniedRealTargetViaSymlinkFileRoot.exitCode, 0);
+
+    const deniedSymlinkRootDirOps = createJustBashOps(workdir, {
+      filesystem: { allowWrite: [".", extraWriteDir], denyRead: [deniedRootDirSymlinkPath] },
+    });
+    const deniedRealTargetViaSymlinkDirRoot = await runWithOps(
+      deniedSymlinkRootDirOps,
+      `cat ${hostSecretDirFile}`,
+    );
+    assert.notEqual(deniedRealTargetViaSymlinkDirRoot.exitCode, 0);
+
+    const allowSymlinkRootOps = createJustBashOps(workdir, {
+      filesystem: {
+        allowWrite: [".", extraWriteDir],
+        denyRead: [hostSecretPath],
+        allowRead: [allowRootFileSymlinkPath],
+      },
+    });
+    const allowedRealTargetViaSymlinkRoot = await runWithOps(
+      allowSymlinkRootOps,
+      `cat ${hostSecretPath}`,
+    );
+    assert.deepEqual(allowedRealTargetViaSymlinkRoot, {
+      exitCode: 0,
+      output: "HOST_ONLY_SECRET\n",
+    });
+
+    symlinkSync(hostSecretPath, allowedSymlinkToHostSecretPath);
+    const allowedSymlinkOps = createJustBashOps(workdir, {
+      filesystem: {
+        allowWrite: [".", extraWriteDir],
+        denyRead: [hostSecretPath],
+        allowRead: [allowedSymlinkDir],
+      },
+    });
+    const deniedAllowedSymlinkRead = await runWithOps(
+      allowedSymlinkOps,
+      `cat ${allowedSymlinkToHostSecretPath}`,
+    );
+    assert.notEqual(deniedAllowedSymlinkRead.exitCode, 0);
+    assert.match(
+      deniedAllowedSymlinkRead.output,
+      /EACCES: permission denied|Permission denied|No such file or directory/i,
+    );
+
+    const allowedTargetSymlinkOps = createJustBashOps(workdir, {
+      filesystem: {
+        allowWrite: [".", extraWriteDir],
+        denyRead: [hostSecretPath],
+        allowRead: [allowedSymlinkDir, hostSecretPath],
+      },
+    });
+    const allowedTargetSymlinkRead = await runWithOps(
+      allowedTargetSymlinkOps,
+      `cat ${allowedSymlinkToHostSecretPath}`,
+    );
+    assert.deepEqual(allowedTargetSymlinkRead, { exitCode: 0, output: "HOST_ONLY_SECRET\n" });
+
+    const deniedWritableSourceOps = createJustBashOps(workdir, {
+      filesystem: { allowWrite: [".", extraWriteDir], denyRead: [deniedMoveSource] },
+    });
+    const deniedCp = await runWithOps(
+      deniedWritableSourceOps,
+      `cp ${deniedMoveSource} ${deniedCpDest}`,
+    );
+    assert.notEqual(deniedCp.exitCode, 0);
+    assert.equal(existsSync(deniedCpDest), false);
+
+    const deniedMove = await runWithOps(
+      deniedWritableSourceOps,
+      `mv ${deniedMoveSource} ${deniedMoveDest}`,
+    );
+    assert.notEqual(deniedMove.exitCode, 0);
+    assert.equal(readFileSync(deniedMoveSource, "utf8"), "MOVE_SECRET\n");
+    assert.equal(existsSync(deniedMoveDest), false);
+
+    const deniedLink = await runWithOps(
+      deniedWritableSourceOps,
+      `ln ${deniedMoveSource} ${deniedLinkDest}`,
+    );
+    assert.notEqual(deniedLink.exitCode, 0);
+    assert.equal(existsSync(deniedLinkDest), false);
+
+    const deniedNestedChildOps = createJustBashOps(workdir, {
+      filesystem: { allowWrite: [".", extraWriteDir], denyRead: [nestedDeniedChild] },
+    });
+    const deniedRecursiveCp = await runWithOps(
+      deniedNestedChildOps,
+      `cp -r ${nestedSourceDir} ${nestedCpDest}`,
+    );
+    assert.notEqual(deniedRecursiveCp.exitCode, 0);
+    assert.equal(existsSync(nestedCpDest), false);
+
+    const deniedRecursiveMv = await runWithOps(
+      deniedNestedChildOps,
+      `mv ${nestedSourceDir} ${nestedMvDest}`,
+    );
+    assert.notEqual(deniedRecursiveMv.exitCode, 0);
+    assert.equal(existsSync(nestedSourceDir), true);
+    assert.equal(existsSync(nestedMvDest), false);
+
+    const cycleSafeCp = await runWithOps(
+      createJustBashOps(workdir, {
+        filesystem: { allowWrite: [".", extraWriteDir], denyRead: [hostSecretPath] },
+      }),
+      `cp -r ${cycleSourceDir} ${cycleCpDest}`,
+    );
+    assert.equal(cycleSafeCp.exitCode, 0);
+    assert.equal(existsSync(join(cycleCpDest, "file.txt")), true);
+
+    if (process.platform !== "win32" && process.getuid?.() !== 0) {
+      chmodSync(unreadableSourceDir, 0o000);
+      const unreadableDirMv = await runWithOps(
+        createJustBashOps(workdir, { filesystem: { allowWrite: [".", extraWriteDir] } }),
+        `mv ${unreadableSourceDir} ${unreadableMvDest}`,
+      );
+      assert.notEqual(unreadableDirMv.exitCode, 0);
+      assert.equal(existsSync(unreadableSourceDir), true);
+      assert.equal(existsSync(unreadableMvDest), false);
+      chmodSync(unreadableSourceDir, 0o700);
+    }
+
+    const hostEscapeProbe = join(workdir, "host-escape.js");
+    writeFileSync(
+      hostEscapeProbe,
+      `import { readFileSync } from "node:fs"; process.stdout.write(readFileSync(${JSON.stringify(
+        hostSecretPath,
+      )}, "utf8"));`,
+    );
+    const hostEscapeOps = createJustBashOps(workdir, {
+      hostCommands: ["node"],
+      filesystem: { allowWrite: [".", extraWriteDir], denyRead: [hostSecretPath] },
+    });
+    const hostEscapeRead = await runWithOps(hostEscapeOps, `node ${hostEscapeProbe}`);
+    assert.deepEqual(hostEscapeRead, { exitCode: 0, output: "HOST_ONLY_SECRET\n" });
   } finally {
     rmSync(hostSecretPath, { force: true });
+    rmSync(hostSecretDir, { recursive: true, force: true });
+    rmSync(allowedSymlinkDir, { recursive: true, force: true });
+    rmSync(symlinkToHostSecretPath, { force: true });
+    rmSync(deniedRootFileSymlinkPath, { force: true });
+    rmSync(deniedRootDirSymlinkPath, { force: true });
+    rmSync(allowRootFileSymlinkPath, { force: true });
+    rmSync(deniedMoveSource, { force: true });
+    rmSync(deniedMoveDest, { force: true });
+    rmSync(deniedCpDest, { force: true });
+    rmSync(deniedLinkDest, { force: true });
+    try {
+      chmodSync(unreadableSourceDir, 0o700);
+    } catch {
+      // Best-effort cleanup: the directory may already be gone on platforms
+      // where chmod/readdir semantics differ, and rmSync below is the boundary.
+    }
+    rmSync(nestedSourceDir, { recursive: true, force: true });
+    rmSync(nestedCpDest, { recursive: true, force: true });
+    rmSync(nestedMvDest, { recursive: true, force: true });
+    rmSync(cycleSourceDir, { recursive: true, force: true });
+    rmSync(cycleCpDest, { recursive: true, force: true });
+    rmSync(unreadableSourceDir, { recursive: true, force: true });
+    rmSync(unreadableMvDest, { recursive: true, force: true });
   }
 
   // KNOWN LIMITATION (just-bash pipeline): non-UTF-8 binary stdout from a

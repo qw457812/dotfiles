@@ -32,16 +32,24 @@ const { spawn } = require("node:child_process") as typeof import("node:child_pro
 export interface JustBashFilesystemConfig {
   /** Write roots plumbed into just-bash's virtual filesystem (MountableFs mounts). */
   allowWrite?: string[];
+  /** Read roots whose contents and direct metadata access are denied. */
+  denyRead?: string[];
+  /** Read roots that override denyRead for content and direct metadata access. */
+  allowRead?: string[];
 }
 
 export interface JustBashConfig {
   /** Passed through verbatim to just-bash as trusted local NetworkConfig. */
   network?: NetworkConfig;
   /**
-   * Write roots plumbed into just-bash's virtual filesystem. just-bash only
-   * consumes `allowWrite` here (it does not implement `denyRead`); the rest of
-   * the writable defaults — /dev devices, TMPDIR, ~/.npm/_logs, etc. — are
-   * supplied by defaultAndConfiguredWriteRoots() inside this module.
+   * Filesystem policy for the just-bash sandbox backend. `allowWrite` is
+   * plumbed into MountableFs as writable roots; `denyRead` / `allowRead` deny
+   * content reads and direct metadata access. Existing configured read roots
+   * are matched by both their normalized path and realpath alias. They
+   * intentionally do not promise complete existence hiding, matching
+   * sandbox-runtime's practical semantics. The rest of the writable defaults —
+   * /dev devices, TMPDIR, ~/.npm/_logs, etc. — are supplied by
+   * defaultAndConfiguredWriteRoots() inside this module.
    */
   filesystem?: JustBashFilesystemConfig;
   /**
@@ -118,9 +126,12 @@ function createJustBashFs(
   policyRoot: string,
   filesystem: JustBashFilesystemConfig | undefined,
   virtualBinCommands: string[],
-): ReadWriteFs | MountableFs {
+) {
   const writeRoots = coalesceWriteRoots(defaultAndConfiguredWriteRoots(policyRoot, filesystem));
-  if (writeRoots.includes("/")) return new ReadWriteFs({ root: "/", allowSymlinks: false });
+  const readPolicy = createReadPathPolicy(policyRoot, filesystem);
+  if (writeRoots.includes("/")) {
+    return applyReadPathPolicy(new ReadWriteFs({ root: "/", allowSymlinks: false }), readPolicy);
+  }
 
   const fs = new MountableFs({ base: new ReadOnlyHostFs() });
   const virtualBinFs = new VirtualBinFs(virtualBinCommands);
@@ -134,7 +145,225 @@ function createJustBashFs(
     if (!ensureWritableDirectory(root)) continue;
     fs.mount(root, new ReadWriteFs({ root, allowSymlinks: false }));
   }
-  return fs;
+  return applyReadPathPolicy(fs, readPolicy);
+}
+
+interface ReadPathPolicy {
+  allowRead: string[];
+  denyRead: string[];
+}
+
+function createReadPathPolicy(
+  policyRoot: string,
+  filesystem: JustBashFilesystemConfig | undefined,
+): ReadPathPolicy {
+  return {
+    allowRead: normalizeReadRoots(policyRoot, filesystem?.allowRead),
+    denyRead: normalizeReadRoots(policyRoot, filesystem?.denyRead),
+  };
+}
+
+function normalizeReadRoots(policyRoot: string, entries: string[] | undefined): string[] {
+  if (!Array.isArray(entries)) return [];
+  return Array.from(
+    new Set(entries.flatMap((entry) => normalizeReadRootAliases(policyRoot, entry))),
+  );
+}
+
+function normalizeReadRootAliases(policyRoot: string, entry: string): string[] {
+  const normalized = normalizeWriteRoot(policyRoot, entry);
+  if (normalized === null) return [];
+
+  try {
+    const real = realpathSync(normalized);
+    return real === normalized ? [normalized] : [normalized, real];
+  } catch (err) {
+    if (isExpectedMissingPathError(err)) return [normalized];
+    throw err;
+  }
+}
+
+function applyReadPathPolicy<T extends ReadWriteFs | MountableFs>(
+  fs: T,
+  policy: ReadPathPolicy,
+): T | DenyFilteredFs {
+  if (policy.allowRead.length === 0 && policy.denyRead.length === 0) return fs;
+  return new DenyFilteredFs(fs, policy);
+}
+
+class DenyFilteredFs {
+  constructor(
+    private readonly inner: ReadWriteFs | MountableFs,
+    private readonly policy: ReadPathPolicy,
+  ) {}
+
+  async readFile(
+    path: string,
+    options?: BufferEncoding | { encoding?: BufferEncoding | null },
+  ): Promise<string> {
+    await this.assertReadable(path, "open");
+    return this.inner.readFile(path, options);
+  }
+
+  async readFileBytes(path: string): Promise<ByteString> {
+    await this.assertReadable(path, "open");
+    return this.inner.readFileBytes(path);
+  }
+
+  async readFileBuffer(path: string): Promise<Uint8Array> {
+    await this.assertReadable(path, "open");
+    return this.inner.readFileBuffer(path);
+  }
+
+  async writeFile(path: string, content: FileContent): Promise<void> {
+    return this.inner.writeFile(path, content);
+  }
+
+  async appendFile(path: string, content: FileContent): Promise<void> {
+    return this.inner.appendFile(path, content);
+  }
+
+  async exists(path: string): Promise<boolean> {
+    // sandbox-runtime does not fully hide denied path existence across backends.
+    // Keep exists() observable and enforce denyRead at direct metadata/content
+    // calls such as stat/readFile instead.
+    return this.inner.exists(path);
+  }
+
+  async stat(path: string): Promise<FsStat> {
+    await this.assertReadable(path, "stat");
+    return this.inner.stat(path);
+  }
+
+  async lstat(path: string): Promise<FsStat> {
+    await this.assertReadable(path, "lstat");
+    return this.inner.lstat(path);
+  }
+
+  async mkdir(path: string, options?: MkdirOptions): Promise<void> {
+    return this.inner.mkdir(path, options);
+  }
+
+  async readdir(path: string): Promise<string[]> {
+    await this.assertReadable(path, "scandir");
+    // Parent directory listings intentionally remain unfiltered: denyRead
+    // blocks direct reads/metadata for denied children, but does not promise
+    // full filename hiding.
+    return this.inner.readdir(path);
+  }
+
+  async rm(path: string, options?: RmOptions): Promise<void> {
+    return this.inner.rm(path, options);
+  }
+
+  async cp(src: string, dest: string, options?: CpOptions): Promise<void> {
+    await this.assertReadableTree(src, "cp");
+    return this.inner.cp(src, dest, options);
+  }
+
+  async mv(src: string, dest: string): Promise<void> {
+    await this.assertReadableTree(src, "rename");
+    return this.inner.mv(src, dest);
+  }
+
+  resolvePath(base: string, path: string): string {
+    return this.inner.resolvePath(base, path);
+  }
+
+  getAllPaths(): string[] {
+    return this.inner
+      .getAllPaths()
+      .filter((path) => !isReadDeniedByPath(resolve(path), this.policy));
+  }
+
+  async chmod(path: string, mode: number): Promise<void> {
+    return this.inner.chmod(path, mode);
+  }
+
+  async symlink(target: string, linkPath: string): Promise<void> {
+    return this.inner.symlink(target, linkPath);
+  }
+
+  async link(existingPath: string, newPath: string): Promise<void> {
+    await this.assertReadable(existingPath, "link");
+    return this.inner.link(existingPath, newPath);
+  }
+
+  async readlink(path: string): Promise<string> {
+    await this.assertReadable(path, "readlink");
+    return this.inner.readlink(path);
+  }
+
+  async realpath(path: string): Promise<string> {
+    await this.assertReadable(path, "realpath");
+    return this.inner.realpath(path);
+  }
+
+  async utimes(path: string, atime: Date, mtime: Date): Promise<void> {
+    return this.inner.utimes(path, atime, mtime);
+  }
+
+  private async assertReadable(
+    path: string,
+    operation: string,
+  ): Promise<{ requested: string; real: string | null }> {
+    const requested = resolve(path);
+    let real: string | null = null;
+    try {
+      real = await fsPromises.realpath(requested);
+    } catch (err) {
+      if (!isExpectedMissingPathError(err)) throw err;
+      // The requested path may not exist yet. Fall back to policy matching the
+      // requested path; the wrapped filesystem will report the real error.
+    }
+
+    if (isReadDeniedByRequestAndRealPath(requested, real, this.policy)) {
+      throw permissionDeniedError(operation, path);
+    }
+
+    return { requested, real };
+  }
+
+  private async assertReadableTree(
+    path: string,
+    operation: string,
+    seen = new Set<string>(),
+  ): Promise<void> {
+    const { requested, real } = await this.assertReadable(path, operation);
+
+    const seenKey = real ?? requested;
+    if (seen.has(seenKey)) return;
+    seen.add(seenKey);
+
+    const stat = await this.inner.stat(path);
+    if (!stat.isDirectory) return;
+
+    const entries = await this.inner.readdir(path);
+    for (const entry of entries) {
+      await this.assertReadableTree(join(path, entry), operation, seen);
+    }
+  }
+}
+
+function isReadDeniedByRequestAndRealPath(
+  requested: string,
+  real: string | null,
+  policy: ReadPathPolicy,
+): boolean {
+  if (isReadDeniedByPath(requested, policy)) return true;
+  // A symlink/request-path allowRead must not override denyRead on the real
+  // target. The real target needs its own allowRead match.
+  return real !== null && real !== requested && isReadDeniedByPath(real, policy);
+}
+
+function isReadDeniedByPath(path: string, policy: ReadPathPolicy): boolean {
+  if (policy.allowRead.some((root) => pathWithinRoot(root, path))) return false;
+  return policy.denyRead.some((root) => pathWithinRoot(root, path));
+}
+
+function isExpectedMissingPathError(err: unknown): boolean {
+  const code = (err as NodeJS.ErrnoException | undefined)?.code;
+  return code === "ENOENT" || code === "ENOTDIR";
 }
 
 class DiscardDeviceFs {
@@ -551,6 +780,14 @@ function noSuchFileError(operation: string, target: string): Error {
   return error;
 }
 
+function permissionDeniedError(operation: string, target: string): Error {
+  const error = new Error(
+    `EACCES: permission denied, ${operation} '${target}'`,
+  ) as NodeJS.ErrnoException;
+  error.code = "EACCES";
+  return error;
+}
+
 function invalidArgumentError(operation: string, target: string): Error {
   const error = new Error(
     `EINVAL: invalid argument, ${operation} '${target}'`,
@@ -932,11 +1169,9 @@ export function createJustBashOps(
                 // reads it, strips the shebang, and interprets it as bash
                 // *inside the sandbox* (executeUserScript). It is NOT spawned
                 // on the host, so it cannot bypass the read-only host FS
-                // (writes still throw EROFS) or the network policy. NOTE:
-                // just-bash's FS does NOT enforce `denyRead` (only `allowWrite`
-                // is plumbed into createJustBashFs), so any sandboxed command —
-                // builtin `cat` just as much as a shadowed imposter — can read
-                // host files outside hidden /bin and /usr/bin. PATH shadowing adds no new read capability;
+                // (writes still throw EROFS) or the network policy. denyRead
+                // is still enforced by DenyFilteredFs for sandboxed commands,
+                // so PATH shadowing does not bypass the just-bash read policy;
                 // the only effect is that the host command silently runs
                 // a sandboxed same-named script instead of the host binary.
                 // buildHostCommandEnv ignores the shell PATH for the real spawn
