@@ -1,0 +1,9 @@
+{
+  "justBash": {
+    "hostCommands": [
+      "git",
+      "gh",
+      "nvim" // in favor of `/skill:lazy-changelog`
+    ]
+  }
+}
