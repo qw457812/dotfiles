@@ -18,7 +18,8 @@
 -- installed/target are computed with lazy's OWN Git.info / Git.get_target, so
 -- the comparison is identical to what :Lazy check / checker.fast_check do.
 --
--- Usage (headless, from your real shell — the agent sandbox cannot run nvim):
+-- Usage (headless; works in this repo's agent sandbox because .pi/sandbox.json
+-- allows `nvim` as a justBash.hostCommand):
 --   nvim --headless +"lua require('lazy')" +"luafile /path/dump-specs.lua" +qa
 -- If lazy is lazy-loaded, just open your config first then :luafile it.
 

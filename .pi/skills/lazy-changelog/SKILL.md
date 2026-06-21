@@ -1,101 +1,75 @@
 ---
 name: lazy-changelog
-description: Report pending changelogs for lazy.nvim plugins that are behind their update target, matching :Lazy check's "Updates" exactly. Use after running :Lazy check to review what commits new plugin versions bring before updating. Computes installed vs target using lazy's own Git.info/Git.get_target (so version="*", commit pins, tag pins, disabled, dev/local plugins are all handled correctly). No Neovim needed at query time; a one-time spec dump is required.
+description: Review lazy.nvim plugin update changelogs with the repo's lazy-changelog scripts.
 disable-model-invocation: true
 ---
 
 # lazy-changelog
 
-Lists lazy.nvim plugins behind their update target and shows the changelog of
-the commits an update would pull. Output is designed to match `:Lazy check`'s
-"Updates" panel exactly.
+Use this skill to report lazy.nvim plugins whose installed commit differs from
+lazy's update target, then show the `git log installed..target` changelog.
 
-## How "outdated" is decided
+## Deterministic run
 
-For each plugin we compare two commits **computed by lazy itself**:
+1. **Confirm freshness.** The human should run `:Lazy check` in Neovim first.
+   Completion criterion: origin refs have been refreshed by lazy.nvim, or the
+   user explicitly accepts cached/offline results.
 
-| commit     | source                                            |
-|------------|---------------------------------------------------|
-| `installed`| `Git.info(plugin.dir).commit` (= current `HEAD`)  |
-| `target`   | `Git.get_target(plugin).commit` (lazy's target)   |
+2. **Ensure the spec dump exists.** If `~/.cache/lazy-changelog/specs.tsv` is
+   missing, or plugin specs changed, run:
 
-`installed != target` ⇒ outdated; changelog = `git log installed..target`
-(the same range lazy's `log` task uses). This delegates every spec nuance —
-`version="*"`, `commit="..."`, `tag="..."`, `pin`, `enabled=false`, dev/dir
-plugins, and the `defaults.version` fallback — to lazy's own code, so the
-result matches `:Lazy check` instead of approximating it.
+   ```bash
+   bash scripts/refresh-specs.sh
+   ```
 
-Compare with an earlier approach that compared the `lazy-lock.json` commit to
-`origin/<branch>`: that reported drift/lockfile staleness, **not** what lazy
-considers outdated, so it produced false positives (version-pinned plugins
-like `blink.cmp`, `yazi.nvim`; commit-pinned ones like `oh-my-tmux`) and false
-negatives.
+   Completion criterion: the command exits 0 and reports a non-zero plugin
+   count. The dump is produced by Neovim using lazy's own `Git.info` and
+   `Git.get_target`, so `version="*"`, `commit`, `tag`, `pin`, disabled, and
+   local/dev plugin rules match `:Lazy check`.
 
-## Workflow
+3. **Start with the overview.** Run:
 
-```bash
-# 1. in Neovim: refresh upstream refs
-:Lazy check
+   ```bash
+   bash scripts/lazy-changelog.sh --list
+   ```
 
-# 2. (once, or after changing your plugin specs) regenerate the specs cache:
-bash scripts/refresh-specs.sh
-#   -> writes ~/.cache/lazy-changelog/specs.tsv via headless nvim
+   Completion criterion: report either `outdated=0` or the listed plugin names,
+   ranges, and commit counts.
 
-# 3. show pending changelogs (offline, instant):
-bash scripts/lazy-changelog.sh
-#   or, auto-refresh the cache first if missing:
-bash scripts/lazy-changelog.sh --refresh
-```
+4. **Expand only what is needed.** For full changelogs or focused output, run:
 
-The dump (`refresh-specs.sh`) needs Neovim because lazy resolves specs at
-load time (e.g. `version = not vim.g.lazyvim_blink_main and "*"`, dynamic
-`enabled`). The default query (`lazy-changelog.sh`) is pure offline git and
-needs no Neovim, reusing the origin refs `:Lazy check` just fetched.
-`--refresh` and `--fetch` regenerate the specs cache and therefore need Neovim.
+   ```bash
+   bash scripts/lazy-changelog.sh
+   bash scripts/lazy-changelog.sh --limit 20 --full
+   bash scripts/lazy-changelog.sh pi mitsuhiko-agent-stuff
+   ```
 
-## Usage
+   Completion criterion: every requested outdated plugin has its changelog range
+   shown, or the script reports all requested plugins are up to date.
 
-```bash
-bash scripts/lazy-changelog.sh [--refresh] [--fetch] [--full] [--limit N] [plugin ...]
+## Command notes
 
-# only these plugins
-bash scripts/lazy-changelog.sh blink.cmp yazi.nvim
+- `--refresh` regenerates `specs.tsv` before comparing; it needs Neovim.
+- `--fetch` fetches plugin repos, regenerates specs, then compares. It is
+  redundant after a fresh `:Lazy check`.
+- Default mode is offline and reuses the refs from the last `:Lazy check`.
+- The script auto-refreshes the specs cache when it detects staleness — i.e.
+  when `:Lazy check` or a `:Lazy update/sync/restore` (which rewrites
+  `lazy-lock.json`) has run since the last dump. No `--refresh` needed in the
+  normal flow; pass `--no-refresh` to force a fast offline query trusting the
+  existing cache.
 
-# cap length, show dates/authors
-bash scripts/lazy-changelog.sh --limit 20 --full
-```
+## Environment
 
-Options: `--refresh` (regenerate specs cache first), `--fetch` (git-fetch per
-plugin, then regenerate specs before comparing — redundant after `:Lazy check`),
-`--full`, `--limit N`, `-h/--help`. Env overrides: `SPEC_FILE`, `NVIM`.
-
-Each outdated plugin is printed as a `## name  installed..target` header
-followed by its `git log` commits. A `scanned=… outdated=…` summary goes to
-stderr.
+The query script is pure shell + git after the dump exists. The dump step needs
+a real Neovim binary; this repo's `.pi/sandbox.json` allows `nvim` via
+`justBash.hostCommands`, so it can run inside the agent sandbox. The scripts are
+written for Termux's restricted `bash` and avoid process substitution, `trap`,
+and `jq`.
 
 ## Files
 
-- `scripts/dump-specs.lua` — runs inside nvim; emits
-  `name|enabled|pin|is_local|dir|skip|installed|target` per plugin, where
-  `installed`/`target` come from lazy's `Git.info`/`Git.get_target`.
-- `scripts/refresh-specs.sh` — headless wrapper around `dump-specs.lua`;
-  writes `specs.tsv`.
-- `scripts/lazy-changelog.sh` — offline comparison + `git log installed..target`.
-
-## Environment notes
-
-Written for Termux's restricted `bash` (no `trap`, no process substitution)
-and runs without `jq`: specs are pre-serialized TSV, iteration uses
-`printf|while read`, and `git log -n` (not `head`) avoids SIGPIPE killing the
-scan loop. The dump step requires Neovim (it cannot run in the agent sandbox,
-but runs fine in your interactive shell).
-
-## Related lazy.nvim internals
-
-- `lua/lazy/manage/checker.lua` — `fast_check()` (the offline comparison this
-  script mirrors) and `M.check()` (the fetch version).
-- `lua/lazy/manage/git.lua` — `Git.info`, `Git.get_target`, `Git.eq`.
-- `lua/lazy/manage/task/git.lua` — `log` task (`from..to` = `installed..target`).
-- `~/.local/state/nvim/lazy/state.json` — stores only `checker.last_check`
-  (the frequency gate); the outdated set is never persisted, always recomputed
-  from git refs — which is why this script can replicate it offline.
+- `scripts/dump-specs.lua` — runs inside Neovim and emits
+  `name|enabled|pin|is_local|dir|skip|installed|target`.
+- `scripts/refresh-specs.sh` — writes `~/.cache/lazy-changelog/specs.tsv`.
+- `scripts/lazy-changelog.sh` — compares `installed`/`target` and prints logs.

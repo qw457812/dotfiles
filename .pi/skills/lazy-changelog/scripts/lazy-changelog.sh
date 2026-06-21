@@ -27,6 +27,7 @@ full=0
 limit=0
 do_fetch=0
 do_refresh=0
+no_refresh=0
 list_mode=0
 filter=""
 
@@ -39,6 +40,7 @@ plugins behind their update target. Output matches :Lazy check's "Updates".
 
 Options:
   --refresh      regenerate the specs cache via nvim first (run after :Lazy check)
+  --no-refresh   trust the existing specs cache, never auto-refresh even if stale
   --fetch        git fetch per plugin, then refresh specs before comparing
                  (redundant if you already ran :Lazy check)
   --full         show date + author + subject instead of oneline
@@ -58,6 +60,7 @@ while [ $# -gt 0 ]; do
   case "$1" in
     --fetch) do_fetch=1; shift ;;
     --refresh) do_refresh=1; shift ;;
+    --no-refresh) no_refresh=1; shift ;;
     --full)  full=1; shift ;;
     --list)  list_mode=1; shift ;;
     -h|--help) usage; exit 0 ;;
@@ -86,7 +89,33 @@ fetch_from_specs() {
   done
 }
 
-[ -f "$SPEC_FILE" ] || do_refresh=1
+[ -f "$SPEC_FILE" ] || { [ "$no_refresh" = "0" ] && do_refresh=1; }
+
+# Auto-refresh on stale cache (only when not already refreshing/fetching and
+# the user did not ask for offline --no-refresh). refresh-specs.sh re-reads
+# the refs that :Lazy check/update just wrote, so a refresh here makes the
+# offline comparison accurate instead of reporting drift that no longer exists.
+if [ "$do_refresh" = "0" ] && [ "$do_fetch" = "0" ] && [ "$no_refresh" = "0" ]; then
+  # Portable epoch-seconds mtime: `find -printf '%T@'` works on toybox and GNU
+  # (toybox `stat -c %Y` prints "%Y" literally). cut drops the fractional secs.
+  mtime() { find "$1" -printf '%T@' 2>/dev/null | cut -d. -f1; }
+  specs_mtime=$(mtime "$SPEC_FILE")
+
+  # :Lazy check refreshes origin refs and bumps lazy/state.json's last_check.
+  state_file="$HOME/.local/state/nvim/lazy/state.json"
+  last_check=""
+  [ -f "$state_file" ] && last_check=$(grep -o '"last_check":[0-9]*' "$state_file" 2>/dev/null | head -1 | cut -d: -f2)
+
+  # :Lazy update/sync/restore rewrites lazy-lock.json, so a newer lockfile means
+  # the recorded installed commits are stale even with no :Lazy check since.
+  lock_file="${XDG_CONFIG_HOME:-$HOME/.config}/nvim/lazy-lock.json"
+  lock_mtime=$(mtime "$lock_file")
+
+  if { [ -n "$specs_mtime" ] && [ -n "$last_check" ] && [ "$specs_mtime" -lt "$last_check" ] 2>/dev/null; } \
+     || { [ -n "$specs_mtime" ] && [ -n "$lock_mtime" ] && [ "$specs_mtime" -lt "$lock_mtime" ] 2>/dev/null; }; then
+    do_refresh=1
+  fi
+fi
 
 # A fetch changes the refs that Git.get_target reads, so refresh the dump after
 # fetching. If no dump exists yet, create one first only to discover plugin dirs.
@@ -105,20 +134,6 @@ fi
   echo "       generate it with dump-specs.lua inside nvim (see --help)" >&2
   exit 1
 }
-
-# Warn if the specs cache predates lazy's last :Lazy check: the refs Lazy
-# fetched are then newer than what the dump saw, so installed/target may be
-# off. Only when we did NOT just refresh/fetch ourselves.
-if [ "$do_refresh" = "0" ] && [ "$do_fetch" = "0" ]; then
-  state_file="$HOME/.local/state/nvim/lazy/state.json"
-  if [ -f "$state_file" ]; then
-    last_check=$(grep -o '"last_check":[0-9]*' "$state_file" 2>/dev/null | head -1 | cut -d: -f2)
-    specs_mtime=$(stat -f %m "$SPEC_FILE" 2>/dev/null || stat -c %Y "$SPEC_FILE" 2>/dev/null)
-    if [ -n "$last_check" ] && [ -n "$specs_mtime" ] && [ "$specs_mtime" -lt "$last_check" ] 2>/dev/null; then
-      echo "warn: specs cache predates the last :Lazy check; re-run with --refresh (after :Lazy check)." >&2
-    fi
-  fi
-fi
 
 log_fmt="--pretty=format:%h %s (%cr)"
 [ "$full" = "1" ] && log_fmt="--pretty=format:%h %ad %an %s"
@@ -172,6 +187,7 @@ done
 echo "----" >&2
 n_total="$(wc -c < "$c_total" | tr -d '[:space:]')"; n_out="$(wc -c < "$c_out" | tr -d '[:space:]')"
 names="$(cat "$c_out_names" 2>/dev/null)"
+names="${names% }"
 if [ -n "$names" ]; then
   printf 'outdated=%s scanned=%s : %s\n' "$n_out" "$n_total" "$names" >&2
 else
