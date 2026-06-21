@@ -67,10 +67,9 @@ refresh_specs() {
 
 fetch_from_specs() {
   [ -f "$SPEC_FILE" ] || return 0
-  printf '%s\n' "$(cat "$SPEC_FILE")" | while IFS='|' read -r name enabled pin is_local dir url skip installed target; do
+  printf '%s\n' "$(cat "$SPEC_FILE")" | while IFS='|' read -r name pin is_local dir url skip installed target; do
     [ -n "$name" ] || continue
     [ -z "$skip" ] || continue
-    [ "$enabled" = "false" ] && continue
     [ -d "$dir/.git" ] || continue
     git -C "$dir" fetch -q --recurse-submodules --tags --force || exit $?
     sleep 0.15 2>/dev/null || :
@@ -99,10 +98,9 @@ mkdir -p "$cnt_dir"
 c_total="$cnt_dir/total"; c_out="$cnt_dir/outdated"; c_out_names="$cnt_dir/outdated_names"
 : > "$c_total"; : > "$c_out"; : > "$c_out_names"
 
-printf '%s\n' "$(cat "$SPEC_FILE")" | while IFS='|' read -r name enabled pin is_local dir url skip installed target; do
+printf '%s\n' "$(cat "$SPEC_FILE")" | while IFS='|' read -r name pin is_local dir url skip installed target; do
   [ -n "$name" ] || continue
-  [ -z "$skip" ] || continue                # disabled/pin/local/not-installed
-  [ "$enabled" = "false" ] && continue
+  [ -z "$skip" ] || continue                # pin/local/not-installed
   [ -n "$installed" ] && [ -n "$target" ] || continue
 
   # optional name filter

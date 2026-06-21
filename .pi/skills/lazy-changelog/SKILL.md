@@ -40,7 +40,7 @@ changelog.
    omits:
 
    ```bash
-   url=$(grep -m1 "^<plugin>|" "$HOME/.cache/lazy-changelog/specs.tsv" | cut -d'|' -f6)
+   url=$(grep -m1 "^<plugin>|" "$HOME/.cache/lazy-changelog/specs.tsv" | cut -d'|' -f5)
    repo=$(printf '%s' "$url" | sed 's#.git$##; s#.*github.com[:/]##')   # owner/repo
    # open github.com/$repo/pull/<NNNN> (or /issues/)
    ```
@@ -58,6 +58,6 @@ changelog.
 ## Files
 
 - `scripts/dump-specs.lua` — runs inside Neovim, emits
-  `name|enabled|pin|is_local|dir|url|skip|installed|target`.
+  `name|pin|is_local|dir|url|skip|installed|target`.
 - `scripts/refresh-specs.sh` — writes `~/.cache/lazy-changelog/specs.tsv`.
 - `scripts/lazy-changelog.sh` — compares installed/target and prints logs.
