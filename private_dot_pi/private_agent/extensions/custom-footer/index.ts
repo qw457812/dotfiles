@@ -121,7 +121,7 @@ export default function (pi: ExtensionAPI) {
           if (totalCacheRead) statsParts.push(`R${formatTokens(totalCacheRead)}`);
           if (totalCacheWrite) statsParts.push(`W${formatTokens(totalCacheWrite)}`);
           if ((totalCacheRead > 0 || totalCacheWrite > 0) && latestCacheHitRate !== undefined) {
-            statsParts.push(`CH${formatDecimal(latestCacheHitRate, 1)}%`);
+            statsParts.push(`H${formatDecimal(latestCacheHitRate, 1)}%`);
           }
 
           // Cost (without "(sub)" indicator - not accessible from extension)

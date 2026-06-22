@@ -2,6 +2,8 @@
 - <https://github.com/openai/codex>
 - <https://github.com/anomalyco/opencode>
 - <https://github.com/openclaw/openclaw>
+- <https://github.com/can1357/oh-my-pi>
+- <https://github.com/open-gsd/gsd-pi>
 - <https://github.com/charmbracelet/crush>
 - <https://github.com/cline/cline>
 - <https://github.com/XiaomiMiMo/MiMo-Code>
