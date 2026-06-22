@@ -508,6 +508,34 @@ try {
   assert.equal(latin1TextOut.exitCode, 0);
   assert.deepEqual(Array.from(latin1TextOut.buffer), [0x63, 0x61, 0x66, 0xc3, 0xa9]);
 
+  // Regression: redirecting host command stdout (stdoutKind:"bytes") to a
+  // file must preserve the original UTF-8 bytes, not mojibake them. just-bash's
+  // redirect built-in passes the encoding ("binary" for host command bytes) as
+  // the 3rd arg to fs.writeFile/appendFile; DenyFilteredFs previously dropped
+  // that arg, so the backing ReadWriteFs defaulted to "utf8" and re-encodes the
+  // latin1 byte string (U+00E2 carried from 0xE2) as UTF-8 (c3 a2), corrupting
+  // every multibyte sequence. box-drawing ─ (e2 94 80) exercises the full chain.
+  //
+  // The ops must carry a denyRead entry: applyReadPathPolicy wraps the FS stack
+  // with DenyFilteredFs only when denyRead/allowRead is non-empty, so a bare
+  // hostOps config (no read policy) would skip the buggy wrapper and pass
+  // against the unbuggy bare ReadWriteFs — a false green. The denied path is
+  // arbitrary and non-existent; writes are unaffected because DenyFilteredFs
+  // gates reads, not writes.
+  const denyReadRedirectOps = createJustBashOps(workdir, {
+    hostCommands: ["node"],
+    filesystem: {
+      allowWrite: [".", extraWriteDir],
+      denyRead: [join(workdir, "denyread-noop")],
+    },
+  });
+  const redirectProbe = join(workdir, "redirect-utf8-probe.js");
+  writeFileSync(redirectProbe, "process.stdout.write(Buffer.from('─','utf8'));");
+  const redirectFile = join(workdir, "redirect-utf8.out");
+  const redirectResult = await runWithOps(denyReadRedirectOps, `node ${redirectProbe} > ${redirectFile}`);
+  assert.equal(redirectResult.exitCode, 0);
+  assert.deepEqual(Array.from(readFileSync(redirectFile)), [0xe2, 0x94, 0x80]);
+
   const awkStdoutFile = await run(
     `awk 'BEGIN { print "a"; print "b" > "/dev/stdout"; print "c" }'`,
   );

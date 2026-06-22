@@ -215,12 +215,20 @@ class DenyFilteredFs {
     return this.inner.readFileBuffer(path);
   }
 
-  async writeFile(path: string, content: FileContent): Promise<void> {
-    return this.inner.writeFile(path, content);
+  async writeFile(
+    path: string,
+    content: FileContent,
+    options?: { encoding?: BufferEncoding } | BufferEncoding,
+  ): Promise<void> {
+    return this.inner.writeFile(path, content, options);
   }
 
-  async appendFile(path: string, content: FileContent): Promise<void> {
-    return this.inner.appendFile(path, content);
+  async appendFile(
+    path: string,
+    content: FileContent,
+    options?: { encoding?: BufferEncoding } | BufferEncoding,
+  ): Promise<void> {
+    return this.inner.appendFile(path, content, options);
   }
 
   async exists(path: string): Promise<boolean> {
