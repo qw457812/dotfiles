@@ -19,6 +19,12 @@
 -- installed/target are computed with lazy's OWN Git.info / Git.get_target, so
 -- the comparison is identical to what :Lazy check / checker.fast_check do.
 --
+-- Output target:
+--   If $LAZY_CHANGELOG_SPEC_FILE is set, writes the TSV there directly (this
+--   is how refresh-specs.sh captures clean output — nvim's own stdout, e.g.
+--   iTerm2 OSC 1337 escape sequences, is discarded so it can never pollute
+--   the data). Otherwise writes to stdout for manual `:luafile` use.
+--
 -- Usage (headless, via refresh-specs.sh):
 --   nvim --headless +"lua require('lazy')" +"luafile /path/dump-specs.lua" +qa
 -- If lazy is lazy-loaded, just open your config first then :luafile it.
@@ -29,6 +35,22 @@ if not lazy_ok or not lazy then
   return
 end
 local Git = require("lazy.manage.git")
+local Util = require("lazy.util")
+
+-- When $LAZY_CHANGELOG_SPEC_FILE is set, accumulate lines and write them in
+-- one shot via Util.write_file (which truncates on open, so a single write).
+-- This keeps nvim's stdout (iTerm2 OSC sequences, plugin chatter) out of the
+-- data; refresh-specs.sh sets the env var and discards nvim stdout. Fall back
+-- to stdout for manual `:luafile` use.
+local out_path = os.getenv("LAZY_CHANGELOG_SPEC_FILE")
+local out_lines = {}
+local function emit(s)
+  if out_path then
+    out_lines[#out_lines + 1] = s
+  else
+    io.stdout:write(s)
+  end
+end
 
 for _, p in ipairs(lazy.plugins()) do
   local name = p.name or "?"
@@ -66,7 +88,11 @@ for _, p in ipairs(lazy.plugins()) do
     if ok and origin then url = origin end
   end
 
-  io.stdout:write(string.format("%s|%s|%s|%s|%s|%s|%s|%s\n",
+  emit(string.format("%s|%s|%s|%s|%s|%s|%s|%s\n",
     name, tostring(pin), tostring(is_local),
     dir, url, skip, installed, target))
+end
+
+if out_path then
+  Util.write_file(out_path, table.concat(out_lines))
 end

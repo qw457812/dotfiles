@@ -35,20 +35,18 @@ fi
 
 mkdir -p "$(dirname "$SPEC_FILE")"
 tmp="${SPEC_FILE}.$$"
-: > "$tmp"
 
-# headless: load config (lazy resolves specs), run the dump, quit.
-# No side-effect guards needed — nothing edits a buffer, so treesitter's
-# parser auto-install, Mason, and LSP never trigger here (verified: dump
-# completes in ~0.4s with no network).
-"$nvim" --headless \
-  +"luafile $DUMP_LUA" \
-  +qa 2>/dev/null > "$tmp"
+# dump-specs.lua writes the TSV straight to $tmp (via lazy.util.write_file)
+# when LAZY_CHANGELOG_SPEC_FILE is set, so nvim's own stdout — iTerm2 OSC
+# escape sequences, plugin startup chatter, deprecation notices — is discarded
+# and can never pollute the data. We only check $tmp for success.
+LAZY_CHANGELOG_SPEC_FILE="$tmp" \
+  "$nvim" --headless +"luafile $DUMP_LUA" +qa >/dev/null 2>&1
 
 rc=$?
 if [ "$rc" -ne 0 ] || [ ! -s "$tmp" ]; then
-  echo "error: nvim headless run failed (exit $rc) or produced no output." >&2
-  echo "       try running manually: $nvim --headless +luafile $DUMP_LUA +qa" >&2
+  echo "error: nvim headless run failed (exit $rc) or wrote no output." >&2
+  echo "       try: LAZY_CHANGELOG_SPEC_FILE=$tmp $nvim --headless +luafile $DUMP_LUA +qa" >&2
   rm -f "$tmp"
   [ "$rc" -ne 0 ] || rc=1
   exit "$rc"

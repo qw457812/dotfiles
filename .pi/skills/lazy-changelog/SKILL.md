@@ -35,14 +35,14 @@ changelog.
    the changelog alone was enough (skip this plugin's diff).
 
 3. **Open the related issue/PR when a commit references one.** Commits often
-   carry `#NNNN`; the plugin's origin URL is in `specs.tsv` (re-dumped every
-   run), so derive owner/repo and read the thread for context the changelog
-   omits:
+   carry `#NNNN`; each outdated plugin's header ends with a short host path
+   in parens — e.g. `(github.com/olimorris/codecompanion.nvim)`, host kept so
+   gitlab/etc plugins aren't misread as github. Prefix `https://` and append
+   the ref path:
 
    ```bash
-   url=$(grep -m1 "^<plugin>|" "$HOME/.cache/lazy-changelog/specs.tsv" | cut -d'|' -f5)
-   repo=$(printf '%s' "$url" | sed 's#.git$##; s#.*github.com[:/]##')   # owner/repo
-   # open github.com/$repo/pull/<NNNN> (or /issues/)
+   # github.com/$repo/pull/<NNNN>   (or /issues/, /compare/inst..tgt)
+   # gitlab.com/$group/$repo/-/merge_requests/<NNNN>
    ```
 
    Completion criterion: every `#NNNN` you needed context on is read.
@@ -52,8 +52,8 @@ changelog.
 - Reports are based on the on-disk `origin/<branch>` refs, i.e. whatever your
   last Neovim session fetched. They can **underreport** new updates if those
   refs are stale; the changelog dates help you judge freshness. Run `:Lazy check`
-  in Neovim for a fast fetch with progress, or pass `--fetch` to have this
-  script fetch each plugin itself.
+  in Neovim for a fast fetch with progress (or headless:
+  `nvim --headless +"Lazy! check" +qa`).
 
 ## Files
 
