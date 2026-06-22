@@ -56,10 +56,6 @@
     }
   },
   "justBash": {
-    "excludedCommands": [
-      "bash checkout.sh:*",
-      "~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/librarian/checkout.sh*"
-    ],
     "hostCommands": ["git", "gh"],
     "filesystem": {
       "allowWrite": [

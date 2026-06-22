@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -o nounset
+set -o pipefail
 
 usage() {
   cat <<'EOF'
@@ -146,17 +147,13 @@ parse_repo() {
   # Strip optional .git suffix.
   path="${path%.git}"
 
-  IFS='/' read -r -a parts <<< "$path"
-  if [[ ${#parts[@]} -lt 2 ]]; then
+  if [[ "$path" != */* ]]; then
     echo "error: repository path must contain at least org/repo: $path" >&2
     return 1
   fi
 
-  local last_index=$(( ${#parts[@]} - 1 ))
-  local repo="${parts[$last_index]}"
-  local org_parts=("${parts[@]:0:$last_index}")
-  local org
-  org="$(IFS='/'; echo "${org_parts[*]}")"
+  local repo="${path##*/}"
+  local org="${path%/*}"
 
   if [[ -z "$host" || -z "$org" || -z "$repo" ]]; then
     echo "error: failed to parse repository: $input" >&2
@@ -165,6 +162,10 @@ parse_repo() {
 
   printf '%s\n%s\n%s\n' "$host" "$org" "$repo"
 }
+
+if ! parsed="$(parse_repo "$repo_input")"; then
+  exit 1
+fi
 
 parsed_host=""
 parsed_org=""
@@ -177,7 +178,7 @@ while IFS= read -r line; do
     2) parsed_repo="$line" ;;
   esac
   parsed_index=$((parsed_index + 1))
-done < <(parse_repo "$repo_input")
+done <<< "$parsed"
 
 host="$parsed_host"
 org="$parsed_org"
@@ -187,10 +188,10 @@ cache_root="${LIBRARIAN_CACHE_ROOT:-$HOME/.cache/checkouts}"
 checkout_path="$cache_root/$host/$org/$repo"
 origin_url="https://$host/$org/$repo.git"
 
-mkdir -p "$(dirname "$checkout_path")"
+mkdir -p "$(dirname "$checkout_path")" || exit $?
 
 if [[ ! -d "$checkout_path/.git" ]]; then
-  git clone --filter=blob:none "$origin_url" "$checkout_path" >/dev/null
+  git clone --filter=blob:none "$origin_url" "$checkout_path" >/dev/null || exit $?
   clone_state="cloned"
 else
   clone_state="existing"
@@ -202,17 +203,17 @@ if [[ ! -d "$checkout_path/.git" ]]; then
 fi
 
 if ! git -C "$checkout_path" remote get-url origin >/dev/null 2>&1; then
-  git -C "$checkout_path" remote add origin "$origin_url"
+  git -C "$checkout_path" remote add origin "$origin_url" || exit $?
 fi
 
 # If remote URL changed (e.g. host shorthand), normalize to canonical HTTPS URL.
-current_origin="$(git -C "$checkout_path" remote get-url origin 2>/dev/null || true)"
+current_origin="$(git -C "$checkout_path" remote get-url origin 2>/dev/null)" || exit $?
 if [[ "$current_origin" != "$origin_url" ]]; then
-  git -C "$checkout_path" remote set-url origin "$origin_url"
+  git -C "$checkout_path" remote set-url origin "$origin_url" || exit $?
 fi
 
 last_fetch_file="$checkout_path/.git/librarian-last-fetch"
-now_epoch="$(date +%s)"
+now_epoch="$(date +%s)" || exit $?
 needs_update=1
 
 if [[ -f "$last_fetch_file" && "$force_update" -eq 0 ]]; then
@@ -229,13 +230,13 @@ update_state="skipped"
 ff_state="not-attempted"
 
 if (( needs_update == 1 )); then
-  git -C "$checkout_path" fetch --prune --tags origin >/dev/null
-  echo "$now_epoch" > "$last_fetch_file"
+  git -C "$checkout_path" fetch --prune --tags origin >/dev/null || exit $?
+  echo "$now_epoch" > "$last_fetch_file" || exit $?
   update_state="fetched"
 
   branch="$(git -C "$checkout_path" symbolic-ref --short -q HEAD 2>/dev/null || true)"
   upstream="$(git -C "$checkout_path" rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null || true)"
-  dirty="$(git -C "$checkout_path" status --porcelain --untracked-files=no)"
+  dirty="$(git -C "$checkout_path" status --porcelain --untracked-files=no)" || exit $?
 
   if [[ -n "$branch" && -n "$upstream" && -z "$dirty" ]]; then
     if git -C "$checkout_path" merge --ff-only "$upstream" >/dev/null 2>&1; then
