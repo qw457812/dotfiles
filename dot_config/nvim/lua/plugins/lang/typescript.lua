@@ -12,7 +12,10 @@ return {
           group = vim.api.nvim_create_augroup("oxlint", { clear = true }),
           callback = function(ev)
             if
-              vim.api.nvim_buf_get_name(ev.buf):find(".oxlintrc") and #vim.lsp.get_clients({ name = "oxlint" }) > 0
+              vim.list_contains(
+                { ".oxlintrc.json", ".oxlintrc.jsonc", "oxlint.config.ts" },
+                vim.fn.fnamemodify(vim.api.nvim_buf_get_name(ev.buf), ":t")
+              ) and #vim.lsp.get_clients({ name = "oxlint" }) > 0
             then
               Snacks.notify("Restarting oxlint...")
               vim.cmd("lsp restart oxlint")
