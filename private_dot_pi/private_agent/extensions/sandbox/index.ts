@@ -28,6 +28,7 @@
 // - https://github.com/afshinm/zerobox
 // - https://github.com/always-further/nono
 //   see nono's pre-built profiles for reference sandbox configurations
+//   - https://github.com/always-further/nono-packs/tree/main/pi
 
 /**
  * Sandbox Extension - OS-level sandboxing for bash commands

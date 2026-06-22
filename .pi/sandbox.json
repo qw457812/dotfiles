@@ -3,6 +3,9 @@
     "hostCommands": [
       "git",
       "gh",
+      "node",
+      "npm",
+      "npx",
       "nvim" // in favor of `/skill:lazy-changelog`
     ]
   }
