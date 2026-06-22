@@ -40,7 +40,14 @@ tmp="${SPEC_FILE}.$$"
 # when LAZY_CHANGELOG_SPEC_FILE is set, so nvim's own stdout — iTerm2 OSC
 # escape sequences, plugin startup chatter, deprecation notices — is discarded
 # and can never pollute the data. We only check $tmp for success.
-LAZY_CHANGELOG_SPEC_FILE="$tmp" \
+#
+# NVIM_LOG_FILE is pinned too: nvim writes ./nvim.log in its cwd by default,
+# and this script never cds, so that lands wherever the caller ran from —
+# i.e. the repo working tree under lazy-changelog.sh. Point it next to
+# $SPEC_FILE (an already-created, writable cache dir) so the log is kept for
+# debugging without leaking into the repo.
+NVIM_LOG_FILE="$(dirname "$SPEC_FILE")/nvim.log" \
+  LAZY_CHANGELOG_SPEC_FILE="$tmp" \
   "$nvim" --headless +"luafile $DUMP_LUA" +qa >/dev/null 2>&1
 
 rc=$?
