@@ -6,6 +6,10 @@
  * Session-log-backed long-running objective mode. All state transitions are
  * appended as custom session entries and reconstructed from the active branch
  * on reload/tree navigation; no external database is used.
+ *
+ * Goal tools are lazy-enabled by /goal command state changes or by session
+ * restore when the active branch contains goal state. After enabling them, this
+ * extension does not disable them again.
  */
 
 import { randomUUID } from "node:crypto";
@@ -378,6 +382,24 @@ export default function goalExtension(pi: ExtensionAPI) {
 	let activeSinceMs: number | null = null;
 	let activeGoalIdAtAgentStart: string | null = null;
 	let continuationQueued = false;
+	let goalToolsEnabled = false;
+
+	function setGoalToolsEnabled(enabled: boolean): void {
+		if (!enabled && goalToolsEnabled) return;
+
+		const goalTools = ["get_goal", "create_goal", "update_goal"] as const;
+		const activeTools = new Set(pi.getActiveTools());
+		const activeToolCountBefore = activeTools.size;
+
+		if (enabled) {
+			goalToolsEnabled = true;
+			for (const tool of goalTools) activeTools.add(tool);
+		} else {
+			for (const tool of goalTools) activeTools.delete(tool);
+		}
+
+		if (activeTools.size !== activeToolCountBefore) pi.setActiveTools(Array.from(activeTools));
+	}
 
 	function currentGoalSnapshot(): Goal | null {
 		if (!goal) return null;
@@ -404,6 +426,7 @@ export default function goalExtension(pi: ExtensionAPI) {
 			action,
 			goal: goal ? cloneGoal(goal) : null,
 		} satisfies PersistedGoalState);
+		setGoalToolsEnabled(true);
 	}
 
 	function updateStatus(ctx: ExtensionContext): void {
@@ -558,11 +581,14 @@ export default function goalExtension(pi: ExtensionAPI) {
 		activeGoalIdAtAgentStart = null;
 		continuationQueued = false;
 
+		let hasGoalState = false;
 		for (const entry of ctx.sessionManager.getBranch()) {
 			if (entry.type !== "custom" || entry.customType !== STATE_TYPE) continue;
+			hasGoalState = true;
 			const data = entry.data as Partial<PersistedGoalState> | undefined;
 			goal = normalizeGoal(data?.goal);
 		}
+		setGoalToolsEnabled(hasGoalState);
 		if (goal?.status === "active") {
 			activeSinceMs = Date.now();
 		}
