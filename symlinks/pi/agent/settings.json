@@ -57,6 +57,20 @@
       "themes": []
     },
     {
+      "source": "git:github.com/DietrichGebert/ponytail",
+      "extensions": [
+        "pi-extension/index.js"
+      ],
+      "skills": [
+        "skills/ponytail",
+        "skills/ponytail-audit",
+        "skills/ponytail-debt",
+        "skills/ponytail-review"
+      ],
+      "prompts": [],
+      "themes": []
+    },
+    {
       "source": "git:github.com/telagod/pi-agent-colony",
       "extensions": [],
       "skills": [],

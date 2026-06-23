@@ -112,6 +112,7 @@
   "pi-retry": { "branch": "main", "commit": "6d2887f003fd2fbe03f8fbd75f201d4c74571c55" },
   "pi-vim": { "branch": "main", "commit": "dd67b2a1962fc36d7e1be4ba588aaec56f7a3d6c" },
   "plenary.nvim": { "branch": "master", "commit": "74b06c6c75e4eeb3108ec01852001636d85a932b" },
+  "ponytail": { "branch": "main", "commit": "dedc97ca7c8a1e7463ac5b36f7fe4b28c3c435a2" },
   "py-requirements.nvim": { "branch": "main", "commit": "025ba677503d2332b722ebefb10e82871ac8ef96" },
   "refactoring.nvim": { "branch": "master", "commit": "7eaa150061ea18fdbe18fbb924d236e3ddccc57d" },
   "render-markdown.nvim": { "branch": "main", "commit": "5adf0895310c1904e5abfaad40a2baad7fe44a07" },

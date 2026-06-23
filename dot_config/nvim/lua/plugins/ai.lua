@@ -47,6 +47,12 @@ return {
         config = function() end,
       },
       {
+        "DietrichGebert/ponytail",
+        build = "pi update --extension git:github.com/DietrichGebert/ponytail",
+        lazy = true,
+        config = function() end,
+      },
+      {
         "telagod/pi-agent-colony",
         build = "pi update --extension git:github.com/telagod/pi-agent-colony",
         lazy = true,
