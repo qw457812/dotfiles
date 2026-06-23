@@ -1,3 +1,11 @@
+/**
+ * Local `disable-model-invocation: true` for selected package skills.
+ *
+ * Hides them from the system prompt while keeping `/skill:<name>` usable.
+ * Use `/hidden-skills` to inspect configured skills and `/hidden-skills diff` to show
+ * the exact prompt change from the latest turn.
+ */
+
 import type { ExtensionAPI, ExtensionCommandContext } from "@earendil-works/pi-coding-agent";
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
@@ -21,10 +29,14 @@ type PromptPair = { before: string; after: string };
 
 export default function (pi: ExtensionAPI) {
   let lastPromptPair: PromptPair | undefined;
+  let warned = false;
 
-  pi.on("before_agent_start", async (event) => {
+  pi.on("before_agent_start", async (event, ctx) => {
     const systemPrompt = stripSkillBlocks(event.systemPrompt);
     lastPromptPair = { before: event.systemPrompt, after: systemPrompt };
+
+    warned = warnOnUnexpectedPromptChange(ctx, event.systemPrompt, systemPrompt, warned);
+
     if (systemPrompt === event.systemPrompt) return;
 
     return { systemPrompt };
@@ -46,7 +58,42 @@ function stripSkillBlocks(systemPrompt: string): string {
 }
 
 function skillBlockRegex(): RegExp {
+  // Mirrors pi's formatSkillsForPrompt skill block shape:
+  // https://github.com/earendil-works/pi/blob/8e1900666f3cb83c281297d8f787fae6ee2bd0e6/packages/coding-agent/src/core/skills.ts#L351-L355
   return /\n  <skill>\n    <name>([^<]+)<\/name>\n    <description>[\s\S]*?<\/description>\n    <location>[\s\S]*?<\/location>\n  <\/skill>/g;
+}
+
+function warnOnUnexpectedPromptChange(
+  ctx: Pick<ExtensionCommandContext, "ui">,
+  before: string,
+  after: string,
+  warned: boolean,
+): boolean {
+  if (warned) return true;
+
+  const beforeNames = skillNamesInPrompt(before);
+  const afterNames = skillNamesInPrompt(after);
+  const stillVisible = [...afterNames].filter((name) => HIDDEN_SKILL_NAMES.has(name));
+  const unexpectedlyRemoved = [...beforeNames].filter(
+    (name) => !afterNames.has(name) && !HIDDEN_SKILL_NAMES.has(name),
+  );
+  const warnings: string[] = [];
+
+  if (stillVisible.length > 0) warnings.push(`failed to remove ${stillVisible.join(", ")}`);
+  if (unexpectedlyRemoved.length > 0)
+    warnings.push(`unexpectedly removed ${unexpectedlyRemoved.join(", ")}`);
+  if (warnings.length === 0) return false;
+
+  ctx.ui.notify(`hide-skills: ${warnings.join("; ")}. Run /hidden-skills diff.`, "warning");
+  return true;
+}
+
+function skillNamesInPrompt(systemPrompt: string): Set<string> {
+  const names = new Set<string>();
+  for (const match of systemPrompt.matchAll(skillBlockRegex())) {
+    names.add(match[1]);
+  }
+  return names;
 }
 
 function buildPromptDiff(before: string, after: string): string {
@@ -66,17 +113,15 @@ function buildPromptDiff(before: string, after: string): string {
 }
 
 function runDiff(beforePath: string, afterPath: string): string {
-  return (
-    execForStdout("git", [
-      "diff",
-      "--no-index",
-      "--no-color",
-      "--patience",
-      "--",
-      beforePath,
-      afterPath,
-    ]) || execForStdout("diff", ["-u", beforePath, afterPath])
-  );
+  return execForStdout("git", [
+    "diff",
+    "--no-index",
+    "--no-color",
+    "--patience",
+    "--",
+    beforePath,
+    afterPath,
+  ]);
 }
 
 function execForStdout(command: string, args: string[]): string {
@@ -103,39 +148,34 @@ function showHiddenSkills(
   showDiff: boolean,
   lastPromptPair: PromptPair | undefined,
 ): void {
+  if (showDiff) {
+    const before = lastPromptPair?.before ?? ctx.getSystemPrompt();
+    const after = lastPromptPair?.after ?? stripSkillBlocks(before);
+    ctx.ui.notify(
+      buildPromptDiff(before, after) || "System prompt diff: (none; extension made no changes)",
+      "info",
+    );
+    return;
+  }
+
   const skills = ctx.getSystemPromptOptions().skills ?? [];
+  const configured = [...HIDDEN_SKILL_NAMES];
   const loaded = skills.filter((skill) => HIDDEN_SKILL_NAMES.has(skill.name));
+  const loadedNames = loaded.map((skill) => skill.name);
+  const missingNames = configured.filter((name) => !loadedNames.includes(name));
   const alreadyHidden = loaded
     .filter((skill) => skill.disableModelInvocation)
     .map((skill) => skill.name);
   const lines = [
-    "Configured hidden skills:",
-    `  names: ${[...HIDDEN_SKILL_NAMES].join(", ")}`,
-    "",
-    loaded.length > 0
-      ? `Currently matched: ${loaded.map((skill) => skill.name).join(", ")}`
-      : "Currently matched: (none)",
+    `Hidden skills: ${loaded.length}/${configured.length} loaded`,
+    loadedNames.join(", "),
   ];
 
+  if (missingNames.length > 0) lines.push(`Missing: ${missingNames.join(", ")}`);
   if (alreadyHidden.length > 0)
     lines.push(`Already hidden by SKILL.md: ${alreadyHidden.join(", ")}`);
 
-  if (showDiff) {
-    const before = lastPromptPair?.before ?? ctx.getSystemPrompt();
-    const after = lastPromptPair?.after ?? stripSkillBlocks(before);
-    const diff = buildPromptDiff(before, after);
-    lines.push(
-      "",
-      diff ? "System prompt diff:" : "System prompt diff: (none; extension made no changes)",
-      diff,
-    );
-  }
-
-  lines.push(
-    "",
-    "Use /hidden-skills diff to show the actual system prompt diff.",
-    "These skills remain manually invokable with /skill:<name>; only system-prompt visibility is removed.",
-  );
+  lines.push("", "Diff: /hidden-skills diff · Manual invoke still works: /skill:<name>");
 
   ctx.ui.notify(lines.join("\n"), "info");
 }
