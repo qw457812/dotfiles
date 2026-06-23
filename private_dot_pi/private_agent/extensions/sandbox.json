@@ -51,7 +51,8 @@
         "/private/var/folders",
         "~/.npm",
         "~/.bun",
-        "~/.cache" // in favor of `/skill:librarian`
+        "~/.cache", // in favor of `/skill:librarian`
+        "~/.local/share/nvim/lazy" // in favor of `/skill:lazy-changelog` (partial-clone pack fetch from `git diff <installed>..<target>`)
       ]
     }
   },
