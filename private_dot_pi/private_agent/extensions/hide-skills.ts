@@ -6,7 +6,11 @@
  * the exact prompt change from the latest turn.
  */
 
-import type { ExtensionAPI, ExtensionCommandContext } from "@earendil-works/pi-coding-agent";
+import type {
+  ExtensionAPI,
+  ExtensionCommandContext,
+  ExtensionContext,
+} from "@earendil-works/pi-coding-agent";
 import { execFileSync, spawn } from "node:child_process";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -24,20 +28,26 @@ const HIDDEN_SKILLS = [
   "ponytail-debt",
   "ponytail-review",
 ];
+
 type PromptPair = { before: string; after: string };
 type Skill = { name: string; disableModelInvocation: boolean };
+type StripResult = { prompt: string; removed: string[] };
 
 export default function (pi: ExtensionAPI) {
   let lastPromptPair: PromptPair | undefined;
-  let warned = false;
+  let checked = false;
 
   pi.on("before_agent_start", async (event, ctx) => {
-    const nextPrompt = stripHiddenSkills(event.systemPrompt);
-    lastPromptPair = { before: event.systemPrompt, after: nextPrompt };
-    warned = warnOnceOnUnexpectedChange(ctx, lastPromptPair, warned);
+    const stripped = stripHiddenSkills(event.systemPrompt);
 
-    if (nextPrompt === event.systemPrompt) return;
-    return { systemPrompt: nextPrompt };
+    lastPromptPair = { before: event.systemPrompt, after: stripped.prompt };
+    if (!checked) {
+      checked = true;
+      checkDrift(ctx, event.systemPromptOptions.skills ?? [], stripped.removed);
+    }
+
+    if (stripped.prompt === event.systemPrompt) return;
+    return { systemPrompt: stripped.prompt };
   });
 
   pi.registerCommand("hidden-skills", {
@@ -48,7 +58,7 @@ export default function (pi: ExtensionAPI) {
     handler: async (args, ctx) => {
       if (args.trim() === "diff") {
         const before = lastPromptPair?.before ?? ctx.getSystemPrompt();
-        const promptPair = lastPromptPair ?? { before, after: stripHiddenSkills(before) };
+        const promptPair = lastPromptPair ?? { before, after: stripHiddenSkills(before).prompt };
         const diff = buildPromptDiff(promptPair);
         if (!diff) ctx.ui.notify("System prompt diff: (none; extension made no changes)", "info");
         else await openDiffInEditor(ctx, diff);
@@ -60,10 +70,15 @@ export default function (pi: ExtensionAPI) {
   });
 }
 
-function stripHiddenSkills(systemPrompt: string): string {
-  return systemPrompt.replace(skillBlockRegex(), (block, name: string) =>
-    HIDDEN_SKILLS.includes(name) ? "" : block,
-  );
+function stripHiddenSkills(systemPrompt: string): StripResult {
+  const removed: string[] = [];
+  const prompt = systemPrompt.replace(skillBlockRegex(), (block, name: string) => {
+    if (!HIDDEN_SKILLS.includes(name)) return block;
+    removed.push(name);
+    return "";
+  });
+
+  return { prompt, removed };
 }
 
 function skillBlockRegex(): RegExp {
@@ -72,34 +87,21 @@ function skillBlockRegex(): RegExp {
   return /\n  <skill>\n    <name>([^<]+)<\/name>\n    <description>[\s\S]*?<\/description>\n    <location>[\s\S]*?<\/location>\n  <\/skill>/g;
 }
 
-function warnOnceOnUnexpectedChange(
-  ctx: Pick<ExtensionCommandContext, "ui">,
-  promptPair: PromptPair,
-  warned: boolean,
-): boolean {
-  if (warned) return true;
+function checkDrift(ctx: Pick<ExtensionContext, "ui">, skills: Skill[], removed: string[]): void {
+  const expected = skills
+    .filter((skill) => HIDDEN_SKILLS.includes(skill.name) && !skill.disableModelInvocation)
+    .map((skill) => skill.name);
+  const missing = expected.filter((name) => !removed.includes(name));
+  const extra = removed.filter((name) => !expected.includes(name));
+  const lines: string[] = [];
 
-  const beforeNames = skillNamesInPrompt(promptPair.before);
-  const afterNames = skillNamesInPrompt(promptPair.after);
-  const stillVisible = [...afterNames].filter((name) => HIDDEN_SKILLS.includes(name));
-  const unexpectedlyRemoved = [...beforeNames].filter(
-    (name) => !afterNames.has(name) && !HIDDEN_SKILLS.includes(name),
-  );
-  const warnings: string[] = [];
+  if (missing.length > 0) lines.push(`failed to strip ${missing.join(", ")}`);
+  if (extra.length > 0) lines.push(`unexpectedly stripped ${extra.join(", ")}`);
+  if (removed.length !== expected.length)
+    lines.push(`expected ${expected.length} strip(s), got ${removed.length}`);
+  if (lines.length === 0) return;
 
-  if (stillVisible.length > 0) warnings.push(`failed to remove ${stillVisible.join(", ")}`);
-  if (unexpectedlyRemoved.length > 0)
-    warnings.push(`unexpectedly removed ${unexpectedlyRemoved.join(", ")}`);
-  if (warnings.length === 0) return false;
-
-  ctx.ui.notify(`hide-skills: ${warnings.join("; ")}. Run /hidden-skills diff.`, "warning");
-  return true;
-}
-
-function skillNamesInPrompt(systemPrompt: string): Set<string> {
-  const names = new Set<string>();
-  for (const match of systemPrompt.matchAll(skillBlockRegex())) names.add(match[1]);
-  return names;
+  ctx.ui.notify(`hide-skills: ${lines.join("; ")}. Run /hidden-skills diff.`, "warning");
 }
 
 async function openDiffInEditor(ctx: ExtensionCommandContext, diff: string): Promise<void> {
@@ -114,7 +116,7 @@ async function openDiffInEditor(ctx: ExtensionCommandContext, diff: string): Pro
   }
 
   await ctx.ui.custom<void>((tui, _theme, _kb, done) => {
-    const filePath = join(tmpdir(), `pi-hidden-skills-${Date.now()}.diff`);
+    const filePath = join(tmpdir(), `pi-extension-editor-hide-skills-${Date.now()}.diff`);
     let stopped = false;
 
     void (async () => {
@@ -173,7 +175,7 @@ function buildStatus(skills: Skill[]): string {
 function buildPromptDiff({ before, after }: PromptPair): string {
   if (before === after) return "";
 
-  const dir = mkdtempSync(join(tmpdir(), "pi-hidden-skills-"));
+  const dir = mkdtempSync(join(tmpdir(), "pi-hide-skills-"));
   const beforePath = join(dir, "system-prompt.before");
   const afterPath = join(dir, "system-prompt.after");
 
@@ -188,7 +190,10 @@ function buildPromptDiff({ before, after }: PromptPair): string {
       );
     } catch (error) {
       const stdout = (error as { stdout?: Buffer | string }).stdout;
-      const diff = Buffer.isBuffer(stdout) ? stdout.toString("utf8") : (stdout ?? "");
+      if (!stdout)
+        return `Failed to run git diff: ${error instanceof Error ? error.message : String(error)}`;
+
+      const diff = Buffer.isBuffer(stdout) ? stdout.toString("utf8") : stdout;
       return diff
         .split("\n")
         .filter((line) => !line.startsWith("diff --git ") && !line.startsWith("index "))

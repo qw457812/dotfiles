@@ -1029,6 +1029,19 @@ return {
         end,
       })
 
+      vim.api.nvim_create_autocmd("BufRead", {
+        group = vim.api.nvim_create_augroup("pi_extension_editor_custom", { clear = true }),
+        pattern = {
+          tmpdir .. "/pi-extension-editor-*.diff", -- ~/.local/share/chezmoi/private_dot_pi/private_agent/extensions/hide-skills.ts
+        },
+        once = true,
+        callback = function(ev)
+          if vim.bo[ev.buf].filetype == "diff" then
+            vim.bo[ev.buf].modifiable = false
+          end
+        end,
+      })
+
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "markdown",
         callback = function(ev)
