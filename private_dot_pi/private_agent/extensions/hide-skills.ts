@@ -6,13 +6,14 @@
  * the exact prompt change from the latest turn.
  */
 
-import type {
-  ExtensionAPI,
-  ExtensionCommandContext,
-  ExtensionContext,
+import {
+  generateUnifiedPatch,
+  type ExtensionAPI,
+  type ExtensionCommandContext,
+  type ExtensionContext,
 } from "@earendil-works/pi-coding-agent";
-import { execFileSync, spawn } from "node:child_process";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { spawn } from "node:child_process";
+import { rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -32,6 +33,11 @@ const HIDDEN_SKILLS = [
 type PromptPair = { before: string; after: string };
 type Skill = { name: string; disableModelInvocation: boolean };
 type StripResult = { prompt: string; removed: string[] };
+
+// Mirrors pi's formatSkillsForPrompt skill block shape:
+// https://github.com/earendil-works/pi/blob/8e1900666f3cb83c281297d8f787fae6ee2bd0e6/packages/coding-agent/src/core/skills.ts#L351-L355
+const SKILL_BLOCK_RE =
+  /\n  <skill>\n    <name>([^<]+)<\/name>\n    <description>[\s\S]*?<\/description>\n    <location>[\s\S]*?<\/location>\n  <\/skill>/g;
 
 export default function (pi: ExtensionAPI) {
   let lastPromptPair: PromptPair | undefined;
@@ -57,9 +63,17 @@ export default function (pi: ExtensionAPI) {
     },
     handler: async (args, ctx) => {
       if (args.trim() === "diff") {
-        const before = lastPromptPair?.before ?? ctx.getSystemPrompt();
-        const promptPair = lastPromptPair ?? { before, after: stripHiddenSkills(before).prompt };
-        const diff = buildPromptDiff(promptPair);
+        const currentPrompt = ctx.getSystemPrompt();
+        const promptPair = lastPromptPair ?? {
+          before: currentPrompt,
+          after: stripHiddenSkills(currentPrompt).prompt,
+        };
+        const diff =
+          promptPair.before === promptPair.after
+            ? ""
+            : generateUnifiedPatch("system-prompt", promptPair.before, promptPair.after)
+                .replace("--- system-prompt\n", "--- system-prompt.before\n")
+                .replace("+++ system-prompt\n", "+++ system-prompt.after\n");
         if (!diff) ctx.ui.notify("System prompt diff: (none; extension made no changes)", "info");
         else await openDiffInEditor(ctx, diff);
         return;
@@ -72,19 +86,13 @@ export default function (pi: ExtensionAPI) {
 
 function stripHiddenSkills(systemPrompt: string): StripResult {
   const removed: string[] = [];
-  const prompt = systemPrompt.replace(skillBlockRegex(), (block, name: string) => {
+  const prompt = systemPrompt.replace(SKILL_BLOCK_RE, (block, name: string) => {
     if (!HIDDEN_SKILLS.includes(name)) return block;
     removed.push(name);
     return "";
   });
 
   return { prompt, removed };
-}
-
-function skillBlockRegex(): RegExp {
-  // Mirrors pi's formatSkillsForPrompt skill block shape:
-  // https://github.com/earendil-works/pi/blob/8e1900666f3cb83c281297d8f787fae6ee2bd0e6/packages/coding-agent/src/core/skills.ts#L351-L355
-  return /\n  <skill>\n    <name>([^<]+)<\/name>\n    <description>[\s\S]*?<\/description>\n    <location>[\s\S]*?<\/location>\n  <\/skill>/g;
 }
 
 function checkDrift(ctx: Pick<ExtensionContext, "ui">, skills: Skill[], removed: string[]): void {
@@ -170,39 +178,4 @@ function buildStatus(skills: Skill[]): string {
 
   lines.push("", "Diff: /hidden-skills diff · Manual invoke still works: /skill:<name>");
   return lines.join("\n");
-}
-
-function buildPromptDiff({ before, after }: PromptPair): string {
-  if (before === after) return "";
-
-  const dir = mkdtempSync(join(tmpdir(), "pi-hide-skills-"));
-  const beforePath = join(dir, "system-prompt.before");
-  const afterPath = join(dir, "system-prompt.after");
-
-  try {
-    writeFileSync(beforePath, before);
-    writeFileSync(afterPath, after);
-    try {
-      return execFileSync(
-        "git",
-        ["diff", "--no-index", "--no-color", "--patience", "--", beforePath, afterPath],
-        { encoding: "utf8" },
-      );
-    } catch (error) {
-      const stdout = (error as { stdout?: Buffer | string }).stdout;
-      if (!stdout)
-        return `Failed to run git diff: ${error instanceof Error ? error.message : String(error)}`;
-
-      const diff = Buffer.isBuffer(stdout) ? stdout.toString("utf8") : stdout;
-      return diff
-        .split("\n")
-        .filter((line) => !line.startsWith("diff --git ") && !line.startsWith("index "))
-        .join("\n")
-        .replace(/^--- .*system-prompt\.before.*$/m, "--- system-prompt.before")
-        .replace(/^\+\+\+ .*system-prompt\.after.*$/m, "+++ system-prompt.after")
-        .trimEnd();
-    }
-  } finally {
-    rmSync(dir, { recursive: true, force: true });
-  }
 }

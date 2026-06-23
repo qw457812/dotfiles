@@ -1032,7 +1032,7 @@ return {
       vim.api.nvim_create_autocmd("BufRead", {
         group = vim.api.nvim_create_augroup("pi_extension_editor_custom", { clear = true }),
         pattern = {
-          tmpdir .. "/pi-extension-editor-*.diff", -- ~/.local/share/chezmoi/private_dot_pi/private_agent/extensions/hide-skills.ts
+          tmpdir .. "/pi-extension-editor-*.diff", -- https://github.com/qw457812/dotfiles/blob/11d12916f92d33ad960e89bd6bdf87f45592222a/private_dot_pi/private_agent/extensions/hide-skills.ts#L119-L119
         },
         once = true,
         callback = function(ev)
