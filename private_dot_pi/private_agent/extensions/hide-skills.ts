@@ -2,12 +2,12 @@
  * Local `disable-model-invocation: true` for selected package skills.
  *
  * Hides them from the system prompt while keeping `/skill:<name>` usable.
- * Use `/hidden-skills` to inspect configured skills and `/hidden-skills diff` to show
+ * Use `/hidden-skills` to inspect configured skills and `/hidden-skills diff` to open
  * the exact prompt change from the latest turn.
  */
 
 import type { ExtensionAPI, ExtensionCommandContext } from "@earendil-works/pi-coding-agent";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawn } from "node:child_process";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -49,10 +49,9 @@ export default function (pi: ExtensionAPI) {
       if (args.trim() === "diff") {
         const before = lastPromptPair?.before ?? ctx.getSystemPrompt();
         const promptPair = lastPromptPair ?? { before, after: stripHiddenSkills(before) };
-        ctx.ui.notify(
-          buildPromptDiff(promptPair) || "System prompt diff: (none; extension made no changes)",
-          "info",
-        );
+        const diff = buildPromptDiff(promptPair);
+        if (!diff) ctx.ui.notify("System prompt diff: (none; extension made no changes)", "info");
+        else await openDiffInEditor(ctx, diff);
         return;
       }
 
@@ -101,6 +100,54 @@ function skillNamesInPrompt(systemPrompt: string): Set<string> {
   const names = new Set<string>();
   for (const match of systemPrompt.matchAll(skillBlockRegex())) names.add(match[1]);
   return names;
+}
+
+async function openDiffInEditor(ctx: ExtensionCommandContext, diff: string): Promise<void> {
+  // Based on pi's external editor flow:
+  // https://github.com/earendil-works/pi/blob/8e1900666f3cb83c281297d8f787fae6ee2bd0e6/packages/coding-agent/src/modes/interactive/components/extension-editor.ts#L113-L155
+  // and the extension example for releasing/restoring the TUI around an inherited stdio process:
+  // https://github.com/earendil-works/pi/blob/8e1900666f3cb83c281297d8f787fae6ee2bd0e6/packages/coding-agent/examples/extensions/interactive-shell.ts#L155-L179
+  const editorCmd = process.env.VISUAL || process.env.EDITOR;
+  if (ctx.mode !== "tui" || !editorCmd) {
+    ctx.ui.notify(diff, "info");
+    return;
+  }
+
+  await ctx.ui.custom<void>((tui, _theme, _kb, done) => {
+    const filePath = join(tmpdir(), `pi-hidden-skills-${Date.now()}.diff`);
+    let stopped = false;
+
+    void (async () => {
+      try {
+        writeFileSync(filePath, diff);
+        tui.stop();
+        stopped = true;
+
+        const [editor, ...editorArgs] = editorCmd.split(" ");
+        process.stdout.write(
+          `Opening ${filePath} in ${editorCmd}\nPi will resume when the editor exits.\n`,
+        );
+        await new Promise<void>((resolve) => {
+          const child = spawn(editor, [...editorArgs, filePath], {
+            stdio: "inherit",
+            shell: process.platform === "win32",
+            env: process.env,
+          });
+          child.on("error", () => resolve());
+          child.on("close", () => resolve());
+        });
+      } finally {
+        rmSync(filePath, { force: true });
+        if (stopped) {
+          tui.start();
+          tui.requestRender(true);
+        }
+        done();
+      }
+    })();
+
+    return { render: () => [], invalidate: () => {} };
+  });
 }
 
 function buildStatus(skills: Skill[]): string {
