@@ -105,8 +105,6 @@ function checkDrift(ctx: Pick<ExtensionContext, "ui">, skills: Skill[], removed:
 
   if (missing.length > 0) lines.push(`failed to strip ${missing.join(", ")}`);
   if (extra.length > 0) lines.push(`unexpectedly stripped ${extra.join(", ")}`);
-  if (removed.length !== expected.length)
-    lines.push(`expected ${expected.length} strip(s), got ${removed.length}`);
   if (lines.length === 0) return;
 
   ctx.ui.notify(`hide-skills: ${lines.join("; ")}. Run /hidden-skills diff.`, "warning");

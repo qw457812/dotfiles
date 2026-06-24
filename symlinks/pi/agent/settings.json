@@ -15,7 +15,7 @@
     "deepseek/deepseek-v4-pro",
     "xiaomi/mimo-v2.5-pro",
     "neuralwatt/glm-5.2",
-    "neuralwatt/glm-5.2-short",
+    "neuralwatt/glm-5.2-short-flex",
     "neuralwatt/kimi-k2.7-code"
   ],
   "packages": [
@@ -32,7 +32,9 @@
         "skills/frontend-design",
         "skills/web-browser"
       ],
-      "prompts": [],
+      "prompts": [
+        "commands/discuss.md"
+      ],
       "themes": []
     },
     {

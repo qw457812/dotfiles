@@ -214,6 +214,8 @@ export default function (pi: ExtensionAPI) {
       return;
     }
 
+    // TODO: event now carries reason/willRetry (manual/threshold/overflow), e.g. could tune compression ratio
+    // https://github.com/earendil-works/pi/commit/5b9b70d2
     const { preparation, customInstructions, signal, branchEntries } = event;
     const { messagesToSummarize, turnPrefixMessages, tokensBefore, firstKeptEntryId, fileOps } =
       preparation;

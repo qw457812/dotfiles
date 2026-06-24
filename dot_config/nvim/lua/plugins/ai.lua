@@ -140,6 +140,7 @@ return {
         lazy = true,
         config = function() end,
       },
+      { "dannote/dot-pi", name = "dannote-dot-pi", lazy = true, config = function() end },
     },
   },
   { "qw457812/claude-code-sourcemap", pin = true, lazy = true, config = function() end },
