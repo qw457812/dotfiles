@@ -61,7 +61,7 @@ export default function (pi: ExtensionAPI) {
         if (ctx.hasUI) {
           const message =
             applyResult.stderr.trim() || `chezmoi exited with code ${applyResult.code}`;
-          ctx.ui.notify(`chezmoi apply failed for ${targetPath}: ${message}`, "warning");
+          ctx.ui.notify(`chezmoi apply failed: ${message}`, "warning");
         }
       } else {
         // Target file edited -> re-add to source
@@ -86,7 +86,7 @@ export default function (pi: ExtensionAPI) {
         if (ctx.hasUI) {
           const message =
             reAddResult.stderr.trim() || `chezmoi exited with code ${reAddResult.code}`;
-          ctx.ui.notify(`chezmoi re-add failed for ${filePath}: ${message}`, "warning");
+          ctx.ui.notify(`chezmoi re-add failed: ${message}`, "warning");
         }
       }
     };
