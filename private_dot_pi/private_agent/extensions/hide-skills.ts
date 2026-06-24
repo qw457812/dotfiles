@@ -124,7 +124,7 @@ async function openDiffInEditor(ctx: ExtensionCommandContext, diff: string): Pro
   }
 
   await ctx.ui.custom<void>((tui, _theme, _kb, done) => {
-    const filePath = join(tmpdir(), `pi-extension-editor-hide-skills-${Date.now()}.diff`);
+    const filePath = join(tmpdir(), `pi-extension-pager-hide-skills-${Date.now()}.diff`);
     let stopped = false;
 
     void (async () => {

@@ -1031,15 +1031,13 @@ return {
       })
 
       vim.api.nvim_create_autocmd("BufRead", {
-        group = vim.api.nvim_create_augroup("pi_extension_editor_custom", { clear = true }),
-        pattern = {
-          tmpdir .. "/pi-extension-editor-*.diff", -- https://github.com/qw457812/dotfiles/blob/11d12916f92d33ad960e89bd6bdf87f45592222a/private_dot_pi/private_agent/extensions/hide-skills.ts#L119-L119
-        },
+        group = vim.api.nvim_create_augroup("my_pi_extension_pager", { clear = true }),
+        -- ~/.local/share/chezmoi/private_dot_pi/private_agent/extensions/hide-skills.ts
+        pattern = tmpdir .. "/pi-extension-pager-*",
         once = true,
         callback = function(ev)
-          if vim.bo[ev.buf].filetype == "diff" then
-            vim.bo[ev.buf].modifiable = false
-          end
+          vim.bo[ev.buf].modifiable = false
+          vim.diagnostic.enable(false, { bufnr = ev.buf })
         end,
       })
 

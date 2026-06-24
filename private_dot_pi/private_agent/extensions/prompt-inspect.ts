@@ -277,7 +277,7 @@ async function openInEditor(
   }
 
   await ctx.ui.custom<void>((tui, _theme, _kb, done) => {
-    const filePath = join(tmpdir(), `pi-extension-editor-prompt-inspect-${Date.now()}.${ext}`);
+    const filePath = join(tmpdir(), `pi-extension-pager-prompt-inspect-${Date.now()}.${ext}`);
     let stopped = false;
 
     void (async () => {
