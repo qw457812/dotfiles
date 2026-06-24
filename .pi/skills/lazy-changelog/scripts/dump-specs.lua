@@ -12,9 +12,9 @@
 --     skip      "" | "pin" | "local" | "not-installed"
 --               Mirrors checker.fast_check's skip conditions. (disabled/clean
 --               plugins never enter lazy.plugins(), so never reach here.)
---     installed current HEAD commit from Git.info ("" if dir has no .git)
---     target    lazy's update target commit from Git.get_target ("" on error
---               or when get_target returns no commit)
+--     installed current HEAD commit from Git.info ("" only for skipped plugins)
+--     target    lazy's update target commit from Git.get_target ("" only for
+--               skipped plugins)
 --
 -- installed/target are computed with lazy's OWN Git.info / Git.get_target, so
 -- the comparison is identical to what :Lazy check / checker.fast_check do.
@@ -72,13 +72,22 @@ for _, p in ipairs(lazy.plugins()) do
     skip = "not-installed"
   else
     local info_ok, info = pcall(Git.info, dir)
-    if info_ok and info and info.commit then
-      installed = info.commit
+    if not info_ok then
+      error(string.format("dump-specs.lua: Git.info failed for %s (%s): %s", name, dir, tostring(info)))
     end
-    local tok, tgt = pcall(Git.get_target, p)
-    if tok and tgt and tgt.commit then
-      target = tgt.commit
+    if not (info and info.commit) then
+      error(string.format("dump-specs.lua: Git.info returned no commit for %s (%s)", name, dir))
     end
+    installed = info.commit
+
+    local target_ok, tgt = pcall(Git.get_target, p)
+    if not target_ok then
+      error(string.format("dump-specs.lua: Git.get_target failed for %s (%s): %s", name, dir, tostring(tgt)))
+    end
+    if not (tgt and tgt.commit) then
+      error(string.format("dump-specs.lua: Git.get_target returned no commit for %s (%s)", name, dir))
+    end
+    target = tgt.commit
   end
 
   -- origin URL for building github issue/PR links; reads the actual .git/config

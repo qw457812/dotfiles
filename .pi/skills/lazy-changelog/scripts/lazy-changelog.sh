@@ -64,11 +64,10 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 # Writes atomically via a tmp file; nvim's own stdout (iTerm2 OSC sequences,
 # plugin chatter) is sent to /dev/null and can never reach the data. Writes a
 # one-line "wrote N plugins" status to stderr; on failure writes the error to
-# stderr and exits non-zero. (Runs in the command-substitution subshell below,
-# so its vars don't leak and its exit propagates as the captured $?.)
+# stderr and returns non-zero.
 refresh_specs() {
   dump_lua="$SCRIPT_DIR/dump-specs.lua"
-  [ -f "$dump_lua" ] || { echo "error: dump-specs.lua missing: $dump_lua" >&2; exit 1; }
+  [ -f "$dump_lua" ] || { echo "error: dump-specs.lua missing: $dump_lua" >&2; return 1; }
 
   # locate nvim: explicit $NVIM, else PATH, else common install paths (Termux,
   # bob, Homebrew, system).
@@ -80,10 +79,18 @@ refresh_specs() {
   fi
   if [ -z "$nvim" ] || [ ! -x "$nvim" ]; then
     echo "error: nvim not found. Set \$NVIM or add it to PATH." >&2
-    exit 1
+    return 1
   fi
 
-  mkdir -p "$(dirname "$SPEC_FILE")"
+  spec_dir="$(dirname "$SPEC_FILE")"
+  if ! mkdir -p "$spec_dir"; then
+    echo "error: cannot create spec cache directory for $SPEC_FILE" >&2
+    return 1
+  fi
+  if [ ! -d "$spec_dir" ] || [ ! -w "$spec_dir" ]; then
+    echo "error: spec cache directory is not writable: $spec_dir" >&2
+    return 1
+  fi
   tmp="${SPEC_FILE}.$$"
 
   # dump-specs.lua writes the TSV straight to $tmp (via lazy.util.write_file)
@@ -94,19 +101,24 @@ refresh_specs() {
   # nvim otherwise writes ./nvim.log in its cwd, and we never cd, so it would
   # land wherever the caller ran from (the repo tree).
   rc=0
-  NVIM_LOG_FILE="$(dirname "$SPEC_FILE")/nvim.log" \
+  NVIM_LOG_FILE="$spec_dir/nvim.log" \
     LAZY_CHANGELOG_SPEC_FILE="$tmp" \
-    "$nvim" --headless +"luafile $dump_lua" +qa >/dev/null 2>&1 || rc=$?
+    "$nvim" --headless +"luafile $dump_lua" +qa >/dev/null 2>&1
+  rc=$?
 
   if [ "$rc" -ne 0 ] || [ ! -s "$tmp" ]; then
     echo "error: nvim headless run failed (exit $rc) or wrote no output." >&2
     echo "       try: LAZY_CHANGELOG_SPEC_FILE=$tmp $nvim --headless +luafile $dump_lua +qa" >&2
     rm -f "$tmp"
     [ "$rc" -ne 0 ] || rc=1
-    exit "$rc"
+    return "$rc"
   fi
 
-  mv "$tmp" "$SPEC_FILE"
+  if ! mv "$tmp" "$SPEC_FILE"; then
+    echo "error: cannot move refreshed specs into $SPEC_FILE" >&2
+    rm -f "$tmp"
+    return 1
+  fi
   echo "wrote $(wc -l < "$SPEC_FILE" | tr -d ' ') plugins to $SPEC_FILE" >&2
 }
 
@@ -114,22 +126,35 @@ refresh_specs() {
 # failure surface it; on success suppress the "wrote N plugins" line (the
 # footer reports the count) so report output (stdout) stays clean and all
 # status is grouped at the end.
-refresh_err="$(refresh_specs 2>&1)" || { echo "$refresh_err" >&2; exit $?; }
+refresh_err_file="${TMPDIR:-$HOME/.cache}/lazy-changelog.refresh.$$"
+if refresh_specs 2> "$refresh_err_file"; then
+  rm -f "$refresh_err_file"
+else
+  refresh_rc=$?
+  cat "$refresh_err_file" >&2
+  rm -f "$refresh_err_file"
+  exit "$refresh_rc"
+fi
 
 # Shorten $HOME to ~ for display (the restricted shell skips ${x/#$HOME/~}).
 short() { case "$1" in "$HOME"*) printf '~%s' "${1#$HOME}";; *) printf '%s' "$1";; esac; }
 
 log_fmt="--pretty=format:%h %s (%cr)"
 
-# Counters: the scan loop runs in a subshell (pipe), so in-memory counters
-# won't escape it. Append one byte per event and wc -c later.
+# Counters: append one byte per event and wc -c later.
 cnt_dir="${TMPDIR:-$HOME/.cache}/lazy-changelog.$$"
 mkdir -p "$cnt_dir"
 c_total="$cnt_dir/total"; c_out="$cnt_dir/outdated"; c_out_names="$cnt_dir/outdated_names"
 c_skip="$cnt_dir/skipped"; c_skip_reasons="$cnt_dir/skip_reasons"; c_ignored="$cnt_dir/ignored"
 : > "$c_total"; : > "$c_out"; : > "$c_out_names"; : > "$c_skip"; : > "$c_skip_reasons"; : > "$c_ignored"
 
-printf '%s\n' "$(cat "$SPEC_FILE")" | while IFS='|' read -r name pin is_local dir url skip installed target; do
+if [ ! -r "$SPEC_FILE" ]; then
+  echo "error: specs cache is not readable: $SPEC_FILE" >&2
+  rm -rf "$cnt_dir"
+  exit 1
+fi
+
+while IFS='|' read -r name pin is_local dir url skip installed target; do
   [ -n "$name" ] || { printf x >> "$c_ignored"; continue; }   # blank/garbage line
 
   # optional name filter — apply before skip/anomaly counting so the summary's
@@ -154,38 +179,57 @@ printf '%s\n' "$(cat "$SPEC_FILE")" | while IFS='|' read -r name pin is_local di
   if [ "${installed:0:7}" != "${target:0:7}" ]; then
     printf x >> "$c_out"
     printf '%s ' "$name" >> "$c_out_names"
-    full_inst="$(git -C "$dir" rev-parse -q --verify "${installed}^{commit}" 2>/dev/null)"; [ -n "$full_inst" ] || full_inst="$installed"
-    full_tgt="$(git -C "$dir" rev-parse -q --verify "${target}^{commit}" 2>/dev/null)"; [ -n "$full_tgt" ] || full_tgt="$target"
+    full_inst="$(git -C "$dir" rev-parse -q --verify "${installed}^{commit}" 2>/dev/null)"
+    if [ -z "$full_inst" ]; then
+      echo "error: cannot resolve installed commit $installed for $name in $dir" >&2
+      rm -rf "$cnt_dir"
+      exit 1
+    fi
+    full_tgt="$(git -C "$dir" rev-parse -q --verify "${target}^{commit}" 2>/dev/null)"
+    if [ -z "$full_tgt" ]; then
+      echo "error: cannot resolve target commit $target for $name in $dir" >&2
+      rm -rf "$cnt_dir"
+      exit 1
+    fi
     # short host path (e.g. github.com/owner/repo, gitlab.com/group/repo) for
     # follow-up links (compare/PR/issue). Derived from the spec's origin url
     # (Git.get_origin = the actual remote), so host is kept — github-only
     # normalization would hide the host of gitlab/etc plugins.
-    # NOTE: feed sed via a here-string — never `printf '%s' "$url" | sed`.
-    # A pipe inside this $(...) inherits the pipe-fed while-read loop's stdin
-    # (the specs data) and drains it, so `read` hits EOF after the first
-    # outdated plugin and `scanned=` underreports (2/9/37... instead of 138).
-    # The usual fixes are blocked by just-bash (the interpreter these scripts
-    # run under): `<(...)` is rejected by its parser ("Parse error: Expected
-    # redirection target") and a loop on a separate fd (`<&3`/`3<`) fails at
-    # runtime ("Bad file descriptor") — same constraint as the Termux
-    # "no process substitution" note at the top of this file. `<<<` is
-    # just-bash-legal and has no inner pipe, so it can't drain the loop stdin.
+    # Feed sed via a here-string so it never reads the while loop's specs stdin.
     repo="$(sed -E 's#\.git$##; s#^[a-z]+://##; s#^[^@/]+@##; s#:#/#' <<<"$url")"
     repo_tag=""; [ -n "$repo" ] && repo_tag="  ($repo)"
     if [ "$list_mode" = "1" ]; then
-      n="$(git -C "$dir" rev-list --count "$full_inst..$full_tgt" 2>/dev/null)"
-      printf '%-28s %s..%s  %s commits  @ %s%s\n' "$name" "${full_inst:0:8}" "${full_tgt:0:8}" "${n:-?}" "$(short "$dir")" "$repo_tag"
+      rev_file="$cnt_dir/rev_count"
+      if ! git -C "$dir" rev-list --count "$full_inst..$full_tgt" > "$rev_file"; then
+        echo "error: git rev-list failed for $name ($full_inst..$full_tgt) in $dir" >&2
+        rm -rf "$cnt_dir"
+        exit 1
+      fi
+      n="$(cat "$rev_file")"
+      printf '%-28s %s..%s  %s commits  @ %s%s\n' "$name" "${full_inst:0:8}" "${full_tgt:0:8}" "$n" "$(short "$dir")" "$repo_tag"
     else
       printf '## %s  %s..%s  @ %s%s\n' "$name" "${full_inst:0:8}" "${full_tgt:0:8}" "$(short "$dir")" "$repo_tag"
       if [ "$limit" -gt 0 ] 2>/dev/null; then
-        git -C "$dir" log -n "$limit" --no-color "$log_fmt" "$full_inst..$full_tgt" 2>/dev/null
+        git -C "$dir" log -n "$limit" --no-color "$log_fmt" "$full_inst..$full_tgt"
+        log_rc=$?
       else
-        git -C "$dir" log --no-color "$log_fmt" "$full_inst..$full_tgt" 2>/dev/null
+        git -C "$dir" log --no-color "$log_fmt" "$full_inst..$full_tgt"
+        log_rc=$?
+      fi
+      if [ "$log_rc" -ne 0 ]; then
+        echo "error: git log failed for $name ($full_inst..$full_tgt) in $dir" >&2
+        rm -rf "$cnt_dir"
+        exit "$log_rc"
       fi
       echo
     fi
   fi
-done
+done < "$SPEC_FILE"
+scan_rc=$?
+if [ "$scan_rc" -ne 0 ]; then
+  rm -rf "$cnt_dir"
+  exit "$scan_rc"
+fi
 
 echo "----" >&2
 n_total="$(wc -c < "$c_total" | tr -d '[:space:]')"; n_out="$(wc -c < "$c_out" | tr -d '[:space:]')"
