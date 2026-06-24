@@ -4,9 +4,11 @@
  * Command:
  *   /prompt-inspect              Open the effective system prompt (ctx.getSystemPrompt())
  *                                in $VISUAL/$EDITOR.
- *   /prompt-inspect payload      Open the last provider request payload, captured from
- *                                `before_provider_request`. Send any message first so
- *                                there is something to show.
+ *   /prompt-inspect payload      Open the last provider request payload plus its HTTP
+ *                                response (status + headers). The request is captured in
+ *                                `before_provider_request`; the response in `after_provider_response`
+ *                                (body is consumed before that event, so only status/headers).
+ *                                Send any message first so there is something to show.
  *   /prompt-inspect diff         Diff three snapshots of the system prompt, split into the
  *                                two extension-mutable stages:
  *               - base -> effective: before_agent_start rewrites (e.g. hide-skills.ts).
@@ -57,8 +59,12 @@
  *     https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/coding-agent/src/core/agent-session.ts#L825
  *   emitBeforeAgentStart chains getSystemPrompt across handlers:
  *     https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/coding-agent/src/core/extensions/runner.ts#L980
- *   emitBeforeProviderRequest runs AFTER payload serialization (stage 2):
+ *   after_provider_request runs AFTER payload serialization (stage 2):
  *     https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/coding-agent/src/core/extensions/runner.ts#L946
+ *   after_provider_response emits HTTP status + headers (no body):
+ *     https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/coding-agent/src/core/sdk.ts#L339
+ *   ProviderResponse carries only status + headers:
+ *     https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/ai/src/types.ts#L104
  *   context event (transformContext) also fires after before_agent_start, so
  *   it cannot serve as an unmodified base anchor:
  *     https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/coding-agent/src/core/sdk.ts#L351
@@ -82,6 +88,8 @@ let basePrompt: string | undefined;
  */
 let effectivePrompt: string | undefined;
 let lastPayload: unknown = undefined;
+/** Last provider response (status + headers); body is consumed before this fires. */
+let lastResponse: { status: number; headers: Record<string, string> } | undefined = undefined;
 
 type Rec = Record<string, unknown>;
 type TextPart = { text?: unknown };
@@ -166,6 +174,13 @@ export default function (pi: ExtensionAPI) {
     effectivePrompt = ctx.getSystemPrompt();
   });
 
+  // response: HTTP status + headers from after_provider_response, captured per
+  // request. The stream body is consumed before this event, so only status/headers
+  // are available (ProviderResponse carries no body).
+  pi.on("after_provider_response", (event) => {
+    lastResponse = { status: event.status, headers: event.headers };
+  });
+
   pi.registerCommand("prompt-inspect", {
     description: "Inspect the system prompt (payload | diff)",
     getArgumentCompletions(prefix) {
@@ -181,7 +196,8 @@ export default function (pi: ExtensionAPI) {
           ctx.ui.notify("No provider request yet. Send a message first.", "warning");
           return;
         }
-        await openInEditor(ctx, JSON.stringify(lastPayload, null, 2), "json");
+        const dump = { request: lastPayload, response: lastResponse ?? null };
+        await openInEditor(ctx, JSON.stringify(dump, null, 2), "json");
         return;
       }
       if (arg === "diff") {
