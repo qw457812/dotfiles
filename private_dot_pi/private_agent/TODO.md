@@ -4,4 +4,5 @@
 
 ## Vision
 
+- [monotykamary/pi-vision-handoff](https://github.com/monotykamary/pi-vision-handoff)
 - [monotykamary/pi-umans-provider](https://github.com/monotykamary/pi-umans-provider)

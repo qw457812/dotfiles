@@ -116,12 +116,12 @@ return {
       --   lazy = true,
       --   config = function() end,
       -- },
-      -- {
-      --   "monotykamary/pi-invisible-continue",
-      --   build = "pi update --extension git:github.com/monotykamary/pi-invisible-continue",
-      --   lazy = true,
-      --   config = function() end,
-      -- },
+      {
+        "monotykamary/pi-invisible-continue",
+        build = "pi update --extension git:github.com/monotykamary/pi-invisible-continue",
+        lazy = true,
+        config = function() end,
+      },
       {
         "monotykamary/pi-retry",
         build = "pi update --extension git:github.com/monotykamary/pi-retry",
@@ -1032,8 +1032,7 @@ return {
 
       vim.api.nvim_create_autocmd("BufRead", {
         group = vim.api.nvim_create_augroup("my_pi_extension_pager", { clear = true }),
-        -- ~/.local/share/chezmoi/private_dot_pi/private_agent/extensions/hide-skills.ts
-        pattern = tmpdir .. "/pi-extension-pager-*",
+        pattern = tmpdir .. "/pi-extension-pager-*", -- https://github.com/qw457812/dotfiles/blob/d0187b8cabdaadb586eaf9302d519bebb71bddcc/private_dot_pi/private_agent/extensions/hide-skills.ts#L127
         once = true,
         callback = function(ev)
           vim.bo[ev.buf].modifiable = false
