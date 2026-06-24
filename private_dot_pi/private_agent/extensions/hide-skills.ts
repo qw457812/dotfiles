@@ -6,6 +6,8 @@
  * the exact prompt change from the latest turn.
  */
 
+// See also: https://github.com/earendil-works/pi/blob/3e5ad67e0f325d4888f82f9b82966218eb4407f5/packages/coding-agent/examples/extensions/prompt-customizer.ts
+
 import {
   generateUnifiedPatch,
   type ExtensionAPI,
