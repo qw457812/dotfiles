@@ -10,11 +10,10 @@ Report lazy.nvim plugins where **installed** (current HEAD) differs from
 **target** (lazy's update commit), then show the `git log installed..target`
 changelog.
 
-## Deterministic run
+## Steps
 
 1. **Read the changelog.** Run without filters to see every outdated plugin's
-   commits. The script first re-reads lazy's `installed`/`target` via headless
-   nvim (a brief refresh):
+   commits:
 
    ```bash
    bash scripts/lazy-changelog.sh
@@ -52,17 +51,15 @@ changelog.
 
 ## Command notes
 
-- Reports are based on the on-disk `origin/<branch>` refs, i.e. whatever your
-  last Neovim session fetched. They can **underreport** new updates if those
-  refs are stale; the changelog dates help you judge freshness. Run `:Lazy check`
-  in Neovim for a fast fetch with progress (or headless:
-  `nvim --headless +"Lazy! check" +qa`).
+- Reports read the on-disk `origin/<branch>` refs — whatever your last Neovim
+  session fetched — so they can **underreport** new updates when those refs are
+  stale; the changelog dates help you judge freshness. Fetching upstream is the
+  human's job: never run `:Lazy check` yourself (not even the headless
+  `Lazy! check` form). If a report looks stale, ask the human to run `:Lazy check`,
+  then re-run this skill.
 
 ## Files
 
-- `scripts/lazy-changelog.sh` — the entry point Step 1 runs. Refreshes specs
-  (headless nvim) then scans, printing each outdated plugin's
-  `installed..target` log. `dump-specs.lua` is invoked through it.
-- `scripts/dump-specs.lua` — runs inside Neovim; emits the per-plugin
-  `name|pin|is_local|dir|url|skip|installed|target` TSV the scan reads. Data,
-  not output you'd call directly.
+- `scripts/lazy-changelog.sh` — the entry point.
+- `scripts/dump-specs.lua` — runs inside nvim (needs lazy loaded), invoked by
+  the script above.

@@ -13,8 +13,8 @@
 #
 # It always re-dumps specs first (headless nvim) so installed/target
 # reflect lazy's latest resolution and the refs your last `:Lazy check` wrote.
-# Run `:Lazy check` in Neovim first for fresh upstream status (or headless:
-# `nvim --headless +"Lazy! check" +qa`).
+# This script never fetches upstream — that's `:Lazy check`, a manual nvim step
+# the human runs beforehand when they want fresh refs.
 #
 # NOTE: written for Termux's restricted `bash` — no process substitution, no
 # trap. jq is NOT required (specs cache is already TSV).
@@ -32,8 +32,8 @@ Usage: lazy-changelog.sh [--limit N] [--list] [plugin ...]
 
 Prints the changelog (git log) of commits an update would pull for lazy.nvim
 plugins behind their update target. Output matches :Lazy check's "Updates".
-Always re-dumps specs first via headless nvim. Run :Lazy check in nvim
-beforehand for fresh upstream refs.
+Always re-dumps specs first via headless nvim. This script never fetches
+upstream — run :Lazy check in nvim beforehand when you want fresh refs.
 
 Options:
   --limit N      cap changelog commits per plugin (0 = all)
