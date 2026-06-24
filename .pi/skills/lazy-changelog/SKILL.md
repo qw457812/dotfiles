@@ -13,7 +13,8 @@ changelog.
 ## Deterministic run
 
 1. **Read the changelog.** Run without filters to see every outdated plugin's
-   commits:
+   commits. The script first re-reads lazy's `installed`/`target` via headless
+   nvim (a brief refresh):
 
    ```bash
    bash scripts/lazy-changelog.sh
@@ -31,8 +32,9 @@ changelog.
    git -C <dir> diff <installed>..<target> -- '*.lua' # scope to a path
    ```
 
-   Completion criterion: the change in the files is understood, or you decide
-   the changelog alone was enough (skip this plugin's diff).
+   Completion criterion: you can state the diff's impact in one sentence —
+   e.g. docs-only, a new config key, a breaking change to an API you use —
+   or you decide the changelog alone was enough and skip the diff.
 
 3. **Open the related issue/PR when a commit references one.** Commits often
    carry `#NNNN`; each outdated plugin's header ends with a short host path
@@ -45,7 +47,8 @@ changelog.
    # gitlab.com/$group/$repo/-/merge_requests/<NNNN>
    ```
 
-   Completion criterion: every `#NNNN` you needed context on is read.
+   Completion criterion: every `#NNNN` whose commit message doesn't make the
+   change self-evident is read.
 
 ## Command notes
 
@@ -57,7 +60,9 @@ changelog.
 
 ## Files
 
-- `scripts/dump-specs.lua` — runs inside Neovim, emits
-  `name|pin|is_local|dir|url|skip|installed|target`.
-- `scripts/refresh-specs.sh` — writes `~/.cache/lazy-changelog/specs.tsv`.
-- `scripts/lazy-changelog.sh` — compares installed/target and prints logs.
+- `scripts/lazy-changelog.sh` — the entry point Step 1 runs. Refreshes specs
+  (headless nvim) then scans, printing each outdated plugin's
+  `installed..target` log. `dump-specs.lua` is invoked through it.
+- `scripts/dump-specs.lua` — runs inside Neovim; emits the per-plugin
+  `name|pin|is_local|dir|url|skip|installed|target` TSV the scan reads. Data,
+  not output you'd call directly.

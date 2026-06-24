@@ -11,7 +11,7 @@
 # (exactly lazy's log task range). Everything else is skipped the same way
 # lazy's fast_check skips it.
 #
-# It always re-dumps specs first (headless nvim, ~1s) so installed/target
+# It always re-dumps specs first (headless nvim) so installed/target
 # reflect lazy's latest resolution and the refs your last `:Lazy check` wrote.
 # Run `:Lazy check` in Neovim first for fresh upstream status (or headless:
 # `nvim --headless +"Lazy! check" +qa`).
@@ -32,7 +32,7 @@ Usage: lazy-changelog.sh [--limit N] [--list] [plugin ...]
 
 Prints the changelog (git log) of commits an update would pull for lazy.nvim
 plugins behind their update target. Output matches :Lazy check's "Updates".
-Always re-dumps specs first via headless nvim (~1s). Run :Lazy check in nvim
+Always re-dumps specs first via headless nvim. Run :Lazy check in nvim
 beforehand for fresh upstream refs.
 
 Options:
@@ -58,15 +58,62 @@ done
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
+# refresh_specs — re-dump lazy's (installed, target) via headless nvim, so the
+# scan reflects lazy's latest resolution and the on-disk refs your last
+# :Lazy check wrote. Called once per run (this skill is called rarely).
+# Writes atomically via a tmp file; nvim's own stdout (iTerm2 OSC sequences,
+# plugin chatter) is sent to /dev/null and can never reach the data. Writes a
+# one-line "wrote N plugins" status to stderr; on failure writes the error to
+# stderr and exits non-zero. (Runs in the command-substitution subshell below,
+# so its vars don't leak and its exit propagates as the captured $?.)
 refresh_specs() {
-  bash "$SCRIPT_DIR/refresh-specs.sh"
+  dump_lua="$SCRIPT_DIR/dump-specs.lua"
+  [ -f "$dump_lua" ] || { echo "error: dump-specs.lua missing: $dump_lua" >&2; exit 1; }
+
+  # locate nvim: explicit $NVIM, else PATH, else common install paths (Termux,
+  # bob, Homebrew, system).
+  nvim="${NVIM:-$(command -v nvim 2>/dev/null)}"
+  if [ -z "$nvim" ] || [ ! -x "$nvim" ]; then
+    for cand in "/data/data/com.termux/files/usr/bin/nvim" "$HOME/.local/share/bob/nvim-bin/nvim" "/opt/homebrew/bin/nvim" "/usr/bin/nvim" "$HOME/.local/bin/nvim"; do
+      [ -x "$cand" ] && nvim="$cand" && break
+    done
+  fi
+  if [ -z "$nvim" ] || [ ! -x "$nvim" ]; then
+    echo "error: nvim not found. Set \$NVIM or add it to PATH." >&2
+    exit 1
+  fi
+
+  mkdir -p "$(dirname "$SPEC_FILE")"
+  tmp="${SPEC_FILE}.$$"
+
+  # dump-specs.lua writes the TSV straight to $tmp (via lazy.util.write_file)
+  # when LAZY_CHANGELOG_SPEC_FILE is set, so nvim's own stdout never reaches
+  # the data — only $tmp is the source of truth.
+  #
+  # NVIM_LOG_FILE is pinned next to $SPEC_FILE (an already-writable cache dir):
+  # nvim otherwise writes ./nvim.log in its cwd, and we never cd, so it would
+  # land wherever the caller ran from (the repo tree).
+  rc=0
+  NVIM_LOG_FILE="$(dirname "$SPEC_FILE")/nvim.log" \
+    LAZY_CHANGELOG_SPEC_FILE="$tmp" \
+    "$nvim" --headless +"luafile $dump_lua" +qa >/dev/null 2>&1 || rc=$?
+
+  if [ "$rc" -ne 0 ] || [ ! -s "$tmp" ]; then
+    echo "error: nvim headless run failed (exit $rc) or wrote no output." >&2
+    echo "       try: LAZY_CHANGELOG_SPEC_FILE=$tmp $nvim --headless +luafile $dump_lua +qa" >&2
+    rm -f "$tmp"
+    [ "$rc" -ne 0 ] || rc=1
+    exit "$rc"
+  fi
+
+  mv "$tmp" "$SPEC_FILE"
+  echo "wrote $(wc -l < "$SPEC_FILE" | tr -d ' ') plugins to $SPEC_FILE" >&2
 }
 
-# Always re-dump specs (via headless nvim) so installed/target reflect the
-# latest lazy resolution and on-disk refs. ~1s; this skill is called rarely.
-# Capture refresh-specs.sh's stderr: on failure surface it; on success
-# suppress its "wrote N plugins" chatter (the footer reports it instead) so
-# report output (stdout) stays clean and all status is grouped at the end.
+# Always re-dump specs first (see refresh_specs above). Capture its stderr: on
+# failure surface it; on success suppress the "wrote N plugins" line (the
+# footer reports the count) so report output (stdout) stays clean and all
+# status is grouped at the end.
 refresh_err="$(refresh_specs 2>&1)" || { echo "$refresh_err" >&2; exit $?; }
 
 # Shorten $HOME to ~ for display (the restricted shell skips ${x/#$HOME/~}).
