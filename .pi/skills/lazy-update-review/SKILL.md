@@ -1,14 +1,15 @@
 ---
 name: lazy-update-review
-description: Review lazy.nvim-managed update changelogs and local config impact.
+description: Review lazy.nvim-managed package updates and local config impact.
 disable-model-invocation: true
 ---
 
 # lazy-update-review
 
-Report lazy.nvim-managed packages where **installed** (current HEAD) differs
-from **target** (lazy's update commit), show the `git log installed..target`
-changelog, and account for any required local config changes.
+Review lazy.nvim-managed package updates where **installed** (current HEAD)
+differs from **target** (lazy's update commit) by reading the
+`git log installed..target` changelog and accounting for any required local
+config changes.
 
 ## Steps
 
@@ -21,8 +22,8 @@ changelog, and account for any required local config changes.
 
    Completion criterion: every outdated plugin's `installed..target` range and
    commit log has been read. If there are too many to read at once, use `--list`
-   only to enumerate/batch plugins, then rerun with plugin filters until every
-   listed outdated plugin's log has been read.
+   only to enumerate/batch plugins, then rerun with plugin-name filters until
+   every listed outdated plugin's log has been read.
 
 2. **Diff a plugin when its changelog is ambiguous about impact.** The header
    carries the install dir (`@ <dir>`), `installed`, and `target`, so:
@@ -51,9 +52,9 @@ changelog, and account for any required local config changes.
    change self-evident is read.
 
 4. **Check whether local configs need updates.** Treat `lazy.nvim` as a general
-   package manager here: specs may install Neovim plugins, Pi packages, Yazi
-   plugins/flavors, or other tools. For every change that mentions changed
-   defaults, config keys, commands, events, APIs, build/install steps, or
+   package manager here: lazy specs may install Neovim plugins, Pi packages,
+   Yazi plugins/flavors, or other tools. For every package change that mentions
+   changed defaults, config keys, commands, events, APIs, build/install steps, or
    integrations you use, first find the owning lazy spec and build hook, then
    check that package's runtime config surface:
 
@@ -69,9 +70,9 @@ changelog, and account for any required local config changes.
    config edit, or needs a follow-up question to the human.
 
 5. **Update this skill when the config-surface map was incomplete.** If step 4
-   missed a package class, owning spec location, build/install hook pattern, or
-   runtime config path you had to discover during the review, edit this skill
-   before reporting.
+   missed a package class, owning lazy spec location, build/install hook
+   pattern, or runtime config path you had to discover during the review, edit
+   this skill before reporting.
 
    Completion criterion: either step 4 covered every discovered surface, or it
    now names the new surface and the search command that finds it.
