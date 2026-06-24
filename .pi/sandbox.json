@@ -6,7 +6,7 @@
       "node",
       "npm",
       "npx",
-      "nvim" // in favor of `/skill:lazy-changelog`
+      "nvim" // in favor of `/skill:lazy-update-review`
     ]
   }
 }

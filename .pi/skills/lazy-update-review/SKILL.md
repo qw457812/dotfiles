@@ -1,10 +1,10 @@
 ---
-name: lazy-changelog
+name: lazy-update-review
 description: Review lazy.nvim-managed update changelogs and local config impact.
 disable-model-invocation: true
 ---
 
-# lazy-changelog
+# lazy-update-review
 
 Report lazy.nvim-managed packages where **installed** (current HEAD) differs
 from **target** (lazy's update commit), show the `git log installed..target`
@@ -16,7 +16,7 @@ changelog, and account for any required local config changes.
    commits:
 
    ```bash
-   bash scripts/lazy-changelog.sh
+   bash scripts/lazy-update-review.sh
    ```
 
    Completion criterion: every outdated plugin's `installed..target` range and
@@ -88,6 +88,6 @@ changelog, and account for any required local config changes.
 
 ## Files
 
-- `scripts/lazy-changelog.sh` — the entry point.
-- `scripts/dump-specs.lua` — runs inside nvim (needs lazy loaded), invoked by
+- `scripts/lazy-update-review.sh` — the entry point.
+- `scripts/dump-plugin-state.lua` — runs inside nvim (needs lazy loaded), invoked by
   the script above.

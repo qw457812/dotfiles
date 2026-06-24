@@ -52,7 +52,7 @@
         "~/.npm",
         "~/.bun",
         "~/.cache", // in favor of `/skill:librarian`
-        "~/.local/share/nvim/lazy" // in favor of `/skill:lazy-changelog` (partial-clone pack fetch from `git diff <installed>..<target>`)
+        "~/.local/share/nvim/lazy" // in favor of `/skill:lazy-update-review` (partial-clone pack fetch from `git diff <installed>..<target>`)
       ]
     }
   },

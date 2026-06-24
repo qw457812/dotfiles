@@ -1,39 +1,41 @@
 #!/usr/bin/env bash
-# lazy-changelog.sh — report pending changelogs for lazy.nvim plugins that are
-# behind their update target, matching :Lazy check's "Updates" exactly.
+# lazy-update-review.sh — report pending changelogs for lazy.nvim plugins whose
+# installed commit is behind lazy's update target.
 #
-# It reads the specs cache (from dump-specs.lua), which already contains, per
-# plugin, lazy's OWN computed (installed, target) commits — using lazy's
-# Git.info / Git.get_target, so version="*", commit=, tag=, pin, disabled,
-# local plugins, and the defaults.version fallback are all handled by lazy.
+# It reads the plugin-state cache (from dump-plugin-state.lua), which already
+# contains, per plugin, lazy's OWN computed (installed, target) commits — using
+# lazy's Git.info / Git.get_target, so version="*", commit=, tag=, pin,
+# disabled, local plugins, and the defaults.version fallback are all handled by
+# lazy.
 #
-# For each plugin where installed != target, it prints `git log installed..target`
-# (exactly lazy's log task range). Everything else is skipped the same way
-# lazy's fast_check skips it.
+# For each non-skipped plugin where installed != target, it prints
+# `git log installed..target` (the same range lazy's git log task uses).
+# Pinned, local, and not-installed plugins are skipped like checker.fast_check;
+# metadata or git failures abort instead of being ignored.
 #
-# It always re-dumps specs first (headless nvim) so installed/target
-# reflect lazy's latest resolution and the refs your last `:Lazy check` wrote.
-# This script never fetches upstream — that's `:Lazy check`, a manual nvim step
-# the human runs beforehand when they want fresh refs.
+# It always re-dumps plugin state first (headless nvim) so installed/target
+# reflect lazy's latest resolution against the on-disk refs already present.
+# This script never fetches upstream, so it can underreport newer updates.
 #
 # NOTE: written for Termux's restricted `bash` — no process substitution, no
-# trap. jq is NOT required (specs cache is already TSV).
+# trap. jq is NOT required (the plugin-state cache is already TSV).
 
 set -u
 
-SPEC_FILE="${SPEC_FILE:-$HOME/.cache/lazy-changelog/specs.tsv}"
+PLUGIN_STATE_FILE="${PLUGIN_STATE_FILE:-$HOME/.cache/lazy-update-review/plugin-state.tsv}"
 
 limit=0
 list_mode=0
 filter=""
 usage() {
   cat <<'EOF'
-Usage: lazy-changelog.sh [--limit N] [--list] [plugin ...]
+Usage: lazy-update-review.sh [--limit N] [--list] [plugin ...]
 
-Prints the changelog (git log) of commits an update would pull for lazy.nvim
-plugins behind their update target. Output matches :Lazy check's "Updates".
-Always re-dumps specs first via headless nvim. This script never fetches
-upstream — run :Lazy check in nvim beforehand when you want fresh refs.
+Prints the `git log installed..target` changelog for lazy.nvim plugins whose
+installed commit is behind lazy's update target. Uses lazy.nvim's own
+installed/target resolution and re-dumps plugin state first via headless nvim.
+This script never fetches upstream, so results are bounded by the on-disk refs
+already present.
 
 Options:
   --limit N      cap changelog commits per plugin (0 = all)
@@ -41,7 +43,7 @@ Options:
   plugin ...     only scan these plugin names (default: all non-skipped)
 
 Env:
-  SPEC_FILE  resolved-specs cache (default: ~/.cache/lazy-changelog/specs.tsv)
+  PLUGIN_STATE_FILE  plugin-state cache (default: ~/.cache/lazy-update-review/plugin-state.tsv)
 EOF
 }
 
@@ -58,16 +60,16 @@ done
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# refresh_specs — re-dump lazy's (installed, target) via headless nvim, so the
-# scan reflects lazy's latest resolution and the on-disk refs your last
-# :Lazy check wrote. Called once per run (this skill is called rarely).
-# Writes atomically via a tmp file; nvim's own stdout (iTerm2 OSC sequences,
-# plugin chatter) is sent to /dev/null and can never reach the data. Writes a
-# one-line "wrote N plugins" status to stderr; on failure writes the error to
-# stderr and returns non-zero.
-refresh_specs() {
-  dump_lua="$SCRIPT_DIR/dump-specs.lua"
-  [ -f "$dump_lua" ] || { echo "error: dump-specs.lua missing: $dump_lua" >&2; return 1; }
+# refresh_plugin_state — re-dump lazy's (installed, target) via headless nvim,
+# so the scan reflects lazy's latest resolution against the on-disk refs
+# already present. Called once per run (this skill is called rarely). Writes
+# atomically via a tmp file; nvim's own stdout (iTerm2 OSC sequences, plugin
+# chatter) is sent to /dev/null and can never reach the data. Writes a one-line
+# "wrote N plugins" status to stderr; on failure writes the error to stderr and
+# returns non-zero.
+refresh_plugin_state() {
+  dump_lua="$SCRIPT_DIR/dump-plugin-state.lua"
+  [ -f "$dump_lua" ] || { echo "error: dump-plugin-state.lua missing: $dump_lua" >&2; return 1; }
 
   # locate nvim: explicit $NVIM, else PATH, else common install paths (Termux,
   # bob, Homebrew, system).
@@ -82,52 +84,53 @@ refresh_specs() {
     return 1
   fi
 
-  spec_dir="$(dirname "$SPEC_FILE")"
-  if ! mkdir -p "$spec_dir"; then
-    echo "error: cannot create spec cache directory for $SPEC_FILE" >&2
+  state_dir="$(dirname "$PLUGIN_STATE_FILE")"
+  if ! mkdir -p "$state_dir"; then
+    echo "error: cannot create plugin-state cache directory for $PLUGIN_STATE_FILE" >&2
     return 1
   fi
-  if [ ! -d "$spec_dir" ] || [ ! -w "$spec_dir" ]; then
-    echo "error: spec cache directory is not writable: $spec_dir" >&2
+  if [ ! -d "$state_dir" ] || [ ! -w "$state_dir" ]; then
+    echo "error: plugin-state cache directory is not writable: $state_dir" >&2
     return 1
   fi
-  tmp="${SPEC_FILE}.$$"
+  tmp="${PLUGIN_STATE_FILE}.$$"
 
-  # dump-specs.lua writes the TSV straight to $tmp (via lazy.util.write_file)
-  # when LAZY_CHANGELOG_SPEC_FILE is set, so nvim's own stdout never reaches
-  # the data — only $tmp is the source of truth.
+  # dump-plugin-state.lua writes the TSV straight to $tmp (via
+  # lazy.util.write_file) when LAZY_CHANGELOG_PLUGIN_STATE_FILE is set, so
+  # nvim's own stdout never reaches the data — only $tmp is the source of
+  # truth.
   #
-  # NVIM_LOG_FILE is pinned next to $SPEC_FILE (an already-writable cache dir):
-  # nvim otherwise writes ./nvim.log in its cwd, and we never cd, so it would
-  # land wherever the caller ran from (the repo tree).
+  # NVIM_LOG_FILE is pinned next to $PLUGIN_STATE_FILE (an already-writable
+  # cache dir): nvim otherwise writes ./nvim.log in its cwd, and we never cd,
+  # so it would land wherever the caller ran from (the repo tree).
   rc=0
-  NVIM_LOG_FILE="$spec_dir/nvim.log" \
-    LAZY_CHANGELOG_SPEC_FILE="$tmp" \
+  NVIM_LOG_FILE="$state_dir/nvim.log" \
+    LAZY_CHANGELOG_PLUGIN_STATE_FILE="$tmp" \
     "$nvim" --headless +"luafile $dump_lua" +qa >/dev/null 2>&1
   rc=$?
 
   if [ "$rc" -ne 0 ] || [ ! -s "$tmp" ]; then
     echo "error: nvim headless run failed (exit $rc) or wrote no output." >&2
-    echo "       try: LAZY_CHANGELOG_SPEC_FILE=$tmp $nvim --headless +luafile $dump_lua +qa" >&2
+    echo "       try: LAZY_CHANGELOG_PLUGIN_STATE_FILE=$tmp $nvim --headless +luafile $dump_lua +qa" >&2
     rm -f "$tmp"
     [ "$rc" -ne 0 ] || rc=1
     return "$rc"
   fi
 
-  if ! mv "$tmp" "$SPEC_FILE"; then
-    echo "error: cannot move refreshed specs into $SPEC_FILE" >&2
+  if ! mv "$tmp" "$PLUGIN_STATE_FILE"; then
+    echo "error: cannot move refreshed plugin state into $PLUGIN_STATE_FILE" >&2
     rm -f "$tmp"
     return 1
   fi
-  echo "wrote $(wc -l < "$SPEC_FILE" | tr -d ' ') plugins to $SPEC_FILE" >&2
+  echo "wrote $(wc -l < "$PLUGIN_STATE_FILE" | tr -d ' ') plugins to $PLUGIN_STATE_FILE" >&2
 }
 
-# Always re-dump specs first (see refresh_specs above). Capture its stderr: on
-# failure surface it; on success suppress the "wrote N plugins" line (the
-# footer reports the count) so report output (stdout) stays clean and all
-# status is grouped at the end.
-refresh_err_file="${TMPDIR:-$HOME/.cache}/lazy-changelog.refresh.$$"
-if refresh_specs 2> "$refresh_err_file"; then
+# Always re-dump plugin state first (see refresh_plugin_state above). Capture
+# its stderr: on failure surface it; on success suppress the "wrote N plugins"
+# line (the footer reports the count) so report output (stdout) stays clean and
+# all status is grouped at the end.
+refresh_err_file="${TMPDIR:-$HOME/.cache}/lazy-update-review.refresh.$$"
+if refresh_plugin_state 2> "$refresh_err_file"; then
   rm -f "$refresh_err_file"
 else
   refresh_rc=$?
@@ -142,14 +145,14 @@ short() { case "$1" in "$HOME"*) printf '~%s' "${1#$HOME}";; *) printf '%s' "$1"
 log_fmt="--pretty=format:%h %s (%cr)"
 
 # Counters: append one byte per event and wc -c later.
-cnt_dir="${TMPDIR:-$HOME/.cache}/lazy-changelog.$$"
+cnt_dir="${TMPDIR:-$HOME/.cache}/lazy-update-review.$$"
 mkdir -p "$cnt_dir"
 c_total="$cnt_dir/total"; c_out="$cnt_dir/outdated"; c_out_names="$cnt_dir/outdated_names"
 c_skip="$cnt_dir/skipped"; c_skip_reasons="$cnt_dir/skip_reasons"; c_ignored="$cnt_dir/ignored"
 : > "$c_total"; : > "$c_out"; : > "$c_out_names"; : > "$c_skip"; : > "$c_skip_reasons"; : > "$c_ignored"
 
-if [ ! -r "$SPEC_FILE" ]; then
-  echo "error: specs cache is not readable: $SPEC_FILE" >&2
+if [ ! -r "$PLUGIN_STATE_FILE" ]; then
+  echo "error: plugin-state cache is not readable: $PLUGIN_STATE_FILE" >&2
   rm -rf "$cnt_dir"
   exit 1
 fi
@@ -195,7 +198,7 @@ while IFS='|' read -r name pin is_local dir url skip installed target; do
     # follow-up links (compare/PR/issue). Derived from the spec's origin url
     # (Git.get_origin = the actual remote), so host is kept — github-only
     # normalization would hide the host of gitlab/etc plugins.
-    # Feed sed via a here-string so it never reads the while loop's specs stdin.
+    # Feed sed via a here-string so it never reads the while loop's input stream.
     repo="$(sed -E 's#\.git$##; s#^[a-z]+://##; s#^[^@/]+@##; s#:#/#' <<<"$url")"
     repo_tag=""; [ -n "$repo" ] && repo_tag="  ($repo)"
     if [ "$list_mode" = "1" ]; then
@@ -224,7 +227,7 @@ while IFS='|' read -r name pin is_local dir url skip installed target; do
       echo
     fi
   fi
-done < "$SPEC_FILE"
+done < "$PLUGIN_STATE_FILE"
 scan_rc=$?
 if [ "$scan_rc" -ne 0 ]; then
   rm -rf "$cnt_dir"
@@ -252,11 +255,11 @@ if [ -n "$n_skip" ] && [ "$n_skip" != "0" ]; then
   [ -n "$brk" ] && skip_summary="$skip_summary ($brk)"
 fi
 [ -n "$n_ign" ] && [ "$n_ign" != "0" ] && skip_summary="$skip_summary ignored=$n_ign"
-n_specs="$(wc -l < "$SPEC_FILE" | tr -d '[:space:]')"
+n_plugins="$(wc -l < "$PLUGIN_STATE_FILE" | tr -d '[:space:]')"
 if [ -n "$names" ]; then
   printf 'outdated=%s scanned=%s%s : %s\n' "$n_out" "$n_total" "$skip_summary" "$names" >&2
 else
   printf 'outdated=%s scanned=%s%s  (all up to date)\n' "$n_out" "$n_total" "$skip_summary" >&2
 fi
-printf '(re-dumped %s specs via headless nvim -> %s; refs from your last :Lazy check)\n' "$n_specs" "$(short "$SPEC_FILE")" >&2
+printf '(re-dumped %s plugins via headless nvim -> %s; using on-disk origin refs)\n' "$n_plugins" "$(short "$PLUGIN_STATE_FILE")" >&2
 rm -rf "$cnt_dir"

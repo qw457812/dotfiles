@@ -1,4 +1,4 @@
--- dump-specs.lua
+-- dump-plugin-state.lua
 -- Emit, for every lazy.nvim plugin, the exact (installed, target) commits that
 -- lazy itself uses to decide "outdated". An offline shell tool then only needs
 -- `git log installed..target` — no re-implementation of get_target/Semver/etc.
@@ -17,32 +17,35 @@
 --               skipped plugins)
 --
 -- installed/target are computed with lazy's OWN Git.info / Git.get_target, so
--- the comparison is identical to what :Lazy check / checker.fast_check do.
+-- successful comparisons use the same resolution logic as :Lazy check /
+-- checker.fast_check. Error handling here is stricter: non-skipped metadata
+-- failures abort instead of being ignored.
 --
 -- Output target:
---   If $LAZY_CHANGELOG_SPEC_FILE is set, writes the TSV there directly (this
---   is how lazy-changelog.sh captures clean output — nvim's own stdout, e.g.
---   iTerm2 OSC 1337 escape sequences, is discarded so it can never pollute
---   the data). Otherwise writes to stdout for manual `:luafile` use.
+--   If $LAZY_CHANGELOG_PLUGIN_STATE_FILE is set, writes the TSV there directly
+--   (this is how lazy-update-review.sh captures clean output — nvim's own stdout,
+--   e.g. iTerm2 OSC 1337 escape sequences, is discarded so it can never
+--   pollute the data). Otherwise writes to stdout for manual `:luafile` use.
 --
--- Usage (headless, via lazy-changelog.sh):
---   nvim --headless +"lua require('lazy')" +"luafile /path/dump-specs.lua" +qa
+-- Usage (headless, via lazy-update-review.sh):
+--   nvim --headless +"lua require('lazy')" +"luafile /path/dump-plugin-state.lua" +qa
 -- If lazy is lazy-loaded, just open your config first then :luafile it.
 
 local lazy_ok, lazy = pcall(require, "lazy")
 if not lazy_ok or not lazy then
-  io.stderr:write("dump-specs.lua: require('lazy') failed — run inside nvim with your config loaded\n")
+  io.stderr:write("dump-plugin-state.lua: require('lazy') failed — run inside nvim with your config loaded\n")
   return
 end
 local Git = require("lazy.manage.git")
 local Util = require("lazy.util")
 
--- When $LAZY_CHANGELOG_SPEC_FILE is set, accumulate lines and write them in
--- one shot via Util.write_file (which truncates on open, so a single write).
+-- When $LAZY_CHANGELOG_PLUGIN_STATE_FILE is set, accumulate lines and write
+-- them in one shot via Util.write_file (which truncates on open, so a single
+-- write).
 -- This keeps nvim's stdout (iTerm2 OSC sequences, plugin chatter) out of the
--- data; lazy-changelog.sh sets the env var and discards nvim stdout. Fall back
+-- data; lazy-update-review.sh sets the env var and discards nvim stdout. Fall back
 -- to stdout for manual `:luafile` use.
-local out_path = os.getenv("LAZY_CHANGELOG_SPEC_FILE")
+local out_path = os.getenv("LAZY_CHANGELOG_PLUGIN_STATE_FILE")
 local out_lines = {}
 local function emit(s)
   if out_path then
@@ -73,19 +76,19 @@ for _, p in ipairs(lazy.plugins()) do
   else
     local info_ok, info = pcall(Git.info, dir)
     if not info_ok then
-      error(string.format("dump-specs.lua: Git.info failed for %s (%s): %s", name, dir, tostring(info)))
+      error(string.format("dump-plugin-state.lua: Git.info failed for %s (%s): %s", name, dir, tostring(info)))
     end
     if not (info and info.commit) then
-      error(string.format("dump-specs.lua: Git.info returned no commit for %s (%s)", name, dir))
+      error(string.format("dump-plugin-state.lua: Git.info returned no commit for %s (%s)", name, dir))
     end
     installed = info.commit
 
     local target_ok, tgt = pcall(Git.get_target, p)
     if not target_ok then
-      error(string.format("dump-specs.lua: Git.get_target failed for %s (%s): %s", name, dir, tostring(tgt)))
+      error(string.format("dump-plugin-state.lua: Git.get_target failed for %s (%s): %s", name, dir, tostring(tgt)))
     end
     if not (tgt and tgt.commit) then
-      error(string.format("dump-specs.lua: Git.get_target returned no commit for %s (%s)", name, dir))
+      error(string.format("dump-plugin-state.lua: Git.get_target returned no commit for %s (%s)", name, dir))
     end
     target = tgt.commit
   end
