@@ -5,7 +5,7 @@ import {
   type Model,
   type SimpleStreamOptions,
   streamSimpleOpenAICompletions,
-} from "@earendil-works/pi-ai";
+} from "@earendil-works/pi-ai/compat";
 import type { ExtensionAPI, ProviderModelConfig } from "@earendil-works/pi-coding-agent";
 import { loginCodebuddy, refreshCodebuddyCredentials } from "./auth.js";
 import { CHAT_BASE_URL, DEFAULT_DOMAIN, PROVIDER, USER_AGENT, VERSION } from "./constants.js";
