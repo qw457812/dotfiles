@@ -1,8 +1,8 @@
 /**
- * Show the active Ponytail mode in the footer.
- *
- * Reads ponytail's `ponytail-mode` session entries (from its /ponytail commands)
- * with ponytail's own default resolution (env > config.json > full). `off` hides the status.
+ * Compact override of ponytail's status-bar text (unconfigurable upstream,
+ * introduced in DietrichGebert/ponytail@947f2ff). Defers the write with
+ * setTimeout(0) so it lands after ponytail's own handlers regardless of
+ * load order. `off` hides the status.
  */
 
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
@@ -68,24 +68,20 @@ function resolveSessionMode(entries: readonly SessionEntry[], fallbackMode: Mode
 export default function (pi: ExtensionAPI): void {
   let configuredDefaultMode = getDefaultMode();
 
-  const applyStatus = (ctx: ExtensionContext, mode: Mode): void => {
-    ctx.ui.setStatus(
-      STATUS_KEY,
-      mode === "off" ? undefined : ctx.ui.theme.fg("accent", `ponytail-${mode}`),
-    );
-  };
-
-  const readEntries = (ctx: ExtensionContext): readonly SessionEntry[] =>
-    (ctx.sessionManager?.getBranch?.() ??
+  const syncStatus = (ctx: ExtensionContext): void => {
+    const entries = (ctx.sessionManager?.getBranch?.() ??
       ctx.sessionManager?.getEntries?.() ??
       []) as readonly SessionEntry[];
+    const mode = resolveSessionMode(entries, configuredDefaultMode);
+    const status = mode === "off" ? undefined : ctx.ui.theme.fg("accent", `󱖿 ${mode}`);
+    setTimeout(() => ctx.ui.setStatus(STATUS_KEY, status), 0);
+  };
 
   pi.on("session_start", async (_event, ctx) => {
     configuredDefaultMode = getDefaultMode();
-    applyStatus(ctx, resolveSessionMode(readEntries(ctx), configuredDefaultMode));
+    syncStatus(ctx);
   });
 
-  pi.on("before_agent_start", async (_event, ctx) => {
-    applyStatus(ctx, resolveSessionMode(readEntries(ctx), configuredDefaultMode));
-  });
+  pi.on("agent_start", async (_event, ctx) => syncStatus(ctx));
+  pi.on("agent_end", async (_event, ctx) => syncStatus(ctx));
 }
