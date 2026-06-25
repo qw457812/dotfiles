@@ -141,6 +141,21 @@ return {
         config = function() end,
       },
       { "dannote/dot-pi", name = "dannote-dot-pi", lazy = true, config = function() end },
+      {
+        "LazyVim/LazyVim",
+        keys = {
+          {
+            "<leader>lp",
+            function()
+              vim.cmd("Lazy log pi")
+              vim.defer_fn(function()
+                vim.cmd("silent! /pi")
+              end, 200)
+            end,
+            desc = "Pi Logs",
+          },
+        },
+      },
     },
   },
   { "qw457812/claude-code-sourcemap", pin = true, lazy = true, config = function() end },

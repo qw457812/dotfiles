@@ -60,28 +60,37 @@ export default function (pi: ExtensionAPI) {
 
   pi.registerCommand("hidden-skills", {
     description: "Show skills hidden from the system prompt",
-    getArgumentCompletions(prefix) {
-      return "diff".startsWith(prefix) ? [{ value: "diff", label: "diff" }] : null;
+    getArgumentCompletions(prefix: string) {
+      const items = [
+        {
+          value: "diff",
+          label: "diff",
+          description: "open the system prompt change from the latest turn",
+        },
+      ];
+      const filtered = items.filter((item) => item.value.startsWith(prefix.trimStart()));
+      return filtered.length > 0 ? filtered : null;
     },
     handler: async (args, ctx) => {
-      if (args.trim() === "diff") {
-        const currentPrompt = ctx.getSystemPrompt();
-        const promptPair = lastPromptPair ?? {
-          before: currentPrompt,
-          after: stripHiddenSkills(currentPrompt).prompt,
-        };
-        const diff =
-          promptPair.before === promptPair.after
-            ? ""
-            : generateUnifiedPatch("system-prompt", promptPair.before, promptPair.after)
-                .replace("--- system-prompt\n", "--- system-prompt.before\n")
-                .replace("+++ system-prompt\n", "+++ system-prompt.after\n");
-        if (!diff) ctx.ui.notify("System prompt diff: (none; extension made no changes)", "info");
-        else await openDiffInEditor(ctx, diff);
+      if (args.trim() !== "diff") {
+        ctx.ui.notify(buildStatus(ctx.getSystemPromptOptions().skills ?? []), "info");
         return;
       }
 
-      ctx.ui.notify(buildStatus(ctx.getSystemPromptOptions().skills ?? []), "info");
+      const currentPrompt = ctx.getSystemPrompt();
+      const { before, after } = lastPromptPair ?? {
+        before: currentPrompt,
+        after: stripHiddenSkills(currentPrompt).prompt,
+      };
+      if (before === after) {
+        ctx.ui.notify("System prompt diff: (none; extension made no changes)", "info");
+        return;
+      }
+
+      const diff = generateUnifiedPatch("system-prompt", before, after)
+        .replace("--- system-prompt\n", "--- system-prompt.before\n")
+        .replace("+++ system-prompt\n", "+++ system-prompt.after\n");
+      await openDiffInEditor(ctx, diff);
     },
   });
 }

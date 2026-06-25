@@ -80,16 +80,22 @@ import { rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-/** Unmodified system prompt, captured once at session_start. */
-let basePrompt: string | undefined;
-/**
- * Snapshot of the last provider request, captured together for accurate pairing.
- * `effectivePrompt` is getSystemPrompt() at request time (after before_agent_start).
- */
-let effectivePrompt: string | undefined;
-let lastPayload: unknown = undefined;
-/** Last provider response (status + headers); body is consumed before this fires. */
-let lastResponse: { status: number; headers: Record<string, string> } | undefined = undefined;
+type PromptInspectState = {
+  /** Unmodified system prompt, captured once at session_start. */
+  basePrompt?: string;
+  /**
+   * Snapshot of the last provider request, captured together for accurate pairing.
+   * `prompt` is getSystemPrompt() at request time (after before_agent_start).
+   */
+  lastRequest?: {
+    prompt: string;
+    payload: unknown;
+  };
+  /** Last provider response (status + headers); body is consumed before this fires. */
+  lastResponse?: { status: number; headers: Record<string, string> };
+};
+
+const state: PromptInspectState = {};
 
 type Rec = Record<string, unknown>;
 type TextPart = { text?: unknown };
@@ -157,12 +163,23 @@ function extractSystemFromPayload(payload: unknown): string | undefined {
   return undefined;
 }
 
+function buildPromptPatch(
+  fromLabel: string,
+  fromText: string,
+  toLabel: string,
+  toText: string,
+): string {
+  return generateUnifiedPatch("system-prompt", fromText, toText)
+    .replace("--- system-prompt\n", `--- ${fromLabel}\n`)
+    .replace("+++ system-prompt\n", `+++ ${toLabel}\n`);
+}
+
 export default function (pi: ExtensionAPI) {
   // base: getSystemPrompt() at session_start is the unmodified base;
   // before_agent_start only fires per user message
   // (https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/coding-agent/src/core/agent-session.ts#L1111).
   pi.on("session_start", (_event, ctx) => {
-    basePrompt = ctx.getSystemPrompt();
+    state.basePrompt = ctx.getSystemPrompt();
   });
 
   // effective: captured together with the payload so the effective->payload
@@ -170,57 +187,77 @@ export default function (pi: ExtensionAPI) {
   // a /prompt-inspect diff could mismatch the payload
   // (https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/coding-agent/src/core/extensions/runner.ts#L946).
   pi.on("before_provider_request", (event, ctx) => {
-    lastPayload = event.payload;
-    effectivePrompt = ctx.getSystemPrompt();
+    state.lastRequest = {
+      prompt: ctx.getSystemPrompt(),
+      payload: event.payload,
+    };
   });
 
   // response: HTTP status + headers from after_provider_response, captured per
   // request. The stream body is consumed before this event, so only status/headers
   // are available (ProviderResponse carries no body).
   pi.on("after_provider_response", (event) => {
-    lastResponse = { status: event.status, headers: event.headers };
+    state.lastResponse = { status: event.status, headers: event.headers };
   });
 
   pi.registerCommand("prompt-inspect", {
     description: "Inspect the system prompt (payload | diff)",
-    getArgumentCompletions(prefix) {
-      const items = ["payload", "diff"]
-        .filter((s) => s.startsWith(prefix))
-        .map((s) => ({ value: s, label: s }));
-      return items.length > 0 ? items : null;
+    getArgumentCompletions(prefix: string) {
+      const items = [
+        {
+          value: "payload",
+          label: "payload",
+          description: "open the last provider request payload plus its HTTP response",
+        },
+        {
+          value: "diff",
+          label: "diff",
+          description: "diff the base, effective, and payload system-prompt stages",
+        },
+      ];
+      const filtered = items.filter((item) => item.value.startsWith(prefix.trimStart()));
+      return filtered.length > 0 ? filtered : null;
     },
     handler: async (args, ctx) => {
       const arg = args.trim();
-      if (arg === "payload") {
-        if (lastPayload === undefined) {
-          ctx.ui.notify("No provider request yet. Send a message first.", "warning");
+      switch (arg) {
+        case "payload": {
+          if (state.lastRequest === undefined) {
+            ctx.ui.notify("No provider request yet. Send a message first.", "warning");
+            return;
+          }
+          const dump = { request: state.lastRequest.payload, response: state.lastResponse ?? null };
+          await openInEditor(ctx, JSON.stringify(dump, null, 2), "json");
           return;
         }
-        const dump = { request: lastPayload, response: lastResponse ?? null };
-        await openInEditor(ctx, JSON.stringify(dump, null, 2), "json");
-        return;
-      }
-      if (arg === "diff") {
-        if (effectivePrompt === undefined || lastPayload === undefined) {
-          ctx.ui.notify("No provider request yet. Send a message first.", "warning");
+        case "diff": {
+          if (state.lastRequest === undefined) {
+            ctx.ui.notify("No provider request yet. Send a message first.", "warning");
+            return;
+          }
+          if (state.basePrompt === undefined) {
+            ctx.ui.notify("No session_start snapshot yet. Restart pi.", "warning");
+            return;
+          }
+          await openDiffInEditor(
+            ctx,
+            state.basePrompt,
+            state.lastRequest.prompt,
+            state.lastRequest.payload,
+          );
           return;
         }
-        if (basePrompt === undefined) {
-          ctx.ui.notify("No session_start snapshot yet. Restart pi.", "warning");
+        case "":
+          // Default: open the current system prompt.
+          await openInEditor(ctx, ctx.getSystemPrompt(), "md");
           return;
-        }
-        await openDiffInEditor(ctx, basePrompt, effectivePrompt, lastPayload);
-        return;
+        default:
+          ctx.ui.notify(
+            `Unknown argument "${arg}". Usage: /prompt-inspect [payload|diff]`,
+            "warning",
+          );
+          return;
       }
-      if (arg !== "") {
-        ctx.ui.notify(
-          `Unknown argument "${arg}". Usage: /prompt-inspect [payload|diff]`,
-          "warning",
-        );
-        return;
-      }
-      // Default: open the current system prompt.
-      await openInEditor(ctx, ctx.getSystemPrompt(), "md");
     },
   });
 }
@@ -231,38 +268,33 @@ async function openDiffInEditor(
   effective: string,
   payload: unknown,
 ): Promise<void> {
+  const patches: string[] = [];
+
   // Stage 1: before_agent_start rewrites (base -> effective).
-  let stage1: string;
-  if (base === effective) {
-    stage1 = "";
-  } else {
-    stage1 = generateUnifiedPatch("system-prompt", base, effective)
-      .replace("--- system-prompt\n", "--- system-prompt.base\n")
-      .replace("+++ system-prompt\n", "+++ system-prompt.effective\n");
+  if (base !== effective) {
+    patches.push(
+      buildPromptPatch("system-prompt.base", base, "system-prompt.effective", effective),
+    );
   }
 
   // Stage 2: before_provider_request payload-level rewrites (effective -> payload).
   const sent = extractSystemFromPayload(payload);
-  let stage2: string;
   if (sent === undefined) {
-    stage2 = "";
     ctx.ui.notify(
       "Could not extract system from payload for /prompt-inspect diff; use /prompt-inspect payload for raw JSON",
       "warning",
     );
-  } else if (effective === sent) {
-    stage2 = "";
-  } else {
-    stage2 = generateUnifiedPatch("system-prompt", effective, sent)
-      .replace("--- system-prompt\n", "--- system-prompt.effective\n")
-      .replace("+++ system-prompt\n", "+++ system-prompt.payload\n");
+  } else if (effective !== sent) {
+    patches.push(
+      buildPromptPatch("system-prompt.effective", effective, "system-prompt.payload", sent),
+    );
   }
 
-  if (!stage1 && !stage2) {
+  if (patches.length === 0) {
     ctx.ui.notify("System prompt diff: (none; all stages match)", "info");
     return;
   }
-  await openInEditor(ctx, [stage1, stage2].filter(Boolean).join("\n\n"), "diff");
+  await openInEditor(ctx, patches.join("\n\n"), "diff");
 }
 
 async function openInEditor(
