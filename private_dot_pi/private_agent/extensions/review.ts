@@ -8,6 +8,8 @@
  * - Review a GitHub pull request (checks out the PR locally)
  * - Review against a base branch (PR style)
  * - Review uncommitted changes
+ * - Review staged changes
+ * - Review unstaged and untracked changes
  * - Review a specific commit
  * - Shared custom review instructions (applied to all review modes when configured)
  *
@@ -16,6 +18,8 @@
  * - `/review pr 123` - review PR #123 (checks out locally)
  * - `/review pr https://github.com/owner/repo/pull/123` - review PR from URL
  * - `/review uncommitted` - review uncommitted changes directly
+ * - `/review staged` - review staged changes directly
+ * - `/review unstaged` - review unstaged and untracked changes directly
  * - `/review branch main` - review against main branch
  * - `/review commit abc123` - review specific commit
  * - `/review folder src docs` - review specific folders/files (snapshot, not diff)
@@ -355,6 +359,8 @@ function hasBlockingReviewFindings(messageText: string): boolean {
 // Review target types (matching Codex's approach)
 type ReviewTarget =
 	| { type: "uncommitted" }
+	| { type: "staged" }
+	| { type: "unstaged" }
 	| { type: "baseBranch"; branch: string }
 	| { type: "commit"; sha: string; title?: string }
 	| { type: "pullRequest"; prNumber: number; baseBranch: string; title: string }
@@ -363,6 +369,12 @@ type ReviewTarget =
 // Prompts (adapted from Codex)
 const UNCOMMITTED_PROMPT =
 	"Review the current code changes (staged, unstaged, and untracked files) and provide prioritized findings.";
+
+const STAGED_PROMPT =
+	"Review only the staged changes. Run `git diff --staged`; do not include unstaged or untracked changes. Provide prioritized findings.";
+
+const UNSTAGED_PROMPT =
+	"Review only the unstaged and untracked changes. Run `git diff` and `git ls-files --others --exclude-standard`; do not include staged changes. Provide prioritized findings.";
 
 const LOCAL_CHANGES_REVIEW_INSTRUCTIONS =
 	"Also include local working-tree changes (staged, unstaged, and untracked files) from this branch. Use `git status --porcelain`, `git diff`, `git diff --staged`, and `git ls-files --others --exclude-standard` so local fixes are part of this review cycle.";
@@ -709,6 +721,12 @@ async function buildReviewPrompt(
 		case "uncommitted":
 			return UNCOMMITTED_PROMPT;
 
+		case "staged":
+			return STAGED_PROMPT;
+
+		case "unstaged":
+			return UNSTAGED_PROMPT;
+
 		case "baseBranch": {
 			const mergeBase = await getMergeBase(pi, target.branch);
 			const basePrompt = mergeBase
@@ -750,6 +768,10 @@ function getUserFacingHint(target: ReviewTarget): string {
 	switch (target.type) {
 		case "uncommitted":
 			return "current changes";
+		case "staged":
+			return "staged changes";
+		case "unstaged":
+			return "unstaged and untracked changes";
 		case "baseBranch":
 			return `changes against '${target.branch}'`;
 		case "commit": {
@@ -833,6 +855,8 @@ async function waitForLoopTurnToStart(ctx: ExtensionContext, previousAssistantId
 // Review preset options for the selector (keep this order stable)
 const REVIEW_PRESETS = [
 	{ value: "uncommitted", label: "Review uncommitted changes", description: "" },
+	{ value: "staged", label: "Review staged changes", description: "" },
+	{ value: "unstaged", label: "Review unstaged and untracked changes", description: "" },
 	{ value: "baseBranch", label: "Review against a base branch", description: "(local)" },
 	{ value: "commit", label: "Review a commit", description: "" },
 	{ value: "pullRequest", label: "Review a pull request", description: "(GitHub PR)" },
@@ -1012,6 +1036,12 @@ export default function reviewExtension(pi: ExtensionAPI) {
 			switch (result) {
 				case "uncommitted":
 					return { type: "uncommitted" };
+
+				case "staged":
+					return { type: "staged" };
+
+				case "unstaged":
+					return { type: "unstaged" };
 
 				case "baseBranch": {
 					const target = await showBranchSelector(ctx);
@@ -1544,6 +1574,12 @@ export default function reviewExtension(pi: ExtensionAPI) {
 			case "uncommitted":
 				return { target: { type: "uncommitted" }, extraInstruction };
 
+			case "staged":
+				return { target: { type: "staged" }, extraInstruction };
+
+			case "unstaged":
+				return { target: { type: "unstaged" }, extraInstruction };
+
 			case "branch": {
 				const branch = parts[1];
 				if (!branch) return { target: null, extraInstruction };
@@ -1620,11 +1656,7 @@ export default function reviewExtension(pi: ExtensionAPI) {
 	}
 
 	function isLoopCompatibleTarget(target: ReviewTarget): boolean {
-		if (target.type !== "commit") {
-			return true;
-		}
-
-		return false;
+		return target.type !== "commit" && target.type !== "staged";
 	}
 
 	async function runLoopFixingReview(
@@ -1748,7 +1780,7 @@ export default function reviewExtension(pi: ExtensionAPI) {
 
 	// Register the /review command
 	pi.registerCommand("review", {
-		description: "Review code changes (PR, uncommitted, branch, commit, or folder)",
+		description: "Review code changes (PR, uncommitted, staged, unstaged, branch, commit, or folder)",
 		handler: async (args, ctx) => {
 			if (ctx.mode !== "tui") {
 				ctx.ui.notify("Review requires interactive mode", "error");
@@ -1812,7 +1844,7 @@ export default function reviewExtension(pi: ExtensionAPI) {
 				}
 
 				if (reviewLoopFixingEnabled && !isLoopCompatibleTarget(target)) {
-					ctx.ui.notify("Loop mode does not work with commit review.", "error");
+					ctx.ui.notify(`Loop mode does not work with ${target.type} review.`, "error");
 					if (fromSelector) {
 						target = null;
 						continue;
