@@ -24,7 +24,7 @@ import {
 import { existsSync, promises as fsPromises, mkdirSync, realpathSync, statSync } from "node:fs";
 import { createRequire } from "node:module";
 import { homedir, tmpdir } from "node:os";
-import { isAbsolute, join, relative, resolve } from "node:path";
+import { dirname, isAbsolute, join, relative, resolve } from "node:path";
 
 const require = createRequire(import.meta.url);
 const { spawn } = require("node:child_process") as typeof import("node:child_process");
@@ -662,10 +662,12 @@ class ReadOnlyHostFs {
   }
 
   async writeFile(path: string, _content: FileContent): Promise<void> {
+    await assertReadonlyWriteTargetHasParent(path, "open");
     throw readOnlyFsError("write", path);
   }
 
   async appendFile(path: string, _content: FileContent): Promise<void> {
+    await assertReadonlyWriteTargetHasParent(path, "open");
     throw readOnlyFsError("write", path);
   }
 
@@ -690,6 +692,7 @@ class ReadOnlyHostFs {
   }
 
   async mkdir(path: string, _options?: MkdirOptions): Promise<void> {
+    await assertReadonlyWriteTargetHasParent(path, "mkdir");
     throw readOnlyFsError("mkdir", path);
   }
 
@@ -699,15 +702,20 @@ class ReadOnlyHostFs {
   }
 
   async rm(path: string, _options?: RmOptions): Promise<void> {
+    await assertReadonlyEntryExists(path, "rm");
     throw readOnlyFsError("rm", path);
   }
 
-  async cp(src: string, _dest: string, _options?: CpOptions): Promise<void> {
-    throw readOnlyFsError("cp", src);
+  async cp(src: string, dest: string, _options?: CpOptions): Promise<void> {
+    await assertReadonlyEntryExists(src, "cp");
+    await assertReadonlyWriteTargetHasParent(dest, "cp");
+    throw readOnlyFsError("cp", dest);
   }
 
-  async mv(src: string, _dest: string): Promise<void> {
-    throw readOnlyFsError("mv", src);
+  async mv(src: string, dest: string): Promise<void> {
+    await assertReadonlyEntryExists(src, "mv");
+    await assertReadonlyWriteTargetHasParent(dest, "mv");
+    throw readOnlyFsError("mv", dest);
   }
 
   resolvePath(base: string, path: string): string {
@@ -719,15 +727,19 @@ class ReadOnlyHostFs {
   }
 
   async chmod(path: string, _mode: number): Promise<void> {
+    await assertReadonlyTargetExists(path, "chmod");
     throw readOnlyFsError("chmod", path);
   }
 
   async symlink(_target: string, linkPath: string): Promise<void> {
+    await assertReadonlyWriteTargetHasParent(linkPath, "symlink");
     throw readOnlyFsError("symlink", linkPath);
   }
 
-  async link(existingPath: string, _newPath: string): Promise<void> {
-    throw readOnlyFsError("link", existingPath);
+  async link(existingPath: string, newPath: string): Promise<void> {
+    await assertReadonlyEntryExists(existingPath, "link");
+    await assertReadonlyWriteTargetHasParent(newPath, "link");
+    throw readOnlyFsError("link", newPath);
   }
 
   async readlink(path: string): Promise<string> {
@@ -741,6 +753,7 @@ class ReadOnlyHostFs {
   }
 
   async utimes(path: string, _atime: Date, _mtime: Date): Promise<void> {
+    await assertReadonlyTargetExists(path, "utimes");
     throw readOnlyFsError("utimes", path);
   }
 }
@@ -905,6 +918,41 @@ function pathWithinRoot(root: string, target: string): boolean {
   const rel = relative(root, target);
   return rel === "" || (!rel.startsWith("..") && !isAbsolute(rel));
 }
+
+async function assertReadonlyWriteTargetHasParent(path: string, operation: string): Promise<void> {
+  try {
+    await fsPromises.stat(dirname(resolve(path)));
+  } catch (err) {
+    if (isExpectedMissingPathError(err)) throw noSuchFileError(operation, path);
+    throw err;
+  }
+}
+
+async function assertReadonlyEntryExists(path: string, operation: string): Promise<void> {
+  if (isHostBinPath(path)) throw noSuchFileError(operation, path);
+  try {
+    await fsPromises.lstat(resolve(path));
+  } catch (err) {
+    if (isExpectedMissingPathError(err)) throw noSuchFileError(operation, path);
+    throw err;
+  }
+}
+
+async function assertReadonlyTargetExists(path: string, operation: string): Promise<void> {
+  if (await resolvesToHostBinPath(path)) throw noSuchFileError(operation, path);
+  try {
+    await fsPromises.stat(resolve(path));
+  } catch (err) {
+    if (isExpectedMissingPathError(err)) throw noSuchFileError(operation, path);
+    throw err;
+  }
+}
+
+export const __testing = {
+  assertReadonlyEntryExists,
+  assertReadonlyTargetExists,
+  assertReadonlyWriteTargetHasParent,
+};
 
 function ensureWritableDirectory(root: string): boolean {
   try {

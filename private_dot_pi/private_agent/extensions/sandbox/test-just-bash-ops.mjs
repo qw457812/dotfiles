@@ -16,7 +16,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const jiti = createJiti(import.meta.url);
-const { createJustBashOps } = await jiti.import("./just-bash-ops.ts");
+const { __testing, createJustBashOps } = await jiti.import("./just-bash-ops.ts");
 
 const thisFilePath = fileURLToPath(import.meta.url);
 const thisDirPath = dirname(thisFilePath);
@@ -24,9 +24,17 @@ const isTermux = process.platform === "android" || process.env.PREFIX?.includes(
 const workdir = mkdtempSync(join(thisDirPath, ".tmp-workdir-"));
 const extraWriteDir = mkdtempSync(join(thisDirPath, ".tmp-extra-write-"));
 const blockedWritePath = join(thisDirPath, `.tmp-blocked-write-${process.pid}.txt`);
+const readonlyMissingParentDir = join(thisDirPath, `.tmp-readonly-missing-parent-${process.pid}`);
+const readonlyMissingParentFile = join(readonlyMissingParentDir, "file.txt");
+const readonlyMissingParentChildDir = join(readonlyMissingParentDir, "child");
+const danglingSymlinkPath = join(thisDirPath, `.tmp-dangling-link-${process.pid}`);
 const hostBinSymlinkPath = join(thisDirPath, `.tmp-host-bin-link-${process.pid}`);
 const defaultTmpWritePath = join(tmpdir(), `pi-sandbox-default-tmp-${process.pid}.txt`);
+const literalTmpFileName = `pi-sandbox-literal-tmp-${process.pid}.txt`;
+const literalTmpWritePath = `/tmp/${literalTmpFileName}`;
+const literalTmpHostPath = existsSync("/tmp") ? literalTmpWritePath : join(tmpdir(), literalTmpFileName);
 const ops = createJustBashOps(workdir, { filesystem: { allowWrite: [".", extraWriteDir] } });
+const literalTmpOps = createJustBashOps(workdir, { filesystem: { allowWrite: [".", extraWriteDir, "/tmp"] } });
 const hostOps = createJustBashOps(workdir, {
   hostCommands: ["node"],
   filesystem: { allowWrite: [".", extraWriteDir] },
@@ -61,13 +69,17 @@ async function run(command) {
   return runWithOps(ops, command);
 }
 
-async function runError(command) {
+async function runErrorWithOps(selectedOps, command) {
   try {
-    const result = await run(command);
+    const result = await runWithOps(selectedOps, command);
     return { result, error: null };
   } catch (error) {
     return { result: null, error };
   }
+}
+
+async function runError(command) {
+  return runErrorWithOps(ops, command);
 }
 
 async function runBinary(command) {
@@ -132,9 +144,59 @@ try {
   });
   assert.equal(readFileSync(defaultTmpWritePath, "utf8"), "tmp");
 
+  if (existsSync("/tmp")) {
+    assert.deepEqual(
+      await runWithOps(literalTmpOps, `printf literal > ${literalTmpWritePath} && cat ${literalTmpWritePath}`),
+      {
+        exitCode: 0,
+        output: "literal",
+      },
+    );
+    assert.equal(readFileSync(literalTmpHostPath, "utf8"), "literal");
+  } else {
+    const literalTmpWrite = await runErrorWithOps(literalTmpOps, `printf literal > ${literalTmpWritePath}`);
+    assert.equal(literalTmpWrite.result, null);
+    assert.match(String(literalTmpWrite.error), /ENOENT: no such file or directory, open '\/tmp\//);
+    assert.equal(existsSync(literalTmpHostPath), false);
+
+    const literalTmpMkdir = await runWithOps(literalTmpOps, `mkdir ${literalTmpWritePath}.dir`);
+    assert.equal(literalTmpMkdir.exitCode, 1);
+    assert.match(literalTmpMkdir.output, /No such file or directory/);
+    assert.doesNotMatch(literalTmpMkdir.output, /read-only file system/);
+
+    const literalTmpRm = await runWithOps(literalTmpOps, `rm ${literalTmpWritePath}.missing`);
+    assert.equal(literalTmpRm.exitCode, 1);
+    assert.match(literalTmpRm.output, /No such file or directory/);
+    assert.doesNotMatch(literalTmpRm.output, /read-only file system/);
+  }
+
   const blockedWrite = await runError(`printf blocked > ${blockedWritePath}`);
   assert.equal(blockedWrite.result, null);
   assert.match(String(blockedWrite.error), /EROFS: read-only file system, write/);
+
+  const readonlyMissingParentWrite = await runError(`printf readonly > ${readonlyMissingParentFile}`);
+  assert.equal(readonlyMissingParentWrite.result, null);
+  assert.match(String(readonlyMissingParentWrite.error), /ENOENT: no such file or directory, open/);
+  assert.equal(existsSync(readonlyMissingParentFile), false);
+
+  const readonlyMissingParentMkdir = await run(`mkdir ${readonlyMissingParentChildDir}`);
+  assert.equal(readonlyMissingParentMkdir.exitCode, 1);
+  assert.match(readonlyMissingParentMkdir.output, /No such file or directory/);
+  assert.doesNotMatch(readonlyMissingParentMkdir.output, /read-only file system|EROFS/);
+
+  const readonlyMissingParentSymlink = await run(`ln -s target ${readonlyMissingParentFile}`);
+  assert.equal(readonlyMissingParentSymlink.exitCode, 1);
+  assert.match(readonlyMissingParentSymlink.output, /symlink/);
+  assert.doesNotMatch(readonlyMissingParentSymlink.output, /open/);
+
+  rmSync(danglingSymlinkPath, { force: true });
+  symlinkSync(`.tmp-missing-target-${process.pid}`, danglingSymlinkPath);
+  await assert.doesNotReject(() => __testing.assertReadonlyEntryExists(danglingSymlinkPath, "rm"));
+  await assert.doesNotReject(() => __testing.assertReadonlyEntryExists(danglingSymlinkPath, "cp"));
+  await assert.rejects(
+    () => __testing.assertReadonlyTargetExists(danglingSymlinkPath, "chmod"),
+    /ENOENT: no such file or directory, chmod/,
+  );
 
   const missingNode = await run(`node -e "process.stdout.write('x')"`);
   assert.equal(missingNode.exitCode, 127);
@@ -604,6 +666,9 @@ try {
   rmSync(workdir, { recursive: true, force: true });
   rmSync(extraWriteDir, { recursive: true, force: true });
   rmSync(blockedWritePath, { force: true });
+  rmSync(readonlyMissingParentDir, { recursive: true, force: true });
+  rmSync(danglingSymlinkPath, { force: true });
   rmSync(hostBinSymlinkPath, { force: true });
   rmSync(defaultTmpWritePath, { force: true });
+  rmSync(literalTmpHostPath, { force: true });
 }
