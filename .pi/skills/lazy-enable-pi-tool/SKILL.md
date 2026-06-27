@@ -1,6 +1,6 @@
 ---
 name: lazy-enable-pi-tool
-description: Lazy-enable a pi extension tool from session state or explicit command entry points.
+description: Lazy-enable a pi extension tool from branch history or confirmed command conditions.
 disable-model-invocation: true
 ---
 
@@ -9,6 +9,11 @@ disable-model-invocation: true
 Convert a pi extension tool from always-active to **lazy-enabled**: the tool is
 registered, but it only enters `pi.getActiveTools()` when a branch signal or a
 confirmed command condition proves the session needs it.
+
+**One-way** means the extension may disable the tool only before it has enabled
+it in the current run. Once enabled, the extension must not remove it again: a
+restored branch can show the agent that it previously used this tool, and hiding
+that tool afterward makes the visible history contradict the current tool list.
 
 ## Steps
 
@@ -28,13 +33,12 @@ confirmed command condition proves the session needs it.
 
    Recommend the smallest policy that proves the session needs the tool, then
    ask one question at a time until every enabling path and rejected signal is
-   settled. If the branch history contains this tool's tool call, the policy
-   must keep the tool enabled; disabling it would make the agent's restored
-   context disagree with its available tools.
+   settled. If branch history contains this tool's tool call, apply **one-way**.
 
-   Completion criterion: the user has confirmed the restore signals and any
-   command conditions that enable the tool, and every restore path with this
-   tool in branch history keeps the tool enabled.
+   Completion criterion: the user has confirmed the restore signals, any command
+   conditions that enable the tool, and every rejected signal; every restore path
+   with this tool in branch history applies **one-way**; a short policy summary
+   has been written before code edits begin.
 
 2. **Add a one-way active-tool helper.** Inside the extension factory, keep a
    boolean owned by the extension and mutate active tools through one helper:
@@ -61,17 +65,13 @@ confirmed command condition proves the session needs it.
    }
    ```
 
-   The guard makes disabling conservative: once this extension has enabled the
-   tool in the current run, it does not disable it again. This protects restored
-   branches whose history already contains the tool call from losing that tool
-   later in the same run.
+   The guard implements **one-way**.
 
    Completion criterion: all `setActiveTools` writes for this tool go through
    this helper, and enabling preserves every other active tool.
 
 3. **Restore from branch navigation.** On `session_start` and `session_tree`,
-   evaluate the branch signal and pass it to the helper before other work that
-   may depend on active tools:
+   evaluate the branch signal and pass it to the helper:
 
    ```ts
    function restoreExampleTool(ctx: ExtensionContext): void {
@@ -84,14 +84,13 @@ confirmed command condition proves the session needs it.
    ```
 
    Completion criterion: restoring a branch with the signal enables the tool and
-   never disables it later in the same run; restoring a branch without the signal
-   disables it only if this extension has not already enabled it during the
-   current run.
+   applies **one-way**; restoring a branch without the signal disables it only if
+   this extension has not already enabled it during the current run.
 
 4. **Implement the confirmed command conditions.** For each command or UI path,
    enable the tool only under the condition the user confirmed. Some commands
-   enable immediately, some enable after creating, resuming, or restoring
-   tool-relevant state, and some never enable tools themselves:
+   enable immediately, some enable only under a later branch, and some never
+   enable tools themselves:
 
    ```ts
    pi.registerCommand("example", {
@@ -112,12 +111,12 @@ confirmed command condition proves the session needs it.
 5. **Document the policy.** Add a short top-level comment explaining what enables
    the tool and why restored branches that already used the tool keep it enabled.
 
-   Completion criterion: the docs state the enabling signals and the diff does
-   not alter the tool's runtime behavior except active-tool exposure.
+   Completion criterion: the docs state the enabling signals, and the tool's
+   execution behavior is unchanged; only when it appears in active tools changes.
 
 ## References
 
-- `private_dot_pi/private_agent/extensions/goal.ts` — custom session state signal
-  plus one-way lazy enable.
-- `private_dot_pi/private_agent/extensions/todos.ts` — historical tool-call signal
-  plus command-triggered enable.
+- `../../../private_dot_pi/private_agent/extensions/goal.ts` — custom session
+  state signal plus one-way lazy enable.
+- `../../../private_dot_pi/private_agent/extensions/todos.ts` — historical
+  tool-call signal plus command-triggered enable.
