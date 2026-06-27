@@ -1,7 +1,7 @@
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 
-// ref: https://github.com/aliou/pi-guardrails/blob/v0.13.0/src/shared/events.ts
-type GuardrailsBlockSource = "policy" | "permission" | "user" | "nonInteractive";
+// ref: https://github.com/aliou/pi-guardrails/blob/v0.15.0/src/shared/events.ts
+type GuardrailsBlockSource = "policy" | "permission" | "user" | "user-stop" | "nonInteractive";
 
 type Action =
   | { kind: "file"; path: string; origin?: string }
