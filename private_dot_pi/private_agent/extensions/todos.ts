@@ -30,6 +30,10 @@
  *
  * Use `/todos` to bring up the visual todo manager or just let the LLM use them
  * naturally.
+ *
+ * The todo tool is lazy-enabled by the /todos command or by session restore when
+ * the active branch contains a previous todo tool call. After enabling it, this
+ * extension does not disable it again.
  */
 import { DynamicBorder, copyToClipboard, getMarkdownTheme, keyHint, type ExtensionAPI, type ExtensionContext, type Theme } from "@earendil-works/pi-coding-agent";
 import { StringEnum } from "@earendil-works/pi-ai";
@@ -1436,13 +1440,52 @@ async function deleteTodo(
 	return result;
 }
 
+function branchHasTodoToolCall(ctx: ExtensionContext): boolean {
+	for (const entry of ctx.sessionManager.getBranch()) {
+		if (entry.type !== "message") continue;
+		const msg = entry.message;
+
+		if (msg.role === "assistant" && Array.isArray(msg.content)) {
+			for (const block of msg.content) {
+				if (block.type === "toolCall" && block.name === "todo") return true;
+			}
+		}
+	}
+	return false;
+}
+
 export default function todosExtension(pi: ExtensionAPI) {
+	let todoToolEnabled = false;
+
+	function setTodoToolEnabled(enabled: boolean): void {
+		if (!enabled && todoToolEnabled) return;
+
+		const activeTools = new Set(pi.getActiveTools());
+		const activeToolCountBefore = activeTools.size;
+
+		if (enabled) {
+			todoToolEnabled = true;
+			activeTools.add("todo");
+		} else {
+			activeTools.delete("todo");
+		}
+
+		if (activeTools.size !== activeToolCountBefore) pi.setActiveTools(Array.from(activeTools));
+	}
+
+	function restoreTodoTool(ctx: ExtensionContext): void {
+		setTodoToolEnabled(branchHasTodoToolCall(ctx));
+	}
+
 	pi.on("session_start", async (_event, ctx) => {
+		restoreTodoTool(ctx);
 		const todosDir = getTodosDir(ctx.cwd);
 		await ensureTodosDir(todosDir);
 		const settings = await readTodoSettings(todosDir);
 		await garbageCollectTodos(todosDir, settings);
 	});
+
+	pi.on("session_tree", async (_event, ctx) => restoreTodoTool(ctx));
 
 	const todosDirLabel = getTodosDirLabel(process.cwd());
 
@@ -1807,6 +1850,7 @@ export default function todosExtension(pi: ExtensionAPI) {
 	pi.registerCommand("todos", {
 		description: "List todos from .pi/todos",
 		handler: async (args, ctx) => {
+			setTodoToolEnabled(true);
 			const todosDir = getTodosDir(ctx.cwd);
 			const todos = await listTodos(todosDir);
 			const currentSessionId = ctx.sessionManager.getSessionId();
