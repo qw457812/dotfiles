@@ -49,6 +49,7 @@ import {
 	type SelectItem,
 	Text,
 	TUI,
+	type Keybinding,
 	fuzzyMatch,
 	matchesKey,
 	truncateToWidth,
@@ -92,7 +93,7 @@ interface TodoSettings {
 }
 
 type KeybindingMatcher = {
-	matches: (keyData: string, keybindingId: string) => boolean;
+	matches: (keyData: string, keybindingId: Keybinding) => boolean;
 };
 
 const TodoParams = Type.Object({
@@ -743,7 +744,10 @@ function getTodoSettingsPath(todosDir: string): string {
 
 function normalizeTodoSettings(raw: Partial<TodoSettings>): TodoSettings {
 	const gc = raw.gc ?? DEFAULT_TODO_SETTINGS.gc;
-	const gcDays = Number.isFinite(raw.gcDays) ? raw.gcDays : DEFAULT_TODO_SETTINGS.gcDays;
+	const gcDays =
+		typeof raw.gcDays === "number" && Number.isFinite(raw.gcDays)
+			? raw.gcDays
+			: DEFAULT_TODO_SETTINGS.gcDays;
 	return {
 		gc: Boolean(gc),
 		gcDays: Math.max(0, Math.floor(gcDays)),
@@ -1064,6 +1068,7 @@ async function listTodos(todosDir: string): Promise<TodoFrontMatter[]> {
 	return sortTodos(todos);
 }
 
+// oxlint-disable-next-line no-unused-vars
 function listTodosSync(todosDir: string): TodoFrontMatter[] {
 	let entries: string[] = [];
 	try {
@@ -2076,7 +2081,7 @@ export default function todosExtension(pi: ExtensionAPI) {
 
 			if (nextPrompt) {
 				ctx.ui.setEditorText(nextPrompt);
-				rootTui?.requestRender();
+				(rootTui as TUI | null)?.requestRender();
 			}
 		},
 	});
