@@ -6,7 +6,7 @@ license: Vibecoded
 
 # tmux Skill
 
-Use tmux as a programmable terminal multiplexer for interactive work. Works on Linux and macOS with stock tmux; avoid custom config by using a private socket.
+Use tmux as a programmable terminal multiplexer for interactive work. Works on Linux and macOS with stock tmux; use a private socket for isolation and `-f /dev/null` when starting the server for a clean config.
 
 ## Quickstart (isolated socket)
 
@@ -15,7 +15,7 @@ SOCKET_DIR=${TMPDIR:-/tmp}/claude-tmux-sockets  # well-known dir for all agent s
 mkdir -p "$SOCKET_DIR"
 SOCKET="$SOCKET_DIR/claude.sock"                # keep agent sessions separate from your personal tmux
 SESSION=claude-python                           # slug-like names; avoid spaces
-tmux -S "$SOCKET" new -d -s "$SESSION" -n shell
+tmux -S "$SOCKET" -f /dev/null new -d -s "$SESSION" -n shell
 tmux -S "$SOCKET" send-keys -t "$SESSION":0.0 -- 'python3 -q' Enter
 tmux -S "$SOCKET" capture-pane -p -J -t "$SESSION":0.0 -S -200  # watch output
 tmux -S "$SOCKET" kill-session -t "$SESSION"                   # clean up
