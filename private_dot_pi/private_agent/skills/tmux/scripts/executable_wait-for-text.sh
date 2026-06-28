@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -eu
+set -o pipefail
 
 usage() {
   cat <<'USAGE'
@@ -70,12 +71,15 @@ if ! command -v tmux >/dev/null 2>&1; then
   exit 1
 fi
 
-tmux_cmd=(tmux)
-if [[ -n "$socket_name" ]]; then
-  tmux_cmd+=(-L "$socket_name")
-elif [[ -n "$socket_path" ]]; then
-  tmux_cmd+=(-S "$socket_path")
-fi
+capture_pane() {
+  if [[ -n "$socket_name" ]]; then
+    tmux -L "$socket_name" capture-pane -p -J -t "$target" -S "-${lines}"
+  elif [[ -n "$socket_path" ]]; then
+    tmux -S "$socket_path" capture-pane -p -J -t "$target" -S "-${lines}"
+  else
+    tmux capture-pane -p -J -t "$target" -S "-${lines}"
+  fi
+}
 
 # End time in epoch seconds (integer, good enough for polling)
 start_epoch=$(date +%s)
@@ -83,13 +87,13 @@ deadline=$((start_epoch + timeout))
 
 while true; do
   # -J joins wrapped lines, -S uses negative index to read last N lines
-  if ! pane_text="$("${tmux_cmd[@]}" capture-pane -p -J -t "$target" -S "-${lines}" 2>&1)"; then
+  if ! pane_text="$(capture_pane 2>&1)"; then
     echo "Failed to capture pane from target: $target" >&2
     printf '%s\n' "$pane_text" >&2
     exit 1
   fi
 
-  if printf '%s\n' "$pane_text" | grep $grep_flag -- "$pattern" >/dev/null 2>&1; then
+  if printf '%s\n' "$pane_text" | grep "$grep_flag" -e "$pattern" >/dev/null 2>&1; then
     exit 0
   fi
 

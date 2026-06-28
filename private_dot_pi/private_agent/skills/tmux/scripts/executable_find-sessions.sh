@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -eu
+set -o pipefail
 
 usage() {
   cat <<'USAGE'
@@ -50,17 +51,16 @@ fi
 
 list_sessions() {
   local label="$1"; shift
-  local tmux_cmd=(tmux "$@")
   local sep=$'\037'
 
-  if ! sessions="$("${tmux_cmd[@]}" list-sessions -F "#{session_name}${sep}#{session_attached}${sep}#{t:session_created}" 2>&1)"; then
+  if ! sessions="$(tmux "$@" list-sessions -F "#{session_name}${sep}#{session_attached}${sep}#{t:session_created}" 2>&1)"; then
     echo "Failed to list tmux sessions on $label" >&2
     printf '%s\n' "$sessions" >&2
     return 1
   fi
 
   if [[ -n "$query" ]]; then
-    sessions="$(printf '%s\n' "$sessions" | grep -i -- "$query" || true)"
+    sessions="$(printf '%s\n' "$sessions" | grep -i -e "$query" || true)"
   fi
 
   if [[ -z "$sessions" ]]; then
@@ -81,34 +81,48 @@ if [[ "$scan_all" == true ]]; then
     exit 1
   fi
 
-  shopt -s nullglob
-  sockets=("$socket_dir"/*)
-  shopt -u nullglob
+  found=false
+  exit_code=0
+  for sock in "$socket_dir"/*; do
+    if [[ ! -e "$sock" ]]; then
+      continue
+    fi
+    if [[ ! -S "$sock" && "$sock" != *.sock ]]; then
+      continue
+    fi
+    if ! sessions_probe="$(tmux -S "$sock" list-sessions 2>&1)"; then
+      case "$sessions_probe" in
+        "no server running on "*)
+          continue
+          ;;
+        *)
+          echo "Failed to list tmux sessions on socket path '$sock'" >&2
+          printf '%s\n' "$sessions_probe" >&2
+          exit_code=1
+          continue
+          ;;
+      esac
+    fi
+    found=true
+    list_sessions "socket path '$sock'" -S "$sock" || exit_code=$?
+  done
 
-  if [[ "${#sockets[@]}" -eq 0 ]]; then
-    echo "No sockets found under $socket_dir" >&2
+  if [[ "$found" != true && "$exit_code" -eq 0 ]]; then
+    echo "No live tmux sessions found under $socket_dir" >&2
     exit 1
   fi
 
-  exit_code=0
-  for sock in "${sockets[@]}"; do
-    if [[ ! -S "$sock" ]]; then
-      continue
-    fi
-    list_sessions "socket path '$sock'" -S "$sock" || exit_code=$?
-  done
   exit "$exit_code"
 fi
 
-tmux_cmd=(tmux)
 socket_label="default socket"
 
 if [[ -n "$socket_name" ]]; then
-  tmux_cmd+=(-L "$socket_name")
   socket_label="socket name '$socket_name'"
+  list_sessions "$socket_label" -L "$socket_name"
 elif [[ -n "$socket_path" ]]; then
-  tmux_cmd+=(-S "$socket_path")
   socket_label="socket path '$socket_path'"
+  list_sessions "$socket_label" -S "$socket_path"
+else
+  list_sessions "$socket_label"
 fi
-
-list_sessions "$socket_label" "${tmux_cmd[@]:1}"
