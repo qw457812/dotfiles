@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -o nounset
+set -eu
 set -o pipefail
 
 usage() {
@@ -116,12 +116,11 @@ parse_repo() {
       ;;
     */* )
       first="${input%%/*}"
+      host="${LIBRARIAN_DEFAULT_HOST:-github.com}"
+      path="$input"
       if [[ "$first" == *.* || "$first" == localhost ]]; then
         host="$first"
         path="${input#*/}"
-      else
-        host="${LIBRARIAN_DEFAULT_HOST:-github.com}"
-        path="$input"
       fi
       ;;
     * )
@@ -188,13 +187,12 @@ cache_root="${LIBRARIAN_CACHE_ROOT:-$HOME/.cache/checkouts}"
 checkout_path="$cache_root/$host/$org/$repo"
 origin_url="https://$host/$org/$repo.git"
 
-mkdir -p "$(dirname "$checkout_path")" || exit $?
+mkdir -p "$(dirname "$checkout_path")"
 
+clone_state="existing"
 if [[ ! -d "$checkout_path/.git" ]]; then
-  git clone --filter=blob:none "$origin_url" "$checkout_path" >/dev/null || exit $?
+  git clone --filter=blob:none "$origin_url" "$checkout_path" >/dev/null
   clone_state="cloned"
-else
-  clone_state="existing"
 fi
 
 if [[ ! -d "$checkout_path/.git" ]]; then
@@ -203,17 +201,17 @@ if [[ ! -d "$checkout_path/.git" ]]; then
 fi
 
 if ! git -C "$checkout_path" remote get-url origin >/dev/null 2>&1; then
-  git -C "$checkout_path" remote add origin "$origin_url" || exit $?
+  git -C "$checkout_path" remote add origin "$origin_url"
 fi
 
 # If remote URL changed (e.g. host shorthand), normalize to canonical HTTPS URL.
-current_origin="$(git -C "$checkout_path" remote get-url origin 2>/dev/null)" || exit $?
+current_origin="$(git -C "$checkout_path" remote get-url origin 2>/dev/null)"
 if [[ "$current_origin" != "$origin_url" ]]; then
-  git -C "$checkout_path" remote set-url origin "$origin_url" || exit $?
+  git -C "$checkout_path" remote set-url origin "$origin_url"
 fi
 
 last_fetch_file="$checkout_path/.git/librarian-last-fetch"
-now_epoch="$(date +%s)" || exit $?
+now_epoch="$(date +%s)"
 needs_update=1
 
 if [[ -f "$last_fetch_file" && "$force_update" -eq 0 ]]; then
@@ -230,24 +228,22 @@ update_state="skipped"
 ff_state="not-attempted"
 
 if (( needs_update == 1 )); then
-  git -C "$checkout_path" fetch --prune --tags origin >/dev/null || exit $?
-  echo "$now_epoch" > "$last_fetch_file" || exit $?
+  git -C "$checkout_path" fetch --prune --tags origin >/dev/null
+  echo "$now_epoch" > "$last_fetch_file"
   update_state="fetched"
 
   branch="$(git -C "$checkout_path" symbolic-ref --short -q HEAD 2>/dev/null || true)"
   upstream="$(git -C "$checkout_path" rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null || true)"
-  dirty="$(git -C "$checkout_path" status --porcelain --untracked-files=no)" || exit $?
+  dirty="$(git -C "$checkout_path" status --porcelain --untracked-files=no)"
 
+  ff_state="skipped-no-upstream"
   if [[ -n "$branch" && -n "$upstream" && -z "$dirty" ]]; then
+    ff_state="skipped-non-ff"
     if git -C "$checkout_path" merge --ff-only "$upstream" >/dev/null 2>&1; then
       ff_state="fast-forwarded"
-    else
-      ff_state="skipped-non-ff"
     fi
   elif [[ -n "$dirty" ]]; then
     ff_state="skipped-dirty"
-  else
-    ff_state="skipped-no-upstream"
   fi
 fi
 
