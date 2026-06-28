@@ -23,6 +23,7 @@ const HIDDEN_SKILLS = [
   // git:github.com/mitsuhiko/agent-stuff
   "frontend-design",
   "web-browser",
+  "github",
   // git:github.com/addyosmani/agent-skills
   "source-driven-development",
   // git:github.com/DietrichGebert/ponytail

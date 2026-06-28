@@ -57,7 +57,11 @@
     }
   },
   "justBash": {
-    "hostCommands": ["git", "gh"],
+    "hostCommands": [
+      "git",
+      "gh",
+      "tmux" // in favor of `/skill:tmux`
+    ],
     "filesystem": {
       "allowWrite": [
         ".",

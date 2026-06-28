@@ -3,6 +3,7 @@
     "hostCommands": [
       "git",
       "gh",
+      "tmux",
       "node",
       "npm",
       "npx",

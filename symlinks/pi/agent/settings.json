@@ -30,7 +30,8 @@
       "skills": [
         "skills/commit",
         "skills/frontend-design",
-        "skills/web-browser"
+        "skills/web-browser",
+        "skills/github"
       ],
       "prompts": [
         "commands/discuss.md"
