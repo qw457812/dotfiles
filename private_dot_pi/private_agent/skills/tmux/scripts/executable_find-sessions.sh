@@ -108,8 +108,8 @@ if [[ "$scan_all" == true ]]; then
   done
 
   if [[ "$found" != true && "$exit_code" -eq 0 ]]; then
-    echo "No live tmux sessions found under $socket_dir" >&2
-    exit 1
+    echo "No sessions found under $socket_dir"
+    exit 0
   fi
 
   exit "$exit_code"
