@@ -51,8 +51,9 @@ fi
 list_sessions() {
   local label="$1"; shift
   local tmux_cmd=(tmux "$@")
+  local sep=$'\037'
 
-  if ! sessions="$("${tmux_cmd[@]}" list-sessions -F '#{session_name}\t#{session_attached}\t#{session_created_string}' 2>/dev/null)"; then
+  if ! sessions="$("${tmux_cmd[@]}" list-sessions -F "#{session_name}${sep}#{session_attached}${sep}#{t:session_created}" 2>/dev/null)"; then
     echo "No tmux server found on $label" >&2
     return 1
   fi
@@ -67,7 +68,7 @@ list_sessions() {
   fi
 
   echo "Sessions on $label:"
-  printf '%s\n' "$sessions" | while IFS=$'\t' read -r name attached created; do
+  printf '%s\n' "$sessions" | while IFS="$sep" read -r name attached created; do
     attached_label=$([[ "$attached" == "1" ]] && echo "attached" || echo "detached")
     printf '  - %s (%s, started %s)\n' "$name" "$attached_label" "$created"
   done
