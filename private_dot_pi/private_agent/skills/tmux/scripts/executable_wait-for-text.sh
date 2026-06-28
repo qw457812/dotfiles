@@ -83,7 +83,11 @@ deadline=$((start_epoch + timeout))
 
 while true; do
   # -J joins wrapped lines, -S uses negative index to read last N lines
-  pane_text="$("${tmux_cmd[@]}" capture-pane -p -J -t "$target" -S "-${lines}" 2>/dev/null || true)"
+  if ! pane_text="$("${tmux_cmd[@]}" capture-pane -p -J -t "$target" -S "-${lines}" 2>&1)"; then
+    echo "Failed to capture pane from target: $target" >&2
+    printf '%s\n' "$pane_text" >&2
+    exit 1
+  fi
 
   if printf '%s\n' "$pane_text" | grep $grep_flag -- "$pattern" >/dev/null 2>&1; then
     exit 0
