@@ -13,7 +13,12 @@
 
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { getSettingsListTheme } from "@earendil-works/pi-coding-agent";
-import { Container, type SettingItem, SettingsList } from "@earendil-works/pi-tui";
+import {
+	Container,
+	type SettingItem,
+	SettingsList,
+	type SettingsListTheme,
+} from "@earendil-works/pi-tui";
 
 // State persisted to session
 interface ToolsState {
@@ -93,10 +98,22 @@ export default function toolsExtension(pi: ExtensionAPI) {
 					})(),
 				);
 
+				// Dim disabled tool names
+				const baseSettingsTheme = getSettingsListTheme();
+				const settingsTheme: SettingsListTheme = {
+					...baseSettingsTheme,
+					label: (text, selected) => {
+						if (!selected && !enabledTools.has(text.trim())) {
+							return theme.fg("dim", text);
+						}
+						return baseSettingsTheme.label(text, selected);
+					},
+				};
+
 				const settingsList = new SettingsList(
 					items,
 					Math.min(items.length + 2, 15),
-					getSettingsListTheme(),
+					settingsTheme,
 					(id, newValue) => {
 						// Update enabled state and apply immediately
 						if (newValue === "enabled") {
