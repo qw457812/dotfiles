@@ -512,10 +512,11 @@ return {
             col = vim.g.user_is_termux and 0 or vim.g.user_explorer_width,
             width = vim.o.columns - (vim.g.user_is_termux and 0 or (vim.g.user_explorer_width + 2)), -- 2 for border width (left + right)
             height = vim.o.lines - 3, -- see: U.snacks.win.fullscreen_height
+            border = not vim.g.user_is_termux and { "│", " ", " ", " ", " ", " ", "│", "│" } or nil,
           },
           ---@type vim.api.keyset.win_config
           split = {
-            width = math.max(80, math.floor(vim.o.columns * 0.5)),
+            width = math.max(80, math.floor(vim.o.columns * 0.6)),
             height = math.max(20, math.floor(vim.o.lines * 0.5)),
           },
           ---@type table<string, sidekick.cli.Keymap|false|nil>

@@ -1,14 +1,14 @@
 tap "antoniorodr/memo"
+tap "asmvik/formulae", "https://github.com/asmvik/homebrew-formulae.git"
 tap "borkdude/brew"
 tap "brewforge/chinese"
 tap "d12frosted/emacs-plus"
-tap "felixkratz/formulae"
+tap "felixkratz/formulae", "https://github.com/FelixKratz/homebrew-formulae"
 tap "fw-ai/firectl"
 tap "homebrew-zathura/zathura"
 tap "j178/tap"
 tap "jstkdng/programs"
 tap "julien-cpsn/atac"
-tap "koekeishiya/formulae"
 tap "krtirtho/apps"
 tap "localsend/localsend"
 tap "manaflow-ai/cmux"
@@ -18,7 +18,7 @@ tap "oven-sh/bun"
 tap "owo-network/brew"
 tap "railwaycat/emacsmacport"
 tap "steipete/tap"
-tap "thezoraiz/ascii-image-converter"
+tap "thezoraiz/ascii-image-converter", "https://github.com/TheZoraiz/homebrew-ascii-image-converter"
 tap "unhappychoice/tap"
 tap "v2raya/v2raya"
 tap "xdevplatform/tap"
@@ -113,7 +113,7 @@ brew "diff-so-fancy"
 # Diff that understands syntax
 brew "difftastic"
 # Pack, ship and run any application as a lightweight container
-brew "docker", link: false
+brew "docker"
 # Isolated development environments using Docker
 brew "docker-compose"
 # Converts Microsoft Office docx documents to equivalent text documents
@@ -214,6 +214,8 @@ brew "gum"
 brew "h2"
 # Post-modern modal text editor
 brew "helix"
+# Agent multiplexer that lives in your terminal
+brew "herdr"
 # Client library for huggingface.co hub
 brew "hf"
 # Convert source code to formatted text with syntax highlighting

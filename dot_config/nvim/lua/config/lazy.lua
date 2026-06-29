@@ -345,6 +345,7 @@ require("lazy").setup({
         -- "matchit",
         -- "matchparen",
         "netrwPlugin", -- using oil.nvim
+        "dir", -- using oil.nvim
         "tarPlugin",
         "tohtml",
         "tutor",
