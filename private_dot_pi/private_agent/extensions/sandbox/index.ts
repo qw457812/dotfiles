@@ -602,6 +602,7 @@ export default function (pi: ExtensionAPI) {
           ignoreViolations: runtimeConfig.ignoreViolations,
           enableWeakerNestedSandbox: runtimeConfig.enableWeakerNestedSandbox,
           enableWeakerNetworkIsolation: runtimeConfig.enableWeakerNetworkIsolation,
+          allowPty: runtimeConfig.allowPty,
         },
         askCallback,
       );

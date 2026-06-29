@@ -13,6 +13,7 @@
   ],
   "sandboxRuntime": {
     "enableWeakerNetworkIsolation": true, // in favor of `gh`
+    "allowPty": true, // in favor of `/skill:tmux`
     "network": {
       "allowedDomains": [
         // Package registries
@@ -40,6 +41,11 @@
         "*.google.com",
         "*.anthropic.com",
         "*.openai.com"
+      ],
+      "allowUnixSockets": [
+        "/tmp/claude/claude-tmux-sockets", // in favor of `/skill:tmux`
+        "/tmp/claude-tmux-sockets",
+        "/private/tmp/claude-tmux-sockets"
       ]
     },
     "filesystem": {
