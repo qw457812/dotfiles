@@ -53,9 +53,21 @@ interface CodexQuotaWindow {
 }
 
 interface CodexQuota {
-  rate_limit?: {
-    primary_window?: CodexQuotaWindow | null;
-    secondary_window?: CodexQuotaWindow | null;
+  quota: {
+    rate_limit?: {
+      primary_window?: CodexQuotaWindow | null;
+      secondary_window?: CodexQuotaWindow | null;
+    } | null;
+    rate_limit_reset_credits?: {
+      available_count?: number;
+    } | null;
+  } | null;
+  reset: {
+    available_count?: number;
+    credits?: Array<{
+      status?: string;
+      expires_at?: string | null;
+    }> | null;
   } | null;
 }
 
@@ -476,10 +488,17 @@ const sources: Record<string, Source> = {
       return (await readAuth<{ access?: string }>("openai-codex"))?.access ?? null;
     },
     async fetch(token: string): Promise<CodexQuota | null> {
-      return fetchJson<CodexQuota>("https://chatgpt.com/backend-api/wham/usage", token);
+      const [quota, reset] = await Promise.all([
+        fetchJson<CodexQuota["quota"]>("https://chatgpt.com/backend-api/wham/usage", token),
+        fetchJson<CodexQuota["reset"]>(
+          "https://chatgpt.com/backend-api/wham/rate-limit-reset-credits",
+          token,
+        ),
+      ]);
+      return quota ? { quota, reset } : null;
     },
     format(quota: CodexQuota, theme: Theme): string | null {
-      const rateLimit = quota.rate_limit;
+      const rateLimit = quota.quota?.rate_limit;
       if (!rateLimit) {
         return null;
       }
@@ -489,9 +508,23 @@ const sources: Record<string, Source> = {
           ? `${theme.fg("accent", `${window.used_percent}%`)}${theme.fg("dim", `/${formatRemaining(window.reset_at * 1000)}`)}`
           : null;
 
+      const resetCount =
+        quota.reset?.available_count ?? quota.quota?.rate_limit_reset_credits?.available_count;
+      const resetExpiresAt = (quota.reset?.credits ?? [])
+        .filter((credit) => credit.status === "available" && credit.expires_at)
+        .map((credit) => Date.parse(credit.expires_at!))
+        .filter((expiresAt): expiresAt is number => Number.isFinite(expiresAt))
+        .sort((a, b) => a - b);
+
       return joinParts([
         formatWindow(rateLimit.primary_window),
         formatWindow(rateLimit.secondary_window),
+        resetCount !== undefined
+          ? [
+              theme.fg("accent", `${resetCount}`),
+              ...resetExpiresAt.map((expiresAt) => theme.fg("dim", formatRemaining(expiresAt))),
+            ].join(theme.fg("dim", "/"))
+          : null,
       ]);
     },
   }),
