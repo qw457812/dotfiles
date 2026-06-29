@@ -27,7 +27,6 @@ return {
     specs = {
       {
         "mitsuhiko/agent-stuff",
-        name = "mitsuhiko-agent-stuff",
         build = "pi update --extension git:github.com/mitsuhiko/agent-stuff",
         lazy = true,
         config = function() end,
