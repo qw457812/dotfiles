@@ -513,7 +513,13 @@ class TodoActionMenuComponent extends Container {
 	}
 
 	handleInput(keyData: string): void {
-		this.selectList.handleInput(keyData);
+		if (keyData === "j") {
+			this.selectList.handleInput("\x1b[B");
+		} else if (keyData === "k") {
+			this.selectList.handleInput("\x1b[A");
+		} else {
+			this.selectList.handleInput(keyData);
+		}
 	}
 
 	override invalidate(): void {
@@ -554,7 +560,13 @@ class TodoDeleteConfirmComponent extends Container {
 	}
 
 	handleInput(keyData: string): void {
-		this.selectList.handleInput(keyData);
+		if (keyData === "j") {
+			this.selectList.handleInput("\x1b[B");
+		} else if (keyData === "k") {
+			this.selectList.handleInput("\x1b[A");
+		} else {
+			this.selectList.handleInput(keyData);
+		}
 	}
 
 	override invalidate(): void {
@@ -603,19 +615,19 @@ class TodoDetailOverlayComponent {
 			this.onAction("work");
 			return;
 		}
-		if (kb.matches(keyData, "tui.select.up")) {
+		if (keyData === "k" || kb.matches(keyData, "tui.select.up")) {
 			this.scrollBy(-1);
 			return;
 		}
-		if (kb.matches(keyData, "tui.select.down")) {
+		if (keyData === "j" || kb.matches(keyData, "tui.select.down")) {
 			this.scrollBy(1);
 			return;
 		}
-		if (kb.matches(keyData, "tui.select.pageUp") || matchesKey(keyData, Key.left)) {
+		if (keyData === "h" || kb.matches(keyData, "tui.select.pageUp") || matchesKey(keyData, Key.left)) {
 			this.scrollBy(-this.viewHeight || -1);
 			return;
 		}
-		if (kb.matches(keyData, "tui.select.pageDown") || matchesKey(keyData, Key.right)) {
+		if (keyData === "l" || kb.matches(keyData, "tui.select.pageDown") || matchesKey(keyData, Key.right)) {
 			this.scrollBy(this.viewHeight || 1);
 			return;
 		}
