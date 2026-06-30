@@ -15,7 +15,7 @@
 	},
 	"dependencies": {
 		"@anthropic-ai/sandbox-runtime": "^0.0.52",
-		"just-bash": "^3.0.1",
+		"just-bash": "^3.0.2",
 		"tree-sitter-bash": "0.25.0",
 		"web-tree-sitter": "0.25.10"
 	},

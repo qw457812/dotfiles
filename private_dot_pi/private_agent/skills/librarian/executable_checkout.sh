@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-set -eu
-set -o pipefail
+set -euo pipefail
 
 usage() {
   cat <<'EOF'
