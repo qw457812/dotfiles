@@ -140,6 +140,7 @@ return {
         config = function() end,
       },
       { "dannote/dot-pi", name = "dannote-dot-pi", lazy = true, config = function() end },
+      { "ogulcancelik/herdr", lazy = true, config = function() end },
       {
         "LazyVim/LazyVim",
         keys = {
@@ -190,7 +191,9 @@ return {
     },
   },
 
-  -- HACK: multiple claude/opencode sessions per cwd
+  -- HACK:
+  -- 1. multiple claude/opencode sessions per cwd
+  -- 2. register herdr as mux backend
   {
     "folke/sidekick.nvim",
     optional = true,
@@ -313,7 +316,23 @@ return {
         count = 0,
       })
 
+      local mux_backend = vim.tbl_get(opts, "cli", "mux", "backend")
       require("sidekick").setup(opts)
+
+      if vim.fn.executable("herdr") == 1 then
+        U.ai.sidekick.cli.mux.register_herdr_backend()
+
+        local is_herdr = vim.env.HERDR_ENV == "1"
+          and (vim.env.HERDR_PANE_ID or "") ~= ""
+          and (vim.env.HERDR_SOCKET_PATH or "") ~= ""
+        if not mux_backend and is_herdr then
+          -- Sidekick validates opts.cli.mux.backend as tmux|zellij during setup; switch after that.
+          vim.schedule(function()
+            ---@diagnostic disable-next-line: assign-type-mismatch
+            require("sidekick.config").cli.mux.backend = "herdr"
+          end)
+        end
+      end
     end,
   },
 
@@ -628,6 +647,7 @@ return {
         },
         ---@type sidekick.cli.Mux
         mux = {
+          backend = "tmux",
           enabled = true,
           dump = 10000,
         },
