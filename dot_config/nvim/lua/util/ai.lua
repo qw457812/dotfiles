@@ -258,188 +258,221 @@ M.sidekick = {
         local Terminal = require("sidekick.cli.terminal")
         local Util = require("sidekick.util")
 
-        if not Session.backends.herdr then
-          ---@class sidekick.cli.session.Herdr: sidekick.cli.Session
-          ---@field herdr_terminal_id? string
-          ---@field herdr_pane_id? string Current snapshot only; Herdr pane ids can be compacted/reused.
-          local Herdr = { priority = 50, external = false }
-          Herdr.__index = Herdr
+        if Session.backends.herdr then
+          return
+        end
 
-          ---@param cmd string[]
-          ---@param opts? vim.SystemOpts|{ notify?: boolean, empty_ok?: boolean, required?: boolean }
-          ---@return table?
-          local function request(cmd, opts)
-            opts = opts or {}
-            cmd = vim.list_extend({ "herdr" }, cmd)
-            local command = table.concat(vim.tbl_map(tostring, cmd), " ")
-            local _, stdout = Util.exec(cmd, opts)
-            if not stdout then
-              if opts.required then
-                error(("Herdr command failed: `%s`"):format(command))
-              end
-              return nil
-            end
-            if stdout == "" then
-              if opts.empty_ok then
-                return {}
-              end
-              error(("Herdr returned an empty response for `%s`"):format(command))
-            end
+        ---@class sidekick.cli.muxer.Herdr: sidekick.cli.Session
+        ---@field herdr_terminal_id? string Herdr terminal id used for direct attach and stable identity.
+        ---@field herdr_pane_id? string Current Herdr pane id; Herdr pane ids can be compacted/reused.
+        local Herdr = {}
+        Herdr.__index = Herdr
+        Herdr.priority = 50
+        Herdr.external = false
 
-            local ok, decoded = pcall(vim.json.decode, stdout)
-            if not ok then
-              error(("Failed to decode Herdr response for `%s`:\n%s"):format(command, stdout))
+        ---@class sidekick.herdr.Pane
+        ---@field skid string unique id for the pane
+        ---@field id string Herdr pane id
+        ---@field terminal_id? string Herdr terminal id
+        ---@field workspace_id? string Herdr workspace id
+        ---@field tab_id? string Herdr tab id
+        ---@field cwd? string pane cwd
+        ---@field agent? string detected agent label
+
+        ---@param args string[]
+        ---@return string[]
+        function Herdr.cmd(args)
+          return vim.list_extend({ "herdr" }, args)
+        end
+
+        ---@param args string[]
+        ---@return string[]
+        function Herdr:herdr(args)
+          return Herdr.cmd(args)
+        end
+
+        ---@param cmd string[]
+        ---@param opts? vim.SystemOpts|{ notify?: boolean, required?: boolean }
+        ---@return table?
+        function Herdr.json(cmd, opts)
+          opts = opts or {}
+          local _, stdout = Util.exec(cmd, opts)
+          if not stdout or stdout == "" then
+            if opts.required then
+              error(("Herdr command failed: `%s`"):format(table.concat(vim.tbl_map(tostring, cmd), " ")))
             end
-            if decoded.error then
-              local msg = "Herdr request failed:\n```json\n" .. vim.json.encode(decoded.error) .. "\n```"
-              if opts.required then
-                error(msg)
-              end
-              if opts.notify ~= false then
-                Util.error(msg)
-              end
-              return nil
-            end
-            return decoded.result
+            return
           end
 
-          ---@param agent table?
-          ---@param cwd string?
-          ---@param tools table<string, sidekick.cli.Tool>
-          ---@return sidekick.cli.Tool?
-          local function tool_from_agent(agent, cwd, tools)
-            local name = agent and agent.name
-            if not name then
-              return nil
+          local ok, ret = pcall(vim.json.decode, stdout)
+          if not ok or type(ret) ~= "table" then
+            local msg = ("Failed to parse Herdr response: `%s`"):format(table.concat(vim.tbl_map(tostring, cmd), " "))
+            if opts.required then
+              error(msg)
             end
-            if cwd then
-              for tool_name, tool in pairs(tools) do
-                if name == Session.sid({ tool = tool_name, cwd = cwd }) then
-                  return tool
-                end
-              end
+            if opts.notify ~= false then
+              Util.error(msg)
             end
-            local tool_name = name:match("^(%S+) ")
-            return tool_name and tools[tool_name] or nil
+            return
           end
 
-          ---@param pane_id string
-          ---@param tools table<string, sidekick.cli.Tool>
-          ---@return sidekick.cli.Tool?, string?, integer[]
-          local function tool_from_process(pane_id, tools)
-            local result = request({ "pane", "process-info", "--pane", pane_id }, { notify = false })
-            local processes = result and result.process_info and result.process_info.foreground_processes or {}
-            local pids = {} ---@type integer[]
-            local found, found_cwd ---@type sidekick.cli.Tool?, string?
-
-            for _, info in ipairs(processes) do
-              if info.pid then
-                pids[#pids + 1] = info.pid
-              end
-              if not found then
-                local proc = {
-                  pid = info.pid,
-                  ppid = 0,
-                  cmd = info.cmdline or (info.argv and table.concat(info.argv, " ")) or info.argv0 or info.name or "",
-                  cwd = info.cwd,
-                }
-                for _, tool in pairs(tools) do
-                  if tool:is_proc(proc) then
-                    found, found_cwd = tool, proc.cwd
-                    break
-                  end
-                end
-              end
+          if ret.error then
+            local msg = "Herdr request failed:\n```json\n" .. vim.json.encode(ret.error) .. "\n```"
+            if opts.required then
+              error(msg)
             end
-
-            return found, found_cwd, pids
+            if opts.notify ~= false then
+              Util.error(msg)
+            end
+            return
           end
 
-          ---@param self sidekick.cli.session.Herdr
-          ---@param pane table
-          local function apply_pane(self, pane)
-            self.herdr_terminal_id = pane.terminal_id
-            self.herdr_pane_id = pane.pane_id
-            self.mux_session = pane.workspace_id
-            self.cwd = pane.cwd or pane.foreground_cwd or self.cwd
-            self.id = "herdr " .. pane.terminal_id
-            self.started = true
-          end
+          return ret.result
+        end
 
-          ---@return sidekick.cli.terminal.Cmd?
-          function Herdr:start()
-            local cmd = { "agent", "start", self.sid, "--cwd", self.cwd, "--no-focus" }
-            for key, value in pairs(self.tool.env or {}) do
-              if value ~= false and value ~= nil then
-                vim.list_extend(cmd, { "--env", ("%s=%s"):format(key, tostring(value)) })
-              end
-            end
-            table.insert(cmd, "--")
-            vim.list_extend(cmd, self.tool.cmd)
-
-            local result = request(cmd, { notify = true, required = true })
-            local pane = result and result.agent
-            if not pane then
-              error("Herdr agent start response did not include result.agent")
-            elseif not pane.terminal_id then
-              error("Herdr agent start response did not include result.agent.terminal_id")
-            elseif not pane.pane_id then
-              error("Herdr agent start response did not include result.agent.pane_id")
-            end
-            apply_pane(self, pane)
-            Util.info(("Started **%s** in Herdr"):format(self.tool.name))
-            return self:attach()
-          end
-
-          ---@return sidekick.cli.terminal.Cmd?
-          function Herdr:attach()
-            if not self.herdr_terminal_id then
-              error("Herdr session has no terminal_id")
-            end
-            return { cmd = { "herdr", "terminal", "attach", self.herdr_terminal_id, "--takeover" } }
-          end
-
-          function Herdr:pane_id()
-            if not self.herdr_terminal_id then
-              return nil
-            end
-            local result = request({ "pane", "list" }, { notify = false })
-            for _, pane in ipairs(result and result.panes or {}) do
-              if pane.terminal_id == self.herdr_terminal_id then
-                apply_pane(self, pane)
-                return pane.pane_id
-              end
+        ---@param ret string[]
+        function Herdr:add_env(ret)
+          for key, value in pairs(self.tool.env or {}) do
+            if value ~= false and value ~= nil then
+              vim.list_extend(ret, { "--env", ("%s=%s"):format(key, tostring(value)) })
             end
           end
+        end
 
-          function Herdr:is_running()
-            local pane_id = self:pane_id()
-            return pane_id and request({ "pane", "get", pane_id }, { notify = false }) ~= nil or false
+        ---@param ret string[]
+        function Herdr:add_cmd(ret)
+          self:add_env(ret)
+          ret[#ret + 1] = "--"
+          vim.list_extend(ret, self.tool.cmd)
+        end
+
+        ---@param pane table
+        function Herdr:update_pane(pane)
+          self.herdr_terminal_id = pane.terminal_id or self.herdr_terminal_id
+          self.herdr_pane_id = pane.pane_id or pane.id or self.herdr_pane_id
+          self.mux_session = pane.workspace_id or self.mux_session
+          self.cwd = pane.foreground_cwd or pane.cwd or self.cwd
+          self.started = true
+          if self.herdr_terminal_id then
+            self.id = ("herdr %s"):format(self.herdr_terminal_id)
+          end
+        end
+
+        ---@return sidekick.cli.terminal.Cmd?
+        function Herdr:start()
+          local cmd = self:herdr({ "agent", "start", self.sid, "--cwd", self.cwd, "--no-focus" })
+          if vim.env.HERDR_ENV == "1" and Config.cli.mux.create == "split" then
+            vim.list_extend(cmd, { "--split", Config.cli.mux.split.vertical and "right" or "down" })
+          end
+          self:add_cmd(cmd)
+
+          local result = Herdr.json(cmd, { notify = true, required = true })
+          local pane = result and result.agent
+          if not pane then
+            return
+          end
+          self:update_pane(pane)
+          Util.info(("Started **%s** in Herdr"):format(self.tool.name))
+          return self:attach()
+        end
+
+        ---@return sidekick.cli.terminal.Cmd?
+        function Herdr:attach()
+          if self.herdr_terminal_id then
+            return { cmd = self:herdr({ "terminal", "attach", self.herdr_terminal_id, "--takeover" }) }
+          end
+        end
+
+        ---@param opts? { notify?: boolean }
+        ---@return sidekick.herdr.Pane[]
+        function Herdr.panes(opts)
+          opts = opts or {}
+          local result = Herdr.json(Herdr.cmd({ "pane", "list" }), { notify = opts.notify == true })
+          local panes = {} ---@type sidekick.herdr.Pane[]
+          for _, pane in ipairs(result and result.panes or {}) do
+            local pane_id, terminal_id = pane.pane_id, pane.terminal_id
+            if pane_id then
+              panes[#panes + 1] = {
+                skid = ("herdr %s"):format(terminal_id or pane_id),
+                id = pane_id,
+                terminal_id = terminal_id,
+                workspace_id = pane.workspace_id,
+                tab_id = pane.tab_id,
+                cwd = pane.foreground_cwd or pane.cwd,
+                agent = pane.agent,
+              }
+            end
+          end
+          return panes
+        end
+
+        ---@param pane_id string
+        ---@return table?
+        function Herdr.process_info(pane_id)
+          local result = Herdr.json(Herdr.cmd({ "pane", "process-info", "--pane", pane_id }), { notify = false })
+          return result and result.process_info
+        end
+
+        ---@return sidekick.herdr.Pane?
+        function Herdr:pane()
+          if not (self.herdr_terminal_id or self.herdr_pane_id) then
+            return
+          end
+          for _, pane in ipairs(Herdr.panes()) do
+            if
+              (self.herdr_terminal_id and pane.terminal_id == self.herdr_terminal_id)
+              or (not self.herdr_terminal_id and pane.id == self.herdr_pane_id)
+            then
+              self:update_pane(pane)
+              return pane
+            end
+          end
+        end
+
+        ---@return string?
+        function Herdr:pane_id()
+          local pane = self:pane()
+          return pane and pane.id
+        end
+
+        function Herdr:is_running()
+          return self:pane() ~= nil
+        end
+
+        ---Send text to a Herdr pane
+        function Herdr:send(text)
+          local pane_id = self:pane_id()
+          if not pane_id then
+            return
           end
 
-          function Herdr:send(text)
-            local pane_id = self:pane_id()
-            if not pane_id then
-              error("Herdr session has no pane_id")
-            end
-            request({ "pane", "send-text", pane_id, text }, { notify = true, empty_ok = true, required = true })
+          local function send()
+            Util.exec(self:herdr({ "pane", "send-text", pane_id, text }), { notify = true })
           end
 
-          function Herdr:submit()
-            local pane_id = self:pane_id()
-            if not pane_id then
-              error("Herdr session has no pane_id")
-            end
-            request({ "pane", "send-keys", pane_id, "enter" }, { notify = true, empty_ok = true, required = true })
+          if self.tool.mux_focus then
+            Util.exec(self:herdr({ "pane", "send-keys", pane_id, "esc", "[", "I" }), { notify = true })
+            vim.defer_fn(send, 50)
+          else
+            send()
           end
+        end
 
-          function Herdr:dump()
-            local pane_id = self:pane_id()
-            if not pane_id then
-              return nil
-            end
-            local _, stdout = Util.exec({
-              "herdr",
+        ---Send text to a Herdr pane
+        function Herdr:submit()
+          local pane_id = self:pane_id()
+          if pane_id then
+            Util.exec(self:herdr({ "pane", "send-keys", pane_id, "Enter" }), { notify = true })
+          end
+        end
+
+        function Herdr:dump()
+          local pane_id = self:pane_id()
+          if not pane_id then
+            return
+          end
+          local _, ret = Util.exec(
+            self:herdr({
               "pane",
               "read",
               pane_id,
@@ -448,61 +481,130 @@ M.sidekick = {
               "--lines",
               tostring(Config.cli.mux.dump), -- Herdr caps pane reads at 1000 lines
               "--ansi",
-            }, { notify = false })
-            return stdout
-          end
-
-          function Herdr.sessions()
-            local result = request({ "pane", "list" }, { notify = false })
-            local tools = Config.tools()
-            local ret = {} ---@type sidekick.cli.session.State[]
-            local agents = {} ---@type table<string, table>
-
-            for _, agent in ipairs((request({ "agent", "list" }, { notify = false }) or {}).agents or {}) do
-              if agent.terminal_id then
-                agents[agent.terminal_id] = agent
-              end
-            end
-
-            for _, pane in ipairs(result and result.panes or {}) do
-              local pane_id, terminal_id = pane.pane_id, pane.terminal_id
-              if pane_id and terminal_id then
-                local agent = agents[terminal_id]
-                local cwd = pane.cwd or pane.foreground_cwd or agent and (agent.cwd or agent.foreground_cwd)
-                local tool = tool_from_agent(agent, cwd, tools)
-                local proc_tool, proc_cwd, pids = tool_from_process(pane_id, tools)
-                if not tool and proc_tool then
-                  tool, cwd = proc_tool, proc_cwd or cwd
-                end
-
-                if tool then
-                  for _, terminal in pairs(Terminal.terminals) do
-                    local parent = terminal.parent
-                    if terminal.mux_backend == "herdr" and parent then
-                      ---@cast parent sidekick.cli.session.Herdr
-                      if parent.herdr_terminal_id == terminal_id then
-                        vim.list_extend(pids, terminal.pids or {})
-                      end
-                    end
-                  end
-                  ret[#ret + 1] = {
-                    id = "herdr " .. terminal_id,
-                    cwd = cwd or Session.cwd(),
-                    tool = tool,
-                    herdr_terminal_id = terminal_id,
-                    herdr_pane_id = pane_id,
-                    mux_session = pane.workspace_id,
-                    pids = pids,
-                  }
-                end
-              end
-            end
-
-            return ret
-          end
-
-          Session.register("herdr", Herdr)
+            }),
+            { notify = false }
+          )
+          return ret
         end
+
+        ---@param pids integer[]
+        ---@param pid integer?
+        local function add_pid(pids, pid)
+          if pid and not vim.tbl_contains(pids, pid) then
+            pids[#pids + 1] = pid
+          end
+        end
+
+        ---@param agent table?
+        ---@param cwd string?
+        ---@param tools table<string, sidekick.cli.Tool>
+        ---@return sidekick.cli.Tool?
+        local function tool_from_agent(agent, cwd, tools)
+          local name = agent and agent.name
+          if not name then
+            return
+          end
+          if cwd then
+            for tool_name, tool in pairs(tools) do
+              if name == Session.sid({ tool = tool_name, cwd = cwd }) then
+                return tool
+              end
+            end
+          end
+          local tool_name = name:match("^(%S+) ")
+          return tool_name and tools[tool_name] or nil
+        end
+
+        ---@param info table?
+        ---@return integer[]
+        local function process_pids(info)
+          local pids = {} ---@type integer[]
+          add_pid(pids, info and info.shell_pid)
+          for _, proc in ipairs(info and info.foreground_processes or {}) do
+            add_pid(pids, proc.pid)
+          end
+          return pids
+        end
+
+        ---@param info table?
+        ---@param pane sidekick.herdr.Pane
+        ---@param tools table<string, sidekick.cli.Tool>
+        ---@return sidekick.cli.Tool?, string?
+        local function tool_from_process(info, pane, tools)
+          for _, proc in ipairs(info and info.foreground_processes or {}) do
+            local p = {
+              pid = proc.pid,
+              ppid = info and info.shell_pid or 0,
+              cmd = proc.cmdline or (proc.argv and table.concat(proc.argv, " ")) or proc.argv0 or proc.name or "",
+              cwd = proc.cwd or pane.cwd,
+            }
+            for _, tool in pairs(tools) do
+              if tool:is_proc(p) then
+                return tool, p.cwd
+              end
+            end
+          end
+        end
+
+        ---@param pids integer[]
+        ---@param terminal_id string
+        local function add_attached_pids(pids, terminal_id)
+          for _, terminal in pairs(Terminal.terminals) do
+            local parent = terminal.parent
+            if terminal.mux_backend == "herdr" and parent then
+              ---@cast parent sidekick.cli.muxer.Herdr
+              if parent.herdr_terminal_id == terminal_id then
+                for _, pid in ipairs(terminal.pids or {}) do
+                  add_pid(pids, pid)
+                end
+              end
+            end
+          end
+        end
+
+        function Herdr.sessions()
+          local ret = {} ---@type sidekick.cli.session.State[]
+          local tools = Config.tools()
+          local agents = {} ---@type table<string, table>
+
+          for _, agent in ipairs((Herdr.json(Herdr.cmd({ "agent", "list" }), { notify = false }) or {}).agents or {}) do
+            if agent.terminal_id then
+              agents[agent.terminal_id] = agent
+            end
+          end
+
+          for _, pane in ipairs(Herdr.panes()) do
+            local terminal_id = pane.terminal_id
+            if terminal_id then
+              local agent = agents[terminal_id]
+              local cwd = pane.cwd or agent and (agent.foreground_cwd or agent.cwd)
+              local info = Herdr.process_info(pane.id)
+              local tool = tool_from_agent(agent, cwd, tools)
+              local proc_tool, proc_cwd = tool_from_process(info, pane, tools)
+              if not tool and proc_tool then
+                tool, cwd = proc_tool, proc_cwd or cwd
+              end
+
+              if tool then
+                local pids = process_pids(info)
+                add_attached_pids(pids, terminal_id)
+                ret[#ret + 1] = {
+                  id = pane.skid,
+                  cwd = cwd or Session.cwd(),
+                  tool = tool,
+                  herdr_terminal_id = terminal_id,
+                  herdr_pane_id = pane.id,
+                  mux_session = pane.workspace_id,
+                  pids = pids,
+                }
+              end
+            end
+          end
+
+          return ret
+        end
+
+        Session.register("herdr", Herdr)
       end,
     },
     -- quick commands that skip the select step

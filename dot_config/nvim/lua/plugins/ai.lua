@@ -316,17 +316,19 @@ return {
         count = 0,
       })
 
-      local mux_backend = vim.tbl_get(opts, "cli", "mux", "backend")
+      opts.cli.mux = opts.cli.mux or {}
+      local use_herdr = opts.cli.mux.backend == "herdr"
+      if use_herdr then
+        -- Sidekick currently only accepts tmux|zellij in its scheduled setup validation.
+        -- Let setup use its default backend, then switch to the user-registered Herdr backend below.
+        opts.cli.mux.backend = nil
+      end
+
       require("sidekick").setup(opts)
 
       if vim.fn.executable("herdr") == 1 then
         U.ai.sidekick.cli.mux.register_herdr_backend()
-
-        local is_herdr = vim.env.HERDR_ENV == "1"
-          and (vim.env.HERDR_PANE_ID or "") ~= ""
-          and (vim.env.HERDR_SOCKET_PATH or "") ~= ""
-        if not mux_backend and is_herdr then
-          -- Sidekick validates opts.cli.mux.backend as tmux|zellij during setup; switch after that.
+        if use_herdr then
           vim.schedule(function()
             ---@diagnostic disable-next-line: assign-type-mismatch
             require("sidekick.config").cli.mux.backend = "herdr"
@@ -647,7 +649,8 @@ return {
         },
         ---@type sidekick.cli.Mux
         mux = {
-          backend = "tmux",
+          ---@diagnostic disable-next-line: assign-type-mismatch
+          backend = vim.env.HERDR_ENV == "1" and "herdr" or nil,
           enabled = true,
           dump = 10000,
         },
