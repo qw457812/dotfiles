@@ -164,6 +164,44 @@ function H.nvim_key_to_tmux(key)
   )
 end
 
+---@param key string
+---@return string
+function H.nvim_key_to_herdr(key)
+  local inner = key:match("^<(.*)>$")
+  if not inner then
+    return key
+  end
+
+  local key_names = {
+    bs = "backspace",
+    bspace = "backspace",
+    cr = "enter",
+    enter = "enter",
+    esc = "esc",
+    space = "space",
+  }
+  local key_mods = {
+    a = "alt",
+    alt = "alt",
+    c = "ctrl",
+    cmd = "cmd",
+    ctrl = "ctrl",
+    d = "cmd",
+    m = "alt",
+    s = "shift",
+    shift = "shift",
+    super = "super",
+  }
+
+  local parts = vim.split(inner, "-", { plain = true })
+  local name = assert(table.remove(parts), "missing key")
+  local mods = vim.tbl_map(function(mod)
+    return key_mods[mod:lower()] or mod:lower()
+  end, parts)
+  name = key_names[name:lower()] or name:lower()
+  return table.concat(vim.list_extend(mods, { name }), "+")
+end
+
 H.sidekick = {
   cli = {
     ---@return { win: integer, buf: integer, tool: sidekick.cli.Tool, terminal: sidekick.cli.Terminal, session: sidekick.cli.Session }[]
@@ -265,6 +303,7 @@ M.sidekick = {
         ---@class sidekick.cli.muxer.Herdr: sidekick.cli.Session
         ---@field herdr_terminal_id? string Herdr terminal id used for direct attach and stable identity.
         ---@field herdr_pane_id? string Current Herdr pane id; Herdr pane ids can be compacted/reused.
+        ---@field herdr_workspace_id? string Herdr workspace id shown in Sidekick's mux label.
         local Herdr = {}
         Herdr.__index = Herdr
         Herdr.priority = 50
@@ -350,7 +389,8 @@ M.sidekick = {
         function Herdr:update_pane(pane)
           self.herdr_terminal_id = pane.terminal_id or self.herdr_terminal_id
           self.herdr_pane_id = pane.pane_id or pane.id or self.herdr_pane_id
-          self.mux_session = pane.workspace_id or self.mux_session
+          self.herdr_workspace_id = pane.workspace_id or self.herdr_workspace_id
+          self.mux_session = self.herdr_workspace_id or self.mux_session
           self.cwd = pane.foreground_cwd or pane.cwd or self.cwd
           self.started = true
           if self.herdr_terminal_id then
@@ -360,8 +400,9 @@ M.sidekick = {
 
         ---@return sidekick.cli.terminal.Cmd?
         function Herdr:start()
+          local split = vim.env.HERDR_ENV == "1" and Config.cli.mux.create == "split"
           local cmd = self:herdr({ "agent", "start", self.sid, "--cwd", self.cwd, "--no-focus" })
-          if vim.env.HERDR_ENV == "1" and Config.cli.mux.create == "split" then
+          if split then
             vim.list_extend(cmd, { "--split", Config.cli.mux.split.vertical and "right" or "down" })
           end
           self:add_cmd(cmd)
@@ -372,7 +413,10 @@ M.sidekick = {
             return
           end
           self:update_pane(pane)
-          Util.info(("Started **%s** in Herdr"):format(self.tool.name))
+          if split then
+            Util.info(("Started **%s** in a Herdr split"):format(self.tool.name))
+            return
+          end
           return self:attach()
         end
 
@@ -451,18 +495,29 @@ M.sidekick = {
           end
 
           if self.tool.mux_focus then
-            Util.exec(self:herdr({ "pane", "send-keys", pane_id, "esc", "[", "I" }), { notify = true })
+            self:send_keys({ "esc", "[", "I" })
             vim.defer_fn(send, 50)
           else
             send()
           end
         end
 
-        ---Send text to a Herdr pane
-        function Herdr:submit()
+        ---@param keys string[]
+        function Herdr:send_keys(keys)
           local pane_id = self:pane_id()
           if pane_id then
-            Util.exec(self:herdr({ "pane", "send-keys", pane_id, "Enter" }), { notify = true })
+            Util.exec(self:herdr(vim.list_extend({ "pane", "send-keys", pane_id }, keys)), { notify = true })
+          end
+        end
+
+        function Herdr:submit()
+          self:send_keys({ "enter" })
+        end
+
+        function Herdr:close()
+          local pane_id = self:pane_id()
+          if pane_id then
+            Util.exec(self:herdr({ "pane", "close", pane_id }), { notify = true })
           end
         end
 
@@ -479,7 +534,7 @@ M.sidekick = {
               "--source",
               "recent",
               "--lines",
-              tostring(Config.cli.mux.dump), -- Herdr caps pane reads at 1000 lines
+              tostring(Config.cli.mux.dump), -- NOTE: Herdr caps pane reads at 1000 lines
               "--ansi",
             }),
             { notify = false }
@@ -594,6 +649,7 @@ M.sidekick = {
                   tool = tool,
                   herdr_terminal_id = terminal_id,
                   herdr_pane_id = pane.id,
+                  herdr_workspace_id = pane.workspace_id,
                   mux_session = pane.workspace_id,
                   pids = pids,
                 }
@@ -681,13 +737,22 @@ M.sidekick = {
         end
         State.detach(state)
         if session.mux_session then
-          U.confirm(("Kill session %q?"):format(session.mux_session), function()
-            if session.backend == "tmux" or session.mux_backend == "tmux" then
+          if session.backend == "tmux" or session.mux_backend == "tmux" then
+            U.confirm(("Kill tmux session %q?"):format(session.mux_session), function()
               Util.exec({ "tmux", "kill-session", "-t", session.mux_session })
-            else
-              -- TODO: zellij
+            end)
+          elseif session.backend == "herdr" or session.mux_backend == "herdr" then
+            local herdr = session.backend == "herdr" and session or session.parent
+            ---@cast herdr sidekick.cli.muxer.Herdr
+            local pane_id = herdr:pane_id()
+            if pane_id then
+              U.confirm(("Close herdr pane %q?"):format(pane_id), function()
+                herdr:close()
+              end)
             end
-          end)
+          else
+            -- TODO: zellij
+          end
         end
       end
 
@@ -775,21 +840,29 @@ M.sidekick = {
         vim.schedule(function()
           local lines_before = H.visible_lines(terminal.buf, terminal.win)
 
+          local function after_submit()
+            vim.defer_fn(function()
+              local lines_after = H.visible_lines(terminal.buf, terminal.win)
+              if vim.deep_equal(lines_before, lines_after) then
+                -- focus if <cr> had no effect
+                terminal:focus()
+              elseif terminal.scrollback and terminal.scrollback:is_open() then
+                -- switch from scrollback to terminal if <cr> had effect
+                terminal.scrollback:close()
+              end
+            end, 50)
+          end
+
           if session.mux_session then
             if session.backend == "tmux" or session.mux_backend == "tmux" then
               -- submit: https://github.com/folke/sidekick.nvim/blob/41dec4dcdf0c8fe17f5f2e9eeced4645a88afb0d/lua/sidekick/cli/session/tmux.lua#L185-L187
               Util.exec({ "tmux", "send-keys", "-t", session.mux_session, "Enter" })
-
-              vim.defer_fn(function()
-                local lines_after = H.visible_lines(terminal.buf, terminal.win)
-                if vim.deep_equal(lines_before, lines_after) then
-                  -- focus if <cr> had no effect
-                  terminal:focus()
-                elseif terminal.scrollback and terminal.scrollback:is_open() then
-                  -- switch from scrollback to terminal if <cr> had effect
-                  terminal.scrollback:close()
-                end
-              end, 50)
+              after_submit()
+            elseif session.backend == "herdr" or session.mux_backend == "herdr" then
+              local herdr = session.backend == "herdr" and session or session.parent
+              ---@cast herdr sidekick.cli.muxer.Herdr
+              herdr:submit()
+              after_submit()
             else
               -- TODO: zellij
             end
@@ -887,6 +960,11 @@ M.sidekick = {
               if t.backend == "tmux" or t.mux_backend == "tmux" then
                 local tmux_keys = vim.tbl_map(H.nvim_key_to_tmux, keys)
                 require("sidekick.util").exec({ "tmux", "send-keys", "-t", t.mux_session, unpack(tmux_keys) })
+                fb()
+              elseif t.backend == "herdr" or t.mux_backend == "herdr" then
+                local herdr = t.backend == "herdr" and t or t.parent
+                ---@cast herdr sidekick.cli.muxer.Herdr
+                herdr:send_keys(vim.tbl_map(H.nvim_key_to_herdr, keys))
                 fb()
               else
                 -- TODO: zellij
