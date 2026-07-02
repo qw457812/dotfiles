@@ -5,7 +5,6 @@ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 const ORDERED_LEVELS: ModelThinkingLevel[] = ["off", "minimal", "low", "medium", "high", "xhigh"];
 
 const MAX_LEVEL_PROVIDERS = new Set([
-  "github-copilot",
   "kiro",
   "zai",
   "deepseek",
@@ -43,7 +42,7 @@ export default function (pi: ExtensionAPI) {
     if (source !== "set" && source !== "cycle") return;
 
     if (
-      (provider === "openai-codex" || provider === "freemodel") &&
+      (provider === "openai-codex" || provider === "github-copilot" || provider === "freemodel") &&
       (id === "gpt-5.5" || id === "gpt-5.4")
     ) {
       setLevelIfSupported(pi, model, "high");

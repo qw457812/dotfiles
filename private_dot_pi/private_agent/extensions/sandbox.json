@@ -29,6 +29,9 @@
         // Bun
         "bun.sh",
         "*.bun.sh",
+        // Mise
+        "mise-versions.jdx.dev",
+        "mise.en.dev",
         // GitHub
         "github.com",
         "*.github.com",
@@ -36,6 +39,8 @@
         "raw.githubusercontent.com",
         // GitLab
         "gitlab.com",
+        // Gitee
+        "gitee.com",
         // LLM APIs
         "*.googleapis.com",
         "*.google.com",
@@ -93,6 +98,9 @@
         "https://index.rubygems.org",
         // Bun
         "https://bun.sh",
+        // Mise
+        "https://mise-versions.jdx.dev",
+        "https://mise.en.dev",
         // GitHub
         "https://github.com",
         "https://api.github.com",
@@ -100,6 +108,8 @@
         "https://raw.githubusercontent.com",
         // GitLab
         "https://gitlab.com",
+        // Gitee
+        "https://gitee.com",
         // LLM APIs
         "https://generativelanguage.googleapis.com",
         "https://oauth2.googleapis.com",
