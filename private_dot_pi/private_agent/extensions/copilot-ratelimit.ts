@@ -1,55 +1,36 @@
 /**
  * GitHub Copilot short-term rate-limit indicator.
  *
- * Copilot enforces two rolling windows on top of the monthly quota:
- *   - session: `global-usage-5-hour-key` (rolling 5 hours)
- *   - weekly:  `global-usage-weekly-key` (every Monday 00:00 UTC)
+ * Copilot exposes its rolling 5h and weekly windows only on inference response
+ * headers. We read them passively and show them in the footer.
  *
- * There is no read-only endpoint for these. The window state rides along on
- * every inference response's headers, so we read it passively — zero extra
- * requests, zero quota spent.
+ * Normal responses go through `after_provider_response`. 429s still need a tiny
+ * fetch wrapper because the OpenAI SDK throws before that hook runs.
  *
- * We cannot use pi's `after_provider_response` event: it fires from `onResponse`,
- * which pi-ai calls AFTER `await client.create()` returns, and the OpenAI SDK
- * throws an APIError on 429 before that line — so the event never fires exactly
- * when we need it (when rate-limited). Instead we wrap `globalThis.fetch` and read
- * the raw response headers before the SDK sees them. Same technique the neuralwatt
- * extension uses to inspect responses.
- *
- * Ref:
- * - pi-ai onResponse placement: packages/ai/dist/api/openai-completions.js (~L114-118)
- * - neuralwatt fetch wrap: github.com/monotykamary/pi-neuralwatt-provider index.ts
- * - window/header format: github.com/DrSmile444/copilot-status-mcp
- *
- * Headers (lowercased):
- *   429: retry-after / x-ratelimit-user-retry-after  (seconds until reset)
- *        x-ratelimit-exceeded  (e.g. "...:global-usage-5-hour-key:...")
- *   200: x-usage-ratelimit-session / x-usage-ratelimit-weekly
- *        "ent=0&rem=35.3&rst=2026-..."  (rem = remaining %, rst = reset ISO time)
- *        Only present once usage crosses ~50%; below that the server omits them.
- *
- * Displayed via ctx.ui.setStatus() — appears in the footer's extension-status line.
- * Format is `<percent>/<time>` pairs; percents are accented, the `/`
- * separator and the time value are dimmed. Rate-limited windows show 100%; the
- * blocked fallback shows the window label in place of a countdown.
+ * Header shapes:
+ *   - 429: `retry-after` / `x-ratelimit-user-retry-after`, `x-ratelimit-exceeded`
+ *   - usage: `x-usage-ratelimit-session` / `x-usage-ratelimit-weekly`
+ *            `ent=0&rem=35.3&rst=2026-...`
  */
 
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 
 const STATUS_KEY = "copilot-ratelimit";
-// Marker stored on our wrapper carrying the pre-wrap original fetch. A
-// re-loaded module instance reads this to recover the true underlying fetch
-// from the previous instance's wrapper, so /reload re-binds to the new
-// closures instead of leaving the stale ones driving the status.
+const PROVIDER = "github-copilot";
+// Carries the pre-wrap fetch so /reload can unwrap back to the true base fetch.
 const FETCH_MARKER = Symbol.for("copilot-ratelimit.fetch");
-// Copilot only returns the rate-limit window headers when the request carries
-// `X-GitHub-Api-Version`. pi's inference paths (anthropic + openai) omit it — it's
-// only sent for /models and policy — so the sniffer injects pi's own version.
+// The server only returns the rolling-window headers when the request carries
+// `X-GitHub-Api-Version`. pi-ai sends it for /models and policy but NOT for
+// inference, so without injecting it the indicator has nothing to read from
+// normal responses. Keep in sync with pi's COPILOT_API_VERSION
+// (utils/oauth/github-copilot.ts).
 const COPILOT_API_VERSION = "2026-06-01";
 
 interface MarkedFetch {
   [FETCH_MARKER]?: typeof fetch;
 }
+
+type HeaderSource = Headers | Record<string, string>;
 
 interface WindowState {
   /** 0-100, percent of the window already consumed. */
@@ -58,48 +39,21 @@ interface WindowState {
   resetsAt?: number;
 }
 
-interface WindowView {
-  label: string;
-  usedPercent: number;
-  resetsAt?: number;
-}
-
-// Current display state. The single render interval re-derives the status text
-// from this, so countdowns tick without a fresh response.
+// The render interval re-derives text from this state so countdowns tick
+// without fresh responses.
 type DisplayState =
   | { kind: "none" }
   | { kind: "blocked"; label: string } // 429 with no usable retry-after
-  | { kind: "limited"; label: string; resetAt: number } // 429, ticking countdown
-  | { kind: "usage"; windows: WindowView[] }; // 200, ≥50% usage
+  | { kind: "limited"; resetAt: number } // 429, ticking countdown
+  | { kind: "usage"; windows: WindowState[] }; // 200, ≥50% usage
 
-// States whose text changes over time and so need the render interval running.
-const TICKING: ReadonlySet<DisplayState["kind"]> = new Set(["limited", "usage"]);
-
-/**
- * Parse a Copilot window header.
- *
- * Format: `key=value` pairs joined by `&` (e.g. `ent=0&rem=35.3&rst=2026-...`).
- * Split manually rather than via URLSearchParams so both `&` and `;` are tolerated;
- * header values never contain either separator, so this is safe.
- */
+/** Parse a Copilot usage window header like `ent=0&rem=94.7&rst=2026-...`. */
 function parseWindowHeader(raw: string | undefined): WindowState | undefined {
   if (!raw) return undefined;
-  const params = new Map<string, string>();
-  for (const part of raw.split(/[;&]/)) {
-    const eq = part.indexOf("=");
-    if (eq < 0) continue;
-    const key = part.slice(0, eq).trim();
-    if (!key) continue;
-    // Values are URL-encoded (e.g. `rst=2026-...T17%3A05%3A31Z`); decode so timestamps parse.
-    let value = part.slice(eq + 1).trim();
-    try {
-      value = decodeURIComponent(value);
-    } catch {
-      // Leave as-is on malformed sequences.
-    }
-    params.set(key, value);
-  }
-  const remaining = Number(params.get("rem"));
+  const params = new URLSearchParams(raw);
+  const rem = params.get("rem");
+  if (rem === null) return undefined;
+  const remaining = Number(rem);
   if (!Number.isFinite(remaining)) return undefined;
   const rst = params.get("rst");
   const resetsAt = rst ? Date.parse(rst) : NaN;
@@ -122,18 +76,24 @@ function formatDuration(ms: number): string {
   return `${seconds}s`;
 }
 
-/** Map an `x-ratelimit-exceeded` value to a short window label. */
-function windowLabel(exceeded: string | undefined): "5h" | "wk" {
-  return exceeded?.includes("weekly") ? "wk" : "5h";
+function getHeader(headers: HeaderSource, name: string): string | undefined {
+  return headers instanceof Headers ? (headers.get(name) ?? undefined) : headers[name];
+}
+
+function retryResetAt(headers: HeaderSource): number | undefined {
+  const seconds = Number(
+    getHeader(headers, "retry-after") ?? getHeader(headers, "x-ratelimit-user-retry-after") ?? "0",
+  );
+  return Number.isFinite(seconds) && seconds > 0 ? Date.now() + seconds * 1000 : undefined;
+}
+
+function usageWindows(headers: HeaderSource): WindowState[] {
+  const session = parseWindowHeader(getHeader(headers, "x-usage-ratelimit-session"));
+  const weekly = parseWindowHeader(getHeader(headers, "x-usage-ratelimit-weekly"));
+  return [session, weekly].filter((window): window is WindowState => window !== undefined);
 }
 
 type FetchInput = Parameters<typeof fetch>[0];
-
-function extractUrl(input: FetchInput): string {
-  if (typeof input === "string") return input;
-  if (input instanceof URL) return input.href;
-  return input.url;
-}
 
 // Only inference endpoints carry the rate-limit window headers; other Copilot
 // requests (e.g. GET /models) also have `x-copilot-service-request-id` but no
@@ -143,7 +103,12 @@ const COPILOT_INFERENCE_PATHS = ["/chat/completions", "/v1/messages", "/messages
 function isCopilotInference(input: FetchInput): boolean {
   let url: URL;
   try {
-    url = new URL(extractUrl(input));
+    url =
+      typeof input === "string"
+        ? new URL(input)
+        : input instanceof URL
+          ? input
+          : new URL(input.url);
   } catch {
     return false;
   }
@@ -151,42 +116,22 @@ function isCopilotInference(input: FetchInput): boolean {
   return COPILOT_INFERENCE_PATHS.some((p) => url.pathname.endsWith(p));
 }
 
-/** Ensure a Copilot request carries `X-GitHub-Api-Version` so the server returns window headers. */
-function withCopilotApiVersion(init?: RequestInit): RequestInit {
-  const headers = new Headers(init?.headers);
-  if (!headers.has("x-github-api-version")) {
-    headers.set("x-github-api-version", COPILOT_API_VERSION);
-  }
-  return { ...init, headers };
-}
-
-// The rate-limit headers we care about, plus the marker that identifies a
-// Copilot inference response (`x-copilot-service-request-id`).
-const HEADER_PROBES = [
-  "x-copilot-service-request-id",
-  "retry-after",
-  "x-ratelimit-user-retry-after",
-  "x-ratelimit-exceeded",
-  "x-usage-ratelimit-session",
-  "x-usage-ratelimit-weekly",
-] as const;
-
 export default function (pi: ExtensionAPI) {
-  // Captured at session_start so the fetch wrapper (which has no ctx) can reach
-  // the UI and theme (for coloring the status text).
+  pi.registerProvider(PROVIDER, {
+    headers: { "X-GitHub-Api-Version": COPILOT_API_VERSION },
+  });
+
+  // Captured at session_start so the fetch wrapper can still render status.
   let currentCtx: ExtensionContext | undefined;
 
   let display: DisplayState = { kind: "none" };
   let renderTimer: ReturnType<typeof setInterval> | undefined;
-  // True underlying fetch captured on first install; doubles as the
-  // "installed by this instance" flag so we don't re-wrap per session_start.
-  let originalFetch: typeof fetch | undefined;
+  let installed = false;
 
   function setStatus(text: string | undefined): void {
     currentCtx?.ui.setStatus(STATUS_KEY, text);
   }
 
-  // Color helpers read the live theme from currentCtx (ExtensionUIContext.theme).
   const dim = (text: string): string => currentCtx?.ui.theme.fg("dim", text) ?? text;
   const accent = (text: string): string => currentCtx?.ui.theme.fg("accent", text) ?? text;
 
@@ -201,20 +146,23 @@ export default function (pi: ExtensionAPI) {
     if (!renderTimer) renderTimer = setInterval(render, 15_000);
   }
 
-  // Clear to the empty state: drop status text and stop the ticking interval.
   function clearDisplay(): void {
     display = { kind: "none" };
     stopRenderTimer();
     setStatus(undefined);
   }
 
-  // Render the current state, then keep the interval alive only for states
-  // that change over time (limited/usage); the rest are static.
   function applyDisplay(next: DisplayState): void {
     display = next;
     render();
-    if (TICKING.has(next.kind)) ensureRenderTimer();
+    if (next.kind === "limited" || next.kind === "usage") ensureRenderTimer();
     else stopRenderTimer();
+  }
+
+  function formatUsageStatus(window: WindowState, now: number): string {
+    const base = accent(`${Math.round(window.usedPercent)}%`);
+    if (!window.resetsAt || window.resetsAt <= now) return base;
+    return `${base}${dim(`/${formatDuration(window.resetsAt - now)}`)}`;
   }
 
   function render(): void {
@@ -235,71 +183,44 @@ export default function (pi: ExtensionAPI) {
       }
       case "usage": {
         const now = Date.now();
-        const parts = display.windows.map((w) => {
-          const base = accent(`${Math.round(w.usedPercent)}%`);
-          return w.resetsAt && w.resetsAt > now
-            ? `${base}${dim(`/${formatDuration(w.resetsAt - now)}`)}`
-            : base;
-        });
+        const parts = display.windows.map((window) => formatUsageStatus(window, now));
         setStatus(dim(" ") + parts.join(" "));
         return;
       }
     }
   }
 
-  function handleCopilotResponse(status: number, headers: Record<string, string>): void {
-    if (status === 429) {
-      const seconds = Number(
-        headers["retry-after"] ?? headers["x-ratelimit-user-retry-after"] ?? "0",
-      );
-      const label = windowLabel(headers["x-ratelimit-exceeded"]);
-      const resetAt =
-        Number.isFinite(seconds) && seconds > 0 ? Date.now() + seconds * 1000 : undefined;
-      applyDisplay(resetAt ? { kind: "limited", label, resetAt } : { kind: "blocked", label });
-      return;
-    }
+  function applyRateLimitDisplay(headers: HeaderSource): void {
+    const exceeded = getHeader(headers, "x-ratelimit-exceeded");
+    const label = exceeded?.includes("weekly") ? "wk" : "5h";
+    const resetAt = retryResetAt(headers);
+    applyDisplay(resetAt ? { kind: "limited", resetAt } : { kind: "blocked", label });
+  }
 
-    // 200 (or other non-429): windows are only reported above ~50% usage. When no
-    // window header is returned (usage below ~50%), the server conveys no info, so
-    // hide the status rather than claim "ok".
-    const session = parseWindowHeader(headers["x-usage-ratelimit-session"]);
-    const weekly = parseWindowHeader(headers["x-usage-ratelimit-weekly"]);
-    const windows: WindowView[] = [];
-    if (session)
-      windows.push({ label: "5h", usedPercent: session.usedPercent, resetsAt: session.resetsAt });
-    if (weekly)
-      windows.push({ label: "wk", usedPercent: weekly.usedPercent, resetsAt: weekly.resetsAt });
+  function applyUsageDisplay(headers: HeaderSource): void {
+    // Below ~50% usage the server omits these headers, so just hide the status.
+    const windows = usageWindows(headers);
     applyDisplay(windows.length > 0 ? { kind: "usage", windows } : { kind: "none" });
   }
 
-  function installFetchSniffer(): void {
-    // Already installed by THIS module instance. The wrapper closures read live
-    // module state (currentCtx/display), so one install serves every session in
-    // this instance — no re-wrap needed across session_start events.
-    if (originalFetch) return;
+  function handleCopilotResponse(status: number, headers: HeaderSource): void {
+    if (status === 429) return applyRateLimitDisplay(headers);
+    applyUsageDisplay(headers);
+  }
 
-    // A previous instance (e.g. after /reload) may have left its wrapper on
-    // globalThis.fetch. Recover the true underlying fetch from it so we never
-    // stack wrappers and always bind the current closures.
+  function install429Sniffer(): void {
+    // One install per module instance; /reload re-binds by recovering the true
+    // underlying fetch from the previous wrapper's marker.
+    if (installed) return;
     const marked = globalThis.fetch as unknown as MarkedFetch;
     const base = marked[FETCH_MARKER] ?? (globalThis.fetch as typeof fetch);
 
     const wrapped: typeof fetch = async (input, init) => {
       const inference = isCopilotInference(input);
-      // Inject X-GitHub-Api-Version so the server returns the rate-limit window headers.
-      const response = await base(input, inference ? withCopilotApiVersion(init) : init);
+      const response = await base(input, init);
       try {
-        if (!inference) return response;
-
-        const headers: Record<string, string> = {};
-        for (const name of HEADER_PROBES) {
-          const value = response.headers.get(name);
-          if (value) headers[name] = value;
-        }
-        // `x-copilot-service-request-id` reliably marks Copilot responses (429 included).
-        if (headers["x-copilot-service-request-id"]) {
-          handleCopilotResponse(response.status, headers);
-        }
+        if (inference && response.status === 429)
+          handleCopilotResponse(response.status, response.headers);
       } catch (error) {
         // A sniff failure must never break a real request, but surface it so
         // sniffer bugs aren't silently invisible.
@@ -308,14 +229,22 @@ export default function (pi: ExtensionAPI) {
       return response;
     };
     (wrapped as unknown as MarkedFetch)[FETCH_MARKER] = base;
-    originalFetch = base;
+    installed = true;
     globalThis.fetch = wrapped;
   }
+
+  // 429s are handled by the fetch wrapper below: in pi-ai's SDK path the request
+  // throws before `onResponse` runs, so this event never fires on 429 in
+  // practice — the guard just keeps the two paths from overlapping.
+  pi.on("after_provider_response", (event, ctx) => {
+    if (ctx.model?.provider !== PROVIDER || event.status === 429) return;
+    handleCopilotResponse(event.status, event.headers);
+  });
 
   pi.on("session_start", (_event, ctx) => {
     currentCtx = ctx;
     display = { kind: "none" };
-    installFetchSniffer();
+    install429Sniffer();
   });
 
   pi.on("session_shutdown", () => {
