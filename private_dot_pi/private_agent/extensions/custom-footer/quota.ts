@@ -547,7 +547,11 @@ const sources: Record<string, Source> = {
       return process.env.ZAI_API_KEY || null;
     },
     async fetch(apiKey: string): Promise<ZaiQuota | null> {
-      return fetchJson<ZaiQuota>("https://api.z.ai/api/monitor/usage/quota/limit", apiKey);
+      const data = await fetchJson<ZaiQuota>(
+        "https://api.z.ai/api/monitor/usage/quota/limit",
+        apiKey,
+      );
+      return data?.data?.limits ? data : null;
     },
     format(quota: ZaiQuota, theme: Theme): string | null {
       const tokens: string[] = [];
