@@ -1,0 +1,2 @@
+IMAGE_BACKEND=gemini
+GEMINI_MODEL=gemini-3.1-flash-image

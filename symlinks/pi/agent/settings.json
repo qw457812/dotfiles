@@ -96,6 +96,15 @@
       "prompts": [],
       "themes": []
     },
+    {
+      "source": "git:github.com/hugohe3/ppt-master",
+      "extensions": [],
+      "skills": [
+        "skills/ppt-master"
+      ],
+      "prompts": [],
+      "themes": []
+    },
     "npm:pi-mcp-adapter",
     "npm:@aliou/pi-guardrails",
     "git:github.com/monotykamary/pi-neuralwatt-provider",

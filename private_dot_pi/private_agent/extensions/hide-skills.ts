@@ -31,6 +31,8 @@ const HIDDEN_SKILLS = [
   "ponytail-audit",
   "ponytail-debt",
   "ponytail-review",
+  // git:github.com/hugohe3/ppt-master
+  "ppt-master",
 ];
 
 type PromptPair = { before: string; after: string };

@@ -139,6 +139,13 @@ return {
         lazy = true,
         config = function() end,
       },
+      {
+        "hugohe3/ppt-master",
+        build = "pi update --extension git:github.com/hugohe3/ppt-master",
+        enabled = not vim.g.user_is_termux,
+        lazy = true,
+        config = function() end,
+      },
       { "dannote/dot-pi", name = "dannote-dot-pi", lazy = true, config = function() end },
       { "ogulcancelik/herdr", lazy = true, config = function() end },
       {
