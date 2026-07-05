@@ -839,33 +839,29 @@ return {
         },
       }
     end,
-    opts = function()
-      local has_gitsigns = LazyVim.has("gitsigns.nvim")
-      return {
-        foldKeymaps = {
-          setup = false,
-          closeOnlyOnFirstColumn = true,
+    opts = {
+      foldKeymaps = {
+        setup = false,
+        closeOnlyOnFirstColumn = true,
+      },
+      useLspFoldsWithTreesitterFallback = {
+        enabled = false,
+      },
+      autoFold = {
+        kinds = {
+          "imports",
+          -- "comment",
+        }, ---@type lsp.FoldingRangeKind[]
+      },
+      foldtext = {
+        padding = {
+          width = 2,
         },
-        useLspFoldsWithTreesitterFallback = {
-          enabled = false,
+        lineCount = {
+          template = "󰘖 %d",
         },
-        autoFold = {
-          kinds = {
-            "imports",
-            -- "comment",
-          }, ---@type lsp.FoldingRangeKind[]
-        },
-        foldtext = {
-          padding = {
-            width = 2,
-          },
-          lineCount = {
-            template = "󰘖 %d",
-          },
-          gitsignsCount = has_gitsigns,
-        },
-      }
-    end,
+      },
+    },
   },
 
   -- alternative: https://github.com/nvim-mini/mini.keymap

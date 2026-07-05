@@ -147,7 +147,7 @@ return {
         config = function() end,
       },
       { "dannote/dot-pi", name = "dannote-dot-pi", lazy = true, config = function() end },
-      { "ogulcancelik/herdr", lazy = true, config = function() end },
+      { "ogulcancelik/herdr", enabled = not vim.g.user_is_termux, lazy = true, config = function() end },
       {
         "LazyVim/LazyVim",
         keys = {

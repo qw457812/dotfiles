@@ -67,16 +67,16 @@ return {
     opts = {
       adapters = {
         http = {
-          copilot = function()
-            return require("codecompanion.adapters").extend("copilot", {
+          extend = {
+            copilot = {
               schema = {
                 model = {
                   -- https://docs.github.com/en/copilot/concepts/billing/copilot-requests#model-multipliers
                   default = "gpt-5-mini",
                 },
               },
-            })
-          end,
+            },
+          },
         },
         acp = {
           -- requires `npm i -g @agentclientprotocol/claude-agent-acp`

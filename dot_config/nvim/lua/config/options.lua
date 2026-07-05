@@ -100,9 +100,14 @@ vim.g.loaded_node_provider = 0
 if vim.g.user_is_termux then
   opt.swapfile = false
 
-  -- https://github.com/nvim-lua/plenary.nvim/issues/536#issuecomment-1799807408
-  -- https://github.com/nvim-lua/plenary.nvim/blob/f031bef84630f556c2fb81215826ea419d81f4e9/lua/plenary/curl.lua#L81
-  vim.env.XDG_RUNTIME_DIR = vim.env.XDG_RUNTIME_DIR or vim.env.PREFIX .. "/tmp"
+  -- FIXME: PREFIX is not set in Pi just-bash sandbox (when `/skill:lazy-update-review`)
+  -- https://github.com/qw457812/dotfiles/blob/481cd77492094ee91199d0f21afb9c0dc53e12fb/.pi/skills/lazy-update-review/scripts/dump-plugin-state.lua
+  -- https://github.com/qw457812/dotfiles/blob/04037799adf20f008d2971303f642e1cf6ad102c/private_dot_pi/private_agent/extensions/sandbox/just-bash-ops.ts
+  if vim.env.PREFIX then
+    -- https://github.com/nvim-lua/plenary.nvim/issues/536#issuecomment-1799807408
+    -- https://github.com/nvim-lua/plenary.nvim/blob/f031bef84630f556c2fb81215826ea419d81f4e9/lua/plenary/curl.lua#L81
+    vim.env.XDG_RUNTIME_DIR = vim.env.XDG_RUNTIME_DIR or vim.env.PREFIX .. "/tmp"
+  end
 end
 
 if vim.g.neovide then
