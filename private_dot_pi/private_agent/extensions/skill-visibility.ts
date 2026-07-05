@@ -1,11 +1,18 @@
 /**
- * Local model-invocation visibility overrides for selected package skills.
+ * Skill visibility overrides for package skills.
  *
- * Hides selected visible skills from the system prompt while keeping `/skill:<name>` usable.
- * Also reveals selected `disable-model-invocation: true` skills to the model without
- * changing the package source.
- * Use `/hidden-skills` to inspect configured skills and `/hidden-skills diff` to open
- * the exact prompt change from the latest turn.
+ * Pi normally derives model visibility from each skill's SKILL.md frontmatter:
+ * `disable-model-invocation: true` keeps a skill out of `<available_skills>`, while
+ * still allowing explicit `/skill:<name>` use. This extension adds a local layer on
+ * top of that without editing package sources.
+ *
+ * Configure:
+ * - PROMPT_HIDDEN_SKILLS: loaded, normally-visible skills to remove from the prompt.
+ * - PROMPT_REVEALED_SKILLS: loaded, normally-hidden skills to add back to the prompt.
+ *
+ * Commands:
+ * - /skill-visibility: show configured/loaded/active status.
+ * - /skill-visibility diff: open the exact prompt rewrite from the latest turn.
  */
 
 // See also: https://github.com/earendil-works/pi/blob/3e5ad67e0f325d4888f82f9b82966218eb4407f5/packages/coding-agent/examples/extensions/prompt-customizer.ts
@@ -23,7 +30,7 @@ import { rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-const HIDDEN_SKILLS = [
+const PROMPT_HIDDEN_SKILLS = [
   // git:github.com/mitsuhiko/agent-stuff
   "frontend-design",
   "web-browser",
@@ -39,15 +46,18 @@ const HIDDEN_SKILLS = [
   "ppt-master",
 ];
 
-const REVEALED_SKILLS: string[] = [
+const PROMPT_REVEALED_SKILLS: string[] = [
   // // git:github.com/mattpocock/skills
   // "teach",
   // "writing-great-skills",
 ];
 
+const COMMAND = "skill-visibility";
+
 type PromptPair = { before: string; after: string };
-type StripResult = { prompt: string; removed: string[] };
-type RevealResult = { prompt: string; added: string[]; available: string[] };
+type PromptHideResult = { prompt: string; removed: string[] };
+type PromptRevealResult = { prompt: string; available: string[] };
+type PromptVisibilityResult = { prompt: string; hidden: string[]; revealed: string[] };
 
 // Mirrors pi's formatSkillsForPrompt skill block shape:
 // https://github.com/earendil-works/pi/blob/8e1900666f3cb83c281297d8f787fae6ee2bd0e6/packages/coding-agent/src/core/skills.ts#L351-L355
@@ -60,24 +70,23 @@ export default function (pi: ExtensionAPI) {
 
   pi.on("before_agent_start", async (event, ctx) => {
     const skills = event.systemPromptOptions.skills ?? [];
-    const stripped = stripHiddenSkills(event.systemPrompt);
-    const revealed = revealDisabledSkills(
-      stripped.prompt,
+    const result = applySkillVisibilityOverrides(
+      event.systemPrompt,
       skills,
       event.systemPromptOptions.selectedTools?.includes("read") ?? false,
     );
 
-    lastPromptPair = { before: event.systemPrompt, after: revealed.prompt };
+    lastPromptPair = { before: event.systemPrompt, after: result.prompt };
     if (!checked) {
       checked = true;
-      checkDrift(ctx, skills, stripped.removed, revealed.available);
+      checkDrift(ctx, skills, result.hidden, result.revealed);
     }
 
-    if (revealed.prompt === event.systemPrompt) return;
-    return { systemPrompt: revealed.prompt };
+    if (result.prompt === event.systemPrompt) return;
+    return { systemPrompt: result.prompt };
   });
 
-  pi.registerCommand("hidden-skills", {
+  pi.registerCommand(COMMAND, {
     description: "Show skill prompt visibility overrides",
     getArgumentCompletions(prefix: string) {
       const items = [
@@ -99,8 +108,8 @@ export default function (pi: ExtensionAPI) {
       const currentPrompt = ctx.getSystemPrompt();
       const { before, after } = lastPromptPair ?? {
         before: currentPrompt,
-        after: revealDisabledSkills(
-          stripHiddenSkills(currentPrompt).prompt,
+        after: applySkillVisibilityOverrides(
+          currentPrompt,
           ctx.getSystemPromptOptions().skills ?? [],
           ctx.getSystemPromptOptions().selectedTools?.includes("read") ?? false,
         ).prompt,
@@ -118,10 +127,25 @@ export default function (pi: ExtensionAPI) {
   });
 }
 
-function stripHiddenSkills(systemPrompt: string): StripResult {
+function applySkillVisibilityOverrides(
+  systemPrompt: string,
+  skills: Skill[],
+  canAppendSkillsSection: boolean,
+): PromptVisibilityResult {
+  const hidden = hidePromptSkills(systemPrompt);
+  const revealed = revealPromptSkills(hidden.prompt, skills, canAppendSkillsSection);
+
+  return {
+    prompt: revealed.prompt,
+    hidden: hidden.removed,
+    revealed: revealed.available,
+  };
+}
+
+function hidePromptSkills(systemPrompt: string): PromptHideResult {
   const removed: string[] = [];
   const strippedPrompt = systemPrompt.replace(SKILL_BLOCK_RE, (block, name: string) => {
-    if (!HIDDEN_SKILLS.includes(name)) return block;
+    if (!PROMPT_HIDDEN_SKILLS.includes(name)) return block;
     removed.push(name);
     return "";
   });
@@ -129,25 +153,21 @@ function stripHiddenSkills(systemPrompt: string): StripResult {
   return { prompt: pruneEmptySkillsSection(strippedPrompt), removed };
 }
 
-function revealDisabledSkills(
+function revealPromptSkills(
   systemPrompt: string,
   skills: Skill[],
   canAppendSkillsSection: boolean,
-): RevealResult {
+): PromptRevealResult {
   const disabledSkillsToReveal = skills.filter(
-    (skill) => REVEALED_SKILLS.includes(skill.name) && skill.disableModelInvocation,
+    (skill) => PROMPT_REVEALED_SKILLS.includes(skill.name) && skill.disableModelInvocation,
   );
   const existingNames = getPromptSkillNames(systemPrompt);
   const missingSkills = disabledSkillsToReveal.filter((skill) => !existingNames.has(skill.name));
-  const added = missingSkills.map((skill) => skill.name);
 
   let prompt = systemPrompt;
   if (missingSkills.length > 0) {
     if (prompt.includes("</available_skills>")) {
-      const blocks = formatSkillBlocks(missingSkills);
-      if (blocks) {
-        prompt = prompt.replace("</available_skills>", `${blocks}\n</available_skills>`);
-      }
+      prompt = insertSkillBlocks(prompt, missingSkills);
     } else if (canAppendSkillsSection) {
       prompt = insertSkillsSection(prompt, formatModelInvocableSkillsForPrompt(missingSkills));
     }
@@ -157,7 +177,13 @@ function revealDisabledSkills(
   const available = disabledSkillsToReveal
     .filter((skill) => availableNames.has(skill.name))
     .map((skill) => skill.name);
-  return { prompt, added, available };
+  return { prompt, available };
+}
+
+function insertSkillBlocks(systemPrompt: string, skills: Skill[]): string {
+  const blocks = formatSkillBlocks(skills);
+  if (!blocks) return systemPrompt;
+  return systemPrompt.replace("</available_skills>", `${blocks}\n</available_skills>`);
 }
 
 function getPromptSkillNames(systemPrompt: string): Set<string> {
@@ -210,26 +236,29 @@ function formatModelInvocableSkillsForPrompt(skills: Skill[]): string {
 function checkDrift(
   ctx: Pick<ExtensionContext, "ui">,
   skills: Skill[],
-  removed: string[],
+  hidden: string[],
   revealed: string[],
 ): void {
   const expectedHidden = skills
-    .filter((skill) => HIDDEN_SKILLS.includes(skill.name) && !skill.disableModelInvocation)
+    .filter((skill) => PROMPT_HIDDEN_SKILLS.includes(skill.name) && !skill.disableModelInvocation)
     .map((skill) => skill.name);
-  const missingHidden = expectedHidden.filter((name) => !removed.includes(name));
-  const extraHidden = removed.filter((name) => !expectedHidden.includes(name));
+  const missingHidden = expectedHidden.filter((name) => !hidden.includes(name));
+  const extraHidden = hidden.filter((name) => !expectedHidden.includes(name));
   const expectedRevealed = skills
-    .filter((skill) => REVEALED_SKILLS.includes(skill.name) && skill.disableModelInvocation)
+    .filter((skill) => PROMPT_REVEALED_SKILLS.includes(skill.name) && skill.disableModelInvocation)
     .map((skill) => skill.name);
   const missingRevealed = expectedRevealed.filter((name) => !revealed.includes(name));
+  const extraRevealed = revealed.filter((name) => !expectedRevealed.includes(name));
   const lines: string[] = [];
 
-  if (missingHidden.length > 0) lines.push(`failed to strip ${missingHidden.join(", ")}`);
-  if (extraHidden.length > 0) lines.push(`unexpectedly stripped ${extraHidden.join(", ")}`);
+  if (missingHidden.length > 0) lines.push(`failed to hide ${missingHidden.join(", ")}`);
+  if (extraHidden.length > 0) lines.push(`unexpected hidden skills: ${extraHidden.join(", ")}`);
   if (missingRevealed.length > 0) lines.push(`failed to reveal ${missingRevealed.join(", ")}`);
+  if (extraRevealed.length > 0)
+    lines.push(`unexpected revealed skills: ${extraRevealed.join(", ")}`);
   if (lines.length === 0) return;
 
-  ctx.ui.notify(`hide-skills: ${lines.join("; ")}. Run /hidden-skills diff.`, "warning");
+  ctx.ui.notify(`skill-visibility: ${lines.join("; ")}. Run /${COMMAND} diff.`, "warning");
 }
 
 async function openDiffInEditor(ctx: ExtensionCommandContext, diff: string): Promise<void> {
@@ -244,7 +273,7 @@ async function openDiffInEditor(ctx: ExtensionCommandContext, diff: string): Pro
   }
 
   await ctx.ui.custom<void>((tui, _theme, _kb, done) => {
-    const filePath = join(tmpdir(), `pi-extension-pager-hide-skills-${Date.now()}.diff`);
+    const filePath = join(tmpdir(), `pi-extension-pager-skill-visibility-${Date.now()}.diff`);
     let stopped = false;
 
     void (async () => {
@@ -281,16 +310,21 @@ async function openDiffInEditor(ctx: ExtensionCommandContext, diff: string): Pro
 }
 
 function buildStatus(skills: Skill[]): string {
-  const hiddenLoaded = skills.filter((skill) => HIDDEN_SKILLS.includes(skill.name));
+  const hiddenLoaded = skills.filter((skill) => PROMPT_HIDDEN_SKILLS.includes(skill.name));
   const hiddenLoadedNames = hiddenLoaded.map((skill) => skill.name);
-  const hiddenMissingNames = HIDDEN_SKILLS.filter((name) => !hiddenLoadedNames.includes(name));
+  const hiddenMissingNames = PROMPT_HIDDEN_SKILLS.filter(
+    (name) => !hiddenLoadedNames.includes(name),
+  );
+  const hiddenByExtension = hiddenLoaded
+    .filter((skill) => !skill.disableModelInvocation)
+    .map((skill) => skill.name);
   const alreadyHidden = hiddenLoaded
     .filter((skill) => skill.disableModelInvocation)
     .map((skill) => skill.name);
 
-  const revealedLoaded = skills.filter((skill) => REVEALED_SKILLS.includes(skill.name));
+  const revealedLoaded = skills.filter((skill) => PROMPT_REVEALED_SKILLS.includes(skill.name));
   const revealedLoadedNames = revealedLoaded.map((skill) => skill.name);
-  const revealedMissingNames = REVEALED_SKILLS.filter(
+  const revealedMissingNames = PROMPT_REVEALED_SKILLS.filter(
     (name) => !revealedLoadedNames.includes(name),
   );
   const revealedByExtension = revealedLoaded
@@ -301,22 +335,54 @@ function buildStatus(skills: Skill[]): string {
     .map((skill) => skill.name);
 
   const lines = [
-    `Hidden skills: ${hiddenLoaded.length}/${HIDDEN_SKILLS.length} loaded`,
-    hiddenLoadedNames.join(", "),
-    `Revealed disabled skills: ${revealedLoaded.length}/${REVEALED_SKILLS.length} loaded`,
-    revealedLoadedNames.join(", "),
+    "Skill visibility overrides",
+    "",
+    ...formatStatusSection({
+      title: "Hide from prompt",
+      configuredCount: PROMPT_HIDDEN_SKILLS.length,
+      loadedCount: hiddenLoaded.length,
+      activeNames: hiddenByExtension,
+      missingNames: hiddenMissingNames,
+      noopLabel: "Already hidden by SKILL.md",
+      noopNames: alreadyHidden,
+    }),
+    "",
+    ...formatStatusSection({
+      title: "Reveal to prompt",
+      configuredCount: PROMPT_REVEALED_SKILLS.length,
+      loadedCount: revealedLoaded.length,
+      activeNames: revealedByExtension,
+      missingNames: revealedMissingNames,
+      noopLabel: "Already visible by SKILL.md",
+      noopNames: alreadyVisible,
+    }),
+    "",
+    `Diff: /${COMMAND} diff · Manual invoke still works: /skill:<name>`,
   ];
 
-  if (hiddenMissingNames.length > 0) lines.push(`Missing hidden: ${hiddenMissingNames.join(", ")}`);
-  if (alreadyHidden.length > 0)
-    lines.push(`Already hidden by SKILL.md: ${alreadyHidden.join(", ")}`);
-  if (revealedMissingNames.length > 0)
-    lines.push(`Missing revealed: ${revealedMissingNames.join(", ")}`);
-  if (revealedByExtension.length > 0)
-    lines.push(`Revealed by extension: ${revealedByExtension.join(", ")}`);
-  if (alreadyVisible.length > 0)
-    lines.push(`Already visible by SKILL.md: ${alreadyVisible.join(", ")}`);
-
-  lines.push("", "Diff: /hidden-skills diff · Manual invoke still works: /skill:<name>");
   return lines.join("\n");
+}
+
+function formatStatusSection(options: {
+  title: string;
+  configuredCount: number;
+  loadedCount: number;
+  activeNames: string[];
+  missingNames: string[];
+  noopLabel: string;
+  noopNames: string[];
+}): string[] {
+  const lines = [
+    `${options.title}: ${options.activeNames.length} active / ${options.loadedCount} loaded / ${options.configuredCount} configured`,
+    `  Active: ${options.activeNames.length > 0 ? options.activeNames.join(", ") : "(none)"}`,
+  ];
+
+  if (options.missingNames.length > 0) {
+    lines.push(`  Missing: ${options.missingNames.join(", ")}`);
+  }
+  if (options.noopNames.length > 0) {
+    lines.push(`  ${options.noopLabel}: ${options.noopNames.join(", ")}`);
+  }
+
+  return lines;
 }

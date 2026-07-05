@@ -11,7 +11,7 @@
  *                                Send any message first so there is something to show.
  *   /prompt-inspect diff         Diff three snapshots of the system prompt, split into the
  *                                two extension-mutable stages:
- *               - base -> effective: before_agent_start rewrites (e.g. hide-skills.ts).
+ *               - base -> effective: before_agent_start rewrites (e.g. skill-visibility.ts).
  *                 Note: getSystemPrompt() already reflects these by request
  *                 time, so `base` is captured once at session_start (the only
  *                 moment it is unmodified, since before_agent_start fires per
@@ -27,7 +27,7 @@
  *                  skills / tools / --append-system-prompt build the base.
  *                  Visible to getSystemPrompt() (= base). Not a diff stage.
  *               2. before_agent_start returns { systemPrompt } (e.g.
- *                  hide-skills.ts): written back to state.systemPrompt, so
+ *                  skill-visibility.ts): written back to state.systemPrompt, so
  *                  getSystemPrompt() reflects it; shown as base -> effective.
  *               3. context event returns { messages }: rewrites messages only,
  *                  never system; out of scope.
@@ -44,9 +44,6 @@
  *   ctx.getSystemPrompt + event flow (session_start, before_provider_request):
  *     https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/coding-agent/docs/extensions.md#L1016
  *     https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/coding-agent/docs/extensions.md#L280
- *   extensions/hide-skills.ts (openDiffInEditor flow, generateUnifiedPatch):
- *     https://github.com/qw457812/dotfiles/blob/dd5505feb520062d6880b6f92ca49811a4f167f9/private_dot_pi/private_agent/extensions/hide-skills.ts#L115
- *     https://github.com/qw457812/dotfiles/blob/dd5505feb520062d6880b6f92ca49811a4f167f9/private_dot_pi/private_agent/extensions/hide-skills.ts#L76
  *   examples/extensions/provider-payload.ts (payload capture):
  *     https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/coding-agent/examples/extensions/provider-payload.ts#L6
  *
