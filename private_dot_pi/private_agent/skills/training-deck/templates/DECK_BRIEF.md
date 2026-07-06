@@ -85,12 +85,12 @@ If none: `No user-provided materials selected for Stage 2.`
 
 ## 13. Style Brief
 
-The deck should be high-level and concise:
+Style should serve the training goal:
 
 - Prefer mental models over exhaustive detail.
-- Put nuance in speaker notes.
+- Keep on-slide wording concise when it improves clarity.
+- Put extra nuance, caveats, and elaboration in speaker notes when slides would become crowded.
 - Use examples to make concepts concrete.
-- Avoid implementation deep dives unless they explain capability or boundary.
 - Let `ppt-master` decide the detailed visual system.
 
 Additional style constraints:
