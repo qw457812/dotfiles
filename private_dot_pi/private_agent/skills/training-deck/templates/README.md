@@ -17,7 +17,7 @@ Workspace: `<training-decks/<deck-slug>/ or custom path>`
 - `MISSION.md` — mission, behavior change, success criteria.
 - `AUDIENCE.md` — audience segments and assumptions.
 - `KNOWLEDGE.md` — synthesized knowledge with source boundaries.
-- `STORYLINE.md` — narrative arc and slide inventory.
+- `STORYLINE.md` — narrative arc and locked slide-by-slide plan.
 - `DELIVERY_PLAN.md` — demo, interaction, Q&A, and training script guidance.
 - `RESOURCES.md` — stable source registry.
 - `MATERIALS.md` — selected user-provided materials.

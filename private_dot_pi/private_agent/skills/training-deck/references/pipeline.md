@@ -113,17 +113,35 @@ Before writing formal artifacts, present a concise proposal and wait for explici
 
 Do not write formal artifacts until the user confirms Vision Lock.
 
-### 8. Artifact Synthesis
+### 8. Slide-by-slide Lock Gate
 
-After Vision Lock, generate the formal artifact package in one pass using `templates/` and the artifact contract.
+After Vision Lock and before Artifact Synthesis, lock the PPT structure slide by slide.
+
+Prepare an internal slide plan from the confirmed vision, then confirm slides sequentially with strict grilling:
+
+1. Present Slide 1 only.
+2. Include its title, teaching purpose, on-slide content, speaker-note emphasis, visual IDs, interaction/demo cue, and source/context IDs.
+3. Ask whether to confirm, revise, insert a slide before/after, or remove it.
+4. Wait for the user's response.
+5. After Slide 1 is confirmed, present Slide 2 only.
+6. Continue until every main-deck slide is confirmed in order.
+7. Confirm appendix slides after the main deck, also one slide at a time when they affect Stage 2.
+
+Do not batch multiple slide confirmations in one question. Do not skip ahead. Do not generate formal artifacts until the slide-by-slide plan is locked.
+
+A locked slide plan fixes slide count, slide order, and slide intent for Stage 2. `ppt-master` may still refine wording, visuals, layout, and speaker notes unless the user explicitly locks those details.
+
+### 9. Artifact Synthesis
+
+After Vision Lock and Slide-by-slide Lock, generate the formal artifact package in one pass using `templates/` and the artifact contract.
 
 If blocking gaps remain, generate a blocked package instead of a usable handoff.
 
-### 9. Self-check
+### 10. Self-check
 
 Run the Artifact Self-check from `references/artifact-contract.md`. Fix mechanical issues automatically and repeat the check. If a remaining issue requires user judgment, set status to `blocked` and ask the next blocking question.
 
-### 10. Stage 1 complete
+### 11. Stage 1 complete
 
 Default stop. Show the copy-paste Stage 2 prompt from `STAGE2_HANDOFF.md`.
 

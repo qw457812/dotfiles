@@ -69,6 +69,8 @@ Do not bypass `ppt-master`'s Strategist confirmation gate.
 Stage 1 constraints should prefill and constrain defaults:
 
 - locked constraints must be respected unless the user explicitly overrides them in Stage 2;
+- locked main-deck slide count, slide order, and slide intent must be preserved;
+- `ppt-master` must not merge, split, drop, or reorder locked slides unless the user explicitly overrides this in Stage 2;
 - recommended constraints guide defaults but may be refined by `ppt-master`;
 - flexible items belong to `ppt-master` design judgment.
 

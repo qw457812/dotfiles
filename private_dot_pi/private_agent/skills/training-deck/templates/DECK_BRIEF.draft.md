@@ -26,11 +26,13 @@ This is a blocked draft. Do not use it as `ppt-master` source.
 
 <Draft storyline.>
 
-## Draft Candidate Slide Inventory
+## Draft Slide-by-slide Plan
 
-| Status | Slide intent | Teaching purpose | Risk / gap |
-|---|---|---|---|
-| <status> | <intent> | <purpose> | <gap> |
+This slide plan is not locked and must not be used by `ppt-master`.
+
+| Slide # | Status | Slide title | Teaching purpose | Risk / gap |
+|---:|---|---|---|---|
+| 1 | <status> | <title> | <purpose> | <gap> |
 
 ## Caveats
 

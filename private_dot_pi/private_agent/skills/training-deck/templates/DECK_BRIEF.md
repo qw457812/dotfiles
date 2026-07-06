@@ -7,6 +7,7 @@ speaker_notes_language: "<speaker notes language>"
 duration: "<duration>"
 delivery_setting: "<presentation | workshop | onboarding | mixed>"
 recommended_page_range: "<range>"
+locked_slide_count: "<number>"
 created_at: "<YYYY-MM-DD>"
 ---
 
@@ -48,11 +49,13 @@ After this training, the audience should be able to:
 |---|---|---|---:|
 | <section> | <purpose> | <message> | <minutes> |
 
-## 8. Candidate Slide Inventory
+## 8. Slide-by-slide Plan
 
-| Status | Slide intent | Teaching purpose | On-slide content | Speaker-note emphasis | Visual IDs | Source IDs / Context |
-|---|---|---|---|---|---|---|
-| `<core/supporting/optional>` | <intent> | <purpose> | <concise slide content> | <notes content> | <visual-id> | <source-id/context> |
+The main-deck slide count, order, and slide intent are locked by Stage 1. `ppt-master` must not merge, split, drop, or reorder these slides unless the user explicitly overrides this in Stage 2.
+
+| Slide # | Status | Slide title | Teaching purpose | On-slide content | Speaker-note emphasis | Visual IDs | Demo / interaction cue | Source IDs / Context |
+|---:|---|---|---|---|---|---|---|---|
+| 1 | `<core/supporting>` | <title> | <purpose> | <concise slide content> | <notes content> | <visual-id> | <cue or none> | <source-id/context> |
 
 ## 9. Demo / Interaction Plan
 
@@ -112,11 +115,13 @@ Additional style constraints:
 
 - `<material-id>` — <what it supports>
 
-## 16. Appendix Candidates
+## 16. Appendix Slides
 
-| Topic | Why appendix | Source / Context | Use in Q&A? |
-|---|---|---|---|
-| <topic> | <reason> | <source/context> | <yes/no> |
+Appendix slides are optional unless marked as locked.
+
+| Appendix # | Status | Slide title | Why appendix | Source / Context | Use in Q&A? |
+|---:|---|---|---|---|---|
+| A1 | `<optional/locked>` | <title> | <reason> | <source/context> | <yes/no> |
 
 ## 17. Caveats / Non-blocking Open Questions
 
@@ -134,20 +139,18 @@ If status is `ready`, write: `No non-blocking caveats that affect deck generatio
 - Audience assumptions
 - Desired behavior changes
 - Must-cover concepts
+- Main-deck slide count, order, and slide intent
 - Anti-goals
 - Source boundaries
 
 ### Recommended
 
-- Page range
-- Section order
-- Demo placement
+- Slide wording refinements
+- Demo placement details within the locked slide plan
 - Style brief
-- Candidate slide inventory
 
 ### Flexible
 
-- Exact page count
 - Visual design system
 - Layout choices
 - Speaker note wording

@@ -9,7 +9,7 @@ argument-hint: "Training topic, existing workspace, or STAGE2_HANDOFF.md"
 
 Prepare a high-quality training deck brief before presentation generation. This skill is user-invoked and has two stages:
 
-- **Stage 1 — preparation**: strict grilling, research, candidate mapping, vision lock, artifact synthesis, and a cold-start handoff package.
+- **Stage 1 — preparation**: strict grilling, research, candidate mapping, vision lock, slide-by-slide lock, artifact synthesis, and a cold-start handoff package.
 - **Stage 2 — generation**: only when explicitly requested, hand off to `ppt-master` using the prepared source bundle.
 
 Stage 1 does not depend on other skills. Stage 2 depends on `ppt-master`.
@@ -66,9 +66,10 @@ Workflow:
 6. Elicit user examples using research-inspired example prompts.
 7. Run Core Lock grilling for blocking gaps and key candidates.
 8. Present a Vision Lock Proposal and wait for explicit confirmation.
-9. Generate the formal artifact package in one pass using the templates in [`templates/`](templates/).
-10. Run the Artifact Self-check from [`references/artifact-contract.md`](references/artifact-contract.md).
-11. Stop by default. Show the Stage 2 prompt. Do not enter `ppt-master` unless the user explicitly asks to continue now.
+9. Run **Slide-by-slide Lock**: confirm the deck structure one slide at a time, in order. Do not batch multiple slides in one question.
+10. Generate the formal artifact package in one pass using the templates in [`templates/`](templates/).
+11. Run the Artifact Self-check from [`references/artifact-contract.md`](references/artifact-contract.md).
+12. Stop by default. Show the Stage 2 prompt. Do not enter `ppt-master` unless the user explicitly asks to continue now.
 
 ## Route B: inspect-existing
 

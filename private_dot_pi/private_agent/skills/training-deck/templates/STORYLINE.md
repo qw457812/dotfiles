@@ -20,17 +20,21 @@
 |---|---|---|---|
 | <topic> | `<core | supporting | optional | out | gap | user-context>` | <reason> | <source/context> |
 
-## Candidate Slide Inventory
+## Slide-by-slide Plan
 
-| Status | Slide intent | Teaching purpose | On-slide content | Speaker-note emphasis | Visual IDs | Source IDs / Context |
-|---|---|---|---|---|---|---|
-| `<core/supporting/optional>` | <intent> | <purpose> | <concise slide content> | <what notes explain> | <visual-id> | <source-id/context> |
+This plan is confirmed one slide at a time during the Slide-by-slide Lock Gate. The main-deck slide count, order, and slide intent are locked for Stage 2.
 
-## Appendix Candidates
+| Slide # | Status | Slide title | Teaching purpose | On-slide content | Speaker-note emphasis | Visual IDs | Demo / interaction cue | Source IDs / Context |
+|---:|---|---|---|---|---|---|---|---|
+| 1 | `<core/supporting>` | <title> | <purpose> | <concise slide content> | <what notes explain> | <visual-id> | <cue or none> | <source-id/context> |
 
-| Topic | Why appendix | Source / Context | Use in Q&A? |
-|---|---|---|---|
-| <topic> | <reason> | <source/context> | <yes/no> |
+## Appendix Slides
+
+Appendix slides are optional unless marked as locked.
+
+| Appendix # | Status | Slide title | Why appendix | Source / Context | Use in Q&A? |
+|---:|---|---|---|---|---|
+| A1 | `<optional/locked>` | <title> | <reason> | <source/context> | <yes/no> |
 
 ## Out of Scope
 

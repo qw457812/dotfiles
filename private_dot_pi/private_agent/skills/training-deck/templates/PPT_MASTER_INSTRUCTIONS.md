@@ -40,6 +40,8 @@ Do not pass a directory. Do not import `resources.md`, `materials.md`, this file
 ## Respect Stage 1
 
 - Treat `DECK_BRIEF.md` locked constraints as binding unless the user explicitly overrides them in Stage 2.
+- Preserve the locked main-deck slide count, slide order, and slide intent from `DECK_BRIEF.md`.
+- Do not merge, split, drop, or reorder locked slides unless the user explicitly overrides this in Stage 2.
 - Treat recommended constraints as defaults for `ppt-master` Strategist.
 - Let `ppt-master` decide flexible visual/layout details.
 - Preserve `ppt-master`'s Strategist confirmation gate.

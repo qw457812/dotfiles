@@ -26,7 +26,15 @@ Rationale:
 
 Implications for deck:
 
-## D004 — Caveat / override decisions
+## D004 — Slide-by-slide lock
+
+Decision:
+
+Rationale:
+
+Implications for deck:
+
+## D005 — Caveat / override decisions
 
 Decision:
 

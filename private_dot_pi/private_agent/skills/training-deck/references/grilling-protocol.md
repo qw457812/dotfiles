@@ -24,6 +24,7 @@ Resolve prerequisite decisions before dependent ones:
 7. User examples
 8. Demo / interaction plan
 9. Vision Lock
+10. Slide-by-slide Lock
 
 ## Blocking questions
 
@@ -35,9 +36,27 @@ A question is blocking when the answer affects whether the Stage 2 handoff is sa
 - a conflict between user-context and researched knowledge
 - a source gap for a key claim
 - whether a material/example should be included
+- the title, teaching purpose, content, or order of any locked slide
 - whether a caveat can be downgraded to non-blocking
 
 If a blocking question remains unresolved, the handoff status cannot be `ready`.
+
+## Slide-by-slide confirmation
+
+When locking deck structure, ask about exactly one slide at a time. Present the current slide number and proposed slide contract, then wait for confirmation before presenting the next slide.
+
+A slide contract includes:
+
+- slide number
+- slide title
+- teaching purpose
+- on-slide content
+- speaker-note emphasis
+- visual IDs
+- demo / interaction cue, if any
+- source IDs / user-context
+
+After a slide is confirmed, do not revise it later unless a dependency or user request requires reopening it.
 
 ## Recommended answer style
 

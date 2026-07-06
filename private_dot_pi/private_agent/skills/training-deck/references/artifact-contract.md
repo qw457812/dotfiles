@@ -118,7 +118,7 @@ Use the fixed section order:
 5. Locked Decisions
 6. Content Priorities
 7. Storyline
-8. Candidate Slide Inventory
+8. Slide-by-slide Plan
 9. Demo / Interaction Plan
 10. Definitions / Concept Map
 11. Visuals Needed
@@ -126,11 +126,13 @@ Use the fixed section order:
 13. Style Brief
 14. Anti-goals / Avoid
 15. Sources
-16. Appendix Candidates
+16. Appendix Slides
 17. Caveats / Non-blocking Open Questions
 18. PPT Master Constraints
 
-`DECK_BRIEF.md` must be standalone. A new session should understand the training goal, audience, storyline, constraints, sources, materials, and caveats from this file alone.
+`DECK_BRIEF.md` must be standalone. A new session should understand the training goal, audience, storyline, locked slide-by-slide plan, constraints, sources, materials, and caveats from this file alone.
+
+The slide-by-slide plan is a locked Stage 1 output. It fixes slide count, slide order, and slide intent for the main deck. `ppt-master` may refine wording, visual design, layout, and speaker notes, but must not merge, split, drop, or reorder confirmed slides unless the user explicitly overrides this in Stage 2.
 
 ## Materials
 
@@ -169,6 +171,8 @@ Before announcing `ready` or `ready-with-caveats`, verify:
 
 - `DECK_BRIEF.md` is standalone.
 - All locked decisions are embedded in `DECK_BRIEF.md`.
+- The main-deck slide plan is numbered consecutively and every slide has a teaching purpose.
+- `locked_slide_count` equals the number of rows in the main-deck slide plan.
 - Every source ID in `DECK_BRIEF.md` exists in `RESOURCES.md`.
 - Every material ID in `DECK_BRIEF.md` exists in `MATERIALS.md`.
 - Every `Stage 2 = include` material exists in `handoff/deck-brief_files/`.
