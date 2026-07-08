@@ -1,72 +1,19 @@
 /**
- * Prompt Inspect: inspect the current system prompt and last provider payload.
+ * Inspect pi's system prompt pipeline.
  *
- * Command:
- *   /prompt-inspect              Open the effective system prompt (ctx.getSystemPrompt())
- *                                in $VISUAL/$EDITOR.
- *   /prompt-inspect payload      Open the last provider request payload plus its HTTP
- *                                response (status + headers). The request is captured in
- *                                `before_provider_request`; the response in `after_provider_response`
- *                                (body is consumed before that event, so only status/headers).
- *                                Send any message first so there is something to show.
- *   /prompt-inspect diff         Diff three snapshots of the system prompt, split into the
- *                                two extension-mutable stages:
- *               - base -> effective: before_agent_start rewrites (e.g. skill-visibility.ts).
- *                 Note: getSystemPrompt() already reflects these by request
- *                 time, so `base` is captured once at session_start (the only
- *                 moment it is unmodified, since before_agent_start fires per
- *                 user message). Per-message base drift from tool changes is
- *                 ignored; use /prompt-inspect for the current value.
- *               - effective -> payload: before_provider_request payload-level rewrites,
- *                 provider identity injection (e.g. Claude Code), and
- *                 serialization. These are invisible to getSystemPrompt().
- *             Empty stages are skipped; if both match, notify "(none)".
+ * /prompt-inspect          Current effective system prompt.
+ * /prompt-inspect payload  Last provider request payload, HTTP metadata, and
+ *                          Pi's parsed assistant message.
+ * /prompt-inspect diff     Diff system prompt stages:
+ *                          base -> effective -> payload.
  *
- *             Four ways pi mutates the system prompt, and what the diff covers:
- *               1. Build time: SYSTEM.md / --system-prompt / context files /
- *                  skills / tools / --append-system-prompt build the base.
- *                  Visible to getSystemPrompt() (= base). Not a diff stage.
- *               2. before_agent_start returns { systemPrompt } (e.g.
- *                  skill-visibility.ts): written back to state.systemPrompt, so
- *                  getSystemPrompt() reflects it; shown as base -> effective.
- *               3. context event returns { messages }: rewrites messages only,
- *                  never system; out of scope.
- *               4. before_provider_request returns a new payload: rewrites the
- *                  provider-level system, invisible to getSystemPrompt();
- *                  shown as effective -> payload.
- *             So the diff covers stages 2 and 4; use /prompt-inspect for stage 1.
- *
- * Outside TUI, or when no editor is set, the command no-ops with a notify.
- *
- * Ref:
- *   registerCommand:
- *     https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/coding-agent/docs/extensions.md#L93
- *   ctx.getSystemPrompt + event flow (session_start, before_provider_request):
- *     https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/coding-agent/docs/extensions.md#L1016
- *     https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/coding-agent/docs/extensions.md#L280
- *   examples/extensions/provider-payload.ts (payload capture):
- *     https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/coding-agent/examples/extensions/provider-payload.ts#L6
- *
- * Source (pi monorepo @ a2e3e9d8, pinned to 0.80.2+main):
- *   session_start fires here, with state.systemPrompt already set to base:
- *     https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/coding-agent/src/core/agent-session.ts#L2113
- *   before_agent_start result is written back to state.systemPrompt (stage 1):
- *     https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/coding-agent/src/core/agent-session.ts#L1132
- *   tool changes rebuild base mid-session (the ignored drift source):
- *     https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/coding-agent/src/core/agent-session.ts#L825
- *   emitBeforeAgentStart chains getSystemPrompt across handlers:
- *     https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/coding-agent/src/core/extensions/runner.ts#L980
- *   after_provider_request runs AFTER payload serialization (stage 2):
- *     https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/coding-agent/src/core/extensions/runner.ts#L946
- *   after_provider_response emits HTTP status + headers (no body):
- *     https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/coding-agent/src/core/sdk.ts#L339
- *   ProviderResponse carries only status + headers:
- *     https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/ai/src/types.ts#L104
- *   context event (transformContext) also fires after before_agent_start, so
- *   it cannot serve as an unmodified base anchor:
- *     https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/coding-agent/src/core/sdk.ts#L351
- *   Per-provider system serialization: see extractSystemFromPayload links.
+ * Stages:
+ *   base      getSystemPrompt() at session_start
+ *   effective getSystemPrompt() at provider request time
+ *   payload   system instructions serialized in the provider request payload
  */
+
+import type { AssistantMessage, ProviderResponse } from "@earendil-works/pi-ai";
 import {
   type ExtensionAPI,
   type ExtensionCommandContext,
@@ -78,30 +25,23 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 type PromptInspectState = {
-  /** Unmodified system prompt, captured once at session_start. */
   basePrompt?: string;
-  /**
-   * Snapshot of the last provider request, captured together for accurate pairing.
-   * `prompt` is getSystemPrompt() at request time (after before_agent_start).
-   */
   lastRequest?: {
     prompt: string;
     payload: unknown;
   };
-  /** Last provider response (status + headers); body is consumed before this fires. */
-  lastResponse?: { status: number; headers: Record<string, string> };
+  lastResponse?: ProviderResponse;
+  lastAssistant?: AssistantMessage;
 };
 
-const state: PromptInspectState = {};
-
 type Rec = Record<string, unknown>;
-type TextPart = { text?: unknown };
+type PayloadTextPart = { text?: unknown };
 
-function joinTextParts(parts: unknown[]): string {
+function joinTextParts(parts: readonly unknown[]): string {
   let out = "";
   for (const part of parts) {
-    if (part && typeof part === "object" && typeof (part as TextPart).text === "string") {
-      out += (part as TextPart).text;
+    if (part && typeof part === "object" && typeof (part as PayloadTextPart).text === "string") {
+      out += (part as PayloadTextPart).text;
     }
   }
   return out;
@@ -113,39 +53,22 @@ function normalizeContent(content: unknown): string {
   return "";
 }
 
-/** Extract the system instruction from a provider payload across API families.
- * Mirrors how pi-ai serializes context.systemPrompt in each api builder
- * (pi monorepo @ a2e3e9d8, packages/ai/src/api/*.ts):
- *   - codex-responses: payload.instructions
- *     https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/ai/src/api/openai-codex-responses.ts#L460
- *   - anthropic: payload.system (string | [{ type:"text", text }])
- *     https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/ai/src/api/anthropic-messages.ts#L908
- *   - bedrock: payload.system ([{ text }])
- *     https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/ai/src/api/bedrock-converse-stream.ts#L217
- *   - google (gemini/vertex): payload.systemInstruction (string)
- *     https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/ai/src/api/google-generative-ai.ts#L358
- *     https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/ai/src/api/google-vertex.ts#L457
- *   - openai-completions/responses, azure, mistral: first message in
- *     payload.messages or payload.input with role system/developer
- *     https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/ai/src/api/openai-completions.ts#L866
- *     https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/ai/src/api/openai-responses-shared.ts#L126
- *     https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/ai/src/api/mistral-conversations.ts#L260 */
+// Extract provider-serialized system instructions across supported API payload shapes.
 function extractSystemFromPayload(payload: unknown): string | undefined {
   if (!payload || typeof payload !== "object") return undefined;
   const p = payload as Rec;
 
-  // OpenAI Codex Responses: top-level instructions.
+  // OpenAI Codex Responses
   if (typeof p.instructions === "string") return p.instructions;
 
-  // Anthropic / Bedrock: top-level system (string | [{ text }] / [{ type:"text", text }]).
+  // Anthropic / Bedrock
   if (typeof p.system === "string") return p.system;
   if (Array.isArray(p.system)) return normalizeContent(p.system);
 
-  // Google (Gemini / Vertex): top-level systemInstruction (string).
+  // Google (Gemini / Vertex)
   if (typeof p.systemInstruction === "string") return p.systemInstruction;
 
-  // OpenAI Completions / Responses / Azure / Mistral: first item of messages or input
-  // with a system/developer role.
+  // OpenAI Completions / Responses / Azure / Mistral
   for (const key of ["messages", "input"] as const) {
     const list = p[key];
     if (Array.isArray(list) && list.length > 0) {
@@ -172,17 +95,12 @@ function buildPromptPatch(
 }
 
 export default function (pi: ExtensionAPI) {
-  // base: getSystemPrompt() at session_start is the unmodified base;
-  // before_agent_start only fires per user message
-  // (https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/coding-agent/src/core/agent-session.ts#L1111).
+  const state: PromptInspectState = {};
+
   pi.on("session_start", (_event, ctx) => {
     state.basePrompt = ctx.getSystemPrompt();
   });
 
-  // effective: captured together with the payload so the effective->payload
-  // stage compares values from the same request; a live getSystemPrompt() in
-  // a /prompt-inspect diff could mismatch the payload
-  // (https://github.com/earendil-works/pi/blob/a2e3e9d8b26b2e40ed6fd376d3f0819a757559a0/packages/coding-agent/src/core/extensions/runner.ts#L946).
   pi.on("before_provider_request", (event, ctx) => {
     state.lastRequest = {
       prompt: ctx.getSystemPrompt(),
@@ -190,11 +108,14 @@ export default function (pi: ExtensionAPI) {
     };
   });
 
-  // response: HTTP status + headers from after_provider_response, captured per
-  // request. The stream body is consumed before this event, so only status/headers
-  // are available (ProviderResponse carries no body).
   pi.on("after_provider_response", (event) => {
     state.lastResponse = { status: event.status, headers: event.headers };
+  });
+
+  pi.on("message_end", (event) => {
+    if (event.message.role === "assistant") {
+      state.lastAssistant = event.message;
+    }
   });
 
   pi.registerCommand("prompt-inspect", {
@@ -204,7 +125,7 @@ export default function (pi: ExtensionAPI) {
         {
           value: "payload",
           label: "payload",
-          description: "open the last provider request payload plus its HTTP response",
+          description: "open provider payload/HTTP metadata plus Pi's parsed assistant response",
         },
         {
           value: "diff",
@@ -223,7 +144,15 @@ export default function (pi: ExtensionAPI) {
             ctx.ui.notify("No provider request yet. Send a message first.", "warning");
             return;
           }
-          const dump = { request: state.lastRequest.payload, response: state.lastResponse ?? null };
+          const dump = {
+            provider: {
+              request: state.lastRequest.payload,
+              response: state.lastResponse ?? null,
+            },
+            pi: {
+              assistant: state.lastAssistant ?? null,
+            },
+          };
           await openInEditor(ctx, JSON.stringify(dump, null, 2), "json");
           return;
         }
@@ -245,7 +174,6 @@ export default function (pi: ExtensionAPI) {
           return;
         }
         case "":
-          // Default: open the current system prompt.
           await openInEditor(ctx, ctx.getSystemPrompt(), "md");
           return;
         default:
