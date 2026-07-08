@@ -36,6 +36,7 @@
         "github.com",
         "*.github.com",
         "api.github.com",
+        "github-cloud.githubusercontent.com",
         "raw.githubusercontent.com",
         // GitLab
         "gitlab.com",
@@ -105,6 +106,7 @@
         "https://github.com",
         "https://api.github.com",
         "https://codeload.github.com",
+        "https://github-cloud.githubusercontent.com",
         "https://raw.githubusercontent.com",
         // GitLab
         "https://gitlab.com",

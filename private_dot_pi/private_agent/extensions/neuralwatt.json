@@ -2,5 +2,6 @@
   "energy": "statusbar",
   "quota": "off",
   "mcr": "statusbar",
-  "hideOnOtherProvider": true
+  "hideOnOtherProvider": true,
+  "carbon": "off"
 }

@@ -1,5 +1,12 @@
 {
   "providers": {
+    // "openai-codex": {
+    //   "modelOverrides": {
+    //     "gpt-5.5": {
+    //       "contextWindow": 400000
+    //     }
+    //   }
+    // },
     "synthetic": {
       "baseUrl": "https://api.synthetic.new/openai/v1",
       "apiKey": "$SYNTHETIC_API_KEY",

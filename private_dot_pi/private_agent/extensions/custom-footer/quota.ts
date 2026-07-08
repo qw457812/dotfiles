@@ -591,6 +591,10 @@ const sources: Record<string, Source> = {
   }),
   xiaomi: createSource<XiaomiQuota, string>("xiaomi", {
     cacheTtlMs: MINUTE_MS,
+    // TODO: get cookie from browser
+    // https://github.com/steipete/CodexBar
+    // https://github.com/steipete/sweet-cookie
+    // https://github.com/glide-browser/glide
     async getAuth(): Promise<string | null> {
       // Manual cookie import
       // 1. Open `https://platform.xiaomimimo.com/#/console/balance`
