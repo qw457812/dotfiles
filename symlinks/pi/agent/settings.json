@@ -1,15 +1,19 @@
 {
-  "lastChangelogVersion": "0.80.3",
+  "lastChangelogVersion": "0.80.6",
   "defaultProvider": "zai",
   "defaultModel": "glm-5.2",
-  "defaultThinkingLevel": "xhigh",
+  "defaultThinkingLevel": "max",
   "hideThinkingBlock": true,
   "quietStartup": true,
   "showHardwareCursor": true,
   "theme": "dark",
   "treeFilterMode": "no-tools",
+  "showCacheMissNotices": true,
   "enabledModels": [
     "zai/glm-5.2",
+    "openai-codex/gpt-5.6-sol",
+    "openai-codex/gpt-5.6-terra",
+    "openai-codex/gpt-5.6-luna",
     "openai-codex/gpt-5.5",
     "openai-codex/gpt-5.4",
     "github-copilot/gpt-5.4",
@@ -17,7 +21,8 @@
     "xiaomi/mimo-v2.5-pro",
     "neuralwatt/glm-5.2",
     "neuralwatt/glm-5.2-short",
-    "neuralwatt/glm-5.2-short-flex"
+    "neuralwatt/glm-5.2-short-flex",
+    "neuralwatt/kimi-k2.7-code"
   ],
   "packages": [
     "npm:pi-vim",

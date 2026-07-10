@@ -4,9 +4,9 @@
 # model_provider = "openrouter"
 # model = "openai/gpt-5.4"
 
-model = "gpt-5.5"
+model = "gpt-5.6-sol"
 
-model_reasoning_effort = "medium"
+model_reasoning_effort = "low"
 approval_policy = "on-request"
 sandbox_mode = "workspace-write"
 personality = "pragmatic"
@@ -19,8 +19,8 @@ base_url = "https://openrouter.ai/api/v1"
 env_key = "CODEX_OPENROUTER_API_KEY"
 
 [mcp_servers.context7]
-args = ["-y", "@upstash/context7-mcp"]
 command = "npx"
+args = ["-y", "@upstash/context7-mcp"]
 enabled = false
 
 [tui]

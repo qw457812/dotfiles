@@ -2,7 +2,15 @@ import type { Model, ModelThinkingLevel } from "@earendil-works/pi-ai";
 import { getSupportedThinkingLevels } from "@earendil-works/pi-ai";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
-const ORDERED_LEVELS: ModelThinkingLevel[] = ["off", "minimal", "low", "medium", "high", "xhigh"];
+const ORDERED_LEVELS: ModelThinkingLevel[] = [
+  "off",
+  "minimal",
+  "low",
+  "medium",
+  "high",
+  "xhigh",
+  "max",
+];
 
 const MAX_LEVEL_PROVIDERS = new Set([
   "kiro",
@@ -41,9 +49,14 @@ export default function (pi: ExtensionAPI) {
     const { provider, id } = model;
     if (source !== "set" && source !== "cycle") return;
 
+    if (provider === "openai-codex" && id === "gpt-5.6-sol") {
+      setLevelIfSupported(pi, model, "medium");
+      return;
+    }
+
     if (
       (provider === "openai-codex" || provider === "github-copilot" || provider === "freemodel") &&
-      (id === "gpt-5.5" || id === "gpt-5.4")
+      (id === "gpt-5.5" || id === "gpt-5.6-terra" || id === "gpt-5.4" || id === "gpt-5.6-luna")
     ) {
       setLevelIfSupported(pi, model, "high");
       return;

@@ -131,6 +131,7 @@ const formatNotification = (text: string | null): { title: string; body: string 
 
 export default function (pi: ExtensionAPI) {
 	let isFocused: boolean | undefined;
+	let pendingNotification: { title: string; body: string } | null = null;
 
 	const notify = (title: string, body: string): void => {
 		if (isFocused !== true) {
@@ -150,7 +151,15 @@ export default function (pi: ExtensionAPI) {
 
 	pi.on("agent_end", async (event) => {
 		const lastText = extractLastAssistantText(event.messages ?? []);
-		const { title, body } = formatNotification(lastText);
+		pendingNotification = formatNotification(lastText);
+	});
+
+	pi.on("agent_settled", async () => {
+		if (pendingNotification === null) {
+			return;
+		}
+		const { title, body } = pendingNotification;
+		pendingNotification = null;
 		notify(title, body);
 	});
 
