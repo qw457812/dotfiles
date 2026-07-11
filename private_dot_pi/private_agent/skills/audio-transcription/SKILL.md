@@ -9,7 +9,7 @@ Use this skill whenever the user asks to transcribe an audio/video file, a Voice
 
 1. **Preserve temporary inputs immediately.** Voice Memo share-sheet paths under `~/Library/Containers/com.apple.VoiceMemos/Data/tmp/.com.apple.uikit.itemprovider...` can disappear. Before probing or experimenting, copy the file to stable `/private/tmp/audio-transcription-inputs/`.
 2. **Use cached local models, not cloud APIs.** Prefer MLX Whisper via `uvx --from mlx-whisper mlx_whisper`; Hugging Face models must be cached in `~/.cache/huggingface/hub/`.
-3. **Force language when known.** For Armin's own dictations this is usually English with an Austrian/German accent, even when the filename is German. Do **not** infer language from filename alone.
+3. **Force language when known.** Use the recording's spoken language, regardless of the speaker's accent or the filename. Do **not** infer language from filename alone.
 4. **For bad audio, run a hallucination-resistant pass.** Use `--condition-on-previous-text False`, `--word-timestamps True`, and `--hallucination-silence-threshold 2`.
 5. **Deliver a cleaned best-effort transcript.** Compare model output with timestamps/JSON, remove obvious Whisper loops, and mark uncertain spans as `[unclear]` rather than inventing words.
 
@@ -18,7 +18,7 @@ Use this skill whenever the user asks to transcribe an audio/video file, a Voice
 Run from this skill directory:
 
 ```bash
-cd /Users/mitsuhiko/Development/agent-stuff/skills/audio-transcription
+cd ~/.pi/agent/skills/audio-transcription
 ./transcribe-audio.py "/path/to/audio.m4a" --language en --quality balanced
 ```
 
@@ -36,7 +36,7 @@ Useful variants:
 
 # Bad/important audio, slower full model
 ./transcribe-audio.py audio.m4a --language en --quality best \
-  --prompt "Armin Ronacher dictating about AI, data centers, Vienna, Donauinsel, shareholder value."
+  --prompt "A meeting about AI infrastructure, data centers, and shareholder value."
 
 # Auto language detection when language is genuinely unknown
 ./transcribe-audio.py audio.m4a --language auto --quality balanced
@@ -52,7 +52,7 @@ Default model IDs:
 Pre-cache / refresh both models:
 
 ```bash
-cd /Users/mitsuhiko/Development/agent-stuff/skills/audio-transcription
+cd ~/.pi/agent/skills/audio-transcription
 ./precache-models.py
 ```
 

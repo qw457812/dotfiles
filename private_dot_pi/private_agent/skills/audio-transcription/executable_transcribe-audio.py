@@ -231,7 +231,7 @@ def main() -> int:
     parser.add_argument(
         "--language",
         default="auto",
-        help="Whisper language code/name, or 'auto'. Use 'en' for most Armin dictations.",
+        help="Whisper language code/name, or 'auto'. Specify the spoken language when known.",
     )
     parser.add_argument(
         "--quality",
