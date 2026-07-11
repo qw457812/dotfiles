@@ -17,6 +17,9 @@ const VALID_MODES = ["off", "lite", "full", "ultra", "review"] as const;
 const VALID = VALID_MODES as readonly string[];
 type Mode = (typeof VALID_MODES)[number];
 
+const RUNTIME_MODES = ["off", "lite", "full", "ultra"] as const;
+const RUNTIME = RUNTIME_MODES as readonly string[];
+
 type SessionEntry = { type?: string; customType?: string; data?: { mode?: unknown } };
 
 // Mirrors ponytail's config-path resolution (XDG_CONFIG_HOME > APPDATA on win32 > ~/.config):
@@ -34,16 +37,17 @@ function getConfigPath(): string {
   return join(homedir(), ".config", "ponytail", "config.json");
 }
 
-// Mirrors ponytail's default-mode resolution (env > config.json > full):
-// https://github.com/DietrichGebert/ponytail/blob/dedc97c/hooks/ponytail-config.js
+// Mirrors ponytail's default-mode resolution (env > config.json > full); review
+// is excluded as a default (#377):
+// https://github.com/DietrichGebert/ponytail/blob/14a0d79/hooks/ponytail-config.js
 function getDefaultMode(): Mode {
   const env = process.env.PONYTAIL_DEFAULT_MODE?.toLowerCase();
-  if (env && VALID.includes(env)) return env as Mode;
+  if (env && RUNTIME.includes(env)) return env as Mode;
 
   try {
     const cfg = JSON.parse(readFileSync(getConfigPath(), "utf8")) as { defaultMode?: string };
     const m = cfg.defaultMode?.toLowerCase();
-    if (m && VALID.includes(m)) return m as Mode;
+    if (m && RUNTIME.includes(m)) return m as Mode;
   } catch {
     // no/invalid config file — fall through to default
   }

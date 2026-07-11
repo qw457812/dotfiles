@@ -1,1 +1,1 @@
-{ "defaultMode": "off" }
+{ "defaultMode": "off", "quietStartup": true }
