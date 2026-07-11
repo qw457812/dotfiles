@@ -1,6 +1,7 @@
 ---
 name: audio-transcription
 description: "Transcribe local audio/video and Apple Voice Memos quickly with cached MLX Whisper models, including bad/low-quality audio."
+disable-model-invocation: true
 ---
 
 Use this skill whenever the user asks to transcribe an audio/video file, a Voice Memos export, dictation, lecture, meeting recording, or "bad audio".
