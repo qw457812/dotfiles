@@ -98,42 +98,7 @@ export function createJustBashOps(
           ...(config?.network !== undefined ? { network: config.network } : {}),
           ...(config?.python === true ? { python: true } : {}),
           ...(config?.javascript ? { javascript: config.javascript } : {}),
-          ...(hostCommands.length > 0
-            ? {
-                customCommands: hostCommands,
-                // defenseInDepth is disabled for this Bash instance because of
-                // a just-bash 3.x bug: with DiD ON, *any* command-prefix
-                // assignment (`VAR=value cmd ...`, including builtins) trips a
-                // `dynamic import of Node.js builtin 'node:module'` violation.
-                // That breaks the common `GIT_AUTHOR_NAME=... git commit`
-                // idiom, so DiD must be off whenever host commands are
-                // registered. (The import is just-bash's own ESM-loader hook
-                // used to enforce DiD; see its defense-in-depth-box.ts.)
-                //
-                // NOTE on PATH shadowing: with DiD OFF, just-bash resolves
-                // commands via PATH *before* dispatching to custom commands.
-                // `PATH=<writable-dir> <host-cmd>` can therefore resolve
-                // to a same-named file in that dir instead of the registered
-                // command. That file is NOT executed on the host — just-bash
-                // reads it, strips the shebang, and interprets it as bash
-                // *inside the sandbox* (executeUserScript). It is NOT spawned
-                // on the host, so it cannot bypass the read-only host FS
-                // (writes still throw EROFS) or the network policy. denyRead
-                // is still enforced by DenyFilteredFs for sandboxed commands,
-                // so PATH shadowing does not bypass the just-bash read policy;
-                // the only effect is that the host command silently runs
-                // a sandboxed same-named script instead of the host binary.
-                // buildHostCommandEnv ignores the shell PATH for the real spawn
-                // (always process.env.PATH).
-                // The practical risk is reliability/confusion: an agent may
-                // believe it ran host `node` while actually running a sandboxed
-                // same-named script. Mitigation: don't allow adversaries to
-                // write same-named executables into PATH dirs.
-                // TODO: drop `defenseInDepth: false` once just-bash fixes the
-                //       prefix-assignment import so DiD can stay on.
-                defenseInDepth: false,
-              }
-            : {}),
+          ...(hostCommands.length > 0 ? { customCommands: hostCommands } : {}),
         });
         // Let Bash.exec's output-boundary decode (logResult ->
         // decodeBinaryToUtf8) run normally. It decodes valid-UTF-8 byte

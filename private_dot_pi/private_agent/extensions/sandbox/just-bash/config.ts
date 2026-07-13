@@ -56,11 +56,8 @@ export interface JustBashConfig {
    * full unsandboxed code execution on the host (e.g. `node -e` or `git` with
    * hooks/config/`ext::` transports), so treat the list as a deliberate escape
    * hatch, not a convenience. The child env is scrubbed (proxy and
-   * secret-shaped vars removed) and PATH is forced to the host PATH.
-   * NOTE: enabling any host command also disables just-bash
-   * `defenseInDepth` for that Bash instance (currently required to work
-   * around a just-bash bug where command-prefix assignments trigger a DiD
-   * violation). Prefer a short explicit allow-list.
+   * secret-shaped vars removed) and PATH is forced to the host PATH. Prefer a
+   * short explicit allow-list.
    */
   hostCommands?: string[];
 }

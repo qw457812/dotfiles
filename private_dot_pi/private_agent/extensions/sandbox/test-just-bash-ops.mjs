@@ -216,18 +216,6 @@ try {
   );
   assert.deepEqual(nodeAbsolutePath, { exitCode: 0, output: "absolute" });
 
-  // KNOWN LIMITATION (just-bash): with DiD OFF (forced when host
-  // commands are enabled), a command-prefix PATH override like
-  // `PATH=<writable-dir> <host-cmd>` makes just-bash resolve the command
-  // from that dir instead of dispatching to the registered custom command. The
-  // resolved file is NOT spawned on the host: just-bash reads it, strips the
-  // shebang, and interprets it as bash *inside the sandbox* (executeUserScript),
-  // so writes still hit the read-only host FS (EROFS) and denyRead is enforced.
-  // PATH shadowing adds no new read capability, only command confusion.
-  // buildHostCommandEnv also ignores the shell PATH for the real spawn.
-  // Mitigation: don't allow adversaries to write same-named executables into
-  // PATH dirs.
-
   // Secret-shaped and proxy env vars must be stripped before reaching the
   // unsandboxed host child, otherwise an injected command could exfiltrate
   // them or reroute traffic through an attacker proxy. Use a probe file to
