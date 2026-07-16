@@ -156,7 +156,7 @@ return {
             function()
               vim.cmd("Lazy log pi")
               vim.defer_fn(function()
-                vim.cmd("silent! /pi")
+                vim.cmd("silent! /○ pi ")
               end, 200)
             end,
             desc = "Pi Logs",

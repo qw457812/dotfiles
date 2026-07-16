@@ -209,12 +209,14 @@ function pruneEmptySkillsSection(systemPrompt: string): string {
 function insertSkillsSection(systemPrompt: string, skillsSection: string): string {
   if (!skillsSection) return systemPrompt;
 
-  // https://github.com/earendil-works/pi/blob/1ab2899800b1d7120cd6188e6eead24459a725b1/packages/coding-agent/src/core/system-prompt.ts#L169
-  const currentDateIndex = systemPrompt.lastIndexOf("\nCurrent date:");
-  if (currentDateIndex === -1) return systemPrompt + skillsSection;
+  // https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/system-prompt.ts#L159
+  const workingDirectoryIndex = systemPrompt.lastIndexOf("\nCurrent working directory:");
+  if (workingDirectoryIndex === -1) return systemPrompt + skillsSection;
 
   return (
-    systemPrompt.slice(0, currentDateIndex) + skillsSection + systemPrompt.slice(currentDateIndex)
+    systemPrompt.slice(0, workingDirectoryIndex) +
+    skillsSection +
+    systemPrompt.slice(workingDirectoryIndex)
   );
 }
 
