@@ -6,6 +6,7 @@ import {
 	createAgentSession,
 	createExtensionRuntime,
 	getMarkdownTheme,
+	ModelRuntime,
 	SessionManager,
 	type AgentSession,
 	type AgentSessionEvent,
@@ -100,6 +101,17 @@ function createBtwResourceLoader(ctx: ExtensionContext, appendSystemPrompt: stri
 		extendResources: () => {},
 		reload: async () => {},
 	};
+}
+
+async function createBtwModelRuntime(ctx: ExtensionContext): Promise<ModelRuntime> {
+	const modelRuntime = await ModelRuntime.create();
+	for (const providerId of ctx.modelRegistry.getRegisteredProviderIds()) {
+		const config = ctx.modelRegistry.getRegisteredProviderConfig(providerId);
+		if (config) {
+			modelRuntime.registerProvider(providerId, config);
+		}
+	}
+	return modelRuntime;
 }
 
 function extractText(parts: AssistantMessage["content"]): string {
@@ -575,7 +587,7 @@ export default function (pi: ExtensionAPI) {
 		const { session } = await createAgentSession({
 			sessionManager: SessionManager.inMemory(),
 			model: ctx.model,
-			modelRegistry: ctx.modelRegistry as AgentSession["modelRegistry"],
+			modelRuntime: await createBtwModelRuntime(ctx),
 			thinkingLevel: pi.getThinkingLevel() as SessionThinkingLevel,
 			tools: ["read", "bash", "edit", "write"],
 			resourceLoader: createBtwResourceLoader(ctx),
@@ -764,7 +776,7 @@ export default function (pi: ExtensionAPI) {
 		const { session } = await createAgentSession({
 			sessionManager: SessionManager.inMemory(),
 			model,
-			modelRegistry: ctx.modelRegistry as AgentSession["modelRegistry"],
+			modelRuntime: await createBtwModelRuntime(ctx),
 			thinkingLevel: "off",
 			tools: [],
 			resourceLoader: createBtwResourceLoader(ctx, [BTW_SUMMARY_PROMPT]),

@@ -14,12 +14,8 @@
  *
  * Ref: https://github.com/aaamosh/codex-reset
  */
-import {
-  AuthStorage,
-  type AuthCredential,
-  type ExtensionAPI,
-  type ExtensionCommandContext,
-} from "@earendil-works/pi-coding-agent";
+
+import type { ExtensionAPI, ExtensionCommandContext } from "@earendil-works/pi-coding-agent";
 import type { AutocompleteItem } from "@earendil-works/pi-tui";
 import { randomUUID } from "node:crypto";
 
@@ -128,19 +124,13 @@ function extractAccountId(token: string): string | null {
   return typeof auth?.chatgpt_account_id === "string" ? auth.chatgpt_account_id : null;
 }
 
-function accountIdFromCredential(credential: AuthCredential | undefined): string | null {
-  if (!credential || credential.type !== "oauth") return null;
-  return typeof credential.accountId === "string" ? credential.accountId : null;
-}
-
-async function loadAuth(): Promise<CodexAuth> {
-  const storage = AuthStorage.create();
-  const token = await storage.getApiKey(PROVIDER);
+async function loadAuth(ctx: ExtensionCommandContext): Promise<CodexAuth> {
+  const token = await ctx.modelRegistry.getApiKeyForProvider(PROVIDER);
   if (!token) {
     throw new CodexResetError(`No ${PROVIDER} auth found. Run /login first.`);
   }
 
-  const accountId = accountIdFromCredential(storage.get(PROVIDER)) ?? extractAccountId(token);
+  const accountId = extractAccountId(token);
   if (!accountId) {
     throw new CodexResetError("Could not parse ChatGPT account id from the openai-codex token.");
   }
@@ -293,7 +283,7 @@ function findCredit(credits: ResetCredit[], creditId: string | undefined): Reset
 }
 
 async function runStatus(ctx: ExtensionCommandContext): Promise<void> {
-  const auth = await loadAuth();
+  const auth = await loadAuth(ctx);
   const [credits, usage] = await Promise.all([
     requestJson<ResetCreditsResponse>(auth, "GET", "/wham/rate-limit-reset-credits"),
     requestJson<UsageResponse>(auth, "GET", "/wham/usage"),
@@ -302,7 +292,7 @@ async function runStatus(ctx: ExtensionCommandContext): Promise<void> {
 }
 
 async function runConsume(args: Args, ctx: ExtensionCommandContext): Promise<void> {
-  const auth = await loadAuth();
+  const auth = await loadAuth(ctx);
   const credits = await requestJson<ResetCreditsResponse>(
     auth,
     "GET",
