@@ -508,8 +508,7 @@ brew "zoxide"
 brew "zsh-vi-mode"
 # Modern Go client + CLI for the Google Places API (New)
 brew "steipete/tap/goplaces"
-# AeroSpace is an i3-like tiling window manager for macOS
-cask "nikitabobko/tap/aerospace"
+cask "aerospace"
 # GPU-accelerated terminal emulator
 cask "alacritty"
 # Enable Windows-like alt-tab
@@ -526,8 +525,7 @@ cask "cmux"
 cask "codex"
 # OpenAI's Codex desktop app for managing coding agents
 cask "codex-app"
-# Menu bar usage monitor for Codex and Claude
-cask "steipete/tap/codexbar"
+cask "codexbar"
 # Dictionary and translator app
 cask "easydict"
 # Web browser
@@ -589,14 +587,12 @@ cask "sqlcl"
 cask "squirrel-app"
 # Utility to hide the notch
 cask "topnotch"
-# 代理客户端，支持 Xray、sing-box 等
-cask "brewforge/chinese/v2rayn"
+cask "v2rayn"
 # Multimedia player
 cask "vlc"
 # GPU-accelerated cross-platform terminal emulator and multiplexer
 cask "wezterm@nightly"
-# Auth-enabled curl-like CLI for the X API
-cask "xdevplatform/tap/xurl"
+cask "xurl"
 # Multiplayer code editor
 cask "zed"
 mas "Bitwarden", id: 1352778147
@@ -649,6 +645,7 @@ vscode "ms-python.black-formatter"
 vscode "ms-python.debugpy"
 vscode "ms-python.python"
 vscode "ms-python.vscode-pylance"
+vscode "ms-python.vscode-python-envs"
 vscode "ms-toolsai.jupyter"
 vscode "ms-toolsai.jupyter-keymap"
 vscode "ms-toolsai.jupyter-renderers"

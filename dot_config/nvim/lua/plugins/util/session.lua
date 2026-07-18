@@ -6,9 +6,9 @@ if lazyvim_docs then
   vim.g.user_auto_session = false
 end
 
-local LazyUtil = require("lazy.util")
+-- local LazyUtil = require("lazy.util")
 
-local restart_cache_file = vim.fn.stdpath("cache") .. "/user_is_restart.txt"
+-- local restart_cache_file = vim.fn.stdpath("cache") .. "/user_is_restart.txt"
 
 ---@type LazySpec
 return {
@@ -29,7 +29,7 @@ return {
               return
             end
           end
-          LazyUtil.write_file(restart_cache_file, "1")
+          -- LazyUtil.write_file(restart_cache_file, "1")
           vim.cmd("restart")
         end,
         desc = "Restart and Restore Session",
@@ -53,12 +53,12 @@ return {
         once = true,
         nested = true,
         callback = function()
-          -- for `<leader>qr`
-          if vim.fn.filereadable(restart_cache_file) == 1 and LazyUtil.read_file(restart_cache_file) == "1" then
-            LazyUtil.write_file(restart_cache_file, "0")
-            require("persistence").load({ last = vim.g.user_auto_root })
-            return
-          end
+          -- -- for `<leader>qr`
+          -- if vim.fn.filereadable(restart_cache_file) == 1 and LazyUtil.read_file(restart_cache_file) == "1" then
+          --   LazyUtil.write_file(restart_cache_file, "0")
+          --   require("persistence").load({ last = vim.g.user_auto_root })
+          --   return
+          -- end
 
           -- for `vim.g.user_auto_session`
           if not vim.g.user_auto_session then

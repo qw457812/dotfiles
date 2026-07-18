@@ -141,13 +141,14 @@ return {
       },
       {
         "hugohe3/ppt-master",
+        pin = true,
         build = "pi update --extension git:github.com/hugohe3/ppt-master",
         enabled = not vim.g.user_is_termux,
         lazy = true,
         config = function() end,
       },
-      { "dannote/dot-pi", name = "dannote-dot-pi", lazy = true, config = function() end },
-      { "ogulcancelik/herdr", enabled = not vim.g.user_is_termux, lazy = true, config = function() end },
+      { "dannote/dot-pi", pin = true, name = "dannote-dot-pi", lazy = true, config = function() end },
+      { "ogulcancelik/herdr", pin = true, enabled = not vim.g.user_is_termux, lazy = true, config = function() end },
       {
         "LazyVim/LazyVim",
         keys = {

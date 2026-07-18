@@ -35,6 +35,8 @@ const PROMPT_HIDDEN_SKILLS = [
   "frontend-design",
   "web-browser",
   "github",
+  // git:github.com/mattpocock/skills
+  "resolving-merge-conflicts",
   // git:github.com/addyosmani/agent-skills
   "source-driven-development",
   // git:github.com/DietrichGebert/ponytail

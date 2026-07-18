@@ -45,6 +45,8 @@
       "source": "git:github.com/mattpocock/skills",
       "extensions": [],
       "skills": [
+        "skills/engineering/resolving-merge-conflicts",
+        "skills/in-progress/batch-grill-me",
         "skills/productivity/grilling",
         "skills/productivity/teach",
         "skills/productivity/writing-great-skills"
