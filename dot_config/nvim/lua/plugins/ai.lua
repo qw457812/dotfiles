@@ -149,6 +149,7 @@ return {
       },
       { "dannote/dot-pi", pin = true, name = "dannote-dot-pi", lazy = true, config = function() end },
       { "ogulcancelik/herdr", pin = true, enabled = not vim.g.user_is_termux, lazy = true, config = function() end },
+      { "vercel-labs/just-bash", version = "*", enabled = vim.g.user_is_termux, lazy = true, config = function() end },
       {
         "LazyVim/LazyVim",
         keys = {
