@@ -1,115 +1,130 @@
 ---
 name: adapt-pi-vim
-description: Adapt a pi extension that extends pi-vim's ModalEditor to newer pi-vim versions. Covers type changes, cursor shape conflict resolution, ex-command support, and pi-managed path resolution. Use when pi-vim has a breaking API change and an extension subclassing ModalEditor (e.g., prompt-editor) needs updating.
+description: Adapt prompt-editor to a newer pi-vim version.
 disable-model-invocation: true
 ---
 
-# Adapt pi-vim changes
+# Adapt pi-vim
 
-When pi-vim bumps to a new version, extensions subclassing `ModalEditor` must be checked
-for compatibility. Reference: `extensions/prompt-editor/index.ts`.
+Upgrade the pi-managed `pi-vim` package and keep the chezmoi-owned
+`PromptEditor extends ModalEditor` integration compatible.
 
-## Quick start
+Paths:
+
+- source extension: `private_dot_pi/private_agent/extensions/prompt-editor/index.ts`
+- source version pin: `private_dot_pi/private_agent/package.json`
+- installed package: `~/.pi/agent/npm/node_modules/pi-vim`
+- detailed compatibility patterns: [REFERENCE.md](REFERENCE.md)
+
+## 1. Freeze the published package revisions
+
+Resolve both revisions from npm's `gitHead` metadata so the diff matches the code
+shipped in the installed and target tarballs:
 
 ```bash
-# Find installed pi-vim version
-cat ~/.pi/agent/npm/node_modules/pi-vim/package.json | head -3
+set -euo pipefail
+OLD_VERSION=$(node -p 'require(process.env.HOME + "/.pi/agent/npm/node_modules/pi-vim/package.json").version')
+TARGET_VERSION=$(npm view pi-vim version)
+OLD_REV=$(npm view "pi-vim@$OLD_VERSION" gitHead)
+TARGET_REV=$(npm view "pi-vim@$TARGET_VERSION" gitHead)
+CHK=$(bash ~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/librarian/checkout.sh \
+  github.com/lajarre/pi-vim --path-only)
+git -C "$CHK" cat-file -e "$OLD_REV^{commit}"
+git -C "$CHK" cat-file -e "$TARGET_REV^{commit}"
+printf 'installed=%s\nold=%s\ntarget_version=%s\ntarget=%s\n' \
+  "$OLD_VERSION" "$OLD_REV" "$TARGET_VERSION" "$TARGET_REV"
+```
 
-# Upgrade pi-vim (always use pi's package manager, never npm directly)
+**Complete when:** both versions and non-empty `gitHead` revisions are recorded,
+both revisions exist in the cached repository, and `OLD_REV..TARGET_REV` is the
+published-package range to review.
+
+## 2. Review the whole change surface
+
+```bash
+git -C "$CHK" log --oneline "$OLD_REV..$TARGET_REV"
+git -C "$CHK" diff --stat "$OLD_REV..$TARGET_REV"
+git -C "$CHK" diff "$OLD_REV..$TARGET_REV" -- \
+  index.ts types.ts settings.ts clipboard-policy.ts mode-colors.ts \
+  mode-change-command.ts cursor-shape.ts
+```
+
+Account for changes to:
+
+- `ModalEditor` constructor, public setters, modes, and private fields accessed structurally
+- `default` extension `session_start` / `session_shutdown` setup
+- settings, colorizer keys, command dispatch, clipboard behavior, and cursor rendering
+- exported or moved helpers copied or re-exported by `prompt-editor`
+
+Read only the matching headings in [REFERENCE.md](REFERENCE.md) once the changed
+surfaces are known.
+
+**Complete when:** every changed integration surface is classified as compatible,
+requiring a concrete edit, or intentionally unsupported with a stated reason.
+
+## 3. Upgrade both package installations
+
+Use Pi for its managed installation, then confirm it installed the frozen target:
+
+```bash
 pi update --extension npm:pi-vim
-
-# Ensure repo is cached via librarian, then compare changelogs
-bash ~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/librarian/checkout.sh \
-  github.com/lajarre/pi-vim --path-only
-# Find the commit for the old version (pi-vim uses chore(release) commits, not tags)
-CHK=~/.cache/checkouts/github.com/lajarre/pi-vim
-OLD_REV=$(git -C "$CHK" log --oneline --all --grep="bump version to $(cat ~/.pi/agent/npm/node_modules/pi-vim/package.json | head -3 | grep version | sed 's/.*"\([^"]*\)".*/\1/')" | head -1 | cut -d' ' -f1)
-# View changes to index.ts since old version
-git -C "$CHK" log --oneline ${OLD_REV}..HEAD -- index.ts
-# Or diff a specific file
-git -C "$CHK" diff ${OLD_REV}..HEAD -- index.ts
+test "$(node -p 'require(process.env.HOME + "/.pi/agent/npm/node_modules/pi-vim/package.json").version')" = \
+  "$TARGET_VERSION"
 ```
 
-> **Never** run `cd ~/.pi/agent/npm && npm install pi-vim@latest` — that bypasses pi's
-> version checking and settings integration. Use `pi update --extension npm:pi-vim` instead.
-> If you need to revert, use `pi install npm:pi-vim@<version>`.
-
-## Assess impact first
-
-Before touching extension code, diff the old and new pi-vim via the librarian
-cached repo to determine if any **public API** changed. Many minor bumps only
-add internal features and need zero extension changes.
+Then update the exact `pi-vim` pin to `TARGET_VERSION` in
+`private_dot_pi/private_agent/package.json` and sync the chezmoi source lockfile:
 
 ```bash
-# View changelog of index.ts between versions
-CHK=~/.cache/checkouts/github.com/lajarre/pi-vim
-# OLD_REV = commit hash of the previously installed version
-# Find it with: git -C "$CHK" log --oneline --all --grep="bump version to <old-version>"
-git -C "$CHK" log --oneline ${OLD_REV}..HEAD -- index.ts
-
-# Check full diff for API surface changes
-git -C "$CHK" diff ${OLD_REV}..HEAD -- index.ts | rg "^[+-]" | rg -v "^[+-]{3}" |
-  rg "(ModalEditorOptions|setQuitFn|setNotifyFn|setClipboardFn|setRegister|cursorShapeRuntime|pendingExCommand|labelColorizer|borderColorizer)" || echo "No API surface changes found"
+cd private_dot_pi/private_agent
+npm install
 ```
 
-If the diff shows no API changes, the extension likely needs no code changes — just update
-`package.json` and verify with `npm run check && npm run lint`.
+Use `pi install npm:pi-vim@<version>` to restore a specific managed version.
 
-For a complete overview of all changed source files (not just index.ts):
+**Complete when:** the installed package, source `package.json`, source lockfile,
+and source `node_modules/pi-vim` report the same target version.
+
+## 4. Adapt prompt-editor
+
+Apply only the compatibility patterns triggered by step 2. Regenerate the local
+`pi-vim.generated.ts` wrapper by loading Pi after changing its template; the wrapper
+must resolve the pi-managed package, not the source-tree dev dependency.
+
+For a replacement editor, compare pi-vim's complete factory setup rather than only
+its constructor. Preserve project/global settings trust boundaries from upstream.
+
+**Complete when:** every surface classified for editing in step 2 is implemented,
+the generated wrapper points at the target installation, and no changed upstream
+setup setter or cleanup hook is unaccounted for.
+
+## 5. Verify
 
 ```bash
-git -C "$CHK" log --oneline --diff-filter=AMR ${OLD_REV}..HEAD -- \
-  ":(exclude)test/*" ":(exclude)*.md" ":(exclude)*.json"
-git -C "$CHK" diff --stat ${OLD_REV}..HEAD -- \
-  ":(exclude)test/*" ":(exclude)*.md" ":(exclude)*.json"
+cd private_dot_pi/private_agent
+npm run check
+npm run lint
+cd -
+pi --list-models >/dev/null
 ```
 
-## Workflow checklist
-
-1. [ ] **Resolve pi-vim path** — use `getAgentDir()` not `npm root -g`（see REFERENCE #1）
-2. [ ] **Update constructor call** — check if `super()` switched from positional args to an options bag（see REFERENCE #2）
-3. [ ] **Check labelColorizers / borderColorizers** — newer pi-vim may add required fields like `ex` or new options like `borderColorizers`（see REFERENCE #3）
-4. [ ] **Disable built-in cursor shape** — if pi-vim added `cursorShapeRuntime`, null it in constructor（see REFERENCE #4）
-5. [ ] **Ex-command passthrough** — if `pendingExCommand` was added, bypass remaps in `handleInput`（see REFERENCE #5）
-6. [ ] **Derive active mode** — extract `getActiveMode()` helper so label/prefix colorizers use the correct mode（see REFERENCE #6）
-7. [ ] **Check mode unions and colorizers** — add new modes such as `visual` / `visual-line`, normalize them to the corresponding color key, and choose their cursor shape（see REFERENCE #9）
-8. [ ] **Mirror the complete session setup** — a replacement editor must reapply clipboard policy, mode-change hooks, ex settings, and the dynamic command registry, not only quit/notify callbacks（see REFERENCE #10）
-9. [ ] **Define `ModalEditorRuntime`** — structural type for safe private field access（see REFERENCE #7）
-10. [ ] **Adopt cursor stripping helpers** — `findSoftwareCursorReset` + `stripSoftwareCursorAfterMarker`（see REFERENCE #8）
-11. [ ] **Update `package.json` version pin** — change `"pi-vim": "<old>"` to the new version, then run `npm install` to sync the lockfile
-
-## Update package.json & install
-
-After upgrading pi-vim and (if needed) adapting extension code, update the
-version pin in `package.json` and sync the lockfile:
-
-```bash
-# Edit the version pin (e.g. "pi-vim": "0.11.0" → "0.11.1")
-# Then install to update package-lock.json
-cd ~/.pi/agent && npm install
-```
-
-This step is required even when no extension code changed — `package.json`
-must reflect the actual installed version so future `npm install` runs are
-reproducible.
-
-## Verify
-
-```bash
-cd ~/.pi/agent && npm run check    # tsc --noEmit
-cd ~/.pi/agent && npm run lint     # oxlint
-```
-
-To inspect the original pi-vim UI without auto-discovered extensions such as
-`prompt-editor`, start Pi with only the installed pi-vim entry explicitly loaded:
+Inspect upstream pi-vim without auto-discovered extensions when UI comparison is
+needed:
 
 ```bash
 pi --no-session --no-extensions -e ~/.pi/agent/npm/node_modules/pi-vim/index.ts
 ```
 
-## After adapting
+Manually exercise every changed interactive branch, such as mode transitions,
+rendering, Ex dispatch, clipboard policy, and settings overrides.
 
-Update this skill with any new patterns discovered during the migration.
-New pi-vim versions may introduce API surfaces not covered here.
+**Complete when:** typecheck, lint, runtime loading, and every affected interactive
+branch pass against the target version.
 
-See [REFERENCE.md](REFERENCE.md) for code samples and detailed explanations.
+## 6. Keep this skill current
+
+Add a new reference pattern only when the migration discovers a reusable integration
+surface not already covered; replace stale guidance rather than layering it.
+
+**Complete when:** [REFERENCE.md](REFERENCE.md) covers every reusable pattern learned
+from the migration with one source of truth per pattern.

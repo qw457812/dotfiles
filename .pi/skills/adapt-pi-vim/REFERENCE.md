@@ -1,9 +1,10 @@
-# Adapt pi-vim — Reference
+# pi-vim compatibility patterns
 
-## 1. Resolve pi-vim path
+Load only the headings implicated by the upstream diff.
 
-Pi manages packages at `<agent-dir>/npm/node_modules/`.
-Use `getAgentDir()` from `@earendil-works/pi-coding-agent`:
+## Pi-managed module resolution
+
+Resolve pi-vim below Pi's agent directory:
 
 ```ts
 import { getAgentDir } from "@earendil-works/pi-coding-agent";
@@ -11,51 +12,49 @@ import { getAgentDir } from "@earendil-works/pi-coding-agent";
 function findPiVimEntry(): string {
   const entry = join(getAgentDir(), "npm", "node_modules", "pi-vim", "index.ts");
   if (existsSync(entry)) return entry;
-  throw new Error("...");
+  throw new Error("prompt-editor: pi-vim not found");
 }
 ```
 
-Do NOT use `execSync("npm root -g")` — that returns the system global root, not pi's managed location.
-Do NOT run `npm install` directly under `npm/` — use `pi update --extension npm:pi-vim` to upgrade.
-
-## 2. Constructor signature changes
-
-pi-vim 0.10.0 replaced the positional `labelColorizers` parameter with an options bag:
+`prompt-editor` generates a sibling wrapper because its loader cannot reliably
+resolve pi-vim directly. Re-export `index.ts` plus any required internal helper from
+the same installed directory:
 
 ```ts
-// v0.9.0 — positional
-super(tui, theme, kb, labelColorizers);
-
-// v0.10.0 — options bag
-super(tui, theme, kb, { labelColorizers, borderColorizers: null });
+export * from ${JSON.stringify(piVimEntry)};
+export { readPiVimSettings } from ${JSON.stringify(join(piVimDir, "settings.ts"))};
 ```
 
-Always check the `ModalEditor` constructor in the installed `pi-vim/index.ts` for the current
-signature after an upgrade. If the 4th argument changed, update your subclass `super()` call
-and the constructor parameter list accordingly.
+The wrapper's complete condition is that every re-export resolves below
+`getAgentDir()/npm/node_modules/pi-vim`.
 
-## 3. labelColorizers / borderColorizers type changes
+## Constructor and colorizers
 
-### labelColorizers
-
-Newer pi-vim may add required fields to `labelColorizers` (e.g., `ex` for ex-command mode).
-Always add the new field even if your render override bypasses `ModalEditor.render()`;
-the narrow-terminal fallback still calls `super.render()`.
+Diff `ModalEditor`'s constructor and options on every upgrade. Keep the local
+constructor parameters aligned with the options passed to `super()`:
 
 ```ts
-type ModeColorizers = Record<"insert" | "normal" | "ex", (s: string) => string>;
-
-const colorizers: ModeColorizers = {
-  insert: (s: string) => theme.fg("borderMuted", reverseVideo(s)),
-  normal: (s: string) => theme.fg("borderAccent", reverseVideo(s)),
-  ex:     (s: string) => theme.fg("warning",      reverseVideo(s)),
-};
+super(tui, theme, kb, { labelColorizers, borderColorizers });
 ```
 
-### borderColorizers
+Colorizer keys can differ from editor modes. For pi-vim 0.13, both visual editor
+modes share one color key:
 
-pi-vim 0.10.0 added `borderColorizers` to the constructor options. Respect
-`syncBorderColorWithMode` by passing mode colorizers only when it is enabled:
+```ts
+type Mode = "insert" | "normal" | "visual" | "visual-line";
+type ModeColorKey = "insert" | "normal" | "visual" | "ex";
+type ModeColorizers = Record<ModeColorKey, (text: string) => string>;
+```
+
+Every label colorizer key is required because narrow rendering still delegates to
+`ModalEditor.render()` even when the wide renderer is overridden.
+
+### Mode-synced border with Insert fallback
+
+Pi assigns its thinking-level `borderColor` after editor construction. pi-vim's
+mode-aware property setter retains that assignment as the base fallback. To keep
+Insert on the thinking-level border while coloring Normal, Visual, and Ex, omit the
+Insert colorizer at runtime:
 
 ```ts
 const borderColorizers =
@@ -65,189 +64,106 @@ const borderColorizers =
 if (borderColorizers) {
   delete (borderColorizers as Partial<ModeColorizers>).insert;
 }
-super(tui, theme, kb, { labelColorizers, borderColorizers });
 ```
 
-pi-vim's `installModeBorderColorizer()` intercepts later `.borderColor` assignments
-and keeps them as the fallback/base color. Omitting a mode colorizer selects that
-fallback. The example deliberately omits `insert`, so Insert continues to show Pi's
-latest thinking-level border while Normal, Visual, and Ex use their Vim mode colors.
-The `Partial` cast is required because pi-vim currently types the colorizer map as a
-complete `Record`, although its runtime lookup supports a missing key.
+The `Partial` cast bridges pi-vim's complete `Record` type to its runtime fallback
+behavior. When mode-synced borders already carry state, plain prefixes avoid a
+second competing mode signal; otherwise retain mode-colored prefixes.
 
-## 4. Disable pi-vim's built-in cursor shape
+## Active mode and labels
 
-If pi-vim adds a `cursorShapeRuntime` field and calls `syncCursorShapeForRender` inside `render()`,
-null it out in your subclass constructor when you manage DECSCUSR shapes independently:
+Ex is a normal-mode substate, and `visual-line` uses the `visual` colorizer:
 
 ```ts
-class PromptEditor extends ModalEditor {
-  constructor(tui: any, theme: any, kb: any, opts?: ModalEditorOptions) {
-    super(tui, theme, kb, opts);
-    // Prevent double-writes and conflicting shape sequences.
-    (this as any).cursorShapeRuntime = null;
-  }
+function getActiveMode(editor: ModalEditorRuntime): ModeColorKey {
+  if (editor.pendingExCommand !== null) return "ex";
+  const mode = editor.getMode();
+  return mode === "visual-line" ? "visual" : mode;
 }
 ```
 
-## 5. Ex-command mode
+A renderer that bypasses `ModalEditor.render()` needs fallback labels for every
+editor mode:
 
-If pi-vim adds `pendingExCommand: string | null` for `:q`, `:wq`, etc:
+```ts
+const labels: Record<Mode, string> = {
+  insert: " INSERT ",
+  normal: " NORMAL ",
+  visual: " VISUAL ",
+  "visual-line": " V-LINE ",
+};
+```
 
-**handleInput bypass** — prevent custom remaps from interfering with ex-command typing:
+The complete condition is that label, prefix, border, and cursor code all account
+for every member of both unions.
+
+## Cursor ownership
+
+`prompt-editor` owns DECSCUSR cursor shape and hardware-cursor visibility. Disable
+pi-vim's cursor runtime after construction to prevent competing terminal writes:
+
+```ts
+(this as any).cursorShapeRuntime = null;
+```
+
+Treat every non-Insert mode as a block cursor unless the upstream mode semantics
+require another shape:
+
+```ts
+function getCursorStyle(mode: Mode): string {
+  return mode === "insert" ? CURSOR_STYLE_INSERT : CURSOR_STYLE_NORMAL;
+}
+```
+
+The local `findSoftwareCursorReset` and `stripSoftwareCursorAfterMarker` copies must
+match the target `cursor-shape.ts` implementation exactly. Compare them during any
+cursor-related upstream change and update their source revision comments.
+
+## Ex input passthrough
+
+While `pendingExCommand` is active, delegate input before applying custom Normal-mode
+remaps:
+
 ```ts
 override handleInput(data: string): void {
   if ((this as unknown as ModalEditorRuntime).pendingExCommand !== null) {
     super.handleInput(data);
     return;
   }
-  // ... custom remaps ...
+  // custom remaps
 }
 ```
 
-**Lifecycle hooks** — if the version provides `setQuitFn` / `setNotifyFn`:
-```ts
-(newEditor as any).setQuitFn(() => ctx.shutdown());
-(newEditor as any).setNotifyFn((message: string) => ctx.ui.notify(message, "warning"));
-```
+This keeps command text, paste guards, Enter submission, and Escape handling under
+pi-vim's Ex state machine.
 
-## 6. Derive active mode
+## Structural access to private runtime state
 
-When ex-command support is present, colorizer selection must account for three modes
-(`insert`, `normal`, `ex`) instead of two. Extract a `getActiveMode` helper to avoid
-duplicating the pendingExCommand check across multiple colorizer lookups:
-
-```ts
-function getActiveMode(editor: ModalEditorRuntime): "insert" | "normal" | "visual" | "ex" {
-  if (editor.pendingExCommand !== null) return "ex";
-  const mode = editor.getMode();
-  return mode === "visual-line" ? "visual" : mode;
-}
-
-// Usage in label rendering:
-const active = getActiveMode(editor);
-const colorize = editor.labelColorizers?.[active] ?? null;
-
-// Usage in prefix rendering:
-const colorize = colorizers[getActiveMode(editor)];
-```
-
-This mirrors pi-vim's own `getActiveMode()` method (private on `ModalEditor`).
-
-## 7. ModalEditorRuntime type
-
-`ModalEditor` has private fields that TypeScript won't let you cast to directly.
-Define a structural type and use the `unknown` hop (required because e.g. `getModeLabel` is private).
+Use one structural type for private fields required by the integration, with an
+`unknown` hop at each access:
 
 ```ts
 type ModalEditorRuntime = {
   getMode: () => Mode;
   getModeLabel?: () => string;
   labelColorizers?: ModeColorizers | null;
-  borderColor?: (s: string) => string;
+  borderColor?: (text: string) => string;
   pendingExCommand: string | null;
   pendingOperator: string | null;
-  addToHistory?: (text: string) => void;
-  history?: string[];
-  historyIndex?: number;
+  setClipboardFn?: (fn: (text: string, signal?: AbortSignal) => unknown) => void;
+  setClipboardReadFn?: (fn: () => string | null) => void;
 };
 
-// Usage:
-(this as unknown as ModalEditorRuntime).pendingExCommand
-(this as unknown as ModalEditorRuntime).pendingOperator
+(this as unknown as ModalEditorRuntime).pendingExCommand;
 ```
 
-Add fields to this type as new private `ModalEditor` members are introduced.
+Add a field only when local behavior reads or writes it. Remove fields when the
+integration stops using them.
 
-## 8. Cursor stripping helpers
+## Replacement-editor session parity
 
-pi-vim provides surgical helpers for stripping the fake inverse-video cursor only at the
-`CURSOR_MARKER` position. Copy these functions verbatim rather than writing equivalent regex logic:
-
-```ts
-// Constants
-const SOFTWARE_CURSOR_START = "\x1b[7m";
-const SOFTWARE_CURSOR_RESETS = ["\x1b[0m", "\x1b[27m"] as const;
-
-// Copied from pi-vim — findSoftwareCursorReset.
-function findSoftwareCursorReset(
-  line: string,
-  startIndex: number,
-): { index: number; sequence: (typeof SOFTWARE_CURSOR_RESETS)[number] } | null {
-  let firstReset: { index: number; sequence: (typeof SOFTWARE_CURSOR_RESETS)[number] } | null = null;
-  for (const sequence of SOFTWARE_CURSOR_RESETS) {
-    const index = line.indexOf(sequence, startIndex);
-    if (index === -1) continue;
-    if (!firstReset || index < firstReset.index) {
-      firstReset = { index, sequence };
-    }
-  }
-  return firstReset;
-}
-
-// Copied from pi-vim — stripSoftwareCursorAfterMarker.
-function stripSoftwareCursorAfterMarker(line: string): string {
-  const markerIndex = line.indexOf(CURSOR_MARKER);
-  if (markerIndex === -1) return line;
-  const searchStart = markerIndex + CURSOR_MARKER.length;
-  const cursorStart = line.indexOf(SOFTWARE_CURSOR_START, searchStart);
-  if (cursorStart === -1) return line;
-  const cursorContentStart = cursorStart + SOFTWARE_CURSOR_START.length;
-  const reset = findSoftwareCursorReset(line, cursorContentStart);
-  if (!reset) return line;
-  return (
-    line.slice(0, cursorStart) +
-    line.slice(cursorContentStart, reset.index) +
-    line.slice(reset.index + reset.sequence.length)
-  );
-}
-```
-
-Call from a method that searches body lines bottom-up:
-
-```ts
-private stripFakeCursor(lines: string[], bottomIdx: number): void {
-  for (let i = bottomIdx - 1; i >= 1; i--) {
-    const stripped = stripSoftwareCursorAfterMarker(lines[i]!);
-    if (stripped !== lines[i]!) {
-      lines[i] = stripped;
-      return;
-    }
-  }
-}
-```
-
-## 9. New modes and color keys
-
-A pi-vim mode union can grow independently of its colorizer keys. For example,
-`visual` and `visual-line` are distinct editor modes but both use the `visual`
-colorizer. Update all local structural types, labels, prefix rendering, and cursor
-shape functions together:
-
-```ts
-type Mode = "insert" | "normal" | "visual" | "visual-line";
-type ModeColorKey = "insert" | "normal" | "visual" | "ex";
-type ModeColorizers = Record<ModeColorKey, (text: string) => string>;
-
-function getActiveMode(editor: ModalEditorRuntime): ModeColorKey {
-  if (editor.pendingExCommand !== null) return "ex";
-  const mode = editor.getMode();
-  return mode === "visual-line" ? "visual" : mode;
-}
-
-function getCursorStyle(mode: Mode): string {
-  return mode === "insert" ? CURSOR_STYLE_INSERT : CURSOR_STYLE_NORMAL;
-}
-```
-
-When a render override bypasses `ModalEditor.render()`, provide fallback labels for
-every mode even if the current pi-vim exposes a private `getModeLabel()` at runtime.
-
-## 10. Reapply pi-vim session configuration
-
-Replacing pi-vim's editor factory also replaces the editor instance that pi-vim
-configured in its `session_start` handler. Diff that handler on every upgrade and
-mirror every relevant setter on the replacement instance, including:
+`PromptEditor` replaces the instance configured by pi-vim's `session_start`, so it
+must mirror every relevant setting and callback from the target factory:
 
 ```ts
 editor.setClipboardMirrorPolicy(clipboardMirrorPolicy.policy);
@@ -260,14 +176,15 @@ editor.setCommandNamesFn(
 );
 ```
 
-`pi.getCommands()` excludes builtin interactive commands, so keep the mirrored
-builtin command list aligned with pi-vim's `EX_BUILTIN_COMMAND_NAMES`. Resolve the
-function at submit time so commands registered or reloaded mid-session are visible.
-Also call pi-vim's matching cleanup function (for example
-`cancelModeChangeCommands()`) from `session_shutdown`.
+Resolve command names at submit time so reloads and mid-session registrations are
+visible. `pi.getCommands()` excludes builtin interactive commands, so keep the local
+builtin list aligned with pi-vim's `EX_BUILTIN_COMMAND_NAMES`.
 
-If the needed settings/policy helpers are internal sibling modules rather than
-exports from `index.ts`, extend the generated absolute-path wrapper with explicit
-re-exports from the installed pi-vim directory. This keeps runtime resolution under
-`getAgentDir()/npm/node_modules/pi-vim` instead of accidentally importing the local
-dev dependency.
+Use upstream settings readers and resolvers to preserve global/project trust rules,
+including the global-only clipboard-copy setting. Pair each upstream process or
+resource setup with its target `session_shutdown` cleanup, such as
+`cancelModeChangeCommands()`.
+
+The complete condition is a setter-by-setter comparison with the target pi-vim
+factory: every difference is either mirrored or justified by `prompt-editor` owning
+that behavior (for example cursor shape or thinking-level border fallback).
