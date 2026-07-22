@@ -8,15 +8,15 @@
     "format": "oxfmt ."
   },
   "devDependencies": {
-    "@earendil-works/pi-agent-core": "0.80.10",
-    "@earendil-works/pi-ai": "0.80.10",
-    "@earendil-works/pi-coding-agent": "0.80.10",
-    "@earendil-works/pi-tui": "0.80.10",
-    "typebox": "^1.1.24",
+    "@earendil-works/pi-agent-core": "0.81.1",
+    "@earendil-works/pi-ai": "0.81.1",
+    "@earendil-works/pi-coding-agent": "0.81.1",
+    "@earendil-works/pi-tui": "0.81.1",
     "@types/node": "^24.0.0",
     "oxfmt": "^0.47.0",
     "oxlint": "^1.62.0",
-    "typescript": "^6.0.3",
-    "pi-vim": "0.12.1"
+    "pi-vim": "0.12.1",
+    "typebox": "^1.1.24",
+    "typescript": "^6.0.3"
   }
 }
