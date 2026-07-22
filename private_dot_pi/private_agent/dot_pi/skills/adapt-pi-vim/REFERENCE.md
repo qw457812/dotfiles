@@ -54,17 +54,21 @@ const colorizers: ModeColorizers = {
 
 ### borderColorizers
 
-pi-vim 0.10.0 added `borderColorizers` to the constructor options. When the extension
-manages its own border color (e.g., thinking-level coloring), pass `null` to disable
-pi-vim's mode-aware border colorizer so it doesn't conflict:
+pi-vim 0.10.0 added `borderColorizers` to the constructor options. Respect
+`syncBorderColorWithMode` by passing mode colorizers only when it is enabled:
 
 ```ts
-super(tui, theme, kb, { labelColorizers, borderColorizers: null });
+const borderColorizers =
+  piVimSettings.syncBorderColorWithMode === true
+    ? buildModeColorizers(theme, modeColors)
+    : null;
+super(tui, theme, kb, { labelColorizers, borderColorizers });
 ```
 
-If you *do* want mode-synced borders, pass matching colorizers and remove any manual
-`borderColor` assignment in your code — pi-vim's `installModeBorderColorizer()` will
-intercept subsequent `.borderColor` assignments and use them as the fallback.
+pi-vim's `installModeBorderColorizer()` intercepts later `.borderColor` assignments
+and keeps them as the fallback/base color. This means a host can continue assigning
+a thinking-level border: it remains visible while sync is disabled and becomes the
+fallback behind the active Vim mode color while sync is enabled.
 
 ## 4. Disable pi-vim's built-in cursor shape
 
@@ -109,9 +113,10 @@ When ex-command support is present, colorizer selection must account for three m
 duplicating the pendingExCommand check across multiple colorizer lookups:
 
 ```ts
-function getActiveMode(editor: ModalEditorRuntime): "insert" | "normal" | "ex" {
+function getActiveMode(editor: ModalEditorRuntime): "insert" | "normal" | "visual" | "ex" {
   if (editor.pendingExCommand !== null) return "ex";
-  return editor.getMode();
+  const mode = editor.getMode();
+  return mode === "visual-line" ? "visual" : mode;
 }
 
 // Usage in label rendering:
@@ -206,3 +211,58 @@ private stripFakeCursor(lines: string[], bottomIdx: number): void {
   }
 }
 ```
+
+## 9. New modes and color keys
+
+A pi-vim mode union can grow independently of its colorizer keys. For example,
+`visual` and `visual-line` are distinct editor modes but both use the `visual`
+colorizer. Update all local structural types, labels, prefix rendering, and cursor
+shape functions together:
+
+```ts
+type Mode = "insert" | "normal" | "visual" | "visual-line";
+type ModeColorKey = "insert" | "normal" | "visual" | "ex";
+type ModeColorizers = Record<ModeColorKey, (text: string) => string>;
+
+function getActiveMode(editor: ModalEditorRuntime): ModeColorKey {
+  if (editor.pendingExCommand !== null) return "ex";
+  const mode = editor.getMode();
+  return mode === "visual-line" ? "visual" : mode;
+}
+
+function getCursorStyle(mode: Mode): string {
+  return mode === "insert" ? CURSOR_STYLE_INSERT : CURSOR_STYLE_NORMAL;
+}
+```
+
+When a render override bypasses `ModalEditor.render()`, provide fallback labels for
+every mode even if the current pi-vim exposes a private `getModeLabel()` at runtime.
+
+## 10. Reapply pi-vim session configuration
+
+Replacing pi-vim's editor factory also replaces the editor instance that pi-vim
+configured in its `session_start` handler. Diff that handler on every upgrade and
+mirror every relevant setter on the replacement instance, including:
+
+```ts
+editor.setClipboardMirrorPolicy(clipboardMirrorPolicy.policy);
+editor.setQuitFn(() => ctx.shutdown());
+editor.setNotifyFn((message) => ctx.ui.notify(message, "warning"));
+editor.setModeChangeFn(modeChangeHandler);
+editor.setExCommandSettings(exCommand.settings);
+editor.setCommandNamesFn(
+  () => new Set([...PI_VIM_BUILTIN_COMMAND_NAMES, ...pi.getCommands().map((c) => c.name)]),
+);
+```
+
+`pi.getCommands()` excludes builtin interactive commands, so keep the mirrored
+builtin command list aligned with pi-vim's `EX_BUILTIN_COMMAND_NAMES`. Resolve the
+function at submit time so commands registered or reloaded mid-session are visible.
+Also call pi-vim's matching cleanup function (for example
+`cancelModeChangeCommands()`) from `session_shutdown`.
+
+If the needed settings/policy helpers are internal sibling modules rather than
+exports from `index.ts`, extend the generated absolute-path wrapper with explicit
+re-exports from the installed pi-vim directory. This keeps runtime resolution under
+`getAgentDir()/npm/node_modules/pi-vim` instead of accidentally importing the local
+dev dependency.

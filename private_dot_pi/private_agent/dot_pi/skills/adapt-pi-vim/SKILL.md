@@ -72,10 +72,11 @@ git -C "$CHK" diff --stat ${OLD_REV}..HEAD -- \
 4. [ ] **Disable built-in cursor shape** — if pi-vim added `cursorShapeRuntime`, null it in constructor（see REFERENCE #4）
 5. [ ] **Ex-command passthrough** — if `pendingExCommand` was added, bypass remaps in `handleInput`（see REFERENCE #5）
 6. [ ] **Derive active mode** — extract `getActiveMode()` helper so label/prefix colorizers use the correct mode（see REFERENCE #6）
-7. [ ] **Wire up lifecycle hooks** — `setQuitFn` / `setNotifyFn` if the version provides them
-8. [ ] **Define `ModalEditorRuntime`** — structural type for safe private field access（see REFERENCE #7）
-9. [ ] **Adopt cursor stripping helpers** — `findSoftwareCursorReset` + `stripSoftwareCursorAfterMarker`（see REFERENCE #8）
-10. [ ] **Update `package.json` version pin** — change `"pi-vim": "<old>"` to the new version, then run `npm install` to sync the lockfile
+7. [ ] **Check mode unions and colorizers** — add new modes such as `visual` / `visual-line`, normalize them to the corresponding color key, and choose their cursor shape（see REFERENCE #9）
+8. [ ] **Mirror the complete session setup** — a replacement editor must reapply clipboard policy, mode-change hooks, ex settings, and the dynamic command registry, not only quit/notify callbacks（see REFERENCE #10）
+9. [ ] **Define `ModalEditorRuntime`** — structural type for safe private field access（see REFERENCE #7）
+10. [ ] **Adopt cursor stripping helpers** — `findSoftwareCursorReset` + `stripSoftwareCursorAfterMarker`（see REFERENCE #8）
+11. [ ] **Update `package.json` version pin** — change `"pi-vim": "<old>"` to the new version, then run `npm install` to sync the lockfile
 
 ## Update package.json & install
 
@@ -97,6 +98,13 @@ reproducible.
 ```bash
 cd ~/.pi/agent && npm run check    # tsc --noEmit
 cd ~/.pi/agent && npm run lint     # oxlint
+```
+
+To inspect the original pi-vim UI without auto-discovered extensions such as
+`prompt-editor`, start Pi with only the installed pi-vim entry explicitly loaded:
+
+```bash
+pi --no-session --no-extensions -e ~/.pi/agent/npm/node_modules/pi-vim/index.ts
 ```
 
 ## After adapting
