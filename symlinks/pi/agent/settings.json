@@ -117,6 +117,9 @@
     "git:gitlab.com/tom81094/pi-copilot-advanced",
     "git:github.com/qw457812/pi-listen"
   ],
+  "piVim": {
+    "syncBorderColorWithMode": true
+  },
   "voice": {
     "language": "zh",
     "toggleShortcut": "alt+v",

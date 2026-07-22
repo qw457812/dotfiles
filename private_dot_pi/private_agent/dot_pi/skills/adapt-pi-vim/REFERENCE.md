@@ -62,13 +62,18 @@ const borderColorizers =
   piVimSettings.syncBorderColorWithMode === true
     ? buildModeColorizers(theme, modeColors)
     : null;
+if (borderColorizers) {
+  delete (borderColorizers as Partial<ModeColorizers>).insert;
+}
 super(tui, theme, kb, { labelColorizers, borderColorizers });
 ```
 
 pi-vim's `installModeBorderColorizer()` intercepts later `.borderColor` assignments
-and keeps them as the fallback/base color. This means a host can continue assigning
-a thinking-level border: it remains visible while sync is disabled and becomes the
-fallback behind the active Vim mode color while sync is enabled.
+and keeps them as the fallback/base color. Omitting a mode colorizer selects that
+fallback. The example deliberately omits `insert`, so Insert continues to show Pi's
+latest thinking-level border while Normal, Visual, and Ex use their Vim mode colors.
+The `Partial` cast is required because pi-vim currently types the colorizer map as a
+complete `Record`, although its runtime lookup supports a missing key.
 
 ## 4. Disable pi-vim's built-in cursor shape
 

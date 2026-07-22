@@ -669,10 +669,21 @@ export default async function (pi: ExtensionAPI) {
       piVimSettings.syncBorderColorWithMode === true
         ? buildModeColorizers(theme, modeColors)
         : null;
-    // Prefix styling is intentionally lighter than the bottom mode label:
-    // insert stays plain/default text; other modes use their configured color.
+    if (borderColorizers) {
+      // Keep Insert mode on Pi's latest thinking-level border. pi-vim falls
+      // back to that host-assigned base color when a mode colorizer is absent.
+      delete (borderColorizers as Partial<ModeColorizers>).insert;
+    }
+    // Insert always stays plain. When the border already communicates mode,
+    // keep every prefix plain too; otherwise retain mode-colored prefixes.
+    const plainPrefix = (s: string) => s;
     const prefixColorizers: ModeColorizers = buildModeColorizers(theme, modeColors);
-    prefixColorizers.insert = (s: string) => s;
+    prefixColorizers.insert = plainPrefix;
+    if (piVimSettings.syncBorderColorWithMode === true) {
+      prefixColorizers.normal = plainPrefix;
+      prefixColorizers.visual = plainPrefix;
+      prefixColorizers.ex = plainPrefix;
+    }
     const modeChangeHandler = createModeChangeHandler(
       piVimSettings.modeChange,
       (event: { mode: Mode; previousMode: Mode }) => pi.events.emit("pi-vim:mode-change", event),
