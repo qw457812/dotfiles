@@ -1,44 +1,69 @@
 import {
   type Api,
-  type AssistantMessageEventStream,
+  type ApiKeyAuth,
   type Context,
   type Model,
+  type OAuthAuth,
+  type Provider,
+  type ProviderHeaders,
   type SimpleStreamOptions,
-  streamSimpleOpenAICompletions,
-} from "@earendil-works/pi-ai/compat";
+  type StreamOptions,
+} from "@earendil-works/pi-ai";
+import { openAICompletionsApi } from "@earendil-works/pi-ai/compat";
 import type { ExtensionAPI, ProviderModelConfig } from "@earendil-works/pi-coding-agent";
-import { loginCodebuddy, refreshCodebuddyCredentials } from "./auth.js";
+import { codebuddyCredentialsToAuth, loginCodebuddy, refreshCodebuddyCredentials } from "./auth.js";
 import { CHAT_BASE_URL, DEFAULT_DOMAIN, PROVIDER, USER_AGENT, VERSION } from "./constants.js";
 import { fetchLiveModels } from "./live-models.js";
+import { type CodebuddyModel, toCodebuddyModel } from "./models.js";
 import modelsData from "./models.json" with { type: "json" };
 import type { CodebuddyOAuthCredentials } from "./types.js";
-import { decodeUserId, firstNonEmpty, normalizeDomain, readHeader, requestId } from "./utils.js";
+import { decodeUserId, readHeader, requestId } from "./utils.js";
 
 // $(npm root -g)/@tencent-ai/codebuddy-code/product.internal.json
 // ~/.codebuddy/logs/
 // ~/.codebuddy/local_storage/
-const MODELS: ProviderModelConfig[] = modelsData as ProviderModelConfig[];
+// pi --list-models codebuddy
+const MODELS = (modelsData as ProviderModelConfig[]).map(toCodebuddyModel);
+const openaiCompletions = openAICompletionsApi();
 
-function streamCodebuddy(
-  model: Model<Api>,
-  context: Context,
-  options?: SimpleStreamOptions,
-): AssistantMessageEventStream {
+const apiKeyAuth: ApiKeyAuth = {
+  name: "CodeBuddy auth token",
+  async resolve({ ctx, credential }) {
+    const apiKey = credential?.key ?? (await ctx.env("CODEBUDDY_AUTH_TOKEN"));
+    if (!apiKey) return undefined;
+    return {
+      auth: { apiKey },
+      env: credential?.env,
+      source: credential?.key ? "stored credential" : "CODEBUDDY_AUTH_TOKEN",
+    };
+  },
+};
+
+const oauthAuth: OAuthAuth = {
+  name: "CodeBuddy CN",
+  login: loginCodebuddy,
+  refresh: refreshCodebuddyCredentials,
+  async toAuth(credentials) {
+    return codebuddyCredentialsToAuth(credentials as CodebuddyOAuthCredentials);
+  },
+};
+
+function buildRequestHeaders(
+  model: CodebuddyModel,
+  options: StreamOptions | SimpleStreamOptions | undefined,
+): ProviderHeaders {
+  const sourceHeaders: ProviderHeaders = { ...model.headers, ...options?.headers };
   const accessToken = options?.apiKey;
-  if (!accessToken) {
-    throw new Error("CodeBuddy access token not found. Please run /login codebuddy first");
-  }
-
-  const userId = readHeader(model.headers, "X-User-Id") || decodeUserId(accessToken);
-  const domain = readHeader(model.headers, "X-Domain") || DEFAULT_DOMAIN;
-  const enterpriseId = readHeader(model.headers, "X-Enterprise-Id");
-  const department = readHeader(model.headers, "X-Department-Info") || "";
-  const agentPurpose = readHeader(model.headers, "X-Agent-Purpose");
+  const userId = readHeader(sourceHeaders, "X-User-Id") || decodeUserId(accessToken);
+  const domain = readHeader(sourceHeaders, "X-Domain") || DEFAULT_DOMAIN;
+  const enterpriseId = readHeader(sourceHeaders, "X-Enterprise-Id");
+  const department = readHeader(sourceHeaders, "X-Department-Info") || "";
+  const agentPurpose = readHeader(sourceHeaders, "X-Agent-Purpose");
   const conversationId = requestId();
   const conversationRequestId = requestId();
   const conversationMessageId = requestId();
 
-  const headers: Record<string, string> = {
+  return {
     ...(userId ? { "X-User-Id": userId } : {}),
     "X-Domain": domain,
     ...(enterpriseId ? { "X-Enterprise-Id": enterpriseId } : {}),
@@ -57,89 +82,84 @@ function streamCodebuddy(
     "User-Agent": USER_AGENT,
     ...options?.headers,
   };
+}
 
-  const modelWithBaseUrl = {
-    ...(model as Model<"openai-completions">),
+function prepareRequest<T extends StreamOptions | SimpleStreamOptions>(
+  model: Model<"openai-completions">,
+  options: T | undefined,
+): { model: CodebuddyModel; options: T } {
+  if (!options?.apiKey) {
+    throw new Error("CodeBuddy access token not found. Please run /login codebuddy first");
+  }
+
+  const codebuddyModel = {
+    ...model,
     baseUrl: model.baseUrl || CHAT_BASE_URL,
-  } as Model<"openai-completions">;
+  } as CodebuddyModel;
+  return {
+    model: codebuddyModel,
+    options: {
+      ...options,
+      headers: buildRequestHeaders(codebuddyModel, options),
+    } as T,
+  };
+}
 
-  return streamSimpleOpenAICompletions(modelWithBaseUrl, context, {
-    ...options,
-    apiKey: accessToken,
-    headers,
-  });
+function isCodebuddyModel(model: Model<Api>): model is CodebuddyModel {
+  return model.provider === PROVIDER && model.api === "openai-completions";
+}
+
+function createCodebuddyProvider(): Provider<"openai-completions"> {
+  let models: readonly CodebuddyModel[] = MODELS;
+  let inflightRefresh: Promise<void> | undefined;
+
+  return {
+    id: PROVIDER,
+    name: "CodeBuddy CN",
+    baseUrl: CHAT_BASE_URL,
+    auth: { apiKey: apiKeyAuth, oauth: oauthAuth },
+    getModels: () => models,
+    refreshModels(context) {
+      inflightRefresh ??= (async () => {
+        try {
+          const stored = await context.store.read();
+          const cachedModels = stored?.models.filter(isCodebuddyModel);
+          if (cachedModels?.length) models = cachedModels;
+
+          if (!context.allowNetwork || context.signal?.aborted || !context.credential) return;
+
+          const auth =
+            context.credential.type === "oauth"
+              ? codebuddyCredentialsToAuth(context.credential as CodebuddyOAuthCredentials)
+              : { apiKey: context.credential.key };
+          if (!auth.apiKey) return;
+
+          const liveModels = await fetchLiveModels({
+            accessToken: auth.apiKey,
+            modelHeaders: auth.headers,
+            signal: context.signal,
+          });
+          if (context.signal?.aborted) return;
+
+          models = liveModels;
+          await context.store.write({ models: liveModels, checkedAt: Date.now() });
+        } finally {
+          inflightRefresh = undefined;
+        }
+      })();
+      return inflightRefresh;
+    },
+    stream(model, context: Context, options?: StreamOptions) {
+      const request = prepareRequest(model, options);
+      return openaiCompletions.stream(request.model, context, request.options);
+    },
+    streamSimple(model, context: Context, options?: SimpleStreamOptions) {
+      const request = prepareRequest(model, options);
+      return openaiCompletions.streamSimple(request.model, context, request.options);
+    },
+  };
 }
 
 export default function (pi: ExtensionAPI) {
-  let refreshAbort: AbortController | null = null;
-
-  const registerCodebuddyProvider = (models: ProviderModelConfig[]) =>
-    pi.registerProvider(PROVIDER, {
-      name: "CodeBuddy CN",
-      baseUrl: CHAT_BASE_URL,
-      apiKey: "$CODEBUDDY_AUTH_TOKEN",
-      api: "openai-completions",
-      models,
-      oauth: {
-        name: "CodeBuddy CN",
-        login: loginCodebuddy,
-        refreshToken: refreshCodebuddyCredentials,
-        getApiKey(credentials: CodebuddyOAuthCredentials) {
-          return credentials.access;
-        },
-        modifyModels(models: Model<Api>[], credentials: CodebuddyOAuthCredentials): Model<Api>[] {
-          const c = credentials;
-          const userId = firstNonEmpty(c.userId, c.uid) || decodeUserId(c.access);
-          const domain = normalizeDomain(c.domain);
-          const headers: Record<string, string> = {
-            ...(userId ? { "X-User-Id": userId } : {}),
-            "X-Domain": domain,
-            ...(c.enterpriseId ? { "X-Enterprise-Id": c.enterpriseId } : {}),
-          };
-          if (c.departmentFullName) {
-            headers["X-Department-Info"] = c.departmentFullName;
-          }
-          return models.map((model) => {
-            if (model.provider !== PROVIDER) {
-              return model;
-            }
-            return {
-              ...model,
-              headers: {
-                ...model.headers,
-                ...headers,
-              },
-            };
-          });
-        },
-      },
-      streamSimple: streamCodebuddy,
-    });
-
-  registerCodebuddyProvider(MODELS);
-
-  pi.on("session_start", async (_event, ctx) => {
-    refreshAbort?.abort();
-    refreshAbort = new AbortController();
-
-    const seedModel = ctx.modelRegistry.find(PROVIDER, MODELS[0]?.id ?? "");
-    if (!seedModel) return;
-
-    const auth = await ctx.modelRegistry.getApiKeyAndHeaders(seedModel);
-    if (!auth.ok || !auth.apiKey) return;
-
-    const liveModels = await fetchLiveModels({
-      accessToken: auth.apiKey,
-      modelHeaders: auth.headers,
-      signal: refreshAbort.signal,
-    });
-    if (!liveModels || refreshAbort.signal.aborted) return;
-
-    registerCodebuddyProvider(liveModels);
-  });
-
-  pi.on("session_shutdown", async () => {
-    refreshAbort?.abort();
-    refreshAbort = null;
-  });
+  pi.registerProvider(createCodebuddyProvider());
 }

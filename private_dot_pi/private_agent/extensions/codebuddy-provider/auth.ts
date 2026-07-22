@@ -1,4 +1,4 @@
-import type { OAuthCredentials, OAuthLoginCallbacks } from "@earendil-works/pi-ai";
+import type { AuthInteraction, ModelAuth, OAuthCredential } from "@earendil-works/pi-ai";
 import {
   ACCOUNTS_PATH,
   ACCOUNT_BASE_URL,
@@ -62,18 +62,20 @@ const COMMON_HEADERS: Record<string, string> = {
 // ── Public API ───────────────────────────────────────────────────────────────
 
 export async function loginCodebuddy(
-  callbacks: OAuthLoginCallbacks,
+  interaction: AuthInteraction,
 ): Promise<CodebuddyOAuthCredentials> {
-  const authState = await fetchAuthState(callbacks.signal);
-  callbacks.onAuth({
+  const authState = await fetchAuthState(interaction.signal);
+  interaction.notify({
+    type: "auth_url",
     url: authState.authUrl,
     instructions: "Complete authorization in the browser. Pi will continue automatically.",
   });
-  callbacks.onProgress?.("Waiting for CodeBuddy authorization...");
+  interaction.notify({ type: "progress", message: "Waiting for CodeBuddy authorization..." });
 
-  const token = await pollToken(authState, callbacks.signal);
+  const token = await pollToken(authState, interaction.signal);
   return enrichCredentials(
     {
+      type: "oauth",
       access: token.accessToken,
       refresh: token.refreshToken,
       expires: token.expires,
@@ -82,12 +84,12 @@ export async function loginCodebuddy(
       authPlatform: authState.platform,
       accountBaseUrl: ACCOUNT_BASE_URL,
     },
-    callbacks.signal,
+    interaction.signal,
   );
 }
 
 export async function refreshCodebuddyCredentials(
-  credentials: OAuthCredentials,
+  credentials: OAuthCredential,
   signal?: AbortSignal,
 ): Promise<CodebuddyOAuthCredentials> {
   const current = normalizeCredentials(credentials as CodebuddyOAuthCredentials);
@@ -133,6 +135,20 @@ export async function refreshCodebuddyCredentials(
       signal,
     );
   });
+}
+
+export function codebuddyCredentialsToAuth(credentials: CodebuddyOAuthCredentials): ModelAuth {
+  const current = normalizeCredentials(credentials);
+  const userId = firstNonEmpty(current.userId, current.uid) || decodeJwtClaims(current.access).sub;
+  return {
+    apiKey: current.access,
+    headers: {
+      ...(userId ? { "X-User-Id": userId } : {}),
+      "X-Domain": normalizeDomain(current.domain),
+      ...(current.enterpriseId ? { "X-Enterprise-Id": current.enterpriseId } : {}),
+      ...(current.departmentFullName ? { "X-Department-Info": current.departmentFullName } : {}),
+    },
+  };
 }
 
 // ── Private: credentials ─────────────────────────────────────────────────────

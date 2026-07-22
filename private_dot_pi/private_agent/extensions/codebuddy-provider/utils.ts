@@ -68,13 +68,15 @@ export function readResponseMessage(payload: unknown): string {
 }
 
 export function readHeader(
-  headers: Record<string, string> | undefined,
+  headers: Record<string, string | null> | undefined,
   key: string,
 ): string | undefined {
   if (!headers) return undefined;
   const target = key.toLowerCase();
   for (const [headerKey, value] of Object.entries(headers)) {
-    if (headerKey.toLowerCase() === target && value.trim()) return value.trim();
+    if (headerKey.toLowerCase() !== target || typeof value !== "string") continue;
+    const trimmed = value.trim();
+    if (trimmed) return trimmed;
   }
   return undefined;
 }

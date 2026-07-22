@@ -1,4 +1,4 @@
-import type { OAuthCredentials } from "@earendil-works/pi-ai";
+import type { OAuthCredential } from "@earendil-works/pi-ai";
 
 // ── API response envelope ──────────────────────────────────────────────────
 export type ApiResponse<T> = {
@@ -67,7 +67,7 @@ export type CodebuddyOAuthCredentials = {
   authBaseUrl?: string;
   authPlatform?: AuthPlatform;
   accountBaseUrl?: string;
-} & OAuthCredentials;
+} & OAuthCredential;
 
 // ── Shared internal types ─────────────────────────────────────────────────────
 export type AuthState = {

@@ -1,5 +1,7 @@
+import type { ProviderHeaders } from "@earendil-works/pi-ai";
 import type { ProviderModelConfig } from "@earendil-works/pi-coding-agent";
 import { CLI_BASE_URL, DEFAULT_DOMAIN, USER_AGENT, VERSION } from "./constants.js";
+import { type CodebuddyModel, toCodebuddyModel } from "./models.js";
 import { decodeUserId, ensureSuccess, readHeader, requestJson } from "./utils.js";
 
 const PRODUCT_CONFIG_URL = new URL("/v3/config", CLI_BASE_URL).toString();
@@ -32,13 +34,13 @@ type CodebuddyProductModel = {
 
 interface FetchLiveModelsOptions {
   accessToken: string;
-  modelHeaders?: Record<string, string>;
+  modelHeaders?: ProviderHeaders;
   signal?: AbortSignal;
 }
 
 function buildProductConfigHeaders(
   accessToken: string,
-  modelHeaders?: Record<string, string>,
+  modelHeaders?: ProviderHeaders,
 ): Record<string, string> {
   const userId = readHeader(modelHeaders, "X-User-Id") || decodeUserId(accessToken);
   const domain = readHeader(modelHeaders, "X-Domain") || DEFAULT_DOMAIN;
@@ -72,10 +74,10 @@ function isLiveChatModel(
   return !tags.some((tag) => EXCLUDED_MODEL_TAGS.has(tag));
 }
 
-function toProviderModelConfig(
+function toLiveModel(
   model: Required<Pick<CodebuddyProductModel, "id" | "name">> & CodebuddyProductModel,
-): ProviderModelConfig {
-  return {
+): CodebuddyModel {
+  const config: ProviderModelConfig = {
     id: model.id,
     name: model.name,
     reasoning: Boolean(model.supportsReasoning),
@@ -85,28 +87,30 @@ function toProviderModelConfig(
     maxTokens: model.maxOutputTokens ?? 32000,
     compat: { supportsDeveloperRole: false, maxTokensField: "max_tokens" },
   };
+  return toCodebuddyModel(config);
 }
 
 export async function fetchLiveModels({
   accessToken,
   modelHeaders,
   signal,
-}: FetchLiveModelsOptions): Promise<ProviderModelConfig[] | null> {
-  try {
-    const payload = await requestJson<CodebuddyProductConfigResponse>(PRODUCT_CONFIG_URL, {
-      headers: buildProductConfigHeaders(accessToken, modelHeaders),
-      signal: signal
-        ? AbortSignal.any([AbortSignal.timeout(LIVE_MODELS_TIMEOUT_MS), signal])
-        : AbortSignal.timeout(LIVE_MODELS_TIMEOUT_MS),
-    });
+}: FetchLiveModelsOptions): Promise<CodebuddyModel[]> {
+  const payload = await requestJson<CodebuddyProductConfigResponse>(PRODUCT_CONFIG_URL, {
+    headers: buildProductConfigHeaders(accessToken, modelHeaders),
+    signal: signal
+      ? AbortSignal.any([AbortSignal.timeout(LIVE_MODELS_TIMEOUT_MS), signal])
+      : AbortSignal.timeout(LIVE_MODELS_TIMEOUT_MS),
+  });
 
-    ensureSuccess(payload, "Failed to fetch CodeBuddy live models");
-    const models = payload.data?.models;
-    if (!Array.isArray(models)) return null;
-
-    const providerModels = models.filter(isLiveChatModel).map(toProviderModelConfig);
-    return providerModels.length > 0 ? providerModels : null;
-  } catch {
-    return null;
+  ensureSuccess(payload, "Failed to fetch CodeBuddy live models");
+  const models = payload.data?.models;
+  if (!Array.isArray(models)) {
+    throw new Error("CodeBuddy model response is missing models");
   }
+
+  const providerModels = models.filter(isLiveChatModel).map(toLiveModel);
+  if (providerModels.length === 0) {
+    throw new Error("CodeBuddy returned no supported chat models");
+  }
+  return providerModels;
 }
