@@ -92,8 +92,8 @@ function ensurePiVimWrapper(): void {
 export * from ${JSON.stringify(piVimEntry)};
 export { resolveClipboardMirrorPolicy } from ${JSON.stringify(join(piVimDir, "clipboard-policy.ts"))};
 export { cancelModeChangeCommands, createModeChangeHandler } from ${JSON.stringify(join(piVimDir, "mode-change-command.ts"))};
-export { buildModeColorizers, resolveModeColors } from ${JSON.stringify(join(piVimDir, "mode-colors.ts"))};
-export { readPiVimSettings, resolveExCommandSettings } from ${JSON.stringify(join(piVimDir, "settings.ts"))};
+export { buildModeColorizers, buildOffBorderColor, resolveModeColors } from ${JSON.stringify(join(piVimDir, "mode-colors.ts"))};
+export { readPiVimSettings, resolveExCommandSettings, resolveSurfaceSyncMaps } from ${JSON.stringify(join(piVimDir, "settings.ts"))};
 `;
 
   const current = existsSync(PI_VIM_WRAPPER) ? readFileSync(PI_VIM_WRAPPER, "utf8") : null;
@@ -221,8 +221,8 @@ function writeTermuxClipboard(text: string, signal?: AbortSignal): Promise<void>
   });
 }
 
-// Copied from pi-vim and verified against v0.13.0 — findSoftwareCursorReset.
-// https://github.com/lajarre/pi-vim/blob/bfcee9a9/cursor-shape.ts
+// Copied from pi-vim and verified against v0.14.1 — findSoftwareCursorReset.
+// https://github.com/lajarre/pi-vim/blob/2671cf11/cursor-shape.ts
 function findSoftwareCursorReset(
   line: string,
   startIndex: number,
@@ -241,8 +241,8 @@ function findSoftwareCursorReset(
   return firstReset;
 }
 
-// Copied from pi-vim and verified against v0.13.0 — stripSoftwareCursorAfterMarker.
-// https://github.com/lajarre/pi-vim/blob/bfcee9a9/cursor-shape.ts
+// Copied from pi-vim and verified against v0.14.1 — stripSoftwareCursorAfterMarker.
+// https://github.com/lajarre/pi-vim/blob/2671cf11/cursor-shape.ts
 // See also: https://github.com/earendil-works/pi/blob/d06db09a53958e485131527db25c1293f29b9367/packages/tui/src/components/editor.ts#L480-L493
 function stripSoftwareCursorAfterMarker(line: string): string {
   const markerIndex = line.indexOf(CURSOR_MARKER);
@@ -269,12 +269,14 @@ export default async function (pi: ExtensionAPI) {
   const {
     ModalEditor,
     buildModeColorizers,
+    buildOffBorderColor,
     cancelModeChangeCommands,
     createModeChangeHandler,
     readPiVimSettings,
     resolveClipboardMirrorPolicy,
     resolveExCommandSettings,
     resolveModeColors,
+    resolveSurfaceSyncMaps,
   } = await import("./pi-vim.generated.ts");
 
   type Mode = "insert" | "normal" | "visual" | "visual-line";
@@ -284,11 +286,13 @@ export default async function (pi: ExtensionAPI) {
 
   type ModeColorKey = "insert" | "normal" | "visual" | "ex";
   type ModeColorizers = Record<ModeColorKey, (s: string) => string>;
+  type SurfaceSync = "mode" | "host" | "thinking";
+  type SurfaceSyncMap = Record<ModeColorKey, SurfaceSync>;
 
   type ModalEditorRuntime = {
     getMode: () => Mode;
     getModeLabel?: () => string;
-    labelColorizers?: ModeColorizers | null;
+    getModeLabelColorizer?: () => ((s: string) => string) | null;
     borderColor?: (s: string) => string;
     pendingExCommand: string | null;
     pendingOperator: string | null;
@@ -308,7 +312,7 @@ export default async function (pi: ExtensionAPI) {
   }
 
   // Related upstream logic:
-  // - https://github.com/lajarre/pi-vim/blob/bfcee9a9/index.ts (ModalEditor.render + getModeLabel + getModeLabelColorizer)
+  // - https://github.com/lajarre/pi-vim/blob/2671cf11/index.ts (ModalEditor.render + getModeLabel + getModeLabelColorizer)
   function getActiveMode(editor: ModalEditorRuntime): ModeColorKey {
     if (editor.pendingExCommand !== null) return "ex";
     const mode = editor.getMode();
@@ -329,8 +333,7 @@ export default async function (pi: ExtensionAPI) {
           "visual-line": " V-LINE ",
         } satisfies Record<Mode, string>
       )[editor.getMode()];
-    const active = getActiveMode(editor);
-    const colorize = editor.labelColorizers?.[active] ?? null;
+    const colorize = editor.getModeLabelColorizer?.() ?? null;
 
     return {
       raw,
@@ -447,17 +450,28 @@ export default async function (pi: ExtensionAPI) {
       kb: EditorFactoryArgs[2],
       labelColorizers: ModeColorizers | null,
       borderColorizers: ModeColorizers | null,
+      borderSync: SurfaceSyncMap,
+      labelSync: SurfaceSyncMap,
+      offBorderColor: ((s: string) => string) | null,
+      labelTransform: (s: string) => string,
       prefixColorizers: ModeColorizers,
     ) {
       super(
         tui as unknown as ModalEditorConstructorArgs[0],
         theme as unknown as ModalEditorConstructorArgs[1],
         kb as unknown as ModalEditorConstructorArgs[2],
-        { labelColorizers, borderColorizers },
+        {
+          labelColorizers,
+          borderColorizers,
+          borderSync,
+          labelSync,
+          offBorderColor,
+          labelTransform,
+        },
       );
       this.prefixColorizers = prefixColorizers;
       // pi-vim has built-in cursor shape management
-      // (https://github.com/lajarre/pi-vim/blob/bfcee9a9/index.ts)
+      // (https://github.com/lajarre/pi-vim/blob/2671cf11/index.ts)
       // that conflicts with our DECSCUSR logic. Disable it so
       // our renderCursor() is the sole cursor authority.
       (this as any).cursorShapeRuntime = null;
@@ -528,7 +542,7 @@ export default async function (pi: ExtensionAPI) {
       }
 
       // Related upstream logic:
-      // - https://github.com/lajarre/pi-vim/blob/bfcee9a9/index.ts (ModalEditor.render)
+      // - https://github.com/lajarre/pi-vim/blob/2671cf11/index.ts (ModalEditor.render)
       // - https://github.com/badlogic/pi-mono/blob/e3fee7a511503ebe170223cd89e7631751539f25/packages/coding-agent/src/modes/interactive/components/custom-editor.ts
       //
       // Bypass ModalEditor.render() here so pi-vim does not append the mode
@@ -664,25 +678,17 @@ export default async function (pi: ExtensionAPI) {
     const theme = ctx.ui.theme;
     const modeColors = resolveModeColors(piVimSettings.modeColors);
     const reverseVideo = (s: string) => `\x1b[7m${s}\x1b[27m`;
+    const { borderSync, labelSync } = resolveSurfaceSyncMaps(piVimSettings);
     const colorizers: ModeColorizers = buildModeColorizers(theme, modeColors, reverseVideo);
-    const borderColorizers: ModeColorizers | null =
-      piVimSettings.syncBorderColorWithMode === true
-        ? buildModeColorizers(theme, modeColors)
-        : null;
-    if (borderColorizers) {
-      // Keep Insert mode on Pi's latest thinking-level border. pi-vim falls
-      // back to that host-assigned base color when a mode colorizer is absent.
-      delete (borderColorizers as Partial<ModeColorizers>).insert;
-    }
-    // Insert always stays plain. When the border already communicates mode,
-    // keep every prefix plain too; otherwise retain mode-colored prefixes.
+    const borderColorizers: ModeColorizers = buildModeColorizers(theme, modeColors);
+    const offBorderColor = buildOffBorderColor(theme);
+    // Insert always stays plain. For other modes, a prefix remains colored
+    // unless the border is guaranteed to carry that mode's color.
     const plainPrefix = (s: string) => s;
     const prefixColorizers: ModeColorizers = buildModeColorizers(theme, modeColors);
     prefixColorizers.insert = plainPrefix;
-    if (piVimSettings.syncBorderColorWithMode === true) {
-      prefixColorizers.normal = plainPrefix;
-      prefixColorizers.visual = plainPrefix;
-      prefixColorizers.ex = plainPrefix;
+    for (const mode of ["normal", "visual", "ex"] as const) {
+      if (borderSync[mode] === "mode") prefixColorizers[mode] = plainPrefix;
     }
     const modeChangeHandler = createModeChangeHandler(
       piVimSettings.modeChange,
@@ -690,7 +696,7 @@ export default async function (pi: ExtensionAPI) {
     );
 
     // Related upstream logic:
-    // - https://github.com/lajarre/pi-vim/blob/bfcee9a9/index.ts (default export session_start handler)
+    // - https://github.com/lajarre/pi-vim/blob/2671cf11/index.ts (default export session_start handler)
     // - https://github.com/badlogic/pi-mono/blob/cca5a3a1a4c6db90e4c5e2e95772845c1d5a251d/packages/coding-agent/src/modes/interactive/interactive-mode.ts#L1841-L1909 (setCustomEditorComponent)
     //
     // prompt-editor loads from the user extension directory, while pi-vim is a
@@ -725,11 +731,15 @@ export default async function (pi: ExtensionAPI) {
           kb,
           colorizers,
           borderColorizers,
+          borderSync,
+          labelSync,
+          offBorderColor,
+          reverseVideo,
           prefixColorizers,
         );
 
         // pi-vim configures quitFn and notifyFn on the editor
-        // (https://github.com/lajarre/pi-vim/blob/bfcee9a9/index.ts).
+        // (https://github.com/lajarre/pi-vim/blob/2671cf11/index.ts).
         // Apply them to our subclass so :q/:wq etc work correctly.
         newEditor.setClipboardMirrorPolicy(clipboardMirrorPolicy.policy);
         newEditor.setQuitFn(() => ctx.shutdown());

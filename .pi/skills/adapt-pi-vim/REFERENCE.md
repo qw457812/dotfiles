@@ -34,10 +34,17 @@ Diff `ModalEditor`'s constructor and options on every upgrade. Keep the local
 constructor parameters aligned with the options passed to `super()`:
 
 ```ts
-super(tui, theme, kb, { labelColorizers, borderColorizers });
+super(tui, theme, kb, {
+  labelColorizers,
+  borderColorizers,
+  borderSync,
+  labelSync,
+  offBorderColor,
+  labelTransform,
+});
 ```
 
-Colorizer keys can differ from editor modes. For pi-vim 0.13, both visual editor
+Colorizer keys can differ from editor modes. For pi-vim 0.14, both visual editor
 modes share one color key:
 
 ```ts
@@ -49,26 +56,36 @@ type ModeColorizers = Record<ModeColorKey, (text: string) => string>;
 Every label colorizer key is required because narrow rendering still delegates to
 `ModalEditor.render()` even when the wide renderer is overridden.
 
-### Mode-synced border with Insert fallback
+### Per-surface synchronization
 
-Pi assigns its thinking-level `borderColor` after editor construction. pi-vim's
-mode-aware property setter retains that assignment as the base fallback. To keep
-Insert on the thinking-level border while coloring Normal, Visual, and Ex, omit the
-Insert colorizer at runtime:
+Resolve `borderSync` and `labelSync` with upstream's resolver so project/global
+precedence and deprecated-key translation remain identical:
 
 ```ts
-const borderColorizers =
-  piVimSettings.syncBorderColorWithMode === true
-    ? buildModeColorizers(theme, modeColors)
-    : null;
-if (borderColorizers) {
-  delete (borderColorizers as Partial<ModeColorizers>).insert;
+const { borderSync, labelSync } = resolveSurfaceSyncMaps(piVimSettings);
+const borderColorizers = buildModeColorizers(theme, modeColors);
+const offBorderColor = buildOffBorderColor(theme);
+```
+
+Pass both maps, `offBorderColor`, and the label's reverse-video transform to the
+constructor. Do not emulate a host fallback by deleting colorizer keys; encode it
+explicitly as `"host"` in `borderSync`. For example, Insert can retain Pi's current
+thinking border while Normal, Visual, and Ex use mode colors:
+
+```json
+{
+  "borderSync": {
+    "insert": "host",
+    "normal": "mode",
+    "visual": "mode",
+    "ex": "mode"
+  }
 }
 ```
 
-The `Partial` cast bridges pi-vim's complete `Record` type to its runtime fallback
-behavior. When mode-synced borders already carry state, plain prefixes avoid a
-second competing mode signal; otherwise retain mode-colored prefixes.
+For custom prefixes, make a mode plain only when its border policy is always
+`"mode"`; retain a colored prefix for `"host"` and `"thinking"`, where the border
+may not communicate the mode.
 
 ## Active mode and labels
 
@@ -92,6 +109,14 @@ const labels: Record<Mode, string> = {
   visual: " VISUAL ",
   "visual-line": " V-LINE ",
 };
+```
+
+Use structural access to `getModeLabelColorizer()` rather than indexing
+`labelColorizers` directly. The method applies `labelSync`, host-border inheritance,
+and the label transform:
+
+```ts
+const colorize = editor.getModeLabelColorizer?.() ?? null;
 ```
 
 The complete condition is that label, prefix, border, and cursor code all account
@@ -146,7 +171,7 @@ Use one structural type for private fields required by the integration, with an
 type ModalEditorRuntime = {
   getMode: () => Mode;
   getModeLabel?: () => string;
-  labelColorizers?: ModeColorizers | null;
+  getModeLabelColorizer?: () => ((text: string) => string) | null;
   borderColor?: (text: string) => string;
   pendingExCommand: string | null;
   pendingOperator: string | null;
