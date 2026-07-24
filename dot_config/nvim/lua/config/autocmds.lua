@@ -48,6 +48,15 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 })
 
 vim.api.nvim_create_autocmd("BufReadPost", {
+  group = vim.api.nvim_create_augroup("dependency_nomodifiable", { clear = true }),
+  pattern = { "*/node_modules/*", "*/.venv/*" },
+  callback = function(ev)
+    vim.bo[ev.buf].readonly = true
+    vim.bo[ev.buf].modifiable = false
+  end,
+})
+
+vim.api.nvim_create_autocmd("BufReadPost", {
   pattern = { ".env", ".env.*" },
   desc = "Disable diagnostics on .env files",
   group = vim.api.nvim_create_augroup("disable_diagnostics_on_env", {}),
