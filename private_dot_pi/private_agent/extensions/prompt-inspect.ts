@@ -20,7 +20,7 @@ import {
   generateUnifiedPatch,
 } from "@earendil-works/pi-coding-agent";
 import { spawn } from "node:child_process";
-import { rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -153,7 +153,7 @@ export default function (pi: ExtensionAPI) {
               assistant: state.lastAssistant ?? null,
             },
           };
-          await openInEditor(ctx, JSON.stringify(dump, null, 2), "json");
+          await openInEditor(ctx, JSON.stringify(dump, null, 2), "payload.json");
           return;
         }
         case "diff": {
@@ -174,7 +174,7 @@ export default function (pi: ExtensionAPI) {
           return;
         }
         case "":
-          await openInEditor(ctx, ctx.getSystemPrompt(), "md");
+          await openInEditor(ctx, ctx.getSystemPrompt(), "system-prompt.md");
           return;
         default:
           ctx.ui.notify(
@@ -219,13 +219,13 @@ async function openDiffInEditor(
     ctx.ui.notify("System prompt diff: (none; all stages match)", "info");
     return;
   }
-  await openInEditor(ctx, patches.join("\n\n"), "diff");
+  await openInEditor(ctx, patches.join("\n\n"), "system-prompt.diff");
 }
 
 async function openInEditor(
   ctx: ExtensionCommandContext,
   text: string,
-  ext: string,
+  fileName: string,
 ): Promise<void> {
   const editorCmd = process.env.VISUAL || process.env.EDITOR;
   if (ctx.mode !== "tui" || !editorCmd) {
@@ -234,7 +234,8 @@ async function openInEditor(
   }
 
   await ctx.ui.custom<void>((tui, _theme, _kb, done) => {
-    const filePath = join(tmpdir(), `pi-extension-pager-prompt-inspect-${Date.now()}.${ext}`);
+    const directory = mkdtempSync(join(tmpdir(), "pi-extension-pager-prompt-inspect-"));
+    const filePath = join(directory, fileName);
     let stopped = false;
 
     void (async () => {
@@ -257,7 +258,11 @@ async function openInEditor(
           child.on("close", () => resolve());
         });
       } finally {
-        rmSync(filePath, { force: true });
+        try {
+          rmSync(directory, { recursive: true, force: true });
+        } catch {
+          // Cleanup is best effort.
+        }
         if (stopped) {
           tui.start();
           tui.requestRender(true);

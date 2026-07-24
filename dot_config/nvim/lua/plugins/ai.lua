@@ -1039,8 +1039,7 @@ return {
           vim.fn.resolve("/tmp/claude-prompt-*.md"), -- claude code
           tmpdir .. "/[0-9]*.md", -- https://github.com/sst/opencode/blob/041353f4ff992e7be4455eaf6e71f492a97a123f/packages/opencode/src/cli/cmd/tui/util/editor.ts#L12
           tmpdir .. "/.*.md", -- https://github.com/openai/codex/blob/f6b563ec6403392aadbc31f449226aaabd881c01/codex-rs/tui/src/external_editor.rs#L60
-          tmpdir .. "/pi-editor-*.pi.md", -- https://github.com/badlogic/pi-mono/blob/5c0ec26c28c918c5301f218e8c13fcc540d8e3a4/packages/coding-agent/src/modes/interactive/interactive-mode.ts#L2746
-          tmpdir .. "/pi-extension-editor-*.md", -- https://github.com/badlogic/pi-mono/blob/e3fee7a511503ebe170223cd89e7631751539f25/packages/coding-agent/src/modes/interactive/components/extension-editor.ts#L120
+          tmpdir .. "/pi-editor-*/prompt.md", -- https://github.com/earendil-works/pi/blob/75e6123aba58342d5e464c5b8417effa3dc441d2/packages/coding-agent/src/modes/interactive/external-editor.ts#L14-L15
           tmpdir .. "/codebuddy_edit_*.md",
         },
         once = true,
@@ -1079,7 +1078,7 @@ return {
 
       vim.api.nvim_create_autocmd("BufRead", {
         group = vim.api.nvim_create_augroup("my_pi_extension_pager", { clear = true }),
-        pattern = tmpdir .. "/pi-extension-pager-*", -- https://github.com/qw457812/dotfiles/blob/d0187b8cabdaadb586eaf9302d519bebb71bddcc/private_dot_pi/private_agent/extensions/hide-skills.ts#L127
+        pattern = tmpdir .. "/pi-extension-pager-*/*", -- ~/.local/share/chezmoi/private_dot_pi/private_agent/extensions/skill-visibility.ts
         once = true,
         callback = function(ev)
           vim.bo[ev.buf].modifiable = false

@@ -26,7 +26,7 @@ import {
   type Skill,
 } from "@earendil-works/pi-coding-agent";
 import { spawn } from "node:child_process";
-import { rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -268,6 +268,7 @@ function checkDrift(
 async function openDiffInEditor(ctx: ExtensionCommandContext, diff: string): Promise<void> {
   // Based on pi's external editor flow:
   // https://github.com/earendil-works/pi/blob/8e1900666f3cb83c281297d8f787fae6ee2bd0e6/packages/coding-agent/src/modes/interactive/components/extension-editor.ts#L113-L155
+  // https://github.com/earendil-works/pi/blob/75e6123aba58342d5e464c5b8417effa3dc441d2/packages/coding-agent/src/modes/interactive/external-editor.ts#L13-L45
   // and the extension example for releasing/restoring the TUI around an inherited stdio process:
   // https://github.com/earendil-works/pi/blob/8e1900666f3cb83c281297d8f787fae6ee2bd0e6/packages/coding-agent/examples/extensions/interactive-shell.ts#L155-L179
   const editorCmd = process.env.VISUAL || process.env.EDITOR;
@@ -277,7 +278,8 @@ async function openDiffInEditor(ctx: ExtensionCommandContext, diff: string): Pro
   }
 
   await ctx.ui.custom<void>((tui, _theme, _kb, done) => {
-    const filePath = join(tmpdir(), `pi-extension-pager-skill-visibility-${Date.now()}.diff`);
+    const directory = mkdtempSync(join(tmpdir(), "pi-extension-pager-skill-visibility-"));
+    const filePath = join(directory, "skills.diff");
     let stopped = false;
 
     void (async () => {
@@ -300,7 +302,11 @@ async function openDiffInEditor(ctx: ExtensionCommandContext, diff: string): Pro
           child.on("close", () => resolve());
         });
       } finally {
-        rmSync(filePath, { force: true });
+        try {
+          rmSync(directory, { recursive: true, force: true });
+        } catch {
+          // Cleanup is best effort.
+        }
         if (stopped) {
           tui.start();
           tui.requestRender(true);
