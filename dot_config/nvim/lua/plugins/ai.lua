@@ -18,6 +18,8 @@ return {
   -- https://github.com/knoopx/pi
   -- https://github.com/rytswd/pi-agent-extensions
   -- https://github.com/audibleblink/pi-harness
+  --
+  -- https://github.com/IgorWarzocha/howaboua-pi-stuff/tree/main/packages/pi-explore-subagents
   {
     "earendil-works/pi",
     version = "*",
@@ -124,6 +126,14 @@ return {
       {
         "monotykamary/pi-retry",
         build = "pi update --extension git:github.com/monotykamary/pi-retry",
+        lazy = true,
+        config = function() end,
+      },
+      -- alternative: https://github.com/tunnckoCore/pi-gpt-fast-mode
+      {
+        "diegopetrucci/pi-extensions",
+        name = "diegopetrucci-pi-extensions",
+        build = "pi update --extension git:github.com/diegopetrucci/pi-extensions",
         lazy = true,
         config = function() end,
       },
@@ -1078,7 +1088,7 @@ return {
 
       vim.api.nvim_create_autocmd("BufRead", {
         group = vim.api.nvim_create_augroup("my_pi_extension_pager", { clear = true }),
-        pattern = tmpdir .. "/pi-extension-pager-*/*", -- ~/.local/share/chezmoi/private_dot_pi/private_agent/extensions/skill-visibility.ts
+        pattern = tmpdir .. "/pi-extension-pager-*/*", -- https://github.com/qw457812/dotfiles/blob/6dd88d5a84d4c3beeea754faf2b8f82d452ea874/private_dot_pi/private_agent/extensions/skill-visibility.ts
         once = true,
         callback = function(ev)
           vim.bo[ev.buf].modifiable = false

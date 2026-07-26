@@ -2,6 +2,8 @@ if not U.path.CHEZMOI then
   return {}
 end
 
+-- TODO: https://github.com/dpezto/chezmoi-template.nvim
+
 local H = {}
 
 ---@type table<string, string[]>

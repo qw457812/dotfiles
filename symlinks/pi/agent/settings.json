@@ -101,6 +101,15 @@
       "themes": []
     },
     {
+      "source": "git:github.com/diegopetrucci/pi-extensions",
+      "extensions": [
+        "extensions/openai-fast/index.ts"
+      ],
+      "skills": [],
+      "prompts": [],
+      "themes": []
+    },
+    {
       "source": "git:github.com/hugohe3/ppt-master",
       "extensions": [],
       "skills": [
