@@ -37,6 +37,11 @@ const PROMPT_HIDDEN_SKILLS = [
   "github",
   // git:github.com/mattpocock/skills
   "resolving-merge-conflicts",
+  // git:github.com/anthropics/skills
+  "docx",
+  "pdf",
+  "pptx",
+  "xlsx",
   // git:github.com/addyosmani/agent-skills
   "source-driven-development",
   // git:github.com/DietrichGebert/ponytail

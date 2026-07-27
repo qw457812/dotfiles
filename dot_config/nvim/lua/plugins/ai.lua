@@ -41,6 +41,13 @@ return {
         config = function() end,
       },
       {
+        "anthropics/skills",
+        name = "anthropics-skills",
+        build = "pi update --extension git:github.com/anthropics/skills",
+        lazy = true,
+        config = function() end,
+      },
+      {
         "addyosmani/agent-skills",
         name = "addyosmani-agent-skills",
         build = "pi update --extension git:github.com/addyosmani/agent-skills",

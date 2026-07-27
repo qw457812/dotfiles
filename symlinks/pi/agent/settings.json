@@ -55,6 +55,18 @@
       "themes": []
     },
     {
+      "source": "git:github.com/anthropics/skills",
+      "extensions": [],
+      "skills": [
+        "skills/docx",
+        "skills/pdf",
+        "skills/pptx",
+        "skills/xlsx"
+      ],
+      "prompts": [],
+      "themes": []
+    },
+    {
       "source": "git:github.com/addyosmani/agent-skills",
       "extensions": [],
       "skills": [
