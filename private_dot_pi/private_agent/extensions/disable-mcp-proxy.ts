@@ -3,9 +3,11 @@
  *
  * pi-mcp-adapter registers the `mcp` proxy tool when `disableProxyTool: true`
  * but no direct tools exist in cache (empty mcpServers or missing cache).
- * This extension checks the merged MCP config and disables `mcp` when every
- * configured server has effective `directTools: true` (i.e. no server
- * relies on the proxy for tool access).
+ * Since v2.12.0, the adapter can also reactivate `mcp` asynchronously after
+ * initialization or metadata updates. This extension checks the merged MCP
+ * config and disables `mcp` when every configured server has effective
+ * `directTools: true` (i.e. no server relies on the proxy for tool access),
+ * then enforces that decision after each adapter status update.
  *
  * Uses getActiveTools() → Set → delete → Array.from pattern
  * to incrementally remove without re-enabling tools disabled by other extensions.
@@ -36,6 +38,8 @@ interface McpConfig {
   };
 }
 
+const MCP_STATUS_EVENT = "pi-mcp-adapter/status/v1";
+
 const CONFIG_PATHS = [
   join(homedir(), ".config", "mcp", "mcp.json"),
   ".mcp.json",
@@ -65,6 +69,7 @@ function loadMergedConfig(cwd: string): McpConfig {
     if (!cfg) continue;
     merged = {
       mcpServers: { ...merged.mcpServers, ...cfg.mcpServers },
+      imports: [...(merged.imports ?? []), ...(cfg.imports ?? [])],
       settings: { ...merged.settings, ...cfg.settings },
     };
   }
@@ -85,28 +90,38 @@ function serverNeedsProxy(entry: McpServerEntry, globalDirect?: boolean | string
 }
 
 export default function (pi: ExtensionAPI) {
+  let shouldDisable = false;
+
+  const enforceDisabled = () => {
+    if (!shouldDisable || !pi.getAllTools().some((t) => t.name === "mcp")) return;
+
+    const active = new Set(pi.getActiveTools());
+    if (!active.delete("mcp")) return;
+    pi.setActiveTools(Array.from(active));
+  };
+
+  // pi-mcp-adapter emits this after initialization and metadata changes. Its
+  // syncToolSurface() runs before the status event, so remove any `mcp` tool
+  // that v2.12.0+ just reactivated.
+  const offMcpStatus = pi.events.on(MCP_STATUS_EVENT, enforceDisabled);
+
   pi.on("session_start", async (_event, ctx) => {
-    if (!pi.getAllTools().some((t) => t.name === "mcp")) return;
-
     const config = loadMergedConfig(ctx.cwd);
-
-    // Only act when the user opted into disableProxyTool
-    if (config.settings?.disableProxyTool !== true) return;
-
-    // If imports are present, servers may come from external host configs
-    // that we can't see — conservatively keep the proxy
-    if (config.imports && config.imports.length > 0) return;
-
     const servers = config.mcpServers ?? {};
     const globalDirect = config.settings?.directTools;
 
-    const shouldDisable =
-      Object.keys(servers).length === 0 ||
-      !Object.values(servers).some((s) => serverNeedsProxy(s, globalDirect));
-    if (!shouldDisable) return;
+    shouldDisable =
+      config.settings?.disableProxyTool === true &&
+      // Imported host configs may contain servers that rely on the proxy.
+      (config.imports?.length ?? 0) === 0 &&
+      (Object.keys(servers).length === 0 ||
+        !Object.values(servers).some((server) => serverNeedsProxy(server, globalDirect)));
 
-    const active = new Set(pi.getActiveTools());
-    active.delete("mcp");
-    pi.setActiveTools(Array.from(active));
+    enforceDisabled();
+  });
+
+  pi.on("session_shutdown", () => {
+    shouldDisable = false;
+    offMcpStatus();
   });
 }
