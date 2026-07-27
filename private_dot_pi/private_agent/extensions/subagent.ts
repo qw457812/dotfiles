@@ -537,7 +537,7 @@ export default function subagentExtension(pi: ExtensionAPI): void {
 					const startedAt = Date.now();
 					const created = await pi.exec(
 						"tmux",
-						tmuxArgs("new-session", "-d", "-s", tmuxSession, "-n", "pi", "-c", cwd),
+						tmuxArgs("-f", "/dev/null", "new-session", "-d", "-s", tmuxSession, "-n", "pi", "-c", cwd),
 					);
 					if (created.code !== 0) {
 						throw new Error(`Failed to create tmux session: ${created.stderr.trim() || created.stdout.trim()}`);
