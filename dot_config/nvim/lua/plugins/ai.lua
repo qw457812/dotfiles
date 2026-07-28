@@ -33,6 +33,8 @@ return {
         lazy = true,
         config = function() end,
       },
+      -- private_dot_pi/private_agent/extensions/review.ts
+      { "earendil-works/pi-review", lazy = true, config = function() end },
       {
         "mattpocock/skills",
         name = "mattpocock-skills",
