@@ -30,11 +30,13 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
+const IS_TERMUX = Boolean(process.env.TERMUX_VERSION);
+
 const PROMPT_HIDDEN_SKILLS = [
   // git:github.com/mitsuhiko/agent-stuff
   "frontend-design",
-  "web-browser",
   "github",
+  ...(IS_TERMUX ? ["web-browser"] : []),
   // git:github.com/mattpocock/skills
   "resolving-merge-conflicts",
   // git:github.com/anthropics/skills
@@ -45,7 +47,6 @@ const PROMPT_HIDDEN_SKILLS = [
   // git:github.com/addyosmani/agent-skills
   "source-driven-development",
   // git:github.com/DietrichGebert/ponytail
-  "ponytail",
   "ponytail-audit",
   "ponytail-debt",
   "ponytail-review",
