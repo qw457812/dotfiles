@@ -946,6 +946,10 @@ export default function (pi: ExtensionAPI) {
 			const question = args.trim();
 
 			if (!question) {
+				if (sideBusy) {
+					await ensureOverlay(ctx);
+					return;
+				}
 				if (thread.length > 0 && ctx.hasUI) {
 					const choice = await ctx.ui.select("BTW side chat:", [
 						"Continue previous conversation",
