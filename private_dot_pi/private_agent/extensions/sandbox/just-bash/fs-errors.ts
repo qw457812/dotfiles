@@ -64,7 +64,7 @@ export function assertDevicePath(path: string, operation: string): void {
   }
 }
 
-export function deviceStat(): FsStat {
+export function discardDeviceStat(devicePath: string): FsStat {
   return {
     isFile: true,
     isDirectory: false,
@@ -72,10 +72,11 @@ export function deviceStat(): FsStat {
     mode: 0o666,
     size: 0,
     mtime: new Date(),
+    identity: `pi-sandbox:device:${devicePath}`,
   };
 }
 
-export function directoryStat(): FsStat {
+export function virtualBinRootStat(): FsStat {
   return {
     isFile: false,
     isDirectory: true,
@@ -83,6 +84,7 @@ export function directoryStat(): FsStat {
     mode: 0o555,
     size: 0,
     mtime: new Date(),
+    identity: "pi-sandbox:virtual-bin-root",
   };
 }
 
@@ -94,5 +96,6 @@ export function virtualCommandStat(commandName: string): FsStat {
     mode: 0o555,
     size: Buffer.byteLength(`# just-bash virtual command stub: ${commandName}\n`, "utf8"),
     mtime: new Date(),
+    identity: `pi-sandbox:virtual-command:${commandName}`,
   };
 }

@@ -34,7 +34,7 @@ export function createJustBashFs(
   fs.mount("/bin", virtualBinFs);
   for (const root of writeRoots) {
     if (isDiscardDevice(root)) {
-      fs.mount(root, new DiscardDeviceFs());
+      fs.mount(root, new DiscardDeviceFs(root));
       continue;
     }
     if (!ensureWritableDirectory(root)) continue;

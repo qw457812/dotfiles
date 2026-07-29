@@ -1,6 +1,6 @@
 # Known just-bash compatibility boundaries
 
-These version-scoped diagnostic leads were observed with just-bash 3.1.0.
+These diagnostic leads were verified with just-bash 3.2.0.
 Probe the installed version before adapting code.
 
 ## Process substitution
@@ -18,17 +18,6 @@ done <<< "$parsed"
 
 Command substitution removes trailing newlines and buffering changes streaming
 behavior. Account for those differences before using this adaptation.
-
-## Built-in `grep` option termination
-
-The built-in `grep` does not accept GNU's standalone `--`. Use an option that
-explicitly consumes the pattern:
-
-```bash
-printf '%s\n' "$text" | grep "$grep_flag" -e "$pattern"
-```
-
-Include patterns beginning with `-` in the regression test.
 
 ## Script argument ceiling
 

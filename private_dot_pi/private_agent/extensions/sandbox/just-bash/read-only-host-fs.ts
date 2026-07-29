@@ -180,6 +180,9 @@ function toFsStat(stat: Awaited<ReturnType<typeof fsPromises.stat>>): FsStat {
     mode: Number(stat.mode),
     size: Number(stat.size),
     mtime: stat.mtime,
+    dev: stat.dev,
+    ino: stat.ino,
+    identity: `real:${stat.dev}:${stat.ino}`,
   };
 }
 

@@ -11,8 +11,8 @@ import {
 import { resolve } from "node:path";
 import {
   assertDevicePath,
-  deviceStat,
-  directoryStat,
+  discardDeviceStat,
+  virtualBinRootStat,
   invalidArgumentError,
   isDeviceRoot,
   isDirectoryError,
@@ -23,6 +23,8 @@ import {
 } from "./fs-errors.ts";
 
 export class DiscardDeviceFs {
+  constructor(private readonly devicePath: string) {}
+
   async readFile(
     path: string,
     _options?: BufferEncoding | { encoding?: BufferEncoding | null },
@@ -55,7 +57,7 @@ export class DiscardDeviceFs {
 
   async stat(path: string): Promise<FsStat> {
     assertDevicePath(path, "stat");
-    return deviceStat();
+    return discardDeviceStat(this.devicePath);
   }
 
   async lstat(path: string): Promise<FsStat> {
@@ -168,7 +170,7 @@ export class VirtualBinFs {
   }
 
   async stat(path: string): Promise<FsStat> {
-    if (isDeviceRoot(path)) return directoryStat();
+    if (isDeviceRoot(path)) return virtualBinRootStat();
     const commandName = this.commandNameForPath(path);
     if (commandName) return virtualCommandStat(commandName);
     throw noSuchFileError("stat", path);

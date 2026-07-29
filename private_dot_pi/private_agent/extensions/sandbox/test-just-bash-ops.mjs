@@ -102,6 +102,14 @@ try {
     output: "",
   });
 
+  const readonlySourceCopy = join(workdir, "readonly-source-copy.mjs");
+  writeFileSync(readonlySourceCopy, "existing destination\n");
+  assert.deepEqual(await run(`cp ${thisFilePath} ${readonlySourceCopy}`), {
+    exitCode: 0,
+    output: "",
+  });
+  assert.equal(readFileSync(readonlySourceCopy, "utf8"), readFileSync(thisFilePath, "utf8"));
+
   assert.deepEqual(await run("echo stdout >/dev/stdout"), {
     exitCode: 0,
     output: "stdout\n",
@@ -453,14 +461,14 @@ try {
     assert.equal(existsSync(nestedSourceDir), true);
     assert.equal(existsSync(nestedMvDest), false);
 
-    const cycleSafeCp = await runWithOps(
+    const rejectedCycleCp = await runWithOps(
       createJustBashOps(workdir, {
         filesystem: { allowWrite: [".", extraWriteDir], denyRead: [hostSecretPath] },
       }),
       `cp -r ${cycleSourceDir} ${cycleCpDest}`,
     );
-    assert.equal(cycleSafeCp.exitCode, 0);
-    assert.equal(existsSync(join(cycleCpDest, "file.txt")), true);
+    assert.notEqual(rejectedCycleCp.exitCode, 0);
+    assert.equal(existsSync(cycleCpDest), false);
 
     // Android/Termux reports chmod(000) directories inconsistently enough that
     // this host-permission edge-case test can leave undeletable temp dirs.
