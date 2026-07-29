@@ -300,8 +300,8 @@ class BtwOverlay extends Container implements Focusable {
 		const dialogWidth = Math.max(56, Math.min(width, Math.floor(width * 0.9)));
 		const innerWidth = Math.max(40, dialogWidth - 2);
 		const terminalRows = process.stdout.rows ?? 30;
-		const dialogHeight = Math.max(16, Math.min(30, Math.floor(terminalRows * 0.75)));
-		const chromeHeight = 7;
+		const dialogHeight = Math.max(16, Math.min(48, Math.floor(terminalRows * 0.75)));
+		const chromeHeight = 9;
 		const transcriptHeight = Math.max(6, dialogHeight - chromeHeight);
 
 		// Markdown renders to innerWidth already — no manual wrapping needed
