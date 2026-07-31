@@ -350,6 +350,7 @@ require("lazy").setup({
         "tohtml",
         "tutor",
         "zipPlugin",
+        "zip",
       },
     },
   },

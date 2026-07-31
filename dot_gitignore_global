@@ -27,3 +27,6 @@ CLAUDE.local.md
 .playwright-mcp
 
 **/.claude/.cc-writes/
+
+# https://github.com/qw457812/dotfiles/blob/2c3726f94a64281616171ead61593764d9f3ff95/private_dot_pi/private_agent/extensions/todos.ts
+.pi/todos/
