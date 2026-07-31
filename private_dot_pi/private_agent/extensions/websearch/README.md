@@ -22,7 +22,7 @@ Then start pi — the `websearch` tool is automatically available.
 
 Both Exa and Parallel have **free tiers** that work without API keys. Keys unlock higher rate limits.
 
-Provider selection mirrors [OpenCode](https://github.com/anomalyco/opencode/tree/5fb85a6aa3a3)'s exactly:
+Provider selection mirrors [OpenCode](https://github.com/anomalyco/opencode/tree/e4bd9757a3a5)'s exactly:
 
 | Scenario                         | Provider                                              |
 | -------------------------------- | ----------------------------------------------------- |

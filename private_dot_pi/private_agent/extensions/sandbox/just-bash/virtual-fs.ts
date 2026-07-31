@@ -10,17 +10,56 @@ import {
 } from "just-bash";
 import { resolve } from "node:path";
 import {
-  assertDevicePath,
-  discardDeviceStat,
-  virtualBinRootStat,
   invalidArgumentError,
-  isDeviceRoot,
   isDirectoryError,
   noSuchFileError,
   notDirectoryError,
   readOnlyFsError,
-  virtualCommandStat,
 } from "./fs-errors.ts";
+
+function isDeviceRoot(path: string): boolean {
+  return resolve("/", path) === "/";
+}
+
+function assertDevicePath(path: string, operation: string): void {
+  if (!isDeviceRoot(path)) throw noSuchFileError(operation, path);
+}
+
+function discardDeviceStat(devicePath: string): FsStat {
+  return {
+    isFile: true,
+    isDirectory: false,
+    isSymbolicLink: false,
+    mode: 0o666,
+    size: 0,
+    mtime: new Date(),
+    identity: `pi-sandbox:device:${devicePath}`,
+  };
+}
+
+function virtualBinRootStat(): FsStat {
+  return {
+    isFile: false,
+    isDirectory: true,
+    isSymbolicLink: false,
+    mode: 0o555,
+    size: 0,
+    mtime: new Date(),
+    identity: "pi-sandbox:virtual-bin-root",
+  };
+}
+
+function virtualCommandStat(commandName: string): FsStat {
+  return {
+    isFile: true,
+    isDirectory: false,
+    isSymbolicLink: false,
+    mode: 0o555,
+    size: Buffer.byteLength(`# just-bash virtual command stub: ${commandName}\n`, "utf8"),
+    mtime: new Date(),
+    identity: `pi-sandbox:virtual-command:${commandName}`,
+  };
+}
 
 export class DiscardDeviceFs {
   constructor(private readonly devicePath: string) {}

@@ -1,6 +1,8 @@
 {
   "settings": {
-    "disableProxyTool": true
+    "disableProxyTool": true,
+    "showStatusIcon": false,
+    "mcpFooterStatus": "compact"
   },
   "mcpServers": {}
 }

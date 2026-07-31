@@ -54,6 +54,7 @@ return {
       },
       { "<leader>anI", "<cmd>CodeCompanion<CR>", desc = "Inline", mode = { "n", "x" } },
       { "<leader>ana", "<cmd>CodeCompanionActions<CR>", desc = "Actions", mode = { "n", "x" } },
+      { "<leader>anr", "<cmd>CodeCompanionCodeReview<CR>", desc = "Code Review" },
       { "<leader>ann", "<cmd>CodeCompanionChat<CR>", desc = "New Chat", mode = { "n", "x" } },
       {
         "<leader>anc",
