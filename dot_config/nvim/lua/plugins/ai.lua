@@ -153,12 +153,6 @@ return {
         config = function() end,
       },
       {
-        "https://gitlab.com/tom81094/pi-copilot-advanced",
-        build = "pi update --extension git:gitlab.com/tom81094/pi-copilot-advanced",
-        lazy = true,
-        config = function() end,
-      },
-      {
         "hugohe3/ppt-master",
         pin = true,
         build = "pi update --extension git:github.com/hugohe3/ppt-master",

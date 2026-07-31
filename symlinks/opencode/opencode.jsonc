@@ -9,11 +9,11 @@
   ],
   "share": "manual",
   // "autoupdate": "notify",
-  "model": "zai-coding-plan/glm-5.1",
-  "small_model": "github-copilot/gpt-5-mini",
+  "model": "zai-coding-plan/glm-5.2",
+  "small_model": "deepseek/deepseek-v4-flash",
   "agent": {
     "plan": {
-      "model": "zai-coding-plan/glm-5.1"
+      "model": "zai-coding-plan/glm-5.2"
     }
   },
   "mcp": {
@@ -138,7 +138,7 @@
   "disabled_providers": [
     "alibaba",
     "alibaba-cn",
-    "deepseek",
+    // "deepseek",
     "groq",
     "kimi-for-coding",
     "minimax",

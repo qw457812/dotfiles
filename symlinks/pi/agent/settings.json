@@ -15,7 +15,6 @@
     "openai-codex/gpt-5.6-luna",
     "neuralwatt/kimi-k3",
     "zai/glm-5.2",
-    "github-copilot/gpt-5.4",
     "deepseek/deepseek-v4-pro",
     "xiaomi/mimo-v2.5-pro",
     "codebuddy/kimi-k3-2"
@@ -133,7 +132,6 @@
     "git:github.com/monotykamary/pi-neuralwatt-provider",
     "git:github.com/monotykamary/pi-invisible-continue",
     "git:github.com/monotykamary/pi-retry",
-    "git:gitlab.com/tom81094/pi-copilot-advanced",
     "git:github.com/qw457812/pi-listen"
   ],
   "piVim": {
