@@ -254,21 +254,6 @@ return {
   },
 
   {
-    "ravitemer/mcphub.nvim",
-    optional = true,
-    ---@module "mcphub"
-    ---@type MCPHub.Config
-    opts = {
-      ---@type MCPHub.UIConfig
-      ui = {
-        window = {
-          border = winborder,
-        },
-      },
-    },
-  },
-
-  {
     "stevearc/oil.nvim",
     ---@module 'oil'
     ---@type oil.SetupOpts

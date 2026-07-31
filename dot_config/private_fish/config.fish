@@ -29,10 +29,6 @@ set -x RIPGREP_CONFIG_PATH $HOME/.ripgreprc
 test -f $HOME/.cache/nvim/lazygit-theme.yml; and set -x LG_CONFIG_FILE $HOME/.config/lazygit/config.yml,$HOME/.cache/nvim/lazygit-theme.yml
 set -x PI_WEBSEARCH_PROVIDER exa # https://github.com/qw457812/dotfiles/blob/4266930f4dd066876d33652c7be2771f0c759560/private_dot_pi/private_agent/extensions/websearch/index.ts#L71-L72
 
-# # `brew install gcloud-cli`
-# # @fish-lsp-disable-next-line 1004
-# type -q brew; and test -f (brew --prefix)/share/google-cloud-sdk/path.fish.inc; and source (brew --prefix)/share/google-cloud-sdk/path.fish.inc
-
 # ==============================================================================
 # EXIT IF NOT INTERACTIVE
 # ==============================================================================
@@ -295,28 +291,11 @@ if type -q claude
     abbr clt claude_temp
     abbr clc "claude --continue"
     abbr clr "claude --resume"
-    abbr clh "claude --model haiku"
-    abbr cls "claude --model sonnet"
-    abbr clo "claude --model opus"
-    abbr clgc "claude --model haiku 'commit only the staged changes'"
     abbr ccstl (type -q bunx; and echo "bunx ccstatusline@latest"; or echo "npx -y ccstatusline@latest")
     set -l ccusage (type -q bunx; and echo "bunx ccusage@latest"; or echo "npx -y ccusage@latest")
     abbr ccu "$ccusage"
     abbr ccum "$ccusage daily --breakdown"
-    # alternatives:
-    # - https://github.com/Fission-AI/OpenSpec
-    # - https://github.com/OthmanAdi/planning-with-files
-    # - https://github.com/obra/superpowers
-    abbr ccspec "uvx --from git+https://github.com/github/spec-kit.git specify init --script sh --ai claude --here"
-    abbr ccgsd "npx -y get-shit-done-cc@latest --local" # https://github.com/glittercowboy/get-shit-done
     abbr cchistory "npx -y cchistory"
-    abbr ccl claude_litellm
-    abbr ccs claude_synthetic
-    abbr ccg claude_glm
-    abbr ccf claude_firepass
-    abbr cck claude_kimi
-    abbr ccm claude_minimax
-    abbr cco claude_openrouter
     # type -q ccr; and abbr ccr "ccr code" # https://github.com/musistudio/claude-code-router
 end
 if type -q codex
@@ -330,20 +309,11 @@ if type -q opencode
     abbr oc opencode
     abbr occ 'opencode --continue'
 end
-# if type -q aider
-#     abbr ad aider
-#     abbr adr 'aider --model r1'
-#     abbr adg 'aider --model gemini'
-#     abbr adc 'aider --model claude'
-#     abbr adp aider_copilot
-# end
 alias synthetic_quota 'curl -s https://api.synthetic.new/v2/quotas -H "Authorization: Bearer $SYNTHETIC_API_KEY" | jq .'
 alias synthetic_models 'curl -s https://api.synthetic.new/openai/v1/models -H "Authorization: Bearer $SYNTHETIC_API_KEY" | jq \'.data[] | select(.provider == "synthetic")\''
 alias neuralwatt_quota 'curl https://api.neuralwatt.com/v1/quota -H "Authorization: Bearer $NEURALWATT_API_KEY" | jq .'
 alias neuralwatt_usage 'curl https://api.neuralwatt.com/v1/usage/energy -H "Authorization: Bearer $NEURALWATT_API_KEY" | jq .'
 alias neuralwatt_models 'curl https://api.neuralwatt.com/v1/models -H "Authorization: Bearer $NEURALWATT_API_KEY" | jq .'
-alias crofai_quota 'curl -s https://crof.ai/usage_api/ -H "Authorization: Bearer $CROFAI_API_KEY" | jq .'
-alias crofai_models 'curl https://crof.ai/v1/models -H "Authorization: Bearer $CROFAI_API_KEY" | jq .'
 
 # Other
 abbr b "cd -"

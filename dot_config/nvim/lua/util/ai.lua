@@ -16,11 +16,7 @@ local H = {}
 M.claude = {
   provider = {
     proxy = {
-      -- alternatives:
-      -- - https://github.com/mcowger/plexus
-      -- - https://github.com/looplj/axonhub
-      -- - https://developers.cloudflare.com/ai-gateway/get-started/
-      -- - https://github.com/router-for-me/CLIProxyAPI
+      -- alternative: https://github.com/router-for-me/CLIProxyAPI
       litellm = {
         ANTHROPIC_BASE_URL = "http://localhost:4000",
         ANTHROPIC_AUTH_TOKEN = vim.env.LITELLM_MASTER_KEY,
@@ -30,20 +26,14 @@ M.claude = {
         ZAI_API_KEY = vim.env.ZAI_API_KEY, -- for ~/.claude/statusline/get-glm-quota.sh
       },
     },
-    -- https://www.wafer.ai/pass
     plan = {
-      -- curl -s -X POST "$CLAUDE_RELAY_SERVICE_URL/apiStats/api-key/test" -H "Content-Type: application/json" -d "{\"apiKey\":\"$CLAUDE_RELAY_SERVICE_API_KEY\"}"
-      crs = vim.env.CLAUDE_RELAY_SERVICE_URL and {
-        ANTHROPIC_BASE_URL = vim.env.CLAUDE_RELAY_SERVICE_URL .. "/api",
-        ANTHROPIC_AUTH_TOKEN = vim.env.CLAUDE_RELAY_SERVICE_API_KEY,
-      } or {},
       -- https://synthetic.new/billing
       synthetic = {
         ANTHROPIC_BASE_URL = "https://api.synthetic.new/anthropic",
         ANTHROPIC_AUTH_TOKEN = vim.env.SYNTHETIC_API_KEY,
         ANTHROPIC_DEFAULT_OPUS_MODEL = "hf:zai-org/GLM-5.1",
         ANTHROPIC_DEFAULT_SONNET_MODEL = "hf:moonshotai/Kimi-K2.6",
-        ANTHROPIC_DEFAULT_HAIKU_MODEL = "hf:MiniMaxAI/MiniMax-M2.5", -- hf:nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4
+        ANTHROPIC_DEFAULT_HAIKU_MODEL = "hf:MiniMaxAI/MiniMax-M2.5",
         ANTHROPIC_MODEL = "hf:zai-org/GLM-5.1",
       },
       -- https://z.ai/manage-apikey/subscription
@@ -53,7 +43,7 @@ M.claude = {
         API_TIMEOUT_MS = "3000000",
         ANTHROPIC_DEFAULT_OPUS_MODEL = "glm-5.2",
         ANTHROPIC_DEFAULT_SONNET_MODEL = "glm-5.2",
-        ANTHROPIC_DEFAULT_HAIKU_MODEL = "glm-4.7", -- glm-4.5-air is not good enough
+        ANTHROPIC_DEFAULT_HAIKU_MODEL = "glm-4.7",
         ANTHROPIC_MODEL = "glm-5.2", -- to disable 1M `context_window_size`
       },
       -- https://app.fireworks.ai/fire-pass
@@ -82,17 +72,14 @@ M.claude = {
       kimi = {
         ANTHROPIC_BASE_URL = "https://api.moonshot.cn/anthropic",
         ANTHROPIC_AUTH_TOKEN = vim.env.MOONSHOT_API_KEY,
-        -- ANTHROPIC_MODEL = "kimi-k2-thinking-turbo",
         ANTHROPIC_DEFAULT_OPUS_MODEL = "kimi-k2-thinking-turbo",
         ANTHROPIC_DEFAULT_SONNET_MODEL = "kimi-k2-thinking-turbo",
         ANTHROPIC_DEFAULT_HAIKU_MODEL = "kimi-k2-thinking-turbo",
-        -- CLAUDE_CODE_SUBAGENT_MODEL = "kimi-k2-thinking-turbo",
       },
       minimax = {
         ANTHROPIC_BASE_URL = "https://api.minimax.io/anthropic",
         ANTHROPIC_AUTH_TOKEN = vim.env.MINIMAX_API_KEY,
         API_TIMEOUT_MS = "3000000",
-        -- ANTHROPIC_MODEL = "MiniMax-M2.1",
         ANTHROPIC_SMALL_FAST_MODEL = "MiniMax-M2.1",
         ANTHROPIC_DEFAULT_SONNET_MODEL = "MiniMax-M2.1",
         ANTHROPIC_DEFAULT_OPUS_MODEL = "MiniMax-M2.1",

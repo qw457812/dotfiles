@@ -84,7 +84,7 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
 
   # model
   model=""
-  if [ -n "$base_url" ] && [ "${base_url#"$CLAUDE_RELAY_SERVICE_URL"}" = "$base_url" ]; then
+  if [ -n "$base_url" ]; then
     model=$(cat "$transcript_path" 2>/dev/null | jq -r 'select(.type == "assistant") | .message.model // empty' | tail -1) # z.ai
   fi
   model=${model:-$(echo "$input" | jq -r '.model.display_name // .model.id // empty')}
@@ -114,14 +114,6 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
   # # session cost
   # session_cost=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
   # session_cost_display="${COLOR_GOLD}$(printf "\$%.2f" "$session_cost")${COLOR_RESET}"
-
-  # # daily cost (mainly for CRS)
-  # daily_cost=$("$HOME/.claude/statusline/get-daily-cost.sh")
-  # daily_cost_display=$([ "$daily_cost" != "0" ] && echo "${COLOR_ORANGE}$(printf "\$%.2f" "$daily_cost")${COLOR_RESET}")
-
-  # # weekly cost (only for CRS; hidden on Monday)
-  # weekly_cost=$("$HOME/.claude/statusline/get-weekly-cost.sh")
-  # weekly_cost_display=$([ -n "$weekly_cost" ] && echo "${COLOR_BRONZE}$(printf "\$%.2f" "$weekly_cost")${COLOR_RESET}")
 
   # synthetic quota (only for synthetic)
   syn_quota=$("$HOME/.claude/statusline/get-synthetic-quota.sh")
@@ -159,16 +151,6 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
     fi
   fi
 
-  # # copilot premium quota
-  # copilot_quota=$("$HOME/.claude/statusline/get-copilot-quota.sh")
-  # copilot_quota_display=""
-  # if echo "$copilot_quota" | jq -e . >/dev/null 2>&1; then
-  #   copilot_used=$(echo "$copilot_quota" | jq -r '.used // 0')
-  #   copilot_limit=$(echo "$copilot_quota" | jq -r '.limit // 0')
-  #   copilot_reset_ms=$(echo "$copilot_quota" | jq -r '.reset_remaining_ms // 0')
-  #   copilot_quota_display="${COLOR_CERULEAN}${copilot_used}${COLOR_STEEL}/${copilot_limit} $(format_ms "$copilot_reset_ms")${COLOR_RESET}"
-  # fi
-
   # codebuddy quota (only when running inside CodeBuddy Code, which re-uses this statusline)
   codebuddy_quota_display=""
   codebuddy_quota=$("$HOME/.claude/statusline/get-codebuddy-quota.sh")
@@ -199,13 +181,6 @@ if [ "$__IS_CLAUDECODE_NVIM" = "1" ] || [ -n "$TERMUX_VERSION" ]; then
     # https://github.com/Rolv-Apneseth/starship.yazi/blob/a63550b2f91f0553cc545fd8081a03810bc41bc0/main.lua#L111-L126
     changes_display=$(STARSHIP_CONFIG="$HOME/.config/starship-statusline.toml" STARSHIP_SHELL="" starship prompt | tr -d '\n')
   fi
-
-  # # GSD update available?
-  # # https://github.com/gsd-build/get-shit-done/blob/2eaed7a8475839958f9ec76ca4c26d9a0bbfc33f/hooks/gsd-statusline.js#L107-L111
-  # gsd_update_display=""
-  # if [ -f ".claude/hooks/gsd-statusline.js" ] && echo "$input" | node .claude/hooks/gsd-statusline.js 2>/dev/null | grep -q "/gsd:update"; then
-  #   gsd_update_display="${COLOR_YELLOW}/gsd:update${COLOR_RESET}"
-  # fi
 
   # empty segments are skipped by xargs
   printf '%s\n' \

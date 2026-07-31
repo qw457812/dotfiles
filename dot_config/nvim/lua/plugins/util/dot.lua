@@ -124,17 +124,17 @@ return {
         })
       end
 
-      -- fix `vim: true` in ~/.aider.conf.yml
-      vim.api.nvim_create_autocmd("BufReadPre", {
-        pattern = { ".aider.conf.yml", "dot_aider.conf.yml" },
-        callback = function(event)
-          -- vim.opt_local.modelines = 0
-          vim.bo[event.buf].modeline = false
-        end,
-      })
-      if LazyVim.has("chezmoi.vim") and vim.g["chezmoi#use_tmp_buffer"] == 1 then
-        vim.g["chezmoi#detect_ignore_pattern"] = "dot_aider.conf.yml"
-      end
+      -- -- fix `vim: true` in ~/.aider.conf.yml
+      -- vim.api.nvim_create_autocmd("BufReadPre", {
+      --   pattern = { ".aider.conf.yml", "dot_aider.conf.yml" },
+      --   callback = function(event)
+      --     -- vim.opt_local.modelines = 0
+      --     vim.bo[event.buf].modeline = false
+      --   end,
+      -- })
+      -- if LazyVim.has("chezmoi.vim") and vim.g["chezmoi#use_tmp_buffer"] == 1 then
+      --   vim.g["chezmoi#detect_ignore_pattern"] = "dot_aider.conf.yml"
+      -- end
 
       -- fix `Option 'commentstring' is empty.` sometimes occurs in kitty.conf
       vim.api.nvim_create_autocmd("FileType", {
@@ -201,10 +201,6 @@ end tell]]
     "nvim-treesitter/nvim-treesitter",
     opts = function()
       vim.filetype.add({
-        filename = {
-          [".aider.model.metadata.json"] = "jsonc",
-          ["dot_aider.model.metadata.json"] = "jsonc", -- chezmoi
-        },
         pattern = {
           [".*/vscode/settings%.json"] = "jsonc",
           [".*/vscode/keybindings%.json"] = "jsonc",

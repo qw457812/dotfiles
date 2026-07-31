@@ -10,19 +10,6 @@
 
 CLAUDE.local.md
 **/.claude/settings.local.json
-# CLAUDE.md
-# .claude
-# .mcp.json
-
-.sisyphus
-# .opencode
-# .opencode.json
-# AGENTS.md
-
-.aider*
-
-# https://github.com/gsd-build/gsd-2
-.bg-shell
 
 .playwright-mcp
 

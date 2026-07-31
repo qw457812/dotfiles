@@ -1,13 +1,4 @@
 {
-  "transformers": [
-    {
-      "path": "$HOME/.claude-code-router/plugins/dashscope-transformer.js",
-      "options": {
-        "enable_thinking": false,
-        "stream": true
-      }
-    }
-  ],
   "Providers": [
     {
       "name": "openrouter",
@@ -29,15 +20,6 @@
       "models": ["@preset/kimi"],
       "transformer": {
         "use": ["openrouter", ["maxtoken", { "max_tokens": 0 }]]
-      }
-    },
-    {
-      "name": "dashscope",
-      "api_base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
-      "api_key": "${DASHSCOPE_API_KEY}",
-      "models": ["qwen3-coder-plus"],
-      "transformer": {
-        "use": ["dashscope"]
       }
     }
   ],

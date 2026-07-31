@@ -1,12 +1,7 @@
 // https://opencode.ai/docs/zen/#pricing
-// https://github.com/settings/billing/premium_requests_usage
 // curl https://opencode.ai/zen/v1/models | jq '.data | sort_by(.created)'
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugin": [
-    // "oh-my-opencode@latest", // https://github.com/code-yeongyu/oh-my-opencode
-    // "opencode-antigravity-auth@latest" // https://github.com/NoeFabris/opencode-antigravity-auth
-  ],
   "share": "manual",
   // "autoupdate": "notify",
   "model": "zai-coding-plan/glm-5.2",
@@ -17,7 +12,6 @@
     }
   },
   "mcp": {
-    // https://github.com/code-yeongyu/oh-my-opencode/blob/af67bc8592485ca25fcdf6752839754304f6bfb6/src/mcp/context7.ts
     "context7": {
       "type": "remote",
       "url": "https://mcp.context7.com/mcp",
@@ -37,8 +31,6 @@
     // https://github.com/anomalyco/opencode/blob/7c6948cf6f90b52a74ad56ac7a7eb16863e65f19/packages/web/src/content/docs/tools.mdx?plain=1#L255-L281
     "websearch": "deny", // for OpenCode provider, we already have `exa_web_search_exa` via exa MCP
     "codesearch": "deny", // for OpenCode provider, `get_code_context_exa` is deprecated by exa
-
-    // "google_search": "deny", // provided by opencode-antigravity-auth
     "bash": {
       "git add *": "ask",
       "git commit *": "ask",
@@ -81,58 +73,11 @@
         }
       }
     },
-    // // check `opencode models anthropic`
-    // "anthropic": {
-    //   "options": {
-    //     "baseURL": "{env:CLAUDE_RELAY_SERVICE_URL}/api/v1",
-    //     "apiKey": "{env:CLAUDE_RELAY_SERVICE_API_KEY}"
-    //   }
-    // },
-    // "google": {
-    //   "models": {
-    //     "antigravity-gemini-3.1-pro": {
-    //       "name": "Gemini 3.1 Pro (Antigravity)",
-    //       "limit": { "context": 1048576, "output": 65535 },
-    //       "modalities": {
-    //         "input": ["text", "image", "pdf"],
-    //         "output": ["text"]
-    //       },
-    //       "variants": {
-    //         "low": { "thinkingLevel": "low" },
-    //         "high": { "thinkingLevel": "high" }
-    //       }
-    //     },
-    //     "antigravity-gemini-3-flash": {
-    //       "name": "Gemini 3 Flash (Antigravity)",
-    //       "limit": { "context": 1048576, "output": 65536 },
-    //       "modalities": {
-    //         "input": ["text", "image", "pdf"],
-    //         "output": ["text"]
-    //       },
-    //       "variants": {
-    //         "minimal": { "thinkingLevel": "minimal" },
-    //         "low": { "thinkingLevel": "low" },
-    //         "medium": { "thinkingLevel": "medium" },
-    //         "high": { "thinkingLevel": "high" }
-    //       }
-    //     }
-    //   }
-    // },
     // curl https://openrouter.ai/api/v1/models | jq '.data | sort_by(.created)' | less
     "openrouter": {
       "options": {
         "apiKey": "{env:OPENCODE_OPENROUTER_API_KEY}"
       },
-      "models": {
-        // "moonshotai/kimi-k2-0905": {
-        //   "options": {
-        //     "provider": {
-        //       "order": ["moonshotai", "baseten", "together", "groq"],
-        //       "allow_fallbacks": false
-        //     }
-        //   }
-        // }
-      }
     }
   },
   "disabled_providers": [

@@ -161,11 +161,11 @@
       "args": ["${workspaceFolder}"],
       "icon": "terminal-tmux"
     },
-    "aider": {
-      "path": "${userHome}/.local/bin/vscode-tmux-aider",
-      "args": ["${workspaceFolder}"],
-      "icon": "robot"
-    }
+    // "aider": {
+    //   "path": "${userHome}/.local/bin/vscode-tmux-aider",
+    //   "args": ["${workspaceFolder}"],
+    //   "icon": "robot"
+    // }
   },
   "terminal.integrated.commandsToSkipShell": [
     "workbench.action.terminal.killEditor" // ctrl+space to close `workbench.action.createTerminalEditor`
