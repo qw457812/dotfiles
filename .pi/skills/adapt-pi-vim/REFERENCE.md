@@ -185,6 +185,57 @@ type ModalEditorRuntime = {
 Add a field only when local behavior reads or writes it. Remove fields when the
 integration stops using them.
 
+### Display-line remaps
+
+`prompt-editor` implements these remaps against Pi Editor's private visual-line
+layout runtime rather than pi-vim's logical-line motions:
+
+```text
+j -> gj
+k -> gk
+H -> g^
+L -> g$
+```
+
+On every upgrade, compare pi-vim's input dispatch and pending fields in `index.ts`.
+A pending state owns the next key, so the display-line handler must return `false`
+and let pi-vim consume it. Keep the Ex guard before all remaps, and keep the
+structural guard aligned with every pending field it reads:
+
+```ts
+if (
+  editor.pendingOperator !== null ||
+  editor.prefixCount ||
+  editor.operatorCount ||
+  editor.pendingG ||
+  editor.pendingMotion ||
+  editor.pendingReplace ||
+  editor.pendingTextObject
+) {
+  return false;
+}
+```
+
+Also compare the private visual-line runtime used by the handler against
+`~/.local/share/nvim/lazy/pi/packages/tui/src/components/editor.ts`:
+`buildVisualLineMap`, `findCurrentVisualLine`, `moveToVisualLine`, `segment`, cursor
+state, and sticky-column state. These are required as one compatibility surface;
+fail loudly when any prerequisite is unavailable rather than consuming a remap with
+partial semantics. Move `j`/`k` through `moveToVisualLine`; Pi's raw Up/Down handling
+navigates prompt history at display boundaries instead of acting like Vim's
+`gj`/`gk` no-op. Clear `preferredVisualCol` after horizontal `H`/`L` movement so
+the next vertical motion derives a display-line-relative column.
+
+Every consumed remap bypasses `ModalEditor.handleInput()`, so call pi-vim's private
+`refreshPendingDispatchRestore()` after moving. This keeps the latest cursor in the
+restore snapshot while an asynchronous Ex dispatch is pending.
+
+Verification is complete when wrapped-line movement and endpoints pass in Normal,
+Visual, and Visual-line modes, and pending sequences still reach pi-vim. At minimum,
+exercise replacement characters (`rj`, `rk`, `rH`, `rL`), movement while an
+asynchronous Ex dispatch is pending, failure when `segment` is unavailable, plus any
+pending state changed by the target release.
+
 ## Replacement-editor session parity
 
 `PromptEditor` replaces the instance configured by pi-vim's `session_start`, so it

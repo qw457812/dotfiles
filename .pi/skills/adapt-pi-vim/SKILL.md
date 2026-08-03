@@ -45,13 +45,13 @@ published-package range to review.
 git -C "$CHK" log --oneline "$OLD_REV..$TARGET_REV"
 git -C "$CHK" diff --stat "$OLD_REV..$TARGET_REV"
 git -C "$CHK" diff "$OLD_REV..$TARGET_REV" -- \
-  index.ts types.ts settings.ts clipboard-policy.ts mode-colors.ts \
+  index.ts types.ts visual.ts settings.ts clipboard-policy.ts mode-colors.ts \
   mode-change-command.ts cursor-shape.ts
 ```
 
 Account for changes to:
 
-- `ModalEditor` constructor, public setters, modes, and private fields accessed structurally
+- `ModalEditor` constructor, public setters, modes, and private pending-input fields that gate custom remaps
 - `default` extension `session_start` / `session_shutdown` setup
 - settings, colorizer keys, command dispatch, clipboard behavior, and cursor rendering
 - exported or moved helpers copied or re-exported by `prompt-editor`
@@ -116,7 +116,8 @@ pi --no-session --no-extensions -e ~/.pi/agent/npm/node_modules/pi-vim/index.ts
 ```
 
 Manually exercise every changed interactive branch, such as mode transitions,
-rendering, Ex dispatch, clipboard policy, and settings overrides.
+rendering, Ex dispatch, custom remaps around changed pending-input states,
+clipboard policy, and settings overrides.
 
 **Complete when:** typecheck, lint, runtime loading, and every affected interactive
 branch pass against the target version.
