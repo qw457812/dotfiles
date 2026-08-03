@@ -65,17 +65,27 @@ config changes.
    rg -n "<name>|<module>|<changed-api-or-key>" dot_config private_dot_* symlinks              # fallback
    ```
 
+   Route every package through the
+   [config-surface map](surfaces/INDEX.md). Follow only matching branches; their
+   exact-range requirements apply even when the changelog claims no breaking API
+   change.
+
    Completion criterion: the owning lazy spec, build/install hook, and every
    matching runtime reference are accounted for — still valid, needs a specific
-   config edit, or needs a follow-up question to the human.
+   config edit, or needs a follow-up question to the human. Every matching
+   config-surface branch also meets its own completion criterion.
 
 5. **Update this skill when the config-surface map was incomplete.** If step 4
    missed a package class, owning lazy spec location, build/install hook
    pattern, or runtime config path you had to discover during the review, edit
-   this skill before reporting.
+   this skill before reporting. Keep each specialized integration co-located under
+   `surfaces/<name>/`, with its trigger owned by
+   [surfaces/INDEX.md](surfaces/INDEX.md). Replace stale guidance rather than
+   layering it.
 
-   Completion criterion: either step 4 covered every discovered surface, or it
-   now names the new surface and the search command that finds it.
+   Completion criterion: either step 4 and its disclosed branch covered every
+   discovered surface, or the relevant file now names the new surface and the
+   search command that finds it.
 
 ## Notes
 
@@ -83,6 +93,9 @@ config changes.
   never fetches upstream. Those targets come from the on-disk `origin/<branch>`
   refs — whatever the last Neovim `:Lazy check` fetched — so the report is
   bounded by already-fetched refs and can **underreport** newer updates.
+- Specialized surface branches may additionally freeze published-release metadata
+  and inspect exact hashes in reusable librarian caches when runtime packages differ
+  from lazy checkouts; they never read targets from or mutate lazy working trees.
 - Never run `:Lazy check` yourself, not even headless `Lazy! check`.
 - A non-zero script exit means the changelog review is incomplete; fix or
   report the error before judging any changelog as reviewed.
@@ -92,3 +105,6 @@ config changes.
 - `scripts/lazy-update-review.sh` — the entry point.
 - `scripts/dump-plugin-state.lua` — runs inside nvim (needs lazy loaded), invoked by
   the script above.
+- `surfaces/INDEX.md` — package-to-config-surface routing.
+- `surfaces/<name>/` — co-located review, apply, and reference files needed by one
+  specialized integration.

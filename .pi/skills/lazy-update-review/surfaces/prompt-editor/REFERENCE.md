@@ -1,6 +1,6 @@
-# pi-vim compatibility patterns
+# Prompt-editor compatibility patterns
 
-Load only the headings implicated by the upstream diff.
+Load each heading only when its owning surface appears in an upstream diff.
 
 ## Pi-managed module resolution
 
@@ -164,8 +164,9 @@ pi-vim's Ex state machine.
 
 ## Structural access to private runtime state
 
-Use one structural type for private fields required by the integration, with an
-`unknown` hop at each access:
+Use small structural types grouped by runtime surface, extending the common shape
+when a specialized private surface needs more fields. Keep an `unknown` hop at each
+access:
 
 ```ts
 type ModalEditorRuntime = {
@@ -216,12 +217,21 @@ if (
 }
 ```
 
-Also compare the private visual-line runtime used by the handler against
-`~/.local/share/nvim/lazy/pi/packages/tui/src/components/editor.ts`:
-`buildVisualLineMap`, `findCurrentVisualLine`, `moveToVisualLine`, `segment`, cursor
-state, and sticky-column state. These are required as one compatibility surface;
-fail loudly when any prerequisite is unavailable rather than consuming a remap with
-partial semantics. Move `j`/`k` through `moveToVisualLine`; Pi's raw Up/Down handling
+Compare the handler with the target revision's
+`packages/tui/src/components/editor.ts` in the librarian cache, never the normally
+outdated lazy worktree:
+
+```bash
+git -C "$PI_CHK" show \
+  "$PI_LAZY_TARGET_REV:packages/tui/src/components/editor.ts"
+git -C "$PI_CHK" show \
+  "$PI_TARGET_REV:packages/tui/src/components/editor.ts"
+```
+
+Inspect each applicable target for `buildVisualLineMap`, `findCurrentVisualLine`,
+`moveToVisualLine`, `segment`, cursor state, and sticky-column state. These are
+required as one compatibility surface; fail loudly when any prerequisite is
+unavailable rather than consuming a remap with partial semantics. Move `j`/`k` through `moveToVisualLine`; Pi's raw Up/Down handling
 navigates prompt history at display boundaries instead of acting like Vim's
 `gj`/`gk` no-op. Clear `preferredVisualCol` after horizontal `H`/`L` movement so
 the next vertical motion derives a display-line-relative column.
