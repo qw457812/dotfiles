@@ -246,6 +246,29 @@ exercise replacement characters (`rj`, `rk`, `rH`, `rL`), movement while an
 asynchronous Ex dispatch is pending, failure when `segment` is unavailable, plus any
 pending state changed by the target release.
 
+### Visual paste
+
+pi-vim 0.14.1 swallows visual `p`/`P`, so `prompt-editor` composes its private visual
+operator and put helpers. Revalidate `getPasteRegisterText`, visual ranges,
+`applyVisualOperator`, `putBefore`/`putAfter`, unnamed-register preference,
+clipboard-mirror policy, and undo-window closure together.
+
+Resolve the put payload before deleting the selection. Visual `p` leaves deleted
+text in the unnamed register; visual `P` preserves the original register and must
+not mirror the deletion. Preserve the raw pending count across the deletion so the
+put receives it. Restore the absolute selection start after a characterwise
+end-of-line deletion. A final linewise selection starting below line zero needs
+`putAfter`; other replacements use `putBefore`.
+
+Do not intercept `p`/`P` while an operator, `g`, character motion, replacement, or
+text object is pending; pi-vim must finish that sequence. Counts are not such a
+guard because they belong to the visual put.
+
+Verification must cover characterwise and linewise `p`/`P`, counted puts, `fp`/`tp`
+and pending-`g` sequences, selections ending at the buffer end, one-step undo, the
+post-`p` deleted register, and the post-`P` preserved register. Fail loudly if any
+required private runtime member is unavailable.
+
 ## Replacement-editor session parity
 
 `PromptEditor` replaces the instance configured by pi-vim's `session_start`, so it
