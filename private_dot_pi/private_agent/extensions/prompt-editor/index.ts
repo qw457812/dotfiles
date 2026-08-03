@@ -361,10 +361,14 @@ export default async function (pi: ExtensionAPI) {
     editor.setClipboardFn?.(writeTermuxClipboard);
   }
 
-  const VIM_REMAPS: Record<string, string> = {
+  const VIM_NORMAL_REMAPS: Record<string, string> = {
     H: "0",
     L: "$",
     U: "\x12", // Ctrl+r
+  };
+  const VIM_VISUAL_REMAPS: Record<string, string> = {
+    H: "0",
+    L: "$",
   };
 
   type CursorTUI = {
@@ -484,7 +488,8 @@ export default async function (pi: ExtensionAPI) {
         super.handleInput(data);
         return;
       }
-      if (this.getMode() === "normal") {
+      const mode = this.getMode();
+      if (mode === "normal") {
         // pi-vim's cutCurrentLineContent (used by `cc`) relies on CTRL_A +
         // CTRL_K which doesn't work when autocomplete is active. Dismiss it
         // before executing a pending operator so `cc` clears correctly.
@@ -511,8 +516,8 @@ export default async function (pi: ExtensionAPI) {
           return;
         }
         // Single-key remaps (H -> 0, L -> $, U -> Ctrl+r)
-        if (data in VIM_REMAPS) {
-          super.handleInput(VIM_REMAPS[data]!);
+        if (data in VIM_NORMAL_REMAPS) {
+          super.handleInput(VIM_NORMAL_REMAPS[data]!);
           return;
         }
         // Y -> y$
@@ -528,6 +533,10 @@ export default async function (pi: ExtensionAPI) {
           super.handleInput("s"); // cut char + insert
           return;
         }
+      }
+      if ((mode === "visual" || mode === "visual-line") && data in VIM_VISUAL_REMAPS) {
+        super.handleInput(VIM_VISUAL_REMAPS[data]!);
+        return;
       }
       super.handleInput(data);
     }
