@@ -8,4 +8,5 @@
 - <https://github.com/cline/cline>
 - <https://github.com/XiaomiMiMo/MiMo-Code>
 - <https://github.com/1jehuang/jcode>
+- <https://github.com/huggingface/tau>
 - <https://github.com/withastro/flue>

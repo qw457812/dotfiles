@@ -47,8 +47,6 @@ set fish_emoji_width 2
 alias ssh "TERM=xterm-256color command ssh"
 alias mosh "TERM=xterm-256color command mosh"
 
-# test -f "$HOME/.openclaw/completions/openclaw.fish" && source "$HOME/.openclaw/completions/openclaw.fish"
-
 set -g __proxy_ip "127.0.0.1"
 set -g __http_proxy_port 10808
 set -g __socks_proxy_port $__http_proxy_port
@@ -73,8 +71,6 @@ abbr paths 'echo $PATH | tr " " "\n" | nl'
 abbr dl "cd ~/Downloads"
 
 # Editor & Pager
-# abbr vim nvim
-# abbr vi nvim
 abbr v nvim
 abbr v! "nvim -u NONE"
 # abbr minimax "NVIM_APPNAME=nvim-minimax nvim"
