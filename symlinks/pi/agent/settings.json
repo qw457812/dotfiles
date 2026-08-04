@@ -128,7 +128,12 @@
       "prompts": [],
       "themes": []
     },
-    "npm:pi-mcp-adapter",
+    {
+      "source": "npm:pi-mcp-adapter",
+      "skills": [
+        "-skills/mcp-scripting/SKILL.md"
+      ]
+    },
     "npm:@aliou/pi-guardrails",
     "git:github.com/monotykamary/pi-neuralwatt-provider",
     "git:github.com/monotykamary/pi-invisible-continue",

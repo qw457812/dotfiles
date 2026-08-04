@@ -111,7 +111,7 @@
   "pi-guardrails": { "branch": "main", "commit": "8492cb7d958e25318bcff982fb9a8370787113b9" },
   "pi-invisible-continue": { "branch": "main", "commit": "c4c8755560169bdd9c5c1cac4d89ffcc4743df22" },
   "pi-listen": { "branch": "main", "commit": "c3cd4fbf5dd4ef6e7ea0e16a0a9b9398dca74a5c" },
-  "pi-mcp-adapter": { "branch": "main", "commit": "b16d02d3ff34a88f71eeba1750f319f28bd6b34f" },
+  "pi-mcp-adapter": { "branch": "main", "commit": "cde58793327b15d65f86e59ec9025d649cb8c300" },
   "pi-neuralwatt-provider": { "branch": "main", "commit": "94222e4996d2cd2dfde250a35e2b8e338f88df11" },
   "pi-retry": { "branch": "main", "commit": "222a2a6eb408396f051f8836ba1d8c4a6a026880" },
   "pi-review": { "branch": "main", "commit": "f1de050504936046c0f85b21fec0e0a93ef394eb" },
