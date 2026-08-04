@@ -163,6 +163,7 @@ local function zen(snacks)
   }
 end
 
+---@type LazySpec
 return {
   {
     "gpakosz/.tmux",
@@ -237,6 +238,18 @@ return {
     pager = true,
     cond = is_wezterm or is_kitty or is_ghostty,
     -- build = "./kitty/install-kittens.bash", -- ~/.config/kitty/neighboring_window.py has been modified to adapt to tmux in kitty
+    build = function(plugin)
+      if vim.fn.executable("herdr") == 1 then
+        -- https://github.com/mrjones2014/smart-splits.nvim/blob/9836ec9bef9801937e5e7100af801f37b77eacab/README.md?plain=1#L618-L620
+        local res = vim.system({ "herdr", "plugin", "link", plugin.dir }, { stdout = false }):wait()
+        if res.code ~= 0 then
+          require("lazyvim.util").warn(
+            ("Failed to run `herdr plugin link %s`:\n%s"):format(plugin.dir, res.stderr),
+            { title = "smart-splits.nvim" }
+          )
+        end
+      end
+    end,
     lazy = false, -- required
     -- stylua: ignore
     keys = {
@@ -273,8 +286,8 @@ return {
             ctx.wrap()
           elseif at_edge == AtEdgeBehavior.split then
             if
-              vim.tbl_contains(config.ignored_buftypes, vim.bo.buftype)
-              or vim.tbl_contains(config.ignored_filetypes, vim.bo.filetype)
+              vim.list_contains(config.ignored_buftypes, vim.bo.buftype)
+              or vim.list_contains(config.ignored_filetypes, vim.bo.filetype)
             then
               return -- just stop
             end
@@ -284,8 +297,14 @@ return {
           end
         end
 
-        if not ((is_wezterm or is_kitty) and ctx.mux and ctx.mux.type == Multiplexer.tmux) then
-          -- "wezterm/kitty without tmux" or "tmux not in wezterm/kitty" or "not in any mux", original at_edge behavior
+        if
+          not (
+            (is_wezterm or is_kitty)
+            and ctx.mux
+            and vim.list_contains({ Multiplexer.tmux, Multiplexer.herdr }, ctx.mux.type)
+          )
+        then
+          -- "wezterm/kitty without tmux/herdr" or "tmux/herdr not in wezterm/kitty" or "not in any mux", original at_edge behavior
           wrap_or_split_or_stop()
           return
         end

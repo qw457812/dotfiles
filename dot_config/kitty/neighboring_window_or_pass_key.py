@@ -23,11 +23,15 @@ def encode_key_mapping(window, key_mapping):
 
 
 def is_nvim(cmd):
-    return re.search("n?vim", cmd, re.I) is not None
+    return re.search("n?vim", cmd, re.IGNORECASE) is not None
 
 
 def is_tmux(cmd):
     return cmd == "tmux"
+
+
+def is_herdr(cmd):
+    return cmd == "herdr"
 
 
 def is_yazi(cmd):
@@ -72,9 +76,14 @@ def handle_result(
     # yazi: for cmp like `cd --interactive`
     if (
         not w.screen.is_main_linebuf()
-        and (is_nvim(cmd) or is_tmux(cmd) or (is_ctrl_jk and is_yazi(cmd)))
+        and (
+            is_nvim(cmd)
+            or is_tmux(cmd)
+            or is_herdr(cmd)
+            or (is_ctrl_jk and is_yazi(cmd))
+        )
     ) or (is_ctrl_jk and is_fzf(w)):
-        # pass the keys through to nvim/tmux/fzf/yazi
+        # pass the keys through to nvim/tmux/herdr/fzf/yazi
         w.write_to_child(encode_key_mapping(w, key))
     else:
         # # kitten @ focus-window --match=neighbor:bottom

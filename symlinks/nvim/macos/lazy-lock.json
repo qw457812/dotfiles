@@ -125,7 +125,7 @@
   "render-markdown.nvim": { "branch": "main", "commit": "f422cb5c6855f150e2ddcfaf44e7157b98b34f6a" },
   "rustaceanvim": { "branch": "master", "commit": "b25d186481624964523fee34f44c529b101c7435" },
   "sidekick.nvim": { "branch": "main", "commit": "208e1c5b8170c01fd1d07df0139322a76479b235" },
-  "smart-splits.nvim": { "branch": "master", "commit": "89ab35b282783efc1c49deadd72c22afd5eac356" },
+  "smart-splits.nvim": { "branch": "master", "commit": "8c16dc71bf75221793f3f6d83061fee031790c3c" },
   "smart-translate.nvim": { "branch": "main", "commit": "a56f6a284aa48885ebd7c34e5bde2b4ecc3eadea" },
   "snacks.nvim": { "branch": "main", "commit": "882c996cf28183f4d63640de0b4c02ec886d01f2" },
   "spring-boot.nvim": { "branch": "main", "commit": "98c6ff1dcdda943d341bba3c00ae9d190a2e5f7d" },

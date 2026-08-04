@@ -1,0 +1,26 @@
+onboarding = false
+
+# https://github.com/mrjones2014/smart-splits.nvim/blob/9836ec9bef9801937e5e7100af801f37b77eacab/README.md?plain=1#L622-L646
+[[keys.command]]
+key = "ctrl+h"
+type = "plugin_action"
+command = "smart-splits.nvim.left"
+description = "navigate left (vim/herdr)"
+
+[[keys.command]]
+key = "ctrl+j"
+type = "plugin_action"
+command = "smart-splits.nvim.down"
+description = "navigate down (vim/herdr)"
+
+[[keys.command]]
+key = "ctrl+k"
+type = "plugin_action"
+command = "smart-splits.nvim.up"
+description = "navigate up (vim/herdr)"
+
+[[keys.command]]
+key = "ctrl+l"
+type = "plugin_action"
+command = "smart-splits.nvim.right"
+description = "navigate right (vim/herdr)"
