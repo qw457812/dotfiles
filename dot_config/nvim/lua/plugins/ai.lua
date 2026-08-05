@@ -740,6 +740,18 @@ return {
           gemini = { cmd = { "hack_to_disable_gemini" } }, -- HACK: disable gemini
           -- debug = { cmd = { "bash", "-c", "env | sort | bat -l env" } },
         },
+        ---@type table<string, sidekick.context.Fn>
+        context = {
+          -- send absolute paths, mirroring the pi `@file` autocomplete extension
+          -- https://github.com/qw457812/dotfiles/blob/bc4c517152505c3b53a072942f7ad76fe4df2d29/private_dot_pi/private_agent/extensions/absolute-at-paths.ts
+          file = function(ctx)
+            local Loc = require("sidekick.cli.context.location")
+            if not Loc.is_file(ctx.buf) then
+              return
+            end
+            return "@" .. vim.api.nvim_buf_get_name(ctx.buf)
+          end,
+        },
         ---@type table<string, sidekick.Prompt|string|fun(ctx:sidekick.context.ctx):(string?)>
         prompts = {
           refactor = "Please refactor {this} to be more maintainable",
