@@ -18,7 +18,16 @@
     "deepseek/deepseek-v4-pro",
     "deepseek/deepseek-v4-flash",
     "xiaomi/mimo-v2.5-pro",
-    "codebuddy/kimi-k3-2"
+    "codebuddy/glm-5.2"
+  ],
+  "extensions": [
+    "-extensions/copilot-ratelimit.ts",
+    "-extensions/git-checkpoint.ts",
+    "-extensions/loop.ts",
+    "-extensions/ppt-master-venv.ts"
+  ],
+  "skills": [
+    "-skills/training-deck/SKILL.md"
   ],
   "packages": [
     "npm:pi-vim",
@@ -45,10 +54,9 @@
       "extensions": [],
       "skills": [
         "skills/engineering/resolving-merge-conflicts",
-        "skills/in-progress/batch-grill-me",
         "skills/productivity/grilling",
         "skills/productivity/teach",
-        "skills/productivity/writing-great-skills"
+        "skills/productivity/writing-for-agents"
       ],
       "prompts": [],
       "themes": []
@@ -123,7 +131,7 @@
       "source": "git:github.com/hugohe3/ppt-master",
       "extensions": [],
       "skills": [
-        "skills/ppt-master"
+        "-skills/ppt-master/SKILL.md"
       ],
       "prompts": [],
       "themes": []

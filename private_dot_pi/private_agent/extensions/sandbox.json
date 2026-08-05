@@ -44,6 +44,8 @@
         "gitlab.com",
         // Gitee
         "gitee.com",
+        // Codeberg
+        "codeberg.org",
         // LLM APIs
         "*.googleapis.com",
         "*.google.com",
@@ -116,6 +118,8 @@
         "https://gitlab.com",
         // Gitee
         "https://gitee.com",
+        // Codeberg
+        "https://codeberg.org",
         // LLM APIs
         "https://generativelanguage.googleapis.com",
         "https://oauth2.googleapis.com",

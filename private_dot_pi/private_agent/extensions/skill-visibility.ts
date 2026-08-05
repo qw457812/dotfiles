@@ -57,7 +57,6 @@ const PROMPT_HIDDEN_SKILLS = [
 const PROMPT_REVEALED_SKILLS: string[] = [
   // // git:github.com/mattpocock/skills
   // "teach",
-  // "writing-great-skills",
 ];
 
 const COMMAND = "skill-visibility";

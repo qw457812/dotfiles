@@ -1,12 +1,7 @@
 /**
- * model-shortcuts.ts — quick model switch commands
+ * model-shortcuts.ts - quick model switch commands
  *
- *   /sol      [level] — switch to openai-codex/gpt-5.6-sol
- *   /terra    [level] — switch to openai-codex/gpt-5.6-terra
- *   /luna     [level] — switch to openai-codex/gpt-5.6-luna
- *   /glm      [level] — switch to zai/glm-5.2
- *   /kimi     [level] — switch to neuralwatt/kimi-k3
- *   /deepseek [level] — switch to deepseek/deepseek-v4-flash
+ *   /<alias> [level]  e.g. /sol high
  *
  * The optional level must be one of the model's supported thinking levels.
  * Without an argument, the current thinking level carries over (thinking.ts
@@ -40,6 +35,7 @@ const ALIASES: Record<string, ModelTarget> = {
   glm: { provider: "zai", id: "glm-5.2" },
   kimi: { provider: "neuralwatt", id: "kimi-k3" },
   deepseek: { provider: "deepseek", id: "deepseek-v4-flash" },
+  codebuddy: { provider: "codebuddy", id: "glm-5.2" },
 };
 
 async function switchModel(
