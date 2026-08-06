@@ -45,11 +45,20 @@ export default function (pi: ExtensionAPI) {
           signal: ctx.signal,
         });
 
-        // File not managed by chezmoi (or run aborted)
         if (targetPathResult.killed || targetPathResult.code !== 0) return;
 
         const targetPath = targetPathResult.stdout.trim();
         if (!targetPath) return;
+
+        const managedResult = await pi.exec("chezmoi", ["managed", targetPath], {
+          cwd: ctx.cwd,
+          signal: ctx.signal,
+        });
+
+        // File not managed by chezmoi (or run aborted)
+        if (managedResult.killed || managedResult.code !== 0 || !managedResult.stdout.trim()) {
+          return;
+        }
 
         const applyResult = await pi.exec("chezmoi", ["apply", "--no-tty", targetPath], {
           cwd: ctx.cwd,
