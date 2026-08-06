@@ -1,5 +1,0 @@
-{
-  "justBash": {
-    "hostCommands": ["git", "gh", "node", "npm", "npx"]
-  }
-}
