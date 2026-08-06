@@ -9,11 +9,13 @@ gui:
   showDivergenceFromBaseBranch: arrowAndNumber
   statusPanelView: allBranchesLog
 git:
-  pagers:
-    - pager: delta --dark --paging=never
-    - pager: delta --dark --paging=never --line-numbers
-    - pager: delta --dark --paging=never --side-by-side
-    - pager: diff-so-fancy
+  diffRenderers:
+    - command: delta --dark --paging=never
+    - command: delta --dark --paging=never --line-numbers
+      name: delta-line-numbers
+    # - command: delta --dark --paging=never --side-by-side
+    #   name: delta-side-by-side
+    # - command: diff-so-fancy
 # exit Lazygit when the user presses escape in a context where there is nothing to cancel/close
 quitOnTopLevelReturn: true
 notARepository: skip
