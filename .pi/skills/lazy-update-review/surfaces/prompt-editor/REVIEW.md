@@ -47,7 +47,7 @@ read -r PI_TARGET_PACKAGE PI_TARGET_VERSION < <(
 )
 PI_OLD_REV=$(npm view "@earendil-works/pi-coding-agent@$PI_OLD_VERSION" gitHead)
 PI_TARGET_REV=$(npm view "$PI_TARGET_PACKAGE@$PI_TARGET_VERSION" gitHead)
-PI_CHK=$(bash ~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/librarian/checkout.sh \
+PI_CHK=$(bash ~/.pi/agent/skills/librarian/checkout.sh \
   github.com/earendil-works/pi --force-update --path-only)
 git -C "$PI_CHK" cat-file -e "$PI_LAZY_OLD_REV^{commit}"
 git -C "$PI_CHK" cat-file -e "$PI_LAZY_TARGET_REV^{commit}"
@@ -72,7 +72,7 @@ VIM_OLD_VERSION=$(node -p 'require(process.env.HOME + "/.pi/agent/npm/node_modul
 VIM_TARGET_VERSION=$(npm view pi-vim version)
 VIM_OLD_REV=$(npm view "pi-vim@$VIM_OLD_VERSION" gitHead)
 VIM_TARGET_REV=$(npm view "pi-vim@$VIM_TARGET_VERSION" gitHead)
-VIM_CHK=$(bash ~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/librarian/checkout.sh \
+VIM_CHK=$(bash ~/.pi/agent/skills/librarian/checkout.sh \
   github.com/lajarre/pi-vim --force-update --path-only)
 git -C "$VIM_CHK" cat-file -e "$VIM_LAZY_OLD_REV^{commit}"
 git -C "$VIM_CHK" cat-file -e "$VIM_LAZY_TARGET_REV^{commit}"
