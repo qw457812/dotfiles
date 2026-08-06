@@ -430,6 +430,16 @@ export default async function (pi: ExtensionAPI) {
 
   type PromptHistory = Parameters<typeof hydratePromptHistory>[1];
 
+  function getPrototypeMethod<T>(target: object, key: PropertyKey): T | undefined {
+    let prototype = Object.getPrototypeOf(target) as object | null;
+    while (prototype) {
+      const value = Object.getOwnPropertyDescriptor(prototype, key)?.value;
+      if (typeof value === "function") return value as T;
+      prototype = Object.getPrototypeOf(prototype) as object | null;
+    }
+    return undefined;
+  }
+
   let blurred = false;
   let activeTui: CursorTUI | undefined;
   let activeEditor: ModalEditorRuntime | undefined;
@@ -441,12 +451,10 @@ export default async function (pi: ExtensionAPI) {
   // blur, restoring on focus) and skip all cursor-shape sequences.
   let userPrefersShowHardwareCursor = true;
 
-  // Saved before we wrap setShowHardwareCursor / requestRender so our
-  // internal blur/focus logic can toggle the effective visibility without
-  // accidentally updating userPrefersShowHardwareCursor, and so session_shutdown
-  // can restore the originals.
+  // Raw renderer implementation used by blur/focus handling. Pi 0.84 passes
+  // a stable Proxy whose method trampolines cannot safely be saved and later
+  // called after the corresponding renderer method is replaced.
   let originalSetShowHardwareCursor: CursorTUI["setShowHardwareCursor"] | undefined;
-  let originalRequestRender: CursorTUI["requestRender"] | undefined;
   let originalSetEditorComponent: EditorUI["setEditorComponent"] | undefined;
   let reinstallTimer: NodeJS.Timeout | undefined;
   let sessionGeneration = 0;
@@ -775,6 +783,17 @@ export default async function (pi: ExtensionAPI) {
     }
 
     override render(width: number): string[] {
+      // A live /settings change updates the active renderer before requesting
+      // this render. Read the preference here instead of wrapping the renderer
+      // method: Pi 0.84 can replace that renderer when TUI mode changes.
+      if (!blurred && activeTui) {
+        const enabled = activeTui.getShowHardwareCursor?.();
+        if (typeof enabled === "boolean" && enabled !== userPrefersShowHardwareCursor) {
+          userPrefersShowHardwareCursor = enabled;
+          writeCursorStyle(activeTui, this.getMode());
+        }
+      }
+
       if (width <= PREFIX_WIDTH) {
         const lines = super.render(width);
         const bottomIdx = findBottomBorderIndex(lines);
@@ -934,7 +953,12 @@ export default async function (pi: ExtensionAPI) {
     }
     const modeChangeHandler = createModeChangeHandler(
       piVimSettings.modeChange,
-      (event: { mode: Mode; previousMode: Mode }) => pi.events.emit("pi-vim:mode-change", event),
+      (event: { mode: Mode; previousMode: Mode }) => {
+        pi.events.emit("pi-vim:mode-change", event);
+        if (activeTui && userPrefersShowHardwareCursor && !blurred) {
+          activeTui.terminal.write(getCursorStyle(event.mode));
+        }
+      },
     );
 
     // Related upstream logic:
@@ -1008,32 +1032,15 @@ export default async function (pi: ExtensionAPI) {
         // constructor, so this reflects the /setting value.
         userPrefersShowHardwareCursor = tui.getShowHardwareCursor?.() ?? true;
 
-        // Capture the original setter once (unbound so .call(tui, …)
-        // supplies the correct this). Guard against re-capture: if
-        // session_shutdown didn't fire, the TUI still holds the
-        // previous wrapper — skip to avoid nesting.
+        // Pi 0.84 passes a stable Proxy that forwards methods to the active
+        // renderer. Capture the renderer's prototype implementation rather
+        // than the Proxy trampoline so blur/focus can call it without recursion.
         if (!originalSetShowHardwareCursor) {
-          originalSetShowHardwareCursor = tui.setShowHardwareCursor;
+          originalSetShowHardwareCursor = getPrototypeMethod<CursorTUI["setShowHardwareCursor"]>(
+            tui,
+            "setShowHardwareCursor",
+          );
         }
-
-        // Wrap setShowHardwareCursor to catch live /setting changes.
-        // interactive-mode calls this when the user toggles
-        // "Show hardware cursor".
-        tui.setShowHardwareCursor = (enabled: boolean) => {
-          const changed = enabled !== userPrefersShowHardwareCursor;
-          userPrefersShowHardwareCursor = enabled;
-          applyHardwareCursorVisibility(tui);
-          // When switching away from hardware cursor, reset the
-          // terminal cursor shape so it doesn't linger.
-          if (!enabled) {
-            tui.terminal.write(CURSOR_STYLE_RESET);
-          } else if (!blurred) {
-            writeCursorStyle(tui, newEditor.getMode());
-          }
-          if (changed) {
-            tui.requestRender();
-          }
-        };
 
         // Apply initial effective visibility outside render() so
         // setShowHardwareCursor() cannot re-enter the render path.
@@ -1044,28 +1051,6 @@ export default async function (pi: ExtensionAPI) {
         if (userPrefersShowHardwareCursor) {
           writeCursorStyle(activeTui, newEditor.getMode());
         }
-
-        // Track mode changes to update cursor style. We hook into
-        // requestRender (called by pi-vim after every handleInput that
-        // mutates state) and write the appropriate shape sequence directly
-        // to the terminal.
-        // Guard against re-capture (same rationale as
-        // originalSetShowHardwareCursor above).
-        if (!originalRequestRender) {
-          originalRequestRender = tui.requestRender;
-        }
-        const origRequestRender = originalRequestRender!;
-        let lastShapeMode: Mode | undefined = newEditor.getMode();
-        tui.requestRender = (force?: boolean) => {
-          origRequestRender.call(tui, force);
-          const curMode = newEditor.getMode();
-          if (curMode !== lastShapeMode) {
-            lastShapeMode = curMode;
-            if (userPrefersShowHardwareCursor && !blurred) {
-              tui.terminal.write(getCursorStyle(curMode));
-            }
-          }
-        };
 
         hydratePromptHistory(editor, history);
         return newEditor;
@@ -1122,17 +1107,6 @@ export default async function (pi: ExtensionAPI) {
       reinstallTimer = undefined;
     }
 
-    // Restore TUI methods that were wrapped in setEditorComponent so
-    // subsequent calls from interactive-mode (applyRuntimeSettings,
-    // resetExtensionUI) hit the originals instead of our stale closures.
-    if (activeTui) {
-      if (originalSetShowHardwareCursor) {
-        activeTui.setShowHardwareCursor = originalSetShowHardwareCursor;
-      }
-      if (originalRequestRender) {
-        activeTui.requestRender = originalRequestRender;
-      }
-    }
     if (activeUi && originalSetEditorComponent) {
       activeUi.setEditorComponent = originalSetEditorComponent;
     }
@@ -1144,7 +1118,6 @@ export default async function (pi: ExtensionAPI) {
     activeUi = undefined;
     userPrefersShowHardwareCursor = true;
     originalSetShowHardwareCursor = undefined;
-    originalRequestRender = undefined;
     originalSetEditorComponent = undefined;
     // Restore default terminal cursor style on exit
     process.stdout.write(CURSOR_STYLE_RESET);

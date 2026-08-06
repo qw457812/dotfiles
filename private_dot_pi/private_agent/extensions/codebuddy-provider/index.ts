@@ -111,7 +111,6 @@ function isCodebuddyModel(model: Model<Api>): model is CodebuddyModel {
 
 function createCodebuddyProvider(): Provider<"openai-completions"> {
   let models: readonly CodebuddyModel[] = MODELS;
-  let inflightRefresh: Promise<void> | undefined;
 
   return {
     id: PROVIDER,
@@ -119,35 +118,38 @@ function createCodebuddyProvider(): Provider<"openai-completions"> {
     baseUrl: CHAT_BASE_URL,
     auth: { apiKey: apiKeyAuth, oauth: oauthAuth },
     getModels: () => models,
-    refreshModels(context) {
-      inflightRefresh ??= (async () => {
-        try {
-          const stored = await context.store.read();
-          const cachedModels = stored?.models.filter(isCodebuddyModel);
-          if (cachedModels?.length) models = cachedModels;
+    async refreshModels(context) {
+      const cachedModels = context.stored?.models.filter(isCodebuddyModel);
+      if (
+        cachedModels?.length &&
+        !(await context.publish({ update: () => (models = cachedModels) }))
+      ) {
+        return;
+      }
 
-          if (!context.allowNetwork || context.signal?.aborted || !context.credential) return;
+      if (!context.allowNetwork || context.signal.aborted || !context.credential) return;
 
-          const auth =
-            context.credential.type === "oauth"
-              ? codebuddyCredentialsToAuth(context.credential as CodebuddyOAuthCredentials)
-              : { apiKey: context.credential.key };
-          if (!auth.apiKey) return;
+      const auth =
+        context.credential.type === "oauth"
+          ? codebuddyCredentialsToAuth(context.credential as CodebuddyOAuthCredentials)
+          : { apiKey: context.credential.key };
+      if (!auth.apiKey) return;
 
-          const liveModels = await fetchLiveModels({
-            accessToken: auth.apiKey,
-            modelHeaders: auth.headers,
-            signal: context.signal,
-          });
-          if (context.signal?.aborted) return;
+      const liveModels = await fetchLiveModels({
+        accessToken: auth.apiKey,
+        modelHeaders: auth.headers,
+        signal: context.signal,
+      });
+      if (context.signal.aborted) return;
 
-          models = liveModels;
-          await context.store.write({ models: liveModels, checkedAt: Date.now() });
-        } finally {
-          inflightRefresh = undefined;
-        }
-      })();
-      return inflightRefresh;
+      if (
+        !(await context.publish({
+          persist: { models: liveModels, checkedAt: Date.now() },
+          update: () => (models = liveModels),
+        }))
+      ) {
+        return;
+      }
     },
     stream(model, context: Context, options?: StreamOptions) {
       const request = prepareRequest(model, options);

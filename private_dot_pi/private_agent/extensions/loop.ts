@@ -9,6 +9,7 @@
  */
 
 import { Type } from "typebox";
+import type { ProviderHeaders } from "@earendil-works/pi-ai";
 import { complete, type Api, type Model, type UserMessage } from "@earendil-works/pi-ai/compat";
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { compact } from "@earendil-works/pi-coding-agent";
@@ -16,6 +17,14 @@ import { Container, type SelectItem, SelectList, Text } from "@earendil-works/pi
 import { DynamicBorder } from "@earendil-works/pi-coding-agent";
 
 type LoopMode = "tests" | "custom" | "self";
+
+function withoutNullHeaders(
+	headers?: Readonly<Record<string, string | null>>,
+): Record<string, string> | undefined {
+	if (!headers) return undefined;
+	const entries = Object.entries(headers).filter((entry): entry is [string, string] => entry[1] !== null);
+	return entries.length > 0 ? Object.fromEntries(entries) : undefined;
+}
 
 type LoopStateData = {
 	active: boolean;
@@ -94,7 +103,7 @@ function getConditionText(mode: LoopMode, condition?: string): string {
 
 async function selectSummaryModel(
 	ctx: ExtensionContext,
-): Promise<{ model: Model<Api>; apiKey?: string; headers?: Record<string, string> } | null> {
+): Promise<{ model: Model<Api>; apiKey?: string; headers?: ProviderHeaders } | null> {
 	if (!ctx.model) return null;
 
 	for (const { provider, modelId } of SUMMARY_FALLBACK_MODELS) {
@@ -442,7 +451,7 @@ export default function loopExtension(pi: ExtensionAPI): void {
 				event.preparation,
 				ctx.model,
 				auth.apiKey ?? "",
-				auth.headers,
+				withoutNullHeaders(auth.headers),
 				instructionParts,
 				event.signal,
 			);
