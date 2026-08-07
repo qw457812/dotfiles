@@ -111,15 +111,6 @@
       "themes": []
     },
     {
-      "source": "npm:amp-themes",
-      "extensions": [
-        "extensions/amp-user-message.ts"
-      ],
-      "skills": [],
-      "prompts": [],
-      "themes": []
-    },
-    {
       "source": "git:github.com/diegopetrucci/pi-extensions",
       "extensions": [
         "extensions/openai-fast/index.ts"
