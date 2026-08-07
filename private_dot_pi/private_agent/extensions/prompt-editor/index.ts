@@ -430,16 +430,6 @@ export default async function (pi: ExtensionAPI) {
 
   type PromptHistory = Parameters<typeof hydratePromptHistory>[1];
 
-  function getPrototypeMethod<T>(target: object, key: PropertyKey): T | undefined {
-    let prototype = Object.getPrototypeOf(target) as object | null;
-    while (prototype) {
-      const value = Object.getOwnPropertyDescriptor(prototype, key)?.value;
-      if (typeof value === "function") return value as T;
-      prototype = Object.getPrototypeOf(prototype) as object | null;
-    }
-    return undefined;
-  }
-
   let blurred = false;
   let activeTui: CursorTUI | undefined;
   let activeEditor: ModalEditorRuntime | undefined;
@@ -451,9 +441,8 @@ export default async function (pi: ExtensionAPI) {
   // blur, restoring on focus) and skip all cursor-shape sequences.
   let userPrefersShowHardwareCursor = true;
 
-  // Raw renderer implementation used by blur/focus handling. Pi 0.84 passes
-  // a stable Proxy whose method trampolines cannot safely be saved and later
-  // called after the corresponding renderer method is replaced.
+  // Stable Proxy method used by blur/focus handling. Pi 0.84.1 preserves the
+  // captured method while routing it to a replacement renderer after a TUI-mode switch.
   let originalSetShowHardwareCursor: CursorTUI["setShowHardwareCursor"] | undefined;
   let originalSetEditorComponent: EditorUI["setEditorComponent"] | undefined;
   let reinstallTimer: NodeJS.Timeout | undefined;
@@ -486,7 +475,7 @@ export default async function (pi: ExtensionAPI) {
     if (!originalSetShowHardwareCursor) return;
     const effective = userPrefersShowHardwareCursor && !blurred;
     if (tui.getShowHardwareCursor?.() === effective) return;
-    originalSetShowHardwareCursor.call(tui, effective);
+    originalSetShowHardwareCursor(effective);
   }
 
   /** Write the DECSCUSR shape if hardware cursor is active; otherwise emit
@@ -1032,15 +1021,9 @@ export default async function (pi: ExtensionAPI) {
         // constructor, so this reflects the /setting value.
         userPrefersShowHardwareCursor = tui.getShowHardwareCursor?.() ?? true;
 
-        // Pi 0.84 passes a stable Proxy that forwards methods to the active
-        // renderer. Capture the renderer's prototype implementation rather
-        // than the Proxy trampoline so blur/focus can call it without recursion.
-        if (!originalSetShowHardwareCursor) {
-          originalSetShowHardwareCursor = getPrototypeMethod<CursorTUI["setShowHardwareCursor"]>(
-            tui,
-            "setShowHardwareCursor",
-          );
-        }
+        // Capture Pi's stable Proxy method. It keeps the current renderer method
+        // stable while forwarding to a replacement renderer after a TUI-mode switch.
+        originalSetShowHardwareCursor ??= tui.setShowHardwareCursor;
 
         // Apply initial effective visibility outside render() so
         // setShowHardwareCursor() cannot re-enter the render path.
