@@ -1,4 +1,25 @@
-import { UserMessageComponent, type ExtensionAPI, type Theme } from "@earendil-works/pi-coding-agent";
+/**
+ * Adds a thinking-level-colored `❯ ` prompt to Pi's built-in user-message box.
+ *
+ * Originally adapted from `npm:amp-themes@0.4.1`'s
+ * `extensions/amp-user-message.ts`. Unlike that extension's custom renderer,
+ * this patch delegates to Pi's original `UserMessageComponent.render()` so
+ * built-in backgrounds, Markdown transformers, output padding, and OSC 133
+ * semantic prompt zones remain intact.
+ *
+ * The first content line starts with `❯ ` and wrapped lines align with its
+ * message text. Sidekick navigation in `dot_config/nvim/lua/plugins/ai.lua`
+ * relies on that visible prefix.
+ *
+ * Pi does not currently expose a renderer hook for built-in user messages, so
+ * this extension patches the component prototype and keeps the patch idempotent.
+ */
+
+import {
+  UserMessageComponent,
+  type ExtensionAPI,
+  type Theme,
+} from "@earendil-works/pi-coding-agent";
 import { stripTerminalSequences } from "@earendil-works/pi-tui";
 
 const OSC133_ZONE_PREFIX = /^((?:\x1b\]133;[ABC](?:\x07|\x1b\\))+)/;
@@ -43,7 +64,10 @@ function decorateUserMessage(
   );
 }
 
-function patchUserMessageRender(getTheme: () => Theme | undefined, getThinkingLevel: () => ThinkingLevel): void {
+function patchUserMessageRender(
+  getTheme: () => Theme | undefined,
+  getThinkingLevel: () => ThinkingLevel,
+): void {
   const prototype = UserMessageComponent.prototype as unknown as PatchableUserMessagePrototype;
   prototype.__prefixedUserMessageGetTheme = getTheme;
   prototype.__prefixedUserMessageGetThinkingLevel = getThinkingLevel;
@@ -71,13 +95,19 @@ export default function (pi: ExtensionAPI) {
   let activeTheme: Theme | undefined;
   let activeThinkingLevel: ThinkingLevel = "off";
 
-  patchUserMessageRender(() => activeTheme, () => activeThinkingLevel);
+  patchUserMessageRender(
+    () => activeTheme,
+    () => activeThinkingLevel,
+  );
 
   pi.on("session_start", (_event, ctx) => {
     if (!ctx.hasUI) return;
     activeTheme = ctx.ui.theme;
     activeThinkingLevel = pi.getThinkingLevel();
-    patchUserMessageRender(() => activeTheme, () => activeThinkingLevel);
+    patchUserMessageRender(
+      () => activeTheme,
+      () => activeThinkingLevel,
+    );
   });
 
   pi.on("thinking_level_select", (event) => {

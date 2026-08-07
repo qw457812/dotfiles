@@ -500,7 +500,7 @@ return {
                     end
 
                     if vim.api.nvim_get_current_buf() == buf then
-                      -- https://github.com/qw457812/dotfiles/blob/4e28970c14da2e0f9aab8b18014ef5d7c309235d/private_dot_pi/private_agent/extensions/prompt-editor/index.ts
+                      -- https://github.com/qw457812/dotfiles/blob/c8e39a021ee14d17b1f3d3526f16ff4d227991b3/private_dot_pi/private_agent/extensions/prompt-editor/index.ts
                       local stopline = math.max(1, vim.fn.line(".") - 20)
                       local insert_pos = vim.fn.searchpos("^❯", "Wbn", stopline)
                       local normal_pos = vim.fn.searchpos("^❮", "Wbn", stopline)
@@ -510,7 +510,7 @@ return {
                       end
                     end
 
-                    -- private_dot_pi/private_agent/extensions/user-message.ts
+                    -- https://github.com/qw457812/dotfiles/blob/555d55f91f12eea199cee9ed5b3ff13f0b54a9e5/private_dot_pi/private_agent/extensions/user-message.ts
                     vim.keymap.set("n", "]]", function()
                       if vim.fn.search("^❯ ", "W") == 0 then
                         LazyVim.warn("No more user messages", { title = "Sidekick" })
