@@ -7,7 +7,10 @@
       "node",
       "npm",
       "npx",
-      "nvim" // in favor of `/skill:lazy-update-review`
+      "nvim", // in favor of `/skill:lazy-update-review`
+      "pi",
+      "rg", // built-in rg is a slow JS impl over the virtual FS
+      "fd"
     ]
   }
 }

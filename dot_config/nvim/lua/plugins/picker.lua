@@ -606,11 +606,10 @@ return {
               ".lazy.lua",
               ".env",
               ".env.*",
-              "AGENTS.md",
-              "CLAUDE.md",
+              "AGENTS.override.md",
               "CLAUDE.local.md",
-              ".mcp.json",
               "**/.claude/**",
+              "**/.pi/**",
             },
             -- ref: https://github.com/folke/snacks.nvim/blob/3d695ab7d062d40c980ca5fd9fe6e593c8f35b12/lua/snacks/picker/config/sources.lua#L200-L208
             format = "file",

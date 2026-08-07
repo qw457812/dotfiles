@@ -519,7 +519,7 @@ const sources: Record<string, Source> = {
       return joinParts([
         formatWindow(rateLimit.primary_window),
         formatWindow(rateLimit.secondary_window),
-        resetCount !== undefined
+        resetCount !== undefined && resetCount > 0
           ? [
               theme.fg("accent", `${resetCount}`),
               ...resetExpiresAt.map((expiresAt) => theme.fg("dim", formatRemaining(expiresAt))),

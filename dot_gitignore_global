@@ -11,6 +11,8 @@
 CLAUDE.local.md
 **/.claude/settings.local.json
 
+AGENTS.override.md
+
 .playwright-mcp
 
 **/.claude/.cc-writes/
