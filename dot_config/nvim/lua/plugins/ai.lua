@@ -501,44 +501,24 @@ return {
 
                     if vim.api.nvim_get_current_buf() == buf then
                       -- https://github.com/qw457812/dotfiles/blob/4e28970c14da2e0f9aab8b18014ef5d7c309235d/private_dot_pi/private_agent/extensions/prompt-editor/index.ts
-                      local stopline = vim.fn.line(".") - 20
-                      if vim.fn.search("^❯", "Wb", stopline) == 0 then
-                        vim.fn.search("^❮", "Wb", stopline)
+                      local stopline = math.max(1, vim.fn.line(".") - 20)
+                      local insert_pos = vim.fn.searchpos("^❯", "Wbn", stopline)
+                      local normal_pos = vim.fn.searchpos("^❮", "Wbn", stopline)
+                      local prompt_pos = insert_pos[1] > normal_pos[1] and insert_pos or normal_pos
+                      if prompt_pos[1] > 0 then
+                        vim.api.nvim_win_set_cursor(0, { prompt_pos[1], prompt_pos[2] - 1 })
                       end
                     end
 
-                    -- https://www.npmjs.com/package/amp-themes?activeTab=code (extensions/amp-user-message.ts)
-                    -- https://unpkg.com/amp-themes@0.4.0/extensions/amp-user-message.ts
+                    -- private_dot_pi/private_agent/extensions/user-message.ts
                     vim.keymap.set("n", "]]", function()
-                      local pos = vim.fn.getpos(".")
-                      -- Skip past the current user message block before searching for the next one
-                      if vim.fn.getline("."):find("^▌") then
-                        vim.fn.search("^[^▌]", "W")
-                      end
-                      if vim.fn.search("^▌", "W") == 0 then
-                        vim.fn.setpos(".", pos)
+                      if vim.fn.search("^❯ ", "W") == 0 then
                         LazyVim.warn("No more user messages", { title = "Sidekick" })
                       end
                     end, { buffer = buf, desc = "Jump to next user message (Sidekick)" })
                     vim.keymap.set("n", "[[", function()
-                      local pos = vim.fn.getpos(".")
-                      if vim.fn.getline("."):find("^▌") then
-                        -- If no gap above, we are already at the first user message block
-                        if vim.fn.search("^[^▌]", "Wb") == 0 then
-                          LazyVim.warn("No more user messages", { title = "Sidekick" })
-                          return
-                        end
-                      end
-                      if vim.fn.search("^▌", "Wb") == 0 then
-                        vim.fn.setpos(".", pos)
+                      if vim.fn.search("^❯ ", "Wb") == 0 then
                         LazyVim.warn("No more user messages", { title = "Sidekick" })
-                      else
-                        -- Jump to the first line of the user message block
-                        if vim.fn.search("^[^▌]", "Wb") == 0 then
-                          vim.fn.cursor(1, 1)
-                        else
-                          vim.fn.search("^▌", "W")
-                        end
                       end
                     end, { buffer = buf, desc = "Jump to previous user message (Sidekick)" })
                   end)
