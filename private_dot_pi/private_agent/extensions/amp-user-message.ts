@@ -1,10 +1,9 @@
-import {
-  getMarkdownTheme,
-  UserMessageComponent,
-  type ExtensionAPI,
-  type ThemeColor,
-} from "@earendil-works/pi-coding-agent";
-import { Markdown, truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
+import { UserMessageComponent, type ExtensionAPI, type ThemeColor } from "@earendil-works/pi-coding-agent";
+import { truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
+
+const OSC133_ZONE_START = "\x1b]133;A\x07";
+const OSC133_ZONE_END = "\x1b]133;B\x07";
+const OSC133_ZONE_FINAL = "\x1b]133;C\x07";
 
 type RenderFn = (width: number) => string[];
 type PatchableUserMessagePrototype = {
@@ -16,8 +15,8 @@ type PatchableUserMessagePrototype = {
   __ampUserMessageGetThinkingLevel?: () => string;
 };
 
-type MarkdownLike = {
-  text?: unknown;
+type MarkdownRenderer = {
+  render(width: number): string[];
 };
 
 type ThemeLike = {
@@ -32,6 +31,7 @@ function thinkingColorFor(level: string): ThemeColor {
     case "medium": return "thinkingMedium";
     case "high": return "thinkingHigh";
     case "xhigh": return "thinkingXhigh";
+    case "max": return "thinkingMax";
     default: return "thinkingOff";
   }
 }
@@ -40,17 +40,21 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function findMarkdownText(value: unknown): string | undefined {
-  if (isRecord(value) && typeof (value as MarkdownLike).text === "string") {
-    return (value as { text: string }).text;
-  }
-
+function findMarkdownRenderer(value: unknown): MarkdownRenderer | undefined {
   if (!isRecord(value)) return undefined;
+  if (
+    value.constructor?.name === "Markdown" &&
+    typeof value.render === "function" &&
+    typeof value.setText === "function" &&
+    typeof value.invalidate === "function"
+  ) {
+    return value as MarkdownRenderer;
+  }
 
   const children = Array.isArray(value.children) ? value.children : [];
   for (const child of children) {
-    const text = findMarkdownText(child);
-    if (text !== undefined) return text;
+    const renderer = findMarkdownRenderer(child);
+    if (renderer) return renderer;
   }
 
   return undefined;
@@ -71,12 +75,11 @@ function renderAmpUserMessage(
   theme: ThemeLike | undefined,
   color: ThemeColor,
 ): string[] | undefined {
-  const text = findMarkdownText(instance);
-  if (text === undefined) return undefined;
+  const renderer = findMarkdownRenderer(instance);
+  if (!renderer) return undefined;
 
   const prefixWidth = 3;
   const contentWidth = Math.max(1, width - prefixWidth);
-  const renderer = new Markdown(text, 0, 0, getMarkdownTheme());
   const lines = renderer.render(contentWidth);
   const body = lines.length > 0 ? lines : [""];
 
@@ -84,6 +87,15 @@ function renderAmpUserMessage(
     "",
     ...body.map((line) => styledUserLine(line, width, theme, color)),
   ];
+}
+
+function markSemanticPrompt(lines: string[]): string[] {
+  if (lines.length === 0) return lines;
+
+  const marked = [...lines];
+  marked[0] = OSC133_ZONE_START + marked[0];
+  marked[marked.length - 1] = OSC133_ZONE_END + OSC133_ZONE_FINAL + marked[marked.length - 1];
+  return marked;
 }
 
 function patchUserMessageRender(getTheme: () => ThemeLike | undefined, getThinkingLevel: () => string): void {
@@ -100,7 +112,7 @@ function patchUserMessageRender(getTheme: () => ThemeLike | undefined, getThinki
     const thinkingLevel = prototype.__ampUserMessageGetThinkingLevel?.() ?? "off";
     const color = thinkingColorFor(thinkingLevel);
     const ampLines = renderAmpUserMessage(this as PatchableUserMessagePrototype, width, theme, color);
-    return ampLines ?? original.call(this, width);
+    return ampLines ? markSemanticPrompt(ampLines) : original.call(this, width);
   };
   prototype.__ampUserMessagePatched = true;
 }
