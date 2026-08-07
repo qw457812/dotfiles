@@ -34,6 +34,7 @@ interface McpConfig {
   settings?: {
     directTools?: boolean | string[];
     disableProxyTool?: boolean;
+    agentPluginPaths?: unknown;
     [key: string]: unknown;
   };
 }
@@ -109,11 +110,15 @@ export default function (pi: ExtensionAPI) {
     const config = loadMergedConfig(ctx.cwd);
     const servers = config.mcpServers ?? {};
     const globalDirect = config.settings?.directTools;
+    const agentPluginPaths = config.settings?.agentPluginPaths;
+    const hasAgentPlugins = Array.isArray(agentPluginPaths) && agentPluginPaths.length > 0;
 
     shouldDisable =
       config.settings?.disableProxyTool === true &&
       // Imported host configs may contain servers that rely on the proxy.
       (config.imports?.length ?? 0) === 0 &&
+      // Agent Plugins add servers outside these config files
+      !hasAgentPlugins &&
       (Object.keys(servers).length === 0 ||
         !Object.values(servers).some((server) => serverNeedsProxy(server, globalDirect)));
 
