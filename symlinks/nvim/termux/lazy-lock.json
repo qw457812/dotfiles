@@ -104,7 +104,6 @@
   "pi-listen": { "branch": "main", "commit": "c3cd4fbf5dd4ef6e7ea0e16a0a9b9398dca74a5c" },
   "pi-mcp-adapter": { "branch": "main", "commit": "eaf379782fddf836828811d1b71ad85d27bc70dd" },
   "pi-neuralwatt-provider": { "branch": "main", "commit": "50069620f70088d615ea8c800787e346b713f4c4" },
-  "pi-retry": { "branch": "main", "commit": "222a2a6eb408396f051f8836ba1d8c4a6a026880" },
   "pi-review": { "branch": "main", "commit": "f1de050504936046c0f85b21fec0e0a93ef394eb" },
   "pi-vim": { "branch": "main", "commit": "2671cf114428bd2f04430cd0dfe86ea4f739586d" },
   "plenary.nvim": { "branch": "master", "commit": "74b06c6c75e4eeb3108ec01852001636d85a932b" },

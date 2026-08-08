@@ -132,12 +132,6 @@ return {
         lazy = true,
         config = function() end,
       },
-      {
-        "monotykamary/pi-retry",
-        build = "pi update --extension git:github.com/monotykamary/pi-retry",
-        lazy = true,
-        config = function() end,
-      },
       -- alternative: https://github.com/tunnckoCore/pi-gpt-fast-mode
       {
         "diegopetrucci/pi-extensions",

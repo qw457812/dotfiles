@@ -10,6 +10,13 @@
   "treeFilterMode": "no-tools",
   "showCacheMissNotices": true,
   "tuiMode": "regular",
+  "retry": {
+    "maxRetries": 8,
+    "baseDelayMs": 500,
+    "provider": {
+      "maxRetries": 1
+    }
+  },
   "enabledModels": [
     "openai-codex/gpt-5.6-sol",
     "openai-codex/gpt-5.6-terra",
@@ -137,7 +144,6 @@
     "npm:@aliou/pi-guardrails",
     "git:github.com/monotykamary/pi-neuralwatt-provider",
     "git:github.com/monotykamary/pi-invisible-continue",
-    "git:github.com/monotykamary/pi-retry",
     "git:github.com/qw457812/pi-listen"
   ],
   "piVim": {
