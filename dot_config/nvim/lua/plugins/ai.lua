@@ -929,10 +929,10 @@ return {
             local cursor_row = vim.api.nvim_win_get_cursor(win)[1]
             for row = cursor_row, math.max(1, cursor_row - 20), -1 do
               local line = vim.api.nvim_buf_get_lines(buf, row - 1, row, false)[1] or ""
-              if line:match("^❮ ") then
+              if line:match("^❮") then
                 vim.api.nvim_feedkeys("i", "n", false)
                 return
-              elseif line:match("^❯ ") then
+              elseif line:match("^❯") then
                 return
               end
             end

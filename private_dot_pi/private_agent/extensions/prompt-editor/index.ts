@@ -291,6 +291,7 @@ export default async function (pi: ExtensionAPI) {
 
   type ModalEditorRuntime = {
     getMode: () => Mode;
+    setMode?: (mode?: Mode) => void;
     getModeLabel?: () => string;
     getModeLabelColorizer?: () => ((s: string) => string) | null;
     borderColor?: (s: string) => string;
@@ -719,6 +720,11 @@ export default async function (pi: ExtensionAPI) {
         return;
       }
       const mode = this.getMode();
+      const submittedFromNormalMode =
+        mode === "normal" &&
+        data !== "\n" &&
+        matchesKey(data, Key.enter) &&
+        this.getText().trim() !== "";
       if (mode === "normal") {
         // pi-vim's cutCurrentLineContent (used by `cc`) relies on CTRL_A +
         // CTRL_K which doesn't work when autocomplete is active. Dismiss it
@@ -741,7 +747,7 @@ export default async function (pi: ExtensionAPI) {
         if (matchesKey(data, Key.ctrl("c"))) {
           super.handleInput(data);
           if (this.getText() === "") {
-            (this as any).mode = "insert";
+            (this as unknown as ModalEditorRuntime).setMode?.("insert");
           }
           return;
         }
@@ -769,6 +775,11 @@ export default async function (pi: ExtensionAPI) {
         if (this.handleVisualPaste(data) || this.handleVisualLineRemap(data)) return;
       }
       super.handleInput(data);
+      if (submittedFromNormalMode && this.getText() === "") {
+        // Enter clears the editor synchronously only when it submitted rather
+        // than accepted autocomplete. Start the next prompt in insert mode.
+        (this as unknown as ModalEditorRuntime).setMode?.("insert");
+      }
     }
 
     override render(width: number): string[] {
