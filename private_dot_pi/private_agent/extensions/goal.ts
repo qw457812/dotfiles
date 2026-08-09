@@ -382,6 +382,7 @@ export default function goalExtension(pi: ExtensionAPI) {
 	let activeSinceMs: number | null = null;
 	let activeGoalIdAtAgentStart: string | null = null;
 	let continuationQueued = false;
+	let pendingAgentError: { goalId: string; errorMessage?: string } | null = null;
 	let goalToolsEnabled = false;
 
 	function setGoalToolsEnabled(enabled: boolean): void {
@@ -580,6 +581,7 @@ export default function goalExtension(pi: ExtensionAPI) {
 		activeSinceMs = null;
 		activeGoalIdAtAgentStart = null;
 		continuationQueued = false;
+		pendingAgentError = null;
 
 		let hasGoalState = false;
 		for (const entry of ctx.sessionManager.getBranch()) {
@@ -637,13 +639,12 @@ export default function goalExtension(pi: ExtensionAPI) {
 
 		const lastAssistant = lastAssistantMessage(event.messages);
 		if (lastAssistant?.stopReason === "error") {
-			const status = goalStopStatusForAssistantError(lastAssistant);
-			setGoalStatus(status);
-			persist("status");
-			showGoalMessage(`Goal ${statusLabel(status)}\n\nThe last goal turn ended with an error, so automatic continuation was stopped.\n\n${goalSummary(goal)}`);
-			updateStatus(ctx);
+			// Pi may still retry this run directly or after auto-compaction. Defer
+			// stopping the goal until agent_settled confirms that recovery failed.
+			pendingAgentError = { goalId: goal.id, errorMessage: lastAssistant.errorMessage };
 			return;
 		}
+		pendingAgentError = null;
 
 		if (wasLastAssistantAborted(event.messages)) {
 			if (!ctx.hasUI) {
@@ -666,6 +667,18 @@ export default function goalExtension(pi: ExtensionAPI) {
 		}
 
 		queueContinuation(ctx);
+	});
+
+	pi.on("agent_settled", async (_event, ctx) => {
+		const pending = pendingAgentError;
+		pendingAgentError = null;
+		if (!pending || !goal || goal.id !== pending.goalId || goal.status !== "active") return;
+
+		const status = goalStopStatusForAssistantError(pending);
+		setGoalStatus(status);
+		persist("status");
+		showGoalMessage(`Goal ${statusLabel(status)}\n\nThe last goal turn ended with an error, so automatic continuation was stopped.\n\n${goalSummary(goal)}`);
+		updateStatus(ctx);
 	});
 
 	pi.on("context", async (event) => {
