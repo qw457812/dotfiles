@@ -321,6 +321,7 @@ export default async function (pi: ExtensionAPI) {
     pendingMotion?: string | null;
     pendingReplace?: boolean;
     pendingTextObject?: string | null;
+    discardingBracketedPasteInNormalMode?: boolean;
     buildVisualLineMap?: (width: number) => VisualLine[];
     findCurrentVisualLine?: (visualLines: VisualLine[]) => number;
     moveToVisualLine?: (
@@ -332,6 +333,9 @@ export default async function (pi: ExtensionAPI) {
       text: string,
       granularity: "grapheme",
     ) => Iterable<{ index: number; segment: string }>;
+    setCursorCol?: (col: number) => void;
+    takeTotalCount?: (defaultValue?: number) => number;
+    updateAutocomplete?: () => void;
     refreshPendingDispatchRestore?: () => void;
   };
 
@@ -624,6 +628,68 @@ export default async function (pi: ExtensionAPI) {
       return true;
     }
 
+    // Keep standalone Normal-mode h/l motions on the current logical line.
+    // pi-vim falls back to Pi's Left/Right handling when a motion reaches a
+    // boundary, and Pi intentionally wraps those keys across logical lines.
+    private handleNormalHorizontalMotion(data: string): boolean {
+      if (data !== "h" && data !== "l") return false;
+
+      const editor = this as unknown as VisualLineEditorRuntime;
+      if (
+        editor.pendingOperator !== null ||
+        editor.pendingG ||
+        editor.pendingMotion ||
+        editor.pendingReplace ||
+        editor.pendingTextObject ||
+        editor.discardingBracketedPasteInNormalMode
+      ) {
+        return false;
+      }
+
+      const state = editor.state;
+      if (
+        !state ||
+        !Array.isArray(state.lines) ||
+        typeof state.cursorLine !== "number" ||
+        typeof state.cursorCol !== "number" ||
+        !editor.segment ||
+        !editor.setCursorCol ||
+        !editor.takeTotalCount ||
+        !editor.updateAutocomplete ||
+        !editor.refreshPendingDispatchRestore
+      ) {
+        throw new Error("prompt-editor: horizontal motion runtime is incompatible");
+      }
+
+      const line = state.lines[state.cursorLine] ?? "";
+      const cursorCol = state.cursorCol;
+      const graphemeStarts = Array.from(editor.segment(line, "grapheme"), ({ index }) => index);
+      const positions = [...graphemeStarts, line.length];
+      let currentIndex = positions.findIndex((position) => position === cursorCol);
+      if (currentIndex === -1) {
+        currentIndex = positions.findLastIndex((position) => position < cursorCol);
+      }
+      currentIndex = Math.max(0, currentIndex);
+
+      const count = editor.takeTotalCount(1);
+      const lastNormalIndex = Math.max(0, graphemeStarts.length - 1);
+      const targetIndex =
+        data === "h"
+          ? Math.max(0, currentIndex - count)
+          : Math.min(lastNormalIndex, currentIndex + count);
+      // Visual mode and vertical movement can leave a Normal-mode cursor at
+      // line.length. At that right-hand sentinel, `l` must be a no-op rather
+      // than clamping backward onto the final grapheme.
+      const targetCol =
+        data === "l" && currentIndex > lastNormalIndex ? cursorCol : (positions[targetIndex] ?? 0);
+
+      editor.lastAction = null;
+      editor.setCursorCol(targetCol);
+      editor.updateAutocomplete();
+      editor.refreshPendingDispatchRestore();
+      return true;
+    }
+
     // Display-line remaps in Normal, Visual, and Visual-line modes:
     // - j -> gj
     // - k -> gk
@@ -739,7 +805,7 @@ export default async function (pi: ExtensionAPI) {
         // Backspace in normal mode: map to h (move left) instead of
         // passing through to the base Editor which deletes a character.
         if (matchesKey(data, Key.backspace)) {
-          super.handleInput("h");
+          if (!this.handleNormalHorizontalMotion("h")) super.handleInput("h");
           return;
         }
         // React when Ctrl+C clears the input: auto-enter insert mode so
@@ -769,7 +835,7 @@ export default async function (pi: ExtensionAPI) {
           super.handleInput("s"); // cut char + insert
           return;
         }
-        if (this.handleVisualLineRemap(data)) return;
+        if (this.handleNormalHorizontalMotion(data) || this.handleVisualLineRemap(data)) return;
       }
       if (mode === "visual" || mode === "visual-line") {
         if (this.handleVisualPaste(data) || this.handleVisualLineRemap(data)) return;
