@@ -9,4 +9,7 @@
 - <https://github.com/XiaomiMiMo/MiMo-Code>
 - <https://github.com/1jehuang/jcode>
 - <https://github.com/huggingface/tau>
+- <https://github.com/PrimeIntellect-ai/prime-agent>
+- <https://github.com/itayinbarr/little-coder>
+- <https://github.com/dirge-code/dirge>
 - <https://github.com/withastro/flue>

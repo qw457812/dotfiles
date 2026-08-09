@@ -120,7 +120,7 @@
     {
       "source": "git:github.com/diegopetrucci/pi-extensions",
       "extensions": [
-        "extensions/openai-fast/index.ts"
+        "extensions/fast/index.ts"
       ],
       "skills": [],
       "prompts": [],
