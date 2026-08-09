@@ -304,12 +304,12 @@ export default async function (pi: ExtensionAPI) {
     historyIndex?: number;
   };
 
-  // Pi keeps visual-line layout/navigation private. Mirror only the runtime
-  // surface needed by the display-line remaps below:
+  // Pi keeps cursor/layout navigation private. Mirror only the runtime
+  // surface needed by the horizontal and display-line remaps below:
   // https://github.com/earendil-works/pi/blob/845d6ff1f6643aba440341cce877ce1c43ebbc39/packages/tui/src/components/editor.ts#L1371-L1455
   // https://github.com/earendil-works/pi/blob/845d6ff1f6643aba440341cce877ce1c43ebbc39/packages/tui/src/components/editor.ts#L1725-L1801
   type VisualLine = { logicalLine: number; startCol: number; length: number };
-  type VisualLineEditorRuntime = ModalEditorRuntime & {
+  type NavigationEditorRuntime = ModalEditorRuntime & {
     state?: { lines?: string[]; cursorLine?: number; cursorCol?: number };
     lastWidth?: number;
     lastAction?: string | null;
@@ -634,7 +634,7 @@ export default async function (pi: ExtensionAPI) {
     private handleNormalHorizontalMotion(data: string): boolean {
       if (data !== "h" && data !== "l") return false;
 
-      const editor = this as unknown as VisualLineEditorRuntime;
+      const editor = this as unknown as NavigationEditorRuntime;
       if (
         editor.pendingOperator !== null ||
         editor.pendingG ||
@@ -698,7 +698,7 @@ export default async function (pi: ExtensionAPI) {
     private handleVisualLineRemap(data: string): boolean {
       if (data !== "j" && data !== "k" && data !== "H" && data !== "L") return false;
 
-      const editor = this as unknown as VisualLineEditorRuntime;
+      const editor = this as unknown as NavigationEditorRuntime;
       if (
         editor.pendingOperator !== null ||
         editor.prefixCount ||
