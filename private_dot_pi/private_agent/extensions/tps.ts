@@ -2,7 +2,12 @@
 // https://github.com/badlogic/pi-mono/blob/a26a9cfabd05ccf774045b3685e50d3605516cdb/.pi/extensions/tps.ts
 // https://github.com/monotykamary/pi-tps/blob/64472f2ccddc327e33ed604d69e94e152a659ac9/extensions/pi-tps/index.ts
 
-import type { AssistantMessage, AssistantMessageEvent } from "@earendil-works/pi-ai";
+import {
+	isContextOverflow,
+	isRetryableAssistantError,
+	type AssistantMessage,
+	type AssistantMessageEvent,
+} from "@earendil-works/pi-ai";
 import type {
 	AgentEndEvent,
 	ExtensionAPI,
@@ -48,6 +53,14 @@ function isAssistantMessage(message: unknown): message is AssistantMessage {
 
 function isFirstTokenEvent({ type }: AssistantMessageEvent) {
 	return type === "thinking_delta" || type === "text_delta" || type === "toolcall_delta";
+}
+
+function lastAssistantMessage(messages: AgentEndEvent["messages"]): AssistantMessage | undefined {
+	for (let i = messages.length - 1; i >= 0; i--) {
+		const message = messages[i];
+		if (isAssistantMessage(message)) return message;
+	}
+	return undefined;
 }
 
 function buildTurnMetrics(turn: TurnTiming): TurnMetrics | null {
@@ -103,9 +116,15 @@ export default function (pi: ExtensionAPI) {
 	let currentTurn: TurnTiming | null = null;
 	let turnMetrics: TurnMetrics[] = [];
 	let turnCount = 0;
+	let retryDelayStartMs: number | null = null;
+	let pendingRetryDelayMs: number | null = null;
+	let totalRetryDelayMs = 0;
 
 	pi.on("agent_start", () => {
-		agentStartMs = performance.now();
+		const now = performance.now();
+		pendingRetryDelayMs = retryDelayStartMs === null ? null : now - retryDelayStartMs;
+		retryDelayStartMs = null;
+		agentStartMs = now;
 		currentTurn = null;
 		turnMetrics = [];
 		turnCount = 0;
@@ -158,11 +177,28 @@ export default function (pi: ExtensionAPI) {
 		currentTurn = null;
 	});
 
-	pi.on("agent_end", (_event: AgentEndEvent, ctx: ExtensionContext) => {
+	pi.on("agent_end", (event: AgentEndEvent, ctx: ExtensionContext) => {
+		const now = performance.now();
+
+		// A native retry continues directly from the existing context, so its run
+		// starts with an assistant message. A queued continuation starts with the
+		// queued user/custom message instead and must not count as retry delay.
+		if (pendingRetryDelayMs !== null && isAssistantMessage(event.messages[0])) {
+			totalRetryDelayMs += pendingRetryDelayMs;
+		}
+		pendingRetryDelayMs = null;
+
+		const lastAssistant = lastAssistantMessage(event.messages);
+		const willLikelyRetry =
+			lastAssistant !== undefined &&
+			isRetryableAssistantError(lastAssistant) &&
+			!isContextOverflow(lastAssistant, ctx.model?.contextWindow ?? 0);
+		retryDelayStartMs = willLikelyRetry ? now : null;
+
 		if (!ctx.hasUI) return;
 		if (agentStartMs === null) return;
 
-		const agentElapsedMs = performance.now() - agentStartMs;
+		const agentElapsedMs = now - agentStartMs;
 		if (agentElapsedMs <= 0 || turnMetrics.length === 0) return;
 
 		let input = 0;
@@ -194,6 +230,7 @@ export default function (pi: ExtensionAPI) {
 			`TPS ${formatDecimal(output / (totalGenerationMs / 1000), 1)}`,
 			...(ttftCount > 0 ? [`TTFT ${formatDuration(totalTtftMs / ttftCount)}`] : []),
 			`Gen ${formatDuration(totalGenerationMs)}/${formatDuration(agentElapsedMs)}`,
+			...(totalRetryDelayMs > 0 ? [`Retry ${formatDuration(totalRetryDelayMs)}`] : []),
 			[
 				`↑${formatTokens(input)}`,
 				`↓${formatTokens(output)}`,
@@ -205,5 +242,11 @@ export default function (pi: ExtensionAPI) {
 				.join(" "),
 		];
 		ctx.ui.notify(parts.join(" · "), "info");
+	});
+
+	pi.on("agent_settled", () => {
+		retryDelayStartMs = null;
+		pendingRetryDelayMs = null;
+		totalRetryDelayMs = 0;
 	});
 }
