@@ -90,9 +90,9 @@ Inspect vanilla pi-vim when UI comparison is required:
 pi --no-session --no-extensions -e ~/.pi/agent/npm/node_modules/pi-vim/index.ts
 ```
 
-Manually exercise every changed interactive branch. For private display-line input,
-cover Normal, Visual, and Visual-line movement, pending Vim sequences, asynchronous
-Ex restoration, and fail-fast compatibility checks.
+Manually exercise every changed interactive branch. For private navigation input,
+run every applicable verification case under
+[Navigation remaps](REFERENCE.md#navigation-remaps).
 
 **Complete when:** static checks, runtime loading, and every interactive branch
 affected by either target range pass.

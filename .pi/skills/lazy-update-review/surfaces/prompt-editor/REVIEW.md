@@ -111,7 +111,8 @@ git -C "$PI_CHK" diff "$PI_OLD_REV..$PI_TARGET_REV" -- \
   packages/coding-agent/src/modes/interactive/interactive-mode.ts
 ```
 
-Account for `Editor` state/layout methods, `CustomEditor` behavior, editor factory
+Account for `Editor` state/layout methods, cursor-column and sticky-column
+bookkeeping, autocomplete refresh, `CustomEditor` behavior, editor factory
 signatures, cursor rendering, input dispatch, and every private member accessed
 structurally by `prompt-editor`.
 
@@ -128,9 +129,9 @@ git -C "$VIM_CHK" diff "$VIM_OLD_REV..$VIM_TARGET_REV" -- \
   mode-change-command.ts cursor-shape.ts
 ```
 
-Account for `ModalEditor` construction, public setters, modes, pending-input fields,
-Ex dispatch, session setup/cleanup, settings, clipboard behavior, colorizers, and
-copied or re-exported helpers.
+Account for `ModalEditor` construction, public setters, modes, counted motion,
+pending-input and bracketed-paste state, Ex dispatch, session setup/cleanup,
+settings, clipboard behavior, colorizers, and copied or re-exported helpers.
 
 For either upstream, read only the headings in the
 [compatibility reference](REFERENCE.md) implicated by its diffs.

@@ -186,40 +186,26 @@ type ModalEditorRuntime = {
 Add a field only when local behavior reads or writes it. Remove fields when the
 integration stops using them.
 
-### Display-line remaps
+### Navigation remaps
 
-`prompt-editor` implements these remaps against Pi Editor's private visual-line
-layout runtime rather than pi-vim's logical-line motions:
+`prompt-editor` owns two navigation behaviors across Pi and pi-vim's private
+runtimes:
 
-```text
-j -> gj
-k -> gk
-H -> g^
-L -> g$
-```
+- standalone Normal-mode `h`/`l` and mapped Backspace stay on the current logical
+  line and move by grapheme;
+- `j`/`k`/`H`/`L` use Pi's visual-line layout as `gj`/`gk`/`g^`/`g$`.
 
 On every upgrade, compare pi-vim's input dispatch and pending fields in `index.ts`.
-A pending state owns the next key, so the display-line handler must return `false`
-and let pi-vim consume it. Keep the Ex guard before all remaps, and keep the
-structural guard aligned with every pending field it reads:
+A pending state owns the next key, so a navigation handler returns `false` and lets
+pi-vim consume it. The horizontal handler consumes its prefix count through
+`takeTotalCount()` but delegates operators, `g`, character motions, replacement,
+text objects, and bracketed-paste discard. The display-line handler additionally
+delegates prefix and operator counts. Keep the Ex guard before every remap and keep
+each structural guard aligned with every pending field it reads.
 
-```ts
-if (
-  editor.pendingOperator !== null ||
-  editor.prefixCount ||
-  editor.operatorCount ||
-  editor.pendingG ||
-  editor.pendingMotion ||
-  editor.pendingReplace ||
-  editor.pendingTextObject
-) {
-  return false;
-}
-```
-
-Compare the handler with the target revision's
-`packages/tui/src/components/editor.ts` in the librarian cache, never the normally
-outdated lazy worktree:
+Compare the handlers with the target revision's
+`packages/tui/src/components/editor.ts` in the librarian cache rather than the
+normally outdated lazy worktree:
 
 ```bash
 git -C "$PI_CHK" show \
@@ -228,23 +214,39 @@ git -C "$PI_CHK" show \
   "$PI_TARGET_REV:packages/tui/src/components/editor.ts"
 ```
 
-Inspect each applicable target for `buildVisualLineMap`, `findCurrentVisualLine`,
-`moveToVisualLine`, `segment`, cursor state, and sticky-column state. These are
-required as one compatibility surface; fail loudly when any prerequisite is
-unavailable rather than consuming a remap with partial semantics. Move `j`/`k` through `moveToVisualLine`; Pi's raw Up/Down handling
-navigates prompt history at display boundaries instead of acting like Vim's
-`gj`/`gk` no-op. Clear `preferredVisualCol` after horizontal `H`/`L` movement so
-the next vertical motion derives a display-line-relative column.
+Inspect the current `NavigationEditorRuntime` field by field. For each applicable Pi
+target, revalidate `buildVisualLineMap`, `findCurrentVisualLine`, `moveToVisualLine`,
+`segment`, `setCursorCol`, `updateAutocomplete`, cursor state, and sticky-column
+state. For each applicable pi-vim target, revalidate `takeTotalCount`,
+`discardingBracketedPasteInNormalMode`, pending state, and
+`refreshPendingDispatchRestore`. Treat these members as one navigation compatibility
+surface; fail loudly when a prerequisite is unavailable rather than consume a remap
+with partial semantics.
+
+For Normal `h`/`l`, derive positions from grapheme starts plus the `line.length`
+sentinel. Clamp ordinary movement to the first and last grapheme starts. If visual
+or vertical movement left the cursor at `line.length`, `l` is a no-op and `h` lands
+on the final grapheme. Move through `setCursorCol()` so Pi clears sticky-column and
+snapped-cursor state, then call `updateAutocomplete()` so a visible picker tracks
+the new cursor.
+
+Move `j`/`k` through `moveToVisualLine`; Pi's raw Up/Down handling navigates prompt
+history at display boundaries instead of acting like Vim's `gj`/`gk` no-op. Clear
+`preferredVisualCol` after horizontal `H`/`L` movement so the next vertical motion
+derives a display-line-relative column.
 
 Every consumed remap bypasses `ModalEditor.handleInput()`, so call pi-vim's private
 `refreshPendingDispatchRestore()` after moving. This keeps the latest cursor in the
 restore snapshot while an asynchronous Ex dispatch is pending.
 
-Verification is complete when wrapped-line movement and endpoints pass in Normal,
-Visual, and Visual-line modes, and pending sequences still reach pi-vim. At minimum,
-exercise replacement characters (`rj`, `rk`, `rH`, `rL`), movement while an
-asynchronous Ex dispatch is pending, failure when `segment` is unavailable, plus any
-pending state changed by the target release.
+Horizontal verification is complete when multiline boundaries, counted movement,
+emoji and combining graphemes, `v$` followed by Escape and `l`, wrapped-line
+`h`/`l` followed by `j`/`k`, active autocomplete, split bracketed paste, and mapped
+Backspace pass. Display-line verification is complete when endpoints pass in
+Normal, Visual, and Visual-line modes and pending sequences still reach pi-vim. At
+minimum, exercise replacement characters (`rj`, `rk`, `rH`, `rL`), asynchronous Ex
+restoration, failure when a required private member is unavailable, plus any pending
+state changed by the target release.
 
 ### Visual paste
 
