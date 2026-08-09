@@ -1,6 +1,23 @@
+/**
+ * thinking.ts - thinking-level command and model-switch defaults
+ *
+ * Commands:
+ *   /thinking          Open a picker containing the current model's supported levels.
+ *   /thinking <level>  Set the level directly, with model-aware completion and validation.
+ *
+ * Automatic defaults apply only to explicit model selection and model cycling:
+ *   - openai-codex/gpt-5.6-sol uses medium.
+ *   - Selected OpenAI frontier models use high.
+ *   - Request-billed and non-frontier open-source providers use their maximum supported level.
+ *
+ * Session restore is left unchanged, and an explicit /thinking argument always takes effect
+ * immediately without opening the picker.
+ */
+
 import type { Model, ModelThinkingLevel } from "@earendil-works/pi-ai";
 import { getSupportedThinkingLevels } from "@earendil-works/pi-ai";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import type { AutocompleteItem } from "@earendil-works/pi-tui";
 
 const ORDERED_LEVELS: ModelThinkingLevel[] = [
   "off",
@@ -42,10 +59,26 @@ function setLevelIfSupported(pi: ExtensionAPI, model: Model<any>, level: ModelTh
   }
 }
 
+function getThinkingLevelCompletions(
+  model: Model<any> | undefined,
+  prefix: string,
+): AutocompleteItem[] | null {
+  const matches = getSupportedLevels(model).filter((level) => level.startsWith(prefix.trimStart()));
+  if (matches.length === 0) return null;
+  return matches.map((level) => ({ value: level, label: level }));
+}
+
 export default function (pi: ExtensionAPI) {
+  let currentModel: Model<any> | undefined;
+
+  pi.on("session_start", (_event, ctx) => {
+    currentModel = ctx.model;
+  });
+
   // Auto thinking level on model change
   pi.on("model_select", async (event, _ctx) => {
     const { model, source } = event;
+    currentModel = model;
     const { provider, id } = model;
     if (source !== "set" && source !== "cycle") return;
 
@@ -69,14 +102,29 @@ export default function (pi: ExtensionAPI) {
   });
 
   pi.registerCommand("thinking", {
-    description: "Set the thinking level",
-    handler: async (_args, ctx) => {
-      const supported = [...getSupportedLevels(ctx.model)].reverse();
-      const current = pi.getThinkingLevel();
-      const available = supported.filter((level) => level !== current);
-      const selected = await ctx.ui.select(`Thinking level (current: ${current})`, available);
-      const target = available.find((level) => level === selected);
-      if (!target) return;
+    description: "Set the thinking level (off|minimal|low|medium|high|xhigh|max)",
+    getArgumentCompletions: (prefix) => getThinkingLevelCompletions(currentModel, prefix),
+    handler: async (args, ctx) => {
+      const supported = getSupportedLevels(ctx.model);
+      const arg = args.trim();
+      let target: ModelThinkingLevel | undefined;
+
+      if (arg) {
+        if (!supported.includes(arg as ModelThinkingLevel)) {
+          ctx.ui.notify(
+            `Unsupported thinking level "${arg}". Supported: ${supported.join(", ")}`,
+            "error",
+          );
+          return;
+        }
+        target = arg as ModelThinkingLevel;
+      } else {
+        const current = pi.getThinkingLevel();
+        const available = [...supported].reverse().filter((level) => level !== current);
+        const selected = await ctx.ui.select(`Thinking level (current: ${current})`, available);
+        target = available.find((level) => level === selected);
+        if (!target) return;
+      }
 
       pi.setThinkingLevel(target);
       const actual = pi.getThinkingLevel();
