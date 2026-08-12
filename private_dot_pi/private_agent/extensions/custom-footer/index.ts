@@ -49,7 +49,10 @@ export default function (pi: ExtensionAPI) {
     if (m < 60) return `${m}m${rs > 0 ? rs + "s" : ""}`;
     const h = Math.floor(m / 60);
     const rm = m % 60;
-    return `${h}h${rm > 0 ? rm + "m" : ""}`;
+    if (h < 24) return `${h}h${rm > 0 ? rm + "m" : ""}`;
+    const d = Math.floor(h / 24);
+    const rh = h % 24;
+    return `${d}d${rh > 0 ? rh + "h" : ""}`;
   }
 
   /**

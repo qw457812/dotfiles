@@ -8,6 +8,8 @@
 .nvim.lua
 .lazy.lua
 
+mise.local.toml
+
 CLAUDE.local.md
 **/.claude/settings.local.json
 

@@ -87,6 +87,11 @@ export default function (pi: ExtensionAPI) {
       return;
     }
 
+    if (provider === "openai-codex" && id === "gpt-5.4-mini") {
+      setLevelIfSupported(pi, model, "off");
+      return;
+    }
+
     if (
       (provider === "openai-codex" || provider === "github-copilot" || provider === "freemodel") &&
       (id === "gpt-5.5" || id === "gpt-5.6-terra" || id === "gpt-5.4" || id === "gpt-5.6-luna")

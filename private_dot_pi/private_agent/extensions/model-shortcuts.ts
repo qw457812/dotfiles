@@ -32,6 +32,7 @@ const ALIASES: Record<string, ModelTarget> = {
   sol: { provider: "openai-codex", id: "gpt-5.6-sol" },
   terra: { provider: "openai-codex", id: "gpt-5.6-terra" },
   luna: { provider: "openai-codex", id: "gpt-5.6-luna" },
+  mini: { provider: "openai-codex", id: "gpt-5.4-mini" },
   glm: { provider: "zai", id: "glm-5.2" },
   kimi: { provider: "neuralwatt", id: "kimi-k3" },
   deepseek: { provider: "deepseek", id: "deepseek-v4-flash" },

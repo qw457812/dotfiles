@@ -20,6 +20,9 @@ return {
   -- https://github.com/audibleblink/pi-harness
   --
   -- https://github.com/IgorWarzocha/howaboua-pi-stuff/tree/main/packages/pi-explore-subagents
+  --
+  -- https://github.com/QwenLM/Qwen-MM-Plugins
+  -- https://github.com/cathrynlavery/diagram-design
   {
     "earendil-works/pi",
     version = "*",

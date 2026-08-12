@@ -7,6 +7,7 @@ AGENTS.md
 .pi/agent/node_modules/
 .pi/agent/extensions/*/node_modules/
 .pi/agent/extensions/prompt-editor/pi-vim.generated.ts
+
 {{ if ne .chezmoi.os "darwin" }}
 Library/
 .hammerspoon/
@@ -18,6 +19,7 @@ Library/
 .config/karabiner.edn
 .local/bin/e
 {{ end }}
+
 {{ if ne .chezmoi.os "android" }}
 .termux/
 {{ else }}
