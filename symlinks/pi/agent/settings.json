@@ -144,6 +144,7 @@
     "npm:@aliou/pi-guardrails",
     "git:github.com/monotykamary/pi-neuralwatt-provider",
     "git:github.com/monotykamary/pi-invisible-continue",
+    "git:github.com/monotykamary/pi-vision-handoff",
     "git:github.com/qw457812/pi-listen"
   ],
   "piVim": {
