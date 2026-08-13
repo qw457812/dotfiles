@@ -34,9 +34,11 @@ const ALIASES: Record<string, ModelTarget> = {
   luna: { provider: "openai-codex", id: "gpt-5.6-luna" },
   mini: { provider: "openai-codex", id: "gpt-5.4-mini" },
   glm: { provider: "zai", id: "glm-5.2" },
+  deepseek: { provider: "deepseek", id: "deepseek-v4-pro" },
+  flash: { provider: "deepseek", id: "deepseek-v4-flash" },
   kimi: { provider: "neuralwatt", id: "kimi-k3" },
-  deepseek: { provider: "deepseek", id: "deepseek-v4-flash" },
-  codebuddy: { provider: "codebuddy", id: "glm-5.2" },
+  flex: { provider: "neuralwatt", id: "kimi-k3-flex" },
+  buddy: { provider: "codebuddy", id: "glm-5.2" },
 };
 
 async function switchModel(
@@ -98,7 +100,7 @@ export default function (pi: ExtensionAPI) {
 
   for (const [alias, target] of Object.entries(ALIASES)) {
     pi.registerCommand(alias, {
-      description: `Switch to ${target.provider}/${target.id}, optionally setting thinking level (off|minimal|low|medium|high|xhigh|max)`,
+      description: `Switch to ${target.provider}/${target.id} [level]`,
       getArgumentCompletions: (prefix) =>
         getThinkingLevelCompletions(modelRegistry, target, prefix),
       handler: (args, ctx) => switchModel(pi, ctx, target, args),

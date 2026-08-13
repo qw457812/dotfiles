@@ -32,6 +32,7 @@
         // Mise
         "mise-versions.jdx.dev",
         "mise.en.dev",
+        "mise.jdx.dev",
         // Pi
         "pi.dev",
         // GitHub
@@ -106,6 +107,7 @@
         // Mise
         "https://mise-versions.jdx.dev",
         "https://mise.en.dev",
+        "https://mise.jdx.dev",
         // Pi
         "https://pi.dev",
         // GitHub
