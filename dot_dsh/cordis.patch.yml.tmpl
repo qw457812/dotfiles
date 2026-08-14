@@ -1,0 +1,5 @@
+# Route settings writes to the real file so they never replace the settings.yaml symlink.
+- id: settings
+  name: '@deepseek-ai/dsh-settings-file'
+  config:
+    path: {{ .chezmoi.sourceDir }}/symlinks/dsh/settings.yaml
