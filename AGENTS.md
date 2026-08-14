@@ -10,7 +10,7 @@
 - Pi config lives under `private_dot_pi/private_agent` and `symlinks/pi/agent`.
 - Pi global settings file lives at `symlinks/pi/agent/settings.json`.
 - When working on `private_dot_pi/private_agent/extensions`, the Pi source checkout is available for reference at `~/.local/share/nvim/lazy/pi`.
-- After TypeScript changes under `private_dot_pi/private_agent/extensions`, run `npm run check` and `npm run lint` in `private_dot_pi/private_agent`.
+- After TypeScript changes under `private_dot_pi/private_agent/extensions`, run `npm --prefix private_dot_pi/private_agent run check` and `npm --prefix private_dot_pi/private_agent run lint` from the chezmoi repository root.
 
 ## Neovim
 

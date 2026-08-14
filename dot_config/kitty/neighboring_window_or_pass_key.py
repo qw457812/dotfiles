@@ -38,6 +38,10 @@ def is_yazi(cmd):
     return cmd == "yazi"
 
 
+def is_vi_sql(cmd):
+    return cmd == "vi-sql"
+
+
 def is_fzf(window):
     fp = window.child.foreground_processes
     return any(
@@ -81,9 +85,10 @@ def handle_result(
             or is_tmux(cmd)
             or is_herdr(cmd)
             or (is_ctrl_jk and is_yazi(cmd))
+            or is_vi_sql(cmd)
         )
     ) or (is_ctrl_jk and is_fzf(w)):
-        # pass the keys through to nvim/tmux/herdr/fzf/yazi
+        # pass the keys through to nvim/tmux/herdr/fzf/yazi/vi-sql
         w.write_to_child(encode_key_mapping(w, key))
     else:
         # # kitten @ focus-window --match=neighbor:bottom

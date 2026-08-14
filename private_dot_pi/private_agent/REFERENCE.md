@@ -1,6 +1,7 @@
 - <https://github.com/qw457812/claude-code-sourcemap>
 - <https://github.com/openai/codex>
 - <https://github.com/anomalyco/opencode>
+- <https://github.com/deepseek-ai/deepseek-harness>
 - <https://github.com/openclaw/openclaw>
 - <https://github.com/can1357/oh-my-pi>
 - <https://github.com/open-gsd/gsd-pi>

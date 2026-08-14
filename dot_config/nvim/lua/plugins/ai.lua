@@ -177,6 +177,7 @@ return {
     },
   },
   { "qw457812/claude-code-sourcemap", pin = true, lazy = true, config = function() end },
+  { "deepseek-ai/deepseek-harness", lazy = true, config = function() end },
 
   -- sidekick cli
   {

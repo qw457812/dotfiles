@@ -16,6 +16,43 @@
     //     }
     //   }
     // },
+    "zai": {
+      "baseUrl": "https://api.z.ai/api/coding/paas/v4",
+      "apiKey": "$ZAI_API_KEY",
+      "models": [
+        {
+          "id": "glm-5.3",
+          "name": "GLM-5.3",
+          "api": "openai-completions",
+          "baseUrl": "https://api.z.ai/api/coding/paas/v4",
+          "reasoning": true,
+          "thinkingLevelMap": {
+            "minimal": null,
+            "low": "high",
+            "medium": "high",
+            "high": "high",
+            "max": "max"
+          },
+          "input": ["text"],
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0
+          },
+          "compat": {
+            "supportsStore": false,
+            "supportsDeveloperRole": false,
+            "supportsReasoningEffort": true,
+            "maxTokensField": "max_tokens",
+            "thinkingFormat": "zai",
+            "zaiToolStream": true
+          },
+          "contextWindow": 1000000,
+          "maxTokens": 131072
+        }
+      ]
+    },
     "synthetic": {
       "baseUrl": "https://api.synthetic.new/openai/v1",
       "apiKey": "$SYNTHETIC_API_KEY",

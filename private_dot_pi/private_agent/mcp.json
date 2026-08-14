@@ -3,6 +3,7 @@
     "disableProxyTool": true,
     "showStatusIcon": false,
     "mcpFooterStatus": "compact",
+    "toolResultRendering": "boxed",
     "scriptMode": false
   },
   "mcpServers": {}

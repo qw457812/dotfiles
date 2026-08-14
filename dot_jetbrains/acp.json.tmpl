@@ -4,45 +4,16 @@
     "use_custom_mcp": true
   },
   "agent_servers": {
-    "Claude Fire Pass": {
-      "command": "{{ lookPath `claude-agent-acp` }}",
-      "env": {
-        "ANTHROPIC_BASE_URL": "https://api.fireworks.ai/inference",
-        "ANTHROPIC_AUTH_TOKEN": "{{ env `FIREPASS_API_KEY` }}",
-        "ANTHROPIC_DEFAULT_OPUS_MODEL": "accounts/fireworks/routers/kimi-k2p6-turbo",
-        "ANTHROPIC_DEFAULT_SONNET_MODEL": "accounts/fireworks/routers/kimi-k2p6-turbo",
-        "ANTHROPIC_DEFAULT_HAIKU_MODEL": "accounts/fireworks/routers/kimi-k2p6-turbo",
-        "ANTHROPIC_MODEL": "accounts/fireworks/routers/kimi-k2p6-turbo"
-      }
-    },
-    "Claude Synthetic": {
-      "command": "{{ lookPath `claude-agent-acp` }}",
-      "env": {
-        "ANTHROPIC_BASE_URL": "https://api.synthetic.new/anthropic",
-        "ANTHROPIC_AUTH_TOKEN": "{{ env `SYNTHETIC_API_KEY` }}",
-        "ANTHROPIC_DEFAULT_OPUS_MODEL": "hf:zai-org/GLM-5.1",
-        "ANTHROPIC_DEFAULT_SONNET_MODEL": "hf:moonshotai/Kimi-K2.6",
-        "ANTHROPIC_DEFAULT_HAIKU_MODEL": "hf:MiniMaxAI/MiniMax-M2.5",
-        "ANTHROPIC_MODEL": "hf:zai-org/GLM-5.1"
-      }
-    },
-    "Claude GLM": {
+    "Claude": {
       "command": "{{ lookPath `claude-agent-acp` }}",
       "env": {
         "ANTHROPIC_BASE_URL": "https://api.z.ai/api/anthropic",
         "ANTHROPIC_AUTH_TOKEN": "{{ env `ZAI_API_KEY` }}",
         "API_TIMEOUT_MS": "3000000",
-        "ANTHROPIC_DEFAULT_OPUS_MODEL": "glm-5.2",
-        "ANTHROPIC_DEFAULT_SONNET_MODEL": "glm-5.2",
+        "ANTHROPIC_DEFAULT_OPUS_MODEL": "glm-5.3",
+        "ANTHROPIC_DEFAULT_SONNET_MODEL": "glm-5.3",
         "ANTHROPIC_DEFAULT_HAIKU_MODEL": "glm-4.7",
-        "ANTHROPIC_MODEL": "glm-5.2"
-      }
-    },
-    "Claude LiteLLM": {
-      "command": "{{ lookPath `claude-agent-acp` }}",
-      "env": {
-        "ANTHROPIC_BASE_URL": "http://localhost:4000",
-        "ANTHROPIC_AUTH_TOKEN": "{{ env `LITELLM_MASTER_KEY` }}"
+        "ANTHROPIC_MODEL": "glm-5.3"
       }
     },
     "OpenCode": {
