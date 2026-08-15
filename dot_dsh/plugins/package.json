@@ -1,0 +1,20 @@
+{
+  "name": "@dotfiles/dsh-plugins",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "tsc --noEmit",
+    "lint": "oxlint .",
+    "format": "oxfmt ."
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1",
+    "@deepseek-ai/dsh-sandbox-policy": "^0.1.0-rc.6",
+    "@deepseek-ai/dsh-shell": "^0.1.0-rc.6",
+    "@deepseek-ai/dsh-tools": "^0.1.0-rc.6",
+    "@types/node": "^26.0.0",
+    "oxfmt": "^0.47.0",
+    "oxlint": "^1.62.0",
+    "typescript": "^5.0.0"
+  }
+}

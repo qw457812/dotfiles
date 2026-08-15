@@ -7,6 +7,7 @@ AGENTS.md
 .pi/agent/node_modules/
 .pi/agent/extensions/*/node_modules/
 .pi/agent/extensions/prompt-editor/pi-vim.generated.ts
+.dsh/plugins/node_modules/
 
 {{ if ne .chezmoi.os "darwin" }}
 Library/

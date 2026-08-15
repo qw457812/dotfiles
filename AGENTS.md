@@ -1,7 +1,7 @@
 ## Chezmoi
 
 - Edit chezmoi source paths like `dot_*`, `private_*`, and `symlink_*`, not generated target paths.
-- Do not run `chezmoi apply` manually; the agent hook `private_dot_pi/private_agent/extensions/chezmoi.ts` runs it when needed.
+- Do not run `chezmoi apply` manually; the Pi extension `private_dot_pi/private_agent/extensions/chezmoi.ts` and the dsh plugin `dot_dsh/plugins/dsh-plugin-chezmoi.mjs` run it when needed.
 - `symlinks/` contains source-state files referenced by `symlink_*` templates.
 - Deployment exclusions are listed in `.chezmoiignore`.
 
@@ -11,6 +11,13 @@
 - Pi global settings file lives at `symlinks/pi/agent/settings.json`.
 - When working on `private_dot_pi/private_agent/extensions`, the Pi source checkout is available for reference at `~/.local/share/nvim/lazy/pi`.
 - After TypeScript changes under `private_dot_pi/private_agent/extensions`, run `npm --prefix private_dot_pi/private_agent run check` and `npm --prefix private_dot_pi/private_agent run lint` from the chezmoi repository root.
+
+## DeepSeek Harness
+
+- Dsh config and plugins live under `dot_dsh/`; the `~/.dsh` home patch (`dot_dsh/cordis.patch.yml.tmpl`) loads plugins from `~/.dsh/plugins/` via profile-relative specifiers.
+- Dsh global settings file lives at `symlinks/dsh/settings.yaml`.
+- When working on `dot_dsh/plugins`, the dsh source checkout is available for reference at `~/.local/share/nvim/lazy/deepseek-harness`.
+- After changes under `dot_dsh/plugins`, run `pnpm --dir dot_dsh/plugins run check` and `pnpm --dir dot_dsh/plugins run lint` from the chezmoi repository root.
 
 ## Neovim
 

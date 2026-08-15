@@ -3,3 +3,8 @@
   name: '@deepseek-ai/dsh-settings-file'
   config:
     path: {{ .chezmoi.sourceDir }}/symlinks/dsh/settings.yaml
+
+# Chezmoi auto-sync after write/edit tool results.
+- insert:
+    - id: chezmoi
+      name: ../../plugins/dsh-plugin-chezmoi.mjs

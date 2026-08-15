@@ -1,6 +1,22 @@
 ui-onboarding:
   welcomeNoticeVersion: 2026-08-13.1
 agent-default-model:
-  provider: deepseek-official
-  model: deepseek-v4-pro
+  provider: zai
+  model: glm-5.3
   reasoningEffort: max
+llm-pi-ai:
+  providers:
+    zai:
+      models:
+        - id: glm-5.3
+          name: GLM-5.3
+          contextWindow: 1000000
+          maxTokens: 131072
+          reasoningEfforts:
+            low: high
+            medium: high
+            high: high
+            max: max
+          compat:
+            thinkingFormat: zai
+            supportsReasoningEffort: true
