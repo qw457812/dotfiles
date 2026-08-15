@@ -177,7 +177,15 @@ return {
     },
   },
   { "qw457812/claude-code-sourcemap", pin = true, lazy = true, config = function() end },
-  { "deepseek-ai/deepseek-harness", lazy = true, config = function() end },
+
+  {
+    "deepseek-ai/deepseek-harness",
+    lazy = true,
+    config = function() end,
+    specs = {
+      { "ccch1mneyyy/dsh-TUI", lazy = true, config = function() end },
+    },
+  },
 
   -- sidekick cli
   {
@@ -395,6 +403,8 @@ return {
         { "<leader>af", function() require("sidekick.cli").send({ msg = "{file}", filter = filter }) end, desc = "File (Sidekick)" },
         { "<leader>ab", function() U.ai.sidekick.cli.quick.show("codebuddy") end, desc = "CodeBuddy" },
         { "<leader>ab", function() U.ai.sidekick.cli.quick.send("codebuddy", { msg = "{this}" }) end, mode = "x", desc = "CodeBuddy" },
+        { "<leader>ae", function() U.ai.sidekick.cli.quick.show("dsh") end, desc = "DeepSeek Harness" },
+        { "<leader>ae", function() U.ai.sidekick.cli.quick.send("dsh", { msg = "{this}" }) end, mode = "x", desc = "DeepSeek Harness" },
       })
     end,
     ---@module "sidekick"
@@ -712,6 +722,18 @@ return {
             },
             keys = {
               blur_t = false, -- codebuddy uses <c-o> for its own functionality
+            },
+          },
+          dsh = {
+            cmd = { "dsh", "--profile", "dsh-tui" },
+            is_proc = "\\<dsh\\>",
+            url = "https://github.com/deepseek-ai/deepseek-harness",
+            env = {
+              __AI_AGENT = "dsh",
+              NVIM_FLATTEN_NEST = "1",
+            },
+            keys = {
+              blur_t = false, -- dsh uses <c-o> for its own functionality
             },
           },
           gemini = { cmd = { "hack_to_disable_gemini" } }, -- HACK: disable gemini

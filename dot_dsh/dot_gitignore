@@ -3,3 +3,6 @@
 /storages/
 
 /plugins/node_modules/
+
+# https://github.com/ccch1mneyyy/dsh-TUI
+/profiles/dsh-tui/node_modules/
