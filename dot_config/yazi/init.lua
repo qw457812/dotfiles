@@ -35,7 +35,7 @@ require("git"):setup()
 -- })
 -- https://github.com/Rolv-Apneseth/starship.yazi
 require("starship"):setup()
--- https://github.com/dedukun/bookmarks.yazi
+-- https://github.com/qw457812/bookmarks.yazi
 require("bookmarks"):setup({
   last_directory = { enable = true, persist = false },
   persist = "all", -- none(default), all, vim

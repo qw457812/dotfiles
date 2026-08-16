@@ -175,7 +175,7 @@ return {
         },
       },
       { "Rolv-Apneseth/starship.yazi", lazy = true, build = H.build_plugin, config = function() end },
-      { "dedukun/bookmarks.yazi", lazy = true, build = H.build_plugin, config = function() end },
+      { "qw457812/bookmarks.yazi", lazy = true, build = H.build_plugin, config = function() end },
     },
   },
 

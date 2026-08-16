@@ -73,7 +73,7 @@ prepend_keymap = [
     "N",
   ], run = "copy name_without_ext", desc = "Copy the filename without extension" },
 
-  # https://github.com/dedukun/bookmarks.yazi
+  # https://github.com/qw457812/bookmarks.yazi
   # h: ~
   # d: ~/Downloads
   # c: ~/.config
@@ -272,7 +272,7 @@ append_keymap = [
     "r",
   ], run = 'shell -- ya emit cd "$(git rev-parse --show-toplevel)"', desc = "cd to git root" },
 
-  # https://github.com/dedukun/bookmarks.yazi
+  # https://github.com/qw457812/bookmarks.yazi
   { on = [
     "b",
     "d",
