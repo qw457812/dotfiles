@@ -46,6 +46,8 @@ brew "atuin"
 brew "autoconf"
 # Tool for generating GNU Standards-compliant Makefiles
 brew "automake"
+# Automatically restart SSH sessions and tunnels
+brew "autossh"
 # General-purpose data compression with high compression ratio
 brew "xz"
 # Bourne-Again SHell, a UNIX command interpreter
@@ -86,8 +88,6 @@ brew "clang-format"
 brew "clipboard"
 # Cross-platform make
 brew "cmake"
-# OCR (Optical Character Recognition) engine
-brew "tesseract"
 # Music player with an ncurses based interface
 brew "cmus"
 # Container runtimes on MacOS (and Linux) with minimal setup
@@ -322,8 +322,6 @@ brew "mu"
 brew "mycli"
 # Open source relational database management system
 brew "mysql"
-# Open source relational database management system
-brew "mysql@8.4"
 # Interactive cheatsheet tool for the command-line
 brew "navi"
 # NCurses Disk Usage
@@ -340,8 +338,6 @@ brew "neovim-remote"
 brew "nginx"
 # Small build system for use with gyp or CMake
 brew "ninja"
-# Tiny, lightning fast, feature-packed file manager
-brew "nnn"
 # Open-source, cross-platform JavaScript runtime environment
 brew "node@24"
 # Modern shell for the GitHub era
@@ -434,6 +430,8 @@ brew "starship"
 brew "statix"
 # Opinionated Lua code formatter
 brew "stylua"
+# OCR (Optical Character Recognition) engine
+brew "tesseract"
 # Feature-rich command-line audio/video downloader
 brew "yt-dlp"
 # Multi-modal AI tool to extract and summarize content
@@ -468,6 +466,8 @@ brew "urlscan"
 brew "urlview"
 # Extremely fast Python package installer and resolver, written in Rust
 brew "uv"
+# Terminal UI for SQL databases
+brew "vi-sql"
 # Ncurses-based file manager with vi-like keybindings
 brew "vifm"
 # Vi 'workalike' with many additional features
@@ -484,8 +484,6 @@ brew "wordnet"
 brew "xclip"
 # Terminal Excel viewer with an interactive TUI
 brew "xleak"
-# Hackable, minimal, fast TUI file explorer
-brew "xplr"
 # Platform for building proxies to bypass network restrictions
 brew "xray"
 # Command-line program for getting and setting the contents of the X selection
