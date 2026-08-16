@@ -1,3 +1,13 @@
+-- https://github.com/mikavilpas/yazi.nvim/blob/a37e7bddd15abdce3bc49c42108dcc7b9b470825/integration-tests/test-environment/.config/yazi/init.lua
+if os.getenv("YAZI_NVIM_ID") ~= nil then
+  -- load nvim.yazi only if running embedded within yazi.nvim
+  local ok, nvim_plugin = pcall(require, "nvim")
+  if ok then
+    -- https://github.com/mikavilpas/yazi.nvim/blob/df28f43610084c5589634d5593a341a877808f4a/yazi-plugin/nvim.yazi/main.lua
+    nvim_plugin:setup()
+  end
+end
+
 -- https://github.com/yazi-rs/plugins/tree/main/smart-enter.yazi
 require("smart-enter"):setup({
   open_multi = true,

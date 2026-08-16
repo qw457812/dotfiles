@@ -12,6 +12,12 @@ return {
     "mikavilpas/yazi.nvim",
     version = "*",
     dependencies = "folke/snacks.nvim",
+    build = function(plugin)
+      require("yazi.plugin").build_plugin(plugin, {
+        sub_dir = "yazi-plugin/nvim.yazi",
+        name = "nvim.yazi",
+      })
+    end,
     cmd = "Yazi",
     keys = {
       { "<leader><cr>", mode = { "n", "x" }, "<cmd>Yazi<cr>", desc = "Yazi (Buffer Dir)" },
@@ -37,6 +43,9 @@ return {
           vim.keymap.set("t", "<c-j>", "<c-j>", { buffer = buf, nowait = true })
           vim.keymap.set("t", "<c-k>", "<c-k>", { buffer = buf, nowait = true })
           vim.keymap.set("t", "<c-l>", "<c-l>", { buffer = buf, nowait = true })
+          -- Let nvim.yazi receive keys intercepted by global terminal mappings.
+          vim.keymap.set("t", "<c-v>", "<c-v>", { buffer = buf, nowait = true })
+          vim.keymap.set("t", "<c-space>", "<c-space>", { buffer = buf, nowait = true })
           -- after closing `show_help` by <bs>, yazi goes to normal mode
           vim.api.nvim_create_autocmd("BufEnter", {
             buffer = buf,
@@ -65,6 +74,16 @@ return {
       ---@type YaziConfig
       return {
         open_for_directories = vim.g.user_hijack_netrw == "yazi.nvim",
+        future_features = {
+          yazi_plugin_keymaps = {
+            open_file_in_vertical_split = "<C-v>",
+            open_file_in_horizontal_split = "<C-x>",
+            grep_in_directory = "<c-g>",
+            replace_in_directory = "<A-r>",
+            cycle_open_buffers = "<c-space>",
+            send_to_quickfix_list = "<c-q>",
+          },
+        },
         -- open_multiple_tabs = true,
         -- floating_window_scaling_factor = vim.g.user_is_termux and 1 or { height = 0.9, width = 0.9 }, -- see `opts.hooks.before_opening_window`
         -- yazi_floating_window_border = vim.g.user_is_termux and "none" or nil, -- see `opts.hooks.before_opening_window`
