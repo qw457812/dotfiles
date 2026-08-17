@@ -17,6 +17,24 @@ import { isExpectedMissingPathError, permissionDeniedError } from "./fs-errors.t
 import { ReadOnlyHostFs } from "./read-only-host-fs.ts";
 import { DiscardDeviceFs, VirtualBinFs } from "./virtual-fs.ts";
 
+const DEFAULT_DEVICE_WRITE_PATHS = [
+  "/dev/stdout",
+  "/dev/stderr",
+  "/dev/null",
+  "/dev/tty",
+  "/dev/dtracehelper",
+  "/dev/autofs_nowait",
+] as const;
+
+const RESERVED_MOUNT_PATHS = [
+  "/usr/bin",
+  "/bin",
+  "/dev/fd",
+  ...DEFAULT_DEVICE_WRITE_PATHS,
+] as const;
+
+type WriteRootSource = "default/environment write" | "justBash.filesystem.allowWrite";
+
 export function createJustBashFs(
   policyRoot: string,
   filesystem: JustBashFilesystemConfig | undefined,
@@ -24,10 +42,6 @@ export function createJustBashFs(
 ) {
   const writeRoots = coalesceWriteRoots(defaultAndConfiguredWriteRoots(policyRoot, filesystem));
   const readPolicy = createReadPathPolicy(policyRoot, filesystem);
-  if (writeRoots.includes("/")) {
-    return applyReadPathPolicy(new ReadWriteFs({ root: "/", allowSymlinks: false }), readPolicy);
-  }
-
   const fs = new MountableFs({ base: new ReadOnlyHostFs() });
   const virtualBinFs = new VirtualBinFs(virtualBinCommands);
   fs.mount("/usr/bin", virtualBinFs);
@@ -272,25 +286,56 @@ function defaultAndConfiguredWriteRoots(
   policyRoot: string,
   filesystem: JustBashFilesystemConfig | undefined,
 ): string[] {
-  return [
-    // Keep just-bash write defaults aligned with sandbox-runtime's recommended paths.
-    // Source: https://github.com/anthropic-experimental/sandbox-runtime/blob/d455fb453e41d32323fbf13d73bfe017bfa52d8a/src/sandbox/sandbox-utils.ts#L278
-    "/dev/stdout",
-    "/dev/stderr",
-    "/dev/null",
-    "/dev/tty",
-    "/dev/dtracehelper",
-    "/dev/autofs_nowait",
+  // Keep just-bash write defaults aligned with sandbox-runtime's recommended paths.
+  // Source: https://github.com/anthropic-experimental/sandbox-runtime/blob/d455fb453e41d32323fbf13d73bfe017bfa52d8a/src/sandbox/sandbox-utils.ts#L278
+  const defaultRoots = normalizeWriteRoots(policyRoot, [
+    ...DEFAULT_DEVICE_WRITE_PATHS,
     "/tmp/claude",
     "/private/tmp/claude",
     join(homedir(), ".npm/_logs"),
     join(homedir(), ".claude/debug"),
     process.env.TMPDIR ?? tmpdir(),
     ...(process.env.TMPDIR === undefined || process.env.TMPDIR === tmpdir() ? [] : [tmpdir()]),
-    ...(filesystem?.allowWrite ?? []),
-  ]
+  ]);
+  const configuredRoots = normalizeWriteRoots(policyRoot, filesystem?.allowWrite ?? []);
+  for (const root of defaultRoots) {
+    if (!isDefaultDeviceWritePath(root)) {
+      assertWriteRootDoesNotOverlapReservedMount(root, "default/environment write");
+    }
+  }
+  for (const root of configuredRoots) {
+    if (!isDefaultDeviceWritePath(root)) {
+      assertWriteRootDoesNotOverlapReservedMount(root, "justBash.filesystem.allowWrite");
+    }
+  }
+  return [...defaultRoots, ...configuredRoots];
+}
+
+function normalizeWriteRoots(policyRoot: string, entries: string[]): string[] {
+  return entries
     .map((entry) => normalizeWriteRoot(policyRoot, entry))
     .filter((entry): entry is string => entry !== null);
+}
+
+function isDefaultDeviceWritePath(path: string): boolean {
+  return DEFAULT_DEVICE_WRITE_PATHS.some((devicePath) => devicePath === path);
+}
+
+function assertWriteRootDoesNotOverlapReservedMount(
+  root: string,
+  source: WriteRootSource,
+): void {
+  const reservedMount = RESERVED_MOUNT_PATHS.find(
+    (path) => pathWithinRoot(root, path) || pathWithinRoot(path, root),
+  );
+  if (reservedMount === undefined) return;
+
+  // MountableFs forbids nested mounts. Letting a broad root such as /, /usr,
+  // or /dev reach coalesceWriteRoots() would erase the virtual-bin or device
+  // mount and expose host binaries/special files instead.
+  throw new Error(
+    `Invalid ${source} root '${root}': overlaps reserved virtual mount '${reservedMount}'`,
+  );
 }
 
 function normalizeWriteRoot(policyRoot: string, entry: string): string | null {

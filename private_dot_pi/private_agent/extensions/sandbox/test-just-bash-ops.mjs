@@ -102,6 +102,51 @@ try {
     output: "",
   });
 
+  // Broad write roots would swallow the virtual-bin or discard-device mount
+  // during root coalescing. Reject them rather than exposing host binaries or
+  // letting just-bash 3.3's special-file hardening break /dev/null.
+  for (const reservedWriteRoot of ["/", "/dev", "/dev/fd", "/usr", "/usr/bin", "/bin"]) {
+    const reservedWriteOps = createJustBashOps(workdir, {
+      filesystem: { allowWrite: [reservedWriteRoot] },
+    });
+    const rejectedReservedWrite = await runErrorWithOps(reservedWriteOps, "true");
+    assert.equal(rejectedReservedWrite.result, null);
+    assert.match(
+      String(rejectedReservedWrite.error),
+      /Invalid justBash\.filesystem\.allowWrite root .*overlaps reserved virtual mount/,
+    );
+  }
+
+  // Exact supported device paths are harmless redundant configuration and
+  // must remain accepted even though broader ancestors such as /dev are not.
+  const explicitDeviceOps = createJustBashOps(workdir, {
+    filesystem: { allowWrite: ["/dev/null", "/dev/stdout"] },
+  });
+  assert.deepEqual(
+    await runWithOps(explicitDeviceOps, "printf discarded >/dev/null; printf device >/dev/stdout"),
+    { exitCode: 0, output: "device" },
+  );
+
+  // Environment-derived defaults report their real source rather than blaming
+  // a justBash.filesystem.allowWrite entry that the user never configured.
+  const originalTmpdir = process.env.TMPDIR;
+  try {
+    process.env.TMPDIR = "/dev";
+    const rejectedDefaultRoot = await runErrorWithOps(
+      createJustBashOps(workdir, { filesystem: { allowWrite: ["."] } }),
+      "true",
+    );
+    assert.equal(rejectedDefaultRoot.result, null);
+    assert.match(
+      String(rejectedDefaultRoot.error),
+      /Invalid default\/environment write root '\/dev': overlaps reserved virtual mount/,
+    );
+    assert.doesNotMatch(String(rejectedDefaultRoot.error), /justBash\.filesystem\.allowWrite/);
+  } finally {
+    if (originalTmpdir === undefined) delete process.env.TMPDIR;
+    else process.env.TMPDIR = originalTmpdir;
+  }
+
   const readonlySourceCopy = join(workdir, "readonly-source-copy.mjs");
   writeFileSync(readonlySourceCopy, "existing destination\n");
   assert.deepEqual(await run(`cp ${thisFilePath} ${readonlySourceCopy}`), {
@@ -138,6 +183,14 @@ try {
   });
 
   assert.deepEqual(await run("which ls"), { exitCode: 0, output: "/usr/bin/ls\n" });
+
+  // just-bash 3.3 process substitution stays entirely inside the VFS for
+  // sandboxed commands, including its deterministic buffered >(cmd) behavior.
+  assert.deepEqual(await run("cat <(printf ps-in)"), { exitCode: 0, output: "ps-in" });
+  assert.deepEqual(await run("printf ps-out | tee >(cat)"), {
+    exitCode: 0,
+    output: "ps-outps-out",
+  });
 
   const extraWritePath = join(extraWriteDir, "extra-write.txt");
   assert.deepEqual(await run(`printf extra > ${extraWritePath} && cat ${extraWritePath}`), {
@@ -216,6 +269,15 @@ try {
   );
   assert.deepEqual(hostNode, { exitCode: 0, output: `ok:${workdir}` });
 
+  // Process-substitution files live only in just-bash's VFS. Host commands
+  // receive the expanded path unchanged and fail naturally if they access it.
+  const hostProcessSubstitution = await runWithOps(
+    hostOps,
+    `node -e "require('node:fs').readFileSync(process.argv[1])" <(printf host-ps)`,
+  );
+  assert.notEqual(hostProcessSubstitution.exitCode, 0);
+  assert.match(hostProcessSubstitution.output, /ENOENT|EBADF|no such file|bad file descriptor/i);
+
   const nodeCommandPath = await runWithOps(hostOps, "command -v node");
   assert.equal(nodeCommandPath.output, "/usr/bin/node\n");
   const nodeAbsolutePath = await runWithOps(
@@ -255,6 +317,24 @@ try {
   assert.deepEqual(prefixVar, { exitCode: 0, output: "FOO=prefix" });
   const exportedVar = await runWithOps(hostOps, `export FOO=x; node ${fooProbe}`);
   assert.deepEqual(exportedVar, { exitCode: 0, output: "FOO=x" });
+
+  // KNOWN LIMITATION: just-bash gives custom commands buffered stdin. Accessing
+  // ctx.stdin therefore marks all descriptor input consumed, even when the host
+  // child reads only one byte. Keep this explicit until upstream exposes a
+  // streaming/consumption API; do not infer reads from child.stdin.bytesWritten.
+  const readOneByteProbe = join(workdir, "read-one-byte.cjs");
+  writeFileSync(
+    readOneByteProbe,
+    "const fs=require('node:fs');const b=Buffer.alloc(1);" +
+      "if(fs.readSync(0,b,0,1,null)>0)process.stdout.write(b);",
+  );
+  const descriptorInputPath = join(workdir, "host-descriptor-input.txt");
+  const hostDescriptorReads = await runWithOps(
+    hostOps,
+    `printf abc > ${descriptorInputPath}; exec 3< ${descriptorInputPath}; ` +
+      `node ${readOneByteProbe} <&3; node ${readOneByteProbe} <&3`,
+  );
+  assert.deepEqual(hostDescriptorReads, { exitCode: 0, output: "a" });
 
   // The just-bash sandbox policy enforces denyRead / allowRead for sandboxed
   // virtual filesystem reads. Host commands remain an explicit escape hatch;

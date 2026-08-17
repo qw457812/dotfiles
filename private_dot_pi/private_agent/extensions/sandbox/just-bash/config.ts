@@ -1,7 +1,11 @@
 import type { JavaScriptConfig, NetworkConfig } from "just-bash";
 
 export interface JustBashFilesystemConfig {
-  /** Write roots plumbed into just-bash's virtual filesystem (MountableFs mounts). */
+  /**
+   * Write roots plumbed into just-bash's virtual filesystem. Protected
+   * virtual-bin or `/dev/fd` overlaps and roots broader than the supported
+   * `/dev` devices are rejected; exact default device paths remain valid.
+   */
   allowWrite?: string[];
   /** Read roots whose contents and direct metadata access are denied. */
   denyRead?: string[];
@@ -58,6 +62,11 @@ export interface JustBashConfig {
    * hatch, not a convenience. The child env is scrubbed (proxy and
    * secret-shaped vars removed) and PATH is forced to the host PATH. Prefer a
    * short explicit allow-list.
+   *
+   * Stdin is exposed by just-bash as one buffered value, so a host command
+   * attached to a persistent numeric descriptor is treated as consuming all
+   * remaining input even if the child exits after a partial read. Use sandboxed
+   * commands when descriptor position semantics matter.
    */
   hostCommands?: string[];
 }

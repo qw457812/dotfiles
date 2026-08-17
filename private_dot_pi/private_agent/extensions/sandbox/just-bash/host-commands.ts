@@ -1,4 +1,9 @@
-import { latin1FromBytes, type ByteString, type Command, type ExecResult } from "just-bash";
+import {
+  latin1FromBytes,
+  type ByteString,
+  type Command,
+  type ExecResult,
+} from "just-bash";
 import { createRequire } from "node:module";
 import type { JustBashConfig } from "./config.ts";
 
