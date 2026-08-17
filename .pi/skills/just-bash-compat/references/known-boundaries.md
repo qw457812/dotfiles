@@ -1,23 +1,7 @@
 # Known just-bash compatibility boundaries
 
-These diagnostic leads were verified with just-bash 3.2.0.
+These diagnostic leads were verified with just-bash 3.3.0.
 Probe the installed version before adapting code.
-
-## Process substitution
-
-`< <(...)` is not executable and may fail with `Expected redirection target`.
-If buffering is semantically acceptable, capture first and feed a here-string:
-
-```bash
-parsed="$(produce_rows)" || exit $?
-
-while IFS= read -r row; do
-  consume "$row"
-done <<< "$parsed"
-```
-
-Command substitution removes trailing newlines and buffering changes streaming
-behavior. Account for those differences before using this adaptation.
 
 ## Script argument ceiling
 
@@ -69,5 +53,4 @@ status to a user-facing error and return `1`, provided the wrapper itself is
 called in a conditional context.
 
 Test this behavior through the complete script. A minimized inline snippet can
-pass while script execution, nested functions, or the project's custom command
-adapter still fails.
+pass while script execution or nested functions still fail.
