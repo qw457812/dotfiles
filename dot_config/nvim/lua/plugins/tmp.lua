@@ -2,9 +2,13 @@ local orig_java_home = vim.env.JAVA_HOME -- may be set by Mise
 local java_home = vim.g.user_is_termux and "/data/data/com.termux/files/usr/lib/jvm/java-21-openjdk"
   or vim.fn.expand("$HOME/.local/share/mise/installs/java/23")
 
-local https_proxy = "http://127.0.0.1:10808"
-local http_proxy = "http://127.0.0.1:10808"
-local all_proxy = "socks5://127.0.0.1:10808"
+local proxy = {
+  http = "http://127.0.0.1:10808",
+  https = "http://127.0.0.1:10808",
+  all = "socks5://127.0.0.1:10808",
+  no = "localhost,127.0.0.1",
+  node_use_env = "1",
+}
 
 ---@type LazySpec
 return {
@@ -157,9 +161,15 @@ return {
       --    - mikesmithgh/kitty-scrollback.nvim
       -- 2. neovide
       if vim.g.terminal_scrollback_pager or vim.g.neovide then
-        vim.env.https_proxy = vim.env.https_proxy or https_proxy
-        vim.env.http_proxy = vim.env.http_proxy or http_proxy
-        vim.env.all_proxy = vim.env.all_proxy or all_proxy
+        vim.env.http_proxy = vim.env.http_proxy or proxy.http
+        vim.env.HTTP_PROXY = vim.env.HTTP_PROXY or proxy.http
+        vim.env.https_proxy = vim.env.https_proxy or proxy.https
+        vim.env.HTTPS_PROXY = vim.env.HTTPS_PROXY or proxy.https
+        vim.env.all_proxy = vim.env.all_proxy or proxy.all
+        vim.env.ALL_PROXY = vim.env.ALL_PROXY or proxy.all
+        vim.env.no_proxy = vim.env.no_proxy or proxy.no
+        vim.env.NO_PROXY = vim.env.NO_PROXY or proxy.no
+        vim.env.NODE_USE_ENV_PROXY = vim.env.NODE_USE_ENV_PROXY or proxy.node_use_env
       end
     end,
   },
@@ -167,21 +177,39 @@ return {
   {
     "folke/sidekick.nvim",
     optional = true,
-    opts = {
-      cli = {
-        tools = {
-          pi = {
-            env = {
+    ---@module "sidekick"
+    ---@param opts sidekick.Config
+    opts = function(_, opts)
+      local proxy_env = vim.g.user_is_termux and {}
+        or {
+          http_proxy = vim.env.http_proxy or proxy.http,
+          HTTP_PROXY = vim.env.HTTP_PROXY or proxy.http,
+          https_proxy = vim.env.https_proxy or proxy.https,
+          HTTPS_PROXY = vim.env.HTTPS_PROXY or proxy.https,
+          all_proxy = vim.env.all_proxy or proxy.all,
+          ALL_PROXY = vim.env.ALL_PROXY or proxy.all,
+          no_proxy = vim.env.no_proxy or proxy.no,
+          NO_PROXY = vim.env.NO_PROXY or proxy.no,
+          NODE_USE_ENV_PROXY = vim.env.NODE_USE_ENV_PROXY or proxy.node_use_env,
+        }
+
+      return U.extend_tbl(opts, {
+        cli = {
+          ---@type table<string, sidekick.cli.Config|{}>
+          tools = {
+            pi = {
               -- needed for openai-codex to login/refreshToken even with TUN on
               -- https://github.com/earendil-works/pi/issues/1132
-              https_proxy = vim.env.https_proxy or (not vim.g.user_is_termux and https_proxy or nil),
-              http_proxy = vim.env.http_proxy or (not vim.g.user_is_termux and http_proxy or nil),
-              all_proxy = vim.env.all_proxy or (not vim.g.user_is_termux and all_proxy or nil),
+              env = proxy_env,
+            },
+            dsh = {
+              -- needed for https://github.com/Yan-Zero/dsh-codex
+              env = proxy_env,
             },
           },
         },
-      },
-    },
+      } --[[@as sidekick.Config]])
+    end,
   },
 
   -- TODO: breaking changes

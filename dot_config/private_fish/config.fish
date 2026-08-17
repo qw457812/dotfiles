@@ -105,8 +105,8 @@ abbr tksv 'tmux kill-server'
 # Git
 abbr g git
 alias lazygit "TERM=xterm-256color command lazygit"
-alias glab "env -u https_proxy -u http_proxy -u all_proxy command glab"
-alias gitnp="env -u https_proxy -u http_proxy -u all_proxy git"
+alias glab "env -u HTTPS_PROXY -u https_proxy -u HTTP_PROXY -u http_proxy -u ALL_PROXY -u all_proxy command glab"
+alias gitnp="env -u HTTPS_PROXY -u https_proxy -u HTTP_PROXY -u http_proxy -u ALL_PROXY -u all_proxy git"
 abbr gg lazygit
 abbr gl 'git l --color'
 abbr gs "git status"

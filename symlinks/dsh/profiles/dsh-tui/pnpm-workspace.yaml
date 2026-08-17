@@ -1,0 +1,9 @@
+packages:
+  - .
+
+nodeLinker: hoisted
+autoInstallPeers: false
+minimumReleaseAgeExclude:
+  - '@deepseek-harness-tui/dsh-tui@0.8.0'
+  - dsh-working-activity@0.2.6
+  - dsh-codex@0.2.4

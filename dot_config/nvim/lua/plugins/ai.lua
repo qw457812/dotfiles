@@ -183,7 +183,51 @@ return {
     lazy = true,
     config = function() end,
     specs = {
-      { "ccch1mneyyy/dsh-TUI", lazy = true, config = function() end },
+      {
+        "ccch1mneyyy/dsh-TUI",
+        build = function(plugin)
+          local version = vim.json.decode(require("lazy.util").read_file(plugin.dir .. "/package.json")).version
+          if not version then
+            return
+          end
+          local res = vim
+            .system(
+              { "dsh", "plugin", "--profile", "dsh-tui", "update", "@deepseek-harness-tui/dsh-tui@" .. version },
+              { text = true }
+            )
+            :wait()
+          if res.code ~= 0 then
+            LazyVim.error(
+              { ("dsh plugin update failed (exit %d)"):format(res.code), res.stdout, res.stderr },
+              { title = "dsh-TUI" }
+            )
+          end
+        end,
+        version = "*",
+        lazy = true,
+        config = function() end,
+      },
+      {
+        "Yan-Zero/dsh-codex",
+        build = function(plugin)
+          local version = vim.json.decode(require("lazy.util").read_file(plugin.dir .. "/package.json")).version
+          if not version then
+            return
+          end
+          local res = vim
+            .system({ "dsh", "plugin", "--profile", "dsh-tui", "update", "dsh-codex@" .. version }, { text = true })
+            :wait()
+          if res.code ~= 0 then
+            LazyVim.error(
+              { ("dsh plugin update failed (exit %d)"):format(res.code), res.stdout, res.stderr },
+              { title = "dsh-codex" }
+            )
+          end
+        end,
+        version = "*",
+        lazy = true,
+        config = function() end,
+      },
     },
   },
 
@@ -233,6 +277,7 @@ return {
         ["<leader>ai"] = "pi",
         -- ["<leader>ag"] = "claude_glm",
         ["<leader>at"] = "pi_tmp",
+        ["<leader>ae"] = "dsh",
       }
       local favourite_tool = "pi"
       for i = 1, 9 do
@@ -342,6 +387,7 @@ return {
         },
         count = 0,
       })
+      numbered_tools({ name = "dsh", count = 1 })
 
       opts.cli.mux = opts.cli.mux or {}
       local use_herdr = opts.cli.mux.backend == "herdr"
@@ -403,8 +449,6 @@ return {
         { "<leader>af", function() require("sidekick.cli").send({ msg = "{file}", filter = filter }) end, desc = "File (Sidekick)" },
         { "<leader>ab", function() U.ai.sidekick.cli.quick.show("codebuddy") end, desc = "CodeBuddy" },
         { "<leader>ab", function() U.ai.sidekick.cli.quick.send("codebuddy", { msg = "{this}" }) end, mode = "x", desc = "CodeBuddy" },
-        { "<leader>ae", function() U.ai.sidekick.cli.quick.show("dsh") end, desc = "DeepSeek Harness" },
-        { "<leader>ae", function() U.ai.sidekick.cli.quick.send("dsh", { msg = "{this}" }) end, mode = "x", desc = "DeepSeek Harness" },
       })
     end,
     ---@module "sidekick"
