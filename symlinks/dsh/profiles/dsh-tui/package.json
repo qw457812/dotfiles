@@ -3,6 +3,7 @@
   "private": true,
   "dependencies": {
     "@deepseek-harness-tui/dsh-tui": "^0.8.0",
+    "@qw457812/dsh-pi-prompts": "^0.1.2",
     "dsh-codex": "^0.2.4"
   },
   "dsh": {
@@ -10,7 +11,8 @@
       "bundles": [
         "@deepseek-ai/dsh-base",
         "@deepseek-harness-tui/dsh-tui",
-        "dsh-codex"
+        "dsh-codex",
+        "@qw457812/dsh-pi-prompts"
       ]
     }
   }
