@@ -38,6 +38,8 @@ export default function (pi: ExtensionAPI) {
         const lines = stdout.trim().split("\n").length;
         ctx.ui.notify(`⚠️ Dirty repo: ${lines} uncommitted change(s)`, "warning");
       }
-    } catch { /* not a git repo, ignore */ }
+    } catch {
+      /* not a git repo, ignore */
+    }
   });
 }

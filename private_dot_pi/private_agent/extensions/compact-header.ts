@@ -19,8 +19,14 @@ export default function (pi: ExtensionAPI) {
         const cwd = home && ctx.cwd.startsWith(home) ? `~${ctx.cwd.slice(home.length)}` : ctx.cwd;
         const sid = ctx.sessionManager.getSessionId().slice(0, 8);
         const cmds = pi.getCommands();
-        const prompts = cmds.filter(c => c.source === "prompt").map(c => `/${c.name}`).join("  ");
-        const skills = cmds.filter(c => c.source === "skill").map(c => c.name.replace(/^skill:/, "")).join("  ");
+        const prompts = cmds
+          .filter((c) => c.source === "prompt")
+          .map((c) => `/${c.name}`)
+          .join("  ");
+        const skills = cmds
+          .filter((c) => c.source === "skill")
+          .map((c) => c.name.replace(/^skill:/, ""))
+          .join("  ");
 
         const pad = (s: string, w: number) => s + " ".repeat(Math.max(0, w - visibleWidth(s)));
         const t = (s: string) => truncateToWidth(s, width, "…");

@@ -20,7 +20,8 @@ const { __testing, createJustBashOps } = await jiti.import("./just-bash-ops.ts")
 
 const thisFilePath = fileURLToPath(import.meta.url);
 const thisDirPath = dirname(thisFilePath);
-const isTermux = process.platform === "android" || process.env.PREFIX?.includes("/com.termux/") === true;
+const isTermux =
+  process.platform === "android" || process.env.PREFIX?.includes("/com.termux/") === true;
 const workdir = mkdtempSync(join(thisDirPath, ".tmp-workdir-"));
 const extraWriteDir = mkdtempSync(join(thisDirPath, ".tmp-extra-write-"));
 const blockedWritePath = join(thisDirPath, `.tmp-blocked-write-${process.pid}.txt`);
@@ -32,9 +33,13 @@ const hostBinSymlinkPath = join(thisDirPath, `.tmp-host-bin-link-${process.pid}`
 const defaultTmpWritePath = join(tmpdir(), `pi-sandbox-default-tmp-${process.pid}.txt`);
 const literalTmpFileName = `pi-sandbox-literal-tmp-${process.pid}.txt`;
 const literalTmpWritePath = `/tmp/${literalTmpFileName}`;
-const literalTmpHostPath = existsSync("/tmp") ? literalTmpWritePath : join(tmpdir(), literalTmpFileName);
+const literalTmpHostPath = existsSync("/tmp")
+  ? literalTmpWritePath
+  : join(tmpdir(), literalTmpFileName);
 const ops = createJustBashOps(workdir, { filesystem: { allowWrite: [".", extraWriteDir] } });
-const literalTmpOps = createJustBashOps(workdir, { filesystem: { allowWrite: [".", extraWriteDir, "/tmp"] } });
+const literalTmpOps = createJustBashOps(workdir, {
+  filesystem: { allowWrite: [".", extraWriteDir, "/tmp"] },
+});
 const hostOps = createJustBashOps(workdir, {
   hostCommands: ["node"],
   filesystem: { allowWrite: [".", extraWriteDir] },
@@ -207,7 +212,10 @@ try {
 
   if (existsSync("/tmp")) {
     assert.deepEqual(
-      await runWithOps(literalTmpOps, `printf literal > ${literalTmpWritePath} && cat ${literalTmpWritePath}`),
+      await runWithOps(
+        literalTmpOps,
+        `printf literal > ${literalTmpWritePath} && cat ${literalTmpWritePath}`,
+      ),
       {
         exitCode: 0,
         output: "literal",
@@ -215,7 +223,10 @@ try {
     );
     assert.equal(readFileSync(literalTmpHostPath, "utf8"), "literal");
   } else {
-    const literalTmpWrite = await runErrorWithOps(literalTmpOps, `printf literal > ${literalTmpWritePath}`);
+    const literalTmpWrite = await runErrorWithOps(
+      literalTmpOps,
+      `printf literal > ${literalTmpWritePath}`,
+    );
     assert.equal(literalTmpWrite.result, null);
     assert.match(String(literalTmpWrite.error), /ENOENT: no such file or directory, open '\/tmp\//);
     assert.equal(existsSync(literalTmpHostPath), false);
@@ -235,7 +246,9 @@ try {
   assert.equal(blockedWrite.result, null);
   assert.match(String(blockedWrite.error), /EROFS: read-only file system, write/);
 
-  const readonlyMissingParentWrite = await runError(`printf readonly > ${readonlyMissingParentFile}`);
+  const readonlyMissingParentWrite = await runError(
+    `printf readonly > ${readonlyMissingParentFile}`,
+  );
   assert.equal(readonlyMissingParentWrite.result, null);
   assert.match(String(readonlyMissingParentWrite.error), /ENOENT: no such file or directory, open/);
   assert.equal(existsSync(readonlyMissingParentFile), false);
@@ -552,11 +565,7 @@ try {
 
     // Android/Termux reports chmod(000) directories inconsistently enough that
     // this host-permission edge-case test can leave undeletable temp dirs.
-    if (
-      process.platform !== "win32" &&
-      !isTermux &&
-      process.getuid?.() !== 0
-    ) {
+    if (process.platform !== "win32" && !isTermux && process.getuid?.() !== 0) {
       chmodSync(unreadableSourceDir, 0o000);
       const unreadableDirMv = await runWithOps(
         createJustBashOps(workdir, { filesystem: { allowWrite: [".", extraWriteDir] } }),
@@ -670,7 +679,10 @@ try {
   const redirectProbe = join(workdir, "redirect-utf8-probe.js");
   writeFileSync(redirectProbe, "process.stdout.write(Buffer.from('─','utf8'));");
   const redirectFile = join(workdir, "redirect-utf8.out");
-  const redirectResult = await runWithOps(denyReadRedirectOps, `node ${redirectProbe} > ${redirectFile}`);
+  const redirectResult = await runWithOps(
+    denyReadRedirectOps,
+    `node ${redirectProbe} > ${redirectFile}`,
+  );
   assert.equal(redirectResult.exitCode, 0);
   assert.deepEqual(Array.from(readFileSync(redirectFile)), [0xe2, 0x94, 0x80]);
 

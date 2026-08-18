@@ -321,10 +321,7 @@ function isDefaultDeviceWritePath(path: string): boolean {
   return DEFAULT_DEVICE_WRITE_PATHS.some((devicePath) => devicePath === path);
 }
 
-function assertWriteRootDoesNotOverlapReservedMount(
-  root: string,
-  source: WriteRootSource,
-): void {
+function assertWriteRootDoesNotOverlapReservedMount(root: string, source: WriteRootSource): void {
   const reservedMount = RESERVED_MOUNT_PATHS.find(
     (path) => pathWithinRoot(root, path) || pathWithinRoot(path, root),
   );
