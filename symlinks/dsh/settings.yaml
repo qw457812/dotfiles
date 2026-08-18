@@ -20,3 +20,5 @@ llm-pi-ai:
           compat:
             thinkingFormat: zai
             supportsReasoningEffort: true
+dsh-tui:
+  diffLayout: unified

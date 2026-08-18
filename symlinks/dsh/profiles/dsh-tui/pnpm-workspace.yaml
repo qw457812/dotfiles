@@ -4,7 +4,7 @@ packages:
 nodeLinker: hoisted
 autoInstallPeers: false
 minimumReleaseAgeExclude:
-  - '@deepseek-harness-tui/dsh-tui@0.8.0'
+  - '@deepseek-harness-tui/dsh-tui@0.8.0 || 0.8.1'
   - '@qw457812/dsh-pi-prompts@0.1.2'
   - dsh-working-activity@0.2.6
   - dsh-codex@0.2.4

@@ -4,6 +4,35 @@
 local sidekick_cli_toggle_key = "<M-space>"
 local copilot_available = not vim.g.user_is_termux or vim.fn.executable("copilot-language-server") == 1
 
+---@param plugin LazyPlugin
+local function update_dsh_plugin(plugin)
+  local pkg = vim.json.decode(require("lazy.util").read_file(plugin.dir .. "/package.json"))
+  if not pkg.name or not pkg.version then
+    return
+  end
+
+  local res = vim
+    .system({ "dsh", "plugin", "--profile", "dsh-tui", "update", pkg.name .. "@" .. pkg.version }, { text = true })
+    :wait()
+  if res.code ~= 0 then
+    LazyVim.error(
+      { ("dsh plugin update failed (exit %d)"):format(res.code), res.stdout, res.stderr },
+      { title = plugin.name }
+    )
+    return
+  end
+
+  local readd = vim
+    .system({ "chezmoi", "re-add", "--no-tty", "~/.dsh/profiles/dsh-tui/pnpm-lock.yaml" }, { text = true })
+    :wait()
+  if readd.code ~= 0 then
+    LazyVim.error(
+      { ("chezmoi re-add `pnpm-lock.yaml` failed (exit %d)"):format(readd.code), readd.stdout, readd.stderr },
+      { title = plugin.name }
+    )
+  end
+end
+
 ---@type LazySpec
 return {
   -- https://github.com/disler/pi-vs-claude-code
@@ -180,54 +209,14 @@ return {
 
   {
     "deepseek-ai/deepseek-harness",
+    version = "*",
+    enabled = vim.fn.executable("dsh") == 1,
+    build = "npm install -g @deepseek-ai/dsh",
     lazy = true,
     config = function() end,
     specs = {
-      {
-        "ccch1mneyyy/dsh-TUI",
-        build = function(plugin)
-          local version = vim.json.decode(require("lazy.util").read_file(plugin.dir .. "/package.json")).version
-          if not version then
-            return
-          end
-          local res = vim
-            .system(
-              { "dsh", "plugin", "--profile", "dsh-tui", "update", "@deepseek-harness-tui/dsh-tui@" .. version },
-              { text = true }
-            )
-            :wait()
-          if res.code ~= 0 then
-            LazyVim.error(
-              { ("dsh plugin update failed (exit %d)"):format(res.code), res.stdout, res.stderr },
-              { title = "dsh-TUI" }
-            )
-          end
-        end,
-        version = "*",
-        lazy = true,
-        config = function() end,
-      },
-      {
-        "Yan-Zero/dsh-codex",
-        build = function(plugin)
-          local version = vim.json.decode(require("lazy.util").read_file(plugin.dir .. "/package.json")).version
-          if not version then
-            return
-          end
-          local res = vim
-            .system({ "dsh", "plugin", "--profile", "dsh-tui", "update", "dsh-codex@" .. version }, { text = true })
-            :wait()
-          if res.code ~= 0 then
-            LazyVim.error(
-              { ("dsh plugin update failed (exit %d)"):format(res.code), res.stdout, res.stderr },
-              { title = "dsh-codex" }
-            )
-          end
-        end,
-        version = "*",
-        lazy = true,
-        config = function() end,
-      },
+      { "ccch1mneyyy/dsh-TUI", build = update_dsh_plugin, version = "*", lazy = true, config = function() end },
+      { "Yan-Zero/dsh-codex", build = update_dsh_plugin, version = "*", lazy = true, config = function() end },
     },
   },
 

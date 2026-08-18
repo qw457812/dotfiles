@@ -1,5 +1,6 @@
 local H = {}
 
+---@param plugin LazyPlugin
 function H.build_plugin(plugin)
   require("yazi.plugin").build_plugin(plugin)
 end
