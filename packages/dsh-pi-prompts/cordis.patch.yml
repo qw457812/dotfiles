@@ -1,0 +1,4 @@
+# Install Pi agent prompts as slash commands.
+- insert:
+    - id: pi-prompts
+      name: "@qw457812/dsh-pi-prompts"
