@@ -1,7 +1,8 @@
 ## Chezmoi
 
 - Edit chezmoi source paths like `dot_*`, `private_*`, and `symlink_*`, not generated target paths.
-- Do not run `chezmoi apply` manually; the Pi extension `private_dot_pi/private_agent/extensions/chezmoi.ts` and the dsh plugin `dot_dsh/plugins/dsh-plugin-chezmoi.mjs` run it when needed.
+- Repository-only projects such as `packages/` and `dsh-plugins/` are Git-tracked but excluded from chezmoi's target state by `.chezmoiignore`.
+- Successful `write`/`edit` tool calls in the chezmoi source normally trigger `chezmoi apply` automatically via the active Pi extension `private_dot_pi/private_agent/extensions/chezmoi.ts` or dsh plugin `dsh-plugins/dsh-plugin-chezmoi.mjs`. Run manual `chezmoi apply` when needed and scope it to the relevant target paths.
 - `symlinks/` contains source-state files referenced by `symlink_*` templates.
 - Deployment exclusions are listed in `.chezmoiignore`.
 
@@ -14,10 +15,12 @@
 
 ## DeepSeek Harness
 
-- Dsh config and plugins live under `dot_dsh/`; the `~/.dsh` home patch (`dot_dsh/cordis.patch.yml.tmpl`) loads plugins from `~/.dsh/plugins/` via profile-relative specifiers.
+- Dsh home config lives under `dot_dsh/`; source-loaded direct plugins live under `dsh-plugins/`; publishable npm bundle sources live under `packages/` and are installed per profile through its `package.json`.
+- The `~/.dsh` home patch (`dot_dsh/cordis.patch.yml.tmpl`) explicitly loads direct plugins from the chezmoi source directory.
 - Dsh global settings file lives at `symlinks/dsh/settings.yaml`.
-- When working on `dot_dsh/plugins`, the dsh source checkout is available for reference at `~/.local/share/nvim/lazy/deepseek-harness`.
-- After changes under `dot_dsh/plugins`, run `pnpm --dir dot_dsh/plugins run check` and `pnpm --dir dot_dsh/plugins run lint` from the chezmoi repository root.
+- For both direct plugins under `dsh-plugins/` and profile-scoped npm bundles under `packages/`, the dsh source checkout is available for reference at `~/.local/share/nvim/lazy/deepseek-harness`.
+- After changes under `dsh-plugins`, run `pnpm --dir dsh-plugins run check` and `pnpm --dir dsh-plugins run lint` from the chezmoi repository root.
+- Before publishing a bundle under `packages/`, run its `check` script and inspect `npm pack --dry-run` output.
 
 ## Neovim
 

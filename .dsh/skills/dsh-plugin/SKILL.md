@@ -1,6 +1,6 @@
 ---
 name: dsh-plugin
-description: Build or change DeepSeek Harness Cordis plugins, including direct dotfile modules, profile-scoped npm bundles, lifecycle, wiring, tests, installation, and publication.
+description: Build or change DeepSeek Harness Cordis plugins, including source-loaded direct modules, profile-scoped npm bundles, lifecycle, wiring, tests, installation, and publication.
 ---
 
 # DSH plugin
@@ -10,7 +10,7 @@ Build from the **surface** inward. Direct modules, published bundles, and first-
 ## Steps
 
 1. **Establish authority and surface.** Read the nearest `AGENTS.md`, the affected profile manifest, the closest working plugin, and the current API package in `~/.local/share/nvim/lazy/deepseek-harness`. Select exactly one surface:
-   - **Direct module** — machine-local behavior loaded from `dot_dsh/plugins`; read [`references/direct-plugin.md`](references/direct-plugin.md).
+   - **Direct module** — machine-local behavior loaded in place from `dsh-plugins/`; read [`references/direct-plugin.md`](references/direct-plugin.md).
    - **npm bundle** — installable, profile-scoped behavior sourced under `packages/`; read [`references/npm-bundle.md`](references/npm-bundle.md).
    - **First-party workspace plugin** — code inside the DeepSeek Harness checkout; follow its nearest `AGENTS.md`, workspace package conventions, and package-local tests instead of either dotfiles layout.
 
@@ -37,9 +37,9 @@ Build from the **surface** inward. Direct modules, published bundles, and first-
 
    Completion criterion: every changed surface has a failing-before/passing-after check, the resolved config has the intended cardinality, and interactive behavior is observed when user-visible.
 
-5. **Wire and release through the selected surface.** Treat chezmoi source files as authoritative and keep the requested profile set exact. Use only targeted `chezmoi apply` paths when a manual apply is explicitly requested or needed for validation. For npm, publishing is an external release gate: inspect the tarball, confirm the immutable version is new, publish only with user authorization, then update profile locks from the registry artifact.
+5. **Wire and release through the selected surface.** Keep the requested profile set exact. For a direct module, update its loader patch. For npm, publishing is an external release gate: inspect the tarball, confirm the immutable version is new, publish only with user authorization, then update profile locks from the registry artifact.
 
-   Completion criterion: source, deployed profile, and—when applicable—npm registry all identify the same plugin package and version; no profile outside the agreed set loads it.
+   Completion criterion: source module, rendered loader config, and—when applicable—npm registry all identify the same plugin package and version; no profile outside the agreed set loads it.
 
 6. **Close the diff.** Run `git diff --check`, inspect scoped status, remove generated stores, caches, tarballs, and temporary TUI sessions, and preserve unrelated worktree state. Keep portable dependency specifications in tracked manifests; host-absolute paths belong only in transient runtime state.
 

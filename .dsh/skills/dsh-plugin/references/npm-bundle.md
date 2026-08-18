@@ -1,6 +1,6 @@
 # Profile-scoped npm bundle
 
-Use an npm bundle when the plugin needs profile-level installation, a portable dependency specifier, or an independent release cycle. In this repository, keep its source under `packages/<package>/`; `packages/` is source-only through `.chezmoiignore`.
+Use an npm bundle when the plugin needs profile-level installation, a portable dependency specifier, or an independent release cycle. In this repository, keep its source under `packages/<package>/`.
 
 ## Package boundary
 
@@ -59,9 +59,9 @@ The ordinary consumer command is:
 dsh plugin --profile <profile> add @scope/dsh-example
 ```
 
-In this chezmoi repository, locate the profile's authoritative source with `chezmoi source-path` before editing. Managed or symlink-backed profiles must leave portable registry ranges in their source `package.json`, list the package once in `dsh.profile.bundles`, and carry a lockfile generated from that source layout. Preserve the user's exact profile set.
+Keep portable registry ranges in the profile's `package.json`, list the package once in `dsh.profile.bundles`, carry a matching lockfile, and preserve the user's exact profile set.
 
-When pnpm's release-age policy blocks a just-published version, add only that exact package version to `minimumReleaseAgeExclude`, regenerate the lock, and keep the exclusion synchronized with the locked release. For symlink-backed lockfiles, generate the lock from the real source directory before running a frozen install in the target profile.
+When pnpm's release-age policy blocks a just-published version, add only that exact package version to `minimumReleaseAgeExclude`, regenerate the lock, and keep the exclusion synchronized with the locked release. Finish with a frozen install in the profile.
 
 ## Release gate
 

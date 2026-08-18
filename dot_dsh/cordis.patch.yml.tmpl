@@ -7,4 +7,4 @@
 # Chezmoi auto-sync after write/edit tool results.
 - insert:
     - id: chezmoi
-      name: ../../plugins/dsh-plugin-chezmoi.mjs
+      name: {{ printf "%s/dsh-plugins/dsh-plugin-chezmoi.mjs" .chezmoi.sourceDir | quote }}
