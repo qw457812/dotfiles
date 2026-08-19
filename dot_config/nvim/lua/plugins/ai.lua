@@ -5,14 +5,15 @@ local sidekick_cli_toggle_key = "<M-space>"
 local copilot_available = not vim.g.user_is_termux or vim.fn.executable("copilot-language-server") == 1
 
 ---@param plugin LazyPlugin
-local function update_dsh_plugin(plugin)
+---@param profile string
+local function update_dsh_plugin(plugin, profile)
   local pkg = vim.json.decode(require("lazy.util").read_file(plugin.dir .. "/package.json"))
   if not pkg.name or not pkg.version then
     return
   end
 
   local res = vim
-    .system({ "dsh", "plugin", "--profile", "dsh-tui", "update", pkg.name .. "@" .. pkg.version }, { text = true })
+    .system({ "dsh", "plugin", "--profile", profile, "update", pkg.name .. "@" .. pkg.version }, { text = true })
     :wait()
   if res.code ~= 0 then
     LazyVim.error(
@@ -23,7 +24,7 @@ local function update_dsh_plugin(plugin)
   end
 
   local readd = vim
-    .system({ "chezmoi", "re-add", "--no-tty", "~/.dsh/profiles/dsh-tui/pnpm-lock.yaml" }, { text = true })
+    .system({ "chezmoi", "re-add", "--no-tty", "~/.dsh/profiles/" .. profile .. "/pnpm-lock.yaml" }, { text = true })
     :wait()
   if readd.code ~= 0 then
     LazyVim.error(
@@ -215,8 +216,34 @@ return {
     lazy = true,
     config = function() end,
     specs = {
-      { "ccch1mneyyy/dsh-TUI", build = update_dsh_plugin, version = "*", lazy = true, config = function() end },
-      { "Yan-Zero/dsh-codex", build = update_dsh_plugin, version = "*", lazy = true, config = function() end },
+      {
+        "ccch1mneyyy/dsh-TUI",
+        build = function(plugin)
+          update_dsh_plugin(plugin, "dsh-tui")
+        end,
+        version = "*",
+        lazy = true,
+        config = function() end,
+      },
+      {
+        "dsh-tui/dsh-tui",
+        name = "dsh-pi-tui",
+        build = function(plugin)
+          update_dsh_plugin(plugin, "pi-tui")
+        end,
+        version = "*",
+        lazy = true,
+        config = function() end,
+      },
+      {
+        "Yan-Zero/dsh-codex",
+        build = function(plugin)
+          update_dsh_plugin(plugin, "dsh-tui")
+        end,
+        version = "*",
+        lazy = true,
+        config = function() end,
+      },
     },
   },
 

@@ -1,11 +1,8 @@
 /profiles/node_modules/
 /sessions/
 /storages/
-
 /plugins/node_modules/
-
-# https://github.com/ccch1mneyyy/dsh-TUI
-/profiles/dsh-tui/node_modules/
+/profiles/*/node_modules/
 
 # https://github.com/Yan-Zero/dsh-codex
 /.openai-codex-auth.json

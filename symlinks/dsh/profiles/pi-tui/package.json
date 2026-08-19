@@ -1,0 +1,15 @@
+{
+  "name": "dsh-profile-pi-tui",
+  "private": true,
+  "dependencies": {
+    "@dsh-tui/dsh-tui": "^0.1.2"
+  },
+  "dsh": {
+    "profile": {
+      "bundles": [
+        "@deepseek-ai/dsh-base",
+        "@dsh-tui/dsh-tui"
+      ]
+    }
+  }
+}
