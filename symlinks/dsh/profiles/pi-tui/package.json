@@ -2,13 +2,17 @@
   "name": "dsh-profile-pi-tui",
   "private": true,
   "dependencies": {
-    "@dsh-tui/dsh-tui": "^0.1.2"
+    "@dsh-tui/dsh-tui": "^0.1.2",
+    "@qw457812/dsh-pi-prompts": "^0.1.2",
+    "dsh-codex": "^0.2.4"
   },
   "dsh": {
     "profile": {
       "bundles": [
         "@deepseek-ai/dsh-base",
-        "@dsh-tui/dsh-tui"
+        "@dsh-tui/dsh-tui",
+        "dsh-codex",
+        "@qw457812/dsh-pi-prompts"
       ]
     }
   }

@@ -239,6 +239,7 @@ return {
         "Yan-Zero/dsh-codex",
         build = function(plugin)
           update_dsh_plugin(plugin, "dsh-tui")
+          update_dsh_plugin(plugin, "pi-tui")
         end,
         version = "*",
         lazy = true,
@@ -785,7 +786,7 @@ return {
             },
           },
           dsh = {
-            cmd = { "dsh", "--profile", "dsh-tui" },
+            cmd = { "dsh", "--profile", "pi-tui" },
             is_proc = "\\<dsh\\>",
             url = "https://github.com/deepseek-ai/deepseek-harness",
             env = {
