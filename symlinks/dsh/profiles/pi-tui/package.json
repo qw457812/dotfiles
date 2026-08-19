@@ -3,7 +3,7 @@
   "private": true,
   "dependencies": {
     "@dsh-tui/dsh-tui": "^0.1.2",
-    "@qw457812/dsh-pi-prompts": "^0.1.2",
+    "@qw457812/dsh-pi-prompts": "^0.2.1",
     "dsh-codex": "^0.2.4"
   },
   "dsh": {

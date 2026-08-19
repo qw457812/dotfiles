@@ -20,5 +20,8 @@ llm-pi-ai:
           compat:
             thinkingFormat: zai
             supportsReasoningEffort: true
+    xiaomi:
+      models:
+        - id: mimo-v2.5-pro
 dsh-tui:
   diffLayout: unified

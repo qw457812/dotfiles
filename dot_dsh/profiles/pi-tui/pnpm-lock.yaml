@@ -12,8 +12,8 @@ importers:
         specifier: ^0.1.2
         version: 0.1.2
       '@qw457812/dsh-pi-prompts':
-        specifier: ^0.1.2
-        version: 0.1.2
+        specifier: ^0.2.1
+        version: 0.2.1
       dsh-codex:
         specifier: ^0.2.4
         version: 0.2.4
@@ -60,11 +60,12 @@ packages:
       '@deepseek-ai/dsh-skill':
         optional: true
 
-  '@qw457812/dsh-pi-prompts@0.1.2':
-    resolution: {integrity: sha512-rCbWKE46cmdbHX7A5AQJnHSRtWX6vU6qMwolcqeD3kQGEKeOUz0r5dnxox80GKw5UFJCxQaX1na5UP+7YPeiQQ==}
+  '@qw457812/dsh-pi-prompts@0.2.1':
+    resolution: {integrity: sha512-LHpnPKL5F20vbiZXyyrC+0GzKMwc6zTTEjGKIlY3LTRkzbSXTAXg7aMRzgUd39ymk6YjsDMKSfc4Dda6ScY8pA==}
     engines: {node: ^22.19.0 || >=24.0.0}
     peerDependencies:
       '@deepseek-ai/cordis': ^4.0.1
+      '@deepseek-ai/dsh-agent': ^0.1.0-rc.7
       '@deepseek-ai/dsh-commands': ^0.1.0-rc.7
       '@deepseek-ai/dsh-llm': ^0.1.0-rc.7
 
@@ -131,7 +132,7 @@ snapshots:
       marked: 18.0.5
       saxes: 6.0.0
 
-  '@qw457812/dsh-pi-prompts@0.1.2':
+  '@qw457812/dsh-pi-prompts@0.2.1':
     dependencies:
       yaml: 2.9.0
 

@@ -1,2 +1,3 @@
 node_modules/
+.pnpm-store/
 /private_dot_pi/private_agent/extensions/prompt-editor/pi-vim.generated.ts

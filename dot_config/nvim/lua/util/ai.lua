@@ -1048,4 +1048,36 @@ M.codecompanion = {
   end,
 }
 
+M.dsh = {
+  ---@param plugin LazyPlugin
+  ---@param profile string
+  update_plugin = function(plugin, profile)
+    local pkg = vim.json.decode(require("lazy.util").read_file(plugin.dir .. "/package.json"))
+    if not pkg.name or not pkg.version then
+      return
+    end
+
+    local res = vim
+      .system({ "dsh", "plugin", "--profile", profile, "update", pkg.name .. "@" .. pkg.version }, { text = true })
+      :wait()
+    if res.code ~= 0 then
+      LazyVim.error(
+        { ("dsh plugin update failed (exit %d)"):format(res.code), res.stdout, res.stderr },
+        { title = plugin.name }
+      )
+      return
+    end
+
+    local readd = vim
+      .system({ "chezmoi", "re-add", "--no-tty", "~/.dsh/profiles/" .. profile .. "/pnpm-lock.yaml" }, { text = true })
+      :wait()
+    if readd.code ~= 0 then
+      LazyVim.error(
+        { ("chezmoi re-add `pnpm-lock.yaml` failed (exit %d)"):format(readd.code), readd.stdout, readd.stderr },
+        { title = plugin.name }
+      )
+    end
+  end,
+}
+
 return M

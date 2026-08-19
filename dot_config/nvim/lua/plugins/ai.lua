@@ -4,36 +4,6 @@
 local sidekick_cli_toggle_key = "<M-space>"
 local copilot_available = not vim.g.user_is_termux or vim.fn.executable("copilot-language-server") == 1
 
----@param plugin LazyPlugin
----@param profile string
-local function update_dsh_plugin(plugin, profile)
-  local pkg = vim.json.decode(require("lazy.util").read_file(plugin.dir .. "/package.json"))
-  if not pkg.name or not pkg.version then
-    return
-  end
-
-  local res = vim
-    .system({ "dsh", "plugin", "--profile", profile, "update", pkg.name .. "@" .. pkg.version }, { text = true })
-    :wait()
-  if res.code ~= 0 then
-    LazyVim.error(
-      { ("dsh plugin update failed (exit %d)"):format(res.code), res.stdout, res.stderr },
-      { title = plugin.name }
-    )
-    return
-  end
-
-  local readd = vim
-    .system({ "chezmoi", "re-add", "--no-tty", "~/.dsh/profiles/" .. profile .. "/pnpm-lock.yaml" }, { text = true })
-    :wait()
-  if readd.code ~= 0 then
-    LazyVim.error(
-      { ("chezmoi re-add `pnpm-lock.yaml` failed (exit %d)"):format(readd.code), readd.stdout, readd.stderr },
-      { title = plugin.name }
-    )
-  end
-end
-
 ---@type LazySpec
 return {
   -- https://github.com/disler/pi-vs-claude-code
@@ -219,7 +189,7 @@ return {
       {
         "ccch1mneyyy/dsh-TUI",
         build = function(plugin)
-          update_dsh_plugin(plugin, "dsh-tui")
+          U.ai.dsh.update_plugin(plugin, "dsh-tui")
         end,
         version = "*",
         lazy = true,
@@ -229,7 +199,7 @@ return {
         "dsh-tui/dsh-tui",
         name = "dsh-pi-tui",
         build = function(plugin)
-          update_dsh_plugin(plugin, "pi-tui")
+          U.ai.dsh.update_plugin(plugin, "pi-tui")
         end,
         version = "*",
         lazy = true,
@@ -238,8 +208,8 @@ return {
       {
         "Yan-Zero/dsh-codex",
         build = function(plugin)
-          update_dsh_plugin(plugin, "dsh-tui")
-          update_dsh_plugin(plugin, "pi-tui")
+          U.ai.dsh.update_plugin(plugin, "dsh-tui")
+          U.ai.dsh.update_plugin(plugin, "pi-tui")
         end,
         version = "*",
         lazy = true,
@@ -795,6 +765,7 @@ return {
             },
             keys = {
               blur_t = false, -- dsh uses <c-o> for its own functionality
+              prompt = false, -- dsh uses <c-p> for its own functionality
             },
           },
           gemini = { cmd = { "hack_to_disable_gemini" } }, -- HACK: disable gemini

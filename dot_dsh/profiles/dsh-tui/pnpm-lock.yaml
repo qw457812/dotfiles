@@ -9,11 +9,11 @@ importers:
   .:
     dependencies:
       '@deepseek-harness-tui/dsh-tui':
-        specifier: ^0.8.1
-        version: 0.8.1
+        specifier: ^0.8.3
+        version: 0.8.3
       '@qw457812/dsh-pi-prompts':
-        specifier: ^0.1.2
-        version: 0.1.2
+        specifier: ^0.2.1
+        version: 0.2.1
       dsh-codex:
         specifier: ^0.2.4
         version: 0.2.4
@@ -24,8 +24,8 @@ packages:
     resolution: {integrity: sha512-p+CMKJ93HFmLkjXKlXiVGlMQEuRb6H0MokBSwUsX+S6BRX8eV5naFZpQJFfJHjRZY0Hmnqy1/r6UWl3x+19zYA==}
     engines: {node: '>=18'}
 
-  '@deepseek-harness-tui/dsh-tui@0.8.1':
-    resolution: {integrity: sha512-SwVgjKriOr/lyyFP8BGwzsJxdJWMIInD8X52hUhbCalRUCp9FO3aXj4gDWOf5Bxc2C3O9nh3guKBEt6QdJk9rQ==}
+  '@deepseek-harness-tui/dsh-tui@0.8.3':
+    resolution: {integrity: sha512-QYhUKMy+5nra0qb6EK4PcWGqF6UQ+FrhSavhMlhoq95eSe/3rbisPZoEbRmPu0NDp+SlLrSA5cHnfFk1vbGHWA==}
     engines: {node: ^22.19 || >=24}
     hasBin: true
     peerDependencies:
@@ -63,11 +63,12 @@ packages:
       - '@dsh-std/presentation'
       - '@dsh-std/storage'
 
-  '@qw457812/dsh-pi-prompts@0.1.2':
-    resolution: {integrity: sha512-rCbWKE46cmdbHX7A5AQJnHSRtWX6vU6qMwolcqeD3kQGEKeOUz0r5dnxox80GKw5UFJCxQaX1na5UP+7YPeiQQ==}
+  '@qw457812/dsh-pi-prompts@0.2.1':
+    resolution: {integrity: sha512-LHpnPKL5F20vbiZXyyrC+0GzKMwc6zTTEjGKIlY3LTRkzbSXTAXg7aMRzgUd39ymk6YjsDMKSfc4Dda6ScY8pA==}
     engines: {node: ^22.19.0 || >=24.0.0}
     peerDependencies:
       '@deepseek-ai/cordis': ^4.0.1
+      '@deepseek-ai/dsh-agent': ^0.1.0-rc.7
       '@deepseek-ai/dsh-commands': ^0.1.0-rc.7
       '@deepseek-ai/dsh-llm': ^0.1.0-rc.7
 
@@ -243,8 +244,8 @@ packages:
   lodash.debounce@4.0.8:
     resolution: {integrity: sha512-FT1yDzDYEoYWhnSGnpE/4Kj1fLZkDFyqRb7fNt6FdYOSxlUWAtp42Eh6Wb0rGIv/m9Bgo7x4GhQbm5Ys4SG5ow==}
 
-  marked@18.0.9:
-    resolution: {integrity: sha512-/Sa4qiiHZxf0/FQdBBowr9q4r10krCwMvpK48FUBdXdUXScDxiQGR9zCPrFgRVR5LU3iySOiIjy09ZQvADir1w==}
+  marked@18.0.10:
+    resolution: {integrity: sha512-FJeH4bRpYoXiggcgriCGItKCSv3xkngJc4QCZ/rkQCogU3VYaLxYJoZl8Nw/b4+x7iij/pd+09mZ6A1dXzpL0A==}
     engines: {node: '>= 20'}
     hasBin: true
 
@@ -371,7 +372,7 @@ snapshots:
       ansi-styles: 6.2.3
       is-fullwidth-code-point: 5.1.0
 
-  '@deepseek-harness-tui/dsh-tui@0.8.1':
+  '@deepseek-harness-tui/dsh-tui@0.8.3':
     dependencies:
       '@alcalzone/ansi-tokenize': 0.3.0
       auto-bind: 5.0.1
@@ -388,7 +389,7 @@ snapshots:
       highlight.js: 11.12.0
       indent-string: 5.0.0
       lodash-es: 4.18.1
-      marked: 18.0.9
+      marked: 18.0.10
       react: 19.2.8
       react-reconciler: 0.33.0(react@19.2.8)
       semver: 7.8.5
@@ -404,7 +405,7 @@ snapshots:
       - '@deepseek-ai/dsh-client-ui-conversation'
       - '@deepseek-ai/dsh-client-ui-slots'
 
-  '@qw457812/dsh-pi-prompts@0.1.2':
+  '@qw457812/dsh-pi-prompts@0.2.1':
     dependencies:
       yaml: 2.9.0
 
@@ -506,7 +507,7 @@ snapshots:
 
   lodash.debounce@4.0.8: {}
 
-  marked@18.0.9: {}
+  marked@18.0.10: {}
 
   mz@2.7.0:
     dependencies:
