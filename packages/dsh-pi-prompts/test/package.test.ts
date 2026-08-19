@@ -13,7 +13,7 @@ describe("npm bundle manifest", () => {
     >;
     expect(manifest).toMatchObject({
       name: "@qw457812/dsh-pi-prompts",
-      version: "0.2.0",
+      version: "0.2.1",
       keywords: expect.arrayContaining(["dsh-plugin"]),
       main: "./lib/index.js",
       types: "./lib/index.d.ts",

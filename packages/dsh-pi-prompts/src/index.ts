@@ -81,34 +81,27 @@ function loadAgentPrompts(ctx: Context, agent: Agent, agentDir: string): PiPromp
   });
 }
 
-/** Register the effective templates in one agent-scoped command layer. */
+/** Register the effective templates in one command-injected agent scope. */
 function registerAgentPrompts(ctx: Context, agent: Agent, agentDir: string): OwnerCleanup {
   const prompts = loadAgentPrompts(ctx, agent, agentDir);
-  const registrations: Array<() => void> = [];
-
-  let cleanup: OwnerCleanup = () => undefined;
-  cleanup = agent.ctx.effect(() => {
+  const fiber = agent.ctx.inject(["commands"], (commandCtx) => {
     for (const prompt of prompts) {
-      if (ctx.commands.find(agent, prompt.name) !== undefined) {
+      if (commandCtx.commands.find(agent, prompt.name) !== undefined) {
         ctx.logger.warn(
           `pi-prompts: prompt "/${prompt.name}" from ${prompt.filePath} skipped; a command already owns that name`,
         );
         continue;
       }
       try {
-        registrations.push(agent.ctx.commands.register(promptDefinition(prompt)));
+        commandCtx.commands.register(promptDefinition(prompt));
       } catch (error) {
         ctx.logger.warn(
           `pi-prompts: cannot register "/${prompt.name}" from ${prompt.filePath}: ${String(error)}`,
         );
       }
     }
-    return () => {
-      for (const dispose of registrations.reverse()) dispose();
-      registrations.length = 0;
-    };
-  }, "pi-prompts.agent()") as OwnerCleanup;
-  return cleanup;
+  });
+  return () => fiber.dispose();
 }
 
 /** Load and own Pi prompt commands for every live root agent. */

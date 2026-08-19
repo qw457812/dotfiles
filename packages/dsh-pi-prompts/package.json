@@ -1,6 +1,6 @@
 {
   "name": "@qw457812/dsh-pi-prompts",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Expose Pi prompt templates as DeepSeek Harness slash commands",
   "keywords": [
     "deepseek-harness",
@@ -60,6 +60,8 @@
     "@deepseek-ai/dsh-agent": "0.1.0-rc.7",
     "@deepseek-ai/dsh-commands": "0.1.0-rc.7",
     "@deepseek-ai/dsh-llm": "0.1.0-rc.7",
+    "@deepseek-ai/dsh-scope": "0.1.0-rc.7",
+    "@deepseek-ai/dsh-session": "0.1.0-rc.7",
     "@types/node": "^26.0.0",
     "oxfmt": "^0.47.0",
     "oxlint": "^1.62.0",

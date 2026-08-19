@@ -70,7 +70,14 @@ function createContext(cwds: string[], rootCount = cwds.length): TestHarness {
     } as unknown as Agent;
     const cleanups: Array<() => Promise<void>> = [];
     agentCleanups.set(agent, cleanups);
+    let registrationOwner: Array<() => Promise<void>> | undefined;
     const scopedCommands = {
+      find: vi.fn((target: Agent, commandName: string) => {
+        if (existingCommands.has(commandName)) return { name: commandName };
+        return definitions.find(
+          (entry) => entry.agent === target && entry.definition.name === commandName,
+        )?.definition;
+      }),
       register: vi.fn((definition: CommandDefinition) => {
         if (
           definitions.some(
@@ -81,19 +88,29 @@ function createContext(cwds: string[], rootCount = cwds.length): TestHarness {
         }
         const entry = { agent, definition };
         definitions.push(entry);
-        return once(() => {
+        const dispose = once(() => {
           const position = definitions.indexOf(entry);
           if (position >= 0) definitions.splice(position, 1);
         });
+        registrationOwner?.push(dispose);
+        return dispose;
       }),
     };
     const agentCtx = {
-      commands: scopedCommands,
-      effect: vi.fn((factory: () => void | (() => void | Promise<void>)) => {
-        const returned = factory();
-        const cleanup = once(typeof returned === "function" ? returned : () => undefined);
-        cleanups.push(cleanup);
-        return cleanup;
+      inject: vi.fn((deps: string[], callback: (ctx: Context) => void) => {
+        expect(deps).toEqual(["commands"]);
+        const ownedRegistrations: Array<() => Promise<void>> = [];
+        registrationOwner = ownedRegistrations;
+        try {
+          callback({ ...agentCtx, commands: scopedCommands } as unknown as Context);
+        } finally {
+          registrationOwner = undefined;
+        }
+        const dispose = once(async () => {
+          for (const unregister of ownedRegistrations.reverse()) await unregister();
+        });
+        cleanups.push(dispose);
+        return { dispose };
       }),
     };
     Object.assign(agent, { ctx: agentCtx });
