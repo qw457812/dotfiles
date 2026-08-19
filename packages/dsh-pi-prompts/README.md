@@ -1,33 +1,53 @@
 # @qw457812/dsh-pi-prompts
 
-Expose [Pi](https://github.com/earendil-works/pi) prompt templates as DeepSeek Harness slash commands.
+Expose [Pi](https://github.com/earendil-works/pi) prompt templates as agent-scoped DeepSeek Harness slash commands.
 
-Each direct `*.md` file in Pi's prompts directory becomes a dsh command. The command name is the file stem, while `description` and `argument-hint` are read from YAML frontmatter with the same `yaml.parse` semantics Pi uses.
+Each direct `*.md` file in Pi's global or project prompts directory becomes a dsh command. The command name is the file stem, while `description` and `argument-hint` are read from YAML frontmatter with the same `yaml.parse` semantics Pi uses.
 
 ## Install
 
-Install the bundle into the `web` profile:
+Install the bundle into each profile that needs Pi prompts:
 
 ```sh
-dsh plugin --profile web add @qw457812/dsh-pi-prompts
+dsh plugin --profile <profile> add @qw457812/dsh-pi-prompts
 ```
 
 Remove it with:
 
 ```sh
-dsh plugin --profile web remove @qw457812/dsh-pi-prompts
+dsh plugin --profile <profile> remove @qw457812/dsh-pi-prompts
 ```
 
-The plugin is profile-scoped; install it separately in each profile that needs Pi prompts.
+The plugin is profile-scoped; installing it in one profile does not affect other profiles.
 
-## Prompt directory
+## Prompt directories
 
-The plugin follows Pi's directory resolution:
+For every root agent, the plugin loads direct `*.md` children from:
 
-- `$PI_CODING_AGENT_DIR/prompts` when `PI_CODING_AGENT_DIR` is set, including `~/...` and `file://...` values.
-- `~/.pi/agent/prompts` otherwise.
+- Global: `$PI_CODING_AGENT_DIR/prompts`, or `~/.pi/agent/prompts` when the environment variable is unset.
+- Project: `<session-cwd>/.pi/prompts`, only when that project is trusted by Pi.
 
-Prompt files are loaded when the plugin starts. Restart dsh after adding or changing a prompt file.
+Discovery is non-recursive. File symlinks are followed, broken symlinks and invalid dsh command names are skipped, and one bad file does not prevent other templates from loading.
+
+The plugin scans these two directories directly. It does not apply Pi's `settings.json` `prompts` entries (including filters and custom paths), CLI prompt paths, or package-provided prompts. Consequently, a direct file disabled through Pi's resource configuration is still exposed by this plugin.
+
+### Project trust
+
+The plugin reuses Pi's persisted project-trust policy:
+
+1. The nearest decision for the canonical session cwd or one of its ancestors in `<agent-dir>/trust.json` wins.
+2. Without a saved decision, global `<agent-dir>/settings.json` `defaultProjectTrust` applies.
+3. `always` enables project prompts; `never` and `ask` disable them. If neither a saved decision nor a valid global default is available, the plugin fails closed.
+
+DSH does not currently present Pi's interactive trust prompt. Use Pi's `/trust` command to save a decision, then start a new dsh session.
+
+### Loading and precedence
+
+Templates are loaded when a root agent is created. Start a new session after adding, changing, or trusting a project prompt.
+
+Project templates override same-named global templates. Existing DSH commands take precedence over all prompt templates, so a project cannot replace built-in or extension commands such as `/plan`.
+
+Each agent receives commands from its own recorded session cwd; concurrent sessions from different projects do not share project templates.
 
 ## Prompt format
 

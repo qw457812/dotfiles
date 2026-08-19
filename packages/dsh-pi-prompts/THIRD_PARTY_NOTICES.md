@@ -2,7 +2,7 @@
 
 ## Pi
 
-Portions of the prompt frontmatter, argument parsing, and placeholder substitution behavior are adapted from [Pi](https://github.com/earendil-works/pi).
+Portions of the prompt discovery, project-trust resolution, frontmatter parsing, argument parsing, and placeholder substitution behavior are adapted from [Pi](https://github.com/earendil-works/pi).
 
 Copyright (c) 2025 Mario Zechner
 

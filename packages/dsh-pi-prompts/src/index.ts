@@ -3,51 +3,37 @@
  * @module @qw457812/dsh-pi-prompts
  */
 
-import { readdirSync, readFileSync, statSync } from "node:fs";
-import { homedir } from "node:os";
-import { join } from "node:path";
-import { fileURLToPath } from "node:url";
 import type { Context } from "@deepseek-ai/cordis";
+import type { Agent } from "@deepseek-ai/dsh-agent";
 import type { CommandDefinition } from "@deepseek-ai/dsh-commands";
 import { createUserMessage } from "@deepseek-ai/dsh-llm";
-import { parseCommandArgs, parsePromptFile, substituteArgs } from "./prompt-templates.js";
-
-interface PiPrompt {
-  name: string;
-  description: string;
-  hint: string | undefined;
-  body: string;
-}
+import { homedir } from "node:os";
+import { join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import { loadPromptsFromDir, mergePrompts, type PiPrompt } from "./discovery.js";
+import { isProjectTrusted } from "./project-trust.js";
+import { parseCommandArgs, substituteArgs } from "./prompt-templates.js";
 
 export const name = "pi-prompts";
-export const inject = ["commands"];
+export const inject = ["agents", "commands"];
 
-/** Resolve Pi's effective prompts directory. */
-function getPromptsDir(): string {
+type OwnerCleanup = () => void | Promise<void>;
+
+/** Resolve Pi's effective agent configuration directory. */
+function getAgentDir(): string {
   const envDir = process.env.PI_CODING_AGENT_DIR;
   if (envDir !== undefined && envDir !== "") {
-    let dir = envDir;
-    if (dir === "~") dir = homedir();
-    else if (dir.startsWith("~/")) dir = join(homedir(), dir.slice(2));
-    else if (dir.startsWith("file://")) dir = fileURLToPath(dir);
-    return join(dir, "prompts");
+    if (envDir === "~") return homedir();
+    if (envDir.startsWith("~/")) return join(homedir(), envDir.slice(2));
+    if (envDir.startsWith("file://")) return fileURLToPath(envDir);
+    return resolve(envDir);
   }
-  return join(homedir(), ".pi", "agent", "prompts");
+  return join(homedir(), ".pi", "agent");
 }
 
-/** dsh command names must begin with a lowercase letter. */
-const NAME_PATTERN = /^[a-z][a-z0-9_-]*$/u;
-
-/** Derive Pi's fallback description from the first non-empty body line. */
-function describeFromBody(body: string): string {
-  const firstLine = body.split("\n").find((line) => line.trim());
-  if (firstLine === undefined) return "";
-  return firstLine.length > 60 ? `${firstLine.slice(0, 60)}...` : firstLine;
-}
-
-/** Register one slash command and return its exact disposer. */
-function registerPrompt(ctx: Context, prompt: PiPrompt): () => void {
-  const definition: CommandDefinition = {
+/** Build one slash command backed by a prompt template. */
+function promptDefinition(prompt: PiPrompt): CommandDefinition {
+  return {
     name: prompt.name,
     description: prompt.description,
     ...(prompt.hint === undefined ? {} : { input: { hint: prompt.hint } }),
@@ -63,70 +49,114 @@ function registerPrompt(ctx: Context, prompt: PiPrompt): () => void {
       return { kind: "success", text: `Sent the pi prompt "${prompt.name}".` };
     },
   };
-  return ctx.commands.register(definition);
 }
 
-/** Load every direct `*.md` child and register one command per valid template. */
-export function apply(ctx: Context): void {
-  const promptsDir = getPromptsDir();
-
-  let entries;
+/** Load one directory without letting a filesystem failure abort agent publication. */
+function loadDirectory(ctx: Context, directory: string): PiPrompt[] {
   try {
-    entries = readdirSync(promptsDir, { withFileTypes: true });
+    return loadPromptsFromDir(directory, (message) => {
+      ctx.logger.warn(`pi-prompts: ${message}`);
+    });
   } catch (error) {
-    ctx.logger.warn(`pi-prompts: cannot read ${promptsDir}: ${String(error)}`);
-    return;
+    ctx.logger.warn(`pi-prompts: cannot read ${directory}: ${String(error)}`);
+    return [];
   }
+}
 
-  const prompts: PiPrompt[] = [];
-  for (const entry of entries) {
-    let isFile = entry.isFile();
-    if (entry.isSymbolicLink()) {
-      try {
-        isFile = statSync(join(promptsDir, entry.name)).isFile();
-      } catch {
+/** Resolve the effective prompt set for one root agent. */
+function loadAgentPrompts(ctx: Context, agent: Agent, agentDir: string): PiPrompt[] {
+  const globalPrompts = loadDirectory(ctx, join(agentDir, "prompts"));
+  const cwd = agent.session.header.cwd;
+  if (cwd === undefined) return globalPrompts;
+
+  let trusted = false;
+  try {
+    trusted = isProjectTrusted(agentDir, cwd);
+  } catch (error) {
+    ctx.logger.warn(`pi-prompts: cannot resolve project trust for ${cwd}: ${String(error)}`);
+  }
+  const projectPrompts = trusted ? loadDirectory(ctx, join(cwd, ".pi", "prompts")) : [];
+  return mergePrompts(projectPrompts, globalPrompts, (message) => {
+    ctx.logger.warn(`pi-prompts: ${message}`);
+  });
+}
+
+/** Register the effective templates in one agent-scoped command layer. */
+function registerAgentPrompts(ctx: Context, agent: Agent, agentDir: string): OwnerCleanup {
+  const prompts = loadAgentPrompts(ctx, agent, agentDir);
+  const registrations: Array<() => void> = [];
+
+  let cleanup: OwnerCleanup = () => undefined;
+  cleanup = agent.ctx.effect(() => {
+    for (const prompt of prompts) {
+      if (ctx.commands.find(agent, prompt.name) !== undefined) {
+        ctx.logger.warn(
+          `pi-prompts: prompt "/${prompt.name}" from ${prompt.filePath} skipped; a command already owns that name`,
+        );
         continue;
       }
+      try {
+        registrations.push(agent.ctx.commands.register(promptDefinition(prompt)));
+      } catch (error) {
+        ctx.logger.warn(
+          `pi-prompts: cannot register "/${prompt.name}" from ${prompt.filePath}: ${String(error)}`,
+        );
+      }
     }
-    if (!isFile || !entry.name.endsWith(".md")) continue;
-    const stem = entry.name.slice(0, -3);
-    if (!NAME_PATTERN.test(stem)) continue;
+    return () => {
+      for (const dispose of registrations.reverse()) dispose();
+      registrations.length = 0;
+    };
+  }, "pi-prompts.agent()") as OwnerCleanup;
+  return cleanup;
+}
 
-    let text: string;
+/** Load and own Pi prompt commands for every live root agent. */
+export function apply(ctx: Context): void {
+  const agentDir = getAgentDir();
+  const installations = new Map<Agent, OwnerCleanup>();
+  let stopping = false;
+
+  const install = (agent: Agent): void => {
+    if (stopping || installations.has(agent) || !ctx.agents.roots().includes(agent)) return;
+    let cleanup: OwnerCleanup = () => undefined;
     try {
-      text = readFileSync(join(promptsDir, entry.name), "utf8");
+      cleanup = registerAgentPrompts(ctx, agent, agentDir);
+      installations.set(agent, async () => {
+        try {
+          await cleanup();
+        } finally {
+          installations.delete(agent);
+        }
+      });
     } catch (error) {
-      ctx.logger.warn(`pi-prompts: cannot read ${entry.name}: ${String(error)}`);
-      continue;
+      ctx.logger.warn(
+        `pi-prompts: cannot install prompts for agent "${agent.id}": ${String(error)}`,
+      );
     }
+  };
 
-    let parsed: ReturnType<typeof parsePromptFile>;
-    try {
-      parsed = parsePromptFile(text);
-    } catch (error) {
-      ctx.logger.warn(`pi-prompts: cannot parse ${entry.name}: ${String(error)}`);
-      continue;
-    }
-
-    const { meta, body } = parsed;
-    if (body.trim() === "") {
-      ctx.logger.warn(`pi-prompts: empty prompt body in ${entry.name}; skipped`);
-      continue;
-    }
-    const description = meta.description;
-    const hint = meta["argument-hint"];
-    prompts.push({
-      name: stem,
-      description:
-        typeof description === "string" && description !== ""
-          ? description
-          : describeFromBody(body),
-      hint: typeof hint === "string" && hint !== "" ? hint : undefined,
-      body,
+  ctx.effect(() => {
+    const stopCreated = ctx.on("agent/created", ({ agent }) => {
+      install(agent);
     });
-  }
+    const stopDisposed = ctx.on("agent/disposed", ({ agent }) => {
+      const cleanup = installations.get(agent);
+      if (cleanup !== undefined) {
+        void Promise.resolve(cleanup()).catch((error: unknown) => {
+          ctx.logger.warn(`pi-prompts: cannot clean up agent "${agent.id}": ${String(error)}`);
+        });
+      }
+    });
+    for (const agent of ctx.agents.roots()) install(agent);
 
-  ctx.effect(function* () {
-    for (const prompt of prompts) yield registerPrompt(ctx, prompt);
-  });
+    return async () => {
+      stopping = true;
+      stopCreated();
+      stopDisposed();
+      const cleanups = [...installations.values()];
+      installations.clear();
+      await Promise.allSettled(cleanups.map((cleanup) => Promise.resolve(cleanup())));
+    };
+  }, "pi-prompts.lifecycle()");
 }
