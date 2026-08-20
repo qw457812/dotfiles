@@ -488,14 +488,21 @@ const sources: Record<string, Source> = {
       return (await readAuth<{ access?: string }>("openai-codex"))?.access ?? null;
     },
     async fetch(token: string): Promise<CodexQuota | null> {
-      const [quota, reset] = await Promise.all([
-        fetchJson<CodexQuota["quota"]>("https://chatgpt.com/backend-api/wham/usage", token),
-        fetchJson<CodexQuota["reset"]>(
-          "https://chatgpt.com/backend-api/wham/rate-limit-reset-credits",
-          token,
-        ),
-      ]);
-      return quota ? { quota, reset } : null;
+      const quota = await fetchJson<CodexQuota["quota"]>(
+        "https://chatgpt.com/backend-api/wham/usage",
+        token,
+      );
+      if (!quota) {
+        return null;
+      }
+      const reset =
+        quota.rate_limit_reset_credits?.available_count !== 0
+          ? await fetchJson<CodexQuota["reset"]>(
+              "https://chatgpt.com/backend-api/wham/rate-limit-reset-credits",
+              token,
+            )
+          : null;
+      return { quota, reset };
     },
     format(quota: CodexQuota, theme: Theme): string | null {
       const rateLimit = quota.quota?.rate_limit;
