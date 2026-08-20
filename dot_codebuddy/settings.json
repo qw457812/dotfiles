@@ -1,5 +1,5 @@
 {
-  "model": "kimi-k3-2",
+  "model": "custom-local:mimo-v2.5-pro",
   "vim": {
     "enabled": true
   },
@@ -77,6 +77,18 @@
   },
   "trustAll": true,
   "language": "简体中文",
-  "showTokensCounter": true
+  "showTokensCounter": true,
+  "hooks": {
+    "ConfigChange": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'if [ \"$(jq -r .file_path)\" = \"$HOME/.codebuddy/settings.json\" ]; then chezmoi re-add --no-tty ~/.codebuddy/settings.json; fi'"
+          }
+        ]
+      }
+    ]
+  },
+  "cleanupPeriodDays": 180
 }
-
