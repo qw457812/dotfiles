@@ -25,3 +25,9 @@ llm-pi-ai:
         - id: mimo-v2.5-pro
 dsh-tui:
   diffLayout: unified
+  statusBar:
+    cwd: false
+    tps: true
+    mode: true
+    activity: true
+    trajectory: true

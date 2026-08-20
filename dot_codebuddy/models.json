@@ -1,0 +1,15 @@
+{
+  "models": [
+    {
+      "id": "mimo-v2.5-pro",
+      "name": "mimo-v2.5-pro",
+      "vendor": "xiaomi",
+      "apiKey": "${XIAOMI_API_KEY}",
+      "url": "https://api.xiaomimimo.com/v1/chat/completions",
+      "maxInputTokens": 1000000,
+      "maxOutputTokens": 131072,
+      "supportsToolCall": true,
+      "supportsImages": false
+    }
+  ]
+}

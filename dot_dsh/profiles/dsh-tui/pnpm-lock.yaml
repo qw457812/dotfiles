@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@deepseek-harness-tui/dsh-tui':
-        specifier: ^0.8.3
-        version: 0.8.3
+        specifier: ^0.8.5
+        version: 0.8.5
       '@qw457812/dsh-pi-prompts':
         specifier: ^0.2.1
         version: 0.2.1
@@ -24,8 +24,8 @@ packages:
     resolution: {integrity: sha512-p+CMKJ93HFmLkjXKlXiVGlMQEuRb6H0MokBSwUsX+S6BRX8eV5naFZpQJFfJHjRZY0Hmnqy1/r6UWl3x+19zYA==}
     engines: {node: '>=18'}
 
-  '@deepseek-harness-tui/dsh-tui@0.8.3':
-    resolution: {integrity: sha512-QYhUKMy+5nra0qb6EK4PcWGqF6UQ+FrhSavhMlhoq95eSe/3rbisPZoEbRmPu0NDp+SlLrSA5cHnfFk1vbGHWA==}
+  '@deepseek-harness-tui/dsh-tui@0.8.5':
+    resolution: {integrity: sha512-zfn53cpB8emobK12b1GFTXDEVOtz7MLHNr34HA2ju5i8mf/J62yaG091eyvOWqZy4GTW6YDSygkeGkg64eBo5A==}
     engines: {node: ^22.19 || >=24}
     hasBin: true
     peerDependencies:
@@ -161,8 +161,8 @@ packages:
       react: ^18.2.0
       react-dom: ^18.2.0
 
-  dsh-working-activity@0.2.6:
-    resolution: {integrity: sha512-laywtmoti+Y71/LJoju6kDRoZazwG1Yu7BQNVLlXdIzJrvCAFgL4te6tVWaKtJP6UntkJqU64WEEs8foL4I+tw==}
+  dsh-working-activity@0.3.2:
+    resolution: {integrity: sha512-IF/WoSUupujUK6fxnxjAkuo2u4cfrM87xkZkk6Df9j3e1A9SJYgM1I4wQsvrEATtPuoEDPotfonFyeNXK3eYsQ==}
     engines: {node: ^22.19 || >=24}
     peerDependencies:
       '@deepseek-ai/cordis': ^4.0.1
@@ -372,7 +372,7 @@ snapshots:
       ansi-styles: 6.2.3
       is-fullwidth-code-point: 5.1.0
 
-  '@deepseek-harness-tui/dsh-tui@0.8.3':
+  '@deepseek-harness-tui/dsh-tui@0.8.5':
     dependencies:
       '@alcalzone/ansi-tokenize': 0.3.0
       auto-bind: 5.0.1
@@ -382,7 +382,7 @@ snapshots:
       cli-highlight: 2.1.11
       code-excerpt: 4.0.0
       diff: 8.0.4
-      dsh-working-activity: 0.2.6(react@19.2.8)
+      dsh-working-activity: 0.3.2(react@19.2.8)
       emoji-regex: 10.6.0
       figures: 6.1.0
       get-east-asian-width: 1.6.0
@@ -467,7 +467,7 @@ snapshots:
 
   dsh-codex@0.2.4: {}
 
-  dsh-working-activity@0.2.6(react@19.2.8):
+  dsh-working-activity@0.3.2(react@19.2.8):
     optionalDependencies:
       react: 19.2.8
 

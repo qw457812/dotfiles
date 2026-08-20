@@ -756,7 +756,7 @@ return {
             },
           },
           dsh = {
-            cmd = { "dsh", "--profile", "pi-tui" },
+            cmd = { "dsh", "--profile", "dsh-tui" },
             is_proc = "\\<dsh\\>",
             url = "https://github.com/deepseek-ai/deepseek-harness",
             env = {
