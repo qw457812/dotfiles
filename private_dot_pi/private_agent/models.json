@@ -1,21 +1,21 @@
 {
   "providers": {
-    // "openai-codex": {
-    //   "modelOverrides": {
-    //     "gpt-5.5": {
-    //       "contextWindow": 400000
-    //     },
-    //     "gpt-5.6-luna": {
-    //       "contextWindow": 372000
-    //     },
-    //     "gpt-5.6-sol": {
-    //       "contextWindow": 372000
-    //     },
-    //     "gpt-5.6-terra": {
-    //       "contextWindow": 372000
-    //     }
-    //   }
-    // },
+    "openai-codex": {
+      "modelOverrides": {
+        // "gpt-5.5": {
+        //   "contextWindow": 400000
+        // },
+        // "gpt-5.6-sol": {
+        //   "contextWindow": 372000
+        // },
+        // "gpt-5.6-terra": {
+        //   "contextWindow": 372000
+        // },
+        "gpt-5.6-luna": {
+          "contextWindow": 372000
+        }
+      }
+    },
     "zai": {
       "baseUrl": "https://api.z.ai/api/coding/paas/v4",
       "apiKey": "$ZAI_API_KEY",
@@ -110,28 +110,6 @@
             "xhigh": "max"
           },
           "cost": { "input": 0.35, "output": 0.8, "cacheRead": 0.003, "cacheWrite": 0 }
-        },
-        {
-          "id": "deepseek-v4-pro-lightning",
-          "name": "DeepSeek V4 Pro (Lightning)",
-          "api": "openai-completions",
-          "baseUrl": "https://crof.ai/v1",
-          "compat": {
-            "maxTokensField": "max_tokens",
-            "supportsStore": false
-          },
-          "reasoning": true,
-          "input": ["text"],
-          "contextWindow": 1000000,
-          "maxTokens": 131072,
-          "thinkingLevelMap": {
-            "minimal": null,
-            "low": null,
-            "medium": null,
-            "high": "high",
-            "xhigh": "max"
-          },
-          "cost": { "input": 0.8, "output": 1.6, "cacheRead": 0.02, "cacheWrite": 0 }
         },
         {
           "id": "mimo-v2.5-pro",

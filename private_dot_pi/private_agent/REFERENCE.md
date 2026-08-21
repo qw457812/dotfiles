@@ -13,4 +13,5 @@
 - <https://github.com/PrimeIntellect-ai/prime-agent>
 - <https://github.com/itayinbarr/little-coder>
 - <https://github.com/dirge-code/dirge>
+- <https://github.com/vercel-labs/fx>
 - <https://github.com/withastro/flue>

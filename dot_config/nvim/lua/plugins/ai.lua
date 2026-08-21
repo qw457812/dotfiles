@@ -9,7 +9,6 @@ return {
   -- https://github.com/disler/pi-vs-claude-code
   -- https://github.com/w-winter/dot314
   -- https://github.com/default-anton/dotfiles/tree/master/pi
-  -- https://github.com/dannote/dot-pi
   -- https://github.com/richardgill/nix/tree/main/out-of-store-config/ai-agents/pi/extensions
   -- https://github.com/kaofelix/dotfiles/tree/main/pi/.pi/agent
   -- https://github.com/aliou/pi-harness
@@ -128,6 +127,7 @@ return {
         lazy = true,
         config = function() end,
       },
+      -- https://github.com/deepseek-ai/deepseek-harness/commit/7078918
       {
         "monotykamary/pi-vision-handoff",
         build = "pi update --extension git:github.com/monotykamary/pi-vision-handoff",
@@ -265,6 +265,7 @@ return {
         -- ["<leader>ag"] = "claude_glm",
         ["<leader>at"] = "pi_tmp",
         ["<leader>ae"] = "dsh",
+        ["<leader>av"] = "fx",
       }
       local favourite_tool = "pi"
       for i = 1, 9 do
@@ -375,6 +376,7 @@ return {
         count = 0,
       })
       numbered_tools({ name = "dsh", count = 1 })
+      numbered_tools({ name = "fx", count = 1 })
 
       opts.cli.mux = opts.cli.mux or {}
       local use_herdr = opts.cli.mux.backend == "herdr"
@@ -766,6 +768,14 @@ return {
             keys = {
               blur_t = false, -- dsh uses <c-o> for its own functionality
               prompt = false, -- dsh uses <c-p> for its own functionality
+            },
+          },
+          fx = {
+            cmd = { "fx" },
+            is_proc = "\\<fx\\>",
+            url = "https://github.com/vercel-labs/fx",
+            env = {
+              __AI_AGENT = "fx",
             },
           },
           gemini = { cmd = { "hack_to_disable_gemini" } }, -- HACK: disable gemini
