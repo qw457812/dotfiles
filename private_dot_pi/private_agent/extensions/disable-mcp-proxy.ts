@@ -7,7 +7,9 @@
  * initialization or metadata updates. This extension checks the merged MCP
  * config and disables `mcp` when every configured server has effective
  * `directTools: true` (i.e. no server relies on the proxy for tool access),
- * then enforces that decision after each adapter status update.
+ * then enforces that decision after each adapter status update. Status
+ * snapshots also prevent disabling the proxy when v2.27.0+ discovers servers
+ * from Pi package manifests or runtime extension registrations.
  *
  * Uses getActiveTools() → Set → delete → Array.from pattern
  * to incrementally remove without re-enabling tools disabled by other extensions.
@@ -37,6 +39,11 @@ interface McpConfig {
     agentPluginPaths?: unknown;
     [key: string]: unknown;
   };
+}
+
+interface McpStatusSnapshot {
+  version: 1;
+  servers: Array<{ name: string }>;
 }
 
 const MCP_STATUS_EVENT = "pi-mcp-adapter/status/v1";
@@ -90,8 +97,36 @@ function serverNeedsProxy(entry: McpServerEntry, globalDirect?: boolean | string
   return true;
 }
 
+function getStatusServerNames(value: unknown): string[] | null {
+  if (!value || typeof value !== "object") return null;
+  const { version, servers } = value as Partial<McpStatusSnapshot>;
+  if (version !== 1 || !Array.isArray(servers)) return null;
+
+  const names: string[] = [];
+  for (const server of servers) {
+    if (!server || typeof server !== "object" || typeof server.name !== "string") return null;
+    names.push(server.name);
+  }
+  return names;
+}
+
 export default function (pi: ExtensionAPI) {
+  let configAllowsDisable = false;
+  let configuredServerNames = new Set<string>();
+  let observedServerNames: string[] | null = null;
   let shouldDisable = false;
+
+  const updateDecision = () => {
+    shouldDisable =
+      configAllowsDisable &&
+      (observedServerNames === null ||
+        observedServerNames.every(
+          // Package servers always use <sanitized-package>__<sanitized-server>.
+          // Treat even a same-named local override conservatively because the
+          // adapter may inherit proxy-related fields from the package entry.
+          (name) => !name.includes("__") && configuredServerNames.has(name),
+        ));
+  };
 
   const enforceDisabled = () => {
     if (!shouldDisable || !pi.getAllTools().some((t) => t.name === "mcp")) return;
@@ -103,8 +138,15 @@ export default function (pi: ExtensionAPI) {
 
   // pi-mcp-adapter emits this after initialization and metadata changes. Its
   // syncToolSurface() runs before the status event, so remove any `mcp` tool
-  // that v2.12.0+ just reactivated.
-  const offMcpStatus = pi.events.on(MCP_STATUS_EVENT, enforceDisabled);
+  // that v2.12.0+ just reactivated. Unknown server names are package-manifest
+  // or runtime registrations that this extension must conservatively leave on
+  // the proxy surface.
+  const offMcpStatus = pi.events.on(MCP_STATUS_EVENT, (snapshot) => {
+    const serverNames = getStatusServerNames(snapshot);
+    if (serverNames) observedServerNames = serverNames;
+    updateDecision();
+    enforceDisabled();
+  });
 
   pi.on("session_start", async (_event, ctx) => {
     const config = loadMergedConfig(ctx.cwd);
@@ -113,19 +155,24 @@ export default function (pi: ExtensionAPI) {
     const agentPluginPaths = config.settings?.agentPluginPaths;
     const hasAgentPlugins = Array.isArray(agentPluginPaths) && agentPluginPaths.length > 0;
 
-    shouldDisable =
+    configuredServerNames = new Set(Object.keys(servers));
+    configAllowsDisable =
       config.settings?.disableProxyTool === true &&
       // Imported host configs may contain servers that rely on the proxy.
       (config.imports?.length ?? 0) === 0 &&
-      // Agent Plugins add servers outside these config files
+      // Agent Plugins add servers outside these config files.
       !hasAgentPlugins &&
-      (Object.keys(servers).length === 0 ||
+      (configuredServerNames.size === 0 ||
         !Object.values(servers).some((server) => serverNeedsProxy(server, globalDirect)));
 
+    updateDecision();
     enforceDisabled();
   });
 
   pi.on("session_shutdown", () => {
+    configAllowsDisable = false;
+    configuredServerNames.clear();
+    observedServerNames = null;
     shouldDisable = false;
     offMcpStatus();
   });
