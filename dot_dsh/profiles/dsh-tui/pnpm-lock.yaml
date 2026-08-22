@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@deepseek-harness-tui/dsh-tui':
-        specifier: ^0.8.6
-        version: 0.8.6
+        specifier: ^0.8.8
+        version: 0.8.8
       '@qw457812/dsh-pi-prompts':
         specifier: ^0.2.1
         version: 0.2.1
@@ -24,35 +24,36 @@ packages:
     resolution: {integrity: sha512-p+CMKJ93HFmLkjXKlXiVGlMQEuRb6H0MokBSwUsX+S6BRX8eV5naFZpQJFfJHjRZY0Hmnqy1/r6UWl3x+19zYA==}
     engines: {node: '>=18'}
 
-  '@deepseek-harness-tui/dsh-tui@0.8.6':
-    resolution: {integrity: sha512-yDGi4nu2oiaZsew4kolLe29rUXfXneVEUwUddfxBdcLwgfej0tY/sDUB/eMPJkaFmlkL11t2sXQ/XciMAAohYg==}
+  '@deepseek-harness-tui/dsh-tui@0.8.8':
+    resolution: {integrity: sha512-clebbC1YnN7kU8nqRPr7U6KBopJLmQovGEO0Qu+7rHX4fN44UGPaBbVW8gLqpZrM73c8+R7kUQm0Aq4oWtmq0g==}
     engines: {node: ^22.19 || >=24}
     hasBin: true
     peerDependencies:
       '@deepseek-ai/cordis': ^4.0.1
-      '@deepseek-ai/dsh-agent': ^0.1.0-rc.7
-      '@deepseek-ai/dsh-agent-instructions': ^0.1.0-rc.7
-      '@deepseek-ai/dsh-agent-presets': ^0.1.0-rc.7
-      '@deepseek-ai/dsh-atomic-write': ^0.1.0-rc.7
-      '@deepseek-ai/dsh-commands': ^0.1.0-rc.7
-      '@deepseek-ai/dsh-cordis-host-runner': ^0.1.0-rc.7
-      '@deepseek-ai/dsh-invariants': ^0.1.0-rc.7
-      '@deepseek-ai/dsh-llm': ^0.1.0-rc.7
-      '@deepseek-ai/dsh-persona': ^0.1.0-rc.7
-      '@deepseek-ai/dsh-session': ^0.1.0-rc.7
-      '@deepseek-ai/dsh-skill': ^0.1.0-rc.7
-      '@deepseek-ai/dsh-storage': ^0.1.0-rc.7
-      '@deepseek-ai/dsh-storage-domain': ^0.1.0-rc.7
-      '@deepseek-ai/dsh-storage-json': ^0.1.0-rc.7
-      '@deepseek-ai/dsh-system-prompt': ^0.1.0-rc.7
-      '@deepseek-ai/dsh-terminal': ^0.1.0-rc.7
-      '@deepseek-ai/dsh-terminal-bash': ^0.1.0-rc.7
-      '@deepseek-ai/dsh-tool-ask-user': ^0.1.0-rc.7
-      '@deepseek-ai/dsh-tool-bash-persistent': ^0.1.0-rc.7
-      '@deepseek-ai/dsh-tool-cordis': ^0.1.0-rc.7
-      '@deepseek-ai/dsh-user-approval': ^0.1.0-rc.7
-      '@deepseek-ai/dsh-user-questions': ^0.1.0-rc.7
-      '@deepseek-ai/dsh-workspace': ^0.1.0-rc.7
+      '@deepseek-ai/dsh-agent': ^0.1.0-rc.6 || ^0.1.1-rc.1
+      '@deepseek-ai/dsh-agent-instructions': ^0.1.0-rc.6 || ^0.1.1-rc.1
+      '@deepseek-ai/dsh-agent-presets': ^0.1.0-rc.6 || ^0.1.1-rc.1
+      '@deepseek-ai/dsh-atomic-write': ^0.1.0-rc.6 || ^0.1.1-rc.1
+      '@deepseek-ai/dsh-commands': ^0.1.0-rc.6 || ^0.1.1-rc.1
+      '@deepseek-ai/dsh-cordis-host-runner': ^0.1.0-rc.6 || ^0.1.1-rc.1
+      '@deepseek-ai/dsh-invariants': ^0.1.0-rc.6 || ^0.1.1-rc.1
+      '@deepseek-ai/dsh-llm': ^0.1.0-rc.6 || ^0.1.1-rc.1
+      '@deepseek-ai/dsh-persona': ^0.1.0-rc.6 || ^0.1.1-rc.1
+      '@deepseek-ai/dsh-session': ^0.1.0-rc.6 || ^0.1.1-rc.1
+      '@deepseek-ai/dsh-settings': ^0.1.0-rc.6 || ^0.1.1-rc.1
+      '@deepseek-ai/dsh-skill': ^0.1.0-rc.6 || ^0.1.1-rc.1
+      '@deepseek-ai/dsh-storage': ^0.1.0-rc.6 || ^0.1.1-rc.1
+      '@deepseek-ai/dsh-storage-domain': ^0.1.0-rc.6 || ^0.1.1-rc.1
+      '@deepseek-ai/dsh-storage-json': ^0.1.0-rc.6 || ^0.1.1-rc.1
+      '@deepseek-ai/dsh-system-prompt': ^0.1.0-rc.6 || ^0.1.1-rc.1
+      '@deepseek-ai/dsh-terminal': ^0.1.0-rc.6 || ^0.1.1-rc.1
+      '@deepseek-ai/dsh-terminal-bash': ^0.1.0-rc.6 || ^0.1.1-rc.1
+      '@deepseek-ai/dsh-tool-ask-user': ^0.1.0-rc.6 || ^0.1.1-rc.1
+      '@deepseek-ai/dsh-tool-bash-persistent': ^0.1.0-rc.6 || ^0.1.1-rc.1
+      '@deepseek-ai/dsh-tool-cordis': ^0.1.0-rc.6 || ^0.1.1-rc.1
+      '@deepseek-ai/dsh-user-approval': ^0.1.0-rc.6 || ^0.1.1-rc.1
+      '@deepseek-ai/dsh-user-questions': ^0.1.0-rc.6 || ^0.1.1-rc.1
+      '@deepseek-ai/dsh-workspace': ^0.1.0-rc.6 || ^0.1.1-rc.1
       '@deepseek-ai/schemastery': ^3.18.1
     bundledDependencies:
       - '@dsh-std/command'
@@ -161,8 +162,8 @@ packages:
       react: ^18.2.0
       react-dom: ^18.2.0
 
-  dsh-working-activity@0.3.2:
-    resolution: {integrity: sha512-IF/WoSUupujUK6fxnxjAkuo2u4cfrM87xkZkk6Df9j3e1A9SJYgM1I4wQsvrEATtPuoEDPotfonFyeNXK3eYsQ==}
+  dsh-working-activity@0.3.3:
+    resolution: {integrity: sha512-jirrLTkQ+8nYLp66b6ImFM2ogSvYLa0CPSi1mtqJneKsE4PuNTYNIxfnMCHcaZDhlMPCFOMyM2jc69rOYq7Dbg==}
     engines: {node: ^22.19 || >=24}
     peerDependencies:
       '@deepseek-ai/cordis': ^4.0.1
@@ -372,7 +373,7 @@ snapshots:
       ansi-styles: 6.2.3
       is-fullwidth-code-point: 5.1.0
 
-  '@deepseek-harness-tui/dsh-tui@0.8.6':
+  '@deepseek-harness-tui/dsh-tui@0.8.8':
     dependencies:
       '@alcalzone/ansi-tokenize': 0.3.0
       auto-bind: 5.0.1
@@ -382,7 +383,7 @@ snapshots:
       cli-highlight: 2.1.11
       code-excerpt: 4.0.0
       diff: 8.0.4
-      dsh-working-activity: 0.3.2(react@19.2.8)
+      dsh-working-activity: 0.3.3(react@19.2.8)
       emoji-regex: 10.6.0
       figures: 6.1.0
       get-east-asian-width: 1.6.0
@@ -467,7 +468,7 @@ snapshots:
 
   dsh-codex@0.2.5: {}
 
-  dsh-working-activity@0.3.2(react@19.2.8):
+  dsh-working-activity@0.3.3(react@19.2.8):
     optionalDependencies:
       react: 19.2.8
 

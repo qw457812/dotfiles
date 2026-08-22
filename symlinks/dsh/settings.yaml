@@ -31,3 +31,4 @@ dsh-tui:
     mode: true
     activity: true
     trajectory: true
+  whale: false

@@ -276,6 +276,8 @@ brew "librime"
 brew "litecli"
 # High-performance, extensible alternative to ls
 brew "lla"
+# LLM inference in C/C++
+brew "llama.cpp"
 # Curses-based tool for viewing and analyzing log files
 brew "lnav"
 # Rainbows and unicorns in your console!

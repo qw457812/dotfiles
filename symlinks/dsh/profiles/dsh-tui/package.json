@@ -2,7 +2,7 @@
   "name": "dsh-profile-dsh-tui",
   "private": true,
   "dependencies": {
-    "@deepseek-harness-tui/dsh-tui": "^0.8.6",
+    "@deepseek-harness-tui/dsh-tui": "^0.8.8",
     "@qw457812/dsh-pi-prompts": "^0.2.1",
     "dsh-codex": "^0.2.5"
   },

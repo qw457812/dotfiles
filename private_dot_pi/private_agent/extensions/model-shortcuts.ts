@@ -38,6 +38,7 @@ const ALIASES: Record<string, ModelTarget> = {
   flash: { provider: "neuralwatt", id: "deepseek-v4-flash" },
   kimi: { provider: "neuralwatt", id: "kimi-k3" },
   flex: { provider: "neuralwatt", id: "kimi-k3-flex" },
+  qwen: { provider: "neuralwatt", id: "qwen-3.8-27b" },
   buddy: { provider: "codebuddy", id: "glm-5.2" },
 };
 

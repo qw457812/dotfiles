@@ -630,7 +630,14 @@ return {
               "<C-g>",
               function(t)
                 local name = t.tool.name
-                if name:find("^claude") or name:find("^codex") or name:find("^opencode") or name:find("^pi") then
+                if
+                  name:find("^claude")
+                  or name:find("^codex")
+                  or name:find("^opencode")
+                  or name:find("^pi")
+                  or name:find("^dsh")
+                  or name:find("^codebuddy")
+                then
                   U.ai.sidekick.cli.tools.actions.send_keys({ "<C-g>" })(t)
                   vim.cmd.startinsert()
                 else
@@ -1106,6 +1113,7 @@ return {
           tmpdir .. "/[0-9]*.md", -- https://github.com/sst/opencode/blob/041353f4ff992e7be4455eaf6e71f492a97a123f/packages/opencode/src/cli/cmd/tui/util/editor.ts#L12
           tmpdir .. "/.*.md", -- https://github.com/openai/codex/blob/f6b563ec6403392aadbc31f449226aaabd881c01/codex-rs/tui/src/external_editor.rs#L60
           tmpdir .. "/pi-editor-*/prompt.md", -- https://github.com/earendil-works/pi/blob/75e6123aba58342d5e464c5b8417effa3dc441d2/packages/coding-agent/src/modes/interactive/external-editor.ts#L14-L15
+          tmpdir .. "/dsh-tui-prompt-*/input.md", -- https://github.com/ccch1mneyyy/dsh-TUI/blob/d7ba76d70dfcf3821268ae3d1e116160dabd62f1/src/utils/externalEditor.ts#L251-L253
           tmpdir .. "/codebuddy_edit_*.md",
         },
         once = true,
