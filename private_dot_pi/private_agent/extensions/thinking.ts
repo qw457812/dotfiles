@@ -38,8 +38,16 @@ const MAX_LEVEL_PROVIDERS = new Set([
   "synthetic",
   "codebuddy",
   "crofai",
-  "makora",
 ]);
+
+const OPENAI_CODEX_LEVELS: Partial<Record<string, ModelThinkingLevel>> = {
+  "gpt-5.6-sol": "medium",
+  "gpt-5.6-terra": "high",
+  "gpt-5.6-luna": "max",
+  "gpt-5.5": "high",
+  "gpt-5.4": "high",
+  "gpt-5.4-mini": "off",
+};
 
 function getSupportedLevels(model: Model<any> | undefined): ModelThinkingLevel[] {
   return model ? (getSupportedThinkingLevels(model) as ModelThinkingLevel[]) : ORDERED_LEVELS;
@@ -82,22 +90,12 @@ export default function (pi: ExtensionAPI) {
     const { provider, id } = model;
     if (source !== "set" && source !== "cycle") return;
 
-    if (provider === "openai-codex" && id === "gpt-5.6-sol") {
-      setLevelIfSupported(pi, model, "medium");
-      return;
-    }
-
-    if (provider === "openai-codex" && id === "gpt-5.4-mini") {
-      setLevelIfSupported(pi, model, "off");
-      return;
-    }
-
-    if (
-      (provider === "openai-codex" || provider === "github-copilot" || provider === "freemodel") &&
-      (id === "gpt-5.5" || id === "gpt-5.6-terra" || id === "gpt-5.4" || id === "gpt-5.6-luna")
-    ) {
-      setLevelIfSupported(pi, model, "high");
-      return;
+    if (provider === "openai-codex") {
+      const level = OPENAI_CODEX_LEVELS[id];
+      if (level) {
+        setLevelIfSupported(pi, model, level);
+        return;
+      }
     }
 
     // request-based billing or non-frontier open-source models

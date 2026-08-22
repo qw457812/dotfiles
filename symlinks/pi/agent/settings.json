@@ -21,12 +21,8 @@
     "openai-codex/gpt-5.6-sol",
     "openai-codex/gpt-5.6-terra",
     "openai-codex/gpt-5.6-luna",
-    "deepseek/deepseek-v4-pro",
-    "deepseek/deepseek-v4-flash",
-    "xiaomi/mimo-v2.5-pro",
     "neuralwatt/kimi-k3",
-    "neuralwatt/kimi-k3-flex",
-    "codebuddy/glm-5.2"
+    "neuralwatt/deepseek-v4-flash"
   ],
   "extensions": [
     "-extensions/copilot-ratelimit.ts",
