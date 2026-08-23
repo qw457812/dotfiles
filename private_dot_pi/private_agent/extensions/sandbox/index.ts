@@ -4,7 +4,7 @@
 // - https://github.com/aldoborrero/pi-agent-kit/blob/c990b5c4b3927c5d0886911f0c22981eb5e54db6/extensions/sandbox/index.ts
 // - https://github.com/anthropic-experimental/sandbox-runtime
 
-// NOTE: @anthropic-ai/sandbox-runtime is pinned at >=0.0.52 (migrated from 0.0.26).
+// NOTE: @anthropic-ai/sandbox-runtime is pinned at ^0.0.73 (migrated from 0.0.26).
 // Versions <0.0.43 lack resolveParentProxy() — the sandbox proxy cannot chain through
 // the user's upstream HTTP_PROXY/HTTPS_PROXY, breaking network access behind firewalls/proxies.
 
