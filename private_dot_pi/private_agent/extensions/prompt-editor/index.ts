@@ -47,6 +47,7 @@ const COMMAND_EXISTS_TIMEOUT_MS = 1000;
 const PI_VIM_BUILTIN_COMMAND_NAMES = [
   "settings",
   "model",
+  "thinking",
   "scoped-models",
   "export",
   "import",
