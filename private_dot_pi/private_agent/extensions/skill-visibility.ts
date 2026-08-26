@@ -46,6 +46,8 @@ const PROMPT_HIDDEN_SKILLS = [
   "xlsx",
   // git:github.com/addyosmani/agent-skills
   "source-driven-development",
+  // npm:@99percentpeople/pi-codex-api
+  "gpt-image-prompts",
   // git:github.com/DietrichGebert/ponytail
   "ponytail-audit",
   "ponytail-debt",

@@ -3,7 +3,7 @@
     "fastMode": false,
     "responseVerbosity": "auto",
     "searchEnabled": false,
-    "imageEnabled": true,
+    "imageEnabled": false,
     "askEnabled": false,
     "allowOtherProviders": false,
     "searchMode": "auto",
