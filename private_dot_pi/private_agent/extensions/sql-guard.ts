@@ -5,10 +5,11 @@ import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-a
  *
  * Validates that SQL executed through SQL MCP tools is read-only.
  *
- * This extension supports the two tool invocation styles used by
- * pi-mcp-adapter:
- *  - Proxy mode (`directTools: false`): toolName === 'mcp', with the actual
- *    tool in input.tool and params in input.args
+ * This extension supports the tool invocation styles used by pi-mcp-adapter:
+ *  - Gateway proxy mode: toolName === 'mcp', with the actual tool in input.tool
+ *    and params in input.args
+ *  - Namespace proxy mode: toolName === 'mcp__<server>', with the same nested
+ *    tool and args shape
  *  - Direct mode (`directTools: true`): the concrete tool is called directly,
  *    with params already in event.input
  *
@@ -70,11 +71,12 @@ function findSqlParam(args: Record<string, unknown>) {
  * cannot be bypassed if the adapter behavior changes in the future.
  */
 function extractSql(toolName: string, input: Record<string, unknown>): ExtractResult {
-  const targetTool = toolName === "mcp" ? String(input.tool || "") : toolName;
+  const isProxyTool = toolName === "mcp" || toolName.startsWith("mcp__");
+  const targetTool = isProxyTool ? String(input.tool || "") : toolName;
   if (!isGuardedTool(targetTool)) return { kind: "skip" };
 
   let args = input;
-  if (toolName === "mcp") {
+  if (isProxyTool) {
     const rawArgs = input.args;
     if (typeof rawArgs === "string") {
       if (!rawArgs.trim()) {
