@@ -1,0 +1,15 @@
+{
+  "codex-api": {
+    "fastMode": false,
+    "responseVerbosity": "auto",
+    "searchEnabled": false,
+    "imageEnabled": true,
+    "askEnabled": false,
+    "allowOtherProviders": false,
+    "searchMode": "auto",
+    "searchContextSize": "medium",
+    "imageQuality": "auto",
+    "usageStatus": false,
+    "usagePollInterval": 0
+  }
+}

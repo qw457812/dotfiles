@@ -1,4 +1,5 @@
 {
+  "99percentpeople-pi-extensions": { "branch": "master", "commit": "fe4c44f3b4d4b52bd2c31d6d4d5a833c4ad60d9d" },
   "LazyVim": { "branch": "main", "commit": "459a4c3b1059671e766a46c7cc223827dc67e3d0" },
   "LazyVim-starter": { "branch": "main", "commit": "803bc181d7c0d6d5eeba9274d9be49b287294d99" },
   "SchemaStore.nvim": { "branch": "main", "commit": "73e89eb3e536a4dd8f991c963bd37189520c9919" },

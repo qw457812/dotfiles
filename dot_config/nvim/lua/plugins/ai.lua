@@ -143,6 +143,14 @@ return {
         config = function() end,
       },
       {
+        "99percentpeople/pi-extensions",
+        name = "99percentpeople-pi-extensions",
+        -- version = "*",
+        -- build = "pi update --extension npm:@99percentpeople/pi-codex-api",
+        lazy = true,
+        config = function() end,
+      },
+      {
         "qw457812/pi-listen",
         build = "pi update --extension git:github.com/qw457812/pi-listen",
         lazy = true,
