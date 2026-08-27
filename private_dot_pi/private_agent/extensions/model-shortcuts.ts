@@ -16,6 +16,19 @@ import type {
 } from "@earendil-works/pi-coding-agent";
 import type { AutocompleteItem } from "@earendil-works/pi-tui";
 
+const ALIASES: Record<string, ModelTarget> = {
+  sol: { provider: "openai-codex", id: "gpt-5.6-sol" },
+  terra: { provider: "openai-codex", id: "gpt-5.6-terra" },
+  luna: { provider: "openai-codex", id: "gpt-5.6-luna" },
+  deepseek: { provider: "deepseek", id: "deepseek-v4-pro" },
+  mimo: { provider: "xiaomi", id: "mimo-v2.5-pro" },
+  flash: { provider: "neuralwatt", id: "deepseek-v4-flash" },
+  kimi: { provider: "neuralwatt", id: "kimi-k3" },
+  flex: { provider: "neuralwatt", id: "kimi-k3-flex" },
+  qwen: { provider: "neuralwatt", id: "qwen-3.8-27b" },
+  buddy: { provider: "codebuddy", id: "glm-5.3" },
+};
+
 const ALL_LEVELS: ModelThinkingLevel[] = [
   "off",
   "minimal",
@@ -27,20 +40,6 @@ const ALL_LEVELS: ModelThinkingLevel[] = [
 ];
 
 type ModelTarget = { provider: string; id: string };
-
-const ALIASES: Record<string, ModelTarget> = {
-  sol: { provider: "openai-codex", id: "gpt-5.6-sol" },
-  terra: { provider: "openai-codex", id: "gpt-5.6-terra" },
-  luna: { provider: "openai-codex", id: "gpt-5.6-luna" },
-  mini: { provider: "openai-codex", id: "gpt-5.4-mini" },
-  deepseek: { provider: "deepseek", id: "deepseek-v4-pro" },
-  mimo: { provider: "xiaomi", id: "mimo-v2.5-pro" },
-  flash: { provider: "neuralwatt", id: "deepseek-v4-flash" },
-  kimi: { provider: "neuralwatt", id: "kimi-k3" },
-  flex: { provider: "neuralwatt", id: "kimi-k3-flex" },
-  qwen: { provider: "neuralwatt", id: "qwen-3.8-27b" },
-  buddy: { provider: "codebuddy", id: "glm-5.2" },
-};
 
 async function switchModel(
   pi: ExtensionAPI,

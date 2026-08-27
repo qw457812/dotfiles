@@ -4,7 +4,7 @@
  * Pi provides the built-in /thinking command and picker.
  *
  * Automatic defaults apply only to explicit model selection and model cycling:
- *   - Models listed in OPENAI_CODEX_LEVELS use their configured level.
+ *   - Models listed in MODEL_LEVELS use their configured level.
  *   - Providers listed in MAX_LEVEL_PROVIDERS use their highest supported level.
  *   - All other models keep the current session level.
  *
@@ -15,15 +15,15 @@ import type { Model, ModelThinkingLevel } from "@earendil-works/pi-ai";
 import { getSupportedThinkingLevels } from "@earendil-works/pi-ai";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
-const ORDERED_LEVELS: ModelThinkingLevel[] = [
-  "off",
-  "minimal",
-  "low",
-  "medium",
-  "high",
-  "xhigh",
-  "max",
-];
+const MODEL_LEVELS: Record<string, Partial<Record<string, ModelThinkingLevel>>> = {
+  "openai-codex": {
+    "gpt-5.6-sol": "medium",
+    "gpt-5.6-terra": "high",
+    "gpt-5.6-luna": "max",
+    "gpt-5.5": "high",
+    "gpt-5.4": "high",
+  },
+};
 
 const MAX_LEVEL_PROVIDERS = new Set([
   "kiro",
@@ -36,14 +36,15 @@ const MAX_LEVEL_PROVIDERS = new Set([
   "crofai",
 ]);
 
-const OPENAI_CODEX_LEVELS: Partial<Record<string, ModelThinkingLevel>> = {
-  "gpt-5.6-sol": "medium",
-  "gpt-5.6-terra": "high",
-  "gpt-5.6-luna": "max",
-  "gpt-5.5": "high",
-  "gpt-5.4": "high",
-  "gpt-5.4-mini": "off",
-};
+const ORDERED_LEVELS: ModelThinkingLevel[] = [
+  "off",
+  "minimal",
+  "low",
+  "medium",
+  "high",
+  "xhigh",
+  "max",
+];
 
 function getSupportedLevels(model: Model<any> | undefined): ModelThinkingLevel[] {
   return model ? (getSupportedThinkingLevels(model) as ModelThinkingLevel[]) : ORDERED_LEVELS;
@@ -70,12 +71,10 @@ export default function (pi: ExtensionAPI) {
     const { provider, id } = model;
     if (source !== "set" && source !== "cycle") return;
 
-    if (provider === "openai-codex") {
-      const level = OPENAI_CODEX_LEVELS[id];
-      if (level) {
-        setLevelIfSupported(pi, model, level);
-        return;
-      }
+    const level = MODEL_LEVELS[provider]?.[id];
+    if (level) {
+      setLevelIfSupported(pi, model, level);
+      return;
     }
 
     // request-based billing or non-frontier open-source models
