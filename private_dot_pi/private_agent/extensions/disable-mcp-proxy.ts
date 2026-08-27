@@ -26,6 +26,7 @@ import { homedir } from "node:os";
 import { join, resolve } from "node:path";
 
 interface McpServerEntry {
+  disabled?: boolean;
   directTools?: boolean | string[];
   [key: string]: unknown;
 }
@@ -84,8 +85,9 @@ function loadMergedConfig(cwd: string): McpConfig {
   return merged;
 }
 
-/** A server needs the proxy when its effective directTools is not `true`. */
+/** An enabled server needs the proxy when its effective directTools is not `true`. */
 function serverNeedsProxy(entry: McpServerEntry, globalDirect?: boolean | string[]): boolean {
+  if (entry.disabled === true) return false;
   if (entry.directTools === undefined) {
     if (globalDirect === undefined) return true;
     if (globalDirect === true) return false;
