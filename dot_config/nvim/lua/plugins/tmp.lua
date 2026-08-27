@@ -203,7 +203,6 @@ return {
               env = proxy_env,
             },
             dsh = {
-              -- needed for https://github.com/Yan-Zero/dsh-codex
               env = proxy_env,
             },
           },

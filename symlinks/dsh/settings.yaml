@@ -32,3 +32,5 @@ dsh-tui:
     activity: true
     trajectory: true
   whale: false
+  fullscreen: false
+  recapOnOpen: false

@@ -203,26 +203,6 @@ return {
         lazy = true,
         config = function() end,
       },
-      {
-        "dsh-tui/dsh-tui",
-        name = "dsh-pi-tui",
-        build = function(plugin)
-          U.ai.dsh.update_plugin(plugin, "pi-tui")
-        end,
-        version = "*",
-        lazy = true,
-        config = function() end,
-      },
-      {
-        "Yan-Zero/dsh-codex",
-        build = function(plugin)
-          U.ai.dsh.update_plugin(plugin, "dsh-tui")
-          U.ai.dsh.update_plugin(plugin, "pi-tui")
-        end,
-        version = "*",
-        lazy = true,
-        config = function() end,
-      },
     },
   },
 

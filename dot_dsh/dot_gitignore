@@ -4,5 +4,5 @@
 /plugins/node_modules/
 /profiles/*/node_modules/
 
-# https://github.com/Yan-Zero/dsh-codex
-/.openai-codex-auth.json
+# https://github.com/ccch1mneyyy/dsh-TUI
+/dsh-auth/credentials.json
