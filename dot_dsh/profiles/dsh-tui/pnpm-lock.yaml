@@ -12,8 +12,8 @@ importers:
         specifier: ^0.9.3
         version: 0.9.3(supports-color@7.2.0)(ws@8.21.3)(zod@4.4.3)
       '@qw457812/dsh-pi-prompts':
-        specifier: ^0.2.1
-        version: 0.2.1
+        specifier: ^0.2.2
+        version: 0.2.2
 
 packages:
 
@@ -285,14 +285,14 @@ packages:
   '@protobufjs/utf8@1.1.2':
     resolution: {integrity: sha512-b1UQwcEZ4yCnMCD8DAL1VlbvBJE9/IX4FTIp7BG1xYpf29SLazLSrqUkj4w7Y5y7cCVP6E5tcqqcI0xemPkHug==}
 
-  '@qw457812/dsh-pi-prompts@0.2.1':
-    resolution: {integrity: sha512-LHpnPKL5F20vbiZXyyrC+0GzKMwc6zTTEjGKIlY3LTRkzbSXTAXg7aMRzgUd39ymk6YjsDMKSfc4Dda6ScY8pA==}
+  '@qw457812/dsh-pi-prompts@0.2.2':
+    resolution: {integrity: sha512-6tW9A3cExjrIKuYv3utK6hM7pZ7eby/gLExSTocFUG3Qv+fShgr4FW6eEu36QB/uk3BAKdu7QtV+tutSynPeaA==}
     engines: {node: ^22.19.0 || >=24.0.0}
     peerDependencies:
       '@deepseek-ai/cordis': ^4.0.1
-      '@deepseek-ai/dsh-agent': ^0.1.0-rc.7
-      '@deepseek-ai/dsh-commands': ^0.1.0-rc.7
-      '@deepseek-ai/dsh-llm': ^0.1.0-rc.7
+      '@deepseek-ai/dsh-agent': ^0.1.1-rc.2
+      '@deepseek-ai/dsh-commands': ^0.1.1-rc.2
+      '@deepseek-ai/dsh-llm': ^0.1.1-rc.2
 
   '@smithy/core@3.33.3':
     resolution: {integrity: sha512-CsOeKq/9kA3y6VJHt+/+VTCtBaxJ4OTFpgrjIUhPpDIKxBci1k2bJaQASF2h/ELWrulGp+t97DZ0mevfAD8idg==}
@@ -1111,7 +1111,7 @@ snapshots:
 
   '@protobufjs/utf8@1.1.2': {}
 
-  '@qw457812/dsh-pi-prompts@0.2.1':
+  '@qw457812/dsh-pi-prompts@0.2.2':
     dependencies:
       yaml: 2.9.0
 
