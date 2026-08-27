@@ -225,6 +225,7 @@ describe("apply", () => {
 
     const result = handler?.({
       agent: { steer } as never,
+      attachments: [],
       commandId: "command-id" as never,
       rawInput: "Alice one two",
       signal: AbortSignal.timeout(1_000),
@@ -247,6 +248,7 @@ describe("apply", () => {
 
     const result = harness.definitions[0]?.definition.handler({
       agent: { steer: vi.fn() } as never,
+      attachments: [],
       commandId: "command-id" as never,
       rawInput: "",
       signal: AbortSignal.timeout(1_000),
@@ -270,6 +272,7 @@ describe("apply", () => {
     const steer = vi.fn();
     harness.definitions[0]?.definition.handler({
       agent: { steer } as never,
+      attachments: [],
       commandId: "command-id" as never,
       rawInput: "",
       signal: AbortSignal.timeout(1_000),
