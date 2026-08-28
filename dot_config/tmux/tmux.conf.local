@@ -424,7 +424,8 @@ bind m run "cut -c3- '#{TMUX_CONF}' | sh -s _toggle_mouse" \; display 'mouse #{?
 #set -g status-position top
 
 # https://wezfurlong.org/wezterm/shell-integration.html#user-vars
-set -g allow-passthrough on
+# https://github.com/diegopetrucci/pi-extensions/commit/2caaad8
+set -g allow-passthrough all
 
 # https://github.com/gpakosz/.tmux/issues/53#issuecomment-276544577
 set -gu prefix2

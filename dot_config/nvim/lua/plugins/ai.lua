@@ -97,12 +97,6 @@ return {
         lazy = true,
         config = function() end,
       },
-      -- {
-      --   "monotykamary/pi-tps",
-      --   build = "pi update --extension git:github.com/monotykamary/pi-tps",
-      --   lazy = true,
-      --   config = function() end,
-      -- },
       {
         "monotykamary/pi-neuralwatt-provider",
         build = "pi update --extension git:github.com/monotykamary/pi-neuralwatt-provider",
@@ -253,7 +247,6 @@ return {
         -- ["<leader>ag"] = "claude_glm",
         ["<leader>at"] = "pi_tmp",
         ["<leader>ae"] = "dsh",
-        ["<leader>av"] = "fx",
       }
       local favourite_tool = "pi"
       for i = 1, 9 do
@@ -364,7 +357,6 @@ return {
         count = 0,
       })
       numbered_tools({ name = "dsh", count = 1 })
-      numbered_tools({ name = "fx", count = 1 })
 
       opts.cli.mux = opts.cli.mux or {}
       local use_herdr = opts.cli.mux.backend == "herdr"
@@ -765,15 +757,6 @@ return {
               prompt = false, -- dsh uses <c-p> for its own functionality
             },
           },
-          fx = {
-            cmd = { "fx" },
-            is_proc = "\\<fx\\>",
-            url = "https://github.com/vercel-labs/fx",
-            env = {
-              __AI_AGENT = "fx",
-            },
-          },
-          gemini = { cmd = { "hack_to_disable_gemini" } }, -- HACK: disable gemini
           -- debug = { cmd = { "bash", "-c", "env | sort | bat -l env" } },
         },
         ---@type table<string, sidekick.context.Fn>
@@ -911,6 +894,15 @@ return {
               -- end
             end
           end)
+        end,
+      })
+
+      -- rarely, `/` triggers blink.cmp when using Pi in the sidekick (terminal mode), not sure why
+      vim.api.nvim_create_autocmd("FileType", {
+        group = vim.api.nvim_create_augroup("sidekick_disable_blink_cmp", { clear = false }),
+        pattern = "sidekick_terminal",
+        callback = function(ev)
+          vim.b[ev.buf].completion = false
         end,
       })
 
@@ -1156,6 +1148,8 @@ return {
             path:match("/CLAUDE%.md$")
             or path:match("/CLAUDE%.local%.md$")
             or path:match("/AGENTS%.md$")
+            or path:match("/AGENTS%.override%.md$")
+            or path:match("/SKILL%.md$")
             or path:find("/%.claude/rules/")
           then
             vim.diagnostic.enable(false, { bufnr = ev.buf })
