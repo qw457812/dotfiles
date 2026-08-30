@@ -1,11 +1,13 @@
 // Ref: https://github.com/disler/pi-vs-claude-code/blob/32dfe122cb6d444e91c68b32597274a725d81fa3/extensions/tool-counter.ts
 
+import type { ToolExecutionEndEvent } from "@earendil-works/pi-coding-agent";
+
 interface Theme {
   fg(color: string, text: string): string;
 }
 
 export interface ToolCounterTracker {
-  onToolExecutionEnd(event: { toolName: string; isError: boolean }): void;
+  onToolExecutionEnd(event: ToolExecutionEndEvent): void;
   onSessionStart(): void;
   getToolTally(theme: Theme): string | null;
 }
