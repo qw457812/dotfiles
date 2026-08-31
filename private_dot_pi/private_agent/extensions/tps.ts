@@ -2,6 +2,8 @@
 // https://github.com/badlogic/pi-mono/blob/a26a9cfabd05ccf774045b3685e50d3605516cdb/.pi/extensions/tps.ts
 // https://github.com/monotykamary/pi-tps/blob/64472f2ccddc327e33ed604d69e94e152a659ac9/extensions/pi-tps/index.ts
 
+// See also: https://github.com/arhen/pi-extensions/tree/21d3e6476f076a889f659d7201e680099165d902/packages/core/pi-core-tps-stats
+
 import {
 	isContextOverflow,
 	isRetryableAssistantError,

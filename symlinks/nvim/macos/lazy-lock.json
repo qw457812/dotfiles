@@ -111,6 +111,7 @@
   "persistence.nvim": { "branch": "main", "commit": "b20b2a7887bd39c1a356980b45e03250f3dce49c" },
   "pi": { "branch": "main", "commit": "4e58f324fae8ebfa98a3d45181fb248072a2afac" },
   "pi-agent-colony": { "branch": "main", "commit": "e609f5d5c935079e36c88944252b168ff0907a27" },
+  "pi-commandcode-provider": { "branch": "main", "commit": "6f367515d835c36abe9a06360c06b60937715e29" },
   "pi-guardrails": { "branch": "main", "commit": "8492cb7d958e25318bcff982fb9a8370787113b9" },
   "pi-invisible-continue": { "branch": "main", "commit": "38aa5500209c9c8c39ec48b123be900ae0066867" },
   "pi-listen": { "branch": "main", "commit": "c3cd4fbf5dd4ef6e7ea0e16a0a9b9398dca74a5c" },

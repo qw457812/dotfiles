@@ -23,9 +23,12 @@ const ALIASES: Record<string, ModelTarget> = {
   deepseek: { provider: "deepseek", id: "deepseek-v4-pro" },
   mimo: { provider: "xiaomi", id: "mimo-v2.5-pro" },
   flash: { provider: "neuralwatt", id: "deepseek-v4-flash" },
+  glm: { provider: "neuralwatt", id: "glm-5.3" },
   kimi: { provider: "neuralwatt", id: "kimi-k3" },
   flex: { provider: "neuralwatt", id: "kimi-k3-flex" },
   qwen: { provider: "neuralwatt", id: "qwen-3.8-27b" },
+  cmd: { provider: "commandcode", id: "deepseek/deepseek-v4-flash" },
+  free: { provider: "commandcode", id: "minimax/minimax-m3-free" },
   buddy: { provider: "codebuddy", id: "glm-5.3" },
 };
 

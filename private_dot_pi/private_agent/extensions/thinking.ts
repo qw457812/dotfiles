@@ -23,6 +23,9 @@ const MODEL_LEVELS: Record<string, Partial<Record<string, ModelThinkingLevel>>> 
     "gpt-5.5": "high",
     "gpt-5.4": "high",
   },
+  commandcode: {
+    "deepseek/deepseek-v4-flash": "max",
+  },
 };
 
 const MAX_LEVEL_PROVIDERS = new Set([

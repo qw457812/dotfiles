@@ -103,6 +103,12 @@ return {
         lazy = true,
         config = function() end,
       },
+      {
+        "patlux/pi-commandcode-provider",
+        build = "pi update --extension git:github.com/patlux/pi-commandcode-provider",
+        lazy = true,
+        config = function() end,
+      },
       -- -- Providers that offer Opus models with a coding plan:
       -- -- 1. https://kilo.ai/pricing
       -- --    - https://github.com/Kilo-Org/kilo-pi-provider
@@ -121,7 +127,9 @@ return {
         lazy = true,
         config = function() end,
       },
-      -- https://github.com/deepseek-ai/deepseek-harness/commit/7078918
+      -- See also:
+      -- - https://github.com/deepseek-ai/deepseek-harness/commit/7078918
+      -- - https://github.com/arhen/pi-extensions/tree/21d3e6476f076a889f659d7201e680099165d902/packages/core/pi-core-vision
       {
         "monotykamary/pi-vision-handoff",
         build = "pi update --extension git:github.com/monotykamary/pi-vision-handoff",
