@@ -146,15 +146,20 @@ interface CommandCodeQuotaWindow {
 }
 
 interface CommandCodeQuota {
-  credits: {
-    monthlyCredits?: number;
-    purchasedCredits?: number;
-    freeCredits?: number;
+  quota: {
+    credits?: {
+      monthlyCredits?: number;
+      purchasedCredits?: number;
+      freeCredits?: number;
+    };
+    windowLimits?: {
+      fiveHour?: CommandCodeQuotaWindow;
+      weekly?: CommandCodeQuotaWindow;
+    };
   };
-  windowLimits?: {
-    fiveHour?: CommandCodeQuotaWindow;
-    weekly?: CommandCodeQuotaWindow;
-  };
+  sub?: {
+    currentPeriodEnd?: string;
+  } | null;
 }
 
 type CodebuddyOAuthCredentials = {
@@ -722,23 +727,30 @@ const sources: Record<string, Source> = {
       return joinParts([formatWindow(quota.window5h), formatWindow(quota.windowWeek)]);
     },
   }),
+  // Ref: https://github.com/patlux/pi-commandcode-provider/blob/96356698fa046f0e14cd9bdf622454aa8ff4750a/src/quota.ts
   commandcode: createSource("commandcode", {
     cacheTtlMs: MINUTE_MS,
     async getAuth(): Promise<string | null> {
       return process.env.COMMANDCODE_API_KEY || null;
     },
     async fetch(apiKey: string): Promise<CommandCodeQuota | null> {
-      const quota = await fetchJson<CommandCodeQuota>(
-        "https://api.commandcode.ai/alpha/billing/credits",
-        apiKey,
-      );
-      return quota?.credits ? quota : null;
+      const [quota, sub] = await Promise.all([
+        fetchJson<CommandCodeQuota["quota"]>(
+          "https://api.commandcode.ai/alpha/billing/credits",
+          apiKey,
+        ),
+        fetchJson<{ data?: CommandCodeQuota["sub"] }>(
+          "https://api.commandcode.ai/alpha/billing/subscriptions",
+          apiKey,
+        ),
+      ]);
+      return quota ? { quota, sub: sub?.data ?? null } : null;
     },
     format(quota: CommandCodeQuota, theme: Theme): string | null {
       const credits =
-        (quota.credits.monthlyCredits ?? 0) +
-        (quota.credits.purchasedCredits ?? 0) +
-        (quota.credits.freeCredits ?? 0);
+        (quota.quota.credits?.monthlyCredits ?? 0) +
+        (quota.quota.credits?.purchasedCredits ?? 0) +
+        (quota.quota.credits?.freeCredits ?? 0);
 
       const formatWindow = (window: CommandCodeQuotaWindow | undefined): string | null => {
         if (!window || !Number.isFinite(window.used) || !Number.isFinite(window.cap)) return null;
@@ -750,9 +762,17 @@ const sources: Record<string, Source> = {
       };
 
       return joinParts([
-        formatWindow(quota.windowLimits?.fiveHour),
-        formatWindow(quota.windowLimits?.weekly),
-        theme.fg("accent", `$${formatDecimal(credits, 2)}`),
+        formatWindow(quota.quota.windowLimits?.fiveHour),
+        formatWindow(quota.quota.windowLimits?.weekly),
+        joinParts(
+          [
+            theme.fg("accent", formatDecimal(credits, 2)),
+            quota.sub?.currentPeriodEnd
+              ? theme.fg("dim", formatRemaining(quota.sub.currentPeriodEnd))
+              : null,
+          ],
+          theme.fg("dim", "/"),
+        ),
       ]);
     },
   }),
