@@ -139,6 +139,24 @@ interface CodebuddyQuota {
   };
 }
 
+interface CommandCodeQuotaWindow {
+  used: number;
+  cap: number;
+  resetAt?: number | string | null;
+}
+
+interface CommandCodeQuota {
+  credits: {
+    monthlyCredits?: number;
+    purchasedCredits?: number;
+    freeCredits?: number;
+  };
+  windowLimits?: {
+    fiveHour?: CommandCodeQuotaWindow;
+    weekly?: CommandCodeQuotaWindow;
+  };
+}
+
 type CodebuddyOAuthCredentials = {
   enterpriseId?: string;
 } & OAuthCredentials;
@@ -696,12 +714,46 @@ const sources: Record<string, Source> = {
 
         const resetAt =
           typeof w.resetsAt === "number" && Number.isFinite(w.resetsAt)
-            ? `/${formatRemaining(w.resetsAt * 1000)}`
+            ? formatRemaining(w.resetsAt * 1000)
             : "?";
-        return `${theme.fg("accent", `$${formatDecimal(w.usedCents / 100, 2)}`)}${theme.fg("dim", `/$${formatDecimal(w.limitCents / 100, 2)}${resetAt}`)}`;
+        return `${theme.fg("accent", `$${formatDecimal(w.usedCents / 100, 2)}`)}${theme.fg("dim", `/$${formatDecimal(w.limitCents / 100, 2)}/${resetAt}`)}`;
       };
 
       return joinParts([formatWindow(quota.window5h), formatWindow(quota.windowWeek)]);
+    },
+  }),
+  commandcode: createSource("commandcode", {
+    cacheTtlMs: MINUTE_MS,
+    async getAuth(): Promise<string | null> {
+      return process.env.COMMANDCODE_API_KEY || null;
+    },
+    async fetch(apiKey: string): Promise<CommandCodeQuota | null> {
+      const quota = await fetchJson<CommandCodeQuota>(
+        "https://api.commandcode.ai/alpha/billing/credits",
+        apiKey,
+      );
+      return quota?.credits ? quota : null;
+    },
+    format(quota: CommandCodeQuota, theme: Theme): string | null {
+      const credits =
+        (quota.credits.monthlyCredits ?? 0) +
+        (quota.credits.purchasedCredits ?? 0) +
+        (quota.credits.freeCredits ?? 0);
+
+      const formatWindow = (window: CommandCodeQuotaWindow | undefined): string | null => {
+        if (!window || !Number.isFinite(window.used) || !Number.isFinite(window.cap)) return null;
+        const resetAt =
+          window.resetAt !== undefined && window.resetAt !== null
+            ? formatRemaining(window.resetAt)
+            : "?";
+        return `${theme.fg("accent", formatDecimal(window.used, 3))}${theme.fg("dim", `/${window.cap}/${resetAt}`)}`;
+      };
+
+      return joinParts([
+        formatWindow(quota.windowLimits?.fiveHour),
+        formatWindow(quota.windowLimits?.weekly),
+        theme.fg("accent", `$${formatDecimal(credits, 2)}`),
+      ]);
     },
   }),
   firepass: createSource("firepass", {
