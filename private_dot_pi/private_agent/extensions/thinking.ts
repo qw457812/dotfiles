@@ -38,6 +38,7 @@ const MAX_LEVEL_PROVIDERS = new Set([
   "deepseek",
   "xiaomi",
   "neuralwatt",
+  "hyper",
   "synthetic",
   "codebuddy",
   "crofai",

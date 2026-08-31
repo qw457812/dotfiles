@@ -29,6 +29,7 @@ const ALIASES: Record<string, ModelTarget> = {
   mimo: { provider: "commandcode", id: "xiaomi/mimo-v2.5-pro" },
   flex: { provider: "neuralwatt", id: "kimi-k3-flex" },
   cmd: { provider: "commandcode", id: "deepseek/deepseek-v4-flash" },
+  hyper: { provider: "hyper", id: "glm-5.3-flash" },
   buddy: { provider: "codebuddy", id: "glm-5.3" },
 };
 

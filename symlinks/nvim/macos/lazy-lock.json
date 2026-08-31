@@ -113,6 +113,7 @@
   "pi-agent-colony": { "branch": "main", "commit": "e609f5d5c935079e36c88944252b168ff0907a27" },
   "pi-commandcode-provider": { "branch": "main", "commit": "6f367515d835c36abe9a06360c06b60937715e29" },
   "pi-guardrails": { "branch": "main", "commit": "8492cb7d958e25318bcff982fb9a8370787113b9" },
+  "pi-hyper-provider": { "branch": "main", "commit": "ac3ed634636b9e8eddad3e02e358943a5a829737" },
   "pi-invisible-continue": { "branch": "main", "commit": "38aa5500209c9c8c39ec48b123be900ae0066867" },
   "pi-listen": { "branch": "main", "commit": "c3cd4fbf5dd4ef6e7ea0e16a0a9b9398dca74a5c" },
   "pi-mcp-adapter": { "branch": "main", "commit": "080ecd4920eea62147d035717743c210bfda3fc0" },

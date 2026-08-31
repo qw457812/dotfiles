@@ -134,6 +134,7 @@
     "git:github.com/monotykamary/pi-invisible-continue",
     "git:github.com/monotykamary/pi-vision-handoff",
     "git:github.com/patlux/pi-commandcode-provider",
+    "npm:@charmland/pi-hyper-provider",
     "npm:@99percentpeople/pi-codex-api",
     "git:github.com/qw457812/pi-listen"
   ],

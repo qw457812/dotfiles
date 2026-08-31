@@ -109,6 +109,13 @@ return {
         lazy = true,
         config = function() end,
       },
+      {
+        "charmbracelet/pi-hyper-provider",
+        version = "*",
+        build = "pi update --extension npm:@charmland/pi-hyper-provider",
+        lazy = true,
+        config = function() end,
+      },
       -- -- Providers that offer Opus models with a coding plan:
       -- -- 1. https://kilo.ai/pricing
       -- --    - https://github.com/Kilo-Org/kilo-pi-provider

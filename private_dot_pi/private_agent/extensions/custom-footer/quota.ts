@@ -110,6 +110,10 @@ interface CrofQuota {
   credits: number;
 }
 
+interface HyperQuota {
+  balance?: number;
+}
+
 interface SmartaipiQuota {
   credits: number;
   free_credits: number;
@@ -835,6 +839,19 @@ const sources: Record<string, Source> = {
         `${theme.fg("accent", formatDecimal(credit, 2))}${theme.fg("dim", `/${formatDecimal(limitNum, 2)}`)}`,
         theme.fg("dim", formatRemaining(Date.parse(cycleResetTime.replace(" ", "T")))),
       ]);
+    },
+  }),
+  hyper: createSource("hyper", {
+    cacheTtlMs: MINUTE_MS,
+    async getAuth(): Promise<string | null> {
+      return process.env.HYPER_API_KEY ?? null;
+    },
+    async fetch(apiKey: string): Promise<HyperQuota | null> {
+      return fetchJson<HyperQuota>("https://hyper.charm.land/v1/credits", apiKey);
+    },
+    format(quota: HyperQuota, theme: Theme): string | null {
+      if (typeof quota.balance !== "number") return null;
+      return theme.fg("accent", formatDecimal(quota.balance, 2));
     },
   }),
   kiro: createSource<KiroQuota, KiroOAuthCredentials>("kiro", {
