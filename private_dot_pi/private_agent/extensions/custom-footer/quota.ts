@@ -758,7 +758,7 @@ const sources: Record<string, Source> = {
           window.resetAt !== undefined && window.resetAt !== null
             ? formatRemaining(window.resetAt)
             : "?";
-        return `${theme.fg("accent", formatDecimal(window.used, 3))}${theme.fg("dim", `/${window.cap}/${resetAt}`)}`;
+        return `${theme.fg("accent", formatDecimal(window.used, 2))}${theme.fg("dim", `/${window.cap}/${resetAt}`)}`;
       };
 
       return joinParts([

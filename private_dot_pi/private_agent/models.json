@@ -16,6 +16,45 @@
         }
       }
     },
+    // https://github.com/patlux/pi-commandcode-provider/pull/65
+    // curl -H "Authorization: Bearer $COMMANDCODE_API_KEY" https://api.commandcode.ai/provider/v1/models
+    "commandcode": {
+      "modelOverrides": {
+        "z-ai/glm-5.3-flash": {
+          "reasoning": true,
+          "thinkingLevelMap": {
+            "minimal": null,
+            "low": "low",
+            "medium": null,
+            "high": "high",
+            "xhigh": null,
+            "max": "max"
+          },
+          "input": ["text", "image"],
+          "maxTokens": 131072,
+          "cost": { "input": 0.15, "output": 0.5, "cacheRead": 0.03, "cacheWrite": 0 },
+          "compat": {
+            "supportsReasoningEffort": true
+          }
+        },
+        "Qwen/Qwen3.8-Flash": {
+          "reasoning": true,
+          "thinkingLevelMap": {
+            "minimal": null,
+            "low": "low",
+            "medium": "medium",
+            "high": null,
+            "xhigh": "xhigh",
+            "max": null
+          },
+          "input": ["text", "image"],
+          "cost": { "input": 0.16, "output": 0.47, "cacheRead": 0.016, "cacheWrite": 0 },
+          "compat": {
+            "supportsReasoningEffort": true
+          }
+        }
+      }
+    },
     "zai": {
       "baseUrl": "https://api.z.ai/api/coding/paas/v4",
       "apiKey": "$ZAI_API_KEY",
