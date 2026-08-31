@@ -31,7 +31,7 @@
   "dannote-dot-pi": { "branch": "master", "commit": "b8724bf1fcdd6146c2fb430633851bc413ef9206" },
   "deepseek-harness": { "branch": "master", "commit": "47f943859bef60e4160492346772ded9b24f765a" },
   "dial.nvim": { "branch": "master", "commit": "f2634758455cfa52a8acea6f142dcd6271a1bf57" },
-  "diegopetrucci-pi-extensions": { "branch": "main", "commit": "53d15a930b78ea3f96f1ea508ec3122c68037454" },
+  "diegopetrucci-pi-extensions": { "branch": "main", "commit": "dfd0d874a64ff2bc3afb1ba7fe6b622f8b41e42a" },
   "dropbar.nvim": { "branch": "master", "commit": "808ba31cde89aec8833e9789f5e04557cd31c9e1" },
   "exercism.nvim": { "branch": "main", "commit": "dee4f1844555a15d0d343e0e88b65dbf20be337e" },
   "flash.nvim": { "branch": "main", "commit": "b6346946d10d07998efee029fb0f7a593806d0cd" },

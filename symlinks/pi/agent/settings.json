@@ -114,15 +114,6 @@
       "themes": []
     },
     {
-      "source": "git:github.com/diegopetrucci/pi-extensions",
-      "extensions": [
-        "extensions/fast/index.ts"
-      ],
-      "skills": [],
-      "prompts": [],
-      "themes": []
-    },
-    {
       "source": "git:github.com/hugohe3/ppt-master",
       "extensions": [],
       "skills": [
@@ -137,6 +128,7 @@
         "-skills/mcp-scripting/SKILL.md"
       ]
     },
+    "npm:@diegopetrucci/pi-fast",
     "npm:@aliou/pi-guardrails",
     "git:github.com/monotykamary/pi-neuralwatt-provider",
     "git:github.com/monotykamary/pi-invisible-continue",

@@ -140,7 +140,7 @@ return {
       {
         "diegopetrucci/pi-extensions",
         name = "diegopetrucci-pi-extensions",
-        build = "pi update --extension git:github.com/diegopetrucci/pi-extensions",
+        build = "pi update --extension npm:@diegopetrucci/pi-fast",
         lazy = true,
         config = function() end,
       },
