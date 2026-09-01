@@ -22,7 +22,18 @@
     "openai-codex/gpt-5.6-terra",
     "openai-codex/gpt-5.6-luna",
     "neuralwatt/kimi-k3",
-    "neuralwatt/deepseek-v4-flash"
+    "neuralwatt/glm-5.3",
+    "neuralwatt/glm-5.3-flash",
+    "neuralwatt/deepseek-v4-flash",
+    "neuralwatt/deepseek-v4-pro",
+    "neuralwatt/qwen-3.8-27b",
+    "commandcode/moonshotai/Kimi-K3",
+    "commandcode/zai-org/GLM-5.3",
+    "commandcode/z-ai/glm-5.3-flash",
+    "commandcode/Qwen/Qwen3.8-Max",
+    "commandcode/deepseek/deepseek-v4-pro",
+    "commandcode/deepseek/deepseek-v4-flash",
+    "commandcode/xiaomi/mimo-v2.5-pro"
   ],
   "extensions": [
     "-extensions/copilot-ratelimit.ts",

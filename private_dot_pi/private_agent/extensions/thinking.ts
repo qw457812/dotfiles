@@ -42,6 +42,7 @@ const MAX_LEVEL_PROVIDERS = new Set([
   "synthetic",
   "codebuddy",
   "crofai",
+  "coralbricks",
 ]);
 
 const ORDERED_LEVELS: ModelThinkingLevel[] = [

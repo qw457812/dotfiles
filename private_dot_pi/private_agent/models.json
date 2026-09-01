@@ -55,6 +55,33 @@
         }
       }
     },
+    // https://www.coralbricks.ai/docs/pi
+    "coralbricks": {
+      "name": "CoralBricks",
+      "baseUrl": "https://inference.coralbricks.ai/v1",
+      "api": "openai-completions",
+      "apiKey": "$CORALBRICKS_API_KEY",
+      "models": [
+        {
+          "id": "glm-5.3-fp4",
+          "name": "GLM 5.3",
+          "reasoning": true,
+          "input": ["text"],
+          "contextWindow": 1048576,
+          "maxTokens": 32768,
+          "cost": { "input": 1.12, "output": 4.4, "cacheRead": 0, "cacheWrite": 0 }
+        },
+        {
+          "id": "kimi-k3",
+          "name": "Kimi K3",
+          "reasoning": true,
+          "input": ["text", "image"],
+          "contextWindow": 1048576,
+          "maxTokens": 32768,
+          "cost": { "input": 3, "output": 15, "cacheRead": 0, "cacheWrite": 0 }
+        }
+      ]
+    },
     "zai": {
       "baseUrl": "https://api.z.ai/api/coding/paas/v4",
       "apiKey": "$ZAI_API_KEY",
