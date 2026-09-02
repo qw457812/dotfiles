@@ -75,6 +75,10 @@
     }
   },
   "justBash": {
+    "excludedCommands": [
+      "termux-open:*", // in favor of `termux-open *.html` for `/skill:teach`
+      "xdg-open:*"
+    ],
     "hostCommands": [
       "git",
       "gh",
