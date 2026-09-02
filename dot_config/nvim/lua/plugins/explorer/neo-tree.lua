@@ -585,6 +585,7 @@ return {
             ["l"] = "child_or_open",
             ["<Tab>"] = "none", -- disable `select` since Tab is used for `<C-w>w` in lua/config/keymaps.lua
             ["<C-;>"] = "none", -- disable `clear_selection` since `select` is disabled
+            ["<C-S-i>"] = "none", -- disable `invert_selection` since `select` is disabled
             ["<leader>fy"] = {
               function(state)
                 local node = state.tree:get_node()
