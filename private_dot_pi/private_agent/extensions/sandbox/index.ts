@@ -603,6 +603,7 @@ export default function (pi: ExtensionAPI) {
           enableWeakerNestedSandbox: runtimeConfig.enableWeakerNestedSandbox,
           enableWeakerNetworkIsolation: runtimeConfig.enableWeakerNetworkIsolation,
           allowPty: runtimeConfig.allowPty,
+          allowAppleEvents: runtimeConfig.allowAppleEvents,
         },
         askCallback,
       );
