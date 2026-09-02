@@ -55,7 +55,8 @@
         "*.openai.com"
       ],
       "allowUnixSockets": [
-        "/tmp/claude/claude-tmux-sockets", // in favor of `/skill:tmux`
+        "/tmp/claude/claude-tmux-sockets", // in favor of `/skill:tmux` (TMPDIR=/tmp/claude, by sandboxRuntime)
+        "/private/tmp/claude/claude-tmux-sockets",
         "/tmp/claude-tmux-sockets",
         "/private/tmp/claude-tmux-sockets"
       ]
