@@ -24,11 +24,13 @@ const MODEL_LEVELS: Record<string, Partial<Record<string, ModelThinkingLevel>>> 
     "gpt-5.4": "high",
   },
   commandcode: {
+    "moonshotai/Kimi-K3": "max",
     "zai-org/GLM-5.3": "max",
     "z-ai/glm-5.3-flash": "max",
     "deepseek/deepseek-v4-pro": "max",
     "deepseek/deepseek-v4-flash": "max",
-    "Qwen/Qwen3.8-Max": "xhigh",
+    "Qwen/Qwen3.8-Max-0902": "xhigh",
+    "Qwen/Qwen3.8-Flash": "xhigh",
   },
 };
 

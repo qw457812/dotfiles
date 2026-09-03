@@ -22,6 +22,7 @@ return {
   --
   -- https://github.com/QwenLM/Qwen-MM-Plugins
   -- https://github.com/cathrynlavery/diagram-design
+  -- https://github.com/emilkowalski/skills
   {
     "earendil-works/pi",
     version = "*",
