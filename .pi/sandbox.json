@@ -4,6 +4,8 @@
       "git",
       "gh",
       "tmux",
+      "termux-open",
+      "xdg-open",
       "node",
       "npm",
       "npx",
