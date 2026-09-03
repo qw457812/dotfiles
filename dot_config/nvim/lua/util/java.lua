@@ -39,8 +39,18 @@ end
 ---@return nil|string package
 ---@return nil|string class
 function M.parse_jdt_uri(uri)
-  if vim.startswith(uri, "jdt://") then
-    return uri:match("contents/([%a%d._-]+)/([%a%d._-]+)/([%a%d$]+).class")
+  if not vim.startswith(uri, "jdt://contents/") then
+    return
+  end
+
+  local jar, pkg, filename = uri:match("^jdt://contents/([^/]+)/([^/]+)/([^/?]+)")
+  if not filename then
+    return
+  end
+
+  local class = filename:match("^(.-)%.class$") or filename:match("^(.-)%.java$")
+  if class then
+    return jar, pkg, class
   end
 end
 
