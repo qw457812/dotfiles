@@ -3,7 +3,6 @@ return {
   {
     "nvim-mini/mini.test",
     lazy = true,
-    opts = {},
     specs = {
       {
         "folke/lazydev.nvim",
