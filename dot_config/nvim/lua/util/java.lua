@@ -32,9 +32,9 @@ function M.jdt_java_runtimes()
 end
 
 -- https://github.com/mfussenegger/nvim-jdtls/issues/423#issuecomment-1429184022
--- copied from: https://github.com/mfussenegger/dotfiles/blob/fa827b77f354b0f31a8352a27cfc1d9a4973a31c/vim/dot-config/nvim/lua/me/init.lua#L231
--- local uri = vim.uri_from_bufnr(bufnr)
----@param uri string
+-- JDT.LS builds these URIs in JDTUtils.toUri(IClassFile):
+-- https://github.com/eclipse-jdtls/eclipse.jdt.ls/blob/08eafe6ff60c7159ef88571d47b6a9ef82fef94e/org.eclipse.jdt.ls.core/src/org/eclipse/jdt/ls/core/internal/JDTUtils.java
+---@param uri string jdt://contents/<classpath-entry>/<optional-package>/<source-file>?<encoded-IClassFile-handle>
 ---@return nil|string jar
 ---@return nil|string package
 ---@return nil|string class
@@ -43,24 +43,49 @@ function M.parse_jdt_uri(uri)
     return
   end
 
-  local jar, pkg, filename = uri:match("^jdt://contents/([^/]+)/([^/]+)/([^/?]+)")
-  if not filename then
+  local path, query = uri:match("^jdt://contents/([^?#]+)%?([^#]*)")
+  if not path then
     return
   end
 
-  local class = filename:match("^(.-)%.class$") or filename:match("^(.-)%.java$")
+  local jar, rest = path:match("^([^/]+)/(.+)$")
+  if not jar then
+    return
+  end
+
+  local pkg, filename = rest:match("^([^/]+)/([^/]+)$")
+  if not filename then -- the default package is omitted from the URI path
+    pkg, filename = "", rest
+  end
+
+  query = vim.uri_decode(query)
+  local class = query:match("&element=([^&]+)%.class") or query:match(".*%(([^/()&]+)%.class")
   if class then
-    return jar, pkg, class
+    return vim.uri_decode(jar), vim.uri_decode(pkg), vim.uri_decode(class)
   end
 end
 
---- jar path from maven local repository
+--- Extract the local classpath JAR from an Eclipse JDT handle in the URI query.
 ---@param uri string
 ---@return string?
 function M.jdt_uri_to_jar_path(uri)
-  local jar = uri:match("jdt://.-(%%5C/.-%.jar)")
-  -- replace escaped backslashes with forward slashes
-  return jar and jar:gsub("%%5C/", "/")
+  local query = uri:match("^jdt://contents/[^?]+%?([^#]*)")
+  if not query then
+    return
+  end
+
+  -- Eclipse handle paths use `\/` as a separator; URI encoding turns that
+  -- into `%5C/`. A Windows drive, unlike a Unix root, precedes the first one.
+  local drive, jar = query:match("([%a]:)%%5[cC]/(.-%.jar)[=%%]")
+  if not jar then
+    jar = query:match("%%5[cC]/(.-%.jar)[=%%]")
+  end
+  if not jar then
+    return
+  end
+
+  jar = jar:gsub("%%5[cC]/", "/")
+  return vim.uri_decode((drive or "") .. "/" .. jar)
 end
 
 ---@param path string
