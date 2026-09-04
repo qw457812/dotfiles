@@ -114,6 +114,10 @@ interface HyperQuota {
   balance?: number;
 }
 
+interface CoralbricksQuota {
+  balance?: number;
+}
+
 interface SmartaipiQuota {
   credits: number;
   free_credits: number;
@@ -851,12 +855,26 @@ const sources: Record<string, Source> = {
     async getAuth(): Promise<string | null> {
       return process.env.HYPER_API_KEY ?? null;
     },
+    // https://github.com/charmbracelet/pi-hyper-provider/blob/e9c2a25d33539a3d935a596ee68284223938faa1/src/credits.ts
     async fetch(apiKey: string): Promise<HyperQuota | null> {
       return fetchJson<HyperQuota>("https://hyper.charm.land/v1/credits", apiKey);
     },
     format(quota: HyperQuota, theme: Theme): string | null {
       if (typeof quota.balance !== "number") return null;
       return theme.fg("accent", formatDecimal(quota.balance, 2));
+    },
+  }),
+  coralbricks: createSource("coralbricks", {
+    cacheTtlMs: MINUTE_MS,
+    async getAuth(): Promise<string | null> {
+      return process.env.CORALBRICKS_API_KEY || null;
+    },
+    async fetch(apiKey: string): Promise<CoralbricksQuota | null> {
+      return fetchJson<CoralbricksQuota>("https://inference.coralbricks.ai/v1/quota", apiKey);
+    },
+    format(quota: CoralbricksQuota, theme: Theme): string | null {
+      if (typeof quota.balance !== "number") return null;
+      return theme.fg("accent", `$${formatDecimal(quota.balance, 2)}`);
     },
   }),
   kiro: createSource<KiroQuota, KiroOAuthCredentials>("kiro", {
