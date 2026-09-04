@@ -261,7 +261,10 @@ async function readAuth<T = Record<string, unknown>>(provider: string): Promise<
   return auth?.[provider] ?? null;
 }
 
-function formatRemaining(date: string | number): string {
+function formatRemaining(
+  date: string | number,
+  { coarse = false }: { coarse?: boolean } = {},
+): string {
   const time = typeof date === "number" ? date : new Date(date).getTime();
   if (!Number.isFinite(time)) return "?";
 
@@ -277,10 +280,10 @@ function formatRemaining(date: string | number): string {
   const seconds = Math.floor((diff % MINUTE_MS) / SECOND_MS);
 
   if (days > 0) {
-    return hours > 0 ? `${days}d${hours}h` : `${days}d`;
+    return hours > 0 && !coarse ? `${days}d${hours}h` : `${days}d`;
   }
   if (hours > 0) {
-    return minutes > 0 ? `${hours}h${minutes}m` : `${hours}h`;
+    return minutes > 0 && !coarse ? `${hours}h${minutes}m` : `${hours}h`;
   }
   if (minutes > 0) {
     return `${minutes}m`;
@@ -556,7 +559,9 @@ const sources: Record<string, Source> = {
         resetCount !== undefined && resetCount > 0
           ? [
               theme.fg("accent", `${resetCount}`),
-              ...resetExpiresAt.map((expiresAt) => theme.fg("dim", formatRemaining(expiresAt))),
+              ...resetExpiresAt.map((expiresAt, index) =>
+                theme.fg("dim", formatRemaining(expiresAt, { coarse: index > 0 })),
+              ),
             ].join(theme.fg("dim", "/"))
           : null,
       ]);
