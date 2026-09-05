@@ -55,7 +55,6 @@
       ],
       "skills": [
         "skills/commit",
-        "skills/frontend-design",
         "skills/web-browser",
         "skills/github"
       ],
@@ -80,6 +79,7 @@
       "source": "git:github.com/anthropics/skills",
       "extensions": [],
       "skills": [
+        "skills/frontend-design",
         "skills/docx",
         "skills/pdf",
         "skills/pptx",

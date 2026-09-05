@@ -34,7 +34,6 @@ const IS_TERMUX = Boolean(process.env.TERMUX_VERSION);
 
 const PROMPT_HIDDEN_SKILLS = [
   // git:github.com/mitsuhiko/agent-stuff
-  "frontend-design",
   "github",
   ...(IS_TERMUX ? ["web-browser"] : []),
   // git:github.com/mattpocock/skills
