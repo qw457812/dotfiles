@@ -175,26 +175,42 @@ return {
         return vim.fn.getcmdwintype() == ":"
       end
 
-      -- HACK: cmdwin completion is a per-mode config, not `opts.cmdwin.completion`.
-      -- upstream `cmdwin` only accepts `enabled`: https://github.com/saghen/blink.cmp/blob/26ec6f0a1a8101eb134f8b8568d6099be015fe70/lua/blink/cmp/config/init.lua#L37-L39
-      require("blink.cmp.config")({
-        completion = {
-          menu = {
-            -- matching `cmdline.completion.menu.auto_show`: true for `q:`, false for `q/` and `q?`
-            auto_show = cmdwin_cmp_menu_auto_show,
-          },
-          ghost_text = {
-            -- align with `completion.menu.auto_show`, because with `ghost_text` and `preselect` enabled
-            -- in cmdwin, <CR> accepts the ghost text (preselected item) instead of executing the command-line.
-            enabled = cmdwin_cmp_menu_auto_show,
-          },
-          list = {
-            selection = {
-              preselect = true, -- the same behavior as normal buffer
+      -- HACK: cmdwin has no per-mode config: upstream dropped its cmdwin override
+      -- (https://github.com/saghen/blink.cmp/blob/2befba190e0ffa3692ab364f75604c9c2d248adf/lua/blink/cmp/config/init.lua#L57-L64
+      -- via https://github.com/saghen/blink.cmp/pull/2628), and `blink.lib` no longer treats
+      -- 'cmdwin' as a config mode: per-mode scopes keyed by 'cmdwin' collapse into the 'cmdline'
+      -- bucket on write, while reads resolve from the plain-buffer mode
+      -- (https://github.com/saghen/blink.lib/blob/e12366919e3447e4227d61e2ce99e2374de76d6a/lua/blink/lib/config.lua#L16-L23 ).
+      -- The only supported way to specialize cmdwin is a buffer-scoped config, dropped
+      -- automatically with the buffer (blink.lib cleans per-buffer scopes on BufDelete/BufWipeout).
+      vim.api.nvim_create_autocmd("CmdwinEnter", {
+        group = vim.api.nvim_create_augroup("user_blink_cmdwin", { clear = true }),
+        callback = function()
+          require("blink.cmp.config")({
+            sources = {
+              -- upstream's dropped cmdwin override set `{ "buffer", "cmdline" }`, the global
+              -- default has no cmdline source at all
+              default = { "buffer", "cmdline" },
             },
-          },
-        },
-      }, { mode = "cmdwin", validate = false })
+            completion = {
+              menu = {
+                -- matching `cmdline.completion.menu.auto_show`: true for `q:`, false for `q/` and `q?`
+                auto_show = cmdwin_cmp_menu_auto_show,
+              },
+              ghost_text = {
+                -- align with `completion.menu.auto_show`, because with `ghost_text` and `preselect` enabled
+                -- in cmdwin, <CR> accepts the ghost text (preselected item) instead of executing the command-line.
+                enabled = cmdwin_cmp_menu_auto_show,
+              },
+              list = {
+                selection = {
+                  preselect = true, -- the same behavior as normal buffer
+                },
+              },
+            },
+          }, { bufnr = 0, validate = false })
+        end,
+      })
 
       return U.extend_tbl(opts, {
         appearance = {
