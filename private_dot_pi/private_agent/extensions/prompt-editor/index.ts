@@ -521,6 +521,9 @@ export default async function (pi: ExtensionAPI) {
         },
       );
       this.prefixColorizers = prefixColorizers;
+      // Pi 0.85 added embedWorkingStatus on CustomEditor. pi-vim's
+      // ModalEditor doesn't forward options to super(), so set it directly.
+      (this as any).embedWorkingStatus = true;
       // pi-vim has built-in cursor shape management
       // (https://github.com/lajarre/pi-vim/blob/2671cf11/index.ts)
       // that conflicts with our DECSCUSR logic. Disable it so
@@ -903,6 +906,9 @@ export default async function (pi: ExtensionAPI) {
       // The editor body is rendered `PREFIX_WIDTH` columns narrower so wrapped
       // text accounts for the prompt prefix. We then extend the top/bottom
       // borders back to the full terminal width and prefix only the body lines.
+      // With embedWorkingStatus the spinner lives inside the top border's left
+      // region (before its trailing border run), so extending on the right
+      // keeps it intact.
       lines[0] = lines[0]! + extraBorder;
       if (visibleWidth(lines[bottomIdx]!) >= labelWidth) {
         lines[bottomIdx] =
