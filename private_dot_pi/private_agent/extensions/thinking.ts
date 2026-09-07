@@ -1,40 +1,17 @@
 /**
  * thinking.ts - model-switch thinking-level defaults
  *
- * Pi provides the built-in /thinking command and picker.
- *
- * Automatic defaults apply only to explicit model selection and model cycling:
- *   - Models listed in MODEL_LEVELS use their configured level.
- *   - Providers listed in MAX_LEVEL_PROVIDERS use their highest supported level.
- *   - All other models keep the current session level.
- *
- * Session restore and Pi's built-in /thinking behavior are left unchanged.
+ * Per-model defaults belong in /settings `modelThinkingLevels`. On switch,
+ * MAX_LEVEL_PROVIDERS take precedence over those defaults. Restore and manual
+ * /thinking are unchanged.
  */
 
 import type { Model, ModelThinkingLevel } from "@earendil-works/pi-ai";
 import { getSupportedThinkingLevels } from "@earendil-works/pi-ai";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
-const MODEL_LEVELS: Record<string, Partial<Record<string, ModelThinkingLevel>>> = {
-  "openai-codex": {
-    "gpt-5.6-sol": "medium",
-    "gpt-5.6-terra": "high",
-    "gpt-5.6-luna": "max",
-    "gpt-5.5": "high",
-    "gpt-5.4": "high",
-  },
-  commandcode: {
-    "moonshotai/Kimi-K3": "max",
-    "zai-org/GLM-5.3": "max",
-    "z-ai/glm-5.3-flash": "max",
-    "deepseek/deepseek-v4-pro": "max",
-    "deepseek/deepseek-v4-flash": "max",
-    "Qwen/Qwen3.8-Max-0902": "xhigh",
-    "Qwen/Qwen3.8-Flash": "xhigh",
-  },
-};
-
 const MAX_LEVEL_PROVIDERS = new Set([
+  "commandcode",
   "kiro",
   "zai",
   "deepseek",
@@ -76,20 +53,12 @@ function setLevelIfSupported(pi: ExtensionAPI, model: Model<any>, level: ModelTh
 }
 
 export default function (pi: ExtensionAPI) {
-  // Auto thinking level on model change
   pi.on("model_select", async (event, _ctx) => {
     const { model, source } = event;
-    const { provider, id } = model;
     if (source !== "set" && source !== "cycle") return;
 
-    const level = MODEL_LEVELS[provider]?.[id];
-    if (level) {
-      setLevelIfSupported(pi, model, level);
-      return;
-    }
-
     // request-based billing or non-frontier open-source models
-    if (MAX_LEVEL_PROVIDERS.has(provider)) {
+    if (MAX_LEVEL_PROVIDERS.has(model.provider)) {
       setLevelIfSupported(pi, model, getMaxLevel(model));
     }
   });
