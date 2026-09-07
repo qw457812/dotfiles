@@ -42,6 +42,7 @@
     "-extensions/ppt-master-venv.ts"
   ],
   "skills": [
+    "~/.local/share/nvim/lazy/humanlayer-skills/plugins/show-me/skills/show-me/SKILL.md",
     "-skills/training-deck/SKILL.md"
   ],
   "packages": [

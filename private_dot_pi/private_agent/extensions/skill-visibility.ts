@@ -45,6 +45,8 @@ const PROMPT_HIDDEN_SKILLS = [
   "xlsx",
   // git:github.com/addyosmani/agent-skills
   "source-driven-development",
+  // https://github.com/humanlayer/skills
+  "show-me",
   // npm:@99percentpeople/pi-codex-api
   "gpt-image-prompts",
   // git:github.com/DietrichGebert/ponytail

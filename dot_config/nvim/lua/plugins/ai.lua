@@ -59,6 +59,7 @@ return {
         lazy = true,
         config = function() end,
       },
+      { "humanlayer/skills", name = "humanlayer-skills", lazy = true, config = function() end },
       {
         "DietrichGebert/ponytail",
         build = "pi update --extension git:github.com/DietrichGebert/ponytail",
