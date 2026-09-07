@@ -5,7 +5,7 @@
   "SchemaStore.nvim": { "branch": "main", "commit": "6a1a2daf151dd742d5ff2f64eb2cc049d7e5ab4a" },
   "Trans.nvim": { "branch": "v2", "commit": "eb2a28dedcf7e12317858baeba0c505e77e2a7d6" },
   "addyosmani-agent-skills": { "branch": "main", "commit": "020ec10a788f5703108d093a4bd3d9a7c3847d36" },
-  "agent-stuff": { "branch": "main", "commit": "3c891a9640f80c271ccc666ab7a39f9811bc3fb6" },
+  "agent-stuff": { "branch": "main", "commit": "122e2994adddb113c04764c5697217dae120fcc6" },
   "anthropics-skills": { "branch": "main", "commit": "53048666b05b4799081517d00e09e0a2dd688678" },
   "async.nvim": { "branch": "main", "commit": "ca8f5696c45bd4786b8840923d86b6932ce92ded" },
   "baleia.nvim": { "branch": "main", "commit": "710537ff5cd669c5a76c5f5b6a9169fd9b913d18" },

@@ -1,6 +1,7 @@
 {
   "excludedCommands": [
     "~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/web-browser/scripts/start.js:*",
+    "~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/web-browser/scripts/stop.js:*",
     "~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/web-browser/scripts/nav.js:*",
     "~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/web-browser/scripts/eval.js:*",
     "~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/web-browser/scripts/screenshot.js:*",

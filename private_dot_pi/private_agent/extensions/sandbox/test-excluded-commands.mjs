@@ -22,6 +22,8 @@ const cwd = path.join(
 const scripts = path.join(cwd, "scripts");
 const startScriptPattern =
   "~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/web-browser/scripts/start.js:*";
+const stopScriptPattern =
+  "~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/web-browser/scripts/stop.js:*";
 const navScriptPattern =
   "~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/web-browser/scripts/nav.js:*";
 const evalScriptPattern =
@@ -32,6 +34,7 @@ const patterns = [
   "gh:*",
   "docker:*",
   startScriptPattern,
+  stopScriptPattern,
   navScriptPattern,
   evalScriptPattern,
   screenshotScriptPattern,
@@ -78,6 +81,14 @@ assert.equal(
 assert.equal(await match("BROWSER_DEBUG_PORT=0 ./scripts/start.js"), null);
 assert.equal(await match("BROWSER_DEBUG_PORT=65536 ./scripts/start.js"), null);
 assert.equal(await match("BROWSER_DEBUG_PORT=abc ./scripts/start.js"), null);
+assert.equal(
+  (await match("BROWSER_DEBUG_PORT=9333 ./scripts/stop.js"))?.pattern,
+  stopScriptPattern,
+);
+assert.equal(await match("BROWSER_DEBUG_PORT=0 ./scripts/stop.js"), null);
+assert.equal(await match("BROWSER_DEBUG_PORT=65536 ./scripts/stop.js"), null);
+assert.equal(await match("BROWSER_BIN=/tmp/evil ./scripts/stop.js"), null);
+assert.equal((await match(`cd ${scripts} && ./stop.js --all`))?.pattern, stopScriptPattern);
 assert.equal(await match("BROWSER_DEBUG_PORT=9333 gh repo view"), null);
 assert.equal(await match("BROWSER_BIN=$CHROME ./scripts/start.js"), null);
 assert.equal(await match("BROWSER_BIN=`which chrome` ./scripts/start.js"), null);

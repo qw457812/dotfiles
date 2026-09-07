@@ -57,8 +57,15 @@ function hasOnlyAllowedEnvAssignments(
 ): boolean {
   if (simple.envAssignments.length === 0) return true;
 
+  // The web-browser lifecycle scripts both accept a BROWSER_DEBUG_PORT override:
   // https://github.com/mitsuhiko/agent-stuff/blob/29bcb2db8afb4ab68850e169471a6912c14d9df6/skills/web-browser/scripts/start.js
-  if (!match.pattern.includes("/web-browser/scripts/start.js:")) return false;
+  // https://github.com/mitsuhiko/agent-stuff/blob/122e2994adddb113c04764c5697217dae120fcc6/skills/web-browser/scripts/stop.js
+  if (
+    !match.pattern.includes("/web-browser/scripts/start.js:") &&
+    !match.pattern.includes("/web-browser/scripts/stop.js:")
+  ) {
+    return false;
+  }
 
   return simple.envAssignments.every((assignment) => {
     if (assignment.name !== "BROWSER_DEBUG_PORT") return false;
