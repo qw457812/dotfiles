@@ -43,6 +43,8 @@ const PROMPT_HIDDEN_SKILLS = [
   "pdf",
   "pptx",
   "xlsx",
+  // https://github.com/vercel-labs/skills
+  "find-skills",
   // git:github.com/addyosmani/agent-skills
   "source-driven-development",
   // https://github.com/humanlayer/skills

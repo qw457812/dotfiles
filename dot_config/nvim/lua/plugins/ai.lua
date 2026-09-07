@@ -23,6 +23,7 @@ return {
   -- https://github.com/QwenLM/Qwen-MM-Plugins
   -- https://github.com/cathrynlavery/diagram-design
   -- https://github.com/emilkowalski/skills
+  -- https://github.com/blader/humanizer
   {
     "earendil-works/pi",
     version = "*",
@@ -52,6 +53,7 @@ return {
         lazy = true,
         config = function() end,
       },
+      { "vercel-labs/skills", name = "vercel-labs-skills", version = "*", lazy = true, config = function() end },
       {
         "addyosmani/agent-skills",
         name = "addyosmani-agent-skills",
@@ -548,12 +550,12 @@ return {
                     end
 
                     -- https://github.com/qw457812/dotfiles/blob/555d55f91f12eea199cee9ed5b3ff13f0b54a9e5/private_dot_pi/private_agent/extensions/user-message.ts
-                    vim.keymap.set("n", "]]", function()
+                    U.keymap("n", { "]]", "J" }, function()
                       if vim.fn.search("^❯ ", "W") == 0 then
                         LazyVim.warn("No more user messages", { title = "Sidekick" })
                       end
                     end, { buffer = buf, desc = "Jump to next user message (Sidekick)" })
-                    vim.keymap.set("n", "[[", function()
+                    U.keymap("n", { "[[", "K" }, function()
                       if vim.fn.search("^❯ ", "Wb") == 0 then
                         LazyVim.warn("No more user messages", { title = "Sidekick" })
                       end

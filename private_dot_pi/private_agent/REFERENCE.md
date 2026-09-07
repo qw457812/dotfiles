@@ -5,13 +5,16 @@
 - <https://github.com/openclaw/openclaw>
 - <https://github.com/can1357/oh-my-pi>
 - <https://github.com/open-gsd/gsd-pi>
+- <https://github.com/xai-org/grok-build>
 - <https://github.com/charmbracelet/crush>
 - <https://github.com/cline/cline>
+- <https://github.com/NousResearch/hermes-agent>
 - <https://github.com/XiaomiMiMo/MiMo-Code>
 - <https://github.com/1jehuang/jcode>
 - <https://github.com/huggingface/tau>
 - <https://github.com/PrimeIntellect-ai/prime-agent>
 - <https://github.com/itayinbarr/little-coder>
 - <https://github.com/dirge-code/dirge>
+- <https://github.com/tontinton/maki>
 - <https://github.com/vercel-labs/fx>
 - <https://github.com/withastro/flue>

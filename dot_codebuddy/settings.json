@@ -1,5 +1,5 @@
 {
-  "model": "custom-local:mimo-v2.5-pro",
+  "model": "glm-5.3-flash",
   "vim": {
     "enabled": true
   },
