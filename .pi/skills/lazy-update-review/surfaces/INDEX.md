@@ -9,6 +9,7 @@ Follow every matching review branch once; packages without a row stay on the gen
 | `github.com/earendil-works/pi` | prompt-editor | [prompt-editor/REVIEW.md](prompt-editor/REVIEW.md) |
 | `github.com/lajarre/pi-vim` | prompt-editor | [prompt-editor/REVIEW.md](prompt-editor/REVIEW.md) |
 | `github.com/deepseek-ai/deepseek-harness` | DSH CLI, profiles, plugins, and bundles | [deepseek-harness/REVIEW.md](deepseek-harness/REVIEW.md) |
+| `github.com/ccch1mneyyy/dsh-TUI` | DSH profile package and TUI settings | [dsh-profile-package/REVIEW.md](dsh-profile-package/REVIEW.md) |
 
 Add a row only when a package needs a repeatable specialized review beyond the
 generic config search. Co-locate that surface's files under `surfaces/<name>/` and

@@ -39,7 +39,7 @@
   "dial.nvim": { "branch": "master", "commit": "f2634758455cfa52a8acea6f142dcd6271a1bf57" },
   "diegopetrucci-pi-extensions": { "branch": "main", "commit": "bf849e251c10d28a3fc601d489fa0ae4768419b1" },
   "dropbar.nvim": { "branch": "master", "commit": "808ba31cde89aec8833e9789f5e04557cd31c9e1" },
-  "dsh-TUI": { "branch": "main", "commit": "a3439a3c7d7e7b3c9cfc505e833525376e8558d0" },
+  "dsh-TUI": { "branch": "main", "commit": "1626398e079be1b5d8e92737f87bd02f865f2a53" },
   "flash.nvim": { "branch": "main", "commit": "5f0f270fdc7c5b0c21d903ee85b9cb06f2ac636a" },
   "flatten.nvim": { "branch": "main", "commit": "d92ca41e9c330f45c1b854a80c89c8488a9d730c" },
   "folke-dot": { "branch": "master", "commit": "10526a848771bab9e9fbb98b5995c997f7ef92b6" },
