@@ -108,9 +108,9 @@ function createBtwResourceLoader(ctx: ExtensionContext, appendSystemPrompt: stri
 async function createBtwModelRuntime(ctx: ExtensionContext): Promise<ModelRuntime> {
 	const modelRuntime = await ModelRuntime.create();
 	for (const providerId of ctx.modelRegistry.getRegisteredProviderIds()) {
-		const config = ctx.modelRegistry.getRegisteredProviderConfig(providerId);
-		if (config) {
-			modelRuntime.registerProvider(providerId, config);
+		const provider = ctx.modelRegistry.getProvider(providerId);
+		if (provider) {
+			modelRuntime.registerNativeProvider(provider);
 		}
 	}
 	return modelRuntime;
