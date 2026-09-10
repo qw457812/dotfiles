@@ -607,6 +607,7 @@ return {
               ".env",
               ".env.*",
               "AGENTS.override.md",
+              "AGENTS.local.md",
               "CLAUDE.local.md",
               "**/.claude/**",
               "**/.pi/**",
