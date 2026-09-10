@@ -12,8 +12,8 @@ importers:
         specifier: ^0.10.0
         version: 0.10.0
       '@qw457812/dsh-pi-prompts':
-        specifier: ^0.2.2
-        version: 0.2.2
+        specifier: ^0.2.3
+        version: 0.2.3
 
 packages:
 
@@ -289,14 +289,14 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@qw457812/dsh-pi-prompts@0.2.2':
-    resolution: {integrity: sha512-6tW9A3cExjrIKuYv3utK6hM7pZ7eby/gLExSTocFUG3Qv+fShgr4FW6eEu36QB/uk3BAKdu7QtV+tutSynPeaA==}
+  '@qw457812/dsh-pi-prompts@0.2.3':
+    resolution: {integrity: sha512-jje/KUDJ4QvfC3ulg5bgcui3A4Jiq3NZhC+sbKUIpqzA1CP18d8V31EevaPcl47FAjPv83VLOVTBA6DIwt3riw==}
     engines: {node: ^22.19.0 || >=24.0.0}
     peerDependencies:
-      '@deepseek-ai/cordis': ^4.0.1
-      '@deepseek-ai/dsh-agent': ^0.1.1-rc.2
-      '@deepseek-ai/dsh-commands': ^0.1.1-rc.2
-      '@deepseek-ai/dsh-llm': ^0.1.1-rc.2
+      '@deepseek-ai/cordis': ^4.0.2
+      '@deepseek-ai/dsh-agent': ^0.1.5-rc.1
+      '@deepseek-ai/dsh-commands': ^0.1.5-rc.1
+      '@deepseek-ai/dsh-llm': ^0.1.5-rc.1
 
   ansi-regex@5.0.1:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
@@ -746,7 +746,7 @@ snapshots:
   '@img/sharp-win32-x64@0.35.3':
     optional: true
 
-  '@qw457812/dsh-pi-prompts@0.2.2':
+  '@qw457812/dsh-pi-prompts@0.2.3':
     dependencies:
       yaml: 2.9.0
 

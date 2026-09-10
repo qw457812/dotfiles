@@ -201,7 +201,8 @@ return {
 
   {
     "deepseek-ai/deepseek-harness",
-    version = "*",
+    -- version = "*",
+    tag = "dsh-v0.1.5-rc.1",
     enabled = vim.fn.executable("dsh") == 1,
     build = "npm install -g @deepseek-ai/dsh",
     lazy = true,

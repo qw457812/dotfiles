@@ -3,7 +3,7 @@
   "private": true,
   "dependencies": {
     "@deepseek-harness-tui/dsh-tui": "^0.10.0",
-    "@qw457812/dsh-pi-prompts": "^0.2.2"
+    "@qw457812/dsh-pi-prompts": "^0.2.3"
   },
   "dsh": {
     "profile": {

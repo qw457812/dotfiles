@@ -3,6 +3,7 @@
 /storages/
 /plugins/node_modules/
 /profiles/*/node_modules/
+/profiles/dsh-tui/.dsh-module-fallback/node_modules/
 
 # https://github.com/ccch1mneyyy/dsh-TUI
 /dsh-auth/credentials.json
