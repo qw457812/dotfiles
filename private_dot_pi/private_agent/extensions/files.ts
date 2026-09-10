@@ -11,7 +11,25 @@ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { DynamicBorder } from "@earendil-works/pi-coding-agent";
 import { Container, Key, matchesKey, type SelectItem, SelectList, Text } from "@earendil-works/pi-tui";
 import { homedir } from "node:os";
-import { isAbsolute, relative, resolve, sep } from "node:path";
+import { extname, isAbsolute, relative, resolve, sep } from "node:path";
+
+const IMAGE_EXTENSIONS = new Set([
+	".apng",
+	".avif",
+	".bmp",
+	".gif",
+	".heic",
+	".heif",
+	".ico",
+	".jpeg",
+	".jpg",
+	".jxl",
+	".png",
+	".svg",
+	".tif",
+	".tiff",
+	".webp",
+]);
 
 interface FileEntry {
 	path: string;
@@ -117,7 +135,9 @@ export default function (pi: ExtensionAPI) {
 			const WINDOWS_UNSAFE_CMD_CHARS_RE = /[&|<>^%\r\n]/;
 			const quoteCmdArg = (value: string) => `"${value.replace(/"/g, '""')}"`;
 
-			const openWithNeovide = async (path: string) => {
+			const openFile = async (path: string) => {
+				const isImage = IMAGE_EXTENSIONS.has(extname(path).toLowerCase());
+
 				if (process.platform === "win32") {
 					if (WINDOWS_UNSAFE_CMD_CHARS_RE.test(path)) {
 						ctx.ui.notify(
@@ -126,19 +146,22 @@ export default function (pi: ExtensionAPI) {
 						);
 						return null;
 					}
-					const commandLine = `neovide ${quoteCmdArg(path)}`;
+					const commandLine = isImage
+						? `start "" ${quoteCmdArg(path)}`
+						: `neovide ${quoteCmdArg(path)}`;
 					return pi.exec("cmd", ["/d", "/s", "/c", commandLine], { cwd: ctx.cwd });
 				} else if (process.platform === "darwin") {
+					if (isImage) return pi.exec("open", [path], { cwd: ctx.cwd });
 					// Use `open -b` to reuse an existing Neovide instance instead of spawning a new one
 					return pi.exec("open", ["-b", "com.neovide.neovide", path], { cwd: ctx.cwd });
 				} else {
-					return pi.exec("neovide", [path], { cwd: ctx.cwd });
+					return pi.exec(isImage ? "xdg-open" : "neovide", [path], { cwd: ctx.cwd });
 				}
 			};
 
 			const openSelected = async (file: FileEntry): Promise<void> => {
 				try {
-					const openResult = await openWithNeovide(file.path);
+					const openResult = await openFile(file.path);
 					if (!openResult) return;
 					if (openResult.code !== 0) {
 						const openStderr = openResult.stderr.trim();
