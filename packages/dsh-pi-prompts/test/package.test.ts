@@ -13,7 +13,7 @@ describe("npm bundle manifest", () => {
     >;
     expect(manifest).toMatchObject({
       name: "@qw457812/dsh-pi-prompts",
-      version: "0.2.2",
+      version: "0.2.3",
       keywords: expect.arrayContaining(["dsh-plugin"]),
       main: "./lib/index.js",
       types: "./lib/index.d.ts",
@@ -22,10 +22,10 @@ describe("npm bundle manifest", () => {
       dsh: { bundle: { patch: "./cordis.patch.yml" } },
       dependencies: { yaml: "2.9.0" },
       peerDependencies: {
-        "@deepseek-ai/cordis": "^4.0.1",
-        "@deepseek-ai/dsh-agent": "^0.1.1-rc.2",
-        "@deepseek-ai/dsh-commands": "^0.1.1-rc.2",
-        "@deepseek-ai/dsh-llm": "^0.1.1-rc.2",
+        "@deepseek-ai/cordis": "^4.0.2",
+        "@deepseek-ai/dsh-agent": "^0.1.5-rc.1",
+        "@deepseek-ai/dsh-commands": "^0.1.5-rc.1",
+        "@deepseek-ai/dsh-llm": "^0.1.5-rc.1",
       },
     });
     expect(manifest).not.toHaveProperty("private");
