@@ -175,23 +175,12 @@ return {
         return vim.fn.getcmdwintype() == ":"
       end
 
-      -- HACK: cmdwin has no per-mode config: upstream dropped its cmdwin override
-      -- (https://github.com/saghen/blink.cmp/blob/2befba190e0ffa3692ab364f75604c9c2d248adf/lua/blink/cmp/config/init.lua#L57-L64
-      -- via https://github.com/saghen/blink.cmp/pull/2628), and `blink.lib` no longer treats
-      -- 'cmdwin' as a config mode: per-mode scopes keyed by 'cmdwin' collapse into the 'cmdline'
-      -- bucket on write, while reads resolve from the plain-buffer mode
-      -- (https://github.com/saghen/blink.lib/blob/e12366919e3447e4227d61e2ce99e2374de76d6a/lua/blink/lib/config.lua#L16-L23 ).
-      -- The only supported way to specialize cmdwin is a buffer-scoped config, dropped
-      -- automatically with the buffer (blink.lib cleans per-buffer scopes on BufDelete/BufWipeout).
+      -- HACK: cmdwin has no per-mode config: `blink.lib` resolves it from the plain-buffer mode.
+      -- Use a buffer-scoped config for the remaining cmdwin-specific completion behavior.
       vim.api.nvim_create_autocmd("CmdwinEnter", {
         group = vim.api.nvim_create_augroup("user_blink_cmdwin", { clear = true }),
         callback = function()
           require("blink.cmp.config")({
-            sources = {
-              -- upstream's dropped cmdwin override set `{ "buffer", "cmdline" }`, the global
-              -- default has no cmdline source at all
-              default = { "buffer", "cmdline" },
-            },
             completion = {
               menu = {
                 -- matching `cmdline.completion.menu.auto_show`: true for `q:`, false for `q/` and `q?`

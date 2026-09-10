@@ -12,7 +12,7 @@
   "better-escape.nvim": { "branch": "master", "commit": "3f4bc0b326606264ff75967f59091b5ddada0554" },
   "blink-cmp-dat-word": { "branch": "main", "commit": "0c58fe92bd94710c52a5cb3a89c63a47bc851733" },
   "blink-ripgrep.nvim": { "branch": "main", "commit": "5ed7bac817777994cb80abccd052b73eb844166c" },
-  "blink.cmp": { "branch": "main", "commit": "49d39fda6350d7f789d1da1053e86c9e256f8108" },
+  "blink.cmp": { "branch": "main", "commit": "f705c79404bad658dac6998e300cc6632f5b9f7f" },
   "blink.lib": { "branch": "main", "commit": "f55df8a6e0a7acccf45ef0ffbb4ce46110fcf7d0" },
   "bookmarks.yazi": { "branch": "main", "commit": "b00a2a648af91f49c3553d31c9ec3a152ff8db80" },
   "bufferline.nvim": { "branch": "main", "commit": "655133c3b4c3e5e05ec549b9f8cc2894ac6f51b3" },
