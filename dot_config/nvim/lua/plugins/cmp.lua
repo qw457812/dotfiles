@@ -446,6 +446,7 @@ return {
   },
   {
     "nvim-mini/mini.snippets",
+    event = vim.g.user_ui2 and "CmdlineEnter" or nil,
     optional = true,
     opts = function(_, opts)
       LazyVim.cmp.actions.snippet_active = function()

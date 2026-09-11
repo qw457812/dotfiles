@@ -292,6 +292,10 @@ return {
         })
       end
 
+      if vim.g.user_ui2 then
+        opts = U.extend_tbl(opts, { cmdline = { enabled = false } })
+      end
+
       return U.extend_tbl(opts, {
         -- presets = {
         --   bottom_search = false,
