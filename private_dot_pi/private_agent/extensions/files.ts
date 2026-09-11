@@ -206,7 +206,7 @@ export default function (pi: ExtensionAPI) {
 
 				const selectList = new SelectList(items, visibleRows, {
 					selectedPrefix: (t) => theme.fg("accent", t),
-					selectedText: (t) => t, // Keep existing colors
+					selectedText: (t) => theme.bg("selectedBg", theme.bold(t)),
 					description: (t) => theme.fg("muted", t),
 					scrollInfo: (t) => theme.fg("dim", t),
 					noMatch: (t) => theme.fg("warning", t),
