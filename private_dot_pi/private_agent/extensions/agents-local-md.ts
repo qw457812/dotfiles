@@ -13,6 +13,8 @@
  * - core/system-prompt.ts — <project_context> / <project_instructions> rendering format
  *
  * Behavior:
+ * - Files are loaded and cached when the session starts; changes take effect
+ *   after `/reload`, restarting Pi, or replacing the session
  * - Global: `${PI_CODING_AGENT_DIR ?? ~/.pi/agent}/AGENTS.local.md`, loaded first
  * - Then `AGENTS.local.md` from each ancestor directory of cwd, nearest root first
  * - Deduped by raw path; BOM stripped; non-files and unreadable files skipped
@@ -36,7 +38,7 @@ import { type ExtensionAPI, getAgentDir } from "@earendil-works/pi-coding-agent"
 import { existsSync, readFileSync, realpathSync, statSync } from "node:fs";
 import { dirname, join, resolve, sep } from "node:path";
 
-const FILENAME = "AGENTS.local.md";
+const LOCAL_CONTEXT_FILENAME = "AGENTS.local.md";
 
 function canonicalizePath(path: string): string {
   try {
@@ -52,7 +54,7 @@ function noContextFilesRequested(): boolean {
 }
 
 function loadLocalContextFileFromDir(dir: string): { path: string; content: string } | null {
-  const filePath = join(dir, FILENAME);
+  const filePath = join(dir, LOCAL_CONTEXT_FILENAME);
   if (!existsSync(filePath)) return null;
   try {
     if (!statSync(filePath).isFile()) return null;
@@ -123,7 +125,9 @@ function findShadowedLocalContextFile(cwd: string): string | undefined {
   if (!worktreeRoot.startsWith(`${mainRepoRoot}${sep}`)) return undefined;
   // dirname of the common git dir must actually be the checked-out main repo.
   if (canonicalizePath(join(mainRepoRoot, ".git")) !== commonGitDir) return undefined;
-  return loadLocalContextFileFromDir(worktreeRoot) ? join(mainRepoRoot, FILENAME) : undefined;
+  return loadLocalContextFileFromDir(worktreeRoot)
+    ? join(mainRepoRoot, LOCAL_CONTEXT_FILENAME)
+    : undefined;
 }
 
 function loadLocalContextFiles(cwd: string): Array<{ path: string; content: string }> {
@@ -174,11 +178,12 @@ function formatContextFilesForPrompt(files: Array<{ path: string; content: strin
 }
 
 export default function (pi: ExtensionAPI) {
-  pi.on("before_agent_start", (event, ctx) => {
-    const files = loadLocalContextFiles(ctx.cwd);
-    if (files.length === 0) return;
+  let localContextFiles: Array<{ path: string; content: string }> = [];
 
-    const instructions = formatContextFilesForPrompt(files);
+  pi.on("before_agent_start", (event) => {
+    if (localContextFiles.length === 0) return;
+
+    const instructions = formatContextFilesForPrompt(localContextFiles);
     const closeTag = "</project_context>";
     const idx = event.systemPrompt.lastIndexOf(closeTag);
     if (idx === -1) {
@@ -194,9 +199,9 @@ export default function (pi: ExtensionAPI) {
   });
 
   pi.on("session_start", async (_event, ctx) => {
-    const count = loadLocalContextFiles(ctx.cwd).length;
-    if (count > 0) {
-      ctx.ui.notify(`Loaded ${count} AGENTS.local.md file(s)`, "info");
+    localContextFiles = loadLocalContextFiles(ctx.cwd);
+    if (localContextFiles.length > 0) {
+      ctx.ui.notify(`Loaded ${localContextFiles.length} AGENTS.local.md file(s)`, "info");
     }
   });
 }
