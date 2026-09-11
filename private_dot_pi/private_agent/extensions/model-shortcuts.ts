@@ -30,14 +30,15 @@ const ALIASES: Record<string, ModelTarget | readonly ModelTarget[]> = {
   ],
   glmflash: [
     { provider: "neuralwatt", id: "glm-5.3-flash" },
+    { provider: "codebuddy", id: "glm-5.3-flash" },
     { provider: "commandcode", id: "z-ai/glm-5.3-flash" },
     { provider: "hyper", id: "glm-5.3-flash" },
-    { provider: "codebuddy", id: "glm-5.3-flash" },
   ],
-  ds: { provider: "commandcode", id: "deepseek/deepseek-v4-pro" },
-  dsflash: [
-    { provider: "neuralwatt", id: "deepseek-v4-flash" },
-    { provider: "commandcode", id: "deepseek/deepseek-v4-flash" },
+  ds: [
+    { provider: "codebuddy", id: "deepseek-v4.1-flash" },
+    { provider: "neuralwatt", id: "deepseek-v4.1-flash" },
+    { provider: "commandcode", id: "deepseek/deepseek-v4.1-flash" },
+    { provider: "hyper", id: "deepseek-v4.1-flash" },
   ],
   qwen: [
     { provider: "commandcode", id: "Qwen/Qwen3.8-Max-0902" },

@@ -1,8 +1,8 @@
 {
   "lastChangelogVersion": "0.85.1",
   "defaultProvider": "openai-codex",
-  "defaultModel": "gpt-5.6-sol",
-  "defaultThinkingLevel": "medium",
+  "defaultModel": "gpt-6-astra",
+  "defaultThinkingLevel": "low",
   "hideThinkingBlock": true,
   "quietStartup": true,
   "showHardwareCursor": true,
@@ -25,15 +25,14 @@
     "neuralwatt/kimi-k3",
     "neuralwatt/glm-5.3",
     "neuralwatt/glm-5.3-flash",
-    "neuralwatt/deepseek-v4-pro",
-    "neuralwatt/deepseek-v4-flash",
-    "neuralwatt/qwen-3.8-27b",
+    "neuralwatt/deepseek-v4.1-flash",
     "commandcode/moonshotai/Kimi-K3",
     "commandcode/zai-org/GLM-5.3",
     "commandcode/z-ai/glm-5.3-flash",
+    "commandcode/deepseek/deepseek-v4.1-flash",
     "commandcode/Qwen/Qwen3.8-Max-0902",
-    "commandcode/deepseek/deepseek-v4-pro",
-    "commandcode/deepseek/deepseek-v4-flash"
+    "codebuddy/glm-5.3-flash",
+    "codebuddy/deepseek-v4.1-flash"
   ],
   "modelThinkingLevels": {
     "openai-codex/gpt-6-astra": "low",

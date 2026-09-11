@@ -119,7 +119,7 @@
   "pi-invisible-continue": { "branch": "main", "commit": "0d54cdb734ab165e4db4d766eea4c360368334c1" },
   "pi-listen": { "branch": "main", "commit": "c3cd4fbf5dd4ef6e7ea0e16a0a9b9398dca74a5c" },
   "pi-mcp-adapter": { "branch": "main", "commit": "10a45367e033a32026987a75d6f401e37340c86f" },
-  "pi-neuralwatt-provider": { "branch": "main", "commit": "c11abd856a8efc511a515758767991426f20149b" },
+  "pi-neuralwatt-provider": { "branch": "main", "commit": "ae9407d586107fe6af5ab9bfcdb20f9af42ac885" },
   "pi-review": { "branch": "main", "commit": "f1de050504936046c0f85b21fec0e0a93ef394eb" },
   "pi-vim": { "branch": "main", "commit": "e55b07c05b648f3bbccf656c2b0c6ec63f1a91d1" },
   "pi-vision-handoff": { "branch": "main", "commit": "406f31bd6232403a3705a42e1c2be7a4d83014e1" },
