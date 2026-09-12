@@ -1,3 +1,4 @@
+---@type LazySpec
 return {
   -- https://github.com/LazyVim/LazyVim/pull/3503/files
   -- https://github.com/JuanZoran/myVimrc/blob/cc60c2a2d3ad51b4d6b34a187d85cbe0ce40ae45/lua/plugins/ui/extra/lualine.lua
@@ -19,6 +20,7 @@ return {
       -- stylua: ignore
       { "<leader>wP", function() require("dropbar.api").pick() end, desc = "Winbar Pick" },
     },
+    ---@param opts dropbar_configs_t
     opts = function(_, opts)
       local bar = require("dropbar.bar")
       local sources = require("dropbar.sources")
@@ -169,7 +171,14 @@ return {
       return vim.tbl_deep_extend("force", opts, {
         bar = {
           enable = false, -- using lualine.nvim
-          sources = function(buf, _)
+          update_events = {
+            buf = vim.list_extend(vim.deepcopy(default_opts.bar.update_events.buf), {
+              "BufWritePost", -- for DropBarFileNameModified -> DropBarFileName
+            }),
+          },
+          ---@param buf integer
+          ---@return dropbar_source_t[]
+          sources = function(buf)
             if vim.bo[buf].ft == "markdown" then
               return vim.g.user_trouble_lualine_old and { source_path, source_markdown } or { source_path }
             end
@@ -181,7 +190,9 @@ return {
         },
         sources = {
           path = {
-            relative_to = function(buf, _)
+            ---@param buf integer
+            ---@return string
+            relative_to = function(buf)
               -- -- show full path in oil buffers
               -- local bufname = vim.api.nvim_buf_get_name(buf)
               -- -- alternative: package.loaded["oil"] and require("oil.util").is_oil_bufnr(buf)
@@ -202,7 +213,9 @@ return {
         },
         icons = {
           kinds = {
-            ---@type fun(path: string): string, string?|false
+            ---@param path string
+            ---@return string
+            ---@return string?
             dir_icon = function(path)
               local icon, hl, is_default = require("mini.icons").get("directory", path)
               if not is_default then
@@ -210,7 +223,9 @@ return {
               end
               return default_opts.icons.kinds.dir_icon(path)
             end,
-            ---@type fun(path: string): string, string?|false
+            ---@param path string
+            ---@return string
+            ---@return string?
             file_icon = function(path)
               local icon, hl, is_default = require("mini.icons").get("file", path)
               if not is_default then
@@ -253,7 +268,7 @@ return {
             end,
           },
         },
-      })
+      } --[[@as dropbar_configs_t]])
     end,
   },
 
