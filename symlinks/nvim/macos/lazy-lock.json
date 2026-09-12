@@ -114,6 +114,7 @@
   "pi": { "branch": "main", "commit": "d981de1229ef899957bbe968bc8dcda02a21f477" },
   "pi-agent-colony": { "branch": "main", "commit": "e609f5d5c935079e36c88944252b168ff0907a27" },
   "pi-commandcode-provider": { "branch": "main", "commit": "adea6585c0ba0a3bae064bec151c8f5df7b739df" },
+  "pi-coralbricks-provider": { "branch": "main", "commit": "ee4e4d7f6a634f1918071ec1f97865b57e392e39" },
   "pi-guardrails": { "branch": "main", "commit": "8492cb7d958e25318bcff982fb9a8370787113b9" },
   "pi-hyper-provider": { "branch": "main", "commit": "ac3ed634636b9e8eddad3e02e358943a5a829737" },
   "pi-invisible-continue": { "branch": "main", "commit": "0d54cdb734ab165e4db4d766eea4c360368334c1" },

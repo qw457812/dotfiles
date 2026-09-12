@@ -108,6 +108,12 @@ return {
         config = function() end,
       },
       {
+        "monotykamary/pi-coralbricks-provider",
+        build = "pi update --extension git:github.com/monotykamary/pi-coralbricks-provider",
+        lazy = true,
+        config = function() end,
+      },
+      {
         "patlux/pi-commandcode-provider",
         build = "pi update --extension git:github.com/patlux/pi-commandcode-provider",
         lazy = true,

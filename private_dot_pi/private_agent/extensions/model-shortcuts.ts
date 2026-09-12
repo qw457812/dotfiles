@@ -54,7 +54,7 @@ const ALIASES: Record<string, ModelTarget | readonly ModelTarget[]> = {
   cmd: { provider: "commandcode", id: "z-ai/glm-5.3-flash" },
   hyper: { provider: "hyper", id: "glm-5.3-flash" },
   buddy: { provider: "codebuddy", id: "glm-5.3-flash" },
-  coral: { provider: "coralbricks", id: "glm-5.3-fp4" },
+  coral: { provider: "coralbricks", id: "glm-5.3-flash-fp4" },
 };
 
 const ALL_LEVELS: ModelThinkingLevel[] = [

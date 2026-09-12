@@ -149,6 +149,7 @@
     "npm:@diegopetrucci/pi-fast",
     "npm:@aliou/pi-guardrails",
     "git:github.com/monotykamary/pi-neuralwatt-provider",
+    "git:github.com/monotykamary/pi-coralbricks-provider",
     "git:github.com/monotykamary/pi-invisible-continue",
     "git:github.com/monotykamary/pi-vision-handoff",
     "git:github.com/patlux/pi-commandcode-provider",
