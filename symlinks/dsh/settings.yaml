@@ -29,8 +29,9 @@ dsh-tui:
     cwd: false
     tps: true
     mode: true
-    activity: true
-    trajectory: true
+    activity: false
+    trajectory: false
+    contextBar: false
   whale: false
   fullscreen: false
   recapOnOpen: false

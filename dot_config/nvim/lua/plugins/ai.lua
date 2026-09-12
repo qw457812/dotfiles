@@ -24,6 +24,8 @@ return {
   -- https://github.com/cathrynlavery/diagram-design
   -- https://github.com/emilkowalski/skills
   -- https://github.com/blader/humanizer
+  --
+  -- https://github.com/NVlabs/SoL-Pi
   {
     "earendil-works/pi",
     version = "*",

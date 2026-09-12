@@ -1,3 +1,5 @@
+// TODO: https://github.com/qjf44/dsh-plugin-thinking-api
+
 import {
   type Api,
   type ApiKeyAuth,
