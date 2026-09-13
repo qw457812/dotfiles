@@ -4,8 +4,11 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "@mozilla/readability": "^0.6.0",
     "cheerio": "^1.2.0",
-    "turndown": "^7.2.4"
+    "linkedom": "^0.18.12",
+    "turndown": "^7.2.4",
+    "unpdf": "^1.3.0"
   },
   "devDependencies": {
     "@types/turndown": "^5.0.6"

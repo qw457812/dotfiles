@@ -33,6 +33,13 @@ import { Type } from "typebox";
 
 import { convertHtmlToMarkdown, extractTextFromHtml } from "./html-convert";
 import {
+  extractPdf,
+  extractReadableMarkdown,
+  fetchWithJina,
+  isPdf,
+  isUsefulContent,
+} from "./content-extract";
+import {
   formatWebfetchCall,
   rebuildWebfetchResultRenderComponent,
   WebfetchResultRenderComponent,
@@ -45,6 +52,7 @@ import {
 // ---------------------------------------------------------------------------
 
 const MAX_RESPONSE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_PDF_RESPONSE_SIZE = 50 * 1024 * 1024; // 50MB
 const DEFAULT_TIMEOUT = 30 * 1000; // 30 seconds
 const MAX_TIMEOUT = 120 * 1000; // 2 minutes
 
@@ -174,15 +182,17 @@ async function fetchUrl(
       throw new Error(`HTTP ${response.status} ${response.statusText}`);
     }
 
-    // Check content length before downloading
+    // PDFs need a larger budget than ordinary web pages.
+    const contentType = response.headers.get("content-type") || "";
+    const maxResponseSize = isPdf(url, contentType) ? MAX_PDF_RESPONSE_SIZE : MAX_RESPONSE_SIZE;
     const contentLength = response.headers.get("content-length");
-    if (contentLength && parseInt(contentLength, 10) > MAX_RESPONSE_SIZE) {
-      throw new Error("Response too large (exceeds 5MB limit)");
+    if (contentLength && parseInt(contentLength, 10) > maxResponseSize) {
+      throw new Error(`Response too large (exceeds ${maxResponseSize / 1024 / 1024}MB limit)`);
     }
 
     const arrayBuffer = await response.arrayBuffer();
-    if (arrayBuffer.byteLength > MAX_RESPONSE_SIZE) {
-      throw new Error("Response too large (exceeds 5MB limit)");
+    if (arrayBuffer.byteLength > maxResponseSize) {
+      throw new Error(`Response too large (exceeds ${maxResponseSize / 1024 / 1024}MB limit)`);
     }
 
     return { response, arrayBuffer };
@@ -343,35 +353,57 @@ export default function (pi: ExtensionAPI) {
         };
       }
 
-      // --- Decode text content ---
-      const content = new TextDecoder().decode(arrayBuffer);
-
-      // --- Format conversion (mirrors OpenCode's switch on format + contentType) ---
+      // --- Extract PDF text before attempting generic decoding ---
       let output: string;
+      if (isPdf(params.url, contentType)) {
+        if (format === "html") {
+          throw new Error("PDF responses cannot be converted to HTML");
+        }
+        const pdf = await extractPdf(arrayBuffer, params.url);
+        details.mime = "application/pdf";
+        output = pdf.content;
+      } else {
+        // --- Decode text content ---
+        const content = new TextDecoder().decode(arrayBuffer);
 
-      switch (format) {
-        case "markdown":
-          if (contentType.includes("text/html")) {
-            output = convertHtmlToMarkdown(content);
-          } else {
+        // --- Format conversion ---
+        switch (format) {
+          case "markdown":
+            if (contentType.includes("text/html")) {
+              const readable = extractReadableMarkdown(content);
+              output = readable?.content || convertHtmlToMarkdown(content);
+              if (!isUsefulContent(output)) {
+                onUpdate?.({
+                  content: [
+                    {
+                      type: "text",
+                      text: `Direct extraction incomplete; trying Jina Reader for ${params.url}...`,
+                    },
+                  ],
+                  details,
+                });
+                output = (await fetchWithJina(params.url, timeout, signal)) || output;
+              }
+            } else {
+              output = content;
+            }
+            break;
+
+          case "text":
+            if (contentType.includes("text/html")) {
+              output = extractTextFromHtml(content);
+            } else {
+              output = content;
+            }
+            break;
+
+          case "html":
             output = content;
-          }
-          break;
+            break;
 
-        case "text":
-          if (contentType.includes("text/html")) {
-            output = extractTextFromHtml(content);
-          } else {
+          default:
             output = content;
-          }
-          break;
-
-        case "html":
-          output = content;
-          break;
-
-        default:
-          output = content;
+        }
       }
 
       // --- Truncation (mirrors websearch extension) ---
