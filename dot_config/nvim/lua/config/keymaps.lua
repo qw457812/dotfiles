@@ -36,6 +36,7 @@ local unmap = U.keymap.del
 safe_map({ "n", "x" }, "l", U.keymap.foldopen_l, { desc = "Right" }) -- nvim-origami
 
 -- https://github.com/chrisgrieser/.config/blob/88eb71f88528f1b5a20b66fd3dfc1f7bd42b408a/nvim/lua/config/keybindings.lua#L19
+-- alternate to `norm! 0`: `vim.fn.winrestview({ leftcol = 0 })`, see https://github.com/folke/sidekick.nvim/commit/3d80a47e6375f6d647c9695d3afea6fa1b3275df
 safe_map({ "n", "x" }, "H", "&wrap ? 'g^' : '0^'", { desc = "Goto line start", expr = true }) -- nvim-origami, use 0^ to scroll fully to the left
 map("o", "H", "&wrap ? 'g^' : '^'", { desc = "Goto line start", expr = true })
 -- map("n", "L", "foldclosed('.') != -1 ? 'zO' : v:count ? '$' : &wrap ? 'g$' : '$'", { desc = "Goto line end", expr = true })

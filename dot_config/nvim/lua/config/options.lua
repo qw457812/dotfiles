@@ -133,6 +133,7 @@ U.on_very_very_lazy(function()
 end)
 
 -- vim.g.user_ui2 = true
+-- TODO: try https://github.com/rachartier/tiny-cmdline.nvim
 if vim.g.user_ui2 then
   opt.cmdheight = 0
   require("vim._core.ui2").enable()
