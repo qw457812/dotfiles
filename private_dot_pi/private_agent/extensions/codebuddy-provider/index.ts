@@ -54,6 +54,7 @@ const oauthAuth: OAuthAuth = {
 function buildRequestHeaders(
   model: CodebuddyModel,
   options: StreamOptions | SimpleStreamOptions | undefined,
+  conversationId: string,
 ): ProviderHeaders {
   const sourceHeaders: ProviderHeaders = { ...model.headers, ...options?.headers };
   const accessToken = options?.apiKey;
@@ -62,7 +63,6 @@ function buildRequestHeaders(
   const enterpriseId = readHeader(sourceHeaders, "X-Enterprise-Id");
   const department = readHeader(sourceHeaders, "X-Department-Info") || "";
   const agentPurpose = readHeader(sourceHeaders, "X-Agent-Purpose");
-  const conversationId = requestId();
   const conversationRequestId = requestId();
   const conversationMessageId = requestId();
 
@@ -90,6 +90,7 @@ function buildRequestHeaders(
 function prepareRequest<T extends StreamOptions | SimpleStreamOptions>(
   model: Model<"openai-completions">,
   options: T | undefined,
+  conversationId: string,
 ): { model: CodebuddyModel; options: T } {
   if (!options?.apiKey) {
     throw new Error("CodeBuddy access token not found. Please run /login codebuddy first");
@@ -103,7 +104,7 @@ function prepareRequest<T extends StreamOptions | SimpleStreamOptions>(
     model: codebuddyModel,
     options: {
       ...options,
-      headers: buildRequestHeaders(codebuddyModel, options),
+      headers: buildRequestHeaders(codebuddyModel, options, conversationId),
     } as T,
   };
 }
@@ -112,7 +113,9 @@ function isCodebuddyModel(model: Model<Api>): model is CodebuddyModel {
   return model.provider === PROVIDER && model.api === "openai-completions";
 }
 
-function createCodebuddyProvider(): Provider<"openai-completions"> {
+function createCodebuddyProvider(
+  conversationIdFor: (sessionId: string | undefined) => string,
+): Provider<"openai-completions"> {
   let models: readonly CodebuddyModel[] = MODELS;
 
   return {
@@ -155,16 +158,40 @@ function createCodebuddyProvider(): Provider<"openai-completions"> {
       }
     },
     stream(model, context: Context, options?: StreamOptions) {
-      const request = prepareRequest(model, options);
+      const request = prepareRequest(model, options, conversationIdFor(options?.sessionId));
       return openaiCompletions.stream(request.model, context, request.options);
     },
     streamSimple(model, context: Context, options?: SimpleStreamOptions) {
-      const request = prepareRequest(model, options);
+      const request = prepareRequest(model, options, conversationIdFor(options?.sessionId));
       return openaiCompletions.streamSimple(request.model, context, request.options);
     },
   };
 }
 
 export default function (pi: ExtensionAPI) {
-  pi.registerProvider(createCodebuddyProvider());
+  // Stable X-Conversation-ID per pi session, mirroring the official CLI. Note this is
+  // determinism, not a cache win: repeat requests still report cached_tokens: 0.
+  const CONVERSATION_ID_CACHE_MAX = 100;
+  const conversationIds = new Map<string, string>(); // sessionId → id, oldest first
+
+  function conversationIdFor(sessionId: string | undefined): string {
+    if (!sessionId) return requestId();
+    const existing = conversationIds.get(sessionId);
+    if (existing) return existing;
+    const id = requestId();
+    conversationIds.set(sessionId, id);
+    if (conversationIds.size > CONVERSATION_ID_CACHE_MAX) {
+      const oldest = conversationIds.keys().next();
+      if (!oldest.done) conversationIds.delete(oldest.value);
+    }
+    return id;
+  }
+
+  pi.registerProvider(createCodebuddyProvider(conversationIdFor));
+
+  // Compaction rewrites the history behind the id, so don't reuse it afterwards.
+  pi.on("session_before_compact", (_event, ctx) => {
+    const sessionId = ctx.sessionManager.getSessionId();
+    if (sessionId) conversationIds.delete(sessionId);
+  });
 }
