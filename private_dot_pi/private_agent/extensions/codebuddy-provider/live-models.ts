@@ -38,8 +38,6 @@ type CodebuddyAgent = {
 type CodebuddyReasoningConfig = {
   /** Whether the gateway lets this model run with thinking turned off. */
   canDisableThinking?: boolean;
-  /** Level the gateway uses when the request does not name one. */
-  defaultEffort?: string;
   /** Authoritative per-model `reasoning_effort` allowlist. */
   supportedEfforts?: string[];
 };
@@ -100,17 +98,9 @@ function isLiveChatModel(
 }
 
 /**
- * Pick the agent whose model allowlist the official CodeBuddy CLI exposes.
- *
- * The CLI's `AgentModelResolver` resolves an agent's `models` ids against the
- * catalogue; for the CLI agent that yields exactly the list its `--model` flag
- * advertises (14 ids today), not the whole catalogue. The agent is named `cli`
- * in current configs — `craft` is an `X-Agent-Intent` header value and a
- * `model:craft` tag, not the agent name — so match the name first and fall back
- * to tags, then to the first agent that declares any models.
- *
- * Returns [] when the response carries no agent allowlist, which callers treat
- * as "do not scope" rather than "no models".
+ * Ids of the agent whose model list the official CodeBuddy CLI exposes. The agent is
+ * named `cli`; `craft` is only a tag, so fall back to tags and then to any agent with models.
+ * Returns [] when there is no allowlist, which callers read as "do not scope".
  */
 function resolveAgentModelIds(agents: CodebuddyAgent[] | undefined): string[] {
   if (!Array.isArray(agents) || agents.length === 0) return [];
@@ -130,18 +120,11 @@ function resolveAgentModelIds(agents: CodebuddyAgent[] | undefined): string[] {
 }
 
 /**
- * Build the pi-ai `thinkingLevelMap` from the gateway's own effort metadata.
+ * pi-ai `thinkingLevelMap`: a `null` entry marks a level unsupported, an absent one
+ * leaves it supported under its own name, and `xhigh`/`max` exist only when named.
  *
- * Conservative on purpose: only levels the gateway explicitly declared are
- * advertised, mirroring the official CodeBuddy CLI. Its `withSupportedEffortsFallback`
- * builds `{[effort]: effort}` from `reasoning.supportedEfforts` and adds nothing
- * when that list is absent. pi-ai treats `xhigh`/`max` as opt-in (they exist only
- * when the map names them), so an absent allowlist leaves them hidden rather than
- * guessed — the gateway does accept those values today, but `supportedEfforts` is
- * the vendor's explicit declaration and the safer default.
- *
- * pi-ai semantics: `null` marks a level unsupported, an absent entry leaves it
- * supported with the level name as the wire value.
+ * Only levels the gateway declared in `supportedEfforts` are advertised; guessing
+ * broader ones would contradict the vendor's own statement of model capability.
  */
 function buildThinkingLevelMap(model: CodebuddyProductModel): ThinkingLevelMap | undefined {
   const supported = (model.reasoning?.supportedEfforts ?? []).filter(
@@ -149,8 +132,7 @@ function buildThinkingLevelMap(model: CodebuddyProductModel): ThinkingLevelMap |
   );
   const canDisable = model.canDisableThinking ?? model.reasoning?.canDisableThinking;
 
-  // No declared allowlist: fall back to pi-ai's defaults (off/minimal/low/medium/high).
-  // An absent `off` key keeps pi-ai's `thinking:{type:"disabled"}` path working.
+  // No allowlist: leave pi-ai's defaults; omitting `off` keeps thinking disableable.
   if (supported.length === 0) {
     return canDisable === false ? { off: null } : undefined;
   }
@@ -209,9 +191,7 @@ export async function fetchLiveModels({
 
   const chatModels = models.filter(isLiveChatModel);
 
-  // Scope to the agent's allowlist, keeping its declared order. Unknown ids are
-  // dropped; an empty result means the allowlist is stale, so fall back to the
-  // full chat catalogue rather than reporting "no supported models".
+  // Keep the agent's declared order; fall back to the full catalogue if it resolves to nothing.
   const available = new Map(chatModels.map((model) => [model.id, model]));
   const scoped: typeof chatModels = [];
   const seen = new Set<string>();
