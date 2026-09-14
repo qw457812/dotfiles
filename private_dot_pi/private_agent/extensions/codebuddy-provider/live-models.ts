@@ -23,7 +23,16 @@ type CodebuddyProductConfigResponse = {
   msg?: string;
   data?: {
     models?: CodebuddyProductModel[];
+    agents?: CodebuddyAgent[];
   };
+};
+
+type CodebuddyAgent = {
+  name?: string;
+  /** Model ids this agent exposes, in picker order. */
+  models?: string[];
+  tags?: string[];
+  modelTags?: string[];
 };
 
 type CodebuddyReasoningConfig = {
@@ -88,6 +97,36 @@ function isLiveChatModel(
   if (model.supportsToolCall === false) return false;
   const tags = model.tags ?? [];
   return !tags.some((tag) => EXCLUDED_MODEL_TAGS.has(tag));
+}
+
+/**
+ * Pick the agent whose model allowlist the official CodeBuddy CLI exposes.
+ *
+ * The CLI's `AgentModelResolver` resolves an agent's `models` ids against the
+ * catalogue; for the CLI agent that yields exactly the list its `--model` flag
+ * advertises (14 ids today), not the whole catalogue. The agent is named `cli`
+ * in current configs — `craft` is an `X-Agent-Intent` header value and a
+ * `model:craft` tag, not the agent name — so match the name first and fall back
+ * to tags, then to the first agent that declares any models.
+ *
+ * Returns [] when the response carries no agent allowlist, which callers treat
+ * as "do not scope" rather than "no models".
+ */
+function resolveAgentModelIds(agents: CodebuddyAgent[] | undefined): string[] {
+  if (!Array.isArray(agents) || agents.length === 0) return [];
+  const hasModels = (agent: CodebuddyAgent | undefined): agent is CodebuddyAgent =>
+    Boolean(agent?.models?.length);
+  const byName = (name: string) => agents.find((a) => a.name === name && a.models?.length);
+  const byTag = (tag: string) =>
+    agents.find((a) => a.models?.length && (a.tags ?? []).includes(tag));
+
+  const agent =
+    byName("cli") ??
+    byName("craft") ??
+    byTag("model:craft") ??
+    byTag("default") ??
+    agents.find(hasModels);
+  return agent?.models ?? [];
 }
 
 /**
@@ -168,7 +207,22 @@ export async function fetchLiveModels({
     throw new Error("CodeBuddy model response is missing models");
   }
 
-  const providerModels = models.filter(isLiveChatModel).map(toLiveModel);
+  const chatModels = models.filter(isLiveChatModel);
+
+  // Scope to the agent's allowlist, keeping its declared order. Unknown ids are
+  // dropped; an empty result means the allowlist is stale, so fall back to the
+  // full chat catalogue rather than reporting "no supported models".
+  const available = new Map(chatModels.map((model) => [model.id, model]));
+  const scoped: typeof chatModels = [];
+  const seen = new Set<string>();
+  for (const id of resolveAgentModelIds(payload.data?.agents)) {
+    const model = available.get(id);
+    if (!model || seen.has(id)) continue;
+    seen.add(id);
+    scoped.push(model);
+  }
+
+  const providerModels = (scoped.length > 0 ? scoped : chatModels).map(toLiveModel);
   if (providerModels.length === 0) {
     throw new Error("CodeBuddy returned no supported chat models");
   }
