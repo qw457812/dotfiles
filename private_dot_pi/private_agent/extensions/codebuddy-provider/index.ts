@@ -1,4 +1,5 @@
-// TODO: https://github.com/qjf44/dsh-plugin-thinking-api
+// https://github.com/qjf44/dsh-plugin-thinking-api
+// https://github.com/SoulChildTc/pi-codebuddy-oauth
 
 import {
   type Api,
@@ -21,7 +22,7 @@ import modelsData from "./models.json" with { type: "json" };
 import type { CodebuddyOAuthCredentials } from "./types.js";
 import { decodeUserId, readHeader, requestId } from "./utils.js";
 
-// $(npm root -g)/@tencent-ai/codebuddy-code/product.internal.json
+// readlink -f ~/.local/bin/codebuddy
 // ~/.codebuddy/logs/
 // ~/.codebuddy/local_storage/
 // pi --list-models codebuddy
