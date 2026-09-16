@@ -172,6 +172,13 @@ return {
         config = function() end,
       },
       {
+        "injaneity/pi-computer-use",
+        version = "*",
+        build = "pi update --extension npm:@injaneity/pi-computer-use",
+        lazy = true,
+        config = function() end,
+      },
+      {
         "qw457812/pi-listen",
         build = "pi update --extension git:github.com/qw457812/pi-listen",
         lazy = true,

@@ -155,6 +155,7 @@
     "git:github.com/patlux/pi-commandcode-provider",
     "npm:@charmland/pi-hyper-provider",
     "npm:@99percentpeople/pi-codex-api",
+    "npm:@injaneity/pi-computer-use",
     "git:github.com/qw457812/pi-listen"
   ],
   "piVim": {
