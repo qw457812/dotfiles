@@ -178,6 +178,7 @@ return {
         lazy = true,
         config = function() end,
       },
+      -- { "openclaw/Peekaboo", version = "*", lazy = true, config = function() end },
       {
         "qw457812/pi-listen",
         build = "pi update --extension git:github.com/qw457812/pi-listen",

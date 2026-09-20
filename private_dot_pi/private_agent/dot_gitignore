@@ -18,3 +18,6 @@ extensions/*/node_modules
 # https://github.com/monotykamary/pi-neuralwatt-provider
 /cache
 /extensions/neuralwatt-mcr.log
+
+# https://github.com/monotykamary/pi-vision-handoff
+/logs/pi-vision-handoff
