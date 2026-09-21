@@ -1,4 +1,5 @@
 {
+  "enabled": false,
   "excludedCommands": [
     "~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/web-browser/scripts/start.js:*",
     "~/.pi/agent/git/github.com/mitsuhiko/agent-stuff/skills/web-browser/scripts/stop.js:*",
