@@ -140,12 +140,7 @@
       "prompts": [],
       "themes": []
     },
-    {
-      "source": "npm:pi-mcp-adapter",
-      "skills": [
-        "-skills/mcp-scripting/SKILL.md"
-      ]
-    },
+    "npm:pi-mcp-adapter",
     "npm:@diegopetrucci/pi-fast",
     "npm:@aliou/pi-guardrails",
     "git:github.com/monotykamary/pi-neuralwatt-provider",

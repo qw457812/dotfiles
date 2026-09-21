@@ -1,6 +1,7 @@
 {
   "settings": {
     "disableProxyTool": true,
+    "namespaceProxyTools": false,
     "showStatusIcon": false,
     "mcpFooterStatus": "compact",
     "toolResultRendering": "boxed",
