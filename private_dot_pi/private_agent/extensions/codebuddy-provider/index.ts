@@ -4,7 +4,7 @@
 import {
   type Api,
   type ApiKeyAuth,
-  type Context,
+  type TranscriptContext,
   type Model,
   type OAuthAuth,
   type Provider,
@@ -157,11 +157,11 @@ function createCodebuddyProvider(
         return;
       }
     },
-    stream(model, context: Context, options?: StreamOptions) {
+    stream(model, context: TranscriptContext, options?: StreamOptions) {
       const request = prepareRequest(model, options, conversationIdFor(options?.sessionId));
       return openaiCompletions.stream(request.model, context, request.options);
     },
-    streamSimple(model, context: Context, options?: SimpleStreamOptions) {
+    streamSimple(model, context: TranscriptContext, options?: SimpleStreamOptions) {
       const request = prepareRequest(model, options, conversationIdFor(options?.sessionId));
       return openaiCompletions.streamSimple(request.model, context, request.options);
     },

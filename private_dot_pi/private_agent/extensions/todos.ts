@@ -1911,11 +1911,11 @@ export default function todosExtension(pi: ExtensionAPI) {
 					tui.requestRender();
 				};
 
-				const copyTodoPathToClipboard = (todoId: string) => {
+				const copyTodoPathToClipboard = async (todoId: string) => {
 					const filePath = getTodoPath(todosDir, todoId);
 					const absolutePath = path.resolve(filePath);
 					try {
-						copyToClipboard(absolutePath);
+						await copyToClipboard(absolutePath);
 						ctx.ui.notify(`Copied ${absolutePath} to clipboard`, "info");
 					} catch (error) {
 						const message = error instanceof Error ? error.message : String(error);
@@ -1923,12 +1923,12 @@ export default function todosExtension(pi: ExtensionAPI) {
 					}
 				};
 
-				const copyTodoTextToClipboard = (record: TodoRecord) => {
+				const copyTodoTextToClipboard = async (record: TodoRecord) => {
 					const title = record.title || "(untitled)";
 					const body = record.body?.trim() || "";
 					const text = body ? `# ${title}\n\n${body}` : `# ${title}`;
 					try {
-						copyToClipboard(text);
+						await copyToClipboard(text);
 						ctx.ui.notify("Copied todo text to clipboard", "info");
 					} catch (error) {
 						const message = error instanceof Error ? error.message : String(error);

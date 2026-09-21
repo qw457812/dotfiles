@@ -92,13 +92,23 @@ export default function (pi: ExtensionAPI) {
           let latestCacheHitRate: number | undefined;
 
           for (const entry of ctx.sessionManager.getEntries()) {
+            const usage =
+              entry.type === "usage" ||
+              entry.type === "compaction" ||
+              entry.type === "branch_summary"
+                ? entry.usage
+                : entry.type === "message" &&
+                    (entry.message.role === "assistant" || entry.message.role === "toolResult")
+                  ? entry.message.usage
+                  : undefined;
+            if (usage) {
+              totalInput += usage.input;
+              totalOutput += usage.output;
+              totalCacheRead += usage.cacheRead;
+              totalCacheWrite += usage.cacheWrite;
+              totalCost += usage.cost.total;
+            }
             if (entry.type === "message" && entry.message.role === "assistant") {
-              totalInput += entry.message.usage.input;
-              totalOutput += entry.message.usage.output;
-              totalCacheRead += entry.message.usage.cacheRead;
-              totalCacheWrite += entry.message.usage.cacheWrite;
-              totalCost += entry.message.usage.cost.total;
-
               const latestPromptTokens =
                 entry.message.usage.input +
                 entry.message.usage.cacheRead +

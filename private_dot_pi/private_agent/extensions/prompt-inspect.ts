@@ -66,7 +66,13 @@ function extractSystemFromPayload(payload: unknown): string | undefined {
   if (Array.isArray(p.system)) return normalizeContent(p.system);
 
   // Google (Gemini / Vertex)
-  if (typeof p.systemInstruction === "string") return p.systemInstruction;
+  const config = p.config && typeof p.config === "object" ? (p.config as Rec) : undefined;
+  const googleSystem = p.systemInstruction ?? config?.systemInstruction;
+  if (googleSystem !== undefined) {
+    return googleSystem && typeof googleSystem === "object" && !Array.isArray(googleSystem)
+      ? normalizeContent((googleSystem as Rec).parts)
+      : normalizeContent(googleSystem);
+  }
 
   // OpenAI Completions / Responses / Azure / Mistral
   for (const key of ["messages", "input"] as const) {

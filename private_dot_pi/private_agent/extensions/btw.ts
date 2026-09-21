@@ -3,6 +3,7 @@
 
 import {
 	buildSessionContext,
+	convertToLlm,
 	createAgentSession,
 	createExtensionRuntime,
 	getMarkdownTheme,
@@ -81,6 +82,7 @@ type ToolCallInfo = {
 
 function stripDynamicSystemPromptFooter(systemPrompt: string): string {
 	return systemPrompt
+		.replace(/\n<cwd>\n[\s\S]*?\n<\/cwd>\s*$/u, "")
 		.replace(/\nCurrent date and time:[^\n]*(?:\nCurrent working directory:[^\n]*)?$/u, "")
 		.replace(/\nCurrent working directory:[^\n]*$/u, "")
 		.trim();
@@ -159,7 +161,9 @@ function buildSeedMessages(ctx: ExtensionContext, thread: BtwDetails[]): Message
 
 	try {
 		const contextMessages = buildSessionContext(ctx.sessionManager.getEntries(), ctx.sessionManager.getLeafId()).messages;
-		seed.push(...(contextMessages.filter((message) => "role" in message) as Message[]));
+		// The side session owns its prompt/tool checkpoint; never replay the main
+		// session's system patches (including tool loadout) into it.
+		seed.push(...convertToLlm(contextMessages).filter((message) => message.role !== "system"));
 	} catch {
 		// Ignore context seed failures and continue with an empty side thread.
 	}

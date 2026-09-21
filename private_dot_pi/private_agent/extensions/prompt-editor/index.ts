@@ -52,6 +52,7 @@ const PI_VIM_BUILTIN_COMMAND_NAMES = [
   "export",
   "import",
   "share",
+  "bug",
   "copy",
   "name",
   "session",

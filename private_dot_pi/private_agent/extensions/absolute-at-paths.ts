@@ -3,6 +3,10 @@ import type { AutocompleteItem } from "@earendil-works/pi-tui";
 import { homedir } from "node:os";
 import { isAbsolute, resolve } from "node:path";
 
+// Pi 0.86 autocompleteSeparatorRegex (not exported from the public entry point).
+const pathSeparator =
+  /(?:\s|(?=\p{Punctuation})[\p{Script_Extensions=Han}\p{Script_Extensions=Hiragana}\p{Script_Extensions=Katakana}\p{Script_Extensions=Hangul}\p{Script_Extensions=Bopomofo}]|[，．：；！？（）［］｛｝“”‘’…—])/u;
+
 function toAbsoluteAtValue(value: string, cwd: string): string {
   if (!value.startsWith("@")) return value;
 
@@ -17,7 +21,7 @@ function toAbsoluteAtValue(value: string, cwd: string): string {
   absolutePath = absolutePath.replaceAll("\\", "/");
   if (hasTrailingSlash && !absolutePath.endsWith("/")) absolutePath += "/";
 
-  return quoted || absolutePath.includes(" ") ? `@"${absolutePath}"` : `@${absolutePath}`;
+  return quoted || pathSeparator.test(absolutePath) ? `@"${absolutePath}"` : `@${absolutePath}`;
 }
 
 export default function (pi: ExtensionAPI) {
