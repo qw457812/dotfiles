@@ -66,11 +66,6 @@
         "pattern": ">\\s*\\/dev\\/sd[a-z]\\b",
         "description": "Redirect to block device",
         "regex": true
-      },
-      {
-        "pattern": "\\bgit(?:\\s+-C\\s+(?:\"[^\"]*\"|'[^']*'|\\S+))*\\s+(?:add|commit|push|pull|merge|rebase|reset|checkout|switch|stash|cherry-pick|revert|restore|clean)\\b",
-        "description": "Mutating git command",
-        "regex": true
       }
     ]
   }
