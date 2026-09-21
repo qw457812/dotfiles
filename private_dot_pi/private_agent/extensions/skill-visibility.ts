@@ -85,7 +85,7 @@ export default function (pi: ExtensionAPI) {
     const result = applySkillVisibilityOverrides(
       event.systemPrompt,
       skills,
-      event.systemPromptOptions.selectedTools?.includes("read") ?? false,
+      canAppendSkillsSection(event.systemPromptOptions.selectedTools),
     );
 
     lastPromptPair = { before: event.systemPrompt, after: result.prompt };
@@ -123,7 +123,7 @@ export default function (pi: ExtensionAPI) {
         after: applySkillVisibilityOverrides(
           currentPrompt,
           ctx.getSystemPromptOptions().skills ?? [],
-          ctx.getSystemPromptOptions().selectedTools?.includes("read") ?? false,
+          canAppendSkillsSection(ctx.getSystemPromptOptions().selectedTools),
         ).prompt,
       };
       if (before === after) {
@@ -137,6 +137,11 @@ export default function (pi: ExtensionAPI) {
       await openDiffInEditor(ctx, diff);
     },
   });
+}
+
+function canAppendSkillsSection(selectedTools: string[] | undefined): boolean {
+  const tools = selectedTools ?? [];
+  return tools.includes("read") || tools.includes("bash");
 }
 
 function applySkillVisibilityOverrides(
@@ -205,30 +210,35 @@ function getPromptSkillNames(systemPrompt: string): Set<string> {
 function pruneEmptySkillsSection(systemPrompt: string): string {
   if (getPromptSkillNames(systemPrompt).size > 0) return systemPrompt;
 
-  // https://github.com/earendil-works/pi/blob/c100620bf447349ae7a4866bc1cb6757cc9f67c4/packages/coding-agent/src/core/skills.ts#L335-L361
-  const endMarker = "</available_skills>";
-  const endIndex = systemPrompt.indexOf(endMarker);
-  if (endIndex === -1) return systemPrompt;
+  // https://github.com/earendil-works/pi/blob/1d6dbf9e3d60f129bf8ee513c82a98f222c57788/packages/coding-agent/src/core/skills.ts#L355-L383
+  const availableSkillsEnd = systemPrompt.indexOf("</available_skills>");
+  if (availableSkillsEnd === -1) return systemPrompt;
 
-  const startMarker =
-    "\n\nThe following skills provide specialized instructions for specific tasks.";
-  const startIndex = systemPrompt.lastIndexOf(startMarker, endIndex);
-  if (startIndex === -1) return systemPrompt;
+  // https://github.com/earendil-works/pi/blob/13cbf77df2396303013a41646bcfa77b4271ae56/packages/coding-agent/src/core/system-prompt.ts#L167-L177
+  const sectionStart = systemPrompt.lastIndexOf("\n\n<skills>\n", availableSkillsEnd);
+  if (sectionStart === -1) return systemPrompt;
 
-  return systemPrompt.slice(0, startIndex) + systemPrompt.slice(endIndex + endMarker.length);
+  const sectionEndMarker = "\n</skills>";
+  const sectionEnd = systemPrompt.indexOf(sectionEndMarker, availableSkillsEnd);
+  if (sectionEnd === -1) return systemPrompt;
+
+  return (
+    systemPrompt.slice(0, sectionStart) + systemPrompt.slice(sectionEnd + sectionEndMarker.length)
+  );
 }
 
 function insertSkillsSection(systemPrompt: string, skillsSection: string): string {
   if (!skillsSection) return systemPrompt;
 
-  // https://github.com/earendil-works/pi/blob/818d67457cdd6b60bce6b121d16b23141c252dd8/packages/coding-agent/src/core/system-prompt.ts#L159
-  const workingDirectoryIndex = systemPrompt.lastIndexOf("\nCurrent working directory:");
-  if (workingDirectoryIndex === -1) return systemPrompt + skillsSection;
+  const renderedSkillsSection = `\n\n<skills>\n${skillsSection.trim()}\n</skills>`;
+  // https://github.com/earendil-works/pi/blob/13cbf77df2396303013a41646bcfa77b4271ae56/packages/coding-agent/src/core/system-prompt.ts#L170-L177
+  const cwdSectionIndex = systemPrompt.lastIndexOf("\n\n<cwd>\n");
+  if (cwdSectionIndex === -1) return systemPrompt + renderedSkillsSection;
 
   return (
-    systemPrompt.slice(0, workingDirectoryIndex) +
-    skillsSection +
-    systemPrompt.slice(workingDirectoryIndex)
+    systemPrompt.slice(0, cwdSectionIndex) +
+    renderedSkillsSection +
+    systemPrompt.slice(cwdSectionIndex)
   );
 }
 
