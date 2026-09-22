@@ -1,8 +1,8 @@
 {
   "lastChangelogVersion": "0.87.0",
-  "defaultProvider": "openai-codex",
-  "defaultModel": "gpt-6-astra",
-  "defaultThinkingLevel": "low",
+  "defaultProvider": "codebuddy",
+  "defaultModel": "deepseek-v4.1-flash",
+  "defaultThinkingLevel": "high",
   "hideThinkingBlock": true,
   "quietStartup": true,
   "showHardwareCursor": true,
@@ -77,6 +77,7 @@
         "skills/engineering/resolving-merge-conflicts",
         "skills/productivity/grilling",
         "skills/productivity/teach",
+        "skills/productivity/to-questionnaire",
         "skills/productivity/writing-for-agents"
       ],
       "prompts": [],

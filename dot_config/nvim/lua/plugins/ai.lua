@@ -123,7 +123,7 @@ return {
       },
       {
         "charmbracelet/pi-hyper-provider",
-        version = "*",
+        -- version = "*",
         build = "pi update --extension npm:@charmland/pi-hyper-provider",
         lazy = true,
         config = function() end,
@@ -171,6 +171,7 @@ return {
         lazy = true,
         config = function() end,
       },
+      -- alternative: https://github.com/trycua/cua
       {
         "injaneity/pi-computer-use",
         version = "*",

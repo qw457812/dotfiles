@@ -39,6 +39,10 @@ interface FileEntry {
 
 type FileToolName = "read" | "write" | "edit";
 
+function isImagePath(filePath: string): boolean {
+	return IMAGE_EXTENSIONS.has(extname(filePath).toLowerCase());
+}
+
 function formatPath(filePath: string, cwd: string): string {
 	const resolvedCwd = resolve(cwd);
 	const resolvedPath = isAbsolute(filePath) ? resolve(filePath) : resolve(resolvedCwd, filePath);
@@ -136,7 +140,7 @@ export default function (pi: ExtensionAPI) {
 			const quoteCmdArg = (value: string) => `"${value.replace(/"/g, '""')}"`;
 
 			const openFile = async (path: string) => {
-				const isImage = IMAGE_EXTENSIONS.has(extname(path).toLowerCase());
+				const isImage = isImagePath(path);
 
 				if (process.platform === "win32") {
 					if (WINDOWS_UNSAFE_CMD_CHARS_RE.test(path)) {
@@ -195,9 +199,14 @@ export default function (pi: ExtensionAPI) {
 					if (f.operations.has("edit")) ops.push(theme.fg("warning", "E"));
 					const opsLabel = ops.join("");
 					const formattedPath = formatPath(f.path, ctx.cwd);
+					const ext = extname(formattedPath);
+					const pathLabel =
+						ext && isImagePath(formattedPath)
+							? formattedPath.slice(0, -ext.length) + theme.fg("syntaxVariable", ext)
+							: formattedPath;
 					return {
 						value: f.path,
-						label: `${opsLabel} ${formattedPath}`,
+						label: `${opsLabel} ${pathLabel}`,
 					};
 				});
 

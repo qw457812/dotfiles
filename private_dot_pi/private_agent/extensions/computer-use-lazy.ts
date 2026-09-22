@@ -11,6 +11,9 @@
  * - The active branch contains a historical assistant `toolCall` for any group
  *   tool. `session_start` and `session_tree` re-evaluate this on restore.
  * - `/computer-use-on` enables the group explicitly for the current run.
+ * - `--no-computer-use-lazy` opts the whole run out of the lazy policy. Pi
+ *   activates extension tools at startup anyway, so honoring the flag means
+ *   simply not removing them.
  *
  * Once enabled during a run, this extension never disables the group again
  * (one-way). A restored branch can show earlier computer-use calls, and hiding
@@ -55,9 +58,18 @@ function branchHasComputerUseToolCall(ctx: ExtensionContext): boolean {
 }
 
 export default function (pi: ExtensionAPI): void {
+  pi.registerFlag("no-computer-use-lazy", {
+    description: "Keep the pi-computer-use tools active in every session",
+    type: "boolean",
+    default: false,
+  });
+
   let computerUseToolsEnabled = false;
 
   function setComputerUseToolsEnabled(enabled: boolean): void {
+    // Pi already activates every extension tool, so opt-out is a no-op.
+    if (pi.getFlag("no-computer-use-lazy") === true) return;
+
     // One-way: a branch restore may not hide tools this run already exposed.
     if (!enabled && computerUseToolsEnabled) return;
 
@@ -89,6 +101,10 @@ export default function (pi: ExtensionAPI): void {
   pi.registerCommand("computer-use-on", {
     description: "Enable the pi-computer-use tools for this run",
     handler: async (_args, ctx) => {
+      if (pi.getFlag("no-computer-use-lazy") === true) {
+        ctx.ui.notify("Computer-use tools are always enabled (--no-computer-use-lazy)", "info");
+        return;
+      }
       if (computerUseToolsEnabled) {
         ctx.ui.notify("Computer-use tools are already enabled", "info");
         return;
