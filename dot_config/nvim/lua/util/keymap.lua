@@ -301,6 +301,10 @@ function M.clear_ui_esc(opts)
   elseif package.loaded["sidekick"] and require("sidekick.nes").have() then
     require("sidekick").clear()
     something_done = true
+  elseif package.loaded["vim._core.mcursor"] and require("vim._core.mcursor").active() then
+    ---https://github.com/neovim/neovim/blob/c171a697cbee36c4f36535e14f1407909733ca4b/runtime/lua/vim/_core/defaults.lua#L120
+    vim.api.nvim_buf_clear_namespace(0, vim.api.nvim_create_namespace("nvim.multicursor"), 0, -1)
+    something_done = true
   elseif opts.close then
     if U.is_floating_win(0, { zen = false }) then
       opts.close()
