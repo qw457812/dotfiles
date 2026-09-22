@@ -4,6 +4,9 @@
  * Git Guard Extension
  *
  * Combines mutating git command confirmation + dirty-repo-guard.
+ *
+ * Commands:
+ *   /git-guard on|off   Toggle confirmation for mutating git commands.
  */
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
@@ -11,8 +14,11 @@ const GUARDED_GIT_PATTERN =
   /\bgit(?:\s+-C\s+(?:"[^"]*"|'[^']*'|\S+))*\s+(?<subcommand>add|commit|push|pull|merge|rebase|reset|checkout|switch|stash|cherry-pick|revert|restore|clean)\b/;
 
 export default function (pi: ExtensionAPI) {
+  let enabled = true;
+
   pi.on("tool_call", async (event, ctx) => {
     if (event.toolName !== "bash") return;
+    if (!enabled) return;
 
     const command = (event.input as { command?: string }).command ?? "";
     const subcommand = command.match(GUARDED_GIT_PATTERN)?.groups?.subcommand;
@@ -41,5 +47,27 @@ export default function (pi: ExtensionAPI) {
     } catch {
       /* not a git repo, ignore */
     }
+  });
+
+  pi.registerCommand("git-guard", {
+    description: "Toggle git command confirmation (/git-guard [on|off])",
+    getArgumentCompletions(prefix: string) {
+      const items = ["on", "off"]
+        .filter((item) => item.startsWith(prefix.trimStart().toLowerCase()))
+        .map((item) => ({ value: item, label: item }));
+      return items.length > 0 ? items : null;
+    },
+    handler: async (args, ctx) => {
+      const arg = args.trim().toLowerCase();
+      if (arg === "on") {
+        enabled = true;
+      } else if (arg === "off") {
+        enabled = false;
+      } else if (arg) {
+        ctx.ui.notify("Usage: /git-guard [on|off]", "error");
+        return;
+      }
+      ctx.ui.notify(`Git guard: ${enabled ? "ON" : "OFF"}`, "info");
+    },
   });
 }

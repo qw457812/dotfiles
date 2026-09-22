@@ -211,6 +211,18 @@ return {
     end,
   },
 
+  {
+    "LazyVim/LazyVim",
+    opts = function()
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "markdown",
+        callback = function(ev)
+          vim.diagnostic.enable(false, { bufnr = ev.buf })
+        end,
+      })
+    end,
+  },
+
   -- TODO: breaking changes
   -- `textobjects.scm` query files with `nvim-treesitter/nvim-treesitter-textobjects`
   { "chrisgrieser/nvim-various-textobjs", optional = true, commit = "bf2133a" },
