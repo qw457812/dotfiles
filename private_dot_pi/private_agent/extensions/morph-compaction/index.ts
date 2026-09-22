@@ -23,8 +23,17 @@
  */
 
 import type { AgentMessage } from "@earendil-works/pi-agent-core";
-import type { ExtensionAPI, FileOperations, SessionEntry } from "@earendil-works/pi-coding-agent";
-import { convertToLlm, serializeConversation } from "@earendil-works/pi-coding-agent";
+import type {
+  ContextEditEntry,
+  ExtensionAPI,
+  FileOperations,
+  SessionEntry,
+} from "@earendil-works/pi-coding-agent";
+import {
+  convertToLlm,
+  serializeConversation,
+  sessionEntryToContextMessages,
+} from "@earendil-works/pi-coding-agent";
 import { compact } from "./morph-client.ts";
 
 const MORPH_MODEL = "morph-compactor";
@@ -52,33 +61,36 @@ function escapeMorphKeepContextTags(text: string): string {
   );
 }
 
-function messageFromEntryForRawCompaction(entry: SessionEntry): AgentMessage | undefined {
-  if (entry.type === "message") return entry.message;
-
-  if (entry.type === "custom_message") {
-    return {
-      role: "custom",
-      customType: entry.customType,
-      content: entry.content,
-      display: entry.display,
-      details: entry.details,
-      timestamp: new Date(entry.timestamp).getTime(),
-    };
-  }
-
-  if (entry.type === "branch_summary") {
-    return {
-      role: "branchSummary",
-      summary: entry.summary,
-      fromId: entry.fromId,
-      timestamp: new Date(entry.timestamp).getTime(),
-    };
-  }
-
+function messageFromEntryForRawCompaction(
+  entry: SessionEntry,
+  edit: ContextEditEntry | undefined,
+): AgentMessage | undefined {
   // Deliberately skip old compaction entries to avoid summary-of-summary drift.
+  if (entry.type === "compaction") return undefined;
+
   // Session metadata entries (labels, model/thinking changes, custom state, etc.)
   // do not participate in Pi's LLM context and should not pollute Morph input.
-  return undefined;
+  const message = sessionEntryToContextMessages(entry)[0];
+
+  // Mirrors the edit application in Pi's projectContextEntry(); keep in sync.
+  // https://github.com/earendil-works/pi/blob/16787ad5b2dc748047f314ca1bfe7708f30f54f3/packages/coding-agent/src/core/session-manager.ts#L519-L540
+  if (!message || !edit) return message;
+  if (edit.replacement === null) return undefined;
+  if (
+    message.role !== "user" &&
+    message.role !== "assistant" &&
+    message.role !== "toolResult" &&
+    message.role !== "custom"
+  ) {
+    return message;
+  }
+
+  const content =
+    (message.role === "assistant" || message.role === "toolResult") &&
+    typeof edit.replacement.content === "string"
+      ? [{ type: "text" as const, text: edit.replacement.content }]
+      : edit.replacement.content;
+  return { ...message, content } as AgentMessage;
 }
 
 function collectContextMessagesBeforeFirstKept(
@@ -88,9 +100,14 @@ function collectContextMessagesBeforeFirstKept(
   const firstKeptIndex = branchEntries.findIndex((entry) => entry.id === firstKeptEntryId);
   if (firstKeptIndex < 0) return [];
 
+  const edits = new Map<string, ContextEditEntry>();
+  for (const entry of branchEntries) {
+    if (entry.type === "context_edit") edits.set(entry.targetId, entry);
+  }
+
   return branchEntries
     .slice(0, firstKeptIndex)
-    .map(messageFromEntryForRawCompaction)
+    .map((entry) => messageFromEntryForRawCompaction(entry, edits.get(entry.id)))
     .filter((message): message is AgentMessage => message !== undefined);
 }
 
