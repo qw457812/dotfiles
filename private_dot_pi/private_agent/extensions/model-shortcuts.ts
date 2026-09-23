@@ -14,24 +14,21 @@ import type {
 } from "@earendil-works/pi-coding-agent";
 import type { AutocompleteItem } from "@earendil-works/pi-tui";
 
+// https://artificialanalysis.ai
+// https://commandcode.ai/docs/plans/go
 const ALIASES: Record<string, ModelTarget | readonly ModelTarget[]> = {
   astra: { provider: "openai-codex", id: "gpt-6-astra" },
-  sol: { provider: "openai-codex", id: "gpt-5.6-sol" },
-  terra: { provider: "openai-codex", id: "gpt-5.6-terra" },
-  luna: { provider: "openai-codex", id: "gpt-5.6-luna" },
-  kimi: [
-    { provider: "commandcode", id: "moonshotai/Kimi-K3" },
-    { provider: "neuralwatt", id: "kimi-k3" },
-  ],
+  sol: { provider: "openai-codex", id: "gpt-6-sol" },
+  luna: { provider: "openai-codex", id: "gpt-6-luna" },
   glm: [
     { provider: "commandcode", id: "zai-org/GLM-5.3" },
     { provider: "neuralwatt", id: "glm-5.3" },
     { provider: "codebuddy", id: "glm-5.3" },
   ],
   glmflash: [
+    { provider: "commandcode", id: "z-ai/glm-5.3-flash" },
     { provider: "neuralwatt", id: "glm-5.3-flash" },
     { provider: "codebuddy", id: "glm-5.3-flash" },
-    { provider: "commandcode", id: "z-ai/glm-5.3-flash" },
     { provider: "hyper", id: "glm-5.3-flash" },
   ],
   ds: [
@@ -39,6 +36,18 @@ const ALIASES: Record<string, ModelTarget | readonly ModelTarget[]> = {
     { provider: "neuralwatt", id: "deepseek-v4.1-flash" },
     { provider: "commandcode", id: "deepseek/deepseek-v4.1-flash" },
     { provider: "hyper", id: "deepseek-v4.1-flash" },
+  ],
+  mimo: [
+    { provider: "commandcode", id: "xiaomi/mimo-v2.6-pro" },
+    { provider: "xiaomi", id: "mimo-v2.6-pro" },
+  ],
+  mimoflash: [
+    { provider: "commandcode", id: "xiaomi/mimo-v2.6-flash" },
+    { provider: "xiaomi", id: "mimo-v2.6-flash" },
+  ],
+  kimi: [
+    { provider: "commandcode", id: "moonshotai/Kimi-K3" },
+    { provider: "neuralwatt", id: "kimi-k3" },
   ],
   qwen: [
     { provider: "commandcode", id: "Qwen/Qwen3.8-Max-0902" },
@@ -49,11 +58,10 @@ const ALIASES: Record<string, ModelTarget | readonly ModelTarget[]> = {
     { provider: "commandcode", id: "Qwen/Qwen3.8-Flash" },
     { provider: "hyper", id: "qwen3.8-flash" },
   ],
-  mimo: { provider: "commandcode", id: "xiaomi/mimo-v2.5-pro" },
-  flex: { provider: "neuralwatt", id: "kimi-k3-flex" },
-  cmd: { provider: "commandcode", id: "z-ai/glm-5.3-flash" },
+  flex: { provider: "neuralwatt", id: "glm-5.3-flex" },
+  cmd: { provider: "commandcode", id: "xiaomi/mimo-v2.6-pro" },
   hyper: { provider: "hyper", id: "glm-5.3-flash" },
-  buddy: { provider: "codebuddy", id: "glm-5.3-flash" },
+  buddy: { provider: "codebuddy", id: "deepseek-v4.1-flash" },
   coral: { provider: "coralbricks", id: "glm-5.3-flash-fp4" },
 };
 

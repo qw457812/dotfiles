@@ -16,6 +16,39 @@
         }
       }
     },
+    // https://github.com/patlux/pi-commandcode-provider/pull/112
+    // Pricing: https://commandcode.ai/docs/resources/pricing-limits
+    // curl -H "Authorization: Bearer $COMMANDCODE_API_KEY" https://api.commandcode.ai/provider/v1/models
+    "commandcode": {
+      "modelOverrides": {
+        "xiaomi/mimo-v2.6-pro": {
+          "reasoning": true,
+          "thinkingLevelMap": {
+            "minimal": null,
+            "low": null,
+            "medium": null,
+            "high": null,
+            "xhigh": null,
+            "max": null
+          },
+          "input": ["text", "image"],
+          "cost": { "input": 0.435, "output": 0.87, "cacheRead": 0.0036, "cacheWrite": 0 }
+        },
+        "xiaomi/mimo-v2.6-flash": {
+          "reasoning": true,
+          "thinkingLevelMap": {
+            "minimal": null,
+            "low": null,
+            "medium": null,
+            "high": null,
+            "xhigh": null,
+            "max": null
+          },
+          "input": ["text", "image"],
+          "cost": { "input": 0.14, "output": 0.28, "cacheRead": 0.0028, "cacheWrite": 0 }
+        }
+      }
+    },
     "zai": {
       "baseUrl": "https://api.z.ai/api/coding/paas/v4",
       "apiKey": "$ZAI_API_KEY",
