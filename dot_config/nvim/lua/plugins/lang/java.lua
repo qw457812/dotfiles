@@ -200,14 +200,20 @@ return {
   -- https://github.com/AstroNvim/astrocommunity/blob/5f74d5fb8d8dc9b8e2904846809121068d7afaca/lua/astrocommunity/pack/spring-boot/init.lua
   {
     "JavaHello/spring-boot.nvim",
-    enabled = not vim.g.user_is_termux,
     ft = {
       "java",
       -- "yaml",
       "jproperties",
     },
     ---@type bootls.Config|{}
-    opts = {},
+    opts = {
+      -- Android's seccomp kills the JVM with SIGSYS when the server uses its default ZGC.
+      -- https://github.com/JavaHello/spring-boot.nvim/blob/9880be48170a21d97444b1eba75853fd3bad33c3/lua/spring_boot/launch.lua#L49
+      jvm_args = vim.g.user_is_termux and { "-XX:-UseZGC", "-XX:+UseG1GC" } or nil,
+      log_file = function()
+        return vim.fs.joinpath(vim.fn.stdpath("log"), "spring-boot-ls.log")
+      end,
+    },
     specs = {
       {
         "mason-org/mason.nvim",

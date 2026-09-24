@@ -101,14 +101,11 @@ return {
   {
     "JavaHello/spring-boot.nvim",
     optional = true,
-    opts = function()
-      -- HACK: better alternative to `vim.env.JAVA_HOME = java_home`
-      -- https://github.com/JavaHello/spring-boot.nvim/blob/2bc14e114f748ebba365641b38403c9819cd42cd/lua/spring_boot/util.lua#L22-L28
-      ---@diagnostic disable-next-line: duplicate-set-field
-      require("spring_boot.util").java_bin = function()
-        return java_home .. "/bin/java"
-      end
-    end,
+    ---@module "spring_boot"
+    ---@type bootls.Config|{}
+    opts = {
+      java_cmd = java_home .. "/bin/java",
+    },
   },
   {
     "folke/sidekick.nvim",
