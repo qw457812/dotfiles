@@ -103,7 +103,7 @@
   "persistence.nvim": { "branch": "main", "commit": "b20b2a7887bd39c1a356980b45e03250f3dce49c" },
   "pi": { "branch": "main", "commit": "f07218c4d4bbc12bef056a7058c3dd49dfe41abe" },
   "pi-agent-colony": { "branch": "main", "commit": "e609f5d5c935079e36c88944252b168ff0907a27" },
-  "pi-commandcode-provider": { "branch": "main", "commit": "6fd0ac75345c3fd9c94aa1638c0e00fe963041b8" },
+  "pi-commandcode-provider": { "branch": "main", "commit": "8b6313481a87e8940882743e0a57bfdcd10b0de4" },
   "pi-computer-use": { "branch": "main", "commit": "4b8dbd7eaa13328ab1a8a4b55d0be0b077de7d62" },
   "pi-coralbricks-provider": { "branch": "main", "commit": "8efa90eab56073e7fd4f9ef42835e46bc6bee353" },
   "pi-guardrails": { "branch": "main", "commit": "31b466cdf3b61ca89361781f07529b7d53377ca1" },
