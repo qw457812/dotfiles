@@ -34,6 +34,18 @@ export class HttpCallError extends Error {
   }
 }
 
+/**
+ * User-initiated cancellation.
+ *
+ * Classified by typed identity (`instanceof`), never by message text: error
+ * messages can carry server-controlled strings (JSON-RPC error.message, MCP
+ * tool error payloads) that must not be able to impersonate a cancellation
+ * and bypass the tool's error narrowing.
+ */
+export class RequestCancelledError extends Error {
+  override name = "RequestCancelledError";
+}
+
 export interface WebSearchInput {
   query: string;
 }

@@ -416,7 +416,8 @@ async function forcedToolCases() {
   }
 
   // Ledger-backed divergence guard ("User cancellation bypasses the error
-  // wrap"): a user abort keeps its plain cancelled message.
+  // wrap"): a user abort keeps its plain cancelled message, identified by
+  // typed identity rather than message text.
   {
     const tool = activateTool(() => {
       throw Object.assign(new Error("The operation was aborted"), { name: "AbortError" });
@@ -427,6 +428,120 @@ async function forcedToolCases() {
       let err;
       await tool.run("golden query", controller.signal).catch((e) => (err = e));
       equal("tool cancellation: plain message kept", err?.message, "Tavily request was cancelled");
+      equal("tool cancellation: typed identity kept", err?.name, "RequestCancelledError");
+    } finally {
+      tool.restore();
+    }
+  }
+
+  // Impersonation guard: a provider error whose message merely ends like a
+  // cancellation is not one — it must go through the error wrap. Errors are
+  // classified by type, never by message text.
+  {
+    const tool = activateTool(() => {
+      throw new Error("quota was cancelled");
+    });
+    try {
+      let err;
+      await tool.run("golden query").catch((e) => (err = e));
+      equal(
+        "tool spoof: wrapped, not passed through",
+        err?.message,
+        "Unable to search the web for golden query",
+      );
+      equal(
+        "tool spoof: original message kept as cause",
+        err?.cause?.message,
+        "quota was cancelled",
+      );
+    } finally {
+      tool.restore();
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Tool-level cases (forced MCP provider)
+// ---------------------------------------------------------------------------
+
+async function forcedMcpCases() {
+  // Impersonation guard (the remote vector): a JSON-RPC error whose
+  // server-controlled message ends with "was cancelled" must go through the
+  // error wrap like any other failure.
+  {
+    const tool = activateTool(
+      () =>
+        new Response(
+          JSON.stringify({
+            jsonrpc: "2.0",
+            id: 1,
+            error: { code: -32000, message: "Search request was cancelled" },
+          }),
+          { status: 200 },
+        ),
+    );
+    try {
+      let err;
+      await tool.run("golden query").catch((e) => (err = e));
+      equal(
+        "mcp rpc spoof: wrapped, not passed through",
+        err?.message,
+        "Unable to search the web for golden query",
+      );
+      equal("mcp rpc spoof: cause is McpRpcError", err?.cause?.name, "McpRpcError");
+    } finally {
+      tool.restore();
+    }
+  }
+
+  // Same guard for tool-execution errors: the provider rethrows the server's
+  // error text verbatim, and that must still be wrapped.
+  {
+    const tool = activateTool(
+      () =>
+        new Response(
+          JSON.stringify({
+            jsonrpc: "2.0",
+            id: 1,
+            result: { content: [{ type: "text", text: "Search was cancelled" }], isError: true },
+          }),
+          { status: 200 },
+        ),
+    );
+    try {
+      let err;
+      await tool.run("golden query").catch((e) => (err = e));
+      equal(
+        "mcp tool-error spoof: wrapped, not passed through",
+        err?.message,
+        "Unable to search the web for golden query",
+      );
+      equal(
+        "mcp tool-error spoof: cause keeps server text",
+        err?.cause?.message,
+        "Search was cancelled",
+      );
+    } finally {
+      tool.restore();
+    }
+  }
+
+  // Genuine cancellation over MCP keeps its plain message with typed identity.
+  {
+    const tool = activateTool(() => {
+      throw Object.assign(new Error("The operation was aborted"), { name: "AbortError" });
+    });
+    try {
+      const controller = new AbortController();
+      controller.abort();
+      let err;
+      await tool.run("golden query", controller.signal).catch((e) => (err = e));
+      equal(
+        "mcp cancellation: plain message kept",
+        err?.message,
+        "MCP request to web_search_exa was cancelled",
+      );
+      equal("mcp cancellation: typed identity kept", err?.name, "RequestCancelledError");
     } finally {
       tool.restore();
     }
@@ -445,6 +560,9 @@ const groups = {
   forced: async () => {
     await forcedToolCases();
   },
+  "forced-mcp": async () => {
+    await forcedMcpCases();
+  },
 };
 
 const group = process.argv[2];
@@ -456,6 +574,7 @@ if (group) {
   for (const [name, provider] of [
     ["random", "random"],
     ["forced", "tavily"],
+    ["forced-mcp", "exa"],
   ]) {
     const child = spawnSync(process.execPath, [fileURLToPath(import.meta.url), name], {
       stdio: "inherit",

@@ -14,6 +14,7 @@
 import { VERSION } from "@earendil-works/pi-coding-agent";
 import {
   HttpCallError,
+  RequestCancelledError,
   type ProviderCallContext,
   type WebSearchInput,
   type WebSearchProvider,
@@ -90,7 +91,7 @@ export const tavilyProvider: WebSearchProvider = {
     } catch (err: any) {
       if (err.name === "AbortError") {
         if (ctx.signal?.aborted) {
-          throw new Error("Tavily request was cancelled");
+          throw new RequestCancelledError("Tavily request was cancelled");
         }
         throw new Error(`Tavily request timed out after ${REQUEST_TIMEOUT_MS}ms`);
       }

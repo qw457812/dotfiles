@@ -131,4 +131,70 @@ for (const [name, count, payload, suffix, quoted] of [
   );
 }
 
+// --- cancellation identity -------------------------------------------------
+// Companion guard for the websearch finding: cancellation is recognized by
+// typed identity (RequestCancelledError), never by message text.
+{
+  const activate = (await loadTs("../webfetch/index.ts")).default;
+  const activateTool = (fetchImpl) => {
+    let tool;
+    activate({
+      on() {},
+      registerTool(definition) {
+        tool = definition;
+      },
+      appendEntry() {},
+    });
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = async (url) => fetchImpl(String(url));
+    return {
+      run: (signal) =>
+        tool.execute(
+          "call-1",
+          { url: "https://example.com/x", format: "markdown" },
+          signal,
+          undefined,
+          {},
+        ),
+      restore: () => {
+        globalThis.fetch = originalFetch;
+      },
+    };
+  };
+
+  const cancel = activateTool(() => {
+    throw Object.assign(new Error("The operation was aborted"), { name: "AbortError" });
+  });
+  try {
+    const controller = new AbortController();
+    controller.abort();
+    let err;
+    await cancel.run(controller.signal).catch((e) => (err = e));
+    equal("webfetch cancellation: plain message kept", err?.message, "Request was cancelled");
+    equal("webfetch cancellation: typed identity kept", err?.name, "RequestCancelledError");
+  } finally {
+    cancel.restore();
+  }
+
+  const spoof = activateTool(() => {
+    throw new Error("Request was cancelled");
+  });
+  try {
+    let err;
+    await spoof.run(undefined).catch((e) => (err = e));
+    equal(
+      "webfetch spoof: wrapped, not passed through",
+      err?.message,
+      "Unable to fetch https://example.com/x",
+    );
+    equal(
+      "webfetch spoof: original message kept as cause",
+      err?.cause?.message,
+      "Request was cancelled",
+    );
+  } finally {
+    spoof.restore();
+  }
+}
+
 process.exit(summary("webfetch golden") ? 1 : 0);

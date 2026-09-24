@@ -116,6 +116,16 @@ function buildHeaders(acceptHeader: string, userAgent: string): Record<string, s
   };
 }
 
+/**
+ * User-initiated cancellation.
+ *
+ * Classified by typed identity (`instanceof`), never by message text — the
+ * error wrap must not let foreign errors impersonate a cancellation.
+ */
+export class RequestCancelledError extends Error {
+  override name = "RequestCancelledError";
+}
+
 // ---------------------------------------------------------------------------
 // HTTP fetch with Cloudflare retry (mirrors OpenCode v2)
 //
@@ -216,7 +226,7 @@ async function fetchUrl(
   } catch (err: any) {
     if (err.name === "AbortError") {
       if (signal?.aborted) {
-        throw new Error("Request was cancelled");
+        throw new RequestCancelledError("Request was cancelled");
       }
       throw new Error(`Request timed out after ${timeoutMs / 1000}s`);
     }
@@ -421,8 +431,9 @@ export default function (pi: ExtensionAPI) {
       } catch (err) {
         // v2 error narrowing (367cf5961): everything surfaces as a single
         // message with the cause attached. User cancellations keep their
-        // plain message (pi-native abort semantics).
-        if (err instanceof Error && err.message === "Request was cancelled") throw err;
+        // plain message (pi-native abort semantics), recognized by typed
+        // identity — never by message text.
+        if (err instanceof RequestCancelledError) throw err;
         throw new Error(`Unable to fetch ${params.url}`, {
           cause: err instanceof Error ? err : new Error(String(err)),
         });

@@ -45,6 +45,7 @@ import { tavilyProvider } from "./providers/tavily";
 import {
   HttpCallError,
   PROVIDER_IDS,
+  RequestCancelledError,
   type ProviderID,
   type WebSearchResult,
 } from "./providers/types";
@@ -242,9 +243,11 @@ export default function (pi: ExtensionAPI) {
         );
       } catch (err) {
         // User cancellation bypasses the error wrap (pi abort semantics, like
-        // the webfetch mirror): providers surface aborts as "... was cancelled"
-        // and that plain message must reach the caller unchanged.
-        if (err instanceof Error && err.message.endsWith("was cancelled")) throw err;
+        // the webfetch mirror): the provider's plain cancelled message reaches
+        // the caller unchanged. Classified by typed identity — never by message
+        // text, which can carry server-controlled strings (JSON-RPC errors,
+        // MCP tool error payloads).
+        if (err instanceof RequestCancelledError) throw err;
         throw wrapWebsearchError(err, params.query);
       }
 

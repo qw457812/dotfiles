@@ -18,7 +18,7 @@
 import { Type, type Static } from "typebox";
 import { Value } from "typebox/value";
 
-import { HttpCallError } from "./providers/types";
+import { HttpCallError, RequestCancelledError } from "./providers/types";
 
 /** Error thrown when MCP response JSON doesn't match the expected schema. */
 class McpSchemaError extends Error {
@@ -327,7 +327,7 @@ export async function mcpCall(options: McpCallOptions): Promise<McpCallResult | 
     if (err.name === "AbortError") {
       // Distinguish user cancellation from timeout (mirrors OpenCode's Effect timeoutOrElse)
       if (signal?.aborted) {
-        throw new Error(`MCP request to ${tool} was cancelled`);
+        throw new RequestCancelledError(`MCP request to ${tool} was cancelled`);
       }
       throw new Error(`MCP request to ${tool} timed out after ${timeout}ms`);
     }
