@@ -21,5 +21,6 @@ export default defineConfig({
     "extensions/tools.ts",
     "extensions/tps.ts",
     "extensions/trust-github-repos.ts",
+    "extensions/webfetch/html-markdown.ts",
   ],
 });
