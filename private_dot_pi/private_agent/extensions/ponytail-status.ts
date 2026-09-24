@@ -78,7 +78,18 @@ export default function (pi: ExtensionAPI): void {
       []) as readonly SessionEntry[];
     const mode = resolveSessionMode(entries, configuredDefaultMode);
     const status = mode === "off" ? undefined : ctx.ui.theme.fg("accent", `󱖿 ${mode}`);
-    setTimeout(() => ctx.ui.setStatus(STATUS_KEY, status), 0);
+    // Resolve ui methods synchronously: the deferred timer may fire after the
+    // ctx has gone stale (session replacement / reload / print-mode shutdown),
+    // and accessing `ctx.ui` then throws via assertActive. The raw uiContext
+    // methods stay safe to call.
+    const setStatus = ctx.ui.setStatus.bind(ctx.ui);
+    setTimeout(() => {
+      try {
+        setStatus(STATUS_KEY, status);
+      } catch {
+        // UI status updates are best-effort; never crash the timer
+      }
+    }, 0);
   };
 
   pi.on("session_start", async (_event, ctx) => {
