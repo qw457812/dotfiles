@@ -18,6 +18,8 @@
 import { Type, type Static } from "typebox";
 import { Value } from "typebox/value";
 
+import { HttpCallError } from "./providers/types";
+
 /** Error thrown when MCP response JSON doesn't match the expected schema. */
 class McpSchemaError extends Error {
   override name = "McpSchemaError";
@@ -28,6 +30,12 @@ export interface McpCallResult {
   text: string;
   /** Whether the tool reported an execution error (isError: true). */
   isError: boolean;
+  /**
+   * Raw structuredContent from the MCP result (spec: optional structured
+   * output object). Providers such as Parallel use it instead of text.
+   * Unvalidated here — providers validate their own response shape.
+   */
+  structuredContent?: unknown;
 }
 
 /** Error thrown when the MCP server returns a JSON-RPC level error. */
@@ -82,6 +90,7 @@ const McpResultSchema = Type.Object(
         ),
         isError: Type.Optional(Type.Boolean()),
         // structuredContent and _meta are optional per spec.
+        structuredContent: Type.Optional(Type.Unknown()),
       },
       { additionalProperties: true },
     ),
@@ -151,18 +160,33 @@ function extractText(data: unknown): McpCallResult | undefined {
   // 3. Extract first non-empty text
   for (const item of result.content) {
     if (item.type === "text" && item.text && item.text.length > 0) {
-      return { text: item.text, isError: isToolError };
+      return { text: item.text, isError: isToolError, structuredContent: result.structuredContent };
     }
   }
 
+  // 4. Structured-only response (no content[].text): preserve structuredContent
+  // for providers that parse it (Parallel). Per MCP 2025-06-18, `content` is
+  // required but has no minItems (empty arrays are schema-valid) and
+  // `structuredContent` is optional; servers SHOULD also serialize structured
+  // content as a TextContent block, but structured-only responses remain
+  // schema-valid — dropping them here would silently lose data for responses
+  // the protocol permits.
+  if (result.structuredContent !== undefined && result.structuredContent !== null) {
+    return { text: "", isError: isToolError, structuredContent: result.structuredContent };
+  }
+
   // When isError is true but no text content exists (e.g. only image/audio
-  // blocks or empty array), return a fallback so the caller surfaces the
-  // error to the LLM for self-correction. Returning undefined would cause
-  // the caller to show "No search results found" and set isError=false,
-  // violating MCP spec: "Clients SHOULD provide tool execution errors to
-  // language models to enable self-correction."
+  // blocks, empty array, or a structured-only response), return a fallback so
+  // the caller surfaces the error to the LLM for self-correction. Returning
+  // undefined would cause the caller to show "No search results found" and set
+  // isError=false, violating MCP spec: "Clients SHOULD provide tool execution
+  // errors to language models to enable self-correction."
   if (isToolError) {
-    return { text: "[Tool error: no text content available]", isError: true };
+    return {
+      text: "[Tool error: no text content available]",
+      isError: true,
+      structuredContent: result.structuredContent,
+    };
   }
 
   return undefined;
@@ -229,7 +253,11 @@ interface McpCallOptions {
  * Call a remote MCP endpoint via HTTP POST and return the result.
  *
  * Supports both plain JSON and SSE response formats.
- * Returns undefined when no valid text content is found.
+ * Returns undefined when the result carries neither text content nor
+ * structuredContent. Structured-only responses (content: [] with
+ * structuredContent) return { text: "", structuredContent } — per MCP
+ * 2025-06-18, `content` is required but may be empty, so they are
+ * schema-valid and must not be treated as empty results.
  * Throws on timeout, user cancellation, network error, JSON-RPC protocol error,
  * or schema mismatch.
  *
@@ -286,8 +314,10 @@ export async function mcpCall(options: McpCallOptions): Promise<McpCallResult | 
       // error message visible to the LLM — it may contain sensitive data.
       const body = await response.text();
       console.error(`[mcp] ${tool} HTTP ${response.status}: ${body.slice(0, 500)}`);
-      throw new Error(
+      throw new HttpCallError(
         `MCP request to ${tool} failed: HTTP ${response.status} ${response.statusText}`,
+        response.status,
+        response.headers.get("retry-after") ?? undefined,
       );
     }
 

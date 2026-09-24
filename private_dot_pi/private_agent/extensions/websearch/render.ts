@@ -16,15 +16,16 @@ import {
   type TruncationResult,
 } from "@earendil-works/pi-coding-agent";
 import { Container, Text, truncateToWidth } from "@earendil-works/pi-tui";
-import type { WebSearchProvider } from "./providers/types";
+import type { ProviderID } from "./providers/types";
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
 export interface WebsearchDetails {
-  provider: WebSearchProvider;
-  isError?: boolean;
+  provider: ProviderID;
+  /** Providers attempted (1 unless failover happened). */
+  attempts?: number;
   truncation?: TruncationResult;
   fullOutputPath?: string;
 }
@@ -38,16 +39,17 @@ export interface WebsearchRenderState {
 
 interface WebsearchCallArgs {
   query: string;
-  numResults?: number;
 }
 
 // ---------------------------------------------------------------------------
 // Provider labels
 // ---------------------------------------------------------------------------
 
-export function providerLabel(provider: WebSearchProvider): string {
+export function providerLabel(provider: ProviderID): string {
   if (provider === "parallel") return "Parallel";
   if (provider === "exa") return "Exa";
+  if (provider === "tavily") return "Tavily";
+  if (provider === "firecrawl") return "Firecrawl";
   return "Web";
 }
 
@@ -65,7 +67,7 @@ function formatDuration(ms: number): string {
 
 export function formatWebsearchCall(
   args: WebsearchCallArgs | undefined,
-  provider: WebSearchProvider | undefined,
+  provider: ProviderID | undefined,
   theme: any,
 ): string {
   const invalidArg = theme.fg("error", "[invalid arg]");
@@ -73,15 +75,6 @@ export function formatWebsearchCall(
   text += args?.query ? theme.fg("accent", `"${args.query}"`) : invalidArg;
   if (provider) {
     text += theme.fg("muted", ` [${providerLabel(provider)}]`);
-  }
-  // Show non-default parameters (mirrors read's offset/limit, grep's glob/limit)
-  const extras: string[] = [];
-  if (args?.numResults !== undefined && args.numResults !== 8) {
-    extras.push(`${args.numResults} results`);
-  }
-
-  if (extras.length > 0) {
-    text += theme.fg("dim", ` (${extras.join(", ")})`);
   }
   return text;
 }
@@ -129,6 +122,9 @@ export function rebuildWebsearchResultRenderComponent(
 
   if (options.isPartial) {
     let text = theme.fg("warning", "Searching...");
+    if (details) {
+      text = theme.fg("warning", `Searching via ${providerLabel(details.provider)}...`);
+    }
     if (state.startedAt !== undefined) {
       const elapsed = Date.now() - state.startedAt;
       text += theme.fg("muted", ` (Elapsed ${formatDuration(elapsed)})`);
@@ -163,13 +159,10 @@ export function rebuildWebsearchResultRenderComponent(
     return;
   }
 
-  let statusText = "";
-  if (details.isError) {
-    // Tool execution error (MCP isError: true) — distinct from protocol error
-    statusText = theme.fg("warning", `⚠ ${label}`);
-    statusText += theme.fg("dim", " (provider error)");
-  } else {
-    statusText = theme.fg("success", `✓ ${label}`);
+  let statusText = theme.fg("success", `✓ ${label}`);
+  // Failover happened when more than one provider was attempted.
+  if (details.attempts && details.attempts > 1) {
+    statusText += theme.fg("muted", ` (after ${details.attempts} providers)`);
   }
   if (details.truncation?.truncated) {
     statusText += theme.fg("warning", " (truncated)");

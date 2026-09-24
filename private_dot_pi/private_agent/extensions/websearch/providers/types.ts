@@ -1,16 +1,58 @@
 /**
  * Shared types for websearch providers.
+ *
+ * Mirrors OpenCode v2's WebSearch schema (packages/schema/src/websearch.ts):
+ * every provider parses its response into structured WebSearchResult objects.
  */
 
-export type WebSearchProvider = "exa" | "parallel";
+export type ProviderID = "exa" | "parallel" | "firecrawl" | "tavily";
 
-export interface WebSearchParams {
+export interface WebSearchResult {
+  url: string;
+  title?: string;
+  content?: string;
+  /** Publication time in milliseconds since the Unix epoch. */
+  published?: number;
+}
+
+/**
+ * HTTP layer error carrying the response status.
+ *
+ * The selection layer checks `status === 429` (plus Retry-After) to drive
+ * cooldown and failover, mirroring OpenCode v2's HttpClientError handling.
+ */
+export class HttpCallError extends Error {
+  override name = "HttpCallError";
+  readonly status: number;
+  /** Raw Retry-After header value: seconds or HTTP-date. */
+  readonly retryAfter: string | undefined;
+
+  constructor(message: string, status: number, retryAfter?: string) {
+    super(message);
+    this.status = status;
+    this.retryAfter = retryAfter;
+  }
+}
+
+export interface WebSearchInput {
   query: string;
-  numResults?: number;
 }
 
 export interface ProviderCallContext {
-  sessionID: string;
-  modelName?: string;
   signal?: AbortSignal;
 }
+
+export interface WebSearchProvider {
+  id: ProviderID;
+  label: string;
+  /**
+   * Env var holding the provider's API key. When unset, the provider is
+   * excluded from random routing (its keyless tier is unusable) but can
+   * still be forced via PI_WEBSEARCH_PROVIDER.
+   */
+  requiresApiKey?: string;
+  execute(input: WebSearchInput, ctx: ProviderCallContext): Promise<WebSearchResult[]>;
+}
+
+/** All provider ids, in registration order. Also validates env overrides. */
+export const PROVIDER_IDS: readonly ProviderID[] = ["exa", "parallel", "firecrawl", "tavily"];
