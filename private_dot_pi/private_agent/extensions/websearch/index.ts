@@ -22,7 +22,7 @@
  *   EXA_API_KEY           — Exa API key (optional; unlocks higher rate limits)
  *   PARALLEL_API_KEY      — Parallel API key (optional)
  *   FIRECRAWL_API_KEY     — Firecrawl API key (optional)
- *   TAVILY_API_KEY        — Tavily API key (effectively required; no keyless results)
+ *   TAVILY_API_KEY        — Tavily API key (optional; the keyless tier is flaky)
  */
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
@@ -119,11 +119,11 @@ function wrapWebsearchError(err: unknown, query: string): Error {
     if (err.status === 401) {
       return new Error("Web search authentication failed (HTTP 401)", { cause: err });
     }
-    return new Error(`Unable to search the web for "${query}" (HTTP ${err.status})`, {
+    return new Error(`Web search request failed (HTTP ${err.status})`, {
       cause: err,
     });
   }
-  return new Error(`WebSearch failed: ${err instanceof Error ? err.message : String(err)}`, {
+  return new Error(`Unable to search the web for ${query}`, {
     cause: err instanceof Error ? err : undefined,
   });
 }
@@ -241,6 +241,10 @@ export default function (pi: ExtensionAPI) {
           },
         );
       } catch (err) {
+        // User cancellation bypasses the error wrap (pi abort semantics, like
+        // the webfetch mirror): providers surface aborts as "... was cancelled"
+        // and that plain message must reach the caller unchanged.
+        if (err instanceof Error && err.message.endsWith("was cancelled")) throw err;
         throw wrapWebsearchError(err, params.query);
       }
 

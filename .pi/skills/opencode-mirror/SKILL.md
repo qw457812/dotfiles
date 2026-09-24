@@ -54,7 +54,7 @@ The pi `websearch` and `webfetch` extensions each mirror one version of OpenCode
 | Error mapping: 429 / 401 / generic | tool `ToolFailure` | `index.ts` wrapWebsearchError over `HttpCallError` |
 | Response shape tolerance | per-provider Effect schemas (strict) | `mcp-client.ts` extractText + per-provider runtime checks (looser, ledgered) |
 
-Smoke checks: jiti-load a provider and execute with env manipulation (`env -u TAVILY_API_KEY`, `env -u PARALLEL_API_KEY`). Known outcomes: keyless Parallel returns ~10 results; keyless Tavily answers HTTP 503 — its exclusion from random routing (requiresApiKey) is a ledger entry, not a bug to fix. E2E asserts on the session jsonl: a `websearch.selection` custom entry exists, `details.provider` matches, result content is `## [title](url)` markdown; resume stickiness: rerun twice with `--session <file>`, provider stays fixed and the selection entry gains no duplicates.
+Smoke checks: jiti-load a provider and execute with env manipulation (`env -u TAVILY_API_KEY`, `env -u PARALLEL_API_KEY`). Known outcomes (2026-09-24): keyless Parallel returns ~10 results, keyless Tavily 8 — its keyless tier flaps (long HTTP 503 stretches); all providers join random routing regardless of credentials (`requiresApiKey` was removed 2026-09-24 to restore v2 registration). E2E asserts on the session jsonl: a `websearch.selection` custom entry exists, `details.provider` matches, result content is `## [title](url)` markdown; resume stickiness: rerun twice with `--session <file>`, provider stays fixed and the selection entry gains no duplicates.
 
 ## webfetch mirror (reference)
 

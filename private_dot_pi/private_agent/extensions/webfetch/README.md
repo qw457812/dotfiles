@@ -1,6 +1,6 @@
 # Pi WebFetch Extension
 
-Adds a `webfetch` tool to [pi](https://pi.dev) that fetches content from URLs and converts it to markdown, text, or HTML format. Mirrors OpenCode **v2**'s webfetch implementation ([anomalyco/opencode](https://github.com/anomalyco/opencode/tree/9c8a63e852722a9bced4a0de1179de58a85dfa20), `v2` branch, 2026-09-23).
+Adds a `webfetch` tool to [pi](https://pi.dev) that fetches content from URLs and converts it to markdown, text, or HTML format. Mirrors OpenCode **v2**'s webfetch implementation ([anomalyco/opencode](https://github.com/anomalyco/opencode/tree/808588e9b9c1e5c960bd4dcdcd0d0b2c1056ecc5), `v2` branch, 2026-09-24).
 
 ## How It Works
 
@@ -61,6 +61,8 @@ webfetch/
 └── README.md
 ```
 
+Golden checks (no model calls, assertions ported from upstream `test/tool-webfetch.test.ts` and `test/tool-html-markdown-budget.test.ts`): `node private_dot_pi/private_agent/extensions/tests/webfetch-golden.mjs`.
+
 ## Differences from OpenCode v2's WebFetch
 
 - **Images kept** — v2 removed image delivery (`Unsupported fetched image content type`); this extension returns non-SVG images as pi-native `{ type: "image" }` content (base64 + mimeType), SVG as text
@@ -74,6 +76,5 @@ webfetch/
 
 ## Drift Notes
 
-- dev line since `5fb85a6a` (the previous pin): only `2d2f587bf` (nullable format schema fix — TypeBox optional-with-default never had that bug)
-- v2 commits behind this mirror: `90fd61225` (renderer swap), `0762d63b6` (OpenCode-User UA), `367cf5961` (error narrowing), plus schema/description cleanups
-- Direction signal (unmerged): `web-fetch` branch moves fetch into a policy-bound codemode Web extension — the fetch layer may be replaced wholesale next sync
+- Synced to `808588e9b` (2026-09-24): zero drift on `origin/v2` for the mirrored axes since the previous pin; `html-markdown.ts` verified byte-identical to upstream
+- Direction signals (unmerged, noted only): `web-fetch` moves fetch into a policy-bound codemode Web extension — the fetch layer may be replaced wholesale next sync; `lazy-webfetch` defers HTML parsing

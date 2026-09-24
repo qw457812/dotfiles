@@ -113,16 +113,6 @@ export function createWebSearchService(providers: WebSearchProvider[]): WebSearc
   /** HTTP 429 cooldowns, pruned when expired (mirrors v2). */
   const cooldowns = new Map<ProviderID, { until: number; error: HttpCallError }>();
 
-  /**
-   * Random-routing candidates: providers whose required API key env is set
-   * (when declared). Keyless-unusable providers (Tavily without a key) are
-   * excluded so random picks never wedge a session on a failing provider;
-   * forced PI_WEBSEARCH_PROVIDER selection bypasses this filter.
-   */
-  function isRandomCandidate(provider: WebSearchProvider): boolean {
-    return !provider.requiresApiKey || Boolean(process.env[provider.requiresApiKey]);
-  }
-
   function randomProvider(
     now: number,
     affinity: { provider?: ProviderID },
@@ -132,17 +122,8 @@ export function createWebSearchService(providers: WebSearchProvider[]): WebSearc
       if (cooldown.until <= now || !registry.has(id)) cooldowns.delete(id);
     }
     const current = affinity.provider !== undefined ? registry.get(affinity.provider) : undefined;
-    if (
-      current &&
-      isRandomCandidate(current) &&
-      !cooldowns.has(current.id) &&
-      !attempted?.has(current.id)
-    ) {
-      return current;
-    }
-    const available = providers.filter(
-      (p) => isRandomCandidate(p) && !cooldowns.has(p.id) && !attempted?.has(p.id),
-    );
+    if (current && !cooldowns.has(current.id) && !attempted?.has(current.id)) return current;
+    const available = providers.filter((p) => !cooldowns.has(p.id) && !attempted?.has(p.id));
     const provider = available[Math.floor(Math.random() * available.length)];
     if (provider) affinity.provider = provider.id;
     return provider;
@@ -179,9 +160,14 @@ export function createWebSearchService(providers: WebSearchProvider[]): WebSearc
     const initialPrevious = affinity.provider;
     let provider = randomProvider(Date.now(), affinity);
     if (!provider) {
-      throw new Error(
-        "No available websearch provider (all cooling down after rate limits or missing API keys)",
-      );
+      // v2 parity: when every provider is cooling down, surface the cached
+      // rate limit (v2 falls back to a registered provider and returns its
+      // `cooldown.error` from the same situation), so the tool wraps it as
+      // "Web search rate limited (HTTP 429)" — including queries that start
+      // while everything is still cooling down.
+      const cooling = cooldowns.values().next().value;
+      if (cooling) throw cooling.error;
+      throw new Error("No websearch provider available");
     }
     // Only notify when the pick actually changed the affinity (initial pick,
     // not a restored/sticky hit — avoids duplicate session entries).

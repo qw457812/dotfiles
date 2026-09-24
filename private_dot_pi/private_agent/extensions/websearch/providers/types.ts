@@ -45,12 +45,6 @@ export interface ProviderCallContext {
 export interface WebSearchProvider {
   id: ProviderID;
   label: string;
-  /**
-   * Env var holding the provider's API key. When unset, the provider is
-   * excluded from random routing (its keyless tier is unusable) but can
-   * still be forced via PI_WEBSEARCH_PROVIDER.
-   */
-  requiresApiKey?: string;
   execute(input: WebSearchInput, ctx: ProviderCallContext): Promise<WebSearchResult[]>;
 }
 

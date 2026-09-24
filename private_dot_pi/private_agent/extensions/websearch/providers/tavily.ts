@@ -2,9 +2,9 @@
  * Tavily search provider — calls the Tavily REST search endpoint.
  *
  * Endpoint: POST https://api.tavily.com/search
- * Auth: Bearer token via TAVILY_API_KEY env var. Unlike the other providers,
- * Tavily has no keyless mode that returns results (mirrors OpenCode v2:
- * a missing key sends X-Tavily-Access-Mode: keyless instead of authorization).
+ * Auth: Bearer token via TAVILY_API_KEY env var; without a key the request
+ * sends X-Tavily-Access-Mode: keyless (mirrors OpenCode v2 — the keyless
+ * tier is flaky, see README).
  * Tool: plain REST JSON (not MCP).
  *
  * Mirrors OpenCode v2's packages/core/src/plugin/websearch/tavily.ts:
@@ -37,11 +37,6 @@ interface TavilySearchResponse {
 export const tavilyProvider: WebSearchProvider = {
   id: "tavily",
   label: "Tavily",
-  // Tavily's keyless tier currently answers HTTP 503 ("temporarily
-  // unavailable"), so without a key it must not join random routing —
-  // a random pick would wedge the session on a failing provider because
-  // only 429 triggers cooldown/failover (v2 semantics).
-  requiresApiKey: "TAVILY_API_KEY",
   async execute(input: WebSearchInput, ctx: ProviderCallContext): Promise<WebSearchResult[]> {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",

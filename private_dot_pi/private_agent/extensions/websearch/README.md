@@ -1,12 +1,11 @@
 # Pi WebSearch Extension
 
-Adds a `websearch` tool to [pi](https://pi.dev) that searches the internet via four remote providers (Exa, Firecrawl, Parallel, Tavily), mirroring OpenCode **v2**'s websearch architecture ([anomalyco/opencode](https://github.com/anomalyco/opencode/tree/9c8a63e852722a9bced4a0de1179de58a85dfa20), `v2` branch, 2026-09-23).
+Adds a `websearch` tool to [pi](https://pi.dev) that searches the internet via four remote providers (Exa, Firecrawl, Parallel, Tavily), mirroring OpenCode **v2**'s websearch architecture ([anomalyco/opencode](https://github.com/anomalyco/opencode/tree/808588e9b9c1e5c960bd4dcdcd0d0b2c1056ecc5), `v2` branch, 2026-09-24).
 
 ## Setup
 
 ```bash
 # Optional — each provider works without a key where its free tier allows
-# (Tavily effectively requires a key; see table below)
 export EXA_API_KEY=exa-...           # https://exa.ai
 export PARALLEL_API_KEY=...          # https://parallel.ai
 export FIRECRAWL_API_KEY=fc-...      # https://firecrawl.dev
@@ -17,14 +16,14 @@ Then start pi — the `websearch` tool is automatically available.
 
 ## Providers
 
-| Provider  | Endpoint                               | Auth (env)          | Keyless |
-| --------- | -------------------------------------- | ------------------- | ------- |
-| Exa       | `https://mcp.exa.ai/mcp`               | `EXA_API_KEY`       | yes     |
-| Parallel  | `https://search.parallel.ai/mcp`       | `PARALLEL_API_KEY`  | yes     |
-| Firecrawl | `https://mcp.firecrawl.dev/v2/mcp`     | `FIRECRAWL_API_KEY` | yes     |
-| Tavily    | `https://api.tavily.com/search` (REST) | `TAVILY_API_KEY`    | no      |
+| Provider  | Endpoint                               | Auth (env)          | Keyless     |
+| --------- | -------------------------------------- | ------------------- | ----------- |
+| Exa       | `https://mcp.exa.ai/mcp`               | `EXA_API_KEY`       | yes         |
+| Parallel  | `https://search.parallel.ai/mcp`       | `PARALLEL_API_KEY`  | yes         |
+| Firecrawl | `https://mcp.firecrawl.dev/v2/mcp`     | `FIRECRAWL_API_KEY` | yes         |
+| Tavily    | `https://api.tavily.com/search` (REST) | `TAVILY_API_KEY`    | yes (flaky) |
 
-Exa, Parallel, and Firecrawl go through MCP-over-HTTP; Tavily is a plain REST endpoint. Tavily is **excluded from random routing when `TAVILY_API_KEY` is unset** — its keyless tier currently answers HTTP 503, and a random pick would wedge a session on a failing provider (only 429 triggers cooldown/failover). Forcing `PI_WEBSEARCH_PROVIDER=tavily` still attempts it.
+Exa, Parallel, and Firecrawl go through MCP-over-HTTP; Tavily is a plain REST endpoint. All four join random routing regardless of credentials, exactly like v2. Inherited caveat: only 429 triggers cooldown/failover, so a session whose sticky pick fails some other way — e.g. Tavily's flaky keyless tier answering HTTP 503 — fails its searches until the provider recovers; force another provider with `PI_WEBSEARCH_PROVIDER` to sidestep it.
 
 Every provider parses its response into structured results (`url` / `title` / `content` / `published`), which the tool formats as markdown for the LLM:
 
@@ -46,7 +45,7 @@ Mirrors OpenCode v2's selection model:
 
 **Random routing** (default): each session sticks to one provider until it is rate limited. HTTP 429 puts the provider on a cooldown sized by its `Retry-After` header (seconds or HTTP date, fallback 60s), and the query fails over to another available provider. When every provider is cooling down, the call fails with `Web search rate limited (HTTP 429)`.
 
-**Forced selection**: no failover; errors (including 429) surface directly — e.g. a keyless Tavily call fails with HTTP 503 ("Keyless Tavily is temporarily unavailable").
+**Forced selection**: no failover; errors (including 429) surface directly — an HTTP failure surfaces as `Web search request failed (HTTP N)`, a 429 as `Web search rate limited (HTTP 429)`.
 
 Stickiness is session-scoped and persisted through pi's native custom session entries (`websearch.selection`), so `pi --resume` keeps the same provider. It is **not** persisted across sessions — OpenCode v2 additionally persists a global choice via SQLite KV written by its consent dialog; this extension intentionally has no consent flow and no state file.
 
@@ -87,6 +86,8 @@ websearch/
 No local MCP server processes. All calls go to remote endpoints via HTTPS.
 No consent dialog, no KV store, no state file — selection is env + memory.
 
+Golden checks (no model calls, assertions ported from upstream `test/websearch.test.ts` and `test/tool-websearch.test.ts`): `node private_dot_pi/private_agent/extensions/tests/websearch-golden.mjs`.
+
 ## Differences from OpenCode v2's WebSearch
 
 - **No consent flow** — OpenCode asks on first use and persists the choice (KV `websearch:provider`, value `false` disables the tool entirely); this extension never prompts, and disabling just means not loading it
@@ -94,13 +95,19 @@ No consent dialog, no KV store, no state file — selection is env + memory.
 - **Session entries exceed v2** — per-session stickiness persists via pi's `CustomEntry` (`websearch.selection`), surviving `--resume`; v2 keeps affinity in memory only
 - **No Effect framework** — plain async/await + TypeBox instead of Effect Schema + Layer
 - **Extra provider attempts are not retried on non-429 errors** — same as v2: only rate limits fail over
+- **User cancellation bypasses the error wrap** — like the webfetch mirror, genuine user aborts keep their plain `... was cancelled` provider message instead of v2's blanket `Unable to search the web for <query>` narrowing (pi abort semantics)
 - **User-Agent** — parallel/tavily/firecrawl send `pi/${VERSION}` instead of OpenCode's app useragent
 - **Env var prefix** — `PI_WEBSEARCH_PROVIDER` instead of `opencode.jsonc`'s `websearch.provider`
 - **MCP client** — TypeBox schema validation + AbortController timeout instead of Effect Schema + `Effect.timeoutOrElse`
 - **Truncation notices** — pi's bash-tool bracket format (`[Showing lines X-Y ...]`) instead of OpenCode's `... N lines truncated; full content saved to ...` marker; both use 2000 lines / 50 KB
 - **No TinyFish provider** — v2 ships it (`agent.tinyfish.ai/mcp`) but its docs omit it, it exists on only one of the two release lines, and it depends on JSON hidden inside MCP text content; revisit if it stabilizes
-- **Credential-aware random candidates** — v2 registers all providers regardless of credentials; this extension excludes keyless-unusable providers (Tavily without `TAVILY_API_KEY`) from random routing, because its 503 endpoint cannot trigger the 429-only failover and there is no consent flow to gate it earlier
 - **Tool description wording** — v2 says "Search the web using the user's selected search integration" (accurate for its consent/KV selection and integrations UI); this extension has no user-facing selection, so the first sentence is just "Search the web"
+
+## Drift Notes
+
+- Synced to `808588e9b` (2026-09-24): zero drift on `origin/v2` for the mirrored axes since the previous pin — nothing to port
+- Direction signals (unmerged, noted only): `websearch-auto` (automatic web search routing), `websearch-limits` (shared and non-fatal web search limits), `websearch-consent-service` (consent prompt dedupe), `direct-websearch` (call the web search service directly)
+- 2026-09-24 live smoke: keyless Tavily answered successfully (8 results) instead of the historical HTTP 503 → user decision same day: `requiresApiKey` removed and all providers rejoin random routing regardless of credentials (v2 registration restored, ledger entry dropped); the inherited wedge-on-non-429 caveat stays as parity (see Providers above)
 
 ## Differences from the previous version of this extension
 
