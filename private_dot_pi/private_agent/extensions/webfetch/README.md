@@ -22,7 +22,7 @@ Adds a `webfetch` tool to [pi](https://pi.dev) that fetches content from URLs an
 cd private_dot_pi/private_agent/extensions/webfetch && npm install
 ```
 
-(one dependency: `htmlparser2` — same as upstream)
+(`htmlparser2` is the runtime dependency; test dependencies are dev-only.)
 
 ## Tool Parameters
 
@@ -57,11 +57,12 @@ webfetch/
 ├── html-markdown.ts  # v2's htmlparser2 markdown renderer, ported verbatim (excluded from oxfmt
 │                     #   so drift diffs stay byte-comparable)
 ├── render.ts         # Custom TUI rendering
-├── package.json      # htmlparser2 only
+├── package.json      # runtime and test dependencies
+├── tests/            # Vitest golden checks
 └── README.md
 ```
 
-Golden checks (no model calls, assertions ported from upstream `test/tool-webfetch.test.ts` and `test/tool-html-markdown-budget.test.ts`): `npm --prefix private_dot_pi/private_agent test -- webfetch`.
+Golden checks (no model calls, assertions ported from upstream `test/tool-webfetch.test.ts` and `test/tool-html-markdown-budget.test.ts`): `npm --prefix private_dot_pi/private_agent/extensions/webfetch test`.
 
 ## Differences from OpenCode v2's WebFetch
 

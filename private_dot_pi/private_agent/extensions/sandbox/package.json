@@ -6,7 +6,8 @@
 	"scripts": {
 		"clean": "echo 'nothing to clean'",
 		"build": "echo 'nothing to build'",
-		"check": "node ./test-excluded-commands.mjs && node ./test-just-bash-ops.mjs && node ./test-config.mjs"
+		"check": "echo 'nothing to check'",
+		"test": "vitest --run"
 	},
 	"pi": {
 		"extensions": [
@@ -19,7 +20,11 @@
 		"tree-sitter-bash": "0.25.0",
 		"web-tree-sitter": "0.25.10"
 	},
+	"peerDependencies": {
+		"@earendil-works/pi-coding-agent": "*"
+	},
 	"devDependencies": {
-		"jiti": "^2.7.0"
+		"@earendil-works/pi-coding-agent": "0.87.1",
+		"vitest": "^4.1.9"
 	}
 }

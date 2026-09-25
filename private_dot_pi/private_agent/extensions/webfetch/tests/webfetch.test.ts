@@ -3,11 +3,11 @@
 // tool-html-markdown-budget.test.ts (conversions, inline-code boundaries,
 // byte-budget edge cases) onto the mirror's plain-function architecture.
 //
-// Run: npm --prefix private_dot_pi/private_agent test -- webfetch
+// Run: npm --prefix private_dot_pi/private_agent/extensions/webfetch test
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { convertHTMLToMarkdown, MAX_MARKDOWN_BYTES } from "../extensions/webfetch/html-markdown";
-import webfetch, { extractTextFromHTML, RequestCancelledError } from "../extensions/webfetch/index";
+import { convertHTMLToMarkdown, MAX_MARKDOWN_BYTES } from "../html-markdown";
+import webfetch, { extractTextFromHTML, RequestCancelledError } from "../index";
 
 /** Await a promise that must reject, and return the rejection value. */
 async function captureError(promise: Promise<unknown>): Promise<any> {
