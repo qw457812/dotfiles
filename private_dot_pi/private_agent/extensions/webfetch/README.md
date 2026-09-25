@@ -61,7 +61,7 @@ webfetch/
 └── README.md
 ```
 
-Golden checks (no model calls, assertions ported from upstream `test/tool-webfetch.test.ts` and `test/tool-html-markdown-budget.test.ts`): `node private_dot_pi/private_agent/extensions/tests/webfetch-golden.mjs`.
+Golden checks (no model calls, assertions ported from upstream `test/tool-webfetch.test.ts` and `test/tool-html-markdown-budget.test.ts`): `npm --prefix private_dot_pi/private_agent test -- webfetch`.
 
 ## Differences from OpenCode v2's WebFetch
 

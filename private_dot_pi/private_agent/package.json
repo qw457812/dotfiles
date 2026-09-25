@@ -5,7 +5,8 @@
   "scripts": {
     "check": "tsc --noEmit",
     "lint": "oxlint .",
-    "format": "oxfmt ."
+    "format": "oxfmt .",
+    "test": "vitest --run"
   },
   "devDependencies": {
     "@earendil-works/pi-agent-core": "0.87.1",
@@ -17,6 +18,7 @@
     "oxlint": "^1.62.0",
     "pi-vim": "0.14.2",
     "typebox": "^1.1.24",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
   }
 }

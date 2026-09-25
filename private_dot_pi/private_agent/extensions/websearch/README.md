@@ -86,7 +86,7 @@ websearch/
 No local MCP server processes. All calls go to remote endpoints via HTTPS.
 No consent dialog, no KV store, no state file — selection is env + memory.
 
-Golden checks (no model calls, assertions ported from upstream `test/websearch.test.ts` and `test/tool-websearch.test.ts`): `node private_dot_pi/private_agent/extensions/tests/websearch-golden.mjs`.
+Golden checks (no model calls, assertions ported from upstream `test/websearch.test.ts` and `test/tool-websearch.test.ts`): `npm --prefix private_dot_pi/private_agent test -- websearch`.
 
 ## Differences from OpenCode v2's WebSearch
 
