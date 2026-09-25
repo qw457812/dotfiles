@@ -1,6 +1,17 @@
 ---@type LazySpec
 return {
   {
+    "nvim-neotest/neotest",
+    optional = true,
+    dependencies = { "marilari88/neotest-vitest" },
+    opts = {
+      adapters = {
+        ["neotest-vitest"] = {},
+      },
+    },
+  },
+
+  {
     "nvim-mini/mini.test",
     lazy = true,
     specs = {
