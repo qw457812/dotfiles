@@ -55,6 +55,13 @@ return {
       { "<leader>anI", "<cmd>CodeCompanion<CR>", desc = "Inline", mode = { "n", "x" } },
       { "<leader>ana", "<cmd>CodeCompanionActions<CR>", desc = "Actions", mode = { "n", "x" } },
       { "<leader>anr", "<cmd>CodeCompanionCodeReview<CR>", desc = "Code Review" },
+      {
+        "<leader>anh",
+        function()
+          require("codecompanion").sessions()
+        end,
+        desc = "Chat Sessions",
+      },
       { "<leader>ann", "<cmd>CodeCompanionChat<CR>", desc = "New Chat", mode = { "n", "x" } },
       {
         "<leader>anc",
@@ -139,6 +146,16 @@ return {
       interactions = {
         chat = {
           adapter = vim.fn.executable("claude-agent-acp") == 1 and "claude_code" or "copilot",
+          sessions = {
+            autosave = true,
+          },
+          slash_commands = {
+            fork = {
+              opts = {
+                auto_save_session = true,
+              },
+            },
+          },
           roles = {
             ---@param adapter CodeCompanion.HTTPAdapter|CodeCompanion.ACPAdapter
             ---@return string
@@ -161,8 +178,8 @@ return {
             clear                  = { modes = { n = "<localleader>c" } },
             codeblock              = { modes = { n = "<localleader>`" } },
             yank_code              = { modes = { n = "<localleader>y" } },
-            buffer_sync_all        = { modes = { n = "<localleader>ba" } },
-            buffer_sync_diff       = { modes = { n = "<localleader>bd" } },
+            sync_all               = { modes = { n = "<localleader>ba" } },
+            sync_diff              = { modes = { n = "<localleader>bd" } },
             next_chat              = { modes = { n = "<localleader>j" } },
             previous_chat          = { modes = { n = "<localleader>k" } },
             change_adapter         = { modes = { n = "<localleader>m" } },
@@ -187,6 +204,18 @@ return {
             next_hunk = { modes = { n = "]h" } },
             previous_hunk = { modes = { n = "[h" } },
           },
+        },
+      },
+      skills = {
+        dirs = {
+          "~/.config/codecompanion/skills",
+          ".codecompanion/skills",
+          "~/.agents/skills",
+          ".agents/skills",
+          "~/.claude/skills",
+          ".claude/skills",
+          "~/.pi/agent/skills",
+          ".pi/skills",
         },
       },
       display = {
@@ -283,51 +312,6 @@ return {
         end),
       })
     end,
-  },
-
-  -- history
-  {
-    "olimorris/codecompanion.nvim",
-    dependencies = "ravitemer/codecompanion-history.nvim",
-    optional = true,
-    keys = {
-      { "<leader>anh", "<cmd>CodeCompanionHistory<CR>", desc = "History" },
-    },
-    opts = {
-      extensions = {
-        history = {
-          ---@module "codecompanion._extensions.history"
-          ---@type CodeCompanion.History.Opts
-          opts = {
-            keymap = "<localleader>h",
-            save_chat_keymap = { n = {}, i = {} }, -- disable since auto_save is enabled (by default), "<Nop>" works too
-            expiration_days = 30,
-            picker_keymaps = {
-              rename = { n = "<localleader>r" },
-              delete = { n = "<localleader>d" },
-              duplicate = { n = "<localleader>y", i = "<M-y>" },
-            },
-            auto_generate_title = false, -- buggy
-            title_generation_opts = {
-              adapter = "copilot",
-            },
-            -- disable summary
-            summary = {
-              create_summary_keymap = { n = {} },
-              browse_summaries_keymap = { n = {} },
-              generation_opts = {
-                adapter = "copilot",
-              },
-            },
-            -- disable memory
-            ---@diagnostic disable-next-line: missing-fields
-            memory = {
-              auto_create_memories_on_summary_generation = false,
-            },
-          },
-        },
-      },
-    },
   },
 
   -- status
