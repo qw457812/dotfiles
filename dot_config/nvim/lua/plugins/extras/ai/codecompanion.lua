@@ -52,7 +52,7 @@ return {
         end,
         desc = "Floating",
       },
-      { "<leader>anI", "<cmd>CodeCompanion<CR>", desc = "Inline", mode = { "n", "x" } },
+      { "<leader>ani", "<cmd>CodeCompanion<CR>", desc = "Inline", mode = { "n", "x" } },
       { "<leader>ana", "<cmd>CodeCompanionActions<CR>", desc = "Actions", mode = { "n", "x" } },
       { "<leader>anr", "<cmd>CodeCompanionCodeReview<CR>", desc = "Code Review" },
       {
@@ -69,7 +69,7 @@ return {
         desc = "Claude Code ACP",
         mode = { "n", "x" },
       },
-      { "<leader>ani", "<cmd>CodeCompanionChat adapter=pi<CR>", desc = "Pi ACP", mode = { "n", "x" } },
+      { "<leader>anp", "<cmd>CodeCompanionChat adapter=pi<CR>", desc = "Pi ACP", mode = { "n", "x" } },
       { "<leader>anw", "<cmd>CodeCompanionChat adapter=neuralwatt<CR>", desc = "Neuralwatt", mode = { "n", "x" } },
     },
     opts = {
@@ -133,6 +133,10 @@ return {
               defaults = {
                 mcpServers = {},
                 timeout = 20000,
+                session_config_options = {
+                  model = "openai-codex/gpt-6-luna",
+                  thought_level = "max",
+                },
               },
               parameters = {
                 protocolVersion = 1,
@@ -215,11 +219,33 @@ return {
           keymaps = {
             view_diff = { modes = { n = "<localleader>d" } },
             always_accept = { modes = { n = "<localleader>A" } },
-            accept_change = { modes = { n = "<localleader>a" } },
-            reject_change = { modes = { n = "<localleader>x" } },
-            cancel = { modes = { n = "<C-c>" } },
+            accept_change = { modes = { n = "<CR>" } },
+            reject_change = { modes = { n = "<C-C>" } },
+            cancel = { modes = { n = "<localleader>x" } },
             next_hunk = { modes = { n = "]h" } },
             previous_hunk = { modes = { n = "[h" } },
+          },
+        },
+      },
+      rules = {
+        pi = {
+          description = "Pi's context files not covered by the default group",
+          files = {
+            "~/.pi/agent/AGENTS.md",
+            "~/.pi/agent/AGENTS.override.md",
+            "~/.pi/agent/AGENTS.local.md",
+            "AGENTS.override.md",
+            "AGENTS.local.md",
+          },
+        },
+        opts = {
+          chat = {
+            autoload = { "default", "pi" },
+            ---@param chat CodeCompanion.Chat
+            ---@return boolean
+            enabled = function(chat)
+              return chat.adapter ~= nil and chat.adapter.type ~= "acp"
+            end,
           },
         },
       },
@@ -250,7 +276,7 @@ return {
         },
       },
       opts = {
-        -- language = "Chinese",
+        language = "Chinese",
       },
     },
   },
@@ -288,7 +314,7 @@ return {
             group = vim.api.nvim_create_augroup("codecompanion_keymaps_" .. buf, { clear = true }),
             buffer = buf,
             callback = function()
-              -- for i_<C-c>
+              -- for i_<C-C>
               vim.cmd("stopinsert")
             end,
           })
@@ -303,6 +329,54 @@ return {
         end,
       })
 
+      -- Approval prompts overwrite and delete their buffer-local mappings.
+      -- Save <CR>/<C-C> before that happens and restore their original mappings afterward.
+      local approval_maps = {}
+      local approval_group = vim.api.nvim_create_augroup("codecompanion_approval_keymaps", { clear = true })
+      vim.api.nvim_create_autocmd("User", {
+        group = approval_group,
+        pattern = "CodeCompanionToolApprovalRequested",
+        callback = function(ev)
+          local buf = ev.data.bufnr
+          if not vim.api.nvim_buf_is_valid(buf) or approval_maps[buf] then
+            return
+          end
+          approval_maps[buf] = vim.api.nvim_buf_call(buf, function()
+            local mappings = {}
+            for _, key in ipairs({ "<CR>", "<C-C>" }) do
+              mappings[key] = vim.fn.maparg(key, "n", false, true)
+            end
+            return mappings
+          end)
+        end,
+      })
+      vim.api.nvim_create_autocmd("User", {
+        group = approval_group,
+        pattern = "CodeCompanionToolApprovalFinished",
+        callback = function(ev)
+          local buf = ev.data.bufnr
+          local mappings = approval_maps[buf]
+          approval_maps[buf] = nil
+          if not mappings or not vim.api.nvim_buf_is_valid(buf) then
+            return
+          end
+          for key, mapping in pairs(mappings) do
+            pcall(vim.keymap.del, "n", key, { buffer = buf })
+            if mapping.buffer == 1 then
+              vim.api.nvim_buf_call(buf, function()
+                vim.fn.mapset("n", false, mapping)
+              end)
+            end
+          end
+        end,
+      })
+      vim.api.nvim_create_autocmd("BufWipeout", {
+        group = approval_group,
+        callback = function(ev)
+          approval_maps[ev.buf] = nil
+        end,
+      })
+
       vim.api.nvim_create_autocmd("BufWinEnter", {
         group = vim.api.nvim_create_augroup("codecompanion_diff_keymaps", { clear = true }),
         callback = vim.schedule_wrap(function(ev)
@@ -313,19 +387,25 @@ return {
 
           local shared_keymaps = require("codecompanion.config").config.interactions.shared.keymaps
           local accept_key = shared_keymaps.accept_change.modes.n
+          accept_key = type(accept_key) == "table" and accept_key[1] or accept_key
+          if Snacks.util.normkey(accept_key) ~= "<CR>" then
+            vim.keymap.set(
+              "n",
+              "<CR>",
+              accept_key,
+              { buffer = buf, remap = true, desc = "Accept Diff (CodeCompanion)" }
+            )
+          end
           local reject_key = shared_keymaps.reject_change.modes.n
-          vim.keymap.set(
-            "n",
-            "<CR>",
-            type(accept_key) == "table" and accept_key[1] or accept_key,
-            { buffer = buf, remap = true, desc = "Accept Diff (CodeCompanion)" }
-          )
-          vim.keymap.set(
-            "n",
-            "<C-c>",
-            type(reject_key) == "table" and reject_key[1] or reject_key,
-            { buffer = buf, remap = true, desc = "Reject Diff (CodeCompanion)" }
-          )
+          reject_key = type(reject_key) == "table" and reject_key[1] or reject_key
+          if Snacks.util.normkey(reject_key) ~= "<C-C>" then
+            vim.keymap.set(
+              "n",
+              "<C-C>",
+              reject_key,
+              { buffer = buf, remap = true, desc = "Reject Diff (CodeCompanion)" }
+            )
+          end
         end),
       })
     end,
