@@ -17,7 +17,7 @@
 
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { execFile, type ExecFileException } from "node:child_process";
-import { lstat, readdir, realpath, unlink, writeFile } from "node:fs/promises";
+import { lstat, readdir, readFile, realpath, unlink, writeFile } from "node:fs/promises";
 import { homedir, tmpdir } from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
@@ -136,6 +136,26 @@ async function unlinkIfSocket(filePath: string): Promise<void> {
 
 async function clearStalePulseRuntimeFiles(): Promise<void> {
   for (const dir of await pulseRuntimeDirs()) {
+    const pidPath = path.join(dir, "pid");
+    try {
+      const contents = await readFile(pidPath, "utf8");
+      const pid = Number(contents.trim());
+      // Never remove runtime files for a live process owned by this user.
+      if (!Number.isSafeInteger(pid) || pid <= 0) continue;
+      try {
+        process.kill(pid, 0);
+        continue;
+      } catch (error) {
+        // Android can reuse an old PID for another app (EPERM) while hiding
+        // /proc/<pid>/stat. PulseAudio then assumes its old daemon is alive.
+        // A same-user Termux daemon remains signalable, even with signal 0.
+        if (!hasErrorCode(error, "ESRCH") && !hasErrorCode(error, "EPERM")) throw error;
+      }
+      if ((await readFile(pidPath, "utf8")) !== contents) continue;
+      await unlink(pidPath);
+    } catch (error) {
+      if (!hasErrorCode(error, "ENOENT")) throw error;
+    }
     await unlinkIfSocket(path.join(dir, "native"));
   }
 }
@@ -149,7 +169,7 @@ async function startPulseAudio(): Promise<void> {
     if (await canConnectToPulseAudioWithoutAutospawn()) return;
   }
 
-  // Termux can leave a stale PulseAudio socket after Android kills the daemon.
+  // Termux can leave stale PulseAudio PID files and sockets after Android kills the daemon.
   // Only retry cleanup for PulseAudio's expected startup failure exit code.
   await clearStalePulseRuntimeFiles();
   await execFileAsync("pulseaudio", PULSE_AUDIO_START_ARGS, { timeout: 5000 });
