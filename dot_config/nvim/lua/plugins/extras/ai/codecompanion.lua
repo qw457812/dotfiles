@@ -70,11 +70,28 @@ return {
         mode = { "n", "x" },
       },
       { "<leader>ani", "<cmd>CodeCompanionChat adapter=pi<CR>", desc = "Pi ACP", mode = { "n", "x" } },
-      { "<leader>anp", "<cmd>CodeCompanionChat adapter=copilot<CR>", desc = "Copilot", mode = { "n", "x" } },
+      { "<leader>anw", "<cmd>CodeCompanionChat adapter=neuralwatt<CR>", desc = "Neuralwatt", mode = { "n", "x" } },
     },
     opts = {
       adapters = {
         http = {
+          neuralwatt = function()
+            return require("codecompanion.adapters").extend("openai_compatible", {
+              name = "neuralwatt",
+              formatted_name = "Neuralwatt",
+              env = {
+                api_key = "NEURALWATT_API_KEY",
+                url = "https://api.neuralwatt.com/v1",
+                chat_url = "/chat/completions",
+                models_endpoint = "/models",
+              },
+              schema = {
+                model = {
+                  default = "glm-5.3-flash",
+                },
+              },
+            })
+          end,
           extend = {
             copilot = {
               schema = {
@@ -145,7 +162,7 @@ return {
       },
       interactions = {
         chat = {
-          adapter = vim.fn.executable("claude-agent-acp") == 1 and "claude_code" or "copilot",
+          adapter = vim.fn.executable("pi-acp") == 1 and "pi" or "neuralwatt",
           sessions = {
             autosave = true,
           },

@@ -197,7 +197,7 @@ export default function (pi: ExtensionAPI) {
 			!isContextOverflow(lastAssistant, ctx.model?.contextWindow ?? 0);
 		retryDelayStartMs = willLikelyRetry ? now : null;
 
-		if (!ctx.hasUI) return;
+		if (ctx.mode !== "tui") return;
 		if (agentStartMs === null) return;
 
 		const agentElapsedMs = now - agentStartMs;
