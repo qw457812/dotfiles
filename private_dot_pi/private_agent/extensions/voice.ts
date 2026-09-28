@@ -1,18 +1,19 @@
 /**
- * https://github.com/codexstar69/pi-listen
- * https://github.com/qw457812/pi-listen
+ * Microphone bootstrap for pi-voice on Termux. Originally written for pi-listen
+ * (https://github.com/codexstar69/pi-listen, https://github.com/qw457812/pi-listen).
  *
- * Ensures PulseAudio microphone module is running for pi-listen on Termux.
- *
- * On Termux (Android), SoX `rec` cannot access the microphone directly.
- * This extension starts PulseAudio and loads `module-sles-source` so `rec`
- * can capture audio through PulseAudio.
+ * Ensures the PulseAudio microphone source is running on Termux (Android).
+ * Android apps cannot open ALSA devices directly, so this extension starts
+ * PulseAudio and loads `module-sles-source`, which exposes the microphone as
+ * the `OpenSL_ES_source` PulseAudio source. pi-voice records from it with
+ * `parec`; any other PulseAudio capture client benefits equally.
  *
  * Only activates on Termux (Android). No-op on other platforms.
  *
  * Prerequisites:
- * - `pi install npm:@codexstar/pi-listen` or `pi install git:github.com/qw457812/pi-listen`
- * - `pkg install pulseaudio sox` (Termux) or `brew install sox` (macOS)
+ * - pi-voice (upstream: https://github.com/earendil-works/pi-voice):
+ *   `pi install git:github.com/qw457812/pi-voice@termux`
+ * - `pkg install pulseaudio` (Termux)
  */
 
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
@@ -26,7 +27,7 @@ const execFileAsync = promisify(execFile);
 const IS_TERMUX = Boolean(process.env.TERMUX_VERSION);
 const SLES_SOURCE_MODULE = "module-sles-source";
 const PULSE_AUDIO_START_ARGS = ["--start", "--exit-idle-time=-1"];
-const NO_AUTOSPAWN_CLIENT_CONFIG = path.join(tmpdir(), "pi-listen-pulse-client.conf");
+const NO_AUTOSPAWN_CLIENT_CONFIG = path.join(tmpdir(), "pi-voice-pulse-client.conf");
 
 function hasErrorCode(error: unknown, code: string | number): boolean {
   return typeof error === "object" && error !== null && "code" in error && error.code === code;
@@ -184,12 +185,12 @@ async function ensurePulseAudio(ctx: ExtensionContext): Promise<void> {
     const error = e as ExecFileException;
     if (isMissingCommand(error)) {
       ctx.ui.notify(
-        `[listen] ${missingCommandName(error)} not found, run \`pkg install pulseaudio\` to enable mic for pi-listen.`,
+        `[voice] ${missingCommandName(error)} not found, run \`pkg install pulseaudio\` to enable microphone capture for pi-voice.`,
         "error",
       );
       return;
     }
-    ctx.ui.notify(`[listen] Failed to start PulseAudio: ${formatError(error)}`, "error");
+    ctx.ui.notify(`[voice] Failed to start PulseAudio: ${formatError(error)}`, "error");
     return;
   }
 
@@ -207,13 +208,13 @@ async function ensurePulseAudio(ctx: ExtensionContext): Promise<void> {
     const error = e as ExecFileException;
     if (isMissingCommand(error)) {
       ctx.ui.notify(
-        `[listen] ${missingCommandName(error)} not found, run \`pkg install pulseaudio\` to enable mic for pi-listen.`,
+        `[voice] ${missingCommandName(error)} not found, run \`pkg install pulseaudio\` to enable microphone capture for pi-voice.`,
         "error",
       );
       return;
     }
     ctx.ui.notify(
-      `[listen] Failed to ensure module-sles-source is loaded: ${error.message}`,
+      `[voice] Failed to ensure module-sles-source is loaded: ${error.message}`,
       "error",
     );
   }

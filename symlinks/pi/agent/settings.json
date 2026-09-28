@@ -147,7 +147,7 @@
     "npm:@charmland/pi-hyper-provider",
     "npm:@99percentpeople/pi-codex-api",
     "npm:@injaneity/pi-computer-use",
-    "git:github.com/qw457812/pi-listen"
+    "git:github.com/qw457812/pi-voice@termux"
   ],
   "piVim": {
     "borderSync": {
@@ -156,14 +156,5 @@
       "visual": "mode",
       "ex": "mode"
     }
-  },
-  "voice": {
-    "language": "zh",
-    "toggleShortcut": "alt+v",
-    "onboarding": {
-      "completed": true
-    },
-    "doubleEscClear": false,
-    "backend": "volcengine"
   }
 }

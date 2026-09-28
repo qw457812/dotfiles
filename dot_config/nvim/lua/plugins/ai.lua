@@ -180,12 +180,7 @@ return {
         config = function() end,
       },
       -- { "openclaw/Peekaboo", version = "*", lazy = true, config = function() end },
-      {
-        "qw457812/pi-listen",
-        build = "pi update --extension git:github.com/qw457812/pi-listen",
-        lazy = true,
-        config = function() end,
-      },
+      { "earendil-works/pi-voice", lazy = true, config = function() end },
       {
         "hugohe3/ppt-master",
         pin = true,
