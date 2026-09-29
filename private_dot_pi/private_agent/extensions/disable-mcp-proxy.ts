@@ -14,8 +14,8 @@
  * Uses getActiveTools() → Set → delete → Array.from pattern
  * to incrementally remove without re-enabling tools disabled by other extensions.
  *
- * Config precedence matches pi-mcp-adapter:
- *   ~/.config/mcp/mcp.json → <agentDir>/mcp.json → .mcp.json → .pi/mcp.json
+ * Config precedence follows pi-mcp-adapter's adapter-specific files:
+ *   ~/.config/mcp/mcp.json → <agentDir>/mcp-adapter.json → .mcp.json → .pi/mcp-adapter.json
  * Per-server `directTools` overrides the global `settings.directTools`.
  */
 
@@ -52,7 +52,7 @@ const MCP_STATUS_EVENT = "pi-mcp-adapter/status/v1";
 const CONFIG_PATHS = [
   join(homedir(), ".config", "mcp", "mcp.json"),
   ".mcp.json",
-  join(CONFIG_DIR_NAME, "mcp.json"),
+  join(CONFIG_DIR_NAME, "mcp-adapter.json"),
 ];
 
 function readJsonConfig(path: string): McpConfig | null {
@@ -68,8 +68,8 @@ function loadMergedConfig(cwd: string): McpConfig {
   const agentDir = getAgentDir();
   const paths = [
     CONFIG_PATHS[0], // ~/.config/mcp/mcp.json
-    join(agentDir, "mcp.json"), // <agentDir>/mcp.json
-    ...CONFIG_PATHS.slice(1), // .mcp.json, .pi/mcp.json
+    join(agentDir, "mcp-adapter.json"), // <agentDir>/mcp-adapter.json
+    ...CONFIG_PATHS.slice(1), // .mcp.json, .pi/mcp-adapter.json
   ];
 
   let merged: McpConfig = {};
