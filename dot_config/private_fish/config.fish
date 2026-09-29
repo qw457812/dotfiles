@@ -342,7 +342,9 @@ if set -q TERMUX_VERSION
     # ==============================================================================
     # AUTO START TMUX ON TERMUX
     # ==============================================================================
-    set -q TMUX; or tmux attach || tmux
+    if not set -q TMUX; and test "$HERDR_ENV" != 1
+        tmux attach || tmux
+    end
 else
     term_proxy_on
 end

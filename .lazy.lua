@@ -27,20 +27,4 @@ return {
       },
     },
   },
-
-  {
-    "folke/sidekick.nvim",
-    optional = true,
-    ---@module "sidekick"
-    ---@type sidekick.Config
-    opts = {
-      cli = {
-        ---@type sidekick.cli.Mux
-        mux = {
-          ---@diagnostic disable-next-line: assign-type-mismatch
-          -- backend = "herdr",
-        },
-      },
-    },
-  },
 }

@@ -41,7 +41,7 @@
   "google-10000-english": { "branch": "master", "commit": "d0736d492489198e4f9d650c7ab4143bc14c1e9e" },
   "grug-far.nvim": { "branch": "main", "commit": "11595bf747edc270bce2069d1020502ad4ae56cf" },
   "helpview.nvim": { "branch": "main", "commit": "06006b471890f19efeb199ffab5da49a2d624619" },
-  "herdr": { "branch": "master", "commit": "74a771d12623726983ed2186380f6a216e797a06" },
+  "herdr": { "branch": "master", "commit": "48292af8e33a08c8030b7f1512c8d0da739f5ab1" },
   "http.nvim": { "branch": "main", "commit": "f3e56c6ca6c34a110b0caacac5b8da0180c0c610" },
   "humanlayer-skills": { "branch": "main", "commit": "ca7c8088db69e315a8b2deea43820270457f8f3c" },
   "just-bash": { "branch": "main", "commit": "a021f95f53f7e01df48dab71b46ffd4637fb4b53" },

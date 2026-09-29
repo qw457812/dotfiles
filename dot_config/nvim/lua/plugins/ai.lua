@@ -190,7 +190,17 @@ return {
         config = function() end,
       },
       { "dannote/dot-pi", pin = true, name = "dannote-dot-pi", lazy = true, config = function() end },
-      { "ogulcancelik/herdr", pin = true, enabled = not vim.g.user_is_termux, lazy = true, config = function() end },
+      -- On Termux:
+      -- - Install: curl -fsSL --retry 3 -o ~/.local/bin/herdr https://github.com/herdrdev/herdr/releases/download/v0.9.1/herdr-linux-aarch64
+      -- - Upgrade: herdr update
+      {
+        "ogulcancelik/herdr",
+        version = "*",
+        enabled = vim.fn.executable("herdr") == 1,
+        build = vim.g.user_is_termux and "herdr update",
+        lazy = true,
+        config = function() end,
+      },
       { "vercel-labs/just-bash", version = "*", enabled = vim.g.user_is_termux, lazy = true, config = function() end },
       {
         "LazyVim/LazyVim",
