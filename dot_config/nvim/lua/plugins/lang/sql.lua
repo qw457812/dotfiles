@@ -2,6 +2,8 @@ if not LazyVim.has_extra("lang.sql") then
   return {}
 end
 
+-- TODO: try https://github.com/2giosangmitom/sqmeow.nvim
+
 local sql_ft = { "sql", "mysql", "plsql" }
 
 ---@type LazySpec

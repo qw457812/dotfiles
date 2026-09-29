@@ -166,8 +166,8 @@ return {
       {
         "99percentpeople/pi-extensions",
         name = "99percentpeople-pi-extensions",
-        -- version = "*",
-        -- build = "pi update --extension npm:@99percentpeople/pi-codex-api",
+        version = "*",
+        build = "pi update --extension npm:@99percentpeople/pi-codex-api",
         lazy = true,
         config = function() end,
       },

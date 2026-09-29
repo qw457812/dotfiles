@@ -186,7 +186,13 @@ return {
             user = "User",
           },
           tools = {
+            run_command = {
+              opts = {
+                safe_commands = { "git status", "git log", "git diff", "ls", "pwd", "rg" },
+              },
+            },
             opts = {
+              approval_mode = "auto",
               -- default_tools = { "files" }, -- ACP does not need it
             },
           },
