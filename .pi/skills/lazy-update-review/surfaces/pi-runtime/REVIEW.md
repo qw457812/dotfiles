@@ -11,7 +11,7 @@ Locate the owning lazy spec/build hook and all local API consumers:
 ```bash
 rg -n 'earendil-works/pi|pi update' dot_config/nvim/lua/plugins
 rg -n '@earendil-works/pi-|registerProvider|registerTool|registerCommand|mcp__|sourceInfo|defaultTools|virtual' private_dot_pi/private_agent symlinks/pi/agent
-rg -n '"@earendil-works/pi-|"pi-mcp-adapter"' private_dot_pi/private_agent --glob '*package*.json'
+rg -n '"@earendil-works/pi-' private_dot_pi/private_agent --glob '*package*.json'
 ```
 
 Read settings, model definitions, extension sources, and dependency pins implicated
@@ -31,14 +31,14 @@ Inspect exact-range diffs covering:
 - Extension/tool contexts, nested tool events, cancellation, and tool-name/input
   routing used by sandbox and guard extensions.
 - Builtin extension identity and command registration in both load and
-  `session_start` phases. Check native MCP and third-party adapters together;
-  a dynamic alias can collide even when load-time replacement is supported.
+  `session_start` phases. Check MCP command ownership and replacement
+  semantics alongside installed extensions.
 - TUI terminal-color helpers, theme APIs and palettes, fullscreen input/scrolling,
   cursor lifecycle, footer rendering, and virtual-model routing.
 
-For MCP migration, check whether local guards understand native
-`mcp__server__tool` input as well as adapter proxy tool arguments. Classify guards
-that only understand the adapter format as requiring adaptation before migration.
+For MCP changes, verify that local guards inspect direct `mcp__server__tool`
+arguments and apply to nested codemode calls. Verify that blocked calls never
+reach the server.
 
 When declarations change, validate local extensions against the frozen target
 package declarations in a temporary tree. Preserve installed packages and source

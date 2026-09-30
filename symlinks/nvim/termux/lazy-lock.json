@@ -109,7 +109,6 @@
   "pi-guardrails": { "branch": "main", "commit": "31b466cdf3b61ca89361781f07529b7d53377ca1" },
   "pi-hyper-provider": { "branch": "main", "commit": "6c47b794efd5fe78d5b02e3fa4a3350045c1170f" },
   "pi-invisible-continue": { "branch": "main", "commit": "5304b3fec05de352ce6a2721c1235864a80ba530" },
-  "pi-mcp-adapter": { "branch": "main", "commit": "9a747ce9bcdc72879c2cd3344879cf5821bd9bdd" },
   "pi-neuralwatt-provider": { "branch": "main", "commit": "4b5fac328c1d196c90c97cd477e4fc0e73752a73" },
   "pi-review": { "branch": "main", "commit": "f1de050504936046c0f85b21fec0e0a93ef394eb" },
   "pi-vim": { "branch": "main", "commit": "e55b07c05b648f3bbccf656c2b0c6ec63f1a91d1" },

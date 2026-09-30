@@ -3,17 +3,16 @@ extensions/*/node_modules
 
 /sessions
 /auth.json
+/mcp-auth.json
+/mcp.log
+/mcp.log.1
 /trust.json
 /pi-crash.log
+/crashes.json
 /pi-debug.log
 
 # https://github.com/mitsuhiko/agent-stuff
 /tmux-subagents
-
-# https://github.com/nicobailon/pi-mcp-adapter
-/mcp-cache.json
-/mcp-onboarding.json
-/mcp-npx-cache.json
 
 # https://github.com/monotykamary/pi-neuralwatt-provider
 /cache

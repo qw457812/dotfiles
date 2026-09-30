@@ -5,25 +5,17 @@ import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-a
  *
  * Validates that SQL executed through SQL MCP tools is read-only.
  *
- * This extension supports the tool invocation styles used by pi-mcp-adapter:
- *  - Gateway proxy mode: toolName === 'mcp', with the actual tool in input.tool
- *    and params in input.args
- *  - Namespace proxy mode: toolName === 'mcp__<server>', with the same nested
- *    tool and args shape
- *  - Direct mode (`directTools: true`): the concrete tool is called directly,
- *    with params already in event.input
- *
- * pi-mcp-adapter reference:
- *  - https://github.com/nicobailon/pi-mcp-adapter
+ * MCP tools (`mcp__<server>__<tool>`) receive params directly in
+ * event.input, including nested calls from codemode.
  *
  * MCP server references:
  *  - SQLcl MCP Server (Oracle): https://www.oracle.com/mcp/
  *  - OceanBase MCP Server: https://github.com/oceanbase/awesome-oceanbase-mcp
  */
 const GUARDED_TOOL_PATTERNS = [
-  /_sqlcl_run$/, // SQLcl MCP Server: tools like sqlcl_sqlcl_run
-  /_sql_run$/, // SQLcl MCP Server: tools like sqlcl_sql_run
-  /_execute_sql$/, // OceanBase MCP Server: tools like oceanbase_execute_sql
+  /_sqlcl_run$/, // SQLcl MCP Server: mcp__sqlcl__sqlcl_run
+  /_sql_run$/, // SQLcl MCP Server: mcp__sqlcl__sql_run
+  /_execute_sql$/, // OceanBase MCP Server: mcp__oceanbase__execute_sql
 ];
 const SQL_PARAM_KEYS = [
   "sql", // Used by tools like sqlcl_sql_run and oceanbase_execute_sql
@@ -63,48 +55,14 @@ function findSqlParam(args: Record<string, unknown>) {
   }
 }
 
-/**
- * Extracts the SQL to validate.
- *
- * In `mcp` proxy mode, `input.args` is expected to be a JSON string.
- * This code still handles object-shaped args defensively so SQL validation
- * cannot be bypassed if the adapter behavior changes in the future.
- */
 function extractSql(toolName: string, input: Record<string, unknown>): ExtractResult {
-  const isProxyTool = toolName === "mcp" || toolName.startsWith("mcp__");
-  const targetTool = isProxyTool ? String(input.tool || "") : toolName;
-  if (!isGuardedTool(targetTool)) return { kind: "skip" };
-
-  let args = input;
-  if (isProxyTool) {
-    const rawArgs = input.args;
-    if (typeof rawArgs === "string") {
-      if (!rawArgs.trim()) {
-        return {
-          kind: "confirm",
-          error: "Guarded tool called with no arguments — possible schema change",
-        };
-      }
-
-      try {
-        args = JSON.parse(rawArgs) as Record<string, unknown>;
-      } catch (error) {
-        return {
-          kind: "block",
-          error: `Failed to parse MCP tool args JSON: ${(error as Error).message}`,
-        };
-      }
-    } else if (rawArgs && typeof rawArgs === "object" && !Array.isArray(rawArgs)) {
-      args = rawArgs as Record<string, unknown>;
-    } else {
-      return {
-        kind: "block",
-        error: "Guarded tool called with unsupported args shape",
-      };
-    }
+  // Route by the concrete tool name, never by an input parameter.
+  if (!isGuardedTool(toolName)) return { kind: "skip" };
+  if (!input || typeof input !== "object" || Array.isArray(input)) {
+    return { kind: "block", error: "Guarded tool called with unsupported args shape" };
   }
 
-  const sql = findSqlParam(args);
+  const sql = findSqlParam(input);
   return sql
     ? { kind: "sql", sql }
     : {

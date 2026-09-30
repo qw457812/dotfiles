@@ -97,13 +97,6 @@ return {
         config = function() end,
       },
       {
-        "nicobailon/pi-mcp-adapter",
-        version = "*",
-        build = "pi update --extension npm:pi-mcp-adapter",
-        lazy = true,
-        config = function() end,
-      },
-      {
         "monotykamary/pi-neuralwatt-provider",
         build = "pi update --extension git:github.com/monotykamary/pi-neuralwatt-provider",
         lazy = true,
