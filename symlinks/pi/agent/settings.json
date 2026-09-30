@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.87.1",
+  "lastChangelogVersion": "0.99.1",
   "defaultProvider": "openai-codex",
   "defaultModel": "gpt-6.1-sol",
   "defaultThinkingLevel": "medium",
@@ -38,6 +38,7 @@
     "openai-codex/gpt-6-luna": "max"
   },
   "extensions": [
+    "-builtin:mcp",
     "-extensions/copilot-ratelimit.ts",
     "-extensions/git-checkpoint.ts",
     "-extensions/loop.ts",

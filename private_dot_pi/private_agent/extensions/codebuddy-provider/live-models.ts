@@ -1,7 +1,6 @@
 import type { ProviderHeaders } from "@earendil-works/pi-ai";
-import type { ProviderModelConfig } from "@earendil-works/pi-coding-agent";
 import { CLI_BASE_URL, DEFAULT_DOMAIN, USER_AGENT, VERSION } from "./constants.js";
-import { type CodebuddyModel, toCodebuddyModel } from "./models.js";
+import { type ChatModelConfig, type CodebuddyModel, toCodebuddyModel } from "./models.js";
 import { decodeUserId, ensureSuccess, readHeader, requestJson } from "./utils.js";
 
 const PRODUCT_CONFIG_URL = new URL("/v3/config", CLI_BASE_URL).toString();
@@ -16,7 +15,7 @@ const EXCLUDED_MODEL_TAGS = new Set([
 /** pi-ai thinking levels, ascending. Mirrors pi-ai `EXTENDED_THINKING_LEVELS`. */
 const PI_THINKING_LEVELS = ["off", "minimal", "low", "medium", "high", "xhigh", "max"] as const;
 
-type ThinkingLevelMap = NonNullable<ProviderModelConfig["thinkingLevelMap"]>;
+type ThinkingLevelMap = NonNullable<ChatModelConfig["thinkingLevelMap"]>;
 
 type CodebuddyProductConfigResponse = {
   code?: number | string;
@@ -152,7 +151,7 @@ function toLiveModel(
   model: Required<Pick<CodebuddyProductModel, "id" | "name">> & CodebuddyProductModel,
 ): CodebuddyModel {
   const reasoning = Boolean(model.supportsReasoning);
-  const config: ProviderModelConfig = {
+  const config: ChatModelConfig = {
     id: model.id,
     name: model.name,
     reasoning,

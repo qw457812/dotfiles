@@ -1,10 +1,19 @@
-import type { Model } from "@earendil-works/pi-ai";
+import type { AnyModel, Model } from "@earendil-works/pi-ai";
 import type { ProviderModelConfig } from "@earendil-works/pi-coding-agent";
 import { CHAT_BASE_URL, PROVIDER } from "./constants.js";
 
+export type ChatModelConfig = Extract<ProviderModelConfig, { type?: "chat" }>;
 export type CodebuddyModel = Model<"openai-completions">;
 
-export function toCodebuddyModel(config: ProviderModelConfig): CodebuddyModel {
+export function isCodebuddyModel(model: AnyModel): model is CodebuddyModel {
+  return (
+    (model.type === undefined || model.type === "chat") &&
+    model.provider === PROVIDER &&
+    model.api === "openai-completions"
+  );
+}
+
+export function toCodebuddyModel(config: ChatModelConfig): CodebuddyModel {
   return {
     id: config.id,
     name: config.name,

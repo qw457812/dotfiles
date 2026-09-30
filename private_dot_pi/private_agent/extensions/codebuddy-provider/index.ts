@@ -2,7 +2,6 @@
 // https://github.com/SoulChildTc/pi-codebuddy-oauth
 
 import {
-  type Api,
   type ApiKeyAuth,
   type TranscriptContext,
   type Model,
@@ -13,11 +12,16 @@ import {
   type StreamOptions,
 } from "@earendil-works/pi-ai";
 import { openAICompletionsApi } from "@earendil-works/pi-ai/compat";
-import type { ExtensionAPI, ProviderModelConfig } from "@earendil-works/pi-coding-agent";
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { codebuddyCredentialsToAuth, loginCodebuddy, refreshCodebuddyCredentials } from "./auth.js";
 import { CHAT_BASE_URL, DEFAULT_DOMAIN, PROVIDER, USER_AGENT, VERSION } from "./constants.js";
 import { fetchLiveModels } from "./live-models.js";
-import { type CodebuddyModel, toCodebuddyModel } from "./models.js";
+import {
+  type ChatModelConfig,
+  type CodebuddyModel,
+  isCodebuddyModel,
+  toCodebuddyModel,
+} from "./models.js";
 import modelsData from "./models.json" with { type: "json" };
 import type { CodebuddyOAuthCredentials } from "./types.js";
 import { decodeUserId, readHeader, requestId } from "./utils.js";
@@ -26,7 +30,7 @@ import { decodeUserId, readHeader, requestId } from "./utils.js";
 // ~/.codebuddy/logs/
 // ~/.codebuddy/local_storage/
 // pi --list-models codebuddy
-const MODELS = (modelsData as ProviderModelConfig[]).map(toCodebuddyModel);
+const MODELS = (modelsData as ChatModelConfig[]).map(toCodebuddyModel);
 const openaiCompletions = openAICompletionsApi();
 
 const apiKeyAuth: ApiKeyAuth = {
@@ -107,10 +111,6 @@ function prepareRequest<T extends StreamOptions | SimpleStreamOptions>(
       headers: buildRequestHeaders(codebuddyModel, options, conversationId),
     } as T,
   };
-}
-
-function isCodebuddyModel(model: Model<Api>): model is CodebuddyModel {
-  return model.provider === PROVIDER && model.api === "openai-completions";
 }
 
 function createCodebuddyProvider(
