@@ -18,7 +18,7 @@ import type { AutocompleteItem } from "@earendil-works/pi-tui";
 // https://commandcode.ai/docs/plans/go
 const ALIASES: Record<string, ModelTarget | readonly ModelTarget[]> = {
   astra: { provider: "openai-codex", id: "gpt-6-astra" },
-  sol: { provider: "openai-codex", id: "gpt-6-sol" },
+  sol: { provider: "openai-codex", id: "gpt-6.1-sol" },
   luna: { provider: "openai-codex", id: "gpt-6-luna" },
   glm: [
     { provider: "commandcode", id: "zai-org/GLM-5.3" },
@@ -39,6 +39,7 @@ const ALIASES: Record<string, ModelTarget | readonly ModelTarget[]> = {
   ],
   mimo: [
     { provider: "commandcode", id: "xiaomi/mimo-v2.6-pro" },
+    { provider: "neuralwatt", id: "mimo-v2.6-pro" },
     { provider: "xiaomi", id: "mimo-v2.6-pro" },
   ],
   mimoflash: [
