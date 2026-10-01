@@ -16,7 +16,7 @@ import {
   type ExtensionUIContext,
   VERSION,
 } from "@earendil-works/pi-coding-agent";
-// 0.99.1 does not export these helpers at the package root. Use installed SDK internals
+// 0.99.2 does not export these helpers at the package root. Use installed SDK internals
 // solely to isolate config/OAuth storage; transports and extensions are not mocked.
 import { InMemoryAuthStorageBackend } from "../node_modules/@earendil-works/pi-coding-agent/dist/core/auth-storage.js";
 import { loadMcpConfig } from "../node_modules/@earendil-works/pi-coding-agent/dist/extensions/mcp/config.js";
@@ -58,7 +58,7 @@ function assistantFor(id: string, name: string, args: JsonObject): AssistantMess
   };
 }
 
-describe("MCP SQL Guard integration (installed SDK 0.99.1)", () => {
+describe("MCP SQL Guard integration (installed SDK 0.99.2)", () => {
   let root: string;
   let session: AgentSession | undefined;
   let callNumber: number;
@@ -126,7 +126,7 @@ describe("MCP SQL Guard integration (installed SDK 0.99.1)", () => {
         // Unlike the CLI, SDK sessions must explicitly install these extensions.
         createCodemodeExtension({ mode: "on" }),
         createMcpExtension({
-          // MCP 0.99.1 defaults use getAgentDir(), not the session's agentDir.
+          // MCP defaults use getAgentDir(), not the session's agentDir.
           loadConfig: () => loadMcpConfig({ agentDir, cwd, projectTrusted: false }),
           credentials: new McpOAuthCredentialStore(new InMemoryAuthStorageBackend()),
           logPath: join(root, "mcp.log"),
@@ -221,7 +221,7 @@ describe("MCP SQL Guard integration (installed SDK 0.99.1)", () => {
 
   it("discovers MCP tool names and leaves non-SQL echo unguarded", async () => {
     await bindAndDiscover();
-    expect(VERSION).toBe("0.99.1");
+    expect(VERSION).toBe("0.99.2");
     expect(
       session
         ?.getAllTools()

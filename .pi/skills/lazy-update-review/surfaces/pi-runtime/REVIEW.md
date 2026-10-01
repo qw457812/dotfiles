@@ -10,13 +10,15 @@ Locate the owning lazy spec/build hook and all local API consumers:
 
 ```bash
 rg -n 'earendil-works/pi|pi update' dot_config/nvim/lua/plugins
-rg -n '@earendil-works/pi-|registerProvider|registerTool|registerCommand|mcp__|sourceInfo|defaultTools|virtual' private_dot_pi/private_agent symlinks/pi/agent
+rg -n '@earendil-works/pi-|registerProvider|registerTool|registerCommand|mcp__|sourceInfo|defaultTools|virtual|mcpServers|exposure' private_dot_pi/private_agent symlinks/pi/agent .pi --glob '!package-lock.json' --glob '!skills/**'
 rg -n '"@earendil-works/pi-' private_dot_pi/private_agent --glob '*package*.json'
 ```
 
 Read settings, model definitions, extension sources, and dependency pins implicated
-by the exact-range diffs. For third-party integrations, resolve the package actually
-loaded by settings and inspect its installed source, including `node_modules` paths
+by the exact-range diffs. Include project `.pi/settings.json` and `.pi/mcp.json`
+when present, alongside the global config; project MCP exposure and names can
+change the runtime loadout even when the global `mcpServers` is empty. For
+third-party integrations, resolve the package actually loaded by settings and inspect its installed source, including `node_modules` paths
 normally ignored by `rg`.
 
 **Complete when:** each changed API's local consumers and package ownership are
