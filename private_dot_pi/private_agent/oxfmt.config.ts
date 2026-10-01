@@ -13,6 +13,7 @@ export default defineConfig({
     "extensions/files.ts",
     "extensions/goal.ts",
     "extensions/handoff.ts",
+    "extensions/jev-router.ts",
     "extensions/loop.ts",
     "extensions/notify.ts",
     "extensions/review.ts",
