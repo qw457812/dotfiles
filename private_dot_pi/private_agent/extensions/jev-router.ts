@@ -5,29 +5,35 @@
  *
  * Registers `jev/auto`, which routes between three OpenAI Codex models:
  *
- * - Planning: GPT-5.6 Sol for complex work, GPT-5.6 Terra otherwise. The Jev classifier rates the
+ * - Planning: GPT-6.1 Sol (medium) for complex work, GPT-6.1 Sol (low) otherwise. The Jev classifier rates the
  *   first user message; planning stays on the chosen model.
- * - Implementation: GPT-5.6 Luna.
+ * - Implementation: GPT-6 Luna (max).
  *
  * The planning model explores, plans, and makes the first edit. After the first successful `edit`
  * or `write` tool call, the next request of the same turn goes to Luna, and the session stays
  * there. A session therefore switches models once and accepts a single prompt-cache miss.
  *
  * The phase is router state: Pi stores it on the session branch, so it follows the session tree
- * and survives compaction. The selected thinking level passes through as the reasoning effort of
- * the chosen model. Requests outside the agent loop, such as compaction summaries, go to Luna.
+ * and survives compaction. Requests outside the agent loop, such as compaction summaries, go to Luna.
  *
  * Requires TypeSafe credentials (TYPESAFE_API_KEY) and an OpenAI Codex login.
  * Usage: pi -e ./jev-router.ts --model jev/auto
  */
 
-import type { Message } from "@earendil-works/pi-ai";
+import type { Message, ModelThinkingLevel } from "@earendil-works/pi-ai";
 import type { ExtensionAPI, ExtensionContext, ModelRoute, ModelRouteRequest } from "@earendil-works/pi-coding-agent";
 
-const PROVIDER = "openai-codex";
-const SOL = "gpt-5.6-sol";
-const TERRA = "gpt-5.6-terra";
-const LUNA = "gpt-5.6-luna";
+interface RouteTarget {
+	provider: string;
+	model: string;
+	thinkingLevel: ModelThinkingLevel;
+}
+
+const ROUTES = {
+	complex: { provider: "openai-codex", model: "gpt-6.1-sol", thinkingLevel: "medium" },
+	standard: { provider: "openai-codex", model: "gpt-6.1-sol", thinkingLevel: "low" },
+	implementation: { provider: "openai-codex", model: "gpt-6-luna", thinkingLevel: "max" },
+} satisfies Record<string, RouteTarget>;
 
 /** Tools whose successful result means implementation has started. */
 const EDIT_TOOLS = new Set(["edit", "write"]);
@@ -35,15 +41,15 @@ const EDIT_TOOLS = new Set(["edit", "write"]);
 interface JevState {
 	phase: "planning" | "implementation";
 	/** OpenAI Codex model for this phase. */
-	model: string;
+	route: RouteTarget;
 }
 
 type JevRequest = ModelRouteRequest<JevState>;
 
-function routeTo(request: JevRequest, ctx: ExtensionContext, id: string, state?: JevState): ModelRoute<JevState> {
-	const model = ctx.modelRegistry.find(PROVIDER, id);
-	if (!model) throw new Error(`Model ${PROVIDER}/${id} is not in the catalog`);
-	return { model, thinkingLevel: request.thinkingLevel, state };
+function routeTo(ctx: ExtensionContext, route: RouteTarget, state?: JevState): ModelRoute<JevState> {
+	const model = ctx.modelRegistry.find(route.provider, route.model);
+	if (!model) throw new Error(`Model ${route.provider}/${route.model} is not in the catalog`);
+	return { model, thinkingLevel: route.thinkingLevel, state };
 }
 
 function lastUserText(messages: readonly Message[]): string {
@@ -60,14 +66,22 @@ function editedThisTurn(messages: readonly Message[]): boolean {
 		.some((message) => message.role === "toolResult" && EDIT_TOOLS.has(message.toolName) && !message.isError);
 }
 
-/** Planning model for a new session: Sol for complex work, Terra otherwise or when Jev is unavailable. */
-async function choosePlanningModel(request: JevRequest, ctx: ExtensionContext): Promise<string> {
+/** Planning model for a new session: Sol (medium) for complex work, Sol (low) otherwise or when Jev is unavailable. */
+async function choosePlanningRoute(request: JevRequest, ctx: ExtensionContext): Promise<RouteTarget> {
 	// Keep a planning model the session already uses, so switching to jev/auto costs no cache miss.
-	const previous = request.previous?.model;
-	if (previous?.provider === PROVIDER && (previous.id === SOL || previous.id === TERRA)) return previous.id;
+	const previous = request.previous;
+	for (const route of [ROUTES.complex, ROUTES.standard]) {
+		if (
+			previous?.model.provider === route.provider &&
+			previous.model.id === route.model &&
+			previous.thinkingLevel === route.thinkingLevel
+		) {
+			return route;
+		}
+	}
 
 	const jev = ctx.modelRegistry.findOfType("classifier", "typesafe", "jev-latest");
-	if (!jev) return TERRA;
+	if (!jev) return ROUTES.standard;
 	const result = await ctx.modelRegistry.classify(
 		jev,
 		{
@@ -86,7 +100,9 @@ async function choosePlanningModel(request: JevRequest, ctx: ExtensionContext): 
 		{ signal: request.signal },
 	);
 	const answer = result.stopReason === "stop" ? result.answers.complexity : undefined;
-	return answer?.type === "choice" && (answer.probabilities.complex ?? 0) >= 0.5 ? SOL : TERRA;
+	return answer?.type === "choice" && (answer.probabilities.complex ?? 0) >= 0.5
+		? ROUTES.complex
+		: ROUTES.standard;
 }
 
 export default function (pi: ExtensionAPI) {
@@ -94,22 +110,24 @@ export default function (pi: ExtensionAPI) {
 		provider: "jev",
 		id: "auto",
 		name: "Auto (Jev)",
-		thinkingLevels: ["low", "medium", "high", "xhigh"],
 		// Shared by all three models; shown before the first response.
 		contextWindow: 272_000,
 		maxTokens: 128_000,
 		async route(request, ctx) {
-			if (request.reason === "direct") return routeTo(request, ctx, LUNA);
+			if (request.reason === "direct") return routeTo(ctx, ROUTES.implementation);
 			const state = request.state;
 			if (!state) {
-				const model = await choosePlanningModel(request, ctx);
-				return routeTo(request, ctx, model, { phase: "planning", model });
+				const route = await choosePlanningRoute(request, ctx);
+				return routeTo(ctx, route, { phase: "planning", route });
 			}
 			// The planning model made the first edit: hand the rest of the work to Luna.
 			if (state.phase === "planning" && editedThisTurn(request.messages)) {
-				return routeTo(request, ctx, LUNA, { phase: "implementation", model: LUNA });
+				return routeTo(ctx, ROUTES.implementation, {
+					phase: "implementation",
+					route: ROUTES.implementation,
+				});
 			}
-			return routeTo(request, ctx, state.model);
+			return routeTo(ctx, state.route);
 		},
 	});
 }
