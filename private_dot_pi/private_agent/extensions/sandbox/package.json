@@ -24,7 +24,7 @@
 		"@earendil-works/pi-coding-agent": "*"
 	},
 	"devDependencies": {
-		"@earendil-works/pi-coding-agent": "0.99.2",
+		"@earendil-works/pi-coding-agent": "1.0.0",
 		"vitest": "^4.1.9"
 	}
 }
