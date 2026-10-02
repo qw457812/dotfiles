@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "codesearch": {
+      "url": "https://mcp.grep.app",
+      "enabled": false
+    }
+  }
+}

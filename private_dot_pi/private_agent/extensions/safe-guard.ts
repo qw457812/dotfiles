@@ -24,7 +24,7 @@ const PROTECTED_PATHS = [
   ".env",
   ".git/",
   "node_modules/",
-  `${CONFIG_DIR_NAME}/`,
+  // `${CONFIG_DIR_NAME}/`,
   "id_rsa",
   ".ssh/",
 ];
