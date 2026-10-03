@@ -13,13 +13,13 @@
  * - Quota info for certain providers (when active)
  * - Elapsed: session duration
  * - Version
- * - Model name, provider (when multi-provider), thinking level
+ * - Model name, provider (when multi-provider), thinking level, virtual model route
  * - Tool tally (if any)
  * - Extension status messages (if any)
  *
  * Ref:
  * - Example extension: https://github.com/badlogic/pi-mono/blob/7b902612e96a8bf49cf6f34345f09a44e5ca6926/packages/coding-agent/examples/extensions/custom-footer.ts
- * - Default footer: https://github.com/badlogic/pi-mono/blob/3de8c48692ba2fd9f23d9cd0b99299edbe46af80/packages/coding-agent/src/modes/interactive/components/footer.ts
+ * - Default footer: https://github.com/earendil-works/pi/blob/a13d35a742c6ef8462812a28fbe1d8c8b7431c32/packages/coding-agent/src/modes/interactive/components/footer.ts
  * - oh-pi footer: https://github.com/telagod/oh-pi/blob/21c06f2d577eb6129582d1f9bb1e0f3bb98ed5c4/pi-package/extensions/custom-footer.ts
  */
 
@@ -31,6 +31,7 @@ import type {
 import { VERSION } from "@earendil-works/pi-coding-agent";
 import { type TUI, truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
 import { getQuota } from "./quota.js";
+import { createSessionStatsGetter } from "./session-stats.js";
 import { createToolCounter } from "./tool-counter.js";
 import { createTpsTracker } from "./tps.js";
 import { formatDecimal, formatTokens } from "./utils.js";
@@ -38,6 +39,7 @@ import { formatDecimal, formatTokens } from "./utils.js";
 export default function (pi: ExtensionAPI) {
   let enabled = true;
   let sessionStart = Date.now();
+  let statsRevision = 0;
   const tpsTracker = createTpsTracker();
   const toolCounter = createToolCounter();
 
@@ -75,6 +77,7 @@ export default function (pi: ExtensionAPI) {
     ) => {
       const unsub = footerData.onBranchChange(() => tui.requestRender());
       const timer = setInterval(() => tui.requestRender(), 30000);
+      const getSessionStats = createSessionStatsGetter(ctx);
 
       return {
         dispose() {
@@ -83,45 +86,16 @@ export default function (pi: ExtensionAPI) {
         },
         invalidate() {},
         render(width: number): string[] {
-          // Calculate cumulative usage from ALL session entries (not just post-compaction messages)
-          let totalInput = 0;
-          let totalOutput = 0;
-          let totalCacheRead = 0;
-          let totalCacheWrite = 0;
-          let totalCost = 0;
-          let latestCacheHitRate: number | undefined;
-
-          for (const entry of ctx.sessionManager.getEntries()) {
-            const usage =
-              entry.type === "usage" ||
-              entry.type === "compaction" ||
-              entry.type === "branch_summary"
-                ? entry.usage
-                : entry.type === "message" &&
-                    (entry.message.role === "assistant" || entry.message.role === "toolResult")
-                  ? entry.message.usage
-                  : undefined;
-            if (usage) {
-              totalInput += usage.input;
-              totalOutput += usage.output;
-              totalCacheRead += usage.cacheRead;
-              totalCacheWrite += usage.cacheWrite;
-              totalCost += usage.cost.total;
-            }
-            if (entry.type === "message" && entry.message.role === "assistant") {
-              const latestPromptTokens =
-                entry.message.usage.input +
-                entry.message.usage.cacheRead +
-                entry.message.usage.cacheWrite;
-              latestCacheHitRate =
-                latestPromptTokens > 0
-                  ? (entry.message.usage.cacheRead / latestPromptTokens) * 100
-                  : undefined;
-            }
-          }
-
-          // Calculate context usage from session
-          const contextUsage = ctx.getContextUsage();
+          const {
+            input: totalInput,
+            output: totalOutput,
+            cacheRead: totalCacheRead,
+            cacheWrite: totalCacheWrite,
+            cost: totalCost,
+            latestCacheHitRate,
+            contextUsage,
+            routed,
+          } = getSessionStats(statsRevision);
           const contextWindow = contextUsage?.contextWindow ?? ctx.model?.contextWindow ?? 0;
           const contextPercentValue = contextUsage?.percent ?? 0;
           const contextPercent =
@@ -157,7 +131,11 @@ export default function (pi: ExtensionAPI) {
           statsParts.push(contextPercentStr);
 
           // Quota
-          const quota = getQuota(ctx.model?.provider, tui, theme);
+          const quota = getQuota(
+            ctx.model?.api === "pi-virtual" ? routed?.provider : ctx.model?.provider,
+            tui,
+            theme,
+          );
           if (quota) {
             statsParts.push(quota);
           }
@@ -192,6 +170,11 @@ export default function (pi: ExtensionAPI) {
               thinkingLevel === "off"
                 ? `${modelName} thinking off`
                 : `${modelName} ${thinkingLevel}`;
+          }
+
+          if (routed) {
+            const level = routed.thinkingLevel ? ` ${routed.thinkingLevel}` : "";
+            rightSideWithoutProvider += ` → ${routed.modelId}${level}`;
           }
 
           // Prepend the provider in parentheses if there are multiple providers and there's enough room
@@ -266,6 +249,16 @@ export default function (pi: ExtensionAPI) {
     toolCounter.onSessionStart();
 
     ctx.ui.setFooter(createFooterFactory(ctx));
+  });
+
+  // ReadonlySessionManager has no getEntryCount(). Leaf changes handle normal
+  // appends/navigation; these boundaries also invalidate after recovery or cleanup.
+  pi.on("agent_end", () => {
+    statsRevision++;
+  });
+
+  pi.on("agent_settled", () => {
+    statsRevision++;
   });
 
   pi.on("turn_start", () => {
