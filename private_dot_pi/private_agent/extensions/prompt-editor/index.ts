@@ -17,6 +17,7 @@ import {
   visibleWidth,
 } from "@earendil-works/pi-tui";
 
+import { readMacOSClipboard } from "./macos-clipboard.ts";
 import {
   applyPromptHistory,
   hydratePromptHistory,
@@ -411,7 +412,11 @@ export default async function (pi: ExtensionAPI) {
     return colorize ? colorize(prefix) : prefix;
   }
 
-  function installTermuxClipboardBridge(editor: ModalEditorRuntime): void {
+  function installClipboardBridge(editor: ModalEditorRuntime): void {
+    if (process.platform === "darwin") {
+      editor.setClipboardReadFn?.(readMacOSClipboard);
+      return;
+    }
     if (!isTermuxClipboardAvailable()) return;
 
     // pi-vim's default clipboard helper uses @mariozechner/clipboard. In
@@ -1095,7 +1100,7 @@ export default async function (pi: ExtensionAPI) {
               ...pi.getCommands().map((command) => command.name),
             ]),
         );
-        installTermuxClipboardBridge(newEditor as unknown as ModalEditorRuntime);
+        installClipboardBridge(newEditor as unknown as ModalEditorRuntime);
 
         activeTui = tui as CursorTUI;
         activeEditor = newEditor as unknown as ModalEditorRuntime;
