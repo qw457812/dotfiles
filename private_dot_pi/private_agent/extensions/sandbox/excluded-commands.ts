@@ -1,10 +1,7 @@
 import { homedir } from "node:os";
 import path from "node:path";
-import {
-  initializeBashParser,
-  parseStaticCommandChain,
-  type StaticSimpleCommand,
-} from "./bash-parser.ts";
+import { initializeBashParser } from "../../lib/bash-parser.ts";
+import { parseStaticCommandChain, type StaticSimpleCommand } from "./static-command-chain.ts";
 
 export type ExcludedCommandMatch = {
   pattern: string;

@@ -11,5 +11,5 @@
     "isolatedModules": true,
     "allowImportingTsExtensions": true
   },
-  "include": ["extensions/**/*.ts", "tests/**/*.ts", "vitest.config.ts"]
+  "include": ["extensions/**/*.ts", "lib/**/*.ts", "tests/**/*.ts", "vitest.config.ts"]
 }

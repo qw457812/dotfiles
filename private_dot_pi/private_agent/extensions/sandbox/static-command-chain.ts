@@ -1,9 +1,7 @@
-import { createRequire } from "node:module";
 import { homedir } from "node:os";
 import path from "node:path";
-import type { Node as SyntaxNode, Parser as WebTreeSitterParser } from "web-tree-sitter";
-
-const require = createRequire(import.meta.url);
+import type { Node as SyntaxNode } from "web-tree-sitter";
+import { withBashTree } from "../../lib/bash-parser.ts";
 
 export type StaticEnvAssignment = {
   name: string;
@@ -17,54 +15,13 @@ export type StaticSimpleCommand = {
   envAssignments: StaticEnvAssignment[];
 };
 
-let bashParserPromise: Promise<WebTreeSitterParser> | undefined;
-let bashParser: WebTreeSitterParser | undefined;
-
-export async function initializeBashParser(): Promise<WebTreeSitterParser> {
-  if (bashParser) return bashParser;
-  if (bashParserPromise) return bashParserPromise;
-
-  bashParserPromise = (async (): Promise<WebTreeSitterParser> => {
-    try {
-      const { Parser, Language } = await import("web-tree-sitter");
-      const treeWasmPath = require.resolve("web-tree-sitter/tree-sitter.wasm");
-      const bashWasmPath = require.resolve("tree-sitter-bash/tree-sitter-bash.wasm");
-
-      await Parser.init({
-        locateFile() {
-          return treeWasmPath;
-        },
-      });
-
-      const bashLanguage = await Language.load(bashWasmPath);
-      const parser = new Parser();
-      parser.setLanguage(bashLanguage);
-      bashParser = parser;
-      return parser;
-    } catch (err) {
-      bashParserPromise = undefined;
-      throw err;
-    }
-  })();
-
-  return bashParserPromise;
-}
-
 export async function parseStaticCommandChain(
   command: string,
   cwd: string,
 ): Promise<StaticSimpleCommand[] | null> {
   if (!command) return null;
 
-  const parser = await initializeBashParser();
-  const tree = parser.parse(command);
-  if (!tree) throw new Error("Failed to parse command");
-
-  try {
-    return getStaticSimpleCommands(tree.rootNode, cwd);
-  } finally {
-    tree.delete();
-  }
+  return withBashTree(command, (root) => getStaticSimpleCommands(root, cwd));
 }
 
 function getStaticSimpleCommands(root: SyntaxNode, cwd: string): StaticSimpleCommand[] | null {
