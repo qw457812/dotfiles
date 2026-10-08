@@ -47,6 +47,11 @@ read -r PI_TARGET_PACKAGE PI_TARGET_VERSION < <(
 )
 PI_OLD_REV=$(npm view "@earendil-works/pi-coding-agent@$PI_OLD_VERSION" gitHead)
 PI_TARGET_REV=$(npm view "$PI_TARGET_PACKAGE@$PI_TARGET_VERSION" gitHead)
+# If either gitHead is empty, resolve it through RELEASE-REV.md before continuing.
+[ -n "$PI_OLD_REV" ] && [ -n "$PI_TARGET_REV" ] || {
+  echo 'Missing npm gitHead: follow RELEASE-REV.md, then resume with the resolved hashes.' >&2
+  exit 1
+}
 PI_CHK=$(bash ~/.pi/agent/skills/librarian/checkout.sh \
   github.com/earendil-works/pi --force-update --path-only)
 git -C "$PI_CHK" cat-file -e "$PI_LAZY_OLD_REV^{commit}"
@@ -81,6 +86,9 @@ git -C "$VIM_CHK" cat-file -e "$VIM_TARGET_REV^{commit}"
 printf 'runtime=%s\nold=%s\ntarget_version=%s\ntarget=%s\n' \
   "$VIM_OLD_VERSION" "$VIM_OLD_REV" "$VIM_TARGET_VERSION" "$VIM_TARGET_REV"
 ```
+
+When npm omits `gitHead`, follow [published revision resolution](RELEASE-REV.md)
+for that exact package version; a matching version tag alone is not release provenance.
 
 A lazy target can contain commits not present in the frozen published release.
 Classify that difference explicitly; only the published `gitHead` range describes

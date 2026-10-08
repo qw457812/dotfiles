@@ -43,9 +43,17 @@ arguments and apply to nested codemode calls. Verify that blocked calls never
 reach the server.
 
 When declarations change, validate local extensions against the frozen target
-package declarations in a temporary tree. Preserve installed packages and source
-pins during review. A check against current dependencies proves only the baseline;
-report target-only errors separately from runtime failures.
+package declarations in a temporary tree. Copy sources without `node_modules`,
+install the exact target host packages, and include runtime dependencies declared
+by nested extension packages. Keep those dependencies in the temporary root so
+nested development pins cannot silently select older host declarations. Find the
+nested manifests with `rg --files private_dot_pi/private_agent -g package.json`.
+
+Preserve installed packages and source pins during review. A check against current
+dependencies proves only the baseline; report target-only errors separately from
+runtime failures. If tests hardcode the old host version, record that failure,
+adjust only the temporary copy to the frozen version, and rerun the behavioral
+suite. Report both the original failure and the adjusted result.
 
 **Complete when:** every changed contract with a local consumer is classified as
 compatible, requiring a specific edit, or intentionally unsupported. Distinguish
