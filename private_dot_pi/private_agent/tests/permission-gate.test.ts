@@ -64,14 +64,32 @@ const PARSE_ERROR_CASES = [
 ];
 
 const APPROVAL_CASES = [
+  'rm -rf "$DIR"',
+  'rm -r "$DIR"',
+  'rm "$FLAGS" -R "$DIR"',
+  'rm -rf /tmp/cache "$OTHER"',
+  'rm "$FILE" /',
+  "rm -f /",
+  "rm -f .",
+  "rm -f /tmp",
+  'chmod 777 "$TARGET"',
+  'chmod o+w "$TARGET"',
+  'chmod u+s "$TARGET"',
+  'chmod -R "$MODE" "$TARGET"',
+  'chmod --recursive "$MODE" "$TARGET"',
+  "chown -R user dir",
+  'chown -hR "$OWNER" "$TARGET"',
+  'chown --recursive "$OWNER" "$TARGET"',
+  "chgrp -R group dir",
+  'chgrp -vR "$GROUP" "$TARGET"',
+  'chgrp --recursive "$GROUP" "$TARGET"',
+  'echo ok >"$(sudo true)"',
   'sudo rm -rf /; echo "unterminated',
   "sudo echo hello",
   "/usr/bin/sudo -u root true",
   "'sudo' true",
-  "rm -f file",
   "rm -r directory",
   "rm -Rf directory",
-  "rm --force file",
   "rm --recursive directory",
   "rm -rf /tmp",
   "rm /tmp/",
@@ -116,9 +134,6 @@ const APPROVAL_CASES = [
   "rm .",
   "rm ../",
   "rm /tmp/..",
-  'rm "$TARGET"',
-  "rm *.txt",
-  "rm ~/file",
   "mkfs /dev/sda",
   "/sbin/mkfs.ext4 /dev/sda",
   "dd",
@@ -145,10 +160,6 @@ const APPROVAL_CASES = [
   "chmod -R u+w dir",
   "chmod --recursive 755 dir",
   "chmod -R --reference=other file",
-  'chmod "$MODE" file',
-  'chmod 755 "$TARGET"',
-  "chown user file",
-  "chgrp group file",
   "echo ok >/dev/sda",
   "echo ok >>'/dev/nvme0n1'",
   "echo ok 2>/dev/disk/by-id/disk",
@@ -156,14 +167,11 @@ const APPROVAL_CASES = [
   "echo ok >|/dev/sda",
   "echo ok >&/dev/sda",
   "cat <>/dev/sda",
-  'echo ok >"$DEVICE"',
   "echo ok >/dev/./sda",
   "true; rm -rf dir; echo done",
-  "true&&rm -f file",
   "rm -rf dir|tee output",
   "(rm -rf dir)",
   "if true; then rm -rf dir; fi",
-  "for file in a b; do rm -f file; done",
   'echo "$(rm -rf dir)"',
   "echo `rm -rf dir`",
   "cat <(rm -rf dir)",
@@ -174,8 +182,41 @@ const APPROVAL_CASES = [
   '"/bin/rm" -rf dir',
 ];
 
+const LOW_NOISE_CASES = [
+  "rm -f file",
+  "rm --force file",
+  'rm "$TARGET"',
+  "rm *.txt",
+  "rm ~/file",
+  'chmod "$MODE" file',
+  'chmod 755 "$TARGET"',
+  "chown user file",
+  "chgrp group file",
+  'echo ok >"$DEVICE"',
+  "true&&rm -f file",
+  "for file in a b; do rm -f file; done",
+  'rm "$FILE"',
+  'rm -f "$FILE"',
+  'rm --force "$FILE"',
+  'rm "$FLAGS" "$FILE"',
+  'rm -- "$FILE" -r',
+  'chmod "$MODE" 777',
+  'chmod -- "$MODE" 777',
+  'chmod "$FLAGS" 777 file',
+  "chmod",
+  'chmod --reference="$REF" "$TARGET"',
+  'chown "$OWNER" "$TARGET"',
+  'chgrp "$GROUP" "$TARGET"',
+  "chown -- user -R",
+  "chgrp -- group --recursive",
+  'echo >"$OUT"',
+  'echo >"${OUT:-/dev/sda}"',
+  'echo >"$(printf /dev/sda)"',
+];
+
 const CLEAR_CASES = [
   ...PARSE_ERROR_CASES,
+  ...LOW_NOISE_CASES,
   "",
   "  ",
   "rm file",
@@ -319,6 +360,15 @@ const GIT_CLEAR_CASES = [
 ];
 
 describe("Permission Gate", () => {
+  it.each(LOW_NOISE_CASES)("does not prompt or abort for low-noise cases: %s", async (command) => {
+    const { run, ctx, emit } = harness(false);
+    expect(await run(command)).toBeUndefined();
+    expect(ctx.ui.confirm).not.toHaveBeenCalled();
+    expect(ctx.ui.notify).not.toHaveBeenCalled();
+    expect(ctx.abort).not.toHaveBeenCalled();
+    expect(emit).not.toHaveBeenCalled();
+  });
+
   it.each(APPROVAL_CASES)("asks once and shows the complete command: %s", async (command) => {
     const { run, ctx, emit } = harness();
     expect(await run(command)).toBeUndefined();

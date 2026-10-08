@@ -8,8 +8,9 @@
  * Git confirmation defaults to ON, lives only in this extension instance, and resets on /reload.
  *
  * Approval rules:
- * - sudo, mkfs/mkfs.*, dd, and all chown/chgrp commands.
- * - rm: force/recursive options or targets lexically normalized to `/`, `.` or `..`.
+ * - sudo, mkfs/mkfs.*, and dd.
+ * - chown/chgrp: recursive options only.
+ * - rm: recursive options or targets lexically normalized to `/`, `.` or `..`.
  *   Literal absolute descendants of /tmp, /var/tmp or the host process's tmpdir() are
  *   exempt when every target is temporary and only common options precede the targets.
  *   On macOS, /private/tmp and /private/var/tmp are also explicitly recognized.
@@ -18,7 +19,10 @@
  * - chmod: recursive or matching world-writable/set-ID modes.
  * - Git: only recognized subcommands in GIT_GUARDED_SUBCOMMANDS.
  * - Writes to /dev/* (including <>), except null, stdout, stderr and fd/0..2.
- * - Unresolved rm/chmod arguments and output destinations.
+ *
+ * Unresolved arguments and output destinations alone do not require approval. Known
+ * recursive options, dangerous modes and literal dangerous targets still do. Unknown
+ * deletion targets cannot qualify for the temporary-directory exemption.
  *
  * Syntax errors alone do not require approval; recognized hazards in recovered syntax
  * trees still do. Parser exceptions skip checks and allow execution, with a warning when
@@ -158,48 +162,53 @@ function redirectRequiresApproval(node: SyntaxNode): boolean {
   if (!writes) return false;
 
   const destination = wordText(node.childForFieldName("destination"));
-  if (destination === undefined) return true;
+  if (destination === undefined) return false;
   const path = posix.normalize(destination);
   return path.startsWith("/dev/") && !/^\/dev\/(?:null|stdout|stderr|fd\/[012])$/.test(path);
 }
 
-function rmRequiresApproval(words: readonly string[]): boolean {
-  const paths = words.map((word) => posix.normalize(word).replace(/\/+$/, "") || "/");
+function rmRequiresApproval(words: readonly (string | undefined)[]): boolean {
+  const paths = words.map((word) =>
+    word === undefined ? undefined : posix.normalize(word).replace(/\/+$/, "") || "/",
+  );
 
   // Only common, leading flags are eligible for the temporary-target exemption.
   let start = 0;
   while (/^(?:-[dfiIrRv]+|--(?:force|recursive|dir|verbose))$/.test(words[start] ?? "")) start++;
   if (words[start] === "--") start++;
   const targets = paths.slice(start);
-  if (targets.some((path) => TEMP_DIRECTORIES.includes(path))) return true;
+  if (targets.some((path) => path !== undefined && TEMP_DIRECTORIES.includes(path))) return true;
   if (
     targets.length > 0 &&
-    targets.every((path) => TEMP_DIRECTORIES.some((dir) => path.startsWith(`${dir}/`)))
+    targets.every(
+      (path) => path !== undefined && TEMP_DIRECTORIES.some((dir) => path.startsWith(`${dir}/`)),
+    )
   )
     return false;
 
   const end = words.indexOf("--");
   const options = end < 0 ? words : words.slice(0, end);
   return (
-    options.some(
-      (word) => /^-[^-]*[frR]/.test(word) || word === "--force" || word === "--recursive",
-    ) || paths.some((path) => ["/", ".", ".."].includes(path))
+    options.some((word) => /^-[^-]*[rR]/.test(word ?? "") || word === "--recursive") ||
+    paths.some((path) => path !== undefined && ["/", ".", ".."].includes(path))
   );
 }
 
-function chmodRequiresApproval(words: readonly string[]): boolean {
+function chmodRequiresApproval(words: readonly (string | undefined)[]): boolean {
   const end = words.indexOf("--");
   const options = end < 0 ? words : words.slice(0, end);
-  if (options.some((word) => /^-[^-]*R/.test(word) || word === "--recursive")) return true;
+  if (options.some((word) => /^-[^-]*R/.test(word ?? "") || word === "--recursive")) return true;
 
-  if (options.some((word) => word === "--reference" || word.startsWith("--reference=")))
+  if (options.some((word) => word === "--reference" || word?.startsWith("--reference=")))
     return false;
 
   const mode =
     end < 0
-      ? words.find((word) => !word.startsWith("-") || /^-0*[0-7]{1,4}$/.test(word))
+      ? words.find(
+          (word) => word === undefined || !word.startsWith("-") || /^-0*[0-7]{1,4}$/.test(word),
+        )
       : words[end + 1];
-  if (!mode) return true;
+  if (!mode) return false;
   if (/^[+=-]?0*[0-7]{1,4}$/.test(mode)) {
     if (mode.startsWith("-")) return false;
     const permissions = Number.parseInt(mode.replace(/^[+=]/, ""), 8);
@@ -223,12 +232,8 @@ function requiresApproval(root: SyntaxNode, gitEnabled: boolean): boolean {
     const name = wordText(node.childForFieldName("name"));
     if (name === undefined) return false;
     const executable = posix.basename(name);
-    if (
-      ["sudo", "dd", "chown", "chgrp", "mkfs"].includes(executable) ||
-      executable.startsWith("mkfs.")
-    )
-      return true;
-    if (executable !== "git" && executable !== "rm" && executable !== "chmod") return false;
+    if (["sudo", "dd", "mkfs"].includes(executable) || executable.startsWith("mkfs.")) return true;
+    if (!["git", "rm", "chmod", "chown", "chgrp"].includes(executable)) return false;
 
     const args = node.childrenForFieldName("argument").map((arg) => wordText(arg));
     if (executable === "git") {
@@ -236,9 +241,12 @@ function requiresApproval(root: SyntaxNode, gitEnabled: boolean): boolean {
       const subcommand = gitSubcommand(args);
       return subcommand !== undefined && GIT_GUARDED_SUBCOMMANDS.has(subcommand);
     }
-    if (args.some((arg) => arg === undefined)) return true;
-    const words = args as string[];
-    return executable === "rm" ? rmRequiresApproval(words) : chmodRequiresApproval(words);
+    if (executable === "rm") return rmRequiresApproval(args);
+    if (executable === "chmod") return chmodRequiresApproval(args);
+
+    const end = args.indexOf("--");
+    const options = end < 0 ? args : args.slice(0, end);
+    return options.some((arg) => /^-[^-]*R/.test(arg ?? "") || arg === "--recursive");
   });
 }
 
