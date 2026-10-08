@@ -44,6 +44,7 @@ type CodebuddyReasoningConfig = {
 type CodebuddyProductModel = {
   id?: string;
   name?: string;
+  credits?: string;
   tags?: string[];
   supportsToolCall?: boolean;
   supportsImages?: boolean;
@@ -151,9 +152,10 @@ function toLiveModel(
   model: Required<Pick<CodebuddyProductModel, "id" | "name">> & CodebuddyProductModel,
 ): CodebuddyModel {
   const reasoning = Boolean(model.supportsReasoning);
+  const credits = model.credits?.trim();
   const config: ChatModelConfig = {
     id: model.id,
-    name: model.name,
+    name: credits ? `${model.name} (${credits})` : model.name,
     reasoning,
     thinkingLevelMap: reasoning ? buildThinkingLevelMap(model) : undefined,
     input: model.supportsImages ? ["text", "image"] : ["text"],

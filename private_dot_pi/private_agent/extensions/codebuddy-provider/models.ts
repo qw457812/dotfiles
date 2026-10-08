@@ -13,6 +13,21 @@ export function isCodebuddyModel(model: AnyModel): model is CodebuddyModel {
   );
 }
 
+export function formatCodebuddyModelList(models: readonly AnyModel[]): string {
+  const entries = models.filter(isCodebuddyModel).map((model) => {
+    const match = /\((x(\d+(?:\.\d+)?)(?: credits)?)\)$/.exec(model.name);
+    return {
+      id: model.id,
+      credits: match?.[1] ?? "credits unknown",
+      rate: match ? Number(match[2]) : Infinity,
+    };
+  });
+  entries.sort((a, b) => a.rate - b.rate || a.id.localeCompare(b.id));
+  if (entries.length === 0) return "No CodeBuddy models available.";
+  const width = Math.max(...entries.map((entry) => entry.id.length));
+  return entries.map((entry) => `${entry.id.padEnd(width)}  ${entry.credits}`).join("\n");
+}
+
 export function toCodebuddyModel(config: ChatModelConfig): CodebuddyModel {
   return {
     id: config.id,

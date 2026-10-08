@@ -19,6 +19,7 @@ import { fetchLiveModels } from "./live-models.js";
 import {
   type ChatModelConfig,
   type CodebuddyModel,
+  formatCodebuddyModelList,
   isCodebuddyModel,
   toCodebuddyModel,
 } from "./models.js";
@@ -188,6 +189,13 @@ export default function (pi: ExtensionAPI) {
   }
 
   pi.registerProvider(createCodebuddyProvider(conversationIdFor));
+
+  pi.registerCommand("codebuddy-models", {
+    description: "List CodeBuddy models by credits (lowest first)",
+    handler: async (_args, ctx) => {
+      ctx.ui.notify(formatCodebuddyModelList(ctx.modelRegistry.getAll()), "info");
+    },
+  });
 
   // Compaction rewrites the history behind the id, so don't reuse it afterwards.
   pi.on("session_before_compact", (_event, ctx) => {

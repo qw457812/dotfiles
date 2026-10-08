@@ -4,6 +4,7 @@ import { CHAT_BASE_URL, PROVIDER } from "../extensions/codebuddy-provider/consta
 import { fetchLiveModels } from "../extensions/codebuddy-provider/live-models.js";
 import {
   type ChatModelConfig,
+  formatCodebuddyModelList,
   isCodebuddyModel,
   toCodebuddyModel,
 } from "../extensions/codebuddy-provider/models.js";
@@ -43,6 +44,57 @@ describe("CodeBuddy chat models", () => {
       { ...chat, type: "classifier" },
     ];
     expect(mixed.filter(isCodebuddyModel)).toEqual([chat]);
+  });
+
+  it.each([
+    ["x0.79 credits", "GLM (x0.79 credits)"],
+    ["x0.00 credits", "GLM (x0.00 credits)"],
+    ["x1.62", "GLM (x1.62)"],
+    ["  x0.06 credits  ", "GLM (x0.06 credits)"],
+    [undefined, "GLM"],
+    ["", "GLM"],
+    ["   ", "GLM"],
+  ])("displays credits %j without changing token costs", async (credits, name) => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () =>
+        new Response(
+          JSON.stringify({
+            code: 0,
+            data: { models: [{ id: "glm", name: "GLM", credits }] },
+          }),
+        ),
+      ),
+    );
+
+    const models = await fetchLiveModels({ accessToken: "test-token" });
+    expect(models[0]).toMatchObject({
+      id: "glm",
+      name,
+      cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
+    });
+  });
+
+  it("lists only CodeBuddy models by numeric credits, with unknown rates last", () => {
+    const models: AnyModel[] = [
+      { ...chat, id: "expensive", name: "Expensive (x10.00 credits)" },
+      { ...chat, id: "unknown", name: "Unknown" },
+      { ...chat, id: "cheap", name: "Cheap (x0.05 credits)" },
+      { ...chat, id: "free", name: "Free (x0.00 credits)" },
+      { ...chat, id: "paid", name: "Paid (x1.62)" },
+      { ...chat, id: "other", provider: "other" },
+      { ...chat, id: "image", type: "image", output: ["image"] },
+    ];
+    expect(formatCodebuddyModelList(models)).toBe(
+      [
+        "free       x0.00 credits",
+        "cheap      x0.05 credits",
+        "paid       x1.62",
+        "expensive  x10.00 credits",
+        "unknown    credits unknown",
+      ].join("\n"),
+    );
+    expect(formatCodebuddyModelList([])).toBe("No CodeBuddy models available.");
   });
 
   it("preserves live-model filtering, agent order and reasoning allowlists", async () => {
