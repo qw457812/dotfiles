@@ -1,7 +1,8 @@
 /**
  * Inspect pi's system prompt pipeline.
  *
- * /prompt-inspect          Current effective system prompt.
+ * /prompt-inspect          Effective prompt snapshot from the last provider request,
+ *                          or the current base prompt before any request.
  * /prompt-inspect payload  Last provider request payload, HTTP metadata, and
  *                          Pi's parsed assistant message.
  * /prompt-inspect diff     Diff system prompt stages:
@@ -10,10 +11,15 @@
  * Stages:
  *   base      getSystemPrompt() at session_start
  *   effective getSystemPrompt() at provider request time
- *   payload   system instructions serialized in the provider request payload
+ *   payload   extracted system instructions in the provider payload hook snapshot
+ *
+ * Providers may preserve updates in the conversation or merge them into the
+ * leading instructions. With transcript updates (or unknown history), show
+ * extracted instructions and Pi's updates separately without assuming either
+ * serialization. Transcript evidence is not wire proof.
  */
 
-import type { AssistantMessage, ProviderResponse } from "@earendil-works/pi-ai";
+import type { AssistantMessage, ProviderResponse, SystemMessage } from "@earendil-works/pi-ai";
 import {
   type ExtensionAPI,
   type ExtensionCommandContext,
@@ -29,6 +35,7 @@ type PromptInspectState = {
   lastRequest?: {
     prompt: string;
     payload: unknown;
+    systemUpdates?: SystemMessage[];
   };
   lastResponse?: ProviderResponse;
   lastAssistant?: AssistantMessage;
@@ -54,7 +61,7 @@ function normalizeContent(content: unknown): string {
 }
 
 // Extract provider-serialized system instructions across supported API payload shapes.
-function extractSystemFromPayload(payload: unknown): string | undefined {
+export function extractSystemFromPayload(payload: unknown): string | undefined {
   if (!payload || typeof payload !== "object") return undefined;
   const p = payload as Rec;
 
@@ -64,6 +71,12 @@ function extractSystemFromPayload(payload: unknown): string | undefined {
   // Anthropic / Bedrock
   if (typeof p.system === "string") return p.system;
   if (Array.isArray(p.system)) return normalizeContent(p.system);
+
+  // Command Code wraps Anthropic-style request parameters in params.
+  // https://github.com/patlux/pi-commandcode-provider
+  const params = p.params && typeof p.params === "object" ? (p.params as Rec) : undefined;
+  if (typeof params?.system === "string") return params.system;
+  if (Array.isArray(params?.system)) return normalizeContent(params.system);
 
   // Google (Gemini / Vertex)
   const config = p.config && typeof p.config === "object" ? (p.config as Rec) : undefined;
@@ -89,6 +102,24 @@ function extractSystemFromPayload(payload: unknown): string | undefined {
   return undefined;
 }
 
+// Only a projection with a leading system message establishes a known baseline.
+// Keep replacements/removals structured; concatenating them changes semantics.
+export function collectSystemPromptUpdates(
+  messages: readonly unknown[],
+): SystemMessage[] | undefined {
+  const initial = messages[0] as SystemMessage | undefined;
+  if (initial?.role !== "system") return undefined;
+  const updates = messages.slice(1).filter((message): message is SystemMessage => {
+    if (!message || typeof message !== "object") return false;
+    const system = message as SystemMessage;
+    if (system.role !== "system") return false;
+    return (
+      normalizeContent(system.content).length > 0 || Object.keys(system.sections ?? {}).length > 0
+    );
+  });
+  return structuredClone(updates);
+}
+
 function buildPromptPatch(
   fromLabel: string,
   fromText: string,
@@ -108,9 +139,14 @@ export default function (pi: ExtensionAPI) {
   });
 
   pi.on("before_provider_request", (event, ctx) => {
+    state.lastResponse = undefined;
+    state.lastAssistant = undefined;
     state.lastRequest = {
       prompt: ctx.getSystemPrompt(),
       payload: event.payload,
+      systemUpdates: ctx.sessionManager?.buildSessionProjection
+        ? collectSystemPromptUpdates(ctx.sessionManager.buildSessionProjection().messages)
+        : undefined,
     };
   });
 
@@ -157,6 +193,14 @@ export default function (pi: ExtensionAPI) {
             },
             pi: {
               assistant: state.lastAssistant ?? null,
+              systemPrompt: {
+                effective: state.lastRequest.prompt,
+                // May be initial instructions or a complete prompt with updates merged in.
+                payloadSystemInstructions:
+                  extractSystemFromPayload(state.lastRequest.payload) ?? null,
+                // Pi transcript evidence, not verified wire updates. null means unknown history.
+                transcriptUpdates: state.lastRequest.systemUpdates ?? null,
+              },
             },
           };
           await openInEditor(ctx, JSON.stringify(dump, null, 2), "payload.json");
@@ -176,11 +220,16 @@ export default function (pi: ExtensionAPI) {
             state.basePrompt,
             state.lastRequest.prompt,
             state.lastRequest.payload,
+            state.lastRequest.systemUpdates,
           );
           return;
         }
         case "":
-          await openInEditor(ctx, ctx.getSystemPrompt(), "system-prompt.md");
+          await openInEditor(
+            ctx,
+            state.lastRequest?.prompt ?? ctx.getSystemPrompt(),
+            "system-prompt.md",
+          );
           return;
         default:
           ctx.ui.notify(
@@ -198,6 +247,7 @@ async function openDiffInEditor(
   base: string,
   effective: string,
   payload: unknown,
+  systemUpdates: SystemMessage[] | undefined,
 ): Promise<void> {
   const patches: string[] = [];
 
@@ -210,7 +260,17 @@ async function openDiffInEditor(
 
   // Stage 2: before_provider_request payload-level rewrites (effective -> payload).
   const sent = extractSystemFromPayload(payload);
-  if (sent === undefined) {
+  const canComparePayload = systemUpdates !== undefined && systemUpdates.length === 0;
+  if (!canComparePayload) {
+    const reason =
+      systemUpdates === undefined
+        ? "transcript history unknown"
+        : "transcript contains system prompt updates";
+    ctx.ui.notify(
+      `effective -> payload comparison skipped: ${reason}. Use /prompt-inspect payload to inspect extracted system instructions and Pi transcript updates (not verified wire updates).`,
+      "info",
+    );
+  } else if (sent === undefined) {
     ctx.ui.notify(
       "Could not extract system from payload for /prompt-inspect diff; use /prompt-inspect payload for raw JSON",
       "warning",
@@ -222,6 +282,7 @@ async function openDiffInEditor(
   }
 
   if (patches.length === 0) {
+    if (!canComparePayload || sent === undefined) return;
     ctx.ui.notify("System prompt diff: (none; all stages match)", "info");
     return;
   }

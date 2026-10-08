@@ -126,7 +126,7 @@
   "pi-vim": { "branch": "main", "commit": "e55b07c05b648f3bbccf656c2b0c6ec63f1a91d1" },
   "pi-vision-handoff": { "branch": "main", "commit": "45a103b4e31f7ab0e4bb19967fa4cc7e8a1ac791" },
   "plenary.nvim": { "branch": "master", "commit": "74b06c6c75e4eeb3108ec01852001636d85a932b" },
-  "ponytail": { "branch": "main", "commit": "e3ba2aa6f1e6f0bc4d69eb09c9f0d0a93af56156" },
+  "ponytail": { "branch": "main", "commit": "b088b2df6e08d4306c6a3c3d575fe38c2d2d2989" },
   "ppt-master": { "branch": "main", "commit": "c2cb78ad997b41d16cefe083831d62571ab9f741" },
   "py-requirements.nvim": { "branch": "main", "commit": "6d8b1657234e76ca1b850c42150187dcaa627e93" },
   "refactoring.nvim": { "branch": "master", "commit": "8bcf893eb3871bc87b42adffe2fb9b0b7dc9d328" },

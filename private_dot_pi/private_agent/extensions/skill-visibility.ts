@@ -18,7 +18,6 @@
 // See also: https://github.com/earendil-works/pi/blob/3e5ad67e0f325d4888f82f9b82966218eb4407f5/packages/coding-agent/examples/extensions/prompt-customizer.ts
 
 import {
-  formatSkillsForPrompt,
   generateUnifiedPatch,
   type ExtensionAPI,
   type ExtensionCommandContext,
@@ -65,9 +64,6 @@ const PROMPT_REVEALED_SKILLS: string[] = [
 const COMMAND = "skill-visibility";
 
 type PromptPair = { before: string; after: string };
-type PromptHideResult = { prompt: string; removed: string[] };
-type PromptRevealResult = { prompt: string; available: string[] };
-type PromptVisibilityResult = { prompt: string; hidden: string[]; revealed: string[] };
 
 // Mirrors pi's formatSkillsForPrompt skill block shape:
 // https://github.com/earendil-works/pi/blob/8e1900666f3cb83c281297d8f787fae6ee2bd0e6/packages/coding-agent/src/core/skills.ts#L351-L355
@@ -80,20 +76,21 @@ export default function (pi: ExtensionAPI) {
 
   pi.on("before_agent_start", async (event, ctx) => {
     const skills = event.systemPromptOptions.skills ?? [];
-    const result = applySkillVisibilityOverrides(
-      event.systemPrompt,
-      skills,
-      canAppendSkillsSection(event.systemPromptOptions.selectedTools),
-    );
-
-    lastPromptPair = { before: event.systemPrompt, after: result.prompt };
+    const before = event.systemPrompt;
+    // Change visibility in the structured options, not forceSystemPrompt: a
+    // forced snapshot would mask sections added by later handlers (ponytail).
+    event.systemPromptOptions.skills = skills.map((skill) => {
+      if (PROMPT_HIDDEN_SKILLS.includes(skill.name))
+        return { ...skill, disableModelInvocation: true };
+      if (PROMPT_REVEALED_SKILLS.includes(skill.name))
+        return { ...skill, disableModelInvocation: false };
+      return skill;
+    });
+    lastPromptPair = { before, after: ctx.getSystemPrompt() };
     if (!checked) {
       checked = true;
-      checkDrift(ctx, skills, result.hidden, result.revealed);
+      checkDrift(ctx, skills, lastPromptPair, event.systemPromptOptions.selectedTools);
     }
-
-    if (result.prompt === event.systemPrompt) return;
-    return { systemPrompt: result.prompt };
   });
 
   pi.registerCommand(COMMAND, {
@@ -115,15 +112,12 @@ export default function (pi: ExtensionAPI) {
         return;
       }
 
-      const currentPrompt = ctx.getSystemPrompt();
-      const { before, after } = lastPromptPair ?? {
-        before: currentPrompt,
-        after: applySkillVisibilityOverrides(
-          currentPrompt,
-          ctx.getSystemPromptOptions().skills ?? [],
-          canAppendSkillsSection(ctx.getSystemPromptOptions().selectedTools),
-        ).prompt,
-      };
+      if (!lastPromptPair) {
+        ctx.ui.notify("System prompt diff: unavailable until the first turn", "info");
+        return;
+      }
+
+      const { before, after } = lastPromptPair;
       if (before === after) {
         ctx.ui.notify("System prompt diff: (none; extension made no changes)", "info");
         return;
@@ -137,140 +131,37 @@ export default function (pi: ExtensionAPI) {
   });
 }
 
-function canAppendSkillsSection(selectedTools: string[] | undefined): boolean {
-  const tools = selectedTools ?? [];
-  return tools.includes("read") || tools.includes("bash");
-}
-
-function applySkillVisibilityOverrides(
-  systemPrompt: string,
-  skills: Skill[],
-  canAppendSkillsSection: boolean,
-): PromptVisibilityResult {
-  const hidden = hidePromptSkills(systemPrompt);
-  const revealed = revealPromptSkills(hidden.prompt, skills, canAppendSkillsSection);
-
-  return {
-    prompt: revealed.prompt,
-    hidden: hidden.removed,
-    revealed: revealed.available,
-  };
-}
-
-function hidePromptSkills(systemPrompt: string): PromptHideResult {
-  const removed: string[] = [];
-  const strippedPrompt = systemPrompt.replace(SKILL_BLOCK_RE, (block, name: string) => {
-    if (!PROMPT_HIDDEN_SKILLS.includes(name)) return block;
-    removed.push(name);
-    return "";
-  });
-
-  return { prompt: pruneEmptySkillsSection(strippedPrompt), removed };
-}
-
-function revealPromptSkills(
-  systemPrompt: string,
-  skills: Skill[],
-  canAppendSkillsSection: boolean,
-): PromptRevealResult {
-  const disabledSkillsToReveal = skills.filter(
-    (skill) => PROMPT_REVEALED_SKILLS.includes(skill.name) && skill.disableModelInvocation,
-  );
-  const existingNames = getPromptSkillNames(systemPrompt);
-  const missingSkills = disabledSkillsToReveal.filter((skill) => !existingNames.has(skill.name));
-
-  let prompt = systemPrompt;
-  if (missingSkills.length > 0) {
-    if (prompt.includes("</available_skills>")) {
-      prompt = insertSkillBlocks(prompt, missingSkills);
-    } else if (canAppendSkillsSection) {
-      prompt = insertSkillsSection(prompt, formatModelInvocableSkillsForPrompt(missingSkills));
-    }
-  }
-
-  const availableNames = getPromptSkillNames(prompt);
-  const available = disabledSkillsToReveal
-    .filter((skill) => availableNames.has(skill.name))
-    .map((skill) => skill.name);
-  return { prompt, available };
-}
-
-function insertSkillBlocks(systemPrompt: string, skills: Skill[]): string {
-  const blocks = formatSkillBlocks(skills);
-  if (!blocks) return systemPrompt;
-  return systemPrompt.replace("</available_skills>", `${blocks}\n</available_skills>`);
-}
-
 function getPromptSkillNames(systemPrompt: string): Set<string> {
   return new Set(Array.from(systemPrompt.matchAll(SKILL_BLOCK_RE), (match) => match[1]));
-}
-
-function pruneEmptySkillsSection(systemPrompt: string): string {
-  if (getPromptSkillNames(systemPrompt).size > 0) return systemPrompt;
-
-  // https://github.com/earendil-works/pi/blob/1d6dbf9e3d60f129bf8ee513c82a98f222c57788/packages/coding-agent/src/core/skills.ts#L355-L383
-  const availableSkillsEnd = systemPrompt.indexOf("</available_skills>");
-  if (availableSkillsEnd === -1) return systemPrompt;
-
-  // https://github.com/earendil-works/pi/blob/13cbf77df2396303013a41646bcfa77b4271ae56/packages/coding-agent/src/core/system-prompt.ts#L167-L177
-  const sectionStart = systemPrompt.lastIndexOf("\n\n<skills>\n", availableSkillsEnd);
-  if (sectionStart === -1) return systemPrompt;
-
-  const sectionEndMarker = "\n</skills>";
-  const sectionEnd = systemPrompt.indexOf(sectionEndMarker, availableSkillsEnd);
-  if (sectionEnd === -1) return systemPrompt;
-
-  return (
-    systemPrompt.slice(0, sectionStart) + systemPrompt.slice(sectionEnd + sectionEndMarker.length)
-  );
-}
-
-function insertSkillsSection(systemPrompt: string, skillsSection: string): string {
-  if (!skillsSection) return systemPrompt;
-
-  const renderedSkillsSection = `\n\n<skills>\n${skillsSection.trim()}\n</skills>`;
-  // https://github.com/earendil-works/pi/blob/13cbf77df2396303013a41646bcfa77b4271ae56/packages/coding-agent/src/core/system-prompt.ts#L170-L177
-  const cwdSectionIndex = systemPrompt.lastIndexOf("\n\n<cwd>\n");
-  if (cwdSectionIndex === -1) return systemPrompt + renderedSkillsSection;
-
-  return (
-    systemPrompt.slice(0, cwdSectionIndex) +
-    renderedSkillsSection +
-    systemPrompt.slice(cwdSectionIndex)
-  );
-}
-
-function formatSkillBlocks(skills: Skill[]): string {
-  return Array.from(
-    formatModelInvocableSkillsForPrompt(skills).matchAll(SKILL_BLOCK_RE),
-    (match) => match[0],
-  )
-    .join("")
-    .replace(/^\n/, "");
-}
-
-function formatModelInvocableSkillsForPrompt(skills: Skill[]): string {
-  return formatSkillsForPrompt(
-    skills.map((skill) => ({ ...skill, disableModelInvocation: false })),
-  );
 }
 
 function checkDrift(
   ctx: Pick<ExtensionContext, "ui">,
   skills: Skill[],
-  hidden: string[],
-  revealed: string[],
+  { before, after }: PromptPair,
+  selectedTools: string[],
 ): void {
-  const expectedHidden = skills
-    .filter((skill) => PROMPT_HIDDEN_SKILLS.includes(skill.name) && !skill.disableModelInvocation)
+  const beforeNames = getPromptSkillNames(before);
+  const afterNames = getPromptSkillNames(after);
+  const missingHidden = skills
+    .filter((skill) => PROMPT_HIDDEN_SKILLS.includes(skill.name) && afterNames.has(skill.name))
     .map((skill) => skill.name);
-  const missingHidden = expectedHidden.filter((name) => !hidden.includes(name));
-  const extraHidden = hidden.filter((name) => !expectedHidden.includes(name));
-  const expectedRevealed = skills
-    .filter((skill) => PROMPT_REVEALED_SKILLS.includes(skill.name) && skill.disableModelInvocation)
+  const extraHidden = [...beforeNames].filter(
+    (name) => !afterNames.has(name) && !PROMPT_HIDDEN_SKILLS.includes(name),
+  );
+  // Pi only renders the skills section when a file reader is selected.
+  const canRenderSkills = selectedTools.includes("read") || selectedTools.includes("bash");
+  const missingRevealed = skills
+    .filter(
+      (skill) =>
+        canRenderSkills &&
+        PROMPT_REVEALED_SKILLS.includes(skill.name) &&
+        !afterNames.has(skill.name),
+    )
     .map((skill) => skill.name);
-  const missingRevealed = expectedRevealed.filter((name) => !revealed.includes(name));
-  const extraRevealed = revealed.filter((name) => !expectedRevealed.includes(name));
+  const extraRevealed = [...afterNames].filter(
+    (name) => !beforeNames.has(name) && !PROMPT_REVEALED_SKILLS.includes(name),
+  );
   const lines: string[] = [];
 
   if (missingHidden.length > 0) lines.push(`failed to hide ${missingHidden.join(", ")}`);

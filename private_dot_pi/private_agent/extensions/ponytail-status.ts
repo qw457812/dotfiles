@@ -39,15 +39,23 @@ function getConfigPath(): string {
 
 // Mirrors ponytail's default-mode resolution (env > config.json > full); review
 // is excluded as a default (#377):
-// https://github.com/DietrichGebert/ponytail/blob/14a0d79/hooks/ponytail-config.js
+// https://github.com/DietrichGebert/ponytail/blob/b088b2df/hooks/ponytail-config.js
+function normalizeDefaultMode(value: unknown): Mode | undefined {
+  if (typeof value !== "string") return undefined;
+  const mode = value.trim().toLowerCase();
+  return RUNTIME.includes(mode) ? (mode as Mode) : undefined;
+}
+
 function getDefaultMode(): Mode {
-  const env = process.env.PONYTAIL_DEFAULT_MODE?.toLowerCase();
-  if (env && RUNTIME.includes(env)) return env as Mode;
+  const env = normalizeDefaultMode(process.env.PONYTAIL_DEFAULT_MODE);
+  if (env) return env;
 
   try {
-    const cfg = JSON.parse(readFileSync(getConfigPath(), "utf8")) as { defaultMode?: string };
-    const m = cfg.defaultMode?.toLowerCase();
-    if (m && RUNTIME.includes(m)) return m as Mode;
+    const cfg = JSON.parse(readFileSync(getConfigPath(), "utf8").replace(/^\uFEFF/, "")) as {
+      defaultMode?: unknown;
+    };
+    const mode = normalizeDefaultMode(cfg.defaultMode);
+    if (mode) return mode;
   } catch {
     // no/invalid config file — fall through to default
   }
@@ -97,6 +105,7 @@ export default function (pi: ExtensionAPI): void {
     syncStatus(ctx);
   });
 
+  pi.on("session_tree", async (_event, ctx) => syncStatus(ctx));
   pi.on("agent_start", async (_event, ctx) => syncStatus(ctx));
   pi.on("agent_end", async (_event, ctx) => syncStatus(ctx));
 }
