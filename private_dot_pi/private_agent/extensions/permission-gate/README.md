@@ -27,10 +27,10 @@ Git rules and Jev both default to **ON**. Switches live only in the current exte
    ```text
    intent_covered  >= 0.80   Actions and important side effects are authorized
    scope_covered   >= 0.90   Targets and effects stay within the authorized scope
-   unexpected_harm <= 0.10   No apparent material effect outside that authorization
+   effects_covered >= 0.90   Material effects are covered by that authorization
    ```
 
-   Auto-approve only when all conditions pass; otherwise ask the user. `unexpected_harm` is not intrinsic danger: explicitly accepted destructive effects do not automatically prevent approval.
+   Auto-approve only when all conditions pass; otherwise ask the user. `effects_covered` is not intrinsic safety: explicitly accepted destructive effects do not automatically prevent approval.
 
 4. Every matched operation is eligible for auto-approval. There is no fixed hard-deny list or non-overridable `deny` decision.
 5. Manual rejection blocks execution and calls `ctx.abort()`. Calls requiring confirmation are blocked when no UI is available.
@@ -50,11 +50,11 @@ Deletion is exempt when every target is a literal absolute descendant of a recog
 
 The extension calls the fixed model `typesafe/jev-latest` through Pi's `ctx.modelRegistry.classify()`. Pi manages authentication, for example through `TYPESAFE_API_KEY`.
 
-Requests contain the full Bash command, the latest ordinary `user` message on the current session branch, `cwd`, and fixed rule identifiers. **Inputs are not redacted.** File contents, tool output and full conversation history are not sent. Command text may reach the provider even if execution is ultimately rejected.
+Requests contain only the full Bash command, the latest ordinary `user` message on the current session branch, and `cwd`. Questions use `cwd` to resolve relative targets, not as authorization. Rule identifiers stay in dialogs and logs. **Inputs are not redacted.** File contents, tool output and full conversation history are not sent. Command text may reach the provider even if execution is ultimately rejected.
 
 - Commands are limited to 8,000 characters and user messages to 16,000. Oversized inputs require manual confirmation rather than truncation-based approval.
 - Missing authorization, unavailable models/credentials, request failures, invalid responses and out-of-range probabilities fall back to manual confirmation.
-- Each request has a five-second deadline and `maxRetries: 0`. Parent-operation cancellation stops classification/confirmation; late results cannot approve execution.
+- Each request has one outer five-second deadline and `maxRetries: 0`; no second provider timer. Parent-operation cancellation stops classification/confirmation; late results cannot approve execution.
 - **Parser exceptions retain the existing warn-and-allow behavior:** warn when UI is available, then skip checks and allow execution. Syntax errors alone do not require confirmation, but recognized hazards in recovered syntax trees still match.
 
 Authorization is read directly from the latest ordinary `user` entry returned by `getBranch()`, without input fingerprints, provenance handlers or added message metadata. Pi persists template-expanded and transformed text before tool calls, so Jev receives that latest text. Text blocks are joined with newlines; an images-only or empty latest user requires manual confirmation and never falls back to older authorization. Custom messages do not provide user authorization.
@@ -111,6 +111,8 @@ GATE_CALIBRATION_REPORT="${TMPDIR:-/tmp}/permission-gate-calibration.json" \
 ./node_modules/.bin/vitest run tests/permission-gate/calibration.test.ts
 ```
 
-Calibration sends only synthetic text from `tests/permission-gate/fixtures.ts`; **it never registers or executes a Bash tool**. The report path is optional. There are 22 matched fixtures, each sampled three times, plus three coverage-exclusion cases. Development-time v2 measurements under both the original 0.90 intent threshold and the current 0.80 threshold produced 24 authorized approvals and 42 confirmations for unauthorized or unclear-scope samples in each run. This is a small, development-tuned sample, not independent accuracy evidence. Recalibrate after changing questions, model or context.
+Calibration sends only synthetic text from `tests/permission-gate/fixtures.ts`; **it never registers or executes a Bash tool**. The report path is optional. There are 24 matched fixtures, each sampled three times, plus three coverage-exclusion cases, including relative-path probes. Development-time v2 measurements under both the original 0.90 intent threshold and the current 0.80 threshold produced 24 authorized approvals and 42 confirmations for unauthorized or unclear-scope samples in each run. This is a small, development-tuned sample, not independent accuracy evidence. Questions v3 use positive `effects_covered` wording; the historical v2 results do not validate v3. Recalibrate after changing questions, model or context.
+
+Following fx’s task-focused state, Gate sends only fields used by its questions. It keeps Pi’s direct classifier API and catalog model: no extra backend layer, model override, retries, hedging, credential scanner or usage pipeline. Inputs remain unredacted.
 
 Reference-project links are collected under “LLM or Jev Judge” in [../../TODO.md](../../TODO.md).

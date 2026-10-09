@@ -90,14 +90,7 @@ export default function (pi: ExtensionAPI) {
     const classified = jevEnabled;
     let judgment: GateJudgment = { action: "ask", reason: "disabled" };
     if (classified) {
-      judgment = await judgeCommand(
-        ctx.modelRegistry,
-        command,
-        user?.text ?? "",
-        ctx.cwd,
-        rules,
-        signal,
-      );
+      judgment = await judgeCommand(ctx.modelRegistry, command, user?.text ?? "", ctx.cwd, signal);
     }
     const durationMs = Date.now() - started;
     const record = (outcome: Outcome) => {

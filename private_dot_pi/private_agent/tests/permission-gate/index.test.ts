@@ -55,7 +55,7 @@ function result(intent = 0.99, scope = 0.99, harm = 0.01): ClassifierResult {
     answers: {
       intent_covered: { type: "bool", probability: intent },
       scope_covered: { type: "bool", probability: scope },
-      unexpected_harm: { type: "bool", probability: harm },
+      effects_covered: { type: "bool", probability: 1 - harm },
     },
     stopReason: "stop",
     timestamp: 0,
@@ -423,7 +423,7 @@ describe("Permission Gate Jev local matching and switches", () => {
     const h = harness();
     expect(await h.run(text, "bash", true)).toBeUndefined();
     expect(h.classify).toHaveBeenCalledOnce();
-    expect(h.classify.mock.calls[0][1].state.matched_rules).toEqual([rule]);
+    expect(h.classify.mock.calls[0][1].state).not.toHaveProperty("matched_rules");
     expect(h.decisions()[0]).toMatchObject({ rules: [rule], outcome: "auto-approved" });
     expect(h.confirm).not.toHaveBeenCalled();
     expect(h.abort).not.toHaveBeenCalled();
@@ -492,7 +492,7 @@ describe("Permission Gate Jev local matching and switches", () => {
     await h.run("git reset --hard");
     expect(h.classify).not.toHaveBeenCalled();
     await h.run("git reset --hard; rm -rf /repo/dir");
-    expect(h.classify.mock.calls[0][1].state.matched_rules).toEqual(["rm"]);
+    expect(h.decisions()[0].rules).toEqual(["rm"]);
     await h.gate("jev off");
     const count = h.appendEntry.mock.calls.length;
     await h.run();
@@ -536,7 +536,7 @@ describe("Permission Gate Jev classifier results", () => {
       expect(h.decisions()[0].judgment).toEqual({
         action,
         reason: action === "allow" ? "approved" : "uncertain",
-        probabilities: { intent_covered: intent, scope_covered: scope, unexpected_harm: harm },
+        probabilities: { intent_covered: intent, scope_covered: scope, effects_covered: 1 - harm },
       });
     },
   );
@@ -554,7 +554,7 @@ describe("Permission Gate Jev classifier results", () => {
     ["string", { type: "bool", probability: "0.99" }],
     ["boolean", { type: "bool", probability: true }],
   ] as const;
-  for (const key of ["intent_covered", "scope_covered", "unexpected_harm"] as const) {
+  for (const key of ["intent_covered", "scope_covered", "effects_covered"] as const) {
     it.each(malformed)(`asks for malformed ${key}: %s`, async (_label, answer) => {
       const h = harness();
       const response = result();
@@ -728,16 +728,16 @@ describe("Permission Gate Jev branch authorization and full input", () => {
     expect(h.classify).toHaveBeenCalledExactlyOnceWith(
       MODEL,
       {
-        state: { command: text, user_intent: intent, cwd: "/repo", matched_rules: ["rm"] },
+        state: { command: text, user_intent: intent, cwd: "/repo" },
         questions: GATE_QUESTIONS,
       },
-      { timeoutMs: 5000, maxRetries: 0, signal: expect.any(AbortSignal) },
+      { maxRetries: 0, signal: expect.any(AbortSignal) },
     );
     const context = h.classify.mock.calls[0][1];
     expect(Object.keys(context.questions)).toEqual([
       "intent_covered",
       "scope_covered",
-      "unexpected_harm",
+      "effects_covered",
     ]);
     for (const question of Object.values(context.questions)) {
       expect(question.type).toBe("bool");
@@ -1046,7 +1046,7 @@ describe("Permission Gate Jev logs, commands and headless behavior", () => {
     const text = `${COMMAND}; rm -rf /repo/second; sudo true; dd if=a of=b; mkfs /dev/sdb; chmod 777 f; chown -R root dir; chgrp -R root dir; git push; echo '${SECRET}' >/dev/sda`;
     const h = harness();
     await h.run(text);
-    const rules = h.classify.mock.calls[0][1].state.matched_rules;
+    const rules = h.decisions()[0].rules;
     expect(rules).toHaveLength(9);
     expect(rules).toEqual(expect.arrayContaining(Object.keys(RULE_LABELS)));
     expect(h.classify.mock.calls[0][1].state.command).toBe(text);
@@ -1060,7 +1060,7 @@ describe("Permission Gate Jev logs, commands and headless behavior", () => {
       judgment: {
         action: "allow",
         reason: "approved",
-        probabilities: { intent_covered: 0.99, scope_covered: 0.99, unexpected_harm: 0.01 },
+        probabilities: { intent_covered: 0.99, scope_covered: 0.99, effects_covered: 0.99 },
       },
       durationMs: expect.any(Number),
       outcome: "auto-approved",
@@ -1132,7 +1132,7 @@ describe("Permission Gate Jev logs, commands and headless behavior", () => {
     expect(output).not.toContain("decision-04");
     expect(output).not.toContain("FOREIGN");
     expect(output).not.toContain("UNSUPPORTED");
-    expect(output).toContain("intent=0.990 scope=0.990 unexpected_harm=0.010");
+    expect(output).toContain("intent_covered=0.990 scope_covered=0.990 effects_covered=0.990");
     expect(output).toContain("typesafe/jev-latest");
     expect(output).toContain(`questions v${QUESTION_VERSION}`);
     expect(output).not.toContain(SECRET);
@@ -1143,6 +1143,36 @@ describe("Permission Gate Jev logs, commands and headless behavior", () => {
     expect(h.sendMessage).not.toHaveBeenCalled();
     expect(h.sendUserMessage).not.toHaveBeenCalled();
     expect(h.appendEntry).toHaveBeenCalledTimes(count);
+  });
+
+  it("displays old question probabilities without migrating them", async () => {
+    const h = harness();
+    await h.run();
+    const record = h.decisions()[0];
+    h.replaceBranch([
+      {
+        type: "custom",
+        id: "legacy",
+        parentId: null,
+        timestamp: TIMESTAMP,
+        customType: GATE_ENTRY,
+        data: {
+          ...record,
+          questionVersion: 2,
+          judgment: {
+            action: "allow",
+            reason: "approved",
+            probabilities: {
+              intent_covered: 0.99,
+              scope_covered: 0.99,
+              unexpected_harm: 0.01,
+            },
+          },
+        },
+      },
+    ]);
+    await h.gate("log");
+    expect(h.notify.mock.calls.at(-1)?.[0]).toContain("unexpected_harm=0.010");
   });
 
   it("formats an unavailable decision without probability scores", async () => {

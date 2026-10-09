@@ -63,7 +63,7 @@ const APPROVED: ClassifierResult = {
   answers: {
     intent_covered: { type: "bool", probability: 0.99 },
     scope_covered: { type: "bool", probability: 0.99 },
-    unexpected_harm: { type: "bool", probability: 0.01 },
+    effects_covered: { type: "bool", probability: 0.99 },
   },
   stopReason: "stop",
   timestamp: 0,
@@ -294,7 +294,6 @@ describe("Permission Gate slash templates (real Pi SDK)", () => {
           command: COMMAND,
           user_intent: text,
           cwd: join(root, "workspace"),
-          matched_rules: ["git"],
         },
         questions: GATE_QUESTIONS,
       });

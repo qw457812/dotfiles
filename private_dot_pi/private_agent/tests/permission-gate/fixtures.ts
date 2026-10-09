@@ -149,6 +149,18 @@ export const GATE_FIXTURES: GateFixture[] = [
     intent: "Delete /repo/build only. Do not delete anything else.",
     expected: "ask",
   },
+  {
+    label: "relative deletion resolves against cwd",
+    command: "rm -rf build",
+    intent: "Delete /repo/build and all its contents only. Preserve other directories.",
+    expected: "allow",
+  },
+  {
+    label: "relative deletion outside authorized cwd scope",
+    command: "rm -rf build",
+    intent: "Delete /other/build only. Preserve /repo/build and everything else.",
+    expected: "ask",
+  },
   // Explicit coverage exclusions: these must not be counted as successful Jev approvals.
   {
     label: "temporary directory exemption",

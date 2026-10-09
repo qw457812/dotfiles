@@ -40,6 +40,8 @@ GitHub star counts checked 2026-10-09; counts are snapshots.
 
 Survey of the REFERENCE.md harnesses' Jev integrations, ranked by usefulness to `extensions/permission-gate`.
 
+Minimal implementation (questions v3): positive `effects_covered` wording; drop unused rule state and reference cwd explicitly; use one deadline. Keep Pi's direct classifier API, `jev-latest`, zero retries and existing confirmation behavior. The ideas below are references, not a feature checklist; avoid extra configuration, adapters, scanners and logging pipelines. V3 still needs live calibration.
+
 ### Priority 1 — Latency: hedged requests / session affinity
 
 - [1jehuang / jcode — `crates/jcode-base/src/jev.rs`](https://github.com/1jehuang/jcode/blob/main/crates/jcode-base/src/jev.rs) — Measured TypeSafe latency is bimodal and sticky per connection: ~150ms or 2–12s. Hedges duplicate requests after 300/700/1500ms and takes the first answer; judgments are side-effect-free and input tokens are cheap ($42/Btok, output free), so hedging is nearly free. Our `CLASSIFY_TIMEOUT = 5_000` lands in the slow bucket → timeout → unnecessary `ask`.
@@ -48,7 +50,7 @@ Survey of the REFERENCE.md harnesses' Jev integrations, ranked by usefulness to 
 
 ### Priority 2 — Request hygiene: state slimming, model pinning, injectable backend
 
-- [vercel-labs / fx — `src/builtins/gateway/typesafe_permission_reviewer.zig`](https://github.com/vercel-labs/fx/blob/main/src/builtins/gateway/typesafe_permission_reviewer.zig) — Minimal state: only `review_policy` + the pending action. Context rot (Jev docs: accuracy falls with irrelevant state) says our unused `cwd`/`matched_rules` fields should be dropped or referenced in instructions.
+- [vercel-labs / fx — `src/builtins/gateway/typesafe_permission_reviewer.zig`](https://github.com/vercel-labs/fx/blob/main/src/builtins/gateway/typesafe_permission_reviewer.zig) — Task-focused state includes review policy/context and the pending action. Applied locally: drop `matched_rules`, retain cwd with explicit relative-target instructions.
 - [vercel-labs / fx — e2e stub](https://github.com/vercel-labs/fx/blob/main/tests/e2e/review-model-override.test.ts) — Local stub server returns fixed Jev responses; make `judgeCommand` accept an injectable classify function for tests.
 - [can1357 / oh-my-pi — `packages/ai/src/judgment/typesafe.ts`](https://github.com/can1357/oh-my-pi/blob/main/packages/ai/src/judgment/typesafe.ts) — Bounded retry with `retry-after` awareness on 429/5xx; model overridable via `TYPESAFE_DEFAULT_MODEL` env. Add a `PERMISSION_GATE_MODEL`-style env and pin `jev-1.13.0` instead of the `jev-latest` alias (alias moves under hand-tuned 0.9/0.1 thresholds; pi's ClassifierResult doesn't surface the responding version).
 - [can1357 / oh-my-pi — `packages/ai/src/judgment/`](https://github.com/can1357/oh-my-pi/tree/main/packages/ai/src/judgment) — Judge abstraction split from backend (native TypeSafe, OpenRouter decisions route, TextJudge chat fallback). Also `Encoding.Jev` offline token counting with longest-prefix truncation vs our char limits.
@@ -65,7 +67,7 @@ Survey of the REFERENCE.md harnesses' Jev integrations, ranked by usefulness to 
 ### Already covered / not applicable
 
 - Double-negative `unexpected_harm` question → rephrase positively (`effects_covered`) + bump `QUESTION_VERSION` (TypeSafe Noul docs: phrase so high value = yes; jaggedness: indirection/double negatives cost accuracy).
-- Redundant abort/timeout plumbing in `judgeCommand` (pi's `classify()` never rejects and applies `timeoutMs` internally) — single-source the timer.
+- Use one outer deadline, with no provider `timeoutMs`; retain the abort race so cancellation and timeout do not depend on the backend honoring its signal.
 - First `unavailable` → one-shot UI notice (like the parser-failure path); log `ClassifierResult.usage` in `GateRecord`.
 - Not applicable: dirge `classify-many` fan-out (single-command case), fx's injection/malice criteria (different threat model), hermes per-tool-call compaction questions.
 

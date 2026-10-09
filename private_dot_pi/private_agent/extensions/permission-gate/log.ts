@@ -32,7 +32,9 @@ export function showLog(ctx: ExtensionContext) {
   const lines = records.map((record) => {
     const p = record.judgment.probabilities;
     const scores = p
-      ? `\n  intent=${p.intent_covered.toFixed(3)} scope=${p.scope_covered.toFixed(3)} unexpected_harm=${p.unexpected_harm.toFixed(3)}`
+      ? `\n  ${Object.entries(p)
+          .map(([key, value]) => `${key}=${value.toFixed(3)}`)
+          .join(" ")}`
       : "";
     return `${record.timestamp} · ${record.rules.map((rule) => RULE_LABELS[rule]).join(", ")} · ${record.judgment.action} / ${record.outcome}\n  ${REASON_LABELS[record.judgment.reason]} · ${record.model} · ${record.durationMs}ms · questions v${record.questionVersion}${scores}`;
   });
