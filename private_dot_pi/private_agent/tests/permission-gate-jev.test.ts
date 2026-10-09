@@ -797,10 +797,13 @@ describe("Permission Gate Jev local matching and switches", () => {
 
 describe("Permission Gate Jev classifier results", () => {
   it.each([
-    [0.9, 0.9, 0.1, "allow"],
+    [0.8, 0.9, 0.1, "allow"],
     [1, 1, 0, "allow"],
-    [0.900001, 0.900001, 0.099999, "allow"],
-    [0.899999, 1, 0, "ask"],
+    [0.800001, 0.900001, 0.099999, "allow"],
+    [0.799999, 1, 0, "ask"],
+    [0.81, 0.94, 0.04, "allow"],
+    [0.81, 0.89, 0.04, "ask"],
+    [0.81, 0.94, 0.11, "ask"],
     [1, 0.899999, 0, "ask"],
     [1, 1, 0.100001, "ask"],
     [0, 1, 0, "ask"],

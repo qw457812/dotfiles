@@ -93,7 +93,7 @@ export function decideClassification(result: ClassifierResult): GateJudgment {
   }
   const scores = probabilities as GateProbabilities;
   const allow =
-    scores.intent_covered >= 0.9 && scores.scope_covered >= 0.9 && scores.unexpected_harm <= 0.1;
+    scores.intent_covered >= 0.8 && scores.scope_covered >= 0.9 && scores.unexpected_harm <= 0.1;
   return {
     action: allow ? "allow" : "ask",
     reason: allow ? "approved" : "uncertain",

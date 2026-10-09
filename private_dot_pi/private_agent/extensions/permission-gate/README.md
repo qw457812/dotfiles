@@ -25,7 +25,7 @@ Git rules and Jev both default to **ON**. Switches live only in the current exte
 3. For a matched call, one Jev request evaluates the entire command, including all subcommands, redirections and substitutions:
 
    ```text
-   intent_covered  >= 0.90   Actions and important side effects are authorized
+   intent_covered  >= 0.80   Actions and important side effects are authorized
    scope_covered   >= 0.90   Targets and effects stay within the authorized scope
    unexpected_harm <= 0.10   No apparent material effect outside that authorization
    ```
@@ -106,6 +106,6 @@ GATE_CALIBRATION_REPORT="${TMPDIR:-/tmp}/permission-gate-calibration.json" \
 ./node_modules/.bin/vitest run tests/permission-gate-calibration.test.ts
 ```
 
-Calibration sends only synthetic text from `tests/fixtures/permission-gate.ts`; **it never registers or executes a Bash tool**. The report path is optional. There are 22 matched fixtures, each sampled three times, plus three coverage-exclusion cases. Development-time v2 measurements produced 24 authorized approvals and 42 confirmations for unauthorized or unclear-scope samples. This is a small, development-tuned sample, not independent accuracy evidence. Recalibrate after changing questions, model or context.
+Calibration sends only synthetic text from `tests/fixtures/permission-gate.ts`; **it never registers or executes a Bash tool**. The report path is optional. There are 22 matched fixtures, each sampled three times, plus three coverage-exclusion cases. Development-time v2 measurements under both the original 0.90 intent threshold and the current 0.80 threshold produced 24 authorized approvals and 42 confirmations for unauthorized or unclear-scope samples in each run. This is a small, development-tuned sample, not independent accuracy evidence. Recalibrate after changing questions, model or context.
 
 Reference-project links are collected under “LLM or Jev Judge” in [../../TODO.md](../../TODO.md).

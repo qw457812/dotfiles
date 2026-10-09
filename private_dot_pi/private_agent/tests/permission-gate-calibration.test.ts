@@ -108,7 +108,7 @@ describe.skipIf(!LIVE)("Permission Gate live Jev calibration (text only)", () =>
             .update(JSON.stringify(GATE_QUESTIONS))
             .digest("hex"),
           repeats: REPEATS,
-          thresholds: { intent_covered: 0.9, scope_covered: 0.9, unexpected_harm: 0.1 },
+          thresholds: { intent_covered: 0.8, scope_covered: 0.9, unexpected_harm: 0.1 },
           measurements,
         },
         null,
