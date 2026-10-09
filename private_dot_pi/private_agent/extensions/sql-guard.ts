@@ -1,4 +1,5 @@
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
+import { withConfirmationQueue } from "../lib/confirmation-queue.ts";
 
 /**
  * SQL Guard Extension
@@ -127,12 +128,19 @@ async function confirmOrBlock(
   reason: string,
 ) {
   if (!ctx.hasUI) return { block: true, reason };
-  pi.events.emit("my:notification", { title, body: message });
-  const ok = await ctx.ui.confirm(title, message);
-  if (!ok) {
-    ctx.abort();
-    return { block: true, reason };
-  }
+  const signal = ctx.signal;
+  return withConfirmationQueue(ctx.ui, async () => {
+    if (signal?.aborted) return { block: true, reason };
+    pi.events.emit("my:notification", { title, body: message });
+    const ok = ctx.signal
+      ? await ctx.ui.confirm(title, message, { signal: ctx.signal })
+      : await ctx.ui.confirm(title, message);
+    if (!ok) {
+      if (!ctx.signal?.aborted) ctx.abort();
+      return { block: true, reason };
+    }
+    if (ctx.signal?.aborted) return { block: true, reason };
+  });
 }
 
 export default function (pi: ExtensionAPI) {

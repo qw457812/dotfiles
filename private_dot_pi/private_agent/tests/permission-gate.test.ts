@@ -2,7 +2,7 @@ import { tmpdir } from "node:os";
 import { posix } from "node:path";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { describe, expect, it, vi } from "vitest";
-import permissionGate from "../extensions/permission-gate.ts";
+import permissionGate from "../extensions/permission-gate/index.ts";
 import dirtyRepoGuard from "../extensions/dirty-repo-guard.ts";
 import safeGuard from "../extensions/safe-guard.ts";
 import { initializeBashParser } from "../lib/bash-parser.ts";
@@ -14,6 +14,7 @@ type Handler = (
     hasUI: boolean;
     ui: { confirm: ReturnType<typeof vi.fn>; notify: ReturnType<typeof vi.fn> };
     abort: ReturnType<typeof vi.fn>;
+    sessionManager: { getSessionId: () => string; getBranch: () => [] };
   },
 ) => Promise<{ block: boolean; reason: string } | undefined>;
 
@@ -40,7 +41,11 @@ function harness(approved = true, hasUI = true, extension = permissionGate) {
     hasUI,
     ui: { confirm: vi.fn(async (): Promise<boolean> => approved), notify: vi.fn() },
     abort: vi.fn(),
+    sessionManager: { getSessionId: () => "test", getBranch: (): [] => [] },
   };
+  // Existing cases exercise local matching and manual confirmation independently of Jev.
+  void gateCommand?.handler("jev off", ctx);
+  ctx.ui.notify.mockClear();
   return {
     ctx,
     emit,
@@ -372,7 +377,11 @@ describe("Permission Gate", () => {
   it.each(APPROVAL_CASES)("asks once and shows the complete command: %s", async (command) => {
     const { run, ctx, emit } = harness();
     expect(await run(command)).toBeUndefined();
-    expect(ctx.ui.confirm).toHaveBeenCalledExactlyOnceWith("🔐 Allow this command?", command);
+    expect(ctx.ui.confirm).toHaveBeenCalledExactlyOnceWith(
+      "🔐 Allow this command?",
+      expect.stringContaining(`\n\n${command}`),
+      { signal: expect.any(AbortSignal) },
+    );
     expect(emit).toHaveBeenCalledWith("my:notification", {
       title: "Pi Danger Approval",
       body: command,
@@ -485,7 +494,11 @@ describe("Permission Gate Git rules", () => {
     const { run, ctx } = harness();
     expect(await run(command)).toBeUndefined();
     expect(ctx.ui.confirm).toHaveBeenCalledOnce();
-    expect(ctx.ui.confirm).toHaveBeenCalledWith("🔐 Allow this command?", command);
+    expect(ctx.ui.confirm).toHaveBeenCalledWith(
+      "🔐 Allow this command?",
+      expect.stringContaining(`\n\n${command}`),
+      { signal: expect.any(AbortSignal) },
+    );
   });
 
   it.each(GIT_CLEAR_CASES)("stays silent: %s", async (command) => {
@@ -533,7 +546,11 @@ describe("Permission Gate integration and Git toggle", () => {
       });
       expect(await run(command)).toBeUndefined();
       expect(parse).toHaveBeenCalledOnce();
-      expect(ctx.ui.confirm).toHaveBeenCalledExactlyOnceWith("🔐 Allow this command?", command);
+      expect(ctx.ui.confirm).toHaveBeenCalledExactlyOnceWith(
+        "🔐 Allow this command?",
+        expect.stringContaining(`\n\n${command}`),
+        { signal: expect.any(AbortSignal) },
+      );
       expect(emit).toHaveBeenCalledOnce();
     } finally {
       parse.mockRestore();
@@ -586,7 +603,11 @@ describe("Permission Gate integration and Git toggle", () => {
     const { run, ctx, gate } = harness();
     await gate("git off");
     await run(command);
-    expect(ctx.ui.confirm).toHaveBeenCalledExactlyOnceWith("🔐 Allow this command?", command);
+    expect(ctx.ui.confirm).toHaveBeenCalledExactlyOnceWith(
+      "🔐 Allow this command?",
+      expect.stringContaining(`\n\n${command}`),
+      { signal: expect.any(AbortSignal) },
+    );
   });
 
   it("does not confirm syntax errors alone when Git rules are off", async () => {
@@ -616,7 +637,10 @@ describe("Permission Gate integration and Git toggle", () => {
     expect(ctx.ui.notify).toHaveBeenLastCalledWith("Git approval: ON", "info");
     await gate("git off");
     await gate("git invalid");
-    expect(ctx.ui.notify).toHaveBeenLastCalledWith("Usage: /gate git [on|off]", "error");
+    expect(ctx.ui.notify).toHaveBeenLastCalledWith(
+      "Usage: /gate git [on|off] | jev [on|off] | log",
+      "error",
+    );
     await gate("git  ");
     expect(ctx.ui.notify).toHaveBeenLastCalledWith("Git approval: OFF", "info");
     await run("git commit");
@@ -624,8 +648,6 @@ describe("Permission Gate integration and Git toggle", () => {
   });
 
   it.each([
-    ["", "info"],
-    [" ", "info"],
     ["on", "error"],
     ["off", "error"],
     ["all off", "error"],
@@ -634,14 +656,21 @@ describe("Permission Gate integration and Git toggle", () => {
   ])("shows usage without changing state for %j", async (args, level) => {
     const { gate, ctx, run } = harness();
     await gate(args);
-    expect(ctx.ui.notify).toHaveBeenLastCalledWith("Usage: /gate git [on|off]", level);
+    expect(ctx.ui.notify).toHaveBeenLastCalledWith(
+      "Usage: /gate git [on|off] | jev [on|off] | log",
+      level,
+    );
     await run("git commit");
     expect(ctx.ui.confirm).toHaveBeenCalledOnce();
   });
 
   it("completes the Git rule and its explicit on/off values", () => {
     const { gateCommand } = harness();
-    expect(gateCommand?.getArgumentCompletions("")).toEqual([{ value: "git", label: "git" }]);
+    expect(gateCommand?.getArgumentCompletions("")).toEqual([
+      { value: "git", label: "git" },
+      { value: "jev", label: "jev" },
+      { value: "log", label: "log" },
+    ]);
     expect(gateCommand?.getArgumentCompletions("g")).toEqual([{ value: "git", label: "git" }]);
     expect(gateCommand?.getArgumentCompletions("git ")).toEqual([
       { value: "git on", label: "git on" },

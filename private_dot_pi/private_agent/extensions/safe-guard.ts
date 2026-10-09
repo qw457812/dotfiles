@@ -7,6 +7,7 @@
  */
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { CONFIG_DIR_NAME, getAgentDir } from "@earendil-works/pi-coding-agent";
+import { withConfirmationQueue } from "../lib/confirmation-queue.ts";
 
 const AGENT_DIR = getAgentDir();
 
@@ -31,12 +32,21 @@ export default function (pi: ExtensionAPI) {
       const hit = guardedPaths.find((p) => path.includes(p));
       if (hit) {
         if (ctx.hasUI) {
-          pi.events.emit("my:notification", { title: "Pi Path Approval", body: path });
-          const ok = await ctx.ui.confirm("🛡️ Protected Path", `Allow write to ${path}?`);
-          if (!ok) {
-            ctx.abort();
-            return { block: true, reason: `Protected path: ${hit}` };
-          }
+          const signal = ctx.signal;
+          return withConfirmationQueue(ctx.ui, async () => {
+            if (signal?.aborted) return { block: true, reason: `Protected path: ${hit}` };
+            pi.events.emit("my:notification", { title: "Pi Path Approval", body: path });
+            const ok = ctx.signal
+              ? await ctx.ui.confirm("🛡️ Protected Path", `Allow write to ${path}?`, {
+                  signal: ctx.signal,
+                })
+              : await ctx.ui.confirm("🛡️ Protected Path", `Allow write to ${path}?`);
+            if (!ok) {
+              if (!ctx.signal?.aborted) ctx.abort();
+              return { block: true, reason: `Protected path: ${hit}` };
+            }
+            if (ctx.signal?.aborted) return { block: true, reason: `Protected path: ${hit}` };
+          });
         } else {
           return { block: true, reason: `Protected path: ${hit}` };
         }

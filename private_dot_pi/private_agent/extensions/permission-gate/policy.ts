@@ -1,51 +1,6 @@
-/**
- * Permission Gate: accidental-operation confirmation for the bash tool, not a security boundary.
- *
- * Commands:
- *   /gate             Show usage.
- *   /gate git         Show Git approval: ON/OFF without changing it.
- *   /gate git on|off  Control Git confirmation only; other rules remain enabled.
- * Git confirmation defaults to ON, lives only in this extension instance, and resets on /reload.
- *
- * Approval rules:
- * - sudo, mkfs/mkfs.*, and dd.
- * - chown/chgrp: recursive options only.
- * - rm: recursive options or targets lexically normalized to `/`, `.` or `..`.
- *   Literal absolute descendants of /tmp, /var/tmp or the host process's tmpdir() are
- *   exempt when every target is temporary and only common options precede the targets.
- *   On macOS, /private/tmp and /private/var/tmp are also explicitly recognized.
- *   Temporary directory roots themselves still require approval. Variables/globs and
- *   shell-local TMPDIR assignments are not resolved; sudo and other rules still apply.
- * - chmod: recursive or matching world-writable/set-ID modes.
- * - Git: only recognized subcommands in GIT_GUARDED_SUBCOMMANDS.
- * - Writes to /dev/* (including <>), except null, stdout, stderr and fd/0..2.
- *
- * Unresolved arguments and output destinations alone do not require approval. Known
- * recursive options, dangerous modes and literal dangerous targets still do. Unknown
- * deletion targets cannot qualify for the temporary-directory exemption.
- *
- * Syntax errors alone do not require approval; recognized hazards in recovered syntax
- * trees still do. Parser exceptions skip checks and allow execution, with a warning when
- * UI is available. Unknown/unresolved Git subcommands do not trigger Git approval.
- *
- * The shared Tree-sitter Bash parser inspects compound commands and nested substitutions,
- * not ordinary quoted text, comments or SQL keywords. Each tool_call prompts at most once
- * and shows the complete command. If approval is required without UI, execution is blocked.
- * Denial calls ctx.abort() and returns a blocking result with reason "Blocked by user".
- *
- * Coverage limits: only literal executable names (including paths) are recognized.
- * Dynamic names, aliases and functions are not resolved; wrappers such as env, command,
- * xargs and shell -c, and eval strings, are not unwrapped. Variables/globs are not evaluated;
- * filesystem state, symlinks and actual permission effects are not inspected. An unresolved
- * executable name alone does not trigger approval. Device-read redirections are not guarded.
- * Only bash tool_call events are handled, not other tools or user_bash.
- * safe-guard.ts owns write/edit path protection; dirty-repo-guard.ts owns dirty-repo reminders.
- */
-import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { tmpdir } from "node:os";
 import { posix } from "node:path";
 import type { Node as SyntaxNode } from "web-tree-sitter";
-import { withBashTree } from "../lib/bash-parser.ts";
 
 const TEMP_DIRECTORIES = [
   "/tmp",
@@ -219,80 +174,58 @@ function chmodRequiresApproval(words: readonly (string | undefined)[]): boolean 
     .some((part) => /[+=][^,]*s/.test(part) || /^(?:[ug]*[oa][ugoa]*|)[+=][^,]*w/.test(part));
 }
 
-/** Inspect the current tree synchronously; return only a boolean, never retain SyntaxNode. */
-function requiresApproval(root: SyntaxNode, gitEnabled: boolean): boolean {
+export const RULE_LABELS = {
+  "device-write": "Device write",
+  sudo: "Sudo",
+  dd: "Disk/data copy",
+  mkfs: "Filesystem formatting",
+  rm: "Deletion",
+  chmod: "Permission change",
+  chown: "Ownership change",
+  chgrp: "Group change",
+  git: "Git mutation",
+} as const;
+
+export type GateRule = keyof typeof RULE_LABELS;
+
+/** Inspect synchronously; retain only fixed rule names, never SyntaxNode or command text. */
+export function approvalRules(root: SyntaxNode, gitEnabled: boolean): GateRule[] {
+  const rules = new Set<GateRule>();
   if (
     root.descendantsOfType("file_redirect").some((node) => node && redirectRequiresApproval(node))
-  ) {
-    return true;
-  }
+  )
+    rules.add("device-write");
 
-  return root.descendantsOfType("command").some((node) => {
-    if (!node) return false;
+  for (const node of root.descendantsOfType("command")) {
+    if (!node) continue;
     const name = wordText(node.childForFieldName("name"));
-    if (name === undefined) return false;
+    if (name === undefined) continue;
     const executable = posix.basename(name);
-    if (["sudo", "dd", "mkfs"].includes(executable) || executable.startsWith("mkfs.")) return true;
-    if (!["git", "rm", "chmod", "chown", "chgrp"].includes(executable)) return false;
+    if (executable === "sudo" || executable === "dd") {
+      rules.add(executable);
+      continue;
+    }
+    if (executable === "mkfs" || executable.startsWith("mkfs.")) {
+      rules.add("mkfs");
+      continue;
+    }
+    if (!["git", "rm", "chmod", "chown", "chgrp"].includes(executable)) continue;
 
     const args = node.childrenForFieldName("argument").map((arg) => wordText(arg));
     if (executable === "git") {
-      if (!gitEnabled) return false;
       const subcommand = gitSubcommand(args);
-      return subcommand !== undefined && GIT_GUARDED_SUBCOMMANDS.has(subcommand);
+      if (gitEnabled && subcommand !== undefined && GIT_GUARDED_SUBCOMMANDS.has(subcommand))
+        rules.add("git");
+    } else if (executable === "rm") {
+      if (rmRequiresApproval(args)) rules.add("rm");
+    } else if (executable === "chmod") {
+      if (chmodRequiresApproval(args)) rules.add("chmod");
+    } else {
+      const end = args.indexOf("--");
+      const options = end < 0 ? args : args.slice(0, end);
+      if (options.some((arg) => /^-[^-]*R/.test(arg ?? "") || arg === "--recursive"))
+        rules.add(executable as "chown" | "chgrp");
     }
-    if (executable === "rm") return rmRequiresApproval(args);
-    if (executable === "chmod") return chmodRequiresApproval(args);
-
-    const end = args.indexOf("--");
-    const options = end < 0 ? args : args.slice(0, end);
-    return options.some((arg) => /^-[^-]*R/.test(arg ?? "") || arg === "--recursive");
-  });
-}
-
-export default function (pi: ExtensionAPI) {
-  let gitEnabled = true;
-
-  pi.on("tool_call", async (event, ctx) => {
-    if (event.toolName !== "bash") return;
-    const command = (event.input as { command?: string }).command ?? "";
-    if (!command.trim()) return;
-
-    const needsApproval = await withBashTree(command, (root) =>
-      requiresApproval(root, gitEnabled),
-    ).catch(() => {
-      if (ctx.hasUI)
-        ctx.ui.notify("Permission Gate: command checks skipped (parser failure)", "warning");
-      return false;
-    });
-    if (!needsApproval) return;
-    if (!ctx.hasUI) return { block: true, reason: "Command requires user confirmation" };
-
-    pi.events.emit("my:notification", { title: "Pi Danger Approval", body: command });
-    const ok = await ctx.ui.confirm("🔐 Allow this command?", command);
-    if (!ok) {
-      ctx.abort();
-      return { block: true, reason: "Blocked by user" };
-    }
-  });
-
-  pi.registerCommand("gate", {
-    description: "Control command confirmation (/gate git [on|off])",
-    getArgumentCompletions(prefix: string) {
-      const query = prefix.trimStart().toLowerCase();
-      const items = (query.includes(" ") ? ["git on", "git off"] : ["git"])
-        .filter((item) => item.startsWith(query))
-        .map((item) => ({ value: item, label: item }));
-      return items.length > 0 ? items : null;
-    },
-    handler: async (args, ctx) => {
-      const [rule, value, ...extra] = args.trim().toLowerCase().split(/\s+/);
-      if (rule !== "git" || extra.length || (value && value !== "on" && value !== "off")) {
-        ctx.ui.notify("Usage: /gate git [on|off]", args.trim() ? "error" : "info");
-        return;
-      }
-      if (value) gitEnabled = value === "on";
-      ctx.ui.notify(`Git approval: ${gitEnabled ? "ON" : "OFF"}`, "info");
-    },
-  });
+  }
+  return [...rules];
 }
