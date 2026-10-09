@@ -121,6 +121,7 @@
   "pi-invisible-continue": { "branch": "main", "commit": "9001e139d44e38585664eab02aece3f83031b0c7" },
   "pi-neuralwatt-provider": { "branch": "main", "commit": "44f41bc542540ba2681debfc64df9c0b4a12137a" },
   "pi-review": { "branch": "main", "commit": "f1de050504936046c0f85b21fec0e0a93ef394eb" },
+  "pi-subagent": { "branch": "main", "commit": "4fc1fe5178d1a2b474794a5ee39e7295844e9d3c" },
   "pi-vim": { "branch": "main", "commit": "e55b07c05b648f3bbccf656c2b0c6ec63f1a91d1" },
   "pi-vision-handoff": { "branch": "main", "commit": "a99694df9339475b5825ac39336984269ab9135b" },
   "pi-voice": { "branch": "main", "commit": "df38132d8b698f24caa52c44501910cde60f6e85" },

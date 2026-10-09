@@ -103,7 +103,7 @@ import {
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import {
   CONFIG_DIR_NAME,
-  createBashTool,
+  createBashToolDefinition,
   createLocalBashOperations,
   getAgentDir,
   type BashOperations,
@@ -507,7 +507,7 @@ export default function (pi: ExtensionAPI) {
 
   const platform = process.platform;
   const localCwd = process.cwd();
-  const localBash = createBashTool(localCwd);
+  const localBash = createBashToolDefinition(localCwd);
 
   let sandboxEnabled = false;
   let sandboxInitialized = false;
@@ -631,7 +631,7 @@ export default function (pi: ExtensionAPI) {
     label: "bash (sandboxed)",
     async execute(id, params, signal, onUpdate, ctx) {
       if (!sandboxEnabled || !sandboxInitialized) {
-        return localBash.execute(id, params, signal, onUpdate);
+        return localBash.execute(id, params, signal, onUpdate, ctx);
       }
 
       const command = typeof params?.command === "string" ? params.command : "";
@@ -643,23 +643,23 @@ export default function (pi: ExtensionAPI) {
             "info",
           );
         }
-        return localBash.execute(id, params, signal, onUpdate);
+        return localBash.execute(id, params, signal, onUpdate, ctx);
       }
 
       const config = withWorktreeMainRepoGitWriteAccess(loadConfig(ctx.cwd), ctx.cwd);
       const backend = resolveBackend(config);
 
       if (backend === "justBash") {
-        const justBash = createBashTool(ctx.cwd, {
+        const justBash = createBashToolDefinition(ctx.cwd, {
           operations: createJustBashOps(ctx.cwd, config.justBash),
         });
-        return justBash.execute(id, params, signal, onUpdate);
+        return justBash.execute(id, params, signal, onUpdate, ctx);
       }
 
-      const sandboxedBash = createBashTool(localCwd, {
+      const sandboxedBash = createBashToolDefinition(localCwd, {
         operations: createSandboxedBashOps(),
       });
-      return sandboxedBash.execute(id, params, signal, onUpdate);
+      return sandboxedBash.execute(id, params, signal, onUpdate, ctx);
     },
   });
 

@@ -39,6 +39,17 @@ return {
         lazy = true,
         config = function() end,
       },
+      {
+        "badlogic/pi-subagent",
+        build = function(plugin)
+          local bin = vim.fn.expand("~/.pi/agent/bin")
+          vim.fs.mkdir(bin, { parents = true })
+          local res = vim.system({ "ln", "-sf", plugin.dir .. "/subagent.ts", bin .. "/subagent" }):wait()
+          assert(res.code == 0, "Failed to link subagent: " .. (res.stderr or ""))
+        end,
+        lazy = true,
+        config = function() end,
+      },
       -- private_dot_pi/private_agent/extensions/review.ts
       { "earendil-works/pi-review", lazy = true, config = function() end },
       {
@@ -607,8 +618,8 @@ return {
             -- down_ctrl_n = { "<c-n>", "<Down>" },
             -- up_ctrl_p = { "<c-p>", "<Up>" },
             -- prompt = { "<a-p>", "prompt" }, -- claude code uses <a-p> for its own functionality
-            -- buffers = { "<a-b>", "buffers", mode = "nt" },
-            -- files = { "<a-f>", "files", mode = "nt" },
+            buffers = { "<a-b>", "buffers", mode = "nt" }, -- tmux prefix
+            files = { "<a-f>", "files", mode = "nt" },
             blur_t = { "<c-o>", "blur" },
             blur_n = { "<c-o>", "blur", mode = "n" },
             -- blur_esc = {

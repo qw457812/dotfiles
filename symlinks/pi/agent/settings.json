@@ -45,7 +45,8 @@
     "-extensions/copilot-ratelimit.ts",
     "-extensions/git-checkpoint.ts",
     "-extensions/loop.ts",
-    "-extensions/ppt-master-venv.ts"
+    "-extensions/ppt-master-venv.ts",
+    "-extensions/subagent.ts"
   ],
   "skills": [
     "~/.local/share/nvim/lazy/vercel-labs-skills/skills/find-skills/SKILL.md",
@@ -71,6 +72,7 @@
       ],
       "themes": []
     },
+    "~/.local/share/nvim/lazy/pi-subagent",
     {
       "source": "git:github.com/mattpocock/skills",
       "extensions": [],
