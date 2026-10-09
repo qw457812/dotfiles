@@ -43,7 +43,7 @@ return {
         "badlogic/pi-subagent",
         build = function(plugin)
           local bin = vim.fn.expand("~/.pi/agent/bin")
-          vim.fs.mkdir(bin, { parents = true })
+          vim.fn.mkdir(bin, "p")
           local res = vim.system({ "ln", "-sf", plugin.dir .. "/subagent.ts", bin .. "/subagent" }):wait()
           assert(res.code == 0, "Failed to link subagent: " .. (res.stderr or ""))
         end,
