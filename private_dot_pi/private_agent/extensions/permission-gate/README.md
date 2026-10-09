@@ -1,24 +1,24 @@
 # Permission Gate
 
-A Bash accidental-operation gate for Pi. Local AST rules identify calls that need approval, then Jev decides whether to skip manual confirmation. **This is not a security boundary or a comprehensive command-safety checker.**
+An accidental-operation gate for Pi. Local Bash AST rules identify calls that need approval, then Jev decides whether to skip manual confirmation. Write/edit protected paths and SQL tools retain their manual guards. **This is not a security boundary or a comprehensive command-safety checker.**
 
-Pi automatically loads this directory's `index.ts`. Run `/reload` after changes. The extension uses shared libraries and npm dependencies from the agent root; it is not a standalone npm package.
+Pi automatically loads only this directory's `index.ts`, which registers the Bash, Path Guard and SQL Guard handlers. The internal guard files are not separate auto-loaded extensions. Run `/reload` after changes. The extension uses shared libraries and npm dependencies from the agent root; it is not a standalone npm package.
 
 ## Commands
 
-| Command | Purpose |
-|---|---|
-| `/gate` | Show status and usage |
-| `/gate git [on\|off]` | Show or toggle local Git rules |
-| `/gate jev [on\|off]` | Show or toggle Jev auto-approval |
-| `/gate log` | Show the latest 20 Jev decision summaries on the current session branch |
+| Command               | Purpose                                                                 |
+| --------------------- | ----------------------------------------------------------------------- |
+| `/gate`               | Show status and usage                                                   |
+| `/gate git [on\|off]` | Show or toggle local Git rules                                          |
+| `/gate jev [on\|off]` | Show or toggle Jev auto-approval                                        |
+| `/gate log`           | Show the latest 20 Jev decision summaries on the current session branch |
 
 Git rules and Jev both default to **ON**. Switches live only in the current extension instance and reset to ON on `/reload`.
 
 - `git off`: Git no longer triggers local approval rules; other matches in the same command still apply.
 - `jev off`: Locally matched calls require manual confirmation; it does not disable the local rules.
 
-## Decision flow
+## Bash decision flow
 
 1. Handle only `bash tool_call`, including nested Bash calls from codemode; ignore other tools and `user_bash`.
 2. Inspect the complete syntax tree with the Tree-sitter Bash parser. Unmatched calls proceed without a Jev request.
@@ -31,6 +31,7 @@ Git rules and Jev both default to **ON**. Switches live only in the current exte
    ```
 
    Auto-approve only when all conditions pass; otherwise ask the user. `unexpected_harm` is not intrinsic danger: explicitly accepted destructive effects do not automatically prevent approval.
+
 4. Every matched operation is eligible for auto-approval. There is no fixed hard-deny list or non-overridable `deny` decision.
 5. Manual rejection blocks execution and calls `ctx.abort()`. Calls requiring confirmation are blocked when no UI is available.
 
@@ -49,30 +50,34 @@ Deletion is exempt when every target is a literal absolute descendant of a recog
 
 The extension calls the fixed model `typesafe/jev-latest` through Pi's `ctx.modelRegistry.classify()`. Pi manages authentication, for example through `TYPESAFE_API_KEY`.
 
-Requests contain the full Bash command, the latest attributable real user message on the current branch, `cwd`, and fixed rule identifiers. **Inputs are not redacted.** File contents, tool output and full conversation history are not sent. Command text may reach the provider even if execution is ultimately rejected.
+Requests contain the full Bash command, the latest ordinary `user` message on the current session branch, `cwd`, and fixed rule identifiers. **Inputs are not redacted.** File contents, tool output and full conversation history are not sent. Command text may reach the provider even if execution is ultimately rejected.
 
 - Commands are limited to 8,000 characters and user messages to 16,000. Oversized inputs require manual confirmation rather than truncation-based approval.
 - Missing authorization, unavailable models/credentials, request failures, invalid responses and out-of-range probabilities fall back to manual confirmation.
 - Each request has a five-second deadline and `maxRetries: 0`. Parent-operation cancellation stops classification/confirmation; late results cannot approve execution.
 - **Parser exceptions retain the existing warn-and-allow behavior:** warn when UI is available, then skip checks and allow execution. Syntax errors alone do not require confirmation, but recognized hazards in recovered syntax trees still match.
 
-Pi's ordinary `user` messages do not preserve input provenance. The extension matches text fingerprints from `input` and `message_end` and persists `permissionGateSource` metadata. For a single non-queued slash input such as `/commit`, `before_agent_start` associates the expanded prompt with that input's original source. This handles template expansion without assuming that the latest input owns every message. Multiple candidates, queued expansions and uncorrelated non-slash transformations remain unknown.
+Authorization is read directly from the latest ordinary `user` entry returned by `getBranch()`, without input fingerprints, provenance handlers or added message metadata. Pi persists template-expanded and transformed text before tool calls, so Jev receives that latest text. Text blocks are joined with newlines; an images-only or empty latest user requires manual confirmation and never falls back to older authorization. Custom messages do not provide user authorization.
 
-Only attributable `interactive`/`rpc` input can authorize actions. Expanded extension-injected input retains its `extension` source and cannot provide authorization. Legacy messages and ambiguous sources require manual confirmation instead of guessing historical authorization.
+**Accepted limit:** ordinary `user` messages cannot distinguish real user input from extension-injected `sendUserMessage` input. Both, as well as legacy ordinary user messages, can supply authorization. Extensions are trusted accordingly; this simplification is not provenance verification. User-entry ID, session ID and cancellation checks still prevent stale decisions from approving calls.
+
+SQL and protected-path checks remain manual and independent of Jev. `/gate jev` and `/gate git` do not disable them, and Jev cannot auto-approve them.
 
 ## Code and integration
 
-| File | Responsibility |
-|---|---|
-| [index.ts](index.ts) | Events, lifecycle, confirmation flow and `/gate` commands |
-| [policy.ts](policy.ts) | Local AST rules and fixed rule labels |
-| [jev.ts](jev.ts) | Questions, request deadlines, response validation and threshold decisions |
-| [intent.ts](intent.ts) | Input fingerprints and real user authorization extraction |
-| [log.ts](log.ts) | Decision-summary format and log display |
-| [../../lib/bash-parser.ts](../../lib/bash-parser.ts) | Shared Bash parser |
-| [../../lib/confirmation-queue.ts](../../lib/confirmation-queue.ts) | Confirmation serialization by UI object |
+| File                                                 | Responsibility                                                            |
+| ---------------------------------------------------- | ------------------------------------------------------------------------- |
+| [index.ts](index.ts)                                 | Events, lifecycle, confirmation flow and `/gate` commands                 |
+| [policy.ts](policy.ts)                               | Local AST rules and fixed rule labels                                     |
+| [jev.ts](jev.ts)                                     | Questions, request deadlines, response validation and threshold decisions |
+| [intent.ts](intent.ts)                               | Latest ordinary user entry and text extraction                            |
+| [path-guard.ts](path-guard.ts)                       | Manual write/edit protected-path checks                                   |
+| [sql-guard.ts](sql-guard.ts)                         | SQL tool validation and manual confirmation                               |
+| [log.ts](log.ts)                                     | Decision-summary format and log display                                   |
+| [../../lib/bash-parser.ts](../../lib/bash-parser.ts) | Shared Bash parser                                                        |
+| [confirmation-queue.ts](confirmation-queue.ts)       | Confirmation serialization by UI object                                   |
 
-Gate, Safe Guard and SQL Guard share a confirmation queue. Gate's classification work is not serialized by this queue. Third-party UI calls do not necessarily participate. Queue scheduling has automated test coverage; the host TUI's dialog-overwrite risk was established by source analysis, not an end-to-end reproduction.
+Gate, Path Guard and SQL Guard share a confirmation queue. Gate's classification work is not serialized by this queue. Third-party UI calls do not necessarily participate. Queue scheduling has automated test coverage; the host TUI's dialog-overwrite risk was established by source analysis, not an end-to-end reproduction.
 
 The Bash `command` argument is locked when checks begin. Rewriting it in a later `tool_call` handler fails and Pi blocks execution; extensions that rewrite commands must run before Gate. Other Bash arguments remain mutable.
 
@@ -96,16 +101,16 @@ npm run lint
 npm test
 ```
 
-Relevant tests are in `tests/permission-gate.test.ts`, `tests/permission-gate-jev.test.ts`, `tests/permission-gate-template.test.ts`, `tests/confirmation-queue.test.ts`, and `tests/permission-gate-calibration.test.ts`. The template regression uses the real Pi SDK and repository `prompts/commit.md` to exercise expansion and provenance persistence, with offline model/classifier stubs and no executable tools. Ordinary tests do not call a live classifier.
+Relevant tests are grouped in `tests/permission-gate/`: `bash.test.ts` covers local Bash rules, `index.test.ts` covers integrated decisions and lifecycle, `sdk.test.ts` covers real SDK discovery and input, `path-guard.test.ts` and `sql-guard.test.ts` cover manual guards, `confirmation-queue.test.ts` covers shared scheduling, and `calibration.test.ts` covers synthetic fixtures and opt-in live calibration. The SDK regression uses the real Pi SDK and repository `prompts/commit.md` to exercise directory discovery, single index registration and latest expanded user text, with offline model/classifier stubs and no executable tools. Ordinary tests do not call a live classifier.
 
 Explicitly enable live calibration:
 
 ```bash
 GATE_CALIBRATE=1 \
 GATE_CALIBRATION_REPORT="${TMPDIR:-/tmp}/permission-gate-calibration.json" \
-./node_modules/.bin/vitest run tests/permission-gate-calibration.test.ts
+./node_modules/.bin/vitest run tests/permission-gate/calibration.test.ts
 ```
 
-Calibration sends only synthetic text from `tests/fixtures/permission-gate.ts`; **it never registers or executes a Bash tool**. The report path is optional. There are 22 matched fixtures, each sampled three times, plus three coverage-exclusion cases. Development-time v2 measurements under both the original 0.90 intent threshold and the current 0.80 threshold produced 24 authorized approvals and 42 confirmations for unauthorized or unclear-scope samples in each run. This is a small, development-tuned sample, not independent accuracy evidence. Recalibrate after changing questions, model or context.
+Calibration sends only synthetic text from `tests/permission-gate/fixtures.ts`; **it never registers or executes a Bash tool**. The report path is optional. There are 22 matched fixtures, each sampled three times, plus three coverage-exclusion cases. Development-time v2 measurements under both the original 0.90 intent threshold and the current 0.80 threshold produced 24 authorized approvals and 42 confirmations for unauthorized or unclear-scope samples in each run. This is a small, development-tuned sample, not independent accuracy evidence. Recalibrate after changing questions, model or context.
 
 Reference-project links are collected under “LLM or Jev Judge” in [../../TODO.md](../../TODO.md).

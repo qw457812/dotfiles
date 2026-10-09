@@ -1,4 +1,5 @@
-import { copyFile, mkdir, mkdtemp, readFile, rm } from "node:fs/promises";
+import { copyFile, mkdir, mkdtemp, readFile, rm, symlink } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
@@ -21,19 +22,15 @@ import {
   type InputEventResult,
 } from "@earendil-works/pi-coding-agent";
 // AuthStorage is internal in this SDK version; use it only to isolate credentials.
-import { AuthStorage } from "../node_modules/@earendil-works/pi-coding-agent/dist/core/auth-storage.js";
+import { AuthStorage } from "../../node_modules/@earendil-works/pi-coding-agent/dist/core/auth-storage.js";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import permissionGate, { GATE_ENTRY } from "../extensions/permission-gate/index.ts";
-import {
-  latestUserIntent,
-  userText,
-  type GateInputSource,
-} from "../extensions/permission-gate/intent.ts";
-import { GATE_QUESTIONS } from "../extensions/permission-gate/jev.ts";
-import type { GateRecord } from "../extensions/permission-gate/log.ts";
-import { initializeBashParser } from "../lib/bash-parser.ts";
+import { GATE_ENTRY } from "../../extensions/permission-gate/index.ts";
+import { latestUserIntent, userText } from "../../extensions/permission-gate/intent.ts";
+import { GATE_QUESTIONS } from "../../extensions/permission-gate/jev.ts";
+import type { GateRecord } from "../../extensions/permission-gate/log.ts";
+import { initializeBashParser } from "../../lib/bash-parser.ts";
 
-const templatePath = new URL("../prompts/commit.md", import.meta.url);
+const templatePath = new URL("../../prompts/commit.md", import.meta.url);
 const COMMAND = 'git commit -m "test: offline template regression"';
 const COST = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 };
 const CHAT: Model<"openai-completions"> = {
@@ -135,6 +132,19 @@ describe("Permission Gate slash templates (real Pi SDK)", () => {
     const agentDir = join(root, "agent");
     await Promise.all([mkdir(cwd), mkdir(join(agentDir, "prompts"), { recursive: true })]);
     await copyFile(templatePath, join(agentDir, "prompts", "commit.md"));
+    await mkdir(join(agentDir, "extensions"));
+    // Directory-loaded code resolves shared dependencies relative to this isolated agent root.
+    for (const name of ["lib", "node_modules"])
+      await symlink(
+        fileURLToPath(new URL(`../../${name}`, import.meta.url)),
+        join(agentDir, name),
+        "dir",
+      );
+    await symlink(
+      fileURLToPath(new URL("../../extensions/permission-gate", import.meta.url)),
+      join(agentDir, "extensions", "permission-gate"),
+      "dir",
+    );
     const rawTemplate = await readFile(templatePath, "utf8");
     // Independent expectation: do not use Pi's expansion helper to construct expected text.
     templateBody = rawTemplate.replace(/^---\n[\s\S]*?\n---\n/, "").trim();
@@ -163,7 +173,7 @@ describe("Permission Gate slash templates (real Pi SDK)", () => {
       cwd,
       agentDir,
       settingsManager,
-      noExtensions: true,
+      noExtensions: false,
       noSkills: true,
       noThemes: true,
       noContextFiles: true,
@@ -183,9 +193,8 @@ describe("Permission Gate slash templates (real Pi SDK)", () => {
             lifecycle.push("before_agent_start");
           });
         },
-        permissionGate,
         (pi) => {
-          // After Gate so handled/transformed input exercises its conservative correlation.
+          // Handled/transformed input still exercises real SDK persistence.
           pi.on("input", (event) => intercept?.(event));
           pi.on("message_end", (event) => {
             if (event.message.role === "user") lifecycle.push("user:message_end");
@@ -194,6 +203,17 @@ describe("Permission Gate slash templates (real Pi SDK)", () => {
       ],
     });
     await resourceLoader.reload();
+    const loaded = resourceLoader.getExtensions();
+    expect(loaded.errors).toEqual([]);
+    // Directory discovery must load only index, not the two guards or queue again.
+    expect(
+      loaded.extensions.filter((extension) => !extension.path.startsWith("<inline")),
+    ).toHaveLength(1);
+    const gate = loaded.extensions.find((extension) =>
+      extension.path.endsWith("/permission-gate/index.ts"),
+    );
+    expect(gate).toBeDefined();
+    expect(gate!.handlers.get("tool_call")).toHaveLength(3);
     expect(resourceLoader.getPrompts().diagnostics).toEqual([]);
     expect(resourceLoader.getPrompts().prompts).toMatchObject([
       { name: "commit", filePath: join(agentDir, "prompts", "commit.md"), content: templateBody },
@@ -240,12 +260,12 @@ describe("Permission Gate slash templates (real Pi SDK)", () => {
       );
   }
 
-  function expectUser(text: string, source: GateInputSource) {
+  function expectUser(text: string) {
     const user = persistedUsers().at(-1);
     expect(user).toBeDefined();
     expect(userText(user!.message.content)).toBe(text);
-    expect(user!.message).toHaveProperty("permissionGateSource", source);
-    // Reconstructing context from the manager must retain Gate's message_end metadata.
+    expect(Object.keys(user!.message).sort()).toEqual(["content", "role", "timestamp"]);
+    // The SDK persists the expanded text; Gate does not add message metadata.
     expect(session.sessionManager.buildSessionContext().messages).toContainEqual(user!.message);
     expect(session.messages).toContainEqual(user!.message);
     return user!;
@@ -293,12 +313,11 @@ describe("Permission Gate slash templates (real Pi SDK)", () => {
   }
 
   it.each(["interactive", "rpc"] as const)(
-    "persists %s provenance through /commit expansion and classifies the entire template",
+    "persists the expanded %s /commit text and classifies the entire template",
     async (source) => {
-      // The default SDK source is interactive; RPC callers pass it explicitly.
       await session.prompt("/commit", source === "rpc" ? { source } : undefined);
       const expanded = templateBody.replace("$@", "");
-      const user = expectUser(expanded, source);
+      const user = expectUser(expanded);
       expect(inputs).toMatchObject([{ text: "/commit", source, streamingBehavior: undefined }]);
       expect(prompts).toEqual([expanded]);
       expect(lifecycle).toEqual(["input", "before_agent_start", "user:message_end"]);
@@ -312,45 +331,49 @@ describe("Permission Gate slash templates (real Pi SDK)", () => {
   );
 
   it.each(["interactive", "rpc"] as const)("expands quoted $@ arguments for %s", async (source) => {
-    await session.prompt('/commit "Use scope template-tests" explain provenance', { source });
-    const expanded = templateBody.replace("$@", "Use scope template-tests explain provenance");
-    expectUser(expanded, source);
+    await session.prompt('/commit "Use scope template-tests" explain intent', { source });
+    const expanded = templateBody.replace("$@", "Use scope template-tests explain intent");
+    expectUser(expanded);
     expect(prompts).toEqual([expanded]);
     expect(expanded).not.toContain("$@");
     await checkGate(true, expanded);
   });
 
   it.each(["prompt", "sendUserMessage"] as const)(
-    "%s extension injection expands /commit but cannot authorize it",
+    "%s extension injection expands /commit and can authorize as an ordinary user",
     async (method) => {
       if (method === "prompt") await session.prompt("/commit", { source: "extension" });
       else await session.sendUserMessage("/commit", { expandPromptTemplates: true });
       const expanded = templateBody.replace("$@", "");
-      expectUser(expanded, "extension");
+      const latest = expectUser(expanded);
       expect(inputs).toMatchObject([{ text: "/commit", source: "extension" }]);
       expect(prompts).toEqual([expanded]);
-      expect(latestUserIntent(session.sessionManager.getBranch())).toBeUndefined();
-      await checkGate(false);
+      expect(latestUserIntent(session.sessionManager.getBranch())).toEqual({
+        id: latest.id,
+        text: expanded,
+      });
+      await checkGate(true, expanded);
     },
   );
 
-  it("does not leak provenance across identical expanded text and subsequent plain input", async () => {
+  it("always uses the latest entry across identical expanded text and subsequent plain input", async () => {
     const expanded = templateBody.replace("$@", "");
     await session.prompt("/commit", { source: "extension" });
-    expectUser(expanded, "extension");
+    expectUser(expanded);
     await session.prompt(expanded, { source: "rpc" });
-    const human = expectUser(expanded, "rpc");
+    const human = expectUser(expanded);
     await checkGate(true, expanded);
     await session.sendUserMessage("/commit", { expandPromptTemplates: true });
-    expectUser(expanded, "extension");
+    const injected = expectUser(expanded);
+    expect(injected.id).not.toBe(human.id);
     expect(latestUserIntent(session.sessionManager.getBranch())).toEqual({
-      id: human.id,
+      id: injected.id,
       text: expanded,
     });
     await checkGate(true, expanded);
     const plain = "Commit only the currently staged changes with a test commit message.";
     await session.prompt(plain);
-    const latest = expectUser(plain, "interactive");
+    const latest = expectUser(plain);
     expect(latestUserIntent(session.sessionManager.getBranch())).toEqual({
       id: latest.id,
       text: plain,
@@ -360,32 +383,65 @@ describe("Permission Gate slash templates (real Pi SDK)", () => {
     expect(stream).toHaveBeenCalledTimes(4);
   });
 
-  it("does not guess provenance for transformed plain input and recovers on the next input", async () => {
+  it("uses transformed persisted text rather than correlating it to raw input", async () => {
     const transformed = "Commit changes inserted by a transforming extension.";
     intercept = () => ({ action: "transform", text: transformed });
     await session.prompt("Explain the staged changes.");
-    expectUser(transformed, "unknown");
-    expect(latestUserIntent(session.sessionManager.getBranch())?.text).toBe("");
-    await checkGate(false);
+    expectUser(transformed);
+    await checkGate(true, transformed);
     intercept = undefined;
     await session.prompt("/commit", { source: "rpc" });
     const expanded = templateBody.replace("$@", "");
-    expectUser(expanded, "rpc");
+    expectUser(expanded);
     await checkGate(true, expanded);
   });
 
-  it("does not bridge multiple slash candidates left by handled input", async () => {
+  it("handled input creates no authorization and does not affect subsequent expanded user text", async () => {
     intercept = () => ({ action: "handled" });
     await session.prompt("/commit", { source: "extension" });
     expect(persistedUsers()).toEqual([]);
     expect(stream).not.toHaveBeenCalled();
+    await checkGate(false);
     intercept = undefined;
     await session.prompt("/commit", { source: "rpc" });
-    expectUser(templateBody.replace("$@", ""), "unknown");
-    await checkGate(false);
-    const plain = "Commit the staged changes now.";
-    await session.prompt(plain);
-    expectUser(plain, "interactive");
-    await checkGate(true, plain);
+    const expanded = templateBody.replace("$@", "");
+    expectUser(expanded);
+    await checkGate(true, expanded);
+  });
+
+  it("the discovered index applies path and SQL guards exactly once without Jev", async () => {
+    const confirm = vi.fn<ExtensionContext["ui"]["confirm"]>().mockResolvedValue(false);
+    const abort = vi.fn();
+    await session.bindExtensions({
+      uiContext: { ...session.extensionRunner.createContext().ui, confirm },
+      abortHandler: abort,
+      onError: (error) => errors.push(error.error),
+    });
+    const call = (toolName: string, input: Record<string, unknown>) =>
+      session.extensionRunner.emitToolCall({
+        type: "tool_call",
+        toolCallId: "offline-guard",
+        toolName,
+        input,
+      });
+    expect(await call("mcp__db__execute_sql", { sql: "SELECT 1" })).toBeUndefined();
+    expect(confirm).not.toHaveBeenCalled();
+    expect(await call("mcp__db__execute_sql", { sql: "UPDATE data SET value = 1" })).toMatchObject({
+      block: true,
+    });
+    expect(confirm).toHaveBeenCalledOnce();
+    for (const tool of ["write", "edit"])
+      expect(await call(tool, { path: "/repo/.env" })).toEqual({
+        block: true,
+        reason: "Protected path: .env",
+      });
+    expect(confirm.mock.calls.map(([title]) => title)).toEqual([
+      "⚠️ SQL Guard",
+      "🛡️ Protected Path",
+      "🛡️ Protected Path",
+    ]);
+    expect(abort).toHaveBeenCalledTimes(3);
+    expect(classifier.classify).not.toHaveBeenCalled();
+    expect(session.getAllTools()).toEqual([]);
   });
 });

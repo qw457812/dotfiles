@@ -10,20 +10,14 @@ import type {
   ExtensionCommandContext,
   ExtensionContext,
   ExtensionHandler,
-  BeforeAgentStartEvent,
-  BeforeAgentStartEventResult,
-  InputEvent,
-  InputEventResult,
-  MessageEndEvent,
-  MessageEndEventResult,
   RegisteredCommand,
   SessionEntry,
   ToolCallEvent,
   ToolCallEventResult,
 } from "@earendil-works/pi-coding-agent";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
-import permissionGate, { GATE_ENTRY } from "../extensions/permission-gate/index.ts";
-import { initializeBashParser } from "../lib/bash-parser.ts";
+import permissionGate, { GATE_ENTRY } from "../../extensions/permission-gate/index.ts";
+import { initializeBashParser } from "../../lib/bash-parser.ts";
 import {
   CLASSIFY_TIMEOUT,
   COMMAND_LIMIT,
@@ -31,9 +25,9 @@ import {
   INTENT_LIMIT,
   QUESTION_VERSION,
   type GateJudgment,
-} from "../extensions/permission-gate/jev.ts";
-import type { GateInputSource } from "../extensions/permission-gate/intent.ts";
-import { RULE_LABELS, type GateRule } from "../extensions/permission-gate/policy.ts";
+} from "../../extensions/permission-gate/jev.ts";
+import { latestUserIntent } from "../../extensions/permission-gate/intent.ts";
+import { RULE_LABELS, type GateRule } from "../../extensions/permission-gate/policy.ts";
 
 const MODEL: ClassifierModel<"typesafe-classifier"> = {
   type: "classifier",
@@ -68,24 +62,13 @@ function result(intent = 0.99, scope = 0.99, harm = 0.01): ClassifierResult {
   };
 }
 
-function user(
-  id = "user-1",
-  content: UserMessage["content"] = INTENT,
-  source: GateInputSource | null = "interactive",
-): SessionEntry {
-  // Existing fixtures represent real user messages already attributed by message_end.
-  const attributed: UserMessage & { permissionGateSource?: GateInputSource } = {
-    role: "user",
-    content,
-    timestamp: 0,
-    ...(source === null ? {} : { permissionGateSource: source }),
-  };
+function user(id = "user-1", content: UserMessage["content"] = INTENT): SessionEntry {
   return {
     type: "message",
     id,
     parentId: null,
     timestamp: TIMESTAMP,
-    message: attributed,
+    message: { role: "user", content, timestamp: 0 },
   };
 }
 
@@ -130,10 +113,7 @@ interface Decision {
 function harness(options: { hasUI?: boolean; branch?: SessionEntry[] } = {}) {
   let branch = options.branch ?? [user()];
   let sessionId = "session-1";
-  let tool: ToolHandler | undefined;
-  let input: ExtensionHandler<InputEvent, InputEventResult> | undefined;
-  let messageEnd: ExtensionHandler<MessageEndEvent, MessageEndEventResult> | undefined;
-  let beforeStart: ExtensionHandler<BeforeAgentStartEvent, BeforeAgentStartEventResult> | undefined;
+  const tools: ToolHandler[] = [];
   const laterTools: ToolHandler[] = [];
   let command: GateCommand | undefined;
   let entryId = 0;
@@ -195,24 +175,8 @@ function harness(options: { hasUI?: boolean; branch?: SessionEntry[] } = {}) {
     });
   });
   permissionGate({
-    on(
-      name: string,
-      handler:
-        | ToolHandler
-        | LifecycleHandler
-        | ExtensionHandler<InputEvent, InputEventResult>
-        | ExtensionHandler<MessageEndEvent, MessageEndEventResult>
-        | ExtensionHandler<BeforeAgentStartEvent, BeforeAgentStartEventResult>,
-    ) {
-      if (name === "tool_call") tool = handler as ToolHandler;
-      else if (name === "input") input = handler as ExtensionHandler<InputEvent, InputEventResult>;
-      else if (name === "message_end")
-        messageEnd = handler as ExtensionHandler<MessageEndEvent, MessageEndEventResult>;
-      else if (name === "before_agent_start")
-        beforeStart = handler as ExtensionHandler<
-          BeforeAgentStartEvent,
-          BeforeAgentStartEventResult
-        >;
+    on(name: string, handler: ToolHandler | LifecycleHandler) {
+      if (name === "tool_call") tools.push(handler as ToolHandler);
       else lifecycle.set(name as LifecycleName, handler as LifecycleHandler);
       return () => {};
     },
@@ -225,12 +189,11 @@ function harness(options: { hasUI?: boolean; branch?: SessionEntry[] } = {}) {
     sendMessage,
     sendUserMessage,
   } as unknown as ExtensionAPI);
-  if (!tool || !command) throw new Error("Permission Gate registration missing");
-  const handler = tool;
+  if (tools.length !== 3 || !command) throw new Error("Permission Gate registration missing");
   const gateCommand = command;
   const dispatchTool = async (event: ToolCallEvent) => {
     // Match Pi's registration-order dispatch: exceptions escape before execution.
-    for (const callback of [handler, ...laterTools]) {
+    for (const callback of [...tools, ...laterTools]) {
       const outcome = await callback(event, ctx);
       if (outcome?.block) return outcome;
     }
@@ -251,45 +214,6 @@ function harness(options: { hasUI?: boolean; branch?: SessionEntry[] } = {}) {
     getSessionId,
     gateCommand,
     gate: (args: string) => gateCommand.handler(args, commandCtx),
-    input: async (
-      text: string,
-      source?: InputEvent["source"],
-      streamingBehavior?: InputEvent["streamingBehavior"],
-    ) => {
-      if (!input) throw new Error("Input handler missing");
-      // Missing source deliberately simulates an incomplete/old API event.
-      return input({ type: "input", text, source, streamingBehavior } as InputEvent, ctx);
-    },
-    beforeAgentStart: async (prompt: string) => {
-      if (!beforeStart) throw new Error("before_agent_start handler missing");
-      return beforeStart(
-        {
-          type: "before_agent_start",
-          prompt,
-          systemPrompt: "",
-          systemPromptOptions: {},
-        } as BeforeAgentStartEvent,
-        ctx,
-      );
-    },
-    persistUser: async (content: UserMessage["content"] = INTENT) => {
-      if (!messageEnd) throw new Error("message_end handler missing");
-      const original: UserMessage = { role: "user", content, timestamp: 0 };
-      const replacement = await messageEnd({ type: "message_end", message: original }, ctx);
-      const persisted = JSON.parse(
-        JSON.stringify(replacement?.message ?? original),
-      ) as UserMessage & {
-        permissionGateSource?: GateInputSource;
-      };
-      branch.push({
-        type: "message",
-        id: `delivered-${++entryId}`,
-        parentId: branch.at(-1)?.id ?? null,
-        timestamp: TIMESTAMP,
-        message: persisted,
-      });
-      return persisted;
-    },
     registerToolCall: (callback: ToolHandler) => laterTools.push(callback),
     runInput: (value: Record<string, unknown>, toolName = "bash") =>
       dispatchTool({ type: "tool_call", toolCallId: `call-${++callId}`, toolName, input: value }),
@@ -330,269 +254,62 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-describe("Permission Gate input provenance through persisted messages", () => {
-  it.each(["interactive", "rpc"] as const)(
-    "authorizes only an attributed %s input after message_end replacement and persistence",
-    async (source) => {
-      const h = harness({ branch: [] });
-      await h.input(INTENT, source);
-      expect(h.branch()).toEqual([]);
-      expect(h.appendEntry).not.toHaveBeenCalled();
-      const persisted = await h.persistUser([{ type: "text", text: INTENT }]);
-      expect(persisted.permissionGateSource).toBe(source);
-      expect(Object.keys(persisted).sort()).toEqual([
-        "content",
-        "permissionGateSource",
-        "role",
-        "timestamp",
-      ]);
-      expect(h.appendEntry).not.toHaveBeenCalled();
-      expect(await h.run()).toBeUndefined();
-      expect(h.classify.mock.calls[0][1].state.user_intent).toBe(INTENT);
-      expect(h.confirm).not.toHaveBeenCalled();
-      expect(h.decisions()[0].outcome).toBe("auto-approved");
-      // Provenance needs no extra raw-input custom entry; only the decision is appended.
-      expect(h.appendEntry).toHaveBeenCalledOnce();
-      expect(h.appendEntry.mock.calls[0][0]).toBe(GATE_ENTRY);
-      expect(JSON.stringify(h.appendEntry.mock.calls)).not.toContain(INTENT);
-    },
-  );
-
-  it.each([false, true])(
-    "sendUserMessage-style extension input cannot authorize (previous real user=%s)",
-    async (previousReal) => {
-      const h = harness({ branch: [] });
-      if (previousReal) {
-        await h.input("Only delete /repo/old-target", "interactive");
-        await h.persistUser("Only delete /repo/old-target");
-      }
-      await h.input(INTENT, "extension");
-      expect((await h.persistUser()).permissionGateSource).toBe("extension");
-      await h.run();
-      if (previousReal) {
-        expect(h.classify).toHaveBeenCalledOnce();
-        expect(h.classify.mock.calls[0][1].state.user_intent).toBe("Only delete /repo/old-target");
-        expect(JSON.stringify(h.classify.mock.calls)).not.toContain(INTENT);
-        expect(h.confirm).not.toHaveBeenCalled();
-      } else {
-        expect(h.classify).not.toHaveBeenCalled();
-        expect(h.confirm).toHaveBeenCalledOnce();
-        expect(h.decisions()[0].judgment.reason).toBe("missing-intent");
-      }
-    },
-  );
-
-  it.each([null, "unknown"] as const)(
-    "a latest legacy/unknown user (%s) asks instead of falling back to older authorization",
-    async (source) => {
-      const h = harness({ branch: [user("older"), user("latest", INTENT, source)] });
-      await h.run();
-      expect(h.classify).not.toHaveBeenCalled();
-      expect(h.findOfType).not.toHaveBeenCalled();
-      expect(h.confirm).toHaveBeenCalledOnce();
-      expect(h.decisions()[0].judgment).toEqual({ action: "ask", reason: "missing-intent" });
-    },
-  );
-
-  it("an uncorrelated message_end is unknown and overrides older real authorization", async () => {
-    const h = harness();
-    expect((await h.persistUser()).permissionGateSource).toBe("unknown");
-    await h.run();
-    expect(h.classify).not.toHaveBeenCalled();
-    expect(h.confirm).toHaveBeenCalledOnce();
-    expect(h.decisions()[0].judgment.reason).toBe("missing-intent");
-  });
-
-  it.each(["transformed request", `${INTENT}\nExtension-added authorization`, `${INTENT} `])(
-    "does not attribute transformed/expanded content by partial or normalized matching: %s",
-    async (delivered) => {
-      const h = harness();
-      await h.input(INTENT, "interactive");
-      expect((await h.persistUser(delivered)).permissionGateSource).toBe("unknown");
-      await h.run();
-      expect(h.classify).not.toHaveBeenCalled();
-      expect(h.confirm).toHaveBeenCalledOnce();
-      expect(h.decisions()[0].judgment.reason).toBe("missing-intent");
-    },
-  );
-
-  it.each([
-    ["interactive", "extension"],
-    ["rpc", "interactive"],
-    ["extension", "rpc"],
-  ] as const)("identical pending content from %s and %s is ambiguous", async (a, b) => {
-    const h = harness();
-    await h.input(INTENT, a);
-    await h.input(INTENT, b);
-    expect((await h.persistUser()).permissionGateSource).toBe("unknown");
-    await h.run();
-    expect(h.classify).not.toHaveBeenCalled();
-    expect(h.confirm).toHaveBeenCalledOnce();
-    // All matching pending inputs are consumed, rather than leaking a real source to replay.
-    expect((await h.persistUser()).permissionGateSource).toBe("unknown");
-    await h.run();
-    expect(h.classify).not.toHaveBeenCalled();
-    expect(h.confirm).toHaveBeenCalledTimes(2);
-  });
-
-  it("correlates interleaved inputs by content, not arrival order, and consumes attribution", async () => {
-    const h = harness({ branch: [] });
-    await h.input(INTENT, "rpc");
-    await h.input("extension request", "extension");
-    expect((await h.persistUser("extension request")).permissionGateSource).toBe("extension");
-    expect((await h.persistUser()).permissionGateSource).toBe("rpc");
-    await h.run();
+describe("Permission Gate latest ordinary user intent", () => {
+  it("accepts legacy and sendUserMessage-style ordinary user entries without provenance", async () => {
+    const h = harness({
+      branch: [user("older", "Only delete /repo/old-target"), user("injected")],
+    });
+    expect(latestUserIntent(h.branch())).toEqual({ id: "injected", text: INTENT });
+    expect(await h.run()).toBeUndefined();
     expect(h.classify.mock.calls[0][1].state.user_intent).toBe(INTENT);
-    expect((await h.persistUser()).permissionGateSource).toBe("unknown");
-    await h.run();
-    expect(h.classify).toHaveBeenCalledOnce();
-    expect(h.confirm).toHaveBeenCalledOnce();
+    expect(h.confirm).not.toHaveBeenCalled();
+    expect(h.decisions()[0].outcome).toBe("auto-approved");
+    expect(JSON.stringify(h.appendEntry.mock.calls)).not.toContain(INTENT);
   });
 
-  it.each(["interactive", "rpc", "extension", "unknown"] as const)(
-    "persisted %s provenance survives a new extension instance/reload and branch selection",
-    async (source) => {
-      const h = harness({ branch: [] });
-      if (source !== "unknown") await h.input(INTENT, source);
-      await h.persistUser();
-      const saved = JSON.parse(JSON.stringify(h.branch())) as SessionEntry[];
-      const reloaded = harness({ branch: saved });
-      await reloaded.fire("session_start");
-      await reloaded.run();
-      const real = source === "interactive" || source === "rpc";
-      expect(reloaded.classify).toHaveBeenCalledTimes(real ? 1 : 0);
-      expect(reloaded.confirm).toHaveBeenCalledTimes(real ? 0 : 1);
-      reloaded.replaceBranch([user("different-branch", "different authorization")]);
-      await reloaded.run();
-      expect(reloaded.classify.mock.calls.at(-1)?.[1].state.user_intent).toBe(
-        "different authorization",
-      );
-      reloaded.replaceBranch(saved);
-      await reloaded.run();
-      expect(reloaded.classify).toHaveBeenCalledTimes(real ? 3 : 1);
-      expect(reloaded.confirm).toHaveBeenCalledTimes(real ? 0 : 2);
-    },
-  );
-
-  it.each([
-    "session_start",
-    "session_before_switch",
-    "session_before_tree",
-    "session_shutdown",
-  ] as const)("%s clears pending input attribution", async (event) => {
-    const h = harness();
-    await h.input(INTENT, "interactive");
-    await h.fire(event);
-    expect((await h.persistUser()).permissionGateSource).toBe("unknown");
+  it("reconstructs latest intent after reload and follows current branch selection", async () => {
+    const saved = JSON.parse(JSON.stringify([user()])) as SessionEntry[];
+    const h = harness({ branch: saved });
+    await h.fire("session_start");
     await h.run();
-    expect(h.classify).not.toHaveBeenCalled();
-    expect(h.confirm).toHaveBeenCalledOnce();
-    // The new lifecycle can attribute new input again.
-    await h.input(INTENT, "rpc");
-    expect((await h.persistUser()).permissionGateSource).toBe("rpc");
+    h.replaceBranch([user("other", "different authorization")]);
     await h.run();
-    expect(h.classify).toHaveBeenCalledOnce();
-  });
-
-  it("does not infer absent input source from TUI mode, UI presence or older real messages", async () => {
-    const h = harness();
-    await h.input(INTENT);
-    const persisted = await h.persistUser();
-    expect(["interactive", "rpc"]).not.toContain(persisted.permissionGateSource);
+    expect(h.classify.mock.calls.at(-1)?.[1].state.user_intent).toBe("different authorization");
+    h.replaceBranch(saved);
     await h.run();
-    expect(h.classify).not.toHaveBeenCalled();
-    expect(h.confirm).toHaveBeenCalledOnce();
-    expect(h.decisions()[0].judgment.reason).toBe("missing-intent");
-    expect(h.appendEntry).toHaveBeenCalledOnce();
+    expect(h.classify.mock.calls.at(-1)?.[1].state.user_intent).toBe(INTENT);
+    expect(h.confirm).not.toHaveBeenCalled();
   });
 });
 
-describe("Permission Gate conservative slash-input attribution", () => {
-  const expanded = "Commit the current staged changes with message Fix API.";
-
-  it.each(["interactive", "rpc"] as const)(
-    "bridges an unambiguous %s slash input to its expanded prompt once",
-    async (source) => {
-      const h = harness({ branch: [] });
-      await h.input("/commit", source);
-      await h.beforeAgentStart(expanded);
-      expect((await h.persistUser(expanded)).permissionGateSource).toBe(source);
-      await h.run('git commit -m "Fix API"');
-      expect(h.classify.mock.calls[0][1].state.user_intent).toBe(expanded);
-      expect(h.confirm).not.toHaveBeenCalled();
-      expect((await h.persistUser(expanded)).permissionGateSource).toBe("unknown");
-    },
-  );
-
-  it("does not promote expanded extension input to human authorization", async () => {
-    const h = harness({ branch: [] });
-    await h.input("/commit", "extension");
-    await h.beforeAgentStart(expanded);
-    expect((await h.persistUser(expanded)).permissionGateSource).toBe("extension");
-    await h.run("git commit");
+describe("Permission Gate integrated manual path and SQL guards", () => {
+  it.each(["write", "edit"])("protects %s paths without asking Jev", async (toolName) => {
+    const h = harness();
+    h.confirm.mockResolvedValue(false);
+    expect(await h.runInput({ path: "/repo/.env" }, toolName)).toEqual({
+      block: true,
+      reason: "Protected path: .env",
+    });
+    expect(h.confirm).toHaveBeenCalledOnce();
+    expect(h.confirm.mock.calls[0][0]).toBe("🛡️ Protected Path");
     expect(h.classify).not.toHaveBeenCalled();
-    expect(h.decisions()[0].judgment.reason).toBe("missing-intent");
+    expect(h.abort).toHaveBeenCalledOnce();
   });
 
-  it.each(["steer", "followUp"] as const)(
-    "does not bridge queued %s slash input",
-    async (delivery) => {
-      const h = harness({ branch: [] });
-      await h.input("/commit", "interactive", delivery);
-      await h.beforeAgentStart(expanded);
-      expect((await h.persistUser(expanded)).permissionGateSource).toBe("unknown");
-      await h.run("git commit");
-      expect(h.classify).not.toHaveBeenCalled();
-    },
-  );
-
-  it("ambiguous expansion consumes stale idle candidates without granting a source", async () => {
-    const h = harness({ branch: [] });
-    await h.input("/commit", "interactive");
-    await h.input("/other", "extension");
-    await h.beforeAgentStart(expanded);
-    expect((await h.persistUser(expanded)).permissionGateSource).toBe("unknown");
-    await h.run("git commit");
+  it.each(["on", "off"])("keeps SQL/path manual with Jev %s", async (setting) => {
+    const h = harness();
+    await h.gate(`jev ${setting}`);
+    expect(await h.runInput({ sql: "SELECT 1" }, "mcp__db__execute_sql")).toBeUndefined();
+    expect(h.confirm).not.toHaveBeenCalled();
+    expect(
+      await h.runInput({ sql: "UPDATE data SET value = 1" }, "mcp__db__execute_sql"),
+    ).toBeUndefined();
+    expect(h.confirm).toHaveBeenCalledOnce();
+    expect(h.confirm.mock.calls[0][0]).toBe("⚠️ SQL Guard");
+    expect(await h.runInput({ path: "/repo/.env" }, "write")).toBeUndefined();
+    expect(h.confirm).toHaveBeenCalledTimes(2);
     expect(h.classify).not.toHaveBeenCalled();
-    await h.input("/commit", "rpc");
-    await h.beforeAgentStart(expanded);
-    expect((await h.persistUser(expanded)).permissionGateSource).toBe("rpc");
-    await h.run("git commit");
-    expect(h.classify).toHaveBeenCalledOnce();
-  });
-
-  it("an exact-match queued human input cannot authorize an ambiguous idle extension expansion", async () => {
-    const h = harness({ branch: [] });
-    await h.input(expanded, "interactive", "followUp");
-    await h.input("/commit", "extension");
-    await h.beforeAgentStart(expanded);
-    expect((await h.persistUser(expanded)).permissionGateSource).toBe("unknown");
-    await h.run("git commit");
-    expect(h.classify).not.toHaveBeenCalled();
-  });
-
-  it("does not bridge arbitrary transformations of a non-slash input", async () => {
-    const h = harness({ branch: [] });
-    await h.input("Show git status", "interactive");
-    await h.beforeAgentStart(expanded);
-    expect((await h.persistUser(expanded)).permissionGateSource).toBe("unknown");
-    await h.run("git commit");
-    expect(h.classify).not.toHaveBeenCalled();
-  });
-
-  it.each([
-    "session_start",
-    "session_before_switch",
-    "session_before_tree",
-    "session_shutdown",
-  ] as const)("%s clears expanded-prompt attribution", async (event) => {
-    const h = harness({ branch: [] });
-    await h.input("/commit", "interactive");
-    await h.beforeAgentStart(expanded);
-    await h.fire(event);
-    expect((await h.persistUser(expanded)).permissionGateSource).toBe("unknown");
-    await h.run("git commit");
-    expect(h.classify).not.toHaveBeenCalled();
+    expect(h.appendEntry).not.toHaveBeenCalled();
   });
 });
 
@@ -906,7 +623,7 @@ describe("Permission Gate Jev classifier results", () => {
 });
 
 describe("Permission Gate Jev branch authorization and full input", () => {
-  it("uses only the most recent real user on the current branch, never assistant/tool/custom messages", async () => {
+  it("uses only the most recent ordinary user on the current branch, never assistant/tool/custom messages", async () => {
     const usage: AssistantMessage["usage"] = {
       input: 0,
       output: 0,
@@ -950,7 +667,7 @@ describe("Permission Gate Jev branch authorization and full input", () => {
         content: "custom authorization",
         display: false,
       },
-      // A user-shaped injected message carrying customType is not a real user.
+      // A user-shaped custom message must not provide ordinary user authorization.
       {
         ...user("injected", "injected authorization"),
         message: {

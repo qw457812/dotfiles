@@ -8,20 +8,23 @@
  * Both switches are instance-local and reset to ON on /reload.
  *
  * Only calls matching the existing literal AST rules reach Jev. No operation category
- * is categorically excluded from auto-approval. Full commands and the latest real user
+ * is categorically excluded from auto-approval. Full commands and the latest ordinary user
  * message are sent to typesafe/jev-latest WITHOUT redaction; never tool output/history.
  * Missing authorization, oversized inputs and classification failures ask the user;
  * ask without UI blocks. Parser exceptions retain the existing warn-and-allow behavior.
  *
  * Coverage is unchanged: dynamic names, aliases, functions, wrappers (env, command,
  * xargs, shell -c), eval strings, expansions and filesystem state are not resolved.
- * Temporary-directory deletion exemptions remain. Only bash tool_call is handled,
- * including nested calls through codemode, not user_bash or other tools.
- * safe-guard.ts owns write/edit protection; dirty-repo-guard.ts owns dirty-repo reminders.
+ * Temporary-directory deletion exemptions remain. Bash checks handle tool_call,
+ * including nested calls through codemode, not user_bash.
+ * This entry also registers manual write/edit path and SQL guards.
+ * dirty-repo-guard.ts owns dirty-repo reminders.
  */
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { withBashTree } from "../../lib/bash-parser.ts";
-import { withConfirmationQueue } from "../../lib/confirmation-queue.ts";
+import { withConfirmationQueue } from "./confirmation-queue.ts";
+import pathGuard from "./path-guard.ts";
+import sqlGuard from "./sql-guard.ts";
 import { approvalRules, RULE_LABELS } from "./policy.ts";
 import {
   GATE_MODEL,
@@ -30,63 +33,21 @@ import {
   judgeCommand,
   type GateJudgment,
 } from "./jev.ts";
-import { latestUserIntent, inputFingerprint, userText, type GateInputSource } from "./intent.ts";
+import { latestUserIntent } from "./intent.ts";
 import { GATE_ENTRY, showLog, type GateRecord, type Outcome } from "./log.ts";
 
 export { GATE_ENTRY } from "./log.ts";
 const USAGE = "Usage: /gate git [on|off] | jev [on|off] | log";
 
 export default function (pi: ExtensionAPI) {
+  pathGuard(pi);
+  sqlGuard(pi);
+
   let gitEnabled = true;
   let jevEnabled = true;
   let lifecycle = new AbortController();
-  let pendingInputs: {
-    fingerprint: string;
-    source: GateInputSource;
-    queued: boolean;
-    expandable: boolean;
-  }[] = [];
-
-  pi.on("input", (event) => {
-    pendingInputs.push({
-      fingerprint: inputFingerprint(event.text),
-      source: event.source,
-      queued: event.streamingBehavior !== undefined,
-      expandable: event.text.startsWith("/"),
-    });
-    pendingInputs = pendingInputs.slice(-128);
-  });
-  pi.on("before_agent_start", (event) => {
-    const fingerprint = inputFingerprint(event.prompt);
-    const candidate = pendingInputs[0];
-    // Pi emits input before slash-template/skill expansion, then this event with
-    // the expanded prompt. Bridge only a single, non-queued slash input.
-    if (pendingInputs.length === 1 && !candidate.queued && candidate.expandable) {
-      pendingInputs = [{ ...candidate, fingerprint, expandable: false }];
-      return;
-    }
-    if (pendingInputs.some((input) => !input.queued && input.fingerprint !== fingerprint)) {
-      // Do not guess between candidates, or leak stale handled/transformed inputs
-      // into a later run. An exact-match queued input cannot resolve this ambiguity.
-      pendingInputs = pendingInputs.filter(
-        (input) => input.queued || input.fingerprint === fingerprint,
-      );
-      pendingInputs.push({ fingerprint, source: "unknown", queued: false, expandable: false });
-    }
-  });
-  pi.on("message_end", (event) => {
-    if (event.message.role !== "user") return;
-    const fingerprint = inputFingerprint(userText(event.message.content));
-    const matches = pendingInputs.filter((input) => input.fingerprint === fingerprint);
-    pendingInputs = pendingInputs.filter((input) => input.fingerprint !== fingerprint);
-    const sources = new Set(matches.map((input) => input.source));
-    const source: GateInputSource = sources.size === 1 ? matches[0].source : "unknown";
-    // Pi otherwise drops InputEvent.source when persisting a regular user message.
-    return { message: { ...event.message, permissionGateSource: source } };
-  });
 
   const invalidate = () => {
-    pendingInputs = [];
     lifecycle.abort();
     lifecycle = new AbortController();
   };

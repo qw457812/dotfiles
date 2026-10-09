@@ -1,5 +1,5 @@
 /**
- * Opt-in live calibration: GATE_CALIBRATE=1 vitest run tests/permission-gate-calibration.test.ts
+ * Opt-in live calibration: GATE_CALIBRATE=1 vitest run tests/permission-gate/calibration.test.ts
  * Uses the normal Pi model runtime and credentials. Sends synthetic fixture text only.
  * NEVER registers or executes a Bash tool. No shell command in a fixture is executed.
  */
@@ -12,39 +12,31 @@ import {
   type ToolCallEvent,
   type ToolCallEventResult,
   type SessionEntry,
-  type InputEvent,
-  type InputEventResult,
-  type MessageEndEvent,
-  type MessageEndEventResult,
 } from "@earendil-works/pi-coding-agent";
 import { writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import permissionGate from "../extensions/permission-gate/index.ts";
-import { withBashTree } from "../lib/bash-parser.ts";
-import { approvalRules } from "../extensions/permission-gate/policy.ts";
+import permissionGate from "../../extensions/permission-gate/index.ts";
+import { withBashTree } from "../../lib/bash-parser.ts";
+import { approvalRules } from "../../extensions/permission-gate/policy.ts";
 import {
   GATE_MODEL,
   GATE_QUESTIONS,
   QUESTION_VERSION,
   type GateJudgment,
-} from "../extensions/permission-gate/jev.ts";
-import { GATE_FIXTURES, type GateFixture } from "./fixtures/permission-gate.ts";
+} from "../../extensions/permission-gate/jev.ts";
+import { GATE_FIXTURES, type GateFixture } from "./fixtures.ts";
 
 const LIVE = process.env.GATE_CALIBRATE === "1";
 const REPEATS = 3;
 
 function classificationOnlyGate(registry: ModelRegistry, fixture: GateFixture) {
-  let handler: ExtensionHandler<ToolCallEvent, ToolCallEventResult> | undefined;
-  let input: ExtensionHandler<InputEvent, InputEventResult> | undefined;
-  let messageEnd: ExtensionHandler<MessageEndEvent, MessageEndEventResult> | undefined;
+  const handlers: ExtensionHandler<ToolCallEvent, ToolCallEventResult>[] = [];
   let record: { judgment: GateJudgment; durationMs: number } | undefined;
   const branch: SessionEntry[] = [];
   permissionGate({
     on(name: string, callback: unknown) {
-      if (name === "tool_call") handler = callback as typeof handler;
-      if (name === "input") input = callback as typeof input;
-      if (name === "message_end") messageEnd = callback as typeof messageEnd;
+      if (name === "tool_call") handlers.push(callback as (typeof handlers)[number]);
       return () => {};
     },
     registerCommand() {},
@@ -61,27 +53,26 @@ function classificationOnlyGate(registry: ModelRegistry, fixture: GateFixture) {
     signal: new AbortController().signal,
   } as unknown as ExtensionContext;
   return async () => {
-    if (!handler || !input || !messageEnd) throw new Error("Gate was not registered");
-    await input({ type: "input", text: fixture.intent, source: "interactive" }, ctx);
+    if (handlers.length !== 3) throw new Error("Gate was not registered");
     const message = { role: "user" as const, content: fixture.intent, timestamp: Date.now() };
-    const ended = await messageEnd({ type: "message_end", message }, ctx);
     branch.push({
       type: "message",
       id: "fixture-user",
       parentId: null,
       timestamp: new Date().toISOString(),
-      message: ended?.message ?? message,
+      message,
     });
-    const blocked = await handler(
-      {
-        type: "tool_call",
-        toolCallId: "fixture",
-        toolName: "bash",
-        input: { command: fixture.command },
-      },
-      ctx,
-    );
-    return { blocked: blocked?.block === true, record };
+    const event: ToolCallEvent = {
+      type: "tool_call",
+      toolCallId: "fixture",
+      toolName: "bash",
+      input: { command: fixture.command },
+    };
+    for (const handler of handlers) {
+      const result = await handler(event, ctx);
+      if (result?.block) return { blocked: true, record };
+    }
+    return { blocked: false, record };
   };
 }
 

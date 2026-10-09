@@ -21,7 +21,7 @@ import {
 import { InMemoryAuthStorageBackend } from "../node_modules/@earendil-works/pi-coding-agent/dist/core/auth-storage.js";
 import { loadMcpConfig } from "../node_modules/@earendil-works/pi-coding-agent/dist/extensions/mcp/config.js";
 import { McpOAuthCredentialStore } from "../node_modules/@earendil-works/pi-coding-agent/dist/extensions/mcp/oauth.js";
-import sqlGuard from "../extensions/sql-guard.ts";
+import sqlGuard from "../extensions/permission-gate/sql-guard.ts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const fixturePath = fileURLToPath(new URL("./fixtures/mcp-server.mjs", import.meta.url));

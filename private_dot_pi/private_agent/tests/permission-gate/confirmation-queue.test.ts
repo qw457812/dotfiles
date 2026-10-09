@@ -6,11 +6,9 @@ import type {
   ToolCallEventResult,
 } from "@earendil-works/pi-coding-agent";
 import { beforeAll, describe, expect, it, vi } from "vitest";
-import permissionGate from "../extensions/permission-gate/index.ts";
-import safeGuard from "../extensions/safe-guard.ts";
-import sqlGuard from "../extensions/sql-guard.ts";
-import { initializeBashParser } from "../lib/bash-parser.ts";
-import { withConfirmationQueue } from "../lib/confirmation-queue.ts";
+import permissionGate from "../../extensions/permission-gate/index.ts";
+import { initializeBashParser } from "../../lib/bash-parser.ts";
+import { withConfirmationQueue } from "../../extensions/permission-gate/confirmation-queue.ts";
 
 function deferred<T>() {
   let resolve!: (value: T) => void;
@@ -32,27 +30,27 @@ function mockUI() {
   return { confirm, notify };
 }
 
-type Guard = "gate" | "safe" | "sql";
+type Guard = "gate" | "path" | "sql";
 type ToolHandler = ExtensionHandler<ToolCallEvent, ToolCallEventResult>;
-const GUARDS: Guard[] = ["gate", "safe", "sql"];
+const GUARDS: Guard[] = ["gate", "path", "sql"];
 const TITLES: Record<Guard, string> = {
   gate: "🔐 Allow this command?",
-  safe: "🛡️ Protected Path",
+  path: "🛡️ Protected Path",
   sql: "⚠️ SQL Guard",
 };
 const INPUTS: Record<Guard, { toolName: string; input: Record<string, unknown> }> = {
   gate: { toolName: "bash", input: { command: "rm -rf /repo/queue-test" } },
-  safe: { toolName: "write", input: { path: "/repo/.env", content: "fixture-only" } },
+  path: { toolName: "write", input: { path: "/repo/.env", content: "fixture-only" } },
   sql: { toolName: "mcp__db__execute_sql", input: { sql: "DROP TABLE queue_test" } },
 };
 
-// Register all three real extensions against mock APIs and one shared UI.
+// Register the unified index against a mock API and one shared UI.
 // Only dispatch tool_call handlers: never create a process, write a file or call SQL/API tools.
 function harness(ui = mockUI()) {
   const handlers: ToolHandler[] = [];
   const emits = {
     gate: vi.fn<ExtensionAPI["events"]["emit"]>(),
-    safe: vi.fn<ExtensionAPI["events"]["emit"]>(),
+    path: vi.fn<ExtensionAPI["events"]["emit"]>(),
     sql: vi.fn<ExtensionAPI["events"]["emit"]>(),
   };
   const controller = new AbortController();
@@ -69,21 +67,26 @@ function harness(ui = mockUI()) {
     sessionManager: { getBranch: () => [], getSessionId: () => "queue-test" },
     modelRegistry: { findOfType: vi.fn(() => undefined), classify },
   } as unknown as ExtensionContext;
-  for (const [kind, extension] of [
-    ["gate", permissionGate],
-    ["safe", safeGuard],
-    ["sql", sqlGuard],
-  ] as const) {
-    extension({
-      on(name: string, callback: ToolHandler) {
-        if (name === "tool_call") handlers.push(callback);
-        return () => {};
+  permissionGate({
+    on(name: string, callback: ToolHandler) {
+      if (name === "tool_call") handlers.push(callback);
+      return () => {};
+    },
+    registerCommand: vi.fn(),
+    appendEntry,
+    events: {
+      emit(name: string, data: { title: string }) {
+        const guard: Guard =
+          data.title === "Pi Danger Approval"
+            ? "gate"
+            : data.title === "Pi Path Approval"
+              ? "path"
+              : "sql";
+        emits[guard](name, data);
       },
-      registerCommand: vi.fn(),
-      appendEntry,
-      events: { emit: emits[kind] },
-    } as unknown as ExtensionAPI);
-  }
+    },
+  } as unknown as ExtensionAPI);
+  expect(handlers).toHaveLength(3);
   let callId = 0;
   return {
     ctx,
@@ -174,11 +177,11 @@ describe("withConfirmationQueue", () => {
   });
 });
 
-describe("real Gate/SafeGuard/SQLGuard shared confirmation scheduling", () => {
+describe("real Gate/PathGuard/SQLGuard shared confirmation scheduling", () => {
   it.each([
-    ["gate", "safe", "sql"],
-    ["safe", "gate", "sql"],
-    ["sql", "safe", "gate"],
+    ["gate", "path", "sql"],
+    ["path", "gate", "sql"],
+    ["sql", "path", "gate"],
   ] as const)("%s holds the dialog while %s and %s wait in FIFO order", async (a, b, c) => {
     const h = harness();
     const dialogs = [deferred<boolean>(), deferred<boolean>(), deferred<boolean>()];
@@ -269,7 +272,7 @@ describe("real Gate/SafeGuard/SQLGuard shared confirmation scheduling", () => {
       const error = new Error("mock dialog failure");
       h.ui.confirm.mockReturnValueOnce(dialog.promise);
       const first = h.run(throwing);
-      // Safe/SQL propagate to Pi's pre-execution error boundary; Gate returns a block.
+      // Path/SQL propagate to Pi's pre-execution error boundary; Gate returns a block.
       const failed =
         throwing === "gate"
           ? expect(first).resolves.toEqual({ block: true, reason: "User confirmation failed" })
@@ -295,7 +298,7 @@ describe("real Gate/SafeGuard/SQLGuard shared confirmation scheduling", () => {
     },
   );
 
-  it.each(["safe", "sql"] as const)(
+  it.each(["path", "sql"] as const)(
     "%s passes ctx.signal unchanged to its active confirmation",
     async (guard) => {
       const h = harness();
@@ -319,7 +322,7 @@ describe("real Gate/SafeGuard/SQLGuard shared confirmation scheduling", () => {
     const h = harness();
     const dialog = deferred<boolean>();
     h.ui.confirm.mockReturnValueOnce(dialog.promise);
-    const first = h.run("safe");
+    const first = h.run("path");
     await flush();
     const queuedController = new AbortController();
     const queuedCtx = { ...h.ctx, signal: queuedController.signal };
@@ -344,14 +347,14 @@ describe("real Gate/SafeGuard/SQLGuard shared confirmation scheduling", () => {
     const b = harness(ui);
     const dialog = deferred<boolean>();
     ui.confirm.mockReturnValueOnce(dialog.promise);
-    const first = a.run("safe");
+    const first = a.run("path");
     await flush();
     const second = b.run("gate");
     await flush();
     expect(ui.confirm).toHaveBeenCalledOnce();
     dialog.resolve(true);
     expect(await Promise.all([first, second])).toEqual([undefined, undefined]);
-    expect(ui.confirm.mock.calls.map(([title]) => title)).toEqual([TITLES.safe, TITLES.gate]);
+    expect(ui.confirm.mock.calls.map(([title]) => title)).toEqual([TITLES.path, TITLES.gate]);
   });
 
   it("different UI objects allow independent dialogs to progress concurrently", async () => {
@@ -362,7 +365,7 @@ describe("real Gate/SafeGuard/SQLGuard shared confirmation scheduling", () => {
     b.ui.confirm.mockReturnValueOnce(dialogs[1].promise);
     const first = a.run("gate");
     await flush();
-    const second = b.run("safe");
+    const second = b.run("path");
     await flush();
     expect(a.ui.confirm).toHaveBeenCalledOnce();
     expect(b.ui.confirm).toHaveBeenCalledOnce();

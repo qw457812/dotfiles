@@ -1,5 +1,5 @@
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
-import { withConfirmationQueue } from "../lib/confirmation-queue.ts";
+import { withConfirmationQueue } from "./confirmation-queue.ts";
 
 /**
  * SQL Guard Extension

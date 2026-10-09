@@ -2,10 +2,9 @@ import { tmpdir } from "node:os";
 import { posix } from "node:path";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { describe, expect, it, vi } from "vitest";
-import permissionGate from "../extensions/permission-gate/index.ts";
-import dirtyRepoGuard from "../extensions/dirty-repo-guard.ts";
-import safeGuard from "../extensions/safe-guard.ts";
-import { initializeBashParser } from "../lib/bash-parser.ts";
+import permissionGate from "../../extensions/permission-gate/index.ts";
+import dirtyRepoGuard from "../../extensions/dirty-repo-guard.ts";
+import { initializeBashParser } from "../../lib/bash-parser.ts";
 
 type Handler = (
   event: { toolName: string; input: { command?: string; path?: string } },
@@ -24,12 +23,12 @@ type GateCommand = {
 };
 
 function harness(approved = true, hasUI = true, extension = permissionGate) {
-  let handler: Handler | undefined;
+  const handlers: Handler[] = [];
   let gateCommand: GateCommand | undefined;
   const emit = vi.fn();
   extension({
     on: (event: string, callback: Handler) => {
-      if (event === "tool_call") handler = callback;
+      if (event === "tool_call") handlers.push(callback);
     },
     events: { emit },
     registerCommand: (name: string, command: GateCommand) => {
@@ -54,9 +53,13 @@ function harness(approved = true, hasUI = true, extension = permissionGate) {
       if (!gateCommand) throw new Error("Gate command not registered");
       return gateCommand.handler(args, ctx);
     },
-    run: (command: string, toolName = "bash") => {
-      if (!handler) throw new Error("Handler not registered");
-      return handler({ toolName, input: { command, path: command } }, ctx);
+    run: async (command: string, toolName = "bash") => {
+      if (!handlers.length) throw new Error("Handler not registered");
+      const event = { toolName, input: { command, path: command } };
+      for (const handler of handlers) {
+        const result = await handler(event, ctx);
+        if (result?.block) return result;
+      }
     },
   };
 }
@@ -688,36 +691,5 @@ describe("Permission Gate integration and Git toggle", () => {
     await run("env git reset --hard");
     await run("bash -c 'git reset --hard'");
     expect(ctx.ui.confirm).not.toHaveBeenCalled();
-  });
-});
-
-describe("Safe Guard keeps only path protection", () => {
-  it("does not duplicate bash confirmation", async () => {
-    const { run, ctx } = harness(false, true, safeGuard);
-    expect(await run("sudo rm -rf /; echo DROP TABLE")).toBeUndefined();
-    expect(ctx.ui.confirm).not.toHaveBeenCalled();
-  });
-
-  it.each(["write", "edit"])(
-    "preserves protected-path confirmation and denial: %s",
-    async (tool) => {
-      const { run, ctx } = harness(false, true, safeGuard);
-      expect(await run("/repo/.env", tool)).toEqual({
-        block: true,
-        reason: "Protected path: .env",
-      });
-      expect(ctx.ui.confirm).toHaveBeenCalledWith(
-        "🛡️ Protected Path",
-        "Allow write to /repo/.env?",
-      );
-      expect(ctx.abort).toHaveBeenCalledOnce();
-    },
-  );
-
-  it.each(["write", "edit"])("blocks protected paths without UI: %s", async (tool) => {
-    const { run, ctx } = harness(true, false, safeGuard);
-    expect(await run("/repo/.env", tool)).toEqual({ block: true, reason: "Protected path: .env" });
-    expect(ctx.ui.confirm).not.toHaveBeenCalled();
-    expect(ctx.abort).not.toHaveBeenCalled();
   });
 });
