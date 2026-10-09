@@ -30,7 +30,8 @@
     "commandcode/z-ai/glm-5.3-flash",
     "commandcode/deepseek/deepseek-v4.1-flash",
     "codebuddy/glm-5.3-flash",
-    "codebuddy/deepseek-v4.1-flash"
+    "codebuddy/deepseek-v4.1-flash",
+    "jev/auto"
   ],
   "modelThinkingLevels": {
     "openai-codex/gpt-6-astra": "low",

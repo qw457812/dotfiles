@@ -225,6 +225,7 @@ return {
     specs = {
       {
         "ccch1mneyyy/dsh-TUI",
+        pin = true,
         build = function(plugin)
           U.ai.dsh.update_plugin(plugin, "dsh-tui")
         end,

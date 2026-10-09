@@ -63,7 +63,8 @@ const ALIASES: Record<string, ModelTarget | readonly ModelTarget[]> = {
   cmd: { provider: "commandcode", id: "xiaomi/mimo-v2.6-pro" },
   hyper: { provider: "hyper", id: "glm-5.3-flash" },
   buddy: { provider: "codebuddy", id: "deepseek-v4.1-flash" },
-  coral: { provider: "coralbricks", id: "glm-5.3-flash-fp4" },
+  coral: { provider: "coralbricks", id: "deepseek-v4.1-flash-fast" },
+  auto: { provider: "jev", id: "auto" },
 };
 
 const ALL_LEVELS: ModelThinkingLevel[] = [

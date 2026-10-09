@@ -18,7 +18,7 @@
     "oxlint": "^1.62.0",
     "pi-vim": "0.14.2",
     "typebox": "^1.1.24",
-    "typescript": "^6.0.3",
+    "typescript": "7.0.2",
     "vitest": "^4.1.9"
   },
   "dependencies": {
