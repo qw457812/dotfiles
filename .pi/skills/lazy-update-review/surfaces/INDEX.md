@@ -6,6 +6,7 @@ Follow every matching review branch once; packages without a row stay on the gen
 
 | Repository | Local config surface | Review branch |
 | --- | --- | --- |
+| `github.com/neovim/neovim` | Neovim executable/runtime versus lazy source checkout | [neovim-runtime/REVIEW.md](neovim-runtime/REVIEW.md) |
 | `github.com/earendil-works/pi` | prompt-editor and Pi runtime/extensions | [prompt-editor/REVIEW.md](prompt-editor/REVIEW.md), [pi-runtime/REVIEW.md](pi-runtime/REVIEW.md) |
 | `github.com/lajarre/pi-vim` | prompt-editor | [prompt-editor/REVIEW.md](prompt-editor/REVIEW.md) |
 | `github.com/deepseek-ai/deepseek-harness` | DSH CLI, profiles, plugins, and bundles | [deepseek-harness/REVIEW.md](deepseek-harness/REVIEW.md) |
