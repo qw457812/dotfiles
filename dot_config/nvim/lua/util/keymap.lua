@@ -314,6 +314,7 @@ function M.clear_ui_esc(opts)
       for _, w in ipairs(vim.api.nvim_list_wins()) do
         if
           vim.api.nvim_win_is_valid(w)
+          and not (vim.fn.exists("&winpinned") == 1 and vim.wo[w].winpinned)
           and U.is_floating_win(w, { zen = false, notify = vim.g.user_esc_keep_notify ~= true, misc = false })
         then
           vim.api.nvim_win_close(w, false)
