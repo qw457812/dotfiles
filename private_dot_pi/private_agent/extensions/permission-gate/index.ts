@@ -40,11 +40,39 @@ export default function (pi: ExtensionAPI) {
   let gitEnabled = true;
   let jevEnabled = true;
   let lifecycle = new AbortController();
-  let pendingInputs: { fingerprint: string; source: GateInputSource }[] = [];
+  let pendingInputs: {
+    fingerprint: string;
+    source: GateInputSource;
+    queued: boolean;
+    expandable: boolean;
+  }[] = [];
 
   pi.on("input", (event) => {
-    pendingInputs.push({ fingerprint: inputFingerprint(event.text), source: event.source });
+    pendingInputs.push({
+      fingerprint: inputFingerprint(event.text),
+      source: event.source,
+      queued: event.streamingBehavior !== undefined,
+      expandable: event.text.startsWith("/"),
+    });
     pendingInputs = pendingInputs.slice(-128);
+  });
+  pi.on("before_agent_start", (event) => {
+    const fingerprint = inputFingerprint(event.prompt);
+    const candidate = pendingInputs[0];
+    // Pi emits input before slash-template/skill expansion, then this event with
+    // the expanded prompt. Bridge only a single, non-queued slash input.
+    if (pendingInputs.length === 1 && !candidate.queued && candidate.expandable) {
+      pendingInputs = [{ ...candidate, fingerprint, expandable: false }];
+      return;
+    }
+    if (pendingInputs.some((input) => !input.queued && input.fingerprint !== fingerprint)) {
+      // Do not guess between candidates, or leak stale handled/transformed inputs
+      // into a later run. An exact-match queued input cannot resolve this ambiguity.
+      pendingInputs = pendingInputs.filter(
+        (input) => input.queued || input.fingerprint === fingerprint,
+      );
+      pendingInputs.push({ fingerprint, source: "unknown", queued: false, expandable: false });
+    }
   });
   pi.on("message_end", (event) => {
     if (event.message.role !== "user") return;

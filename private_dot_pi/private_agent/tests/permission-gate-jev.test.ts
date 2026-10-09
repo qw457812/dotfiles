@@ -10,6 +10,8 @@ import type {
   ExtensionCommandContext,
   ExtensionContext,
   ExtensionHandler,
+  BeforeAgentStartEvent,
+  BeforeAgentStartEventResult,
   InputEvent,
   InputEventResult,
   MessageEndEvent,
@@ -131,6 +133,7 @@ function harness(options: { hasUI?: boolean; branch?: SessionEntry[] } = {}) {
   let tool: ToolHandler | undefined;
   let input: ExtensionHandler<InputEvent, InputEventResult> | undefined;
   let messageEnd: ExtensionHandler<MessageEndEvent, MessageEndEventResult> | undefined;
+  let beforeStart: ExtensionHandler<BeforeAgentStartEvent, BeforeAgentStartEventResult> | undefined;
   const laterTools: ToolHandler[] = [];
   let command: GateCommand | undefined;
   let entryId = 0;
@@ -198,12 +201,18 @@ function harness(options: { hasUI?: boolean; branch?: SessionEntry[] } = {}) {
         | ToolHandler
         | LifecycleHandler
         | ExtensionHandler<InputEvent, InputEventResult>
-        | ExtensionHandler<MessageEndEvent, MessageEndEventResult>,
+        | ExtensionHandler<MessageEndEvent, MessageEndEventResult>
+        | ExtensionHandler<BeforeAgentStartEvent, BeforeAgentStartEventResult>,
     ) {
       if (name === "tool_call") tool = handler as ToolHandler;
       else if (name === "input") input = handler as ExtensionHandler<InputEvent, InputEventResult>;
       else if (name === "message_end")
         messageEnd = handler as ExtensionHandler<MessageEndEvent, MessageEndEventResult>;
+      else if (name === "before_agent_start")
+        beforeStart = handler as ExtensionHandler<
+          BeforeAgentStartEvent,
+          BeforeAgentStartEventResult
+        >;
       else lifecycle.set(name as LifecycleName, handler as LifecycleHandler);
       return () => {};
     },
@@ -242,10 +251,26 @@ function harness(options: { hasUI?: boolean; branch?: SessionEntry[] } = {}) {
     getSessionId,
     gateCommand,
     gate: (args: string) => gateCommand.handler(args, commandCtx),
-    input: async (text: string, source?: InputEvent["source"]) => {
+    input: async (
+      text: string,
+      source?: InputEvent["source"],
+      streamingBehavior?: InputEvent["streamingBehavior"],
+    ) => {
       if (!input) throw new Error("Input handler missing");
       // Missing source deliberately simulates an incomplete/old API event.
-      return input({ type: "input", text, source } as InputEvent, ctx);
+      return input({ type: "input", text, source, streamingBehavior } as InputEvent, ctx);
+    },
+    beforeAgentStart: async (prompt: string) => {
+      if (!beforeStart) throw new Error("before_agent_start handler missing");
+      return beforeStart(
+        {
+          type: "before_agent_start",
+          prompt,
+          systemPrompt: "",
+          systemPromptOptions: {},
+        } as BeforeAgentStartEvent,
+        ctx,
+      );
     },
     persistUser: async (content: UserMessage["content"] = INTENT) => {
       if (!messageEnd) throw new Error("message_end handler missing");
@@ -479,6 +504,95 @@ describe("Permission Gate input provenance through persisted messages", () => {
     expect(h.confirm).toHaveBeenCalledOnce();
     expect(h.decisions()[0].judgment.reason).toBe("missing-intent");
     expect(h.appendEntry).toHaveBeenCalledOnce();
+  });
+});
+
+describe("Permission Gate conservative slash-input attribution", () => {
+  const expanded = "Commit the current staged changes with message Fix API.";
+
+  it.each(["interactive", "rpc"] as const)(
+    "bridges an unambiguous %s slash input to its expanded prompt once",
+    async (source) => {
+      const h = harness({ branch: [] });
+      await h.input("/commit", source);
+      await h.beforeAgentStart(expanded);
+      expect((await h.persistUser(expanded)).permissionGateSource).toBe(source);
+      await h.run('git commit -m "Fix API"');
+      expect(h.classify.mock.calls[0][1].state.user_intent).toBe(expanded);
+      expect(h.confirm).not.toHaveBeenCalled();
+      expect((await h.persistUser(expanded)).permissionGateSource).toBe("unknown");
+    },
+  );
+
+  it("does not promote expanded extension input to human authorization", async () => {
+    const h = harness({ branch: [] });
+    await h.input("/commit", "extension");
+    await h.beforeAgentStart(expanded);
+    expect((await h.persistUser(expanded)).permissionGateSource).toBe("extension");
+    await h.run("git commit");
+    expect(h.classify).not.toHaveBeenCalled();
+    expect(h.decisions()[0].judgment.reason).toBe("missing-intent");
+  });
+
+  it.each(["steer", "followUp"] as const)(
+    "does not bridge queued %s slash input",
+    async (delivery) => {
+      const h = harness({ branch: [] });
+      await h.input("/commit", "interactive", delivery);
+      await h.beforeAgentStart(expanded);
+      expect((await h.persistUser(expanded)).permissionGateSource).toBe("unknown");
+      await h.run("git commit");
+      expect(h.classify).not.toHaveBeenCalled();
+    },
+  );
+
+  it("ambiguous expansion consumes stale idle candidates without granting a source", async () => {
+    const h = harness({ branch: [] });
+    await h.input("/commit", "interactive");
+    await h.input("/other", "extension");
+    await h.beforeAgentStart(expanded);
+    expect((await h.persistUser(expanded)).permissionGateSource).toBe("unknown");
+    await h.run("git commit");
+    expect(h.classify).not.toHaveBeenCalled();
+    await h.input("/commit", "rpc");
+    await h.beforeAgentStart(expanded);
+    expect((await h.persistUser(expanded)).permissionGateSource).toBe("rpc");
+    await h.run("git commit");
+    expect(h.classify).toHaveBeenCalledOnce();
+  });
+
+  it("an exact-match queued human input cannot authorize an ambiguous idle extension expansion", async () => {
+    const h = harness({ branch: [] });
+    await h.input(expanded, "interactive", "followUp");
+    await h.input("/commit", "extension");
+    await h.beforeAgentStart(expanded);
+    expect((await h.persistUser(expanded)).permissionGateSource).toBe("unknown");
+    await h.run("git commit");
+    expect(h.classify).not.toHaveBeenCalled();
+  });
+
+  it("does not bridge arbitrary transformations of a non-slash input", async () => {
+    const h = harness({ branch: [] });
+    await h.input("Show git status", "interactive");
+    await h.beforeAgentStart(expanded);
+    expect((await h.persistUser(expanded)).permissionGateSource).toBe("unknown");
+    await h.run("git commit");
+    expect(h.classify).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    "session_start",
+    "session_before_switch",
+    "session_before_tree",
+    "session_shutdown",
+  ] as const)("%s clears expanded-prompt attribution", async (event) => {
+    const h = harness({ branch: [] });
+    await h.input("/commit", "interactive");
+    await h.beforeAgentStart(expanded);
+    await h.fire(event);
+    expect((await h.persistUser(expanded)).permissionGateSource).toBe("unknown");
+    await h.run("git commit");
+    expect(h.classify).not.toHaveBeenCalled();
   });
 });
 

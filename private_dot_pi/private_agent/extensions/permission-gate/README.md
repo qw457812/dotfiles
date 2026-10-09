@@ -56,7 +56,9 @@ Requests contain the full Bash command, the latest attributable real user messag
 - Each request has a five-second deadline and `maxRetries: 0`. Parent-operation cancellation stops classification/confirmation; late results cannot approve execution.
 - **Parser exceptions retain the existing warn-and-allow behavior:** warn when UI is available, then skip checks and allow execution. Syntax errors alone do not require confirmation, but recognized hazards in recovered syntax trees still match.
 
-Pi's ordinary `user` messages do not preserve input provenance. The extension matches text fingerprints from `input` and `message_end` and persists `permissionGateSource` metadata. Only attributable `interactive`/`rpc` input can authorize actions. Extension-injected messages do not provide authorization; legacy messages, unmatched transformed messages and ambiguous sources require manual confirmation instead of guessing historical authorization.
+Pi's ordinary `user` messages do not preserve input provenance. The extension matches text fingerprints from `input` and `message_end` and persists `permissionGateSource` metadata. For a single non-queued slash input such as `/commit`, `before_agent_start` associates the expanded prompt with that input's original source. This handles template expansion without assuming that the latest input owns every message. Multiple candidates, queued expansions and uncorrelated non-slash transformations remain unknown.
+
+Only attributable `interactive`/`rpc` input can authorize actions. Expanded extension-injected input retains its `extension` source and cannot provide authorization. Legacy messages and ambiguous sources require manual confirmation instead of guessing historical authorization.
 
 ## Code and integration
 
@@ -94,7 +96,7 @@ npm run lint
 npm test
 ```
 
-Relevant tests are in `tests/permission-gate.test.ts`, `tests/permission-gate-jev.test.ts`, `tests/confirmation-queue.test.ts`, and `tests/permission-gate-calibration.test.ts`. Ordinary tests do not call a live classifier.
+Relevant tests are in `tests/permission-gate.test.ts`, `tests/permission-gate-jev.test.ts`, `tests/permission-gate-template.test.ts`, `tests/confirmation-queue.test.ts`, and `tests/permission-gate-calibration.test.ts`. The template regression uses the real Pi SDK and repository `prompts/commit.md` to exercise expansion and provenance persistence, with offline model/classifier stubs and no executable tools. Ordinary tests do not call a live classifier.
 
 Explicitly enable live calibration:
 
