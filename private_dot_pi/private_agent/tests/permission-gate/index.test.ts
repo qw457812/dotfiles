@@ -282,7 +282,7 @@ describe("Permission Gate latest ordinary user intent", () => {
   });
 });
 
-describe("Permission Gate integrated manual path and SQL guards", () => {
+describe("Permission Gate integrated path and SQL guards", () => {
   it.each(["write", "edit"])("protects %s paths without asking Jev", async (toolName) => {
     const h = harness();
     h.confirm.mockResolvedValue(false);
@@ -296,7 +296,7 @@ describe("Permission Gate integrated manual path and SQL guards", () => {
     expect(h.abort).toHaveBeenCalledOnce();
   });
 
-  it.each(["on", "off"])("keeps SQL/path manual with Jev %s", async (setting) => {
+  it.each(["on", "off"])("uses Jev %s only for SQL rejected by local rules", async (setting) => {
     const h = harness();
     await h.gate(`jev ${setting}`);
     expect(await h.runInput({ sql: "SELECT 1" }, "mcp__db__execute_sql")).toBeUndefined();
@@ -308,9 +308,93 @@ describe("Permission Gate integrated manual path and SQL guards", () => {
     expect(h.confirm.mock.calls[0][0]).toBe("⚠️ SQL Guard");
     expect(await h.runInput({ path: "/repo/.env" }, "write")).toBeUndefined();
     expect(h.confirm).toHaveBeenCalledTimes(2);
-    expect(h.classify).not.toHaveBeenCalled();
-    expect(h.appendEntry).not.toHaveBeenCalled();
+    expect(h.classify).toHaveBeenCalledTimes(setting === "on" ? 1 : 0);
+    expect(h.appendEntry).toHaveBeenCalledTimes(setting === "on" ? 1 : 0);
   });
+
+  it.each(["sql", "sqlcl"])("prevents later handlers from rewriting checked %s", async (key) => {
+    const h = harness();
+    h.classify.mockResolvedValue({
+      ...result(),
+      answers: { read_only: { type: "bool", probability: 0.99 } },
+    });
+    h.registerToolCall((event) => {
+      (event.input as Record<string, unknown>)[key] = "DROP TABLE data";
+    });
+    await expect(
+      h.runInput({ [key]: "SELECT 1; SELECT 2" }, "mcp__db__execute_sql"),
+    ).rejects.toThrow(TypeError);
+    expect(h.confirm).not.toHaveBeenCalled();
+  });
+
+  it("classifies Bash and SQL concurrently while serializing their confirmation dialogs", async () => {
+    const h = harness();
+    const bashResult = deferred<ClassifierResult>();
+    const sqlResult = deferred<ClassifierResult>();
+    const firstDialog = deferred<boolean>();
+    h.classify.mockImplementation((_model, context) =>
+      context.questions.read_only ? sqlResult.promise : bashResult.promise,
+    );
+    h.confirm.mockReturnValueOnce(firstDialog.promise);
+    const sqlCall = h.runInput({ sql: "DROP TABLE data" }, "mcp__db__execute_sql");
+    const bashCall = h.run();
+    await flush();
+    expect(h.classify).toHaveBeenCalledTimes(2);
+    expect(h.confirm).not.toHaveBeenCalled();
+    sqlResult.resolve({ ...result(), answers: { read_only: { type: "bool", probability: 0.1 } } });
+    await flush();
+    expect(h.confirm).toHaveBeenCalledOnce();
+    expect(h.confirm.mock.calls[0][0]).toBe("⚠️ SQL Guard");
+    bashResult.resolve(result(0.1));
+    await flush();
+    expect(h.confirm).toHaveBeenCalledOnce();
+    firstDialog.resolve(true);
+    expect(await Promise.all([sqlCall, bashCall])).toEqual([undefined, undefined]);
+    expect(h.confirm).toHaveBeenCalledTimes(2);
+    expect(h.confirm.mock.calls[1][0]).toBe("🔐 Allow this command?");
+    expect(h.decisions().map((entry) => entry.outcome)).toEqual(["user-approved", "user-approved"]);
+  });
+
+  it("auto-approves SQL using read-only probability without needing a user message", async () => {
+    const h = harness({ branch: [] });
+    h.classify.mockResolvedValue({
+      ...result(),
+      answers: { read_only: { type: "bool", probability: 0.99 } },
+    });
+    const sql = "SELECT 1; SELECT 2";
+    expect(await h.runInput({ sql }, "mcp__db__execute_sql")).toBeUndefined();
+    expect(h.classify.mock.calls[0][1].state).toEqual({ sql, tool: "mcp__db__execute_sql" });
+    expect(h.confirm).not.toHaveBeenCalled();
+    expect(h.decisions()[0]).toMatchObject({ rules: ["sql"], outcome: "auto-approved" });
+    await h.gate("log");
+    expect(h.notify).toHaveBeenLastCalledWith(expect.stringContaining("SQL is read-only"), "info");
+    expect(h.notify.mock.calls.at(-1)?.[0]).toContain("read_only=0.990");
+  });
+
+  it.each([
+    "session_start",
+    "session_before_switch",
+    "session_before_tree",
+    "session_shutdown",
+  ] as const)(
+    "%s cancels in-flight SQL classification and prevents late approval",
+    async (event) => {
+      const h = harness();
+      const pendingResult = deferred<ClassifierResult>();
+      h.classify.mockReturnValue(pendingResult.promise);
+      const pending = h.runInput({ sql: "DROP TABLE data" }, "mcp__db__execute_sql");
+      await flush();
+      await h.fire(event);
+      pendingResult.resolve({
+        ...result(),
+        answers: { read_only: { type: "bool", probability: 0.99 } },
+      });
+      expect(await pending).toEqual(CANCELLED);
+      expect(h.confirm).not.toHaveBeenCalled();
+      expect(h.abort).not.toHaveBeenCalled();
+      expect(h.decisions()).toHaveLength(0);
+    },
+  );
 });
 
 describe("Permission Gate command integrity before tool execution", () => {

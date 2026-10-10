@@ -11,7 +11,7 @@ export interface GateRecord {
   questionVersion: number;
   timestamp: string;
   model: string;
-  rules: GateRule[];
+  rules: (GateRule | "sql")[];
   judgment: GateJudgment;
   durationMs: number;
   outcome: Outcome;
@@ -31,7 +31,7 @@ export function showLog(ctx: ExtensionContext) {
           .map(([key, value]) => `${key}=${value.toFixed(3)}`)
           .join(" ")}`
       : "";
-    return `${record.timestamp} · ${record.rules.map((rule) => RULE_LABELS[rule]).join(", ")} · ${record.judgment.action} / ${record.outcome}\n  ${REASON_LABELS[record.judgment.reason]} · ${record.model} · ${record.durationMs}ms · questions v${record.questionVersion}${scores}`;
+    return `${record.timestamp} · ${record.rules.map((rule) => (rule === "sql" ? "SQL" : RULE_LABELS[rule])).join(", ")} · ${record.judgment.action} / ${record.outcome}\n  ${REASON_LABELS[record.judgment.reason]} · ${record.model} · ${record.durationMs}ms · questions v${record.questionVersion}${scores}`;
   });
   ctx.ui.notify(lines.length ? lines.join("\n\n") : "No Jev decisions on this branch.", "info");
 }

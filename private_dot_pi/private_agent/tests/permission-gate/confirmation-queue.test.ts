@@ -295,13 +295,17 @@ describe("real Gate/PathGuard/SQLGuard shared confirmation scheduling", () => {
   );
 
   it.each(["path", "sql"] as const)(
-    "%s passes ctx.signal unchanged to its active confirmation",
+    "%s propagates parent cancellation to its active confirmation",
     async (guard) => {
       const h = harness();
       await h.run(guard);
       expect(h.ui.confirm).toHaveBeenCalledExactlyOnceWith(TITLES[guard], expect.any(String), {
-        signal: h.controller.signal,
+        signal: expect.any(AbortSignal),
       });
+      const signal = h.ui.confirm.mock.calls[0][2]!.signal!;
+      expect(signal.aborted).toBe(false);
+      h.controller.abort();
+      expect(signal.aborted).toBe(true);
     },
   );
 

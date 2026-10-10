@@ -408,7 +408,7 @@ describe("Permission Gate slash templates (real Pi SDK)", () => {
     await checkGate(true, expanded);
   });
 
-  it("the discovered index applies path and SQL guards exactly once without Jev", async () => {
+  it("the discovered index applies path and SQL guards exactly once with Jev disabled", async () => {
     const confirm = vi.fn<ExtensionContext["ui"]["confirm"]>().mockResolvedValue(false);
     const abort = vi.fn();
     await session.bindExtensions({
@@ -416,6 +416,7 @@ describe("Permission Gate slash templates (real Pi SDK)", () => {
       abortHandler: abort,
       onError: (error) => errors.push(error.error),
     });
+    await session.prompt("/gate jev off");
     const call = (toolName: string, input: Record<string, unknown>) =>
       session.extensionRunner.emitToolCall({
         type: "tool_call",

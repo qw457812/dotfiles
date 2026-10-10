@@ -7,7 +7,7 @@
  * /gate log                   Latest 20 decision summaries on the current branch.
  * Both switches are instance-local and reset to ON on /reload.
  *
- * Only calls matching the existing literal AST rules reach Jev. No operation category
+ * Only Bash calls matching the existing literal AST rules reach Jev. No Bash operation category
  * is categorically excluded from auto-approval. Full commands and the latest ordinary user
  * message are sent to typesafe/jev-latest WITHOUT redaction; never tool output/history.
  * Missing authorization, oversized inputs and classification failures ask the user;
@@ -17,7 +17,9 @@
  * xargs, shell -c), eval strings, expansions and filesystem state are not resolved.
  * Temporary-directory deletion exemptions remain. Bash checks handle tool_call,
  * including nested calls through codemode, not user_bash.
- * This entry also registers manual write/edit path and SQL guards.
+ * This entry also registers manual write/edit path checks and the SQL read-only guard.
+ * SQL reaches Jev only after the existing SQL rules require confirmation; SQL requests contain
+ * only the selected SQL string and tool name, never user intent. Both use /gate jev.
  * dirty-repo-guard.ts owns dirty-repo reminders.
  */
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
@@ -40,12 +42,16 @@ export { GATE_ENTRY } from "./log.ts";
 const USAGE = "Usage: /gate git [on|off] | jev [on|off] | log";
 
 export default function (pi: ExtensionAPI) {
-  pathGuard(pi);
-  sqlGuard(pi);
-
   let gitEnabled = true;
   let jevEnabled = true;
   let lifecycle = new AbortController();
+
+  pathGuard(pi);
+  sqlGuard(
+    pi,
+    () => jevEnabled,
+    () => lifecycle.signal,
+  );
 
   const invalidate = () => {
     lifecycle.abort();
@@ -143,7 +149,7 @@ export default function (pi: ExtensionAPI) {
   });
 
   pi.registerCommand("gate", {
-    description: "Bash auto-approval and confirmation (/gate git|jev [on|off], log)",
+    description: "Bash/SQL auto-approval and confirmation (/gate git|jev [on|off], log)",
     getArgumentCompletions(prefix: string) {
       const query = prefix.trimStart().toLowerCase();
       const options = query.includes(" ")

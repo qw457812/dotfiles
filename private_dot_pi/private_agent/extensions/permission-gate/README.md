@@ -1,6 +1,6 @@
 # Permission Gate
 
-An accidental-operation gate for Pi. Local Bash AST rules identify calls that need approval, then Jev decides whether to skip manual confirmation. Write/edit protected paths and SQL tools retain their manual guards. **This is not a security boundary or a comprehensive command-safety checker.**
+An accidental-operation gate for Pi. Local Bash AST rules identify calls that need approval, then Jev decides whether to skip manual confirmation. SQL rules use Jev to identify read-only false positives before asking for confirmation. Write/edit protected paths retain their manual guards. **This is not a security boundary or a comprehensive command-safety checker.**
 
 Pi automatically loads only this directory's `index.ts`, which registers the Bash, Path Guard and SQL Guard handlers. The internal guard files are not separate auto-loaded extensions. Run `/reload` after changes. The extension uses shared libraries and npm dependencies from the agent root; it is not a standalone npm package.
 
@@ -46,13 +46,23 @@ Git rules and Jev both default to **ON**. Switches live only in the current exte
 
 Deletion is exempt when every target is a literal absolute descendant of a recognized temporary directory and only recognized common options precede the targets. Recognized directories include `/tmp`, `/var/tmp`, and the host process's `tmpdir()`, plus `/private/tmp` and `/private/var/tmp` on macOS. Temporary-directory roots themselves are not exempt.
 
+## SQL decision flow
+
+1. Match the existing SQL tool suffixes (`_sqlcl_run`, `_sql_run`, `_execute_sql`) and read the first non-empty string in `sql` / `sqlcl`. MCP direct and codemode nested calls use the same handler.
+2. Keep existing local SQL rules unchanged. Locally accepted queries proceed without Jev, including their existing detection limits.
+3. Only SQL requiring confirmation reaches Jev. One `read_only` question evaluates the complete SQL, including multiple statements, CTEs, procedural blocks and function calls. Auto-approve when `read_only >= 0.90`; otherwise ask the user. Unknown routine semantics, mutations, explicit locks and other non-read-only effects require confirmation. This is **not user-authorization classification**: SQL requests do not include user intent.
+4. `/gate jev off` retains manual confirmation for local matches. Missing SQL parameters ask without classification; unsupported argument shapes remain hard-blocked.
+5. Failed, oversized or uncertain classifications fall back to the existing confirmation dialog. Session lifecycle and parent-operation cancellation stop old calls without aborting a replacement operation.
+
+SQL uses question version 1; Bash retains authorization questions version 3. The SQL threshold has offline regression coverage but has not been calibrated against a live classifier.
+
 ## Jev, context and failure behavior
 
 The extension calls the fixed model `typesafe/jev-latest` through Pi's `ctx.modelRegistry.classify()`. Pi manages authentication, for example through `TYPESAFE_API_KEY`.
 
-Requests contain only the full Bash command, the latest ordinary `user` message on the current session branch, and `cwd`. Questions use `cwd` to resolve relative targets, not as authorization. Rule identifiers stay in dialogs and logs. **Inputs are not redacted.** File contents, tool output and full conversation history are not sent. Command text may reach the provider even if execution is ultimately rejected.
+Bash requests contain only the full command, the latest ordinary `user` message on the current session branch, and `cwd`. Questions use `cwd` to resolve relative targets, not as authorization. SQL requests contain only the full selected SQL string and concrete tool name, not other tool parameters, database contents or user messages. Rule identifiers stay in dialogs and logs. **Inputs are not redacted.** File contents, tool output and full conversation history are not sent. Command/SQL text may reach the provider even if execution is ultimately rejected.
 
-- Commands are limited to 8,000 characters and user messages to 16,000. Oversized inputs require manual confirmation rather than truncation-based approval.
+- Commands and SQL are limited to 8,000 characters and Bash user messages to 16,000. Oversized inputs require manual confirmation rather than truncation-based approval.
 - Missing authorization, unavailable models/credentials, request failures, invalid responses and out-of-range probabilities fall back to manual confirmation.
 - Each request has one outer five-second deadline and `maxRetries: 0`; no second provider timer. Parent-operation cancellation stops classification/confirmation; late results cannot approve execution.
 - **Parser exceptions retain the existing warn-and-allow behavior:** warn when UI is available, then skip checks and allow execution. Syntax errors alone do not require confirmation, but recognized hazards in recovered syntax trees still match.
@@ -61,7 +71,7 @@ Authorization is read directly from the latest ordinary `user` entry returned by
 
 **Accepted limit:** ordinary `user` messages cannot distinguish real user input from extension-injected `sendUserMessage` input. Both, as well as legacy ordinary user messages, can supply authorization. Extensions are trusted accordingly; this simplification is not provenance verification. User-entry ID, session ID and cancellation checks still prevent stale decisions from approving calls.
 
-SQL and protected-path checks remain manual and independent of Jev. `/gate jev` and `/gate git` do not disable them, and Jev cannot auto-approve them.
+Protected-path checks remain manual and independent of Jev. Neither switch disables SQL/path checks; `/gate jev` controls auto-approval for Bash and SQL, while `/gate git` affects only local Bash Git rules.
 
 ## Code and integration
 
@@ -72,17 +82,17 @@ SQL and protected-path checks remain manual and independent of Jev. `/gate jev` 
 | [jev.ts](jev.ts)                                     | Questions, request deadlines, response validation and threshold decisions |
 | [intent.ts](intent.ts)                               | Latest ordinary user entry and text extraction                            |
 | [path-guard.ts](path-guard.ts)                       | Manual write/edit protected-path checks                                   |
-| [sql-guard.ts](sql-guard.ts)                         | SQL tool validation and manual confirmation                               |
+| [sql-guard.ts](sql-guard.ts)                         | SQL rules, Jev read-only checks and confirmation                           |
 | [log.ts](log.ts)                                     | Decision-summary format and log display                                   |
 | [../../lib/bash-parser.ts](../../lib/bash-parser.ts) | Shared Bash parser                                                        |
 | [confirmation.ts](confirmation.ts)                   | Shared confirmation, notification, cancellation and blocking outcomes     |
 | [confirmation-queue.ts](confirmation-queue.ts)       | Confirmation serialization by UI object                                   |
 
-Gate, Path Guard and SQL Guard share `confirm(pi, ctx, title, message)`, which returns only a confirmation outcome. Notifications use the dialog title and message. `confirmationResult(outcome)` converts outcomes to fixed blocking reasons; guards cannot customize those reasons. Bash retains session/intent validity checks locally and passes its combined lifecycle signal through `ctx.signal`. All guards share a confirmation queue. Without UI they block; rejection aborts the operation; cancellation cannot approve a call; dialog or notification errors return a blocking result without exposing error details. Gate's classification work is not serialized by this queue. Third-party UI calls do not necessarily participate. Queue scheduling has automated test coverage; the host TUI's dialog-overwrite risk was established by source analysis, not an end-to-end reproduction.
+Gate, Path Guard and SQL Guard share `confirm(pi, ctx, title, message)`, which returns only a confirmation outcome. Notifications use the dialog title and message. `confirmationResult(outcome)` converts outcomes to fixed blocking reasons; guards cannot customize those reasons. Bash retains session/intent validity checks locally; SQL uses session validity without user intent. Both pass the shared instance lifecycle and parent-operation signals through `ctx.signal`. All guards share a confirmation queue. Without UI they block; rejection aborts the operation; cancellation cannot approve a call; dialog or notification errors return a blocking result without exposing error details. Gate's classification work is not serialized by this queue. Third-party UI calls do not necessarily participate. Queue scheduling has automated test coverage; the host TUI's dialog-overwrite risk was established by source analysis, not an end-to-end reproduction.
 
-The Bash `command` argument is locked when checks begin. Rewriting it in a later `tool_call` handler fails and Pi blocks execution; extensions that rewrite commands must run before Gate. Other Bash arguments remain mutable.
+The Bash `command` argument is locked when checks begin. Rewriting it in a later `tool_call` handler fails and Pi blocks execution; extensions that rewrite commands must run before Gate. Other Bash arguments remain mutable. SQL checks similarly lock existing `sql` / `sqlcl` fields; other SQL tool arguments remain mutable.
 
-Decisions are stored as non-model-context entries containing fixed rules, probabilities, model, question version, latency and manual outcomes. They do not additionally store raw commands, user messages or provider error bodies. Logs record approval outcomes, not successful tool execution.
+Decisions are stored as non-model-context entries containing fixed rules, probabilities, model, question version, latency and manual outcomes. SQL entries use the `SQL` rule label and `read_only` probability. Entries do not additionally store raw commands, SQL, user messages or provider error bodies. Logs record approval outcomes, not successful tool execution.
 
 ## Known limits
 
@@ -102,7 +112,7 @@ npm run lint
 npm test
 ```
 
-Relevant tests are grouped in `tests/permission-gate/`: `bash.test.ts` covers local Bash rules, `index.test.ts` covers integrated decisions and lifecycle, `sdk.test.ts` covers real SDK discovery and input, `path-guard.test.ts` and `sql-guard.test.ts` cover manual guards, `confirmation.test.ts` covers common confirmation outcomes, `confirmation-queue.test.ts` covers shared scheduling, and `calibration.test.ts` covers synthetic fixtures and opt-in live calibration. The SDK regression uses the real Pi SDK and repository `prompts/commit.md` to exercise directory discovery, single index registration and latest expanded user text, with offline model/classifier stubs and no executable tools. Ordinary tests do not call a live classifier.
+Relevant tests are grouped in `tests/permission-gate/`: `bash.test.ts` covers local Bash rules, `index.test.ts` covers integrated decisions and lifecycle, `sdk.test.ts` covers real SDK discovery and input, `path-guard.test.ts` covers manual path checks, `sql-guard.test.ts` covers SQL rules/read-only classification/fallbacks, `../mcp.test.ts` covers real MCP direct and nested dispatch, `confirmation.test.ts` covers common confirmation outcomes, `confirmation-queue.test.ts` covers shared scheduling, and `calibration.test.ts` covers synthetic fixtures and opt-in live calibration. The SDK regression uses the real Pi SDK and repository `prompts/commit.md` to exercise directory discovery, single index registration and latest expanded user text, with offline model/classifier stubs and no executable tools. Ordinary tests do not call a live classifier.
 
 Explicitly enable live calibration:
 

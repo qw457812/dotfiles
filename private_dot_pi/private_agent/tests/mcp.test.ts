@@ -3,7 +3,12 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { runToolCall, type AgentToolCallOutcome } from "@earendil-works/pi-agent-core";
-import type { AssistantMessage, JsonObject } from "@earendil-works/pi-ai";
+import type {
+  AssistantMessage,
+  ClassifierModel,
+  ClassifierResult,
+  JsonObject,
+} from "@earendil-works/pi-ai";
 import {
   type AgentSession,
   createAgentSession,
@@ -14,6 +19,7 @@ import {
   SettingsManager,
   type ToolCallEvent,
   type ExtensionUIContext,
+  type ExtensionContext,
   VERSION,
 } from "@earendil-works/pi-coding-agent";
 // These helpers are not exported at the package root. Use installed SDK internals
@@ -21,8 +27,30 @@ import {
 import { InMemoryAuthStorageBackend } from "../node_modules/@earendil-works/pi-coding-agent/dist/core/auth-storage.js";
 import { loadMcpConfig } from "../node_modules/@earendil-works/pi-coding-agent/dist/extensions/mcp/config.js";
 import { McpOAuthCredentialStore } from "../node_modules/@earendil-works/pi-coding-agent/dist/extensions/mcp/oauth.js";
-import sqlGuard from "../extensions/permission-gate/sql-guard.ts";
+import permissionGate from "../extensions/permission-gate/index.ts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+const MODEL: ClassifierModel<"typesafe-classifier"> = {
+  type: "classifier",
+  id: "jev-latest",
+  name: "Mock Jev",
+  provider: "typesafe",
+  api: "typesafe-classifier",
+  baseUrl: "https://never-called.invalid",
+  input: ["text"],
+  cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
+  contextWindow: 100_000,
+};
+function sqlResult(probability = 0.01): ClassifierResult {
+  return {
+    api: MODEL.api,
+    provider: MODEL.provider,
+    model: MODEL.id,
+    answers: { read_only: { type: "bool", probability } },
+    stopReason: "stop",
+    timestamp: 0,
+  };
+}
 
 const fixturePath = fileURLToPath(new URL("./fixtures/mcp-server.mjs", import.meta.url));
 const guardedTools = [
@@ -64,6 +92,7 @@ describe("MCP SQL Guard integration (installed SDK 1.1.0)", () => {
   let callNumber: number;
   let calls: ToolCallEvent[];
   let errors: string[];
+  let classify: ReturnType<typeof vi.fn<ExtensionContext["modelRegistry"]["classify"]>>;
 
   async function dispatches(): Promise<Dispatch[]> {
     const data = await readFile(join(root, "dispatch.jsonl"), "utf8");
@@ -97,6 +126,9 @@ describe("MCP SQL Guard integration (installed SDK 1.1.0)", () => {
     callNumber = 0;
     calls = [];
     errors = [];
+    classify = vi
+      .fn<ExtensionContext["modelRegistry"]["classify"]>()
+      .mockResolvedValue(sqlResult());
     const cwd = join(root, "workspace");
     const agentDir = join(root, "agent");
     await Promise.all([mkdir(cwd), mkdir(agentDir), writeFile(join(root, "dispatch.jsonl"), "")]);
@@ -132,11 +164,15 @@ describe("MCP SQL Guard integration (installed SDK 1.1.0)", () => {
           logPath: join(root, "mcp.log"),
         }),
         (pi) => {
+          pi.on("session_start", (_event, ctx) => {
+            vi.spyOn(ctx.modelRegistry, "classify").mockImplementation(classify);
+            vi.spyOn(ctx.modelRegistry, "findOfType").mockReturnValue(MODEL);
+          });
           pi.on("tool_call", (event) => {
             calls.push(event);
           });
         },
-        sqlGuard,
+        permissionGate,
       ],
     });
     await resourceLoader.reload();
@@ -191,6 +227,7 @@ describe("MCP SQL Guard integration (installed SDK 1.1.0)", () => {
     } finally {
       session?.dispose();
       session = undefined;
+      vi.restoreAllMocks();
       vi.unstubAllGlobals();
       if (root) {
         // Verify real transport shutdown, with a fallback for failed setup/tests.
@@ -284,6 +321,35 @@ describe("MCP SQL Guard integration (installed SDK 1.1.0)", () => {
       expect(errors).toEqual([]);
     },
     20_000,
+  );
+
+  it.each([false, true])(
+    "Jev read-only check controls direct/nested SQL dispatch (nested=%s)",
+    async (nested) => {
+      await bindAndDiscover();
+      classify.mockResolvedValue(sqlResult(0.99));
+      const args = { sql: "SELECT 1; SELECT 2" };
+      const invokeSql = () =>
+        nested
+          ? invoke("codemode", {
+              code: `return await tools.${mcpToolName("sql_run")}(${JSON.stringify(args)});`,
+            })
+          : invoke(mcpToolName("sql_run"), args);
+      const allowed = await invokeSql();
+      expect(allowed.isError).toBe(false);
+      expect(resultText(allowed)).toContain(args.sql);
+      expect(await dispatches()).toEqual([{ name: "sql_run", args }]);
+      expect(classify).toHaveBeenCalledOnce();
+      expect(classify.mock.calls[0][1].state).toEqual({
+        sql: args.sql,
+        tool: mcpToolName("sql_run"),
+      });
+      classify.mockResolvedValue(sqlResult(0.01));
+      const blocked = await invokeSql();
+      expect(resultText(blocked)).toContain("Operation requires user confirmation");
+      expect(await dispatches()).toEqual([{ name: "sql_run", args }]);
+      expect(errors).toEqual([]);
+    },
   );
 
   it.each([false, true])(
