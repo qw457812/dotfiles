@@ -7,10 +7,10 @@
 import {
   ExtensionEditorComponent,
   getMarkdownTheme,
-  type KeybindingsManager,
   SettingsManager,
   type ExtensionAPI,
   type ExtensionContext,
+  type KeybindingsManager,
   type Theme,
 } from "@earendil-works/pi-coding-agent";
 import {
@@ -228,34 +228,40 @@ export class GrillingAnswerComponent implements Component, Focusable {
     ).length;
     add(
       this.theme.fg(
-        "accent",
+        "error",
         this.theme.bold(
           this.reviewing
             ? `Review answers (${answered}/${this.questions.length})`
-            : `Grilling (${this.index + 1}/${this.questions.length}) (${answered} Answered)`,
+            : `Grilling ${this.index + 1}/${this.questions.length} (${answered} answered)`,
         ),
       ),
     );
+    lines.push(this.theme.fg("dim", "─".repeat(width)));
     if (this.reviewing) {
       for (let i = 0; i < this.questions.length; i++) {
         lines.push("");
         lines.push(...this.markdown[i].question.render(width));
-        add(this.theme.fg("success", "Recommendation:"));
+        lines.push("");
+        add(this.theme.fg("warning", "Recommendation:"));
         lines.push(...this.markdown[i].recommendation.render(width));
-        add(`Answer: ${this.answers[i]}`);
+        lines.push("");
+        add(this.theme.fg("success", "Answer:"));
+        add(this.answers[i]);
+        lines.push("", this.theme.fg("dim", "─".repeat(width)));
       }
-      lines.push("");
       add(this.theme.fg("dim", "Enter send · Tab/Shift+Tab edit · Esc back · Ctrl+C cancel"));
     } else {
+      lines.push("");
       lines.push(...this.markdown[this.index].question.render(width));
       lines.push("");
-      add(this.theme.fg("success", "Recommendation:"));
+      add(this.theme.fg("warning", "Recommendation:"));
       lines.push(...this.markdown[this.index].recommendation.render(width));
       lines.push("");
-      add(this.theme.fg("muted", "Your answer (leave blank to accept the recommendation):"));
+      add(this.theme.fg("success", "Your answer (leave blank to accept the recommendation):"));
       lines.push(...this.editor.render(width).map((line) => truncateToWidth(line, width)));
       add(this.theme.fg("dim", "Enter accept · Tab/Shift+Tab navigate · Esc cancel"));
     }
+    lines.push("");
     return lines;
   }
 }

@@ -54,7 +54,10 @@ const keybindings = {
 
 function component(bindings: KeybindingsManager = keybindings) {
   const done = vi.fn();
-  const theme = { fg: (_: string, text: string) => text, bold: (text: string) => text } as Theme;
+  const theme = {
+    fg: vi.fn((_: string, text: string) => text),
+    bold: (text: string) => text,
+  } as unknown as Theme;
   const runtime = {
     requestRender: vi.fn(),
     terminal: { rows: 24, columns: 80 },
@@ -66,7 +69,7 @@ function component(bindings: KeybindingsManager = keybindings) {
     done,
     bindings,
   );
-  return { ui, done, runtime };
+  return { ui, done, runtime, theme };
 }
 
 function renderText(ui: GrillingAnswerComponent, width = 120): string {
@@ -224,7 +227,7 @@ describe("GrillingAnswerComponent", () => {
     }
     expect(review).not.toMatch(/^Q\d+:$/m);
     expect(review).not.toContain("**");
-    expect(review).toContain("Answer: Yes");
+    expect(review).toContain("Answer:\nYes");
     expect(done).not.toHaveBeenCalled();
     ui.handleInput("\r");
     expect(done).toHaveBeenCalledWith("Q1: Yes\n\nQ2: Yes");
@@ -240,17 +243,31 @@ describe("GrillingAnswerComponent", () => {
       expect(preview).toContain(q.question.replace(/\*\*/g, ""));
       expect(preview).toContain(`Recommendation:\n${q.recommendation}`);
     }
-    expect(preview).toContain("Answer: Yes\n");
+    expect(preview).toContain("Answer:\nYes\n");
     expect(preview).not.toContain(" — accept recommendation");
     expect(preview).toContain("Enter send · Tab/Shift+Tab edit · Esc back · Ctrl+C cancel");
     ui.handleInput("\r");
     expect(done).toHaveBeenCalledWith("Q1: Yes\n\nQ2: Yes");
   });
+  it.each([80, 120])("separates review questions and sections at width %i", (width) => {
+    const { ui } = component();
+    ui.handleInput("\r");
+    ui.handleInput("\r");
+    const review = renderText(ui, width);
+    const rule = "─".repeat(width);
+    expect(review).toContain("Options: Pi / dsh.\n\nRecommendation:");
+    expect(review).toContain("Keep the existing /answer command.\n\nAnswer:\nYes");
+    expect(review).toContain(`Answer:\nYes\n\n${rule}\n\nQ2 - Submission:`);
+    expect(review).toContain("Require confirmation before submitting?\n\nRecommendation:");
+    expect(review).toContain("Add a confirmation step.\n\nAnswer:\nYes");
+    expect(review).toContain(`Answer:\nYes\n\n${rule}\nEnter send`);
+    expect(review.split("\n").filter((line) => line === rule)).toHaveLength(3);
+  });
   it("does not accept skipped blank questions through Tab", () => {
     const { ui, done } = component();
     ui.handleInput("\t");
     ui.handleInput("\r");
-    expect(renderText(ui)).toContain("Grilling (1/2) (1 Answered)");
+    expect(renderText(ui)).toContain("Grilling 1/2 (1 answered)");
     expect(done).not.toHaveBeenCalled();
   });
   it("preserves custom answers across navigation and allows review edits", () => {
@@ -271,18 +288,53 @@ describe("GrillingAnswerComponent", () => {
   });
   it("updates completion progress from live drafts without accepting skipped questions", () => {
     const { ui } = component();
-    expect(renderText(ui)).toContain("(0 Answered)");
+    expect(renderText(ui)).toContain("(0 answered)");
     ui.handleInput("x");
-    expect(renderText(ui)).toContain("(1 Answered)");
+    expect(renderText(ui)).toContain("(1 answered)");
     ui.handleInput("\t");
-    expect(renderText(ui)).toContain("Grilling (2/2) (1 Answered)");
+    expect(renderText(ui)).toContain("Grilling 2/2 (1 answered)");
     ui.handleInput("x");
-    expect(renderText(ui)).toContain("(2 Answered)");
+    expect(renderText(ui)).toContain("(2 answered)");
     ui.handleInput("\x7f");
-    expect(renderText(ui)).toContain("(1 Answered)");
+    expect(renderText(ui)).toContain("(1 answered)");
     ui.handleInput("\x1b[Z");
     ui.handleInput("\x7f");
-    expect(renderText(ui)).toContain("(0 Answered)");
+    expect(renderText(ui)).toContain("(0 answered)");
+  });
+  it("separates the heading with a full-width rule and preserves blank spacing in both views", () => {
+    const { ui } = component();
+    for (const reviewing of [false, true]) {
+      if (reviewing) {
+        ui.handleInput("\r");
+        ui.handleInput("\r");
+      }
+      const lines = renderText(ui).split("\n");
+      expect(lines[1]).toBe("─".repeat(120));
+      expect(lines[2]).toBe("");
+      expect(lines[3]).toContain("Q1 - Scope");
+      expect(lines.at(-2)).toContain(reviewing ? "Enter send" : "Enter accept");
+      expect(lines.at(-1)).toBe("");
+    }
+  });
+  it("uses the configured colors for headings and labels in both views", () => {
+    const { ui, theme } = component();
+    for (const reviewing of [false, true]) {
+      if (reviewing) {
+        ui.handleInput("\r");
+        ui.handleInput("\r");
+      }
+      vi.mocked(theme.fg).mockClear();
+      ui.render(120);
+      expect(theme.fg).toHaveBeenCalledWith(
+        "error",
+        reviewing ? "Review answers (2/2)" : "Grilling 1/2 (0 answered)",
+      );
+      expect(theme.fg).toHaveBeenCalledWith("warning", "Recommendation:");
+      expect(theme.fg).toHaveBeenCalledWith(
+        "success",
+        reviewing ? "Answer:" : "Your answer (leave blank to accept the recommendation):",
+      );
+    }
   });
   it("shows compact static shortcuts for blank drafts, custom answers and skipped questions", () => {
     const { ui } = component();
@@ -294,7 +346,7 @@ describe("GrillingAnswerComponent", () => {
       expect(text).not.toContain("Shift+Enter newline");
       expect(text).not.toContain("Ctrl+G external editor");
     }
-    expect(renderText(ui)).toContain("Grilling (1/2) (1 Answered)");
+    expect(renderText(ui)).toContain("Grilling 1/2 (1 answered)");
   });
   it("renders Markdown in both views while keeping answers and submission as plain text", () => {
     const question = "# Choose a scope\n\n- **Pi**\n- dsh\n\n```text\n**literal code**\n```";
@@ -417,11 +469,11 @@ it("returns from review to the first or last question without losing answers", (
   ui.handleInput("\r");
   ui.handleInput("\r");
   ui.handleInput("\t");
-  expect(renderText(ui)).toContain("Grilling (1/2) (2 Answered)");
+  expect(renderText(ui)).toContain("Grilling 1/2 (2 answered)");
   ui.handleInput("\r");
   ui.handleInput("\r");
   ui.handleInput("\x1b[Z");
-  expect(renderText(ui)).toContain("Grilling (2/2) (2 Answered)");
+  expect(renderText(ui)).toContain("Grilling 2/2 (2 answered)");
   ui.handleInput("\r");
   ui.handleInput("\r");
   expect(done).toHaveBeenCalledWith("Q1: Yes\n\nQ2: Yes");
@@ -578,7 +630,7 @@ describe("Ctrl+G built-in editing", () => {
       ui.handleInput("\x07");
       expect(open).toHaveBeenCalledOnce();
       expect(done).not.toHaveBeenCalled();
-      expect(renderText(ui)).toContain("Grilling (2/2) (2 Answered)");
+      expect(renderText(ui)).toContain("Grilling 2/2 (2 answered)");
       ui.handleInput("\x1b[Z");
       ui.handleInput("\t");
       ui.handleInput("\r");
