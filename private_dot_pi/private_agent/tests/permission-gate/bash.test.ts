@@ -386,8 +386,8 @@ describe("Permission Gate", () => {
       { signal: expect.any(AbortSignal) },
     );
     expect(emit).toHaveBeenCalledWith("my:notification", {
-      title: "Pi Danger Approval",
-      body: command,
+      title: "🔐 Allow this command?",
+      body: expect.stringContaining(`\n\n${command}`),
     });
     expect(ctx.abort).not.toHaveBeenCalled();
   });
@@ -403,7 +403,7 @@ describe("Permission Gate", () => {
     const { run, ctx, emit } = harness(true, false);
     expect(await run(command)).toEqual({
       block: true,
-      reason: "Command requires user confirmation",
+      reason: "Operation requires user confirmation",
     });
     expect(ctx.ui.confirm).not.toHaveBeenCalled();
     expect(ctx.abort).not.toHaveBeenCalled();
@@ -521,7 +521,7 @@ describe("Permission Gate Git rules", () => {
     const { run, ctx } = harness(true, false);
     expect(await run(command)).toEqual({
       block: true,
-      reason: "Command requires user confirmation",
+      reason: "Operation requires user confirmation",
     });
     expect(ctx.ui.confirm).not.toHaveBeenCalled();
   });
@@ -628,7 +628,7 @@ describe("Permission Gate integration and Git toggle", () => {
       await gate("git off");
       expect(await run(command)).toEqual({
         block: true,
-        reason: "Command requires user confirmation",
+        reason: "Operation requires user confirmation",
       });
       expect(ctx.ui.confirm).not.toHaveBeenCalled();
     },

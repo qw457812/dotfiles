@@ -298,7 +298,7 @@ describe("Permission Gate slash templates (real Pi SDK)", () => {
         questions: GATE_QUESTIONS,
       });
     } else {
-      expect(result).toEqual({ block: true, reason: "Command requires user confirmation" });
+      expect(result).toEqual({ block: true, reason: "Operation requires user confirmation" });
       expect(classifier.classify).not.toHaveBeenCalled();
       expect(classifier.findOfType).not.toHaveBeenCalled();
     }
@@ -432,7 +432,7 @@ describe("Permission Gate slash templates (real Pi SDK)", () => {
     for (const tool of ["write", "edit"])
       expect(await call(tool, { path: "/repo/.env" })).toEqual({
         block: true,
-        reason: "Protected path: .env",
+        reason: "Blocked by user",
       });
     expect(confirm.mock.calls.map(([title]) => title)).toEqual([
       "⚠️ SQL Guard",

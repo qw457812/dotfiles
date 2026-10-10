@@ -1,5 +1,5 @@
-import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
-import { withConfirmationQueue } from "./confirmation-queue.ts";
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import { confirm, confirmationResult } from "./confirmation.ts";
 
 /**
  * SQL Guard Extension
@@ -120,29 +120,6 @@ function validateSqlQuery(sql: string): { valid: boolean; error?: string } {
   return { valid: true };
 }
 
-async function confirmOrBlock(
-  pi: ExtensionAPI,
-  ctx: ExtensionContext,
-  title: string,
-  message: string,
-  reason: string,
-) {
-  if (!ctx.hasUI) return { block: true, reason };
-  const signal = ctx.signal;
-  return withConfirmationQueue(ctx.ui, async () => {
-    if (signal?.aborted) return { block: true, reason };
-    pi.events.emit("my:notification", { title, body: message });
-    const ok = ctx.signal
-      ? await ctx.ui.confirm(title, message, { signal: ctx.signal })
-      : await ctx.ui.confirm(title, message);
-    if (!ok) {
-      if (!ctx.signal?.aborted) ctx.abort();
-      return { block: true, reason };
-    }
-    if (ctx.signal?.aborted) return { block: true, reason };
-  });
-}
-
 export default function (pi: ExtensionAPI) {
   pi.on("tool_call", async (event, ctx) => {
     const input = event.input as Record<string, unknown>;
@@ -153,25 +130,16 @@ export default function (pi: ExtensionAPI) {
       return { block: true, reason: `SQL Guard: ${extracted.error}` };
     }
 
-    if (extracted.kind === "confirm") {
-      return confirmOrBlock(
-        pi,
-        ctx,
-        "⚠️ SQL Guard",
-        `${extracted.error}\n\nTool: ${event.toolName}\n\nInput:\n${JSON.stringify(event.input, null, 2)}`,
-        `SQL Guard: ${extracted.error}`,
-      );
-    }
+    const error =
+      extracted.kind === "confirm" ? extracted.error : validateSqlQuery(extracted.sql).error;
+    if (!error) return;
 
-    const result = validateSqlQuery(extracted.sql);
-    if (result.valid) return;
-
-    return confirmOrBlock(
+    const outcome = await confirm(
       pi,
       ctx,
       "⚠️ SQL Guard",
-      `${result.error}\n\nTool: ${event.toolName}\n\nInput:\n${JSON.stringify(event.input, null, 2)}`,
-      `SQL Guard: ${result.error}`,
+      `${error}\n\nTool: ${event.toolName}\n\nInput:\n${JSON.stringify(event.input, null, 2)}`,
     );
+    return confirmationResult(outcome);
   });
 }

@@ -288,7 +288,7 @@ describe("Permission Gate integrated manual path and SQL guards", () => {
     h.confirm.mockResolvedValue(false);
     expect(await h.runInput({ path: "/repo/.env" }, toolName)).toEqual({
       block: true,
-      reason: "Protected path: .env",
+      reason: "Blocked by user",
     });
     expect(h.confirm).toHaveBeenCalledOnce();
     expect(h.confirm.mock.calls[0][0]).toBe("🛡️ Protected Path");
@@ -808,7 +808,10 @@ describe("Permission Gate Jev deadlines, cancellation and concurrency", () => {
     const operation = h.run();
     await flush();
     await vi.advanceTimersByTimeAsync(CLASSIFY_TIMEOUT);
-    expect(await operation).toEqual({ block: true, reason: "Command requires user confirmation" });
+    expect(await operation).toEqual({
+      block: true,
+      reason: "Operation requires user confirmation",
+    });
     expect(h.classify.mock.calls[0][2]?.signal?.aborted).toBe(true);
     pending.resolve(result());
     await flush();
@@ -975,6 +978,24 @@ describe("Permission Gate Jev deadlines, cancellation and concurrency", () => {
       expect(h.abort).not.toHaveBeenCalled();
       expect(h.decisions()[0].outcome).toBe("cancelled");
       expect(h.decisions()[0].outcome).not.toBe("user-denied");
+    },
+  );
+
+  it.each([true, false, "throw"] as const)(
+    "changed user intent during a dialog completion=%s cancels without aborting",
+    async (completion) => {
+      const h = harness();
+      const dialog = deferred<boolean>();
+      h.classify.mockResolvedValue(result(0.5));
+      h.confirm.mockReturnValue(dialog.promise);
+      const operation = h.run();
+      await flush();
+      h.branch().push(user("replacement-user", "Do not delete anything"));
+      if (completion === "throw") dialog.reject(new Error(SECRET));
+      else dialog.resolve(completion);
+      expect(await operation).toEqual(CANCELLED);
+      expect(h.abort).not.toHaveBeenCalled();
+      expect(h.decisions()[0].outcome).toBe("cancelled");
     },
   );
 
@@ -1242,7 +1263,7 @@ describe("Permission Gate Jev logs, commands and headless behavior", () => {
     expect(await h.run()).toBeUndefined();
     expect(h.decisions()[0].outcome).toBe("auto-approved");
     h.classify.mockResolvedValue(result(0.5));
-    expect(await h.run()).toEqual({ block: true, reason: "Command requires user confirmation" });
+    expect(await h.run()).toEqual({ block: true, reason: "Operation requires user confirmation" });
     expect(h.decisions()[1]).toMatchObject({
       judgment: { action: "ask", reason: "uncertain" },
       outcome: "no-ui",
@@ -1252,7 +1273,7 @@ describe("Permission Gate Jev logs, commands and headless behavior", () => {
     expect(h.emit).not.toHaveBeenCalled();
     expect(h.abort).not.toHaveBeenCalled();
     await h.gate("jev off");
-    expect(await h.run()).toEqual({ block: true, reason: "Command requires user confirmation" });
+    expect(await h.run()).toEqual({ block: true, reason: "Operation requires user confirmation" });
     expect(h.classify).toHaveBeenCalledTimes(2);
     expect(h.decisions()).toHaveLength(2);
   });

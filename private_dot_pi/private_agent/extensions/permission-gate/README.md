@@ -75,9 +75,10 @@ SQL and protected-path checks remain manual and independent of Jev. `/gate jev` 
 | [sql-guard.ts](sql-guard.ts)                         | SQL tool validation and manual confirmation                               |
 | [log.ts](log.ts)                                     | Decision-summary format and log display                                   |
 | [../../lib/bash-parser.ts](../../lib/bash-parser.ts) | Shared Bash parser                                                        |
+| [confirmation.ts](confirmation.ts)                   | Shared confirmation, notification, cancellation and blocking outcomes     |
 | [confirmation-queue.ts](confirmation-queue.ts)       | Confirmation serialization by UI object                                   |
 
-Gate, Path Guard and SQL Guard share a confirmation queue. Gate's classification work is not serialized by this queue. Third-party UI calls do not necessarily participate. Queue scheduling has automated test coverage; the host TUI's dialog-overwrite risk was established by source analysis, not an end-to-end reproduction.
+Gate, Path Guard and SQL Guard share `confirm(pi, ctx, title, message)`, which returns only a confirmation outcome. Notifications use the dialog title and message. `confirmationResult(outcome)` converts outcomes to fixed blocking reasons; guards cannot customize those reasons. Bash retains session/intent validity checks locally and passes its combined lifecycle signal through `ctx.signal`. All guards share a confirmation queue. Without UI they block; rejection aborts the operation; cancellation cannot approve a call; dialog or notification errors return a blocking result without exposing error details. Gate's classification work is not serialized by this queue. Third-party UI calls do not necessarily participate. Queue scheduling has automated test coverage; the host TUI's dialog-overwrite risk was established by source analysis, not an end-to-end reproduction.
 
 The Bash `command` argument is locked when checks begin. Rewriting it in a later `tool_call` handler fails and Pi blocks execution; extensions that rewrite commands must run before Gate. Other Bash arguments remain mutable.
 
@@ -101,7 +102,7 @@ npm run lint
 npm test
 ```
 
-Relevant tests are grouped in `tests/permission-gate/`: `bash.test.ts` covers local Bash rules, `index.test.ts` covers integrated decisions and lifecycle, `sdk.test.ts` covers real SDK discovery and input, `path-guard.test.ts` and `sql-guard.test.ts` cover manual guards, `confirmation-queue.test.ts` covers shared scheduling, and `calibration.test.ts` covers synthetic fixtures and opt-in live calibration. The SDK regression uses the real Pi SDK and repository `prompts/commit.md` to exercise directory discovery, single index registration and latest expanded user text, with offline model/classifier stubs and no executable tools. Ordinary tests do not call a live classifier.
+Relevant tests are grouped in `tests/permission-gate/`: `bash.test.ts` covers local Bash rules, `index.test.ts` covers integrated decisions and lifecycle, `sdk.test.ts` covers real SDK discovery and input, `path-guard.test.ts` and `sql-guard.test.ts` cover manual guards, `confirmation.test.ts` covers common confirmation outcomes, `confirmation-queue.test.ts` covers shared scheduling, and `calibration.test.ts` covers synthetic fixtures and opt-in live calibration. The SDK regression uses the real Pi SDK and repository `prompts/commit.md` to exercise directory discovery, single index registration and latest expanded user text, with offline model/classifier stubs and no executable tools. Ordinary tests do not call a live classifier.
 
 Explicitly enable live calibration:
 

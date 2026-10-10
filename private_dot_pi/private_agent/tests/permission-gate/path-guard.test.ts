@@ -51,7 +51,7 @@ describe("Path Guard", () => {
       const { run, ctx } = harness(false, true);
       expect(await run("/repo/.env", tool)).toEqual({
         block: true,
-        reason: "Protected path: .env",
+        reason: "Blocked by user",
       });
       expect(ctx.ui.confirm).toHaveBeenCalledWith(
         "🛡️ Protected Path",
@@ -63,7 +63,10 @@ describe("Path Guard", () => {
 
   it.each(["write", "edit"])("blocks protected paths without UI: %s", async (tool) => {
     const { run, ctx } = harness(true, false);
-    expect(await run("/repo/.env", tool)).toEqual({ block: true, reason: "Protected path: .env" });
+    expect(await run("/repo/.env", tool)).toEqual({
+      block: true,
+      reason: "Operation requires user confirmation",
+    });
     expect(ctx.ui.confirm).not.toHaveBeenCalled();
     expect(ctx.abort).not.toHaveBeenCalled();
   });
@@ -76,7 +79,7 @@ describe("Path Guard matching", () => {
     for (const hit of [".env", ".git/", "node_modules/", "id_rsa", ".ssh/"])
       expect(await run(`/repo/${hit}file`, "write")).toEqual({
         block: true,
-        reason: `Protected path: ${hit}`,
+        reason: "Operation requires user confirmation",
       });
     expect(await run("/repo/.pi/settings.json", "write")).toBeUndefined();
     expect(ctx.ui.confirm).not.toHaveBeenCalled();
@@ -91,8 +94,8 @@ describe("Path Guard matching", () => {
       "Allow write to /repo/.env?",
     );
     expect(emit).toHaveBeenCalledExactlyOnceWith("my:notification", {
-      title: "Pi Path Approval",
-      body: "/repo/.env",
+      title: "🛡️ Protected Path",
+      body: "Allow write to /repo/.env?",
     });
     expect(ctx.abort).not.toHaveBeenCalled();
   });

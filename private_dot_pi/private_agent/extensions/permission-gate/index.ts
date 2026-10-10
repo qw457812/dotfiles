@@ -22,7 +22,7 @@
  */
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { withBashTree } from "../../lib/bash-parser.ts";
-import { withConfirmationQueue } from "./confirmation-queue.ts";
+import { confirm, confirmationResult } from "./confirmation.ts";
 import pathGuard from "./path-guard.ts";
 import sqlGuard from "./sql-guard.ts";
 import { approvalRules, RULE_LABELS } from "./policy.ts";
@@ -73,10 +73,11 @@ export default function (pi: ExtensionAPI) {
     const signal = ctx.signal ? AbortSignal.any([lifetime, ctx.signal]) : lifetime;
     const sessionId = ctx.sessionManager.getSessionId();
     const user = latestUserIntent(ctx.sessionManager.getBranch());
-    const current = () =>
-      !signal.aborted &&
+    const sameAuthorization = () =>
+      !lifetime.aborted &&
       ctx.sessionManager.getSessionId() === sessionId &&
       latestUserIntent(ctx.sessionManager.getBranch())?.id === user?.id;
+    const current = () => !signal.aborted && sameAuthorization();
     const rules = await withBashTree(command, (root) => approvalRules(root, gitEnabled)).catch(
       () => {
         if (ctx.hasUI)
@@ -111,38 +112,34 @@ export default function (pi: ExtensionAPI) {
     const cancelled = () => {
       judgment = { action: "cancelled", reason: "cancelled" };
       record("cancelled");
-      return { block: true, reason: "Permission Gate: operation cancelled" };
+      return confirmationResult("cancelled");
     };
     if (!current() || judgment.action === "cancelled") return cancelled();
     if (judgment.action === "allow") {
       record("auto-approved");
       return;
     }
-    if (!ctx.hasUI) {
-      record("no-ui");
-      return { block: true, reason: "Command requires user confirmation" };
-    }
-
-    // Classification is parallel; dialogs share a queue with the path and SQL guards.
-    return withConfirmationQueue(ctx.ui, async () => {
-      try {
-        if (!current()) return cancelled();
-        pi.events.emit("my:notification", { title: "Pi Danger Approval", body: command });
-        const description = `Rules: ${rules.map((rule) => RULE_LABELS[rule]).join(", ")}\n${REASON_LABELS[judgment.reason]}\n\n${command}`;
-        const ok = await ctx.ui.confirm("🔐 Allow this command?", description, { signal });
-        if (!current()) return cancelled();
-        if (!ok) {
-          record("user-denied");
-          ctx.abort();
-          return { block: true, reason: "Blocked by user" };
-        }
-        record("user-approved");
-      } catch {
-        if (!current()) return cancelled();
-        record("confirmation-failed");
-        return { block: true, reason: "User confirmation failed" };
-      }
-    });
+    const outcome = await confirm(
+      pi,
+      {
+        ...ctx,
+        signal,
+        abort: () => {
+          if (current()) ctx.abort();
+        },
+      },
+      "🔐 Allow this command?",
+      `Rules: ${rules.map((rule) => RULE_LABELS[rule]).join(", ")}\n${REASON_LABELS[judgment.reason]}\n\n${command}`,
+    );
+    // A real denial aborts its own signal; changed authorization is still cancellation.
+    if (
+      !sameAuthorization() ||
+      outcome === "cancelled" ||
+      (outcome !== "user-denied" && signal.aborted)
+    )
+      return cancelled();
+    record(outcome);
+    return confirmationResult(outcome);
   });
 
   pi.registerCommand("gate", {

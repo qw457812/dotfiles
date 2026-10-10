@@ -77,11 +77,7 @@ function harness(ui = mockUI()) {
     events: {
       emit(name: string, data: { title: string }) {
         const guard: Guard =
-          data.title === "Pi Danger Approval"
-            ? "gate"
-            : data.title === "Pi Path Approval"
-              ? "path"
-              : "sql";
+          data.title === TITLES.gate ? "gate" : data.title === TITLES.path ? "path" : "sql";
         emits[guard](name, data);
       },
     },
@@ -272,11 +268,11 @@ describe("real Gate/PathGuard/SQLGuard shared confirmation scheduling", () => {
       const error = new Error("mock dialog failure");
       h.ui.confirm.mockReturnValueOnce(dialog.promise);
       const first = h.run(throwing);
-      // Path/SQL propagate to Pi's pre-execution error boundary; Gate returns a block.
-      const failed =
-        throwing === "gate"
-          ? expect(first).resolves.toEqual({ block: true, reason: "User confirmation failed" })
-          : expect(first).rejects.toBe(error);
+      // Every guard fails closed without leaking dialog errors.
+      const failed = expect(first).resolves.toEqual({
+        block: true,
+        reason: "User confirmation failed",
+      });
       await flush();
       const otherGuards = GUARDS.filter((guard) => guard !== throwing);
       const queued = otherGuards.map((guard) => h.run(guard));

@@ -1,16 +1,11 @@
 import type { ExtensionContext } from "@earendil-works/pi-coding-agent";
+import type { ConfirmationOutcome } from "./confirmation.ts";
 import { REASON_LABELS, type GateJudgment } from "./jev.ts";
 import { RULE_LABELS, type GateRule } from "./policy.ts";
 
 export const GATE_ENTRY = "permission-gate-decision";
 
-export type Outcome =
-  | "auto-approved"
-  | "user-approved"
-  | "user-denied"
-  | "no-ui"
-  | "cancelled"
-  | "confirmation-failed";
+export type Outcome = "auto-approved" | ConfirmationOutcome;
 export interface GateRecord {
   version: 1;
   questionVersion: number;

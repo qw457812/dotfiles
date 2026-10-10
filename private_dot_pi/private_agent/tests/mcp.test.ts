@@ -250,7 +250,7 @@ describe("MCP SQL Guard integration (installed SDK 1.1.0)", () => {
       for (const input of [{ [key]: "DROP TABLE important" }, {}, { [key]: "" }]) {
         const blocked = await invoke(mcpToolName(name), input);
         expect(blocked.isError).toBe(true);
-        expect(resultText(blocked)).toContain("SQL Guard:");
+        expect(resultText(blocked)).toContain("Operation requires user confirmation");
         expect(await dispatches()).toEqual([{ name, args }]);
       }
       expect(calls.map((call) => call.toolName)).toEqual(Array(4).fill(mcpToolName(name)));
@@ -275,7 +275,7 @@ describe("MCP SQL Guard integration (installed SDK 1.1.0)", () => {
           code: `return await tools.${mcpToolName(name)}(${JSON.stringify(input)});`,
         });
         expect(resultText(blocked)).toContain("Script failed");
-        expect(resultText(blocked)).toContain("SQL Guard:");
+        expect(resultText(blocked)).toContain("Operation requires user confirmation");
         expect(await dispatches()).toEqual([{ name, args }]);
       }
       const nested = calls.filter((call) => call.toolName === mcpToolName(name));
@@ -301,7 +301,7 @@ describe("MCP SQL Guard integration (installed SDK 1.1.0)", () => {
       for (const args of inputs) {
         const outcome = await invoke(mcpToolName("sql_run"), args);
         expect(outcome.isError).toBe(!approved);
-        if (!approved) expect(resultText(outcome)).toContain("SQL Guard:");
+        if (!approved) expect(resultText(outcome)).toContain("Blocked by user");
       }
       expect(confirm).toHaveBeenCalledTimes(2);
       expect(confirm.mock.calls[0]).toEqual(expect.arrayContaining(["⚠️ SQL Guard"]));
