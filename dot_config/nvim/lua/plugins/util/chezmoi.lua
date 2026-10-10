@@ -192,6 +192,78 @@ function H.pick_find_config()
   end
 end
 
+---@param managed boolean
+function H.pick_find_chezmoi_targets(managed)
+  Snacks.picker.pick({
+    title = managed and "Chezmoi Managed Files" or "Chezmoi Unmanaged Files",
+    cwd = vim.fn.getcwd(),
+    finder = "proc",
+    cmd = "chezmoi",
+    args = { managed and "managed" or "unmanaged", "--path-style=absolute", "--include=files,symlinks", "." },
+    actions = {
+      ---@param picker snacks.Picker
+      chezmoi_manage = function(picker)
+        local files = vim.tbl_map(Snacks.picker.util.path, picker:selected({ fallback = true }))
+        if #files == 0 then
+          return
+        end
+        local prompt = managed and "Forget these files from chezmoi (keep target files)?"
+          or "Add these files to chezmoi?"
+        U.confirm(prompt, function()
+          local cmd = { "chezmoi", managed and "forget" or "add", "--force", "--" }
+          vim.list_extend(cmd, files)
+          Snacks.picker.util.cmd(cmd, function()
+            H.reset()
+            if not picker.closed then
+              picker:refresh()
+            end
+          end, { cwd = picker:cwd() })
+        end)
+      end,
+      ---@param picker snacks.Picker
+      delete_file = function(picker)
+        local files = vim.tbl_map(Snacks.picker.util.path, picker:selected({ fallback = true }))
+        if #files == 0 then
+          return
+        end
+        U.confirm("Permanently delete these files?", function()
+          for _, file in ipairs(files) do
+            local ok, err = vim.uv.fs_unlink(file)
+            if not ok then
+              LazyVim.error(("Failed to delete `%s`:\n%s"):format(file, err), { title = "Chezmoi" })
+            end
+          end
+          picker:refresh()
+        end)
+      end,
+    },
+    win = {
+      input = {
+        keys = {
+          [managed and ",f" or ",a"] = {
+            "chezmoi_manage",
+            desc = managed and "chezmoi_forget" or "chezmoi_add",
+          },
+          [",d"] = not managed and "delete_file" or false,
+        },
+      },
+      list = {
+        keys = {
+          [managed and ",f" or ",a"] = {
+            "chezmoi_manage",
+            desc = managed and "chezmoi_forget" or "chezmoi_add",
+          },
+          [",d"] = not managed and "delete_file" or false,
+        },
+      },
+    },
+    transform = function(item)
+      item.file = item.text
+    end,
+    format = "file",
+  })
+end
+
 ---@type string[]
 H.xdg_config_ignore = {}
 
@@ -367,6 +439,20 @@ return {
       { "<leader>f`", H.pick_find_chezmoi_all, desc = "Chezmoi Files (All)" },
       { "<leader>s`", H.pick_search_chezmoi_all, desc = "Chezmoi Files (All)" },
       { "<leader>fc", H.pick_find_config, desc = "Config File" },
+      {
+        "<leader>fZu",
+        function()
+          H.pick_find_chezmoi_targets(false)
+        end,
+        desc = "Chezmoi Unmanaged Files",
+      },
+      {
+        "<leader>fZm",
+        function()
+          H.pick_find_chezmoi_targets(true)
+        end,
+        desc = "Chezmoi Managed Files",
+      },
     },
     init = function()
       U.on_very_very_lazy(H.autocmd_chezmoi_add)
