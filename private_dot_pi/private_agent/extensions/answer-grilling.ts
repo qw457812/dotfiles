@@ -6,14 +6,17 @@
  */
 import {
   ExtensionEditorComponent,
+  getMarkdownTheme,
   type KeybindingsManager,
   SettingsManager,
   type ExtensionAPI,
+  type ExtensionContext,
   type Theme,
 } from "@earendil-works/pi-coding-agent";
 import {
   Editor,
   Key,
+  Markdown,
   matchesKey,
   truncateToWidth,
   wrapTextWithAnsi,
@@ -24,6 +27,7 @@ import {
 
 export interface GrillingQuestion {
   id: string;
+  /** Original Markdown, including the numbered heading but excluding the ❓ marker. */
   question: string;
   recommendation: string;
 }
@@ -60,20 +64,22 @@ export function parseGrillingRound(text: string): GrillingQuestion[] {
     }
     const header =
       !inFence && !marker
-        ? line.match(/^\s*❓\s*(?:\*\*)?(Q\d+)(?:\*\*)?\s*[-–—:]\s*(.*)$/i)
+        ? line.match(/^\s*❓\s*(\*\*(Q\d+)\*\*\s+-\s+\*\*.+?\*\*:[ \t]*.*)$/)
         : null;
     if (header) {
       finish();
       current = {
-        id: header[1].toUpperCase(),
-        body: [header[2]],
+        id: header[2],
+        body: [header[1]],
         recommendation: null,
         ended: false,
       };
       continue;
     }
     if (!inFence && !marker && /^\s*❓/.test(line)) {
-      throw new Error("Unsupported grilling question format. Expected ❓ Qn - question.");
+      throw new Error(
+        "Unsupported grilling question format. Ask the agent to rewrite it as ❓ **Qn** - **title**: question.",
+      );
     }
     if (!current || current.ended) continue;
     // Recommendation content ends only at a separator, the next question, or EOF.
@@ -107,6 +113,7 @@ export class GrillingAnswerComponent implements Component, Focusable {
   private index = 0;
   private reviewing = false;
   private answers: string[];
+  private markdown: { question: Markdown; recommendation: Markdown }[];
   private editor: Editor;
   private builtInEditor: ExtensionEditorComponent;
   private hasFocus = false;
@@ -120,6 +127,11 @@ export class GrillingAnswerComponent implements Component, Focusable {
     externalEditorCommand?: string,
   ) {
     this.answers = questions.map(() => "");
+    const markdownTheme = getMarkdownTheme();
+    this.markdown = questions.map((q) => ({
+      question: new Markdown(q.question, 0, 0, markdownTheme),
+      recommendation: new Markdown(q.recommendation, 0, 0, markdownTheme),
+    }));
     this.builtInEditor = new ExtensionEditorComponent(
       tui,
       keybindings,
@@ -150,6 +162,10 @@ export class GrillingAnswerComponent implements Component, Focusable {
 
   invalidate(): void {
     this.editor.invalidate();
+    for (const content of this.markdown) {
+      content.question.invalidate();
+      content.recommendation.invalidate();
+    }
   }
 
   private navigate(index: number): void {
@@ -206,117 +222,115 @@ export class GrillingAnswerComponent implements Component, Focusable {
     width = Math.max(1, width);
     const lines: string[] = [];
     const add = (text: string) => lines.push(...wrapTextWithAnsi(text, width));
+    const currentAnswer = this.editor.getText().trim();
+    const answered = this.answers.filter((answer, i) =>
+      (!this.reviewing && i === this.index ? currentAnswer : answer).trim(),
+    ).length;
     add(
       this.theme.fg(
         "accent",
-        this.theme.bold(`Grilling (${this.index + 1}/${this.questions.length})`),
+        this.theme.bold(
+          this.reviewing
+            ? `Review answers (${answered}/${this.questions.length})`
+            : `Grilling (${this.index + 1}/${this.questions.length}) (${answered} Answered)`,
+        ),
       ),
     );
     if (this.reviewing) {
-      add(this.theme.fg("accent", "Review this round's answers"));
       for (let i = 0; i < this.questions.length; i++) {
-        const q = this.questions[i];
         lines.push("");
-        add(`${q.id}: ${q.question}`);
-        add(this.theme.fg("success", `Recommendation: ${q.recommendation}`));
+        lines.push(...this.markdown[i].question.render(width));
+        add(this.theme.fg("success", "Recommendation:"));
+        lines.push(...this.markdown[i].recommendation.render(width));
         add(`Answer: ${this.answers[i]}`);
       }
       lines.push("");
-      add(
-        this.theme.fg(
-          "dim",
-          "Enter submit · Tab first question · Shift+Tab last question · Esc back · Ctrl+C cancel",
-        ),
-      );
+      add(this.theme.fg("dim", "Enter send · Tab/Shift+Tab edit · Esc back · Ctrl+C cancel"));
     } else {
-      const q = this.questions[this.index];
-      add(`${q.id}: ${q.question}`);
+      lines.push(...this.markdown[this.index].question.render(width));
       lines.push("");
-      add(this.theme.fg("success", `➡️ ${q.recommendation}`));
+      add(this.theme.fg("success", "Recommendation:"));
+      lines.push(...this.markdown[this.index].recommendation.render(width));
       lines.push("");
-      add(
-        this.theme.fg(
-          "muted",
-          "Your answer (leave blank and press Enter to accept the recommendation):",
-        ),
-      );
+      add(this.theme.fg("muted", "Your answer (leave blank to accept the recommendation):"));
       lines.push(...this.editor.render(width).map((line) => truncateToWidth(line, width)));
-      const externalKeys = this.keybindings.getKeys("app.editor.external").join("/");
-      add(
-        this.theme.fg(
-          "dim",
-          `Enter accept/next · Tab/Shift+Tab navigate · Shift+Enter newline${externalKeys ? ` · ${externalKeys} external editor` : ""} · Esc cancel`,
-        ),
-      );
+      add(this.theme.fg("dim", "Enter accept · Tab/Shift+Tab navigate · Esc cancel"));
     }
     return lines;
   }
 }
 
 export default function (pi: ExtensionAPI) {
+  const answerHandler = async (ctx: ExtensionContext) => {
+    if (ctx.mode !== "tui") {
+      ctx.ui.notify("answer-grilling requires interactive mode", "error");
+      return;
+    }
+    if (!ctx.isIdle()) {
+      ctx.ui.notify("Wait for the current response to finish", "warning");
+      return;
+    }
+    const sessionId = ctx.sessionManager.getSessionId();
+    const leafId = ctx.sessionManager.getLeafId();
+    const entry = [...ctx.sessionManager.getBranch()]
+      .reverse()
+      .find((e) => e.type === "message" && e.message.role === "assistant");
+    if (!entry || entry.type !== "message" || entry.message.role !== "assistant") {
+      ctx.ui.notify("No assistant response found", "info");
+      return;
+    }
+    if (entry.message.stopReason !== "stop") {
+      ctx.ui.notify("The latest assistant response is incomplete", "warning");
+      return;
+    }
+    const text = entry.message.content
+      .filter((c) => c.type === "text")
+      .map((c) => c.text)
+      .join("\n");
+    let questions: GrillingQuestion[];
+    try {
+      questions = parseGrillingRound(text);
+    } catch (error) {
+      ctx.ui.notify(error instanceof Error ? error.message : String(error), "error");
+      return;
+    }
+    if (!questions.length) {
+      ctx.ui.notify("No grilling questions found in the latest response (❓ Qn / ➡️)", "info");
+      return;
+    }
+    const result = await ctx.ui.custom<string | null>(
+      (tui, theme, keybindings, done) =>
+        new GrillingAnswerComponent(
+          questions,
+          tui,
+          theme,
+          done,
+          keybindings,
+          SettingsManager.create(ctx.cwd).getExternalEditorCommand(),
+        ),
+    );
+    if (result === null) return;
+    if (
+      ctx.sessionManager.getSessionId() !== sessionId ||
+      ctx.sessionManager.getLeafId() !== leafId ||
+      !ctx.isIdle()
+    ) {
+      ctx.ui.notify(
+        "The session or round has changed. Reopen /answer-grilling before submitting.",
+        "warning",
+      );
+      return;
+    }
+    pi.sendUserMessage(result, { deliverAs: "followUp" });
+  };
+
   pi.registerCommand("answer-grilling", {
     description: "Answer a grilling round with recommendations or custom answers",
-    handler: async (_args, ctx) => {
-      if (ctx.mode !== "tui") {
-        ctx.ui.notify("answer-grilling requires interactive mode", "error");
-        return;
-      }
-      if (!ctx.isIdle()) {
-        ctx.ui.notify("Wait for the current response to finish", "warning");
-        return;
-      }
-      const sessionId = ctx.sessionManager.getSessionId();
-      const leafId = ctx.sessionManager.getLeafId();
-      const entry = [...ctx.sessionManager.getBranch()]
-        .reverse()
-        .find((e) => e.type === "message" && e.message.role === "assistant");
-      if (!entry || entry.type !== "message" || entry.message.role !== "assistant") {
-        ctx.ui.notify("No assistant response found", "info");
-        return;
-      }
-      if (entry.message.stopReason !== "stop") {
-        ctx.ui.notify("The latest assistant response is incomplete", "warning");
-        return;
-      }
-      const text = entry.message.content
-        .filter((c) => c.type === "text")
-        .map((c) => c.text)
-        .join("\n");
-      let questions: GrillingQuestion[];
-      try {
-        questions = parseGrillingRound(text);
-      } catch (error) {
-        ctx.ui.notify(error instanceof Error ? error.message : String(error), "error");
-        return;
-      }
-      if (!questions.length) {
-        ctx.ui.notify("No grilling questions found in the latest response (❓ Qn / ➡️)", "info");
-        return;
-      }
-      const result = await ctx.ui.custom<string | null>(
-        (tui, theme, keybindings, done) =>
-          new GrillingAnswerComponent(
-            questions,
-            tui,
-            theme,
-            done,
-            keybindings,
-            SettingsManager.create(ctx.cwd).getExternalEditorCommand(),
-          ),
-      );
-      if (result === null) return;
-      if (
-        ctx.sessionManager.getSessionId() !== sessionId ||
-        ctx.sessionManager.getLeafId() !== leafId ||
-        !ctx.isIdle()
-      ) {
-        ctx.ui.notify(
-          "The session or round has changed. Reopen /answer-grilling before submitting.",
-          "warning",
-        );
-        return;
-      }
-      pi.sendUserMessage(result, { deliverAs: "followUp" });
-    },
+    handler: (_args, ctx) => answerHandler(ctx),
+  });
+
+  pi.registerShortcut("alt+,", {
+    description: "Answer a grilling round",
+    handler: answerHandler,
   });
 }
