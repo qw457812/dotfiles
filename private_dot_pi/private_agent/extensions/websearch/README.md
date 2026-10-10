@@ -1,6 +1,6 @@
 # Pi WebSearch Extension
 
-Adds a `websearch` tool to [pi](https://pi.dev) that searches the internet via four remote providers (Exa, Firecrawl, Parallel, Tavily), mirroring OpenCode **v2**'s websearch architecture ([anomalyco/opencode](https://github.com/anomalyco/opencode/tree/808588e9b9c1e5c960bd4dcdcd0d0b2c1056ecc5), `v2` branch, 2026-09-24).
+Adds a `websearch` tool to [pi](https://pi.dev) that searches the internet via four remote providers (Exa, Firecrawl, Parallel, Tavily), mirroring OpenCode **v2**'s websearch architecture ([anomalyco/opencode](https://github.com/anomalyco/opencode/tree/55dde8810d8a859c0a21e42491ae7d5801fb49ef), `v2` branch, 2026-10-09).
 
 ## Setup
 
@@ -105,8 +105,8 @@ Golden checks (no model calls, assertions ported from upstream `test/websearch.t
 
 ## Drift Notes
 
-- Synced to `808588e9b` (2026-09-24): zero drift on `origin/v2` for the mirrored axes since the previous pin — nothing to port
-- Direction signals (unmerged, noted only): `websearch-auto` (automatic web search routing), `websearch-limits` (shared and non-fatal web search limits), `websearch-consent-service` (consent prompt dedupe), `direct-websearch` (call the web search service directly)
+- Synced to `55dde8810d` (2026-10-09): four drifted commits, zero ports — `1aae67e853` is an Effect rc.118 import-path rename (`effect/unstable/http` → `effect/http`) with no mirror impact (no Effect here); the rest are GUI-only `packages/app` commits outside the mirror surface
+- Direction signals (unmerged, noted only): `websearch-auto` (automatic web search routing), `websearch-limits` (shared and non-fatal web search limits), `websearch-consent-service` (consent prompt dedupe), `websearch-consent-repro` (consent repro), `direct-websearch` (call the web search service directly)
 - 2026-09-24 live smoke: keyless Tavily answered successfully (8 results) instead of the historical HTTP 503 → user decision same day: `requiresApiKey` removed and all providers rejoin random routing regardless of credentials (v2 registration restored, ledger entry dropped); the inherited wedge-on-non-429 caveat stays as parity (see Providers above)
 
 ## Differences from the previous version of this extension

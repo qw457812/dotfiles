@@ -1,6 +1,6 @@
 # Pi WebFetch Extension
 
-Adds a `webfetch` tool to [pi](https://pi.dev) that fetches content from URLs and converts it to markdown, text, or HTML format. Mirrors OpenCode **v2**'s webfetch implementation ([anomalyco/opencode](https://github.com/anomalyco/opencode/tree/808588e9b9c1e5c960bd4dcdcd0d0b2c1056ecc5), `v2` branch, 2026-09-24).
+Adds a `webfetch` tool to [pi](https://pi.dev) that fetches content from URLs and converts it to markdown, text, or HTML format. Mirrors OpenCode **v2**'s webfetch implementation ([anomalyco/opencode](https://github.com/anomalyco/opencode/tree/55dde8810d8a859c0a21e42491ae7d5801fb49ef), `v2` branch, 2026-10-09).
 
 ## How It Works
 
@@ -77,5 +77,5 @@ Golden checks (no model calls, assertions ported from upstream `test/tool-webfet
 
 ## Drift Notes
 
-- Synced to `808588e9b` (2026-09-24): zero drift on `origin/v2` for the mirrored axes since the previous pin; `html-markdown.ts` verified byte-identical to upstream
-- Direction signals (unmerged, noted only): `web-fetch` moves fetch into a policy-bound codemode Web extension — the fetch layer may be replaced wholesale next sync; `lazy-webfetch` defers HTML parsing
+- Synced to `55dde8810d` (2026-10-09): four drifted commits, zero ports — `1aae67e853` is an Effect rc.118 import-path rename (`effect/unstable/http` → `effect/http`) with no mirror impact (no Effect here); the rest are GUI-only `packages/app` commits outside the mirror surface; `html-markdown.ts` verified byte-identical to upstream
+- Direction signals (unmerged, noted only): `web-fetch` moves fetch into a policy-bound codemode Web extension — the fetch layer may be replaced wholesale next sync; `webfetch-images` restores v2-removed image output (the mirror keeps images pi-native, so the lines may converge); `lazy-webfetch` defers HTML parsing; `fix-read-tool-for-webfetch`, `nxl/deflake-webfetch-memory-test` (test-only)
