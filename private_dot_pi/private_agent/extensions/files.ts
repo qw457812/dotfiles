@@ -4,7 +4,8 @@
  * Files Extension
  *
  * /files command lists all files the model has read/written/edited in the active session branch,
- * coalesced by path and sorted newest first. Selecting a file opens it in Neovide.
+ * including nested calls from codemode, coalesced by path and sorted newest first.
+ * Selecting a file opens it in Neovide.
  */
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
@@ -100,6 +101,21 @@ export default function (pi: ExtensionAPI) {
 
 			// Second pass: match tool results to get the actual execution timestamp
 			const fileMap = new Map<string, FileEntry>();
+			const addFile = (name: FileToolName, path: string, timestamp: number) => {
+				const existing = fileMap.get(path);
+				if (existing) {
+					existing.operations.add(name);
+					if (timestamp > existing.lastTimestamp) {
+						existing.lastTimestamp = timestamp;
+					}
+				} else {
+					fileMap.set(path, {
+						path,
+						operations: new Set([name]),
+						lastTimestamp: timestamp,
+					});
+				}
+			};
 
 			for (const entry of branch) {
 				if (entry.type !== "message") continue;
@@ -107,23 +123,19 @@ export default function (pi: ExtensionAPI) {
 
 				if (msg.role === "toolResult") {
 					const toolCall = toolCalls.get(msg.toolCallId);
-					if (!toolCall) continue;
+					if (toolCall) addFile(toolCall.name, toolCall.path, msg.timestamp);
 
-					const { path, name } = toolCall;
-					const timestamp = msg.timestamp;
+					// Include file operations from codemode's nested tool calls
+					for (const call of msg.nestedCalls?.calls ?? []) {
+						if (call.status === "unfinished") continue;
 
-					const existing = fileMap.get(path);
-					if (existing) {
-						existing.operations.add(name);
-						if (timestamp > existing.lastTimestamp) {
-							existing.lastTimestamp = timestamp;
+						const name = call.name;
+						if (name === "read" || name === "write" || name === "edit") {
+							const path = call.arguments?.path;
+							if (path && typeof path === "string") {
+								addFile(name, path, msg.timestamp);
+							}
 						}
-					} else {
-						fileMap.set(path, {
-							path,
-							operations: new Set([name]),
-							lastTimestamp: timestamp,
-						});
 					}
 				}
 			}
