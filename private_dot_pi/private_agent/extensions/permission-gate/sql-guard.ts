@@ -39,37 +39,11 @@ const DANGEROUS_KEYWORDS = [
 const READ_ONLY_COMMANDS = new Set(["SELECT", "WITH", "DESC", "DESCRIBE", "SHOW", "EXPLAIN"]);
 const DANGEROUS_SQL_RE = new RegExp(`\\b(${DANGEROUS_KEYWORDS.join("|")})\\b`);
 
-type ExtractResult =
-  | { kind: "skip" }
-  | { kind: "sql"; sql: string }
-  | { kind: "block"; error: string }
-  | { kind: "confirm"; error: string };
-
-function isGuardedTool(toolName: string) {
-  return GUARDED_TOOL_PATTERNS.some((pattern) => pattern.test(toolName));
-}
-
 function findSqlParam(args: Record<string, unknown>) {
   for (const key of SQL_PARAM_KEYS) {
     const value = args[key];
     if (typeof value === "string" && value.trim()) return value;
   }
-}
-
-function extractSql(toolName: string, input: Record<string, unknown>): ExtractResult {
-  // Route by the concrete tool name, never by an input parameter.
-  if (!isGuardedTool(toolName)) return { kind: "skip" };
-  if (!input || typeof input !== "object" || Array.isArray(input)) {
-    return { kind: "block", error: "Guarded tool called with unsupported args shape" };
-  }
-
-  const sql = findSqlParam(input);
-  return sql
-    ? { kind: "sql", sql }
-    : {
-        kind: "confirm",
-        error: "Guarded tool matched but no recognized SQL parameter found",
-      };
 }
 
 function stripSql(sql: string) {
@@ -85,60 +59,52 @@ function stripSql(sql: string) {
  * Allows only SELECT / WITH and a small set of schema inspection commands.
  * Also rejects multi-statement input and common write-operation keywords.
  */
-function validateSqlQuery(sql: string): { valid: boolean; error?: string } {
-  const invalid = (error: string) => ({ valid: false as const, error });
-  if (!sql.trim()) return { valid: true };
-
+function sqlConfirmationReason(sql: string): string | undefined {
   const stripped = stripSql(sql);
-  if (!stripped) return { valid: true };
+  if (!stripped) return;
 
   const firstSemicolon = stripped.indexOf(";");
   const hasInvalidSemicolons =
     firstSemicolon !== -1 &&
     (firstSemicolon !== stripped.length - 1 || firstSemicolon !== stripped.lastIndexOf(";"));
   if (hasInvalidSemicolons) {
-    return invalid("Multiple SQL statements are not allowed (semicolons detected).");
+    return "Multiple SQL statements are not allowed (semicolons detected).";
   }
 
   const upper = stripped.toUpperCase();
   const firstWord = upper.split(/\s+/, 1)[0] || "";
   if (!READ_ONLY_COMMANDS.has(firstWord)) {
-    return invalid(
-      `Only SELECT queries and schema inspection commands are allowed. Found: ${firstWord}`,
-    );
+    return `Only SELECT queries and schema inspection commands are allowed. Found: ${firstWord}`;
   }
 
   if (firstWord === "SELECT" || firstWord === "WITH") {
     const keyword = upper.match(DANGEROUS_SQL_RE)?.[1];
     if (keyword) {
-      return invalid(
-        `Query contains dangerous operation: ${keyword}. Only SELECT queries and schema inspection commands are allowed.`,
-      );
+      return `Query contains dangerous operation: ${keyword}. Only SELECT queries and schema inspection commands are allowed.`;
     }
   }
-
-  return { valid: true };
 }
 
 export default function (pi: ExtensionAPI) {
   pi.on("tool_call", async (event, ctx) => {
-    const input = event.input as Record<string, unknown>;
-    const extracted = extractSql(event.toolName, input);
-
-    if (extracted.kind === "skip") return;
-    if (extracted.kind === "block") {
-      return { block: true, reason: `SQL Guard: ${extracted.error}` };
+    // Route by the concrete tool name, never by an input parameter.
+    if (!GUARDED_TOOL_PATTERNS.some((pattern) => pattern.test(event.toolName))) return;
+    const input = event.input;
+    if (!input || typeof input !== "object" || Array.isArray(input)) {
+      return { block: true, reason: "SQL Guard: Guarded tool called with unsupported args shape" };
     }
 
-    const error =
-      extracted.kind === "confirm" ? extracted.error : validateSqlQuery(extracted.sql).error;
-    if (!error) return;
+    const sql = findSqlParam(input);
+    const reason = sql
+      ? sqlConfirmationReason(sql)
+      : "Guarded tool matched but no recognized SQL parameter found";
+    if (!reason) return;
 
     const outcome = await confirm(
       pi,
       ctx,
       "⚠️ SQL Guard",
-      `${error}\n\nTool: ${event.toolName}\n\nInput:\n${JSON.stringify(event.input, null, 2)}`,
+      `${reason}\n\nTool: ${event.toolName}\n\nInput:\n${JSON.stringify(input, null, 2)}`,
     );
     return confirmationResult(outcome);
   });
