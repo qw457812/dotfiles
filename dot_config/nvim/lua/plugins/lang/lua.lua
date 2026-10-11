@@ -1,4 +1,4 @@
-local lua_lsp = "lua_ls" ---@type "lua_ls" | "emmylua_ls"
+local lua_lsp = "emmylua_ls" ---@type "lua_ls" | "emmylua_ls"
 
 ---@type LazySpec
 return {
@@ -117,31 +117,66 @@ return {
   {
     "neovim/nvim-lspconfig",
     ---@type PluginLspOpts
-    opts = {
-      ---@type table<string, lazyvim.lsp.Config|boolean>
-      servers = {
-        lua_ls = {
-          enabled = lua_lsp == "lua_ls",
+    -- Use an opts function: early runtimepath lookup returns nil, breaking EmmyLua's library list.
+    opts = function(_, opts)
+      return vim.tbl_deep_extend("force", opts, {
+        ---@type table<string, lazyvim.lsp.Config|boolean>
+        servers = {
+          lua_ls = {
+            enabled = lua_lsp == "lua_ls",
+          },
+          emmylua_ls = {
+            enabled = lua_lsp == "emmylua_ls",
+            mason = not vim.g.user_is_termux and nil, -- run `pkg install emmylua-ls` on termux
+            -- If the workspace has its own emmylua_ls/lua_ls config file, defer to it.
+            on_init = function(client)
+              local workspace = client.workspace_folders and client.workspace_folders[1]
+              if not workspace then
+                return
+              end
+              local path = workspace.name
+              if path == U.path.CONFIG or path == vim.fn.stdpath("config") then
+                return
+              end
+              -- Defer to project settings outside the Neovim config workspace.
+              for _, file in ipairs({ ".emmyrc.json", ".emmyrc.lua", ".luarc.json" }) do
+                if vim.uv.fs_stat(path .. "/" .. file) then
+                  client.config.settings = {}
+                  return
+                end
+              end
+            end,
+            ---@type lspconfig.settings.emmylua_ls
+            settings = {
+              emmylua = {
+                runtime = { version = "LuaJIT" },
+                workspace = {
+                  library = {
+                    vim.env.VIMRUNTIME,
+                    vim.api.nvim_get_runtime_file("lua/lspconfig", false)[1],
+                    vim.api.nvim_get_runtime_file("lua/lazy", false)[1],
+                    vim.api.nvim_get_runtime_file("lua/lazyvim", false)[1],
+                  },
+                },
+              },
+            },
+            -- root_dir = function(bufnr, on_dir)
+            --   local root = vim.fs.root(bufnr, vim.lsp.config.emmylua_ls.root_markers)
+            --   on_dir(root ~= vim.env.HOME and root or vim.fs.root(bufnr, "lua"))
+            -- end,
+            -- -- lazydev#136: custom root_dir triggers emmylua_ls before library loaded → stale diagnostics.
+            -- -- Go-to-definition works but pull-diagnostic state won't refresh. Re-pull after delay.
+            -- on_attach = function(client, bufnr)
+            --   vim.defer_fn(function()
+            --     if client:is_stopped() then
+            --       return
+            --     end
+            --     vim.lsp.diagnostic._refresh(bufnr, client.id)
+            --   end, 1000)
+            -- end,
+          },
         },
-        emmylua_ls = {
-          enabled = lua_lsp == "emmylua_ls",
-          mason = not vim.g.user_is_termux and nil, -- run `pkg install emmylua-ls` on termux
-          -- root_dir = function(bufnr, on_dir)
-          --   local root = vim.fs.root(bufnr, vim.lsp.config.emmylua_ls.root_markers)
-          --   on_dir(root ~= vim.env.HOME and root or vim.fs.root(bufnr, "lua"))
-          -- end,
-          -- -- lazydev#136: custom root_dir triggers emmylua_ls before library loaded → stale diagnostics.
-          -- -- Go-to-definition works but pull-diagnostic state won't refresh. Re-pull after delay.
-          -- on_attach = function(client, bufnr)
-          --   vim.defer_fn(function()
-          --     if client:is_stopped() then
-          --       return
-          --     end
-          --     vim.lsp.diagnostic._refresh(bufnr, client.id)
-          --   end, 1000)
-          -- end,
-        },
-      },
-    },
+      })
+    end,
   },
 }
