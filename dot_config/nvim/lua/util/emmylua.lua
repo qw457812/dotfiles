@@ -1,3 +1,4 @@
+---@class util.emmylua
 local M = {}
 
 ---@param client vim.lsp.Client

@@ -1,5 +1,3 @@
-local lua_lsp = "emmylua_ls" ---@type "lua_ls" | "emmylua_ls"
-
 ---@type LazySpec
 return {
   {
@@ -123,10 +121,10 @@ return {
       ---@type table<string, lazyvim.lsp.Config|boolean>
       servers = {
         lua_ls = {
-          enabled = lua_lsp == "lua_ls",
+          enabled = vim.g.user_lua_lsp == "lua_ls",
         },
         emmylua_ls = {
-          enabled = lua_lsp == "emmylua_ls",
+          enabled = vim.g.user_lua_lsp == "emmylua_ls",
           mason = not vim.g.user_is_termux and nil, -- run `pkg install emmylua-ls` on termux
           -- If the workspace has its own emmylua_ls/lua_ls config file, defer to it.
           on_init = function(client)
@@ -142,7 +140,8 @@ return {
                 end
               end
             end
-            require("util.emmylua").attach(client)
+
+            U.emmylua.attach(client) -- fix lazydev.nvim for emmylua_ls
           end,
           ---@type lspconfig.settings.emmylua_ls
           settings = {
