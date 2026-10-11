@@ -117,8 +117,25 @@ describe("parseGrillingRound", () => {
       { id: "Q1", question, recommendation: "是。" },
     ]);
   });
+  it.each(["-", "–", "—"])("accepts standalone bold questions with %s", (dash) => {
+    const question = `**Q4 ${dash} 真实实现要不要讲缺口？**`;
+    const body = "静态核查，未做端到端复现。";
+    expect(parseGrillingRound(`❓ ${question}\n\n${body}\n\n➡️ 推荐：**讲**。`)).toEqual([
+      { id: "Q4", question: `${question}\n\n${body}`, recommendation: "推荐：**讲**。" },
+    ]);
+    expect(() => parseGrillingRound(`❓ ${question}`)).toThrow("missing");
+    expect(() =>
+      parseGrillingRound(`❓ ${question}\n➡️ 是。\n---\n❓ ${question}\n➡️ 是。`),
+    ).toThrow("Duplicate");
+  });
+  it("preserves punctuation inside a standalone bold question", () => {
+    const question = "**Q1 — Scope: Use Pi?**";
+    expect(parseGrillingRound(`❓ ${question}\n➡️ Yes.`)).toEqual([
+      { id: "Q1", question, recommendation: "Yes." },
+    ]);
+  });
   it.each([
-    "**Q1 — Scope: Use Pi?**",
+    "**Q1 — Scope** trailing text without a colon",
     "Q1 - **Scope**: Use Pi?",
     "**Q1** - Scope: Use Pi?",
     "**Q1**: Scope?",
@@ -609,6 +626,16 @@ describe("answer-grilling command", () => {
       "Unclosed code fence in the grilling round",
       "error",
     );
+  });
+  it("opens the UI for standalone bold questions", async () => {
+    const fixture = commandFixture();
+    fixture.entry.message.content[0].text =
+      "❓ **Q4 — 真实实现要不要讲缺口？**\n\n静态核查，未做端到端复现。\n\n➡️ 推荐：**讲**。\n\n---\n\n" +
+      "❓ **Q5 — 是否避免依赖现场 API？**\n\n➡️ 推荐：**是**。\n\n---\n\n" +
+      "❓ **Q6 — 第 1 页是否按上述方向锁定？**\n\n➡️ 推荐：**是**。";
+    await fixture.run();
+    expect(fixture.custom).toHaveBeenCalledOnce();
+    expect(fixture.notify).not.toHaveBeenCalled();
   });
   it("opens the UI for the original Chinese round", async () => {
     const fixture = commandFixture();

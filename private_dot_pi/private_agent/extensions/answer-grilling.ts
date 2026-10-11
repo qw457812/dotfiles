@@ -65,7 +65,7 @@ export function parseGrillingRound(text: string): GrillingQuestion[] {
     const header =
       !inFence && !marker
         ? line.match(
-            /^\s*❓\s*(\*\*(Q\d+)(?:\*\*\s+[-–—]\s+\*\*.+?\*\*|\s+[-–—]\s+.+?\*\*)[:：][ \t]*.*)$/,
+            /^\s*❓\s*(\*\*(Q\d+)(?:\*\*\s+[-–—]\s+\*\*.+?\*\*[:：][ \t]*.*|\s+[-–—]\s+.+?\*\*(?:[:：][ \t]*.*|[ \t]*)))$/,
           )
         : null;
     if (header) {
