@@ -29,6 +29,8 @@ return {
   --
   -- https://github.com/badlogic/pi-skills/blob/90bb51cae36515a648515b633a81c0c6efc8c74d/browser-tools/SKILL.md
   -- https://github.com/badlogic/pi-termux-mobile
+  --
+  -- https://github.com/morluto/rea
   {
     "earendil-works/pi",
     version = "*",
@@ -107,6 +109,7 @@ return {
       -- },
       {
         "aliou/pi-guardrails",
+        pin = true,
         build = "pi update --extension npm:@aliou/pi-guardrails",
         lazy = true,
         config = function() end,
@@ -214,7 +217,14 @@ return {
         lazy = true,
         config = function() end,
       },
-      { "vercel-labs/just-bash", version = "*", enabled = vim.g.user_is_termux, lazy = true, config = function() end },
+      {
+        "vercel-labs/just-bash",
+        pin = true,
+        version = "*",
+        enabled = vim.g.user_is_termux,
+        lazy = true,
+        config = function() end,
+      },
       {
         "LazyVim/LazyVim",
         keys = {
