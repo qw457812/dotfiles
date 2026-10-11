@@ -149,13 +149,17 @@ return {
             ---@type lspconfig.settings.emmylua_ls
             settings = {
               emmylua = {
-                runtime = { version = "LuaJIT" },
+                runtime = {
+                  version = "LuaJIT",
+                  requirePattern = { "lua/?.lua", "lua/?/init.lua", "?.lua", "?/init.lua" },
+                },
                 workspace = {
                   library = {
                     vim.env.VIMRUNTIME,
-                    vim.api.nvim_get_runtime_file("lua/lspconfig", false)[1],
-                    vim.api.nvim_get_runtime_file("lua/lazy", false)[1],
-                    vim.api.nvim_get_runtime_file("lua/lazyvim", false)[1],
+                    -- Keep module prefixes to avoid resolving "util" as "lspconfig.util".
+                    vim.fs.dirname(vim.api.nvim_get_runtime_file("lua/lspconfig", false)[1]),
+                    vim.fs.dirname(vim.api.nvim_get_runtime_file("lua/lazy", false)[1]),
+                    vim.fs.dirname(vim.api.nvim_get_runtime_file("lua/lazyvim", false)[1]),
                   },
                 },
               },
