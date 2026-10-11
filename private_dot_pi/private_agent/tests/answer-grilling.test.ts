@@ -31,7 +31,7 @@ Keep the existing /answer command.
 ➡️ Add a confirmation step.`;
 const questions = parseGrillingRound(round);
 
-// Original nonconforming assistant reply; the agent must rewrite it, not the parser.
+// Assistant reply with a single bold heading, em dashes and full-width colons.
 const mixedChangesRound = `❓ **Q1 — 文件内混合改动**：如果同一个文件里既有本次提交相关、也有无关改动，你希望按 hunk 选择性暂存（例如 \`git add -p\`），对吗？
 
 ➡️ 是：只暂存相关 hunk。
@@ -94,13 +94,31 @@ describe("parseGrillingRound", () => {
       },
     ]);
   });
-  it("rejects the original nonconforming round instead of repairing its Markdown", () => {
-    expect(() => parseGrillingRound(mixedChangesRound)).toThrow("Ask the agent to rewrite it");
+  it("accepts the original Chinese round without rewriting its Markdown", () => {
+    const parsed = parseGrillingRound(mixedChangesRound);
+    expect(parsed.map((q) => q.id)).toEqual(["Q1", "Q2", "Q3"]);
+    expect(parsed[0]).toEqual({
+      id: "Q1",
+      question: mixedChangesRound.split("\n")[0].replace("❓ ", ""),
+      recommendation: "是：只暂存相关 hunk。",
+    });
+    expect(parsed[1].recommendation).toBe("是：无关改动保持 unstaged。");
+    expect(parsed[2].recommendation).toBe("是：不自动把所有新文件都加入暂存区。");
+  });
+  it.each(
+    ["-", "–", "—"].flatMap((dash) =>
+      [":", "："].flatMap((colon) => [
+        `**Q1** ${dash} **视觉风格**${colon} 使用 **Pi** 和 \`**literal**\`？`,
+        `**Q1 ${dash} 视觉风格**${colon} 使用 **Pi** 和 \`**literal**\`？`,
+      ]),
+    ),
+  )("accepts heading variants and preserves Markdown: %s", (question) => {
+    expect(parseGrillingRound(`❓ ${question}\n➡️ 是。`)).toEqual([
+      { id: "Q1", question, recommendation: "是。" },
+    ]);
   });
   it.each([
-    "**Q1 — Scope**: Use **Pi** and `**literal**`?",
     "**Q1 — Scope: Use Pi?**",
-    "**Q1** — **Scope**: Use Pi?",
     "Q1 - **Scope**: Use Pi?",
     "**Q1** - Scope: Use Pi?",
     "**Q1**: Scope?",
@@ -108,7 +126,6 @@ describe("parseGrillingRound", () => {
     "Q1 -",
     "**Q1** -",
     "**Q1** - ****: Use Pi?",
-    "**Q1** - **Scope**：Use Pi?",
   ])("rejects headings that do not follow the skill format: %s", (heading) => {
     expect(() => parseGrillingRound("❓ " + heading + "\n➡️ Yes.")).toThrow(
       "Unsupported grilling question format",
@@ -192,7 +209,11 @@ describe("parseGrillingRound", () => {
   });
   it("rejects missing recommendations and duplicate identifiers", () => {
     expect(() => parseGrillingRound("❓ **Q1** - **Scope**: Use Pi?")).toThrow("missing");
+    expect(() => parseGrillingRound("❓ **Q1 — 视觉风格**：使用浅色？")).toThrow("missing");
     expect(() => parseGrillingRound(round.replace("Q2", "Q1"))).toThrow("Duplicate");
+    expect(() =>
+      parseGrillingRound(round + "\n---\n❓ **Q1 — 视觉风格**：使用浅色？\n➡️ 是。"),
+    ).toThrow("Duplicate");
     expect(parseGrillingRound("An ordinary response?")).toEqual([]);
     expect(() =>
       parseGrillingRound(round + "\n---\n❓ **Qthree** - Another question?\n➡️ Yes."),
@@ -589,9 +610,16 @@ describe("answer-grilling command", () => {
       "error",
     );
   });
+  it("opens the UI for the original Chinese round", async () => {
+    const fixture = commandFixture();
+    fixture.entry.message.content[0].text = mixedChangesRound;
+    await fixture.run();
+    expect(fixture.custom).toHaveBeenCalledOnce();
+    expect(fixture.notify).not.toHaveBeenCalled();
+  });
   it("rejects nonconforming rounds before opening the UI and asks the agent to rewrite them", async () => {
     const fixture = commandFixture();
-    fixture.entry.message.content[0].text = round + "\n---\n" + mixedChangesRound;
+    fixture.entry.message.content[0].text = round + "\n---\n❓ **Q3**: Scope?\n➡️ Yes.";
     await fixture.run();
     expect(fixture.custom).not.toHaveBeenCalled();
     expect(fixture.sendUserMessage).not.toHaveBeenCalled();
