@@ -26,6 +26,9 @@ return {
   -- https://github.com/blader/humanizer
   --
   -- https://github.com/NVlabs/SoL-Pi
+  --
+  -- https://github.com/badlogic/pi-skills/blob/90bb51cae36515a648515b633a81c0c6efc8c74d/browser-tools/SKILL.md
+  -- https://github.com/badlogic/pi-termux-mobile
   {
     "earendil-works/pi",
     version = "*",
@@ -74,6 +77,7 @@ return {
         lazy = true,
         config = function() end,
       },
+      { "typesafe-ai/skills", name = "typesafe-ai-skills", lazy = true, config = function() end },
       { "humanlayer/skills", name = "humanlayer-skills", lazy = true, config = function() end },
       {
         "DietrichGebert/ponytail",
@@ -185,6 +189,11 @@ return {
       },
       -- { "openclaw/Peekaboo", version = "*", lazy = true, config = function() end },
       { "earendil-works/pi-voice", lazy = true, config = function() end },
+      -- https://github.com/open-slide/open-slide
+      -- https://github.com/lewislulu/html-ppt-skill
+      --
+      -- https://github.com/nexu-io/open-design
+      { "op7418/guizang-ppt-skill", lazy = true, config = function() end },
       {
         "hugohe3/ppt-master",
         pin = true,
