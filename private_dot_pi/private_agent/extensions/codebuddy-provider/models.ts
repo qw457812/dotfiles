@@ -13,19 +13,24 @@ export function isCodebuddyModel(model: AnyModel): model is CodebuddyModel {
   );
 }
 
-export function formatCodebuddyModelList(models: readonly AnyModel[]): string {
+export function getCodebuddyModelOptions(
+  models: readonly AnyModel[],
+): { model: CodebuddyModel; label: string }[] {
   const entries = models.filter(isCodebuddyModel).map((model) => {
     const match = /\((x(\d+(?:\.\d+)?)(?: credits)?)\)$/.exec(model.name);
     return {
-      id: model.id,
+      model,
       credits: match?.[1] ?? "credits unknown",
       rate: match ? Number(match[2]) : Infinity,
     };
   });
-  entries.sort((a, b) => a.rate - b.rate || a.id.localeCompare(b.id));
-  if (entries.length === 0) return "No CodeBuddy models available.";
-  const width = Math.max(...entries.map((entry) => entry.id.length));
-  return entries.map((entry) => `${entry.id.padEnd(width)}  ${entry.credits}`).join("\n");
+  entries.sort((a, b) => a.rate - b.rate || a.model.id.localeCompare(b.model.id));
+  if (entries.length === 0) return [];
+  const width = Math.max(...entries.map((entry) => entry.model.id.length));
+  return entries.map((entry) => ({
+    model: entry.model,
+    label: `${entry.model.id.padEnd(width)}  ${entry.credits}`,
+  }));
 }
 
 export function toCodebuddyModel(config: ChatModelConfig): CodebuddyModel {

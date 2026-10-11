@@ -60,9 +60,7 @@ const ALIASES: Record<string, ModelTarget | readonly ModelTarget[]> = {
     { provider: "hyper", id: "qwen3.8-flash" },
   ],
   flex: { provider: "neuralwatt", id: "glm-5.3-flex" },
-  cmd: { provider: "commandcode", id: "xiaomi/mimo-v2.6-pro" },
   hyper: { provider: "hyper", id: "glm-5.3-flash" },
-  buddy: { provider: "codebuddy", id: "deepseek-v4.1-flash" },
   coral: { provider: "coralbricks", id: "deepseek-v4.1-flash-fast" },
   auto: { provider: "jev", id: "auto" },
 };

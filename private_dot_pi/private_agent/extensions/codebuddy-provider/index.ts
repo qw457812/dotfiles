@@ -19,7 +19,7 @@ import { fetchLiveModels } from "./live-models.js";
 import {
   type ChatModelConfig,
   type CodebuddyModel,
-  formatCodebuddyModelList,
+  getCodebuddyModelOptions,
   isCodebuddyModel,
   toCodebuddyModel,
 } from "./models.js";
@@ -191,9 +191,31 @@ export default function (pi: ExtensionAPI) {
   pi.registerProvider(createCodebuddyProvider(conversationIdFor));
 
   pi.registerCommand("codebuddy-models", {
-    description: "List CodeBuddy models by credits (lowest first)",
+    description: "Select a CodeBuddy model by credits (lowest first)",
     handler: async (_args, ctx) => {
-      ctx.ui.notify(formatCodebuddyModelList(ctx.modelRegistry.getAll()), "info");
+      if (!ctx.hasUI) return;
+
+      const options = getCodebuddyModelOptions(ctx.modelRegistry.getAll());
+      if (options.length === 0) {
+        ctx.ui.notify("No CodeBuddy models available.", "warning");
+        return;
+      }
+
+      const selected = await ctx.ui.select(
+        "Select CodeBuddy model (lowest credits first)",
+        options.map((option) => option.label),
+      );
+      const option = options.find((option) => option.label === selected);
+      if (!option) return;
+
+      if (!(await pi.setModel(option.model))) {
+        ctx.ui.notify(
+          "CodeBuddy credentials unavailable. Please run /login codebuddy first.",
+          "error",
+        );
+        return;
+      }
+      ctx.ui.notify(`Switched to ${PROVIDER}/${option.model.id}`, "info");
     },
   });
 
