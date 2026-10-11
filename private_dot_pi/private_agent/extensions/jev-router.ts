@@ -10,7 +10,7 @@
  * - Implementation: GPT-6 Luna (max).
  *
  * The planning model explores, plans, and makes the first edit. After the first successful `edit`
- * or `write` tool call, the next request of the same turn goes to Luna, and the session stays
+ * or `write` tool call (including nested calls from codemode), the next request of the same turn goes to Luna, and the session stays
  * there. A session therefore switches models once and accepts a single prompt-cache miss.
  *
  * The phase is router state: Pi stores it on the session branch, so it follows the session tree
@@ -61,9 +61,12 @@ function lastUserText(messages: readonly Message[]): string {
 /** Whether a tool call since the last user message edited a file successfully. */
 function editedThisTurn(messages: readonly Message[]): boolean {
 	const lastUser = messages.findLastIndex((message) => message.role === "user");
-	return messages
-		.slice(lastUser + 1)
-		.some((message) => message.role === "toolResult" && EDIT_TOOLS.has(message.toolName) && !message.isError);
+	return messages.slice(lastUser + 1).some((message) => {
+		if (message.role !== "toolResult") return false;
+		if (EDIT_TOOLS.has(message.toolName) && !message.isError) return true;
+		// A nested edit can succeed even if its enclosing script later fails.
+		return message.nestedCalls?.calls.some((call) => EDIT_TOOLS.has(call.name) && call.status === "ok") ?? false;
+	});
 }
 
 /** Planning model for a new session: Sol (medium) for complex work, Sol (low) otherwise or when Jev is unavailable. */
