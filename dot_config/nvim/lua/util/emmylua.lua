@@ -56,16 +56,20 @@ function M.attach(client)
     return response
   end
 
-  local refresh = client.handlers["workspace/diagnostic/refresh"] or vim.lsp.handlers["workspace/diagnostic/refresh"]
-  client.handlers["workspace/diagnostic/refresh"] = function(err, result, ctx, config)
-    local response = refresh(err, result, ctx, config)
-    -- Neovim refreshes workspace reports only; dynamic libraries also invalidate document reports.
-    if not err and client:supports_method("textDocument/diagnostic") then
-      for bufnr in pairs(client.attached_buffers) do
-        vim.lsp.diagnostic._refresh(bufnr, client.id)
+  ---@diagnostic disable-next-line: undefined-field
+  if vim.lsp.diagnostic._refresh then
+    local refresh = client.handlers["workspace/diagnostic/refresh"] or vim.lsp.handlers["workspace/diagnostic/refresh"]
+    client.handlers["workspace/diagnostic/refresh"] = function(err, result, ctx, config)
+      local response = refresh(err, result, ctx, config)
+      -- Neovim refreshes workspace reports only; dynamic libraries also invalidate document reports.
+      if not err and client:supports_method("textDocument/diagnostic") then
+        for bufnr in pairs(client.attached_buffers) do
+          ---@diagnostic disable-next-line: undefined-field
+          vim.lsp.diagnostic._refresh(bufnr, client.id)
+        end
       end
+      return response
     end
-    return response
   end
 end
 
