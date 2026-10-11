@@ -5,6 +5,7 @@ return {
   {
     "neovim/nvim-lspconfig",
     ---@type PluginLspOpts
+    ---@diagnostic disable-next-line: missing-fields
     opts = {
       ---@type table<string, lazyvim.lsp.Config|boolean>
       servers = {
@@ -117,6 +118,7 @@ return {
   {
     "neovim/nvim-lspconfig",
     ---@type PluginLspOpts
+    ---@diagnostic disable-next-line: missing-fields
     opts = {
       ---@type table<string, lazyvim.lsp.Config|boolean>
       servers = {
@@ -142,6 +144,21 @@ return {
             end
             require("util.emmylua").attach(client)
           end,
+          ---@type lspconfig.settings.emmylua_ls
+          settings = {
+            emmylua = {
+              completion = {
+                callSnippet = true,
+              },
+              doc = {
+                privateName = { "_*" },
+              },
+              hint = {
+                localHint = false,
+                indexHint = false,
+              },
+            },
+          },
           -- root_dir = function(bufnr, on_dir)
           --   local root = vim.fs.root(bufnr, vim.lsp.config.emmylua_ls.root_markers)
           --   on_dir(root ~= vim.env.HOME and root or vim.fs.root(bufnr, "lua"))
