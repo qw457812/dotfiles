@@ -34,7 +34,7 @@ import {
   truncateHead,
 } from "@earendil-works/pi-coding-agent";
 import { Text } from "@earendil-works/pi-tui";
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "os";
 import { join } from "path";
 import { Type } from "typebox";
@@ -282,38 +282,7 @@ const DESCRIPTION = `Fetch content from an HTTP or HTTPS URL and return it as te
 
 Use a more targeted tool when one is available. This tool is read-only. Large text results may be truncated while the complete output is saved to a temporary file.`;
 
-// ---------------------------------------------------------------------------
-// Temp file tracking for cleanup on session shutdown
-// ---------------------------------------------------------------------------
-
-const tempFiles: string[] = [];
-
-async function cleanupTempFiles(): Promise<void> {
-  const dirs = [...tempFiles];
-  tempFiles.length = 0;
-  const failed: string[] = [];
-  for (const dir of dirs) {
-    try {
-      await rm(dir, { recursive: true, force: true });
-    } catch (err: any) {
-      console.warn(`[webfetch] Failed to clean up temp dir ${dir}:`, err.message || err);
-      failed.push(dir);
-    }
-  }
-  if (failed.length > 0) {
-    tempFiles.push(...failed);
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Extension entry
-// ---------------------------------------------------------------------------
-
 export default function (pi: ExtensionAPI) {
-  pi.on("session_shutdown", async () => {
-    await cleanupTempFiles();
-  });
-
   pi.registerTool({
     name: "webfetch",
     label: "Web Fetch",
@@ -409,8 +378,6 @@ export default function (pi: ExtensionAPI) {
           const tempDir = await mkdtemp(join(tmpdir(), "pi-webfetch-"));
           const tempFile = join(tempDir, "output.txt");
           await writeFile(tempFile, output, "utf8");
-
-          tempFiles.push(tempDir);
 
           details.truncation = truncation;
           details.fullOutputPath = tempFile;

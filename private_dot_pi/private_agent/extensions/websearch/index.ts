@@ -33,7 +33,7 @@ import {
   truncateHead,
 } from "@earendil-works/pi-coding-agent";
 import { Text } from "@earendil-works/pi-tui";
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "os";
 import { join } from "path";
 import { Type } from "typebox";
@@ -129,35 +129,6 @@ function wrapWebsearchError(err: unknown, query: string): Error {
   });
 }
 
-// ---------------------------------------------------------------------------
-// Temp file tracking for cleanup on session shutdown
-// ---------------------------------------------------------------------------
-
-const tempFiles: string[] = [];
-
-async function cleanupTempFiles(): Promise<void> {
-  // Snapshot paths before clearing so failures can be re-queued
-  const dirs = [...tempFiles];
-  tempFiles.length = 0;
-  const failed: string[] = [];
-  for (const dir of dirs) {
-    try {
-      await rm(dir, { recursive: true, force: true });
-    } catch (err: any) {
-      // Re-queue for next cleanup attempt; log for diagnostics
-      console.warn(`[websearch] Failed to clean up temp dir ${dir}:`, err.message || err);
-      failed.push(dir);
-    }
-  }
-  if (failed.length > 0) {
-    tempFiles.push(...failed);
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Extension entry
-// ---------------------------------------------------------------------------
-
 export default function (pi: ExtensionAPI) {
   const service = createWebSearchService([
     exaProvider,
@@ -188,9 +159,8 @@ export default function (pi: ExtensionAPI) {
     }
   });
 
-  pi.on("session_shutdown", async (_event, ctx) => {
+  pi.on("session_shutdown", (_event, ctx) => {
     service.forgetSession(ctx.sessionManager.getSessionId() ?? "");
-    await cleanupTempFiles();
   });
 
   pi.registerTool({
@@ -269,8 +239,6 @@ export default function (pi: ExtensionAPI) {
         const tempDir = await mkdtemp(join(tmpdir(), "pi-websearch-"));
         const tempFile = join(tempDir, "output.txt");
         await writeFile(tempFile, rawResult, "utf8");
-
-        tempFiles.push(tempDir);
 
         details.truncation = truncation;
         details.fullOutputPath = tempFile;
