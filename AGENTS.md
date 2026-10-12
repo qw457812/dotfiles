@@ -58,3 +58,7 @@ sleep 1
 tmux -S "$SOCKET" capture-pane -p -J -t "$TARGET" -S -200
 tmux -S "$SOCKET" kill-session -t "$SESSION"
 ```
+
+## Commit Guidelines
+
+- Use subsystem/component scopes matching repository history, e.g. `pi/permission-gate`, `nvim/lua`.
