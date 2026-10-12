@@ -124,12 +124,9 @@ glide.keymaps.set("normal", "T", when_editing(null, "commandline_show tab "));
 glide.keymaps.set("normal", "b", when_editing("motion b", bookmark_picker()), {
   description: "Open bookmark",
 });
-glide.keymaps.set(
-  "normal",
-  "B",
-  when_editing("motion B", bookmark_picker(true)),
-  { description: "Open bookmark in a new tab" },
-);
+glide.keymaps.set("normal", "B", when_editing("motion B", bookmark_picker(true)), {
+  description: "Open bookmark in a new tab",
+});
 glide.keymaps.set("normal", "s", history_picker(), {
   description: "Open history",
 });
@@ -172,13 +169,10 @@ glide.keymaps.set(
 glide.keymaps.set(
   "normal",
   "p",
-  when_editing(
-    `keys ${glide.ctx.os === "macosx" ? "<D-v>" : "<C-v>"}`,
-    async () => {
-      const url = text_to_url(await navigator.clipboard.readText());
-      await browser.tabs.update({ url });
-    },
-  ),
+  when_editing(`keys ${glide.ctx.os === "macosx" ? "<D-v>" : "<C-v>"}`, async () => {
+    const url = text_to_url(await navigator.clipboard.readText());
+    await browser.tabs.update({ url });
+  }),
 );
 glide.keymaps.set(
   "normal",
@@ -367,31 +361,11 @@ glide.keymaps.set("normal", "<leader>sk", "map");
 glide.keymaps.set("normal", "<leader>un", "clear");
 glide.keymaps.set("normal", "<leader>g,", "tab_new about:settings");
 glide.keymaps.set("normal", "<leader>gg", go_to_tab("https://github.com/"));
-glide.keymaps.set(
-  "normal",
-  "<leader>gs",
-  go_to_tab("https://github.com/search"),
-);
-glide.keymaps.set(
-  "normal",
-  "<leader>g/",
-  go_to_tab("https://github.com/search?type=code"),
-);
-glide.keymaps.set(
-  "normal",
-  "<leader>gt",
-  go_to_tab("https://github.com/trending"),
-);
-glide.keymaps.set(
-  "normal",
-  "<leader>g.",
-  go_to_tab("https://github.com/qw457812/dotfiles"),
-);
-glide.keymaps.set(
-  "normal",
-  "<leader>gG",
-  go_to_tab("https://github.com/glide-browser/glide"),
-);
+glide.keymaps.set("normal", "<leader>gs", go_to_tab("https://github.com/search"));
+glide.keymaps.set("normal", "<leader>g/", go_to_tab("https://github.com/search?type=code"));
+glide.keymaps.set("normal", "<leader>gt", go_to_tab("https://github.com/trending"));
+glide.keymaps.set("normal", "<leader>g.", go_to_tab("https://github.com/qw457812/dotfiles"));
+glide.keymaps.set("normal", "<leader>gG", go_to_tab("https://github.com/glide-browser/glide"));
 glide.keymaps.set(
   "normal",
   "<leader>gK",
@@ -402,9 +376,7 @@ glide.keymaps.set(
 glide.keymaps.set(
   "normal",
   "<leader>gP",
-  go_to_tab(
-    "https://searchfox.org/firefox-release/source/browser/app/profile/firefox.js",
-  ),
+  go_to_tab("https://searchfox.org/firefox-release/source/browser/app/profile/firefox.js"),
 );
 glide.keymaps.set(
   "normal",
@@ -520,9 +492,7 @@ glide.autocmds.create("UrlEnter", { hostname: "github.com" }, async () => {
   const url = new URL(glide.ctx.url);
   const path_segments = url.pathname.split("/").filter(Boolean);
   const is_searching =
-    path_segments.length === 1 &&
-    path_segments[0] === "search" &&
-    url.searchParams.has("q");
+    path_segments.length === 1 && path_segments[0] === "search" && url.searchParams.has("q");
 
   let org: string | undefined;
   let repo: string | undefined;
@@ -601,28 +571,12 @@ glide.autocmds.create("UrlEnter", { hostname: "openrouter.ai" }, async () => {
       await browser.tabs.update({ url });
     };
   }
-  glide.buf.keymaps.set(
-    "normal",
-    ",,",
-    go_to("https://openrouter.ai/settings/keys"),
-  );
-  glide.buf.keymaps.set(
-    "normal",
-    ",c",
-    go_to("https://openrouter.ai/settings/credits"),
-  );
-  glide.buf.keymaps.set(
-    "normal",
-    ",a",
-    go_to("https://openrouter.ai/activity"),
-  );
+  glide.buf.keymaps.set("normal", ",,", go_to("https://openrouter.ai/settings/keys"));
+  glide.buf.keymaps.set("normal", ",c", go_to("https://openrouter.ai/settings/credits"));
+  glide.buf.keymaps.set("normal", ",a", go_to("https://openrouter.ai/activity"));
   glide.buf.keymaps.set("normal", ",l", go_to("https://openrouter.ai/logs"));
   glide.buf.keymaps.set("normal", ",m", go_to("https://openrouter.ai/models"));
-  glide.buf.keymaps.set(
-    "normal",
-    ",r",
-    go_to("https://openrouter.ai/rankings"),
-  );
+  glide.buf.keymaps.set("normal", ",r", go_to("https://openrouter.ai/rankings"));
 });
 
 // glide.autocmds.create(
@@ -640,10 +594,7 @@ glide.autocmds.create("UrlEnter", { hostname: "openrouter.ai" }, async () => {
 // );
 
 // Excmds
-const open = glide.excmds.create(
-  { name: "open", description: "Open URL" },
-  opener(),
-);
+const open = glide.excmds.create({ name: "open", description: "Open URL" }, opener());
 declare global {
   interface ExcmdRegistry {
     open: typeof open;
@@ -658,16 +609,8 @@ declare global {
     open_in_new_tab: typeof open_in_new_tab;
   }
 }
-glide.keymaps.set(
-  "normal",
-  "o",
-  when_editing("motion o", "commandline_show open "),
-);
-glide.keymaps.set(
-  "normal",
-  "O",
-  when_editing(null, "commandline_show open_in_new_tab "),
-);
+glide.keymaps.set("normal", "o", when_editing("motion o", "commandline_show open "));
+glide.keymaps.set("normal", "O", when_editing(null, "commandline_show open_in_new_tab "));
 
 // ref: https://github.com/seruman/rc.d/blob/2b56450a8316680dfcecbdae0729f592e7ac42f4/private_dot_config/glide/glide.ts#L394-L458
 const bulk_tab_close = glide.excmds.create(
@@ -679,10 +622,7 @@ const bulk_tab_close = glide.excmds.create(
         `${t.id}${t.pinned ? "  " : ""} [${t.title?.replace(/\n/g, " ") || "No Title"}](${t.url || "about:blank"})`,
     );
 
-    const mktemp = await glide.process.execute("mktemp", [
-      "-t",
-      "glide-editor-tabs.XXXXXX",
-    ]);
+    const mktemp = await glide.process.execute("mktemp", ["-t", "glide-editor-tabs.XXXXXX"]);
     const tmp = (await mktemp.stdout.text()).trim();
     await glide.fs.write(tmp, lines.join("\n"));
 
@@ -698,8 +638,7 @@ const bulk_tab_close = glide.excmds.create(
           "--quit-after-last-window-closed=true",
         ])
       ).wait();
-      if (exit_code !== 0)
-        throw new Error(`Editor failed with exit code ${exit_code}`);
+      if (exit_code !== 0) throw new Error(`Editor failed with exit code ${exit_code}`);
 
       const edited = await glide.fs.read(tmp, "utf8");
       const keep = new Set(
@@ -730,9 +669,7 @@ function when_editing(
   non_editing_action: glide.ExcmdString | glide.KeymapCallback | null,
 ): glide.KeymapCallback {
   return async (props) => {
-    const action = (await glide.ctx.is_editing())
-      ? editing_action
-      : non_editing_action;
+    const action = (await glide.ctx.is_editing()) ? editing_action : non_editing_action;
 
     if (!action) return;
 
@@ -828,10 +765,7 @@ function go_to_tab_by_hostname(hostname: string, default_url: string) {
   return async () => {
     const tabs = await browser.tabs.query({});
     const matching_tab = tabs.find(
-      (tab) =>
-        tab.url &&
-        URL.canParse(tab.url) &&
-        new URL(tab.url).hostname === hostname,
+      (tab) => tab.url && URL.canParse(tab.url) && new URL(tab.url).hostname === hostname,
     );
     if (matching_tab && matching_tab.id) {
       await browser.tabs.update(matching_tab.id, { active: true });
@@ -842,9 +776,7 @@ function go_to_tab_by_hostname(hostname: string, default_url: string) {
 }
 
 function text_to_url(text: string): string {
-  return URL.canParse(text)
-    ? text
-    : default_search_engine.replace("{}", encodeURIComponent(text));
+  return URL.canParse(text) ? text : default_search_engine.replace("{}", encodeURIComponent(text));
 }
 
 function display_url(url: string): string {
@@ -863,10 +795,7 @@ const bookmark_cache = {
 
 async function cached_bookmarks() {
   const now = Date.now();
-  if (
-    bookmark_cache.data &&
-    now - bookmark_cache.timestamp < bookmark_cache.ttl
-  ) {
+  if (bookmark_cache.data && now - bookmark_cache.timestamp < bookmark_cache.ttl) {
     return bookmark_cache.data;
   }
   bookmark_cache.data = await browser.bookmarks.getRecent(10000);
@@ -986,9 +915,7 @@ function history_picker(newtab: boolean = false) {
               }),
               DOM.create_element("div", {
                 children: [
-                  ...(item.title
-                    ? [DOM.create_element("div", { children: item.title })]
-                    : []),
+                  ...(item.title ? [DOM.create_element("div", { children: item.title })] : []),
                   DOM.create_element("div", { children: display_url(url) }),
                 ],
               }),
