@@ -28,10 +28,9 @@
  * context (typically gitignored) rather than a replacement for sibling files.
  * Intentional deviation: empty files are skipped.
  *
- * Pi's system prompt already wraps all loaded context files in a single
- * `<project_context>` block, so the `<project_instructions>` entries are injected
- * into that existing block (before its closing tag) instead of appending a second
- * wrapper. When no native block exists, one is appended — mirroring pi's formatting.
+ * Adds files to `systemPromptOptions.contextFiles`, so Pi renders one shared
+ * `<project_context>` block without freezing the prompt and masking other
+ * extensions' structured changes (such as skill visibility).
  */
 
 import { type ExtensionAPI, getAgentDir } from "@earendil-works/pi-coding-agent";
@@ -168,34 +167,15 @@ function loadLocalContextFiles(cwd: string): Array<{ path: string; content: stri
   return contextFiles;
 }
 
-function formatContextFilesForPrompt(files: Array<{ path: string; content: string }>): string {
-  return files
-    .map(
-      ({ path: filePath, content }) =>
-        `<project_instructions path="${filePath}">\n${content}\n</project_instructions>\n\n`,
-    )
-    .join("");
-}
-
 export default function (pi: ExtensionAPI) {
   let localContextFiles: Array<{ path: string; content: string }> = [];
 
   pi.on("before_agent_start", (event) => {
     if (localContextFiles.length === 0) return;
 
-    const instructions = formatContextFilesForPrompt(localContextFiles);
-    const closeTag = "</project_context>";
-    const idx = event.systemPrompt.lastIndexOf(closeTag);
-    if (idx === -1) {
-      return {
-        systemPrompt:
-          event.systemPrompt +
-          `\n\n<project_context>\n\nProject-specific instructions and guidelines:\n\n${instructions}${closeTag}\n`,
-      };
-    }
-    return {
-      systemPrompt: event.systemPrompt.slice(0, idx) + instructions + event.systemPrompt.slice(idx),
-    };
+    const contextFiles = event.systemPromptOptions.contextFiles;
+    const existingPaths = new Set(contextFiles.map((file) => file.path));
+    contextFiles.push(...localContextFiles.filter((file) => !existingPaths.has(file.path)));
   });
 
   pi.on("session_start", async (_event, ctx) => {
