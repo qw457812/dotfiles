@@ -12,7 +12,7 @@ import {
   type StreamOptions,
 } from "@earendil-works/pi-ai";
 import { openAICompletionsApi } from "@earendil-works/pi-ai/compat";
-import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { codebuddyCredentialsToAuth, loginCodebuddy, refreshCodebuddyCredentials } from "./auth.js";
 import { CHAT_BASE_URL, DEFAULT_DOMAIN, PROVIDER, USER_AGENT, VERSION } from "./constants.js";
 import { fetchLiveModels } from "./live-models.js";
@@ -169,6 +169,18 @@ function createCodebuddyProvider(
   };
 }
 
+function updateCreditsStatus(model: ExtensionContext["model"], ctx: ExtensionContext) {
+  if (!ctx.hasUI) return;
+  const multiplier =
+    model && isCodebuddyModel(model)
+      ? /\((x\d+(?:\.\d+)?)(?: credits)?\)$/.exec(model.name)?.[1]
+      : undefined;
+  ctx.ui.setStatus(
+    "codebuddy-model-credits",
+    multiplier ? ctx.ui.theme.fg("dim", multiplier) : undefined,
+  );
+}
+
 export default function (pi: ExtensionAPI) {
   // Stable X-Conversation-ID per pi session, mirroring the official CLI. Note this is
   // determinism, not a cache win: repeat requests still report cached_tokens: 0.
@@ -189,6 +201,9 @@ export default function (pi: ExtensionAPI) {
   }
 
   pi.registerProvider(createCodebuddyProvider(conversationIdFor));
+
+  pi.on("session_start", (_event, ctx) => updateCreditsStatus(ctx.model, ctx));
+  pi.on("model_select", (event, ctx) => updateCreditsStatus(event.model, ctx));
 
   pi.registerCommand("codebuddy-models", {
     description: "Select a CodeBuddy model by credits (lowest first)",

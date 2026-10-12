@@ -1,5 +1,9 @@
 import type { AnyModel } from "@earendil-works/pi-ai";
-import type { ExtensionAPI, ExtensionCommandContext } from "@earendil-works/pi-coding-agent";
+import type {
+  ExtensionAPI,
+  ExtensionCommandContext,
+  ExtensionContext,
+} from "@earendil-works/pi-coding-agent";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { CHAT_BASE_URL, PROVIDER } from "../extensions/codebuddy-provider/constants.js";
 import register from "../extensions/codebuddy-provider/index.js";
@@ -186,6 +190,58 @@ function setupPicker({
   };
   return { pi, ctx, run: () => handler("", ctx as unknown as ExtensionCommandContext) };
 }
+
+describe("CodeBuddy credits status", () => {
+  function setupStatus(model: AnyModel | undefined, hasUI = true) {
+    const { pi } = setupPicker();
+    const ctx = {
+      model,
+      hasUI,
+      ui: { setStatus: vi.fn(), theme: { fg: vi.fn((_color, text) => `dim:${text}`) } },
+    };
+    const emit = (event: "session_start" | "model_select", selected = model) => {
+      const handler = pi.on.mock.calls.find(([name]) => name === event)![1];
+      return handler({ type: event, model: selected }, ctx as unknown as ExtensionContext);
+    };
+    return { ctx, emit };
+  }
+
+  it.each(["x0.11 credits", "x0.00 credits", "x1.62"])(
+    "shows only the multiplier on session start: %s",
+    (credits) => {
+      const { ctx, emit } = setupStatus({ ...chat, name: `Model (${credits})` });
+      emit("session_start");
+      expect(ctx.ui.setStatus).toHaveBeenCalledExactlyOnceWith(
+        "codebuddy-model-credits",
+        `dim:${credits.split(" ")[0]}`,
+      );
+    },
+  );
+
+  it("updates from the selected model and clears stale credits", () => {
+    const { ctx, emit } = setupStatus(cheap);
+    emit("session_start");
+    emit("model_select", expensive);
+    expect(ctx.ui.setStatus).toHaveBeenLastCalledWith("codebuddy-model-credits", "dim:x10");
+    emit("model_select", { ...cheap, provider: "other" });
+    expect(ctx.ui.setStatus).toHaveBeenLastCalledWith("codebuddy-model-credits", undefined);
+    emit("model_select", { ...cheap, name: "Unknown" });
+    expect(ctx.ui.setStatus).toHaveBeenLastCalledWith("codebuddy-model-credits", undefined);
+  });
+
+  it("clears the status when no model is selected", () => {
+    const { ctx, emit } = setupStatus(undefined);
+    emit("session_start");
+    expect(ctx.ui.setStatus).toHaveBeenCalledExactlyOnceWith("codebuddy-model-credits", undefined);
+  });
+
+  it("does not access status UI in non-interactive mode", () => {
+    const { ctx, emit } = setupStatus(cheap, false);
+    emit("session_start");
+    emit("model_select", expensive);
+    expect(ctx.ui.setStatus).not.toHaveBeenCalled();
+  });
+});
 
 describe("/codebuddy-models picker", () => {
   it("shows models by credits and switches to the selected model", async () => {
