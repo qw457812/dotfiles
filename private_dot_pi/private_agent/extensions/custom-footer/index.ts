@@ -246,7 +246,7 @@ export default function (pi: ExtensionAPI) {
     sessionStart = Date.now();
 
     tpsTracker.onSessionStart();
-    toolCounter.onSessionStart();
+    toolCounter.onSessionStart(ctx);
 
     ctx.ui.setFooter(createFooterFactory(ctx));
   });
