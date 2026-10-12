@@ -99,8 +99,8 @@ glide.keymaps.set("normal", "<Esc>", async (props) => {
   await glide.keys.send("<Esc>", { skip_mappings: true });
   await focus_page(props);
   if (!is_editing) {
+    if (glide.findbar.is_open()) await glide.findbar.close();
     await glide.excmds.execute("clear");
-    // TODO: close find bar if open
   }
 });
 
@@ -112,10 +112,24 @@ glide.keymaps.set("normal", "<Esc>", async (props) => {
 // glide.keymaps.set("normal", "F", () =>
 //   glide.hints.show({ include_click_listeners: true, action: "newtab-click" }),
 // );
-glide.keymaps.set("normal", "/", async () => {
-  await glide.keys.send(glide.ctx.os === "macosx" ? "<D-f>" : "<C-f>", {
-    skip_mappings: true,
-  });
+glide.keymaps.set("normal", "/", () => glide.findbar.open({ highlight_all: true, query: "" }));
+glide.keymaps.set("normal", "n", () => glide.findbar.next_match());
+glide.keymaps.set("normal", "N", () => glide.findbar.previous_match());
+// `<CR>` submits the query and goes to normal mode so `n`/`N` take over
+glide.keymaps.set("insert", "<CR>", async () => {
+  await glide.keys.send("<CR>", { skip_mappings: true });
+  if (glide.findbar.is_focused()) {
+    await glide.excmds.execute("mode_change normal");
+  }
+});
+// Close findbar by once `<Esc>` press
+glide.keymaps.set("insert", "<Esc>", async (props) => {
+  if (glide.findbar.is_focused()) {
+    await glide.findbar.close();
+    await focus_page(props);
+    return;
+  }
+  await glide.excmds.execute("mode_change normal");
 });
 glide.keymaps.set("normal", "r", when_editing("r", "reload"));
 glide.keymaps.set("normal", "R", when_editing(null, "reload_hard"));
