@@ -125,30 +125,45 @@ describe("SQL Guard Jev read-only check", () => {
     expect(JSON.stringify(h.appendEntry.mock.calls)).not.toContain("secret");
   });
 
+  it("checks database changes and locks, not local output or client settings", () => {
+    const question = SQL_QUESTIONS.read_only;
+    expect(question.instructions).toContain(
+      "without changing database state or taking explicit database locks",
+    );
+    expect(question.instructions).toContain("do not count as database changes");
+    expect(question.criteria).toEqual({
+      true: expect.stringContaining("Local file writes and client-only state changes are allowed"),
+      false: expect.stringContaining("unknown database effects"),
+    });
+  });
+
   it.each(["sql", "sqlcl"])("classifies the recognized %s argument", async (key) => {
     const h = harness(false, true);
     expect(await h.run(tool, { [key]: sql })).toBeUndefined();
     expect(h.classify.mock.calls[0][1].state).toEqual({ sql, tool });
   });
 
-  it.each([0, 0.899, 0.9, 1])("requires read_only >= 0.9 (probability=%s)", async (probability) => {
-    const h = harness(false, true);
-    h.classify.mockResolvedValue(result(probability));
-    const outcome = await h.run(tool, { sql });
-    if (probability >= 0.9) {
-      expect(outcome).toBeUndefined();
-      expect(h.ctx.ui.confirm).not.toHaveBeenCalled();
-    } else {
-      expect(outcome).toEqual({ block: true, reason: "Blocked by user" });
-      expect(h.ctx.ui.confirm).toHaveBeenCalledWith(
-        "⚠️ SQL Guard",
-        expect.stringContaining("SQL is not clearly read-only"),
-        expect.anything(),
-      );
-      expect(h.ctx.abort).toHaveBeenCalledOnce();
-      expect(h.appendEntry.mock.calls[0][1].outcome).toBe("user-denied");
-    }
-  });
+  it.each([0, 0.699999, 0.7, 0.700001, 0.89, 1])(
+    "requires read_only >= 0.7 (probability=%s)",
+    async (probability) => {
+      const h = harness(false, true);
+      h.classify.mockResolvedValue(result(probability));
+      const outcome = await h.run(tool, { sql });
+      if (probability >= 0.7) {
+        expect(outcome).toBeUndefined();
+        expect(h.ctx.ui.confirm).not.toHaveBeenCalled();
+      } else {
+        expect(outcome).toEqual({ block: true, reason: "Blocked by user" });
+        expect(h.ctx.ui.confirm).toHaveBeenCalledWith(
+          "⚠️ SQL Guard",
+          expect.stringContaining("SQL is not clearly read-only"),
+          expect.anything(),
+        );
+        expect(h.ctx.abort).toHaveBeenCalledOnce();
+        expect(h.appendEntry.mock.calls[0][1].outcome).toBe("user-denied");
+      }
+    },
+  );
 
   it.each([true, false])("non-read-only SQL retains manual approval=%s", async (approved) => {
     const h = harness(approved, true);

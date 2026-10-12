@@ -20,6 +20,7 @@ import permissionGate from "../../extensions/permission-gate/index.ts";
 import { withBashTree } from "../../lib/bash-parser.ts";
 import { approvalRules } from "../../extensions/permission-gate/policy.ts";
 import {
+  AUTO_APPROVE_THRESHOLD,
   GATE_MODEL,
   GATE_QUESTIONS,
   QUESTION_VERSION,
@@ -99,7 +100,11 @@ describe.skipIf(!LIVE)("Permission Gate live Jev calibration (text only)", () =>
             .update(JSON.stringify(GATE_QUESTIONS))
             .digest("hex"),
           repeats: REPEATS,
-          thresholds: { intent_covered: 0.8, scope_covered: 0.9, effects_covered: 0.9 },
+          thresholds: {
+            intent_covered: AUTO_APPROVE_THRESHOLD,
+            scope_covered: AUTO_APPROVE_THRESHOLD,
+            effects_covered: AUTO_APPROVE_THRESHOLD,
+          },
           measurements,
         },
         null,

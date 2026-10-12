@@ -25,12 +25,12 @@ Git rules and Jev both default to **ON**. Switches live only in the current exte
 3. For a matched call, one Jev request evaluates the entire command, including all subcommands, redirections and substitutions:
 
    ```text
-   intent_covered  >= 0.80   Actions and important side effects are authorized
-   scope_covered   >= 0.90   Targets and effects stay within the authorized scope
-   effects_covered >= 0.90   Material effects are covered by that authorization
+   intent_covered  >= 0.70   Actions follow from the request or ordinary task steps
+   scope_covered   >= 0.70   Targets, destinations and extent fit the request
+   effects_covered >= 0.70   Material side effects are expected under the request
    ```
 
-   Auto-approve only when all conditions pass; otherwise ask the user. `effects_covered` is not intrinsic safety: explicitly accepted destructive effects do not automatically prevent approval.
+   Auto-approve only when all conditions pass; otherwise ask the user. This is a convenience-first policy: ordinary task steps and consequences need not be individually spelled out. `effects_covered` is not intrinsic safety: requested destructive effects do not automatically prevent approval. Bash and SQL share `AUTO_APPROVE_THRESHOLD = 0.70`.
 
 4. Every matched operation is eligible for auto-approval. There is no fixed hard-deny list or non-overridable `deny` decision.
 5. Manual rejection blocks execution and calls `ctx.abort()`. Calls requiring confirmation are blocked when no UI is available.
@@ -50,15 +50,15 @@ Deletion is exempt when every target is a literal absolute descendant of a recog
 
 1. Match the existing SQL tool suffixes (`_sqlcl_run`, `_sql_run`, `_execute_sql`) and read the first non-empty string in `sql` / `sqlcl`. MCP direct and codemode nested calls use the same handler.
 2. Keep existing local SQL rules unchanged. Locally accepted queries proceed without Jev, including their existing detection limits.
-3. Only SQL requiring confirmation reaches Jev. One `read_only` question evaluates the complete SQL, including multiple statements, CTEs, procedural blocks and function calls. Auto-approve when `read_only >= 0.90`; otherwise ask the user. Unknown routine semantics, mutations, explicit locks and other non-read-only effects require confirmation. This is **not user-authorization classification**: SQL requests do not include user intent.
+3. Only SQL requiring confirmation reaches Jev. One `read_only` question evaluates the complete SQL, including multiple statements, CTEs, procedural blocks and function calls. Auto-approve when `read_only >= 0.70`; otherwise ask the user. The check looks for database state changes and explicit database locks: mutations, database session/transaction changes, explicit locks and unknown database effects require confirmation. Local machine effects such as `SPOOL` file writes and client-only settings do not disqualify an input; this is not a local-machine safety check. This is **not user-authorization classification**: SQL requests do not include user intent.
 4. `/gate jev off` retains manual confirmation for local matches. Missing SQL parameters ask without classification; unsupported argument shapes remain hard-blocked.
 5. Failed, oversized or uncertain classifications fall back to the existing confirmation dialog. Session lifecycle and parent-operation cancellation stop old calls without aborting a replacement operation.
 
-SQL uses question version 1; Bash retains authorization questions version 3. The SQL threshold has offline regression coverage but has not been calibrated against a live classifier.
+SQL uses question version 4; Bash uses authorization questions version 4. The convenience-first thresholds have offline regression coverage but have not been calibrated against a live classifier.
 
 ## Jev, context and failure behavior
 
-The extension calls the fixed model `typesafe/jev-latest` through Pi's `ctx.modelRegistry.classify()`. Pi manages authentication, for example through `TYPESAFE_API_KEY`.
+The extension keeps the unpinned model alias `typesafe/jev-latest` through Pi's `ctx.modelRegistry.classify()`. Pi manages authentication, for example through `TYPESAFE_API_KEY`.
 
 Bash requests contain only the full command, the latest ordinary `user` message on the current session branch, and `cwd`. Questions use `cwd` to resolve relative targets, not as authorization. SQL requests contain only the full selected SQL string and concrete tool name, not other tool parameters, database contents or user messages. Rule identifiers stay in dialogs and logs. **Inputs are not redacted.** File contents, tool output and full conversation history are not sent. Command/SQL text may reach the provider even if execution is ultimately rejected.
 
@@ -122,7 +122,7 @@ GATE_CALIBRATION_REPORT="${TMPDIR:-/tmp}/permission-gate-calibration.json" \
 ./node_modules/.bin/vitest run tests/permission-gate/calibration.test.ts
 ```
 
-Calibration sends only synthetic text from `tests/permission-gate/fixtures.ts`; **it never registers or executes a Bash tool**. The report path is optional. There are 24 matched fixtures, each sampled three times, plus three coverage-exclusion cases, including relative-path probes. Development-time v2 measurements under both the original 0.90 intent threshold and the current 0.80 threshold produced 24 authorized approvals and 42 confirmations for unauthorized or unclear-scope samples in each run. This is a small, development-tuned sample, not independent accuracy evidence. Questions v3 use positive `effects_covered` wording; the historical v2 results do not validate v3. Recalibrate after changing questions, model or context.
+Calibration sends only synthetic text from `tests/permission-gate/fixtures.ts`; **it never registers or executes a Bash tool**. The report path is optional. There are 24 matched fixtures, each sampled three times, plus three coverage-exclusion cases, including relative-path probes. Development-time v2 measurements under both the original 0.90 intent threshold and the current 0.80 threshold produced 24 authorized approvals and 42 confirmations for unauthorized or unclear-scope samples in each run. This is a small, development-tuned sample, not independent accuracy evidence. Questions v4 simplify authorization judgments and lower all approval thresholds to 0.70; the historical v2 results do not validate v4. Recalibrate after changing questions, model or context.
 
 Following fx’s task-focused state, Gate sends only fields used by its questions. It keeps Pi’s direct classifier API and catalog model: no extra backend layer, model override, retries, hedging, credential scanner or usage pipeline. Inputs remain unredacted.
 
