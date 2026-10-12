@@ -454,28 +454,30 @@ glide.keymaps.set("command", "<c-d>", "keys <Del>");
 //   }
 // });
 
-// ref: https://github.com/glide-browser/glide/discussions/147#discussioncomment-15564858
-glide.autocmds.create("ModeChanged", "*", ({ new_mode }) => {
-  const fallback = "--glide-fallback-mode";
-  // https://github.com/glide-browser/glide/issues/237
-  const mode_colors: Record<keyof GlideModes, string> = {
-    command: "--glide-mode-command",
-    hint: "--glide-mode-hint",
-    ignore: "--glide-mode-ignore",
-    insert: "--glide-mode-insert",
-    normal: "--glide-mode-normal",
-    "op-pending": "--glide-mode-op-pending",
-    visual: "--glide-mode-visual",
-  };
-  glide.styles.add(
-    `
-      #browser {
-        border-bottom: 3px solid var(${mode_colors[new_mode] ?? fallback})
-      }
-    `,
-    { id: "glide-custom-mode-indicator", overwrite: true },
-  );
-});
+// mode indicator, ref:
+// - https://github.com/glide-browser/glide/discussions/147#discussioncomment-15564858
+// - https://github.com/seruman/rc.d/blob/85f59ca592507a44133c881080bb5f8756020031/private_dot_config/glide/ui.glide.ts#L247-L264
+glide.styles.add(
+  css`
+    #browser {
+      position: relative;
+    }
+
+    #browser::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      pointer-events: none;
+      z-index: 2147483647;
+      background: var(--glide-current-mode-color, var(--glide-fallback-mode));
+      box-shadow: 0 0 12px -2px var(--glide-current-mode-color, var(--glide-fallback-mode));
+    }
+  `,
+  { id: "glide-custom-mode-indicator" },
+);
 
 function on_tab_enter(
   pattern: glide.AutocmdPatterns["UrlEnter"],
