@@ -166,6 +166,7 @@ glide.keymaps.set(
           href = href.slice(4);
         }
         await navigator.clipboard.writeText(href);
+        await browser.notifications.create({ type: "basic", title: "Copied URL", message: href });
       },
     }),
   {
@@ -177,7 +178,13 @@ glide.keymaps.set(
   "ym",
   when_editing(null, async ({ tab_id }) => {
     const tab = await browser.tabs.get(tab_id);
-    await navigator.clipboard.writeText(`[${tab.title}](${tab.url})`);
+    const md_link = `[${tab.title}](${tab.url})`;
+    await navigator.clipboard.writeText(md_link);
+    await browser.notifications.create({
+      type: "basic",
+      title: "Copied Markdown Link",
+      message: md_link,
+    });
   }),
 );
 glide.keymaps.set(
@@ -226,10 +233,10 @@ glide.keymaps.set("normal", "gs", async () => {
 glide.keymaps.set(
   "normal",
   "d",
-  when_editing("mode_change op-pending --operator=d", "scroll_page_down"),
+  when_editing("mode_change op-pending --operator=d", "scroll_half_page_down"),
   // { retain_key_display: true }, // no way to display key sequence only for editing
 );
-glide.keymaps.set("normal", "u", when_editing("undo", "scroll_page_up"));
+glide.keymaps.set("normal", "u", when_editing("undo", "scroll_half_page_up"));
 glide.keymaps.set("normal", "x", when_editing("motion x", tab_close));
 glide.keymaps.set(
   "normal",
@@ -264,6 +271,8 @@ glide.keymaps.set("normal", ">>", async ({ tab_id }) => {
 });
 glide.keymaps.set("normal", "q", "keys <<");
 glide.keymaps.set("normal", "w", when_editing("motion w", "keys >>"));
+glide.keymaps.set("normal", "gn", "go_next");
+glide.keymaps.set("normal", "gp", "go_previous");
 glide.keymaps.set("normal", "U", "redo");
 glide.keymaps.set("normal", "<BS>", tab_close);
 glide.keymaps.set("normal", "<S-BS>", async () => {
@@ -391,11 +400,6 @@ glide.keymaps.set(
   "normal",
   "<leader>gP",
   go_to_tab("https://searchfox.org/firefox-release/source/browser/app/profile/firefox.js"),
-);
-glide.keymaps.set(
-  "normal",
-  "<leader>gi",
-  go_to_tab_by_hostname("ossinsight.io", "https://ossinsight.io/"),
 );
 glide.keymaps.set(
   "normal",
@@ -543,6 +547,11 @@ glide.autocmds.create("UrlEnter", { hostname: "github.com" }, async () => {
         md_link = `[${tab.title}](${tab.url})`;
       }
       await navigator.clipboard.writeText(md_link);
+      await browser.notifications.create({
+        type: "basic",
+        title: "Copied Markdown Link",
+        message: md_link,
+      });
     }),
   );
   glide.buf.keymaps.set(
@@ -551,6 +560,11 @@ glide.autocmds.create("UrlEnter", { hostname: "github.com" }, async () => {
     when_editing(null, async () => {
       assert(org && repo, `Path does not look like github.com/$org/$repo`);
       await navigator.clipboard.writeText(`${org}/${repo}`);
+      await browser.notifications.create({
+        type: "basic",
+        title: "Copied Repo",
+        message: `${org}/${repo}`,
+      });
     }),
   );
 
