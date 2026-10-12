@@ -81,6 +81,7 @@ return {
       },
       { "typesafe-ai/skills", name = "typesafe-ai-skills", lazy = true, config = function() end },
       { "humanlayer/skills", name = "humanlayer-skills", lazy = true, config = function() end },
+      { "QingYunA/answer-me-with-html", lazy = true, config = function() end },
       {
         "DietrichGebert/ponytail",
         build = "pi update --extension git:github.com/DietrichGebert/ponytail",

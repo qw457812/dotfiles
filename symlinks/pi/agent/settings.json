@@ -52,6 +52,7 @@
     "~/.local/share/nvim/lazy/vercel-labs-skills/skills/find-skills/SKILL.md",
     "~/.local/share/nvim/lazy/typesafe-ai-skills/skills/typesafe-ai/SKILL.md",
     "~/.local/share/nvim/lazy/humanlayer-skills/plugins/show-me/skills/show-me/SKILL.md",
+    "~/.local/share/nvim/lazy/answer-me-with-html/skills/answer-me-with-html/SKILL.md",
     "~/.local/share/nvim/lazy/guizang-ppt-skill/SKILL.md",
     "-skills/training-deck/SKILL.md"
   ],

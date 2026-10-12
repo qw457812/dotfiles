@@ -52,6 +52,8 @@ const PROMPT_HIDDEN_SKILLS = [
   "ponytail-audit",
   "ponytail-debt",
   "ponytail-review",
+  // https://github.com/QingYunA/answer-me-with-html
+  "answer-me-with-html",
   // https://github.com/op7418/guizang-ppt-skill
   "guizang-ppt-skill",
   // git:github.com/hugohe3/ppt-master
