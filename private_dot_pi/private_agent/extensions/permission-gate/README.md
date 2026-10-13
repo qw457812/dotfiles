@@ -30,7 +30,11 @@ Git rules and Jev both default to **ON**. Switches live only in the current exte
    effects_covered >= 0.70   Material side effects are expected under the request
    ```
 
-   Auto-approve only when all conditions pass; otherwise ask the user. This is a convenience-first policy: ordinary task steps and consequences need not be individually spelled out. `effects_covered` is not intrinsic safety: requested destructive effects do not automatically prevent approval. Bash and SQL share `AUTO_APPROVE_THRESHOLD = 0.70`.
+   When Git is the **only** matched local rule, the same request also asks `read_only` about the **entire shell command**. Auto-approve when `read_only >= 0.70`, independently of authorization scores or missing user intent. Normal Git index stat-cache refreshes are allowed; staged-content changes, file writes, deletions, uploads and unknown effects are not read-only. A high read-only score makes the authorization answers irrelevant.
+
+   Otherwise, auto-approve only when all three authorization conditions pass; ask the user when they do not. Mixed Git/`rm`/`sudo`/device-write matches never use the read-only bypass. State-changing Git commands can still auto-approve when the requested work authorizes them.
+
+   This is a convenience-first policy: ordinary task steps and consequences need not be individually spelled out. `effects_covered` is not intrinsic safety: requested destructive effects do not automatically prevent approval. Bash and SQL share `AUTO_APPROVE_THRESHOLD = 0.70`.
 
 4. Every matched operation is eligible for auto-approval. There is no fixed hard-deny list or non-overridable `deny` decision.
 5. Manual rejection blocks execution and calls `ctx.abort()`. Calls requiring confirmation are blocked when no UI is available.
@@ -54,7 +58,7 @@ Deletion is exempt when every target is a literal absolute descendant of a recog
 4. `/gate jev off` retains manual confirmation for local matches. Missing SQL parameters ask without classification; unsupported argument shapes remain hard-blocked.
 5. Failed, oversized or uncertain classifications fall back to the existing confirmation dialog. Session lifecycle and parent-operation cancellation stop old calls without aborting a replacement operation.
 
-SQL uses question version 4; Bash uses authorization questions version 4. The convenience-first thresholds have offline regression coverage but have not been calibrated against a live classifier.
+SQL uses question version 4; Bash uses questions version 6 (generic authorization plus Git-only read-only classification). The convenience-first thresholds have offline regression coverage but have not been calibrated against a live classifier.
 
 ## Jev, context and failure behavior
 
@@ -63,11 +67,11 @@ The extension keeps the unpinned model alias `typesafe/jev-latest` through Pi's 
 Bash requests contain only the full command, the latest ordinary `user` message on the current session branch, and `cwd`. Questions use `cwd` to resolve relative targets, not as authorization. SQL requests contain only the full selected SQL string and concrete tool name, not other tool parameters, database contents or user messages. Rule identifiers stay in dialogs and logs. **Inputs are not redacted.** File contents, tool output and full conversation history are not sent. Command/SQL text may reach the provider even if execution is ultimately rejected.
 
 - Commands and SQL are limited to 8,000 characters and Bash user messages to 16,000. Oversized inputs require manual confirmation rather than truncation-based approval.
-- Missing authorization, unavailable models/credentials, request failures, invalid responses and out-of-range probabilities fall back to manual confirmation.
+- Missing authorization falls back to manual confirmation, except when a Git-only match is classified as read-only. Unavailable models/credentials, request failures, invalid responses on the selected decision branch and out-of-range probabilities fall back to manual confirmation.
 - Each request has one outer five-second deadline and `maxRetries: 0`; no second provider timer. Parent-operation cancellation stops classification/confirmation; late results cannot approve execution.
 - **Parser exceptions retain the existing warn-and-allow behavior:** warn when UI is available, then skip checks and allow execution. Syntax errors alone do not require confirmation, but recognized hazards in recovered syntax trees still match.
 
-Authorization is read directly from the latest ordinary `user` entry returned by `getBranch()`, without input fingerprints, provenance handlers or added message metadata. Pi persists template-expanded and transformed text before tool calls, so Jev receives that latest text. Text blocks are joined with newlines; an images-only or empty latest user requires manual confirmation and never falls back to older authorization. Custom messages do not provide user authorization.
+Authorization is read directly from the latest ordinary `user` entry returned by `getBranch()`, without input fingerprints, provenance handlers or added message metadata. Pi persists template-expanded and transformed text before tool calls, so Jev receives that latest text. Text blocks are joined with newlines; an images-only or empty latest user never falls back to older authorization. Such calls require manual confirmation unless a Git-only match is classified as read-only. Custom messages do not provide user authorization.
 
 **Accepted limit:** ordinary `user` messages cannot distinguish real user input from extension-injected `sendUserMessage` input. Both, as well as legacy ordinary user messages, can supply authorization. Extensions are trusted accordingly; this simplification is not provenance verification. User-entry ID, session ID and cancellation checks still prevent stale decisions from approving calls.
 
@@ -96,7 +100,7 @@ All three checks share `confirm(pi, ctx, title, message)`, which returns only a 
 
 The Bash `command` argument is locked when checks begin. Rewriting it in a later `tool_call` handler fails and Pi blocks execution; extensions that rewrite commands must run before Gate. Other Bash arguments remain mutable. SQL checks similarly lock existing `sql` / `sqlcl` fields; other SQL tool arguments remain mutable.
 
-Decisions are stored as non-model-context entries containing fixed rules, probabilities, model, question version, latency and manual outcomes. SQL entries use the `SQL` rule label and `read_only` probability. Entries do not additionally store raw commands, SQL, user messages or provider error bodies. Logs record approval outcomes, not successful tool execution.
+Decisions are stored as non-model-context entries containing fixed rules, probabilities, model, question version, latency and manual outcomes. SQL entries use the `SQL` rule label and `read_only` probability. Git matches use `Git operation` rather than assuming mutation; read-only approvals show `Command is read-only (Git inspection)` and its `read_only` probability. Git authorization decisions also retain the read-only score. Entries do not additionally store raw commands, SQL, user messages or provider error bodies. Logs record approval outcomes, not successful tool execution.
 
 ## Known limits
 
@@ -126,7 +130,7 @@ GATE_CALIBRATION_REPORT="${TMPDIR:-/tmp}/permission-gate-calibration.json" \
 ./node_modules/.bin/vitest run tests/permission-gate/calibration.test.ts
 ```
 
-Calibration sends only synthetic text from `tests/permission-gate/fixtures.ts`; **it never registers or executes a Bash tool**. The report path is optional. There are 24 matched fixtures, each sampled three times, plus three coverage-exclusion cases, including relative-path probes. Development-time v2 measurements under both the original 0.90 intent threshold and the current 0.80 threshold produced 24 authorized approvals and 42 confirmations for unauthorized or unclear-scope samples in each run. This is a small, development-tuned sample, not independent accuracy evidence. Questions v4 simplify authorization judgments and lower all approval thresholds to 0.70; the historical v2 results do not validate v4. Recalibrate after changing questions, model or context.
+Calibration sends only synthetic text from `tests/permission-gate/fixtures.ts`; **it never registers or executes a Bash tool**. The report path is optional. There are 33 matched fixtures, each sampled three times, plus three coverage-exclusion cases, including relative-path probes, compound Git inspection, staged/unstaged review boundaries and non-Git effects accompanying Git inspection. Development-time v2 measurements under both the original 0.90 intent threshold and the current 0.80 threshold produced 24 authorized approvals and 42 confirmations for unauthorized or unclear-scope samples in each run. This is a small, development-tuned sample, not independent accuracy evidence. Questions v4 simplified authorization judgments and lowered all approval thresholds to 0.70; v5 added the Git-only read-only branch; v6 keeps authorization questions generic rather than prescribing review-specific policy. The historical v2 results do not validate v4, v5 or v6. Recalibrate after changing questions, model or context.
 
 Following fx’s task-focused state, Gate sends only fields used by its questions. It keeps Pi’s direct classifier API and catalog model: no extra backend layer, model override, retries, hedging, credential scanner or usage pipeline. Inputs remain unredacted.
 

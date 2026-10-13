@@ -183,7 +183,7 @@ export const RULE_LABELS = {
   chmod: "Permission change",
   chown: "Ownership change",
   chgrp: "Group change",
-  git: "Git mutation",
+  git: "Git operation",
 } as const;
 
 export type GateRule = keyof typeof RULE_LABELS;

@@ -26,7 +26,7 @@ import { AuthStorage } from "../../node_modules/@earendil-works/pi-coding-agent/
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { GATE_ENTRY } from "../../extensions/permission-gate/index.ts";
 import { latestUserIntent, userText } from "../../extensions/permission-gate/intent.ts";
-import { GATE_QUESTIONS } from "../../extensions/permission-gate/jev.ts";
+import { GIT_QUESTIONS } from "../../extensions/permission-gate/jev.ts";
 import type { GateRecord } from "../../extensions/permission-gate/log.ts";
 import { initializeBashParser } from "../../lib/bash-parser.ts";
 
@@ -61,6 +61,7 @@ const APPROVED: ClassifierResult = {
   provider: CLASSIFIER.provider,
   model: CLASSIFIER.id,
   answers: {
+    read_only: { type: "bool", probability: 0 },
     intent_covered: { type: "bool", probability: 0.99 },
     scope_covered: { type: "bool", probability: 0.99 },
     effects_covered: { type: "bool", probability: 0.99 },
@@ -295,12 +296,14 @@ describe("Permission Gate slash templates (real Pi SDK)", () => {
           user_intent: text,
           cwd: join(root, "workspace"),
         },
-        questions: GATE_QUESTIONS,
+        questions: GIT_QUESTIONS,
       });
     } else {
       expect(result).toEqual({ block: true, reason: "Operation requires user confirmation" });
-      expect(classifier.classify).not.toHaveBeenCalled();
-      expect(classifier.findOfType).not.toHaveBeenCalled();
+      // Git-only calls can establish read-only behavior without user authorization.
+      expect(classifier.classify).toHaveBeenCalledOnce();
+      expect(classifier.classify.mock.calls[0][1].state.user_intent).toBe("");
+      expect(classifier.findOfType).toHaveBeenCalledOnce();
     }
     const record = session.sessionManager
       .getBranch()

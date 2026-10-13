@@ -22,6 +22,7 @@ import {
   CLASSIFY_TIMEOUT,
   COMMAND_LIMIT,
   GATE_QUESTIONS,
+  GIT_QUESTIONS,
   INTENT_LIMIT,
   QUESTION_VERSION,
   type GateJudgment,
@@ -53,6 +54,7 @@ function result(intent = 0.99, scope = 0.99, harm = 0.01): ClassifierResult {
     provider: MODEL.provider,
     model: MODEL.id,
     answers: {
+      read_only: { type: "bool", probability: 0 },
       intent_covered: { type: "bool", probability: intent },
       scope_covered: { type: "bool", probability: scope },
       effects_covered: { type: "bool", probability: 1 - harm },
@@ -741,6 +743,181 @@ describe("Permission Gate Jev classifier results", () => {
       expect(JSON.stringify(h.notify.mock.calls)).not.toContain(SECRET);
     },
   );
+});
+
+describe("Permission Gate Git read-only auto-approval", () => {
+  const inspection =
+    'echo "=== 当前 worktree ==="; git worktree list; echo; ' +
+    'echo "=== 工作区状态 ==="; git status -s | head -20; echo "(空=干净)"; echo; ' +
+    'echo "=== stash ==="; git stash list; echo "(空=无)"; echo; ' +
+    'echo "=== 本地 vs 远端缓存 ==="; ' +
+    "git rev-list --left-right --count HEAD...origin/20261012-交易库数据源切换";
+
+  function gitResult(readOnly: number, intent = 0, scope = 0, harm = 1) {
+    const response = result(intent, scope, harm);
+    response.answers.read_only = { type: "bool", probability: readOnly };
+    return response;
+  }
+
+  it.each([0.7, 0.99, 1])(
+    "auto-approves the full inspection at read_only=%s despite low authorization",
+    async (score) => {
+      const h = harness({
+        hasUI: false,
+        branch: [user("review", "Review only unstaged changes.")],
+      });
+      h.classify.mockResolvedValue(gitResult(score));
+      expect(await h.run(inspection)).toBeUndefined();
+      expect(h.classify).toHaveBeenCalledExactlyOnceWith(
+        MODEL,
+        {
+          state: {
+            command: inspection,
+            user_intent: "Review only unstaged changes.",
+            cwd: "/repo",
+          },
+          questions: GIT_QUESTIONS,
+        },
+        { maxRetries: 0, signal: expect.any(AbortSignal) },
+      );
+      expect(h.confirm).not.toHaveBeenCalled();
+      expect(h.decisions()[0]).toMatchObject({
+        judgment: { action: "allow", reason: "git-read-only", probabilities: { read_only: score } },
+        outcome: "auto-approved",
+      });
+      await h.gate("log");
+      expect(h.notify.mock.calls.at(-1)?.[0]).toContain("Command is read-only (Git inspection)");
+    },
+  );
+
+  it("does not require user intent or unused authorization answers for a read-only command", async () => {
+    const h = harness({ branch: [] });
+    const response = gitResult(0.99);
+    response.answers = { read_only: response.answers.read_only };
+    h.classify.mockResolvedValue(response);
+    expect(await h.run("git stash show")).toBeUndefined();
+    expect(h.classify.mock.calls[0][1].state.user_intent).toBe("");
+    expect(h.confirm).not.toHaveBeenCalled();
+    expect(h.decisions()[0].judgment.reason).toBe("git-read-only");
+  });
+
+  it.each([
+    ["git add src/api.ts", "Review only unstaged changes."],
+    ["git reset HEAD -- src/api.ts", "Review only staged changes."],
+    ["git stash push", "Review only unstaged changes."],
+    ["git stash pop", "Review only staged changes."],
+    ["git stash list; printf changed > src/api.ts", "Review only unstaged changes."],
+    ['git stash show "$(touch changed)"', "Review only staged changes."],
+  ])("asks when %s is not read-only or authorized", async (command, intent) => {
+    const h = harness({ branch: [user("review", intent)] });
+    h.classify.mockResolvedValue(gitResult(0.01));
+    await h.run(command);
+    expect(h.classify.mock.calls[0][1].state.command).toBe(command);
+    expect(h.confirm).toHaveBeenCalledOnce();
+    expect(h.decisions()[0].judgment.reason).toBe("uncertain");
+  });
+
+  it.each([0, 0.699999])(
+    "still auto-approves authorized state changes at read_only=%s",
+    async (score) => {
+      const h = harness({ branch: [user("stage", "Stage src/api.ts. Do not commit.")] });
+      h.classify.mockResolvedValue(gitResult(score, 0.99, 0.99, 0.01));
+      expect(await h.run("git add src/api.ts")).toBeUndefined();
+      expect(h.confirm).not.toHaveBeenCalled();
+      expect(h.decisions()[0].judgment).toMatchObject({
+        action: "allow",
+        reason: "approved",
+        probabilities: { read_only: score },
+      });
+    },
+  );
+
+  it("does not treat a read-only score just below the threshold as approval", async () => {
+    const h = harness();
+    h.classify.mockResolvedValue(gitResult(0.699999));
+    await h.run("git stash list");
+    expect(h.confirm).toHaveBeenCalledOnce();
+    expect(h.decisions()[0].judgment.reason).toBe("uncertain");
+  });
+
+  it("still validates authorization answers on the non-read-only branch", async () => {
+    const h = harness();
+    const response = gitResult(0.01, 0.99, 0.99, 0.01);
+    delete response.answers.scope_covered;
+    h.classify.mockResolvedValue(response);
+    await h.run("git add src/api.ts");
+    expect(h.confirm).toHaveBeenCalledOnce();
+    expect(h.decisions()[0].judgment.reason).toBe("invalid-response");
+  });
+
+  it("asks for non-read-only Git without intent even if authorization answers are high", async () => {
+    const h = harness({ branch: [] });
+    h.classify.mockResolvedValue(gitResult(0.01, 0.99, 0.99, 0.01));
+    await h.run("git add src/api.ts");
+    expect(h.confirm).toHaveBeenCalledOnce();
+    expect(h.decisions()[0].judgment.reason).toBe("missing-intent");
+  });
+
+  it.each([
+    undefined,
+    null,
+    { type: "score", score: 1, confidence: 1 },
+    { type: "bool" },
+    { type: "bool", probability: NaN },
+    { type: "bool", probability: Infinity },
+    { type: "bool", probability: -0.01 },
+    { type: "bool", probability: 1.01 },
+    { type: "bool", probability: "0.99" },
+  ])("asks for malformed Git read_only: %j", async (answer) => {
+    const h = harness();
+    const response = result();
+    response.answers.read_only = answer as unknown as ClassifierResult["answers"][string];
+    h.classify.mockResolvedValue(response);
+    await h.run("git stash list");
+    expect(h.confirm).toHaveBeenCalledOnce();
+    expect(h.decisions()[0].judgment.reason).toBe("invalid-response");
+  });
+
+  it.each(["error", "aborted"] as const)(
+    "does not trust read_only on provider stopReason=%s",
+    async (stopReason) => {
+      const h = harness();
+      h.classify.mockResolvedValue({ ...gitResult(0.99), stopReason });
+      await h.run("git stash list");
+      expect(h.confirm).toHaveBeenCalledOnce();
+      expect(h.decisions()[0].judgment.reason).toBe("unavailable");
+    },
+  );
+
+  it.each([
+    "git stash list; rm -rf /repo/data",
+    "git stash list; sudo true",
+    "git stash list >/dev/sda",
+  ])("does not apply the read-only bypass to mixed rules: %s", async (command) => {
+    const h = harness();
+    h.classify.mockResolvedValue(gitResult(0.99));
+    await h.run(command);
+    expect(h.classify.mock.calls[0][1].questions).toBe(GATE_QUESTIONS);
+    expect(h.confirm).toHaveBeenCalledOnce();
+    expect(h.decisions()[0].judgment.reason).toBe("uncertain");
+  });
+
+  it("retains manual confirmation with Jev disabled", async () => {
+    const h = harness();
+    await h.gate("jev off");
+    await h.run(inspection);
+    expect(h.classify).not.toHaveBeenCalled();
+    expect(h.confirm).toHaveBeenCalledOnce();
+  });
+
+  it("adds a whole-command read-only question to generic authorization", () => {
+    for (const [key, question] of Object.entries(GATE_QUESTIONS)) {
+      expect(GIT_QUESTIONS[key]).toBe(question);
+    }
+    expect(Object.keys(GIT_QUESTIONS)).toEqual(["read_only", ...Object.keys(GATE_QUESTIONS)]);
+    expect(GIT_QUESTIONS.read_only.instructions).toContain("ENTIRE command");
+    expect(GIT_QUESTIONS.read_only.instructions).toContain("index stat-cache refreshes");
+  });
 });
 
 describe("Permission Gate Jev branch authorization and full input", () => {

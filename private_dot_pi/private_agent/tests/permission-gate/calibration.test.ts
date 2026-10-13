@@ -23,6 +23,7 @@ import {
   AUTO_APPROVE_THRESHOLD,
   GATE_MODEL,
   GATE_QUESTIONS,
+  GIT_QUESTIONS,
   QUESTION_VERSION,
   type GateJudgment,
 } from "../../extensions/permission-gate/jev.ts";
@@ -97,10 +98,11 @@ describe.skipIf(!LIVE)("Permission Gate live Jev calibration (text only)", () =>
           model: GATE_MODEL,
           questionVersion: QUESTION_VERSION,
           questionsSha256: createHash("sha256")
-            .update(JSON.stringify(GATE_QUESTIONS))
+            .update(JSON.stringify({ authorization: GATE_QUESTIONS, git: GIT_QUESTIONS }))
             .digest("hex"),
           repeats: REPEATS,
           thresholds: {
+            read_only: AUTO_APPROVE_THRESHOLD,
             intent_covered: AUTO_APPROVE_THRESHOLD,
             scope_covered: AUTO_APPROVE_THRESHOLD,
             effects_covered: AUTO_APPROVE_THRESHOLD,

@@ -45,7 +45,15 @@ export default function registerBashChecks(
       isValid: sameAuthorization,
       canRecord: sameSession,
       classify: isJevEnabled()
-        ? () => judgeCommand(ctx.modelRegistry, command, user?.text ?? "", ctx.cwd, signal)
+        ? () =>
+            judgeCommand(
+              ctx.modelRegistry,
+              command,
+              user?.text ?? "",
+              ctx.cwd,
+              signal,
+              rules.length === 1 && rules[0] === "git",
+            )
         : undefined,
       questionVersion: QUESTION_VERSION,
       rules,
