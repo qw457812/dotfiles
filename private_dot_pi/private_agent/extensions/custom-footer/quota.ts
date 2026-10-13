@@ -394,8 +394,7 @@ async function getDailyFirepassUsage(): Promise<FirepassUsage> {
             if (!entryTs) continue;
             const entryDate = toLocalDayKey(new Date(entryTs));
             if (entryDate === today) {
-              // Pi preserves entry IDs and timestamps when copying fork/branch history.
-              // Include the timestamp because entry IDs are short and only unique per session.
+              // Forked history must not inflate daily usage; timestamps distinguish short-ID collisions across sessions.
               if (typeof entry.id === "string" && entry.id) {
                 const key = JSON.stringify([entry.id, entryTs]);
                 if (seenEntries.has(key)) continue;

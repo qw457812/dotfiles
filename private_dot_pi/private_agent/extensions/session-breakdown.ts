@@ -548,7 +548,11 @@ async function walkSessionFiles(
 	return out;
 }
 
-async function parseSessionFile(filePath: string, signal?: AbortSignal): Promise<ParsedSession | null> {
+async function parseSessionFile(
+	filePath: string,
+	seenMessages: Set<string>,
+	signal?: AbortSignal,
+): Promise<ParsedSession | null> {
 	const fileName = path.basename(filePath);
 	let startedAt = parseSessionStartFromFilename(fileName);
 	let currentModel: ModelKey | null = null;
@@ -625,6 +629,14 @@ async function parseSessionFile(filePath: string, signal?: AbortSignal): Promise
 			}
 			const role = obj?.message?.role ?? obj?.role;
 			if (explicitMk || role === "assistant") modelsUsed.add(mk);
+
+			// Forks are distinct sessions, but their copied history must not inflate message or usage totals.
+			const timestamp = obj.timestamp ?? obj.message?.timestamp;
+			if (typeof obj.id === "string" && obj.id && timestamp != null) {
+				const key = JSON.stringify([obj.id, timestamp]);
+				if (seenMessages.has(key)) continue;
+				seenMessages.add(key);
+			}
 
 			messages += 1;
 			messagesByModel.set(mk, (messagesByModel.get(mk) ?? 0) + 1);
@@ -1396,7 +1408,7 @@ function rangeSummary(range: RangeAgg, days: number, mode: MeasurementMode): str
 	return `Last ${days} days: ${formatCount(range.sessions)} sessions · ${costPart}`;
 }
 
-async function computeBreakdown(
+export async function computeBreakdown(
 	signal?: AbortSignal,
 	onProgress?: (update: Partial<BreakdownProgressState>) => void,
 ): Promise<BreakdownData> {
@@ -1412,6 +1424,13 @@ async function computeBreakdown(
 		onProgress?.({ phase: "scan", foundFiles: found });
 	});
 
+	// Shared history should count toward the original session's cwd/day, not a fork's.
+	candidates.sort((a, b) => {
+		const aTime = parseSessionStartFromFilename(path.basename(a))?.getTime() ?? Infinity;
+		const bTime = parseSessionStartFromFilename(path.basename(b))?.getTime() ?? Infinity;
+		return aTime - bTime || a.localeCompare(b);
+	});
+
 	const totalFiles = candidates.length;
 	onProgress?.({
 		phase: "parse",
@@ -1422,12 +1441,13 @@ async function computeBreakdown(
 	});
 
 	let parsedFiles = 0;
+  const seenMessages = new Set<string>();
 	for (const filePath of candidates) {
 		if (signal?.aborted) break;
 		parsedFiles += 1;
 		onProgress?.({ phase: "parse", parsedFiles, totalFiles, currentFile: path.basename(filePath) });
 
-		const session = await parseSessionFile(filePath, signal);
+		const session = await parseSessionFile(filePath, seenMessages, signal);
 		if (!session) continue;
 
 		const sessionDay = localMidnight(session.startedAt);
