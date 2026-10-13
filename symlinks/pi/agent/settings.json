@@ -157,6 +157,7 @@
     "git:github.com/monotykamary/pi-vision-handoff",
     "git:github.com/patlux/pi-commandcode-provider",
     "npm:@charmland/pi-hyper-provider",
+    "npm:pi-provider-kiro",
     "npm:@99percentpeople/pi-codex-api",
     "npm:@injaneity/pi-computer-use",
     "git:github.com/qw457812/pi-voice@termux"

@@ -1,5 +1,4 @@
-import type { OAuthCredentials } from "@earendil-works/pi-ai";
-import { getAgentDir } from "@earendil-works/pi-coding-agent";
+import { getAgentDir, type ModelRegistry } from "@earendil-works/pi-coding-agent";
 import type { TUI } from "@earendil-works/pi-tui";
 import { createReadStream, type Dirent } from "node:fs";
 import { mkdir, readdir, readFile, stat, writeFile } from "node:fs/promises";
@@ -170,24 +169,25 @@ interface CommandCodeQuota {
   } | null;
 }
 
-type CodebuddyOAuthCredentials = {
-  enterpriseId?: string;
-} & OAuthCredentials;
+interface CodebuddyQuotaAuth {
+  access: string;
+  enterpriseId: string;
+}
 
-// https://github.com/mikeyobrien/pi-provider-kiro/blob/77366aa27d76cdaa2a6d712a61120657788c4b06/src/usage.ts
+// https://github.com/mikeyobrien/pi-provider-kiro/blob/0899ed9c823e3bea592f642472f134f4439e4fee/src/usage.ts
 interface KiroQuota {
-  usageBreakdownList?: Array<{
-    currentUsage: number;
-    currentUsageWithPrecision?: number;
-    usageLimit: number;
-    usageLimitWithPrecision?: number;
-    nextDateReset?: number | string;
+  usageBreakdownList: Array<{
+    currentUsageWithPrecision: number;
+    usageLimitWithPrecision: number;
+    nextDateReset: number;
   }>;
 }
 
-type KiroOAuthCredentials = {
-  region?: string;
-} & OAuthCredentials;
+interface KiroQuotaAuth {
+  access: string;
+  region: string;
+  profileArn: string;
+}
 
 // Fire Pass V2 is unlimited
 interface FirepassUsage {
@@ -202,14 +202,14 @@ interface CachedValue<T> {
 
 interface SourceConfig<T, A = string> {
   cacheTtlMs: number;
-  getAuth: () => Promise<A | null>;
+  getAuth: (modelRegistry: ModelRegistry) => Promise<A | null>;
   fetch: (auth: A) => Promise<T | null>;
   format: (quota: T, theme: Theme) => string | null;
 }
 
 interface Source {
   get(theme: Theme): string | null;
-  refresh(tui: TUI): Promise<void>;
+  refresh(tui: TUI, modelRegistry: ModelRegistry): Promise<void>;
 }
 
 function fresh<T>(cache: CachedValue<T> | null, ttlMs: number): CachedValue<T> | null {
@@ -417,7 +417,7 @@ function createSource<T, A = string>(provider: string, config: SourceConfig<T, A
   let nextRetryAt = 0;
   let retryDelayMs = BASE_RETRY_DELAY_MS;
 
-  async function load(): Promise<CachedValue<T> | null> {
+  async function load(modelRegistry: ModelRegistry): Promise<CachedValue<T> | null> {
     const cached =
       fresh(cache, config.cacheTtlMs) ?? (await readCache<T>(provider, config.cacheTtlMs));
     if (cached) {
@@ -426,7 +426,7 @@ function createSource<T, A = string>(provider: string, config: SourceConfig<T, A
       return cached;
     }
 
-    const auth = await config.getAuth();
+    const auth = await config.getAuth(modelRegistry);
     if (!auth) {
       nextRetryAt = Date.now() + BASE_RETRY_DELAY_MS;
       retryDelayMs = BASE_RETRY_DELAY_MS;
@@ -457,7 +457,7 @@ function createSource<T, A = string>(provider: string, config: SourceConfig<T, A
       const cached = fresh(cache, config.cacheTtlMs);
       return cached ? config.format(cached.value, theme) : null;
     },
-    async refresh(tui: TUI): Promise<void> {
+    async refresh(tui: TUI, modelRegistry: ModelRegistry): Promise<void> {
       if (fetching || fresh(cache, config.cacheTtlMs)) {
         return;
       }
@@ -467,7 +467,7 @@ function createSource<T, A = string>(provider: string, config: SourceConfig<T, A
 
       fetching = true;
       try {
-        const next = await load();
+        const next = await load(modelRegistry);
         if (!next) {
           return;
         }
@@ -517,9 +517,9 @@ const sources: Record<string, Source> = {
   }),
   "openai-codex": createSource("openai-codex", {
     cacheTtlMs: MINUTE_MS,
-    async getAuth(): Promise<string | null> {
+    async getAuth(modelRegistry): Promise<string | null> {
       // curl -s -H "Authorization: Bearer $(cat ~/.codex/auth.json | jq -r '.tokens.access_token')" "https://chatgpt.com/backend-api/wham/usage" | jq .
-      return (await readAuth<{ access?: string }>("openai-codex"))?.access ?? null;
+      return (await modelRegistry.getApiKeyForProvider("openai-codex")) ?? null;
     },
     async fetch(token: string): Promise<CodexQuota | null> {
       const quota = await fetchJson<CodexQuota["quota"]>(
@@ -812,14 +812,21 @@ const sources: Record<string, Source> = {
       );
     },
   }),
-  codebuddy: createSource<CodebuddyQuota, CodebuddyOAuthCredentials>("codebuddy", {
+  codebuddy: createSource<CodebuddyQuota, CodebuddyQuotaAuth>("codebuddy", {
     cacheTtlMs: MINUTE_MS,
-    async getAuth(): Promise<CodebuddyOAuthCredentials | null> {
-      return await readAuth<CodebuddyOAuthCredentials>("codebuddy");
+    async getAuth(modelRegistry): Promise<CodebuddyQuotaAuth | null> {
+      try {
+        const authResult = await modelRegistry.getProviderAuth("codebuddy");
+        const access = authResult?.auth.apiKey;
+        const enterpriseId = Object.entries(authResult?.auth.headers ?? {}).find(
+          ([name]) => name.toLowerCase() === "x-enterprise-id",
+        )?.[1];
+        return access && enterpriseId ? { access, enterpriseId } : null;
+      } catch {
+        return null;
+      }
     },
     async fetch(auth): Promise<CodebuddyQuota | null> {
-      if (!auth.enterpriseId) return null;
-
       try {
         // https://www.codebuddy.cn/profile/usage
         const resp = await fetch(
@@ -877,58 +884,66 @@ const sources: Record<string, Source> = {
       return theme.fg("accent", `$${formatDecimal(quota.balance, 2)}`);
     },
   }),
-  kiro: createSource<KiroQuota, KiroOAuthCredentials>("kiro", {
+  kiro: createSource<KiroQuota, KiroQuotaAuth>("kiro", {
     cacheTtlMs: MINUTE_MS,
-    async getAuth(): Promise<KiroOAuthCredentials | null> {
-      return await readAuth<KiroOAuthCredentials>("kiro");
+    async getAuth(modelRegistry): Promise<KiroQuotaAuth | null> {
+      const access = await modelRegistry.getApiKeyForProvider("kiro");
+      if (!access) return null;
+      // Read provider metadata only after Pi has refreshed the stored credential.
+      const stored = await readAuth<{ region?: string; profileArn?: string }>("kiro");
+      if (!stored?.region || !stored.profileArn) return null;
+      return { access, region: stored.region, profileArn: stored.profileArn };
     },
+    // https://github.com/mikeyobrien/pi-provider-kiro/blob/0899ed9c823e3bea592f642472f134f4439e4fee/src/management.ts#L340-L366
     async fetch(auth): Promise<KiroQuota | null> {
       try {
-        const region = auth.region || "us-east-1";
-        const resp = await fetch(`https://q.${region}.amazonaws.com/`, {
-          method: "POST",
+        const url = new URL(`https://management.${auth.region}.kiro.dev/Get-Usage-Limits`);
+        url.search = new URLSearchParams({
+          profileArn: auth.profileArn,
+          origin: "KIRO_CLI",
+          resourceType: "CREDIT",
+          isEmailRequired: "false",
+        }).toString();
+        const resp = await fetch(url, {
+          method: "GET",
           signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
           headers: {
-            "Content-Type": "application/x-amz-json-1.0",
+            Accept: "application/json",
             Authorization: `Bearer ${auth.access}`,
-            "X-Amz-Target": "AmazonCodeWhispererService.GetUsageLimits",
           },
-          body: JSON.stringify({ origin: "CLI", resourceType: "CREDIT" }),
         });
         if (!resp.ok) return null;
-        return (await resp.json()) as KiroQuota;
+        const quota = (await resp.json()) as KiroQuota;
+        return Array.isArray(quota?.usageBreakdownList) ? quota : null;
       } catch {
         return null;
       }
     },
     format(quota: KiroQuota, theme: Theme): string | null {
       return joinParts(
-        (quota.usageBreakdownList ?? []).map((b) => {
-          const used = b.currentUsageWithPrecision ?? b.currentUsage;
-          const limit = b.usageLimitWithPrecision ?? b.usageLimit;
-          const resetAt = b.nextDateReset;
-          return joinParts([
-            `${theme.fg("accent", formatDecimal(used, 2))}${theme.fg("dim", `/${formatDecimal(limit, 2)}`)}`,
-            resetAt
-              ? theme.fg(
-                  "dim",
-                  formatRemaining(typeof resetAt === "number" ? resetAt * 1000 : resetAt),
-                )
-              : null,
-          ]);
-        }),
+        quota.usageBreakdownList.map((b) =>
+          joinParts([
+            `${theme.fg("accent", formatDecimal(b.currentUsageWithPrecision, 2))}${theme.fg("dim", `/${formatDecimal(b.usageLimitWithPrecision, 2)}`)}`,
+            theme.fg("dim", formatRemaining(b.nextDateReset * 1000)),
+          ]),
+        ),
       );
     },
   }),
 };
 
-export function getQuota(provider: string | undefined, tui: TUI, theme: Theme): string | null {
+export function getQuota(
+  provider: string | undefined,
+  tui: TUI,
+  theme: Theme,
+  modelRegistry: ModelRegistry,
+): string | null {
   const source = provider ? sources[provider] : null;
   if (!source) {
     return null;
   }
 
   const quota = source.get(theme);
-  void source.refresh(tui);
+  void source.refresh(tui, modelRegistry);
   return quota;
 }

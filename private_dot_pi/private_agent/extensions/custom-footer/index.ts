@@ -135,6 +135,7 @@ export default function (pi: ExtensionAPI) {
             ctx.model?.api === "pi-virtual" ? routed?.provider : ctx.model?.provider,
             tui,
             theme,
+            ctx.modelRegistry,
           );
           if (quota) {
             statsParts.push(quota);
