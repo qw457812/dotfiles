@@ -1,3 +1,5 @@
+// oxlint-disable no-unused-vars
+
 // Copied from: https://github.com/mitsuhiko/agent-stuff/blob/0865c849befd2021490679f96a8dee58c84ac857/extensions/session-breakdown.ts
 
 /**
