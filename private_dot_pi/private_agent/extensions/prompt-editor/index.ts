@@ -39,7 +39,7 @@ const TERMUX_CLIPBOARD_GET = "termux-clipboard-get";
 const TERMUX_CLIPBOARD_SET = "termux-clipboard-set";
 const CLIPBOARD_READ_MAX_BUFFER_BYTES = 1024 * 1024;
 const CLIPBOARD_WRITE_ABORTED_MESSAGE = "clipboard write aborted";
-const CLIPBOARD_COMMAND_TIMEOUT_MS = 1000;
+const CLIPBOARD_COMMAND_TIMEOUT_MS = 3000;
 const COMMAND_EXISTS_TIMEOUT_MS = 1000;
 // pi-vim mirrors these because Pi does not expose its builtin interactive
 // command registry. Keep this list aligned with pi-vim's EX_BUILTIN_COMMAND_NAMES.

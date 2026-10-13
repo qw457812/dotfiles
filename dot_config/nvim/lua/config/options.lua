@@ -101,6 +101,32 @@ vim.g.loaded_node_provider = 0
 if vim.g.user_is_termux then
   opt.swapfile = false
 
+  -- Keep unnamedplus sync without waiting indefinitely for Termux:API.
+  -- Builtin Termux commands (Neovim v0.12.6):
+  -- https://github.com/neovim/neovim/blob/779c36969e31080503be2dfccbcc3f999e289606/runtime/autoload/provider/clipboard.vim#L156-L162
+  -- 3s timeout precedents: Termux uses it for clipboard-set; x-cmd uses it for get and set.
+  -- https://github.com/termux/termux-tools/blob/f5865c30a6a32346217cbb3bcfc70080a9fb7c9e/scripts/termux-info.in#L161-L162
+  -- https://github.com/x-cmd/x-cmd/blob/4529288ac227a66da44aac2fa90c5b52b5e368a4/mod/pb/lib/main#L34
+  -- https://github.com/x-cmd/x-cmd/blob/4529288ac227a66da44aac2fa90c5b52b5e368a4/mod/pb/lib/main#L71
+  -- Another Termux clipboard implementation uses 5s for copy:
+  -- https://github.com/can1357/oh-my-pi/blob/74df786d4586e2882b107bc963764601b71bfe0b/packages/coding-agent/src/utils/clipboard.ts#L134
+  if vim.fn.executable("timeout") == 1 and vim.fn.executable("termux-clipboard-set") == 1 then
+    vim.g.clipboard = {
+      name = "termux-clipboard (bounded)",
+      copy = {
+        ["+"] = { "timeout", "-k", "1s", "3s", "termux-clipboard-set" },
+        ["*"] = { "timeout", "-k", "1s", "3s", "termux-clipboard-set" },
+      },
+      paste = {
+        ["+"] = { "timeout", "-k", "1s", "3s", "termux-clipboard-get" },
+        ["*"] = { "timeout", "-k", "1s", "3s", "termux-clipboard-get" },
+      },
+      -- Match the builtin default to preserve asynchronous copy and caching.
+      -- https://github.com/neovim/neovim/blob/779c36969e31080503be2dfccbcc3f999e289606/runtime/autoload/provider/clipboard.vim#L177
+      cache_enabled = 1,
+    }
+  end
+
   -- FIXME: PREFIX is not set in Pi just-bash sandbox (when `/skill:lazy-update-review`)
   -- https://github.com/qw457812/dotfiles/blob/481cd77492094ee91199d0f21afb9c0dc53e12fb/.pi/skills/lazy-update-review/scripts/dump-plugin-state.lua
   -- https://github.com/qw457812/dotfiles/blob/04037799adf20f008d2971303f642e1cf6ad102c/private_dot_pi/private_agent/extensions/sandbox/just-bash-ops.ts
