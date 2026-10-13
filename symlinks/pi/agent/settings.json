@@ -1,8 +1,9 @@
 {
+  "$schema": "https://pi.dev/schemas/settings.schema.json",
   "lastChangelogVersion": "1.2.0",
-  "defaultProvider": "openai-codex",
-  "defaultModel": "gpt-6.1-sol",
-  "defaultThinkingLevel": "medium",
+  "defaultProvider": "codebuddy",
+  "defaultModel": "step-5-preview",
+  "defaultThinkingLevel": "high",
   "hideThinkingBlock": true,
   "quietStartup": true,
   "showHardwareCursor": true,
@@ -31,6 +32,7 @@
     "commandcode/deepseek/deepseek-v4.1-flash",
     "codebuddy/glm-5.3-flash",
     "codebuddy/deepseek-v4.1-flash",
+    "codebuddy/step-5-preview",
     "jev/auto"
   ],
   "modelThinkingLevels": {

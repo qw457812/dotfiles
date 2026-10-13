@@ -63,6 +63,7 @@ const ALIASES: Record<string, ModelTarget | readonly ModelTarget[]> = {
   hyper: { provider: "hyper", id: "glm-5.3-flash" },
   coral: { provider: "coralbricks", id: "deepseek-v4.1-flash-fast" },
   auto: { provider: "jev", id: "auto" },
+  free: { provider: "codebuddy", id: "step-5-preview" },
 };
 
 const ALL_LEVELS: ModelThinkingLevel[] = [

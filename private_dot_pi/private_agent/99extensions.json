@@ -5,9 +5,10 @@
     "searchEnabled": false,
     "imageEnabled": false,
     "askEnabled": false,
-    "allowOtherProviders": false,
+    "allowOtherProviders": true,
     "searchMode": "auto",
     "searchContextSize": "medium",
+    "imageModel": "gpt-image-2.5-flare",
     "imageQuality": "auto",
     "usageStatus": false,
     "usagePollInterval": 0
