@@ -213,7 +213,7 @@ interface Source {
 }
 
 function fresh<T>(cache: CachedValue<T> | null, ttlMs: number): CachedValue<T> | null {
-  if (!cache || Date.now() - cache.updatedAt >= ttlMs) {
+  if (!cache || !Number.isFinite(cache.updatedAt) || Date.now() - cache.updatedAt >= ttlMs) {
     return null;
   }
 
@@ -247,7 +247,8 @@ function cachePath(provider: string): string {
 }
 
 async function readCache<T>(provider: string, ttlMs: number): Promise<CachedValue<T> | null> {
-  return fresh(await readJson<CachedValue<T>>(cachePath(provider)), ttlMs);
+  const cached = await readJson<CachedValue<T>>(cachePath(provider));
+  return cached?.value ? fresh(cached, ttlMs) : null;
 }
 
 async function writeCache<T>(provider: string, value: T): Promise<void> {
@@ -455,7 +456,13 @@ function createSource<T, A = string>(provider: string, config: SourceConfig<T, A
   return {
     get(theme: Theme): string | null {
       const cached = fresh(cache, config.cacheTtlMs);
-      return cached ? config.format(cached.value, theme) : null;
+      if (!cached) return null;
+      try {
+        return config.format(cached.value, theme);
+      } catch {
+        // A quota formatter must never interrupt terminal rendering.
+        return null;
+      }
     },
     async refresh(tui: TUI, modelRegistry: ModelRegistry): Promise<void> {
       if (fetching || fresh(cache, config.cacheTtlMs)) {
@@ -475,6 +482,9 @@ function createSource<T, A = string>(provider: string, config: SourceConfig<T, A
         cache = next;
         nextRetryAt = 0;
         tui.requestRender();
+      } catch {
+        nextRetryAt = Date.now() + retryDelayMs;
+        retryDelayMs = Math.min(retryDelayMs * 2, MAX_RETRY_DELAY_MS);
       } finally {
         fetching = false;
       }

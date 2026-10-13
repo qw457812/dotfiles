@@ -8,7 +8,7 @@ vi.mock("node:fs/promises", () => ({
   writeFile: vi.fn(),
 }));
 
-import { readFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 
 const theme = { fg: (_color: string, text: string) => text };
 
@@ -35,12 +35,120 @@ async function fixture() {
   };
 }
 
+const validSynthetic = {
+  rollingFiveHourLimit: { max: 100, remaining: 80, nextTickAt: "2030-01-01" },
+  weeklyTokenLimit: { percentRemaining: 70, nextRegenAt: "2030-01-01" },
+};
+
+describe("custom footer quota validation", () => {
+  beforeEach(() => {
+    vi.resetModules();
+    vi.mocked(readFile).mockReset().mockRejectedValue(new Error("No cache"));
+    vi.mocked(writeFile).mockClear();
+    vi.stubEnv("SYNTHETIC_API_KEY", "test-token");
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
+  });
+
+  it("hides a response missing Synthetic weekly quota", async () => {
+    const f = await fixture();
+    f.fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        rollingFiveHourLimit: validSynthetic.rollingFiveHourLimit,
+      }),
+    });
+    f.get("synthetic");
+    await vi.waitFor(() => expect(f.requestRender).toHaveBeenCalled());
+    expect(() => f.get("synthetic")).not.toThrow();
+    expect(f.get("synthetic")).toBeNull();
+  });
+
+  it.each([
+    ["synthetic", []],
+    ["synthetic", 1],
+    ["github-copilot", { quota_snapshots: {} }],
+    ["zai", { data: { limits: {} } }],
+    ["openai-codex", { quota: { rate_limit: {} }, reset: { credits: [null] } }],
+    ["kiro", { usageBreakdownList: [null] }],
+  ])("hides malformed %s cached quota without interrupting rendering", async (provider, value) => {
+    const f = await fixture();
+    vi.mocked(readFile).mockResolvedValue(JSON.stringify({ value, updatedAt: Date.now() }));
+    f.get(provider as string);
+    await vi.waitFor(() => expect(f.requestRender).toHaveBeenCalled());
+    expect(() => f.get(provider as string)).not.toThrow();
+    expect(f.get(provider as string)).toBeNull();
+  });
+
+  it.each([
+    null,
+    [],
+    {},
+    { value: validSynthetic },
+    { value: validSynthetic, updatedAt: "now" },
+    { value: validSynthetic, updatedAt: Date.now() - 3600000 },
+    { value: null, updatedAt: Date.now() },
+  ])("ignores invalid cache and replaces it with a valid response: %j", async (cached) => {
+    const f = await fixture();
+    vi.mocked(readFile).mockResolvedValue(JSON.stringify(cached));
+    f.fetchMock.mockResolvedValue({ ok: true, json: async () => validSynthetic });
+    f.get("synthetic");
+    await vi.waitFor(() => expect(f.requestRender).toHaveBeenCalled());
+    expect(f.fetchMock).toHaveBeenCalledTimes(1);
+    expect(writeFile).toHaveBeenCalledTimes(1);
+    expect(f.get("synthetic")).toMatch(/^20\/100\//);
+  });
+
+  it("accepts valid cache with extra fields without requesting auth or fetching", async () => {
+    const f = await fixture();
+    vi.mocked(readFile).mockResolvedValue(
+      JSON.stringify({
+        value: { ...validSynthetic, unrelated: { anything: true } },
+        updatedAt: Date.now(),
+      }),
+    );
+    f.get("synthetic");
+    await vi.waitFor(() => expect(f.requestRender).toHaveBeenCalled());
+    expect(f.fetchMock).not.toHaveBeenCalled();
+    expect(f.get("synthetic")).toMatch(/^20\/100\//);
+  });
+
+  it("isolates formatter errors from TUI rendering", async () => {
+    const f = await fixture();
+    vi.mocked(readFile).mockResolvedValue(
+      JSON.stringify({ value: validSynthetic, updatedAt: Date.now() }),
+    );
+    f.get("synthetic");
+    await vi.waitFor(() => expect(f.requestRender).toHaveBeenCalled());
+    const { getQuota } = await import("../extensions/custom-footer/quota.js");
+    const render = () =>
+      getQuota(
+        "synthetic",
+        { requestRender: f.requestRender } as unknown as TUI,
+        {
+          fg: () => {
+            throw new Error("Formatter failed");
+          },
+        },
+        f.registry as unknown as ModelRegistry,
+      );
+    expect(render).not.toThrow();
+    expect(render()).toBeNull();
+    expect(f.get("synthetic")).toMatch(/^20\/100\//);
+  });
+});
+
 describe("custom footer quota authentication", () => {
   beforeEach(() => {
     vi.resetModules();
     vi.mocked(readFile).mockReset().mockRejectedValue(new Error("No cache"));
   });
-  afterEach(() => vi.unstubAllGlobals());
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
+  });
 
   it("uses Pi's resolved Codex token instead of reading auth.json", async () => {
     const f = await fixture();
