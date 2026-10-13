@@ -17,6 +17,7 @@ export default defineConfig({
     "extensions/loop.ts",
     "extensions/notify.ts",
     "extensions/review.ts",
+    "extensions/session-breakdown.ts",
     "extensions/subagent.ts",
     "extensions/todos.ts",
     "extensions/tools.ts",
