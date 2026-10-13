@@ -193,7 +193,12 @@ return {
         config = function() end,
       },
       -- { "openclaw/Peekaboo", version = "*", lazy = true, config = function() end },
-      { "earendil-works/pi-voice", lazy = true, config = function() end },
+      {
+        "earendil-works/pi-voice",
+        build = "pi install git:github.com/qw457812/pi-voice@termux",
+        lazy = true,
+        config = function() end,
+      },
       -- https://github.com/open-slide/open-slide
       -- https://github.com/lewislulu/html-ppt-skill
       --

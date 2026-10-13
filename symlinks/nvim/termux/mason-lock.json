@@ -17,7 +17,7 @@
   "markdownlint-cli2": "0.23.3",
   "oxfmt": "0.72.0",
   "oxlint": "1.87.0",
-  "prettier": "3.9.9",
+  "prettier": "3.9.10",
   "pyright": "1.1.414",
   "shellcheck": "v0.11.0",
   "shfmt": "v3.14.1",
@@ -27,5 +27,5 @@
   "vscode-spring-boot-tools": "2.2.0",
   "vtsls": "0.3.0",
   "vue-language-server": "3.3.12",
-  "yaml-language-server": "1.24.0"
+  "yaml-language-server": "1.25.0"
 }
