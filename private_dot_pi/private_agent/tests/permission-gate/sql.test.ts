@@ -13,7 +13,7 @@ import {
   SQL_QUESTIONS,
   SQL_QUESTION_VERSION,
 } from "../../extensions/permission-gate/jev.ts";
-import sqlGuard from "../../extensions/permission-gate/sql-guard.ts";
+import registerSqlChecks from "../../extensions/permission-gate/sql.ts";
 
 type Handler = ExtensionHandler<ToolCallEvent, ToolCallEventResult>;
 
@@ -50,7 +50,7 @@ function harness(approved?: boolean, enabled = false) {
     id: "jev-latest",
   }));
   const getSessionId = vi.fn(() => "sql-session");
-  sqlGuard(
+  registerSqlChecks(
     {
       on: (_event: string, callback: Handler) => {
         handler = callback;

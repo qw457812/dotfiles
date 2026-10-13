@@ -18,7 +18,7 @@ import { createHash } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import permissionGate from "../../extensions/permission-gate/index.ts";
 import { withBashTree } from "../../lib/bash-parser.ts";
-import { approvalRules } from "../../extensions/permission-gate/policy.ts";
+import { approvalRules } from "../../extensions/permission-gate/bash-rules.ts";
 import {
   AUTO_APPROVE_THRESHOLD,
   GATE_MODEL,

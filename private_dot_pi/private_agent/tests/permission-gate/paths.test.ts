@@ -1,7 +1,7 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { getAgentDir } from "@earendil-works/pi-coding-agent";
 import { describe, expect, it, vi } from "vitest";
-import pathGuard from "../../extensions/permission-gate/path-guard.ts";
+import registerPathChecks from "../../extensions/permission-gate/paths.ts";
 
 type Handler = (
   event: { toolName: string; input: { path?: string } },
@@ -16,7 +16,7 @@ type Handler = (
 function harness(approved = true, hasUI = true) {
   let handler: Handler | undefined;
   const emit = vi.fn();
-  pathGuard({
+  registerPathChecks({
     on: (_event: string, callback: Handler) => {
       handler = callback;
     },

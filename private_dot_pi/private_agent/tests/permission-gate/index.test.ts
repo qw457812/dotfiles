@@ -27,7 +27,7 @@ import {
   type GateJudgment,
 } from "../../extensions/permission-gate/jev.ts";
 import { latestUserIntent } from "../../extensions/permission-gate/intent.ts";
-import { RULE_LABELS, type GateRule } from "../../extensions/permission-gate/policy.ts";
+import { RULE_LABELS, type GateRule } from "../../extensions/permission-gate/bash-rules.ts";
 
 const MODEL: ClassifierModel<"typesafe-classifier"> = {
   type: "classifier",
@@ -370,6 +370,43 @@ describe("Permission Gate integrated path and SQL guards", () => {
     expect(h.notify).toHaveBeenLastCalledWith(expect.stringContaining("SQL is read-only"), "info");
     expect(h.notify.mock.calls.at(-1)?.[0]).toContain("read_only=0.990");
   });
+
+  it.each(["classification", "confirmation"] as const)(
+    "SQL does not depend on user intent changing during %s",
+    async (phase) => {
+      const h = harness();
+      const classification = deferred<ClassifierResult>();
+      const dialog = deferred<boolean>();
+      h.classify.mockReturnValue(classification.promise);
+      h.confirm.mockReturnValue(dialog.promise);
+      const pending = h.runInput({ sql: "SELECT 1; SELECT 2" }, "mcp__db__execute_sql");
+      await flush();
+      const response = {
+        ...result(),
+        answers: {
+          read_only: {
+            type: "bool" as const,
+            probability: phase === "classification" ? 0.99 : 0.1,
+          },
+        },
+      };
+      if (phase === "confirmation") {
+        classification.resolve(response);
+        await flush();
+        expect(h.confirm).toHaveBeenCalledOnce();
+      }
+      h.branch().push(user("new-user", "Different task"));
+      if (phase === "classification") classification.resolve(response);
+      else dialog.resolve(true);
+      expect(await pending).toBeUndefined();
+      expect(h.getBranch).not.toHaveBeenCalled();
+      expect(h.abort).not.toHaveBeenCalled();
+      expect(h.decisions()[0]).toMatchObject({
+        rules: ["sql"],
+        outcome: phase === "classification" ? "auto-approved" : "user-approved",
+      });
+    },
+  );
 
   it.each([
     "session_start",
@@ -983,6 +1020,31 @@ describe("Permission Gate Jev deadlines, cancellation and concurrency", () => {
     expect(h.confirm).not.toHaveBeenCalled();
   });
 
+  it.each(["session", "intent"] as const)(
+    "captures Bash authorization before parsing can change the %s",
+    async (change) => {
+      const h = harness();
+      const parser = await initializeBashParser();
+      const parse = parser.parse.bind(parser);
+      vi.spyOn(parser, "parse").mockImplementationOnce((...args) => {
+        if (change === "session") h.replaceSession("replacement-session");
+        else h.branch().push(user("replacement-user", "Do not delete anything"));
+        return parse(...args);
+      });
+      expect(await h.run()).toEqual(CANCELLED);
+      expect(h.classify.mock.calls[0][1].state.user_intent).toBe(INTENT);
+      expect(h.confirm).not.toHaveBeenCalled();
+      expect(h.abort).not.toHaveBeenCalled();
+      expect(h.appendEntry).toHaveBeenCalledTimes(change === "intent" ? 1 : 0);
+      if (change === "intent") {
+        expect(h.decisions()[0]).toMatchObject({
+          judgment: { action: "cancelled", reason: "cancelled" },
+          outcome: "cancelled",
+        });
+      }
+    },
+  );
+
   it("does not approve after the latest user message changes during classification", async () => {
     const h = harness();
     const pending = deferred<ClassifierResult>();
@@ -1179,6 +1241,38 @@ describe("Permission Gate Jev logs, commands and headless behavior", () => {
     expect(h.sendMessage).not.toHaveBeenCalled();
     expect(h.sendUserMessage).not.toHaveBeenCalled();
   });
+
+  it.each(["bash", "sql"] as const)(
+    "%s logs classification latency without including time spent confirming",
+    async (tool) => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date(TIMESTAMP));
+      const h = harness();
+      const classification = deferred<ClassifierResult>();
+      const dialog = deferred<boolean>();
+      h.classify.mockReturnValue(classification.promise);
+      h.confirm.mockReturnValue(dialog.promise);
+      const pending =
+        tool === "bash" ? h.run() : h.runInput({ sql: "DROP TABLE data" }, "mcp__db__execute_sql");
+      await flush();
+      await vi.advanceTimersByTimeAsync(125);
+      classification.resolve(
+        tool === "bash"
+          ? result(0.1)
+          : { ...result(), answers: { read_only: { type: "bool", probability: 0.1 } } },
+      );
+      await flush();
+      expect(h.confirm).toHaveBeenCalledOnce();
+      await vi.advanceTimersByTimeAsync(1_000);
+      dialog.resolve(true);
+      expect(await pending).toBeUndefined();
+      expect(h.decisions()[0]).toMatchObject({
+        durationMs: 125,
+        timestamp: new Date(Date.parse(TIMESTAMP) + 1_125).toISOString(),
+        outcome: "user-approved",
+      });
+    },
+  );
 
   it.each(["auto", "manual"])(
     "never caches %s approvals for identical commands",

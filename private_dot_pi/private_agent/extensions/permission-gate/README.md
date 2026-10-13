@@ -2,7 +2,7 @@
 
 An accidental-operation gate for Pi. Local Bash AST rules identify calls that need approval, then Jev decides whether to skip manual confirmation. SQL rules use Jev to identify read-only false positives before asking for confirmation. Write/edit protected paths retain their manual guards. **This is not a security boundary or a comprehensive command-safety checker.**
 
-Pi automatically loads only this directory's `index.ts`, which registers the Bash, Path Guard and SQL Guard handlers. The internal guard files are not separate auto-loaded extensions. Run `/reload` after changes. The extension uses shared libraries and npm dependencies from the agent root; it is not a standalone npm package.
+Pi automatically loads only this directory's `index.ts`, which registers the path, SQL and Bash handlers in that order. The internal modules are not separate auto-loaded extensions. Run `/reload` after changes. The extension uses shared libraries and npm dependencies from the agent root; it is not a standalone npm package.
 
 ## Commands
 
@@ -77,18 +77,22 @@ Protected-path checks remain manual and independent of Jev. Neither switch disab
 
 | File                                                 | Responsibility                                                            |
 | ---------------------------------------------------- | ------------------------------------------------------------------------- |
-| [index.ts](index.ts)                                 | Events, lifecycle, confirmation flow and `/gate` commands                 |
-| [policy.ts](policy.ts)                               | Local AST rules and fixed rule labels                                     |
+| [index.ts](index.ts)                                 | Handler registration, lifecycle, switches and `/gate` commands            |
+| [bash.ts](bash.ts)                                   | Bash input locking, AST matching and session/intent validity              |
+| [bash-rules.ts](bash-rules.ts)                       | Local Bash AST rules and fixed rule labels                                |
+| [sql.ts](sql.ts)                                     | SQL input locking, local rules and session validity                       |
+| [paths.ts](paths.ts)                                 | Manual write/edit protected-path checks                                   |
+| [approval.ts](approval.ts)                           | Shared classification, approval, cancellation and log timing              |
 | [jev.ts](jev.ts)                                     | Questions, request deadlines, response validation and threshold decisions |
 | [intent.ts](intent.ts)                               | Latest ordinary user entry and text extraction                            |
-| [path-guard.ts](path-guard.ts)                       | Manual write/edit protected-path checks                                   |
-| [sql-guard.ts](sql-guard.ts)                         | SQL rules, Jev read-only checks and confirmation                           |
-| [log.ts](log.ts)                                     | Decision-summary format and log display                                   |
-| [../../lib/bash-parser.ts](../../lib/bash-parser.ts) | Shared Bash parser                                                        |
+| [log.ts](log.ts)                                     | Decision-record construction and log display                              |
 | [confirmation.ts](confirmation.ts)                   | Shared confirmation, notification, cancellation and blocking outcomes     |
 | [confirmation-queue.ts](confirmation-queue.ts)       | Confirmation serialization by UI object                                   |
+| [../../lib/bash-parser.ts](../../lib/bash-parser.ts) | Shared Bash parser                                                        |
 
-Gate, Path Guard and SQL Guard share `confirm(pi, ctx, title, message)`, which returns only a confirmation outcome. Notifications use the dialog title and message. `confirmationResult(outcome)` converts outcomes to fixed blocking reasons; guards cannot customize those reasons. Bash retains session/intent validity checks locally; SQL uses session validity without user intent. Both pass the shared instance lifecycle and parent-operation signals through `ctx.signal`. All guards share a confirmation queue. Without UI they block; rejection aborts the operation; cancellation cannot approve a call; dialog or notification errors return a blocking result without exposing error details. Gate's classification work is not serialized by this queue. Third-party UI calls do not necessarily participate. Queue scheduling has automated test coverage; the host TUI's dialog-overwrite risk was established by source analysis, not an end-to-end reproduction.
+Bash and SQL share `requestApproval(pi, ctx, options)`. Their modules retain local matching, input locking and validity predicates: Bash captures its session and latest user before asynchronous parsing, while SQL uses session validity without user intent. Approval validity and permission to record a decision are separate: changed Bash intent cancels the call but can still produce a cancellation entry in the same session; a replaced session/lifecycle never receives the old entry. Both pass the shared instance lifecycle and parent-operation signals to the approval flow. Logs measure classification time, not time spent waiting for confirmation. Disabled Jev and missing SQL skip classification and decision logging.
+
+All three checks share `confirm(pi, ctx, title, message)`, which returns only a confirmation outcome. Notifications use the dialog title and message. `confirmationResult(outcome)` converts outcomes to fixed blocking reasons; callers cannot customize those reasons. All checks share a confirmation queue. Without UI, calls requiring confirmation block; rejection aborts the operation; cancellation cannot approve a call; dialog or notification errors return a blocking result without exposing error details. Classification work is not serialized by this queue. Third-party UI calls do not necessarily participate. Queue scheduling has automated test coverage; the host TUI's dialog-overwrite risk was established by source analysis, not an end-to-end reproduction.
 
 The Bash `command` argument is locked when checks begin. Rewriting it in a later `tool_call` handler fails and Pi blocks execution; extensions that rewrite commands must run before Gate. Other Bash arguments remain mutable. SQL checks similarly lock existing `sql` / `sqlcl` fields; other SQL tool arguments remain mutable.
 
@@ -112,7 +116,7 @@ npm run lint
 npm test
 ```
 
-Relevant tests are grouped in `tests/permission-gate/`: `bash.test.ts` covers local Bash rules, `index.test.ts` covers integrated decisions and lifecycle, `sdk.test.ts` covers real SDK discovery and input, `path-guard.test.ts` covers manual path checks, `sql-guard.test.ts` covers SQL rules/read-only classification/fallbacks, `../mcp.test.ts` covers real MCP direct and nested dispatch, `confirmation.test.ts` covers common confirmation outcomes, `confirmation-queue.test.ts` covers shared scheduling, and `calibration.test.ts` covers synthetic fixtures and opt-in live calibration. The SDK regression uses the real Pi SDK and repository `prompts/commit.md` to exercise directory discovery, single index registration and latest expanded user text, with offline model/classifier stubs and no executable tools. Ordinary tests do not call a live classifier.
+Relevant tests are grouped in `tests/permission-gate/`: `bash.test.ts` covers local Bash rules, `index.test.ts` covers integrated decisions and lifecycle, `sdk.test.ts` covers real SDK discovery and input, `paths.test.ts` covers manual path checks, `sql.test.ts` covers SQL rules/read-only classification/fallbacks, `../mcp.test.ts` covers real MCP direct and nested dispatch, `confirmation.test.ts` covers common confirmation outcomes, `confirmation-queue.test.ts` covers shared scheduling, and `calibration.test.ts` covers synthetic fixtures and opt-in live calibration. The SDK regression uses the real Pi SDK and repository `prompts/commit.md` to exercise directory discovery, single index registration and latest expanded user text, with offline model/classifier stubs and no executable tools. Ordinary tests do not call a live classifier.
 
 Explicitly enable live calibration:
 

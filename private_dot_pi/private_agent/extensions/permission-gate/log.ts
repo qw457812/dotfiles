@@ -1,7 +1,7 @@
-import type { ExtensionContext } from "@earendil-works/pi-coding-agent";
+import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import type { ConfirmationOutcome } from "./confirmation.ts";
-import { REASON_LABELS, type GateJudgment } from "./jev.ts";
-import { RULE_LABELS, type GateRule } from "./policy.ts";
+import { GATE_MODEL, REASON_LABELS, type GateJudgment } from "./jev.ts";
+import { RULE_LABELS, type GateRule } from "./bash-rules.ts";
 
 export const GATE_ENTRY = "permission-gate-decision";
 
@@ -15,6 +15,22 @@ export interface GateRecord {
   judgment: GateJudgment;
   durationMs: number;
   outcome: Outcome;
+}
+
+export function recordDecision(
+  pi: ExtensionAPI,
+  decision: Omit<GateRecord, "version" | "timestamp" | "model">,
+) {
+  pi.appendEntry<GateRecord>(GATE_ENTRY, {
+    version: 1,
+    questionVersion: decision.questionVersion,
+    timestamp: new Date().toISOString(),
+    model: `${GATE_MODEL.provider}/${GATE_MODEL.id}`,
+    rules: decision.rules,
+    judgment: decision.judgment,
+    durationMs: decision.durationMs,
+    outcome: decision.outcome,
+  });
 }
 
 export function showLog(ctx: ExtensionContext) {

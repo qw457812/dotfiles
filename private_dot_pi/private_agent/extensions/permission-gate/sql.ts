@@ -1,13 +1,6 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-import { confirm, confirmationResult } from "./confirmation.ts";
-import {
-  GATE_MODEL,
-  REASON_LABELS,
-  SQL_QUESTION_VERSION,
-  judgeSql,
-  type GateJudgment,
-} from "./jev.ts";
-import { GATE_ENTRY, type GateRecord, type Outcome } from "./log.ts";
+import { requestApproval } from "./approval.ts";
+import { REASON_LABELS, SQL_QUESTION_VERSION, judgeSql } from "./jev.ts";
 
 /**
  * SQL Guard Extension
@@ -93,7 +86,7 @@ function sqlConfirmationReason(sql: string): string | undefined {
   }
 }
 
-export default function (
+export default function registerSqlChecks(
   pi: ExtensionAPI,
   isJevEnabled: () => boolean,
   getLifetime: () => AbortSignal,
@@ -126,51 +119,19 @@ export default function (
     const signal = ctx.signal ? AbortSignal.any([lifetime, ctx.signal]) : lifetime;
     const sessionId = ctx.sessionManager.getSessionId();
     const sameSession = () => !lifetime.aborted && ctx.sessionManager.getSessionId() === sessionId;
-    const current = () => !signal.aborted && sameSession();
-    const classified = !!sql && isJevEnabled();
-    const started = Date.now();
-    let judgment: GateJudgment = { action: "ask", reason: "disabled" };
-    if (classified) judgment = await judgeSql(ctx.modelRegistry, sql, event.toolName, signal);
-    const durationMs = Date.now() - started;
-    const record = (outcome: Outcome) => {
-      if (!classified || !sameSession()) return;
-      pi.appendEntry<GateRecord>(GATE_ENTRY, {
-        version: 1,
-        questionVersion: SQL_QUESTION_VERSION,
-        timestamp: new Date().toISOString(),
-        model: `${GATE_MODEL.provider}/${GATE_MODEL.id}`,
-        rules: ["sql"],
-        judgment,
-        durationMs,
-        outcome,
-      });
-    };
-    const cancelled = () => {
-      judgment = { action: "cancelled", reason: "cancelled" };
-      record("cancelled");
-      return confirmationResult("cancelled");
-    };
-    if (!current() || judgment.action === "cancelled") return cancelled();
-    if (judgment.action === "allow") {
-      record("auto-approved");
-      return;
-    }
-    const outcome = await confirm(
-      pi,
-      {
-        ...ctx,
-        signal,
-        abort: () => {
-          if (current()) ctx.abort();
-        },
-      },
-      "⚠️ SQL Guard",
-      `${reason}${sql ? `\n${REASON_LABELS[judgment.reason]}` : ""}\n\nTool: ${event.toolName}\n\nInput:\n${JSON.stringify(input, null, 2)}`,
-    );
-    // A genuine denial aborts its own signal, but a replaced session is cancellation.
-    if (!sameSession() || outcome === "cancelled" || (outcome !== "user-denied" && signal.aborted))
-      return cancelled();
-    record(outcome);
-    return confirmationResult(outcome);
+    return requestApproval(pi, ctx, {
+      signal,
+      isValid: sameSession,
+      canRecord: sameSession,
+      classify:
+        sql && isJevEnabled()
+          ? () => judgeSql(ctx.modelRegistry, sql, event.toolName, signal)
+          : undefined,
+      questionVersion: SQL_QUESTION_VERSION,
+      rules: ["sql"],
+      title: "⚠️ SQL Guard",
+      message: (judgment) =>
+        `${reason}${sql ? `\n${REASON_LABELS[judgment.reason]}` : ""}\n\nTool: ${event.toolName}\n\nInput:\n${JSON.stringify(input, null, 2)}`,
+    });
   });
 }
