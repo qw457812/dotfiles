@@ -243,7 +243,7 @@ export default function (pi: ExtensionAPI) {
 
   // Set custom footer on startup
   pi.on("session_start", (_event, ctx) => {
-    sessionStart = Date.now();
+    sessionStart = new Date(ctx.sessionManager.getHeader()?.timestamp ?? Date.now()).getTime();
 
     tpsTracker.onSessionStart();
     toolCounter.onSessionStart(ctx);
