@@ -102,7 +102,7 @@
   "orgmode": { "branch": "master", "commit": "77c1f50b37a569e7188933693a709831373fa3c8" },
   "pantran.nvim": { "branch": "main", "commit": "b87c3ae48cba4659587fb75abd847e5b7a7c9ca0" },
   "persistence.nvim": { "branch": "main", "commit": "b20b2a7887bd39c1a356980b45e03250f3dce49c" },
-  "pi": { "branch": "main", "commit": "abe508e1b89912adde45528136c3221eb69acdd7" },
+  "pi": { "branch": "main", "commit": "06a466935536f8c9bcacb2d5efc0fc021be1bdff" },
   "pi-agent-colony": { "branch": "main", "commit": "e609f5d5c935079e36c88944252b168ff0907a27" },
   "pi-commandcode-provider": { "branch": "main", "commit": "b61093de3f866fc533f827a25a27bc342e9d678d" },
   "pi-computer-use": { "branch": "main", "commit": "4b8dbd7eaa13328ab1a8a4b55d0be0b077de7d62" },

@@ -68,6 +68,7 @@ function fixture(localFiles = true) {
   } as unknown as ExtensionContext;
   const event = {
     type: "before_agent_start",
+    messageType: "user",
     prompt: "test",
     get systemPrompt() {
       return buildSystemPrompt(options);

@@ -10,13 +10,13 @@ import {
   type ExtensionUIContext,
 } from "@earendil-works/pi-coding-agent";
 import {
-  CURSOR_MARKER,
   Key,
   matchesKey,
   truncateToWidth,
   visibleWidth,
 } from "@earendil-works/pi-tui";
 
+import { renderPromptCursor } from "./cursor.ts";
 import { readMacOSClipboard } from "./macos-clipboard.ts";
 import {
   applyPromptHistory,
@@ -29,8 +29,6 @@ const NORMAL_PREFIX = "❮ ";
 const CONTINUATION_PREFIX = "  ";
 const PREFIX_WIDTH = visibleWidth(INSERT_PREFIX);
 const ANSI_COLOR_RE = /\x1b\[[0-9;]*m/g;
-const SOFTWARE_CURSOR_START = "\x1b[7m";
-const SOFTWARE_CURSOR_RESETS = ["\x1b[0m", "\x1b[27m"] as const;
 const EXTENSION_DIR =
   typeof __dirname === "string" ? __dirname : dirname(fileURLToPath(import.meta.url));
 // pi's extension loader can evaluate TS via jiti, but importing pi-vim directly
@@ -222,48 +220,6 @@ function writeTermuxClipboard(text: string, signal?: AbortSignal): Promise<void>
     });
     child.stdin.end(text);
   });
-}
-
-// Copied from pi-vim and verified against v0.14.1 — findSoftwareCursorReset.
-// https://github.com/lajarre/pi-vim/blob/2671cf11/cursor-shape.ts
-function findSoftwareCursorReset(
-  line: string,
-  startIndex: number,
-): { index: number; sequence: (typeof SOFTWARE_CURSOR_RESETS)[number] } | null {
-  let firstReset: { index: number; sequence: (typeof SOFTWARE_CURSOR_RESETS)[number] } | null =
-    null;
-
-  for (const sequence of SOFTWARE_CURSOR_RESETS) {
-    const index = line.indexOf(sequence, startIndex);
-    if (index === -1) continue;
-    if (!firstReset || index < firstReset.index) {
-      firstReset = { index, sequence };
-    }
-  }
-
-  return firstReset;
-}
-
-// Copied from pi-vim and verified against v0.14.1 — stripSoftwareCursorAfterMarker.
-// https://github.com/lajarre/pi-vim/blob/2671cf11/cursor-shape.ts
-// See also: https://github.com/earendil-works/pi/blob/d06db09a53958e485131527db25c1293f29b9367/packages/tui/src/components/editor.ts#L480-L493
-function stripSoftwareCursorAfterMarker(line: string): string {
-  const markerIndex = line.indexOf(CURSOR_MARKER);
-  if (markerIndex === -1) return line;
-
-  const searchStart = markerIndex + CURSOR_MARKER.length;
-  const cursorStart = line.indexOf(SOFTWARE_CURSOR_START, searchStart);
-  if (cursorStart === -1) return line;
-
-  const cursorContentStart = cursorStart + SOFTWARE_CURSOR_START.length;
-  const reset = findSoftwareCursorReset(line, cursorContentStart);
-  if (!reset) return line;
-
-  return (
-    line.slice(0, cursorStart) +
-    line.slice(cursorContentStart, reset.index) +
-    line.slice(reset.index + reset.sequence.length)
-  );
 }
 
 export default async function (pi: ExtensionAPI) {
@@ -461,8 +417,8 @@ export default async function (pi: ExtensionAPI) {
   let sessionGeneration = 0;
 
   // ANSI DECSCUSR cursor style sequences (CSI Ps SP q).
-  // Pi's Editor always paints a fake inverse-video cursor in render()
-  // (https://github.com/earendil-works/pi/blob/d06db09a53958e485131527db25c1293f29b9367/packages/tui/src/components/editor.ts#L466-L495).
+  // Pi 1.2's Editor emits an APC-wrapped cursor cell; the TUI resolves it
+  // to inverse video unless we remove the wrapper in renderPromptCursor().
   //
   // When the user enables hardware cursor, we keep only the zero-width
   // CURSOR_MARKER and drive the visible cursor with DECSCUSR shapes. Focus
@@ -934,56 +890,7 @@ export default async function (pi: ExtensionAPI) {
     }
 
     private renderCursor(lines: string[], bottomIdx: number): void {
-      if (userPrefersShowHardwareCursor) {
-        // Optional: re-inject CURSOR_MARKER when Editor suppressed it
-        // during autocomplete. Without it the cursor shape may revert to
-        // steady block despite the correct DECSCUSR sequence being written.
-        this.ensureCursorMarker(lines, bottomIdx);
-        // Hardware cursor mode: strip the fake inverse-video cursor rendered
-        // by Editor immediately after CURSOR_MARKER.
-        this.stripFakeCursor(lines, bottomIdx);
-      } else if (blurred) {
-        // Fake cursor mode + blurred: same as hardware path — only the
-        // software cursor adjacent to CURSOR_MARKER is stripped.
-        this.stripFakeCursor(lines, bottomIdx);
-      }
-      // Fake cursor mode + focused: leave the upstream inverse-video cursor
-      // untouched — it serves as the visible cursor.
-    }
-
-    /**
-     * Re-inject CURSOR_MARKER when Editor suppressed it during autocomplete.
-     * Without it the cursor shape falls back to steady block even though
-     * the correct DECSCUSR sequence was written.
-     */
-    private ensureCursorMarker(lines: string[], bottomIdx: number): void {
-      for (let i = bottomIdx - 1; i >= 1; i--) {
-        if (lines[i]!.includes(CURSOR_MARKER)) return; // already present
-      }
-      // No marker found — inject before the first inverse-video sequence
-      for (let i = bottomIdx - 1; i >= 1; i--) {
-        const idx = lines[i]!.indexOf(SOFTWARE_CURSOR_START);
-        if (idx !== -1) {
-          lines[i] = lines[i]!.slice(0, idx) + CURSOR_MARKER + lines[i]!.slice(idx);
-          return;
-        }
-      }
-    }
-
-    /**
-     * Strip the fake inverse-video cursor rendered by Editor immediately
-     * after CURSOR_MARKER, preserving the grapheme underneath. Delegates to
-     * pi-vim's stripSoftwareCursorAfterMarker for exact alignment.
-     * ensureCursorMarker guarantees MARKER is present before this runs.
-     */
-    private stripFakeCursor(lines: string[], bottomIdx: number): void {
-      for (let i = bottomIdx - 1; i >= 1; i--) {
-        const stripped = stripSoftwareCursorAfterMarker(lines[i]!);
-        if (stripped !== lines[i]!) {
-          lines[i] = stripped;
-          return;
-        }
-      }
+      renderPromptCursor(lines, bottomIdx, { hardware: userPrefersShowHardwareCursor, blurred });
     }
   }
 

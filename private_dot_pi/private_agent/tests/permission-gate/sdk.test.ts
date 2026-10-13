@@ -189,7 +189,7 @@ describe("Permission Gate slash templates (real Pi SDK)", () => {
             lifecycle.push("input");
           });
           pi.on("before_agent_start", (event) => {
-            prompts.push(event.prompt);
+            if (event.messageType === "user") prompts.push(event.prompt);
             lifecycle.push("before_agent_start");
           });
         },

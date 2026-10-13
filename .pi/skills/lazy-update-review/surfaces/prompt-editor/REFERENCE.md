@@ -140,9 +140,17 @@ function getCursorStyle(mode: Mode): string {
 }
 ```
 
-The local `findSoftwareCursorReset` and `stripSoftwareCursorAfterMarker` copies must
-match the target `cursor-shape.ts` implementation exactly. Compare them during any
-cursor-related upstream change and update their source revision comments.
+Local `cursor.ts` owns cursor-cell wrapping independently of pi-vim. Pi 1.2 emits
+APC markers through `renderFakeCursor()`; the TUI resolves them after component
+rendering. Compare `renderPromptCursor()` with the exact target's Editor and
+`resolveFakeCursors()`, not just pi-vim's `cursor-shape.ts` (0.14.2 still assumes
+SGR reverse video). Update its source revision comment when the protocol changes.
+
+Complete when hardware/software cursor modes, focus/blur, a missing hardware
+marker, clipped APC endings, wide/combining graphemes, and narrow rendering pass.
+Preserve cursor-cell text and selection styles; restrict changes to the editor body,
+leaving borders, mode labels, and autocomplete rows intact. Run
+`tests/prompt-editor-cursor.test.ts` against the target host as well as interactive checks.
 
 ## Ex input passthrough
 
