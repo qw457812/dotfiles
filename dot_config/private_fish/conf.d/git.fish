@@ -10,7 +10,7 @@ function gw -a name
         return 0
     end
 
-    set -l repo (basename (git worktree list | head -n 1 | awk '{print $1}'))
+    set -l repo (basename (git -c core.quotePath=false worktree list | head -n 1 | awk '{print $1}'))
     set -l path $git_worktrees_root/"$repo-"(string replace -a '/' '-' -- $name)
 
     if not test -d $path
@@ -37,7 +37,7 @@ function gpr -a pr
     end
 
     set -l branch (gh pr view "$pr" --json headRefName -q .headRefName)
-    set -l repo (basename (git worktree list | head -n 1 | awk '{print $1}'))
+    set -l repo (basename (git -c core.quotePath=false worktree list | head -n 1 | awk '{print $1}'))
     set -l path $git_worktrees_root/"$repo-$pr-"(string replace -a '/' '-' -- $branch)
 
     if not test -d $path
@@ -50,7 +50,7 @@ end
 
 function gwl
     set -l current (realpath (git rev-parse --show-toplevel 2>/dev/null; or pwd))
-    set -l worktrees (git worktree list)
+    set -l worktrees (git -c core.quotePath=false worktree list)
     set -l filtered
     for wt in $worktrees
         if test (realpath (echo $wt | awk '{print $1}')) != "$current"
@@ -67,13 +67,13 @@ function gwl
 end
 
 function gwr
-    set -l candidates (git worktree list | tail -n +2)
+    set -l candidates (git -c core.quotePath=false worktree list | tail -n +2)
     if test (count $candidates) -eq 0
         return 0
     end
     set -l selected (printf '%s\n' $candidates | fzf | awk '{print $1}')
     if test -n "$selected"
-        set -l main (git worktree list | head -n 1 | awk '{print $1}')
+        set -l main (git -c core.quotePath=false worktree list | head -n 1 | awk '{print $1}')
         cd $main
         git worktree remove $selected
     end
@@ -81,11 +81,11 @@ end
 
 function gwm
     set -l current (git rev-parse --show-toplevel 2>/dev/null; or pwd)
-    set -l main (git worktree list | head -n 1 | awk '{print $1}')
+    set -l main (git -c core.quotePath=false worktree list | head -n 1 | awk '{print $1}')
 
     if test "$current" = "$main"
         # We're in main, go to most recent worktree
-        set -l latest (git worktree list | tail -n 1 | awk '{print $1}')
+        set -l latest (git -c core.quotePath=false worktree list | tail -n 1 | awk '{print $1}')
         if test "$latest" != "$main"
             cd $latest
         end
