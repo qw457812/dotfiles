@@ -18,8 +18,14 @@ Read settings, model definitions, extension sources, and dependency pins implica
 by the exact-range diffs. Include project `.pi/settings.json` and `.pi/mcp.json`
 when present, alongside the global config; project MCP exposure and names can
 change the runtime loadout even when the global `mcpServers` is empty. For
-third-party integrations, resolve the package actually loaded by settings and inspect its installed source, including `node_modules` paths
-normally ignored by `rg`.
+third-party integrations, resolve the package actually loaded by settings, then
+search its entry/source directories explicitly, including ignored installed files:
+
+```bash
+rg -n --no-ignore '<changed-api>' <resolved-package-entry-or-source-directory>
+```
+
+A normal repository search can miss every consumer below `node_modules`.
 
 **Complete when:** each changed API's local consumers and package ownership are
 recorded, including third-party consumers and separately pinned development types.
@@ -42,18 +48,32 @@ For MCP changes, verify that local guards inspect direct `mcp__server__tool`
 arguments and apply to nested codemode calls. Verify that blocked calls never
 reach the server.
 
-When declarations change, validate local extensions against the frozen target
-package declarations in a temporary tree. Copy sources without `node_modules`,
-install the exact target host packages, and include runtime dependencies declared
-by nested extension packages. Keep those dependencies in the temporary root so
-nested development pins cannot silently select older host declarations. Find the
-nested manifests with `rg --files private_dot_pi/private_agent -g package.json`.
+When declarations change, validate against the frozen target in an isolated source
+copy. Preserve installed packages and source pins during review:
 
-Preserve installed packages and source pins during review. A check against current
-dependencies proves only the baseline; report target-only errors separately from
-runtime failures. If tests hardcode the old host version, record that failure,
-adjust only the temporary copy to the frozen version, and rerun the behavioral
-suite. Report both the original failure and the adjusted result.
+- Place the copy under `~/.cache`, outside `os.tmpdir()`. The sandbox permits writes
+  to the system temp directory, so putting read-only test fixtures there makes
+  permission assertions fail for reasons unrelated to the target release.
+- Copy sources without `node_modules`; install exact target host packages at the
+  temporary root. Find nested manifests with
+  `rg --files private_dot_pi/private_agent -g package.json` and place their runtime
+  dependencies at that root too, so nested host pins cannot select old declarations.
+- Preserve unrelated dependency resolutions from the baseline locks/installed
+  packages, including promoted nested dependencies. Record discrepancies between
+  locks and actual installs; resolving every caret range afresh confounds the review.
+- Record the compiler/linter executable and version used by the baseline. Missing
+  native platform packages (for example TypeScript on Android) are environment
+  failures. If a compatible baseline tool runs against target declarations, name
+  its version and limitations; do not claim the declared target toolchain passed.
+
+Run the unmodified tests first. Record hardcoded host-version failures and event
+fixture/type errors, then make only the required test adaptations in the temporary
+copy and rerun check and the behavioral suite. Report original and adapted results
+separately from runtime regressions; test adaptations remain required source edits.
+
+Tie results to the copied source state. If local consumers change concurrently,
+revalidate the affected latest sources before claiming they passed; leave the
+unrelated work untouched.
 
 **Complete when:** every changed contract with a local consumer is classified as
 compatible, requiring a specific edit, or intentionally unsupported. Distinguish

@@ -9,21 +9,24 @@ disable-model-invocation: true
 Review lazy.nvim-managed package updates where **installed** (current HEAD)
 differs from **target** (lazy's update commit) by reading the
 `git log installed..target` changelog and accounting for any required local
-config changes.
+config changes. Review only the packages named by the caller; with no package
+filter, review all outdated packages. Installation or runtime-config adaptation
+requires an explicit apply request; updating this skill is part of review.
 
 ## Steps
 
-1. **Read the changelog.** Run without filters to see every outdated plugin's
-   commits:
+1. **Read the changelog.** Resolve the script relative to this skill directory:
 
    ```bash
-   bash scripts/lazy-update-review.sh
+   bash scripts/lazy-update-review.sh       # all packages
+   bash scripts/lazy-update-review.sh pi    # caller requested only pi
    ```
 
-   Completion criterion: every outdated plugin's `installed..target` range and
-   commit log has been read. If there are too many to read at once, use `--list`
-   only to enumerate/batch plugins, then rerun with plugin-name filters until
-   every listed outdated plugin's log has been read.
+   Completion criterion: every outdated plugin in the requested scope has had its
+   complete `installed..target` range and commit log read. For large reports, use
+   `--list` with the same scope to enumerate batches, then rerun with plugin-name
+   filters until all listed logs are read. Report the scope; a filtered scan does
+   not establish that other packages are up to date.
 
 2. **Diff a plugin when its changelog is ambiguous about impact.** The header
    carries the install dir (`@ <dir>`), `installed`, and `target`, so:
@@ -99,6 +102,10 @@ config changes.
 - Never run `:Lazy check` yourself, not even headless `Lazy! check`.
 - A non-zero script exit means the changelog review is incomplete; fix or
   report the error before judging any changelog as reviewed.
+- If the user updates after review, preserve the recorded old/target hashes and
+  runtime versions. Verify the installed result before continuing an authorized
+  apply; a new `outdated=0` report does not prove compatibility. If no pre-update
+  record exists, ask for the old revision/version rather than inventing a range.
 
 ## Files
 

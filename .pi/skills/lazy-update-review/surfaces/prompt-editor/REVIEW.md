@@ -8,7 +8,7 @@ pi-vim runtime is managed independently through Pi settings.
 
 Paths:
 
-- source extension: `private_dot_pi/private_agent/extensions/prompt-editor/index.ts`
+- source extension and helpers: `private_dot_pi/private_agent/extensions/prompt-editor/`
 - source package pins: `private_dot_pi/private_agent/package.json`
 - reusable source caches: librarian checkouts for `earendil-works/pi` and
   `lajarre/pi-vim`
@@ -19,6 +19,10 @@ the immutable revision hashes from the report; inspect those exact hashes in fre
 librarian caches instead of reading or mutating the lazy working trees.
 
 ## 1. Freeze the applicable ranges
+
+Record the loaded Pi and pi-vim versions, but freeze update ranges only for packages
+in the requested scope. An unchanged peer stays at its installed version for the
+compatibility check; do not silently expand a Pi-only request into a pi-vim update.
 
 Copy each changed package's installed and target revisions from its lazy report
 header. Do not check out the target or mutate the lazy working tree. For Pi:
@@ -62,7 +66,7 @@ printf 'runtime=%s\nold=%s\ntarget_package=%s\ntarget_version=%s\ntarget=%s\n' \
   "$PI_OLD_VERSION" "$PI_OLD_REV" "$PI_TARGET_PACKAGE" "$PI_TARGET_VERSION" "$PI_TARGET_REV"
 ```
 
-For pi-vim, first freeze its independent lazy range:
+When pi-vim is in scope, first freeze its independent lazy range:
 
 ```bash
 VIM_LAZY_OLD_REV='copy pi-vim installed revision from header'
@@ -109,11 +113,17 @@ git -C "$PI_CHK" log --oneline "$PI_OLD_REV..$PI_TARGET_REV"
 git -C "$PI_CHK" diff --stat "$PI_OLD_REV..$PI_TARGET_REV"
 git -C "$PI_CHK" diff "$PI_LAZY_OLD_REV..$PI_LAZY_TARGET_REV" -- \
   packages/tui/src/components/editor.ts \
+  packages/tui/src/tui.ts \
+  packages/tui/src/tui-main-screen.ts \
+  packages/tui/src/tui-alt-screen.ts \
   packages/coding-agent/src/modes/interactive/components/custom-editor.ts \
   packages/coding-agent/src/core/extensions/types.ts \
   packages/coding-agent/src/modes/interactive/interactive-mode.ts
 git -C "$PI_CHK" diff "$PI_OLD_REV..$PI_TARGET_REV" -- \
   packages/tui/src/components/editor.ts \
+  packages/tui/src/tui.ts \
+  packages/tui/src/tui-main-screen.ts \
+  packages/tui/src/tui-alt-screen.ts \
   packages/coding-agent/src/modes/interactive/components/custom-editor.ts \
   packages/coding-agent/src/core/extensions/types.ts \
   packages/coding-agent/src/modes/interactive/interactive-mode.ts
@@ -121,8 +131,10 @@ git -C "$PI_CHK" diff "$PI_OLD_REV..$PI_TARGET_REV" -- \
 
 Account for `Editor` state/layout methods, cursor-column and sticky-column
 bookkeeping, autocomplete refresh, `CustomEditor` behavior, editor factory
-signatures, cursor rendering, input dispatch, and every private member accessed
-structurally by `prompt-editor`.
+signatures, cursor rendering through the final TUI renderer, input dispatch, and
+every private member accessed structurally by `prompt-editor`. Reproduce changed
+render contracts with the target components and local helpers; type checks alone
+cannot catch a change to the escape sequences inside a returned string.
 
 For pi-vim, inspect both ranges:
 
