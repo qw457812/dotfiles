@@ -6,9 +6,18 @@ vi.mock("node:fs/promises", () => ({
   readFile: vi.fn(),
   mkdir: vi.fn(),
   writeFile: vi.fn(),
+  readdir: vi.fn(),
+  stat: vi.fn(),
+}));
+vi.mock("node:fs", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("node:fs")>()),
+  createReadStream: vi.fn(),
 }));
 
-import { readFile, writeFile } from "node:fs/promises";
+import { createReadStream } from "node:fs";
+import { readFile, readdir, stat, writeFile } from "node:fs/promises";
+import { basename } from "node:path";
+import { Readable } from "node:stream";
 
 const theme = { fg: (_color: string, text: string) => text };
 
@@ -243,5 +252,87 @@ describe("custom footer quota authentication", () => {
     f.get("codebuddy");
     await vi.waitFor(() => expect(f.registry.getProviderAuth).toHaveBeenCalled());
     expect(f.fetchMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("Firepass daily usage", () => {
+  beforeEach(() => {
+    vi.resetModules();
+    vi.mocked(readFile).mockReset().mockRejectedValue(new Error("No cache"));
+    vi.mocked(writeFile).mockReset();
+    vi.mocked(readdir).mockReset();
+    vi.mocked(stat).mockReset();
+    vi.mocked(createReadStream).mockReset();
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
+  });
+
+  function message(id: string | undefined, timestamp = new Date().toISOString()) {
+    return {
+      type: "message",
+      id,
+      timestamp,
+      message: {
+        role: "assistant",
+        provider: "firepass",
+        usage: { totalTokens: 100, cost: { total: 0.1 } },
+      },
+    };
+  }
+
+  async function usage(files: Record<string, unknown[]>) {
+    vi.mocked(readdir).mockResolvedValue(
+      Object.keys(files).map((name) => ({
+        name,
+        isDirectory: () => false,
+        isFile: () => true,
+      })) as unknown as Awaited<ReturnType<typeof readdir>>,
+    );
+    vi.mocked(stat).mockResolvedValue({ mtime: new Date() } as Awaited<ReturnType<typeof stat>>);
+    vi.mocked(createReadStream).mockImplementation(
+      (path) =>
+        Readable.from(
+          files[basename(String(path))].map((entry) => `${JSON.stringify(entry)}\n`),
+        ) as ReturnType<typeof createReadStream>,
+    );
+    const f = await fixture();
+    f.get("firepass");
+    await vi.waitFor(() => expect(f.requestRender).toHaveBeenCalled());
+    return JSON.parse(String(vi.mocked(writeFile).mock.calls[0][1])).value;
+  }
+
+  it("counts shared fork/branch history once and new requests on every branch", async () => {
+    const shared = message("shared");
+    const original = message("original");
+    expect(
+      await usage({
+        "original.jsonl": [shared, original],
+        "fork.jsonl": [shared, original, message("fork")],
+        "branch.jsonl": [shared, message("branch")],
+      }),
+    ).toEqual({ tokens: 400, cost: 0.4 });
+  });
+
+  it("keeps independent requests with the same short ID but different timestamps", async () => {
+    const now = Date.now();
+    // Use two timestamps on the same local day, including when the test runs near midnight.
+    const later = new Date(now + (new Date(now).getHours() < 12 ? 1000 : -1000)).toISOString();
+    expect(
+      await usage({
+        "a.jsonl": [message("same-id", new Date(now).toISOString())],
+        "b.jsonl": [message("same-id", later)],
+      }),
+    ).toEqual({ tokens: 200, cost: 0.2 });
+  });
+
+  it("does not deduplicate messages without usable entry IDs", async () => {
+    const noId = message(undefined);
+    const emptyId = message("");
+    expect(await usage({ "a.jsonl": [noId, emptyId], "b.jsonl": [noId, emptyId] })).toEqual({
+      tokens: 400,
+      cost: 0.4,
+    });
   });
 });

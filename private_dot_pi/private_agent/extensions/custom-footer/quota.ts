@@ -325,6 +325,7 @@ function readNum(v: unknown): number | null {
 // alternative: `firectl --api-key $FIREWORKS_API_KEY billing export-metrics --start-time "2026-05-16" --end-time "2026-05-17"`
 async function getDailyFirepassUsage(): Promise<FirepassUsage> {
   const today = toLocalDayKey(new Date());
+  const seenEntries = new Set<string>();
   let tokens = 0;
   let cost = 0;
 
@@ -393,6 +394,13 @@ async function getDailyFirepassUsage(): Promise<FirepassUsage> {
             if (!entryTs) continue;
             const entryDate = toLocalDayKey(new Date(entryTs));
             if (entryDate === today) {
+              // Pi preserves entry IDs and timestamps when copying fork/branch history.
+              // Include the timestamp because entry IDs are short and only unique per session.
+              if (typeof entry.id === "string" && entry.id) {
+                const key = JSON.stringify([entry.id, entryTs]);
+                if (seenEntries.has(key)) continue;
+                seenEntries.add(key);
+              }
               tokens += t;
               cost += c;
             }
