@@ -21,6 +21,7 @@ import {
   type CodebuddyModel,
   getCodebuddyModelOptions,
   isCodebuddyModel,
+  parseCodebuddyCredits,
   toCodebuddyModel,
 } from "./models.js";
 import modelsData from "./models.json" with { type: "json" };
@@ -116,8 +117,14 @@ function prepareRequest<T extends StreamOptions | SimpleStreamOptions>(
 
 function createCodebuddyProvider(
   conversationIdFor: (sessionId: string | undefined) => string,
+  onModelsChanged: (models: readonly CodebuddyModel[]) => void,
 ): Provider<"openai-completions"> {
   let models: readonly CodebuddyModel[] = MODELS;
+
+  function updateModels(next: readonly CodebuddyModel[]) {
+    models = next;
+    onModelsChanged(models);
+  }
 
   return {
     id: PROVIDER,
@@ -129,7 +136,7 @@ function createCodebuddyProvider(
       const cachedModels = context.stored?.models.filter(isCodebuddyModel);
       if (
         cachedModels?.length &&
-        !(await context.publish({ update: () => (models = cachedModels) }))
+        !(await context.publish({ update: () => updateModels(cachedModels) }))
       ) {
         return;
       }
@@ -149,14 +156,10 @@ function createCodebuddyProvider(
       });
       if (context.signal.aborted) return;
 
-      if (
-        !(await context.publish({
-          persist: { models: liveModels, checkedAt: Date.now() },
-          update: () => (models = liveModels),
-        }))
-      ) {
-        return;
-      }
+      await context.publish({
+        persist: { models: liveModels, checkedAt: Date.now() },
+        update: () => updateModels(liveModels),
+      });
     },
     stream(model, context: TranscriptContext, options?: StreamOptions) {
       const request = prepareRequest(model, options, conversationIdFor(options?.sessionId));
@@ -172,9 +175,7 @@ function createCodebuddyProvider(
 function updateCreditsStatus(model: ExtensionContext["model"], ctx: ExtensionContext) {
   if (!ctx.hasUI) return;
   const multiplier =
-    model && isCodebuddyModel(model)
-      ? /\((x\d+(?:\.\d+)?)(?: credits)?\)$/.exec(model.name)?.[1]
-      : undefined;
+    model && isCodebuddyModel(model) ? parseCodebuddyCredits(model.name)?.multiplier : undefined;
   ctx.ui.setStatus(
     "codebuddy-model-credits",
     multiplier ? ctx.ui.theme.fg("dim", multiplier) : undefined,
@@ -200,10 +201,35 @@ export default function (pi: ExtensionAPI) {
     return id;
   }
 
-  pi.registerProvider(createCodebuddyProvider(conversationIdFor));
+  let catalog: readonly CodebuddyModel[] | undefined;
+  let currentCtx: ExtensionContext | undefined;
 
-  pi.on("session_start", (_event, ctx) => updateCreditsStatus(ctx.model, ctx));
-  pi.on("model_select", (event, ctx) => updateCreditsStatus(event.model, ctx));
+  function refreshCreditsStatus() {
+    if (!currentCtx) return;
+    // Catalog publication does not replace the session's selected model object.
+    let model = currentCtx.model;
+    if (model && isCodebuddyModel(model) && catalog) {
+      const modelId = model.id;
+      model = catalog.find((entry) => entry.id === modelId);
+    }
+    updateCreditsStatus(model, currentCtx);
+  }
+
+  pi.registerProvider(
+    createCodebuddyProvider(conversationIdFor, (models) => {
+      catalog = models;
+      refreshCreditsStatus();
+    }),
+  );
+
+  pi.on("session_start", (_event, ctx) => {
+    currentCtx = ctx;
+    refreshCreditsStatus();
+  });
+  pi.on("model_select", () => refreshCreditsStatus());
+  pi.on("session_shutdown", () => {
+    currentCtx = undefined;
+  });
 
   pi.registerCommand("codebuddy-models", {
     description: "Select a CodeBuddy model by credits (lowest first)",

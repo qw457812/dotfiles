@@ -13,15 +13,22 @@ export function isCodebuddyModel(model: AnyModel): model is CodebuddyModel {
   );
 }
 
+export function parseCodebuddyCredits(
+  name: string,
+): { label: string; multiplier: string; rate: number } | undefined {
+  const match = /\(((x(\d+(?:\.\d+)?))(?: credits)?)\)$/.exec(name);
+  return match ? { label: match[1], multiplier: match[2], rate: Number(match[3]) } : undefined;
+}
+
 export function getCodebuddyModelOptions(
   models: readonly AnyModel[],
 ): { model: CodebuddyModel; label: string }[] {
   const entries = models.filter(isCodebuddyModel).map((model) => {
-    const match = /\((x(\d+(?:\.\d+)?)(?: credits)?)\)$/.exec(model.name);
+    const credits = parseCodebuddyCredits(model.name);
     return {
       model,
-      credits: match?.[1] ?? "credits unknown",
-      rate: match ? Number(match[2]) : Infinity,
+      credits: credits?.label ?? "credits unknown",
+      rate: credits?.rate ?? Infinity,
     };
   });
   entries.sort((a, b) => a.rate - b.rate || a.model.id.localeCompare(b.model.id));

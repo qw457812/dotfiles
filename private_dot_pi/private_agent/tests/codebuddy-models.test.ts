@@ -1,8 +1,10 @@
-import type { AnyModel } from "@earendil-works/pi-ai";
+import type { AnyModel, Provider } from "@earendil-works/pi-ai";
 import type {
   ExtensionAPI,
   ExtensionCommandContext,
   ExtensionContext,
+  ModelSelectEvent,
+  SessionStartEvent,
 } from "@earendil-works/pi-coding-agent";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { CHAT_BASE_URL, PROVIDER } from "../extensions/codebuddy-provider/constants.js";
@@ -12,6 +14,7 @@ import {
   type ChatModelConfig,
   getCodebuddyModelOptions,
   isCodebuddyModel,
+  parseCodebuddyCredits,
   toCodebuddyModel,
 } from "../extensions/codebuddy-provider/models.js";
 import modelsData from "../extensions/codebuddy-provider/models.json" with { type: "json" };
@@ -20,6 +23,19 @@ const configs = modelsData as ChatModelConfig[];
 const chat = toCodebuddyModel(configs[0]);
 
 afterEach(() => vi.unstubAllGlobals());
+
+describe("CodeBuddy credits parsing", () => {
+  it.each([
+    ["Model (x0.11 credits)", { label: "x0.11 credits", multiplier: "x0.11", rate: 0.11 }],
+    ["Model (x0.00 credits)", { label: "x0.00 credits", multiplier: "x0.00", rate: 0 }],
+    ["Model (preview) (x1.62)", { label: "x1.62", multiplier: "x1.62", rate: 1.62 }],
+    ["Model", undefined],
+    ["Model (xunknown credits)", undefined],
+    ["Model (x0.11 credits) preview", undefined],
+  ])("parses %s", (name, expected) => {
+    expect(parseCodebuddyCredits(name)).toEqual(expected);
+  });
+});
 
 describe("CodeBuddy chat models", () => {
   it("preserves static metadata and thinking levels", () => {
@@ -194,17 +210,121 @@ function setupPicker({
 describe("CodeBuddy credits status", () => {
   function setupStatus(model: AnyModel | undefined, hasUI = true) {
     const { pi } = setupPicker();
+    let activeModel = model;
     const ctx = {
-      model,
+      get model() {
+        return activeModel;
+      },
       hasUI,
       ui: { setStatus: vi.fn(), theme: { fg: vi.fn((_color, text) => `dim:${text}`) } },
     };
     const emit = (event: "session_start" | "model_select", selected = model) => {
       const handler = pi.on.mock.calls.find(([name]) => name === event)![1];
-      return handler({ type: event, model: selected }, ctx as unknown as ExtensionContext);
+      let payload: SessionStartEvent | ModelSelectEvent;
+      if (event === "session_start") {
+        payload = { type: event, reason: "startup" };
+      } else {
+        if (!selected || selected.type === "image" || selected.type === "classifier") {
+          throw new Error("model_select requires a chat model");
+        }
+        // Pi updates the active model before emitting model_select; ctx.model is a getter.
+        activeModel = selected;
+        payload = { type: event, model: selected, previousModel: undefined, source: "set" };
+      }
+      return handler(payload, ctx as unknown as ExtensionContext);
     };
-    return { ctx, emit };
+    const provider = pi.registerProvider.mock.calls[0][0] as Provider<"openai-completions">;
+    const shutdown = () => {
+      const handler = pi.on.mock.calls.find(([name]) => name === "session_shutdown")![1];
+      handler({ type: "session_shutdown" }, ctx as unknown as ExtensionContext);
+    };
+    return { ctx, emit, provider, shutdown };
   }
+
+  async function refreshCatalog(
+    provider: Provider<"openai-completions">,
+    models: (typeof cheap)[],
+    { allowNetwork = false, accepted = true } = {},
+  ) {
+    await provider.refreshModels!({
+      stored: { models, checkedAt: Date.now() },
+      credential: { type: "api_key", key: "test-token" },
+      allowNetwork,
+      signal: new AbortController().signal,
+      publish: async (publication) => {
+        if (accepted) publication.update?.();
+        return accepted;
+      },
+    });
+  }
+
+  it("shows cached credits even when publication precedes session start", async () => {
+    const { ctx, emit, provider } = setupStatus({ ...cheap, name: "Cheap" });
+    await refreshCatalog(provider, [cheap]);
+    emit("session_start");
+    expect(ctx.ui.setStatus).toHaveBeenLastCalledWith("codebuddy-model-credits", "dim:x0.05");
+  });
+
+  it("updates credits after live publication without a model selection event", async () => {
+    const { ctx, emit, provider } = setupStatus(cheap);
+    emit("session_start");
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(
+        async () =>
+          new Response(
+            JSON.stringify({
+              code: 0,
+              data: { models: [{ id: cheap.id, name: "Cheap", credits: "x0.15 credits" }] },
+            }),
+          ),
+      ),
+    );
+    await refreshCatalog(provider, [cheap], { allowNetwork: true });
+    expect(ctx.model).toBe(cheap);
+    expect(ctx.ui.setStatus).toHaveBeenLastCalledWith("codebuddy-model-credits", "dim:x0.15");
+  });
+
+  it("uses the published catalog on later model selection", async () => {
+    const { ctx, emit, provider } = setupStatus(cheap);
+    emit("session_start");
+    await refreshCatalog(provider, [{ ...cheap, name: "Cheap (x0.15 credits)" }]);
+    emit("model_select", cheap);
+    expect(ctx.ui.setStatus).toHaveBeenLastCalledWith("codebuddy-model-credits", "dim:x0.15");
+  });
+
+  it("clears credits when the published model loses its rate or disappears", async () => {
+    const { ctx, emit, provider } = setupStatus(cheap);
+    emit("session_start");
+    await refreshCatalog(provider, [{ ...cheap, name: "Cheap" }]);
+    expect(ctx.ui.setStatus).toHaveBeenLastCalledWith("codebuddy-model-credits", undefined);
+    await refreshCatalog(provider, [expensive]);
+    expect(ctx.ui.setStatus).toHaveBeenLastCalledWith("codebuddy-model-credits", undefined);
+  });
+
+  it("does not apply a rejected publication", async () => {
+    const { ctx, emit, provider } = setupStatus(cheap);
+    emit("session_start");
+    await refreshCatalog(provider, [{ ...cheap, name: "Cheap (x0.15 credits)" }], {
+      accepted: false,
+    });
+    expect(ctx.ui.setStatus).toHaveBeenCalledExactlyOnceWith(
+      "codebuddy-model-credits",
+      "dim:x0.05",
+    );
+  });
+
+  it("does not restore credits for another provider or update a shut down UI", async () => {
+    const { ctx, emit, provider, shutdown } = setupStatus(cheap);
+    emit("session_start");
+    emit("model_select", { ...cheap, provider: "other" });
+    await refreshCatalog(provider, [cheap]);
+    expect(ctx.ui.setStatus).toHaveBeenLastCalledWith("codebuddy-model-credits", undefined);
+    shutdown();
+    ctx.ui.setStatus.mockClear();
+    await refreshCatalog(provider, [cheap]);
+    expect(ctx.ui.setStatus).not.toHaveBeenCalled();
+  });
 
   it.each(["x0.11 credits", "x0.00 credits", "x1.62"])(
     "shows only the multiplier on session start: %s",
