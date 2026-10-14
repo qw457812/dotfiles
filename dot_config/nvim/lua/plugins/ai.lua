@@ -31,6 +31,8 @@ return {
   -- https://github.com/badlogic/pi-termux-mobile
   --
   -- https://github.com/morluto/rea
+  --
+  -- https://github.com/google/artemis
   {
     "earendil-works/pi",
     version = "*",

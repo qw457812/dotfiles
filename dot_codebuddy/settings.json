@@ -1,5 +1,5 @@
 {
-  "model": "deepseek-v4.1-flash",
+  "model": "glm-5.3-flash",
   "vim": {
     "enabled": true
   },

@@ -41,7 +41,7 @@ return {
     --   vim.g.user_is_termux and 'RUSTC_BOOTSTRAP=1 RUSTFLAGS="-C link-args=-lluajit"' or ""
     -- ),
     build = function()
-      require("blink.cmp").build():wait(60000) -- wait up to 60 seconds
+      require("blink.cmp").build():pwait()
     end,
     optional = true,
     ---@param opts blink.cmp.Config

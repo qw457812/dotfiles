@@ -13,11 +13,12 @@ tap "krtirtho/apps"
 tap "localsend/localsend"
 tap "manaflow-ai/cmux"
 tap "nikitabobko/tap"
+tap "openclaw/tap"
 tap "opencode-ai/tap"
 tap "oven-sh/bun"
 tap "owo-network/brew"
 tap "railwaycat/emacsmacport"
-tap "steipete/tap"
+tap "steipete/tap", trusted: { formulae: ["codexbar"] }
 tap "thezoraiz/ascii-image-converter", "https://github.com/TheZoraiz/homebrew-ascii-image-converter"
 tap "unhappychoice/tap"
 tap "v2raya/v2raya"
@@ -32,8 +33,6 @@ brew "readline"
 brew "abook"
 # Utility to read Word (.doc) files
 brew "antiword"
-# Cryptography and SSL/TLS Toolkit
-brew "openssl@3"
 # Extendable version manager with support for Ruby, Node.js, Erlang & more
 brew "asdf"
 # Spell checker with better logic than ispell
@@ -52,6 +51,8 @@ brew "autossh"
 brew "xz"
 # Bourne-Again SHell, a UNIX command interpreter
 brew "bash"
+# Cryptography and SSL/TLS Toolkit
+brew "openssl@3"
 # Clone of cat(1) with syntax highlighting and Git integration
 brew "bat"
 # Bash scripts that integrate bat with various command-line tools
@@ -68,8 +69,6 @@ brew "bottom"
 brew "broot"
 # Resource monitor. C++ version and continuation of bashtop and bpytop
 brew "btop"
-# Easily download, build, install, upgrade, and uninstall Python packages
-brew "python-setuptools"
 # CLI tool for analyzing Claude Code usage from local JSONL files
 brew "ccusage"
 # Tool to obtain certs from Let's Encrypt and autoenable HTTPS
@@ -92,8 +91,6 @@ brew "cmake"
 brew "cmus"
 # Container runtimes on MacOS (and Linux) with minimal setup
 brew "colima"
-# Interpreted, interactive, object-oriented programming language
-brew "python@3.13"
 # Pure Scala Artifact Fetching
 brew "coursier"
 # Securely send things from one computer to another
@@ -128,6 +125,8 @@ brew "doxx"
 brew "duf"
 # More intuitive version of du in rust
 brew "dust"
+# Interpreted, interactive, object-oriented programming language
+brew "python@3.13"
 # Useful examples at the command-line
 brew "eg-examples"
 # AST-based pattern checker for JavaScript
@@ -164,6 +163,10 @@ brew "fzf"
 brew "gdu"
 # GitHub command-line tool
 brew "gh"
+# Development kit for the Java programming language
+brew "openjdk@21"
+# Multi-platform software reverse engineering framework
+brew "ghidra"
 # Distributed revision control system
 brew "git"
 # Syntax-highlighting pager for git and diff output
@@ -278,6 +281,8 @@ brew "litecli"
 brew "lla"
 # LLM inference in C/C++
 brew "llama.cpp"
+# Access large language models from the command-line
+brew "llm"
 # Curses-based tool for viewing and analyzing log files
 brew "lnav"
 # Rainbows and unicorns in your console!
@@ -348,8 +353,6 @@ brew "nushell"
 brew "nvimpager"
 # Development kit for the Java programming language
 brew "openjdk@17"
-# Development kit for the Java programming language
-brew "openjdk@21"
 # SSL/TLS VPN implementing OSI layer 2 or 3 secure network extension
 brew "openvpn"
 # Display directories as trees (with optional color/HTML output)
@@ -392,6 +395,8 @@ brew "pygments"
 brew "pyright"
 # Python Language Server for the Language Server Protocol
 brew "python-lsp-server"
+# Easily download, build, install, upgrade, and uninstall Python packages
+brew "python-setuptools"
 # Interpreted, interactive, object-oriented programming language
 brew "python@3.11"
 # File browser
@@ -506,8 +511,8 @@ brew "zlib"
 brew "zoxide"
 # Better and friendly vi(vim) mode plugin for ZSH
 brew "zsh-vi-mode"
-# Modern Go client + CLI for the Google Places API (New)
-brew "steipete/tap/goplaces"
+# Lightning-fast macOS screenshots & AI vision analysis
+brew "openclaw/tap/peekaboo", trusted: true
 cask "aerospace"
 # GPU-accelerated terminal emulator
 cask "alacritty"
@@ -691,9 +696,11 @@ npm "@agentclientprotocol/claude-agent-acp"
 npm "@deepseek-ai/dsh"
 npm "@earendil-works/pi-coding-agent"
 npm "@executeautomation/playwright-mcp-server"
+npm "@magnitudedev/cli"
 npm "@mermaid-js/mermaid-cli"
 npm "@mimo-ai/cli"
 npm "agent-browser"
+npm "command-code"
 npm "cowsay"
 npm "devmoji"
 npm "docx"

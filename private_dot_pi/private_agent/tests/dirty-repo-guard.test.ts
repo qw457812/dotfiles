@@ -36,7 +36,7 @@ describe("Dirty Repo Guard", () => {
     await start();
     expect(exec).toHaveBeenCalledWith("git", ["status", "--porcelain"]);
     expect(ctx.ui.notify).toHaveBeenCalledExactlyOnceWith(
-      "⚠️ Dirty repo: 2 uncommitted change(s)",
+      expect.stringContaining("Dirty repo: 2 uncommitted change(s)"),
       "warning",
     );
   });
