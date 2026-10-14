@@ -26,6 +26,7 @@ import { AuthStorage } from "../../node_modules/@earendil-works/pi-coding-agent/
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { GATE_ENTRY } from "../../extensions/permission-gate/index.ts";
 import { latestUserIntent, userText } from "../../extensions/permission-gate/intent.ts";
+import { TEMP_DIRECTORIES } from "../../extensions/permission-gate/temporary-directories.ts";
 import { GIT_QUESTIONS } from "../../extensions/permission-gate/jev.ts";
 import type { GateRecord } from "../../extensions/permission-gate/log.ts";
 import { initializeBashParser } from "../../lib/bash-parser.ts";
@@ -62,6 +63,7 @@ const APPROVED: ClassifierResult = {
   model: CLASSIFIER.id,
   answers: {
     read_only: { type: "bool", probability: 0 },
+    temporary_operation: { type: "bool", probability: 0 },
     intent_covered: { type: "bool", probability: 0.99 },
     scope_covered: { type: "bool", probability: 0.99 },
     effects_covered: { type: "bool", probability: 0.99 },
@@ -295,6 +297,7 @@ describe("Permission Gate slash templates (real Pi SDK)", () => {
           command: COMMAND,
           user_intent: text,
           cwd: join(root, "workspace"),
+          temporary_directories: TEMP_DIRECTORIES,
         },
         questions: GIT_QUESTIONS,
       });

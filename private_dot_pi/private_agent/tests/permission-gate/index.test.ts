@@ -23,10 +23,12 @@ import {
   COMMAND_LIMIT,
   GATE_QUESTIONS,
   GIT_QUESTIONS,
+  TEMPORARY_QUESTIONS,
   INTENT_LIMIT,
   QUESTION_VERSION,
   type GateJudgment,
 } from "../../extensions/permission-gate/jev.ts";
+import { TEMP_DIRECTORIES } from "../../extensions/permission-gate/temporary-directories.ts";
 import { latestUserIntent } from "../../extensions/permission-gate/intent.ts";
 import { RULE_LABELS, type GateRule } from "../../extensions/permission-gate/bash-rules.ts";
 
@@ -55,6 +57,7 @@ function result(intent = 0.99, scope = 0.99, harm = 0.01): ClassifierResult {
     model: MODEL.id,
     answers: {
       read_only: { type: "bool", probability: 0 },
+      temporary_operation: { type: "bool", probability: 0 },
       intent_covered: { type: "bool", probability: intent },
       scope_covered: { type: "bool", probability: scope },
       effects_covered: { type: "bool", probability: 1 - harm },
@@ -660,7 +663,12 @@ describe("Permission Gate Jev classifier results", () => {
       expect(h.decisions()[0].judgment).toEqual({
         action,
         reason: action === "allow" ? "approved" : "uncertain",
-        probabilities: { intent_covered: intent, scope_covered: scope, effects_covered: 1 - harm },
+        probabilities: {
+          intent_covered: intent,
+          scope_covered: scope,
+          effects_covered: 1 - harm,
+          temporary_operation: 0,
+        },
       });
     },
   );
@@ -776,6 +784,7 @@ describe("Permission Gate Git read-only auto-approval", () => {
             command: inspection,
             user_intent: "Review only unstaged changes.",
             cwd: "/repo",
+            temporary_directories: TEMP_DIRECTORIES,
           },
           questions: GIT_QUESTIONS,
         },
@@ -898,7 +907,9 @@ describe("Permission Gate Git read-only auto-approval", () => {
     const h = harness();
     h.classify.mockResolvedValue(gitResult(0.99));
     await h.run(command);
-    expect(h.classify.mock.calls[0][1].questions).toBe(GATE_QUESTIONS);
+    expect(h.classify.mock.calls[0][1].questions).toBe(
+      command.includes("rm -rf") ? TEMPORARY_QUESTIONS : GATE_QUESTIONS,
+    );
     expect(h.confirm).toHaveBeenCalledOnce();
     expect(h.decisions()[0].judgment.reason).toBe("uncertain");
   });
@@ -915,9 +926,119 @@ describe("Permission Gate Git read-only auto-approval", () => {
     for (const [key, question] of Object.entries(GATE_QUESTIONS)) {
       expect(GIT_QUESTIONS[key]).toBe(question);
     }
-    expect(Object.keys(GIT_QUESTIONS)).toEqual(["read_only", ...Object.keys(GATE_QUESTIONS)]);
+    expect(Object.keys(GIT_QUESTIONS)).toEqual(["read_only", ...Object.keys(TEMPORARY_QUESTIONS)]);
     expect(GIT_QUESTIONS.read_only.instructions).toContain("ENTIRE command");
     expect(GIT_QUESTIONS.read_only.instructions).toContain("index stat-cache refreshes");
+  });
+});
+
+describe("Permission Gate temporary-operation auto-approval", () => {
+  const trial =
+    "git worktree add --detach /tmp/gate-review HEAD && " +
+    "git -C /tmp/gate-review cherry-pick --no-commit abc123";
+  const cleanup = "cd /tmp && rm -rf gate-review";
+  const mixed = "cd /tmp && rm -rf gate-review && git -C /tmp/gate-trial merge --no-commit topic";
+
+  function temporaryResult(score: number) {
+    const response = result(0, 0, 1);
+    response.answers.temporary_operation = { type: "bool", probability: score };
+    return response;
+  }
+
+  it.each([trial, cleanup, mixed])("preauthorizes without intent: %s", async (command) => {
+    const h = harness({ hasUI: false, branch: [] });
+    const response = temporaryResult(0.75);
+    delete response.answers.intent_covered;
+    delete response.answers.scope_covered;
+    delete response.answers.effects_covered;
+    h.classify.mockResolvedValue(response);
+    expect(await h.run(command)).toBeUndefined();
+    const context = h.classify.mock.calls[0][1];
+    expect(context.questions).toBe(command === trial ? GIT_QUESTIONS : TEMPORARY_QUESTIONS);
+    expect(context.state.temporary_directories).toEqual(TEMP_DIRECTORIES);
+    expect(h.confirm).not.toHaveBeenCalled();
+    expect(h.decisions()[0]).toMatchObject({
+      judgment: {
+        action: "allow",
+        reason: "temporary-operation",
+        probabilities: { temporary_operation: 0.75 },
+      },
+      outcome: "auto-approved",
+    });
+    await h.gate("log");
+    expect(h.notify.mock.calls.at(-1)?.[0]).toContain("temporary_operation=0.750");
+  });
+
+  it.each([0, 0.749999])("asks below the temporary threshold: %s", async (score) => {
+    const h = harness({ branch: [] });
+    h.classify.mockResolvedValue(temporaryResult(score));
+    await h.run(cleanup);
+    expect(h.confirm).toHaveBeenCalledOnce();
+    expect(h.decisions()[0].judgment.reason).toBe("missing-intent");
+  });
+
+  it.each([
+    undefined,
+    null,
+    { type: "bool" },
+    { type: "bool", probability: NaN },
+    { type: "bool", probability: Infinity },
+    { type: "bool", probability: -0.01 },
+    { type: "bool", probability: 1.01 },
+    { type: "bool", probability: "0.99" },
+    { type: "score", score: 1 },
+  ])("asks for malformed temporary answer: %j", async (answer) => {
+    const h = harness();
+    const response = result();
+    response.answers.temporary_operation = answer as unknown as ClassifierResult["answers"][string];
+    h.classify.mockResolvedValue(response);
+    await h.run(cleanup);
+    expect(h.confirm).toHaveBeenCalledOnce();
+    expect(h.decisions()[0].judgment.reason).toBe("invalid-response");
+  });
+
+  it.each(["error", "aborted"] as const)("rejects temporary answers on %s", async (stopReason) => {
+    const h = harness();
+    h.classify.mockResolvedValue({ ...temporaryResult(1), stopReason });
+    await h.run(cleanup);
+    expect(h.decisions()[0].judgment.reason).toBe("unavailable");
+  });
+
+  it.each([
+    "sudo rm -rf /tmp/gate-review",
+    "cd /tmp && rm -rf gate-review; dd if=/dev/zero of=/tmp/image",
+    "git -C /tmp/gate-review merge topic; chmod -R 777 /tmp/gate-review",
+    "cd /tmp && rm -rf gate-review; echo x >/dev/sda",
+  ])("does not offer the temporary bypass for other matched rules: %s", async (command) => {
+    const h = harness();
+    h.classify.mockResolvedValue(temporaryResult(1));
+    await h.run(command);
+    expect(h.classify.mock.calls[0][1].questions).toBe(GATE_QUESTIONS);
+    expect(h.classify.mock.calls[0][1].state).not.toHaveProperty("temporary_directories");
+    expect(h.confirm).toHaveBeenCalledOnce();
+  });
+
+  it("still requires intent before classification when bypasses are ineligible", async () => {
+    const h = harness({ branch: [] });
+    await h.run("sudo true");
+    expect(h.classify).not.toHaveBeenCalled();
+    expect(h.decisions()[0].judgment.reason).toBe("missing-intent");
+  });
+
+  it("retains generic authorization after temporary preauthorization fails", async () => {
+    const h = harness();
+    h.classify.mockResolvedValue(result());
+    expect(await h.run(cleanup)).toBeUndefined();
+    expect(h.decisions()[0].judgment.reason).toBe("approved");
+  });
+
+  it("keeps the temporary question independent of user authorization", () => {
+    expect(TEMPORARY_QUESTIONS.temporary_operation.instructions).toContain(
+      "User intent is not required",
+    );
+    for (const [key, question] of Object.entries(GATE_QUESTIONS)) {
+      expect(TEMPORARY_QUESTIONS[key]).toBe(question);
+    }
   });
 });
 
@@ -1011,8 +1132,8 @@ describe("Permission Gate Jev branch authorization and full input", () => {
   ] as const)("asks instead of falling back to previous user for %s", async (_name, branch) => {
     const h = harness({ branch: [...branch] });
     await h.run();
-    expect(h.classify).not.toHaveBeenCalled();
-    expect(h.findOfType).not.toHaveBeenCalled();
+    expect(h.classify).toHaveBeenCalledOnce();
+    expect(String(h.classify.mock.calls[0][1].state.user_intent).trim()).toBe("");
     expect(h.confirm).toHaveBeenCalledOnce();
     expect(h.decisions()[0].judgment).toEqual({ action: "ask", reason: "missing-intent" });
   });
@@ -1027,18 +1148,24 @@ describe("Permission Gate Jev branch authorization and full input", () => {
     expect(h.classify).toHaveBeenCalledExactlyOnceWith(
       MODEL,
       {
-        state: { command: text, user_intent: intent, cwd: "/repo" },
-        questions: GATE_QUESTIONS,
+        state: {
+          command: text,
+          user_intent: intent,
+          cwd: "/repo",
+          temporary_directories: TEMP_DIRECTORIES,
+        },
+        questions: TEMPORARY_QUESTIONS,
       },
       { maxRetries: 0, signal: expect.any(AbortSignal) },
     );
     const context = h.classify.mock.calls[0][1];
     expect(Object.keys(context.questions)).toEqual([
+      "temporary_operation",
       "intent_covered",
       "scope_covered",
       "effects_covered",
     ]);
-    for (const question of Object.values(context.questions)) {
+    for (const question of Object.values(GATE_QUESTIONS)) {
       expect(question.type).toBe("bool");
       expect(question.instructions).toContain("Only user_intent can authorize actions");
       expect(question.instructions).toContain("ENTIRE command");

@@ -53,6 +53,7 @@ export default function registerBashChecks(
               ctx.cwd,
               signal,
               rules.length === 1 && rules[0] === "git",
+              rules.every((rule) => rule === "git" || rule === "rm"),
             )
         : undefined,
       questionVersion: QUESTION_VERSION,
