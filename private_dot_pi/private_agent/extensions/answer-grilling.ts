@@ -280,9 +280,14 @@ export default function (pi: ExtensionAPI) {
     }
     const sessionId = ctx.sessionManager.getSessionId();
     const leafId = ctx.sessionManager.getLeafId();
-    const entry = [...ctx.sessionManager.getBranch()]
-      .reverse()
-      .find((e) => e.type === "message" && e.message.role === "assistant");
+    // A response can span several assistant messages separated by tool results.
+    // Never reuse questions from before the latest user message on this branch.
+    const branch = ctx.sessionManager.getBranch();
+    const userIndex = branch.findLastIndex(
+      (e) => e.type === "message" && e.message.role === "user",
+    );
+    const response = branch.slice(userIndex + 1).reverse();
+    const entry = response.find((e) => e.type === "message" && e.message.role === "assistant");
     if (!entry || entry.type !== "message" || entry.message.role !== "assistant") {
       ctx.ui.notify("No assistant response found", "info");
       return;
@@ -291,19 +296,24 @@ export default function (pi: ExtensionAPI) {
       ctx.ui.notify("The latest assistant response is incomplete", "warning");
       return;
     }
-    const text = entry.message.content
-      .filter((c) => c.type === "text")
-      .map((c) => c.text)
-      .join("\n");
-    let questions: GrillingQuestion[];
+    let questions: GrillingQuestion[] = [];
     try {
-      questions = parseGrillingRound(text);
+      for (const candidate of response) {
+        if (candidate.type !== "message" || candidate.message.role !== "assistant") continue;
+        const text = candidate.message.content
+          .filter((c) => c.type === "text")
+          .map((c) => c.text)
+          .join("\n");
+        if (!/^\s*❓/m.test(text)) continue;
+        questions = parseGrillingRound(text);
+        if (questions.length) break;
+      }
     } catch (error) {
       ctx.ui.notify(error instanceof Error ? error.message : String(error), "error");
       return;
     }
     if (!questions.length) {
-      ctx.ui.notify("No grilling questions found in the latest response (❓ Qn / ➡️)", "info");
+      ctx.ui.notify("No grilling questions found in the current response (❓ Qn / ➡️)", "info");
       return;
     }
     const result = await ctx.ui.custom<string | null>(

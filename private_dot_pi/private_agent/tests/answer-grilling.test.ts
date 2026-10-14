@@ -538,15 +538,17 @@ function commandFixture() {
     type: "message",
     message: { role: "assistant", stopReason: "stop", content: [{ type: "text", text: round }] },
   };
+  const branch = [entry];
   const notify = vi.fn();
   const custom = vi.fn(async (..._args: unknown[]): Promise<string | null> => "Q1: Yes\n\nQ2: Yes");
   const ctx = {
+    cwd: process.cwd(),
     mode: "tui",
     isIdle: () => state.idle,
     sessionManager: {
       getSessionId: () => state.sessionId,
       getLeafId: () => state.leafId,
-      getBranch: () => [entry],
+      getBranch: () => branch,
     },
     ui: { notify, custom },
   } as unknown as ExtensionCommandContext;
@@ -557,6 +559,7 @@ function commandFixture() {
     runShortcut: () => shortcut!.handler(ctx),
     state,
     entry,
+    branch,
     ctx,
     notify,
     custom,
@@ -565,9 +568,106 @@ function commandFixture() {
 }
 
 describe("answer-grilling command", () => {
-  it("registers Alt+, and submits answers through the same workflow", async () => {
+  function message(role: string, text: string, stopReason = "stop") {
+    return {
+      id: `${role}-${text}`,
+      type: "message",
+      message: { role, stopReason, content: [{ type: "text", text }] },
+    };
+  }
+
+  it("finds questions before tool calls without merging the final reminder into recommendations", async () => {
     const fixture = commandFixture();
-    expect(fixture.registerShortcut).toHaveBeenCalledWith("alt+,", expect.any(Object));
+    fixture.entry.message.stopReason = "toolUse";
+    fixture.branch.unshift(message("user", "Ask me questions"));
+    fixture.branch.push(
+      message("toolResult", "Spawned jev-official-review"),
+      message("assistant", "Please confirm Q1–Q2."),
+    );
+    await fixture.run();
+    expect(fixture.custom).toHaveBeenCalledOnce();
+    const factory = fixture.custom.mock.calls[0][0] as (
+      tui: TUI,
+      theme: Theme,
+      bindings: KeybindingsManager,
+      done: (result: string | null) => void,
+    ) => GrillingAnswerComponent;
+    const ui = factory(
+      { requestRender: vi.fn(), terminal: { rows: 24, columns: 80 } } as unknown as TUI,
+      { fg: (_: string, text: string) => text, bold: (text: string) => text } as Theme,
+      keybindings,
+      vi.fn(),
+    );
+    ui.handleInput("\t");
+    expect(renderText(ui)).toContain("Add a confirmation step.");
+    expect(renderText(ui)).not.toContain("Please confirm");
+    expect(fixture.sendUserMessage).toHaveBeenCalledOnce();
+  });
+
+  it("does not reuse questions from before the latest user message", async () => {
+    const fixture = commandFixture();
+    fixture.branch.push(message("user", "Q1: Yes"), message("assistant", "Thanks."));
+    await fixture.run();
+    expect(fixture.custom).not.toHaveBeenCalled();
+    expect(fixture.notify).toHaveBeenCalledWith(
+      "No grilling questions found in the current response (❓ Qn / ➡️)",
+      "info",
+    );
+  });
+
+  it("does not find an assistant response before the latest user message", async () => {
+    const fixture = commandFixture();
+    fixture.branch.push(message("user", "Q1: Yes"));
+    await fixture.run();
+    expect(fixture.custom).not.toHaveBeenCalled();
+    expect(fixture.notify).toHaveBeenCalledWith("No assistant response found", "info");
+  });
+
+  it.each(["toolUse", "aborted", "error"])(
+    "rejects an incomplete final assistant message with stopReason %s",
+    async (stopReason) => {
+      const fixture = commandFixture();
+      fixture.branch.push(message("assistant", "Still working", stopReason));
+      await fixture.run();
+      expect(fixture.custom).not.toHaveBeenCalled();
+      expect(fixture.notify).toHaveBeenCalledWith(
+        "The latest assistant response is incomplete",
+        "warning",
+      );
+    },
+  );
+
+  it("prefers the latest question set in the current response", async () => {
+    const fixture = commandFixture();
+    fixture.branch.push(message("assistant", "❓ **Q3** - **New scope**: Use dsh?\n➡️ Yes."));
+    fixture.branch.push(message("assistant", "Please confirm."));
+    await fixture.run();
+    const factory = fixture.custom.mock.calls[0][0] as (...args: unknown[]) => GrillingAnswerComponent;
+    const ui = factory(
+      { requestRender: vi.fn(), terminal: { rows: 24, columns: 80 } },
+      { fg: (_: string, text: string) => text, bold: (text: string) => text },
+      keybindings,
+      vi.fn(),
+    );
+    expect(renderText(ui)).toContain("Grilling 1/1");
+    expect(renderText(ui)).toContain("Q3 - New scope");
+  });
+
+  it("does not fall back to an older valid round when the latest questions are malformed", async () => {
+    const fixture = commandFixture();
+    fixture.branch.push(message("assistant", "❓ **Q3** - **Scope**: Use dsh?"));
+    fixture.branch.push(message("assistant", "Please confirm."));
+    await fixture.run();
+    expect(fixture.custom).not.toHaveBeenCalled();
+    expect(fixture.notify).toHaveBeenCalledWith(
+      "Q3 is missing its question or ➡️ recommendation",
+      "error",
+    );
+  });
+
+  it("registers Alt+. and submits answers through the same workflow", async () => {
+    const fixture = commandFixture();
+    expect(fixture.registerShortcut).toHaveBeenCalledWith("alt+.", expect.any(Object));
     await fixture.runShortcut();
     expect(fixture.custom).toHaveBeenCalledOnce();
     expect(fixture.sendUserMessage).toHaveBeenCalledWith("Q1: Yes\n\nQ2: Yes", {
