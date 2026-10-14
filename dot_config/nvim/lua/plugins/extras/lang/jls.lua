@@ -126,6 +126,41 @@ return {
     "idelice/nvim-jls",
     main = "jls",
     ft = { "java" },
-    opts = {},
+    ---@module "jls"
+    ---@type JlsConfig
+    opts = {
+      inlay_hints = {
+        enabled = true,
+      },
+    },
+  },
+
+  {
+    "idelice/nvim-jls",
+    opts = function()
+      -- Copied from: https://github.com/idelice/nvim-jls/blob/98e3eef9e999ddc749f812810973a28debaed467/lua/jls/client.lua#L6-L9
+      local function is_external_jls_source(bufnr)
+        local name = vim.api.nvim_buf_get_name(bufnr)
+        return name ~= nil and name:find("jls%-jar%-sources", 1, false) ~= nil
+      end
+
+      -- in favor of bufferline.nvim
+      -- https://github.com/idelice/nvim-jls/blob/98e3eef9e999ddc749f812810973a28debaed467/lua/jls/client.lua#L63-L69
+      vim.api.nvim_create_autocmd({ "BufReadPost", "BufEnter", "BufWinEnter" }, {
+        group = vim.api.nvim_create_augroup("jls_jar_sources_buflisted", { clear = true }),
+        callback = function(ev)
+          if not is_external_jls_source(ev.buf) then
+            return
+          end
+
+          vim.schedule(function()
+            if vim.api.nvim_buf_is_valid(ev.buf) then
+              -- https://github.com/idelice/nvim-jls/blob/98e3eef9e999ddc749f812810973a28debaed467/lua/jls/client.lua#L22
+              vim.bo[ev.buf].buflisted = true
+            end
+          end)
+        end,
+      })
+    end,
   },
 }

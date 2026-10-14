@@ -111,7 +111,13 @@ return {
                   "done",
                   vim.schedule_wrap(function()
                     for symbol in vim.iter(picker:items()):rev() do
-                      if U.lsp.cursor_in_range(cursor, symbol.range) then
+                      -- symbol.item.location.range for https://github.com/idelice/jls
+                      local range = symbol.range or vim.tbl_get(symbol, "item", "location", "range")
+                      if not range then
+                        return
+                      end
+
+                      if U.lsp.cursor_in_range(cursor, range) then
                         picker.list:move(symbol.idx, true)
                         return
                       end
