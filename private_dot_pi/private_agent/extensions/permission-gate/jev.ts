@@ -4,7 +4,8 @@ import type { ExtensionContext } from "@earendil-works/pi-coding-agent";
 export const GATE_MODEL = { provider: "typesafe", id: "jev-latest" } as const;
 export const QUESTION_VERSION = 6;
 // Convenience-first policy; probabilities are not a safety guarantee.
-export const AUTO_APPROVE_THRESHOLD = 0.7;
+export const BASH_AUTO_APPROVE_THRESHOLD = 0.7;
+export const SQL_AUTO_APPROVE_THRESHOLD = 0.9;
 export const COMMAND_LIMIT = 8_000;
 export const SQL_LIMIT = 8_000;
 export const SQL_QUESTION_VERSION = 4;
@@ -108,7 +109,7 @@ function decideGitClassification(result: ClassifierResult, hasUserIntent: boolea
   )
     return { action: "ask", reason: "invalid-response" };
   // Authorization answers are irrelevant on the read-only branch.
-  if (answer.probability >= AUTO_APPROVE_THRESHOLD)
+  if (answer.probability >= BASH_AUTO_APPROVE_THRESHOLD)
     return {
       action: "allow",
       reason: "git-read-only",
@@ -137,9 +138,9 @@ export function decideClassification(result: ClassifierResult): GateJudgment {
   }
   const scores = probabilities as GateProbabilities;
   const allow =
-    scores.intent_covered >= AUTO_APPROVE_THRESHOLD &&
-    scores.scope_covered >= AUTO_APPROVE_THRESHOLD &&
-    scores.effects_covered >= AUTO_APPROVE_THRESHOLD;
+    scores.intent_covered >= BASH_AUTO_APPROVE_THRESHOLD &&
+    scores.scope_covered >= BASH_AUTO_APPROVE_THRESHOLD &&
+    scores.effects_covered >= BASH_AUTO_APPROVE_THRESHOLD;
   return {
     action: allow ? "allow" : "ask",
     reason: allow ? "approved" : "uncertain",
@@ -173,7 +174,7 @@ export function decideSqlClassification(result: ClassifierResult): GateJudgment 
     answer.probability > 1
   )
     return { action: "ask", reason: "invalid-response" };
-  const allow = answer.probability >= AUTO_APPROVE_THRESHOLD;
+  const allow = answer.probability >= SQL_AUTO_APPROVE_THRESHOLD;
   return {
     action: allow ? "allow" : "ask",
     reason: allow ? "read-only" : "not-read-only",

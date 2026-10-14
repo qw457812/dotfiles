@@ -143,13 +143,13 @@ describe("SQL Guard Jev read-only check", () => {
     expect(h.classify.mock.calls[0][1].state).toEqual({ sql, tool });
   });
 
-  it.each([0, 0.699999, 0.7, 0.700001, 0.89, 1])(
-    "requires read_only >= 0.7 (probability=%s)",
+  it.each([0, 0.7, 0.89, 0.899999, 0.9, 0.900001, 1])(
+    "requires read_only >= 0.9 (probability=%s)",
     async (probability) => {
       const h = harness(false, true);
       h.classify.mockResolvedValue(result(probability));
       const outcome = await h.run(tool, { sql });
-      if (probability >= 0.7) {
+      if (probability >= 0.9) {
         expect(outcome).toBeUndefined();
         expect(h.ctx.ui.confirm).not.toHaveBeenCalled();
       } else {

@@ -34,7 +34,7 @@ Git rules and Jev both default to **ON**. Switches live only in the current exte
 
    Otherwise, auto-approve only when all three authorization conditions pass; ask the user when they do not. Mixed Git/`rm`/`sudo`/device-write matches never use the read-only bypass. State-changing Git commands can still auto-approve when the requested work authorizes them.
 
-   This is a convenience-first policy: ordinary task steps and consequences need not be individually spelled out. `effects_covered` is not intrinsic safety: requested destructive effects do not automatically prevent approval. Bash and SQL share `AUTO_APPROVE_THRESHOLD = 0.70`.
+   This is a convenience-first policy: ordinary task steps and consequences need not be individually spelled out. `effects_covered` is not intrinsic safety: requested destructive effects do not automatically prevent approval. Bash uses `BASH_AUTO_APPROVE_THRESHOLD = 0.70`; SQL uses the stricter `SQL_AUTO_APPROVE_THRESHOLD = 0.90`.
 
 4. Every matched operation is eligible for auto-approval. There is no fixed hard-deny list or non-overridable `deny` decision.
 5. Manual rejection blocks execution and calls `ctx.abort()`. Calls requiring confirmation are blocked when no UI is available.
@@ -54,11 +54,11 @@ Deletion is exempt when every target is a literal absolute descendant of a recog
 
 1. Match the existing SQL tool suffixes (`_sqlcl_run`, `_sql_run`, `_execute_sql`) and read the first non-empty string in `sql` / `sqlcl`. MCP direct and codemode nested calls use the same handler.
 2. Keep existing local SQL rules unchanged. Locally accepted queries proceed without Jev, including their existing detection limits.
-3. Only SQL requiring confirmation reaches Jev. One `read_only` question evaluates the complete SQL, including multiple statements, CTEs, procedural blocks and function calls. Auto-approve when `read_only >= 0.70`; otherwise ask the user. The check looks for database state changes and explicit database locks: mutations, database session/transaction changes, explicit locks and unknown database effects require confirmation. Local machine effects such as `SPOOL` file writes and client-only settings do not disqualify an input; this is not a local-machine safety check. This is **not user-authorization classification**: SQL requests do not include user intent.
+3. Only SQL requiring confirmation reaches Jev. One `read_only` question evaluates the complete SQL, including multiple statements, CTEs, procedural blocks and function calls. Auto-approve when `read_only >= 0.90`; otherwise ask the user. The check looks for database state changes and explicit database locks: mutations, database session/transaction changes, explicit locks and unknown database effects require confirmation. Local machine effects such as `SPOOL` file writes and client-only settings do not disqualify an input; this is not a local-machine safety check. This is **not user-authorization classification**: SQL requests do not include user intent.
 4. `/gate jev off` retains manual confirmation for local matches. Missing SQL parameters ask without classification; unsupported argument shapes remain hard-blocked.
 5. Failed, oversized or uncertain classifications fall back to the existing confirmation dialog. Session lifecycle and parent-operation cancellation stop old calls without aborting a replacement operation.
 
-SQL uses question version 4; Bash uses questions version 6 (generic authorization plus Git-only read-only classification). The convenience-first thresholds have offline regression coverage but have not been calibrated against a live classifier.
+SQL uses question version 4; Bash uses questions version 6 (generic authorization plus Git-only read-only classification). The approval thresholds have offline regression coverage but have not been calibrated against a live classifier.
 
 ## Jev, context and failure behavior
 
