@@ -25,16 +25,16 @@ Git rules and Jev both default to **ON**. Switches live only in the current exte
 3. For a matched call, one Jev request evaluates the entire command, including all subcommands, redirections and substitutions:
 
    ```text
-   intent_covered  >= 0.70   Actions follow from the request or ordinary task steps
-   scope_covered   >= 0.70   Targets, destinations and extent fit the request
-   effects_covered >= 0.70   Material side effects are expected under the request
+   intent_covered  >= 0.75   Actions follow from the request or ordinary task steps
+   scope_covered   >= 0.75   Targets, destinations and extent fit the request
+   effects_covered >= 0.75   Material side effects are expected under the request
    ```
 
-   When Git is the **only** matched local rule, the same request also asks `read_only` about the **entire shell command**. Auto-approve when `read_only >= 0.70`, independently of authorization scores or missing user intent. Normal Git index stat-cache refreshes are allowed; staged-content changes, file writes, deletions, uploads and unknown effects are not read-only. A high read-only score makes the authorization answers irrelevant.
+   When Git is the **only** matched local rule, the same request also asks `read_only` about the **entire shell command**. Auto-approve when `read_only >= 0.75`, independently of authorization scores or missing user intent. Normal Git index stat-cache refreshes are allowed; staged-content changes, file writes, deletions, uploads and unknown effects are not read-only. A high read-only score makes the authorization answers irrelevant.
 
    Otherwise, auto-approve only when all three authorization conditions pass; ask the user when they do not. Mixed Git/`rm`/`sudo`/device-write matches never use the read-only bypass. State-changing Git commands can still auto-approve when the requested work authorizes them.
 
-   This is a convenience-first policy: ordinary task steps and consequences need not be individually spelled out. `effects_covered` is not intrinsic safety: requested destructive effects do not automatically prevent approval. Bash uses `BASH_AUTO_APPROVE_THRESHOLD = 0.70`; SQL uses the stricter `SQL_AUTO_APPROVE_THRESHOLD = 0.90`.
+   This is a convenience-first policy: ordinary task steps and consequences need not be individually spelled out. `effects_covered` is not intrinsic safety: requested destructive effects do not automatically prevent approval. Bash uses `BASH_AUTO_APPROVE_THRESHOLD = 0.75`; SQL uses the stricter `SQL_AUTO_APPROVE_THRESHOLD = 0.90`.
 
 4. Every matched operation is eligible for auto-approval. There is no fixed hard-deny list or non-overridable `deny` decision.
 5. Manual rejection blocks execution and calls `ctx.abort()`. Calls requiring confirmation are blocked when no UI is available.

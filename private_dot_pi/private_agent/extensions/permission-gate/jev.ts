@@ -4,7 +4,7 @@ import type { ExtensionContext } from "@earendil-works/pi-coding-agent";
 export const GATE_MODEL = { provider: "typesafe", id: "jev-latest" } as const;
 export const QUESTION_VERSION = 6;
 // Convenience-first policy; probabilities are not a safety guarantee.
-export const BASH_AUTO_APPROVE_THRESHOLD = 0.7;
+export const BASH_AUTO_APPROVE_THRESHOLD = 0.75;
 export const SQL_AUTO_APPROVE_THRESHOLD = 0.9;
 export const COMMAND_LIMIT = 8_000;
 export const SQL_LIMIT = 8_000;

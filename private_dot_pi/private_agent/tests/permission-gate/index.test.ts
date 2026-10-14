@@ -637,15 +637,16 @@ describe("Permission Gate Jev local matching and switches", () => {
 
 describe("Permission Gate Jev classifier results", () => {
   it.each([
-    [0.7, 0.7, 0.3, "allow"],
+    [0.75, 0.75, 0.25, "allow"],
     [1, 1, 0, "allow"],
-    [0.700001, 0.700001, 0.299999, "allow"],
-    [0.699999, 1, 0, "ask"],
+    [0.750001, 0.750001, 0.249999, "allow"],
+    [0.7, 0.7, 0.3, "ask"],
+    [0.749999, 1, 0, "ask"],
     [0.81, 0.94, 0.04, "allow"],
     [0.81, 0.89, 0.04, "allow"],
     [0.81, 0.94, 0.11, "allow"],
-    [1, 0.699999, 0, "ask"],
-    [1, 1, 0.300001, "ask"],
+    [1, 0.749999, 0, "ask"],
+    [1, 1, 0.250001, "ask"],
     [0, 1, 0, "ask"],
     [1, 0, 0, "ask"],
     [1, 1, 1, "ask"],
@@ -759,7 +760,7 @@ describe("Permission Gate Git read-only auto-approval", () => {
     return response;
   }
 
-  it.each([0.7, 0.99, 1])(
+  it.each([0.75, 0.750001, 0.99, 1])(
     "auto-approves the full inspection at read_only=%s despite low authorization",
     async (score) => {
       const h = harness({
@@ -817,7 +818,7 @@ describe("Permission Gate Git read-only auto-approval", () => {
     expect(h.decisions()[0].judgment.reason).toBe("uncertain");
   });
 
-  it.each([0, 0.699999])(
+  it.each([0, 0.749999])(
     "still auto-approves authorized state changes at read_only=%s",
     async (score) => {
       const h = harness({ branch: [user("stage", "Stage src/api.ts. Do not commit.")] });
@@ -832,9 +833,9 @@ describe("Permission Gate Git read-only auto-approval", () => {
     },
   );
 
-  it("does not treat a read-only score just below the threshold as approval", async () => {
+  it.each([0.7, 0.749999])("does not auto-approve a read-only score of %s", async (score) => {
     const h = harness();
-    h.classify.mockResolvedValue(gitResult(0.699999));
+    h.classify.mockResolvedValue(gitResult(score));
     await h.run("git stash list");
     expect(h.confirm).toHaveBeenCalledOnce();
     expect(h.decisions()[0].judgment.reason).toBe("uncertain");
