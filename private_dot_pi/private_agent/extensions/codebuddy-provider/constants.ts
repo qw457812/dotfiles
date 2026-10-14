@@ -17,12 +17,13 @@ export const ACCOUNTS_PATH = "/v2/plugin/accounts";
 export const EXPIRY_BUFFER_MS = 5 * 60 * 1000; // 5-minute buffer before token expiry
 
 // ── HTTP / polling ──────────────────────────────────────────────────────────
+export const HTTP_TIMEOUT_MS = 15000;
 export const POLL_INTERVAL_MS = 1000;
 export const POLL_TIMEOUT_MS = 5 * 60 * 1000;
 export const SUCCESS_CODES = new Set([0, 200]);
 export const PENDING_CODES = new Set([11217]);
 
 // ── Product metadata ────────────────────────────────────────────────────────
-export const VERSION = "2.97.3";
+export const VERSION = "2.164.0";
 export const USER_AGENT = `CLI/${VERSION} CodeBuddy/${VERSION}`;
 export const PRODUCT = "SaaS";

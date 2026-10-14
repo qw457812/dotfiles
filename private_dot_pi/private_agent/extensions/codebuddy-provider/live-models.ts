@@ -49,6 +49,7 @@ type CodebuddyProductModel = {
   supportsToolCall?: boolean;
   supportsImages?: boolean;
   supportsReasoning?: boolean;
+  onlyReasoning?: boolean;
   maxInputTokens?: number;
   maxOutputTokens?: number;
   canDisableThinking?: boolean;
@@ -130,7 +131,9 @@ function buildThinkingLevelMap(model: CodebuddyProductModel): ThinkingLevelMap |
   const supported = (model.reasoning?.supportedEfforts ?? []).filter(
     (effort) => typeof effort === "string" && effort.length > 0,
   );
-  const canDisable = model.canDisableThinking ?? model.reasoning?.canDisableThinking;
+  const canDisable = model.onlyReasoning
+    ? false
+    : (model.canDisableThinking ?? model.reasoning?.canDisableThinking);
 
   // No allowlist: leave pi-ai's defaults; omitting `off` keeps thinking disableable.
   if (supported.length === 0) {

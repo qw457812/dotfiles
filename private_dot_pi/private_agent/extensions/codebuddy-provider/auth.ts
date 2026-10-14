@@ -26,9 +26,10 @@ import type {
   TokenPayload,
 } from "./types.js";
 import {
-  asError,
+  HttpError,
   decodeJwtClaims,
   ensureSuccess,
+  isRetryableRequestError,
   firstNonEmpty,
   normalizeDomain,
   normalizeNonEmpty,
@@ -73,7 +74,7 @@ export async function loginCodebuddy(
   interaction.notify({ type: "progress", message: "Waiting for CodeBuddy authorization..." });
 
   const token = await pollToken(authState, interaction.signal);
-  return enrichCredentials(
+  const credentials = await enrichCredentials(
     {
       type: "oauth",
       access: token.accessToken,
@@ -86,6 +87,8 @@ export async function loginCodebuddy(
     },
     interaction.signal,
   );
+  interaction.signal?.throwIfAborted();
+  return credentials;
 }
 
 export async function refreshCodebuddyCredentials(
@@ -99,42 +102,47 @@ export async function refreshCodebuddyCredentials(
 
   const baseUrls = uniqueStrings([current.authBaseUrl, CLI_BASE_URL, ACCOUNT_BASE_URL]);
 
-  return tryEach(baseUrls, async (baseUrl) => {
-    const payload = await requestJson<ApiResponse<TokenData>>(`${baseUrl}${AUTH_REFRESH_PATH}`, {
-      method: "POST",
-      headers: {
-        ...COMMON_HEADERS,
-        Authorization: `Bearer ${current.access}`,
-        "Content-Type": "application/json",
-        "X-Domain": normalizeDomain(current.domain),
-        "X-Refresh-Token": current.refresh,
-        "X-Auth-Refresh-Source": "plugin",
-        "X-Request-ID": requestId(),
-        ...(current.userId ? { "X-User-Id": current.userId } : {}),
-      },
-      body: "{}",
-      signal,
-    });
-    ensureSuccess(payload, "Token refresh failed");
-    const data = payload.data;
-    const accessToken = data?.accessToken || data?.access_token;
-    if (!accessToken) {
-      throw new Error("Token refresh response missing accessToken");
-    }
+  return tryEach(
+    baseUrls,
+    async (baseUrl) => {
+      const payload = await requestJson<ApiResponse<TokenData>>(`${baseUrl}${AUTH_REFRESH_PATH}`, {
+        method: "POST",
+        headers: {
+          ...COMMON_HEADERS,
+          Authorization: `Bearer ${current.access}`,
+          "Content-Type": "application/json",
+          "X-Domain": normalizeDomain(current.domain),
+          "X-Refresh-Token": current.refresh,
+          "X-Auth-Refresh-Source": "plugin",
+          "X-Request-ID": requestId(),
+          ...(current.userId ? { "X-User-Id": current.userId } : {}),
+        },
+        body: "{}",
+        signal,
+      });
+      ensureSuccess(payload, "Token refresh failed");
+      const data = payload.data;
+      const accessToken = data?.accessToken || data?.access_token;
+      if (!accessToken) {
+        throw new Error("Token refresh response missing accessToken");
+      }
 
-    return enrichCredentials(
-      {
-        ...current,
-        access: accessToken,
-        refresh: data?.refreshToken || data?.refresh_token || current.refresh,
-        expires: parseExpiry(data?.expiresAt, data?.expiresIn) ?? current.expires,
-        domain: data?.domain || current.domain,
-        authBaseUrl: baseUrl,
-        accountBaseUrl: current.accountBaseUrl || ACCOUNT_BASE_URL,
-      },
-      signal,
-    );
-  });
+      return enrichCredentials(
+        {
+          ...current,
+          access: accessToken,
+          refresh: data?.refreshToken || data?.refresh_token || current.refresh,
+          expires: parseExpiry(data?.expiresAt, data?.expiresIn) ?? current.expires,
+          domain: data?.domain || current.domain,
+          authBaseUrl: baseUrl,
+          accountBaseUrl: current.accountBaseUrl || ACCOUNT_BASE_URL,
+        },
+        signal,
+        true,
+      );
+    },
+    signal,
+  );
 }
 
 export function codebuddyCredentialsToAuth(credentials: CodebuddyOAuthCredentials): ModelAuth {
@@ -156,23 +164,20 @@ export function codebuddyCredentialsToAuth(credentials: CodebuddyOAuthCredential
 async function enrichCredentials(
   credentials: CodebuddyOAuthCredentials,
   signal?: AbortSignal,
+  refreshProfile = false,
 ): Promise<CodebuddyOAuthCredentials> {
-  if (!needsProfileEnrichment(credentials)) return normalizeCredentials(credentials);
+  if (!refreshProfile && !needsProfileEnrichment(credentials))
+    return normalizeCredentials(credentials);
 
   try {
     const profile = await fetchProfile(credentials, signal);
     const merged: CodebuddyOAuthCredentials = {
       ...credentials,
-      userId: credentials.userId || profile.userId,
-      uid: credentials.uid || profile.uid,
-      email: credentials.email || profile.email,
-      nickname: credentials.nickname || profile.nickname,
-      enterpriseId: credentials.enterpriseId || profile.enterpriseId,
-      enterpriseName: credentials.enterpriseName || profile.enterpriseName,
-      departmentFullName: credentials.departmentFullName || profile.departmentFullName,
+      ...profile,
     };
     return normalizeCredentials(merged);
   } catch {
+    // Profile lookup is best-effort: never discard a successfully rotated refresh token.
     return normalizeCredentials(credentials);
   }
 }
@@ -218,67 +223,77 @@ async function fetchAuthState(signal?: AbortSignal): Promise<AuthState> {
     { baseUrl: ACCOUNT_BASE_URL, platform: "ide" },
   ];
 
-  return tryEach(attempts, async (attempt) => {
-    const payload = await requestJson<ApiResponse<AuthStateData>>(
-      `${attempt.baseUrl}${AUTH_STATE_PATH}?platform=${attempt.platform}`,
-      {
-        method: "POST",
-        headers: {
-          ...COMMON_HEADERS,
-          ...NO_AUTH_HEADERS,
-          "Content-Type": "application/json",
-          "X-Request-ID": requestId(),
+  return tryEach(
+    attempts,
+    async (attempt) => {
+      const payload = await requestJson<ApiResponse<AuthStateData>>(
+        `${attempt.baseUrl}${AUTH_STATE_PATH}?platform=${attempt.platform}`,
+        {
+          method: "POST",
+          headers: {
+            ...COMMON_HEADERS,
+            ...NO_AUTH_HEADERS,
+            "Content-Type": "application/json",
+            "X-Request-ID": requestId(),
+          },
+          body: "{}",
+          signal,
         },
-        body: "{}",
-        signal,
-      },
-    );
-    ensureSuccess(payload, "Failed to get CodeBuddy authorization URL");
-    const data = payload.data;
-    const state = data?.state || "";
-    const authUrl =
-      data?.authUrl ||
-      data?.auth_url ||
-      data?.url ||
-      `${attempt.baseUrl}/login?state=${encodeURIComponent(state)}`;
-    if (!state || !authUrl) {
-      throw new Error("CodeBuddy authorization response missing state or authUrl");
-    }
-    return {
-      baseUrl: attempt.baseUrl,
-      platform: attempt.platform,
-      state,
-      authUrl: toAbsoluteUrl(attempt.baseUrl, authUrl),
-    };
-  });
+      );
+      ensureSuccess(payload, "Failed to get CodeBuddy authorization URL");
+      const data = payload.data;
+      const state = data?.state || "";
+      const authUrl =
+        data?.authUrl ||
+        data?.auth_url ||
+        data?.url ||
+        `${attempt.baseUrl}/login?state=${encodeURIComponent(state)}`;
+      if (!state || !authUrl) {
+        throw new Error("CodeBuddy authorization response missing state or authUrl");
+      }
+      return {
+        baseUrl: attempt.baseUrl,
+        platform: attempt.platform,
+        state,
+        authUrl: toAbsoluteUrl(attempt.baseUrl, authUrl),
+      };
+    },
+    signal,
+  );
 }
 
 // ── Private: token polling ───────────────────────────────────────────────────
 
 async function pollToken(authState: AuthState, signal?: AbortSignal): Promise<TokenPayload> {
   const url = `${authState.baseUrl}${AUTH_TOKEN_PATH}?state=${encodeURIComponent(authState.state)}`;
-  const deadline = Date.now() + POLL_TIMEOUT_MS;
+  const timeout = AbortSignal.timeout(POLL_TIMEOUT_MS);
+  const pollSignal = signal ? AbortSignal.any([signal, timeout]) : timeout;
 
-  while (Date.now() < deadline) {
-    if (signal?.aborted) {
-      throw new Error("CodeBuddy authorization cancelled");
-    }
+  try {
+    while (true) {
+      pollSignal.throwIfAborted();
+      let payload: ApiResponse<TokenData>;
+      try {
+        payload = await requestJson<ApiResponse<TokenData>>(url, {
+          headers: {
+            ...COMMON_HEADERS,
+            ...NO_AUTH_HEADERS,
+          },
+          signal: pollSignal,
+        });
+      } catch (error) {
+        pollSignal.throwIfAborted();
+        const pending =
+          error instanceof HttpError && error.code !== null && PENDING_CODES.has(error.code);
+        if (!pending && !isRetryableRequestError(error)) throw error;
+        await sleep(POLL_INTERVAL_MS, pollSignal);
+        continue;
+      }
 
-    try {
-      const payload = await requestJson<ApiResponse<TokenData>>(url, {
-        headers: {
-          ...COMMON_HEADERS,
-          ...NO_AUTH_HEADERS,
-        },
-        signal,
-      });
       const code = readResponseCode(payload);
-      if (code !== null && SUCCESS_CODES.has(code)) {
-        const data = payload.data;
-        const accessToken = data?.accessToken || data?.access_token;
-        if (!accessToken) {
-          throw new Error("CodeBuddy authorization response missing accessToken");
-        }
+      const data = payload?.data;
+      const accessToken = data?.accessToken || data?.access_token;
+      if ((code === null || SUCCESS_CODES.has(code)) && accessToken) {
         return {
           accessToken,
           refreshToken: data?.refreshToken || data?.refresh_token || "",
@@ -287,24 +302,21 @@ async function pollToken(authState: AuthState, signal?: AbortSignal): Promise<To
           domain: data?.domain || DEFAULT_DOMAIN,
         };
       }
-      if (code !== null && !SUCCESS_CODES.has(code) && !PENDING_CODES.has(code)) {
+      if (code === null || SUCCESS_CODES.has(code)) {
+        throw new Error("CodeBuddy authorization response missing accessToken");
+      }
+      if (!PENDING_CODES.has(code)) {
         throw new Error(
           readResponseMessage(payload) || `CodeBuddy authorization failed (code=${code})`,
         );
       }
-    } catch (error) {
-      if (signal?.aborted) {
-        throw new Error("CodeBuddy authorization cancelled");
-      }
-      if (Date.now() + POLL_INTERVAL_MS >= deadline) {
-        throw asError(error);
-      }
+      await sleep(POLL_INTERVAL_MS, pollSignal);
     }
-
-    await sleep(POLL_INTERVAL_MS, signal);
+  } catch (error) {
+    if (signal?.aborted) throw new Error("CodeBuddy authorization cancelled");
+    if (timeout.aborted) throw new Error("CodeBuddy authorization timed out. Please try again");
+    throw error;
   }
-
-  throw new Error("CodeBuddy authorization timed out. Please try again");
 }
 
 // ── Private: profile ─────────────────────────────────────────────────────────
@@ -319,39 +331,43 @@ async function fetchProfile(
     ACCOUNT_BASE_URL,
   ]);
 
-  return tryEach(urls, async (baseUrl) => {
-    const payload = await requestJson<ApiResponse<AccountsData>>(`${baseUrl}${ACCOUNTS_PATH}`, {
-      headers: {
-        ...COMMON_HEADERS,
-        Authorization: `Bearer ${credentials.access}`,
-        "X-Domain": normalizeDomain(credentials.domain),
-      },
-      signal,
-    });
-    if (readResponseCode(payload) !== null) {
-      ensureSuccess(payload, "Failed to fetch CodeBuddy account info");
-    }
-    const data = payload.data;
-    const accounts = data?.accounts || data?.Accounts;
-    const selected = accounts?.find((a) => a.lastLogin === true) || accounts?.[0];
-    if (!selected) {
-      throw new Error("CodeBuddy account info is empty");
-    }
-    const uid = selected.uid || selected.id || "";
-    const nickname = selected.nickname || selected.label || selected.name || "";
-    const email = selected.email || "";
-    const enterpriseId = selected.enterpriseId || selected.enterprise_id || "";
-    const enterpriseName = selected.enterpriseName || selected.enterprise_name || "";
-    const departmentFullName =
-      selected.departmentFullName || selected.department_full_name || selected.deptFullName || "";
-    return {
-      userId: uid,
-      uid,
-      email: email || nickname || uid,
-      nickname: nickname || email || uid,
-      enterpriseId,
-      enterpriseName,
-      departmentFullName,
-    };
-  });
+  return tryEach(
+    urls,
+    async (baseUrl) => {
+      const payload = await requestJson<ApiResponse<AccountsData>>(`${baseUrl}${ACCOUNTS_PATH}`, {
+        headers: {
+          ...COMMON_HEADERS,
+          Authorization: `Bearer ${credentials.access}`,
+          "X-Domain": normalizeDomain(credentials.domain),
+        },
+        signal,
+      });
+      if (readResponseCode(payload) !== null) {
+        ensureSuccess(payload, "Failed to fetch CodeBuddy account info");
+      }
+      const data = payload.data;
+      const accounts = data?.accounts || data?.Accounts;
+      const selected = accounts?.find((a) => a.lastLogin === true) || accounts?.[0];
+      if (!selected) {
+        throw new Error("CodeBuddy account info is empty");
+      }
+      const uid = selected.uid || selected.id || "";
+      const nickname = selected.nickname || selected.label || selected.name || "";
+      const email = selected.email || "";
+      const enterpriseId = selected.enterpriseId || selected.enterprise_id || "";
+      const enterpriseName = selected.enterpriseName || selected.enterprise_name || "";
+      const departmentFullName =
+        selected.departmentFullName || selected.department_full_name || selected.deptFullName || "";
+      return {
+        userId: uid,
+        uid,
+        email: email || nickname || uid,
+        nickname: nickname || email || uid,
+        enterpriseId,
+        enterpriseName,
+        departmentFullName,
+      };
+    },
+    signal,
+  );
 }

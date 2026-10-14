@@ -1,6 +1,6 @@
 import { Buffer } from "node:buffer";
 import { randomUUID } from "node:crypto";
-import { DEFAULT_DOMAIN, EXPIRY_BUFFER_MS, SUCCESS_CODES } from "./constants.js";
+import { DEFAULT_DOMAIN, EXPIRY_BUFFER_MS, HTTP_TIMEOUT_MS, SUCCESS_CODES } from "./constants.js";
 
 // ── JWT ──────────────────────────────────────────────────────────────────────
 
@@ -148,8 +148,29 @@ export async function sleep(ms: number, signal?: AbortSignal): Promise<void> {
 
 // ── HTTP ─────────────────────────────────────────────────────────────────────
 
+export class HttpError extends Error {
+  constructor(
+    public readonly status: number,
+    message: string,
+    public readonly code: number | null = null,
+  ) {
+    super(`HTTP ${status}: ${message}`);
+    this.name = "HttpError";
+  }
+}
+
+export function isRetryableRequestError(error: unknown): boolean {
+  if (error instanceof HttpError) {
+    return error.status === 408 || error.status === 429 || error.status >= 500;
+  }
+  return error instanceof TypeError || (error instanceof Error && error.name === "TimeoutError");
+}
+
 export async function requestJson<T>(url: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(url, init);
+  const timeout = AbortSignal.timeout(HTTP_TIMEOUT_MS);
+  const signal = init?.signal ? AbortSignal.any([init.signal, timeout]) : timeout;
+  signal.throwIfAborted();
+  const response = await fetch(url, { ...init, signal });
   const text = await response.text();
   let payload: unknown = null;
   let parseError: Error | null = null;
@@ -161,7 +182,7 @@ export async function requestJson<T>(url: string, init?: RequestInit): Promise<T
 
   if (!response.ok) {
     const message = readResponseMessage(payload) || text || response.statusText;
-    throw new Error(`HTTP ${response.status}: ${message}`);
+    throw new HttpError(response.status, message, readResponseCode(payload));
   }
 
   if (parseError) {
@@ -177,13 +198,16 @@ export async function requestJson<T>(url: string, init?: RequestInit): Promise<T
 export async function tryEach<T, U>(
   items: T[],
   fn: (item: T, index: number) => Promise<U>,
+  signal?: AbortSignal,
 ): Promise<U> {
   if (items.length === 0) throw new Error("tryEach: no items to try");
   let lastError: unknown;
   for (let i = 0; i < items.length; i++) {
+    signal?.throwIfAborted();
     try {
       return await fn(items[i], i);
     } catch (error) {
+      signal?.throwIfAborted();
       lastError = error;
     }
   }

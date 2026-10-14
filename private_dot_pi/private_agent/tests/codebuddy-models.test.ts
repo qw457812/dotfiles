@@ -1,4 +1,4 @@
-import type { AnyModel, Provider } from "@earendil-works/pi-ai";
+import { type AnyModel, type Provider, createModels } from "@earendil-works/pi-ai";
 import type {
   ExtensionAPI,
   ExtensionCommandContext,
@@ -177,6 +177,35 @@ describe("CodeBuddy chat models", () => {
   });
 });
 
+describe("CodeBuddy reasoning-only models", () => {
+  it("disables off even when canDisableThinking otherwise permits it", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(
+        async () =>
+          new Response(
+            JSON.stringify({
+              code: 0,
+              data: {
+                models: [
+                  {
+                    id: "deepseek-v4-pro",
+                    name: "DeepSeek",
+                    supportsReasoning: true,
+                    onlyReasoning: true,
+                    canDisableThinking: true,
+                  },
+                ],
+              },
+            }),
+          ),
+      ),
+    );
+    const models = await fetchLiveModels({ accessToken: "test-token" });
+    expect(models[0].thinkingLevelMap).toEqual({ off: null });
+  });
+});
+
 const cheap = { ...chat, id: "cheap", name: "Cheap (x0.05 credits)" };
 const expensive = { ...chat, id: "expensive", name: "Expensive (x10 credits)" };
 
@@ -206,6 +235,36 @@ function setupPicker({
   };
   return { pi, ctx, run: () => handler("", ctx as unknown as ExtensionCommandContext) };
 }
+
+describe("CodeBuddy ambient authentication", () => {
+  it("discovers models through Pi using only CODEBUDDY_AUTH_TOKEN", async () => {
+    const { pi } = setupPicker();
+    const provider = pi.registerProvider.mock.calls[0][0] as Provider<"openai-completions">;
+    const env = vi.fn(async (name: string) =>
+      name === "CODEBUDDY_AUTH_TOKEN" ? "ambient-token" : undefined,
+    );
+    const models = createModels({ authContext: { env, fileExists: async () => false } });
+    models.setProvider(provider);
+    const fetch = vi.fn(
+      async (_url: unknown, _init?: RequestInit) =>
+        new Response(
+          JSON.stringify({
+            code: 0,
+            data: { models: [{ id: "live", name: "Live", credits: "x0.15" }] },
+          }),
+        ),
+    );
+    vi.stubGlobal("fetch", fetch);
+    const result = await models.refresh({ allowNetwork: true });
+    expect(result.errors.size).toBe(0);
+    expect(env).toHaveBeenCalledWith("CODEBUDDY_AUTH_TOKEN");
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(fetch.mock.calls[0][1]).toMatchObject({
+      headers: { Authorization: "Bearer ambient-token" },
+    });
+    expect(models.getModel(PROVIDER, "live")?.name).toBe("Live (x0.15)");
+  });
+});
 
 describe("CodeBuddy credits status", () => {
   function setupStatus(model: AnyModel | undefined, hasUI = true) {
