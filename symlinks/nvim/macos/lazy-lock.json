@@ -128,7 +128,7 @@
   "pi-subagent": { "branch": "main", "commit": "4fc1fe5178d1a2b474794a5ee39e7295844e9d3c" },
   "pi-vim": { "branch": "main", "commit": "e55b07c05b648f3bbccf656c2b0c6ec63f1a91d1" },
   "pi-vision-handoff": { "branch": "main", "commit": "a99694df9339475b5825ac39336984269ab9135b" },
-  "pi-voice": { "branch": "main", "commit": "1b7e95cd1e54ddd7634e3a2fcb610720508ba4c1" },
+  "pi-voice": { "branch": "main", "commit": "d2a09e7a668e32e639aed2f92c71c1d01dff5545" },
   "plenary.nvim": { "branch": "master", "commit": "74b06c6c75e4eeb3108ec01852001636d85a932b" },
   "ponytail": { "branch": "main", "commit": "2961b52fc1fe6a5a87c7a959a79512e5c2f3ffe5" },
   "ppt-master": { "branch": "main", "commit": "c2cb78ad997b41d16cefe083831d62571ab9f741" },

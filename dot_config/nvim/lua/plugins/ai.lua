@@ -1,7 +1,7 @@
 ---@class vim.var_accessor
 ---@field user_sidekick_indicator? { win: number }
 
-local sidekick_cli_toggle_key = "<M-space>"
+local sidekick_cli_toggle_key = "<M-CR>"
 local copilot_available = not vim.g.user_is_termux or vim.fn.executable("copilot-language-server") == 1
 
 ---@type LazySpec

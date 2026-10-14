@@ -3,7 +3,7 @@
   "backend": {
     "type": "transcribe-cpp"
   },
-  "shortcut": "alt+v",
+  "shortcut": "alt+space",
   "preferredLanguages": [
     "en",
     "zh"
@@ -13,9 +13,15 @@
   "microphone": {
     "type": "system-default"
   },
+  "voiceActivityDetection": true,
   "model": {
     "source": "catalog",
+{{- if eq .chezmoi.os "android" }}
+    "id": "SenseVoiceSmall",
+    "path": "~/.cache/huggingface/hub/models--handy-computer--SenseVoiceSmall-gguf/snapshots/4a08b8e900b38a977e32eb08d5d0697d6e72ba04/SenseVoiceSmall-Q8_0.gguf"
+{{- else }}
     "id": "Qwen3-ASR-0.6B",
     "path": "~/.cache/huggingface/hub/models--handy-computer--Qwen3-ASR-0.6B-gguf/snapshots/e4e16599b900eb0cb36e524514756bb92eb092b7/Qwen3-ASR-0.6B-Q8_0.gguf"
+{{- end }}
   }
 }
