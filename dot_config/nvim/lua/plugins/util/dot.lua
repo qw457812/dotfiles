@@ -1,29 +1,7 @@
 ---@type LazySpec
 return {
   -- learn
-  {
-    "folke/dot",
-    name = "folke-dot",
-    lazy = true,
-    config = function() end,
-    specs = {
-      {
-        "LazyVim/LazyVim",
-        keys = {
-          {
-            "<leader>lf",
-            function()
-              vim.cmd("Lazy log folke-dot")
-              vim.defer_fn(function()
-                vim.cmd("silent! /folke-dot")
-              end, 200)
-            end,
-            desc = "Folke Dot Logs",
-          },
-        },
-      },
-    },
-  },
+  { "folke/dot", name = "folke-dot", lazy = true, config = function() end },
 
   -- fish
   {

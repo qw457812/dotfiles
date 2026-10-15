@@ -22,23 +22,6 @@ return {
     end,
     lazy = true,
     config = function() end,
-    specs = {
-      {
-        "LazyVim/LazyVim",
-        keys = {
-          {
-            "<leader>ln",
-            function()
-              vim.cmd("Lazy log neovim")
-              vim.defer_fn(function()
-                vim.cmd("silent! /neovim")
-              end, 200)
-            end,
-            desc = "Neovim Logs",
-          },
-        },
-      },
-    },
   },
   { "LazyVim/starter", name = "LazyVim-starter", lazy = true, config = function() end },
 
@@ -68,27 +51,6 @@ return {
       },
     },
   },
-
-  -- {
-  --   "esmuellert/codediff.nvim",
-  --   enabled = not vim.g.user_is_termux,
-  --   dependencies = "MunifTanjim/nui.nvim",
-  --   cmd = "CodeDiff",
-  --   opts = {
-  --     -- wait for: https://github.com/esmuellert/codediff.nvim/issues/211
-  --     keymaps = {
-  --       view = {
-  --         next_hunk = "]h",
-  --         prev_hunk = "[h",
-  --         next_file = "J",
-  --         prev_file = "K",
-  --       },
-  --       explorer = {
-  --         hover = "gk",
-  --       },
-  --     },
-  --   },
-  -- },
 
   {
     "LazyVim/LazyVim",

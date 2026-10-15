@@ -165,30 +165,7 @@ end
 
 ---@type LazySpec
 return {
-  {
-    "gpakosz/.tmux",
-    commit = "87dcd13",
-    name = "oh-my-tmux",
-    lazy = true,
-    config = function() end,
-    specs = {
-      {
-        "LazyVim/LazyVim",
-        keys = {
-          {
-            "<leader>lt",
-            function()
-              vim.cmd("Lazy log oh-my-tmux")
-              vim.defer_fn(function()
-                vim.cmd("silent! /oh-my-tmux")
-              end, 200)
-            end,
-            desc = "Oh my tmux! Logs",
-          },
-        },
-      },
-    },
-  },
+  { "gpakosz/.tmux", commit = "87dcd13", name = "oh-my-tmux", lazy = true, config = function() end },
 
   -- https://github.com/arturgoms/nvim/blob/045c55460e36e1d4163b426b2ac66bd710721ac5/lua/3thparty/plugins/tmux.lua
   {
