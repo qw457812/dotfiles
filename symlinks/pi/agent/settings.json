@@ -44,6 +44,7 @@
     "+codemode"
   ],
   "extensions": [
+    "~/.local/share/nvim/lazy/pi/.pi/extensions/import-repro.ts",
     "-extensions/copilot-ratelimit.ts",
     "-extensions/git-checkpoint.ts",
     "-extensions/loop.ts",
