@@ -90,6 +90,37 @@ return {
   --   },
   -- },
 
+  {
+    "LazyVim/LazyVim",
+    opts = function()
+      -- tmux 3.8 can wait 500ms for bare Esc while an unanswered size query is pending.
+      -- Size queries were introduced in https://github.com/tmux/tmux/issues/4099;
+      -- https://github.com/tmux/tmux/commit/418ddada23d290ab02417b62213b402a08f4d9b5
+      -- added pending size queries to the 500ms delay guard (fixing #5388).
+      -- Send an explicit CSI-u Escape only to terminals whose job is tmux,
+      -- including Sidekick's embedded tmux clients (not shell jobs running tmux attach).
+      vim.api.nvim_create_autocmd("TermOpen", {
+        group = vim.api.nvim_create_augroup("tmux_terminal_escape", { clear = true }),
+        callback = function(event)
+          local buf = event.buf
+          vim.schedule(function()
+            if not vim.api.nvim_buf_is_valid(buf) then
+              return
+            end
+            local job = vim.b[buf].terminal_job_id
+            local argv = job and vim.api.nvim_get_chan_info(job).argv
+            if not argv or vim.fn.fnamemodify(argv[1] or "", ":t") ~= "tmux" then
+              return
+            end
+            vim.keymap.set("t", "<Esc>", function()
+              vim.api.nvim_chan_send(job, "\27[27;1u")
+            end, { buffer = buf, nowait = true, desc = "Send unambiguous Escape to tmux" })
+          end)
+        end,
+      })
+    end,
+  },
+
   -- for java projects using JDK version older than 21, 1.8 in my case
   {
     "mfussenegger/nvim-jdtls",
