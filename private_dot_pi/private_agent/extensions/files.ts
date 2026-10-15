@@ -9,7 +9,7 @@
  */
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-import { DynamicBorder } from "@earendil-works/pi-coding-agent";
+import { copyToClipboard, DynamicBorder } from "@earendil-works/pi-coding-agent";
 import { Container, Key, matchesKey, type SelectItem, SelectList, Text } from "@earendil-works/pi-tui";
 import { homedir } from "node:os";
 import { extname, isAbsolute, relative, resolve, sep } from "node:path";
@@ -192,6 +192,17 @@ export default function (pi: ExtensionAPI) {
 				}
 			};
 
+			const copyPath = async (path: string): Promise<void> => {
+				const absolutePath = resolve(ctx.cwd, path);
+				try {
+					await copyToClipboard(absolutePath);
+					ctx.ui.notify(`Copied ${absolutePath} to clipboard`, "info");
+				} catch (error) {
+					const message = error instanceof Error ? error.message : String(error);
+					ctx.ui.notify(`Failed to copy ${absolutePath}: ${message}`, "error");
+				}
+			};
+
 			// Show file picker with SelectList
 			await ctx.ui.custom<void>((tui, theme, _kb, done) => {
 				const container = new Container();
@@ -244,7 +255,11 @@ export default function (pi: ExtensionAPI) {
 
 				// Help text
 				container.addChild(
-					new Text(theme.fg("dim", " ↑↓ navigate • ←→ page • enter open • esc close"), 0, 0),
+					new Text(
+						theme.fg("dim", " ↑↓ navigate • ←→ page • u/d half-page • g/G top/bottom • y copy • enter open • esc close"),
+						0,
+						0,
+					),
 				);
 
 				// Bottom border
@@ -258,6 +273,17 @@ export default function (pi: ExtensionAPI) {
 							selectList.handleInput("\x1b[B"); // down
 						} else if (data === "k") {
 							selectList.handleInput("\x1b[A"); // up
+						} else if (data === "g" || data === "G") {
+							currentIndex = data === "g" ? 0 : items.length - 1;
+							selectList.setSelectedIndex(currentIndex);
+						} else if (data === "u" || data === "d") {
+							const halfPage = Math.max(1, Math.floor(visibleRows / 2));
+							const direction = data === "u" ? -1 : 1;
+							currentIndex = Math.max(0, Math.min(items.length - 1, currentIndex + direction * halfPage));
+							selectList.setSelectedIndex(currentIndex);
+						} else if (data === "y") {
+							const item = items[currentIndex];
+							if (item) void copyPath(item.value);
 						} else if (data === "h" || matchesKey(data, Key.left)) {
 							// Page up - clamp to 0
 							currentIndex = Math.max(0, currentIndex - visibleRows);
