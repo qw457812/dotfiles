@@ -347,7 +347,7 @@ export default function (pi: ExtensionAPI) {
     handler: (_args, ctx) => answerHandler(ctx),
   });
 
-  pi.registerShortcut("alt+,", {
+  pi.registerShortcut("alt+.", {
     description: "Answer a grilling round",
     handler: answerHandler,
   });

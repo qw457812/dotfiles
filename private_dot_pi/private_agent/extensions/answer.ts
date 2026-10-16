@@ -589,7 +589,7 @@ export default function (pi: ExtensionAPI) {
 		handler: (_args, ctx) => answerHandler(ctx),
 	});
 
-	pi.registerShortcut("alt+.", {
+	pi.registerShortcut("alt+,", {
 		description: "Extract and answer questions",
 		handler: answerHandler,
 	});
