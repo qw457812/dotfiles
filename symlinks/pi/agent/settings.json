@@ -46,6 +46,7 @@
   ],
   "extensions": [
     "~/.local/share/nvim/lazy/pi/.pi/extensions/import-repro.ts",
+    "~/.local/share/nvim/lazy/pi/packages/coding-agent/examples/extensions/bookmark.ts",
     "-extensions/copilot-ratelimit.ts",
     "-extensions/git-checkpoint.ts",
     "-extensions/loop.ts",

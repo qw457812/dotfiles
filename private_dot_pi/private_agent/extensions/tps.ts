@@ -228,6 +228,14 @@ export default function (pi: ExtensionAPI) {
 		if (output <= 0 || totalGenerationMs <= 0) return;
 
 		const parts = [
+			new Date()
+				.toLocaleString("zh-CN", {
+					month: "2-digit",
+					day: "2-digit",
+					hour: "2-digit",
+					minute: "2-digit",
+					hourCycle: "h23",
+				}),
 			`${turnCount} ${turnCount === 1 ? "turn" : "turns"}`,
 			`TPS ${formatDecimal(output / (totalGenerationMs / 1000), 1)}`,
 			...(ttftCount > 0 ? [`TTFT ${formatDuration(totalTtftMs / ttftCount)}`] : []),

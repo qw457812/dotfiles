@@ -1,7 +1,7 @@
 ---@class vim.var_accessor
 ---@field user_sidekick_indicator? { win: number }
 
-local sidekick_cli_toggle_key = "<M-CR>"
+local sidekick_cli_toggle_key = "<M-;>"
 local copilot_available = not vim.g.user_is_termux or vim.fn.executable("copilot-language-server") == 1
 
 ---@type LazySpec
@@ -240,12 +240,12 @@ return {
           {
             "<leader>lp",
             function()
-              vim.cmd("Lazy log pi")
+              vim.cmd("Lazy")
               vim.defer_fn(function()
                 vim.cmd("silent! /○ pi ")
               end, 200)
             end,
-            desc = "Pi Logs",
+            desc = "Pi",
           },
         },
       },

@@ -2,7 +2,7 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { confirm, confirmationResult } from "./confirmation.ts";
 
-const PROTECTED_PATHS = [".env", ".git/", "node_modules/", "id_rsa", ".ssh/"];
+const PROTECTED_PATHS = [".env", ".git/", "node_modules/", ".ssh/"];
 
 export default function registerPathChecks(pi: ExtensionAPI) {
   pi.on("tool_call", async (event, ctx) => {
