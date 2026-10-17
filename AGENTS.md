@@ -61,4 +61,4 @@ tmux -S "$SOCKET" kill-session -t "$SESSION"
 
 ## Commit Guidelines
 
-- Use subsystem/component scopes matching repository history, e.g. `pi/permission-gate`, `nvim/lua`.
+- Use subsystem/component scopes matching repository history, e.g. `pi/permission-gate`, `nvim/sidekick`.
