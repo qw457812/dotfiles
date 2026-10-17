@@ -171,11 +171,43 @@ return {
     lazy = true,
     config = function() end,
     build = function(plugin)
-      local target = vim.fn.expand("~/.config/tmux/tmux.conf")
-      vim.fn.mkdir(vim.fn.fnamemodify(target, ":h"), "p")
-      local res = vim.system({ "ln", "-sfn", plugin.dir .. "/.tmux.conf", target }):wait()
+      local tmux_conf = vim.fn.expand("~/.config/tmux/tmux.conf") --[[@as string]]
+      vim.fn.mkdir(vim.fn.fnamemodify(tmux_conf, ":h"), "p")
+      local res = vim.system({ "ln", "-sfn", plugin.dir .. "/.tmux.conf", tmux_conf }):wait()
       assert(res.code == 0, "Failed to link oh-my-tmux: " .. (res.stderr or ""))
     end,
+    specs = {
+      {
+        "LazyVim/LazyVim",
+        opts = function()
+          if not U.path.CHEZMOI then
+            return
+          end
+
+          local tmux_conf_local = U.path.CHEZMOI .. "/dot_config/tmux/tmux.conf.local"
+          vim.api.nvim_create_autocmd("BufRead", {
+            group = vim.api.nvim_create_augroup("oh_my_tmux_keymaps", {}),
+            pattern = tmux_conf_local,
+            callback = function(ev)
+              vim.keymap.set("n", "<localleader>d", function()
+                local omt_dir = require("lazy.core.config").spec.plugins["oh-my-tmux"].dir
+                local cmd = { "delta", "--paging", "never", omt_dir .. "/.tmux.conf.local", tmux_conf_local }
+                Snacks.terminal(cmd, {
+                  interactive = false,
+                  win = {
+                    height = U.snacks.win.fullscreen_height,
+                    width = 0,
+                    title = "oh-my-tmux .tmux.conf.local",
+                    zindex = (vim.api.nvim_win_get_config(0).zindex or 50) + 1,
+                    b = { user_lualine_filename = "diff" },
+                  },
+                })
+              end, { buffer = ev.buf, desc = "Diff with upstream oh-my-tmux" })
+            end,
+          })
+        end,
+      },
+    },
   },
 
   -- https://github.com/arturgoms/nvim/blob/045c55460e36e1d4163b426b2ac66bd710721ac5/lua/3thparty/plugins/tmux.lua
