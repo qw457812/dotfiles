@@ -165,7 +165,18 @@ end
 
 ---@type LazySpec
 return {
-  { "gpakosz/.tmux", commit = "87dcd13", name = "oh-my-tmux", lazy = true, config = function() end },
+  {
+    "gpakosz/.tmux",
+    name = "oh-my-tmux",
+    lazy = true,
+    config = function() end,
+    build = function(plugin)
+      local target = vim.fn.expand("~/.config/tmux/tmux.conf")
+      vim.fn.mkdir(vim.fn.fnamemodify(target, ":h"), "p")
+      local res = vim.system({ "ln", "-sfn", plugin.dir .. "/.tmux.conf", target }):wait()
+      assert(res.code == 0, "Failed to link oh-my-tmux: " .. (res.stderr or ""))
+    end,
+  },
 
   -- https://github.com/arturgoms/nvim/blob/045c55460e36e1d4163b426b2ac66bd710721ac5/lua/3thparty/plugins/tmux.lua
   {
