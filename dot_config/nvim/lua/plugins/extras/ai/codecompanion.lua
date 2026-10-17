@@ -149,28 +149,38 @@ return {
                 },
               },
               handlers = {
-                setup = function()
-                  return true
-                end,
-                auth = function()
-                  return true
-                end,
-                form_messages = function(self, messages, capabilities)
-                  return helpers.form_messages(self, messages, capabilities)
-                end,
-                on_exit = function() end,
+                lifecycle = {
+                  setup = function()
+                    return true
+                  end,
+                  auth = function()
+                    return true
+                  end,
+                  on_exit = function() end,
+                },
+                request = {
+                  build_messages = helpers.build_messages,
+                },
               },
             }
           end,
         },
       },
       interactions = {
+        inline = {
+          adapter = "neuralwatt",
+        },
         chat = {
           adapter = vim.fn.executable("pi-acp") == 1 and "pi" or "neuralwatt",
           sessions = {
             autosave = true,
           },
           slash_commands = {
+            fetch = {
+              opts = {
+                adapter = vim.g.user_is_termux and "jina" or nil,
+              },
+            },
             fork = {
               opts = {
                 auto_save_session = true,
@@ -186,6 +196,11 @@ return {
             user = "User",
           },
           tools = {
+            fetch_webpage = {
+              opts = {
+                adapter = vim.g.user_is_termux and "jina" or nil,
+              },
+            },
             run_command = {
               opts = {
                 safe_commands = { "git status", "git log", "git diff", "ls", "pwd", "rg" },
