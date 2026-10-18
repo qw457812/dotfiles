@@ -1,6 +1,12 @@
 # Path
 fish_add_path -g ~/go/bin
-set -q TERMUX_VERSION; or fish_add_path -g ~/.cargo/bin # https://github.com/rust-lang/rustup/blob/5e59246c45756b860ffa2c0e471e9989f0d56ff8/doc/user-guide/src/installation/already-installed-rust.md?plain=1#L63-L66
+if set -q TERMUX_VERSION
+    # Keep Termux Rust ahead of Rustup shims while exposing Cargo-installed tools.
+    # https://github.com/rust-lang/rustup/blob/5e59246c45756b860ffa2c0e471e9989f0d56ff8/doc/user-guide/src/installation/already-installed-rust.md?plain=1#L63-L66
+    fish_add_path --path --append ~/.cargo/bin
+else
+    fish_add_path -g ~/.cargo/bin
+end
 fish_add_path -g ~/.local/share/bob/nvim-bin
 fish_add_path -g ~/.local/bin
 fish_add_path -g ~/.opencode/bin

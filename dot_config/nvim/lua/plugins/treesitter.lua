@@ -4,7 +4,9 @@ return {
     "neovim/nvim-lspconfig",
     opts = {
       servers = {
-        ts_query_ls = not vim.g.user_is_termux and {} or nil,
+        ts_query_ls = {
+          mason = not vim.g.user_is_termux and nil, -- run `cargo install ts_query_ls` on termux
+        },
       },
     },
   },
