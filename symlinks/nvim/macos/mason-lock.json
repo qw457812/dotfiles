@@ -1,10 +1,10 @@
 {
-  "alejandra": "4.0.0",
+  "alejandra": "4.1.0",
   "basedpyright": "1.40.2",
   "bash-language-server": "5.8.1",
   "biome": "2.5.15",
   "codelldb": "v1.12.3",
-  "copilot-language-server": "1.553.0",
+  "copilot-language-server": "1.554.0",
   "debugpy": "1.8.22",
   "docker-compose-language-service": "1.0.0",
   "dockerfile-language-server": "0.15.0",
@@ -27,10 +27,10 @@
   "marksman": "2026-02-08",
   "nil": "2025-06-13",
   "oxfmt": "0.72.0",
-  "oxlint": "1.87.0",
+  "oxlint": "1.88.0",
   "prettier": "3.9.10",
   "pyright": "1.1.414",
-  "ruff": "0.17.0",
+  "ruff": "0.17.1",
   "selene": "0.32.0",
   "shellcheck": "v0.11.0",
   "shfmt": "v3.14.1",
@@ -44,5 +44,5 @@
   "vscode-spring-boot-tools": "2.2.0",
   "vtsls": "0.3.0",
   "vue-language-server": "3.3.13",
-  "yaml-language-server": "1.25.0"
+  "yaml-language-server": "2.0.0"
 }

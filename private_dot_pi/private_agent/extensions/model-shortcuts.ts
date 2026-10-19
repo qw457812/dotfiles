@@ -32,8 +32,9 @@ const ALIASES: Record<string, ModelTarget | readonly ModelTarget[]> = {
     { provider: "hyper", id: "glm-5.3-flash" },
   ],
   ds: [
+    { provider: "neuralwatt", id: "deepseek-v4.1-flash-canary" },
+    { provider: "coralbricks", id: "deepseek-v4.1-flash-fast" },
     { provider: "codebuddy", id: "deepseek-v4.1-flash" },
-    { provider: "neuralwatt", id: "deepseek-v4.1-flash" },
     { provider: "commandcode", id: "deepseek/deepseek-v4.1-flash" },
     { provider: "hyper", id: "deepseek-v4.1-flash" },
   ],
