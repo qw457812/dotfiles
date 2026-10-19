@@ -358,6 +358,10 @@ Verify late competing installs, coalesced reinstalls, retained drafts/history,
 setter callbacks, fresh command names, same/new UI session replacement, and stale
 timer callbacks after session replacement or shutdown. History retention includes
 both asynchronously loaded previous-session prompts and prompts added since
-startup, not only the initial branch snapshot. Shutdown must cancel queued work,
+startup, not only the initial branch snapshot. Reinstalls clone the current
+session-owned editor's history, including an intentionally empty array, and reset
+its browsing index to `-1`. Only the first install hydrates the branch snapshot;
+a new session starts with a fresh editor reference rather than copying its peer.
+Shutdown must cancel queued work,
 restore an unwrapped bound setter, unsubscribe focus, and release cursor resources.
 Host-contract tests do not replace interactive checks with the target Pi/pi-vim.

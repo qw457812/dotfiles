@@ -321,9 +321,33 @@ describe("prompt-editor installation lifecycle (host-contract integration)", () 
     const h = host();
     e.start(context(h));
     h.editor.addToHistory("submitted since startup");
+    h.editor.historyIndex = 1;
+    const previousHistory = h.editor.history;
     h.ui.setEditorComponent(h.competitor);
     await vi.runAllTimersAsync();
     expect(h.editor.history).toEqual(["submitted since startup", "second", "first"]);
+    expect(h.editor.history).not.toBe(previousHistory);
+    expect(h.editor.historyIndex).toBe(-1);
+    h.editor.addToHistory("another prompt");
+    expect(previousHistory).toEqual(["submitted since startup", "second", "first"]);
+    h.ui.setEditorComponent(h.competitor);
+    await vi.runAllTimersAsync();
+    expect(h.editor.history).toEqual([
+      "another prompt",
+      "submitted since startup",
+      "second",
+      "first",
+    ]);
+  });
+
+  it("preserves an explicitly emptied history instead of restoring the startup snapshot", async () => {
+    const e = await extension();
+    const h = host();
+    e.start(context(h));
+    h.editor.history = [];
+    h.ui.setEditorComponent(h.competitor);
+    await vi.runAllTimersAsync();
+    expect(h.editor.history).toEqual([]);
   });
 
   it("reinstalls after a caller requests the default editor", async () => {
@@ -398,6 +422,24 @@ describe("prompt-editor installation lifecycle (host-contract integration)", () 
     h.ui.setEditorComponent(h.competitor);
     await vi.runAllTimersAsync();
     expect(h.editor.history).toEqual(["second", "first", "previous session"]);
+  });
+
+  it("retains history loaded after a reinstall when another reinstall follows", async () => {
+    const complete = previousHistory();
+    const e = await extension();
+    const h = host();
+    e.start(context(h));
+    h.ui.setEditorComponent(h.competitor);
+    await vi.runAllTimersAsync();
+    complete();
+    await vi.waitFor(() =>
+      expect(h.editor.history).toEqual(["second", "first", "previous session"]),
+    );
+    h.ui.setEditorComponent(h.competitor);
+    h.editor.setText("draft changed during replacement");
+    await vi.runAllTimersAsync();
+    expect(h.editor.history).toEqual(["second", "first", "previous session"]);
+    expect(h.editor.getText()).toBe("draft changed during replacement");
   });
 
   it("discards late history when the user has edited the draft", async () => {

@@ -435,6 +435,9 @@ export default async function (pi: ExtensionAPI) {
 
     const installPromptEditor = (history: PromptHistory) => {
       if (!isCurrentSession()) return;
+      // The startup snapshot misses prompts added or loaded since installation.
+      // This editor reference belongs to this session, not the competing editor.
+      const retainedHistory = editor?.history?.slice();
       originalSetEditorComponent?.((tui, editorTheme, kb) => {
         const newEditor = new PromptEditor(
           tui,
@@ -471,7 +474,12 @@ export default async function (pi: ExtensionAPI) {
         editor = newEditor as unknown as ModalEditorRuntime;
         cursor.install(tui, newEditor);
 
-        hydratePromptHistory(editor, history);
+        if (retainedHistory) {
+          editor.history = retainedHistory;
+          editor.historyIndex = -1;
+        } else {
+          hydratePromptHistory(editor, history);
+        }
         return newEditor;
       });
 
