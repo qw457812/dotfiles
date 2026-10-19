@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { handleVisualPaste } from "../extensions/prompt-editor/visual-paste.ts";
+import { handleVisualPaste } from "../../extensions/prompt-editor/visual-paste.ts";
 
 function fixture() {
   const editor = {

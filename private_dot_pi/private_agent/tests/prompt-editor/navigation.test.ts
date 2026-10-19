@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   handleNormalHorizontalMotion,
   handleVisualLineRemap,
-} from "../extensions/prompt-editor/navigation.ts";
+} from "../../extensions/prompt-editor/navigation.ts";
 
 function fixture(lines = ["abc", "def"]) {
   const state = { lines, cursorLine: 0, cursorCol: 0 };

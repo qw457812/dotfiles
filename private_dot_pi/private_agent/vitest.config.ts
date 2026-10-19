@@ -9,7 +9,7 @@ export default defineConfig({
       {
         find: /^.*\/pi-vim\.generated\.ts$/,
         replacement: fileURLToPath(
-          new URL("./tests/fixtures/prompt-editor-pi-vim.ts", import.meta.url),
+          new URL("./tests/prompt-editor/fixtures/pi-vim.ts", import.meta.url),
         ),
       },
     ],

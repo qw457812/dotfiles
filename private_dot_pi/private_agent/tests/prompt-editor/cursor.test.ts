@@ -1,7 +1,10 @@
 import { CURSOR_MARKER, Editor, renderFakeCursor, type TUI } from "@earendil-works/pi-tui";
 import { describe, expect, it, vi } from "vitest";
 
-import { createCursorController, renderPromptCursor } from "../extensions/prompt-editor/cursor.ts";
+import {
+  createCursorController,
+  renderPromptCursor,
+} from "../../extensions/prompt-editor/cursor.ts";
 
 describe("prompt-editor cursor controller", () => {
   function setup(initial = true) {

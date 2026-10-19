@@ -6,7 +6,7 @@ import {
   readMacOSClipboard,
   readTermuxClipboard,
   writeTermuxClipboard,
-} from "../extensions/prompt-editor/clipboard.ts";
+} from "../../extensions/prompt-editor/clipboard.ts";
 
 vi.mock("node:child_process", () => ({ spawn: vi.fn(), spawnSync: vi.fn() }));
 

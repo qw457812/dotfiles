@@ -74,7 +74,7 @@ vi.mock("@earendil-works/pi-coding-agent", () => ({
   getAgentDir: () => "/test/agent",
   CustomEditor: mocks.ModalEditor,
 }));
-vi.mock("../extensions/prompt-editor/pi-vim.generated.ts", () => ({
+vi.mock("../../extensions/prompt-editor/pi-vim.generated.ts", () => ({
   ModalEditor: mocks.ModalEditor,
   readPiVimSettings: mocks.readSettings,
   resolveClipboardMirrorPolicy: (policy: string) => ({ policy }),
@@ -89,14 +89,14 @@ vi.mock("../extensions/prompt-editor/pi-vim.generated.ts", () => ({
   createModeChangeHandler: (_settings: unknown, emit: (event: unknown) => void) => emit,
   cancelModeChangeCommands: mocks.cancelModeChangeCommands,
 }));
-vi.mock("../extensions/prompt-editor/clipboard.ts", () => ({
+vi.mock("../../extensions/prompt-editor/clipboard.ts", () => ({
   installClipboardBridge: mocks.clipboard,
 }));
-vi.mock("../extensions/prompt-editor/cursor.ts", () => ({
+vi.mock("../../extensions/prompt-editor/cursor.ts", () => ({
   createCursorController: () => mocks.cursor,
 }));
 
-import promptEditor from "../extensions/prompt-editor/index.ts";
+import promptEditor from "../../extensions/prompt-editor/index.ts";
 
 type Editor = InstanceType<typeof mocks.ModalEditor>;
 type Factory = (...args: unknown[]) => Editor;

@@ -167,7 +167,7 @@ mode changes, editor reinstalls, shutdown reset, a missing hardware marker, clip
 APC endings, wide/combining graphemes, and narrow rendering pass.
 Preserve cursor-cell text and selection styles; restrict changes to the editor body,
 leaving borders, mode labels, and autocomplete rows intact. Run
-`tests/prompt-editor-cursor.test.ts` against the target host as well as interactive checks.
+`tests/prompt-editor/cursor.test.ts` against the target host as well as interactive checks.
 
 ## Ex input passthrough
 
@@ -295,7 +295,7 @@ Verification must cover characterwise and linewise `p`/`P`, counted puts, `fp`/`
 and pending-`g` sequences, selections ending at the buffer end, one-step undo, the
 post-`p` deleted register, and the post-`P` preserved register. Fail loudly if any
 required private runtime member is unavailable. Run
-`tests/prompt-editor-visual-paste.test.ts`; verify actual buffer, register, and
+`tests/prompt-editor/visual-paste.test.ts`; verify actual buffer, register, and
 one-step undo behavior against the installed pi-vim runtime, not just mocked calls.
 
 ## Clipboard bridge
@@ -313,7 +313,7 @@ read limits and timeouts shared across both platforms. Termux write failures mus
 retain the spawn-style metadata consumed by pi-vim's circuit breaker, and aborts
 must kill the helper and remove the abort listener.
 
-Complete when `tests/prompt-editor-clipboard.test.ts` passes, and changed upstream hook,
+Complete when `tests/prompt-editor/clipboard.test.ts` passes, and changed upstream hook,
 register-fallback, or mirror contracts have been verified against the target
 pi-vim runtime. Mocked process tests alone do not prove those contracts.
 
@@ -348,7 +348,7 @@ that behavior (for example cursor shape or thinking-level border fallback).
 
 ### Installation lifecycle
 
-Run `tests/prompt-editor-lifecycle.test.ts` for the real extension entry point and
+Run `tests/prompt-editor/lifecycle.test.ts` for the real extension entry point and
 prompt-history helpers against a controlled host and mocked pi-vim dependencies.
 The fixture models Pi's text/callback transfer and post-factory border overwrite;
 those are host responsibilities, not work performed by prompt-editor itself.
