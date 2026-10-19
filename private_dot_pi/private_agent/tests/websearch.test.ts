@@ -499,6 +499,44 @@ describe("tool (forced MCP provider)", () => {
     expect(err.message).toBe("MCP request to web_search_exa was cancelled");
   });
 
+  it("parses an SSE tools/call response", async () => {
+    const payload = JSON.stringify({
+      jsonrpc: "2.0",
+      id: 1,
+      result: {
+        content: [
+          { type: "text", text: "URL: https://example.com/a\nTitle: Example\nText:\nhello" },
+        ],
+      },
+    });
+    const tool = activateTool(
+      mods,
+      () => new Response(`event: message\ndata: ${payload}\n\n`, { status: 200 }),
+    );
+    const out = await tool.run("golden query");
+
+    expect(out.content[0].text).toBe("## [Example](https://example.com/a)\n\nhello");
+  });
+
+  it("propagates MCP tool errors that carry no text", async () => {
+    const tool = activateTool(
+      mods,
+      () =>
+        new Response(
+          JSON.stringify({
+            jsonrpc: "2.0",
+            id: 1,
+            result: { content: [], isError: true, structuredContent: { results: [] } },
+          }),
+          { status: 200 },
+        ),
+    );
+    const err = await captureError(tool.run("golden query"));
+
+    expect(err.message).toBe("Unable to search the web for golden query");
+    expect(err.cause.message).toBe("Exa search failed");
+  });
+
   // A 429 whose body is still being read must keep the cancellation/timeout
   // classification: swallowing it as HttpCallError would turn an abort into a
   // rate limit and drive cooldown/failover.
@@ -943,5 +981,38 @@ describe("tool (forced firecrawl provider)", () => {
 
     expect(err.message).toBe("Unable to search the web for golden query");
     expect(err.cause.message).toBe("Firecrawl search failed");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Tool-level cases (forced Parallel provider) — Parallel parses
+// structuredContent, but an MCP error without text must still surface an
+// actionable message.
+// ---------------------------------------------------------------------------
+
+describe("tool (forced parallel provider)", () => {
+  let mods: Mods;
+
+  beforeEach(async () => {
+    mods = await loadWebsearch("parallel");
+  });
+
+  it("propagates MCP tool errors that carry no text", async () => {
+    const tool = activateTool(
+      mods,
+      () =>
+        new Response(
+          JSON.stringify({
+            jsonrpc: "2.0",
+            id: 1,
+            result: { content: [], isError: true, structuredContent: { results: [] } },
+          }),
+          { status: 200 },
+        ),
+    );
+    const err = await captureError(tool.run("golden query"));
+
+    expect(err.message).toBe("Unable to search the web for golden query");
+    expect(err.cause.message).toBe("Parallel search failed");
   });
 });

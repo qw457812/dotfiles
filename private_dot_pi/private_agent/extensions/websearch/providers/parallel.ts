@@ -48,7 +48,7 @@ function getParallelHeaders(): Record<string, string> {
 
 function parseParallelResults(mcpResult: McpCallResult): WebSearchResult[] {
   if (mcpResult.isError) {
-    throw new Error(mcpResult.text);
+    throw new Error(mcpResult.text || "Parallel search failed");
   }
   const structured = mcpResult.structuredContent as Partial<ParallelSearchResponse> | undefined;
   if (!structured?.results || !Array.isArray(structured.results)) {

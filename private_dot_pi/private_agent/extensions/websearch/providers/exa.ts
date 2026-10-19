@@ -64,7 +64,7 @@ export const exaProvider: WebSearchProvider = {
       signal: ctx.signal,
     });
     if (result?.isError) {
-      throw new Error(result.text);
+      throw new Error(result.text || "Exa search failed");
     }
     return result ? parseExaResults(result.text) : [];
   },

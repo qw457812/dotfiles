@@ -1,6 +1,14 @@
 /**
  * Lightweight MCP-over-HTTP client.
  *
+ * Hand-rolled rather than using @earendil-works/pi-mcp: Exa/Parallel/Firecrawl
+ * are stateless one-shot `tools/call`s, and pi's client must `connect()`
+ * (initialize + initialized) before it can send one — two extra round trips
+ * per search. Its `McpHttpError` also exposes only status and body, not
+ * Retry-After, which the selection layer needs to size 429 cooldowns.
+ * TinyFish's keyed handshake needs the raw initialize exchange, which
+ * `mcpRequest` already exposes.
+ *
  * Two entry points over the same transport (timeout, abort, 429/Retry-After
  * mapping):
  * - `mcpRequest` posts one raw JSON-RPC message and returns the HTTP response
@@ -12,6 +20,8 @@
  * - Direct JSON body: decode JSON-RPC envelope, extract result.content[].text
  * - SSE body: scan `data:` lines, parse each as JSON-RPC, return first with text
  * - TypeBox schema validation on parsed JSON (mirrors OpenCode's Effect Schema)
+ * - Response bodies are read with a MAX_RESPONSE_BYTES (256 KiB) cap while
+ *   streaming, matching v2's collectBoundedResponseBody
  *
  * Error detection (prevents silent failures on HTTP 200):
  * - JSON-RPC error envelope (error.code + error.message) → McpRpcError (throw)
@@ -396,8 +406,9 @@ export function parseJsonRpcEnvelope(body: string): Record<string, unknown> | un
  * (TinyFish's `initialize` / `notifications/initialized` handshake), where the
  * response is either not a CallToolResult or is a bodyless 2xx acknowledgement.
  *
- * Throws on timeout, user cancellation, network error, or non-2xx status
- * (`HttpCallError`, carrying Retry-After so 429s drive the selection cooldown).
+ * Throws on timeout, user cancellation, network error, non-2xx status
+ * (`HttpCallError`, carrying Retry-After so 429s drive the selection cooldown),
+ * or a body over MAX_RESPONSE_BYTES (`McpResponseTooLargeError`).
  */
 export async function mcpRequest(options: McpRequestOptions): Promise<McpRawResponse> {
   const {
@@ -503,7 +514,7 @@ export async function mcpRequest(options: McpRequestOptions): Promise<McpRawResp
  * 2025-06-18, `content` is required but may be empty, so they are
  * schema-valid and must not be treated as empty results.
  * Throws on timeout, user cancellation, network error, JSON-RPC protocol error,
- * or schema mismatch.
+ * schema mismatch, or a body over MAX_RESPONSE_BYTES.
  *
  * When the tool reports an execution error (isError: true), the result is
  * returned (not thrown) so the caller can surface the error content to the
