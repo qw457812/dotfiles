@@ -345,3 +345,19 @@ resource setup with its target `session_shutdown` cleanup, such as
 The complete condition is a setter-by-setter comparison with the target pi-vim
 factory: every difference is either mirrored or justified by `prompt-editor` owning
 that behavior (for example cursor shape or thinking-level border fallback).
+
+### Installation lifecycle
+
+Run `tests/prompt-editor-lifecycle.test.ts` for the real extension entry point and
+prompt-history helpers against a controlled host and mocked pi-vim dependencies.
+The fixture models Pi's text/callback transfer and post-factory border overwrite;
+those are host responsibilities, not work performed by prompt-editor itself.
+Revalidate that contract against the target `setCustomEditorComponent()`.
+
+Verify late competing installs, coalesced reinstalls, retained drafts/history,
+setter callbacks, fresh command names, same/new UI session replacement, and stale
+timer callbacks after session replacement or shutdown. History retention includes
+both asynchronously loaded previous-session prompts and prompts added since
+startup, not only the initial branch snapshot. Shutdown must cancel queued work,
+restore an unwrapped bound setter, unsubscribe focus, and release cursor resources.
+Host-contract tests do not replace interactive checks with the target Pi/pi-vim.
