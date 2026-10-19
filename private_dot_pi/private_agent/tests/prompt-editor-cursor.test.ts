@@ -1,7 +1,150 @@
 import { CURSOR_MARKER, Editor, renderFakeCursor, type TUI } from "@earendil-works/pi-tui";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
-import { renderPromptCursor } from "../extensions/prompt-editor/cursor.ts";
+import { createCursorController, renderPromptCursor } from "../extensions/prompt-editor/cursor.ts";
+
+describe("prompt-editor cursor controller", () => {
+  function setup(initial = true) {
+    let enabled = initial;
+    let mode = "insert";
+    const tui = {
+      getShowHardwareCursor: vi.fn(() => enabled),
+      setShowHardwareCursor: vi.fn((value: boolean) => {
+        enabled = value;
+      }),
+      requestRender: vi.fn(),
+      terminal: { write: vi.fn() },
+    };
+    const editor = { getMode: () => mode };
+    const writeReset = vi.fn();
+    const controller = createCursorController(writeReset);
+    return {
+      tui,
+      editor,
+      controller,
+      writeReset,
+      setPreference(value: boolean) {
+        enabled = value;
+      },
+      setMode(value: string) {
+        mode = value;
+      },
+    };
+  }
+
+  it.each(["insert", "normal", "visual", "visual-line"])("installs the shape for %s", (mode) => {
+    const { tui, editor, controller, setMode } = setup();
+    setMode(mode);
+    controller.install(tui, editor);
+    expect(tui.setShowHardwareCursor).not.toHaveBeenCalled();
+    expect(tui.terminal.write).toHaveBeenCalledWith(mode === "insert" ? "\x1b[6 q" : "\x1b[2 q");
+  });
+
+  it("hides on blur without mistaking forced visibility for a setting change", () => {
+    const { tui, editor, controller, setMode } = setup();
+    controller.install(tui, editor);
+    controller.setFocused(false);
+    controller.syncPreference("insert");
+    controller.modeChanged("normal");
+    expect(tui.terminal.write.mock.calls).toEqual([["\x1b[6 q"], ["\x1b[0 q"]]);
+    setMode("normal");
+    controller.setFocused(true);
+    expect(tui.setShowHardwareCursor.mock.calls).toEqual([[false], [true]]);
+    expect(tui.terminal.write).toHaveBeenLastCalledWith("\x1b[2 q");
+    expect(tui.requestRender).not.toHaveBeenCalled();
+    const lines = ["──", renderFakeCursor("x"), "──"];
+    controller.render(lines, 2);
+    expect(lines[1]).toBe(`${CURSOR_MARKER}x`);
+  });
+
+  it("keeps software mode free of shape changes and rerenders on focus changes", () => {
+    const { tui, editor, controller } = setup(false);
+    controller.install(tui, editor);
+    const body = `${CURSOR_MARKER}${renderFakeCursor("x")}`;
+    const focused = ["──", body, "──"];
+    controller.render(focused, 2);
+    expect(focused[1]).toBe(body);
+    controller.setFocused(false);
+    const blurred = ["──", body, "──"];
+    controller.render(blurred, 2);
+    expect(blurred[1]).toBe(`${CURSOR_MARKER}x`);
+    controller.modeChanged("normal");
+    controller.setFocused(true);
+    const restored = ["──", body, "──"];
+    controller.render(restored, 2);
+    expect(restored[1]).toBe(body);
+    expect(tui.requestRender).toHaveBeenCalledTimes(2);
+    expect(tui.setShowHardwareCursor).not.toHaveBeenCalled();
+    expect(tui.terminal.write).not.toHaveBeenCalled();
+  });
+
+  it("syncs live settings without setting visibility or requesting another render", () => {
+    const { tui, editor, controller, setPreference } = setup();
+    controller.install(tui, editor);
+    setPreference(false);
+    controller.syncPreference("normal");
+    controller.modeChanged("insert");
+    controller.syncPreference("normal");
+    setPreference(true);
+    controller.syncPreference("normal");
+    controller.modeChanged("insert");
+    expect(tui.terminal.write.mock.calls).toEqual([
+      ["\x1b[6 q"],
+      ["\x1b[0 q"],
+      ["\x1b[2 q"],
+      ["\x1b[6 q"],
+    ]);
+    expect(tui.setShowHardwareCursor).not.toHaveBeenCalled();
+    expect(tui.requestRender).not.toHaveBeenCalled();
+  });
+
+  it("remembers focus before installation", () => {
+    const { tui, editor, controller } = setup();
+    controller.setFocused(false);
+    controller.install(tui, editor);
+    expect(tui.setShowHardwareCursor).toHaveBeenCalledWith(false);
+    expect(tui.terminal.write).toHaveBeenCalledWith("\x1b[0 q");
+  });
+
+  it("retains the stable Proxy setter across editor reinstallation", () => {
+    const { tui, editor, controller } = setup();
+    controller.install(tui, editor);
+    const original = tui.setShowHardwareCursor;
+    tui.setShowHardwareCursor = vi.fn();
+    controller.install(tui, editor);
+    controller.setFocused(false);
+    expect(original).toHaveBeenCalledWith(false);
+    expect(tui.setShowHardwareCursor).not.toHaveBeenCalled();
+  });
+
+  it("defaults to hardware mode when the getter is unavailable", () => {
+    const { tui, editor, controller } = setup();
+    controller.install({ ...tui, getShowHardwareCursor: undefined }, editor);
+    controller.syncPreference("normal");
+    expect(tui.setShowHardwareCursor).toHaveBeenCalledWith(true);
+    expect(tui.terminal.write.mock.calls).toEqual([["\x1b[6 q"]]);
+  });
+
+  it("resets on shutdown, releases old references, and starts clean on reuse", () => {
+    const first = setup();
+    const { controller, writeReset } = first;
+    controller.install(first.tui, first.editor);
+    controller.setFocused(false);
+    controller.shutdown();
+    controller.modeChanged("normal");
+    controller.syncPreference("normal");
+    expect(writeReset).toHaveBeenCalledWith("\x1b[0 q");
+    expect(first.tui.terminal.write).toHaveBeenCalledTimes(2);
+    const next = setup();
+    controller.install(next.tui, next.editor);
+    controller.setFocused(false);
+    expect(next.tui.setShowHardwareCursor).toHaveBeenCalledWith(false);
+    expect(first.tui.setShowHardwareCursor).toHaveBeenCalledTimes(1);
+    controller.shutdown();
+    controller.shutdown();
+    expect(writeReset).toHaveBeenCalledTimes(3);
+  });
+});
 
 const inverse = (text: string) => `\x1b[7m${text}\x1b[27m`;
 

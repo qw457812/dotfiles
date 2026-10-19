@@ -11,7 +11,7 @@ import {
 import { Key, matchesKey, truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
 
 import { installClipboardBridge } from "./clipboard.ts";
-import { renderPromptCursor } from "./cursor.ts";
+import { createCursorController } from "./cursor.ts";
 import {
   applyPromptHistory,
   hydratePromptHistory,
@@ -235,76 +235,18 @@ export default async function (pi: ExtensionAPI) {
     return colorize ? colorize(prefix) : prefix;
   }
 
-  type CursorTUI = {
-    getShowHardwareCursor?: () => boolean;
-    setShowHardwareCursor: (enabled: boolean) => void;
-    requestRender: (force?: boolean) => void;
-    terminal: {
-      write: (data: string) => void;
-    };
-  };
-
   type EditorUI = {
     setEditorComponent: ExtensionUIContext["setEditorComponent"];
   };
 
   type PromptHistory = Parameters<typeof hydratePromptHistory>[1];
 
-  let blurred = false;
-  let activeTui: CursorTUI | undefined;
-  let activeEditor: ModalEditorRuntime | undefined;
+  const cursor = createCursorController();
   let activeUi: EditorUI | undefined;
 
-  // User preference from /setting "Show hardware cursor". Mirrors the value
-  // that interactive-mode writes via tui.setShowHardwareCursor(). When false,
-  // we leave the upstream fake inverse-video cursor intact (stripping it on
-  // blur, restoring on focus) and skip all cursor-shape sequences.
-  let userPrefersShowHardwareCursor = true;
-
-  // Stable Proxy method used by blur/focus handling. Pi 0.84.1 preserves the
-  // captured method while routing it to a replacement renderer after a TUI-mode switch.
-  let originalSetShowHardwareCursor: CursorTUI["setShowHardwareCursor"] | undefined;
   let originalSetEditorComponent: EditorUI["setEditorComponent"] | undefined;
   let reinstallTimer: NodeJS.Timeout | undefined;
   let sessionGeneration = 0;
-
-  // ANSI DECSCUSR cursor style sequences (CSI Ps SP q).
-  // Pi 1.2's Editor emits an APC-wrapped cursor cell; the TUI resolves it
-  // to inverse video unless we remove the wrapper in renderPromptCursor().
-  //
-  // When the user enables hardware cursor, we keep only the zero-width
-  // CURSOR_MARKER and drive the visible cursor with DECSCUSR shapes. Focus
-  // tracking hides/shows the hardware cursor so the visible block no longer
-  // depends on best-effort focus events.
-  //
-  // When the user disables hardware cursor, we leave the fake inverse-video
-  // cursor intact (stripping it on blur, restoring on focus) and only emit
-  // CURSOR_STYLE_RESET to clear any lingering cursor shape.
-  const CURSOR_STYLE_INSERT = "\x1b[6 q"; // steady bar
-  const CURSOR_STYLE_NORMAL = "\x1b[2 q"; // steady block
-  const CURSOR_STYLE_RESET = "\x1b[0 q"; // reset to default
-
-  function getCursorStyle(mode: Mode): string {
-    return mode === "insert" ? CURSOR_STYLE_INSERT : CURSOR_STYLE_NORMAL;
-  }
-
-  /** Apply hardware cursor visibility based on user preference and current
-   *  focus state. Uses the original setter to bypass the wrapper installed
-   *  on tui.setShowHardwareCursor. */
-  function applyHardwareCursorVisibility(tui: CursorTUI): void {
-    if (!originalSetShowHardwareCursor) return;
-    const effective = userPrefersShowHardwareCursor && !blurred;
-    if (tui.getShowHardwareCursor?.() === effective) return;
-    originalSetShowHardwareCursor(effective);
-  }
-
-  /** Write the DECSCUSR shape if hardware cursor is active; otherwise emit
-   *  CURSOR_STYLE_RESET so the terminal reverts to its default shape. */
-  function writeCursorStyle(tui: CursorTUI, mode: Mode): void {
-    tui.terminal.write(
-      userPrefersShowHardwareCursor && !blurred ? getCursorStyle(mode) : CURSOR_STYLE_RESET,
-    );
-  }
 
   class PromptEditor extends ModalEditor {
     private readonly prefixColorizers: ModeColorizers;
@@ -341,7 +283,7 @@ export default async function (pi: ExtensionAPI) {
       // pi-vim has built-in cursor shape management
       // (https://github.com/lajarre/pi-vim/blob/2671cf11/index.ts)
       // that conflicts with our DECSCUSR logic. Disable it so
-      // our renderCursor() is the sole cursor authority.
+      // our cursor controller is the sole cursor authority.
       (this as any).cursorShapeRuntime = null;
     }
 
@@ -667,22 +609,13 @@ export default async function (pi: ExtensionAPI) {
     }
 
     override render(width: number): string[] {
-      // A live /settings change updates the active renderer before requesting
-      // this render. Read the preference here instead of wrapping the renderer
-      // method: Pi 0.84 can replace that renderer when TUI mode changes.
-      if (!blurred && activeTui) {
-        const enabled = activeTui.getShowHardwareCursor?.();
-        if (typeof enabled === "boolean" && enabled !== userPrefersShowHardwareCursor) {
-          userPrefersShowHardwareCursor = enabled;
-          writeCursorStyle(activeTui, this.getMode());
-        }
-      }
+      cursor.syncPreference(this.getMode());
 
       if (width <= PREFIX_WIDTH) {
         const lines = super.render(width);
         const bottomIdx = findBottomBorderIndex(lines);
         // Last line has ModalEditor's mode label; don't strip its inverse-video.
-        this.renderCursor(lines, bottomIdx >= 1 ? bottomIdx : lines.length - 1);
+        cursor.render(lines, bottomIdx >= 1 ? bottomIdx : lines.length - 1);
         return lines;
       }
 
@@ -696,13 +629,13 @@ export default async function (pi: ExtensionAPI) {
       // bottom border below.
       const lines = CustomEditor.prototype.render.call(this, width - PREFIX_WIDTH) as string[];
       if (lines.length < 3) {
-        this.renderCursor(lines, lines.length);
+        cursor.render(lines, lines.length);
         return lines;
       }
 
       const bottomIdx = findBottomBorderIndex(lines);
       if (bottomIdx <= 0) {
-        this.renderCursor(lines, lines.length);
+        cursor.render(lines, lines.length);
         return lines;
       }
 
@@ -737,31 +670,14 @@ export default async function (pi: ExtensionAPI) {
         lines[i] = (i === 1 ? renderedPrefix : CONTINUATION_PREFIX) + lines[i]!;
       }
 
-      this.renderCursor(lines, bottomIdx);
+      cursor.render(lines, bottomIdx);
       return lines;
-    }
-
-    private renderCursor(lines: string[], bottomIdx: number): void {
-      renderPromptCursor(lines, bottomIdx, { hardware: userPrefersShowHardwareCursor, blurred });
     }
   }
 
   const offMyFocusChange = pi.events.on("my:focus_change", (data: unknown) => {
     const { focused } = data as { focused: boolean };
-    blurred = !focused;
-    if (!activeTui || !activeEditor) return;
-
-    if (userPrefersShowHardwareCursor) {
-      applyHardwareCursorVisibility(activeTui);
-      // Update cursor style on every focus change: writeCursorStyle
-      // emits the DECSCUSR shape when focused and CURSOR_STYLE_RESET
-      // when blurred, matching the setting-toggle path.
-      writeCursorStyle(activeTui, activeEditor.getMode());
-    } else {
-      // Fake cursor mode: request a re-render so renderCursor() can
-      // strip or restore the inverse-video cursor.
-      activeTui.requestRender();
-    }
+    cursor.setFocused(focused);
   });
 
   pi.on("session_start", (_event, ctx) => {
@@ -793,9 +709,7 @@ export default async function (pi: ExtensionAPI) {
       piVimSettings.modeChange,
       (event: { mode: Mode; previousMode: Mode }) => {
         pi.events.emit("pi-vim:mode-change", event);
-        if (activeTui && userPrefersShowHardwareCursor && !blurred) {
-          activeTui.terminal.write(getCursorStyle(event.mode));
-        }
+        cursor.modeChanged(event.mode);
       },
     );
 
@@ -861,28 +775,8 @@ export default async function (pi: ExtensionAPI) {
         );
         installClipboardBridge(newEditor);
 
-        activeTui = tui as CursorTUI;
-        activeEditor = newEditor as unknown as ModalEditorRuntime;
-        editor = activeEditor;
-
-        // Capture initial user preference from the TUI. interactive-mode
-        // passes settingsManager.getShowHardwareCursor() to the TUI
-        // constructor, so this reflects the /setting value.
-        userPrefersShowHardwareCursor = tui.getShowHardwareCursor?.() ?? true;
-
-        // Capture Pi's stable Proxy method. It keeps the current renderer method
-        // stable while forwarding to a replacement renderer after a TUI-mode switch.
-        originalSetShowHardwareCursor ??= tui.setShowHardwareCursor;
-
-        // Apply initial effective visibility outside render() so
-        // setShowHardwareCursor() cannot re-enter the render path.
-        applyHardwareCursorVisibility(activeTui);
-        // writeCursorStyle handles both modes (shape on enable, reset
-        // on disable), but skip if user has hardware cursor off — no
-        // DECSCUSR sequences needed at all.
-        if (userPrefersShowHardwareCursor) {
-          writeCursorStyle(activeTui, newEditor.getMode());
-        }
+        editor = newEditor as unknown as ModalEditorRuntime;
+        cursor.install(tui, newEditor);
 
         hydratePromptHistory(editor, history);
         return newEditor;
@@ -944,14 +838,8 @@ export default async function (pi: ExtensionAPI) {
     }
     offMyFocusChange();
     cancelModeChangeCommands();
-    blurred = false;
-    activeTui = undefined;
-    activeEditor = undefined;
     activeUi = undefined;
-    userPrefersShowHardwareCursor = true;
-    originalSetShowHardwareCursor = undefined;
     originalSetEditorComponent = undefined;
-    // Restore default terminal cursor style on exit
-    process.stdout.write(CURSOR_STYLE_RESET);
+    cursor.shutdown();
   });
 }

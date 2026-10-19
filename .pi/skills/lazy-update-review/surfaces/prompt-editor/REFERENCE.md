@@ -140,14 +140,31 @@ function getCursorStyle(mode: Mode): string {
 }
 ```
 
-Local `cursor.ts` owns cursor-cell wrapping independently of pi-vim. Pi 1.2 emits
-APC markers through `renderFakeCursor()`; the TUI resolves them after component
+Local `cursor.ts` owns both `createCursorController()` and cursor-cell wrapping;
+`index.ts` forwards installation, render, focus, mode-change, and shutdown events.
+Compare the controller with the target TUI's hardware-cursor getter/setter and
+renderer-switch behavior: retain Pi's stable Proxy setter across editor reinstalls,
+read live settings before rendering only while focused, and apply effective
+visibility outside render to avoid re-entry. A forced-off cursor on blur is not a
+changed user preference. Verify shutdown clears references and resets DECSCUSR
+through stdout, including when no editor was installed.
+
+Test native focus input separately from injected `my:focus_change` events. In Pi
+1.3.0, fullscreen `handleViewportInput()` consumes `ESC[I` / `ESC[O` before
+`focus.ts`'s terminal-input listener, so controller event tests alone cannot prove
+end-to-end focus tracking. Recheck input-listener ordering at the target revision;
+report a blocked native-focus path explicitly rather than treating injected events
+as a pass. Exercise a live regular/fullscreen switch to verify the captured Proxy
+setter still reaches the replacement renderer.
+
+Pi 1.2 emits APC markers through `renderFakeCursor()`; the TUI resolves them after component
 rendering. Compare `renderPromptCursor()` with the exact target's Editor and
 `resolveFakeCursors()`, not just pi-vim's `cursor-shape.ts` (0.14.2 still assumes
 SGR reverse video). Update its source revision comment when the protocol changes.
 
-Complete when hardware/software cursor modes, focus/blur, a missing hardware
-marker, clipped APC endings, wide/combining graphemes, and narrow rendering pass.
+Complete when hardware/software cursor modes, live setting toggles, focus/blur,
+mode changes, editor reinstalls, shutdown reset, a missing hardware marker, clipped
+APC endings, wide/combining graphemes, and narrow rendering pass.
 Preserve cursor-cell text and selection styles; restrict changes to the editor body,
 leaving borders, mode labels, and autocomplete rows intact. Run
 `tests/prompt-editor-cursor.test.ts` against the target host as well as interactive checks.

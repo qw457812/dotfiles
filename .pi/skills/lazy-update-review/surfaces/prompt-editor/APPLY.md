@@ -123,6 +123,11 @@ global settings; `--no-session` only isolates session persistence. Make the revi
 pi-vim package available below its `npm/node_modules`, and copy extensions that
 generate sibling files so probes cannot rewrite deployed wrappers. Load only the
 needed extensions with `--no-extensions -e ...` and use `--offline` for UI-only tests.
+`--offline` suppresses startup networking, not model requests: block network access
+at the OS level for probes that must never submit a request (on macOS, wrap Pi in
+`sandbox-exec -p '(version 1)(allow default)(deny network*)'`). Before entering a
+slash command, verify the entire editor buffer is empty; Ctrl+U may clear only the
+current line of a multiline prompt.
 Check that the active instance is `PromptEditor`, not a fallback editor.
 
 Follow [Cursor ownership](REFERENCE.md#cursor-ownership) and
