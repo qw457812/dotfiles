@@ -1,6 +1,6 @@
 # Pi WebFetch Extension
 
-Adds a `webfetch` tool to [pi](https://pi.dev) that fetches content from URLs and converts it to markdown, text, or HTML format. Mirrors OpenCode **v2**'s webfetch implementation ([anomalyco/opencode](https://github.com/anomalyco/opencode/tree/4617210822bdbb31e5749751afbfb4584ccedac8), `v2` branch, 2026-10-10).
+Adds a `webfetch` tool to [pi](https://pi.dev) that fetches content from URLs and converts it to markdown, text, or HTML format. Mirrors OpenCode **v2**'s webfetch implementation ([anomalyco/opencode](https://github.com/anomalyco/opencode/tree/ba06ff9e0bf2dcefbbbc3a1d6094f3572d77c84e), `dev` branch, 2026-10-19 — the default branch that `v2` was merged into and that now ships the 2.x line).
 
 ## How It Works
 
@@ -77,5 +77,5 @@ Golden checks (no model calls, assertions ported from upstream `test/tool-webfet
 
 ## Drift Notes
 
-- Synced to `4617210822` (2026-10-10): four drifted commits, zero ports — Effect 4.0.1 upgrade (`location-lifecycle` only), models.dev snapshot refresh, nix hashes, and a CI desktop build; `html-markdown.ts` and `tool/plugin/webfetch.ts` verified byte-identical to upstream
+- Synced to `ba06ff9e0b` (2026-10-19) on `dev`, the default branch `v2` was merged into: 1685 commits since the previous pin, only one touching the mirror surface — `86755e1cea` (TinyFish session handshake, websearch-only) — and `html-markdown.ts` / `tool/plugin/webfetch.ts` verified byte-identical to upstream
 - Direction signals (unmerged, noted only): `web-fetch` moves fetch into a policy-bound codemode Web extension — the fetch layer may be replaced wholesale next sync; `webfetch-images` restores v2-removed image output (the mirror keeps images pi-native, so the lines may converge); `lazy-webfetch` defers HTML parsing; `fix-read-tool-for-webfetch`, `nxl/deflake-webfetch-memory-test` (test-only); `owned-fetch-retention` and `hotfix/agent-owned-fetch-leak` touch SDK request signals, not the tool surface

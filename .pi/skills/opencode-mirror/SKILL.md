@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 The pi `websearch` and `webfetch` extensions each mirror one version of OpenCode's counterpart tool. Three words anchor this skill:
 
-- **Upstream** is anomalyco/opencode, `v2` release line. Port only from `v2`; the `dev` line (v1.18.x) is the frozen architecture both mirrors replaced.
+- **Upstream** is anomalyco/opencode's `dev` branch: the default branch, where the `v2` line was merged and where 2.0.x releases are cut. `v2` itself is now a frozen historical anchor (`4617210822`, 2.0.26, 2026-10-10) — the old `dev` was the v1.18.x architecture both mirrors replaced, but `dev` today *is* v2.
 - **Pin** is the commit hash + date in each extension README's first paragraph. All drift is measured from it.
 - **Ledger** is each README's "Differences from OpenCode v2" section: the single source of truth for every intentional divergence. A deviation absent from the ledger is a bug; a bug fixed where the mirror otherwise follows v2 is a new ledger entry.
 
@@ -23,8 +23,8 @@ The pi `websearch` and `webfetch` extensions each mirror one version of OpenCode
 2. Measure drift on the right line. Resolve file paths from the tree of the line you diff — locations moved between lines:
 
    ```bash
-   git ls-tree -r --name-only origin/v2 | rg -i 'websearch|webfetch|html-markdown'
-   git log --no-merges <pin>..origin/v2 -- <those paths>
+   git ls-tree -r --name-only origin/dev | rg -i 'websearch|webfetch|html-markdown'
+   git log --no-merges <pin>..origin/dev -- <those paths>
    ```
 
    Unmerged `websearch-*` / `web-fetch` branches are direction signals; note them, leave them.
@@ -47,14 +47,14 @@ The pi `websearch` and `webfetch` extensions each mirror one version of OpenCode
 
 | Axis | Upstream (v2) home | Mirror home |
 | --- | --- | --- |
-| Provider set: exa, parallel, firecrawl, tavily (tinyfish is a ledger exclusion) | `packages/core/src/plugin/websearch/*` | `providers/*` |
+| Provider set: exa, parallel, firecrawl, tavily, tinyfish | `packages/core/src/plugin/websearch/*` | `providers/*` |
 | Selection: forced / random + per-session affinity + 429 cooldown + failover | `packages/core/src/websearch.ts` | `selection.ts` |
 | Tool schema (query only) + description | `packages/core/src/tool/plugin/websearch.ts` | `index.ts` |
 | Result consumption: structured results → markdown | tool content formatting | `index.ts` formatResults |
 | Error mapping: 429 / 401 / generic | tool `ToolFailure` | `index.ts` wrapWebsearchError over `HttpCallError` |
 | Response shape tolerance | per-provider Effect schemas (strict) | `mcp-client.ts` extractText + per-provider runtime checks (looser, ledgered) |
 
-Smoke checks: jiti-load a provider and execute with env manipulation (`env -u TAVILY_API_KEY`, `env -u PARALLEL_API_KEY`). Known outcomes (2026-09-24): keyless Parallel returns ~10 results, keyless Tavily 8 — its keyless tier flaps (long HTTP 503 stretches); all providers join random routing regardless of credentials (`requiresApiKey` was removed 2026-09-24 to restore v2 registration). E2E asserts on the session jsonl: a `websearch.selection` custom entry exists, `details.provider` matches, result content is `## [title](url)` markdown; resume stickiness: rerun twice with `--session <file>`, provider stays fixed and the selection entry gains no duplicates.
+Smoke checks: jiti-load a provider and execute with env manipulation (`env -u TAVILY_API_KEY`, `env -u PARALLEL_API_KEY`, `env -u TINYFISH_API_KEY`). Known outcomes (2026-09-24): keyless Parallel returns ~10 results, keyless Tavily 8 — its keyless tier flaps (long HTTP 503 stretches); all providers join random routing regardless of credentials (`requiresApiKey` was removed 2026-09-24 to restore v2 registration). TinyFish (2026-10-19): keyless answers from one `tools/call`, but with `TINYFISH_API_KEY` set it must run the session handshake first — `initialize` (returns `Mcp-Session-Id`) → `notifications/initialized` (acknowledged 204, not the spec's 202) → `tools/call` carrying the id; a sessionless keyed call answers 400, an unknown session 404. E2E asserts on the session jsonl: a `websearch.selection` custom entry exists, `details.provider` matches, result content is `## [title](url)` markdown; resume stickiness: rerun twice with `--session <file>`, provider stays fixed and the selection entry gains no duplicates.
 
 ## webfetch mirror (reference)
 

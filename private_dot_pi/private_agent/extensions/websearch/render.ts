@@ -50,6 +50,7 @@ export function providerLabel(provider: ProviderID): string {
   if (provider === "exa") return "Exa";
   if (provider === "tavily") return "Tavily";
   if (provider === "firecrawl") return "Firecrawl";
+  if (provider === "tinyfish") return "TinyFish";
   return "Web";
 }
 

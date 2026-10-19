@@ -69,7 +69,7 @@ export const firecrawlProvider: WebSearchProvider = {
       signal: ctx.signal,
     });
     if (result?.isError) {
-      throw new Error(result.text);
+      throw new Error(result.text || "Firecrawl search failed");
     }
     // Structured-only MCP responses carry an empty text (see mcp-client
     // extractText); firecrawl results live in text as JSON, so empty text

@@ -5,7 +5,7 @@
  * every provider parses its response into structured WebSearchResult objects.
  */
 
-export type ProviderID = "exa" | "parallel" | "firecrawl" | "tavily";
+export type ProviderID = "exa" | "parallel" | "firecrawl" | "tavily" | "tinyfish";
 
 export interface WebSearchResult {
   url: string;
@@ -61,4 +61,10 @@ export interface WebSearchProvider {
 }
 
 /** All provider ids, in registration order. Also validates env overrides. */
-export const PROVIDER_IDS: readonly ProviderID[] = ["exa", "parallel", "firecrawl", "tavily"];
+export const PROVIDER_IDS: readonly ProviderID[] = [
+  "exa",
+  "parallel",
+  "firecrawl",
+  "tavily",
+  "tinyfish",
+];

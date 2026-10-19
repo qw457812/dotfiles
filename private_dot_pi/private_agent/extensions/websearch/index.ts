@@ -6,8 +6,7 @@
  * architecture (packages/core/src/{websearch,plugin/websearch} at the
  * commit pinned in README.md):
  *
- * - Four providers: Exa, Parallel, Firecrawl, Tavily (v2's TinyFish is
- *   excluded — see README)
+ * - Five providers: Exa, Parallel, Firecrawl, Tavily, TinyFish
  * - Selection: PI_WEBSEARCH_PROVIDER forces a provider; default "random"
  *   routes per-session with sticky affinity, HTTP 429 cooldowns sized by
  *   Retry-After, and failover across providers
@@ -18,11 +17,13 @@
  *   `pi --resume` keeps the same provider
  *
  * Configuration (environment variables):
- *   PI_WEBSEARCH_PROVIDER — "exa" | "parallel" | "firecrawl" | "tavily" | "random" (default)
+ *   PI_WEBSEARCH_PROVIDER — "exa" | "parallel" | "firecrawl" | "tavily" | "tinyfish" | "random" (default)
  *   EXA_API_KEY           — Exa API key (optional; unlocks higher rate limits)
  *   PARALLEL_API_KEY      — Parallel API key (optional)
  *   FIRECRAWL_API_KEY     — Firecrawl API key (optional)
  *   TAVILY_API_KEY        — Tavily API key (optional; the keyless tier is flaky)
+ *   TINYFISH_API_KEY      — TinyFish API key (optional; keyed requests run the
+ *                           MCP session handshake, keyless requests skip it)
  */
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
@@ -42,6 +43,7 @@ import { exaProvider } from "./providers/exa";
 import { firecrawlProvider } from "./providers/firecrawl";
 import { parallelProvider } from "./providers/parallel";
 import { tavilyProvider } from "./providers/tavily";
+import { tinyfishProvider } from "./providers/tinyfish";
 import {
   HttpCallError,
   PROVIDER_IDS,
@@ -135,6 +137,7 @@ export default function (pi: ExtensionAPI) {
     parallelProvider,
     firecrawlProvider,
     tavilyProvider,
+    tinyfishProvider,
   ]);
 
   // Restore this session's provider affinity from the last persisted

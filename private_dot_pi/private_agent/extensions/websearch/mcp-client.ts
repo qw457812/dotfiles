@@ -1,8 +1,12 @@
 /**
  * Lightweight MCP-over-HTTP client.
  *
- * Sends JSON-RPC 2.0 `tools/call` requests to a remote MCP endpoint
- * and parses the response (plain JSON or SSE).
+ * Two entry points over the same transport (timeout, abort, 429/Retry-After
+ * mapping):
+ * - `mcpRequest` posts one raw JSON-RPC message and returns the HTTP response
+ *   (status, headers, body) — protocol phases such as TinyFish's `initialize`
+ *   handshake and its bodyless `notifications/initialized` acknowledgement.
+ * - `mcpCall` posts a `tools/call` and parses the result (plain JSON or SSE).
  *
  * Mirrors OpenCode's mcp-websearch.ts parsing logic:
  * - Direct JSON body: decode JSON-RPC envelope, extract result.content[].text
@@ -19,6 +23,30 @@ import { Type, type Static } from "typebox";
 import { Value } from "typebox/value";
 
 import { HttpCallError, RequestCancelledError } from "./providers/types";
+
+/**
+ * Protocol versions this client implements — pi's own MCP client list
+ * (packages/mcp/src/protocol/types.ts). `LATEST` is what stateless requests
+ * advertise; a provider that runs `initialize` advertises the negotiated
+ * version instead, after validating it against this list.
+ *
+ * MCP 2025-06-18 lifecycle: the client MUST send a version it supports, the
+ * server answers with a version it supports, and the client SHOULD disconnect
+ * when the answer is unsupported. Transports: the client MUST send
+ * `MCP-Protocol-Version` on subsequent requests and SHOULD send the
+ * negotiated version.
+ *
+ * Sources: specification/2025-06-18/basic/lifecycle#version-negotiation and
+ * specification/2025-06-18/basic/transports#protocol-version-header
+ */
+export const SUPPORTED_PROTOCOL_VERSIONS = [
+  "2025-11-25",
+  "2025-06-18",
+  "2025-03-26",
+  "2024-11-05",
+] as const;
+
+export const LATEST_PROTOCOL_VERSION = SUPPORTED_PROTOCOL_VERSIONS[0];
 
 /** Error thrown when MCP response JSON doesn't match the expected schema. */
 class McpSchemaError extends Error {
@@ -45,6 +73,22 @@ export class McpRpcError extends Error {
   constructor(message: string, code?: number) {
     super(message);
     this.code = code;
+  }
+}
+
+/**
+ * Thrown when a request exceeds its timeout. Typed so callers can tell a
+ * timeout from user cancellation (`RequestCancelledError`) without matching
+ * message text.
+ */
+export class McpTimeoutError extends Error {
+  override name = "McpTimeoutError";
+  constructor(
+    message: string,
+    readonly label: string,
+    readonly timeoutMs: number,
+  ) {
+    super(message);
   }
 }
 
@@ -245,35 +289,125 @@ interface McpCallOptions {
   headers?: Record<string, string>;
   /** AbortSignal for cancellation */
   signal?: AbortSignal;
-  /** MCP protocol version for the MCP-Protocol-Version header (default: "2025-03-26") */
+  /** MCP protocol version for the MCP-Protocol-Version header (default: LATEST_PROTOCOL_VERSION) */
   protocolVersion?: string;
 }
 
+/** One JSON-RPC message posted to an MCP endpoint, with its raw response. */
+export interface McpRequestOptions {
+  /** Remote MCP endpoint URL */
+  url: string;
+  /** Single JSON-RPC request or notification (notifications carry no `id`) */
+  message: unknown;
+  /** Name used in error messages (usually the tool name or phase) */
+  label: string;
+  /** Request timeout in ms (default 25000) */
+  timeout?: number;
+  /** Extra headers (e.g. Authorization, Mcp-Session-Id) */
+  headers?: Record<string, string>;
+  /** AbortSignal for cancellation */
+  signal?: AbortSignal;
+  /** MCP protocol version for the MCP-Protocol-Version header (default: LATEST_PROTOCOL_VERSION) */
+  protocolVersion?: string;
+}
+
+export interface McpRawResponse {
+  status: number;
+  /**
+   * Response headers. Carries `Mcp-Session-Id` when the server assigns a
+   * session during initialization (MCP 2025-06-18 session management).
+   */
+  headers: Headers;
+  body: string;
+}
+
+/** Cap on a single MCP response body (mirrors v2's MAX_RESPONSE_BYTES). */
+export const MAX_RESPONSE_BYTES = 256 * 1024;
+
+/** Thrown when a response body exceeds MAX_RESPONSE_BYTES. */
+class McpResponseTooLargeError extends Error {
+  override name = "McpResponseTooLargeError";
+}
+
 /**
- * Call a remote MCP endpoint via HTTP POST and return the result.
- *
- * Supports both plain JSON and SSE response formats.
- * Returns undefined when the result carries neither text content nor
- * structuredContent. Structured-only responses (content: [] with
- * structuredContent) return { text: "", structuredContent } — per MCP
- * 2025-06-18, `content` is required but may be empty, so they are
- * schema-valid and must not be treated as empty results.
- * Throws on timeout, user cancellation, network error, JSON-RPC protocol error,
- * or schema mismatch.
- *
- * When the tool reports an execution error (isError: true), the result is
- * returned (not thrown) so the caller can surface the error content to the
- * LLM for self-correction, per the MCP specification.
+ * Read a response body while enforcing MAX_RESPONSE_BYTES, so a broken or
+ * hostile endpoint cannot make the extension buffer an unbounded body.
+ * Cancels the stream as soon as the cap is crossed.
  */
-export async function mcpCall(options: McpCallOptions): Promise<McpCallResult | undefined> {
+async function readBoundedBody(response: Response, label: string): Promise<string> {
+  const exceeded = () =>
+    new McpResponseTooLargeError(`${label} response exceeded ${MAX_RESPONSE_BYTES} bytes`);
+
+  const declared = Number(response.headers.get("content-length"));
+  if (Number.isFinite(declared) && declared > MAX_RESPONSE_BYTES) {
+    await response.body?.cancel().catch(() => {});
+    throw exceeded();
+  }
+  if (!response.body) return "";
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let body = "";
+  let bytes = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      bytes += value.byteLength;
+      if (bytes > MAX_RESPONSE_BYTES) {
+        await reader.cancel().catch(() => {});
+        throw exceeded();
+      }
+      body += decoder.decode(value, { stream: true });
+    }
+    return body + decoder.decode();
+  } finally {
+    reader.releaseLock();
+  }
+}
+
+/**
+ * Return the first JSON-RPC envelope from a body that is either a plain JSON
+ * object or an SSE stream. MCP allows either content type for any request
+ * (2025-06-18 transports), so protocol phases that are not tool calls parse
+ * through this too.
+ */
+export function parseJsonRpcEnvelope(body: string): Record<string, unknown> | undefined {
+  const candidates: string[] = [];
+  const trimmed = body.trim();
+  if (trimmed.startsWith("{")) candidates.push(trimmed);
+  for (const line of body.split("\n")) {
+    if (!line.startsWith("data:")) continue;
+    const payload = line.slice(5).trimStart();
+    if (payload.startsWith("{")) candidates.push(payload);
+  }
+  for (const candidate of candidates) {
+    const data = JSON.parse(candidate); // SyntaxError propagates for malformed JSON
+    if (data === null || typeof data !== "object" || Array.isArray(data)) continue;
+    const envelope = data as Record<string, unknown>;
+    if ("result" in envelope || "error" in envelope) return envelope;
+  }
+  return undefined;
+}
+
+/**
+ * POST a single JSON-RPC message to an MCP endpoint and return the raw HTTP
+ * response. Used directly for protocol phases that are not tool calls
+ * (TinyFish's `initialize` / `notifications/initialized` handshake), where the
+ * response is either not a CallToolResult or is a bodyless 2xx acknowledgement.
+ *
+ * Throws on timeout, user cancellation, network error, or non-2xx status
+ * (`HttpCallError`, carrying Retry-After so 429s drive the selection cooldown).
+ */
+export async function mcpRequest(options: McpRequestOptions): Promise<McpRawResponse> {
   const {
     url,
-    tool,
-    args,
+    message,
+    label,
     timeout = 25_000,
     headers = {},
     signal,
-    protocolVersion = "2025-03-26",
+    protocolVersion = LATEST_PROTOCOL_VERSION,
   } = options;
 
   const controller = new AbortController();
@@ -299,41 +433,92 @@ export async function mcpCall(options: McpCallOptions): Promise<McpCallResult | 
         "Content-Type": "application/json",
         Accept: "application/json, text/event-stream",
         // Spec 2025-06-18: "If using HTTP, the client MUST include the
-        // MCP-Protocol-Version header on all subsequent requests."
-        // Forward-compatible with 2025-03-26 servers (which ignore unknown
-        // headers per HTTP spec). Default is the 2025-03-26 fallback per spec.
+        // MCP-Protocol-Version header on all subsequent requests." Default is
+        // the latest version this client supports (the spec's 2025-03-26
+        // fallback applies to servers that receive no header at all). All
+        // mirrored endpoints accept it; an older server that does not must
+        // answer 400, which surfaces as HttpCallError instead of silently
+        // degrading.
         "MCP-Protocol-Version": protocolVersion,
         ...headers,
       },
-      body: JSON.stringify(buildRequest(tool, args)),
+      body: JSON.stringify(message),
       signal: controller.signal,
     });
 
     if (!response.ok) {
       // Read body for diagnostics but don't include raw response in the
       // error message visible to the LLM — it may contain sensitive data.
-      const body = await response.text();
-      console.error(`[mcp] ${tool} HTTP ${response.status}: ${body.slice(0, 500)}`);
+      // A body over the cap is reported as such instead of replacing the
+      // HTTP failure with a size failure.
+      let body: string;
+      try {
+        body = await readBoundedBody(response, label);
+      } catch (err) {
+        // Only the size cap is recoverable here: a cancelled or timed-out
+        // body read must reach the outer catch so it keeps its classification
+        // (and does not turn a 429 into a cooldown).
+        if (!(err instanceof McpResponseTooLargeError)) throw err;
+        body = `[body exceeded ${MAX_RESPONSE_BYTES} bytes]`;
+      }
+      console.error(`[mcp] ${label} HTTP ${response.status}: ${body.slice(0, 500)}`);
       throw new HttpCallError(
-        `MCP request to ${tool} failed: HTTP ${response.status} ${response.statusText}`,
+        `MCP request to ${label} failed: HTTP ${response.status} ${response.statusText}`,
         response.status,
         response.headers.get("retry-after") ?? undefined,
       );
     }
 
-    const body = await response.text();
-    return parseResponse(body);
+    return {
+      status: response.status,
+      headers: response.headers,
+      body: await readBoundedBody(response, label),
+    };
   } catch (err: any) {
     if (err.name === "AbortError") {
       // Distinguish user cancellation from timeout (mirrors OpenCode's Effect timeoutOrElse)
       if (signal?.aborted) {
-        throw new RequestCancelledError(`MCP request to ${tool} was cancelled`);
+        throw new RequestCancelledError(`MCP request to ${label} was cancelled`);
       }
-      throw new Error(`MCP request to ${tool} timed out after ${timeout}ms`);
+      throw new McpTimeoutError(
+        `MCP request to ${label} timed out after ${timeout}ms`,
+        label,
+        timeout,
+      );
     }
     throw err;
   } finally {
     clearTimeout(timeoutId);
     signal?.removeEventListener("abort", onExternalAbort);
   }
+}
+
+/**
+ * Call a remote MCP endpoint via HTTP POST and return the result.
+ *
+ * Supports both plain JSON and SSE response formats.
+ * Returns undefined when the result carries neither text content nor
+ * structuredContent. Structured-only responses (content: [] with
+ * structuredContent) return { text: "", structuredContent } — per MCP
+ * 2025-06-18, `content` is required but may be empty, so they are
+ * schema-valid and must not be treated as empty results.
+ * Throws on timeout, user cancellation, network error, JSON-RPC protocol error,
+ * or schema mismatch.
+ *
+ * When the tool reports an execution error (isError: true), the result is
+ * returned (not thrown) so the caller can surface the error content to the
+ * LLM for self-correction, per the MCP specification.
+ */
+export async function mcpCall(options: McpCallOptions): Promise<McpCallResult | undefined> {
+  const { url, tool, args, timeout, headers, signal, protocolVersion } = options;
+  const { body } = await mcpRequest({
+    url,
+    label: tool,
+    message: buildRequest(tool, args),
+    timeout,
+    headers,
+    signal,
+    protocolVersion,
+  });
+  return parseResponse(body);
 }

@@ -33,9 +33,12 @@ async function loadWebsearch(provider: string) {
   const types = await import("../extensions/websearch/providers/types");
   const selection = await import("../extensions/websearch/selection");
   const index = await import("../extensions/websearch/index");
+  const mcpClient = await import("../extensions/websearch/mcp-client");
   return {
     HttpCallError: types.HttpCallError,
     RequestCancelledError: types.RequestCancelledError,
+    McpTimeoutError: mcpClient.McpTimeoutError,
+    MAX_RESPONSE_BYTES: mcpClient.MAX_RESPONSE_BYTES,
     createWebSearchService: selection.createWebSearchService,
     activate: index.default as unknown as (pi: unknown) => void,
   };
@@ -72,7 +75,10 @@ function fakeProvider(id: ProviderID, providerState: FakeState): WebSearchProvid
 // Tool harness: stub ExtensionAPI + scripted fetch
 // ---------------------------------------------------------------------------
 
-function activateTool(mods: Mods, fetchImpl: (url: string) => Response) {
+function activateTool(
+  mods: Mods,
+  fetchImpl: (url: string, init?: RequestInit) => Response | Promise<Response>,
+) {
   const entries: Array<{ customType: string; data: unknown }> = [];
   let tool: any;
   mods.activate({
@@ -93,7 +99,7 @@ function activateTool(mods: Mods, fetchImpl: (url: string) => Response) {
         sessionManager: { getSessionId: () => "golden-session" },
       }),
     entries,
-    fetchMock: fetchMock as Mock<(url: string) => Response>,
+    fetchMock: fetchMock as Mock<(url: string, init?: RequestInit) => Response | Promise<Response>>,
   };
 }
 
@@ -267,6 +273,7 @@ describe("selection (random routing)", () => {
         parallel: state(),
         firecrawl: state(),
         tavily: state(),
+        tinyfish: state(),
       };
       const svc = mods.createWebSearchService(
         (Object.keys(states) as ProviderID[]).map((id) => fakeProvider(id, states[id])),
@@ -279,7 +286,7 @@ describe("selection (random routing)", () => {
       picked.add(out.provider);
       if (affinities !== 1) badAffinity++;
     }
-    expect([...picked].sort()).toEqual(["exa", "firecrawl", "parallel", "tavily"]);
+    expect([...picked].sort()).toEqual(["exa", "firecrawl", "parallel", "tavily", "tinyfish"]);
     expect(badAffinity).toBe(0);
   });
 
@@ -315,7 +322,7 @@ describe("tool (random routing)", () => {
 
   // "does not reopen consent when all automatic providers are cooling down":
   // every query surfaces "Web search rate limited (HTTP 429)" and each of the
-  // four providers is contacted at most once.
+  // five providers is contacted at most once.
   it("fails every query with the rate limit while all providers are cooling down", async () => {
     const tool = activateTool(
       mods,
@@ -328,9 +335,10 @@ describe("tool (random routing)", () => {
       expect(err.message).toBe("Web search rate limited (HTTP 429)");
     }
 
-    expect(tool.fetchMock).toHaveBeenCalledTimes(4);
+    expect(tool.fetchMock).toHaveBeenCalledTimes(5);
     const hosts = tool.fetchMock.mock.calls.map(([url]) => new URL(url).host);
     expect([...new Set(hosts)].sort()).toEqual([
+      "agent.tinyfish.ai",
       "api.tavily.com",
       "mcp.exa.ai",
       "mcp.firecrawl.dev",
@@ -489,5 +497,451 @@ describe("tool (forced MCP provider)", () => {
     const err = await captureError(tool.run("golden query", controller.signal));
     expect(err).toBeInstanceOf(mods.RequestCancelledError);
     expect(err.message).toBe("MCP request to web_search_exa was cancelled");
+  });
+
+  // A 429 whose body is still being read must keep the cancellation/timeout
+  // classification: swallowing it as HttpCallError would turn an abort into a
+  // rate limit and drive cooldown/failover.
+  function hangingRateLimitedBody(signal: AbortSignal | null | undefined) {
+    return new Response(
+      new ReadableStream({
+        start(controller) {
+          signal?.addEventListener("abort", () => {
+            controller.error(Object.assign(new Error("aborted"), { name: "AbortError" }));
+          });
+        },
+      }),
+      { status: 429, headers: { "Retry-After": "120" } },
+    );
+  }
+
+  it("keeps cancellation while reading a 429 response body", async () => {
+    const controller = new AbortController();
+    const tool = activateTool(mods, (_url, init) => {
+      queueMicrotask(() => controller.abort());
+      return hangingRateLimitedBody(init?.signal);
+    });
+
+    const err = await captureError(tool.run("golden query", controller.signal));
+
+    expect(err).toBeInstanceOf(mods.RequestCancelledError);
+    expect(err.message).toBe("MCP request to web_search_exa was cancelled");
+    expect(tool.fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps the timeout while reading a 429 response body", async () => {
+    vi.useFakeTimers();
+    const tool = activateTool(mods, (_url, init) => hangingRateLimitedBody(init?.signal));
+
+    const pending = captureError(tool.run("golden query"));
+    await vi.advanceTimersByTimeAsync(25_001);
+    const err = await pending;
+
+    expect(err.message).toBe("Unable to search the web for golden query");
+    expect(err.cause).toBeInstanceOf(mods.McpTimeoutError);
+    expect(tool.fetchMock).toHaveBeenCalledTimes(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Tool-level cases (forced TinyFish provider) — ports the request-sequence
+// assertions of v2's `plugins/websearch` test (initialize → initialized →
+// tools/call with Mcp-Session-Id) plus the server behaviors observed live on
+// 2026-10-19: keyless initialize returns no session, keyed tools/call without
+// one answers 400, an unknown session answers 404, the initialized
+// notification is acknowledged with 204.
+// ---------------------------------------------------------------------------
+
+describe("tool (forced tinyfish provider)", () => {
+  let mods: Mods;
+
+  beforeEach(async () => {
+    mods = await loadWebsearch("tinyfish");
+  });
+
+  interface Scripted {
+    status?: number;
+    headers?: Record<string, string>;
+    body?: string;
+  }
+
+  function scriptedFetch(steps: Scripted[]) {
+    const calls: Array<{ url: string; init: RequestInit | undefined }> = [];
+    const fetchImpl = (url: string, init?: RequestInit) => {
+      calls.push({ url, init });
+      const step = steps.shift();
+      if (!step) throw new Error("unexpected extra request");
+      return new Response(step.body ?? null, {
+        status: step.status ?? 200,
+        headers: step.headers,
+      });
+    };
+    return { fetchImpl, calls };
+  }
+
+  const json = (value: unknown) => JSON.stringify(value);
+
+  const initializeResult = json({
+    jsonrpc: "2.0",
+    id: 1,
+    result: {
+      protocolVersion: "2025-11-25",
+      capabilities: { tools: { listChanged: false } },
+      serverInfo: { name: "tinyfish", version: "0.1.1" },
+    },
+  });
+
+  const searchResult = (query: string) =>
+    json({
+      jsonrpc: "2.0",
+      id: 1,
+      result: {
+        content: [
+          {
+            type: "text",
+            text: json({
+              query,
+              results: [{ url: "https://example.com/t", title: "Tiny", snippet: "tiny content" }],
+            }),
+          },
+        ],
+      },
+    });
+
+  it("runs the MCP session handshake for keyed requests", async () => {
+    vi.stubEnv("TINYFISH_API_KEY", "tinyfish-secret");
+    const { fetchImpl, calls } = scriptedFetch([
+      { body: initializeResult, headers: { "mcp-session-id": "ses_tinyfish" } },
+      { status: 204 },
+      { body: searchResult("golden query") },
+    ]);
+    const tool = activateTool(mods, fetchImpl);
+    const out = await tool.run("golden query");
+
+    expect(calls).toHaveLength(3);
+    const bodies = calls.map(({ init }) => JSON.parse(String(init?.body)));
+    const headers = calls.map(({ init }) => (init?.headers ?? {}) as Record<string, string>);
+
+    expect(bodies[0]).toMatchObject({
+      method: "initialize",
+      params: { protocolVersion: "2025-11-25", clientInfo: { name: "pi" } },
+    });
+    expect(headers[0]).toMatchObject({
+      "X-API-Key": "tinyfish-secret",
+      "MCP-Protocol-Version": "2025-11-25",
+    });
+    expect(headers[0]["X-TinyFish-Access-Mode"]).toBeUndefined();
+
+    // Notification: no id, and the session id must be carried already.
+    expect(bodies[1]).toEqual({ jsonrpc: "2.0", method: "notifications/initialized" });
+    expect(headers[1]["Mcp-Session-Id"]).toBe("ses_tinyfish");
+
+    expect(bodies[2]).toMatchObject({
+      method: "tools/call",
+      params: { name: "search", arguments: { query: "golden query" } },
+    });
+    expect(headers[2]["Mcp-Session-Id"]).toBe("ses_tinyfish");
+
+    // The server's answer (2025-11-25 in the fixture, as live) is the
+    // negotiated version and is what subsequent requests advertise, matching
+    // pi's own MCP client (packages/mcp/src/client.ts echoes
+    // InitializeResult.protocolVersion via transport.setProtocolVersion).
+    // Source: specification/2025-06-18/basic/lifecycle#version-negotiation
+    expect(headers[1]["MCP-Protocol-Version"]).toBe("2025-11-25");
+    expect(headers[2]["MCP-Protocol-Version"]).toBe("2025-11-25");
+
+    expect(out.content[0].text).toBe("## [Tiny](https://example.com/t)\n\ntiny content");
+    expect(out.details).toMatchObject({ provider: "tinyfish", attempts: 1 });
+  });
+
+  it("skips the handshake for keyless requests", async () => {
+    vi.stubEnv("TINYFISH_API_KEY", "");
+    const { fetchImpl, calls } = scriptedFetch([{ body: searchResult("golden query") }]);
+    const tool = activateTool(mods, fetchImpl);
+    const out = await tool.run("golden query");
+
+    expect(calls).toHaveLength(1);
+    const headers = (calls[0].init?.headers ?? {}) as Record<string, string>;
+    expect(headers["X-TinyFish-Access-Mode"]).toBe("keyless");
+    expect(headers["X-API-Key"]).toBeUndefined();
+    expect(headers["Mcp-Session-Id"]).toBeUndefined();
+    // No handshake, so nothing was negotiated: advertise the latest version
+    // this client supports (the live keyless tier accepts it).
+    expect(headers["MCP-Protocol-Version"]).toBe("2025-11-25");
+    expect(out.details.provider).toBe("tinyfish");
+  });
+
+  // mcp-client returns { text: "", isError: true } for an MCP error that only
+  // carries structuredContent; the empty-text shortcut must not swallow it.
+  it("propagates MCP tool errors that carry no text", async () => {
+    vi.stubEnv("TINYFISH_API_KEY", "");
+    const { fetchImpl } = scriptedFetch([
+      {
+        body: json({
+          jsonrpc: "2.0",
+          id: 1,
+          result: { content: [], isError: true, structuredContent: { results: [] } },
+        }),
+      },
+    ]);
+    const tool = activateTool(mods, fetchImpl);
+    const err = await captureError(tool.run("golden query"));
+
+    expect(err.message).toBe("Unable to search the web for golden query");
+    expect(err.cause.message).toBe("TinyFish search failed");
+  });
+
+  it("fails when initialize returns no Mcp-Session-Id", async () => {
+    vi.stubEnv("TINYFISH_API_KEY", "tinyfish-secret");
+    const { fetchImpl, calls } = scriptedFetch([{ body: initializeResult }]);
+    const tool = activateTool(mods, fetchImpl);
+    const err = await captureError(tool.run("golden query"));
+
+    expect(err.message).toBe("Unable to search the web for golden query");
+    expect(err.cause.message).toBe(
+      "TinyFish MCP initialize did not return an Mcp-Session-Id header",
+    );
+    expect(calls).toHaveLength(1);
+  });
+
+  it("fails fast when initialize returns no protocolVersion", async () => {
+    vi.stubEnv("TINYFISH_API_KEY", "tinyfish-secret");
+    const { fetchImpl, calls } = scriptedFetch([
+      {
+        body: json({ jsonrpc: "2.0", id: 1, result: { capabilities: {} } }),
+        headers: { "mcp-session-id": "ses_tinyfish" },
+      },
+    ]);
+    const tool = activateTool(mods, fetchImpl);
+    const err = await captureError(tool.run("golden query"));
+
+    expect(err.cause.message).toBe("TinyFish MCP initialize returned no protocolVersion");
+    expect(calls).toHaveLength(1);
+  });
+
+  // Port of pi's MCP client test "accepts servers that answer with an older
+  // protocol version" (packages/mcp/test/client.test.ts).
+  it("accepts a server that answers with an older protocol version", async () => {
+    vi.stubEnv("TINYFISH_API_KEY", "tinyfish-secret");
+    const older = json({
+      jsonrpc: "2.0",
+      id: 1,
+      result: {
+        protocolVersion: "2025-06-18",
+        capabilities: { tools: { listChanged: false } },
+        serverInfo: { name: "tinyfish", version: "0.1.1" },
+      },
+    });
+    const { fetchImpl, calls } = scriptedFetch([
+      { body: older, headers: { "mcp-session-id": "ses_tinyfish" } },
+      { status: 204 },
+      { body: searchResult("golden query") },
+    ]);
+    const tool = activateTool(mods, fetchImpl);
+    await tool.run("golden query");
+
+    const headers = calls.map(({ init }) => (init?.headers ?? {}) as Record<string, string>);
+    expect(headers[1]["MCP-Protocol-Version"]).toBe("2025-06-18");
+    expect(headers[2]["MCP-Protocol-Version"]).toBe("2025-06-18");
+  });
+
+  it("rejects a protocol version it does not support", async () => {
+    vi.stubEnv("TINYFISH_API_KEY", "tinyfish-secret");
+    const { fetchImpl, calls } = scriptedFetch([
+      {
+        body: json({
+          jsonrpc: "2.0",
+          id: 1,
+          result: {
+            protocolVersion: "1999-01-01",
+            capabilities: {},
+            serverInfo: { name: "tinyfish", version: "0.1.1" },
+          },
+        }),
+        headers: { "mcp-session-id": "ses_tinyfish" },
+      },
+    ]);
+    const tool = activateTool(mods, fetchImpl);
+    const err = await captureError(tool.run("golden query"));
+
+    expect(err.cause.message).toBe(
+      "TinyFish MCP server selected unsupported protocol version 1999-01-01",
+    );
+    // Fails before the initialized notification and the search.
+    expect(calls).toHaveLength(1);
+  });
+
+  it("surfaces a JSON-RPC error from initialize", async () => {
+    vi.stubEnv("TINYFISH_API_KEY", "tinyfish-secret");
+    const { fetchImpl } = scriptedFetch([
+      {
+        body: json({
+          jsonrpc: "2.0",
+          id: 1,
+          error: { code: -32602, message: "Unsupported protocol version" },
+        }),
+      },
+    ]);
+    const tool = activateTool(mods, fetchImpl);
+    const err = await captureError(tool.run("golden query"));
+
+    expect(err.cause.message).toBe("TinyFish MCP initialize failed: Unsupported protocol version");
+  });
+
+  it("surfaces a 429 during initialize as a rate limit with Retry-After", async () => {
+    vi.stubEnv("TINYFISH_API_KEY", "tinyfish-secret");
+    const { fetchImpl, calls } = scriptedFetch([
+      { status: 429, headers: { "Retry-After": "120" } },
+    ]);
+    const tool = activateTool(mods, fetchImpl);
+    const err = await captureError(tool.run("golden query"));
+
+    expect(err.message).toBe("Web search rate limited (HTTP 429)");
+    expect(err.cause).toBeInstanceOf(mods.HttpCallError);
+    expect(err.cause.status).toBe(429);
+    expect(err.cause.retryAfter).toBe("120");
+    expect(calls).toHaveLength(1);
+  });
+
+  it("reports keyed searches rejected without a session", async () => {
+    vi.stubEnv("TINYFISH_API_KEY", "tinyfish-secret");
+    const { fetchImpl } = scriptedFetch([
+      { body: initializeResult, headers: { "mcp-session-id": "ses_tinyfish" } },
+      { status: 204 },
+      {
+        status: 400,
+        body: json({
+          jsonrpc: "2.0",
+          id: 1,
+          error: { code: -32600, message: "Missing required Mcp-Session-Id header" },
+        }),
+      },
+    ]);
+    const tool = activateTool(mods, fetchImpl);
+    const err = await captureError(tool.run("golden query"));
+
+    expect(err.message).toBe("Web search request failed (HTTP 400)");
+  });
+
+  // v2 parity: upstream initializes per search and never retries a 404, so a
+  // "Session not found; send a new initialize request" answer surfaces as-is.
+  it("does not re-initialize on a 404 session-not-found (v2 parity)", async () => {
+    vi.stubEnv("TINYFISH_API_KEY", "tinyfish-secret");
+    const { fetchImpl, calls } = scriptedFetch([
+      { body: initializeResult, headers: { "mcp-session-id": "ses_tinyfish" } },
+      { status: 204 },
+      {
+        status: 404,
+        body: json({
+          jsonrpc: "2.0",
+          id: 1,
+          error: { code: -32001, message: "Session not found; send a new initialize request" },
+        }),
+      },
+    ]);
+    const tool = activateTool(mods, fetchImpl);
+    const err = await captureError(tool.run("golden query"));
+
+    expect(err.message).toBe("Web search request failed (HTTP 404)");
+    expect(calls).toHaveLength(3);
+  });
+
+  // MCP 2025-06-18 transports: any request may be answered with either plain
+  // JSON or an SSE stream, including initialize.
+  it("parses an initialize response delivered over SSE", async () => {
+    vi.stubEnv("TINYFISH_API_KEY", "tinyfish-secret");
+    const { fetchImpl, calls } = scriptedFetch([
+      {
+        body: `event: message\ndata: ${initializeResult}\n\n`,
+        headers: { "mcp-session-id": "ses_tinyfish" },
+      },
+      { status: 204 },
+      { body: searchResult("golden query") },
+    ]);
+    const tool = activateTool(mods, fetchImpl);
+    const out = await tool.run("golden query");
+
+    expect(calls).toHaveLength(3);
+    expect(out.details.provider).toBe("tinyfish");
+  });
+
+  it("fails cleanly when initialize returns unparseable JSON", async () => {
+    vi.stubEnv("TINYFISH_API_KEY", "tinyfish-secret");
+    const { fetchImpl } = scriptedFetch([
+      { body: "null", headers: { "mcp-session-id": "ses_tinyfish" } },
+    ]);
+    const tool = activateTool(mods, fetchImpl);
+    const err = await captureError(tool.run("golden query"));
+
+    expect(err.cause.message).toBe("TinyFish MCP initialize returned no JSON-RPC payload");
+  });
+
+  it("rejects a response body over the 256 KiB cap", async () => {
+    vi.stubEnv("TINYFISH_API_KEY", "");
+    const tool = activateTool(
+      mods,
+      () => new Response("x".repeat(mods.MAX_RESPONSE_BYTES + 1), { status: 200 }),
+    );
+    const err = await captureError(tool.run("golden query"));
+
+    expect(err.cause.message).toBe(`search response exceeded ${mods.MAX_RESPONSE_BYTES} bytes`);
+  });
+
+  // The handshake shares one budget (v2's single Effect.timeoutOrElse), so a
+  // timeout reports the handshake, not a per-leg "timed out after Nms".
+  it("reports the handshake timeout with the shared budget", async () => {
+    vi.stubEnv("TINYFISH_API_KEY", "tinyfish-secret");
+    vi.useFakeTimers();
+    let requests = 0;
+    const tool = activateTool(mods, (_url, init) => {
+      requests++;
+      return new Promise<Response>((_resolve, reject) => {
+        init?.signal?.addEventListener("abort", () => {
+          reject(Object.assign(new Error("aborted"), { name: "AbortError" }));
+        });
+      });
+    });
+
+    const pending = captureError(tool.run("golden query"));
+    await vi.advanceTimersByTimeAsync(25_001);
+    const err = await pending;
+
+    expect(err.cause.message).toBe("TinyFish initialize request timed out");
+    expect(err.cause.cause).toBeInstanceOf(mods.McpTimeoutError);
+    expect(requests).toBe(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Tool-level cases (forced Firecrawl provider) — mcp-client represents an MCP
+// error that only carries structuredContent as { text: "", isError: true }.
+// Firecrawl checks the flag before the empty-text shortcut; it must still
+// surface an actionable message instead of an empty one.
+// ---------------------------------------------------------------------------
+
+describe("tool (forced firecrawl provider)", () => {
+  let mods: Mods;
+
+  beforeEach(async () => {
+    mods = await loadWebsearch("firecrawl");
+  });
+
+  it("propagates MCP tool errors that carry no text", async () => {
+    const tool = activateTool(
+      mods,
+      () =>
+        new Response(
+          JSON.stringify({
+            jsonrpc: "2.0",
+            id: 1,
+            result: { content: [], isError: true, structuredContent: { success: false } },
+          }),
+          { status: 200 },
+        ),
+    );
+    const err = await captureError(tool.run("golden query"));
+
+    expect(err.message).toBe("Unable to search the web for golden query");
+    expect(err.cause.message).toBe("Firecrawl search failed");
   });
 });

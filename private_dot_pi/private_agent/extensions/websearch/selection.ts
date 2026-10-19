@@ -4,7 +4,7 @@
  * 429 cooldowns and failover), reduced to pi-extension scope:
  *
  * Selection model:
- *   PI_WEBSEARCH_PROVIDER = exa | parallel | firecrawl | tavily | random (default)
+ *   PI_WEBSEARCH_PROVIDER = exa | parallel | firecrawl | tavily | tinyfish | random (default)
  *
  * - Forced selection (env names a specific provider): single attempt, errors
  *   (including 429) surface directly. Mirrors v2's non-random path, which
