@@ -22,7 +22,7 @@ import { Readable } from "node:stream";
 const theme = { fg: (_color: string, text: string) => text };
 
 async function fixture() {
-  const { getQuota } = await import("../extensions/custom-footer/quota.js");
+  const { getQuota } = await import("../../extensions/custom-footer/quota.js");
   const requestRender = vi.fn();
   const registry = {
     getApiKeyForProvider: vi.fn(),
@@ -131,7 +131,7 @@ describe("custom footer quota validation", () => {
     );
     f.get("synthetic");
     await vi.waitFor(() => expect(f.requestRender).toHaveBeenCalled());
-    const { getQuota } = await import("../extensions/custom-footer/quota.js");
+    const { getQuota } = await import("../../extensions/custom-footer/quota.js");
     const render = () =>
       getQuota(
         "synthetic",

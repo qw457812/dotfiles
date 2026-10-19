@@ -7,14 +7,14 @@ import {
 } from "@earendil-works/pi-ai";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import register from "../extensions/codebuddy-provider/index.js";
-import { fetchLiveModels } from "../extensions/codebuddy-provider/live-models.js";
+import register from "../../extensions/codebuddy-provider/index.js";
+import { fetchLiveModels } from "../../extensions/codebuddy-provider/live-models.js";
 import {
   type ChatModelConfig,
   type CodebuddyModel,
   toCodebuddyModel,
-} from "../extensions/codebuddy-provider/models.js";
-import modelsData from "../extensions/codebuddy-provider/models.json" with { type: "json" };
+} from "../../extensions/codebuddy-provider/models.js";
+import modelsData from "../../extensions/codebuddy-provider/models.json" with { type: "json" };
 
 const levels = ["off", "minimal", "low", "medium", "high", "xhigh", "max"] as const;
 type ThinkingLevel = (typeof levels)[number];

@@ -4,14 +4,14 @@ import {
   codebuddyCredentialsToAuth,
   loginCodebuddy,
   refreshCodebuddyCredentials,
-} from "../extensions/codebuddy-provider/auth.js";
+} from "../../extensions/codebuddy-provider/auth.js";
 import {
   HTTP_TIMEOUT_MS,
   POLL_INTERVAL_MS,
   POLL_TIMEOUT_MS,
-} from "../extensions/codebuddy-provider/constants.js";
-import type { CodebuddyOAuthCredentials } from "../extensions/codebuddy-provider/types.js";
-import { HttpError, requestJson, tryEach } from "../extensions/codebuddy-provider/utils.js";
+} from "../../extensions/codebuddy-provider/constants.js";
+import type { CodebuddyOAuthCredentials } from "../../extensions/codebuddy-provider/types.js";
+import { HttpError, requestJson, tryEach } from "../../extensions/codebuddy-provider/utils.js";
 
 const json = (payload: unknown, status = 200) => new Response(JSON.stringify(payload), { status });
 const authState = () =>

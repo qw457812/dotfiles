@@ -1,7 +1,7 @@
 import type { ExtensionContext, ToolExecutionEndEvent } from "@earendil-works/pi-coding-agent";
 import { describe, expect, it, vi } from "vitest";
-import { createToolCounter } from "../extensions/custom-footer/tool-counter.js";
-import { createSessionStatsGetter } from "../extensions/custom-footer/session-stats.js";
+import { createToolCounter } from "../../extensions/custom-footer/tool-counter.js";
+import { createSessionStatsGetter } from "../../extensions/custom-footer/session-stats.js";
 
 function usage(input = 10, cacheRead = 30) {
   return { input, output: 5, cacheRead, cacheWrite: 0, cost: { total: 0.01 } };
@@ -143,7 +143,12 @@ function toolCounterCtx(entries: unknown[]) {
 function toolResult(toolName: string, isError = false, nestedCalls?: unknown) {
   return {
     type: "message",
-    message: { role: "toolResult", toolName, isError, ...(nestedCalls === undefined ? {} : { nestedCalls }) },
+    message: {
+      role: "toolResult",
+      toolName,
+      isError,
+      ...(nestedCalls === undefined ? {} : { nestedCalls }),
+    },
   };
 }
 

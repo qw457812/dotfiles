@@ -7,17 +7,17 @@ import type {
   SessionStartEvent,
 } from "@earendil-works/pi-coding-agent";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { CHAT_BASE_URL, PROVIDER } from "../extensions/codebuddy-provider/constants.js";
-import register from "../extensions/codebuddy-provider/index.js";
-import { fetchLiveModels } from "../extensions/codebuddy-provider/live-models.js";
+import { CHAT_BASE_URL, PROVIDER } from "../../extensions/codebuddy-provider/constants.js";
+import register from "../../extensions/codebuddy-provider/index.js";
+import { fetchLiveModels } from "../../extensions/codebuddy-provider/live-models.js";
 import {
   type ChatModelConfig,
   getCodebuddyModelOptions,
   isCodebuddyModel,
   parseCodebuddyCredits,
   toCodebuddyModel,
-} from "../extensions/codebuddy-provider/models.js";
-import modelsData from "../extensions/codebuddy-provider/models.json" with { type: "json" };
+} from "../../extensions/codebuddy-provider/models.js";
+import modelsData from "../../extensions/codebuddy-provider/models.json" with { type: "json" };
 
 const configs = modelsData as ChatModelConfig[];
 const chat = toCodebuddyModel(configs[0]);
