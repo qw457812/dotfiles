@@ -274,8 +274,9 @@ state changed by the target release.
 
 ### Visual paste
 
-pi-vim 0.14.1 swallows visual `p`/`P`, so `prompt-editor` composes its private visual
-operator and put helpers. Revalidate `getPasteRegisterText`, visual ranges,
+pi-vim 0.14.1 swallows visual `p`/`P`, so local `visual-paste.ts` composes its private
+visual operator and put helpers and owns `VisualPasteEditorRuntime`. `index.ts`
+retains the Visual-mode dispatch, calling paste before navigation. Revalidate `getPasteRegisterText`, visual ranges,
 `applyVisualOperator`, `putBefore`/`putAfter`, unnamed-register preference,
 clipboard-mirror policy, and undo-window closure together.
 
@@ -293,7 +294,9 @@ guard because they belong to the visual put.
 Verification must cover characterwise and linewise `p`/`P`, counted puts, `fp`/`tp`
 and pending-`g` sequences, selections ending at the buffer end, one-step undo, the
 post-`p` deleted register, and the post-`P` preserved register. Fail loudly if any
-required private runtime member is unavailable.
+required private runtime member is unavailable. Run
+`tests/prompt-editor-visual-paste.test.ts`; verify actual buffer, register, and
+one-step undo behavior against the installed pi-vim runtime, not just mocked calls.
 
 ## Clipboard bridge
 
