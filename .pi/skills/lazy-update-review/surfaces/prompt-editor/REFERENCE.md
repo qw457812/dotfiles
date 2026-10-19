@@ -211,8 +211,9 @@ integration stops using them.
 
 ### Navigation remaps
 
-`prompt-editor` owns two navigation behaviors across Pi and pi-vim's private
-runtimes:
+Local `navigation.ts` owns two navigation behaviors and their structural runtime
+type across Pi and pi-vim. `index.ts` retains the Ex guard, mode dispatch,
+Backspace mapping, and upstream fallback; it calls the helpers directly:
 
 - standalone Normal-mode `h`/`l` and mapped Backspace stay on the current logical
   line and move by grapheme;
@@ -237,7 +238,7 @@ git -C "$PI_CHK" show \
   "$PI_TARGET_REV:packages/tui/src/components/editor.ts"
 ```
 
-Inspect the current `NavigationEditorRuntime` field by field. For each applicable Pi
+Inspect `navigation.ts`'s `NavigationEditorRuntime` field by field. For each applicable Pi
 target, revalidate `buildVisualLineMap`, `findCurrentVisualLine`, `moveToVisualLine`,
 `segment`, `setCursorCol`, `updateAutocomplete`, cursor state, and sticky-column
 state. For each applicable pi-vim target, revalidate `takeTotalCount`,
