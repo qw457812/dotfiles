@@ -184,8 +184,6 @@ type ModalEditorRuntime = {
   borderColor?: (text: string) => string;
   pendingExCommand: string | null;
   pendingOperator: string | null;
-  setClipboardFn?: (fn: (text: string, signal?: AbortSignal) => unknown) => void;
-  setClipboardReadFn?: (fn: () => string | null) => void;
 };
 
 (this as unknown as ModalEditorRuntime).pendingExCommand;
@@ -278,6 +276,25 @@ Verification must cover characterwise and linewise `p`/`P`, counted puts, `fp`/`
 and pending-`g` sequences, selections ending at the buffer end, one-step undo, the
 post-`p` deleted register, and the post-`P` preserved register. Fail loudly if any
 required private runtime member is unavailable.
+
+## Clipboard bridge
+
+Local `clipboard.ts` owns platform detection, reads, Termux writes, and hook
+installation. When upstream clipboard behavior changes, compare pi-vim's
+`setClipboardReadFn`, `setClipboardFn`, register fallback, mirror cancellation,
+and circuit-breaker error classification with this module.
+
+macOS overrides reads only, using an absolute `pbpaste` path and a UTF-8 locale;
+Termux overrides reads and writes only when both Termux:API commands are available.
+Other environments retain upstream behavior. Preserve empty text (`""`) versus
+failed reads (`null`), which let pi-vim fall back to its unnamed register. Keep
+read limits and timeouts shared across both platforms. Termux write failures must
+retain the spawn-style metadata consumed by pi-vim's circuit breaker, and aborts
+must kill the helper and remove the abort listener.
+
+Complete when `tests/prompt-editor-clipboard.test.ts` passes, and changed upstream hook,
+register-fallback, or mirror contracts have been verified against the target
+pi-vim runtime. Mocked process tests alone do not prove those contracts.
 
 ## Replacement-editor session parity
 
