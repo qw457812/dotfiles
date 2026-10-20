@@ -158,20 +158,6 @@ return {
               },
             },
           },
-          -- root_dir = function(bufnr, on_dir)
-          --   local root = vim.fs.root(bufnr, vim.lsp.config.emmylua_ls.root_markers)
-          --   on_dir(root ~= vim.env.HOME and root or vim.fs.root(bufnr, "lua"))
-          -- end,
-          -- -- lazydev#136: custom root_dir triggers emmylua_ls before library loaded → stale diagnostics.
-          -- -- Go-to-definition works but pull-diagnostic state won't refresh. Re-pull after delay.
-          -- on_attach = function(client, bufnr)
-          --   vim.defer_fn(function()
-          --     if client:is_stopped() then
-          --       return
-          --     end
-          --     vim.lsp.diagnostic._refresh(bufnr, client.id)
-          --   end, 1000)
-          -- end,
         },
       },
     },

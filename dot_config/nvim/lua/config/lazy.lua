@@ -176,18 +176,12 @@ require("lazy").setup({
         end,
         desc = "Pi",
       },
-      ["<leader>ag"] = {
+      ["<leader>af"] = {
         function(plugin)
           vim.cmd.close()
-          local orig_cwd = vim.fn.chdir(plugin.dir)
-          U.ai.sidekick.cli.quick.show("claude_glm" .. (vim.v.count == 0 and "" or vim.v.count))
-          if orig_cwd ~= "" then
-            vim.schedule(function()
-              vim.fn.chdir(orig_cwd)
-            end)
-          end
+          require("sidekick.cli").send({ msg = "@" .. U.path.home_to_tilde(plugin.dir), filter = { installed = true } })
         end,
-        desc = "Claude GLM",
+        desc = "Plugin Dir (Sidekick)",
       },
       ["<leader>gg"] = {
         function(plugin)
@@ -202,6 +196,20 @@ require("lazy").setup({
           end
         end,
         desc = "Plugin Git Log",
+      },
+      ["<leader>gO"] = {
+        function(plugin)
+          U.open_in_browser(plugin.url:gsub("%.git$", ""))
+        end,
+        desc = "Plugin Git Browse (open)",
+      },
+      ["<leader>gY"] = {
+        function(plugin)
+          local url = plugin.url:gsub("%.git$", "")
+          vim.fn.setreg(vim.v.register, url)
+          LazyVim.info(url, { title = "Copied URL" })
+        end,
+        desc = "Plugin Git Browse (copy)",
       },
       ["<leader>gi"] = {
         function(plugin)

@@ -30,6 +30,10 @@ return {
   -- https://github.com/badlogic/pi-skills/blob/90bb51cae36515a648515b633a81c0c6efc8c74d/browser-tools/SKILL.md
   -- https://github.com/badlogic/pi-termux-mobile
   --
+  -- https://github.com/earendil-works/pi-durable-cloudflare
+  -- https://github.com/earendil-works/pi-claude-code
+  -- https://github.com/earendil-works/pi-chat
+  --
   -- https://github.com/morluto/rea
   --
   -- https://github.com/google/artemis
@@ -124,8 +128,8 @@ return {
         config = function() end,
       },
       {
-        "monotykamary/pi-coralbricks-provider",
-        build = "pi update --extension git:github.com/monotykamary/pi-coralbricks-provider",
+        "Coral-Bricks-AI/pi-coralbricks-provider",
+        build = "pi update --extension git:github.com/Coral-Bricks-AI/pi-coralbricks-provider",
         lazy = true,
         config = function() end,
       },

@@ -595,6 +595,16 @@ return {
               end,
               desc = "Copy Path to Clipboard",
             },
+            ["<leader>af"] = {
+              function(state)
+                local node = state.tree:get_node()
+                if node and (node.type == "file" or node.type == "directory") then
+                  local path = U.path.home_to_tilde(node:get_id())
+                  require("sidekick.cli").send({ msg = "@" .. path, filter = { installed = true } })
+                end
+              end,
+              desc = "File/Dir (Sidekick)",
+            },
             ["<leader>fY"] = "copy_selector",
             ["<leader><space>"] = "find_in_dir",
             ["<leader>/"] = "grep_in_dir",
