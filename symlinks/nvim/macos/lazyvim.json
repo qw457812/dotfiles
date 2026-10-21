@@ -40,7 +40,6 @@
     "plugins.extras.editor.mini-operators",
     "plugins.extras.editor.undotree",
     "plugins.extras.lang.csv",
-    "plugins.extras.lang.jls",
     "plugins.extras.lang.xml",
     "plugins.extras.lsp.mason-lock",
     "plugins.extras.lsp.tiny-inline-diagnostic",

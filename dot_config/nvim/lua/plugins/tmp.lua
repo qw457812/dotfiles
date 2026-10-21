@@ -1,6 +1,6 @@
 local orig_java_home = vim.env.JAVA_HOME -- may be set by Mise
-local java_home = vim.g.user_is_termux and "/data/data/com.termux/files/usr/lib/jvm/java-21-openjdk"
-  or vim.fn.expand("$HOME/.local/share/mise/installs/java/23")
+local java_home = vim.g.user_is_termux and "/data/data/com.termux/files/usr/lib/jvm/java-25-openjdk"
+  or vim.fn.expand("$HOME/.local/share/mise/installs/java/25")
 
 local proxy = {
   http = "http://127.0.0.1:10808",
@@ -88,6 +88,7 @@ return {
     "mfussenegger/nvim-jdtls",
     optional = true,
     opts = function(_, opts)
+      -- JDTLS 1.62's Eclipse bundles require Java 25+, independently of the project's JDK.
       table.insert(opts.cmd, "--java-executable=" .. java_home .. "/bin/java")
     end,
   },
