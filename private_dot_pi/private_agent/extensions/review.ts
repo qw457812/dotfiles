@@ -67,6 +67,8 @@ const PR_CHECKOUT_BLOCKED_BY_PENDING_CHANGES_MESSAGE =
 const REVIEW_LOOP_MAX_ITERATIONS = 10;
 const REVIEW_LOOP_START_TIMEOUT_MS = 15000;
 const REVIEW_LOOP_START_POLL_MS = 50;
+const REVIEW_END_LABEL = "code-review-end";
+const REVIEW_RESUME_LABEL = "code-review-resume";
 
 type ReviewSessionState = {
 	active: boolean;
@@ -866,6 +868,37 @@ async function waitForLoopTurnToStart(ctx: ExtensionContext, previousAssistantId
 	}
 
 	return false;
+}
+
+function getLastAssistantEntryId(ctx: ExtensionContext): string | undefined {
+	return ctx.sessionManager
+		.getBranch()
+		.reverse()
+		.find((entry) => entry.type === "message" && entry.message.role === "assistant")?.id;
+}
+
+function getReviewStateEntryId(ctx: ExtensionContext, fromId?: string): string | undefined {
+	return ctx.sessionManager
+		.getBranch(fromId)
+		.reverse()
+		.find((entry) => entry.type === "custom" && entry.customType === REVIEW_STATE_TYPE)?.id;
+}
+
+function getLabelEntry(ctx: ExtensionContext, label: string) {
+	return ctx.sessionManager
+		.getEntries()
+		.filter((entry) => entry.type === "label")
+		.reverse()
+		.find((entry) => entry.label === label && ctx.sessionManager.getLabel(entry.targetId) === label);
+}
+
+function setExclusiveLabel(pi: ExtensionAPI, ctx: ExtensionContext, entryId: string, label: string) {
+	for (const entry of ctx.sessionManager.getEntries()) {
+		if (entry.id !== entryId && ctx.sessionManager.getLabel(entry.id) === label) {
+			pi.setLabel(entry.id, undefined);
+		}
+	}
+	pi.setLabel(entryId, label);
 }
 
 // Review preset options for the selector (keep this order stable)
@@ -2039,6 +2072,9 @@ Instructions:
 			return "error";
 		}
 
+		const reviewEndId = getLastAssistantEntryId(ctx);
+		if (reviewEndId) setExclusiveLabel(pi, ctx, reviewEndId, REVIEW_END_LABEL);
+
 		const notifySuccess = options.notifySuccess ?? true;
 
 		if (action === "returnOnly") {
@@ -2145,6 +2181,80 @@ Instructions:
 		description: "Complete review and return to original position",
 		handler: async (_args, ctx) => {
 			await runEndReview(ctx);
+		},
+	});
+
+	// Register the /resume-review command
+	pi.registerCommand("resume-review", {
+		description: "Return to the last review branch",
+		handler: async (_args, ctx) => {
+			if (ctx.mode !== "tui") {
+				ctx.ui.notify("Resume-review requires interactive mode", "error");
+				return;
+			}
+
+			if (getReviewState(ctx)?.active) {
+				ctx.ui.notify("Already in a review. Use /tree to move within it.", "info");
+				return;
+			}
+
+			const reviewEndId = getLabelEntry(ctx, REVIEW_END_LABEL)?.targetId;
+			if (!reviewEndId) {
+				ctx.ui.notify("No review branch to resume (use /review and /end-review first)", "info");
+				return;
+			}
+
+			const reviewResumeId = getLastAssistantEntryId(ctx);
+			if (!reviewResumeId) {
+				ctx.ui.notify("No assistant message on this branch to return to.", "info");
+				return;
+			}
+
+			const result = await ctx.navigateTree(reviewEndId, { summarize: false });
+			if (result.cancelled) {
+				ctx.ui.notify("Navigation cancelled. Use /resume-review to try again.", "info");
+				return;
+			}
+
+			setExclusiveLabel(pi, ctx, reviewResumeId, REVIEW_RESUME_LABEL);
+			ctx.ui.notify("Review session resumed. Use /end-resume-review to leave.", "info");
+		},
+	});
+
+	// Register the /end-resume-review command
+	pi.registerCommand("end-resume-review", {
+		description: "Return to the position before resuming",
+		handler: async (_args, ctx) => {
+			if (ctx.mode !== "tui") {
+				ctx.ui.notify("End-resume-review requires interactive mode", "error");
+				return;
+			}
+
+			if (!getReviewState(ctx)?.active) {
+				ctx.ui.notify("Not in a review branch. Use /resume-review first.", "info");
+				return;
+			}
+
+			const resumeEntry = getLabelEntry(ctx, REVIEW_RESUME_LABEL);
+			if (!resumeEntry) {
+				ctx.ui.notify("Review was not resumed. Use /end-review to return.", "info");
+				return;
+			}
+
+			if (getReviewStateEntryId(ctx, resumeEntry.id) !== getReviewStateEntryId(ctx)) {
+				ctx.ui.notify("This resume position belongs to another review. Use /end-review to return.", "info");
+				return;
+			}
+
+			const reviewResumeId = resumeEntry.targetId;
+			const result = await ctx.navigateTree(reviewResumeId, { summarize: false });
+			if (result.cancelled) {
+				ctx.ui.notify("Navigation cancelled. Use /end-resume-review to try again.", "info");
+				return;
+			}
+
+			pi.setLabel(reviewResumeId, undefined);
+			ctx.ui.notify("Returned to the position before resuming. Use /resume-review to re-enter.", "info");
 		},
 	});
 }
