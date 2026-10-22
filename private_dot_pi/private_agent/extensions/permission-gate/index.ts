@@ -2,7 +2,7 @@
  * Accidental-operation gate for Bash, SQL and protected paths, not a security boundary.
  *
  * Only this entry is auto-loaded; it registers the internal tool checks.
- * Git rules and Jev default to ON and reset on /reload.
+ * Gate, Git rules and Jev default to ON and reset on /reload.
  * See README.md for commands, coverage, unredacted classifier inputs and failure behavior.
  */
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
@@ -12,18 +12,21 @@ import registerSqlChecks from "./sql.ts";
 import { showLog } from "./log.ts";
 
 export { GATE_ENTRY } from "./log.ts";
-const USAGE = "Usage: /gate git [on|off] | jev [on|off] | log";
+const USAGE = "Usage: /gate on|off | git [on|off] | jev [on|off] | log";
 
 export default function (pi: ExtensionAPI) {
+  let enabled = true;
+  const isEnabled = () => enabled;
   let gitEnabled = true;
   let jevEnabled = true;
   let lifecycle = new AbortController();
 
-  registerPathChecks(pi);
+  registerPathChecks(pi, isEnabled);
   registerSqlChecks(
     pi,
     () => jevEnabled,
     () => lifecycle.signal,
+    isEnabled,
   );
 
   const invalidate = () => {
@@ -40,15 +43,16 @@ export default function (pi: ExtensionAPI) {
     () => gitEnabled,
     () => jevEnabled,
     () => lifecycle.signal,
+    isEnabled,
   );
 
   pi.registerCommand("gate", {
-    description: "Bash/SQL auto-approval and confirmation (/gate git|jev [on|off], log)",
+    description: "Permission gate (/gate on|off, git|jev [on|off], log)",
     getArgumentCompletions(prefix: string) {
       const query = prefix.trimStart().toLowerCase();
       const options = query.includes(" ")
         ? ["git on", "git off", "jev on", "jev off"]
-        : ["git", "jev", "log"];
+        : ["on", "off", "git", "jev", "log"];
       const items = options
         .filter((item) => item.startsWith(query))
         .map((item) => ({ value: item, label: item }));
@@ -58,9 +62,14 @@ export default function (pi: ExtensionAPI) {
       const [rule, value, ...extra] = args.trim().toLowerCase().split(/\s+/);
       if (!rule) {
         ctx.ui.notify(
-          `Git approval: ${gitEnabled ? "ON" : "OFF"}; Jev auto-approval: ${jevEnabled ? "ON" : "OFF"}\n${USAGE}`,
+          `Permission Gate: ${enabled ? "ON" : "OFF"}; Git approval: ${gitEnabled ? "ON" : "OFF"}; Jev auto-approval: ${jevEnabled ? "ON" : "OFF"}\n${USAGE}`,
           "info",
         );
+        return;
+      }
+      if ((rule === "on" || rule === "off") && !value && !extra.length) {
+        enabled = rule === "on";
+        ctx.ui.notify(`Permission Gate: ${enabled ? "ON" : "OFF"}`, enabled ? "info" : "warning");
         return;
       }
       if (rule === "log" && !value && !extra.length) {

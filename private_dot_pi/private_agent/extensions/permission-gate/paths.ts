@@ -4,8 +4,9 @@ import { confirm, confirmationResult } from "./confirmation.ts";
 
 const PROTECTED_PATHS = [".env", ".git/", "node_modules/", ".ssh/"];
 
-export default function registerPathChecks(pi: ExtensionAPI) {
+export default function registerPathChecks(pi: ExtensionAPI, isEnabled: () => boolean = () => true) {
   pi.on("tool_call", async (event, ctx) => {
+    if (!isEnabled()) return;
     if (event.toolName !== "write" && event.toolName !== "edit") return;
     const path = (event.input as { path?: string }).path ?? "";
     const hit = PROTECTED_PATHS.find((part) => path.includes(part));

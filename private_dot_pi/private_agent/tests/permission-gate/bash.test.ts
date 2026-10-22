@@ -641,7 +641,7 @@ describe("Permission Gate integration and Git toggle", () => {
     await gate("git off");
     await gate("git invalid");
     expect(ctx.ui.notify).toHaveBeenLastCalledWith(
-      "Usage: /gate git [on|off] | jev [on|off] | log",
+      "Usage: /gate on|off | git [on|off] | jev [on|off] | log",
       "error",
     );
     await gate("git  ");
@@ -651,8 +651,8 @@ describe("Permission Gate integration and Git toggle", () => {
   });
 
   it.each([
-    ["on", "error"],
-    ["off", "error"],
+    ["on extra", "error"],
+    ["off extra", "error"],
     ["all off", "error"],
     ["git invalid", "error"],
     ["git off extra", "error"],
@@ -660,7 +660,7 @@ describe("Permission Gate integration and Git toggle", () => {
     const { gate, ctx, run } = harness();
     await gate(args);
     expect(ctx.ui.notify).toHaveBeenLastCalledWith(
-      "Usage: /gate git [on|off] | jev [on|off] | log",
+      "Usage: /gate on|off | git [on|off] | jev [on|off] | log",
       level,
     );
     await run("git commit");
@@ -670,6 +670,8 @@ describe("Permission Gate integration and Git toggle", () => {
   it("completes the Git rule and its explicit on/off values", () => {
     const { gateCommand } = harness();
     expect(gateCommand?.getArgumentCompletions("")).toEqual([
+      { value: "on", label: "on" },
+      { value: "off", label: "off" },
       { value: "git", label: "git" },
       { value: "jev", label: "jev" },
       { value: "log", label: "log" },

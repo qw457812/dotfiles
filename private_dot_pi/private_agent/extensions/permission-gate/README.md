@@ -9,11 +9,14 @@ Pi automatically loads only this directory's `index.ts`, which registers the pat
 | Command               | Purpose                                                                 |
 | --------------------- | ----------------------------------------------------------------------- |
 | `/gate`               | Show status and usage                                                   |
+| `/gate on\|off`       | Enable or bypass all Bash, SQL and protected-path checks                 |
 | `/gate git [on\|off]` | Show or toggle local Git rules                                          |
 | `/gate jev [on\|off]` | Show or toggle Jev auto-approval                                        |
 | `/gate log`           | Show the latest 20 Jev decision summaries on the current session branch |
 
-Git rules and Jev both default to **ON**. Switches live only in the current extension instance and reset to ON on `/reload`.
+The master gate, Git rules and Jev all default to **ON**. Switches live only in the current extension instance and reset to ON on `/reload`.
+
+- `/gate off`: Bypass all checks for subsequent tool calls, including input locking and Jev requests. Already-running checks are unchanged. `/gate on` restores checks without changing the Git/Jev sub-switches.
 
 - `git off`: Git no longer triggers local approval rules; other matches in the same command still apply.
 - `jev off`: Locally matched calls require manual confirmation; it does not disable the local rules.
@@ -75,7 +78,7 @@ Authorization is read directly from the latest ordinary `user` entry returned by
 
 **Accepted limit:** ordinary `user` messages cannot distinguish real user input from extension-injected `sendUserMessage` input. Both, as well as legacy ordinary user messages, can supply authorization. Extensions are trusted accordingly; this simplification is not provenance verification. User-entry ID, session ID and cancellation checks still prevent stale decisions from approving calls.
 
-Protected-path checks remain manual and independent of Jev. Neither switch disables SQL/path checks; `/gate jev` controls auto-approval for Bash and SQL, while `/gate git` affects only local Bash Git rules.
+Protected-path checks remain manual and independent of Jev. Neither Git nor Jev sub-switch disables SQL/path checks; the master `/gate off` bypasses all checks; `/gate jev` controls auto-approval for Bash and SQL, while `/gate git` affects only local Bash Git rules.
 
 ## Code and integration
 

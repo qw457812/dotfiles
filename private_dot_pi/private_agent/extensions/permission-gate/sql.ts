@@ -90,8 +90,10 @@ export default function registerSqlChecks(
   pi: ExtensionAPI,
   isJevEnabled: () => boolean,
   getLifetime: () => AbortSignal,
+  isEnabled: () => boolean = () => true,
 ) {
   pi.on("tool_call", async (event, ctx) => {
+    if (!isEnabled()) return;
     // Route by the concrete tool name, never by an input parameter.
     if (!GUARDED_TOOL_PATTERNS.some((pattern) => pattern.test(event.toolName))) return;
     const input = event.input;

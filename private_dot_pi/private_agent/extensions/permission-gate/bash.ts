@@ -10,8 +10,10 @@ export default function registerBashChecks(
   isGitEnabled: () => boolean,
   isJevEnabled: () => boolean,
   getLifetime: () => AbortSignal,
+  isEnabled: () => boolean = () => true,
 ) {
   pi.on("tool_call", async (event, ctx) => {
+    if (!isEnabled()) return;
     if (event.toolName !== "bash") return;
     const command = (event.input as { command?: string }).command ?? "";
     // Later tool_call handlers may otherwise change the command after it was approved.

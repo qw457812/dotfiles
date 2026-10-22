@@ -47,7 +47,7 @@ const TIMESTAMP = "2026-01-01T00:00:00.000Z";
 const SECRET = "secret-token-DO-NOT-LOG";
 const COMMAND = `rm -rf /repo/${SECRET}`;
 const INTENT = `Delete /repo/${SECRET}, including all its files.`;
-const USAGE = "Usage: /gate git [on|off] | jev [on|off] | log";
+const USAGE = "Usage: /gate on|off | git [on|off] | jev [on|off] | log";
 const CANCELLED = { block: true, reason: "Permission Gate: operation cancelled" };
 
 function result(intent = 0.99, scope = 0.99, harm = 0.01): ClassifierResult {
@@ -505,6 +505,52 @@ describe("Permission Gate command integrity before tool execution", () => {
     expect(input.command).toBe("changed");
     expect(Object.getOwnPropertyDescriptor(input, "command")?.writable).toBe(true);
     expect(h.classify).not.toHaveBeenCalled();
+  });
+});
+
+describe("Permission Gate master switch", () => {
+  it.each([
+    ["bash", { command: "sudo true" }],
+    ["mcp__db__execute_sql", { sql: "DROP TABLE users" }],
+    ["write", { path: "/repo/.env" }],
+    ["edit", { path: "/repo/.ssh/config" }],
+  ])("bypasses %s checks while off and restores them on enable", async (toolName, input) => {
+    const h = harness();
+    await h.gate(" OFF ");
+    expect(h.notify).toHaveBeenLastCalledWith("Permission Gate: OFF", "warning");
+    const args = { ...input };
+    expect(await h.runInput(args, toolName)).toBeUndefined();
+    expect(Object.values(Object.getOwnPropertyDescriptors(args)).every((p) => p.writable)).toBe(true);
+    expect(h.classify).not.toHaveBeenCalled();
+    expect(h.confirm).not.toHaveBeenCalled();
+    expect(h.appendEntry).not.toHaveBeenCalled();
+    await h.gate("");
+    expect(h.notify).toHaveBeenLastCalledWith(expect.stringContaining("Permission Gate: OFF;"), "info");
+
+    await h.gate("on");
+    expect(h.notify).toHaveBeenLastCalledWith("Permission Gate: ON", "info");
+    await h.gate("jev off");
+    await h.runInput({ ...input }, toolName);
+    expect(h.confirm).toHaveBeenCalledOnce();
+  });
+
+  it("preserves sub-switches and defaults to ON in a new instance", async () => {
+    const h = harness();
+    await h.gate("git off");
+    await h.gate("jev off");
+    await h.gate("off");
+    await h.gate("on");
+    await h.gate("");
+    expect(h.notify).toHaveBeenLastCalledWith(
+      expect.stringContaining("Permission Gate: ON; Git approval: OFF; Jev auto-approval: OFF"),
+      "info",
+    );
+    const fresh = harness();
+    await fresh.gate("");
+    expect(fresh.notify).toHaveBeenLastCalledWith(
+      expect.stringContaining("Permission Gate: ON; Git approval: ON; Jev auto-approval: ON"),
+      "info",
+    );
   });
 });
 
@@ -1690,8 +1736,8 @@ describe("Permission Gate Jev logs, commands and headless behavior", () => {
   });
 
   it.each([
-    "on",
-    "off",
+    "on extra",
+    "off extra",
     "all off",
     "git invalid",
     "git off extra",
@@ -1727,7 +1773,7 @@ describe("Permission Gate Jev logs, commands and headless behavior", () => {
     );
     const completions = h.gateCommand.getArgumentCompletions!;
     expect(await completions("")).toEqual(
-      ["git", "jev", "log"].map((value) => ({ value, label: value })),
+      ["on", "off", "git", "jev", "log"].map((value) => ({ value, label: value })),
     );
     expect(await completions("j")).toEqual([{ value: "jev", label: "jev" }]);
     expect(await completions("jev ")).toEqual(
