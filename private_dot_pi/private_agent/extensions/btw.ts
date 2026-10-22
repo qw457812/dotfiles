@@ -84,20 +84,16 @@ type ToolCallInfo = {
 	status: "running" | "done" | "error";
 };
 
-function stripDynamicSystemPromptFooter(systemPrompt: string): string {
-	return systemPrompt
-		.replace(/\n<cwd>\n[\s\S]*?\n<\/cwd>\s*$/u, "")
-		.replace(/\nCurrent date and time:[^\n]*(?:\nCurrent working directory:[^\n]*)?$/u, "")
-		.replace(/\nCurrent working directory:[^\n]*$/u, "")
-		.trim();
-}
-
 export async function createBtwResourceLoader(
-	ctx: ExtensionContext,
+	ctx: ExtensionContext | ExtensionCommandContext,
 	appendSystemPrompt: string[] = [BTW_SYSTEM_PROMPT],
-	withWebTools = true,
+	isSideChat = true,
 ): Promise<ResourceLoader> {
-	// Load only these extensions, never the main session's extensions.
+	const mainPromptOptions = isSideChat && "getSystemPromptOptions" in ctx ? ctx.getSystemPromptOptions() : undefined;
+	const extensionPaths = isSideChat
+		? ["./websearch/index.ts", "./webfetch/index.ts"].map((path) => fileURLToPath(new URL(path, import.meta.url)))
+		: [];
+
 	const loader = new DefaultResourceLoader({
 		cwd: ctx.cwd,
 		agentDir: getAgentDir(),
@@ -110,12 +106,16 @@ export async function createBtwResourceLoader(
 		// Prompts are literal text; do not discover or resolve prompt files.
 		systemPrompt: "",
 		appendSystemPrompt: [],
-		systemPromptOverride: () => stripDynamicSystemPromptFooter(ctx.getSystemPrompt()),
-		appendSystemPromptOverride: () => appendSystemPrompt,
-		additionalExtensionPaths: withWebTools ? [
-			fileURLToPath(new URL("./websearch/index.ts", import.meta.url)),
-			fileURLToPath(new URL("./webfetch/index.ts", import.meta.url)),
-		] : [],
+		systemPromptOverride: () =>
+			isSideChat ? mainPromptOptions?.customPrompt : appendSystemPrompt.join("\n\n"),
+		appendSystemPromptOverride: () =>
+			isSideChat
+				? [mainPromptOptions?.appendSystemPrompt, ...appendSystemPrompt].filter(
+						(prompt): prompt is string => prompt !== undefined && prompt !== "",
+					)
+				: [],
+		agentsFilesOverride: () => ({ agentsFiles: mainPromptOptions?.contextFiles?.map((file) => ({ ...file })) ?? [] }),
+		additionalExtensionPaths: extensionPaths,
 	});
 	await loader.reload();
 	const { errors } = loader.getExtensions();
