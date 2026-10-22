@@ -5,10 +5,12 @@ import {
 	buildSessionContext,
 	convertToLlm,
 	createAgentSession,
-	createExtensionRuntime,
+	DefaultResourceLoader,
+	getAgentDir,
 	getMarkdownTheme,
 	ModelRuntime,
 	SessionManager,
+	SettingsManager,
 	type AgentSession,
 	type AgentSessionEvent,
 	type ExtensionAPI,
@@ -28,6 +30,8 @@ import {
 	type OverlayHandle,
 	type TUI,
 } from "@earendil-works/pi-tui";
+
+import { fileURLToPath } from "node:url";
 
 const BTW_ENTRY_TYPE = "btw-thread-entry";
 const BTW_RESET_TYPE = "btw-thread-reset";
@@ -88,23 +92,37 @@ function stripDynamicSystemPromptFooter(systemPrompt: string): string {
 		.trim();
 }
 
-function createBtwResourceLoader(ctx: ExtensionContext, appendSystemPrompt: string[] = [BTW_SYSTEM_PROMPT]): ResourceLoader {
-	const extensionsResult = { extensions: [], errors: [], runtime: createExtensionRuntime() };
-	const systemPrompt = stripDynamicSystemPromptFooter(ctx.getSystemPrompt());
-
-	return {
-		getExtensions: () => extensionsResult,
-		getSkills: () => ({ skills: [], diagnostics: [] }),
-		getPrompts: () => ({ prompts: [], diagnostics: [] }),
-		getThemes: () => ({ themes: [], diagnostics: [] }),
-		getAgentsFiles: () => ({ agentsFiles: [] }),
-		getSystemPrompt: () => systemPrompt,
-		getSystemPromptSource: () => undefined,
-		getAppendSystemPrompt: () => appendSystemPrompt,
-		getAppendSystemPromptSources: () => [],
-		extendResources: () => {},
-		reload: async () => {},
-	};
+export async function createBtwResourceLoader(
+	ctx: ExtensionContext,
+	appendSystemPrompt: string[] = [BTW_SYSTEM_PROMPT],
+	withWebTools = true,
+): Promise<ResourceLoader> {
+	// Load only these extensions, never the main session's extensions.
+	const loader = new DefaultResourceLoader({
+		cwd: ctx.cwd,
+		agentDir: getAgentDir(),
+		settingsManager: SettingsManager.inMemory(),
+		noExtensions: true,
+		noSkills: true,
+		noPromptTemplates: true,
+		noThemes: true,
+		noContextFiles: true,
+		// Prompts are literal text; do not discover or resolve prompt files.
+		systemPrompt: "",
+		appendSystemPrompt: [],
+		systemPromptOverride: () => stripDynamicSystemPromptFooter(ctx.getSystemPrompt()),
+		appendSystemPromptOverride: () => appendSystemPrompt,
+		additionalExtensionPaths: withWebTools ? [
+			fileURLToPath(new URL("./websearch/index.ts", import.meta.url)),
+			fileURLToPath(new URL("./webfetch/index.ts", import.meta.url)),
+		] : [],
+	});
+	await loader.reload();
+	const { errors } = loader.getExtensions();
+	if (errors.length > 0) {
+		throw new Error(errors.map(({ path, error }) => `${path}: ${error}`).join("\n"));
+	}
+	return loader;
 }
 
 async function createBtwModelRuntime(ctx: ExtensionContext): Promise<ModelRuntime> {
@@ -395,6 +413,10 @@ export default function (pi: ExtensionAPI) {
 		switch (toolName) {
 			case "bash":
 				return typeof a.command === "string" ? truncateToWidth(a.command.split("\n")[0], 50, "…") : "";
+			case "websearch":
+				return typeof a.query === "string" ? truncateToWidth(a.query.split("\n")[0], 50, "…") : "";
+			case "webfetch":
+				return typeof a.url === "string" ? truncateToWidth(a.url, 50, "…") : "";
 			case "read":
 			case "write":
 			case "edit":
@@ -600,9 +622,10 @@ export default function (pi: ExtensionAPI) {
 			model: ctx.model,
 			modelRuntime: await createBtwModelRuntime(ctx),
 			thinkingLevel: pi.getThinkingLevel() as SessionThinkingLevel,
-			tools: ["read", "bash", "edit", "write"],
-			resourceLoader: createBtwResourceLoader(ctx),
+			tools: ["read", "bash", "edit", "write", "websearch", "webfetch"],
+			resourceLoader: await createBtwResourceLoader(ctx),
 		});
+		await session.bindExtensions({});
 
 		const unsubscribe = session.subscribe((event: AgentSessionEvent) => {
 			if (!sideBusy || !pendingQuestion) {
@@ -785,7 +808,7 @@ export default function (pi: ExtensionAPI) {
 			modelRuntime: await createBtwModelRuntime(ctx),
 			thinkingLevel: "off",
 			tools: [],
-			resourceLoader: createBtwResourceLoader(ctx, [BTW_SUMMARY_PROMPT]),
+			resourceLoader: await createBtwResourceLoader(ctx, [BTW_SUMMARY_PROMPT], false),
 		});
 
 		try {
