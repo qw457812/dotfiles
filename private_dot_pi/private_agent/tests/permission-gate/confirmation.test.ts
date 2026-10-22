@@ -38,7 +38,7 @@ describe("confirm", () => {
     expect(h.abort).not.toHaveBeenCalled();
   });
 
-  it("aborts on denial before releasing the queue", async () => {
+  it("aborts the operation on denial", async () => {
     const h = harness();
     h.dialog.mockResolvedValue(false);
     expect(await confirm(h.pi, h.ctx, TITLE, MESSAGE)).toBe("user-denied");
@@ -75,7 +75,7 @@ describe("confirm", () => {
     },
   );
 
-  it("a notification failure returns failure and releases the queue", async () => {
+  it("a notification failure blocks its call without affecting later confirmations", async () => {
     const h = harness();
     h.emit.mockImplementationOnce(() => {
       throw new Error("private notification error");

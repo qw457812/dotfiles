@@ -3,7 +3,6 @@ import type {
   ExtensionContext,
   ToolCallEventResult,
 } from "@earendil-works/pi-coding-agent";
-import { withConfirmationQueue } from "./confirmation-queue.ts";
 
 export type ConfirmationOutcome =
   | "user-approved"
@@ -12,7 +11,7 @@ export type ConfirmationOutcome =
   | "cancelled"
   | "confirmation-failed";
 
-/** Serialize dialogs and return an outcome, without deciding the caller's policy. */
+/** Use Pi's dialog stack and return an outcome, without deciding the caller's policy. */
 export async function confirm(
   pi: ExtensionAPI,
   ctx: ExtensionContext,
@@ -23,23 +22,20 @@ export async function confirm(
   if (signal?.aborted) return "cancelled";
   if (!ctx.hasUI) return "no-ui";
 
-  return withConfirmationQueue(ctx.ui, async () => {
-    try {
-      if (signal?.aborted) return "cancelled";
-      pi.events.emit("my:notification", { title, body: message });
-      const approved = signal
-        ? await ctx.ui.confirm(title, message, { signal })
-        : await ctx.ui.confirm(title, message);
-      if (signal?.aborted) return "cancelled";
-      if (!approved) {
-        ctx.abort(); // Abort before releasing the queue, so waiting dialogs stay suppressed.
-        return "user-denied";
-      }
-      return "user-approved";
-    } catch {
-      return signal?.aborted ? "cancelled" : "confirmation-failed";
+  try {
+    pi.events.emit("my:notification", { title, body: message });
+    const approved = signal
+      ? await ctx.ui.confirm(title, message, { signal })
+      : await ctx.ui.confirm(title, message);
+    if (signal?.aborted) return "cancelled";
+    if (!approved) {
+      ctx.abort(); // Cancel sibling confirmations sharing this operation's signal.
+      return "user-denied";
     }
-  });
+    return "user-approved";
+  } catch {
+    return signal?.aborted ? "cancelled" : "confirmation-failed";
+  }
 }
 
 /** Every guard uses the same blocking reasons. */

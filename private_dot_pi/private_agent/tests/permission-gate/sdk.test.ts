@@ -208,7 +208,7 @@ describe("Permission Gate slash templates (real Pi SDK)", () => {
     await resourceLoader.reload();
     const loaded = resourceLoader.getExtensions();
     expect(loaded.errors).toEqual([]);
-    // Directory discovery must load only index, not the two guards or queue again.
+    // Directory discovery must load only index, not its internal guard modules again.
     expect(
       loaded.extensions.filter((extension) => !extension.path.startsWith("<inline")),
     ).toHaveLength(1);

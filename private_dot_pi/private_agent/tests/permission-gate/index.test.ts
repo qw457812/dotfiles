@@ -332,7 +332,7 @@ describe("Permission Gate integrated path and SQL guards", () => {
     expect(h.confirm).not.toHaveBeenCalled();
   });
 
-  it("classifies Bash and SQL concurrently while serializing their confirmation dialogs", async () => {
+  it("classifies Bash and SQL and opens their confirmations concurrently", async () => {
     const h = harness();
     const bashResult = deferred<ClassifierResult>();
     const sqlResult = deferred<ClassifierResult>();
@@ -352,7 +352,8 @@ describe("Permission Gate integrated path and SQL guards", () => {
     expect(h.confirm.mock.calls[0][0]).toBe("⚠️ SQL Guard");
     bashResult.resolve(result(0.1));
     await flush();
-    expect(h.confirm).toHaveBeenCalledOnce();
+    expect(h.confirm).toHaveBeenCalledTimes(2);
+    expect(await bashCall).toBeUndefined();
     firstDialog.resolve(true);
     expect(await Promise.all([sqlCall, bashCall])).toEqual([undefined, undefined]);
     expect(h.confirm).toHaveBeenCalledTimes(2);
@@ -1362,13 +1363,13 @@ describe("Permission Gate Jev deadlines, cancellation and concurrency", () => {
     expect(h.confirm).not.toHaveBeenCalled();
   });
 
-  it("classifies in parallel but serializes confirmation dialogs", async () => {
+  it("classifies and opens confirmation dialogs in parallel", async () => {
     const h = harness();
     const a = deferred<ClassifierResult>();
     const b = deferred<ClassifierResult>();
     const dialog = deferred<boolean>();
     h.classify.mockReturnValueOnce(a.promise).mockReturnValueOnce(b.promise);
-    h.confirm.mockReturnValueOnce(dialog.promise);
+    h.confirm.mockReturnValueOnce(dialog.promise).mockReturnValueOnce(dialog.promise);
     const first = h.run("rm -rf /repo/first");
     const second = h.run("rm -rf /repo/second");
     await flush();
@@ -1378,8 +1379,8 @@ describe("Permission Gate Jev deadlines, cancellation and concurrency", () => {
     await flush();
     b.resolve(result(0.5));
     await flush();
-    expect(h.confirm).toHaveBeenCalledOnce();
-    expect(h.emit).toHaveBeenCalledOnce();
+    expect(h.confirm).toHaveBeenCalledTimes(2);
+    expect(h.emit).toHaveBeenCalledTimes(2);
     dialog.resolve(true);
     expect(await first).toBeUndefined();
     expect(await second).toBeUndefined();
@@ -1392,23 +1393,23 @@ describe("Permission Gate Jev deadlines, cancellation and concurrency", () => {
     ]);
   });
 
-  it("denial aborts the operation and suppresses queued confirmations", async () => {
+  it("denial aborts the operation and cancels concurrent confirmations", async () => {
     const h = harness();
     const dialog = deferred<boolean>();
     h.classify.mockResolvedValue(result(0.5));
-    h.confirm.mockReturnValueOnce(dialog.promise);
+    h.confirm.mockReturnValueOnce(dialog.promise).mockReturnValueOnce(dialog.promise);
     const first = h.run("rm -rf /repo/first");
     const second = h.run("rm -rf /repo/second");
     await flush();
     expect(h.classify).toHaveBeenCalledTimes(2);
-    expect(h.confirm).toHaveBeenCalledOnce();
+    expect(h.confirm).toHaveBeenCalledTimes(2);
     dialog.resolve(false);
     expect(await first).toEqual({ block: true, reason: "Blocked by user" });
     expect(await second).toEqual(CANCELLED);
     expect(h.abort).toHaveBeenCalledOnce();
     expect(h.controller.signal.aborted).toBe(true);
-    expect(h.confirm).toHaveBeenCalledOnce();
-    expect(h.emit).toHaveBeenCalledOnce();
+    expect(h.confirm).toHaveBeenCalledTimes(2);
+    expect(h.emit).toHaveBeenCalledTimes(2);
     expect(h.decisions().map((decision) => decision.outcome)).toEqual(["user-denied", "cancelled"]);
   });
 
@@ -1451,30 +1452,30 @@ describe("Permission Gate Jev deadlines, cancellation and concurrency", () => {
   );
 
   it.each(["session_before_switch", "session_before_tree"] as const)(
-    "invalidates active and queued dialogs on %s without appending old decisions",
+    "invalidates concurrent dialogs on %s without appending old decisions",
     async (event) => {
       const h = harness();
       const dialog = deferred<boolean>();
       h.classify.mockResolvedValue(result(0.5));
-      h.confirm.mockReturnValueOnce(dialog.promise);
+      h.confirm.mockReturnValueOnce(dialog.promise).mockReturnValueOnce(dialog.promise);
       const first = h.run("rm -rf /repo/first");
       const second = h.run("rm -rf /repo/second");
       await flush();
-      expect(h.confirm).toHaveBeenCalledOnce();
-      const signal = h.confirm.mock.calls[0][2]?.signal;
+      expect(h.confirm).toHaveBeenCalledTimes(2);
+      const signals = h.confirm.mock.calls.map(([, , options]) => options?.signal);
       await h.fire(event);
       if (event === "session_before_switch") h.replaceSession("session-2");
       else h.replaceBranch([user("replacement-branch")]);
-      expect(signal?.aborted).toBe(true);
+      for (const signal of signals) expect(signal?.aborted).toBe(true);
       dialog.resolve(true);
       expect(await first).toEqual(CANCELLED);
       expect(await second).toEqual(CANCELLED);
-      expect(h.confirm).toHaveBeenCalledOnce();
+      expect(h.confirm).toHaveBeenCalledTimes(2);
       expect(h.appendEntry).not.toHaveBeenCalled();
       expect(h.abort).not.toHaveBeenCalled();
       // A new lifecycle can still classify and confirm on the replacement branch.
       expect(await h.run("rm -rf /repo/new-operation")).toBeUndefined();
-      expect(h.confirm).toHaveBeenCalledTimes(2);
+      expect(h.confirm).toHaveBeenCalledTimes(3);
       expect(h.decisions()[0].outcome).toBe("user-approved");
     },
   );
@@ -1495,7 +1496,7 @@ describe("Permission Gate Jev deadlines, cancellation and concurrency", () => {
     expect(h.decisions()[1].outcome).toBe("user-approved");
   });
 
-  it("a confirmation error blocks safely and releases the queue for the next dialog", async () => {
+  it("a confirmation error blocks safely without affecting another dialog", async () => {
     const h = harness();
     h.classify.mockResolvedValue(result(0.5));
     h.confirm.mockRejectedValueOnce(new Error(SECRET));

@@ -21,7 +21,7 @@ interface ApprovalOptions {
   message: (judgment: GateJudgment) => string;
 }
 
-/** Keep classification parallel; only manual confirmation enters the shared UI queue. */
+/** Classify and confirm concurrently, with shared cancellation and validity checks. */
 export async function requestApproval(
   pi: ExtensionAPI,
   ctx: ExtensionContext,
