@@ -11,6 +11,9 @@ extensions/*/node_modules
 /crashes.json
 /pi-debug.log
 
+# https://github.com/badlogic/pi-subagent
+/subagents
+
 # https://github.com/mitsuhiko/agent-stuff
 /tmux-subagents
 

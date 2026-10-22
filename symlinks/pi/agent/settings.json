@@ -72,8 +72,7 @@
       "skills": [
         "skills/commit",
         "skills/web-browser",
-        "skills/github",
-        "skills/pi-share"
+        "skills/github"
       ],
       "prompts": [
         "commands/discuss.md"

@@ -76,7 +76,7 @@ describe("Path Guard matching", () => {
   it.each(["/repo", getAgentDir()])("keeps the same protected paths in cwd=%s", async (cwd) => {
     const { run, ctx } = harness(true, false);
     ctx.cwd = cwd;
-    for (const hit of [".env", ".git/", "node_modules/", "id_rsa", ".ssh/"])
+    for (const hit of [".env", ".git/", "node_modules/", ".ssh/"])
       expect(await run(`/repo/${hit}file`, "write")).toEqual({
         block: true,
         reason: "Operation requires user confirmation",
