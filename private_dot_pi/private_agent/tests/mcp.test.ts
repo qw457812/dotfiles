@@ -86,7 +86,7 @@ function assistantFor(id: string, name: string, args: JsonObject): AssistantMess
   };
 }
 
-describe("MCP SQL Guard integration (installed SDK 1.3.0)", () => {
+describe("MCP SQL Guard integration (installed SDK 1.4.0)", () => {
   let root: string;
   let session: AgentSession | undefined;
   let callNumber: number;
@@ -258,7 +258,7 @@ describe("MCP SQL Guard integration (installed SDK 1.3.0)", () => {
 
   it("discovers MCP tool names and leaves non-SQL echo unguarded", async () => {
     await bindAndDiscover();
-    expect(VERSION).toBe("1.3.0");
+    expect(VERSION).toBe("1.4.0");
     expect(
       session
         ?.getAllTools()

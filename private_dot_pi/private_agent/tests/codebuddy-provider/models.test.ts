@@ -63,7 +63,7 @@ describe("CodeBuddy chat models", () => {
     const mixed: AnyModel[] = [
       chat,
       { ...chat, type: "image", output: ["image"] },
-      { ...chat, type: "classifier" },
+      { ...chat, type: "classifier", compat: undefined },
     ];
     expect(mixed.filter(isCodebuddyModel)).toEqual([chat]);
   });

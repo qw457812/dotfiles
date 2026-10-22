@@ -69,7 +69,12 @@ for dependency and native-toolchain failures.
 
 Deploy changed source paths through chezmoi. Edits normally auto-apply, but lockfiles
 written by npm may need a scoped manual apply; verify the relevant deployed files
-without deploying unrelated work.
+without deploying unrelated work. Source and deployed `node_modules` are separate:
+chezmoi excludes them, so matching manifests do not prove the deployed dependencies
+are current. For the root and each affected nested package, compare installed host
+versions in both trees. After deploying the locks, synchronize stale deployed
+installs with `npm --prefix <deployed-package-dir> ci --ignore-scripts`; verify native
+runtime dependencies separately when they require lifecycle scripts.
 
 For a pi-vim update, install the reviewed version exactly and synchronize the source
 dependency:
