@@ -1,4 +1,9 @@
+encryption = "age"
 umask = 0o22
+
+[age]
+identity = "{{ .chezmoi.homeDir }}/.config/chezmoi/key.txt"
+recipient = "age1dsx0ury5zqfdts367xzglrnvftlxyn8yxaq96tg6jaefwhwc5g9sur8v4v"
 
 [edit]
 command = "nvim"
