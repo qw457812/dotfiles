@@ -54,10 +54,6 @@ set fish_emoji_width 2
 alias ssh "TERM=xterm-256color command ssh"
 alias mosh "TERM=xterm-256color command mosh"
 
-set -g __proxy_ip "127.0.0.1"
-set -g __http_proxy_port 10808
-set -g __socks_proxy_port $__http_proxy_port
-
 # Files & Directories
 set -l ll_cmd 'eza --all --color=always --color-scale all --icons=always --long --group --time-style=iso --git'
 alias ll "$ll_cmd --group-directories-first"
@@ -223,7 +219,7 @@ abbr czet --set-cursor "chezmoi execute-template '%'"
 abbr czd 'chezmoi diff'
 abbr czap 'chezmoi apply'
 # abbr czapv 'chezmoi apply -v'
-# abbr cze 'chezmoi edit'
+abbr cze 'chezmoi edit'
 # abbr czeap 'chezmoi edit --apply'
 # abbr czeapv 'chezmoi edit --apply --verbose'
 abbr czu 'chezmoi update'
@@ -353,5 +349,5 @@ if set -q TERMUX_VERSION
         tmux attach || tmux
     end
 else
-    term_proxy_on
+    proxy env auto
 end
