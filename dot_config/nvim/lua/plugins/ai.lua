@@ -61,6 +61,12 @@ return {
         lazy = true,
         config = function() end,
       },
+      {
+        "badlogic/explainer",
+        build = "npm install --ignore-scripts",
+        lazy = true,
+        config = function() end,
+      },
       -- private_dot_pi/private_agent/extensions/review.ts
       { "earendil-works/pi-review", lazy = true, config = function() end },
       {

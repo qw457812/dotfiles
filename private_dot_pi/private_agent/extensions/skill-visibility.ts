@@ -35,6 +35,8 @@ const PROMPT_HIDDEN_SKILLS = [
   // git:github.com/mitsuhiko/agent-stuff
   "github",
   ...(IS_TERMUX ? ["web-browser"] : []),
+  // https://github.com/badlogic/explainer
+  "explainer",
   // git:github.com/mattpocock/skills
   "pr",
   // git:github.com/anthropics/skills

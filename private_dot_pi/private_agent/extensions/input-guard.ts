@@ -1,6 +1,6 @@
 /**
  * Prevents accidental prompts consisting of one ASCII letter repeated one or
- * more times, such as `q` or `qqqq`.
+ * more times, such as `q` or `qqqq`. Only single uppercase A–D bypass the guard.
  */
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
@@ -14,7 +14,7 @@ export default function (pi: ExtensionAPI) {
     }
 
     const text = event.text.trim();
-    if (!SUSPICIOUS_INPUT.test(text)) {
+    if (/^[A-D]$/.test(text) || !SUSPICIOUS_INPUT.test(text)) {
       return { action: "continue" };
     }
 

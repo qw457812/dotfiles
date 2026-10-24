@@ -31,6 +31,12 @@ brew "gettext"
 brew "readline"
 # Address book with mutt support
 brew "abook"
+# General-purpose data compression with high compression ratio
+brew "xz"
+# Display directories as trees (with optional color/HTML output)
+brew "tree"
+# Automate deployment, configuration, and upgrading
+brew "ansible"
 # Utility to read Word (.doc) files
 brew "antiword"
 # Extendable version manager with support for Ruby, Node.js, Erlang & more
@@ -47,8 +53,6 @@ brew "autoconf"
 brew "automake"
 # Automatically restart SSH sessions and tunnels
 brew "autossh"
-# General-purpose data compression with high compression ratio
-brew "xz"
 # Bourne-Again SHell, a UNIX command interpreter
 brew "bash"
 # Cryptography and SSL/TLS Toolkit
@@ -163,8 +167,6 @@ brew "fzf"
 brew "gdu"
 # GitHub command-line tool
 brew "gh"
-# Development kit for the Java programming language
-brew "openjdk@21"
 # Multi-platform software reverse engineering framework
 brew "ghidra"
 # Distributed revision control system
@@ -311,6 +313,8 @@ brew "media-info"
 brew "micro"
 # Terminal-based visual file manager
 brew "midnight-commander"
+# Another rule-based tunnel in Go, formerly known as ClashMeta
+brew "mihomo", restart_service: :changed
 # Polyglot runtime manager (asdf rust clone)
 brew "mise"
 # Deep clean and optimize your Mac
@@ -353,10 +357,10 @@ brew "nushell"
 brew "nvimpager"
 # Development kit for the Java programming language
 brew "openjdk@17"
+# Development kit for the Java programming language
+brew "openjdk@21"
 # SSL/TLS VPN implementing OSI layer 2 or 3 secure network extension
 brew "openvpn"
-# Display directories as trees (with optional color/HTML output)
-brew "tree"
 # Password manager
 brew "pass"
 # CLI for Postgres with auto-completion and syntax highlighting
