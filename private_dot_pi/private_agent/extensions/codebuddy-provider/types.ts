@@ -52,7 +52,8 @@ export type AccountsData = {
 };
 
 // ── Auth platform ────────────────────────────────────────────────────────────
-export type AuthPlatform = "cli" | "ide";
+// product.json's `platform`, sent verbatim as `?platform=` (not an endpoint kind).
+export type AuthPlatform = "CLI";
 
 // ── Credentials type ─────────────────────────────────────────────────────────
 export type CodebuddyOAuthCredentials = {

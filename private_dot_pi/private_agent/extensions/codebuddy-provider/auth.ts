@@ -26,9 +26,11 @@ import type {
   TokenPayload,
 } from "./types.js";
 import {
+  ANONYMOUS_USER_ID,
   HttpError,
   decodeJwtClaims,
   ensureSuccess,
+  enterpriseHeaders,
   isRetryableRequestError,
   firstNonEmpty,
   normalizeDomain,
@@ -115,7 +117,7 @@ export async function refreshCodebuddyCredentials(
           "X-Refresh-Token": current.refresh,
           "X-Auth-Refresh-Source": "plugin",
           "X-Request-ID": requestId(),
-          ...(current.userId ? { "X-User-Id": current.userId } : {}),
+          "X-User-Id": current.userId || ANONYMOUS_USER_ID,
         },
         body: "{}",
         signal,
@@ -147,14 +149,17 @@ export async function refreshCodebuddyCredentials(
 
 export function codebuddyCredentialsToAuth(credentials: CodebuddyOAuthCredentials): ModelAuth {
   const current = normalizeCredentials(credentials);
-  const userId = firstNonEmpty(current.userId, current.uid) || decodeJwtClaims(current.access).sub;
+  const userId = firstNonEmpty(current.userId, current.uid) || ANONYMOUS_USER_ID;
+
   return {
     apiKey: current.access,
     headers: {
-      ...(userId ? { "X-User-Id": userId } : {}),
+      "X-User-Id": userId,
       "X-Domain": normalizeDomain(current.domain),
-      ...(current.enterpriseId ? { "X-Enterprise-Id": current.enterpriseId } : {}),
-      ...(current.departmentFullName ? { "X-Department-Info": current.departmentFullName } : {}),
+      ...enterpriseHeaders({
+        enterpriseId: current.enterpriseId,
+        department: current.departmentFullName,
+      }),
     },
   };
 }
@@ -215,12 +220,13 @@ function needsProfileEnrichment(credentials: CodebuddyOAuthCredentials): boolean
 // ── Private: auth state ──────────────────────────────────────────────────────
 
 async function fetchAuthState(signal?: AbortSignal): Promise<AuthState> {
+  // "CLI" is product.json's `platform`, not the endpoint kind, so both base URLs use it.
   const attempts: Array<{
     baseUrl: string;
     platform: AuthPlatform;
   }> = [
-    { baseUrl: CLI_BASE_URL, platform: "cli" },
-    { baseUrl: ACCOUNT_BASE_URL, platform: "ide" },
+    { baseUrl: CLI_BASE_URL, platform: "CLI" },
+    { baseUrl: ACCOUNT_BASE_URL, platform: "CLI" },
   ];
 
   return tryEach(

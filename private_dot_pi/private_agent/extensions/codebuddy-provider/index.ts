@@ -14,7 +14,15 @@ import {
 import { openAICompletionsApi } from "@earendil-works/pi-ai/compat";
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { codebuddyCredentialsToAuth, loginCodebuddy, refreshCodebuddyCredentials } from "./auth.js";
-import { CHAT_BASE_URL, DEFAULT_DOMAIN, PROVIDER, USER_AGENT, VERSION } from "./constants.js";
+import {
+  AGENT_RUNTIME,
+  CHAT_BASE_URL,
+  DEFAULT_DOMAIN,
+  PRODUCT,
+  PROVIDER,
+  USER_AGENT,
+  VERSION,
+} from "./constants.js";
 import { fetchLiveModels } from "./live-models.js";
 import {
   type ChatModelConfig,
@@ -26,7 +34,7 @@ import {
 } from "./models.js";
 import modelsData from "./models.json" with { type: "json" };
 import type { CodebuddyOAuthCredentials } from "./types.js";
-import { decodeUserId, readHeader, requestId } from "./utils.js";
+import { enterpriseHeaders, readHeader, requestId, resolveUserId } from "./utils.js";
 
 // readlink -f ~/.local/bin/codebuddy
 // ~/.codebuddy/logs/
@@ -64,30 +72,35 @@ function buildRequestHeaders(
 ): ProviderHeaders {
   const sourceHeaders: ProviderHeaders = { ...model.headers, ...options?.headers };
   const accessToken = options?.apiKey;
-  const userId = readHeader(sourceHeaders, "X-User-Id") || decodeUserId(accessToken);
+  const userId = resolveUserId(sourceHeaders, accessToken);
   const domain = readHeader(sourceHeaders, "X-Domain") || DEFAULT_DOMAIN;
   const enterpriseId = readHeader(sourceHeaders, "X-Enterprise-Id");
-  const department = readHeader(sourceHeaders, "X-Department-Info") || "";
+  const department = readHeader(sourceHeaders, "X-Department-Info");
   const agentPurpose = readHeader(sourceHeaders, "X-Agent-Purpose");
   const conversationRequestId = requestId();
   const conversationMessageId = requestId();
 
   return {
-    ...(userId ? { "X-User-Id": userId } : {}),
+    "X-User-Id": userId,
     "X-Domain": domain,
-    ...(enterpriseId ? { "X-Enterprise-Id": enterpriseId } : {}),
-    "X-Department-Info": department,
+    ...enterpriseHeaders({ enterpriseId, department }),
     "X-IDE-Type": "CLI",
     "X-IDE-Name": "CLI",
     "X-IDE-Version": VERSION,
     "X-Product-Version": VERSION,
+    // Unconditional in the CLI even though the gateway ignores them.
+    "X-Product": PRODUCT,
+    "X-Agent-Runtime": AGENT_RUNTIME,
     "X-Requested-With": "XMLHttpRequest",
     "X-Conversation-ID": conversationId,
     "X-Conversation-Request-ID": conversationRequestId,
     "X-Conversation-Message-ID": conversationMessageId,
     "X-Request-ID": conversationMessageId,
     "X-Agent-Intent": "craft",
-    ...(agentPurpose ? { "X-Agent-Purpose": agentPurpose } : {}),
+    "X-Agent-Purpose": agentPurpose ?? "conversation",
+    // pi exposes no per-request compaction marker, so a summary is indistinguishable from
+    // a normal turn; guessing "compaction" would corrupt telemetry.
+    "X-Agent-Type": "main",
     "User-Agent": USER_AGENT,
     ...options?.headers,
   };

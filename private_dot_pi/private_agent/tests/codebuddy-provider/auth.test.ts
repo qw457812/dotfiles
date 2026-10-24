@@ -14,6 +14,9 @@ import type { CodebuddyOAuthCredentials } from "../../extensions/codebuddy-provi
 import { HttpError, requestJson, tryEach } from "../../extensions/codebuddy-provider/utils.js";
 
 const json = (payload: unknown, status = 200) => new Response(JSON.stringify(payload), { status });
+// Minimal unsigned JWT; only the payload segment matters for subject decoding.
+const oauthToken = (claims: Record<string, unknown>) =>
+  ["e30", Buffer.from(JSON.stringify(claims)).toString("base64url"), "sig"].join(".");
 const authState = () =>
   json({ code: 0, data: { state: "state", authUrl: "https://www.codebuddy.cn/login" } });
 const token = () =>
@@ -128,6 +131,23 @@ describe("CodeBuddy HTTP cancellation", () => {
 });
 
 describe("CodeBuddy login polling", () => {
+  it("requests the auth state with the CLI's uppercase platform value", async () => {
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce(authState())
+      .mockResolvedValueOnce(
+        json({ data: { accessToken: "access", refreshToken: "refresh", expiresIn: 3600 } }),
+      )
+      .mockResolvedValueOnce(accounts());
+    vi.stubGlobal("fetch", fetch);
+    const pending = loginCodebuddy(interaction());
+    await vi.advanceTimersByTimeAsync(0);
+    await pending;
+    const url = new URL(String(fetch.mock.calls[0][0]));
+    // `product.json` declares platform "CLI"; the CLI sends it verbatim.
+    expect(url.searchParams.get("platform")).toBe("CLI");
+  });
+
   it.each([
     [{ code: 12345, message: "Authorization rejected" }, "Authorization rejected"],
     [{ code: 0, data: {} }, "missing accessToken"],
@@ -228,6 +248,28 @@ describe("CodeBuddy refreshed account identity", () => {
     expect(fetch).toHaveBeenCalledTimes(2);
   });
 
+  it("sends X-User-Id on the refresh request like every other builder", async () => {
+    const fetch = vi.fn().mockResolvedValueOnce(token()).mockResolvedValueOnce(accounts());
+    vi.stubGlobal("fetch", fetch);
+    await refreshCodebuddyCredentials(current);
+    const headers = new Headers(fetch.mock.calls[0][1]?.headers);
+    expect(headers.get("x-user-id")).toBe("user");
+    expect(headers.get("x-refresh-token")).toBe("old-refresh");
+  });
+
+  it("falls back to the anonymous identity when the credential has no subject", async () => {
+    const anonymous = {
+      ...current,
+      access: oauthToken({}),
+      userId: undefined,
+      uid: undefined,
+    };
+    const fetch = vi.fn().mockResolvedValueOnce(token());
+    vi.stubGlobal("fetch", fetch);
+    await refreshCodebuddyCredentials(anonymous);
+    expect(new Headers(fetch.mock.calls[0][1]?.headers).get("x-user-id")).toBe("anonymous");
+  });
+
   it("clears enterprise headers after switching to a personal account", async () => {
     vi.stubGlobal(
       "fetch",
@@ -239,6 +281,28 @@ describe("CodeBuddy refreshed account identity", () => {
     expect(result.enterpriseName).toBeUndefined();
     expect(auth.headers).not.toHaveProperty("X-Enterprise-Id");
     expect(auth.headers).not.toHaveProperty("X-Department-Info");
+  });
+
+  it("forwards enterprise headers when the credential carries them", () => {
+    const auth = codebuddyCredentialsToAuth(current);
+    expect(current.enterpriseId).toBe("old-enterprise");
+    expect(auth.headers).toMatchObject({
+      "X-Enterprise-Id": "old-enterprise",
+      "X-Tenant-Id": "old-enterprise",
+      "X-Department-Info": "Old department",
+    });
+  });
+
+  it("sends a usable X-User-Id without an enterprise identity", () => {
+    const auth = codebuddyCredentialsToAuth({
+      ...current,
+      access: "ck_opaque.token",
+      userId: undefined,
+      uid: undefined,
+      email: undefined,
+      nickname: undefined,
+    });
+    expect(auth.headers).toMatchObject({ "X-User-Id": "anonymous" });
   });
 
   it("preserves rotated tokens and old metadata if profile lookup fails", async () => {

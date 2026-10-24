@@ -1,7 +1,13 @@
 import type { ProviderHeaders } from "@earendil-works/pi-ai";
-import { CLI_BASE_URL, DEFAULT_DOMAIN, USER_AGENT, VERSION } from "./constants.js";
+import { CLI_BASE_URL, DEFAULT_DOMAIN, PRODUCT, USER_AGENT, VERSION } from "./constants.js";
 import { type ChatModelConfig, type CodebuddyModel, toCodebuddyModel } from "./models.js";
-import { decodeUserId, ensureSuccess, readHeader, requestJson } from "./utils.js";
+import {
+  ensureSuccess,
+  enterpriseHeaders,
+  readHeader,
+  requestJson,
+  resolveUserId,
+} from "./utils.js";
 
 const PRODUCT_CONFIG_URL = new URL("/v3/config", CLI_BASE_URL).toString();
 const LIVE_MODELS_TIMEOUT_MS = 5000;
@@ -66,24 +72,23 @@ function buildProductConfigHeaders(
   accessToken: string,
   modelHeaders?: ProviderHeaders,
 ): Record<string, string> {
-  const userId = readHeader(modelHeaders, "X-User-Id") || decodeUserId(accessToken);
+  const userId = resolveUserId(modelHeaders, accessToken);
   const domain = readHeader(modelHeaders, "X-Domain") || DEFAULT_DOMAIN;
   const enterpriseId = readHeader(modelHeaders, "X-Enterprise-Id");
-  const department = readHeader(modelHeaders, "X-Department-Info") || "";
-  const agentPurpose = readHeader(modelHeaders, "X-Agent-Purpose");
+  const department = readHeader(modelHeaders, "X-Department-Info");
 
   return {
     Authorization: `Bearer ${accessToken}`,
-    ...(userId ? { "X-User-Id": userId } : {}),
+    "X-User-Id": userId,
     "X-Domain": domain,
-    ...(enterpriseId ? { "X-Enterprise-Id": enterpriseId } : {}),
-    "X-Department-Info": department,
+    ...enterpriseHeaders({ enterpriseId, department }),
     "X-IDE-Type": "CLI",
     "X-IDE-Name": "CLI",
     "X-IDE-Version": VERSION,
     "X-Product-Version": VERSION,
+    // The CLI sends no X-Agent-Runtime on /v3/config, unlike on chat requests.
+    "X-Product": PRODUCT,
     "X-Requested-With": "XMLHttpRequest",
-    ...(agentPurpose ? { "X-Agent-Purpose": agentPurpose } : {}),
     "User-Agent": USER_AGENT,
     Connection: "close",
   };

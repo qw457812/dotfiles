@@ -1,6 +1,15 @@
+import type { ProviderHeaders } from "@earendil-works/pi-ai";
 import { Buffer } from "node:buffer";
 import { randomUUID } from "node:crypto";
 import { DEFAULT_DOMAIN, EXPIRY_BUFFER_MS, HTTP_TIMEOUT_MS, SUCCESS_CODES } from "./constants.js";
+
+/**
+ * Identity the CLI substitutes when a credential carries none of its own.
+ *
+ * Single source of truth: `resolveUserId` and `codebuddyCredentialsToAuth` must agree,
+ * otherwise the two auth paths would report different identities for the same token.
+ */
+export const ANONYMOUS_USER_ID = "anonymous";
 
 // ── JWT ──────────────────────────────────────────────────────────────────────
 
@@ -28,6 +37,28 @@ export function decodeJwtClaims(
 
 export function decodeUserId(accessToken: string | undefined): string | undefined {
   return normalizeNonEmpty(decodeJwtClaims(accessToken).sub);
+}
+
+/**
+ * The catalog is skipped when `X-User-Id` is absent or blank, so identity is always sent.
+ */
+export function resolveUserId(headers: ProviderHeaders | undefined, accessToken?: string): string {
+  return readHeader(headers, "X-User-Id") || decodeUserId(accessToken) || ANONYMOUS_USER_ID;
+}
+
+/** Enterprise identity headers. `X-User-Id` is separate: it has its own fallback chain. */
+export function enterpriseHeaders({
+  enterpriseId,
+  department,
+}: {
+  enterpriseId?: string;
+  department?: string;
+}): Record<string, string> {
+  return {
+    ...(enterpriseId ? { "X-Enterprise-Id": enterpriseId } : {}),
+    ...(enterpriseId ? { "X-Tenant-Id": enterpriseId } : {}),
+    ...(department ? { "X-Department-Info": department } : {}),
+  };
 }
 
 // ── Domain ───────────────────────────────────────────────────────────────────

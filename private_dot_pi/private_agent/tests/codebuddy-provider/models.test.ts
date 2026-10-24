@@ -1,4 +1,9 @@
-import { type AnyModel, type Provider, createModels } from "@earendil-works/pi-ai";
+import {
+  type AnyModel,
+  type Provider,
+  createModels,
+  normalizeContext,
+} from "@earendil-works/pi-ai";
 import type {
   ExtensionAPI,
   ExtensionCommandContext,
@@ -263,6 +268,191 @@ describe("CodeBuddy ambient authentication", () => {
       headers: { Authorization: "Bearer ambient-token" },
     });
     expect(models.getModel(PROVIDER, "live")?.name).toBe("Live (x0.15)");
+  });
+});
+
+describe("CodeBuddy CLI header parity", () => {
+  const catalogBody = () =>
+    new Response(JSON.stringify({ code: 0, data: { models: [{ id: "live", name: "Live" }] } }));
+  // Minimal unsigned JWT; only the payload segment matters for subject decoding.
+  const oauthToken = (claims: Record<string, unknown>) =>
+    ["e30", Buffer.from(JSON.stringify(claims)).toString("base64url"), "sig"].join(".");
+
+  it.each([
+    ["an opaque CODEBUDDY_AUTH_TOKEN", "ck_opaque.token", "anonymous"],
+    ["an OAuth JWT", oauthToken({ sub: "user-123" }), "user-123"],
+  ])("sends a non-empty X-User-Id for %s", async (_label, token, userId) => {
+    const fetch = vi.fn(async (_url: string | URL | Request, _init?: RequestInit) => catalogBody());
+    vi.stubGlobal("fetch", fetch);
+    await fetchLiveModels({ accessToken: token });
+    expect(new Headers(fetch.mock.calls[0][1]?.headers).get("x-user-id")).toBe(userId);
+  });
+
+  it("forwards the enterprise identity the credential carries", async () => {
+    // A logged-in CodeBuddy CN session sends X-Enterprise-Id on /v3/config, so the
+    // catalog request must keep forwarding it.
+    const fetch = vi.fn(async (_url: string | URL | Request, _init?: RequestInit) => catalogBody());
+    vi.stubGlobal("fetch", fetch);
+    await fetchLiveModels({
+      accessToken: "ck_opaque.token",
+      modelHeaders: {
+        "X-User-Id": "anonymous",
+        "X-Enterprise-Id": "enterprise",
+        "X-Department-Info": "department",
+      },
+    });
+    const headers = new Headers(fetch.mock.calls[0][1]?.headers);
+    expect(headers.get("x-user-id")).toBe("anonymous");
+    expect(headers.get("x-enterprise-id")).toBe("enterprise");
+    // The CLI mirrors the enterprise id into X-Tenant-Id on /v3/config.
+    expect(headers.get("x-tenant-id")).toBe("enterprise");
+    expect(headers.get("x-department-info")).toBe("department");
+  });
+
+  it("sends no department header when the account has no department name", async () => {
+    const fetch = vi.fn(async (_url: string | URL | Request, _init?: RequestInit) => catalogBody());
+    vi.stubGlobal("fetch", fetch);
+    await fetchLiveModels({
+      accessToken: "ck_opaque.token",
+      modelHeaders: { "X-User-Id": "anonymous", "X-Enterprise-Id": "enterprise" },
+    });
+    const headers = new Headers(fetch.mock.calls[0][1]?.headers);
+    expect(headers.get("x-enterprise-id")).toBe("enterprise");
+    expect(headers.get("x-tenant-id")).toBe("enterprise");
+    expect(headers.get("x-department-info")).toBeNull();
+  });
+
+  it("sends no enterprise header when the credential has none", async () => {
+    const fetch = vi.fn(async (_url: string | URL | Request, _init?: RequestInit) => catalogBody());
+    vi.stubGlobal("fetch", fetch);
+    await fetchLiveModels({ accessToken: "ck_opaque.token" });
+    const headers = new Headers(fetch.mock.calls[0][1]?.headers);
+    expect(headers.get("x-user-id")).toBe("anonymous");
+    expect(headers.get("x-enterprise-id")).toBeNull();
+    expect(headers.get("x-tenant-id")).toBeNull();
+    // /v3/config carries X-Product but, unlike chat requests, no X-Agent-Runtime.
+    expect(headers.get("x-product")).toBe("SaaS");
+    expect(headers.get("x-agent-runtime")).toBeNull();
+  });
+
+  it("forwards enterprise identity onto chat requests", async () => {
+    const fetch = vi.fn(
+      async (_url: string | URL | Request, _init?: RequestInit) =>
+        new Response("data: [DONE]\n\n", {
+          headers: { "content-type": "text/event-stream" },
+        }),
+    );
+    vi.stubGlobal("fetch", fetch);
+    const provider = setupPicker().pi.registerProvider.mock
+      .calls[0][0] as Provider<"openai-completions">;
+    await provider
+      .streamSimple(
+        chat,
+        normalizeContext({
+          messages: [{ role: "user", content: "Say OK", timestamp: 0 }],
+        }),
+        {
+          apiKey: "ck_opaque.token",
+          maxTokens: 8,
+          maxRetries: 0,
+          headers: {
+            "X-Enterprise-Id": "enterprise",
+            "X-Department-Info": "department",
+          },
+        },
+      )
+      .result();
+
+    const headers = new Headers(fetch.mock.calls[0][1]?.headers);
+    expect(headers.get("x-user-id")).toBe("anonymous");
+    expect(headers.get("x-enterprise-id")).toBe("enterprise");
+    expect(headers.get("x-tenant-id")).toBe("enterprise");
+    expect(headers.get("x-department-info")).toBe("department");
+  });
+
+  it("omits enterprise identity from chat requests when the caller supplies none", async () => {
+    const fetch = vi.fn(
+      async (_url: string | URL | Request, _init?: RequestInit) =>
+        new Response("data: [DONE]\n\n", {
+          headers: { "content-type": "text/event-stream" },
+        }),
+    );
+    vi.stubGlobal("fetch", fetch);
+    const provider = setupPicker().pi.registerProvider.mock
+      .calls[0][0] as Provider<"openai-completions">;
+    await provider
+      .streamSimple(
+        chat,
+        normalizeContext({
+          messages: [{ role: "user", content: "Say OK", timestamp: 0 }],
+        }),
+        { apiKey: "ck_opaque.token", maxTokens: 8, maxRetries: 0 },
+      )
+      .result();
+
+    const headers = new Headers(fetch.mock.calls[0][1]?.headers);
+    expect(headers.get("x-user-id")).toBe("anonymous");
+    expect(headers.get("x-enterprise-id")).toBeNull();
+    expect(headers.get("x-tenant-id")).toBeNull();
+    // Absent, not empty: the CLI only sets this header when a department name exists.
+    expect(headers.get("x-department-info")).toBeNull();
+  });
+
+  it("forwards X-Agent-Purpose on chat requests", async () => {
+    const fetch = vi.fn(
+      async (_url: string | URL | Request, _init?: RequestInit) =>
+        new Response("data: [DONE]\n\n", {
+          headers: { "content-type": "text/event-stream" },
+        }),
+    );
+    vi.stubGlobal("fetch", fetch);
+    const provider = setupPicker().pi.registerProvider.mock
+      .calls[0][0] as Provider<"openai-completions">;
+    await provider
+      .streamSimple(
+        chat,
+        normalizeContext({
+          messages: [{ role: "user", content: "Say OK", timestamp: 0 }],
+        }),
+        {
+          apiKey: "ck_opaque.token",
+          maxTokens: 8,
+          maxRetries: 0,
+          headers: { "X-Agent-Purpose": "person_agent" },
+        },
+      )
+      .result();
+
+    const headers = new Headers(fetch.mock.calls[0][1]?.headers);
+    expect(headers.get("x-agent-purpose")).toBe("person_agent");
+    expect(headers.get("x-agent-intent")).toBe("craft");
+  });
+
+  it("applies the CLI's default session classification when nothing overrides it", async () => {
+    const fetch = vi.fn(
+      async (_url: string | URL | Request, _init?: RequestInit) =>
+        new Response("data: [DONE]\n\n", {
+          headers: { "content-type": "text/event-stream" },
+        }),
+    );
+    vi.stubGlobal("fetch", fetch);
+    const provider = setupPicker().pi.registerProvider.mock
+      .calls[0][0] as Provider<"openai-completions">;
+    await provider
+      .streamSimple(
+        chat,
+        normalizeContext({
+          messages: [{ role: "user", content: "Say OK", timestamp: 0 }],
+        }),
+        { apiKey: "ck_opaque.token", maxTokens: 8, maxRetries: 0 },
+      )
+      .result();
+
+    const headers = new Headers(fetch.mock.calls[0][1]?.headers);
+    expect(headers.get("x-agent-purpose")).toBe("conversation");
+    expect(headers.get("x-agent-type")).toBe("main");
+    expect(headers.get("x-agent-runtime")).toBe("other");
+    expect(headers.get("x-product")).toBe("SaaS");
   });
 });
 

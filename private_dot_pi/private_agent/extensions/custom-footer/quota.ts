@@ -171,7 +171,7 @@ interface CommandCodeQuota {
 
 interface CodebuddyQuotaAuth {
   access: string;
-  enterpriseId: string;
+  enterpriseId?: string;
 }
 
 // https://github.com/mikeyobrien/pi-provider-kiro/blob/0899ed9c823e3bea592f642472f134f4439e4fee/src/usage.ts
@@ -835,10 +835,12 @@ const sources: Record<string, Source> = {
       try {
         const authResult = await modelRegistry.getProviderAuth("codebuddy");
         const access = authResult?.auth.apiKey;
-        const enterpriseId = Object.entries(authResult?.auth.headers ?? {}).find(
-          ([name]) => name.toLowerCase() === "x-enterprise-id",
-        )?.[1];
-        return access && enterpriseId ? { access, enterpriseId } : null;
+        if (!access) return null;
+        const enterpriseId =
+          Object.entries(authResult?.auth.headers ?? {}).find(
+            ([name]) => name.toLowerCase() === "x-enterprise-id",
+          )?.[1] || undefined;
+        return { access, enterpriseId };
       } catch {
         return null;
       }
@@ -846,14 +848,16 @@ const sources: Record<string, Source> = {
     async fetch(auth): Promise<CodebuddyQuota | null> {
       try {
         // https://www.codebuddy.cn/profile/usage
+        // Opaque `ck_` keys need the /v2 prefix; the unprefixed route 401s them at the
+        // gateway while still accepting OAuth JWTs.
         const resp = await fetch(
-          "https://www.codebuddy.cn/billing/meter/get-enterprise-user-usage",
+          "https://www.codebuddy.cn/v2/billing/meter/get-enterprise-user-usage",
           {
             method: "POST",
             signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
             headers: {
               Authorization: `Bearer ${auth.access}`,
-              "X-Enterprise-Id": auth.enterpriseId,
+              ...(auth.enterpriseId ? { "X-Enterprise-Id": auth.enterpriseId } : {}),
             },
             body: "{}",
           },

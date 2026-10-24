@@ -24,6 +24,10 @@ export const SUCCESS_CODES = new Set([0, 200]);
 export const PENDING_CODES = new Set([11217]);
 
 // ── Product metadata ────────────────────────────────────────────────────────
-export const VERSION = "2.164.0";
+// Tracks the installed CodeBuddy CLI; the gateway checks the UA shape only, so a stale
+// value is log drift rather than a functional break.
+export const VERSION = "2.173.0";
 export const USER_AGENT = `CLI/${VERSION} CodeBuddy/${VERSION}`;
 export const PRODUCT = "SaaS";
+// pi is always a local session, which the CLI reports as "other".
+export const AGENT_RUNTIME = "other";

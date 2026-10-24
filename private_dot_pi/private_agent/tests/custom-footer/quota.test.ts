@@ -171,7 +171,7 @@ describe("custom footer quota authentication", () => {
     ).toBe(true);
   });
 
-  it("uses resolved CodeBuddy token and enterprise header", async () => {
+  it("uses resolved CodeBuddy token and the /v2 usage endpoint", async () => {
     const f = await fixture();
     f.registry.getProviderAuth.mockResolvedValue({
       auth: { apiKey: "refreshed-codebuddy-token", headers: { "x-enterprise-id": "enterprise" } },
@@ -179,9 +179,28 @@ describe("custom footer quota authentication", () => {
     f.get("codebuddy");
     await vi.waitFor(() => expect(f.fetchMock).toHaveBeenCalled());
     expect(f.registry.getProviderAuth).toHaveBeenCalledWith("codebuddy");
+    // The unprefixed route rejects opaque `ck_` keys at the gateway, so the /v2
+    // prefix is required for CODEBUDDY_AUTH_TOKEN credentials.
+    expect(f.fetchMock.mock.calls[0][0]).toBe(
+      "https://www.codebuddy.cn/v2/billing/meter/get-enterprise-user-usage",
+    );
     expect(f.fetchMock.mock.calls[0][1].headers).toMatchObject({
       Authorization: "Bearer refreshed-codebuddy-token",
       "X-Enterprise-Id": "enterprise",
+    });
+  });
+
+  it("queries CodeBuddy usage without an enterprise header", async () => {
+    const f = await fixture();
+    // CODEBUDDY_AUTH_TOKEN resolves to an opaque key with no enterprise identity.
+    f.registry.getProviderAuth.mockResolvedValue({
+      auth: { apiKey: "opaque-token" },
+      source: "CODEBUDDY_AUTH_TOKEN",
+    });
+    f.get("codebuddy");
+    await vi.waitFor(() => expect(f.fetchMock).toHaveBeenCalled());
+    expect(f.fetchMock.mock.calls[0][1].headers).toEqual({
+      Authorization: "Bearer opaque-token",
     });
   });
 
