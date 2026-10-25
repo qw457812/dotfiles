@@ -211,19 +211,6 @@ return {
         lazy = true,
         config = function() end,
       },
-      -- https://github.com/open-slide/open-slide
-      -- https://github.com/lewislulu/html-ppt-skill
-      --
-      -- https://github.com/nexu-io/open-design
-      { "op7418/guizang-ppt-skill", lazy = true, config = function() end },
-      {
-        "hugohe3/ppt-master",
-        pin = true,
-        build = "pi update --extension git:github.com/hugohe3/ppt-master",
-        enabled = not vim.g.user_is_termux,
-        lazy = true,
-        config = function() end,
-      },
       { "dannote/dot-pi", pin = true, name = "dannote-dot-pi", lazy = true, config = function() end },
       -- On Termux:
       -- - Install: curl -fsSL --retry 3 -o ~/.local/bin/herdr https://github.com/herdrdev/herdr/releases/download/v0.9.1/herdr-linux-aarch64

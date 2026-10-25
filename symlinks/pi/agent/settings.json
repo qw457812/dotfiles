@@ -42,7 +42,6 @@
     "-extensions/copilot-ratelimit.ts",
     "-extensions/git-checkpoint.ts",
     "-extensions/loop.ts",
-    "-extensions/ppt-master-venv.ts",
     "-extensions/subagent.ts"
   ],
   "skills": [
@@ -51,8 +50,7 @@
     "~/.local/share/nvim/lazy/explainer/SKILL.md",
     "~/.local/share/nvim/lazy/humanlayer-skills/plugins/show-me/skills/show-me/SKILL.md",
     "~/.local/share/nvim/lazy/answer-me-with-html/skills/answer-me-with-html/SKILL.md",
-    "~/.local/share/nvim/lazy/guizang-ppt-skill/SKILL.md",
-    "-skills/training-deck/SKILL.md"
+    "~/.local/share/nvim/lazy/guizang-ppt-skill/SKILL.md"
   ],
   "packages": [
     "npm:pi-vim",
@@ -133,15 +131,6 @@
         "pi-package/prompts/refactor.md",
         "pi-package/prompts/test.md"
       ],
-      "themes": []
-    },
-    {
-      "source": "git:github.com/hugohe3/ppt-master",
-      "extensions": [],
-      "skills": [
-        "-skills/ppt-master/SKILL.md"
-      ],
-      "prompts": [],
       "themes": []
     },
     "npm:@diegopetrucci/pi-fast",
