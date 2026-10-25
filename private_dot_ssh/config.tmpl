@@ -1,8 +1,13 @@
+{{- if eq .chezmoi.os "darwin" }}
 Include ~/.colima/ssh_config
+{{- end }}
 
 Host *
-  ForwardAgent yes
   AddKeysToAgent yes
+  ServerAliveInterval 15
+  ControlMaster auto
+  ControlPath ~/.ssh/%C
+  ControlPersist 10m
 {{- if eq .chezmoi.os "darwin" }}
   UseKeychain yes
 {{- end }}
