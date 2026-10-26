@@ -34,8 +34,8 @@ const ALIASES: Record<string, ModelTarget | readonly ModelTarget[]> = {
   ds: [
     { provider: "codebuddy", id: "deepseek-v4.1-flash" },
     { provider: "commandcode", id: "deepseek/deepseek-v4.1-flash" },
-    { provider: "neuralwatt", id: "deepseek-v4.1-flash-canary" },
     { provider: "neuralwatt", id: "deepseek-v4.1-flash" },
+    { provider: "neuralwatt", id: "deepseek-v4.1-flash-canary" },
     { provider: "coralbricks", id: "deepseek-v4.1-flash-fast" },
     { provider: "hyper", id: "deepseek-v4.1-flash-1017" },
   ],
@@ -52,7 +52,6 @@ const ALIASES: Record<string, ModelTarget | readonly ModelTarget[]> = {
   flex: { provider: "neuralwatt", id: "glm-5.3-flex" },
   coral: { provider: "coralbricks", id: "deepseek-v4.1-flash-fast" },
   auto: { provider: "jev", id: "auto" },
-  free: { provider: "codebuddy", id: "step-5-preview" },
 };
 
 const ALL_LEVELS: ModelThinkingLevel[] = [

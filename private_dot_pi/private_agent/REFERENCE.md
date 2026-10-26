@@ -4,6 +4,7 @@
 - <https://github.com/deepseek-ai/deepseek-harness>
 - <https://github.com/openclaw/openclaw>
 - <https://github.com/can1357/oh-my-pi>
+- <https://github.com/JetBrains/thinkrail>
 - <https://github.com/open-gsd/gsd-pi>
 - <https://github.com/xai-org/grok-build>
 - <https://github.com/charmbracelet/crush>

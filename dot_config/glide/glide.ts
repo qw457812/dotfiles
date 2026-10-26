@@ -403,6 +403,11 @@ glide.keymaps.set(
 );
 glide.keymaps.set(
   "normal",
+  "<leader>ga",
+  go_to_tab_by_hostname("artificialanalysis.ai", "https://artificialanalysis.ai/"),
+);
+glide.keymaps.set(
+  "normal",
   "<leader>gr",
   go_to_tab_by_hostname("openrouter.ai", "https://openrouter.ai/settings/keys"),
 );
@@ -593,6 +598,21 @@ glide.autocmds.create("UrlEnter", { hostname: "github.com" }, async () => {
       `issues?q=${encodeURIComponent("sort:updated-desc is:issue is:open (label:bug OR type:Bug)")}`,
     ),
   );
+});
+
+glide.autocmds.create("UrlEnter", { hostname: "artificialanalysis.ai" }, async () => {
+  function go_to(url: string) {
+    return async () => {
+      await browser.tabs.update({ url });
+    };
+  }
+  glide.buf.keymaps.set("normal", ",,", go_to("https://artificialanalysis.ai/"));
+  glide.buf.keymaps.set(
+    "normal",
+    ",i",
+    go_to("https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index"),
+  );
+  glide.buf.keymaps.set("normal", ",r", go_to("https://artificialanalysis.ai/models/releases"));
 });
 
 glide.autocmds.create("UrlEnter", { hostname: "openrouter.ai" }, async () => {

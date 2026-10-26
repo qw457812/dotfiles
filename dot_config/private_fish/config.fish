@@ -349,5 +349,5 @@ if set -q TERMUX_VERSION
         tmux attach || tmux
     end
 else
-    proxy env auto
+    proxy env on
 end

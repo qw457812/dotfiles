@@ -4,9 +4,9 @@
 #
 #   proxy on                system proxy on  + export env vars
 #   proxy off               system proxy off + unset env vars
-#   proxy status            endpoint, listener, system state, env state
+#   proxy status            endpoint, reachability, system state, env state
+#   proxy sys on|off        system proxy only
 #   proxy env on|off        env vars only
-#   proxy env auto          export only if something listens on the port
 #
 # Override the endpoint with: set -g __PROXY_HOST <host>; set -g __PROXY_PORT <port>
 #
@@ -29,8 +29,10 @@ function __proxy_services --description 'enabled macOS network services'
     networksetup -listallnetworkservices | tail -n +2 | string match -rv '^\*'
 end
 
-function __proxy_listening
-    lsof -nP -iTCP:$__PROXY_PORT -sTCP:LISTEN >/dev/null 2>&1
+function __proxy_reachable --description 'can a TCP connection be opened to the proxy'
+    set -l timeout -w 1
+    test (uname) = Darwin; and set -a timeout -G 1
+    nc -z $timeout "$__PROXY_HOST" "$__PROXY_PORT" >/dev/null 2>&1
 end
 
 function __proxy_sys_on
@@ -79,7 +81,7 @@ end
 
 function __proxy_status
     printf 'endpoint : %s:%s\n' $__PROXY_HOST $__PROXY_PORT
-    __proxy_listening; and printf 'listener : up\n'; or printf 'listener : down\n'
+    __proxy_reachable; and printf 'reachable: yes\n'; or printf 'reachable: no\n'
     if type -q networksetup
         set -l state off
         scutil --proxy | string match -rq '^\s+HTTPEnable : 1'; and set state on
@@ -93,10 +95,13 @@ function __proxy_status
     set -q http_proxy; and printf 'env      : %s\n' $http_proxy; or printf 'env      : off\n'
 end
 
-function proxy --description 'Local proxy: on | off | status | env on|auto|off'
+function proxy --description 'Local proxy: on | off | status | sys on|off | env on|off'
     switch "$argv[1]"
         case on
-            __proxy_listening; or echo "proxy: nothing listening on $__PROXY_PORT" >&2
+            if not __proxy_reachable
+                echo "proxy: cannot connect to $__PROXY_HOST:$__PROXY_PORT" >&2
+                return 1
+            end
             __proxy_sys_on
             __proxy_env_on
         case off
@@ -104,24 +109,28 @@ function proxy --description 'Local proxy: on | off | status | env on|auto|off'
             __proxy_env_off
         case status
             __proxy_status
+        case sys
+            switch "$argv[2]"
+                case on
+                    __proxy_sys_on
+                case off
+                    __proxy_sys_off
+                case '*'
+                    echo 'usage: proxy sys on|off' >&2
+                    return 1
+            end
         case env
             switch "$argv[2]"
                 case on
                     __proxy_env_on
                 case off
                     __proxy_env_off
-                case auto
-                    if __proxy_listening
-                        __proxy_env_on
-                    else
-                        __proxy_env_off
-                    end
                 case '*'
-                    echo 'usage: proxy env on|auto|off' >&2
+                    echo 'usage: proxy env on|off' >&2
                     return 1
             end
         case '*'
-            echo 'usage: proxy on|off|status|env on|auto|off' >&2
+            echo 'usage: proxy on|off|status|sys on|off|env on|off' >&2
             return 1
     end
 end
