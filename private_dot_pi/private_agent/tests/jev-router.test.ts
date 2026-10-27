@@ -53,13 +53,16 @@ const nested = (name: string, status: "ok" | "error" | "unfinished" = "ok") => (
 
 describe("Jev implementation routing", () => {
   it.each(["edit", "write"])("switches after a successful direct %s", async (name) => {
-    expect((await route([user, result(name)])).model.id).toBe("gpt-6-luna");
+    const routed = await route([user, result(name)]);
+    expect(routed.model.id).toBe("gpt-6.1-terra");
+    expect(routed.thinkingLevel).toBe("medium");
   });
 
   it.each(["edit", "write"])("switches after a nested %s even if the outer script failed", async (name) => {
     for (const isError of [false, true]) {
       const routed = await route([user, result("codemode", isError, [nested(name)])]);
-      expect(routed.model.id).toBe("gpt-6-luna");
+      expect(routed.model.id).toBe("gpt-6.1-terra");
+      expect(routed.thinkingLevel).toBe("medium");
       expect(routed.state).toMatchObject({ phase: "implementation" });
     }
   });

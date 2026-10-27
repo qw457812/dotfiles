@@ -7,14 +7,14 @@
  *
  * - Planning: GPT-6.1 Sol (high) for complex work, GPT-6.1 Sol (medium) otherwise. The Jev classifier rates the
  *   first user message; planning stays on the chosen model.
- * - Implementation: GPT-6 Luna (max).
+ * - Implementation: GPT-6.1 Terra (medium).
  *
  * The planning model explores, plans, and makes the first edit. After the first successful `edit`
- * or `write` tool call (including nested calls from codemode), the next request of the same turn goes to Luna, and the session stays
+ * or `write` tool call (including nested calls from codemode), the next request of the same turn goes to Terra, and the session stays
  * there. A session therefore switches models once and accepts a single prompt-cache miss.
  *
  * The phase is router state: Pi stores it on the session branch, so it follows the session tree
- * and survives compaction. Requests outside the agent loop, such as compaction summaries, go to Luna.
+ * and survives compaction. Requests outside the agent loop, such as compaction summaries, go to Terra.
  *
  * Requires TypeSafe credentials (TYPESAFE_API_KEY) and an OpenAI Codex login.
  * Usage: pi -e ./jev-router.ts --model jev/auto
@@ -32,7 +32,7 @@ interface RouteTarget {
 const ROUTES = {
 	complex: { provider: "openai-codex", model: "gpt-6.1-sol", thinkingLevel: "high" },
 	standard: { provider: "openai-codex", model: "gpt-6.1-sol", thinkingLevel: "medium" },
-	implementation: { provider: "openai-codex", model: "gpt-6-luna", thinkingLevel: "max" },
+	implementation: { provider: "openai-codex", model: "gpt-6.1-terra", thinkingLevel: "medium" },
 } satisfies Record<string, RouteTarget>;
 
 /** Tools whose successful result means implementation has started. */
@@ -123,7 +123,7 @@ export default function (pi: ExtensionAPI) {
 				const route = await choosePlanningRoute(request, ctx);
 				return routeTo(ctx, route, { phase: "planning", route });
 			}
-			// The planning model made the first edit: hand the rest of the work to Luna.
+			// The planning model made the first edit: hand the rest of the work to Terra.
 			if (state.phase === "planning" && editedThisTurn(request.messages)) {
 				return routeTo(ctx, ROUTES.implementation, {
 					phase: "implementation",

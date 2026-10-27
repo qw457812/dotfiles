@@ -19,6 +19,7 @@ import type { AutocompleteItem } from "@earendil-works/pi-tui";
 const ALIASES: Record<string, ModelTarget | readonly ModelTarget[]> = {
   astra: { provider: "openai-codex", id: "gpt-6-astra" },
   sol: { provider: "openai-codex", id: "gpt-6.1-sol" },
+  terra: { provider: "openai-codex", id: "gpt-6.1-terra" },
   luna: { provider: "openai-codex", id: "gpt-6-luna" },
   glm: [
     { provider: "commandcode", id: "zai-org/GLM-5.3" },
