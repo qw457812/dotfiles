@@ -27,7 +27,7 @@ Library/
 {{ if not (and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "fedora-asahi-remix")) }}
 .local/bin/glide
 .local/bin/glide-install
-.local/share/applications/glide.desktop
+.local/share/applications/glide-glide.desktop
 {{ end }}
 
 {{ if ne .chezmoi.os "android" }}
