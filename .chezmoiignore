@@ -24,6 +24,10 @@ Library/
 .local/bin/e
 {{ end }}
 
+{{ if ne .chezmoi.os "linux" }}
+.config/systemd/user/kanata.service
+{{ end }}
+
 {{ if not (and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "fedora-asahi-remix")) }}
 .local/bin/glide
 .local/bin/glide-install
