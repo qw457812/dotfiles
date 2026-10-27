@@ -1,0 +1,24 @@
+#!/bin/sh
+# Focus an existing KDE window before launching another instance.
+set -eu
+
+case "${1:-}" in
+  glide) class='^glide-glide$' ;;
+  kitty) class='^kitty$' ;;
+  *)
+    printf 'Usage: %s glide|kitty\n' "$0" >&2
+    exit 2
+    ;;
+esac
+
+# Do not launch a duplicate if the window query itself fails.
+window=$(kdotool search --limit 1 --class "$class")
+if [ -n "$window" ]; then
+  exec kdotool windowactivate "$window"
+fi
+
+# Use a separate user service so restarting Kanata does not kill the app.
+case "$1" in
+  glide) exec systemd-run --user --collect -- "$HOME/.local/bin/glide" ;;
+  kitty) exec systemd-run --user --collect -- /usr/bin/kitty ;;
+esac

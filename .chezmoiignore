@@ -25,6 +25,7 @@ Library/
 {{ end }}
 
 {{ if ne .chezmoi.os "linux" }}
+.local/bin/kde-focus-or-launch
 .config/systemd/user/kanata.service
 {{ end }}
 

@@ -4,10 +4,11 @@
   linux-dev-names-include ("Apple MTP keyboard")
   process-unmapped-keys yes
   concurrent-tap-hold yes
+  danger-enable-cmd yes
 )
 
 (defsrc
-  spc v m f j k scln lmet lalt
+  spc v m f j k scln lmet lalt rmet
 )
 
 (defalias
@@ -21,6 +22,10 @@
   cmd-alone (tap-hold-press 0 250 A-tab lmet)
   ;; Globally send the tmux prefix on tap; hold as Alt.
   option-alone (tap-hold-press 0 250 C-b lalt)
+  ;; Right Command is a dedicated launcher-layer key, not Super.
+  launcher (layer-while-held launcher)
+  open-glide (cmd /usr/bin/env kde-focus-or-launch glide)
+  open-kitty (cmd /usr/bin/env kde-focus-or-launch kitty)
   ;; Other standard keys resolve to plain f; only j activates f-mode.
   ;; Unlike ordinary tap-hold, waiting alone does not activate the layer.
   f-layer (tap-hold-except-keys 250 250 f (layer-while-held f-mode)
@@ -36,15 +41,19 @@
 )
 
 (deflayer base
-  @space-shift @v-ctrl @m-ctrl @f-layer j k @semicolon @cmd-alone @option-alone
+  @space-shift @v-ctrl @m-ctrl @f-layer j k @semicolon @cmd-alone @option-alone @launcher
 )
 
 (deflayer f-mode
-  _ _ _ _ bspc _ _ _ _
+  _ _ _ _ bspc _ _ _ _ _
+)
+
+(deflayer launcher
+  _ _ _ _ @open-glide @open-kitty _ _ _ _
 )
 
 ;; Match the original Goku profile's 30 ms simultaneous-key window.
-;; Disable in f-mode so f+j remains Backspace rather than joining a chord.
+;; Disable in f-mode and launcher so their j/k actions take precedence.
 (defchordsv2
-  (j k) esc 30 first-release (f-mode)
+  (j k) esc 30 first-release (f-mode launcher)
 )
