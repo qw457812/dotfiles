@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Let `git diff` show plaintext for age-encrypted chezmoi sources.
+# The attribute side (*.age diff=age) lives in .gitattributes.
+
+git -C {{ .chezmoi.sourceDir | quote }} config diff.age.textconv 'chezmoi decrypt'
