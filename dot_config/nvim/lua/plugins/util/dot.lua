@@ -102,6 +102,40 @@ return {
         })
       end
 
+      if vim.g.user_is_asahi and vim.fn.executable("systemctl") == 1 and vim.fn.executable("kanata") == 1 then
+        vim.api.nvim_create_autocmd("BufWritePost", {
+          pattern = "*/kanata/config.kbd",
+          callback = U.debounce_wrap(500, function()
+            local check = vim
+              .system({
+                "kanata",
+                "--check",
+                "--cfg",
+                vim.fn.expand("~/.config/kanata/config.kbd") --[[@as string]],
+              }, { text = true })
+              :wait()
+            if check.code ~= 0 then
+              LazyVim.error(
+                ("Invalid Kanata config; service not restarted:\n%s\n%s"):format(check.stdout, check.stderr),
+                { title = "Kanata" }
+              )
+              return
+            end
+            -- Preserve a manually stopped service, e.g. when debugging key mappings.
+            local active = vim.system({ "systemctl", "--user", "is-active", "--quiet", "kanata.service" }):wait()
+            if active.code ~= 0 then
+              return
+            end
+            local res = vim.system({ "systemctl", "--user", "restart", "kanata.service" }, { text = true }):wait()
+            if res.code == 0 then
+              LazyVim.info("kanata.service restarted", { title = "Kanata" })
+            else
+              LazyVim.error(("Failed to restart kanata.service:\n%s"):format(res.stderr), { title = "Kanata" })
+            end
+          end),
+        })
+      end
+
       -- -- fix `vim: true` in ~/.aider.conf.yml
       -- vim.api.nvim_create_autocmd("BufReadPre", {
       --   pattern = { ".aider.conf.yml", "dot_aider.conf.yml" },
@@ -199,5 +233,25 @@ end tell]]
         end,
       })
     end,
+  },
+
+  -- Kanata
+  {
+    "nvim-treesitter/nvim-treesitter",
+    init = function()
+      vim.filetype.add({ extension = { kbd = "kanata" } })
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "TSUpdate",
+        callback = function()
+          require("nvim-treesitter.parsers").kanata = {
+            install_info = {
+              url = "https://github.com/postsolar/tree-sitter-kanata",
+              revision = "af53b4c35d6faa3b4ba7c317fb795a6eb679b42a",
+            },
+          }
+        end,
+      })
+    end,
+    opts = { ensure_installed = { "kanata" } },
   },
 }
