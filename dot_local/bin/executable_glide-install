@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ ${1:-} == --help ]]; then
+  printf 'Usage: glide-install\nInstall or update the official Linux Glide release; the previous version is saved in ~/.local/opt/glide.previous.\nQuit Glide first. Configuration and browser data will not be modified.\n'
+  exit 0
+fi
+if (($#)); then
+  printf 'Unsupported arguments; run glide-install --help.\n' >&2
+  exit 2
+fi
+
+fail() {
+  printf '%s\n' "$*" >&2
+  exit 1
+}
+
+[[ $(uname -s) == Linux ]] || fail 'This script only supports Linux.'
+case $(uname -m) in
+  aarch64 | arm64) arch=aarch64 ;;
+  x86_64 | amd64) arch=x86_64 ;;
+  *) fail 'Unsupported CPU architecture.' ;;
+esac
+for cmd in curl tar xz flock pgrep mktemp; do
+  command -v "$cmd" >/dev/null || fail "Missing dependency: $cmd"
+done
+
+root="$HOME/.local/opt"
+dest="$root/glide"
+backup="$root/glide.previous"
+mkdir -p "$root"
+exec 9>"$root/.glide-install.lock"
+flock -n 9 || fail 'Another Glide installer is already running.'
+
+check_stopped() {
+  local status=0
+  pgrep -u "$(id -u)" -x 'glide|glide-bin' >/dev/null || status=$?
+  case $status in
+    0) fail 'Quit Glide normally before running this script.' ;;
+    1) ;;
+    *) fail 'Unable to check whether Glide is running; installation cancelled.' ;;
+  esac
+}
+check_stopped
+[[ ! -L $dest && ! -L $backup ]] || fail 'The installation or backup path is a symlink; operation cancelled.'
+[[ ! -e $dest || -d $dest ]] || fail 'The installation path is not a directory.'
+[[ ! -e $backup || -d $backup ]] || fail 'The backup path is not a directory.'
+
+work=$(mktemp -d "$root/.glide-install.XXXXXXXX")
+restore=0
+cleanup() {
+  local status=$?
+  trap - EXIT
+  if ((restore)) && [[ ! -e $dest && -d $backup ]]; then
+    if ! mv -- "$backup" "$dest"; then
+      printf 'Recovery failed; the previous version is still at %s. Restore it manually.\n' "$backup" >&2
+      status=1
+    fi
+  fi
+  rm -rf -- "$work"
+  exit "$status"
+}
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
+url="https://github.com/glide-browser/glide/releases/latest/download/glide.linux-$arch.tar.xz"
+printf 'Downloading %s\n' "$url"
+curl --fail --location --show-error --retry 3 --connect-timeout 20 \
+  --proto '=https' --proto-redir '=https' --output "$work/glide.tar.xz" "$url"
+mkdir "$work/unpacked"
+tar --extract --xz --file "$work/glide.tar.xz" --directory "$work/unpacked" \
+  --no-same-owner --no-same-permissions
+new="$work/unpacked/glide"
+[[ -d $new && ! -L $new && -x $new/glide && -s $new/application.ini && -s $new/libxul.so ]] ||
+  fail 'Unexpected archive structure; keeping the existing installation.'
+
+# Downloads may take a while; check again before replacing the installation.
+check_stopped
+if [[ -d $dest ]]; then
+  rm -rf -- "$backup"
+  restore=1
+  mv -- "$dest" "$backup"
+fi
+mv -- "$new" "$dest"
+restore=0
+printf 'Installed: %s\n' "$dest/glide"
+if [[ -d $backup ]]; then
+  printf 'Previous version: %s\n' "$backup"
+fi
+printf 'Launch Glide with glide or from the application menu.\n'
