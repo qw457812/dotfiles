@@ -7,7 +7,7 @@
 )
 
 (defsrc
-  spc v m f j k scln
+  spc v m f j k scln lmet lalt
 )
 
 (defalias
@@ -17,6 +17,10 @@
   space-shift (tap-hold-release 250 250 spc lsft)
   v-ctrl (tap-hold-release 250 250 v lctl)
   m-ctrl (tap-hold-release 250 250 m lctl)
+  ;; Fedora: tap left Command to switch apps; hold as Super.
+  cmd-alone (tap-hold-press 0 250 A-tab lmet)
+  ;; Globally send the tmux prefix on tap; hold as Alt.
+  option-alone (tap-hold-press 0 250 C-b lalt)
   ;; Other standard keys resolve to plain f; only j activates f-mode.
   ;; Unlike ordinary tap-hold, waiting alone does not activate the layer.
   f-layer (tap-hold-except-keys 250 250 f (layer-while-held f-mode)
@@ -32,11 +36,11 @@
 )
 
 (deflayer base
-  @space-shift @v-ctrl @m-ctrl @f-layer j k @semicolon
+  @space-shift @v-ctrl @m-ctrl @f-layer j k @semicolon @cmd-alone @option-alone
 )
 
 (deflayer f-mode
-  _ _ _ _ bspc _ _
+  _ _ _ _ bspc _ _ _ _
 )
 
 ;; Match the original Goku profile's 30 ms simultaneous-key window.
