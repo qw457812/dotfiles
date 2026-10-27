@@ -238,11 +238,13 @@ end tell]]
   -- Kanata
   {
     "nvim-treesitter/nvim-treesitter",
-    init = function()
-      vim.filetype.add({ extension = { kbd = "kanata" } })
+    opts = function()
+      vim.filetype.add({ pattern = { [".*/kanata/.+%.kbd"] = "kanata" } })
+
       vim.api.nvim_create_autocmd("User", {
         pattern = "TSUpdate",
         callback = function()
+          ---@diagnostic disable-next-line: inject-field
           require("nvim-treesitter.parsers").kanata = {
             install_info = {
               url = "https://github.com/postsolar/tree-sitter-kanata",
@@ -252,6 +254,9 @@ end tell]]
         end,
       })
     end,
+  },
+  {
+    "nvim-treesitter/nvim-treesitter",
     opts = { ensure_installed = { "kanata" } },
   },
 }
