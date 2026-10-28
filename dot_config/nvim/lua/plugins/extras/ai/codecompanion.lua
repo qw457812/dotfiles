@@ -87,7 +87,7 @@ return {
               },
               schema = {
                 model = {
-                  default = "glm-5.3-flash",
+                  default = "deepseek-v4.1-flash",
                 },
               },
             })
@@ -208,7 +208,6 @@ return {
             },
             opts = {
               approval_mode = "auto",
-              -- default_tools = { "files" }, -- ACP does not need it
             },
           },
           -- stylua: ignore
@@ -233,6 +232,7 @@ return {
             yolo_mode              = { modes = { n = "<localleader>Y" } },
             goto_file_under_cursor = { modes = { n = "<localleader>F" } },
             copilot_stats          = { modes = { n = "<localleader>S" } },
+            tool_call_details      = { modes = { n = "gk" } },
             _btw                   = { modes = { n = "<localleader>B" } },
           },
         },
@@ -276,8 +276,8 @@ return {
           ".codecompanion/skills",
           "~/.agents/skills",
           ".agents/skills",
-          "~/.claude/skills",
-          ".claude/skills",
+          -- "~/.claude/skills",
+          -- ".claude/skills",
           "~/.pi/agent/skills",
           ".pi/skills",
         },
@@ -316,6 +316,28 @@ return {
     "olimorris/codecompanion.nvim",
     optional = true,
     opts = function()
+      -- `opts.interactions.chat.tools.opts.default_tools` applies to every adapter, so load
+      -- tools here instead to skip ACP chats (their agent provides its own)
+      vim.api.nvim_create_autocmd("User", {
+        group = vim.api.nvim_create_augroup("codecompanion_tools", { clear = true }),
+        pattern = "CodeCompanionChatCreated",
+        callback = function(ev)
+          local chat = require("codecompanion").buf_get_chat(ev.data.bufnr)
+          if not chat or not chat.adapter or chat.adapter.type == "acp" then
+            return
+          end
+          for _, tool in ipairs({
+            "agent",
+            "web_search",
+            "fetch_webpage",
+            -- "search_help",
+            -- "memory",
+          }) do
+            chat.tool_registry:add(tool)
+          end
+        end,
+      })
+
       vim.api.nvim_create_autocmd("FileType", {
         group = vim.api.nvim_create_augroup("codecompanion_keymaps", { clear = true }),
         pattern = "codecompanion",
@@ -559,4 +581,6 @@ return {
   --     })
   --   end,
   -- },
+
+  { "svkozak/pi-acp", build = "npm i -g pi-acp", version = "*", lazy = true, config = function() end },
 }
