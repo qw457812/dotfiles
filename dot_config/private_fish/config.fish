@@ -30,11 +30,12 @@ if status is-interactive # https://github.com/ndonfris/fish-lsp/blob/1be77fcfa37
 end
 # set -x MANROFFOPT -c
 set -x EZA_MIN_LUMINANCE 50
+set -x BOB_CONFIG "$XDG_CONFIG_HOME/bob/config.json"
 # type -q brew; and set -x DYLD_LIBRARY_PATH (brew --prefix)/opt/librime/lib # https://github.com/wlh320/rime-ls#macos
 set -x RIPGREP_CONFIG_PATH $HOME/.ripgreprc
 test -f $HOME/.cache/nvim/lazygit-theme.yml; and set -x LG_CONFIG_FILE $HOME/.config/lazygit/config.yml,$HOME/.cache/nvim/lazygit-theme.yml
 # set -x PI_WEBSEARCH_PROVIDER exa # https://github.com/qw457812/dotfiles/blob/4266930f4dd066876d33652c7be2771f0c759560/private_dot_pi/private_agent/extensions/websearch/index.ts#L71-L72
-set -gx PI_NO_SLEEP_DISPLAY 1 # https://github.com/mitsuhiko/agent-stuff/blob/ab0a07b6d3b0e3a2846c4ee3753dee4c683e7ec2/extensions/no-sleep.ts#L41
+set -x PI_NO_SLEEP_DISPLAY 1 # https://github.com/mitsuhiko/agent-stuff/blob/ab0a07b6d3b0e3a2846c4ee3753dee4c683e7ec2/extensions/no-sleep.ts#L41
 
 # ==============================================================================
 # EXIT IF NOT INTERACTIVE

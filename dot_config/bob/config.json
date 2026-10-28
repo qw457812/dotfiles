@@ -1,4 +1,4 @@
 {
-  "add_neovim_binary_to_path": false,
-  "ignore_running_instances": true
+  "downloads_location": "$HOME/.local/share/bob",
+  "add_neovim_binary_to_path": false
 }
