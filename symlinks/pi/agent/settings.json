@@ -51,8 +51,7 @@
     "~/.local/share/nvim/lazy/typesafe-ai-skills/skills/typesafe-ai/SKILL.md",
     "~/.local/share/nvim/lazy/explainer/SKILL.md",
     "~/.local/share/nvim/lazy/humanlayer-skills/plugins/show-me/skills/show-me/SKILL.md",
-    "~/.local/share/nvim/lazy/answer-me-with-html/skills/answer-me-with-html/SKILL.md",
-    "~/.local/share/nvim/lazy/guizang-ppt-skill/SKILL.md"
+    "~/.local/share/nvim/lazy/answer-me-with-html/skills/answer-me-with-html/SKILL.md"
   ],
   "packages": [
     "npm:pi-vim",

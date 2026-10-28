@@ -133,6 +133,8 @@ brew "dust"
 brew "python@3.13"
 # Useful examples at the command-line
 brew "eg-examples"
+# Extremely fast JavaScript bundler and minifier
+brew "esbuild"
 # AST-based pattern checker for JavaScript
 brew "eslint"
 # Command-line tool to interact with exercism.io
@@ -257,6 +259,8 @@ brew "jq"
 brew "jupyterlab"
 # Open-source distributed event streaming platform
 brew "kafka"
+# Cross-platform software keyboard remapper for Linux, macOS and Windows
+brew "kanata"
 # Generic command-line non-JVM Apache Kafka producer and consumer
 brew "kcat"
 # Command-line music player
@@ -592,6 +596,8 @@ cask "showyedge"
 cask "sqlcl"
 # Rime input method engine
 cask "squirrel-app"
+# Mesh VPN based on WireGuard
+cask "tailscale-app"
 # Utility to hide the notch
 cask "topnotch"
 cask "v2rayn"
