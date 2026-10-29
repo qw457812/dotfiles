@@ -413,6 +413,125 @@ describe("account-wide automatic polling cooldown", () => {
   });
 });
 
+describe("automatic failure notifications", () => {
+  it("warns once while identical polling failures continue", async () => {
+    const f = fixture([]);
+    f.fetchMock.mockRejectedValue(new TypeError("fetch failed"));
+    await f.start();
+    await vi.advanceTimersByTimeAsync(3 * MINUTE);
+    expect(f.fetchMock).toHaveBeenCalledTimes(4);
+    expect(f.notify).toHaveBeenCalledExactlyOnceWith(
+      "Codex auto-reset failed:\nfetch failed",
+      "warning",
+    );
+    await f.stop();
+  });
+
+  it("does not reset the warning after another instance causes a polling cooldown", async () => {
+    const first = fixture([]);
+    const peer = fixture([]);
+    const backend = first.fetchMock.mockRejectedValue(new TypeError("fetch failed"));
+    vi.stubGlobal("fetch", backend);
+    await first.start();
+    await vi.advanceTimersByTimeAsync(MINUTE - 1);
+    vi.setSystemTime(NOW + MINUTE);
+    await peer.start();
+    await peer.stop();
+    expect(peer.notify).toHaveBeenCalledTimes(1);
+    // The first instance skips its next poll because the peer reserved the slot.
+    await vi.advanceTimersByTimeAsync(1);
+    expect(backend).toHaveBeenCalledTimes(2);
+    await vi.advanceTimersByTimeAsync(MINUTE);
+    expect(backend).toHaveBeenCalledTimes(3);
+    expect(first.notify).toHaveBeenCalledTimes(1);
+    await first.stop();
+  });
+
+  it("does not reset the warning when the account lock is busy", async () => {
+    const f = fixture([]);
+    f.fetchMock.mockRejectedValue(new TypeError("fetch failed"));
+    await f.start();
+    vi.mocked(lockfile.lock).mockRejectedValueOnce(
+      Object.assign(new Error("Busy"), { code: "ELOCKED" }),
+    );
+    await vi.advanceTimersByTimeAsync(MINUTE);
+    expect(f.fetchMock).toHaveBeenCalledTimes(1);
+    await vi.advanceTimersByTimeAsync(MINUTE);
+    expect(f.fetchMock).toHaveBeenCalledTimes(2);
+    expect(f.notify).toHaveBeenCalledTimes(1);
+    await f.stop();
+  });
+
+  it("does not reset the warning when credentials are unavailable", async () => {
+    const f = fixture([]);
+    f.fetchMock.mockRejectedValue(new TypeError("fetch failed"));
+    await f.start();
+    f.getApiKeyForProvider.mockResolvedValue(undefined);
+    await vi.advanceTimersByTimeAsync(MINUTE);
+    expect(f.fetchMock).toHaveBeenCalledTimes(1);
+    f.getApiKeyForProvider.mockResolvedValue(token());
+    await vi.advanceTimersByTimeAsync(MINUTE);
+    expect(f.fetchMock).toHaveBeenCalledTimes(2);
+    expect(f.notify).toHaveBeenCalledTimes(1);
+    await f.stop();
+  });
+
+  it("warns again for a new outage after a successful check with no available credits", async () => {
+    const f = fixture([]);
+    f.fetchMock
+      .mockRejectedValue(new TypeError("fetch failed"))
+      .mockRejectedValueOnce(new TypeError("fetch failed"))
+      .mockResolvedValueOnce(response({ credits: [] }));
+    await f.start();
+    await vi.advanceTimersByTimeAsync(3 * MINUTE);
+    expect(f.fetchMock).toHaveBeenCalledTimes(4);
+    expect(f.notify).toHaveBeenCalledTimes(2);
+    await f.stop();
+  });
+
+  it("recognizes a successful check even when consumption is in retry cooldown", async () => {
+    const f = fixture();
+    f.fetchMock
+      .mockRejectedValue(new TypeError("fetch failed"))
+      .mockRejectedValueOnce(new TypeError("fetch failed"))
+      .mockResolvedValueOnce(response({ credits: f.credits }));
+    await f.start();
+    await vi.advanceTimersByTimeAsync(MINUTE - 1);
+    files.set(
+      statePath(),
+      JSON.stringify({
+        ...state(),
+        attempts: [
+          {
+            creditId: "expiring",
+            expiresAt: credit().expires_at,
+            redeemRequestId: "pending-request",
+            status: "pending",
+            lastAttemptAt: Date.now(),
+          },
+        ],
+      }),
+    );
+    await vi.advanceTimersByTimeAsync(1);
+    expect(f.fetchMock).toHaveBeenCalledTimes(2);
+    expect(f.post).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(MINUTE);
+    expect(f.notify).toHaveBeenCalledTimes(2);
+    await f.stop();
+  });
+
+  it("does not reset the warning just because GET succeeds before another failed POST", async () => {
+    const f = fixture();
+    f.post.mockRejectedValue(new TypeError("fetch failed"));
+    await f.start();
+    await vi.advanceTimersByTimeAsync(2 * MINUTE);
+    expect(f.post).toHaveBeenCalledTimes(3);
+    expect(f.bodies()).toEqual([f.bodies()[0], f.bodies()[0], f.bodies()[0]]);
+    expect(f.notify).toHaveBeenCalledTimes(1);
+    await f.stop();
+  });
+});
+
 describe("durable idempotent consumption", () => {
   it("publishes the exact request ID atomically before dispatch", async () => {
     const f = fixture();

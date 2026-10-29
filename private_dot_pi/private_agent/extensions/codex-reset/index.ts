@@ -112,7 +112,7 @@ interface CodexResetState {
 
 type ConsumeResult =
   | { credit: ResetCredit; response: ConsumeResponse & { code: ConsumeCode } }
-  | { skipped: "busy" | "already_consumed" | "unavailable" | "cooldown" };
+  | { skipped: "busy" | "already_consumed" | "unavailable" | "poll_cooldown" | "retry_cooldown" };
 
 interface Args {
   command: "status" | "consume" | "help";
@@ -444,7 +444,8 @@ async function consumeCredit(
     const state = await loadState(path, auth.accountId);
     if (automatic) {
       const now = Date.now();
-      if (now - state.lastAutoPollStartedAt < AUTO_POLL_INTERVAL_MS) return { skipped: "cooldown" };
+      if (now - state.lastAutoPollStartedAt < AUTO_POLL_INTERVAL_MS)
+        return { skipped: "poll_cooldown" };
       // Reserve the account's polling slot before GET, including failed requests.
       // Persist under the lock so staggered instances and reloads share the limit.
       state.lastAutoPollStartedAt = now;
@@ -485,7 +486,7 @@ async function consumeCredit(
     if (previous?.status !== "pending" && target.status !== "available")
       return { skipped: "unavailable" };
     if (automatic && previous && Date.now() - previous.lastAttemptAt < AUTO_POLL_INTERVAL_MS)
-      return { skipped: "cooldown" };
+      return { skipped: "retry_cooldown" };
 
     const attempt: ConsumeAttempt = {
       creditId: target.id,
@@ -528,13 +529,15 @@ async function consumeCredit(
   }
 }
 
-async function runAutoConsume(ctx: ExtensionContext, signal: AbortSignal): Promise<void> {
+/** Local skips are not evidence that a previous backend failure has recovered. */
+async function runAutoConsume(ctx: ExtensionContext, signal: AbortSignal): Promise<boolean> {
   const token = await ctx.modelRegistry.getApiKeyForProvider(PROVIDER);
-  if (!token || signal.aborted) return;
+  if (!token || signal.aborted) return false;
   const accountId = extractAccountId(token);
-  if (!accountId) return;
+  if (!accountId) return false;
   const result = await consumeCredit({ token, accountId }, undefined, signal);
-  if (signal.aborted || "skipped" in result) return;
+  if (signal.aborted) return false;
+  if ("skipped" in result) return result.skipped !== "busy" && result.skipped !== "poll_cooldown";
   const { credit, response } = result;
   if (isConsumeSuccess(response.code)) {
     ctx.ui.notify(
@@ -549,6 +552,7 @@ async function runAutoConsume(ctx: ExtensionContext, signal: AbortSignal): Promi
   }
   // nothing_to_reset is a definitive no-op, not success. The next check may
   // start a new logical attempt with a new ID, while still within the deadline.
+  return true;
 }
 
 async function runConsume(args: Args, ctx: ExtensionCommandContext): Promise<void> {
@@ -698,8 +702,8 @@ export default function (pi: ExtensionAPI) {
     const check = () => {
       if (running || sessionController.signal.aborted) return;
       running = runAutoConsume(ctx, sessionController.signal)
-        .then(() => {
-          lastError = "";
+        .then((checked) => {
+          if (checked) lastError = "";
         })
         .catch((error) => {
           if (sessionController.signal.aborted) return;
