@@ -14,9 +14,9 @@ const token = `header.${Buffer.from(
 ).toString("base64url")}.signature`;
 let directory: string;
 
-function journalPath() {
+function statePath() {
   const key = createHash("sha256").update(JSON.stringify(accountId)).digest("hex");
-  return join(directory, "codex-reset-redemptions", `${key}.json`);
+  return join(directory, "codex-reset-state", `${key}.json`);
 }
 
 function fixture() {
@@ -46,7 +46,7 @@ afterEach(async () => {
   await rm(directory, { recursive: true, force: true });
 });
 
-describe("Codex redemption with real journal files and account locks", () => {
+describe("Codex consumption with real state files and account locks", () => {
   it("resumes a lost response from a new extension instance using the persisted ID", async () => {
     const bodies: unknown[] = [];
     vi.stubGlobal(
@@ -76,8 +76,8 @@ describe("Codex redemption with real journal files and account locks", () => {
     );
     const first = fixture();
     await first.consume();
-    const pending = JSON.parse(await readFile(journalPath(), "utf8"));
-    expect(pending.lastCheckedAt).toBe(0);
+    const pending = JSON.parse(await readFile(statePath(), "utf8"));
+    expect(pending.lastAutoPollStartedAt).toBe(0);
     expect(pending.attempts[0].status).toBe("pending");
     const reloaded = fixture();
     await reloaded.consume();
@@ -87,12 +87,12 @@ describe("Codex redemption with real journal files and account locks", () => {
       expect.stringContaining("Confirmed previously consumed"),
       "info",
     );
-    expect(JSON.parse(await readFile(journalPath(), "utf8")).attempts[0].status).toBe(
+    expect(JSON.parse(await readFile(statePath(), "utf8")).attempts[0].status).toBe(
       "already_redeemed",
     );
-    expect((await stat(journalPath())).mode & 0o777).toBe(0o600);
-    expect(await readdir(join(directory, "codex-reset-redemptions"))).toEqual([
-      journalPath().split("/").at(-1),
+    expect((await stat(statePath())).mode & 0o777).toBe(0o600);
+    expect(await readdir(join(directory, "codex-reset-state"))).toEqual([
+      statePath().split("/").at(-1),
     ]);
   });
 
@@ -120,13 +120,13 @@ describe("Codex redemption with real journal files and account locks", () => {
     expect(second.notify).toHaveBeenCalledWith(expect.stringContaining("busy"), "info");
     finishPost(new Response(JSON.stringify({ code: "reset" })));
     await consuming;
-    expect(await readdir(join(directory, "codex-reset-redemptions"))).toHaveLength(1);
+    expect(await readdir(join(directory, "codex-reset-state"))).toHaveLength(1);
   });
 
   it("recovers a stale lock left by a crashed process", async () => {
-    await mkdir(`${journalPath()}.lock`, { recursive: true });
+    await mkdir(`${statePath()}.lock`, { recursive: true });
     const old = new Date(Date.now() - 3 * 60_000);
-    await utimes(`${journalPath()}.lock`, old, old);
+    await utimes(`${statePath()}.lock`, old, old);
     const post = vi.fn();
     vi.stubGlobal(
       "fetch",
@@ -140,6 +140,6 @@ describe("Codex redemption with real journal files and account locks", () => {
     );
     await fixture().consume();
     expect(post).toHaveBeenCalledTimes(1);
-    expect(JSON.parse(await readFile(journalPath(), "utf8")).attempts[0].status).toBe("reset");
+    expect(JSON.parse(await readFile(statePath(), "utf8")).attempts[0].status).toBe("reset");
   });
 });

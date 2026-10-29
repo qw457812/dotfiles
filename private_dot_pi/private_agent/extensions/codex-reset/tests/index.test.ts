@@ -47,12 +47,12 @@ function hash(value: unknown) {
   return createHash("sha256").update(JSON.stringify(value)).digest("hex");
 }
 
-function journalPath(account = accountId) {
-  return join(getAgentDir(), "codex-reset-redemptions", `${hash(account)}.json`);
+function statePath(account = accountId) {
+  return join(getAgentDir(), "codex-reset-state", `${hash(account)}.json`);
 }
 
-function journal(account = accountId) {
-  return JSON.parse(files.get(journalPath(account))!);
+function state(account = accountId) {
+  return JSON.parse(files.get(statePath(account))!);
 }
 
 function fixture(credits: Credit[] = [credit()]) {
@@ -169,7 +169,7 @@ describe("automatic Codex reset eligibility", () => {
     [5 * MINUTE, true],
     [5 * MINUTE + 1, false],
     [60 * MINUTE, false],
-  ])("only redeems when 0 < remaining <= 5 minutes: %i ms", async (remaining, expected) => {
+  ])("only consumes when 0 < remaining <= 5 minutes: %i ms", async (remaining, expected) => {
     const f = fixture([credit("boundary", remaining)]);
     await f.start();
     expect(f.post).toHaveBeenCalledTimes(expected ? 1 : 0);
@@ -184,7 +184,7 @@ describe("automatic Codex reset eligibility", () => {
     { ...credit(), expires_at: undefined },
     { ...credit(), expires_at: null },
     { ...credit(), expires_at: "invalid" },
-  ])("never starts redemption for an ineligible credit: %j", async (invalid) => {
+  ])("never starts consumption for an ineligible credit: %j", async (invalid) => {
     const f = fixture([invalid, credit("not-expiring", 60 * MINUTE)]);
     await f.start();
     expect(f.post).not.toHaveBeenCalled();
@@ -245,12 +245,12 @@ describe("automatic Codex reset eligibility", () => {
     const save = vi.mocked(rename).getMockImplementation()!;
     vi.mocked(rename).mockImplementation(async (...args) => {
       await save(...args);
-      if (journal().attempts.length > 0) vi.setSystemTime(NOW + 5 * MINUTE);
+      if (state().attempts.length > 0) vi.setSystemTime(NOW + 5 * MINUTE);
     });
     const f = fixture();
     await f.start();
     expect(f.post).not.toHaveBeenCalled();
-    expect(journal().attempts[0].status).toBe("pending");
+    expect(state().attempts[0].status).toBe("pending");
     await f.stop();
   });
 
@@ -283,7 +283,7 @@ describe("automatic Codex reset eligibility", () => {
     await f.stop();
   });
 
-  it.each(["print", "json"])("also redeems in %s mode without a UI", async (mode) => {
+  it.each(["print", "json"])("also consumes in %s mode without a UI", async (mode) => {
     const f = fixture();
     Object.assign(f.ctx, { hasUI: false, mode });
     await f.start();
@@ -303,12 +303,12 @@ describe("account-wide automatic polling cooldown", () => {
       await instances[i].start();
     }
     expect(backend).toHaveBeenCalledTimes(1);
-    expect(journal()).toMatchObject({ lastCheckedAt: NOW, attempts: [] });
+    expect(state()).toMatchObject({ lastAutoPollStartedAt: NOW, attempts: [] });
     await vi.advanceTimersByTimeAsync(20_000);
     expect(backend).toHaveBeenCalledTimes(2);
     await vi.advanceTimersByTimeAsync(40_000);
     expect(backend).toHaveBeenCalledTimes(2);
-    expect(journal().lastCheckedAt).toBe(NOW + MINUTE);
+    expect(state().lastAutoPollStartedAt).toBe(NOW + MINUTE);
     await Promise.all(instances.map((instance) => instance.stop()));
     expect(locks.size).toBe(0);
   });
@@ -330,7 +330,7 @@ describe("account-wide automatic polling cooldown", () => {
   it("persists the polling slot before GET, including failed requests", async () => {
     const first = fixture([]);
     first.fetchMock.mockImplementationOnce(async () => {
-      expect(journal().lastCheckedAt).toBe(NOW);
+      expect(state().lastAutoPollStartedAt).toBe(NOW);
       throw new Error("Network unavailable");
     });
     await first.start();
@@ -338,7 +338,7 @@ describe("account-wide automatic polling cooldown", () => {
       expect.stringContaining("Network unavailable"),
       "warning",
     );
-    expect(journal()).toMatchObject({ lastCheckedAt: NOW, attempts: [] });
+    expect(state()).toMatchObject({ lastAutoPollStartedAt: NOW, attempts: [] });
     await first.stop();
     vi.setSystemTime(NOW + 30_000);
     const second = fixture([]);
@@ -371,21 +371,21 @@ describe("account-wide automatic polling cooldown", () => {
     second.getApiKeyForProvider.mockResolvedValue(token("another-account"));
     await second.start();
     expect(second.fetchMock).toHaveBeenCalledTimes(1);
-    expect(journal("another-account").lastCheckedAt).toBe(NOW);
+    expect(state("another-account").lastAutoPollStartedAt).toBe(NOW);
     await second.stop();
   });
 
   it.each([undefined, null, "123", true, {}])(
-    "rejects an invalid lastCheckedAt instead of resetting it: %j",
-    async (lastCheckedAt) => {
-      const raw = JSON.stringify({ accountId, lastCheckedAt, attempts: [] });
-      files.set(journalPath(), raw);
+    "rejects an invalid lastAutoPollStartedAt instead of resetting it: %j",
+    async (lastAutoPollStartedAt) => {
+      const raw = JSON.stringify({ accountId, lastAutoPollStartedAt, attempts: [] });
+      files.set(statePath(), raw);
       const f = fixture();
       await f.start();
       expect(f.fetchMock).not.toHaveBeenCalled();
-      expect(files.get(journalPath())).toBe(raw);
+      expect(files.get(statePath())).toBe(raw);
       expect(f.notify).toHaveBeenCalledWith(
-        expect.stringContaining("Invalid Codex redemption journal"),
+        expect.stringContaining("Invalid Codex reset state"),
         "warning",
       );
       await f.stop();
@@ -398,11 +398,11 @@ describe("account-wide automatic polling cooldown", () => {
     expect(f.fetchMock).toHaveBeenCalledTimes(1);
     await f.command("status");
     expect(f.fetchMock).toHaveBeenCalledTimes(3);
-    expect(journal().lastCheckedAt).toBe(NOW);
+    expect(state().lastAutoPollStartedAt).toBe(NOW);
     await f.stop();
   });
 
-  it("allows manual redemption during the automatic polling cooldown", async () => {
+  it("allows manual consumption during the automatic polling cooldown", async () => {
     const f = fixture([credit("manual", 60 * MINUTE)]);
     await f.start();
     expect(f.post).not.toHaveBeenCalled();
@@ -413,20 +413,20 @@ describe("account-wide automatic polling cooldown", () => {
   });
 });
 
-describe("durable idempotent redemption", () => {
+describe("durable idempotent consumption", () => {
   it("publishes the exact request ID atomically before dispatch", async () => {
     const f = fixture();
     f.post.mockImplementation(async (_url, init) => {
-      expect(journal().attempts[0]).toMatchObject({
+      expect(state().attempts[0]).toMatchObject({
         creditId: "expiring",
-        requestId: JSON.parse(String(init.body)).redeem_request_id,
+        redeemRequestId: JSON.parse(String(init.body)).redeem_request_id,
         status: "pending",
       });
       expect([...files.keys()].some((path) => path.endsWith(".tmp"))).toBe(false);
       return response({ code: "reset" });
     });
     await f.start();
-    expect(journal().attempts[0].status).toBe("reset");
+    expect(state().attempts[0].status).toBe("reset");
     expect(writeFile).toHaveBeenCalledWith(expect.any(String), expect.any(String), {
       flag: "wx",
       mode: 0o600,
@@ -440,13 +440,13 @@ describe("durable idempotent redemption", () => {
       .mockRejectedValueOnce(new Error("Response lost"))
       .mockResolvedValue(response({ code: "already_redeemed" }));
     await f.start();
-    expect(journal().attempts[0].status).toBe("pending");
+    expect(state().attempts[0].status).toBe("pending");
     expect(f.notify).not.toHaveBeenCalledWith(expect.stringContaining("consumed"), "info");
     f.credits[0].status = "redeemed";
     await vi.advanceTimersByTimeAsync(MINUTE);
     expect(f.bodies()).toHaveLength(2);
     expect(f.bodies()[1]).toEqual(f.bodies()[0]);
-    expect(journal().attempts[0].status).toBe("already_redeemed");
+    expect(state().attempts[0].status).toBe("already_redeemed");
     expect(f.notify).toHaveBeenCalledWith(
       expect.stringContaining("Confirmed previously consumed"),
       "info",
@@ -469,7 +469,7 @@ describe("durable idempotent redemption", () => {
     await reloaded.stop();
   });
 
-  it("does not replay a completed attempt or notify again when the backend list is stale", async () => {
+  it("does not replay a successful consume attempt or notify again when the backend list is stale", async () => {
     const f = fixture();
     await f.start();
     await vi.advanceTimersByTimeAsync(MINUTE);
@@ -484,7 +484,7 @@ describe("durable idempotent redemption", () => {
   });
 
   it.each(["reset", "already_redeemed"])(
-    "skips completed %s credits in a stale backend list before selecting the next candidate",
+    "skips successfully consumed credits (%s) in a stale backend list before selecting the next candidate",
     async (code) => {
       const f = fixture([credit("first", 2.1 * MINUTE), credit("second", 2.2 * MINUTE)]);
       f.post.mockResolvedValueOnce(response({ code }));
@@ -499,7 +499,7 @@ describe("durable idempotent redemption", () => {
       await vi.advanceTimersByTimeAsync(2 * MINUTE);
       expect(f.post).toHaveBeenCalledTimes(2);
       expect(f.notify).toHaveBeenCalledTimes(2);
-      expect(journal().attempts.map((attempt: { status: string }) => attempt.status)).toEqual([
+      expect(state().attempts.map((attempt: { status: string }) => attempt.status)).toEqual([
         code,
         "reset",
       ]);
@@ -511,13 +511,13 @@ describe("durable idempotent redemption", () => {
     const f = fixture();
     f.post.mockResolvedValueOnce(response({ code: "nothing_to_reset" }));
     await f.start();
-    expect(journal().attempts[0].status).toBe("nothing_to_reset");
+    expect(state().attempts[0].status).toBe("nothing_to_reset");
     expect(f.notify).not.toHaveBeenCalled();
     await vi.advanceTimersByTimeAsync(MINUTE);
     const [first, second] = f.bodies();
     expect(second.credit_id).toBe(first.credit_id);
     expect(second.redeem_request_id).not.toBe(first.redeem_request_id);
-    expect(journal().attempts[0].status).toBe("reset");
+    expect(state().attempts[0].status).toBe("reset");
     expect(f.notify).toHaveBeenCalledTimes(1);
     await f.stop();
   });
@@ -534,7 +534,7 @@ describe("durable idempotent redemption", () => {
     await f.stop();
   });
 
-  it("isolates journals and request IDs by account", async () => {
+  it("isolates state and request IDs by account", async () => {
     const first = fixture();
     await first.start();
     await first.stop();
@@ -542,7 +542,7 @@ describe("durable idempotent redemption", () => {
     second.getApiKeyForProvider.mockResolvedValue(token("another-account"));
     await second.start();
     expect(second.bodies()[0].redeem_request_id).not.toBe(first.bodies()[0].redeem_request_id);
-    expect(journal("another-account").accountId).toBe("another-account");
+    expect(state("another-account").accountId).toBe("another-account");
     await second.stop();
   });
 
@@ -552,9 +552,9 @@ describe("durable idempotent redemption", () => {
       const f = fixture();
       f.post.mockResolvedValueOnce(response(payload));
       await f.start();
-      expect(journal().attempts[0].status).toBe("pending");
+      expect(state().attempts[0].status).toBe("pending");
       expect(f.notify).toHaveBeenCalledWith(
-        expect.stringContaining("Unknown Codex redemption outcome"),
+        expect.stringContaining("Unknown Codex consumption outcome"),
         "warning",
       );
       await vi.advanceTimersByTimeAsync(MINUTE);
@@ -572,13 +572,13 @@ describe("durable idempotent redemption", () => {
     await f.stop();
   });
 
-  it("persists no_credit and ends the poll without a follow-up GET or another redemption", async () => {
+  it("persists no_credit and ends the poll without a follow-up GET or another consumption", async () => {
     const f = fixture([credit("first", 2 * MINUTE), credit("second", 4 * MINUTE)]);
     f.post.mockResolvedValue(response({ code: "no_credit" }));
     await f.start();
     expect(f.bodies()).toEqual([{ credit_id: "first", redeem_request_id: expect.any(String) }]);
     expect(f.fetchMock.mock.calls.map(([, init]) => init.method)).toEqual(["GET", "POST"]);
-    expect(journal().attempts[0].status).toBe("no_credit");
+    expect(state().attempts[0].status).toBe("no_credit");
     expect(locks.size).toBe(0);
     expect(f.notify).toHaveBeenCalledWith(
       expect.stringContaining("no other credit was used"),
@@ -595,7 +595,7 @@ describe("durable idempotent redemption", () => {
       f.post.mockResolvedValueOnce(response({ code: "no_credit" }));
       await f.start();
       expect(f.fetchMock.mock.calls.map(([, init]) => init.method)).toEqual(["GET", "POST"]);
-      expect(journal().attempts[0].status).toBe("no_credit");
+      expect(state().attempts[0].status).toBe("no_credit");
       const firstAttempt = f.bodies()[0];
       if (status === "redeemed") f.credits[0].status = "redeemed";
       if (status === "none")
@@ -606,7 +606,7 @@ describe("durable idempotent redemption", () => {
       expect(f.fetchMock.mock.calls.filter(([, init]) => init.method === "GET")).toHaveLength(2);
       if (status === "none") {
         expect(f.post).toHaveBeenCalledTimes(1);
-        expect(journal().attempts[0].status).toBe("no_credit");
+        expect(state().attempts[0].status).toBe("no_credit");
       } else {
         expect(f.post).toHaveBeenCalledTimes(2);
         expect(f.bodies()[1].credit_id).toBe(status === "available" ? "first" : "second");
@@ -651,7 +651,7 @@ describe("durable idempotent redemption", () => {
   );
 });
 
-describe("journal and locking safety", () => {
+describe("state and locking safety", () => {
   it("serializes concurrent Pi instances and suppresses duplicate success notifications", async () => {
     const first = fixture();
     const second = fixture();
@@ -701,25 +701,25 @@ describe("journal and locking safety", () => {
       .mockResolvedValueOnce(response({ code: "reset" }))
       .mockResolvedValue(response({ code: "already_redeemed" }));
     await f.start();
-    expect(journal().attempts[0].status).toBe("pending");
+    expect(state().attempts[0].status).toBe("pending");
     expect([...files.keys()].some((path) => path.endsWith(".tmp"))).toBe(false);
     await vi.advanceTimersByTimeAsync(MINUTE);
     expect(f.bodies()[1]).toEqual(f.bodies()[0]);
-    expect(journal().attempts[0].status).toBe("already_redeemed");
+    expect(state().attempts[0].status).toBe("already_redeemed");
     await f.stop();
   });
 
   it.each([
     "not json",
     "null",
-    JSON.stringify({ accountId: "wrong", lastCheckedAt: 0, attempts: [] }),
-    JSON.stringify({ accountId, lastCheckedAt: 0, attempts: [{ status: "pending" }] }),
-  ])("never replaces a malformed journal: %s", async (raw) => {
-    files.set(journalPath(), raw);
+    JSON.stringify({ accountId: "wrong", lastAutoPollStartedAt: 0, attempts: [] }),
+    JSON.stringify({ accountId, lastAutoPollStartedAt: 0, attempts: [{ status: "pending" }] }),
+  ])("never replaces invalid persisted state: %s", async (raw) => {
+    files.set(statePath(), raw);
     const f = fixture();
     await f.start();
     expect(f.post).not.toHaveBeenCalled();
-    expect(files.get(journalPath())).toBe(raw);
+    expect(files.get(statePath())).toBe(raw);
     await f.stop();
   });
 
@@ -737,11 +737,17 @@ describe("journal and locking safety", () => {
   });
 });
 
-describe("manual Codex redemption", () => {
+describe("manual Codex consumption", () => {
   it("notifies after confirmed consumption outside the automatic expiry window", async () => {
     const f = fixture([credit("manual", 60 * MINUTE)]);
     await f.command("consume");
     expect(f.confirm).toHaveBeenCalledTimes(1);
+    expect(f.confirm).toHaveBeenCalledWith(
+      "Consume Codex reset?",
+      expect.stringContaining(
+        "A successful reset consumes one banked credit and cannot be undone.",
+      ),
+    );
     expect(f.notify).toHaveBeenCalledWith(expect.stringContaining("Codex reset consumed."), "info");
     expect(f.post).toHaveBeenCalledTimes(1);
   });
@@ -795,7 +801,7 @@ describe("manual Codex redemption", () => {
       "info",
     );
     expect(f.fetchMock.mock.calls.map(([, init]) => init.method)).toEqual(["GET", "GET", "POST"]);
-    expect(journal().attempts[0].status).toBe(code);
+    expect(state().attempts[0].status).toBe(code);
     expect(locks.size).toBe(0);
   });
 
@@ -824,7 +830,7 @@ describe("manual Codex redemption", () => {
     expect(f.notify).toHaveBeenCalledWith(expect.stringContaining("account changed"), "warning");
   });
 
-  it("preserves dry-run without modifying the journal or taking a lock", async () => {
+  it("preserves dry-run without modifying the state or taking a lock", async () => {
     const f = fixture();
     await f.command("consume --dry-run");
     expect(f.confirm).not.toHaveBeenCalled();

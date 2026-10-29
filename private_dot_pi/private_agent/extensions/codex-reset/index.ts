@@ -1,11 +1,11 @@
 /**
  * Codex banked rate-limit reset helper.
  *
- * While Pi is running, check every minute and automatically redeem at most one
+ * While Pi is running, check every minute and automatically consume at most one
  * available credit expiring within five minutes. Usage is not a prerequisite.
  * Automatic credit-list checks share a persisted 60-second cooldown per account.
  * Manual commands bypass this polling cooldown.
- * Redemption attempts are journaled before POST and serialized per account.
+ * Consumption attempts are persisted before POST and serialized per account.
  * Retries after ambiguous failures reuse the same request ID across Pi instances,
  * reloads and manual commands.
  *
@@ -28,7 +28,7 @@
  *   https://github.com/openai/codex/blob/a29c7b97e88367044ae84c28c85451ec3e72af9f/codex-rs/backend-client/src/client/rate_limit_resets.rs#L89-L122
  * - Official CLI regression: a lost response retries the same request ID and credit ID.
  *   https://github.com/openai/codex/blob/a29c7b97e88367044ae84c28c85451ec3e72af9f/codex-rs/tui/src/chatwidget/tests/usage.rs#L658-L687
- * - Reference helper: UUID generation for a single explicit-credit submission (no retry journal).
+ * - Reference helper: UUID generation for a single explicit-credit submission (no persisted retry state).
  *   https://github.com/aaamosh/codex-reset/blob/d8105e16fb74c544c3a03a3924c96b1ab90b8375/codex_reset.py#L372-L414
  * - Reference extension: pending request ID reuse for retries of the same account/card.
  *   https://github.com/99percentpeople/pi-extensions/blob/a7ae6b89a211c35b657e886e9ceeafbf51616c22/extensions/codex-api/usage.ts#L1214-L1265
@@ -50,8 +50,8 @@ const PROVIDER = "openai-codex";
 const BASE_URL = "https://chatgpt.com/backend-api";
 const FETCH_TIMEOUT_MS = 30_000;
 const JWT_CLAIM_PATH = "https://api.openai.com/auth";
-const AUTO_CHECK_MS = 60_000;
-const AUTO_EXPIRE_MS = 5 * AUTO_CHECK_MS;
+const AUTO_POLL_INTERVAL_MS = 60_000;
+const AUTO_CONSUME_WINDOW_MS = 5 * AUTO_POLL_INTERVAL_MS;
 
 interface CodexAuth {
   token: string;
@@ -96,23 +96,23 @@ interface ConsumeResponse {
 
 type ConsumeCode = "reset" | "already_redeemed" | "nothing_to_reset" | "no_credit";
 
-interface RedemptionAttempt {
+interface ConsumeAttempt {
   creditId: string;
   expiresAt: string | null;
-  requestId: string;
+  redeemRequestId: string;
   status: "pending" | ConsumeCode;
   lastAttemptAt: number;
 }
 
-interface RedemptionJournal {
+interface CodexResetState {
   accountId: string;
-  lastCheckedAt: number;
-  attempts: RedemptionAttempt[];
+  lastAutoPollStartedAt: number;
+  attempts: ConsumeAttempt[];
 }
 
-type RedemptionResult =
+type ConsumeResult =
   | { credit: ResetCredit; response: ConsumeResponse & { code: ConsumeCode } }
-  | { skipped: "busy" | "completed" | "unavailable" | "cooldown" };
+  | { skipped: "busy" | "already_consumed" | "unavailable" | "cooldown" };
 
 interface Args {
   command: "status" | "consume" | "help";
@@ -345,13 +345,13 @@ function hash(value: unknown): string {
   return createHash("sha256").update(JSON.stringify(value)).digest("hex");
 }
 
-function journalPath(accountId: string): string {
-  return join(getAgentDir(), "codex-reset-redemptions", `${hash(accountId)}.json`);
+function statePath(accountId: string): string {
+  return join(getAgentDir(), "codex-reset-state", `${hash(accountId)}.json`);
 }
 
 function expiresSoon(expiresAt: string | null | undefined, now = Date.now()): boolean {
   const remaining = Date.parse(expiresAt ?? "") - now;
-  return remaining > 0 && remaining <= AUTO_EXPIRE_MS;
+  return remaining > 0 && remaining <= AUTO_CONSUME_WINDOW_MS;
 }
 
 function isConsumeCode(code: unknown): code is ConsumeCode {
@@ -363,53 +363,49 @@ function isConsumeCode(code: unknown): code is ConsumeCode {
   );
 }
 
-function isCompleted(status: string): boolean {
+function isConsumeSuccess(status: string): boolean {
   return status === "reset" || status === "already_redeemed";
 }
 
-async function loadJournal(path: string, accountId: string): Promise<RedemptionJournal> {
+async function loadState(path: string, accountId: string): Promise<CodexResetState> {
   let raw: string;
   try {
     raw = await readFile(path, "utf8");
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT")
-      return { accountId, lastCheckedAt: 0, attempts: [] };
+      return { accountId, lastAutoPollStartedAt: 0, attempts: [] };
     throw error;
   }
-  const journal = JSON.parse(raw) as RedemptionJournal;
+  const state = JSON.parse(raw) as CodexResetState;
   if (
-    journal?.accountId !== accountId ||
-    !Number.isFinite(journal.lastCheckedAt) ||
-    !Array.isArray(journal.attempts) ||
-    !journal.attempts.every(
+    state?.accountId !== accountId ||
+    !Number.isFinite(state.lastAutoPollStartedAt) ||
+    !Array.isArray(state.attempts) ||
+    !state.attempts.every(
       (attempt) =>
         attempt &&
         typeof attempt.creditId === "string" &&
         attempt.creditId &&
-        typeof attempt.requestId === "string" &&
-        attempt.requestId &&
+        typeof attempt.redeemRequestId === "string" &&
+        attempt.redeemRequestId &&
         (attempt.expiresAt === null || typeof attempt.expiresAt === "string") &&
         (attempt.status === "pending" || isConsumeCode(attempt.status)) &&
         Number.isFinite(attempt.lastAttemptAt),
     ) ||
-    new Set(journal.attempts.map((attempt) => attempt.creditId)).size !== journal.attempts.length
+    new Set(state.attempts.map((attempt) => attempt.creditId)).size !== state.attempts.length
   ) {
     throw new CodexResetError(
-      `Invalid Codex redemption journal: ${path}. Refusing to replace request IDs.`,
+      `Invalid Codex reset state: ${path}. Refusing to replace request IDs.`,
     );
   }
-  return journal;
+  return state;
 }
 
-async function saveJournal(
-  path: string,
-  journal: RedemptionJournal,
-  signal: AbortSignal,
-): Promise<void> {
+async function saveState(path: string, state: CodexResetState, signal: AbortSignal): Promise<void> {
   const temporary = `${path}.${randomUUID()}.tmp`;
   try {
     signal.throwIfAborted();
-    await writeFile(temporary, JSON.stringify(journal), { flag: "wx", mode: 0o600 });
+    await writeFile(temporary, JSON.stringify(state), { flag: "wx", mode: 0o600 });
     signal.throwIfAborted();
     await rename(temporary, path);
   } finally {
@@ -418,14 +414,14 @@ async function saveJournal(
 }
 
 /** All callers share a durable request ID and an inter-process account lock. */
-async function redeemCredit(
+async function consumeCredit(
   auth: CodexAuth,
   creditId?: string,
   signal?: AbortSignal,
-): Promise<RedemptionResult> {
+): Promise<ConsumeResult> {
   const automatic = creditId === undefined;
-  const directory = join(getAgentDir(), "codex-reset-redemptions");
-  const path = journalPath(auth.accountId);
+  const directory = join(getAgentDir(), "codex-reset-state");
+  const path = statePath(auth.accountId);
   await mkdir(directory, { recursive: true, mode: 0o700 });
   const lease = new AbortController();
   const operationSignal = AbortSignal.any([lease.signal, ...(signal ? [signal] : [])]);
@@ -434,7 +430,7 @@ async function redeemCredit(
     release = await lockfile.lock(path, {
       realpath: false,
       retries: 0,
-      stale: 2 * AUTO_CHECK_MS,
+      stale: 2 * AUTO_POLL_INTERVAL_MS,
       update: 10_000,
       onCompromised: (error) => lease.abort(error),
     });
@@ -445,14 +441,14 @@ async function redeemCredit(
 
   try {
     operationSignal.throwIfAborted();
-    const journal = await loadJournal(path, auth.accountId);
+    const state = await loadState(path, auth.accountId);
     if (automatic) {
       const now = Date.now();
-      if (now - journal.lastCheckedAt < AUTO_CHECK_MS) return { skipped: "cooldown" };
+      if (now - state.lastAutoPollStartedAt < AUTO_POLL_INTERVAL_MS) return { skipped: "cooldown" };
       // Reserve the account's polling slot before GET, including failed requests.
       // Persist under the lock so staggered instances and reloads share the limit.
-      journal.lastCheckedAt = now;
-      await saveJournal(path, journal, operationSignal);
+      state.lastAutoPollStartedAt = now;
+      await saveState(path, state, operationSignal);
     }
     const credits = await requestJson<ResetCreditsResponse>(
       auth,
@@ -464,7 +460,7 @@ async function redeemCredit(
     // Resolve an unknown result before choosing another card, even if the backend
     // already reports the original card as redeeming/redeemed (or omits it).
     const pending = automatic
-      ? journal.attempts
+      ? state.attempts
           .filter((attempt) => attempt.status === "pending" && expiresSoon(attempt.expiresAt))
           .sort((a, b) => Date.parse(a.expiresAt!) - Date.parse(b.expiresAt!))[0]
       : undefined;
@@ -477,32 +473,32 @@ async function redeemCredit(
                 credit.id &&
                 credit.status === "available" &&
                 expiresSoon(credit.expires_at) &&
-                !journal.attempts.some(
-                  (attempt) => attempt.creditId === credit.id && isCompleted(attempt.status),
+                !state.attempts.some(
+                  (attempt) => attempt.creditId === credit.id && isConsumeSuccess(attempt.status),
                 ),
             )
             .sort((a, b) => Date.parse(a.expires_at!) - Date.parse(b.expires_at!))[0];
     if (!target?.id || (automatic && !expiresSoon(target.expires_at)))
       return { skipped: "unavailable" };
-    const previous = journal.attempts.find((attempt) => attempt.creditId === target.id);
-    if (previous && isCompleted(previous.status)) return { skipped: "completed" };
+    const previous = state.attempts.find((attempt) => attempt.creditId === target.id);
+    if (previous && isConsumeSuccess(previous.status)) return { skipped: "already_consumed" };
     if (previous?.status !== "pending" && target.status !== "available")
       return { skipped: "unavailable" };
-    if (automatic && previous && Date.now() - previous.lastAttemptAt < AUTO_CHECK_MS)
+    if (automatic && previous && Date.now() - previous.lastAttemptAt < AUTO_POLL_INTERVAL_MS)
       return { skipped: "cooldown" };
 
-    const attempt: RedemptionAttempt = {
+    const attempt: ConsumeAttempt = {
       creditId: target.id,
       expiresAt: target.expires_at ?? null,
-      requestId: previous?.status === "pending" ? previous.requestId : randomUUID(),
+      redeemRequestId: previous?.status === "pending" ? previous.redeemRequestId : randomUUID(),
       status: "pending",
       lastAttemptAt: Date.now(),
     };
-    if (previous) journal.attempts[journal.attempts.indexOf(previous)] = attempt;
-    else journal.attempts.push(attempt);
+    if (previous) state.attempts[state.attempts.indexOf(previous)] = attempt;
+    else state.attempts.push(attempt);
     // Publish the complete pending record atomically before any POST. A crash
     // after dispatch or a failed outcome write leaves the same ID for replay.
-    await saveJournal(path, journal, operationSignal);
+    await saveState(path, state, operationSignal);
     operationSignal.throwIfAborted();
     if (automatic && !expiresSoon(target.expires_at)) return { skipped: "unavailable" };
     if (!automatic && target.expires_at && Date.parse(target.expires_at) <= Date.now())
@@ -511,19 +507,19 @@ async function redeemCredit(
       auth,
       "POST",
       "/wham/rate-limit-reset-credits/consume",
-      { credit_id: target.id, redeem_request_id: attempt.requestId },
+      { credit_id: target.id, redeem_request_id: attempt.redeemRequestId },
       operationSignal,
     );
     const code = response?.code;
     if (!isConsumeCode(code)) {
       throw new CodexResetError(
-        "Unknown Codex redemption outcome; preserving the request ID for retry.",
+        "Unknown Codex consumption outcome; preserving the request ID for retry.",
         undefined,
         response,
       );
     }
     attempt.status = code;
-    await saveJournal(path, journal, operationSignal);
+    await saveState(path, state, operationSignal);
     return { credit: target, response: { ...response, code } };
   } finally {
     await release().catch((error) => {
@@ -537,10 +533,10 @@ async function runAutoConsume(ctx: ExtensionContext, signal: AbortSignal): Promi
   if (!token || signal.aborted) return;
   const accountId = extractAccountId(token);
   if (!accountId) return;
-  const result = await redeemCredit({ token, accountId }, undefined, signal);
+  const result = await consumeCredit({ token, accountId }, undefined, signal);
   if (signal.aborted || "skipped" in result) return;
   const { credit, response } = result;
-  if (isCompleted(response.code)) {
+  if (isConsumeSuccess(response.code)) {
     ctx.ui.notify(
       `${response.code === "already_redeemed" ? "Confirmed previously consumed" : "Automatically consumed expiring"} Codex reset ${shortId(credit.id)} (expires ${credit.expires_at}).\ncode=${response.code}  windows_reset=${response.windows_reset ?? "?"}`,
       "info",
@@ -562,8 +558,8 @@ async function runConsume(args: Args, ctx: ExtensionCommandContext): Promise<voi
     "GET",
     "/wham/rate-limit-reset-credits",
   );
-  const journal = await loadJournal(journalPath(auth.accountId), auth.accountId);
-  const pending = journal.attempts.find(
+  const state = await loadState(statePath(auth.accountId), auth.accountId);
+  const pending = state.attempts.find(
     (attempt) =>
       attempt.status === "pending" &&
       (attempt.expiresAt === null || Date.parse(attempt.expiresAt) > Date.now()),
@@ -600,7 +596,7 @@ async function runConsume(args: Args, ctx: ExtensionCommandContext): Promise<voi
 
   const ok = await ctx.ui.confirm(
     "Consume Codex reset?",
-    `${summary}\n\nThis immediately consumes one banked rate-limit reset credit and cannot be undone.`,
+    `${summary}\n\nA successful reset consumes one banked credit and cannot be undone.`,
   );
   if (!ok) {
     ctx.ui.notify("Cancelled Codex reset consumption.", "info");
@@ -612,16 +608,16 @@ async function runConsume(args: Args, ctx: ExtensionCommandContext): Promise<voi
     ctx.ui.notify("Codex account changed during confirmation; no credit was submitted.", "warning");
     return;
   }
-  const redemption = await redeemCredit(confirmedAuth, target.id);
-  if ("skipped" in redemption) {
+  const consumeResult = await consumeCredit(confirmedAuth, target.id);
+  if ("skipped" in consumeResult) {
     ctx.ui.notify(
-      `No Codex reset submitted (${redemption.skipped}); no other credit was used.`,
+      `No Codex reset submitted (${consumeResult.skipped}); no other credit was used.`,
       "info",
     );
     return;
   }
-  const result = redemption.response;
-  if (!isCompleted(result.code)) {
+  const result = consumeResult.response;
+  if (!isConsumeSuccess(result.code)) {
     ctx.ui.notify(
       result.code === "nothing_to_reset"
         ? "No current Codex usage window needs a reset; no credit was consumed."
@@ -717,7 +713,7 @@ export default function (pi: ExtensionAPI) {
           running = undefined;
         });
     };
-    timer = setInterval(check, AUTO_CHECK_MS);
+    timer = setInterval(check, AUTO_POLL_INTERVAL_MS);
     timer.unref();
     check();
   });
@@ -745,7 +741,7 @@ export default function (pi: ExtensionAPI) {
               "  /codex-reset consume --dry-run",
               "  /codex-reset consume --credit <id-prefix>",
               "",
-              "Auto: polls at most once per 60 seconds per account across Pi instances; redeems only available credits expiring within 5 minutes (no confirmation).",
+              "Auto: polls at most once per 60 seconds per account across Pi instances; consumes only available credits expiring within 5 minutes (no confirmation).",
               "Manual commands bypass the automatic polling cooldown.",
               "Unknown outcomes retry with the same persisted request ID; manual retries share it.",
             ].join("\n"),
