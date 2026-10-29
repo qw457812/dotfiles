@@ -6,7 +6,7 @@
     "check": "tsc --noEmit",
     "lint": "oxlint .",
     "format": "oxfmt .",
-    "test": "vitest --run && npm --prefix extensions/webfetch test && npm --prefix extensions/sandbox test"
+    "test": "vitest --run && npm --prefix extensions/webfetch test && npm --prefix extensions/sandbox test && npm --prefix extensions/codex-reset test"
   },
   "devDependencies": {
     "@earendil-works/pi-agent-core": "1.4.0",
