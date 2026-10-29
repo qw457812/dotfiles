@@ -245,7 +245,7 @@ describe("automatic Codex reset eligibility", () => {
     const save = vi.mocked(rename).getMockImplementation()!;
     vi.mocked(rename).mockImplementation(async (...args) => {
       await save(...args);
-      vi.setSystemTime(NOW + 5 * MINUTE);
+      if (journal().attempts.length > 0) vi.setSystemTime(NOW + 5 * MINUTE);
     });
     const f = fixture();
     await f.start();
@@ -289,6 +289,126 @@ describe("automatic Codex reset eligibility", () => {
     await f.start();
     expect(f.post).toHaveBeenCalledTimes(1);
     expect(f.confirm).not.toHaveBeenCalled();
+    await f.stop();
+  });
+});
+
+describe("account-wide automatic polling cooldown", () => {
+  it("limits five staggered Pi instances to one GET per 60 seconds", async () => {
+    const instances = Array.from({ length: 5 }, () => fixture([]));
+    const backend = instances[0].fetchMock;
+    vi.stubGlobal("fetch", backend);
+    for (let i = 0; i < instances.length; i++) {
+      if (i > 0) await vi.advanceTimersByTimeAsync(10_000);
+      await instances[i].start();
+    }
+    expect(backend).toHaveBeenCalledTimes(1);
+    expect(journal()).toMatchObject({ lastCheckedAt: NOW, attempts: [] });
+    await vi.advanceTimersByTimeAsync(20_000);
+    expect(backend).toHaveBeenCalledTimes(2);
+    await vi.advanceTimersByTimeAsync(40_000);
+    expect(backend).toHaveBeenCalledTimes(2);
+    expect(journal().lastCheckedAt).toBe(NOW + MINUTE);
+    await Promise.all(instances.map((instance) => instance.stop()));
+    expect(locks.size).toBe(0);
+  });
+
+  it.each([
+    [MINUTE - 1, 0],
+    [MINUTE, 1],
+  ])("keeps the cooldown across reloads at %i milliseconds", async (elapsed, expected) => {
+    const first = fixture([]);
+    await first.start();
+    await first.stop();
+    vi.setSystemTime(NOW + elapsed);
+    const reloaded = fixture([]);
+    await reloaded.start();
+    expect(reloaded.fetchMock).toHaveBeenCalledTimes(expected);
+    await reloaded.stop();
+  });
+
+  it("persists the polling slot before GET, including failed requests", async () => {
+    const first = fixture([]);
+    first.fetchMock.mockImplementationOnce(async () => {
+      expect(journal().lastCheckedAt).toBe(NOW);
+      throw new Error("Network unavailable");
+    });
+    await first.start();
+    expect(first.notify).toHaveBeenCalledWith(
+      expect.stringContaining("Network unavailable"),
+      "warning",
+    );
+    expect(journal()).toMatchObject({ lastCheckedAt: NOW, attempts: [] });
+    await first.stop();
+    vi.setSystemTime(NOW + 30_000);
+    const second = fixture([]);
+    await second.start();
+    expect(second.fetchMock).not.toHaveBeenCalled();
+    await second.stop();
+    vi.setSystemTime(NOW + MINUTE);
+    const third = fixture([]);
+    await third.start();
+    expect(third.fetchMock).toHaveBeenCalledTimes(1);
+    await third.stop();
+  });
+
+  it("does not query if the polling timestamp cannot be persisted", async () => {
+    vi.mocked(writeFile).mockRejectedValue(new Error("Disk full"));
+    const f = fixture();
+    await f.start();
+    expect(f.fetchMock).not.toHaveBeenCalled();
+    expect(f.post).not.toHaveBeenCalled();
+    expect(f.notify).toHaveBeenCalledWith(expect.stringContaining("Disk full"), "warning");
+    expect(locks.size).toBe(0);
+    await f.stop();
+  });
+
+  it("keeps polling cooldowns separate for different accounts", async () => {
+    const first = fixture([]);
+    await first.start();
+    await first.stop();
+    const second = fixture([]);
+    second.getApiKeyForProvider.mockResolvedValue(token("another-account"));
+    await second.start();
+    expect(second.fetchMock).toHaveBeenCalledTimes(1);
+    expect(journal("another-account").lastCheckedAt).toBe(NOW);
+    await second.stop();
+  });
+
+  it.each([undefined, null, "123", true, {}])(
+    "rejects an invalid lastCheckedAt instead of resetting it: %j",
+    async (lastCheckedAt) => {
+      const raw = JSON.stringify({ accountId, lastCheckedAt, attempts: [] });
+      files.set(journalPath(), raw);
+      const f = fixture();
+      await f.start();
+      expect(f.fetchMock).not.toHaveBeenCalled();
+      expect(files.get(journalPath())).toBe(raw);
+      expect(f.notify).toHaveBeenCalledWith(
+        expect.stringContaining("Invalid Codex redemption journal"),
+        "warning",
+      );
+      await f.stop();
+    },
+  );
+
+  it("allows manual status queries during the automatic polling cooldown", async () => {
+    const f = fixture([]);
+    await f.start();
+    expect(f.fetchMock).toHaveBeenCalledTimes(1);
+    await f.command("status");
+    expect(f.fetchMock).toHaveBeenCalledTimes(3);
+    expect(journal().lastCheckedAt).toBe(NOW);
+    await f.stop();
+  });
+
+  it("allows manual redemption during the automatic polling cooldown", async () => {
+    const f = fixture([credit("manual", 60 * MINUTE)]);
+    await f.start();
+    expect(f.post).not.toHaveBeenCalled();
+    await f.command("consume");
+    expect(f.post).toHaveBeenCalledTimes(1);
+    expect(f.notify).toHaveBeenCalledWith(expect.stringContaining("Codex reset consumed."), "info");
     await f.stop();
   });
 });
@@ -556,7 +676,11 @@ describe("journal and locking safety", () => {
   });
 
   it("fails closed before POST when persisting the pending record fails", async () => {
-    vi.mocked(writeFile).mockRejectedValue(new Error("Disk full"));
+    const write = vi.mocked(writeFile).getMockImplementation()!;
+    vi.mocked(writeFile).mockImplementation(async (...args) => {
+      if (JSON.parse(String(args[1])).attempts.length > 0) throw new Error("Disk full");
+      await write(...args);
+    });
     const f = fixture();
     await f.start();
     expect(f.post).not.toHaveBeenCalled();
@@ -567,10 +691,11 @@ describe("journal and locking safety", () => {
 
   it("preserves the pending ID if saving a successful outcome fails", async () => {
     const save = vi.mocked(rename).getMockImplementation()!;
-    vi.mocked(rename)
-      .mockImplementationOnce(save)
-      .mockRejectedValueOnce(new Error("Write failed"))
-      .mockImplementation(save);
+    vi.mocked(rename).mockImplementation(async (...args) => {
+      const next = JSON.parse(files.get(String(args[0]))!);
+      if (next.attempts[0]?.status === "reset") throw new Error("Write failed");
+      await save(...args);
+    });
     const f = fixture();
     f.post
       .mockResolvedValueOnce(response({ code: "reset" }))
@@ -587,28 +712,14 @@ describe("journal and locking safety", () => {
   it.each([
     "not json",
     "null",
-    JSON.stringify({ accountId: "wrong", attempts: [] }),
-    JSON.stringify({ accountId, attempts: [{ status: "pending" }] }),
+    JSON.stringify({ accountId: "wrong", lastCheckedAt: 0, attempts: [] }),
+    JSON.stringify({ accountId, lastCheckedAt: 0, attempts: [{ status: "pending" }] }),
   ])("never replaces a malformed journal: %s", async (raw) => {
     files.set(journalPath(), raw);
     const f = fixture();
     await f.start();
     expect(f.post).not.toHaveBeenCalled();
     expect(files.get(journalPath())).toBe(raw);
-    await f.stop();
-  });
-
-  it("skips legacy claims with missing request IDs without selecting another credit", async () => {
-    files.set(
-      join(getAgentDir(), "codex-reset-claims", `${hash([accountId, "old"])}.json`),
-      JSON.stringify({ creditId: "old" }),
-    );
-    const f = fixture([credit("old", 2 * MINUTE), credit("different", 4 * MINUTE)]);
-    await f.start();
-    await vi.advanceTimersByTimeAsync(MINUTE);
-    expect(f.post).not.toHaveBeenCalled();
-    expect(f.notify).toHaveBeenCalledTimes(1);
-    expect(f.notify).toHaveBeenCalledWith(expect.stringContaining("has no request ID"), "warning");
     await f.stop();
   });
 

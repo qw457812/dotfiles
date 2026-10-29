@@ -1,6 +1,6 @@
 import type { ExtensionAPI, ExtensionCommandContext } from "@earendil-works/pi-coding-agent";
 import { createHash } from "node:crypto";
-import { mkdir, mkdtemp, readFile, readdir, rm, stat, utimes, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, readdir, rm, stat, utimes } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -77,6 +77,7 @@ describe("Codex redemption with real journal files and account locks", () => {
     const first = fixture();
     await first.consume();
     const pending = JSON.parse(await readFile(journalPath(), "utf8"));
+    expect(pending.lastCheckedAt).toBe(0);
     expect(pending.attempts[0].status).toBe("pending");
     const reloaded = fixture();
     await reloaded.consume();
@@ -140,28 +141,5 @@ describe("Codex redemption with real journal files and account locks", () => {
     await fixture().consume();
     expect(post).toHaveBeenCalledTimes(1);
     expect(JSON.parse(await readFile(journalPath(), "utf8")).attempts[0].status).toBe("reset");
-  });
-
-  it("does not replace a legacy claim whose original request ID cannot be recovered", async () => {
-    const key = createHash("sha256")
-      .update(JSON.stringify([accountId, "credit"]))
-      .digest("hex");
-    await mkdir(join(directory, "codex-reset-claims"));
-    await writeFile(
-      join(directory, "codex-reset-claims", `${key}.json`),
-      JSON.stringify({ creditId: "credit" }),
-    );
-    const post = vi.fn();
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(async (_url: string, init: RequestInit) => {
-        if (init.method === "POST") post();
-        return new Response(JSON.stringify({ credits: [{ id: "credit", status: "available" }] }));
-      }),
-    );
-    const f = fixture();
-    await f.consume();
-    expect(post).not.toHaveBeenCalled();
-    expect(f.notify).toHaveBeenCalledWith(expect.stringContaining("has no request ID"), "error");
   });
 });

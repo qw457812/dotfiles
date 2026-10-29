@@ -3,9 +3,11 @@
  *
  * While Pi is running, check every minute and automatically redeem at most one
  * available credit expiring within five minutes. Usage is not a prerequisite.
+ * Automatic credit-list checks share a persisted 60-second cooldown per account.
+ * Manual commands bypass this polling cooldown.
  * Redemption attempts are journaled before POST and serialized per account.
  * Retries after ambiguous failures reuse the same request ID across Pi instances,
- * reloads and manual commands. Legacy claims without request IDs are not retried.
+ * reloads and manual commands.
  *
  * Commands:
  *   /codex-reset                               Show banked reset credits and current usage.
@@ -104,6 +106,7 @@ interface RedemptionAttempt {
 
 interface RedemptionJournal {
   accountId: string;
+  lastCheckedAt: number;
   attempts: RedemptionAttempt[];
 }
 
@@ -369,12 +372,14 @@ async function loadJournal(path: string, accountId: string): Promise<RedemptionJ
   try {
     raw = await readFile(path, "utf8");
   } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === "ENOENT") return { accountId, attempts: [] };
+    if ((error as NodeJS.ErrnoException).code === "ENOENT")
+      return { accountId, lastCheckedAt: 0, attempts: [] };
     throw error;
   }
   const journal = JSON.parse(raw) as RedemptionJournal;
   if (
     journal?.accountId !== accountId ||
+    !Number.isFinite(journal.lastCheckedAt) ||
     !Array.isArray(journal.attempts) ||
     !journal.attempts.every(
       (attempt) =>
@@ -441,6 +446,14 @@ async function redeemCredit(
   try {
     operationSignal.throwIfAborted();
     const journal = await loadJournal(path, auth.accountId);
+    if (automatic) {
+      const now = Date.now();
+      if (now - journal.lastCheckedAt < AUTO_CHECK_MS) return { skipped: "cooldown" };
+      // Reserve the account's polling slot before GET, including failed requests.
+      // Persist under the lock so staggered instances and reloads share the limit.
+      journal.lastCheckedAt = now;
+      await saveJournal(path, journal, operationSignal);
+    }
     const credits = await requestJson<ResetCreditsResponse>(
       auth,
       "GET",
@@ -477,22 +490,6 @@ async function redeemCredit(
       return { skipped: "unavailable" };
     if (automatic && previous && Date.now() - previous.lastAttemptAt < AUTO_CHECK_MS)
       return { skipped: "cooldown" };
-
-    // Older claims contain no request ID. A failed POST may have succeeded, so
-    // never invent a replacement ID for them, including during manual retries.
-    const legacyPath = join(
-      getAgentDir(),
-      "codex-reset-claims",
-      `${hash([auth.accountId, target.id])}.json`,
-    );
-    try {
-      await readFile(legacyPath, "utf8");
-      throw new CodexResetError(
-        `Legacy Codex claim for ${shortId(target.id)} has no request ID; check /codex-reset status before resolving it manually.`,
-      );
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
-    }
 
     const attempt: RedemptionAttempt = {
       creditId: target.id,
@@ -748,8 +745,9 @@ export default function (pi: ExtensionAPI) {
               "  /codex-reset consume --dry-run",
               "  /codex-reset consume --credit <id-prefix>",
               "",
-              "Auto: checks every minute while Pi is running; redeems only available credits expiring within 5 minutes (no confirmation).",
-              "Unknown outcomes retry with the same persisted request ID; manual retries share it. Legacy claims without IDs are skipped.",
+              "Auto: polls at most once per 60 seconds per account across Pi instances; redeems only available credits expiring within 5 minutes (no confirmation).",
+              "Manual commands bypass the automatic polling cooldown.",
+              "Unknown outcomes retry with the same persisted request ID; manual retries share it.",
             ].join("\n"),
             "info",
           );
