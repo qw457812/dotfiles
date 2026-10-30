@@ -731,6 +731,7 @@ return {
   -- },
   {
     "saghen/blink.cmp",
+    optional = true,
     dependencies = {
       "xieyonn/blink-cmp-dat-word",
       shell_command_editor = true,
