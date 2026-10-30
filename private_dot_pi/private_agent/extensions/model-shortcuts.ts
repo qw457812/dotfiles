@@ -17,10 +17,10 @@ import type { AutocompleteItem } from "@earendil-works/pi-tui";
 // https://artificialanalysis.ai
 // https://commandcode.ai/docs/plans/go
 const ALIASES: Record<string, ModelTarget | readonly ModelTarget[]> = {
-  astra: { provider: "openai-codex", id: "gpt-6-astra" },
-  sol: { provider: "openai-codex", id: "gpt-6.1-sol" },
-  terra: { provider: "openai-codex", id: "gpt-6.1-terra" },
-  luna: { provider: "openai-codex", id: "gpt-6-luna" },
+  astra: { provider: "openai", id: "gpt-6-astra" },
+  sol: { provider: "openai", id: "gpt-6.1-sol" },
+  terra: { provider: "openai", id: "gpt-6.1-terra" },
+  luna: { provider: "openai", id: "gpt-6-luna" },
   glm: [
     { provider: "commandcode", id: "zai-org/GLM-5.3" },
     { provider: "neuralwatt", id: "glm-5.3" },

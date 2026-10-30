@@ -134,7 +134,7 @@ return {
                 mcpServers = {},
                 timeout = 20000,
                 session_config_options = {
-                  model = "openai-codex/gpt-6-luna",
+                  model = "openai/gpt-6-luna",
                   thought_level = "max",
                 },
               },

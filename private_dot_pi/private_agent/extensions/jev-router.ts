@@ -3,7 +3,7 @@
 /**
  * Jev router - a virtual model that plans on a strong model and implements on a cheap one.
  *
- * Registers `jev/auto`, which routes between three OpenAI Codex models:
+ * Registers `jev/auto`, which routes between three OpenAI models:
  *
  * - Planning: GPT-6.1 Sol (medium) for complex work, GPT-6.1 Terra (high) otherwise. The Jev classifier rates the
  *   first user message; planning stays on the chosen model.
@@ -16,7 +16,7 @@
  * The phase is router state: Pi stores it on the session branch, so it follows the session tree
  * and survives compaction. Requests outside the agent loop, such as compaction summaries, go to Terra.
  *
- * Requires TypeSafe credentials (TYPESAFE_API_KEY) and an OpenAI Codex login.
+ * Requires TypeSafe credentials (TYPESAFE_API_KEY) and an OpenAI login.
  * Usage: pi -e ./jev-router.ts --model jev/auto
  */
 
@@ -30,9 +30,9 @@ interface RouteTarget {
 }
 
 const ROUTES = {
-	complex: { provider: "openai-codex", model: "gpt-6.1-sol", thinkingLevel: "medium" },
-	standard: { provider: "openai-codex", model: "gpt-6.1-terra", thinkingLevel: "high" },
-	implementation: { provider: "openai-codex", model: "gpt-6.1-terra", thinkingLevel: "medium" },
+	complex: { provider: "openai", model: "gpt-6.1-sol", thinkingLevel: "medium" },
+	standard: { provider: "openai", model: "gpt-6.1-terra", thinkingLevel: "high" },
+	implementation: { provider: "openai", model: "gpt-6.1-terra", thinkingLevel: "medium" },
 } satisfies Record<string, RouteTarget>;
 
 /** Tools whose successful result means implementation has started. */
@@ -40,7 +40,7 @@ const EDIT_TOOLS = new Set(["edit", "write"]);
 
 interface JevState {
 	phase: "planning" | "implementation";
-	/** OpenAI Codex model for this phase. */
+	/** OpenAI model for this phase. */
 	route: RouteTarget;
 }
 
