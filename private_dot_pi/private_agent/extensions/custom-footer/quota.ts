@@ -912,8 +912,9 @@ const sources: Record<string, Source> = {
       if (!access) return null;
       // Read provider metadata only after Pi has refreshed the stored credential.
       const stored = await readAuth<{ region?: string; profileArn?: string }>("kiro");
-      if (!stored?.region || !stored.profileArn) return null;
-      return { access, region: stored.region, profileArn: stored.profileArn };
+      const region = stored?.region?.trim().toLowerCase();
+      if (!region || !stored?.profileArn) return null;
+      return { access, region, profileArn: stored.profileArn };
     },
     // https://github.com/mikeyobrien/pi-provider-kiro/blob/0899ed9c823e3bea592f642472f134f4439e4fee/src/management.ts#L340-L366
     async fetch(auth): Promise<KiroQuota | null> {

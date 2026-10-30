@@ -209,7 +209,7 @@ describe("custom footer quota authentication", () => {
     f.registry.getApiKeyForProvider.mockImplementation(async () => {
       vi.mocked(readFile).mockResolvedValue(
         JSON.stringify({
-          kiro: { region: "us-east-1", access: "stale", profileArn: "test-profile" },
+          kiro: { region: "  US-EAST-1  ", access: "stale", profileArn: "test-profile" },
         }),
       );
       return "refreshed-kiro-token";
@@ -246,7 +246,7 @@ describe("custom footer quota authentication", () => {
     expect(f.get("kiro")).toMatch(/^0\.02\/50 \d+[mh]/);
   });
 
-  it.each([{ region: "us-east-1" }, { profileArn: "test-profile" }])(
+  it.each([{ region: "us-east-1" }, { profileArn: "test-profile" }, { region: "   ", profileArn: "test-profile" }])(
     "skips Kiro usage when required metadata is missing: %j",
     async (metadata) => {
       const f = await fixture();
