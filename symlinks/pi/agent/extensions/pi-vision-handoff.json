@@ -1,4 +1,4 @@
 {
   "visionModel": "openai-codex/gpt-6-luna",
-  "fallbackModels": ["neuralwatt/glm-5.3-flash"]
+  "fallbackModels": ["neuralwatt/deepseek-v4.1-flash"]
 }
