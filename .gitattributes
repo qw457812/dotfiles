@@ -1,1 +1,2 @@
 *.age diff=age
+symlinks/pi/agent/settings.json filter=pi-settings
