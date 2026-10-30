@@ -960,7 +960,7 @@ export function getQuota(
   theme: Theme,
   modelRegistry: ModelRegistry,
 ): string | null {
-  const source = provider ? sources[provider] : null;
+  const source = provider ? sources[provider === "openai" ? "openai-codex" : provider] : null;
   if (!source) {
     return null;
   }

@@ -14,6 +14,19 @@
         }
       }
     },
+    "openai": {
+      "modelOverrides": {
+        "gpt-6.1-sol": {
+          "contextWindow": 372000
+        },
+        "gpt-6.1-terra": {
+          "contextWindow": 372000
+        },
+        "gpt-6-luna": {
+          "contextWindow": 372000
+        }
+      }
+    },
     "zai": {
       "baseUrl": "https://api.z.ai/api/coding/paas/v4",
       "apiKey": "$ZAI_API_KEY",
