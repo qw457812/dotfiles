@@ -760,18 +760,18 @@ const sources: Record<string, Source> = {
   // Ref: https://github.com/patlux/pi-commandcode-provider/blob/96356698fa046f0e14cd9bdf622454aa8ff4750a/src/quota.ts
   commandcode: createSource("commandcode", {
     cacheTtlMs: MINUTE_MS,
-    async getAuth(): Promise<string | null> {
-      return process.env.COMMANDCODE_API_KEY || null;
+    async getAuth(modelRegistry): Promise<string | null> {
+      return (await modelRegistry.getApiKeyForProvider("commandcode")) ?? null;
     },
-    async fetch(apiKey: string): Promise<CommandCodeQuota | null> {
+    async fetch(token: string): Promise<CommandCodeQuota | null> {
       const [quota, sub] = await Promise.all([
         fetchJson<CommandCodeQuota["quota"]>(
           "https://api.commandcode.ai/alpha/billing/credits",
-          apiKey,
+          token,
         ),
         fetchJson<{ data?: CommandCodeQuota["sub"] }>(
           "https://api.commandcode.ai/alpha/billing/subscriptions",
-          apiKey,
+          token,
         ),
       ]);
       return quota ? { quota, sub: sub?.data ?? null } : null;
