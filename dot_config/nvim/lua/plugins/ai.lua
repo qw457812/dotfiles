@@ -251,6 +251,14 @@ return {
   { "qw457812/claude-code-sourcemap", pin = true, lazy = true, config = function() end },
 
   {
+    "folke/zaly",
+    version = "*",
+    lazy = true,
+    build = "npm install -g @zaly/cli",
+    config = function() end,
+  },
+
+  {
     "deepseek-ai/deepseek-harness",
     -- version = "*",
     tag = "dsh-v0.1.5-rc.1",
@@ -319,6 +327,7 @@ return {
         -- ["<leader>ag"] = "claude_glm",
         ["<leader>at"] = "pi_tmp",
         ["<leader>ae"] = "dsh",
+        ["<leader>az"] = "zaly",
       }
       local favourite_tool = "pi"
       for i = 1, 9 do
@@ -429,6 +438,7 @@ return {
         count = 0,
       })
       numbered_tools({ name = "dsh", count = 1 })
+      numbered_tools({ name = "zaly", count = 1 })
 
       opts.cli.mux = opts.cli.mux or {}
       local use_herdr = opts.cli.mux.backend == "herdr"
@@ -827,6 +837,16 @@ return {
             keys = {
               blur_t = false, -- dsh uses <c-o> for its own functionality
               prompt = false, -- dsh uses <c-p> for its own functionality
+            },
+          },
+          zaly = {
+            cmd = { "zaly" },
+            is_proc = "\\<zaly\\>",
+            url = "https://github.com/folke/zaly",
+            env = {
+              MANPAGER = "col -bx",
+              __AI_AGENT = "zaly",
+              NVIM_FLATTEN_NEST = "1",
             },
           },
           -- debug = { cmd = { "bash", "-c", "env | sort | bat -l env" } },

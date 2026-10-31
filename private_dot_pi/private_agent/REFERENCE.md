@@ -2,6 +2,7 @@
 - <https://github.com/openai/codex>
 - <https://github.com/anomalyco/opencode>
 - <https://github.com/deepseek-ai/deepseek-harness>
+- <https://github.com/folke/zaly>
 - <https://github.com/openclaw/openclaw>
 - <https://github.com/can1357/oh-my-pi>
 - <https://github.com/JetBrains/thinkrail>
