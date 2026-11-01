@@ -5,6 +5,7 @@ import {
   installClipboardBridge,
   readMacOSClipboard,
   readTermuxClipboard,
+  readWaylandClipboard,
   writeTermuxClipboard,
 } from "../../extensions/prompt-editor/clipboard.ts";
 
@@ -107,6 +108,29 @@ describe("Termux clipboard reads", () => {
   });
 });
 
+describe("Wayland clipboard reads", () => {
+  it.each([" 中文 😀\nsecond line\n", ""])("preserves text %j", (text) => {
+    sync.mockReturnValue(result({ stdout: text }));
+    expect(readWaylandClipboard()).toBe(text);
+    expect(sync).toHaveBeenCalledWith("wl-paste", ["--no-newline"], expect.objectContaining({
+      timeout: 1000,
+      maxBuffer: 1024 * 1024,
+      encoding: "utf8",
+    }));
+  });
+  it.each([{ status: 1 }, { signal: "SIGTERM" }, { error: new Error("timeout") }])(
+    "falls back on failure: %j",
+    (failure) => {
+      sync.mockReturnValue(result({ stdout: "partial", ...failure }));
+      expect(readWaylandClipboard()).toBeNull();
+    },
+  );
+  it("falls back when spawning throws", () => {
+    sync.mockImplementation(() => { throw new Error("spawn failed"); });
+    expect(readWaylandClipboard()).toBeNull();
+  });
+});
+
 describe("clipboard bridge", () => {
   function editor() {
     return { setClipboardReadFn: vi.fn(), setClipboardFn: vi.fn() };
@@ -139,11 +163,31 @@ describe("clipboard bridge", () => {
   it("leaves other platforms untouched", () => {
     setPlatform("linux");
     vi.stubEnv("PREFIX", "");
+    vi.stubEnv("WAYLAND_DISPLAY", "");
     const target = editor();
     installClipboardBridge(target);
     expect(target.setClipboardReadFn).not.toHaveBeenCalled();
     expect(target.setClipboardFn).not.toHaveBeenCalled();
     expect(sync).not.toHaveBeenCalled();
+  });
+  it("installs Wayland reads when wl-paste is available", () => {
+    setPlatform("linux");
+    vi.stubEnv("PREFIX", "");
+    vi.stubEnv("WAYLAND_DISPLAY", "wayland-0");
+    sync.mockReturnValue(result());
+    const target = editor();
+    installClipboardBridge(target);
+    expect(target.setClipboardReadFn).toHaveBeenCalledWith(readWaylandClipboard);
+    expect(target.setClipboardFn).not.toHaveBeenCalled();
+  });
+  it("leaves the default reader in place when wl-paste is missing", () => {
+    setPlatform("linux");
+    vi.stubEnv("PREFIX", "");
+    vi.stubEnv("WAYLAND_DISPLAY", "wayland-0");
+    sync.mockReturnValue(result({ status: 1 }));
+    const target = editor();
+    installClipboardBridge(target);
+    expect(target.setClipboardReadFn).not.toHaveBeenCalled();
   });
   it.each([0, 1])("requires both Termux commands (missing %i)", (missing) => {
     setPlatform("android");

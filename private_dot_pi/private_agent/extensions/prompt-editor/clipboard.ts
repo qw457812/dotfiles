@@ -48,6 +48,22 @@ function isTermuxClipboardAvailable(): boolean {
   );
 }
 
+export function readWaylandClipboard(): string | null {
+  try {
+    const result = spawnSync("wl-paste", ["--no-newline"], {
+      encoding: "utf8",
+      maxBuffer: CLIPBOARD_READ_MAX_BUFFER_BYTES,
+      stdio: ["ignore", "pipe", "ignore"],
+      timeout: CLIPBOARD_COMMAND_TIMEOUT_MS,
+      windowsHide: true,
+    });
+    if (result.error || result.status !== 0 || result.signal) return null;
+    return result.stdout ?? "";
+  } catch {
+    return null;
+  }
+}
+
 export function readTermuxClipboard(): string | null {
   try {
     const result = spawnSync(TERMUX_CLIPBOARD_GET, [], {
@@ -155,12 +171,18 @@ export function installClipboardBridge(editor: ClipboardEditor): void {
     editor.setClipboardReadFn?.(readMacOSClipboard);
     return;
   }
-  if (!isTermuxClipboardAvailable()) return;
-
-  // pi-vim's default clipboard helper uses @mariozechner/clipboard. In
-  // Termux that often cannot read Android's clipboard, so normal-mode `p`
-  // falls back to pi-vim's unnamed register (for example the last `yy`).
-  // Use Termux:API directly so `p` sees text copied outside pi.
-  editor.setClipboardReadFn?.(readTermuxClipboard);
-  editor.setClipboardFn?.(writeTermuxClipboard);
+  if (isTermuxClipboardAvailable()) {
+    // Use Termux:API directly to access Android's clipboard.
+    editor.setClipboardReadFn?.(readTermuxClipboard);
+    editor.setClipboardFn?.(writeTermuxClipboard);
+    return;
+  }
+  if (
+    process.platform === "linux" &&
+    !process.env.PREFIX?.includes("com.termux") &&
+    process.env.WAYLAND_DISPLAY &&
+    commandExists("wl-paste")
+  ) {
+    editor.setClipboardReadFn?.(readWaylandClipboard);
+  }
 }
