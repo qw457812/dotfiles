@@ -62,7 +62,7 @@ return {
         config = function() end,
       },
       {
-        "badlogic/explainer",
+        "earendil-works/explainer",
         build = "npm install --ignore-scripts",
         lazy = true,
         config = function() end,
