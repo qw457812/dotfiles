@@ -25,6 +25,8 @@ Library/
 {{ end }}
 
 {{ if ne .chezmoi.os "linux" }}
+.local/share/applications/kanata-focus-glide.desktop
+.local/share/applications/kanata-focus-kitty.desktop
 .local/bin/kde-focus-or-launch
 .config/systemd/user/kanata.service
 {{ end }}

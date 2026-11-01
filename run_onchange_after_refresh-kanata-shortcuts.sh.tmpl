@@ -1,0 +1,47 @@
+{{ if eq .chezmoi.os "linux" -}}
+#!/bin/sh
+set -eu
+
+# Refresh when either shortcut declaration changes.
+# {{ include "dot_local/share/applications/kanata-focus-glide.desktop.tmpl" | sha256sum }}
+# {{ include "dot_local/share/applications/kanata-focus-kitty.desktop.tmpl" | sha256sum }}
+
+case ":${XDG_CURRENT_DESKTOP:-}:" in
+  *:KDE:*) ;;
+  *) exit 0 ;;
+esac
+
+# KSycoca's databaseChanged signal lets KGlobalAccel discover the shortcuts.
+# Do not restart KWin, which may host KGlobalAccel on KDE Wayland.
+if command -v kbuildsycoca6 >/dev/null 2>&1; then
+  kbuildsycoca6 --noincremental
+fi
+
+if ! command -v gdbus >/dev/null 2>&1; then
+  exit 0
+fi
+
+# Update only our two actions: refreshing KSycoca discovers new components,
+# but does not replace shortcuts already loaded in the current session.
+# Qt key values: Ctrl|Alt|Shift|Meta (0x1e000000) plus U/K (0x55/0x4b).
+for app in glide kitty; do
+  case "$app" in
+    glide) key=503316565; name='Focus or launch Glide' ;;
+    kitty) key=503316555; name='Focus or launch Kitty' ;;
+  esac
+  component="kanata-focus-$app.desktop"
+  attempts=0
+  until gdbus call --session --dest org.kde.kglobalaccel --object-path /kglobalaccel \
+    --method org.kde.KGlobalAccel.getComponent "$component" >/dev/null 2>&1; do
+    attempts=$((attempts + 1))
+    if [ "$attempts" -ge 30 ]; then
+      printf 'KDE shortcut component was not registered: %s\n' "$component" >&2
+      exit 1
+    fi
+    sleep 0.1
+  done
+  gdbus call --session --dest org.kde.kglobalaccel --object-path /kglobalaccel \
+    --method org.kde.KGlobalAccel.setForeignShortcut \
+    "['$component', '_launch', '$name', '$name']" "[$key]" >/dev/null
+done
+{{ end -}}
