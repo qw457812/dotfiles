@@ -206,6 +206,10 @@ require("lazy").setup({
       ["<leader>gY"] = {
         function(plugin)
           local url = plugin.url:gsub("%.git$", "")
+          local commit = vim.api.nvim_get_current_line():match("%f[%w](" .. string.rep("[a-f0-9]", 7) .. ")%f[%W]")
+          if commit then
+            url = url .. "/commit/" .. commit
+          end
           vim.fn.setreg(vim.v.register, url)
           LazyVim.info(url, { title = "Copied URL" })
         end,
