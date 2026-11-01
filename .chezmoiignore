@@ -25,6 +25,8 @@ Library/
 {{ end }}
 
 {{ if ne .chezmoi.os "linux" }}
+.config/fcitx5/
+.local/share/fcitx5/
 .local/share/applications/kanata-focus-glide.desktop
 .local/share/applications/kanata-focus-kitty.desktop
 .local/bin/kde-focus-or-launch

@@ -1,0 +1,18 @@
+{{ if eq .chezmoi.os "linux" -}}
+#!/bin/sh
+set -eu
+
+# Tiger Code official single-character table, 2026-08-15.
+# {{ include "dot_local/share/fcitx5/table/tiger.source.txt" | sha256sum }}
+
+if ! command -v libime_tabledict >/dev/null 2>&1; then
+  echo 'libime_tabledict is required to compile the Tiger Code table.' >&2
+  exit 1
+fi
+
+table_dir="${HOME}/.local/share/fcitx5/table"
+tmp=$(mktemp "$table_dir/.tiger.main.dict.XXXXXX")
+trap 'rm -f "$tmp"' EXIT HUP INT TERM
+libime_tabledict "$table_dir/tiger.source.txt" "$tmp"
+mv -f "$tmp" "$table_dir/tiger.main.dict"
+{{ end -}}
