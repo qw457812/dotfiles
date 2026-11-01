@@ -39,6 +39,7 @@
     "plugins.extras.lsp.tiny-inline-diagnostic",
     "plugins.extras.ui.border",
     "plugins.extras.ui.dropbar",
+    "plugins.extras.util.chezmoi-template",
     "plugins.extras.util.kitty-scrollback",
     "plugins.extras.util.tmux",
     "plugins.extras.util.translate",
@@ -47,7 +48,7 @@
   "install_version": 8,
   "news": {
     "NEWS.md": "11866",
-    "doc/news.txt": "21516"
+    "doc/news.txt": "30038"
   },
   "version": 8
 }
