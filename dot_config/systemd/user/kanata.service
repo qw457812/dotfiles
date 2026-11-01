@@ -4,6 +4,7 @@ Documentation=https://github.com/jtroo/kanata
 
 [Service]
 Type=simple
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
 ExecStart=%h/.cargo/bin/kanata --cfg %h/.config/kanata/config.kbd --no-wait
 Restart=on-failure
 RestartSec=3
