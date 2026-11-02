@@ -1,6 +1,7 @@
 symlinks/
 packages/
 dsh-plugins/
+windows/
 backup/
 README.md
 CLAUDE.md
