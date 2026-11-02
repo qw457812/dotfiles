@@ -32,6 +32,8 @@ Library/
 .local/share/fcitx5/
 .local/share/applications/kanata-focus-glide.desktop
 .local/share/applications/kanata-focus-kitty.desktop
+.local/share/applications/kanata-focus-krdc.desktop
+.local/share/applications/kanata-focus-bitwarden.desktop
 .local/bin/kde-focus-or-launch
 .config/systemd/user/kanata.service
 {{ end }}

@@ -7,7 +7,7 @@
 )
 
 (defsrc
-  spc v m f j k scln lmet lalt rmet
+  spc v m f j k scln lmet lalt rmet l
 )
 
 (defalias
@@ -21,7 +21,7 @@
   cmd-alone (tap-hold-press 0 250 A-tab lmet)
   ;; Globally send the tmux prefix on tap; hold as Alt.
   option-alone (tap-hold-press 0 250 C-b lalt)
-  ;; Preserve right Super; KDE handles Ctrl+Alt+Shift+Meta+U/K.
+  ;; Preserve right Super; KDE handles Ctrl+Alt+Shift+Meta+U/K/L/B.
   ;; Use letters to avoid Apple/XKB function-key and multimedia mappings.
   launcher (multi rmet (layer-while-held launcher))
   ;; Other standard keys resolve to plain f; only j activates f-mode.
@@ -39,15 +39,15 @@
 )
 
 (deflayer base
-  @space-shift @v-ctrl @m-ctrl @f-layer j k @semicolon @cmd-alone @option-alone @launcher
+  @space-shift @v-ctrl @m-ctrl @f-layer j k @semicolon @cmd-alone @option-alone @launcher l
 )
 
 (deflayer f-mode
-  _ _ _ _ bspc _ _ _ _ _
+  _ _ _ _ bspc _ _ _ _ _ _
 )
 
 (deflayer launcher
-  _ _ _ _ C-A-S-u C-A-S-k _ _ _ _
+  C-A-S-b _ _ _ C-A-S-u C-A-S-k _ _ _ _ C-A-S-l
 )
 
 ;; Match the original Goku profile's 30 ms simultaneous-key window.

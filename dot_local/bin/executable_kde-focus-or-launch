@@ -5,8 +5,10 @@ set -eu
 case "${1:-}" in
   glide) class='^glide-glide$' ;;
   kitty) class='^kitty$' ;;
+  krdc) class='^org\.kde\.krdc$' ;;
+  bitwarden) class='^bitwarden$' ;;
   *)
-    printf 'Usage: %s glide|kitty\n' "$0" >&2
+    printf 'Usage: %s glide|kitty|krdc|bitwarden\n' "$0" >&2
     exit 2
     ;;
 esac
@@ -21,4 +23,6 @@ fi
 case "$1" in
   glide) exec systemd-run --user --collect -- "$HOME/.local/bin/glide" ;;
   kitty) exec systemd-run --user --collect -- /usr/bin/kitty ;;
+  krdc) exec systemd-run --user --collect -- /usr/bin/krdc ;;
+  bitwarden) exec systemd-run --user --collect -- /usr/local/bin/bitwarden ;;
 esac
