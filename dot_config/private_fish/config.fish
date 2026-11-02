@@ -349,6 +349,6 @@ if set -q TERMUX_VERSION
     if not set -q TMUX; and test "$HERDR_ENV" != 1
         tmux attach || tmux
     end
-else
+else if test (uname) != Linux
     proxy env on
 end

@@ -151,7 +151,7 @@ return {
       --    - scrollback_pager nvim --cmd "lua vim.g.terminal_scrollback_pager = true" -c "lua require('util.terminal').kitty_scrollback_pager(INPUT_LINE_NUMBER, CURSOR_LINE, CURSOR_COLUMN)"
       --    - mikesmithgh/kitty-scrollback.nvim
       -- 2. neovide
-      if vim.g.terminal_scrollback_pager or vim.g.neovide then
+      if not vim.g.user_is_asahi and (vim.g.terminal_scrollback_pager or vim.g.neovide) then
         vim.env.http_proxy = vim.env.http_proxy or proxy.http
         vim.env.HTTP_PROXY = vim.env.HTTP_PROXY or proxy.http
         vim.env.https_proxy = vim.env.https_proxy or proxy.https
@@ -171,7 +171,7 @@ return {
     ---@module "sidekick"
     ---@param opts sidekick.Config
     opts = function(_, opts)
-      local proxy_env = vim.g.user_is_termux and {}
+      local proxy_env = (vim.g.user_is_termux or vim.g.user_is_asahi) and {}
         or {
           http_proxy = vim.env.http_proxy or proxy.http,
           HTTP_PROXY = vim.env.HTTP_PROXY or proxy.http,
