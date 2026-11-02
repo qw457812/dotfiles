@@ -37,6 +37,8 @@ return {
   -- https://github.com/morluto/rea
   --
   -- https://github.com/google/artemis
+  --
+  -- https://github.com/unclebob/ub-mode
   {
     "earendil-works/pi",
     version = "*",
@@ -251,6 +253,8 @@ return {
     config = function() end,
   },
 
+  -- https://github.com/deepseek-ai/dsh-superagent-prototype
+  -- https://github.com/Mooling0602/dsh-termux-fix
   {
     "deepseek-ai/deepseek-harness",
     -- version = "*",
