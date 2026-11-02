@@ -21,6 +21,7 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { Markdown, type MarkdownTheme, stripTerminalSequences } from "@earendil-works/pi-tui";
 import { spawn } from "node:child_process";
+import { randomUUID } from "node:crypto";
 
 // requires `set -g allow-passthrough on` in tmux config
 const wrapForTmux = (seq: string): string => {
@@ -32,8 +33,9 @@ const notifyOSC99 = (title: string, body: string): void => {
 	const encode = (value: string): string => Buffer.from(value, "utf8").toString("base64");
 
 	// Kitty OSC 99: i=notification id, d=0 means not done yet, p=body for second part, e=1 means base64 payload
-	process.stdout.write(wrapForTmux(`\x1b]99;i=1:d=0:e=1;${encode(title)}\x1b\\`));
-	process.stdout.write(wrapForTmux(`\x1b]99;i=1:p=body:e=1;${encode(body)}\x1b\\`));
+	const id = randomUUID();
+	process.stdout.write(wrapForTmux(`\x1b]99;i=${id}:d=0:e=1;${encode(title)}\x1b\\`));
+	process.stdout.write(wrapForTmux(`\x1b]99;i=${id}:p=body:e=1;${encode(body)}\x1b\\`));
 };
 
 const notifyOSC777 = (title: string, body: string): void => {
