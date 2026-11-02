@@ -7,8 +7,9 @@ case "${1:-}" in
   kitty) class='^kitty$' ;;
   krdc) class='^org\.kde\.krdc$' ;;
   bitwarden) class='^bitwarden$' ;;
+  settings) class='^systemsettings$' ;;
   *)
-    printf 'Usage: %s glide|kitty|krdc|bitwarden\n' "$0" >&2
+    printf 'Usage: %s glide|kitty|krdc|bitwarden|settings\n' "$0" >&2
     exit 2
     ;;
 esac
@@ -25,4 +26,5 @@ case "$1" in
   kitty) exec systemd-run --user --collect -- /usr/bin/kitty ;;
   krdc) exec systemd-run --user --collect -- /usr/bin/krdc ;;
   bitwarden) exec systemd-run --user --collect -- /usr/local/bin/bitwarden ;;
+  settings) exec systemd-run --user --collect -- /usr/bin/systemsettings ;;
 esac
