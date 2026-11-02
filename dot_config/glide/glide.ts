@@ -305,12 +305,16 @@ glide.keymaps.set("normal", "<C-p>", async ({ tab_id }) => {
 glide.keymaps.set("normal", "<leader><BS>", "quit");
 glide.keymaps.set("normal", "<leader>,", "commandline_show tab ");
 for (let i = 1; i <= 9; i++) {
-  glide.keymaps.set("normal", `<leader>${i}`, `keys <D-${i}>`);
+  glide.keymaps.set(
+    "normal",
+    `<leader>${i}`,
+    `keys <${glide.ctx.os === "macosx" ? "D" : "A"}-${i}>`,
+  );
 }
-glide.keymaps.set("normal", "gh", "keys <D-1>");
-glide.keymaps.set("normal", "gl", "keys <D-9>");
-glide.keymaps.set("normal", "<leader>bH", "keys <D-1>");
-glide.keymaps.set("normal", "<leader>bL", "keys <D-9>");
+glide.keymaps.set("normal", "gh", glide.ctx.os === "macosx" ? "keys <D-1>" : "keys <A-1>");
+glide.keymaps.set("normal", "gl", glide.ctx.os === "macosx" ? "keys <D-9>" : "keys <A-9>");
+glide.keymaps.set("normal", "<leader>bH", glide.ctx.os === "macosx" ? "keys <D-1>" : "keys <A-1>");
+glide.keymaps.set("normal", "<leader>bL", glide.ctx.os === "macosx" ? "keys <D-9>" : "keys <A-9>");
 glide.keymaps.set(
   "normal",
   "<leader>bh",
@@ -424,7 +428,14 @@ glide.keymaps.set(["normal", "insert"], "<C-q>", focus_page);
 glide.keymaps.set("command", "<c-j>", "commandline_focus_next");
 glide.keymaps.set("command", "<c-k>", "commandline_focus_back");
 glide.keymaps.set("command", "<c-w>", "keys <A-BS>");
-glide.keymaps.set("command", "<c-u>", "keys <D-BS>");
+glide.keymaps.set("command", "<c-u>", async () => {
+  if (glide.ctx.os === "macosx") {
+    await glide.keys.send("<D-BS>", { skip_mappings: true });
+  } else {
+    await glide.keys.send("<S-Home>", { skip_mappings: true });
+    await glide.keys.send("<BS>", { skip_mappings: true });
+  }
+});
 glide.keymaps.set("command", "<c-d>", "keys <Del>");
 
 // Autocmds
