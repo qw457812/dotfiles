@@ -111,7 +111,6 @@
   "pi-computer-use": { "branch": "main", "commit": "4b8dbd7eaa13328ab1a8a4b55d0be0b077de7d62" },
   "pi-coralbricks-provider": { "branch": "main", "commit": "e0fd4a95806525ba73e8c7830140dca81ee629a8" },
   "pi-guardrails": { "branch": "main", "commit": "31b466cdf3b61ca89361781f07529b7d53377ca1" },
-  "pi-hyper-provider": { "branch": "main", "commit": "4d4e84e979eb86b3e9d27e311e8ab32e1e56d38a" },
   "pi-invisible-continue": { "branch": "main", "commit": "93969f4912a953e58d73fded9575992e6c4e8a66" },
   "pi-neuralwatt-provider": { "branch": "main", "commit": "96805891433a992306ed0ebbbcf8d2234a928955" },
   "pi-provider-kiro": { "branch": "main", "commit": "dd93f2e884b60cecd85c7fb4a818fb6d64ba3dba" },

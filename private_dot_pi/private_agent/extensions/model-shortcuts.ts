@@ -30,7 +30,6 @@ const ALIASES: Record<string, ModelTarget | readonly ModelTarget[]> = {
     { provider: "commandcode", id: "z-ai/glm-5.3-flash" },
     { provider: "neuralwatt", id: "glm-5.3-flash" },
     { provider: "codebuddy", id: "glm-5.3-flash" },
-    { provider: "hyper", id: "glm-5.3-flash" },
   ],
   ds: [
     { provider: "codebuddy", id: "deepseek-v4.1-flash" },
@@ -38,7 +37,6 @@ const ALIASES: Record<string, ModelTarget | readonly ModelTarget[]> = {
     { provider: "neuralwatt", id: "deepseek-v4.1-flash" },
     { provider: "neuralwatt", id: "deepseek-v4.1-flash-canary" },
     { provider: "coralbricks", id: "deepseek-v4.1-flash-fast" },
-    { provider: "hyper", id: "deepseek-v4.1-flash-1017" },
   ],
   mimo: [
     { provider: "commandcode", id: "xiaomi/mimo-v2.6-pro" },
