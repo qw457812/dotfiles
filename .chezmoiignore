@@ -26,6 +26,8 @@ Library/
 {{ end }}
 
 {{ if ne .chezmoi.os "linux" }}
+.config/fish/functions/win-proxy.fish
+.config/fish/completions/win-proxy.fish
 .config/fcitx5/
 .local/share/fcitx5/
 .local/share/applications/kanata-focus-glide.desktop

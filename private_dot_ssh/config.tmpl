@@ -14,6 +14,14 @@ Host *
 
 Include config.local
 
+{{ if eq .chezmoi.os "linux" }}
+# https://github.com/qw457812/dotfiles/blob/7daf02631a7137ea2ebb1df88d2de0b4c23d2213/windows/docker-compose.yml#L22
+Host win-vm
+  HostName 127.0.0.1
+  Port 2222
+  User {{ env "WIN_USER" }}
+{{ end }}
+
 Host gh
   Hostname github.com
   User git
