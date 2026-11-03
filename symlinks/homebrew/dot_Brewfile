@@ -530,6 +530,8 @@ cask "alt-tab"
 cask "android-platform-tools"
 # Display management tool
 cask "betterdisplay"
+# Desktop password and login vault
+cask "bitwarden"
 # Web browser focusing on privacy
 cask "brave-browser"
 # Ghostty-based terminal with vertical tabs and notifications for AI coding agents
@@ -608,7 +610,6 @@ cask "wezterm@nightly"
 cask "xurl"
 # Multiplayer code editor
 cask "zed"
-mas "Bitwarden", id: 1352778147
 mas "Blackmagic Disk Speed Test", id: 425264550
 mas "GarageBand", id: 682658836
 mas "iMovie", id: 408981434

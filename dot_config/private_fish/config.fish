@@ -23,6 +23,10 @@ set -q XDG_CONFIG_HOME; or set -gx XDG_CONFIG_HOME "$HOME/.config"
 set -gx EDITOR (which nvim)
 set -gx VISUAL $EDITOR
 set -gx SUDO_EDITOR $EDITOR
+if test (uname) = Darwin
+    # Bitwarden SSH agent
+    set -gx SSH_AUTH_SOCK "$HOME/.bitwarden-ssh-agent.sock"
+end
 
 if status is-interactive # https://github.com/ndonfris/fish-lsp/blob/1be77fcfa37d9d3877994f14163c7faacf7a533e/fish_files/get-documentation.fish
     # set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
