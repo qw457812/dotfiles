@@ -47,6 +47,56 @@ Object.entries(search_engines).forEach(([keyword, url]) => {
   });
 });
 
+// Extensions
+const extensions = [
+  {
+    name: "Awesome Screenshot: Screen capture, Annotate",
+    url: "https://addons.mozilla.org/firefox/downloads/file/4623093/screenshot_capture_annotate-4.3.7.21.xpi",
+    private_browsing_allowed: false,
+  },
+  {
+    name: "Bitwarden Password Manager",
+    url: "https://addons.mozilla.org/firefox/downloads/file/5198653/bitwarden_password_manager-2026.10.2.xpi",
+    private_browsing_allowed: true,
+  },
+  {
+    name: "Dark Reader",
+    url: "https://addons.mozilla.org/firefox/downloads/file/5175215/darkreader-4.9.134.xpi",
+    private_browsing_allowed: true,
+  },
+  {
+    name: "floccus bookmarks sync",
+    url: "https://addons.mozilla.org/firefox/downloads/file/5156500/floccus-5.12.0.xpi",
+    private_browsing_allowed: true,
+  },
+  {
+    name: "I still don't care about cookies",
+    url: "https://addons.mozilla.org/firefox/downloads/file/4637154/istilldontcareaboutcookies-1.1.9.xpi",
+    private_browsing_allowed: true,
+  },
+  {
+    name: "KISS Translator",
+    url: "https://addons.mozilla.org/firefox/downloads/file/5117268/kiss_translator-2.1.1.xpi",
+    private_browsing_allowed: true,
+  },
+  {
+    name: "Refined GitHub",
+    url: "https://addons.mozilla.org/firefox/downloads/file/5167698/refined_github-26.10.26.xpi",
+    private_browsing_allowed: true,
+  },
+  {
+    name: "uBlock Origin",
+    url: "https://addons.mozilla.org/firefox/downloads/file/5199068/ublock_origin-1.75.2.xpi",
+    private_browsing_allowed: true,
+  },
+];
+
+for (const { name, url, private_browsing_allowed } of extensions) {
+  void glide.addons.install(url, { private_browsing_allowed }).catch((error) => {
+    console.error(`Failed to install ${name}:`, error);
+  });
+}
+
 // Env
 if (glide.ctx.os === "macosx") {
   glide.env.set("PATH", `/opt/homebrew/bin:${glide.env.get("PATH")}`);
