@@ -35,8 +35,7 @@
  * the active branch contains a previous todo tool call. After enabling it, this
  * extension does not disable it again.
  */
-import { DynamicBorder, copyToClipboard, getMarkdownTheme, keyHint, type ExtensionAPI, type ExtensionContext, type Theme } from "@earendil-works/pi-coding-agent";
-import { StringEnum } from "@earendil-works/pi-ai";
+import { DynamicBorder, copyToClipboard, getMarkdownTheme, type KeybindingHints, type ExtensionAPI, type ExtensionContext, type Theme } from "@earendil-works/pi-coding-agent";
 import { Type } from "typebox";
 import path from "node:path";
 import fs from "node:fs/promises";
@@ -101,7 +100,7 @@ type KeybindingMatcher = {
 };
 
 const TodoParams = Type.Object({
-	action: StringEnum([
+	action: Type.Enum([
 		"list",
 		"list-all",
 		"get",
@@ -1293,8 +1292,8 @@ function renderTodoDetail(theme: Theme, todo: TodoRecord, expanded: boolean): st
 	return lines.join("\n");
 }
 
-function appendExpandHint(theme: Theme, text: string): string {
-	return `${text}\n${theme.fg("dim", `(${keyHint("app.tools.expand", "to expand")})`)}`;
+function appendExpandHint(theme: Theme, text: string, hints: KeybindingHints): string {
+	return `${text}\n${theme.fg("dim", `(${hints.keyHint("app.tools.expand", "to expand")})`)}`;
 }
 
 async function ensureTodoExists(filePath: string, id: string): Promise<TodoRecord | null> {
@@ -1802,7 +1801,7 @@ export default function todosExtension(pi: ExtensionAPI) {
 			return new Text(text, 0, 0);
 		},
 
-		renderResult(result, { expanded, isPartial }, theme) {
+		renderResult(result, { expanded, isPartial }, theme, context) {
 			const details = result.details as TodoToolDetails | undefined;
 			if (isPartial) {
 				return new Text(theme.fg("warning", "Processing..."), 0, 0);
@@ -1821,7 +1820,7 @@ export default function todosExtension(pi: ExtensionAPI) {
 				if (!expanded) {
 					const { closedTodos } = splitTodosByAssignment(details.todos);
 					if (closedTodos.length) {
-						text = appendExpandHint(theme, text);
+						text = appendExpandHint(theme, text, context);
 					}
 				}
 				return new Text(text, 0, 0);
@@ -1853,7 +1852,7 @@ export default function todosExtension(pi: ExtensionAPI) {
 				text = lines.join("\n");
 			}
 			if (!expanded) {
-				text = appendExpandHint(theme, text);
+				text = appendExpandHint(theme, text, context);
 			}
 			return new Text(text, 0, 0);
 		},

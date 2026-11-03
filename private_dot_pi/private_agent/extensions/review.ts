@@ -1122,7 +1122,7 @@ export default function reviewExtension(pi: ExtensionAPI) {
 						tui.requestRender();
 					},
 				};
-			});
+			}, { blocked: { kind: "question", message: "Select a review preset" } });
 
 			if (!result) return null;
 
@@ -1308,7 +1308,7 @@ export default function reviewExtension(pi: ExtensionAPI) {
 					tui.requestRender();
 				},
 			};
-		});
+		}, { blocked: { kind: "question", message: "Select a base branch for review" } });
 
 		if (!result) return null;
 		return { type: "baseBranch", branch: result };
@@ -1414,7 +1414,7 @@ export default function reviewExtension(pi: ExtensionAPI) {
 					tui.requestRender();
 				},
 			};
-		});
+		}, { blocked: { kind: "question", message: "Select a commit to review" } });
 
 		if (!result) return null;
 		return { type: "commit", sha: result.sha, title: result.title };

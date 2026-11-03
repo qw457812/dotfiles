@@ -12,7 +12,7 @@
 import {
   DEFAULT_MAX_BYTES,
   formatSize,
-  keyHint,
+  type KeybindingHints,
   type TruncationResult,
 } from "@earendil-works/pi-coding-agent";
 import { Container, Text, truncateToWidth } from "@earendil-works/pi-tui";
@@ -107,6 +107,7 @@ export function rebuildWebfetchResultRenderComponent(
   theme: any,
   state: WebfetchRenderState,
   isError: boolean,
+  hints: KeybindingHints,
 ): void {
   const cState = component.state;
   component.clear();
@@ -205,7 +206,7 @@ export function rebuildWebfetchResultRenderComponent(
           if (cState.cachedSkipped && cState.cachedSkipped > 0) {
             const hint =
               theme.fg("muted", `... (${cState.cachedSkipped} more lines,`) +
-              ` ${keyHint("app.tools.expand", "to expand")})`;
+              ` ${hints.keyHint("app.tools.expand", "to expand")})`;
             return [...(cState.cachedLines ?? []), truncateToWidth(hint, width, "...")];
           }
           return cState.cachedLines ?? [];

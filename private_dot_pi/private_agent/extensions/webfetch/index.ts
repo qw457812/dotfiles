@@ -25,7 +25,6 @@
  * - No permission gate (unlike OpenCode which requires webfetch permission)
  */
 
-import { StringEnum } from "@earendil-works/pi-ai";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import {
   DEFAULT_MAX_BYTES,
@@ -260,7 +259,7 @@ const WebFetchParamsSchema = Type.Object({
     description: "The HTTP or HTTPS URL to fetch content from",
   }),
   format: Type.Optional(
-    StringEnum(["text", "markdown", "html"] as const, {
+    Type.Enum(["text", "markdown", "html"] as const, {
       description: "The format to return the content in. Defaults to markdown.",
     }),
   ),
@@ -452,6 +451,7 @@ export default function (pi: ExtensionAPI) {
         theme,
         state,
         context.isError,
+        context,
       );
       component.invalidate();
       return component;

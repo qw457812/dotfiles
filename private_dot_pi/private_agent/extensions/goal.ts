@@ -14,7 +14,6 @@
 
 import { randomUUID } from "node:crypto";
 
-import { StringEnum } from "@earendil-works/pi-ai";
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { Type } from "typebox";
 
@@ -53,7 +52,7 @@ const CreateGoalParams = Type.Object({
 });
 
 const UpdateGoalParams = Type.Object({
-	status: StringEnum(["complete", "blocked"] as const),
+	status: Type.Enum(["complete", "blocked"] as const),
 });
 
 function nowSeconds(): number {

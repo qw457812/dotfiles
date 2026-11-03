@@ -568,6 +568,14 @@ function commandFixture() {
 }
 
 describe("answer-grilling command", () => {
+  it("reports waiting for answers through the host program status", async () => {
+    const fixture = commandFixture();
+    await fixture.run();
+    expect(fixture.custom).toHaveBeenCalledWith(expect.any(Function), {
+      blocked: { kind: "question", message: "Answer the grilling questions" },
+    });
+  });
+
   function message(role: string, text: string, stopReason = "stop") {
     return {
       id: `${role}-${text}`,

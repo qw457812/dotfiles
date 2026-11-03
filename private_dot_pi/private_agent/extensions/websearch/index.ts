@@ -302,6 +302,7 @@ export default function (pi: ExtensionAPI) {
         theme,
         state,
         context.isError,
+        context,
       );
       component.invalidate();
       return component;

@@ -565,7 +565,7 @@ export default function (pi: ExtensionAPI) {
 			// Show the Q&A component
 			const answersResult = await ctx.ui.custom<string | null>((tui, _theme, _kb, done) => {
 				return new QnAComponent(extractionResult.questions, tui, done);
-			});
+			}, { blocked: { kind: "question", message: "Answer the extracted questions" } });
 
 			if (answersResult === null) {
 				ctx.ui.notify("Cancelled", "info");

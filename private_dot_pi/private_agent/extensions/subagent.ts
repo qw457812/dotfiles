@@ -7,7 +7,6 @@ import { mkdir, readFile, rename, stat, writeFile } from "node:fs/promises";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { StringEnum } from "@earendil-works/pi-ai";
 import {
 	DEFAULT_MAX_BYTES,
 	DEFAULT_MAX_LINES,
@@ -454,7 +453,7 @@ export default function subagentExtension(pi: ExtensionAPI): void {
 				Type.String({ description: "Model id or provider/model override. Defaults to the current model." }),
 			),
 			thinking: Type.Optional(
-				StringEnum(THINKING_LEVELS, {
+				Type.Enum(THINKING_LEVELS, {
 					description: "Thinking level override. Defaults to the current thinking level.",
 				}),
 			),

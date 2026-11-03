@@ -326,6 +326,7 @@ export default function (pi: ExtensionAPI) {
           keybindings,
           SettingsManager.create(ctx.cwd).getExternalEditorCommand(),
         ),
+      { blocked: { kind: "question", message: "Answer the grilling questions" } },
     );
     if (result === null) return;
     if (
