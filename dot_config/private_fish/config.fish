@@ -23,8 +23,7 @@ set -q XDG_CONFIG_HOME; or set -gx XDG_CONFIG_HOME "$HOME/.config"
 set -gx EDITOR (which nvim)
 set -gx VISUAL $EDITOR
 set -gx SUDO_EDITOR $EDITOR
-if test (uname) = Darwin
-    # Bitwarden SSH agent
+if test (uname) = Darwin; or test (uname) = Linux; and not set -q TERMUX_VERSION
     set -gx SSH_AUTH_SOCK "$HOME/.bitwarden-ssh-agent.sock"
 end
 
