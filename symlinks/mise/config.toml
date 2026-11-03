@@ -3,8 +3,6 @@ java = "latest"
 node = "lts"
 python = "latest"
 scala = "latest"
-"npm:devmoji" = "latest"
-"npm:pi-acp" = "latest"
 
 [settings]
 idiomatic_version_file_enable_tools = ["python", "node"]
