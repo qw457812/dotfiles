@@ -14,4 +14,6 @@ require("mini.test").setup({
   },
 })
 
--- alternative: https://github.com/LazyVim/LazyVim/blob/8546f6232ecb1305a4ef9df281bad3512ba09da5/tests/minit.lua
+-- alternative:
+-- - https://github.com/LazyVim/LazyVim/blob/8546f6232ecb1305a4ef9df281bad3512ba09da5/tests/minit.lua
+-- - https://github.com/y3owk1n/undo-glow.nvim/commit/60dbbea

@@ -2,7 +2,7 @@
   "basedpyright": "1.40.2",
   "bash-language-server": "5.8.1",
   "biome": "2.6.4",
-  "copilot-language-server": "1.562.0",
+  "copilot-language-server": "1.565.1",
   "debugpy": "1.8.22",
   "docker-compose-language-service": "1.0.0",
   "dockerfile-language-server": "0.15.0",
@@ -35,6 +35,6 @@
   "tsc": "7.0.2",
   "vscode-spring-boot-tools": "2.2.0",
   "vtsls": "0.3.0",
-  "vue-language-server": "3.3.13",
+  "vue-language-server": "3.3.14",
   "yaml-language-server": "2.0.0"
 }
