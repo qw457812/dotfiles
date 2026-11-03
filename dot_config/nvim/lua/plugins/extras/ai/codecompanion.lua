@@ -119,7 +119,7 @@ return {
               end)(),
             })
           end,
-          -- requires `npm i -g pi-acp`
+          -- requires `pi-acp` on PATH, e.g. `npm i -g pi-acp`
           pi = function()
             local helpers = require("codecompanion.adapters.acp.helpers")
             return {
@@ -599,5 +599,5 @@ return {
   --   end,
   -- },
 
-  { "svkozak/pi-acp", build = "npm i -g pi-acp", version = "*", lazy = true, config = function() end },
+  { "svkozak/pi-acp", build = "mise upgrade npm:pi-acp", version = "*", lazy = true, config = function() end },
 }

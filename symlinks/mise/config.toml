@@ -1,9 +1,13 @@
 [tools]
 java = "latest"
+node = "lts"
 python = "latest"
 scala = "latest"
+"npm:devmoji" = "latest"
+"npm:pi-acp" = "latest"
 
 [settings]
-idiomatic_version_file_enable_tools = ["python"]
+idiomatic_version_file_enable_tools = ["python", "node"]
+idiomatic_version_file_disable_files = ["node:package.json"]
 experimental = true
 python.uv_venv_auto = true
