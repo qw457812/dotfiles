@@ -23,8 +23,11 @@ set -q XDG_CONFIG_HOME; or set -gx XDG_CONFIG_HOME "$HOME/.config"
 set -gx EDITOR (which nvim)
 set -gx VISUAL $EDITOR
 set -gx SUDO_EDITOR $EDITOR
-if test (uname) = Darwin; or test (uname) = Linux; and not set -q TERMUX_VERSION
+if test (uname) = Darwin
     set -gx SSH_AUTH_SOCK "$HOME/.bitwarden-ssh-agent.sock"
+else if test (uname) = Linux; and not set -q TERMUX_VERSION
+    # Flatpak
+    set -gx SSH_AUTH_SOCK "$HOME/.var/app/com.bitwarden.desktop/data/.bitwarden-ssh-agent.sock"
 end
 
 if status is-interactive # https://github.com/ndonfris/fish-lsp/blob/1be77fcfa37d9d3877994f14163c7faacf7a533e/fish_files/get-documentation.fish

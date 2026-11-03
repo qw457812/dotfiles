@@ -25,6 +25,6 @@ case "$1" in
   glide) exec systemd-run --user --collect -- "$HOME/.local/bin/glide" ;;
   kitty) exec systemd-run --user --collect -- /usr/bin/kitty ;;
   krdc) exec systemd-run --user --collect -- /usr/bin/krdc ;;
-  bitwarden) exec systemd-run --user --collect -- /usr/local/bin/bitwarden ;;
+  bitwarden) exec systemd-run --user --collect -- /usr/bin/flatpak run com.bitwarden.desktop ;;
   settings) exec systemd-run --user --collect -- /usr/bin/systemsettings ;;
 esac
