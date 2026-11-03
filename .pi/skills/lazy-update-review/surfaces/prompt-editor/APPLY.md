@@ -74,7 +74,19 @@ chezmoi excludes them, so matching manifests do not prove the deployed dependenc
 are current. For the root and each affected nested package, compare installed host
 versions in both trees. After deploying the locks, synchronize stale deployed
 installs with `npm --prefix <deployed-package-dir> ci --ignore-scripts`; verify native
-runtime dependencies separately when they require lifecycle scripts.
+runtime dependencies separately when they require lifecycle scripts. Before any
+`npm ci`, record existing `.bin` symlinks and executable versions. Reinstallation
+recreates package entry points and can erase a working Termux compiler fallback;
+restore only the verified baseline fallback, or report the native-toolchain blocker.
+
+Finish dependency mutations in both trees before running checks. The generated
+pi-vim wrapper can make source type checks import deployed dependencies, so checking
+source in parallel with deployed `npm ci` produces transient missing-module errors.
+
+If review identified machine-local settings keys, update the clean-filter template
+and render/run that template to synchronize the active repository filter. Verify
+filter idempotence and retention of shareable preferences, while preserving the
+working settings file's runtime state.
 
 For a pi-vim update, install the reviewed version exactly and synchronize the source
 dependency:
@@ -128,11 +140,13 @@ global settings; `--no-session` only isolates session persistence. Make the revi
 pi-vim package available below its `npm/node_modules`, and copy extensions that
 generate sibling files so probes cannot rewrite deployed wrappers. Load only the
 needed extensions with `--no-extensions -e ...` and use `--offline` for UI-only tests.
-`--offline` suppresses startup networking, not model requests: block network access
-at the OS level for probes that must never submit a request (on macOS, wrap Pi in
-`sandbox-exec -p '(version 1)(allow default)(deny network*)'`). Before entering a
-slash command, verify the entire editor buffer is empty; Ctrl+U may clear only the
-current line of a multiline prompt.
+`--offline` suppresses startup networking, not model requests. Prefer OS-level
+network isolation (on macOS, wrap Pi in
+`sandbox-exec -p '(version 1)(allow default)(deny network*)'`). If unavailable, use
+credential-free fixtures, intercept unexpected prompt submissions and reject
+provider requests; report that these guards are not OS-level isolation. Before
+entering a slash command, verify the entire editor buffer is empty; Ctrl+U may
+clear only the current line of a multiline prompt.
 Check that the active instance is `PromptEditor`, not a fallback editor.
 
 Follow [Cursor ownership](REFERENCE.md#cursor-ownership) and
