@@ -4,7 +4,8 @@ local function focus_last_chat()
   if not (chat and chat.ui:is_visible()) then
     return false
   end
-  vim.api.nvim_set_current_win(chat.ui.winnr)
+  local input = chat.ui.input
+  vim.api.nvim_set_current_win(input and input:is_visible() and input.winnr or chat.ui.winnr)
   U.stop_visual_mode()
   -- vim.cmd("startinsert!")
   return true
@@ -233,6 +234,8 @@ return {
             goto_file_under_cursor = { modes = { n = "<localleader>F" } },
             copilot_stats          = { modes = { n = "<localleader>S" } },
             tool_call_details      = { modes = { n = "gk" } },
+            scroll_chat_down       = { modes = { n = "J", i = "<C-f>" } },
+            scroll_chat_up         = { modes = { n = "K", i = "<C-b>" } },
             _btw                   = { modes = { n = "<localleader>B" } },
           },
         },
@@ -276,8 +279,8 @@ return {
           ".codecompanion/skills",
           "~/.agents/skills",
           ".agents/skills",
-          -- "~/.claude/skills",
-          -- ".claude/skills",
+          "~/.claude/skills",
+          ".claude/skills",
           "~/.pi/agent/skills",
           ".pi/skills",
         },
@@ -289,6 +292,7 @@ return {
         chat = {
           -- show_settings = true,
           -- start_in_insert_mode = true,
+          input = { layout = "split" },
           window = {
             layout = vim.o.columns >= 120 and "vertical" or "horizontal",
             height = 0.5,
@@ -340,18 +344,22 @@ return {
 
       vim.api.nvim_create_autocmd("FileType", {
         group = vim.api.nvim_create_augroup("codecompanion_keymaps", { clear = true }),
-        pattern = "codecompanion",
+        pattern = { "codecompanion", "codecompanion_chat_input" },
         callback = function(ev)
           local buf = ev.buf
           vim.b[buf].user_blink_path = false
           vim.b[buf].user_lualine_filename = "codecompanion"
 
-          vim.keymap.set(
-            "n",
-            "<Esc>",
-            U.keymap.clear_ui_or_unfocus_esc,
-            { buffer = buf, desc = "Clear UI or Unfocus (CodeCompanion)" }
-          )
+          vim.keymap.set("n", "<Esc>", function()
+            local chat = require("codecompanion").buf_get_chat(buf)
+            U.keymap.clear_ui_or_unfocus_esc({
+              exclude = function(win)
+                return win == (chat and chat.ui.winnr)
+                  or win == (chat and chat.ui.input and chat.ui.input.winnr)
+                  or U.is_floating_win(win)
+              end,
+            })
+          end, { buffer = buf, desc = "Clear UI or Unfocus (CodeCompanion)" })
 
           vim.api.nvim_create_autocmd("BufLeave", {
             group = vim.api.nvim_create_augroup("codecompanion_keymaps_" .. buf, { clear = true }),
@@ -380,35 +388,44 @@ return {
         group = approval_group,
         pattern = "CodeCompanionToolApprovalRequested",
         callback = function(ev)
-          local buf = ev.data.bufnr
-          if not vim.api.nvim_buf_is_valid(buf) or approval_maps[buf] then
+          local chat_buf = ev.data.bufnr
+          if not vim.api.nvim_buf_is_valid(chat_buf) or approval_maps[chat_buf] then
             return
           end
-          approval_maps[buf] = vim.api.nvim_buf_call(buf, function()
-            local mappings = {}
-            for _, key in ipairs({ "<CR>", "<C-C>" }) do
-              mappings[key] = vim.fn.maparg(key, "n", false, true)
-            end
-            return mappings
-          end)
+          local chat = require("codecompanion").buf_get_chat(chat_buf)
+          local prompt_bufs = chat and chat.prompt:get_bufnrs() or { chat_buf }
+          approval_maps[chat_buf] = {}
+          for _, prompt_buf in ipairs(prompt_bufs) do
+            approval_maps[chat_buf][prompt_buf] = vim.api.nvim_buf_call(prompt_buf, function()
+              local mappings = {}
+              for _, key in ipairs({ "<CR>", "<C-C>" }) do
+                mappings[key] = vim.fn.maparg(key, "n", false, true)
+              end
+              return mappings
+            end)
+          end
         end,
       })
       vim.api.nvim_create_autocmd("User", {
         group = approval_group,
         pattern = "CodeCompanionToolApprovalFinished",
         callback = function(ev)
-          local buf = ev.data.bufnr
-          local mappings = approval_maps[buf]
-          approval_maps[buf] = nil
-          if not mappings or not vim.api.nvim_buf_is_valid(buf) then
+          local chat_buf = ev.data.bufnr
+          local maps_by_buf = approval_maps[chat_buf]
+          approval_maps[chat_buf] = nil
+          if not maps_by_buf then
             return
           end
-          for key, mapping in pairs(mappings) do
-            pcall(vim.keymap.del, "n", key, { buffer = buf })
-            if mapping.buffer == 1 then
-              vim.api.nvim_buf_call(buf, function()
-                vim.fn.mapset("n", false, mapping)
-              end)
+          for prompt_buf, mappings in pairs(maps_by_buf) do
+            if vim.api.nvim_buf_is_valid(prompt_buf) then
+              for key, mapping in pairs(mappings) do
+                pcall(vim.keymap.del, "n", key, { buffer = prompt_buf })
+                if mapping.buffer == 1 then
+                  vim.api.nvim_buf_call(prompt_buf, function()
+                    vim.fn.mapset("n", false, mapping)
+                  end)
+                end
+              end
             end
           end
         end,

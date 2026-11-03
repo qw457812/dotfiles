@@ -335,13 +335,40 @@ function M.clear_ui_esc(opts)
   return something_done
 end
 
----@param opts? ClearUiEscOpts
+---@class ClearUiOrUnfocusEscOpts: ClearUiEscOpts
+---@field exclude? fun(win: integer): boolean
+
+---@param opts? ClearUiOrUnfocusEscOpts
 function M.clear_ui_or_unfocus_esc(opts)
-  if not M.clear_ui_esc(opts) then
-    local win = vim.api.nvim_get_current_win()
-    vim.cmd("wincmd p")
-    if vim.api.nvim_get_current_win() == win then
-      vim.cmd("wincmd w")
+  if M.clear_ui_esc(opts) then
+    return
+  end
+
+  local current_win = vim.api.nvim_get_current_win()
+
+  local function eligible(win)
+    return win ~= current_win
+      and vim.api.nvim_win_is_valid(win)
+      and vim.api.nvim_win_get_config(win).focusable ~= false
+      and not (opts and opts.exclude and opts.exclude(win))
+  end
+
+  local prev_winnr = vim.fn.winnr("#")
+  local prev_win = prev_winnr > 0 and vim.fn.win_getid(prev_winnr) or 0
+  if prev_win ~= 0 and eligible(prev_win) then
+    vim.api.nvim_set_current_win(prev_win)
+    return
+  end
+
+  local wins = vim.api.nvim_tabpage_list_wins(0)
+  local current_idx = assert(vim.iter(wins):enumerate():find(function(_, win)
+    return win == current_win
+  end))
+  for offset = 1, #wins - 1 do
+    local win = wins[(current_idx + offset - 1) % #wins + 1]
+    if eligible(win) then
+      vim.api.nvim_set_current_win(win)
+      return
     end
   end
 end

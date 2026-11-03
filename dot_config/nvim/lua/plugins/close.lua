@@ -583,7 +583,7 @@ return {
     opts = function()
       vim.api.nvim_create_autocmd("FileType", {
         group = augroup,
-        pattern = "codecompanion",
+        pattern = { "codecompanion", "codecompanion_chat_input" },
         callback = function(event)
           -- -- close (clears chat history)
           -- vim.schedule(function()
@@ -602,12 +602,14 @@ return {
           -- end)
 
           -- hide (does not clear chat history)
-          vim.keymap.set(
-            "n",
-            close_key,
-            "<cmd>close<cr>",
-            { buffer = event.buf, silent = true, desc = "Close (CodeCompanion)" }
-          )
+          vim.keymap.set("n", close_key, function()
+            local chat = require("codecompanion").buf_get_chat(event.buf)
+            if chat then
+              chat.ui:hide()
+            else
+              vim.cmd.close()
+            end
+          end, { buffer = event.buf, silent = true, desc = "Close (CodeCompanion)" })
         end,
       })
 
