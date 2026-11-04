@@ -10,6 +10,7 @@ copr:copr.fedorainfracloud.org:group_asahi:u-boot                Copr repo for u
 copr:copr.fedorainfracloud.org:jdxcode:mise                      Copr repo for mise owned by jdxcode
 copr:copr.fedorainfracloud.org:jhuang6451:nerd-fonts             Copr repo for nerd-fonts owned by jhuang6451
 copr:copr.fedorainfracloud.org:lihaohong:yazi                    Copr repo for yazi owned by lihaohong
+copr:copr.fedorainfracloud.org:scottames:ghostty                 Copr repo for ghostty owned by scottames
 copr:copr.fedorainfracloud.org:zhullyb:v2rayA                    Copr repo for v2rayA owned by zhullyb
 fedora                                                           Fedora 44 - aarch64
 fedora-asahi-remix-hotfixes                                      Fedora Asahi Remix Hotfixes

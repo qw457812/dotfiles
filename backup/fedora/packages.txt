@@ -112,6 +112,7 @@ fwupd
 fzf
 gh
 ghostscript
+ghostty
 git
 git-credential-libsecret
 git-delta

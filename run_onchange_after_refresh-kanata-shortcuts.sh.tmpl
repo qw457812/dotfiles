@@ -5,6 +5,7 @@ set -eu
 # Refresh when either shortcut declaration changes.
 # {{ include "dot_local/share/applications/kanata-focus-glide.desktop.tmpl" | sha256sum }}
 # {{ include "dot_local/share/applications/kanata-focus-kitty.desktop.tmpl" | sha256sum }}
+# {{ include "dot_local/share/applications/kanata-focus-ghostty.desktop.tmpl" | sha256sum }}
 # {{ include "dot_local/share/applications/kanata-focus-krdc.desktop.tmpl" | sha256sum }}
 # {{ include "dot_local/share/applications/kanata-focus-bitwarden.desktop.tmpl" | sha256sum }}
 # {{ include "dot_local/share/applications/kanata-focus-settings.desktop.tmpl" | sha256sum }}
@@ -26,11 +27,12 @@ fi
 
 # Update only our actions: refreshing KSycoca discovers new components,
 # but does not replace shortcuts already loaded in the current session.
-# Qt key values: Ctrl|Alt|Shift|Meta (0x1e000000) plus U/K/L/B/S (0x55/0x4b/0x4c/0x42/0x53).
-for app in glide kitty krdc bitwarden settings; do
+# Qt key values: Ctrl|Alt|Shift|Meta (0x1e000000) plus U/K/G/L/B/S (0x55/0x4b/0x47/0x4c/0x42/0x53).
+for app in glide kitty ghostty krdc bitwarden settings; do
   case "$app" in
     glide) key=503316565; name='Focus or launch Glide' ;;
     kitty) key=503316555; name='Focus or launch Kitty' ;;
+    ghostty) key=503316551; name='Focus or launch Ghostty' ;;
     krdc) key=503316556; name='Focus or launch KRDC' ;;
     bitwarden) key=503316546; name='Focus or launch Bitwarden' ;;
     settings) key=503316563; name='Focus or launch System Settings' ;;

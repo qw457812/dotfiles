@@ -21,7 +21,7 @@
   cmd-alone (tap-hold-press 0 250 A-tab lmet)
   ;; Globally send the tmux prefix on tap; hold as Alt.
   option-alone (tap-hold-press 0 250 C-b lalt)
-  ;; Preserve right Super; KDE handles Ctrl+Alt+Shift+Meta+U/K/L/B/S.
+  ;; Preserve right Super; KDE handles Ctrl+Alt+Shift+Meta+U/K/L/B/S/G.
   ;; Use letters to avoid Apple/XKB function-key and multimedia mappings.
   launcher (multi rmet (layer-while-held launcher))
   ;; Other standard keys resolve to plain f; only j activates f-mode.
@@ -47,7 +47,7 @@
 )
 
 (deflayer launcher
-  C-A-S-b _ _ _ C-A-S-u C-A-S-k _ _ _ _ C-A-S-l C-A-S-s
+  C-A-S-b _ _ _ C-A-S-u C-A-S-k C-A-S-l _ _ _ C-A-S-g C-A-S-s
 )
 
 ;; Match the original Goku profile's 30 ms simultaneous-key window.
