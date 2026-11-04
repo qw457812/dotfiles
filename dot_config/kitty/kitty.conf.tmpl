@@ -80,6 +80,7 @@ background_image_layout scaled
 # Advanced
 # shell /opt/homebrew/bin/fish --login --interactive
 auto_reload_config -1
+restore_session_after_logout yes
 {{- if and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "fedora-asahi-remix") }}
 # for neovim `vim.g.clipboard = "osc52"`
 clipboard_control write-clipboard write-primary read-clipboard read-primary
