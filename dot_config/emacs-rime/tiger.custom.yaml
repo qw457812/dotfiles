@@ -61,9 +61,8 @@ patch:
   # 也可自己把 （ 替换成别的，比如 'xform/（/〔/'
 
   # ------------------------------------------------------------------------------------------
-  # rename emoji.json to emoji_cn.json, emoji.txt to emoji_cn.txt
   # ↓emoji表情滤镜
-  emoji_cn/opencc_config: emoji_cn.json
+  emoji_cn/opencc_config: emoji.json
 
   # 取消分号引导的快符功能（分号不作码元）
   # 让【 】可以直接上屏（对应的重复上屏的功能也没了）

@@ -136,7 +136,7 @@ TODO:
 
 ## [RIME](https://rime.im/)
 
-[My rime config](private_Library/Rime) for Chinese input based on [rime-ice](https://github.com/iDvel/rime-ice) and [TigerCode](https://tiger-code.com/).
+[My rime config](private_Library/Rime) for Chinese input based on [TigerCode](https://tiger-code.com/).
 
 Using [InputSourcePro](https://github.com/runjuu/InputSourcePro) to keep [Squirrel](https://github.com/rime/squirrel) as the only input source on macOS, instead of ABC.
 

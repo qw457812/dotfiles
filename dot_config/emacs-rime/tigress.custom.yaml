@@ -61,9 +61,8 @@ patch:
   # 也可自己把 （ 替换成别的，比如 'xform/（/〔/'
 
   # ------------------------------------------------------------------------------------------
-  # rename emoji.json to emoji_cn.json, emoji.txt to emoji_cn.txt
   # ↓emoji表情滤镜
-  emoji_cn/opencc_config: emoji_cn.json
+  emoji_cn/opencc_config: emoji.json
   
   switches: # 0 默认关，1 默认开
     - name: ascii_mode

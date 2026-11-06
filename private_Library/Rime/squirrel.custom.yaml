@@ -1,8 +1,5 @@
-# squirrel.yaml的补丁文件是squirrel.custom.yaml
 patch:
-  # ascii_mode、inline、no_inline、vim_mode 等等设定
-  # 可参考 /Library/Input Methods/Squirrel.app/Contents/SharedSupport/squirrel.yaml
-  # 注: rime_ice.custom.yaml中配置了默认英文(即ascii_mode默认为true), 故此处只需配置ascii_mode需要改为false的app
+  # Reference: /Library/Input Methods/Squirrel.app/Contents/SharedSupport/squirrel.yaml
   app_options:
     # com.apple.Spotlight:
     #   ascii_mode: true    # 开启默认英文
@@ -56,9 +53,6 @@ patch:
       ascii_mode: false
     com.tencent.xinWeChat:
       ascii_mode: false
-
-  # purity_of_form_custom主题: 候选项排列方向 stacked | linear
-  # preset_color_schemes/purity_of_form_custom/candidate_list_layout: linear
 
   # 选择皮肤，亮色与暗色主题
   style/color_scheme: macos_light
@@ -586,30 +580,3 @@ patch:
       label_color: 0xF9A6FF
       name: "肛师专用／东北大花被"
       text_color: 0x1D9FFF
-  # -------------------------------------为了不影响小鹤，已移至tiger.custom.yaml和tigress.custom.yaml-------------------------------------
-  # style:
-  #   #capture_type: none
-  #   #color_font: true
-  #   comment_font_face: "Consolas, Apple Color Emoji, TumanPUA, LXGW WenKai GB Screen, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
-  #   comment_font_point: 16 #滤镜字号
-  #   #display_tray_icon: false
-  #   font_face: "Consolas, Apple Color Emoji, LXGW WenKai GB Screen, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
-  #   font_point: 16 #主字体字号
-  #   #fullscreen: false
-  #   inline_preedit: true #鼠须管开嵌入在QQ上可能会有点问题，这里可改为 true 关闭嵌入模式
-  #   label_font_face: "LXGW WenKai GB Screen, SimSun, SimSun-ExtB, SimSun-ExtG, TH-Tshyn-P0, TH-Tshyn-P1, TH-Tshyn-P2, TH-Tshyn-P16"
-  #   label_font_point: 16 #标号字号
-  #   #label_format: "%s."
-  #   layout:
-  #     min_width: 85
-  #   corner_radius: 5
-  #   hilited_corner_radius: 5
-  #   line_spacing: 8
-  #   hilite_spacing: 6
-  #   spacing: 12
-  #   color_scheme: win11light
-  #   color_scheme_dark: easy_dark
-  #   # 鼠须管盲打，嵌入首选，删除下面两行的#号，即可生效
-  #   #alpha: 0.0001
-  #   #inline_candidate: true
-  # -------------------------------------为了不影响小鹤，已移至tiger.custom.yaml和tigress.custom.yaml-------------------------------------
