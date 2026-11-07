@@ -225,9 +225,16 @@ editing, then calls Pi's private `cancelAutocomplete()` to clear the visible pic
 and abort pending suggestions: direct host deletion alone leaves the picker alive.
 Revalidate this cleanup with visible, in-flight and multiline autocomplete cases.
 
+Literal Normal-mode `gj` aliases upstream `J` (normalized line join). Clear only
+`pendingG` before forwarding `J`, retaining the prefix count and upstream undo/dot
+recording. Synthetic `j -> gj` calls `super.handleInput` directly and stays a display
+motion. Visual `gj`, operator forms such as `dgj`/`cgj`, `gJ`, `gk` and commands with
+`pendingGCount` retain upstream semantics. Verify join, count override, dot-repeat,
+one-step undo/redo and EOF no-ops without losing the previous repeatable change.
+
 On every upgrade, compare upstream's input dispatch and pending fields. A pending
 argument, EX or bracketed-paste discard owns the next key. Revalidate operators,
-`pendingG`, `pendingZ`, character motions, replacement and text objects. In
+`pendingG`, `pendingGCount`, `pendingZ`, character motions, replacement and text objects. In
 particular, `ZlQ` and `ZjQ` must cancel at the invalid suffix rather than retain
 a force-quit prefix. Endpoint H/L helpers additionally delegate pending counts.
 

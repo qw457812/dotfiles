@@ -133,6 +133,9 @@ export default async function (pi: ExtensionAPI) {
     borderColor?: (s: string) => string;
     pendingExCommand: string | null;
     pendingOperator: string | null;
+    pendingG: boolean;
+    pendingGCount: string;
+    discardingBracketedPasteInNormalMode: boolean;
     cancelAutocomplete: () => void;
     addToHistory?: (text: string) => void;
     history?: string[];
@@ -228,6 +231,21 @@ export default async function (pi: ExtensionAPI) {
       const runtime = this as unknown as ModalEditorRuntime;
       if (!this.preflightHost()) {
         super.handleInput(data);
+        return;
+      }
+      // Explicit Normal-mode gj aliases J; synthetic j -> gj calls super directly.
+      if (
+        this.getMode() === "normal" &&
+        data === "j" &&
+        runtime.pendingG &&
+        runtime.pendingGCount === "" &&
+        runtime.pendingOperator === null &&
+        runtime.pendingExCommand === null &&
+        !runtime.discardingBracketedPasteInNormalMode
+      ) {
+        // Keep the prefix count, but let upstream record and replay a canonical J.
+        runtime.pendingG = false;
+        super.handleInput("J");
         return;
       }
       // Preserve local cl -> s; upstream still lacks horizontal change motions.

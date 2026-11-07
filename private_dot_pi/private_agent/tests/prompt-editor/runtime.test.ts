@@ -187,6 +187,95 @@ describe("prompt-editor with real pi-vim 0.15.1 and Pi components", () => {
     },
   );
 
+  it.each(["gj", "J"])("joins the next logical line with %s", async (command) => {
+    const h = await host();
+    h.set("first\n  second\nthird");
+    send(h.editor, ...command);
+    expect(h.editor.getText()).toBe("first second\nthird");
+    expect(h.editor.getMode()).toBe("normal");
+    expect(h.editor.getCursor()).toEqual({ line: 0, col: 5 });
+  });
+
+  it("keeps gj joins repeatable and gives each join one undo unit", async () => {
+    const h = await host();
+    const original = "one\n two\nthree\nfour";
+    h.set(original);
+    send(h.editor, "g", "j");
+    expect(h.editor.getText()).toBe("one two\nthree\nfour");
+    send(h.editor, ".");
+    expect(h.editor.getText()).toBe("one two three\nfour");
+    send(h.editor, "u");
+    expect(h.editor.getText()).toBe("one two\nthree\nfour");
+    send(h.editor, "u");
+    expect(h.editor.getText()).toBe(original);
+    send(h.editor, "\x12");
+    expect(h.editor.getText()).toBe("one two\nthree\nfour");
+  });
+
+  it("preserves prefix counts for gj and a count override on dot", async () => {
+    const h = await host();
+    h.set("one\ntwo\nthree\nfour\nfive\nsix");
+    send(h.editor, "3", "g", "j");
+    expect(h.editor.getText()).toBe("one two three\nfour\nfive\nsix");
+    send(h.editor, "2", ".");
+    expect(h.editor.getText()).toBe("one two three four\nfive\nsix");
+  });
+
+  it("keeps EOF gj a no-op without replacing the last repeatable change", async () => {
+    const h = await host();
+    h.set("abc\ndef");
+    send(h.editor, "r", "X", "G", "g", "j");
+    expect(h.editor.getText()).toBe("Xbc\ndef");
+    send(h.editor, ".");
+    expect(h.editor.getText()).toBe("Xbc\nXef");
+  });
+
+  it.each(["visual", "visual-line"] as const)(
+    "keeps explicit gj as a display motion in %s",
+    async (mode) => {
+      const h = await host();
+      h.set("abcdefghijklmnopqrstuvwxyz".repeat(3), mode);
+      const r = runtime(h.editor);
+      const rows = r.buildVisualLineMap(r.lastWidth);
+      send(h.editor, "g", "j");
+      expect(h.editor.getCursor()).toEqual({ line: 0, col: rows[1]!.startCol });
+      expect(h.editor.getMode()).toBe(mode);
+      expect(h.editor.getText()).toBe("abcdefghijklmnopqrstuvwxyz".repeat(3));
+    },
+  );
+
+  it.each(["dgj", "cgj", "ygj", "gJ", "gk", "g2j"])(
+    "retains upstream semantics for %s",
+    async (command) => {
+      const h = await host();
+      const baseline = await host();
+      const text = "abcdefghijklmnopqrstuvwxyz".repeat(4) + "\nnext";
+      h.set(text);
+      baseline.set(text);
+      send(h.editor, ...command);
+      for (const key of command) ModalEditor.prototype.handleInput.call(baseline.editor, key);
+      expect(h.editor.getText()).toBe(baseline.editor.getText());
+      expect(h.editor.getMode()).toBe(baseline.editor.getMode());
+      expect(h.editor.getCursor()).toEqual(baseline.editor.getCursor());
+      expect(runtime(h.editor).unnamedRegister).toBe(runtime(baseline.editor).unnamedRegister);
+    },
+  );
+
+  it("keeps gj literal in Ex and Insert, and ignores it in bracketed paste", async () => {
+    const h = await host();
+    h.set("one\ntwo");
+    send(h.editor, ":", "g", "j");
+    expect(h.editor.getText()).toBe("one\ntwo");
+    expect(h.editor.render(40).map(clean)[0]).toContain("EX :gj_");
+    h.set("one\ntwo", "insert");
+    send(h.editor, "g", "j");
+    expect(h.editor.getText()).toBe("gjone\ntwo");
+    h.set("one\ntwo");
+    send(h.editor, "g", "\x1b[200~", "j", "\x1b[201~");
+    expect(h.editor.getText()).toBe("one\ntwo");
+    expect(h.editor.getMode()).toBe("normal");
+  });
+
   it.each(["h", "l", "H", "L"])(
     "resets upstream's wanted display column after local %s",
     async (key) => {
