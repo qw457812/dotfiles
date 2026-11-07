@@ -1,20 +1,21 @@
 # Pi WebFetch Extension
 
-Adds a `webfetch` tool to [pi](https://pi.dev) that fetches content from URLs and converts it to markdown, text, or HTML format. Mirrors OpenCode **v2**'s webfetch implementation ([anomalyco/opencode](https://github.com/anomalyco/opencode/tree/ba06ff9e0bf2dcefbbbc3a1d6094f3572d77c84e), `dev` branch, 2026-10-19 — the default branch that `v2` was merged into and that now ships the 2.x line).
+Adds a `webfetch` tool to [pi](https://pi.dev) that fetches content from URLs and converts it to markdown, text, or HTML format. Mirrors OpenCode **v2**'s webfetch implementation ([anomalyco/opencode](https://github.com/anomalyco/opencode/tree/fdce6365bcdf2af0fdac65d46dc1806a75d10b02), `dev` branch, 2026-11-07 — the default branch that `v2` was merged into and that now ships the 2.x line).
 
 ## How It Works
 
-1. Validates the URL (`http://` / `https://` only, fail-fast like v2)
+1. Validates the URL (`http://` / `https://` only, no embedded credentials, fragment stripped, fail-fast like v2)
 2. Fetches with format-aware `Accept` headers and the **OpenCode-User** UA (`Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; OpenCode-User/1.0; +https://opencode.ai`)
-3. If blocked by Cloudflare (403 + `cf-mitigated: challenge`), drains the 403 response and retries with the bare `opencode` UA (within the same total timeout budget)
-4. Classifies the response: images are returned as base64 image attachments (non-SVG; SVG is textual); non-textual mimes fail (`Unsupported fetched file content type`); everything else decodes
-5. Converts by content type and requested format:
+3. If blocked by Cloudflare (403 + `cf-mitigated: challenge`), drains the 403 response and retries with the bare `opencode` UA (within the same total timeout budget, restarting the redirect chain)
+4. Follows redirects manually (up to 10), validating each target's scheme and credentials before requesting it; v2 checks each hop against its permission rules instead
+5. Classifies the response: images are returned as base64 image attachments (non-SVG; SVG is textual); non-textual mimes fail (`Unsupported fetched file content type`); everything else decodes
+6. Converts by content type and requested format:
    - **HTML + markdown** → v2's own htmlparser2 renderer (`html-markdown.ts`, ported verbatim)
    - **HTML + text** → htmlparser2 SAX extraction with a skip-depth counter (`script, style, noscript, iframe, object, embed`)
    - **HTML + html** → raw HTML
    - **Non-HTML textual** → content as-is
-6. Truncates output (2000 lines / 50KB) with pi's bracket-format notice, saving the full output to a temp file
-7. Every failure surfaces as `Unable to fetch <url>` with the cause attached
+7. Truncates output (2000 lines / 50KB) with pi's bracket-format notice, saving the full output to a temp file
+8. Every failure surfaces as `Unable to fetch <url>` with the cause attached
 
 ## Setup
 
@@ -34,13 +35,15 @@ cd private_dot_pi/private_agent/extensions/webfetch && npm install
 
 ## Limits
 
-| Limit             | Value                                   |
-| ----------------- | --------------------------------------- |
-| Max response size | 5MB (shared with the renderer's budget) |
-| Default timeout   | 30 seconds                              |
-| Max timeout       | 120 seconds                             |
-| URL scheme        | `http://` or `https://` only            |
-| Output truncation | 2000 lines or 50KB                      |
+| Limit             | Value                                         |
+| ----------------- | --------------------------------------------- |
+| Max response size | 5MB (shared with the renderer's budget)       |
+| Default timeout   | 30 seconds                                    |
+| Max timeout       | 120 seconds                                   |
+| URL scheme        | `http://` or `https://` only                  |
+| URL credentials   | rejected (`URL must not include credentials`) |
+| Max redirects     | 10, each target validated                     |
+| Output truncation | 2000 lines or 50KB                            |
 
 ## Output Truncation
 
@@ -52,8 +55,8 @@ Output is truncated to 2000 lines or 50 KB (pi's built-in limits). When truncate
 
 ```
 webfetch/
-├── index.ts          # Tool registration, fetch, format dispatch, error narrowing, truncation,
-│                     #   extractTextFromHTML (like upstream; exported for tests)
+├── index.ts          # Tool registration, URL validation, redirect loop, fetch, format dispatch,
+│                     #   error narrowing, truncation, extractTextFromHTML (like upstream; exported for tests)
 ├── html-markdown.ts  # v2's htmlparser2 markdown renderer, ported verbatim (excluded from oxfmt
 │                     #   so drift diffs stay byte-comparable)
 ├── render.ts         # Custom TUI rendering
@@ -67,15 +70,18 @@ Golden checks (no model calls, assertions ported from upstream `test/tool-webfet
 ## Differences from OpenCode v2's WebFetch
 
 - **Images kept** — v2 removed image delivery (`Unsupported fetched image content type`); this extension returns non-SVG images as pi-native `{ type: "image" }` content (base64 + mimeType), SVG as text
-- **No permission gate** — v2 requires `webfetch` permission; this extension does not
+- **No permission gate** — v2 requires `webfetch` permission and re-checks every redirect target against its rules (`assertNotDenied`); this extension has neither. Redirects are still followed manually (max 10) and validated per hop for scheme and credentials, so the transport-level protections match v2 even though no rule is consulted
 - **No Effect framework** — plain async/await + TypeBox instead of Effect Schema
 - **Per-attempt timeout controllers** — v2 wraps retry in `Effect.timeoutOrElse`; here each attempt gets its own `AbortController` with the remaining budget
-- **Response body draining** — non-2xx and 403 response bodies are drained to release TCP connections; v2 relies on Effect's resource management
+- **Response body draining** — non-2xx, 403 and redirect response bodies are drained to release TCP connections; v2 relies on Effect's resource management
 - **User cancellation bypasses the error wrap** — `Unable to fetch <url>` mirrors v2's error narrowing, but genuine user aborts keep their plain "Request was cancelled" message (pi abort semantics)
 - **Description wording** — v2's "retained in managed storage" sentence adapted to this extension's temp-file truncation
 - **Renderer** — `html-markdown.ts` ported verbatim from v2 (it replaced turndown in 90fd61225) and excluded from oxfmt via `ignorePatterns`, keeping drift diffs byte-comparable; no turndown/cheerio dependencies remain
 
 ## Drift Notes
 
+- Synced to `fdce6365bc` (2026-11-07) on `dev`, the default branch `v2` was merged into: drift on the mirror surface was one renderer refactor and three webfetch transport fixes, all ported — `598c52f058` (html-markdown dedupe, `closeLink`/`inline` extraction → file re-copied verbatim), `17837a20d6` (manual redirect loop: `MAX_REDIRECTS = 10`, relative resolution, per-hop scheme check; the permission `check` stays upstream-only), `125655ec6f` (reject URL credentials, strip fragments from redirect targets), `e803323c13` (fragment-free initial URL; rules-vs-URL-as-written is permission-only and not mirrored), `94bc5662c4` (`Mime.isTextual` is byte-identical to the mirror's local `isTextualMime`, so no code change). Classified availability, not ported: `805a4b8200` and `17837a20d6`'s permission hop check (rule matching), `c930ef1f08` (invocation plumbing), `01cd723db9` (catalog notify dedupe), `b2bd02ee71` + `baeebc2f93` (integration/websearch policies), `a809a4755f` (provider registration helper), `dad29a8991` (Effect import paths)
+- Verbatim check: `html-markdown.ts` byte-identical to `origin/dev` at the pin
+- Direction signals (unmerged, noted only): `webfetch-redirect-permission` (per-hop permission check, now superseded by `17837a20d6`), `webfetch-rule-urls` (drops fragments from image-download permission URLs; touches `image-generate.ts`, not this tool)
 - Synced to `ba06ff9e0b` (2026-10-19) on `dev`, the default branch `v2` was merged into: 1685 commits since the previous pin, only one touching the mirror surface — `86755e1cea` (TinyFish session handshake, websearch-only) — and `html-markdown.ts` / `tool/plugin/webfetch.ts` verified byte-identical to upstream
 - Direction signals (unmerged, noted only): `web-fetch` (single commit, based on 2026-09-15 `dev`, now far behind) adds a policy-bound `fetch` to the codemode sandbox — additive, `tool/plugin/webfetch.ts` is untouched and registers with `codemode: false`; `webfetch-images` restores v2-removed image output (the mirror keeps images pi-native, so the lines may converge); `lazy-webfetch` defers HTML parsing; `fix-read-tool-for-webfetch`, `nxl/deflake-webfetch-memory-test` (test-only); `owned-fetch-retention` and `hotfix/agent-owned-fetch-leak` touch SDK request signals, not the tool surface

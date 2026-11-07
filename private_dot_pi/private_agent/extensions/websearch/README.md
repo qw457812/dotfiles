@@ -1,6 +1,6 @@
 # Pi WebSearch Extension
 
-Adds a `websearch` tool to [pi](https://pi.dev) that searches the internet via five remote providers (Exa, Firecrawl, Parallel, Tavily, TinyFish), mirroring OpenCode **v2**'s websearch architecture ([anomalyco/opencode](https://github.com/anomalyco/opencode/tree/ba06ff9e0bf2dcefbbbc3a1d6094f3572d77c84e), `dev` branch, 2026-10-19 — the default branch that `v2` was merged into and that now ships the 2.x line).
+Adds a `websearch` tool to [pi](https://pi.dev) that searches the internet via five remote providers (Exa, Firecrawl, Parallel, Tavily, TinyFish), mirroring OpenCode **v2**'s websearch architecture ([anomalyco/opencode](https://github.com/anomalyco/opencode/tree/fdce6365bcdf2af0fdac65d46dc1806a75d10b02), `dev` branch, 2026-11-07 — the default branch that `v2` was merged into and that now ships the 2.x line).
 
 ## Setup
 
@@ -96,6 +96,7 @@ Golden checks (no model calls, assertions ported from upstream `test/websearch.t
 ## Differences from OpenCode v2's WebSearch
 
 - **No consent flow** — OpenCode asks on first use and persists the choice (KV `websearch:provider`, value `false` disables the tool entirely); this extension never prompts, and disabling just means not loading it
+- **No integration connections or policy actions** — v2 stores credentials in integration connections and can remove providers via `websearch.use` / `integration.use` managed policies (hiding the tool when none remain); this extension always registers all five providers and credentials come from env vars, with no policy layer
 - **No global persistence** — OpenCode remembers a user-chosen provider across sessions in its app SQLite database; this extension's env var is the declarative config and random affinity is process state
 - **Session entries exceed v2** — per-session stickiness persists via pi's `CustomEntry` (`websearch.selection`), surviving `--resume`; v2 keeps affinity in memory only
 - **No Effect framework** — plain async/await + TypeBox instead of Effect Schema + Layer
@@ -111,6 +112,7 @@ Golden checks (no model calls, assertions ported from upstream `test/websearch.t
 
 ## Drift Notes
 
+- Synced to `fdce6365bc` (2026-11-07) on `dev`: no changes to the mirror surface. Every commit touching websearch paths was classified availability — `a809a4755f` (provider registration helper, pure integration/credential plumbing around unchanged `execute` bodies), `01cd723db9` (publish catalog updates only when the provider list changes), `b2bd02ee71` + `baeebc2f93` (integration connect/use and `websearch.use` policies, which also hide the tool when every provider is removed), `dad29a8991` (Effect import paths). `598c52f058` touched `html-markdown.ts` (webfetch only). Unmerged `websearch-*` direction branches unchanged
 - Synced to `ba06ff9e0b` (2026-10-19) on `dev`, the default branch `v2` was merged into: 1685 commits since the previous pin, exactly one touching the mirror surface — `86755e1cea` (2026-10-16), which added TinyFish's keyed MCP session handshake and is ported here. `v2` is frozen at `4617210822` (2.0.26) while 2.0.27–2.0.32 ship from `dev`, so the pin moved lines rather than commits
 - 2026-10-19 live smoke: TinyFish answered from both tiers (8–10 results per query). Server behaviors confirmed for the golden checks: keyed `initialize` returns `Mcp-Session-Id` (and negotiates protocol 2025-11-25), `notifications/initialized` is acknowledged 204, `tools/call` without a session answers 400 `-32600`, an unknown session answers 404 `-32001`, `DELETE` answers 405
 - Direction signals (unmerged, noted only): `websearch-auto` (automatic web search routing), `websearch-limits` (shared and non-fatal web search limits), `websearch-consent-service` (consent prompt dedupe), `websearch-consent-repro` (consent repro), `direct-websearch` (call the web search service directly), `websearch-plugin-wait` (server waits for plugins before answering)

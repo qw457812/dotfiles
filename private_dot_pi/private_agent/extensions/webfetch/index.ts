@@ -6,12 +6,15 @@
  *
  * Mirrors OpenCode v2's webfetch implementation
  * (packages/core/src/tool/plugin/webfetch.ts, pinned commit in README):
- * - URL validation (http/https only)
+ * - URL validation (http/https only, no embedded credentials, fragment
+ *   stripped) and manual redirect following (max 10, each hop validated;
+ *   v2 17837a20d6 / 125655ec6f / e803323c13)
  * - Format parameter: markdown (default), text, or html
  * - Accept header strategy based on requested format
  * - OpenCode-User UA by default; plain "opencode" UA on Cloudflare
  *   403 challenge retry (v2 0762d63b6)
- * - Response body draining on error to release TCP connections
+ * - Response body draining on error and redirect hops to release TCP
+ *   connections
  * - Response size limit (5MB, shared with the markdown renderer budget)
  * - Textual mime whitelist; non-textual content types fail
  * - HTML→Markdown via v2's own htmlparser2 renderer (html-markdown.ts,
@@ -22,7 +25,8 @@
  *   v2 removed images, this extension keeps them (ledger deviation)
  * - Error narrowing: every failure surfaces as "Unable to fetch <url>"
  *   with the cause attached (v2 367cf5961)
- * - No permission gate (unlike OpenCode which requires webfetch permission)
+ * - No permission gate (unlike OpenCode which requires webfetch permission
+ *   and re-checks every redirect target against its rules)
  */
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
@@ -55,6 +59,32 @@ import {
 const MAX_RESPONSE_SIZE = MAX_MARKDOWN_BYTES; // 5MB, shared with renderer budget
 const DEFAULT_TIMEOUT = 30 * 1000; // 30 seconds
 const MAX_TIMEOUT_SECONDS = 120;
+
+export const MAX_REDIRECTS = 10;
+const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308]);
+
+// ---------------------------------------------------------------------------
+// URL validation (mirrors OpenCode v2's assertHttpUrl)
+// ---------------------------------------------------------------------------
+
+function assertHttpUrl(url: URL): void {
+  if (url.protocol !== "http:" && url.protocol !== "https:") {
+    throw new Error("URL must use http:// or https://");
+  }
+  // Upstream's rule: credentials in the URL are rejected outright, since a
+  // permission rule for the bare host would otherwise be bypassed. Kept even
+  // though this extension has no permission gate.
+  if (url.username || url.password) throw new Error("URL must not include credentials");
+}
+
+/** Validate a URL as written, stripping the fragment (never sent). */
+function sanitizeUrl(value: string): string {
+  // Matches upstream: rules match the URL as written, but the fragment is
+  // never sent, so it is removed before validation and fetch.
+  const url = value.split("#")[0];
+  assertHttpUrl(new URL(url));
+  return url;
+}
 
 // ---------------------------------------------------------------------------
 // Mime classification (mirrors OpenCode v2's webfetch.ts)
@@ -139,6 +169,36 @@ interface FetchResult {
   arrayBuffer: ArrayBuffer;
 }
 
+/**
+ * Follows redirects manually so every hop is validated (scheme, credentials)
+ * before it is requested, mirroring v2's redirect loop now that v2 checks each
+ * target against the permission rules. This extension has no permission gate;
+ * validation and the hop count still apply.
+ */
+async function fetchFollowingRedirects(
+  url: string,
+  headers: Record<string, string>,
+  signal: AbortSignal,
+): Promise<Response> {
+  let current = url;
+  for (let redirects = 0; ; redirects++) {
+    const response = await fetch(current, { headers, signal, redirect: "manual" });
+    const location = response.headers.get("location");
+    if (!REDIRECT_STATUSES.has(response.status) || !location) return response;
+
+    // Drain the redirect body to release the TCP connection back to the pool.
+    await response.arrayBuffer().catch(() => {});
+    if (redirects >= MAX_REDIRECTS) {
+      throw new Error(`Too many redirects (more than ${MAX_REDIRECTS})`);
+    }
+
+    const target = new URL(location, current);
+    target.hash = "";
+    assertHttpUrl(target);
+    current = target.href;
+  }
+}
+
 async function fetchUrl(
   url: string,
   acceptHeader: string,
@@ -162,11 +222,7 @@ async function fetchUrl(
     let response: Response;
     try {
       const headers = buildHeaders(acceptHeader, openCodeUserAgent);
-      response = await fetch(url, {
-        headers,
-        signal: firstSignal,
-        redirect: "follow",
-      });
+      response = await fetchFollowingRedirects(url, headers, firstSignal);
     } finally {
       clearTimeout(firstTimeoutId);
     }
@@ -191,12 +247,10 @@ async function fetchUrl(
       const retrySignal = AbortSignal.any([externalController.signal, retryController.signal]);
 
       try {
+        // The retry restarts from the original URL, matching v2 (which wraps
+        // the whole redirect chain in the Cloudflare retry).
         const retryHeaders = buildHeaders(acceptHeader, CLOUDFLARE_RETRY_UA);
-        response = await fetch(url, {
-          headers: retryHeaders,
-          signal: retrySignal,
-          redirect: "follow",
-        });
+        response = await fetchFollowingRedirects(url, retryHeaders, retrySignal);
       } finally {
         clearTimeout(retryTimeoutId);
       }
@@ -318,15 +372,12 @@ export default function (pi: ExtensionAPI) {
 
       try {
         // --- Validate URL (mirrors v2's assertHttpUrl; a malformed URL throws
-        //     TypeError from new URL and funnels to the error wrap below) ---
-        const { protocol } = new URL(params.url);
-        if (protocol !== "http:" && protocol !== "https:") {
-          throw new Error("URL must use http:// or https://");
-        }
-
+        //     TypeError from new URL and funnels to the error wrap below). The
+        //     fragment is never sent, so it is stripped like upstream. ---
+        const url = sanitizeUrl(params.url);
         // --- Fetch ---
         const { response, arrayBuffer } = await fetchUrl(
-          params.url,
+          url,
           buildAcceptHeader(format),
           timeout,
           signal,

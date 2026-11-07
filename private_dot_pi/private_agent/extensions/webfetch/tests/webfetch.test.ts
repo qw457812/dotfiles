@@ -7,7 +7,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { convertHTMLToMarkdown, MAX_MARKDOWN_BYTES } from "../html-markdown";
-import webfetch, { extractTextFromHTML, RequestCancelledError } from "../index";
+import webfetch, { extractTextFromHTML, MAX_REDIRECTS, RequestCancelledError } from "../index";
 
 /** Await a promise that must reject, and return the rejection value. */
 async function captureError(promise: Promise<unknown>): Promise<any> {
@@ -152,7 +152,7 @@ describe("byte-budget edge cases", () => {
 // Companion guard for the websearch finding: cancellation is recognized by
 // typed identity (RequestCancelledError), never by message text.
 
-function activateWebfetch(fetchImpl: (url: string) => Response) {
+function activateWebfetch(fetchImpl: (url: string, init?: RequestInit) => Response) {
   let tool: any;
   webfetch({
     on() {},
@@ -164,10 +164,10 @@ function activateWebfetch(fetchImpl: (url: string) => Response) {
   const fetchMock = vi.fn(fetchImpl);
   vi.stubGlobal("fetch", fetchMock);
   return {
-    run: (signal?: AbortSignal) =>
+    run: (signal?: AbortSignal, overrides: Record<string, unknown> = {}) =>
       tool.execute(
         "call-1",
-        { url: "https://example.com/x", format: "markdown" },
+        { url: "https://example.com/x", format: "markdown", ...overrides },
         signal,
         undefined,
         {},
@@ -195,5 +195,117 @@ describe("cancellation identity", () => {
     const err = await captureError(tool.run());
     expect(err.message).toBe("Unable to fetch https://example.com/x");
     expect(err.cause.message).toBe("Request was cancelled");
+  });
+});
+
+// --- redirects and URL validation ------------------------------------------
+// tool-webfetch.test.ts: "follows redirects, checking each target against the
+// rules without asking", "stops at a redirect target the rules deny",
+// "rejects redirects to non-HTTP schemes and endless redirect chains",
+// "matches rules against the URL as written without the fragment and rejects
+// credentials" — the permission assertions collapse into URL validation here
+// (this extension has no permission gate, see README ledger).
+
+const redirect = (location: string, status = 302) =>
+  new Response(null, { status, headers: { location } });
+
+const ok = () => new Response("hello", { headers: { "content-type": "text/plain" } });
+
+describe("redirects and URL validation", () => {
+  it("follows redirects manually and resolves relative targets", async () => {
+    const seen: Array<{ url: string; redirect?: string }> = [];
+    const tool = activateWebfetch((url, init) => {
+      seen.push({ url, redirect: init?.redirect });
+      if (url === "https://example.com/x") return redirect("/target");
+      if (url === "https://example.com/target")
+        return redirect("https://cdn.example.com/final#frag", 301);
+      return ok();
+    });
+
+    const result = await tool.run();
+
+    expect(seen).toEqual([
+      { url: "https://example.com/x", redirect: "manual" },
+      { url: "https://example.com/target", redirect: "manual" },
+      { url: "https://cdn.example.com/final", redirect: "manual" },
+    ]);
+    expect(result.content).toEqual([{ type: "text", text: "hello" }]);
+    expect(result.details).toMatchObject({
+      url: "https://example.com/x",
+      contentType: "text/plain",
+    });
+  });
+
+  it("strips the fragment from the requested URL", async () => {
+    const seen: string[] = [];
+    const tool = activateWebfetch((url) => {
+      seen.push(url);
+      return ok();
+    });
+
+    await tool.run(undefined, { url: "https://Example.com/page#top" });
+
+    expect(seen).toEqual(["https://Example.com/page"]);
+  });
+
+  it("rejects credentials before transport", async () => {
+    const tool = activateWebfetch(ok);
+
+    const err = await captureError(tool.run(undefined, { url: "https://user@example.com/" }));
+
+    expect(err.message).toBe("Unable to fetch https://user@example.com/");
+    expect(err.cause.message).toBe("URL must not include credentials");
+    expect(tool.fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects redirects to non-HTTP schemes", async () => {
+    const tool = activateWebfetch(() => redirect("file:///etc/passwd"));
+
+    const err = await captureError(tool.run());
+
+    expect(err.cause.message).toBe("URL must use http:// or https://");
+    expect(tool.fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("rejects redirects that include credentials", async () => {
+    const tool = activateWebfetch(() => redirect("https://user@evil.example.com/"));
+
+    const err = await captureError(tool.run());
+
+    expect(err.cause.message).toBe("URL must not include credentials");
+    expect(tool.fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("stops endless redirect chains", async () => {
+    const tool = activateWebfetch((url) => redirect(`${url}x`, 307));
+
+    const err = await captureError(tool.run());
+
+    expect(err.cause.message).toBe(`Too many redirects (more than ${MAX_REDIRECTS})`);
+    expect(tool.fetchMock).toHaveBeenCalledTimes(MAX_REDIRECTS + 1);
+  });
+
+  it("keeps the Cloudflare retry, restarting the redirect chain", async () => {
+    const seen: Array<{ url: string; userAgent: string }> = [];
+    const tool = activateWebfetch((url, init) => {
+      const headers = (init?.headers as Record<string, string> | undefined) ?? {};
+      const userAgent = headers["User-Agent"] ?? "";
+      seen.push({ url, userAgent });
+      if (url === "https://example.com/x") return redirect("/target");
+      if (userAgent === "opencode") return ok();
+      return new Response(null, { status: 403, headers: { "cf-mitigated": "challenge" } });
+    });
+
+    await tool.run();
+
+    // First chain: x → target, blocked at target. Retry restarts at x with the
+    // bare client UA, then reaches target again.
+    expect(seen.map((entry) => entry.url)).toEqual([
+      "https://example.com/x",
+      "https://example.com/target",
+      "https://example.com/x",
+      "https://example.com/target",
+    ]);
+    expect(seen.map((entry) => entry.userAgent === "opencode")).toEqual([false, false, true, true]);
   });
 });
