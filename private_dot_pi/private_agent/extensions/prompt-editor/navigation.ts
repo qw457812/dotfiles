@@ -6,10 +6,13 @@ type VisualLine = { logicalLine: number; startCol: number; length: number };
 type NavigationEditorRuntime = {
   getMode: () => string;
   pendingOperator: string | null;
+  pendingExCommand?: string | null;
+  pendingZ?: boolean;
   state?: { lines?: string[]; cursorLine?: number; cursorCol?: number };
   lastWidth?: number;
   lastAction?: string | null;
   preferredVisualCol?: number | null;
+  displayWantedColumn?: number | null;
   snappedFromCursorCol?: number | null;
   prefixCount?: string;
   operatorCount?: string;
@@ -20,17 +23,27 @@ type NavigationEditorRuntime = {
   discardingBracketedPasteInNormalMode?: boolean;
   buildVisualLineMap?: (width: number) => VisualLine[];
   findCurrentVisualLine?: (visualLines: VisualLine[]) => number;
-  moveToVisualLine?: (
-    visualLines: VisualLine[],
-    currentVisualLine: number,
-    targetVisualLine: number,
-  ) => void;
   segment?: (text: string, granularity: "grapheme") => Iterable<{ index: number; segment: string }>;
   setCursorCol?: (col: number) => void;
   takeTotalCount?: (defaultValue?: number) => number;
   updateAutocomplete?: () => void;
   refreshPendingDispatchRestore?: () => void;
 };
+
+// A pending argument or paste owns the next input, including local aliases.
+export function canRemapNavigation(runtime: unknown, allowOperator = false): boolean {
+  const editor = runtime as NavigationEditorRuntime;
+  return !(
+    (!allowOperator && editor.pendingOperator !== null) ||
+    editor.pendingExCommand != null ||
+    editor.pendingZ ||
+    editor.pendingG ||
+    editor.pendingMotion ||
+    editor.pendingReplace ||
+    editor.pendingTextObject ||
+    editor.discardingBracketedPasteInNormalMode
+  );
+}
 
 // Keep standalone Normal-mode h/l motions on the current logical line.
 // pi-vim falls back to Pi's Left/Right handling when a motion reaches a
@@ -39,16 +52,7 @@ export function handleNormalHorizontalMotion(runtime: unknown, data: string): bo
   if (data !== "h" && data !== "l") return false;
 
   const editor = runtime as NavigationEditorRuntime;
-  if (
-    editor.pendingOperator !== null ||
-    editor.pendingG ||
-    editor.pendingMotion ||
-    editor.pendingReplace ||
-    editor.pendingTextObject ||
-    editor.discardingBracketedPasteInNormalMode
-  ) {
-    return false;
-  }
+  if (!canRemapNavigation(editor)) return false;
 
   const state = editor.state;
   if (
@@ -89,29 +93,18 @@ export function handleNormalHorizontalMotion(runtime: unknown, data: string): bo
 
   editor.lastAction = null;
   editor.setCursorCol(targetCol);
+  editor.displayWantedColumn = null;
   editor.updateAutocomplete();
   editor.refreshPendingDispatchRestore();
   return true;
 }
 
-// Display-line remaps in Normal, Visual, and Visual-line modes:
-// - j -> gj
-// - k -> gk
-// - H -> g^
-// - L -> g$
+// Display-line endpoints only. j/k run upstream's gj/gk input path.
 export function handleVisualLineRemap(runtime: unknown, data: string): boolean {
-  if (data !== "j" && data !== "k" && data !== "H" && data !== "L") return false;
+  if (data !== "H" && data !== "L") return false;
 
   const editor = runtime as NavigationEditorRuntime;
-  if (
-    editor.pendingOperator !== null ||
-    editor.prefixCount ||
-    editor.operatorCount ||
-    editor.pendingG ||
-    editor.pendingMotion ||
-    editor.pendingReplace ||
-    editor.pendingTextObject
-  ) {
+  if (!canRemapNavigation(editor) || editor.prefixCount || editor.operatorCount) {
     return false;
   }
 
@@ -125,7 +118,6 @@ export function handleVisualLineRemap(runtime: unknown, data: string): boolean {
     typeof width !== "number" ||
     !editor.buildVisualLineMap ||
     !editor.findCurrentVisualLine ||
-    !editor.moveToVisualLine ||
     !editor.segment ||
     !editor.refreshPendingDispatchRestore
   ) {
@@ -140,18 +132,6 @@ export function handleVisualLineRemap(runtime: unknown, data: string): boolean {
   }
 
   editor.lastAction = null;
-  if (data === "j" || data === "k") {
-    // Do not forward j/k as Up/Down: Pi's arrow handling navigates prompt
-    // history at visual-line boundaries, while Vim's gj/gk are no-ops.
-    // https://github.com/earendil-works/pi/blob/845d6ff1f6643aba440341cce877ce1c43ebbc39/packages/tui/src/components/editor.ts#L820-L845
-    const targetVisualLine = currentVisualLine + (data === "j" ? 1 : -1);
-    if (targetVisualLine >= 0 && targetVisualLine < visualLines.length) {
-      editor.moveToVisualLine(visualLines, currentVisualLine, targetVisualLine);
-    }
-    editor.refreshPendingDispatchRestore();
-    return true;
-  }
-
   const line = state.lines[current.logicalLine] ?? "";
   const segmentStart = current.startCol;
   const segmentEnd = Math.min(segmentStart + current.length, line.length);
@@ -176,6 +156,7 @@ export function handleVisualLineRemap(runtime: unknown, data: string): boolean {
 
   state.cursorLine = current.logicalLine;
   state.cursorCol = targetCol;
+  editor.displayWantedColumn = null;
   editor.preferredVisualCol = null;
   editor.snappedFromCursorCol = null;
   editor.refreshPendingDispatchRestore();

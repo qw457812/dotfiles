@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => {
   const construct = vi.fn();
+  const preflightHost = vi.fn(() => true);
   class ModalEditor {
     private text = "";
     borderColor = (text: string) => text;
@@ -15,6 +16,9 @@ const mocks = vi.hoisted(() => {
     setNotifyFn = vi.fn<(fn: (message: string) => void) => void>();
     setModeChangeFn = vi.fn<(fn: (event: unknown) => void) => void>();
     setExCommandSettings = vi.fn();
+    setHistoryNavigation = vi.fn();
+    setCursorShapeSettings = vi.fn();
+    preflightHost = preflightHost;
     setCommandNamesFn = vi.fn<(fn: () => ReadonlySet<string>) => void>();
     constructor(...args: unknown[]) {
       construct(...args);
@@ -36,14 +40,16 @@ const mocks = vi.hoisted(() => {
   return {
     ModalEditor,
     construct,
+    preflightHost,
     readdir: vi.fn(),
     stat: vi.fn(),
     open: vi.fn(),
     writeFileSync: vi.fn(),
     readSettings: vi.fn(),
     cancelModeChangeCommands: vi.fn(),
-    clipboard: vi.fn(),
     cursor: {
+      setShapeSequences: vi.fn(),
+      release: vi.fn(),
       install: vi.fn(),
       syncPreference: vi.fn(),
       render: vi.fn(),
@@ -76,6 +82,11 @@ vi.mock("@earendil-works/pi-coding-agent", () => ({
 }));
 vi.mock("../../extensions/prompt-editor/pi-vim.generated.ts", () => ({
   ModalEditor: mocks.ModalEditor,
+  CURSOR_SHAPE_SEQUENCES: { bar: "\x1b[5 q", block: "\x1b[1 q" },
+  createCursorBindingResolver: () => () => undefined,
+  resolveCursorShapeSettings: () => ({ settings: { insert: "bar", normal: "block" } }),
+  resolveHistoryNavigation: () => ({ enabled: true }),
+  resolveLabelPosition: () => ({ position: "top-left" }),
   readPiVimSettings: mocks.readSettings,
   resolveClipboardMirrorPolicy: (policy: string) => ({ policy }),
   resolveExCommandSettings: (settings: unknown) => ({ settings }),
@@ -88,9 +99,6 @@ vi.mock("../../extensions/prompt-editor/pi-vim.generated.ts", () => ({
   buildOffBorderColor: () => (text: string) => text,
   createModeChangeHandler: (_settings: unknown, emit: (event: unknown) => void) => emit,
   cancelModeChangeCommands: mocks.cancelModeChangeCommands,
-}));
-vi.mock("../../extensions/prompt-editor/clipboard.ts", () => ({
-  installClipboardBridge: mocks.clipboard,
 }));
 vi.mock("../../extensions/prompt-editor/cursor.ts", () => ({
   createCursorController: () => mocks.cursor,
@@ -108,7 +116,14 @@ function host(initialText = "draft") {
   const callbacks = { onSubmit: vi.fn(), onChange: vi.fn() };
   Object.assign(defaultEditor, callbacks);
   let current = defaultEditor;
-  const tui = {};
+  // A competing upstream factory has already forced hardware visibility on.
+  let hardwareCursor = true;
+  const tui = {
+    getShowHardwareCursor: () => hardwareCursor,
+    setShowHardwareCursor: vi.fn((enabled: boolean) => {
+      hardwareCursor = enabled;
+    }),
+  };
   const editorTheme = {};
   const keybindings = {};
   const defaultBorder = (text: string) => `default:${text}`;
@@ -162,7 +177,9 @@ function context(h: ReturnType<typeof host>, prompts = ["first", "second"]) {
   };
 }
 
-async function extension() {
+async function extension(
+  settings: { showHardwareCursor?: boolean } = { showHardwareCursor: true },
+) {
   const handlers = new Map<string, Handler>();
   const focus = new Map<string, (event: unknown) => void>();
   const offFocus = vi.fn(() => focus.delete("my:focus_change"));
@@ -180,6 +197,7 @@ async function extension() {
     },
     getCommands: () => commands,
     getThinkingLevel: () => "medium",
+    getSettings: () => settings,
   };
   await promptEditor(api as unknown as ExtensionAPI);
   return {
@@ -227,6 +245,7 @@ function previousHistory() {
 beforeEach(() => {
   vi.useFakeTimers();
   vi.clearAllMocks();
+  mocks.preflightHost.mockReset().mockReturnValue(true);
   vi.stubEnv("PI_CODING_AGENT_DIR", "/test/agent");
   mocks.readdir.mockReset().mockResolvedValue([]);
   mocks.stat.mockReset();
@@ -260,10 +279,52 @@ describe("prompt-editor installation lifecycle (host-contract integration)", () 
     expect(h.editor.onChange).toBe(h.callbacks.onChange);
     expect(h.editor.borderColor).toBe(h.thinkingBorder);
     expect(h.ui.theme.getThinkingBorderColor).toHaveBeenCalledWith("medium");
-    expect(mocks.clipboard).toHaveBeenCalledWith(h.editor);
-    expect(mocks.cursor.install).toHaveBeenCalledWith(h.tui, h.editor);
+    expect(mocks.cursor.install).toHaveBeenCalledWith(h.tui, h.editor, true);
+    expect(h.editor.setHistoryNavigation).toHaveBeenCalledWith(true);
+    expect(h.editor.setCursorShapeSettings).toHaveBeenCalledWith({
+      insert: "bar",
+      normal: "block",
+    });
     expect(vi.getTimerCount()).toBe(0);
   });
+
+  it.each([
+    { preference: false, env: "1", expected: false },
+    { preference: true, env: undefined, expected: true },
+    { preference: undefined, env: undefined, expected: false },
+    { preference: undefined, env: "0", expected: false },
+    { preference: undefined, env: "1", expected: true },
+  ])(
+    "restores stock cursor visibility after failed preflight: %j",
+    async ({ preference, env, expected }) => {
+      vi.stubEnv("PI_HARDWARE_CURSOR", env);
+      mocks.preflightHost.mockReturnValue(false);
+      const e = await extension({ showHardwareCursor: preference });
+      const h = host();
+      expect(h.tui.getShowHardwareCursor()).toBe(true);
+      e.start(context(h));
+      expect(mocks.cursor.install).not.toHaveBeenCalled();
+      expect(mocks.cursor.release).toHaveBeenCalledOnce();
+      expect(h.tui.setShowHardwareCursor).toHaveBeenCalledWith(expected);
+      expect(h.tui.getShowHardwareCursor()).toBe(expected);
+      expect(mocks.cursor.release.mock.invocationCallOrder[0]).toBeLessThan(
+        h.tui.setShowHardwareCursor.mock.invocationCallOrder[0]!,
+      );
+    },
+  );
+
+  it.each([undefined, "1"])(
+    "passes the effective host default to compatible cursor installs with env=%j",
+    async (env) => {
+      vi.stubEnv("PI_HARDWARE_CURSOR", env);
+      const e = await extension({});
+      const h = host();
+      e.start(context(h));
+      expect(mocks.cursor.install).toHaveBeenCalledWith(h.tui, h.editor, env === "1");
+      expect(mocks.cursor.release).not.toHaveBeenCalled();
+      expect(h.tui.setShowHardwareCursor).not.toHaveBeenCalled();
+    },
+  );
 
   it("wins over a late editor install even after an earlier async handler yields to timers", async () => {
     const e = await extension();

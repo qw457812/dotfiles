@@ -1,16 +1,13 @@
+import { canRemapNavigation } from "./navigation.ts";
+
 type VisualPasteEditorRuntime = {
   getMode: () => string;
-  pendingOperator: string | null;
   prefixCount?: string;
   operatorCount?: string;
-  pendingG?: boolean;
-  pendingMotion?: string | null;
-  pendingReplace?: boolean;
-  pendingTextObject?: string | null;
   unnamedRegister?: string;
   preferRegisterForPut?: boolean;
   clipboardMirrorPolicy?: string;
-  getPasteRegisterText?: () => string;
+  getSafePutText?: () => string;
   getVisualAnchor?: () => { line: number; col: number };
   getCursor?: () => { line: number; col: number };
   getLines?: () => string[];
@@ -25,20 +22,12 @@ type VisualPasteEditorRuntime = {
 
 // Visual `p` replaces the selection and leaves its deleted text in the
 // unnamed register. Visual `P` performs the same replacement without
-// changing the register. pi-vim 0.14.1 intentionally swallows both keys.
+// changing the register. pi-vim 0.15.1 still swallows both keys.
 export function handleVisualPaste(runtime: unknown, data: string): boolean {
   if (data !== "p" && data !== "P") return false;
 
   const editor = runtime as VisualPasteEditorRuntime;
-  if (
-    editor.pendingOperator !== null ||
-    editor.pendingG ||
-    editor.pendingMotion ||
-    editor.pendingReplace ||
-    editor.pendingTextObject
-  ) {
-    return false;
-  }
+  if (!canRemapNavigation(editor)) return false;
 
   if (
     typeof editor.prefixCount !== "string" ||
@@ -46,7 +35,7 @@ export function handleVisualPaste(runtime: unknown, data: string): boolean {
     typeof editor.unnamedRegister !== "string" ||
     typeof editor.preferRegisterForPut !== "boolean" ||
     typeof editor.clipboardMirrorPolicy !== "string" ||
-    !editor.getPasteRegisterText ||
+    !editor.getSafePutText ||
     !editor.getVisualAnchor ||
     !editor.getCursor ||
     !editor.getLines ||
@@ -61,7 +50,8 @@ export function handleVisualPaste(runtime: unknown, data: string): boolean {
     throw new Error("prompt-editor: visual paste runtime is incompatible");
   }
 
-  const putText = editor.getPasteRegisterText();
+  // Use upstream's effective payload before deleting: control-only puts are no-ops.
+  const putText = editor.getSafePutText();
   if (!putText) {
     editor.prefixCount = "";
     editor.operatorCount = "";

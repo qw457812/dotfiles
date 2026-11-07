@@ -2,6 +2,7 @@ import { Editor, type TUI } from "@earendil-works/pi-tui";
 import { describe, expect, it, vi } from "vitest";
 
 import {
+  canRemapNavigation,
   handleNormalHorizontalMotion,
   handleVisualLineRemap,
 } from "../../extensions/prompt-editor/navigation.ts";
@@ -43,6 +44,9 @@ function fixture(lines = ["abc", "def"]) {
 const pendingStates = [
   { pendingOperator: "d" },
   { pendingG: true },
+  { pendingZ: true },
+  { pendingExCommand: ":model" },
+  { discardingBracketedPasteInNormalMode: true },
   { pendingMotion: "f" },
   { pendingReplace: true },
   { pendingTextObject: "i" },
@@ -135,7 +139,7 @@ describe("prompt-editor logical-line horizontal motions", () => {
 });
 
 describe("prompt-editor display-line remaps", () => {
-  it.each(["h", "l", "x", "r", "\x1b[200~"])("delegates %j", (key) => {
+  it.each(["h", "l", "j", "k", "x", "r", "\x1b[200~"])("delegates %j", (key) => {
     expect(handleVisualLineRemap({}, key)).toBe(false);
   });
 
@@ -151,28 +155,13 @@ describe("prompt-editor display-line remaps", () => {
     },
   );
 
-  it.each([
-    ["j", 0, 1],
-    ["k", 1, 0],
-  ] as const)("moves %s through Pi's visual-line method", (key, current, target) => {
+  it("allows only the operator exception needed by cl", () => {
     const editor = fixture();
-    editor.findCurrentVisualLine.mockReturnValue(current);
-    expect(handleVisualLineRemap(editor, key)).toBe(true);
-    expect(editor.buildVisualLineMap).toHaveBeenCalledWith(10);
-    expect(editor.moveToVisualLine).toHaveBeenCalledWith(expect.any(Array), current, target);
-    expect(editor.lastAction).toBeNull();
-    expect(editor.refreshPendingDispatchRestore).toHaveBeenCalledOnce();
-  });
-
-  it.each([
-    ["k", 0],
-    ["j", 1],
-  ] as const)("consumes %s at boundary %i without invoking history", (key, current) => {
-    const editor = fixture();
-    editor.findCurrentVisualLine.mockReturnValue(current);
-    expect(handleVisualLineRemap(editor, key)).toBe(true);
-    expect(editor.moveToVisualLine).not.toHaveBeenCalled();
-    expect(editor.refreshPendingDispatchRestore).toHaveBeenCalledOnce();
+    editor.pendingOperator = "c";
+    expect(canRemapNavigation(editor)).toBe(false);
+    expect(canRemapNavigation(editor, true)).toBe(true);
+    editor.pendingMotion = "f";
+    expect(canRemapNavigation(editor, true)).toBe(false);
   });
 
   it.each(["normal", "visual", "visual-line"])("handles H and final-segment L in %s", (mode) => {
@@ -231,11 +220,10 @@ describe("prompt-editor display-line remaps", () => {
     "lastWidth",
     "buildVisualLineMap",
     "findCurrentVisualLine",
-    "moveToVisualLine",
     "segment",
     "refreshPendingDispatchRestore",
   ])("fails loudly when %s is unavailable", (member) => {
-    expect(() => handleVisualLineRemap({ ...fixture(), [member]: undefined }, "j")).toThrow(
+    expect(() => handleVisualLineRemap({ ...fixture(), [member]: undefined }, "H")).toThrow(
       "display-line remap runtime is incompatible",
     );
   });
@@ -243,7 +231,7 @@ describe("prompt-editor display-line remaps", () => {
   it("fails loudly when Pi cannot locate the current visual line", () => {
     const editor = fixture();
     editor.findCurrentVisualLine.mockReturnValue(-1);
-    expect(() => handleVisualLineRemap(editor, "j")).toThrow(
+    expect(() => handleVisualLineRemap(editor, "H")).toThrow(
       "current Pi Editor visual line is unavailable",
     );
   });
@@ -299,14 +287,12 @@ describe("navigation against the installed Pi Editor", () => {
     runtime.state.cursorCol = 0;
     const map = runtime.buildVisualLineMap(runtime.lastWidth);
     expect(map.length).toBeGreaterThan(2);
-    const move = vi.spyOn(runtime, "moveToVisualLine");
-    handleVisualLineRemap(editor, "j");
-    expect(move).toHaveBeenCalledWith(map, 0, 1);
+    runtime.moveToVisualLine(map, 0, 1);
     handleVisualLineRemap(editor, "H");
     expect(editor.getCursor()).toEqual({ line: 0, col: map[1]!.startCol });
     handleVisualLineRemap(editor, "L");
     expect(editor.getCursor().col).toBe(map[1]!.startCol + map[1]!.length - 1);
-    handleVisualLineRemap(editor, "k");
+    runtime.moveToVisualLine(map, 1, 0);
     expect(runtime.findCurrentVisualLine(map)).toBe(0);
     expect(editor.getText()).toBe(text);
   });

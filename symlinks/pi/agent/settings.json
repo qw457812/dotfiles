@@ -154,6 +154,10 @@
     "git:github.com/qw457812/pi-voice@termux"
   ],
   "piVim": {
+    "cursorShape": {
+      "insert": "steady-bar",
+      "normal": "steady-block"
+    },
     "borderSync": {
       "insert": "host",
       "normal": "mode",

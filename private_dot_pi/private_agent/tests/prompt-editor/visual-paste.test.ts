@@ -15,7 +15,7 @@ function fixture() {
     unnamedRegister: "original register",
     preferRegisterForPut: false,
     clipboardMirrorPolicy: "always",
-    getPasteRegisterText: vi.fn(() => "clipboard payload"),
+    getSafePutText: vi.fn(() => "clipboard payload"),
     getVisualAnchor: vi.fn(() => ({ line: 0, col: 2 })),
     getCursor: vi.fn(() => ({ line: 0, col: 4 })),
     getLines: vi.fn(() => ["abcdef", "second", "last"]),
@@ -54,7 +54,7 @@ describe("prompt-editor visual paste", () => {
     const editor = fixture();
     Object.assign(editor, pending);
     for (const key of ["p", "P"]) expect(handleVisualPaste(editor, key)).toBe(false);
-    expect(editor.getPasteRegisterText).not.toHaveBeenCalled();
+    expect(editor.getSafePutText).not.toHaveBeenCalled();
     expect(editor.prefixCount).toBe("2");
     expect(editor.operatorCount).toBe("3");
   });
@@ -70,8 +70,8 @@ describe("prompt-editor visual paste", () => {
       editor.operatorCount = "";
     });
     expect(handleVisualPaste(editor, key)).toBe(true);
-    expect(editor.getPasteRegisterText).toHaveBeenCalledOnce();
-    expect(editor.getPasteRegisterText.mock.invocationCallOrder[0]).toBeLessThan(
+    expect(editor.getSafePutText).toHaveBeenCalledOnce();
+    expect(editor.getSafePutText.mock.invocationCallOrder[0]).toBeLessThan(
       editor.applyVisualOperator.mock.invocationCallOrder[0]!,
     );
     expect(editor.applyVisualOperator).toHaveBeenCalledWith("d", false);
@@ -123,7 +123,7 @@ describe("prompt-editor visual paste", () => {
     "consumes an empty payload without deleting or changing mode for %s",
     (key) => {
       const editor = fixture();
-      editor.getPasteRegisterText.mockReturnValue("");
+      editor.getSafePutText.mockReturnValue("");
       expect(handleVisualPaste(editor, key)).toBe(true);
       expect(editor.prefixCount).toBe("");
       expect(editor.operatorCount).toBe("");
@@ -210,7 +210,7 @@ describe("prompt-editor visual paste", () => {
   it("leaves state untouched when resolving the payload throws", () => {
     const editor = fixture();
     const failure = new Error("read failed");
-    editor.getPasteRegisterText.mockImplementation(() => {
+    editor.getSafePutText.mockImplementation(() => {
       throw failure;
     });
     expect(() => handleVisualPaste(editor, "P")).toThrow(failure);
@@ -225,7 +225,7 @@ describe("prompt-editor visual paste", () => {
     "unnamedRegister",
     "preferRegisterForPut",
     "clipboardMirrorPolicy",
-    "getPasteRegisterText",
+    "getSafePutText",
     "getVisualAnchor",
     "getCursor",
     "getLines",
@@ -240,6 +240,6 @@ describe("prompt-editor visual paste", () => {
     const original = fixture();
     const editor = { ...original, [member]: undefined };
     expect(() => handleVisualPaste(editor, "p")).toThrow("visual paste runtime is incompatible");
-    expect(original.getPasteRegisterText).not.toHaveBeenCalled();
+    expect(original.getSafePutText).not.toHaveBeenCalled();
   });
 });

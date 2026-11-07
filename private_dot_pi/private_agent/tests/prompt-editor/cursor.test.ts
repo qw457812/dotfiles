@@ -101,6 +101,35 @@ describe("prompt-editor cursor controller", () => {
     expect(tui.requestRender).not.toHaveBeenCalled();
   });
 
+  it("uses upstream-resolved shape sequences", () => {
+    const { tui, editor, controller } = setup();
+    controller.setShapeSequences({ insert: "\x1b[3 q", normal: "\x1b[6 q" });
+    controller.install(tui, editor);
+    controller.modeChanged("visual");
+    expect(tui.terminal.write.mock.calls).toEqual([["\x1b[3 q"], ["\x1b[6 q"]]);
+  });
+
+  it("restores a false setting after a competing upstream factory forces hardware on", () => {
+    const { tui, editor, controller } = setup(true);
+    controller.install(tui, editor, false);
+    expect(tui.getShowHardwareCursor()).toBe(false);
+    expect(tui.setShowHardwareCursor).toHaveBeenCalledWith(false);
+    expect(tui.terminal.write).not.toHaveBeenCalled();
+  });
+
+  it("releases ownership for stock-editor degradation while retaining terminal focus", () => {
+    const { tui, editor, controller, writeReset } = setup();
+    controller.install(tui, editor);
+    controller.setFocused(false);
+    controller.release();
+    const writes = tui.terminal.write.mock.calls.length;
+    controller.modeChanged("normal");
+    expect(tui.terminal.write).toHaveBeenCalledTimes(writes);
+    expect(writeReset).toHaveBeenCalledWith("\x1b[0 q");
+    controller.install(tui, editor, true);
+    expect(tui.getShowHardwareCursor()).toBe(false);
+  });
+
   it("remembers focus before installation", () => {
     const { tui, editor, controller } = setup();
     controller.setFocused(false);

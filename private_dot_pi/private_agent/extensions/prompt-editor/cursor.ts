@@ -13,16 +13,14 @@ const CURSOR_STYLE_INSERT = "\x1b[6 q"; // steady bar
 const CURSOR_STYLE_NORMAL = "\x1b[2 q"; // steady block
 const CURSOR_STYLE_RESET = "\x1b[0 q";
 
-function getCursorStyle(mode: string): string {
-  return mode === "insert" ? CURSOR_STYLE_INSERT : CURSOR_STYLE_NORMAL;
-}
-
 /** Own cursor preference, focus and terminal shape without wrapping the renderer. */
 export function createCursorController(
   writeReset: (data: string) => void = (data) => {
     process.stdout.write(data);
   },
 ) {
+  let shapes = { insert: CURSOR_STYLE_INSERT, normal: CURSOR_STYLE_NORMAL };
+  const getCursorStyle = (mode: string) => (mode === "insert" ? shapes.insert : shapes.normal);
   let blurred = false;
   let hardware = true;
   let activeTui: CursorTUI | undefined;
@@ -39,11 +37,25 @@ export function createCursorController(
     tui.terminal.write(hardware && !blurred ? getCursorStyle(mode) : CURSOR_STYLE_RESET);
   }
 
+  function release(): void {
+    activeTui = undefined;
+    activeEditor = undefined;
+    setShowHardwareCursor = undefined;
+    writeReset(CURSOR_STYLE_RESET);
+  }
+
   return {
-    install(tui: CursorTUI, editor: CursorEditor): void {
+    setShapeSequences(sequences: { insert: string; normal: string }): void {
+      shapes = { ...sequences };
+    },
+
+    release,
+
+    install(tui: CursorTUI, editor: CursorEditor, preference?: boolean): void {
       activeTui = tui;
       activeEditor = editor;
-      hardware = tui.getShowHardwareCursor?.() ?? true;
+      // A competing pi-vim factory forces hardware on; prefer the real setting.
+      hardware = preference ?? tui.getShowHardwareCursor?.() ?? true;
       setShowHardwareCursor ??= tui.setShowHardwareCursor;
       // Set visibility outside render() to avoid re-entering the render path.
       applyVisibility(tui);
@@ -84,10 +96,7 @@ export function createCursorController(
     shutdown(): void {
       blurred = false;
       hardware = true;
-      activeTui = undefined;
-      activeEditor = undefined;
-      setShowHardwareCursor = undefined;
-      writeReset(CURSOR_STYLE_RESET);
+      release();
     },
   };
 }

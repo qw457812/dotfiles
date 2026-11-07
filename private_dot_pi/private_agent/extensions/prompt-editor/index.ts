@@ -3,16 +3,17 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
-  CustomEditor,
   getAgentDir,
   type ExtensionAPI,
   type ExtensionUIContext,
 } from "@earendil-works/pi-coding-agent";
-import { Key, matchesKey, truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
-
-import { installClipboardBridge } from "./clipboard.ts";
+import { Key, matchesKey, visibleWidth } from "@earendil-works/pi-tui";
 import { createCursorController } from "./cursor.ts";
-import { handleNormalHorizontalMotion, handleVisualLineRemap } from "./navigation.ts";
+import {
+  canRemapNavigation,
+  handleNormalHorizontalMotion,
+  handleVisualLineRemap,
+} from "./navigation.ts";
 import { handleVisualPaste } from "./visual-paste.ts";
 import {
   applyPromptHistory,
@@ -84,7 +85,9 @@ export * from ${JSON.stringify(piVimEntry)};
 export { resolveClipboardMirrorPolicy } from ${JSON.stringify(join(piVimDir, "clipboard-policy.ts"))};
 export { cancelModeChangeCommands, createModeChangeHandler } from ${JSON.stringify(join(piVimDir, "mode-change-command.ts"))};
 export { buildModeColorizers, buildOffBorderColor, resolveModeColors } from ${JSON.stringify(join(piVimDir, "mode-colors.ts"))};
-export { readPiVimSettings, resolveExCommandSettings, resolveSurfaceSyncMaps } from ${JSON.stringify(join(piVimDir, "settings.ts"))};
+export { CURSOR_SHAPE_SEQUENCES } from ${JSON.stringify(join(piVimDir, "cursor-shape.ts"))};
+export { createCursorBindingResolver } from ${JSON.stringify(join(piVimDir, "input-keys.ts"))};
+export { readPiVimSettings, resolveCursorShapeSettings, resolveExCommandSettings, resolveHistoryNavigation, resolveLabelPosition, resolveSurfaceSyncMaps } from ${JSON.stringify(join(piVimDir, "settings.ts"))};
 `;
 
   const current = existsSync(PI_VIM_WRAPPER) ? readFileSync(PI_VIM_WRAPPER, "utf8") : null;
@@ -98,13 +101,18 @@ export default async function (pi: ExtensionAPI) {
 
   const {
     ModalEditor,
+    CURSOR_SHAPE_SEQUENCES,
+    createCursorBindingResolver,
     buildModeColorizers,
     buildOffBorderColor,
     cancelModeChangeCommands,
     createModeChangeHandler,
     readPiVimSettings,
     resolveClipboardMirrorPolicy,
+    resolveCursorShapeSettings,
     resolveExCommandSettings,
+    resolveHistoryNavigation,
+    resolveLabelPosition,
     resolveModeColors,
     resolveSurfaceSyncMaps,
   } = await import("./pi-vim.generated.ts");
@@ -122,11 +130,10 @@ export default async function (pi: ExtensionAPI) {
   type ModalEditorRuntime = {
     getMode: () => Mode;
     setMode?: (mode?: Mode) => void;
-    getModeLabel?: () => string;
-    getModeLabelColorizer?: () => ((s: string) => string) | null;
     borderColor?: (s: string) => string;
     pendingExCommand: string | null;
     pendingOperator: string | null;
+    cancelAutocomplete: () => void;
     addToHistory?: (text: string) => void;
     history?: string[];
     historyIndex?: number;
@@ -146,28 +153,6 @@ export default async function (pi: ExtensionAPI) {
     if (editor.pendingExCommand !== null) return "ex";
     const mode = editor.getMode();
     return mode === "visual-line" ? "visual" : mode;
-  }
-
-  function getRenderedModeLabel(editor: ModalEditorRuntime): {
-    raw: string;
-    rendered: string;
-  } {
-    const raw =
-      editor.getModeLabel?.() ??
-      (
-        {
-          insert: " INSERT ",
-          normal: " NORMAL ",
-          visual: " VISUAL ",
-          "visual-line": " V-LINE ",
-        } satisfies Record<Mode, string>
-      )[editor.getMode()];
-    const colorize = editor.getModeLabelColorizer?.() ?? null;
-
-    return {
-      raw,
-      rendered: colorize ? colorize(raw) : raw,
-    };
   }
 
   function getRenderedPrefix(editor: ModalEditorRuntime, colorizers: ModeColorizers): string {
@@ -194,6 +179,7 @@ export default async function (pi: ExtensionAPI) {
 
   class PromptEditor extends ModalEditor {
     private readonly prefixColorizers: ModeColorizers;
+    private readonly resolveCursorMotion: ReturnType<typeof createCursorBindingResolver>;
 
     constructor(
       tui: EditorFactoryArgs[0],
@@ -206,6 +192,8 @@ export default async function (pi: ExtensionAPI) {
       offBorderColor: ((s: string) => string) | null,
       labelTransform: (s: string) => string,
       prefixColorizers: ModeColorizers,
+      labelPosition: "bottom-right" | "top-left",
+      selectionColorizer: (s: string) => string,
     ) {
       super(
         tui as unknown as ModalEditorConstructorArgs[0],
@@ -218,9 +206,14 @@ export default async function (pi: ExtensionAPI) {
           labelSync,
           offBorderColor,
           labelTransform,
+          labelPosition,
+          selectionColorizer,
         },
       );
       this.prefixColorizers = prefixColorizers;
+      this.resolveCursorMotion = createCursorBindingResolver(
+        kb as unknown as ModalEditorConstructorArgs[2],
+      );
       // Pi 0.85 added embedWorkingStatus on CustomEditor. pi-vim's
       // ModalEditor doesn't forward options to super(), so set it directly.
       (this as any).embedWorkingStatus = true;
@@ -232,10 +225,30 @@ export default async function (pi: ExtensionAPI) {
     }
 
     override handleInput(data: string): void {
-      // pi-vim has an ex command mode.
-      // If active, let pi-vim handle input directly so remaps don't interfere.
-      if ((this as unknown as ModalEditorRuntime).pendingExCommand !== null) {
+      const runtime = this as unknown as ModalEditorRuntime;
+      if (!this.preflightHost()) {
         super.handleInput(data);
+        return;
+      }
+      // Preserve local cl -> s; upstream still lacks horizontal change motions.
+      if (runtime.pendingOperator === "c" && data === "l" && canRemapNavigation(this, true)) {
+        runtime.pendingOperator = null;
+        super.handleInput("s");
+        return;
+      }
+      // Upstream owns degradation, EX, paste and pending arguments (including Z).
+      if (!canRemapNavigation(this)) {
+        const completesLineChange =
+          this.getMode() === "normal" &&
+          runtime.pendingOperator === "c" &&
+          data === "c" &&
+          canRemapNavigation(this, true);
+        super.handleInput(data);
+        if (completesLineChange && this.getMode() === "insert") {
+          // Upstream cc calls host deletion directly, leaving the old picker alive.
+          // Cancel through Pi so both visible UI and in-flight requests are cleared.
+          runtime.cancelAutocomplete();
+        }
         return;
       }
       const mode = this.getMode();
@@ -245,16 +258,6 @@ export default async function (pi: ExtensionAPI) {
         matchesKey(data, Key.enter) &&
         this.getText().trim() !== "";
       if (mode === "normal") {
-        // pi-vim's cutCurrentLineContent (used by `cc`) relies on CTRL_A +
-        // CTRL_K which doesn't work when autocomplete is active. Dismiss it
-        // before executing a pending operator so `cc` clears correctly.
-        if (
-          (this as unknown as ModalEditorRuntime).pendingOperator !== null &&
-          (this as any).isShowingAutocomplete?.()
-        ) {
-          (this as any).cancelAutocomplete?.();
-        }
-
         // Backspace in normal mode: map to h (move left) instead of
         // passing through to the base Editor which deletes a character.
         if (matchesKey(data, Key.backspace)) {
@@ -281,17 +284,24 @@ export default async function (pi: ExtensionAPI) {
           super.handleInput("$");
           return;
         }
-        // cl -> s: pi-vim doesn't accept l as a motion for c, so we clear
-        // the pending operator directly and delegate to the native s command.
-        if ((this as unknown as ModalEditorRuntime).pendingOperator === "c" && data === "l") {
-          (this as unknown as ModalEditorRuntime).pendingOperator = null;
-          super.handleInput("s"); // cut char + insert
+      }
+      if (mode !== "insert") {
+        // Match upstream cursor aliases, preserving modal Escape and Vim undo/redo.
+        const vimControl =
+          matchesKey(data, "escape") ||
+          matchesKey(data, "ctrl+[") ||
+          matchesKey(data, "ctrl+r") ||
+          matchesKey(data, "ctrl+_");
+        const motion = vimControl ? data : (this.resolveCursorMotion(data) ?? data);
+        if (mode === "normal" && handleNormalHorizontalMotion(this, motion)) return;
+        if ((mode === "visual" || mode === "visual-line") && handleVisualPaste(this, data)) return;
+        if (motion === "j" || motion === "k") {
+          // Let upstream own wrapped layout, wanted columns, counts and replay.
+          super.handleInput("g");
+          super.handleInput(motion);
           return;
         }
-        if (handleNormalHorizontalMotion(this, data) || handleVisualLineRemap(this, data)) return;
-      }
-      if (mode === "visual" || mode === "visual-line") {
-        if (handleVisualPaste(this, data) || handleVisualLineRemap(this, data)) return;
+        if (handleVisualLineRemap(this, motion)) return;
       }
       super.handleInput(data);
       if (submittedFromNormalMode && this.getText() === "") {
@@ -302,6 +312,7 @@ export default async function (pi: ExtensionAPI) {
     }
 
     override render(width: number): string[] {
+      if (!this.preflightHost()) return super.render(width);
       cursor.syncPreference(this.getMode());
 
       if (width <= PREFIX_WIDTH) {
@@ -312,15 +323,9 @@ export default async function (pi: ExtensionAPI) {
         return lines;
       }
 
-      // Related upstream logic:
-      // - https://github.com/lajarre/pi-vim/blob/2671cf11/index.ts (ModalEditor.render)
-      // - https://github.com/badlogic/pi-mono/blob/e3fee7a511503ebe170223cd89e7631751539f25/packages/coding-agent/src/modes/interactive/components/custom-editor.ts
-      //
-      // Bypass ModalEditor.render() here so pi-vim does not append the mode
-      // label to the last rendered line (which becomes the autocomplete list
-      // during slash-command completion). We re-attach the label to the actual
-      // bottom border below.
-      const lines = CustomEditor.prototype.render.call(this, width - PREFIX_WIDTH) as string[];
+      // Upstream owns selection paint, labels, preflight and gj/gk layout tracking.
+      // The top-left label stays on the border even when autocomplete is visible.
+      const lines = super.render(width - PREFIX_WIDTH);
       if (lines.length < 3) {
         cursor.render(lines, lines.length);
         return lines;
@@ -334,14 +339,10 @@ export default async function (pi: ExtensionAPI) {
 
       const borderColor = this.borderColor ?? ((s: string) => s);
       const extraBorder = borderColor("─".repeat(PREFIX_WIDTH));
-      const { raw: rawLabel, rendered: renderedLabel } = getRenderedModeLabel(
-        this as unknown as ModalEditorRuntime,
-      );
       const renderedPrefix = getRenderedPrefix(
         this as unknown as ModalEditorRuntime,
         this.prefixColorizers,
       );
-      const labelWidth = visibleWidth(rawLabel);
 
       // The editor body is rendered `PREFIX_WIDTH` columns narrower so wrapped
       // text accounts for the prompt prefix. We then extend the top/bottom
@@ -350,14 +351,7 @@ export default async function (pi: ExtensionAPI) {
       // region (before its trailing border run), so extending on the right
       // keeps it intact.
       lines[0] = lines[0]! + extraBorder;
-      if (visibleWidth(lines[bottomIdx]!) >= labelWidth) {
-        lines[bottomIdx] =
-          truncateToWidth(lines[bottomIdx]!, width - PREFIX_WIDTH - labelWidth, "") +
-          extraBorder +
-          renderedLabel;
-      } else {
-        lines[bottomIdx] = lines[bottomIdx]! + extraBorder;
-      }
+      lines[bottomIdx] = lines[bottomIdx]! + extraBorder;
 
       for (let i = 1; i < bottomIdx; i++) {
         lines[i] = (i === 1 ? renderedPrefix : CONTINUATION_PREFIX) + lines[i]!;
@@ -382,6 +376,23 @@ export default async function (pi: ExtensionAPI) {
       piVimSettings.exCommand,
       piVimSettings.globalExCommand,
     );
+
+    const historyNavigation = resolveHistoryNavigation(piVimSettings.historyNavigation);
+    const cursorShape = resolveCursorShapeSettings(piVimSettings.cursorShape);
+    const labelPosition = resolveLabelPosition(piVimSettings.labelPosition);
+    for (const warning of [
+      clipboardMirrorPolicy.warning,
+      exCommand.warning,
+      historyNavigation.warning,
+      cursorShape.warning,
+      labelPosition.warning,
+    ]) {
+      if (warning && ctx.hasUI) ctx.ui.notify(warning, "warning");
+    }
+    cursor.setShapeSequences({
+      insert: CURSOR_SHAPE_SEQUENCES[cursorShape.settings.insert],
+      normal: CURSOR_SHAPE_SEQUENCES[cursorShape.settings.normal],
+    });
 
     const theme = ctx.ui.theme;
     const modeColors = resolveModeColors(piVimSettings.modeColors);
@@ -450,6 +461,16 @@ export default async function (pi: ExtensionAPI) {
           offBorderColor,
           reverseVideo,
           prefixColorizers,
+          labelPosition.position,
+          (text) => {
+            try {
+              const painted = ctx.ui.theme.bg("selectedBg", text);
+              if (painted !== text && painted !== `\x1b[49m${text}\x1b[49m`) return painted;
+            } catch {
+              // Incomplete themes retain upstream's reverse-video fallback.
+            }
+            return reverseVideo(text);
+          },
         );
 
         // pi-vim configures quitFn and notifyFn on the editor
@@ -459,6 +480,8 @@ export default async function (pi: ExtensionAPI) {
         newEditor.setQuitFn(() => ctx.shutdown());
         newEditor.setNotifyFn((message: string) => ctx.ui.notify(message, "warning"));
         newEditor.setModeChangeFn(modeChangeHandler);
+        newEditor.setHistoryNavigation(historyNavigation.enabled);
+        newEditor.setCursorShapeSettings(cursorShape.settings);
         newEditor.setExCommandSettings(exCommand.settings);
         // Resolve at submit time so commands registered or reloaded during the
         // session become available without reinstalling the editor.
@@ -469,10 +492,16 @@ export default async function (pi: ExtensionAPI) {
               ...pi.getCommands().map((command) => command.name),
             ]),
         );
-        installClipboardBridge(newEditor);
-
         editor = newEditor as unknown as ModalEditorRuntime;
-        cursor.install(tui, newEditor);
+        // Match Pi's effective preference, not a competing editor's forced visibility.
+        const showHardwareCursor =
+          pi.getSettings().showHardwareCursor ?? process.env.PI_HARDWARE_CURSOR === "1";
+        if (newEditor.preflightHost()) {
+          cursor.install(tui, newEditor, showHardwareCursor);
+        } else {
+          cursor.release();
+          tui.setShowHardwareCursor(showHardwareCursor);
+        }
 
         if (retainedHistory) {
           editor.history = retainedHistory;

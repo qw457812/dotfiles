@@ -41,11 +41,13 @@ super(tui, theme, kb, {
   labelSync,
   offBorderColor,
   labelTransform,
+  labelPosition,
+  selectionColorizer,
 });
 ```
 
-Colorizer keys can differ from editor modes. For pi-vim 0.14, both visual editor
-modes share one color key:
+Colorizer keys differ from editor modes: both visual editor modes share one
+color key:
 
 ```ts
 type Mode = "insert" | "normal" | "visual" | "visual-line";
@@ -53,8 +55,8 @@ type ModeColorKey = "insert" | "normal" | "visual" | "ex";
 type ModeColorizers = Record<ModeColorKey, (text: string) => string>;
 ```
 
-Every label colorizer key is required because narrow rendering still delegates to
-`ModalEditor.render()` even when the wide renderer is overridden.
+Every label colorizer key is required: both narrow and wide paths delegate to
+`ModalEditor.render()`.
 
 ### Per-surface synchronization
 
@@ -89,38 +91,39 @@ may not communicate the mode.
 
 ## Active mode and labels
 
-Ex is a normal-mode substate, and `visual-line` uses the `visual` colorizer:
+Ex is a normal-mode substate, and `visual-line` uses the `visual` colorizer.
+Prefix coloring accounts for both mode unions; labels and pending-command feedback
+belong to upstream.
 
-```ts
-function getActiveMode(editor: ModalEditorRuntime): ModeColorKey {
-  if (editor.pendingExCommand !== null) return "ex";
-  const mode = editor.getMode();
-  return mode === "visual-line" ? "visual" : mode;
-}
+Local rendering calls `super.render(width - PREFIX_WIDTH)` before adding body
+prefixes and extending borders; it uses full width only when the prefix cannot fit.
+Both upstream label positions are supported. For `bottom-right`, extending the
+bottom border after upstream render intentionally leaves two trailing dashes after
+the label. During autocomplete, the label remains on the last rendered row, even
+when that overwrites suggestion text. The user accepts both behaviors; retain
+upstream placement rather than adding a bottom-border relocation workaround.
+`top-left` stays on the top border during autocomplete. Cover both positions in
+component tests. `selectionColorizer` uses the live theme with reverse-video
+fallback for missing or reset-only `selectedBg`.
+
+### Render and preflight contracts
+
+Compare every side effect in the target `ModalEditor.render`, not just its label.
+In pi-vim 0.15.1 that includes `preflightHost`, Visual paint, and recording the host's
+post-render `lastWidth` in `displayLineWidth` for `gj`/`gk`. Keep the upstream pipeline
+at the actual prefix-reduced width, before local decoration.
+
+A failed preflight must reach stock input and rendering before local navigation,
+labels, or cursor ownership. Locate these paths with:
+
+```bash
+rg -n 'preflightHost|super.render|canRemapNavigation' \
+  private_dot_pi/private_agent/extensions/prompt-editor
 ```
 
-A renderer that bypasses `ModalEditor.render()` needs fallback labels for every
-editor mode:
-
-```ts
-const labels: Record<Mode, string> = {
-  insert: " INSERT ",
-  normal: " NORMAL ",
-  visual: " VISUAL ",
-  "visual-line": " V-LINE ",
-};
-```
-
-Use structural access to `getModeLabelColorizer()` rather than indexing
-`labelColorizers` directly. The method applies `labelSync`, host-border inheritance,
-and the label transform:
-
-```ts
-const colorize = editor.getModeLabelColorizer?.() ?? null;
-```
-
-The complete condition is that label, prefix, border, and cursor code all account
-for every member of both unions.
+Complete when exact-target component tests cover wrapped `gj`/`gk`, Visual paint,
+resize and narrow-to-wide transitions, plus missing-action degradation through the
+real local entry point.
 
 ## Cursor ownership
 
@@ -131,14 +134,10 @@ pi-vim's cursor runtime after construction to prevent competing terminal writes:
 (this as any).cursorShapeRuntime = null;
 ```
 
-Treat every non-Insert mode as a block cursor unless the upstream mode semantics
-require another shape:
-
-```ts
-function getCursorStyle(mode: Mode): string {
-  return mode === "insert" ? CURSOR_STYLE_INSERT : CURSOR_STYLE_NORMAL;
-}
-```
+Resolve `cursorShape` with upstream's resolver and map it through
+`CURSOR_SHAPE_SEQUENCES`; the local controller receives the resulting sequences.
+Non-Insert modes share the Normal shape. Shape settings are upstream-owned;
+visibility, focus and safe cursor-cell unwrapping are local policy.
 
 Local `cursor.ts` owns both `createCursorController()` and cursor-cell wrapping;
 `index.ts` forwards installation, render, focus, mode-change, and shutdown events.
@@ -146,8 +145,14 @@ Compare the controller with the target TUI's hardware-cursor getter/setter and
 renderer-switch behavior: retain Pi's stable Proxy setter across editor reinstalls,
 read live settings before rendering only while focused, and apply effective
 visibility outside render to avoid re-entry. A forced-off cursor on blur is not a
-changed user preference. Verify shutdown clears references and resets DECSCUSR
-through stdout, including when no editor was installed.
+changed user preference. A competing upstream factory forces hardware visibility
+on, so both successful and degraded installations resolve the configured
+`pi.getSettings().showHardwareCursor` preference, using Pi's `PI_HARDWARE_CURSOR`
+default when unset. A failed preflight releases local ownership, then restores
+visibility directly on the injected TUI. Cover the full installation path with
+forced-on visibility, a false preference and missing host actions; retain tests
+for explicit settings overriding the environment default. Verify shutdown clears
+references and resets DECSCUSR through stdout, including when no editor was installed.
 
 Test native focus input separately from injected `my:focus_change` events. In Pi
 1.3.0, fullscreen `handleViewportInput()` consumes `ESC[I` / `ESC[O` before
@@ -196,8 +201,6 @@ access:
 ```ts
 type ModalEditorRuntime = {
   getMode: () => Mode;
-  getModeLabel?: () => string;
-  getModeLabelColorizer?: () => ((text: string) => string) | null;
   borderColor?: (text: string) => string;
   pendingExCommand: string | null;
   pendingOperator: string | null;
@@ -211,81 +214,62 @@ integration stops using them.
 
 ### Navigation remaps
 
-Local `navigation.ts` owns two navigation behaviors and their structural runtime
-type across Pi and pi-vim. `index.ts` retains the Ex guard, mode dispatch,
-Backspace mapping, and upstream fallback; it calls the helpers directly:
+Local `navigation.ts` owns logical-line `h`/`l` clamping, display-line endpoints
+`H`/`L`, and the shared `canRemapNavigation` guard. `index.ts` delegates `j`/`k`
+to upstream's `g` then `j`/`k` input path, including counts. Cursor aliases come
+from upstream's `createCursorBindingResolver`, retaining Escape and Vim undo/redo
+ownership. Arrows and literal keys share display-row navigation; bare j/k stay
+buffer-local rather than recalling history. Backspace maps to `h`; the guarded
+`cl -> s` compatibility remap is retained. Successful `cc` still uses upstream
+editing, then calls Pi's private `cancelAutocomplete()` to clear the visible picker
+and abort pending suggestions: direct host deletion alone leaves the picker alive.
+Revalidate this cleanup with visible, in-flight and multiline autocomplete cases.
 
-- standalone Normal-mode `h`/`l` and mapped Backspace stay on the current logical
-  line and move by grapheme;
-- `j`/`k`/`H`/`L` use Pi's visual-line layout as `gj`/`gk`/`g^`/`g$`.
+On every upgrade, compare upstream's input dispatch and pending fields. A pending
+argument, EX or bracketed-paste discard owns the next key. Revalidate operators,
+`pendingG`, `pendingZ`, character motions, replacement and text objects. In
+particular, `ZlQ` and `ZjQ` must cancel at the invalid suffix rather than retain
+a force-quit prefix. Endpoint H/L helpers additionally delegate pending counts.
 
-On every upgrade, compare pi-vim's input dispatch and pending fields in `index.ts`.
-A pending state owns the next key, so a navigation handler returns `false` and lets
-pi-vim consume it. The horizontal handler consumes its prefix count through
-`takeTotalCount()` but delegates operators, `g`, character motions, replacement,
-text objects, and bracketed-paste discard. The display-line handler additionally
-delegates prefix and operator counts. Keep the Ex guard before every remap and keep
-each structural guard aligned with every pending field it reads.
+Compare every field in `NavigationEditorRuntime` with the exact applicable targets:
+Pi's `buildVisualLineMap`, `findCurrentVisualLine`, `segment`, `setCursorCol`,
+`updateAutocomplete`, cursor and sticky-column state; pi-vim's `takeTotalCount`,
+`displayWantedColumn`, pending fields and `refreshPendingDispatchRestore`. Use exact hashes in librarian
+caches rather than normally outdated lazy working trees. Fail loudly when a local
+helper's prerequisite is unavailable.
 
-Compare the handlers with the target revision's
-`packages/tui/src/components/editor.ts` in the librarian cache rather than the
-normally outdated lazy worktree:
+For Normal h/l, derive positions from grapheme starts plus the `line.length`
+sentinel. Clamp ordinary motion to first/last grapheme starts; at the sentinel,
+l is a no-op and h lands on the final grapheme. Use `setCursorCol` to clear sticky
+and snapped columns, then `updateAutocomplete`. H/L clear `preferredVisualCol`.
+Both helpers clear upstream's `displayWantedColumn`, so j after local h/l/H/L uses
+the new column rather than the previous gj/gk target. These helpers bypass upstream input, so refresh `refreshPendingDispatchRestore`
+after moving to preserve asynchronous EX restoration. j/k instead use the upstream
+input path, never raw Up/Down host history or a second movement implementation.
 
-```bash
-git -C "$PI_CHK" show \
-  "$PI_LAZY_TARGET_REV:packages/tui/src/components/editor.ts"
-git -C "$PI_CHK" show \
-  "$PI_TARGET_REV:packages/tui/src/components/editor.ts"
-```
-
-Inspect `navigation.ts`'s `NavigationEditorRuntime` field by field. For each applicable Pi
-target, revalidate `buildVisualLineMap`, `findCurrentVisualLine`, `moveToVisualLine`,
-`segment`, `setCursorCol`, `updateAutocomplete`, cursor state, and sticky-column
-state. For each applicable pi-vim target, revalidate `takeTotalCount`,
-`discardingBracketedPasteInNormalMode`, pending state, and
-`refreshPendingDispatchRestore`. Treat these members as one navigation compatibility
-surface; fail loudly when a prerequisite is unavailable rather than consume a remap
-with partial semantics.
-
-For Normal `h`/`l`, derive positions from grapheme starts plus the `line.length`
-sentinel. Clamp ordinary movement to the first and last grapheme starts. If visual
-or vertical movement left the cursor at `line.length`, `l` is a no-op and `h` lands
-on the final grapheme. Move through `setCursorCol()` so Pi clears sticky-column and
-snapped-cursor state, then call `updateAutocomplete()` so a visible picker tracks
-the new cursor.
-
-Move `j`/`k` through `moveToVisualLine`; Pi's raw Up/Down handling navigates prompt
-history at display boundaries instead of acting like Vim's `gj`/`gk` no-op. Clear
-`preferredVisualCol` after horizontal `H`/`L` movement so the next vertical motion
-derives a display-line-relative column.
-
-Every consumed remap bypasses `ModalEditor.handleInput()`, so call pi-vim's private
-`refreshPendingDispatchRestore()` after moving. This keeps the latest cursor in the
-restore snapshot while an asynchronous Ex dispatch is pending.
-
-Horizontal verification is complete when multiline boundaries, counted movement,
-emoji and combining graphemes, `v$` followed by Escape and `l`, wrapped-line
-`h`/`l` followed by `j`/`k`, active autocomplete, split bracketed paste, and mapped
-Backspace pass. Display-line verification is complete when endpoints pass in
-Normal, Visual, and Visual-line modes and pending sequences still reach pi-vim. At
-minimum, exercise replacement characters (`rj`, `rk`, `rH`, `rL`), asynchronous Ex
-restoration, failure when a required private member is unavailable, plus any pending
-state changed by the target release.
+Complete when `navigation.test.ts` and `runtime.test.ts` cover multiline boundaries,
+counts, emoji/combining graphemes, v$ then Escape/l, wrapped h/l then j/k, H/L in all
+selection modes, autocomplete, split paste, Backspace, cursor aliases, rj/rk/rH/rL,
+asynchronous EX restoration and every pending state changed by the target.
 
 ### Visual paste
 
-pi-vim 0.14.1 swallows visual `p`/`P`, so local `visual-paste.ts` composes its private
+pi-vim 0.15.1 still swallows visual `p`/`P`, so local `visual-paste.ts` composes its private
 visual operator and put helpers and owns `VisualPasteEditorRuntime`. `index.ts`
-retains the Visual-mode dispatch, calling paste before navigation. Revalidate `getPasteRegisterText`, visual ranges,
+retains the Visual-mode dispatch, calling paste before navigation. Revalidate `getSafePutText`, visual ranges,
 `applyVisualOperator`, `putBefore`/`putAfter`, unnamed-register preference,
 clipboard-mirror policy, and undo-window closure together.
 
-Resolve the put payload before deleting the selection. Visual `p` leaves deleted
-text in the unnamed register; visual `P` preserves the original register and must
-not mirror the deletion. Preserve the raw pending count across the deletion so the
-put receives it. Restore the absolute selection start after a characterwise
-end-of-line deletion. A final linewise selection starting below line zero needs
-`putAfter`; other replacements use `putBefore`.
+Resolve and validate the effective put payload before deleting the selection.
+pi-vim 0.15 filters C0/DEL/C1 controls and normalizes CR/newlines and tabs through
+`getSafePutText`; a nonempty raw register can therefore become an empty no-op put.
+Verify control-only payloads leave the selection and buffer untouched, and retain
+the original register when normalization changes only the insertion payload.
+Visual `p` leaves deleted text in the unnamed register; visual `P` preserves the
+original register and must not mirror the deletion. Preserve the raw pending count
+across the deletion so the put receives it. Restore the absolute selection start
+after a characterwise end-of-line deletion. A final linewise selection starting
+below line zero needs `putAfter`; other replacements use `putBefore`.
 
 Do not intercept `p`/`P` while an operator, `g`, character motion, replacement, or
 text object is pending; pi-vim must finish that sequence. Counts are not such a
@@ -298,24 +282,22 @@ required private runtime member is unavailable. Run
 `tests/prompt-editor/visual-paste.test.ts`; verify actual buffer, register, and
 one-step undo behavior against the installed pi-vim runtime, not just mocked calls.
 
-## Clipboard bridge
+## Upstream clipboard transport
 
-Local `clipboard.ts` owns platform detection, reads, Termux writes, and hook
-installation. When upstream clipboard behavior changes, compare pi-vim's
-`setClipboardReadFn`, `setClipboardFn`, register fallback, mirror cancellation,
-and circuit-breaker error classification with this module.
+The local bridge was removed for pi-vim 0.15.1 on Pi 1.5.0. Runtime reads and writes
+use upstream defaults; settings still flow through `setClipboardMirrorPolicy`.
+Review pi-vim's `clipboard-mirror.ts` and `clipboard-platform.ts` plus Pi's
+`copyToClipboard` when their contracts change. Platform reads have a shared 750 ms
+budget; ordinary Node writes run Pi's backend through a helper. Termux detection
+depends on `TERMUX_VERSION`; macOS uses `/usr/bin/pbpaste`, and Wayland reads
+require `WAYLAND_DISPLAY`.
 
-macOS overrides reads only, using an absolute `pbpaste` path and a UTF-8 locale;
-Termux overrides reads and writes only when both Termux:API commands are available.
-Other environments retain upstream behavior. Preserve empty text (`""`) versus
-failed reads (`null`), which let pi-vim fall back to its unnamed register. Keep
-read limits and timeouts shared across both platforms. Termux write failures must
-retain the spawn-style metadata consumed by pi-vim's circuit breaker, and aborts
-must kill the helper and remove the abort listener.
-
-Complete when `tests/prompt-editor/clipboard.test.ts` passes, and changed upstream hook,
-register-fallback, or mirror contracts have been verified against the target
-pi-vim runtime. Mocked process tests alone do not prove those contracts.
+Complete when actual target transport preserves UTF-8, successful empty reads
+versus failure (`null`), register fallback, mirror ordering/cancellation and failure
+classification. Native clipboard tests snapshot before writing and restore in
+`finally`; if snapshotting fails, skip writes and report the blocker. Report
+untested operating systems explicitly rather than treating Termux as proof of
+macOS/Wayland behavior.
 
 ## Replacement-editor session parity
 
@@ -327,6 +309,8 @@ editor.setClipboardMirrorPolicy(clipboardMirrorPolicy.policy);
 editor.setQuitFn(() => ctx.shutdown());
 editor.setNotifyFn((message) => ctx.ui.notify(message, "warning"));
 editor.setModeChangeFn(modeChangeHandler);
+editor.setHistoryNavigation(historyNavigation.enabled);
+editor.setCursorShapeSettings(cursorShape.settings);
 editor.setExCommandSettings(exCommand.settings);
 editor.setCommandNamesFn(
   () => new Set([...PI_VIM_BUILTIN_COMMAND_NAMES, ...pi.getCommands().map((c) => c.name)]),
@@ -364,4 +348,7 @@ its browsing index to `-1`. Only the first install hydrates the branch snapshot;
 a new session starts with a fresh editor reference rather than copying its peer.
 Shutdown must cancel queued work,
 restore an unwrapped bound setter, unsubscribe focus, and release cursor resources.
-Host-contract tests do not replace interactive checks with the target Pi/pi-vim.
+`tests/prompt-editor/runtime.test.ts` loads the real pinned dependency via the
+fixture wrapper and checks the actual local class, routing, selection paint,
+wrapped motions, safe Visual puts, cursor ownership and degradation. Host-contract
+and component tests do not replace interactive target checks.
