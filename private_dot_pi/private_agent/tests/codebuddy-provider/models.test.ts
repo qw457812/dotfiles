@@ -12,7 +12,11 @@ import type {
   SessionStartEvent,
 } from "@earendil-works/pi-coding-agent";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { CHAT_BASE_URL, PROVIDER } from "../../extensions/codebuddy-provider/constants.js";
+import {
+  CHAT_BASE_URL,
+  PROVIDER,
+  USER_AGENT,
+} from "../../extensions/codebuddy-provider/constants.js";
 import register from "../../extensions/codebuddy-provider/index.js";
 import { fetchLiveModels } from "../../extensions/codebuddy-provider/live-models.js";
 import {
@@ -333,6 +337,7 @@ describe("CodeBuddy CLI header parity", () => {
     // /v3/config carries X-Product but, unlike chat requests, no X-Agent-Runtime.
     expect(headers.get("x-product")).toBe("SaaS");
     expect(headers.get("x-agent-runtime")).toBeNull();
+    expect(headers.get("user-agent")).toBe(USER_AGENT);
   });
 
   it("forwards enterprise identity onto chat requests", async () => {
@@ -453,6 +458,7 @@ describe("CodeBuddy CLI header parity", () => {
     expect(headers.get("x-agent-type")).toBe("main");
     expect(headers.get("x-agent-runtime")).toBe("other");
     expect(headers.get("x-product")).toBe("SaaS");
+    expect(headers.get("user-agent")).toBe(USER_AGENT);
   });
 });
 

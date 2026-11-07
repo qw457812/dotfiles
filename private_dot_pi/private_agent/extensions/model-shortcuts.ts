@@ -44,6 +44,7 @@ const ALIASES: Record<string, ModelTarget | readonly ModelTarget[]> = {
   ],
   kimi: [
     { provider: "commandcode", id: "moonshotai/Kimi-K3.1-Pro" },
+    { provider: "neuralwatt", id: "kimi-k3.1-pro" },
     { provider: "codebuddy", id: "kimi-k3.1-pro" },
   ],
   qwen: { provider: "commandcode", id: "Qwen/Qwen3.8-Max-0902" },
