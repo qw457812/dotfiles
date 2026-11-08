@@ -60,6 +60,62 @@ function M.repo(opts)
   return repo
 end
 
+---@class user.util.git.commit.url.Opts
+---@field commit string commit hash (abbreviated is fine)
+---@field cwd? string
+
+--- Get the web URL of a commit, e.g. `https://github.com/owner/repo/commit/<hash>`
+--- ref: https://github.com/folke/snacks.nvim/blob/a4664298ba6669ec14f704b9602339f448bd45c9/lua/snacks/gitbrowse.lua#L206-L219
+---@param opts user.util.git.commit.url.Opts
+---@return string?
+function M.commit_url(opts)
+  local git_root = Snacks.git.get_root(opts.cwd)
+  if not git_root then
+    return
+  end
+
+  ---@param cmd string[]
+  ---@return string[]?
+  local function system(cmd)
+    local out = vim.fn.system(cmd)
+    if vim.v.shell_error ~= 0 then
+      return
+    end
+    return vim.split(vim.trim(out), "\n")
+  end
+
+  -- prefer the full hash
+  local commit = (system({ "git", "-C", git_root, "rev-parse", "--verify", opts.commit }) or {})[1] or opts.commit
+
+  local remotes = {} ---@type { name: string, url: string }[]
+  for _, line in ipairs(system({ "git", "-C", git_root, "remote", "-v" }) or {}) do
+    local name, url = line:match("(%S+)%s+(%S+)%s+%(fetch%)")
+    if name and url then
+      table.insert(remotes, { name = name, url = url })
+    end
+  end
+
+  ---@param name string
+  ---@return { name: string, url: string }?
+  local function find_remote(name)
+    return vim.iter(remotes):find(function(r)
+      return r.name == name
+    end)
+  end
+  local remote = find_remote("origin") or find_remote("upstream") or remotes[1]
+  if not remote then
+    return
+  end
+
+  local repo = Snacks.gitbrowse.get_repo(remote.url)
+  local url = Snacks.gitbrowse.get_url(repo, { commit = commit }, { what = "commit" })
+  -- `get_url` returns the bare repo when the host is not in its `url_patterns`
+  if url == repo then
+    return
+  end
+  return url
+end
+
 ---@class user.util.git.diff.term.Opts: snacks.terminal.Opts
 ---@field args? string[] additional arguments to pass to `git`
 ---@field cmd_args? string[] additional arguments to pass to the `git <cmd>``

@@ -334,10 +334,46 @@ return {
               },
             })
           end,
+          commit_yank = {
+            desc = "Copy Commit URL",
+            action = function(picker)
+              -- convert a visual selection in the list into picker selections
+              -- ref: https://github.com/folke/snacks.nvim/blob/a4664298ba6669ec14f704b9602339f448bd45c9/lua/snacks/explorer/actions.lua#L88-L100
+              if vim.fn.mode():find("^[vV]") then
+                picker.list:select()
+              end
+              local urls = {} ---@type string[]
+              for _, item in ipairs(picker:selected({ fallback = true })) do
+                local url = item.commit and U.git.commit_url({ commit = item.commit, cwd = item.cwd })
+                if not url then
+                  Snacks.notify.error(("Failed to get commit URL: %s"):format(item.commit or item.text))
+                  return
+                end
+                urls[#urls + 1] = url
+              end
+              picker.list:set_selected() -- clear selections
+              local value = table.concat(urls, "\n")
+              vim.fn.setreg(vim.v.register, value)
+              Snacks.notify.info(
+                ("Yanked %d commit URL(s) to register `%s`:\n%s"):format(#urls, vim.v.register, value),
+                { title = "Git Log" }
+              )
+            end,
+          },
         },
         win = {
-          input = { keys = { ["<localleader>f"] = "fixup_rebase" } },
-          list = { keys = { ["<localleader>f"] = "fixup_rebase" } },
+          input = {
+            keys = {
+              ["<localleader>f"] = "fixup_rebase",
+              ["<localleader>y"] = "commit_yank",
+            },
+          },
+          list = {
+            keys = {
+              ["<localleader>f"] = "fixup_rebase",
+              ["<localleader>y"] = { "commit_yank", mode = { "n", "x" } },
+            },
+          },
         },
       }
 
