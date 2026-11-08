@@ -2,7 +2,6 @@ patch:
   # Reference: /Library/Input Methods/Squirrel.app/Contents/SharedSupport/default.yaml
   schema_list:
     - schema: tiger
-    # - schema: tigress
 
   switcher/hotkeys:
     - Control+grave

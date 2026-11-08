@@ -2,7 +2,6 @@
 patch:
   schema_list:
     - schema: tiger   # 虎码官方单字
-    # - schema: tigress # 虎码官方词库
   menu/page_size: 5 # 每页显示5个候选字词。
   switcher:
     hotkeys:
