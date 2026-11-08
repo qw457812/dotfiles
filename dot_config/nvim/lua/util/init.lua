@@ -392,19 +392,21 @@ function M.patch_func(orig, override)
   end
 end
 
+-- ref: https://github.com/nvim-mini/mini.test/commit/0d0c3257cf799a6a1869fdb4bdda8f330bb63e03
 ---@param text string
 ---@param width number
 ---@param direction? -1 | 1
 function M.truncate(text, width, direction)
-  if width <= 1 then
-    return width == 1 and "…" or ""
+  if vim.api.nvim_strwidth(text) <= width then
+    return text
   end
-  local tw = vim.api.nvim_strwidth(text)
-  if tw > width then
-    return direction == -1 and "…" .. vim.fn.strcharpart(text, tw - width + 1, width - 1)
-      or vim.fn.strcharpart(text, 0, width - 1) .. "…"
+  for w = vim.fn.strchars(text) - 1, 1, -1 do
+    text = vim.fn.strcharpart(text, direction == -1 and 1 or 0, w)
+    if vim.api.nvim_strwidth(text) < width then
+      return direction == -1 and "…" .. text or text .. "…"
+    end
   end
-  return text
+  return width < 1 and "" or "…"
 end
 
 ---@param buflisted? boolean
