@@ -6,45 +6,6 @@ patch:
   switcher/hotkeys:
     - Control+grave
 
-  # 中西文切换
-  #
-  # good_old_caps_lock:
-  # true   切换大写
-  # false  切换中英
-  # macOS 偏好设置的优先级更高，如果勾选【使用大写锁定键切换“ABC”输入法】则始终会切换输入法。
-  #
-  # 切换中英：
-  # 不同的选项表示：打字打到一半时按下了 CapsLock、Shift、Control 后：
-  # commit_code  上屏原始的编码，然后切换到英文
-  # commit_text  上屏拼出的词句，然后切换到英文
-  # clear        清除未上屏内容，然后切换到英文
-  # inline_ascii 切换到临时英文模式，按回车上屏后回到中文状态
-  # noop         屏蔽快捷键，不切换中英，但不要屏蔽 CapsLock
-  # 切换中英快捷键由 left_shift 改为 right_control (交换 : 和 ; 后按 shift+; 会触发鼠须管 shift 切换中英文)
-  # 改为 right_control 后, 在 VSCode 和 tidgi (均开启 vim 模式) 中切换中英文经常不灵
   ascii_composer/switch_key/Shift_L: noop
   ascii_composer/switch_key/Control_R: commit_code
-  # ascii_composer/good_old_caps_lock: false
-  # ascii_composer/switch_key/Caps_Lock: commit_code
   ascii_composer/switch_key/Shift_R: noop
-
-  ##### 结尾的 /+ 表示在原基础上追加
-  # 保留已有的快捷键，追加
-  key_binder/bindings/+:
-    # optimized_mode_switch:
-    # 在最近的两个方案之间切换
-    # - { when: always, accept: Control+Shift+space, select: .next }
-    - { when: always, accept: Control+Shift+bracketleft, select: .next }
-    # 切换中英
-    # - { when: always, accept: Shift+space, toggle: ascii_mode }
-    - { when: always, accept: Control+Shift+bracketright, toggle: ascii_mode }
-    # 切换中英标点
-    # - { when: always, accept: Control+period, toggle: ascii_punct }
-    - { when: always, accept: Control+Shift+period, toggle: ascii_punct }
-
-    # https://github.com/ssnhd/rime
-    # https://github.com/LEOYoon-Tsaw/Rime_collections/blob/master/Rime_description.md#%E7%A4%BA%E4%BE%8B-10
-    - { when: has_menu, accept: semicolon, send: 2 }              # ":" (分号)选择第 2 个候选词
-    # 影响全拼单引号分词，改为小鹤双拼方案专有快捷键
-    # - { when: has_menu, accept: apostrophe, send: 3 }             # "'" (引号)选择第 3 个候选词
-
