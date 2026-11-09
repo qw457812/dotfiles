@@ -187,20 +187,17 @@ prepend_keymap = [
     "f",
     "M",
   ], run = "plugin mount", desc = "Mount Manager" },
+  # see also: https://github.com/yazi-rs/plugins/tree/main/diff.yazi
   { on = [
     "<Space>",
     "f",
     "d",
-  ], run = "shell --block -- diff -u %s1 %h | delta --paging always --line-numbers", desc = "Diff the selected with the hovered file" },
-  # https://github.com/yazi-rs/plugins/tree/main/diff.yazi
+  ], run = "shell --block -- diff -ur %s1 %h | delta --paging always --line-numbers", desc = "diff -ur <selected> <hovered>" },
   { on = [
     "<Space>",
     "f",
     "D",
-  ], run = [
-    "plugin diff",
-    "shell --block -- sleep 0.05 && (command -v pbpaste >/dev/null && pbpaste || termux-clipboard-get) | delta --paging always --line-numbers",
-  ], desc = "Diff the selected with the hovered file" },
+  ], run = "shell --block -- diff -Nur %s1 %h | delta --paging always --line-numbers", desc = "diff -Nur <selected> <hovered>" },
   { on = [
     "<Space>",
     "g",

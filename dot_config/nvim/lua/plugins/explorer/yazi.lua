@@ -147,7 +147,6 @@ return {
             "chmod.yazi",
             "git.yazi",
             "vcs-files.yazi",
-            "diff.yazi",
             "smart-filter.yazi",
             "mount.yazi",
             "zoom.yazi",
