@@ -479,6 +479,8 @@ brew "unar"
 brew "urlscan"
 # URL extractor/launcher
 brew "urlview"
+# Pretty print math in monospace fonts, using a TeX-like syntax
+brew "utftex"
 # Extremely fast Python package installer and resolver, written in Rust
 brew "uv"
 # Terminal UI for SQL databases

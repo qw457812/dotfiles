@@ -82,6 +82,12 @@ return {
             border = "none",
           } --[[@as render.md.code.UserConfig]]
       ),
+      pipe_table = {
+        grid = true,
+      },
+      latex = {
+        position = "replace",
+      },
       -- checkbox = {
       --   enabled = true,
       -- },

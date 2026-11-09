@@ -25,6 +25,7 @@ return {
         "groovy",
         "jq",
         "mermaid",
+        "latex",
         "promql",
         "scss", -- vue
       },

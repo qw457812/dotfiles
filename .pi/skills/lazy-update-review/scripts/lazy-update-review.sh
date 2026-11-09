@@ -44,6 +44,7 @@ Options:
 
 Env:
   PLUGIN_STATE_FILE  plugin-state cache (default: ~/.cache/lazy-update-review/plugin-state.tsv)
+  NVIM_BIN           nvim executable to use (default: PATH, then common install paths)
 EOF
 }
 
@@ -71,16 +72,29 @@ refresh_plugin_state() {
   dump_lua="$SCRIPT_DIR/dump-plugin-state.lua"
   [ -f "$dump_lua" ] || { echo "error: dump-plugin-state.lua missing: $dump_lua" >&2; return 1; }
 
-  # locate nvim: explicit $NVIM, else PATH, else common install paths (Termux,
-  # bob, Homebrew, system).
-  nvim="${NVIM:-$(command -v nvim 2>/dev/null)}"
-  if [ -z "$nvim" ] || [ ! -x "$nvim" ]; then
+  # locate nvim: explicit $NVIM_BIN, else PATH, else common install paths
+  # (Termux, bob, Homebrew, system). $NVIM is not a binary path: Neovim sets
+  # it to v:servername (RPC address) for :terminal and jobstart() children.
+  nvim=""
+  if [ -n "${NVIM_BIN:-}" ]; then
+    if [ -f "$NVIM_BIN" ] && [ -x "$NVIM_BIN" ]; then
+      nvim="$NVIM_BIN"
+    else
+      echo "error: NVIM_BIN is not an executable file: $NVIM_BIN" >&2
+      return 1
+    fi
+  fi
+  if [ -z "$nvim" ]; then
+    nvim="$(command -v nvim 2>/dev/null)"
+  fi
+  if [ -z "$nvim" ] || [ ! -f "$nvim" ] || [ ! -x "$nvim" ]; then
+    nvim=""
     for cand in "/data/data/com.termux/files/usr/bin/nvim" "$HOME/.local/share/bob/nvim-bin/nvim" "/opt/homebrew/bin/nvim" "/usr/bin/nvim" "$HOME/.local/bin/nvim"; do
-      [ -x "$cand" ] && nvim="$cand" && break
+      [ -f "$cand" ] && [ -x "$cand" ] && nvim="$cand" && break
     done
   fi
-  if [ -z "$nvim" ] || [ ! -x "$nvim" ]; then
-    echo "error: nvim not found. Set \$NVIM or add it to PATH." >&2
+  if [ -z "$nvim" ] || [ ! -f "$nvim" ] || [ ! -x "$nvim" ]; then
+    echo "error: nvim not found. Set \$NVIM_BIN to the nvim binary or add it to PATH." >&2
     return 1
   fi
 

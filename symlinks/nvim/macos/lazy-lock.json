@@ -133,7 +133,7 @@
   "ponytail": { "branch": "main", "commit": "96608e078b2d5ea607c5c3b8b5a54d1c1fba6846" },
   "py-requirements.nvim": { "branch": "main", "commit": "4ada99ffa200fc01258780102dbf3e644c63306c" },
   "refactoring.nvim": { "branch": "master", "commit": "ea18f97c58276e213736c9f0193f7aa4c690693e" },
-  "render-markdown.nvim": { "branch": "main", "commit": "8e8795368391036643b622875a6da6a51bcd33f4" },
+  "render-markdown.nvim": { "branch": "main", "commit": "9c235bedc4f96145e63fcad5b78cd78bce8822c4" },
   "rustaceanvim": { "branch": "master", "commit": "b25d186481624964523fee34f44c529b101c7435" },
   "sidekick.nvim": { "branch": "main", "commit": "3d80a47e6375f6d647c9695d3afea6fa1b3275df" },
   "smart-splits.nvim": { "branch": "master", "commit": "ec76708f1617ef9e2ac353357fe52d2c997a0f06" },
