@@ -18,6 +18,8 @@ return {
   -- https://github.com/rytswd/pi-agent-extensions
   -- https://github.com/audibleblink/pi-harness
   --
+  -- https://github.com/HerbertGao/pi-extensions
+  --
   -- https://github.com/IgorWarzocha/howaboua-pi-stuff/tree/main/packages/pi-explore-subagents
   --
   -- https://github.com/QwenLM/Qwen-MM-Plugins
@@ -39,6 +41,10 @@ return {
   -- https://github.com/google/artemis
   --
   -- https://github.com/unclebob/ub-mode
+  --
+  -- https://github.com/NVIDIA/auto-ontology
+  --
+  -- https://github.com/vercel-labs/durable-harness
   {
     "earendil-works/pi",
     version = "*",
@@ -191,7 +197,9 @@ return {
         lazy = true,
         config = function() end,
       },
-      -- alternative: https://github.com/trycua/cua
+      -- alternative:
+      -- - https://github.com/trycua/cua
+      -- - https://github.com/vercel-labs/agent-desktop
       {
         "injaneity/pi-computer-use",
         version = "*",

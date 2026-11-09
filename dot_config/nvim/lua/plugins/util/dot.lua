@@ -2,6 +2,7 @@
 return {
   -- learn
   { "folke/dot", name = "folke-dot", lazy = true, config = function() end },
+  { "https://github.com/craftzdog/dotfiles", name = "craftzdog-dotfiles", lazy = true, config = function() end },
 
   -- fish
   {
