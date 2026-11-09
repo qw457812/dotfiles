@@ -5,8 +5,10 @@
 # Trime default style settings
 # encoding: utf-8
 
+# Reference: https://github.com/osfans/trime/blob/4748cb370931b6314f75e1b843018d57e6dcad2c/app/src/main/assets/shared/trime.yaml
+
 config_version: "3.0"
-name: 預設 #方案名稱
+name: 自定义 #方案名稱
 author: osfans #作者資訊
 
 style:
