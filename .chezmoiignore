@@ -42,6 +42,7 @@ Library/
 {{ end }}
 
 {{ if ne .chezmoi.os "android" }}
+.config/trime/
 .termux/
 {{ else }}
 .vrapperrc
