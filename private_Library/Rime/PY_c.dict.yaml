@@ -101869,6 +101869,7 @@ columns:
 贵盟	gui meng	61
 诡秘	gui mi	11357
 鬼迷	gui mi	511
+闺蜜	gui mi	700
 闺密	gui mi	693
 鬼面	gui mian	2307
 柜面	gui mian	6286
@@ -318815,7 +318816,7 @@ columns:
 北京话	bei jing hua	4442
 北京化二	bei jing hua er	167
 背景画面	bei jing hua mian	1470
-˵ƴˆŰ北京华宇软件股份	bei jing hua yu ruan jian gu fen	17
+北京华宇软件股份	bei jing hua yu ruan jian gu fen	17
 背景技术	bei jing ji shu	1242
 北京驾校	bei jing jia xiao	146
 北京见	bei jing jian	247
@@ -359802,7 +359803,6 @@ columns:
 吃晚餐	chi wan can	4021
 吃晚饭	chi wan fan	19935
 吃完饭	chi wan fan	28855
-ű吃	wan fan	2840
 吃完饭再走吧	chi wan fan zai zou ba	183
 吃完后	chi wan hou	5881
 吃完回来了	chi wan hui lai le	183
@@ -360473,7 +360473,6 @@ columns:
 承重孙	cheng zhong sun	73
 城中桃李	cheng zhong tao li	16
 城中桃李愁风雨	cheng zhong tao li chou feng yu	94
-űȨ	zhong xiang	2327
 城中心	cheng zhong xin	4437
 成重要	cheng zhong yao	384
 城中增暮寒	cheng zhong zeng mu han	73
@@ -399001,7 +399000,6 @@ columns:
 丢得远远的	diu de yuan yuan de	47
 丢掉花	diu diao hua	65
 丢掉幻想	diu diao huan xiang	374
-ű丢掉	neng gou zhao	4416
 东大道	dong da dao	2956
 东大河	dong da he	94
 东大街	dong da jie	20469
@@ -429641,7 +429639,6 @@ columns:
 感觉主义	gan jue zhu yi	255
 感觉自然	gan jue zi ran	888
 干君底事	gan jun di shi	45
-ű干	jun he	815
 感君怜	gan jun lian	57
 纲纪废弛	gang ji fei chi	42
 刚记海鲜	gang ji hai xian	17
@@ -452551,11 +452548,11 @@ columns:
 国务院副总理	guo wu yuan fu zong li	22605
 国务院港澳办公室	guo wu yuan gang ao ban gong shi	171
 国务院港澳事务办公室	guo wu yuan gang ao shi wu ban	29
-ˆű国务院港澳事务办	guo wu yuan gang ao shi wu ban	178
+国务院港澳事务办	guo wu yuan gang ao shi wu ban	178
 国务院国资委	guo wu yuan guo zi wei	146
 国务院机关事务管理局	guo wu yuan ji guan shi wu guan	136
-Ṻ国务院机关事务管	guo wu yuan ji guan shi wu guan	178
-ˆű国务院台湾事务办	guo wu yuan tai wan shi wu ban	178
+国务院机关事务管	guo wu yuan ji guan shi wu guan	178
+国务院台湾事务办	guo wu yuan tai wan shi wu ban	178
 国务院通过了	guo wu yuan tong guo le	183
 国务院外事办公室	guo wu yuan wai shi ban gong shi	145
 国务院文件	guo wu yuan wen jian	183
@@ -453435,7 +453432,6 @@ columns:
 海魂衫	hai hun shan	358
 海昏县	hai hun xian	77
 还活着	hai huo zhe	21026
-ŀŰ含	la han hen	462923
 含恨而终	han hen er zhong	265
 含恨在心	han hen zai xin	83
 汉弘农王	han hong nong wang	5
@@ -463194,7 +463190,6 @@ columns:
 横眉瞪眼	heng mei deng yan	42
 横眉冷对	heng mei leng dui	2203
 横眉冷对千夫指	heng mei leng dui qian fu zhi	1725
-ű横	mei nu	2359
 横眉竖目	heng mei shu mu	530
 横眉竖眼	heng mei shu yan	416
 横眉吐气	heng mei tu qi	5
@@ -500524,7 +500519,6 @@ columns:
 晋灵公	jin ling gong	530
 晋灵公姬夷皋	jin ling gong ji yi gao	7
 金领阶层	jin ling jie ceng	504
-ű金	ling mi	4415
 近零排放	jin ling pai fang	265
 金陵十二钗	jin ling shi er chai	146
 金灵鼠	jin ling shu	116
@@ -552395,7 +552389,6 @@ columns:
 没有受到	mei you shou dao	13757
 没有收到	mei you shou dao	16293
 没有收到啊	mei you shou dao a	183
-ϰű	you shou	1879
 没有数的	mei you shu de	31
 没有数过	mei you shu guo	114
 没有疏漏	mei you shu lou	88
@@ -560169,7 +560162,6 @@ columns:
 目不交睫	mu bu jiao jie	260
 目不窥园	mu bu kui yuan	62
 木不木	mu bu mu	140
-űŀɋŀ目	ang mu bu neng liang	205050
 目不识书	mu bu shi shu	10
 目不识字	mu bu shi zi	5
 木材切削学	mu cai qie xiao xue	83
@@ -575959,7 +575951,6 @@ columns:
 品德好	pin de hao	2431
 品德教育	pin de jiao yu	6125
 品德课	pin de ke	4852
-ű拼	du fang	4455
 拼读音	pin du yin	78
 拼多多	pin duo duo	116
 平淡从容	ping dan cong rong	478
@@ -591292,7 +591283,6 @@ columns:
 轻诺必寡信	qing nuo bi gua xin	183
 轻诺寡信	qing nuo gua xin	140
 青女素娥	qing nv su e	192
-ű穷	nian lei	4975
 穷年累岁	qiong nian lei sui	5
 穷年累月	qiong nian lei yue	171
 穷年屡月	qiong nian lv yue	5
@@ -601173,7 +601163,6 @@ columns:
 人身自由	ren shen zi you	24345
 人身自由权	ren shen zi you quan	146
 妊娠综合征	ren shen zong he zheng	17
-ű人	sheng bai	2167
 人生百岁	ren sheng bai sui	229
 人生并不是康庄大道	ren sheng bing bu shi kang zhuang da	146
 人生不如意事	ren sheng bu ru yi shi	183
@@ -621997,8 +621986,8 @@ columns:
 士气如虹	shi qi ru hong	17
 时期是	shi qi shi	16573
 十七史百将传	shi qi shi bai jiang zhuan	7
-ˆű省人民政府法制办	sheng ren min zheng fu fa zhi ban	178
-ˆű省人民政府新闻办	sheng ren min zheng fu xin wen ban	178
+省人民政府法制办	sheng ren min zheng fu fa zhi ban	178
+省人民政府新闻办	sheng ren min zheng fu xin wen ban	178
 省人事厅	sheng ren shi ting	25681
 生人数	sheng ren shu	5102
 圣人忘情	sheng ren wang qing	36
@@ -624710,7 +624699,6 @@ columns:
 十二峰	shi er feng	3824
 失而复得	shi er fu de	6432
 侍儿扶起娇无力	shi er fu qi jiao wu li	229
-Ūű	jiao wu	2928
 十二高峰天外寒	shi er gao feng tian wai han	5
 时而高亢	shi er gao kang	286
 十二个	shi er ge	32642
@@ -647635,7 +647623,6 @@ columns:
 算经十书	suan jing shi shu	41
 算九衢红粉皆难比	suan jiu qu hong fen jie nan bi	26
 算旧账	suan jiu zhang	400
-ŰÑ	lian ta	6271
 苏联卫国战争	su lian wei guo zhan zheng	686
 苏联政策研究	su lian zheng ce yan jiu	7
 苏联政府	su lian zheng fu	3460
@@ -651057,7 +651044,6 @@ columns:
 她能走动了	ta neng zou dong le	484
 他能走动了	ta neng zou dong le	584
 他年锦里经祠庙	ta nian jin li jing ci miao	68
-Ɏű他年	kie zang ta nian	162507
 他年事	ta nian shi	245
 他念他的经	ta nian ta de jing	10
 它凝聚	ta ning ju	1045
@@ -734986,7 +734972,6 @@ columns:
 一个坏蛋	yi ge huai dan	410
 一个还	yi ge huan	7351
 一个谎	yi ge huang	1690
-ű一个	shi ge pi	5920
 一个活	yi ge huo	6977
 一个活儿	yi ge huo er	146
 一个机构	yi ge ji gou	6307
@@ -759237,7 +759222,6 @@ columns:
 有什么	you shen me	500167
 有什么啊	you shen me a	17
 有什么办法	you shen me ban fa	183
-́ű	shen me	6055
 有什么根据	you shen me gen ju	183
 有什么关系	you shen me guan xi	146
 有什么诡计	you shen me gui ji	187
