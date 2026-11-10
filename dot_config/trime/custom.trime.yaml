@@ -886,6 +886,10 @@ preset_keys:
   space: {repeatable: false, functional: false, send: space}
   space1: {label: 空格, repeatable: false, functional: false, send: space}
   Escape: {label: Esc, send: Escape}
+  Vim_h: {label: h, send: h, repeatable: true}
+  Vim_j: {label: j, send: j, repeatable: true}
+  Vim_k: {label: k, send: k, repeatable: true}
+  Vim_l: {label: l, send: l, repeatable: true}
   Home: {label: 行首, send: Home}
   Insert: {label: 插入, send: Insert}
   Delete: {label: 刪除, send: Delete}
@@ -1008,10 +1012,10 @@ preset_keyboards:
       - {click: 'd', long_click: End}
       - {click: 'f', long_click: Page_Up}
       - {click: 'g', long_click: Page_Down}
-      - {click: 'h', long_click: Left}
-      - {click: 'j', long_click: Down}
-      - {click: 'k', long_click: Up}
-      - {click: 'l', long_click: Right}
+      - {click: Vim_h}
+      - {click: Vim_j}
+      - {click: Vim_k}
+      - {click: Vim_l}
       - {click: ';', long_click: ':'}
       - {click: 'z', long_click: '`'}
       - {click: 'x', long_click: cut}
@@ -1026,7 +1030,7 @@ preset_keyboards:
       - {click: Shift_L}
       - {click: Keyboard_symbols, long_click: Keyboard_number}
       - {click: Mode_switch, long_click: Menu}
-      - {click: space, width: 30}
+      - {click: space, swipe_left: Left, swipe_down: Down, swipe_up: Up, swipe_right: Right, width: 30}
       - {click: "'", long_click: '"'}
       - {click: BackSpace, width: 15}
       - {click: Return, composing: Return1, long_click: CommitComment, width: 15}
