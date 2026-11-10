@@ -126,6 +126,7 @@ python-tkinter
 rclone
 readline
 ripgrep
+rsync
 ruff
 rust
 sed

@@ -1,0 +1,36 @@
+{{ if eq .chezmoi.os "android" -}}
+#!/bin/sh
+set -eu
+
+# config-hash: {{ output "sh" "-c" (printf "cd %q && find dot_config/trime private_Library/Rime -type f -exec cksum {} + | LC_ALL=C sort | cksum" .chezmoi.sourceDir) }}
+
+# Trime 3.3.8+ keeps user data in app-private storage and mirrors a folder
+# picked through SAF (Profile -> Storage -> Data storage mode ->
+# Sync from external storage). chezmoi manages the config in ~/.config/trime,
+# this script pushes it to the external mirror.
+#
+# The mirror also holds Trime runtime data (build/, userdb, sync backups,
+# installation.yaml, user.yaml) plus a local git repo, so deletions are
+# limited to paths that chezmoi actually owns.
+
+src="${HOME:?}/.config/trime"
+dst="/storage/emulated/0/trime"
+
+[ -d "$src" ] || exit 0
+[ -d "$dst" ] || exit 0
+command -v rsync >/dev/null 2>&1 || exit 0
+
+# -rlt: recurse, copy symlinks, keep mtimes (Trime merges by mtime);
+# permissions are not applied because sdcardfs ignores them anyway.
+rsync -rlt --delete \
+  --exclude '/build/' \
+  --exclude '/sync/' \
+  --exclude '/.git/' \
+  --exclude '/.gitignore' \
+  --exclude '/installation.yaml' \
+  --exclude '/user.yaml' \
+  --exclude '/soundeffect/' \
+  --exclude '*.userdb/' \
+  --exclude '*.log' \
+  "$src/" "$dst/"
+{{ end -}}
