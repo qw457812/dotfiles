@@ -86,7 +86,7 @@ function assistantFor(id: string, name: string, args: JsonObject): AssistantMess
   };
 }
 
-describe("MCP SQL Guard integration (installed SDK 1.5.0)", () => {
+describe("MCP SQL Guard integration", () => {
   let root: string;
   let session: AgentSession | undefined;
   let callNumber: number;
@@ -256,9 +256,15 @@ describe("MCP SQL Guard integration (installed SDK 1.5.0)", () => {
     }
   });
 
+  it("uses the SDK version declared by the project", async () => {
+    const manifest = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8")) as {
+      devDependencies: Record<string, string>;
+    };
+    expect(VERSION).toBe(manifest.devDependencies["@earendil-works/pi-coding-agent"]);
+  });
+
   it("discovers MCP tool names and leaves non-SQL echo unguarded", async () => {
     await bindAndDiscover();
-    expect(VERSION).toBe("1.5.0");
     expect(
       session
         ?.getAllTools()

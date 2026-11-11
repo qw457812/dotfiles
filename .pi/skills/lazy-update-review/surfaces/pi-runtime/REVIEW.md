@@ -64,10 +64,12 @@ Inspect exact-range diffs covering:
   contexts gain host-bound helpers, locate imported equivalents such as `keyHint`;
   extension-local package copies may not share host state.
 - New UI status APIs: inspect every matching `ctx.ui.custom()` use and distinguish
-  user decisions from loaders or viewers. For `blocked`, inline questions can use
-  `kind: "question"`; loaders remain working, overlays ignore the option, and
-  built-in dialogs already report their own status. Classify adoption as an optional
-  integration improvement rather than an execution regression; apply needs consent.
+  user decisions from loaders or viewers. For `blocked`, questions can use
+  `kind: "question"`; loaders remain working and built-in dialogs report their own
+  status. Since Pi 1.5.1, overlays also honor `blocked` until `done()`, even while
+  hidden with `setHidden()`; verify cleanup on `/reload` and session switches.
+  Classify adoption as an optional integration improvement rather than an execution
+  regression; apply needs consent.
 
 For MCP changes, verify that local guards inspect direct `mcp__server__tool`
 arguments and apply to nested codemode calls. Verify that blocked calls never
@@ -83,6 +85,8 @@ copy. Preserve installed packages and source pins during review:
   temporary root. Find nested manifests with
   `rg --files private_dot_pi/private_agent -g package.json` and place their runtime
   dependencies at that root too, so nested host pins cannot select old declarations.
+- Materialize chezmoi `dot_gitignore` files as `.gitignore` in the copy so lint
+  excludes dependencies and generated files as it does in the deployed tree.
 - Preserve unrelated dependency resolutions from the baseline locks/installed
   packages, including promoted nested dependencies. Record discrepancies between
   locks and actual installs; resolving every caret range afresh confounds the review.
@@ -98,7 +102,11 @@ fixture/type errors, then make only the required test adaptations in the tempora
 copy and rerun check and the behavioral suite. Report original and adapted results
 separately from runtime regressions; test adaptations remain required source edits.
 
-Tie results to the copied source state. If local consumers change concurrently,
+Tie results to the copied source state. Before comparing source and deployed test
+runs, compare their `tests/**/*.test.ts` inventories with `chezmoi managed`:
+chezmoi may leave unmanaged tests from older configurations in the deployed tree.
+Report those separately, preserve them, and rerun the deployed suite excluding
+only the identified unmanaged files. If local consumers change concurrently,
 revalidate the affected latest sources before claiming they passed; leave the
 unrelated work untouched.
 

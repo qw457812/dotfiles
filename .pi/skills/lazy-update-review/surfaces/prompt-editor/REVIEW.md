@@ -156,6 +156,13 @@ settings, clipboard behavior, colorizers, and copied or re-exported helpers.
 For either upstream, read only the headings in the
 [compatibility reference](REFERENCE.md) implicated by its diffs.
 
+If type checks report missing exports from `pi-vim.generated.ts`, compare that
+ignored file with `ensurePiVimWrapper()` in the local entry point. A stale generated
+wrapper is baseline state, not an upstream API removal. Regenerate it only in the
+isolated review copy using the current generator's exports; report regeneration as
+an apply prerequisite. Compare the source tree's installed development packages
+with the deployed runtime and declared pins before attributing missing APIs.
+
 **Complete when:** every changed integration surface and every structurally accessed
 private member is classified as compatible, requiring a concrete edit, or
 intentionally unsupported with a stated reason.
