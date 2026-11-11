@@ -301,8 +301,10 @@ glide.keymaps.set("normal", "J", "tab_next");
 glide.keymaps.set("normal", "K", "tab_prev");
 // track previously active tab
 let previousTabId: number | undefined;
+let currentTabId: number | undefined;
 browser.tabs.onActivated.addListener((activeInfo) => {
-  previousTabId = activeInfo.previousTabId;
+  previousTabId = activeInfo.previousTabId ?? currentTabId;
+  currentTabId = activeInfo.tabId;
 });
 glide.keymaps.set("normal", "`", async () => {
   if (previousTabId) {
