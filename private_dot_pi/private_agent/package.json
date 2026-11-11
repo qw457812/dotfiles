@@ -16,7 +16,7 @@
     "@types/node": "^24.0.0",
     "oxfmt": "^0.47.0",
     "oxlint": "^1.62.0",
-    "pi-vim": "0.15.1",
+    "pi-vim": "0.16.0",
     "typebox": "^1.3.27",
     "typescript": "7.0.2",
     "vitest": "^4.1.9"

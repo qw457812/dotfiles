@@ -40,6 +40,9 @@ type Runtime = {
   lastWidth: number;
   displayLineWidth: number | null;
   pendingZ: boolean;
+  prefixCount: string;
+  pendingExCommand: string | null;
+  refreshPendingDispatchRestore: () => void;
   history: string[];
   historyIndex: number;
   unnamedRegister: string;
@@ -63,7 +66,11 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-async function host(hardware = true, labelPosition: "top-left" | "bottom-right" = "top-left") {
+async function host(
+  hardware = true,
+  labelPosition: "top-left" | "bottom-right" = "top-left",
+  extraBindings: Record<string, Array<Parameters<typeof matchesKey>[1]>> = {},
+) {
   config.settings.labelPosition = labelPosition;
   vi.spyOn(process.stdout, "write").mockImplementation(() => true);
   const handlers = new Map<string, Handler>();
@@ -95,6 +102,7 @@ async function host(hardware = true, labelPosition: "top-left" | "bottom-right" 
     "tui.editor.cursorLeft": ["left", "ctrl+b"],
     "tui.editor.cursorRight": ["right", "ctrl+f"],
     "app.interrupt": ["escape", "ctrl+c"],
+    ...extraBindings,
   };
   const kb = {
     getKeys: (action: string) => bindings[action] ?? [],
@@ -165,10 +173,136 @@ async function host(hardware = true, labelPosition: "top-left" | "bottom-right" 
   };
 }
 
-describe("prompt-editor with real pi-vim 0.15.1 and Pi components", () => {
+describe("prompt-editor with real pi-vim 0.16.0 and Pi components", () => {
   it("runs on the reviewed target", () => {
     const root = join(import.meta.dirname, "../../node_modules/pi-vim/package.json");
-    expect(JSON.parse(readFileSync(root, "utf8")).version).toBe("0.15.1");
+    expect(JSON.parse(readFileSync(root, "utf8")).version).toBe("0.16.0");
+  });
+
+  it.each(["\x7f", "\x08", "\x1b[D", "\x1b[C", "\x1b[A", "\x1b[B"])(
+    "lets a claimed Normal shortcut %j beat local navigation exactly once",
+    async (key) => {
+      const h = await host();
+      h.set("abcdef\nghijkl\nmnopqr", "normal", 3, 1, 40);
+      send(h.editor, "3");
+      const r = runtime(h.editor);
+      const refresh = vi.spyOn(r, "refreshPendingDispatchRestore");
+      const shortcut = vi.fn(() => true);
+      h.editor.onExtensionShortcut = shortcut;
+      send(h.editor, key);
+      expect(shortcut).toHaveBeenCalledExactlyOnceWith(key);
+      expect(h.editor.getCursor()).toEqual({ line: 1, col: 3 });
+      expect(r.prefixCount).toBe("");
+      expect(refresh).toHaveBeenCalledTimes(1);
+      send(h.editor, "l");
+      expect(h.editor.getCursor()).toEqual({ line: 1, col: 4 });
+    },
+  );
+
+  it.each([
+    ["\x7f", 1, 2],
+    ["\x08", 1, 2],
+    ["\x1b[D", 1, 2],
+    ["\x1b[C", 1, 4],
+    ["\x1b[A", 0, 3],
+    ["\x1b[B", 2, 3],
+  ] as const)("keeps unclaimed navigation %j and probes only once", async (key, line, col) => {
+    const h = await host();
+    h.set("abcdef\nghijkl\nmnopqr", "normal", 3, 1, 40);
+    const shortcut = vi.fn(() => false);
+    h.editor.onExtensionShortcut = shortcut;
+    send(h.editor, key);
+    expect(shortcut).toHaveBeenCalledExactlyOnceWith(key);
+    expect(h.editor.getCursor()).toEqual({ line, col });
+  });
+
+  it.each(["normal", "visual", "visual-line"] as const)(
+    "preserves upstream half/full-page motion in %s",
+    async (mode) => {
+      const h = await host();
+      h.set(Array.from({ length: 30 }, () => "abcdefgh").join("\n"), mode, 3, 10, 40);
+      const shortcut = vi.fn((_data: string) => false);
+      h.editor.onExtensionShortcut = shortcut;
+      send(h.editor, "\x04");
+      expect(h.editor.getCursor()).toEqual({ line: 14, col: 3 });
+      send(h.editor, "\x15");
+      expect(h.editor.getCursor()).toEqual({ line: 10, col: 3 });
+      send(h.editor, "\x06");
+      expect(h.editor.getCursor()).toEqual({ line: 15, col: 3 });
+      send(h.editor, "\x02");
+      expect(h.editor.getCursor()).toEqual({ line: 10, col: 3 });
+      expect(h.editor.getMode()).toBe(mode);
+      expect(shortcut.mock.calls.map(([key]) => key)).toEqual(
+        mode === "normal" ? ["\x04", "\x15", "\x06", "\x02"] : [],
+      );
+    },
+  );
+
+  it.each(["\x04", "\x15", "\x06", "\x02"])(
+    "delegates claimed Normal scroll shortcut %j exactly once",
+    async (key) => {
+      const h = await host();
+      h.set("one\ntwo\nthree", "normal", 1, 1, 40);
+      const shortcut = vi.fn(() => true);
+      h.editor.onExtensionShortcut = shortcut;
+      send(h.editor, key);
+      expect(shortcut).toHaveBeenCalledExactlyOnceWith(key);
+      expect(h.editor.getCursor()).toEqual({ line: 1, col: 1 });
+    },
+  );
+
+  it.each(["visual", "visual-line"] as const)(
+    "does not claim local cursor aliases in %s",
+    async (mode) => {
+      const h = await host();
+      h.set("abcdef", mode, 3);
+      const shortcut = vi.fn(() => true);
+      h.editor.onExtensionShortcut = shortcut;
+      send(h.editor, "\x7f");
+      expect(shortcut).not.toHaveBeenCalled();
+      expect(h.editor.getCursor()).toEqual({ line: 0, col: 2 });
+      expect(h.editor.getMode()).toBe(mode);
+    },
+  );
+
+  it("leaves pending operators, EX history and split paste to upstream", async () => {
+    const h = await host();
+    const shortcut = vi.fn(() => false);
+    h.editor.onExtensionShortcut = shortcut;
+    h.set("abcdef", "normal", 3);
+    send(h.editor, "d", "\x7f");
+    expect(shortcut).toHaveBeenCalledExactlyOnceWith("\x7f");
+    expect(h.editor.getText()).toBe("abdef");
+    shortcut.mockClear();
+    for (const command of ["ab", "xy", "ac"]) send(h.editor, ":", ...command, "\r");
+    send(h.editor, ":", "a", "\x1b[A");
+    expect(runtime(h.editor).pendingExCommand).toBe(":ac");
+    send(h.editor, "\x1b[A");
+    expect(runtime(h.editor).pendingExCommand).toBe(":ab");
+    send(h.editor, "\x1b[B", "\x1b[B");
+    expect(runtime(h.editor).pendingExCommand).toBe(":a");
+    expect(shortcut).not.toHaveBeenCalled();
+    send(h.editor, "\x1b");
+    // EX Escape retains upstream's app.interrupt shortcut dispatch.
+    expect(shortcut).toHaveBeenCalledExactlyOnceWith("\x1b");
+    shortcut.mockClear();
+    send(h.editor, "\x1b[200~", "\x7f", "\x1b[201~");
+    expect(shortcut).not.toHaveBeenCalled();
+  });
+
+  it("does not offer modal, printable or submit aliases as local shortcuts", async () => {
+    const h = await host(true, "top-left", {
+      "tui.editor.cursorLeft": ["left", "ctrl+r", "ctrl+_", "escape", "enter"],
+      "tui.input.submit": ["enter"],
+    });
+    const shortcut = vi.fn(() => true);
+    h.editor.onExtensionShortcut = shortcut;
+    h.set("abcdef", "normal", 3);
+    send(h.editor, "h", "\x12", "\x1f", "\r");
+    expect(shortcut).not.toHaveBeenCalled();
+    send(h.editor, "\x1b");
+    // Idle Normal Escape may still run the existing app.interrupt route.
+    expect(shortcut).toHaveBeenCalledExactlyOnceWith("\x1b");
   });
 
   it.each(["j", "\x1b[B"])(

@@ -142,6 +142,14 @@ export default async function (pi: ExtensionAPI) {
     historyIndex?: number;
   };
 
+  type NavigationShortcutRuntime = {
+    appKeybindings: Pick<ModalEditorConstructorArgs[2], "matches">;
+    displayWantedColumn: number | null;
+    clearPendingState: () => void;
+    cancelRepeatableCommand: () => void;
+    refreshPendingDispatchRestore: () => void;
+  };
+
   function findBottomBorderIndex(lines: string[]): number {
     for (let i = lines.length - 1; i >= 0; i--) {
       const stripped = lines[i]!.replace(ANSI_COLOR_RE, "");
@@ -227,6 +235,21 @@ export default async function (pi: ExtensionAPI) {
       (this as any).cursorShapeRuntime = null;
     }
 
+    private claimNavigationShortcut(data: string): boolean {
+      const runtime = this as unknown as NavigationShortcutRuntime;
+      // Match pi-vim 0.16.0's claim cleanup. Local remaps bypass its
+      // handleInput() finally, so refresh asynchronous EX restoration here too.
+      try {
+        if (!this.onExtensionShortcut?.(data)) return false;
+        runtime.displayWantedColumn = null;
+        runtime.clearPendingState();
+        runtime.cancelRepeatableCommand();
+        return true;
+      } finally {
+        runtime.refreshPendingDispatchRestore();
+      }
+    }
+
     override handleInput(data: string): void {
       const runtime = this as unknown as ModalEditorRuntime;
       if (!this.preflightHost()) {
@@ -276,12 +299,6 @@ export default async function (pi: ExtensionAPI) {
         matchesKey(data, Key.enter) &&
         this.getText().trim() !== "";
       if (mode === "normal") {
-        // Backspace in normal mode: map to h (move left) instead of
-        // passing through to the base Editor which deletes a character.
-        if (matchesKey(data, Key.backspace)) {
-          if (!handleNormalHorizontalMotion(this, "h")) super.handleInput("h");
-          return;
-        }
         // React when Ctrl+C clears the input: auto-enter insert mode so
         // the user can start typing immediately.
         if (matchesKey(data, Key.ctrl("c"))) {
@@ -311,6 +328,21 @@ export default async function (pi: ExtensionAPI) {
           matchesKey(data, "ctrl+r") ||
           matchesKey(data, "ctrl+_");
         const motion = vimControl ? data : (this.resolveCursorMotion(data) ?? data);
+        // Only probe keys consumed locally. Other keys (including scrolling)
+        // reach upstream with the original chord and must not be probed twice.
+        if (
+          mode === "normal" &&
+          !vimControl &&
+          (data.charCodeAt(0) < 32 || data === "\x7f") &&
+          ["h", "j", "k", "l"].includes(motion) &&
+          !(this as unknown as NavigationShortcutRuntime).appKeybindings.matches(
+            data,
+            "tui.input.submit",
+          ) &&
+          this.claimNavigationShortcut(data)
+        ) {
+          return;
+        }
         if (mode === "normal" && handleNormalHorizontalMotion(this, motion)) return;
         if ((mode === "visual" || mode === "visual-line") && handleVisualPaste(this, data)) return;
         if (motion === "j" || motion === "k") {

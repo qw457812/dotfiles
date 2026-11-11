@@ -259,6 +259,44 @@ counts, emoji/combining graphemes, v$ then Escape/l, wrapped h/l then j/k, H/L i
 selection modes, autocomplete, split paste, Backspace, cursor aliases, rj/rk/rH/rL,
 asynchronous EX restoration and every pending state changed by the target.
 
+### Navigation shortcut precedence and scrolling
+
+When input dispatch or cursor aliases change, inspect `claimNavigationShortcut`
+with upstream's shortcut dispatch and `createCursorBindingResolver`:
+
+```bash
+rg -n 'claimNavigationShortcut|NavigationShortcutRuntime|resolveCursorMotion|onExtensionShortcut' \
+  private_dot_pi/private_agent/extensions/prompt-editor/index.ts
+```
+
+Local Normal-mode navigation can consume a chord before upstream sees it. Offer
+only locally consumed control/escape-sequence or DEL chords to the extension
+shortcut callback, using the original input. Preserve upstream exclusions for
+modal Escape, undo/redo and submit; delegate EX, paste and pending arguments to
+upstream. An unclaimed local chord retains its navigation behavior. Other chords
+reach upstream unchanged, so they are probed there exactly once.
+
+Compare every `NavigationShortcutRuntime` member with the exact target:
+`appKeybindings.matches`, `displayWantedColumn`, `clearPendingState`,
+`cancelRepeatableCommand` and `refreshPendingDispatchRestore`. A claim clears the
+wanted column and pending/repeat state. Local early returns bypass upstream's
+`handleInput` finally; refresh asynchronous EX restoration even if the callback
+throws. Existing app-action shortcut dispatch remains upstream-owned, including
+Escape bound to `app.interrupt`.
+
+In pi-vim 0.16.0, the resolver reserves `Ctrl+d/u/f/b` for half/full-page display-row
+motion and fixes Backspace/`Ctrl+h` to `h`. Delegate scrolling upstream in Normal
+and both Visual modes; only Normal offers the extension-only shortcut route.
+Revalidate page height at the prefix-reduced render width, column preservation,
+counts, resize, and empty-prompt `Ctrl+d` staying in the editor.
+
+Complete when exact-target runtime tests cover claimed and unclaimed Backspace
+and all arrow aliases, single callback delivery, count cleanup, modal/submit
+exclusions, pending operators, EX prefix history, split paste, and all four scroll
+keys in Normal/Visual/V-Line. Interactive checks must confirm the active instance
+is `PromptEditor` and exercise shortcut claims and scrolling in regular and
+fullscreen modes.
+
 ### Visual paste
 
 pi-vim 0.15.1 still swallows visual `p`/`P`, so local `visual-paste.ts` composes its private
