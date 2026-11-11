@@ -147,7 +147,7 @@
     "git:github.com/Coral-Bricks-AI/pi-coralbricks-provider",
     "git:github.com/monotykamary/pi-invisible-continue",
     "git:github.com/monotykamary/pi-vision-handoff",
-    "git:github.com/patlux/pi-commandcode-provider",
+    "git:github.com/patlux/pi-commandcode-provider@0137ace",
     "npm:pi-provider-kiro",
     "npm:@99percentpeople/pi-codex-api",
     "npm:@injaneity/pi-computer-use",

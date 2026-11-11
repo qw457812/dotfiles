@@ -149,7 +149,8 @@ return {
       },
       {
         "patlux/pi-commandcode-provider",
-        build = "pi update --extension git:github.com/patlux/pi-commandcode-provider",
+        build = "pi uninstall git:github.com/patlux/pi-commandcode-provider && pi install git:github.com/patlux/pi-commandcode-provider@0137ace",
+        commit = "0137ace",
         lazy = true,
         config = function() end,
       },
