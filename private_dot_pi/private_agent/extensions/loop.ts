@@ -304,7 +304,7 @@ export default function loopExtension(pi: ExtensionAPI): void {
 					tui.requestRender();
 				},
 			};
-		}, { blocked: { kind: "question", message: "Select a loop preset" } });
+		});
 
 		if (!selection) return null;
 
