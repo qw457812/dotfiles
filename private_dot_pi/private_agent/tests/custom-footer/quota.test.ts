@@ -82,6 +82,7 @@ describe("custom footer quota validation", () => {
     ["zai", { data: { limits: {} } }],
     ["openai-codex", { quota: { rate_limit: {} }, reset: { credits: [null] } }],
     ["kiro", { usageBreakdownList: [null] }],
+    ["lyber", {}],
   ])("hides malformed %s cached quota without interrupting rendering", async (provider, value) => {
     const f = await fixture();
     vi.mocked(readFile).mockResolvedValue(JSON.stringify({ value, updatedAt: Date.now() }));
@@ -271,6 +272,31 @@ describe("custom footer quota authentication", () => {
     f.get("codebuddy");
     await vi.waitFor(() => expect(f.registry.getProviderAuth).toHaveBeenCalled());
     expect(f.fetchMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("Lyber credits", () => {
+  beforeEach(() => {
+    vi.resetModules();
+    vi.mocked(readFile).mockReset().mockRejectedValue(new Error("No cache"));
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
+  });
+
+  it("shows the prepaid balance", async () => {
+    const f = await fixture();
+    f.registry.getApiKeyForProvider.mockResolvedValue("lyber-token");
+    f.fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({ available_micro_usdc: 14_978_841 }),
+    });
+    f.get("lyber");
+    await vi.waitFor(() => expect(f.requestRender).toHaveBeenCalled());
+    expect(f.fetchMock.mock.calls[0][0]).toBe("https://api.lyber.ai/v1/credits");
+    expect(f.fetchMock.mock.calls[0][1].headers.Authorization).toBe("Bearer lyber-token");
+    expect(f.get("lyber")).toBe("$14.98");
   });
 });
 

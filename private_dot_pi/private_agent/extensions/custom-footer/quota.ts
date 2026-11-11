@@ -117,6 +117,11 @@ interface CoralbricksQuota {
   balance?: number;
 }
 
+// https://www.lyber.ai/docs/api/credits/
+interface LyberQuota {
+  available_micro_usdc: number;
+}
+
 interface SmartaipiQuota {
   credits: number;
   free_credits: number;
@@ -903,6 +908,21 @@ const sources: Record<string, Source> = {
     format(quota: CoralbricksQuota, theme: Theme): string | null {
       if (typeof quota.balance !== "number") return null;
       return theme.fg("accent", `$${formatDecimal(quota.balance, 2)}`);
+    },
+  }),
+  lyber: createSource("lyber", {
+    cacheTtlMs: MINUTE_MS,
+    async getAuth(modelRegistry): Promise<string | null> {
+      return (await modelRegistry.getApiKeyForProvider("lyber")) ?? null;
+    },
+    async fetch(apiKey: string): Promise<LyberQuota | null> {
+      return fetchJson<LyberQuota>("https://api.lyber.ai/v1/credits", apiKey);
+    },
+    format(quota: LyberQuota, theme: Theme): string | null {
+      const available = readNum(quota.available_micro_usdc);
+      return available === null
+        ? null
+        : theme.fg("accent", `$${formatDecimal(available / 1_000_000, 2)}`);
     },
   }),
   kiro: createSource<KiroQuota, KiroQuotaAuth>("kiro", {

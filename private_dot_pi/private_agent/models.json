@@ -241,6 +241,56 @@
         }
       ]
     },
+    // https://www.lyber.ai/docs/
+    // curl -s https://api.lyber.ai/v1/models -H "Authorization: Bearer $LYBER_API_KEY"
+    "lyber": {
+      "name": "Lyber",
+      "baseUrl": "https://api.lyber.ai/v1",
+      "api": "openai-completions",
+      "apiKey": "$LYBER_API_KEY",
+      "compat": {
+        "supportsStore": false,
+        "supportsDeveloperRole": false,
+        "supportsLongCacheRetention": false
+      },
+      "models": [
+        {
+          "id": "kimi-k31-pro-abliterated",
+          "name": "Kimi K3.1 Pro Abliterated",
+          "reasoning": true,
+          "thinkingLevelMap": {
+            "off": "none",
+            "minimal": null,
+            "low": "low",
+            "medium": null,
+            "high": "high",
+            "max": "max"
+          },
+          "input": ["text"],
+          "contextWindow": 1048576,
+          "maxTokens": 131072,
+          "cost": { "input": 4, "output": 15, "cacheRead": 0.4, "cacheWrite": 0 }
+        },
+        {
+          "id": "deepseek-v4.1-flash-1017-abliterated",
+          "name": "DeepSeek V4.1 Flash 1017 Uncensored",
+          "reasoning": true,
+          "thinkingLevelMap": {
+            "off": "none",
+            "minimal": null,
+            "low": "low",
+            "medium": null,
+            "high": "high",
+            "xhigh": "xhigh",
+            "max": "max"
+          },
+          "input": ["text"],
+          "contextWindow": 1048576,
+          "maxTokens": 126976,
+          "cost": { "input": 0.29, "output": 0.99, "cacheRead": 0.029, "cacheWrite": 0 }
+        }
+      ]
+    },
     "firepass": {
       "baseUrl": "https://api.fireworks.ai/inference/v1",
       "apiKey": "$FIREPASS_API_KEY",
