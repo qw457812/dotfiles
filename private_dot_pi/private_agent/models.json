@@ -27,6 +27,13 @@
         }
       }
     },
+    "commandcode": {
+      "modelOverrides": {
+        "meta/muse-ember": {
+          "cost": { "input": 0.1, "output": 0.5, "cacheRead": 0.004, "cacheWrite": 0 }
+        }
+      }
+    },
     "zai": {
       "baseUrl": "https://api.z.ai/api/coding/paas/v4",
       "apiKey": "$ZAI_API_KEY",
