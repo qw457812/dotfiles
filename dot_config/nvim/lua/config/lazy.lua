@@ -53,7 +53,7 @@ require("lazy").setup({
   install = { colorscheme = { "tokyonight", "habamax" } },
   ui = {
     border = "rounded",
-    size = vim.env.TERMUX_VERSION and {
+    size = U.is_narrow() and {
       width = 1,
       height = vim.o.lines - 4, -- see: U.snacks.win.fullscreen_height
     } or nil,

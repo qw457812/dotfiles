@@ -142,7 +142,7 @@ return {
           right_trunc_marker = "",
           separator_style = vim.g.user_transparent_background and { "", "" } or "slant", -- slope
           -- in favor of `BufferLineGoToBuffer`
-          numbers = vim.g.user_is_termux and "none" or function(o)
+          numbers = U.is_narrow() and "none" or function(o)
             ---@type bufferline.State
             local state = require("bufferline.state")
             for i, item in ipairs(state.visible_components) do
@@ -195,7 +195,7 @@ return {
     dependencies = { "nvim-mini/mini.icons" },
     optional = true,
     opts = function(_, opts)
-      local is_termux = vim.g.user_is_termux
+      local is_narrow = U.is_narrow()
       local has_dropbar = U.has_user_extra("ui.dropbar")
 
       local function remove_component(sections, comp_name)
@@ -209,22 +209,22 @@ return {
       opts.sections.lualine_a = {
         {
           "mode",
-          fmt = is_termux and function(str)
+          fmt = is_narrow and function(str)
             return str:sub(1, 1)
           end or nil,
         },
       }
-      opts.sections.lualine_b = { { "branch", icons_enabled = not is_termux } }
+      opts.sections.lualine_b = { { "branch", icons_enabled = not is_narrow } }
 
       local lualine_c = opts.sections.lualine_c
-      lualine_c[1] = LazyVim.lualine.root_dir({ cwd = not is_termux, icon = is_termux and "" or nil })
-      lualine_c[4] = (is_termux or has_dropbar) and U.lualine.filename or U.lualine.pretty_path
-      if is_termux then
+      lualine_c[1] = LazyVim.lualine.root_dir({ cwd = not is_narrow, icon = is_narrow and "" or nil })
+      lualine_c[4] = (is_narrow or has_dropbar) and U.lualine.filename or U.lualine.pretty_path
+      if is_narrow then
         remove_component(lualine_c, "filetype")
       end
-      if is_termux or has_dropbar or vim.g.trouble_lualine == false then
+      if is_narrow or has_dropbar or vim.g.trouble_lualine == false then
         local diagnostics = remove_component(lualine_c, "diagnostics")
-        if not is_termux then
+        if not is_narrow then
           table.insert(lualine_c, diagnostics)
         end
       end
@@ -234,7 +234,7 @@ return {
       local copilot, sidekick = table.remove(lualine_x, 3), table.remove(lualine_x, 2)
       table.insert(lualine_x, 4, copilot)
       table.insert(lualine_x, 4, sidekick)
-      if is_termux then
+      if is_narrow then
         remove_component(lualine_x, "diff")
       else
         vim.list_extend(lualine_x, { U.lualine.formatter, U.lualine.linter, U.lualine.lsp })
@@ -246,7 +246,7 @@ return {
         {
           "bo:filetype",
           cond = function()
-            return not is_termux
+            return not is_narrow
           end,
           color = function()
             -- align with https://github.com/qw457812/dotfiles/blob/424e2fa63c3f268cbf84453ba47d48f6f31e8293/dot_config/nvim/lua/util/lualine.lua#L55
@@ -266,7 +266,7 @@ return {
         opts.options.section_separators = { left = "", right = "" }
         opts.sections.lualine_a[1].separator = { left = "" }
         opts.sections.lualine_z[#opts.sections.lualine_z].separator = { right = "" }
-      elseif is_termux then
+      elseif is_narrow then
         opts.options.section_separators = { left = "", right = "" }
       else
         opts.options.section_separators = { left = "", right = "" }
@@ -446,14 +446,14 @@ return {
  █████████     ██ ██         ██ █████ ███ ███ ██ ███ 
 ███████████████████████████████  ███ ███ ███ ██ ███]],
       }
-      opts.dashboard.preset.header = vim.g.user_is_termux and ("NVIM v%s"):format(tostring(vim.version()))
+      opts.dashboard.preset.header = U.is_narrow() and ("NVIM v%s"):format(tostring(vim.version()))
         or headers[math.random(#headers)]
 
       opts.dashboard.sections = {
         {}, -- top padding for header
         function() -- header
           if
-            vim.g.user_is_termux
+            U.is_narrow()
             or vim.fn.executable("npx") == 0
             or not (vim.uv.cwd() == U.path.HOME or Snacks.git.get_root()) -- frequently used dirs
           then

@@ -197,7 +197,7 @@ function M.diff_term(opts)
   end
 
   local cmd = { "git", "-c", "delta.paging=never" }
-  vim.list_extend(cmd, vim.g.user_is_termux and {} or { "-c", "delta.line-numbers=true" })
+  vim.list_extend(cmd, U.is_narrow() and {} or { "-c", "delta.line-numbers=true" })
   vim.list_extend(cmd, opts.args)
   table.insert(cmd, "diff")
   if opts.ignore_space then

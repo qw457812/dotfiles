@@ -143,7 +143,7 @@ return {
 
       -- TODO: status notifications for hidden floating terminal
       -- check: https://github.com/GeorgesAlkhouri/nvim-aider/commit/aa5df1a
-      local floating_terminal = vim.g.user_is_termux
+      local floating_terminal = U.is_narrow()
 
       ---@module "claudecode"
       ---@type PartialClaudeCodeConfig
@@ -199,8 +199,8 @@ return {
             },
           } --[[@as snacks.win.Config]], floating_terminal and {
             position = "float",
-            height = vim.g.user_is_termux and U.snacks.win.fullscreen_height or 0.9,
-            width = vim.g.user_is_termux and 0 or 0.9,
+            height = U.snacks.win.fullscreen_height,
+            width = 0,
           } --[[@as snacks.win.Config]] or {}),
         },
       }

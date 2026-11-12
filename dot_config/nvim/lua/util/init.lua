@@ -143,8 +143,14 @@ function M.is_bigfile(buf)
   return vim.bo[buf].filetype == "bigfile" or vim.b[buf].bigfile
 end
 
+-- narrow like termux
 ---@return boolean
-function M.too_narrow()
+function M.is_narrow()
+  return vim.o.columns < 120
+end
+
+---@return boolean
+function M.has_narrow_win()
   for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
     local buf = vim.api.nvim_win_get_buf(win)
     local is_explorer = vim.list_contains({ "neo-tree", "snacks_layout_box" }, vim.bo[buf].filetype)

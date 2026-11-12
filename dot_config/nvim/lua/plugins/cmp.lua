@@ -514,7 +514,7 @@ return {
       signature = {
         enabled = true,
         -- window = {
-        --   show_documentation = not vim.g.user_is_termux,
+        --   show_documentation = not U.is_narrow(),
         -- },
       },
     },

@@ -28,8 +28,8 @@ function M.toggle(cmd, opts, hide_key)
   if vim.tbl_get(opts, "win", "position") == "float" then
     opts = vim.tbl_deep_extend("force", {
       win = {
-        height = vim.g.user_is_termux and U.snacks.win.fullscreen_height or nil,
-        width = vim.g.user_is_termux and 0 or nil,
+        height = U.is_narrow() and U.snacks.win.fullscreen_height or nil,
+        width = U.is_narrow() and 0 or nil,
       },
       -- try `<c-/>` -> `<c-/>` -> `<c-space>` in home dir (root and cwd are the same), without this, then <c-space> will open a bottom terminal
       -- see: https://github.com/folke/snacks.nvim/blob/8c501965beff9a741b29eea53c7f876b039bddea/lua/snacks/terminal.lua#L173-L184

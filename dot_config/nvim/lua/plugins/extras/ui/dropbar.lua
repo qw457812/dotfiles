@@ -122,7 +122,7 @@ return {
           local win_width = vim.api.nvim_win_get_width(win)
 
           -- same behavior as `length` of `LazyVim.lualine.pretty_path()`
-          local max_symbols = vim.g.user_is_termux and 5 or 10
+          local max_symbols = U.is_narrow() and 5 or 10
           if #symbols > max_symbols then
             local symbol_ellipsis = symbols[2]
             symbol_ellipsis.name = "…"
@@ -130,7 +130,7 @@ return {
             symbols = { symbols[1], symbol_ellipsis, unpack(symbols, #symbols - max_symbols + 2, #symbols) }
           end
 
-          local max_symbol_len = vim.g.user_is_termux and 10 or 18
+          local max_symbol_len = U.is_narrow() and 10 or 18
           for i = 2, #symbols - 1 do
             symbols[i].name = truncate_string(symbols[i].name, max_symbol_len)
           end
@@ -335,7 +335,7 @@ return {
       -- for saecki/live-rename.nvim
       opts.inactive_winbar = vim.deepcopy(opts.winbar)
 
-      if not vim.g.user_is_termux and vim.g.user_trouble_lualine_old and LazyVim.has("trouble.nvim") then
+      if not U.is_narrow() and vim.g.user_trouble_lualine_old and LazyVim.has("trouble.nvim") then
         local trouble = require("trouble")
         local symbols = trouble.statusline({
           mode = "symbols", -- "lsp_document_symbols"

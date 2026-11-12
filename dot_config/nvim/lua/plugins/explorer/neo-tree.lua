@@ -120,7 +120,7 @@ return {
               return
             end
             if is_visible() then
-              if U.too_narrow() then
+              if U.has_narrow_win() then
                 require("neo-tree.command").execute({ action = "close" })
               end
             elseif vim.g.user_explorer_auto_open and U.too_wide() then
@@ -441,7 +441,8 @@ return {
             end
           end,
           close_or_unfocus = function(state)
-            local command = (vim.g.user_explorer_auto_close or U.too_narrow()) and "close_window" or "unfocus_window"
+            local command = (vim.g.user_explorer_auto_close or U.has_narrow_win()) and "close_window"
+              or "unfocus_window"
             state.commands[command](state)
           end,
           cancel_or_close_or_unfocus = function(state)
@@ -750,7 +751,7 @@ return {
           {
             event = "file_opened",
             handler = function()
-              if is_visible() and (vim.g.user_explorer_auto_close or U.too_narrow()) then
+              if is_visible() and (vim.g.user_explorer_auto_close or U.has_narrow_win()) then
                 require("neo-tree.command").execute({ action = "close" })
               end
             end,

@@ -684,12 +684,12 @@ return {
 
       local snacks_picker = {
         sections = {
-          lualine_a = not vim.g.user_is_termux and {
+          lualine_a = not U.is_narrow() and {
             function()
               return "snacks"
             end,
           } or nil,
-          lualine_b = not vim.g.user_is_termux and {
+          lualine_b = not U.is_narrow() and {
             function()
               local picker = Snacks.picker.get()[1]
               -- return picker and picker.list.cursor .. "/" .. picker.input.totals or ""
@@ -735,8 +735,8 @@ return {
       --   -- formatter = { "path.filename_first", 2 },
       -- },
       winopts = {
-        width = vim.g.user_is_termux and 1 or nil,
-        height = vim.g.user_is_termux and 1 or nil,
+        width = U.is_narrow() and 1 or nil,
+        height = U.is_narrow() and 1 or nil,
         preview = {
           horizontal = "right:50%",
         },
@@ -750,9 +750,9 @@ return {
           pager = [[delta --width=$COLUMNS --hunk-header-style="omit" --file-style="omit"]],
         },
       },
-      -- files = { path_shorten = vim.g.user_is_termux and 10 or 20 },
-      -- grep = { path_shorten = vim.g.user_is_termux and 10 or 20 },
-      -- buffers = { path_shorten = vim.g.user_is_termux and 10 or 20 },
+      -- files = { path_shorten = U.is_narrow() and 10 or 20 },
+      -- grep = { path_shorten = U.is_narrow() and 10 or 20 },
+      -- buffers = { path_shorten = U.is_narrow() and 10 or 20 },
     },
   },
 
@@ -777,10 +777,10 @@ return {
           },
           vertical = {
             width = function(_, max_columns, _)
-              return vim.g.user_is_termux and max_columns or math.floor(max_columns * 0.8)
+              return U.is_narrow() and max_columns or math.floor(max_columns * 0.8)
             end,
             height = function(_, _, max_lines)
-              return vim.g.user_is_termux and max_lines or math.floor(max_lines * 0.8)
+              return U.is_narrow() and max_lines or math.floor(max_lines * 0.8)
             end,
             preview_cutoff = 20,
             preview_height = 0.5,

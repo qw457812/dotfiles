@@ -29,7 +29,7 @@ return {
                 end
               end,
               close_or_unfocus = function(picker)
-                if vim.g.user_explorer_auto_close or U.too_narrow() then
+                if vim.g.user_explorer_auto_close or U.has_narrow_win() then
                   picker:close()
                 else
                   picker:action("unfocus")
@@ -76,7 +76,7 @@ return {
                   end
                 else
                   Snacks.picker.actions.jump(picker, item, action)
-                  if vim.g.user_explorer_auto_close or U.too_narrow() then
+                  if vim.g.user_explorer_auto_close or U.has_narrow_win() then
                     picker:close()
                   end
                 end

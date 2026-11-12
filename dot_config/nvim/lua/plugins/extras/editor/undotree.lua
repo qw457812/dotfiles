@@ -76,10 +76,10 @@ return {
             preview_cutoff = 1, -- preview should always be shown
             vertical = {
               width = function(_, max_columns, _)
-                return vim.g.user_is_termux and max_columns or math.floor(max_columns * 0.9)
+                return U.is_narrow() and max_columns or math.floor(max_columns * 0.9)
               end,
               height = function(_, _, max_lines)
-                return vim.g.user_is_termux and max_lines or math.floor(max_lines * 0.95)
+                return U.is_narrow() and max_lines or math.floor(max_lines * 0.95)
               end,
               preview_height = function(_, _, max_lines)
                 return math.max(max_lines - 12, math.floor(max_lines * 0.65))

@@ -70,7 +70,7 @@ return {
         },
       },
       notifier = {
-        width = vim.g.user_is_termux and { min = 20, max = 0.7 } or nil,
+        width = U.is_narrow() and { min = 20, max = 0.7 } or nil,
         sort = { "added" }, -- sort only by time
         icons = { error = "󰅚", warn = "", info = "󰋽", debug = "󰃤", trace = "󰓗" },
         -- style = "fancy",

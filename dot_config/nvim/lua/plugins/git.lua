@@ -202,14 +202,14 @@ return {
       ---@param args? string[] { "--file-style", "omit", "--hunk-header-style", "omit" }
       ---@return string[]
       local function diff_cmd(args)
-        local cmd = vim.list_extend({ "delta" }, vim.g.user_is_termux and {} or { "--line-numbers" })
+        local cmd = vim.list_extend({ "delta" }, U.is_narrow() and {} or { "--line-numbers" })
         return vim.list_extend(cmd, args or {})
       end
 
       ---@param args? string[] { "-c", "delta.file-style=omit", "-c", "delta.hunk-header-style=omit" }
       ---@return string[]
       local function git_args(args)
-        return vim.list_extend(vim.g.user_is_termux and {} or { "-c", "delta.line-numbers=true" }, args or {})
+        return vim.list_extend(U.is_narrow() and {} or { "-c", "delta.line-numbers=true" }, args or {})
       end
 
       ---@return string
@@ -249,7 +249,7 @@ return {
               on_close = U.snacks.picker.on_close,
               previewers = {
                 diff = {
-                  cmd = vim.g.user_is_termux and diff_cmd({ "--hunk-header-style", "omit" }) or nil,
+                  cmd = U.is_narrow() and diff_cmd({ "--hunk-header-style", "omit" }) or nil,
                 },
               },
             },

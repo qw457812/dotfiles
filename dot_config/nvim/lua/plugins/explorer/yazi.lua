@@ -86,8 +86,8 @@ return {
           },
         },
         -- open_multiple_tabs = true,
-        -- floating_window_scaling_factor = vim.g.user_is_termux and 1 or { height = 0.9, width = 0.9 }, -- see `opts.hooks.before_opening_window`
-        -- yazi_floating_window_border = vim.g.user_is_termux and "none" or nil, -- see `opts.hooks.before_opening_window`
+        -- floating_window_scaling_factor = U.is_narrow() and 1 or { height = 0.9, width = 0.9 }, -- see `opts.hooks.before_opening_window`
+        -- yazi_floating_window_border = U.is_narrow() and "none" or nil, -- see `opts.hooks.before_opening_window`
         keymaps = {
           open_file_in_vertical_split = false,
           open_file_in_horizontal_split = false,
