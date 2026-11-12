@@ -890,16 +890,21 @@ preset_keys:
   Vim_j: {label: j, send: j, repeatable: true}
   Vim_k: {label: k, send: k, repeatable: true}
   Vim_l: {label: l, send: l, repeatable: true}
+  Control_L: {label: Ctrl, send: Control_L}
+  Alt_L: {label: Alt, send: Alt_L}
+  tmux: {label: C-b, send: Control+b}
+  Alt_space: {label: 'A-␣', send: Alt+space} # ~/.pi/agent/pi-voice.json
+  Sel_2: {label: 次选, send: '2'}
   Home: {label: 行首, send: Home}
   Insert: {label: 插入, send: Insert}
   Delete: {label: 刪除, send: Delete}
   End: {label: 行尾, send: End}
   Page_Up: {label: 上頁, send: Page_Up}
   Page_Down: {label: 下頁, send: Page_Down}
-  Left: {label: '←', send: Left}
-  Down: {label: '↓', send: Down}
-  Up: {label: '↑', send: Up}
-  Right: {label: '→', send: Right}
+  Left: {label: '←', send: Left, repeatable: true}
+  Down: {label: '↓', send: Down, repeatable: true}
+  Up: {label: '↑', send: Up, repeatable: true}
+  Right: {label: '→', send: Right, repeatable: true}
   select_all: {label: 全選, send: Control+a}
   Clear: {label: 清除, text: "{Control+a}{BackSpace}"} #全選並刪除
   cut: {label: 剪下, send: Control+x}
@@ -984,10 +989,11 @@ preset_keyboards:
     author: "osfans <waxaca@163.com>"
     ascii_mode: 0
     width: 10
-    height: 44
+    height: 50
+    keyboard_height: 327 # 272.5 * 120%
     lock: true #切換程序時記憶鍵盤
     keys:
-      - {click: '1', long_click: '!'}
+      - {height: 40, click: '1', long_click: '!'}
       - {click: '2', long_click: '@'}
       - {click: '3', long_click: '#'}
       - {click: '4', long_click: '$'}
@@ -1008,32 +1014,37 @@ preset_keyboards:
       - {click: 'o', long_click: '{'}
       - {click: 'p', long_click: '}'}
       - {click: 'a', long_click: select_all }
-      - {click: 's', long_click: Home}
-      - {click: 'd', long_click: End}
-      - {click: 'f', long_click: Page_Up}
-      - {click: 'g', long_click: Page_Down}
+      - {click: 's', long_click: '<'}
+      - {click: 'd', long_click: '>'}
+      - {click: 'f', long_click: '"'}
+      - {click: 'g', long_click: "'"}
       - {click: Vim_h}
       - {click: Vim_j}
       - {click: Vim_k}
       - {click: Vim_l}
-      - {click: ';', long_click: ':'}
+      - {click: Escape, swipe_up: Hide} # TODO: long_click
       - {click: 'z', long_click: '`'}
       - {click: 'x', long_click: cut}
       - {click: 'c', long_click: copy}
       - {click: 'v', long_click: paste}
       - {click: 'b', long_click: '~'}
-      - {click: 'n', long_click: Insert}
-      - {click: 'm', long_click: Delete}
-      - {click: ',', long_click: '<'}
-      - {click: '.', long_click: '>'}
-      - {click: '/', long_click: '?'}
+      - {click: 'n', long_click: ';'}
+      - {click: 'm', long_click: ':'}
       - {click: Shift_L}
-      - {click: Keyboard_symbols, long_click: Keyboard_number}
-      - {click: Mode_switch, long_click: Menu}
-      - {click: space, swipe_left: Left, swipe_down: Down, swipe_up: Up, swipe_right: Right, width: 30}
-      - {click: "'", long_click: '"'}
-      - {click: BackSpace, width: 15}
-      - {click: Return, composing: Return1, long_click: CommitComment, width: 15}
+      - {click: BackSpace, width: 20}
+      - {click: Control_L, width: 15} # TODO: long_click
+      - {click: Mode_switch, long_click: Keyboard_symbols, swipe_up: Deploy}
+      - {click: ',', long_click: Alt_space}
+      - {click: space, swipe_left: Left, swipe_down: Down, swipe_up: Up, swipe_right: Right, long_click: '/', width: 30}
+      - {click: '.', long_click: '?', composing: Sel_2}
+      - {click: Tab} # TODO: long_click
+      - {click: Return, composing: Return1, long_click: CommitComment, width: 15} # TODO: long_click
+      - {height: 32.5, click: Alt_L, width: 18} # TODO: long_click
+      - {click: Left, width: 16}
+      - {click: Right, width: 16}
+      - {click: Down, width: 16}
+      - {click: Up, width: 16}
+      - {click: tmux, long_click: "{Control+b}{Control+b}", width: 18}
   mini:
     name: 精简键盘
     author: "tumuyan"
