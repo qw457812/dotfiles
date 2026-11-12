@@ -895,7 +895,7 @@ preset_keys:
   tmux: {label: C-b, send: Control+b}
   Alt_space: {label: 'A-␣', send: Alt+space} # ~/.pi/agent/pi-voice.json
   Sel_2: {label: 次选, send: '2'}
-  Esc_zh: {label: Esc, toggle: ascii_mode, send: SWITCH_CHARSET}
+  Esc_zh: {label: Esc, text: "{Mode_switch}{Escape}"}
   Home: {label: 行首, send: Home}
   Insert: {label: 插入, send: Insert}
   Delete: {label: 刪除, send: Delete}
