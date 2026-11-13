@@ -902,6 +902,8 @@ preset_keys:
   End: {label: 行尾, send: End}
   Page_Up: {label: 上頁, send: Page_Up}
   Page_Down: {label: 下頁, send: Page_Down}
+  Page_Left: {label: '◀', send: Page_Up}
+  Page_Right: {label: '▶', send: Page_Down}
   Left: {label: '←', send: Left, repeatable: true}
   Down: {label: '↓', send: Down, repeatable: true}
   Up: {label: '↑', send: Up, repeatable: true}
@@ -989,12 +991,13 @@ preset_keyboards:
     name: 預設40鍵
     author: "osfans <waxaca@163.com>"
     ascii_mode: 0
+    label_transform: uppercase
     width: 10
     height: 50
     keyboard_height: 327 # 272.5 * 120%
     lock: true #切換程序時記憶鍵盤
     keys:
-      - {height: 40, click: '1', long_click: '!'}
+      - {height: 40, click: '1', long_click: '!', has_menu: Page_Left}
       - {click: '2', long_click: '@'}
       - {click: '3', long_click: '#'}
       - {click: '4', long_click: '$'}
@@ -1003,7 +1006,7 @@ preset_keyboards:
       - {click: '7', long_click: '&'}
       - {click: '8', long_click: '*'}
       - {click: '9', long_click: '('}
-      - {click: '0', long_click: ')'}
+      - {click: '0', long_click: ')', has_menu: Page_Right}
       - {click: 'q', long_click: '_'}
       - {click: 'w', long_click: '-'}
       - {click: 'e', long_click: '+'}
@@ -1037,7 +1040,7 @@ preset_keyboards:
       - {click: Mode_switch, long_click: Keyboard_symbols, swipe_up: Deploy}
       - {click: ',', long_click: Alt_space}
       - {click: space, swipe_left: Left, swipe_down: Down, swipe_up: Up, swipe_right: Right, long_click: '/', width: 30}
-      - {click: '.', long_click: '?', composing: Sel_2}
+      - {click: '.', long_click: '?', has_menu: Sel_2}
       - {click: Tab} # TODO: long_click
       - {click: Return, composing: Return1, long_click: CommitComment, width: 15} # TODO: long_click
       - {height: 32.5, click: Alt_L, width: 18} # TODO: long_click
