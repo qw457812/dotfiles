@@ -1,0 +1,57 @@
+[accounts.jkdflfj-gmail]
+default = true
+email = "jkdflfj@gmail.com"
+
+imap.server = "imaps://imap.gmail.com:993"
+imap.sasl.plain.authcid = "jkdflfj@gmail.com"
+imap.sasl.plain.passwd.command = ["pass", "show", "himalaya-jkdflfj@gmail.com"]
+
+smtp.server = "smtps://smtp.gmail.com:465"
+smtp.sasl.plain.authcid = "jkdflfj@gmail.com"
+smtp.sasl.plain.passwd.command = ["pass", "show", "himalaya-jkdflfj@gmail.com"]
+
+mailbox.alias.sent = "[Gmail]/Sent Mail"
+mailbox.alias.drafts = "[Gmail]/Drafts"
+mailbox.alias.trash = "[Gmail]/Trash"
+mailbox.alias.junk = "[Gmail]/Spam"
+mailbox.alias.archive = "[Gmail]/All Mail"
+
+[accounts.iuseneovimbtw-gmail]
+email = "iuseneovimbtw@gmail.com"
+
+imap.server = "imaps://imap.gmail.com:993"
+imap.sasl.plain.authcid = "iuseneovimbtw@gmail.com"
+imap.sasl.plain.passwd.command = ["pass", "show", "himalaya-iuseneovimbtw@gmail.com"]
+
+smtp.server = "smtps://smtp.gmail.com:465"
+smtp.sasl.plain.authcid = "iuseneovimbtw@gmail.com"
+smtp.sasl.plain.passwd.command = ["pass", "show", "himalaya-iuseneovimbtw@gmail.com"]
+
+mailbox.alias.sent = "[Gmail]/Sent Mail"
+mailbox.alias.drafts = "[Gmail]/Drafts"
+mailbox.alias.trash = "[Gmail]/Trash"
+mailbox.alias.junk = "[Gmail]/Spam"
+mailbox.alias.archive = "[Gmail]/All Mail"
+
+[accounts.qw457812-163]
+email = "qw457812@163.com"
+
+imap.server = "imaps://imap.163.com:993"
+imap.sasl.login.password.command = ["pass", "show", "himalaya-qw457812@163.com"]
+imap.sasl.login.username = "qw457812@163.com"
+imap.id.auto = true
+imap.id.fields = { name = true }
+
+smtp.server = "smtps://smtp.163.com:465"
+smtp.sasl.login.password.command = ["pass", "show", "himalaya-qw457812@163.com"]
+smtp.sasl.login.username = "qw457812@163.com"
+
+mailbox.alias.sent = "已发送"
+mailbox.alias.drafts = "草稿箱"
+mailbox.alias.trash = "已删除"
+mailbox.alias.junk = "垃圾邮件"
+message.send.save-copy = "sent"
+
+# https://github.com/pimalaya/himalaya-tui
+[theme]
+preset = "tokyo-night"
