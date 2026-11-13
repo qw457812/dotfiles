@@ -41,7 +41,11 @@ local enabled = {
 local Config = require("lazy.core.config")
 Config.options.checker.enabled = false
 Config.options.change_detection.enabled = false
+local cond = Config.options.defaults.cond
 Config.options.defaults.cond = function(plugin)
+  if cond == false or (type(cond) == "function" and not cond(plugin)) then
+    return false
+  end
   ---@diagnostic disable-next-line: undefined-field
   return vim.tbl_contains(enabled, plugin.name) or plugin.shell_command_editor
 end
