@@ -100,6 +100,9 @@ requires an explicit apply request; updating this skill is part of review.
   and inspect exact hashes in reusable librarian caches when runtime packages differ
   from lazy checkouts; they never read targets from or mutate lazy working trees.
 - Never run `:Lazy check` yourself, not even headless `Lazy! check`.
+- Package filters match exact plugin names (`blink-ripgrep.nvim`, not
+  `blink-ripgrep`). A filter that matches no plugin exits non-zero; `scanned=0`
+  means nothing was checked, never that the rest of the plugin set is up to date.
 - A non-zero script exit means the changelog review is incomplete; fix or
   report the error before judging any changelog as reviewed.
 - If the user updates after review, preserve the recorded old/target hashes and

@@ -273,7 +273,7 @@
             "high": "high",
             "max": "max"
           },
-          "input": ["text"],
+          "input": ["text", "image"],
           "contextWindow": 1048576,
           "maxTokens": 131072,
           "cost": { "input": 4, "output": 15, "cacheRead": 0.4, "cacheWrite": 0 }
@@ -291,7 +291,7 @@
             "xhigh": "xhigh",
             "max": "max"
           },
-          "input": ["text"],
+          "input": ["text", "image"],
           "contextWindow": 1048576,
           "maxTokens": 126976,
           "cost": { "input": 0.29, "output": 0.99, "cacheRead": 0.029, "cacheWrite": 0 }

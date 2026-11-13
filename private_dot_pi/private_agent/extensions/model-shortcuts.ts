@@ -36,7 +36,6 @@ const ALIASES: Record<string, ModelTarget | readonly ModelTarget[]> = {
     { provider: "commandcode", id: "deepseek/deepseek-v4.1-flash" },
     { provider: "coralbricks", id: "deepseek-v4.1-flash-fast" },
     { provider: "neuralwatt", id: "deepseek-v4.1-flash" },
-    { provider: "lyber", id: "deepseek-v4.1-flash-1017-abliterated" },
   ],
   mimo: [
     { provider: "commandcode", id: "xiaomi/mimo-v2.6-pro" },
@@ -47,10 +46,9 @@ const ALIASES: Record<string, ModelTarget | readonly ModelTarget[]> = {
     { provider: "commandcode", id: "moonshotai/Kimi-K3.1-Pro" },
     { provider: "neuralwatt", id: "kimi-k3.1-pro" },
     { provider: "codebuddy", id: "kimi-k3.1-pro" },
-    { provider: "lyber", id: "kimi-k31-pro-abliterated" },
   ],
   qwen: { provider: "commandcode", id: "Qwen/Qwen3.8-Max-0902" },
-  flex: { provider: "neuralwatt", id: "glm-5.3-flex" },
+  flex: { provider: "neuralwatt", id: "kimi-k3.1-pro-flex" },
   coral: { provider: "coralbricks", id: "deepseek-v4.1-flash-fast" },
   auto: { provider: "jev", id: "auto" },
 };

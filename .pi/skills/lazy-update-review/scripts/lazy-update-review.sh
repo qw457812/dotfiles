@@ -40,7 +40,8 @@ already present.
 Options:
   --limit N      cap changelog commits per plugin (0 = all)
   --list         only list outdated plugins + range + commit count (no log body)
-  plugin ...     only scan these plugin names (default: all non-skipped)
+  plugin ...     only scan these exact plugin names (default: all non-skipped).
+                 An unmatched filter is an error.
 
 Env:
   PLUGIN_STATE_FILE  plugin-state cache (default: ~/.cache/lazy-update-review/plugin-state.tsv)
@@ -163,7 +164,8 @@ cnt_dir="${TMPDIR:-$HOME/.cache}/lazy-update-review.$$"
 mkdir -p "$cnt_dir"
 c_total="$cnt_dir/total"; c_out="$cnt_dir/outdated"; c_out_names="$cnt_dir/outdated_names"
 c_skip="$cnt_dir/skipped"; c_skip_reasons="$cnt_dir/skip_reasons"; c_ignored="$cnt_dir/ignored"
-: > "$c_total"; : > "$c_out"; : > "$c_out_names"; : > "$c_skip"; : > "$c_skip_reasons"; : > "$c_ignored"
+c_matched="$cnt_dir/matched"
+: > "$c_total"; : > "$c_out"; : > "$c_out_names"; : > "$c_skip"; : > "$c_skip_reasons"; : > "$c_ignored"; : > "$c_matched"
 
 if [ ! -r "$PLUGIN_STATE_FILE" ]; then
   echo "error: plugin-state cache is not readable: $PLUGIN_STATE_FILE" >&2
@@ -174,12 +176,13 @@ fi
 while IFS='|' read -r name pin is_local dir url skip installed target; do
   [ -n "$name" ] || { printf x >> "$c_ignored"; continue; }   # blank/garbage line
 
-  # optional name filter — apply before skip/anomaly counting so the summary's
-  # scanned/skipped/ignored refer only to the filtered set.
+  # optional exact-name filter — applied before skip/anomaly counting so the
+  # summary's scanned/skipped/ignored refer only to the filtered set.
   if [ -n "$filter" ]; then
     match=0
     for f in $filter; do [ "$f" = "$name" ] && match=1; done
     [ "$match" = "1" ] || continue
+    printf x >> "$c_matched"
   fi
 
   [ -z "$skip" ] || {                                         # pin/local/not-installed
@@ -251,6 +254,12 @@ fi
 echo "----" >&2
 n_total="$(wc -c < "$c_total" | tr -d '[:space:]')"; n_out="$(wc -c < "$c_out" | tr -d '[:space:]')"
 n_skip="$(wc -c < "$c_skip" | tr -d '[:space:]')"; n_ign="$(wc -c < "$c_ignored" | tr -d '[:space:]')"
+n_matched="$(wc -c < "$c_matched" | tr -d '[:space:]')"
+if [ -n "$filter" ] && [ "$n_matched" = "0" ]; then
+  echo "error: no plugin name matched filter:$filter" >&2
+  rm -rf "$cnt_dir"
+  exit 1
+fi
 names="$(cat "$c_out_names" 2>/dev/null)"; names="${names% }"
 skip_summary=""
 if [ -n "$n_skip" ] && [ "$n_skip" != "0" ]; then
@@ -272,6 +281,8 @@ fi
 n_plugins="$(wc -l < "$PLUGIN_STATE_FILE" | tr -d '[:space:]')"
 if [ -n "$names" ]; then
   printf 'outdated=%s scanned=%s%s : %s\n' "$n_out" "$n_total" "$skip_summary" "$names" >&2
+elif [ "$n_total" = "0" ]; then
+  printf 'outdated=0 scanned=0%s  (nothing checked)\n' "$skip_summary" >&2
 else
   printf 'outdated=%s scanned=%s%s  (all up to date)\n' "$n_out" "$n_total" "$skip_summary" >&2
 fi

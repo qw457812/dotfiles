@@ -30,6 +30,7 @@
     "neuralwatt/deepseek-v4.1-flash",
     "commandcode/deepseek/deepseek-v4.1-flash",
     "codebuddy/deepseek-v4.1-flash",
+    "coralbricks/deepseek-v4.1-flash-fast",
     "jev/auto"
   ],
   "modelThinkingLevels": {

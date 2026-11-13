@@ -552,6 +552,9 @@ return {
             ---@type blink-ripgrep.Options
             opts = {
               prefix_min_len = 3, -- same as `min_keyword_length`
+              future_features = {
+                use_blink_nightly = vim.g.lazyvim_blink_main,
+              },
               project_root_marker = function(_, path)
                 return path == LazyVim.root({ normalize = true })
               end,

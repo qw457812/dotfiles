@@ -9,7 +9,6 @@ tap "homebrew-zathura/zathura"
 tap "j178/tap"
 tap "jstkdng/programs"
 tap "julien-cpsn/atac"
-tap "krtirtho/apps"
 tap "localsend/localsend"
 tap "manaflow-ai/cmux"
 tap "nikitabobko/tap"
@@ -19,6 +18,7 @@ tap "oven-sh/bun"
 tap "owo-network/brew"
 tap "railwaycat/emacsmacport"
 tap "steipete/tap", trusted: { formulae: ["codexbar"] }
+tap "team-spotube/apps", "https://github.com/team-spotube/homebrew-apps.git"
 tap "thezoraiz/ascii-image-converter", "https://github.com/TheZoraiz/homebrew-ascii-image-converter"
 tap "unhappychoice/tap"
 tap "v2raya/v2raya"
@@ -522,7 +522,7 @@ brew "zlib"
 # Shell extension to navigate your filesystem faster
 brew "zoxide"
 # Better and friendly vi(vim) mode plugin for ZSH
-brew "zsh-vi-mode"
+brew "zsh-vi-mode", pin: true
 # Lightning-fast macOS screenshots & AI vision analysis
 brew "openclaw/tap/peekaboo", trusted: true
 cask "aerospace"
@@ -599,7 +599,7 @@ cask "sf-symbols"
 # Visible indicator of the current input source
 cask "showyedge"
 # Oracle SQLcl is the modern command-line interface for the Oracle Database
-cask "sqlcl"
+cask "sqlcl", pin: true
 # Rime input method engine
 cask "squirrel-app"
 # Mesh VPN based on WireGuard
@@ -703,10 +703,6 @@ vscode "wholroyd.jinja"
 vscode "xabikos.javascriptsnippets"
 vscode "zhuangtongfa.material-theme"
 go "github.com/Done-0/fuck-u-code/cmd/fuck-u-code"
-uv "claude-monitor"
-uv "graphifyy"
-uv "kimi-cli"
-uv "nano-pdf"
 cargo "himalaya-tui", source: "https://github.com/pimalaya/himalaya-tui.git"
 npm "@agentclientprotocol/claude-agent-acp"
 npm "@deepseek-ai/dsh"
