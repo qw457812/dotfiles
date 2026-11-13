@@ -46,21 +46,20 @@ require("lazy").setup({
         local overrides = {}
         for name, plugin in pairs(Config.spec.plugins) do
           ---@type boolean|(fun(plugin: LazyPlugin): boolean)|nil
-          local original_cond = plugin.cond
-          table.insert(overrides, {
-            name,
-            name = name,
-            optional = true,
-            cond = function(p)
-              if defaults_cond == false or (type(defaults_cond) == "function" and not defaults_cond(p)) then
-                return false
-              end
-              if type(original_cond) == "function" then
-                return original_cond(p)
-              end
-              return original_cond ~= false
-            end,
-          })
+          local orig_cond = plugin.cond
+          if orig_cond ~= nil then
+            table.insert(overrides, {
+              name,
+              name = name,
+              optional = true,
+              cond = function(p)
+                if defaults_cond == false or (type(defaults_cond) == "function" and not defaults_cond(p)) then
+                  return false
+                end
+                return not (orig_cond == false or (type(orig_cond) == "function" and not orig_cond(p)))
+              end,
+            })
+          end
         end
         return overrides
       end,
