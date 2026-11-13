@@ -98,6 +98,12 @@ vim.g.loaded_perl_provider = 0
 vim.g.loaded_ruby_provider = 0
 vim.g.loaded_node_provider = 0
 
+if vim.env.SSH_CONNECTION and vim.g.user_is_macos then
+  -- Share the remote macOS clipboard with Pi's pbpaste-based put.
+  -- Related workflow: SSH from Termux tmux, then paste Neovim yanks with pi-vim's `p` in Sidekick's tmux backend.
+  vim.opt.clipboard = "unnamedplus"
+end
+
 if vim.g.user_is_termux then
   opt.swapfile = false
 
