@@ -22,7 +22,7 @@ require("lazy").setup({
     -- import/override with your plugins
     { import = "plugins" },
     -- import plugins.lang, plugins.util, etc.
-    unpack((function()
+    (function()
       local specs = {}
       for name, type in vim.fs.dir(vim.fn.stdpath("config") .. "/lua/plugins") do
         if type == "directory" and name ~= "specs" and name ~= "extras" then
@@ -30,7 +30,41 @@ require("lazy").setup({
         end
       end
       return specs
-    end)()),
+    end)(),
+    -- Keep this last: enforce defaults.cond AND plugin.cond, not lazy's fallback.
+    -- https://github.com/folke/lazy.nvim/blob/306a05526ada86a7b30af95c5cc81ffba93fef97/lua/lazy/core/meta.lua#L267-L270
+    -- These overrides do not cover project-local or package specs added later.
+    {
+      name = "enforce-defaults-cond",
+      import = function()
+        local Config = require("lazy.core.config")
+        local defaults_cond = Config.options.defaults.cond -- Used by plugins/{pager,remote,shell-command-editor}.lua and LazyVim's extras/vscode.lua
+        if defaults_cond == nil then
+          return {}
+        end
+
+        local overrides = {}
+        for name, plugin in pairs(Config.spec.plugins) do
+          ---@type boolean|(fun(plugin: LazyPlugin): boolean)|nil
+          local original_cond = plugin.cond
+          table.insert(overrides, {
+            name,
+            name = name,
+            optional = true,
+            cond = function(p)
+              if defaults_cond == false or (type(defaults_cond) == "function" and not defaults_cond(p)) then
+                return false
+              end
+              if type(original_cond) == "function" then
+                return original_cond(p)
+              end
+              return original_cond ~= false
+            end,
+          })
+        end
+        return overrides
+      end,
+    },
   },
   defaults = {
     -- By default, only LazyVim plugins will be lazy-loaded. Your custom plugins will load during startup.
