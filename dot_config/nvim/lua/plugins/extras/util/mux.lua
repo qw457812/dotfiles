@@ -239,6 +239,7 @@ return {
     end,
   },
 
+  { "smart-splits-nvim/backend-kitty", cond = is_kitty, lazy = true },
   {
     "folke/snacks.nvim",
     optional = true,
@@ -309,11 +310,11 @@ return {
       -- toggle kitty window layout (zoom)
       local on_open_kitty = function() end
       local on_close_kitty = function() end
-      if is_kitty and LazyVim.has("smart-splits.nvim") then
-        local smart_splits_kitty = require("smart-splits.mux.kitty")
+      if is_kitty and LazyVim.has("backend-kitty") then
+        local kitty = require("smart-splits-backend-kitty.kitty")
         local is_zoomed
         on_open_kitty = function()
-          is_zoomed = smart_splits_kitty.current_pane_is_zoomed()
+          is_zoomed = kitty.is_zoomed()
           if is_zoomed == false then
             vim.system({ "kitten", "@", "goto-layout", "stack" })
           end

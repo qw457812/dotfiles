@@ -9,6 +9,7 @@
   "answer-me-with-html": { "branch": "main", "commit": "edccab07c012e2141585f8ddb18a62e01664fa2b" },
   "anthropics-skills": { "branch": "main", "commit": "dbd4588f9e1033efb41dad4bef2f7947c8993d44" },
   "async.nvim": { "branch": "main", "commit": "028d843a892b4920d8306216369aeee9fbcebae5" },
+  "backend-kitty": { "branch": "main", "commit": "3d2a42abbe7545b406757f8a303813e49dc0449a" },
   "baleia.nvim": { "branch": "main", "commit": "14c279cc7241d97585f8000dfd7dcdbca9fb4458" },
   "better-escape.nvim": { "branch": "master", "commit": "3f4bc0b326606264ff75967f59091b5ddada0554" },
   "blink-cmp-dat-word": { "branch": "main", "commit": "0c58fe92bd94710c52a5cb3a89c63a47bc851733" },
