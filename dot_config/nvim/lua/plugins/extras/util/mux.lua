@@ -4,16 +4,6 @@ local is_kitty = vim.g.user_is_kitty
 -- TODO: tmux in ghostty
 local is_ghostty = vim.g.user_is_ghostty
 
--- https://github.com/folke/zen-mode.nvim/blob/a31cf7113db34646ca320f8c2df22cf1fbfc6f2a/lua/zen-mode/plugins.lua#L96
-local function get_tmux_opt(option)
-  local option_raw = vim.fn.system([[tmux show -w ]] .. option)
-  if option_raw == "" then
-    option_raw = vim.fn.system([[tmux show -g ]] .. option)
-  end
-  local opt = vim.split(vim.trim(option_raw), " ")[2]
-  return opt
-end
-
 ---@return {autocmds:function,on_open:function,on_close:function}
 local function zen()
   -- toggle tmux status line
@@ -25,8 +15,8 @@ local function zen()
     local augroup = vim.api.nvim_create_augroup("zenmode_tmux", { clear = true })
     -- https://github.com/TranThangBin/.dotfiles/blob/01a5013b351aaf2b79aa7d771fdc2cec5d861799/nvim/.config/nvim/lua/tranquangthang/lazy/zen-mode.lua#L39
     on_open_tmux = function()
-      tmux_status = get_tmux_opt("status")
-      tmux_pane = get_tmux_opt("pane-border-status")
+      tmux_status = U.mux.tmux.get_opt("status")
+      tmux_pane = U.mux.tmux.get_opt("pane-border-status")
       vim.fn.system([[tmux set -w pane-border-status off]])
       vim.fn.system([[tmux set status off]])
       vim.fn.system([[tmux list-panes -F '\#F' | grep -q Z || tmux resize-pane -Z]])
@@ -63,40 +53,18 @@ local function zen()
   local on_close_wezterm = function() end
   if is_wezterm then
     local wezterm = require("wezterm")
-    if wezterm.list_clients() then -- sometimes `wezterm cli` went wrong in tmux, check it
-      local smart_splits_wezterm = require("smart-splits.mux.wezterm")
-
-      -- local function pane_is_zoomed(pane_id)
-      --   if not pane_id then
-      --     return
-      --   end
-      --
-      --   local panes = wezterm.list_panes()
-      --   if not panes then
-      --     return
-      --   end
-      --
-      --   for _, p in ipairs(panes) do
-      --     if p.pane_id == pane_id then
-      --       return p.is_zoomed
-      --     end
-      --   end
-      -- end
-
-      local pane_id = smart_splits_wezterm.current_pane_id() -- will pane_id change during nvim session?
-      local is_zoomed
-      on_open_wezterm = function()
-        -- is_zoomed = pane_is_zoomed(pane_id) -- alternative
-        is_zoomed = smart_splits_wezterm.current_pane_is_zoomed()
-        if is_zoomed == false then
-          wezterm.zoom_pane(pane_id, { zoom = true })
-        end
+    local pane_id, is_zoomed
+    on_open_wezterm = function()
+      pane_id = U.mux.wezterm.current_pane_id()
+      is_zoomed = U.mux.wezterm.pane_is_zoomed(pane_id)
+      if is_zoomed == false then
+        wezterm.zoom_pane(pane_id, { zoom = true })
       end
-      on_close_wezterm = function()
-        -- restore zoom state
-        if is_zoomed == false then
-          wezterm.zoom_pane(pane_id, { unzoom = true })
-        end
+    end
+    on_close_wezterm = function()
+      -- restore zoom state
+      if is_zoomed == false then
+        wezterm.zoom_pane(pane_id, { unzoom = true })
       end
     end
   end
@@ -324,16 +292,14 @@ return {
 
         if is_wezterm then
           -- (nvim in) tmux in wezterm: currently at the edge of tmux, we will check whether it's at the edge of wezterm as well
-          local mux_wezterm = require("smart-splits.mux.wezterm")
           local wezterm = require("wezterm")
 
-          -- NOTE: `$WEZTERM_PANE` could be wrong when getting wezterm pane_id in tmux, use `wezterm cli list-clients --format=json` instead
-          -- See: https://github.com/wez/wezterm/issues/3413#issuecomment-1491870672
-          -- In this case, we need to specify the `--pane-id` for `wezterm cli get-pane-direction`, otherwise it will use `$WEZTERM_PANE`
-          -- See: `wezterm cli get-pane-direction --help`
-          -- local wezterm_pane_id = wezterm.get_current_pane() -- `$WEZTERM_PANE` could be wrong
-          local wezterm_pane_id = mux_wezterm.current_pane_id()
-          -- local at_edge_of_wezterm = mux_wezterm.current_pane_at_edge(ctx.direction) -- missing `--pane-id`
+          -- `$WEZTERM_PANE` could be wrong in tmux. So we need to specify the `--pane-id` for `wezterm cli get-pane-direction`,
+          -- otherwise it will use `$WEZTERM_PANE`, see: `wezterm cli get-pane-direction --help`.
+          local wezterm_pane_id = U.mux.wezterm.current_pane_id()
+          if not wezterm_pane_id then
+            return
+          end
           ---@diagnostic disable-next-line: param-type-mismatch
           local at_edge_of_wezterm = wezterm.get_pane_direction(ctx.direction, wezterm_pane_id) == nil
           if at_edge_of_wezterm then
@@ -341,10 +307,6 @@ return {
             wrap_or_split_or_stop()
           else
             -- at the edge of tmux, but not at the edge of wezterm, navigate to wezterm
-            -- local ok = mux_wezterm.next_pane(ctx.direction) -- missing `--pane-id`
-            -- if not ok then
-            --   wrap_or_split_or_stop()
-            -- end
             ---@diagnostic disable-next-line: param-type-mismatch
             wezterm.switch_pane.direction(ctx.direction, wezterm_pane_id)
           end

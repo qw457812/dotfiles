@@ -41,7 +41,7 @@
     "plugins.extras.ui.dropbar",
     "plugins.extras.util.chezmoi-template",
     "plugins.extras.util.kitty-scrollback",
-    "plugins.extras.util.tmux",
+    "plugins.extras.util.mux",
     "plugins.extras.util.translate",
     "plugins.extras.util.zoxide"
   ],

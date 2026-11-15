@@ -689,7 +689,7 @@ return {
                 t:send("\n")
               end,
             },
-            -- we already have global mappings for window navigation (plugins.extras.util.tmux)
+            -- we already have global mappings for window navigation (plugins.extras.util.mux)
             nav_down = vim.F.if_nil(vim.g.neovide, false) and nil, -- HACK: fix "'kitty @ kitten neighboring_window.py right' returned 1", same for nav_up and nav_right
             nav_up = vim.F.if_nil(vim.g.neovide, false) and nil,
             nav_right = vim.F.if_nil(vim.g.neovide, false) and nil,
