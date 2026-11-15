@@ -326,7 +326,7 @@ glide.keymaps.set("normal", "w", when_editing("motion w", "keys >>"));
 glide.keymaps.set("normal", "gn", "go_next");
 glide.keymaps.set("normal", "gp", "go_previous");
 glide.keymaps.set("normal", "U", "redo");
-glide.keymaps.set("normal", "<BS>", tab_close);
+glide.keymaps.set("normal", "<BS>", when_editing("caret_move left", tab_close));
 glide.keymaps.set("normal", "<S-BS>", async () => {
   await browser.sessions.restore();
 });
