@@ -90,8 +90,4 @@ bindings = [
   # My vim bindings
   { key = "H", mods = "Shift", mode = "Vi|~Search", action = "FirstOccupied" },
   { key = "L", mods = "Shift", mode = "Vi|~Search", action = "Last" },
-  # Use cmd+, to edit this file with chezmoi
-  # https://github.com/alacritty/alacritty/issues/1047#issuecomment-362233176
-  # send tmux key binding, see `bind C-]` in ~/.tmux.conf.local
-  { key = ",", mods = "Command", chars = "\u0002\u001d" },
 ]

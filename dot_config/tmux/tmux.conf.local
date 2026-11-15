@@ -459,11 +459,6 @@ bind C-l next-window     # select next window
 # edit configuration with chezmoi
 bind e new-window -n "czea #{TMUX_CONF_LOCAL}" -e EDITOR="$EDITOR" sh -c 'chezmoi edit --apply --verbose "$TMUX_CONF_LOCAL" && "$TMUX_PROGRAM" ${TMUX_SOCKET:+-S "$TMUX_SOCKET"} source "$TMUX_CONF" \; display "$TMUX_CONF_LOCAL sourced"'
 
-# edit alacritty configuration with chezmoi
-# https://stackoverflow.com/questions/30680362/how-to-use-ctrl-semicolon-for-prefix-in-tmux
-# TODO `--verbose` not work
-bind C-] new-window -n "chezmoi edit --apply ~/.config/alacritty/alacritty.toml" -e EDITOR="$EDITOR" sh -c 'chezmoi edit --apply ~/.config/alacritty/alacritty.toml'
-
 # session navigation
 bind ` switch-client -l  # move to last session
 
@@ -502,28 +497,6 @@ is_wezterm='test -n "$WEZTERM_UNIX_SOCKET"'
 is_kitty='test -n "$KITTY_PID"'
 # bind-key -n 'C-x' if-shell "$is_wezterm" 'display-message "true"' 'display-message "false"'
 
-# bind-key -n 'C-h' if-shell "$is_vim" 'send-keys C-h' { if -F '#{pane_at_left}' '' 'select-pane -L' }
-# bind-key -n 'C-j' if-shell "$is_vim" 'send-keys C-j' { if -F '#{pane_at_bottom}' '' 'select-pane -D' }
-# bind-key -n 'C-k' if-shell "$is_vim" 'send-keys C-k' { if -F '#{pane_at_top}' '' 'select-pane -U' }
-# bind-key -n 'C-l' if-shell "$is_vim" 'send-keys C-l' { if -F '#{pane_at_right}' '' 'select-pane -R' }
-#
-# bind-key -n 'C-h' if-shell "$is_vim" 'send-keys C-h' \
-#   { if -F '#{pane_at_left}' \
-#     { if-shell "$is_wezterm" 'run-shell "wezterm cli activate-pane-direction Left"' '' } \
-#     'select-pane -L' }
-# bind-key -n 'C-j' if-shell "$is_vim" 'send-keys C-j' \
-#   { if -F '#{pane_at_bottom}' \
-#     { if-shell "$is_wezterm" 'run-shell "wezterm cli activate-pane-direction Down"' '' } \
-#     'select-pane -D' }
-# bind-key -n 'C-k' if-shell "$is_vim" 'send-keys C-k' \
-#   { if -F '#{pane_at_top}' \
-#     { if-shell "$is_wezterm" 'run-shell "wezterm cli activate-pane-direction Up"' '' } \
-#     'select-pane -U' }
-# bind-key -n 'C-l' if-shell "$is_vim" 'send-keys C-l' \
-#   { if -F '#{pane_at_right}' \
-#     { if-shell "$is_wezterm" 'run-shell "wezterm cli activate-pane-direction Right"' '' } \
-#     'select-pane -R' }
-#
 # NOTE: `$WEZTERM_PANE` could be wrong when getting wezterm pane_id in tmux, use `wezterm cli list-clients --format=json` instead
 # See: https://github.com/wez/wezterm/issues/3413#issuecomment-1491870672
 # In this case, we need to specify the `--pane-id` for `wezterm cli activate-pane-direction`, otherwise it will use `$WEZTERM_PANE`
@@ -549,24 +522,6 @@ bind-key -n 'C-l' if-shell "$is_vim" 'send-keys C-l' \
       { if-shell "$is_kitty" "run-shell \"kitty @ kitten neighboring_window.py right\"" '' } } \
     'select-pane -R' }
 
-# bind-key -T copy-mode-vi 'C-h' if -F '#{pane_at_left}' '' 'select-pane -L'
-# bind-key -T copy-mode-vi 'C-j' if -F '#{pane_at_bottom}' '' 'select-pane -D'
-# bind-key -T copy-mode-vi 'C-k' if -F '#{pane_at_top}' '' 'select-pane -U'
-# bind-key -T copy-mode-vi 'C-l' if -F '#{pane_at_right}' '' 'select-pane -R'
-#
-# bind-key -T copy-mode-vi 'C-h' if -F '#{pane_at_left}' \
-#   { if-shell "$is_wezterm" 'run-shell "wezterm cli activate-pane-direction Left"' '' } \
-#   'select-pane -L'
-# bind-key -T copy-mode-vi 'C-j' if -F '#{pane_at_bottom}' \
-#   { if-shell "$is_wezterm" 'run-shell "wezterm cli activate-pane-direction Down"' '' } \
-#   'select-pane -D'
-# bind-key -T copy-mode-vi 'C-k' if -F '#{pane_at_top}' \
-#   { if-shell "$is_wezterm" 'run-shell "wezterm cli activate-pane-direction Up"' '' } \
-#   'select-pane -U'
-# bind-key -T copy-mode-vi 'C-l' if -F '#{pane_at_right}' \
-#   { if-shell "$is_wezterm" 'run-shell "wezterm cli activate-pane-direction Right"' '' } \
-#   'select-pane -R'
-#
 bind-key -T copy-mode-vi 'C-h' if -F '#{pane_at_left}' \
   { if-shell "$is_wezterm" "run-shell \"wezterm cli activate-pane-direction --pane-id \$(wezterm cli list-clients --format json | jq -r 'sort_by(.idle_time.nanos) | .[0].focused_pane_id') Left\"" \
     { if-shell "$is_kitty" "run-shell \"kitty @ kitten neighboring_window.py left\"" '' } } \
