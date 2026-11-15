@@ -4,126 +4,6 @@ local is_kitty = vim.g.user_is_kitty
 -- TODO: tmux in ghostty
 local is_ghostty = vim.g.user_is_ghostty
 
----@return {autocmds:function,on_open:function,on_close:function}
-local function zen()
-  -- toggle tmux status line
-  local on_open_tmux = function() end
-  local on_close_tmux = function() end
-  if is_tmux then
-    local tmux_status
-    local tmux_pane
-    local augroup = vim.api.nvim_create_augroup("zenmode_tmux", { clear = true })
-    -- https://github.com/TranThangBin/.dotfiles/blob/01a5013b351aaf2b79aa7d771fdc2cec5d861799/nvim/.config/nvim/lua/tranquangthang/lazy/zen-mode.lua#L39
-    on_open_tmux = function()
-      tmux_status = U.mux.tmux.get_opt("status")
-      tmux_pane = U.mux.tmux.get_opt("pane-border-status")
-      vim.fn.system([[tmux set -w pane-border-status off]])
-      vim.fn.system([[tmux set status off]])
-      vim.fn.system([[tmux list-panes -F '\#F' | grep -q Z || tmux resize-pane -Z]])
-      -- restore tmux status line when switching to another tmux window or ctrl-z
-      vim.api.nvim_create_autocmd({ "FocusLost", "VimSuspend" }, {
-        group = augroup,
-        desc = "Restore tmux status line on Neovim Focus Lost",
-        callback = function()
-          vim.fn.system(string.format([[tmux set status %s]], tmux_status))
-        end,
-      })
-      vim.api.nvim_create_autocmd({ "FocusGained", "VimResume" }, {
-        group = augroup,
-        desc = "Hide tmux status line on Neovim Focus Gained",
-        callback = function()
-          vim.fn.system([[tmux set status off]])
-        end,
-      })
-    end
-    on_close_tmux = function()
-      if type(tmux_pane) == "string" then
-        vim.fn.system(string.format([[tmux set -w pane-border-status %s]], tmux_pane))
-      else
-        vim.fn.system([[tmux set -uw pane-border-status]])
-      end
-      vim.fn.system(string.format([[tmux set status %s]], tmux_status))
-      vim.fn.system([[tmux list-panes -F '\#F' | grep -q Z && tmux resize-pane -Z]])
-      vim.api.nvim_clear_autocmds({ group = augroup })
-    end
-  end
-
-  -- toggle wezterm pane zoom state
-  local on_open_wezterm = function() end
-  local on_close_wezterm = function() end
-  if is_wezterm then
-    local wezterm = require("wezterm")
-    local pane_id, is_zoomed
-    on_open_wezterm = function()
-      pane_id = U.mux.wezterm.current_pane_id()
-      is_zoomed = U.mux.wezterm.pane_is_zoomed(pane_id)
-      if is_zoomed == false then
-        wezterm.zoom_pane(pane_id, { zoom = true })
-      end
-    end
-    on_close_wezterm = function()
-      -- restore zoom state
-      if is_zoomed == false then
-        wezterm.zoom_pane(pane_id, { unzoom = true })
-      end
-    end
-  end
-
-  -- toggle kitty window layout (zoom)
-  local on_open_kitty = function() end
-  local on_close_kitty = function() end
-  if is_kitty then
-    local smart_splits_kitty = require("smart-splits.mux.kitty")
-
-    local is_zoomed
-    on_open_kitty = function()
-      is_zoomed = smart_splits_kitty.current_pane_is_zoomed()
-      if is_zoomed == false then
-        vim.system({ "kitten", "@", "goto-layout", "stack" })
-      end
-    end
-    on_close_kitty = function()
-      -- restore window layout
-      if is_zoomed == false then
-        vim.system({ "kitten", "@", "last-used-layout" })
-      end
-    end
-  end
-
-  local function on_open()
-    on_open_tmux()
-    on_open_wezterm()
-    on_open_kitty()
-  end
-
-  local function on_close()
-    on_close_tmux()
-    on_close_wezterm()
-    on_close_kitty()
-  end
-
-  return {
-    autocmds = function()
-      if not (is_tmux or is_wezterm or is_kitty) then
-        return
-      end
-
-      -- https://github.com/folke/zen-mode.nvim/issues/111
-      vim.api.nvim_create_autocmd("VimLeavePre", {
-        desc = "Restore tmux status line and wezterm pane zoom state when close Neovim in Zen Mode",
-        callback = function()
-          if assert(Snacks.toggle.get("zen")):get() then
-            -- `U.toggle.zen:set(false)` not working for snacks zen
-            on_close()
-          end
-        end,
-      })
-    end,
-    on_open = on_open,
-    on_close = on_close,
-  }
-end
-
 ---@type LazySpec
 return {
   {
@@ -363,18 +243,118 @@ return {
     "folke/snacks.nvim",
     optional = true,
     opts = function(_, opts)
-      local z = zen()
-      z.autocmds()
+      -- toggle tmux status line
+      local on_open_tmux = function() end
+      local on_close_tmux = function() end
+      if is_tmux then
+        local tmux_status
+        local tmux_pane
+        local augroup = vim.api.nvim_create_augroup("snacks_zen_tmux", { clear = true })
+        -- https://github.com/TranThangBin/.dotfiles/blob/01a5013b351aaf2b79aa7d771fdc2cec5d861799/nvim/.config/nvim/lua/tranquangthang/lazy/zen-mode.lua#L39
+        on_open_tmux = function()
+          tmux_status = U.mux.tmux.get_opt("status")
+          tmux_pane = U.mux.tmux.get_opt("pane-border-status")
+          vim.fn.system([[tmux set -w pane-border-status off]])
+          vim.fn.system([[tmux set status off]])
+          vim.fn.system([[tmux list-panes -F '\#F' | grep -q Z || tmux resize-pane -Z]])
+          -- restore tmux status line when switching to another tmux window or ctrl-z
+          vim.api.nvim_create_autocmd({ "FocusLost", "VimSuspend" }, {
+            group = augroup,
+            desc = "Restore tmux status line on Neovim Focus Lost",
+            callback = function()
+              vim.fn.system(string.format([[tmux set status %s]], tmux_status))
+            end,
+          })
+          vim.api.nvim_create_autocmd({ "FocusGained", "VimResume" }, {
+            group = augroup,
+            desc = "Hide tmux status line on Neovim Focus Gained",
+            callback = function()
+              vim.fn.system([[tmux set status off]])
+            end,
+          })
+        end
+        on_close_tmux = function()
+          if type(tmux_pane) == "string" then
+            vim.fn.system(string.format([[tmux set -w pane-border-status %s]], tmux_pane))
+          else
+            vim.fn.system([[tmux set -uw pane-border-status]])
+          end
+          vim.fn.system(string.format([[tmux set status %s]], tmux_status))
+          vim.fn.system([[tmux list-panes -F '\#F' | grep -q Z && tmux resize-pane -Z]])
+          vim.api.nvim_clear_autocmds({ group = augroup })
+        end
+      end
+
+      -- toggle wezterm pane zoom state
+      local on_open_wezterm = function() end
+      local on_close_wezterm = function() end
+      if is_wezterm and LazyVim.has("wezterm.nvim") then
+        local wezterm = require("wezterm")
+        local pane_id, is_zoomed
+        on_open_wezterm = function()
+          pane_id = U.mux.wezterm.current_pane_id()
+          is_zoomed = U.mux.wezterm.pane_is_zoomed(pane_id)
+          if is_zoomed == false then
+            wezterm.zoom_pane(pane_id, { zoom = true })
+          end
+        end
+        on_close_wezterm = function()
+          -- restore zoom state
+          if is_zoomed == false then
+            wezterm.zoom_pane(pane_id, { unzoom = true })
+          end
+        end
+      end
+
+      -- toggle kitty window layout (zoom)
+      local on_open_kitty = function() end
+      local on_close_kitty = function() end
+      if is_kitty and LazyVim.has("smart-splits.nvim") then
+        local smart_splits_kitty = require("smart-splits.mux.kitty")
+        local is_zoomed
+        on_open_kitty = function()
+          is_zoomed = smart_splits_kitty.current_pane_is_zoomed()
+          if is_zoomed == false then
+            vim.system({ "kitten", "@", "goto-layout", "stack" })
+          end
+        end
+        on_close_kitty = function()
+          -- restore window layout
+          if is_zoomed == false then
+            vim.system({ "kitten", "@", "last-used-layout" })
+          end
+        end
+      end
+
+      if is_tmux or is_wezterm or is_kitty then
+        -- https://github.com/folke/zen-mode.nvim/issues/111
+        vim.api.nvim_create_autocmd("VimLeavePre", {
+          desc = "Restore tmux status line and wezterm pane zoom state when close Neovim in Zen Mode",
+          callback = function()
+            if assert(Snacks.toggle.get("zen")):get() then
+              -- `U.toggle.zen:set(false)` not working for snacks zen
+              on_close_tmux()
+              on_close_wezterm()
+              on_close_kitty()
+            end
+          end,
+        })
+      end
+
       opts.zen = opts.zen or {}
-      local on_open = opts.zen.on_open or function() end
-      local on_close = opts.zen.on_close or function() end
+      local orig_on_open = opts.zen.on_open or function() end
+      local orig_on_close = opts.zen.on_close or function() end
       opts.zen.on_open = function()
-        on_open()
-        z.on_open()
+        orig_on_open()
+        on_open_tmux()
+        on_open_wezterm()
+        on_open_kitty()
       end
       opts.zen.on_close = function()
-        on_close()
-        z.on_close()
+        orig_on_close()
+        on_close_tmux()
+        on_close_wezterm()
+        on_close_kitty()
       end
     end,
   },
