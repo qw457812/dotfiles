@@ -191,12 +191,8 @@ return {
             wezterm.switch_pane.direction(ctx.direction, wezterm_pane_id)
           end
         elseif is_kitty then
-          local mux_kitty = require("smart-splits.mux.kitty")
-          local at_edge_of_kitty = mux_kitty.current_pane_at_edge(ctx.direction)
-          if at_edge_of_kitty then
+          if not require("smart-splits-backend-kitty").move(ctx.direction, { at_edge = "stop" }) then
             wrap_or_split_or_stop()
-          else
-            mux_kitty.next_pane(ctx.direction)
           end
         end
       end,
@@ -208,6 +204,7 @@ return {
     -- See: https://github.com/mrjones2014/smart-splits.nvim/blob/0523920a07c54eea7610f342ca8c1bddbee4b626/lua/smart-splits/mux/utils.lua#L59
     -- But in `wezterm/keys.lua`/`kitty/kitty.conf`, we pass the C-hjkl keys through to either nvim or tmux, so it's OK to not set `IS_NVIM` and let wezterm/kitty treat it as tmux.
   },
+  { "smart-splits-nvim/backend-kitty", cond = is_kitty, lazy = true },
 
   -- library
   {
@@ -239,7 +236,6 @@ return {
     end,
   },
 
-  { "smart-splits-nvim/backend-kitty", cond = is_kitty, lazy = true },
   {
     "folke/snacks.nvim",
     optional = true,
