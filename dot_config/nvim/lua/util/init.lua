@@ -46,7 +46,7 @@ end
 
 ---@param win? integer default 0
 ---@param opts? {zen?: boolean, notify?: boolean, misc?: boolean} default true
----      - zen: whether to treat zen-mode as floating window
+---      - zen: whether to treat Snacks Zen as floating window
 ---      - notify: whether to treat snacks_notif, notify, noice as floating window
 ---      - misc: whether to treat nvim-treesitter-context, snacks_dashboard terminal sections, layers.nvim help as floating windows
 ---@return boolean
@@ -65,7 +65,7 @@ function M.is_floating_win(win, opts)
   local buf = vim.api.nvim_win_get_buf(win)
   local ft = vim.bo[buf].filetype
 
-  -- snacks zen or zen-mode.nvim
+  -- Snacks Zen
   if not opts.zen then
     if
       Snacks.toggle.get("zen"):get()
@@ -76,12 +76,6 @@ function M.is_floating_win(win, opts)
       )
     then
       return false
-    end
-    if package.loaded["zen-mode"] then
-      local zen_mode = require("zen-mode.view")
-      if zen_mode.is_open() and (win == zen_mode.win or win == zen_mode.bg_win) then
-        return false
-      end
     end
   end
 

@@ -14,9 +14,8 @@ local function get_tmux_opt(option)
   return opt
 end
 
----@param snacks? boolean
 ---@return {autocmds:function,on_open:function,on_close:function}
-local function zen(snacks)
+local function zen()
   -- toggle tmux status line
   local on_open_tmux = function() end
   local on_close_tmux = function() end
@@ -27,12 +26,10 @@ local function zen(snacks)
     -- https://github.com/TranThangBin/.dotfiles/blob/01a5013b351aaf2b79aa7d771fdc2cec5d861799/nvim/.config/nvim/lua/tranquangthang/lazy/zen-mode.lua#L39
     on_open_tmux = function()
       tmux_status = get_tmux_opt("status")
-      if snacks then
-        tmux_pane = get_tmux_opt("pane-border-status")
-        vim.fn.system([[tmux set -w pane-border-status off]])
-        vim.fn.system([[tmux set status off]])
-        vim.fn.system([[tmux list-panes -F '\#F' | grep -q Z || tmux resize-pane -Z]])
-      end
+      tmux_pane = get_tmux_opt("pane-border-status")
+      vim.fn.system([[tmux set -w pane-border-status off]])
+      vim.fn.system([[tmux set status off]])
+      vim.fn.system([[tmux list-panes -F '\#F' | grep -q Z || tmux resize-pane -Z]])
       -- restore tmux status line when switching to another tmux window or ctrl-z
       vim.api.nvim_create_autocmd({ "FocusLost", "VimSuspend" }, {
         group = augroup,
@@ -50,15 +47,13 @@ local function zen(snacks)
       })
     end
     on_close_tmux = function()
-      if snacks then
-        if type(tmux_pane) == "string" then
-          vim.fn.system(string.format([[tmux set -w pane-border-status %s]], tmux_pane))
-        else
-          vim.fn.system([[tmux set -uw pane-border-status]])
-        end
-        vim.fn.system(string.format([[tmux set status %s]], tmux_status))
-        vim.fn.system([[tmux list-panes -F '\#F' | grep -q Z && tmux resize-pane -Z]])
+      if type(tmux_pane) == "string" then
+        vim.fn.system(string.format([[tmux set -w pane-border-status %s]], tmux_pane))
+      else
+        vim.fn.system([[tmux set -uw pane-border-status]])
       end
+      vim.fn.system(string.format([[tmux set status %s]], tmux_status))
+      vim.fn.system([[tmux list-panes -F '\#F' | grep -q Z && tmux resize-pane -Z]])
       vim.api.nvim_clear_autocmds({ group = augroup })
     end
   end
@@ -152,8 +147,6 @@ local function zen(snacks)
           if assert(Snacks.toggle.get("zen")):get() then
             -- `U.toggle.zen:set(false)` not working for snacks zen
             on_close()
-          elseif U.toggle.zen:get() then
-            U.toggle.zen:set(false)
           end
         end,
       })
@@ -432,29 +425,10 @@ return {
   },
 
   {
-    "folke/zen-mode.nvim",
-    optional = true,
-    opts = function(_, opts)
-      local z = zen()
-      z.autocmds()
-      local on_open = opts.on_open or function() end
-      local on_close = opts.on_close or function() end
-      opts.on_open = function()
-        on_open()
-        z.on_open()
-      end
-      opts.on_close = function()
-        on_close()
-        z.on_close()
-      end
-    end,
-  },
-
-  {
     "folke/snacks.nvim",
     optional = true,
     opts = function(_, opts)
-      local z = zen(true)
+      local z = zen()
       z.autocmds()
       opts.zen = opts.zen or {}
       local on_open = opts.zen.on_open or function() end

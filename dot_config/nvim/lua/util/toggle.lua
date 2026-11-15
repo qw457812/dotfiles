@@ -90,7 +90,7 @@ M.explorer_auto_open = st({
 M.zen = st({
   name = "Zen Mode",
   get = function()
-    return st_zen:get() or (package.loaded["zen-mode"] and require("zen-mode.view").is_open())
+    return st_zen:get()
   end,
   set = function(state)
     if state then
@@ -103,11 +103,7 @@ M.zen = st({
             vim.cmd("wincmd p")
           end
         end
-        if LazyVim.has("zen-mode.nvim") then
-          require("zen-mode").open()
-        else
-          st_zen:set(true)
-        end
+        st_zen:set(true)
       end
       if vim.fn.getcmdwintype() ~= "" then
         vim.cmd("q")
@@ -116,11 +112,7 @@ M.zen = st({
         open()
       end
     else
-      if st_zen:get() then
-        st_zen:set(false)
-      elseif package.loaded["zen-mode"] and require("zen-mode.view").is_open() then
-        require("zen-mode").close()
-      end
+      st_zen:set(false)
     end
   end,
 })
