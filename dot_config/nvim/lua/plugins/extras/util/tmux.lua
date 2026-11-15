@@ -361,37 +361,10 @@ return {
       -- float_win_behavior = "mux",
       disable_multiplexer_nav_when_zoomed = false,
     },
-    -- -- NOTE: For tmux in wezterm/kitty, smart-splits.nvim treats tmux as the multiplexer.
-    -- -- It will only handle tmux's startup/shutdown events in `setup`, but not wezterm/kitty's, which results in the lack of `SetUserVar=IS_NVIM` for wezterm/kitty.
-    -- -- See: https://github.com/mrjones2014/smart-splits.nvim/blob/0523920a07c54eea7610f342ca8c1bddbee4b626/lua/smart-splits/mux/utils.lua#L59
-    -- -- The following code fails to set `IS_NVIM` for wezterm/kitty, probably need https://github.com/wez/wezterm/blob/6f375e29a2c4d70b8b51956edd494693196c6692/assets/shell-integration/wezterm.sh#L442.
-    -- -- But in `wezterm/keys.lua`/`kitty/kitty.conf`, we pass the C-hjkl keys through to either nvim or tmux, so it's OK to not set `IS_NVIM` and let wezterm/kitty treat it as tmux.
-    -- config = function(_, opts)
-    --   require("smart-splits").setup(opts)
-    --
-    --   local mux = require("smart-splits.mux").get()
-    --   local Multiplexer = require("smart-splits.types").Multiplexer
-    --
-    --   -- tmux in wezterm/kitty
-    --   if (is_wezterm or is_kitty) and mux and mux.type == Multiplexer.tmux then
-    --     local mux_wezterm_or_kitty = is_wezterm and require("smart-splits.mux.wezterm")
-    --       or require("smart-splits.mux.kitty")
-    --     -- alternative to `on_init()`:
-    --     -- - require("wezterm").set_user_var("IS_NVIM", true)
-    --     -- - https://github.com/folke/dot/blob/39602b7edc7222213bce762080d8f46352167434/nvim/lua/util/init.lua#L152
-    --     mux_wezterm_or_kitty.on_init()
-    --     vim.api.nvim_create_autocmd("VimResume", {
-    --       callback = function()
-    --         mux_wezterm_or_kitty.on_init()
-    --       end,
-    --     })
-    --     vim.api.nvim_create_autocmd({ "VimSuspend", "VimLeavePre" }, {
-    --       callback = function()
-    --         mux_wezterm_or_kitty.on_exit()
-    --       end,
-    --     })
-    --   end
-    -- end,
+    -- NOTE: For tmux in wezterm/kitty, smart-splits.nvim treats tmux as the multiplexer.
+    -- It will only handle tmux's startup/shutdown events in `setup`, but not wezterm/kitty's, which results in the lack of `SetUserVar=IS_NVIM` for wezterm/kitty.
+    -- See: https://github.com/mrjones2014/smart-splits.nvim/blob/0523920a07c54eea7610f342ca8c1bddbee4b626/lua/smart-splits/mux/utils.lua#L59
+    -- But in `wezterm/keys.lua`/`kitty/kitty.conf`, we pass the C-hjkl keys through to either nvim or tmux, so it's OK to not set `IS_NVIM` and let wezterm/kitty treat it as tmux.
   },
 
   -- library
