@@ -122,6 +122,12 @@ return {
         main = "smart-splits-backend-wezterm",
       },
       {
+        "smart-splits-nvim/backend-ghostty",
+        pager = true,
+        cond = is_ghostty,
+        main = "smart-splits-backend-ghostty",
+      },
+      {
         "adriankarlen/smart-splits-backend-herdr",
         pager = true,
         cond = is_wezterm or is_kitty or is_ghostty,
@@ -240,6 +246,8 @@ return {
             table.insert(backends, "smart-splits-backend-wezterm")
           elseif is_kitty then
             table.insert(backends, "smart-splits-backend-kitty")
+          elseif is_ghostty then
+            table.insert(backends, "smart-splits-backend-ghostty")
           end
           return backends
         end,

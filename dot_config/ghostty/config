@@ -12,9 +12,25 @@ macos-titlebar-style = tabs
 macos-window-buttons = hidden
 
 keybind = performable:ctrl+h=goto_split:left
-keybind = performable:ctrl+j=goto_split:bottom
-keybind = performable:ctrl+k=goto_split:top
+keybind = performable:ctrl+j=goto_split:down
+keybind = performable:ctrl+k=goto_split:up
 keybind = performable:ctrl+l=goto_split:right
+keybind = performable:ctrl+left=resize_split:left,30
+keybind = performable:ctrl+down=resize_split:down,30
+keybind = performable:ctrl+up=resize_split:up,30
+keybind = performable:ctrl+right=resize_split:right,30
+
+# https://github.com/smart-splits-nvim/backend-ghostty/blob/0ea13a1684cb2c838f5fa47f8ce251a1fca47c76/README.md?plain=1#L137-L164
+keybind = nvim/
+keybind = nvim/ctrl+h=text:\x08
+keybind = nvim/ctrl+j=text:\x0a
+keybind = nvim/ctrl+k=text:\x0b
+keybind = nvim/ctrl+l=text:\x0c
+keybind = nvim/ctrl+left=csi:1;5D
+keybind = nvim/ctrl+down=csi:1;5B
+keybind = nvim/ctrl+up=csi:1;5A
+keybind = nvim/ctrl+right=csi:1;5C
+
 keybind = super+m=toggle_split_zoom
 keybind = super+enter=new_split:auto
 keybind = super+space=write_screen_file:open,vt
