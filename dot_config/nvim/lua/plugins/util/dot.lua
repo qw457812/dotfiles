@@ -171,6 +171,30 @@ return {
         })
       end
 
+      if vim.fn.executable("rex") == 1 then
+        vim.api.nvim_create_autocmd("BufWritePost", {
+          pattern = "*/rex/*.lua",
+          callback = U.debounce_wrap(500, function()
+            local check = vim.system({ "rex", "config", "check", "--json" }, { text = true }):wait()
+            local ok, config = pcall(vim.json.decode, check.stdout or "")
+            if check.code ~= 0 or not ok or not config.exists or #config.diagnostics > 0 then
+              LazyVim.error(
+                ("Failed to check Rex config:\n%s\n%s"):format(check.stderr or "", check.stdout or ""),
+                { title = "Rex" }
+              )
+              return
+            end
+
+            local res = vim.system({ "rex", "config", "reload" }, { text = true }):wait()
+            if res.code == 0 then
+              LazyVim.info("Rex config reloaded", { title = "Rex" })
+            else
+              LazyVim.error(("Failed to reload Rex config:\n%s"):format(res.stderr or ""), { title = "Rex" })
+            end
+          end),
+        })
+      end
+
       if vim.g.user_is_termux then
         vim.api.nvim_create_autocmd("BufWritePost", {
           pattern = { "termux.properties", "private_termux.properties" },

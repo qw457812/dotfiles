@@ -4,6 +4,7 @@ local is_wezterm = vim.g.user_is_wezterm
 local is_kitty = vim.g.user_is_kitty
 -- TODO: tmux in ghostty
 local is_ghostty = vim.g.user_is_ghostty
+local is_rex = vim.g.user_is_rex
 
 ---@type LazySpec
 return {
@@ -56,7 +57,7 @@ return {
   {
     "aserowy/tmux.nvim",
     pager = true,
-    cond = is_tmux and not (is_wezterm or is_kitty), -- tmux but not in wezterm/kitty
+    cond = is_tmux and not (is_wezterm or is_kitty or is_rex), -- tmux but not in wezterm/kitty/rex
     -- stylua: ignore
     keys = {
       -- Move to window
@@ -98,13 +99,19 @@ return {
   {
     "smart-splits-nvim/smart-splits.nvim",
     pager = true,
-    cond = is_wezterm or is_kitty or is_ghostty,
+    cond = is_wezterm or is_kitty or is_ghostty or is_rex,
     lazy = false, -- required
     dependencies = {
       {
+        "rawnly/smart-splits-backend-rex",
+        pager = true,
+        cond = is_rex,
+        main = "smart-splits-backend-rex",
+      },
+      {
         "smart-splits-nvim/backend-tmux",
         pager = true,
-        cond = is_wezterm or is_kitty or is_ghostty,
+        cond = is_wezterm or is_kitty or is_ghostty or is_rex,
         main = "smart-splits-backend-tmux",
         opts = { disable_nav_when_zoomed = false },
       },
@@ -130,7 +137,7 @@ return {
       {
         "adriankarlen/smart-splits-backend-herdr",
         pager = true,
-        cond = is_wezterm or is_kitty or is_ghostty,
+        cond = is_wezterm or is_kitty or is_ghostty or is_rex,
         main = "smart-splits-backend-herdr",
         opts = { disable_nav_when_zoomed = false },
         build = function(plugin)
@@ -248,6 +255,8 @@ return {
             table.insert(backends, "smart-splits-backend-kitty")
           elseif is_ghostty then
             table.insert(backends, "smart-splits-backend-ghostty")
+          elseif is_rex then
+            table.insert(backends, "smart-splits-backend-rex")
           end
           return backends
         end,

@@ -68,7 +68,7 @@
              ;; problem: can switch to Finder.app's closed window
              ; :prev_app                {:shell "/opt/homebrew/bin/yabai -m window --focus recent || open -g hammerspoon://cmd_tab"}
              :prev_app                {:shell "open -g hammerspoon://prev_app"}
-             :open-default-terminal   {:shell "open /Applications/kitty.app"} ; kitty.app, WezTerm.app
+             :open-default-terminal   {:shell "open \"/Applications/Rex Beta.app\""} ; kitty.app, WezTerm.app, Rex Beta.app
              :open-default-browser    {:shell "open \"/Applications/Glide.app\""} ; Brave Browser.app, Helium.app, Glide.app, Google Chrome.app
              :home_dir                [{:key  :grave_accent_and_tilde
                                         :modi [:left_shift]
@@ -1468,8 +1468,8 @@
            [:!Qj :open-default-browser :!default-browser]
            [:!Qj :same_wind_app :default-browser]
            [:!Qk :open-default-terminal :!default-terminal]
-           ;; [:!Qk :same_wind_app :default-terminal] ; not working for kitty
-           [:!Qk "/opt/homebrew/bin/yabai -m window --focus $(/opt/homebrew/bin/yabai -m query --windows | /opt/homebrew/bin/jq -e \"map(select(.app==\\\"kitty\\\" and .\\\"has-focus\\\"==false)) | .[0] | .id\") > /dev/null 2>&1" :default-terminal]
+           [:!Qk :same_wind_app :default-terminal] ; not working for kitty
+           ;; [:!Qk "/opt/homebrew/bin/yabai -m window --focus $(/opt/homebrew/bin/yabai -m query --windows | /opt/homebrew/bin/jq -e \"map(select(.app==\\\"kitty\\\" and .\\\"has-focus\\\"==false)) | .[0] | .id\") > /dev/null 2>&1" :default-terminal]
            ;; [:!Qk [:open "/Applications/WezTerm.app"] :default-terminal]
            ;; [:!Ql [:open "/Applications/Visual Studio Code.app"] :!VSCode]
            ;; [:!Ql :same_wind_app :VSCode]
@@ -1927,8 +1927,8 @@
            [:!Wj [:left_command :open-default-browser] :!default-browser]
            [:!Wj :same_wind_app :default-browser]
            [:!Wk [:left_command :open-default-terminal] :!default-terminal]
-           ;; [:!Wk :same_wind_app :default-terminal] ; not working for kitty
-           [:!Wk [:left_command "/opt/homebrew/bin/yabai -m window --focus $(/opt/homebrew/bin/yabai -m query --windows | /opt/homebrew/bin/jq -e \"map(select(.app==\\\"kitty\\\" and .\\\"has-focus\\\"==false)) | .[0] | .id\") > /dev/null 2>&1"] :default-terminal]
+           [:!Wk :same_wind_app :default-terminal] ; not working for kitty
+           ;; [:!Wk [:left_command "/opt/homebrew/bin/yabai -m window --focus $(/opt/homebrew/bin/yabai -m query --windows | /opt/homebrew/bin/jq -e \"map(select(.app==\\\"kitty\\\" and .\\\"has-focus\\\"==false)) | .[0] | .id\") > /dev/null 2>&1"] :default-terminal]
            ;; [:!Wk [:left_command [:open "/Applications/WezTerm.app"]] :default-terminal]
            ;; [:!Wl [:left_command [:open "/Applications/Visual Studio Code.app"]] :!VSCode]
            ;; [:!Wl :same_wind_app :VSCode]
@@ -2284,6 +2284,7 @@
    "^com\\.apple\\.Terminal$" "^com\\.googlecode\\.iterm2$"
    "^co\\.zeit\\.hyperterm$" "^co\\.zeit\\.hyper$" "^io\\.alacritty$" "^org\\.alacritty$"
    "^com\\.github\\.wez\\.wezterm$" "^net\\.kovidgoyal\\.kitty$" "^org\\.vim\\."
+   "^com\\.superlogical\\.rex$"
    "^com\\.qvacua\\.VimR$" "^com\\.vmware\\.fusion$" "^com\\.vmware\\.horizon$"
    "^com\\.vmware\\.view$" "^com\\.parallels\\.desktop$"
    "^com\\.parallels\\.vm$" "^com\\.parallels\\.desktop\\.console$"
@@ -2300,6 +2301,7 @@
   ["^com\\.apple\\.Terminal$" "^com\\.googlecode\\.iterm2$"
    "^co\\.zeit\\.hyperterm$" "^co\\.zeit\\.hyper$" "^io\\.alacritty$" "^org\\.alacritty$"
    "^com\\.github\\.wez\\.wezterm$" "^net\\.kovidgoyal\\.kitty$" "^org\\.vim\\."
+   "^com\\.superlogical\\.rex$"
    "^com\\.qvacua\\.VimR$"
    "^com\\.microsoft\\.VSCode(Insiders)?$"
    "^com\\.todesktop\\.230313mzl4w4u92$"
@@ -2322,8 +2324,8 @@
    "^app\\.glide-browser\\.glide$" "^company\\.thebrowser\\.dia$" "^com\\.apple\\.Safari$"
    "^com\\.jetbrains\\.intellij\\.ce$" "^com\\.jetbrains\\.pycharm\\.ce(-EAP)?$"]
   :tmux-autostart-terminals
-  ["^org\\.alacritty$" "^com\\.github\\.wez\\.wezterm$" "^net\\.kovidgoyal\\.kitty$" "^com\\.mitchellh\\.ghostty$"]
-  :default-terminal ["^net\\.kovidgoyal\\.kitty$"]
+  ["^org\\.alacritty$" "^com\\.github\\.wez\\.wezterm$" "^net\\.kovidgoyal\\.kitty$" "^com\\.mitchellh\\.ghostty$" "^com\\.superlogical\\.rex$"]
+  :default-terminal ["^com\\.superlogical\\.rex$"]
   :default-browser  ["^app\\.glide-browser\\.glide$"]
   :Terminals        ["^com\\.apple\\.Terminal$"
                      "^com\\.googlecode\\.iterm2$"
@@ -2332,12 +2334,14 @@
                      "^com\\.github\\.wez\\.wezterm$"
                      "^net\\.kovidgoyal\\.kitty$"
                      "^com\\.mitchellh\\.ghostty$"
+                     "^com\\.superlogical\\.rex$"
                      ]
   :Alacritty        ["^org\\.alacritty$"]
   :Kitty            ["^net\\.kovidgoyal\\.kitty$"]
   :WezTerm          ["^com\\.github\\.wez\\.wezterm$"]
   :iTerm            ["^com\\.googlecode\\.iterm2$"]
   :Ghostty          ["^com\\.mitchellh\\.ghostty$"]
+  :Rex              ["^com\\.superlogical\\.rex$"]
   :Neovide          ["^com\\.neovide\\.neovide$"]
   :Emacs            ["^org\\.gnu\\.Emacs$" "^org\\.gnu\\.AquamacsEmacs$"
                      "^org\\.gnu\\.Aquamacs$"]
