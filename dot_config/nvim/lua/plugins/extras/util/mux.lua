@@ -1,4 +1,5 @@
 local is_tmux = vim.g.user_is_tmux
+local is_herdr = vim.g.user_is_herdr
 local is_wezterm = vim.g.user_is_wezterm
 local is_kitty = vim.g.user_is_kitty
 -- TODO: tmux in ghostty
@@ -95,23 +96,51 @@ return {
   },
 
   {
-    "mrjones2014/smart-splits.nvim",
+    "smart-splits-nvim/smart-splits.nvim",
     pager = true,
     cond = is_wezterm or is_kitty or is_ghostty,
-    -- build = "./kitty/install-kittens.bash", -- ~/.config/kitty/neighboring_window.py has been modified to adapt to tmux in kitty
-    build = function(plugin)
-      if vim.fn.executable("herdr") == 1 then
-        -- https://github.com/mrjones2014/smart-splits.nvim/blob/9836ec9bef9801937e5e7100af801f37b77eacab/README.md?plain=1#L618-L620
-        local res = vim.system({ "herdr", "plugin", "link", plugin.dir }, { stdout = false }):wait()
-        if res.code ~= 0 then
-          require("lazyvim.util").warn(
-            ("Failed to run `herdr plugin link %s`:\n%s"):format(plugin.dir, res.stderr),
-            { title = "smart-splits.nvim" }
-          )
-        end
-      end
-    end,
     lazy = false, -- required
+    dependencies = {
+      {
+        "smart-splits-nvim/backend-tmux",
+        pager = true,
+        cond = is_wezterm or is_kitty or is_ghostty,
+        main = "smart-splits-backend-tmux",
+        opts = { disable_nav_when_zoomed = false },
+      },
+      {
+        "smart-splits-nvim/backend-kitty",
+        pager = true,
+        cond = is_kitty,
+        main = "smart-splits-backend-kitty",
+        build = "./kitten/install_relative_resize.lua",
+      },
+      {
+        "smart-splits-nvim/backend-wezterm",
+        pager = true,
+        cond = is_wezterm,
+        main = "smart-splits-backend-wezterm",
+      },
+      {
+        "adriankarlen/smart-splits-backend-herdr",
+        pager = true,
+        cond = is_wezterm or is_kitty or is_ghostty,
+        main = "smart-splits-backend-herdr",
+        opts = { disable_nav_when_zoomed = false },
+        build = function(plugin)
+          if vim.fn.executable("herdr") == 1 then
+            -- https://github.com/adriankarlen/smart-splits-backend-herdr/blob/da1e50ae7bec7a7c2781aaf5a531eff350bdab20/README.md?plain=1#L103
+            local res = vim.system({ "herdr", "plugin", "link", plugin.dir }, { text = true }):wait()
+            if res.code ~= 0 then
+              require("lazyvim.util").warn(
+                ("Failed to run `herdr plugin link %s`:\n%s"):format(plugin.dir, res.stderr or ""),
+                { title = "smart-splits-backend-herdr" }
+              )
+            end
+          end
+        end,
+      },
+    },
     -- stylua: ignore
     keys = {
       { "<C-h>", mode = { "n", "t" }, function() require("smart-splits").move_cursor_left() end, desc = "Go to Left Window" },
@@ -132,79 +161,91 @@ return {
       ignored_filetypes = { "NvimTree", "neo-tree" },
       --- for tmux in wezterm: navigate from tmux panes to wezterm panes
       --- https://github.com/mrjones2014/smart-splits.nvim/blob/0523920a07c54eea7610f342ca8c1bddbee4b626/lua/smart-splits/api.lua#L382
-      ---@param ctx SmartSplitsContext
-      at_edge = function(ctx)
-        local config = require("smart-splits.lazy").require_on_index("smart-splits.config") --[[@as SmartSplitsConfig]]
-        local types = require("smart-splits.types")
-        local AtEdgeBehavior = types.AtEdgeBehavior
-        local Multiplexer = types.Multiplexer
+      ---@type SmartSplitsMoveConfig|{}
+      move = {
+        at_edge = function(ctx)
+          local config = require("smart-splits.config")
+          local types = require("smart-splits.types")
+          local AtEdgeBehavior = types.AtEdgeBehavior
+          local at_edge = AtEdgeBehavior.stop -- config here: wrap, split, stop
 
-        local at_edge = AtEdgeBehavior.stop -- config here: wrap, split, stop
-
-        local function wrap_or_split_or_stop()
-          if at_edge == AtEdgeBehavior.wrap then
-            ---@diagnostic disable-next-line: undefined-field
-            ctx.wrap()
-          elseif at_edge == AtEdgeBehavior.split then
-            if
-              vim.list_contains(config.ignored_buftypes, vim.bo.buftype)
-              or vim.list_contains(config.ignored_filetypes, vim.bo.filetype)
-            then
-              return -- just stop
+          local function wrap_or_split_or_stop()
+            if at_edge == AtEdgeBehavior.wrap then
+              ---@diagnostic disable-next-line: undefined-field
+              ctx.wrap()
+            elseif at_edge == AtEdgeBehavior.split then
+              if
+                vim.list_contains(config.ignored_buftypes, vim.bo.buftype)
+                or vim.list_contains(config.ignored_filetypes, vim.bo.filetype)
+              then
+                return -- just stop
+              end
+              ctx.split()
+            elseif at_edge == AtEdgeBehavior.stop then
+              return
             end
-            ctx.split()
-          elseif at_edge == AtEdgeBehavior.stop then
-            return
           end
-        end
 
-        if
-          not (
-            (is_wezterm or is_kitty)
-            and ctx.mux
-            and vim.list_contains({ Multiplexer.tmux, Multiplexer.herdr }, ctx.mux.type)
-          )
-        then
-          -- "wezterm/kitty without tmux/herdr" or "tmux/herdr not in wezterm/kitty" or "not in any mux", original at_edge behavior
-          wrap_or_split_or_stop()
-          return
-        end
-
-        if is_wezterm then
-          -- (nvim in) tmux in wezterm: currently at the edge of tmux, we will check whether it's at the edge of wezterm as well
-          local wezterm = require("wezterm")
-
-          -- `$WEZTERM_PANE` could be wrong in tmux. So we need to specify the `--pane-id` for `wezterm cli get-pane-direction`,
-          -- otherwise it will use `$WEZTERM_PANE`, see: `wezterm cli get-pane-direction --help`.
-          local wezterm_pane_id = U.mux.wezterm.current_pane_id()
-          if not wezterm_pane_id then
-            return
-          end
-          ---@diagnostic disable-next-line: param-type-mismatch
-          local at_edge_of_wezterm = wezterm.get_pane_direction(ctx.direction, wezterm_pane_id) == nil
-          if at_edge_of_wezterm then
-            -- at the edge of both tmux and wezterm, original at_edge behavior
+          if
+            not ((is_wezterm or is_kitty) and ctx.backend and vim.list_contains({ "tmux", "herdr" }, ctx.backend.name))
+          then
+            -- "wezterm/kitty without tmux/herdr" or "tmux/herdr not in wezterm/kitty" or "not in any mux", original at_edge behavior
             wrap_or_split_or_stop()
-          else
-            -- at the edge of tmux, but not at the edge of wezterm, navigate to wezterm
+            return
+          end
+
+          if is_wezterm then
+            -- (nvim in) tmux in wezterm: currently at the edge of tmux, we will check whether it's at the edge of wezterm as well
+            local wezterm = require("wezterm")
+
+            -- `$WEZTERM_PANE` could be wrong in tmux. So we need to specify the `--pane-id` for `wezterm cli get-pane-direction`,
+            -- otherwise it will use `$WEZTERM_PANE`, see: `wezterm cli get-pane-direction --help`.
+            local wezterm_pane_id = U.mux.wezterm.current_pane_id()
+            if not wezterm_pane_id then
+              return
+            end
             ---@diagnostic disable-next-line: param-type-mismatch
-            wezterm.switch_pane.direction(ctx.direction, wezterm_pane_id)
+            local at_edge_of_wezterm = wezterm.get_pane_direction(ctx.direction, wezterm_pane_id) == nil
+            if at_edge_of_wezterm then
+              -- at the edge of both tmux and wezterm, original at_edge behavior
+              wrap_or_split_or_stop()
+            else
+              -- at the edge of tmux, but not at the edge of wezterm, navigate to wezterm
+              ---@diagnostic disable-next-line: param-type-mismatch
+              wezterm.switch_pane.direction(ctx.direction, wezterm_pane_id)
+            end
+          elseif is_kitty then
+            if not require("smart-splits-backend-kitty").move(ctx.direction, { at_edge = "stop" }) then
+              wrap_or_split_or_stop()
+            end
           end
-        elseif is_kitty then
-          if not require("smart-splits-backend-kitty").move(ctx.direction, { at_edge = "stop" }) then
-            wrap_or_split_or_stop()
+        end,
+      },
+      ---@type SmartSplitsMuxConfig|{}
+      mux = {
+        -- NOTE: For tmux in wezterm/kitty, smart-splits.nvim selects tmux as the backend.
+        -- It only runs tmux's `activate`, not wezterm/kitty's, so it does not send `SetUserVar=IS_NVIM` to wezterm/kitty.
+        -- See: https://github.com/mrjones2014/smart-splits.nvim/blob/d3617de050f58e6f1f924b1401fba7677517c196/lua/smart-splits/backend.lua
+        -- But in `wezterm/keys.lua`/`kitty/kitty.conf`, we pass the C-hjkl keys through to either nvim or tmux,
+        -- so it's OK for C-hjkl to leave `IS_NVIM` unset and let wezterm/kitty treat it as tmux.
+        backend = function()
+          local backends = {}
+          if is_herdr then
+            table.insert(backends, "smart-splits-backend-herdr")
           end
-        end
-      end,
-      -- float_win_behavior = "mux",
-      disable_multiplexer_nav_when_zoomed = false,
+          if is_tmux then
+            table.insert(backends, "smart-splits-backend-tmux")
+          end
+          if is_wezterm then
+            table.insert(backends, "smart-splits-backend-wezterm")
+          elseif is_kitty then
+            table.insert(backends, "smart-splits-backend-kitty")
+          end
+          return backends
+        end,
+      },
     },
-    -- NOTE: For tmux in wezterm/kitty, smart-splits.nvim treats tmux as the multiplexer.
-    -- It will only handle tmux's startup/shutdown events in `setup`, but not wezterm/kitty's, which results in the lack of `SetUserVar=IS_NVIM` for wezterm/kitty.
-    -- See: https://github.com/mrjones2014/smart-splits.nvim/blob/0523920a07c54eea7610f342ca8c1bddbee4b626/lua/smart-splits/mux/utils.lua#L59
-    -- But in `wezterm/keys.lua`/`kitty/kitty.conf`, we pass the C-hjkl keys through to either nvim or tmux, so it's OK to not set `IS_NVIM` and let wezterm/kitty treat it as tmux.
   },
-  { "smart-splits-nvim/backend-kitty", cond = is_kitty, lazy = true },
 
   -- library
   {

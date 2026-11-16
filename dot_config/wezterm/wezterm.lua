@@ -1,3 +1,5 @@
+-- `wezterm --version`: wezterm 20250909-070512-bf9a2aee
+--
 -- https://wezfurlong.org/wezterm/config/lua/config/index.html
 --
 -- https://github.com/folke/dot/blob/master/config/wezterm/wezterm.lua
@@ -16,6 +18,7 @@ wezterm.log_info("reloading")
 require("mouse").apply_to_config(config)
 require("links").apply_to_config(config)
 require("keys").apply_to_config(config)
+require("smart_splits").apply_to_config(config)
 
 -- config.default_prog = { "/opt/homebrew/bin/fish", "-l" }
 

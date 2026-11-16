@@ -767,7 +767,7 @@ return {
         ---@type sidekick.cli.Mux
         mux = {
           ---@diagnostic disable-next-line: assign-type-mismatch
-          backend = vim.env.HERDR_ENV == "1" and "herdr" or nil,
+          backend = vim.g.user_is_herdr and "herdr" or nil,
           enabled = true,
           dump = 10000,
         },

@@ -1,26 +1,26 @@
 onboarding = false
 
-# https://github.com/mrjones2014/smart-splits.nvim/blob/9836ec9bef9801937e5e7100af801f37b77eacab/README.md?plain=1#L622-L646
+# https://github.com/adriankarlen/smart-splits-backend-herdr/blob/da1e50ae7bec7a7c2781aaf5a531eff350bdab20/README.md?plain=1#L108-L132
 [[keys.command]]
 key = "ctrl+h"
 type = "plugin_action"
-command = "smart-splits.nvim.left"
-description = "navigate left (vim/herdr)"
+command = "smart-splits-backend-herdr.left"
+description = "navigate left (neovim/herdr)"
 
 [[keys.command]]
 key = "ctrl+j"
 type = "plugin_action"
-command = "smart-splits.nvim.down"
-description = "navigate down (vim/herdr)"
+command = "smart-splits-backend-herdr.down"
+description = "navigate down (neovim/herdr)"
 
 [[keys.command]]
 key = "ctrl+k"
 type = "plugin_action"
-command = "smart-splits.nvim.up"
-description = "navigate up (vim/herdr)"
+command = "smart-splits-backend-herdr.up"
+description = "navigate up (neovim/herdr)"
 
 [[keys.command]]
 key = "ctrl+l"
 type = "plugin_action"
-command = "smart-splits.nvim.right"
-description = "navigate right (vim/herdr)"
+command = "smart-splits-backend-herdr.right"
+description = "navigate right (neovim/herdr)"

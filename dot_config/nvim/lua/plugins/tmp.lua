@@ -218,9 +218,4 @@ return {
   -- `textobjects.scm` query files with `nvim-treesitter/nvim-treesitter-textobjects`
   { "chrisgrieser/nvim-various-textobjs", optional = true, commit = "bf2133a" },
 
-  -- TODO: breaking changes
-  -- v3 moves multiplexers into backend plugins and drops the Herdr backend
-  -- https://github.com/mrjones2014/smart-splits.nvim/issues/488
-  -- pin v2 for now
-  { "mrjones2014/smart-splits.nvim", optional = true, commit = "ec76708" },
 }
