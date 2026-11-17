@@ -572,6 +572,8 @@ cask "glide-browser"
 cask "hammerspoon"
 # Chromium-based web browser
 cask "helium-browser"
+# Desktop app for terminals and coding agents
+cask "herdr-app"
 # Tool for multi-language users
 cask "input-source-pro"
 # Menu bar manager
