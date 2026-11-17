@@ -217,17 +217,6 @@ return {
         config = function() end,
       },
       { "dannote/dot-pi", pin = true, name = "dannote-dot-pi", lazy = true, config = function() end },
-      -- On Termux:
-      -- - Install: curl -fsSL --retry 3 -o ~/.local/bin/herdr https://github.com/herdrdev/herdr/releases/download/v0.9.1/herdr-linux-aarch64
-      -- - Upgrade: herdr update
-      {
-        "ogulcancelik/herdr",
-        version = "*",
-        enabled = vim.fn.executable("herdr") == 1,
-        build = vim.g.user_is_termux and "herdr update",
-        lazy = true,
-        config = function() end,
-      },
       {
         "vercel-labs/just-bash",
         pin = true,
@@ -318,9 +307,7 @@ return {
     },
   },
 
-  -- HACK:
-  -- 1. multiple claude/opencode sessions per cwd
-  -- 2. register herdr as mux backend
+  -- HACK: multiple claude/opencode sessions per cwd
   {
     "folke/sidekick.nvim",
     optional = true,
@@ -447,25 +434,7 @@ return {
       numbered_tools({ name = "dsh", count = 1 })
       numbered_tools({ name = "zaly", count = 1 })
 
-      opts.cli.mux = opts.cli.mux or {}
-      local use_herdr = opts.cli.mux.backend == "herdr"
-      if use_herdr then
-        -- Sidekick currently only accepts tmux|zellij in its scheduled setup validation.
-        -- Let setup use its default backend, then switch to the user-registered Herdr backend below.
-        opts.cli.mux.backend = nil
-      end
-
       require("sidekick").setup(opts)
-
-      if vim.fn.executable("herdr") == 1 then
-        U.ai.sidekick.cli.mux.register_herdr_backend()
-        if use_herdr then
-          vim.schedule(function()
-            ---@diagnostic disable-next-line: assign-type-mismatch
-            require("sidekick.config").cli.mux.backend = "herdr"
-          end)
-        end
-      end
     end,
   },
 
@@ -766,8 +735,6 @@ return {
         },
         ---@type sidekick.cli.Mux
         mux = {
-          ---@diagnostic disable-next-line: assign-type-mismatch
-          backend = vim.g.user_is_herdr and "herdr" or nil,
           enabled = true,
           dump = 10000,
         },

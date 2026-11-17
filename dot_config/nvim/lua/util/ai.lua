@@ -151,44 +151,6 @@ function H.nvim_key_to_tmux(key)
   )
 end
 
----@param key string
----@return string
-function H.nvim_key_to_herdr(key)
-  local inner = key:match("^<(.*)>$")
-  if not inner then
-    return key
-  end
-
-  local key_names = {
-    bs = "backspace",
-    bspace = "backspace",
-    cr = "enter",
-    enter = "enter",
-    esc = "esc",
-    space = "space",
-  }
-  local key_mods = {
-    a = "alt",
-    alt = "alt",
-    c = "ctrl",
-    cmd = "cmd",
-    ctrl = "ctrl",
-    d = "cmd",
-    m = "alt",
-    s = "shift",
-    shift = "shift",
-    super = "super",
-  }
-
-  local parts = vim.split(inner, "-", { plain = true })
-  local name = assert(table.remove(parts), "missing key")
-  local mods = vim.tbl_map(function(mod)
-    return key_mods[mod:lower()] or mod:lower()
-  end, parts)
-  name = key_names[name:lower()] or name:lower()
-  return table.concat(vim.list_extend(mods, { name }), "+")
-end
-
 H.sidekick = {
   cli = {
     ---@return { win: integer, buf: integer, tool: sidekick.cli.Tool, terminal: sidekick.cli.Terminal, session: sidekick.cli.Session }[]
@@ -276,14 +238,6 @@ H.sidekick = {
 
 M.sidekick = {
   cli = {
-    mux = {
-      register_herdr_backend = function()
-        local Session = require("sidekick.cli.session")
-        if not Session.backends.herdr then
-          Session.register("herdr", require("util.sidekick.herdr"))
-        end
-      end,
-    },
     -- quick commands that skip the select step
     quick = {
       ---Copied from: https://github.com/folke/sidekick.nvim/blob/d9e1fa2124340d3337d1a3a22b2f20de0701affe/lua/sidekick/cli/init.lua#L85-L96
@@ -362,15 +316,6 @@ M.sidekick = {
             U.confirm(("Kill tmux session %q?"):format(session.mux_session), function()
               Util.exec({ "tmux", "kill-session", "-t", session.mux_session })
             end)
-          elseif session.backend == "herdr" or session.mux_backend == "herdr" then
-            local herdr = session.backend == "herdr" and session or session.parent
-            ---@cast herdr sidekick.cli.muxer.Herdr
-            local pane_id = herdr:pane_id()
-            if pane_id then
-              U.confirm(("Close herdr pane %q?"):format(pane_id), function()
-                herdr:close()
-              end)
-            end
           else
             -- TODO: zellij
           end
@@ -479,11 +424,6 @@ M.sidekick = {
               -- submit: https://github.com/folke/sidekick.nvim/blob/41dec4dcdf0c8fe17f5f2e9eeced4645a88afb0d/lua/sidekick/cli/session/tmux.lua#L185-L187
               Util.exec({ "tmux", "send-keys", "-t", session.mux_session, "Enter" })
               after_submit()
-            elseif session.backend == "herdr" or session.mux_backend == "herdr" then
-              local herdr = session.backend == "herdr" and session or session.parent
-              ---@cast herdr sidekick.cli.muxer.Herdr
-              herdr:submit()
-              after_submit()
             else
               -- TODO: zellij
             end
@@ -581,11 +521,6 @@ M.sidekick = {
               if t.backend == "tmux" or t.mux_backend == "tmux" then
                 local tmux_keys = vim.tbl_map(H.nvim_key_to_tmux, keys)
                 require("sidekick.util").exec({ "tmux", "send-keys", "-t", t.mux_session, unpack(tmux_keys) })
-                fb()
-              elseif t.backend == "herdr" or t.mux_backend == "herdr" then
-                local herdr = t.backend == "herdr" and t or t.parent
-                ---@cast herdr sidekick.cli.muxer.Herdr
-                herdr:send_keys(vim.tbl_map(H.nvim_key_to_herdr, keys))
                 fb()
               else
                 -- TODO: zellij

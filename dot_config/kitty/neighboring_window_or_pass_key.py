@@ -30,10 +30,6 @@ def is_tmux(cmd):
     return cmd == "tmux"
 
 
-def is_herdr(cmd):
-    return cmd == "herdr"
-
-
 def is_yazi(cmd):
     return cmd == "yazi"
 
@@ -83,12 +79,11 @@ def handle_result(
         and (
             is_nvim(cmd)
             or is_tmux(cmd)
-            or is_herdr(cmd)
             or (is_ctrl_jk and is_yazi(cmd))
             or is_vi_sql(cmd)
         )
     ) or (is_ctrl_jk and is_fzf(w)):
-        # pass the keys through to nvim/tmux/herdr/fzf/yazi/vi-sql
+        # pass the keys through to nvim/tmux/fzf/yazi/vi-sql
         w.write_to_child(encode_key_mapping(w, key))
     else:
         # # kitten @ focus-window --match=neighbor:bottom

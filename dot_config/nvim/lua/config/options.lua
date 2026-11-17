@@ -36,7 +36,6 @@ vim.g.user_is_kitty = not vim.g.neovide and vim.env.KITTY_PID ~= nil
 vim.g.user_is_ghostty = not vim.g.neovide and vim.env.GHOSTTY_RESOURCES_DIR ~= nil
 vim.g.user_is_rex = not vim.g.neovide and vim.env.REX_SESSION ~= nil
 vim.g.user_is_tmux = not vim.g.neovide and vim.env.TMUX ~= nil
-vim.g.user_is_herdr = not vim.g.neovide and vim.env.HERDR_ENV == "1"
 vim.g.user_is_termux = vim.env.TERMUX_VERSION ~= nil
 vim.g.user_is_macos = vim.fn.has("mac") == 1
 vim.g.user_is_asahi = jit.os == "Linux" and vim.uv.os_uname().machine == "aarch64"

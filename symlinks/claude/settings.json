@@ -92,16 +92,6 @@
     ],
     "SessionStart": [
       {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "if [ -f ~/.claude/hooks/herdr-agent-state.sh ]; then bash ~/.claude/hooks/herdr-agent-state.sh session; fi",
-            "timeout": 10
-          }
-        ]
-      },
-      {
         "hooks": [
           {
             "type": "command",

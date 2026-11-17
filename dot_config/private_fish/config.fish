@@ -353,7 +353,7 @@ if set -q TERMUX_VERSION
     # ==============================================================================
     # AUTO START TMUX ON TERMUX
     # ==============================================================================
-    if not set -q TMUX; and test "$HERDR_ENV" != 1
+    if not set -q TMUX
         tmux attach || tmux
     end
 else if test (uname) != Linux

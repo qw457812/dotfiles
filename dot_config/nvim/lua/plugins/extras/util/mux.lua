@@ -1,5 +1,4 @@
 local is_tmux = vim.g.user_is_tmux
-local is_herdr = vim.g.user_is_herdr
 local is_wezterm = vim.g.user_is_wezterm
 local is_kitty = vim.g.user_is_kitty
 -- TODO: tmux in ghostty
@@ -134,25 +133,6 @@ return {
         cond = is_ghostty,
         main = "smart-splits-backend-ghostty",
       },
-      {
-        "adriankarlen/smart-splits-backend-herdr",
-        pager = true,
-        cond = is_wezterm or is_kitty or is_ghostty or is_rex,
-        main = "smart-splits-backend-herdr",
-        opts = { disable_nav_when_zoomed = false },
-        build = function(plugin)
-          if vim.fn.executable("herdr") == 1 then
-            -- https://github.com/adriankarlen/smart-splits-backend-herdr/blob/da1e50ae7bec7a7c2781aaf5a531eff350bdab20/README.md?plain=1#L103
-            local res = vim.system({ "herdr", "plugin", "link", plugin.dir }, { text = true }):wait()
-            if res.code ~= 0 then
-              require("lazyvim.util").warn(
-                ("Failed to run `herdr plugin link %s`:\n%s"):format(plugin.dir, res.stderr or ""),
-                { title = "smart-splits-backend-herdr" }
-              )
-            end
-          end
-        end,
-      },
     },
     -- stylua: ignore
     keys = {
@@ -199,10 +179,8 @@ return {
             end
           end
 
-          if
-            not ((is_wezterm or is_kitty) and ctx.backend and vim.list_contains({ "tmux", "herdr" }, ctx.backend.name))
-          then
-            -- "wezterm/kitty without tmux/herdr" or "tmux/herdr not in wezterm/kitty" or "not in any mux", original at_edge behavior
+          if not ((is_wezterm or is_kitty) and ctx.backend and ctx.backend.name == "tmux") then
+            -- "wezterm/kitty without tmux" or "tmux not in wezterm/kitty" or "not in any mux", original at_edge behavior
             wrap_or_split_or_stop()
             return
           end
@@ -243,9 +221,6 @@ return {
         -- so it's OK for C-hjkl to leave `IS_NVIM` unset and let wezterm/kitty treat it as tmux.
         backend = function()
           local backends = {}
-          if is_herdr then
-            table.insert(backends, "smart-splits-backend-herdr")
-          end
           if is_tmux then
             table.insert(backends, "smart-splits-backend-tmux")
           end

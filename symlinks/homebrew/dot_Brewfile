@@ -221,8 +221,6 @@ brew "gum"
 brew "h2"
 # Post-modern modal text editor
 brew "helix"
-# Agent multiplexer that lives in your terminal
-brew "herdr"
 # Client library for huggingface.co hub
 brew "hf"
 # Convert source code to formatted text with syntax highlighting
