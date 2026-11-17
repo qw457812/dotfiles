@@ -22,8 +22,8 @@ rex.bind("ctrl+b>shift+l", "pane.resize", { amount = 2, direction = "right" })
 rex.bind("cmd+m", "pane.zoom")
 rex.bind("cmd+j", "client.tab.next")
 rex.bind("cmd+k", "client.tab.previous")
-rex.bind("cmd+,", "client.tab.move", { direction = "backward" })
-rex.bind("cmd+.", "client.tab.move", { direction = "forward" })
+rex.bind("cmd+[", "client.tab.move", { direction = "backward" })
+rex.bind("cmd+]", "client.tab.move", { direction = "forward" })
 
 rex.bind("shift+cmd+;", "client.palette.toggle")
 
