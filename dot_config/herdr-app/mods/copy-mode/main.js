@@ -1,33 +1,70 @@
-import { View, div } from "gpui-kit";
-import { checking, closeOverlay, focused, notify, props, run } from "herdr";
+// Inspired by https://github.com/SiegfredLorelle/.dotfiles/blob/aa19918189dd3a502035c61986acd6093046a2e7/herdr-app/.config/herdr-app/mods/copy-mode/main.js
 
-const script = `
-source_tab=$2
-cleanup() {
-  [ -z "$scrollback" ] || rm -f "$scrollback"
-  if [ -n "$HC_TERMINAL_ID" ]; then
-    nohup sh -c 'hc kill "$1"; sleep 0.5; herdr-app do tab.select --id "$2"' _ "$HC_TERMINAL_ID" "$source_tab" </dev/null >/dev/null 2>&1 &
-  fi
-}
-trap cleanup EXIT
-scrollback=$(mktemp) || exit 1
-hc read --lines 50000 "$1" > "$scrollback" &&
-  nvim --cmd 'lua vim.g.terminal_scrollback_pager = true' -c 'normal! G' -- "$scrollback"
+import { View, div } from "gpui-kit";
+import { checking, closeOverlay, focused, hc, notify, props, run, terminals } from "herdr";
+
+const HISTORY_LINES = 50000;
+const SHOW_ATTEMPTS = 30;
+const SHOW_RETRY_MS = 100;
+
+const SCROLLBACK_SCRIPT = `
+tmpdir=$(mktemp -d) || exit 1
+trap 'rm -rf "$tmpdir"' EXIT
+scrollback="$tmpdir/scrollback"
+hc read --json --lines ${HISTORY_LINES} "$1" > "$tmpdir/read.json" || exit 1
+jq -ej '.text | strings' "$tmpdir/read.json" > "$scrollback" || exit 1
+HERDR_SCROLLBACK_INCOMPLETE=$(jq -r 'if .complete then "0" else "1" end' "$tmpdir/read.json") || exit 1
+export HERDR_SCROLLBACK_INCOMPLETE
+nvim --cmd 'lua vim.g.terminal_scrollback_pager = true' \\
+  -c 'lua U.terminal.colorize()' \\
+  -c 'lua if vim.env.HERDR_SCROLLBACK_INCOMPLETE == "1" then U.on_very_very_lazy(function() vim.notify("Older output may be missing", vim.log.levels.WARN, { title = "Scrollback" }) end) end' \\
+  -- "$scrollback"
 `;
 
 export default class CopyMode extends View {
-  init() {
+  init(_props, cx) {
     if (checking()) return;
-    const { terminal, tab } = focused() ?? {};
-    closeOverlay(props().overlay);
-    if (!terminal || !tab) {
-      notify({ title: "Copy mode", body: "Focus a terminal first.", level: "warning" });
+    const { terminal, pane } = focused() ?? {};
+    if (!terminal || !pane) {
+      notify({ title: "Copy mode", body: "Focus a terminal pane first.", level: "warning" });
+      closeOverlay(props().overlay);
       return;
     }
-    run("terminal.open", {
-      name: "Scrollback",
-      place: "tab",
-      argv: ["sh", "-c", script, "herdr-copy-mode", terminal, tab],
+    cx.spawn(async (cx) => {
+      let address;
+      try {
+        const result = await hc([
+          "run",
+          "--bg",
+          "--rm",
+          "--no-parent",
+          "--json",
+          "--",
+          "sh",
+          "-c",
+          SCROLLBACK_SCRIPT,
+          "herdr-copy-mode",
+          terminal,
+        ]);
+        if (result.code !== 0) throw new Error(result.stderr || `hc exited ${result.code}`);
+        address = JSON.parse(result.stdout).address;
+        for (let i = 0; i < SHOW_ATTEMPTS; i++) {
+          if (focused()?.pane !== pane) throw new Error("Focus changed before copy mode opened.");
+          if (terminals().some((t) => t.address === address)) {
+            run("terminal.show", { pane, terminal: address });
+            if (focused()?.shown === address) {
+              closeOverlay(props().overlay);
+              return;
+            }
+          }
+          await cx.sleep(SHOW_RETRY_MS);
+        }
+        throw new Error("Could not show the Neovim terminal.");
+      } catch (error) {
+        if (address) await hc(["kill", address]);
+        notify({ title: "Copy mode", body: String(error), level: "error" });
+        closeOverlay(props().overlay);
+      }
     });
   }
 
