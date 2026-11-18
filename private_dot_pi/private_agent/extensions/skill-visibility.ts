@@ -30,11 +30,14 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 const IS_TERMUX = Boolean(process.env.TERMUX_VERSION);
+const IS_REX = Boolean(process.env.REX_SESSION);
 
 const PROMPT_HIDDEN_SKILLS = [
   // git:github.com/mitsuhiko/agent-stuff
   "github",
   ...(IS_TERMUX ? ["web-browser"] : []),
+  // https://www.superlogical.com/rex/docs/automate/agent-skill
+  ...(!IS_REX ? ["rex"] : []),
   // https://github.com/badlogic/explainer
   "explainer",
   // git:github.com/mattpocock/skills

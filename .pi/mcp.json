@@ -2,9 +2,6 @@
   "mcpServers": {
     "codesearch": {
       "url": "https://mcp.grep.app"
-    },
-    "superlogical": {
-      "url": "https://www.superlogical.com/rex/community-mcp"
     }
   }
 }

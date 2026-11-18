@@ -11,15 +11,22 @@
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
+const IS_REX = Boolean(process.env.REX_SESSION);
 const REX_PROMPT_SECTION = "rex";
 const REX_SESSION_START_TIMEOUT_MS = 3000;
 
 export default function rexExtension(pi: ExtensionAPI): void {
+  if (IS_REX) {
+    pi.registerMcpServer("superlogical", {
+      url: "https://www.superlogical.com/rex/community-mcp",
+    });
+  }
+
   let rexContext = "";
 
   pi.on("session_start", async (_event, ctx) => {
     rexContext = "";
-    if (!process.env.REX_SESSION) return;
+    if (!IS_REX) return;
 
     const result = await pi.exec(
       "rex",
