@@ -1,7 +1,7 @@
 {
   "$schema": "https://pi.dev/schemas/settings.schema.json",
   "defaultProvider": "openai",
-  "defaultModel": "gpt-6.1-terra",
+  "defaultModel": "gpt-6.2-sol",
   "defaultThinkingLevel": "medium",
   "hideThinkingBlock": true,
   "quietStartup": true,
@@ -19,12 +19,12 @@
     }
   },
   "enabledModels": [
-    "openai-codex/gpt-6-astra",
-    "openai-codex/gpt-6.1-sol",
+    "openai-codex/gpt-6.2-astra",
+    "openai-codex/gpt-6.2-sol",
     "openai-codex/gpt-6.1-terra",
     "openai-codex/gpt-6-luna",
-    "openai/gpt-6-astra",
-    "openai/gpt-6.1-sol",
+    "openai/gpt-6.2-astra",
+    "openai/gpt-6.2-sol",
     "openai/gpt-6.1-terra",
     "openai/gpt-6-luna",
     "neuralwatt/deepseek-v4.1-flash",
@@ -34,12 +34,12 @@
     "jev/auto"
   ],
   "modelThinkingLevels": {
-    "openai-codex/gpt-6-astra": "low",
-    "openai-codex/gpt-6.1-sol": "medium",
+    "openai-codex/gpt-6.2-astra": "low",
+    "openai-codex/gpt-6.2-sol": "medium",
     "openai-codex/gpt-6.1-terra": "medium",
     "openai-codex/gpt-6-luna": "max",
-    "openai/gpt-6-astra": "low",
-    "openai/gpt-6.1-sol": "medium",
+    "openai/gpt-6.2-astra": "low",
+    "openai/gpt-6.2-sol": "medium",
     "openai/gpt-6.1-terra": "medium",
     "openai/gpt-6-luna": "max"
   },

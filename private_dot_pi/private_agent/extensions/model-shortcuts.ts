@@ -17,8 +17,8 @@ import type { AutocompleteItem } from "@earendil-works/pi-tui";
 // https://artificialanalysis.ai
 // https://commandcode.ai/docs/plans/go
 const ALIASES: Record<string, ModelTarget | readonly ModelTarget[]> = {
-  astra: { provider: "openai", id: "gpt-6-astra" },
-  sol: { provider: "openai", id: "gpt-6.1-sol" },
+  astra: { provider: "openai", id: "gpt-6.2-astra" },
+  sol: { provider: "openai", id: "gpt-6.2-sol" },
   terra: { provider: "openai", id: "gpt-6.1-terra" },
   luna: { provider: "openai", id: "gpt-6-luna" },
   glm: [
@@ -47,9 +47,7 @@ const ALIASES: Record<string, ModelTarget | readonly ModelTarget[]> = {
     { provider: "neuralwatt", id: "kimi-k3.1-pro" },
     { provider: "codebuddy", id: "kimi-k3.1-pro" },
   ],
-  qwen: { provider: "commandcode", id: "Qwen/Qwen3.8-Max-0902" },
   flex: { provider: "neuralwatt", id: "kimi-k3.1-pro-flex" },
-  coral: { provider: "coralbricks", id: "deepseek-v4.1-flash-fast" },
   auto: { provider: "jev", id: "auto" },
 };
 

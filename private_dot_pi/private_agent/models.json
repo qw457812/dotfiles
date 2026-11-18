@@ -3,7 +3,7 @@
   "providers": {
     "openai-codex": {
       "modelOverrides": {
-        "gpt-6.1-sol": {
+        "gpt-6.2-sol": {
           "contextWindow": 372000
         },
         "gpt-6.1-terra": {
@@ -16,7 +16,7 @@
     },
     "openai": {
       "modelOverrides": {
-        "gpt-6.1-sol": {
+        "gpt-6.2-sol": {
           "contextWindow": 372000
         },
         "gpt-6.1-terra": {

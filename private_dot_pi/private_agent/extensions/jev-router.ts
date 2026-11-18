@@ -5,7 +5,7 @@
  *
  * Registers `jev/auto`, which routes between three OpenAI models:
  *
- * - Planning: GPT-6.1 Sol (medium) for complex work, GPT-6.1 Terra (high) otherwise. The Jev classifier rates the
+ * - Planning: GPT-6.2 Sol (medium) for complex work, GPT-6.2 Sol (low) otherwise. The Jev classifier rates the
  *   first user message; planning stays on the chosen model.
  * - Implementation: GPT-6.1 Terra (medium).
  *
@@ -30,8 +30,8 @@ interface RouteTarget {
 }
 
 const ROUTES = {
-	complex: { provider: "openai", model: "gpt-6.1-sol", thinkingLevel: "medium" },
-	standard: { provider: "openai", model: "gpt-6.1-terra", thinkingLevel: "high" },
+	complex: { provider: "openai", model: "gpt-6.2-sol", thinkingLevel: "medium" },
+	standard: { provider: "openai", model: "gpt-6.2-sol", thinkingLevel: "low" },
 	implementation: { provider: "openai", model: "gpt-6.1-terra", thinkingLevel: "medium" },
 } satisfies Record<string, RouteTarget>;
 
@@ -69,7 +69,7 @@ function editedThisTurn(messages: readonly Message[]): boolean {
 	});
 }
 
-/** Planning model for a new session: Sol (medium) for complex work, Terra (high) otherwise or when Jev is unavailable. */
+/** Planning model for a new session: Sol (medium) for complex work, Sol (low) otherwise or when Jev is unavailable. */
 async function choosePlanningRoute(request: JevRequest, ctx: ExtensionContext): Promise<RouteTarget> {
 	// Keep a planning model the session already uses, so switching to jev/auto costs no cache miss.
 	const previous = request.previous;
