@@ -493,6 +493,14 @@ bind | split-window -h
 # https://github.com/junegunn/fzf/pull/582
 # https://github.com/christoomey/vim-tmux-navigator#tmux
 is_vim="ps -o state= -o comm= -t '#{pane_tty}' | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?\.?(view|n?vim?x?|fzf)(-wrapped)?(diff)?$'"
+
+set -gu update-environment
+set -ag update-environment "HC_TERMINAL_ID HC_TERMINAL_SOCKET"
+set -ag update-environment "REX_SESSION REX_BLOCK REX_SERVER REX_BIN_DIR"
+set -ag update-environment "KITTY_PID KITTY_WINDOW_ID KITTY_LISTEN_ON KITTY_PUBLIC_KEY KITTY_INSTALLATION_DIR"
+set -ag update-environment "GHOSTTY_RESOURCES_DIR GHOSTTY_BIN_DIR GHOSTTY_SHELL_FEATURES"
+set -ag update-environment "WEZTERM_PANE WEZTERM_UNIX_SOCKET"
+
 is_wezterm='test -n "$WEZTERM_UNIX_SOCKET"'
 is_kitty='test -n "$KITTY_PID"'
 is_herdr_app='test -n "$HC_TERMINAL_ID"'
