@@ -1,0 +1,11 @@
+{
+  "place": "none",
+  "overlay": {
+    "kind": "window",
+    "key": "pane-nav",
+    "width": 0,
+    "height": 0,
+    "frame": "none",
+    "keep": true
+  }
+}

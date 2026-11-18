@@ -495,6 +495,7 @@ bind | split-window -h
 is_vim="ps -o state= -o comm= -t '#{pane_tty}' | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?\.?(view|n?vim?x?|fzf)(-wrapped)?(diff)?$'"
 is_wezterm='test -n "$WEZTERM_UNIX_SOCKET"'
 is_kitty='test -n "$KITTY_PID"'
+is_herdr_app='test -n "$HC_TERMINAL_ID"'
 # bind-key -n 'C-x' if-shell "$is_wezterm" 'display-message "true"' 'display-message "false"'
 
 # NOTE: `$WEZTERM_PANE` could be wrong when getting wezterm pane_id in tmux, use `wezterm cli list-clients --format=json` instead
@@ -503,40 +504,48 @@ is_kitty='test -n "$KITTY_PID"'
 # See: `wezterm cli activate-pane-direction --help`
 bind-key -n 'C-h' if-shell "$is_vim" 'send-keys C-h' \
   { if -F '#{pane_at_left}' \
-    { if-shell "$is_wezterm" "run-shell \"wezterm cli activate-pane-direction --pane-id \$(wezterm cli list-clients --format json | jq -r 'sort_by(.idle_time.nanos) | .[0].focused_pane_id') Left\"" \
-      { if-shell "$is_kitty" "run-shell \"kitty @ kitten neighboring_window.py left\"" '' } } \
+    { if-shell "$is_herdr_app" "run-shell -E \"herdr-app do pane.go --direction left >/dev/null\"" \
+      { if-shell "$is_wezterm" "run-shell \"wezterm cli activate-pane-direction --pane-id \$(wezterm cli list-clients --format json | jq -r 'sort_by(.idle_time.nanos) | .[0].focused_pane_id') Left\"" \
+        { if-shell "$is_kitty" "run-shell \"kitty @ kitten neighboring_window.py left\"" '' } } } \
     'select-pane -L' }
 bind-key -n 'C-j' if-shell "$is_vim" 'send-keys C-j' \
   { if -F '#{pane_at_bottom}' \
-    { if-shell "$is_wezterm" "run-shell \"wezterm cli activate-pane-direction --pane-id \$(wezterm cli list-clients --format json | jq -r 'sort_by(.idle_time.nanos) | .[0].focused_pane_id') Down\"" \
-      { if-shell "$is_kitty" "run-shell \"kitty @ kitten neighboring_window.py bottom\"" '' } } \
+    { if-shell "$is_herdr_app" "run-shell -E \"herdr-app do pane.go --direction down >/dev/null\"" \
+      { if-shell "$is_wezterm" "run-shell \"wezterm cli activate-pane-direction --pane-id \$(wezterm cli list-clients --format json | jq -r 'sort_by(.idle_time.nanos) | .[0].focused_pane_id') Down\"" \
+        { if-shell "$is_kitty" "run-shell \"kitty @ kitten neighboring_window.py bottom\"" '' } } } \
     'select-pane -D' }
 bind-key -n 'C-k' if-shell "$is_vim" 'send-keys C-k' \
   { if -F '#{pane_at_top}' \
-    { if-shell "$is_wezterm" "run-shell \"wezterm cli activate-pane-direction --pane-id \$(wezterm cli list-clients --format json | jq -r 'sort_by(.idle_time.nanos) | .[0].focused_pane_id') Up\"" \
-      { if-shell "$is_kitty" "run-shell \"kitty @ kitten neighboring_window.py top\"" '' } } \
+    { if-shell "$is_herdr_app" "run-shell -E \"herdr-app do pane.go --direction up >/dev/null\"" \
+      { if-shell "$is_wezterm" "run-shell \"wezterm cli activate-pane-direction --pane-id \$(wezterm cli list-clients --format json | jq -r 'sort_by(.idle_time.nanos) | .[0].focused_pane_id') Up\"" \
+        { if-shell "$is_kitty" "run-shell \"kitty @ kitten neighboring_window.py top\"" '' } } } \
     'select-pane -U' }
 bind-key -n 'C-l' if-shell "$is_vim" 'send-keys C-l' \
   { if -F '#{pane_at_right}' \
-    { if-shell "$is_wezterm" "run-shell \"wezterm cli activate-pane-direction --pane-id \$(wezterm cli list-clients --format json | jq -r 'sort_by(.idle_time.nanos) | .[0].focused_pane_id') Right\"" \
-      { if-shell "$is_kitty" "run-shell \"kitty @ kitten neighboring_window.py right\"" '' } } \
+    { if-shell "$is_herdr_app" "run-shell -E \"herdr-app do pane.go --direction right >/dev/null\"" \
+      { if-shell "$is_wezterm" "run-shell \"wezterm cli activate-pane-direction --pane-id \$(wezterm cli list-clients --format json | jq -r 'sort_by(.idle_time.nanos) | .[0].focused_pane_id') Right\"" \
+        { if-shell "$is_kitty" "run-shell \"kitty @ kitten neighboring_window.py right\"" '' } } } \
     'select-pane -R' }
 
 bind-key -T copy-mode-vi 'C-h' if -F '#{pane_at_left}' \
-  { if-shell "$is_wezterm" "run-shell \"wezterm cli activate-pane-direction --pane-id \$(wezterm cli list-clients --format json | jq -r 'sort_by(.idle_time.nanos) | .[0].focused_pane_id') Left\"" \
-    { if-shell "$is_kitty" "run-shell \"kitty @ kitten neighboring_window.py left\"" '' } } \
+  { if-shell "$is_herdr_app" "run-shell -E \"herdr-app do pane.go --direction left >/dev/null\"" \
+    { if-shell "$is_wezterm" "run-shell \"wezterm cli activate-pane-direction --pane-id \$(wezterm cli list-clients --format json | jq -r 'sort_by(.idle_time.nanos) | .[0].focused_pane_id') Left\"" \
+      { if-shell "$is_kitty" "run-shell \"kitty @ kitten neighboring_window.py left\"" '' } } } \
   'select-pane -L'
 bind-key -T copy-mode-vi 'C-j' if -F '#{pane_at_bottom}' \
-  { if-shell "$is_wezterm" "run-shell \"wezterm cli activate-pane-direction --pane-id \$(wezterm cli list-clients --format json | jq -r 'sort_by(.idle_time.nanos) | .[0].focused_pane_id') Down\"" \
-    { if-shell "$is_kitty" "run-shell \"kitty @ kitten neighboring_window.py bottom\"" '' } } \
+  { if-shell "$is_herdr_app" "run-shell -E \"herdr-app do pane.go --direction down >/dev/null\"" \
+    { if-shell "$is_wezterm" "run-shell \"wezterm cli activate-pane-direction --pane-id \$(wezterm cli list-clients --format json | jq -r 'sort_by(.idle_time.nanos) | .[0].focused_pane_id') Down\"" \
+      { if-shell "$is_kitty" "run-shell \"kitty @ kitten neighboring_window.py bottom\"" '' } } } \
   'select-pane -D'
 bind-key -T copy-mode-vi 'C-k' if -F '#{pane_at_top}' \
-  { if-shell "$is_wezterm" "run-shell \"wezterm cli activate-pane-direction --pane-id \$(wezterm cli list-clients --format json | jq -r 'sort_by(.idle_time.nanos) | .[0].focused_pane_id') Up\"" \
-    { if-shell "$is_kitty" "run-shell \"kitty @ kitten neighboring_window.py top\"" '' } } \
+  { if-shell "$is_herdr_app" "run-shell -E \"herdr-app do pane.go --direction up >/dev/null\"" \
+    { if-shell "$is_wezterm" "run-shell \"wezterm cli activate-pane-direction --pane-id \$(wezterm cli list-clients --format json | jq -r 'sort_by(.idle_time.nanos) | .[0].focused_pane_id') Up\"" \
+      { if-shell "$is_kitty" "run-shell \"kitty @ kitten neighboring_window.py top\"" '' } } } \
   'select-pane -U'
 bind-key -T copy-mode-vi 'C-l' if -F '#{pane_at_right}' \
-  { if-shell "$is_wezterm" "run-shell \"wezterm cli activate-pane-direction --pane-id \$(wezterm cli list-clients --format json | jq -r 'sort_by(.idle_time.nanos) | .[0].focused_pane_id') Right\"" \
-    { if-shell "$is_kitty" "run-shell \"kitty @ kitten neighboring_window.py right\"" '' } } \
+  { if-shell "$is_herdr_app" "run-shell -E \"herdr-app do pane.go --direction right >/dev/null\"" \
+    { if-shell "$is_wezterm" "run-shell \"wezterm cli activate-pane-direction --pane-id \$(wezterm cli list-clients --format json | jq -r 'sort_by(.idle_time.nanos) | .[0].focused_pane_id') Right\"" \
+      { if-shell "$is_kitty" "run-shell \"kitty @ kitten neighboring_window.py right\"" '' } } } \
   'select-pane -R'
 
 bind -n 'C-Left' if-shell "$is_vim" 'send-keys C-Left' 'resize-pane -L 1'

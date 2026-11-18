@@ -4,6 +4,8 @@ local is_kitty = vim.g.user_is_kitty
 -- TODO: tmux in ghostty
 local is_ghostty = vim.g.user_is_ghostty
 local is_rex = vim.g.user_is_rex
+local is_herdr_app = vim.g.user_is_herdr_app
+local use_smart_splits = is_wezterm or is_kitty or is_ghostty or is_rex or is_herdr_app
 
 ---@type LazySpec
 return {
@@ -56,7 +58,7 @@ return {
   {
     "aserowy/tmux.nvim",
     pager = true,
-    cond = is_tmux and not (is_wezterm or is_kitty or is_rex), -- tmux but not in wezterm/kitty/rex
+    cond = is_tmux and not use_smart_splits, -- tmux but not in wezterm/kitty/ghostty/rex/herdr-app
     -- stylua: ignore
     keys = {
       -- Move to window
@@ -98,19 +100,13 @@ return {
   {
     "smart-splits-nvim/smart-splits.nvim",
     pager = true,
-    cond = is_wezterm or is_kitty or is_ghostty or is_rex,
+    cond = use_smart_splits,
     lazy = false, -- required
     dependencies = {
       {
-        "rawnly/smart-splits-backend-rex",
-        pager = true,
-        cond = is_rex,
-        main = "smart-splits-backend-rex",
-      },
-      {
         "smart-splits-nvim/backend-tmux",
         pager = true,
-        cond = is_wezterm or is_kitty or is_ghostty or is_rex,
+        cond = is_tmux,
         main = "smart-splits-backend-tmux",
         opts = { disable_nav_when_zoomed = false },
       },
@@ -132,6 +128,17 @@ return {
         pager = true,
         cond = is_ghostty,
         main = "smart-splits-backend-ghostty",
+      },
+      {
+        "rawnly/smart-splits-backend-rex",
+        pager = true,
+        cond = is_rex,
+        main = "smart-splits-backend-rex",
+      },
+      {
+        "pajecawav/smart-splits-herdr",
+        pager = true,
+        cond = is_herdr_app,
       },
     },
     -- stylua: ignore
@@ -179,8 +186,8 @@ return {
             end
           end
 
-          if not ((is_wezterm or is_kitty) and ctx.backend and ctx.backend.name == "tmux") then
-            -- "wezterm/kitty without tmux" or "tmux not in wezterm/kitty" or "not in any mux", original at_edge behavior
+          if not ((is_wezterm or is_kitty or is_herdr_app) and ctx.backend and ctx.backend.name == "tmux") then
+            -- "wezterm/kitty/herdr-app without tmux" or "tmux not in wezterm/kitty/herdr-app" or "not in any mux", original at_edge behavior
             wrap_or_split_or_stop()
             return
           end
@@ -209,6 +216,10 @@ return {
             if not require("smart-splits-backend-kitty").move(ctx.direction, { at_edge = "stop" }) then
               wrap_or_split_or_stop()
             end
+          elseif is_herdr_app then
+            if not require("smart-splits-herdr").move(ctx.direction, { at_edge = "stop" }) then
+              wrap_or_split_or_stop()
+            end
           end
         end,
       },
@@ -232,6 +243,8 @@ return {
             table.insert(backends, "smart-splits-backend-ghostty")
           elseif is_rex then
             table.insert(backends, "smart-splits-backend-rex")
+          elseif is_herdr_app then
+            table.insert(backends, "smart-splits-herdr")
           end
           return backends
         end,

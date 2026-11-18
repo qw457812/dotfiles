@@ -13,6 +13,8 @@ patch:
       vim_mode: true
     com.superlogical.rex:
       vim_mode: true
+    dev.herdr.app:
+      vim_mode: true
     org.gnu.Emacs:
       vim_mode: true
     app.glide-browser.glide:

@@ -35,6 +35,7 @@ vim.g.user_is_wezterm = not vim.g.neovide and vim.env.WEZTERM_UNIX_SOCKET ~= nil
 vim.g.user_is_kitty = not vim.g.neovide and vim.env.KITTY_PID ~= nil
 vim.g.user_is_ghostty = not vim.g.neovide and vim.env.GHOSTTY_RESOURCES_DIR ~= nil
 vim.g.user_is_rex = not vim.g.neovide and vim.env.REX_SESSION ~= nil
+vim.g.user_is_herdr_app = not vim.g.neovide and vim.env.HC_TERMINAL_ID ~= nil
 vim.g.user_is_tmux = not vim.g.neovide and vim.env.TMUX ~= nil
 vim.g.user_is_termux = vim.env.TERMUX_VERSION ~= nil
 vim.g.user_is_macos = vim.fn.has("mac") == 1
@@ -49,7 +50,8 @@ vim.g.user_transparent_background = vim.g.user_is_wezterm or vim.g.user_is_kitty
 vim.g.user_explorer_width = math.max(35, math.min(50, math.floor(vim.o.columns * 0.25)))
 -- holding layout like no-neck-pain.nvim
 -- the `vim.g.user_explorer_auto_open` setting will be ignored if `vim.g.user_explorer_auto_close` is set to true
-vim.g.user_explorer_auto_open = vim.o.columns - vim.g.user_explorer_width >= 120
+vim.g.user_explorer_auto_open = not (vim.g.user_is_rex or vim.g.user_is_herdr_app)
+  and vim.o.columns - vim.g.user_explorer_width >= 120
 vim.g.user_explorer_auto_close = U.is_narrow()
 if vim.env.SHELL_COMMAND_EDITOR then
   -- set in fish_user_key_bindings.fish before calling `edit_command_buffer`
