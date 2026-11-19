@@ -22,6 +22,11 @@
 - After changes under `dsh-plugins`, run `pnpm --dir dsh-plugins run check` and `pnpm --dir dsh-plugins run lint` from the chezmoi repository root.
 - Before publishing a bundle under `packages/`, run its `check` script and inspect `npm pack --dry-run` output.
 
+## Herdr
+
+- Herdr app config lives under `dot_config/herdr-app`; read `~/.config/herdr-app/AGENTS.md` before changing layouts, keys, or mods.
+- herdr-core config lives under `dot_config/herdr-core`.
+
 ## Neovim
 
 - Neovim config lives under `dot_config/nvim`; it imports LazyVim defaults from `~/.local/share/nvim/lazy/LazyVim`, then local lazy.nvim specs merge with and override those defaults.
