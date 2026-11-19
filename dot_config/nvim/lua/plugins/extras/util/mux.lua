@@ -135,6 +135,7 @@ return {
         cond = is_rex,
         main = "smart-splits-backend-rex",
       },
+      -- TODO: ctrl-hjkl feels laggy, `HC_QUIET_MS=0 hc server restart --fresh`
       {
         "pajecawav/smart-splits-herdr",
         pager = true,
