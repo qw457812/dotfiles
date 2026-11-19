@@ -30,9 +30,9 @@ interface RouteTarget {
 }
 
 const ROUTES = {
-	complex: { provider: "openai", model: "gpt-6.2-sol", thinkingLevel: "medium" },
-	standard: { provider: "openai", model: "gpt-6.2-sol", thinkingLevel: "low" },
-	implementation: { provider: "openai", model: "gpt-6.2-sol", thinkingLevel: "low" },
+	complex: { provider: "openai-codex", model: "gpt-6.2-sol", thinkingLevel: "medium" },
+	standard: { provider: "openai-codex", model: "gpt-6.2-sol", thinkingLevel: "low" },
+	implementation: { provider: "openai-codex", model: "gpt-6.2-sol", thinkingLevel: "low" },
 } satisfies Record<string, RouteTarget>;
 
 /** Tools whose successful result means implementation has started. */
