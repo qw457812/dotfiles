@@ -2,6 +2,23 @@
   "mcpServers": {
     "codesearch": {
       "url": "https://mcp.grep.app"
+    },
+    "artificial-analysis": {
+      "url": "https://mcp.artificialanalysis.ai/mcp",
+      "headers": {
+        "x-api-key": "${AA_API_KEY}"
+      },
+      "toolExposure": {
+        "aa_language_models": "hidden",
+        "aa_language_model": "hidden",
+        "aa_language_model_performance": "hidden",
+        "aa_language_providers": "hidden",
+        "aa_language_provider": "hidden",
+        "aa_language_provider_performance": "hidden",
+        "aa_language_provider_measurements": "hidden",
+        "aa_media_rankings": "hidden"
+      },
+      "enabled": false
     }
   }
 }

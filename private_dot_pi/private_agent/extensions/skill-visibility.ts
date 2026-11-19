@@ -43,6 +43,7 @@ const PROMPT_HIDDEN_SKILLS = [
   // git:github.com/mattpocock/skills
   "pr",
   // git:github.com/anthropics/skills
+  "frontend-design",
   "docx",
   "pdf",
   "pptx",

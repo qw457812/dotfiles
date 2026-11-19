@@ -3,20 +3,20 @@
 /**
  * Jev router - a virtual model that plans on a strong model and implements on a cheap one.
  *
- * Registers `jev/auto`, which routes between three OpenAI models:
+ * Registers `jev/auto`, which routes between three configured models:
  *
- * - Planning: GPT-6.2 Sol (medium) for complex work, GPT-6.2 Sol (low) otherwise. The Jev classifier rates the
+ * - Planning: the `complex` model for complex work, the `standard` model otherwise. The Jev classifier rates the
  *   first user message; planning stays on the chosen model.
- * - Implementation: GPT-6.1 Terra (medium).
+ * - Implementation: the `implementation` model.
  *
  * The planning model explores, plans, and makes the first edit. After the first successful `edit`
- * or `write` tool call (including nested calls from codemode), the next request of the same turn goes to Terra, and the session stays
+ * or `write` tool call (including nested calls from codemode), the next request of the same turn goes to the `implementation` model, and the session stays
  * there. A session therefore switches models once and accepts a single prompt-cache miss.
  *
  * The phase is router state: Pi stores it on the session branch, so it follows the session tree
- * and survives compaction. Requests outside the agent loop, such as compaction summaries, go to Terra.
+ * and survives compaction. Requests outside the agent loop, such as compaction summaries, go to the `implementation` model.
  *
- * Requires TypeSafe credentials (TYPESAFE_API_KEY) and an OpenAI login.
+ * Requires TypeSafe credentials (TYPESAFE_API_KEY) and credentials for the configured models.
  * Usage: pi -e ./jev-router.ts --model jev/auto
  */
 
@@ -32,7 +32,7 @@ interface RouteTarget {
 const ROUTES = {
 	complex: { provider: "openai", model: "gpt-6.2-sol", thinkingLevel: "medium" },
 	standard: { provider: "openai", model: "gpt-6.2-sol", thinkingLevel: "low" },
-	implementation: { provider: "openai", model: "gpt-6.1-terra", thinkingLevel: "medium" },
+	implementation: { provider: "openai", model: "gpt-6.2-sol", thinkingLevel: "low" },
 } satisfies Record<string, RouteTarget>;
 
 /** Tools whose successful result means implementation has started. */
@@ -40,7 +40,7 @@ const EDIT_TOOLS = new Set(["edit", "write"]);
 
 interface JevState {
 	phase: "planning" | "implementation";
-	/** OpenAI model for this phase. */
+	/** Model for this phase. */
 	route: RouteTarget;
 }
 
@@ -69,7 +69,7 @@ function editedThisTurn(messages: readonly Message[]): boolean {
 	});
 }
 
-/** Planning model for a new session: Sol (medium) for complex work, Sol (low) otherwise or when Jev is unavailable. */
+/** Planning model for a new session: `complex` for complex work, `standard` otherwise or when Jev is unavailable. */
 async function choosePlanningRoute(request: JevRequest, ctx: ExtensionContext): Promise<RouteTarget> {
 	// Keep a planning model the session already uses, so switching to jev/auto costs no cache miss.
 	const previous = request.previous;
@@ -123,7 +123,7 @@ export default function (pi: ExtensionAPI) {
 				const route = await choosePlanningRoute(request, ctx);
 				return routeTo(ctx, route, { phase: "planning", route });
 			}
-			// The planning model made the first edit: hand the rest of the work to Terra.
+			// The planning model made the first edit: hand the rest of the work to the `implementation` model.
 			if (state.phase === "planning" && editedThisTurn(request.messages)) {
 				return routeTo(ctx, ROUTES.implementation, {
 					phase: "implementation",
