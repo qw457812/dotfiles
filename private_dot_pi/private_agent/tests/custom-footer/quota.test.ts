@@ -300,6 +300,57 @@ describe("Lyber credits", () => {
   });
 });
 
+describe("Neuralwatt daily free energy", () => {
+  beforeEach(() => {
+    vi.resetModules();
+    vi.mocked(readFile).mockReset().mockRejectedValue(new Error("No cache"));
+    vi.stubEnv("NEURALWATT_API_KEY", "test-token");
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
+  });
+
+  const balance = {
+    total_credits_usd: 55.64,
+    credits_used_usd: 31.3375,
+  };
+
+  it("shows today's free energy before the credit balance", async () => {
+    const f = await fixture();
+    f.fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        balance,
+        daily_free_energy: {
+          kwh_included: 0.1,
+          kwh_used: 0.0421,
+          reset_at: new Date(Date.now() + 5 * 3600_000).toISOString(),
+        },
+      }),
+    });
+    f.get("neuralwatt");
+    await vi.waitFor(() => expect(f.requestRender).toHaveBeenCalled());
+    expect(f.fetchMock.mock.calls[0][0]).toBe("https://api.neuralwatt.com/v1/quota");
+    expect(f.fetchMock.mock.calls[0][1].headers.Authorization).toBe("Bearer test-token");
+    expect(f.get("neuralwatt")).toMatch(/^42\.1Wh\/100Wh\/\d+h\d+m \$31\.34\/\$55\.64$/);
+  });
+
+  it.each([undefined, null, {}])(
+    "shows only the credit balance when daily free energy is missing: %j",
+    async (dailyFreeEnergy) => {
+      const f = await fixture();
+      f.fetchMock.mockResolvedValue({
+        ok: true,
+        json: async () => ({ balance, daily_free_energy: dailyFreeEnergy }),
+      });
+      f.get("neuralwatt");
+      await vi.waitFor(() => expect(f.requestRender).toHaveBeenCalled());
+      expect(f.get("neuralwatt")).toBe("$31.34/$55.64");
+    },
+  );
+});
+
 describe("Firepass daily usage", () => {
   beforeEach(() => {
     vi.resetModules();

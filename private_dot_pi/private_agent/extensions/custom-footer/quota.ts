@@ -70,13 +70,17 @@ interface CodexQuota {
   } | null;
 }
 
-// https://portal.neuralwatt.com/docs/api/quota
+// https://docs.neuralwatt.com/api/quota
 interface NeuralwattQuota {
   balance: {
-    credits_remaining_usd: number;
     total_credits_usd: number;
     credits_used_usd: number;
   };
+  daily_free_energy?: {
+    kwh_included: number;
+    kwh_used: number;
+    reset_at: string;
+  } | null;
 }
 
 interface ZaiQuota {
@@ -602,8 +606,16 @@ const sources: Record<string, Source> = {
       return fetchJson<NeuralwattQuota>("https://api.neuralwatt.com/v1/quota", apiKey);
     },
     format(quota: NeuralwattQuota, theme: Theme): string | null {
-      const bal = quota.balance;
-      return `${theme.fg("accent", `$${formatDecimal(bal.credits_used_usd, 2)}`)}${theme.fg("dim", `/$${formatDecimal(bal.total_credits_usd, 2)}`)}`;
+      const { balance, daily_free_energy: free } = quota;
+      return joinParts([
+        free && Number.isFinite(free.kwh_used) && Number.isFinite(free.kwh_included)
+          ? `${theme.fg("accent", `${formatDecimal(free.kwh_used * 1000, 2)}Wh`)}${theme.fg(
+              "dim",
+              `/${formatDecimal(free.kwh_included * 1000, 2)}Wh/${formatRemaining(free.reset_at)}`,
+            )}`
+          : null,
+        `${theme.fg("accent", `$${formatDecimal(balance.credits_used_usd, 2)}`)}${theme.fg("dim", `/$${formatDecimal(balance.total_credits_usd, 2)}`)}`,
+      ]);
     },
   }),
   zai: createSource("zai", {
