@@ -185,7 +185,7 @@
   "terminal_opacity": 0,
   "divider": {
     "width": 1,
-    "color": "border"
+    "color": "#0b1024"
   },
   "titlebar": "none",
   "traffic_lights": [
