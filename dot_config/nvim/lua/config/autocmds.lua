@@ -9,6 +9,18 @@ local function lazyvim_augroup(name, clear)
   return vim.api.nvim_create_augroup("lazyvim_" .. name, { clear = clear or false })
 end
 
+-- Forward reports unwrapped by Sidekick's embedded tmux client to Herdr or Rex.
+if (vim.g.user_is_herdr_app or vim.g.user_is_rex) and not vim.g.user_is_tmux and vim.api.nvim_ui_send then
+  vim.api.nvim_create_autocmd("TermRequest", {
+    group = vim.api.nvim_create_augroup("sidekick_osc7501", { clear = true }),
+    callback = function(ev)
+      if vim.bo[ev.buf].filetype == "sidekick_terminal" and ev.data.sequence:match("^\27%]7501;state=") then
+        vim.api.nvim_ui_send(ev.data.sequence .. (ev.data.terminator or "\27\\"))
+      end
+    end,
+  })
+end
+
 -- show cursor line only in active window
 -- https://github.com/folke/dot/blob/56d310467f3f962e506810b710a1562cee03b75e/nvim/lua/config/autocmds.lua#L2-L17
 vim.api.nvim_create_autocmd({ "InsertLeave", "WinEnter" }, {

@@ -776,11 +776,22 @@ return {
             },
           },
           pi = {
-            env = {
-              MANPAGER = "col -bx",
-              __AI_AGENT = "pi",
-              NVIM_FLATTEN_NEST = "1",
-            },
+            env = (function()
+              local env = {
+                MANPAGER = "col -bx",
+                __AI_AGENT = "pi",
+                NVIM_FLATTEN_NEST = "1",
+              }
+              if (vim.g.user_is_herdr_app or vim.g.user_is_rex) and not vim.g.user_is_tmux and vim.api.nvim_ui_send then
+                -- tmux can't answer Pi's OSC 7501 probe. Send reports via DCS passthrough instead.
+                local node_options = vim.env.NODE_OPTIONS or ""
+                local preload = vim.fn.expand("~/.pi/agent/osc7501-tmux.cjs")
+                env.PI_PROGRAM_STATUS = "1"
+                env.PI_OSC7501_ORIGINAL_NODE_OPTIONS = node_options
+                env.NODE_OPTIONS = vim.trim(node_options .. " --require=" .. vim.json.encode(preload))
+              end
+              return env
+            end)(),
             keys = {
               blur_t = false, -- pi uses <c-o> for its own functionality
               prompt = false, -- pi uses <c-p> for its own functionality

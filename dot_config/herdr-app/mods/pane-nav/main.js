@@ -27,10 +27,13 @@ export default class PaneNav extends View {
     if (!focus) return;
     // Copy mode can temporarily show a different terminal in this pane.
     const terminal = focus.shown ?? focus.terminal;
-    const program =
-      terminals().find((t) => t.address === terminal)?.program ??
-      panes().find((p) => p.pane === focus.pane)?.program;
-    const names = [program?.key, program?.name].map((name) => String(name ?? "").toLowerCase());
+    const info = terminals().find((t) => t.address === terminal);
+    const pane = panes().find((p) => p.pane === focus.pane);
+    const program = info?.program ?? pane?.program;
+    const foreground = (info?.report?.app || info?.status || pane?.app) && info?.foreground?.name;
+    const names = (foreground ? [foreground] : [program?.key, program?.name]).map((name) =>
+      String(name ?? "").toLowerCase(),
+    );
     const vertical = direction === "up" || direction === "down";
     const passthrough = names.some(
       (name) => PASSTHROUGH.has(name) || (vertical && (name === "fzf" || name === "yazi")),
