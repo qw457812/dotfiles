@@ -71,7 +71,6 @@ export default class Pane extends View {
       .px(10)
       .gap(8)
       .items_center()
-      .bg(t.chrome)
       .when(bottom, el => el.border_t(1))
       .when(!bottom, el => el.border_b(1))
       .border_color(t.border)
