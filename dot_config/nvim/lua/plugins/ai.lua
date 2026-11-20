@@ -396,7 +396,7 @@ return {
             vim.uv.fs_symlink(base_exepath, dest) -- use symlink to make `is_proc` behave
           end
           opts.cli.tools[tool] = vim.tbl_deep_extend("force", vim.deepcopy(base), _opts.tool_opts or {})
-          opts.cli.tools[tool].cmd[1], opts.cli.tools[tool].is_proc = tool, "\\<" .. tool .. "\\>"
+          opts.cli.tools[tool].cmd[1], opts.cli.tools[tool].is_proc = dest, "\\<" .. tool .. "\\>"
         end
 
         if name ~= base_name and not get_tool(name).cmd then
@@ -978,19 +978,12 @@ return {
       end
 
       -- tmux can't answer Pi's OSC 7501 probe. Send reports via DCS passthrough instead.
-      -- TODO: A project mise.toml that sets NODE_OPTIONS  can overwrite this
-      -- value during shell startup, dropping the preload and preventing status forwarding.
-      local node_options = vim.env.NODE_OPTIONS or ""
-      local preload = vim.fn.expand("~/.pi/agent/osc7501-tmux.cjs")
       return U.extend_tbl(opts, {
         cli = {
           tools = {
             pi = {
-              env = {
-                PI_PROGRAM_STATUS = "1",
-                PI_OSC7501_ORIGINAL_NODE_OPTIONS = node_options,
-                NODE_OPTIONS = vim.trim(node_options .. " --require=" .. vim.json.encode(preload)),
-              },
+              cmd = { vim.fn.expand("~/.local/bin/pi-sidekick") },
+              env = { PI_SIDEKICK_OSC7501 = "1" },
             },
           },
         },

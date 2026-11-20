@@ -12,7 +12,10 @@ if (originalNodeOptions !== undefined) {
     const write = process.stdout.write;
     process.stdout.write = function (chunk, ...args) {
       // Wrap only complete OSC 7501 reports, not queries or ordinary TUI output.
-      if (typeof chunk === "string" && /^\x1b\]7501;state=[^\x1b\x07]*(?:\x07|\x1b\\)$/.test(chunk)) {
+      if (
+        typeof chunk === "string" &&
+        /^\x1b\]7501;state=[^\x1b\x07]*(?:\x07|\x1b\\)$/.test(chunk)
+      ) {
         chunk = "\x1bPtmux;" + chunk.replaceAll("\x1b", "\x1b\x1b") + "\x1b\\";
       }
       return write.call(this, chunk, ...args);

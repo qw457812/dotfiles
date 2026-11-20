@@ -1,0 +1,36 @@
+#!/bin/sh
+
+mise_ready=0
+if [ "${1:-}" = --sidekick-mise-ready ]; then
+  mise_ready=1
+  shift
+fi
+
+if [ "${PI_SIDEKICK_OSC7501:-}" = 1 ] &&
+   [ "${PI_PROGRAM_STATUS:-}" != 0 ] &&
+   [ -n "${TMUX:-}" ]; then
+  # tmux may exec the wrapper directly, without a shell that activates mise.
+  # Load project env before appending the preload: mise.toml can set, for example,
+  # [env]
+  # NODE_OPTIONS = "--openssl-legacy-provider"
+  if [ "$mise_ready" = 0 ] && command -v mise >/dev/null 2>&1; then
+    MISE_EXEC_AUTO_INSTALL=false exec mise exec --no-deps -- "$0" --sidekick-mise-ready "$@"
+  fi
+
+  # A remaining shim could apply the project environment again and drop the preload.
+  shims="${MISE_DATA_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/mise}/shims"
+  for tool in pi node; do
+    if [ "$(command -v "$tool")" = "$shims/$tool" ]; then
+      printf 'pi-sidekick: %s still resolves to a mise shim; configure or install it first.\n' "$tool" >&2
+      exit 1
+    fi
+  done
+
+  preload="$HOME/.pi/agent/osc7501-tmux.cjs"
+  export PI_PROGRAM_STATUS=1
+  export PI_OSC7501_ORIGINAL_NODE_OPTIONS="${NODE_OPTIONS:-}"
+  export NODE_OPTIONS="${NODE_OPTIONS:+$NODE_OPTIONS }--require=\"$preload\""
+fi
+unset PI_SIDEKICK_OSC7501
+
+exec pi "$@"
