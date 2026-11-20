@@ -5,6 +5,7 @@
     "version": "0.1.16"
   },
   "type": "row",
+  "terminal_menu": "paste-menu",
   "children": [
     {
       "id": "sidebar",
