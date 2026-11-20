@@ -532,7 +532,8 @@ return {
         -- HACK: redraw to update the signs
         local function redraw()
           vim.defer_fn(function()
-            Snacks.util.redraw(vim.api.nvim_get_current_win())
+            -- Snacks.util.redraw(vim.api.nvim_get_current_win())
+            vim.cmd([[mode]])
           end, 500)
         end
 
@@ -597,7 +598,8 @@ return {
       vim.api.nvim_create_autocmd("User", {
         pattern = "MiniDiffUpdated",
         callback = U.debounce_wrap(100, function()
-          Snacks.util.redraw(vim.api.nvim_get_current_win())
+          -- Snacks.util.redraw(vim.api.nvim_get_current_win())
+          vim.cmd([[mode]])
         end),
       })
     end,
