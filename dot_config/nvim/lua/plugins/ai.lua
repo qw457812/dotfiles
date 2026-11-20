@@ -776,22 +776,11 @@ return {
             },
           },
           pi = {
-            env = (function()
-              local env = {
-                MANPAGER = "col -bx",
-                __AI_AGENT = "pi",
-                NVIM_FLATTEN_NEST = "1",
-              }
-              if (vim.g.user_is_herdr_app or vim.g.user_is_rex) and not vim.g.user_is_tmux and vim.api.nvim_ui_send then
-                -- tmux can't answer Pi's OSC 7501 probe. Send reports via DCS passthrough instead.
-                local node_options = vim.env.NODE_OPTIONS or ""
-                local preload = vim.fn.expand("~/.pi/agent/osc7501-tmux.cjs")
-                env.PI_PROGRAM_STATUS = "1"
-                env.PI_OSC7501_ORIGINAL_NODE_OPTIONS = node_options
-                env.NODE_OPTIONS = vim.trim(node_options .. " --require=" .. vim.json.encode(preload))
-              end
-              return env
-            end)(),
+            env = {
+              MANPAGER = "col -bx",
+              __AI_AGENT = "pi",
+              NVIM_FLATTEN_NEST = "1",
+            },
             keys = {
               blur_t = false, -- pi uses <c-o> for its own functionality
               prompt = false, -- pi uses <c-p> for its own functionality
@@ -908,6 +897,105 @@ return {
         },
       },
     },
+  },
+
+  {
+    "folke/sidekick.nvim",
+    optional = true,
+    ---@param opts sidekick.Config
+    opts = function(_, opts)
+      local mux = opts.cli and opts.cli.mux
+      if not (mux and mux.enabled and (mux.backend or (vim.env.ZELLIJ and "zellij" or "tmux")) == "tmux") then
+        return
+      end
+
+      if not ((vim.g.user_is_herdr_app or vim.g.user_is_rex) and not vim.g.user_is_tmux and vim.api.nvim_ui_send) then
+        return
+      end
+
+      -- Herdr and Rex see one terminal, even when Neovim hosts several Sidekick sessions.
+      local group = vim.api.nvim_create_augroup("sidekick_osc7501", { clear = true })
+      local priority = { idle = 1, done = 2, working = 3, error = 4, blocked = 5 }
+      local reports = {}
+      local sequence_number = 0
+      local published
+
+      local function publish()
+        local best
+        for _, report in pairs(reports) do
+          if not best or report.rank > best.rank or (report.rank == best.rank and report.order > best.order) then
+            best = report
+          end
+        end
+        local sequence = best and best.sequence
+        if sequence ~= published then
+          vim.api.nvim_ui_send(sequence or "\27]7501;state=clear\27\\")
+          published = sequence
+        end
+      end
+
+      vim.api.nvim_create_autocmd("TermRequest", {
+        group = group,
+        callback = function(ev)
+          if vim.bo[ev.buf].filetype ~= "sidekick_terminal" then
+            return
+          end
+          local sequence = ev.data.sequence
+          local state = sequence:match("^\27%]7501;state=([^:]+)")
+          if not state or sequence:match(":id=[^:]+") then
+            return
+          end
+          if state == "clear" then
+            reports[ev.buf] = nil
+          elseif priority[state] then
+            sequence_number = sequence_number + 1
+            reports[ev.buf] = {
+              rank = priority[state],
+              order = sequence_number,
+              sequence = sequence .. (ev.data.terminator or "\27\\"),
+            }
+          else
+            return
+          end
+          publish()
+        end,
+      })
+
+      -- Hiding keeps the terminal client alive; detaching closes it, even if Pi keeps running.
+      vim.api.nvim_create_autocmd({ "TermClose", "BufWipeout" }, {
+        group = group,
+        callback = function(ev)
+          if reports[ev.buf] then
+            reports[ev.buf] = nil
+            publish()
+          end
+        end,
+      })
+
+      -- Respect Pi's opt-out
+      if vim.env.PI_PROGRAM_STATUS == "0" then
+        return
+      end
+
+      -- tmux can't answer Pi's OSC 7501 probe. Send reports via DCS passthrough instead.
+      -- TODO: A project mise.toml that sets NODE_OPTIONS  can overwrite this
+      -- value during shell startup, dropping the preload and preventing status forwarding.
+      local node_options = vim.env.NODE_OPTIONS or ""
+      local preload = vim.fn.expand("~/.pi/agent/osc7501-tmux.cjs")
+      return U.extend_tbl(opts, {
+        cli = {
+          tools = {
+            pi = {
+              env = {
+                PI_PROGRAM_STATUS = "1",
+                PI_OSC7501_ORIGINAL_NODE_OPTIONS = node_options,
+                NODE_OPTIONS = vim.trim(node_options .. " --require=" .. vim.json.encode(preload)),
+              },
+            },
+          },
+        },
+      })
+    end,
   },
 
   {
