@@ -45,7 +45,10 @@ if vim.g.user_is_asahi and vim.g.user_is_kitty and not vim.g.user_is_tmux and no
 end
 -- using karabiner for neovide
 vim.g.user_distinguish_ctrl_i_tab = vim.g.user_is_kitty or vim.g.user_is_wezterm or vim.g.neovide
-vim.g.user_transparent_background = vim.g.user_is_wezterm or vim.g.user_is_kitty or vim.g.user_is_ghostty
+vim.g.user_transparent_background = vim.g.user_is_wezterm
+  or vim.g.user_is_kitty
+  or vim.g.user_is_ghostty
+  or vim.g.user_is_herdr_app
 -- TODO: Snacks.explorer
 vim.g.user_explorer_width = math.max(35, math.min(50, math.floor(vim.o.columns * 0.25)))
 -- holding layout like no-neck-pain.nvim

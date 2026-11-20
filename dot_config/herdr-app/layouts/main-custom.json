@@ -104,7 +104,7 @@
                     "height": 30,
                     "position": "top"
                   },
-                  "background": "background",
+                  "background": "#00000033",
                   "border": {
                     "width": 1,
                     "color": "border"
@@ -170,11 +170,15 @@
       "resizable": false
     }
   ],
-  "background": "canvas",
+  "background": {
+    "image": "backgrounds/wall2.png",
+    "fit": "cover"
+  },
   "terminal_padding": [
     14,
     12
   ],
+  "terminal_opacity": 0.55,
   "divider": {
     "width": 1,
     "color": "border"
