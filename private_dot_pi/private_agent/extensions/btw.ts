@@ -389,7 +389,7 @@ export default function (pi: ExtensionAPI) {
 		return model ? `${model.provider}/${model.id}` : "none";
 	}
 
-	function renderMarkdownLines(text: string, width: number): string[] {
+	function renderMarkdownLines(text: string, width: number): readonly string[] {
 		if (!text) return [];
 		try {
 			const md = new Markdown(text, 0, 0, mdTheme);

@@ -25,7 +25,11 @@ search its entry/source directories explicitly, including ignored installed file
 rg -n --no-ignore '<changed-api>' <resolved-package-entry-or-source-directory>
 ```
 
-A normal repository search can miss every consumer below `node_modules`.
+A normal repository search can miss every consumer below `node_modules`. Also resolve
+path-valued `extensions` and `packages` in settings. A path under the owning lazy
+checkout may load source directly rather than through npm; check each such path
+with `git diff <installed>..<target> -- <relative-path>` in the source cache and
+review its host imports even if the file itself is unchanged.
 
 When upstream adds persisted settings state, include the repository's Git clean
 filter as a config surface:
@@ -62,7 +66,11 @@ Inspect exact-range diffs covering:
 - TUI terminal-color helpers, theme APIs and palettes, fullscreen input/scrolling,
   cursor lifecycle, footer rendering, and virtual-model routing. When renderer
   contexts gain host-bound helpers, locate imported equivalents such as `keyHint`;
-  extension-local package copies may not share host state.
+  extension-local package copies may not share host state. For cached render
+  output, search `rg -n 'super\.render\(|\.prototype\.render|render: .*string\[\]|cachedLines'`
+  in local and resolved third-party sources. Propagate readonly types for
+  pass-through consumers; copy before mutation. Trace the concrete base class:
+  a fresh `Editor.render()` result is not the same contract as `Container.render()`.
 - New UI status APIs: inspect every matching `ctx.ui.custom()` use and distinguish
   user decisions from loaders or viewers. For `blocked`, questions can use
   `kind: "question"`; loaders remain working and built-in dialogs report their own

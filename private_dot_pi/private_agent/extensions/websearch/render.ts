@@ -95,7 +95,7 @@ const PREVIEW_LINES = 5;
 export class WebsearchResultRenderComponent extends Container {
   state = {
     cachedWidth: undefined as number | undefined,
-    cachedLines: undefined as string[] | undefined,
+    cachedLines: undefined as readonly string[] | undefined,
     cachedSkipped: undefined as number | undefined,
   };
 }
