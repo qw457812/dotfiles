@@ -217,5 +217,4 @@ return {
   -- TODO: breaking changes
   -- `textobjects.scm` query files with `nvim-treesitter/nvim-treesitter-textobjects`
   { "chrisgrieser/nvim-various-textobjs", optional = true, commit = "bf2133a" },
-
 }
