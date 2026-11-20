@@ -5,5 +5,5 @@
 {{ else if eq .chezmoi.os "darwin" }}
 {{ .chezmoi.sourceDir }}/symlinks/nvim/macos/mason-lock.json
 {{ else }}
-{{ .chezmoi.sourceDir }}/symlinks/nvim/mason-lock.json
+{{ fail (printf "unsupported os: %s" .chezmoi.os) }}
 {{ end }}
