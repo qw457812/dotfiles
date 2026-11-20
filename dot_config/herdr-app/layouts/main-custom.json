@@ -155,7 +155,7 @@
           ],
           "padding": 8,
           "gap": 8,
-          "background": "#0b102480"
+          "background": "chrome"
         },
         {
           "id": "status",
@@ -176,7 +176,7 @@
     "fit": "cover"
   },
   "colors": {
-    "chrome": "#0b102480"
+    "chrome": "#0b1024bf"
   },
   "terminal_padding": [
     14,
