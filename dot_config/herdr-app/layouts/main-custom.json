@@ -6,6 +6,14 @@
   },
   "type": "row",
   "terminal_menu": "paste-menu",
+  "floating": [
+    {
+      "id": "pane-nav-float",
+      "content": {
+        "mod": "pane-nav"
+      }
+    }
+  ],
   "children": [
     {
       "id": "sidebar",

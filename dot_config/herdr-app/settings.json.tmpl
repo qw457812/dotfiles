@@ -9,6 +9,6 @@
   "terminal_scroll_speed": 1,
   "minimum_contrast": 1,
   "option_as_alt": "on",
-  "font": "Maple Mono NF CN",
-  "font_size": 12
+  "font": "{{ if eq .chezmoi.os "linux" }}Maple Mono Normal NF CN{{ else }}Maple Mono NF CN{{ end }}",
+  "font_size": {{ if eq .chezmoi.os "linux" }}16{{ else }}12{{ end }}
 }

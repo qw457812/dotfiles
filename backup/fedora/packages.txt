@@ -209,6 +209,7 @@ kmail
 kmenuedit
 kmines
 kmouth
+kmscon
 kolourpaint
 konsole
 kontact
@@ -311,7 +312,6 @@ plasma-nm-openconnect
 plasma-nm-openswan
 plasma-nm-openvpn
 plasma-nm-pptp
-plasma-nm-vpnc
 plasma-pa
 plasma-print-manager
 plasma-setup

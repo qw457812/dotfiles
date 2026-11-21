@@ -4,7 +4,6 @@ copr:copr.fedorainfracloud.org:dejan:lazygit                     Copr repo for l
 copr:copr.fedorainfracloud.org:group_asahi:fedora-remix-branding Copr repo for fedora-remix-branding owned by @asahi
 copr:copr.fedorainfracloud.org:group_asahi:fedora-remix-scripts  Copr repo for fedora-remix-scripts owned by @asahi
 copr:copr.fedorainfracloud.org:group_asahi:kernel                Copr repo for kernel owned by @asahi
-copr:copr.fedorainfracloud.org:group_asahi:mesa                  Copr repo for mesa owned by @asahi
 copr:copr.fedorainfracloud.org:group_asahi:steam                 Copr repo for steam owned by @asahi
 copr:copr.fedorainfracloud.org:group_asahi:u-boot                Copr repo for u-boot owned by @asahi
 copr:copr.fedorainfracloud.org:jdxcode:mise                      Copr repo for mise owned by jdxcode
@@ -12,7 +11,7 @@ copr:copr.fedorainfracloud.org:jhuang6451:nerd-fonts             Copr repo for n
 copr:copr.fedorainfracloud.org:lihaohong:yazi                    Copr repo for yazi owned by lihaohong
 copr:copr.fedorainfracloud.org:scottames:ghostty                 Copr repo for ghostty owned by scottames
 copr:copr.fedorainfracloud.org:zhullyb:v2rayA                    Copr repo for v2rayA owned by zhullyb
-fedora                                                           Fedora 44 - aarch64
+fedora                                                           Fedora 45 - aarch64
 fedora-asahi-remix-hotfixes                                      Fedora Asahi Remix Hotfixes
-fedora-cisco-openh264                                            Fedora 44 openh264 (From Cisco) - aarch64
-updates                                                          Fedora 44 - aarch64 - Updates
+fedora-cisco-openh264                                            Fedora 45 openh264 (From Cisco) - aarch64
+updates                                                          Fedora 45 - aarch64 - Updates
