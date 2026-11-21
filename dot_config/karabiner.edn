@@ -68,7 +68,7 @@
              ;; problem: can switch to Finder.app's closed window
              ; :prev_app                {:shell "/opt/homebrew/bin/yabai -m window --focus recent || open -g hammerspoon://cmd_tab"}
              :prev_app                {:shell "open -g hammerspoon://prev_app"}
-             :open-default-terminal   {:shell "open \"/Applications/Rex Beta.app\""} ; kitty.app, WezTerm.app, Rex Beta.app, Herdr.app
+             :open-default-terminal   {:shell "open \"/Applications/Herdr.app\""} ; kitty.app, WezTerm.app, Rex Beta.app, Herdr.app
              :open-default-browser    {:shell "open \"/Applications/Glide.app\""} ; Brave Browser.app, Helium.app, Glide.app, Google Chrome.app
              :home_dir                [{:key  :grave_accent_and_tilde
                                         :modi [:left_shift]
@@ -1473,8 +1473,8 @@
            ;; [:!Qk [:open "/Applications/WezTerm.app"] :default-terminal]
            ;; [:!Ql [:open "/Applications/Visual Studio Code.app"] :!VSCode]
            ;; [:!Ql :same_wind_app :VSCode]
-           [:!Ql [:open "/Applications/Ghostty.app"] :!Ghostty]
-           [:!Ql :same_wind_app :Ghostty]
+           [:!Ql [:open "/Applications/Rex Beta.app"] :!Rex]
+           [:!Ql :same_wind_app :Rex]
            [:!Qsemicolon "/opt/homebrew/bin/yabai -m window --focus $(/opt/homebrew/bin/yabai -m query --windows | /opt/homebrew/bin/jq -e \"map(select(.app==\\\"RuijieWorkSpaceDesktop\\\")) | .[0] | .id\") > /dev/null 2>&1 || open /Applications/RuijieWorkSpace.app" :!RuijieWorkSpace]
            [:!Qsemicolon [:open "/Applications/RuijieWorkSpace.app"] :RuijieWorkSpace]
            ; [:!Qf [:open "/System/Library/CoreServices/Finder.app"] :!Finder]
@@ -1932,8 +1932,8 @@
            ;; [:!Wk [:left_command [:open "/Applications/WezTerm.app"]] :default-terminal]
            ;; [:!Wl [:left_command [:open "/Applications/Visual Studio Code.app"]] :!VSCode]
            ;; [:!Wl :same_wind_app :VSCode]
-           [:!Wl [:left_command [:open "/Applications/Ghostty.app"]] :!Ghostty]
-           [:!Wl :same_wind_app :Ghostty]
+           [:!Wl [:left_command [:open "/Applications/Rex Beta.app"]] :!Rex]
+           [:!Wl :same_wind_app :Rex]
            [:!Wsemicolon [:left_command "/opt/homebrew/bin/yabai -m window --focus $(/opt/homebrew/bin/yabai -m query --windows | /opt/homebrew/bin/jq -e \"map(select(.app==\\\"RuijieWorkSpaceDesktop\\\")) | .[0] | .id\") > /dev/null 2>&1 || open /Applications/RuijieWorkSpace.app"] :!RuijieWorkSpace]
            [:!Wsemicolon [:left_command [:open "/Applications/RuijieWorkSpace.app"]] :RuijieWorkSpace]
            ; [:!Wquote [:open "/Applications/SwitchHosts.app"]]
@@ -2326,7 +2326,7 @@
   :tmux-autostart-terminals
   ["^org\\.alacritty$" "^com\\.github\\.wez\\.wezterm$" "^net\\.kovidgoyal\\.kitty$"
    "^com\\.mitchellh\\.ghostty$" "^com\\.superlogical\\.rex$" "^dev\\.herdr\\.app$"]
-  :default-terminal ["^com\\.superlogical\\.rex$"]
+  :default-terminal ["^dev\\.herdr\\.app$"]
   :default-browser  ["^app\\.glide-browser\\.glide$"]
   :Terminals        ["^com\\.apple\\.Terminal$"
                      "^com\\.googlecode\\.iterm2$"
