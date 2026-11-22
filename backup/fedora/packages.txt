@@ -117,6 +117,8 @@ ghostty
 git
 git-credential-libsecret
 git-delta
+git-lfs
+glab
 glibc
 glibc-all-langpacks
 gnupg2
@@ -124,6 +126,7 @@ gnupg2-g13
 gnupg2-scdaemon
 gnupg2-utils
 gnupg2-wks
+golang
 grub2-efi-aa64
 grub2-efi-aa64-modules
 grubby
@@ -135,6 +138,7 @@ gstreamer1-plugins-good
 gstreamer1-plugins-ugly-free
 gtk2-immodule-xim
 gtk3-immodule-xim
+gum
 gutenprint
 gutenprint-cups
 gwenview
@@ -288,6 +292,7 @@ PackageKit-gstreamer-plugin
 pam-kwallet
 paps
 parted
+pass
 passwdqc
 pciutils
 phonon-qt6-backend-vlc
@@ -393,6 +398,7 @@ update-m1n1
 usb_modeswitch
 usbutils
 util-linux
+uv
 v2ray
 v2raya
 vim-minimal

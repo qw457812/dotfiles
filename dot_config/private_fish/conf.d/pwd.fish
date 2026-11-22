@@ -2,7 +2,7 @@ if not status is-interactive
     exit
 end
 
-if not type -q gum; or not type -q hub; or not type -q devmoji
+if not type -q gum; or not type -q devmoji
     exit
 end
 
@@ -30,14 +30,14 @@ function auto_pwd --on-variable PWD
 
         # recent commits
         echo -e "## Recent Activity\n" | gum format >>$tmp
-        hub l -10 \
+        git l -10 \
             --since='1 week ago' \
             | devmoji --log --color \
             | sed 's/^/  /' >>$tmp
 
         # local changes
         echo -e "## Status\n" | gum format >>$tmp
-        hub -c color.ui=always status --short --branch | sed 's/^/  /' >>$tmp
+        git -c color.ui=always status --short --branch | sed 's/^/  /' >>$tmp
 
         cat $tmp
         rm -f $tmp

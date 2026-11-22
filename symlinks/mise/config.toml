@@ -1,6 +1,9 @@
 [tools]
+bun = "latest"
+himalaya = "latest"
 java = "latest"
 node = "lts"
+pnpm = "latest"
 python = "latest"
 scala = "latest"
 

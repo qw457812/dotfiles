@@ -25,6 +25,9 @@ return {
   },
   { "LazyVim/starter", name = "LazyVim-starter", lazy = true, config = function() end },
 
+  -- zhhmn/fcitx5-table
+  { "zhhmn/huma-rime", lazy = true, config = function() end },
+
   -- -- dummy import
   -- {
   --   import = "foobar",

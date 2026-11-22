@@ -1,3 +1,7 @@
+if set -q TERMUX_VERSION
+    set -gx MISE_DISABLE_TOOLS java,scala,python,node,pnpm,bun
+end
+
 if not type -q mise
     return
 end

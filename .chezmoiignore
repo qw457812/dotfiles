@@ -14,9 +14,9 @@ AGENTS.local.md
 .pi/agent/extensions/prompt-editor/pi-vim.generated.ts
 
 {{ if ne .chezmoi.os "darwin" }}
-.gnupg/gpg-agent.conf
 Library/
 .hammerspoon/
+.colima/
 .macos
 .Brewfile
 .yabairc
@@ -51,13 +51,18 @@ Library/
 .ideavimrc
 .jetbrains/
 .qutebrowser/
+.gnupg/gpg-agent.conf
 .config/glide/
 .config/alacritty/
 .config/kitty/
 .config/wezterm/
 .config/ghostty/
+.config/rex/
+.config/herdr-app/
 .config/neovide/
 .config/zathura/
+.config/kanata/
+.config/wall*.png
 .local/bin/vscode-tmux
 .local/bin/vscode-tmux-aider
 {{ end }}
