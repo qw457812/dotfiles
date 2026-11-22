@@ -137,6 +137,71 @@ return {
         })
       end
 
+      if vim.g.user_is_asahi and vim.fn.executable("clash-meta") == 1 then
+        vim.api.nvim_create_autocmd("BufWritePost", {
+          pattern = "*/dot_config/mihomo/encrypted_private_config.yaml.tmpl.age",
+          callback = U.debounce_wrap(500, function()
+            -- The Fedora unit runs `clash-meta -f /etc/clash-meta/config.yaml -d /var/lib/clash-meta`, and that
+            -- `-f` path is a manual `sudo ln -sf ~/.config/mihomo/config.yaml /etc/clash-meta/config.yaml`
+            local config = vim
+              .system({
+                "chezmoi",
+                "cat",
+                vim.fn.expand("~/.config/mihomo/config.yaml") --[[@as string]],
+              }, { text = true })
+              :wait()
+            if config.code ~= 0 or not config.stdout or config.stdout == "" then
+              LazyVim.error("Failed to render the Mihomo config", { title = "Mihomo" })
+              return
+            end
+
+            local check = vim
+              .system({
+                "clash-meta",
+                "-t",
+                "-f",
+                "/dev/stdin",
+                "-d",
+                "/var/lib/clash-meta",
+              }, { stdin = config.stdout, text = true })
+              :wait()
+            if check.code ~= 0 then
+              LazyVim.error(("Invalid Mihomo config:\n%s"):format(check.stdout), { title = "Mihomo" })
+              return
+            end
+
+            local reload = vim
+              .system({
+                "curl",
+                "--noproxy",
+                "*",
+                "--silent",
+                "--show-error",
+                "--fail",
+                "--max-time",
+                "10",
+                "--output",
+                "/dev/null",
+                "--write-out",
+                "%{http_code}",
+                "-X",
+                "PUT",
+                "-H",
+                "Content-Type: application/json",
+                "--data-binary",
+                "@-",
+                "http://127.0.0.1:9090/configs?force=true",
+              }, { stdin = vim.json.encode({ payload = config.stdout }), text = true })
+              :wait()
+            if reload.code == 0 and reload.stdout == "204" then
+              LazyVim.info("Mihomo config reloaded", { title = "Mihomo" })
+            else
+              LazyVim.error("Failed to reload Mihomo", { title = "Mihomo" })
+            end
+          end),
+        })
+      end
+
       -- -- fix `vim: true` in ~/.aider.conf.yml
       -- vim.api.nvim_create_autocmd("BufReadPre", {
       --   pattern = { ".aider.conf.yml", "dot_aider.conf.yml" },
