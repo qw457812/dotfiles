@@ -40,6 +40,12 @@
 
 - Fish config lives under `dot_config/private_fish` and `symlinks/fish`.
 
+## Rime
+
+- `private_Library/Rime/` is the single source of truth. It deploys to `~/Library/Rime` on macOS; Fedora (`dot_local/share/fcitx5/rime/`) and Android (`dot_config/trime/`) only mirror shared files through one-line `include` templates. Edit the source, not the mirrors.
+- Frontend-specific files live in their platform dir: `squirrel.custom.yaml` (macOS), `fcitx5.yaml` (Linux), `custom.trime.yaml` (Android).
+- For upstream TigerCode data syncs, read `.agents/skills/sync-tiger/SKILL.md`.
+
 ## Interactive TUI Testing
 
 Test interactive terminal applications in a fresh, fixed-size tmux session with
@@ -66,4 +72,4 @@ tmux -S "$SOCKET" kill-session -t "$SESSION"
 
 ## Commit Guidelines
 
-- Use subsystem/component scopes matching repository history, e.g. `pi/permission-gate`, `nvim/sidekick`.
+- Use subsystem/component scopes matching repository history, e.g. `pi/prompt-editor`, `nvim/sidekick`.
