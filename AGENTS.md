@@ -2,7 +2,7 @@
 
 - Edit chezmoi source paths like `dot_*`, `private_*`, and `symlink_*`, not generated target paths.
 - Repository-only projects such as `packages/` and `dsh-plugins/` are Git-tracked but excluded from chezmoi's target state by `.chezmoiignore`.
-- Successful `write`/`edit` tool calls in the chezmoi source normally trigger `chezmoi apply` automatically via the active Pi extension `private_dot_pi/private_agent/extensions/chezmoi.ts` or dsh plugin `dsh-plugins/dsh-plugin-chezmoi.mjs`. Run manual `chezmoi apply` when needed and scope it to the relevant target paths.
+- `write`/`edit` calls on managed source files trigger `chezmoi apply` for the target via the Pi extension `private_dot_pi/private_agent/extensions/chezmoi.ts` or dsh plugin `dsh-plugins/dsh-plugin-chezmoi.mjs`; managed target edits trigger `chezmoi re-add` as a fallback. `bash` edits need a manual `chezmoi apply` scoped to the relevant target path.
 - `symlinks/` contains source-state files referenced by `symlink_*` templates.
 - Deployment exclusions are listed in `.chezmoiignore`.
 
@@ -11,7 +11,7 @@
 - Pi config lives under `private_dot_pi/private_agent` and `symlinks/pi/agent`.
 - Pi global settings file lives at `symlinks/pi/agent/settings.json`.
 - When working on `private_dot_pi/private_agent/extensions`, the Pi source checkout is available for reference at `~/.local/share/nvim/lazy/pi`.
-- After TypeScript changes under `private_dot_pi/private_agent/extensions`, run `npm --prefix private_dot_pi/private_agent run check` and `npm --prefix private_dot_pi/private_agent run lint` from the chezmoi repository root.
+- After TypeScript changes under `private_dot_pi/private_agent`, run `npm --prefix private_dot_pi/private_agent run check` and `npm --prefix private_dot_pi/private_agent run lint` from the chezmoi repository root.
 
 ## DeepSeek Harness
 
@@ -21,11 +21,6 @@
 - For both direct plugins under `dsh-plugins/` and profile-scoped npm bundles under `packages/`, the dsh source checkout is available for reference at `~/.local/share/nvim/lazy/deepseek-harness`.
 - After changes under `dsh-plugins`, run `pnpm --dir dsh-plugins run check` and `pnpm --dir dsh-plugins run lint` from the chezmoi repository root.
 - Before publishing a bundle under `packages/`, run its `check` script and inspect `npm pack --dry-run` output.
-
-## Herdr
-
-- Herdr app config lives under `dot_config/herdr-app`; read `~/.config/herdr-app/AGENTS.md` before changing layouts, keys, or mods.
-- herdr-core config lives under `dot_config/herdr-core`.
 
 ## Neovim
 
@@ -40,35 +35,20 @@
 
 - Fish config lives under `dot_config/private_fish` and `symlinks/fish`.
 
+## Herdr
+
+- Herdr app config lives under `dot_config/herdr-app`; read `~/.config/herdr-app/AGENTS.md` before changing layouts, keys, or mods.
+- herdr-core config lives under `dot_config/herdr-core`.
+
 ## Rime
 
-- `private_Library/Rime/` is the single source of truth. It deploys to `~/Library/Rime` on macOS; Fedora (`dot_local/share/fcitx5/rime/`) and Android (`dot_config/trime/`) only mirror shared files through one-line `include` templates. Edit the source, not the mirrors.
+- `private_Library/Rime/` holds the shared Rime files and deploys to `~/Library/Rime` on macOS; Fedora (`dot_local/share/fcitx5/rime/`) and Android (`dot_config/trime/`) mirror the shared files through one-line `include` templates.
 - Frontend-specific files live in their platform dir: `squirrel.custom.yaml` (macOS), `fcitx5.yaml` (Linux), `custom.trime.yaml` (Android).
 - For upstream TigerCode data syncs, read `.agents/skills/sync-tiger/SKILL.md`.
 
-## Interactive TUI Testing
+## Interactive Testing with tmux
 
-Test interactive terminal applications in a fresh, fixed-size tmux session with
-a unique socket. Wait after startup and interactions, send literal text separately
-from special keys, inspect captured output, and clean up:
-
-```bash
-TEMP_DIR="${TMPDIR:-/tmp}"
-SOCKET_DIR="${CLAUDE_TMUX_SOCKET_DIR:-$TEMP_DIR/claude-tmux-sockets}"
-SESSION="tui-test-$(date +%s)-$$"
-SOCKET="$SOCKET_DIR/$SESSION.sock"
-TARGET="$SESSION:0.0"
-
-mkdir -p "$SOCKET_DIR"
-tmux -S "$SOCKET" -f /dev/null new-session -d -s "$SESSION" -c "$TEMP_DIR" -x 80 -y 24 'pi --no-session'
-sleep 3
-tmux -S "$SOCKET" capture-pane -p -J -t "$TARGET" -S -200
-tmux -S "$SOCKET" send-keys -t "$TARGET" -l -- '/hotkeys'
-tmux -S "$SOCKET" send-keys -t "$TARGET" Enter
-sleep 1
-tmux -S "$SOCKET" capture-pane -p -J -t "$TARGET" -S -200
-tmux -S "$SOCKET" kill-session -t "$SESSION"
-```
+For interactive TUI tests, follow `.agents/skills/interactive-testing/SKILL.md`.
 
 ## Commit Guidelines
 
