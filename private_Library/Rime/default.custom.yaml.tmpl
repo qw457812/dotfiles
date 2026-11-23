@@ -7,6 +7,10 @@ patch:
     - Control+grave
 
   ascii_composer/switch_key/Shift_L: noop
+  {{- if eq .chezmoi.os "darwin" }}
+  # Karabiner turns a right Command tap into right Control.
   ascii_composer/switch_key/Control_R: commit_code
+  {{- else if eq .chezmoi.os "linux" }}
   ascii_composer/switch_key/Super_R: commit_code
+  {{- end }}
   ascii_composer/switch_key/Shift_R: noop
