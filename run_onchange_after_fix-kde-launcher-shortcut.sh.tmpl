@@ -1,0 +1,65 @@
+{{ if eq .chezmoi.os "linux" -}}
+#!/bin/sh
+set -eu
+
+# KDE binds "Activate Application Launcher" to bare Meta. KWin handles that
+# global shortcut on its own, independently of fcitx, so tapping right Command
+# (Super_R, which Rime uses to switch ascii_mode) would also open the launcher.
+# Keep only Alt+F1.
+
+case ":${XDG_CURRENT_DESKTOP:-}:" in
+  *:KDE:*) ;;
+  *) exit 0 ;;
+esac
+
+if ! command -v gdbus >/dev/null 2>&1; then
+  exit 0
+fi
+
+# Qt key values: Key_Meta (0x01000022) and Alt modifier (0x08000000) plus
+# Key_F1 (0x01000030).
+meta=16777250
+alt_f1=150994992
+
+kglobalaccel() {
+  gdbus call --session --dest org.kde.kglobalaccel --object-path /kglobalaccel "$@"
+}
+
+# plasmashell registers its actions asynchronously after login.
+attempts=0
+while ! kglobalaccel --method org.kde.KGlobalAccel.getComponent plasmashell >/dev/null 2>&1; do
+  attempts=$((attempts + 1))
+  if [ "$attempts" -ge 100 ]; then
+    echo 'KGlobalAccel did not register plasmashell' >&2
+    exit 1
+  fi
+  sleep 0.1
+done
+
+while :; do
+  names=$(gdbus call --session --dest org.kde.kglobalaccel \
+    --object-path /component/plasmashell \
+    --method org.kde.kglobalaccel.Component.shortcutNames 2>/dev/null || true)
+  case "$names" in
+    *"'activate application launcher'"*) break ;;
+  esac
+  attempts=$((attempts + 1))
+  if [ "$attempts" -ge 200 ]; then
+    echo 'plasmashell did not register the launcher action' >&2
+    exit 1
+  fi
+  sleep 0.1
+done
+
+# Leave a shortcut that is already free of bare Meta alone; only replace the
+# default.
+shortcuts=$(kglobalaccel --method org.kde.KGlobalAccel.getGlobalShortcutsByKey "$meta")
+case "$shortcuts" in
+  *"'activate application launcher'"*) ;;
+  *) exit 0 ;;
+esac
+
+kglobalaccel --method org.kde.KGlobalAccel.setForeignShortcut \
+  "['plasmashell', 'activate application launcher', 'plasmashell', 'Activate Application Launcher']" \
+  "[$alt_f1]" >/dev/null
+{{ end -}}
