@@ -1,5 +1,13 @@
+# Fcitx 5 global settings.
+# Super_R is handled inside Rime (ascii_composer/switch_key in
+# default.custom.yaml), so it must not be a fcitx trigger key.
 [Hotkey]
 EnumerateWithTriggerKeys=False
 
 [Hotkey/TriggerKeys]
-0=Super_R
+
+[Behavior]
+# Rime has to stay active, otherwise Super_R and the vim_mode processor never
+# see a key.
+ActiveByDefault=True
+# resetStateWhenFocusIn=All

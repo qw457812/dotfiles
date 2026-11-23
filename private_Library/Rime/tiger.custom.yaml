@@ -118,6 +118,7 @@ patch:
 
   engine:
     processors:
+      - lua_processor@*vim_mode # fcitx5-rime has no client-side vim_mode like Squirrel; gated by fcitx5.yaml app_options
       - ascii_composer
       - recognizer
       - key_binder

@@ -1,0 +1,24 @@
+# Fcitx5 settings
+# encoding: utf-8
+
+config_version: "0.22"
+
+# Reference: /usr/share/rime-data/fcitx5.yaml
+
+# Per-application session options, applied when fcitx5-rime creates the Rime
+# session for a program (key = the program name fcitx reports).
+# - vim_mode: enables lua/vim_mode.lua (Esc / Ctrl-C / Ctrl-[ -> ascii_mode).
+# - ascii_mode: overrides the schema default for one application, e.g. make
+#   tiger start in Chinese instead of English (`reset: 1` in tiger.custom.yaml).
+app_options:
+  herdr-app:
+    vim_mode: true
+  glide-glide:
+    vim_mode: true
+  ghostty:
+    vim_mode: true
+  kitty:
+    vim_mode: true
+  # # Start in Chinese, e.g. for chat clients:
+  # some-chat-app:
+  #   ascii_mode: false
