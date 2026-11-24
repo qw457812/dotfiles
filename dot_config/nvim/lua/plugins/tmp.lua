@@ -1,6 +1,6 @@
 local orig_java_home = vim.env.JAVA_HOME -- may be set by Mise
 local java_home = vim.g.user_is_termux and "/data/data/com.termux/files/usr/lib/jvm/java-25-openjdk"
-  or vim.fn.expand("$HOME/.local/share/mise/installs/java/25")
+  or vim.fn.expand("$HOME/.local/share/mise/installs/java/zulu-25")
 
 local proxy = {
   http = "http://127.0.0.1:10808",

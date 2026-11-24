@@ -1,7 +1,8 @@
+# see dot_config/private_fish/conf.d/mise.fish for `MISE_DISABLE_TOOLS`, `MISE_LOCKFILE` envs
 [tools]
 bun = "latest"
 himalaya = "latest"
-java = "latest"
+java = "zulu-25"
 node = "lts"
 pnpm = "latest"
 python = "latest"
@@ -12,3 +13,4 @@ idiomatic_version_file_enable_tools = ["python", "node"]
 idiomatic_version_file_disable_files = ["node:package.json"]
 experimental = true
 python.uv_venv_auto = true
+lockfile_platforms = ["macos-arm64", "linux-arm64"]
