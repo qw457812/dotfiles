@@ -388,8 +388,6 @@ brew "poetry"
 brew "poppler"
 # Object-relational database system
 brew "postgresql@14"
-# Framework for managing multi-language pre-commit hooks
-brew "pre-commit"
 # Code formatter for JavaScript, CSS, JSON, GraphQL, Markdown, YAML
 brew "prettier"
 # Modern replacement for ps written in Rust

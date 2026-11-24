@@ -5,6 +5,7 @@ himalaya = "latest"
 java = "zulu-25"
 node = "lts"
 pnpm = "latest"
+pre-commit = "latest"
 python = "latest"
 scala = "latest"
 
