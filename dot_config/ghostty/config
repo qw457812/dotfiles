@@ -47,7 +47,7 @@ right-click-action = paste
 
 # see: `ghostty +list-themes --color=dark`
 theme = TokyoNight Moon
-background-image = ~/.config/wall3.png
+background-image = ~/wallpapers/wall3.png
 background-image-opacity = 0.125
 background-image-fit = cover
 

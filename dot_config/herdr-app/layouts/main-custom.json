@@ -181,7 +181,7 @@
     }
   ],
   "background": {
-    "image": "backgrounds/wall2.png",
+    "image": "backgrounds/beach-shop.png",
     "fit": "cover"
   },
   "colors": {

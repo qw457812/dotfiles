@@ -45,7 +45,7 @@ config.colors = {
   -- https://github.com/folke/tokyonight.nvim/blob/19f39b53ef5e148bf94ea3696df36175af7e31e6/extras/wezterm/tokyonight_night.toml#L3
   background = "#1d1d1f", -- #1a1b26
 }
-config.window_background_image = os.getenv("HOME") .. "/.config/wall.png"
+config.window_background_image = wezterm.home_dir .. "/wallpapers/wall.png"
 config.window_background_image_hsb = {
   brightness = 0.05,
 }

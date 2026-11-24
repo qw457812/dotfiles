@@ -47,6 +47,7 @@ Library/
 .config/trime/
 .pi/agent/bin/himalaya
 {{ else }}
+wallpapers/
 .vrapperrc
 .obsidian.vimrc
 .ideavimrc
@@ -63,7 +64,6 @@ Library/
 .config/neovide/
 .config/zathura/
 .config/kanata/
-.config/wall*.png
 .local/bin/vscode-tmux
 .local/bin/vscode-tmux-aider
 {{ end }}
