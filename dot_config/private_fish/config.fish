@@ -347,8 +347,9 @@ if set -q TERMUX_VERSION
     alias l "$ll_cmd --group-directories-first"
     alias lm "$ll_cmd --sort=modified --classify"
     abbr -a --position anywhere --set-cursor ghh 'git help % | eval $MANPAGER'
+    alias himalaya $HOME/.pi/agent/bin/himalaya
     abbr dl 'cd ~/storage/downloads'
-    abbr rime 'cd ~/storage/shared/Android/rime'
+    abbr rime 'cd ~/storage/shared/trime'
 
     # ==============================================================================
     # AUTO START TMUX ON TERMUX

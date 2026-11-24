@@ -1,0 +1,8 @@
+#!/bin/sh
+# Static musl himalaya needs remote DNS (socks5h) and an explicit CA bundle.
+# MISE_QUIET suppresses unrelated mise warnings on stderr.
+
+MISE_QUIET=1 \
+  ALL_PROXY=socks5h://127.0.0.1:10808 \
+  SSL_CERT_FILE=/data/data/com.termux/files/usr/etc/tls/cert.pem \
+  exec "$HOME/.local/share/mise/shims/himalaya" "$@"

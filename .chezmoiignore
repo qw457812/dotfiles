@@ -43,8 +43,9 @@ Library/
 {{ end }}
 
 {{ if ne .chezmoi.os "android" }}
-.config/trime/
 .termux/
+.config/trime/
+.pi/agent/bin/himalaya
 {{ else }}
 .vrapperrc
 .obsidian.vimrc
