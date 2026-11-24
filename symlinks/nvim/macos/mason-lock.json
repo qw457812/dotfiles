@@ -41,6 +41,7 @@
   "tree-sitter-cli": "v0.27.2",
   "ts_query_ls": "v3.16.0",
   "tsc": "7.0.2",
+  "ty": "0.0.107",
   "vscode-spring-boot-tools": "2.2.0",
   "vtsls": "0.3.0",
   "vue-language-server": "3.3.14",

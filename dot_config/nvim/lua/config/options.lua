@@ -94,8 +94,8 @@ vim.g.deprecation_warnings = true
 vim.g.trouble_lualine = false
 vim.g.lazyvim_blink_main = true
 vim.g.ai_cmp = vim.lsp.inline_completion == nil -- for extras.ai.copilot-native and extras.ai.copilot-lsp
--- failed to install basedpyright on termux via mason
-vim.g.lazyvim_python_lsp = not vim.g.user_is_termux and "basedpyright" or vim.g.lazyvim_python_lsp
+-- vim.g.lazyvim_python_lsp = not vim.g.user_is_termux and "basedpyright" or vim.g.lazyvim_python_lsp -- failed to install basedpyright on termux via mason
+vim.g.lazyvim_python_lsp = "ty"
 vim.g.lazyvim_ts_lsp = not vim.g.user_is_termux and "tsc" or vim.g.lazyvim_ts_lsp
 -- vim.env.FZF_DEFAULT_OPTS = "" -- better coop with fzf-lua
 
