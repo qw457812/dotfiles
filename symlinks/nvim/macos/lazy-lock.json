@@ -49,7 +49,7 @@
   "explainer": { "branch": "main", "commit": "98935b002a16f64eccb6a060d726e16567913ff5" },
   "flash.nvim": { "branch": "main", "commit": "5f0f270fdc7c5b0c21d903ee85b9cb06f2ac636a" },
   "flatten.nvim": { "branch": "main", "commit": "d92ca41e9c330f45c1b854a80c89c8488a9d730c" },
-  "folke-dot": { "branch": "master", "commit": "10526a848771bab9e9fbb98b5995c997f7ef92b6" },
+  "folke-dot": { "branch": "master", "commit": "e3e971362149aa013b1498e6fdcd775138c7eab5" },
   "friendly-snippets": { "branch": "main", "commit": "7a1c9f7897a4eb078b157a04c7af81e5869215b1" },
   "gitsigns.nvim": { "branch": "main", "commit": "1ce96a464fdbc24208e24c117e2021794259005d" },
   "google-10000-english": { "branch": "master", "commit": "d0736d492489198e4f9d650c7ab4143bc14c1e9e" },
