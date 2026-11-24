@@ -94,7 +94,7 @@ mosh
 nano
 ncdu
 ncurses
-neovim
+neovim-nightly
 net-tools
 ninja
 nnn
@@ -147,6 +147,7 @@ termux-x11-nightly
 translate-shell
 tree
 tsu
+ty
 unar
 unbound
 unzip

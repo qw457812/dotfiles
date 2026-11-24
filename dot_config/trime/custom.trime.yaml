@@ -877,12 +877,12 @@ preset_keys:
   VOLUME_UP: {label: 音量+, send: VOLUME_UP}
   VOLUME_MUTE: {label: 靜音, send: VOLUME_MUTE}
   # 編輯
-  Shift_L: {label: Shift, send: Shift_L, shift_lock: ascii_long}
+  Shift_L: {label: '⇧', send: Shift_L, shift_lock: ascii_long} # ⬆
   Return: {label: enter_labels, send: Return}
   Return1: {label: Enter, send: Return }
   Return2: {label: 回车, send: Return }
   Hide: {label: 隱藏, send: BACK}
-  BackSpace: {label: 退格, repeatable: true, send: BackSpace}
+  BackSpace: {label: '⌫', repeatable: true, send: BackSpace}
   space: {repeatable: false, functional: false, send: space}
   space1: {label: 空格, repeatable: false, functional: false, send: space}
   Escape: {label: Esc, send: Escape}
@@ -892,6 +892,7 @@ preset_keys:
   Vim_l: {label: l, send: l, repeatable: true}
   Control_L: {label: Ctrl, send: Control_L}
   Alt_L: {label: Alt, send: Alt_L}
+  Tab: {label: '↹', send: Tab}
   tmux: {label: C-b, send: Control+b}
   Alt_space: {label: 'A-␣', send: Alt+space} # ~/.pi/agent/pi-voice.json
   Sel_2: {label: 次选, send: '2'}

@@ -32,7 +32,8 @@ return {
       servers = {
         oxlint = {
           settings = {
-            typeAware = true,
+            -- The oxlint-tsgolint npm package does not ship an Android backend.
+            typeAware = not vim.g.user_is_termux and true or nil,
             unusedDisableDirectives = "warn",
           },
         },

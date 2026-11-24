@@ -2,8 +2,6 @@ if not LazyVim.has_extra("lang.python") then
   return {}
 end
 
--- TODO: https://github.com/astral-sh/ty
-
 -- local ruff = vim.g.lazyvim_python_ruff or "ruff"
 local has_black = LazyVim.has_extra("formatting.black")
 
@@ -23,6 +21,9 @@ return {
     "neovim/nvim-lspconfig",
     opts = {
       servers = {
+        ty = {
+          mason = not vim.g.user_is_termux and nil, -- run `pkg install ty` on termux
+        },
         -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#basedpyright
         -- https://docs.basedpyright.com/#/settings
         -- https://docs.basedpyright.com/#/configuration
