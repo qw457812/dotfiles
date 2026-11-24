@@ -16,9 +16,8 @@ return {
         ---@type table<string, lazyvim.lsp.Config|boolean>
         servers = {
           fish_lsp = {
-            -- failed to install on termux
             -- ksb_pastebuf of kitty-scrollback.nvim
-            enabled = not (vim.g.user_is_termux or vim.g.terminal_scrollback_pager),
+            enabled = not vim.g.terminal_scrollback_pager,
             cmd_env = {
               -- HACK: prevent `bob update --all` from failing with: `Error: Neovim is currently running. Please close it before updating.`
               -- see: https://github.com/ndonfris/fish-lsp/blob/1be77fcfa37d9d3877994f14163c7faacf7a533e/fish_files/get-documentation.fish
@@ -46,17 +45,14 @@ return {
       } --[[@as PluginLspOpts]])
     end,
   },
-  -- {
-  --   "stevearc/conform.nvim",
-  --   optional = true,
-  --   opts = function(_, opts)
-  --     if vim.g.user_is_termux then
-  --       return
-  --     end
-  --     opts.formatters_by_ft = opts.formatters_by_ft or {}
-  --     opts.formatters_by_ft.fish = nil -- using fish-lsp
-  --   end,
-  -- },
+  {
+    "stevearc/conform.nvim",
+    optional = true,
+    opts = function(_, opts)
+      opts.formatters_by_ft = opts.formatters_by_ft or {}
+      opts.formatters_by_ft.fish = nil -- using fish-lsp
+    end,
+  },
 
   -- zsh
   {

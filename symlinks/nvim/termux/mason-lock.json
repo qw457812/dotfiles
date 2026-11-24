@@ -5,6 +5,7 @@
   "debugpy": "1.8.22",
   "dockerfile-language-server": "0.15.0",
   "eslint-lsp": "4.10.0",
+  "fish-lsp": "1.1.5",
   "hadolint": "v2.15.1",
   "java-debug-adapter": "0.59.0",
   "java-test": "0.47.0",
