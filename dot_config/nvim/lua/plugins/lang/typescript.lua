@@ -25,4 +25,18 @@ return {
       end
     end,
   },
+
+  {
+    "neovim/nvim-lspconfig",
+    opts = {
+      servers = {
+        oxlint = {
+          settings = {
+            typeAware = true,
+            unusedDisableDirectives = "warn",
+          },
+        },
+      },
+    },
+  },
 }
