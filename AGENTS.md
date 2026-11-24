@@ -4,7 +4,6 @@
 - Repository-only projects such as `packages/` and `dsh-plugins/` are Git-tracked but excluded from chezmoi's target state by `.chezmoiignore`.
 - `write`/`edit` calls on managed source files trigger `chezmoi apply` for the target via the Pi extension `private_dot_pi/private_agent/extensions/chezmoi.ts` or dsh plugin `dsh-plugins/dsh-plugin-chezmoi.mjs`; managed target edits trigger `chezmoi re-add` as a fallback. `bash` edits need a manual `chezmoi apply` scoped to the relevant target path.
 - `symlinks/` contains source-state files referenced by `symlink_*` templates.
-- Deployment exclusions are listed in `.chezmoiignore`.
 
 ## Pi
 
@@ -37,8 +36,7 @@
 
 ## Herdr
 
-- Herdr app config lives under `dot_config/herdr-app`; read `~/.config/herdr-app/AGENTS.md` before changing layouts, keys, or mods.
-- herdr-core config lives under `dot_config/herdr-core`.
+- Herdr config lives under `dot_config/herdr-app` and `dot_config/herdr-core`; read `~/.config/herdr-app/AGENTS.md` before changing anything there.
 
 ## Rime
 

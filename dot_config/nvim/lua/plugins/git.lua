@@ -499,7 +499,9 @@ return {
           --   os = {
           --     -- ref: https://github.com/jesseduffield/lazygit/blob/e6bd9d0ae6dd30d04dfe77d2cac15ac54fa18ff6/pkg/config/editor_presets.go#L60
           --     edit = vim.o.shell:find("fish")
-          --         and 'begin; if test -z "$NVIM"; nvim -- {{filename}}; else; nvim --server "$NVIM" --remote-send "q"; and nvim --server "$NVIM" --remote {{filename}}; end; end'
+          --         and ('begin; set -l nvim_bin %s; if test -z "$NVIM"; $nvim_bin -- {{filename}}; else; $nvim_bin --server "$NVIM" --remote-send "q"; and $nvim_bin --server "$NVIM" --remote {{filename}}; end; end'):format(
+          --           vim.fn.shellescape(vim.v.progpath)
+          --         )
           --       or nil,
           --   },
           -- },

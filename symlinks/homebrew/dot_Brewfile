@@ -9,6 +9,7 @@ tap "homebrew-zathura/zathura"
 tap "j178/tap"
 tap "jstkdng/programs"
 tap "julien-cpsn/atac"
+tap "lightpanda-io/browser"
 tap "localsend/localsend"
 tap "manaflow-ai/cmux"
 tap "nikitabobko/tap"
@@ -521,6 +522,8 @@ brew "zlib"
 brew "zoxide"
 # Better and friendly vi(vim) mode plugin for ZSH
 brew "zsh-vi-mode", pin: true
+# Headless browser for AI agents and automation
+brew "lightpanda-io/browser/lightpanda", trusted: true
 # Lightning-fast macOS screenshots & AI vision analysis
 brew "openclaw/tap/peekaboo", trusted: true
 cask "nikitabobko/tap/aerospace"
@@ -532,7 +535,7 @@ cask "alt-tab"
 cask "android-platform-tools"
 # Display management tool
 cask "betterdisplay"
-# Desktop password and login vault
+# Open source desktop password manager with encrypted vault and autofilling
 cask "bitwarden"
 # Web browser focusing on privacy
 cask "brave-browser"
