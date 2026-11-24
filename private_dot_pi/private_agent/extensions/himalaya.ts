@@ -4,15 +4,26 @@ import {
   type ExtensionUIContext,
 } from "@earendil-works/pi-coding-agent";
 import { spawn } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import { homedir } from "node:os";
 import { join } from "node:path";
 
-const HOME = process.env.HOME ?? "/data/data/com.termux/files/home";
 const IS_TERMUX = Boolean(process.env.TERMUX_VERSION);
+const HOME = homedir();
 const PASS_STORE = process.env.PASSWORD_STORE_DIR || join(HOME, ".password-store");
+
+// The `pass show <entry>` a configured secret command runs.
+const PASS_SHOW_RE = /\bpass[\s"',]+show[\s"',]+([^\s"'`,;|&$)]+)/g;
+
+export function passEntries(text: string): string[] {
+  const uncommented = text.replace(/(^|\s)#.*$/gm, "$1");
+  return [...uncommented.matchAll(PASS_SHOW_RE)].map((match) => match[1]);
+}
 
 // Config is authoritative: pass entries may be named anything.
 function discoverEntries(): string[] {
+  // TODO: himalaya master ignores HIMALAYA_CONFIG and deep-merges every default
+  // path; scan env paths plus XDG, ~/.config and ~/.himalayarc instead.
   const configured = process.env.HIMALAYA_CONFIG?.split(":").filter(Boolean) ?? [];
   const files = configured.length
     ? configured
@@ -29,10 +40,10 @@ function discoverEntries(): string[] {
     } catch {
       continue;
     }
-    const arrayRe = /(?:passwd|password)\.command\s*=\s*\[\s*"pass"\s*,\s*"show"\s*,\s*"([^"]+)"/g;
-    for (const match of text.matchAll(arrayRe)) entries.add(match[1]);
-    const stringRe = /(?:passwd|password)\.command\s*=\s*"pass\s+show\s+([^"\s]+)"/g;
-    for (const match of text.matchAll(stringRe)) entries.add(match[1]);
+    for (const entry of passEntries(text)) {
+      // Skip flags and stale names the loose match can catch.
+      if (existsSync(join(PASS_STORE, `${entry}.gpg`))) entries.add(entry);
+    }
   }
   return [...entries].sort();
 }
