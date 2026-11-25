@@ -126,6 +126,22 @@ return {
         emmylua_ls = {
           enabled = vim.g.user_lua_lsp == "emmylua_ls",
           mason = not vim.g.user_is_termux and nil, -- run `pkg install emmylua-ls` on termux
+          root_dir = function(bufnr, on_dir)
+            local home = vim.uv.os_homedir()
+            local root = vim.fs.root(bufnr, vim.lsp.config.emmylua_ls.root_markers)
+            -- ~/stylua.toml should not make $HOME an EmmyLua workspace.
+            if root ~= home then
+              on_dir(root)
+              return
+            end
+
+            local dir = vim.fs.dirname(vim.api.nvim_buf_get_name(bufnr))
+            if dir == home then
+              return
+            end
+            local lua_root = vim.fs.root(bufnr, "lua")
+            on_dir(lua_root ~= home and lua_root or dir)
+          end,
           -- If the workspace has its own emmylua_ls/lua_ls config file, defer to it.
           on_init = function(client)
             local workspace = client.workspace_folders and client.workspace_folders[1]
