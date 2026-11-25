@@ -8,7 +8,6 @@
   "showHardwareCursor": true,
   "theme": "system",
   "treeFilterMode": "no-tools",
-  "showCacheMissNotices": true,
   "tuiMode": "regular",
   "sessionShareDestination": "gist",
   "retry": {
@@ -17,6 +16,12 @@
     "provider": {
       "maxRetries": 1
     }
+  },
+  "notices": {
+    "cacheMisses": true,
+    "cacheWarming": true,
+    "compactionCosts": true,
+    "reasoningDrops": true
   },
   "enabledModels": [
     "openai-codex/gpt-6.2-astra",
