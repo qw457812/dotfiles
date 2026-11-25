@@ -93,6 +93,7 @@ return {
         config = function() end,
       },
       { "vercel-labs/skills", name = "vercel-labs-skills", version = "*", lazy = true, config = function() end },
+      -- TODO: https://github.com/getsentry/skills/blob/main/skills/agents-md/SKILL.md
       {
         "addyosmani/agent-skills",
         name = "addyosmani-agent-skills",
@@ -191,14 +192,14 @@ return {
         lazy = true,
         config = function() end,
       },
-      {
-        "99percentpeople/pi-extensions",
-        name = "99percentpeople-pi-extensions",
-        version = "*",
-        build = "pi update --extension npm:@99percentpeople/pi-codex-api",
-        lazy = true,
-        config = function() end,
-      },
+      -- {
+      --   "99percentpeople/pi-extensions",
+      --   name = "99percentpeople-pi-extensions",
+      --   version = "*",
+      --   build = "pi update --extension npm:@99percentpeople/pi-codex-api",
+      --   lazy = true,
+      --   config = function() end,
+      -- },
       -- alternative:
       -- - https://github.com/trycua/cua
       -- - https://github.com/vercel-labs/agent-desktop

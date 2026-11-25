@@ -54,8 +54,6 @@ const PROMPT_HIDDEN_SKILLS = [
   "source-driven-development",
   // https://github.com/typesafe-ai/skills
   "typesafe-ai",
-  // npm:@99percentpeople/pi-codex-api
-  "gpt-image-prompts",
   // git:github.com/DietrichGebert/ponytail
   "ponytail-audit",
   "ponytail-debt",

@@ -61,6 +61,9 @@
     "~/.local/share/nvim/lazy/humanlayer-skills/plugins/show-me/skills/show-me/SKILL.md",
     "~/.local/share/nvim/lazy/answer-me-with-html/skills/answer-me-with-html/SKILL.md"
   ],
+  "prompts": [
+    "~/.local/share/nvim/lazy/pi/.pi/prompts/deslop.md"
+  ],
   "packages": [
     "npm:pi-vim",
     {
@@ -150,7 +153,6 @@
     "git:github.com/monotykamary/pi-vision-handoff",
     "git:github.com/patlux/pi-commandcode-provider@0137ace",
     "npm:pi-provider-kiro",
-    "npm:@99percentpeople/pi-codex-api",
     "npm:@injaneity/pi-computer-use",
     "git:github.com/qw457812/pi-voice@termux"
   ],

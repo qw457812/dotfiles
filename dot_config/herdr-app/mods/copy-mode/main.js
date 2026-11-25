@@ -7,6 +7,7 @@ const HISTORY_LINES = 50000;
 const SHOW_ATTEMPTS = 30;
 const SHOW_RETRY_MS = 100;
 
+// https://github.com/herdrdev/herdr-core/pull/74
 const SCROLLBACK_SCRIPT = `
 tmpdir=$(mktemp -d) || exit 1
 trap 'rm -rf "$tmpdir"' EXIT
