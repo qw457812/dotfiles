@@ -11,7 +11,7 @@ differs from **target** (lazy's update commit) by reading the
 `git log installed..target` changelog and accounting for any required local
 config changes. Review only the packages named by the caller; with no package
 filter, review all outdated packages. Installation or runtime-config adaptation
-requires an explicit apply request; updating this skill is part of review.
+requires an explicit apply request.
 
 ## Steps
 
@@ -78,19 +78,14 @@ requires an explicit apply request; updating this skill is part of review.
    config edit, or needs a follow-up question to the human. Every matching
    config-surface branch also meets its own completion criterion.
 
-5. **Update this skill when the config-surface map was incomplete.** If step 4
-   missed a package class, owning lazy spec location, build/install hook
-   pattern, or runtime config path you had to discover during the review, edit
-   this skill before reporting. Keep each specialized integration co-located under
-   `surfaces/<name>/`, with its trigger owned by
-   [surfaces/INDEX.md](surfaces/INDEX.md). Replace stale guidance rather than
-   layering it.
-
-   Completion criterion: either step 4 and its disclosed branch covered every
-   discovered surface, or the relevant file now names the new surface and the
-   search command that finds it.
-
 ## Notes
+
+- **Maintain this skill when the review exposes a durable gap.** Fix stale
+  guidance or add a check if it would prevent a likely repeat miss. If the
+  generic search already worked, leave the skill unchanged. Keep one-off
+  findings and version-specific workarounds in the review report. Put any new
+  specialized branch under `surfaces/<name>/` and route it through
+  [surfaces/INDEX.md](surfaces/INDEX.md).
 
 - The script re-dumps lazy.nvim's computed `installed` and `target` commits, but
   never fetches upstream. Those targets come from the on-disk `origin/<branch>`
