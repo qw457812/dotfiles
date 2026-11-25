@@ -1,9 +1,11 @@
 ## Chezmoi
 
+- This repository is used on macOS, Android (Termux), and Fedora Asahi Remix. Check OS-specific template branches when changing shared config.
 - Edit chezmoi source paths like `dot_*`, `private_*`, and `symlink_*`, not generated target paths.
 - Repository-only projects such as `packages/` and `dsh-plugins/` are Git-tracked but excluded from chezmoi's target state by `.chezmoiignore`.
 - `write`/`edit` calls on managed source files trigger `chezmoi apply` for the target via the Pi extension `private_dot_pi/private_agent/extensions/chezmoi.ts` or dsh plugin `dsh-plugins/dsh-plugin-chezmoi.mjs`; managed target edits trigger `chezmoi re-add` as a fallback. `bash` edits need a manual `chezmoi apply` scoped to the relevant target path.
 - `symlinks/` contains source-state files referenced by `symlink_*` templates.
+- When an unmanaged target should be tracked by chezmoi, ask the user for confirmation before adding it.
 
 ## Pi
 
@@ -47,6 +49,12 @@
 ## Interactive Testing with tmux
 
 For interactive TUI tests, follow `.agents/skills/interactive-testing/SKILL.md`.
+
+## Code Quality
+
+- Read files in full before wide-ranging changes, before editing files you have not fully inspected, and when asked to investigate or audit. Do not rely on search snippets for broad changes.
+- Inline single-line helpers that have only one call site.
+- Do not preserve backward compatibility unless the user asks for it.
 
 ## Commit Guidelines
 
