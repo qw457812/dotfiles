@@ -795,11 +795,6 @@
 
   {:des   "d mode (tab navigation)"
    :rules [:d-tab-mode
-           ;; FIXME vscode 中有时不灵, 在rime配置中修改快捷键
-           ;; [:i :left_shift] ; rime 中英切换 | ~/Library/Rime/default.custom.yaml
-
-           [:spacebar :same_wind_app] ; cmd+`
-
            ;; switch tabs in most apps
            [:j :!CSclose_bracket [:!switch-tabs-by-ctrl-tab-app :!tmux-autostart-terminals :!WeWork :!WeChat]] ; Cmd Shift ]
            [:k :!CSopen_bracket [:!switch-tabs-by-ctrl-tab-app :!tmux-autostart-terminals :!WeWork :!WeChat]] ; Cmd Shift [
@@ -830,15 +825,6 @@
            ;; TODO tmux: previous pane
            [:h [:!Tb :h :!Tb :k] :tmux-autostart-terminals] ; tmux: previous pane
            [:l [:!Tb :o] :tmux-autostart-terminals] ; tmux: next pane
-
-           ;; resize window, remap Rectangle.app
-           [:m :!TSOspacebar] ; maximize
-
-           ;; ~/.hammerspoon/init.lua | https://github.com/dbalatero/VimMode.spoon
-
-           ;; Homerow.app
-           [:f :!!f6] ; Clicking (vimium-f)
-           [:s :!!f5] ; Scrolling
            ]}
 
   {:des   "f mode (delete, return, backslash)"
@@ -860,9 +846,6 @@
            [:p :!Sequal_sign] ; +
 
            ;; tool
-           [:q :!!7] ; Snipaste: hide/show all images
-           [:w :!!6] ; Snipaste: paste
-           [:e :!!5] ; Snipaste: snip and copy
            [:s :!!f11] ; Snipaste: snip
            [:d :!!f10] ; raycast://extensions/isfeng/easydict/ocr
            [:a :!!f3] ; raycast://extensions/huzef44/screenocr/recognize-text
@@ -953,26 +936,19 @@
   ;; TODO 可用键位 :!!f14 :!!f15 :!!f18
   {:des   "t mode (toggle setting, information)"
    :rules [:t-mode
-           [:spacebar :!!f16] ; show hidden items for Bartender 4
            [:i :!!close_bracket nil {:delayed {:invoked [:!Ct]} :params {:delay 100}}] ; trigger Benchmark for ClashX
            [:h :!!open_bracket] ; Switch Hosts (Raycast extensions)
            ;; [:j :!!close_bracket] ; open Menu for ClashX
            [:k [:hs ["toggle_aclock"]]] ; show time
            [:l :!!f12] ; itsycal (calendar)
-           [:semicolon :!!f2] ; control center by Bartender 4
            ;; Toggle dark mode (https://github.com/sindresorhus/dark-mode/blob/main/Sources/DarkMode.swift)
            [:d "osascript -e 'tell application \"System Events\" to tell appearance preferences to set dark mode to not dark mode'"]
-           [:w :!!f13] ; wifi by Bartender 4
            ;; [:p :!!f17] ; Toggle System Proxy for ClashX
            [:p [:!!f17 :!!f4]] ; Toggle System Proxy and Enhance Mode for ClashX Pro
            [:g "/opt/homebrew/bin/goku"]
            [:r :!TOgrave_accent_and_tilde] ; rime deploy
            ;; [:y "/opt/homebrew/bin/yabai --restart-service"] ; https://github.com/koekeishiya/yabai/wiki/Tips-and-tricks#quickly-restart-the-yabai-launch-agent
            [:y "/usr/bin/pgrep yabai > /dev/null && /opt/homebrew/bin/yabai --stop-service || /opt/homebrew/bin/yabai --start-service"]
-
-           ;; information
-           [:n :!!f1] ; clock by Bartender 4 (n for notifications)
-           ;; TODO f11 desktop
 
            ;; MonitorControl.app
            [:open_bracket :display_brightness_decrement]
@@ -1052,19 +1028,13 @@
            ]}
 
   ;; jk mk ji df jl kl nk
-  ;; 减少 hjkl 延迟, 注掉
   {:des  "simultaneous keys (jk, mk)"
    :rules [
-           ;; or jj to esc?
            [[:j :k] :escape]
            ;; [[:j :k] :escape nil {:params {:sim 50}}] ; sim 值越大, j 延迟越高
-           ;; [[:k :l] :return_or_enter]
-
-           ;; [[:j :l] :!!spacebar] ; Alfred Hotkey
 
            ;; TODO left-hand mode
            [[:m :k] :!!backslash] ; raycast://extensions/isfeng/easydict/easydict
-           [[:n :k] :!!equal_sign] ; raycast://extensions/raycast/floating-notes/toggle-floating-notes-window
            ]}
 
   ;; or hold cmd+q for a while?
@@ -1121,15 +1091,10 @@
            [:!Qk :open-default-terminal :!default-terminal]
            [:!Qk :same_wind_app :default-terminal] ; not working for kitty
            ;; [:!Qk "/opt/homebrew/bin/yabai -m window --focus $(/opt/homebrew/bin/yabai -m query --windows | /opt/homebrew/bin/jq -e \"map(select(.app==\\\"kitty\\\" and .\\\"has-focus\\\"==false)) | .[0] | .id\") > /dev/null 2>&1" :default-terminal]
-           ;; [:!Qk [:open "/Applications/WezTerm.app"] :default-terminal]
-           ;; [:!Ql [:open "/Applications/Visual Studio Code.app"] :!VSCode]
-           ;; [:!Ql :same_wind_app :VSCode]
            [:!Ql [:open "/Applications/Rex Beta.app"] :!Rex]
            [:!Ql :same_wind_app :Rex]
            [:!Qsemicolon "/opt/homebrew/bin/yabai -m window --focus $(/opt/homebrew/bin/yabai -m query --windows | /opt/homebrew/bin/jq -e \"map(select(.app==\\\"RuijieWorkSpaceDesktop\\\")) | .[0] | .id\") > /dev/null 2>&1 || open /Applications/RuijieWorkSpace.app" :!RuijieWorkSpace]
            [:!Qsemicolon [:open "/Applications/RuijieWorkSpace.app"] :RuijieWorkSpace]
-           ; [:!Qf [:open "/System/Library/CoreServices/Finder.app"] :!Finder]
-           ; [:!Qf :same_wind_app :Finder]
            [:!Qu [:open "/Applications/Neovide.app"]] ; pronounce
            [:!Qi [:open "/Applications/IntelliJ IDEA CE.app"] :!IntelliJ]
            [:!Qi :same_wind_app :IntelliJ]
@@ -1141,7 +1106,7 @@
            ;; [:!Qspacebar [:open "/Applications/KeePassXC.app"]]
            [:!Qspacebar [:open "/Applications/Bitwarden.app"]]
            [:!Qcomma [:open "/System/Applications/System Settings.app"]] ; cmd+, for setting
-           [:!Qperiod [:open "/System/Applications/Apps.app"]] ; 启动台
+           [:!Qperiod [:open "/System/Applications/Apps.app"]]
            [:!Qopen_bracket [:open "/Applications/Hillstone Secure Connect.app"]]
            [:!Qclose_bracket [[:open "/Applications/企业微信.app/Contents/Frameworks/wwmapp.app"] :same_wind_app] :!WeWork-Meeting] ; 企业微信•会议
            [:!Qclose_bracket :same_wind_app :WeWork-Meeting]
@@ -1194,7 +1159,6 @@
 ;; WARN: the order of rules matters, see "space to shift" below
 
 
-  ;; TODO ranger like keybinding for Finder
   {:des   "Finder: navigation"
    :rules [:Finder
            [:!Tj :down_arrow]
