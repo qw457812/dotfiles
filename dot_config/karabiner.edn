@@ -131,9 +131,6 @@
   :s-vi-mode             {:key     :s
                           :modi    {:optional :any}}
 
-  ;; :d-vi-mode             {:key     :d
-  ;;                         :modi    {:optional :any}}
-
   :d-tab-mode            {:key     :d
                           :modi    {:optional :caps_lock}}
 
@@ -173,10 +170,6 @@
 
   :i-mode                {:key     :i
                           :modi    {:optional :caps_lock}}
-
-  ;; :number-r-mode         {:key     :r}
-
-  ;; :symbol-e-mode         {:key     :e}
 
   :e-mode                {:key     :e
                           :modi    {:optional :caps_lock}}
@@ -255,9 +248,6 @@
 
            ;; see "For Not HHKB" below
            [:caps_lock :!Sescape :!hhkb-bt]
-
-           ;; see "For Neither HHKB nor Apple-Internal-Keyboard" below
-           ;; [:delete_or_backspace :!Sbackslash [:!hhkb-bt :!macbook-internal]]
 
            ;; see "For HHKB" below
            [:escape :!Sgrave_accent_and_tilde :hhkb-bt]
@@ -829,50 +819,6 @@
            [:a :!!f7] ; clipboard history by Maccy.app
            ]}
 
-  #_{:des   "d mode (vi mode)"
-   :rules [:d-vi-mode
-           [:##j :down_arrow]
-           [:##k :up_arrow]
-           [:##h :left_arrow]
-           [:##l :right_arrow]
-           [:v :left_shift] ; Vi Visual Mode
-
-           [:##b :!Oleft_arrow]
-           [:##w :!Oright_arrow]
-           [:##0 :home]
-           [:##4 :end]
-           ;; [:##hyphen :end]
-           ;; [:s :!Cx]
-           [:y :!Cc]
-           [:p :!Cv]
-           [:u :!Cz]
-           [:r :!CSz]
-
-           ;; [:semicolon [:!Cleft_arrow :!CSright_arrow]] ; Highlight current line
-           ;; [:c :!Cdelete_or_backspace]
-           [:##n :!Cleft_arrow] ; C-a
-           [:##m :!Cright_arrow] ; C-e
-           ;; [:##i :page_up]
-           ;; [:##o :page_down] ; 常用 do
-
-           ;; [:j {:mkey {:vwheel -60}}] ; Scroll down
-           ;; [:k {:mkey {:vwheel 60}}] ; Scroll up
-           ;; [:z {:pkey :button2}] ; Right click
-           ;; [:v {:pkey :button1}] ; Left click
-           ;; [:b {:pkey :button3}] ; Middle click
-           ;; [:x {:pkey :button3}] ; Middle click
-
-           ;; switch tabs in most apps
-           [:##comma :!CSopen_bracket] ; Cmd Shift [
-           [:##period :!CSclose_bracket] ; Cmd Shift ]
-
-           ;; [:##f :fn]
-
-           ;; Homerow.app
-           [:f :!!f6] ; Clicking (vimium-f)
-           [:s :!!f5] ; Scrolling
-           ]}
-
   {:des   "d mode (tab navigation)"
    :rules [:d-tab-mode
            ;; FIXME vscode 中有时不灵, 在rime配置中修改快捷键
@@ -1235,52 +1181,6 @@
            [:p [:!Sa :period :s :o :u :t :tab :escape] :IntelliJ]
            ]}
 
-  #_{:des   "r mode (numbers)"
-   :rules [:number-r-mode
-           ;; [:##a :left_control]
-           ;; [:##s :left_shift]
-           ;; [:##d :left_option]
-           ;; [:##f :left_command]
-           ;; [:##semicolon :!Fdelete_or_backspace]
-           [:##semicolon :delete_or_backspace]
-           [:##o :9]
-           [:##i :8]
-           [:##u :7]
-           [:##l :6]
-           [:##k :5]
-           [:##j :4]
-           [:##m :1]
-           [:##comma :2]
-           [:##period :3]
-           [:##h :0]]}
-
-  ;; TODO 成本高：肌肉记忆、心智负担
-  ;; https://github.com/narze/dotfiles/blob/dotbot/etc/karabiner.edn
-  ;; ,-----------------------------------------------------------------------------------.
-  ;; |                                         |      |   -  |   +  |   (  |   )  |      |
-  ;; |------+------+------+------+------+-------------+------+------+------+------+------|
-  ;; |                   N/A                   |   _  |   [  |   ]  |   {  |   }  |      |
-  ;; |------+------+------+------+------+------|------+------+------+------+------+------|
-  ;; |                                         |   =  |   |  |   <  |   >  |   ?  |      |
-  ;; |------+------+------+------+------+------+------+------+------+------+------+------
-  #_{:des   "e mode (symbols)"
-   :rules [:symbol-e-mode
-           [:u :hyphen]
-           [:i :!Sequal_sign] ; +
-           [:o :!S9] ; (
-           [:p :!S0] ; )
-           [:h :!Shyphen] ; _
-           [:j :open_bracket]
-           [:k :close_bracket]
-           [:l :!Sopen_bracket] ; {
-           [:semicolon :!Sclose_bracket] ; }
-           [:n :equal_sign]
-           [:m :!Sbackslash] ; |
-           [:comma :!Scomma] ; <
-           [:period :!Speriod] ; >
-           [:slash :!Sslash] ; ?
-           ]}
-
   {:des   "e mode (cmd+tab)"
    :rules [:e-mode
            ;; [:j :prev_app] ; cmd+tab
@@ -1360,19 +1260,6 @@
                        ;; basic.to_delayed_action_delay_milliseconds
                        :delay    500}}]]}
 
-  ;; https://github.com/mmroczka/.dotfiles/blob/master/karabiner/karabiner.edn
-  #_{:des   "Double colon triggers emoji search"
-   :rules [[:!Ssemicolon [:delete_or_backspace :!TCspacebar ["emoji_mode" 0]] ["emoji_mode" 1]]
-           [:!Ssemicolon ["emoji_mode" 1] nil {:alone :!Ssemicolon :delayed {:invoked ["emoji_mode" 0] :canceled ["emoji_mode" 0]}}]]}
-
-  ;; TODO 改为在屏幕上下左右的中心点击一下鼠标
-  ;; 组合键使用
-  #_{:des   "right_command+ijkl to arrow"
-   :rules [[:!Q##i :up_arrow]
-           [:!Q##j :left_arrow]
-           [:!Q##k :down_arrow]
-           [:!Q##l :right_arrow]]}
-
   {:des   "right_command with right-hand keys to launch-mode"
    :rules [[:!Qh [:open "/Applications/企业微信.app"] :!WeWork]
            [:!Qh :!Ograve_accent_and_tilde :WeWork] ; AltTab.app
@@ -1407,12 +1294,6 @@
            [:!Qclose_bracket :same_wind_app :WeWork-Meeting]
            ]}
 
-  #_{:des   "Hold cmd+v for clipboard history by Maccy.app"
-   :rules [[:!Cv nil nil {:alone :!Cv :held :!!f7 :repeat false :halt true :params {:alone 200 :held 200}}]]}
-
-  #_{:des   "return_or_enter to control when pressed with other keys"
-   :rules [[:##return_or_enter :left_control nil {:alone :return_or_enter}]]}
-
   {:des   "fn alone -> cmd+c"
    :rules [[:#Pfn :fn nil {:alone :!Cc}]]}
 
@@ -1430,65 +1311,6 @@
            ;; [:#Pright_command :right_command :Neovide {:alone :!Tperiod}] ; rime-ls
            ]}
 
-  ;; TODO or press f twice to switch rime's english/chinese input? see "Double colon triggers emoji search" above
-  ;; TODO "For NIZ" below
-  ;; https://github.com/yqrashawn/GokuRakuJoudo/blob/master/examples.org#two-stroke-keybindings-emacs-c-x-mode
-  #_{:des   "right cmd alone -> toggle rime's ascii_mode, right cmd twice -> mouse center click to active app"
-   :rules [:!niz-x87-bt
-           [
-            ;; <from> second right_command (when variable "right-command" is 1)
-            :#Pright_command
-
-            ;; <to>
-            [:right_command ["right-command" 0]] ; or move `["right-command" 0]` into `:afterup`
-            ;; :right_command
-
-            ;; <condition>
-            ["right-command" 1]
-
-            ;; <additional-option>
-            {
-             ;; [to_if_alone](https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/to-if-alone/)
-             ;; run 3 actions when the <from> key is pressed alone
-             ;; 1. send control+shift+] (toggle rime's ascii_mode back | ~/Library/Rime/default.custom.yaml)
-             ;; 2. call hammerspoon URL event "mouseCenterClick"
-             ;; 3. set variable "right-command" to 0
-             ;; FIXME vscode 切换中英文经常不灵
-             :alone   [:!TSclose_bracket [:hs ["mouse_center_click"]] ["right-command" 0]] ; or move `["right-command" 0]` into `:afterup`
-             ;; :alone   [:!TSclose_bracket [:hs ["mouse_center_click"]]]
-
-             ;; [to_after_key_up](https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/to-after-key-up/)
-             ;; set variable "right-command" to 0 when the <from> key is released
-             ;; :afterup ["right-command" 0]
-             }]
-
-
-           [
-            ;; <from> first right_command (when variable "right-command" is 0)
-            :#Pright_command
-
-            ;; <to>
-            :right_command
-
-            ;; <condition>
-            nil
-
-            ;; <additional-option>
-            {
-             ;; run 2 actions when the <from> key is pressed alone
-             ;; 1. send left_shift  (toggle rime's ascii_mode | ~/Library/Rime/default.yaml)
-             ;; 2. set variable "right-command" to 1 (for the second press)
-             ;; FIXME vscode 切换中英文经常不灵
-             :alone   [:left_shift ["right-command" 1]]
-
-             :delayed {
-                       ;; set variable "right-command" to 0 when no other key presses after basic.to_delayed_action_delay_milliseconds
-                       :invoked  ["right-command" 0]
-
-                       ;; set variable "right-command" to 0 when another key presses within basic.to_delayed_action_delay_milliseconds
-                       :canceled ["right-command" 0]}
-
-             :params  {:delay    500}}]]}
 
   {:des   "left option alone -> tmux prefix"
    :rules [[:condi :!niz-x87-wired :!glove80]
@@ -1515,70 +1337,9 @@
   {:des   "left shift alone -> copy"
    :rules [[:left_shift :left_shift :!glove80 {:alone :!Cc}]]}
 
-  ;; TODO alone 修饰键 right_shift(状态开关 类似caps_lock 开关vi模式)
-  ;; TODO noti like command-q
-  ;; {:des   "right shift alone -> caps_lock (see \"caps_lock layer: vi mode\" below)"
-  ;;  :rules [[:#Pright_shift :right_shift nil {:alone [:caps_lock]}]]}
-  #_{:des   "right shift alone -> caps_lock (see \"caps_lock layer: vi mode\" below)"
-   :rules [[:#Pright_shift :right_shift :!glove80 {:alone [:caps_lock]}]]}
-
 ;; ------------------------------ Fundamental ------------------------------
 ;; WARN: the order of rules matters, see "space to shift" below
 
-  #_{:des   "caps_lock layer: vi mode"
-   :rules [[:!P#Sj :!Pdown_arrow]
-           [:!P#Sk :!Pup_arrow]
-           [:!P#Sh :!Pleft_arrow]
-           [:!P#Sl :!Pright_arrow]
-
-           ;; TODO 不需要按住
-           [:!Pv :!Pleft_shift] ; Vi Visual Mode
-           [:!PRv [:!PCleft_arrow :!PCSright_arrow]] ; Highlight current line
-
-           [:!P#Sb :!POleft_arrow]
-           [:!P#Sw :!POright_arrow]
-           [:!P#Se :!POright_arrow]
-
-           ;; [:!P#Si :!PCleft_arrow]
-           ;; [:!P#Sa :!PCright_arrow]
-           ;; i/I/a/A -> exit this layer to input, inspired by https://github.com/zuorn/EmacsVim
-           ;; FIXME caps_lock 触发了多次 -> try :lazy
-           ;; [:!PSi [:!Pcaps_lock :!Cleft_arrow]]
-           ;; [:!PRa [:!Pcaps_lock :!Cright_arrow]]
-           [:!Pi :!Pcaps_lock]
-           [:!Pa [:!Pright_arrow :!Pcaps_lock]]
-
-           [:!P#S0 :!PTa]
-           [:!P#S4 :!PTe]
-           [:!PR#S4 :!PTe]
-           [:!PT#Su :!Ppage_up]
-           [:!PT#Sd :!Ppage_down]
-           ;; TODO gg, see "Double colon triggers emoji search" above
-           ;; notimeout ---> https://github.com/yqrashawn/GokuRakuJoudo/blob/master/examples.org#custom-variable
-           ;; timeoutlen=delay ---> https://github.com/yqrashawn/GokuRakuJoudo/blob/master/examples.org#two-stroke-keybindings-emacs-c-x-mode
-           [:!P#Sg :!PCup_arrow]
-           [:!PR#Sg :!PCdown_arrow]
-
-           [:!Pslash :!PCf]
-
-           [:!Px :!Pdelete_forward]
-           [:!Pd :!PCx]
-           [:!PRd [:!PCSright_arrow :!PCx]] ; D for d$
-           [:!Py :!PCc]
-           [:!PSy [:!PCSright_arrow :!PCc]] ; Y for y$
-           [:!Pp :!PCv]
-           [:!Pu :!PCz]
-           [:!Pr :!PCSz]
-           [:!PTr :!PCSz]
-
-           ;; TODO esc -> caps_lock
-           ;; [:!P##left_control :!Pleft_control [:hhkb-bt] {:alone [:!Pcaps_lock :escape]}]
-           ;; [:!P##caps_lock :!Pleft_control [:!hhkb-bt] {:alone [:!Pcaps_lock :escape]}]
-           ]}
-
-  ;; 影响 vim 中使用 c-h 切换窗口 `map <C-h> <C-W>h`
-  ;; {:des   "global C-h to backspace"
-   ;; :rules [[:!Th :delete_or_backspace nil {:params {:alone 500 :held 500}}]]}
 
   ;; TODO ranger like keybinding for Finder
   {:des   "Finder: navigation"
@@ -1607,17 +1368,10 @@
            [:!Tj :!COdown_arrow] ; select next unread chat message
            ]}
 
-  #_{:des   "WPSOffice: paste without formatting"
-   :rules [:WPSOffice
-           [:!Cv :!COSv] ; 粘贴剪贴板内容并匹配周围文本的格式
-           [:!Qv :!COSv]
-           ]}
-
   {:des   "RuijieWorkSpace: f11 -> ctrl + alt + delete"
    :rules [:RuijieWorkSpace
            [:f10 :!TOdelete_forward] ; unlock
            ]}
-
 
   {:des   "Spotify: play navigation"
    :rules [:Spotify
@@ -1627,13 +1381,6 @@
            [:!Th :!CSleft_arrow] ; seek backward
            [:!Tu :!Cup_arrow] ; volume up
            [:!Td :!Cdown_arrow] ; volume down
-           ]}
-
-  ;; 影响 cmd+w 关闭 raycast
-  #_{:des   "Kitty: tmux window manipulation"
-   :rules [:tmux-autostart-terminals
-           [:!Ct [:!Tb :c]] ; Cmd T -> tmux: new window
-           [:!Cw [:!Tb :!S7]] ; Cmd W -> tmux: kill window
            ]}
 
   ;; behaves like doomemacs pdf-tools | ~/.config/doomemacs/.local/straight/repos/pdf-tools/lisp/pdf-view.el
@@ -1834,15 +1581,6 @@
            [:##caps_lock :left_control nil {:alone :escape}]
            [:##left_control :!CTOleft_shift nil {:alone :!Cv}]]}
 
-  ;; https://github.com/yqrashawn/GokuRakuJoudo/blob/master/examples.org#device-input-method-application-conditions
-  #_{:des   "# For Neither HHKB nor Apple-Internal-Keyboard\n- behaves like HHKB, swap delete_or_backspace and \\, but keep shift+\\ as |"
-   :rules [[:condi :!hhkb-bt :!macbook-internal]
-           ;; behaves like HHKB, swap delete_or_backspace and \
-           [:##delete_or_backspace :backslash]
-           ;; FIXME cmd+shift+delete
-           [:#CTObackslash :delete_or_backspace] ; keep shift+\ as |
-           ]}
-
   {:des   "For HHKB\n- left_control to esc when pressed alone\n- swap esc and `\n- shift+delete to |"
    :rules [:hhkb-bt
            [:##left_control :left_control nil {:alone :escape}]
@@ -1967,114 +1705,6 @@
                        ;; held 越短 right-click 选择文本的延迟越低, 但是太短会导致单击 right-click 时, 如果按下去的时间稍长就会发送 left-click 且松开后复制
                        :alone    125
                        :held     125}}]]}
-
-  ;; TODO easy to accidentally trigger
-  #_{:des   "trackpad + keyboard: copy/paste, vi mode"
-   :rules [
-           ;; s(when the finger is on the trackpad) -> copy word
-           {:type       :basic
-            :from       {:key_code :s}
-            :to         [{:pointing_button :button1}
-                         {:pointing_button :button1}
-                         {:key_code :c :modifiers [:left_command] :lazy true}]
-            :conditions [{:type  :variable_unless
-                          :name  "multitouch_extension_finger_count_total"
-                          :value 0}]}
-           ;; d -> copy selected
-           {:type       :basic
-            :from       {:key_code :d}
-            :to         [{:key_code :c :modifiers [:left_command] :lazy true}]
-            :conditions [{:type  :variable_unless
-                          :name  "multitouch_extension_finger_count_total"
-                          :value 0}]}
-           ;; {:type       :basic
-           ;;  :from       {:key_code :f}
-           ;;  :to         [{:pointing_button :button1}
-           ;;               {:key_code :v :modifiers [:left_command] :lazy true}]
-           ;;  :conditions [{:type  :variable_unless
-           ;;                :name  "multitouch_extension_finger_count_total"
-           ;;                :value 0}]}
-           ;; f -> paste
-           {:type            :basic
-            :from            {:key_code :f}
-            :to_if_alone     [{:pointing_button :button1}
-                              {:key_code :v :modifiers [:left_command] :lazy true}]
-            ;; hold f to overwrite
-            :to_if_held_down [{:pointing_button :button1}
-                              {:key_code :a :modifiers [:left_command] :lazy true}
-                              {:key_code :v :modifiers [:left_command] :lazy true :repeat false}]
-            :conditions      [{:type  :variable_unless
-                               :name  "multitouch_extension_finger_count_total"
-                               :value 0}]
-            :parameters      {:basic.to_if_alone_timeout_milliseconds 500
-                              :basic.to_if_held_down_threshold_milliseconds 500}}
-
-           ;; [Multitouch Vi Mode](https://ke-complex-modifications.pqrs.org/#multitouch_vi_mode)
-           ;; h/j/k/l to home/page_down/page_up/end when two fingers are on the trackpad
-           ;; {:type       :basic
-           ;;  :from       {:key_code :h :modifiers {:optional :any}}
-           ;;  :to         [{:key_code :home}]
-           ;;  :conditions [{:type  :variable_if
-           ;;                :name  "multitouch_extension_finger_count_total"
-           ;;                :value 2}]}
-           ;; {:type       :basic
-           ;;  :from       {:key_code :j :modifiers {:optional :any}}
-           ;;  :to         [{:key_code :page_down}]
-           ;;  :conditions [{:type  :variable_if
-           ;;                :name  "multitouch_extension_finger_count_total"
-           ;;                :value 2}]}
-           ;; {:type       :basic
-           ;;  :from       {:key_code :k :modifiers {:optional :any}}
-           ;;  :to         [{:key_code :page_up}]
-           ;;  :conditions [{:type  :variable_if
-           ;;                :name  "multitouch_extension_finger_count_total"
-           ;;                :value 2}]}
-           ;; {:type       :basic
-           ;;  :from       {:key_code :l :modifiers {:optional :any}}
-           ;;  :to         [{:key_code :end}]
-           ;;  :conditions [{:type  :variable_if
-           ;;                :name  "multitouch_extension_finger_count_total"
-           ;;                :value 2}]}
-           ;; h/j/k/l to arrow keys when the number of fingers on the trackpad is not zero or two
-           ;; {:type       :basic
-           ;;  :from       {:key_code :h :modifiers {:optional :any}}
-           ;;  :to         [{:key_code :left_arrow}]
-           ;;  :conditions [{:type  :variable_unless
-           ;;                :name  "multitouch_extension_finger_count_total"
-           ;;                :value 0}]}
-           ;; {:type       :basic
-           ;;  :from       {:key_code :j :modifiers {:optional :any}}
-           ;;  :to         [{:key_code :down_arrow}]
-           ;;  :conditions [{:type  :variable_unless
-           ;;                :name  "multitouch_extension_finger_count_total"
-           ;;                :value 0}]}
-           ;; {:type       :basic
-           ;;  :from       {:key_code :k :modifiers {:optional :any}}
-           ;;  :to         [{:key_code :up_arrow}]
-           ;;  :conditions [{:type  :variable_unless
-           ;;                :name  "multitouch_extension_finger_count_total"
-           ;;                :value 0}]}
-           ;; {:type       :basic
-           ;;  :from       {:key_code :l :modifiers {:optional :any}}
-           ;;  :to         [{:key_code :right_arrow}]
-           ;;  :conditions [{:type  :variable_unless
-           ;;                :name  "multitouch_extension_finger_count_total"
-           ;;                :value 0}]}
-
-           ;; e/r -> scroll up/down
-           ;; {:type       :basic
-           ;;  :from       {:key_code :r}
-           ;;  :to         [{:mouse_key {:vertical_wheel -128}}]
-           ;;  :conditions [{:type  :variable_unless
-           ;;                :name  "multitouch_extension_finger_count_total"
-           ;;                :value 0}]}
-           ;; {:type       :basic
-           ;;  :from       {:key_code :e}
-           ;;  :to         [{:mouse_key {:vertical_wheel 128}}]
-           ;;  :conditions [{:type  :variable_unless
-           ;;                :name  "multitouch_extension_finger_count_total"
-           ;;                :value 0}]}
-           ]}
 
   ;; WARN: the order of rules matters ---> try put this rules before :f-mode, then press f-space and hold f, release space and press space again
   ;; https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/to/lazy/
