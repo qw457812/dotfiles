@@ -19,4 +19,4 @@ disable-model-invocation: true
 - The shared tiger processor list loads `lua/vim_mode.lua`; keep that module available to each frontend. It implements fcitx5-specific behavior while Squirrel handles its own Vim mode.
 - `tiger.extended.dict.yaml` intentionally disables the single-code alternative symbols. Preserve that change when syncing upstream.
 - `PY_c` is the pinyin reverse lookup; `core2022`, `easy_english`, Lua and OpenCC files can be shared dependencies. The official `emoji_cn` option name is distinct from the `opencc/emoji.json` resource filename.
-- Preserve `~/Library/Rime` user databases, sync data and its separate Git repository. The retained emacs-rime configuration is historical and may not deploy without its own shared defaults.
+- Preserve `~/Library/Rime` user databases, sync data and its separate Git repository.

@@ -236,7 +236,6 @@ append_keymap = [
 
   # https://yazi-rs.github.io/docs/configuration/keymap#manager.shell
   { on = "e", run = "shell --block -- ${EDITOR:=vi} %s", desc = "Edit the selected files use $EDITOR" },
-  # { on = "E", run = "shell -- open -a /Applications/Emacs.app %s", desc = "Edit the selected files use Emacs.app" },
 
   { on = "<Backspace>", run = "close", desc = "Close the current tab, or quit if it is last tab" },
 

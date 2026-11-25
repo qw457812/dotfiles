@@ -118,7 +118,7 @@ function start_zellij() {
 }
 
 # you have to add the `ZSH...=...` assignment before the line `source $ZSH/oh-my-zsh.sh`, see https://github.com/ohmyzsh/ohmyzsh/issues/3676#issuecomment-77806736
-# prevent from affecting the terminal in JetBrains, emacs, vscode | https://github.com/ohmyzsh/ohmyzsh/issues/7420
+# prevent from affecting the terminal in JetBrains, vscode | https://github.com/ohmyzsh/ohmyzsh/issues/7420
 case "${__CFBundleIdentifier}" in
     "org.alacritty")
         ZSH_TMUX_AUTOSTART=true
@@ -164,7 +164,6 @@ source $ZSH/oh-my-zsh.sh
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 export PATH="$PATH:$HOME/.local/bin"
-export PATH="$PATH:$HOME/.config/doomemacs/bin"
 
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
@@ -412,16 +411,6 @@ function sys_proxy_off() {
   networksetup -setsecurewebproxystate Wi-Fi off
   networksetup -setsocksfirewallproxystate Wi-Fi off
 }
-
-# alias e='emacsclient -t'
-# # doomemacs by chemacs2
-# function de() {
-#   echo 'default' > ~/.emacs-profile && e "$@"
-# }
-# # spacemacs by chemacs2
-# function se() {
-#   echo 'spacemacs' > ~/.emacs-profile && e "$@"
-# }
 
 # https://wezfurlong.org/wezterm/shell-integration.html
 # https://github.com/wez/wezterm/blob/main/assets/shell-integration/wezterm.sh

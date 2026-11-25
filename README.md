@@ -72,7 +72,6 @@ TODO:
    - IDE
      - [ ] [IdeaVim](#ideavim)
      - [ ] [VSCode Neovim](#vscode-neovimhttpsgithubcomvscode-neovimvscode-neovim)
-     - [ ] [Doom Emacs](#doom-emacs)
    - File manager
      - [ ] Terminal: [Yazi](#yazihttpsgithubcomsxyaziyazi)
      - [ ] Neovim: [neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim)
@@ -108,12 +107,6 @@ Tips:
 
 [keybindings.json](symlinks/vscode/keybindings.json)
 
-## [Doom Emacs](https://github.com/doomemacs/doomemacs)
-
-[DOOMDIR](dot_config/doom)
-
-Using [Emacs Plus](https://github.com/d12frosted/homebrew-emacs-plus).
-
 ## [Fish](https://fishshell.com)
 
 [fish config](dot_config/private_fish)
@@ -142,7 +135,7 @@ Using [InputSourcePro](https://github.com/runjuu/InputSourcePro) to keep [Squirr
 
 And using [ShowyEdge](https://github.com/pqrs-org/ShowyEdge) to notice when input source automatically changes to ABC.
 
-Using [emacs-rime](https://github.com/DogLooksGood/emacs-rime) in Doom Emacs and [rime-ls](https://github.com/wlh320/rime-ls) in Neovim.
+Using [rime-ls](https://github.com/wlh320/rime-ls) in Neovim.
 
 ## [SketchyBar](https://github.com/FelixKratz/SketchyBar)
 
