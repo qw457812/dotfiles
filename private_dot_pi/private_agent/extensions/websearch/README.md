@@ -70,6 +70,8 @@ Results are joined as markdown (`## [title](url)`, `Published:` line, content) a
 [Showing lines 1-800 of 1200. Full output: /tmp/pi-websearch-XXXX/output.txt]
 ```
 
+If the temp file cannot be saved (full or unwritable temp directory, quota), the call still returns the truncated results and the notice says why — `[Showing lines 1-N of M. Could not save the full output: <error>]` — with `details.fullOutputError` carrying the reason. This mirrors pi's bash tool since 1.6.1; before that a failed save failed the whole call.
+
 ## Architecture
 
 ```
@@ -102,6 +104,7 @@ Golden checks (no model calls, assertions ported from upstream `test/websearch.t
 - **No Effect framework** — plain async/await + TypeBox instead of Effect Schema + Layer
 - **Extra provider attempts are not retried on non-429 errors** — same as v2: only rate limits fail over
 - **User cancellation bypasses the error wrap** — like the webfetch mirror, genuine user aborts keep their plain `... was cancelled` provider message instead of v2's blanket `Unable to search the web for <query>` narrowing (pi abort semantics)
+- **Full-output save failures are reported, not fatal** — a failed temp-file save keeps the truncated results and names the reason in the notice and `details.fullOutputError`, mirroring pi's bash tool since 1.6.1
 - **User-Agent** — parallel/tavily/firecrawl/tinyfish send `pi/${VERSION}` instead of OpenCode's app useragent; TinyFish's handshake also announces `clientInfo: { name: "pi", version: ... }` where v2 sends `opencode`/`1.0`
 - **`MCP-Protocol-Version` is always sent** — the mirror includes the header on every MCP request (spec 2025-06-18 marks it MUST) and echoes the version negotiated in `initialize`, validated against pi's supported list (2025-11-25, 2025-06-18, 2025-03-26, 2024-11-05) exactly as pi's own MCP client does; the stateless providers (Exa, Parallel, Firecrawl) send the latest supported version because they never handshake; v2 sends the header nowhere, including TinyFish's handshake, relying on the spec's 2025-03-26 fallback
 - **TinyFish result parsing is fail-fast** — v2 decodes `content[].text` with an Effect schema and silently yields zero results on a shape mismatch; the mirror throws when `results` is missing, matching the other providers' runtime checks

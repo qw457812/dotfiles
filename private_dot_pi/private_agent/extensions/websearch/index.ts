@@ -12,7 +12,8 @@
  *   Retry-After, and failover across providers
  * - Results are structured per provider and formatted as markdown the LLM
  *   consumes: ## [title](url) + Published + content
- * - Output truncation with temp file fallback (pi conventions)
+ * - Output truncation with temp file fallback (pi conventions); a failed
+ *   save keeps the truncated text and reports why (pi 1.6.1)
  * - Session-scoped affinity persistence via appendEntry/CustomEntry, so
  *   `pi --resume` keeps the same provider
  *
@@ -34,7 +35,7 @@ import {
   truncateHead,
 } from "@earendil-works/pi-coding-agent";
 import { Text } from "@earendil-works/pi-tui";
-import { mkdtemp, writeFile } from "node:fs/promises";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "os";
 import { join } from "path";
 import { Type } from "typebox";
@@ -65,6 +66,29 @@ import {
   SELECTION_ENTRY_TYPE,
   type WebSearchQueryResult,
 } from "./selection";
+
+// ---------------------------------------------------------------------------
+// Full-output persistence (pi 1.6.1 bash-tool semantics)
+//
+// A temp-file failure must not fail the tool call or discard the truncated
+// results: the result keeps the truncated text and says why the full output
+// could not be saved.
+// ---------------------------------------------------------------------------
+
+type SavedFullOutput = { path: string } | { error: string };
+
+async function saveFullOutput(prefix: string, text: string): Promise<SavedFullOutput> {
+  let dir: string | undefined;
+  try {
+    dir = await mkdtemp(join(tmpdir(), prefix));
+    const path = join(dir, "output.txt");
+    await writeFile(path, text, "utf8");
+    return { path };
+  } catch (err) {
+    if (dir) await rm(dir, { recursive: true, force: true }).catch(() => {});
+    return { error: err instanceof Error ? err.message : String(err) };
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Tool schema (mirrors OpenCode v2: query only, result count fixed at 8)
@@ -239,20 +263,26 @@ export default function (pi: ExtensionAPI) {
       let resultText = truncation.content;
 
       if (truncation.truncated) {
-        const tempDir = await mkdtemp(join(tmpdir(), "pi-websearch-"));
-        const tempFile = join(tempDir, "output.txt");
-        await writeFile(tempFile, rawResult, "utf8");
-
         details.truncation = truncation;
-        details.fullOutputPath = tempFile;
+        const saved = await saveFullOutput("pi-websearch-", rawResult);
+        if ("path" in saved) {
+          details.fullOutputPath = saved.path;
+        } else {
+          details.fullOutputError = saved.error;
+        }
 
-        // pi convention (bash tool): bracket-format continuation notice.
+        // pi convention (bash tool): bracket-format continuation notice,
+        // naming the temp file or why it could not be saved.
+        const fullOutput =
+          "path" in saved
+            ? `Full output: ${saved.path}`
+            : `Could not save the full output: ${saved.error}`;
         const startLine = 1;
         const endLine = truncation.outputLines;
         if (truncation.truncatedBy === "lines") {
-          resultText += `\n\n[Showing lines ${startLine}-${endLine} of ${truncation.totalLines}. Full output: ${tempFile}]`;
+          resultText += `\n\n[Showing lines ${startLine}-${endLine} of ${truncation.totalLines}. ${fullOutput}]`;
         } else {
-          resultText += `\n\n[Showing lines ${startLine}-${endLine} of ${truncation.totalLines} (${formatSize(DEFAULT_MAX_BYTES)} limit). Full output: ${tempFile}]`;
+          resultText += `\n\n[Showing lines ${startLine}-${endLine} of ${truncation.totalLines} (${formatSize(DEFAULT_MAX_BYTES)} limit). ${fullOutput}]`;
         }
       }
 

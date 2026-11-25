@@ -28,6 +28,8 @@ export interface WebsearchDetails {
   attempts?: number;
   truncation?: TruncationResult;
   fullOutputPath?: string;
+  /** Why the full output could not be saved to a temp file, when it could not. */
+  fullOutputError?: string;
 }
 
 /** Shared renderer state for a websearch tool row. */
@@ -227,10 +229,13 @@ export function rebuildWebsearchResultRenderComponent(
   // Truncation warning (mirrors bash tool's bracket format with formatSize)
   const truncation = details.truncation;
   const fullOutputPath = details.fullOutputPath;
-  if (truncation?.truncated || fullOutputPath) {
+  const fullOutputError = details.fullOutputError;
+  if (truncation?.truncated || fullOutputPath || fullOutputError) {
     const warnings: string[] = [];
     if (fullOutputPath) {
       warnings.push(`Full output: ${fullOutputPath}`);
+    } else if (fullOutputError) {
+      warnings.push(`Could not save the full output: ${fullOutputError}`);
     }
     if (truncation?.truncated) {
       // Distinguish truncation cause (mirrors bash tool)

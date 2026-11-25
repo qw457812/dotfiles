@@ -49,6 +49,8 @@ cd private_dot_pi/private_agent/extensions/webfetch && npm install
 
 Output is truncated to 2000 lines or 50 KB (pi's built-in limits). When truncated, the full output is saved to a temp file and the LLM is informed with pi's bash-tool bracket format: `[Showing lines 1-N of M. Full output: <path>]`.
 
+If the temp file cannot be saved (full or unwritable temp directory, quota), the call still returns the truncated output and the notice says why — `[Showing lines 1-N of M. Could not save the full output: <error>]` — with `details.fullOutputError` carrying the reason. This mirrors pi's bash tool since 1.6.1; before that a failed save failed the whole call.
+
 **Known caveat, inherited from v2:** the markdown renderer caps conversion output at ~5MB (`CONTENT_BYTES` — v2's anti-DoS budget, with a 64KB structural margin). When a page's markdown conversion exceeds that budget (escaping-dense multi-MB HTML can expand past its source size), the tail past the budget is silently dropped and the "full output" temp file holds the capped conversion, not the complete one. Upstream v2 has the identical chain, and its docs make the same overclaim ("the full text is retained in managed storage"). Deliberately mirrored rather than fixed locally — a disclosure fix would be a deviation from upstream's silence; revisit if upstream adds disclosure semantics.
 
 ## Architecture
@@ -75,6 +77,7 @@ Golden checks (no model calls, assertions ported from upstream `test/tool-webfet
 - **Per-attempt timeout controllers** — v2 wraps retry in `Effect.timeoutOrElse`; here each attempt gets its own `AbortController` with the remaining budget
 - **Response body draining** — non-2xx, 403 and redirect response bodies are drained to release TCP connections; v2 relies on Effect's resource management
 - **User cancellation bypasses the error wrap** — `Unable to fetch <url>` mirrors v2's error narrowing, but genuine user aborts keep their plain "Request was cancelled" message (pi abort semantics)
+- **Full-output save failures are reported, not fatal** — v2's managed storage hides storage failures; here a failed temp-file save keeps the truncated output and names the reason in the notice and `details.fullOutputError`, mirroring pi's bash tool since 1.6.1
 - **Description wording** — v2's "retained in managed storage" sentence adapted to this extension's temp-file truncation
 - **Renderer** — `html-markdown.ts` ported verbatim from v2 (it replaced turndown in 90fd61225) and excluded from oxfmt via `ignorePatterns`, keeping drift diffs byte-comparable; no turndown/cheerio dependencies remain
 

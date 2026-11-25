@@ -5,6 +5,8 @@
 //
 // Run: npm --prefix private_dot_pi/private_agent/extensions/webfetch test
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 import { convertHTMLToMarkdown, MAX_MARKDOWN_BYTES } from "../html-markdown";
 import webfetch, { extractTextFromHTML, MAX_REDIRECTS, RequestCancelledError } from "../index";
@@ -23,6 +25,7 @@ async function captureError(promise: Promise<unknown>): Promise<any> {
 const budget = MAX_MARKDOWN_BYTES - 64 * 1024;
 
 afterEach(() => {
+  vi.unstubAllEnvs();
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
@@ -146,6 +149,32 @@ describe("byte-budget edge cases", () => {
       expect(convertHTMLToMarkdown(html)).toBe("x".repeat(Math.min(count, budget - 2)) + suffix);
     },
   );
+});
+
+// --- full-output temp-file failures ----------------------------------------
+// pi 1.6.1 bash-tool semantics: a temp-file failure keeps the truncated
+// output and names the reason instead of failing the fetch.
+
+describe("full-output temp-file failure", () => {
+  it("keeps the truncated output and says why the full output was not saved", async () => {
+    const missing = join(tmpdir(), "pi-webfetch-missing-temp-dir");
+    vi.stubEnv("TMPDIR", missing);
+    vi.stubEnv("TMP", missing);
+    vi.stubEnv("TEMP", missing);
+    const tool = activateWebfetch(
+      () => new Response("line\n".repeat(3000), { headers: { "content-type": "text/plain" } }),
+    );
+
+    const out = await tool.run();
+
+    expect(out.details.truncation.truncated).toBe(true);
+    expect(out.details.fullOutputPath).toBeUndefined();
+    expect(out.details.fullOutputError).toMatch(/ENOENT/);
+    expect(out.content[0].text).toMatch(/^line\n/);
+    expect(out.content[0].text).toMatch(
+      /\[Showing lines 1-2000 of \d+\. Could not save the full output: ENOENT/,
+    );
+  });
 });
 
 // --- cancellation identity -------------------------------------------------

@@ -8,6 +8,8 @@
 // Run: npm --prefix private_dot_pi/private_agent test -- websearch
 import type { Mock } from "vitest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 import type {
   ProviderID,
@@ -412,6 +414,39 @@ describe("tool (forced provider)", () => {
     );
     const out = await tool.run("golden query");
     expect(out.content[0].text).toBe("No search results found. Please try a different query.");
+  });
+
+  // pi 1.6.1 bash-tool semantics: a temp-file failure keeps the truncated
+  // results and names the reason instead of failing the search.
+  it("keeps the truncated results when the full output cannot be saved", async () => {
+    const missing = join(tmpdir(), "pi-websearch-missing-temp-dir");
+    vi.stubEnv("TMPDIR", missing);
+    vi.stubEnv("TMP", missing);
+    vi.stubEnv("TEMP", missing);
+    const tool = activateTool(
+      mods,
+      () =>
+        new Response(
+          JSON.stringify({
+            results: [
+              {
+                url: "https://example.com/a",
+                title: "Example",
+                content: "line\n".repeat(3000),
+              },
+            ],
+          }),
+          { status: 200 },
+        ),
+    );
+
+    const out = await tool.run("golden query");
+
+    expect(out.details.truncation.truncated).toBe(true);
+    expect(out.details.fullOutputPath).toBeUndefined();
+    expect(out.details.fullOutputError).toMatch(/ENOENT/);
+    expect(out.content[0].text).toMatch(/## \[Example\]\(https:\/\/example\.com\/a\)/);
+    expect(out.content[0].text).toContain("Could not save the full output: ENOENT");
   });
 
   // Ledger-backed divergence guard ("User cancellation bypasses the error
