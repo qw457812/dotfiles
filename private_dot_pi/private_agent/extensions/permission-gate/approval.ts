@@ -5,7 +5,7 @@ import type {
 } from "@earendil-works/pi-coding-agent";
 import { confirm, confirmationResult } from "./confirmation.ts";
 import type { GateJudgment } from "./jev.ts";
-import { recordDecision, type GateRecord, type Outcome } from "./log.ts";
+import { recordDecision, type GateRule, type Outcome } from "./log.ts";
 
 interface ApprovalOptions {
   signal: AbortSignal;
@@ -16,7 +16,7 @@ interface ApprovalOptions {
   /** Omit when disabled or input is missing; neither case writes a decision entry. */
   classify?: () => Promise<GateJudgment>;
   questionVersion: number;
-  rules: GateRecord["rules"];
+  rule: GateRule;
   title: string;
   message: (judgment: GateJudgment) => string;
 }
@@ -39,7 +39,7 @@ export async function requestApproval(
     if (!classify || !canRecord()) return;
     recordDecision(pi, {
       questionVersion: options.questionVersion,
-      rules: options.rules,
+      rule: options.rule,
       judgment: decision,
       durationMs,
       outcome,

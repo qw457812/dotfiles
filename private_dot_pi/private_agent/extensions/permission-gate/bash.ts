@@ -1,9 +1,10 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { withBashTree } from "../../lib/bash-parser.ts";
 import { requestApproval } from "./approval.ts";
-import { approvalRules, RULE_LABELS } from "./bash-rules.ts";
+import { hasGuardedGitCommand } from "./bash-rules.ts";
 import { QUESTION_VERSION, REASON_LABELS, judgeCommand } from "./jev.ts";
 import { latestUserIntent } from "./intent.ts";
+import { GIT_RULE_LABEL } from "./log.ts";
 
 export default function registerBashChecks(
   pi: ExtensionAPI,
@@ -13,7 +14,7 @@ export default function registerBashChecks(
   isEnabled: () => boolean = () => true,
 ) {
   pi.on("tool_call", async (event, ctx) => {
-    if (!isEnabled()) return;
+    if (!isEnabled() || !isGitEnabled()) return;
     if (event.toolName !== "bash") return;
     const command = (event.input as { command?: string }).command ?? "";
     // Later tool_call handlers may otherwise change the command after it was approved.
@@ -33,36 +34,25 @@ export default function registerBashChecks(
     const sameSession = () => !lifetime.aborted && ctx.sessionManager.getSessionId() === sessionId;
     const sameAuthorization = () =>
       sameSession() && latestUserIntent(ctx.sessionManager.getBranch())?.id === user?.id;
-    const rules = await withBashTree(command, (root) => approvalRules(root, isGitEnabled())).catch(
-      () => {
-        if (ctx.hasUI)
-          ctx.ui.notify("Permission Gate: command checks skipped (parser failure)", "warning");
-        return [];
-      },
-    );
-    if (!rules.length) return;
+    const matched = await withBashTree(command, hasGuardedGitCommand).catch(() => {
+      if (ctx.hasUI)
+        ctx.ui.notify("Permission Gate: command checks skipped (parser failure)", "warning");
+      return false;
+    });
+    if (!matched) return;
 
     return requestApproval(pi, ctx, {
       signal,
       isValid: sameAuthorization,
       canRecord: sameSession,
       classify: isJevEnabled()
-        ? () =>
-            judgeCommand(
-              ctx.modelRegistry,
-              command,
-              user?.text ?? "",
-              ctx.cwd,
-              signal,
-              rules.length === 1 && rules[0] === "git",
-              rules.every((rule) => rule === "git" || rule === "rm"),
-            )
+        ? () => judgeCommand(ctx.modelRegistry, command, user?.text ?? "", ctx.cwd, signal)
         : undefined,
       questionVersion: QUESTION_VERSION,
-      rules,
+      rule: "git",
       title: "🔐 Allow this command?",
       message: (judgment) =>
-        `Rules: ${rules.map((rule) => RULE_LABELS[rule]).join(", ")}\n${REASON_LABELS[judgment.reason]}\n\n${command}`,
+        `Rules: ${GIT_RULE_LABEL}\n${REASON_LABELS[judgment.reason]}\n\n${command}`,
     });
   });
 }

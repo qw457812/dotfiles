@@ -130,7 +130,7 @@ export default function registerSqlChecks(
           ? () => judgeSql(ctx.modelRegistry, sql, event.toolName, signal)
           : undefined,
       questionVersion: SQL_QUESTION_VERSION,
-      rules: ["sql"],
+      rule: "sql",
       title: "⚠️ SQL Guard",
       message: (judgment) =>
         `${reason}${sql ? `\n${REASON_LABELS[judgment.reason]}` : ""}\n\nTool: ${event.toolName}\n\nInput:\n${JSON.stringify(input, null, 2)}`,

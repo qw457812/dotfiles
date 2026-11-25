@@ -76,12 +76,28 @@ describe("Path Guard matching", () => {
   it.each(["/repo", getAgentDir()])("keeps the same protected paths in cwd=%s", async (cwd) => {
     const { run, ctx } = harness(true, false);
     ctx.cwd = cwd;
-    for (const hit of [".env", ".git/", "node_modules/", ".ssh/"])
-      expect(await run(`/repo/${hit}file`, "write")).toEqual({
+    for (const hit of [
+      ".env",
+      ".env.local",
+      ".git",
+      ".git/config",
+      "node_modules/pkg/index.js",
+      ".ssh/config",
+      "sub/../.git/config",
+    ])
+      expect(await run(`/repo/${hit}`, "write")).toEqual({
         block: true,
         reason: "Operation requires user confirmation",
       });
-    expect(await run("/repo/.pi/settings.json", "write")).toBeUndefined();
+    for (const path of [
+      "/repo/.env.example",
+      "/repo/site.env",
+      "/repo/foo.git/config",
+      "/repo/my_node_modules/file",
+      "/repo/my.ssh/file",
+      "/repo/node_modules/../file",
+    ])
+      expect(await run(path, "write")).toBeUndefined();
     expect(ctx.ui.confirm).not.toHaveBeenCalled();
     expect(ctx.abort).not.toHaveBeenCalled();
   });

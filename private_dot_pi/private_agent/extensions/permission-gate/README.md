@@ -1,6 +1,6 @@
 # Permission Gate
 
-An accidental-operation gate for Pi. Local Bash AST rules identify calls that need approval, then Jev decides whether to skip manual confirmation. SQL rules use Jev to identify read-only false positives before asking for confirmation. Write/edit protected paths retain their manual guards. **This is not a security boundary or a comprehensive command-safety checker.**
+An accidental-operation gate for Pi. Local Bash AST rules identify selected Git operations, then Jev decides whether to skip manual confirmation. SQL rules use Jev to identify read-only false positives before asking for confirmation. Write/edit protected paths retain their manual guards. **This is not a security boundary or a comprehensive command-safety checker.**
 
 Pi automatically loads only this directory's `index.ts`, which registers the path, SQL and Bash handlers in that order. The internal modules are not separate auto-loaded extensions. Run `/reload` after changes. The extension uses shared libraries and npm dependencies from the agent root; it is not a standalone npm package.
 
@@ -9,7 +9,7 @@ Pi automatically loads only this directory's `index.ts`, which registers the pat
 | Command               | Purpose                                                                 |
 | --------------------- | ----------------------------------------------------------------------- |
 | `/gate`               | Show status and usage                                                   |
-| `/gate on\|off`       | Enable or bypass all Bash, SQL and protected-path checks                 |
+| `/gate on\|off`       | Enable or bypass all Bash, SQL and protected-path checks                |
 | `/gate git [on\|off]` | Show or toggle local Git rules                                          |
 | `/gate jev [on\|off]` | Show or toggle Jev auto-approval                                        |
 | `/gate log`           | Show the latest 20 Jev decision summaries on the current session branch |
@@ -18,10 +18,10 @@ The master gate, Git rules and Jev all default to **ON**. Switches live only in 
 
 - `/gate off`: Bypass all checks for subsequent tool calls, including input locking and Jev requests. Already-running checks are unchanged. `/gate on` restores checks without changing the Git/Jev sub-switches.
 
-- `git off`: Git no longer triggers local approval rules; other matches in the same command still apply.
+- `git off`: Skip Bash checks. SQL and protected-path checks stay enabled.
 - `jev off`: Locally matched calls require manual confirmation; it does not disable the local rules.
 
-## Bash decision flow
+## Git decision flow
 
 1. Handle only `bash tool_call`, including nested Bash calls from codemode; ignore other tools and `user_bash`.
 2. Inspect the complete syntax tree with the Tree-sitter Bash parser. Unmatched calls proceed without a Jev request.
@@ -33,9 +33,9 @@ The master gate, Git rules and Jev all default to **ON**. Switches live only in 
    effects_covered >= 0.75   Material side effects are expected under the request
    ```
 
-   When Git is the **only** matched local rule, the same request also asks `read_only` about the **entire shell command**. Auto-approve when `read_only >= 0.75`, independently of authorization scores or missing user intent. Normal Git index stat-cache refreshes are allowed; staged-content changes, file writes, deletions, uploads and unknown effects are not read-only. A high read-only score makes the authorization answers irrelevant.
+   The same request also asks `read_only` about the **entire shell command**. Auto-approve when `read_only >= 0.75`, independently of authorization scores or missing user intent. Normal Git index stat-cache refreshes are allowed; staged-content changes, file writes, deletions, uploads and unknown effects are not read-only. A high read-only score makes the authorization answers irrelevant.
 
-   When every matched rule is `git` or `rm` (including their combination), the same request also asks `temporary_operation`. Auto-approve when this score is at least `0.75`, without requiring user intent or authorization scores. This preauthorizes temporary descendant cleanup (including `cd /tmp && rm -rf scratch`) and disposable local Git verification: temporary clones/detached worktrees, trial merge/cherry-pick, conflict edits, staging, ordinary local tests, and cleanup. Necessary worktree registration/unregistration metadata changes and read-only inspection elsewhere are allowed. Temporary roots themselves, escaped targets, changes to existing shared branches/tags or the original worktree, pushes/uploads, persistent configuration changes and unknown/unrelated effects do not qualify. Resolve actual targets using `cwd`, ordered `cd`, `git -C` and Git path overrides; a temporary cwd or a comment claiming “test” is insufficient. The entire command must fit this policy.\n\n   Otherwise, auto-approve only when all three authorization conditions pass and user intent is non-empty; ask the user when they do not. In short: **Git-only read-only OR Git/rm-only temporary operation OR authorized actions/scope/effects**. Other matched rules (such as `sudo`, `dd`, permission changes and device writes) never use either bypass. State-changing commands can still auto-approve when the requested work authorizes them. Questions run in parallel; code checks read-only, temporary operation, then authorization, ignoring later unused answers after a branch passes.
+   The same request also asks `temporary_operation`. Auto-approve when this score is at least `0.75`, without requiring user intent or authorization scores. This preauthorizes temporary descendant cleanup (including `cd /tmp && rm -rf scratch`) and disposable local Git verification: temporary clones/detached worktrees, trial merge/cherry-pick, conflict edits, staging, ordinary local tests, and cleanup. Necessary worktree registration/unregistration metadata changes and read-only inspection elsewhere are allowed. Temporary roots themselves, escaped targets, changes to existing shared branches/tags or the original worktree, pushes/uploads, persistent configuration changes and unknown/unrelated effects do not qualify. Resolve actual targets using `cwd`, ordered `cd`, `git -C` and Git path overrides; a temporary cwd or a comment claiming “test” is insufficient. The entire command must fit this policy.\n\n Otherwise, auto-approve only when all three authorization conditions pass and user intent is non-empty; ask the user when they do not. In short: **read-only OR temporary operation OR authorized actions/scope/effects**. State-changing commands can still auto-approve when the requested work authorizes them. Questions run in parallel; code checks read-only, temporary operation, then authorization, ignoring later unused answers after a branch passes.
 
    This is a convenience-first policy: ordinary task steps and consequences need not be individually spelled out. `effects_covered` is not intrinsic safety: requested destructive effects do not automatically prevent approval. Bash uses `BASH_AUTO_APPROVE_THRESHOLD = 0.75`; SQL uses the stricter `SQL_AUTO_APPROVE_THRESHOLD = 0.90`.
 
@@ -44,14 +44,11 @@ The master gate, Git rules and Jev all default to **ON**. Switches live only in 
 
 ### Local rules
 
-- `sudo`, `dd`, and `mkfs`/`mkfs.*`.
-- Recursive `chown`/`chgrp`.
-- Recursive `rm`, or deletion of literal targets normalized to `/`, `.`, `..`, or a temporary-directory root.
-- Recursive `chmod`, or modes matching world-writable/set-ID permissions.
-- Git: `add`, `commit`, `push`, `pull`, `merge`, `rebase`, `reset`, `checkout`, `switch`, `stash`, `cherry-pick`, `revert`, `restore`, and `clean`.
-- Write redirections to `/dev/*` (including `<>`), except `null`, `stdout`, `stderr`, and `fd/0..2`.
+The guarded Git subcommands are `add`, `commit`, `push`, `pull`, `merge`, `rebase`, `reset`, `checkout`, `switch`, `stash`, `cherry-pick`, `revert`, `restore`, and `clean`. No other Bash operation triggers the gate on its own. If a guarded Git operation is part of a compound command, Jev still evaluates the entire command.
 
-Deletion is exempt when every target is a literal absolute descendant of a recognized temporary directory and only recognized common options precede the targets. Recognized directories include `/tmp`, `/var/tmp`, and the host process's `tmpdir()`, plus `/private/tmp` and `/private/var/tmp` on macOS. Temporary-directory roots themselves are not exempt.
+### Protected paths
+
+`write` and `edit` ask for confirmation when a normalized path segment is `.git`, `node_modules`, `.ssh`, `.env`, or starts with `.env.`. The segment `.env.example` is exempt unless another segment is protected. For example, `repo/.env.local` and `repo/.git/config` still prompt; `repo/.env.example` and `repo/foo.git/config` do not.
 
 ## SQL decision flow
 
@@ -61,20 +58,20 @@ Deletion is exempt when every target is a literal absolute descendant of a recog
 4. `/gate jev off` retains manual confirmation for local matches. Missing SQL parameters ask without classification; unsupported argument shapes remain hard-blocked.
 5. Failed, oversized or uncertain classifications fall back to the existing confirmation dialog. Session lifecycle and parent-operation cancellation stop old calls without aborting a replacement operation.
 
-SQL uses question version 4; Bash uses questions version 7 (generic authorization, Git-only read-only classification, and Git/rm-only temporary-operation preauthorization). Offline tests verify routing, thresholds and failure behavior; live calibration is opt-in and is not a safety guarantee.
+SQL uses question version 4; Bash uses questions version 7 (generic authorization, read-only classification, and temporary-operation preauthorization). Offline tests verify routing, thresholds and failure behavior; live calibration is opt-in and is not a safety guarantee.
 
 ## Jev, context and failure behavior
 
 The extension keeps the unpinned model alias `typesafe/jev-latest` through Pi's `ctx.modelRegistry.classify()`. Pi manages authentication, for example through `TYPESAFE_API_KEY`.
 
-Bash requests contain the full command, the latest ordinary `user` message on the current session branch, and `cwd`; Git/rm-only requests also include `temporary_directories`, the same trusted host-specific roots used by local deletion exemptions. Questions use `cwd` to resolve relative targets, not as authorization. SQL requests contain only the full selected SQL string and concrete tool name, not other tool parameters, database contents or user messages. Rule identifiers stay in dialogs and logs. **Inputs are not redacted.** File contents, tool output and full conversation history are not sent. Command/SQL text may reach the provider even if execution is ultimately rejected.
+Bash requests contain the full command, the latest ordinary `user` message on the current session branch, `cwd`, and `temporary_directories` (host-specific roots used by the temporary-operation question). Questions use `cwd` to resolve relative targets, not as authorization. SQL requests contain only the full selected SQL string and concrete tool name, not other tool parameters, database contents or user messages. Rule identifiers stay in dialogs and logs. **Inputs are not redacted.** File contents, tool output and full conversation history are not sent. Command/SQL text may reach the provider even if execution is ultimately rejected.
 
 - Commands and SQL are limited to 8,000 characters and Bash user messages to 16,000. Oversized inputs require manual confirmation rather than truncation-based approval.
-- Missing authorization falls back to manual confirmation, except when a Git-only match is classified as read-only or a Git/rm-only match qualifies as a temporary operation. Unavailable models/credentials, request failures, invalid responses on the selected decision branch and out-of-range probabilities fall back to manual confirmation.
+- Missing authorization falls back to manual confirmation, except when the command is classified as read-only or qualifies as a temporary operation. Unavailable models/credentials, request failures, invalid responses on the selected decision branch and out-of-range probabilities fall back to manual confirmation.
 - Each request has one outer five-second deadline and `maxRetries: 0`; no second provider timer. Parent-operation cancellation stops classification/confirmation; late results cannot approve execution.
 - **Parser exceptions retain the existing warn-and-allow behavior:** warn when UI is available, then skip checks and allow execution. Syntax errors alone do not require confirmation, but recognized hazards in recovered syntax trees still match.
 
-Authorization is read directly from the latest ordinary `user` entry returned by `getBranch()`, without input fingerprints, provenance handlers or added message metadata. Pi persists template-expanded and transformed text before tool calls, so Jev receives that latest text. Text blocks are joined with newlines; an images-only or empty latest user never falls back to older authorization. Such calls require manual confirmation unless a Git-only match is classified as read-only or a Git/rm-only match qualifies as a temporary operation. Custom messages do not provide user authorization.
+Authorization is read directly from the latest ordinary `user` entry returned by `getBranch()`, without input fingerprints, provenance handlers or added message metadata. Pi persists template-expanded and transformed text before tool calls, so Jev receives that latest text. Text blocks are joined with newlines; an images-only or empty latest user never falls back to older authorization. Such calls require manual confirmation unless the command is classified as read-only or qualifies as a temporary operation. Custom messages do not provide user authorization.
 
 **Accepted limit:** ordinary `user` messages cannot distinguish real user input from extension-injected `sendUserMessage` input. Both, as well as legacy ordinary user messages, can supply authorization. Extensions are trusted accordingly; this simplification is not provenance verification. User-entry ID, session ID and cancellation checks still prevent stale decisions from approving calls.
 
@@ -85,8 +82,9 @@ Protected-path checks remain manual and independent of Jev. Neither Git nor Jev 
 | File                                                 | Responsibility                                                            |
 | ---------------------------------------------------- | ------------------------------------------------------------------------- |
 | [index.ts](index.ts)                                 | Handler registration, lifecycle, switches and `/gate` commands            |
-| [bash.ts](bash.ts)                                   | Bash input locking, AST matching and session/intent validity              |
-| [bash-rules.ts](bash-rules.ts)                       | Local Bash AST rules and fixed rule labels                                |\n| [temporary-directories.ts](temporary-directories.ts) | Shared host temporary roots for local rules and classifier state          |
+| [bash.ts](bash.ts)                                   | Bash input locking, Git matching and session/intent validity              |
+| [bash-rules.ts](bash-rules.ts)                       | Local Git AST matching                                                    |
+| [temporary-directories.ts](temporary-directories.ts) | Host temporary roots for classifier state                                 |
 | [sql.ts](sql.ts)                                     | SQL input locking, local rules and session validity                       |
 | [paths.ts](paths.ts)                                 | Manual write/edit protected-path checks                                   |
 | [approval.ts](approval.ts)                           | Shared classification, approval, cancellation and log timing              |
@@ -134,7 +132,7 @@ GATE_CALIBRATION_REPORT="${TMPDIR:-/tmp}/permission-gate-calibration.json" \
 
 Calibration sends only synthetic text from `tests/permission-gate/fixtures.ts`; **it never registers or executes a Bash tool**. The report path is optional. Each matched fixture is sampled three times, alongside coverage-exclusion cases, including relative-path probes, compound Git inspection, staged/unstaged review boundaries, temporary cleanup and detached merge/cherry-pick trials, and external/shared-ref effects that must not qualify as temporary operations. Development-time v2 measurements under both the original 0.90 intent threshold and the current 0.80 threshold produced 24 authorized approvals and 42 confirmations for unauthorized or unclear-scope samples in each run. This is a small, development-tuned sample, not independent accuracy evidence. Questions v4 simplified authorization judgments and lowered all approval thresholds to 0.70; v5 added the Git-only read-only branch; v6 keeps authorization questions generic rather than prescribing review-specific policy. Version 7 adds independent temporary-operation preauthorization without changing the authorization questions or thresholds. The historical v2 results do not validate v4–v7. Recalibrate after changing questions, model or context.
 
-A development-time v7 live run sampled 46 matched synthetic fixtures three times (138 judgments). All 13 new temporary-operation fixtures passed all three samples (39/39), including staging/quit after earlier setup. Overall, 135/138 judgments matched expectations: all three samples of `git reset --hard HEAD~1` with only “Yes, continue.” were incorrectly approved by the unchanged generic authorization branch, not the read-only or temporary branches. This remains an authorization-model limitation; the live suite intentionally retains the failing expectation. These development-tuned measurements are not independent accuracy or safety evidence.
+Before the local rules were narrowed to Git, a development-time v7 live run sampled 46 matched synthetic fixtures three times (138 judgments). All 13 new temporary-operation fixtures passed all three samples (39/39), including staging/quit after earlier setup. Overall, 135/138 judgments matched expectations: all three samples of `git reset --hard HEAD~1` with only “Yes, continue.” were incorrectly approved by the unchanged generic authorization branch, not the read-only or temporary branches. This remains an authorization-model limitation; the live suite intentionally retains the failing expectation. These development-tuned measurements are not independent accuracy or safety evidence.
 
 Following fx’s task-focused state, Gate sends only fields used by its questions. It keeps Pi’s direct classifier API and catalog model: no extra backend layer, model override, retries, hedging, credential scanner or usage pipeline. Inputs remain unredacted.
 

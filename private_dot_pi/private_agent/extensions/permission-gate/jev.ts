@@ -31,8 +31,8 @@ export const REASON_LABELS = {
 export type GateReason = keyof typeof REASON_LABELS;
 
 export interface GateProbabilities {
-  read_only?: number;
-  temporary_operation?: number;
+  read_only: number;
+  temporary_operation: number;
   intent_covered: number;
   scope_covered: number;
   effects_covered: number;
@@ -44,7 +44,7 @@ export interface GateJudgment {
   probabilities?:
     | GateProbabilities
     | { read_only: number }
-    | { temporary_operation: number; read_only?: number };
+    | { temporary_operation: number; read_only: number };
 }
 
 const INSTRUCTIONS =
@@ -83,7 +83,7 @@ export const GATE_QUESTIONS: ClassifierContext["questions"] = {
   },
 };
 
-// Only used when every matched rule is Git or deletion. This is preauthorization, not user intent.
+// This is preauthorization, not user intent.
 export const TEMPORARY_QUESTIONS: ClassifierContext["questions"] = {
   temporary_operation: {
     type: "bool",
@@ -114,7 +114,7 @@ export const TEMPORARY_QUESTIONS: ClassifierContext["questions"] = {
   ...GATE_QUESTIONS,
 };
 
-// Only used when Git is the sole matched rule; inspect the entire shell command, not just Git.
+// Inspect the entire shell command, not just Git.
 export const GIT_QUESTIONS: ClassifierContext["questions"] = {
   read_only: {
     type: "bool",
@@ -135,66 +135,59 @@ export const GIT_QUESTIONS: ClassifierContext["questions"] = {
   ...TEMPORARY_QUESTIONS,
 };
 
-function decidePreauthorizedClassification(
+function readProbability(
   result: ClassifierResult,
-  hasUserIntent: boolean,
-  gitOnly: boolean,
-): GateJudgment {
-  if (result.stopReason !== "stop") return { action: "ask", reason: "unavailable" };
-  const probabilities: { read_only?: number; temporary_operation?: number } = {};
-  for (const key of gitOnly
-    ? (["read_only", "temporary_operation"] as const)
-    : (["temporary_operation"] as const)) {
-    const answer = result.answers?.[key];
-    if (
-      answer?.type !== "bool" ||
-      !Number.isFinite(answer.probability) ||
-      answer.probability < 0 ||
-      answer.probability > 1
-    )
-      return { action: "ask", reason: "invalid-response" };
-    probabilities[key] = answer.probability;
-    // Later branch answers are irrelevant once a valid preauthorization passes.
-    if (answer.probability >= BASH_AUTO_APPROVE_THRESHOLD)
-      return {
-        action: "allow",
-        reason: key === "read_only" ? "git-read-only" : "temporary-operation",
-        probabilities:
-          key === "read_only"
-            ? { read_only: answer.probability }
-            : { ...probabilities, temporary_operation: answer.probability },
-      };
-  }
-  if (!hasUserIntent) return { action: "ask", reason: "missing-intent" };
-  const judgment = decideClassification(result);
-  if (judgment.probabilities)
-    judgment.probabilities = { ...judgment.probabilities, ...probabilities };
-  return judgment;
+  key: keyof GateProbabilities,
+): number | undefined {
+  const answer = result.answers?.[key];
+  if (
+    answer?.type === "bool" &&
+    Number.isFinite(answer.probability) &&
+    answer.probability >= 0 &&
+    answer.probability <= 1
+  )
+    return answer.probability;
 }
 
-export function decideClassification(result: ClassifierResult): GateJudgment {
+function decideGitClassification(result: ClassifierResult, hasUserIntent: boolean): GateJudgment {
   if (result.stopReason !== "stop") return { action: "ask", reason: "unavailable" };
-  const probabilities: Partial<GateProbabilities> = {};
-  for (const key of ["intent_covered", "scope_covered", "effects_covered"] as const) {
-    const answer = result.answers?.[key];
-    if (
-      answer?.type !== "bool" ||
-      !Number.isFinite(answer.probability) ||
-      answer.probability < 0 ||
-      answer.probability > 1
-    )
-      return { action: "ask", reason: "invalid-response" };
-    probabilities[key] = answer.probability;
-  }
-  const scores = probabilities as GateProbabilities;
+
+  // Check each branch before reading answers that it doesn't need.
+  const read_only = readProbability(result, "read_only");
+  if (read_only === undefined) return { action: "ask", reason: "invalid-response" };
+  if (read_only >= BASH_AUTO_APPROVE_THRESHOLD)
+    return { action: "allow", reason: "git-read-only", probabilities: { read_only } };
+
+  const temporary_operation = readProbability(result, "temporary_operation");
+  if (temporary_operation === undefined) return { action: "ask", reason: "invalid-response" };
+  if (temporary_operation >= BASH_AUTO_APPROVE_THRESHOLD)
+    return {
+      action: "allow",
+      reason: "temporary-operation",
+      probabilities: { read_only, temporary_operation },
+    };
+
+  if (!hasUserIntent) return { action: "ask", reason: "missing-intent" };
+
+  const intent_covered = readProbability(result, "intent_covered");
+  const scope_covered = readProbability(result, "scope_covered");
+  const effects_covered = readProbability(result, "effects_covered");
+  if (intent_covered === undefined || scope_covered === undefined || effects_covered === undefined)
+    return { action: "ask", reason: "invalid-response" };
   const allow =
-    scores.intent_covered >= BASH_AUTO_APPROVE_THRESHOLD &&
-    scores.scope_covered >= BASH_AUTO_APPROVE_THRESHOLD &&
-    scores.effects_covered >= BASH_AUTO_APPROVE_THRESHOLD;
+    intent_covered >= BASH_AUTO_APPROVE_THRESHOLD &&
+    scope_covered >= BASH_AUTO_APPROVE_THRESHOLD &&
+    effects_covered >= BASH_AUTO_APPROVE_THRESHOLD;
   return {
     action: allow ? "allow" : "ask",
     reason: allow ? "approved" : "uncertain",
-    probabilities: scores,
+    probabilities: {
+      intent_covered,
+      scope_covered,
+      effects_covered,
+      read_only,
+      temporary_operation,
+    },
   };
 }
 
@@ -216,19 +209,13 @@ export const SQL_QUESTIONS: ClassifierContext["questions"] = {
 
 export function decideSqlClassification(result: ClassifierResult): GateJudgment {
   if (result.stopReason !== "stop") return { action: "ask", reason: "unavailable" };
-  const answer = result.answers?.read_only;
-  if (
-    answer?.type !== "bool" ||
-    !Number.isFinite(answer.probability) ||
-    answer.probability < 0 ||
-    answer.probability > 1
-  )
-    return { action: "ask", reason: "invalid-response" };
-  const allow = answer.probability >= SQL_AUTO_APPROVE_THRESHOLD;
+  const read_only = readProbability(result, "read_only");
+  if (read_only === undefined) return { action: "ask", reason: "invalid-response" };
+  const allow = read_only >= SQL_AUTO_APPROVE_THRESHOLD;
   return {
     action: allow ? "allow" : "ask",
     reason: allow ? "read-only" : "not-read-only",
-    probabilities: { read_only: answer.probability },
+    probabilities: { read_only },
   };
 }
 
@@ -254,14 +241,11 @@ export async function judgeCommand(
   userIntent: string,
   cwd: string,
   signal: AbortSignal,
-  gitOnly = false,
-  temporaryEligible = gitOnly,
 ): Promise<GateJudgment> {
   if (signal.aborted) return { action: "cancelled", reason: "cancelled" };
   if (command.length > COMMAND_LIMIT || userIntent.length > INTENT_LIMIT)
     return { action: "ask", reason: "input-too-long" };
   const hasUserIntent = Boolean(userIntent.trim());
-  if (!hasUserIntent && !temporaryEligible) return { action: "ask", reason: "missing-intent" };
   return judge(
     registry,
     {
@@ -269,15 +253,12 @@ export async function judgeCommand(
         command,
         user_intent: userIntent,
         cwd,
-        ...(temporaryEligible ? { temporary_directories: TEMP_DIRECTORIES } : {}),
+        temporary_directories: TEMP_DIRECTORIES,
       },
-      questions: gitOnly ? GIT_QUESTIONS : temporaryEligible ? TEMPORARY_QUESTIONS : GATE_QUESTIONS,
+      questions: GIT_QUESTIONS,
     },
     signal,
-    (result) =>
-      temporaryEligible
-        ? decidePreauthorizedClassification(result, hasUserIntent, gitOnly)
-        : decideClassification(result),
+    (result) => decideGitClassification(result, hasUserIntent),
   );
 }
 

@@ -38,7 +38,7 @@ const TITLES: Record<Guard, string> = {
   sql: "⚠️ SQL Guard",
 };
 const INPUTS: Record<Guard, { toolName: string; input: Record<string, unknown> }> = {
-  gate: { toolName: "bash", input: { command: "rm -rf /repo/confirmation-test" } },
+  gate: { toolName: "bash", input: { command: "git add -- /repo/confirmation-test" } },
   path: { toolName: "write", input: { path: "/repo/.env", content: "fixture-only" } },
   sql: { toolName: "mcp__db__execute_sql", input: { sql: "DROP TABLE confirmation_test" } },
 };

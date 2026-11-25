@@ -18,7 +18,7 @@ import { createHash } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import permissionGate from "../../extensions/permission-gate/index.ts";
 import { withBashTree } from "../../lib/bash-parser.ts";
-import { approvalRules } from "../../extensions/permission-gate/bash-rules.ts";
+import { hasGuardedGitCommand } from "../../extensions/permission-gate/bash-rules.ts";
 import {
   BASH_AUTO_APPROVE_THRESHOLD,
   GATE_MODEL,
@@ -81,8 +81,8 @@ function classificationOnlyGate(registry: ModelRegistry, fixture: GateFixture) {
 
 describe("Permission Gate calibration fixture coverage (no network)", () => {
   it.each(GATE_FIXTURES)("$label", async (fixture) => {
-    const rules = await withBashTree(fixture.command, (root) => approvalRules(root, true));
-    expect(rules.length > 0).toBe(fixture.expected !== "unmatched");
+    const matched = await withBashTree(fixture.command, hasGuardedGitCommand);
+    expect(matched).toBe(fixture.expected !== "unmatched");
   });
 });
 

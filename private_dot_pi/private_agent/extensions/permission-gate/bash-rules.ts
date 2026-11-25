@@ -1,6 +1,5 @@
 import { posix } from "node:path";
 import type { Node as SyntaxNode } from "web-tree-sitter";
-import { TEMP_DIRECTORIES } from "./temporary-directories.ts";
 
 const GIT_GUARDED_SUBCOMMANDS = new Set([
   "add",
@@ -101,122 +100,14 @@ function gitSubcommand(words: readonly (string | undefined)[]): string | undefin
   return undefined;
 }
 
-function redirectRequiresApproval(node: SyntaxNode): boolean {
-  const writes = node.children.some(
-    (child) => child && [">", ">>", ">|", "&>", "&>>", ">&", "<>"].includes(child.type),
-  );
-  if (!writes) return false;
-
-  const destination = wordText(node.childForFieldName("destination"));
-  if (destination === undefined) return false;
-  const path = posix.normalize(destination);
-  return path.startsWith("/dev/") && !/^\/dev\/(?:null|stdout|stderr|fd\/[012])$/.test(path);
-}
-
-function rmRequiresApproval(words: readonly (string | undefined)[]): boolean {
-  const paths = words.map((word) =>
-    word === undefined ? undefined : posix.normalize(word).replace(/\/+$/, "") || "/",
-  );
-
-  // Only common, leading flags are eligible for the temporary-target exemption.
-  let start = 0;
-  while (/^(?:-[dfiIrRv]+|--(?:force|recursive|dir|verbose))$/.test(words[start] ?? "")) start++;
-  if (words[start] === "--") start++;
-  const targets = paths.slice(start);
-  if (targets.some((path) => path !== undefined && TEMP_DIRECTORIES.includes(path))) return true;
-  if (
-    targets.length > 0 &&
-    targets.every(
-      (path) => path !== undefined && TEMP_DIRECTORIES.some((dir) => path.startsWith(`${dir}/`)),
-    )
-  )
-    return false;
-
-  const end = words.indexOf("--");
-  const options = end < 0 ? words : words.slice(0, end);
-  return (
-    options.some((word) => /^-[^-]*[rR]/.test(word ?? "") || word === "--recursive") ||
-    paths.some((path) => path !== undefined && ["/", ".", ".."].includes(path))
-  );
-}
-
-function chmodRequiresApproval(words: readonly (string | undefined)[]): boolean {
-  const end = words.indexOf("--");
-  const options = end < 0 ? words : words.slice(0, end);
-  if (options.some((word) => /^-[^-]*R/.test(word ?? "") || word === "--recursive")) return true;
-
-  if (options.some((word) => word === "--reference" || word?.startsWith("--reference=")))
-    return false;
-
-  const mode =
-    end < 0
-      ? words.find(
-          (word) => word === undefined || !word.startsWith("-") || /^-0*[0-7]{1,4}$/.test(word),
-        )
-      : words[end + 1];
-  if (!mode) return false;
-  if (/^[+=-]?0*[0-7]{1,4}$/.test(mode)) {
-    if (mode.startsWith("-")) return false;
-    const permissions = Number.parseInt(mode.replace(/^[+=]/, ""), 8);
-    return (permissions & 0o002) !== 0 || (permissions & 0o6000) !== 0;
-  }
-  return mode
-    .split(",")
-    .some((part) => /[+=][^,]*s/.test(part) || /^(?:[ug]*[oa][ugoa]*|)[+=][^,]*w/.test(part));
-}
-
-export const RULE_LABELS = {
-  "device-write": "Device write",
-  sudo: "Sudo",
-  dd: "Disk/data copy",
-  mkfs: "Filesystem formatting",
-  rm: "Deletion",
-  chmod: "Permission change",
-  chown: "Ownership change",
-  chgrp: "Group change",
-  git: "Git operation",
-} as const;
-
-export type GateRule = keyof typeof RULE_LABELS;
-
-/** Inspect synchronously; retain only fixed rule names, never SyntaxNode or command text. */
-export function approvalRules(root: SyntaxNode, gitEnabled: boolean): GateRule[] {
-  const rules = new Set<GateRule>();
-  if (
-    root.descendantsOfType("file_redirect").some((node) => node && redirectRequiresApproval(node))
-  )
-    rules.add("device-write");
-
+export function hasGuardedGitCommand(root: SyntaxNode): boolean {
   for (const node of root.descendantsOfType("command")) {
     if (!node) continue;
     const name = wordText(node.childForFieldName("name"));
-    if (name === undefined) continue;
-    const executable = posix.basename(name);
-    if (executable === "sudo" || executable === "dd") {
-      rules.add(executable);
-      continue;
-    }
-    if (executable === "mkfs" || executable.startsWith("mkfs.")) {
-      rules.add("mkfs");
-      continue;
-    }
-    if (!["git", "rm", "chmod", "chown", "chgrp"].includes(executable)) continue;
-
+    if (name === undefined || posix.basename(name) !== "git") continue;
     const args = node.childrenForFieldName("argument").map((arg) => wordText(arg));
-    if (executable === "git") {
-      const subcommand = gitSubcommand(args);
-      if (gitEnabled && subcommand !== undefined && GIT_GUARDED_SUBCOMMANDS.has(subcommand))
-        rules.add("git");
-    } else if (executable === "rm") {
-      if (rmRequiresApproval(args)) rules.add("rm");
-    } else if (executable === "chmod") {
-      if (chmodRequiresApproval(args)) rules.add("chmod");
-    } else {
-      const end = args.indexOf("--");
-      const options = end < 0 ? args : args.slice(0, end);
-      if (options.some((arg) => /^-[^-]*R/.test(arg ?? "") || arg === "--recursive"))
-        rules.add(executable as "chown" | "chgrp");
-    }
+    const subcommand = gitSubcommand(args);
+    if (subcommand && GIT_GUARDED_SUBCOMMANDS.has(subcommand)) return true;
   }
-  return [...rules];
+  return false;
 }

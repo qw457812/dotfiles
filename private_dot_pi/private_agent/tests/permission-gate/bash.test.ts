@@ -1,5 +1,3 @@
-import { tmpdir } from "node:os";
-import { posix } from "node:path";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { describe, expect, it, vi } from "vitest";
 import permissionGate from "../../extensions/permission-gate/index.ts";
@@ -64,252 +62,19 @@ function harness(approved = true, hasUI = true, extension = permissionGate) {
   };
 }
 
-const PARSE_ERROR_CASES = [
-  'echo "unterminated',
-  "if true; then echo ok",
-  "echo ok >",
-  'rm -rf /tmp/file; echo "unterminated',
-];
-
-const APPROVAL_CASES = [
-  'rm -rf "$DIR"',
-  'rm -r "$DIR"',
-  'rm "$FLAGS" -R "$DIR"',
-  'rm -rf /tmp/cache "$OTHER"',
-  'rm "$FILE" /',
-  "rm -f /",
-  "rm -f .",
-  "rm -f /tmp",
-  'chmod 777 "$TARGET"',
-  'chmod o+w "$TARGET"',
-  'chmod u+s "$TARGET"',
-  'chmod -R "$MODE" "$TARGET"',
-  'chmod --recursive "$MODE" "$TARGET"',
-  "chown -R user dir",
-  'chown -hR "$OWNER" "$TARGET"',
-  'chown --recursive "$OWNER" "$TARGET"',
-  "chgrp -R group dir",
-  'chgrp -vR "$GROUP" "$TARGET"',
-  'chgrp --recursive "$GROUP" "$TARGET"',
-  'echo ok >"$(sudo true)"',
-  'sudo rm -rf /; echo "unterminated',
-  "sudo echo hello",
-  "/usr/bin/sudo -u root true",
-  "'sudo' true",
-  "rm -r directory",
-  "rm -Rf directory",
-  "rm --recursive directory",
+const NON_GIT_CASES = [
+  "rm -rf dir",
   "rm -rf /tmp",
-  "rm /tmp/",
-  "rm -- /tmp",
-  "rm -rf /tmp/.",
-  "rm -rf /var/tmp",
-  "rm /var/tmp/",
-  "rm -rf /tmp/child/..",
-  "rm -rf /private/tmp",
-  "rm -rf /private/tmp/",
-  "rm -rf /private/var/tmp",
-  "rm -rf /private/var/tmp/child/..",
-  "rm -rf /private/tmp-not-temp/file",
-  "rm -rf /private/var/tmp-not-temp/file",
-  "rm -rf /private/tmp/../etc/file",
-  "rm -rf /private/var/tmp/../../etc/file",
-  "rm -rf /private/tmp/file /repo/file",
-  "sudo rm -rf /private/tmp/file",
-  ...(process.platform === "darwin" ? ["rm /private/tmp", "rm -- /private/var/tmp"] : []),
-  `rm -rf ${JSON.stringify(tmpdir())}`,
-  "rm -rf /tmp/file /repo/file",
-  "rm -rf /repo/file /tmp/file",
-  "rm -rf /tmp/file relative.tmp",
-  "rm -rf /tmp-not-temp/file",
-  "rm -rf /var/tmp-not-temp/file",
-  "rm -rf /tmp/../etc/file",
-  "rm -rf /tmp/nested/../../etc/file",
-  "rm -rf ./tmp/file",
-  "rm -rf report.tmp",
-  "rm -rf /tmp/*",
-  'rm -rf "$TMPDIR/file"',
-  'TMPDIR=/tmp rm -rf "$TMPDIR/file"',
-  "rm -rf /tmp/file --unknown-option",
-  "rm -rf --unknown-option /tmp/file",
-  "rm -rf /tmp/file -- /repo/file",
-  "rm -rf -- /tmp/file /repo/file",
-  "sudo rm -rf /tmp/file",
-  "rm -rf /tmp/file; rm -rf /repo/file",
-  "rm -rf /tmp/file; git reset --hard",
-  "rm -rf /tmp/file >/dev/sda",
-  "rm /",
-  "rm .",
-  "rm ../",
-  "rm /tmp/..",
-  "mkfs /dev/sda",
-  "/sbin/mkfs.ext4 /dev/sda",
-  "dd",
+  'rm -rf "$DIR"',
+  "chmod -R 777 dir",
+  "chown -R user dir",
+  "chgrp -R group dir",
+  "sudo true",
   "dd if=input of=output",
-  "chmod 2 file",
-  "chmod 22 file",
-  "chmod 0000777 file",
-  "chmod 0004755 file",
-  "chmod 0002755 file",
-  "chmod +2 file",
-  "chmod =0000777 file",
-  "chmod 777 file",
-  "chmod 0777 file",
-  "chmod 666 file",
-  "chmod 4755 file",
-  "chmod 2755 file",
-  "chmod +777 file",
-  "chmod o+w file",
-  "chmod a=rw file",
-  "chmod +w file",
-  "chmod u+s file",
-  "chmod g=rs file",
-  "chmod u+x,o+w file",
-  "chmod -R u+w dir",
-  "chmod --recursive 755 dir",
-  "chmod -R --reference=other file",
+  "mkfs.ext4 /dev/sda",
   "echo ok >/dev/sda",
-  "echo ok >>'/dev/nvme0n1'",
-  "echo ok 2>/dev/disk/by-id/disk",
-  "echo ok &>/dev/disk0",
-  "echo ok >|/dev/sda",
-  "echo ok >&/dev/sda",
-  "cat <>/dev/sda",
-  "echo ok >/dev/./sda",
-  "true; rm -rf dir; echo done",
-  "rm -rf dir|tee output",
-  "(rm -rf dir)",
-  "if true; then rm -rf dir; fi",
-  'echo "$(rm -rf dir)"',
-  "echo `rm -rf dir`",
-  "cat <(rm -rf dir)",
-  "cat <<EOF\n$(rm -rf dir)\nEOF",
-  "TARGET=$(sudo true) echo done",
-  "r\\m -rf dir",
-  'r"m" -rf dir',
-  '"/bin/rm" -rf dir',
-];
-
-const LOW_NOISE_CASES = [
-  "rm -f file",
-  "rm --force file",
-  'rm "$TARGET"',
-  "rm *.txt",
-  "rm ~/file",
-  'chmod "$MODE" file',
-  'chmod 755 "$TARGET"',
-  "chown user file",
-  "chgrp group file",
-  'echo ok >"$DEVICE"',
-  "true&&rm -f file",
-  "for file in a b; do rm -f file; done",
-  'rm "$FILE"',
-  'rm -f "$FILE"',
-  'rm --force "$FILE"',
-  'rm "$FLAGS" "$FILE"',
-  'rm -- "$FILE" -r',
-  'chmod "$MODE" 777',
-  'chmod -- "$MODE" 777',
-  'chmod "$FLAGS" 777 file',
-  "chmod",
-  'chmod --reference="$REF" "$TARGET"',
-  'chown "$OWNER" "$TARGET"',
-  'chgrp "$GROUP" "$TARGET"',
-  "chown -- user -R",
-  "chgrp -- group --recursive",
-  'echo >"$OUT"',
-  'echo >"${OUT:-/dev/sda}"',
-  'echo >"$(printf /dev/sda)"',
-];
-
-const CLEAR_CASES = [
-  ...PARSE_ERROR_CASES,
-  ...LOW_NOISE_CASES,
-  "",
-  "  ",
-  "rm file",
-  "rm -i file",
-  "rm -- -rf",
-  "rm -- --recursive",
-  "rm ./-rf",
-  "rm -f /tmp/file",
-  "rm -rf /tmp/directory",
-  "rm -Rf /var/tmp/directory",
-  "rm --force --recursive /tmp/directory",
-  "rm -rf -- /tmp/directory",
-  "rm -rf /tmp/first /var/tmp/second",
-  "rm -rf '/tmp/a b'",
-  'rm -rf "/var/tmp/a b"',
-  "rm -rf /tmp//directory/",
-  "rm -rf /tmp/child/../file",
-  "rm -rf /tmp/-rf",
-  "rm -rf -- /tmp/--recursive",
-  "rm -rf '/tmp/*'",
-  `rm -rf ${JSON.stringify(posix.join(tmpdir(), "permission-gate-test-file"))}`,
-  "/bin/rm -rf /tmp/directory",
-  "true && rm -rf /tmp/directory; echo done",
-  "rm -rf /tmp/first; rm -rf /var/tmp/second",
-  'echo "$(rm -rf /tmp/directory)"',
-  ...(process.platform === "darwin"
-    ? [
-        "rm -rf /private/tmp/file",
-        "rm -rf -- /private/var/tmp/directory",
-        "rm -rf /tmp/first /private/tmp/second /private/var/tmp/third",
-        "rm -rf '/private/tmp/a b'",
-        "rm -rf /private/tmp/child/../file",
-      ]
-    : []),
-  "chmod 0 file",
-  "chmod 1 file",
-  "chmod 75 file",
-  "chmod 0000755 file",
-  "chmod 0001755 file",
-  "chmod -2 file",
-  "chmod -0006000 file",
-  "chmod -- -777 file",
-  "chmod --reference=other file",
-  "chmod --reference 777 file",
-  "chmod 755 file",
-  "chmod 644 file",
-  "chmod u+w file",
-  "chmod g+w file",
-  "chmod o-w file",
-  "chmod u-s file",
-  "chmod 1755 file",
-  "chmod 755 777",
-  "chmod 755 'o+w'",
-  "echo sudo rm -rf dir",
-  'echo "sudo rm -rf dir; chmod 777 file"',
-  "printf '%s' 'mkfs dd if=foo > /dev/sda'",
-  "# sudo rm -rf /\necho ok",
-  "cat <<'EOF'\n$(rm -rf dir)\nsudo\nEOF",
-  "cat <<EOF\nrm -rf dir\nEOF",
-  'echo "literal $text rm -rf"',
-  "echo 'DROP TABLE x; DELETE FROM x; TRUNCATE x'",
-  "echo ok >/dev/null",
-  "echo ok >/dev/stdout",
-  "echo ok 2>/dev/stderr",
-  "echo ok >/dev/fd/1",
-  "echo ok 2>&1",
-  "echo ok >output",
-  "cat </dev/sda",
-  "echo /dev/sda",
-  "git status",
-];
-
-// Deliberate coverage limits: dynamic names, aliases/functions and wrapper strings
-// are not resolved, even when their execution could invoke a dangerous command.
-const UNRESOLVED_EXECUTABLE_CASES = [
-  '"$TOOL" -rf dir',
-  "${TOOL} -rf dir",
-  "$(printf rm) -rf dir",
-  "env rm -rf dir",
-  "command rm -rf dir",
-  "xargs rm -rf",
-  "bash -c 'rm -rf dir'",
-  "eval 'rm -rf dir'",
-  "alias wipe='rm -rf'; wipe dir",
-  "wipe dir",
+  "git status >/dev/sda",
+  'echo "unterminated',
 ];
 
 const GIT_APPROVAL_CASES = [
@@ -368,49 +133,7 @@ const GIT_CLEAR_CASES = [
 ];
 
 describe("Permission Gate", () => {
-  it.each(LOW_NOISE_CASES)("does not prompt or abort for low-noise cases: %s", async (command) => {
-    const { run, ctx, emit } = harness(false);
-    expect(await run(command)).toBeUndefined();
-    expect(ctx.ui.confirm).not.toHaveBeenCalled();
-    expect(ctx.ui.notify).not.toHaveBeenCalled();
-    expect(ctx.abort).not.toHaveBeenCalled();
-    expect(emit).not.toHaveBeenCalled();
-  });
-
-  it.each(APPROVAL_CASES)("asks once and shows the complete command: %s", async (command) => {
-    const { run, ctx, emit } = harness();
-    expect(await run(command)).toBeUndefined();
-    expect(ctx.ui.confirm).toHaveBeenCalledExactlyOnceWith(
-      "🔐 Allow this command?",
-      expect.stringContaining(`\n\n${command}`),
-      { signal: expect.any(AbortSignal) },
-    );
-    expect(emit).toHaveBeenCalledWith("my:notification", {
-      title: "🔐 Allow this command?",
-      body: expect.stringContaining(`\n\n${command}`),
-    });
-    expect(ctx.abort).not.toHaveBeenCalled();
-  });
-
-  it.each([...CLEAR_CASES, ...UNRESOLVED_EXECUTABLE_CASES])("stays silent: %s", async (command) => {
-    const { run, ctx, emit } = harness(true, false);
-    expect(await run(command)).toBeUndefined();
-    expect(ctx.ui.confirm).not.toHaveBeenCalled();
-    expect(emit).not.toHaveBeenCalled();
-  });
-
-  it.each(APPROVAL_CASES)("blocks without UI: %s", async (command) => {
-    const { run, ctx, emit } = harness(true, false);
-    expect(await run(command)).toEqual({
-      block: true,
-      reason: "Operation requires user confirmation",
-    });
-    expect(ctx.ui.confirm).not.toHaveBeenCalled();
-    expect(ctx.abort).not.toHaveBeenCalled();
-    expect(emit).not.toHaveBeenCalled();
-  });
-
-  it.each(PARSE_ERROR_CASES)("does not prompt for syntax errors alone: %s", async (command) => {
+  it.each(NON_GIT_CASES)("does not prompt or abort for unmatched commands: %s", async (command) => {
     const { run, ctx, emit } = harness(false);
     expect(await run(command)).toBeUndefined();
     expect(ctx.ui.confirm).not.toHaveBeenCalled();
@@ -428,7 +151,7 @@ describe("Permission Gate", () => {
       });
       try {
         const { run, ctx, emit } = harness(false, hasUI);
-        expect(await run("sudo rm -rf /")).toBeUndefined();
+        expect(await run("git reset --hard")).toBeUndefined();
         expect(ctx.ui.confirm).not.toHaveBeenCalled();
         expect(ctx.abort).not.toHaveBeenCalled();
         expect(emit).not.toHaveBeenCalled();
@@ -462,32 +185,9 @@ describe("Permission Gate", () => {
     }
   });
 
-  it.each(["/private/tmp/file", "/private/var/tmp/file"])(
-    "only exempts macOS private temporary descendants: %s",
-    async (path) => {
-      const { run, ctx } = harness();
-      expect(await run(`rm -rf ${path}`)).toBeUndefined();
-      expect(ctx.ui.confirm).toHaveBeenCalledTimes(process.platform === "darwin" ? 0 : 1);
-    },
-  );
-
-  it("does not ask or abort for an exempt temporary deletion even with UI", async () => {
-    const { run, ctx, emit } = harness(false);
-    expect(await run("rm -rf -- /tmp/permission-gate-test-file")).toBeUndefined();
-    expect(ctx.ui.confirm).not.toHaveBeenCalled();
-    expect(ctx.abort).not.toHaveBeenCalled();
-    expect(emit).not.toHaveBeenCalled();
-  });
-
-  it("aborts and blocks on denial", async () => {
-    const { run, ctx } = harness(false);
-    expect(await run("rm -rf dir")).toEqual({ block: true, reason: "Blocked by user" });
-    expect(ctx.abort).toHaveBeenCalledOnce();
-  });
-
   it.each(["write", "edit", "read"])("ignores non-bash tools: %s", async (tool) => {
     const { run, ctx } = harness();
-    expect(await run("sudo rm -rf /", tool)).toBeUndefined();
+    expect(await run("git reset --hard", tool)).toBeUndefined();
     expect(ctx.ui.confirm).not.toHaveBeenCalled();
   });
 });
@@ -534,31 +234,29 @@ describe("Permission Gate Git rules", () => {
 });
 
 describe("Permission Gate integration and Git toggle", () => {
-  it.each([
-    "sudo git reset --hard",
-    "git reset --hard; rm -rf dir",
-    "git commit -m update && git push",
-    "git status >/dev/sda",
-  ])("parses and confirms once with both extensions loaded: %s", async (command) => {
-    const parser = await initializeBashParser();
-    const parse = vi.spyOn(parser, "parse");
-    try {
-      const { run, ctx, emit } = harness(true, true, (pi) => {
-        permissionGate(pi);
-        dirtyRepoGuard(pi);
-      });
-      expect(await run(command)).toBeUndefined();
-      expect(parse).toHaveBeenCalledOnce();
-      expect(ctx.ui.confirm).toHaveBeenCalledExactlyOnceWith(
-        "🔐 Allow this command?",
-        expect.stringContaining(`\n\n${command}`),
-        { signal: expect.any(AbortSignal) },
-      );
-      expect(emit).toHaveBeenCalledOnce();
-    } finally {
-      parse.mockRestore();
-    }
-  });
+  it.each(["git reset --hard; rm -rf dir", "git commit -m update && git push"])(
+    "parses and confirms once with both extensions loaded: %s",
+    async (command) => {
+      const parser = await initializeBashParser();
+      const parse = vi.spyOn(parser, "parse");
+      try {
+        const { run, ctx, emit } = harness(true, true, (pi) => {
+          permissionGate(pi);
+          dirtyRepoGuard(pi);
+        });
+        expect(await run(command)).toBeUndefined();
+        expect(parse).toHaveBeenCalledOnce();
+        expect(ctx.ui.confirm).toHaveBeenCalledExactlyOnceWith(
+          "🔐 Allow this command?",
+          expect.stringContaining(`\n\n${command}`),
+          { signal: expect.any(AbortSignal) },
+        );
+        expect(emit).toHaveBeenCalledOnce();
+      } finally {
+        parse.mockRestore();
+      }
+    },
+  );
 
   it.each([
     "add",
@@ -595,24 +293,6 @@ describe("Permission Gate integration and Git toggle", () => {
     expect(ctx.ui.notify).toHaveBeenLastCalledWith("Git approval: ON", "info");
   });
 
-  it.each([
-    "sudo git reset --hard",
-    "git status >/dev/sda",
-    "git reset --hard; rm -rf dir",
-    'git "$ACTION"; rm -rf dir',
-    'sudo git "$ACTION"',
-    'git "$ACTION" >/dev/sda',
-  ])("still confirms other risks with Git rules off: %s", async (command) => {
-    const { run, ctx, gate } = harness();
-    await gate("git off");
-    await run(command);
-    expect(ctx.ui.confirm).toHaveBeenCalledExactlyOnceWith(
-      "🔐 Allow this command?",
-      expect.stringContaining(`\n\n${command}`),
-      { signal: expect.any(AbortSignal) },
-    );
-  });
-
   it("does not confirm syntax errors alone when Git rules are off", async () => {
     const { run, ctx, gate } = harness(true, false);
     await gate("git off");
@@ -620,19 +300,6 @@ describe("Permission Gate integration and Git toggle", () => {
     expect(ctx.ui.confirm).not.toHaveBeenCalled();
     expect(ctx.abort).not.toHaveBeenCalled();
   });
-
-  it.each(["rm -rf dir", 'git "$ACTION"; rm -rf dir'])(
-    "still blocks without UI with Git rules off: %s",
-    async (command) => {
-      const { run, ctx, gate } = harness(true, false);
-      await gate("git off");
-      expect(await run(command)).toEqual({
-        block: true,
-        reason: "Operation requires user confirmation",
-      });
-      expect(ctx.ui.confirm).not.toHaveBeenCalled();
-    },
-  );
 
   it("reports status and rejects invalid gate arguments without changing state", async () => {
     const { run, ctx, gate } = harness();

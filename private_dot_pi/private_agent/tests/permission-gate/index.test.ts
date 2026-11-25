@@ -30,7 +30,7 @@ import {
 } from "../../extensions/permission-gate/jev.ts";
 import { TEMP_DIRECTORIES } from "../../extensions/permission-gate/temporary-directories.ts";
 import { latestUserIntent } from "../../extensions/permission-gate/intent.ts";
-import { RULE_LABELS, type GateRule } from "../../extensions/permission-gate/bash-rules.ts";
+import type { GateRecord } from "../../extensions/permission-gate/log.ts";
 
 const MODEL: ClassifierModel<"typesafe-classifier"> = {
   type: "classifier",
@@ -45,8 +45,8 @@ const MODEL: ClassifierModel<"typesafe-classifier"> = {
 };
 const TIMESTAMP = "2026-01-01T00:00:00.000Z";
 const SECRET = "secret-token-DO-NOT-LOG";
-const COMMAND = `rm -rf /repo/${SECRET}`;
-const INTENT = `Delete /repo/${SECRET}, including all its files.`;
+const COMMAND = `git add -- /repo/${SECRET}`;
+const INTENT = `Stage /repo/${SECRET}.`;
 const USAGE = "Usage: /gate on|off | git [on|off] | jev [on|off] | log";
 const CANCELLED = { block: true, reason: "Permission Gate: operation cancelled" };
 
@@ -109,7 +109,7 @@ interface Decision {
   questionVersion: number;
   timestamp: string;
   model: string;
-  rules: GateRule[];
+  rules: GateRecord["rules"];
   judgment: GateJudgment;
   durationMs: number;
   outcome: string;
@@ -338,7 +338,7 @@ describe("Permission Gate integrated path and SQL guards", () => {
     const sqlResult = deferred<ClassifierResult>();
     const firstDialog = deferred<boolean>();
     h.classify.mockImplementation((_model, context) =>
-      context.questions.read_only ? sqlResult.promise : bashResult.promise,
+      "sql" in context.state ? sqlResult.promise : bashResult.promise,
     );
     h.confirm.mockReturnValueOnce(firstDialog.promise);
     const sqlCall = h.runInput({ sql: "DROP TABLE data" }, "mcp__db__execute_sql");
@@ -510,7 +510,7 @@ describe("Permission Gate command integrity before tool execution", () => {
 
 describe("Permission Gate master switch", () => {
   it.each([
-    ["bash", { command: "sudo true" }],
+    ["bash", { command: "git add file" }],
     ["mcp__db__execute_sql", { sql: "DROP TABLE users" }],
     ["write", { path: "/repo/.env" }],
     ["edit", { path: "/repo/.ssh/config" }],
@@ -520,12 +520,17 @@ describe("Permission Gate master switch", () => {
     expect(h.notify).toHaveBeenLastCalledWith("Permission Gate: OFF", "warning");
     const args = { ...input };
     expect(await h.runInput(args, toolName)).toBeUndefined();
-    expect(Object.values(Object.getOwnPropertyDescriptors(args)).every((p) => p.writable)).toBe(true);
+    expect(Object.values(Object.getOwnPropertyDescriptors(args)).every((p) => p.writable)).toBe(
+      true,
+    );
     expect(h.classify).not.toHaveBeenCalled();
     expect(h.confirm).not.toHaveBeenCalled();
     expect(h.appendEntry).not.toHaveBeenCalled();
     await h.gate("");
-    expect(h.notify).toHaveBeenLastCalledWith(expect.stringContaining("Permission Gate: OFF;"), "info");
+    expect(h.notify).toHaveBeenLastCalledWith(
+      expect.stringContaining("Permission Gate: OFF;"),
+      "info",
+    );
 
     await h.gate("on");
     expect(h.notify).toHaveBeenLastCalledWith("Permission Gate: ON", "info");
@@ -582,30 +587,26 @@ describe("Permission Gate Jev local matching and switches", () => {
     expect(reloaded.classify).toHaveBeenCalledOnce();
   });
 
-  it.each([
-    ["sudo true", "sudo"],
-    ["dd if=source of=target", "dd"],
-    ["mkfs.ext4 /dev/sda", "mkfs"],
-    ["rm -rf /repo/dir", "rm"],
-    ["chmod 777 /repo/file", "chmod"],
-    ["chown -R root /repo/dir", "chown"],
-    ["chgrp -R root /repo/dir", "chgrp"],
-    ["echo data >/dev/sda", "device-write"],
-    ["git reset --hard", "git"],
-  ] as const)("can auto-approve %s (%s), including nested tool calls", async (text, rule) => {
-    const h = harness();
-    expect(await h.run(text, "bash", true)).toBeUndefined();
-    expect(h.classify).toHaveBeenCalledOnce();
-    expect(h.classify.mock.calls[0][1].state).not.toHaveProperty("matched_rules");
-    expect(h.decisions()[0]).toMatchObject({ rules: [rule], outcome: "auto-approved" });
-    expect(h.confirm).not.toHaveBeenCalled();
-    expect(h.abort).not.toHaveBeenCalled();
-  });
+  it.each(["git add src/api.ts", "git reset --hard"])(
+    "can auto-approve %s, including nested tool calls",
+    async (text) => {
+      const h = harness();
+      expect(await h.run(text, "bash", true)).toBeUndefined();
+      expect(h.classify).toHaveBeenCalledOnce();
+      expect(h.classify.mock.calls[0][1].state).not.toHaveProperty("matched_rules");
+      expect(h.decisions()[0]).toMatchObject({ rules: ["git"], outcome: "auto-approved" });
+      expect(h.confirm).not.toHaveBeenCalled();
+      expect(h.abort).not.toHaveBeenCalled();
+    },
+  );
 
   it.each([
     "echo harmless",
     "git status",
     "rm -f file",
+    "rm -rf /repo/dir",
+    "sudo true",
+    "chmod -R 777 dir",
     "rm -rf /tmp/jev-test",
     "rm -rf /var/tmp/jev-test",
     "env rm -rf /repo/dir",
@@ -659,17 +660,19 @@ describe("Permission Gate Jev local matching and switches", () => {
     expect(h.confirm).not.toHaveBeenCalled();
   });
 
-  it("git off removes only Git matches, while Jev off asks manually without decision entries", async () => {
+  it("git off skips Git checks, while Jev off asks manually without decision entries", async () => {
     const h = harness();
     await h.gate("git off");
     await h.run("git reset --hard");
     expect(h.classify).not.toHaveBeenCalled();
     await h.run("git reset --hard; rm -rf /repo/dir");
-    expect(h.decisions()[0].rules).toEqual(["rm"]);
+    expect(h.classify).not.toHaveBeenCalled();
+    expect(h.confirm).not.toHaveBeenCalled();
+    await h.gate("git on");
     await h.gate("jev off");
     const count = h.appendEntry.mock.calls.length;
     await h.run();
-    expect(h.classify).toHaveBeenCalledOnce();
+    expect(h.classify).not.toHaveBeenCalled();
     expect(h.confirm).toHaveBeenCalledExactlyOnceWith(
       "🔐 Allow this command?",
       expect.stringContaining(COMMAND),
@@ -678,10 +681,10 @@ describe("Permission Gate Jev local matching and switches", () => {
     expect(h.appendEntry).toHaveBeenCalledTimes(count);
     await h.gate("jev on");
     await h.run();
-    expect(h.classify).toHaveBeenCalledTimes(2);
+    expect(h.classify).toHaveBeenCalledOnce();
     await h.gate("git on");
     await h.run("git push");
-    expect(h.classify).toHaveBeenCalledTimes(3);
+    expect(h.classify).toHaveBeenCalledTimes(2);
   });
 });
 
@@ -714,6 +717,7 @@ describe("Permission Gate Jev classifier results", () => {
           intent_covered: intent,
           scope_covered: scope,
           effects_covered: 1 - harm,
+          read_only: 0,
           temporary_operation: 0,
         },
       });
@@ -950,16 +954,20 @@ describe("Permission Gate Git read-only auto-approval", () => {
     "git stash list; rm -rf /repo/data",
     "git stash list; sudo true",
     "git stash list >/dev/sda",
-  ])("does not apply the read-only bypass to mixed rules: %s", async (command) => {
-    const h = harness();
-    h.classify.mockResolvedValue(gitResult(0.99));
-    await h.run(command);
-    expect(h.classify.mock.calls[0][1].questions).toBe(
-      command.includes("rm -rf") ? TEMPORARY_QUESTIONS : GATE_QUESTIONS,
-    );
-    expect(h.confirm).toHaveBeenCalledOnce();
-    expect(h.decisions()[0].judgment.reason).toBe("uncertain");
-  });
+  ])(
+    "classifies the full command when Git is paired with unguarded operations: %s",
+    async (command) => {
+      const h = harness();
+      h.classify.mockResolvedValue(gitResult(0));
+      await h.run(command);
+      expect(h.classify.mock.calls[0][1]).toMatchObject({
+        questions: GIT_QUESTIONS,
+        state: { command },
+      });
+      expect(h.confirm).toHaveBeenCalledOnce();
+      expect(h.decisions()[0].judgment.reason).toBe("uncertain");
+    },
+  );
 
   it("retains manual confirmation with Jev disabled", async () => {
     const h = harness();
@@ -983,7 +991,6 @@ describe("Permission Gate temporary-operation auto-approval", () => {
   const trial =
     "git worktree add --detach /tmp/gate-review HEAD && " +
     "git -C /tmp/gate-review cherry-pick --no-commit abc123";
-  const cleanup = "cd /tmp && rm -rf gate-review";
   const mixed = "cd /tmp && rm -rf gate-review && git -C /tmp/gate-trial merge --no-commit topic";
 
   function temporaryResult(score: number) {
@@ -992,7 +999,7 @@ describe("Permission Gate temporary-operation auto-approval", () => {
     return response;
   }
 
-  it.each([trial, cleanup, mixed])("preauthorizes without intent: %s", async (command) => {
+  it.each([trial, mixed])("preauthorizes without intent: %s", async (command) => {
     const h = harness({ hasUI: false, branch: [] });
     const response = temporaryResult(0.75);
     delete response.answers.intent_covered;
@@ -1001,14 +1008,14 @@ describe("Permission Gate temporary-operation auto-approval", () => {
     h.classify.mockResolvedValue(response);
     expect(await h.run(command)).toBeUndefined();
     const context = h.classify.mock.calls[0][1];
-    expect(context.questions).toBe(command === trial ? GIT_QUESTIONS : TEMPORARY_QUESTIONS);
+    expect(context.questions).toBe(GIT_QUESTIONS);
     expect(context.state.temporary_directories).toEqual(TEMP_DIRECTORIES);
     expect(h.confirm).not.toHaveBeenCalled();
     expect(h.decisions()[0]).toMatchObject({
       judgment: {
         action: "allow",
         reason: "temporary-operation",
-        probabilities: { temporary_operation: 0.75 },
+        probabilities: { read_only: 0, temporary_operation: 0.75 },
       },
       outcome: "auto-approved",
     });
@@ -1019,7 +1026,7 @@ describe("Permission Gate temporary-operation auto-approval", () => {
   it.each([0, 0.749999])("asks below the temporary threshold: %s", async (score) => {
     const h = harness({ branch: [] });
     h.classify.mockResolvedValue(temporaryResult(score));
-    await h.run(cleanup);
+    await h.run(trial);
     expect(h.confirm).toHaveBeenCalledOnce();
     expect(h.decisions()[0].judgment.reason).toBe("missing-intent");
   });
@@ -1039,7 +1046,7 @@ describe("Permission Gate temporary-operation auto-approval", () => {
     const response = result();
     response.answers.temporary_operation = answer as unknown as ClassifierResult["answers"][string];
     h.classify.mockResolvedValue(response);
-    await h.run(cleanup);
+    await h.run(trial);
     expect(h.confirm).toHaveBeenCalledOnce();
     expect(h.decisions()[0].judgment.reason).toBe("invalid-response");
   });
@@ -1047,35 +1054,21 @@ describe("Permission Gate temporary-operation auto-approval", () => {
   it.each(["error", "aborted"] as const)("rejects temporary answers on %s", async (stopReason) => {
     const h = harness();
     h.classify.mockResolvedValue({ ...temporaryResult(1), stopReason });
-    await h.run(cleanup);
+    await h.run(trial);
     expect(h.decisions()[0].judgment.reason).toBe("unavailable");
   });
 
-  it.each([
-    "sudo rm -rf /tmp/gate-review",
-    "cd /tmp && rm -rf gate-review; dd if=/dev/zero of=/tmp/image",
-    "git -C /tmp/gate-review merge topic; chmod -R 777 /tmp/gate-review",
-    "cd /tmp && rm -rf gate-review; echo x >/dev/sda",
-  ])("does not offer the temporary bypass for other matched rules: %s", async (command) => {
-    const h = harness();
-    h.classify.mockResolvedValue(temporaryResult(1));
-    await h.run(command);
-    expect(h.classify.mock.calls[0][1].questions).toBe(GATE_QUESTIONS);
-    expect(h.classify.mock.calls[0][1].state).not.toHaveProperty("temporary_directories");
-    expect(h.confirm).toHaveBeenCalledOnce();
-  });
-
-  it("still requires intent before classification when bypasses are ineligible", async () => {
+  it("does not classify standalone temporary cleanup", async () => {
     const h = harness({ branch: [] });
-    await h.run("sudo true");
+    await h.run("cd /tmp && rm -rf gate-review");
     expect(h.classify).not.toHaveBeenCalled();
-    expect(h.decisions()[0].judgment.reason).toBe("missing-intent");
+    expect(h.confirm).not.toHaveBeenCalled();
   });
 
   it("retains generic authorization after temporary preauthorization fails", async () => {
     const h = harness();
     h.classify.mockResolvedValue(result());
-    expect(await h.run(cleanup)).toBeUndefined();
+    expect(await h.run(trial)).toBeUndefined();
     expect(h.decisions()[0].judgment.reason).toBe("approved");
   });
 
@@ -1185,7 +1178,7 @@ describe("Permission Gate Jev branch authorization and full input", () => {
     expect(h.decisions()[0].judgment).toEqual({ action: "ask", reason: "missing-intent" });
   });
 
-  it("sends exact, unredacted 8000/16000-character inputs with all three typed questions and request options", async () => {
+  it("sends exact, unredacted 8000/16000-character inputs with typed questions and request options", async () => {
     const text = COMMAND + " #" + "x".repeat(COMMAND_LIMIT - COMMAND.length - 2);
     const intent = INTENT + "y".repeat(INTENT_LIMIT - INTENT.length);
     const h = harness({ branch: [user("limit", intent)] });
@@ -1201,12 +1194,13 @@ describe("Permission Gate Jev branch authorization and full input", () => {
           cwd: "/repo",
           temporary_directories: TEMP_DIRECTORIES,
         },
-        questions: TEMPORARY_QUESTIONS,
+        questions: GIT_QUESTIONS,
       },
       { maxRetries: 0, signal: expect.any(AbortSignal) },
     );
     const context = h.classify.mock.calls[0][1];
     expect(Object.keys(context.questions)).toEqual([
+      "read_only",
       "temporary_operation",
       "intent_covered",
       "scope_covered",
@@ -1416,8 +1410,8 @@ describe("Permission Gate Jev deadlines, cancellation and concurrency", () => {
     const dialog = deferred<boolean>();
     h.classify.mockReturnValueOnce(a.promise).mockReturnValueOnce(b.promise);
     h.confirm.mockReturnValueOnce(dialog.promise).mockReturnValueOnce(dialog.promise);
-    const first = h.run("rm -rf /repo/first");
-    const second = h.run("rm -rf /repo/second");
+    const first = h.run("git add -- /repo/first");
+    const second = h.run("git add -- /repo/second");
     await flush();
     expect(h.classify).toHaveBeenCalledTimes(2);
     expect(h.confirm).not.toHaveBeenCalled();
@@ -1444,8 +1438,8 @@ describe("Permission Gate Jev deadlines, cancellation and concurrency", () => {
     const dialog = deferred<boolean>();
     h.classify.mockResolvedValue(result(0.5));
     h.confirm.mockReturnValueOnce(dialog.promise).mockReturnValueOnce(dialog.promise);
-    const first = h.run("rm -rf /repo/first");
-    const second = h.run("rm -rf /repo/second");
+    const first = h.run("git add -- /repo/first");
+    const second = h.run("git add -- /repo/second");
     await flush();
     expect(h.classify).toHaveBeenCalledTimes(2);
     expect(h.confirm).toHaveBeenCalledTimes(2);
@@ -1504,8 +1498,8 @@ describe("Permission Gate Jev deadlines, cancellation and concurrency", () => {
       const dialog = deferred<boolean>();
       h.classify.mockResolvedValue(result(0.5));
       h.confirm.mockReturnValueOnce(dialog.promise).mockReturnValueOnce(dialog.promise);
-      const first = h.run("rm -rf /repo/first");
-      const second = h.run("rm -rf /repo/second");
+      const first = h.run("git add -- /repo/first");
+      const second = h.run("git add -- /repo/second");
       await flush();
       expect(h.confirm).toHaveBeenCalledTimes(2);
       const signals = h.confirm.mock.calls.map(([, , options]) => options?.signal);
@@ -1520,7 +1514,7 @@ describe("Permission Gate Jev deadlines, cancellation and concurrency", () => {
       expect(h.appendEntry).not.toHaveBeenCalled();
       expect(h.abort).not.toHaveBeenCalled();
       // A new lifecycle can still classify and confirm on the replacement branch.
-      expect(await h.run("rm -rf /repo/new-operation")).toBeUndefined();
+      expect(await h.run("git add -- /repo/new-operation")).toBeUndefined();
       expect(h.confirm).toHaveBeenCalledTimes(3);
       expect(h.decisions()[0].outcome).toBe("user-approved");
     },
@@ -1531,10 +1525,10 @@ describe("Permission Gate Jev deadlines, cancellation and concurrency", () => {
     const dialog = deferred<boolean>();
     h.classify.mockResolvedValueOnce(result(0.5)).mockResolvedValueOnce(result());
     h.confirm.mockReturnValueOnce(dialog.promise);
-    const first = h.run("rm -rf /repo/first");
+    const first = h.run("git add -- /repo/first");
     await flush();
     expect(h.confirm).toHaveBeenCalledOnce();
-    expect(await h.run("rm -rf /repo/second")).toBeUndefined();
+    expect(await h.run("git add -- /repo/second")).toBeUndefined();
     expect(h.decisions()[0].outcome).toBe("auto-approved");
     expect(h.confirm).toHaveBeenCalledOnce();
     dialog.resolve(true);
@@ -1546,8 +1540,8 @@ describe("Permission Gate Jev deadlines, cancellation and concurrency", () => {
     const h = harness();
     h.classify.mockResolvedValue(result(0.5));
     h.confirm.mockRejectedValueOnce(new Error(SECRET));
-    const first = h.run("rm -rf /repo/first");
-    const second = h.run("rm -rf /repo/second");
+    const first = h.run("git add -- /repo/first");
+    const second = h.run("git add -- /repo/second");
     expect(await first).toEqual({ block: true, reason: "User confirmation failed" });
     expect(await second).toBeUndefined();
     expect(h.confirm).toHaveBeenCalledTimes(2);
@@ -1561,13 +1555,12 @@ describe("Permission Gate Jev deadlines, cancellation and concurrency", () => {
 });
 
 describe("Permission Gate Jev logs, commands and headless behavior", () => {
-  it("merges/deduplicates rules and sends the complete compound command; stores only bounded summaries", async () => {
+  it("logs one Git match and sends the complete compound command; stores only bounded summaries", async () => {
     const text = `${COMMAND}; rm -rf /repo/second; sudo true; dd if=a of=b; mkfs /dev/sdb; chmod 777 f; chown -R root dir; chgrp -R root dir; git push; echo '${SECRET}' >/dev/sda`;
     const h = harness();
     await h.run(text);
     const rules = h.decisions()[0].rules;
-    expect(rules).toHaveLength(9);
-    expect(rules).toEqual(expect.arrayContaining(Object.keys(RULE_LABELS)));
+    expect(rules).toEqual(["git"]);
     expect(h.classify.mock.calls[0][1].state.command).toBe(text);
     expect(h.classify.mock.calls[0][1].state.user_intent).toBe(INTENT);
     expect(h.appendEntry).toHaveBeenCalledExactlyOnceWith(GATE_ENTRY, {
@@ -1579,7 +1572,13 @@ describe("Permission Gate Jev logs, commands and headless behavior", () => {
       judgment: {
         action: "allow",
         reason: "approved",
-        probabilities: { intent_covered: 0.99, scope_covered: 0.99, effects_covered: 0.99 },
+        probabilities: {
+          intent_covered: 0.99,
+          scope_covered: 0.99,
+          effects_covered: 0.99,
+          read_only: 0,
+          temporary_operation: 0,
+        },
       },
       durationMs: expect.any(Number),
       outcome: "auto-approved",
@@ -1696,7 +1695,7 @@ describe("Permission Gate Jev logs, commands and headless behavior", () => {
     expect(h.appendEntry).toHaveBeenCalledTimes(count);
   });
 
-  it("displays old question probabilities without migrating them", async () => {
+  it("displays old rules and question probabilities without migrating them", async () => {
     const h = harness();
     await h.run();
     const record = h.decisions()[0];
@@ -1710,6 +1709,7 @@ describe("Permission Gate Jev logs, commands and headless behavior", () => {
         data: {
           ...record,
           questionVersion: 2,
+          rules: ["rm", "git"],
           judgment: {
             action: "allow",
             reason: "approved",
@@ -1723,7 +1723,9 @@ describe("Permission Gate Jev logs, commands and headless behavior", () => {
       },
     ]);
     await h.gate("log");
-    expect(h.notify.mock.calls.at(-1)?.[0]).toContain("unexpected_harm=0.010");
+    const output = h.notify.mock.calls.at(-1)?.[0];
+    expect(output).toContain("rm, Git operation");
+    expect(output).toContain("unexpected_harm=0.010");
   });
 
   it("formats an unavailable decision without probability scores", async () => {

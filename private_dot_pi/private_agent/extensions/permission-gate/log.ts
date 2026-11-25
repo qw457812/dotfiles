@@ -1,9 +1,12 @@
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import type { ConfirmationOutcome } from "./confirmation.ts";
 import { GATE_MODEL, REASON_LABELS, type GateJudgment } from "./jev.ts";
-import { RULE_LABELS, type GateRule } from "./bash-rules.ts";
 
 export const GATE_ENTRY = "permission-gate-decision";
+export const GIT_RULE_LABEL = "Git operation";
+
+export type GateRule = "git" | "sql";
+const RULE_LABELS: Partial<Record<string, string>> = { git: GIT_RULE_LABEL, sql: "SQL" };
 
 export type Outcome = "auto-approved" | ConfirmationOutcome;
 export interface GateRecord {
@@ -11,7 +14,7 @@ export interface GateRecord {
   questionVersion: number;
   timestamp: string;
   model: string;
-  rules: (GateRule | "sql")[];
+  rules: string[]; // Older records can contain several rules, including retired names.
   judgment: GateJudgment;
   durationMs: number;
   outcome: Outcome;
@@ -19,14 +22,14 @@ export interface GateRecord {
 
 export function recordDecision(
   pi: ExtensionAPI,
-  decision: Omit<GateRecord, "version" | "timestamp" | "model">,
+  decision: Omit<GateRecord, "version" | "timestamp" | "model" | "rules"> & { rule: GateRule },
 ) {
   pi.appendEntry<GateRecord>(GATE_ENTRY, {
     version: 1,
     questionVersion: decision.questionVersion,
     timestamp: new Date().toISOString(),
     model: `${GATE_MODEL.provider}/${GATE_MODEL.id}`,
-    rules: decision.rules,
+    rules: [decision.rule],
     judgment: decision.judgment,
     durationMs: decision.durationMs,
     outcome: decision.outcome,
@@ -47,7 +50,7 @@ export function showLog(ctx: ExtensionContext) {
           .map(([key, value]) => `${key}=${value.toFixed(3)}`)
           .join(" ")}`
       : "";
-    return `${record.timestamp} · ${record.rules.map((rule) => (rule === "sql" ? "SQL" : RULE_LABELS[rule])).join(", ")} · ${record.judgment.action} / ${record.outcome}\n  ${REASON_LABELS[record.judgment.reason]} · ${record.model} · ${record.durationMs}ms · questions v${record.questionVersion}${scores}`;
+    return `${record.timestamp} · ${record.rules.map((rule) => RULE_LABELS[rule] ?? rule).join(", ")} · ${record.judgment.action} / ${record.outcome}\n  ${REASON_LABELS[record.judgment.reason]} · ${record.model} · ${record.durationMs}ms · questions v${record.questionVersion}${scores}`;
   });
   ctx.ui.notify(lines.length ? lines.join("\n\n") : "No Jev decisions on this branch.", "info");
 }
