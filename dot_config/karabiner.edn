@@ -140,10 +140,6 @@
   :f-mode                {:key     :f
                           :modi    {:optional :caps_lock}}
 
-  ;; :launch-mode           {:key     :w
-  ;;                         :condi   :!Games
-  ;;                         :modi    {:optional :caps_lock}}
-
   :yabai-config-mode     {:key     :w
                           :modi    {:optional :caps_lock}}
 
@@ -745,8 +741,6 @@
            [:z :!Cz]
            [:x :!Cx]
            [:c :!Cc]
-           ;; [:v :!Cv [:!WPSOffice :!CitrixViewer]]
-           [:v :!Cv :!CitrixViewer]
            [:b :!Cb]
            [:n :!Cn]
            [:m :!Cm]
@@ -768,9 +762,6 @@
            [:end :!Chyphen] ; see "For Glove80" below
            [:page_up :!Cpage_up]
            [:page_down :!Cpage_down]
-
-           ;; [:v :!COSv :WPSOffice] ; see "WPSOffice: paste without formatting" below, comment out for paste in search bar
-           [:v :!Sinsert :CitrixViewer] ; for MTPuTTY
            ]}
 
   ;; Mos.app 翻转鼠标滚动方向
@@ -835,10 +826,6 @@
            ;; [:##b :left_command]
 
            ;; [:##f :fn]
-           [:d :!Cc :!CitrixViewer]
-           [:f :!Cv :!CitrixViewer]
-           [:d :!Cinsert :CitrixViewer] ; for MTPuTTY
-           [:f :!Sinsert :CitrixViewer] ; for MTPuTTY
            [:a :!!f7] ; clipboard history by Maccy.app
            ]}
 
@@ -894,16 +881,12 @@
            [:spacebar :same_wind_app] ; cmd+`
 
            ;; switch tabs in most apps
-           [:j :!CSclose_bracket [:!switch-tabs-by-ctrl-tab-app :!tmux-autostart-terminals :!Emacs :!WeWork :!WeChat]] ; Cmd Shift ]
-           [:k :!CSopen_bracket [:!switch-tabs-by-ctrl-tab-app :!tmux-autostart-terminals :!Emacs :!WeWork :!WeChat]] ; Cmd Shift [
+           [:j :!CSclose_bracket [:!switch-tabs-by-ctrl-tab-app :!tmux-autostart-terminals :!WeWork :!WeChat]] ; Cmd Shift ]
+           [:k :!CSopen_bracket [:!switch-tabs-by-ctrl-tab-app :!tmux-autostart-terminals :!WeWork :!WeChat]] ; Cmd Shift [
            [:j :!Ttab :switch-tabs-by-ctrl-tab-app] ; Ctrl Tab
            [:k :!TStab :switch-tabs-by-ctrl-tab-app] ; Ctrl Shift Tab
            [:j [:!Tb :!Tl] :tmux-autostart-terminals] ; tmux: next window
            [:k [:!Tb :!Th] :tmux-autostart-terminals] ; tmux: previous window
-           ;; [:j [:spacebar :tab :close_bracket] :Emacs] ; doomemacs: next workspace
-           ;; [:k [:spacebar :tab :open_bracket] :Emacs] ; doomemacs: previous workspace
-           [:j [:spacebar :b :n] :Emacs] ; doomemacs: next buffer
-           [:k [:spacebar :b :p] :Emacs] ; doomemacs: previous buffer
            [:j :!Cdown_arrow :WeWork] ; wework: next chat message
            [:k :!Cup_arrow :WeWork] ; wework: previous chat message
            [:j :!Odown_arrow :WeChat] ; wechat: next chat message
@@ -915,10 +898,9 @@
            ;; [:l :!Cn :create-tab-by-cmd-n-app] ; Cmd n
            ;; [:l [:!Tb :c] :tmux-autostart-terminals] ; tmux: new window
            ;; [:h [:!Tb :!S7] :tmux-autostart-terminals] ; tmux: kill window
-           [:n :!Ct [:!create-tab-by-cmd-n-app :!tmux-autostart-terminals :!Emacs]] ; Cmd t
+           [:n :!Ct [:!create-tab-by-cmd-n-app :!tmux-autostart-terminals]] ; Cmd t
            [:n :!Cn :create-tab-by-cmd-n-app] ; Cmd n
            [:n [:!Tb :c] :tmux-autostart-terminals] ; tmux: new window
-           [:n [:spacebar :b :!Sn] :Emacs] ; doomemacs: new empty buffer
 
            ;; switch sheets
            ;; [:comma :!COopen_bracket :WPSOffice] ; wps: previous worksheet
@@ -928,14 +910,11 @@
            ;; TODO tmux: previous pane
            [:h [:!Tb :h :!Tb :k] :tmux-autostart-terminals] ; tmux: previous pane
            [:l [:!Tb :o] :tmux-autostart-terminals] ; tmux: next pane
-           [:h [:spacebar :w :!Sw] :Emacs] ; doomemacs: previous window
-           [:l [:spacebar :w :w] :Emacs] ; doomemacs: next window
 
            ;; resize window, remap Rectangle.app
            [:m :!TSOspacebar] ; maximize
 
            ;; ~/.hammerspoon/init.lua | https://github.com/dbalatero/VimMode.spoon
-           ;; [:v :!!f19 [:!vim-mode-disabled-application :!Emacs]]
 
            ;; Homerow.app
            [:f :!!f6] ; Clicking (vimium-f)
@@ -967,66 +946,6 @@
            [:s :!!f11] ; Snipaste: snip
            [:d :!!f10] ; raycast://extensions/isfeng/easydict/ocr
            [:a :!!f3] ; raycast://extensions/huzef44/screenocr/recognize-text
-           ]}
-
-  ;; Karabiner-EventViewer.app ---> Frontmost Application
-  #_{:des   "w mode (application launcher)"
-   :rules [:launch-mode
-           ;; TODO spacebar
-           [:h [:open "/Applications/企业微信.app"] :!WeWork]
-           ;; [:h :same_wind_app :WeWork]
-           [:h :!Ograve_accent_and_tilde :WeWork] ; AltTab.app
-           [:j [:open "/Applications/Google Chrome.app"] :!Chrome]
-           [:j :same_wind_app :Chrome]
-           [:k [:open "/Applications/kitty.app"] :!Kitty]
-           [:k :same_wind_app :Kitty]
-           [:l [:open "/Applications/Visual Studio Code.app"] :!VSCode]
-           [:l :same_wind_app :VSCode]
-           [:semicolon [:open "/Library/Application Support/Citrix Receiver/Citrix Viewer.app"]] ; Citrix Workspace.app
-           [:quote [:open "/Applications/SwitchHosts.app"]]
-           ;; [:a [:open-app "Activity Monitor"]]
-           [:a [:open "/System/Applications/Utilities/Activity Monitor.app"]]
-           [:s [:open "/Applications/Spotify.app"]]
-           [:d [:open "/Applications/DBeaver.app"]]
-           ;; [:f [:opena "Finder"] :!Finder]
-           [:f [:open "/System/Library/CoreServices/Finder.app"] :!Finder]
-           [:f :same_wind_app :Finder]
-           ;; [:g [:open "/Applications/TidGi.app"]]
-           [:g [:open "/Applications/ChatGPT.app"] :!ChatGPT]
-           [:g :same_wind_app :ChatGPT]
-           [:e [:open "/Applications/Emacs.app"] :!Emacs]
-           [:e :same_wind_app :Emacs]
-           [:r [:open "/Applications/Safari.app"] :!Safari]
-           [:r :same_wind_app :Safari]
-           [:t [:open "/Applications/iTerm.app"] :!iTerm]
-           [:t :same_wind_app :iTerm]
-           ;; [:y [:open "/Applications/YesPlayMusic.app"]]
-           [:y [:open "$HOME/Applications/PyCharm Community Edition.app"] :!PyCharm]
-           [:y :same_wind_app :PyCharm]
-           [:u [:open "/Applications/Neovide.app"]] ; pronounce
-           [:i [:open "/Applications/IntelliJ IDEA CE.app"] :!IntelliJ]
-           [:i :same_wind_app :IntelliJ]
-           ;; [:o [:open "/Applications/Obsidian.app"]]
-           [:o [:open "/Applications/wpsoffice.app"]] ; office
-           [:p [:open "/System/Applications/Preview.app"] :!Preview]
-           [:p :same_wind_app :Preview]
-           [:open_bracket [[:open "/Applications/企业微信.app/Contents/Frameworks/wwmapp.app"] :same_wind_app] :!WeWork-Meeting] ; 企业微信•会议
-           [:open_bracket :same_wind_app :WeWork-Meeting]
-           [:v [:open "/Applications/Karabiner-EventViewer.app"]]
-           [:b [:open "/Applications/JetBrains Toolbox.app"]]
-           ;; open my tiddlywiki then press escape to trigger vimium in chrome
-           [:n [:open "http://127.0.0.1:8080/"] nil {:delayed {:invoked [:escape]} :params {:delay 800}}] ; note
-           [:m [:open "/Applications/Thunderbird.app"] :!Thunderbird] ; email
-           [:m :same_wind_app :Thunderbird]
-           [:comma [:open "/System/Applications/System Settings.app"]] ; cmd+, for setting
-           [:period [:open "/System/Applications/Launchpad.app"]] ; 启动台
-           [:slash [:open "/Applications/WhatPulse/WhatPulse.app"]]
-           ;; [:left_command [:open "/Applications/OpenInTerminal-Lite.app"] :!glove80]
-           ;; [:left_shift [:open "/Applications/OpenInTerminal-Lite.app"] :glove80]
-           ;; [:right_command [:open "/Applications/OpenInEditor-Lite.app"] :!glove80]
-           ;; [:right_shift [:open "/Applications/OpenInEditor-Lite.app"] :glove80]
-           [:left_option [:open "/Applications/Karabiner-Elements.app"]]
-           [:right_option [:open "/Applications/WeChat.app"]]
            ]}
 
   {:des   "w mode (yabai)"
@@ -1161,8 +1080,6 @@
            [:i :!!close_bracket nil {:delayed {:invoked [:!Ct]} :params {:delay 100}}] ; trigger Benchmark for ClashX
            [:h :!!open_bracket] ; Switch Hosts (Raycast extensions)
            ;; [:j :!!close_bracket] ; open Menu for ClashX
-           [:j [:open "/Applications/v2rayN.app"] :!V2rayN]
-           [:j :prev_app :V2rayN]
            [:k [:hs ["toggle_aclock"]]] ; show time
            [:l :!!f12] ; itsycal (calendar)
            [:semicolon :!!f2] ; control center by Bartender 4
@@ -1202,7 +1119,7 @@
            [:0 :!CS0]
            [:hyphen :!CShyphen]
            [:equal_sign :!CSequal_sign]
-           [:w :!CSw [:!Chrome :!Brave :!Helium :!Glide :!Dia :!Safari :!CitrixViewer]] ; accidentally close all tabs
+           [:w :!CSw [:!Chrome :!Brave :!Helium :!Glide]] ; accidentally close all tabs
            [:e :!CSe]
            [:r :!CSr]
            [:t :!CSt]
@@ -1316,7 +1233,6 @@
            ;; [:u [:open_bracket :close_bracket :left_arrow :!Cv :right_arrow :!S9 :!S0 :left_arrow :!!f7] nil {:delayed {:invoked [:!C2]} :params {:delay 500}}] ; markdown url
            [:u [:open_bracket :!Cv :close_bracket :!S9 :!S0 :left_arrow :!!f7] nil {:delayed {:invoked [:!C2]} :params {:delay 500}}] ; markdown url
            [:p [:!Sa :period :s :o :u :t :tab :escape] :IntelliJ]
-           [:p [:!Sa :period :p :r :i :n :t :tab :escape] :PyCharm]
            ]}
 
   #_{:des   "r mode (numbers)"
@@ -1396,11 +1312,6 @@
            ;; TODO left-hand mode
            [[:m :k] :!!backslash] ; raycast://extensions/isfeng/easydict/easydict
            [[:n :k] :!!equal_sign] ; raycast://extensions/raycast/floating-notes/toggle-floating-notes-window
-
-           ;; emacs-everywhere | https://github.com/tecosaur/emacs-everywhere
-           ;; https://github.com/yqrashawn/yqdotfiles/blob/master/modules/yqrashawn/home-manager/dotfiles/karabiner.edn
-           [[:j :i] [:!Ca :!Cx "/opt/homebrew/bin/emacsclient --eval '(emacs-everywhere)'"] [:!vim-mode-disabled-application :!Emacs]]
-           [[:j :i] [:!Tx :5 :0] :Emacs]
            ]}
 
   ;; or hold cmd+q for a while?
@@ -1479,27 +1390,18 @@
            [:!Qsemicolon [:open "/Applications/RuijieWorkSpace.app"] :RuijieWorkSpace]
            ; [:!Qf [:open "/System/Library/CoreServices/Finder.app"] :!Finder]
            ; [:!Qf :same_wind_app :Finder]
-           ;; [:!Qe [:open "/Applications/Emacs.app"] :!Emacs]
-           ;; [:!Qe :same_wind_app :Emacs]
-           [:!Qy [:open "$HOME/Applications/PyCharm Community Edition.app"] :!PyCharm]
-           [:!Qy :same_wind_app :PyCharm]
            [:!Qu [:open "/Applications/Neovide.app"]] ; pronounce
            [:!Qi [:open "/Applications/IntelliJ IDEA CE.app"] :!IntelliJ]
            [:!Qi :same_wind_app :IntelliJ]
            [:!Qo [:open "/Applications/wpsoffice.app"]] ; office
-           ; [:!Qo [:open "/Applications/LibreOffice.app"] :!LibreOffice] ; office
-           ; [:!Qo :same_wind_app :LibreOffice]
            [:!Qp [:open "/System/Applications/Preview.app"] :!Preview]
            [:!Qp :same_wind_app :Preview]
-           [:!Qn [:open "http://127.0.0.1:8080/"] nil {:delayed {:invoked [:escape]} :params {:delay 800}}] ; note
            [:!Qm [:open "/Applications/Thunderbird.app"] :!Thunderbird] ; email
            [:!Qm :same_wind_app :Thunderbird]
            ;; [:!Qspacebar [:open "/Applications/KeePassXC.app"]]
            [:!Qspacebar [:open "/Applications/Bitwarden.app"]]
-           [:!Qgrave_accent_and_tilde [:open "/Applications/YesPlayMusic.app"]]
            [:!Qcomma [:open "/System/Applications/System Settings.app"]] ; cmd+, for setting
-           [:!Qperiod [:open "/System/Applications/Launchpad.app"]] ; 启动台
-           [:!Qslash [:open "/Applications/qutebrowser.app"]]
+           [:!Qperiod [:open "/System/Applications/Apps.app"]] ; 启动台
            [:!Qopen_bracket [:open "/Applications/Hillstone Secure Connect.app"]]
            [:!Qclose_bracket [[:open "/Applications/企业微信.app/Contents/Frameworks/wwmapp.app"] :same_wind_app] :!WeWork-Meeting] ; 企业微信•会议
            [:!Qclose_bracket :same_wind_app :WeWork-Meeting]
@@ -1524,9 +1426,7 @@
    :rules [[:condi :!niz-x87-bt :!glove80]
            ;; [:#Pright_command :right_command nil {:alone [:hs ["mouse_center_click"]]}]
            ;; `:##` or `:#P` ---> only `:#P` work for "For Apple-Internal-Keyboard\n- left cmd + right cmd -> raycast" below
-           ;; [:##right_command :right_command :!Emacs {:alone :left_shift}] ; rime
-           [:#Pright_command :right_command [:!Emacs :!Neovide] {:alone :right_control}] ; rime
-           [:#Pright_command :right_command :Emacs {:alone :!Tbackslash}] ; emacs-rime
+           [:#Pright_command :right_command :Neovide {:alone :right_control}] ; rime
            ;; [:#Pright_command :right_command :Neovide {:alone :!Tperiod}] ; rime-ls
            ]}
 
@@ -1592,11 +1492,9 @@
 
   {:des   "left option alone -> tmux prefix"
    :rules [[:condi :!niz-x87-wired :!glove80]
-           ;; [:left_option :left_option :!Terminals {:alone [:!!f18]}] ; left option alone -> hyper+f18 (iTerm2 Hotkey Window)
-           [:#Pleft_option :left_option [:!tmux-autostart-terminals :!VSCode :!Cursor :!RuijieWorkSpace] {:alone :open-default-terminal}]
+           [:#Pleft_option :left_option [:!tmux-autostart-terminals :!VSCode :!RuijieWorkSpace] {:alone :open-default-terminal}]
            [:#Pleft_option :left_option :tmux-autostart-terminals {:alone [:!Tb]}] ; tmux prefix
            [:#Pleft_option :left_option :VSCode {:alone [:!Tb]}] ; tmux prefix
-           [:#Pleft_option :left_option :Cursor {:alone [:!Tb]}] ; tmux prefix
            [:#Pleft_option :left_option :RuijieWorkSpace {:alone [:!Tb]}] ; tmux prefix
            ]}
 
@@ -1614,11 +1512,6 @@
   ;; rime 中英切换 left_shift改为right_control | ~/Library/Rime/default.custom.yaml
   #_{:des   "left shift alone -> switch rime's english/chinese input"
    :rules [[:left_shift :left_shift nil {:alone :right_control}]]}
-  ;; doomemacs: toggle-input-method (C-\) | https://github.com/DogLooksGood/emacs-rime
-  ;; {:des   "left shift alone -> switch rime's english/chinese input"
-  ;;  :rules [[:left_shift :left_shift :Emacs {:alone [:left_shift :!Tbackslash]}]]}
-  #_{:des   "left shift alone -> switch rime's english/chinese input"
-   :rules [[:left_shift :left_shift [:Emacs :!glove80] {:alone [:left_shift :!Tbackslash]}]]}
   {:des   "left shift alone -> copy"
    :rules [[:left_shift :left_shift :!glove80 {:alone :!Cc}]]}
 
@@ -1686,27 +1579,6 @@
   ;; 影响 vim 中使用 c-h 切换窗口 `map <C-h> <C-W>h`
   ;; {:des   "global C-h to backspace"
    ;; :rules [[:!Th :delete_or_backspace nil {:params {:alone 500 :held 500}}]]}
-
-  #_{:des   "Emacs key bindings [control+keys] (rev 10)"
-   :rules [[:!T#Sy :!Cv :!Emacs]
-           :!emacs-mode-disable-app
-           [:!Ob :!Oleft_arrow]
-           [:!Of :!Oright_arrow]
-           [:!Ow :!Cc]
-           [:!T#Od :delete_forward :!Firefoxes]
-           [:!T#Oh :delete_or_backspace]
-           [:!T#SOw :!Odelete_or_backspace]
-           ;; [:!T#Oi :tab]
-           [:!T#Oopen_bracket :escape]
-           [:!T#OSm :return_or_enter]
-           [:!T#OSb :left_arrow]
-           [:!T#OSf :right_arrow :!Games]
-           [:!T#OSb :left_arrow]
-           [:!T#OSn :down_arrow]
-           [:!T#OSp :up_arrow]
-           [:!T#Sv :page_down]
-           [:!T#Sa :!Cleft_arrow]
-           [:!T#Se :!Cright_arrow]]}
 
   ;; TODO ranger like keybinding for Finder
   {:des   "Finder: navigation"
@@ -1829,7 +1701,6 @@
            ;; launch-mode before remap
            ;; [:!Wdelete_or_backspace [:left_command [:open "/Applications/KeePassXC.app"]]] ; space
            [:!Wdelete_or_backspace [:left_command [:open "/Applications/Bitwarden.app"]]] ; space
-           [:!Wescape [:left_command [:open "/Applications/YesPlayMusic.app"]]] ; `
 
            ;; TODO delete cmd-c cmd-v rime ` = \ [ ]
            ;; TODO when need to be `:#P` instead of `:##`
@@ -1840,8 +1711,6 @@
            [:##left_shift :delete_or_backspace :!Preview] ; see lshift-cmd-mode simlayer above
            [:##left_shift :!Cw :Preview] ; see "Preview: doomemacs like keybindings" above
            [:##right_shift :right_command nil {:alone :escape}]
-           ;; [:!Qv :!COSv :WPSOffice] ; see "WPSOffice: paste without formatting" above
-           [:!Qv [:left_command :!Sinsert] :CitrixViewer] ; for MTPuTTY, add left_command to prevent switching IME with cmd+shift
            ;; TODO: better way to cmd -> ctrl for RuijieWorkSpace
            [:!Qc :!Tc :RuijieWorkSpace] ; copy
            [:!Qv :!Tv :RuijieWorkSpace] ; paste
@@ -1852,10 +1721,9 @@
            [:!Qs :!Ts :RuijieWorkSpace]
            [:!Qf :!Tf :RuijieWorkSpace]
            [:!Qr :!Tr :RuijieWorkSpace]
-           [:##left_option :left_option [:!tmux-autostart-terminals :!VSCode :!Cursor :!RuijieWorkSpace] {:alone :open-default-terminal}]
+           [:##left_option :left_option [:!tmux-autostart-terminals :!VSCode :!RuijieWorkSpace] {:alone :open-default-terminal}]
            [:##left_option :left_option :tmux-autostart-terminals {:alone [:!Tb]}] ; tmux prefix
            [:##left_option :left_option :VSCode {:alone [:!Tb]}] ; tmux prefix
-           [:##left_option :left_option :Cursor {:alone [:!Tb]}] ; tmux prefix
            [:##left_option :left_option :RuijieWorkSpace {:alone [:!Tb]}] ; tmux prefix
            [:##right_option :right_option nil {:alone [:hs ["mouse_center_click"]]}]
            [:##up_arrow :down_arrow]
@@ -1881,38 +1749,31 @@
            ;; see "d mode (tab navigation)" above
            [:!T#Pspacebar :same_wind_app] ; cmd+`
            ;; switch tabs in most apps
-           [:!T#Pj :!CSclose_bracket [:!switch-tabs-by-ctrl-tab-app :!tmux-autostart-terminals :!Emacs :!WeWork :!WeChat]] ; Cmd Shift ]
-           [:!T#Pk :!CSopen_bracket [:!switch-tabs-by-ctrl-tab-app :!tmux-autostart-terminals :!Emacs :!WeWork :!WeChat]] ; Cmd Shift [
+           [:!T#Pj :!CSclose_bracket [:!switch-tabs-by-ctrl-tab-app :!tmux-autostart-terminals :!WeWork :!WeChat]] ; Cmd Shift ]
+           [:!T#Pk :!CSopen_bracket [:!switch-tabs-by-ctrl-tab-app :!tmux-autostart-terminals :!WeWork :!WeChat]] ; Cmd Shift [
            [:!T#Pj :!Ttab :switch-tabs-by-ctrl-tab-app] ; Ctrl Tab
            [:!T#Pk :!TStab :switch-tabs-by-ctrl-tab-app] ; Ctrl Shift Tab
            [:!T#Pj [:!Tb :!Tl] :tmux-autostart-terminals] ; tmux: next window
            [:!T#Pk [:!Tb :!Th] :tmux-autostart-terminals] ; tmux: previous window
-           [:!T#Pj [:spacebar :b :n] :Emacs] ; doomemacs: next buffer
-           [:!T#Pk [:spacebar :b :p] :Emacs] ; doomemacs: previous buffer
            [:!T#Pj :!Cdown_arrow :WeWork] ; wework: next chat message
            [:!T#Pk :!Cup_arrow :WeWork] ; wework: previous chat message
            [:!T#Pj :!Odown_arrow :WeChat] ; wechat: next chat message
            [:!T#Pk :!Oup_arrow :WeChat] ; wechat: previous chat message
            ;; create tab in most apps
-           [:!T#Pn :!Ct [:!create-tab-by-cmd-n-app :!tmux-autostart-terminals :!Emacs]] ; Cmd t
+           [:!T#Pn :!Ct [:!create-tab-by-cmd-n-app :!tmux-autostart-terminals]] ; Cmd t
            [:!T#Pn :!Cn :create-tab-by-cmd-n-app] ; Cmd n
            [:!T#Pn [:!Tb :c] :tmux-autostart-terminals] ; tmux: new window
-           [:!T#Pn [:spacebar :b :!Sn] :Emacs] ; doomemacs: new empty buffer
            ;; switch sheets
            [:!T#Ph :!COopen_bracket :WPSOffice] ; wps: previous worksheet
            [:!T#Pl :!COclose_bracket :WPSOffice] ; wps: next worksheet
            ;; TODO tmux: previous pane
            [:!T#Ph [:!Tb :h :!Tb :k] :tmux-autostart-terminals] ; tmux: previous pane
            [:!T#Pl [:!Tb :o] :tmux-autostart-terminals] ; tmux: next pane
-           [:!T#Ph [:spacebar :w :!Sw] :Emacs] ; doomemacs: previous window
-           [:!T#Pl [:spacebar :w :w] :Emacs] ; doomemacs: next window
            ;; resize window, remap Rectangle.app
            [:!T#Pm :!TSOspacebar] ; maximize
 
            ;; right_control -> rime: toggle ascii punct | ~/Library/Rime/default.custom.yaml
            ;; TODO `:##` or `:#P`
-           ;; [:##right_control :right_control :Emacs {:alone [:right_control :!Tbackslash]}] ; emacs-rime
-           [:#Pright_control :right_control :Emacs {:alone :!Tbackslash}] ; emacs-rime
            ;; [:#Pright_control :right_control :Neovide {:alone [:right_control :!Tperiod]}] ; rime-ls
            ;; TODO launch-mode
            ;; TODO h, j, k, l -> yabai
@@ -1938,42 +1799,23 @@
            [:!Wsemicolon [:left_command [:open "/Applications/RuijieWorkSpace.app"]] :RuijieWorkSpace]
            ; [:!Wquote [:open "/Applications/SwitchHosts.app"]]
            [:!Wa [:left_command [:open "/System/Applications/Utilities/Activity Monitor.app"]]]
-           [:!Ws [:left_command [:open "/Applications/spotube.app"]]]
            [:!Wd [:left_command [:open "/Applications/DBeaver.app"]]]
            [:!Wf [:left_command [:open "/System/Library/CoreServices/Finder.app"]] :!Finder]
            [:!Wf :same_wind_app :Finder]
-           ; [:!Wg [:open "/Applications/ChatGPT.app"] :!ChatGPT]
-           ; [:!Wg :same_wind_app :ChatGPT]
            ;; pin https://chatgpt.com/ to first tab
            [:!Wg [:left_command :open-default-browser] nil {:delayed {:invoked [:!C1 :!CSo :!Cr]} :params {:delay 800}}]
-           [:!We [:left_command [:open "/Applications/Emacs.app"]] :!Emacs]
-           [:!We :same_wind_app :Emacs]
-           [:!Wr [:left_command [:open "/Applications/Safari.app"]] :!Safari]
-           [:!Wr :same_wind_app :Safari]
-           [:!Wt [:left_command [:open "/Applications/iTerm.app"]] :!iTerm]
-           [:!Wt :same_wind_app :iTerm]
-           [:!Wy [:left_command [:open "$HOME/Applications/PyCharm Community Edition.app"]] :!PyCharm]
-           [:!Wy :same_wind_app :PyCharm]
            [:!Wu [:left_command [:open "/Applications/Neovide.app"]]] ; pronounce
            [:!Wi [:left_command [:open "/Applications/IntelliJ IDEA CE.app"]] :!IntelliJ]
            [:!Wi :same_wind_app :IntelliJ]
            [:!Wo [:left_command [:open "/Applications/wpsoffice.app"]]] ; office
-           ; [:!Wo [:left_command [:open "/Applications/LibreOffice.app"]] :!LibreOffice] ; office
-           ; [:!Wo :same_wind_app :LibreOffice]
            [:!Wp [:left_command [:open "/System/Applications/Preview.app"]] :!Preview]
            [:!Wp :same_wind_app :Preview]
-           [:!Wc [:left_command [:open "/Applications/Cursor.app"]] :!Cursor]
-           [:!Wc :same_wind_app :Cursor]
            ;; [:!Wv [:left_command [:open "/Applications/Karabiner-EventViewer.app"]]]
            [:!Wv [:left_command [:open "/Applications/Neovide.app"]]]
-           [:!Wb [:left_command [:open "/Applications/JetBrains Toolbox.app"]]]
-           [:!Wn [:left_command [:open "http://127.0.0.1:8080/"]] nil {:delayed {:invoked [:escape]} :params {:delay 800}}] ; note
            [:!Wm [:left_command [:open "/Applications/Thunderbird.app"]] :!Thunderbird] ; email
            [:!Wm :same_wind_app :Thunderbird]
            [:!Wcomma [:left_command [:open "/System/Applications/System Settings.app"]]] ; cmd+, for setting
-           [:!Wperiod [:left_command [:open "/System/Applications/Launchpad.app"]]] ; 启动台
-           ; [:!Wslash [:open "/Applications/WhatPulse/WhatPulse.app"]]
-           [:!Wslash [:left_command [:open "/Applications/qutebrowser.app"]]]
+           [:!Wperiod [:left_command [:open "/System/Applications/Apps.app"]]] ; 启动台
            [:!Wopen_bracket [:left_command [:open "/Applications/Hillstone Secure Connect.app"]]]
            [:!Wclose_bracket [:left_command [:open "/Applications/企业微信.app/Contents/Frameworks/wwmapp.app"] :same_wind_app] :!WeWork-Meeting] ; 企业微信•会议
            [:!Wclose_bracket :same_wind_app :WeWork-Meeting]
@@ -2018,11 +1860,9 @@
            [:##right_option :!CTOleft_shift nil {:alone :!Cv}] ; right_ctrl see "For Not HHKB" above
            :niz-x87-wired
            [:##left_option :left_command nil {:alone :prev_app}] ; left_command, see "left cmd alone" above
-           ;; [:##left_command :left_option :!Terminals {:alone [:!!f18]}] ; left_option, see "left option alone" above
-           [:##left_command :left_option [:!tmux-autostart-terminals :!VSCode :!Cursor] {:alone :open-default-terminal}] ; left_option, see "left option alone" above
+           [:##left_command :left_option [:!tmux-autostart-terminals :!VSCode] {:alone :open-default-terminal}] ; left_option, see "left option alone" above
            [:##left_command :left_option :tmux-autostart-terminals {:alone [:!Tb]}] ; left_option, see "left option alone" above
            [:##left_command :left_option :VSCode {:alone [:!Tb]}] ; left_option, see "left option alone" above
-           [:##left_command :left_option :Cursor {:alone [:!Tb]}] ; left_option, see "left option alone" above
            [:##right_option :right_command nil {:alone [:hs ["mouse_center_click"]]}] ; right_command, see "right cmd alone" above
            [:##application :right_option :translate-by-opt-shift-a-app {:alone [:!OSa]}] ; right_option, see "right option alone" above
            [:##application :right_option :!translate-by-opt-shift-a-app {:alone [:!!backslash]}] ; right_option, see "right option alone" above
@@ -2271,32 +2111,6 @@
  ;; Karabiner-EventViewer.app ---> Frontmost Application
  :applications
  {
-  :emacs-mode-disable-app
-  ["^org\\.gnu\\.Emacs$" "^org\\.xquartz\\.X11$" "^org\\.gnu\\.AquamacsEmacs$"
-   "^org\\.gnu\\.Aquamacs$" "^org\\.pqrs\\.unknownapp.conkeror$"
-   "^com\\.microsoft\\.rdc$" "^com\\.microsoft\\.rdc\\.mac$"
-   "^com\\.microsoft\\.rdc\\.macos$" "^com\\.microsoft\\.rdc\\.osx\\.beta$"
-   "^net\\.sf\\.cord$" "^com\\.thinomenon\\.RemoteDesktopConnection$"
-   "^com\\.itap-mobile\\.qmote$" "^com\\.nulana\\.remotixmac$"
-   "^com\\.p5sys\\.jump\\.mac\\.viewer$"
-   "^com\\.p5sys\\.jump\\.mac\\.viewer\\.web$" "^com\\.teamviewer\\.TeamViewer$"
-   "^com\\.vmware\\.horizon$" "^com\\.2X\\.Client\\.Mac$"
-   "^com\\.apple\\.Terminal$" "^com\\.googlecode\\.iterm2$"
-   "^co\\.zeit\\.hyperterm$" "^co\\.zeit\\.hyper$" "^io\\.alacritty$" "^org\\.alacritty$"
-   "^com\\.github\\.wez\\.wezterm$" "^net\\.kovidgoyal\\.kitty$" "^org\\.vim\\."
-   "^com\\.superlogical\\.rex$" "^dev\\.herdr\\.app$"
-   "^com\\.qvacua\\.VimR$" "^com\\.vmware\\.fusion$" "^com\\.vmware\\.horizon$"
-   "^com\\.vmware\\.view$" "^com\\.parallels\\.desktop$"
-   "^com\\.parallels\\.vm$" "^com\\.parallels\\.desktop\\.console$"
-   "^org\\.virtualbox\\.app\\.VirtualBoxVM$" "^com\\.vmware\\.proxyApp\\."
-   "^com\\.parallels\\.winapp\\." "^org\\.x\\.X11$" "^com\\.apple\\.x11$"
-   "^org\\.macosforge\\.xquartz\\.X11$" "^org\\.macports\\.X11$"
-   "^com\\.sublimetext\\." "^com\\.microsoft\\.VSCode(Insiders)?$"
-   "^com\\.jetbrains\\.intellij\\.ce$"
-   "^com\\.jetbrains\\.pycharm\\.ce(-EAP)?$"
-   "^com\\.neovide\\.neovide$"
-   "^org\\.jkiss\\.dbeaver\\.core\\.product$"
-   "^md\\.obsidian$" "^com\\.tidgi$"]
   :vim-mode-disabled-application
   ["^com\\.apple\\.Terminal$" "^com\\.googlecode\\.iterm2$"
    "^co\\.zeit\\.hyperterm$" "^co\\.zeit\\.hyper$" "^io\\.alacritty$" "^org\\.alacritty$"
@@ -2304,54 +2118,31 @@
    "^com\\.superlogical\\.rex$" "^dev\\.herdr\\.app$"
    "^com\\.qvacua\\.VimR$"
    "^com\\.microsoft\\.VSCode(Insiders)?$"
-   "^com\\.todesktop\\.230313mzl4w4u92$"
    "^com\\.jetbrains\\.intellij\\.ce$"
-   "^com\\.jetbrains\\.pycharm\\.ce(-EAP)?$"
    "^com\\.neovide\\.neovide$"
    "^org\\.jkiss\\.dbeaver\\.core\\.product$"
    "^md\\.obsidian$" "^com\\.tidgi$"]
   :switch-tabs-by-ctrl-tab-app
-  ["^org\\.mozilla\\.thunderbird$" "^com\\.kingsoft\\.wpsoffice\\.mac$"
-   "^com\\.citrix\\.receiver\\.icaviewer\\.mac$"]
+  ["^org\\.mozilla\\.thunderbird$" "^com\\.kingsoft\\.wpsoffice\\.mac$"]
   :create-tab-by-cmd-n-app
-  ["^com\\.microsoft\\.VSCode(Insiders)?$" "^com\\.todesktop\\.230313mzl4w4u92$"]
+  ["^com\\.microsoft\\.VSCode(Insiders)?$"]
   :line-navigating-by-cmd-arrow-app
   ["^com\\.google\\.Chrome$" "^com\\.brave\\.Browser$" "^net\\.imput\\.helium$"
-   "^app\\.glide-browser\\.glide$" "^company\\.thebrowser\\.dia$"
+   "^app\\.glide-browser\\.glide$"
    "^com\\.tencent\\.xinWeChat$"]
   :translate-by-opt-shift-a-app
   ["^com\\.google\\.Chrome$" "^com\\.brave\\.Browser$" "^net\\.imput\\.helium$"
-   "^app\\.glide-browser\\.glide$" "^company\\.thebrowser\\.dia$" "^com\\.apple\\.Safari$"
-   "^com\\.jetbrains\\.intellij\\.ce$" "^com\\.jetbrains\\.pycharm\\.ce(-EAP)?$"]
+   "^app\\.glide-browser\\.glide$"
+   "^com\\.jetbrains\\.intellij\\.ce$"]
   :tmux-autostart-terminals
   ["^org\\.alacritty$" "^com\\.github\\.wez\\.wezterm$" "^net\\.kovidgoyal\\.kitty$"
    "^com\\.mitchellh\\.ghostty$" "^com\\.superlogical\\.rex$" "^dev\\.herdr\\.app$"]
   :default-terminal ["^dev\\.herdr\\.app$"]
   :default-browser  ["^app\\.glide-browser\\.glide$"]
-  :Terminals        ["^com\\.apple\\.Terminal$"
-                     "^com\\.googlecode\\.iterm2$"
-                     "^co\\.zeit\\.hyperterm$" "^co\\.zeit\\.hyper$"
-                     "^io\\.alacritty$" "^org\\.alacritty$"
-                     "^com\\.github\\.wez\\.wezterm$"
-                     "^net\\.kovidgoyal\\.kitty$"
-                     "^com\\.mitchellh\\.ghostty$"
-                     "^com\\.superlogical\\.rex$"
-                     "^dev\\.herdr\\.app$"
-                     ]
-  :Alacritty        ["^org\\.alacritty$"]
-  :Kitty            ["^net\\.kovidgoyal\\.kitty$"]
-  :WezTerm          ["^com\\.github\\.wez\\.wezterm$"]
-  :iTerm            ["^com\\.googlecode\\.iterm2$"]
-  :Ghostty          ["^com\\.mitchellh\\.ghostty$"]
   :Rex              ["^com\\.superlogical\\.rex$"]
-  :Herdr            ["^dev\\.herdr\\.app$"]
   :Neovide          ["^com\\.neovide\\.neovide$"]
-  :Emacs            ["^org\\.gnu\\.Emacs$" "^org\\.gnu\\.AquamacsEmacs$"
-                     "^org\\.gnu\\.Aquamacs$"]
   :VSCode           ["^com\\.microsoft\\.VSCode$"]
-  :Cursor           ["^com\\.todesktop\\.230313mzl4w4u92$"]
   :IntelliJ         ["^com\\.jetbrains\\.intellij\\.ce$"]
-  :PyCharm          ["^com\\.jetbrains\\.pycharm\\.ce(-EAP)?$"]
   :Finder           ["^com\\.apple\\.finder$"]
   :Preview          ["^com\\.apple\\.Preview$"]
   :ActivityMonitor  ["^com\\.apple\\.ActivityMonitor$"]
@@ -2360,20 +2151,12 @@
   :WeWork           ["^com\\.tencent\\.WeWorkMac$"]
   :WeWork-Meeting   ["^com\\.tencent\\.wwmapp$"]
   :WeChat           ["^com\\.tencent\\.xinWeChat$"]
-  :CitrixViewer     ["^com\\.citrix\\.receiver\\.icaviewer\\.mac$"]
   :RuijieWorkSpace  ["^cn\\.com\\.ruijie\\.RuijieWorkSpace$"]
-  :ChatGPT          ["^com\\.lencx\\.chatgpt$"]
-  :V2rayN           ["^2dust\\.v2rayN$"]
   :WPSOffice        ["^com\\.kingsoft\\.wpsoffice\\.mac$"]
-  :LibreOffice      ["^org\\.libreoffice\\.script$"]
   :Chrome           ["^com\\.google\\.Chrome$"]
   :Brave            ["^com\\.brave\\.Browser$"]
   :Helium           ["^net\\.imput\\.helium$"]
   :Glide            ["^app\\.glide-browser\\.glide$"]
-  :Dia              ["^company\\.thebrowser\\.dia$"]
-  :Safari           ["^com\\.apple\\.Safari$"]
-  :Firefoxes        ["^org\\.mozilla\\.firefox$"
-                     "^org\\.mozilla\\.firefoxdeveloperedition$"]
   :Games            ["^unity\\." "^com\\.Klei\\." "^unity\\.Klei\\."
                      "^org\\.Terraria"
                      "\\.rimworld$"
