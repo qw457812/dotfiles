@@ -1119,7 +1119,7 @@
    :rules [[:condi :!glove80]
            ;; [:#Pright_command :right_command nil {:alone [:hs ["mouse_center_click"]]}]
            ;; `:##` or `:#P` ---> only `:#P` work for "For Apple-Internal-Keyboard\n- left cmd + right cmd -> raycast" below
-           [:#Pright_command :right_command :Neovide {:alone :right_control}] ; rime
+           [:#Pright_command :right_command nil {:alone :right_control}] ; rime
            ;; [:#Pright_command :right_command :Neovide {:alone :!Tperiod}] ; rime-ls
            ]}
 
