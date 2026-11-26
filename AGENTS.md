@@ -1,61 +1,22 @@
 ## Chezmoi
 
-- This repository is used on macOS, Android (Termux), and Fedora Asahi Remix. Check OS-specific template branches when changing shared config.
-- Edit chezmoi source paths like `dot_*`, `private_*`, and `symlink_*`, not generated target paths.
-- Repository-only projects such as `packages/` and `dsh-plugins/` are Git-tracked but excluded from chezmoi's target state by `.chezmoiignore`.
-- `write`/`edit` calls on managed source files trigger `chezmoi apply` for the target via the Pi extension `private_dot_pi/private_agent/extensions/chezmoi.ts` or dsh plugin `dsh-plugins/dsh-plugin-chezmoi.mjs`; managed target edits trigger `chezmoi re-add` as a fallback. `bash` edits need a manual `chezmoi apply` scoped to the relevant target path.
-- `symlinks/` contains source-state files referenced by `symlink_*` templates.
-- When an unmanaged target should be tracked by chezmoi, ask the user for confirmation before adding it.
+- For a managed target, edit the source returned by `chezmoi source-path <target>`. Get the user's confirmation before tracking an unmanaged target.
+- For linked config, edit the backing file (e.g. `symlinks/pi/agent/settings.json` or `symlinks/dsh/settings.yaml`) to change content; edit `symlink_*` to change the destination. To convert a managed plain file to a symlink, follow the [conversion procedure](.agents/skills/chezmoi-symlink/SKILL.md).
+- Pi and dsh `write`/`edit` hooks run `chezmoi apply` for managed source edits and `chezmoi re-add` for managed target edits. After `bash` edits to managed sources, run `chezmoi apply <target>` for each affected target.
+- Check `.chezmoiignore` for repo-only paths. For shared config, check its exclusions and the template branches for macOS, Android (Termux), and Fedora Asahi Remix.
 
-## Pi
+## Change conventions
 
-- Pi config lives under `private_dot_pi/private_agent` and `symlinks/pi/agent`.
-- Pi global settings file lives at `symlinks/pi/agent/settings.json`.
-- When working on `private_dot_pi/private_agent/extensions`, the Pi source checkout is available for reference at `~/.local/share/nvim/lazy/pi`.
-- After TypeScript changes under `private_dot_pi/private_agent`, run `npm --prefix private_dot_pi/private_agent run check` and `npm --prefix private_dot_pi/private_agent run lint` from the chezmoi repository root.
+- Read each file in full before editing it. For broad changes, investigations, and audits, read all relevant files in full.
+- Inline one-line helpers with a single call site. Preserve backward compatibility only when requested.
+- For interactive TUI tests, follow the [tmux test procedure](.agents/skills/interactive-testing/SKILL.md).
+- For commits, match the subsystem/component scope in the affected paths' history (e.g. `pi/prompt-editor`).
 
-## DeepSeek Harness
+## Subsystem guidance
 
-- Dsh home config lives under `dot_dsh/`; source-loaded direct plugins live under `dsh-plugins/`; publishable npm bundle sources live under `packages/` and are installed per profile through its `package.json`.
-- The `~/.dsh` home patch (`dot_dsh/cordis.patch.yml.tmpl`) explicitly loads direct plugins from the chezmoi source directory.
-- Dsh global settings file lives at `symlinks/dsh/settings.yaml`.
-- For both direct plugins under `dsh-plugins/` and profile-scoped npm bundles under `packages/`, the dsh source checkout is available for reference at `~/.local/share/nvim/lazy/deepseek-harness`.
-- After changes under `dsh-plugins`, run `pnpm --dir dsh-plugins run check` and `pnpm --dir dsh-plugins run lint` from the chezmoi repository root.
-- Before publishing a bundle under `packages/`, run its `check` script and inspect `npm pack --dry-run` output.
-
-## Neovim
-
-- Neovim config lives under `dot_config/nvim`; it imports LazyVim defaults from `~/.local/share/nvim/lazy/LazyVim`, then local lazy.nvim specs merge with and override those defaults.
-- lazy.nvim-managed plugin checkouts live under `~/.local/share/nvim/lazy/<plugin>` and are available for reference when changing plugin specs or config.
-- lazy.nvim also manages non-Neovim package checkouts, including Pi itself and Pi packages such as `~/.local/share/nvim/lazy/agent-stuff`; their lazy specs define the `pi update --self` and `pi update --extension <package>` build hooks in `dot_config/nvim/lua/plugins/ai.lua`.
-- Prefer existing helpers in `dot_config/nvim/lua/util` and current plugin-spec patterns.
-- Lua style: Stylua, 2-space indent, 120-column width.
-- Host-specific lock/config files live under `symlinks/nvim/{macos,termux,fedora-asahi}`.
-
-## Fish
-
-- Fish config lives under `dot_config/private_fish` and `symlinks/fish`.
-
-## Herdr
-
-- Herdr config lives under `dot_config/herdr-app` and `dot_config/herdr-core`; read `~/.config/herdr-app/AGENTS.md` before changing anything there.
-
-## Rime
-
-- `private_Library/Rime/` holds the shared Rime files and deploys to `~/Library/Rime` on macOS; Fedora (`dot_local/share/fcitx5/rime/`) and Android (`dot_config/trime/`) mirror the shared files through one-line `include` templates.
-- Frontend-specific files live in their platform dir: `squirrel.custom.yaml` (macOS), `fcitx5.yaml` (Linux), `custom.trime.yaml` (Android).
-- For upstream TigerCode data syncs, read `.agents/skills/sync-tiger/SKILL.md`.
-
-## Interactive Testing with tmux
-
-For interactive TUI tests, follow `.agents/skills/interactive-testing/SKILL.md`.
-
-## Code Quality
-
-- Read files in full before wide-ranging changes, before editing files you have not fully inspected, and when asked to investigate or audit. Do not rely on search snippets for broad changes.
-- Inline single-line helpers that have only one call site.
-- Do not preserve backward compatibility unless the user asks for it.
-
-## Commit Guidelines
-
-- Use subsystem/component scopes matching repository history, e.g. `pi/prompt-editor`, `nvim/sidekick`.
+- **Pi extensions:** Consult `~/.local/share/nvim/lazy/pi` for extension APIs. After any TypeScript change under `private_dot_pi/private_agent/`, run `npm run check && npm run lint` in that directory; both must pass.
+- **Pi updates:** The lazy.nvim build hooks for Pi itself and its packages are in `dot_config/nvim/lua/plugins/ai.lua`.
+- **DeepSeek Harness plugins:** When changing source-loaded modules in `dsh-plugins/` or building, installing, or publishing profile-scoped npm bundles from `packages/`, follow the [dsh plugin workflow](.dsh/skills/dsh-plugin/SKILL.md) for wiring and validation.
+- **Neovim:** Check inherited defaults in `~/.local/share/nvim/lazy/LazyVim` and plugin behavior in sibling checkouts. Match neighboring specs, reuse helpers in `dot_config/nvim/lua/util/`, and format Lua with StyLua. Keep host-specific locks and config in `symlinks/nvim/<host>/`.
+- **Herdr:** Read `~/.config/herdr-app/AGENTS.md` before changing `dot_config/herdr-app/` or `dot_config/herdr-core/`.
+- **Rime:** Edit shared files in `private_Library/Rime/`; `dot_local/share/fcitx5/rime/` and `dot_config/trime/` include them. Keep frontend overrides in their platform directory. For upstream TigerCode reviews or syncs, follow the [sync procedure](.agents/skills/sync-tiger/SKILL.md).
