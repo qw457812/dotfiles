@@ -28,6 +28,10 @@ Six Go models postdate the 1.88.3 snapshot and carry overrides transcribed from 
 
 Keep the set exact. `deepseek/deepseek-v4.1-flash-ultrafast`, `claude-fable-5-2` and `google/gemini-4-carbon` now have upstream capability entries, but none is on the Go table, so a Go account cannot run them; leave them unoverridden rather than copying metadata for models the plan rejects.
 
+## Pareto line
+
+When the user asks which Go model to use or what it costs, read [the Pareto line](reference/pareto-line.md).
+
 ## Adding an override
 
 1. Confirm the model in the Go table at https://commandcode.ai/docs/plans/go.
