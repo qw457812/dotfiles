@@ -182,10 +182,7 @@ describe("structured output and media types", () => {
         }),
     );
 
-    await expect(tool.run()).rejects.toMatchObject({
-      message: "Unable to fetch https://example.com/x",
-      cause: { message: "Unsupported fetched image content type: image/png" },
-    });
+    await expect(tool.run()).rejects.toThrow("Unsupported fetched image content type: image/png");
   });
 
   it("returns SVG as text", async () => {
@@ -201,7 +198,9 @@ describe("structured output and media types", () => {
   });
 });
 
-function activateWebfetch(fetchImpl: (url: string, init?: RequestInit) => Response) {
+function activateWebfetch(
+  fetchImpl: (url: string, init?: RequestInit) => Response | Promise<Response>,
+) {
   let tool: any;
   webfetch({
     on() {},
@@ -224,6 +223,55 @@ function activateWebfetch(fetchImpl: (url: string, init?: RequestInit) => Respon
     fetchMock,
   };
 }
+
+describe("request errors", () => {
+  it("reports the HTTP status without the status text or body", async () => {
+    const tool = activateWebfetch(
+      () => new Response("remote body", { status: 404, statusText: "remote status text" }),
+    );
+
+    const err = await captureError(tool.run());
+
+    expect(err.message).toBe("HTTP 404");
+  });
+
+  it("reports a request timeout", async () => {
+    vi.useFakeTimers();
+    try {
+      const tool = activateWebfetch(
+        (_url, { signal } = {}) =>
+          new Promise<Response>((_resolve, reject) => {
+            signal?.addEventListener("abort", () => reject(signal.reason), { once: true });
+          }),
+      );
+      const failure = captureError(tool.run(undefined, { timeout: 1 }));
+      await vi.advanceTimersByTimeAsync(1000);
+      expect((await failure).message).toBe("Request timed out after 1s");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("reports the response size limit", async () => {
+    const tool = activateWebfetch(
+      () => new Response("", { headers: { "content-length": String(MAX_MARKDOWN_BYTES + 1) } }),
+    );
+
+    await expect(tool.run()).rejects.toThrow(
+      `Response too large (exceeds ${MAX_MARKDOWN_BYTES} byte limit)`,
+    );
+  });
+
+  it("does not echo a malformed remote MIME value", async () => {
+    const tool = activateWebfetch(
+      () => new Response("", { headers: { "content-type": "application/not a media type" } }),
+    );
+
+    const err = await captureError(tool.run());
+
+    expect(err.message).toBe("Unsupported fetched file content type");
+  });
+});
 
 describe("cancellation identity", () => {
   it("keeps its plain message for user cancellation", async () => {
@@ -296,9 +344,22 @@ describe("redirects and URL validation", () => {
 
     const err = await captureError(tool.run(undefined, { url: "https://user@example.com/" }));
 
-    expect(err.message).toBe("Unable to fetch https://user@example.com/");
-    expect(err.cause.message).toBe("URL must not include credentials");
+    expect(err.message).toBe("URL must not include credentials");
     expect(tool.fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("reports malformed URLs before transport", async () => {
+    const tool = activateWebfetch(ok);
+
+    await expect(tool.run(undefined, { url: "not a URL" })).rejects.toThrow("Invalid URL");
+    expect(tool.fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("reports a malformed redirect URL", async () => {
+    const tool = activateWebfetch(() => redirect("http://["));
+
+    await expect(tool.run()).rejects.toThrow("Invalid redirect URL");
+    expect(tool.fetchMock).toHaveBeenCalledTimes(1);
   });
 
   it("rejects redirects to non-HTTP schemes", async () => {
@@ -306,7 +367,7 @@ describe("redirects and URL validation", () => {
 
     const err = await captureError(tool.run());
 
-    expect(err.cause.message).toBe("URL must use http:// or https://");
+    expect(err.message).toBe("URL must use http:// or https://");
     expect(tool.fetchMock).toHaveBeenCalledTimes(1);
   });
 
@@ -315,7 +376,7 @@ describe("redirects and URL validation", () => {
 
     const err = await captureError(tool.run());
 
-    expect(err.cause.message).toBe("URL must not include credentials");
+    expect(err.message).toBe("URL must not include credentials");
     expect(tool.fetchMock).toHaveBeenCalledTimes(1);
   });
 
@@ -324,7 +385,7 @@ describe("redirects and URL validation", () => {
 
     const err = await captureError(tool.run());
 
-    expect(err.cause.message).toBe(`Too many redirects (more than ${MAX_REDIRECTS})`);
+    expect(err.message).toBe(`Too many redirects (more than ${MAX_REDIRECTS})`);
     expect(tool.fetchMock).toHaveBeenCalledTimes(MAX_REDIRECTS + 1);
   });
 

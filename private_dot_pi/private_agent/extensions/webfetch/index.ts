@@ -30,16 +30,24 @@ const MAX_TIMEOUT_SECONDS = 120;
 export const MAX_REDIRECTS = 10;
 const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308]);
 
+// Only messages built by this tool bypass the generic error wrapper.
+class WebfetchRequestError extends Error {
+  override name = "WebfetchRequestError";
+}
+
 function assertHttpUrl(url: URL): void {
   if (url.protocol !== "http:" && url.protocol !== "https:") {
-    throw new Error("URL must use http:// or https://");
+    throw new WebfetchRequestError("URL must use http:// or https://");
   }
-  if (url.username || url.password) throw new Error("URL must not include credentials");
+  if (url.username || url.password)
+    throw new WebfetchRequestError("URL must not include credentials");
 }
 
 function sanitizeUrl(value: string): string {
   const url = value.split("#")[0];
-  assertHttpUrl(new URL(url));
+  const parsed = URL.parse(url);
+  if (!parsed) throw new WebfetchRequestError("Invalid URL");
+  assertHttpUrl(parsed);
   return url;
 }
 
@@ -110,10 +118,11 @@ async function fetchFollowingRedirects(
     // Drain the redirect body to release the TCP connection back to the pool.
     await response.arrayBuffer().catch(() => {});
     if (redirects >= MAX_REDIRECTS) {
-      throw new Error(`Too many redirects (more than ${MAX_REDIRECTS})`);
+      throw new WebfetchRequestError(`Too many redirects (more than ${MAX_REDIRECTS})`);
     }
 
-    const target = new URL(location, current);
+    const target = URL.parse(location, current);
+    if (!target) throw new WebfetchRequestError("Invalid redirect URL");
     target.hash = "";
     assertHttpUrl(target);
     current = target.href;
@@ -154,7 +163,7 @@ async function fetchUrl(
       // The retry shares the first attempt's deadline; the final body read has no attempt timer.
       const retryDeadline = timeoutMs - (Date.now() - fetchStartTime);
       if (retryDeadline <= 0) {
-        throw new Error(`Request timed out after ${timeoutMs / 1000}s`);
+        throw new WebfetchRequestError(`Request timed out after ${timeoutMs / 1000}s`);
       }
 
       const retryController = new AbortController();
@@ -173,7 +182,7 @@ async function fetchUrl(
     // Drain failed responses to release the connection.
     if (!response.ok) {
       await response.arrayBuffer().catch(() => {});
-      throw new Error(`HTTP ${response.status} ${response.statusText}`);
+      throw new WebfetchRequestError(`HTTP ${response.status}`);
     }
 
     const contentType = response.headers.get("content-type") || "";
@@ -182,18 +191,28 @@ async function fetchUrl(
     if (isImage || !isTextualMime(mime)) {
       await response.body?.cancel().catch(() => {});
       const kind = isImage ? "image" : "file";
-      throw new Error(`Unsupported fetched ${kind} content type: ${mime}`);
+      // Reflect only bounded MIME names, not arbitrary header text.
+      const label = /^[a-z0-9][a-z0-9!#$&^_.+-]{0,126}\/[a-z0-9][a-z0-9!#$&^_.+-]{0,126}$/.test(
+        mime,
+      )
+        ? `: ${mime}`
+        : "";
+      throw new WebfetchRequestError(`Unsupported fetched ${kind} content type${label}`);
     }
 
     // Check both the declared size and the actual body; the header is optional.
     const contentLength = response.headers.get("content-length");
     if (contentLength && parseInt(contentLength, 10) > MAX_RESPONSE_SIZE) {
-      throw new Error(`Response too large (exceeds ${MAX_RESPONSE_SIZE} byte limit)`);
+      throw new WebfetchRequestError(
+        `Response too large (exceeds ${MAX_RESPONSE_SIZE} byte limit)`,
+      );
     }
 
     const arrayBuffer = await response.arrayBuffer();
     if (arrayBuffer.byteLength > MAX_RESPONSE_SIZE) {
-      throw new Error(`Response too large (exceeds ${MAX_RESPONSE_SIZE} byte limit)`);
+      throw new WebfetchRequestError(
+        `Response too large (exceeds ${MAX_RESPONSE_SIZE} byte limit)`,
+      );
     }
 
     return { contentType, arrayBuffer };
@@ -202,7 +221,9 @@ async function fetchUrl(
       if (signal?.aborted) {
         throw new RequestCancelledError("Request was cancelled");
       }
-      throw new Error(`Request timed out after ${timeoutMs / 1000}s`);
+      throw new WebfetchRequestError(`Request timed out after ${timeoutMs / 1000}s`, {
+        cause: err,
+      });
     }
     throw err;
   } finally {
@@ -346,7 +367,7 @@ export default function (pi: ExtensionAPI) {
           structuredContent: { contentType, output },
         };
       } catch (err) {
-        if (err instanceof RequestCancelledError) throw err;
+        if (err instanceof WebfetchRequestError || err instanceof RequestCancelledError) throw err;
         throw new Error(`Unable to fetch ${params.url}`, {
           cause: err instanceof Error ? err : new Error(String(err)),
         });

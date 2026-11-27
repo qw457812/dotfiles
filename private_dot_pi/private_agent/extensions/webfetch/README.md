@@ -12,7 +12,7 @@ Install dependencies with `npm install` in this directory.
 | `format` | `"markdown"` (default), `"text"`, or `"html"`. Applies to HTML responses; other textual responses pass through. |
 | `timeout` | Fetch timeout in seconds, default 30; must be greater than 0 and at most 120. |
 
-The tool validates each redirect target and follows up to 10 hops. It rejects binary images and other non-textual responses; SVG passes through as text. Fetch failures surface as `Unable to fetch <url>` with the original cause, except user cancellation.
+The tool validates each redirect target and follows up to 10 hops. It rejects binary images and other non-textual responses; SVG passes through as text. Direct calls and codemode scripts see actionable errors for invalid URLs, HTTP status codes, timeouts, unsupported media, oversized responses, and redirect limits. Unexpected errors use `Unable to fetch <url>` without exposing the original exception to the model.
 
 ## Output
 
@@ -33,7 +33,8 @@ The HTTP response limit is 5 MiB. Separately, Markdown conversion has its own si
 - **Permission:** the mirror has no OpenCode permission prompt, saved site rule, or per-hop authorization check. URL validation still applies at every hop.
 - **Fetch lifecycle:** the mirror uses AbortController timers around fetch attempts, with the remaining time for a Cloudflare retry. Unlike upstream's timeout around the whole operation, those timers do not cover buffering the final body. The mirror drains redirect and HTTP error bodies and checks the response size from `Content-Length` and the buffered body; upstream bounds body collection as it streams.
 - **Preview storage:** Pi uses its own bracket notices and a temporary file rather than OpenCode's managed storage. A failed save is nonfatal.
-- **Runtime:** async/await and TypeBox instead of Effect. User cancellation bypasses generic error wrapping.
+- **Errors:** OpenCode's session layer unwraps tool failures. Pi forwards selected request errors explicitly, without exposing raw HTTP bodies, status text, or arbitrary exception chains. User cancellation keeps its own message.
+- **Runtime:** async/await and TypeBox instead of Effect.
 
 ## Verification
 
