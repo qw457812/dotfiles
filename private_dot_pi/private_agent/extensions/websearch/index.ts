@@ -1,31 +1,4 @@
-/**
- * Pi WebSearch Extension
- *
- * Adds a `websearch` tool that searches the internet via remote
- * MCP-over-HTTP / REST endpoints, mirroring OpenCode v2's websearch
- * architecture (packages/core/src/{websearch,plugin/websearch} at the
- * commit pinned in README.md):
- *
- * - Five providers: Exa, Parallel, Firecrawl, Tavily, TinyFish
- * - Selection: PI_WEBSEARCH_PROVIDER forces a provider; default "random"
- *   routes per-session with sticky affinity, HTTP 429 cooldowns sized by
- *   Retry-After, and failover across providers
- * - Results are structured per provider and formatted as markdown the LLM
- *   consumes: ## [title](url) + Published + content
- * - Output truncation with temp file fallback (pi conventions); a failed
- *   save keeps the truncated text and reports why (pi 1.6.1)
- * - Session-scoped affinity persistence via appendEntry/CustomEntry, so
- *   `pi --resume` keeps the same provider
- *
- * Configuration (environment variables):
- *   PI_WEBSEARCH_PROVIDER — "exa" | "parallel" | "firecrawl" | "tavily" | "tinyfish" | "random" (default)
- *   EXA_API_KEY           — Exa API key (optional; unlocks higher rate limits)
- *   PARALLEL_API_KEY      — Parallel API key (optional)
- *   FIRECRAWL_API_KEY     — Firecrawl API key (optional)
- *   TAVILY_API_KEY        — Tavily API key (optional; the keyless tier is flaky)
- *   TINYFISH_API_KEY      — TinyFish API key (optional; keyed requests run the
- *                           MCP session handshake, keyless requests skip it)
- */
+// Mirrors OpenCode's websearch; see README.md for the upstream pin and differences.
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import {
@@ -38,7 +11,8 @@ import { Text } from "@earendil-works/pi-tui";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "os";
 import { join } from "path";
-import { Type } from "typebox";
+import { type Static, Type } from "typebox";
+import { Value } from "typebox/value";
 
 import { exaProvider } from "./providers/exa";
 import { firecrawlProvider } from "./providers/firecrawl";
@@ -67,14 +41,6 @@ import {
   type WebSearchQueryResult,
 } from "./selection";
 
-// ---------------------------------------------------------------------------
-// Full-output persistence (pi 1.6.1 bash-tool semantics)
-//
-// A temp-file failure must not fail the tool call or discard the truncated
-// results: the result keeps the truncated text and says why the full output
-// could not be saved.
-// ---------------------------------------------------------------------------
-
 type SavedFullOutput = { path: string } | { error: string };
 
 async function saveFullOutput(prefix: string, text: string): Promise<SavedFullOutput> {
@@ -90,36 +56,34 @@ async function saveFullOutput(prefix: string, text: string): Promise<SavedFullOu
   }
 }
 
-// ---------------------------------------------------------------------------
-// Tool schema (mirrors OpenCode v2: query only, result count fixed at 8)
-// ---------------------------------------------------------------------------
-
 const WebSearchParamsSchema = Type.Object({
   query: Type.String({
     description: "Websearch query",
   }),
 });
 
-// ---------------------------------------------------------------------------
-// Description builder (v2's two-line description with lazy year)
-//
-// Deviation: v2's first sentence is "Search the web using the user's selected
-// search integration" — accurate there because OpenCode has consent-flow /
-// KV-persisted provider selection and an integrations UI. This extension's
-// selection is env-only (PI_WEBSEARCH_PROVIDER) with no user-visible picker,
-// so the description stays truthful with a plain "Search the web".
-// ---------------------------------------------------------------------------
+const WebSearchOutputSchema = Type.Array(
+  Type.Object({
+    url: Type.String(),
+    title: Type.Optional(Type.String()),
+    published: Type.Optional(
+      Type.Number({ description: "Publication time in milliseconds since the Unix epoch" }),
+    ),
+    content: Type.Optional(Type.String()),
+  }),
+);
 
+class InvalidWebSearchOutputError extends Error {
+  override name = "InvalidWebSearchOutputError";
+}
+
+// OpenCode's description assumes an integration picker; this mirror uses environment variables.
 function buildDescription(): string {
   const year = new Date().getFullYear();
   return `Search the web. Use this for current information beyond knowledge cutoff.
 
 The current year is ${year}. Use this year when searching for recent information or current events.`;
 }
-
-// ---------------------------------------------------------------------------
-// Result formatting (v2's tool content format)
-// ---------------------------------------------------------------------------
 
 const NO_RESULTS = "No search results found. Please try a different query.";
 
@@ -131,14 +95,6 @@ function formatResult(result: WebSearchResult): string {
       : "";
   return `## [${title}](${result.url})${published}${result.content ? `\n\n${result.content}` : ""}`;
 }
-
-function formatResults(raw: WebSearchQueryResult): string {
-  return raw.results.length ? raw.results.map(formatResult).join("\n\n") : NO_RESULTS;
-}
-
-// ---------------------------------------------------------------------------
-// Error wrapping (v2's ToolFailure messages)
-// ---------------------------------------------------------------------------
 
 function wrapWebsearchError(err: unknown, query: string): Error {
   if (err instanceof HttpCallError) {
@@ -164,8 +120,7 @@ export default function (pi: ExtensionAPI) {
     tinyfishProvider,
   ]);
 
-  // Restore this session's provider affinity from the last persisted
-  // "websearch.selection" custom entry (pi --resume keeps the same provider).
+  // Restore affinity from Pi's session log so resuming does not pick a new provider.
   pi.on("session_start", (_event, ctx) => {
     const defaultSessionID = ctx.sessionManager.getSessionId();
     if (!defaultSessionID) return;
@@ -198,6 +153,7 @@ export default function (pi: ExtensionAPI) {
     },
 
     parameters: WebSearchParamsSchema,
+    outputSchema: WebSearchOutputSchema,
 
     async execute(
       _toolCallId,
@@ -208,10 +164,10 @@ export default function (pi: ExtensionAPI) {
     ): Promise<{
       content: Array<{ type: "text"; text: string }>;
       details: WebsearchDetails;
+      structuredContent: Static<typeof WebSearchOutputSchema>;
     }> {
       const sessionID = ctx.sessionManager.getSessionId() ?? "default";
 
-      // Stream progress: which provider, which attempt (visible on failover).
       const progressDetails: WebsearchDetails = { provider: "exa", attempts: 1 };
       const onProvider = (provider: ProviderID, attempt: number) => {
         progressDetails.provider = provider;
@@ -222,7 +178,6 @@ export default function (pi: ExtensionAPI) {
         });
       };
 
-      // Persist affinity changes as session entries (restore source on resume).
       const onAffinityChange = (provider: ProviderID) => {
         pi.appendEntry(SELECTION_ENTRY_TYPE, { provider });
       };
@@ -239,17 +194,27 @@ export default function (pi: ExtensionAPI) {
           },
         );
       } catch (err) {
-        // User cancellation bypasses the error wrap (pi abort semantics, like
-        // the webfetch mirror): the provider's plain cancelled message reaches
-        // the caller unchanged. Classified by typed identity — never by message
-        // text, which can carry server-controlled strings (JSON-RPC errors,
-        // MCP tool error payloads).
+        // Use typed identity: a remote error message can contain arbitrary text.
         if (err instanceof RequestCancelledError) throw err;
         throw wrapWebsearchError(err, params.query);
       }
 
-      const rawResult = formatResults(queryResult);
+      const structuredContent = queryResult.results.map(({ url, title, published, content }) => ({
+        url,
+        ...(title === undefined ? {} : { title }),
+        ...(published === undefined ? {} : { published }),
+        ...(content === undefined ? {} : { content }),
+      }));
+      if (!Value.Check(WebSearchOutputSchema, structuredContent)) {
+        throw new InvalidWebSearchOutputError(
+          `Invalid search results from ${queryResult.provider}`,
+        );
+      }
 
+      // The Markdown preview is bounded; scripts get the original hits for filtering.
+      const rawResult = structuredContent.length
+        ? structuredContent.map(formatResult).join("\n\n")
+        : NO_RESULTS;
       const truncation = truncateHead(rawResult, {
         maxLines: DEFAULT_MAX_LINES,
         maxBytes: DEFAULT_MAX_BYTES,
@@ -271,8 +236,6 @@ export default function (pi: ExtensionAPI) {
           details.fullOutputError = saved.error;
         }
 
-        // pi convention (bash tool): bracket-format continuation notice,
-        // naming the temp file or why it could not be saved.
         const fullOutput =
           "path" in saved
             ? `Full output: ${saved.path}`
@@ -289,13 +252,12 @@ export default function (pi: ExtensionAPI) {
       return {
         content: [{ type: "text", text: resultText }],
         details,
+        structuredContent,
       };
     },
 
     renderCall(args, theme, context) {
-      // The provider is only known at execution time (random + cooldowns);
-      // renderCall shows the query and, when the env forces a provider,
-      // that fixed label.
+      // Before execution, only a forced provider is known.
       const state = context.state as WebsearchRenderState;
       if (context.executionStarted && state.startedAt === undefined) {
         state.startedAt = Date.now();

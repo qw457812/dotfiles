@@ -1,26 +1,4 @@
-/**
- * TinyFish search provider — calls the remote TinyFish MCP endpoint.
- *
- * Endpoint: https://agent.tinyfish.ai/mcp
- * Auth: X-API-Key via TINYFISH_API_KEY, otherwise X-TinyFish-Access-Mode: keyless.
- * Tool name: search
- *
- * Mirrors OpenCode v2's packages/core/src/plugin/websearch/tinyfish.ts:
- * - Keyed requests must first run the MCP session handshake (`initialize` →
- *   `notifications/initialized`) and present the returned `Mcp-Session-Id`;
- *   without it the server answers 400 "Missing required Mcp-Session-Id
- *   header" (spec: a server requiring a session SHOULD reply 400). Keyless
- *   requests are stateless and skip the handshake — their `initialize` returns
- *   no session header at all, so running it would fail on the missing header.
- * - Results are JSON inside MCP text content: {query, results: [{url, title,
- *   snippet}]}, mapped to url/title/content.
- * - The protocol version is negotiated in `initialize` and validated against
- *   pi's supported list (see mcp-client); the negotiated value is advertised
- *   on the notification and on `search`.
- * - A session is rebuilt for every search and never terminated: v2 does the
- *   same (the 404 "Session not found" re-initialize path is effectively
- *   unreachable when the session id is seconds old).
- */
+// Keyed requests require an MCP session; keyless requests are stateless and do not get a session ID.
 
 import { VERSION } from "@earendil-works/pi-coding-agent";
 import {
@@ -40,7 +18,7 @@ import type {
 
 const TINYFISH_ENDPOINT = "https://agent.tinyfish.ai/mcp";
 
-/** One budget for initialize + initialized notification (v2's 25s scope). */
+// Both handshake requests share one deadline.
 const INIT_TIMEOUT_MS = 25_000;
 
 const SEARCH_TIMEOUT_MS = 25_000;
@@ -67,15 +45,7 @@ function getTinyFishHeaders(apiKey: string | undefined): Record<string, string> 
   return headers;
 }
 
-/**
- * Validate the InitializeResult and return its `protocolVersion`.
- *
- * The handshake previously ignored the response body; a JSON-RPC error
- * envelope or a missing version would surface only as a confusing "no
- * Mcp-Session-Id" error. Protocol-level corruption fails fast here instead.
- * The body is either plain JSON or SSE (both are legal for any request), so
- * it goes through the shared envelope parser.
- */
+// Surface protocol errors before checking for a missing session ID.
 function parseInitializeResult(body: string): string {
   const envelope = parseJsonRpcEnvelope(body);
   if (envelope === undefined) {
@@ -99,14 +69,7 @@ function parseInitializeResult(body: string): string {
   return version;
 }
 
-/**
- * Run the MCP session handshake: negotiate the protocol version, capture the
- * server's `Mcp-Session-Id`, and send the `initialized` notification.
- *
- * The notification is acknowledged with an empty 204 (the spec says 202), so
- * it goes through `mcpRequest`, which only checks the HTTP status instead of
- * trying to parse a CallToolResult.
- */
+// The server acknowledges initialized with an empty 204; use the raw request path.
 async function initialize(
   headers: Record<string, string>,
   signal: AbortSignal | undefined,
@@ -156,8 +119,6 @@ async function initialize(
 
     return { session, protocolVersion: negotiated };
   } catch (err) {
-    // One budget covers the whole handshake, like v2's single
-    // Effect.timeoutOrElse: either leg timing out reports the same message.
     if (err instanceof McpTimeoutError) {
       throw new Error("TinyFish initialize request timed out", { cause: err });
     }
@@ -196,16 +157,12 @@ export const tinyfishProvider: WebSearchProvider = {
       protocolVersion: handshake?.protocolVersion ?? LATEST_PROTOCOL_VERSION,
     });
 
-    // Check the MCP tool-error flag before the empty-text shortcut: an error
-    // result can carry structuredContent and no text (see mcp-client
-    // extractText), and returning [] here would report "No search results
-    // found" for a failed search.
+    // MCP errors can carry structuredContent without text; don't treat those as no hits.
     if (result?.isError) {
       throw new Error(result.text || "TinyFish search failed");
     }
 
-    // Structured-only responses carry empty text; TinyFish results live in
-    // text as JSON, so empty text means no results.
+    // TinyFish puts its hit JSON in MCP text, not structuredContent.
     return result?.text ? parseTinyFishResults(result.text) : [];
   },
 };

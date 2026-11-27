@@ -1,10 +1,3 @@
-/**
- * Shared types for websearch providers.
- *
- * Mirrors OpenCode v2's WebSearch schema (packages/schema/src/websearch.ts):
- * every provider parses its response into structured WebSearchResult objects.
- */
-
 export type ProviderID = "exa" | "parallel" | "firecrawl" | "tavily" | "tinyfish";
 
 export interface WebSearchResult {
@@ -15,16 +8,10 @@ export interface WebSearchResult {
   published?: number;
 }
 
-/**
- * HTTP layer error carrying the response status.
- *
- * The selection layer checks `status === 429` (plus Retry-After) to drive
- * cooldown and failover, mirroring OpenCode v2's HttpClientError handling.
- */
+// Preserve status and Retry-After for the selection layer's cooldown logic.
 export class HttpCallError extends Error {
   override name = "HttpCallError";
   readonly status: number;
-  /** Raw Retry-After header value: seconds or HTTP-date. */
   readonly retryAfter: string | undefined;
 
   constructor(message: string, status: number, retryAfter?: string) {
@@ -34,14 +21,7 @@ export class HttpCallError extends Error {
   }
 }
 
-/**
- * User-initiated cancellation.
- *
- * Classified by typed identity (`instanceof`), never by message text: error
- * messages can carry server-controlled strings (JSON-RPC error.message, MCP
- * tool error payloads) that must not be able to impersonate a cancellation
- * and bypass the tool's error narrowing.
- */
+// Use typed identity so a server-supplied message cannot bypass error wrapping.
 export class RequestCancelledError extends Error {
   override name = "RequestCancelledError";
 }
@@ -60,7 +40,6 @@ export interface WebSearchProvider {
   execute(input: WebSearchInput, ctx: ProviderCallContext): Promise<WebSearchResult[]>;
 }
 
-/** All provider ids, in registration order. Also validates env overrides. */
 export const PROVIDER_IDS: readonly ProviderID[] = [
   "exa",
   "parallel",

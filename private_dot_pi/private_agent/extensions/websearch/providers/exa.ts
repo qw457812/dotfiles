@@ -1,15 +1,4 @@
-/**
- * Exa search provider — calls the remote Exa MCP endpoint.
- *
- * Endpoint: https://mcp.exa.ai/mcp
- * If EXA_API_KEY is set, it is appended to the URL (mirrors OpenCode v2).
- * Exa works without an API key (free tier), but a key unlocks higher limits.
- * Tool name: web_search_exa
- *
- * Result parsing mirrors OpenCode v2's packages/core/src/plugin/websearch/exa.ts:
- * text blocks separated by `\n\n---\n\n`, fields matched with URL: / Title: /
- * Published: / Highlights|Text: lines. "N/A" values are dropped.
- */
+// Exa returns text hit blocks with labeled fields rather than structured hits.
 
 import { mcpCall } from "../mcp-client";
 import type {
@@ -21,7 +10,6 @@ import type {
 
 const EXA_ENDPOINT = "https://mcp.exa.ai/mcp";
 
-/** OpenCode v2 hardcodes numResults: 8 (the tool no longer exposes it). */
 const NUM_RESULTS = 8;
 
 function getExaUrl(): string {

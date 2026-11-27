@@ -1,9 +1,4 @@
-// Golden checks for the webfetch mirror — ports the assertions of OpenCode
-// v2's packages/core/test/tool-webfetch.test.ts and
-// tool-html-markdown-budget.test.ts (conversions, inline-code boundaries,
-// byte-budget edge cases) onto the mirror's plain-function architecture.
-//
-// Run: npm --prefix private_dot_pi/private_agent/extensions/webfetch test
+// Golden checks ported from OpenCode's tool-webfetch and HTML Markdown budget tests.
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -11,7 +6,6 @@ import { join } from "node:path";
 import { convertHTMLToMarkdown, MAX_MARKDOWN_BYTES } from "../html-markdown";
 import webfetch, { extractTextFromHTML, MAX_REDIRECTS, RequestCancelledError } from "../index";
 
-/** Await a promise that must reject, and return the rejection value. */
 async function captureError(promise: Promise<unknown>): Promise<any> {
   try {
     await promise;
@@ -21,7 +15,7 @@ async function captureError(promise: Promise<unknown>): Promise<any> {
   throw new Error("expected the call to fail, but it resolved");
 }
 
-// tool-webfetch.test.ts: "defaults to the production byte budget …"
+// The renderer reserves 64 KiB for closing Markdown structures.
 const budget = MAX_MARKDOWN_BYTES - 64 * 1024;
 
 afterEach(() => {
@@ -30,10 +24,6 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-// --- conversions -----------------------------------------------------------
-
-// tool-webfetch.test.ts: "ports HTML text and markdown conversions without
-// active content"
 describe("conversions", () => {
   const html =
     "<h1>Hello</h1><script>bad()</script><p>world <strong>wide</strong> <product-name>today</product-name></p><style>.bad {}</style>";
@@ -47,8 +37,6 @@ describe("conversions", () => {
     expect(convertHTMLToMarkdown(html)).toBe("# Hello\n\nworld **wide** today");
   });
 
-  // tool-webfetch.test.ts: "renders headings, inline semantics, links, images,
-  // breaks, and thematic breaks"
   it("renders headings, inline semantics, links, images, breaks, and thematic breaks", () => {
     const input = `<h2>Read <em>this</em></h2><p><a href="https://example.com/a (b)" title="Example">docs</a><br><img src="diagram.png" alt="a ] b"></p><hr><p><del>old</del></p>`;
     expect(convertHTMLToMarkdown(input)).toBe(
@@ -56,8 +44,6 @@ describe("conversions", () => {
     );
   });
 
-  // tool-webfetch.test.ts: "preserves inline and preformatted code verbatim
-  // with safe fences"
   it("preserves inline and preformatted code verbatim with safe fences", () => {
     const input = `<p>Use <code>say(\`hello\`)</code> now.</p><pre><code class="language-ts">const fence = \`\`\`\n&amp; stays decoded</code></pre>`;
     expect(convertHTMLToMarkdown(input)).toBe(
@@ -66,9 +52,6 @@ describe("conversions", () => {
   });
 });
 
-// --- inline-code boundaries ------------------------------------------------
-
-// tool-webfetch.test.ts: "preserves inline code boundaries for %j"
 const inlineBoundaries: Array<[string, string]> = [
   ["`x`", "`` `x` ``"],
   ["`x", "`` `x ``"],
@@ -92,9 +75,6 @@ describe("inline-code boundaries", () => {
   });
 });
 
-// --- byte-budget edge cases ------------------------------------------------
-
-// tool-webfetch.test.ts: "fits inline code to its emitted boundaries: %s"
 const budgetFits: Array<[string, string, number, string]> = [
   ["discarded trailing backtick after ASCII", "x`", 7, "``x``"],
   ["discarded trailing backtick after Unicode", "😀`", 10, "``😀``"],
@@ -128,7 +108,6 @@ describe("byte-budget edge cases", () => {
     },
   );
 
-  // tool-html-markdown-budget.test.ts: "finishes bounded code conversion: %s"
   const codeBudgets: Array<[string, number, string, string, boolean]> = [
     ["exhausted budget", budget, "x", "", false],
     ["one byte short of an empty fence", budget - 13, "x", "", false],
@@ -151,10 +130,6 @@ describe("byte-budget edge cases", () => {
   );
 });
 
-// --- full-output temp-file failures ----------------------------------------
-// pi 1.6.1 bash-tool semantics: a temp-file failure keeps the truncated
-// output and names the reason instead of failing the fetch.
-
 describe("full-output temp-file failure", () => {
   it("keeps the truncated output and says why the full output was not saved", async () => {
     const missing = join(tmpdir(), "pi-webfetch-missing-temp-dir");
@@ -170,6 +145,10 @@ describe("full-output temp-file failure", () => {
     expect(out.details.truncation.truncated).toBe(true);
     expect(out.details.fullOutputPath).toBeUndefined();
     expect(out.details.fullOutputError).toMatch(/ENOENT/);
+    expect(out.structuredContent).toEqual({
+      contentType: "text/plain",
+      output: "line\n".repeat(3000),
+    });
     expect(out.content[0].text).toMatch(/^line\n/);
     expect(out.content[0].text).toMatch(
       /\[Showing lines 1-2000 of \d+\. Could not save the full output: ENOENT/,
@@ -177,9 +156,50 @@ describe("full-output temp-file failure", () => {
   });
 });
 
-// --- cancellation identity -------------------------------------------------
-// Companion guard for the websearch finding: cancellation is recognized by
-// typed identity (RequestCancelledError), never by message text.
+describe("structured output and media types", () => {
+  it("returns the response MIME and converted text", async () => {
+    const tool = activateWebfetch(
+      () =>
+        new Response("<p>Hello <strong>world</strong></p>", {
+          headers: { "content-type": "text/html; charset=utf-8" },
+        }),
+    );
+
+    const out = await tool.run();
+
+    expect(out.content).toEqual([{ type: "text", text: "Hello **world**" }]);
+    expect(out.structuredContent).toEqual({
+      contentType: "text/html; charset=utf-8",
+      output: "Hello **world**",
+    });
+  });
+
+  it("rejects binary images", async () => {
+    const tool = activateWebfetch(
+      () =>
+        new Response(new Uint8Array([137, 80, 78, 71]), {
+          headers: { "content-type": "image/png" },
+        }),
+    );
+
+    await expect(tool.run()).rejects.toMatchObject({
+      message: "Unable to fetch https://example.com/x",
+      cause: { message: "Unsupported fetched image content type: image/png" },
+    });
+  });
+
+  it("returns SVG as text", async () => {
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg"><circle r="3"/></svg>';
+    const tool = activateWebfetch(
+      () => new Response(svg, { headers: { "content-type": "image/svg+xml" } }),
+    );
+
+    const out = await tool.run();
+
+    expect(out.content).toEqual([{ type: "text", text: svg }]);
+    expect(out.structuredContent).toEqual({ contentType: "image/svg+xml", output: svg });
+  });
+});
 
 function activateWebfetch(fetchImpl: (url: string, init?: RequestInit) => Response) {
   let tool: any;
@@ -227,13 +247,7 @@ describe("cancellation identity", () => {
   });
 });
 
-// --- redirects and URL validation ------------------------------------------
-// tool-webfetch.test.ts: "follows redirects, checking each target against the
-// rules without asking", "stops at a redirect target the rules deny",
-// "rejects redirects to non-HTTP schemes and endless redirect chains",
-// "matches rules against the URL as written without the fragment and rejects
-// credentials" — the permission assertions collapse into URL validation here
-// (this extension has no permission gate, see README ledger).
+// Port the URL validation assertions; OpenCode's permission rules have no local equivalent.
 
 const redirect = (location: string, status = 302) =>
   new Response(null, { status, headers: { location } });
@@ -327,8 +341,6 @@ describe("redirects and URL validation", () => {
 
     await tool.run();
 
-    // First chain: x → target, blocked at target. Retry restarts at x with the
-    // bare client UA, then reaches target again.
     expect(seen.map((entry) => entry.url)).toEqual([
       "https://example.com/x",
       "https://example.com/target",

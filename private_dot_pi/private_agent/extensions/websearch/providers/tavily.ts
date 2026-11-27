@@ -1,15 +1,4 @@
-/**
- * Tavily search provider — calls the Tavily REST search endpoint.
- *
- * Endpoint: POST https://api.tavily.com/search
- * Auth: Bearer token via TAVILY_API_KEY env var; without a key the request
- * sends X-Tavily-Access-Mode: keyless (mirrors OpenCode v2 — the keyless
- * tier is flaky, see README).
- * Tool: plain REST JSON (not MCP).
- *
- * Mirrors OpenCode v2's packages/core/src/plugin/websearch/tavily.ts:
- * body {query, search_depth: "basic", chunks_per_source: 3, max_results: 8}.
- */
+// Tavily uses REST rather than the bounded MCP reader; see README.md for the size caveat.
 
 import { VERSION } from "@earendil-works/pi-coding-agent";
 import {
@@ -51,7 +40,6 @@ export const tavilyProvider: WebSearchProvider = {
       headers["X-Tavily-Access-Mode"] = "keyless";
     }
 
-    // Timeout + external signal linking (same pattern as mcp-client).
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
     if (ctx.signal?.aborted) controller.abort();

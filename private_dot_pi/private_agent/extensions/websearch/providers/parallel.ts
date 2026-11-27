@@ -1,16 +1,3 @@
-/**
- * Parallel search provider — calls the remote Parallel MCP endpoint.
- *
- * Endpoint: https://search.parallel.ai/mcp
- * Auth: Bearer token via PARALLEL_API_KEY env var (optional).
- * Tool name: web_search
- *
- * Mirrors OpenCode v2's packages/core/src/plugin/websearch/parallel.ts:
- * - Sends only {objective, search_queries} (v1 also sent session_id/model_name)
- * - Parses structuredContent.results instead of passing text through verbatim
- * - User-Agent identifies pi (v2 uses opencode's app useragent)
- */
-
 import { VERSION } from "@earendil-works/pi-coding-agent";
 import { mcpCall, type McpCallResult } from "../mcp-client";
 import type {
@@ -28,9 +15,7 @@ interface ParallelSearchResponse {
   results: Array<{
     url: string;
     title?: string;
-    /** Publication date string, parsed with Date.parse. */
     publish_date?: string;
-    /** Excerpts joined into the content field with blank lines. */
     excerpts: string[];
   }>;
 }

@@ -1,14 +1,3 @@
-/**
- * Custom TUI rendering for the websearch tool.
- * Mirrors pi's built-in bash/read/grep tool rendering patterns:
- * - Uses context.lastComponent for component reuse (no GC churn)
- * - Uses context.state for timing across call/result renders
- * - Uses theme.fg("toolOutput") for content (not "dim")
- * - Shows preview lines in collapsed view (like read/grep)
- * - Uses context.isError for error styling
- * - Distinguishes line vs byte truncation with formatSize
- */
-
 import {
   DEFAULT_MAX_BYTES,
   formatSize,
@@ -18,21 +7,15 @@ import {
 import { Container, Text, truncateToWidth } from "@earendil-works/pi-tui";
 import type { ProviderID } from "./providers/types";
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
 export interface WebsearchDetails {
   provider: ProviderID;
   /** Providers attempted (1 unless failover happened). */
   attempts?: number;
   truncation?: TruncationResult;
   fullOutputPath?: string;
-  /** Why the full output could not be saved to a temp file, when it could not. */
   fullOutputError?: string;
 }
 
-/** Shared renderer state for a websearch tool row. */
 export interface WebsearchRenderState {
   startedAt?: number;
   endedAt?: number;
@@ -43,10 +26,6 @@ interface WebsearchCallArgs {
   query: string;
 }
 
-// ---------------------------------------------------------------------------
-// Provider labels
-// ---------------------------------------------------------------------------
-
 export function providerLabel(provider: ProviderID): string {
   if (provider === "parallel") return "Parallel";
   if (provider === "exa") return "Exa";
@@ -56,17 +35,9 @@ export function providerLabel(provider: ProviderID): string {
   return "Web";
 }
 
-// ---------------------------------------------------------------------------
-// Duration formatting (mirrors bash tool)
-// ---------------------------------------------------------------------------
-
 function formatDuration(ms: number): string {
   return `${(ms / 1000).toFixed(1)}s`;
 }
-
-// ---------------------------------------------------------------------------
-// Call rendering
-// ---------------------------------------------------------------------------
 
 export function formatWebsearchCall(
   args: WebsearchCallArgs | undefined,
@@ -82,18 +53,8 @@ export function formatWebsearchCall(
   return text;
 }
 
-// ---------------------------------------------------------------------------
-// Result rendering
-// ---------------------------------------------------------------------------
-
-/** Collapsed preview: how many visual lines to show (mirrors bash's BASH_PREVIEW_LINES = 5) */
 const PREVIEW_LINES = 5;
 
-// ---------------------------------------------------------------------------
-// Container-based result rendering (mirrors bash tool)
-// ---------------------------------------------------------------------------
-
-/** Custom Container for websearch result rendering with width-aware caching. */
 export class WebsearchResultRenderComponent extends Container {
   state = {
     cachedWidth: undefined as number | undefined,
@@ -102,14 +63,6 @@ export class WebsearchResultRenderComponent extends Container {
   };
 }
 
-/**
- * Rebuild the result component's children.
- *
- * Mirrors bash's rebuildBashResultRenderComponent:
- * - Status line as a Text child
- * - Content as a width-aware collapsed component or full expanded Text
- * - Truncation warning and duration as Text children
- */
 export function rebuildWebsearchResultRenderComponent(
   component: WebsearchResultRenderComponent,
   result: { details?: WebsearchDetails; content: Array<{ type: string; text?: string }> },
@@ -164,7 +117,6 @@ export function rebuildWebsearchResultRenderComponent(
   }
 
   let statusText = theme.fg("success", `✓ ${label}`);
-  // Failover happened when more than one provider was attempted.
   if (details.attempts && details.attempts > 1) {
     statusText += theme.fg("muted", ` (after ${details.attempts} providers)`);
   }
@@ -187,14 +139,9 @@ export function rebuildWebsearchResultRenderComponent(
     const styledOutput = trimmedLines.map((line) => theme.fg("toolOutput", line)).join("\n");
 
     if (options.expanded) {
-      // Show all lines (mirrors bash/read expanded view)
       component.addChild(new Text(`\n${styledOutput}`, 0, 0));
     } else {
-      // Width-aware collapsed preview using truncateToVisualLines (same as bash tool).
-      // NOTE: Unlike bash (which uses tail truncation for command output),
-      // websearch uses truncateToVisualLines but discards the tail-truncated result
-      // and instead takes the head — this is intentional since search results are
-      // most relevant at the top.
+      // Keep the first visual lines so higher-ranked hits remain visible.
       component.addChild({
         render: (width: number) => {
           if (cState.cachedLines === undefined || cState.cachedWidth !== width) {
@@ -226,7 +173,6 @@ export function rebuildWebsearchResultRenderComponent(
     }
   }
 
-  // Truncation warning (mirrors bash tool's bracket format with formatSize)
   const truncation = details.truncation;
   const fullOutputPath = details.fullOutputPath;
   const fullOutputError = details.fullOutputError;
@@ -238,7 +184,6 @@ export function rebuildWebsearchResultRenderComponent(
       warnings.push(`Could not save the full output: ${fullOutputError}`);
     }
     if (truncation?.truncated) {
-      // Distinguish truncation cause (mirrors bash tool)
       if (truncation.truncatedBy === "lines") {
         warnings.push(
           `Truncated: showing ${truncation.outputLines} of ${truncation.totalLines} lines`,

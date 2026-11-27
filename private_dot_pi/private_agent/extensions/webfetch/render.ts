@@ -1,14 +1,3 @@
-/**
- * Custom TUI rendering for the webfetch tool.
- * Mirrors pi's built-in bash/read/grep tool rendering patterns
- * and the websearch extension's rendering approach:
- * - Uses context.lastComponent for component reuse (no GC churn)
- * - Uses context.state for timing across call/result renders
- * - Uses theme.fg("toolOutput") for content
- * - Shows preview lines in collapsed view (like read/grep)
- * - Uses context.isError for error styling
- */
-
 import {
   DEFAULT_MAX_BYTES,
   formatSize,
@@ -17,40 +6,24 @@ import {
 } from "@earendil-works/pi-coding-agent";
 import { Container, Text, truncateToWidth } from "@earendil-works/pi-tui";
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
 export interface WebfetchDetails {
   url: string;
   format: "markdown" | "text" | "html";
   contentType?: string;
-  isImage?: boolean;
-  mime?: string;
   truncation?: TruncationResult;
   fullOutputPath?: string;
-  /** Why the full output could not be saved to a temp file, when it could not. */
   fullOutputError?: string;
 }
 
-/** Shared renderer state for a webfetch tool row. */
 export interface WebfetchRenderState {
   startedAt?: number;
   endedAt?: number;
   interval?: ReturnType<typeof setInterval>;
 }
 
-// ---------------------------------------------------------------------------
-// Duration formatting
-// ---------------------------------------------------------------------------
-
 function formatDuration(ms: number): string {
   return `${(ms / 1000).toFixed(1)}s`;
 }
-
-// ---------------------------------------------------------------------------
-// Call rendering
-// ---------------------------------------------------------------------------
 
 function truncateUrl(url: string, maxLen: number): string {
   if (url.length <= maxLen) return url;
@@ -74,18 +47,8 @@ export function formatWebfetchCall(
   return text;
 }
 
-// ---------------------------------------------------------------------------
-// Result rendering
-// ---------------------------------------------------------------------------
-
-/** Collapsed preview: how many visual lines to show (mirrors bash's 5) */
 const PREVIEW_LINES = 5;
 
-// ---------------------------------------------------------------------------
-// Container-based result rendering
-// ---------------------------------------------------------------------------
-
-/** Custom Container for webfetch result rendering with width-aware caching. */
 export class WebfetchResultRenderComponent extends Container {
   state = {
     cachedWidth: undefined as number | undefined,
@@ -94,14 +57,6 @@ export class WebfetchResultRenderComponent extends Container {
   };
 }
 
-/**
- * Rebuild the result component's children.
- *
- * Mirrors websearch's rebuildWebsearchResultRenderComponent:
- * - Status line as a Text child
- * - Content as a width-aware collapsed component or full expanded Text
- * - Truncation warning and duration as Text children
- */
 export function rebuildWebfetchResultRenderComponent(
   component: WebfetchResultRenderComponent,
   result: { details?: WebfetchDetails; content: Array<{ type: string; text?: string }> },
@@ -135,21 +90,6 @@ export function rebuildWebfetchResultRenderComponent(
     return;
   }
 
-  // --- Image result ---
-  if (details.isImage) {
-    let statusText = theme.fg("success", "✓ Fetched image");
-    if (details.mime) {
-      statusText += theme.fg("muted", ` (${details.mime})`);
-    }
-    if (state.startedAt !== undefined) {
-      const endTime = state.endedAt ?? Date.now();
-      statusText += theme.fg("muted", ` Took ${formatDuration(endTime - state.startedAt)}`);
-    }
-    component.addChild(new Text(statusText, 0, 0));
-    return;
-  }
-
-  // --- Error result ---
   if (isError) {
     let text = theme.fg("error", "✗ Fetch failed");
     const content = result.content[0];
@@ -165,7 +105,6 @@ export function rebuildWebfetchResultRenderComponent(
     return;
   }
 
-  // --- Text result ---
   let statusText = theme.fg("success", "✓ Fetched");
   if (details.contentType) {
     statusText += theme.fg("muted", ` (${details.contentType.split(";")[0]?.trim()})`);
@@ -222,7 +161,6 @@ export function rebuildWebfetchResultRenderComponent(
     }
   }
 
-  // --- Truncation warning ---
   const truncation = details.truncation;
   const fullOutputPath = details.fullOutputPath;
   const fullOutputError = details.fullOutputError;

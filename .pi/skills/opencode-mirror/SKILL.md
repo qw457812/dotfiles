@@ -1,94 +1,28 @@
 ---
 name: opencode-mirror
-description: Keep the pi websearch and webfetch extensions mirroring upstream OpenCode v2. Measure drift since each README pin, port changes across providers, selection, fetch, and conversion layers, record deviations in the ledger, verify with golden tests and print-mode runs, move the pin. Use when asked to check OpenCode upstream changes for websearch or webfetch, sync or port either mirror, change a search provider or fetch/conversion path, or triage review findings against either extension.
+description: Sync Pi’s webfetch and websearch mirrors with OpenCode, or review a finding for upstream parity.
 disable-model-invocation: true
 ---
 
-# Mirroring opencode
+# OpenCode mirrors
 
-The pi `websearch` and `webfetch` extensions each mirror one version of OpenCode's counterpart tool. Three words anchor this skill:
+**Upstream** is `anomalyco/opencode` on `origin/dev`; `v2` is a historical branch. The **pin** is the hash and date in each mirror README’s first paragraph. The **ledger** is its “Differences from Upstream” section. Read the relevant README for the current contract, intentional differences, and golden test command: [webfetch](../../../private_dot_pi/private_agent/extensions/webfetch/README.md) · [websearch](../../../private_dot_pi/private_agent/extensions/websearch/README.md).
 
-- **Upstream** is anomalyco/opencode's `dev` branch: the default branch, where the `v2` line was merged and where 2.0.x releases are cut. `v2` itself is now a frozen historical anchor (`4617210822`, 2.0.26, 2026-10-10) — the old `dev` was the v1.18.x architecture both mirrors replaced, but `dev` today *is* v2.
-- **Pin** is the commit hash + date in each extension README's first paragraph. All drift is measured from it.
-- **Ledger** is each README's "Differences from OpenCode v2" section: the single source of truth for every intentional divergence. A deviation absent from the ledger is a bug; a bug fixed where the mirror otherwise follows v2 is a new ledger entry.
+## Sync
 
-## Sync run
+1. **Pin the comparison.** Refresh the cache with `bash ~/.pi/agent/skills/librarian/checkout.sh anomalyco/opencode --path-only`. Record the exact `origin/dev` hash and commit date; use that hash throughout the run. Use each README’s own pin as the base.
+2. **Account for drift.** Use `git ls-tree -r --name-only` at both endpoints to locate the tool, helpers, and tests, then inspect `git log --no-merges <pin>..<target> -- <paths>` and the net diff. Start with `webfetch`, `websearch`, and `html-markdown`; trace shared dependencies when behavior moves out of those paths. Classify every relevant change: **port** for behavior, **availability** for exposure or integration plumbing the mirror does not use, **out of scope** for unrelated internals or docs. Unmerged branches are **direction** only. A drift-only review stops after reporting this classification.
+3. **Port or ledger.** For each behavior change, port an upstream golden assertion or add a regression check if upstream has none. Add the check before editing behavior. Record deliberate omissions in the ledger. Keep whole-file ports byte-identical to the target and formatting-exempt. When dropping an upstream mechanism, update descriptions and docs that imply it still exists. For transport changes, check the applicable MCP specification version and distinguish protocol requirements from observed server behavior.
+4. **Verify.** Run the extension checks in `AGENTS.md`, then the affected README’s golden tests. Check whole-file ports against the target hash, not `origin/v2`. If provider selection, result consumption, or output shape changes, run the applicable print-mode checks below. Report any check not run and why.
+5. **Advance the pin.** Once all relevant changes are accounted for and verification passes, update the README hash/date and summarize the classification in Drift Notes. If the sync removes a managed source file, confirm that chezmoi also removed the deployed copy; remove a stale target if needed.
 
-1. Refresh the upstream cache:
+## Print-mode checks
 
-   ```bash
-   bash ~/.pi/agent/skills/librarian/checkout.sh anomalyco/opencode --path-only
-   ```
+Prefer deterministic fixtures for the model and remote responses. For direct calls, inspect the result sent to the model or its session entry. For codemode, assert on the value **inside the script** and emit a small success marker; the session records nested call status, not the nested return value.
 
-2. Measure drift on the right line. Resolve file paths from the tree of the line you diff — locations moved between lines:
+- **Result consumption or output schema:** check direct `content` and the actual `tools.*()` return separately. Use a large fixture to prove that preview truncation and spill notices affect `content` but do not trim the script value. Keep transport, conversion, and codemode’s final output budgets distinct from preview truncation. Use the README’s Output section as the contract.
+- **Provider selection or persistence:** check the selected provider, `details.provider`, and the `websearch.selection` entry during random selection. Resume the same session twice and check that the provider remains stable without duplicate selection entries.
 
-   ```bash
-   git ls-tree -r --name-only origin/dev | rg -i 'websearch|webfetch|html-markdown'
-   git log --no-merges <pin>..origin/dev -- <those paths>
-   ```
+## Review findings
 
-   Unmerged `websearch-*` / `web-fetch` branches are direction signals; note them, leave them.
-
-   Complete when every drifted commit is classified: **port** (implementation change), **availability** (only changes who gets the tool — skip), or **direction** (unmerged — note only).
-
-3. Port each change onto the mirror's axes (sections below). Port discipline:
-
-   - Whole-file ports stay verbatim, listed in `private_dot_pi/private_agent/oxfmt.config.ts` `ignorePatterns`, so drift diffs stay byte-comparable.
-   - Upstream test assertions are the verification source: port them as golden checks before touching behavior.
-   - A mechanism the mirror drops takes its copy with it — README/docs/description sentences must not claim unmirrored mechanisms ("user's selected search integration", "retained in managed storage").
-
-   Complete when every classified **port** commit is mirrored or written into the ledger.
-
-4. Verify, in this order: the AGENTS.md typecheck/lint for extensions; the mirror section's golden checks below; the print-mode E2E when selection or result consumption changed. A transport claim in a comment or fix (structuredContent, Retry-After, isError, budget caps) backs onto the MCP 2025-06-18 spec first — a SHOULD is not a MUST, classify before writing.
-
-5. Move the pin (README hash + date) and clean up: a source deletion leaves the deployed copy orphaned — chezmoi applies additions, not removals; rm the target too. A sync without a moved pin leaves the next drift check reading stale.
-
-## websearch mirror (reference)
-
-| Axis | Upstream (v2) home | Mirror home |
-| --- | --- | --- |
-| Provider set: exa, parallel, firecrawl, tavily, tinyfish | `packages/core/src/plugin/websearch/*` | `providers/*` |
-| Selection: forced / random + per-session affinity + 429 cooldown + failover | `packages/core/src/websearch.ts` | `selection.ts` |
-| Tool schema (query only) + description | `packages/core/src/tool/plugin/websearch.ts` | `index.ts` |
-| Result consumption: structured results → markdown | tool content formatting | `index.ts` formatResults |
-| Error mapping: 429 / 401 / generic | tool `ToolFailure` | `index.ts` wrapWebsearchError over `HttpCallError` |
-| Response shape tolerance | per-provider Effect schemas (strict) | `mcp-client.ts` extractText + per-provider runtime checks (looser, ledgered) |
-
-Smoke checks: jiti-load a provider and execute with env manipulation (`env -u TAVILY_API_KEY`, `env -u PARALLEL_API_KEY`, `env -u TINYFISH_API_KEY`). Known outcomes (2026-09-24): keyless Parallel returns ~10 results, keyless Tavily 8 — its keyless tier flaps (long HTTP 503 stretches); all providers join random routing regardless of credentials (`requiresApiKey` was removed 2026-09-24 to restore v2 registration). TinyFish (2026-10-19): keyless answers from one `tools/call`, but with `TINYFISH_API_KEY` set it must run the session handshake first — `initialize` (returns `Mcp-Session-Id`) → `notifications/initialized` (acknowledged 204, not the spec's 202) → `tools/call` carrying the id; a sessionless keyed call answers 400, an unknown session 404. E2E asserts on the session jsonl: a `websearch.selection` custom entry exists, `details.provider` matches, result content is `## [title](url)` markdown; resume stickiness: rerun twice with `--session <file>`, provider stays fixed and the selection entry gains no duplicates.
-
-## webfetch mirror (reference)
-
-| Axis | Upstream (v2) home | Mirror home |
-| --- | --- | --- |
-| Markdown renderer | `packages/core/src/tool/html-markdown.ts` | `html-markdown.ts` (verbatim, oxfmt-exempt) |
-| Request identity: OpenCode-User UA, bare `opencode` on Cloudflare 403 retry | `packages/core/src/tool/plugin/webfetch.ts` | `index.ts` |
-| Mime whitelist + error narrowing (`Unable to fetch <url>`) | same | `index.ts` |
-| Tool schema (timeout (0, 120] fail-fast) + description | same | `index.ts` |
-| Text extraction | `tool/plugin/webfetch.ts` (in-module export) | `index.ts` (bottom, exported — like upstream) |
-| Truncation + full-output temp file | central ToolOutput service | `index.ts` (pi brackets) |
-| Images | v2 fails on images | pi-native `{type:"image"}` keep (ledgered) |
-
-Golden checks: port assertions from `packages/core/test/tool-webfetch.test.ts` and `tool-html-markdown-budget.test.ts` (conversions, inline-code boundaries, byte-budget edge cases). Verbatim check: `diff <(git show origin/v2:.../html-markdown.ts) <mirror file>` is empty. E2E: fetch a known page in markdown and text formats, assert `details` = `{url, format, contentType}`.
-
-Known shared caveat (ledgered, deliberately not fixed): the renderer silently caps conversion at ~5MB, so the "full output" file can hold a capped conversion — the overclaim matches upstream.
-
-## Verification recipe (reference)
-
-No-model-call smoke via jiti (from pi's own install, the `node_modules/jiti/lib/jiti.mjs` beside the `pi-coding-agent` package):
-
-```js
-import { createJiti } from "<pi install>/node_modules/jiti/lib/jiti.mjs";
-const jiti = createJiti(import.meta.url);
-const mod = await jiti.import("<repo>/private_dot_pi/private_agent/extensions/<name>/<file>.ts");
-```
-
-Print-mode E2E: `pi --print 'Call the <tool> tool once with …'`, then assert in the session jsonl under `~/.pi/agent/sessions/` (details fields, persistence entries, result shape).
-
-## Findings triage (reference)
-
-First question on any review finding or bug: does upstream v2 have it?
-
-- **Inherited** — v2 shares it (429-only failover wedging a session on a dead keyless provider; budget-capped conversion presented as full output). Fix when behavior demands it; the fix is a ledger entry. Otherwise record it and keep parity.
-- **Own** — artifact of mirror-local architecture (structured-only MCP responses dropped by text-first extraction). Just fix.
-
-Where the mirror kept upstream's architecture, bugs inherit; where it diverged, it grows its own. Split every diff along that line before deciding what a finding means.
+Check the behavior at the mirror’s pin first, then at the current upstream target if checking drift. **Inherited:** keep parity or ledger a deliberate fix. **Mirror-local:** fix the Pi implementation and add a regression check. A documented difference is intentional unless the review explicitly changes that decision.

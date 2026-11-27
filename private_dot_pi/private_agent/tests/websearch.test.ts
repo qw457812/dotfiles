@@ -1,11 +1,5 @@
-// Golden checks for the websearch mirror. Ports the assertions of OpenCode
-// v2's packages/core/test/websearch.test.ts (selection: failover, cooldowns,
-// Retry-After sizing, shared cooldowns) and tool-websearch.test.ts (tool-level
-// error messages, all-cooling behavior) onto the mirror's architecture:
-// selection-level cases use in-memory fake providers (v2's TestWebSearch
-// equivalent), tool-level cases stub fetch and run the real tool.
-//
-// Run: npm --prefix private_dot_pi/private_agent test -- websearch
+// Golden checks ported from OpenCode's core websearch and tool-websearch tests.
+// See the mirror README for the test command.
 import type { Mock } from "vitest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { tmpdir } from "node:os";
@@ -17,7 +11,6 @@ import type {
   WebSearchProvider,
 } from "../extensions/websearch/providers/types";
 
-/** Await a promise that must reject, and return the rejection value. */
 async function captureError(promise: Promise<unknown>): Promise<any> {
   try {
     await promise;
@@ -27,8 +20,7 @@ async function captureError(promise: Promise<unknown>): Promise<any> {
   throw new Error("expected the call to fail, but it resolved");
 }
 
-// The selection caches PI_WEBSEARCH_PROVIDER per module load, so every test
-// reloads the mirror modules inside a fresh registry under its own env.
+// Reload the modules after stubbing env because forced selection is cached on import.
 async function loadWebsearch(provider: string) {
   vi.stubEnv("PI_WEBSEARCH_PROVIDER", provider);
   vi.resetModules();
@@ -47,10 +39,6 @@ async function loadWebsearch(provider: string) {
 }
 
 type Mods = Awaited<ReturnType<typeof loadWebsearch>>;
-
-// ---------------------------------------------------------------------------
-// Fake providers (v2's TestWebSearch equivalent): scripted behavior + call log
-// ---------------------------------------------------------------------------
 
 interface FakeState {
   calls: string[];
@@ -72,10 +60,6 @@ function fakeProvider(id: ProviderID, providerState: FakeState): WebSearchProvid
     },
   };
 }
-
-// ---------------------------------------------------------------------------
-// Tool harness: stub ExtensionAPI + scripted fetch
-// ---------------------------------------------------------------------------
 
 function activateTool(
   mods: Mods,
@@ -112,10 +96,6 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-// ---------------------------------------------------------------------------
-// Selection-level cases (random routing) — test/websearch.test.ts ports
-// ---------------------------------------------------------------------------
-
 describe("selection (random routing)", () => {
   let mods: Mods;
 
@@ -123,8 +103,6 @@ describe("selection (random routing)", () => {
     mods = await loadWebsearch("random");
   });
 
-  // "fails over on rate limits with random and keeps the replacement after
-  // cooldown" (TestClock adjustments become fake timers).
   it("fails over on rate limits with random and keeps the replacement after cooldown", async () => {
     vi.useFakeTimers();
     vi.setSystemTime(0);
@@ -171,14 +149,10 @@ describe("selection (random routing)", () => {
       { sessionID: "s1", onAffinityChange },
     );
     expect(recovered).toMatchObject({ provider: "exa", attempts: 2 });
-    // Session entries (ledger: "Session entries exceed v2"): one per real
-    // affinity change — the failover and the failback — none for sticky hits
-    // or restored affinity.
+    // Only affinity changes should append entries; resume and sticky hits must not.
     expect(affinityLog).toEqual(["parallel", "exa"]);
   });
 
-  // "fails promptly when all providers are cooling down without asking for a
-  // provider": both queries fail with the rate limit, no provider retried.
   it("fails promptly when all providers are cooling down without asking for a provider", async () => {
     const exa = state();
     const parallel = state();
@@ -210,7 +184,6 @@ describe("selection (random routing)", () => {
     ]);
   });
 
-  // "tries each provider only once per query even with a zero cooldown"
   it("tries each provider only once per query even with a zero cooldown", async () => {
     const exa = state();
     const parallel = state();
@@ -226,9 +199,7 @@ describe("selection (random routing)", () => {
     expect([exa.calls.length, parallel.calls.length]).toEqual([1, 1]);
   });
 
-  // "respects Retry-After %j and recovers after cooldown" — upstream's exact
-  // table, including the HTTP-date case (its TestClock starts at epoch 0, so
-  // fake time does the same here).
+  // Match upstream's epoch clock for the HTTP-date Retry-After case.
   const cooldownTable: Array<[string | undefined, number]> = [
     ["120", 120_000],
     ["Thu, 01 Jan 1970 00:02:00 GMT", 120_000],
@@ -263,9 +234,6 @@ describe("selection (random routing)", () => {
     },
   );
 
-  // v2 parity guard: every registered provider joins random routing regardless
-  // of credentials (requiresApiKey was removed 2026-09-24), and each session
-  // emits exactly one affinity entry for its initial pick.
   it("includes every provider in random routing regardless of credentials", async () => {
     const picked = new Set<string>();
     let badAffinity = 0;
@@ -292,7 +260,6 @@ describe("selection (random routing)", () => {
     expect(badAffinity).toBe(0);
   });
 
-  // "shares cooldowns without sending a peer back to the rate-limited provider"
   it("shares cooldowns without sending a peer back to the rate-limited provider", async () => {
     const exa = state();
     const parallel = state();
@@ -311,10 +278,6 @@ describe("selection (random routing)", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// Tool-level cases (random routing) — tool-websearch.test.ts ports
-// ---------------------------------------------------------------------------
-
 describe("tool (random routing)", () => {
   let mods: Mods;
 
@@ -322,9 +285,6 @@ describe("tool (random routing)", () => {
     mods = await loadWebsearch("random");
   });
 
-  // "does not reopen consent when all automatic providers are cooling down":
-  // every query surfaces "Web search rate limited (HTTP 429)" and each of the
-  // five providers is contacted at most once.
   it("fails every query with the rate limit while all providers are cooling down", async () => {
     const tool = activateTool(
       mods,
@@ -349,10 +309,6 @@ describe("tool (random routing)", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// Tool-level cases (forced provider) — tool-websearch.test.ts ports
-// ---------------------------------------------------------------------------
-
 describe("tool (forced provider)", () => {
   let mods: Mods;
 
@@ -360,8 +316,6 @@ describe("tool (forced provider)", () => {
     mods = await loadWebsearch("tavily");
   });
 
-  // "reports safe HTTP failures with the attempted provider" (upstream's
-  // message table).
   const httpFailures: Array<[number, string]> = [
     [403, "Web search request failed (HTTP 403)"],
     [429, "Web search rate limited (HTTP 429)"],
@@ -403,8 +357,25 @@ describe("tool (forced provider)", () => {
     );
     const out = await tool.run("golden query");
     expect(out.content[0].text).toBe("## [Example](https://example.com/a)\n\nexample content");
+    expect(out.structuredContent).toStrictEqual([
+      { url: "https://example.com/a", title: "Example", content: "example content" },
+    ]);
     expect(out.details).toMatchObject({ provider: "tavily", attempts: 1 });
     expect(tool.entries).toEqual([]);
+  });
+
+  it.each([
+    ["missing", { title: "Missing URL" }],
+    ["non-string", { url: 123, title: "Invalid URL" }],
+  ])("rejects a search hit with a %s URL", async (_kind, hit) => {
+    const tool = activateTool(
+      mods,
+      () => new Response(JSON.stringify({ results: [{ url: "https://example.com/a" }, hit] })),
+    );
+
+    await expect(tool.run("golden query")).rejects.toMatchObject({
+      name: "InvalidWebSearchOutputError",
+    });
   });
 
   it("returns the placeholder for empty results", async () => {
@@ -414,15 +385,15 @@ describe("tool (forced provider)", () => {
     );
     const out = await tool.run("golden query");
     expect(out.content[0].text).toBe("No search results found. Please try a different query.");
+    expect(out.structuredContent).toEqual([]);
   });
 
-  // pi 1.6.1 bash-tool semantics: a temp-file failure keeps the truncated
-  // results and names the reason instead of failing the search.
   it("keeps the truncated results when the full output cannot be saved", async () => {
     const missing = join(tmpdir(), "pi-websearch-missing-temp-dir");
     vi.stubEnv("TMPDIR", missing);
     vi.stubEnv("TMP", missing);
     vi.stubEnv("TEMP", missing);
+    const content = `${"x".repeat(1024)}\n`.repeat(1024);
     const tool = activateTool(
       mods,
       () =>
@@ -432,8 +403,9 @@ describe("tool (forced provider)", () => {
               {
                 url: "https://example.com/a",
                 title: "Example",
-                content: "line\n".repeat(3000),
+                content,
               },
+              { url: "https://example.com/b" },
             ],
           }),
           { status: 200 },
@@ -447,11 +419,13 @@ describe("tool (forced provider)", () => {
     expect(out.details.fullOutputError).toMatch(/ENOENT/);
     expect(out.content[0].text).toMatch(/## \[Example\]\(https:\/\/example\.com\/a\)/);
     expect(out.content[0].text).toContain("Could not save the full output: ENOENT");
+    expect(out.content[0].text).not.toContain("https://example.com/b");
+    expect(out.structuredContent).toStrictEqual([
+      { url: "https://example.com/a", title: "Example", content },
+      { url: "https://example.com/b" },
+    ]);
   });
 
-  // Ledger-backed divergence guard ("User cancellation bypasses the error
-  // wrap"): a user abort keeps its plain cancelled message, identified by
-  // typed identity rather than message text.
   it("keeps its plain message for user cancellation", async () => {
     const tool = activateTool(mods, () => {
       throw Object.assign(new Error("The operation was aborted"), { name: "AbortError" });
@@ -463,8 +437,7 @@ describe("tool (forced provider)", () => {
     expect(err.message).toBe("Tavily request was cancelled");
   });
 
-  // Impersonation guard: a provider error whose message merely ends like a
-  // cancellation is not one — it must go through the error wrap.
+  // A provider can return cancellation-like text without a user abort.
   it("wraps provider errors that merely imitate cancellation", async () => {
     const tool = activateTool(mods, () => {
       throw new Error("quota was cancelled");
@@ -474,10 +447,6 @@ describe("tool (forced provider)", () => {
     expect(err.cause.message).toBe("quota was cancelled");
   });
 });
-
-// ---------------------------------------------------------------------------
-// Tool-level cases (forced MCP provider) — the remote impersonation vectors
-// ---------------------------------------------------------------------------
 
 describe("tool (forced MCP provider)", () => {
   let mods: Mods;
@@ -572,9 +541,7 @@ describe("tool (forced MCP provider)", () => {
     expect(err.cause.message).toBe("Exa search failed");
   });
 
-  // A 429 whose body is still being read must keep the cancellation/timeout
-  // classification: swallowing it as HttpCallError would turn an abort into a
-  // rate limit and drive cooldown/failover.
+  // An aborted 429 body read must not trigger provider cooldown or failover.
   function hangingRateLimitedBody(signal: AbortSignal | null | undefined) {
     return new Response(
       new ReadableStream({
@@ -616,15 +583,7 @@ describe("tool (forced MCP provider)", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// Tool-level cases (forced TinyFish provider) — ports the request-sequence
-// assertions of v2's `plugins/websearch` test (initialize → initialized →
-// tools/call with Mcp-Session-Id) plus the server behaviors observed live on
-// 2026-10-19: keyless initialize returns no session, keyed tools/call without
-// one answers 400, an unknown session answers 404, the initialized
-// notification is acknowledged with 204.
-// ---------------------------------------------------------------------------
-
+// TinyFish request sequence follows upstream; status fixtures reflect the hosted endpoint.
 describe("tool (forced tinyfish provider)", () => {
   let mods: Mods;
 
@@ -705,7 +664,6 @@ describe("tool (forced tinyfish provider)", () => {
     });
     expect(headers[0]["X-TinyFish-Access-Mode"]).toBeUndefined();
 
-    // Notification: no id, and the session id must be carried already.
     expect(bodies[1]).toEqual({ jsonrpc: "2.0", method: "notifications/initialized" });
     expect(headers[1]["Mcp-Session-Id"]).toBe("ses_tinyfish");
 
@@ -715,11 +673,7 @@ describe("tool (forced tinyfish provider)", () => {
     });
     expect(headers[2]["Mcp-Session-Id"]).toBe("ses_tinyfish");
 
-    // The server's answer (2025-11-25 in the fixture, as live) is the
-    // negotiated version and is what subsequent requests advertise, matching
-    // pi's own MCP client (packages/mcp/src/client.ts echoes
-    // InitializeResult.protocolVersion via transport.setProtocolVersion).
-    // Source: specification/2025-06-18/basic/lifecycle#version-negotiation
+    // Subsequent requests must advertise the server's negotiated version.
     expect(headers[1]["MCP-Protocol-Version"]).toBe("2025-11-25");
     expect(headers[2]["MCP-Protocol-Version"]).toBe("2025-11-25");
 
@@ -738,14 +692,10 @@ describe("tool (forced tinyfish provider)", () => {
     expect(headers["X-TinyFish-Access-Mode"]).toBe("keyless");
     expect(headers["X-API-Key"]).toBeUndefined();
     expect(headers["Mcp-Session-Id"]).toBeUndefined();
-    // No handshake, so nothing was negotiated: advertise the latest version
-    // this client supports (the live keyless tier accepts it).
     expect(headers["MCP-Protocol-Version"]).toBe("2025-11-25");
     expect(out.details.provider).toBe("tinyfish");
   });
 
-  // mcp-client returns { text: "", isError: true } for an MCP error that only
-  // carries structuredContent; the empty-text shortcut must not swallow it.
   it("propagates MCP tool errors that carry no text", async () => {
     vi.stubEnv("TINYFISH_API_KEY", "");
     const { fetchImpl } = scriptedFetch([
@@ -792,8 +742,7 @@ describe("tool (forced tinyfish provider)", () => {
     expect(calls).toHaveLength(1);
   });
 
-  // Port of pi's MCP client test "accepts servers that answer with an older
-  // protocol version" (packages/mcp/test/client.test.ts).
+  // Ports Pi's MCP client check for an older negotiated protocol version.
   it("accepts a server that answers with an older protocol version", async () => {
     vi.stubEnv("TINYFISH_API_KEY", "tinyfish-secret");
     const older = json({
@@ -840,7 +789,6 @@ describe("tool (forced tinyfish provider)", () => {
     expect(err.cause.message).toBe(
       "TinyFish MCP server selected unsupported protocol version 1999-01-01",
     );
-    // Fails before the initialized notification and the search.
     expect(calls).toHaveLength(1);
   });
 
@@ -896,8 +844,6 @@ describe("tool (forced tinyfish provider)", () => {
     expect(err.message).toBe("Web search request failed (HTTP 400)");
   });
 
-  // v2 parity: upstream initializes per search and never retries a 404, so a
-  // "Session not found; send a new initialize request" answer surfaces as-is.
   it("does not re-initialize on a 404 session-not-found (v2 parity)", async () => {
     vi.stubEnv("TINYFISH_API_KEY", "tinyfish-secret");
     const { fetchImpl, calls } = scriptedFetch([
@@ -919,8 +865,7 @@ describe("tool (forced tinyfish provider)", () => {
     expect(calls).toHaveLength(3);
   });
 
-  // MCP 2025-06-18 transports: any request may be answered with either plain
-  // JSON or an SSE stream, including initialize.
+  // MCP 2025-06-18 allows an SSE response even during initialize.
   it("parses an initialize response delivered over SSE", async () => {
     vi.stubEnv("TINYFISH_API_KEY", "tinyfish-secret");
     const { fetchImpl, calls } = scriptedFetch([
@@ -960,8 +905,6 @@ describe("tool (forced tinyfish provider)", () => {
     expect(err.cause.message).toBe(`search response exceeded ${mods.MAX_RESPONSE_BYTES} bytes`);
   });
 
-  // The handshake shares one budget (v2's single Effect.timeoutOrElse), so a
-  // timeout reports the handshake, not a per-leg "timed out after Nms".
   it("reports the handshake timeout with the shared budget", async () => {
     vi.stubEnv("TINYFISH_API_KEY", "tinyfish-secret");
     vi.useFakeTimers();
@@ -984,13 +927,6 @@ describe("tool (forced tinyfish provider)", () => {
     expect(requests).toBe(1);
   });
 });
-
-// ---------------------------------------------------------------------------
-// Tool-level cases (forced Firecrawl provider) — mcp-client represents an MCP
-// error that only carries structuredContent as { text: "", isError: true }.
-// Firecrawl checks the flag before the empty-text shortcut; it must still
-// surface an actionable message instead of an empty one.
-// ---------------------------------------------------------------------------
 
 describe("tool (forced firecrawl provider)", () => {
   let mods: Mods;
@@ -1018,12 +954,6 @@ describe("tool (forced firecrawl provider)", () => {
     expect(err.cause.message).toBe("Firecrawl search failed");
   });
 });
-
-// ---------------------------------------------------------------------------
-// Tool-level cases (forced Parallel provider) — Parallel parses
-// structuredContent, but an MCP error without text must still surface an
-// actionable message.
-// ---------------------------------------------------------------------------
 
 describe("tool (forced parallel provider)", () => {
   let mods: Mods;

@@ -1,132 +1,51 @@
-# Pi WebSearch Extension
+# Pi WebSearch
 
-Adds a `websearch` tool to [pi](https://pi.dev) that searches the internet via five remote providers (Exa, Firecrawl, Parallel, Tavily, TinyFish), mirroring OpenCode **v2**'s websearch architecture ([anomalyco/opencode](https://github.com/anomalyco/opencode/tree/fdce6365bcdf2af0fdac65d46dc1806a75d10b02), `dev` branch, 2026-11-07 — the default branch that `v2` was merged into and that now ships the 2.x line).
+Search the web from Pi with Exa, Firecrawl, Parallel, Tavily, or TinyFish. Mirrors [OpenCode websearch at `c85b83eb08`](https://github.com/anomalyco/opencode/tree/c85b83eb08c3d2666b842848215325acb282d92b) (`dev`, 2026-11-25).
 
-## Setup
+## Usage
 
-```bash
-# Optional — each provider works without a key where its free tier allows
-export EXA_API_KEY=exa-...           # https://exa.ai
-export PARALLEL_API_KEY=...          # https://parallel.ai
-export FIRECRAWL_API_KEY=fc-...      # https://firecrawl.dev
-export TAVILY_API_KEY=tvly-...       # https://tavily.com
-export TINYFISH_API_KEY=sk-...       # https://agent.tinyfish.ai
-```
+The tool accepts one required parameter, `query`. Set `PI_WEBSEARCH_PROVIDER` to a provider ID below to force it, or leave it unset (or set it to `random`) for session-sticky random selection. All five providers are eligible for random routing even without a key; keyless requests depend on each provider's free tier.
 
-Then start pi — the `websearch` tool is automatically available.
+| Provider ID | API key environment variable | Transport |
+| --- | --- | --- |
+| `exa` | `EXA_API_KEY` | MCP over HTTPS |
+| `firecrawl` | `FIRECRAWL_API_KEY` | MCP over HTTPS |
+| `parallel` | `PARALLEL_API_KEY` | MCP over HTTPS |
+| `tavily` | `TAVILY_API_KEY` | REST |
+| `tinyfish` | `TINYFISH_API_KEY` | MCP over HTTPS |
 
-## Providers
+**Random** routing sticks to one provider per session and restores it on resume. Only HTTP 429 triggers failover: the provider enters cooldown for its `Retry-After` duration (or 60 seconds if missing or invalid), and the query immediately tries another available provider. If all providers are cooling down, the call fails with a rate-limit error. A non-429 failure does not move the sticky selection; force a different provider if a keyless tier keeps failing.
 
-| Provider  | Endpoint                               | Auth (env)          | Keyless     |
-| --------- | -------------------------------------- | ------------------- | ----------- |
-| Exa       | `https://mcp.exa.ai/mcp`               | `EXA_API_KEY`       | yes         |
-| Parallel  | `https://search.parallel.ai/mcp`       | `PARALLEL_API_KEY`  | yes         |
-| Firecrawl | `https://mcp.firecrawl.dev/v2/mcp`     | `FIRECRAWL_API_KEY` | yes         |
-| Tavily    | `https://api.tavily.com/search` (REST) | `TAVILY_API_KEY`    | yes (flaky) |
-| TinyFish  | `https://agent.tinyfish.ai/mcp`        | `TINYFISH_API_KEY`  | yes         |
+**Forced** routing makes one attempt with the chosen provider, bypassing cooldown and failover.
 
-Exa, Parallel, Firecrawl, and TinyFish go through MCP-over-HTTP; Tavily is a plain REST endpoint. All five join random routing regardless of credentials, exactly like v2. Inherited caveat: only 429 triggers cooldown/failover, so a session whose sticky pick fails some other way — e.g. Tavily's flaky keyless tier answering HTTP 503 — fails its searches until the provider recovers; force another provider with `PI_WEBSEARCH_PROVIDER` to sidestep it.
+TinyFish makes one `tools/call` without a key. With a key, each search negotiates a session (`initialize` → `notifications/initialized` → `tools/call` with `Mcp-Session-Id`).
 
-TinyFish's keyless tier is stateless. With `TINYFISH_API_KEY` set, every search first runs the MCP session handshake — `initialize` → `notifications/initialized` → `tools/call` — because the keyed tier rejects a sessionless `tools/call` with HTTP 400 `Missing required Mcp-Session-Id header`. The session is rebuilt for each search and left to expire, as in v2.
-
-Every provider parses its response into structured results (`url` / `title` / `content` / `published`), which the tool formats as markdown for the LLM:
-
-```
-## [Title](url)
-Published: 2026-01-02T03:04:05.000Z
-
-content...
-```
-
-## Provider Selection
-
-Mirrors OpenCode v2's selection model:
-
-| Scenario                                                           | Provider                 |
-| ------------------------------------------------------------------ | ------------------------ |
-| `PI_WEBSEARCH_PROVIDER=exa\|parallel\|firecrawl\|tavily\|tinyfish` | forced single provider   |
-| `PI_WEBSEARCH_PROVIDER=random` or unset                            | random routing (default) |
-
-**Random routing** (default): each session sticks to one provider until it is rate limited. HTTP 429 puts the provider on a cooldown sized by its `Retry-After` header (seconds or HTTP date, fallback 60s), and the query fails over to another available provider. When every provider is cooling down, the call fails with `Web search rate limited (HTTP 429)`.
-
-**Forced selection**: no failover; errors (including 429) surface directly — an HTTP failure surfaces as `Web search request failed (HTTP N)`, a 429 as `Web search rate limited (HTTP 429)`.
-
-Stickiness is session-scoped and persisted through pi's native custom session entries (`websearch.selection`), so `pi --resume` keeps the same provider. It is **not** persisted across sessions — OpenCode v2 additionally persists a global choice via SQLite KV written by its consent dialog; this extension intentionally has no consent flow and no state file.
-
-Exa, OpenCode's own provider rollout flags, and API keys do **not** affect selection — keys are for authentication only.
-
-## Tool Parameters
-
-| Parameter    | Type              | Description                                    |
-| ------------ | ----------------- | ---------------------------------------------- |
-| `query`      | string (required) | Search query                                   |
-| `numResults` | —                 | removed (v2 fixed result counts internally: 8) |
+**Known limitation (shared with pinned upstream):** the MCP client caps each response at 256 KiB, but Tavily's REST path reads the entire response body without a byte cap. Large responses can consume memory while being read and parsed, and their hits are copied into the codemode sandbox before scripts can filter them. Codemode's final output budget does not protect these steps. If a bounded response is needed, force an MCP provider. A future Tavily cap should reject oversized bodies during streaming, not truncate the hits.
 
 ## Output
 
-Results are joined as markdown (`## [title](url)`, `Published:` line, content) and truncated to 2000 lines / 50 KB (pi's built-in limits). When truncated, the full output is saved to a temp file and the LLM is told the path, using pi's bash-tool bracket format:
+**Direct calls** display Markdown with linked titles, dates when present, and snippets. If output exceeds 2000 lines or 50 KiB, the preview links to a file containing the full Markdown. If saving fails, the preview remains available, and the notice and `details.fullOutputError` report why.
 
-```
-[Showing lines 1-800 of 1200. Full output: /tmp/pi-websearch-XXXX/output.txt]
-```
+**Codemode** returns an array of hits in provider order: `{ url: string; title?: string; published?: number; content?: string }[]`. `published` is Unix time in milliseconds. No hits returns `[]`. The Markdown preview budget does not trim these hits; codemode's own output budget applies to what the script sends back to the model.
 
-If the temp file cannot be saved (full or unwritable temp directory, quota), the call still returns the truncated results and the notice says why — `[Showing lines 1-N of M. Could not save the full output: <error>]` — with `details.fullOutputError` carrying the reason. This mirrors pi's bash tool since 1.6.1; before that a failed save failed the whole call.
-
-## Architecture
-
-```
-websearch/
-├── index.ts              # Tool registration, markdown formatting, error wrapping
-├── selection.ts          # v2 selection model: random affinity, 429 cooldowns, failover
-├── mcp-client.ts         # Generic MCP-over-HTTP client (JSON-RPC 2.0 + SSE parsing, raw + tool-call requests)
-├── providers/
-│   ├── types.ts          # Shared types (ProviderID, WebSearchResult, HttpCallError)
-│   ├── exa.ts             # Exa (MCP web_search_exa; text format parsed)
-│   ├── parallel.ts       # Parallel (MCP web_search; structuredContent parsed)
-│   ├── firecrawl.ts      # Firecrawl (MCP firecrawl_search; JSON in text)
-│   ├── tavily.ts         # Tavily (REST POST /search)
-│   └── tinyfish.ts       # TinyFish (MCP search; keyed requests run the session handshake)
-├── render.ts             # Custom TUI rendering
-└── README.md
+```js
+const hits = await tools.websearch({ query: "Pi release notes" });
+text(hits.map(({ url, title }) => ({ url, title })));
 ```
 
-No local MCP server processes. All calls go to remote endpoints via HTTPS.
-No consent dialog, no KV store, no state file — selection is env + memory.
+## Differences from Upstream
 
-Golden checks (no model calls, assertions ported from upstream `test/websearch.test.ts` and `test/tool-websearch.test.ts`): `npm --prefix private_dot_pi/private_agent test -- websearch`.
+- **Providers and exposure:** Claude Agent is omitted because it depends on OpenCode's account and runtime. Pi controls direct and codemode availability, without OpenCode's catalog pinning.
+- **Configuration:** credentials and provider choice come from environment variables rather than integration connections, consent, or managed policy. The description does not claim a provider picker. Random affinity is written to a `websearch.selection` session entry for resume, not to a global provider preference.
+- **MCP transport:** the client uses TypeBox and AbortController instead of Effect. It sends Pi's `MCP-Protocol-Version` header on each request and uses the negotiated version after TinyFish initialization. Parallel, Tavily, Firecrawl, and TinyFish identify as Pi; TinyFish also does so in `clientInfo`.
+- **TinyFish parsing:** a missing `results` array fails rather than becoming an empty result.
+- **Preview storage:** the tool uses Pi's bracket notices and a local Markdown temp file; a failed save does not fail the search. User cancellation bypasses generic error wrapping.
 
-## Differences from OpenCode v2's WebSearch
+## Verification
 
-- **No consent flow** — OpenCode asks on first use and persists the choice (KV `websearch:provider`, value `false` disables the tool entirely); this extension never prompts, and disabling just means not loading it
-- **No integration connections or policy actions** — v2 stores credentials in integration connections and can remove providers via `websearch.use` / `integration.use` managed policies (hiding the tool when none remain); this extension always registers all five providers and credentials come from env vars, with no policy layer
-- **No global persistence** — OpenCode remembers a user-chosen provider across sessions in its app SQLite database; this extension's env var is the declarative config and random affinity is process state
-- **Session entries exceed v2** — per-session stickiness persists via pi's `CustomEntry` (`websearch.selection`), surviving `--resume`; v2 keeps affinity in memory only
-- **No Effect framework** — plain async/await + TypeBox instead of Effect Schema + Layer
-- **Extra provider attempts are not retried on non-429 errors** — same as v2: only rate limits fail over
-- **User cancellation bypasses the error wrap** — like the webfetch mirror, genuine user aborts keep their plain `... was cancelled` provider message instead of v2's blanket `Unable to search the web for <query>` narrowing (pi abort semantics)
-- **Full-output save failures are reported, not fatal** — a failed temp-file save keeps the truncated results and names the reason in the notice and `details.fullOutputError`, mirroring pi's bash tool since 1.6.1
-- **User-Agent** — parallel/tavily/firecrawl/tinyfish send `pi/${VERSION}` instead of OpenCode's app useragent; TinyFish's handshake also announces `clientInfo: { name: "pi", version: ... }` where v2 sends `opencode`/`1.0`
-- **`MCP-Protocol-Version` is always sent** — the mirror includes the header on every MCP request (spec 2025-06-18 marks it MUST) and echoes the version negotiated in `initialize`, validated against pi's supported list (2025-11-25, 2025-06-18, 2025-03-26, 2024-11-05) exactly as pi's own MCP client does; the stateless providers (Exa, Parallel, Firecrawl) send the latest supported version because they never handshake; v2 sends the header nowhere, including TinyFish's handshake, relying on the spec's 2025-03-26 fallback
-- **TinyFish result parsing is fail-fast** — v2 decodes `content[].text` with an Effect schema and silently yields zero results on a shape mismatch; the mirror throws when `results` is missing, matching the other providers' runtime checks
-- **Env var prefix** — `PI_WEBSEARCH_PROVIDER` instead of `opencode.jsonc`'s `websearch.provider`
-- **MCP client** — TypeBox schema validation + AbortController timeout instead of Effect Schema + `Effect.timeoutOrElse`
-- **Truncation notices** — pi's bash-tool bracket format (`[Showing lines X-Y ...]`) instead of OpenCode's `... N lines truncated; full content saved to ...` marker; both use 2000 lines / 50 KB
-- **Tool description wording** — v2 says "Search the web using the user's selected search integration" (accurate for its consent/KV selection and integrations UI); this extension has no user-facing selection, so the first sentence is just "Search the web"
+From the chezmoi root, run `cd private_dot_pi/private_agent && npm exec -- vitest --run tests/websearch.test.ts`.
 
 ## Drift Notes
 
-- Synced to `fdce6365bc` (2026-11-07) on `dev`: no changes to the mirror surface. Every commit touching websearch paths was classified availability — `a809a4755f` (provider registration helper, pure integration/credential plumbing around unchanged `execute` bodies), `01cd723db9` (publish catalog updates only when the provider list changes), `b2bd02ee71` + `baeebc2f93` (integration connect/use and `websearch.use` policies, which also hide the tool when every provider is removed), `dad29a8991` (Effect import paths). `598c52f058` touched `html-markdown.ts` (webfetch only). Unmerged `websearch-*` direction branches unchanged
-- Synced to `ba06ff9e0b` (2026-10-19) on `dev`, the default branch `v2` was merged into: 1685 commits since the previous pin, exactly one touching the mirror surface — `86755e1cea` (2026-10-16), which added TinyFish's keyed MCP session handshake and is ported here. `v2` is frozen at `4617210822` (2.0.26) while 2.0.27–2.0.32 ship from `dev`, so the pin moved lines rather than commits
-- 2026-10-19 live smoke: TinyFish answered from both tiers (8–10 results per query). Server behaviors confirmed for the golden checks: keyed `initialize` returns `Mcp-Session-Id` (and negotiates protocol 2025-11-25), `notifications/initialized` is acknowledged 204, `tools/call` without a session answers 400 `-32600`, an unknown session answers 404 `-32001`, `DELETE` answers 405
-- Direction signals (unmerged, noted only): `websearch-auto` (automatic web search routing), `websearch-limits` (shared and non-fatal web search limits), `websearch-consent-service` (consent prompt dedupe), `websearch-consent-repro` (consent repro), `direct-websearch` (call the web search service directly), `websearch-plugin-wait` (server waits for plugins before answering)
-- 2026-09-24 live smoke: keyless Tavily answered successfully (8 results) instead of the historical HTTP 503 → user decision same day: `requiresApiKey` removed and all providers rejoin random routing regardless of credentials (v2 registration restored, ledger entry dropped); the inherited wedge-on-non-429 caveat stays as parity (see Providers above)
-
-## Differences from the previous version of this extension
-
-- Mirrors OpenCode **v2** instead of `e4bd9757a` (dev line)
-- Providers: +Firecrawl, +Tavily, +TinyFish (Exa and Parallel were already there); FNV-1a hash A/B routing replaced by v2's random/affinity/cooldown/failover model
-- TinyFish keyed requests run the MCP session handshake (`initialize` → `notifications/initialized` → `tools/call`) and present `Mcp-Session-Id`; keyless requests stay a single tools/call
-- `numResults` tool parameter removed (fixed at 8 internally, as in v2)
-- Results are parsed to structured objects and formatted as markdown instead of passing provider text through verbatim; Parallel now reads `structuredContent` (and no longer sends `session_id`/`model_name`)
-- MCP tool errors (`isError`) now throw instead of being returned inline with a prefix
-- Truncation notice uses pi's bracket format
+- `c85b83eb08`: ported the flat hit array (`8a30e585a6`) and small-field-first ordering (`5756d59a68`); provider metadata stays separate. Claude Agent (`8bae58e7b9`) is deliberately omitted. OpenCode's Code Mode exposure, pinning, and plugin readiness changes remain upstream-only. Unmerged `websearch-*` branches are direction signals.
+- `ba06ff9e0b`: ported TinyFish's keyed session handshake (`86755e1cea`). Golden checks cover observed server behavior, including HTTP 204 for the initialization notification.

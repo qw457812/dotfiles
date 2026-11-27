@@ -1,34 +1,4 @@
-/**
- * Pi WebFetch Extension
- *
- * Adds a `webfetch` tool that fetches content from URLs and converts to
- * markdown, text, or HTML format.
- *
- * Mirrors OpenCode v2's webfetch implementation
- * (packages/core/src/tool/plugin/webfetch.ts, pinned commit in README):
- * - URL validation (http/https only, no embedded credentials, fragment
- *   stripped) and manual redirect following (max 10, each hop validated;
- *   v2 17837a20d6 / 125655ec6f / e803323c13)
- * - Format parameter: markdown (default), text, or html
- * - Accept header strategy based on requested format
- * - OpenCode-User UA by default; plain "opencode" UA on Cloudflare
- *   403 challenge retry (v2 0762d63b6)
- * - Response body draining on error and redirect hops to release TCP
- *   connections
- * - Response size limit (5MB, shared with the markdown renderer budget)
- * - Textual mime whitelist; non-textual content types fail
- * - HTML→Markdown via v2's own htmlparser2 renderer (html-markdown.ts,
- *   ported verbatim and excluded from oxfmt so drift diffs stay
- *   byte-comparable; turndown is gone from upstream since 90fd61225)
- * - Output truncation with temp file fallback; a failed save keeps the
- *   truncated text and reports why the full output is missing (pi 1.6.1)
- * - Image handling (base64 for non-SVG, text for SVG) — pi-native keep;
- *   v2 removed images, this extension keeps them (ledger deviation)
- * - Error narrowing: every failure surfaces as "Unable to fetch <url>"
- *   with the cause attached (v2 367cf5961)
- * - No permission gate (unlike OpenCode which requires webfetch permission
- *   and re-checks every redirect target against its rules)
- */
+// Mirrors OpenCode's webfetch; see README.md for the upstream pin and differences.
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import {
@@ -41,7 +11,7 @@ import { Text } from "@earendil-works/pi-tui";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "os";
 import { join } from "path";
-import { Type } from "typebox";
+import { type Static, Type } from "typebox";
 
 import { Parser } from "htmlparser2";
 import { convertHTMLToMarkdown, MAX_MARKDOWN_BYTES } from "./html-markdown";
@@ -53,10 +23,6 @@ import {
   type WebfetchRenderState,
 } from "./render";
 
-// ---------------------------------------------------------------------------
-// Constants (mirrors OpenCode v2's webfetch.ts)
-// ---------------------------------------------------------------------------
-
 const MAX_RESPONSE_SIZE = MAX_MARKDOWN_BYTES; // 5MB, shared with renderer budget
 const DEFAULT_TIMEOUT = 30 * 1000; // 30 seconds
 const MAX_TIMEOUT_SECONDS = 120;
@@ -64,32 +30,18 @@ const MAX_TIMEOUT_SECONDS = 120;
 export const MAX_REDIRECTS = 10;
 const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308]);
 
-// ---------------------------------------------------------------------------
-// URL validation (mirrors OpenCode v2's assertHttpUrl)
-// ---------------------------------------------------------------------------
-
 function assertHttpUrl(url: URL): void {
   if (url.protocol !== "http:" && url.protocol !== "https:") {
     throw new Error("URL must use http:// or https://");
   }
-  // Upstream's rule: credentials in the URL are rejected outright, since a
-  // permission rule for the bare host would otherwise be bypassed. Kept even
-  // though this extension has no permission gate.
   if (url.username || url.password) throw new Error("URL must not include credentials");
 }
 
-/** Validate a URL as written, stripping the fragment (never sent). */
 function sanitizeUrl(value: string): string {
-  // Matches upstream: rules match the URL as written, but the fragment is
-  // never sent, so it is removed before validation and fetch.
   const url = value.split("#")[0];
   assertHttpUrl(new URL(url));
   return url;
 }
-
-// ---------------------------------------------------------------------------
-// Mime classification (mirrors OpenCode v2's webfetch.ts)
-// ---------------------------------------------------------------------------
 
 const mimeFrom = (contentType: string) => contentType.split(";", 1)[0]?.trim().toLowerCase() ?? "";
 
@@ -110,10 +62,6 @@ function isTextualMime(mime: string): boolean {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Accept header strategy (mirrors OpenCode v2 exactly)
-// ---------------------------------------------------------------------------
-
 function buildAcceptHeader(format: "text" | "markdown" | "html"): string {
   switch (format) {
     case "markdown":
@@ -124,15 +72,6 @@ function buildAcceptHeader(format: "text" | "markdown" | "html"): string {
       return "text/html;q=1.0, application/xhtml+xml;q=0.9, text/plain;q=0.8, text/markdown;q=0.7, */*;q=0.1";
   }
 }
-
-// ---------------------------------------------------------------------------
-// Request identity (mirrors OpenCode v2's 0762d63b6)
-//
-// v2 sends an honest, bot-identifying UA by default (browser-shaped prefix to
-// pass naive filters, compatible; token + contact URL to identify the client)
-// and falls back to the bare client name on Cloudflare 403 challenges, where
-// the spoofed browser shape fails the TLS-fingerprint check anyway.
-// ---------------------------------------------------------------------------
 
 const openCodeUserAgent =
   "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; OpenCode-User/1.0; +https://opencode.ai";
@@ -146,36 +85,17 @@ function buildHeaders(acceptHeader: string, userAgent: string): Record<string, s
   };
 }
 
-/**
- * User-initiated cancellation.
- *
- * Classified by typed identity (`instanceof`), never by message text — the
- * error wrap must not let foreign errors impersonate a cancellation.
- */
+/** Keep foreign errors from impersonating a user cancellation by message text. */
 export class RequestCancelledError extends Error {
   override name = "RequestCancelledError";
 }
 
-// ---------------------------------------------------------------------------
-// HTTP fetch with Cloudflare retry (mirrors OpenCode v2)
-//
-// Differences from OpenCode:
-// - Per-attempt AbortController (OpenCode uses Effect's runtime)
-// - Drains response body on error to release TCP connections
-// - Retry uses remaining timeout budget (OpenCode uses Effect.timeoutOrElse)
-// ---------------------------------------------------------------------------
-
 interface FetchResult {
-  response: Response;
+  contentType: string;
   arrayBuffer: ArrayBuffer;
 }
 
-/**
- * Follows redirects manually so every hop is validated (scheme, credentials)
- * before it is requested, mirroring v2's redirect loop now that v2 checks each
- * target against the permission rules. This extension has no permission gate;
- * validation and the hop count still apply.
- */
+// Manual redirects let us validate each destination before contacting it.
 async function fetchFollowingRedirects(
   url: string,
   headers: Record<string, string>,
@@ -208,14 +128,13 @@ async function fetchUrl(
 ): Promise<FetchResult> {
   const fetchStartTime = Date.now();
 
-  // Link external signal once for the entire operation (including retry)
+  // Keep user cancellation linked across both attempts and body reads.
   const externalController = new AbortController();
   if (signal?.aborted) externalController.abort();
   const onExternalAbort = () => externalController.abort();
   signal?.addEventListener("abort", onExternalAbort, { once: true });
 
   try {
-    // --- First attempt: OpenCode-User UA ---
     const firstController = new AbortController();
     const firstTimeoutId = setTimeout(() => firstController.abort(), timeoutMs);
     const firstSignal = AbortSignal.any([externalController.signal, firstController.signal]);
@@ -228,16 +147,11 @@ async function fetchUrl(
       clearTimeout(firstTimeoutId);
     }
 
-    // --- Retry with bare client UA if blocked by Cloudflare bot detection ---
-    // (TLS fingerprint mismatch with the browser-shaped default UA)
     if (response.status === 403 && response.headers.get("cf-mitigated") === "challenge") {
-      // Drain the 403 response body to release the TCP connection back
-      // to the pool before making a second request to the same origin.
+      // Release the challenged response before retrying.
       await response.arrayBuffer().catch(() => {});
 
-      // Compute remaining time from the single total budget.
-      // Mirrors OpenCode: Effect.timeoutOrElse wraps the entire operation
-      // (including retry), so total wall time is bounded by timeoutMs.
+      // The retry shares the first attempt's deadline; the final body read has no attempt timer.
       const retryDeadline = timeoutMs - (Date.now() - fetchStartTime);
       if (retryDeadline <= 0) {
         throw new Error(`Request timed out after ${timeoutMs / 1000}s`);
@@ -248,8 +162,7 @@ async function fetchUrl(
       const retrySignal = AbortSignal.any([externalController.signal, retryController.signal]);
 
       try {
-        // The retry restarts from the original URL, matching v2 (which wraps
-        // the whole redirect chain in the Cloudflare retry).
+        // Restart at the original URL so the retry also follows and validates redirects.
         const retryHeaders = buildHeaders(acceptHeader, CLOUDFLARE_RETRY_UA);
         response = await fetchFollowingRedirects(url, retryHeaders, retrySignal);
       } finally {
@@ -257,15 +170,22 @@ async function fetchUrl(
       }
     }
 
-    // Check for HTTP errors — drain the body before throwing to release
-    // the TCP connection back to Node's connection pool. Without this,
-    // non-2xx responses (401, 404, 500, etc.) hold connections until GC.
+    // Drain failed responses to release the connection.
     if (!response.ok) {
       await response.arrayBuffer().catch(() => {});
       throw new Error(`HTTP ${response.status} ${response.statusText}`);
     }
 
-    // Check content length before downloading
+    const contentType = response.headers.get("content-type") || "";
+    const mime = mimeFrom(contentType);
+    const isImage = isImageAttachment(mime);
+    if (isImage || !isTextualMime(mime)) {
+      await response.body?.cancel().catch(() => {});
+      const kind = isImage ? "image" : "file";
+      throw new Error(`Unsupported fetched ${kind} content type: ${mime}`);
+    }
+
+    // Check both the declared size and the actual body; the header is optional.
     const contentLength = response.headers.get("content-length");
     if (contentLength && parseInt(contentLength, 10) > MAX_RESPONSE_SIZE) {
       throw new Error(`Response too large (exceeds ${MAX_RESPONSE_SIZE} byte limit)`);
@@ -276,7 +196,7 @@ async function fetchUrl(
       throw new Error(`Response too large (exceeds ${MAX_RESPONSE_SIZE} byte limit)`);
     }
 
-    return { response, arrayBuffer };
+    return { contentType, arrayBuffer };
   } catch (err: any) {
     if (err.name === "AbortError") {
       if (signal?.aborted) {
@@ -290,10 +210,6 @@ async function fetchUrl(
   }
 }
 
-// ---------------------------------------------------------------------------
-// Format conversion (mirrors OpenCode v2's convert helper)
-// ---------------------------------------------------------------------------
-
 function convert(
   content: string,
   contentType: string,
@@ -304,14 +220,6 @@ function convert(
   if (format === "text") return extractTextFromHTML(content);
   return content;
 }
-
-// ---------------------------------------------------------------------------
-// Full-output persistence (pi 1.6.1 bash-tool semantics)
-//
-// A temp-file failure must not fail the tool call or discard the truncated
-// output: the result keeps the truncated text and says why the full output
-// could not be saved.
-// ---------------------------------------------------------------------------
 
 type SavedFullOutput = { path: string } | { error: string };
 
@@ -327,10 +235,6 @@ async function saveFullOutput(prefix: string, text: string): Promise<SavedFullOu
     return { error: err instanceof Error ? err.message : String(err) };
   }
 }
-
-// ---------------------------------------------------------------------------
-// Tool schema (mirrors OpenCode v2's Input)
-// ---------------------------------------------------------------------------
 
 const WebFetchParamsSchema = Type.Object({
   url: Type.String({
@@ -350,11 +254,12 @@ const WebFetchParamsSchema = Type.Object({
   ),
 });
 
-// ---------------------------------------------------------------------------
-// Tool description (v2's text; the managed-storage sentence adapted to this
-// extension's pi-native truncation: full output goes to a temp file)
-// ---------------------------------------------------------------------------
+const WebFetchOutputSchema = Type.Object({
+  contentType: Type.String(),
+  output: Type.String(),
+});
 
+// Pi uses a local temp file rather than OpenCode's managed storage.
 const DESCRIPTION = `Fetch content from an HTTP or HTTPS URL and return it as text, markdown, or HTML. Markdown is the default.
 
 Use a more targeted tool when one is available. This tool is read-only. Large text results may be truncated while the complete output is saved to a temporary file.`;
@@ -365,6 +270,7 @@ export default function (pi: ExtensionAPI) {
     label: "Web Fetch",
     description: DESCRIPTION,
     parameters: WebFetchParamsSchema,
+    outputSchema: WebFetchOutputSchema,
 
     async execute(
       _toolCallId,
@@ -373,15 +279,12 @@ export default function (pi: ExtensionAPI) {
       onUpdate,
       _ctx,
     ): Promise<{
-      content: Array<
-        { type: "text"; text: string } | { type: "image"; data: string; mimeType: string }
-      >;
+      content: Array<{ type: "text"; text: string }>;
       details: WebfetchDetails;
+      structuredContent: Static<typeof WebFetchOutputSchema>;
     }> {
       const format: "markdown" | "text" | "html" =
         (params.format as "markdown" | "text" | "html") ?? "markdown";
-      // v2 fail-fast: the schema constrains timeout (0, 120]; the default
-      // applies when the parameter is omitted.
       const timeout = (params.timeout ?? DEFAULT_TIMEOUT / 1000) * 1000;
 
       const details: WebfetchDetails = {
@@ -395,52 +298,19 @@ export default function (pi: ExtensionAPI) {
       });
 
       try {
-        // --- Validate URL (mirrors v2's assertHttpUrl; a malformed URL throws
-        //     TypeError from new URL and funnels to the error wrap below). The
-        //     fragment is never sent, so it is stripped like upstream. ---
         const url = sanitizeUrl(params.url);
-        // --- Fetch ---
-        const { response, arrayBuffer } = await fetchUrl(
+        const { contentType, arrayBuffer } = await fetchUrl(
           url,
           buildAcceptHeader(format),
           timeout,
           signal,
         );
-
-        // --- Classify content type (mirrors v2's mimeFrom) ---
-        const contentType = response.headers.get("content-type") || "";
-        const mime = mimeFrom(contentType);
         details.contentType = contentType;
 
-        // --- Image responses (pi-native keep; v2 fails on images) ---
-        if (isImageAttachment(mime)) {
-          const base64Content = Buffer.from(arrayBuffer).toString("base64");
-          details.isImage = true;
-          details.mime = mime;
-
-          return {
-            content: [
-              { type: "text", text: "Image fetched successfully" },
-              {
-                type: "image",
-                data: base64Content,
-                mimeType: mime,
-              },
-            ],
-            details,
-          };
-        }
-
-        // --- Textual mime whitelist (mirrors v2's isTextualMime gate) ---
-        if (!isTextualMime(mime)) {
-          throw new Error(`Unsupported fetched file content type: ${mime}`);
-        }
-
-        // --- Decode and convert (mirrors v2's decode + convert) ---
         const content = new TextDecoder().decode(arrayBuffer);
         const output = convert(content, contentType, format);
 
-        // --- Truncation (pi convention: bracket-format continuation notice) ---
+        // Only the model-facing preview is trimmed; scripts get the conversion as produced.
         const truncation = truncateHead(output, {
           maxLines: DEFAULT_MAX_LINES,
           maxBytes: DEFAULT_MAX_BYTES,
@@ -457,8 +327,6 @@ export default function (pi: ExtensionAPI) {
             details.fullOutputError = saved.error;
           }
 
-          // pi convention (bash tool): bracket-format continuation notice,
-          // naming the temp file or why it could not be saved.
           const fullOutput =
             "path" in saved
               ? `Full output: ${saved.path}`
@@ -475,12 +343,9 @@ export default function (pi: ExtensionAPI) {
         return {
           content: [{ type: "text", text: resultText }],
           details,
+          structuredContent: { contentType, output },
         };
       } catch (err) {
-        // v2 error narrowing (367cf5961): everything surfaces as a single
-        // message with the cause attached. User cancellations keep their
-        // plain message (pi-native abort semantics), recognized by typed
-        // identity — never by message text.
         if (err instanceof RequestCancelledError) throw err;
         throw new Error(`Unable to fetch ${params.url}`, {
           cause: err instanceof Error ? err : new Error(String(err)),
@@ -541,11 +406,7 @@ export default function (pi: ExtensionAPI) {
   });
 }
 
-// ---------------------------------------------------------------------------
-// HTML → plain text (port of OpenCode v2's extractTextFromHTML; lives here
-// like upstream, exported for tests)
-// ---------------------------------------------------------------------------
-
+// Ported from OpenCode's webfetch; exported for the golden tests.
 export function extractTextFromHTML(html: string): string {
   let text = "";
   let skipDepth = 0;

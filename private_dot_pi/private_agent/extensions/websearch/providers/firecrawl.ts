@@ -1,15 +1,3 @@
-/**
- * Firecrawl search provider — calls the remote Firecrawl MCP endpoint.
- *
- * Endpoint: https://mcp.firecrawl.dev/v2/mcp
- * Auth: Bearer token via FIRECRAWL_API_KEY env var (optional; the hosted MCP
- * endpoint works without a key at a lower rate).
- * Tool name: firecrawl_search
- *
- * Mirrors OpenCode v2's packages/core/src/plugin/websearch/firecrawl.ts:
- * MCP text content parsed as JSON ({success, data: {web: [{url, title, description}]}}).
- */
-
 import { VERSION } from "@earendil-works/pi-coding-agent";
 import { mcpCall } from "../mcp-client";
 import type {
@@ -21,7 +9,6 @@ import type {
 
 const FIRECRAWL_ENDPOINT = "https://mcp.firecrawl.dev/v2/mcp";
 
-/** OpenCode v2 hardcodes limit: 8 (the tool no longer exposes result counts). */
 const RESULT_LIMIT = 8;
 
 const PI_VERSION = `pi/${VERSION}`;
@@ -71,9 +58,7 @@ export const firecrawlProvider: WebSearchProvider = {
     if (result?.isError) {
       throw new Error(result.text || "Firecrawl search failed");
     }
-    // Structured-only MCP responses carry an empty text (see mcp-client
-    // extractText); firecrawl results live in text as JSON, so empty text
-    // means no results here.
+    // Firecrawl puts its hit JSON in MCP text, not structuredContent.
     return result?.text ? parseFirecrawlResults(result.text) : [];
   },
 };

@@ -1,27 +1,4 @@
-/**
- * Websearch selection layer — mirrors OpenCode v2's packages/core/src/websearch.ts
- * (interactive provider selection, random routing with per-session affinity,
- * 429 cooldowns and failover), reduced to pi-extension scope:
- *
- * Selection model:
- *   PI_WEBSEARCH_PROVIDER = exa | parallel | firecrawl | tavily | tinyfish | random (default)
- *
- * - Forced selection (env names a specific provider): single attempt, errors
- *   (including 429) surface directly. Mirrors v2's non-random path, which
- *   never consults cooldowns.
- * - Random selection (default): each session sticks to one provider (affinity)
- *   until that provider is rate limited; HTTP 429 puts it on a cooldown sized
- *   by Retry-After (seconds or HTTP-date, fallback 60s) and the query fails
- *   over to another available provider.
- *
- * Session-scoped persistence (pi-native, exceeds v2): stickiness is restored on
- * session_start from a "websearch.selection" custom session entry, so
- * `pi --resume` keeps the same provider; affinity changes are re-appended so
- * the resumed session follows failovers too.
- *
- * Differences from v2: no KV (no global persistence, env is the config),
- * no consent flow, no app.integration connections — env vars hold credentials.
- */
+// Mirrors the pinned OpenCode selection logic; see README.md for Pi's configuration.
 
 import {
   HttpCallError,
@@ -33,7 +10,6 @@ import {
 
 export type Selection = ProviderID | "random";
 
-/** customType of the session entry persisting per-session provider affinity. */
 export const SELECTION_ENTRY_TYPE = "websearch.selection";
 
 const COOLDOWN_FALLBACK_MS = 60_000;
@@ -50,7 +26,6 @@ export interface WebSearchQueryOptions {
 export interface WebSearchQueryResult {
   provider: ProviderID;
   results: WebSearchResult[];
-  /** How many providers were attempted (1 unless failover happened). */
   attempts: number;
 }
 
@@ -60,10 +35,6 @@ export interface WebSearchService {
   restoreAffinity(sessionID: string, provider: ProviderID): void;
   forgetSession(sessionID: string): void;
 }
-
-// ---------------------------------------------------------------------------
-// Env selection
-// ---------------------------------------------------------------------------
 
 let cachedSelection: Selection | undefined;
 
@@ -88,10 +59,6 @@ export function forcedSelection(): ProviderID | undefined {
   return selection === "random" ? undefined : selection;
 }
 
-// ---------------------------------------------------------------------------
-// Cooldown parsing (v2's cooldownMillis, verbatim semantics)
-// ---------------------------------------------------------------------------
-
 function cooldownMillis(value: string | undefined, now: number): number {
   if (!value?.trim()) return COOLDOWN_FALLBACK_MS;
   const seconds = Number(value);
@@ -100,17 +67,11 @@ function cooldownMillis(value: string | undefined, now: number): number {
   return Number.isFinite(date) ? Math.max(0, date - now) : COOLDOWN_FALLBACK_MS;
 }
 
-// ---------------------------------------------------------------------------
-// Service
-// ---------------------------------------------------------------------------
-
 export function createWebSearchService(providers: WebSearchProvider[]): WebSearchService {
   const registry = new Map<ProviderID, WebSearchProvider>(providers.map((p) => [p.id, p]));
 
-  /** Per-session affinity ({provider}) for random mode. In-memory only. */
   const preferred = new Map<string, { provider?: ProviderID }>();
 
-  /** HTTP 429 cooldowns, pruned when expired (mirrors v2). */
   const cooldowns = new Map<ProviderID, { until: number; error: HttpCallError }>();
 
   function randomProvider(
@@ -145,7 +106,6 @@ export function createWebSearchService(providers: WebSearchProvider[]): WebSearc
   ): Promise<WebSearchQueryResult> {
     const choice = getSelection();
 
-    // Forced selection: single attempt, cooldowns ignored (v2 semantics).
     if (choice !== "random") {
       const provider = registry.get(choice);
       if (!provider) throw new Error(`Unknown websearch provider: ${choice}`);
@@ -154,31 +114,23 @@ export function createWebSearchService(providers: WebSearchProvider[]): WebSearc
       return { provider: provider.id, results, attempts: 1 };
     }
 
-    // Random selection: sticky affinity, 429 cooldown, failover.
     const affinity = preferred.get(options.sessionID) ?? {};
     preferred.set(options.sessionID, affinity);
     const initialPrevious = affinity.provider;
     let provider = randomProvider(Date.now(), affinity);
     if (!provider) {
-      // v2 parity: when every provider is cooling down, surface the cached
-      // rate limit (v2 falls back to a registered provider and returns its
-      // `cooldown.error` from the same situation), so the tool wraps it as
-      // "Web search rate limited (HTTP 429)" — including queries that start
-      // while everything is still cooling down.
+      // Preserve the rate-limit error even when this query starts during a cooldown.
       const cooling = cooldowns.values().next().value;
       if (cooling) throw cooling.error;
       throw new Error("No websearch provider available");
     }
-    // Only notify when the pick actually changed the affinity (initial pick,
-    // not a restored/sticky hit — avoids duplicate session entries).
+    // Notify only when affinity changes so resume does not duplicate session entries.
     notifyAffinity(options, affinity, initialPrevious);
 
     const attempted = new Set<ProviderID>();
     let cooldownError: HttpCallError | undefined;
     while (true) {
       options.onProvider?.(provider.id, attempted.size + 1);
-      // v2 semantics: `cooldown` is a let — set either by the 429 handler
-      // below or read from the map when skipping an actively cooled provider.
       let cooldown = cooldowns.get(provider.id);
       if (!cooldown || cooldown.until <= Date.now()) {
         attempted.add(provider.id);
