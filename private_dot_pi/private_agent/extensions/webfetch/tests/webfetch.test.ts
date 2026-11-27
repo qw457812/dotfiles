@@ -248,6 +248,51 @@ describe("request errors", () => {
     );
   });
 
+  it("reports a transport failure at the current redirect target", async () => {
+    const cause = new TypeError("fetch failed");
+    const tool = activateWebfetch((url) => {
+      if (url.endsWith("/x")) return redirect("/unreachable#fragment");
+      return Promise.reject(cause);
+    });
+
+    const err = await captureError(tool.run());
+
+    expect(err.message).toBe("Transport error (GET https://example.com/unreachable)");
+    expect(err.cause).toBe(cause);
+  });
+
+  it("reports a body read failure at the current redirect target", async () => {
+    const cause = new TypeError("terminated");
+    const tool = activateWebfetch((url) => {
+      if (url.endsWith("/x")) return redirect("/partial#fragment");
+      return new Response(
+        new ReadableStream({
+          start: (controller) => controller.enqueue(new Uint8Array([120])),
+          pull: (controller) => controller.error(cause),
+        }),
+      );
+    });
+
+    const err = await captureError(tool.run());
+
+    expect(err.message).toBe("Transport error (GET https://example.com/partial)");
+    expect(err.cause).toBe(cause);
+  });
+
+  it("keeps the generic fallback for a local decoding failure", async () => {
+    const cause = new Error("decoder failed");
+    const response = new Response("content");
+    const tool = activateWebfetch(() => response);
+    vi.spyOn(TextDecoder.prototype, "decode").mockImplementationOnce(() => {
+      throw cause;
+    });
+
+    const err = await captureError(tool.run());
+
+    expect(err.message).toBe("Unable to fetch https://example.com/x");
+    expect(err.cause).toBe(cause);
+  });
+
   it("reports a request timeout", async () => {
     vi.useFakeTimers();
     try {
@@ -356,12 +401,12 @@ describe("cancellation identity", () => {
     expect(cancel).toHaveBeenCalledTimes(1);
   });
 
-  it("wraps foreign errors that imitate the cancellation message", async () => {
+  it("treats a fetch error imitating user cancellation as a transport error", async () => {
     const tool = activateWebfetch(() => {
       throw new Error("Request was cancelled");
     });
     const err = await captureError(tool.run());
-    expect(err.message).toBe("Unable to fetch https://example.com/x");
+    expect(err.message).toBe("Transport error (GET https://example.com/x)");
     expect(err.cause.message).toBe("Request was cancelled");
   });
 });

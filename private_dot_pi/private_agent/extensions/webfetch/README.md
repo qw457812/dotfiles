@@ -12,7 +12,7 @@ Install dependencies with `npm install` in this directory.
 | `format` | `"markdown"` (default), `"text"`, or `"html"`. Applies to HTML responses; other textual responses pass through. |
 | `timeout` | Request and body-reading deadline in seconds, including redirects and retry. Defaults to 30; must be greater than 0 and at most 120. |
 
-The tool validates each redirect target and follows up to 10 hops. It rejects binary images and other non-textual responses; SVG passes through as text. Direct calls and codemode scripts see actionable errors for invalid URLs, HTTP status codes, timeouts, unsupported media, oversized responses, and redirect limits. Unexpected errors use `Unable to fetch <url>` without exposing the original exception to the model.
+The tool validates each redirect target and follows up to 10 hops. It rejects binary images and other non-textual responses; SVG passes through as text. Direct calls and codemode scripts see actionable errors for invalid URLs, HTTP status codes, timeouts, unsupported media, oversized responses, and redirect limits. If the request or response stream fails, the error is `Transport error (GET <url>)` for the failed hop. Unexpected errors use `Unable to fetch <url>` without exposing the original exception to the model.
 
 ## Output
 

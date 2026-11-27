@@ -98,6 +98,10 @@ export class RequestCancelledError extends Error {
   override name = "RequestCancelledError";
 }
 
+function transportError(url: string, cause: unknown): WebfetchRequestError {
+  return new WebfetchRequestError(`Transport error (GET ${url})`, { cause });
+}
+
 function discardBody(response: Response): void {
   void response.body?.cancel().catch(() => {});
 }
@@ -111,7 +115,13 @@ async function fetchFollowingRedirects(
   let current = url;
   for (let redirects = 0; ; redirects++) {
     signal.throwIfAborted();
-    const response = await fetch(current, { headers, signal, redirect: "manual" });
+    let response: Response;
+    try {
+      response = await fetch(current, { headers, signal, redirect: "manual" });
+    } catch (cause) {
+      if (signal.aborted) throw cause;
+      throw transportError(current, cause);
+    }
     const location = response.headers.get("location");
     if (!REDIRECT_STATUSES.has(response.status) || !location) return { response, url: current };
 
@@ -130,6 +140,7 @@ async function fetchFollowingRedirects(
 
 async function readResponseBody(
   response: Response,
+  url: string,
   signal: AbortSignal,
 ): Promise<Buffer<ArrayBuffer>> {
   const declared = Number.parseInt(response.headers.get("content-length") ?? "", 10);
@@ -152,7 +163,10 @@ async function readResponseBody(
   try {
     signal.throwIfAborted();
     for (;;) {
-      const { done, value } = await reader.read();
+      const { done, value } = await reader.read().catch((cause: unknown) => {
+        if (signal.aborted) throw cause;
+        throw transportError(url, cause);
+      });
       signal.throwIfAborted();
       if (done) return body.subarray(0, size);
       const nextSize = size + value.byteLength;
@@ -232,7 +246,7 @@ async function fetchUrl(
       throw new WebfetchRequestError(`Unsupported fetched ${kind} content type${label}`);
     }
 
-    return { contentType, body: await readResponseBody(response, fetchSignal) };
+    return { contentType, body: await readResponseBody(response, requestUrl, fetchSignal) };
   } catch (err) {
     if (signal?.aborted) throw new RequestCancelledError("Request was cancelled");
     if (timeout.signal.aborted) throw new WebfetchRequestError("Request timed out", { cause: err });
