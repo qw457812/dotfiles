@@ -1,182 +1,32 @@
-# Prompt-editor compatibility branch
+# Review prompt-editor against Pi and pi-vim
 
-Follow this branch only when the lazy review includes `earendil-works/pi` or
-`lajarre/pi-vim`. `PromptEditor extends ModalEditor` depends on private runtime
-surfaces from both repositories. Review checkout and runtime ranges separately:
-lazy tracks both repositories, Pi's build hook installs its npm release, and the
-pi-vim runtime is managed independently through Pi settings.
+`PromptEditor extends ModalEditor` uses private APIs from both hosts. Lazy tracks both source checkouts; Pi installs a published CLI and manages pi-vim separately. The source checkout and the loaded npm package are different review surfaces.
 
-Paths:
+## 1. Freeze the ranges
 
-- source extension and helpers: `private_dot_pi/private_agent/extensions/prompt-editor/`
-- source package pins: `private_dot_pi/private_agent/package.json`
-- reusable source caches: librarian checkouts for `earendil-works/pi` and
-  `lajarre/pi-vim`
-- pi-vim runtime: `~/.pi/agent/npm/node_modules/pi-vim`
+For **both** peers record the installed runtime version: `pi --version` and the loaded pi-vim `package.json` under `getAgentDir()/npm/node_modules/pi-vim` (normally `~/.pi/agent/npm/node_modules/pi-vim`; honor `PI_CODING_AGENT_DIR`). Record separately installed development pins when they differ. For each **in-scope outdated** package:
 
-The lazy working trees normally remain on their **installed** revisions. Copy only
-the immutable revision hashes from the report; inspect those exact hashes in fresh
-librarian caches instead of reading or mutating the lazy working trees.
+- **Checkout:** copy `installed..target` from the report header. Inspect those commits in a refreshed librarian cache (read `~/.pi/agent/skills/librarian/SKILL.md`), leaving the lazy checkout and its refs alone.
+- **Pi release:** snapshot the [self-update endpoint](https://pi.dev/api/latest-version) once. Require `ok: true`, `packageName` and `version`; record the exact old and target npm package names and versions. The installed package is normally `@earendil-works/pi-coding-agent`.
+- **pi-vim release:** use the loaded version as old and freeze the target from `npm view pi-vim version`. If a peer is out of scope, keep its installed runtime fixed without selecting a new release for it.
+- **Published revisions:** resolve each exact artifact with `npm view 'package@version' gitHead`. If empty, follow [npm provenance](RELEASE-REV.md) with that exact artifact. Verify and expand each revision to a full hash with `git rev-parse --verify '<rev>^{commit}'` in its matching cache. Compare the lazy and published targets for checkout-only changes; the published range describes the runtime.
 
-## 1. Freeze the applicable ranges
+**Done when:** the review records both installed peers, all applicable checkout and published ranges (full hashes), and which changes are released. Missing provenance or objects block the exact source review; they do not rule out tests of the exact npm artifact.
 
-Record the loaded Pi and pi-vim versions, but freeze update ranges only for packages
-in the requested scope. An unchanged peer stays at its installed version for the
-compatibility check; do not silently expand a Pi-only request into a pi-vim update.
+## 2. Trace private contracts
 
-Copy each changed package's installed and target revisions from its lazy report
-header. Do not check out the target or mutate the lazy working tree. For Pi:
+Read the log and diff stat for every distinct frozen range. In `private_dot_pi/private_agent/extensions/prompt-editor/`, enumerate private members, generated wrapper exports, and upstream factory behavior mirrored locally. Trace each to its definition and consumers in the exact target. Start with Pi's `packages/tui/src/` (editor, key handling and main/alt-screen renderers) and the coding agent's `custom-editor.ts`, extension types and interactive editor factory. In pi-vim start with `ModalEditor`, its settings and the helper modules imported or re-exported by the wrapper. Follow moved definitions rather than treating that list as exhaustive.
 
-```bash
-PI_LAZY_OLD_REV='copy Pi installed revision from header'
-PI_LAZY_TARGET_REV='copy Pi target revision from header'
-```
+Read the applicable contract checks:
 
-Freeze the Pi release endpoint used by `pi update --self`, then resolve that exact
-published package revision:
+| Changed upstream surface | Check |
+| --- | --- |
+| Loader, exports, constructor, settings/factory, history, session lifecycle | [Wrapper and replacement lifecycle](REFERENCE.md#wrapper-and-replacement-lifecycle) |
+| Render, colorizers, preflight or label placement | [Render and degradation](REFERENCE.md#render-and-degradation) |
+| Cursor markers, visibility, renderer switching or terminal focus | [Cursor ownership](REFERENCE.md#cursor-ownership) |
+| Input dispatch, pending state, shortcuts, Ex, motion or autocomplete | [Navigation and shortcuts](REFERENCE.md#navigation-and-shortcuts) |
+| Visual operators, put, register behavior or clipboard | [Visual paste](REFERENCE.md#visual-paste), [Clipboard transport](REFERENCE.md#clipboard-transport) as applicable |
 
-```bash
-set -euo pipefail
-PI_OLD_VERSION=$(pi --version)
-PI_RELEASE_JSON=$(curl -fsSL https://pi.dev/api/latest-version)
-read -r PI_TARGET_PACKAGE PI_TARGET_VERSION < <(
-  node -e '
-    const fs = require("node:fs");
-    const value = JSON.parse(fs.readFileSync(0, "utf8"));
-    if (value.ok !== true || typeof value.packageName !== "string" || typeof value.version !== "string") {
-      throw new Error("invalid Pi release metadata");
-    }
-    process.stdout.write(`${value.packageName} ${value.version}\n`);
-  ' <<<"$PI_RELEASE_JSON"
-)
-PI_OLD_REV=$(npm view "@earendil-works/pi-coding-agent@$PI_OLD_VERSION" gitHead)
-PI_TARGET_REV=$(npm view "$PI_TARGET_PACKAGE@$PI_TARGET_VERSION" gitHead)
-# If either gitHead is empty, resolve it through RELEASE-REV.md before continuing.
-[ -n "$PI_OLD_REV" ] && [ -n "$PI_TARGET_REV" ] || {
-  echo 'Missing npm gitHead: follow RELEASE-REV.md, then resume with the resolved hashes.' >&2
-  exit 1
-}
-PI_CHK=$(bash ~/.pi/agent/skills/librarian/checkout.sh \
-  github.com/earendil-works/pi --force-update --path-only)
-git -C "$PI_CHK" cat-file -e "$PI_LAZY_OLD_REV^{commit}"
-git -C "$PI_CHK" cat-file -e "$PI_LAZY_TARGET_REV^{commit}"
-git -C "$PI_CHK" cat-file -e "$PI_OLD_REV^{commit}"
-git -C "$PI_CHK" cat-file -e "$PI_TARGET_REV^{commit}"
-printf 'runtime=%s\nold=%s\ntarget_package=%s\ntarget_version=%s\ntarget=%s\n' \
-  "$PI_OLD_VERSION" "$PI_OLD_REV" "$PI_TARGET_PACKAGE" "$PI_TARGET_VERSION" "$PI_TARGET_REV"
-```
+When testing declarations or behavior during review, use [isolated Pi validation](../pi-runtime/VALIDATE.md#isolated-target-checks). A stale `pi-vim.generated.ts` can masquerade as an API removal: compare it to `ensurePiVimWrapper()` and regenerate in the isolated copy only. For changed render/input behavior, use the actual target components; type checks cannot validate escape sequences or dispatch order.
 
-When pi-vim is in scope, first freeze its independent lazy range:
-
-```bash
-VIM_LAZY_OLD_REV='copy pi-vim installed revision from header'
-VIM_LAZY_TARGET_REV='copy pi-vim target revision from header'
-```
-
-Then resolve the package actually loaded by `prompt-editor`:
-
-```bash
-set -euo pipefail
-VIM_OLD_VERSION=$(node -p 'require(process.env.HOME + "/.pi/agent/npm/node_modules/pi-vim/package.json").version')
-VIM_TARGET_VERSION=$(npm view pi-vim version)
-VIM_OLD_REV=$(npm view "pi-vim@$VIM_OLD_VERSION" gitHead)
-VIM_TARGET_REV=$(npm view "pi-vim@$VIM_TARGET_VERSION" gitHead)
-VIM_CHK=$(bash ~/.pi/agent/skills/librarian/checkout.sh \
-  github.com/lajarre/pi-vim --force-update --path-only)
-git -C "$VIM_CHK" cat-file -e "$VIM_LAZY_OLD_REV^{commit}"
-git -C "$VIM_CHK" cat-file -e "$VIM_LAZY_TARGET_REV^{commit}"
-git -C "$VIM_CHK" cat-file -e "$VIM_OLD_REV^{commit}"
-git -C "$VIM_CHK" cat-file -e "$VIM_TARGET_REV^{commit}"
-printf 'runtime=%s\nold=%s\ntarget_version=%s\ntarget=%s\n' \
-  "$VIM_OLD_VERSION" "$VIM_OLD_REV" "$VIM_TARGET_VERSION" "$VIM_TARGET_REV"
-```
-
-When npm omits `gitHead`, follow [published revision resolution](RELEASE-REV.md)
-for that exact package version; a matching version tag alone is not release provenance.
-
-A lazy target can contain commits not present in the frozen published release.
-Classify that difference explicitly; only the published `gitHead` range describes
-the runtime package under compatibility review.
-
-**Complete when:** every applicable lazy and npm range is recorded, every revision
-exists locally, and any difference between lazy target and published target is
-classified as released or unreleased.
-
-## 2. Review private integration surfaces
-
-Inspect each distinct lazy or published runtime range once.
-
-For Pi, inspect the same private surfaces across both ranges:
-
-```bash
-git -C "$PI_CHK" log --oneline "$PI_OLD_REV..$PI_TARGET_REV"
-git -C "$PI_CHK" diff --stat "$PI_OLD_REV..$PI_TARGET_REV"
-git -C "$PI_CHK" diff "$PI_LAZY_OLD_REV..$PI_LAZY_TARGET_REV" -- \
-  packages/tui/src/components/editor.ts \
-  packages/tui/src/tui.ts \
-  packages/tui/src/tui-main-screen.ts \
-  packages/tui/src/tui-alt-screen.ts \
-  packages/coding-agent/src/modes/interactive/components/custom-editor.ts \
-  packages/coding-agent/src/core/extensions/types.ts \
-  packages/coding-agent/src/modes/interactive/interactive-mode.ts
-git -C "$PI_CHK" diff "$PI_OLD_REV..$PI_TARGET_REV" -- \
-  packages/tui/src/components/editor.ts \
-  packages/tui/src/tui.ts \
-  packages/tui/src/tui-main-screen.ts \
-  packages/tui/src/tui-alt-screen.ts \
-  packages/coding-agent/src/modes/interactive/components/custom-editor.ts \
-  packages/coding-agent/src/core/extensions/types.ts \
-  packages/coding-agent/src/modes/interactive/interactive-mode.ts
-```
-
-Account for `Editor` state/layout methods, cursor-column and sticky-column
-bookkeeping, autocomplete refresh, `CustomEditor` behavior, editor factory
-signatures, cursor rendering through the final TUI renderer, input dispatch, and
-every private member accessed structurally by `prompt-editor`. Reproduce changed
-render contracts with the target components and local helpers; type checks alone
-cannot catch a change to the escape sequences inside a returned string.
-
-For pi-vim, inspect both ranges:
-
-```bash
-git -C "$VIM_CHK" log --oneline "$VIM_OLD_REV..$VIM_TARGET_REV"
-git -C "$VIM_CHK" diff --stat "$VIM_OLD_REV..$VIM_TARGET_REV"
-git -C "$VIM_CHK" diff "$VIM_LAZY_OLD_REV..$VIM_LAZY_TARGET_REV" -- \
-  index.ts types.ts visual.ts settings.ts clipboard-policy.ts mode-colors.ts \
-  mode-change-command.ts cursor-shape.ts
-git -C "$VIM_CHK" diff "$VIM_OLD_REV..$VIM_TARGET_REV" -- \
-  index.ts types.ts visual.ts settings.ts clipboard-policy.ts mode-colors.ts \
-  mode-change-command.ts cursor-shape.ts
-```
-
-Account for `ModalEditor` construction, public setters, modes, counted motion,
-pending-input and bracketed-paste state, Ex dispatch, session setup/cleanup,
-settings, clipboard behavior, colorizers, and copied or re-exported helpers.
-
-For either upstream, read only the headings in the
-[compatibility reference](REFERENCE.md) implicated by its diffs.
-
-If type checks report missing exports from `pi-vim.generated.ts`, compare that
-ignored file with `ensurePiVimWrapper()` in the local entry point. A stale generated
-wrapper is baseline state, not an upstream API removal. Regenerate it only in the
-isolated review copy using the current generator's exports; report regeneration as
-an apply prerequisite. Compare the source tree's installed development packages
-with the deployed runtime and declared pins before attributing missing APIs.
-
-**Complete when:** every changed integration surface and every structurally accessed
-private member is classified as compatible, requiring a concrete edit, or
-intentionally unsupported with a stated reason.
-
-## 3. Finish the review
-
-Report each private integration surface as compatible, requiring a concrete edit,
-or intentionally unsupported. Name the static, runtime, and interactive checks that
-must run after the target is installed; the current runtime cannot prove target
-compatibility.
-
-When the caller explicitly requests installation or source adaptation, continue with
-the [apply branch](APPLY.md).
-
-**Complete when:** review-only runs leave prompt-editor source and package
-installations untouched and name every required follow-up; apply requests continue
-with the exact frozen targets.
+**Done when:** each affected contract and every structurally accessed private member has a finding: compatible, needs a concrete edit, or intentionally unsupported with a reason. Record static evidence, exact-target tests and follow-ups separately.

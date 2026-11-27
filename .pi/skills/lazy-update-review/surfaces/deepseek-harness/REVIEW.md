@@ -1,41 +1,9 @@
-# DeepSeek Harness review
+# DeepSeek Harness: which release will the hook install?
 
-Use this branch for `github.com/deepseek-ai/deepseek-harness`.
+1. **Resolve the CLI channel.** Read the lazy build command and its helpers in `dot_config/nvim/lua/{plugins,util}`. Compare the source target's CLI version, `dsh --version` and `npm view @deepseek-ai/dsh dist-tags --json`. A checkout on a prerelease tag can still install `latest` rather than `next`.
 
-1. Find the lazy owner and global CLI build hook:
+   **Done when:** the installed CLI, target checkout and version the hook would install are recorded, including any mismatch.
 
-   ```bash
-   rg -n "deepseek-harness|@deepseek-ai/dsh" dot_config/nvim/lua/plugins dot_config/nvim/lua/util
-   ```
+2. **Trace profile composition.** Follow the changed settings, commands, tools, services and APIs from upstream docs/schema diffs to the deployed profiles (`dot_dsh/`, `symlinks/dsh/`), source-loaded plugins (`dsh-plugins/`) and independently published bundles (`packages/`). For each consumer check the owning manifest and API pins, workspace, lockfile, Cordis patch and update helper. Valid YAML can still acquire a different default or CLI behavior.
 
-   Compare the target CLI version with the installed CLI and npm dist-tags. A
-   prerelease may be published under `next` while an unqualified install still
-   resolves `latest`:
-
-   ```bash
-   dsh --version
-   npm view @deepseek-ai/dsh dist-tags --json
-   ```
-
-2. Account for profile composition, settings, direct source-loaded plugins, and
-   local publishable bundles:
-
-   ```bash
-   rg -n "<changed-package-or-key>|@deepseek-ai/dsh" \
-     dot_dsh symlinks/dsh dsh-plugins packages
-   find dot_dsh symlinks/dsh -name 'pnpm-lock.yaml*' -print
-   ```
-
-   Treat `dot_dsh/` and `symlinks/dsh/` as deployed profile/config sources,
-   `dsh-plugins/` as direct runtime plugins, and `packages/` as independently
-   published bundles. Check the owning `package.json`, `pnpm-workspace.yaml`,
-   lockfile, Cordis patch, and lazy update helper for every matching surface.
-
-3. Diff upstream docs and schemas for each matching setting, command, tool,
-   service, or API. In particular, classify changed defaults and CLI behavior
-   even when the local YAML remains schema-valid.
-
-**Complete when:** the global CLI build resolves the target release channel; each
-profile bundle/build hook and runtime config reference is classified as valid,
-requiring an edit, or awaiting a user preference; and local plugin/package API
-pins are checked against the target runtime surface.
+   **Done when:** every affected profile, plugin and bundle is classified against the runtime the hook selects; name required edits or user choices separately from compatible settings.

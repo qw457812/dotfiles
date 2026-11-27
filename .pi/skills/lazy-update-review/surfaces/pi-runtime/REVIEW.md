@@ -1,136 +1,26 @@
-# Pi runtime and extension compatibility
+# Pi runtime: trace changed contracts to loaded consumers
 
-Follow this branch when `earendil-works/pi` changes, alongside prompt-editor review.
-Reuse that branch's frozen lazy and published npm revisions; inspect every distinct
-exact range. The lazy build hook and the installed CLI can track different releases.
+Use the [frozen Pi ranges](../prompt-editor/REVIEW.md#1-freeze-the-ranges). Check every distinct checkout and published range; only the published range describes the installed CLI.
 
-## 1. Find runtime consumers
+## 1. Resolve the consumers
 
-Locate the owning lazy spec/build hook and all local API consumers:
+Search for changed identifiers in `private_dot_pi/private_agent`, `symlinks/pi/agent` and project `.pi/` (including `settings.json` and `mcp.json`). Inspect model definitions and separately pinned development manifests as well as extension source. Project MCP exposure can change the tool loadout even if the global server list is empty.
 
-```bash
-rg -n 'earendil-works/pi|pi update' dot_config/nvim/lua/plugins
-rg -n '@earendil-works/pi-|registerProvider|registerTool|registerCommand|mcp__|sourceInfo|defaultTools|virtual|mcpServers|exposure' private_dot_pi/private_agent symlinks/pi/agent .pi --glob '!package-lock.json' --glob '!skills/**'
-rg -n '"@earendil-works/pi-' private_dot_pi/private_agent --glob '*package*.json'
-```
+Resolve each implicated package or path-valued extension to the code Pi actually loads. Search explicit installed entry/source paths with `rg --no-ignore` for third-party consumers under `node_modules`. For paths loaded directly from the lazy checkout, diff those paths at the exact revisions in the source cache and check their host imports even if the path itself is unchanged.
 
-Read settings, model definitions, extension sources, and dependency pins implicated
-by the exact-range diffs. Include project `.pi/settings.json` and `.pi/mcp.json`
-when present, alongside the global config; project MCP exposure and names can
-change the runtime loadout even when the global `mcpServers` is empty. For
-third-party integrations, resolve the package actually loaded by settings, then
-search its entry/source directories explicitly, including ignored installed files:
+**Done when:** every changed contract has a list of local and installed consumers (or a recorded absence), and their runtime/development package ownership is clear.
 
-```bash
-rg -n --no-ignore '<changed-api>' <resolved-package-entry-or-source-directory>
-```
+## 2. Check implicated contracts
 
-A normal repository search can miss every consumer below `node_modules`. Also resolve
-path-valued `extensions` and `packages` in settings. A path under the owning lazy
-checkout may load source directly rather than through npm; check each such path
-with `git diff <installed>..<target> -- <relative-path>` in the source cache and
-review its host imports even if the file itself is unchanged.
+| If the diff changes… | Check… |
+| --- | --- |
+| Providers and models | Config types and root exports, cache unions, chat/image/classifier discrimination, provider events, auth and default model selection. |
+| Tool/extension contexts or schemas | Nested calls, cancellation and tool-name/input routing; compare loader aliases with direct SDK imports. A runtime shim can hide standalone type errors. Compare schema shape, coercion and refinements, not just imports. |
+| Command identity or MCP routing | Registration at load and `session_start`, builtin/MCP/extension ownership and replacement; check guard coverage for direct `mcp__server__tool` arguments and nested codemode calls, including that denied calls never reach the server. |
+| TUI, themes or renderer | Check color/key hint helpers for host-bound state, fullscreen input/scrolling, cursor lifecycle, footer, palettes and virtual models. Search both local and resolved third-party code for `super.render()` and render overrides. Trace the concrete base (fresh editor output vs cached container output); propagate readonly results or copy before mutation. |
+| Dialog/program status | Audit affected `ctx.ui.custom()` calls. Questions may opt in to `kind: "question"`; loaders remain working, and builtins report their own state. Check hidden overlays until `done()`, plus cleanup on reload/session switch. Classify missed opt-in separately from regressions. For raw OSC checks, use [interactive validation](VALIDATE.md#interactive-target-checks). |
+| Persisted settings | Classify new keys as shared preferences or machine-local bookkeeping. Compare `run_once_set-up-pi-settings-filter.sh.tmpl` with `git config --get filter.pi-settings.clean`; the active filter may hide keys from `git diff`. Report needed edits without changing working settings or Git config in review. |
 
-When upstream adds persisted settings state, include the repository's Git clean
-filter as a config surface:
+If declarations changed, run [isolated target checks](VALIDATE.md#isolated-target-checks). For changed behavior, name the needed target smoke tests (extension loading, provider/tool routing, or interactive UI/command ownership).
 
-```bash
-rg -n 'pi-settings|deviceId|lastChangelogVersion|extensionChangelogVersions' run_once_set-up-pi-settings-filter.sh.tmpl .gitattributes symlinks/pi/agent/settings.json
-git config --get filter.pi-settings.clean
-```
-
-Classify new keys as shareable preferences or machine-local bookkeeping (for
-example changelog read receipts). Check both the filter template and active Git
-config; a clean `git diff` may merely mean the filter hides a key. Review reports
-name required filter edits without deleting runtime state or changing Git config.
-
-**Complete when:** each changed API's local consumers and package ownership are
-recorded, including third-party consumers, separately pinned development types,
-and persistence filters for new settings state.
-
-## 2. Inspect changed integration contracts
-
-Inspect exact-range diffs covering:
-
-- Provider/model configuration types, root exports, model-cache unions, chat/image/
-  classifier discrimination, provider events, and auth/default-model changes.
-- Extension/tool contexts, nested tool events, cancellation, and tool-name/input
-  routing used by sandbox and guard extensions. For schema changes, compare the
-  extension loader's import aliases with direct TypeScript imports: runtime shims
-  can preserve compatibility while standalone checks see different builders or
-  inferred argument types. Check JSON schema shape and coercion/refinement behavior,
-  not only whether imports still resolve.
-- Builtin extension identity and command registration in both load and
-  `session_start` phases. Check MCP command ownership and replacement
-  semantics alongside installed extensions.
-- TUI terminal-color helpers, theme APIs and palettes, fullscreen input/scrolling,
-  cursor lifecycle, footer rendering, and virtual-model routing. When renderer
-  contexts gain host-bound helpers, locate imported equivalents such as `keyHint`;
-  extension-local package copies may not share host state. For cached render
-  output, search `rg -n 'super\.render\(|\.prototype\.render|render: .*string\[\]|cachedLines'`
-  in local and resolved third-party sources. Propagate readonly types for
-  pass-through consumers; copy before mutation. Trace the concrete base class:
-  a fresh `Editor.render()` result is not the same contract as `Container.render()`.
-- New UI status APIs: inspect every matching `ctx.ui.custom()` use and distinguish
-  user decisions from loaders or viewers. For `blocked`, questions can use
-  `kind: "question"`; loaders remain working and built-in dialogs report their own
-  status. Since Pi 1.5.1, overlays also honor `blocked` until `done()`, even while
-  hidden with `setHidden()`; verify cleanup on `/reload` and session switches.
-  Classify adoption as an optional integration improvement rather than an execution
-  regression; apply needs consent.
-
-For MCP changes, verify that local guards inspect direct `mcp__server__tool`
-arguments and apply to nested codemode calls. Verify that blocked calls never
-reach the server.
-
-When declarations change, validate against the frozen target in an isolated source
-copy. Preserve installed packages and source pins during review:
-
-- Place the copy under `~/.cache`, outside `os.tmpdir()`. The sandbox permits writes
-  to the system temp directory, so putting read-only test fixtures there makes
-  permission assertions fail for reasons unrelated to the target release.
-- Copy sources without `node_modules`; install exact target host packages at the
-  temporary root. Find nested manifests with
-  `rg --files private_dot_pi/private_agent -g package.json` and place their runtime
-  dependencies at that root too, so nested host pins cannot select old declarations.
-- Materialize chezmoi `dot_gitignore` files as `.gitignore` in the copy so lint
-  excludes dependencies and generated files as it does in the deployed tree.
-- Preserve unrelated dependency resolutions from the baseline locks/installed
-  packages, including promoted nested dependencies. Record discrepancies between
-  locks and actual installs; resolving every caret range afresh confounds the review.
-- Record the resolved compiler/linter executable and its own `--version`, including
-  `.bin` symlink targets; `package.json` versions do not identify the tool actually
-  run. Missing native platform packages (for example TypeScript on Android) are
-  environment failures. If a compatible baseline tool runs against target
-  declarations, name its version and limitations; do not claim the declared target
-  toolchain passed.
-
-Run the unmodified tests first. Record hardcoded host-version failures and event
-fixture/type errors, then make only the required test adaptations in the temporary
-copy and rerun check and the behavioral suite. Report original and adapted results
-separately from runtime regressions; test adaptations remain required source edits.
-
-Tie results to the copied source state. Before comparing source and deployed test
-runs, compare their `tests/**/*.test.ts` inventories with `chezmoi managed`:
-chezmoi may leave unmanaged tests from older configurations in the deployed tree.
-Report those separately, preserve them, and rerun the deployed suite excluding
-only the identified unmanaged files. If local consumers change concurrently,
-revalidate the affected latest sources before claiming they passed; leave the
-unrelated work untouched.
-
-**Complete when:** every changed contract with a local consumer is classified as
-compatible, requiring a specific edit, or intentionally unsupported. Distinguish
-existing breakage from optional-new-feature gaps and migration prerequisites.
-
-## 3. Report follow-up checks
-
-Name required source/type-pin edits and package choices without installing them.
-After installation, require the repository's Pi check/lint/test scripts, extension
-loading and provider/tool smoke tests, and fixed-size tmux checks for affected UI
-or command ownership. For program-status changes, capture raw OSC 7501 with
-`PI_PROGRAM_STATUS=1`: assert the intended blocked kind/message while the dialog is
-visible and restoration after completion or cancellation; verify loaders are not
-misreported. Reuse prompt-editor's interactive checklist when applicable.
-
-**Complete when:** each finding names its affected path and required follow-up;
-review-only runs leave runtime packages and local runtime configuration unchanged.
+**Done when:** every affected contract is classified against its actual consumers. Separate regressions, pre-existing failures, required migration edits and optional improvements. Record exactly what ran on the target and what remains untested.

@@ -1,115 +1,43 @@
 ---
 name: lazy-update-review
-description: Review lazy.nvim-managed package updates and local config impact.
+description: Review pending lazy.nvim package updates against local configuration.
 disable-model-invocation: true
 ---
 
-# lazy-update-review
+# Lazy update review
 
-Review lazy.nvim-managed package updates where **installed** (current HEAD)
-differs from **target** (lazy's update commit) by reading the
-`git log installed..target` changelog and accounting for any required local
-config changes. Review only the packages named by the caller; with no package
-filter, review all outdated packages. Installation or runtime-config adaptation
-requires an explicit apply request.
+Review the packages named by the caller, or all eligible packages if none are named. Leave installations and runtime configuration unchanged unless the caller explicitly requests an apply.
 
-## Steps
+## 1. Establish the review range
 
-1. **Read the changelog.** Resolve the script relative to this skill directory:
+Run `bash .pi/skills/lazy-update-review/scripts/lazy-update-review.sh` from the chezmoi root, appending only the requested **exact lazy names** (e.g. `pi`). The script compares installed HEAD with lazy's target from on-disk refs. This is **not** a check for the latest upstream commit. Never run `:Lazy check`, including headless `Lazy! check`.
 
-   ```bash
-   bash scripts/lazy-update-review.sh       # all packages
-   bash scripts/lazy-update-review.sh pi    # caller requested only pi
-   ```
+Keep the footer and each outdated package's `installed..target`, checkout directory and host/repo from its header. Read the full commit log for each range. For a large report, use `--list` with the same scope to plan batches, then read the uncapped logs by name. A list or a `--limit` sample is not a reviewed log.
 
-   Completion criterion: every outdated plugin in the requested scope has had its
-   complete `installed..target` range and commit log read. For large reports, use
-   `--list` with the same scope to enumerate batches, then rerun with plugin-name
-   filters until all listed logs are read. Report the scope; a filtered scan does
-   not establish that other packages are up to date.
+**Done when:** the scan succeeds, every requested name is accounted for, and every outdated log in scope has been read. Check an uncertain name on its own: a mixed filter can succeed on one match. Report skipped or ignored entries as unchecked; `scanned=0` means nothing was checked. On nonzero exit, fix or report the incomplete scan.
 
-2. **Diff a plugin when its changelog is ambiguous about impact.** The header
-   carries the install dir (`@ <dir>`), `installed`, and `target`, so:
+## 2. Trace each update to its consumer
 
-   ```bash
-   git -C <dir> diff <installed>..<target>            # all changes
-   git -C <dir> diff <installed>..<target> -- '*.lua' # scope to a path
-   ```
+Find the owning spec in `dot_config/nvim/lua/plugins` and follow its build hook (or record that it has none). Lazy may manage a source checkout, a separately installed executable, a Pi package or a Yazi flavor. Search for changed defaults, keys, commands, events, APIs and install steps where the package **runs**, not just in its lazy spec. For example, Yazi consumers live under `dot_config/yazi` and `symlinks/yazi`; Pi has both project `.pi/` and global config.
 
-   Completion criterion: you can state the diff's impact in one sentence —
-   e.g. docs-only, a new config key, a breaking change to an API you use —
-   or you decide the changelog alone was enough and skip the diff.
+Match the **host/repo in the header** against this table. Do the additional reviews even if the changelog claims compatibility. Run each matching branch once across the in-scope packages; unmatched packages need only the generic review.
 
-3. **Open the related issue/PR when a commit references one.** Commits often
-   carry `#NNNN`; each outdated plugin's header ends with a short host path
-   in parens — e.g. `(github.com/olimorris/codecompanion.nvim)`, host kept so
-   gitlab/etc plugins aren't misread as github. Prefix `https://` and append
-   the ref path:
+| Report repository | Additional review, in order |
+| --- | --- |
+| `github.com/neovim/neovim` | [Neovim executable vs. source checkout](surfaces/neovim-runtime/REVIEW.md) |
+| `github.com/earendil-works/pi` | [Prompt-editor and frozen release ranges](surfaces/prompt-editor/REVIEW.md), then [Pi runtime consumers](surfaces/pi-runtime/REVIEW.md) |
+| `github.com/lajarre/pi-vim` | [Prompt-editor and frozen release ranges](surfaces/prompt-editor/REVIEW.md) |
+| `github.com/deepseek-ai/deepseek-harness` | [DSH CLI and profile composition](surfaces/deepseek-harness/REVIEW.md) |
+| `github.com/ccch1mneyyy/dsh-TUI` | [DSH profile package](surfaces/dsh-profile-package/REVIEW.md) |
 
-   ```bash
-   # github.com/$repo/pull/<NNNN>   (or /issues/, /compare/inst..tgt)
-   # gitlab.com/$group/$repo/-/merge_requests/<NNNN>
-   ```
+For an ambiguous changelog, read `git -C <checkout> diff <installed>..<target>`, narrowing to affected paths as needed. Use the branch's frozen hashes and source cache where specified. Open each referenced issue or PR whose change the commit does not explain, on the **reported host** (GitHub `/pull/N` or `/issues/N`; GitLab `/-/merge_requests/N`).
 
-   Completion criterion: every `#NNNN` whose commit message doesn't make the
-   change self-evident is read.
+**Done when:** for every outdated package, the spec, build hook, affected runtime references and matching branch checks have a finding: still valid, a specific edit at a named path, or an unresolved question with the evidence needed to answer it.
 
-4. **Check whether local configs need updates.** Treat `lazy.nvim` as a general
-   package manager here: lazy specs may install Neovim plugins, Pi packages,
-   Yazi plugins/flavors, or other tools. For every package change that mentions
-   changed defaults, config keys, commands, events, APIs, build/install steps, or
-   integrations you use, first find the owning lazy spec and build hook, then
-   check that package's runtime config surface:
+## 3. Hand off the review
 
-   ```bash
-   rg -n "<lazy-name>|<repo>|<changed-api-or-key>" dot_config/nvim/lua/plugins
-   rg -n "<name>|<module>|<changed-api-or-key>" dot_config/yazi symlinks/yazi                 # Yazi packages
-   rg -n "<name>|<module>|<changed-api-or-key>" private_dot_pi/private_agent symlinks/pi/agent # Pi packages
-   rg -n "<name>|<module>|<changed-api-or-key>" dot_config private_dot_* symlinks              # fallback
-   ```
+Report scope, scan counts and findings against the recorded ranges. A filtered scan says nothing about other packages. The report is complete when every finding names its evidence (static or tested on an exact target) and any required follow-up or blocker.
 
-   Route every package through the
-   [config-surface map](surfaces/INDEX.md). Follow only matching branches; their
-   exact-range requirements apply even when the changelog claims no breaking API
-   change.
+For an explicit apply, verify installed hashes and runtime versions against the record first. If the user updated meanwhile, reuse the recorded range; a fresh `outdated=0` is not compatibility evidence. Ask for a missing old revision/version; review any different target before proceeding. For Pi or pi-vim, use the [frozen-target apply procedure](surfaces/prompt-editor/APPLY.md) only for the changes authorized.
 
-   Completion criterion: the owning lazy spec, build/install hook, and every
-   matching runtime reference are accounted for — still valid, needs a specific
-   config edit, or needs a follow-up question to the human. Every matching
-   config-surface branch also meets its own completion criterion.
-
-## Notes
-
-- **Maintain this skill when the review exposes a durable gap.** Fix stale
-  guidance or add a check if it would prevent a likely repeat miss. If the
-  generic search already worked, leave the skill unchanged. Keep one-off
-  findings and version-specific workarounds in the review report. Put any new
-  specialized branch under `surfaces/<name>/` and route it through
-  [surfaces/INDEX.md](surfaces/INDEX.md).
-
-- The script re-dumps lazy.nvim's computed `installed` and `target` commits, but
-  never fetches upstream. Those targets come from the on-disk `origin/<branch>`
-  refs — whatever the last Neovim `:Lazy check` fetched — so the report is
-  bounded by already-fetched refs and can **underreport** newer updates.
-- Specialized surface branches may additionally freeze published-release metadata
-  and inspect exact hashes in reusable librarian caches when runtime packages differ
-  from lazy checkouts; they never read targets from or mutate lazy working trees.
-- Never run `:Lazy check` yourself, not even headless `Lazy! check`.
-- Package filters match exact plugin names (`blink-ripgrep.nvim`, not
-  `blink-ripgrep`). A filter that matches no plugin exits non-zero; `scanned=0`
-  means nothing was checked, never that the rest of the plugin set is up to date.
-- A non-zero script exit means the changelog review is incomplete; fix or
-  report the error before judging any changelog as reviewed.
-- If the user updates after review, preserve the recorded old/target hashes and
-  runtime versions. Verify the installed result before continuing an authorized
-  apply; a new `outdated=0` report does not prove compatibility. If no pre-update
-  record exists, ask for the old revision/version rather than inventing a range.
-
-## Files
-
-- `scripts/lazy-update-review.sh` — the entry point.
-- `scripts/dump-plugin-state.lua` — runs inside nvim (needs lazy loaded), invoked by
-  the script above.
-- `surfaces/INDEX.md` — package-to-config-surface routing.
-- `surfaces/<name>/` — co-located review, apply, and reference files needed by one
-  specialized integration.
+Change this skill only if correcting stale guidance or adding a check would prevent a repeat miss. Put one-off findings in the report. Add a specialized branch under `surfaces/<name>/` and to the table only when generic tracing is insufficient.

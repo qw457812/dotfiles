@@ -1,34 +1,9 @@
-# Neovim runtime versus lazy checkout
+# Neovim: source checkout or running binary?
 
-For `github.com/neovim/neovim`, distinguish the lazy-managed source checkout from
-the executable and its bundled runtime.
+1. **Identify the installer.** Compare the reported source range with `command -v nvim` and `nvim --version`. Trace the lazy build hook and executable selectors (search for `neovim/neovim`, `bob` and `nvimExecutablePaths` in Neovim, Fish, Homebrew and VS Code config). A spec without a build hook updates only source; Bob can already have installed the target independently. Preserve existing spec edits.
 
-1. Find the owning spec and its build hook, then identify the executable:
+   **Done when:** the report names the checkout range, running executable/build and owner of binary/runtime updates.
 
-   ```bash
-   rg -n 'neovim/neovim|bob|nvimExecutablePaths' dot_config/nvim dot_config/private_fish symlinks/vscode symlinks/homebrew
-   command -v nvim
-   nvim --version
-   ```
+2. **Trace the runtime diff.** Search `dot_config/nvim` for identifiers changed in that range, including private APIs, removed options, default mappings and copies of upstream helpers. Compare copied code even when the only upstream reference is a URL in a comment. If the executable matches the target, run focused compatibility tests with it (use `+qa!` for modified buffers).
 
-   A spec without a build hook only updates the source checkout. Bob may already
-   have installed the target binary independently. Record both versions; preserve
-   existing spec edits.
-
-   **Complete when:** source installed/target, executable version, and the actual
-   install/build owner are distinguished.
-
-2. Review the reported source range against local runtime references, including
-   internal APIs, removed options, default mappings, and copied upstream helpers:
-
-   ```bash
-   rg -n 'isprint|isident|mcursor|DiffUpdated|get_captures_at_pos|_tagfunc|_watch|TabLine|vim\.lsp\.completion' dot_config/nvim
-   ```
-
-   Extend the search with names changed in the range. Check copied helpers against
-   the upstream diff even when their original source URL is only a comment. If the
-   executable matches the target, use it for focused compatibility tests; otherwise
-   report that target behavior remains untested. Use `+qa!` when tests modify buffers.
-
-   **Complete when:** every matching local reference is accounted for, and the report
-   distinguishes static review from tests on the target runtime.
+   **Done when:** each matching reference has a finding, and tests on the target binary are distinguished from static review or an untested target.

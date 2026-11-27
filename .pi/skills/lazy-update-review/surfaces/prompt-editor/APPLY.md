@@ -1,160 +1,27 @@
-# Apply prompt-editor compatibility updates
+# Apply reviewed Pi or pi-vim changes
 
-Load this branch only when the caller explicitly requests applying the frozen and
-reviewed Pi or pi-vim target. Substitute the recorded values from
-[REVIEW.md](REVIEW.md) in the applicable command block.
+Work only on the caller-authorized installations and source changes. Use the exact package versions and checkout hashes from [the review](REVIEW.md#1-freeze-the-ranges).
 
-## 1. Apply frozen targets
+## 1. Verify the installed result
 
-First compare `pi --version` and the lazy checkout's HEAD with the recorded review.
-If the user already installed the frozen target, skip self-update and continue with
-source adaptation; the release endpoint may have advanced since review. A different,
-unreviewed installed version/revision requires a new exact-range review.
+Compare current lazy HEAD and loaded runtime versions with the recorded old and target values. An already installed target needs no second installation. A revision/version matching neither recorded endpoint needs a fresh exact-range review.
 
-When Pi is still on the reviewed old version, require the release endpoint to match
-the frozen package and version before invoking the lazy build hook's command:
+- **Pi installation:** if still on the reviewed old version, re-read the self-update endpoint and require its package and version to match the frozen target before running the lazy build's `pi update --self`. Verify `pi --version` afterward. Do not accept endpoint drift or a different installed result.
+- **pi-vim installation:** use `pi install "npm:pi-vim@<frozen-version>"` and verify the version under the active agent directory's `npm/node_modules/pi-vim`. Exact installation changes Pi's settings entry: after verification restore the intended rolling `npm:pi-vim` in `symlinks/pi/agent/settings.json`, preserving unrelated settings.
 
-```bash
-set -euo pipefail
-PI_OLD_VERSION='recorded-old-pi-version'
-PI_TARGET_PACKAGE='recorded-pi-package'
-PI_TARGET_VERSION='recorded-pi-version'
-PI_PACKAGES=(
-  @earendil-works/pi-agent-core
-  @earendil-works/pi-ai
-  @earendil-works/pi-coding-agent
-  @earendil-works/pi-tui
-)
+**Done when:** the runtime versions used for adaptation match the reviewed target combination, including any peer held at its old version.
 
-PI_CURRENT_VERSION=$(pi --version)
-if [ "$PI_CURRENT_VERSION" != "$PI_TARGET_VERSION" ]; then
-  test "$PI_CURRENT_VERSION" = "$PI_OLD_VERSION"
-  test "$(curl -fsSL https://pi.dev/api/latest-version | node -e '
-    const fs = require("node:fs");
-    const value = JSON.parse(fs.readFileSync(0, "utf8"));
-    if (value.ok !== true || typeof value.packageName !== "string" || typeof value.version !== "string") {
-      throw new Error("invalid Pi release metadata");
-    }
-    process.stdout.write(`${value.packageName}@${value.version}`);
-  ')" = "$PI_TARGET_PACKAGE@$PI_TARGET_VERSION"
-  pi update --self
-fi
-test "$(pi --version)" = "$PI_TARGET_VERSION"
-for package in "${PI_PACKAGES[@]}"; do
-  test "$(npm view "$package@$PI_TARGET_VERSION" version)" = "$PI_TARGET_VERSION"
-done
-cd private_dot_pi/private_agent
-npm install --save-dev --save-exact \
-  "@earendil-works/pi-agent-core@$PI_TARGET_VERSION" \
-  "@earendil-works/pi-ai@$PI_TARGET_VERSION" \
-  "@earendil-works/pi-coding-agent@$PI_TARGET_VERSION" \
-  "@earendil-works/pi-tui@$PI_TARGET_VERSION"
-cd -
-```
+## 2. Synchronize authorized edits
 
-Repeat the exact-pin update for Pi host dependencies already declared in every
-nested extension manifest, not just the root:
+- **SDK and pi-vim pins:** enumerate `package.json` files under `private_dot_pi/private_agent`. For every affected root or nested manifest, update the existing pins to the exact reviewed npm versions, preserve their dependency sections, and sync lockfiles and source installs. Inspect unrelated transitive changes. Apply only the source and test adaptations identified by review.
+- **Deployment:** verify the affected chezmoi targets; scope any manual apply to changed managed files (including lockfiles written by npm). Source and deployed `node_modules` are separate. Compare resolved versions in both trees and, after deploying locks, refresh stale deployed packages with `npm --prefix <deployed-package-dir> ci --ignore-scripts`; check native dependencies that need lifecycle scripts separately. Record actual `.bin` targets and tool versions **before** reinstalling. Restore only a verified baseline compiler fallback if reinstall erases it; otherwise report the blocker.
+- **Generated wrapper:** when the pi-vim runtime or template changes, regenerate by loading Pi in the intended agent directory. Check every wrapper export resolves into that agent directory's managed pi-vim. Finish dependency mutations in both trees before checking either: source checks can import deployed packages through the wrapper.
+- **Settings clean filter:** if review identified machine-local keys, update the chezmoi filter template and render/run it to update the active Git filter. Verify idempotence and shareable-key retention without discarding working runtime state.
 
-```bash
-rg --files private_dot_pi/private_agent -g package.json
-rg -n '"@earendil-works/pi-' private_dot_pi/private_agent --glob package.json
-```
+**Done when:** every affected source/deployed manifest, lockfile and resolved dependency is accounted for and the generated wrapper and package setting point where intended.
 
-Synchronize each affected manifest, lockfile, and source `node_modules`; verify
-installed versions from each package directory. Inspect unrelated transitive
-version changes rather than attributing all lockfile churn to Pi. Include the
-review's required source and test edits, such as discriminated event fixtures and
-old-version assertions. Use the [runtime review's validation safeguards](../pi-runtime/REVIEW.md#2-inspect-changed-integration-contracts)
-for dependency and native-toolchain failures.
+## 3. Verify
 
-Deploy changed source paths through chezmoi. Edits normally auto-apply, but lockfiles
-written by npm may need a scoped manual apply; verify the relevant deployed files
-without deploying unrelated work. Source and deployed `node_modules` are separate:
-chezmoi excludes them, so matching manifests do not prove the deployed dependencies
-are current. For the root and each affected nested package, compare installed host
-versions in both trees. After deploying the locks, synchronize stale deployed
-installs with `npm --prefix <deployed-package-dir> ci --ignore-scripts`; verify native
-runtime dependencies separately when they require lifecycle scripts. Before any
-`npm ci`, record existing `.bin` symlinks and executable versions. Reinstallation
-recreates package entry points and can erase a working Termux compiler fallback;
-restore only the verified baseline fallback, or report the native-toolchain blocker.
+Run the Pi agent's `check`, `lint` and `test` scripts from `private_dot_pi/private_agent`; use `pi --list-models` as a startup smoke test. Run [interactive target checks](../pi-runtime/VALIDATE.md#interactive-target-checks) for affected UI/command paths. Use the [target validation safeguards](../pi-runtime/VALIDATE.md#isolated-target-checks) when classifying toolchain or dependency problems.
 
-Finish dependency mutations in both trees before running checks. The generated
-pi-vim wrapper can make source type checks import deployed dependencies, so checking
-source in parallel with deployed `npm ci` produces transient missing-module errors.
-
-If review identified machine-local settings keys, update the clean-filter template
-and render/run that template to synchronize the active repository filter. Verify
-filter idempotence and retention of shareable preferences, while preserving the
-working settings file's runtime state.
-
-For a pi-vim update, install the reviewed version exactly and synchronize the source
-dependency:
-
-```bash
-set -euo pipefail
-VIM_TARGET_VERSION='recorded-pi-vim-version'
-
-pi install "npm:pi-vim@$VIM_TARGET_VERSION"
-test "$(node -p 'require(process.env.HOME + "/.pi/agent/npm/node_modules/pi-vim/package.json").version')" = \
-  "$VIM_TARGET_VERSION"
-cd private_dot_pi/private_agent
-npm install --save-dev --save-exact "pi-vim@$VIM_TARGET_VERSION"
-cd -
-```
-
-The exact install temporarily pins Pi's package setting. Restore its chezmoi source
-to the rolling `npm:pi-vim` entry after verifying the runtime; future reviews will
-freeze the next release before updating. Use `pi install npm:pi-vim@<version>` to
-restore another specific managed version.
-
-Regenerate `pi-vim.generated.ts` by loading Pi after changing its template; every
-generated re-export must resolve below `getAgentDir()/npm/node_modules/pi-vim`.
-
-**Complete when:** applicable global/managed runtimes and all affected root/nested
-host pins, lockfiles, and source installs match the reviewed versions, deployed
-files are current, and the Pi package setting retains its intended rolling source.
-
-## 2. Verify affected branches
-
-After applying the reviewed versions and any required source edits, run:
-
-```bash
-cd private_dot_pi/private_agent
-npm run check
-npm run lint
-npm test
-cd -
-pi --list-models >/dev/null
-```
-
-Inspect vanilla pi-vim when UI comparison is required:
-
-```bash
-pi --no-session --no-extensions -e ~/.pi/agent/npm/node_modules/pi-vim/index.ts
-```
-
-Exercise affected UI in regular and fullscreen modes in a fresh fixed-size tmux
-session with a unique socket. Use a temporary `PI_CODING_AGENT_DIR` with copied settings, not symlinks to writable
-global settings; `--no-session` only isolates session persistence. Make the reviewed
-pi-vim package available below its `npm/node_modules`, and copy extensions that
-generate sibling files so probes cannot rewrite deployed wrappers. Load only the
-needed extensions with `--no-extensions -e ...` and use `--offline` for UI-only tests.
-`--offline` suppresses startup networking, not model requests. Prefer OS-level
-network isolation (on macOS, wrap Pi in
-`sandbox-exec -p '(version 1)(allow default)(deny network*)'`). If unavailable, use
-credential-free fixtures, intercept unexpected prompt submissions and reject
-provider requests; report that these guards are not OS-level isolation. Before
-entering a slash command, verify the entire editor buffer is empty; Ctrl+U may
-clear only the current line of a multiline prompt.
-Check that the active instance is `PromptEditor`, not a fallback editor.
-
-Follow [Cursor ownership](REFERENCE.md#cursor-ownership) and
-[Navigation remaps](REFERENCE.md#navigation-remaps) when those surfaces change.
-Assert raw cursor markers or ANSI output as well as captured screen text; visually
-identical frames can hide a broken escape-sequence contract. Clean up the test session.
-
-**Complete when:** static checks, the full behavioral suite, runtime loading, and
-every affected interactive branch pass, with compiler fallbacks and untested cases
-reported explicitly. Remind the user to restart existing Pi processes: updating
-the executable on disk does not reload a running host.
+**Done when:** static checks, the behavioral suite, runtime loading and affected interactive paths have passed on the target or are explicitly reported as blocked/untested. Tell the user to restart existing Pi processes; the running host does not reload just because the executable changed.
