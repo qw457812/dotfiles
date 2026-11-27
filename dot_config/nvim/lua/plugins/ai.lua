@@ -916,7 +916,8 @@ return {
 
       -- Herdr and Rex see one terminal, even when Neovim hosts several Sidekick sessions.
       local group = vim.api.nvim_create_augroup("sidekick_osc7501", { clear = true })
-      local priority = { idle = 1, done = 2, working = 3, error = 4, blocked = 5 }
+      -- blocked > done > working > idle, as Herdr ranks them.
+      local priority = { idle = 1, working = 2, done = 3, error = 4, blocked = 5 }
       local reports = {}
       local sequence_number = 0
       local published
@@ -942,10 +943,24 @@ return {
             return
           end
           local sequence = ev.data.sequence
-          local state = sequence:match("^\27%]7501;state=([^:]+)")
-          if not state or sequence:match(":id=[^:]+") then
+          local body = sequence:match("^\27%]7501;(.*)$")
+          if not body then
             return
           end
+
+          local state
+          for pair in body:gmatch("[^:]+") do
+            local key, value = pair:match("^([^=]+)=(.*)$")
+            key = key and vim.trim(key)
+            -- Only an absent id denotes the root; even an empty id is not a root report.
+            if key == "id" then
+              return
+            end
+            if key == "state" then
+              state = vim.trim(value)
+            end
+          end
+
           if state == "clear" then
             reports[ev.buf] = nil
           elseif priority[state] then
@@ -973,12 +988,24 @@ return {
         end,
       })
 
+      vim.api.nvim_create_autocmd("VimLeavePre", {
+        group = group,
+        callback = function()
+          reports = {}
+          publish()
+        end,
+      })
+
       -- Respect Pi's opt-out
       if vim.env.PI_PROGRAM_STATUS == "0" then
         return
       end
 
-      -- tmux can't answer Pi's OSC 7501 probe. Send reports via DCS passthrough instead.
+      -- tmux neither answers nor forwards bare OSC 7501 queries.
+      -- pi-sidekick sets PI_PROGRAM_STATUS=1 to skip the probe and wraps Pi's reports for tmux DCS passthrough.
+      --
+      -- TODO: Support OSC 7501 detection for agents running inside tmux.
+      -- If an agent uses DA to end detection, ensure it receives the OSC 7501 reply before the DA reply.
       return U.extend_tbl(opts, {
         cli = {
           tools = {
