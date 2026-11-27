@@ -29,7 +29,7 @@ The HTTP response limit is 5 MiB. Separately, Markdown conversion has its own si
 
 ## Differences from Upstream
 
-- **Tool exposure:** Pi controls direct and codemode availability through its own tool settings.
+- **Tool exposure:** OpenCode excludes `webfetch` from Code Mode (`codemode: false`) and hides the direct tool in full Code Mode. Its scripts use a permission-checked global `fetch()` for HTTP responses, without automatic Markdown conversion. Pi's sandbox has no global `fetch()`, so this mirror exposes `tools.webfetch()` and reuses the upstream tool's structured result shape.
 - **Permission:** the mirror has no OpenCode permission prompt, saved site rule, or per-hop authorization check. URL validation still applies at every hop.
 - **Fetch lifecycle:** the mirror uses AbortController timers around fetch attempts, with the remaining time for a Cloudflare retry. Unlike upstream's timeout around the whole operation, those timers do not cover buffering the final body. The mirror drains redirect and HTTP error bodies and checks the response size from `Content-Length` and the buffered body; upstream bounds body collection as it streams.
 - **Preview storage:** Pi uses its own bracket notices and a temporary file rather than OpenCode's managed storage. A failed save is nonfatal.
@@ -41,4 +41,4 @@ From the chezmoi root, run `npm --prefix private_dot_pi/private_agent/extensions
 
 ## Drift Notes
 
-- `c85b83eb08`: ported `{ contentType, output }` (`d9d0a46d46`), removed the local binary-image attachment branch, and verified the renderer is unchanged. OpenCode's Code Mode placement and site-scoped permission persistence (`c6df401531`) remain upstream-only. Unmerged `codemode-webfetch` and `web-fetch` are direction signals.
+- `c85b83eb08`: ported `{ contentType, output }` (`d9d0a46d46`), removed the local binary-image attachment branch, and verified the renderer is unchanged. Site-scoped permission persistence (`c6df401531`) remains upstream-only. Unmerged `codemode-webfetch` and `web-fetch` are direction signals.
