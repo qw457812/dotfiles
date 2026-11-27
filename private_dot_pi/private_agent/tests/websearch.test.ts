@@ -374,7 +374,8 @@ describe("tool (forced provider)", () => {
     );
 
     await expect(tool.run("golden query")).rejects.toMatchObject({
-      name: "InvalidWebSearchOutputError",
+      message: "Unable to search the web for golden query",
+      cause: { name: "InvalidWebSearchOutputError" },
     });
   });
 

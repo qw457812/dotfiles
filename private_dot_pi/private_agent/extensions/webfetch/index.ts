@@ -98,9 +98,8 @@ export class RequestCancelledError extends Error {
   override name = "RequestCancelledError";
 }
 
-interface FetchResult {
-  contentType: string;
-  arrayBuffer: ArrayBuffer;
+function discardBody(response: Response): void {
+  void response.body?.cancel().catch(() => {});
 }
 
 // Manual redirects let us validate each destination before contacting it.
@@ -108,24 +107,72 @@ async function fetchFollowingRedirects(
   url: string,
   headers: Record<string, string>,
   signal: AbortSignal,
-): Promise<Response> {
+): Promise<{ response: Response; url: string }> {
   let current = url;
   for (let redirects = 0; ; redirects++) {
+    signal.throwIfAborted();
     const response = await fetch(current, { headers, signal, redirect: "manual" });
     const location = response.headers.get("location");
-    if (!REDIRECT_STATUSES.has(response.status) || !location) return response;
+    if (!REDIRECT_STATUSES.has(response.status) || !location) return { response, url: current };
 
-    // Drain the redirect body to release the TCP connection back to the pool.
-    await response.arrayBuffer().catch(() => {});
+    discardBody(response);
     if (redirects >= MAX_REDIRECTS) {
       throw new WebfetchRequestError(`Too many redirects (more than ${MAX_REDIRECTS})`);
     }
 
     const target = URL.parse(location, current);
-    if (!target) throw new WebfetchRequestError("Invalid redirect URL");
+    if (!target) throw new WebfetchRequestError("Invalid URL");
     target.hash = "";
     assertHttpUrl(target);
     current = target.href;
+  }
+}
+
+async function readResponseBody(
+  response: Response,
+  signal: AbortSignal,
+): Promise<Buffer<ArrayBuffer>> {
+  const declared = Number.parseInt(response.headers.get("content-length") ?? "", 10);
+  const declaredSize = Number.isSafeInteger(declared) && declared >= 0 ? declared : 0;
+  const tooLarge = `Response too large (exceeds ${MAX_RESPONSE_SIZE} byte limit)`;
+  if (declaredSize > MAX_RESPONSE_SIZE) {
+    discardBody(response);
+    throw new WebfetchRequestError(tooLarge);
+  }
+  if (!response.body) return Buffer.alloc(0);
+
+  const reader = response.body.getReader();
+  // Cancel a pending read even if the response stream is not tied to fetch's signal.
+  const onAbort = () => {
+    void reader.cancel().catch(() => {});
+  };
+  signal.addEventListener("abort", onAbort, { once: true });
+  let body = Buffer.allocUnsafe(declaredSize || 64 * 1024);
+  let size = 0;
+  try {
+    signal.throwIfAborted();
+    for (;;) {
+      const { done, value } = await reader.read();
+      signal.throwIfAborted();
+      if (done) return body.subarray(0, size);
+      const nextSize = size + value.byteLength;
+      if (nextSize > MAX_RESPONSE_SIZE) {
+        void reader.cancel().catch(() => {});
+        throw new WebfetchRequestError(tooLarge);
+      }
+      if (nextSize > body.byteLength) {
+        const grown = Buffer.allocUnsafe(
+          Math.min(MAX_RESPONSE_SIZE, Math.max(nextSize, body.byteLength * 2)),
+        );
+        body.copy(grown, 0, 0, size);
+        body = grown;
+      }
+      body.set(value, size);
+      size = nextSize;
+    }
+  } finally {
+    signal.removeEventListener("abort", onAbort);
+    reader.releaseLock();
   }
 }
 
@@ -134,62 +181,47 @@ async function fetchUrl(
   acceptHeader: string,
   timeoutMs: number,
   signal?: AbortSignal,
-): Promise<FetchResult> {
-  const fetchStartTime = Date.now();
-
-  // Keep user cancellation linked across both attempts and body reads.
-  const externalController = new AbortController();
-  if (signal?.aborted) externalController.abort();
-  const onExternalAbort = () => externalController.abort();
-  signal?.addEventListener("abort", onExternalAbort, { once: true });
+): Promise<{ contentType: string; body: Buffer<ArrayBuffer> }> {
+  const timeout = new AbortController();
+  const timer = setTimeout(() => timeout.abort(), timeoutMs);
+  const fetchSignal = signal ? AbortSignal.any([signal, timeout.signal]) : timeout.signal;
 
   try {
-    const firstController = new AbortController();
-    const firstTimeoutId = setTimeout(() => firstController.abort(), timeoutMs);
-    const firstSignal = AbortSignal.any([externalController.signal, firstController.signal]);
+    let result = await fetchFollowingRedirects(
+      url,
+      buildHeaders(acceptHeader, openCodeUserAgent),
+      fetchSignal,
+    );
 
-    let response: Response;
-    try {
-      const headers = buildHeaders(acceptHeader, openCodeUserAgent);
-      response = await fetchFollowingRedirects(url, headers, firstSignal);
-    } finally {
-      clearTimeout(firstTimeoutId);
+    if (
+      result.response.status === 403 &&
+      result.response.headers.get("cf-mitigated") === "challenge"
+    ) {
+      discardBody(result.response);
+      result = await fetchFollowingRedirects(
+        url,
+        buildHeaders(acceptHeader, CLOUDFLARE_RETRY_UA),
+        fetchSignal,
+      );
     }
 
-    if (response.status === 403 && response.headers.get("cf-mitigated") === "challenge") {
-      // Release the challenged response before retrying.
-      await response.arrayBuffer().catch(() => {});
-
-      // The retry shares the first attempt's deadline; the final body read has no attempt timer.
-      const retryDeadline = timeoutMs - (Date.now() - fetchStartTime);
-      if (retryDeadline <= 0) {
-        throw new WebfetchRequestError(`Request timed out after ${timeoutMs / 1000}s`);
-      }
-
-      const retryController = new AbortController();
-      const retryTimeoutId = setTimeout(() => retryController.abort(), retryDeadline);
-      const retrySignal = AbortSignal.any([externalController.signal, retryController.signal]);
-
-      try {
-        // Restart at the original URL so the retry also follows and validates redirects.
-        const retryHeaders = buildHeaders(acceptHeader, CLOUDFLARE_RETRY_UA);
-        response = await fetchFollowingRedirects(url, retryHeaders, retrySignal);
-      } finally {
-        clearTimeout(retryTimeoutId);
-      }
+    const { response, url: requestUrl } = result;
+    if (fetchSignal.aborted) {
+      discardBody(response);
+      fetchSignal.throwIfAborted();
     }
-
-    // Drain failed responses to release the connection.
     if (!response.ok) {
-      await response.arrayBuffer().catch(() => {});
-      throw new WebfetchRequestError(`HTTP ${response.status}`);
+      discardBody(response);
+      throw new WebfetchRequestError(
+        `StatusCode: non 2xx status code (${response.status} GET ${requestUrl})`,
+      );
     }
 
     const contentType = response.headers.get("content-type") || "";
     const mime = mimeFrom(contentType);
     const isImage = isImageAttachment(mime);
     if (isImage || !isTextualMime(mime)) {
-      await response.body?.cancel().catch(() => {});
+      discardBody(response);
       const kind = isImage ? "image" : "file";
       // Reflect only bounded MIME names, not arbitrary header text.
       const label = /^[a-z0-9][a-z0-9!#$&^_.+-]{0,126}\/[a-z0-9][a-z0-9!#$&^_.+-]{0,126}$/.test(
@@ -200,34 +232,13 @@ async function fetchUrl(
       throw new WebfetchRequestError(`Unsupported fetched ${kind} content type${label}`);
     }
 
-    // Check both the declared size and the actual body; the header is optional.
-    const contentLength = response.headers.get("content-length");
-    if (contentLength && parseInt(contentLength, 10) > MAX_RESPONSE_SIZE) {
-      throw new WebfetchRequestError(
-        `Response too large (exceeds ${MAX_RESPONSE_SIZE} byte limit)`,
-      );
-    }
-
-    const arrayBuffer = await response.arrayBuffer();
-    if (arrayBuffer.byteLength > MAX_RESPONSE_SIZE) {
-      throw new WebfetchRequestError(
-        `Response too large (exceeds ${MAX_RESPONSE_SIZE} byte limit)`,
-      );
-    }
-
-    return { contentType, arrayBuffer };
-  } catch (err: any) {
-    if (err.name === "AbortError") {
-      if (signal?.aborted) {
-        throw new RequestCancelledError("Request was cancelled");
-      }
-      throw new WebfetchRequestError(`Request timed out after ${timeoutMs / 1000}s`, {
-        cause: err,
-      });
-    }
+    return { contentType, body: await readResponseBody(response, fetchSignal) };
+  } catch (err) {
+    if (signal?.aborted) throw new RequestCancelledError("Request was cancelled");
+    if (timeout.signal.aborted) throw new WebfetchRequestError("Request timed out", { cause: err });
     throw err;
   } finally {
-    signal?.removeEventListener("abort", onExternalAbort);
+    clearTimeout(timer);
   }
 }
 
@@ -320,7 +331,7 @@ export default function (pi: ExtensionAPI) {
 
       try {
         const url = sanitizeUrl(params.url);
-        const { contentType, arrayBuffer } = await fetchUrl(
+        const { contentType, body } = await fetchUrl(
           url,
           buildAcceptHeader(format),
           timeout,
@@ -328,7 +339,7 @@ export default function (pi: ExtensionAPI) {
         );
         details.contentType = contentType;
 
-        const content = new TextDecoder().decode(arrayBuffer);
+        const content = new TextDecoder().decode(body);
         const output = convert(content, contentType, format);
 
         // Only the model-facing preview is trimmed; scripts get the conversion as produced.

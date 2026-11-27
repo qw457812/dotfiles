@@ -206,8 +206,9 @@ export default function (pi: ExtensionAPI) {
         ...(content === undefined ? {} : { content }),
       }));
       if (!Value.Check(WebSearchOutputSchema, structuredContent)) {
-        throw new InvalidWebSearchOutputError(
-          `Invalid search results from ${queryResult.provider}`,
+        throw wrapWebsearchError(
+          new InvalidWebSearchOutputError(`Invalid search results from ${queryResult.provider}`),
+          params.query,
         );
       }
 

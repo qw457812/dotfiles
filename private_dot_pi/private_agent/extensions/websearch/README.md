@@ -28,6 +28,8 @@ TinyFish makes one `tools/call` without a key. With a key, each search negotiate
 
 **Codemode** returns an array of hits in provider order: `{ url: string; title?: string; published?: number; content?: string }[]`. `published` is Unix time in milliseconds. No hits returns `[]`. The Markdown preview budget does not trim these hits; codemode's own output budget applies to what the script sends back to the model.
 
+Malformed hits fail the call with `Unable to search the web for <query>`; they are not dropped from an otherwise successful result.
+
 ```js
 const hits = await tools.websearch({ query: "Pi release notes" });
 text(hits.map(({ url, title }) => ({ url, title })));

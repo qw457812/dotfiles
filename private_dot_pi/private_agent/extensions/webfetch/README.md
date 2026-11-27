@@ -10,7 +10,7 @@ Install dependencies with `npm install` in this directory.
 | --- | --- |
 | `url` | Required HTTP(S) URL. Credentials are rejected; fragments are stripped. |
 | `format` | `"markdown"` (default), `"text"`, or `"html"`. Applies to HTML responses; other textual responses pass through. |
-| `timeout` | Fetch timeout in seconds, default 30; must be greater than 0 and at most 120. |
+| `timeout` | Request and body-reading deadline in seconds, including redirects and retry. Defaults to 30; must be greater than 0 and at most 120. |
 
 The tool validates each redirect target and follows up to 10 hops. It rejects binary images and other non-textual responses; SVG passes through as text. Direct calls and codemode scripts see actionable errors for invalid URLs, HTTP status codes, timeouts, unsupported media, oversized responses, and redirect limits. Unexpected errors use `Unable to fetch <url>` without exposing the original exception to the model.
 
@@ -25,15 +25,14 @@ const { output } = await tools.webfetch({ url: "https://example.com", format: "t
 text(output.slice(0, 1000));
 ```
 
-The HTTP response limit is 5 MiB. Separately, Markdown conversion has its own size budget and can silently omit the tail. Both the temp file and codemode result contain the conversion as produced, not the raw HTTP body or any omitted Markdown.
+The HTTP response body is capped at 5 MiB while streaming. Separately, Markdown conversion has its own size budget and can silently omit the tail. Both the temp file and codemode result contain the conversion as produced, not the raw HTTP body or any omitted Markdown.
 
 ## Differences from Upstream
 
 - **Tool exposure:** OpenCode excludes `webfetch` from Code Mode (`codemode: false`) and hides the direct tool in full Code Mode. Its scripts use a permission-checked global `fetch()` for HTTP responses, without automatic Markdown conversion. Pi's sandbox has no global `fetch()`, so this mirror exposes `tools.webfetch()` and reuses the upstream tool's structured result shape.
 - **Permission:** the mirror has no OpenCode permission prompt, saved site rule, or per-hop authorization check. URL validation still applies at every hop.
-- **Fetch lifecycle:** the mirror uses AbortController timers around fetch attempts, with the remaining time for a Cloudflare retry. Unlike upstream's timeout around the whole operation, those timers do not cover buffering the final body. The mirror drains redirect and HTTP error bodies and checks the response size from `Content-Length` and the buffered body; upstream bounds body collection as it streams.
 - **Preview storage:** Pi uses its own bracket notices and a temporary file rather than OpenCode's managed storage. A failed save is nonfatal.
-- **Errors:** OpenCode's session layer unwraps tool failures. Pi forwards selected request errors explicitly, without exposing raw HTTP bodies, status text, or arbitrary exception chains. User cancellation keeps its own message.
+- **Errors:** Pi reproduces OpenCode's session-facing messages for known failures. HTTP errors include the failed request URL, but not the remote status text or body. Unlike OpenCode's session unwrapping, Pi keeps the generic fallback for unexpected exceptions and only echoes well-formed MIME names. User cancellation keeps its own message.
 - **Runtime:** async/await and TypeBox instead of Effect.
 
 ## Verification

@@ -225,14 +225,27 @@ function activateWebfetch(
 }
 
 describe("request errors", () => {
-  it("reports the HTTP status without the status text or body", async () => {
+  it("reports ordinary 403s with the upstream status message and does not retry", async () => {
     const tool = activateWebfetch(
-      () => new Response("remote body", { status: 404, statusText: "remote status text" }),
+      () => new Response("remote body", { status: 403, statusText: "remote status text" }),
     );
 
     const err = await captureError(tool.run());
 
-    expect(err.message).toBe("HTTP 404");
+    expect(err.message).toBe("StatusCode: non 2xx status code (403 GET https://example.com/x)");
+    expect(tool.fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("reports the failed request URL after following a redirect", async () => {
+    const tool = activateWebfetch((url) =>
+      url.endsWith("/x") ? redirect("/missing#fragment") : new Response(null, { status: 404 }),
+    );
+
+    const err = await captureError(tool.run());
+
+    expect(err.message).toBe(
+      "StatusCode: non 2xx status code (404 GET https://example.com/missing)",
+    );
   });
 
   it("reports a request timeout", async () => {
@@ -246,13 +259,38 @@ describe("request errors", () => {
       );
       const failure = captureError(tool.run(undefined, { timeout: 1 }));
       await vi.advanceTimersByTimeAsync(1000);
-      expect((await failure).message).toBe("Request timed out after 1s");
+      expect((await failure).message).toBe("Request timed out");
     } finally {
       vi.useRealTimers();
     }
   });
 
-  it("reports the response size limit", async () => {
+  it("uses one deadline for the initial request, Cloudflare retry, and final body", async () => {
+    vi.useFakeTimers();
+    try {
+      const cancel = vi.fn();
+      const tool = activateWebfetch(async (_url, init) => {
+        if (new Headers(init?.headers).get("User-Agent") !== "opencode") {
+          await new Promise((resolve) => setTimeout(resolve, 750));
+          return new Response(new ReadableStream({ pull() {} }), {
+            status: 403,
+            headers: { "cf-mitigated": "challenge" },
+          });
+        }
+        return new Response(new ReadableStream({ pull() {}, cancel }));
+      });
+
+      const failure = captureError(tool.run(undefined, { timeout: 1 }));
+      await vi.advanceTimersByTimeAsync(1000);
+      expect(tool.fetchMock).toHaveBeenCalledTimes(2);
+      expect(cancel).toHaveBeenCalledTimes(1);
+      expect((await failure).message).toBe("Request timed out");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("reports the declared response size limit", async () => {
     const tool = activateWebfetch(
       () => new Response("", { headers: { "content-length": String(MAX_MARKDOWN_BYTES + 1) } }),
     );
@@ -260,6 +298,27 @@ describe("request errors", () => {
     await expect(tool.run()).rejects.toThrow(
       `Response too large (exceeds ${MAX_MARKDOWN_BYTES} byte limit)`,
     );
+  });
+
+  it("cancels an oversized streamed response without waiting for EOF", async () => {
+    const cancel = vi.fn();
+    const tool = activateWebfetch(
+      () =>
+        new Response(
+          new ReadableStream({
+            start(controller) {
+              controller.enqueue(new Uint8Array(MAX_MARKDOWN_BYTES));
+              controller.enqueue(new Uint8Array(1));
+            },
+            cancel,
+          }),
+        ),
+    );
+
+    await expect(tool.run()).rejects.toThrow(
+      `Response too large (exceeds ${MAX_MARKDOWN_BYTES} byte limit)`,
+    );
+    expect(cancel).toHaveBeenCalledTimes(1);
   });
 
   it("does not echo a malformed remote MIME value", async () => {
@@ -283,6 +342,18 @@ describe("cancellation identity", () => {
     const err = await captureError(tool.run(controller.signal));
     expect(err).toBeInstanceOf(RequestCancelledError);
     expect(err.message).toBe("Request was cancelled");
+  });
+
+  it("preserves user cancellation during a stalled body read", async () => {
+    const cancel = vi.fn();
+    const controller = new AbortController();
+    const tool = activateWebfetch(() => new Response(new ReadableStream({ pull() {}, cancel })));
+    const failure = captureError(tool.run(controller.signal));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    controller.abort();
+
+    expect(await failure).toBeInstanceOf(RequestCancelledError);
+    expect(cancel).toHaveBeenCalledTimes(1);
   });
 
   it("wraps foreign errors that imitate the cancellation message", async () => {
@@ -358,7 +429,7 @@ describe("redirects and URL validation", () => {
   it("reports a malformed redirect URL", async () => {
     const tool = activateWebfetch(() => redirect("http://["));
 
-    await expect(tool.run()).rejects.toThrow("Invalid redirect URL");
+    await expect(tool.run()).rejects.toThrow("Invalid URL");
     expect(tool.fetchMock).toHaveBeenCalledTimes(1);
   });
 
