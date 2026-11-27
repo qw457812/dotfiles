@@ -68,7 +68,7 @@
              ;; problem: can switch to Finder.app's closed window
              ; :prev_app                {:shell "/opt/homebrew/bin/yabai -m window --focus recent || open -g hammerspoon://cmd_tab"}
              :prev_app                {:shell "open -g hammerspoon://prev_app"}
-             :open-default-terminal   {:shell "open \"/Applications/Herdr.app\""} ; kitty.app, WezTerm.app, Rex Beta.app, Herdr.app
+             :open-default-terminal   {:shell "open \"/Applications/Herdr.app\""} ; kitty.app, WezTerm.app, Rex.app, Herdr.app
              :open-default-browser    {:shell "open \"/Applications/Glide.app\""}} ; Brave Browser.app, Helium.app, Glide.app, Google Chrome.app
 
  :templates
@@ -1085,7 +1085,7 @@
            [:!Qk :open-default-terminal :!default-terminal]
            [:!Qk :same_wind_app :default-terminal] ; not working for kitty
            ;; [:!Qk "/opt/homebrew/bin/yabai -m window --focus $(/opt/homebrew/bin/yabai -m query --windows | /opt/homebrew/bin/jq -e \"map(select(.app==\\\"kitty\\\" and .\\\"has-focus\\\"==false)) | .[0] | .id\") > /dev/null 2>&1" :default-terminal]
-           [:!Ql [:open "/Applications/Rex Beta.app"] :!Rex]
+           [:!Ql [:open "/Applications/Rex.app"] :!Rex]
            [:!Ql :same_wind_app :Rex]
            [:!Qsemicolon "/opt/homebrew/bin/yabai -m window --focus $(/opt/homebrew/bin/yabai -m query --windows | /opt/homebrew/bin/jq -e \"map(select(.app==\\\"RuijieWorkSpaceDesktop\\\")) | .[0] | .id\") > /dev/null 2>&1 || open /Applications/RuijieWorkSpace.app" :!RuijieWorkSpace]
            [:!Qsemicolon [:open "/Applications/RuijieWorkSpace.app"] :RuijieWorkSpace]
@@ -1351,7 +1351,7 @@
            ;; [:!Wk [:left_command [:open "/Applications/WezTerm.app"]] :default-terminal]
            ;; [:!Wl [:left_command [:open "/Applications/Visual Studio Code.app"]] :!VSCode]
            ;; [:!Wl :same_wind_app :VSCode]
-           [:!Wl [:left_command [:open "/Applications/Rex Beta.app"]] :!Rex]
+           [:!Wl [:left_command [:open "/Applications/Rex.app"]] :!Rex]
            [:!Wl :same_wind_app :Rex]
            [:!Wsemicolon [:left_command "/opt/homebrew/bin/yabai -m window --focus $(/opt/homebrew/bin/yabai -m query --windows | /opt/homebrew/bin/jq -e \"map(select(.app==\\\"RuijieWorkSpaceDesktop\\\")) | .[0] | .id\") > /dev/null 2>&1 || open /Applications/RuijieWorkSpace.app"] :!RuijieWorkSpace]
            [:!Wsemicolon [:left_command [:open "/Applications/RuijieWorkSpace.app"]] :RuijieWorkSpace]

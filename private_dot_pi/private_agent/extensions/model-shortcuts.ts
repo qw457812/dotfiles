@@ -22,9 +22,9 @@ const ALIASES: Record<string, ModelTarget | readonly ModelTarget[]> = {
   terra: { provider: "openai-codex", id: "gpt-6.1-terra" },
   luna: { provider: "openai-codex", id: "gpt-6-luna" },
   glm: [
+    { provider: "codebuddy", id: "glm-5.4" },
     { provider: "commandcode", id: "zai-org/GLM-5.3" },
     { provider: "neuralwatt", id: "glm-5.3" },
-    { provider: "codebuddy", id: "glm-5.3" },
   ],
   glmflash: [
     { provider: "neuralwatt", id: "glm-5.3-flash" },
@@ -47,6 +47,7 @@ const ALIASES: Record<string, ModelTarget | readonly ModelTarget[]> = {
     { provider: "neuralwatt", id: "kimi-k3.1-pro" },
     { provider: "codebuddy", id: "kimi-k3.1-pro" },
   ],
+  ember: { provider: "commandcode", id: "meta/muse-ember" },
   flex: { provider: "neuralwatt", id: "kimi-k3.1-pro-flex" },
   auto: { provider: "jev", id: "auto" },
 };

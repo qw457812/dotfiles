@@ -28,27 +28,6 @@ hs.urlevent.bind("mouse_center_click", function(eventName, params)
   mouseCenterClick()
 end)
 
--- function maximizeWindow()
---   -- local win = hs.window.focusedWindow()
---   -- local f = win:frame()
---   -- local screen = win:screen()
---   -- local max = screen:frame()
---   -- f.x = max.x
---   -- f.y = max.y
---   -- f.w = max.w
---   -- f.h = max.h
---   -- win:setFrame(f, 0)
---
---   -- Maximize Window use Rectangle.app, note that not work with yabai
---   -- https://www.hammerspoon.org/docs/hs.eventtap.html#keyStroke
---   -- https://www.hammerspoon.org/docs/hs.keycodes.html#map
---   hs.eventtap.keyStroke({ "ctrl", "alt", "shift" }, "space")
--- end
--- hs.urlevent.bind("mouse_center_click_then_maximize_window", function(eventName, params)
---   mouseCenterClick()
---   maximizeWindow()
--- end)
-
 function cmdTab(repeatTimes)
   -- problem: act like cmd+tab, but not release cmd
   -- hs.eventtap.keyStroke({"cmd"}, "tab")
@@ -163,56 +142,5 @@ end
 hs.urlevent.bind("mouse_highlight", function(eventName, params)
   mouseHighlight()
 end)
-
---[[
--- https://github.com/dbalatero/VimMode.spoon
---------------------------------
--- START VIM CONFIG
---------------------------------
-local VimMode = hs.loadSpoon("VimMode")
-local vim = VimMode:new()
-
--- Configure apps you do *not* want Vim mode enabled in
--- For example, you don't want this plugin overriding your control of Terminal
--- vim
--- [:j :i] :!!f18 | ~/.config/karabiner.edn
-vim
-  :disableForApp('Code')
-  :disableForApp('zoom.us')
-  :disableForApp('iTerm')
-  :disableForApp('iTerm2')
-  :disableForApp('Terminal')
-
--- If you want the screen to dim (a la Flux) when you enter normal mode
--- flip this to true.
-vim:shouldDimScreenInNormalMode(false)
-
--- If you want to show an on-screen alert when you enter normal mode, set
--- this to true
-vim:shouldShowAlertInNormalMode(true)
-
--- You can configure your on-screen alert font
-vim:setAlertFont("Courier New")
-
--- Enter normal mode by typing a key sequence
--- vim:enterWithSequence('jk')
-
--- if you want to bind a single key to entering vim, remove the
--- :enterWithSequence('jk') line above and uncomment the bindHotKeys line
--- below:
---
--- To customize the hot key you want, see the mods and key parameters at:
---   https://www.hammerspoon.org/docs/hs.hotkey.html#bind
---
--- vim:bindHotKeys({ enter = { {'ctrl'}, ';' } })
-vim:bindHotKeys({ enter = { {"ctrl", "alt", "cmd", "shift"}, 'f19' } })
-
--- https://github.com/dbalatero/VimMode.spoon#block-cursor-mode
--- vim:enableBetaFeature('block_cursor_overlay')
-
---------------------------------
--- END VIM CONFIG
---------------------------------
---]]
 
 hs.alert.show("Hammerspoon Config loaded")

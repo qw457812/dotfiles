@@ -44,6 +44,9 @@ return {
                     title = "oh-my-tmux .tmux.conf.local",
                     zindex = (vim.api.nvim_win_get_config(0).zindex or 50) + 1,
                     b = { user_lualine_filename = "diff" },
+                    on_close = function(win)
+                      win:close() -- fully close on `hide` to make it one-time
+                    end,
                   },
                 })
               end, { buffer = ev.buf, desc = "Diff with upstream oh-my-tmux" })

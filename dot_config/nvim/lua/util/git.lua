@@ -210,6 +210,14 @@ function M.diff_term(opts)
   end
   vim.list_extend(cmd, opts.cmd_args)
 
+  -- NOTE: the wrapper below is a call-site `opts.win.on_close` for `Snacks.terminal`, so it is the one merged
+  -- last: a global `on_close` from `opts.terminal.win` or `opts.win` is shadowed by `Snacks.config.get`, and one
+  -- from any `opts.styles.*` (`terminal|minimal|float|split`, or a custom style pulled in via `style = "..."`)
+  -- by `Snacks.win.resolve`; none of them ever run here.
+  -- Only the `diff_term` caller's `on_close`, captured below, is chained.
+  -- ref:
+  -- - https://github.com/folke/snacks.nvim/blob/882c996cf28183f4d63640de0b4c02ec886d01f2/lua/snacks/terminal.lua#L89-L93
+  -- - https://github.com/folke/snacks.nvim/blob/882c996cf28183f4d63640de0b4c02ec886d01f2/lua/snacks/win.lua#L257-L268
   local on_close = opts.win.on_close
   opts.win.on_close = function(win)
     win:close() -- fully close on `hide` to make it one-time

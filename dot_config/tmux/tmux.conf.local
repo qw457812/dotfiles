@@ -393,7 +393,6 @@ tmux_conf_theme_clock_style="24"
 #   - false (default)
 #   - disabled
 # on Linux, this requires xsel, xclip or wl-copy
-# tmux_conf_copy_to_os_clipboard=false
 tmux_conf_copy_to_os_clipboard=true # for terminal inside vscode
 
 
@@ -413,7 +412,6 @@ tmux_conf_urlscan_options="--compact --dedupe"
 set -g history-limit 50000
 
 # start with mouse mode enabled
-#set -g mouse on
 %if #{TERMUX_VERSION}
 set -g mouse on
 %endif
@@ -528,6 +526,7 @@ bind-key -n 'C-k' if-shell "$is_vim" 'send-keys C-k' \
       { if-shell "$is_wezterm" "run-shell \"wezterm cli activate-pane-direction --pane-id \$(wezterm cli list-clients --format json | jq -r 'sort_by(.idle_time.nanos) | .[0].focused_pane_id') Up\"" \
         { if-shell "$is_kitty" "run-shell \"kitty @ kitten neighboring_window.py top\"" '' } } } \
     'select-pane -U' }
+# note: C-l for clear-history not working anymore
 bind-key -n 'C-l' if-shell "$is_vim" 'send-keys C-l' \
   { if -F '#{pane_at_right}' \
     { if-shell "$is_herdr_app" "run-shell -E \"herdr-app do pane.go --direction right >/dev/null\"" \
@@ -612,19 +611,6 @@ tmux_conf_uninstall_plugins_on_reload=false
 #set -g @plugin 'tmux-plugins/tmux-cpu'
 set -g @plugin 'MunifTanjim/tmux-suspend'
 set -g @plugin 'MunifTanjim/tmux-mode-indicator'
-# set -g @plugin 'tmux-plugins/tmux-sidebar'
-# set -g @sidebar-tree-command 'tree -C'
-set -g @plugin 'tmux-plugins/tmux-open'
-set -g @open 'O'
-set -g @open-S 'https://www.google.com/search?q='
-# # https://github.com/aserowy/tmux.nvim#tpm
-# # note: C-l for clear-history not working anymore
-# set -g @plugin 'aserowy/tmux.nvim'
-# set -g @tmux-nvim-navigation-cycle false
-# set -g @tmux-nvim-resize-keybinding-left 'C-Left'
-# set -g @tmux-nvim-resize-keybinding-down 'C-Down'
-# set -g @tmux-nvim-resize-keybinding-up 'C-Up'
-# set -g @tmux-nvim-resize-keybinding-right 'C-Right'
 set -g @plugin 'tmux-plugins/tmux-resurrect'
 # set -g @resurrect-capture-pane-contents 'on'
 # set -g @resurrect-strategy-nvim 'session'
