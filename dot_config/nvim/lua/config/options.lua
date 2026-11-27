@@ -34,7 +34,7 @@ vim.g.user_term_close_key = "<S-BS>"
 vim.g.user_is_wezterm = not vim.g.neovide and vim.env.WEZTERM_UNIX_SOCKET ~= nil
 vim.g.user_is_kitty = not vim.g.neovide and vim.env.KITTY_PID ~= nil
 vim.g.user_is_ghostty = not vim.g.neovide and vim.env.GHOSTTY_RESOURCES_DIR ~= nil
-vim.g.user_is_rex = not vim.g.neovide and vim.env.REX_SESSION ~= nil
+vim.g.user_is_rex = not vim.g.neovide and vim.env.REX_BLOCK ~= nil
 vim.g.user_is_herdr_app = not vim.g.neovide and vim.env.HC_TERMINAL_ID ~= nil
 vim.g.user_is_tmux = not vim.g.neovide and vim.env.TMUX ~= nil
 vim.g.user_is_termux = vim.env.TERMUX_VERSION ~= nil

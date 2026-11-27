@@ -11,7 +11,7 @@
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
-const IS_REX = Boolean(process.env.REX_SESSION);
+const IS_REX = Boolean(process.env.REX_BLOCK);
 const REX_PROMPT_SECTION = "rex";
 const REX_SESSION_START_TIMEOUT_MS = 3000;
 

@@ -30,7 +30,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 const IS_TERMUX = Boolean(process.env.TERMUX_VERSION);
-const IS_REX = Boolean(process.env.REX_SESSION);
+const IS_REX = Boolean(process.env.REX_BLOCK);
 
 const PROMPT_HIDDEN_SKILLS = [
   // git:github.com/mitsuhiko/agent-stuff
