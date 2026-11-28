@@ -3,6 +3,16 @@
     "codesearch": {
       "url": "https://mcp.grep.app"
     },
+    "atuin": {
+      "command": "atuin",
+      "args": [
+        "mcp"
+      ],
+      "toolExposure": {
+        "atuin_output": "hidden",
+        "atuin_output_search": "hidden"
+      }
+    },
     "artificial-analysis": {
       "url": "https://mcp.artificialanalysis.ai/mcp",
       "headers": {

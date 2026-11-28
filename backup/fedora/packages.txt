@@ -20,7 +20,6 @@ atheros-firmware
 at-spi2-atk
 at-spi2-core
 attr
-atuin
 audiocd-kio
 audit
 b43-fwcutter
