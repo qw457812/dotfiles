@@ -10,11 +10,11 @@ local use_smart_splits = is_wezterm or is_kitty or is_ghostty or is_rex or is_he
 do
   -- https://www.superlogical.com/rex/docs/customize/resume-rules#example-neovim-sessions
   -- https://www.superlogical.com/rex/docs/build/program-resume
-  local rex_resume_token = vim.env.OSC7577_TOKEN
+  local program_resume_token = vim.env.OSC7577_TOKEN
   vim.env.OSC7577_TOKEN = nil
-  if rex_resume_token then
+  if program_resume_token then
     vim.api.nvim_create_autocmd("SessionWritePost", {
-      group = vim.api.nvim_create_augroup("rex_resume", {}),
+      group = vim.api.nvim_create_augroup("program_resume", {}),
       callback = function()
         if vim.v.this_session == "" then
           return
@@ -22,7 +22,7 @@ do
         local argv = vim.tbl_map(vim.base64.encode, { "nvim", "-S", vim.v.this_session })
         -- This process is Neovim's server. The terminal runs its parent, the TUI.
         local body = ("pid=%d:time=%d:argv=%s"):format(vim.uv.os_getppid(), os.time(), table.concat(argv, ","))
-        local mac = vim.fn.sha256(body .. ":" .. rex_resume_token)
+        local mac = vim.fn.sha256(body .. ":" .. program_resume_token)
         io.stderr:write("\27]7577;", body, ":mac=", mac, "\27\\")
       end,
     })

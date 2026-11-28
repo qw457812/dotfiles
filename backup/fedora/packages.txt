@@ -402,6 +402,7 @@ v2ray
 v2raya
 vim-minimal
 vlc-plugin-gstreamer
+w3m
 wget2-wget
 which
 whois

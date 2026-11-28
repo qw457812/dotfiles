@@ -45,14 +45,15 @@ return {
       } --[[@as PluginLspOpts]])
     end,
   },
-  {
-    "stevearc/conform.nvim",
-    optional = true,
-    opts = function(_, opts)
-      opts.formatters_by_ft = opts.formatters_by_ft or {}
-      opts.formatters_by_ft.fish = nil -- using fish-lsp
-    end,
-  },
+  -- -- using fish_indent instead of fish-lsp since fish-lsp's formatting changes vim.bo.modified
+  -- {
+  --   "stevearc/conform.nvim",
+  --   optional = true,
+  --   opts = function(_, opts)
+  --     opts.formatters_by_ft = opts.formatters_by_ft or {}
+  --     opts.formatters_by_ft.fish = nil -- using fish-lsp
+  --   end,
+  -- },
 
   -- zsh
   {

@@ -58,16 +58,20 @@ together; never leave one without the other.
    {{ .chezmoi.sourceDir }}/symlinks/<app>/<rest>
    ```
 
-   Name = `symlink_<basename>.tmpl`, where `<basename>` is the plain source
-   filename you just moved (e.g. `default.rules` → `symlink_default.rules.tmpl`;
-   the directory's `dot_`/`private_` prefix already encodes the target location,
-   so it carries through unchanged). Do not apply this naming rule to source
-   templates like `foo.tmpl`; templated source files are out of scope for this
-   workflow.
+   Name = `symlink_<basename>.tmpl`. Chezmoi allows only `symlink_` and
+   `dot_` on a symbolic link target, in that order. Keep `dot_` so the target
+   keeps its leading dot (`dot_config.toml` → `symlink_dot_config.toml.tmpl`),
+   but drop any other file-level prefix: `private_config.toml` →
+   `symlink_config.toml.tmpl`, because `symlink_private_config.toml.tmpl`
+   targets `private_config.toml`. Move the dropped attribute's effect to the
+   backing file's mode instead, e.g. `chmod 600` for `private_`. Directory
+   prefixes such as `dot_` and `private_` carry through unchanged. Do not apply
+   this naming rule to source templates like `foo.tmpl`; templated source files
+   are out of scope for this workflow.
 
    Completion criterion: the pointer file exists in the vacated directory with
    exactly that body — one line, `{{ .chezmoi.sourceDir }}` prefix, trailing
-   newline.
+   newline — and `chezmoi target-path <pointer>` names the expected target.
 
 4. **Apply the pointer and verify the symlink resolves.** Apply the target so
    the pointer is realised, then confirm both chezmoi's view and the live
