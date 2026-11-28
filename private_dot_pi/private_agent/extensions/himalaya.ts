@@ -20,20 +20,23 @@ export function passEntries(text: string): string[] {
   return [...uncommented.matchAll(PASS_SHOW_RE)].map((match) => match[1]);
 }
 
+export function configPaths(
+  home = HOME,
+  xdg = process.env.XDG_CONFIG_HOME || join(home, ".config"),
+): string[] {
+  return [
+    ...new Set([
+      join(xdg, "himalaya", "config.toml"),
+      join(home, ".config", "himalaya", "config.toml"),
+      join(home, ".himalayarc"),
+    ]),
+  ];
+}
+
 // Config is authoritative: pass entries may be named anything.
 function discoverEntries(): string[] {
-  // TODO: himalaya master ignores HIMALAYA_CONFIG and deep-merges every default
-  // path; scan env paths plus XDG, ~/.config and ~/.himalayarc instead.
-  const configured = process.env.HIMALAYA_CONFIG?.split(":").filter(Boolean) ?? [];
-  const files = configured.length
-    ? configured
-    : [
-        join(process.env.XDG_CONFIG_HOME ?? join(HOME, ".config"), "himalaya/config.toml"),
-        join(HOME, ".himalayarc"),
-      ];
-
   const entries = new Set<string>();
-  for (const file of files) {
+  for (const file of configPaths()) {
     let text: string;
     try {
       text = readFileSync(file, "utf8");

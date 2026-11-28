@@ -1,5 +1,27 @@
-import { describe, expect, it } from "vitest";
-import { passEntries } from "../extensions/himalaya.ts";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { configPaths, passEntries } from "../extensions/himalaya.ts";
+
+describe("himalaya config paths", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("reads every default layer, the rc file last", () => {
+    expect(configPaths("/home/alice", "/xdg")).toEqual([
+      "/xdg/himalaya/config.toml",
+      "/home/alice/.config/himalaya/config.toml",
+      "/home/alice/.himalayarc",
+    ]);
+  });
+
+  it("falls back to ~/.config without XDG_CONFIG_HOME", () => {
+    vi.stubEnv("XDG_CONFIG_HOME", "");
+    expect(configPaths("/home/alice")).toEqual([
+      "/home/alice/.config/himalaya/config.toml",
+      "/home/alice/.himalayarc",
+    ]);
+  });
+});
 
 describe("himalaya pass entries", () => {
   it("reads string and array commands", () => {

@@ -224,8 +224,6 @@ brew "helix"
 brew "hf"
 # Convert source code to formatted text with syntax highlighting
 brew "highlight"
-# CLI email client written in Rust
-brew "himalaya"
 # Interactive command-line HTTP client with autocomplete and syntax highlighting
 brew "http-prompt"
 # User-friendly cURL replacement (command-line HTTP client)

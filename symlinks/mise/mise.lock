@@ -20,21 +20,20 @@ checksum = "sha256:6c4bb87dd013ed1a8d6a16e357a3d094959fd5530b4d7061f7f3680c3c7ce
 url = "https://github.com/oven-sh/bun/releases/download/bun-v1.3.12/bun-darwin-aarch64.zip"
 
 [[tools.himalaya]]
-version = "2.2.1"
+version = "3.0.0"
 backend = "github:pimalaya/himalaya"
 specifiers = ["latest"]
 
 [tools.himalaya."platforms.linux-arm64"]
-checksum = "sha256:1dc21c3dd6d948929e22e5cae49b9d0b3b30ff88fafd4493fd4460c6252e9d90"
+checksum = "sha256:2045bb610f8c6829866a5f89f5e0e91606c3612c66533ff93c7eebbf36c1815f"
 checksum_source = "mise-versions"
-url = "https://github.com/pimalaya/himalaya/releases/download/v2.2.1/himalaya.aarch64-linux.tgz"
-url_api = "https://api.github.com/repos/pimalaya/himalaya/releases/assets/605477871"
+url = "https://github.com/pimalaya/himalaya/releases/download/v3.0.0/himalaya.aarch64-linux.tgz"
+url_api = "https://api.github.com/repos/pimalaya/himalaya/releases/assets/796968845"
 
 [tools.himalaya."platforms.macos-arm64"]
-checksum = "sha256:a5d97a1f7bbca45e58bddde3f9f17325f614c9cd6d5f17fabf38ddcb030869ab"
-checksum_source = "mise-versions"
-url = "https://github.com/pimalaya/himalaya/releases/download/v2.2.1/himalaya.aarch64-darwin.tgz"
-url_api = "https://api.github.com/repos/pimalaya/himalaya/releases/assets/605476229"
+checksum = "sha256:9668e824c7d518ce0db4f01a10aa2f6a8d6c631b03a4ad20c4aba58f19d85ccb"
+url = "https://github.com/pimalaya/himalaya/releases/download/v3.0.0/himalaya.aarch64-darwin.tgz"
+url_api = "https://api.github.com/repos/pimalaya/himalaya/releases/assets/796973195"
 
 [[tools.java]]
 version = "zulu-25.38.201.0"
